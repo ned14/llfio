@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Express 2012 for Windows Desktop
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TripleGit", "TripleGit\TripleGit.vcxproj", "{D733647B-03E2-449A-9B5C-D33840F1520F}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "unittests", "unittests\unittests.vcxproj", "{5D87A57F-B41E-49D3-BEE8-9D35492F62F8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D733647B-03E2-449A-9B5C-D33840F1520F}.Debug|Win32.ActiveCfg = Debug|Win32
+		{D733647B-03E2-449A-9B5C-D33840F1520F}.Debug|Win32.Build.0 = Debug|Win32
+		{D733647B-03E2-449A-9B5C-D33840F1520F}.Release|Win32.ActiveCfg = Release|Win32
+		{D733647B-03E2-449A-9B5C-D33840F1520F}.Release|Win32.Build.0 = Release|Win32
+		{5D87A57F-B41E-49D3-BEE8-9D35492F62F8}.Debug|Win32.ActiveCfg = Debug|Win32
+		{5D87A57F-B41E-49D3-BEE8-9D35492F62F8}.Debug|Win32.Build.0 = Debug|Win32
+		{5D87A57F-B41E-49D3-BEE8-9D35492F62F8}.Release|Win32.ActiveCfg = Release|Win32
+		{5D87A57F-B41E-49D3-BEE8-9D35492F62F8}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
