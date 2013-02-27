@@ -5,20 +5,54 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TripleGit", "TripleGit\Trip
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "unittests", "unittests\unittests.vcxproj", "{5D87A57F-B41E-49D3-BEE8-9D35492F62F8}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "niallsnasty256hash", "triplegit\hashes\niallsnasty256hash\niallsnasty256hash.vcxproj", "{903BF1F3-14E6-4681-B054-CA183F72EC2F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|ARM = Debug|ARM
 		Debug|Win32 = Debug|Win32
+		Debug|x64 = Debug|x64
+		Release|ARM = Release|ARM
 		Release|Win32 = Release|Win32
+		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D733647B-03E2-449A-9B5C-D33840F1520F}.Debug|ARM.ActiveCfg = Debug|ARM
+		{D733647B-03E2-449A-9B5C-D33840F1520F}.Debug|ARM.Build.0 = Debug|ARM
 		{D733647B-03E2-449A-9B5C-D33840F1520F}.Debug|Win32.ActiveCfg = Debug|Win32
 		{D733647B-03E2-449A-9B5C-D33840F1520F}.Debug|Win32.Build.0 = Debug|Win32
+		{D733647B-03E2-449A-9B5C-D33840F1520F}.Debug|x64.ActiveCfg = Debug|x64
+		{D733647B-03E2-449A-9B5C-D33840F1520F}.Debug|x64.Build.0 = Debug|x64
+		{D733647B-03E2-449A-9B5C-D33840F1520F}.Release|ARM.ActiveCfg = Release|ARM
+		{D733647B-03E2-449A-9B5C-D33840F1520F}.Release|ARM.Build.0 = Release|ARM
 		{D733647B-03E2-449A-9B5C-D33840F1520F}.Release|Win32.ActiveCfg = Release|Win32
 		{D733647B-03E2-449A-9B5C-D33840F1520F}.Release|Win32.Build.0 = Release|Win32
+		{D733647B-03E2-449A-9B5C-D33840F1520F}.Release|x64.ActiveCfg = Release|x64
+		{D733647B-03E2-449A-9B5C-D33840F1520F}.Release|x64.Build.0 = Release|x64
+		{5D87A57F-B41E-49D3-BEE8-9D35492F62F8}.Debug|ARM.ActiveCfg = Debug|ARM
+		{5D87A57F-B41E-49D3-BEE8-9D35492F62F8}.Debug|ARM.Build.0 = Debug|ARM
 		{5D87A57F-B41E-49D3-BEE8-9D35492F62F8}.Debug|Win32.ActiveCfg = Debug|Win32
 		{5D87A57F-B41E-49D3-BEE8-9D35492F62F8}.Debug|Win32.Build.0 = Debug|Win32
+		{5D87A57F-B41E-49D3-BEE8-9D35492F62F8}.Debug|x64.ActiveCfg = Debug|x64
+		{5D87A57F-B41E-49D3-BEE8-9D35492F62F8}.Debug|x64.Build.0 = Debug|x64
+		{5D87A57F-B41E-49D3-BEE8-9D35492F62F8}.Release|ARM.ActiveCfg = Release|ARM
+		{5D87A57F-B41E-49D3-BEE8-9D35492F62F8}.Release|ARM.Build.0 = Release|ARM
 		{5D87A57F-B41E-49D3-BEE8-9D35492F62F8}.Release|Win32.ActiveCfg = Release|Win32
 		{5D87A57F-B41E-49D3-BEE8-9D35492F62F8}.Release|Win32.Build.0 = Release|Win32
+		{5D87A57F-B41E-49D3-BEE8-9D35492F62F8}.Release|x64.ActiveCfg = Release|x64
+		{5D87A57F-B41E-49D3-BEE8-9D35492F62F8}.Release|x64.Build.0 = Release|x64
+		{903BF1F3-14E6-4681-B054-CA183F72EC2F}.Debug|ARM.ActiveCfg = Debug|ARM
+		{903BF1F3-14E6-4681-B054-CA183F72EC2F}.Debug|ARM.Build.0 = Debug|ARM
+		{903BF1F3-14E6-4681-B054-CA183F72EC2F}.Debug|Win32.ActiveCfg = Debug|Win32
+		{903BF1F3-14E6-4681-B054-CA183F72EC2F}.Debug|Win32.Build.0 = Debug|Win32
+		{903BF1F3-14E6-4681-B054-CA183F72EC2F}.Debug|x64.ActiveCfg = Debug|x64
+		{903BF1F3-14E6-4681-B054-CA183F72EC2F}.Debug|x64.Build.0 = Debug|x64
+		{903BF1F3-14E6-4681-B054-CA183F72EC2F}.Release|ARM.ActiveCfg = Release|ARM
+		{903BF1F3-14E6-4681-B054-CA183F72EC2F}.Release|ARM.Build.0 = Release|ARM
+		{903BF1F3-14E6-4681-B054-CA183F72EC2F}.Release|Win32.ActiveCfg = Release|Win32
+		{903BF1F3-14E6-4681-B054-CA183F72EC2F}.Release|Win32.Build.0 = Release|Win32
+		{903BF1F3-14E6-4681-B054-CA183F72EC2F}.Release|x64.ActiveCfg = Release|x64
+		{903BF1F3-14E6-4681-B054-CA183F72EC2F}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
