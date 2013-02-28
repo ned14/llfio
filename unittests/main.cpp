@@ -8,8 +8,9 @@ Created: Feb 2013
 #include "../triplegit/hashes/niallsnasty256hash/niallsnasty256hash.hpp"
 #include <iostream>
 #include <random>
+#include <chrono>
 
-static char random[1024*1024];
+static char random[25*1024*1024];
 
 int main (int argc, char * const argv[]) {
     std::mt19937 gen(0x78adbcff);
@@ -60,9 +61,35 @@ TEST_CASE("niallsnasty256hash/works", "Tests that niallsnasty256hash works")
 {
 	using namespace NiallsNasty256Hash;
 	using namespace std;
-	const string shouldbe("fdfebc853403a53055875ead6eda6ea8dc2468d6daa4c4607d0caacbd88f31f3");
+	const string shouldbe("cbfcbb29c84eea014a3e10af5c0687a2853582ffda4bfdf34b82e8d2bc28a1f6");
+	auto scratch=unique_ptr<char>(new char[sizeof(random)]);
+	typedef chrono::duration<double, ratio<1>> secs_type;
+	for(int n=0; n<100; n++)
+	{
+		memcpy(scratch.get(), random, sizeof(random));
+	}
+	{
+		auto begin=chrono::high_resolution_clock::now();
+		auto p=scratch.get();
+		for(int n=0; n<1000; n++)
+		{
+			memcpy(p, random, sizeof(random));
+		}
+		auto end=chrono::high_resolution_clock::now();
+		auto diff=chrono::duration_cast<secs_type>(end-begin);
+		cout << "memcpy does " << ((1000*sizeof(random))/diff.count())/1024/1024 << "Mb/sec" << endl;
+	}
 	Hash256 hash;
-	AddToHash256(hash, random, sizeof(random));
+	{
+		auto begin=chrono::high_resolution_clock::now();
+		for(int n=0; n<1000; n++)
+		{
+			AddToHash256(hash, random, sizeof(random));
+		}
+		auto end=chrono::high_resolution_clock::now();
+		auto diff=chrono::duration_cast<secs_type>(end-begin);
+		cout << "Niall's nasty 256 bit hash does " << ((1000*sizeof(random))/diff.count())/1024/1024 << "Mb/sec" << endl;
+	}
 	cout << "Hash is " << hash.asHexString() << endl;
 	CHECK(shouldbe==hash.asHexString());
 }
