@@ -59,6 +59,7 @@ class TYPEALIGNMENT(32) Hash256
 	{
 		char asBytes[32];
 		unsigned long long asLongLongs[4];
+		size_t asSize_t;
 #if HAVE_M128
 		__m128i asM128s[2];
 #endif
@@ -131,6 +132,8 @@ public:
 	bool operator==(const Hash256 &o) const { return !memcmp(mydata.asBytes, o.mydata.asBytes, sizeof(mydata.asBytes)); }
 	bool operator>(const Hash256 &o) const { return memcmp(mydata.asBytes, o.mydata.asBytes, sizeof(mydata.asBytes))>0; }
 #endif
+	Hash256(Hash256 &&o) { *this=o; }
+	Hash256 &operator=(Hash256 &&o) { *this=o; return *this; }
 	bool operator!=(const Hash256 &o) const { return !(*this==o); }
 	bool operator<(const Hash256 &o) const { return o>*this; }
 	bool operator>=(const Hash256 &o) const { return !(o>*this); }
@@ -139,6 +142,8 @@ public:
 	const char *asBytes() const { return mydata.asBytes; }
 	//! Returns the hash as long longs
 	const unsigned long long *asLongLongs() const { return mydata.asLongLongs; }
+	//! Returns the front of the hash as a size_t
+	size_t asSize_t() const { return mydata.asSize_t; }
 	//! Returns the hash as a 64 character hexadecimal string
 	std::string asHexString() const
 	{
@@ -157,5 +162,36 @@ public:
 extern void AddToHash256(Hash256 &hash, const char *data, size_t length);
 
 } //namespace
+
+namespace std
+{
+	//! Defines a hash for a Hash256 (simply truncates)
+	template<> struct hash<::NiallsNasty256Hash::Hash256>
+	{
+		size_t operator()(const ::NiallsNasty256Hash::Hash256 &v) const
+		{
+			return v.asSize_t();
+		}
+	};
+	//! Stop the default std::vector<> doing unaligned storage
+	template<> class vector<::NiallsNasty256Hash::Hash256, allocator<::NiallsNasty256Hash::Hash256>> : public vector<::NiallsNasty256Hash::Hash256, NiallsCPP11Utilities::aligned_allocator<::NiallsNasty256Hash::Hash256>>
+	{
+		typedef vector<::NiallsNasty256Hash::Hash256, NiallsCPP11Utilities::aligned_allocator<::NiallsNasty256Hash::Hash256>> Base;
+	public:
+		explicit vector (const allocator_type& alloc = allocator_type()) : Base(alloc) { }
+		explicit vector (size_type n) : Base(n) { }
+		vector (size_type n, const value_type& val,
+			const allocator_type& alloc = allocator_type()) : Base(n, val, alloc) { }
+		template <class InputIterator> vector (InputIterator first, InputIterator last,
+			const allocator_type& alloc = allocator_type()) : Base(first, last, alloc) { }
+		vector (const vector& x) : Base(x) { }
+		vector (const vector& x, const allocator_type& alloc) : Base(x, alloc) { }
+		vector (vector&& x) : Base(std::move(x)) { }
+		vector (vector&& x, const allocator_type& alloc) : Base(std::move(x), alloc) { }
+#if defined(_MSC_VER) && _MSC_VER>1700
+		vector (initializer_list<value_type> il, const allocator_type& alloc = allocator_type()) : Base(il, alloc) { }
+#endif
+	};
+}
 
 #endif

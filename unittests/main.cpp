@@ -55,6 +55,10 @@ TEST_CASE("niallsnasty256hash/Hash256/works", "Tests that Hash256 works")
 	CHECK_FALSE(hash1>hash1);
 	CHECK(hash2>=hash2);
 	CHECK_FALSE(hash2>hash2);
+
+	CHECK(alignment_of<Hash256>::value==32);
+	vector<Hash256> hashes(4);
+	CHECK(vector<Hash256>::allocator_type::alignment==32);
 }
 
 TEST_CASE("niallsnasty256hash/works", "Tests that niallsnasty256hash works")
