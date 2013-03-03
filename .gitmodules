@@ -1,8 +1,8 @@
 [submodule "unittests/CATCH"]
 	path = unittests/CATCH
 	url = https://github.com/philsquared/Catch.git
-[submodule "triplegit/boost"]
-	path = triplegit/boost
+[submodule "boost"]
+	path = boost
 	url = git://github.com/ryppl/boost-svn.git
 [submodule "NiallsCPP11Utilities"]
 	path = NiallsCPP11Utilities
