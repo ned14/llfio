@@ -5,95 +5,189 @@ Created: Feb 2013
 
 #define CATCH_CONFIG_RUNNER
 #include "catch.hpp"
-#include "../triplegit/hashes/niallsnasty256hash/niallsnasty256hash.hpp"
-#include <iostream>
-#include <random>
-#include <chrono>
+#include <utility>
+#include <sstream>
+#include "boost/graph/adjacency_list.hpp"
+#include "boost/graph/topological_sort.hpp"
+#include "boost/graph/depth_first_search.hpp"
+#include "boost/graph/dijkstra_shortest_paths.hpp"
+#include "boost/graph/visitors.hpp"
 
-static char random[25*1024*1024];
+enum files_e { dax_h, yow_h, boz_h, zow_h, foo_cpp, 
+               foo_o, bar_cpp, bar_o, libfoobar_a,
+               zig_cpp, zig_o, zag_cpp, zag_o, 
+                 libzigzag_a, killerapp, N };
+const char* name[] = { "dax.h", "yow.h", "boz.h", "zow.h", "foo.cpp",
+                       "foo.o", "bar.cpp", "bar.o", "libfoobar.a",
+                       "zig.cpp", "zig.o", "zag.cpp", "zag.o",
+                       "libzigzag.a", "killerapp" };
+typedef std::pair<int,int> Edge;
+Edge used_by[] = {
+	Edge(dax_h, foo_cpp), Edge(dax_h, bar_cpp), Edge(dax_h, yow_h),
+	Edge(yow_h, bar_cpp), Edge(yow_h, zag_cpp),
+	Edge(boz_h, bar_cpp), Edge(boz_h, zig_cpp), Edge(boz_h, zag_cpp),
+	Edge(zow_h, foo_cpp), 
+	Edge(foo_cpp, foo_o),
+	Edge(foo_o, libfoobar_a),
+	Edge(bar_cpp, bar_o),
+	Edge(bar_o, libfoobar_a),
+	Edge(libfoobar_a, libzigzag_a),
+	Edge(zig_cpp, zig_o),
+	Edge(zig_o, libzigzag_a),
+	Edge(zag_cpp, zag_o),
+	Edge(zag_o, libzigzag_a),
+	Edge(libzigzag_a, killerapp)
+};
+const std::size_t nedges = sizeof(used_by)/sizeof(Edge);
 
 int main (int argc, char * const argv[]) {
-    std::mt19937 gen(0x78adbcff);
-    std::uniform_int_distribution<char> dis;
-	for(int n=0; n<sizeof(random); n++)
-	{
-		random[n]=dis(gen);
-	}
     int ret=Catch::Main( argc, argv );
 	printf("Press Return to exit ...\n");
 	getchar();
 	return ret;
 }
 
-TEST_CASE("niallsnasty256hash/Hash256/works", "Tests that Hash256 works")
+struct print_visitor : public boost::bfs_visitor<> {
+  std::ostream &out;
+  print_visitor(std::ostream &_out) : out(_out) { }
+  template <class Vertex, class Graph>
+  void discover_vertex(Vertex v, Graph&) {
+    out << name[v] << " ";
+  }
+};
+
+
+struct cycle_detector : public boost::dfs_visitor<>
 {
-	using namespace NiallsNasty256Hash;
-	using namespace std;
-	char _hash1[32], _hash2[32];
-	memset(_hash1, 0, sizeof(_hash1));
-	memset(_hash2, 0, sizeof(_hash2));
-	_hash1[5]=78;
-	_hash2[31]=1;
-	Hash256 hash1(_hash1), hash2(_hash2), null;
-	cout << "hash1=0x" << hash1.asHexString() << endl;
-	cout << "hash2=0x" << hash2.asHexString() << endl;
-	CHECK(hash1==hash1);
-	CHECK(hash2==hash2);
-	CHECK(null==null);
-	CHECK(hash1!=null);
-	CHECK(hash2!=null);
-	CHECK(hash1!=hash2);
+  cycle_detector(bool& has_cycle) 
+    : m_has_cycle(has_cycle) { }
 
-	CHECK(hash1<hash2);
-	CHECK_FALSE(hash1>hash2);
-	CHECK(hash2>hash1);
-	CHECK_FALSE(hash2<hash1);
+  template <class Edge, class Graph>
+  void back_edge(Edge, Graph&) { m_has_cycle = true; }
+protected:
+  bool& m_has_cycle;
+};
 
-	CHECK(hash1<=hash2);
-	CHECK_FALSE(hash1>=hash2);
-	CHECK(hash1>=hash1);
-	CHECK_FALSE(hash1>hash1);
-	CHECK(hash2>=hash2);
-	CHECK_FALSE(hash2>hash2);
 
-	CHECK(alignment_of<Hash256>::value==32);
-	vector<Hash256> hashes(4);
-	CHECK(vector<Hash256>::allocator_type::alignment==32);
-}
-
-TEST_CASE("niallsnasty256hash/works", "Tests that niallsnasty256hash works")
+TEST_CASE("boost.graph/works", "Tests that one of the samples from Boost.Graph works as advertised")
 {
-	using namespace NiallsNasty256Hash;
+	using namespace boost;
 	using namespace std;
-	const string shouldbe("cbfcbb29c84eea014a3e10af5c0687a2853582ffda4bfdf34b82e8d2bc28a1f6");
-	auto scratch=unique_ptr<char>(new char[sizeof(random)]);
-	typedef chrono::duration<double, ratio<1>> secs_type;
-	for(int n=0; n<100; n++)
-	{
-		memcpy(scratch.get(), random, sizeof(random));
-	}
-	{
-		auto begin=chrono::high_resolution_clock::now();
-		auto p=scratch.get();
-		for(int n=0; n<1000; n++)
-		{
-			memcpy(p, random, sizeof(random));
-		}
-		auto end=chrono::high_resolution_clock::now();
-		auto diff=chrono::duration_cast<secs_type>(end-begin);
-		cout << "memcpy does " << ((1000*sizeof(random))/diff.count())/1024/1024 << "Mb/sec" << endl;
-	}
-	Hash256 hash;
-	{
-		auto begin=chrono::high_resolution_clock::now();
-		for(int n=0; n<1000; n++)
-		{
-			AddToHash256(hash, random, sizeof(random));
-		}
-		auto end=chrono::high_resolution_clock::now();
-		auto diff=chrono::duration_cast<secs_type>(end-begin);
-		cout << "Niall's nasty 256 bit hash does " << ((1000*sizeof(random))/diff.count())/1024/1024 << "Mb/sec" << endl;
-	}
-	cout << "Hash is " << hash.asHexString() << endl;
-	CHECK(shouldbe==hash.asHexString());
+	typedef adjacency_list<vecS, vecS, bidirectionalS> Graph;
+	Graph g(used_by, used_by + nedges, N);
+	typedef graph_traits<Graph>::vertex_descriptor Vertex;
+	ostringstream out;
+
+  // Determine ordering for a full recompilation
+  // and the order with files that can be compiled in parallel
+  {
+    typedef list<Vertex> MakeOrder;
+    MakeOrder::iterator i;
+    MakeOrder make_order;
+
+    topological_sort(g, std::front_inserter(make_order));
+    out << "make ordering: ";
+    for (i = make_order.begin();
+         i != make_order.end(); ++i) 
+      out << name[*i] << " ";
+  
+    out << endl << endl;
+	cout << out.str();
+	CHECK(out.str()=="make ordering: zow.h boz.h zig.cpp zig.o dax.h yow.h zag.cpp zag.o bar.cpp bar.o foo.cpp foo.o libfoobar.a libzigzag.a killerapp \n\n");
+	out.clear();
+	out.str("");
+
+    // Parallel compilation ordering
+    std::vector<int> time(N, 0);
+    for (i = make_order.begin(); i != make_order.end(); ++i) {    
+      // Walk through the in_edges an calculate the maximum time.
+      if (in_degree (*i, g) > 0) {
+        Graph::in_edge_iterator j, j_end;
+        int maxdist=0;
+        // Through the order from topological sort, we are sure that every 
+        // time we are using here is already initialized.
+        for (boost::tie(j, j_end) = in_edges(*i, g); j != j_end; ++j)
+          maxdist=(std::max)(time[source(*j, g)], maxdist);
+        time[*i]=maxdist+1;
+      }
+    }
+
+    out << "parallel make ordering, " << endl
+         << "vertices with same group number can be made in parallel" << endl;
+    {
+      graph_traits<Graph>::vertex_iterator i, iend;
+      for (boost::tie(i,iend) = vertices(g); i != iend; ++i)
+        out << "time_slot[" << name[*i] << "] = " << time[*i] << endl;
+    }
+
+  }
+  out << endl;
+	cout << out.str();
+	const char *test1=R"(parallel make ordering, 
+vertices with same group number can be made in parallel
+time_slot[dax.h] = 0
+time_slot[yow.h] = 1
+time_slot[boz.h] = 0
+time_slot[zow.h] = 0
+time_slot[foo.cpp] = 1
+time_slot[foo.o] = 2
+time_slot[bar.cpp] = 2
+time_slot[bar.o] = 3
+time_slot[libfoobar.a] = 4
+time_slot[zig.cpp] = 1
+time_slot[zig.o] = 2
+time_slot[zag.cpp] = 2
+time_slot[zag.o] = 3
+time_slot[libzigzag.a] = 5
+time_slot[killerapp] = 6
+
+)";
+	CHECK(out.str()==test1);
+	out.clear();
+	out.str("");
+
+  // if I change yow.h what files need to be re-made?
+  {
+    out << "A change to yow.h will cause what to be re-made?" << endl;
+    print_visitor vis(out);
+    breadth_first_search(g, vertex(yow_h, g), visitor(vis));
+    out << endl;
+  }
+  out << endl;
+	cout << out.str();
+	CHECK(out.str()=="A change to yow.h will cause what to be re-made?\nyow.h bar.cpp zag.cpp bar.o zag.o libfoobar.a libzigzag.a killerapp \n\n");
+	out.clear();
+	out.str("");
+
+  // are there any cycles in the graph?
+  {
+    bool has_cycle = false;
+    cycle_detector vis(has_cycle);
+    depth_first_search(g, visitor(vis));
+    out << "The graph has a cycle? " << has_cycle << endl;
+  }
+  out << endl;
+	cout << out.str();
+	CHECK(out.str()=="The graph has a cycle? 0\n\n");
+	out.clear();
+	out.str("");
+
+  // add a dependency going from bar.cpp to dax.h
+  {
+    out << "adding edge bar_cpp -> dax_h" << endl;
+    add_edge(bar_cpp, dax_h, g);
+  }
+  out << endl;
+
+  // are there any cycles in the graph?
+  {
+    bool has_cycle = false;
+    cycle_detector vis(has_cycle);
+    depth_first_search(g, visitor(vis));
+    out << "The graph has a cycle now? " << has_cycle << endl;
+  }
+	cout << out.str();
+	CHECK(out.str()=="adding edge bar_cpp -> dax_h\n\nThe graph has a cycle now? 1\n");
+	out.clear();
+	out.str("");
 }

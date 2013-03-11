@@ -146,6 +146,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
+      <AdditionalIncludeDirectories>../boost</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -208,8 +209,8 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\triplegit\hashes\niallsnasty256hash\niallsnasty256hash.vcxproj">
-      <Project>{903bf1f3-14e6-4681-b054-ca183f72ec2f}</Project>
+    <ProjectReference Include="..\NiallsCPP11Utilities\NiallsCPP11Utilities.vcxproj">
+      <Project>{cf7497ef-702b-4237-bb7c-ad72c297b88e}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
