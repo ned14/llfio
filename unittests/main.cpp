@@ -68,13 +68,11 @@ protected:
   bool& m_has_cycle;
 };
 
-
-TEST_CASE("boost.graph/works", "Tests that one of the samples from Boost.Graph works as advertised")
+template<class adjacency_list> void TestGraph(adjacency_list &g)
 {
 	using namespace boost;
 	using namespace std;
-	typedef adjacency_list<vecS, vecS, bidirectionalS> Graph;
-	Graph g(used_by, used_by + nedges, N);
+	typedef adjacency_list Graph;
 	typedef graph_traits<Graph>::vertex_descriptor Vertex;
 	ostringstream out;
 
@@ -158,6 +156,15 @@ time_slot[killerapp] = 6
 	CHECK(out.str()=="A change to yow.h will cause what to be re-made?\nyow.h bar.cpp zag.cpp bar.o zag.o libfoobar.a libzigzag.a killerapp \n\n");
 	out.clear();
 	out.str("");
+}
+
+template<class adjacency_list> void ModifyGraph(adjacency_list &g)
+{
+	using namespace boost;
+	using namespace std;
+	typedef adjacency_list Graph;
+	typedef graph_traits<Graph>::vertex_descriptor Vertex;
+	ostringstream out;
 
   // are there any cycles in the graph?
   {
@@ -190,4 +197,13 @@ time_slot[killerapp] = 6
 	CHECK(out.str()=="adding edge bar_cpp -> dax_h\n\nThe graph has a cycle now? 1\n");
 	out.clear();
 	out.str("");
+}
+
+TEST_CASE("boost.graph/works", "Tests that one of the samples from Boost.Graph works as advertised")
+{
+	using namespace boost;
+	typedef adjacency_list<vecS, vecS, bidirectionalS> Graph;
+	Graph g(used_by, used_by + nedges, N);
+	TestGraph<>(g);
+	ModifyGraph<>(g);
 }
