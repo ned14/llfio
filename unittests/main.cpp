@@ -7,11 +7,13 @@ Created: Feb 2013
 #include "catch.hpp"
 #include <utility>
 #include <sstream>
-#include "boost/graph/adjacency_list.hpp"
+#include "../triplegit/src/std_filesystem.hpp"
+#include "../triplegit/include/triplegit.hpp"
 #include "boost/graph/topological_sort.hpp"
 #include "boost/graph/depth_first_search.hpp"
 #include "boost/graph/dijkstra_shortest_paths.hpp"
 #include "boost/graph/visitors.hpp"
+#include "boost/graph/isomorphism.hpp"
 
 enum files_e { dax_h, yow_h, boz_h, zow_h, foo_cpp, 
                foo_o, bar_cpp, bar_o, libfoobar_a,
@@ -39,6 +41,9 @@ Edge used_by[] = {
 	Edge(libzigzag_a, killerapp)
 };
 const std::size_t nedges = sizeof(used_by)/sizeof(Edge);
+
+static triplegit::fs_store store(std::filesystem::current_path());
+static triplegit::collection_id testgraph(store, "unittests.testgraph");
 
 int main (int argc, char * const argv[]) {
     int ret=Catch::Main( argc, argv );
@@ -206,4 +211,22 @@ TEST_CASE("boost.graph/works", "Tests that one of the samples from Boost.Graph w
 	Graph g(used_by, used_by + nedges, N);
 	TestGraph<>(g);
 	ModifyGraph<>(g);
+}
+
+TEST_CASE("triplegit/works", "Tests that one of the samples from Boost.Graph works as advertised with triplegit")
+{
+	typedef triplegit::boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS> Graph;
+	Graph g(used_by, used_by + nedges, N);
+	g.attach(store, testgraph);
+	g.begincommit().wait();
+	TestGraph<>(g);
+
+	Graph g2(store, testgraph);
+	TestGraph<>(g2);
+
+	ModifyGraph<>(g);
+	g.begincommit().wait();
+
+	Graph g3(store, testgraph);
+	CHECK(boost::isomorphism(g, g3));
 }
