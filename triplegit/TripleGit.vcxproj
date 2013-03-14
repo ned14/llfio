@@ -27,11 +27,18 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\async_file_io.hpp" />
     <ClInclude Include="include\triplegit.hpp" />
     <ClInclude Include="src\std_filesystem.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\async_file_io.cpp" />
     <ClCompile Include="src\triplegit.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\NiallsCPP11Utilities\NiallsCPP11Utilities.vcxproj">
+      <Project>{cf7497ef-702b-4237-bb7c-ad72c297b88e}</Project>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{D733647B-03E2-449A-9B5C-D33840F1520F}</ProjectGuid>
@@ -133,8 +140,8 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;TRIPLEGIT_DLL_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>false</SDLCheck>
       <AdditionalIncludeDirectories>../boost</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>

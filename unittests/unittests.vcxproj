@@ -213,6 +213,9 @@
     <ProjectReference Include="..\NiallsCPP11Utilities\NiallsCPP11Utilities.vcxproj">
       <Project>{cf7497ef-702b-4237-bb7c-ad72c297b88e}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\TripleGit\TripleGit.vcxproj">
+      <Project>{d733647b-03e2-449a-9b5c-d33840f1520f}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

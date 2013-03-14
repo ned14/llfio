@@ -7,6 +7,10 @@ File Created: Mar 2013
 #define TRIPLEGIT_H
 
 #include "../../NiallsCPP11Utilities/Int128_256.hpp"
+#if !defined(_WIN32_WINNT) && defined(WIN32)
+#define _WIN32_WINNT 0x0501
+#endif
+#define BOOST_THREAD_VERSION 3
 #include "boost/graph/adjacency_list.hpp"
 #include "boost/graph/adjacency_list_io.hpp"
 #include "boost/thread/future.hpp"
@@ -27,17 +31,23 @@ namespace boost { namespace property_tree { template<typename Key, typename Data
 
 namespace triplegit
 {
-
-//! For now, this is boost's future. Will be replaced when C++'s future catches up with boost's
-typedef boost::unique_future<void> future;
-//! For now, this is boost's future. Will be replaced when C++'s future catches up with boost's
-template<typename Iterator> Iterator wait_for_any(Iterator begin, Iterator end) { return boost::wait_for_any(begin, end); }
-//! For now, this is boost's future. Will be replaced when C++'s future catches up with boost's
-template<typename Iterator> void wait_for_all(Iterator begin, Iterator end) { boost::wait_for_all(begin, end); }
-//! For now, this is boost's future. Will be replaced when C++'s future catches up with boost's
-template<typename... Args> unsigned wait_for_any(Args... args) { return boost::wait_for_any(args...); }
-//! For now, this is boost's future. Will be replaced when C++'s future catches up with boost's
-template<typename... Args> void wait_for_all(Args... args) { boost::wait_for_all(args...); }
+	namespace async_io {
+		//! For now, this is boost's future. Will be replaced when C++'s future catches up with boost's
+		template<class T> class future : public boost::future<T>
+		{
+		public:
+			future() { }
+			future(boost::future<T> &&o) : boost::future<T>(std::move(o)) { }
+		};
+		//! For now, this is boost's future. Will be replaced when C++'s future catches up with boost's
+		template<typename Iterator> Iterator wait_for_any(Iterator begin, Iterator end) { return boost::wait_for_any(begin, end); }
+		//! For now, this is boost's future. Will be replaced when C++'s future catches up with boost's
+		template<typename Iterator> void wait_for_all(Iterator begin, Iterator end) { boost::wait_for_all(begin, end); }
+		//! For now, this is boost's future. Will be replaced when C++'s future catches up with boost's
+		template<typename... Args> unsigned wait_for_any(Args... args) { return boost::wait_for_any(args...); }
+		//! For now, this is boost's future. Will be replaced when C++'s future catches up with boost's
+		template<typename... Args> void wait_for_all(Args... args) { boost::wait_for_all(args...); }
+	} // namespace
 
 namespace detail { void TRIPLEGIT_API prefetched_unique_id_source(void *ptr, size_t size); }
 
@@ -105,7 +115,6 @@ namespace detail {
 	class TRIPLEGIT_API storable_vertices
 	{
 		bool amLoaded, amDirty;
-		//! Batch attachs and detaches this collection of vertices to and from the given stores
 		void *begin_batch_attachdetach();
 		void do_batch_attach(void *p, base_store &store, collection_id id);
 		void do_batch_detach(void *p, base_store &store, collection_id id);
@@ -119,7 +128,7 @@ namespace detail {
 		bool isDirty() const { return amDirty; }
 
 		//! Begins a commit to attached storage
-		future begincommit();
+		async_io::future<void> begincommit();
 		//! Attachs this collection of vertices to the given store
 		void attach(base_store &store, collection_id id)
 		{
@@ -162,6 +171,7 @@ public:
 
 namespace boost
 {
+	using namespace ::boost;
 	/*! \class adjacency_list
 	\brief A stored Boost.Graph adjacency_list
 	*/
