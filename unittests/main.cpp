@@ -226,10 +226,25 @@ TEST_CASE("async_io/thread_pool/works", "Tests that the async i/o thread pool im
 	using namespace triplegit::async_io;
 	std::thread::id this_id = std::this_thread::get_id();
 	std::cout << "I am main thread " << this_id << std::endl;
-	thread_pool pool(1);
-	CHECK(task()==78);
-	future<int> result=pool.enqueue(task);
-	CHECK(result.get()==78);
+	thread_pool pool(4);
+	auto r=task();
+	CHECK(r==78);
+	std::vector<future<int>> results(8);
+	for(auto &i : results)
+	{
+		i=pool.enqueue(task);
+	}
+	std::vector<future<int>> results2;
+	results2.push_back(pool.enqueue(task));
+	results2.push_back(pool.enqueue(task));
+	std::pair<size_t, int> allresults2=when_any(results2.begin(), results2.end()).get();
+	CHECK(allresults2.first<2);
+	CHECK(allresults2.second==78);
+	std::vector<int> allresults=when_all(results.begin(), results.end()).get();
+	for(int i : allresults)
+	{
+		CHECK(i==78);
+	}
 }
 
 #if 0
