@@ -80,14 +80,14 @@ template<class adjacency_list> void TestGraph(adjacency_list &g)
 	using namespace boost;
 	using namespace std;
 	typedef adjacency_list Graph;
-	typedef graph_traits<Graph>::vertex_descriptor Vertex;
+	typedef typename graph_traits<Graph>::vertex_descriptor Vertex;
 	ostringstream out;
 
   // Determine ordering for a full recompilation
   // and the order with files that can be compiled in parallel
   {
     typedef list<Vertex> MakeOrder;
-    MakeOrder::iterator i;
+    typename MakeOrder::iterator i;
     MakeOrder make_order;
 
     topological_sort(g, std::front_inserter(make_order));
@@ -107,7 +107,7 @@ template<class adjacency_list> void TestGraph(adjacency_list &g)
     for (i = make_order.begin(); i != make_order.end(); ++i) {    
       // Walk through the in_edges an calculate the maximum time.
       if (in_degree (*i, g) > 0) {
-        Graph::in_edge_iterator j, j_end;
+        typename Graph::in_edge_iterator j, j_end;
         int maxdist=0;
         // Through the order from topological sort, we are sure that every 
         // time we are using here is already initialized.
@@ -120,7 +120,7 @@ template<class adjacency_list> void TestGraph(adjacency_list &g)
     out << "parallel make ordering, " << endl
          << "vertices with same group number can be made in parallel" << endl;
     {
-      graph_traits<Graph>::vertex_iterator i, iend;
+      typename graph_traits<Graph>::vertex_iterator i, iend;
       for (boost::tie(i,iend) = vertices(g); i != iend; ++i)
         out << "time_slot[" << name[*i] << "] = " << time[*i] << endl;
     }
@@ -170,7 +170,7 @@ template<class adjacency_list> void ModifyGraph(adjacency_list &g)
 	using namespace boost;
 	using namespace std;
 	typedef adjacency_list Graph;
-	typedef graph_traits<Graph>::vertex_descriptor Vertex;
+	typedef typename graph_traits<Graph>::vertex_descriptor Vertex;
 	ostringstream out;
 
   // are there any cycles in the graph?
@@ -217,14 +217,22 @@ TEST_CASE("boost.graph/works", "Tests that one of the samples from Boost.Graph w
 
 static int task()
 {
+#ifdef __GNUC__
+	triplegit::async_io::thread::id this_id = boost::this_thread::get_id();
+#else
 	std::thread::id this_id = std::this_thread::get_id();
+#endif
 	std::cout << "I am worker thread " << this_id << std::endl;
 	return 78;
 }
 TEST_CASE("async_io/thread_pool/works", "Tests that the async i/o thread pool implementation works")
 {
 	using namespace triplegit::async_io;
+#ifdef __GNUC__
+	triplegit::async_io::thread::id this_id = boost::this_thread::get_id();
+#else
 	std::thread::id this_id = std::this_thread::get_id();
+#endif
 	std::cout << "I am main thread " << this_id << std::endl;
 	thread_pool pool(4);
 	auto r=task();
@@ -268,7 +276,7 @@ TEST_CASE("async_io/works", "Tests that the async i/o implementation works")
 		std::vector<shared_future<async_io_handle>> manyfiles;
 		manyfiles.reserve(10000);
 		for(size_t n=0; n<10000; n++)
-			manyfiles.push_back(dispatcher->mkfile(mkdir, "testdir/"+std::to_string(n)));
+			manyfiles.push_back(std::move(dispatcher->mkfile(mkdir, "testdir/"+std::to_string(n))));
 		for(size_t n=0; n<10000; n++)
 			dispatcher->close(manyfiles[n]);
 		auto end=chrono::high_resolution_clock::now();

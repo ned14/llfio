@@ -55,7 +55,7 @@ if env['CC']=='cl':
     if not debugbuild:
         env['LINKFLAGS']+=["/OPT:ICF"]  # Eliminate redundants
 else:
-    env['CPPDEFINES']+=["DISABLE_SYMBOLMANGLER"] # libstdc++ doesn't have emplace()
+    env['CPPDEFINES']+=[]
     env['CCFLAGS']+=["-fstrict-aliasing", "-fargument-noalias", "-Wstrict-aliasing"]
     env['CCFLAGS']+=["-Wall", "-Wno-unused"]
     if debugbuild:
@@ -68,15 +68,15 @@ else:
 
 outputs={}
 
-# Build the NiallsCPP11Utilities DLL
-sources = ["ErrorHandling.cpp", "MappedFileInfo.cpp", "StaticTypeRegistry.cpp"]
-if "DISABLE_SYMBOLMANGLER" not in env['CPPDEFINES']: sources.append("SymbolMangler.cpp")
-libobjects = env.SharedObject(sources, CPPDEFINES=env['CPPDEFINES']+["NIALLSCPP11UTILITIES_DLL_EXPORTS"])
+# Build the triplegit DLL
+sources = []
+if os.path.exists("triplegit/src"): sources+=[src for src in os.listdir("triplegit/src") if src[-4:]=='.cpp']
+libobjects = [env.SharedObject(target=src, source=os.path.abspath("triplegit/src/"+src), CPPDEFINES=env['CPPDEFINES']+["TRIPLEGIT_DLL_EXPORTS"]) for src in sources]
 if env.GetOption("static"):
-    mylib = env.StaticLibrary("NiallsCPP11Utilities", source = libobjects)
+    mylib = env.StaticLibrary("triplegit", source = libobjects)
     myliblib = mylib
 else:
-    mylib = env.SharedLibrary("NiallsCPP11Utilities", source = libobjects)
+    mylib = env.SharedLibrary("triplegit", source = libobjects)
     if env['CC']=='cl': env.AddPostAction(mylib, 'mt.exe -nologo -manifest ${TARGET}.manifest -outputresource:$TARGET;2')
     myliblib = mylib
     if sys.platform=='win32':
@@ -84,7 +84,7 @@ else:
 outputs['mylib']=(mylib, sources)
 
 # Unit tests
-sources = [ "unittests.cpp" ]
+sources = [ "unittests/main.cpp" ]
 objects = env.Object("unittests", source = sources) # + [myliblib]
 testlibs=[myliblib]
 testprogram_cpp = env.Program("unittests", source = objects, LINKFLAGS=env['LINKFLAGSEXE'], LIBS = env['LIBS'] + testlibs)

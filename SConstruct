@@ -115,7 +115,7 @@ else:
 	
     if not conf.CheckHaveBoost():
     	old=env['CPPPATH']
-    	boostpath=os.path.abspath(os.path.join(os.getcwd(), "../boost"))
+    	boostpath=os.path.abspath(os.path.join(os.getcwd(), "boost"))
     	while not os.path.exists(boostpath) and len(boostpath):
     		boostpath=os.path.dirname(boostpath)
     	if len(boostpath):
@@ -173,7 +173,7 @@ mylibrary=mylibrary['mylib'][0]
 
 # Set up the MSVC project files
 if 'win32'==sys.platform:
-    includes = [ "NiallsCPP11Utilities.hpp" ]
+    includes = [ "include/triplegit.hpp" ]
     variants = []
     projs = {}
     for buildvariant, output in buildvariants.items():
@@ -190,7 +190,7 @@ if 'win32'==sys.platform:
         #print buildtargets
         #print [str(x[1][0][0]) for x in buildtargets]
         msvsprojs+=env.MSVSProject(program+env['MSVSPROJECTSUFFIX'], srcs=items.values()[0][1], incs=includes, misc="Readme.txt", buildtarget=[x[1][0][0] for x in buildtargets], runfile=[str(x[1][0][0]) for x in buildtargets], variant=[x[0] for x in buildtargets], auto_build_solution=0)
-    msvssolution = env.MSVSSolution("NiallsCPP11Utilities.sln", projects=msvsprojs, variant=variants)
+    msvssolution = env.MSVSSolution("triplegit.sln", projects=msvsprojs, variant=variants)
     Depends(msvssolution, msvsprojs)
     Alias("msvcproj", msvssolution)
 

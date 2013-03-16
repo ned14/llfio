@@ -154,18 +154,18 @@ namespace boost
 	/*! \class adjacency_list
 	\brief A stored Boost.Graph adjacency_list
 	*/
-	template<class OutEdgeListS = ::boost::vecS, // a Sequence or an AssociativeContainer
-            class VertexListS = ::boost::vecS, // a Sequence or a RandomAccessContainer
-            class DirectedS = ::boost::directedS,
-            class VertexProperty = ::boost::no_property,
-            class EdgeProperty = ::boost::no_property,
-            class GraphProperty = ::boost::no_property,
-            class EdgeListS = ::boost::listS>
+	template<class OutEdgeListS = boost::vecS, // a Sequence or an AssociativeContainer
+            class VertexListS = boost::vecS, // a Sequence or a RandomAccessContainer
+            class DirectedS = boost::directedS,
+            class VertexProperty = boost::no_property,
+            class EdgeProperty = boost::no_property,
+            class GraphProperty = boost::no_property,
+            class EdgeListS = boost::listS>
 	class adjacency_list : public ::boost::adjacency_list<OutEdgeListS, VertexListS, DirectedS, VertexProperty, EdgeProperty, GraphProperty, EdgeListS>, public storable_vertices<adjacency_list<OutEdgeListS, VertexListS, DirectedS, VertexProperty, EdgeProperty, GraphProperty, EdgeListS>>
 	{
 		typedef ::boost::adjacency_list<OutEdgeListS, VertexListS, DirectedS, VertexProperty, EdgeProperty, GraphProperty, EdgeListS> Base;
 	public:
-		adjacency_list(base_store &store, collection_id id, const GraphProperty& p = GraphProperty()) : Base(p) { attach(store, id); }
+		adjacency_list(base_store &store, collection_id id, const GraphProperty& p = GraphProperty()) : Base(p) { Base::attach(store, id); }
 		adjacency_list(const GraphProperty& p = GraphProperty()) : Base(p) { }
 		adjacency_list(const adjacency_list& x) : Base(x) { }
 		adjacency_list& operator=(const adjacency_list& x) {
@@ -179,15 +179,15 @@ namespace boost
 			return *this;
 		}
 #endif
-		adjacency_list(vertices_size_type num_vertices, const GraphProperty& p = GraphProperty()) : Base(num_vertices, p) { }
+		adjacency_list(typename Base::vertices_size_type num_vertices, const GraphProperty& p = GraphProperty()) : Base(num_vertices, p) { }
 		template <class EdgeIterator> adjacency_list(EdgeIterator first, EdgeIterator last,
-                          vertices_size_type n,
-                          edges_size_type = 0,
+                          typename Base::vertices_size_type n,
+                          typename Base::edges_size_type = 0,
 						  const GraphProperty& p = GraphProperty()) : Base(first, last, n, 0, p) { }
 		template <class EdgeIterator, class EdgePropertyIterator> adjacency_list(EdgeIterator first, EdgeIterator last,
                           EdgePropertyIterator ep_iter,
-                          vertices_size_type n,
-                          edges_size_type = 0,
+                          typename Base::vertices_size_type n,
+                          typename Base::edges_size_type = 0,
 						  const GraphProperty& p = GraphProperty()) : Base(first, last, ep_iter, n, 0, p) { }
 	};
 

@@ -25,6 +25,12 @@ File Created: Mar 2013
 
 namespace triplegit { namespace async_io {
 
+#ifdef __GNUC__
+typedef boost::thread thread;
+#else
+typedef std::thread thread;
+#endif
+
 /*! \class future
 \brief For now, this is boost's future. Will be replaced when C++'s future catches up with boost's
 
@@ -70,7 +76,7 @@ class thread_pool {
 	};
 	friend class worker;
 
-	std::vector< std::unique_ptr<std::thread> > workers;
+	std::vector< std::unique_ptr<thread> > workers;
     boost::asio::io_service service;
     boost::asio::io_service::work working;
 public:
@@ -79,7 +85,7 @@ public:
 	{
 		workers.reserve(no);
 		for(size_t n=0; n<no; n++)
-			workers.push_back(std::unique_ptr<std::thread>(new std::thread(worker(this))));
+			workers.push_back(std::unique_ptr<thread>(new thread(worker(this))));
 	}
     ~thread_pool()
 	{
