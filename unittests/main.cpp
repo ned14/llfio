@@ -232,7 +232,7 @@ TEST_CASE("async_io/thread_pool/works", "Tests that the async i/o thread pool im
 	std::vector<future<int>> results(8);
 	for(auto &i : results)
 	{
-		i=pool.enqueue(task);
+		i=std::move(pool.enqueue(task));
 	}
 	std::vector<future<int>> results2;
 	results2.push_back(pool.enqueue(task));
@@ -244,6 +244,40 @@ TEST_CASE("async_io/thread_pool/works", "Tests that the async i/o thread pool im
 	for(int i : allresults)
 	{
 		CHECK(i==78);
+	}
+}
+
+TEST_CASE("waitaround", "Primes SpeedStep")
+{
+	typedef std::chrono::duration<double, std::ratio<1>> secs_type;
+	auto begin=std::chrono::high_resolution_clock::now();
+	while(std::chrono::duration_cast<secs_type>(std::chrono::high_resolution_clock::now()-begin).count()<3);
+}
+
+TEST_CASE("async_io/works", "Tests that the async i/o implementation works")
+{
+	using namespace triplegit::async_io;
+	using namespace std;
+	using triplegit::async_io::future;
+	typedef std::chrono::duration<double, ratio<1>> secs_type;
+	auto dispatcher=async_file_io_dispatcher();
+
+	{
+		auto begin=chrono::high_resolution_clock::now();
+		auto mkdir(std::move(dispatcher->mkdir("testdir")));
+		std::vector<shared_future<async_io_handle>> manyfiles;
+		manyfiles.reserve(10000);
+		for(size_t n=0; n<10000; n++)
+			manyfiles.push_back(dispatcher->mkfile(mkdir, "testdir/"+std::to_string(n)));
+		for(size_t n=0; n<10000; n++)
+			dispatcher->close(manyfiles[n]);
+		auto end=chrono::high_resolution_clock::now();
+		auto diff=chrono::duration_cast<secs_type>(end-begin);
+		cout << "It took " << diff.count() << " secs to do " << 10000/diff.count() << " file creations per sec" << endl;
+		dispatcher->sync();
+		begin=chrono::high_resolution_clock::now();
+		diff=chrono::duration_cast<secs_type>(begin-end);
+		cout << "It took " << diff.count() << " secs to synchronise" << endl;
 	}
 }
 

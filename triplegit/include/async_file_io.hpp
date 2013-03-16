@@ -35,7 +35,23 @@ template<class T> class future : public boost::future<T>
 public:
 	future() { }
 	future(boost::future<T> &&o) : boost::future<T>(std::move(o)) { }
+	future(future &&o) : boost::future<T>(std::move(o)) { }
 	future &operator=(boost::future<T> &&o) { static_cast<boost::future<T> &&>(*this)=std::move(o); return *this; }
+	future &operator=(future &&o) { static_cast<boost::future<T> &&>(*this)=std::move(o); return *this; }
+};
+/*! \class shared_future
+\brief For now, this is boost's shared_future. Will be replaced when C++'s shared_future catches up with boost's
+
+when_all() and when_any() definitions borrowed from http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2012/n3428.pdf
+*/
+template<class T> class shared_future : public boost::shared_future<T>
+{
+public:
+	shared_future() { }
+	shared_future(boost::shared_future<T> &&o) : boost::shared_future<T>(std::move(o)) { }
+	shared_future(shared_future &&o) : boost::shared_future<T>(std::move(o)) { }
+	shared_future &operator=(boost::shared_future<T> &&o) { static_cast<boost::shared_future<T> &&>(*this)=std::move(o); return *this; }
+	shared_future &operator=(shared_future &&o) { static_cast<boost::shared_future<T> &&>(*this)=std::move(o); return *this; }
 };
 
 /*! \class thread_pool
@@ -133,6 +149,56 @@ template <class InputIterator> future<std::pair<size_t, typename std::decay<decl
 	return when_any(f.begin(), f.end());
 }*/
 
+namespace detail {
+	class async_io_handle
+	{
+		async_io_handle() { }
+	public:
+		virtual ~async_io_handle();
+	};
+}
+
+//! A reference to an async file handle
+typedef std::shared_ptr<detail::async_io_handle> async_io_handle;
+
+namespace detail { struct async_file_io_dispatcher_base_p; class async_file_io_dispatcher_compat; class async_file_io_dispatcher_windows; class async_file_io_dispatcher_linux; class async_file_io_dispatcher_qnx; }
+
+/*! \class async_file_io_dispatcher_base
+\brief Abstract base class for dispatching file i/o asynchronously
+*/
+class async_file_io_dispatcher_base
+{
+	friend TRIPLEGIT_ASYNC_FILE_IO_API std::shared_ptr<async_file_io_dispatcher_base> async_file_io_dispatcher(thread_pool &threadpool=process_threadpool(), bool start_io_service_in_own_thread=true);
+	friend class detail::async_file_io_dispatcher_compat;
+	friend class detail::async_file_io_dispatcher_windows;
+	friend class detail::async_file_io_dispatcher_linux;
+	friend class detail::async_file_io_dispatcher_qnx;
+
+	detail::async_file_io_dispatcher_base_p *p;
+	async_file_io_dispatcher_base(thread_pool &threadpool);
+public:
+	virtual ~async_file_io_dispatcher_base();
+
+	//! Returns the current wait queue depth of this dispatcher
+	size_t wait_queue_depth() const;
+	//! Synchronises all outstanding operations in this dispatcher
+	virtual void sync()=0;
+
+	//! Asynchronously creates a directory
+	virtual shared_future<async_io_handle> mkdir(const std::string &path)=0;
+	//! Asynchronously creates a directory once \em first is completed
+	virtual shared_future<async_io_handle> mkdir(shared_future<async_io_handle> first, const std::string &path)=0;
+	//! Asynchronously creates a file
+	virtual shared_future<async_io_handle> mkfile(const std::string &path)=0;
+	//! Asynchronously creates a file once \em first is completed
+	virtual shared_future<async_io_handle> mkfile(shared_future<async_io_handle> first, const std::string &path)=0;
+	//! Asynchronously closes a file or directory handle once that handle becomes available
+	virtual shared_future<async_io_handle> close(shared_future<async_io_handle> h)=0;
+	//! Asynchronously closes a file or directory handle
+	virtual shared_future<async_io_handle> close(async_io_handle h)=0;
+
+};
+extern TRIPLEGIT_ASYNC_FILE_IO_API std::shared_ptr<async_file_io_dispatcher_base> async_file_io_dispatcher(thread_pool &threadpool, bool start_io_service_in_own_thread);
 
 } } // namespace
 
