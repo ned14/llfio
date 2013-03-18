@@ -22,7 +22,6 @@ File Created: Mar 2013
 #define TRIPLEGIT_API DLLIMPORTMARKUP
 #endif
 
-namespace std { namespace filesystem { class path; } }
 namespace boost { namespace property_tree { template<typename Key, typename Data, typename KeyCompare = std::less<Key>> class basic_ptree; typedef basic_ptree< std::string, std::string > ptree; } }
 
 namespace triplegit

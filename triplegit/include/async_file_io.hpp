@@ -13,6 +13,7 @@ File Created: Mar 2013
 #define _WIN32_WINNT 0x0501
 #endif
 #define BOOST_THREAD_VERSION 3
+#define BOOST_THREAD_PROVIDES_FUTURE_CONTINUATION
 #include "boost/asio.hpp"
 #include "boost/thread/future.hpp"
 
@@ -55,9 +56,9 @@ template<class T> class shared_future : public boost::shared_future<T>
 public:
 	shared_future() { }
 	shared_future(boost::shared_future<T> &&o) : boost::shared_future<T>(std::move(o)) { }
-	shared_future(shared_future &&o) : boost::shared_future<T>(std::move(o)) { }
+	shared_future(const boost::shared_future<T> &o) : boost::shared_future<T>(o) { }
 	shared_future &operator=(boost::shared_future<T> &&o) { static_cast<boost::shared_future<T> &&>(*this)=std::move(o); return *this; }
-	shared_future &operator=(shared_future &&o) { static_cast<boost::shared_future<T> &&>(*this)=std::move(o); return *this; }
+	shared_future &operator=(const boost::shared_future<T> &o) { static_cast<boost::shared_future<T> &>(*this)=o; return *this; }
 };
 
 /*! \class thread_pool
@@ -93,6 +94,8 @@ public:
 		for(auto &i : workers)
 			i->join();
 	}
+	//! Returns the underlying io_service
+	boost::asio::io_service &io_service() { return service; }
 	//! Sends some callable entity to the thread pool for execution
 	template<class F> future<typename std::result_of<F()>::type> enqueue(F f)
 	{
@@ -169,6 +172,35 @@ typedef std::shared_ptr<detail::async_io_handle> async_io_handle;
 
 namespace detail { struct async_file_io_dispatcher_base_p; class async_file_io_dispatcher_compat; class async_file_io_dispatcher_windows; class async_file_io_dispatcher_linux; class async_file_io_dispatcher_qnx; }
 
+/*! \enum open_flags
+\brief Bitwise file and directory open flags
+*/
+enum class file_flags : size_t
+{
+	None=0,		//!< No flags set
+	Read=1,		//!< Read access
+	Write=2,	//!< Write access
+	Append=4,	//!< Append only
+	Truncate=8, //!< Truncate existing file to zero
+	Create=16,	//!< Open and create if doesn't exist
+	CreateOnlyIfNotExist=32, //!< Create and open only if doesn't exist
+	AutoFlush=64,	//!< Automatically initiate an asynchronous flush just before file close, and fuse both operations so both must complete for close to complete.
+
+	OSDirect=(1<<16),		//!< Bypass the OS file buffers (only really useful for writing large files. Note you must 4Kb align everything if this is on)
+	OSSync=(1<<17)		//!< Ask the OS to not complete until the data is on the physical storage. Best used only with Direct, otherwise use AutoFlush.
+
+};
+inline file_flags operator&(file_flags a, file_flags b)
+{
+	typedef std::underlying_type<file_flags>::type type;
+	return static_cast<file_flags>(static_cast<type>(a) & static_cast<type>(b));
+}
+inline file_flags operator|(file_flags a, file_flags b)
+{
+	typedef std::underlying_type<file_flags>::type type;
+	return static_cast<file_flags>(static_cast<type>(a) | static_cast<type>(b));
+}
+
 /*! \class async_file_io_dispatcher_base
 \brief Abstract base class for dispatching file i/o asynchronously
 */
@@ -181,30 +213,31 @@ class async_file_io_dispatcher_base
 	friend class detail::async_file_io_dispatcher_qnx;
 
 	detail::async_file_io_dispatcher_base_p *p;
-	async_file_io_dispatcher_base(thread_pool &threadpool);
+	async_file_io_dispatcher_base(thread_pool &threadpool, file_flags flagsforce, file_flags flagsmask);
 public:
 	virtual ~async_file_io_dispatcher_base();
 
+	//! Returns the thread pool used by this dispatcher
+	thread_pool &threadpool() const;
+	//! Returns file flags as would be used after forcing and masking
+	file_flags fileflags(file_flags flags) const;
 	//! Returns the current wait queue depth of this dispatcher
 	size_t wait_queue_depth() const;
-	//! Synchronises all outstanding operations in this dispatcher
-	virtual void sync()=0;
 
 	//! Asynchronously creates a directory
-	virtual shared_future<async_io_handle> mkdir(const std::string &path)=0;
+	virtual shared_future<async_io_handle> dir(const std::string &path, file_flags flags=file_flags::None)=0;
 	//! Asynchronously creates a directory once \em first is completed
-	virtual shared_future<async_io_handle> mkdir(shared_future<async_io_handle> first, const std::string &path)=0;
+	virtual shared_future<async_io_handle> dir(shared_future<async_io_handle> first, const std::string &path, file_flags flags=file_flags::None)=0;
 	//! Asynchronously creates a file
-	virtual shared_future<async_io_handle> mkfile(const std::string &path)=0;
+	virtual shared_future<async_io_handle> file(const std::string &path, file_flags flags=file_flags::None)=0;
 	//! Asynchronously creates a file once \em first is completed
-	virtual shared_future<async_io_handle> mkfile(shared_future<async_io_handle> first, const std::string &path)=0;
+	virtual shared_future<async_io_handle> file(shared_future<async_io_handle> first, const std::string &path, file_flags flags=file_flags::None)=0;
+	//! Asynchronously synchronises a file or directory with physical storage
+	virtual shared_future<async_io_handle> sync(shared_future<async_io_handle> h, file_flags flags=file_flags::None)=0;
 	//! Asynchronously closes a file or directory handle once that handle becomes available
-	virtual shared_future<async_io_handle> close(shared_future<async_io_handle> h)=0;
-	//! Asynchronously closes a file or directory handle
-	virtual shared_future<async_io_handle> close(async_io_handle h)=0;
-
+	virtual shared_future<async_io_handle> close(shared_future<async_io_handle> h, file_flags flags=file_flags::None)=0;
 };
-extern TRIPLEGIT_ASYNC_FILE_IO_API std::shared_ptr<async_file_io_dispatcher_base> async_file_io_dispatcher(thread_pool &threadpool, bool start_io_service_in_own_thread);
+extern TRIPLEGIT_ASYNC_FILE_IO_API std::shared_ptr<async_file_io_dispatcher_base> async_file_io_dispatcher(thread_pool &threadpool, file_flags flagsforce=file_flags::AutoFlush, file_flags flagsmask=file_flags::None);
 
 } } // namespace
 
