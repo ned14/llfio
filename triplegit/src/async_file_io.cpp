@@ -4,19 +4,34 @@ Provides a threadpool and asynchronous file i/o infrastructure based on Boost.AS
 File Created: Mar 2013
 */
 
+#define _CRT_SECURE_NO_WARNINGS
+#define _CRT_NONSTDC_DEPRECATE(a)
+
 #include "../include/async_file_io.hpp"
 #include "boost/smart_ptr/detail/spinlock.hpp"
+#include "../../NiallsCPP11Utilities/ErrorHandling.hpp"
+#include <atomic>
 #include <mutex>
 
 #include <fcntl.h>
 #ifdef WIN32
 #include <io.h>
-#define open _open
-#define close _close
+#define posix_open _open
+#define posix_close _close
+#define posix_read _read
+#define posix_write _write
 #else
+#define posix_open open
+#define posix_close close
+#define posix_read read
+#define posix_write write
 #endif
 
 namespace triplegit { namespace async_io {
+
+// libstdc++ doesn't come with std::lock_guard
+#define lock_guard boost::lock_guard
+
 
 thread_pool &process_threadpool()
 {
@@ -25,13 +40,24 @@ thread_pool &process_threadpool()
 }
 
 namespace detail {
-	class async_io_handle
+	class async_io_handle_posix : public async_io_handle
 	{
-		async_io_handle() { }
+		int fd;
 	public:
-		virtual ~async_io_handle();
-		//! Asynchonrously synchronises this open item to storage
-		virtual shared_future<async_io_handle> sync()=0;
+		async_io_handle_posix(async_file_io_dispatcher_base *parent, int _fd) : async_io_handle(parent), fd(_fd)
+		{
+			ERRHOS(fd);
+			parent->int_add_io_handle((void *)(size_t)fd, shared_from_this());
+		}
+		~async_io_handle_posix()
+		{
+			parent->int_del_io_handle((void *)(size_t)fd);
+			if(fd>=0)
+			{
+				close(fd);
+				fd=-1;
+			}
+		}
 	};
 
 	struct async_file_io_dispatcher_base_p
@@ -40,9 +66,8 @@ namespace detail {
 		file_flags flagsforce, flagsmask;
 
 		typedef boost::detail::spinlock opslock_t;
-		opslock_t opslock;
-		size_t monotoniccount;
-		std::unordered_map<size_t, shared_future<async_io_handle>> ops;
+		opslock_t fdslock; std::unordered_map<void *, std::weak_ptr<async_io_handle>> fds;
+		opslock_t opslock; size_t monotoniccount; std::unordered_map<size_t, shared_future<async_io::async_io_handle>> ops;
 
 		async_file_io_dispatcher_base_p(thread_pool &_pool, file_flags _flagsforce, file_flags _flagsmask) : pool(_pool),
 			flagsforce(_flagsforce), flagsmask(_flagsmask), monotoniccount(0) { }
@@ -62,6 +87,18 @@ async_file_io_dispatcher_base::~async_file_io_dispatcher_base()
 	delete p;
 }
 
+void async_file_io_dispatcher_base::int_add_io_handle(void *key, std::shared_ptr<detail::async_io_handle> h)
+{
+	lock_guard<detail::async_file_io_dispatcher_base_p::opslock_t> lockh(p->fdslock);
+	p->fds.insert(make_pair(key, std::weak_ptr<detail::async_io_handle>(h)));
+}
+
+void async_file_io_dispatcher_base::int_del_io_handle(void *key)
+{
+	lock_guard<detail::async_file_io_dispatcher_base_p::opslock_t> lockh(p->fdslock);
+	p->fds.erase(key);
+}
+
 thread_pool &async_file_io_dispatcher_base::threadpool() const
 {
 	return p->pool;
@@ -74,14 +111,25 @@ file_flags async_file_io_dispatcher_base::fileflags(file_flags flags) const
 
 size_t async_file_io_dispatcher_base::wait_queue_depth() const
 {
-	std::lock_guard<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
+	lock_guard<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
 	return p->ops.size();
 }
+
+shared_future<async_io_handle> async_file_io_dispatcher_base::add_async_op(std::function<async_io_handle (size_t)> _op)
+{
+	lock_guard<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
+	size_t thisid=++p->monotoniccount;
+	auto op(std::bind(_op, thisid));
+	auto ret(threadpool().enqueue(op).share());
+	p->ops.insert(std::make_pair(thisid, ret));
+	return ret;
+}
+
 
 namespace detail {
 	class async_file_io_dispatcher_compat : public async_file_io_dispatcher_base
 	{
-		future<async_io_handle> doopen(const std::string &path, file_flags _flags)
+		async_io::async_io_handle doopen(size_t id, std::string path, file_flags _flags)
 		{
 			int flags=0;
 			if(file_flags::Read==(_flags & file_flags::Read) && file_flags::Write==(_flags & file_flags::Write)) flags|=O_RDWR;
@@ -97,10 +145,7 @@ namespace detail {
 #ifdef OS_SYNC
 			if(file_flags::OSSync==(_flags & file_flags::OSSync)) flags|=O_SYNC;
 #endif
-			async_io_handle_posix ret(open(path.c_str(), flags));
-			std::lock_guard<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
-			remove my id from ops?;
-			return ret;
+			return async_io::async_io_handle(new async_io_handle_posix(this, posix_open(path.c_str(), flags)));
 		}
 
 	public:
@@ -108,26 +153,23 @@ namespace detail {
 		{
 		}
 
-		virtual shared_future<async_io_handle> dir(const std::string &path, file_flags flags=file_flags::None)
+		virtual shared_future<async_io::async_io_handle> dir(const std::string &path, file_flags flags=file_flags::None)
 		{
-			auto op(threadpool().enqueue(std::bind(*this, &doopen, path, fileflags(flags))));
-			return int_addop(std::move(op));
+			return add_async_op(std::bind(&async_file_io_dispatcher_compat::doopen, this, std::placeholders::_1, std::string(path), fileflags));
 		}
-		virtual shared_future<async_io_handle> dir(shared_future<async_io_handle> first, const std::string &path, file_flags flags=file_flags::None)
-		{
-			auto op(first.then(std::bind(*this, &doopen, path, fileflags(flags))));
-			return int_addop(std::move(op));
-		}
-		virtual shared_future<async_io_handle> file(const std::string &path, file_flags flags=file_flags::None)
+		virtual shared_future<async_io::async_io_handle> dir(shared_future<async_io::async_io_handle> first, const std::string &path, file_flags flags=file_flags::None)
 		{
 		}
-		virtual shared_future<async_io_handle> file(shared_future<async_io_handle> first, const std::string &path, file_flags flags=file_flags::None)
+		virtual shared_future<async_io::async_io_handle> file(const std::string &path, file_flags flags=file_flags::None)
 		{
 		}
-		virtual shared_future<async_io_handle> sync(shared_future<async_io_handle> h, file_flags flags=file_flags::None)
+		virtual shared_future<async_io::async_io_handle> file(shared_future<async_io::async_io_handle> first, const std::string &path, file_flags flags=file_flags::None)
 		{
 		}
-		virtual shared_future<async_io_handle> close(shared_future<async_io_handle> h, file_flags flags=file_flags::None)
+		virtual shared_future<async_io::async_io_handle> sync(shared_future<async_io::async_io_handle> h, file_flags flags=file_flags::None)
+		{
+		}
+		virtual shared_future<async_io::async_io_handle> close(shared_future<async_io::async_io_handle> h, file_flags flags=file_flags::None)
 		{
 		}
 	};

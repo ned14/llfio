@@ -158,13 +158,20 @@ template <class InputIterator> future<std::pair<size_t, typename std::decay<decl
 	return when_any(f.begin(), f.end());
 }*/
 
+class async_file_io_dispatcher_base;
+
 namespace detail {
-	class async_io_handle
+	class async_io_handle : public std::enable_shared_from_this<async_io_handle>
 	{
-		async_io_handle() { }
+		friend class async_file_io_dispatcher_base;
+	protected:
+		async_file_io_dispatcher_base *parent;
+		async_io_handle(async_file_io_dispatcher_base *_parent) : parent(_parent) { }
 	public:
 		virtual ~async_io_handle();
 	};
+	class async_io_handle_posix;
+	class async_io_handle_windows;
 }
 
 //! A reference to an async file handle
@@ -192,13 +199,11 @@ enum class file_flags : size_t
 };
 inline file_flags operator&(file_flags a, file_flags b)
 {
-	typedef std::underlying_type<file_flags>::type type;
-	return static_cast<file_flags>(static_cast<type>(a) & static_cast<type>(b));
+	return static_cast<file_flags>(static_cast<size_t>(a) & static_cast<size_t>(b));
 }
 inline file_flags operator|(file_flags a, file_flags b)
 {
-	typedef std::underlying_type<file_flags>::type type;
-	return static_cast<file_flags>(static_cast<type>(a) | static_cast<type>(b));
+	return static_cast<file_flags>(static_cast<size_t>(a) | static_cast<size_t>(b));
 }
 
 /*! \class async_file_io_dispatcher_base
@@ -206,13 +211,18 @@ inline file_flags operator|(file_flags a, file_flags b)
 */
 class async_file_io_dispatcher_base
 {
-	friend TRIPLEGIT_ASYNC_FILE_IO_API std::shared_ptr<async_file_io_dispatcher_base> async_file_io_dispatcher(thread_pool &threadpool=process_threadpool(), bool start_io_service_in_own_thread=true);
+	//friend TRIPLEGIT_ASYNC_FILE_IO_API std::shared_ptr<async_file_io_dispatcher_base> async_file_io_dispatcher(thread_pool &threadpool=process_threadpool(), file_flags flagsforce=file_flags::AutoFlush, file_flags flagsmask=file_flags::None);
+	friend class detail::async_io_handle_posix;
+	friend class detail::async_io_handle_windows;
 	friend class detail::async_file_io_dispatcher_compat;
 	friend class detail::async_file_io_dispatcher_windows;
 	friend class detail::async_file_io_dispatcher_linux;
 	friend class detail::async_file_io_dispatcher_qnx;
 
 	detail::async_file_io_dispatcher_base_p *p;
+	void int_add_io_handle(void *key, std::shared_ptr<detail::async_io_handle> h);
+	void int_del_io_handle(void *key);
+protected:
 	async_file_io_dispatcher_base(thread_pool &threadpool, file_flags flagsforce, file_flags flagsmask);
 public:
 	virtual ~async_file_io_dispatcher_base();
@@ -236,8 +246,10 @@ public:
 	virtual shared_future<async_io_handle> sync(shared_future<async_io_handle> h, file_flags flags=file_flags::None)=0;
 	//! Asynchronously closes a file or directory handle once that handle becomes available
 	virtual shared_future<async_io_handle> close(shared_future<async_io_handle> h, file_flags flags=file_flags::None)=0;
+protected:
+	shared_future<async_io_handle> add_async_op(std::function<async_io_handle (size_t)> op);
 };
-extern TRIPLEGIT_ASYNC_FILE_IO_API std::shared_ptr<async_file_io_dispatcher_base> async_file_io_dispatcher(thread_pool &threadpool, file_flags flagsforce=file_flags::AutoFlush, file_flags flagsmask=file_flags::None);
+extern TRIPLEGIT_ASYNC_FILE_IO_API std::shared_ptr<async_file_io_dispatcher_base> async_file_io_dispatcher(thread_pool &threadpool=process_threadpool(), file_flags flagsforce=file_flags::AutoFlush, file_flags flagsmask=file_flags::None);
 
 } } // namespace
 

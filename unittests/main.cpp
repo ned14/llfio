@@ -6,7 +6,7 @@ Created: Feb 2013
 #include <utility>
 #include <sstream>
 #include <iostream>
-#include "../triplegit/src/std_filesystem.hpp"
+#include "../triplegit/include/std_filesystem.hpp"
 #include "../triplegit/include/triplegit.hpp"
 #include "../triplegit/include/async_file_io.hpp"
 #include "boost/graph/topological_sort.hpp"
@@ -272,11 +272,11 @@ TEST_CASE("async_io/works", "Tests that the async i/o implementation works")
 
 	{
 		auto begin=chrono::high_resolution_clock::now();
-		auto mkdir(dispatcher->mkdir("testdir"));
+		auto mkdir(dispatcher->dir("testdir"));
 		std::vector<shared_future<async_io_handle>> manyfiles;
 		manyfiles.reserve(10000);
 		for(size_t n=0; n<10000; n++)
-			manyfiles.push_back(dispatcher->mkfile(mkdir, "testdir/"+std::to_string(n)));
+			manyfiles.push_back(dispatcher->file(mkdir, "testdir/"+std::to_string(n)));
 		for(size_t n=0; n<10000; n++)
 			dispatcher->close(manyfiles[n]);
 		auto end=chrono::high_resolution_clock::now();

@@ -144,6 +144,7 @@
       <SDLCheck>false</SDLCheck>
       <AdditionalIncludeDirectories>../boost</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <MinimalRebuild>false</MinimalRebuild>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

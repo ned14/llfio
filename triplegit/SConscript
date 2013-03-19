@@ -69,13 +69,19 @@ else:
 outputs={}
 
 # Build the triplegit DLL
-outputs['mylib']=SConscript("triplegit/SConscript")
-
-# Unit tests
-sources = [ "unittests/main.cpp" ]
-objects = env.Object("unittests", source = sources) # + [myliblib]
-testlibs=[myliblib]
-testprogram_cpp = env.Program("unittests", source = objects, LINKFLAGS=env['LINKFLAGSEXE'], LIBS = env['LIBS'] + testlibs)
-outputs['unittests']=(testprogram_cpp, sources)
+sources = [ ]
+if os.path.exists("src"): sources+=[(os.path.splitext(src)[0], "src/"+src) for src in os.listdir("src") if src[-4:]=='.cpp']
+print(sources)
+libobjects = [env.SharedObject(s[0], s[1], CPPDEFINES=env['CPPDEFINES']+["TRIPLEGIT_DLL_EXPORTS"]) for s in sources]
+if env.GetOption("static"):
+    mylib = env.StaticLibrary("triplegit", source = libobjects)
+    myliblib = mylib
+else:
+    mylib = env.SharedLibrary("triplegit", source = libobjects)
+    if env['CC']=='cl': env.AddPostAction(mylib, 'mt.exe -nologo -manifest ${TARGET}.manifest -outputresource:$TARGET;2')
+    myliblib = mylib
+    if sys.platform=='win32':
+        myliblib=mylib[1]
+outputs['triplegitlib']=(mylib, sources)
 
 Return("outputs")
