@@ -9,7 +9,6 @@ File Created: Mar 2013
 #include "../../NiallsCPP11Utilities/Int128_256.hpp"
 #include "boost/graph/adjacency_list.hpp"
 #include "boost/graph/adjacency_list_io.hpp"
-#include "std_filesystem.hpp"
 #include "async_file_io.hpp"
 #include <unordered_set>
 

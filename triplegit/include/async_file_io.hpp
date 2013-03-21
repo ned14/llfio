@@ -8,6 +8,7 @@ File Created: Mar 2013
 #define TRIPLEGIT_ASYNC_FILE_IO_H
 
 #include "../../NiallsCPP11Utilities/NiallsCPP11Utilities.hpp"
+#include "std_filesystem.hpp"
 #include <thread>
 #if !defined(_WIN32_WINNT) && defined(WIN32)
 #define _WIN32_WINNT 0x0501
@@ -161,21 +162,26 @@ template <class InputIterator> future<std::pair<size_t, typename std::decay<decl
 class async_file_io_dispatcher_base;
 
 namespace detail {
+
 	class async_io_handle : public std::enable_shared_from_this<async_io_handle>
 	{
 		friend class async_file_io_dispatcher_base;
+		async_file_io_dispatcher_base *_parent;
+		std::filesystem::path _path; // guaranteed canonical
 	protected:
-		async_file_io_dispatcher_base *parent;
-		async_io_handle(async_file_io_dispatcher_base *_parent) : parent(_parent) { }
+		async_io_handle(async_file_io_dispatcher_base *parent, const std::filesystem::path &path) : _parent(parent), _path(std::filesystem::canonical(path)) { }
 	public:
 		virtual ~async_io_handle();
+		//! Returns the parent of this io handle
+		async_file_io_dispatcher_base *parent() const { return _parent; }
+		//! Returns the path of this io handle
+		const std::filesystem::path &path() const { return _path; }
 	};
-	class async_io_handle_posix;
-	class async_io_handle_windows;
+	struct async_io_handle_posix;
+	struct async_io_handle_windows;
 }
 
-//! A reference to an async file handle
-typedef std::shared_ptr<detail::async_io_handle> async_io_handle;
+struct async_io_op;
 
 namespace detail { struct async_file_io_dispatcher_base_p; class async_file_io_dispatcher_compat; class async_file_io_dispatcher_windows; class async_file_io_dispatcher_linux; class async_file_io_dispatcher_qnx; }
 
@@ -206,14 +212,27 @@ inline file_flags operator|(file_flags a, file_flags b)
 	return static_cast<file_flags>(static_cast<size_t>(a) | static_cast<size_t>(b));
 }
 
+/*! \struct async_file_io_op_req
+\brief A convenience bundle of path and flags, with optional precondition
+*/
+struct async_path_op_req
+{
+	std::filesystem::path path;
+	file_flags flags;
+	shared_future<std::shared_ptr<detail::async_io_handle>> precondition;
+	async_path_op_req(std::filesystem::path _path, file_flags _flags=file_flags::None) : path(_path), flags(_flags) { }
+	async_path_op_req(std::filesystem::path _path, file_flags _flags, shared_future<std::shared_ptr<detail::async_io_handle>> _precondition) : path(_path), flags(_flags), precondition(_precondition) { }
+	async_path_op_req(std::filesystem::path _path, shared_future<std::shared_ptr<detail::async_io_handle>> _precondition) : path(_path), flags(file_flags::None), precondition(_precondition) { }
+};
+
 /*! \class async_file_io_dispatcher_base
 \brief Abstract base class for dispatching file i/o asynchronously
 */
-class async_file_io_dispatcher_base
+class async_file_io_dispatcher_base : public std::enable_shared_from_this<async_file_io_dispatcher_base>
 {
 	//friend TRIPLEGIT_ASYNC_FILE_IO_API std::shared_ptr<async_file_io_dispatcher_base> async_file_io_dispatcher(thread_pool &threadpool=process_threadpool(), file_flags flagsforce=file_flags::AutoFlush, file_flags flagsmask=file_flags::None);
-	friend class detail::async_io_handle_posix;
-	friend class detail::async_io_handle_windows;
+	friend struct detail::async_io_handle_posix;
+	friend struct detail::async_io_handle_windows;
 	friend class detail::async_file_io_dispatcher_compat;
 	friend class detail::async_file_io_dispatcher_windows;
 	friend class detail::async_file_io_dispatcher_linux;
@@ -234,22 +253,34 @@ public:
 	//! Returns the current wait queue depth of this dispatcher
 	size_t wait_queue_depth() const;
 
-	//! Asynchronously creates a directory
-	virtual shared_future<async_io_handle> dir(const std::string &path, file_flags flags=file_flags::None)=0;
-	//! Asynchronously creates a directory once \em first is completed
-	virtual shared_future<async_io_handle> dir(shared_future<async_io_handle> first, const std::string &path, file_flags flags=file_flags::None)=0;
-	//! Asynchronously creates a file
-	virtual shared_future<async_io_handle> file(const std::string &path, file_flags flags=file_flags::None)=0;
-	//! Asynchronously creates a file once \em first is completed
-	virtual shared_future<async_io_handle> file(shared_future<async_io_handle> first, const std::string &path, file_flags flags=file_flags::None)=0;
-	//! Asynchronously synchronises a file or directory with physical storage
-	virtual shared_future<async_io_handle> sync(shared_future<async_io_handle> h, file_flags flags=file_flags::None)=0;
-	//! Asynchronously closes a file or directory handle once that handle becomes available
-	virtual shared_future<async_io_handle> close(shared_future<async_io_handle> h, file_flags flags=file_flags::None)=0;
+	//! Asynchronously creates directories
+	virtual std::vector<async_io_op> dir(const std::vector<async_path_op_req> &reqs)=0;
+	//! Asynchronously creates files
+	virtual std::vector<async_io_op> file(const std::vector<async_path_op_req> &reqs)=0;
+	//! Asynchronously synchronises items with physical storage once they complete
+	virtual std::vector<async_io_op> sync(const std::vector<async_io_op> &ops)=0;
+	//! Asynchronously closes connections to items once they complete
+	virtual std::vector<async_io_op> close(const std::vector<async_io_op> &ops)=0;
 protected:
-	shared_future<async_io_handle> add_async_op(std::function<async_io_handle (size_t)> op);
+	template<class F, class... Args> async_io_op chain_async_op(shared_future<std::shared_ptr<detail::async_io_handle>> precondition, std::shared_ptr<detail::async_io_handle> (F::*f)(size_t, Args...), Args... args);
+	template<class F, class T> std::vector<async_io_op> chain_async_ops(const std::vector<T> &container, std::shared_ptr<detail::async_io_handle> (F::*f)(size_t, T));
+	template<class F> std::vector<async_io_op> chain_async_ops(const std::vector<async_path_op_req> &container, std::shared_ptr<detail::async_io_handle> (F::*f)(size_t, async_path_op_req));
 };
 extern TRIPLEGIT_ASYNC_FILE_IO_API std::shared_ptr<async_file_io_dispatcher_base> async_file_io_dispatcher(thread_pool &threadpool=process_threadpool(), file_flags flagsforce=file_flags::AutoFlush, file_flags flagsmask=file_flags::None);
+
+/*! \struct async_io_op
+\brief A reference to an async operation
+*/
+struct async_io_op
+{
+	std::shared_ptr<async_file_io_dispatcher_base> parent; //!< The parent dispatcher
+	size_t id;											//!< A unique id for this operation
+	shared_future<std::shared_ptr<detail::async_io_handle>> h;	//!< A future handle to the item being operated upon
+
+	async_io_op(std::shared_ptr<async_file_io_dispatcher_base> _parent, size_t _id, shared_future<std::shared_ptr<detail::async_io_handle>> _handle) : parent(_parent), id(_id), h(_handle) { }
+	async_io_op(std::shared_ptr<async_file_io_dispatcher_base> _parent, size_t _id) : parent(_parent), id(_id) { }
+};
+
 
 } } // namespace
 
