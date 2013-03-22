@@ -140,18 +140,18 @@ size_t async_file_io_dispatcher_base::count() const
 template<class F, class... Args> std::shared_ptr<detail::async_io_handle> async_file_io_dispatcher_base::invoke_async_op_completions(size_t id, std::shared_ptr<detail::async_io_handle> h, std::shared_ptr<detail::async_io_handle> (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, Args...), Args... args)
 {
 	std::shared_ptr<detail::async_io_handle> ret((static_cast<F *>(this)->*f)(id, h, args...));
-	std::vector<typename detail::async_file_io_dispatcher_op::completion_t> completions;
 	// Find me in ops, remove my completions and delete me from extant ops
-	{
-		lock_guard<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
-		typename std::unordered_map<size_t, detail::async_file_io_dispatcher_op>::iterator it(p->ops.find(id));
-		if(p->ops.end()==it)
-			throw std::runtime_error("Failed to find this operation in list of currently executing operations");
-		completions=std::move(it->second.completions);
-		p->ops.erase(it);
-	}
+	lock_guard<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
+	typename std::unordered_map<size_t, detail::async_file_io_dispatcher_op>::iterator it(p->ops.find(id));
+	if(p->ops.end()==it)
+		throw std::runtime_error("Failed to find this operation in list of currently executing operations");
+	std::vector<typename detail::async_file_io_dispatcher_op::completion_t> completions(std::move(it->second.completions));
+	p->ops.erase(it);
 	for(auto &c : completions)
-		ret=c(ret);
+	{
+		// TODO: These need to be written into the outstanding ops, but I can't identify them?
+		fixme=threadpool().enqueue(std::bind(c, ret));
+	}
 	return ret;
 }
 
