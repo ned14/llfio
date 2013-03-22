@@ -127,7 +127,7 @@ namespace detail {
 	}
 }
 //! Returns a future vector of results from all the supplied futures
-template <class InputIterator> future<std::vector<typename std::decay<decltype(((typename InputIterator::value_type *) 0)->get())>::type>> when_all(InputIterator first, InputIterator last)
+template <class InputIterator> inline future<std::vector<typename std::decay<decltype(((typename InputIterator::value_type *) 0)->get())>::type>> when_all(InputIterator first, InputIterator last)
 {
 	typedef typename InputIterator::value_type future_type;
 	typedef typename std::decay<decltype(((typename InputIterator::value_type *) 0)->get())>::type value_type;
@@ -139,9 +139,9 @@ template <class InputIterator> future<std::vector<typename std::decay<decltype((
 	return process_threadpool().enqueue(std::move(waitforall));
 }
 //! Returns a future tuple of results from all the supplied futures
-//template <typename... T> future<std::tuple<typename std::decay<T...>::type>> when_all(T&&... futures);
+//template <typename... T> inline future<std::tuple<typename std::decay<T...>::type>> when_all(T&&... futures);
 //! Returns a future result from the first of the supplied futures
-template <class InputIterator> future<std::pair<size_t, typename std::decay<decltype(((typename InputIterator::value_type *) 0)->get())>::type>> when_any(InputIterator first, InputIterator last)
+template <class InputIterator> inline future<std::pair<size_t, typename std::decay<decltype(((typename InputIterator::value_type *) 0)->get())>::type>> when_any(InputIterator first, InputIterator last)
 {
 	typedef typename InputIterator::value_type future_type;
 	typedef typename std::decay<decltype(((typename InputIterator::value_type *) 0)->get())>::type value_type;
@@ -153,7 +153,7 @@ template <class InputIterator> future<std::pair<size_t, typename std::decay<decl
 	return process_threadpool().enqueue(std::move(waitforall));
 }
 //! Returns a future result from the first of the supplied futures
-/*template <typename... T> future<std::pair<size_t, typename std::decay<T>::type>> when_any(T&&... futures)
+/*template <typename... T> inline future<std::pair<size_t, typename std::decay<T>::type>> when_any(T&&... futures)
 {
 	std::array<T..., sizeof...(T)> f={ futures...};
 	return when_any(f.begin(), f.end());
@@ -171,7 +171,7 @@ namespace detail {
 	protected:
 		async_io_handle(async_file_io_dispatcher_base *parent, const std::filesystem::path &path) : _parent(parent), _path(std::filesystem::canonical(path)) { }
 	public:
-		virtual ~async_io_handle();
+		virtual ~async_io_handle() { }
 		//! Returns the parent of this io handle
 		async_file_io_dispatcher_base *parent() const { return _parent; }
 		//! Returns the path of this io handle
@@ -212,18 +212,7 @@ inline file_flags operator|(file_flags a, file_flags b)
 	return static_cast<file_flags>(static_cast<size_t>(a) | static_cast<size_t>(b));
 }
 
-/*! \struct async_file_io_op_req
-\brief A convenience bundle of path and flags, with optional precondition
-*/
-struct async_path_op_req
-{
-	std::filesystem::path path;
-	file_flags flags;
-	shared_future<std::shared_ptr<detail::async_io_handle>> precondition;
-	async_path_op_req(std::filesystem::path _path, file_flags _flags=file_flags::None) : path(_path), flags(_flags) { }
-	async_path_op_req(std::filesystem::path _path, file_flags _flags, shared_future<std::shared_ptr<detail::async_io_handle>> _precondition) : path(_path), flags(_flags), precondition(_precondition) { }
-	async_path_op_req(std::filesystem::path _path, shared_future<std::shared_ptr<detail::async_io_handle>> _precondition) : path(_path), flags(file_flags::None), precondition(_precondition) { }
-};
+struct async_path_op_req;
 
 /*! \class async_file_io_dispatcher_base
 \brief Abstract base class for dispatching file i/o asynchronously
@@ -252,19 +241,30 @@ public:
 	file_flags fileflags(file_flags flags) const;
 	//! Returns the current wait queue depth of this dispatcher
 	size_t wait_queue_depth() const;
+	//! Returns the number of open items in this dispatcher
+	size_t count() const;
 
 	//! Asynchronously creates directories
 	virtual std::vector<async_io_op> dir(const std::vector<async_path_op_req> &reqs)=0;
+	//! Asynchronously creates a directory
+	inline async_io_op dir(const async_path_op_req &req);
 	//! Asynchronously creates files
 	virtual std::vector<async_io_op> file(const std::vector<async_path_op_req> &reqs)=0;
+	//! Asynchronously creates a file
+	inline async_io_op file(const async_path_op_req &req);
 	//! Asynchronously synchronises items with physical storage once they complete
 	virtual std::vector<async_io_op> sync(const std::vector<async_io_op> &ops)=0;
+	//! Asynchronously synchronises an item with physical storage once it completes
+	inline async_io_op sync(const async_io_op &req);
 	//! Asynchronously closes connections to items once they complete
 	virtual std::vector<async_io_op> close(const std::vector<async_io_op> &ops)=0;
+	//! Asynchronously closes the connection to an item once it completes
+	inline async_io_op close(const async_io_op &req);
 protected:
-	template<class F, class... Args> async_io_op chain_async_op(shared_future<std::shared_ptr<detail::async_io_handle>> precondition, std::shared_ptr<detail::async_io_handle> (F::*f)(size_t, Args...), Args... args);
-	template<class F, class T> std::vector<async_io_op> chain_async_ops(const std::vector<T> &container, std::shared_ptr<detail::async_io_handle> (F::*f)(size_t, T));
-	template<class F> std::vector<async_io_op> chain_async_ops(const std::vector<async_path_op_req> &container, std::shared_ptr<detail::async_io_handle> (F::*f)(size_t, async_path_op_req));
+	template<class F, class... Args> std::shared_ptr<detail::async_io_handle> invoke_async_op_completions(size_t id, std::shared_ptr<detail::async_io_handle> h, std::shared_ptr<detail::async_io_handle> (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, Args...), Args... args);
+	template<class F, class... Args> async_io_op chain_async_op(const async_io_op &precondition, std::shared_ptr<detail::async_io_handle> (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, Args...), Args... args);
+	template<class F, class T> std::vector<async_io_op> chain_async_ops(const std::vector<T> &container, std::shared_ptr<detail::async_io_handle> (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, T));
+	template<class F> std::vector<async_io_op> chain_async_ops(const std::vector<async_path_op_req> &container, std::shared_ptr<detail::async_io_handle> (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, async_path_op_req));
 };
 extern TRIPLEGIT_ASYNC_FILE_IO_API std::shared_ptr<async_file_io_dispatcher_base> async_file_io_dispatcher(thread_pool &threadpool=process_threadpool(), file_flags flagsforce=file_flags::AutoFlush, file_flags flagsmask=file_flags::None);
 
@@ -277,9 +277,61 @@ struct async_io_op
 	size_t id;											//!< A unique id for this operation
 	shared_future<std::shared_ptr<detail::async_io_handle>> h;	//!< A future handle to the item being operated upon
 
+	async_io_op() : id(0) { }
 	async_io_op(std::shared_ptr<async_file_io_dispatcher_base> _parent, size_t _id, shared_future<std::shared_ptr<detail::async_io_handle>> _handle) : parent(_parent), id(_id), h(_handle) { }
 	async_io_op(std::shared_ptr<async_file_io_dispatcher_base> _parent, size_t _id) : parent(_parent), id(_id) { }
 };
+//! Convenience overload for a vector of async_io_op
+inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(std::vector<async_io_op>::iterator first, std::vector<async_io_op>::iterator last)
+{
+	std::vector<shared_future<std::shared_ptr<detail::async_io_handle>>> allhs;
+	allhs.reserve(std::distance(first, last));
+	std::for_each(first, last, [&allhs](const async_io_op &i){ allhs.push_back(i.h); });
+	return when_all(allhs.begin(), allhs.end());
+}
+
+/*! \struct async_file_io_op_req
+\brief A convenience bundle of path and flags, with optional precondition
+*/
+struct async_path_op_req
+{
+	std::filesystem::path path;
+	file_flags flags;
+	async_io_op precondition;
+	async_path_op_req(std::filesystem::path _path, file_flags _flags=file_flags::None) : path(_path), flags(_flags) { }
+	async_path_op_req(std::filesystem::path _path, file_flags _flags, async_io_op _precondition) : path(_path), flags(_flags), precondition(_precondition) { }
+	async_path_op_req(async_io_op _precondition, std::filesystem::path _path) : path(_path), flags(file_flags::None), precondition(_precondition) { }
+	async_path_op_req(const char *_path, file_flags _flags=file_flags::None) : path(_path), flags(_flags) { }
+};
+
+inline async_io_op async_file_io_dispatcher_base::dir(const async_path_op_req &req)
+{
+	std::vector<async_path_op_req> i;
+	i.reserve(1);
+	i.push_back(req);
+	return dir(i).front();
+}
+inline async_io_op async_file_io_dispatcher_base::file(const async_path_op_req &req)
+{
+	std::vector<async_path_op_req> i;
+	i.reserve(1);
+	i.push_back(req);
+	return file(i).front();
+}
+inline async_io_op async_file_io_dispatcher_base::sync(const async_io_op &req)
+{
+	std::vector<async_io_op> i;
+	i.reserve(1);
+	i.push_back(req);
+	return sync(i).front();
+}
+inline async_io_op async_file_io_dispatcher_base::close(const async_io_op &req)
+{
+	std::vector<async_io_op> i;
+	i.reserve(1);
+	i.push_back(req);
+	return close(i).front();
+}
 
 
 } } // namespace

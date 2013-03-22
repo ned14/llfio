@@ -273,17 +273,17 @@ TEST_CASE("async_io/works", "Tests that the async i/o implementation works")
 	{
 		auto begin=chrono::high_resolution_clock::now();
 		auto mkdir(dispatcher->dir("testdir"));
-		std::vector<shared_future<async_io_handle>> manyfiles;
-		manyfiles.reserve(10000);
+		std::vector<async_path_op_req> manyfilereqs;
+		manyfilereqs.reserve(10000);
 		for(size_t n=0; n<10000; n++)
-			manyfiles.push_back(dispatcher->file(mkdir, "testdir/"+std::to_string(n)));
-		for(size_t n=0; n<10000; n++)
-			dispatcher->close(manyfiles[n]);
+			manyfilereqs.push_back(async_path_op_req(mkdir, "testdir/"+std::to_string(n)));
+		auto manyopenfiles(dispatcher->file(manyfilereqs));
+		auto manyclosedfiles(dispatcher->close(manyopenfiles));
 		auto end=chrono::high_resolution_clock::now();
 		auto diff=chrono::duration_cast<secs_type>(end-begin);
 		cout << "It took " << diff.count() << " secs to do " << 10000/diff.count() << " file creations per sec" << endl;
 		begin=chrono::high_resolution_clock::now();
-		when_all(manyfiles.begin(), manyfiles.end());
+		when_all(manyclosedfiles.begin(), manyclosedfiles.end());
 		end=chrono::high_resolution_clock::now();
 		diff=chrono::duration_cast<secs_type>(end-begin);
 		cout << "It took " << diff.count() << " secs to synchronise" << endl;

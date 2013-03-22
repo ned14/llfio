@@ -50,8 +50,9 @@ namespace detail {
 	struct async_io_handle_posix : public async_io_handle
 	{
 		int fd;
+		bool has_ever_been_fsynced;
 
-		async_io_handle_posix(async_file_io_dispatcher_base *parent, const std::filesystem::path &path, int _fd) : async_io_handle(parent, path), fd(_fd)
+		async_io_handle_posix(async_file_io_dispatcher_base *parent, const std::filesystem::path &path, int _fd) : async_io_handle(parent, path), fd(_fd), has_ever_been_fsynced(false)
 		{
 			ERRHOS(fd);
 			parent->int_add_io_handle((void *)(size_t)fd, shared_from_this());
@@ -67,6 +68,13 @@ namespace detail {
 		}
 	};
 
+	struct async_file_io_dispatcher_op
+	{
+		shared_future<std::shared_ptr<detail::async_io_handle>> h;
+		typedef std::function<std::shared_ptr<detail::async_io_handle> (std::shared_ptr<detail::async_io_handle>)> completion_t;
+		std::vector<completion_t> completions;
+		async_file_io_dispatcher_op(shared_future<std::shared_ptr<detail::async_io_handle>> _h) : h(_h) { }
+	};
 	struct async_file_io_dispatcher_base_p
 	{
 		thread_pool &pool;
@@ -74,7 +82,7 @@ namespace detail {
 
 		typedef boost::detail::spinlock opslock_t;
 		opslock_t fdslock; std::unordered_map<void *, std::weak_ptr<async_io_handle>> fds;
-		opslock_t opslock; size_t monotoniccount; std::unordered_map<size_t, shared_future<std::shared_ptr<detail::async_io_handle>>> ops;
+		opslock_t opslock; size_t monotoniccount; std::unordered_map<size_t, async_file_io_dispatcher_op> ops;
 
 		async_file_io_dispatcher_base_p(thread_pool &_pool, file_flags _flagsforce, file_flags _flagsmask) : pool(_pool),
 			flagsforce(_flagsforce), flagsmask(_flagsmask), monotoniccount(0) { }
@@ -122,39 +130,68 @@ size_t async_file_io_dispatcher_base::wait_queue_depth() const
 	return p->ops.size();
 }
 
-template<class F, class... Args> async_io_op async_file_io_dispatcher_base::chain_async_op(shared_future<std::shared_ptr<detail::async_io_handle>> precondition, std::shared_ptr<detail::async_io_handle> (F::*f)(size_t, Args...), Args... args)
+size_t async_file_io_dispatcher_base::count() const
+{
+	lock_guard<detail::async_file_io_dispatcher_base_p::opslock_t> lockh(p->fdslock);
+	return p->fds.size();
+}
+
+// Called in unknown thread
+template<class F, class... Args> std::shared_ptr<detail::async_io_handle> async_file_io_dispatcher_base::invoke_async_op_completions(size_t id, std::shared_ptr<detail::async_io_handle> h, std::shared_ptr<detail::async_io_handle> (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, Args...), Args... args)
+{
+	std::shared_ptr<detail::async_io_handle> ret((static_cast<F *>(this)->*f)(id, h, args...));
+	std::vector<typename detail::async_file_io_dispatcher_op::completion_t> completions;
+	// Find me in ops, remove my completions and delete me from extant ops
+	{
+		lock_guard<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
+		typename std::unordered_map<size_t, detail::async_file_io_dispatcher_op>::iterator it(p->ops.find(id));
+		if(p->ops.end()==it)
+			throw std::runtime_error("Failed to find this operation in list of currently executing operations");
+		completions=std::move(it->second.completions);
+		p->ops.erase(it);
+	}
+	for(auto &c : completions)
+		ret=c(ret);
+	return ret;
+}
+
+template<class F, class... Args> async_io_op async_file_io_dispatcher_base::chain_async_op(const async_io_op &precondition, std::shared_ptr<detail::async_io_handle> (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, Args...), Args... args)
 {
 	lock_guard<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
 	size_t thisid=++p->monotoniccount;
-	auto dobind=[f, this, thisid, args...]() { return std::function<std::shared_ptr<detail::async_io_handle> ()>(std::bind(f, this, thisid, args...)); };
+	// Wrap supplied implementation routine with a completion dispatcher
+	auto wrapperf=&async_file_io_dispatcher_base::invoke_async_op_completions<F, Args...>;
+	// Bind supplied implementation routine to this, unique id and any args they passed
+	typename detail::async_file_io_dispatcher_op::completion_t boundf(std::bind(wrapperf, this, thisid, std::placeholders::_1, f, args...));
+	// Make a new async_io_op ready for returning
 	async_io_op ret(shared_from_this(), thisid);
-	if(!precondition.valid())
+	if(!precondition.h.valid())
 	{
-		// Bind now and queue immediately
-		ret.h=threadpool().enqueue(dobind()).share();
+		// Bind input handle now and queue immediately to next available thread worker
+		// Boost's shared_future has get() as non-const which is weird, because it doesn't
+		// delete the data after retrieval.
+		ret.h=threadpool().enqueue(std::bind(boundf, const_cast<shared_future<std::shared_ptr<detail::async_io_handle>> &>(precondition.h).get())).share();
 	}
 	else
 	{
-		// Chain dobind to be executed with precondition completes
-		todo;
+		// Chain boundf to be executed when precondition completes
+		auto dep(p->ops.find(precondition.id));
+		if(p->ops.end()==dep)
+			throw std::runtime_error("Failed to find precondition in list of currently executing operations");
+		dep->second.completions.push_back(boundf);
 	}
 	p->ops.insert(std::make_pair(thisid, ret.h));
 	return ret;
-
-	// Create a routine which will bind f to args in the future
-
-	//if(!req.precondition.valid())
-	//auto f(std::bind(&async_file_io_dispatcher_compat::dodir, this, std::placeholders::_1, i));
 }
-template<class F, class T> std::vector<async_io_op> async_file_io_dispatcher_base::chain_async_ops(const std::vector<T> &container, std::shared_ptr<detail::async_io_handle> (F::*f)(size_t, T))
+template<class F, class T> std::vector<async_io_op> async_file_io_dispatcher_base::chain_async_ops(const std::vector<T> &container, std::shared_ptr<detail::async_io_handle> (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, T))
 {
 	std::vector<async_io_op> ret;
 	ret.reserve(container.size());
 	for(auto &i : container)
-		ret.push_back(chain_async_op(i.h, f, i));
+		ret.push_back(chain_async_op(i, f, i));
 	return ret;
 }
-template<class F> std::vector<async_io_op> async_file_io_dispatcher_base::chain_async_ops(const std::vector<async_path_op_req> &container, std::shared_ptr<detail::async_io_handle> (F::*f)(size_t, async_path_op_req))
+template<class F> std::vector<async_io_op> async_file_io_dispatcher_base::chain_async_ops(const std::vector<async_path_op_req> &container, std::shared_ptr<detail::async_io_handle> (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, async_path_op_req))
 {
 	std::vector<async_io_op> ret;
 	ret.reserve(container.size());
@@ -168,12 +205,12 @@ namespace detail {
 	class async_file_io_dispatcher_compat : public async_file_io_dispatcher_base
 	{
 		// Called in unknown thread
-		std::shared_ptr<detail::async_io_handle> dodir(size_t id, async_path_op_req req)
+		std::shared_ptr<detail::async_io_handle> dodir(size_t id, std::shared_ptr<detail::async_io_handle>, async_path_op_req req)
 		{
 			return std::shared_ptr<detail::async_io_handle>(new async_io_handle_posix(this, req.path, posix_mkdir(req.path.c_str(), 0x1f8/*770*/)));
 		}
 		// Called in unknown thread
-		std::shared_ptr<detail::async_io_handle> dofile(size_t id, async_path_op_req req)
+		std::shared_ptr<detail::async_io_handle> dofile(size_t id, std::shared_ptr<detail::async_io_handle>, async_path_op_req req)
 		{
 			int flags=0;
 			if(file_flags::Read==(req.flags & file_flags::Read) && file_flags::Write==(req.flags & file_flags::Write)) flags|=O_RDWR;
@@ -192,17 +229,16 @@ namespace detail {
 			return std::shared_ptr<detail::async_io_handle>(new async_io_handle_posix(this, req.path, posix_open(req.path.c_str(), flags, 0x1b0/*660*/)));
 		}
 		// Called in unknown thread
-		std::shared_ptr<detail::async_io_handle> dosync(size_t id, async_io_op op)
+		std::shared_ptr<detail::async_io_handle> dosync(size_t id, std::shared_ptr<detail::async_io_handle> h, async_io_op)
 		{
-			std::shared_ptr<detail::async_io_handle> h(op.h.get());
 			async_io_handle_posix *p=static_cast<async_io_handle_posix *>(h.get());
 			ERRHOS(posix_fsync(p->fd));
+			p->has_ever_been_fsynced=true;
 			return h;
 		}
 		// Called in unknown thread
-		std::shared_ptr<detail::async_io_handle> doclose(size_t id, async_io_op op)
+		std::shared_ptr<detail::async_io_handle> doclose(size_t id, std::shared_ptr<detail::async_io_handle> h, async_io_op)
 		{
-			std::shared_ptr<detail::async_io_handle> h(op.h.get());
 			async_io_handle_posix *p=static_cast<async_io_handle_posix *>(h.get());
 			ERRHOS(posix_close(p->fd));
 			p->fd=-1;
@@ -233,16 +269,19 @@ namespace detail {
 			ret.reserve(ops.size());
 			for(auto &i : ops)
 			{
-				auto op(chain_async_op(i.h, &async_file_io_dispatcher_compat::doclose, i));
+				auto op(chain_async_op(i, &async_file_io_dispatcher_compat::doclose, i));
 #ifdef __linux__
-				// Need to fsync the containing directory on Linux file systems, otherwise the file doesn't
-				// necessarily appear where it's supposed to
-				fixme;
-				async_path_op_req containingdir(i.path().parent_path(), file_flags::Read);
-				auto diropenop(chain_async_op(op, containingdir));
-				auto syncdir(std::bind(&async_file_io_dispatcher_compat::dosync, this, std::placeholders::_1, diropenop.h));
-				auto syncdirop(chain_async_op(diropenop, syncdir));
-				auto opendir(std::bind(&async_file_io_dispatcher_compat::dofile, this, std::placeholders::_1, i));
+				if(p->has_ever_been_fsynced)
+				{
+					// Need to fsync the containing directory on Linux file systems, otherwise the file doesn't
+					// necessarily appear where it's supposed to
+					fixme;
+					async_path_op_req containingdir(i.path().parent_path(), file_flags::Read);
+					auto diropenop(chain_async_op(op, containingdir));
+					auto syncdir(std::bind(&async_file_io_dispatcher_compat::dosync, this, std::placeholders::_1, diropenop.h));
+					auto syncdirop(chain_async_op(diropenop, syncdir));
+					auto opendir(std::bind(&async_file_io_dispatcher_compat::dofile, this, std::placeholders::_1, i));
+				}
 #else
 				// On non-Linux file systems, closing a file guarantees the storage for its containing directory
 				// will be atomically updated as soon as the file's contents reach storage. In other words,
