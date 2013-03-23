@@ -69,10 +69,8 @@ else:
 outputs={}
 
 # Build the triplegit DLL
-sources = [ ]
-if os.path.exists("src"): sources+=[(os.path.splitext(src)[0], "src/"+src) for src in os.listdir("src") if src[-4:]=='.cpp']
-print(sources)
-libobjects = [env.SharedObject(s[0], s[1], CPPDEFINES=env['CPPDEFINES']+["TRIPLEGIT_DLL_EXPORTS"]) for s in sources]
+sources = env.SConscript(os.path.join("src", "SConscript"), 'env')
+libobjects = env.SharedObject(sources, CPPDEFINES=env['CPPDEFINES']+["TRIPLEGIT_DLL_EXPORTS"])
 if env.GetOption("static"):
     mylib = env.StaticLibrary("triplegit", source = libobjects)
     myliblib = mylib
@@ -82,6 +80,6 @@ else:
     myliblib = mylib
     if sys.platform=='win32':
         myliblib=mylib[1]
-outputs['triplegitlib']=(mylib, sources)
+outputs['triplegitlib']=(myliblib, mylib, sources)
 
 Return("outputs")

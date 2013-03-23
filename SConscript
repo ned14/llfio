@@ -69,12 +69,12 @@ else:
 outputs={}
 
 # Build the triplegit DLL
-outputs['mylib']=SConscript("triplegit/SConscript")
+outputs['mylibs']=SConscript("triplegit/SConscript")
 
 # Unit tests
 sources = [ "unittests/main.cpp" ]
 objects = env.Object("unittests", source = sources) # + [myliblib]
-testlibs=[myliblib]
+testlibs=outputs['mylibs']['triplegitlib'][0]
 testprogram_cpp = env.Program("unittests", source = objects, LINKFLAGS=env['LINKFLAGSEXE'], LIBS = env['LIBS'] + testlibs)
 outputs['unittests']=(testprogram_cpp, sources)
 

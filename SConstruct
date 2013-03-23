@@ -133,7 +133,8 @@ buildvariants={}
 for architecture in architectures:
     for buildtype in ["Debug", "Release"]:
         env['VARIANT']=architecture+"/"+buildtype
-        mylibraryvariant=SConscript("SConscript", variant_dir=env['VARIANT'], duplicate=False, exports="env")
+        Export("env")
+        mylibraryvariant=env.SConscript("SConscript", exports="env", variant_dir=env['VARIANT'], duplicate=False)
         buildvariants[(buildtype, architecture)]=mylibraryvariant
 # What architecture am I on?
 architecture="generic"
