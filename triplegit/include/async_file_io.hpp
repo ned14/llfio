@@ -14,7 +14,6 @@ File Created: Mar 2013
 #define _WIN32_WINNT 0x0501
 #endif
 #define BOOST_THREAD_VERSION 3
-#define BOOST_THREAD_PROVIDES_FUTURE_CONTINUATION
 #include "boost/asio.hpp"
 #include "boost/thread/future.hpp"
 
@@ -190,16 +189,16 @@ namespace detail { struct async_file_io_dispatcher_base_p; class async_file_io_d
 */
 enum class file_flags : size_t
 {
-	None=0,		//!< No flags set
-	Read=1,		//!< Read access
-	Write=2,	//!< Write access
-	Append=4,	//!< Append only
-	Truncate=8, //!< Truncate existing file to zero
-	Create=16,	//!< Open and create if doesn't exist
+	None=0,				//!< No flags set
+	Read=1,				//!< Read access
+	Write=2,			//!< Write access
+	Append=4,			//!< Append only
+	Truncate=8,			//!< Truncate existing file to zero
+	Create=16,			//!< Open and create if doesn't exist
 	CreateOnlyIfNotExist=32, //!< Create and open only if doesn't exist
-	AutoFlush=64,	//!< Automatically initiate an asynchronous flush just before file close, and fuse both operations so both must complete for close to complete.
+	AutoFlush=64,		//!< Automatically initiate an asynchronous flush just before file close, and fuse both operations so both must complete for close to complete.
 
-	OSDirect=(1<<16),		//!< Bypass the OS file buffers (only really useful for writing large files. Note you must 4Kb align everything if this is on)
+	OSDirect=(1<<16),	//!< Bypass the OS file buffers (only really useful for writing large files. Note you must 4Kb align everything if this is on)
 	OSSync=(1<<17)		//!< Ask the OS to not complete until the data is on the physical storage. Best used only with Direct, otherwise use AutoFlush.
 
 };
@@ -299,8 +298,7 @@ struct async_path_op_req
 	file_flags flags;
 	async_io_op precondition;
 	async_path_op_req(std::filesystem::path _path, file_flags _flags=file_flags::None) : path(_path), flags(_flags) { }
-	async_path_op_req(std::filesystem::path _path, file_flags _flags, async_io_op _precondition) : path(_path), flags(_flags), precondition(_precondition) { }
-	async_path_op_req(async_io_op _precondition, std::filesystem::path _path) : path(_path), flags(file_flags::None), precondition(_precondition) { }
+	async_path_op_req(async_io_op _precondition, std::filesystem::path _path, file_flags _flags=file_flags::None) : path(_path), flags(_flags), precondition(_precondition) { }
 	async_path_op_req(const char *_path, file_flags _flags=file_flags::None) : path(_path), flags(_flags) { }
 };
 

@@ -14,11 +14,16 @@ File Created: Mar 2013
 #include <mutex>
 
 #include <fcntl.h>
+#include <sys/stat.h>
 #ifdef WIN32
 #include <io.h>
 #include <direct.h>
 #define posix_mkdir(path, mode) _wmkdir(path)
 #define posix_rmdir _wrmdir
+#define posix_stat _wstat64
+#define stat _stat64
+#define S_ISREG(m) ((m) & _S_IFREG)
+#define S_ISDIR(m) ((m) & _S_IFDIR)
 #define posix_open _wopen
 #define posix_close _close
 #define posix_read _read
@@ -27,6 +32,7 @@ File Created: Mar 2013
 #else
 #define posix_mkdir mkdir
 #define posix_rmdir rmdir
+#define posix_stat stat
 #define posix_open open
 #define posix_close close
 #define posix_read read
@@ -71,7 +77,7 @@ namespace detail {
 	struct async_file_io_dispatcher_op
 	{
 		shared_future<std::shared_ptr<detail::async_io_handle>> h;
-		typedef std::function<std::shared_ptr<detail::async_io_handle> (std::shared_ptr<detail::async_io_handle>)> completion_t;
+		typedef std::pair<size_t, std::function<std::shared_ptr<detail::async_io_handle> (std::shared_ptr<detail::async_io_handle>)>> completion_t;
 		std::vector<completion_t> completions;
 		async_file_io_dispatcher_op(shared_future<std::shared_ptr<detail::async_io_handle>> _h) : h(_h) { }
 	};
@@ -85,7 +91,12 @@ namespace detail {
 		opslock_t opslock; size_t monotoniccount; std::unordered_map<size_t, async_file_io_dispatcher_op> ops;
 
 		async_file_io_dispatcher_base_p(thread_pool &_pool, file_flags _flagsforce, file_flags _flagsmask) : pool(_pool),
-			flagsforce(_flagsforce), flagsmask(_flagsmask), monotoniccount(0) { }
+			flagsforce(_flagsforce), flagsmask(_flagsmask), monotoniccount(0)
+		{
+			// Boost's spinlock is so lightweight it has no constructor ...
+			fdslock.unlock();
+			opslock.unlock();
+		}
 	};
 	class async_file_io_dispatcher_compat;
 	class async_file_io_dispatcher_windows;
@@ -149,8 +160,11 @@ template<class F, class... Args> std::shared_ptr<detail::async_io_handle> async_
 	p->ops.erase(it);
 	for(auto &c : completions)
 	{
-		// TODO: These need to be written into the outstanding ops, but I can't identify them?
-		fixme=threadpool().enqueue(std::bind(c, ret));
+		// Enqueue each completion
+		it=p->ops.find(c.first);
+		if(p->ops.end()==it)
+			throw std::runtime_error("Failed to find this completion operation in list of currently executing operations");
+		it->second.h=threadpool().enqueue(std::bind(c.second, ret));
 	}
 	return ret;
 }
@@ -158,19 +172,23 @@ template<class F, class... Args> std::shared_ptr<detail::async_io_handle> async_
 template<class F, class... Args> async_io_op async_file_io_dispatcher_base::chain_async_op(const async_io_op &precondition, std::shared_ptr<detail::async_io_handle> (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, Args...), Args... args)
 {
 	lock_guard<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
-	size_t thisid=++p->monotoniccount;
+	size_t thisid=0;
+	while(!(thisid=++p->monotoniccount));
 	// Wrap supplied implementation routine with a completion dispatcher
 	auto wrapperf=&async_file_io_dispatcher_base::invoke_async_op_completions<F, Args...>;
 	// Bind supplied implementation routine to this, unique id and any args they passed
-	typename detail::async_file_io_dispatcher_op::completion_t boundf(std::bind(wrapperf, this, thisid, std::placeholders::_1, f, args...));
+	typename detail::async_file_io_dispatcher_op::completion_t boundf(std::make_pair(thisid, std::bind(wrapperf, this, thisid, std::placeholders::_1, f, args...)));
 	// Make a new async_io_op ready for returning
 	async_io_op ret(shared_from_this(), thisid);
-	if(!precondition.h.valid())
+	if(!precondition.id)
 	{
 		// Bind input handle now and queue immediately to next available thread worker
+		std::shared_ptr<detail::async_io_handle> h;
 		// Boost's shared_future has get() as non-const which is weird, because it doesn't
 		// delete the data after retrieval.
-		ret.h=threadpool().enqueue(std::bind(boundf, const_cast<shared_future<std::shared_ptr<detail::async_io_handle>> &>(precondition.h).get())).share();
+		if(precondition.h.valid())
+			h=const_cast<shared_future<std::shared_ptr<detail::async_io_handle>> &>(precondition.h).get();
+		ret.h=threadpool().enqueue(std::bind(boundf.second, h)).share();
 	}
 	else
 	{
@@ -207,7 +225,25 @@ namespace detail {
 		// Called in unknown thread
 		std::shared_ptr<detail::async_io_handle> dodir(size_t id, std::shared_ptr<detail::async_io_handle>, async_path_op_req req)
 		{
-			return std::shared_ptr<detail::async_io_handle>(new async_io_handle_posix(this, req.path, posix_mkdir(req.path.c_str(), 0x1f8/*770*/)));
+			int ret=0;
+			if(file_flags::Create==(req.flags & file_flags::Create))
+			{
+				ret=posix_mkdir(req.path.c_str(), 0x1f8/*770*/);
+				if(-1==ret && EEXIST==errno)
+				{
+					// Ignore already exists unless we were asked otherwise
+					if(file_flags::CreateOnlyIfNotExist!=(req.flags & file_flags::CreateOnlyIfNotExist))
+						ret=0;
+				}
+			}
+			else
+			{
+				struct stat s={0};
+				int ret=posix_stat(req.path.c_str(), &s);
+				if(0==ret && !S_ISDIR(s.st_mode))
+					throw std::runtime_error("Not a directory");
+			}
+			return std::shared_ptr<detail::async_io_handle>(new async_io_handle_posix(this, req.path, ret));
 		}
 		// Called in unknown thread
 		std::shared_ptr<detail::async_io_handle> dofile(size_t id, std::shared_ptr<detail::async_io_handle>, async_path_op_req req)
