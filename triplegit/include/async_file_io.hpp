@@ -10,6 +10,7 @@ File Created: Mar 2013
 #include "../../NiallsCPP11Utilities/NiallsCPP11Utilities.hpp"
 #include "std_filesystem.hpp"
 #include <thread>
+#include <atomic>
 #if !defined(_WIN32_WINNT) && defined(WIN32)
 #define _WIN32_WINNT 0x0501
 #endif
@@ -21,6 +22,11 @@ File Created: Mar 2013
 #define TRIPLEGIT_ASYNC_FILE_IO_API DLLEXPORTMARKUP
 #else
 #define TRIPLEGIT_ASYNC_FILE_IO_API DLLIMPORTMARKUP
+#endif
+
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable: 4251) // type needs to have dll-interface to be used by clients of class
 #endif
 
 
@@ -59,6 +65,18 @@ public:
 	shared_future(const boost::shared_future<T> &o) : boost::shared_future<T>(o) { }
 	shared_future &operator=(boost::shared_future<T> &&o) { static_cast<boost::shared_future<T> &&>(*this)=std::move(o); return *this; }
 	shared_future &operator=(const boost::shared_future<T> &o) { static_cast<boost::shared_future<T> &>(*this)=o; return *this; }
+};
+/*! \class promise
+\brief For now, this is boost's promise. Will be replaced when C++'s promise catches up with boost's
+*/
+template<class T> class promise : public boost::promise<T>
+{
+public:
+	promise() { }
+	promise(boost::promise<T> &&o) : boost::promise<T>(std::move(o)) { }
+	promise(promise &&o) : boost::promise<T>(std::move(o)) { }
+	promise &operator=(boost::promise<T> &&o) { static_cast<boost::promise<T> &&>(*this)=std::move(o); return *this; }
+	promise &operator=(promise &&o) { static_cast<boost::promise<T> &&>(*this)=std::move(o); return *this; }
 };
 
 /*! \class thread_pool
@@ -168,7 +186,7 @@ namespace detail {
 		async_file_io_dispatcher_base *_parent;
 		std::filesystem::path _path; // guaranteed canonical
 	protected:
-		async_io_handle(async_file_io_dispatcher_base *parent, const std::filesystem::path &path) : _parent(parent), _path(std::filesystem::canonical(path)) { }
+		async_io_handle(async_file_io_dispatcher_base *parent, const std::filesystem::path &path) : _parent(parent), _path(path) { }
 	public:
 		virtual ~async_io_handle() { }
 		//! Returns the parent of this io handle
@@ -216,7 +234,7 @@ struct async_path_op_req;
 /*! \class async_file_io_dispatcher_base
 \brief Abstract base class for dispatching file i/o asynchronously
 */
-class async_file_io_dispatcher_base : public std::enable_shared_from_this<async_file_io_dispatcher_base>
+class TRIPLEGIT_ASYNC_FILE_IO_API async_file_io_dispatcher_base : public std::enable_shared_from_this<async_file_io_dispatcher_base>
 {
 	//friend TRIPLEGIT_ASYNC_FILE_IO_API std::shared_ptr<async_file_io_dispatcher_base> async_file_io_dispatcher(thread_pool &threadpool=process_threadpool(), file_flags flagsforce=file_flags::AutoFlush, file_flags flagsmask=file_flags::None);
 	friend struct detail::async_io_handle_posix;
@@ -243,6 +261,8 @@ public:
 	//! Returns the number of open items in this dispatcher
 	size_t count() const;
 
+	//! Invoke the specified function when each of the supplied operations complete
+	std::vector<async_io_op> completion(const std::vector<async_io_op> &ops, const std::vector<std::function<std::shared_ptr<detail::async_io_handle> (size_t, std::shared_ptr<detail::async_io_handle>)>> &callbacks);
 	//! Asynchronously creates directories
 	virtual std::vector<async_io_op> dir(const std::vector<async_path_op_req> &reqs)=0;
 	//! Asynchronously creates a directory
@@ -260,6 +280,7 @@ public:
 	//! Asynchronously closes the connection to an item once it completes
 	inline async_io_op close(const async_io_op &req);
 protected:
+	std::shared_ptr<detail::async_io_handle> invoke_user_completion(size_t id, std::shared_ptr<detail::async_io_handle> h, std::function<std::shared_ptr<detail::async_io_handle> (size_t, std::shared_ptr<detail::async_io_handle>)> callback);
 	template<class F, class... Args> std::shared_ptr<detail::async_io_handle> invoke_async_op_completions(size_t id, std::shared_ptr<detail::async_io_handle> h, std::shared_ptr<detail::async_io_handle> (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, Args...), Args... args);
 	template<class F, class... Args> async_io_op chain_async_op(const async_io_op &precondition, std::shared_ptr<detail::async_io_handle> (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, Args...), Args... args);
 	template<class F, class T> std::vector<async_io_op> chain_async_ops(const std::vector<T> &container, std::shared_ptr<detail::async_io_handle> (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, T));
@@ -280,13 +301,39 @@ struct async_io_op
 	async_io_op(std::shared_ptr<async_file_io_dispatcher_base> _parent, size_t _id, shared_future<std::shared_ptr<detail::async_io_handle>> _handle) : parent(_parent), id(_id), h(_handle) { }
 	async_io_op(std::shared_ptr<async_file_io_dispatcher_base> _parent, size_t _id) : parent(_parent), id(_id) { }
 };
+
+namespace detail
+{
+	struct when_all_count_completed_state
+	{
+		std::atomic<size_t> togo;
+		std::vector<std::shared_ptr<detail::async_io_handle>> out;
+		promise<std::vector<std::shared_ptr<detail::async_io_handle>>> done;
+		when_all_count_completed_state(size_t outsize) : togo(outsize), out(outsize) { }
+	};
+	inline std::shared_ptr<detail::async_io_handle> when_all_count_completed(size_t, std::shared_ptr<detail::async_io_handle> h, std::shared_ptr<detail::when_all_count_completed_state> state, size_t idx)
+	{
+		state->out[idx]=h; // This might look thread unsafe, but each idx is unique
+		if(!--state->togo)
+			state->done.set_value(state->out);
+		return h;
+	}
+}
+
 //! Convenience overload for a vector of async_io_op
 inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(std::vector<async_io_op>::iterator first, std::vector<async_io_op>::iterator last)
 {
-	std::vector<shared_future<std::shared_ptr<detail::async_io_handle>>> allhs;
-	allhs.reserve(std::distance(first, last));
-	std::for_each(first, last, [&allhs](const async_io_op &i){ allhs.push_back(i.h); });
-	return when_all(allhs.begin(), allhs.end());
+	if(first==last)
+		return future<std::vector<std::shared_ptr<detail::async_io_handle>>>();
+	std::vector<async_io_op> inputs(first, last);
+	std::shared_ptr<detail::when_all_count_completed_state> state(new detail::when_all_count_completed_state(inputs.size()));
+	std::vector<std::function<std::shared_ptr<detail::async_io_handle> (size_t, std::shared_ptr<detail::async_io_handle>)>> callbacks;
+	callbacks.reserve(inputs.size());
+	size_t idx=0;
+	for(auto &i : inputs)
+		callbacks.push_back(std::bind(&detail::when_all_count_completed, std::placeholders::_1, std::placeholders::_2, state, idx++));
+	inputs.front().parent->completion(inputs, callbacks);
+	return state->done.get_future();
 }
 
 /*! \struct async_file_io_op_req
@@ -297,9 +344,18 @@ struct async_path_op_req
 	std::filesystem::path path;
 	file_flags flags;
 	async_io_op precondition;
-	async_path_op_req(std::filesystem::path _path, file_flags _flags=file_flags::None) : path(_path), flags(_flags) { }
-	async_path_op_req(async_io_op _precondition, std::filesystem::path _path, file_flags _flags=file_flags::None) : path(_path), flags(_flags), precondition(_precondition) { }
-	async_path_op_req(const char *_path, file_flags _flags=file_flags::None) : path(_path), flags(_flags) { }
+	//! Fails is path is not absolute
+	async_path_op_req(std::filesystem::path _path, file_flags _flags=file_flags::None) : path(_path), flags(_flags) { if(!path.is_absolute()) throw std::runtime_error("Non-absolute path"); }
+	//! Fails is path is not absolute
+	async_path_op_req(async_io_op _precondition, std::filesystem::path _path, file_flags _flags=file_flags::None) : path(_path), flags(_flags), precondition(_precondition) { if(!path.is_absolute()) throw std::runtime_error("Non-absolute path"); }
+	//! Constructs on the basis of a string. make_preferred() and absolute() are called in this case.
+	async_path_op_req(std::string _path, file_flags _flags=file_flags::None) : path(std::filesystem::absolute(std::filesystem::path(_path).make_preferred())), flags(_flags) { }
+	//! Constructs on the basis of a string. make_preferred() and absolute() are called in this case.
+	async_path_op_req(async_io_op _precondition, std::string _path, file_flags _flags=file_flags::None) : path(std::filesystem::absolute(std::filesystem::path(_path).make_preferred())), flags(_flags), precondition(_precondition) { }
+	//! Constructs on the basis of a string. make_preferred() and absolute() are called in this case.
+	async_path_op_req(const char *_path, file_flags _flags=file_flags::None) : path(std::filesystem::absolute(std::filesystem::path(_path).make_preferred())), flags(_flags) { }
+	//! Constructs on the basis of a string. make_preferred() and absolute() are called in this case.
+	async_path_op_req(async_io_op _precondition, const char *_path, file_flags _flags=file_flags::None) : path(std::filesystem::absolute(std::filesystem::path(_path).make_preferred())), flags(_flags), precondition(_precondition) { }
 };
 
 inline async_io_op async_file_io_dispatcher_base::dir(const async_path_op_req &req)
@@ -333,5 +389,9 @@ inline async_io_op async_file_io_dispatcher_base::close(const async_io_op &req)
 
 
 } } // namespace
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 
 #endif

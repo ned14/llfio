@@ -10,7 +10,6 @@ File Created: Mar 2013
 #include "../include/async_file_io.hpp"
 #include "boost/smart_ptr/detail/spinlock.hpp"
 #include "../../NiallsCPP11Utilities/ErrorHandling.hpp"
-#include <atomic>
 #include <mutex>
 
 #include <fcntl.h>
@@ -48,7 +47,9 @@ namespace triplegit { namespace async_io {
 
 thread_pool &process_threadpool()
 {
-	static thread_pool ret(8);
+	// This is basically how many file i/o operations can occur at once
+	// Obviously the kernel also has a limit
+	static thread_pool ret(64);
 	return ret;
 }
 
@@ -61,7 +62,11 @@ namespace detail {
 		async_io_handle_posix(async_file_io_dispatcher_base *parent, const std::filesystem::path &path, int _fd) : async_io_handle(parent, path), fd(_fd), has_ever_been_fsynced(false)
 		{
 			ERRHOS(fd);
-			parent->int_add_io_handle((void *)(size_t)fd, shared_from_this());
+		}
+		// You can't use shared_from_this() in a constructor so ...
+		void do_add_io_handle_to_parent()
+		{
+			parent()->int_add_io_handle((void *)(size_t)fd, shared_from_this());
 		}
 		~async_io_handle_posix()
 		{
@@ -148,6 +153,23 @@ size_t async_file_io_dispatcher_base::count() const
 }
 
 // Called in unknown thread
+std::shared_ptr<detail::async_io_handle> async_file_io_dispatcher_base::invoke_user_completion(size_t id, std::shared_ptr<detail::async_io_handle> h, std::function<std::shared_ptr<detail::async_io_handle> (size_t, std::shared_ptr<detail::async_io_handle>)> callback)
+{
+	return callback(id, h);
+}
+
+std::vector<async_io_op> async_file_io_dispatcher_base::completion(const std::vector<async_io_op> &ops, const std::vector<std::function<std::shared_ptr<detail::async_io_handle> (size_t, std::shared_ptr<detail::async_io_handle>)>> &callbacks)
+{
+	std::vector<async_io_op> ret;
+	ret.reserve(ops.size());
+	std::vector<async_io_op>::const_iterator i;
+	std::vector<std::function<std::shared_ptr<detail::async_io_handle> (size_t, std::shared_ptr<detail::async_io_handle>)>>::const_iterator c;
+	for(i=ops.begin(), c=callbacks.begin(); i!=ops.end() && c!=callbacks.end(); ++i, ++c)
+		ret.push_back(chain_async_op(*i, &async_file_io_dispatcher_base::invoke_user_completion, *c));
+	return ret;
+}
+
+// Called in unknown thread
 template<class F, class... Args> std::shared_ptr<detail::async_io_handle> async_file_io_dispatcher_base::invoke_async_op_completions(size_t id, std::shared_ptr<detail::async_io_handle> h, std::shared_ptr<detail::async_io_handle> (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, Args...), Args... args)
 {
 	std::shared_ptr<detail::async_io_handle> ret((static_cast<F *>(this)->*f)(id, h, args...));
@@ -180,7 +202,18 @@ template<class F, class... Args> async_io_op async_file_io_dispatcher_base::chai
 	typename detail::async_file_io_dispatcher_op::completion_t boundf(std::make_pair(thisid, std::bind(wrapperf, this, thisid, std::placeholders::_1, f, args...)));
 	// Make a new async_io_op ready for returning
 	async_io_op ret(shared_from_this(), thisid);
-	if(!precondition.id)
+	bool done=false;
+	if(precondition.id)
+	{
+		// If still in flight, chain boundf to be executed when precondition completes
+		auto dep(p->ops.find(precondition.id));
+		if(p->ops.end()!=dep)
+		{
+			dep->second.completions.push_back(boundf);
+			done=true;
+		}
+	}
+	if(!done)
 	{
 		// Bind input handle now and queue immediately to next available thread worker
 		std::shared_ptr<detail::async_io_handle> h;
@@ -189,14 +222,6 @@ template<class F, class... Args> async_io_op async_file_io_dispatcher_base::chai
 		if(precondition.h.valid())
 			h=const_cast<shared_future<std::shared_ptr<detail::async_io_handle>> &>(precondition.h).get();
 		ret.h=threadpool().enqueue(std::bind(boundf.second, h)).share();
-	}
-	else
-	{
-		// Chain boundf to be executed when precondition completes
-		auto dep(p->ops.find(precondition.id));
-		if(p->ops.end()==dep)
-			throw std::runtime_error("Failed to find precondition in list of currently executing operations");
-		dep->second.completions.push_back(boundf);
 	}
 	p->ops.insert(std::make_pair(thisid, ret.h));
 	return ret;
@@ -243,7 +268,9 @@ namespace detail {
 				if(0==ret && !S_ISDIR(s.st_mode))
 					throw std::runtime_error("Not a directory");
 			}
-			return std::shared_ptr<detail::async_io_handle>(new async_io_handle_posix(this, req.path, ret));
+			auto ret2=std::shared_ptr<detail::async_io_handle>(new async_io_handle_posix(this, req.path, ret));
+			static_cast<async_io_handle_posix *>(ret2.get())->do_add_io_handle_to_parent();
+			return ret2;
 		}
 		// Called in unknown thread
 		std::shared_ptr<detail::async_io_handle> dofile(size_t id, std::shared_ptr<detail::async_io_handle>, async_path_op_req req)
@@ -262,7 +289,9 @@ namespace detail {
 #ifdef OS_SYNC
 			if(file_flags::OSSync==(req.flags & file_flags::OSSync)) flags|=O_SYNC;
 #endif
-			return std::shared_ptr<detail::async_io_handle>(new async_io_handle_posix(this, req.path, posix_open(req.path.c_str(), flags, 0x1b0/*660*/)));
+			auto ret=std::shared_ptr<detail::async_io_handle>(new async_io_handle_posix(this, req.path, posix_open(req.path.c_str(), flags, 0x1b0/*660*/)));
+			static_cast<async_io_handle_posix *>(ret.get())->do_add_io_handle_to_parent();
+			return ret;
 		}
 		// Called in unknown thread
 		std::shared_ptr<detail::async_io_handle> dosync(size_t id, std::shared_ptr<detail::async_io_handle> h, async_io_op)

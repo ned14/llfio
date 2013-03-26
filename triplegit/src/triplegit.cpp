@@ -5,7 +5,14 @@ File Created: Mar 2013
 
 #include "../include/triplegit.hpp"
 #include "../include/async_file_io.hpp"
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable: 4996) // Function call with parameters that may be unsafe
+#endif
 #include "boost/lockfree/spsc_queue.hpp"
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 #include <atomic>
 
 using namespace std;
