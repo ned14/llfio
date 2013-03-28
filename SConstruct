@@ -169,8 +169,8 @@ else:
 
 print "*** Build variant preferred by environment is", "Debug" if env.GetOption("debug") else "Release", architecture, "using compiler", env['CC']
 mylibrary=buildvariants[("Debug" if env.GetOption("debug") else "Release", architecture)]
+#print(mylibrary)
 Default([x[0] for x in mylibrary.values()])
-mylibrary=mylibrary['mylib'][0]
 
 # Set up the MSVC project files
 if 'win32'==sys.platform:

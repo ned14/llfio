@@ -33,7 +33,7 @@ File Created: Mar 2013
 #define posix_rmdir rmdir
 #define posix_stat stat
 #define posix_open open
-#define posix_close close
+#define posix_close ::close
 #define posix_read read
 #define posix_write write
 #define posix_fsync fsync
@@ -336,23 +336,23 @@ namespace detail {
 			{
 				auto op(chain_async_op(i, &async_file_io_dispatcher_compat::doclose, i));
 #ifdef __linux__
+				// It's a real shame Linux's unsafe default forces a synchronisation here ...
+				async_io_handle_posix *p=static_cast<async_io_handle_posix *>(const_cast<shared_future<std::shared_ptr<detail::async_io_handle>> &>(i.h).get().get());
 				if(p->has_ever_been_fsynced)
 				{
 					// Need to fsync the containing directory on Linux file systems, otherwise the file doesn't
 					// necessarily appear where it's supposed to
-					fixme;
-					async_path_op_req containingdir(i.path().parent_path(), file_flags::Read);
-					auto diropenop(chain_async_op(op, containingdir));
-					auto syncdir(std::bind(&async_file_io_dispatcher_compat::dosync, this, std::placeholders::_1, diropenop.h));
-					auto syncdirop(chain_async_op(diropenop, syncdir));
-					auto opendir(std::bind(&async_file_io_dispatcher_compat::dofile, this, std::placeholders::_1, i));
+					async_path_op_req containingdir(op, p->path().parent_path(), file_flags::Read);
+					auto diropenop(chain_async_op(containingdir.precondition, &async_file_io_dispatcher_compat::dofile, containingdir));
+					auto syncdirop(chain_async_op(diropenop, &async_file_io_dispatcher_compat::dosync, diropenop));
+					auto closedirop(chain_async_op(syncdirop, &async_file_io_dispatcher_compat::doclose, syncdirop));
+					op=closedirop;
 				}
-#else
+#endif
 				// On non-Linux file systems, closing a file guarantees the storage for its containing directory
 				// will be atomically updated as soon as the file's contents reach storage. In other words,
 				// if you fsync() a file before closing it, closing it auto-fsyncs its containing directory.
 				ret.push_back(op);
-#endif
 			}
 			return ret;
 		}

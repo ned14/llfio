@@ -63,6 +63,7 @@ else:
     else:
         env['CCFLAGS']+=["-O2", "-g"]
     env['CXXFLAGS']+=["-std=c++0x"]
+    env['LIBS']+=["boost_filesystem", "boost_system", "boost_thread", "pthread"]
     env['LINKFLAGS']+=[]
     env['LINKFLAGSEXE']=env['LINKFLAGS'][:]
 
@@ -71,6 +72,7 @@ outputs={}
 # Build the triplegit DLL
 sources = env.SConscript(os.path.join("src", "SConscript"), 'env')
 libobjects = env.SharedObject(sources, CPPDEFINES=env['CPPDEFINES']+["TRIPLEGIT_DLL_EXPORTS"])
+libobjects+=env.SConscript(os.path.join("..", "NiallsCPP11Utilities", "SConscript"), 'env')['mylib']
 if env.GetOption("static"):
     mylib = env.StaticLibrary("triplegit", source = libobjects)
     myliblib = mylib

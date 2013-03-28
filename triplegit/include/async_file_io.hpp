@@ -15,7 +15,9 @@ File Created: Mar 2013
 #define _WIN32_WINNT 0x0501
 #endif
 #define BOOST_THREAD_VERSION 3
+#define BOOST_THREAD_DONT_PROVIDE_FUTURE
 #include "boost/asio.hpp"
+#include "boost/thread/thread.hpp"
 #include "boost/thread/future.hpp"
 
 #ifdef TRIPLEGIT_DLL_EXPORTS
@@ -43,14 +45,14 @@ typedef std::thread thread;
 
 when_all() and when_any() definitions borrowed from http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2012/n3428.pdf
 */
-template<class T> class future : public boost::future<T>
+template<class T> class future : public boost::unique_future<T>
 {
 public:
 	future() { }
-	future(boost::future<T> &&o) : boost::future<T>(std::move(o)) { }
-	future(future &&o) : boost::future<T>(std::move(o)) { }
-	future &operator=(boost::future<T> &&o) { static_cast<boost::future<T> &&>(*this)=std::move(o); return *this; }
-	future &operator=(future &&o) { static_cast<boost::future<T> &&>(*this)=std::move(o); return *this; }
+	future(boost::unique_future<T> &&o) : boost::unique_future<T>(std::move(o)) { }
+	future(future &&o) : boost::unique_future<T>(std::move(o)) { }
+	future &operator=(boost::unique_future<T> &&o) { static_cast<boost::unique_future<T> &&>(*this)=std::move(o); return *this; }
+	future &operator=(future &&o) { static_cast<boost::unique_future<T> &&>(*this)=std::move(o); return *this; }
 };
 /*! \class shared_future
 \brief For now, this is boost's shared_future. Will be replaced when C++'s shared_future catches up with boost's

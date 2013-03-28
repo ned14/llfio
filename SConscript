@@ -63,6 +63,7 @@ else:
     else:
         env['CCFLAGS']+=["-O2", "-g"]
     env['CXXFLAGS']+=["-std=c++0x"]
+    env['LIBS']+=["boost_filesystem", "boost_system", "boost_thread", "pthread"]
     env['LINKFLAGS']+=[]
     env['LINKFLAGSEXE']=env['LINKFLAGS'][:]
 
@@ -72,10 +73,12 @@ outputs={}
 outputs['mylibs']=SConscript("triplegit/SConscript")
 
 # Unit tests
-sources = [ "unittests/main.cpp" ]
-objects = env.Object("unittests", source = sources) # + [myliblib]
+sources = env.SConscript(os.path.join("unittests", "SConscript"), 'env')
+objects = env.Object(source = sources) # + [myliblib]
 testlibs=outputs['mylibs']['triplegitlib'][0]
-testprogram_cpp = env.Program("unittests", source = objects, LINKFLAGS=env['LINKFLAGSEXE'], LIBS = env['LIBS'] + testlibs)
+testprogram_cpp = env.Program("tests", source = objects, LINKFLAGS=env['LINKFLAGSEXE'], LIBS = env['LIBS'] + testlibs)
 outputs['unittests']=(testprogram_cpp, sources)
 
+# Remove triplegit lib contents from mylibs
+del outputs['mylibs']
 Return("outputs")
