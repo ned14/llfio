@@ -274,8 +274,8 @@ TEST_CASE("async_io/works", "Tests that the async i/o implementation works")
 		auto begin=chrono::high_resolution_clock::now();
 		auto mkdir(dispatcher->dir(async_path_op_req("testdir", file_flags::Create)));
 		std::vector<async_path_op_req> manyfilereqs;
-		manyfilereqs.reserve(2000);
-		for(size_t n=0; n<2000; n++)
+		manyfilereqs.reserve(1000);
+		for(size_t n=0; n<1000; n++)
 			manyfilereqs.push_back(async_path_op_req(mkdir, "testdir/"+std::to_string(n), file_flags::Create));
 		auto manyopenfiles(dispatcher->file(manyfilereqs));
 		auto manyclosedfiles(dispatcher->close(manyopenfiles));
