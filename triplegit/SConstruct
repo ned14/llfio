@@ -113,17 +113,18 @@ else:
     #else:
     #    print "Disabling C++11 support"
 	
+    boostpath=os.path.abspath(os.path.join(os.getcwd(), "boost"))
+    while not os.path.exists(boostpath):
+    	#print(boostpath)
+    	boostpath=os.path.dirname(os.path.dirname(boostpath))
+    	if len(boostpath)<4: break
+    	boostpath=os.path.join(boostpath, "boost")
+    if len(boostpath)>4 and os.path.exists(boostpath):
+       	env['CPPPATH']+=[boostpath]
+    	env['LIBS']+=[os.path.join(boostpath, 'stage', 'lib')]
     if not conf.CheckHaveBoost():
-    	old=env['CPPPATH']
-    	boostpath=os.path.abspath(os.path.join(os.getcwd(), "boost"))
-    	while not os.path.exists(boostpath) and len(boostpath):
-    		boostpath=os.path.join(os.path.dirname(os.path.dirname(boostpath)), "boost")
-    	if len(boostpath):
-        	env['CPPPATH']+=[boostpath]
-    	#env['LIB']+=['../boost/stage/lib/']
-    	if not conf.CheckHaveBoost():
-    		print("ERROR: I need the Boost libraries, either in the system or in a boost directory just above mine")
-    		sys.exit(1)
+    	print("ERROR: I need the Boost libraries, either in the system or in a boost directory just above mine")
+    	sys.exit(1)
 
     env=conf.Finish()
 

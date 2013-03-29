@@ -72,6 +72,17 @@ else:
         cc.env['CPPFLAGS']=temp
         cc.Result(result)
         return result
+    def CheckHaveOpenMP(cc):
+        cc.Message("Checking for OpenMP support ...")
+        try:
+            temp=cc.env['CPPFLAGS']
+        except:
+            temp=[]
+        cc.env['CPPFLAGS']=temp+["-fopenmp"]
+        result=cc.TryCompile('#include <omp.h>\nint main(void) { return 0; }\n', '.cpp')
+        cc.env['CPPFLAGS']=temp
+        cc.Result(result)
+        return result
     def CheckHaveCPP11Features(cc):
         cc.Message("Checking if can enable C++11 features ...")
         try:
@@ -92,7 +103,7 @@ else:
         result=cc.TryCompile('#include "boost/mpl/vector.hpp"\n', '.cpp')
         cc.Result(result)
         return result
-    conf=Configure(env, { "CheckHaveClang" : CheckHaveClang, "CheckHaveGCC" : CheckHaveGCC, "CheckHaveVisibility" : CheckHaveVisibility, "CheckHaveCPP11Features" : CheckHaveCPP11Features, "CheckHaveBoost" : CheckHaveBoost } )
+    conf=Configure(env, { "CheckHaveClang" : CheckHaveClang, "CheckHaveGCC" : CheckHaveGCC, "CheckHaveVisibility" : CheckHaveVisibility, "CheckHaveOpenMP" : CheckHaveOpenMP, "CheckHaveCPP11Features" : CheckHaveCPP11Features, "CheckHaveBoost" : CheckHaveBoost } )
     if env.GetOption('useclang') and conf.CheckHaveClang():
         env['CC']="clang"
         env['CXX']="clang++"
@@ -107,6 +118,11 @@ else:
                              ]
     else:
         print "Disabling -fvisibility support"
+    if conf.CheckHaveOpenMP():
+        env['CPPFLAGS']+=["-fopenmp"]
+        env['LINKFLAGS']+=["-fopenmp"]
+    else:
+        print "Disabling OpenMP support"
 
     #if conf.CheckHaveCPP11Features():
     #    env['CXXFLAGS']+=["-std=c++11"]
@@ -114,9 +130,12 @@ else:
     #    print "Disabling C++11 support"
 	
     boostpath=os.path.abspath(os.path.join(os.getcwd(), "boost"))
-    while not os.path.exists(boostpath) and len(boostpath):
-    	boostpath=os.path.dirname(boostpath)
-    if len(boostpath):
+    while not os.path.exists(boostpath):
+    	#print(boostpath)
+    	boostpath=os.path.dirname(os.path.dirname(boostpath))
+    	if len(boostpath)<4: break
+    	boostpath=os.path.join(boostpath, "boost")
+    if len(boostpath)>4 and os.path.exists(boostpath):
        	env['CPPPATH']+=[boostpath]
     	env['LIBS']+=[os.path.join(boostpath, 'stage', 'lib')]
     if not conf.CheckHaveBoost():
