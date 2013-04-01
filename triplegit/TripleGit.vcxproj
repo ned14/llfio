@@ -33,7 +33,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\async_file_io.cpp" />
-    <ClCompile Include="src\triplegit.cpp" />
+    <ClCompile Include="src\triplegitmain.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\NiallsCPP11Utilities\NiallsCPP11Utilities.vcxproj">
