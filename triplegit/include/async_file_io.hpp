@@ -8,7 +8,7 @@ File Created: Mar 2013
 #define TRIPLEGIT_ASYNC_FILE_IO_H
 
 #include "../../NiallsCPP11Utilities/NiallsCPP11Utilities.hpp"
-#include "std_filesystem.hpp"
+#include "../../NiallsCPP11Utilities/std_filesystem.hpp"
 #include <thread>
 #include <atomic>
 #if !defined(_WIN32_WINNT) && defined(WIN32)
@@ -229,6 +229,10 @@ inline file_flags operator&(file_flags a, file_flags b)
 inline file_flags operator|(file_flags a, file_flags b)
 {
 	return static_cast<file_flags>(static_cast<size_t>(a) | static_cast<size_t>(b));
+}
+inline file_flags operator~(file_flags a)
+{
+	return static_cast<file_flags>(~static_cast<size_t>(a));
 }
 
 struct async_path_op_req;

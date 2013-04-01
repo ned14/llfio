@@ -4,6 +4,8 @@ Provides a threadpool and asynchronous file i/o infrastructure based on Boost.AS
 File Created: Mar 2013
 */
 
+//#define USE_POSIX_ON_WIN32 // Useful for testing
+
 #define _CRT_SECURE_NO_WARNINGS
 #define _CRT_NONSTDC_DEPRECATE(a)
 
@@ -15,6 +17,7 @@ File Created: Mar 2013
 #include <fcntl.h>
 #include <sys/stat.h>
 #ifdef WIN32
+#ifdef USE_POSIX_ON_WIN32
 #include <io.h>
 #include <direct.h>
 #define posix_mkdir(path, mode) _wmkdir(path)
@@ -28,6 +31,10 @@ File Created: Mar 2013
 #define posix_read _read
 #define posix_write _write
 #define posix_fsync _commit
+#else
+#define WIN32_LEAN_AND_MEAN 1
+#include <Windows.h>
+#endif
 #else
 #define posix_mkdir mkdir
 #define posix_rmdir rmdir
@@ -54,30 +61,54 @@ thread_pool &process_threadpool()
 }
 
 namespace detail {
+#if defined(WIN32) && !defined(USE_POSIX_ON_WIN32)
+	struct async_io_handle_windows : public async_io_handle
+	{
+		boost::asio::windows::random_access_handle h;
+
+		async_io_handle_windows(async_file_io_dispatcher_base *parent, const std::filesystem::path &path, HANDLE _h) : async_io_handle(parent, path), h(process_threadpool().io_service(), _h)
+		{
+		}
+		// You can't use shared_from_this() in a constructor so ...
+		void do_add_io_handle_to_parent()
+		{
+			parent()->int_add_io_handle((void *)h.native_handle(), shared_from_this());
+		}
+		~async_io_handle_windows()
+		{
+			parent()->int_del_io_handle((void *)h.native_handle());
+			h.close();
+		}
+	};
+#else
 	struct async_io_handle_posix : public async_io_handle
 	{
 		int fd;
-		bool has_ever_been_fsynced;
+		bool has_been_added, has_ever_been_fsynced;
 
-		async_io_handle_posix(async_file_io_dispatcher_base *parent, const std::filesystem::path &path, int _fd) : async_io_handle(parent, path), fd(_fd), has_ever_been_fsynced(false)
+		async_io_handle_posix(async_file_io_dispatcher_base *parent, const std::filesystem::path &path, int _fd) : async_io_handle(parent, path), fd(_fd), has_been_added(false), has_ever_been_fsynced(false)
 		{
-			ERRHOS(fd);
+			if(fd!=-999)
+				ERRHOSFN(fd, path);
 		}
 		// You can't use shared_from_this() in a constructor so ...
 		void do_add_io_handle_to_parent()
 		{
 			parent()->int_add_io_handle((void *)(size_t)fd, shared_from_this());
+			has_been_added=true;
 		}
 		~async_io_handle_posix()
 		{
-			parent()->int_del_io_handle((void *)(size_t)fd);
+			if(has_been_added)
+				parent()->int_del_io_handle((void *)(size_t)fd);
 			if(fd>=0)
 			{
-				posix_close(fd);
+				ERRHOSFN(posix_close(fd), path());
 				fd=-1;
 			}
 		}
 	};
+#endif
 
 	struct async_file_io_dispatcher_op
 	{
@@ -245,10 +276,98 @@ template<class F> std::vector<async_io_op> async_file_io_dispatcher_base::chain_
 
 
 namespace detail {
-	class async_file_io_dispatcher_compat : public async_file_io_dispatcher_base
+#if defined(WIN32) && !defined(USE_POSIX_ON_WIN32)
+	class async_file_io_dispatcher_windows : public async_file_io_dispatcher_base
 	{
 		// Called in unknown thread
 		std::shared_ptr<detail::async_io_handle> dodir(size_t id, std::shared_ptr<detail::async_io_handle>, async_path_op_req req)
+		{
+			BOOL ret=0;
+			if(file_flags::Create==(req.flags & file_flags::Create))
+			{
+				ret=CreateDirectory(req.path.c_str(), NULL);
+				if(!ret && ERROR_ALREADY_EXISTS==GetLastError())
+				{
+					// Ignore already exists unless we were asked otherwise
+					if(file_flags::CreateOnlyIfNotExist!=(req.flags & file_flags::CreateOnlyIfNotExist))
+						ret=1;
+				}
+			}
+			else
+			{
+				DWORD attr=GetFileAttributes(req.path.c_str());
+				if(INVALID_FILE_ATTRIBUTES!=attr && !(attr & FILE_ATTRIBUTE_DIRECTORY))
+					throw std::runtime_error("Not a directory");
+			}
+			auto ret2=std::shared_ptr<detail::async_io_handle>(new async_io_handle_windows(this, req.path, ret));
+			static_cast<async_io_handle_posix *>(ret2.get())->do_add_io_handle_to_parent();
+			return ret2;
+		}
+		// Called in unknown thread
+		std::shared_ptr<detail::async_io_handle> dofile(size_t id, std::shared_ptr<detail::async_io_handle>, async_path_op_req req)
+		{
+			int flags=0;
+			if(file_flags::Read==(req.flags & file_flags::Read) && file_flags::Write==(req.flags & file_flags::Write)) flags|=O_RDWR;
+			else if(file_flags::Read==(req.flags & file_flags::Read)) flags|=O_RDONLY;
+			else if(file_flags::Write==(req.flags & file_flags::Write)) flags|=O_WRONLY;
+			if(file_flags::Append==(req.flags & file_flags::Append)) flags|=O_APPEND;
+			if(file_flags::Truncate==(req.flags & file_flags::Truncate)) flags|=O_TRUNC;
+			if(file_flags::CreateOnlyIfNotExist==(req.flags & file_flags::CreateOnlyIfNotExist)) flags|=O_EXCL|O_CREAT;
+			else if(file_flags::Create==(req.flags & file_flags::Create)) flags|=O_CREAT;
+#ifdef O_DIRECT
+			if(file_flags::OSDirect==(req.flags & file_flags::OSDirect)) flags|=O_DIRECT;
+#endif
+#ifdef OS_SYNC
+			if(file_flags::OSSync==(req.flags & file_flags::OSSync)) flags|=O_SYNC;
+#endif
+			auto ret=std::shared_ptr<detail::async_io_handle>(new async_io_handle_posix(this, req.path, posix_open(req.path.c_str(), flags, 0x1b0/*660*/)));
+			static_cast<async_io_handle_posix *>(ret.get())->do_add_io_handle_to_parent();
+			return ret;
+		}
+		// Called in unknown thread
+		std::shared_ptr<detail::async_io_handle> dosync(size_t id, std::shared_ptr<detail::async_io_handle> h, async_io_op)
+		{
+			async_io_handle_posix *p=static_cast<async_io_handle_posix *>(h.get());
+			ERRHOS(posix_fsync(p->fd));
+			p->has_ever_been_fsynced=true;
+			return h;
+		}
+		// Called in unknown thread
+		std::shared_ptr<detail::async_io_handle> doclose(size_t id, std::shared_ptr<detail::async_io_handle> h, async_io_op)
+		{
+			async_io_handle_posix *p=static_cast<async_io_handle_posix *>(h.get());
+			ERRHOS(posix_close(p->fd));
+			p->fd=-1;
+			return h;
+		}
+
+	public:
+		async_file_io_dispatcher_windows(thread_pool &threadpool, file_flags flagsforce, file_flags flagsmask) : async_file_io_dispatcher_base(threadpool, flagsforce, flagsmask)
+		{
+		}
+
+		virtual std::vector<async_io_op> dir(const std::vector<async_path_op_req> &reqs)
+		{
+			return chain_async_ops(reqs, &async_file_io_dispatcher_windows::dodir);
+		}
+		virtual std::vector<async_io_op> file(const std::vector<async_path_op_req> &reqs)
+		{
+			return chain_async_ops(reqs, &async_file_io_dispatcher_windows::dofile);
+		}
+		virtual std::vector<async_io_op> sync(const std::vector<async_io_op> &ops)
+		{
+			return chain_async_ops(ops, &async_file_io_dispatcher_windows::dosync);
+		}
+		virtual std::vector<async_io_op> close(const std::vector<async_io_op> &ops)
+		{
+			return chain_async_ops(ops, &async_file_io_dispatcher_windows::doclose);
+		}
+	};
+#else
+	class async_file_io_dispatcher_compat : public async_file_io_dispatcher_base
+	{
+		// Called in unknown thread
+		std::shared_ptr<detail::async_io_handle> dodir(size_t id, std::shared_ptr<detail::async_io_handle> _, async_path_op_req req)
 		{
 			int ret=0;
 			if(file_flags::Create==(req.flags & file_flags::Create))
@@ -260,17 +379,21 @@ namespace detail {
 					if(file_flags::CreateOnlyIfNotExist!=(req.flags & file_flags::CreateOnlyIfNotExist))
 						ret=0;
 				}
+				req.flags=req.flags&~(file_flags::Create|file_flags::CreateOnlyIfNotExist);
 			}
+
+			struct stat s={0};
+			ret=posix_stat(req.path.c_str(), &s);
+			if(0==ret && !S_ISDIR(s.st_mode))
+				throw std::runtime_error("Not a directory");
+			if(file_flags::Read==(req.flags & file_flags::Read))
+				return dofile(id, _, req);
 			else
 			{
-				struct stat s={0};
-				int ret=posix_stat(req.path.c_str(), &s);
-				if(0==ret && !S_ISDIR(s.st_mode))
-					throw std::runtime_error("Not a directory");
+				// Create dummy handle so
+				auto ret=std::shared_ptr<detail::async_io_handle>(new async_io_handle_posix(this, req.path, -999));
+				return ret;
 			}
-			auto ret2=std::shared_ptr<detail::async_io_handle>(new async_io_handle_posix(this, req.path, ret));
-			static_cast<async_io_handle_posix *>(ret2.get())->do_add_io_handle_to_parent();
-			return ret2;
 		}
 		// Called in unknown thread
 		std::shared_ptr<detail::async_io_handle> dofile(size_t id, std::shared_ptr<detail::async_io_handle>, async_path_op_req req)
@@ -357,12 +480,13 @@ namespace detail {
 			return ret;
 		}
 	};
+#endif
 }
 
 std::shared_ptr<async_file_io_dispatcher_base> async_file_io_dispatcher(thread_pool &threadpool, file_flags flagsforce, file_flags flagsmask)
 {
-#ifdef WIN32
-	return std::make_shared<detail::async_file_io_dispatcher_compat>(threadpool, flagsforce, flagsmask);
+#if defined(WIN32) && !defined(USE_POSIX_ON_WIN32)
+	return std::make_shared<detail::async_file_io_dispatcher_windows>(threadpool, flagsforce, flagsmask);
 #else
 	return std::make_shared<detail::async_file_io_dispatcher_compat>(threadpool, flagsforce, flagsmask);
 #endif

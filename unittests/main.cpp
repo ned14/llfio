@@ -6,7 +6,6 @@ Created: Feb 2013
 #include <utility>
 #include <sstream>
 #include <iostream>
-#include "../triplegit/include/std_filesystem.hpp"
 #include "../triplegit/include/triplegit.hpp"
 #include "../triplegit/include/async_file_io.hpp"
 #include "boost/graph/topological_sort.hpp"
