@@ -217,6 +217,7 @@ enum class file_flags : size_t
 	Create=16,			//!< Open and create if doesn't exist
 	CreateOnlyIfNotExist=32, //!< Create and open only if doesn't exist
 	AutoFlush=64,		//!< Automatically initiate an asynchronous flush just before file close, and fuse both operations so both must complete for close to complete.
+	WillBeSequentiallyAccessed=128, //!< Will be exclusively either read or written sequentially. If you're exclusively writing sequentially, \em strongly consider turning on OSDirect too.
 
 	OSDirect=(1<<16),	//!< Bypass the OS file buffers (only really useful for writing large files. Note you must 4Kb align everything if this is on)
 	OSSync=(1<<17)		//!< Ask the OS to not complete until the data is on the physical storage. Best used only with Direct, otherwise use AutoFlush.
@@ -273,10 +274,18 @@ public:
 	virtual std::vector<async_io_op> dir(const std::vector<async_path_op_req> &reqs)=0;
 	//! Asynchronously creates a directory
 	inline async_io_op dir(const async_path_op_req &req);
-	//! Asynchronously creates files
+	//! Asynchronously deletes directories
+	virtual std::vector<async_io_op> rmdir(const std::vector<async_path_op_req> &reqs)=0;
+	//! Asynchronously deletes a directory
+	inline async_io_op rmdir(const async_path_op_req &req);
+	//! Asynchronously opens or creates files
 	virtual std::vector<async_io_op> file(const std::vector<async_path_op_req> &reqs)=0;
-	//! Asynchronously creates a file
+	//! Asynchronously opens or creates a file
 	inline async_io_op file(const async_path_op_req &req);
+	//! Asynchronously deletes files
+	virtual std::vector<async_io_op> rmfile(const std::vector<async_path_op_req> &reqs)=0;
+	//! Asynchronously deletes files
+	inline async_io_op rmfile(const async_path_op_req &req);
 	//! Asynchronously synchronises items with physical storage once they complete
 	virtual std::vector<async_io_op> sync(const std::vector<async_io_op> &ops)=0;
 	//! Asynchronously synchronises an item with physical storage once it completes
@@ -326,7 +335,7 @@ namespace detail
 	}
 }
 
-//! Convenience overload for a vector of async_io_op
+//! \brief Convenience overload for a vector of async_io_op
 inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(std::vector<async_io_op>::iterator first, std::vector<async_io_op>::iterator last)
 {
 	if(first==last)
@@ -371,12 +380,26 @@ inline async_io_op async_file_io_dispatcher_base::dir(const async_path_op_req &r
 	i.push_back(req);
 	return dir(i).front();
 }
+inline async_io_op async_file_io_dispatcher_base::rmdir(const async_path_op_req &req)
+{
+	std::vector<async_path_op_req> i;
+	i.reserve(1);
+	i.push_back(req);
+	return rmdir(i).front();
+}
 inline async_io_op async_file_io_dispatcher_base::file(const async_path_op_req &req)
 {
 	std::vector<async_path_op_req> i;
 	i.reserve(1);
 	i.push_back(req);
 	return file(i).front();
+}
+inline async_io_op async_file_io_dispatcher_base::rmfile(const async_path_op_req &req)
+{
+	std::vector<async_path_op_req> i;
+	i.reserve(1);
+	i.push_back(req);
+	return rmfile(i).front();
 }
 inline async_io_op async_file_io_dispatcher_base::sync(const async_io_op &req)
 {

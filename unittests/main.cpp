@@ -270,23 +270,39 @@ TEST_CASE("async_io/works", "Tests that the async i/o implementation works")
 	auto dispatcher=async_file_io_dispatcher();
 
 	{
-		auto begin=chrono::high_resolution_clock::now();
 		auto mkdir(dispatcher->dir(async_path_op_req("testdir", file_flags::Create)));
 		std::vector<async_path_op_req> manyfilereqs;
 		manyfilereqs.reserve(1000);
 		for(size_t n=0; n<1000; n++)
-			manyfilereqs.push_back(async_path_op_req(mkdir, "testdir/"+std::to_string(n), file_flags::Create));
+			manyfilereqs.push_back(async_path_op_req(mkdir, "testdir/"+std::to_string(n), file_flags::Create|file_flags::Write));
+
+		auto begin=chrono::high_resolution_clock::now();
 		auto manyopenfiles(dispatcher->file(manyfilereqs));
 		auto manyclosedfiles(dispatcher->close(manyopenfiles));
 		auto dispatched=chrono::high_resolution_clock::now();
-		when_all(manyclosedfiles.begin(), manyclosedfiles.end());
+		when_all(manyclosedfiles.begin(), manyclosedfiles.end()).wait();
+		auto createdsync=chrono::high_resolution_clock::now();
+		auto it(manyclosedfiles.begin());
+		for(auto &i : manyfilereqs)
+			i.precondition=*it++;
+		auto manydeletedfiles(dispatcher->rmfile(manyfilereqs));
+		auto dispatched2=chrono::high_resolution_clock::now();
+		when_all(manydeletedfiles.begin(), manydeletedfiles.end()).wait();
 		auto end=chrono::high_resolution_clock::now();
-		auto diff=chrono::duration_cast<secs_type>(end-begin);
-		cout << "It took " << diff.count() << " secs to do " << 10000/diff.count() << " file creations per sec" << endl;
+		auto rmdir(dispatcher->rmdir(async_path_op_req("testdir")));
+
+		auto diff=chrono::duration_cast<secs_type>(createdsync-begin);
+		cout << "It took " << diff.count() << " secs to do " << manyfilereqs.size()/diff.count() << " file creations per sec" << endl;
 		diff=chrono::duration_cast<secs_type>(dispatched-begin);
-		cout << "It took " << diff.count() << " secs to dispatch" << endl;
-		diff=chrono::duration_cast<secs_type>(end-dispatched);
-		cout << "It took " << diff.count() << " secs to synchronise" << endl;
+		cout << "   It took " << diff.count() << " secs to dispatch file creation" << endl;
+		diff=chrono::duration_cast<secs_type>(createdsync-dispatched);
+		cout << "   It took " << diff.count() << " secs to synchronise file creation" << endl;
+		diff=chrono::duration_cast<secs_type>(end-createdsync);
+		cout << "It took " << diff.count() << " secs to do " << manyfilereqs.size()/diff.count() << " file deletions per sec" << endl;
+		diff=chrono::duration_cast<secs_type>(dispatched2-createdsync);
+		cout << "   It took " << diff.count() << " secs to dispatch file deletion" << endl;
+		diff=chrono::duration_cast<secs_type>(end-dispatched2);
+		cout << "   It took " << diff.count() << " secs to synchronise file deletion" << endl;
 	}
 }
 

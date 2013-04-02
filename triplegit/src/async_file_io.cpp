@@ -17,7 +17,8 @@ File Created: Mar 2013
 #include <fcntl.h>
 #include <sys/stat.h>
 #ifdef WIN32
-#ifdef USE_POSIX_ON_WIN32
+#include <Windows.h>
+// We also compile the posix compat layer for catching silly compile errors for POSIX
 #include <io.h>
 #include <direct.h>
 #define posix_mkdir(path, mode) _wmkdir(path)
@@ -28,19 +29,17 @@ File Created: Mar 2013
 #define S_ISDIR(m) ((m) & _S_IFDIR)
 #define posix_open _wopen
 #define posix_close _close
+#define posix_unlink _wunlink
 #define posix_read _read
 #define posix_write _write
 #define posix_fsync _commit
-#else
-#define WIN32_LEAN_AND_MEAN 1
-#include <Windows.h>
-#endif
 #else
 #define posix_mkdir mkdir
 #define posix_rmdir rmdir
 #define posix_stat stat
 #define posix_open open
 #define posix_close ::close
+#define posix_unlink unlink
 #define posix_read read
 #define posix_write write
 #define posix_fsync fsync
@@ -61,32 +60,45 @@ thread_pool &process_threadpool()
 }
 
 namespace detail {
-#if defined(WIN32) && !defined(USE_POSIX_ON_WIN32)
+#if defined(WIN32)
 	struct async_io_handle_windows : public async_io_handle
 	{
-		boost::asio::windows::random_access_handle h;
+		std::shared_ptr<async_file_io_dispatcher_base> parent;
+		std::unique_ptr<boost::asio::windows::random_access_handle> h;
+		void *myid;
+		bool has_been_added, autoflush;
 
-		async_io_handle_windows(async_file_io_dispatcher_base *parent, const std::filesystem::path &path, HANDLE _h) : async_io_handle(parent, path), h(process_threadpool().io_service(), _h)
-		{
-		}
+		async_io_handle_windows(std::shared_ptr<async_file_io_dispatcher_base> _parent, const std::filesystem::path &path) : async_io_handle(_parent.get(), path), parent(_parent), myid(nullptr), has_been_added(false), autoflush(false) { }
+		async_io_handle_windows(std::shared_ptr<async_file_io_dispatcher_base> _parent, const std::filesystem::path &path, bool _autoflush, HANDLE _h) : async_io_handle(_parent.get(), path), parent(_parent), h(new boost::asio::windows::random_access_handle(process_threadpool().io_service(), _h)), myid(_h), has_been_added(false), autoflush(_autoflush) { }
 		// You can't use shared_from_this() in a constructor so ...
 		void do_add_io_handle_to_parent()
 		{
-			parent()->int_add_io_handle((void *)h.native_handle(), shared_from_this());
+			if(h)
+			{
+				parent->int_add_io_handle(myid, shared_from_this());
+				has_been_added=true;
+			}
 		}
 		~async_io_handle_windows()
 		{
-			parent()->int_del_io_handle((void *)h.native_handle());
-			h.close();
+			if(has_been_added)
+				parent->int_del_io_handle(myid);
+			if(h)
+			{
+				if(autoflush)
+					ERRHWINFN(FlushFileBuffers(h->native_handle()), path());
+				h->close();
+			}
 		}
 	};
-#else
+#endif
 	struct async_io_handle_posix : public async_io_handle
 	{
+		std::shared_ptr<async_file_io_dispatcher_base> parent;
 		int fd;
-		bool has_been_added, has_ever_been_fsynced;
+		bool has_been_added, autoflush, has_ever_been_fsynced;
 
-		async_io_handle_posix(async_file_io_dispatcher_base *parent, const std::filesystem::path &path, int _fd) : async_io_handle(parent, path), fd(_fd), has_been_added(false), has_ever_been_fsynced(false)
+		async_io_handle_posix(std::shared_ptr<async_file_io_dispatcher_base> _parent, const std::filesystem::path &path, bool _autoflush, int _fd) : async_io_handle(_parent.get(), path), parent(_parent), fd(_fd), has_been_added(false), autoflush(_autoflush),has_ever_been_fsynced(false)
 		{
 			if(fd!=-999)
 				ERRHOSFN(fd, path);
@@ -94,21 +106,23 @@ namespace detail {
 		// You can't use shared_from_this() in a constructor so ...
 		void do_add_io_handle_to_parent()
 		{
-			parent()->int_add_io_handle((void *)(size_t)fd, shared_from_this());
+			parent->int_add_io_handle((void *)(size_t)fd, shared_from_this());
 			has_been_added=true;
 		}
 		~async_io_handle_posix()
 		{
 			if(has_been_added)
-				parent()->int_del_io_handle((void *)(size_t)fd);
+				parent->int_del_io_handle((void *)(size_t)fd);
 			if(fd>=0)
 			{
+				// Flush synchronously here? I guess ...
+				if(autoflush)
+					ERRHOSFN(posix_fsync(fd), path());
 				ERRHOSFN(posix_close(fd), path());
 				fd=-1;
 			}
 		}
 	};
-#endif
 
 	struct async_file_io_dispatcher_op
 	{
@@ -168,7 +182,7 @@ thread_pool &async_file_io_dispatcher_base::threadpool() const
 
 file_flags async_file_io_dispatcher_base::fileflags(file_flags flags) const
 {
-	return (flags&p->flagsmask)|p->flagsforce;
+	return (flags&~p->flagsmask)|p->flagsforce;
 }
 
 size_t async_file_io_dispatcher_base::wait_queue_depth() const
@@ -195,6 +209,7 @@ std::vector<async_io_op> async_file_io_dispatcher_base::completion(const std::ve
 	ret.reserve(ops.size());
 	std::vector<async_io_op>::const_iterator i;
 	std::vector<std::function<std::shared_ptr<detail::async_io_handle> (size_t, std::shared_ptr<detail::async_io_handle>)>>::const_iterator c;
+	lock_guard<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
 	for(i=ops.begin(), c=callbacks.begin(); i!=ops.end() && c!=callbacks.end(); ++i, ++c)
 		ret.push_back(chain_async_op(*i, &async_file_io_dispatcher_base::invoke_user_completion, *c));
 	return ret;
@@ -222,10 +237,17 @@ template<class F, class... Args> std::shared_ptr<detail::async_io_handle> async_
 	return ret;
 }
 
+// You MUST hold opslock before entry!
 template<class F, class... Args> async_io_op async_file_io_dispatcher_base::chain_async_op(const async_io_op &precondition, std::shared_ptr<detail::async_io_handle> (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, Args...), Args... args)
 {
-	lock_guard<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
 	size_t thisid=0;
+#ifndef NDEBUG
+	if(p->opslock.try_lock())
+	{
+		assert(0);
+		std::terminate();
+	}
+#endif
 	while(!(thisid=++p->monotoniccount));
 	// Wrap supplied implementation routine with a completion dispatcher
 	auto wrapperf=&async_file_io_dispatcher_base::invoke_async_op_completions<F, Args...>;
@@ -261,6 +283,7 @@ template<class F, class T> std::vector<async_io_op> async_file_io_dispatcher_bas
 {
 	std::vector<async_io_op> ret;
 	ret.reserve(container.size());
+	lock_guard<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
 	for(auto &i : container)
 		ret.push_back(chain_async_op(i, f, i));
 	return ret;
@@ -269,6 +292,7 @@ template<class F> std::vector<async_io_op> async_file_io_dispatcher_base::chain_
 {
 	std::vector<async_io_op> ret;
 	ret.reserve(container.size());
+	lock_guard<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
 	for(auto &i : container)
 		ret.push_back(chain_async_op(i.precondition, f, i));
 	return ret;
@@ -276,13 +300,14 @@ template<class F> std::vector<async_io_op> async_file_io_dispatcher_base::chain_
 
 
 namespace detail {
-#if defined(WIN32) && !defined(USE_POSIX_ON_WIN32)
+#if defined(WIN32)
 	class async_file_io_dispatcher_windows : public async_file_io_dispatcher_base
 	{
 		// Called in unknown thread
-		std::shared_ptr<detail::async_io_handle> dodir(size_t id, std::shared_ptr<detail::async_io_handle>, async_path_op_req req)
+		std::shared_ptr<detail::async_io_handle> dodir(size_t id, std::shared_ptr<detail::async_io_handle> _, async_path_op_req req)
 		{
 			BOOL ret=0;
+			req.flags=fileflags(req.flags);
 			if(file_flags::Create==(req.flags & file_flags::Create))
 			{
 				ret=CreateDirectory(req.path.c_str(), NULL);
@@ -292,52 +317,77 @@ namespace detail {
 					if(file_flags::CreateOnlyIfNotExist!=(req.flags & file_flags::CreateOnlyIfNotExist))
 						ret=1;
 				}
+				req.flags=req.flags&~(file_flags::Create|file_flags::CreateOnlyIfNotExist);
 			}
+			DWORD attr=GetFileAttributes(req.path.c_str());
+			if(INVALID_FILE_ATTRIBUTES!=attr && !(attr & FILE_ATTRIBUTE_DIRECTORY))
+				throw std::runtime_error("Not a directory");
+			if(file_flags::Read==(req.flags & file_flags::Read))
+				return dofile(id, _, req);
 			else
 			{
-				DWORD attr=GetFileAttributes(req.path.c_str());
-				if(INVALID_FILE_ATTRIBUTES!=attr && !(attr & FILE_ATTRIBUTE_DIRECTORY))
-					throw std::runtime_error("Not a directory");
+				// Create empty handle so
+				auto ret=std::shared_ptr<detail::async_io_handle>(new async_io_handle_windows(shared_from_this(), req.path));
+				return ret;
 			}
-			auto ret2=std::shared_ptr<detail::async_io_handle>(new async_io_handle_windows(this, req.path, ret));
-			static_cast<async_io_handle_posix *>(ret2.get())->do_add_io_handle_to_parent();
-			return ret2;
+		}
+		// Called in unknown thread
+		std::shared_ptr<detail::async_io_handle> dormdir(size_t id, std::shared_ptr<detail::async_io_handle> _, async_path_op_req req)
+		{
+			req.flags=fileflags(req.flags);
+			ERRHWINFN(RemoveDirectory(req.path.c_str()), req.path);
+			auto ret=std::shared_ptr<detail::async_io_handle>(new async_io_handle_windows(shared_from_this(), req.path));
+			return ret;
 		}
 		// Called in unknown thread
 		std::shared_ptr<detail::async_io_handle> dofile(size_t id, std::shared_ptr<detail::async_io_handle>, async_path_op_req req)
 		{
-			int flags=0;
-			if(file_flags::Read==(req.flags & file_flags::Read) && file_flags::Write==(req.flags & file_flags::Write)) flags|=O_RDWR;
-			else if(file_flags::Read==(req.flags & file_flags::Read)) flags|=O_RDONLY;
-			else if(file_flags::Write==(req.flags & file_flags::Write)) flags|=O_WRONLY;
-			if(file_flags::Append==(req.flags & file_flags::Append)) flags|=O_APPEND;
-			if(file_flags::Truncate==(req.flags & file_flags::Truncate)) flags|=O_TRUNC;
-			if(file_flags::CreateOnlyIfNotExist==(req.flags & file_flags::CreateOnlyIfNotExist)) flags|=O_EXCL|O_CREAT;
-			else if(file_flags::Create==(req.flags & file_flags::Create)) flags|=O_CREAT;
-#ifdef O_DIRECT
-			if(file_flags::OSDirect==(req.flags & file_flags::OSDirect)) flags|=O_DIRECT;
-#endif
-#ifdef OS_SYNC
-			if(file_flags::OSSync==(req.flags & file_flags::OSSync)) flags|=O_SYNC;
-#endif
-			auto ret=std::shared_ptr<detail::async_io_handle>(new async_io_handle_posix(this, req.path, posix_open(req.path.c_str(), flags, 0x1b0/*660*/)));
-			static_cast<async_io_handle_posix *>(ret.get())->do_add_io_handle_to_parent();
+			DWORD access=0, creation=0, flags=FILE_ATTRIBUTE_NORMAL|FILE_FLAG_OVERLAPPED;
+			req.flags=fileflags(req.flags);
+			if(file_flags::Append==(req.flags & file_flags::Append)) access|=FILE_APPEND_DATA;
+			else
+			{
+				if(file_flags::Read==(req.flags & file_flags::Read)) access|=GENERIC_READ;
+				if(file_flags::Write==(req.flags & file_flags::Write)) access|=GENERIC_WRITE;
+			}
+			if(file_flags::CreateOnlyIfNotExist==(req.flags & file_flags::CreateOnlyIfNotExist)) creation|=CREATE_NEW;
+			else if(file_flags::Create==(req.flags & file_flags::Create)) creation|=CREATE_ALWAYS;
+			else if(file_flags::Truncate==(req.flags & file_flags::Truncate)) creation|=TRUNCATE_EXISTING;
+			else creation|=OPEN_EXISTING;
+			if(file_flags::WillBeSequentiallyAccessed==(req.flags & file_flags::WillBeSequentiallyAccessed))
+				flags|=FILE_FLAG_SEQUENTIAL_SCAN;
+			if(file_flags::OSDirect==(req.flags & file_flags::OSDirect)) flags|=FILE_FLAG_NO_BUFFERING;
+			if(file_flags::OSSync==(req.flags & file_flags::OSSync)) flags|=FILE_FLAG_WRITE_THROUGH;
+			auto ret=std::shared_ptr<detail::async_io_handle>(new async_io_handle_windows(shared_from_this(), req.path, (file_flags::AutoFlush|file_flags::Write)==(req.flags & (file_flags::AutoFlush|file_flags::Write)),
+				CreateFile(req.path.c_str(), access, FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,
+					NULL, creation, flags, NULL)));
+			static_cast<async_io_handle_windows *>(ret.get())->do_add_io_handle_to_parent();
+			return ret;
+		}
+		// Called in unknown thread
+		std::shared_ptr<detail::async_io_handle> dormfile(size_t id, std::shared_ptr<detail::async_io_handle> _, async_path_op_req req)
+		{
+			req.flags=fileflags(req.flags);
+			ERRHWINFN(DeleteFile(req.path.c_str()), req.path);
+			auto ret=std::shared_ptr<detail::async_io_handle>(new async_io_handle_windows(shared_from_this(), req.path));
 			return ret;
 		}
 		// Called in unknown thread
 		std::shared_ptr<detail::async_io_handle> dosync(size_t id, std::shared_ptr<detail::async_io_handle> h, async_io_op)
 		{
-			async_io_handle_posix *p=static_cast<async_io_handle_posix *>(h.get());
-			ERRHOS(posix_fsync(p->fd));
-			p->has_ever_been_fsynced=true;
+			async_io_handle_windows *p=static_cast<async_io_handle_windows *>(h.get());
+			ERRHWINFN(FlushFileBuffers(p->h->native_handle()), p->path());
 			return h;
 		}
 		// Called in unknown thread
 		std::shared_ptr<detail::async_io_handle> doclose(size_t id, std::shared_ptr<detail::async_io_handle> h, async_io_op)
 		{
-			async_io_handle_posix *p=static_cast<async_io_handle_posix *>(h.get());
-			ERRHOS(posix_close(p->fd));
-			p->fd=-1;
+			async_io_handle_windows *p=static_cast<async_io_handle_windows *>(h.get());
+			// Windows doesn't provide an async fsync so do it synchronously
+			if(p->autoflush)
+				ERRHWINFN(FlushFileBuffers(p->h->native_handle()), p->path());
+			p->h->close();
+			p->h.reset();
 			return h;
 		}
 
@@ -350,9 +400,17 @@ namespace detail {
 		{
 			return chain_async_ops(reqs, &async_file_io_dispatcher_windows::dodir);
 		}
+		virtual std::vector<async_io_op> rmdir(const std::vector<async_path_op_req> &reqs)
+		{
+			return chain_async_ops(reqs, &async_file_io_dispatcher_windows::dormdir);
+		}
 		virtual std::vector<async_io_op> file(const std::vector<async_path_op_req> &reqs)
 		{
 			return chain_async_ops(reqs, &async_file_io_dispatcher_windows::dofile);
+		}
+		virtual std::vector<async_io_op> rmfile(const std::vector<async_path_op_req> &reqs)
+		{
+			return chain_async_ops(reqs, &async_file_io_dispatcher_windows::dormfile);
 		}
 		virtual std::vector<async_io_op> sync(const std::vector<async_io_op> &ops)
 		{
@@ -363,13 +421,14 @@ namespace detail {
 			return chain_async_ops(ops, &async_file_io_dispatcher_windows::doclose);
 		}
 	};
-#else
+#endif
 	class async_file_io_dispatcher_compat : public async_file_io_dispatcher_base
 	{
 		// Called in unknown thread
 		std::shared_ptr<detail::async_io_handle> dodir(size_t id, std::shared_ptr<detail::async_io_handle> _, async_path_op_req req)
 		{
 			int ret=0;
+			req.flags=fileflags(req.flags);
 			if(file_flags::Create==(req.flags & file_flags::Create))
 			{
 				ret=posix_mkdir(req.path.c_str(), 0x1f8/*770*/);
@@ -391,14 +450,23 @@ namespace detail {
 			else
 			{
 				// Create dummy handle so
-				auto ret=std::shared_ptr<detail::async_io_handle>(new async_io_handle_posix(this, req.path, -999));
+				auto ret=std::shared_ptr<detail::async_io_handle>(new async_io_handle_posix(shared_from_this(), req.path, false, -999));
 				return ret;
 			}
+		}
+		// Called in unknown thread
+		std::shared_ptr<detail::async_io_handle> dormdir(size_t id, std::shared_ptr<detail::async_io_handle> _, async_path_op_req req)
+		{
+			req.flags=fileflags(req.flags);
+			ERRHOSFN(posix_rmdir(req.path.c_str()), req.path);
+			auto ret=std::shared_ptr<detail::async_io_handle>(new async_io_handle_posix(shared_from_this(), req.path, false, -999));
+			return ret;
 		}
 		// Called in unknown thread
 		std::shared_ptr<detail::async_io_handle> dofile(size_t id, std::shared_ptr<detail::async_io_handle>, async_path_op_req req)
 		{
 			int flags=0;
+			req.flags=fileflags(req.flags);
 			if(file_flags::Read==(req.flags & file_flags::Read) && file_flags::Write==(req.flags & file_flags::Write)) flags|=O_RDWR;
 			else if(file_flags::Read==(req.flags & file_flags::Read)) flags|=O_RDONLY;
 			else if(file_flags::Write==(req.flags & file_flags::Write)) flags|=O_WRONLY;
@@ -412,15 +480,24 @@ namespace detail {
 #ifdef OS_SYNC
 			if(file_flags::OSSync==(req.flags & file_flags::OSSync)) flags|=O_SYNC;
 #endif
-			auto ret=std::shared_ptr<detail::async_io_handle>(new async_io_handle_posix(this, req.path, posix_open(req.path.c_str(), flags, 0x1b0/*660*/)));
+			auto ret=std::shared_ptr<detail::async_io_handle>(new async_io_handle_posix(shared_from_this(), req.path, (file_flags::AutoFlush|file_flags::Write)==(req.flags & (file_flags::AutoFlush|file_flags::Write)),
+				posix_open(req.path.c_str(), flags, 0x1b0/*660*/)));
 			static_cast<async_io_handle_posix *>(ret.get())->do_add_io_handle_to_parent();
+			return ret;
+		}
+		// Called in unknown thread
+		std::shared_ptr<detail::async_io_handle> dormfile(size_t id, std::shared_ptr<detail::async_io_handle> _, async_path_op_req req)
+		{
+			req.flags=fileflags(req.flags);
+			ERRHOSFN(posix_unlink(req.path.c_str()), req.path);
+			auto ret=std::shared_ptr<detail::async_io_handle>(new async_io_handle_posix(shared_from_this(), req.path, false, -999));
 			return ret;
 		}
 		// Called in unknown thread
 		std::shared_ptr<detail::async_io_handle> dosync(size_t id, std::shared_ptr<detail::async_io_handle> h, async_io_op)
 		{
 			async_io_handle_posix *p=static_cast<async_io_handle_posix *>(h.get());
-			ERRHOS(posix_fsync(p->fd));
+			ERRHOSFN(posix_fsync(p->fd), p->path());
 			p->has_ever_been_fsynced=true;
 			return h;
 		}
@@ -428,7 +505,9 @@ namespace detail {
 		std::shared_ptr<detail::async_io_handle> doclose(size_t id, std::shared_ptr<detail::async_io_handle> h, async_io_op)
 		{
 			async_io_handle_posix *p=static_cast<async_io_handle_posix *>(h.get());
-			ERRHOS(posix_close(p->fd));
+			if(p->autoflush)
+				ERRHOSFN(posix_fsync(p->fd), p->path());
+			ERRHOSFN(posix_close(p->fd), p->path());
 			p->fd=-1;
 			return h;
 		}
@@ -443,9 +522,17 @@ namespace detail {
 		{
 			return chain_async_ops(reqs, &async_file_io_dispatcher_compat::dodir);
 		}
+		virtual std::vector<async_io_op> rmdir(const std::vector<async_path_op_req> &reqs)
+		{
+			return chain_async_ops(reqs, &async_file_io_dispatcher_compat::dormdir);
+		}
 		virtual std::vector<async_io_op> file(const std::vector<async_path_op_req> &reqs)
 		{
 			return chain_async_ops(reqs, &async_file_io_dispatcher_compat::dofile);
+		}
+		virtual std::vector<async_io_op> rmfile(const std::vector<async_path_op_req> &reqs)
+		{
+			return chain_async_ops(reqs, &async_file_io_dispatcher_compat::dormfile);
 		}
 		virtual std::vector<async_io_op> sync(const std::vector<async_io_op> &ops)
 		{
@@ -455,6 +542,7 @@ namespace detail {
 		{
 			std::vector<async_io_op> ret;
 			ret.reserve(ops.size());
+			lock_guard<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
 			for(auto &i : ops)
 			{
 				auto op(chain_async_op(i, &async_file_io_dispatcher_compat::doclose, i));
@@ -480,7 +568,6 @@ namespace detail {
 			return ret;
 		}
 	};
-#endif
 }
 
 std::shared_ptr<async_file_io_dispatcher_base> async_file_io_dispatcher(thread_pool &threadpool, file_flags flagsforce, file_flags flagsmask)
