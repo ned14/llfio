@@ -1,9 +1,61 @@
 import os, sys, platform, subprocess
 	
-architectures = ["generic", "x86", "x64", "ARMv7"]
+architectures = ["generic"]
 
 env = Environment()
 #print env['TOOLS']
+
+architecture="generic"
+ARMcrosscompiler=False
+if env['CC']=='cl':
+	# We're on windows
+	if os.environ.has_key('LIBPATH'):
+		if not env.GetOption('force32') and -1!=os.environ['LIBPATH'].find("\\amd64"):
+			architecture="x64"
+		elif -1!=os.environ['LIBPATH'].find("\\arm"):
+			architecture="ARMv7"
+		else:
+			architecture="x86"
+		architectures.append(architecture)
+else:
+	# We're on POSIX, so ask the compiler what it thinks it's building
+	output=''
+	try:
+		output=subprocess.check_output([env['CXX'], "--target-help"])
+	except:
+		try:
+			output=subprocess.check_output([env['CXX'], "--version"])
+		except:
+			output=platform.machine()
+	if 'armelf' in output:
+		architectures+=["ARMv7"]
+		architecture="ARMv7"
+	# Choose Intel in preference as otherwise it's probably a cross-compiler
+	if 'x64' in output or 'x86_64' in output:
+		architectures+=["x86", "x64"]
+		architecture="x64"
+	else:
+		for a in ['i386', 'i486', 'i586', 'i686']:
+			if a in output:
+				architectures+=["x86"]
+				architecture="x86"
+				break
+	# If not ARMv7 support, see if there is a cross-compiler
+	if "ARMv7" not in architectures:
+		output=''
+		try:
+			output=subprocess.check_output(['arm-linux-gnueabi-g++', "--target-help"])
+		except:
+			try:
+				output=subprocess.check_output(['arm-linux-gnueabi-g++', "--version"])
+			except:
+				output=platform.machine()
+		if 'armelf' in output:
+			architectures+=["ARMv7"]
+			ARMcrosscompiler=True
+print "*** Architectures detected as being available:", architectures
+print "*** Minimum architecture is:", architecture
+
 if sys.platform=="win32" and 'INCLUDE' not in os.environ:
     env = Environment(tools=['mingw', 'msvs'])
 #print env['TOOLS']
@@ -13,8 +65,19 @@ AddOption('--static', dest='static', nargs='?', const=True, help='build a static
 AddOption('--useclang', dest='useclang', nargs='?', const=True, help='use clang if it is available')
 AddOption('--usegcc', dest='usegcc', nargs='?', const=True, help='use gcc if it is available')
 AddOption('--force32', dest='force32', help='force 32 bit build on 64 bit machine')
-AddOption('--sse', dest='sse', nargs=1, type='int', default=1, help='set SSE used (0-4) on 32 bit x86. Defaults to 1 (SSE1).')
-AddOption('--avx', dest='avx', nargs=1, type='int', default=0, help='set AVX used (0-2) on x86/x64. Defaults to 0 (No AVX).')
+AddOption('--archs', dest='archs', nargs=1, type='str', default='min', help='which architectures to build, comma separated. all means all. Defaults to min.')
+if 'x86' in architectures:
+	AddOption('--sse', dest='sse', nargs=1, type='int', default=2, help='set SSE used (0-4) on 32 bit x86. Defaults to 2 (SSE2).')
+	AddOption('--avx', dest='avx', nargs=1, type='int', default=0, help='set AVX used (0-2) on x86/x64. Defaults to 0 (No AVX).')
+if 'ARMv7' in architectures:
+	AddOption('--fpu', dest='fpu', nargs=1, type='str', default='neon-vfpv4', help='sets FPU used on ARMv7. Defaults to neon-vfpv4.')
+	AddOption('--thumb', dest='thumb', nargs='?', const=True, help='generate ARMv7 Thumb instructions instead of normal.')
+if env.GetOption('archs')!='min' and env.GetOption('archs')!='all':
+	archs=env.GetOption('archs').split(',')
+	for arch in archs:
+		assert arch in architectures
+	architectures=archs
+if architecture=='x64' and env.GetOption('force32'): architecture='x86'
 
 # Force scons to always use absolute paths in everything (helps debuggers to find source files)
 env['CCCOM']   =    env['CCCOM'].replace('$CHANGED_SOURCES','$SOURCES.abspath')
@@ -147,47 +210,23 @@ else:
 # Build
 mylibrary=None
 buildvariants={}
-for architecture in architectures:
+for arch in architectures:
     for buildtype in ["Debug", "Release"]:
-        env['VARIANT']=architecture+"/"+buildtype
-        Export("env")
-        mylibraryvariant=env.SConscript("SConscript", exports="env", variant_dir=env['VARIANT'], duplicate=False)
-        buildvariants[(buildtype, architecture)]=mylibraryvariant
-# What architecture am I on?
-architecture="generic"
-if env['CC']=='cl':
-	# We're on windows
-	if os.environ.has_key('LIBPATH'):
-		if not env.GetOption('force32') and -1!=os.environ['LIBPATH'].find("\\amd64"):
-			architecture="x64"
-		elif -1!=os.environ['LIBPATH'].find("\\arm"):
-			architecture="ARMv7"
-		else:
-			architecture="x86"
-else:
-	# We're on POSIX, so ask the compiler what it thinks it's building
-	output=''
-	try:
-		output=subprocess.check_output([env['CC'], "--target-help"])
-	except:
-		try:
-			output=subprocess.check_output([env['CC'], "--version"])
-		except:
-			output=platform.machine()
-	if not env.GetOption('force32') and ('x64' in output or 'x86_64' in output):
-		architecture="x64"
-	elif 'ARM' in output:
-		architecture="ARMv7"
-	else:
-		for a in ['i386', 'i486', 'i586', 'i686']:
-			if a in output:
-				architecture="x86"
-				break
+        env['VARIANT']=arch+"/"+buildtype
+        Export(["env", "ARMcrosscompiler"])
+        mylibraryvariant=env.SConscript("SConscript", exports=["env", "ARMcrosscompiler"], variant_dir=env['VARIANT'], duplicate=False)
+        buildvariants[(buildtype, arch)]=mylibraryvariant
 
-print "*** Build variant preferred by environment is", "Debug" if env.GetOption("debug") else "Release", architecture, "using compiler", env['CC']
-mylibrary=buildvariants[("Debug" if env.GetOption("debug") else "Release", architecture)]
-#print(mylibrary)
-Default([x[0] for x in mylibrary.values()])
+if env.GetOption('archs')=='min':
+	print "*** Build variant preferred by environment is", "Debug" if env.GetOption("debug") else "Release", architecture, "using compiler", env['CC']
+	mylibrary=buildvariants[("Debug" if env.GetOption("debug") else "Release", architecture)]
+	#print(mylibrary)
+	Default([x[0] for x in mylibrary.values()])
+else:
+	#print(buildvariants)
+	mylibrary=[x.values()[0][0] for x in buildvariants.values()]
+	#print(mylibrary)
+	Default(mylibrary)
 
 # Set up the MSVC project files
 if 'win32'==sys.platform:

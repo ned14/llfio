@@ -35,7 +35,7 @@ File Created: Mar 2013
 #define posix_fsync _commit
 #else
 #define posix_mkdir mkdir
-#define posix_rmdir rmdir
+#define posix_rmdir ::rmdir
 #define posix_stat stat
 #define posix_open open
 #define posix_close ::close
