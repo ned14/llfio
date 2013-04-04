@@ -85,7 +85,7 @@ namespace detail {
 				parent->int_del_io_handle(myid);
 			if(h)
 			{
-				if(autoflush)
+				if(autoflush && write_count_since_fsync())
 					ERRHWINFN(FlushFileBuffers(h->native_handle()), path());
 				h->close();
 			}
@@ -116,7 +116,7 @@ namespace detail {
 			if(fd>=0)
 			{
 				// Flush synchronously here? I guess ...
-				if(autoflush)
+				if(autoflush && write_count_since_fsync())
 					ERRHOSFN(posix_fsync(fd), path());
 				ERRHOSFN(posix_close(fd), path());
 				fd=-1;
@@ -376,7 +376,10 @@ namespace detail {
 		std::shared_ptr<detail::async_io_handle> dosync(size_t id, std::shared_ptr<detail::async_io_handle> h, async_io_op)
 		{
 			async_io_handle_windows *p=static_cast<async_io_handle_windows *>(h.get());
-			ERRHWINFN(FlushFileBuffers(p->h->native_handle()), p->path());
+			size_t bytestobesynced=p->write_count_since_fsync();
+			if(bytestobesynced)
+				ERRHWINFN(FlushFileBuffers(p->h->native_handle()), p->path());
+			p->byteswrittenatlastfsync+=bytestobesynced;
 			return h;
 		}
 		// Called in unknown thread
@@ -384,7 +387,7 @@ namespace detail {
 		{
 			async_io_handle_windows *p=static_cast<async_io_handle_windows *>(h.get());
 			// Windows doesn't provide an async fsync so do it synchronously
-			if(p->autoflush)
+			if(p->autoflush && p->write_count_since_fsync())
 				ERRHWINFN(FlushFileBuffers(p->h->native_handle()), p->path());
 			p->h->close();
 			p->h.reset();
@@ -446,7 +449,12 @@ namespace detail {
 			if(0==ret && !S_ISDIR(s.st_mode))
 				throw std::runtime_error("Not a directory");
 			if(file_flags::Read==(req.flags & file_flags::Read))
-				return dofile(id, _, req);
+			{
+				auto ret=dofile(id, _, req);
+				// Set the bytes written to something to enable fsyncing of directories
+				ret->byteswritten=1;
+				return ret;
+			}
 			else
 			{
 				// Create dummy handle so
@@ -497,15 +505,18 @@ namespace detail {
 		std::shared_ptr<detail::async_io_handle> dosync(size_t id, std::shared_ptr<detail::async_io_handle> h, async_io_op)
 		{
 			async_io_handle_posix *p=static_cast<async_io_handle_posix *>(h.get());
-			ERRHOSFN(posix_fsync(p->fd), p->path());
+			size_t bytestobesynced=p->write_count_since_fsync();
+			if(bytestobesynced)
+				ERRHOSFN(posix_fsync(p->fd), p->path());
 			p->has_ever_been_fsynced=true;
+			p->byteswrittenatlastfsync+=bytestobesynced;
 			return h;
 		}
 		// Called in unknown thread
 		std::shared_ptr<detail::async_io_handle> doclose(size_t id, std::shared_ptr<detail::async_io_handle> h, async_io_op)
 		{
 			async_io_handle_posix *p=static_cast<async_io_handle_posix *>(h.get());
-			if(p->autoflush)
+			if(p->autoflush && p->write_count_since_fsync())
 				ERRHOSFN(posix_fsync(p->fd), p->path());
 			ERRHOSFN(posix_close(p->fd), p->path());
 			p->fd=-1;

@@ -182,27 +182,47 @@ class async_file_io_dispatcher_base;
 
 namespace detail {
 
+	struct async_io_handle_posix;
+	struct async_io_handle_windows;
+	struct async_file_io_dispatcher_base_p;
+	class async_file_io_dispatcher_compat;
+	class async_file_io_dispatcher_windows;
+	class async_file_io_dispatcher_linux;
+	class async_file_io_dispatcher_qnx;
 	class async_io_handle : public std::enable_shared_from_this<async_io_handle>
 	{
 		friend class async_file_io_dispatcher_base;
+		friend struct async_io_handle_posix;
+		friend struct async_io_handle_windows;
+		friend class async_file_io_dispatcher_compat;
+		friend class async_file_io_dispatcher_windows;
+		friend class async_file_io_dispatcher_linux;
+		friend class async_file_io_dispatcher_qnx;
+
 		async_file_io_dispatcher_base *_parent;
+		std::chrono::system_clock::time_point _opened;
 		std::filesystem::path _path; // guaranteed canonical
 	protected:
-		async_io_handle(async_file_io_dispatcher_base *parent, const std::filesystem::path &path) : _parent(parent), _path(path) { }
+		std::atomic<size_t> bytesread, byteswritten, byteswrittenatlastfsync;
+		async_io_handle(async_file_io_dispatcher_base *parent, const std::filesystem::path &path) : _parent(parent), _opened(std::chrono::system_clock::now()), _path(path), bytesread(0), byteswritten(0), byteswrittenatlastfsync(0) { }
 	public:
 		virtual ~async_io_handle() { }
 		//! Returns the parent of this io handle
 		async_file_io_dispatcher_base *parent() const { return _parent; }
+		//! Returns when this handle was opened
+		const std::chrono::system_clock::time_point &opened() const { return _opened; }
 		//! Returns the path of this io handle
 		const std::filesystem::path &path() const { return _path; }
+		//! Returns how many bytes have been read since this handle was opened.
+		size_t read_count() const { return bytesread; }
+		//! Returns how many bytes have been written since this handle was opened.
+		size_t write_count() const { return byteswritten; }
+		//! Returns how many bytes have been written since this handle was last fsynced.
+		size_t write_count_since_fsync() const { return byteswritten-byteswrittenatlastfsync; }
 	};
-	struct async_io_handle_posix;
-	struct async_io_handle_windows;
 }
 
 struct async_io_op;
-
-namespace detail { struct async_file_io_dispatcher_base_p; class async_file_io_dispatcher_compat; class async_file_io_dispatcher_windows; class async_file_io_dispatcher_linux; class async_file_io_dispatcher_qnx; }
 
 /*! \enum open_flags
 \brief Bitwise file and directory open flags
