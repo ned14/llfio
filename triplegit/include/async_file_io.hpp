@@ -9,6 +9,7 @@ File Created: Mar 2013
 
 #include "../../NiallsCPP11Utilities/NiallsCPP11Utilities.hpp"
 #include "../../NiallsCPP11Utilities/std_filesystem.hpp"
+#include <type_traits>
 #include <thread>
 #include <atomic>
 #if !defined(_WIN32_WINNT) && defined(WIN32)
@@ -179,6 +180,9 @@ template <class InputIterator> inline future<std::pair<size_t, typename std::dec
 }*/
 
 class async_file_io_dispatcher_base;
+struct async_io_op;
+struct async_path_op_req;
+template<class T> struct async_data_op_req;
 
 namespace detail {
 
@@ -222,7 +226,6 @@ namespace detail {
 	};
 }
 
-struct async_io_op;
 
 /*! \enum open_flags
 \brief Bitwise file and directory open flags
@@ -256,9 +259,6 @@ inline file_flags operator~(file_flags a)
 	return static_cast<file_flags>(~static_cast<size_t>(a));
 }
 
-struct async_path_op_req;
-template<class T> struct async_data_op_req;
-
 /*! \class async_file_io_dispatcher_base
 \brief Abstract base class for dispatching file i/o asynchronously
 */
@@ -289,8 +289,10 @@ public:
 	//! Returns the number of open items in this dispatcher
 	size_t count() const;
 
+	typedef std::pair<bool, std::shared_ptr<detail::async_io_handle>> completion_returntype;
+	typedef completion_returntype completion_t(size_t, std::shared_ptr<detail::async_io_handle>);
 	//! Invoke the specified function when each of the supplied operations complete
-	std::vector<async_io_op> completion(const std::vector<async_io_op> &ops, const std::vector<std::function<std::shared_ptr<detail::async_io_handle> (size_t, std::shared_ptr<detail::async_io_handle>)>> &callbacks);
+	std::vector<async_io_op> completion(const std::vector<async_io_op> &ops, const std::vector<std::function<completion_t>> &callbacks);
 	//! Asynchronously creates directories
 	virtual std::vector<async_io_op> dir(const std::vector<async_path_op_req> &reqs)=0;
 	//! Asynchronously creates a directory
@@ -320,17 +322,22 @@ public:
 	virtual std::vector<async_io_op> read(const std::vector<async_data_op_req<void>> &ops)=0;
 	//! Asynchronously reads data from an item
 	inline async_io_op read(const async_data_op_req<void> &req);
+	//! Asynchronously reads data from items
+	template<class T> inline std::vector<async_io_op> read(const std::vector<async_data_op_req<T>> &ops);
 	//! Asynchronously writes data to items
 	virtual std::vector<async_io_op> write(const std::vector<async_data_op_req<const void>> &ops)=0;
-	//! Asynchronously writes data to items
+	//! Asynchronously writes data to an item
 	inline async_io_op write(const async_data_op_req<const void> &req);
+	//! Asynchronously writes data to items
+	template<class T> inline std::vector<async_io_op> write(const std::vector<async_data_op_req<T>> &ops);
 protected:
-	std::shared_ptr<detail::async_io_handle> invoke_user_completion(size_t id, std::shared_ptr<detail::async_io_handle> h, std::function<std::shared_ptr<detail::async_io_handle> (size_t, std::shared_ptr<detail::async_io_handle>)> callback);
-	template<class F, class... Args> std::shared_ptr<detail::async_io_handle> invoke_async_op_completions(size_t id, std::shared_ptr<detail::async_io_handle> h, std::shared_ptr<detail::async_io_handle> (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, Args...), Args... args);
-	template<class F, class... Args> async_io_op chain_async_op(const async_io_op &precondition, std::shared_ptr<detail::async_io_handle> (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, Args...), Args... args);
-	template<class F, class T> std::vector<async_io_op> chain_async_ops(const std::vector<T> &container, std::shared_ptr<detail::async_io_handle> (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, T));
-	template<class F> std::vector<async_io_op> chain_async_ops(const std::vector<async_path_op_req> &container, std::shared_ptr<detail::async_io_handle> (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, async_path_op_req));
-	template<class F, class T> std::vector<async_io_op> chain_async_ops(const std::vector<async_data_op_req<T>> &container, std::shared_ptr<detail::async_io_handle> (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, async_data_op_req<T>));
+	void complete_async_op(size_t id, std::shared_ptr<detail::async_io_handle> h);
+	completion_returntype invoke_user_completion(size_t id, std::shared_ptr<detail::async_io_handle> h, std::function<completion_t> callback);
+	template<class F, class... Args> std::shared_ptr<detail::async_io_handle> invoke_async_op_completions(size_t id, std::shared_ptr<detail::async_io_handle> h, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, Args...), Args... args);
+	template<class F, class... Args> async_io_op chain_async_op(const async_io_op &precondition, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, Args...), Args... args);
+	template<class F, class T> std::vector<async_io_op> chain_async_ops(const std::vector<T> &container, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, T));
+	template<class F> std::vector<async_io_op> chain_async_ops(const std::vector<async_path_op_req> &container, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, async_path_op_req));
+	template<class F, class T> std::vector<async_io_op> chain_async_ops(const std::vector<async_data_op_req<T>> &container, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, async_data_op_req<T>));
 };
 extern TRIPLEGIT_ASYNC_FILE_IO_API std::shared_ptr<async_file_io_dispatcher_base> async_file_io_dispatcher(thread_pool &threadpool=process_threadpool(), file_flags flagsforce=file_flags::AutoFlush, file_flags flagsmask=file_flags::None);
 
@@ -357,12 +364,12 @@ namespace detail
 		promise<std::vector<std::shared_ptr<detail::async_io_handle>>> done;
 		when_all_count_completed_state(size_t outsize) : togo(outsize), out(outsize) { }
 	};
-	inline std::shared_ptr<detail::async_io_handle> when_all_count_completed(size_t, std::shared_ptr<detail::async_io_handle> h, std::shared_ptr<detail::when_all_count_completed_state> state, size_t idx)
+	inline async_file_io_dispatcher_base::completion_returntype when_all_count_completed(size_t, std::shared_ptr<detail::async_io_handle> h, std::shared_ptr<detail::when_all_count_completed_state> state, size_t idx)
 	{
 		state->out[idx]=h; // This might look thread unsafe, but each idx is unique
 		if(!--state->togo)
 			state->done.set_value(state->out);
-		return h;
+		return std::make_pair(false, h);
 	}
 }
 
@@ -373,7 +380,7 @@ inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(st
 		return future<std::vector<std::shared_ptr<detail::async_io_handle>>>();
 	std::vector<async_io_op> inputs(first, last);
 	std::shared_ptr<detail::when_all_count_completed_state> state(new detail::when_all_count_completed_state(inputs.size()));
-	std::vector<std::function<std::shared_ptr<detail::async_io_handle> (size_t, std::shared_ptr<detail::async_io_handle>)>> callbacks;
+	std::vector<std::function<async_file_io_dispatcher_base::completion_t>> callbacks;
 	callbacks.reserve(inputs.size());
 	size_t idx=0;
 	for(auto &i : inputs)
@@ -410,25 +417,25 @@ struct async_path_op_req
 template<> struct async_data_op_req<void> // For reading
 {
 	async_io_op precondition;
-	std::vector<std::pair<void *, size_t>> buffers;
+	std::vector<boost::asio::mutable_buffer> buffers;
 	off_t where;
-	async_data_op_req(async_io_op _precondition, void *_buffer, size_t _length, off_t _where) : precondition(_precondition), where(_where) { buffers.reserve(1); buffers.push_back(std::make_pair(_buffer, _length)); }
-	async_data_op_req(async_io_op _precondition, std::vector<std::pair<void *, size_t>> _buffers, off_t _where) : precondition(_precondition), buffers(_buffers), where(_where) { }
+	async_data_op_req(async_io_op _precondition, void *_buffer, size_t _length, off_t _where) : precondition(_precondition), where(_where) { buffers.reserve(1); buffers.push_back(boost::asio::mutable_buffer(_buffer, _length)); }
+	async_data_op_req(async_io_op _precondition, std::vector<boost::asio::mutable_buffer> _buffers, off_t _where) : precondition(_precondition), buffers(_buffers), where(_where) { }
 };
 template<> struct async_data_op_req<const void> // For writing
 {
 	async_io_op precondition;
-	std::vector<std::pair<const void *, size_t>> buffers;
+	std::vector<boost::asio::const_buffer> buffers;
 	off_t where;
-	async_data_op_req(async_io_op _precondition, const void *_buffer, size_t _length, off_t _where) : precondition(_precondition), where(_where) { buffers.reserve(1); buffers.push_back(std::make_pair(_buffer, _length)); }
-	async_data_op_req(async_io_op _precondition, std::vector<std::pair<const void *, size_t>> _buffers, off_t _where) : precondition(_precondition), buffers(_buffers), where(_where) { }
+	async_data_op_req(async_io_op _precondition, const void *_buffer, size_t _length, off_t _where) : precondition(_precondition), where(_where) { buffers.reserve(1); buffers.push_back(boost::asio::const_buffer(_buffer, _length)); }
+	async_data_op_req(async_io_op _precondition, std::vector<boost::asio::const_buffer> _buffers, off_t _where) : precondition(_precondition), buffers(_buffers), where(_where) { }
 };
 //! \brief A specialisation for any pointer to type T
-template<class T> struct async_data_op_req<T *> : public async_data_op_req<void>
+template<class T> struct async_data_op_req : public async_data_op_req<void>
 {
 	async_data_op_req(async_io_op _precondition, T *_buffer, size_t _length, off_t _where) : async_data_op_req<void>(_precondition, static_cast<void *>(_buffer), _length, _where) { }
 };
-template<class T> struct async_data_op_req<const T *> : public async_data_op_req<const void>
+template<class T> struct async_data_op_req<const T> : public async_data_op_req<const void>
 {
 	async_data_op_req(async_io_op _precondition, const T *_buffer, size_t _length, off_t _where) : async_data_op_req<const void>(_precondition, static_cast<const void *>(_buffer), _length, _where) { }
 };
@@ -459,6 +466,22 @@ template<class C, class T, class A> struct async_data_op_req<const std::basic_st
 {
 	async_data_op_req(async_io_op _precondition, const std::basic_string<C, T, A> &v, off_t _where) : async_data_op_req<const void>(_precondition, static_cast<const void *>(&v.front()), v.size()*sizeof(A), _where) { }
 };
+
+namespace detail {
+	template<bool isconst> struct void_type_selector { typedef void type; };
+	template<> struct void_type_selector<true> { typedef const void type; };
+	template<class T> struct async_file_io_dispatcher_rwconverter
+	{
+		typedef async_data_op_req<typename void_type_selector<std::is_const<T>::value>::type> return_type;
+		const std::vector<return_type> &operator()(const std::vector<async_data_op_req<T>> &ops)
+		{
+			typedef async_data_op_req<T> reqT;
+			static_assert(std::is_convertible<reqT, return_type>::value, "async_data_op_req<T> is not convertible to async_data_op_req<[const] void>");
+			static_assert(sizeof(return_type)==sizeof(reqT), "async_data_op_req<T> does not have the same size as async_data_op_req<[const] void>");
+			return reinterpret_cast<const std::vector<return_type> &>(ops);
+		}
+	};
+}
 
 inline async_io_op async_file_io_dispatcher_base::dir(const async_path_op_req &req)
 {
@@ -515,6 +538,14 @@ inline async_io_op async_file_io_dispatcher_base::write(const async_data_op_req<
 	i.reserve(1);
 	i.push_back(req);
 	return write(i).front();
+}
+template<class T> inline std::vector<async_io_op> async_file_io_dispatcher_base::read(const std::vector<async_data_op_req<T>> &ops)
+{
+	return read(detail::async_file_io_dispatcher_rwconverter<T>()(ops));
+}
+template<class T> inline std::vector<async_io_op> async_file_io_dispatcher_base::write(const std::vector<async_data_op_req<T>> &ops)
+{
+	return write(detail::async_file_io_dispatcher_rwconverter<T>()(ops));
 }
 
 

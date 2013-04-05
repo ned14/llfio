@@ -224,17 +224,17 @@ size_t async_file_io_dispatcher_base::count() const
 }
 
 // Called in unknown thread
-std::shared_ptr<detail::async_io_handle> async_file_io_dispatcher_base::invoke_user_completion(size_t id, std::shared_ptr<detail::async_io_handle> h, std::function<std::shared_ptr<detail::async_io_handle> (size_t, std::shared_ptr<detail::async_io_handle>)> callback)
+async_file_io_dispatcher_base::completion_returntype async_file_io_dispatcher_base::invoke_user_completion(size_t id, std::shared_ptr<detail::async_io_handle> h, std::function<async_file_io_dispatcher_base::completion_t> callback)
 {
 	return callback(id, h);
 }
 
-std::vector<async_io_op> async_file_io_dispatcher_base::completion(const std::vector<async_io_op> &ops, const std::vector<std::function<std::shared_ptr<detail::async_io_handle> (size_t, std::shared_ptr<detail::async_io_handle>)>> &callbacks)
+std::vector<async_io_op> async_file_io_dispatcher_base::completion(const std::vector<async_io_op> &ops, const std::vector<std::function<async_file_io_dispatcher_base::completion_t>> &callbacks)
 {
 	std::vector<async_io_op> ret;
 	ret.reserve(ops.size());
 	std::vector<async_io_op>::const_iterator i;
-	std::vector<std::function<std::shared_ptr<detail::async_io_handle> (size_t, std::shared_ptr<detail::async_io_handle>)>>::const_iterator c;
+	std::vector<std::function<async_file_io_dispatcher_base::completion_t>>::const_iterator c;
 	lock_guard<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
 	for(i=ops.begin(), c=callbacks.begin(); i!=ops.end() && c!=callbacks.end(); ++i, ++c)
 		ret.push_back(chain_async_op(*i, &async_file_io_dispatcher_base::invoke_user_completion, *c));
@@ -242,12 +242,11 @@ std::vector<async_io_op> async_file_io_dispatcher_base::completion(const std::ve
 }
 
 // Called in unknown thread
-template<class F, class... Args> std::shared_ptr<detail::async_io_handle> async_file_io_dispatcher_base::invoke_async_op_completions(size_t id, std::shared_ptr<detail::async_io_handle> h, std::shared_ptr<detail::async_io_handle> (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, Args...), Args... args)
+void async_file_io_dispatcher_base::complete_async_op(size_t id, std::shared_ptr<detail::async_io_handle> h)
 {
-	std::shared_ptr<detail::async_io_handle> ret((static_cast<F *>(this)->*f)(id, h, args...));
 	// Find me in ops, remove my completions and delete me from extant ops
 	lock_guard<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
-	typename std::unordered_map<size_t, detail::async_file_io_dispatcher_op>::iterator it(p->ops.find(id));
+	std::unordered_map<size_t, detail::async_file_io_dispatcher_op>::iterator it(p->ops.find(id));
 	if(p->ops.end()==it)
 		throw std::runtime_error("Failed to find this operation in list of currently executing operations");
 	std::vector<typename detail::async_file_io_dispatcher_op::completion_t> completions(std::move(it->second.completions));
@@ -258,13 +257,24 @@ template<class F, class... Args> std::shared_ptr<detail::async_io_handle> async_
 		it=p->ops.find(c.first);
 		if(p->ops.end()==it)
 			throw std::runtime_error("Failed to find this completion operation in list of currently executing operations");
-		it->second.h=threadpool().enqueue(std::bind(c.second, ret));
+		it->second.h=threadpool().enqueue(std::bind(c.second, h));
 	}
-	return ret;
+}
+
+// Called in unknown thread
+template<class F, class... Args> std::shared_ptr<detail::async_io_handle> async_file_io_dispatcher_base::invoke_async_op_completions(size_t id, std::shared_ptr<detail::async_io_handle> h, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, Args...), Args... args)
+{
+	completion_returntype ret((static_cast<F *>(this)->*f)(id, h, args...));
+	// If boolean is true, reschedule completion notification setting it to ret.second, otherwise complete now
+	if(ret.first)
+		todo;
+	else
+		complete_async_op(id, ret);
+	return ret.second;
 }
 
 // You MUST hold opslock before entry!
-template<class F, class... Args> async_io_op async_file_io_dispatcher_base::chain_async_op(const async_io_op &precondition, std::shared_ptr<detail::async_io_handle> (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, Args...), Args... args)
+template<class F, class... Args> async_io_op async_file_io_dispatcher_base::chain_async_op(const async_io_op &precondition, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, Args...), Args... args)
 {
 	size_t thisid=0;
 #ifndef NDEBUG
@@ -305,7 +315,7 @@ template<class F, class... Args> async_io_op async_file_io_dispatcher_base::chai
 	p->ops.insert(std::make_pair(thisid, ret.h));
 	return ret;
 }
-template<class F, class T> std::vector<async_io_op> async_file_io_dispatcher_base::chain_async_ops(const std::vector<T> &container, std::shared_ptr<detail::async_io_handle> (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, T))
+template<class F, class T> std::vector<async_io_op> async_file_io_dispatcher_base::chain_async_ops(const std::vector<T> &container, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, T))
 {
 	std::vector<async_io_op> ret;
 	ret.reserve(container.size());
@@ -314,7 +324,7 @@ template<class F, class T> std::vector<async_io_op> async_file_io_dispatcher_bas
 		ret.push_back(chain_async_op(i, f, i));
 	return ret;
 }
-template<class F> std::vector<async_io_op> async_file_io_dispatcher_base::chain_async_ops(const std::vector<async_path_op_req> &container, std::shared_ptr<detail::async_io_handle> (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, async_path_op_req))
+template<class F> std::vector<async_io_op> async_file_io_dispatcher_base::chain_async_ops(const std::vector<async_path_op_req> &container, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, async_path_op_req))
 {
 	std::vector<async_io_op> ret;
 	ret.reserve(container.size());
@@ -323,7 +333,7 @@ template<class F> std::vector<async_io_op> async_file_io_dispatcher_base::chain_
 		ret.push_back(chain_async_op(i.precondition, f, i));
 	return ret;
 }
-template<class F, class T> std::vector<async_io_op> async_file_io_dispatcher_base::chain_async_ops(const std::vector<async_data_op_req<T>> &container, std::shared_ptr<detail::async_io_handle> (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, async_data_op_req<T>))
+template<class F, class T> std::vector<async_io_op> async_file_io_dispatcher_base::chain_async_ops(const std::vector<async_data_op_req<T>> &container, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, async_data_op_req<T>))
 {
 	std::vector<async_io_op> ret;
 	ret.reserve(container.size());
@@ -339,7 +349,7 @@ namespace detail {
 	class async_file_io_dispatcher_windows : public async_file_io_dispatcher_base
 	{
 		// Called in unknown thread
-		std::shared_ptr<detail::async_io_handle> dodir(size_t id, std::shared_ptr<detail::async_io_handle> _, async_path_op_req req)
+		completion_returntype dodir(size_t id, std::shared_ptr<detail::async_io_handle> _, async_path_op_req req)
 		{
 			BOOL ret=0;
 			req.flags=fileflags(req.flags);
@@ -363,19 +373,19 @@ namespace detail {
 			{
 				// Create empty handle so
 				auto ret=std::shared_ptr<detail::async_io_handle>(new async_io_handle_windows(shared_from_this(), req.path));
-				return ret;
+				return std::make_pair(false, ret);
 			}
 		}
 		// Called in unknown thread
-		std::shared_ptr<detail::async_io_handle> dormdir(size_t id, std::shared_ptr<detail::async_io_handle> _, async_path_op_req req)
+		completion_returntype dormdir(size_t id, std::shared_ptr<detail::async_io_handle> _, async_path_op_req req)
 		{
 			req.flags=fileflags(req.flags);
 			ERRHWINFN(RemoveDirectory(req.path.c_str()), req.path);
 			auto ret=std::shared_ptr<detail::async_io_handle>(new async_io_handle_windows(shared_from_this(), req.path));
-			return ret;
+			return std::make_pair(false, ret);
 		}
 		// Called in unknown thread
-		std::shared_ptr<detail::async_io_handle> dofile(size_t id, std::shared_ptr<detail::async_io_handle>, async_path_op_req req)
+		completion_returntype dofile(size_t id, std::shared_ptr<detail::async_io_handle>, async_path_op_req req)
 		{
 			DWORD access=0, creation=0, flags=FILE_ATTRIBUTE_NORMAL|FILE_FLAG_OVERLAPPED;
 			req.flags=fileflags(req.flags);
@@ -397,28 +407,28 @@ namespace detail {
 				CreateFile(req.path.c_str(), access, FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,
 					NULL, creation, flags, NULL)));
 			static_cast<async_io_handle_windows *>(ret.get())->do_add_io_handle_to_parent();
-			return ret;
+			return std::make_pair(false, ret);
 		}
 		// Called in unknown thread
-		std::shared_ptr<detail::async_io_handle> dormfile(size_t id, std::shared_ptr<detail::async_io_handle> _, async_path_op_req req)
+		completion_returntype dormfile(size_t id, std::shared_ptr<detail::async_io_handle> _, async_path_op_req req)
 		{
 			req.flags=fileflags(req.flags);
 			ERRHWINFN(DeleteFile(req.path.c_str()), req.path);
 			auto ret=std::shared_ptr<detail::async_io_handle>(new async_io_handle_windows(shared_from_this(), req.path));
-			return ret;
+			return std::make_pair(false, ret);
 		}
 		// Called in unknown thread
-		std::shared_ptr<detail::async_io_handle> dosync(size_t id, std::shared_ptr<detail::async_io_handle> h, async_io_op)
+		completion_returntype dosync(size_t id, std::shared_ptr<detail::async_io_handle> h, async_io_op)
 		{
 			async_io_handle_windows *p=static_cast<async_io_handle_windows *>(h.get());
 			size_t bytestobesynced=p->write_count_since_fsync();
 			if(bytestobesynced)
 				ERRHWINFN(FlushFileBuffers(p->h->native_handle()), p->path());
 			p->byteswrittenatlastfsync+=(long) bytestobesynced;
-			return h;
+			return std::make_pair(false, h);
 		}
 		// Called in unknown thread
-		std::shared_ptr<detail::async_io_handle> doclose(size_t id, std::shared_ptr<detail::async_io_handle> h, async_io_op)
+		completion_returntype doclose(size_t id, std::shared_ptr<detail::async_io_handle> h, async_io_op)
 		{
 			async_io_handle_windows *p=static_cast<async_io_handle_windows *>(h.get());
 			// Windows doesn't provide an async fsync so do it synchronously
@@ -426,23 +436,25 @@ namespace detail {
 				ERRHWINFN(FlushFileBuffers(p->h->native_handle()), p->path());
 			p->h->close();
 			p->h.reset();
-			return h;
+			return std::make_pair(false, h);
 		}
 		// Called in unknown thread
-		std::shared_ptr<detail::async_io_handle> doread(size_t id, std::shared_ptr<detail::async_io_handle> h, async_data_op_req<void> req)
+		void read_handler(const boost::system::error_code &ec, size_t bytes_transferred);
+		// Called in unknown thread
+		completion_returntype doread(size_t id, std::shared_ptr<detail::async_io_handle> h, async_data_op_req<void> req)
 		{
 			async_io_handle_windows *p=static_cast<async_io_handle_windows *>(h.get());
-			boost::asio::mutable_buffer buffers;
-			boost::asio::async_read_at(p->h, req.where, buffers, completion);
-			return h;
+			boost::asio::async_read_at(p->h, req.where, req.buffers, &async_file_io_dispatcher_windows::read_handler);
+			return std::make_pair(false, h);
 		}
 		// Called in unknown thread
-		std::shared_ptr<detail::async_io_handle> dowrite(size_t id, std::shared_ptr<detail::async_io_handle> h, async_data_op_req<const void> req)
+		void write_handler(const boost::system::error_code &ec, size_t bytes_transferred);
+		// Called in unknown thread
+		completion_returntype dowrite(size_t id, std::shared_ptr<detail::async_io_handle> h, async_data_op_req<const void> req)
 		{
 			async_io_handle_windows *p=static_cast<async_io_handle_windows *>(h.get());
-			boost::asio::const_buffer buffers;
-			boost::asio::async_write_at(p->h, req.where, buffers, completion);
-			return h;
+			boost::asio::async_write_at(p->h, req.where, req.buffers, &async_file_io_dispatcher_windows::write_handler);
+			return std::make_pair(false, h);
 		}
 
 	public:
@@ -487,7 +499,7 @@ namespace detail {
 	class async_file_io_dispatcher_compat : public async_file_io_dispatcher_base
 	{
 		// Called in unknown thread
-		std::shared_ptr<detail::async_io_handle> dodir(size_t id, std::shared_ptr<detail::async_io_handle> _, async_path_op_req req)
+		completion_returntype dodir(size_t id, std::shared_ptr<detail::async_io_handle> _, async_path_op_req req)
 		{
 			int ret=0;
 			req.flags=fileflags(req.flags);
@@ -511,26 +523,26 @@ namespace detail {
 			{
 				auto ret=dofile(id, _, req);
 				// Set the bytes written to something to enable fsyncing of directories
-				ret->byteswritten=1;
+				ret.second->byteswritten=1;
 				return ret;
 			}
 			else
 			{
 				// Create dummy handle so
 				auto ret=std::shared_ptr<detail::async_io_handle>(new async_io_handle_posix(shared_from_this(), req.path, false, -999));
-				return ret;
+				return std::make_pair(false, ret);
 			}
 		}
 		// Called in unknown thread
-		std::shared_ptr<detail::async_io_handle> dormdir(size_t id, std::shared_ptr<detail::async_io_handle> _, async_path_op_req req)
+		completion_returntype dormdir(size_t id, std::shared_ptr<detail::async_io_handle> _, async_path_op_req req)
 		{
 			req.flags=fileflags(req.flags);
 			ERRHOSFN(posix_rmdir(req.path.c_str()), req.path);
 			auto ret=std::shared_ptr<detail::async_io_handle>(new async_io_handle_posix(shared_from_this(), req.path, false, -999));
-			return ret;
+			return std::make_pair(false, ret);
 		}
 		// Called in unknown thread
-		std::shared_ptr<detail::async_io_handle> dofile(size_t id, std::shared_ptr<detail::async_io_handle>, async_path_op_req req)
+		completion_returntype dofile(size_t id, std::shared_ptr<detail::async_io_handle>, async_path_op_req req)
 		{
 			int flags=0;
 			req.flags=fileflags(req.flags);
@@ -550,18 +562,18 @@ namespace detail {
 			auto ret=std::shared_ptr<detail::async_io_handle>(new async_io_handle_posix(shared_from_this(), req.path, (file_flags::AutoFlush|file_flags::Write)==(req.flags & (file_flags::AutoFlush|file_flags::Write)),
 				posix_open(req.path.c_str(), flags, 0x1b0/*660*/)));
 			static_cast<async_io_handle_posix *>(ret.get())->do_add_io_handle_to_parent();
-			return ret;
+			return std::make_pair(false, ret);
 		}
 		// Called in unknown thread
-		std::shared_ptr<detail::async_io_handle> dormfile(size_t id, std::shared_ptr<detail::async_io_handle> _, async_path_op_req req)
+		completion_returntype dormfile(size_t id, std::shared_ptr<detail::async_io_handle> _, async_path_op_req req)
 		{
 			req.flags=fileflags(req.flags);
 			ERRHOSFN(posix_unlink(req.path.c_str()), req.path);
 			auto ret=std::shared_ptr<detail::async_io_handle>(new async_io_handle_posix(shared_from_this(), req.path, false, -999));
-			return ret;
+			return std::make_pair(false, ret);
 		}
 		// Called in unknown thread
-		std::shared_ptr<detail::async_io_handle> dosync(size_t id, std::shared_ptr<detail::async_io_handle> h, async_io_op)
+		completion_returntype dosync(size_t id, std::shared_ptr<detail::async_io_handle> h, async_io_op)
 		{
 			async_io_handle_posix *p=static_cast<async_io_handle_posix *>(h.get());
 			size_t bytestobesynced=p->write_count_since_fsync();
@@ -569,20 +581,20 @@ namespace detail {
 				ERRHOSFN(posix_fsync(p->fd), p->path());
 			p->has_ever_been_fsynced=true;
 			p->byteswrittenatlastfsync+=(long) bytestobesynced;
-			return h;
+			return std::make_pair(false, h);
 		}
 		// Called in unknown thread
-		std::shared_ptr<detail::async_io_handle> doclose(size_t id, std::shared_ptr<detail::async_io_handle> h, async_io_op)
+		completion_returntype doclose(size_t id, std::shared_ptr<detail::async_io_handle> h, async_io_op)
 		{
 			async_io_handle_posix *p=static_cast<async_io_handle_posix *>(h.get());
 			if(p->autoflush && p->write_count_since_fsync())
 				ERRHOSFN(posix_fsync(p->fd), p->path());
 			ERRHOSFN(posix_close(p->fd), p->path());
 			p->fd=-1;
-			return h;
+			return std::make_pair(false, h);
 		}
 		// Called in unknown thread
-		std::shared_ptr<detail::async_io_handle> doread(size_t id, std::shared_ptr<detail::async_io_handle> h, async_data_op_req<void> req)
+		completion_returntype doread(size_t id, std::shared_ptr<detail::async_io_handle> h, async_data_op_req<void> req)
 		{
 			async_io_handle_posix *p=static_cast<async_io_handle_posix *>(h.get());
 			iovec v;
@@ -590,15 +602,15 @@ namespace detail {
 			vecs.reserve(req.buffers.size());
 			for(auto &b : req.buffers)
 			{
-				v.iov_base=(void *) b.first;
-				v.iov_len=b.second;
+				v.iov_base=boost::asio::buffer_cast<void *>(b);
+				v.iov_len=boost::asio::buffer_size(b);
 				vecs.push_back(v);
 			}
 			ERRHOSFN((int) preadv(p->fd, &vecs.front(), (int) vecs.size(), req.where), p->path());
-			return h;
+			return std::make_pair(false, h);
 		}
 		// Called in unknown thread
-		std::shared_ptr<detail::async_io_handle> dowrite(size_t id, std::shared_ptr<detail::async_io_handle> h, async_data_op_req<const void> req)
+		completion_returntype dowrite(size_t id, std::shared_ptr<detail::async_io_handle> h, async_data_op_req<const void> req)
 		{
 			async_io_handle_posix *p=static_cast<async_io_handle_posix *>(h.get());
 			iovec v;
@@ -606,12 +618,12 @@ namespace detail {
 			vecs.reserve(req.buffers.size());
 			for(auto &b : req.buffers)
 			{
-				v.iov_base=(void *) b.first;
-				v.iov_len=b.second;
+				v.iov_base=(void *) boost::asio::buffer_cast<const void *>(b);
+				v.iov_len=boost::asio::buffer_size(b);
 				vecs.push_back(v);
 			}
 			ERRHOSFN((int) pwritev(p->fd, &vecs.front(), (int) vecs.size(), req.where), p->path());
-			return h;
+			return std::make_pair(false, h);
 		}
 
 	public:
