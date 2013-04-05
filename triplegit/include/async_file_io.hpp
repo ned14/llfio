@@ -203,7 +203,7 @@ namespace detail {
 		std::chrono::system_clock::time_point _opened;
 		std::filesystem::path _path; // guaranteed canonical
 	protected:
-		std::atomic<size_t> bytesread, byteswritten, byteswrittenatlastfsync;
+		std::atomic<off_t> bytesread, byteswritten, byteswrittenatlastfsync;
 		async_io_handle(async_file_io_dispatcher_base *parent, const std::filesystem::path &path) : _parent(parent), _opened(std::chrono::system_clock::now()), _path(path), bytesread(0), byteswritten(0), byteswrittenatlastfsync(0) { }
 	public:
 		virtual ~async_io_handle() { }
@@ -214,11 +214,11 @@ namespace detail {
 		//! Returns the path of this io handle
 		const std::filesystem::path &path() const { return _path; }
 		//! Returns how many bytes have been read since this handle was opened.
-		size_t read_count() const { return bytesread; }
+		off_t read_count() const { return bytesread; }
 		//! Returns how many bytes have been written since this handle was opened.
-		size_t write_count() const { return byteswritten; }
+		off_t write_count() const { return byteswritten; }
 		//! Returns how many bytes have been written since this handle was last fsynced.
-		size_t write_count_since_fsync() const { return byteswritten-byteswrittenatlastfsync; }
+		off_t write_count_since_fsync() const { return byteswritten-byteswrittenatlastfsync; }
 	};
 }
 
@@ -257,6 +257,7 @@ inline file_flags operator~(file_flags a)
 }
 
 struct async_path_op_req;
+template<class T> struct async_data_op_req;
 
 /*! \class async_file_io_dispatcher_base
 \brief Abstract base class for dispatching file i/o asynchronously
@@ -314,12 +315,22 @@ public:
 	virtual std::vector<async_io_op> close(const std::vector<async_io_op> &ops)=0;
 	//! Asynchronously closes the connection to an item once it completes
 	inline async_io_op close(const async_io_op &req);
+
+	//! Asynchronously reads data from items
+	virtual std::vector<async_io_op> read(const std::vector<async_data_op_req<void>> &ops)=0;
+	//! Asynchronously reads data from an item
+	inline async_io_op read(const async_data_op_req<void> &req);
+	//! Asynchronously writes data to items
+	virtual std::vector<async_io_op> write(const std::vector<async_data_op_req<const void>> &ops)=0;
+	//! Asynchronously writes data to items
+	inline async_io_op write(const async_data_op_req<const void> &req);
 protected:
 	std::shared_ptr<detail::async_io_handle> invoke_user_completion(size_t id, std::shared_ptr<detail::async_io_handle> h, std::function<std::shared_ptr<detail::async_io_handle> (size_t, std::shared_ptr<detail::async_io_handle>)> callback);
 	template<class F, class... Args> std::shared_ptr<detail::async_io_handle> invoke_async_op_completions(size_t id, std::shared_ptr<detail::async_io_handle> h, std::shared_ptr<detail::async_io_handle> (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, Args...), Args... args);
 	template<class F, class... Args> async_io_op chain_async_op(const async_io_op &precondition, std::shared_ptr<detail::async_io_handle> (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, Args...), Args... args);
 	template<class F, class T> std::vector<async_io_op> chain_async_ops(const std::vector<T> &container, std::shared_ptr<detail::async_io_handle> (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, T));
 	template<class F> std::vector<async_io_op> chain_async_ops(const std::vector<async_path_op_req> &container, std::shared_ptr<detail::async_io_handle> (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, async_path_op_req));
+	template<class F, class T> std::vector<async_io_op> chain_async_ops(const std::vector<async_data_op_req<T>> &container, std::shared_ptr<detail::async_io_handle> (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, async_data_op_req<T>));
 };
 extern TRIPLEGIT_ASYNC_FILE_IO_API std::shared_ptr<async_file_io_dispatcher_base> async_file_io_dispatcher(thread_pool &threadpool=process_threadpool(), file_flags flagsforce=file_flags::AutoFlush, file_flags flagsmask=file_flags::None);
 
@@ -371,7 +382,7 @@ inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(st
 	return state->done.get_future();
 }
 
-/*! \struct async_file_io_op_req
+/*! \struct async_path_op_req
 \brief A convenience bundle of path and flags, with optional precondition
 */
 struct async_path_op_req
@@ -391,6 +402,62 @@ struct async_path_op_req
 	async_path_op_req(const char *_path, file_flags _flags=file_flags::None) : path(std::filesystem::absolute(std::filesystem::path(_path).make_preferred())), flags(_flags) { }
 	//! Constructs on the basis of a string. make_preferred() and absolute() are called in this case.
 	async_path_op_req(async_io_op _precondition, const char *_path, file_flags _flags=file_flags::None) : path(std::filesystem::absolute(std::filesystem::path(_path).make_preferred())), flags(_flags), precondition(_precondition) { }
+};
+
+/*! \struct async_data_op_req
+\brief A convenience bundle of precondition, data and where. Data \b MUST stay around until the operation completes.
+*/
+template<> struct async_data_op_req<void> // For reading
+{
+	async_io_op precondition;
+	std::vector<std::pair<void *, size_t>> buffers;
+	off_t where;
+	async_data_op_req(async_io_op _precondition, void *_buffer, size_t _length, off_t _where) : precondition(_precondition), where(_where) { buffers.reserve(1); buffers.push_back(std::make_pair(_buffer, _length)); }
+	async_data_op_req(async_io_op _precondition, std::vector<std::pair<void *, size_t>> _buffers, off_t _where) : precondition(_precondition), buffers(_buffers), where(_where) { }
+};
+template<> struct async_data_op_req<const void> // For writing
+{
+	async_io_op precondition;
+	std::vector<std::pair<const void *, size_t>> buffers;
+	off_t where;
+	async_data_op_req(async_io_op _precondition, const void *_buffer, size_t _length, off_t _where) : precondition(_precondition), where(_where) { buffers.reserve(1); buffers.push_back(std::make_pair(_buffer, _length)); }
+	async_data_op_req(async_io_op _precondition, std::vector<std::pair<const void *, size_t>> _buffers, off_t _where) : precondition(_precondition), buffers(_buffers), where(_where) { }
+};
+//! \brief A specialisation for any pointer to type T
+template<class T> struct async_data_op_req<T *> : public async_data_op_req<void>
+{
+	async_data_op_req(async_io_op _precondition, T *_buffer, size_t _length, off_t _where) : async_data_op_req<void>(_precondition, static_cast<void *>(_buffer), _length, _where) { }
+};
+template<class T> struct async_data_op_req<const T *> : public async_data_op_req<const void>
+{
+	async_data_op_req(async_io_op _precondition, const T *_buffer, size_t _length, off_t _where) : async_data_op_req<const void>(_precondition, static_cast<const void *>(_buffer), _length, _where) { }
+};
+//! \brief A specialisation for any std::vector<T, A>
+template<class T, class A> struct async_data_op_req<std::vector<T, A>> : public async_data_op_req<void>
+{
+	async_data_op_req(async_io_op _precondition, std::vector<T, A> &v, off_t _where) : async_data_op_req<void>(_precondition, static_cast<void *>(&v.front()), v.size()*sizeof(T), _where) { }
+};
+template<class T, class A> struct async_data_op_req<const std::vector<T, A>> : public async_data_op_req<const void>
+{
+	async_data_op_req(async_io_op _precondition, const std::vector<T, A> &v, off_t _where) : async_data_op_req<const void>(_precondition, static_cast<const void *>(&v.front()), v.size()*sizeof(T), _where) { }
+};
+//! \brief A specialisation for any std::array<T, N>
+template<class T, size_t N> struct async_data_op_req<std::array<T, N>> : public async_data_op_req<void>
+{
+	async_data_op_req(async_io_op _precondition, std::array<T, N> &v, off_t _where) : async_data_op_req<void>(_precondition, static_cast<void *>(&v.front()), v.size()*sizeof(T), _where) { }
+};
+template<class T, size_t N> struct async_data_op_req<const std::array<T, N>> : public async_data_op_req<const void>
+{
+	async_data_op_req(async_io_op _precondition, const std::array<T, N> &v, off_t _where) : async_data_op_req<const void>(_precondition, static_cast<const void *>(&v.front()), v.size()*sizeof(T), _where) { }
+};
+//! \brief A specialisation for any std::basic_string<C, T, A>
+template<class C, class T, class A> struct async_data_op_req<std::basic_string<C, T, A>> : public async_data_op_req<void>
+{
+	async_data_op_req(async_io_op _precondition, std::basic_string<C, T, A> &v, off_t _where) : async_data_op_req<void>(_precondition, static_cast<void *>(&v.front()), v.size()*sizeof(A), _where) { }
+};
+template<class C, class T, class A> struct async_data_op_req<const std::basic_string<C, T, A>> : public async_data_op_req<const void>
+{
+	async_data_op_req(async_io_op _precondition, const std::basic_string<C, T, A> &v, off_t _where) : async_data_op_req<const void>(_precondition, static_cast<const void *>(&v.front()), v.size()*sizeof(A), _where) { }
 };
 
 inline async_io_op async_file_io_dispatcher_base::dir(const async_path_op_req &req)
@@ -434,6 +501,20 @@ inline async_io_op async_file_io_dispatcher_base::close(const async_io_op &req)
 	i.reserve(1);
 	i.push_back(req);
 	return close(i).front();
+}
+inline async_io_op async_file_io_dispatcher_base::read(const async_data_op_req<void> &req)
+{
+	std::vector<async_data_op_req<void>> i;
+	i.reserve(1);
+	i.push_back(req);
+	return read(i).front();
+}
+inline async_io_op async_file_io_dispatcher_base::write(const async_data_op_req<const void> &req)
+{
+	std::vector<async_data_op_req<const void>> i;
+	i.reserve(1);
+	i.push_back(req);
+	return write(i).front();
 }
 
 

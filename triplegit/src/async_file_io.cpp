@@ -30,26 +30,52 @@ File Created: Mar 2013
 #define posix_open _wopen
 #define posix_close _close
 #define posix_unlink _wunlink
-#define posix_read _read
-#define posix_write _write
 #define posix_fsync _commit
 #else
+#include <sys/uio.h>
 #define posix_mkdir mkdir
 #define posix_rmdir ::rmdir
 #define posix_stat stat
 #define posix_open open
 #define posix_close ::close
 #define posix_unlink unlink
-#define posix_read read
-#define posix_write write
 #define posix_fsync fsync
 #endif
-
-namespace triplegit { namespace async_io {
 
 // libstdc++ doesn't come with std::lock_guard
 #define lock_guard boost::lock_guard
 
+#ifdef WIN32
+struct iovec {
+    void  *iov_base;    /* Starting address */
+    size_t iov_len;     /* Number of bytes to transfer */
+};
+typedef ptrdiff_t ssize_t;
+static boost::detail::spinlock preadwritelock;
+ssize_t preadv(int fd, const struct iovec *iov, int iovcnt, off_t offset)
+{
+	off_t at=offset;
+	ssize_t transferred;
+	lock_guard<boost::detail::spinlock> lockh(preadwritelock);
+	if(-1==_lseeki64(fd, offset, SEEK_SET)) return -1;
+	for(; iovcnt; iov++, iovcnt--, at+=(off_t) transferred)
+		if(-1==(transferred=_read(fd, iov->iov_base, (unsigned) iov->iov_len))) return -1;
+	return at-offset;
+}
+ssize_t pwritev(int fd, const struct iovec *iov, int iovcnt, off_t offset)
+{
+	off_t at=offset;
+	ssize_t transferred;
+	lock_guard<boost::detail::spinlock> lockh(preadwritelock);
+	if(-1==_lseeki64(fd, offset, SEEK_SET)) return -1;
+	for(; iovcnt; iov++, iovcnt--, at+=(off_t) transferred)
+		if(-1==(transferred=_write(fd, iov->iov_base, (unsigned) iov->iov_len))) return -1;
+	return at-offset;
+}
+#endif
+
+
+namespace triplegit { namespace async_io {
 
 thread_pool &process_threadpool()
 {
@@ -297,6 +323,15 @@ template<class F> std::vector<async_io_op> async_file_io_dispatcher_base::chain_
 		ret.push_back(chain_async_op(i.precondition, f, i));
 	return ret;
 }
+template<class F, class T> std::vector<async_io_op> async_file_io_dispatcher_base::chain_async_ops(const std::vector<async_data_op_req<T>> &container, std::shared_ptr<detail::async_io_handle> (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, async_data_op_req<T>))
+{
+	std::vector<async_io_op> ret;
+	ret.reserve(container.size());
+	lock_guard<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
+	for(auto &i : container)
+		ret.push_back(chain_async_op(i.precondition, f, i));
+	return ret;
+}
 
 
 namespace detail {
@@ -379,7 +414,7 @@ namespace detail {
 			size_t bytestobesynced=p->write_count_since_fsync();
 			if(bytestobesynced)
 				ERRHWINFN(FlushFileBuffers(p->h->native_handle()), p->path());
-			p->byteswrittenatlastfsync+=bytestobesynced;
+			p->byteswrittenatlastfsync+=(long) bytestobesynced;
 			return h;
 		}
 		// Called in unknown thread
@@ -391,6 +426,22 @@ namespace detail {
 				ERRHWINFN(FlushFileBuffers(p->h->native_handle()), p->path());
 			p->h->close();
 			p->h.reset();
+			return h;
+		}
+		// Called in unknown thread
+		std::shared_ptr<detail::async_io_handle> doread(size_t id, std::shared_ptr<detail::async_io_handle> h, async_data_op_req<void> req)
+		{
+			async_io_handle_windows *p=static_cast<async_io_handle_windows *>(h.get());
+			boost::asio::mutable_buffer buffers;
+			boost::asio::async_read_at(p->h, req.where, buffers, completion);
+			return h;
+		}
+		// Called in unknown thread
+		std::shared_ptr<detail::async_io_handle> dowrite(size_t id, std::shared_ptr<detail::async_io_handle> h, async_data_op_req<const void> req)
+		{
+			async_io_handle_windows *p=static_cast<async_io_handle_windows *>(h.get());
+			boost::asio::const_buffer buffers;
+			boost::asio::async_write_at(p->h, req.where, buffers, completion);
 			return h;
 		}
 
@@ -422,6 +473,14 @@ namespace detail {
 		virtual std::vector<async_io_op> close(const std::vector<async_io_op> &ops)
 		{
 			return chain_async_ops(ops, &async_file_io_dispatcher_windows::doclose);
+		}
+		virtual std::vector<async_io_op> read(const std::vector<async_data_op_req<void>> &reqs)
+		{
+			return chain_async_ops(reqs, &async_file_io_dispatcher_windows::doread);
+		}
+		virtual std::vector<async_io_op> write(const std::vector<async_data_op_req<const void>> &reqs)
+		{
+			return chain_async_ops(reqs, &async_file_io_dispatcher_windows::dowrite);
 		}
 	};
 #endif
@@ -509,7 +568,7 @@ namespace detail {
 			if(bytestobesynced)
 				ERRHOSFN(posix_fsync(p->fd), p->path());
 			p->has_ever_been_fsynced=true;
-			p->byteswrittenatlastfsync+=bytestobesynced;
+			p->byteswrittenatlastfsync+=(long) bytestobesynced;
 			return h;
 		}
 		// Called in unknown thread
@@ -520,6 +579,38 @@ namespace detail {
 				ERRHOSFN(posix_fsync(p->fd), p->path());
 			ERRHOSFN(posix_close(p->fd), p->path());
 			p->fd=-1;
+			return h;
+		}
+		// Called in unknown thread
+		std::shared_ptr<detail::async_io_handle> doread(size_t id, std::shared_ptr<detail::async_io_handle> h, async_data_op_req<void> req)
+		{
+			async_io_handle_posix *p=static_cast<async_io_handle_posix *>(h.get());
+			iovec v;
+			std::vector<iovec> vecs;
+			vecs.reserve(req.buffers.size());
+			for(auto &b : req.buffers)
+			{
+				v.iov_base=(void *) b.first;
+				v.iov_len=b.second;
+				vecs.push_back(v);
+			}
+			ERRHOSFN((int) preadv(p->fd, &vecs.front(), (int) vecs.size(), req.where), p->path());
+			return h;
+		}
+		// Called in unknown thread
+		std::shared_ptr<detail::async_io_handle> dowrite(size_t id, std::shared_ptr<detail::async_io_handle> h, async_data_op_req<const void> req)
+		{
+			async_io_handle_posix *p=static_cast<async_io_handle_posix *>(h.get());
+			iovec v;
+			std::vector<iovec> vecs;
+			vecs.reserve(req.buffers.size());
+			for(auto &b : req.buffers)
+			{
+				v.iov_base=(void *) b.first;
+				v.iov_len=b.second;
+				vecs.push_back(v);
+			}
+			ERRHOSFN((int) pwritev(p->fd, &vecs.front(), (int) vecs.size(), req.where), p->path());
 			return h;
 		}
 
@@ -577,6 +668,14 @@ namespace detail {
 				ret.push_back(op);
 			}
 			return ret;
+		}
+		virtual std::vector<async_io_op> read(const std::vector<async_data_op_req<void>> &reqs)
+		{
+			return chain_async_ops(reqs, &async_file_io_dispatcher_compat::doread);
+		}
+		virtual std::vector<async_io_op> write(const std::vector<async_data_op_req<const void>> &reqs)
+		{
+			return chain_async_ops(reqs, &async_file_io_dispatcher_compat::dowrite);
 		}
 	};
 }
