@@ -81,6 +81,10 @@ public:
 	promise &operator=(boost::promise<T> &&o) { static_cast<boost::promise<T> &&>(*this)=std::move(o); return *this; }
 	promise &operator=(promise &&o) { static_cast<boost::promise<T> &&>(*this)=std::move(o); return *this; }
 };
+/*! \brief For now, this is boost's exception_ptr. Will be replaced when C++'s promise catches up with boost's
+*/
+typedef boost::exception_ptr exception_ptr;
+template<class T> inline exception_ptr make_exception_ptr(const T &e) { return boost::copy_exception(e); }
 
 /*! \class thread_pool
 \brief A very simple thread pool based on Boost.ASIO and std::thread
@@ -292,7 +296,7 @@ public:
 	typedef std::pair<bool, std::shared_ptr<detail::async_io_handle>> completion_returntype;
 	typedef completion_returntype completion_t(size_t, std::shared_ptr<detail::async_io_handle>);
 	//! Invoke the specified function when each of the supplied operations complete
-	std::vector<async_io_op> completion(const std::vector<async_io_op> &ops, const std::vector<std::function<completion_t>> &callbacks);
+	std::vector<async_io_op> completion(const std::vector<async_io_op> &ops, const std::vector<std::pair<bool, std::function<completion_t>>> &callbacks);
 	//! Asynchronously creates directories
 	virtual std::vector<async_io_op> dir(const std::vector<async_path_op_req> &reqs)=0;
 	//! Asynchronously creates a directory
@@ -331,13 +335,13 @@ public:
 	//! Asynchronously writes data to items
 	template<class T> inline std::vector<async_io_op> write(const std::vector<async_data_op_req<T>> &ops);
 protected:
-	void complete_async_op(size_t id, std::shared_ptr<detail::async_io_handle> h);
+	void complete_async_op(size_t id, std::shared_ptr<detail::async_io_handle> h, exception_ptr e=exception_ptr());
 	completion_returntype invoke_user_completion(size_t id, std::shared_ptr<detail::async_io_handle> h, std::function<completion_t> callback);
 	template<class F, class... Args> std::shared_ptr<detail::async_io_handle> invoke_async_op_completions(size_t id, std::shared_ptr<detail::async_io_handle> h, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, Args...), Args... args);
-	template<class F, class... Args> async_io_op chain_async_op(const async_io_op &precondition, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, Args...), Args... args);
-	template<class F, class T> std::vector<async_io_op> chain_async_ops(const std::vector<T> &container, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, T));
-	template<class F> std::vector<async_io_op> chain_async_ops(const std::vector<async_path_op_req> &container, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, async_path_op_req));
-	template<class F, class T> std::vector<async_io_op> chain_async_ops(const std::vector<async_data_op_req<T>> &container, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, async_data_op_req<T>));
+	template<class F, class... Args> async_io_op chain_async_op(const async_io_op &precondition, bool detachedfuture, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, Args...), Args... args);
+	template<class F, class T> std::vector<async_io_op> chain_async_ops(const std::vector<T> &container, bool detachedfuture, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, T));
+	template<class F> std::vector<async_io_op> chain_async_ops(const std::vector<async_path_op_req> &container, bool detachedfuture, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, async_path_op_req));
+	template<class F, class T> std::vector<async_io_op> chain_async_ops(const std::vector<async_data_op_req<T>> &container, bool detachedfuture, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, async_data_op_req<T>));
 };
 extern TRIPLEGIT_ASYNC_FILE_IO_API std::shared_ptr<async_file_io_dispatcher_base> async_file_io_dispatcher(thread_pool &threadpool=process_threadpool(), file_flags flagsforce=file_flags::AutoFlush, file_flags flagsmask=file_flags::None);
 
@@ -380,11 +384,11 @@ inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(st
 		return future<std::vector<std::shared_ptr<detail::async_io_handle>>>();
 	std::vector<async_io_op> inputs(first, last);
 	std::shared_ptr<detail::when_all_count_completed_state> state(new detail::when_all_count_completed_state(inputs.size()));
-	std::vector<std::function<async_file_io_dispatcher_base::completion_t>> callbacks;
+	std::vector<std::pair<bool, std::function<async_file_io_dispatcher_base::completion_t>>> callbacks;
 	callbacks.reserve(inputs.size());
 	size_t idx=0;
 	for(auto &i : inputs)
-		callbacks.push_back(std::bind(&detail::when_all_count_completed, std::placeholders::_1, std::placeholders::_2, state, idx++));
+		callbacks.push_back(std::make_pair(false, std::bind(&detail::when_all_count_completed, std::placeholders::_1, std::placeholders::_2, state, idx++)));
 	inputs.front().parent->completion(inputs, callbacks);
 	return state->done.get_future();
 }
