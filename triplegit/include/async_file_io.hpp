@@ -297,6 +297,13 @@ public:
 	typedef completion_returntype completion_t(size_t, std::shared_ptr<detail::async_io_handle>);
 	//! Invoke the specified function when each of the supplied operations complete
 	std::vector<async_io_op> completion(const std::vector<async_io_op> &ops, const std::vector<std::pair<bool, std::function<completion_t>>> &callbacks);
+	//! Invoke the specified function when the supplied operation completes
+	inline async_io_op completion(const async_io_op &req, const std::pair<bool, std::function<completion_t>> &callback);
+	//! Invoke the specified function when the supplied operation completes
+	template<class R> inline async_io_op function(const async_io_op &req, std::function<R()> callback);
+	//! Invoke the specified function when the supplied operation completes
+	template<class C, class... Args> inline async_io_op call(const async_io_op &req, C callback, Args... args);
+
 	//! Asynchronously creates directories
 	virtual std::vector<async_io_op> dir(const std::vector<async_path_op_req> &reqs)=0;
 	//! Asynchronously creates a directory
@@ -373,7 +380,7 @@ namespace detail
 		state->out[idx]=h; // This might look thread unsafe, but each idx is unique
 		if(!--state->togo)
 			state->done.set_value(state->out);
-		return std::make_pair(false, h);
+		return std::make_pair(true, h);
 	}
 }
 
@@ -391,6 +398,14 @@ inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(st
 		callbacks.push_back(std::make_pair(false, std::bind(&detail::when_all_count_completed, std::placeholders::_1, std::placeholders::_2, state, idx++)));
 	inputs.front().parent->completion(inputs, callbacks);
 	return state->done.get_future();
+}
+//! \brief Convenience overload for a list of async_io_op
+template<class... Args> inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(Args... args)
+{
+	std::vector<async_io_op> ops;
+	ops.reserve(sizeof...(Args));
+	ops.push_back(args...);
+	return when_all(ops.begin(), ops.end());
 }
 
 /*! \struct async_path_op_req
@@ -487,6 +502,31 @@ namespace detail {
 	};
 }
 
+inline async_io_op async_file_io_dispatcher_base::completion(const async_io_op &req, const std::pair<bool, std::function<async_file_io_dispatcher_base::completion_t>> &callback)
+{
+	std::vector<async_io_op> r;
+	std::vector<std::pair<bool, std::function<async_file_io_dispatcher_base::completion_t>>> i;
+	r.reserve(1); i.reserve(1);
+	r.push_back(req);
+	i.push_back(callback);
+	return completion(r, i).front();
+}
+template<class R> inline async_io_op async_file_io_dispatcher_base::function(const async_io_op &req, std::function<R()> callback)
+{
+	auto invoker=[](size_t, std::shared_ptr<detail::async_io_handle> _, std::function<R()> callback){
+		callback();
+		return std::make_pair(true, _);
+	};
+	return completion(req, std::bind(invoker, std::placeholders::_1, std::placeholders::_2, callback));
+}
+template<class C, class... Args> inline async_io_op async_file_io_dispatcher_base::call(const async_io_op &req, C callback, Args... args)
+{
+	auto invoker=[callback, args...](size_t, std::shared_ptr<detail::async_io_handle> _){
+		callback(args...);
+		return std::make_pair(true, _);
+	};
+	return completion(req, std::make_pair(false, std::bind(invoker, std::placeholders::_1, std::placeholders::_2)));
+}
 inline async_io_op async_file_io_dispatcher_base::dir(const async_path_op_req &req)
 {
 	std::vector<async_path_op_req> i;

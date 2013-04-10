@@ -333,6 +333,26 @@ TEST_CASE("async_io/works", "Tests that the async i/o implementation works")
 	}
 }
 
+TEST_CASE("async_io/errors", "Tests that the async i/o error handling works")
+{
+	using namespace triplegit::async_io;
+	using namespace std;
+	using triplegit::async_io::future;
+	auto dispatcher=async_file_io_dispatcher();
+
+	{
+		auto mkdir(dispatcher->dir(async_path_op_req("testdir", file_flags::Create)));
+		vector<async_io_op> files;
+		files.push_back(dispatcher->file(async_path_op_req(mkdir, "testdir/a", file_flags::Create)));
+		files.push_back(dispatcher->file(async_path_op_req(mkdir, "testdir/b", file_flags::Create)));
+		when_all(files.begin(), files.end()).wait();
+		auto rename(dispatcher->call(files.front(), []{
+			std::filesystem::rename("testdir/a", "testdir/b");
+		}));
+		CHECK_THROWS(when_all(rename).get()); // This should trip with failure to rename
+	}
+}
+
 #if 0
 TEST_CASE("triplegit/works", "Tests that one of the samples from Boost.Graph works as advertised with triplegit")
 {

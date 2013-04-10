@@ -45,7 +45,7 @@ File Created: Mar 2013
 // libstdc++ doesn't come with std::lock_guard
 #define lock_guard boost::lock_guard
 
-#ifdef _DEBUG
+#if defined(_DEBUG) && 0
 #ifdef WIN32
 #define DEBUG_PRINT(...) \
 	{ \
@@ -341,38 +341,51 @@ void async_file_io_dispatcher_base::complete_async_op(size_t id, std::shared_ptr
 // Called in unknown thread
 template<class F, class... Args> std::shared_ptr<detail::async_io_handle> async_file_io_dispatcher_base::invoke_async_op_completions(size_t id, std::shared_ptr<detail::async_io_handle> h, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, Args...), Args... args)
 {
-	completion_returntype ret((static_cast<F *>(this)->*f)(id, h, args...));
-	// If boolean is false, reschedule completion notification setting it to ret.second, otherwise complete now
-	if(ret.first)
+	try
 	{
-		complete_async_op(id, ret.second);
+		completion_returntype ret((static_cast<F *>(this)->*f)(id, h, args...));
+		// If boolean is false, reschedule completion notification setting it to ret.second, otherwise complete now
+		if(ret.first)
+		{
+			complete_async_op(id, ret.second);
+		}
+		else
+		{
+			// Make sure this was set up for deferred completion
+	#ifndef NDEBUG
+			lock_guard<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
+			std::unordered_map<size_t, detail::async_file_io_dispatcher_op>::iterator it(p->ops.find(id));
+			if(p->ops.end()==it)
+			{
+	#ifndef NDEBUG
+				std::vector<size_t> opsids;
+				for(auto &i : p->ops)
+					opsids.push_back(i.first);
+				std::sort(opsids.begin(), opsids.end());
+	#endif
+				throw std::runtime_error("Failed to find this operation in list of currently executing operations");
+			}
+			if(!it->second.detached_promise)
+			{
+				// If this trips, it means a completion handler tried to defer signalling
+				// completion but it hadn't been set up with a detached future
+				assert(0);
+				std::terminate();
+			}
+	#endif
+		}
+		return ret.second;
 	}
-	else
+#ifdef _MSC_VER
+	catch(const std::exception &)
+#else
+	catch(...)
+#endif
 	{
-		// Make sure this was set up for deferred completion
-#ifndef NDEBUG
-		lock_guard<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
-		std::unordered_map<size_t, detail::async_file_io_dispatcher_op>::iterator it(p->ops.find(id));
-		if(p->ops.end()==it)
-		{
-#ifndef NDEBUG
-			std::vector<size_t> opsids;
-			for(auto &i : p->ops)
-				opsids.push_back(i.first);
-			std::sort(opsids.begin(), opsids.end());
-#endif
-			throw std::runtime_error("Failed to find this operation in list of currently executing operations");
-		}
-		if(!it->second.detached_promise)
-		{
-			// If this trips, it means a completion handler tried to defer signalling
-			// completion but it hadn't been set up with a detached future
-			assert(0);
-			std::terminate();
-		}
-#endif
+		exception_ptr e(async_io::make_exception_ptr(std::current_exception()));
+		complete_async_op(id, h, e);
+		throw;
 	}
-	return ret.second;
 }
 
 // You MUST hold opslock before entry!
