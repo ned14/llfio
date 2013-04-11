@@ -232,6 +232,23 @@ namespace detail {
 }
 
 
+#define ASYNC_FILEIO_DECLARE_CLASS_ENUM_AS_BITFIELD(type) \
+inline type operator&(type a, type b) \
+{ \
+	return static_cast<type>(static_cast<size_t>(a) & static_cast<size_t>(b)); \
+} \
+inline type operator|(type a, type b) \
+{ \
+	return static_cast<type>(static_cast<size_t>(a) | static_cast<size_t>(b)); \
+} \
+inline type operator~(type a) \
+{ \
+	return static_cast<type>(~static_cast<size_t>(a)); \
+} \
+inline bool operator!(type a) \
+{ \
+	return 0==static_cast<size_t>(a); \
+}
 /*! \enum open_flags
 \brief Bitwise file and directory open flags
 */
@@ -251,18 +268,15 @@ enum class file_flags : size_t
 	OSSync=(1<<17)		//!< Ask the OS to not complete until the data is on the physical storage. Best used only with Direct, otherwise use AutoFlush.
 
 };
-inline file_flags operator&(file_flags a, file_flags b)
+ASYNC_FILEIO_DECLARE_CLASS_ENUM_AS_BITFIELD(file_flags)
+enum class async_op_flags : size_t
 {
-	return static_cast<file_flags>(static_cast<size_t>(a) & static_cast<size_t>(b));
-}
-inline file_flags operator|(file_flags a, file_flags b)
-{
-	return static_cast<file_flags>(static_cast<size_t>(a) | static_cast<size_t>(b));
-}
-inline file_flags operator~(file_flags a)
-{
-	return static_cast<file_flags>(~static_cast<size_t>(a));
-}
+	None=0,					//!< No flags set
+	DetachedFuture=1,		//!< The specified completion routine may choose to not complete immediately
+	ImmediateCompletion=2	//!< Call chained completion immediately instead of scheduling for later. Make SURE your completion can not block!
+};
+ASYNC_FILEIO_DECLARE_CLASS_ENUM_AS_BITFIELD(async_op_flags)
+
 
 /*! \class async_file_io_dispatcher_base
 \brief Abstract base class for dispatching file i/o asynchronously
@@ -297,9 +311,9 @@ public:
 	typedef std::pair<bool, std::shared_ptr<detail::async_io_handle>> completion_returntype;
 	typedef completion_returntype completion_t(size_t, std::shared_ptr<detail::async_io_handle>);
 	//! Invoke the specified function when each of the supplied operations complete
-	std::vector<async_io_op> completion(const std::vector<async_io_op> &ops, const std::vector<std::pair<bool, std::function<completion_t>>> &callbacks);
+	std::vector<async_io_op> completion(const std::vector<async_io_op> &ops, const std::vector<std::pair<async_op_flags, std::function<completion_t>>> &callbacks);
 	//! Invoke the specified function when the supplied operation completes
-	inline async_io_op completion(const async_io_op &req, const std::pair<bool, std::function<completion_t>> &callback);
+	inline async_io_op completion(const async_io_op &req, const std::pair<async_op_flags, std::function<completion_t>> &callback);
 	//! Invoke the specified function when the supplied operation completes
 	template<class R> inline async_io_op function(const async_io_op &req, std::function<R()> callback);
 	//! Invoke the specified function when the supplied operation completes
@@ -346,10 +360,10 @@ protected:
 	void complete_async_op(size_t id, std::shared_ptr<detail::async_io_handle> h, exception_ptr e=exception_ptr());
 	completion_returntype invoke_user_completion(size_t id, std::shared_ptr<detail::async_io_handle> h, std::function<completion_t> callback);
 	template<class F, class... Args> std::shared_ptr<detail::async_io_handle> invoke_async_op_completions(size_t id, std::shared_ptr<detail::async_io_handle> h, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, Args...), Args... args);
-	template<class F, class... Args> async_io_op chain_async_op(int optype, const async_io_op &precondition, bool detachedfuture, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, Args...), Args... args);
-	template<class F, class T> std::vector<async_io_op> chain_async_ops(int optype, const std::vector<T> &container, bool detachedfuture, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, T));
-	template<class F> std::vector<async_io_op> chain_async_ops(int optype, const std::vector<async_path_op_req> &container, bool detachedfuture, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, async_path_op_req));
-	template<class F, class T> std::vector<async_io_op> chain_async_ops(int optype, const std::vector<async_data_op_req<T>> &container, bool detachedfuture, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, async_data_op_req<T>));
+	template<class F, class... Args> async_io_op chain_async_op(int optype, const async_io_op &precondition, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, Args...), Args... args);
+	template<class F, class T> std::vector<async_io_op> chain_async_ops(int optype, const std::vector<T> &container, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, T));
+	template<class F> std::vector<async_io_op> chain_async_ops(int optype, const std::vector<async_path_op_req> &container, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, async_path_op_req));
+	template<class F, class T> std::vector<async_io_op> chain_async_ops(int optype, const std::vector<async_data_op_req<T>> &container, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, async_data_op_req<T>));
 };
 extern TRIPLEGIT_ASYNC_FILE_IO_API std::shared_ptr<async_file_io_dispatcher_base> async_file_io_dispatcher(thread_pool &threadpool=process_threadpool(), file_flags flagsforce=file_flags::AutoFlush, file_flags flagsmask=file_flags::None);
 
@@ -418,11 +432,11 @@ inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(st
 		return future<std::vector<std::shared_ptr<detail::async_io_handle>>>();
 	std::vector<async_io_op> inputs(first, last);
 	std::shared_ptr<detail::when_all_count_completed_state> state(new detail::when_all_count_completed_state(inputs.size()));
-	std::vector<std::pair<bool, std::function<async_file_io_dispatcher_base::completion_t>>> callbacks;
+	std::vector<std::pair<async_op_flags, std::function<async_file_io_dispatcher_base::completion_t>>> callbacks;
 	callbacks.reserve(inputs.size());
 	size_t idx=0;
 	for(auto &i : inputs)
-		callbacks.push_back(std::make_pair(false, std::bind(&detail::when_all_count_completed_nothrow, std::placeholders::_1, std::placeholders::_2, state, idx++)));
+		callbacks.push_back(std::make_pair(async_op_flags::ImmediateCompletion, std::bind(&detail::when_all_count_completed_nothrow, std::placeholders::_1, std::placeholders::_2, state, idx++)));
 	inputs.front().parent->completion(inputs, callbacks);
 	return state->done.get_future();
 }
@@ -433,11 +447,11 @@ inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(st
 		return future<std::vector<std::shared_ptr<detail::async_io_handle>>>();
 	std::vector<async_io_op> inputs(first, last);
 	std::shared_ptr<detail::when_all_count_completed_state> state(new detail::when_all_count_completed_state(inputs.size()));
-	std::vector<std::pair<bool, std::function<async_file_io_dispatcher_base::completion_t>>> callbacks;
+	std::vector<std::pair<async_op_flags, std::function<async_file_io_dispatcher_base::completion_t>>> callbacks;
 	callbacks.reserve(inputs.size());
 	size_t idx=0;
 	for(auto &i : inputs)
-		callbacks.push_back(std::make_pair(false, std::bind(&detail::when_all_count_completed, std::placeholders::_1, std::placeholders::_2, state, idx++)));
+		callbacks.push_back(std::make_pair(async_op_flags::ImmediateCompletion, std::bind(&detail::when_all_count_completed, std::placeholders::_1, std::placeholders::_2, state, idx++)));
 	inputs.front().parent->completion(inputs, callbacks);
 	return state->done.get_future();
 }
@@ -554,10 +568,10 @@ namespace detail {
 	};
 }
 
-inline async_io_op async_file_io_dispatcher_base::completion(const async_io_op &req, const std::pair<bool, std::function<async_file_io_dispatcher_base::completion_t>> &callback)
+inline async_io_op async_file_io_dispatcher_base::completion(const async_io_op &req, const std::pair<async_op_flags, std::function<async_file_io_dispatcher_base::completion_t>> &callback)
 {
 	std::vector<async_io_op> r;
-	std::vector<std::pair<bool, std::function<async_file_io_dispatcher_base::completion_t>>> i;
+	std::vector<std::pair<async_op_flags, std::function<async_file_io_dispatcher_base::completion_t>>> i;
 	r.reserve(1); i.reserve(1);
 	r.push_back(req);
 	i.push_back(callback);
@@ -569,7 +583,7 @@ template<class R> inline async_io_op async_file_io_dispatcher_base::function(con
 		callback();
 		return std::make_pair(true, _);
 	};
-	return completion(req, std::bind(invoker, std::placeholders::_1, std::placeholders::_2, callback));
+	return completion(req, std::make_pair(async_op_flags::None, std::bind(invoker, std::placeholders::_1, std::placeholders::_2, callback)));
 }
 template<class C, class... Args> inline async_io_op async_file_io_dispatcher_base::call(const async_io_op &req, C callback, Args... args)
 {
@@ -577,7 +591,7 @@ template<class C, class... Args> inline async_io_op async_file_io_dispatcher_bas
 		callback(args...);
 		return std::make_pair(true, _);
 	};
-	return completion(req, std::make_pair(false, std::bind(invoker, std::placeholders::_1, std::placeholders::_2)));
+	return completion(req, std::make_pair(async_op_flags::None, std::bind(invoker, std::placeholders::_1, std::placeholders::_2)));
 }
 inline async_io_op async_file_io_dispatcher_base::dir(const async_path_op_req &req)
 {

@@ -96,6 +96,26 @@ ssize_t pwritev(int fd, const struct iovec *iov, int iovcnt, off_t offset)
 
 namespace triplegit { namespace async_io {
 
+// Creates a promise which is instantly fulfilled
+template<class F> future<typename std::result_of<F()>::type> immediate_future(F f)
+{
+	typedef typename std::result_of<F()>::type R;
+	promise<R> temp;
+	try
+	{
+		temp.set_value(f());
+	}
+#ifdef _MSC_VER
+	catch(const std::exception &)
+#else
+	catch(...)
+#endif
+	{
+		temp.set_exception(async_io::make_exception_ptr(std::current_exception()));
+	}
+	return temp.get_future();
+}
+
 thread_pool &process_threadpool()
 {
 	// This is basically how many file i/o operations can occur at once
@@ -185,12 +205,14 @@ namespace detail {
 	struct async_file_io_dispatcher_op
 	{
 		OpType optype;
+		async_op_flags flags;
 		shared_future<std::shared_ptr<detail::async_io_handle>> h;
 		std::unique_ptr<promise<std::shared_ptr<detail::async_io_handle>>> detached_promise;
 		typedef std::pair<size_t, std::function<std::shared_ptr<detail::async_io_handle> (std::shared_ptr<detail::async_io_handle>)>> completion_t;
 		std::vector<completion_t> completions;
-		async_file_io_dispatcher_op(OpType _optype, shared_future<std::shared_ptr<detail::async_io_handle>> _h) : optype(_optype), h(_h) { }
-		async_file_io_dispatcher_op(async_file_io_dispatcher_op &&o) : optype(o.optype), h(std::move(o.h)),
+		async_file_io_dispatcher_op(OpType _optype, async_op_flags _flags, shared_future<std::shared_ptr<detail::async_io_handle>> _h)
+			: optype(_optype), flags(_flags), h(_h) { }
+		async_file_io_dispatcher_op(async_file_io_dispatcher_op &&o) : optype(o.optype), flags(std::move(o.flags)), h(std::move(o.h)),
 			detached_promise(std::move(o.detached_promise)), completions(std::move(o.completions)) { }
 	};
 	struct async_file_io_dispatcher_base_p
@@ -266,12 +288,12 @@ async_file_io_dispatcher_base::completion_returntype async_file_io_dispatcher_ba
 	return callback(id, h);
 }
 
-std::vector<async_io_op> async_file_io_dispatcher_base::completion(const std::vector<async_io_op> &ops, const std::vector<std::pair<bool, std::function<async_file_io_dispatcher_base::completion_t>>> &callbacks)
+std::vector<async_io_op> async_file_io_dispatcher_base::completion(const std::vector<async_io_op> &ops, const std::vector<std::pair<async_op_flags, std::function<async_file_io_dispatcher_base::completion_t>>> &callbacks)
 {
 	std::vector<async_io_op> ret;
 	ret.reserve(ops.size());
 	std::vector<async_io_op>::const_iterator i;
-	std::vector<std::pair<bool, std::function<async_file_io_dispatcher_base::completion_t>>>::const_iterator c;
+	std::vector<std::pair<async_op_flags, std::function<async_file_io_dispatcher_base::completion_t>>>::const_iterator c;
 	lock_guard<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
 	for(i=ops.begin(), c=callbacks.begin(); i!=ops.end() && c!=callbacks.end(); ++i, ++c)
 		ret.push_back(chain_async_op((int) detail::OpType::UserCompletion, *i, c->first, &async_file_io_dispatcher_base::invoke_user_completion, c->second));
@@ -281,7 +303,8 @@ std::vector<async_io_op> async_file_io_dispatcher_base::completion(const std::ve
 // Called in unknown thread
 void async_file_io_dispatcher_base::complete_async_op(size_t id, std::shared_ptr<detail::async_io_handle> h, exception_ptr e)
 {
-	lock_guard<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
+	bool have_opslock=p->opslock.try_lock();
+	auto unlock=NiallsCPP11Utilities::Undoer([this, have_opslock](){ if(have_opslock) p->opslock.unlock(); });
 	// Find me in ops, remove my completions and delete me from extant ops
 	std::unordered_map<size_t, detail::async_file_io_dispatcher_op>::iterator it(p->ops.find(id));
 	if(p->ops.end()==it)
@@ -308,10 +331,14 @@ void async_file_io_dispatcher_base::complete_async_op(size_t id, std::shared_ptr
 			if(it->second.detached_promise)
 			{
 				it->second.h=it->second.detached_promise->get_future();
-				threadpool().enqueue(std::bind(c.second, h));
+				if(!!(it->second.flags & async_op_flags::ImmediateCompletion))
+					immediate_future(std::bind(c.second, h));
+				else
+					threadpool().enqueue(std::bind(c.second, h));
 			}
 			else
-				it->second.h=threadpool().enqueue(std::bind(c.second, h));
+				it->second.h=!!(it->second.flags & async_op_flags::ImmediateCompletion)
+					? immediate_future(std::bind(c.second, h)) : threadpool().enqueue(std::bind(c.second, h));
 			DEBUG_PRINT("C %u\n", (unsigned) c.first);
 		}
 		// Restore it to my id
@@ -353,7 +380,8 @@ template<class F, class... Args> std::shared_ptr<detail::async_io_handle> async_
 		{
 			// Make sure this was set up for deferred completion
 	#ifndef NDEBUG
-			lock_guard<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
+			bool have_opslock=p->opslock.try_lock();
+			auto unlock=NiallsCPP11Utilities::Undoer([this, have_opslock](){ if(have_opslock) p->opslock.unlock(); });
 			std::unordered_map<size_t, detail::async_file_io_dispatcher_op>::iterator it(p->ops.find(id));
 			if(p->ops.end()==it)
 			{
@@ -389,7 +417,7 @@ template<class F, class... Args> std::shared_ptr<detail::async_io_handle> async_
 }
 
 // You MUST hold opslock before entry!
-template<class F, class... Args> async_io_op async_file_io_dispatcher_base::chain_async_op(int optype, const async_io_op &precondition, bool detachedfuture, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, Args...), Args... args)
+template<class F, class... Args> async_io_op async_file_io_dispatcher_base::chain_async_op(int optype, const async_io_op &precondition, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, Args...), Args... args)
 {
 	size_t thisid=0;
 #ifndef NDEBUG
@@ -442,16 +470,17 @@ template<class F, class... Args> async_io_op async_file_io_dispatcher_base::chai
 		// delete the data after retrieval.
 		if(precondition.h.valid())
 			h=const_cast<shared_future<std::shared_ptr<detail::async_io_handle>> &>(precondition.h).get();
-		ret.h=threadpool().enqueue(std::bind(boundf.second, h)).share();
+		ret.h=!!(flags & async_op_flags::ImmediateCompletion)
+			? immediate_future(std::bind(boundf.second, h)).share() : threadpool().enqueue(std::bind(boundf.second, h)).share();
 	}
-	auto opsit=p->ops.insert(std::make_pair(thisid, detail::async_file_io_dispatcher_op((detail::OpType) optype, ret.h)));
+	auto opsit=p->ops.insert(std::make_pair(thisid, detail::async_file_io_dispatcher_op((detail::OpType) optype, flags, ret.h)));
 	assert(opsit.second);
 	DEBUG_PRINT("I %u\n", (unsigned) thisid);
 	auto unopsit=NiallsCPP11Utilities::Undoer([this, opsit, thisid](){
 		p->ops.erase(opsit.first);
 		DEBUG_PRINT("E R %u\n", (unsigned) thisid);
 	});
-	if(detachedfuture)
+	if(!!(flags & async_op_flags::DetachedFuture))
 	{
 		opsit.first->second.detached_promise.reset(new promise<std::shared_ptr<detail::async_io_handle>>);
 		if(!done)
@@ -461,31 +490,31 @@ template<class F, class... Args> async_io_op async_file_io_dispatcher_base::chai
 	undep.dismiss();
 	return ret;
 }
-template<class F, class T> std::vector<async_io_op> async_file_io_dispatcher_base::chain_async_ops(int optype, const std::vector<T> &container, bool detachedfuture, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, T))
+template<class F, class T> std::vector<async_io_op> async_file_io_dispatcher_base::chain_async_ops(int optype, const std::vector<T> &container, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, T))
 {
 	std::vector<async_io_op> ret;
 	ret.reserve(container.size());
 	lock_guard<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
 	for(auto &i : container)
-		ret.push_back(chain_async_op(optype, i, detachedfuture, f, i));
+		ret.push_back(chain_async_op(optype, i, flags, f, i));
 	return ret;
 }
-template<class F> std::vector<async_io_op> async_file_io_dispatcher_base::chain_async_ops(int optype, const std::vector<async_path_op_req> &container, bool detachedfuture, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, async_path_op_req))
+template<class F> std::vector<async_io_op> async_file_io_dispatcher_base::chain_async_ops(int optype, const std::vector<async_path_op_req> &container, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, async_path_op_req))
 {
 	std::vector<async_io_op> ret;
 	ret.reserve(container.size());
 	lock_guard<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
 	for(auto &i : container)
-		ret.push_back(chain_async_op(optype, i.precondition, detachedfuture, f, i));
+		ret.push_back(chain_async_op(optype, i.precondition, flags, f, i));
 	return ret;
 }
-template<class F, class T> std::vector<async_io_op> async_file_io_dispatcher_base::chain_async_ops(int optype, const std::vector<async_data_op_req<T>> &container, bool detachedfuture, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, async_data_op_req<T>))
+template<class F, class T> std::vector<async_io_op> async_file_io_dispatcher_base::chain_async_ops(int optype, const std::vector<async_data_op_req<T>> &container, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, async_data_op_req<T>))
 {
 	std::vector<async_io_op> ret;
 	ret.reserve(container.size());
 	lock_guard<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
 	for(auto &i : container)
-		ret.push_back(chain_async_op(optype, i.precondition, detachedfuture, f, i));
+		ret.push_back(chain_async_op(optype, i.precondition, flags, f, i));
 	return ret;
 }
 
@@ -618,35 +647,35 @@ namespace detail {
 
 		virtual std::vector<async_io_op> dir(const std::vector<async_path_op_req> &reqs)
 		{
-			return chain_async_ops((int) detail::OpType::dir, reqs, false, &async_file_io_dispatcher_windows::dodir);
+			return chain_async_ops((int) detail::OpType::dir, reqs, async_op_flags::None, &async_file_io_dispatcher_windows::dodir);
 		}
 		virtual std::vector<async_io_op> rmdir(const std::vector<async_path_op_req> &reqs)
 		{
-			return chain_async_ops((int) detail::OpType::rmdir, reqs, false, &async_file_io_dispatcher_windows::dormdir);
+			return chain_async_ops((int) detail::OpType::rmdir, reqs, async_op_flags::None, &async_file_io_dispatcher_windows::dormdir);
 		}
 		virtual std::vector<async_io_op> file(const std::vector<async_path_op_req> &reqs)
 		{
-			return chain_async_ops((int) detail::OpType::file, reqs, false, &async_file_io_dispatcher_windows::dofile);
+			return chain_async_ops((int) detail::OpType::file, reqs, async_op_flags::None, &async_file_io_dispatcher_windows::dofile);
 		}
 		virtual std::vector<async_io_op> rmfile(const std::vector<async_path_op_req> &reqs)
 		{
-			return chain_async_ops((int) detail::OpType::rmfile, reqs, false, &async_file_io_dispatcher_windows::dormfile);
+			return chain_async_ops((int) detail::OpType::rmfile, reqs, async_op_flags::None, &async_file_io_dispatcher_windows::dormfile);
 		}
 		virtual std::vector<async_io_op> sync(const std::vector<async_io_op> &ops)
 		{
-			return chain_async_ops((int) detail::OpType::sync, ops, false, &async_file_io_dispatcher_windows::dosync);
+			return chain_async_ops((int) detail::OpType::sync, ops, async_op_flags::None, &async_file_io_dispatcher_windows::dosync);
 		}
 		virtual std::vector<async_io_op> close(const std::vector<async_io_op> &ops)
 		{
-			return chain_async_ops((int) detail::OpType::close, ops, false, &async_file_io_dispatcher_windows::doclose);
+			return chain_async_ops((int) detail::OpType::close, ops, async_op_flags::None, &async_file_io_dispatcher_windows::doclose);
 		}
 		virtual std::vector<async_io_op> read(const std::vector<async_data_op_req<void>> &reqs)
 		{
-			return chain_async_ops((int) detail::OpType::read, reqs, true, &async_file_io_dispatcher_windows::doread);
+			return chain_async_ops((int) detail::OpType::read, reqs, async_op_flags::DetachedFuture|async_op_flags::ImmediateCompletion, &async_file_io_dispatcher_windows::doread);
 		}
 		virtual std::vector<async_io_op> write(const std::vector<async_data_op_req<const void>> &reqs)
 		{
-			return chain_async_ops((int) detail::OpType::write, reqs, true, &async_file_io_dispatcher_windows::dowrite);
+			return chain_async_ops((int) detail::OpType::write, reqs, async_op_flags::DetachedFuture|async_op_flags::ImmediateCompletion, &async_file_io_dispatcher_windows::dowrite);
 		}
 	};
 #endif
@@ -788,23 +817,23 @@ namespace detail {
 
 		virtual std::vector<async_io_op> dir(const std::vector<async_path_op_req> &reqs)
 		{
-			return chain_async_ops((int) detail::OpType::dir, reqs, false, &async_file_io_dispatcher_compat::dodir);
+			return chain_async_ops((int) detail::OpType::dir, reqs, async_op_flags::None, &async_file_io_dispatcher_compat::dodir);
 		}
 		virtual std::vector<async_io_op> rmdir(const std::vector<async_path_op_req> &reqs)
 		{
-			return chain_async_ops((int) detail::OpType::rmdir, reqs, false, &async_file_io_dispatcher_compat::dormdir);
+			return chain_async_ops((int) detail::OpType::rmdir, reqs, async_op_flags::None, &async_file_io_dispatcher_compat::dormdir);
 		}
 		virtual std::vector<async_io_op> file(const std::vector<async_path_op_req> &reqs)
 		{
-			return chain_async_ops((int) detail::OpType::file, reqs, false, &async_file_io_dispatcher_compat::dofile);
+			return chain_async_ops((int) detail::OpType::file, reqs, async_op_flags::None, &async_file_io_dispatcher_compat::dofile);
 		}
 		virtual std::vector<async_io_op> rmfile(const std::vector<async_path_op_req> &reqs)
 		{
-			return chain_async_ops((int) detail::OpType::rmfile, reqs, false, &async_file_io_dispatcher_compat::dormfile);
+			return chain_async_ops((int) detail::OpType::rmfile, reqs, async_op_flags::None, &async_file_io_dispatcher_compat::dormfile);
 		}
 		virtual std::vector<async_io_op> sync(const std::vector<async_io_op> &ops)
 		{
-			return chain_async_ops((int) detail::OpType::sync, ops, false, &async_file_io_dispatcher_compat::dosync);
+			return chain_async_ops((int) detail::OpType::sync, ops, async_op_flags::None, &async_file_io_dispatcher_compat::dosync);
 		}
 		virtual std::vector<async_io_op> close(const std::vector<async_io_op> &ops)
 		{
@@ -813,7 +842,7 @@ namespace detail {
 			lock_guard<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
 			for(auto &i : ops)
 			{
-				auto op(chain_async_op((int) detail::OpType::close, i, false, &async_file_io_dispatcher_compat::doclose, i));
+				auto op(chain_async_op((int) detail::OpType::close, i, async_op_flags::None, &async_file_io_dispatcher_compat::doclose, i));
 #ifdef __linux__
 				// It's a real shame Linux's unsafe default forces a synchronisation here ...
 				async_io_handle_posix *p=static_cast<async_io_handle_posix *>(const_cast<shared_future<std::shared_ptr<detail::async_io_handle>> &>(i.h).get().get());
@@ -822,9 +851,9 @@ namespace detail {
 					// Need to fsync the containing directory on Linux file systems, otherwise the file doesn't
 					// necessarily appear where it's supposed to
 					async_path_op_req containingdir(op, p->path().parent_path(), file_flags::Read);
-					auto diropenop(chain_async_op(containingdir.precondition, false, &async_file_io_dispatcher_compat::dofile, containingdir));
-					auto syncdirop(chain_async_op(diropenop, false, &async_file_io_dispatcher_compat::dosync, diropenop));
-					auto closedirop(chain_async_op(syncdirop, false, &async_file_io_dispatcher_compat::doclose, syncdirop));
+					auto diropenop(chain_async_op(containingdir.precondition, async_op_flags::None, &async_file_io_dispatcher_compat::dofile, containingdir));
+					auto syncdirop(chain_async_op(diropenop, async_op_flags::None, &async_file_io_dispatcher_compat::dosync, diropenop));
+					auto closedirop(chain_async_op(syncdirop, async_op_flags::None, &async_file_io_dispatcher_compat::doclose, syncdirop));
 					op=closedirop;
 				}
 #endif
@@ -837,11 +866,11 @@ namespace detail {
 		}
 		virtual std::vector<async_io_op> read(const std::vector<async_data_op_req<void>> &reqs)
 		{
-			return chain_async_ops((int) detail::OpType::read, reqs, false, &async_file_io_dispatcher_compat::doread);
+			return chain_async_ops((int) detail::OpType::read, reqs, async_op_flags::None, &async_file_io_dispatcher_compat::doread);
 		}
 		virtual std::vector<async_io_op> write(const std::vector<async_data_op_req<const void>> &reqs)
 		{
-			return chain_async_ops((int) detail::OpType::write, reqs, false, &async_file_io_dispatcher_compat::dowrite);
+			return chain_async_ops((int) detail::OpType::write, reqs, async_op_flags::None, &async_file_io_dispatcher_compat::dowrite);
 		}
 	};
 }
