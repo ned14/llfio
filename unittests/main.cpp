@@ -330,6 +330,9 @@ TEST_CASE("async_io/works", "Tests that the async i/o implementation works")
 		cout << "It took " << diff.count() << " secs to do " << manyfilereqs.size()/diff.count() << " file closes per sec" << endl;
 		diff=chrono::duration_cast<secs_type>(deletedsync-closedsync);
 		cout << "It took " << diff.count() << " secs to do " << manyfilereqs.size()/diff.count() << " file deletions per sec" << endl;
+
+		// Fetch any outstanding error
+		rmdir.h.get();
 	}
 }
 
@@ -338,18 +341,26 @@ TEST_CASE("async_io/errors", "Tests that the async i/o error handling works")
 	using namespace triplegit::async_io;
 	using namespace std;
 	using triplegit::async_io::future;
-	auto dispatcher=async_file_io_dispatcher();
 
 	{
+		auto dispatcher=async_file_io_dispatcher();
 		auto mkdir(dispatcher->dir(async_path_op_req("testdir", file_flags::Create)));
+		{
+			vector<async_io_op> files;
+			files.push_back(dispatcher->file(async_path_op_req(mkdir, "testdir/a", file_flags::Create)));
+			files.push_back(dispatcher->file(async_path_op_req(mkdir, "testdir/b", file_flags::Create)));
+			when_all(files.begin(), files.end()).wait();
+			auto copy(dispatcher->call(files.front(), []{
+				std::filesystem::copy("testdir/c", "testdir/d");
+			}));
+			CHECK_THROWS(copy.h.get()); // This should trip with failure to copy
+			CHECK_THROWS(when_all({copy}).get()); // This should trip with failure to copy
+		}
 		vector<async_io_op> files;
-		files.push_back(dispatcher->file(async_path_op_req(mkdir, "testdir/a", file_flags::Create)));
-		files.push_back(dispatcher->file(async_path_op_req(mkdir, "testdir/b", file_flags::Create)));
-		when_all(files.begin(), files.end()).wait();
-		auto rename(dispatcher->call(files.front(), []{
-			std::filesystem::rename("testdir/a", "testdir/b");
-		}));
-		CHECK_THROWS(when_all(rename).get()); // This should trip with failure to rename
+		files.push_back(dispatcher->rmfile(async_path_op_req(mkdir, "testdir/a")));
+		files.push_back(dispatcher->rmfile(async_path_op_req(mkdir, "testdir/b")));
+		// TODO: Insert a barrier() here once I write it.
+		files.push_back(dispatcher->rmdir(async_path_op_req(mkdir, "testdir")));
 	}
 }
 

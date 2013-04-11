@@ -10,6 +10,7 @@ File Created: Mar 2013
 #include "../../NiallsCPP11Utilities/NiallsCPP11Utilities.hpp"
 #include "../../NiallsCPP11Utilities/std_filesystem.hpp"
 #include <type_traits>
+#include <initializer_list>
 #include <thread>
 #include <atomic>
 #if !defined(_WIN32_WINNT) && defined(WIN32)
@@ -375,16 +376,57 @@ namespace detail
 		promise<std::vector<std::shared_ptr<detail::async_io_handle>>> done;
 		when_all_count_completed_state(size_t outsize) : togo(outsize), out(outsize) { }
 	};
-	inline async_file_io_dispatcher_base::completion_returntype when_all_count_completed(size_t, std::shared_ptr<detail::async_io_handle> h, std::shared_ptr<detail::when_all_count_completed_state> state, size_t idx)
+	inline async_file_io_dispatcher_base::completion_returntype when_all_count_completed_nothrow(size_t, std::shared_ptr<detail::async_io_handle> h, std::shared_ptr<detail::when_all_count_completed_state> state, size_t idx)
 	{
 		state->out[idx]=h; // This might look thread unsafe, but each idx is unique
 		if(!--state->togo)
 			state->done.set_value(state->out);
 		return std::make_pair(true, h);
 	}
+	inline async_file_io_dispatcher_base::completion_returntype when_all_count_completed(size_t, std::shared_ptr<detail::async_io_handle> h, std::shared_ptr<detail::when_all_count_completed_state> state, size_t idx)
+	{
+		state->out[idx]=h; // This might look thread unsafe, but each idx is unique
+		if(!--state->togo)
+		{
+			bool done=false;
+			try
+			{
+				for(auto &i : state->out)
+					i.get();
+			}
+#ifdef _MSC_VER
+			catch(const std::exception &)
+#else
+			catch(...)
+#endif
+			{
+				exception_ptr e(async_io::make_exception_ptr(std::current_exception()));
+				state->done.set_exception(e);
+				done=true;
+			}
+			if(!done)
+				state->done.set_value(state->out);
+		}
+		return std::make_pair(true, h);
+	}
 }
 
-//! \brief Convenience overload for a vector of async_io_op
+//! \brief Convenience overload for a vector of async_io_op. Does not retrieve exceptions.
+inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(std::nothrow_t, std::vector<async_io_op>::iterator first, std::vector<async_io_op>::iterator last)
+{
+	if(first==last)
+		return future<std::vector<std::shared_ptr<detail::async_io_handle>>>();
+	std::vector<async_io_op> inputs(first, last);
+	std::shared_ptr<detail::when_all_count_completed_state> state(new detail::when_all_count_completed_state(inputs.size()));
+	std::vector<std::pair<bool, std::function<async_file_io_dispatcher_base::completion_t>>> callbacks;
+	callbacks.reserve(inputs.size());
+	size_t idx=0;
+	for(auto &i : inputs)
+		callbacks.push_back(std::make_pair(false, std::bind(&detail::when_all_count_completed_nothrow, std::placeholders::_1, std::placeholders::_2, state, idx++)));
+	inputs.front().parent->completion(inputs, callbacks);
+	return state->done.get_future();
+}
+//! \brief Convenience overload for a vector of async_io_op. Retrieves exceptions.
 inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(std::vector<async_io_op>::iterator first, std::vector<async_io_op>::iterator last)
 {
 	if(first==last)
@@ -399,12 +441,22 @@ inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(st
 	inputs.front().parent->completion(inputs, callbacks);
 	return state->done.get_future();
 }
-//! \brief Convenience overload for a list of async_io_op
-template<class... Args> inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(Args... args)
+//! \brief Convenience overload for a list of async_io_op.  Does not retrieve exceptions.
+inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(std::nothrow_t _, std::initializer_list<async_io_op> _ops)
 {
 	std::vector<async_io_op> ops;
-	ops.reserve(sizeof...(Args));
-	ops.push_back(args...);
+	ops.reserve(_ops.size());
+	for(auto &&i : _ops)
+		ops.push_back(std::move(i));
+	return when_all(_, ops.begin(), ops.end());
+}
+//! \brief Convenience overload for a list of async_io_op. Retrieves exceptions.
+inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(std::initializer_list<async_io_op> _ops)
+{
+	std::vector<async_io_op> ops;
+	ops.reserve(_ops.size());
+	for(auto &&i : _ops)
+		ops.push_back(std::move(i));
 	return when_all(ops.begin(), ops.end());
 }
 
