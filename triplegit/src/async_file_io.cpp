@@ -535,7 +535,7 @@ namespace detail {
 		{
 			DWORD access=0, creation=0, flags=FILE_ATTRIBUTE_NORMAL|FILE_FLAG_OVERLAPPED;
 			req.flags=fileflags(req.flags);
-			if(file_flags::Append==(req.flags & file_flags::Append)) access|=FILE_APPEND_DATA;
+			if(file_flags::Append==(req.flags & file_flags::Append)) access|=FILE_APPEND_DATA|SYNCHRONIZE;
 			else
 			{
 				if(file_flags::Read==(req.flags & file_flags::Read)) access|=GENERIC_READ;
