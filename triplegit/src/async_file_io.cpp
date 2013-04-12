@@ -4,6 +4,7 @@ Provides a threadpool and asynchronous file i/o infrastructure based on Boost.AS
 File Created: Mar 2013
 */
 
+#define MAX_NON_ASYNC_QUEUE_DEPTH 8
 //#define USE_POSIX_ON_WIN32 // Useful for testing
 
 #define _CRT_SECURE_NO_WARNINGS
@@ -96,31 +97,11 @@ ssize_t pwritev(int fd, const struct iovec *iov, int iovcnt, off_t offset)
 
 namespace triplegit { namespace async_io {
 
-// Creates a promise which is instantly fulfilled
-template<class F> future<typename std::result_of<F()>::type> immediate_future(F f)
-{
-	typedef typename std::result_of<F()>::type R;
-	promise<R> temp;
-	try
-	{
-		temp.set_value(f());
-	}
-#ifdef _MSC_VER
-	catch(const std::exception &)
-#else
-	catch(...)
-#endif
-	{
-		temp.set_exception(async_io::make_exception_ptr(std::current_exception()));
-	}
-	return temp.get_future();
-}
-
 thread_pool &process_threadpool()
 {
 	// This is basically how many file i/o operations can occur at once
 	// Obviously the kernel also has a limit
-	static thread_pool ret(1);
+	static thread_pool ret(MAX_NON_ASYNC_QUEUE_DEPTH);
 	return ret;
 }
 
@@ -220,8 +201,9 @@ namespace detail {
 		thread_pool &pool;
 		file_flags flagsforce, flagsmask;
 
-		typedef boost::detail::spinlock opslock_t;
-		opslock_t fdslock; std::unordered_map<void *, std::weak_ptr<async_io_handle>> fds;
+		typedef boost::detail::spinlock fdslock_t;
+		typedef std::recursive_mutex opslock_t;
+		fdslock_t fdslock; std::unordered_map<void *, std::weak_ptr<async_io_handle>> fds;
 		opslock_t opslock; size_t monotoniccount; std::unordered_map<size_t, async_file_io_dispatcher_op> ops;
 
 		async_file_io_dispatcher_base_p(thread_pool &_pool, file_flags _flagsforce, file_flags _flagsmask) : pool(_pool),
@@ -229,7 +211,6 @@ namespace detail {
 		{
 			// Boost's spinlock is so lightweight it has no constructor ...
 			fdslock.unlock();
-			opslock.unlock();
 			ops.reserve(10000);
 		}
 	};
@@ -237,6 +218,28 @@ namespace detail {
 	class async_file_io_dispatcher_windows;
 	class async_file_io_dispatcher_linux;
 	class async_file_io_dispatcher_qnx;
+	struct immediate_async_ops
+	{
+		std::vector<boost::packaged_task<std::shared_ptr<detail::async_io_handle>>> toexecute; // NOTE to self later: this ought to go to std::packaged_task<boost::packaged_task<std::shared_ptr<detail::async_io_handle>()>>
+
+		immediate_async_ops() { }
+		// Returns a promise which is fulfilled when this is destructed
+		future<std::shared_ptr<detail::async_io_handle>> enqueue(std::function<std::shared_ptr<detail::async_io_handle>()> f)
+		{
+			toexecute.push_back(boost::packaged_task<std::shared_ptr<detail::async_io_handle>>(std::move(f))); // NOTE to self later: this ought to go to std::packaged_task<std::shared_ptr<detail::async_io_handle>()>
+			return toexecute.back().get_future();
+		}
+		~immediate_async_ops()
+		{
+			for(auto &i : toexecute)
+				i();
+		}
+	private:
+		immediate_async_ops(const immediate_async_ops &);
+		immediate_async_ops &operator=(const immediate_async_ops &);
+		immediate_async_ops(immediate_async_ops &&);
+		immediate_async_ops &operator=(immediate_async_ops &&);
+	};
 }
 
 async_file_io_dispatcher_base::async_file_io_dispatcher_base(thread_pool &threadpool, file_flags flagsforce, file_flags flagsmask) : p(new detail::async_file_io_dispatcher_base_p(threadpool, flagsforce, flagsmask))
@@ -250,13 +253,13 @@ async_file_io_dispatcher_base::~async_file_io_dispatcher_base()
 
 void async_file_io_dispatcher_base::int_add_io_handle(void *key, std::shared_ptr<detail::async_io_handle> h)
 {
-	lock_guard<detail::async_file_io_dispatcher_base_p::opslock_t> lockh(p->fdslock);
+	lock_guard<detail::async_file_io_dispatcher_base_p::fdslock_t> lockh(p->fdslock);
 	p->fds.insert(make_pair(key, std::weak_ptr<detail::async_io_handle>(h)));
 }
 
 void async_file_io_dispatcher_base::int_del_io_handle(void *key)
 {
-	lock_guard<detail::async_file_io_dispatcher_base_p::opslock_t> lockh(p->fdslock);
+	lock_guard<detail::async_file_io_dispatcher_base_p::fdslock_t> lockh(p->fdslock);
 	p->fds.erase(key);
 }
 
@@ -278,7 +281,7 @@ size_t async_file_io_dispatcher_base::wait_queue_depth() const
 
 size_t async_file_io_dispatcher_base::count() const
 {
-	lock_guard<detail::async_file_io_dispatcher_base_p::opslock_t> lockh(p->fdslock);
+	lock_guard<detail::async_file_io_dispatcher_base_p::fdslock_t> lockh(p->fdslock);
 	return p->fds.size();
 }
 
@@ -295,16 +298,17 @@ std::vector<async_io_op> async_file_io_dispatcher_base::completion(const std::ve
 	std::vector<async_io_op>::const_iterator i;
 	std::vector<std::pair<async_op_flags, std::function<async_file_io_dispatcher_base::completion_t>>>::const_iterator c;
 	lock_guard<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
+	detail::immediate_async_ops immediates;
 	for(i=ops.begin(), c=callbacks.begin(); i!=ops.end() && c!=callbacks.end(); ++i, ++c)
-		ret.push_back(chain_async_op((int) detail::OpType::UserCompletion, *i, c->first, &async_file_io_dispatcher_base::invoke_user_completion, c->second));
+		ret.push_back(chain_async_op(immediates, (int) detail::OpType::UserCompletion, *i, c->first, &async_file_io_dispatcher_base::invoke_user_completion, c->second));
 	return ret;
 }
 
 // Called in unknown thread
 void async_file_io_dispatcher_base::complete_async_op(size_t id, std::shared_ptr<detail::async_io_handle> h, exception_ptr e)
 {
-	bool have_opslock=p->opslock.try_lock();
-	auto unlock=NiallsCPP11Utilities::Undoer([this, have_opslock](){ if(have_opslock) p->opslock.unlock(); });
+	lock_guard<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
+	detail::immediate_async_ops immediates;
 	// Find me in ops, remove my completions and delete me from extant ops
 	std::unordered_map<size_t, detail::async_file_io_dispatcher_op>::iterator it(p->ops.find(id));
 	if(p->ops.end()==it)
@@ -327,18 +331,28 @@ void async_file_io_dispatcher_base::complete_async_op(size_t id, std::shared_ptr
 			it=p->ops.find(c.first);
 			if(p->ops.end()==it)
 				throw std::runtime_error("Failed to find this completion operation in list of currently executing operations");
-			// If he was set up with a detached future, use that instead
-			if(it->second.detached_promise)
+			if(!!(it->second.flags & async_op_flags::ImmediateCompletion))
 			{
-				it->second.h=it->second.detached_promise->get_future();
-				if(!!(it->second.flags & async_op_flags::ImmediateCompletion))
-					immediate_future(std::bind(c.second, h));
+				// If he was set up with a detached future, use that instead
+				if(it->second.detached_promise)
+				{
+					it->second.h=it->second.detached_promise->get_future();
+					immediates.enqueue(std::bind(c.second, h));
+				}
 				else
-					threadpool().enqueue(std::bind(c.second, h));
+					it->second.h=immediates.enqueue(std::bind(c.second, h));
 			}
 			else
-				it->second.h=!!(it->second.flags & async_op_flags::ImmediateCompletion)
-					? immediate_future(std::bind(c.second, h)) : threadpool().enqueue(std::bind(c.second, h));
+			{
+				// If he was set up with a detached future, use that instead
+				if(it->second.detached_promise)
+				{
+					it->second.h=it->second.detached_promise->get_future();
+					threadpool().enqueue(std::bind(c.second, h));
+				}
+				else
+					it->second.h=threadpool().enqueue(std::bind(c.second, h));
+			}
 			DEBUG_PRINT("C %u\n", (unsigned) c.first);
 		}
 		// Restore it to my id
@@ -380,8 +394,7 @@ template<class F, class... Args> std::shared_ptr<detail::async_io_handle> async_
 		{
 			// Make sure this was set up for deferred completion
 	#ifndef NDEBUG
-			bool have_opslock=p->opslock.try_lock();
-			auto unlock=NiallsCPP11Utilities::Undoer([this, have_opslock](){ if(have_opslock) p->opslock.unlock(); });
+			lock_guard<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
 			std::unordered_map<size_t, detail::async_file_io_dispatcher_op>::iterator it(p->ops.find(id));
 			if(p->ops.end()==it)
 			{
@@ -417,16 +430,9 @@ template<class F, class... Args> std::shared_ptr<detail::async_io_handle> async_
 }
 
 // You MUST hold opslock before entry!
-template<class F, class... Args> async_io_op async_file_io_dispatcher_base::chain_async_op(int optype, const async_io_op &precondition, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, Args...), Args... args)
-{
+template<class F, class... Args> async_io_op async_file_io_dispatcher_base::chain_async_op(detail::immediate_async_ops &immediates, int optype, const async_io_op &precondition, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, Args...), Args... args)
+{	
 	size_t thisid=0;
-#ifndef NDEBUG
-	if(p->opslock.try_lock())
-	{
-		assert(0);
-		std::terminate();
-	}
-#endif
 	while(!(thisid=++p->monotoniccount));
 #if 0 //ndef NDEBUG
 	if(!p->ops.empty())
@@ -470,8 +476,10 @@ template<class F, class... Args> async_io_op async_file_io_dispatcher_base::chai
 		// delete the data after retrieval.
 		if(precondition.h.valid())
 			h=const_cast<shared_future<std::shared_ptr<detail::async_io_handle>> &>(precondition.h).get();
-		ret.h=!!(flags & async_op_flags::ImmediateCompletion)
-			? immediate_future(std::bind(boundf.second, h)).share() : threadpool().enqueue(std::bind(boundf.second, h)).share();
+		if(!!(flags & async_op_flags::ImmediateCompletion))
+			ret.h=immediates.enqueue(std::bind(boundf.second, h)).share();
+		else
+			ret.h=threadpool().enqueue(std::bind(boundf.second, h)).share();
 	}
 	auto opsit=p->ops.insert(std::make_pair(thisid, detail::async_file_io_dispatcher_op((detail::OpType) optype, flags, ret.h)));
 	assert(opsit.second);
@@ -495,8 +503,9 @@ template<class F, class T> std::vector<async_io_op> async_file_io_dispatcher_bas
 	std::vector<async_io_op> ret;
 	ret.reserve(container.size());
 	lock_guard<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
+	detail::immediate_async_ops immediates;
 	for(auto &i : container)
-		ret.push_back(chain_async_op(optype, i, flags, f, i));
+		ret.push_back(chain_async_op(immediates, optype, i, flags, f, i));
 	return ret;
 }
 template<class F> std::vector<async_io_op> async_file_io_dispatcher_base::chain_async_ops(int optype, const std::vector<async_path_op_req> &container, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, async_path_op_req))
@@ -504,8 +513,9 @@ template<class F> std::vector<async_io_op> async_file_io_dispatcher_base::chain_
 	std::vector<async_io_op> ret;
 	ret.reserve(container.size());
 	lock_guard<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
+	detail::immediate_async_ops immediates;
 	for(auto &i : container)
-		ret.push_back(chain_async_op(optype, i.precondition, flags, f, i));
+		ret.push_back(chain_async_op(immediates, optype, i.precondition, flags, f, i));
 	return ret;
 }
 template<class F, class T> std::vector<async_io_op> async_file_io_dispatcher_base::chain_async_ops(int optype, const std::vector<async_data_op_req<T>> &container, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, async_data_op_req<T>))
@@ -513,8 +523,9 @@ template<class F, class T> std::vector<async_io_op> async_file_io_dispatcher_bas
 	std::vector<async_io_op> ret;
 	ret.reserve(container.size());
 	lock_guard<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
+	detail::immediate_async_ops immediates;
 	for(auto &i : container)
-		ret.push_back(chain_async_op(optype, i.precondition, flags, f, i));
+		ret.push_back(chain_async_op(immediates, optype, i.precondition, flags, f, i));
 	return ret;
 }
 
@@ -840,9 +851,10 @@ namespace detail {
 			std::vector<async_io_op> ret;
 			ret.reserve(ops.size());
 			lock_guard<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
+			detail::immediate_async_ops immediates;
 			for(auto &i : ops)
 			{
-				auto op(chain_async_op((int) detail::OpType::close, i, async_op_flags::None, &async_file_io_dispatcher_compat::doclose, i));
+				auto op(chain_async_op(immediates, (int) detail::OpType::close, i, async_op_flags::None, &async_file_io_dispatcher_compat::doclose, i));
 #ifdef __linux__
 				// It's a real shame Linux's unsafe default forces a synchronisation here ...
 				async_io_handle_posix *p=static_cast<async_io_handle_posix *>(const_cast<shared_future<std::shared_ptr<detail::async_io_handle>> &>(i.h).get().get());

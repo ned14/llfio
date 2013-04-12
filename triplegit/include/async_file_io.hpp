@@ -33,6 +33,37 @@ File Created: Mar 2013
 #pragma warning(disable: 4251) // type needs to have dll-interface to be used by clients of class
 #endif
 
+/*! \file async_file_io.hpp
+\brief Provides a batch asynchronous file i/o layer based on Boost.ASIO
+
+Some quick benchmarks:
+
+For 1000 file open, write one byte, fsync + close, then delete:
+
+Windows IOCP on Windows 7 x64, 2.4Ghz Sandy Bridge on 256Gb Samsung 840 Pro SSD:
+\code
+It took 0.010001 secs to dispatch all operations
+It took 0.375038 secs to finish all operations
+
+It took 0.154015 secs to do 6492.86 file opens per sec
+   It took 0.144014 secs to synchronise file opens
+It took 0.0130013 secs to do 76915.4 file writes per sec
+It took 0.0860086 secs to do 11626.7 file closes per sec
+It took 0.132013 secs to do 7575 file deletions per sec
+\endcode
+
+POSIX compat on Windows 7 x64, 2.4Ghz Sandy Bridge on 256Gb Samsung 840 Pro SSD:
+\code
+It took 0.010001 secs to dispatch all operations
+It took 0.39804 secs to finish all operations
+
+It took 0.135014 secs to do 7406.67 file opens per sec
+   It took 0.125013 secs to synchronise file opens
+It took 0.0490049 secs to do 20406.1 file writes per sec
+It took 0.0920092 secs to do 10868.5 file closes per sec
+It took 0.132013 secs to do 7575 file deletions per sec
+\endcode
+*/
 
 namespace triplegit { namespace async_io {
 
@@ -229,6 +260,7 @@ namespace detail {
 		//! Returns how many bytes have been written since this handle was last fsynced.
 		off_t write_count_since_fsync() const { return byteswritten-byteswrittenatlastfsync; }
 	};
+	struct immediate_async_ops;
 }
 
 
@@ -360,11 +392,17 @@ protected:
 	void complete_async_op(size_t id, std::shared_ptr<detail::async_io_handle> h, exception_ptr e=exception_ptr());
 	completion_returntype invoke_user_completion(size_t id, std::shared_ptr<detail::async_io_handle> h, std::function<completion_t> callback);
 	template<class F, class... Args> std::shared_ptr<detail::async_io_handle> invoke_async_op_completions(size_t id, std::shared_ptr<detail::async_io_handle> h, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, Args...), Args... args);
-	template<class F, class... Args> async_io_op chain_async_op(int optype, const async_io_op &precondition, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, Args...), Args... args);
+	template<class F, class... Args> async_io_op chain_async_op(detail::immediate_async_ops &immediates, int optype, const async_io_op &precondition, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, Args...), Args... args);
 	template<class F, class T> std::vector<async_io_op> chain_async_ops(int optype, const std::vector<T> &container, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, T));
 	template<class F> std::vector<async_io_op> chain_async_ops(int optype, const std::vector<async_path_op_req> &container, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, async_path_op_req));
 	template<class F, class T> std::vector<async_io_op> chain_async_ops(int optype, const std::vector<async_data_op_req<T>> &container, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, async_data_op_req<T>));
 };
+/*! \brief Instatiates the best available async_file_io_dispatcher implementation for this system.
+
+Note that the number of threads in the threadpool supplied is the maximum non-async op queue depth (e.g. file opens, closes etc.).
+For fast SSDs, there isn't much gain after eight-sixteen threads, so the process threadpool is set to eight by default.
+For slow hard drives, or worse, SANs, a queue depth of 64 or higher might deliver significant benefits.
+*/
 extern TRIPLEGIT_ASYNC_FILE_IO_API std::shared_ptr<async_file_io_dispatcher_base> async_file_io_dispatcher(thread_pool &threadpool=process_threadpool(), file_flags flagsforce=file_flags::AutoFlush, file_flags flagsmask=file_flags::None);
 
 /*! \struct async_io_op
