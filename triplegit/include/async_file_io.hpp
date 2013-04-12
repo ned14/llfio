@@ -34,13 +34,13 @@ File Created: Mar 2013
 #endif
 
 /*! \file async_file_io.hpp
-\brief Provides a batch asynchronous file i/o layer based on Boost.ASIO
+\brief Provides a batch asynchronous file i/o implementation based on Boost.ASIO
 
 Some quick benchmarks:
 
 For 1000 file open, write one byte, fsync + close, then delete:
 
-Windows IOCP on Windows 7 x64, 2.4Ghz Sandy Bridge on 256Gb Samsung 840 Pro SSD:
+Windows Overlapped IOCP backend on Windows 7 x64, 2.4Ghz Sandy Bridge on 256Gb Samsung 840 Pro SSD:
 \code
 It took 0.010001 secs to dispatch all operations
 It took 0.375038 secs to finish all operations
@@ -52,7 +52,7 @@ It took 0.0860086 secs to do 11626.7 file closes per sec
 It took 0.132013 secs to do 7575 file deletions per sec
 \endcode
 
-POSIX compat on Windows 7 x64, 2.4Ghz Sandy Bridge on 256Gb Samsung 840 Pro SSD:
+POSIX compat backend on Windows 7 x64, 2.4Ghz Sandy Bridge on 256Gb Samsung 840 Pro SSD:
 \code
 It took 0.010001 secs to dispatch all operations
 It took 0.39804 secs to finish all operations
@@ -65,7 +65,9 @@ It took 0.132013 secs to do 7575 file deletions per sec
 \endcode
 */
 
-namespace triplegit { namespace async_io {
+namespace triplegit {
+//! \brief The namespace containing the Boost.ASIO asynchronous file i/o implementation.
+namespace async_io {
 
 #ifdef __GNUC__
 typedef boost::thread thread;
@@ -229,6 +231,7 @@ namespace detail {
 	class async_file_io_dispatcher_windows;
 	class async_file_io_dispatcher_linux;
 	class async_file_io_dispatcher_qnx;
+	//! \brief May occasionally be useful to access to discover information about an open handle
 	class async_io_handle : public std::enable_shared_from_this<async_io_handle>
 	{
 		friend class async_file_io_dispatcher_base;
@@ -249,6 +252,8 @@ namespace detail {
 		virtual ~async_io_handle() { }
 		//! Returns the parent of this io handle
 		async_file_io_dispatcher_base *parent() const { return _parent; }
+		//! Returns the native handle of this io handle
+		virtual void *native_handle() const=0;
 		//! Returns when this handle was opened
 		const std::chrono::system_clock::time_point &opened() const { return _opened; }
 		//! Returns the path of this io handle
