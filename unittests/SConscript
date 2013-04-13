@@ -1,0 +1,3 @@
+Import("env")
+srcs=Glob("*.cpp")
+Return("srcs")
