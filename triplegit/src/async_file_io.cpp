@@ -72,23 +72,23 @@ struct iovec {
 };
 typedef ptrdiff_t ssize_t;
 static boost::detail::spinlock preadwritelock;
-ssize_t preadv(int fd, const struct iovec *iov, int iovcnt, off_t offset)
+ssize_t preadv(int fd, const struct iovec *iov, int iovcnt, triplegit::async_io::off_t offset)
 {
-	off_t at=offset;
+	triplegit::async_io::off_t at=offset;
 	ssize_t transferred;
 	lock_guard<boost::detail::spinlock> lockh(preadwritelock);
 	if(-1==_lseeki64(fd, offset, SEEK_SET)) return -1;
-	for(; iovcnt; iov++, iovcnt--, at+=(off_t) transferred)
+	for(; iovcnt; iov++, iovcnt--, at+=(triplegit::async_io::off_t) transferred)
 		if(-1==(transferred=_read(fd, iov->iov_base, (unsigned) iov->iov_len))) return -1;
 	return at-offset;
 }
-ssize_t pwritev(int fd, const struct iovec *iov, int iovcnt, off_t offset)
+ssize_t pwritev(int fd, const struct iovec *iov, int iovcnt, triplegit::async_io::off_t offset)
 {
-	off_t at=offset;
+	triplegit::async_io::off_t at=offset;
 	ssize_t transferred;
 	lock_guard<boost::detail::spinlock> lockh(preadwritelock);
 	if(-1==_lseeki64(fd, offset, SEEK_SET)) return -1;
-	for(; iovcnt; iov++, iovcnt--, at+=(off_t) transferred)
+	for(; iovcnt; iov++, iovcnt--, at+=(triplegit::async_io::off_t) transferred)
 		if(-1==(transferred=_write(fd, iov->iov_base, (unsigned) iov->iov_len))) return -1;
 	return at-offset;
 }

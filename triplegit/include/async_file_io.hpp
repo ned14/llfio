@@ -75,6 +75,9 @@ typedef boost::thread thread;
 typedef std::thread thread;
 #endif
 
+// This isn't consistent on MSVC so hard code it
+typedef unsigned long long off_t;
+
 /*! \class future
 \brief For now, this is boost's future. Will be replaced when C++'s future catches up with boost's
 
