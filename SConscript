@@ -1,7 +1,7 @@
 import os, sys, platform
 
-Import("env", "ARMcrosscompiler")
-env=env.Clone()
+Import("importedenv", "ARMcrosscompiler")
+env=importedenv.Clone()
 architecture=env['VARIANT'][:env['VARIANT'].find('/')]
 debugbuild="Debug" in env['VARIANT']
 if env['CC']=='cl':
@@ -82,10 +82,10 @@ outputs={}
 outputs['mylibs']=SConscript("triplegit/SConscript")
 
 # Unit tests
-sources = env.SConscript(os.path.join("unittests", "SConscript"), 'env')
+sources = env.SConscript(os.path.join("unittests", "SConscript"), 'importedenv')
 objects = env.Object(source = sources) # + [myliblib]
 testlibs=outputs['mylibs']['triplegitlib'][0]
-testprogram_cpp = env.Program("unittests", source = objects, LINKFLAGS=env['LINKFLAGSEXE'], LIBS = env['LIBS'] + testlibs)
+testprogram_cpp = env.Program("tests", source = objects, LINKFLAGS=env['LINKFLAGSEXE'], LIBS = env['LIBS'] + testlibs)
 outputs['unittests']=(testprogram_cpp, sources)
 
 # Remove triplegit lib contents from mylibs

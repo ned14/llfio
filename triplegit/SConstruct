@@ -90,6 +90,7 @@ env['CCFLAGS']=[]
 env['CXXFLAGS']=[]
 env['LIBS']=[]
 env['LIBPATH']=[]
+env['RPATH']=[]
 env['LINKFLAGS']=[]
 
 # Am I in a 32 or 64 bit environment? Note that not specifying --sse doesn't set any x86 or x64 specific options
@@ -203,7 +204,7 @@ else:
     if len(boostpath)>4 and os.path.exists(boostpath):
     	env['CPPPATH']+=[boostpath]
     	env['LIBPATH']+=[os.path.join(boostpath, 'stage', 'lib')]
-    	env['RPATH']=os.path.join(boostpath, 'stage', 'lib')
+    	env['RPATH']+=os.path.join(boostpath, 'stage', 'lib')
     if not conf.CheckHaveBoost():
     	print("ERROR: I need the Boost libraries, either in the system or in a boost directory just above mine")
     	sys.exit(1)
@@ -216,8 +217,8 @@ buildvariants={}
 for arch in architectures:
     for buildtype in ["Debug", "Release"]:
         env['VARIANT']=arch+"/"+buildtype
-        Export(["env", "ARMcrosscompiler"])
-        mylibraryvariant=env.SConscript("SConscript", exports=["env", "ARMcrosscompiler"], variant_dir=env['VARIANT'], duplicate=False)
+        importedenv=env
+        mylibraryvariant=env.SConscript("SConscript", exports=["importedenv", "ARMcrosscompiler"], variant_dir=env['VARIANT'], duplicate=False)
         buildvariants[(buildtype, arch)]=mylibraryvariant
 
 if env.GetOption('archs')=='min':
