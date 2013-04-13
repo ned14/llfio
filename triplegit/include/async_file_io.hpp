@@ -137,8 +137,8 @@ class thread_pool {
 	friend class worker;
 
 	std::vector< std::unique_ptr<thread> > workers;
-    boost::asio::io_service service;
-    boost::asio::io_service::work working;
+	boost::asio::io_service service;
+	boost::asio::io_service::work working;
 public:
 	//! Constructs a thread pool of \em no workers
     explicit thread_pool(size_t no) : working(service)
@@ -630,11 +630,11 @@ template<class R> inline async_io_op async_file_io_dispatcher_base::function(con
 }
 template<class C, class... Args> inline async_io_op async_file_io_dispatcher_base::call(const async_io_op &req, C callback, Args... args)
 {
-	auto invoker=[callback, args...](size_t, std::shared_ptr<detail::async_io_handle> _){
+	auto invoker=[](size_t, std::shared_ptr<detail::async_io_handle> _, C callback, Args... args){
 		callback(args...);
 		return std::make_pair(true, _);
 	};
-	return completion(req, std::make_pair(async_op_flags::None, std::bind(invoker, std::placeholders::_1, std::placeholders::_2)));
+	return completion(req, std::make_pair(async_op_flags::None, std::bind(invoker, std::placeholders::_1, std::placeholders::_2, callback, args...)));
 }
 inline async_io_op async_file_io_dispatcher_base::dir(const async_path_op_req &req)
 {
