@@ -366,17 +366,45 @@ TEST_CASE("async_io/works/64/sync", "Tests that the synchronous async i/o implem
 	_1000_open_write_close_deletes(dispatcher, 65536);
 }
 
-TEST_CASE("async_io/works/1/autoflush", "Tests that the synchronous async i/o implementation works")
+TEST_CASE("async_io/works/1/autoflush", "Tests that the autoflush async i/o implementation works")
 {
 	auto dispatcher=triplegit::async_io::async_file_io_dispatcher(triplegit::async_io::process_threadpool(), triplegit::async_io::file_flags::AutoFlush);
 	std::cout << "\n\n1000 file opens, writes 1 byte, closes, and deletes with autoflush i/o:\n";
 	_1000_open_write_close_deletes(dispatcher, 1);
 }
 
-TEST_CASE("async_io/works/64/autoflush", "Tests that the synchronous async i/o implementation works")
+TEST_CASE("async_io/works/64/autoflush", "Tests that the autoflush async i/o implementation works")
 {
 	auto dispatcher=triplegit::async_io::async_file_io_dispatcher(triplegit::async_io::process_threadpool(), triplegit::async_io::file_flags::AutoFlush);
 	std::cout << "\n\n1000 file opens, writes 64Kb, closes, and deletes with autoflush i/o:\n";
+	_1000_open_write_close_deletes(dispatcher, 65536);
+}
+
+TEST_CASE("async_io/works/1/direct", "Tests that the direct async i/o implementation works")
+{
+	auto dispatcher=triplegit::async_io::async_file_io_dispatcher(triplegit::async_io::process_threadpool(), triplegit::async_io::file_flags::OSDirect);
+	std::cout << "\n\n1000 file opens, writes 1 byte, closes, and deletes with direct i/o:\n";
+	_1000_open_write_close_deletes(dispatcher, 1);
+}
+
+TEST_CASE("async_io/works/64/direct", "Tests that the direct async i/o implementation works")
+{
+	auto dispatcher=triplegit::async_io::async_file_io_dispatcher(triplegit::async_io::process_threadpool(), triplegit::async_io::file_flags::OSDirect);
+	std::cout << "\n\n1000 file opens, writes 64Kb, closes, and deletes with direct i/o:\n";
+	_1000_open_write_close_deletes(dispatcher, 65536);
+}
+
+TEST_CASE("async_io/works/1/directsync", "Tests that the direct synchronous async i/o implementation works")
+{
+	auto dispatcher=triplegit::async_io::async_file_io_dispatcher(triplegit::async_io::process_threadpool(), triplegit::async_io::file_flags::OSDirect|triplegit::async_io::file_flags::OSSync);
+	std::cout << "\n\n1000 file opens, writes 1 byte, closes, and deletes with direct synchronous i/o:\n";
+	_1000_open_write_close_deletes(dispatcher, 1);
+}
+
+TEST_CASE("async_io/works/64/directsync", "Tests that the direct synchronous async i/o implementation works")
+{
+	auto dispatcher=triplegit::async_io::async_file_io_dispatcher(triplegit::async_io::process_threadpool(), triplegit::async_io::file_flags::OSDirect|triplegit::async_io::file_flags::OSSync);
+	std::cout << "\n\n1000 file opens, writes 64Kb, closes, and deletes with direct synchronous i/o:\n";
 	_1000_open_write_close_deletes(dispatcher, 65536);
 }
 

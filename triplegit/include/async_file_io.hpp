@@ -221,83 +221,117 @@ CrystalDiskMark 3.0.2 x64 (C) 2007-2013 hiyohiyo
 
 
 Windows IOCP backend, 3.5Ghz Ivy Bridge Windows 8 x64 on 
-my Seagate 7200rpm drive:
-
-1000 file opens, writes 1 byte, closes, and deletes (primes system):
-It took 0.188024 secs to do all operations
-  It took 0.009017 secs to dispatch all operations
-  It took 0.179007 secs to finish all operations
-
-It took 0.0750099 secs to do 13331.6 file opens per sec
-It took 0.0110013 secs to do 90898.3 file writes per sec
-It took 0.033005 secs to do 30298.4 file closes per sec
-It took 0.0690082 secs to do 14491 file deletions per sec
-
+my Samsung 256Gb 830 SSD drive:
 
 1000 file opens, writes 1 byte, closes, and deletes:
-It took 0.188007 secs to do all operations
-  It took 0.0079851 secs to dispatch all operations
-  It took 0.180022 secs to finish all operations
+It took 0.187081 secs to do all operations
+  It took 0.0079831 secs to dispatch all operations
+  It took 0.179098 secs to finish all operations
 
-It took 0.0769936 secs to do 12988.1 file opens per sec
-It took 0.0110005 secs to do 90905 file writes per sec
-It took 0.025004 secs to do 39993.6 file closes per sec
-It took 0.0750087 secs to do 13331.8 file deletions per sec
+It took 0.0789921 secs to do 12659.5 file opens per sec
+It took 0.0110014 secs to do 90897.5 file writes per sec
+It took 0.0250035 secs to do 39994.4 file closes per sec
+It took 0.0720843 secs to do 13872.6 file deletions per sec
 
 
 1000 file opens, writes 64Kb, closes, and deletes:
-It took 0.962129 secs to do all operations
-  It took 0.0070011 secs to dispatch all operations
-  It took 0.955127 secs to finish all operations
+It took 0.924099 secs to do all operations
+  It took 0.007996 secs to dispatch all operations
+  It took 0.916103 secs to finish all operations
 
-It took 0.0860119 secs to do 11626.3 file opens per sec
-It took 0.017003 secs to do 58813.2 file writes per sec
-It took 0.800101 secs to do 1249.84 file closes per sec
-It took 0.0590126 secs to do 16945.5 file deletions per sec
+It took 0.0859878 secs to do 11629.6 file opens per sec
+It took 0.0230033 secs to do 43472 file writes per sec
+It took 0.7571 secs to do 1320.83 file closes per sec
+It took 0.0580077 secs to do 17239.1 file deletions per sec
 
 
 1000 file opens, writes 1 byte, closes, and deletes with synchronous i/o:
-It took 2.96683 secs to do all operations
-  It took 0.0534192 secs to dispatch all operations
-  It took 2.91341 secs to finish all operations
+It took 2.98316 secs to do all operations
+  It took 0.0446 secs to dispatch all operations
+  It took 2.93856 secs to finish all operations
 
-It took 2.7258 secs to do 366.864 file opens per sec
-It took 0.0350025 secs to do 28569.4 file writes per sec
-It took 0.129011 secs to do 7751.27 file closes per sec
-It took 0.0770115 secs to do 12985.1 file deletions per sec
+It took 2.71914 secs to do 367.763 file opens per sec
+It took 0.0359893 secs to do 27786 file writes per sec
+It took 0.151021 secs to do 6621.6 file closes per sec
+It took 0.0770071 secs to do 12985.8 file deletions per sec
 
 
 1000 file opens, writes 64Kb, closes, and deletes with synchronous i/o:
-It took 1.63751 secs to do all operations
-  It took 0.0150026 secs to dispatch all operations
-  It took 1.62251 secs to finish all operations
+It took 1.65352 secs to do all operations
+  It took 0.0149789 secs to dispatch all operations
+  It took 1.63854 secs to finish all operations
 
-It took 0.721396 secs to do 1386.2 file opens per sec
-It took 0.0380043 secs to do 26312.8 file writes per sec
-It took 0.817103 secs to do 1223.84 file closes per sec
-It took 0.0610082 secs to do 16391.2 file deletions per sec
+It took 0.714499 secs to do 1399.58 file opens per sec
+It took 0.0420066 secs to do 23805.8 file writes per sec
+It took 0.835109 secs to do 1197.45 file closes per sec
+It took 0.0619072 secs to do 16153.2 file deletions per sec
 
 
 1000 file opens, writes 1 byte, closes, and deletes with autoflush i/o:
-It took 2.64517 secs to do all operations
-  It took 0.0089971 secs to dispatch all operations
-  It took 2.63617 secs to finish all operations
+It took 2.70265 secs to do all operations
+  It took 0.0089945 secs to dispatch all operations
+  It took 2.69366 secs to finish all operations
 
-It took 0.0769977 secs to do 12987.4 file opens per sec
-It took 0.0354966 secs to do 28171.7 file writes per sec
-It took 2.39964 secs to do 416.729 file closes per sec
-It took 0.133034 secs to do 7516.87 file deletions per sec
+It took 0.0759873 secs to do 13160.1 file opens per sec
+It took 0.0334323 secs to do 29911.2 file writes per sec
+It took 2.46722 secs to do 405.315 file closes per sec
+It took 0.126015 secs to do 7935.54 file deletions per sec
 
 
 1000 file opens, writes 64Kb, closes, and deletes with autoflush i/o:
-It took 2.66503 secs to do all operations
-  It took 0.0079793 secs to dispatch all operations
-  It took 2.65705 secs to finish all operations
+It took 2.79222 secs to do all operations
+  It took 0.0079943 secs to dispatch all operations
+  It took 2.78422 secs to finish all operations
 
-It took 0.079987 secs to do 12502 file opens per sec
-It took 0.0422422 secs to do 23673 file writes per sec
-It took 2.48179 secs to do 402.934 file closes per sec
-It took 0.0610069 secs to do 16391.6 file deletions per sec
+It took 0.0829872 secs to do 12050.1 file opens per sec
+It took 0.0381194 secs to do 26233.4 file writes per sec
+It took 2.6111 secs to do 382.98 file closes per sec
+It took 0.0600064 secs to do 16664.9 file deletions per sec
+
+
+1000 file opens, writes 1 byte, closes, and deletes with direct i/o:
+It took 0.178027 secs to do all operations
+  It took 0.0070116 secs to dispatch all operations
+  It took 0.171015 secs to finish all operations
+
+It took 0.0629898 secs to do 15875.6 file opens per sec
+It took 0.0110008 secs to do 90902.5 file writes per sec
+It took 0.0190018 secs to do 52626.6 file closes per sec
+It took 0.0850346 secs to do 11759.9 file deletions per sec
+
+
+1000 file opens, writes 64Kb, closes, and deletes with direct i/o:
+It took 1.67592 secs to do all operations
+  It took 0.0169852 secs to dispatch all operations
+  It took 1.65893 secs to finish all operations
+
+It took 0.711476 secs to do 1405.53 file opens per sec
+It took 0.0163148 secs to do 61294 file writes per sec
+It took 0.890117 secs to do 1123.45 file closes per sec
+It took 0.058008 secs to do 17239 file deletions per sec
+
+
+1000 file opens, writes 1 byte, closes, and deletes with direct synchronous i/o:
+
+It took 0.309121 secs to do all operations
+  It took 0.00698 secs to dispatch all operations
+  It took 0.302141 secs to finish all operations
+
+It took 0.138198 secs to do 7235.99 file opens per sec
+It took 0.0142443 secs to do 70203.5 file writes per sec
+It took 0.0796398 secs to do 12556.5 file closes per sec
+It took 0.0770388 secs to do 12980.5 file deletions per sec
+
+
+1000 file opens, writes 64Kb, closes, and deletes with direct synchronous i/o:
+It took 1.95023 secs to do all operations
+  It took 0.020987 secs to dispatch all operations
+  It took 1.92924 secs to finish all operations
+
+It took 0.967097 secs to do 1034.02 file opens per sec
+It took 0.0290068 secs to do 34474.7 file writes per sec
+It took 0.901115 secs to do 1109.74 file closes per sec
+It took 0.0530077 secs to do 18865.2 file deletions per sec
 
 */
 
@@ -559,7 +593,7 @@ ASYNC_FILEIO_DECLARE_CLASS_ENUM_AS_BITFIELD(async_op_flags)
 */
 class TRIPLEGIT_ASYNC_FILE_IO_API async_file_io_dispatcher_base : public std::enable_shared_from_this<async_file_io_dispatcher_base>
 {
-	//friend TRIPLEGIT_ASYNC_FILE_IO_API std::shared_ptr<async_file_io_dispatcher_base> async_file_io_dispatcher(thread_pool &threadpool=process_threadpool(), file_flags flagsforce=file_flags::AutoFlush, file_flags flagsmask=file_flags::None);
+	//friend TRIPLEGIT_ASYNC_FILE_IO_API std::shared_ptr<async_file_io_dispatcher_base> async_file_io_dispatcher(thread_pool &threadpool=process_threadpool(), file_flags flagsforce=file_flags::None, file_flags flagsmask=file_flags::None);
 	friend struct detail::async_io_handle_posix;
 	friend struct detail::async_io_handle_windows;
 	friend class detail::async_file_io_dispatcher_compat;
@@ -643,11 +677,13 @@ protected:
 };
 /*! \brief Instatiates the best available async_file_io_dispatcher implementation for this system.
 
+\em flagsforce is ORed with any opened file flags. The NOT of \em flags mask is ANDed with any opened flags.
+
 Note that the number of threads in the threadpool supplied is the maximum non-async op queue depth (e.g. file opens, closes etc.).
 For fast SSDs, there isn't much gain after eight-sixteen threads, so the process threadpool is set to eight by default.
 For slow hard drives, or worse, SANs, a queue depth of 64 or higher might deliver significant benefits.
 */
-extern TRIPLEGIT_ASYNC_FILE_IO_API std::shared_ptr<async_file_io_dispatcher_base> async_file_io_dispatcher(thread_pool &threadpool=process_threadpool(), file_flags flagsforce=file_flags::AutoFlush, file_flags flagsmask=file_flags::None);
+extern TRIPLEGIT_ASYNC_FILE_IO_API std::shared_ptr<async_file_io_dispatcher_base> async_file_io_dispatcher(thread_pool &threadpool=process_threadpool(), file_flags flagsforce=file_flags::None, file_flags flagsmask=file_flags::None);
 
 /*! \struct async_io_op
 \brief A reference to an async operation
