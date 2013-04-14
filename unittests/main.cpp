@@ -254,86 +254,130 @@ TEST_CASE("async_io/thread_pool/works", "Tests that the async i/o thread pool im
 	}
 }
 
-TEST_CASE("waitaround", "Primes SpeedStep")
-{
-	typedef std::chrono::duration<double, std::ratio<1>> secs_type;
-	auto begin=std::chrono::high_resolution_clock::now();
-	while(std::chrono::duration_cast<secs_type>(std::chrono::high_resolution_clock::now()-begin).count()<3);
-}
 
-TEST_CASE("async_io/works", "Tests that the async i/o implementation works")
+static void _1000_open_write_close_deletes(std::shared_ptr<triplegit::async_io::async_file_io_dispatcher_base> dispatcher, size_t bytes)
 {
 	using namespace triplegit::async_io;
 	using namespace std;
 	using triplegit::async_io::future;
 	typedef std::chrono::duration<double, ratio<1>> secs_type;
-	auto dispatcher=async_file_io_dispatcher();
+	auto mkdir(dispatcher->dir(async_path_op_req("testdir", file_flags::Create)));
+	vector<char, NiallsCPP11Utilities::aligned_allocator<char, 4096>> towrite(bytes, 'N');
+	CHECK(!(((size_t) &towrite.front()) & 4095));
 
-	{
-		auto mkdir(dispatcher->dir(async_path_op_req("testdir", file_flags::Create)));
+	// Wait for six seconds to let filing system recover and prime SpeedStep
+	auto begin=std::chrono::high_resolution_clock::now();
+	while(std::chrono::duration_cast<secs_type>(std::chrono::high_resolution_clock::now()-begin).count()<6);
 
-		// Start opening 1000 files
-		auto begin=chrono::high_resolution_clock::now();
-		std::vector<async_path_op_req> manyfilereqs;
-		manyfilereqs.reserve(1000);
-		for(size_t n=0; n<1000; n++)
-			manyfilereqs.push_back(async_path_op_req(mkdir, "testdir/"+std::to_string(n), file_flags::Create|file_flags::Write));
-		auto manyopenfiles(dispatcher->file(manyfilereqs));
+	// Start opening 1000 files
+	begin=chrono::high_resolution_clock::now();
+	std::vector<async_path_op_req> manyfilereqs;
+	manyfilereqs.reserve(1000);
+	for(size_t n=0; n<1000; n++)
+		manyfilereqs.push_back(async_path_op_req(mkdir, "testdir/"+std::to_string(n), file_flags::Create|file_flags::Write));
+	auto manyopenfiles(dispatcher->file(manyfilereqs));
 
-		// Write one byte to each of those 1000 files as they are opened
-		char towrite='N';
-		std::vector<async_data_op_req<const char>> manyfilewrites;
-		manyfilewrites.reserve(manyfilereqs.size());
-		auto openit=manyopenfiles.begin();
-		for(size_t n=0; n<manyfilereqs.size(); n++)
-			manyfilewrites.push_back(async_data_op_req<const char>(*openit++, &towrite, 1, 0));
-		auto manywrittenfiles(dispatcher->write(manyfilewrites));
+	// Write to each of those 1000 files as they are opened
+	std::vector<async_data_op_req<const char>> manyfilewrites;
+	manyfilewrites.reserve(manyfilereqs.size());
+	auto openit=manyopenfiles.begin();
+	for(size_t n=0; n<manyfilereqs.size(); n++)
+		manyfilewrites.push_back(async_data_op_req<const char>(*openit++, &towrite.front(), towrite.size(), 0));
+	auto manywrittenfiles(dispatcher->write(manyfilewrites));
 
-		// Close each of those 1000 files once one byte has been written
-		auto manyclosedfiles(dispatcher->close(manywrittenfiles));
+	// Close each of those 1000 files once one byte has been written
+	auto manyclosedfiles(dispatcher->close(manywrittenfiles));
 
-		// Delete each of those 1000 files once they are closed
-		auto it(manyclosedfiles.begin());
-		for(auto &i : manyfilereqs)
-			i.precondition=*it++;
-		auto manydeletedfiles(dispatcher->rmfile(manyfilereqs));
-		auto dispatched=chrono::high_resolution_clock::now();
+	// Delete each of those 1000 files once they are closed
+	auto it(manyclosedfiles.begin());
+	for(auto &i : manyfilereqs)
+		i.precondition=*it++;
+	auto manydeletedfiles(dispatcher->rmfile(manyfilereqs));
+	auto dispatched=chrono::high_resolution_clock::now();
 
-		// Wait for all files to open
-		when_all(manyopenfiles.begin(), manyopenfiles.end()).wait();
-		auto openedsync=chrono::high_resolution_clock::now();
-		// Wait for all files to write
-		when_all(manywrittenfiles.begin(), manywrittenfiles.end()).wait();
-		auto writtensync=chrono::high_resolution_clock::now();
-		// Wait for all files to close
-		when_all(manyclosedfiles.begin(), manyclosedfiles.end()).wait();
-		auto closedsync=chrono::high_resolution_clock::now();
-		// Wait for all files to delete
-		when_all(manydeletedfiles.begin(), manydeletedfiles.end()).wait();
-		auto deletedsync=chrono::high_resolution_clock::now();
+	// Wait for all files to open
+	when_all(manyopenfiles.begin(), manyopenfiles.end()).wait();
+	auto openedsync=chrono::high_resolution_clock::now();
+	// Wait for all files to write
+	when_all(manywrittenfiles.begin(), manywrittenfiles.end()).wait();
+	auto writtensync=chrono::high_resolution_clock::now();
+	// Wait for all files to close
+	when_all(manyclosedfiles.begin(), manyclosedfiles.end()).wait();
+	auto closedsync=chrono::high_resolution_clock::now();
+	// Wait for all files to delete
+	when_all(manydeletedfiles.begin(), manydeletedfiles.end()).wait();
+	auto deletedsync=chrono::high_resolution_clock::now();
 
-		auto end=deletedsync;
-		auto rmdir(dispatcher->rmdir(async_path_op_req("testdir")));
+	auto end=deletedsync;
+	auto rmdir(dispatcher->rmdir(async_path_op_req("testdir")));
 
-		auto diff=chrono::duration_cast<secs_type>(dispatched-begin);
-		cout << "It took " << diff.count() << " secs to dispatch all operations" << endl;
-		diff=chrono::duration_cast<secs_type>(end-dispatched);
-		cout << "It took " << diff.count() << " secs to finish all operations" << endl << endl;
+	auto diff=chrono::duration_cast<secs_type>(end-begin);
+	cout << "It took " << diff.count() << " secs to do all operations" << endl;
+	diff=chrono::duration_cast<secs_type>(dispatched-begin);
+	cout << "  It took " << diff.count() << " secs to dispatch all operations" << endl;
+	diff=chrono::duration_cast<secs_type>(end-dispatched);
+	cout << "  It took " << diff.count() << " secs to finish all operations" << endl << endl;
 
-		diff=chrono::duration_cast<secs_type>(openedsync-begin);
-		cout << "It took " << diff.count() << " secs to do " << manyfilereqs.size()/diff.count() << " file opens per sec" << endl;
-		diff=chrono::duration_cast<secs_type>(openedsync-dispatched);
-		cout << "   It took " << diff.count() << " secs to synchronise file opens" << endl;
-		diff=chrono::duration_cast<secs_type>(writtensync-openedsync);
-		cout << "It took " << diff.count() << " secs to do " << manyfilereqs.size()/diff.count() << " file writes per sec" << endl;
-		diff=chrono::duration_cast<secs_type>(closedsync-writtensync);
-		cout << "It took " << diff.count() << " secs to do " << manyfilereqs.size()/diff.count() << " file closes per sec" << endl;
-		diff=chrono::duration_cast<secs_type>(deletedsync-closedsync);
-		cout << "It took " << diff.count() << " secs to do " << manyfilereqs.size()/diff.count() << " file deletions per sec" << endl;
+	diff=chrono::duration_cast<secs_type>(openedsync-begin);
+	cout << "It took " << diff.count() << " secs to do " << manyfilereqs.size()/diff.count() << " file opens per sec" << endl;
+	diff=chrono::duration_cast<secs_type>(writtensync-openedsync);
+	cout << "It took " << diff.count() << " secs to do " << manyfilereqs.size()/diff.count() << " file writes per sec" << endl;
+	diff=chrono::duration_cast<secs_type>(closedsync-writtensync);
+	cout << "It took " << diff.count() << " secs to do " << manyfilereqs.size()/diff.count() << " file closes per sec" << endl;
+	diff=chrono::duration_cast<secs_type>(deletedsync-closedsync);
+	cout << "It took " << diff.count() << " secs to do " << manyfilereqs.size()/diff.count() << " file deletions per sec" << endl;
 
-		// Fetch any outstanding error
-		rmdir.h.get();
-	}
+	// Fetch any outstanding error
+	rmdir.h.get();
+}
+
+TEST_CASE("async_io/works/1prime", "Tests that the async i/o implementation works (primes system)")
+{
+	auto dispatcher=triplegit::async_io::async_file_io_dispatcher(triplegit::async_io::process_threadpool(), triplegit::async_io::file_flags::None);
+	std::cout << "\n\n1000 file opens, writes 1 byte, closes, and deletes (primes system):\n";
+	_1000_open_write_close_deletes(dispatcher, 1);
+}
+
+TEST_CASE("async_io/works/1", "Tests that the async i/o implementation works")
+{
+	auto dispatcher=triplegit::async_io::async_file_io_dispatcher(triplegit::async_io::process_threadpool(), triplegit::async_io::file_flags::None);
+	std::cout << "\n\n1000 file opens, writes 1 byte, closes, and deletes:\n";
+	_1000_open_write_close_deletes(dispatcher, 1);
+}
+
+TEST_CASE("async_io/works/64", "Tests that the async i/o implementation works")
+{
+	auto dispatcher=triplegit::async_io::async_file_io_dispatcher(triplegit::async_io::process_threadpool(), triplegit::async_io::file_flags::None);
+	std::cout << "\n\n1000 file opens, writes 64Kb, closes, and deletes:\n";
+	_1000_open_write_close_deletes(dispatcher, 65536);
+}
+
+TEST_CASE("async_io/works/1/sync", "Tests that the synchronous async i/o implementation works")
+{
+	auto dispatcher=triplegit::async_io::async_file_io_dispatcher(triplegit::async_io::process_threadpool(), triplegit::async_io::file_flags::OSSync);
+	std::cout << "\n\n1000 file opens, writes 1 byte, closes, and deletes with synchronous i/o:\n";
+	_1000_open_write_close_deletes(dispatcher, 1);
+}
+
+TEST_CASE("async_io/works/64/sync", "Tests that the synchronous async i/o implementation works")
+{
+	auto dispatcher=triplegit::async_io::async_file_io_dispatcher(triplegit::async_io::process_threadpool(), triplegit::async_io::file_flags::OSSync);
+	std::cout << "\n\n1000 file opens, writes 64Kb, closes, and deletes with synchronous i/o:\n";
+	_1000_open_write_close_deletes(dispatcher, 65536);
+}
+
+TEST_CASE("async_io/works/1/autoflush", "Tests that the synchronous async i/o implementation works")
+{
+	auto dispatcher=triplegit::async_io::async_file_io_dispatcher(triplegit::async_io::process_threadpool(), triplegit::async_io::file_flags::AutoFlush);
+	std::cout << "\n\n1000 file opens, writes 1 byte, closes, and deletes with autoflush i/o:\n";
+	_1000_open_write_close_deletes(dispatcher, 1);
+}
+
+TEST_CASE("async_io/works/64/autoflush", "Tests that the synchronous async i/o implementation works")
+{
+	auto dispatcher=triplegit::async_io::async_file_io_dispatcher(triplegit::async_io::process_threadpool(), triplegit::async_io::file_flags::AutoFlush);
+	std::cout << "\n\n1000 file opens, writes 64Kb, closes, and deletes with autoflush i/o:\n";
+	_1000_open_write_close_deletes(dispatcher, 65536);
 }
 
 TEST_CASE("async_io/errors", "Tests that the async i/o error handling works")

@@ -36,33 +36,198 @@ File Created: Mar 2013
 /*! \file async_file_io.hpp
 \brief Provides a batch asynchronous file i/o implementation based on Boost.ASIO
 
-Some quick benchmarks:
+My Seagate 7200rpm drive:
 
-For 1000 file open, write one byte, fsync + close, then delete:
+-----------------------------------------------------------------------
+CrystalDiskMark 3.0.2 x64 (C) 2007-2013 hiyohiyo
+                           Crystal Dew World : http://crystalmark.info/
+-----------------------------------------------------------------------
+* MB/s = 1,000,000 byte/s [SATA/300 = 300,000,000 byte/s]
 
-Windows Overlapped IOCP backend on Windows 7 x64, 2.4Ghz Sandy Bridge on 256Gb Samsung 840 Pro SSD:
-\code
-It took 0.010001 secs to dispatch all operations
-It took 0.375038 secs to finish all operations
+           Sequential Read :    46.012 MB/s
+          Sequential Write :    44.849 MB/s
+         Random Read 512KB :    26.367 MB/s
+        Random Write 512KB :    23.521 MB/s
+    Random Read 4KB (QD=1) :     0.487 MB/s [   118.8 IOPS]
+   Random Write 4KB (QD=1) :     0.771 MB/s [   188.3 IOPS]
+   Random Read 4KB (QD=32) :     0.819 MB/s [   199.8 IOPS]
+  Random Write 4KB (QD=32) :     0.789 MB/s [   192.6 IOPS]
 
-It took 0.154015 secs to do 6492.86 file opens per sec
-   It took 0.144014 secs to synchronise file opens
-It took 0.0130013 secs to do 76915.4 file writes per sec
-It took 0.0860086 secs to do 11626.7 file closes per sec
-It took 0.132013 secs to do 7575 file deletions per sec
-\endcode
+  Test : 1000 MB [G: 99.0% (178.2/180.1 GB)] (x5)
+  Date : 2013/04/13 23:02:23
+    OS : Windows 8  [6.2 Build 9200] (x64)
+  
 
-POSIX compat backend on Windows 7 x64, 2.4Ghz Sandy Bridge on 256Gb Samsung 840 Pro SSD:
-\code
-It took 0.010001 secs to dispatch all operations
-It took 0.39804 secs to finish all operations
+Windows IOCP backend, 3.5Ghz Ivy Bridge Windows 8 x64 on 
+my Seagate 7200rpm drive:
 
-It took 0.135014 secs to do 7406.67 file opens per sec
-   It took 0.125013 secs to synchronise file opens
-It took 0.0490049 secs to do 20406.1 file writes per sec
-It took 0.0920092 secs to do 10868.5 file closes per sec
-It took 0.132013 secs to do 7575 file deletions per sec
-\endcode
+1000 file opens, writes 1 byte, closes, and deletes:
+It took 0.26311 secs to do all operations
+  It took 0.0079942 secs to dispatch all operations
+  It took 0.255116 secs to finish all operations
+
+It took 0.0899875 secs to do 11112.7 file opens per sec
+It took 0.0100023 secs to do 99977 file writes per sec
+It took 0.0210025 secs to do 47613.4 file closes per sec
+It took 0.142118 secs to do 7036.43 file deletions per sec
+
+
+1000 file opens, writes 64Kb, closes, and deletes:
+It took 1.01195 secs to do all operations
+  It took 0.0079939 secs to dispatch all operations
+  It took 1.00396 secs to finish all operations
+
+It took 0.10599 secs to do 9434.83 file opens per sec
+It took 0.0410053 secs to do 24387.1 file writes per sec
+It took 0.769099 secs to do 1300.22 file closes per sec
+It took 0.0958558 secs to do 10432.3 file deletions per sec
+
+
+1000 file opens, writes 1 byte, closes, and deletes with synchronous i/o:
+It took 9.28653 secs to do all operations
+  It took 0.142254 secs to dispatch all operations
+  It took 9.14427 secs to finish all operations
+
+It took 8.92534 secs to do 112.041 file opens per sec
+It took 0.112127 secs to do 8918.5 file writes per sec
+It took 0.177022 secs to do 5649.03 file closes per sec
+It took 0.0720397 secs to do 13881.2 file deletions per sec
+
+
+1000 file opens, writes 64Kb, closes, and deletes with synchronous i/o:
+It took 3.03522 secs to do all operations
+  It took 0.0212259 secs to dispatch all operations
+  It took 3.01399 secs to finish all operations
+
+It took 1.92052 secs to do 520.694 file opens per sec
+It took 0.0720104 secs to do 13886.9 file writes per sec
+It took 0.806102 secs to do 1240.54 file closes per sec
+It took 0.236588 secs to do 4226.75 file deletions per sec
+
+
+1000 file opens, writes 1 byte, closes, and deletes with autoflush i/o:
+It took 11.9628 secs to do all operations
+  It took 0.0080006 secs to dispatch all operations
+  It took 11.9548 secs to finish all operations
+
+It took 0.0940122 secs to do 10636.9 file opens per sec
+It took 0.46754 secs to do 2138.85 file writes per sec
+It took 11.2472 secs to do 88.9107 file closes per sec
+It took 0.154042 secs to do 6491.76 file deletions per sec
+
+
+1000 file opens, writes 64Kb, closes, and deletes with autoflush i/o:
+It took 14.5824 secs to do all operations
+  It took 0.0080019 secs to dispatch all operations
+  It took 14.5744 secs to finish all operations
+
+It took 0.0980132 secs to do 10202.7 file opens per sec
+It took 0.465669 secs to do 2147.45 file writes per sec
+It took 13.8906 secs to do 71.9913 file closes per sec
+It took 0.128166 secs to do 7802.36 file deletions per sec
+
+
+
+My Samsung 256Gb 830 SSD:
+-----------------------------------------------------------------------
+CrystalDiskMark 3.0.2 x64 (C) 2007-2013 hiyohiyo
+                           Crystal Dew World : http://crystalmark.info/
+-----------------------------------------------------------------------
+* MB/s = 1,000,000 byte/s [SATA/300 = 300,000,000 byte/s]
+
+           Sequential Read :   478.802 MB/s
+          Sequential Write :   406.425 MB/s
+         Random Read 512KB :   337.185 MB/s
+        Random Write 512KB :   390.353 MB/s
+    Random Read 4KB (QD=1) :    21.235 MB/s [  5184.4 IOPS]
+   Random Write 4KB (QD=1) :    58.373 MB/s [ 14251.1 IOPS]
+   Random Read 4KB (QD=32) :   301.170 MB/s [ 73527.7 IOPS]
+  Random Write 4KB (QD=32) :   148.339 MB/s [ 36215.5 IOPS]
+
+  Test : 1000 MB [C: 72.2% (57.3/79.4 GB)] (x5)
+  Date : 2013/04/13 23:10:09
+    OS : Windows 8  [6.2 Build 9200] (x64)
+
+
+Windows IOCP backend, 3.5Ghz Ivy Bridge Windows 8 x64 on 
+my Seagate 7200rpm drive:
+
+1000 file opens, writes 1 byte, closes, and deletes (primes system):
+It took 0.188024 secs to do all operations
+  It took 0.009017 secs to dispatch all operations
+  It took 0.179007 secs to finish all operations
+
+It took 0.0750099 secs to do 13331.6 file opens per sec
+It took 0.0110013 secs to do 90898.3 file writes per sec
+It took 0.033005 secs to do 30298.4 file closes per sec
+It took 0.0690082 secs to do 14491 file deletions per sec
+
+
+1000 file opens, writes 1 byte, closes, and deletes:
+It took 0.188007 secs to do all operations
+  It took 0.0079851 secs to dispatch all operations
+  It took 0.180022 secs to finish all operations
+
+It took 0.0769936 secs to do 12988.1 file opens per sec
+It took 0.0110005 secs to do 90905 file writes per sec
+It took 0.025004 secs to do 39993.6 file closes per sec
+It took 0.0750087 secs to do 13331.8 file deletions per sec
+
+
+1000 file opens, writes 64Kb, closes, and deletes:
+It took 0.962129 secs to do all operations
+  It took 0.0070011 secs to dispatch all operations
+  It took 0.955127 secs to finish all operations
+
+It took 0.0860119 secs to do 11626.3 file opens per sec
+It took 0.017003 secs to do 58813.2 file writes per sec
+It took 0.800101 secs to do 1249.84 file closes per sec
+It took 0.0590126 secs to do 16945.5 file deletions per sec
+
+
+1000 file opens, writes 1 byte, closes, and deletes with synchronous i/o:
+It took 2.96683 secs to do all operations
+  It took 0.0534192 secs to dispatch all operations
+  It took 2.91341 secs to finish all operations
+
+It took 2.7258 secs to do 366.864 file opens per sec
+It took 0.0350025 secs to do 28569.4 file writes per sec
+It took 0.129011 secs to do 7751.27 file closes per sec
+It took 0.0770115 secs to do 12985.1 file deletions per sec
+
+
+1000 file opens, writes 64Kb, closes, and deletes with synchronous i/o:
+It took 1.63751 secs to do all operations
+  It took 0.0150026 secs to dispatch all operations
+  It took 1.62251 secs to finish all operations
+
+It took 0.721396 secs to do 1386.2 file opens per sec
+It took 0.0380043 secs to do 26312.8 file writes per sec
+It took 0.817103 secs to do 1223.84 file closes per sec
+It took 0.0610082 secs to do 16391.2 file deletions per sec
+
+
+1000 file opens, writes 1 byte, closes, and deletes with autoflush i/o:
+It took 2.64517 secs to do all operations
+  It took 0.0089971 secs to dispatch all operations
+  It took 2.63617 secs to finish all operations
+
+It took 0.0769977 secs to do 12987.4 file opens per sec
+It took 0.0354966 secs to do 28171.7 file writes per sec
+It took 2.39964 secs to do 416.729 file closes per sec
+It took 0.133034 secs to do 7516.87 file deletions per sec
+
+
+1000 file opens, writes 64Kb, closes, and deletes with autoflush i/o:
+It took 2.66503 secs to do all operations
+  It took 0.0079793 secs to dispatch all operations
+  It took 2.65705 secs to finish all operations
+
+It took 0.079987 secs to do 12502 file opens per sec
+It took 0.0422422 secs to do 23673 file writes per sec
+It took 2.48179 secs to do 402.934 file closes per sec
+It took 0.0610069 secs to do 16391.6 file deletions per sec
+
 */
 
 namespace triplegit {

@@ -596,7 +596,8 @@ namespace detail {
 				flags|=FILE_FLAG_SEQUENTIAL_SCAN;
 			if(!!(req.flags & file_flags::OSDirect)) flags|=FILE_FLAG_NO_BUFFERING;
 			if(!!(req.flags & file_flags::OSSync)) flags|=FILE_FLAG_WRITE_THROUGH;
-			auto ret=std::shared_ptr<detail::async_io_handle>(new async_io_handle_windows(shared_from_this(), req.path, (file_flags::AutoFlush|file_flags::Write)==(req.flags & (file_flags::AutoFlush|file_flags::Write)),
+			// If writing and autoflush and NOT synchronous, turn on autoflush
+			auto ret=std::shared_ptr<detail::async_io_handle>(new async_io_handle_windows(shared_from_this(), req.path, (file_flags::AutoFlush|file_flags::Write)==(req.flags & (file_flags::AutoFlush|file_flags::Write|file_flags::OSSync)),
 				CreateFile(req.path.c_str(), access, FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,
 					NULL, creation, flags, NULL)));
 			static_cast<async_io_handle_windows *>(ret.get())->do_add_io_handle_to_parent();
@@ -809,7 +810,8 @@ namespace detail {
 				dirh=get_handle_to_containing_dir(req.path);
 			}
 #endif
-			auto ret=std::shared_ptr<detail::async_io_handle>(new async_io_handle_posix(shared_from_this(), dirh, req.path, (file_flags::AutoFlush|file_flags::Write)==(req.flags & (file_flags::AutoFlush|file_flags::Write)),
+			// If writing and autoflush and NOT synchronous, turn on autoflush
+			auto ret=std::shared_ptr<detail::async_io_handle>(new async_io_handle_posix(shared_from_this(), dirh, req.path, (file_flags::AutoFlush|file_flags::Write)==(req.flags & (file_flags::AutoFlush|file_flags::Write|file_flags::OSSync)),
 				posix_open(req.path.c_str(), flags, 0x1b0/*660*/)));
 #if 0//def __linux__
 			if(!!(req.flags & (file_flags::Create|file_flags::CreateOnlyIfNotExist)) && !!(req.flags & (file_flags::AutoFlush|file_flags::OSSync)))
