@@ -128,6 +128,77 @@ It took 0.128166 secs to do 7802.36 file deletions per sec
 
 
 
+POSIX compat backend, 3.5Ghz Ivy Bridge Linux 3.2 x64 on 
+my Seagate 7200rpm drive:
+
+1000 file opens, writes 1 byte, closes, and deletes:
+It took 0.03907 secs to do all operations
+  It took 0.00425 secs to dispatch all operations
+  It took 0.03482 secs to finish all operations
+
+It took 0.015097 secs to do 66238.3 file opens per sec
+It took 0.009744 secs to do 102627 file writes per sec
+It took 0.008307 secs to do 120380 file closes per sec
+It took 0.005922 secs to do 168862 file deletions per sec
+
+
+1000 file opens, writes 64Kb, closes, and deletes:
+It took 0.039257 secs to do all operations
+  It took 0.004198 secs to dispatch all operations
+  It took 0.035059 secs to finish all operations
+
+It took 0.017462 secs to do 57267.2 file opens per sec
+It took 0.010241 secs to do 97646.7 file writes per sec
+It took 0.007234 secs to do 138236 file closes per sec
+It took 0.00432 secs to do 231481 file deletions per sec
+
+
+1000 file opens, writes 1 byte, closes, and deletes with synchronous i/o:
+It took 7.53982 secs to do all operations
+  It took 0.003997 secs to dispatch all operations
+  It took 7.53582 secs to finish all operations
+
+It took 6.35027 secs to do 157.473 file opens per sec
+It took 1.18224 secs to do 845.848 file writes per sec
+It took 0.005773 secs to do 173220 file closes per sec
+It took 0.001528 secs to do 654450 file deletions per sec
+
+
+1000 file opens, writes 64Kb, closes, and deletes with synchronous i/o:
+It took 7.97113 secs to do all operations
+  It took 0.004116 secs to dispatch all operations
+  It took 7.96701 secs to finish all operations
+
+It took 6.32829 secs to do 158.021 file opens per sec
+It took 1.63634 secs to do 611.12 file writes per sec
+It took 0.004897 secs to do 204207 file closes per sec
+It took 0.001605 secs to do 623053 file deletions per sec
+
+
+1000 file opens, writes 1 byte, closes, and deletes with autoflush i/o:
+It took 7.46535 secs to do all operations
+  It took 0.00405 secs to dispatch all operations
+  It took 7.4613 secs to finish all operations
+
+It took 6.30895 secs to do 158.505 file opens per sec
+It took 1.12623 secs to do 887.922 file writes per sec
+It took 0.02834 secs to do 35285.8 file closes per sec
+It took 0.001838 secs to do 544070 file deletions per sec
+
+
+1000 file opens, writes 64Kb, closes, and deletes with autoflush i/o:
+It took 8.0235 secs to do all operations
+  It took 0.00419 secs to dispatch all operations
+  It took 8.01931 secs to finish all operations
+
+It took 6.29931 secs to do 158.748 file opens per sec
+It took 1.68728 secs to do 592.67 file writes per sec
+It took 0.035096 secs to do 28493.3 file closes per sec
+It took 0.001815 secs to do 550964 file deletions per sec
+
+
+
+
 My Samsung 256Gb 830 SSD:
 -----------------------------------------------------------------------
 CrystalDiskMark 3.0.2 x64 (C) 2007-2013 hiyohiyo

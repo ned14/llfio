@@ -800,7 +800,7 @@ namespace detail {
 #ifdef O_DIRECT
 			if(!!(req.flags & file_flags::OSDirect)) flags|=O_DIRECT;
 #endif
-#ifdef OS_SYNC
+#ifdef O_SYNC
 			if(!!(req.flags & file_flags::OSSync)) flags|=O_SYNC;
 #endif
 #ifdef __linux__
@@ -813,7 +813,7 @@ namespace detail {
 			// If writing and autoflush and NOT synchronous, turn on autoflush
 			auto ret=std::shared_ptr<detail::async_io_handle>(new async_io_handle_posix(shared_from_this(), dirh, req.path, (file_flags::AutoFlush|file_flags::Write)==(req.flags & (file_flags::AutoFlush|file_flags::Write|file_flags::OSSync)),
 				posix_open(req.path.c_str(), flags, 0x1b0/*660*/)));
-#if 0//def __linux__
+#ifdef __linux__
 			if(!!(req.flags & (file_flags::Create|file_flags::CreateOnlyIfNotExist)) && !!(req.flags & (file_flags::AutoFlush|file_flags::OSSync)))
 				posix_fsync(static_cast<async_io_handle_posix *>(dirh.get())->fd);
 #endif
