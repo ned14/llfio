@@ -263,7 +263,7 @@ static void _1000_open_write_close_deletes(std::shared_ptr<triplegit::async_io::
 	typedef std::chrono::duration<double, ratio<1>> secs_type;
 	auto mkdir(dispatcher->dir(async_path_op_req("testdir", file_flags::Create)));
 	vector<char, NiallsCPP11Utilities::aligned_allocator<char, 4096>> towrite(bytes, 'N');
-	CHECK(!(((size_t) &towrite.front()) & 4095));
+	assert(!(((size_t) &towrite.front()) & 4095));
 
 	// Wait for six seconds to let filing system recover and prime SpeedStep
 	auto begin=std::chrono::high_resolution_clock::now();

@@ -84,12 +84,12 @@ env['CCCOM']   =    env['CCCOM'].replace('$CHANGED_SOURCES','$SOURCES.abspath')
 env['SHCCCOM'] =  env['SHCCCOM'].replace('$CHANGED_SOURCES','$SOURCES.abspath')
 env['CXXCOM']  =   env['CXXCOM'].replace('$CHANGED_SOURCES','$SOURCES.abspath')
 env['SHCXXCOM']= env['SHCXXCOM'].replace('$CHANGED_SOURCES','$SOURCES.abspath')
-architecture="generic"
 env['CPPPATH']=[]
 env['CPPDEFINES']=[]
 env['CCFLAGS']=[]
 env['CXXFLAGS']=[]
 env['LIBS']=[]
+env['LIBPATH']=[]
 env['LINKFLAGS']=[]
 
 # Am I in a 32 or 64 bit environment? Note that not specifying --sse doesn't set any x86 or x64 specific options
@@ -199,8 +199,9 @@ else:
     	if len(boostpath)<4: break
     	boostpath=os.path.join(boostpath, "boost")
     if len(boostpath)>4 and os.path.exists(boostpath):
-       	env['CPPPATH']+=[boostpath]
-    	env['LIBS']+=[os.path.join(boostpath, 'stage', 'lib')]
+    	env['CPPPATH']+=[boostpath]
+    	env['LIBPATH']+=[os.path.join(boostpath, 'stage', 'lib')]
+    	env['RPATH']=os.path.join(boostpath, 'stage', 'lib')
     if not conf.CheckHaveBoost():
     	print("ERROR: I need the Boost libraries, either in the system or in a boost directory just above mine")
     	sys.exit(1)

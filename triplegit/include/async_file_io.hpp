@@ -333,6 +333,119 @@ It took 0.0290068 secs to do 34474.7 file writes per sec
 It took 0.901115 secs to do 1109.74 file closes per sec
 It took 0.0530077 secs to do 18865.2 file deletions per sec
 
+
+
+
+
+POSIX compat backend, 1.7Ghz ARM Cortex-A15 Linux 3.4 on 
+Samsung Chromebook eMMC internal drive:
+
+1000 file opens, writes 1 byte, closes, and deletes:
+It took 0.386876 secs to do all operations
+  It took 0.110156 secs to dispatch all operations
+  It took 0.27672 secs to finish all operations
+
+It took 0.181143 secs to do 5520.5 file opens per sec
+It took 0.094321 secs to do 10602.1 file writes per sec
+It took 0.070552 secs to do 14173.9 file closes per sec
+It took 0.04086 secs to do 24473.8 file deletions per sec
+
+
+1000 file opens, writes 64Kb, closes, and deletes:
+It took 0.425939 secs to do all operations
+  It took 0.147966 secs to dispatch all operations
+  It took 0.277973 secs to finish all operations
+
+It took 0.17901 secs to do 5586.28 file opens per sec
+It took 0.152722 secs to do 6547.85 file writes per sec
+It took 0.054538 secs to do 18335.8 file closes per sec
+It took 0.039669 secs to do 25208.6 file deletions per sec
+
+
+1000 file opens, writes 1 byte, closes, and deletes with synchronous i/o:
+It took 19.4941 secs to do all operations
+  It took 0.07904 secs to dispatch all operations
+  It took 19.4151 secs to finish all operations
+
+It took 13.323 secs to do 75.058 file opens per sec
+It took 6.06393 secs to do 164.909 file writes per sec
+It took 0.071753 secs to do 13936.7 file closes per sec
+It took 0.035389 secs to do 28257.4 file deletions per sec
+
+
+1000 file opens, writes 64Kb, closes, and deletes with synchronous i/o:
+It took 22.8757 secs to do all operations
+  It took 0.102336 secs to dispatch all operations
+  It took 22.7734 secs to finish all operations
+
+It took 5.35023 secs to do 186.908 file opens per sec
+It took 17.498 secs to do 57.1495 file writes per sec
+It took 0.014796 secs to do 67585.8 file closes per sec
+It took 0.012747 secs to do 78449.8 file deletions per sec
+
+
+1000 file opens, writes 1 byte, closes, and deletes with autoflush i/o:
+It took 13.2068 secs to do all operations
+  It took 0.085519 secs to dispatch all operations
+  It took 13.1213 secs to finish all operations
+
+It took 9.65411 secs to do 103.583 file opens per sec
+It took 3.40673 secs to do 293.537 file writes per sec
+It took 0.119205 secs to do 8388.91 file closes per sec
+It took 0.02677 secs to do 37355.2 file deletions per sec
+
+
+1000 file opens, writes 64Kb, closes, and deletes with autoflush i/o:
+It took 24.0624 secs to do all operations
+  It took 0.092833 secs to dispatch all operations
+  It took 23.9695 secs to finish all operations
+
+It took 12.9862 secs to do 77.0047 file opens per sec
+It took 10.8002 secs to do 92.5906 file writes per sec
+It took 0.219705 secs to do 4551.56 file closes per sec
+It took 0.05619 secs to do 17796.8 file deletions per sec
+
+
+1000 file opens, writes 1 byte, closes, and deletes with direct i/o:
+[Started testing]
+
+[Running: async_io/works/1/direct]
+unittests/main.cpp:266: !(((size_t) &towrite.front()) & 4095) failed with unexpected exception with message: 'Invalid argument (22) in 'triplegit/src/async_file_io.cpp':dowrite:884'
+[Finished: 'async_io/works/1/direct' 1 test case failed (1 of 2 assertions failed)]
+
+
+1000 file opens, writes 64Kb, closes, and deletes with direct i/o:
+It took 6.84248 secs to do all operations
+  It took 0.125639 secs to dispatch all operations
+  It took 6.71684 secs to finish all operations
+
+It took 0.204354 secs to do 4893.47 file opens per sec
+It took 6.58176 secs to do 151.935 file writes per sec
+It took 0.025033 secs to do 39947.3 file closes per sec
+It took 0.031331 secs to do 31917.3 file deletions per sec
+
+
+1000 file opens, writes 1 byte, closes, and deletes with direct synchronous i/o:
+It took 7.00683 secs to do all operations
+  It took 0.054578 secs to dispatch all operations
+  It took 6.95225 secs to finish all operations
+
+It took 6.88883 secs to do 145.163 file opens per sec
+It took 0.057979 secs to do 17247.6 file writes per sec
+It took 0.030898 secs to do 32364.6 file closes per sec
+It took 0.029125 secs to do 34334.8 file deletions per sec
+
+
+1000 file opens, writes 64Kb, closes, and deletes with direct synchronous i/o:
+It took 24.9112 secs to do all operations
+  It took 0.058847 secs to dispatch all operations
+  It took 24.8524 secs to finish all operations
+
+It took 11.8282 secs to do 84.5438 file opens per sec
+It took 13.0079 secs to do 76.8762 file writes per sec
+It took 0.057255 secs to do 17465.7 file closes per sec
+It took 0.017878 secs to do 55934.7 file deletions per sec
+
 */
 
 namespace triplegit {
