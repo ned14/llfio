@@ -337,6 +337,55 @@ It took 0.0530077 secs to do 18865.2 file deletions per sec
 
 
 
+iozone -e -I -a -s 1000M -r 4k -r 512k -i 0 -i 1 -i 2
+                                                            random  random    bkwd   record   stride                                   
+              KB  reclen   write rewrite    read    reread    read   write    read  rewrite     read   fwrite frewrite   fread  freread
+         1024000       4    2528    3044    12000    11693   11337     931                                                          
+         1024000     512   17393   17039    68703    68524   67958    3881                                                          
+
+iozone -e -I -s 31M -r 4k -t 32 -T -i 0 -i 2
+
+        Children see throughput for 2 initial writers = 1502.15 KB/sec
+        Parent sees throughput for 2 initial writers = 1502.13 KB/sec
+        Min throughput per thread = 751.07 KB/sec
+        Max throughput per thread = 751.08 KB/sec
+        Avg throughput per thread = 751.07 KB/sec
+        Min xfer = 511992.00 KB
+
+        Children see throughput for 2 rewriters = 1537.12 KB/sec
+        Parent sees throughput for 2 rewriters = 1537.11 KB/sec
+        Min throughput per thread = 768.34 KB/sec
+        Max throughput per thread = 768.77 KB/sec
+        Avg throughput per thread = 768.56 KB/sec
+        Min xfer = 511716.00 KB
+
+        Children see throughput for 2 random readers = 9044.48 KB/sec
+        Parent sees throughput for 2 random readers = 9044.42 KB/sec
+        Min throughput per thread = 4521.79 KB/sec
+        Max throughput per thread = 4522.69 KB/sec
+        Avg throughput per thread = 4522.24 KB/sec
+        Min xfer = 511900.00 KB
+
+        Children see throughput for 2 random writers = 825.19 KB/sec
+        Parent sees throughput for 2 random writers = 825.14 KB/sec
+        Min throughput per thread = 412.52 KB/sec
+        Max throughput per thread = 412.67 KB/sec
+        Avg throughput per thread = 412.60 KB/sec
+        Min xfer = 511812.00 KB
+
+
+From these I infer:
+
+           Sequential Read :   67.09 MB/s
+          Sequential Write :   16.98 MB/s
+         Random Read 512KB :   66.36 MB/s
+        Random Write 512KB :    3.79 MB/s
+    Random Read 4KB (QD=1) :   11.42 MB/s [ 2834.3 IOPS]
+   Random Write 4KB (QD=1) :    0.91 MB/s [  232.8 IOPS]
+   Random Read 4KB (QD=32) :      ? MB/s  [      ? IOPS]
+  Random Write 4KB (QD=32) :      ? MB/s  [      ? IOPS]
+
+
 POSIX compat backend, 1.7Ghz ARM Cortex-A15 Linux 3.4 on 
 Samsung Chromebook eMMC internal drive:
 
