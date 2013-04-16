@@ -1,6 +1,6 @@
 import os, sys, platform
 
-Import("env")
+Import("env", "ARMcrosscompiler")
 env=env.Clone()
 architecture=env['VARIANT'][:env['VARIANT'].find('/')]
 debugbuild="Debug" in env['VARIANT']
@@ -14,6 +14,8 @@ if env['CC']=='cl':
         if   env.GetOption('avx')==1: env['CCFLAGS']+=[ "/arch:AVX" ]
 else:
     if architecture=="x86":
+        env['CCFLAGS']+=["-m32"]
+        env['LINKFLAGS']+=["-m32"]
         if env.GetOption('sse'):
             env['CCFLAGS']+=["-mfpmath=sse"]
             if env.GetOption('sse')>1: env['CCFLAGS']+=["-msse%s" % str(env.GetOption('sse'))]
@@ -23,6 +25,13 @@ else:
             env['CCFLAGS']+=["-mfpmath=avx"]
             if env.GetOption('avx')>1: env['CCFLAGS']+=["-mavx%s" % str(env.GetOption('avx'))]
             else: env['CCFLAGS']+=["-mavx"]
+    if architecture=='ARMv7':
+        if ARMcrosscompiler:
+            env['CC']='arm-linux-gnueabi-gcc'
+            env['CXX']='arm-linux-gnueabi-g++'
+        env['CCFLAGS']+=['-mfpu=%s' % env.GetOption('fpu')]
+        if env.GetOption('thumb'):
+	    env['CCFLAGS']+=['-mthumb']
 
 # Am I building a debug or release build?
 if debugbuild:
@@ -64,7 +73,7 @@ else:
         env['CCFLAGS']+=["-O2", "-g"]
     env['CXXFLAGS']+=["-std=c++0x"]
     env['LIBS']+=["boost_filesystem", "boost_system", "boost_thread", "pthread"]
-    env['LINKFLAGS']+=["-Wl,-rpath=."]
+    env['LINKFLAGS']+=[]
     env['LINKFLAGSEXE']=env['LINKFLAGS'][:]
 
 outputs={}

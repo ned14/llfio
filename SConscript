@@ -85,7 +85,7 @@ outputs['mylibs']=SConscript("triplegit/SConscript")
 sources = env.SConscript(os.path.join("unittests", "SConscript"), 'env')
 objects = env.Object(source = sources) # + [myliblib]
 testlibs=outputs['mylibs']['triplegitlib'][0]
-testprogram_cpp = env.Program("tests", source = objects, LINKFLAGS=env['LINKFLAGSEXE'], LIBS = env['LIBS'] + testlibs)
+testprogram_cpp = env.Program("unittests", source = objects, LINKFLAGS=env['LINKFLAGSEXE'], LIBS = env['LIBS'] + testlibs)
 outputs['unittests']=(testprogram_cpp, sources)
 
 # Remove triplegit lib contents from mylibs
