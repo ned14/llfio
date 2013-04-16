@@ -100,7 +100,9 @@ if sys.platform=="win32" and 'INCLUDE' in os.environ:
     env['ENV']['LIB']=os.environ['LIB']
     env['ENV']['PATH']=os.environ['PATH']
 else:
-    if sys.platform=="win32": env['ENV']['PATH']=os.environ['PATH']
+    if sys.platform=="win32":
+        env['ENV']['PATH']=os.environ['PATH']
+        env['CPPDEFINES']+=["WIN32"]
     # Test the build environment
     def CheckHaveClang(cc):
         cc.Message("Checking if clang is available ...")
