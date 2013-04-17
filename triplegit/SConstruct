@@ -204,7 +204,7 @@ else:
     if len(boostpath)>4 and os.path.exists(boostpath):
     	env['CPPPATH']+=[boostpath]
     	env['LIBPATH']+=[os.path.join(boostpath, 'stage', 'lib')]
-    	env['RPATH']+=os.path.join(boostpath, 'stage', 'lib')
+    	env['RPATH']+=[os.path.join(boostpath, 'stage', 'lib')]
     if not conf.CheckHaveBoost():
     	print("ERROR: I need the Boost libraries, either in the system or in a boost directory just above mine")
     	sys.exit(1)
