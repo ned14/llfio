@@ -1,9 +1,96 @@
-# Handle line endings automatically for files detected as text
-# and leave all files detected as binary untouched.
-* text=auto
-
-#
-# The above will handle all files NOT found below
-#
-# These files are text and should be normalized (Convert crlf => lf)
+* text=auto !eol
 *.gitattributes text
+
+# Scriptish formats
+*.bat        svneol=native#text/plain
+*.bsh        svneol=native#text/x-beanshell
+*.cgi        svneol=native#text/plain
+*.cmd        svneol=native#text/plain
+*.js         svneol=native#text/javascript
+*.php        svneol=native#text/x-php
+*.pl         svneol=native#text/x-perl
+*.pm         svneol=native#text/x-perl
+*.py         svneol=native#text/x-python
+*.sh         eol=lf svneol=LF#text/x-sh
+configure    eol=lf svneol=LF#text/x-sh
+
+# Image formats
+*.bmp        svneol=unset#image/bmp
+*.gif        svneol=unset#image/gif
+*.ico        svneol=unset#image/ico
+*.jpeg       svneol=unset#image/jpeg
+*.jpg        svneol=unset#image/jpeg
+*.png        svneol=unset#image/png
+*.tif        svneol=unset#image/tiff
+*.tiff       svneol=unset#image/tiff
+*.svg        svneol=native#image/svg+xml
+
+# Data formats
+*.pdf        svneol=unset#application/pdf
+*.avi        svneol=unset#video/avi
+*.doc        svneol=unset#application/msword
+*.dsp        svneol=crlf#text/plain
+*.dsw        svneol=crlf#text/plain
+*.eps        svneol=unset#application/postscript
+*.gz         svneol=unset#application/gzip
+*.mov        svneol=unset#video/quicktime
+*.mp3        svneol=unset#audio/mpeg
+*.ppt        svneol=unset#application/vnd.ms-powerpoint
+*.ps         svneol=unset#application/postscript
+*.psd        svneol=unset#application/photoshop
+*.rdf        svneol=unset#text/rdf
+*.rss        svneol=unset#text/xml
+*.rtf        svneol=unset#text/rtf
+*.sln        svneol=native#text/plain
+*.swf        svneol=unset#application/x-shockwave-flash
+*.tgz        svneol=unset#application/gzip
+*.vcproj     svneol=native#text/xml
+*.vcxproj    svneol=native#text/xml
+*.vsprops    svneol=native#text/xml
+*.wav        svneol=unset#audio/wav
+*.xls        svneol=unset#application/vnd.ms-excel
+*.zip        svneol=unset#application/zip
+
+# Text formats
+.htaccess    svneol=native#text/plain
+*.bbk        svneol=native#text/xml
+*.cmake      svneol=native#text/plain
+*.css        svneol=native#text/css
+*.dtd        svneol=native#text/xml
+*.htm        svneol=native#text/html
+*.html       svneol=native#text/html
+*.ini        svneol=native#text/plain
+*.log        svneol=native#text/plain
+*.mak        svneol=native#text/plain
+*.qbk        svneol=native#text/plain
+*.rst        svneol=native#text/plain
+*.sql        svneol=native#text/x-sql
+*.txt        svneol=native#text/plain
+*.xhtml      svneol=native#text/xhtml+xml
+*.xml        svneol=native#text/xml
+*.xsd        svneol=native#text/xml
+*.xsl        svneol=native#text/xml
+*.xslt       svneol=native#text/xml
+*.xul        svneol=native#text/xul
+*.yml        svneol=native#text/plain
+boost-no-inspect svneol=native#text/plain
+CHANGES      svneol=native#text/plain
+COPYING      svneol=native#text/plain
+INSTALL      svneol=native#text/plain
+Jamfile      svneol=native#text/plain
+Jamroot      svneol=native#text/plain
+Jamfile.v2   svneol=native#text/plain
+Jamrules     svneol=native#text/plain
+Makefile*    svneol=native#text/plain
+README       svneol=native#text/plain
+TODO         svneol=native#text/plain
+
+# Code formats
+*.c          svneol=native#text/plain
+*.cpp        svneol=native#text/plain
+*.h          svneol=native#text/plain
+*.hpp        svneol=native#text/plain
+*.ipp        svneol=native#text/plain
+*.tpp        svneol=native#text/plain
+*.jam        svneol=native#text/plain
+*.java       svneol=native#text/plain
