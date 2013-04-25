@@ -13,6 +13,7 @@ Created: Feb 2013
 #include "boost/graph/dijkstra_shortest_paths.hpp"
 #include "boost/graph/visitors.hpp"
 #include "boost/graph/isomorphism.hpp"
+#include "boost/lockfree/queue.hpp"
 #define CATCH_CONFIG_RUNNER
 #include "catch.hpp"
 
@@ -45,6 +46,29 @@ const std::size_t nedges = sizeof(used_by)/sizeof(Edge);
 
 //static triplegit::fs_store store(std::filesystem::current_path());
 //static triplegit::collection_id testgraph(store, "unittests.testgraph");
+
+// From http://burtleburtle.net/bob/rand/smallprng.html
+typedef unsigned int  u4;
+typedef struct ranctx { u4 a; u4 b; u4 c; u4 d; } ranctx;
+
+#define rot(x,k) (((x)<<(k))|((x)>>(32-(k))))
+u4 ranval( ranctx *x ) {
+    u4 e = x->a - rot(x->b, 27);
+    x->a = x->b ^ rot(x->c, 17);
+    x->b = x->c + x->d;
+    x->c = x->d + e;
+    x->d = e + x->a;
+    return x->d;
+}
+
+void raninit( ranctx *x, u4 seed ) {
+    u4 i;
+    x->a = 0xf1ea5eed, x->b = x->c = x->d = seed;
+    for (i=0; i<20; ++i) {
+        (void)ranval(x);
+    }
+}
+
 
 int main (int argc, char * const argv[]) {
     int ret=Catch::Main( argc, argv );
@@ -434,6 +458,209 @@ TEST_CASE("async_io/errors", "Tests that the async i/o error handling works")
 		// TODO: Insert a barrier() here once I write it.
 		files.push_back(dispatcher->rmdir(async_path_op_req(mkdir, "testdir")));
 	}
+}
+
+static void evil_random_io(std::shared_ptr<triplegit::async_io::async_file_io_dispatcher_base> dispatcher, size_t no, size_t bytes, size_t alignment=0)
+{
+	using namespace triplegit::async_io;
+	using namespace std;
+	using triplegit::async_io::future;
+	using namespace NiallsCPP11Utilities;
+	using triplegit::async_io::off_t;
+	typedef std::chrono::duration<double, ratio<1>> secs_type;
+
+	vector<vector<char, NiallsCPP11Utilities::aligned_allocator<char, 4096>>> towrite(no);
+	struct Op
+	{
+		bool write;
+		async_data_op_req<char> req;
+		Hash256 hash; // Only used for reading
+	};
+	vector<vector<Op>> todo(no);
+	vector<Hash256> hashes(no);
+	Hash256::BeginBatch(no, &hashes.front());
+	for(size_t n=0; n<no; n++)
+	{
+		towrite[n].reserve(bytes);
+		towrite[n].resize(bytes);
+		assert(!(((size_t) &towrite[n].front()) & 4095));
+	}
+	// We create no lots of random writes and reads representing about 50% of bytes
+	// We simulate what we _ought_ to see appear in storage during the test and
+	// SHA256 out the results
+	// We then replay the same with real storage to see if it matches
+	auto begin=std::chrono::high_resolution_clock::now();
+#pragma omp parallel for
+	for(ptrdiff_t n=0; n<(ptrdiff_t) no; n++)
+	{
+		ranctx gen;
+		raninit(&gen, 0x78adbcff^(u4) n);
+		Op op;
+		Hash256::BatchHashOp hashop=Hash256::BeginBatch(1, &op.hash);
+		Hash256::BatchItem hashopitem;
+		get<0>(hashopitem)=0;
+		auto unhashop=Undoer([hashop]{ Hash256::FinishBatch(hashop); });
+		for(off_t bytessofar=0; bytessofar<bytes/2;)
+		{
+			u4 r=ranval(&gen), toissue=(r>>24) & 15;
+			size_t thisbytes=0;
+			op.write=bytessofar<bytes/4 ? true : !(r&(1<<31));
+			op.req.buffers.resize(toissue);
+			op.req.where=toissue &~(bytes/2-1);
+			if(alignment)
+				op.req.where&=~(alignment-1);
+			for(size_t m=0; m<toissue; m++)
+			{
+				u4 s=ranval(&gen) & ((256*1024-1)&~3);				
+				op.req.buffers.push_back(boost::asio::mutable_buffer((void *)(((size_t) op.req.where)+thisbytes), s));
+				if(op.write)
+					for(; s>0; s-=4, thisbytes+=4)
+						*(u4 *)(((size_t) op.req.where)+thisbytes)=ranval(&gen);
+				else
+				{
+					get<1>(hashopitem)=(const char *)(((size_t) op.req.where)+thisbytes);
+					get<2>(hashopitem)=s;
+					Hash256::AddSHA256ToBatch(hashop, 1, &hashopitem);
+					thisbytes+=s;
+				}
+			}
+			if(!op.write)
+				Hash256::FinishBatch(hashop, false);
+			todo[n].push_back(op);
+		}
+	}
+	auto end=std::chrono::high_resolution_clock::now();
+	auto diff=chrono::duration_cast<secs_type>(end-begin);
+	cout << "It took " << diff.count() << " secs to simulate torture test in RAM" << endl;
+
+	auto mkdir(dispatcher->dir(async_path_op_req("testdir", file_flags::Create)));
+	// Wait for three seconds to let filing system recover and prime SpeedStep
+	begin=std::chrono::high_resolution_clock::now();
+	while(std::chrono::duration_cast<secs_type>(std::chrono::high_resolution_clock::now()-begin).count()<3);
+
+	// Open our test files
+	begin=std::chrono::high_resolution_clock::now();
+	std::vector<async_path_op_req> manyfilereqs;
+	manyfilereqs.reserve(no);
+	for(size_t n=0; n<no; n++)
+		manyfilereqs.push_back(async_path_op_req(mkdir, "testdir/"+std::to_string(n), file_flags::Create|file_flags::Write));
+	auto manyopenfiles(dispatcher->file(manyfilereqs));
+
+	// Schedule a replay of our in-RAM simulation
+	std::vector<async_io_op> manywrittenfiles(no);
+	boost::lockfree::queue<const Op *> failures;
+	auto checkHash=[&failures](Op &op, size_t, std::shared_ptr<triplegit::async_io::detail::async_io_handle> h) -> std::pair<bool, std::shared_ptr<triplegit::async_io::detail::async_io_handle>> {
+		const char *data=(const char *)(((size_t) op.req.where));
+		size_t length=0;
+		for(auto &i : op.req.buffers)
+			length+=boost::asio::buffer_size(i);
+		Hash256 hash;
+		hash.AddSHA256To(data, length);
+		if(hash!=op.hash)
+			failures.push(&op);
+		return make_pair(true, h);
+	};
+#pragma omp parallel for
+	for(ptrdiff_t n; n<(ptrdiff_t) no; n++)
+	{
+		for(Op &op : todo[n])
+		{
+			op.req.precondition=manywrittenfiles[n];
+			manywrittenfiles[n]=op.write ? dispatcher->write(op.req) : dispatcher->read(op.req);
+			if(!op.write)
+				dispatcher->completion(manywrittenfiles[n], std::make_pair(async_op_flags::ImmediateCompletion, std::bind(checkHash, ref(op), placeholders::_1, placeholders::_2)));
+		}
+	}
+
+	// Close each of those files
+	auto manyclosedfiles(dispatcher->close(manywrittenfiles));
+
+	// Delete each of those files once they are closed
+	auto it(manyclosedfiles.begin());
+	for(auto &i : manyfilereqs)
+		i.precondition=*it++;
+	auto manydeletedfiles(dispatcher->rmfile(manyfilereqs));
+	auto dispatched=chrono::high_resolution_clock::now();
+
+	// Wait for all files to open
+	when_all(manyopenfiles.begin(), manyopenfiles.end()).wait();
+	auto openedsync=chrono::high_resolution_clock::now();
+	// Wait for all files to write
+	when_all(manywrittenfiles.begin(), manywrittenfiles.end()).wait();
+	auto writtensync=chrono::high_resolution_clock::now();
+	// Wait for all files to close
+	when_all(manyclosedfiles.begin(), manyclosedfiles.end()).wait();
+	auto closedsync=chrono::high_resolution_clock::now();
+	CHECK(failures.empty());
+	// Wait for all files to delete
+	when_all(manydeletedfiles.begin(), manydeletedfiles.end()).wait();
+	auto deletedsync=chrono::high_resolution_clock::now();
+
+	end=deletedsync;
+	auto rmdir(dispatcher->rmdir(async_path_op_req("testdir")));
+
+	diff=chrono::duration_cast<secs_type>(end-begin);
+	cout << "It took " << diff.count() << " secs to do all operations" << endl;
+	diff=chrono::duration_cast<secs_type>(dispatched-begin);
+	cout << "  It took " << diff.count() << " secs to dispatch all operations" << endl;
+	diff=chrono::duration_cast<secs_type>(end-dispatched);
+	cout << "  It took " << diff.count() << " secs to finish all operations" << endl << endl;
+	off_t readed=0, written=0;
+	diff=chrono::duration_cast<secs_type>(end-begin);
+	for(auto &i : manydeletedfiles)
+	{
+		readed+=i.h.get()->read_count();
+		written+=i.h.get()->write_count();
+	}
+	cout << "We read " << readed << " bytes and wrote " << written << " bytes" << endl;
+	cout << "  That makes " << (readed+written)/diff.count()/1024/1024 << " Mb/sec" << endl;
+
+	diff=chrono::duration_cast<secs_type>(openedsync-begin);
+	cout << "It took " << diff.count() << " secs to do " << manyfilereqs.size()/diff.count() << " file opens per sec" << endl;
+	diff=chrono::duration_cast<secs_type>(writtensync-openedsync);
+	cout << "It took " << diff.count() << " secs to do " << manyfilereqs.size()/diff.count() << " file writes per sec" << endl;
+	diff=chrono::duration_cast<secs_type>(closedsync-writtensync);
+	cout << "It took " << diff.count() << " secs to do " << manyfilereqs.size()/diff.count() << " file closes per sec" << endl;
+	diff=chrono::duration_cast<secs_type>(deletedsync-closedsync);
+	cout << "It took " << diff.count() << " secs to do " << manyfilereqs.size()/diff.count() << " file deletions per sec" << endl;
+
+	// Fetch any outstanding error
+	rmdir.h.get();
+}
+
+TEST_CASE("async_io/torture", "Tortures the async i/o implementation")
+{
+	auto dispatcher=triplegit::async_io::async_file_io_dispatcher(triplegit::async_io::process_threadpool(), triplegit::async_io::file_flags::None);
+	std::cout << "\n\nSustained random i/o to 10 files of 10Mb:\n";
+	evil_random_io(dispatcher, 10, 10*1024*1024);
+}
+
+TEST_CASE("async_io/torture/sync", "Tortures the synchronous async i/o implementation")
+{
+	auto dispatcher=triplegit::async_io::async_file_io_dispatcher(triplegit::async_io::process_threadpool(), triplegit::async_io::file_flags::OSSync);
+	std::cout << "\n\nSustained random synchronous i/o to 10 files of 1Mb:\n";
+	evil_random_io(dispatcher, 10, 1*1024*1024);
+}
+
+TEST_CASE("async_io/torture/autoflush", "Tortures the autoflush async i/o implementation")
+{
+	auto dispatcher=triplegit::async_io::async_file_io_dispatcher(triplegit::async_io::process_threadpool(), triplegit::async_io::file_flags::AutoFlush);
+	std::cout << "\n\nSustained random autoflush i/o to 10 files of 1Mb:\n";
+	evil_random_io(dispatcher, 10, 1*1024*1024);
+}
+
+TEST_CASE("async_io/torture/direct", "Tortures the direct async i/o implementation")
+{
+	auto dispatcher=triplegit::async_io::async_file_io_dispatcher(triplegit::async_io::process_threadpool(), triplegit::async_io::file_flags::OSDirect);
+	std::cout << "\n\nSustained random direct i/o to 10 files of 10Mb:\n";
+	evil_random_io(dispatcher, 10, 10*1024*1024, 4096);
+}
+
+TEST_CASE("async_io/torture/directsync", "Tortures the direct synchronous async i/o implementation")
+{
+	auto dispatcher=triplegit::async_io::async_file_io_dispatcher(triplegit::async_io::process_threadpool(), triplegit::async_io::file_flags::OSDirect|triplegit::async_io::file_flags::OSSync);
+	std::cout << "\n\nSustained random direct synchronous i/o to 10 files of 1Mb:\n";
+	evil_random_io(dispatcher, 10, 1*1024*1024, 4096);
 }
 
 #if 0
