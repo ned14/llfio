@@ -62,15 +62,15 @@ if sys.platform=="win32" and 'INCLUDE' not in os.environ:
 AddOption('--postfix', dest='postfix', nargs=1, default='_test', help='appends a string to the DLL name')
 AddOption('--debugbuild', dest='debug', nargs='?', const=True, help='enable debug build')
 AddOption('--static', dest='static', nargs='?', const=True, help='build a static library rather than shared library')
-AddOption('--useclang', dest='useclang', nargs='?', const=True, help='use clang if it is available')
-AddOption('--usegcc', dest='usegcc', nargs='?', const=True, help='use gcc if it is available')
+AddOption('--useclang', dest='useclang', nargs=1, type='str', default='clang++', help='use clang if it is available')
+AddOption('--usegcc', dest='usegcc', nargs=1, type='str', default='g++', help='use gcc if it is available')
 AddOption('--force32', dest='force32', help='force 32 bit build on 64 bit machine')
 AddOption('--archs', dest='archs', nargs=1, type='str', default='min', help='which architectures to build, comma separated. all means all. Defaults to min.')
 if 'x86' in architectures:
 	AddOption('--sse', dest='sse', nargs=1, type='int', default=2, help='set SSE used (0-4) on 32 bit x86. Defaults to 2 (SSE2).')
 	AddOption('--avx', dest='avx', nargs=1, type='int', default=0, help='set AVX used (0-2) on x86/x64. Defaults to 0 (No AVX).')
 if 'ARMv7' in architectures:
-	AddOption('--fpu', dest='fpu', nargs=1, type='str', default='neon-vfpv4', help='sets FPU used on ARMv7. Defaults to neon-vfpv4.')
+	AddOption('--fpu', dest='fpu', nargs=1, type='str', default='neon', help='sets FPU used on ARMv7. Defaults to neon.')
 	AddOption('--thumb', dest='thumb', nargs='?', const=True, help='generate ARMv7 Thumb instructions instead of normal.')
 if env.GetOption('archs')!='min' and env.GetOption('archs')!='all':
 	archs=env.GetOption('archs').split(',')
@@ -172,10 +172,10 @@ else:
     conf=Configure(env, { "CheckHaveClang" : CheckHaveClang, "CheckHaveGCC" : CheckHaveGCC, "CheckHaveVisibility" : CheckHaveVisibility, "CheckHaveOpenMP" : CheckHaveOpenMP, "CheckHaveCPP11Features" : CheckHaveCPP11Features, "CheckHaveBoost" : CheckHaveBoost } )
     if env.GetOption('useclang') and conf.CheckHaveClang():
         env['CC']="clang"
-        env['CXX']="clang++"
+        env['CXX']=env.GetOption('useclang')
     if env.GetOption('usegcc') and conf.CheckHaveGCC():
         env['CC']="gcc"
-        env['CXX']="g++"
+        env['CXX']=env.GetOption('usegcc')
     if not conf.CheckLib("rt", "clock_gettime") and not conf.CheckLib("c", "clock_gettime"):
         print "WARNING: Can't find clock_gettime() in librt or libc, code may not fully compile if your system headers say that this function is available"
     if conf.CheckHaveVisibility():
