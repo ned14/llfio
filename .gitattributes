@@ -15,41 +15,41 @@
 configure    eol=lf svneol=LF#text/x-sh
 
 # Image formats
-*.bmp        svneol=unset#image/bmp
-*.gif        svneol=unset#image/gif
-*.ico        svneol=unset#image/ico
-*.jpeg       svneol=unset#image/jpeg
-*.jpg        svneol=unset#image/jpeg
-*.png        svneol=unset#image/png
-*.tif        svneol=unset#image/tiff
-*.tiff       svneol=unset#image/tiff
-*.svg        svneol=native#image/svg%2Bxml
+*.bmp        binary svneol=unset#image/bmp
+*.gif        binary svneol=unset#image/gif
+*.ico        binary svneol=unset#image/ico
+*.jpeg       binary svneol=unset#image/jpeg
+*.jpg        binary svneol=unset#image/jpeg
+*.png        binary svneol=unset#image/png
+*.tif        binary svneol=unset#image/tiff
+*.tiff       binary svneol=unset#image/tiff
+*.svg        text svneol=native#image/svg%2Bxml
 
 # Data formats
-*.pdf        svneol=unset#application/pdf
-*.avi        svneol=unset#video/avi
-*.doc        svneol=unset#application/msword
-*.dsp        svneol=crlf#text/plain
-*.dsw        svneol=crlf#text/plain
-*.eps        svneol=unset#application/postscript
-*.gz         svneol=unset#application/gzip
-*.mov        svneol=unset#video/quicktime
-*.mp3        svneol=unset#audio/mpeg
-*.ppt        svneol=unset#application/vnd.ms-powerpoint
-*.ps         svneol=unset#application/postscript
-*.psd        svneol=unset#application/photoshop
-*.rdf        svneol=unset#text/rdf
-*.rss        svneol=unset#text/xml
-*.rtf        svneol=unset#text/rtf
+*.pdf        binary svneol=unset#application/pdf
+*.avi        binary svneol=unset#video/avi
+*.doc        binary svneol=unset#application/msword
+*.dsp        text svneol=crlf#text/plain
+*.dsw        text svneol=crlf#text/plain
+*.eps        binary svneol=unset#application/postscript
+*.gz         binary svneol=unset#application/gzip
+*.mov        binary svneol=unset#video/quicktime
+*.mp3        binary svneol=unset#audio/mpeg
+*.ppt        binary svneol=unset#application/vnd.ms-powerpoint
+*.ps         binary svneol=unset#application/postscript
+*.psd        binary svneol=unset#application/photoshop
+*.rdf        binary svneol=unset#text/rdf
+*.rss        text svneol=unset#text/xml
+*.rtf        binary svneol=unset#text/rtf
 *.sln        text svneol=native#text/plain
-*.swf        svneol=unset#application/x-shockwave-flash
-*.tgz        svneol=unset#application/gzip
+*.swf        binary svneol=unset#application/x-shockwave-flash
+*.tgz        binary svneol=unset#application/gzip
 *.vcproj     text svneol=native#text/xml
 *.vcxproj    text svneol=native#text/xml
 *.vsprops    text svneol=native#text/xml
-*.wav        svneol=unset#audio/wav
-*.xls        svneol=unset#application/vnd.ms-excel
-*.zip        svneol=unset#application/zip
+*.wav        binary svneol=unset#audio/wav
+*.xls        binary svneol=unset#application/vnd.ms-excel
+*.zip        binary svneol=unset#application/zip
 
 # Text formats
 .htaccess    text svneol=native#text/plain
