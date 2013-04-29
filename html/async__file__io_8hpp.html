@@ -97,6 +97,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &quot;../../NiallsCPP11Utilities/NiallsCPP11Utilities.hpp&quot;</code><br/>
 <code>#include &quot;../../NiallsCPP11Utilities/std_filesystem.hpp&quot;</code><br/>
+<code>#include &lt;type_traits&gt;</code><br/>
 <code>#include &lt;initializer_list&gt;</code><br/>
 <code>#include &lt;thread&gt;</code><br/>
 <code>#include &lt;atomic&gt;</code><br/>
@@ -159,9 +160,9 @@ Typedefs</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a6743cd614fc8161dfce94144c36cfb85"><td class="memItemLeft" align="right" valign="top">thread_pool &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetriplegit_1_1async__io.html#a6743cd614fc8161dfce94144c36cfb85">triplegit::async_io::process_threadpool</a> ()</td></tr>
-<tr class="memdesc:a6743cd614fc8161dfce94144c36cfb85"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the process threadpool.  <a href="#a6743cd614fc8161dfce94144c36cfb85"></a><br/></td></tr>
-<tr class="separator:a6743cd614fc8161dfce94144c36cfb85"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3a274621797a5b07475f3f08b2aef9a4"><td class="memItemLeft" align="right" valign="top">DLLIMPORTMARKUP thread_pool &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetriplegit_1_1async__io.html#a3a274621797a5b07475f3f08b2aef9a4">triplegit::async_io::process_threadpool</a> ()</td></tr>
+<tr class="memdesc:a3a274621797a5b07475f3f08b2aef9a4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the process threadpool.  <a href="#a3a274621797a5b07475f3f08b2aef9a4"></a><br/></td></tr>
+<tr class="separator:a3a274621797a5b07475f3f08b2aef9a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afc5e0576470c19d979b3b853305fc7d6"><td class="memTemplParams" colspan="2">template&lt;class InputIterator &gt; </td></tr>
 <tr class="memitem:afc5e0576470c19d979b3b853305fc7d6"><td class="memTemplItemLeft" align="right" valign="top">future&lt; std::vector&lt; typename <br class="typebreak"/>
 std::decay&lt; decltype(((typename <br class="typebreak"/>
@@ -176,10 +177,11 @@ InputIterator::value_type *) 0) -&gt;<br class="typebreak"/>
 get())&gt;::type &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacetriplegit_1_1async__io.html#ac024775f7df8eb059d2aeee8de8f5ff9">triplegit::async_io::when_any</a> (InputIterator first, InputIterator last)</td></tr>
 <tr class="memdesc:ac024775f7df8eb059d2aeee8de8f5ff9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a future tuple of results from all the supplied futures.  <a href="#ac024775f7df8eb059d2aeee8de8f5ff9"></a><br/></td></tr>
 <tr class="separator:ac024775f7df8eb059d2aeee8de8f5ff9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afa6da488279e514281ae9d5904d8d426"><td class="memItemLeft" align="right" valign="top">std::shared_ptr<br class="typebreak"/>
-&lt; async_file_io_dispatcher_base &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetriplegit_1_1async__io.html#afa6da488279e514281ae9d5904d8d426">triplegit::async_io::async_file_io_dispatcher</a> (thread_pool &amp;threadpool=process_threadpool(), file_flags flagsforce=file_flags::None, file_flags flagsmask=file_flags::None)</td></tr>
-<tr class="memdesc:afa6da488279e514281ae9d5904d8d426"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instatiates the best available async_file_io_dispatcher implementation for this system.  <a href="#afa6da488279e514281ae9d5904d8d426"></a><br/></td></tr>
-<tr class="separator:afa6da488279e514281ae9d5904d8d426"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a186162bcdd5e5322ca93970896e3de80"><td class="memItemLeft" align="right" valign="top">DLLIMPORTMARKUP <br class="typebreak"/>
+std::shared_ptr<br class="typebreak"/>
+&lt; async_file_io_dispatcher_base &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetriplegit_1_1async__io.html#a186162bcdd5e5322ca93970896e3de80">triplegit::async_io::async_file_io_dispatcher</a> (thread_pool &amp;threadpool=process_threadpool(), file_flags flagsforce=file_flags::None, file_flags flagsmask=file_flags::None)</td></tr>
+<tr class="memdesc:a186162bcdd5e5322ca93970896e3de80"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instatiates the best available async_file_io_dispatcher implementation for this system.  <a href="#a186162bcdd5e5322ca93970896e3de80"></a><br/></td></tr>
+<tr class="separator:a186162bcdd5e5322ca93970896e3de80"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae692c0402d30c1350b8475c8d9c42c69"><td class="memItemLeft" align="right" valign="top">future&lt; std::vector<br class="typebreak"/>
 &lt; std::shared_ptr<br class="typebreak"/>
 &lt; detail::async_io_handle &gt; &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetriplegit_1_1async__io.html#ae692c0402d30c1350b8475c8d9c42c69">triplegit::async_io::when_all</a> (std::nothrow_t, std::vector&lt; async_io_op &gt;::iterator first, std::vector&lt; async_io_op &gt;::iterator last)</td></tr>
