@@ -828,6 +828,11 @@ public:
 	inline async_io_op write(const async_data_op_req<const void> &req);
 	//! Asynchronously writes data to items
 	template<class T> inline std::vector<async_io_op> write(const std::vector<async_data_op_req<T>> &ops);
+
+	//! Convenience function for truncating the lengths of items via std::filesystem::resize_file()
+	inline std::vector<async_io_op> truncate(const std::vector<async_io_op> &ops, const std::vector<off_t> &sizes);
+	//! Convenience function for truncating the length of an item via std::filesystem::resize_file()
+	inline async_io_op truncate(const async_io_op &op, off_t newsize);
 protected:
 	void complete_async_op(size_t id, std::shared_ptr<detail::async_io_handle> h, exception_ptr e=exception_ptr());
 	completion_returntype invoke_user_completion(size_t id, std::shared_ptr<detail::async_io_handle> h, std::function<completion_t> callback);
@@ -1152,6 +1157,28 @@ template<class T> inline std::vector<async_io_op> async_file_io_dispatcher_base:
 template<class T> inline std::vector<async_io_op> async_file_io_dispatcher_base::write(const std::vector<async_data_op_req<T>> &ops)
 {
 	return write(detail::async_file_io_dispatcher_rwconverter<T>()(ops));
+}
+inline std::vector<async_io_op> async_file_io_dispatcher_base::truncate(const std::vector<async_io_op> &ops, const std::vector<off_t> &sizes)
+{
+	auto dotruncate=[](size_t, std::shared_ptr<detail::async_io_handle> h, off_t newsize) {
+		std::filesystem::resize_file(h->path(), newsize);
+		return std::make_pair(true, h);
+	};
+	std::vector<std::pair<async_op_flags, std::function<completion_t>>> callbacks;
+	callbacks.reserve(ops.size());
+	for(auto &i : sizes)
+		callbacks.push_back(std::make_pair(async_op_flags::None, std::bind(dotruncate, std::placeholders::_1, std::placeholders::_2, i)));
+	return completion(ops, callbacks);
+}
+inline async_io_op async_file_io_dispatcher_base::truncate(const async_io_op &op, off_t newsize)
+{
+	std::vector<async_io_op> o;
+	std::vector<off_t> i;
+	o.reserve(1);
+	o.push_back(op);
+	i.reserve(1);
+	i.push_back(newsize);
+	return truncate(o, i).front();
 }
 
 

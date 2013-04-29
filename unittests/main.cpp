@@ -470,13 +470,16 @@ static void evil_random_io(std::shared_ptr<triplegit::async_io::async_file_io_di
 	typedef std::chrono::duration<double, ratio<1>> secs_type;
 
 	vector<vector<char, NiallsCPP11Utilities::aligned_allocator<char, 4096>>> towrite(no);
+	vector<char *> towriteptrs(no);
+	vector<size_t> towritesizes(no);
 	struct Op
 	{
+		Hash256 hash; // Only used for reading
 		bool write;
 		async_data_op_req<char> req;
-		Hash256 hash; // Only used for reading
 	};
-	vector<vector<Op>> todo(no);
+	static_assert(!(sizeof(PadSizeToMultipleOf<Op, 32>)&31), "Op's stored size must be a multiple of 32 bytes");
+	vector<vector<PadSizeToMultipleOf<Op, 32>, NiallsCPP11Utilities::aligned_allocator<Op, 32>>> todo(no);
 	vector<Hash256> hashes(no);
 	Hash256::BeginBatch(no, &hashes.front());
 	for(size_t n=0; n<no; n++)
@@ -484,6 +487,8 @@ static void evil_random_io(std::shared_ptr<triplegit::async_io::async_file_io_di
 		towrite[n].reserve(bytes);
 		towrite[n].resize(bytes);
 		assert(!(((size_t) &towrite[n].front()) & 4095));
+		towriteptrs[n]=&towrite[n].front();
+		towritesizes[n]=bytes;
 	}
 	// We create no lots of random writes and reads representing about 50% of bytes
 	// We simulate what we _ought_ to see appear in storage during the test and
@@ -511,14 +516,14 @@ static void evil_random_io(std::shared_ptr<triplegit::async_io::async_file_io_di
 				op.req.where&=~(alignment-1);
 			for(size_t m=0; m<toissue; m++)
 			{
-				u4 s=ranval(&gen) & ((256*1024-1)&~3);				
+				u4 s=ranval(&gen) & ((256*1024-1)&~63); // Must be a multiple of 64 bytes for SHA256
 				op.req.buffers.push_back(boost::asio::mutable_buffer((void *)(((size_t) op.req.where)+thisbytes), s));
 				if(op.write)
 					for(; s>0; s-=4, thisbytes+=4)
-						*(u4 *)(((size_t) op.req.where)+thisbytes)=ranval(&gen);
+						*(u4 *)(((size_t)towriteptrs[n]+(size_t) op.req.where)+thisbytes)=ranval(&gen);
 				else
 				{
-					get<1>(hashopitem)=(const char *)(((size_t) op.req.where)+thisbytes);
+					get<1>(hashopitem)=(const char *)(((size_t)towriteptrs[n]+(size_t) op.req.where)+thisbytes);
 					get<2>(hashopitem)=s;
 					Hash256::AddSHA256ToBatch(hashop, 1, &hashopitem);
 					thisbytes+=s;
@@ -527,16 +532,25 @@ static void evil_random_io(std::shared_ptr<triplegit::async_io::async_file_io_di
 			if(!op.write)
 				Hash256::FinishBatch(hashop, false);
 			todo[n].push_back(op);
+			bytessofar+=thisbytes;
 		}
 	}
 	auto end=std::chrono::high_resolution_clock::now();
 	auto diff=chrono::duration_cast<secs_type>(end-begin);
 	cout << "It took " << diff.count() << " secs to simulate torture test in RAM" << endl;
+	begin=std::chrono::high_resolution_clock::now();
+	vector<Hash256> memhashes(no);
+	Hash256::BatchAddSHA256To(no, &memhashes.front(), (const char **) &towriteptrs.front(), &towritesizes.front());
+	end=std::chrono::high_resolution_clock::now();
+	diff=chrono::duration_cast<secs_type>(end-begin);
+	cout << "It took " << diff.count() << " secs to SHA256 the results" << endl;
+	for(size_t n=0; n<no; n++)
+		memset(towriteptrs[n], 0, towritesizes[n]);
 
 	auto mkdir(dispatcher->dir(async_path_op_req("testdir", file_flags::Create)));
 	// Wait for three seconds to let filing system recover and prime SpeedStep
-	begin=std::chrono::high_resolution_clock::now();
-	while(std::chrono::duration_cast<secs_type>(std::chrono::high_resolution_clock::now()-begin).count()<3);
+	//begin=std::chrono::high_resolution_clock::now();
+	//while(std::chrono::duration_cast<secs_type>(std::chrono::high_resolution_clock::now()-begin).count()<3);
 
 	// Open our test files
 	begin=std::chrono::high_resolution_clock::now();
@@ -545,10 +559,16 @@ static void evil_random_io(std::shared_ptr<triplegit::async_io::async_file_io_di
 	for(size_t n=0; n<no; n++)
 		manyfilereqs.push_back(async_path_op_req(mkdir, "testdir/"+std::to_string(n), file_flags::Create|file_flags::Write));
 	auto manyopenfiles(dispatcher->file(manyfilereqs));
+	for(size_t n=0; n<no; n++)
+		manyfilereqs[n].precondition=dispatcher->truncate(dispatcher->close(manyopenfiles[n]), bytes);
+	manyopenfiles=dispatcher->file(manyfilereqs);
 
 	// Schedule a replay of our in-RAM simulation
-	std::vector<async_io_op> manywrittenfiles(no);
-	boost::lockfree::queue<const Op *> failures;
+	std::vector<async_io_op> manywrittenfiles(manyopenfiles.cbegin(), manyopenfiles.cend());
+	size_t maxfailures=0;
+	for(size_t n=0; n<no; n++)
+		maxfailures+=todo[n].size();
+	boost::lockfree::queue<const Op *> failures(maxfailures);
 	auto checkHash=[&failures](Op &op, size_t, std::shared_ptr<triplegit::async_io::detail::async_io_handle> h) -> std::pair<bool, std::shared_ptr<triplegit::async_io::detail::async_io_handle>> {
 		const char *data=(const char *)(((size_t) op.req.where));
 		size_t length=0;
@@ -561,7 +581,7 @@ static void evil_random_io(std::shared_ptr<triplegit::async_io::async_file_io_di
 		return make_pair(true, h);
 	};
 #pragma omp parallel for
-	for(ptrdiff_t n; n<(ptrdiff_t) no; n++)
+	for(ptrdiff_t n=0; n<(ptrdiff_t) no; n++)
 	{
 		for(Op &op : todo[n])
 		{
@@ -570,6 +590,8 @@ static void evil_random_io(std::shared_ptr<triplegit::async_io::async_file_io_di
 			if(!op.write)
 				dispatcher->completion(manywrittenfiles[n], std::make_pair(async_op_flags::ImmediateCompletion, std::bind(checkHash, ref(op), placeholders::_1, placeholders::_2)));
 		}
+		// After replay, read the entire file into memory
+		manywrittenfiles[n]=dispatcher->read(async_data_op_req<char>(manywrittenfiles[n], towriteptrs[n], towritesizes[n], 0));
 	}
 
 	// Close each of those files
@@ -591,7 +613,6 @@ static void evil_random_io(std::shared_ptr<triplegit::async_io::async_file_io_di
 	// Wait for all files to close
 	when_all(manyclosedfiles.begin(), manyclosedfiles.end()).wait();
 	auto closedsync=chrono::high_resolution_clock::now();
-	CHECK(failures.empty());
 	// Wait for all files to delete
 	when_all(manydeletedfiles.begin(), manydeletedfiles.end()).wait();
 	auto deletedsync=chrono::high_resolution_clock::now();
@@ -626,6 +647,21 @@ static void evil_random_io(std::shared_ptr<triplegit::async_io::async_file_io_di
 
 	// Fetch any outstanding error
 	rmdir.h.get();
+	CHECK(failures.empty());
+	if(!failures.empty())
+	{
+		const Op *failedop;
+		cout << "The following hash failures occurred:" << endl;
+		while(failures.pop(failedop))
+			cout << "   " << (failedop->write ? "Write to" : "Read from") << " " << to_string(failedop->req.where) << endl;
+	}
+	else
+	{
+		vector<Hash256> filehashes(no);
+		Hash256::BatchAddSHA256To(no, &filehashes.front(), (const char **) &towriteptrs.front(), &towritesizes.front());
+		for(size_t n=0; n<no; n++)
+			CHECK(memhashes[n]==filehashes[n]);
+	}
 }
 
 TEST_CASE("async_io/torture", "Tortures the async i/o implementation")

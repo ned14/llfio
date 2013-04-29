@@ -8,7 +8,7 @@ var searchData=
   ['async_5fdata_5fop_5freq_3c_20std_3a_3avector_3c_20t_2c_20a_20_3e_20_3e',['async_data_op_req&lt; std::vector&lt; T, A &gt; &gt;',['../structtriplegit_1_1async__io_1_1async__data__op__req_3_01std_1_1vector_3_01_t_00_01_a_01_4_01_4.html',1,'triplegit::async_io']]],
   ['async_5fdata_5fop_5freq_3c_20void_20_3e',['async_data_op_req&lt; void &gt;',['../structtriplegit_1_1async__io_1_1async__data__op__req.html',1,'triplegit::async_io']]],
   ['async_5ffile_5fio_2ehpp',['async_file_io.hpp',['../async__file__io_8hpp.html',1,'']]],
-  ['async_5ffile_5fio_5fdispatcher',['async_file_io_dispatcher',['../namespacetriplegit_1_1async__io.html#a186162bcdd5e5322ca93970896e3de80',1,'triplegit::async_io']]],
+  ['async_5ffile_5fio_5fdispatcher',['async_file_io_dispatcher',['../namespacetriplegit_1_1async__io.html#afa6da488279e514281ae9d5904d8d426',1,'triplegit::async_io']]],
   ['async_5ffile_5fio_5fdispatcher_5fbase',['async_file_io_dispatcher_base',['../classtriplegit_1_1async__io_1_1async__file__io__dispatcher__base.html',1,'triplegit::async_io']]],
   ['async_5fio_5fhandle',['async_io_handle',['../classtriplegit_1_1async__io_1_1detail_1_1async__io__handle.html',1,'triplegit::async_io::detail']]],
   ['async_5fio_5fop',['async_io_op',['../structtriplegit_1_1async__io_1_1async__io__op.html',1,'triplegit::async_io']]],
