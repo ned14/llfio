@@ -3,7 +3,7 @@
 	url = https://github.com/philsquared/Catch.git
 [submodule "boost"]
 	path = boost
-	url = git://github.com/ryppl/boost-svn.git
+	url = https://github.com/ned14/boost-trunk.git
 [submodule "NiallsCPP11Utilities"]
 	path = NiallsCPP11Utilities
 	url = git@github.com:ned14/NiallsCPP11Utilities.git
