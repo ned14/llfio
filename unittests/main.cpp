@@ -317,6 +317,15 @@ static void _1000_open_write_close_deletes(std::shared_ptr<triplegit::async_io::
 	for(auto &i : manyfilereqs)
 		i.precondition=*it++;
 	auto manydeletedfiles(dispatcher->rmfile(manyfilereqs));
+
+	// As a test of call() which involves significant template metaprogramming, have a do nothing callback
+	std::atomic<size_t> callcount;
+	auto callable=[&callcount](int i) { ++callcount; return i; };
+	std::vector<std::tuple<decltype(callable), int>> callables;
+	callables.reserve(1000);
+	for(size_t n=0; n<1000; n++)
+		callables.push_back(std::make_tuple(callable, 78));
+	auto manycallbacks(dispatcher->call<decltype(callable), int>(manydeletedfiles, std::move(callables)));
 	auto dispatched=chrono::high_resolution_clock::now();
 
 	// Wait for all files to open
@@ -331,6 +340,8 @@ static void _1000_open_write_close_deletes(std::shared_ptr<triplegit::async_io::
 	// Wait for all files to delete
 	when_all(manydeletedfiles.begin(), manydeletedfiles.end()).wait();
 	auto deletedsync=chrono::high_resolution_clock::now();
+	// Wait for all callbacks
+	when_all(manycallbacks.second.begin(), manycallbacks.second.end()).wait();
 
 	auto end=deletedsync;
 	auto rmdir(dispatcher->rmdir(async_path_op_req("testdir")));
@@ -353,6 +364,7 @@ static void _1000_open_write_close_deletes(std::shared_ptr<triplegit::async_io::
 
 	// Fetch any outstanding error
 	rmdir.h.get();
+	CHECK(callcount==1000);
 }
 
 TEST_CASE("async_io/works/1prime", "Tests that the async i/o implementation works (primes system)")
@@ -446,11 +458,15 @@ TEST_CASE("async_io/errors", "Tests that the async i/o error handling works")
 			files.push_back(dispatcher->file(async_path_op_req(mkdir, "testdir/a", file_flags::Create)));
 			files.push_back(dispatcher->file(async_path_op_req(mkdir, "testdir/b", file_flags::Create)));
 			when_all(files.begin(), files.end()).wait();
+#if 0
 			auto copy(dispatcher->call(files.front(), []{
 				std::filesystem::copy("testdir/c", "testdir/d");
 			}));
-			CHECK_THROWS(copy.h.get()); // This should trip with failure to copy
-			CHECK_THROWS(when_all({copy}).get()); // This should trip with failure to copy
+			CHECK_THROWS(copy.second.h.get()); // This should trip with failure to copy
+			CHECK_THROWS(when_all({copy.second}).get()); // This should trip with failure to copy
+#else
+			CHECK(!"Fixme");
+#endif
 		}
 		vector<async_io_op> files;
 		files.push_back(dispatcher->rmfile(async_path_op_req(mkdir, "testdir/a")));

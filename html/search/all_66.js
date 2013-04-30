@@ -4,6 +4,5 @@ var searchData=
   ['fileflags',['fileflags',['../classtriplegit_1_1async__io_1_1async__file__io__dispatcher__base.html#ab1746bda51c77ef5c1691b3f6857a270',1,'triplegit::async_io::async_file_io_dispatcher_base']]],
   ['fs_5fstore',['fs_store',['../classtriplegit_1_1fs__store.html#ab7e25c70606385d88d069550c4816378',1,'triplegit::fs_store']]],
   ['fs_5fstore',['fs_store',['../classtriplegit_1_1fs__store.html',1,'triplegit']]],
-  ['function',['function',['../classtriplegit_1_1async__io_1_1async__file__io__dispatcher__base.html#a449655e9c519e389cb3e747e1b284b00',1,'triplegit::async_io::async_file_io_dispatcher_base']]],
   ['future',['future',['../classtriplegit_1_1async__io_1_1future.html',1,'triplegit::async_io']]]
 ];

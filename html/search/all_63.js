@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['call',['call',['../classtriplegit_1_1async__io_1_1async__file__io__dispatcher__base.html#a9b7bc59194c36aa858a2db6113690f9c',1,'triplegit::async_io::async_file_io_dispatcher_base']]],
+  ['call',['call',['../classtriplegit_1_1async__io_1_1async__file__io__dispatcher__base.html#a4d9b04666f9b32347504958a69d91476',1,'triplegit::async_io::async_file_io_dispatcher_base::call(const std::vector&lt; async_io_op &gt; &amp;ops, std::vector&lt; std::tuple&lt; C, Args...&gt;&gt; &amp;&amp;callables)'],['../classtriplegit_1_1async__io_1_1async__file__io__dispatcher__base.html#a7057167ed1a46e3b24fa3806bd6172c1',1,'triplegit::async_io::async_file_io_dispatcher_base::call(const async_io_op &amp;req, C callback, Args...args)']]],
   ['checkcollectionid',['checkCollectionId',['../classtriplegit_1_1base__store.html#af1c4c71d3f7e240925439a456c7d2b36',1,'triplegit::base_store']]],
   ['close',['close',['../classtriplegit_1_1async__io_1_1async__file__io__dispatcher__base.html#abffcc5e304efb9622ef184eca8d29868',1,'triplegit::async_io::async_file_io_dispatcher_base::close(const std::vector&lt; async_io_op &gt; &amp;ops)=0'],['../classtriplegit_1_1async__io_1_1async__file__io__dispatcher__base.html#a828b6f410645dfe2dca3075c86e054c7',1,'triplegit::async_io::async_file_io_dispatcher_base::close(const async_io_op &amp;req)']]],
   ['collection_5fid',['collection_id',['../classtriplegit_1_1collection__id.html',1,'triplegit']]],

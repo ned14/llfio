@@ -16,8 +16,9 @@ File Created: Mar 2013
 #if !defined(_WIN32_WINNT) && defined(WIN32)
 #define _WIN32_WINNT 0x0501
 #endif
-#define BOOST_THREAD_VERSION 3
-#define BOOST_THREAD_DONT_PROVIDE_FUTURE
+#define BOOST_THREAD_VERSION 4
+//#define BOOST_THREAD_DONT_PROVIDE_FUTURE
+//#define BOOST_THREAD_PROVIDES_SIGNATURE_PACKAGED_TASK
 #include "boost/asio.hpp"
 #include "boost/thread/thread.hpp"
 #include "boost/thread/future.hpp"
@@ -786,10 +787,11 @@ public:
 	std::vector<async_io_op> completion(const std::vector<async_io_op> &ops, const std::vector<std::pair<async_op_flags, std::function<completion_t>>> &callbacks);
 	//! Invoke the specified function when the supplied operation completes
 	inline async_io_op completion(const async_io_op &req, const std::pair<async_op_flags, std::function<completion_t>> &callback);
-	//! Invoke the specified function when the supplied operation completes
-	template<class R> inline async_io_op function(const async_io_op &req, std::function<R()> callback);
-	//! Invoke the specified function when the supplied operation completes
-	template<class C, class... Args> inline async_io_op call(const async_io_op &req, C callback, Args... args);
+
+	//! Invoke the specified callable when the supplied operation completes
+	template<class C, class... Args> inline std::pair<std::vector<future<typename std::result_of<C(Args...)>::type>>, std::vector<async_io_op>> call(const std::vector<async_io_op> &ops, std::vector<std::tuple<C, Args...>> &&callables);
+	//! Invoke the specified callable when the supplied operation completes
+	template<class C, class... Args> inline std::pair<future<typename std::result_of<C(Args...)>::type>, async_io_op> call(const async_io_op &req, C callback, Args... args);
 
 	//! Asynchronously creates directories
 	virtual std::vector<async_io_op> dir(const std::vector<async_path_op_req> &reqs)=0;
@@ -1078,21 +1080,36 @@ inline async_io_op async_file_io_dispatcher_base::completion(const async_io_op &
 	i.push_back(callback);
 	return completion(r, i).front();
 }
-template<class R> inline async_io_op async_file_io_dispatcher_base::function(const async_io_op &req, std::function<R()> callback)
+template<class C, class... Args> inline std::pair<std::vector<future<typename std::result_of<C(Args...)>::type>>, std::vector<async_io_op>> async_file_io_dispatcher_base::call(const std::vector<async_io_op> &ops, std::vector<std::tuple<C, Args...>> &&callables)
 {
-	auto invoker=[](size_t, std::shared_ptr<detail::async_io_handle> _, std::function<R()> callback){
-		callback();
+	typedef typename std::result_of<C(Args...)>::type rettype;
+	typedef boost::packaged_task<rettype> tasktype; // NOTE to self later: this ought to go to std::packaged_task<rettype(Args...)>
+	std::vector<future<rettype>> retfutures;
+	std::vector<std::pair<async_op_flags, std::function<completion_t>>> callbacks;
+	retfutures.reserve(callables.size());
+	callbacks.reserve(callables.size());
+	auto f=[](size_t, std::shared_ptr<detail::async_io_handle> _, std::shared_ptr<tasktype> c, std::tuple<C, Args...> args) {
+		NiallsCPP11Utilities::call_using_tuple<1>(std::move(*c), args);
 		return std::make_pair(true, _);
 	};
-	return completion(req, std::make_pair(async_op_flags::None, std::bind(invoker, std::placeholders::_1, std::placeholders::_2, callback)));
+	for(auto &&t : callables)
+	{
+		std::shared_ptr<tasktype> c(new tasktype(std::move(std::get<0>(t))));
+		retfutures.push_back(c->get_future());
+		callbacks.push_back(std::make_pair(async_op_flags::None, std::bind(f, std::placeholders::_1, std::placeholders::_2, c, std::move(t))));
+	}
+	return std::make_pair(retfutures, completion(ops, callbacks));
 }
-template<class C, class... Args> inline async_io_op async_file_io_dispatcher_base::call(const async_io_op &req, C callback, Args... args)
+template<class C, class... Args> inline std::pair<future<typename std::result_of<C(Args...)>::type>, async_io_op> async_file_io_dispatcher_base::call(const async_io_op &req, C callback, Args... args)
 {
-	auto invoker=[](size_t, std::shared_ptr<detail::async_io_handle> _, C callback, Args... args){
-		callback(args...);
-		return std::make_pair(true, _);
-	};
-	return completion(req, std::make_pair(async_op_flags::None, std::bind(invoker, std::placeholders::_1, std::placeholders::_2, callback, args...)));
+	typedef typename std::result_of<C(Args...)>::type rettype;
+	std::vector<async_io_op> i;
+	std::vector<std::tuple<C, Args...>> c;
+	i.reserve(1); c.reserve(1);
+	i.push_back(req);
+	c.push_back(std::make_tuple(callback, args...));
+	std::pair<std::vector<future<rettype>>, std::vector<async_io_op>> ret(call(i, c));
+	return std::make_pair(ret.first.front(), ret.second.front());
 }
 inline async_io_op async_file_io_dispatcher_base::dir(const async_path_op_req &req)
 {

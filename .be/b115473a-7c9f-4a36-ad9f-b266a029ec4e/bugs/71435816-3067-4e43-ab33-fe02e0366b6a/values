@@ -9,11 +9,11 @@ reporter: '"Niall Douglas \(s \[underscore\] sourceforge {at} nedprod \[dot\] co
 severity: minor
 
 
-status: fixed
+status: open
 
 
-summary: Port to ARM is unfinished.
+summary: Replace all uses of new and shared_ptr<> with make_shared<>
 
 
-time: Thu, 11 Apr 2013 21:38:40 +0000
+time: Tue, 30 Apr 2013 23:32:27 +0000
 
