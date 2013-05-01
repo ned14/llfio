@@ -227,13 +227,16 @@ namespace detail {
 	class async_file_io_dispatcher_qnx;
 	struct immediate_async_ops
 	{
-		std::vector<boost::packaged_task<std::shared_ptr<detail::async_io_handle>>> toexecute; // NOTE to self later: this ought to go to std::packaged_task<boost::packaged_task<std::shared_ptr<detail::async_io_handle>()>>
+		typedef std::shared_ptr<detail::async_io_handle> rettype;
+		typedef rettype retfuncttype();
+		std::vector<packaged_task<retfuncttype>> toexecute;
 
 		immediate_async_ops() { }
 		// Returns a promise which is fulfilled when this is destructed
-		future<std::shared_ptr<detail::async_io_handle>> enqueue(std::function<std::shared_ptr<detail::async_io_handle>()> f)
+		future<rettype> enqueue(std::function<retfuncttype> f)
 		{
-			toexecute.push_back(boost::packaged_task<std::shared_ptr<detail::async_io_handle>>(std::move(f))); // NOTE to self later: this ought to go to std::packaged_task<std::shared_ptr<detail::async_io_handle>()>
+			packaged_task<retfuncttype> t(std::move(f));
+			toexecute.push_back(std::move(t));
 			return toexecute.back().get_future();
 		}
 		~immediate_async_ops()

@@ -17,6 +17,7 @@ File Created: Mar 2013
 #define _WIN32_WINNT 0x0501
 #endif
 #define BOOST_THREAD_VERSION 4
+#define BOOST_THREAD_PROVIDES_VARIADIC_THREAD
 //#define BOOST_THREAD_DONT_PROVIDE_FUTURE
 //#define BOOST_THREAD_PROVIDES_SIGNATURE_PACKAGED_TASK
 #include "boost/asio.hpp"
@@ -511,50 +512,65 @@ typedef std::thread thread;
 // This isn't consistent on MSVC so hard code it
 typedef unsigned long long off_t;
 
+#define ASYNC_FILE_IO_FORWARD_STL_IMPL(M, B) \
+template<class T> class M : public B<T> \
+{ \
+public: \
+	M() { } \
+	M(const B<T> &o) : B<T>(o) { } \
+	M(B<T> &&o) : B<T>(std::move(o)) { } \
+	M(const M &o) : B<T>(o) { } \
+	M(M &&o) : B<T>(std::move(o)) { } \
+	M &operator=(const B<T> &o) { static_cast<B<T> &&>(*this)=o; return *this; } \
+	M &operator=(B<T> &&o) { static_cast<B<T> &&>(*this)=std::move(o); return *this; } \
+	M &operator=(const M &o) { static_cast<B<T> &&>(*this)=o; return *this; } \
+	M &operator=(M &&o) { static_cast<B<T> &&>(*this)=std::move(o); return *this; } \
+};
+#define ASYNC_FILE_IO_FORWARD_STL_IMPL_NC(M, B) \
+template<class T> class M : public B<T> \
+{ \
+public: \
+	M() { } \
+	M(B<T> &&o) : B<T>(std::move(o)) { } \
+	M(M &&o) : B<T>(std::move(o)) { } \
+	M &operator=(B<T> &&o) { static_cast<B<T> &&>(*this)=std::move(o); return *this; } \
+	M &operator=(M &&o) { static_cast<B<T> &&>(*this)=std::move(o); return *this; } \
+};
 /*! \class future
 \brief For now, this is boost's future. Will be replaced when C++'s future catches up with boost's
 
 when_all() and when_any() definitions borrowed from http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2012/n3428.pdf
 */
-template<class T> class future : public boost::unique_future<T>
-{
-public:
-	future() { }
-	future(boost::unique_future<T> &&o) : boost::unique_future<T>(std::move(o)) { }
-	future(future &&o) : boost::unique_future<T>(std::move(o)) { }
-	future &operator=(boost::unique_future<T> &&o) { static_cast<boost::unique_future<T> &&>(*this)=std::move(o); return *this; }
-	future &operator=(future &&o) { static_cast<boost::unique_future<T> &&>(*this)=std::move(o); return *this; }
-};
+ASYNC_FILE_IO_FORWARD_STL_IMPL_NC(future, boost::future)
 /*! \class shared_future
 \brief For now, this is boost's shared_future. Will be replaced when C++'s shared_future catches up with boost's
 
 when_all() and when_any() definitions borrowed from http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2012/n3428.pdf
 */
-template<class T> class shared_future : public boost::shared_future<T>
-{
-public:
-	shared_future() { }
-	shared_future(boost::shared_future<T> &&o) : boost::shared_future<T>(std::move(o)) { }
-	shared_future(const boost::shared_future<T> &o) : boost::shared_future<T>(o) { }
-	shared_future &operator=(boost::shared_future<T> &&o) { static_cast<boost::shared_future<T> &&>(*this)=std::move(o); return *this; }
-	shared_future &operator=(const boost::shared_future<T> &o) { static_cast<boost::shared_future<T> &>(*this)=o; return *this; }
-};
+ASYNC_FILE_IO_FORWARD_STL_IMPL(shared_future, boost::shared_future)
 /*! \class promise
 \brief For now, this is boost's promise. Will be replaced when C++'s promise catches up with boost's
 */
-template<class T> class promise : public boost::promise<T>
-{
-public:
-	promise() { }
-	promise(boost::promise<T> &&o) : boost::promise<T>(std::move(o)) { }
-	promise(promise &&o) : boost::promise<T>(std::move(o)) { }
-	promise &operator=(boost::promise<T> &&o) { static_cast<boost::promise<T> &&>(*this)=std::move(o); return *this; }
-	promise &operator=(promise &&o) { static_cast<boost::promise<T> &&>(*this)=std::move(o); return *this; }
-};
-/*! \brief For now, this is boost's exception_ptr. Will be replaced when C++'s promise catches up with boost's
+ASYNC_FILE_IO_FORWARD_STL_IMPL(promise, boost::promise)
+/*! \brief For now, this is boost's exception_ptr. Will be replaced when C++'s exception_ptr catches up with boost's
 */
 typedef boost::exception_ptr exception_ptr;
 template<class T> inline exception_ptr make_exception_ptr(const T &e) { return boost::copy_exception(e); }
+using std::current_exception;
+/*! \brief For now, this is boost's packaged_task. Will be replaced when C++'s packaged_task catches up with boost's
+*/
+template<class> class packaged_task;
+template<class R, class... Args> class packaged_task<R(Args...)> : public boost::packaged_task<R(Args...)>
+{
+	typedef boost::packaged_task<R(Args...)> Base;
+public:
+	packaged_task() { }
+	packaged_task(Base &&o) : Base(std::move(o)) { }
+	packaged_task(packaged_task &&o) : Base(static_cast<Base &&>(o)) { }
+	template<class T> packaged_task(T &&o) : Base(std::forward<T>(o)) { }
+	packaged_task &operator=(Base &&o) { static_cast<Base &&>(*this)=std::move(o); return *this; }
+	packaged_task &operator=(packaged_task &&o) { static_cast<Base &&>(*this)=std::move(o); return *this; }
+};
 
 /*! \class thread_pool
 \brief A very simple thread pool based on Boost.ASIO and std::thread
@@ -597,8 +613,8 @@ public:
 		typedef typename std::result_of<F()>::type R;
 		// Somewhat annoyingly, io_service.post() needs its parameter to be copy constructible,
 		// and packaged_task is only move constructible, so ...
-		auto task=std::make_shared<boost::packaged_task<R>>(std::move(f)); // NOTE to self later: this ought to go to std::packaged_task<R()>
-		service.post(std::bind([](std::shared_ptr<boost::packaged_task<R>> t) { (*t)(); }, task));
+		auto task=std::make_shared<packaged_task<R()>>(std::move(f));
+		service.post(std::bind([](std::shared_ptr<packaged_task<R()>> t) { (*t)(); }, task));
 		return task->get_future();
 	}
 };
@@ -864,7 +880,9 @@ struct async_io_op
 	shared_future<std::shared_ptr<detail::async_io_handle>> h;	//!< A future handle to the item being operated upon
 
 	async_io_op() : id(0) { }
-	async_io_op(std::shared_ptr<async_file_io_dispatcher_base> _parent, size_t _id, shared_future<std::shared_ptr<detail::async_io_handle>> _handle) : parent(_parent), id(_id), h(_handle) { }
+	async_io_op(const async_io_op &o) : parent(o.parent), id(o.id), h(o.h) { }
+	async_io_op(async_io_op &&o) : parent(std::move(o.parent)), id(std::move(o.id)), h(std::move(o.h)) { }
+	async_io_op(std::shared_ptr<async_file_io_dispatcher_base> _parent, size_t _id, shared_future<std::shared_ptr<detail::async_io_handle>> _handle) : parent(_parent), id(_id), h(std::move(_handle)) { }
 	async_io_op(std::shared_ptr<async_file_io_dispatcher_base> _parent, size_t _id) : parent(_parent), id(_id) { }
 };
 
@@ -901,7 +919,7 @@ namespace detail
 			catch(...)
 #endif
 			{
-				exception_ptr e(async_io::make_exception_ptr(std::current_exception()));
+				exception_ptr e(async_io::make_exception_ptr(current_exception()));
 				state->done.set_exception(e);
 				done=true;
 			}
@@ -973,15 +991,15 @@ struct async_path_op_req
 	//! Fails is path is not absolute
 	async_path_op_req(std::filesystem::path _path, file_flags _flags=file_flags::None) : path(_path), flags(_flags) { if(!path.is_absolute()) throw std::runtime_error("Non-absolute path"); }
 	//! Fails is path is not absolute
-	async_path_op_req(async_io_op _precondition, std::filesystem::path _path, file_flags _flags=file_flags::None) : path(_path), flags(_flags), precondition(_precondition) { if(!path.is_absolute()) throw std::runtime_error("Non-absolute path"); }
+	async_path_op_req(async_io_op _precondition, std::filesystem::path _path, file_flags _flags=file_flags::None) : path(_path), flags(_flags), precondition(std::move(_precondition)) { if(!path.is_absolute()) throw std::runtime_error("Non-absolute path"); }
 	//! Constructs on the basis of a string. make_preferred() and absolute() are called in this case.
 	async_path_op_req(std::string _path, file_flags _flags=file_flags::None) : path(std::filesystem::absolute(std::filesystem::path(_path).make_preferred())), flags(_flags) { }
 	//! Constructs on the basis of a string. make_preferred() and absolute() are called in this case.
-	async_path_op_req(async_io_op _precondition, std::string _path, file_flags _flags=file_flags::None) : path(std::filesystem::absolute(std::filesystem::path(_path).make_preferred())), flags(_flags), precondition(_precondition) { }
+	async_path_op_req(async_io_op _precondition, std::string _path, file_flags _flags=file_flags::None) : path(std::filesystem::absolute(std::filesystem::path(_path).make_preferred())), flags(_flags), precondition(std::move(_precondition)) { }
 	//! Constructs on the basis of a string. make_preferred() and absolute() are called in this case.
 	async_path_op_req(const char *_path, file_flags _flags=file_flags::None) : path(std::filesystem::absolute(std::filesystem::path(_path).make_preferred())), flags(_flags) { }
 	//! Constructs on the basis of a string. make_preferred() and absolute() are called in this case.
-	async_path_op_req(async_io_op _precondition, const char *_path, file_flags _flags=file_flags::None) : path(std::filesystem::absolute(std::filesystem::path(_path).make_preferred())), flags(_flags), precondition(_precondition) { }
+	async_path_op_req(async_io_op _precondition, const char *_path, file_flags _flags=file_flags::None) : path(std::filesystem::absolute(std::filesystem::path(_path).make_preferred())), flags(_flags), precondition(std::move(_precondition)) { }
 };
 
 /*! \struct async_data_op_req
@@ -993,8 +1011,10 @@ template<> struct async_data_op_req<void> // For reading
 	std::vector<boost::asio::mutable_buffer> buffers;
 	off_t where;
 	async_data_op_req() { }
-	async_data_op_req(async_io_op _precondition, void *_buffer, size_t _length, off_t _where) : precondition(_precondition), where(_where) { buffers.reserve(1); buffers.push_back(boost::asio::mutable_buffer(_buffer, _length)); }
-	async_data_op_req(async_io_op _precondition, std::vector<boost::asio::mutable_buffer> _buffers, off_t _where) : precondition(_precondition), buffers(_buffers), where(_where) { }
+	async_data_op_req(const async_data_op_req &o) : precondition(o.precondition), buffers(o.buffers), where(o.where) { }
+	async_data_op_req(async_data_op_req &&o) : precondition(std::move(o.precondition)), buffers(std::move(o.buffers)), where(std::move(o.where)) { }
+	async_data_op_req(async_io_op _precondition, void *_buffer, size_t _length, off_t _where) : precondition(std::move(_precondition)), where(_where) { buffers.reserve(1); buffers.push_back(boost::asio::mutable_buffer(_buffer, _length)); }
+	async_data_op_req(async_io_op _precondition, std::vector<boost::asio::mutable_buffer> _buffers, off_t _where) : precondition(std::move(_precondition)), buffers(_buffers), where(_where) { }
 };
 template<> struct async_data_op_req<const void> // For writing
 {
@@ -1002,57 +1022,80 @@ template<> struct async_data_op_req<const void> // For writing
 	std::vector<boost::asio::const_buffer> buffers;
 	off_t where;
 	async_data_op_req() { }
+	async_data_op_req(const async_data_op_req &o) : precondition(o.precondition), buffers(o.buffers), where(o.where) { }
+	async_data_op_req(async_data_op_req &&o) : precondition(std::move(o.precondition)), buffers(std::move(o.buffers)), where(std::move(o.where)) { }
 	async_data_op_req(const async_data_op_req<void> &o) : precondition(o.precondition), where(o.where) { buffers.reserve(o.buffers.capacity()); for(auto &i: o.buffers) buffers.push_back(i); }
-	async_data_op_req(async_io_op _precondition, const void *_buffer, size_t _length, off_t _where) : precondition(_precondition), where(_where) { buffers.reserve(1); buffers.push_back(boost::asio::const_buffer(_buffer, _length)); }
-	async_data_op_req(async_io_op _precondition, std::vector<boost::asio::const_buffer> _buffers, off_t _where) : precondition(_precondition), buffers(_buffers), where(_where) { }
+	async_data_op_req(async_data_op_req<void> &&o) : precondition(std::move(o.precondition)), where(o.where) { buffers.reserve(o.buffers.capacity()); for(auto &&i: o.buffers) buffers.push_back(std::move(i)); }
+	async_data_op_req(async_io_op _precondition, const void *_buffer, size_t _length, off_t _where) : precondition(std::move(_precondition)), where(_where) { buffers.reserve(1); buffers.push_back(boost::asio::const_buffer(_buffer, _length)); }
+	async_data_op_req(async_io_op _precondition, std::vector<boost::asio::const_buffer> _buffers, off_t _where) : precondition(std::move(_precondition)), buffers(_buffers), where(_where) { }
 };
 //! \brief A specialisation for any pointer to type T
 template<class T> struct async_data_op_req : public async_data_op_req<void>
 {
 	async_data_op_req() { }
-	async_data_op_req(async_io_op _precondition, T *_buffer, size_t _length, off_t _where) : async_data_op_req<void>(_precondition, static_cast<void *>(_buffer), _length, _where) { }
+	async_data_op_req(const async_data_op_req &o) : async_data_op_req<void>(o) { }
+	async_data_op_req(async_data_op_req &&o) : async_data_op_req<void>(std::move(o)) { }
+	async_data_op_req(async_io_op _precondition, T *_buffer, size_t _length, off_t _where) : async_data_op_req<void>(std::move(_precondition), static_cast<void *>(_buffer), _length, _where) { }
 };
 template<class T> struct async_data_op_req<const T> : public async_data_op_req<const void>
 {
 	async_data_op_req() { }
-	async_data_op_req(const async_data_op_req<T> &o) : precondition(o.precondition), where(o.where) { buffers.reserve(o.buffers.capacity()); for(auto &i: o.buffers) buffers.push_back(i); }
-	async_data_op_req(async_io_op _precondition, const T *_buffer, size_t _length, off_t _where) : async_data_op_req<const void>(_precondition, static_cast<const void *>(_buffer), _length, _where) { }
+	async_data_op_req(const async_data_op_req &o) : async_data_op_req<const void>(o) { }
+	async_data_op_req(async_data_op_req &&o) : async_data_op_req<const void>(std::move(o)) { }
+	async_data_op_req(const async_data_op_req<T> &o) : async_data_op_req<const void>(o) { }
+	async_data_op_req(async_data_op_req<T> &&o) : async_data_op_req<const void>(std::move(o)) { }
+	async_data_op_req(async_io_op _precondition, const T *_buffer, size_t _length, off_t _where) : async_data_op_req<const void>(std::move(_precondition), static_cast<const void *>(_buffer), _length, _where) { }
 };
 //! \brief A specialisation for any std::vector<T, A>
 template<class T, class A> struct async_data_op_req<std::vector<T, A>> : public async_data_op_req<void>
 {
 	async_data_op_req() { }
-	async_data_op_req(async_io_op _precondition, std::vector<T, A> &v, off_t _where) : async_data_op_req<void>(_precondition, static_cast<void *>(&v.front()), v.size()*sizeof(T), _where) { }
+	async_data_op_req(const async_data_op_req &o) : async_data_op_req<void>(o) { }
+	async_data_op_req(async_data_op_req &&o) : async_data_op_req<void>(std::move(o)) { }
+	async_data_op_req(async_io_op _precondition, std::vector<T, A> &v, off_t _where) : async_data_op_req<void>(std::move(_precondition), static_cast<void *>(&v.front()), v.size()*sizeof(T), _where) { }
 };
 template<class T, class A> struct async_data_op_req<const std::vector<T, A>> : public async_data_op_req<const void>
 {
 	async_data_op_req() { }
-	async_data_op_req(const async_data_op_req<const std::vector<T, A>> &o) : precondition(o.precondition), where(o.where) { buffers.reserve(o.buffers.capacity()); for(auto &i: o.buffers) buffers.push_back(i); }
-	async_data_op_req(async_io_op _precondition, const std::vector<T, A> &v, off_t _where) : async_data_op_req<const void>(_precondition, static_cast<const void *>(&v.front()), v.size()*sizeof(T), _where) { }
+	async_data_op_req(const async_data_op_req &o) : async_data_op_req<const void>(o) { }
+	async_data_op_req(async_data_op_req &&o) : async_data_op_req<const void>(std::move(o)) { }
+	async_data_op_req(const async_data_op_req<std::vector<T, A>> &o) : async_data_op_req<const void>(o) { }
+	async_data_op_req(async_data_op_req<std::vector<T, A>> &&o) : async_data_op_req<const void>(std::move(o)) { }
+	async_data_op_req(async_io_op _precondition, const std::vector<T, A> &v, off_t _where) : async_data_op_req<const void>(std::move(_precondition), static_cast<const void *>(&v.front()), v.size()*sizeof(T), _where) { }
 };
 //! \brief A specialisation for any std::array<T, N>
 template<class T, size_t N> struct async_data_op_req<std::array<T, N>> : public async_data_op_req<void>
 {
 	async_data_op_req() { }
-	async_data_op_req(async_io_op _precondition, std::array<T, N> &v, off_t _where) : async_data_op_req<void>(_precondition, static_cast<void *>(&v.front()), v.size()*sizeof(T), _where) { }
+	async_data_op_req(const async_data_op_req &o) : async_data_op_req<void>(o) { }
+	async_data_op_req(async_data_op_req &&o) : async_data_op_req<void>(std::move(o)) { }
+	async_data_op_req(async_io_op _precondition, std::array<T, N> &v, off_t _where) : async_data_op_req<void>(std::move(_precondition), static_cast<void *>(&v.front()), v.size()*sizeof(T), _where) { }
 };
 template<class T, size_t N> struct async_data_op_req<const std::array<T, N>> : public async_data_op_req<const void>
 {
 	async_data_op_req() { }
-	async_data_op_req(const async_data_op_req<const std::array<T, N>> &o) : precondition(o.precondition), where(o.where) { buffers.reserve(o.buffers.capacity()); for(auto &i: o.buffers) buffers.push_back(i); }
-	async_data_op_req(async_io_op _precondition, const std::array<T, N> &v, off_t _where) : async_data_op_req<const void>(_precondition, static_cast<const void *>(&v.front()), v.size()*sizeof(T), _where) { }
+	async_data_op_req(const async_data_op_req &o) : async_data_op_req<const void>(o) { }
+	async_data_op_req(async_data_op_req &&o) : async_data_op_req<const void>(std::move(o)) { }
+	async_data_op_req(const async_data_op_req<std::array<T, N>> &o) : async_data_op_req<const void>(o) { }
+	async_data_op_req(async_data_op_req<std::array<T, N>> &&o) : async_data_op_req<const void>(std::move(o)) { }
+	async_data_op_req(async_io_op _precondition, const std::array<T, N> &v, off_t _where) : async_data_op_req<const void>(std::move(_precondition), static_cast<const void *>(&v.front()), v.size()*sizeof(T), _where) { }
 };
 //! \brief A specialisation for any std::basic_string<C, T, A>
 template<class C, class T, class A> struct async_data_op_req<std::basic_string<C, T, A>> : public async_data_op_req<void>
 {
 	async_data_op_req() { }
-	async_data_op_req(async_io_op _precondition, std::basic_string<C, T, A> &v, off_t _where) : async_data_op_req<void>(_precondition, static_cast<void *>(&v.front()), v.size()*sizeof(A), _where) { }
+	async_data_op_req(const async_data_op_req &o) : async_data_op_req<void>(o) { }
+	async_data_op_req(async_data_op_req &&o) : async_data_op_req<void>(std::move(o)) { }
+	async_data_op_req(async_io_op _precondition, std::basic_string<C, T, A> &v, off_t _where) : async_data_op_req<void>(std::move(_precondition), static_cast<void *>(&v.front()), v.size()*sizeof(A), _where) { }
 };
 template<class C, class T, class A> struct async_data_op_req<const std::basic_string<C, T, A>> : public async_data_op_req<const void>
 {
 	async_data_op_req() { }
-	async_data_op_req(const async_data_op_req<const std::basic_string<C, T, A>> &o) : precondition(o.precondition), where(o.where) { buffers.reserve(o.buffers.capacity()); for(auto &i: o.buffers) buffers.push_back(i); }
-	async_data_op_req(async_io_op _precondition, const std::basic_string<C, T, A> &v, off_t _where) : async_data_op_req<const void>(_precondition, static_cast<const void *>(&v.front()), v.size()*sizeof(A), _where) { }
+	async_data_op_req(const async_data_op_req &o) : async_data_op_req<const void>(o) { }
+	async_data_op_req(async_data_op_req &&o) : async_data_op_req<const void>(std::move(o)) { }
+	async_data_op_req(const async_data_op_req<std::basic_string<C, T, A>> &o) : async_data_op_req<const void>(o) { }
+	async_data_op_req(async_data_op_req<std::basic_string<C, T, A>> &&o) : async_data_op_req<const void>(std::move(o)) { }
+	async_data_op_req(async_io_op _precondition, const std::basic_string<C, T, A> &v, off_t _where) : async_data_op_req<const void>(std::move(_precondition), static_cast<const void *>(&v.front()), v.size()*sizeof(A), _where) { }
 };
 
 namespace detail {
@@ -1078,18 +1121,18 @@ inline async_io_op async_file_io_dispatcher_base::completion(const async_io_op &
 	r.reserve(1); i.reserve(1);
 	r.push_back(req);
 	i.push_back(callback);
-	return completion(r, i).front();
+	return std::move(completion(r, i).front());
 }
 template<class C, class... Args> inline std::pair<std::vector<future<typename std::result_of<C(Args...)>::type>>, std::vector<async_io_op>> async_file_io_dispatcher_base::call(const std::vector<async_io_op> &ops, std::vector<std::tuple<C, Args...>> &&callables)
 {
 	typedef typename std::result_of<C(Args...)>::type rettype;
-	typedef boost::packaged_task<rettype> tasktype; // NOTE to self later: this ought to go to std::packaged_task<rettype(Args...)>
+	typedef packaged_task<rettype(typename std::decay<Args>::type...)> tasktype;
 	std::vector<future<rettype>> retfutures;
 	std::vector<std::pair<async_op_flags, std::function<completion_t>>> callbacks;
 	retfutures.reserve(callables.size());
 	callbacks.reserve(callables.size());
 	auto f=[](size_t, std::shared_ptr<detail::async_io_handle> _, std::shared_ptr<tasktype> c, std::tuple<C, Args...> args) {
-		NiallsCPP11Utilities::call_using_tuple<1>(std::move(*c), args);
+		NiallsCPP11Utilities::call_using_tuple<1>(std::forward<tasktype>(*c), std::forward<std::tuple<C, Args...>>(args));
 		return std::make_pair(true, _);
 	};
 	for(auto &&t : callables)
@@ -1098,7 +1141,7 @@ template<class C, class... Args> inline std::pair<std::vector<future<typename st
 		retfutures.push_back(c->get_future());
 		callbacks.push_back(std::make_pair(async_op_flags::None, std::bind(f, std::placeholders::_1, std::placeholders::_2, c, std::move(t))));
 	}
-	return std::make_pair(retfutures, completion(ops, callbacks));
+	return std::make_pair(std::move(retfutures), completion(ops, callbacks));
 }
 template<class C, class... Args> inline std::pair<future<typename std::result_of<C(Args...)>::type>, async_io_op> async_file_io_dispatcher_base::call(const async_io_op &req, C callback, Args... args)
 {
@@ -1109,63 +1152,63 @@ template<class C, class... Args> inline std::pair<future<typename std::result_of
 	i.push_back(req);
 	c.push_back(std::make_tuple(callback, args...));
 	std::pair<std::vector<future<rettype>>, std::vector<async_io_op>> ret(call(i, c));
-	return std::make_pair(ret.first.front(), ret.second.front());
+	return std::make_pair(std::move(ret.first.front()), ret.second.front());
 }
 inline async_io_op async_file_io_dispatcher_base::dir(const async_path_op_req &req)
 {
 	std::vector<async_path_op_req> i;
 	i.reserve(1);
 	i.push_back(req);
-	return dir(i).front();
+	return std::move(dir(i).front());
 }
 inline async_io_op async_file_io_dispatcher_base::rmdir(const async_path_op_req &req)
 {
 	std::vector<async_path_op_req> i;
 	i.reserve(1);
 	i.push_back(req);
-	return rmdir(i).front();
+	return std::move(rmdir(i).front());
 }
 inline async_io_op async_file_io_dispatcher_base::file(const async_path_op_req &req)
 {
 	std::vector<async_path_op_req> i;
 	i.reserve(1);
 	i.push_back(req);
-	return file(i).front();
+	return std::move(file(i).front());
 }
 inline async_io_op async_file_io_dispatcher_base::rmfile(const async_path_op_req &req)
 {
 	std::vector<async_path_op_req> i;
 	i.reserve(1);
 	i.push_back(req);
-	return rmfile(i).front();
+	return std::move(rmfile(i).front());
 }
 inline async_io_op async_file_io_dispatcher_base::sync(const async_io_op &req)
 {
 	std::vector<async_io_op> i;
 	i.reserve(1);
 	i.push_back(req);
-	return sync(i).front();
+	return std::move(sync(i).front());
 }
 inline async_io_op async_file_io_dispatcher_base::close(const async_io_op &req)
 {
 	std::vector<async_io_op> i;
 	i.reserve(1);
 	i.push_back(req);
-	return close(i).front();
+	return std::move(close(i).front());
 }
 inline async_io_op async_file_io_dispatcher_base::read(const async_data_op_req<void> &req)
 {
 	std::vector<async_data_op_req<void>> i;
 	i.reserve(1);
 	i.push_back(req);
-	return read(i).front();
+	return std::move(read(i).front());
 }
 inline async_io_op async_file_io_dispatcher_base::write(const async_data_op_req<const void> &req)
 {
 	std::vector<async_data_op_req<const void>> i;
 	i.reserve(1);
 	i.push_back(req);
-	return write(i).front();
+	return std::move(write(i).front());
 }
 template<class T> inline std::vector<async_io_op> async_file_io_dispatcher_base::read(const std::vector<async_data_op_req<T>> &ops)
 {
@@ -1195,7 +1238,7 @@ inline async_io_op async_file_io_dispatcher_base::truncate(const async_io_op &op
 	o.push_back(op);
 	i.reserve(1);
 	i.push_back(newsize);
-	return truncate(o, i).front();
+	return std::move(truncate(o, i).front());
 }
 
 
