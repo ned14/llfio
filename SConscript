@@ -72,7 +72,7 @@ else:
     else:
         env['CCFLAGS']+=["-O2", "-g"]
     env['CXXFLAGS']+=["-std=c++0x"]
-    env['LIBS']+=["boost_filesystem", "boost_system", "boost_thread", "pthread"]
+    env['LIBS']+=["boost_atomic", "boost_filesystem", "boost_system", "boost_thread", "pthread"]
     env['LINKFLAGS']+=[]
     env['LINKFLAGSEXE']=env['LINKFLAGS'][:]
 
@@ -84,10 +84,13 @@ outputs['mylibs']=SConscript("triplegit/SConscript")
 # Unit tests
 sources = env.SConscript(os.path.join("unittests", "SConscript"), 'importedenv')
 objects = env.Object(source = sources) # + [myliblib]
-testlibs=outputs['mylibs']['triplegitlib'][0]
+testlibs=outputs['mylibs']['triplegitlib'][0] + outputs['mylibs']['NiallsCPP11Utilitieslib']
 
-testprogram_cpp = env.Program("tests", source = objects, LINKFLAGS=env['LINKFLAGSEXE'], LIBS = env['LIBS'] + testlibs)
+testprogram_cpp = env.Program("tests", source = objects, LINKFLAGS=env['LINKFLAGSEXE'], LIBS = testlibs + env['LIBS'])
 outputs['unittests']=(testprogram_cpp, sources)
+
+GSoC_test = env.Program("GSoC_test", source=env.SConscript(os.path.join("GSoCTest", "SConscript"), 'importedenv'), LINKFLAGS=env['LINKFLAGSEXE'], LIBS = testlibs + env['LIBS'])
+outputs['GSoC_test']=(GSoC_test)
 
 # Remove triplegit lib contents from mylibs
 del outputs['mylibs']

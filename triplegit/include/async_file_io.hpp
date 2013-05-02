@@ -13,6 +13,7 @@ File Created: Mar 2013
 #include <initializer_list>
 #include <thread>
 #include <atomic>
+#include <exception>
 #if !defined(_WIN32_WINNT) && defined(WIN32)
 #define _WIN32_WINNT 0x0501
 #endif

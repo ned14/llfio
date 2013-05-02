@@ -81,7 +81,8 @@ outputs={}
 # Build the triplegit DLL
 sources = env.SConscript(os.path.join("src", "SConscript"), 'importedenv')
 libobjects = env.SharedObject(sources, CPPDEFINES=env['CPPDEFINES']+["TRIPLEGIT_DLL_EXPORTS"])
-libobjects+=env.SConscript(os.path.join("..", "NiallsCPP11Utilities", "SConscript"), 'importedenv')['mylib']
+outputs['NiallsCPP11Utilitieslib']=env.SConscript(os.path.join("..", "NiallsCPP11Utilities", "SConscript"), 'importedenv')['mylib']
+libobjects+=outputs['NiallsCPP11Utilitieslib']
 env['RPATH']+=["."]
 if env.GetOption("static"):
     mylib = env.StaticLibrary("triplegit", source = libobjects)
