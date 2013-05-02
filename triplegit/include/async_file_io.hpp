@@ -17,7 +17,7 @@ File Created: Mar 2013
 #define _WIN32_WINNT 0x0501
 #endif
 #define BOOST_THREAD_VERSION 4
-#define BOOST_THREAD_PROVIDES_VARIADIC_THREAD
+//#define BOOST_THREAD_PROVIDES_VARIADIC_THREAD
 //#define BOOST_THREAD_DONT_PROVIDE_FUTURE
 //#define BOOST_THREAD_PROVIDES_SIGNATURE_PACKAGED_TASK
 #include "boost/asio.hpp"
@@ -557,12 +557,13 @@ ASYNC_FILE_IO_FORWARD_STL_IMPL(promise, boost::promise)
 typedef boost::exception_ptr exception_ptr;
 template<class T> inline exception_ptr make_exception_ptr(const T &e) { return boost::copy_exception(e); }
 using std::current_exception;
-/*! \brief For now, this is boost's packaged_task. Will be replaced when C++'s packaged_task catches up with boost's
+/*! \brief For now, this is an emulation of std::packaged_task based on boost's packaged_task.
+We have to drop the Args... support because it segfaults MSVC Nov 2012 CTP.
 */
 template<class> class packaged_task;
-template<class R, class... Args> class packaged_task<R(Args...)> : public boost::packaged_task<R(Args...)>
+template<class R> class packaged_task<R()> : public boost::packaged_task<R()>
 {
-	typedef boost::packaged_task<R(Args...)> Base;
+	typedef boost::packaged_task<R()> Base;
 public:
 	packaged_task() { }
 	packaged_task(Base &&o) : Base(std::move(o)) { }
@@ -805,7 +806,7 @@ public:
 	inline async_io_op completion(const async_io_op &req, const std::pair<async_op_flags, std::function<completion_t>> &callback);
 
 	//! Invoke the specified callable when the supplied operation completes
-	template<class C, class... Args> inline std::pair<std::vector<future<typename std::result_of<C(Args...)>::type>>, std::vector<async_io_op>> call(const std::vector<async_io_op> &ops, std::vector<std::tuple<C, Args...>> &&callables);
+	template<class R> inline std::pair<std::vector<future<R>>, std::vector<async_io_op>> call(const std::vector<async_io_op> &ops, const std::vector<std::function<R()>> &callables);
 	//! Invoke the specified callable when the supplied operation completes
 	template<class C, class... Args> inline std::pair<future<typename std::result_of<C(Args...)>::type>, async_io_op> call(const async_io_op &req, C callback, Args... args);
 
@@ -884,6 +885,8 @@ struct async_io_op
 	async_io_op(async_io_op &&o) : parent(std::move(o.parent)), id(std::move(o.id)), h(std::move(o.h)) { }
 	async_io_op(std::shared_ptr<async_file_io_dispatcher_base> _parent, size_t _id, shared_future<std::shared_ptr<detail::async_io_handle>> _handle) : parent(_parent), id(_id), h(std::move(_handle)) { }
 	async_io_op(std::shared_ptr<async_file_io_dispatcher_base> _parent, size_t _id) : parent(_parent), id(_id) { }
+	async_io_op &operator=(const async_io_op &o) { parent=o.parent; id=o.id; h=o.h; return *this; }
+	async_io_op &operator=(async_io_op &&o) { parent=std::move(o.parent); id=std::move(o.id); h=std::move(o.h); return *this; }
 };
 
 namespace detail
@@ -1123,23 +1126,22 @@ inline async_io_op async_file_io_dispatcher_base::completion(const async_io_op &
 	i.push_back(callback);
 	return std::move(completion(r, i).front());
 }
-template<class C, class... Args> inline std::pair<std::vector<future<typename std::result_of<C(Args...)>::type>>, std::vector<async_io_op>> async_file_io_dispatcher_base::call(const std::vector<async_io_op> &ops, std::vector<std::tuple<C, Args...>> &&callables)
+template<class R> inline std::pair<std::vector<future<R>>, std::vector<async_io_op>> async_file_io_dispatcher_base::call(const std::vector<async_io_op> &ops, const std::vector<std::function<R()>> &callables)
 {
-	typedef typename std::result_of<C(Args...)>::type rettype;
-	typedef packaged_task<rettype(typename std::decay<Args>::type...)> tasktype;
-	std::vector<future<rettype>> retfutures;
+	typedef packaged_task<R()> tasktype;
+	std::vector<future<R>> retfutures;
 	std::vector<std::pair<async_op_flags, std::function<completion_t>>> callbacks;
 	retfutures.reserve(callables.size());
 	callbacks.reserve(callables.size());
-	auto f=[](size_t, std::shared_ptr<detail::async_io_handle> _, std::shared_ptr<tasktype> c, std::tuple<C, Args...> args) {
-		NiallsCPP11Utilities::call_using_tuple<1>(std::forward<tasktype>(*c), std::forward<std::tuple<C, Args...>>(args));
+	auto f=[](size_t, std::shared_ptr<detail::async_io_handle> _, std::shared_ptr<tasktype> c) {
+		(*c)();
 		return std::make_pair(true, _);
 	};
-	for(auto &&t : callables)
+	for(auto &t : callables)
 	{
-		std::shared_ptr<tasktype> c(new tasktype(std::move(std::get<0>(t))));
+		std::shared_ptr<tasktype> c(std::make_shared<tasktype>(t));
 		retfutures.push_back(c->get_future());
-		callbacks.push_back(std::make_pair(async_op_flags::None, std::bind(f, std::placeholders::_1, std::placeholders::_2, c, std::move(t))));
+		callbacks.push_back(std::make_pair(async_op_flags::None, std::bind(f, std::placeholders::_1, std::placeholders::_2, std::move(c))));
 	}
 	return std::make_pair(std::move(retfutures), completion(ops, callbacks));
 }
@@ -1147,10 +1149,10 @@ template<class C, class... Args> inline std::pair<future<typename std::result_of
 {
 	typedef typename std::result_of<C(Args...)>::type rettype;
 	std::vector<async_io_op> i;
-	std::vector<std::tuple<C, Args...>> c;
+	std::vector<std::function<rettype()>> c;
 	i.reserve(1); c.reserve(1);
 	i.push_back(req);
-	c.push_back(std::make_tuple(callback, args...));
+	c.push_back(std::move(std::bind<rettype()>(callback, args...)));
 	std::pair<std::vector<future<rettype>>, std::vector<async_io_op>> ret(call(i, c));
 	return std::make_pair(std::move(ret.first.front()), ret.second.front());
 }

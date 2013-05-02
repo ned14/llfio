@@ -62,8 +62,8 @@ if sys.platform=="win32" and 'INCLUDE' not in os.environ:
 AddOption('--postfix', dest='postfix', nargs=1, default='_test', help='appends a string to the DLL name')
 AddOption('--debugbuild', dest='debug', nargs='?', const=True, help='enable debug build')
 AddOption('--static', dest='static', nargs='?', const=True, help='build a static library rather than shared library')
-AddOption('--useclang', dest='useclang', nargs=1, type='str', default='clang++', help='use clang if it is available')
-AddOption('--usegcc', dest='usegcc', nargs=1, type='str', default='g++', help='use gcc if it is available')
+AddOption('--useclang', dest='useclang', nargs=1, type='str', help='use clang if it is available')
+AddOption('--usegcc', dest='usegcc', nargs=1, type='str', help='use gcc if it is available')
 AddOption('--force32', dest='force32', help='force 32 bit build on 64 bit machine')
 AddOption('--archs', dest='archs', nargs=1, type='str', default='min', help='which architectures to build, comma separated. all means all. Defaults to min.')
 if 'x86' in architectures:

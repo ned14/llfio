@@ -85,6 +85,7 @@ outputs['mylibs']=SConscript("triplegit/SConscript")
 sources = env.SConscript(os.path.join("unittests", "SConscript"), 'importedenv')
 objects = env.Object(source = sources) # + [myliblib]
 testlibs=outputs['mylibs']['triplegitlib'][0]
+
 testprogram_cpp = env.Program("tests", source = objects, LINKFLAGS=env['LINKFLAGSEXE'], LIBS = env['LIBS'] + testlibs)
 outputs['unittests']=(testprogram_cpp, sources)
 
