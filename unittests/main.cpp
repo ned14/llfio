@@ -72,8 +72,10 @@ void raninit( ranctx *x, u4 seed ) {
 
 int main (int argc, char * const argv[]) {
     int ret=Catch::Main( argc, argv );
+#if defined(WIN32) && !defined(NDEBUG)
 	printf("Press Return to exit ...\n");
 	getchar();
+#endif
 	return ret;
 }
 

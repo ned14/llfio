@@ -121,13 +121,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:af0627f7511cac82528dcd7ed490b5211"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structtriplegit_1_1async__io_1_1async__io__op.html">async_io_op</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtriplegit_1_1async__io_1_1async__file__io__dispatcher__base.html#af0627f7511cac82528dcd7ed490b5211">completion</a> (const <a class="el" href="structtriplegit_1_1async__io_1_1async__io__op.html">async_io_op</a> &amp;req, const std::pair&lt; async_op_flags, std::function&lt; completion_t &gt;&gt; &amp;callback)</td></tr>
 <tr class="memdesc:af0627f7511cac82528dcd7ed490b5211"><td class="mdescLeft">&#160;</td><td class="mdescRight">Invoke the specified function when the supplied operation completes.  <a href="#af0627f7511cac82528dcd7ed490b5211"></a><br/></td></tr>
 <tr class="separator:af0627f7511cac82528dcd7ed490b5211"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4d9b04666f9b32347504958a69d91476"><td class="memTemplParams" colspan="2">template&lt;class C , class... Args&gt; </td></tr>
-<tr class="memitem:a4d9b04666f9b32347504958a69d91476"><td class="memTemplItemLeft" align="right" valign="top">std::pair&lt; std::vector&lt; <a class="el" href="classtriplegit_1_1async__io_1_1future.html">future</a><br class="typebreak"/>
-&lt; typename std::result_of&lt; C(Args...)&gt;<br class="typebreak"/>
-::type &gt; &gt;, std::vector<br class="typebreak"/>
-&lt; <a class="el" href="structtriplegit_1_1async__io_1_1async__io__op.html">async_io_op</a> &gt; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classtriplegit_1_1async__io_1_1async__file__io__dispatcher__base.html#a4d9b04666f9b32347504958a69d91476">call</a> (const std::vector&lt; <a class="el" href="structtriplegit_1_1async__io_1_1async__io__op.html">async_io_op</a> &gt; &amp;ops, std::vector&lt; std::tuple&lt; C, Args...&gt;&gt; &amp;&amp;callables)</td></tr>
-<tr class="memdesc:a4d9b04666f9b32347504958a69d91476"><td class="mdescLeft">&#160;</td><td class="mdescRight">Invoke the specified callable when the supplied operation completes.  <a href="#a4d9b04666f9b32347504958a69d91476"></a><br/></td></tr>
-<tr class="separator:a4d9b04666f9b32347504958a69d91476"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af5ec8648416926263780d9c597db35ed"><td class="memTemplParams" colspan="2">template&lt;class R &gt; </td></tr>
+<tr class="memitem:af5ec8648416926263780d9c597db35ed"><td class="memTemplItemLeft" align="right" valign="top">std::pair&lt; std::vector&lt; <a class="el" href="classtriplegit_1_1async__io_1_1future.html">future</a><br class="typebreak"/>
+&lt; R &gt; &gt;, std::vector<br class="typebreak"/>
+&lt; <a class="el" href="structtriplegit_1_1async__io_1_1async__io__op.html">async_io_op</a> &gt; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classtriplegit_1_1async__io_1_1async__file__io__dispatcher__base.html#af5ec8648416926263780d9c597db35ed">call</a> (const std::vector&lt; <a class="el" href="structtriplegit_1_1async__io_1_1async__io__op.html">async_io_op</a> &gt; &amp;ops, const std::vector&lt; std::function&lt; R()&gt;&gt; &amp;callables)</td></tr>
+<tr class="memdesc:af5ec8648416926263780d9c597db35ed"><td class="mdescLeft">&#160;</td><td class="mdescRight">Invoke the specified callable when the supplied operation completes.  <a href="#af5ec8648416926263780d9c597db35ed"></a><br/></td></tr>
+<tr class="separator:af5ec8648416926263780d9c597db35ed"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7057167ed1a46e3b24fa3806bd6172c1"><td class="memTemplParams" colspan="2">template&lt;class C , class... Args&gt; </td></tr>
 <tr class="memitem:a7057167ed1a46e3b24fa3806bd6172c1"><td class="memTemplItemLeft" align="right" valign="top">std::pair&lt; <a class="el" href="classtriplegit_1_1async__io_1_1future.html">future</a>&lt; typename <br class="typebreak"/>
 std::result_of&lt; C(Args...)&gt;<br class="typebreak"/>
@@ -200,17 +199,17 @@ std::result_of&lt; C(Args...)&gt;<br class="typebreak"/>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Abstract base class for dispatching file i/o asynchronously. </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="a4d9b04666f9b32347504958a69d91476"></a>
+<a class="anchor" id="af5ec8648416926263780d9c597db35ed"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class C , class... Args&gt; </div>
+template&lt;class R &gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">std::pair&lt; std::vector&lt; <a class="el" href="classtriplegit_1_1async__io_1_1future.html">future</a>&lt; typename std::result_of&lt; C(Args...)&gt;::type &gt; &gt;, std::vector&lt; <a class="el" href="structtriplegit_1_1async__io_1_1async__io__op.html">async_io_op</a> &gt; &gt; triplegit::async_io::async_file_io_dispatcher_base::call </td>
+          <td class="memname">std::pair&lt; std::vector&lt; <a class="el" href="classtriplegit_1_1async__io_1_1future.html">future</a>&lt; R &gt; &gt;, std::vector&lt; <a class="el" href="structtriplegit_1_1async__io_1_1async__io__op.html">async_io_op</a> &gt; &gt; triplegit::async_io::async_file_io_dispatcher_base::call </td>
           <td>(</td>
           <td class="paramtype">const std::vector&lt; <a class="el" href="structtriplegit_1_1async__io_1_1async__io__op.html">async_io_op</a> &gt; &amp;&#160;</td>
           <td class="paramname"><em>ops</em>, </td>
@@ -218,7 +217,7 @@ template&lt;class C , class... Args&gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">std::vector&lt; std::tuple&lt; C, Args...&gt;&gt; &amp;&amp;&#160;</td>
+          <td class="paramtype">const std::vector&lt; std::function&lt; R()&gt;&gt; &amp;&#160;</td>
           <td class="paramname"><em>callables</em>&#160;</td>
         </tr>
         <tr>
