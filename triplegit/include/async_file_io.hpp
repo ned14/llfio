@@ -17,7 +17,7 @@ File Created: Mar 2013
 #if !defined(_WIN32_WINNT) && defined(WIN32)
 #define _WIN32_WINNT 0x0501
 #endif
-#define BOOST_THREAD_VERSION 4
+//#define BOOST_THREAD_VERSION 4
 //#define BOOST_THREAD_PROVIDES_VARIADIC_THREAD
 //#define BOOST_THREAD_DONT_PROVIDE_FUTURE
 //#define BOOST_THREAD_PROVIDES_SIGNATURE_PACKAGED_TASK
@@ -542,7 +542,11 @@ public: \
 
 when_all() and when_any() definitions borrowed from http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2012/n3428.pdf
 */
+#if BOOST_THREAD_VERSION >=4
 ASYNC_FILE_IO_FORWARD_STL_IMPL_NC(future, boost::future)
+#else
+ASYNC_FILE_IO_FORWARD_STL_IMPL_NC(future, boost::unique_future)
+#endif
 /*! \class shared_future
 \brief For now, this is boost's shared_future. Will be replaced when C++'s shared_future catches up with boost's
 
@@ -562,9 +566,16 @@ using std::current_exception;
 We have to drop the Args... support because it segfaults MSVC Nov 2012 CTP.
 */
 template<class> class packaged_task;
-template<class R> class packaged_task<R()> : public boost::packaged_task<R()>
+template<class R> class packaged_task<R()>
+#if BOOST_THREAD_VERSION >=4
+: public boost::packaged_task<R()>
 {
 	typedef boost::packaged_task<R()> Base;
+#else
+: public boost::packaged_task<R>
+	{
+		typedef boost::packaged_task<R> Base;
+#endif
 public:
 	packaged_task() { }
 	packaged_task(Base &&o) : Base(std::move(o)) { }
