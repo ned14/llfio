@@ -89,9 +89,6 @@ testlibs=outputs['mylibs']['triplegitlib'][0] + outputs['mylibs']['NiallsCPP11Ut
 testprogram_cpp = env.Program("tests", source = objects, LINKFLAGS=env['LINKFLAGSEXE'], LIBS = testlibs + env['LIBS'])
 outputs['unittests']=(testprogram_cpp, sources)
 
-GSoC_test = env.Program("GSoC_test", source=env.SConscript(os.path.join("GSoCTest", "SConscript"), 'importedenv'), LINKFLAGS=env['LINKFLAGSEXE'], LIBS = testlibs + env['LIBS'])
-outputs['GSoC_test']=(GSoC_test)
-
 # Remove triplegit lib contents from mylibs
 del outputs['mylibs']
 Return("outputs")
