@@ -1,5 +1,5 @@
-* text=auto !eol
-*.gitattributes text
+* text=auto !eol svneol=native#text/plain
+*.gitattributes text svneol=native#text/plain
 
 # Scriptish formats
 *.bat        text svneol=native#text/plain
