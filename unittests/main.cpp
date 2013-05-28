@@ -578,12 +578,10 @@ static void evil_random_io(std::shared_ptr<triplegit::async_io::async_file_io_di
 	for(size_t n=0; n<no; n++)
 		manyfilereqs.push_back(async_path_op_req(mkdir, "testdir/"+std::to_string(n), file_flags::Create|file_flags::Write));
 	auto manyopenfiles(dispatcher->file(manyfilereqs));
-	for(size_t n=0; n<no; n++)
-		manyfilereqs[n].precondition=dispatcher->truncate(dispatcher->close(manyopenfiles[n]), bytes);
-	manyopenfiles=dispatcher->file(manyfilereqs);
+	std::vector<off_t> sizes(no, bytes);
+	auto manywrittenfiles(dispatcher->truncate(manyopenfiles, sizes));
 
 	// Schedule a replay of our in-RAM simulation
-	std::vector<async_io_op> manywrittenfiles(manyopenfiles.cbegin(), manyopenfiles.cend());
 	size_t maxfailures=0;
 	for(size_t n=0; n<no; n++)
 		maxfailures+=todo[n].size();
@@ -599,7 +597,7 @@ static void evil_random_io(std::shared_ptr<triplegit::async_io::async_file_io_di
 			failures.push(&op);
 		return make_pair(true, h);
 	};
-#pragma omp parallel for
+//#pragma omp parallel for
 	for(ptrdiff_t n=0; n<(ptrdiff_t) no; n++)
 	{
 		for(Op &op : todo[n])

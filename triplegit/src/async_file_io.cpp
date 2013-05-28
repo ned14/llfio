@@ -32,6 +32,7 @@ File Created: Mar 2013
 #define posix_close _close
 #define posix_unlink _wunlink
 #define posix_fsync _commit
+#define posix_ftruncate _chsize_s
 #else
 #include <sys/uio.h>
 #define posix_mkdir mkdir
@@ -41,12 +42,13 @@ File Created: Mar 2013
 #define posix_close ::close
 #define posix_unlink unlink
 #define posix_fsync fsync
+#define posix_ftruncate ftruncate
 #endif
 
 // libstdc++ doesn't come with std::lock_guard
 #define lock_guard boost::lock_guard
 
-#if defined(_DEBUG) && 0
+#if defined(_DEBUG) && 1
 #ifdef WIN32
 #define DEBUG_PRINT(...) \
 	{ \
@@ -186,8 +188,25 @@ namespace detail {
 		sync,
 		close,
 		read,
-		write
+		write,
+		truncate,
+
+		Last
 	};
+	static const char *optypes[]={
+		"unknown",
+		"UserCompletion",
+		"dir",
+		"rmdir",
+		"file",
+		"rmfile",
+		"sync",
+		"close",
+		"read",
+		"write",
+		"truncate"
+	};
+	static_assert(static_cast<size_t>(OpType::Last)==sizeof(optypes)/sizeof(*optypes), "You forgot to fix up the strings matching OpType");
 	struct async_file_io_dispatcher_op
 	{
 		OpType optype;
@@ -493,7 +512,7 @@ template<class F, class... Args> async_io_op async_file_io_dispatcher_base::chai
 	}
 	auto opsit=p->ops.insert(std::make_pair(thisid, detail::async_file_io_dispatcher_op((detail::OpType) optype, flags, ret.h)));
 	assert(opsit.second);
-	DEBUG_PRINT("I %u\n", (unsigned) thisid);
+	DEBUG_PRINT("I %u < %u (%s)\n", (unsigned) thisid, precondition.id, detail::optypes[static_cast<int>(optype)]);
 	auto unopsit=NiallsCPP11Utilities::Undoer([this, opsit, thisid](){
 		p->ops.erase(opsit.first);
 		DEBUG_PRINT("E R %u\n", (unsigned) thisid);
@@ -508,14 +527,19 @@ template<class F, class... Args> async_io_op async_file_io_dispatcher_base::chai
 	undep.dismiss();
 	return ret;
 }
-template<class F, class T> std::vector<async_io_op> async_file_io_dispatcher_base::chain_async_ops(int optype, const std::vector<T> &container, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, T))
+template<class F, class T> std::vector<async_io_op> async_file_io_dispatcher_base::chain_async_ops(int optype, const std::vector<async_io_op> &preconditions, const std::vector<T> &container, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, T))
 {
 	std::vector<async_io_op> ret;
 	ret.reserve(container.size());
+	assert(preconditions.size()==container.size());
+	if(preconditions.size()!=container.size())
+		throw std::runtime_error("preconditions size does not match size of ops data");
 	lock_guard<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
 	detail::immediate_async_ops immediates;
-	for(auto &i : container)
-		ret.push_back(chain_async_op(immediates, optype, i, flags, f, i));
+	auto precondition_it=preconditions.cbegin();
+	auto container_it=container.cbegin();
+	for(; precondition_it!=preconditions.cend() && container_it!=container.cend(); ++precondition_it, ++container_it)
+		ret.push_back(chain_async_op(immediates, optype, *precondition_it, flags, f, *container_it));
 	return ret;
 }
 template<class F> std::vector<async_io_op> async_file_io_dispatcher_base::chain_async_ops(int optype, const std::vector<async_path_op_req> &container, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, async_path_op_req))
@@ -664,10 +688,27 @@ namespace detail {
 		completion_returntype dowrite(size_t id, std::shared_ptr<detail::async_io_handle> h, async_data_op_req<const void> req)
 		{
 			async_io_handle_windows *p=static_cast<async_io_handle_windows *>(h.get());
-			DEBUG_PRINT("W %u\n", (unsigned) id);
+			DEBUG_PRINT("W %u %p\n", (unsigned) id, h.get());
 			boost::asio::async_write_at(*p->h, req.where, req.buffers, boost::bind(&async_file_io_dispatcher_windows::boost_asio_completion_handler, this, true, id, h, boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred));
 			// Indicate we're not finished yet
 			return std::make_pair(false, h);
+		}
+		// Called in unknown thread
+		completion_returntype dotruncate(size_t id, std::shared_ptr<detail::async_io_handle> h, off_t _newsize)
+		{
+			async_io_handle_windows *p=static_cast<async_io_handle_windows *>(h.get());
+			DEBUG_PRINT("T %u %p\n", (unsigned) id, h.get());
+			// This is a bit tricky ... overlapped files ignore their file position except in this one
+			// case, but clearly here we have a race condition. No choice but to rinse and repeat I guess.
+			LARGE_INTEGER size={0}, newsize;
+			newsize.QuadPart=_newsize;
+			while(size.QuadPart!=newsize.QuadPart)
+			{
+				ERRHWINFN(SetFilePointerEx(p->h->native_handle(), newsize, NULL, FILE_BEGIN), p->path());
+				ERRHWINFN(SetEndOfFile(p->h->native_handle()), p->path());
+				ERRHWINFN(GetFileSizeEx(p->h->native_handle(), &size), p->path());
+			}
+			return std::make_pair(true, h);
 		}
 
 	public:
@@ -693,11 +734,11 @@ namespace detail {
 		}
 		virtual std::vector<async_io_op> sync(const std::vector<async_io_op> &ops)
 		{
-			return chain_async_ops((int) detail::OpType::sync, ops, async_op_flags::None, &async_file_io_dispatcher_windows::dosync);
+			return chain_async_ops((int) detail::OpType::sync, ops, ops, async_op_flags::None, &async_file_io_dispatcher_windows::dosync);
 		}
 		virtual std::vector<async_io_op> close(const std::vector<async_io_op> &ops)
 		{
-			return chain_async_ops((int) detail::OpType::close, ops, async_op_flags::None, &async_file_io_dispatcher_windows::doclose);
+			return chain_async_ops((int) detail::OpType::close, ops, ops, async_op_flags::None, &async_file_io_dispatcher_windows::doclose);
 		}
 		virtual std::vector<async_io_op> read(const std::vector<async_data_op_req<void>> &reqs)
 		{
@@ -707,28 +748,31 @@ namespace detail {
 		{
 			return chain_async_ops((int) detail::OpType::write, reqs, async_op_flags::DetachedFuture|async_op_flags::ImmediateCompletion, &async_file_io_dispatcher_windows::dowrite);
 		}
+		virtual std::vector<async_io_op> truncate(const std::vector<async_io_op> &ops, const std::vector<off_t> &sizes)
+		{
+			return chain_async_ops((int) detail::OpType::truncate, ops, sizes, async_op_flags::None, &async_file_io_dispatcher_windows::dotruncate);
+		}
 	};
 #endif
 	class async_file_io_dispatcher_compat : public async_file_io_dispatcher_base
 	{
-#ifdef __linux__
-		// Need to fsync the containing directory on Linux, otherwise the file isn't guaranteed to appear where we just created it
-		typedef boost::detail::spinlock linuxdirsynclock_t;
-		linuxdirsynclock_t linuxdirsynclock; std::unordered_map<std::filesystem::path, std::weak_ptr<async_io_handle>> linuxdirsync;
+		// Keep an optional weak reference counted index of containing directories on POSIX
+		typedef boost::detail::spinlock dircachelock_t;
+		dircachelock_t dircachelock; std::unordered_map<std::filesystem::path, std::weak_ptr<async_io_handle>> dircache;
 		std::shared_ptr<detail::async_io_handle> get_handle_to_containing_dir(const std::filesystem::path &path)
 		{
 			std::filesystem::path containingdir(path.parent_path());
 			std::shared_ptr<detail::async_io_handle> dirh;
-			lock_guard<linuxdirsynclock_t> linuxdirsynclockh(linuxdirsynclock);
+			lock_guard<dircachelock_t> dircachelockh(dircachelock);
 			do
 			{
-				std::unordered_map<std::filesystem::path, std::weak_ptr<async_io_handle>>::iterator it=linuxdirsync.find(containingdir);
-				if(linuxdirsync.end()==it || it->second.expired())
+				std::unordered_map<std::filesystem::path, std::weak_ptr<async_io_handle>>::iterator it=dircache.find(containingdir);
+				if(dircache.end()==it || it->second.expired())
 				{
-					if(linuxdirsync.end()!=it) linuxdirsync.erase(it);
+					if(dircache.end()!=it) dircache.erase(it);
 					dirh=std::shared_ptr<detail::async_io_handle>(new async_io_handle_posix(std::shared_ptr<async_file_io_dispatcher_base>(), std::shared_ptr<detail::async_io_handle>(),
 						containingdir, false, posix_open(containingdir.c_str(), O_RDONLY, 0x1b0/*660*/)));
-					auto _it=linuxdirsync.insert(std::make_pair(containingdir, std::weak_ptr<async_io_handle>(dirh)));
+					auto _it=dircache.insert(std::make_pair(containingdir, std::weak_ptr<async_io_handle>(dirh)));
 					return dirh;
 				}
 				else
@@ -736,7 +780,7 @@ namespace detail {
 			} while(!dirh);
 			return dirh;
 		}
-#endif
+
 		// Called in unknown thread
 		completion_returntype dodir(size_t id, std::shared_ptr<detail::async_io_handle> _, async_path_op_req req)
 		{
@@ -769,8 +813,10 @@ namespace detail {
 #ifdef __linux__
 				// Need to fsync the containing directory, otherwise the file isn't guaranteed to appear where we just created it
 				if(!!(req.flags & (file_flags::Create|file_flags::CreateOnlyIfNotExist)) && !!(req.flags & (file_flags::AutoFlush|file_flags::OSSync)))
-					dirh=get_handle_to_containing_dir(req.path);
+					req.flags=req.flags|file_flags::FastDirectoryEnumeration;
 #endif
+				if(!!(req.flags & file_flags::FastDirectoryEnumeration))
+					dirh=get_handle_to_containing_dir(req.path);
 				auto ret=std::shared_ptr<detail::async_io_handle>(new async_io_handle_posix(shared_from_this(), dirh, req.path, false, -999));
 #ifdef __linux__
 				if(!!(req.flags & (file_flags::Create|file_flags::CreateOnlyIfNotExist)) && !!(req.flags & (file_flags::AutoFlush|file_flags::OSSync)))
@@ -809,10 +855,10 @@ namespace detail {
 #ifdef __linux__
 			// Need to fsync the containing directory, otherwise the file isn't guaranteed to appear where we just created it
 			if((flags & O_CREAT) && !!(req.flags & (file_flags::AutoFlush|file_flags::OSSync)))
-			{
-				dirh=get_handle_to_containing_dir(req.path);
-			}
+				req.flags=req.flags|file_flags::FastDirectoryEnumeration;
 #endif
+			if(!!(req.flags & file_flags::FastDirectoryEnumeration))
+				dirh=get_handle_to_containing_dir(req.path);
 			// If writing and autoflush and NOT synchronous, turn on autoflush
 			auto ret=std::shared_ptr<detail::async_io_handle>(new async_io_handle_posix(shared_from_this(), dirh, req.path, (file_flags::AutoFlush|file_flags::Write)==(req.flags & (file_flags::AutoFlush|file_flags::Write|file_flags::OSSync)),
 				posix_open(req.path.c_str(), flags, 0x1b0/*660*/)));
@@ -888,6 +934,14 @@ namespace detail {
 			p->byteswritten+=byteswritten;
 			return std::make_pair(true, h);
 		}
+		// Called in unknown thread
+		completion_returntype dotruncate(size_t id, std::shared_ptr<detail::async_io_handle> h, off_t newsize)
+		{
+			async_io_handle_posix *p=static_cast<async_io_handle_posix *>(h.get());
+			ERRHOSFN(posix_ftruncate(p->fd, newsize), p->path());
+			return std::make_pair(true, h);
+		}
+
 
 	public:
 		async_file_io_dispatcher_compat(thread_pool &threadpool, file_flags flagsforce, file_flags flagsmask) : async_file_io_dispatcher_base(threadpool, flagsforce, flagsmask)
@@ -913,11 +967,11 @@ namespace detail {
 		}
 		virtual std::vector<async_io_op> sync(const std::vector<async_io_op> &ops)
 		{
-			return chain_async_ops((int) detail::OpType::sync, ops, async_op_flags::None, &async_file_io_dispatcher_compat::dosync);
+			return chain_async_ops((int) detail::OpType::sync, ops, ops, async_op_flags::None, &async_file_io_dispatcher_compat::dosync);
 		}
 		virtual std::vector<async_io_op> close(const std::vector<async_io_op> &ops)
 		{
-			return chain_async_ops((int) detail::OpType::close, ops, async_op_flags::None, &async_file_io_dispatcher_compat::doclose);
+			return chain_async_ops((int) detail::OpType::close, ops, ops, async_op_flags::None, &async_file_io_dispatcher_compat::doclose);
 		}
 		virtual std::vector<async_io_op> read(const std::vector<async_data_op_req<void>> &reqs)
 		{
@@ -927,6 +981,11 @@ namespace detail {
 		{
 			return chain_async_ops((int) detail::OpType::write, reqs, async_op_flags::None, &async_file_io_dispatcher_compat::dowrite);
 		}
+		virtual std::vector<async_io_op> truncate(const std::vector<async_io_op> &ops, const std::vector<off_t> &sizes)
+		{
+			return chain_async_ops((int) detail::OpType::truncate, ops, sizes, async_op_flags::None, &async_file_io_dispatcher_compat::dotruncate);
+		}
+
 	};
 }
 

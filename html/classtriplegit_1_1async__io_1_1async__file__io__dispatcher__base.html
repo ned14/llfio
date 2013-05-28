@@ -189,11 +189,11 @@ std::result_of&lt; C(Args...)&gt;<br class="typebreak"/>
 <tr class="memitem:ab00ad1238d5b87b7e87940b4566f7491"><td class="memTemplItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="structtriplegit_1_1async__io_1_1async__io__op.html">async_io_op</a> &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classtriplegit_1_1async__io_1_1async__file__io__dispatcher__base.html#ab00ad1238d5b87b7e87940b4566f7491">write</a> (const std::vector&lt; <a class="el" href="structtriplegit_1_1async__io_1_1async__data__op__req.html">async_data_op_req</a>&lt; T &gt;&gt; &amp;ops)</td></tr>
 <tr class="memdesc:ab00ad1238d5b87b7e87940b4566f7491"><td class="mdescLeft">&#160;</td><td class="mdescRight">Asynchronously writes data to items.  <a href="#ab00ad1238d5b87b7e87940b4566f7491"></a><br/></td></tr>
 <tr class="separator:ab00ad1238d5b87b7e87940b4566f7491"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afd50d52fec35330deac6153aece92d7d"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="structtriplegit_1_1async__io_1_1async__io__op.html">async_io_op</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtriplegit_1_1async__io_1_1async__file__io__dispatcher__base.html#afd50d52fec35330deac6153aece92d7d">truncate</a> (const std::vector&lt; <a class="el" href="structtriplegit_1_1async__io_1_1async__io__op.html">async_io_op</a> &gt; &amp;ops, const std::vector&lt; off_t &gt; &amp;sizes)</td></tr>
-<tr class="memdesc:afd50d52fec35330deac6153aece92d7d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenience function for truncating the lengths of items via std::filesystem::resize_file()  <a href="#afd50d52fec35330deac6153aece92d7d"></a><br/></td></tr>
-<tr class="separator:afd50d52fec35330deac6153aece92d7d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5edf444e467cdcf70e1d629ab9228e9e"><td class="memItemLeft" align="right" valign="top">virtual std::vector&lt; <a class="el" href="structtriplegit_1_1async__io_1_1async__io__op.html">async_io_op</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtriplegit_1_1async__io_1_1async__file__io__dispatcher__base.html#a5edf444e467cdcf70e1d629ab9228e9e">truncate</a> (const std::vector&lt; <a class="el" href="structtriplegit_1_1async__io_1_1async__io__op.html">async_io_op</a> &gt; &amp;ops, const std::vector&lt; off_t &gt; &amp;sizes)=0</td></tr>
+<tr class="memdesc:a5edf444e467cdcf70e1d629ab9228e9e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Truncates the lengths of items.  <a href="#a5edf444e467cdcf70e1d629ab9228e9e"></a><br/></td></tr>
+<tr class="separator:a5edf444e467cdcf70e1d629ab9228e9e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aedd6e17486c726c5b08be8132fe55776"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structtriplegit_1_1async__io_1_1async__io__op.html">async_io_op</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtriplegit_1_1async__io_1_1async__file__io__dispatcher__base.html#aedd6e17486c726c5b08be8132fe55776">truncate</a> (const <a class="el" href="structtriplegit_1_1async__io_1_1async__io__op.html">async_io_op</a> &amp;op, off_t newsize)</td></tr>
-<tr class="memdesc:aedd6e17486c726c5b08be8132fe55776"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenience function for truncating the length of an item via std::filesystem::resize_file()  <a href="#aedd6e17486c726c5b08be8132fe55776"></a><br/></td></tr>
+<tr class="memdesc:aedd6e17486c726c5b08be8132fe55776"><td class="mdescLeft">&#160;</td><td class="mdescRight">Truncates the length of an item.  <a href="#aedd6e17486c726c5b08be8132fe55776"></a><br/></td></tr>
 <tr class="separator:aedd6e17486c726c5b08be8132fe55776"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -789,7 +789,7 @@ template&lt;class T &gt; </div>
 
 </div>
 </div>
-<a class="anchor" id="afd50d52fec35330deac6153aece92d7d"></a>
+<a class="anchor" id="a5edf444e467cdcf70e1d629ab9228e9e"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -797,7 +797,7 @@ template&lt;class T &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">std::vector&lt; <a class="el" href="structtriplegit_1_1async__io_1_1async__io__op.html">async_io_op</a> &gt; triplegit::async_io::async_file_io_dispatcher_base::truncate </td>
+          <td class="memname">virtual std::vector&lt;<a class="el" href="structtriplegit_1_1async__io_1_1async__io__op.html">async_io_op</a>&gt; triplegit::async_io::async_file_io_dispatcher_base::truncate </td>
           <td>(</td>
           <td class="paramtype">const std::vector&lt; <a class="el" href="structtriplegit_1_1async__io_1_1async__io__op.html">async_io_op</a> &gt; &amp;&#160;</td>
           <td class="paramname"><em>ops</em>, </td>
@@ -816,12 +816,12 @@ template&lt;class T &gt; </div>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>Convenience function for truncating the lengths of items via std::filesystem::resize_file() </p>
+<p>Truncates the lengths of items. </p>
 
 </div>
 </div>
@@ -857,7 +857,7 @@ template&lt;class T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Convenience function for truncating the length of an item via std::filesystem::resize_file() </p>
+<p>Truncates the length of an item. </p>
 
 </div>
 </div>

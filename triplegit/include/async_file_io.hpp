@@ -765,6 +765,7 @@ enum class file_flags : size_t
 	CreateOnlyIfNotExist=32, //!< Create and open only if doesn't exist
 	AutoFlush=64,		//!< Automatically initiate an asynchronous flush just before file close, and fuse both operations so both must complete for close to complete.
 	WillBeSequentiallyAccessed=128, //!< Will be exclusively either read or written sequentially. If you're exclusively writing sequentially, \em strongly consider turning on OSDirect too.
+	FastDirectoryEnumeration=256, //! Hold a file handle open to the containing directory of each open file (POSIX only).
 
 	OSDirect=(1<<16),	//!< Bypass the OS file buffers (only really useful for writing large files. Note you must 4Kb align everything if this is on)
 	OSSync=(1<<17)		//!< Ask the OS to not complete until the data is on the physical storage. Best used only with Direct, otherwise use AutoFlush.
@@ -860,16 +861,16 @@ public:
 	//! Asynchronously writes data to items
 	template<class T> inline std::vector<async_io_op> write(const std::vector<async_data_op_req<T>> &ops);
 
-	//! Convenience function for truncating the lengths of items via std::filesystem::resize_file()
-	inline std::vector<async_io_op> truncate(const std::vector<async_io_op> &ops, const std::vector<off_t> &sizes);
-	//! Convenience function for truncating the length of an item via std::filesystem::resize_file()
+	//! Truncates the lengths of items
+	virtual std::vector<async_io_op> truncate(const std::vector<async_io_op> &ops, const std::vector<off_t> &sizes)=0;
+	//! Truncates the length of an item
 	inline async_io_op truncate(const async_io_op &op, off_t newsize);
 protected:
 	void complete_async_op(size_t id, std::shared_ptr<detail::async_io_handle> h, exception_ptr e=exception_ptr());
 	completion_returntype invoke_user_completion(size_t id, std::shared_ptr<detail::async_io_handle> h, std::function<completion_t> callback);
 	template<class F, class... Args> std::shared_ptr<detail::async_io_handle> invoke_async_op_completions(size_t id, std::shared_ptr<detail::async_io_handle> h, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, Args...), Args... args);
 	template<class F, class... Args> async_io_op chain_async_op(detail::immediate_async_ops &immediates, int optype, const async_io_op &precondition, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, Args...), Args... args);
-	template<class F, class T> std::vector<async_io_op> chain_async_ops(int optype, const std::vector<T> &container, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, T));
+	template<class F, class T> std::vector<async_io_op> chain_async_ops(int optype, const std::vector<async_io_op> &preconditions, const std::vector<T> &container, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, T));
 	template<class F> std::vector<async_io_op> chain_async_ops(int optype, const std::vector<async_path_op_req> &container, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, async_path_op_req));
 	template<class F, class T> std::vector<async_io_op> chain_async_ops(int optype, const std::vector<async_data_op_req<T>> &container, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, async_data_op_req<T>));
 };
@@ -1231,18 +1232,6 @@ template<class T> inline std::vector<async_io_op> async_file_io_dispatcher_base:
 template<class T> inline std::vector<async_io_op> async_file_io_dispatcher_base::write(const std::vector<async_data_op_req<T>> &ops)
 {
 	return write(detail::async_file_io_dispatcher_rwconverter<T>()(ops));
-}
-inline std::vector<async_io_op> async_file_io_dispatcher_base::truncate(const std::vector<async_io_op> &ops, const std::vector<off_t> &sizes)
-{
-	auto dotruncate=[](size_t, std::shared_ptr<detail::async_io_handle> h, off_t newsize) {
-		std::filesystem::resize_file(h->path(), newsize);
-		return std::make_pair(true, h);
-	};
-	std::vector<std::pair<async_op_flags, std::function<completion_t>>> callbacks;
-	callbacks.reserve(ops.size());
-	for(auto &i : sizes)
-		callbacks.push_back(std::make_pair(async_op_flags::None, std::bind(dotruncate, std::placeholders::_1, std::placeholders::_2, i)));
-	return completion(ops, callbacks);
 }
 inline async_io_op async_file_io_dispatcher_base::truncate(const async_io_op &op, off_t newsize)
 {
