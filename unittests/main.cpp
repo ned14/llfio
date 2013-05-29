@@ -530,12 +530,15 @@ static void evil_random_io(std::shared_ptr<triplegit::async_io::async_file_io_di
 			size_t thisbytes=0;
 			op.write=bytessofar<bytes/4 ? true : !(r&(1<<31));
 			op.req.buffers.resize(toissue);
-			op.req.where=toissue &~(bytes/2-1);
+			op.req.where=r & (bytes-1);
+			if(op.req.where>bytes-1024*1024) op.req.where=bytes-1024*1024;
 			if(alignment)
 				op.req.where&=~(alignment-1);
 			for(size_t m=0; m<toissue; m++)
 			{
 				u4 s=ranval(&gen) & ((256*1024-1)&~63); // Must be a multiple of 64 bytes for SHA256
+				if(s<64) s=64;
+				if(thisbytes+s>1024*1024) break;
 				op.req.buffers.push_back(boost::asio::mutable_buffer((void *)(((size_t) op.req.where)+thisbytes), s));
 				if(op.write)
 					for(; s>0; s-=4, thisbytes+=4)
@@ -580,6 +583,10 @@ static void evil_random_io(std::shared_ptr<triplegit::async_io::async_file_io_di
 	auto manyopenfiles(dispatcher->file(manyfilereqs));
 	std::vector<off_t> sizes(no, bytes);
 	auto manywrittenfiles(dispatcher->truncate(manyopenfiles, sizes));
+#if defined(_DEBUG) && 0
+	for(size_t n=0; n<manywrittenfiles.size(); n++)
+		cout << n << ": " << manywrittenfiles[n].id << " (" << manywrittenfiles[n].h.get()->path() << ") " << endl;
+#endif
 
 	// Schedule a replay of our in-RAM simulation
 	size_t maxfailures=0;

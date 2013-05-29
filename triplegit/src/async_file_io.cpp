@@ -49,10 +49,11 @@ File Created: Mar 2013
 #define lock_guard boost::lock_guard
 
 #if defined(_DEBUG) && 1
+#define DEBUG_PRINTING 1
 #ifdef WIN32
 #define DEBUG_PRINT(...) \
 	{ \
-		char buffer[256]; \
+		char buffer[16384]; \
 		sprintf(buffer, __VA_ARGS__); \
 		OutputDebugStringA(buffer); \
 	}
@@ -131,6 +132,7 @@ namespace detail {
 		}
 		~async_io_handle_windows()
 		{
+			DEBUG_PRINT("D %p\n", this);
 			if(has_been_added)
 				parent->int_del_io_handle(myid);
 			if(h)
@@ -382,7 +384,7 @@ void async_file_io_dispatcher_base::complete_async_op(size_t id, std::shared_ptr
 				else
 					it->second.h=threadpool().enqueue(std::bind(c.second, h));
 			}
-			DEBUG_PRINT("C %u\n", (unsigned) c.first);
+			DEBUG_PRINT("C %u > %u %p\n", (unsigned) id, (unsigned) c.first, h.get());
 		}
 		// Restore it to my id
 		it=p->ops.find(id);
@@ -405,7 +407,7 @@ void async_file_io_dispatcher_base::complete_async_op(size_t id, std::shared_ptr
 			it->second.detached_promise->set_value(h);
 	}
 	p->ops.erase(it);
-	DEBUG_PRINT("R %u\n", (unsigned) id);
+	DEBUG_PRINT("R %u %p\n", (unsigned) id, h.get());
 }
 
 // Called in unknown thread
@@ -505,6 +507,11 @@ template<class F, class... Args> async_io_op async_file_io_dispatcher_base::chai
 		// delete the data after retrieval.
 		if(precondition.h.valid())
 			h=const_cast<shared_future<std::shared_ptr<detail::async_io_handle>> &>(precondition.h).get();
+		else if(precondition.id)
+		{
+			// It should never happen that precondition.id is valid but deleted and h hasn't been set
+			assert(0);
+		}
 		if(!!(flags & async_op_flags::ImmediateCompletion))
 			ret.h=immediates.enqueue(std::bind(boundf.second, h)).share();
 		else
@@ -643,6 +650,7 @@ namespace detail {
 		{
 			async_io_handle_windows *p=static_cast<async_io_handle_windows *>(h.get());
 			size_t bytestobesynced=p->write_count_since_fsync();
+			assert(p);
 			if(bytestobesynced)
 				ERRHWINFN(FlushFileBuffers(p->h->native_handle()), p->path());
 			p->byteswrittenatlastfsync+=(long) bytestobesynced;
@@ -652,6 +660,7 @@ namespace detail {
 		completion_returntype doclose(size_t id, std::shared_ptr<detail::async_io_handle> h, async_io_op)
 		{
 			async_io_handle_windows *p=static_cast<async_io_handle_windows *>(h.get());
+			assert(p);
 			// Windows doesn't provide an async fsync so do it synchronously
 			if(p->autoflush && p->write_count_since_fsync())
 				ERRHWINFN(FlushFileBuffers(p->h->native_handle()), p->path());
@@ -664,7 +673,17 @@ namespace detail {
 		{
 			exception_ptr e;
 			if(ec)
-				e=async_io::make_exception_ptr(boost::system::system_error(ec));
+			{
+				// boost::system::system_error makes no attempt to ask windows for what the error code means :(
+				try
+				{
+					ERRGWINFN(ec.value(), h->path());
+				}
+				catch(...)
+				{
+					e=async_io::make_exception_ptr(current_exception());
+				}
+			}
 			else
 			{
 				async_io_handle_windows *p=static_cast<async_io_handle_windows *>(h.get());
@@ -680,6 +699,7 @@ namespace detail {
 		completion_returntype doread(size_t id, std::shared_ptr<detail::async_io_handle> h, async_data_op_req<void> req)
 		{
 			async_io_handle_windows *p=static_cast<async_io_handle_windows *>(h.get());
+			assert(p);
 			boost::asio::async_read_at(*p->h, req.where, req.buffers, boost::bind(&async_file_io_dispatcher_windows::boost_asio_completion_handler, this, false, id, h, boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred));
 			// Indicate we're not finished yet
 			return std::make_pair(false, h);
@@ -688,7 +708,12 @@ namespace detail {
 		completion_returntype dowrite(size_t id, std::shared_ptr<detail::async_io_handle> h, async_data_op_req<const void> req)
 		{
 			async_io_handle_windows *p=static_cast<async_io_handle_windows *>(h.get());
-			DEBUG_PRINT("W %u %p\n", (unsigned) id, h.get());
+			assert(p);
+			DEBUG_PRINT("W %u %p (%c) @ %u, b=%u\n", (unsigned) id, h.get(), p->path().native().back(), (unsigned) req.where, (unsigned) req.buffers.size());
+#ifdef DEBUG_PRINTING
+			for(auto &b : req.buffers)
+				DEBUG_PRINT("  W %u: %p %u\n", (unsigned) id, boost::asio::buffer_cast<const void *>(b), (unsigned) boost::asio::buffer_size(b));
+#endif
 			boost::asio::async_write_at(*p->h, req.where, req.buffers, boost::bind(&async_file_io_dispatcher_windows::boost_asio_completion_handler, this, true, id, h, boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred));
 			// Indicate we're not finished yet
 			return std::make_pair(false, h);
@@ -697,7 +722,8 @@ namespace detail {
 		completion_returntype dotruncate(size_t id, std::shared_ptr<detail::async_io_handle> h, off_t _newsize)
 		{
 			async_io_handle_windows *p=static_cast<async_io_handle_windows *>(h.get());
-			DEBUG_PRINT("T %u %p\n", (unsigned) id, h.get());
+			assert(p);
+			DEBUG_PRINT("T %u %p (%c)\n", (unsigned) id, h.get(), p->path().native().back());
 			// This is a bit tricky ... overlapped files ignore their file position except in this one
 			// case, but clearly here we have a race condition. No choice but to rinse and repeat I guess.
 			LARGE_INTEGER size={0}, newsize;
