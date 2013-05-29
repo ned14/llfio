@@ -321,13 +321,13 @@ static void _1000_open_write_close_deletes(std::shared_ptr<triplegit::async_io::
 	auto manydeletedfiles(dispatcher->rmfile(manyfilereqs));
 
 	// As a test of call() which involves significant template metaprogramming, have a do nothing callback
-	std::atomic<size_t> callcount;
-	typedef int (*callable_type)(std::atomic<size_t> &, int);
-	callable_type callable=[](std::atomic<size_t> &callcount, int i) { ++callcount; return i; };
+	std::atomic<size_t> callcount(0);
+	typedef int (*callable_type)(std::atomic<size_t> *, int);
+	callable_type callable=[](std::atomic<size_t> *callcount, int i) { ++*callcount; return i; };
 	std::vector<std::function<int()>> callables;
 	callables.reserve(1000);
 	for(size_t n=0; n<1000; n++)
-		callables.push_back(std::bind(callable, ref(callcount), 78));
+		callables.push_back(std::bind(callable, &callcount, 78));
 	auto manycallbacks(dispatcher->call(manydeletedfiles, std::move(callables)));
 	auto dispatched=chrono::high_resolution_clock::now();
 
