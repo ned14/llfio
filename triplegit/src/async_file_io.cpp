@@ -509,8 +509,10 @@ template<class F, class... Args> async_io_op async_file_io_dispatcher_base::chai
 			h=const_cast<shared_future<std::shared_ptr<detail::async_io_handle>> &>(precondition.h).get();
 		else if(precondition.id)
 		{
-			// It should never happen that precondition.id is valid but deleted and h hasn't been set
+			// It should never happen that precondition.id is valid but removed from extant ops
+			// which indicates it completed and yet h remains invalid
 			assert(0);
+			std::terminate();
 		}
 		if(!!(flags & async_op_flags::ImmediateCompletion))
 			ret.h=immediates.enqueue(std::bind(boundf.second, h)).share();
