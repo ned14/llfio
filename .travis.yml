@@ -14,4 +14,4 @@ before_install:
  - git submodule update --init --recursive
 script:
  - if [ $CC = "clang" ]; then scons -k --useclang=clang++-3.2; else scons -k; fi
- - if [ $UNIT_TESTS -eq 1]; then x64/Release/tests; fi
+ - if [ $UNIT_TESTS -eq 1 ]; then x64/Release/tests; fi
