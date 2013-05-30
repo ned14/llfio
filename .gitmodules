@@ -6,4 +6,4 @@
 	url = https://github.com/ned14/boost-trunk.git
 [submodule "NiallsCPP11Utilities"]
 	path = NiallsCPP11Utilities
-	url = git@github.com:ned14/NiallsCPP11Utilities.git
+	url = https://github.com/ned14/NiallsCPP11Utilities.git
