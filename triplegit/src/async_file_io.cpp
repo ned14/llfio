@@ -601,7 +601,7 @@ namespace detail {
 			else
 			{
 				// Create empty handle so
-				auto ret=std::shared_ptr<detail::async_io_handle>(new async_io_handle_windows(shared_from_this(), req.path));
+				auto ret=std::make_shared<async_io_handle_windows>(shared_from_this(), req.path);
 				return std::make_pair(true, ret);
 			}
 		}
@@ -610,7 +610,7 @@ namespace detail {
 		{
 			req.flags=fileflags(req.flags);
 			ERRHWINFN(RemoveDirectory(req.path.c_str()), req.path);
-			auto ret=std::shared_ptr<detail::async_io_handle>(new async_io_handle_windows(shared_from_this(), req.path));
+			auto ret=std::make_shared<async_io_handle_windows>(shared_from_this(), req.path);
 			return std::make_pair(true, ret);
 		}
 		// Called in unknown thread
@@ -633,9 +633,9 @@ namespace detail {
 			if(!!(req.flags & file_flags::OSDirect)) flags|=FILE_FLAG_NO_BUFFERING;
 			if(!!(req.flags & file_flags::OSSync)) flags|=FILE_FLAG_WRITE_THROUGH;
 			// If writing and autoflush and NOT synchronous, turn on autoflush
-			auto ret=std::shared_ptr<detail::async_io_handle>(new async_io_handle_windows(shared_from_this(), req.path, (file_flags::AutoFlush|file_flags::Write)==(req.flags & (file_flags::AutoFlush|file_flags::Write|file_flags::OSSync)),
+			auto ret=std::make_shared<async_io_handle_windows>(shared_from_this(), req.path, (file_flags::AutoFlush|file_flags::Write)==(req.flags & (file_flags::AutoFlush|file_flags::Write|file_flags::OSSync)),
 				CreateFile(req.path.c_str(), access, FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,
-					NULL, creation, flags, NULL)));
+					NULL, creation, flags, NULL));
 			static_cast<async_io_handle_windows *>(ret.get())->do_add_io_handle_to_parent();
 			return std::make_pair(true, ret);
 		}
@@ -644,7 +644,7 @@ namespace detail {
 		{
 			req.flags=fileflags(req.flags);
 			ERRHWINFN(DeleteFile(req.path.c_str()), req.path);
-			auto ret=std::shared_ptr<detail::async_io_handle>(new async_io_handle_windows(shared_from_this(), req.path));
+			auto ret=std::make_shared<async_io_handle_windows>(shared_from_this(), req.path);
 			return std::make_pair(true, ret);
 		}
 		// Called in unknown thread
@@ -798,8 +798,8 @@ namespace detail {
 				if(dircache.end()==it || it->second.expired())
 				{
 					if(dircache.end()!=it) dircache.erase(it);
-					dirh=std::shared_ptr<detail::async_io_handle>(new async_io_handle_posix(std::shared_ptr<async_file_io_dispatcher_base>(), std::shared_ptr<detail::async_io_handle>(),
-						containingdir, false, posix_open(containingdir.c_str(), O_RDONLY, 0x1b0/*660*/)));
+					dirh=std::make_shared<async_io_handle_posix>(std::shared_ptr<async_file_io_dispatcher_base>(), std::shared_ptr<detail::async_io_handle>(),
+						containingdir, false, posix_open(containingdir.c_str(), O_RDONLY, 0x1b0/*660*/));
 					auto _it=dircache.insert(std::make_pair(containingdir, std::weak_ptr<async_io_handle>(dirh)));
 					return dirh;
 				}
@@ -845,7 +845,7 @@ namespace detail {
 #endif
 				if(!!(req.flags & file_flags::FastDirectoryEnumeration))
 					dirh=get_handle_to_containing_dir(req.path);
-				auto ret=std::shared_ptr<detail::async_io_handle>(new async_io_handle_posix(shared_from_this(), dirh, req.path, false, -999));
+				auto ret=std::make_shared<async_io_handle_posix>(shared_from_this(), dirh, req.path, false, -999);
 #ifdef __linux__
 				if(!!(req.flags & (file_flags::Create|file_flags::CreateOnlyIfNotExist)) && !!(req.flags & (file_flags::AutoFlush|file_flags::OSSync)))
 					posix_fsync(static_cast<async_io_handle_posix *>(dirh.get())->fd);
@@ -858,7 +858,7 @@ namespace detail {
 		{
 			req.flags=fileflags(req.flags);
 			ERRHOSFN(posix_rmdir(req.path.c_str()), req.path);
-			auto ret=std::shared_ptr<detail::async_io_handle>(new async_io_handle_posix(shared_from_this(), std::shared_ptr<detail::async_io_handle>(), req.path, false, -999));
+			auto ret=std::make_shared<async_io_handle_posix>(shared_from_this(), std::shared_ptr<detail::async_io_handle>(), req.path, false, -999);
 			return std::make_pair(true, ret);
 		}
 		// Called in unknown thread
@@ -888,8 +888,8 @@ namespace detail {
 			if(!!(req.flags & file_flags::FastDirectoryEnumeration))
 				dirh=get_handle_to_containing_dir(req.path);
 			// If writing and autoflush and NOT synchronous, turn on autoflush
-			auto ret=std::shared_ptr<detail::async_io_handle>(new async_io_handle_posix(shared_from_this(), dirh, req.path, (file_flags::AutoFlush|file_flags::Write)==(req.flags & (file_flags::AutoFlush|file_flags::Write|file_flags::OSSync)),
-				posix_open(req.path.c_str(), flags, 0x1b0/*660*/)));
+			auto ret=std::make_shared<async_io_handle_posix>(shared_from_this(), dirh, req.path, (file_flags::AutoFlush|file_flags::Write)==(req.flags & (file_flags::AutoFlush|file_flags::Write|file_flags::OSSync)),
+				posix_open(req.path.c_str(), flags, 0x1b0/*660*/));
 #ifdef __linux__
 			if(!!(req.flags & (file_flags::Create|file_flags::CreateOnlyIfNotExist)) && !!(req.flags & (file_flags::AutoFlush|file_flags::OSSync)))
 				posix_fsync(static_cast<async_io_handle_posix *>(dirh.get())->fd);
@@ -902,7 +902,7 @@ namespace detail {
 		{
 			req.flags=fileflags(req.flags);
 			ERRHOSFN(posix_unlink(req.path.c_str()), req.path);
-			auto ret=std::shared_ptr<detail::async_io_handle>(new async_io_handle_posix(shared_from_this(), std::shared_ptr<detail::async_io_handle>(), req.path, false, -999));
+			auto ret=std::make_shared<async_io_handle_posix>(shared_from_this(), std::shared_ptr<detail::async_io_handle>(), req.path, false, -999);
 			return std::make_pair(true, ret);
 		}
 		// Called in unknown thread

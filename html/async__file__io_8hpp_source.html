@@ -497,7 +497,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00952"></a><span class="lineno">  952</span>&#160;    <span class="keywordflow">if</span>(first==last)</div>
 <div class="line"><a name="l00953"></a><span class="lineno">  953</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="classtriplegit_1_1async__io_1_1future.html" title="For now, this is boost&#39;s future. Will be replaced when C++&#39;s future catches up with boost&#39;s...">future&lt;std::vector&lt;std::shared_ptr&lt;detail::async_io_handle&gt;</a>&gt;&gt;();</div>
 <div class="line"><a name="l00954"></a><span class="lineno">  954</span>&#160;    std::vector&lt;async_io_op&gt; inputs(first, last);</div>
-<div class="line"><a name="l00955"></a><span class="lineno">  955</span>&#160;    std::shared_ptr&lt;detail::when_all_count_completed_state&gt; state(<span class="keyword">new</span> detail::when_all_count_completed_state(inputs.size()));</div>
+<div class="line"><a name="l00955"></a><span class="lineno">  955</span>&#160;    <span class="keyword">auto</span> state(std::make_shared&lt;detail::when_all_count_completed_state&gt;(inputs.size()));</div>
 <div class="line"><a name="l00956"></a><span class="lineno">  956</span>&#160;    std::vector&lt;std::pair&lt;async_op_flags, std::function&lt;async_file_io_dispatcher_base::completion_t&gt;&gt;&gt; callbacks;</div>
 <div class="line"><a name="l00957"></a><span class="lineno">  957</span>&#160;    callbacks.reserve(inputs.size());</div>
 <div class="line"><a name="l00958"></a><span class="lineno">  958</span>&#160;    <span class="keywordtype">size_t</span> idx=0;</div>
@@ -511,7 +511,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00967"></a><span class="lineno">  967</span>&#160;    <span class="keywordflow">if</span>(first==last)</div>
 <div class="line"><a name="l00968"></a><span class="lineno">  968</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="classtriplegit_1_1async__io_1_1future.html" title="For now, this is boost&#39;s future. Will be replaced when C++&#39;s future catches up with boost&#39;s...">future&lt;std::vector&lt;std::shared_ptr&lt;detail::async_io_handle&gt;</a>&gt;&gt;();</div>
 <div class="line"><a name="l00969"></a><span class="lineno">  969</span>&#160;    std::vector&lt;async_io_op&gt; inputs(first, last);</div>
-<div class="line"><a name="l00970"></a><span class="lineno">  970</span>&#160;    std::shared_ptr&lt;detail::when_all_count_completed_state&gt; state(<span class="keyword">new</span> detail::when_all_count_completed_state(inputs.size()));</div>
+<div class="line"><a name="l00970"></a><span class="lineno">  970</span>&#160;    <span class="keyword">auto</span> state(std::make_shared&lt;detail::when_all_count_completed_state&gt;(inputs.size()));</div>
 <div class="line"><a name="l00971"></a><span class="lineno">  971</span>&#160;    std::vector&lt;std::pair&lt;async_op_flags, std::function&lt;async_file_io_dispatcher_base::completion_t&gt;&gt;&gt; callbacks;</div>
 <div class="line"><a name="l00972"></a><span class="lineno">  972</span>&#160;    callbacks.reserve(inputs.size());</div>
 <div class="line"><a name="l00973"></a><span class="lineno">  973</span>&#160;    <span class="keywordtype">size_t</span> idx=0;</div>

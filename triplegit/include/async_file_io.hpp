@@ -952,7 +952,7 @@ inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(st
 	if(first==last)
 		return future<std::vector<std::shared_ptr<detail::async_io_handle>>>();
 	std::vector<async_io_op> inputs(first, last);
-	std::shared_ptr<detail::when_all_count_completed_state> state(new detail::when_all_count_completed_state(inputs.size()));
+	auto state(std::make_shared<detail::when_all_count_completed_state>(inputs.size()));
 	std::vector<std::pair<async_op_flags, std::function<async_file_io_dispatcher_base::completion_t>>> callbacks;
 	callbacks.reserve(inputs.size());
 	size_t idx=0;
@@ -967,7 +967,7 @@ inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(st
 	if(first==last)
 		return future<std::vector<std::shared_ptr<detail::async_io_handle>>>();
 	std::vector<async_io_op> inputs(first, last);
-	std::shared_ptr<detail::when_all_count_completed_state> state(new detail::when_all_count_completed_state(inputs.size()));
+	auto state(std::make_shared<detail::when_all_count_completed_state>(inputs.size()));
 	std::vector<std::pair<async_op_flags, std::function<async_file_io_dispatcher_base::completion_t>>> callbacks;
 	callbacks.reserve(inputs.size());
 	size_t idx=0;
