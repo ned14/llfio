@@ -9,4 +9,5 @@ before_install:
  - git submodule update --init --recursive
 script:
  - scons -k --usegcc=$CXX
+after_script:
  - x64/Release/tests

@@ -1029,6 +1029,8 @@ template<> struct async_data_op_req<void> // For reading
 	async_data_op_req() { }
 	async_data_op_req(const async_data_op_req &o) : precondition(o.precondition), buffers(o.buffers), where(o.where) { }
 	async_data_op_req(async_data_op_req &&o) : precondition(std::move(o.precondition)), buffers(std::move(o.buffers)), where(std::move(o.where)) { }
+	async_data_op_req &operator=(const async_data_op_req &o) { precondition=o.precondition; buffers=o.buffers; where=o.where; return *this; }
+	async_data_op_req &operator=(async_data_op_req &&o) { precondition=std::move(o.precondition); buffers=std::move(o.buffers); where=std::move(o.where); return *this; }
 	async_data_op_req(async_io_op _precondition, void *_buffer, size_t _length, off_t _where) : precondition(std::move(_precondition)), where(_where) { buffers.reserve(1); buffers.push_back(boost::asio::mutable_buffer(_buffer, _length)); }
 	async_data_op_req(async_io_op _precondition, std::vector<boost::asio::mutable_buffer> _buffers, off_t _where) : precondition(std::move(_precondition)), buffers(_buffers), where(_where) { }
 };
@@ -1042,6 +1044,8 @@ template<> struct async_data_op_req<const void> // For writing
 	async_data_op_req(async_data_op_req &&o) : precondition(std::move(o.precondition)), buffers(std::move(o.buffers)), where(std::move(o.where)) { }
 	async_data_op_req(const async_data_op_req<void> &o) : precondition(o.precondition), where(o.where) { buffers.reserve(o.buffers.capacity()); for(auto &i: o.buffers) buffers.push_back(i); }
 	async_data_op_req(async_data_op_req<void> &&o) : precondition(std::move(o.precondition)), where(o.where) { buffers.reserve(o.buffers.capacity()); for(auto &&i: o.buffers) buffers.push_back(std::move(i)); }
+	async_data_op_req &operator=(const async_data_op_req &o) { precondition=o.precondition; buffers=o.buffers; where=o.where; return *this; }
+	async_data_op_req &operator=(async_data_op_req &&o) { precondition=std::move(o.precondition); buffers=std::move(o.buffers); where=std::move(o.where); return *this; }
 	async_data_op_req(async_io_op _precondition, const void *_buffer, size_t _length, off_t _where) : precondition(std::move(_precondition)), where(_where) { buffers.reserve(1); buffers.push_back(boost::asio::const_buffer(_buffer, _length)); }
 	async_data_op_req(async_io_op _precondition, std::vector<boost::asio::const_buffer> _buffers, off_t _where) : precondition(std::move(_precondition)), buffers(_buffers), where(_where) { }
 };
@@ -1051,6 +1055,8 @@ template<class T> struct async_data_op_req : public async_data_op_req<void>
 	async_data_op_req() { }
 	async_data_op_req(const async_data_op_req &o) : async_data_op_req<void>(o) { }
 	async_data_op_req(async_data_op_req &&o) : async_data_op_req<void>(std::move(o)) { }
+	async_data_op_req &operator=(const async_data_op_req &o) { static_cast<async_data_op_req<void>>(*this)=o; return *this; }
+	async_data_op_req &operator=(async_data_op_req &&o) { static_cast<async_data_op_req<void>>(*this)=std::move(o); return *this; }
 	async_data_op_req(async_io_op _precondition, T *_buffer, size_t _length, off_t _where) : async_data_op_req<void>(std::move(_precondition), static_cast<void *>(_buffer), _length, _where) { }
 };
 template<class T> struct async_data_op_req<const T> : public async_data_op_req<const void>
@@ -1060,6 +1066,8 @@ template<class T> struct async_data_op_req<const T> : public async_data_op_req<c
 	async_data_op_req(async_data_op_req &&o) : async_data_op_req<const void>(std::move(o)) { }
 	async_data_op_req(const async_data_op_req<T> &o) : async_data_op_req<const void>(o) { }
 	async_data_op_req(async_data_op_req<T> &&o) : async_data_op_req<const void>(std::move(o)) { }
+	async_data_op_req &operator=(const async_data_op_req &o) { static_cast<async_data_op_req<const void>>(*this)=o; return *this; }
+	async_data_op_req &operator=(async_data_op_req &&o) { static_cast<async_data_op_req<const void>>(*this)=std::move(o); return *this; }
 	async_data_op_req(async_io_op _precondition, const T *_buffer, size_t _length, off_t _where) : async_data_op_req<const void>(std::move(_precondition), static_cast<const void *>(_buffer), _length, _where) { }
 };
 //! \brief A specialisation for any std::vector<T, A>
@@ -1068,6 +1076,8 @@ template<class T, class A> struct async_data_op_req<std::vector<T, A>> : public 
 	async_data_op_req() { }
 	async_data_op_req(const async_data_op_req &o) : async_data_op_req<void>(o) { }
 	async_data_op_req(async_data_op_req &&o) : async_data_op_req<void>(std::move(o)) { }
+	async_data_op_req &operator=(const async_data_op_req &o) { static_cast<async_data_op_req<void>>(*this)=o; return *this; }
+	async_data_op_req &operator=(async_data_op_req &&o) { static_cast<async_data_op_req<void>>(*this)=std::move(o); return *this; }
 	async_data_op_req(async_io_op _precondition, std::vector<T, A> &v, off_t _where) : async_data_op_req<void>(std::move(_precondition), static_cast<void *>(&v.front()), v.size()*sizeof(T), _where) { }
 };
 template<class T, class A> struct async_data_op_req<const std::vector<T, A>> : public async_data_op_req<const void>
@@ -1077,6 +1087,8 @@ template<class T, class A> struct async_data_op_req<const std::vector<T, A>> : p
 	async_data_op_req(async_data_op_req &&o) : async_data_op_req<const void>(std::move(o)) { }
 	async_data_op_req(const async_data_op_req<std::vector<T, A>> &o) : async_data_op_req<const void>(o) { }
 	async_data_op_req(async_data_op_req<std::vector<T, A>> &&o) : async_data_op_req<const void>(std::move(o)) { }
+	async_data_op_req &operator=(const async_data_op_req &o) { static_cast<async_data_op_req<const void>>(*this)=o; return *this; }
+	async_data_op_req &operator=(async_data_op_req &&o) { static_cast<async_data_op_req<const void>>(*this)=std::move(o); return *this; }
 	async_data_op_req(async_io_op _precondition, const std::vector<T, A> &v, off_t _where) : async_data_op_req<const void>(std::move(_precondition), static_cast<const void *>(&v.front()), v.size()*sizeof(T), _where) { }
 };
 //! \brief A specialisation for any std::array<T, N>
@@ -1085,6 +1097,8 @@ template<class T, size_t N> struct async_data_op_req<std::array<T, N>> : public 
 	async_data_op_req() { }
 	async_data_op_req(const async_data_op_req &o) : async_data_op_req<void>(o) { }
 	async_data_op_req(async_data_op_req &&o) : async_data_op_req<void>(std::move(o)) { }
+	async_data_op_req &operator=(const async_data_op_req &o) { static_cast<async_data_op_req<void>>(*this)=o; return *this; }
+	async_data_op_req &operator=(async_data_op_req &&o) { static_cast<async_data_op_req<void>>(*this)=std::move(o); return *this; }
 	async_data_op_req(async_io_op _precondition, std::array<T, N> &v, off_t _where) : async_data_op_req<void>(std::move(_precondition), static_cast<void *>(&v.front()), v.size()*sizeof(T), _where) { }
 };
 template<class T, size_t N> struct async_data_op_req<const std::array<T, N>> : public async_data_op_req<const void>
@@ -1092,6 +1106,8 @@ template<class T, size_t N> struct async_data_op_req<const std::array<T, N>> : p
 	async_data_op_req() { }
 	async_data_op_req(const async_data_op_req &o) : async_data_op_req<const void>(o) { }
 	async_data_op_req(async_data_op_req &&o) : async_data_op_req<const void>(std::move(o)) { }
+	async_data_op_req &operator=(const async_data_op_req &o) { static_cast<async_data_op_req<const void>>(*this)=o; return *this; }
+	async_data_op_req &operator=(async_data_op_req &&o) { static_cast<async_data_op_req<const void>>(*this)=std::move(o); return *this; }
 	async_data_op_req(const async_data_op_req<std::array<T, N>> &o) : async_data_op_req<const void>(o) { }
 	async_data_op_req(async_data_op_req<std::array<T, N>> &&o) : async_data_op_req<const void>(std::move(o)) { }
 	async_data_op_req(async_io_op _precondition, const std::array<T, N> &v, off_t _where) : async_data_op_req<const void>(std::move(_precondition), static_cast<const void *>(&v.front()), v.size()*sizeof(T), _where) { }
@@ -1102,6 +1118,8 @@ template<class C, class T, class A> struct async_data_op_req<std::basic_string<C
 	async_data_op_req() { }
 	async_data_op_req(const async_data_op_req &o) : async_data_op_req<void>(o) { }
 	async_data_op_req(async_data_op_req &&o) : async_data_op_req<void>(std::move(o)) { }
+	async_data_op_req &operator=(const async_data_op_req &o) { static_cast<async_data_op_req<void>>(*this)=o; return *this; }
+	async_data_op_req &operator=(async_data_op_req &&o) { static_cast<async_data_op_req<void>>(*this)=std::move(o); return *this; }
 	async_data_op_req(async_io_op _precondition, std::basic_string<C, T, A> &v, off_t _where) : async_data_op_req<void>(std::move(_precondition), static_cast<void *>(&v.front()), v.size()*sizeof(A), _where) { }
 };
 template<class C, class T, class A> struct async_data_op_req<const std::basic_string<C, T, A>> : public async_data_op_req<const void>
@@ -1111,6 +1129,8 @@ template<class C, class T, class A> struct async_data_op_req<const std::basic_st
 	async_data_op_req(async_data_op_req &&o) : async_data_op_req<const void>(std::move(o)) { }
 	async_data_op_req(const async_data_op_req<std::basic_string<C, T, A>> &o) : async_data_op_req<const void>(o) { }
 	async_data_op_req(async_data_op_req<std::basic_string<C, T, A>> &&o) : async_data_op_req<const void>(std::move(o)) { }
+	async_data_op_req &operator=(const async_data_op_req &o) { static_cast<async_data_op_req<const void>>(*this)=o; return *this; }
+	async_data_op_req &operator=(async_data_op_req &&o) { static_cast<async_data_op_req<const void>>(*this)=std::move(o); return *this; }
 	async_data_op_req(async_io_op _precondition, const std::basic_string<C, T, A> &v, off_t _where) : async_data_op_req<const void>(std::move(_precondition), static_cast<const void *>(&v.front()), v.size()*sizeof(A), _where) { }
 };
 
