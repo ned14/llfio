@@ -891,13 +891,13 @@ struct async_io_op
 {
 	std::shared_ptr<async_file_io_dispatcher_base> parent; //!< The parent dispatcher
 	size_t id;											//!< A unique id for this operation
-	shared_future<std::shared_ptr<detail::async_io_handle>> h;	//!< A future handle to the item being operated upon
+	std::shared_ptr<shared_future<std::shared_ptr<detail::async_io_handle>>> h;	//!< A future handle to the item being operated upon
 
-	async_io_op() : id(0) { }
+	async_io_op() : id(0), h(std::make_shared<shared_future<std::shared_ptr<detail::async_io_handle>>>()) { }
 	async_io_op(const async_io_op &o) : parent(o.parent), id(o.id), h(o.h) { }
 	async_io_op(async_io_op &&o) : parent(std::move(o.parent)), id(std::move(o.id)), h(std::move(o.h)) { }
-	async_io_op(std::shared_ptr<async_file_io_dispatcher_base> _parent, size_t _id, shared_future<std::shared_ptr<detail::async_io_handle>> _handle) : parent(_parent), id(_id), h(std::move(_handle)) { }
-	async_io_op(std::shared_ptr<async_file_io_dispatcher_base> _parent, size_t _id) : parent(_parent), id(_id) { }
+	async_io_op(std::shared_ptr<async_file_io_dispatcher_base> _parent, size_t _id, std::shared_ptr<shared_future<std::shared_ptr<detail::async_io_handle>>> _handle) : parent(_parent), id(_id), h(std::move(_handle)) { }
+	async_io_op(std::shared_ptr<async_file_io_dispatcher_base> _parent, size_t _id) : parent(_parent), id(_id), h(std::make_shared<shared_future<std::shared_ptr<detail::async_io_handle>>>()) { }
 	async_io_op &operator=(const async_io_op &o) { parent=o.parent; id=o.id; h=o.h; return *this; }
 	async_io_op &operator=(async_io_op &&o) { parent=std::move(o.parent); id=std::move(o.id); h=std::move(o.h); return *this; }
 };

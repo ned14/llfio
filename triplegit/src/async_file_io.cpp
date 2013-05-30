@@ -213,11 +213,11 @@ namespace detail {
 	{
 		OpType optype;
 		async_op_flags flags;
-		shared_future<std::shared_ptr<detail::async_io_handle>> h;
+		std::shared_ptr<shared_future<std::shared_ptr<detail::async_io_handle>>> h;
 		std::unique_ptr<promise<std::shared_ptr<detail::async_io_handle>>> detached_promise;
 		typedef std::pair<size_t, std::function<std::shared_ptr<detail::async_io_handle> (std::shared_ptr<detail::async_io_handle>)>> completion_t;
 		std::vector<completion_t> completions;
-		async_file_io_dispatcher_op(OpType _optype, async_op_flags _flags, shared_future<std::shared_ptr<detail::async_io_handle>> _h)
+		async_file_io_dispatcher_op(OpType _optype, async_op_flags _flags, std::shared_ptr<shared_future<std::shared_ptr<detail::async_io_handle>>> _h)
 			: optype(_optype), flags(_flags), h(_h) { }
 		async_file_io_dispatcher_op(async_file_io_dispatcher_op &&o) : optype(o.optype), flags(std::move(o.flags)), h(std::move(o.h)),
 			detached_promise(std::move(o.detached_promise)), completions(std::move(o.completions)) { }
@@ -367,22 +367,22 @@ void async_file_io_dispatcher_base::complete_async_op(size_t id, std::shared_ptr
 				// If he was set up with a detached future, use that instead
 				if(it->second.detached_promise)
 				{
-					it->second.h=it->second.detached_promise->get_future();
+					*it->second.h=it->second.detached_promise->get_future();
 					immediates.enqueue(std::bind(c.second, h));
 				}
 				else
-					it->second.h=immediates.enqueue(std::bind(c.second, h));
+					*it->second.h=immediates.enqueue(std::bind(c.second, h));
 			}
 			else
 			{
 				// If he was set up with a detached future, use that instead
 				if(it->second.detached_promise)
 				{
-					it->second.h=it->second.detached_promise->get_future();
+					*it->second.h=it->second.detached_promise->get_future();
 					threadpool().enqueue(std::bind(c.second, h));
 				}
 				else
-					it->second.h=threadpool().enqueue(std::bind(c.second, h));
+					*it->second.h=threadpool().enqueue(std::bind(c.second, h));
 			}
 			DEBUG_PRINT("C %u > %u %p\n", (unsigned) id, (unsigned) c.first, h.get());
 		}
@@ -505,8 +505,8 @@ template<class F, class... Args> async_io_op async_file_io_dispatcher_base::chai
 		std::shared_ptr<detail::async_io_handle> h;
 		// Boost's shared_future has get() as non-const which is weird, because it doesn't
 		// delete the data after retrieval.
-		if(precondition.h.valid())
-			h=const_cast<shared_future<std::shared_ptr<detail::async_io_handle>> &>(precondition.h).get();
+		if(precondition.h->valid())
+			h=const_cast<shared_future<std::shared_ptr<detail::async_io_handle>> &>(*precondition.h).get();
 		else if(precondition.id)
 		{
 			// It should never happen that precondition.id is valid but removed from extant ops
@@ -515,9 +515,9 @@ template<class F, class... Args> async_io_op async_file_io_dispatcher_base::chai
 			std::terminate();
 		}
 		if(!!(flags & async_op_flags::ImmediateCompletion))
-			ret.h=immediates.enqueue(std::bind(boundf.second, h)).share();
+			*ret.h=immediates.enqueue(std::bind(boundf.second, h)).share();
 		else
-			ret.h=threadpool().enqueue(std::bind(boundf.second, h)).share();
+			*ret.h=threadpool().enqueue(std::bind(boundf.second, h)).share();
 	}
 	auto opsit=p->ops.insert(std::make_pair(thisid, detail::async_file_io_dispatcher_op((detail::OpType) optype, flags, ret.h)));
 	assert(opsit.second);
@@ -530,7 +530,7 @@ template<class F, class... Args> async_io_op async_file_io_dispatcher_base::chai
 	{
 		opsit.first->second.detached_promise.reset(new promise<std::shared_ptr<detail::async_io_handle>>);
 		if(!done)
-			opsit.first->second.h=opsit.first->second.detached_promise->get_future();
+			*opsit.first->second.h=opsit.first->second.detached_promise->get_future();
 	}
 	unopsit.dismiss();
 	undep.dismiss();

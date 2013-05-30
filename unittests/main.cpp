@@ -654,8 +654,8 @@ static void evil_random_io(std::shared_ptr<triplegit::async_io::async_file_io_di
 	diff=chrono::duration_cast<secs_type>(end-begin);
 	for(auto &i : manydeletedfiles)
 	{
-		readed+=i.h.get()->read_count();
-		written+=i.h.get()->write_count();
+		readed+=i.h->get()->read_count();
+		written+=i.h->get()->write_count();
 	}
 	cout << "We read " << readed << " bytes and wrote " << written << " bytes" << endl;
 	cout << "  That makes " << (readed+written)/diff.count()/1024/1024 << " Mb/sec" << endl;
