@@ -6,3 +6,5 @@ script: scons
 before_install:
  - sudo apt-get update -qq
  - sudo apt-get install -qq boost-all-dev
+ - git submodule update --init --recursive
+ 
