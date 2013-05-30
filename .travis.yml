@@ -10,6 +10,6 @@ before_install:
  - sudo apt-get install -qq libboost1.53-all-dev libstdc++-4.8-dev clang-3.2
  - git submodule update --init --recursive
 script:
- - scons -k --usegcc=$CXX
+ - if [ $CC = "clang" ]; then scons -k --useclang=clang++-3.2; else scons -k; fi
 after_script:
  - x64/Release/tests
