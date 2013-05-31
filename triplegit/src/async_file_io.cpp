@@ -56,7 +56,7 @@ File Created: Mar 2013
 // libstdc++ doesn't come with std::lock_guard
 #define lock_guard boost::lock_guard
 
-#if defined(_DEBUG) && 0
+#if defined(_DEBUG) && 1
 #define DEBUG_PRINTING 1
 #ifdef WIN32
 #define DEBUG_PRINT(...) \
@@ -1001,7 +1001,7 @@ namespace detail {
 		completion_returntype doread(size_t id, std::shared_ptr<detail::async_io_handle> h, async_data_op_req<void> req)
 		{
 			async_io_handle_posix *p=static_cast<async_io_handle_posix *>(h.get());
-			ssize_t bytesread=0;
+			ssize_t bytesread=0, bytestoread=0;
 			iovec v;
 			std::vector<iovec> vecs;
 			vecs.reserve(req.buffers.size());
@@ -1014,17 +1014,20 @@ namespace detail {
 			{
 				v.iov_base=boost::asio::buffer_cast<void *>(b);
 				v.iov_len=boost::asio::buffer_size(b);
+				bytestoread+=v.iov_len;
 				vecs.push_back(v);
 			}
 			ERRHOSFN((int) (bytesread=preadv(p->fd, &vecs.front(), (int) vecs.size(), req.where)), p->path());
 			p->bytesread+=bytesread;
+			if(bytesread!=bytestoread)
+				throw std::runtime_error("Failed to read all buffers");
 			return std::make_pair(true, h);
 		}
 		// Called in unknown thread
 		completion_returntype dowrite(size_t id, std::shared_ptr<detail::async_io_handle> h, async_data_op_req<const void> req)
 		{
 			async_io_handle_posix *p=static_cast<async_io_handle_posix *>(h.get());
-			ssize_t byteswritten=0;
+			ssize_t byteswritten=0, bytestowrite=0;
 			iovec v;
 			std::vector<iovec> vecs;
 			vecs.reserve(req.buffers.size());
@@ -1037,10 +1040,13 @@ namespace detail {
 			{
 				v.iov_base=(void *) boost::asio::buffer_cast<const void *>(b);
 				v.iov_len=boost::asio::buffer_size(b);
+				bytestowrite+=v.iov_len;
 				vecs.push_back(v);
 			}
 			ERRHOSFN((int) (byteswritten=pwritev(p->fd, &vecs.front(), (int) vecs.size(), req.where)), p->path());
 			p->byteswritten+=byteswritten;
+			if(byteswritten!=bytestowrite)
+				throw std::runtime_error("Failed to write all buffers");
 			return std::make_pair(true, h);
 		}
 		// Called in unknown thread

@@ -564,7 +564,7 @@ static void evil_random_io(std::shared_ptr<triplegit::async_io::async_file_io_di
 				u4 s=ranval(&gen) & ((256*1024-1)&~63); // Must be a multiple of 64 bytes for SHA256
 				if(s<64) s=64;
 #ifdef _DEBUG
-				if(s>65536) s=65536; // clamp for now. I think Boost.ASIO won't transfer more than 64Kb at a time anyway ... ?!?
+				//if(s>65536) s=65536; // clamp for now. I think Boost.ASIO won't transfer more than 64Kb at a time anyway ... ?!?
 #endif
 				if(thisbytes+s>1024*1024) break;
 				char *buffertouse=(char *)((size_t)towriteptrs[n]+(size_t) op.req.where);
@@ -649,22 +649,26 @@ static void evil_random_io(std::shared_ptr<triplegit::async_io::async_file_io_di
 	boost::lockfree::queue<pair<const Op *, size_t> *> failures(maxfailures);
 	auto checkHash=[&failures](Op &op, char *base, size_t, std::shared_ptr<triplegit::async_io::detail::async_io_handle> h) -> std::pair<bool, std::shared_ptr<triplegit::async_io::detail::async_io_handle>> {
 		const char *data=(const char *)(((size_t) base+(size_t) op.req.where));
+		size_t idxoffset=0;
 		for(size_t m=0; m<op.req.buffers.size(); m++)
 		{
 			const char *buffer=op.data[m];
 			size_t idx;
 			for(idx=0; idx<boost::asio::buffer_size(op.req.buffers[m]); idx++)
+			{
 				if(data[idx]!=buffer[idx])
 				{
-					failures.push(new pair<const Op *, size_t>(make_pair(&op, idx)));
+					failures.push(new pair<const Op *, size_t>(make_pair(&op, idxoffset+idx)));
 #ifdef _DEBUG
 					string contents(data, 8), shouldbe(buffer, 8);
 					cout << "Contents of file at " << op.req.where << " +" << idx << " contains " << contents << " instead of " << shouldbe << endl;
 #endif
 					break;
 				}
+			}
 			if(idx!=boost::asio::buffer_size(op.req.buffers[m])) break;
 			data+=boost::asio::buffer_size(op.req.buffers[m]);
+			idxoffset+=boost::asio::buffer_size(op.req.buffers[m]);
 		}
 		return make_pair(true, h);
 	};
