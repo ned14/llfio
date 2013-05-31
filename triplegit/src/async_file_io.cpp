@@ -14,6 +14,8 @@ File Created: Mar 2013
 #include "boost/smart_ptr/detail/spinlock.hpp"
 #include "../../NiallsCPP11Utilities/ErrorHandling.hpp"
 #include <mutex>
+#include "valgrind/memcheck.h"
+#include "valgrind/helgrind.h"
 
 #include <fcntl.h>
 #include <sys/stat.h>
@@ -239,7 +241,12 @@ namespace detail {
 		{
 			// Boost's spinlock is so lightweight it has no constructor ...
 			fdslock.unlock();
+			ANNOTATE_RWLOCK_CREATE(&fdslock);
 			ops.reserve(10000);
+		}
+		~async_file_io_dispatcher_base_p()
+		{
+			ANNOTATE_RWLOCK_DESTROY(&fdslock);
 		}
 	};
 	class async_file_io_dispatcher_compat;
@@ -285,13 +292,17 @@ async_file_io_dispatcher_base::~async_file_io_dispatcher_base()
 void async_file_io_dispatcher_base::int_add_io_handle(void *key, std::shared_ptr<detail::async_io_handle> h)
 {
 	lock_guard<detail::async_file_io_dispatcher_base_p::fdslock_t> lockh(p->fdslock);
+	ANNOTATE_RWLOCK_ACQUIRED(&p->fdslock, 1);
 	p->fds.insert(make_pair(key, std::weak_ptr<detail::async_io_handle>(h)));
+	ANNOTATE_RWLOCK_RELEASED(&p->fdslock, 1);
 }
 
 void async_file_io_dispatcher_base::int_del_io_handle(void *key)
 {
 	lock_guard<detail::async_file_io_dispatcher_base_p::fdslock_t> lockh(p->fdslock);
+	ANNOTATE_RWLOCK_ACQUIRED(&p->fdslock, 1);
 	p->fds.erase(key);
+	ANNOTATE_RWLOCK_RELEASED(&p->fdslock, 1);
 }
 
 thread_pool &async_file_io_dispatcher_base::threadpool() const
@@ -312,8 +323,12 @@ size_t async_file_io_dispatcher_base::wait_queue_depth() const
 
 size_t async_file_io_dispatcher_base::count() const
 {
+	size_t ret;
 	lock_guard<detail::async_file_io_dispatcher_base_p::fdslock_t> lockh(p->fdslock);
-	return p->fds.size();
+	ANNOTATE_RWLOCK_ACQUIRED(&p->fdslock, 1);
+	ret=p->fds.size();
+	ANNOTATE_RWLOCK_RELEASED(&p->fdslock, 1);
+	return ret;
 }
 
 // Called in unknown thread

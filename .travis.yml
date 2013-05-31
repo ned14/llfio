@@ -4,15 +4,15 @@ compiler:
   - clang
 env:
   - UNIT_TESTS=0
-  - UNIT_TESTS=1
+  - UNIT_TESTS=memcheck
 before_install:
  - sudo add-apt-repository -y ppa:apokluda/boost1.53
  - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
  - sudo add-apt-repository -y ppa:h-rayflood/llvm
  - sudo apt-get update -qq
  - sudo apt-get install -qq libboost1.53-all-dev libstdc++-4.8-dev clang-3.2
- - if [ $UNIT_TESTS -eq 1 ]; then sudo apt-get install -qq valgrind; fi
+ - if [ $UNIT_TESTS = "memcheck" ]; then sudo apt-get install -qq valgrind; fi
  - git submodule update --init --recursive
 script:
  - if [ $CC = "clang" ]; then scons -k --useclang=clang++-3.2; else scons -k; fi
- - if [ $UNIT_TESTS -eq 1 ]; then valgrind --suppressions=unittests/valgrind.supp --track-origins=yes --track-fds=yes --leak-check=full --show-reachable=yes --error-exitcode=1 x64/Release/tests async_io/works/1; fi
+ - if [ $UNIT_TESTS = "memcheck" ]; then valgrind --tool=memcheck --suppressions=unittests/memcheck.supp --track-origins=yes --track-fds=yes --leak-check=full --show-reachable=yes --error-exitcode=1 x64/Release/tests async_io/works/1; fi
