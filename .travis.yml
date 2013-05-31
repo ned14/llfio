@@ -15,4 +15,4 @@ before_install:
  - git submodule update --init --recursive
 script:
  - if [ $CC = "clang" ]; then scons -k --useclang=clang++-3.2; else scons -k; fi
- - if [ $UNIT_TESTS -eq 1 ]; then valgrind --error-exitcode=1 x64/Release/tests async_io/works/1; fi
+ - if [ $UNIT_TESTS -eq 1 ]; then valgrind --suppressions=unittests/valgrind.supp --track-origins=yes --track-fds=yes --leak-check=full --show-reachable=yes --error-exitcode=1 x64/Release/tests async_io/works/1; fi

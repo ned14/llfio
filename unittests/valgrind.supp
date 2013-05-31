@@ -1,0 +1,37 @@
+{
+   libstdc1
+   Memcheck:Addr8
+   fun:wcscmp
+   fun:_ZNSt10moneypunctIwLb0EED1Ev
+   fun:_ZNSt10moneypunctIwLb0EED0Ev
+   fun:_ZNSt6locale5_ImplD1Ev
+   fun:_ZNSt6localeD1Ev
+   fun:__cxa_finalize
+   ...
+   fun:__run_exit_handlers
+   fun:exit
+   fun:(below main)
+}
+{
+   libstdc2
+   Memcheck:Addr8
+   fun:wcscmp
+   fun:_ZNSt10moneypunctIwLb1EED1Ev
+   fun:_ZNSt10moneypunctIwLb1EED0Ev
+   fun:_ZNSt6locale5_ImplD1Ev
+   fun:_ZNSt6localeD1Ev
+   fun:__cxa_finalize
+   ...
+   fun:__run_exit_handlers
+   fun:exit
+   fun:(below main)
+}
+{
+   boost1
+   Memcheck:Leak
+   fun:malloc
+   fun:_ZN5boost6detail25get_once_per_thread_epochEv
+   ...
+   fun:_ZN5boost6detail23get_current_thread_dataEv
+   ...
+}
