@@ -536,7 +536,7 @@ template<class F, class... Args> async_io_op async_file_io_dispatcher_base::chai
 	}
 	auto opsit=p->ops.insert(std::make_pair(thisid, detail::async_file_io_dispatcher_op((detail::OpType) optype, flags, ret.h)));
 	assert(opsit.second);
-	DEBUG_PRINT("I %u < %u (%s)\n", (unsigned) thisid, precondition.id, detail::optypes[static_cast<int>(optype)]);
+	DEBUG_PRINT("I %u < %u (%s)\n", (unsigned) thisid, (unsigned) precondition.id, detail::optypes[static_cast<int>(optype)]);
 	auto unopsit=NiallsCPP11Utilities::Undoer([this, opsit, thisid](){
 		p->ops.erase(opsit.first);
 		DEBUG_PRINT("E R %u\n", (unsigned) thisid);
