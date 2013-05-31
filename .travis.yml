@@ -4,7 +4,8 @@ compiler:
   - clang
 env:
   - UNIT_TESTS=0
-  - UNIT_TESTS=memcheck
+  - UNIT_TESTS=memcheck DEBUG=1
+#  - UNIT_TESTS=memcheck DEBUG=0
 #  - UNIT_TESTS=drd
 before_install:
  - sudo add-apt-repository -y ppa:apokluda/boost1.53
@@ -15,6 +16,7 @@ before_install:
  - if [ $UNIT_TESTS != "0" ]; then sudo apt-get install -qq valgrind; fi
  - git submodule update --init --recursive
 script:
- - if [ $CC = "clang" ]; then scons -k --useclang=clang++-3.2; else scons -k; fi
- - if [ $UNIT_TESTS = "memcheck" ]; then valgrind --tool=memcheck --suppressions=unittests/memcheck.supp --track-origins=yes --track-fds=yes --leak-check=full --show-reachable=yes --error-exitcode=1 x64/Release/tests async_io/works/1; fi
+ - if [ $CC = "clang" ]; then if [ $DEBUG -eq 0 ]; then scons -k --useclang=clang++-3.2; else scons -k --useclang=clang++-3.2 --debugbuild; fi; else  if [ $DEBUG -eq 0 ]; then scons -k; else scons -k --debugbuild; fi; fi
+ - if [ $UNIT_TESTS = "memcheck" ] && [ $DEBUG -eq 0 ]; then valgrind --tool=memcheck --suppressions=unittests/memcheck.supp --track-origins=yes --track-fds=yes --leak-check=full --show-reachable=yes --error-exitcode=1 x64/Release/tests async_io/works/1; fi
+ - if [ $UNIT_TESTS = "memcheck" ] && [ $DEBUG -eq 1 ]; then valgrind --tool=memcheck --suppressions=unittests/memcheck.supp --track-origins=yes --track-fds=yes --leak-check=full --show-reachable=yes --error-exitcode=1 x64/Debug/tests async_io/works/1; fi
  - if [ $UNIT_TESTS = "drd" ] && [ $CXX != "clang++" ]; then valgrind --tool=drd --suppressions=unittests/drd.supp --error-exitcode=1 x64/Release/tests async_io/works/1; fi
