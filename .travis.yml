@@ -7,7 +7,7 @@ env:
   - VALGRIND=0 UNIT_TESTS=0 DEBUG=0 GCCVER=""
   - VALGRIND=0 UNIT_TESTS="exclude:async_io/torture* exclude:async_io/errors" DEBUG=0 GCCVER=""
   - VALGRIND=memcheck UNIT_TESTS="exclude:async_io/torture* exclude:async_io/errors" DEBUG=1 GCCVER=""
-  - VALGRIND=0 CCFLAGS="--usethreadsanitize --usegcc=g++-4.8" UNIT_TESTS="exclude:async_io/torture* exclude:async_io/errors" DEBUG=1 GCCVER="4.8" 
+  - VALGRIND=0 CCFLAGS="--usethreadsanitize --usegcc=g++-4.8" UNIT_TESTS="exclude:async_io/torture* exclude:async_io/errors" DEBUG=1 GCCVER="4.8" TSAN_OPTIONS="suppressions=unittests/tsan.supp"
 
 matrix:
   exclude:
