@@ -14,9 +14,9 @@ matrix:
   exclude:
     - compiler: clang
       env: VALGRIND=0 CCFLAGS="--usethreadsanitize --usegcc=g++-4.8" UNIT_TESTS="exclude:async_io/torture* exclude:async_io/errors" DEBUG=1 GCCVER="4.8" TSAN_OPTIONS="suppressions=unittests/tsan.supp"
-#  allow_failures:
-#    - compiler: gcc
-#      env: VALGRIND=0 CCFLAGS="--usethreadsanitize --usegcc=g++-4.8" UNIT_TESTS="exclude:async_io/torture* exclude:async_io/errors" DEBUG=1 GCCVER="4.8" TSAN_OPTIONS="suppressions=unittests/tsan.supp"
+  allow_failures:
+    - compiler: gcc
+      env: VALGRIND=0 CCFLAGS="--usethreadsanitize --usegcc=g++-4.8" UNIT_TESTS="exclude:async_io/torture* exclude:async_io/errors" DEBUG=1 GCCVER="4.8" TSAN_OPTIONS="suppressions=unittests/tsan.supp"
 
 before_install:
  - sudo add-apt-repository -y ppa:apokluda/boost1.53
