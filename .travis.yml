@@ -18,7 +18,7 @@ before_install:
  - if [ $CXX = "clang++" ]; then sudo add-apt-repository -y ppa:h-rayflood/llvm; fi
  - sudo apt-get update -qq
  - sudo apt-get install -qq libboost1.53-all-dev
- - if [ $CXX = "clang++" ]; then sudo apt-get install -qq libstdc++-4.8-dev clang-3.2
+ - if [ $CXX = "clang++" ]; then sudo apt-get install -qq libstdc++-4.8-dev clang-3.2; fi
  - if [ $VALGRIND != "0" ]; then sudo apt-get install -qq valgrind; fi
  - git submodule update --init --recursive
 
