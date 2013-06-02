@@ -78,7 +78,7 @@ else:
     env['CXXFLAGS']+=["-std=c++0x"]
     env['LIBS']+=["boost_atomic", "boost_filesystem", "boost_system", "boost_thread", "pthread"]
     env['LINKFLAGS']+=[]
-    env['LINKFLAGSEXE']=env['LINKFLAGS'][:]+["-pie"]
+    env['LINKFLAGSEXE']=env['LINKFLAGS'][:] #+["-pie"]
 
 outputs={}
 
