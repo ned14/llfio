@@ -366,7 +366,7 @@ static void _1000_open_write_close_deletes(std::shared_ptr<triplegit::async_io::
 	cout << "It took " << diff.count() << " secs to do " << manyfilereqs.size()/diff.count() << " file deletions per sec" << endl;
 
 	// Fetch any outstanding error
-	rmdir.h.get();
+	rmdir.h->get();
 	CHECK((callcount==1000U));
 }
 
@@ -419,12 +419,14 @@ TEST_CASE("async_io/works/64/autoflush", "Tests that the autoflush async i/o imp
 	_1000_open_write_close_deletes(dispatcher, 65536);
 }
 
+#if 0
 TEST_CASE("async_io/works/1/direct", "Tests that the direct async i/o implementation works")
 {
 	auto dispatcher=triplegit::async_io::async_file_io_dispatcher(triplegit::async_io::process_threadpool(), triplegit::async_io::file_flags::OSDirect);
 	std::cout << "\n\n1000 file opens, writes 1 byte, closes, and deletes with direct i/o:\n";
 	_1000_open_write_close_deletes(dispatcher, 1);
 }
+#endif
 
 TEST_CASE("async_io/works/64/direct", "Tests that the direct async i/o implementation works")
 {
@@ -433,12 +435,14 @@ TEST_CASE("async_io/works/64/direct", "Tests that the direct async i/o implement
 	_1000_open_write_close_deletes(dispatcher, 65536);
 }
 
+#if 0
 TEST_CASE("async_io/works/1/directsync", "Tests that the direct synchronous async i/o implementation works")
 {
 	auto dispatcher=triplegit::async_io::async_file_io_dispatcher(triplegit::async_io::process_threadpool(), triplegit::async_io::file_flags::OSDirect|triplegit::async_io::file_flags::OSSync);
 	std::cout << "\n\n1000 file opens, writes 1 byte, closes, and deletes with direct synchronous i/o:\n";
 	_1000_open_write_close_deletes(dispatcher, 1);
 }
+#endif
 
 TEST_CASE("async_io/works/64/directsync", "Tests that the direct synchronous async i/o implementation works")
 {
@@ -465,7 +469,7 @@ TEST_CASE("async_io/errors", "Tests that the async i/o error handling works")
 			auto copy(dispatcher->call(files.front(), []{
 				std::filesystem::copy("testdir/c", "testdir/d");
 			}));
-			CHECK_THROWS(copy.second.h.get()); // This should trip with failure to copy
+			CHECK_THROWS(copy.second.h->get()); // This should trip with failure to copy
 			CHECK_THROWS(when_all({copy.second}).get()); // This should trip with failure to copy
 #else
 			CHECK(!"Fixme");
@@ -585,7 +589,7 @@ static void evil_random_io(std::shared_ptr<triplegit::async_io::async_file_io_di
 	auto manywrittenfiles(dispatcher->truncate(manyopenfiles, sizes));
 #if defined(_DEBUG) && 0
 	for(size_t n=0; n<manywrittenfiles.size(); n++)
-		cout << n << ": " << manywrittenfiles[n].id << " (" << manywrittenfiles[n].h.get()->path() << ") " << endl;
+		cout << n << ": " << manywrittenfiles[n].id << " (" << manywrittenfiles[n].h->get()->path() << ") " << endl;
 #endif
 
 	// Schedule a replay of our in-RAM simulation
@@ -670,7 +674,7 @@ static void evil_random_io(std::shared_ptr<triplegit::async_io::async_file_io_di
 	cout << "It took " << diff.count() << " secs to do " << manyfilereqs.size()/diff.count() << " file deletions per sec" << endl;
 
 	// Fetch any outstanding error
-	rmdir.h.get();
+	rmdir.h->get();
 	CHECK(failures.empty());
 	if(!failures.empty())
 	{

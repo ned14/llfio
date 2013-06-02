@@ -65,8 +65,12 @@ if env['CC']=='cl':
         env['LINKFLAGS']+=["/OPT:ICF"]  # Eliminate redundants
 else:
     env['CPPDEFINES']+=[]
-    env['CCFLAGS']+=["-fstrict-aliasing", "-fargument-noalias", "-Wstrict-aliasing"]
+    env['CCFLAGS']+=["-fstrict-aliasing", "-Wstrict-aliasing"]
     env['CCFLAGS']+=["-Wall", "-Wno-unused"]
+    if env.GetOption('useclang'):
+        env['CCFLAGS']+=["-Wno-mismatched-tags"]
+    else:
+        env['CCFLAGS']+=["-fargument-noalias"]
     if debugbuild:
         env['CCFLAGS']+=["-O0", "-g"]
     else:

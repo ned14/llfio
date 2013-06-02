@@ -1003,7 +1003,7 @@ struct async_path_op_req
 	std::filesystem::path path;
 	file_flags flags;
 	async_io_op precondition;
-	async_path_op_req() { }
+	async_path_op_req() : flags(file_flags::None) { }
 	//! Fails is path is not absolute
 	async_path_op_req(std::filesystem::path _path, file_flags _flags=file_flags::None) : path(_path), flags(_flags) { if(!path.is_absolute()) throw std::runtime_error("Non-absolute path"); }
 	//! Fails is path is not absolute

@@ -111,7 +111,7 @@ else:
             temp=env['CC']
         except:
             temp=[]
-        cc.env['CC']="clang"
+        cc.env['CC']=env.GetOption('useclang')
         result=cc.TryLink('int main(void) { return 0; }\n', '.c')
         cc.env['CC']=temp
         cc.Result(result)
@@ -122,7 +122,7 @@ else:
             temp=env['CC']
         except:
             temp=[]
-        cc.env['CC']="gcc"
+        cc.env['CC']=env.GetOption('usegcc')
         result=cc.TryLink('int main(void) { return 0; }\n', '.c')
         cc.env['CC']=temp
         cc.Result(result)
