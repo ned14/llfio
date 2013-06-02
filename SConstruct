@@ -179,7 +179,7 @@ else:
         env['CC']="gcc"
         env['CXX']=env.GetOption('usegcc')
     if env.GetOption('usethreadsanitize'):
-        env['CPPFLAGS']+=["-fsanitize=thread", "-fPIC"]
+        env['CPPFLAGS']+=["-fsanitize=thread", "-fPIC", "--suppressions=unittests/tsan.supp"]
         env['LINKFLAGS']+=["-fsanitize=thread"]
         env['LIBS']+=["tsan"]
     if not conf.CheckLib("rt", "clock_gettime") and not conf.CheckLib("c", "clock_gettime"):
