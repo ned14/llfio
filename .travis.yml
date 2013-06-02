@@ -7,15 +7,15 @@ env:
   - VALGRIND=0 UNIT_TESTS=0 DEBUG=0 GCCVER=""
   - VALGRIND=0 UNIT_TESTS="exclude:async_io/torture* exclude:async_io/errors" DEBUG=0 GCCVER=""
   - VALGRIND=memcheck UNIT_TESTS="exclude:async_io/torture* exclude:async_io/errors" DEBUG=1 GCCVER=""
-  - VALGRIND=0 CCFLAGS="--usethreadsanitize --usegcc=g++-4.8" UNIT_TESTS="exclude:async_io/torture* exclude:async_io/errors" DEBUG=1 GCCVER="4.8" 
+  - VALGRIND=0 CCFLAGS="--usethreadsanitize --usegcc=g++-4.8" UNIT_TESTS="exclude:async_io/torture* exclude:async_io/errors --suppressions=unittests/tsan.supp" DEBUG=1 GCCVER="4.8" 
 
 matrix:
   exclude:
     - compiler: clang
-      env: VALGRIND=0 CCFLAGS="--usethreadsanitize --usegcc=g++-4.8" UNIT_TESTS="exclude:async_io/torture* exclude:async_io/errors" DEBUG=1 GCCVER="4.8"
+      env: VALGRIND=0 CCFLAGS="--usethreadsanitize --usegcc=g++-4.8" UNIT_TESTS="exclude:async_io/torture* exclude:async_io/errors --suppressions=unittests/tsan.supp" DEBUG=1 GCCVER="4.8"
   allow_failures:
     - compiler: gcc
-      env: VALGRIND=0 CCFLAGS="--usethreadsanitize --usegcc=g++-4.8" UNIT_TESTS="exclude:async_io/torture* exclude:async_io/errors" DEBUG=1 GCCVER="4.8"
+      env: VALGRIND=0 CCFLAGS="--usethreadsanitize --usegcc=g++-4.8" UNIT_TESTS="exclude:async_io/torture* exclude:async_io/errors --suppressions=unittests/tsan.supp" DEBUG=1 GCCVER="4.8"
 
 before_install:
  - sudo add-apt-repository -y ppa:apokluda/boost1.53

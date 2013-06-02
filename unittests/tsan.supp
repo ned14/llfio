@@ -1,0 +1,10 @@
+{
+   boostfuture1
+   ThreadSanitizer: data race
+   fun:boost::mutex::~mutex()
+   fun:boost::detail::future_object_base::~future_object_base()
+   fun:boost::detail::future_object<std::shared_ptr<triplegit::async_io::detail::async_io_handle> >::~future_object()
+   fun:boost::detail::task_base<std::shared_ptr<triplegit::async_io::detail::async_io_handle> >::~task_base()
+   fun:boost::detail::task_object<std::_Bind<std::function<std::shared_ptr<triplegit::async_io::detail::async_io_handle> (std::shared_ptr<triplegit::async_io::detail::async_io_handle>)> (std::shared_ptr<triplegit::async_io::detail::async_io_handle>)>, std::shared_ptr<triplegit::async_io::detail::async_io_handle> >::~task_object()
+   ...
+}
