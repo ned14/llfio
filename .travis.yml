@@ -12,6 +12,9 @@ matrix:
   exclude:
     - compiler: clang
       env: UNIT_TESTS="exclude:async_io/torture* exclude:async_io/errors" VALGRIND=memcheck DEBUG=1
+  allow_failures:
+    - compiler: gcc
+      env: UNIT_TESTS="exclude:async_io/torture* exclude:async_io/errors" VALGRIND=memcheck DEBUG=1
 
 before_install:
  - sudo add-apt-repository -y ppa:apokluda/boost1.53
@@ -31,4 +34,4 @@ script:
  - if [ $DEBUG -eq 0 ]; then PREFIXPATH="x64/Release"; fi
  - if [ $DEBUG -eq 1 ]; then PREFIXPATH="x64/Debug"; fi
 
- - if [ $UNIT_TESTS != "0" ]; then $PREFIXTEST $PREFIXPATH/tests $UNIT_TESTS; fi
+ - if [ "$UNIT_TESTS" != "0" ]; then $PREFIXTEST $PREFIXPATH/tests $UNIT_TESTS; fi
