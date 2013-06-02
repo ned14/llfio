@@ -78,7 +78,8 @@ else:
     env['CXXFLAGS']+=["-std=c++0x"]
     env['LIBS']+=["boost_atomic", "boost_filesystem", "boost_system", "boost_thread", "pthread"]
     env['LINKFLAGS']+=[]
-    env['LINKFLAGSEXE']=env['LINKFLAGS'][:] #+["-pie"]
+    env['CCFLAGSEXE']=env['CCFLAGS'][:] +["-fPIC"]
+    env['LINKFLAGSEXE']=env['LINKFLAGS'][:] +["-pie"]
 
 outputs={}
 
@@ -87,7 +88,7 @@ outputs['mylibs']=SConscript("triplegit/SConscript")
 
 # Unit tests
 sources = env.SConscript(os.path.join("unittests", "SConscript"), 'importedenv')
-objects = env.Object(source = sources) # + [myliblib]
+objects = env.Object(source = sources, CCFLAGS=env['CCFLAGSEXE']) # + [myliblib]
 testlibs=outputs['mylibs']['triplegitlib'][0] + outputs['mylibs']['NiallsCPP11Utilitieslib']
 
 testprogram_cpp = env.Program("tests", source = objects, LINKFLAGS=env['LINKFLAGSEXE'], LIBS = testlibs + env['LIBS'])
