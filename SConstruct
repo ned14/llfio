@@ -64,6 +64,7 @@ AddOption('--debugbuild', dest='debug', nargs='?', const=True, help='enable debu
 AddOption('--static', dest='static', nargs='?', const=True, help='build a static library rather than shared library')
 AddOption('--useclang', dest='useclang', nargs=1, type='str', help='use clang if it is available')
 AddOption('--usegcc', dest='usegcc', nargs=1, type='str', help='use gcc if it is available')
+AddOption('--usethreadsanitize', dest='usethreadsanitize', nargs='?', const=True, help='use thread sanitiser')
 AddOption('--force32', dest='force32', help='force 32 bit build on 64 bit machine')
 AddOption('--archs', dest='archs', nargs=1, type='str', default='min', help='which architectures to build, comma separated. all means all. Defaults to min.')
 if 'x86' in architectures:
@@ -86,6 +87,7 @@ env['CXXCOM']  =   env['CXXCOM'].replace('$CHANGED_SOURCES','$SOURCES.abspath')
 env['SHCXXCOM']= env['SHCXXCOM'].replace('$CHANGED_SOURCES','$SOURCES.abspath')
 env['CPPPATH']=[]
 env['CPPDEFINES']=[]
+env['CPPFLAGS']=[]
 env['CCFLAGS']=[]
 env['CXXFLAGS']=[]
 env['LIBS']=[]
@@ -176,6 +178,10 @@ else:
     if env.GetOption('usegcc') and conf.CheckHaveGCC():
         env['CC']="gcc"
         env['CXX']=env.GetOption('usegcc')
+    if env.GetOption('usethreadsanitize'):
+        env['CPPFLAGS']+=["-fsanitize=thread", "-fPIC"]
+        env['LINKFLAGS']+=["-fsanitize=thread"]
+        env['LIBS']+=["tsan"]
     if not conf.CheckLib("rt", "clock_gettime") and not conf.CheckLib("c", "clock_gettime"):
         print "WARNING: Can't find clock_gettime() in librt or libc, code may not fully compile if your system headers say that this function is available"
     if conf.CheckHaveVisibility():

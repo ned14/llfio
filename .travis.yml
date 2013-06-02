@@ -7,6 +7,7 @@ env:
   - UNIT_TESTS=0 VALGRIND=0 DEBUG=0
   - UNIT_TESTS="exclude:async_io/torture* exclude:async_io/errors" VALGRIND=0 DEBUG=0
   - UNIT_TESTS="exclude:async_io/torture* exclude:async_io/errors" VALGRIND=memcheck DEBUG=1
+#  - UNIT_TESTS="async_io/works/1" VALGRIND=0 DEBUG=1 FLAGS="--usegcc=g++-4.8 --usethreadsanitize"
 
 matrix:
   exclude:
