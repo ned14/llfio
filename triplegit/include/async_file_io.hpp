@@ -25,6 +25,17 @@ File Created: Mar 2013
 #include "boost/thread/thread.hpp"
 #include "boost/thread/future.hpp"
 
+#if BOOST_VERSION<105300
+#error I absolutely need Boost v1.53 or higher to compile (I need lock free containers).
+#endif
+#if BOOST_VERSION<105400
+#ifdef _MSC_VER
+#pragma message(__FILE__ ": WARNING: Boost v1.53 has a memory corruption bug in boost::packaged_task<> when built under C++11 which makes this library useless. Get a newer Boost!")
+#else
+#warning Boost v1.53 has a memory corruption bug in boost::packaged_task<> when built under C++11 which makes this library useless. Get a newer Boost!
+#endif
+#endif
+
 #ifdef TRIPLEGIT_DLL_EXPORTS
 #define TRIPLEGIT_ASYNC_FILE_IO_API DLLEXPORTMARKUP
 #else
