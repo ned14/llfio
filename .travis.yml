@@ -15,11 +15,13 @@ matrix:
   exclude:
     - compiler: clang
       env: VALGRIND=0 CCFLAGS="--usethreadsanitize --usegcc=g++-4.8" UNIT_TESTS="exclude:async_io/torture* exclude:async_io/errors" DEBUG=1 GCCVER="4.8" TSAN_OPTIONS="suppressions=unittests/tsan.supp"
+    - compiler: clang
       env: VALGRIND=memcheck UNIT_TESTS="async_io/torture" DEBUG=1 GCCVER=""
 
   allow_failures:
     - compiler: gcc
       env: VALGRIND=0 CCFLAGS="--usethreadsanitize --usegcc=g++-4.8" UNIT_TESTS="exclude:async_io/torture* exclude:async_io/errors" DEBUG=1 GCCVER="4.8" TSAN_OPTIONS="suppressions=unittests/tsan.supp"
+    - compiler: gcc
       env: VALGRIND=memcheck UNIT_TESTS="async_io/torture" DEBUG=1 GCCVER=""
 
 before_install:
