@@ -10,6 +10,12 @@ File Created: Mar 2013
 #define _CRT_SECURE_NO_WARNINGS
 #define _CRT_NONSTDC_DEPRECATE(a)
 
+// This always compiles in input validation for this file only (the header file
+// disables at the point of instance validation in release builds)
+#ifndef TRIPLEGIT_NEVER_VALIDATE_INPUTS
+#define TRIPLEGIT_VALIDATE_INPUTS 1
+#endif
+
 #include "../include/async_file_io.hpp"
 #include "boost/smart_ptr/detail/spinlock.hpp"
 #include "../../NiallsCPP11Utilities/ErrorHandling.hpp"
@@ -761,38 +767,83 @@ namespace detail {
 
 		virtual std::vector<async_io_op> dir(const std::vector<async_path_op_req> &reqs)
 		{
+#if TRIPLEGIT_VALIDATE_INPUTS
+			for(auto &i : reqs)
+				if(!i.validate())
+					throw std::runtime_error("Inputs are invalid.");
+#endif
 			return chain_async_ops((int) detail::OpType::dir, reqs, async_op_flags::None, &async_file_io_dispatcher_windows::dodir);
 		}
 		virtual std::vector<async_io_op> rmdir(const std::vector<async_path_op_req> &reqs)
 		{
+#if TRIPLEGIT_VALIDATE_INPUTS
+			for(auto &i : reqs)
+				if(!i.validate())
+					throw std::runtime_error("Inputs are invalid.");
+#endif
 			return chain_async_ops((int) detail::OpType::rmdir, reqs, async_op_flags::None, &async_file_io_dispatcher_windows::dormdir);
 		}
 		virtual std::vector<async_io_op> file(const std::vector<async_path_op_req> &reqs)
 		{
+#if TRIPLEGIT_VALIDATE_INPUTS
+			for(auto &i : reqs)
+				if(!i.validate())
+					throw std::runtime_error("Inputs are invalid.");
+#endif
 			return chain_async_ops((int) detail::OpType::file, reqs, async_op_flags::None, &async_file_io_dispatcher_windows::dofile);
 		}
 		virtual std::vector<async_io_op> rmfile(const std::vector<async_path_op_req> &reqs)
 		{
+#if TRIPLEGIT_VALIDATE_INPUTS
+			for(auto &i : reqs)
+				if(!i.validate())
+					throw std::runtime_error("Inputs are invalid.");
+#endif
 			return chain_async_ops((int) detail::OpType::rmfile, reqs, async_op_flags::None, &async_file_io_dispatcher_windows::dormfile);
 		}
 		virtual std::vector<async_io_op> sync(const std::vector<async_io_op> &ops)
 		{
+#if TRIPLEGIT_VALIDATE_INPUTS
+			for(auto &i : ops)
+				if(!i.validate())
+					throw std::runtime_error("Inputs are invalid.");
+#endif
 			return chain_async_ops((int) detail::OpType::sync, ops, ops, async_op_flags::None, &async_file_io_dispatcher_windows::dosync);
 		}
 		virtual std::vector<async_io_op> close(const std::vector<async_io_op> &ops)
 		{
+#if TRIPLEGIT_VALIDATE_INPUTS
+			for(auto &i : ops)
+				if(!i.validate())
+					throw std::runtime_error("Inputs are invalid.");
+#endif
 			return chain_async_ops((int) detail::OpType::close, ops, ops, async_op_flags::None, &async_file_io_dispatcher_windows::doclose);
 		}
 		virtual std::vector<async_io_op> read(const std::vector<async_data_op_req<void>> &reqs)
 		{
+#if TRIPLEGIT_VALIDATE_INPUTS
+			for(auto &i : reqs)
+				if(!i.validate())
+					throw std::runtime_error("Inputs are invalid.");
+#endif
 			return chain_async_ops((int) detail::OpType::read, reqs, async_op_flags::DetachedFuture|async_op_flags::ImmediateCompletion, &async_file_io_dispatcher_windows::doread);
 		}
 		virtual std::vector<async_io_op> write(const std::vector<async_data_op_req<const void>> &reqs)
 		{
+#if TRIPLEGIT_VALIDATE_INPUTS
+			for(auto &i : reqs)
+				if(!i.validate())
+					throw std::runtime_error("Inputs are invalid.");
+#endif
 			return chain_async_ops((int) detail::OpType::write, reqs, async_op_flags::DetachedFuture|async_op_flags::ImmediateCompletion, &async_file_io_dispatcher_windows::dowrite);
 		}
 		virtual std::vector<async_io_op> truncate(const std::vector<async_io_op> &ops, const std::vector<off_t> &sizes)
 		{
+#if TRIPLEGIT_VALIDATE_INPUTS
+			for(auto &i : ops)
+				if(!i.validate())
+					throw std::runtime_error("Inputs are invalid.");
+#endif
 			return chain_async_ops((int) detail::OpType::truncate, ops, sizes, async_op_flags::None, &async_file_io_dispatcher_windows::dotruncate);
 		}
 	};
@@ -994,38 +1045,83 @@ namespace detail {
 
 		virtual std::vector<async_io_op> dir(const std::vector<async_path_op_req> &reqs)
 		{
+#if TRIPLEGIT_VALIDATE_INPUTS
+			for(auto &i : reqs)
+				if(!i.validate())
+					throw std::runtime_error("Inputs are invalid.");
+#endif
 			return chain_async_ops((int) detail::OpType::dir, reqs, async_op_flags::None, &async_file_io_dispatcher_compat::dodir);
 		}
 		virtual std::vector<async_io_op> rmdir(const std::vector<async_path_op_req> &reqs)
 		{
+#if TRIPLEGIT_VALIDATE_INPUTS
+			for(auto &i : reqs)
+				if(!i.validate())
+					throw std::runtime_error("Inputs are invalid.");
+#endif
 			return chain_async_ops((int) detail::OpType::rmdir, reqs, async_op_flags::None, &async_file_io_dispatcher_compat::dormdir);
 		}
 		virtual std::vector<async_io_op> file(const std::vector<async_path_op_req> &reqs)
 		{
+#if TRIPLEGIT_VALIDATE_INPUTS
+			for(auto &i : reqs)
+				if(!i.validate())
+					throw std::runtime_error("Inputs are invalid.");
+#endif
 			return chain_async_ops((int) detail::OpType::file, reqs, async_op_flags::None, &async_file_io_dispatcher_compat::dofile);
 		}
 		virtual std::vector<async_io_op> rmfile(const std::vector<async_path_op_req> &reqs)
 		{
+#if TRIPLEGIT_VALIDATE_INPUTS
+			for(auto &i : reqs)
+				if(!i.validate())
+					throw std::runtime_error("Inputs are invalid.");
+#endif
 			return chain_async_ops((int) detail::OpType::rmfile, reqs, async_op_flags::None, &async_file_io_dispatcher_compat::dormfile);
 		}
 		virtual std::vector<async_io_op> sync(const std::vector<async_io_op> &ops)
 		{
+#if TRIPLEGIT_VALIDATE_INPUTS
+			for(auto &i : ops)
+				if(!i.validate())
+					throw std::runtime_error("Inputs are invalid.");
+#endif
 			return chain_async_ops((int) detail::OpType::sync, ops, ops, async_op_flags::None, &async_file_io_dispatcher_compat::dosync);
 		}
 		virtual std::vector<async_io_op> close(const std::vector<async_io_op> &ops)
 		{
+#if TRIPLEGIT_VALIDATE_INPUTS
+			for(auto &i : ops)
+				if(!i.validate())
+					throw std::runtime_error("Inputs are invalid.");
+#endif
 			return chain_async_ops((int) detail::OpType::close, ops, ops, async_op_flags::None, &async_file_io_dispatcher_compat::doclose);
 		}
 		virtual std::vector<async_io_op> read(const std::vector<async_data_op_req<void>> &reqs)
 		{
+#if TRIPLEGIT_VALIDATE_INPUTS
+			for(auto &i : reqs)
+				if(!i.validate())
+					throw std::runtime_error("Inputs are invalid.");
+#endif
 			return chain_async_ops((int) detail::OpType::read, reqs, async_op_flags::None, &async_file_io_dispatcher_compat::doread);
 		}
 		virtual std::vector<async_io_op> write(const std::vector<async_data_op_req<const void>> &reqs)
 		{
+#if TRIPLEGIT_VALIDATE_INPUTS
+			for(auto &i : reqs)
+				if(!i.validate())
+					throw std::runtime_error("Inputs are invalid.");
+#endif
 			return chain_async_ops((int) detail::OpType::write, reqs, async_op_flags::None, &async_file_io_dispatcher_compat::dowrite);
 		}
 		virtual std::vector<async_io_op> truncate(const std::vector<async_io_op> &ops, const std::vector<off_t> &sizes)
 		{
+#if TRIPLEGIT_VALIDATE_INPUTS
+			for(auto &i : ops)
+				if(!i.validate())
+					throw std::runtime_error("Inputs are invalid.");
+#endif
 			return chain_async_ops((int) detail::OpType::truncate, ops, sizes, async_op_flags::None, &async_file_io_dispatcher_compat::dotruncate);
 		}
 

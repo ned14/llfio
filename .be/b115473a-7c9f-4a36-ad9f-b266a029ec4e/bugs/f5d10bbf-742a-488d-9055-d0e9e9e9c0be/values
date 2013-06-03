@@ -9,7 +9,7 @@ reporter: '"Niall Douglas \(s \[underscore\] sourceforge {at} nedprod \[dot\] co
 severity: minor
 
 
-status: open
+status: fixed
 
 
 summary: Add optional parameter input validation. It's sorely needed.

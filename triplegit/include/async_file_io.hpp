@@ -36,10 +36,21 @@ File Created: Mar 2013
 #endif
 #endif
 
+#ifndef TRIPLEGIT_ASYNC_FILE_IO_API
 #ifdef TRIPLEGIT_DLL_EXPORTS
 #define TRIPLEGIT_ASYNC_FILE_IO_API DLLEXPORTMARKUP
 #else
 #define TRIPLEGIT_ASYNC_FILE_IO_API DLLIMPORTMARKUP
+#endif
+#endif
+
+//! \def TRIPLEGIT_VALIDATE_INPUTS Validate inputs at the point of instantiation
+#ifndef TRIPLEGIT_VALIDATE_INPUTS
+#ifndef NDEBUG
+#define TRIPLEGIT_VALIDATE_INPUTS 1
+#else
+#define TRIPLEGIT_VALIDATE_INPUTS 0
+#endif
 #endif
 
 #ifdef _MSC_VER
@@ -907,10 +918,27 @@ struct async_io_op
 	async_io_op() : id(0), h(std::make_shared<shared_future<std::shared_ptr<detail::async_io_handle>>>()) { }
 	async_io_op(const async_io_op &o) : parent(o.parent), id(o.id), h(o.h) { }
 	async_io_op(async_io_op &&o) : parent(std::move(o.parent)), id(std::move(o.id)), h(std::move(o.h)) { }
-	async_io_op(std::shared_ptr<async_file_io_dispatcher_base> _parent, size_t _id, std::shared_ptr<shared_future<std::shared_ptr<detail::async_io_handle>>> _handle) : parent(_parent), id(_id), h(std::move(_handle)) { }
+	async_io_op(std::shared_ptr<async_file_io_dispatcher_base> _parent, size_t _id, std::shared_ptr<shared_future<std::shared_ptr<detail::async_io_handle>>> _handle) : parent(_parent), id(_id), h(std::move(_handle)) { _validate(); }
 	async_io_op(std::shared_ptr<async_file_io_dispatcher_base> _parent, size_t _id) : parent(_parent), id(_id), h(std::make_shared<shared_future<std::shared_ptr<detail::async_io_handle>>>()) { }
 	async_io_op &operator=(const async_io_op &o) { parent=o.parent; id=o.id; h=o.h; return *this; }
 	async_io_op &operator=(async_io_op &&o) { parent=std::move(o.parent); id=std::move(o.id); h=std::move(o.h); return *this; }
+	//! Validates contents
+	bool validate() const
+	{
+		if(!parent || !id) return false;
+		// If h is valid and ready and contains an exception, throw it now
+		if(h->valid() && h->is_ready() /*h->wait_for(seconds(0))==future_status::ready*/)
+			h->get();
+		return true;
+	}
+private:
+	void _validate() const
+	{
+#if TRIPLEGIT_VALIDATE_INPUTS
+		if(!validate())
+			throw std::runtime_error("Inputs are invalid.");
+#endif
+	}
 };
 
 namespace detail
@@ -1018,15 +1046,29 @@ struct async_path_op_req
 	//! Fails is path is not absolute
 	async_path_op_req(std::filesystem::path _path, file_flags _flags=file_flags::None) : path(_path), flags(_flags) { if(!path.is_absolute()) throw std::runtime_error("Non-absolute path"); }
 	//! Fails is path is not absolute
-	async_path_op_req(async_io_op _precondition, std::filesystem::path _path, file_flags _flags=file_flags::None) : path(_path), flags(_flags), precondition(std::move(_precondition)) { if(!path.is_absolute()) throw std::runtime_error("Non-absolute path"); }
+	async_path_op_req(async_io_op _precondition, std::filesystem::path _path, file_flags _flags=file_flags::None) : path(_path), flags(_flags), precondition(std::move(_precondition)) { _validate(); if(!path.is_absolute()) throw std::runtime_error("Non-absolute path"); }
 	//! Constructs on the basis of a string. make_preferred() and absolute() are called in this case.
-	async_path_op_req(std::string _path, file_flags _flags=file_flags::None) : path(std::filesystem::absolute(std::filesystem::path(_path).make_preferred())), flags(_flags) { }
+	async_path_op_req(std::string _path, file_flags _flags=file_flags::None) : path(std::filesystem::absolute(std::filesystem::path(_path).make_preferred())), flags(_flags) { _validate(); }
 	//! Constructs on the basis of a string. make_preferred() and absolute() are called in this case.
-	async_path_op_req(async_io_op _precondition, std::string _path, file_flags _flags=file_flags::None) : path(std::filesystem::absolute(std::filesystem::path(_path).make_preferred())), flags(_flags), precondition(std::move(_precondition)) { }
+	async_path_op_req(async_io_op _precondition, std::string _path, file_flags _flags=file_flags::None) : path(std::filesystem::absolute(std::filesystem::path(_path).make_preferred())), flags(_flags), precondition(std::move(_precondition)) { _validate(); }
 	//! Constructs on the basis of a string. make_preferred() and absolute() are called in this case.
-	async_path_op_req(const char *_path, file_flags _flags=file_flags::None) : path(std::filesystem::absolute(std::filesystem::path(_path).make_preferred())), flags(_flags) { }
+	async_path_op_req(const char *_path, file_flags _flags=file_flags::None) : path(std::filesystem::absolute(std::filesystem::path(_path).make_preferred())), flags(_flags) { _validate(); }
 	//! Constructs on the basis of a string. make_preferred() and absolute() are called in this case.
-	async_path_op_req(async_io_op _precondition, const char *_path, file_flags _flags=file_flags::None) : path(std::filesystem::absolute(std::filesystem::path(_path).make_preferred())), flags(_flags), precondition(std::move(_precondition)) { }
+	async_path_op_req(async_io_op _precondition, const char *_path, file_flags _flags=file_flags::None) : path(std::filesystem::absolute(std::filesystem::path(_path).make_preferred())), flags(_flags), precondition(std::move(_precondition)) { _validate(); }
+	//! Validates contents
+	bool validate() const
+	{
+		if(path.empty()) return false;
+		return !precondition.id || precondition.validate();
+	}
+private:
+	void _validate() const
+	{
+#if TRIPLEGIT_VALIDATE_INPUTS
+		if(!validate())
+			throw std::runtime_error("Inputs are invalid.");
+#endif
+	}
 };
 
 /*! \struct async_data_op_req
@@ -1042,8 +1084,31 @@ template<> struct async_data_op_req<void> // For reading
 	async_data_op_req(async_data_op_req &&o) : precondition(std::move(o.precondition)), buffers(std::move(o.buffers)), where(std::move(o.where)) { }
 	async_data_op_req &operator=(const async_data_op_req &o) { precondition=o.precondition; buffers=o.buffers; where=o.where; return *this; }
 	async_data_op_req &operator=(async_data_op_req &&o) { precondition=std::move(o.precondition); buffers=std::move(o.buffers); where=std::move(o.where); return *this; }
-	async_data_op_req(async_io_op _precondition, void *_buffer, size_t _length, off_t _where) : precondition(std::move(_precondition)), where(_where) { buffers.reserve(1); buffers.push_back(boost::asio::mutable_buffer(_buffer, _length)); }
-	async_data_op_req(async_io_op _precondition, std::vector<boost::asio::mutable_buffer> _buffers, off_t _where) : precondition(std::move(_precondition)), buffers(_buffers), where(_where) { }
+	async_data_op_req(async_io_op _precondition, void *_buffer, size_t _length, off_t _where) : precondition(std::move(_precondition)), where(_where) { buffers.reserve(1); buffers.push_back(boost::asio::mutable_buffer(_buffer, _length)); _validate(); }
+	async_data_op_req(async_io_op _precondition, std::vector<boost::asio::mutable_buffer> _buffers, off_t _where) : precondition(std::move(_precondition)), buffers(_buffers), where(_where) { _validate(); }
+	//! Validates contents
+	bool validate() const
+	{
+		if(!precondition.validate()) return false;
+		if(buffers.empty()) return false;
+		for(auto &b : buffers)
+		{
+			if(!boost::asio::buffer_cast<const void *>(b) || !boost::asio::buffer_size(b)) return false;
+			if(!!(precondition.parent->fileflags(file_flags::None)&file_flags::OSDirect))
+			{
+				if(((size_t)boost::asio::buffer_cast<const void *>(b) & 4095) || (boost::asio::buffer_size(b) & 4095)) return false;
+			}
+		}
+		return true;
+	}
+private:
+	void _validate() const
+	{
+#if TRIPLEGIT_VALIDATE_INPUTS
+		if(!validate())
+			throw std::runtime_error("Inputs are invalid.");
+#endif
+	}
 };
 template<> struct async_data_op_req<const void> // For writing
 {
@@ -1057,8 +1122,31 @@ template<> struct async_data_op_req<const void> // For writing
 	async_data_op_req(async_data_op_req<void> &&o) : precondition(std::move(o.precondition)), where(o.where) { buffers.reserve(o.buffers.capacity()); for(auto &&i: o.buffers) buffers.push_back(std::move(i)); }
 	async_data_op_req &operator=(const async_data_op_req &o) { precondition=o.precondition; buffers=o.buffers; where=o.where; return *this; }
 	async_data_op_req &operator=(async_data_op_req &&o) { precondition=std::move(o.precondition); buffers=std::move(o.buffers); where=std::move(o.where); return *this; }
-	async_data_op_req(async_io_op _precondition, const void *_buffer, size_t _length, off_t _where) : precondition(std::move(_precondition)), where(_where) { buffers.reserve(1); buffers.push_back(boost::asio::const_buffer(_buffer, _length)); }
-	async_data_op_req(async_io_op _precondition, std::vector<boost::asio::const_buffer> _buffers, off_t _where) : precondition(std::move(_precondition)), buffers(_buffers), where(_where) { }
+	async_data_op_req(async_io_op _precondition, const void *_buffer, size_t _length, off_t _where) : precondition(std::move(_precondition)), where(_where) { buffers.reserve(1); buffers.push_back(boost::asio::const_buffer(_buffer, _length)); _validate(); }
+	async_data_op_req(async_io_op _precondition, std::vector<boost::asio::const_buffer> _buffers, off_t _where) : precondition(std::move(_precondition)), buffers(_buffers), where(_where) { _validate(); }
+	//! Validates contents
+	bool validate() const
+	{
+		if(!precondition.validate()) return false;
+		if(buffers.empty()) return false;
+		for(auto &b : buffers)
+		{
+			if(!boost::asio::buffer_cast<const void *>(b) || !boost::asio::buffer_size(b)) return false;
+			if(!!(precondition.parent->fileflags(file_flags::None)&file_flags::OSDirect))
+			{
+				if(((size_t)boost::asio::buffer_cast<const void *>(b) & 4095) || (boost::asio::buffer_size(b) & 4095)) return false;
+			}
+		}
+		return true;
+	}
+private:
+	void _validate() const
+	{
+#if TRIPLEGIT_VALIDATE_INPUTS
+		if(!validate())
+			throw std::runtime_error("Inputs are invalid.");
+#endif
+	}
 };
 //! \brief A specialisation for any pointer to type T
 template<class T> struct async_data_op_req : public async_data_op_req<void>
