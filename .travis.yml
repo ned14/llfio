@@ -56,6 +56,6 @@ script:
 
  - if [ "$UNIT_TESTS" != "0" ]; then $PREFIXTEST $PREFIXPATH/tests $UNIT_TESTS; fi
 
- after_success:
-  - if [ $CCFLAGS = "-fprofile-arcs -ftest-coverage" ]; then coveralls --exclude lib --exclude tests; fi
+after_success:
+ - if [ $CCFLAGS = "-fprofile-arcs -ftest-coverage" ]; then coveralls --exclude lib --exclude tests; fi
   
