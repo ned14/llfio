@@ -504,8 +504,6 @@ static void evil_random_io(std::shared_ptr<triplegit::async_io::async_file_io_di
 	};
 	static_assert(!(sizeof(PadSizeToMultipleOf<Op, 32>)&31), "Op's stored size must be a multiple of 32 bytes");
 	vector<vector<PadSizeToMultipleOf<Op, 32>, NiallsCPP11Utilities::aligned_allocator<Op, 32>>> todo(no);
-	vector<Hash256> hashes(no);
-	Hash256::BeginBatch(no, &hashes.front());
 	for(size_t n=0; n<no; n++)
 	{
 		towrite[n].reserve(bytes);
