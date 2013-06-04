@@ -781,6 +781,7 @@ enum class file_flags : size_t
 	None=0,				//!< No flags set
 	Read=1,				//!< Read access
 	Write=2,			//!< Write access
+	ReadWrite=3,		//!< Read and write access
 	Append=4,			//!< Append only
 	Truncate=8,			//!< Truncate existing file to zero
 	Create=16,			//!< Open and create if doesn't exist

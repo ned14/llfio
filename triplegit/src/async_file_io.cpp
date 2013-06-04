@@ -19,9 +19,9 @@ File Created: Mar 2013
 #include "../include/async_file_io.hpp"
 #include "boost/smart_ptr/detail/spinlock.hpp"
 #include "../../NiallsCPP11Utilities/ErrorHandling.hpp"
+#include "../../NiallsCPP11Utilities/valgrind/memcheck.h"
+#include "../../NiallsCPP11Utilities/valgrind/helgrind.h"
 #include <mutex>
-#include "valgrind/memcheck.h"
-#include "valgrind/helgrind.h"
 
 #include <fcntl.h>
 #include <sys/stat.h>
@@ -56,7 +56,7 @@ File Created: Mar 2013
 // libstdc++ doesn't come with std::lock_guard
 #define lock_guard boost::lock_guard
 
-#if defined(_DEBUG) && 0
+#if defined(_DEBUG) && 1
 #define DEBUG_PRINTING 1
 #ifdef WIN32
 #define DEBUG_PRINT(...) \
@@ -723,6 +723,11 @@ namespace detail {
 		{
 			async_io_handle_windows *p=static_cast<async_io_handle_windows *>(h.get());
 			assert(p);
+			DEBUG_PRINT("R %u %p (%c) @ %u, b=%u\n", (unsigned) id, h.get(), p->path().native().back(), (unsigned) req.where, (unsigned) req.buffers.size());
+#ifdef DEBUG_PRINTING
+			for(auto &b : req.buffers)
+				DEBUG_PRINT("  R %u: %p %u\n", (unsigned) id, boost::asio::buffer_cast<const void *>(b), (unsigned) boost::asio::buffer_size(b));
+#endif
 			boost::asio::async_read_at(*p->h, req.where, req.buffers, boost::bind(&async_file_io_dispatcher_windows::boost_asio_completion_handler, this, false, id, h, boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred));
 			// Indicate we're not finished yet
 			return std::make_pair(false, h);
