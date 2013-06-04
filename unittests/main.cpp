@@ -591,7 +591,7 @@ static void evil_random_io(std::shared_ptr<triplegit::async_io::async_file_io_di
 	std::vector<async_path_op_req> manyfilereqs;
 	manyfilereqs.reserve(no);
 	for(size_t n=0; n<no; n++)
-		manyfilereqs.push_back(async_path_op_req(mkdir, "testdir/"+std::to_string(n), file_flags::Create|file_flags::Write));
+		manyfilereqs.push_back(async_path_op_req(mkdir, "testdir/"+std::to_string(n), file_flags::Create|file_flags::ReadWrite));
 	auto manyopenfiles(dispatcher->file(manyfilereqs));
 	std::vector<off_t> sizes(no, bytes);
 	auto manywrittenfiles(dispatcher->truncate(manyopenfiles, sizes));
@@ -704,7 +704,7 @@ TEST_CASE("async_io/torture", "Tortures the async i/o implementation")
 {
 	auto dispatcher=triplegit::async_io::async_file_io_dispatcher(triplegit::async_io::process_threadpool(), triplegit::async_io::file_flags::None);
 	std::cout << "\n\nSustained random i/o to 10 files of 10Mb:\n";
-	evil_random_io(dispatcher, 10, 10*1024*1024);
+	evil_random_io(dispatcher, 1, 10*1024*1024);
 }
 
 TEST_CASE("async_io/torture/sync", "Tortures the synchronous async i/o implementation")
