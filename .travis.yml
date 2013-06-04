@@ -12,7 +12,7 @@ notifications:
 env:
   - _="Build test" VALGRIND=0 UNIT_TESTS=0 DEBUG=0 GCCVER=""
   - _="Unit/functional tests" VALGRIND=0 UNIT_TESTS="exclude:async_io/torture* exclude:async_io/errors" DEBUG=0 GCCVER=""
-  - _="Unit/functional tests coverage" VALGRIND=0 CCFLAGS="-fprofile-arcs -ftest-coverage" UNIT_TESTS="exclude:async_io/torture* exclude:async_io/errors" DEBUG=0 GCCVER="4.8"
+  - _="Unit/functional tests coverage" VALGRIND=0 CCFLAGS="--usegcov --usegcc=g++-4.8" UNIT_TESTS="exclude:async_io/torture* exclude:async_io/errors" DEBUG=0 GCCVER="4.8"
   - _="Memory error and leak tests" VALGRIND=memcheck UNIT_TESTS="exclude:async_io/torture* exclude:async_io/errors" DEBUG=1 GCCVER=""
   - _="Race detection tests" VALGRIND=0 CCFLAGS="--usethreadsanitize --usegcc=g++-4.8" UNIT_TESTS="exclude:async_io/torture* exclude:async_io/errors" DEBUG=1 GCCVER="4.8" TSAN_OPTIONS="suppressions=unittests/tsan.supp"
   - _="Torture test" VALGRIND=0 UNIT_TESTS="async_io/torture" DEBUG=0 GCCVER=""
@@ -21,13 +21,15 @@ env:
 matrix:
   exclude:
     - compiler: clang
-      env: _="Unit/functional tests coverage" VALGRIND=0 CCFLAGS="-fprofile-arcs -ftest-coverage" UNIT_TESTS="exclude:async_io/torture* exclude:async_io/errors" DEBUG=0 GCCVER="4.8"
+      env: _="Unit/functional tests coverage" VALGRIND=0 CCFLAGS="--usegcov --usegcc=g++-4.8" UNIT_TESTS="exclude:async_io/torture* exclude:async_io/errors" DEBUG=0 GCCVER="4.8"
     - compiler: clang
       env: _="Race detection tests" VALGRIND=0 CCFLAGS="--usethreadsanitize --usegcc=g++-4.8" UNIT_TESTS="exclude:async_io/torture* exclude:async_io/errors" DEBUG=1 GCCVER="4.8" TSAN_OPTIONS="suppressions=unittests/tsan.supp"
     - compiler: clang
       env: _="Torture test" VALGRIND=0 UNIT_TESTS="async_io/torture" DEBUG=0 GCCVER=""
 
   allow_failures:
+    - compiler: gcc
+      env: _="Unit/functional tests coverage" VALGRIND=0 CCFLAGS="--usegcov --usegcc=g++-4.8" UNIT_TESTS="exclude:async_io/torture* exclude:async_io/errors" DEBUG=0 GCCVER="4.8"
     - compiler: gcc
       env: _="Race detection tests" VALGRIND=0 CCFLAGS="--usethreadsanitize --usegcc=g++-4.8" UNIT_TESTS="exclude:async_io/torture* exclude:async_io/errors" DEBUG=1 GCCVER="4.8" TSAN_OPTIONS="suppressions=unittests/tsan.supp"
     - compiler: gcc
