@@ -499,6 +499,7 @@ static void evil_random_io(std::shared_ptr<triplegit::async_io::async_file_io_di
 	{
 		Hash256 hash; // Only used for reading
 		bool write;
+		ranctx seed;
 		async_data_op_req<char> req;
 	};
 	static_assert(!(sizeof(PadSizeToMultipleOf<Op, 32>)&31), "Op's stored size must be a multiple of 32 bytes");
@@ -539,6 +540,7 @@ static void evil_random_io(std::shared_ptr<triplegit::async_io::async_file_io_di
 			if(op.req.where>bytes-1024*1024) op.req.where=bytes-1024*1024;
 			if(alignment)
 				op.req.where&=~(alignment-1);
+			ranctx writeseed=op.seed=gen;
 			for(m=0; m<toissue; m++)
 			{
 				u4 s=ranval(&gen) & ((256*1024-1)&~63); // Must be a multiple of 64 bytes for SHA256
@@ -547,17 +549,20 @@ static void evil_random_io(std::shared_ptr<triplegit::async_io::async_file_io_di
 				op.req.buffers.push_back(boost::asio::mutable_buffer((void *)(((size_t)towriteptrs[n]+(size_t) op.req.where)+thisbytes), s));
 				if(op.write)
 					for(; s>0; s-=4, thisbytes+=4)
-						*(u4 *)(((size_t)towriteptrs[n]+(size_t) op.req.where)+thisbytes)=ranval(&gen);
+						*(u4 *)(((size_t)towriteptrs[n]+(size_t) op.req.where)+thisbytes)=ranval(&writeseed);
 				else
-				{
-					get<1>(hashopitem)=(const char *)(((size_t)towriteptrs[n]+(size_t) op.req.where)+thisbytes);
-					get<2>(hashopitem)=s;
-					Hash256::AddSHA256ToBatch(hashop, 1, &hashopitem);
 					thisbytes+=s;
-				}
 			}
 			if(!op.write)
+			{
+				get<1>(hashopitem)=(const char *)(((size_t)towriteptrs[n]+(size_t) op.req.where));
+				get<2>(hashopitem)=thisbytes;
+				Hash256::AddSHA256ToBatch(hashop, 1, &hashopitem);
 				Hash256::FinishBatch(hashop, false);
+#ifdef _DEBUG
+				cout << "<=SHA256 of " << thisbytes << " bytes at " << op.req.where << " is " << op.hash.asHexString() << endl;
+#endif
+			}
 #ifdef _DEBUG
 			// Quickly make sure none of these exceed 10Mb
 			off_t end=op.req.where;
@@ -605,13 +610,16 @@ static void evil_random_io(std::shared_ptr<triplegit::async_io::async_file_io_di
 	for(size_t n=0; n<no; n++)
 		maxfailures+=todo[n].size();
 	boost::lockfree::queue<const Op *> failures(maxfailures);
-	auto checkHash=[&failures](Op &op, size_t, std::shared_ptr<triplegit::async_io::detail::async_io_handle> h) -> std::pair<bool, std::shared_ptr<triplegit::async_io::detail::async_io_handle>> {
-		const char *data=(const char *)(((size_t) op.req.where));
+	auto checkHash=[&failures](Op &op, char *base, size_t, std::shared_ptr<triplegit::async_io::detail::async_io_handle> h) -> std::pair<bool, std::shared_ptr<triplegit::async_io::detail::async_io_handle>> {
+		const char *data=(const char *)(((size_t) base+(size_t) op.req.where));
 		size_t length=0;
 		for(auto &i : op.req.buffers)
 			length+=boost::asio::buffer_size(i);
 		Hash256 hash;
 		hash.AddSHA256To(data, length);
+#ifdef _DEBUG
+		cout << "=>SHA256 of " << length << " bytes at " << op.req.where << " is " << hash.asHexString() << endl;
+#endif
 		if(hash!=op.hash)
 			failures.push(&op);
 		return make_pair(true, h);
@@ -622,9 +630,18 @@ static void evil_random_io(std::shared_ptr<triplegit::async_io::async_file_io_di
 		for(Op &op : todo[n])
 		{
 			op.req.precondition=manywrittenfiles[n];
+			if(op.write)
+			{
+				// Write exactly the same randomness as the in memory test to exactly the same offset
+				ranctx gen=op.seed;
+				size_t thisbytes=0;
+				for(auto &b : op.req.buffers)
+					for(size_t m=0; m<boost::asio::buffer_size(b); m+=4, thisbytes+=4)
+						*(u4 *)(((size_t)towriteptrs[n]+(size_t) op.req.where)+thisbytes)=ranval(&gen);
+			}
 			manywrittenfiles[n]=op.write ? dispatcher->write(op.req) : dispatcher->read(op.req);
 			if(!op.write)
-				dispatcher->completion(manywrittenfiles[n], std::make_pair(async_op_flags::ImmediateCompletion, std::bind(checkHash, ref(op), placeholders::_1, placeholders::_2)));
+				dispatcher->completion(manywrittenfiles[n], std::make_pair(async_op_flags::ImmediateCompletion, std::bind(checkHash, ref(op), towriteptrs[n], placeholders::_1, placeholders::_2)));
 		}
 		// After replay, read the entire file into memory
 		manywrittenfiles[n]=dispatcher->read(async_data_op_req<char>(manywrittenfiles[n], towriteptrs[n], towritesizes[n], 0));
@@ -663,19 +680,22 @@ static void evil_random_io(std::shared_ptr<triplegit::async_io::async_file_io_di
 	diff=chrono::duration_cast<secs_type>(end-dispatched);
 	cout << "  It took " << diff.count() << " secs to finish all operations" << endl << endl;
 	off_t readed=0, written=0;
+	size_t ops=0;
 	diff=chrono::duration_cast<secs_type>(end-begin);
-	for(auto &i : manydeletedfiles)
+	for(auto &i : manyclosedfiles)
 	{
 		readed+=i.h->get()->read_count();
 		written+=i.h->get()->write_count();
 	}
-	cout << "We read " << readed << " bytes and wrote " << written << " bytes" << endl;
+	for(ptrdiff_t n=0; n<(ptrdiff_t) no; n++)
+		ops+=todo[n].size();
+	cout << "We read " << readed << " bytes and wrote " << written << " bytes during " << ops << " operations." << endl;
 	cout << "  That makes " << (readed+written)/diff.count()/1024/1024 << " Mb/sec" << endl;
 
 	diff=chrono::duration_cast<secs_type>(openedsync-begin);
 	cout << "It took " << diff.count() << " secs to do " << manyfilereqs.size()/diff.count() << " file opens per sec" << endl;
 	diff=chrono::duration_cast<secs_type>(writtensync-openedsync);
-	cout << "It took " << diff.count() << " secs to do " << manyfilereqs.size()/diff.count() << " file writes per sec" << endl;
+	cout << "It took " << diff.count() << " secs to do " << manyfilereqs.size()/diff.count() << " file reads and writes per sec" << endl;
 	diff=chrono::duration_cast<secs_type>(closedsync-writtensync);
 	cout << "It took " << diff.count() << " secs to do " << manyfilereqs.size()/diff.count() << " file closes per sec" << endl;
 	diff=chrono::duration_cast<secs_type>(deletedsync-closedsync);
