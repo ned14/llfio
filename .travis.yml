@@ -2,13 +2,19 @@ language: cpp
 compiler:
   - gcc
   - clang
-
+notifications:
+  email:
+#    recipients:
+#      - one@example.com
+#      - other@example.com
+    on_success: change # [always|never|change] # default: change
+    on_failure: change # [always|never|change] # default: always
 env:
   - VALGRIND=0 UNIT_TESTS=0 DEBUG=0 GCCVER=""
   - VALGRIND=0 UNIT_TESTS="exclude:async_io/torture* exclude:async_io/errors" DEBUG=0 GCCVER=""
   - VALGRIND=memcheck UNIT_TESTS="exclude:async_io/torture* exclude:async_io/errors" DEBUG=1 GCCVER=""
   - VALGRIND=0 CCFLAGS="--usethreadsanitize --usegcc=g++-4.8" UNIT_TESTS="exclude:async_io/torture* exclude:async_io/errors" DEBUG=1 GCCVER="4.8" TSAN_OPTIONS="suppressions=unittests/tsan.supp"
-  - VALGRIND=memcheck UNIT_TESTS="async_io/torture" DEBUG=1 GCCVER=""
+  - VALGRIND=0 UNIT_TESTS="async_io/torture" DEBUG=0 GCCVER=""
 
 # The clang 3.2 .deb doesn't supply the needed tsan runtime library :(
 matrix:
@@ -16,13 +22,13 @@ matrix:
     - compiler: clang
       env: VALGRIND=0 CCFLAGS="--usethreadsanitize --usegcc=g++-4.8" UNIT_TESTS="exclude:async_io/torture* exclude:async_io/errors" DEBUG=1 GCCVER="4.8" TSAN_OPTIONS="suppressions=unittests/tsan.supp"
     - compiler: clang
-      env: VALGRIND=memcheck UNIT_TESTS="async_io/torture" DEBUG=1 GCCVER=""
+      env: VALGRIND=0 UNIT_TESTS="async_io/torture" DEBUG=0 GCCVER=""
 
   allow_failures:
     - compiler: gcc
       env: VALGRIND=0 CCFLAGS="--usethreadsanitize --usegcc=g++-4.8" UNIT_TESTS="exclude:async_io/torture* exclude:async_io/errors" DEBUG=1 GCCVER="4.8" TSAN_OPTIONS="suppressions=unittests/tsan.supp"
     - compiler: gcc
-      env: VALGRIND=memcheck UNIT_TESTS="async_io/torture" DEBUG=1 GCCVER=""
+      env: VALGRIND=0 UNIT_TESTS="async_io/torture" DEBUG=0 GCCVER=""
 
 before_install:
  - sudo add-apt-repository -y ppa:apokluda/boost1.53
