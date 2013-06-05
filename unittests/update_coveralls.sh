@@ -16,7 +16,7 @@ cat >coverage.json <<EOF
   "source_files": [
 EOF
 
-for file in $(find * -iname '*.gcov' -print | egrep '^(src|include)')
+for file in $(find * -iname '*.gcov' -print | egrep '^(src|include)' | egrep -v 'NiallsCPP11Utilities')
 do
   cat >>coverage.json <<EOF
     {
@@ -32,3 +32,4 @@ cat >coverage.json <(head -n -1 coverage.json.tmp) <(echo -e "    }\n  ]\n}")
 rm *.gcov coverage.json.tmp
 
 curl -F json_file=@coverage.json https://coveralls.io/api/v1/jobs
+cat coverage.json
