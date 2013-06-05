@@ -58,5 +58,5 @@ script:
  - if [ "$UNIT_TESTS" != "0" ]; then $PREFIXTEST $PREFIXPATH/tests $UNIT_TESTS; fi
 
 after_success:
- - if [ $GCOV -eq 1 ]; then sh unittests/update_coveralls.sh; fi
+ - if [ $GCOV -eq 1 ]; then bash unittests/update_coveralls.sh; fi
   
