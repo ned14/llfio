@@ -497,13 +497,11 @@ static void evil_random_io(std::shared_ptr<triplegit::async_io::async_file_io_di
 	vector<size_t> towritesizes(no);
 	struct Op
 	{
-		Hash256 hash; // Only used for reading
 		bool write;
-		ranctx seed;
+		vector<vector<char>> data;
 		async_data_op_req<char> req;
 	};
-	static_assert(!(sizeof(PadSizeToMultipleOf<Op, 32>)&31), "Op's stored size must be a multiple of 32 bytes");
-	vector<vector<PadSizeToMultipleOf<Op, 32>, NiallsCPP11Utilities::aligned_allocator<Op, 32>>> todo(no);
+	vector<vector<Op>> todo(no);
 	for(size_t n=0; n<no; n++)
 	{
 		towrite[n].reserve(bytes);
@@ -512,50 +510,44 @@ static void evil_random_io(std::shared_ptr<triplegit::async_io::async_file_io_di
 		towriteptrs[n]=&towrite[n].front();
 		towritesizes[n]=bytes;
 	}
-	// We create no lots of random writes and reads representing about 50% of bytes
+	// We create no lots of random writes and reads representing about 100% of bytes
 	// We simulate what we _ought_ to see appear in storage during the test and
 	// SHA256 out the results
 	// We then replay the same with real storage to see if it matches
 	auto begin=std::chrono::high_resolution_clock::now();
-#pragma omp parallel for
+//#pragma omp parallel for
 	for(ptrdiff_t n=0; n<(ptrdiff_t) no; n++)
 	{
 		ranctx gen;
 		raninit(&gen, 0x78adbcff^(u4) n);
-		Op op;
-		for(off_t bytessofar=0; bytessofar<bytes/2;)
+		for(off_t bytessofar=0; bytessofar<bytes;)
 		{
+			Op op;
 			u4 r=ranval(&gen), toissue=(r>>24) & 15;
 			size_t thisbytes=0, m;
 			if(!toissue) toissue=1;
 			op.write=bytessofar<bytes/4 ? true : !(r&(1<<31));
-			op.req.buffers.clear();
 			op.req.where=r & (bytes-1);
 			if(op.req.where>bytes-1024*1024) op.req.where=bytes-1024*1024;
 			if(alignment)
 				op.req.where&=~(alignment-1);
-			ranctx writeseed=op.seed=gen;
 			for(m=0; m<toissue; m++)
 			{
 				u4 s=ranval(&gen) & ((256*1024-1)&~63); // Must be a multiple of 64 bytes for SHA256
 				if(s<64) s=64;
 				if(thisbytes+s>1024*1024) break;
-				op.req.buffers.push_back(boost::asio::mutable_buffer((void *)(((size_t)towriteptrs[n]+(size_t) op.req.where)+thisbytes), s));
+				op.data.push_back(vector<char>(s));
+				char *buffer=&op.data.back().front();
 				if(op.write)
 				{
-					for(; s>0; s-=4, thisbytes+=4)
-						*(u4 *)(((size_t)towriteptrs[n]+(size_t) op.req.where)+thisbytes)=ranval(&writeseed);
+					for(size_t x=0; x<s; x+=4)
+						*(u4 *)(buffer+x)=ranval(&gen);
+					memcpy((char *)((size_t)towriteptrs[n]+(size_t) op.req.where+thisbytes), buffer, s);
 				}
 				else
-					thisbytes+=s;
-			}
-			if(!op.write)
-			{
-				op.hash=Hash256();
-				op.hash.AddSHA256To((const char *)(((size_t)towriteptrs[n]+(size_t) op.req.where)), thisbytes);
-#ifdef _DEBUG
-				cout << "<=SHA256 of " << thisbytes << " bytes at " << op.req.where << " is " << op.hash.asHexString() << endl;
-#endif
+					memcpy(buffer, (char *)((size_t)towriteptrs[n]+(size_t) op.req.where+thisbytes), s);
+				thisbytes+=s;
+				op.req.buffers.push_back(boost::asio::mutable_buffer(buffer, s));
 			}
 #ifdef _DEBUG
 			// Quickly make sure none of these exceed 10Mb
@@ -564,7 +556,7 @@ static void evil_random_io(std::shared_ptr<triplegit::async_io::async_file_io_di
 				end+=boost::asio::buffer_size(b);
 			assert(end<bytes);
 #endif
-			todo[n].push_back(op);
+			todo[n].push_back(move(op));
 			bytessofar+=thisbytes;
 		}
 	}
@@ -606,16 +598,14 @@ static void evil_random_io(std::shared_ptr<triplegit::async_io::async_file_io_di
 	boost::lockfree::queue<const Op *> failures(maxfailures);
 	auto checkHash=[&failures](Op &op, char *base, size_t, std::shared_ptr<triplegit::async_io::detail::async_io_handle> h) -> std::pair<bool, std::shared_ptr<triplegit::async_io::detail::async_io_handle>> {
 		const char *data=(const char *)(((size_t) base+(size_t) op.req.where));
-		size_t length=0;
-		for(auto &i : op.req.buffers)
-			length+=boost::asio::buffer_size(i);
-		Hash256 hash;
-		hash.AddSHA256To(data, length);
-#ifdef _DEBUG
-		cout << "=>SHA256 of " << length << " bytes at " << op.req.where << " is " << hash.asHexString() << endl;
-#endif
-		if(hash!=op.hash)
-			failures.push(&op);
+		assert(op.data.size()==op.req.buffers.size());
+		for(size_t m=0; m<op.req.buffers.size(); m++)
+		{
+			const char *buffer=&op.data[m].front();
+			if(memcmp(data, buffer, boost::asio::buffer_size(op.req.buffers[m])))
+				failures.push(&op);
+			data+=boost::asio::buffer_size(op.req.buffers[m]);
+		}
 		return make_pair(true, h);
 	};
 //#pragma omp parallel for
@@ -626,19 +616,10 @@ static void evil_random_io(std::shared_ptr<triplegit::async_io::async_file_io_di
 			op.req.precondition=manywrittenfiles[n];
 			if(op.write)
 			{
-				// Write exactly the same randomness as the in memory test to exactly the same offset
-				ranctx gen=op.seed;
-				size_t thisbytes=0;
-#ifdef _DEBUG
-				cout << "=> seed " << gen.a << endl;
-#endif
-				for(auto &b : op.req.buffers)
-					for(size_t m=0; m<boost::asio::buffer_size(b); m+=4, thisbytes+=4)
-						*(u4 *)(((size_t)towriteptrs[n]+(size_t) op.req.where)+thisbytes)=ranval(&gen);
+				manywrittenfiles[n]=dispatcher->write(op.req);
 			}
-			manywrittenfiles[n]=op.write ? dispatcher->write(op.req) : dispatcher->read(op.req);
-			if(!op.write)
-				dispatcher->completion(manywrittenfiles[n], std::make_pair(async_op_flags::ImmediateCompletion, std::bind(checkHash, ref(op), towriteptrs[n], placeholders::_1, placeholders::_2)));
+			else
+				manywrittenfiles[n]=dispatcher->completion(dispatcher->read(op.req), std::make_pair(async_op_flags::ImmediateCompletion, std::bind(checkHash, ref(op), towriteptrs[n], placeholders::_1, placeholders::_2)));
 		}
 		// After replay, read the entire file into memory
 		manywrittenfiles[n]=dispatcher->read(async_data_op_req<char>(manywrittenfiles[n], towriteptrs[n], towritesizes[n], 0));
@@ -708,12 +689,16 @@ static void evil_random_io(std::shared_ptr<triplegit::async_io::async_file_io_di
 		while(failures.pop(failedop))
 			cout << "   " << (failedop->write ? "Write to" : "Read from") << " " << to_string(failedop->req.where) << endl;
 	}
-	else
+	INFO("Checking if the final files have exactly the right contents ... this may take a bit ...");
 	{
 		vector<Hash256> filehashes(no);
 		Hash256::BatchAddSHA256To(no, &filehashes.front(), (const char **) &towriteptrs.front(), &towritesizes.front());
 		for(size_t n=0; n<no; n++)
-			CHECK(memhashes[n]==filehashes[n]);
+			if(memhashes[n]!=filehashes[n])
+			{
+				string failmsg("File "+to_string(n)+" contents were not what they were supposed to be!");
+				FAIL(failmsg.c_str());
+			}
 	}
 }
 
