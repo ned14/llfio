@@ -185,6 +185,7 @@ else:
         env['LIBS']+=["tsan"]
     if env.GetOption('usegcov'):
         env['CPPFLAGS']+=["-fprofile-arcs", "-ftest-coverage"]
+        env['LIBS']+=["gcov"]
     if not conf.CheckLib("rt", "clock_gettime") and not conf.CheckLib("c", "clock_gettime"):
         print "WARNING: Can't find clock_gettime() in librt or libc, code may not fully compile if your system headers say that this function is available"
     if conf.CheckHaveVisibility():
