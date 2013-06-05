@@ -6,7 +6,7 @@ then
   exit 0
 fi
 
-gcov --source-prefix `pwd` --preserve-paths --relative-only $(find -iname *.gcda) 1>/dev/null || exit 0
+gcov-4.8 --source-prefix `pwd` --preserve-paths --relative-only $(find -iname *.gcda) 1>/dev/null || exit 0
 
 cat >coverage.json <<EOF
 {

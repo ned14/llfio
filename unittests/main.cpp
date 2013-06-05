@@ -523,10 +523,6 @@ static void evil_random_io(std::shared_ptr<triplegit::async_io::async_file_io_di
 		ranctx gen;
 		raninit(&gen, 0x78adbcff^(u4) n);
 		Op op;
-		Hash256::BatchHashOp hashop=Hash256::BeginBatch(1, &op.hash);
-		Hash256::BatchItem hashopitem;
-		get<0>(hashopitem)=0;
-		auto unhashop=Undoer([hashop]{ Hash256::FinishBatch(hashop); });
 		for(off_t bytessofar=0; bytessofar<bytes/2;)
 		{
 			u4 r=ranval(&gen), toissue=(r>>24) & 15;
@@ -546,17 +542,17 @@ static void evil_random_io(std::shared_ptr<triplegit::async_io::async_file_io_di
 				if(thisbytes+s>1024*1024) break;
 				op.req.buffers.push_back(boost::asio::mutable_buffer((void *)(((size_t)towriteptrs[n]+(size_t) op.req.where)+thisbytes), s));
 				if(op.write)
+				{
 					for(; s>0; s-=4, thisbytes+=4)
 						*(u4 *)(((size_t)towriteptrs[n]+(size_t) op.req.where)+thisbytes)=ranval(&writeseed);
+				}
 				else
 					thisbytes+=s;
 			}
 			if(!op.write)
 			{
-				get<1>(hashopitem)=(const char *)(((size_t)towriteptrs[n]+(size_t) op.req.where));
-				get<2>(hashopitem)=thisbytes;
-				Hash256::AddSHA256ToBatch(hashop, 1, &hashopitem);
-				Hash256::FinishBatch(hashop, false);
+				op.hash=Hash256();
+				op.hash.AddSHA256To((const char *)(((size_t)towriteptrs[n]+(size_t) op.req.where)), thisbytes);
 #ifdef _DEBUG
 				cout << "<=SHA256 of " << thisbytes << " bytes at " << op.req.where << " is " << op.hash.asHexString() << endl;
 #endif
@@ -633,6 +629,9 @@ static void evil_random_io(std::shared_ptr<triplegit::async_io::async_file_io_di
 				// Write exactly the same randomness as the in memory test to exactly the same offset
 				ranctx gen=op.seed;
 				size_t thisbytes=0;
+#ifdef _DEBUG
+				cout << "=> seed " << gen.a << endl;
+#endif
 				for(auto &b : op.req.buffers)
 					for(size_t m=0; m<boost::asio::buffer_size(b); m+=4, thisbytes+=4)
 						*(u4 *)(((size_t)towriteptrs[n]+(size_t) op.req.where)+thisbytes)=ranval(&gen);
