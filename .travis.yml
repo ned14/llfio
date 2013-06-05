@@ -59,5 +59,5 @@ script:
  - if [ "$UNIT_TESTS" != "0" ]; then $PREFIXTEST $PREFIXPATH/tests $UNIT_TESTS; fi
 
 after_success:
- - if [ $GCOV -eq 1 ]; then coveralls --gcov "gcov-4.8 -p -r -s `pwd`" -e .sconf_temp -e tests -t $COVERALLS_TOKEN; fi
+ - if [ $GCOV -eq 1 ]; then coveralls --gcov "gcov-4.8 -p -r -s `pwd`" -r `pwd` --verbose -e .sconf_temp -e tests -e NiallsCPP11Utilities -e triplegit/src/../include/../../NiallsCPP11Utilities -t $COVERALLS_TOKEN; fi
   
