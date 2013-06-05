@@ -65,7 +65,7 @@ AddOption('--static', dest='static', nargs='?', const=True, help='build a static
 AddOption('--useclang', dest='useclang', nargs=1, type='str', help='use clang if it is available')
 AddOption('--usegcc', dest='usegcc', nargs=1, type='str', help='use gcc if it is available')
 AddOption('--usethreadsanitize', dest='usethreadsanitize', nargs='?', const=True, help='use thread sanitiser')
-AddOption('--gcov', dest='gcov', nargs='?', const=True, help='use GCC coverage')
+AddOption('--usegcov', dest='usegcov', nargs='?', const=True, help='use GCC coverage')
 AddOption('--force32', dest='force32', help='force 32 bit build on 64 bit machine')
 AddOption('--archs', dest='archs', nargs=1, type='str', default='min', help='which architectures to build, comma separated. all means all. Defaults to min.')
 if 'x86' in architectures:
