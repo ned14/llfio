@@ -15,7 +15,7 @@ env:
   matrix:
     - _="Build test" VALGRIND=0 UNIT_TESTS=0 DEBUG=0 GCCVER="" GCOV=0
     - _="Unit/functional tests" VALGRIND=0 UNIT_TESTS="exclude:async_io/torture* exclude:async_io/errors" DEBUG=0 GCCVER="" GCOV=0
-    - _="Unit/functional tests coverage" VALGRIND=0 CCFLAGS="--usegcov --usegcc=g++-4.8" UNIT_TESTS="exclude:async_io/torture* exclude:async_io/errors" DEBUG=1 GCCVER="" GCOV=1
+    - _="Unit/functional tests coverage" VALGRIND=0 CCFLAGS="--usegcov --usegcc=g++-4.8" UNIT_TESTS="exclude:async_io/torture* exclude:async_io/errors" DEBUG=1 GCCVER="4.8" GCOV=1
     - _="Memory error and leak tests" VALGRIND=memcheck UNIT_TESTS="exclude:async_io/torture* exclude:async_io/errors" DEBUG=1 GCCVER="" GCOV=0
     - _="Race detection tests" VALGRIND=0 CCFLAGS="--usethreadsanitize --usegcc=g++-4.8" UNIT_TESTS="exclude:async_io/torture* exclude:async_io/errors" DEBUG=1 GCCVER="4.8" TSAN_OPTIONS="suppressions=unittests/tsan.supp" GCOV=0
     - _="Torture test" VALGRIND=0 UNIT_TESTS="async_io/torture" DEBUG=0 GCCVER="" GCOV=0
@@ -24,7 +24,7 @@ env:
 matrix:
   exclude:
     - compiler: clang
-      env: _="Unit/functional tests coverage" VALGRIND=0 CCFLAGS="--usegcov --usegcc=g++-4.8" UNIT_TESTS="exclude:async_io/torture* exclude:async_io/errors" DEBUG=1 GCCVER="" GCOV=1
+      env: _="Unit/functional tests coverage" VALGRIND=0 CCFLAGS="--usegcov --usegcc=g++-4.8" UNIT_TESTS="exclude:async_io/torture* exclude:async_io/errors" DEBUG=1 GCCVER="4.8" GCOV=1
     - compiler: clang
       env: _="Race detection tests" VALGRIND=0 CCFLAGS="--usethreadsanitize --usegcc=g++-4.8" UNIT_TESTS="exclude:async_io/torture* exclude:async_io/errors" DEBUG=1 GCCVER="4.8" TSAN_OPTIONS="suppressions=unittests/tsan.supp" GCOV=0
     - compiler: clang
@@ -59,5 +59,5 @@ script:
  - if [ "$UNIT_TESTS" != "0" ]; then $PREFIXTEST $PREFIXPATH/tests $UNIT_TESTS; fi
 
 after_success:
- - if [ $GCOV -eq 1 ]; then coveralls --gcov "gcov -p -r -s `pwd`" -e .sconf_temp -e tests -t $COVERALLS_TOKEN; fi
+ - if [ $GCOV -eq 1 ]; then coveralls --gcov "gcov-4.8 -p -r -s `pwd`" -e .sconf_temp -e tests -t $COVERALLS_TOKEN; fi
   
