@@ -598,12 +598,14 @@ static void evil_random_io(std::shared_ptr<triplegit::async_io::async_file_io_di
 	boost::lockfree::queue<const Op *> failures(maxfailures);
 	auto checkHash=[&failures](Op &op, char *base, size_t, std::shared_ptr<triplegit::async_io::detail::async_io_handle> h) -> std::pair<bool, std::shared_ptr<triplegit::async_io::detail::async_io_handle>> {
 		const char *data=(const char *)(((size_t) base+(size_t) op.req.where));
-		assert(op.data.size()==op.req.buffers.size());
 		for(size_t m=0; m<op.req.buffers.size(); m++)
 		{
 			const char *buffer=&op.data[m].front();
 			if(memcmp(data, buffer, boost::asio::buffer_size(op.req.buffers[m])))
+			{
 				failures.push(&op);
+				break;
+			}
 			data+=boost::asio::buffer_size(op.req.buffers[m]);
 		}
 		return make_pair(true, h);
