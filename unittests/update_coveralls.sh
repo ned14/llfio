@@ -21,7 +21,7 @@ do
   cat >>coverage.json <<EOF
     {
       "name": "$(echo ${file} | sed -re 's%#%\/%g; s%.gcov$%%')",
-      "source": $(tail -n +3 ${file} | cut -d ':' -f 3- | python json_encode.py),
+      "source": $(tail -n +3 ${file} | cut -d ':' -f 3- | python unittests/json_encode.py),
       "coverage": [$(tail -n +3 ${file} | cut -d ':' -f 1 | sed -re 's%^ +%%g; s%-%null%g; s%^[#=]+$%0%;' | tr $'\n' ',' | sed -re 's%,$%%')]
     },
 EOF
