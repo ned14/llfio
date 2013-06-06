@@ -1005,6 +1005,11 @@ namespace detail {
 			iovec v;
 			std::vector<iovec> vecs;
 			vecs.reserve(req.buffers.size());
+			DEBUG_PRINT("R %u %p (%c) @ %u, b=%u\n", (unsigned) id, h.get(), p->path().native().back(), (unsigned) req.where, (unsigned) req.buffers.size());
+#ifdef DEBUG_PRINTING
+			for(auto &b : req.buffers)
+				DEBUG_PRINT("  R %u: %p %u\n", (unsigned) id, boost::asio::buffer_cast<const void *>(b), (unsigned) boost::asio::buffer_size(b));
+#endif
 			for(auto &b : req.buffers)
 			{
 				v.iov_base=boost::asio::buffer_cast<void *>(b);
@@ -1023,6 +1028,11 @@ namespace detail {
 			iovec v;
 			std::vector<iovec> vecs;
 			vecs.reserve(req.buffers.size());
+			DEBUG_PRINT("W %u %p (%c) @ %u, b=%u\n", (unsigned) id, h.get(), p->path().native().back(), (unsigned) req.where, (unsigned) req.buffers.size());
+#ifdef DEBUG_PRINTING
+			for(auto &b : req.buffers)
+				DEBUG_PRINT("  W %u: %p %u\n", (unsigned) id, boost::asio::buffer_cast<const void *>(b), (unsigned) boost::asio::buffer_size(b));
+#endif
 			for(auto &b : req.buffers)
 			{
 				v.iov_base=(void *) boost::asio::buffer_cast<const void *>(b);
@@ -1037,6 +1047,7 @@ namespace detail {
 		completion_returntype dotruncate(size_t id, std::shared_ptr<detail::async_io_handle> h, off_t newsize)
 		{
 			async_io_handle_posix *p=static_cast<async_io_handle_posix *>(h.get());
+			DEBUG_PRINT("T %u %p (%c)\n", (unsigned) id, h.get(), p->path().native().back());
 			ERRHOSFN(posix_ftruncate(p->fd, newsize), p->path());
 			return std::make_pair(true, h);
 		}

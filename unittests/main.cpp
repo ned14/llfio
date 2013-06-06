@@ -3,6 +3,9 @@
 Created: Feb 2013
 */
 
+// If defined, uses a ton more memory and is many orders of magnitude slower.
+#define DEBUG_TORTURE_TEST 1
+
 #include <utility>
 #include <sstream>
 #include <iostream>
@@ -495,13 +498,25 @@ static void evil_random_io(std::shared_ptr<triplegit::async_io::async_file_io_di
 	vector<vector<char, NiallsCPP11Utilities::aligned_allocator<char, 4096>>> towrite(no);
 	vector<char *> towriteptrs(no);
 	vector<size_t> towritesizes(no);
+#ifdef DEBUG_TORTURE_TEST
 	struct Op
 	{
 		bool write;
-		vector<vector<char>> data;
+		vector<char *> data;
 		async_data_op_req<char> req;
 	};
 	vector<vector<Op>> todo(no);
+#else
+	struct Op
+	{
+		Hash256 hash; // Only used for reading
+		bool write;
+		ranctx seed;
+		async_data_op_req<char> req;
+	};
+	static_assert(!(sizeof(PadSizeToMultipleOf<Op, 32>)&31), "Op's stored size must be a multiple of 32 bytes");
+	vector<vector<PadSizeToMultipleOf<Op, 32>, NiallsCPP11Utilities::aligned_allocator<Op, 32>>> todo(no);
+#endif
 	for(size_t n=0; n<no; n++)
 	{
 		towrite[n].reserve(bytes);
@@ -510,6 +525,9 @@ static void evil_random_io(std::shared_ptr<triplegit::async_io::async_file_io_di
 		towriteptrs[n]=&towrite[n].front();
 		towritesizes[n]=bytes;
 	}
+#ifdef DEBUG_TORTURE_TEST
+	auto mkfill=[]{ static char ret='0'; if(ret+1>'z') ret='0'; return ret++; };
+#endif
 	// We create no lots of random writes and reads representing about 100% of bytes
 	// We simulate what we _ought_ to see appear in storage during the test and
 	// SHA256 out the results
@@ -531,24 +549,57 @@ static void evil_random_io(std::shared_ptr<triplegit::async_io::async_file_io_di
 			if(op.req.where>bytes-1024*1024) op.req.where=bytes-1024*1024;
 			if(alignment)
 				op.req.where&=~(alignment-1);
+#ifdef DEBUG_TORTURE_TEST
+			u4 fillvalue=mkfill();
+			fillvalue|=fillvalue<<8;
+			fillvalue|=fillvalue<<16;
+#else
+			ranctx writeseed=op.seed=gen;
+#endif
+#ifdef _DEBUG
+			toissue=1; // clamp for now
+#endif
 			for(m=0; m<toissue; m++)
 			{
 				u4 s=ranval(&gen) & ((256*1024-1)&~63); // Must be a multiple of 64 bytes for SHA256
 				if(s<64) s=64;
+#ifdef _DEBUG
+				if(s>65536) s=65536; // clamp for now. I think Boost.ASIO won't transfer more than 64Kb at a time anyway ... ?!?
+#endif
 				if(thisbytes+s>1024*1024) break;
-				op.data.push_back(vector<char>(s));
-				char *buffer=&op.data.back().front();
+#ifdef DEBUG_TORTURE_TEST
+				op.data.push_back(new char[s]);
+				char *buffer=op.data.back();
+#else
+				char *buffer=(char *)((size_t)towriteptrs[n]+(size_t) op.req.where);
+#endif
 				if(op.write)
 				{
 					for(size_t x=0; x<s; x+=4)
-						*(u4 *)(buffer+x)=ranval(&gen);
+#ifndef DEBUG_TORTURE_TEST
+						*(u4 *)(buffer+thisbytes+x)=ranval(&writeseed);
+#else
+						*(u4 *)(buffer+x)=fillvalue;
 					memcpy((char *)((size_t)towriteptrs[n]+(size_t) op.req.where+thisbytes), buffer, s);
+#endif
 				}
+#ifdef DEBUG_TORTURE_TEST
 				else
 					memcpy(buffer, (char *)((size_t)towriteptrs[n]+(size_t) op.req.where+thisbytes), s);
+#endif
 				thisbytes+=s;
 				op.req.buffers.push_back(boost::asio::mutable_buffer(buffer, s));
 			}
+#ifndef DEBUG_TORTURE_TEST
+			if(!op.write)
+			{
+				op.hash=Hash256();
+				op.hash.AddSHA256To((const char *)(((size_t)towriteptrs[n]+(size_t) op.req.where)), thisbytes);
+#ifdef _DEBUG
+				cout << "<=SHA256 of " << thisbytes << " bytes at " << op.req.where << " is " << op.hash.asHexString() << endl;
+#endif
+			}
+#endif
 #ifdef _DEBUG
 			// Quickly make sure none of these exceed 10Mb
 			off_t end=op.req.where;
@@ -595,17 +646,18 @@ static void evil_random_io(std::shared_ptr<triplegit::async_io::async_file_io_di
 	size_t maxfailures=0;
 	for(size_t n=0; n<no; n++)
 		maxfailures+=todo[n].size();
-	boost::lockfree::queue<const Op *> failures(maxfailures);
+	boost::lockfree::queue<pair<const Op *, size_t> *> failures(maxfailures);
 	auto checkHash=[&failures](Op &op, char *base, size_t, std::shared_ptr<triplegit::async_io::detail::async_io_handle> h) -> std::pair<bool, std::shared_ptr<triplegit::async_io::detail::async_io_handle>> {
 		const char *data=(const char *)(((size_t) base+(size_t) op.req.where));
 		for(size_t m=0; m<op.req.buffers.size(); m++)
 		{
-			const char *buffer=&op.data[m].front();
-			if(memcmp(data, buffer, boost::asio::buffer_size(op.req.buffers[m])))
-			{
-				failures.push(&op);
-				break;
-			}
+			const char *buffer=op.data[m];
+			for(size_t idx=0; idx<boost::asio::buffer_size(op.req.buffers[m]); idx++)
+				if(data[idx]!=buffer[idx])
+				{
+					failures.push(new pair<const Op *, size_t>(make_pair(&op, idx)));
+					break;
+				}
 			data+=boost::asio::buffer_size(op.req.buffers[m]);
 		}
 		return make_pair(true, h);
@@ -629,12 +681,6 @@ static void evil_random_io(std::shared_ptr<triplegit::async_io::async_file_io_di
 
 	// Close each of those files
 	auto manyclosedfiles(dispatcher->close(manywrittenfiles));
-
-	// Delete each of those files once they are closed
-	auto it(manyclosedfiles.begin());
-	for(auto &i : manyfilereqs)
-		i.precondition=*it++;
-	auto manydeletedfiles(dispatcher->rmfile(manyfilereqs));
 	auto dispatched=chrono::high_resolution_clock::now();
 
 	// Wait for all files to open
@@ -646,12 +692,7 @@ static void evil_random_io(std::shared_ptr<triplegit::async_io::async_file_io_di
 	// Wait for all files to close
 	when_all(manyclosedfiles.begin(), manyclosedfiles.end()).wait();
 	auto closedsync=chrono::high_resolution_clock::now();
-	// Wait for all files to delete
-	when_all(manydeletedfiles.begin(), manydeletedfiles.end()).wait();
-	auto deletedsync=chrono::high_resolution_clock::now();
-
-	end=deletedsync;
-	auto rmdir(dispatcher->rmdir(async_path_op_req("testdir")));
+	end=closedsync;
 
 	diff=chrono::duration_cast<secs_type>(end-begin);
 	cout << "It took " << diff.count() << " secs to do all operations" << endl;
@@ -678,18 +719,20 @@ static void evil_random_io(std::shared_ptr<triplegit::async_io::async_file_io_di
 	cout << "It took " << diff.count() << " secs to do " << manyfilereqs.size()/diff.count() << " file reads and writes per sec" << endl;
 	diff=chrono::duration_cast<secs_type>(closedsync-writtensync);
 	cout << "It took " << diff.count() << " secs to do " << manyfilereqs.size()/diff.count() << " file closes per sec" << endl;
-	diff=chrono::duration_cast<secs_type>(deletedsync-closedsync);
-	cout << "It took " << diff.count() << " secs to do " << manyfilereqs.size()/diff.count() << " file deletions per sec" << endl;
 
-	// Fetch any outstanding error
-	rmdir.h->get();
 	CHECK(failures.empty());
 	if(!failures.empty())
 	{
-		const Op *failedop;
+		pair<Op *, size_t> *failedop;
 		cout << "The following hash failures occurred:" << endl;
 		while(failures.pop(failedop))
-			cout << "   " << (failedop->write ? "Write to" : "Read from") << " " << to_string(failedop->req.where) << endl;
+		{
+			auto undofailedop=Undoer([&failedop]{ delete failedop; });
+			size_t bytes=0;
+			for(auto &b : failedop->first->req.buffers)
+				bytes+=boost::asio::buffer_size(b);
+			cout << "   " << (failedop->first->write ? "Write to" : "Read from") << " " << to_string(failedop->first->req.where) << " at offset " << failedop->second << " into bytes " << bytes << endl;
+		}
 	}
 	INFO("Checking if the final files have exactly the right contents ... this may take a bit ...");
 	{
@@ -702,6 +745,26 @@ static void evil_random_io(std::shared_ptr<triplegit::async_io::async_file_io_di
 				FAIL(failmsg.c_str());
 			}
 	}
+#ifdef DEBUG_TORTURE_TEST
+	for(ptrdiff_t n=0; n<(ptrdiff_t) no; n++)
+	{
+		for(Op &op : todo[n])
+		{
+			for(auto &i : op.data)
+				delete[] i;
+		}
+	}
+#endif
+	// Delete each of those files once they are closed
+	auto it(manyclosedfiles.begin());
+	for(auto &i : manyfilereqs)
+		i.precondition=*it++;
+	auto manydeletedfiles(dispatcher->rmfile(manyfilereqs));
+	// Wait for all files to delete
+	when_all(manydeletedfiles.begin(), manydeletedfiles.end()).wait();
+	auto rmdir(dispatcher->rmdir(async_path_op_req("testdir")));
+	// Fetch any outstanding error
+	rmdir.h->get();
 }
 
 TEST_CASE("async_io/torture", "Tortures the async i/o implementation")
