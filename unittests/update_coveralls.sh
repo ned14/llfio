@@ -21,7 +21,7 @@ do
   cat >>coverage.json <<EOF
     {
       "name": "$(echo ${file} | sed -re 's%#%\/%g; s%.gcov$%%')",
-      "source": "$(tail -n +3 ${file} | cut -d ':' -f 3- )",
+      "source": $(tail -n +3 ${file} | cut -d ':' -f 3- | python json_encode.py),
       "coverage": [$(tail -n +3 ${file} | cut -d ':' -f 1 | sed -re 's%^ +%%g; s%-%null%g; s%^[#=]+$%0%;' | tr $'\n' ',' | sed -re 's%,$%%')]
     },
 EOF
@@ -32,7 +32,7 @@ mv coverage.json coverage.json.tmp
 cat >coverage.json <(head -n -1 coverage.json.tmp) <(echo -e "    }\n  ]\n}")
 rm *.gcov coverage.json.tmp
 
-cat coverage.json
+head coverage.json
 echo
 curl -F json_file=@coverage.json https://coveralls.io/api/v1/jobs
 head coverage.json
