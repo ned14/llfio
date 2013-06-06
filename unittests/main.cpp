@@ -557,7 +557,7 @@ static void evil_random_io(std::shared_ptr<triplegit::async_io::async_file_io_di
 			ranctx writeseed=op.seed=gen;
 #endif
 #ifdef _DEBUG
-			toissue=1; // clamp for now
+			//toissue=1; // clamp for now
 #endif
 			for(m=0; m<toissue; m++)
 			{
@@ -567,11 +567,10 @@ static void evil_random_io(std::shared_ptr<triplegit::async_io::async_file_io_di
 				if(s>65536) s=65536; // clamp for now. I think Boost.ASIO won't transfer more than 64Kb at a time anyway ... ?!?
 #endif
 				if(thisbytes+s>1024*1024) break;
+				char *buffertouse=(char *)((size_t)towriteptrs[n]+(size_t) op.req.where);
 #ifdef DEBUG_TORTURE_TEST
 				op.data.push_back(new char[s]);
 				char *buffer=op.data.back();
-#else
-				char *buffer=(char *)((size_t)towriteptrs[n]+(size_t) op.req.where);
 #endif
 				if(op.write)
 				{
@@ -581,6 +580,7 @@ static void evil_random_io(std::shared_ptr<triplegit::async_io::async_file_io_di
 #else
 						*(u4 *)(buffer+x)=fillvalue;
 					memcpy((char *)((size_t)towriteptrs[n]+(size_t) op.req.where+thisbytes), buffer, s);
+					buffertouse=buffer;
 #endif
 				}
 #ifdef DEBUG_TORTURE_TEST
@@ -588,7 +588,7 @@ static void evil_random_io(std::shared_ptr<triplegit::async_io::async_file_io_di
 					memcpy(buffer, (char *)((size_t)towriteptrs[n]+(size_t) op.req.where+thisbytes), s);
 #endif
 				thisbytes+=s;
-				op.req.buffers.push_back(boost::asio::mutable_buffer(buffer, s));
+				op.req.buffers.push_back(boost::asio::mutable_buffer(buffertouse, s));
 			}
 #ifndef DEBUG_TORTURE_TEST
 			if(!op.write)
@@ -652,12 +652,18 @@ static void evil_random_io(std::shared_ptr<triplegit::async_io::async_file_io_di
 		for(size_t m=0; m<op.req.buffers.size(); m++)
 		{
 			const char *buffer=op.data[m];
-			for(size_t idx=0; idx<boost::asio::buffer_size(op.req.buffers[m]); idx++)
+			size_t idx;
+			for(idx=0; idx<boost::asio::buffer_size(op.req.buffers[m]); idx++)
 				if(data[idx]!=buffer[idx])
 				{
 					failures.push(new pair<const Op *, size_t>(make_pair(&op, idx)));
+#ifdef _DEBUG
+					string contents(data, 8), shouldbe(buffer, 8);
+					cout << "Contents of file at " << op.req.where << " +" << idx << " contains " << contents << " instead of " << shouldbe << endl;
+#endif
 					break;
 				}
+			if(idx!=boost::asio::buffer_size(op.req.buffers[m])) break;
 			data+=boost::asio::buffer_size(op.req.buffers[m]);
 		}
 		return make_pair(true, h);
