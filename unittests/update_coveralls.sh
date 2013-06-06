@@ -1,5 +1,5 @@
 #!/bin/bash
-# Borrowed from https://github.com/purpleKarrot/Karrot/blob/develop/test/coveralls.in
+# Adapted from https://github.com/purpleKarrot/Karrot/blob/develop/test/coveralls.in
 
 if [ 0 -eq $(find -iname *.gcda | wc -l) ]
 then
@@ -32,7 +32,7 @@ mv coverage.json coverage.json.tmp
 cat >coverage.json <(head -n -1 coverage.json.tmp) <(echo -e "    }\n  ]\n}")
 rm *.gcov coverage.json.tmp
 
-head coverage.json
-echo
+#head coverage.json
+#echo
 curl -F json_file=@coverage.json https://coveralls.io/api/v1/jobs
-head coverage.json
+#head coverage.json
