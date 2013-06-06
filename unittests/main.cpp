@@ -557,7 +557,7 @@ static void evil_random_io(std::shared_ptr<triplegit::async_io::async_file_io_di
 			ranctx writeseed=op.seed=gen;
 #endif
 #ifdef _DEBUG
-			//toissue=1; // clamp for now
+			//toissue=1; // clamp for now. I think Boost.ASIO on Win IOCP seems to dislike more than one buffer at a time ?!?
 #endif
 			for(m=0; m<toissue; m++)
 			{

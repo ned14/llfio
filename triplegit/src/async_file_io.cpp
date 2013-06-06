@@ -56,7 +56,7 @@ File Created: Mar 2013
 // libstdc++ doesn't come with std::lock_guard
 #define lock_guard boost::lock_guard
 
-#if defined(_DEBUG) && 1
+#if defined(_DEBUG) && 0
 #define DEBUG_PRINTING 1
 #ifdef WIN32
 #define DEBUG_PRINT(...) \
