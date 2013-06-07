@@ -46,7 +46,9 @@ if env['CC']=='cl':
     env['CCFLAGS']+=["/GF"]             # Eliminate duplicate strings
     env['CCFLAGS']+=["/Gy"]             # Seperate COMDATs
     env['CCFLAGS']+=["/Zi"]             # Program database debug info
-    if debugbuild:
+    if env.GetOption('debug')==2:       # Optimised debug build
+        env['CCFLAGS']+=["/O1", "/MTd", "/Oy-"]
+    elif debugbuild:
         env['CCFLAGS']+=["/Od", "/MTd"]
     else:
         env['CCFLAGS']+=["/O2", "/MT"]
@@ -71,7 +73,11 @@ else:
         env['CCFLAGS']+=["-Wno-mismatched-tags"]
     else:
         env['CCFLAGS']+=["-fargument-noalias"]
-    if debugbuild:
+    if env.GetOption('debug')==2:       # Optimised debug build
+        env['CCFLAGS']+=["-O1", "-g", "-fno-omit-frame-pointer"]
+        if architecture=='ARMv7':
+            env['CCFLAGS']+=["-mapcs-frame", "-mtpcs-frame", "-mtpcs-leaf-frame"]
+    elif debugbuild:
         env['CCFLAGS']+=["-O0", "-g"]
     else:
         env['CCFLAGS']+=["-O2", "-g"]

@@ -61,6 +61,7 @@ if sys.platform=="win32" and 'INCLUDE' not in os.environ:
 #print env['TOOLS']
 AddOption('--postfix', dest='postfix', nargs=1, default='_test', help='appends a string to the DLL name')
 AddOption('--debugbuild', dest='debug', nargs='?', const=True, help='enable debug build')
+AddOption('--optdebugbuild', dest='optdebug', nargs='?', const=True, help='enable optimised debug build')
 AddOption('--static', dest='static', nargs='?', const=True, help='build a static library rather than shared library')
 AddOption('--useclang', dest='useclang', nargs=1, type='str', help='use clang if it is available')
 AddOption('--usegcc', dest='usegcc', nargs=1, type='str', help='use gcc if it is available')
@@ -80,6 +81,7 @@ if env.GetOption('archs')!='min' and env.GetOption('archs')!='all':
 		assert arch in architectures
 	architectures=archs
 if architecture=='x64' and env.GetOption('force32'): architecture='x86'
+if env.GetOption("optdebug"): env.SetOption("debug", 2)
 
 # Force scons to always use absolute paths in everything (helps debuggers to find source files)
 env['CCCOM']   =    env['CCCOM'].replace('$CHANGED_SOURCES','$SOURCES.abspath')

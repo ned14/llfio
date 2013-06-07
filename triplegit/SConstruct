@@ -61,9 +61,12 @@ if sys.platform=="win32" and 'INCLUDE' not in os.environ:
 #print env['TOOLS']
 AddOption('--postfix', dest='postfix', nargs=1, default='_test', help='appends a string to the DLL name')
 AddOption('--debugbuild', dest='debug', nargs='?', const=True, help='enable debug build')
+AddOption('--optdebugbuild', dest='optdebug', nargs='?', const=True, help='enable optimised debug build')
 AddOption('--static', dest='static', nargs='?', const=True, help='build a static library rather than shared library')
-AddOption('--useclang', dest='useclang', nargs=1, type='str', default='clang++', help='use clang if it is available')
-AddOption('--usegcc', dest='usegcc', nargs=1, type='str', default='g++', help='use gcc if it is available')
+AddOption('--useclang', dest='useclang', nargs=1, type='str', help='use clang if it is available')
+AddOption('--usegcc', dest='usegcc', nargs=1, type='str', help='use gcc if it is available')
+AddOption('--usethreadsanitize', dest='usethreadsanitize', nargs='?', const=True, help='use thread sanitiser')
+AddOption('--usegcov', dest='usegcov', nargs='?', const=True, help='use GCC coverage')
 AddOption('--force32', dest='force32', help='force 32 bit build on 64 bit machine')
 AddOption('--archs', dest='archs', nargs=1, type='str', default='min', help='which architectures to build, comma separated. all means all. Defaults to min.')
 if 'x86' in architectures:
@@ -78,6 +81,7 @@ if env.GetOption('archs')!='min' and env.GetOption('archs')!='all':
 		assert arch in architectures
 	architectures=archs
 if architecture=='x64' and env.GetOption('force32'): architecture='x86'
+if env.GetOption("optdebug"): env.SetOption("debug", 2)
 
 # Force scons to always use absolute paths in everything (helps debuggers to find source files)
 env['CCCOM']   =    env['CCCOM'].replace('$CHANGED_SOURCES','$SOURCES.abspath')
@@ -86,6 +90,7 @@ env['CXXCOM']  =   env['CXXCOM'].replace('$CHANGED_SOURCES','$SOURCES.abspath')
 env['SHCXXCOM']= env['SHCXXCOM'].replace('$CHANGED_SOURCES','$SOURCES.abspath')
 env['CPPPATH']=[]
 env['CPPDEFINES']=[]
+env['CPPFLAGS']=[]
 env['CCFLAGS']=[]
 env['CXXFLAGS']=[]
 env['LIBS']=[]
@@ -111,7 +116,7 @@ else:
             temp=env['CC']
         except:
             temp=[]
-        cc.env['CC']="clang"
+        cc.env['CC']=env.GetOption('useclang')
         result=cc.TryLink('int main(void) { return 0; }\n', '.c')
         cc.env['CC']=temp
         cc.Result(result)
@@ -122,7 +127,7 @@ else:
             temp=env['CC']
         except:
             temp=[]
-        cc.env['CC']="gcc"
+        cc.env['CC']=env.GetOption('usegcc')
         result=cc.TryLink('int main(void) { return 0; }\n', '.c')
         cc.env['CC']=temp
         cc.Result(result)
@@ -176,6 +181,13 @@ else:
     if env.GetOption('usegcc') and conf.CheckHaveGCC():
         env['CC']="gcc"
         env['CXX']=env.GetOption('usegcc')
+    if env.GetOption('usethreadsanitize'):
+        env['CPPFLAGS']+=["-fsanitize=thread", "-fPIC"]
+        env['LINKFLAGS']+=["-fsanitize=thread"]
+        env['LIBS']+=["tsan"]
+    if env.GetOption('usegcov'):
+        env['CPPFLAGS']+=["-fprofile-arcs", "-ftest-coverage"]
+        env['LIBS']+=["gcov"]
     if not conf.CheckLib("rt", "clock_gettime") and not conf.CheckLib("c", "clock_gettime"):
         print "WARNING: Can't find clock_gettime() in librt or libc, code may not fully compile if your system headers say that this function is available"
     if conf.CheckHaveVisibility():

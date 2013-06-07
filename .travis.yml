@@ -16,8 +16,8 @@ env:
     - _="Build test" VALGRIND=0 UNIT_TESTS=0 DEBUG=0 GCCVER="" GCOV=0
     - _="Unit/functional tests" VALGRIND=0 UNIT_TESTS="exclude:async_io/errors" DEBUG=0 GCCVER="" GCOV=0
     - _="GCC 4.8 + Unit/functional tests coverage" VALGRIND=0 CCFLAGS="--usegcov --usegcc=g++-4.8" UNIT_TESTS="exclude:async_io/errors" DEBUG=1 GCCVER="4.8" GCOV=1
-    - _="Memory error and leak tests" VALGRIND=memcheck UNIT_TESTS="exclude:async_io/errors" DEBUG=1 GCCVER="" GCOV=0
-    - _="Race detection tests" VALGRIND=0 CCFLAGS="--usethreadsanitize --usegcc=g++-4.8" UNIT_TESTS="exclude:async_io/errors" DEBUG=1 GCCVER="4.8" TSAN_OPTIONS="suppressions=unittests/tsan.supp" GCOV=0
+    - _="Memory error and leak tests" VALGRIND=memcheck UNIT_TESTS="exclude:async_io/errors" DEBUG=2 GCCVER="" GCOV=0
+    - _="Race detection tests" VALGRIND=0 CCFLAGS="--usethreadsanitize --usegcc=g++-4.8" UNIT_TESTS="exclude:async_io/errors" DEBUG=2 GCCVER="4.8" TSAN_OPTIONS="suppressions=unittests/tsan.supp" GCOV=0
 
 # The clang 3.2 .deb doesn't supply the needed tsan runtime library :(
 matrix:
@@ -25,11 +25,11 @@ matrix:
     - compiler: clang
       env: _="GCC 4.8 + Unit/functional tests coverage" VALGRIND=0 CCFLAGS="--usegcov --usegcc=g++-4.8" UNIT_TESTS="exclude:async_io/errors" DEBUG=1 GCCVER="4.8" GCOV=1
     - compiler: clang
-      env: _="Race detection tests" VALGRIND=0 CCFLAGS="--usethreadsanitize --usegcc=g++-4.8" UNIT_TESTS="exclude:async_io/errors" DEBUG=1 GCCVER="4.8" TSAN_OPTIONS="suppressions=unittests/tsan.supp" GCOV=0
+      env: _="Race detection tests" VALGRIND=0 CCFLAGS="--usethreadsanitize --usegcc=g++-4.8" UNIT_TESTS="exclude:async_io/errors" DEBUG=2 GCCVER="4.8" TSAN_OPTIONS="suppressions=unittests/tsan.supp" GCOV=0
 
   allow_failures:
     - compiler: gcc
-      env: _="Race detection tests" VALGRIND=0 CCFLAGS="--usethreadsanitize --usegcc=g++-4.8" UNIT_TESTS="exclude:async_io/errors" DEBUG=1 GCCVER="4.8" TSAN_OPTIONS="suppressions=unittests/tsan.supp" GCOV=0
+      env: _="Race detection tests" VALGRIND=0 CCFLAGS="--usethreadsanitize --usegcc=g++-4.8" UNIT_TESTS="exclude:async_io/errors" DEBUG=2 GCCVER="4.8" TSAN_OPTIONS="suppressions=unittests/tsan.supp" GCOV=0
 
 before_install:
  - sudo add-apt-repository -y ppa:apokluda/boost1.53
@@ -43,13 +43,14 @@ before_install:
  - git submodule update --init --recursive
 
 script:
- - if [ $CC = "clang" ]; then if [ $DEBUG -eq 0 ]; then scons -k --useclang=clang++-3.2 $CCFLAGS; else scons -k --useclang=clang++-3.2 --debugbuild $CCFLAGS; fi; else if [ $DEBUG -eq 0 ]; then scons -k $CCFLAGS; else scons -k --debugbuild $CCFLAGS; fi; fi
+ - if [ $DEBUG -eq 0 ]; then PREFIXPATH="x64/Release"; DEBUGBUILD=""; fi
+ - if [ $DEBUG -eq 1 ]; then PREFIXPATH="x64/Debug"; DEBUGBUILD="--debugbuild"; fi
+ - if [ $DEBUG -eq 2 ]; then PREFIXPATH="x64/Debug"; DEBUGBUILD="--optdebugbuild"; fi
+ - if [ $CC = "clang" ]; then scons -k --useclang=clang++-3.2 $DEBUGBUILD $CCFLAGS; fi; else scons -k $DEBUGBUILD $CCFLAGS; fi; fi
  - if [ $VALGRIND = "memcheck" ]; then PREFIXTEST="valgrind --tool=memcheck --suppressions=unittests/memcheck.supp --track-origins=yes --track-fds=yes --leak-check=full --show-reachable=yes --error-exitcode=1"; fi
  - if [ $VALGRIND = "drd" ]; then PREFIXTEST="valgrind --tool=drd --suppressions=unittests/drd.supp --error-exitcode=1"; fi
  - if [ $VALGRIND = "0" ]; then PREFIXTEST=""; fi
- - if [ $DEBUG -eq 0 ]; then PREFIXPATH="x64/Release"; fi
- - if [ $DEBUG -eq 1 ]; then PREFIXPATH="x64/Debug"; fi
-
+ 
  - if [ "$UNIT_TESTS" != "0" ]; then $PREFIXTEST $PREFIXPATH/tests $UNIT_TESTS; fi
 
 after_success:
