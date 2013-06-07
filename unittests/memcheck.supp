@@ -35,3 +35,37 @@
    fun:_ZN5boost6detail23get_current_thread_dataEv
    ...
 }
+{
+   boosthread1
+   Memcheck:Leak
+   ...
+   fun:calloc
+   fun:_dl_allocate_tls
+   fun:pthread_create@@GLIBC_2.2.5
+   fun:_ZN5boost6thread21start_thread_noexceptEv
+   ...
+}
+{
+   libgomp1
+   Memcheck:Leak
+   ...
+   fun:realloc
+   obj:/usr/lib/x86_64-linux-gnu/libgomp.so.1.0.0
+   ...
+}
+{
+   libgomp2
+   Memcheck:Leak
+   ...
+   fun:malloc
+   obj:/usr/lib/x86_64-linux-gnu/libgomp.so.1.0.0
+   ...
+}
+{
+   libgomp3
+   Memcheck:Leak
+   ...
+   fun:pthread_create@@GLIBC_2.2.5
+   obj:/usr/lib/x86_64-linux-gnu/libgomp.so.1.0.0
+   ...
+}

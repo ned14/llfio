@@ -539,7 +539,7 @@ static void evil_random_io(std::shared_ptr<triplegit::async_io::async_file_io_di
 	// SHA256 out the results
 	// We then replay the same with real storage to see if it matches
 	auto begin=std::chrono::high_resolution_clock::now();
-#ifdef BOOST_ASIO_BUG_WORKAROUND
+#ifndef BOOST_ASIO_BUG_WORKAROUND
 #pragma omp parallel for
 #endif
 	for(ptrdiff_t n=0; n<(ptrdiff_t) no; n++)
@@ -683,7 +683,7 @@ static void evil_random_io(std::shared_ptr<triplegit::async_io::async_file_io_di
 		}
 		return make_pair(true, h);
 	};
-#ifdef BOOST_ASIO_BUG_WORKAROUND
+#ifndef BOOST_ASIO_BUG_WORKAROUND
 #pragma omp parallel for
 #endif
 	for(ptrdiff_t n=0; n<(ptrdiff_t) no; n++)
