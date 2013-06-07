@@ -468,26 +468,21 @@ TEST_CASE("async_io/errors", "Tests that the async i/o error handling works")
 	{
 		auto dispatcher=async_file_io_dispatcher();
 		auto mkdir(dispatcher->dir(async_path_op_req("testdir", file_flags::Create)));
+		vector<async_path_op_req> filereqs;
+		filereqs.push_back(async_path_op_req(mkdir, "testdir/a", file_flags::CreateOnlyIfNotExist));
+		filereqs.push_back(async_path_op_req(mkdir, "testdir/a", file_flags::CreateOnlyIfNotExist));
+		auto manyfilecreates=dispatcher->file(filereqs); // One of these will error
+		auto manyfiledeletes=dispatcher->rmfile(filereqs); // One of these will also error
+		auto sync=dispatcher->barrier(manyfiledeletes);
+		CHECK_NOTHROW(when_all(std::nothrow_t(), sync.begin(), sync.end()).wait());
+		int hasError=0;
+		for(auto &i : sync)
 		{
-			vector<async_io_op> files;
-			files.push_back(dispatcher->file(async_path_op_req(mkdir, "testdir/a", file_flags::Create)));
-			files.push_back(dispatcher->file(async_path_op_req(mkdir, "testdir/b", file_flags::Create)));
-			when_all(files.begin(), files.end()).wait();
-#if 0
-			auto copy(dispatcher->call(files.front(), []{
-				std::filesystem::copy("testdir/c", "testdir/d");
-			}));
-			CHECK_THROWS(copy.second.h->get()); // This should trip with failure to copy
-			CHECK_THROWS(when_all({copy.second}).get()); // This should trip with failure to copy
-#else
-			CHECK(!"Fixme");
-#endif
+			if(i.h->has_exception()) hasError++;
 		}
-		vector<async_io_op> files;
-		files.push_back(dispatcher->rmfile(async_path_op_req(mkdir, "testdir/a")));
-		files.push_back(dispatcher->rmfile(async_path_op_req(mkdir, "testdir/b")));
-		// TODO: Insert a barrier() here once I write it.
-		files.push_back(dispatcher->rmdir(async_path_op_req(mkdir, "testdir")));
+		CHECK(hasError==1);
+		CHECK_THROWS(when_all(sync.begin(), sync.end()).wait());
+		auto rmdir=dispatcher->rmdir(async_path_op_req("testdir"));
 	}
 }
 

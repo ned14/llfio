@@ -195,10 +195,31 @@ std::result_of&lt; C(Args...)&gt;<br class="typebreak"/>
 <tr class="memitem:aedd6e17486c726c5b08be8132fe55776"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structtriplegit_1_1async__io_1_1async__io__op.html">async_io_op</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtriplegit_1_1async__io_1_1async__file__io__dispatcher__base.html#aedd6e17486c726c5b08be8132fe55776">truncate</a> (const <a class="el" href="structtriplegit_1_1async__io_1_1async__io__op.html">async_io_op</a> &amp;op, off_t newsize)</td></tr>
 <tr class="memdesc:aedd6e17486c726c5b08be8132fe55776"><td class="mdescLeft">&#160;</td><td class="mdescRight">Truncates the length of an item.  <a href="#aedd6e17486c726c5b08be8132fe55776"></a><br/></td></tr>
 <tr class="separator:aedd6e17486c726c5b08be8132fe55776"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abab6bf4b54cd79f634359bec3df83a1a"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="structtriplegit_1_1async__io_1_1async__io__op.html">async_io_op</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtriplegit_1_1async__io_1_1async__file__io__dispatcher__base.html#abab6bf4b54cd79f634359bec3df83a1a">barrier</a> (const std::vector&lt; <a class="el" href="structtriplegit_1_1async__io_1_1async__io__op.html">async_io_op</a> &gt; &amp;ops)</td></tr>
+<tr class="memdesc:abab6bf4b54cd79f634359bec3df83a1a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Completes each of the supplied ops when and only when the last of the supplied ops completes.  <a href="#abab6bf4b54cd79f634359bec3df83a1a"></a><br/></td></tr>
+<tr class="separator:abab6bf4b54cd79f634359bec3df83a1a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Abstract base class for dispatching file i/o asynchronously. </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
+<a class="anchor" id="abab6bf4b54cd79f634359bec3df83a1a"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;<a class="el" href="structtriplegit_1_1async__io_1_1async__io__op.html">async_io_op</a>&gt; triplegit::async_io::async_file_io_dispatcher_base::barrier </td>
+          <td>(</td>
+          <td class="paramtype">const std::vector&lt; <a class="el" href="structtriplegit_1_1async__io_1_1async__io__op.html">async_io_op</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>ops</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Completes each of the supplied ops when and only when the last of the supplied ops completes. </p>
+
+</div>
+</div>
 <a class="anchor" id="af5ec8648416926263780d9c597db35ed"></a>
 <div class="memitem">
 <div class="memproto">

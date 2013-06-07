@@ -200,6 +200,7 @@ namespace detail {
 		read,
 		write,
 		truncate,
+		barrier,
 
 		Last
 	};
@@ -214,7 +215,8 @@ namespace detail {
 		"close",
 		"read",
 		"write",
-		"truncate"
+		"truncate",
+		"barrier"
 	};
 	static_assert(static_cast<size_t>(OpType::Last)==sizeof(optypes)/sizeof(*optypes), "You forgot to fix up the strings matching OpType");
 	struct async_file_io_dispatcher_op
@@ -572,6 +574,16 @@ template<class F, class T> std::vector<async_io_op> async_file_io_dispatcher_bas
 		ret.push_back(chain_async_op(immediates, optype, *precondition_it, flags, f, *container_it));
 	return ret;
 }
+template<class F> std::vector<async_io_op> async_file_io_dispatcher_base::chain_async_ops(int optype, const std::vector<async_io_op> &container, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, async_io_op))
+{
+	std::vector<async_io_op> ret;
+	ret.reserve(container.size());
+	lock_guard<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
+	detail::immediate_async_ops immediates;
+	for(auto &i : container)
+		ret.push_back(chain_async_op(immediates, optype, i, flags, f, i));
+	return ret;
+}
 template<class F> std::vector<async_io_op> async_file_io_dispatcher_base::chain_async_ops(int optype, const std::vector<async_path_op_req> &container, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, async_path_op_req))
 {
 	std::vector<async_io_op> ret;
@@ -591,6 +603,53 @@ template<class F, class T> std::vector<async_io_op> async_file_io_dispatcher_bas
 	for(auto &i : container)
 		ret.push_back(chain_async_op(immediates, optype, i.precondition, flags, f, i));
 	return ret;
+}
+
+namespace detail
+{
+	struct barrier_count_completed_state
+	{
+		std::atomic<size_t> togo;
+		std::vector<std::pair<size_t, std::shared_ptr<detail::async_io_handle>>> out;
+		barrier_count_completed_state(size_t outsize) : togo(outsize), out(outsize) { }
+	};
+}
+
+/* This is extremely naughty ... you really shouldn't be using templates to hide implementation
+types, but hey it works and is non-header so so what ...
+*/
+//template<class T> async_file_io_dispatcher_base::completion_returntype async_file_io_dispatcher_base::dobarrier(size_t id, std::shared_ptr<detail::async_io_handle> h, T state);
+template<> async_file_io_dispatcher_base::completion_returntype async_file_io_dispatcher_base::dobarrier<std::pair<std::shared_ptr<detail::barrier_count_completed_state>, size_t>>(size_t id, std::shared_ptr<detail::async_io_handle> h, std::pair<std::shared_ptr<detail::barrier_count_completed_state>, size_t> state)
+{
+	size_t idx=state.second;
+	state.first->out[idx]=std::make_pair(id, h); // This might look thread unsafe, but each idx is unique
+	if(--state.first->togo)
+		return std::make_pair(false, h);
+	// Last one just completed, so issue completions for everything in out except me
+	detail::barrier_count_completed_state &s=*state.first;
+	for(idx=0; idx<s.out.size(); idx++)
+	{
+		if(idx==state.second) continue;
+		complete_async_op(s.out[idx].first, s.out[idx].second);
+	}
+	return std::make_pair(true, h);
+}
+
+std::vector<async_io_op> async_file_io_dispatcher_base::barrier(const std::vector<async_io_op> &ops)
+{
+#if TRIPLEGIT_VALIDATE_INPUTS
+		for(auto &i : ops)
+			if(!i.validate())
+				throw std::runtime_error("Inputs are invalid.");
+#endif
+	// Create a shared state for the completions to be attached to all the items we are waiting upon
+	auto state(std::make_shared<detail::barrier_count_completed_state>(ops.size()));
+	std::vector<std::pair<std::shared_ptr<detail::barrier_count_completed_state>, size_t>> statev;
+	statev.reserve(ops.size());
+	size_t idx=0;
+	for(auto &op : ops)
+		statev.push_back(make_pair(state, idx++));
+	return chain_async_ops((int) detail::OpType::barrier, ops, statev, async_op_flags::ImmediateCompletion|async_op_flags::DetachedFuture, &async_file_io_dispatcher_base::dobarrier<std::pair<std::shared_ptr<detail::barrier_count_completed_state>, size_t>>);
 }
 
 
@@ -813,7 +872,7 @@ namespace detail {
 				if(!i.validate())
 					throw std::runtime_error("Inputs are invalid.");
 #endif
-			return chain_async_ops((int) detail::OpType::sync, ops, ops, async_op_flags::None, &async_file_io_dispatcher_windows::dosync);
+			return chain_async_ops((int) detail::OpType::sync, ops, async_op_flags::None, &async_file_io_dispatcher_windows::dosync);
 		}
 		virtual std::vector<async_io_op> close(const std::vector<async_io_op> &ops)
 		{
@@ -822,7 +881,7 @@ namespace detail {
 				if(!i.validate())
 					throw std::runtime_error("Inputs are invalid.");
 #endif
-			return chain_async_ops((int) detail::OpType::close, ops, ops, async_op_flags::None, &async_file_io_dispatcher_windows::doclose);
+			return chain_async_ops((int) detail::OpType::close, ops, async_op_flags::None, &async_file_io_dispatcher_windows::doclose);
 		}
 		virtual std::vector<async_io_op> read(const std::vector<async_data_op_req<void>> &reqs)
 		{
@@ -1108,7 +1167,7 @@ namespace detail {
 				if(!i.validate())
 					throw std::runtime_error("Inputs are invalid.");
 #endif
-			return chain_async_ops((int) detail::OpType::sync, ops, ops, async_op_flags::None, &async_file_io_dispatcher_compat::dosync);
+			return chain_async_ops((int) detail::OpType::sync, ops, async_op_flags::None, &async_file_io_dispatcher_compat::dosync);
 		}
 		virtual std::vector<async_io_op> close(const std::vector<async_io_op> &ops)
 		{
@@ -1117,7 +1176,7 @@ namespace detail {
 				if(!i.validate())
 					throw std::runtime_error("Inputs are invalid.");
 #endif
-			return chain_async_ops((int) detail::OpType::close, ops, ops, async_op_flags::None, &async_file_io_dispatcher_compat::doclose);
+			return chain_async_ops((int) detail::OpType::close, ops, async_op_flags::None, &async_file_io_dispatcher_compat::doclose);
 		}
 		virtual std::vector<async_io_op> read(const std::vector<async_data_op_req<void>> &reqs)
 		{
@@ -1146,7 +1205,6 @@ namespace detail {
 #endif
 			return chain_async_ops((int) detail::OpType::truncate, ops, sizes, async_op_flags::None, &async_file_io_dispatcher_compat::dotruncate);
 		}
-
 	};
 }
 
