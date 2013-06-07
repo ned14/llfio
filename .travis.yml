@@ -14,27 +14,22 @@ env:
     - secure: "LG1scRCvFAHZ2rWGLL5ShXTegKNF3+4YaT8BAZalpMWjwBbYnIbAYgFYOwCk\naUy8e5zpC8FElIctGY/9ni1wcGwQkP97YaMvcai1r0IBjbVBi8tqvqekc/5Q\n2pz8IlJXDz/WzTEVb9w7xIDfRCZq8Xiw9LpENvVwfpbrQfFJLLk="
   matrix:
     - _="Build test" VALGRIND=0 UNIT_TESTS=0 DEBUG=0 GCCVER="" GCOV=0
-    - _="Unit/functional tests" VALGRIND=0 UNIT_TESTS="exclude:async_io/torture* exclude:async_io/errors" DEBUG=0 GCCVER="" GCOV=0
-    - _="GCC 4.8 + Unit/functional tests coverage" VALGRIND=0 CCFLAGS="--usegcov --usegcc=g++-4.8" UNIT_TESTS="exclude:async_io/torture* exclude:async_io/errors" DEBUG=1 GCCVER="4.8" GCOV=1
-    - _="Memory error and leak tests" VALGRIND=memcheck UNIT_TESTS="exclude:async_io/torture* exclude:async_io/errors" DEBUG=1 GCCVER="" GCOV=0
-    - _="Race detection tests" VALGRIND=0 CCFLAGS="--usethreadsanitize --usegcc=g++-4.8" UNIT_TESTS="exclude:async_io/torture* exclude:async_io/errors" DEBUG=1 GCCVER="4.8" TSAN_OPTIONS="suppressions=unittests/tsan.supp" GCOV=0
-    - _="Torture test" VALGRIND=0 UNIT_TESTS="async_io/torture" DEBUG=0 GCCVER="" GCOV=0
+    - _="Unit/functional tests" VALGRIND=0 UNIT_TESTS="exclude:async_io/errors" DEBUG=0 GCCVER="" GCOV=0
+    - _="GCC 4.8 + Unit/functional tests coverage" VALGRIND=0 CCFLAGS="--usegcov --usegcc=g++-4.8" UNIT_TESTS="exclude:async_io/errors" DEBUG=1 GCCVER="4.8" GCOV=1
+    - _="Memory error and leak tests" VALGRIND=memcheck UNIT_TESTS="exclude:async_io/errors" DEBUG=1 GCCVER="" GCOV=0
+    - _="Race detection tests" VALGRIND=0 CCFLAGS="--usethreadsanitize --usegcc=g++-4.8" UNIT_TESTS="exclude:async_io/errors" DEBUG=1 GCCVER="4.8" TSAN_OPTIONS="suppressions=unittests/tsan.supp" GCOV=0
 
 # The clang 3.2 .deb doesn't supply the needed tsan runtime library :(
 matrix:
   exclude:
     - compiler: clang
-      env: _="GCC 4.8 + Unit/functional tests coverage" VALGRIND=0 CCFLAGS="--usegcov --usegcc=g++-4.8" UNIT_TESTS="exclude:async_io/torture* exclude:async_io/errors" DEBUG=1 GCCVER="4.8" GCOV=1
+      env: _="GCC 4.8 + Unit/functional tests coverage" VALGRIND=0 CCFLAGS="--usegcov --usegcc=g++-4.8" UNIT_TESTS="exclude:async_io/errors" DEBUG=1 GCCVER="4.8" GCOV=1
     - compiler: clang
-      env: _="Race detection tests" VALGRIND=0 CCFLAGS="--usethreadsanitize --usegcc=g++-4.8" UNIT_TESTS="exclude:async_io/torture* exclude:async_io/errors" DEBUG=1 GCCVER="4.8" TSAN_OPTIONS="suppressions=unittests/tsan.supp" GCOV=0
-    - compiler: clang
-      env: _="Torture test" VALGRIND=0 UNIT_TESTS="async_io/torture" DEBUG=0 GCCVER="" GCOV=0
+      env: _="Race detection tests" VALGRIND=0 CCFLAGS="--usethreadsanitize --usegcc=g++-4.8" UNIT_TESTS="exclude:async_io/errors" DEBUG=1 GCCVER="4.8" TSAN_OPTIONS="suppressions=unittests/tsan.supp" GCOV=0
 
   allow_failures:
     - compiler: gcc
-      env: _="Race detection tests" VALGRIND=0 CCFLAGS="--usethreadsanitize --usegcc=g++-4.8" UNIT_TESTS="exclude:async_io/torture* exclude:async_io/errors" DEBUG=1 GCCVER="4.8" TSAN_OPTIONS="suppressions=unittests/tsan.supp" GCOV=0
-    - compiler: gcc
-      env: _="Torture test" VALGRIND=0 UNIT_TESTS="async_io/torture" DEBUG=0 GCCVER="" GCOV=0
+      env: _="Race detection tests" VALGRIND=0 CCFLAGS="--usethreadsanitize --usegcc=g++-4.8" UNIT_TESTS="exclude:async_io/errors" DEBUG=1 GCCVER="4.8" TSAN_OPTIONS="suppressions=unittests/tsan.supp" GCOV=0
 
 before_install:
  - sudo add-apt-repository -y ppa:apokluda/boost1.53

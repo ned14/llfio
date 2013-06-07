@@ -495,6 +495,7 @@ static void evil_random_io(std::shared_ptr<triplegit::async_io::async_file_io_di
 	using triplegit::async_io::off_t;
 	typedef std::chrono::duration<double, ratio<1>> secs_type;
 
+	NiallsCPP11Utilities::aligned_allocator<char, 4096> aligned_allocator;
 	vector<vector<char, NiallsCPP11Utilities::aligned_allocator<char, 4096>>> towrite(no);
 	vector<char *> towriteptrs(no);
 	vector<size_t> towritesizes(no);
@@ -533,7 +534,7 @@ static void evil_random_io(std::shared_ptr<triplegit::async_io::async_file_io_di
 	// SHA256 out the results
 	// We then replay the same with real storage to see if it matches
 	auto begin=std::chrono::high_resolution_clock::now();
-//#pragma omp parallel for
+#pragma omp parallel for
 	for(ptrdiff_t n=0; n<(ptrdiff_t) no; n++)
 	{
 		ranctx gen;
@@ -558,6 +559,7 @@ static void evil_random_io(std::shared_ptr<triplegit::async_io::async_file_io_di
 #endif
 #ifdef _DEBUG
 			//toissue=1; // clamp for now. I think Boost.ASIO on Win IOCP seems to dislike more than one buffer at a time ?!?
+			//if(toissue>4) toissue=4;
 #endif
 			for(m=0; m<toissue; m++)
 			{
@@ -566,10 +568,12 @@ static void evil_random_io(std::shared_ptr<triplegit::async_io::async_file_io_di
 #ifdef _DEBUG
 				//if(s>65536) s=65536; // clamp for now. I think Boost.ASIO won't transfer more than 64Kb at a time anyway ... ?!?
 #endif
+				if(alignment)
+					s=(s+4095)&~(alignment-1);
 				if(thisbytes+s>1024*1024) break;
-				char *buffertouse=(char *)((size_t)towriteptrs[n]+(size_t) op.req.where);
+				char *buffertouse=(char *)((size_t)towriteptrs[n]+(size_t) op.req.where+thisbytes);
 #ifdef DEBUG_TORTURE_TEST
-				op.data.push_back(new char[s]);
+				op.data.push_back(aligned_allocator.allocate(s));
 				char *buffer=op.data.back();
 #endif
 				if(op.write)
@@ -605,7 +609,7 @@ static void evil_random_io(std::shared_ptr<triplegit::async_io::async_file_io_di
 			off_t end=op.req.where;
 			for(auto &b : op.req.buffers)
 				end+=boost::asio::buffer_size(b);
-			assert(end<bytes);
+			assert(end<=bytes);
 #endif
 			todo[n].push_back(move(op));
 			bytessofar+=thisbytes;
@@ -672,7 +676,7 @@ static void evil_random_io(std::shared_ptr<triplegit::async_io::async_file_io_di
 		}
 		return make_pair(true, h);
 	};
-//#pragma omp parallel for
+#pragma omp parallel for
 	for(ptrdiff_t n=0; n<(ptrdiff_t) no; n++)
 	{
 		for(Op &op : todo[n])
@@ -761,7 +765,7 @@ static void evil_random_io(std::shared_ptr<triplegit::async_io::async_file_io_di
 		for(Op &op : todo[n])
 		{
 			for(auto &i : op.data)
-				delete[] i;
+				aligned_allocator.deallocate(i, 0);
 		}
 	}
 #endif
@@ -781,7 +785,7 @@ TEST_CASE("async_io/torture", "Tortures the async i/o implementation")
 {
 	auto dispatcher=triplegit::async_io::async_file_io_dispatcher(triplegit::async_io::process_threadpool(), triplegit::async_io::file_flags::None);
 	std::cout << "\n\nSustained random i/o to 10 files of 10Mb:\n";
-	evil_random_io(dispatcher, 1, 10*1024*1024);
+	evil_random_io(dispatcher, 10, 10*1024*1024);
 }
 
 TEST_CASE("async_io/torture/sync", "Tortures the synchronous async i/o implementation")
