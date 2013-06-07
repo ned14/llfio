@@ -9,7 +9,7 @@ reporter: '"Niall Douglas \(s \[underscore\] sourceforge {at} nedprod \[dot\] co
 severity: wishlist
 
 
-status: open
+status: closed
 
 
 summary: function() and call() currently provide no method for retrieving their returns.
