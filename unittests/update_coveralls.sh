@@ -1,5 +1,6 @@
 #!/bin/bash
 # Adapted from https://github.com/purpleKarrot/Karrot/blob/develop/test/coveralls.in
+# which itself was adapted from https://github.com/berenm/cmake-extra/blob/master/coveralls-upload.in
 
 if [ 0 -eq $(find -iname *.gcda | wc -l) ]
 then
