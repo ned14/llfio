@@ -347,14 +347,22 @@ async_file_io_dispatcher_base::completion_returntype async_file_io_dispatcher_ba
 
 std::vector<async_io_op> async_file_io_dispatcher_base::completion(const std::vector<async_io_op> &ops, const std::vector<std::pair<async_op_flags, std::function<async_file_io_dispatcher_base::completion_t>>> &callbacks)
 {
+	if(!ops.empty() && ops.size()!=callbacks.size())
+		throw std::runtime_error("The sequence of preconditions must either be empty or exactly the same length as callbacks.");
 	std::vector<async_io_op> ret;
-	ret.reserve(ops.size());
+	ret.reserve(callbacks.size());
 	std::vector<async_io_op>::const_iterator i;
 	std::vector<std::pair<async_op_flags, std::function<async_file_io_dispatcher_base::completion_t>>>::const_iterator c;
 	lock_guard<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
 	detail::immediate_async_ops immediates;
-	for(i=ops.begin(), c=callbacks.begin(); i!=ops.end() && c!=callbacks.end(); ++i, ++c)
-		ret.push_back(chain_async_op(immediates, (int) detail::OpType::UserCompletion, *i, c->first, &async_file_io_dispatcher_base::invoke_user_completion, c->second));
+	if(ops.empty())
+	{
+		async_io_op empty;
+		for(auto & c: callbacks)
+			ret.push_back(chain_async_op(immediates, (int) detail::OpType::UserCompletion, empty, c.first, &async_file_io_dispatcher_base::invoke_user_completion, c.second));
+	}
+	else for(i=ops.begin(), c=callbacks.begin(); i!=ops.end() && c!=callbacks.end(); ++i, ++c)
+			ret.push_back(chain_async_op(immediates, (int) detail::OpType::UserCompletion, *i, c->first, &async_file_io_dispatcher_base::invoke_user_completion, c->second));
 	return ret;
 }
 

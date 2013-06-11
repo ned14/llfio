@@ -9,7 +9,7 @@ reporter: '"Niall Douglas \(s \[underscore\] sourceforge {at} nedprod \[dot\] co
 severity: wishlist
 
 
-status: open
+status: fixed
 
 
 summary: Add a std::vector<async_io_op> barrier() which completes each of its inputs

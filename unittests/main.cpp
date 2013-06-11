@@ -497,7 +497,10 @@ TEST_CASE("async_io/barrier", "Tests that the async i/o barrier works correctly 
 	auto verifybarrier=[](atomic<size_t> *count, size_t shouldbe)
 	{
 		if(*count!=shouldbe)
+		{
+			CHECK((*count==shouldbe));
 			throw runtime_error("Count was not what it should have been!");
+		}
 		return true;
 	};
 	// For each of those runs, dispatch ops and a barrier for them
@@ -527,10 +530,12 @@ TEST_CASE("async_io/barrier", "Tests that the async i/o barrier works correctly 
 		opscount+=run.first+2;
 	}
 	auto dispatched=chrono::high_resolution_clock::now();
-	when_all(next).wait();
+	CHECK_NOTHROW(when_all(next).wait());
 	// Retrieve any errors
 	for(auto &i : verifies)
-		i.get();
+	{
+		CHECK_NOTHROW(i.get());
+	}
 	auto end=std::chrono::high_resolution_clock::now();
 	auto diff=chrono::duration_cast<secs_type>(end-begin);
 	cout << "It took " << diff.count() << " secs to do " << opscount << " operations" << endl;
