@@ -844,6 +844,10 @@ public:
 	//! Invoke the specified callable when the supplied operation completes
 	template<class R> inline std::pair<std::vector<future<R>>, std::vector<async_io_op>> call(const std::vector<async_io_op> &ops, const std::vector<std::function<R()>> &callables);
 	//! Invoke the specified callable when the supplied operation completes
+	template<class R> std::pair<std::vector<future<R>>, std::vector<async_io_op>> call(const std::vector<std::function<R()>> &callables) { return call(std::vector<async_io_op>(), callables); }
+	//! Invoke the specified callable when the supplied operation completes
+	template<class R> inline std::pair<future<R>, async_io_op> call(const async_io_op &req, std::function<R()> callback);
+	//! Invoke the specified callable when the supplied operation completes
 	template<class C, class... Args> inline std::pair<future<typename std::result_of<C(Args...)>::type>, async_io_op> call(const async_io_op &req, C callback, Args... args);
 
 	//! Asynchronously creates directories
@@ -1036,6 +1040,18 @@ inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(st
 	ops.reserve(_ops.size());
 	for(auto &&i : _ops)
 		ops.push_back(std::move(i));
+	return when_all(ops.begin(), ops.end());
+}
+//! \brief Convenience overload for a single async_io_op.  Does not retrieve exceptions.
+inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(std::nothrow_t _, async_io_op op)
+{
+	std::vector<async_io_op> ops(1, op);
+	return when_all(_, ops.begin(), ops.end());
+}
+//! \brief Convenience overload for a single async_io_op.  Retrieves exceptions.
+inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(async_io_op op)
+{
+	std::vector<async_io_op> ops(1, op);
 	return when_all(ops.begin(), ops.end());
 }
 
@@ -1282,16 +1298,20 @@ template<class R> inline std::pair<std::vector<future<R>>, std::vector<async_io_
 	}
 	return std::make_pair(std::move(retfutures), completion(ops, callbacks));
 }
+template<class R> inline std::pair<future<R>, async_io_op> async_file_io_dispatcher_base::call(const async_io_op &req, std::function<R()> callback)
+{
+	std::vector<async_io_op> i;
+	std::vector<std::function<R()>> c;
+	i.reserve(1); c.reserve(1);
+	i.push_back(req);
+	c.push_back(std::move(callback));
+	std::pair<std::vector<future<R>>, std::vector<async_io_op>> ret(call(i, c));
+	return std::make_pair(std::move(ret.first.front()), ret.second.front());
+}
 template<class C, class... Args> inline std::pair<future<typename std::result_of<C(Args...)>::type>, async_io_op> async_file_io_dispatcher_base::call(const async_io_op &req, C callback, Args... args)
 {
 	typedef typename std::result_of<C(Args...)>::type rettype;
-	std::vector<async_io_op> i;
-	std::vector<std::function<rettype()>> c;
-	i.reserve(1); c.reserve(1);
-	i.push_back(req);
-	c.push_back(std::move(std::bind<rettype()>(callback, args...)));
-	std::pair<std::vector<future<rettype>>, std::vector<async_io_op>> ret(call(i, c));
-	return std::make_pair(std::move(ret.first.front()), ret.second.front());
+	return call(req, std::bind<rettype()>(callback, args...));
 }
 inline async_io_op async_file_io_dispatcher_base::dir(const async_path_op_req &req)
 {
