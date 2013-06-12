@@ -125,8 +125,13 @@ namespace detail {
 		void *myid;
 		bool has_been_added, autoflush;
 
+		static HANDLE int_checkHandle(HANDLE h, const std::filesystem::path &path)
+		{
+			ERRHWINFN(INVALID_HANDLE_VALUE!=h, path);
+			return h;
+		}
 		async_io_handle_windows(std::shared_ptr<async_file_io_dispatcher_base> _parent, const std::filesystem::path &path) : async_io_handle(_parent.get(), path), parent(_parent), myid(nullptr), has_been_added(false), autoflush(false) { }
-		async_io_handle_windows(std::shared_ptr<async_file_io_dispatcher_base> _parent, const std::filesystem::path &path, bool _autoflush, HANDLE _h) : async_io_handle(_parent.get(), path), parent(_parent), h(new boost::asio::windows::random_access_handle(process_threadpool().io_service(), _h)), myid(_h), has_been_added(false), autoflush(_autoflush) { }
+		async_io_handle_windows(std::shared_ptr<async_file_io_dispatcher_base> _parent, const std::filesystem::path &path, bool _autoflush, HANDLE _h) : async_io_handle(_parent.get(), path), parent(_parent), h(new boost::asio::windows::random_access_handle(process_threadpool().io_service(), int_checkHandle(_h, path))), myid(_h), has_been_added(false), autoflush(_autoflush) { }
 		virtual void *native_handle() const { return myid; }
 
 		// You can't use shared_from_this() in a constructor so ...
@@ -619,7 +624,13 @@ namespace detail
 	{
 		std::atomic<size_t> togo;
 		std::vector<std::pair<size_t, std::shared_ptr<detail::async_io_handle>>> out;
-		barrier_count_completed_state(size_t outsize) : togo(outsize), out(outsize) { }
+		std::vector<std::shared_ptr<shared_future<std::shared_ptr<detail::async_io_handle>>>> outsharedstates;
+		barrier_count_completed_state(const std::vector<async_io_op> &ops) : togo(ops.size()), out(ops.size())
+		{
+			outsharedstates.reserve(ops.size());
+			for(auto &i : ops)
+				outsharedstates.push_back(i.h);
+		}
 	};
 }
 
@@ -633,14 +644,40 @@ template<> async_file_io_dispatcher_base::completion_returntype async_file_io_di
 	state.first->out[idx]=std::make_pair(id, h); // This might look thread unsafe, but each idx is unique
 	if(--state.first->togo)
 		return std::make_pair(false, h);
+	exception_ptr this_e(async_io::make_exception_ptr(std::current_exception()));
 	// Last one just completed, so issue completions for everything in out except me
 	detail::barrier_count_completed_state &s=*state.first;
 	for(idx=0; idx<s.out.size(); idx++)
 	{
 		if(idx==state.second) continue;
-		complete_async_op(s.out[idx].first, s.out[idx].second);
+		shared_future<std::shared_ptr<detail::async_io_handle>> *thisresult=state.first->outsharedstates[idx].get();
+		if(thisresult->has_exception())
+		{
+			// This seems excessive but I don't see any other legal way to extract the exception ...
+			try
+			{
+				thisresult->get();
+			}
+#ifdef _MSC_VER
+			catch(const std::exception &)
+#else
+			catch(...)
+#endif
+			{
+				exception_ptr e(async_io::make_exception_ptr(std::current_exception()));
+				complete_async_op(s.out[idx].first, s.out[idx].second, e);
+			}
+		}
+		else
+			complete_async_op(s.out[idx].first, s.out[idx].second);
 	}
-	return std::make_pair(true, h);
+	idx=state.second;
+	// Am I being called because my precondition threw an exception so we're actually currently inside an exception catch?
+	// If so then duplicate the same exception throw
+	if(this_e)
+		rethrow_exception(this_e);
+	else
+		return std::make_pair(true, h);
 }
 
 std::vector<async_io_op> async_file_io_dispatcher_base::barrier(const std::vector<async_io_op> &ops)
@@ -651,7 +688,7 @@ std::vector<async_io_op> async_file_io_dispatcher_base::barrier(const std::vecto
 				throw std::runtime_error("Inputs are invalid.");
 #endif
 	// Create a shared state for the completions to be attached to all the items we are waiting upon
-	auto state(std::make_shared<detail::barrier_count_completed_state>(ops.size()));
+	auto state(std::make_shared<detail::barrier_count_completed_state>(ops));
 	std::vector<std::pair<std::shared_ptr<detail::barrier_count_completed_state>, size_t>> statev;
 	statev.reserve(ops.size());
 	size_t idx=0;

@@ -583,6 +583,7 @@ ASYNC_FILE_IO_FORWARD_STL_IMPL(promise, boost::promise)
 */
 typedef boost::exception_ptr exception_ptr;
 template<class T> inline exception_ptr make_exception_ptr(const T &e) { return boost::copy_exception(e); }
+using boost::rethrow_exception;
 using std::current_exception;
 /*! \brief For now, this is an emulation of std::packaged_task based on boost's packaged_task.
 We have to drop the Args... support because it segfaults MSVC Nov 2012 CTP.

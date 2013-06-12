@@ -560,16 +560,39 @@ TEST_CASE("async_io/errors", "Tests that the async i/o error handling works")
 		filereqs.push_back(async_path_op_req(mkdir, "testdir/a", file_flags::CreateOnlyIfNotExist));
 		filereqs.push_back(async_path_op_req(mkdir, "testdir/a", file_flags::CreateOnlyIfNotExist));
 		auto manyfilecreates=dispatcher->file(filereqs); // One of these will error
-		auto manyfiledeletes=dispatcher->rmfile(filereqs); // One of these will also error
-		auto sync=dispatcher->barrier(manyfiledeletes);
-		CHECK_NOTHROW(when_all(std::nothrow_t(), sync.begin(), sync.end()).wait());
+		auto sync1=dispatcher->barrier(manyfilecreates); // barrier() accumulates errors for you
+		CHECK_NOTHROW(when_all(std::nothrow_t(), sync1.begin(), sync1.end()).wait()); // nothrow variant must never throw
 		int hasError=0;
-		for(auto &i : sync)
+		for(auto &i : manyfilecreates)
 		{
 			if(i.h->has_exception()) hasError++;
 		}
 		CHECK(hasError==1);
-		CHECK_THROWS(when_all(sync.begin(), sync.end()).wait());
+		hasError=0;
+		for(auto &i : sync1)
+		{
+			if(i.h->has_exception()) hasError++;
+		}
+		CHECK(hasError==1);
+
+		auto manyfiledeletes=dispatcher->rmfile(filereqs); // One of these will also error. Same as above.
+		auto sync2=dispatcher->barrier(manyfiledeletes);
+		CHECK_NOTHROW(when_all(std::nothrow_t(), sync2.begin(), sync2.end()).wait());
+		hasError=0;
+		for(auto &i : manyfiledeletes)
+		{
+			if(i.h->has_exception()) hasError++;
+		}
+		CHECK(hasError==1);
+		hasError=0;
+		for(auto &i : sync2)
+		{
+			if(i.h->has_exception()) hasError++;
+		}
+		CHECK(hasError==1);
+
+		CHECK_THROWS(when_all(sync1.begin(), sync1.end()).wait()); // throw variant must always throw
+		CHECK_THROWS(when_all(sync2.begin(), sync2.end()).wait());
 		auto rmdir=dispatcher->rmdir(async_path_op_req("testdir"));
 	}
 }
