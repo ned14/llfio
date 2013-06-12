@@ -299,6 +299,23 @@ async_file_io_dispatcher_base::async_file_io_dispatcher_base(thread_pool &thread
 
 async_file_io_dispatcher_base::~async_file_io_dispatcher_base()
 {
+	for(;;)
+	{
+		std::vector<std::shared_ptr<shared_future<std::shared_ptr<detail::async_io_handle>>>> outstanding;
+		{
+			lock_guard<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
+			if(!p->ops.empty())
+			{
+				outstanding.reserve(p->ops.size());
+				for(auto &op : p->ops)
+					if(op.second.h->valid())
+						outstanding.push_back(op.second.h);
+			}
+		}
+		if(outstanding.empty()) break;
+		for(auto &op : outstanding)
+			op->wait();
+	}
 	delete p;
 }
 

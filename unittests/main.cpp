@@ -23,6 +23,7 @@ Created: Feb 2013
 #include "boost/graph/visitors.hpp"
 #include "boost/graph/isomorphism.hpp"
 #include "boost/lockfree/queue.hpp"
+#define CATCH_CONFIG_USE_ANSI_COLOUR_CODES
 #define CATCH_CONFIG_RUNNER
 #include "catch.hpp"
 

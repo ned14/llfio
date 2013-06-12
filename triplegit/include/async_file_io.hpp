@@ -629,7 +629,7 @@ class thread_pool {
 	boost::asio::io_service::work working;
 public:
 	//! Constructs a thread pool of \em no workers
-    explicit thread_pool(size_t no) : working(service)
+	explicit thread_pool(size_t no) : working(service)
 	{
 		workers.reserve(no);
 		for(size_t n=0; n<no; n++)
@@ -758,19 +758,19 @@ namespace detail {
 
 
 #define ASYNC_FILEIO_DECLARE_CLASS_ENUM_AS_BITFIELD(type) \
-inline type operator&(type a, type b) \
+inline constexpr type operator&(type a, type b) \
 { \
 	return static_cast<type>(static_cast<size_t>(a) & static_cast<size_t>(b)); \
 } \
-inline type operator|(type a, type b) \
+inline constexpr type operator|(type a, type b) \
 { \
 	return static_cast<type>(static_cast<size_t>(a) | static_cast<size_t>(b)); \
 } \
-inline type operator~(type a) \
+inline constexpr type operator~(type a) \
 { \
 	return static_cast<type>(~static_cast<size_t>(a)); \
 } \
-inline bool operator!(type a) \
+inline constexpr bool operator!(type a) \
 { \
 	return 0==static_cast<size_t>(a); \
 }
