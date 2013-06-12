@@ -1293,7 +1293,7 @@ template<class R> inline std::pair<std::vector<future<R>>, std::vector<async_io_
 	};
 	for(auto &t : callables)
 	{
-		std::shared_ptr<tasktype> c(std::make_shared<tasktype>(t));
+		std::shared_ptr<tasktype> c(std::make_shared<tasktype>(std::function<R()>(t)));
 		retfutures.push_back(c->get_future());
 		callbacks.push_back(std::make_pair(async_op_flags::None, std::bind(f, std::placeholders::_1, std::placeholders::_2, std::move(c))));
 	}
