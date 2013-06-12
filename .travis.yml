@@ -54,7 +54,7 @@ script:
  - if [ $VALGRIND = "drd" ]; then PREFIXTEST="valgrind --tool=drd --suppressions=unittests/drd.supp --error-exitcode=1"; fi
  - if [ $VALGRIND = "0" ]; then PREFIXTEST=""; fi
  
- - if [ "$UNIT_TESTS" != "0" ]; then $PREFIXTEST $PREFIXPATH/tests $UNIT_TESTS; fi
+ - if [ "$UNIT_TESTS" != "0" ]; then $PREFIXTEST $PREFIXPATH/tests -s $UNIT_TESTS; fi
 
 after_success:
  - if [ $GCOV -eq 1 ]; then bash unittests/update_coveralls.sh `pwd`; fi
