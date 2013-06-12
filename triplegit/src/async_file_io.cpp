@@ -675,8 +675,11 @@ template<> async_file_io_dispatcher_base::completion_returntype async_file_io_di
 	// Am I being called because my precondition threw an exception so we're actually currently inside an exception catch?
 	// If so then duplicate the same exception throw
 	if(this_e)
-		//rethrow_exception(this_e); // This triggers a bug in MSVC which causes it to ignore all try blocks since the exception throw. That means the op never completes.
-		throw; // This on the other hand is a lucky hack but it works
+#ifndef _MSC_VER
+		rethrow_exception(this_e); // This triggers a bug in MSVC which causes it to ignore all try blocks since the exception throw. That means the op never completes.
+#else
+		throw; // This on the other hand is a lucky hack that it works at all (it shouldn't).
+#endif
 	else
 		return std::make_pair(true, h);
 }
