@@ -54,6 +54,7 @@ script:
  - if [ $VALGRIND = "drd" ]; then PREFIXTEST="valgrind --tool=drd --suppressions=unittests/drd.supp --error-exitcode=1"; fi
  - if [ $VALGRIND = "0" ]; then PREFIXTEST=""; fi
  
+ - if [ $GCOV -eq 1 ]; then UNIT_TESTS="$UNIT_TESTS || true"; fi
  - if [ "$UNIT_TESTS" != "0" ]; then $PREFIXTEST $PREFIXPATH/tests -s $UNIT_TESTS; fi
 
 after_success:
