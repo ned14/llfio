@@ -43,6 +43,7 @@ File Created: Mar 2013
 #define posix_ftruncate _chsize_s
 #else
 #include <sys/uio.h>
+#include <limits.h>
 #define posix_mkdir mkdir
 #define posix_rmdir ::rmdir
 #define posix_stat stat
@@ -77,6 +78,9 @@ File Created: Mar 2013
 
 
 #ifdef WIN32
+#ifndef IOV_MAX
+#define IOV_MAX 1024
+#endif
 struct iovec {
     void  *iov_base;    /* Starting address */
     size_t iov_len;     /* Number of bytes to transfer */
@@ -1165,8 +1169,13 @@ namespace detail {
 				bytestoread+=v.iov_len;
 				vecs.push_back(v);
 			}
-			ERRHOSFN((int) (bytesread=preadv(p->fd, &vecs.front(), (int) vecs.size(), req.where)), p->path());
-			p->bytesread+=bytesread;
+			for(size_t n=0; n<vecs.size(); n+=IOV_MAX)
+			{
+				ssize_t _bytesread;
+				ERRHOSFN((int) (_bytesread=preadv(p->fd, (&vecs.front())+n, std::min((int) (vecs.size()-n), IOV_MAX), req.where+bytesread)), p->path());
+				p->bytesread+=_bytesread;
+				bytesread+=_bytesread;
+			}
 			if(bytesread!=bytestoread)
 				throw std::runtime_error("Failed to read all buffers");
 			return std::make_pair(true, h);
@@ -1191,8 +1200,13 @@ namespace detail {
 				bytestowrite+=v.iov_len;
 				vecs.push_back(v);
 			}
-			ERRHOSFN((int) (byteswritten=pwritev(p->fd, &vecs.front(), (int) vecs.size(), req.where)), p->path());
-			p->byteswritten+=byteswritten;
+			for(size_t n=0; n<vecs.size(); n+=IOV_MAX)
+			{
+				ssize_t _byteswritten;
+				ERRHOSFN((int) (_byteswritten=pwritev(p->fd, (&vecs.front())+n, std::min((int) (vecs.size()-n), IOV_MAX), req.where+byteswritten)), p->path());
+				p->byteswritten+=_byteswritten;
+				byteswritten+=_byteswritten;
+			}
 			if(byteswritten!=bytestowrite)
 				throw std::runtime_error("Failed to write all buffers");
 			return std::make_pair(true, h);
