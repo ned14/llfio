@@ -342,6 +342,7 @@ static void _1000_open_write_close_deletes(std::shared_ptr<triplegit::async_io::
 		callables.push_back(std::bind(callable, &callcount, 78));
 	auto manycallbacks(dispatcher->call(manydeletedfiles, std::move(callables)));
 	auto dispatched=chrono::high_resolution_clock::now();
+	cout << "There are now " << dec << dispatcher->count() << " handles open with a queue depth of " << dispatcher->wait_queue_depth() << endl;
 
 	// Wait for all files to open
 	when_all(manyopenfiles.begin(), manyopenfiles.end()).wait();
@@ -533,6 +534,7 @@ TEST_CASE("async_io/barrier", "Tests that the async i/o barrier works correctly 
 		opscount+=run.first+2;
 	}
 	auto dispatched=chrono::high_resolution_clock::now();
+	cout << "There are now " << dec << dispatcher->count() << " handles open with a queue depth of " << dispatcher->wait_queue_depth() << endl;
 	CHECK_NOTHROW(when_all(next).wait());
 	// Retrieve any errors
 	for(auto &i : verifies)
@@ -847,6 +849,7 @@ static void evil_random_io(std::shared_ptr<triplegit::async_io::async_file_io_di
 	// Close each of those files
 	auto manyclosedfiles(dispatcher->close(manywrittenfiles));
 	auto dispatched=chrono::high_resolution_clock::now();
+	cout << "There are now " << dec << dispatcher->count() << " handles open with a queue depth of " << dispatcher->wait_queue_depth() << endl;
 
 	// Wait for all files to open
 	when_all(manyopenfiles.begin(), manyopenfiles.end()).wait();
@@ -969,6 +972,24 @@ TEST_CASE("async_io/torture/directsync", "Tortures the direct synchronous async 
 	auto dispatcher=triplegit::async_io::async_file_io_dispatcher(triplegit::async_io::process_threadpool(), triplegit::async_io::file_flags::OSDirect|triplegit::async_io::file_flags::OSSync);
 	std::cout << "\n\nSustained random direct synchronous i/o to 10 files of 1Mb:\n";
 	evil_random_io(dispatcher, 10, 1*1024*1024, 4096);
+}
+
+TEST_CASE("async_io/sync", "Tests async fsync")
+{
+	using namespace triplegit::async_io;
+	using namespace std;
+	vector<char> buffer(64, 'n');
+	auto dispatcher=triplegit::async_io::async_file_io_dispatcher(triplegit::async_io::process_threadpool(), triplegit::async_io::file_flags::OSSync);
+	std::cout << "\n\nTesting synchronous directory and file creation:\n";
+	auto mkdir(dispatcher->dir(async_path_op_req("testdir", file_flags::Create)));
+	auto mkfile(dispatcher->file(async_path_op_req(mkdir, "testdir/foo", file_flags::Create|file_flags::ReadWrite)));
+	auto writefile1(dispatcher->write(async_data_op_req<vector<char>>(mkfile, buffer, 0)));
+	auto sync1(dispatcher->sync(writefile1));
+	auto writefile2(dispatcher->write(async_data_op_req<vector<char>>(sync1, buffer, 0)));
+	auto closefile(dispatcher->close(writefile2));
+	auto delfile(dispatcher->rmfile(async_path_op_req(closefile, "testdir/foo")));
+	auto deldir(dispatcher->rmdir(async_path_op_req(delfile, "testdir")));
+	CHECK_NOTHROW(when_all(deldir).wait());
 }
 
 #if 0
