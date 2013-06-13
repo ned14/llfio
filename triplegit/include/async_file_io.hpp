@@ -979,11 +979,7 @@ namespace detail
 				for(auto &i : state->out)
 					i.get();
 			}
-#ifdef _MSC_VER
-			catch(const std::exception &)
-#else
 			catch(...)
-#endif
 			{
 				exception_ptr e(async_io::make_exception_ptr(current_exception()));
 				state->done.set_exception(e);
