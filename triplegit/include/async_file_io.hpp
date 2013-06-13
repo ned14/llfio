@@ -635,7 +635,7 @@ public:
 		for(size_t n=0; n<no; n++)
 			workers.push_back(std::unique_ptr<thread>(new thread(worker(this))));
 	}
-    ~thread_pool()
+	~thread_pool()
 	{
 		service.stop();
 		for(auto &i : workers)
@@ -824,6 +824,7 @@ class TRIPLEGIT_ASYNC_FILE_IO_API async_file_io_dispatcher_base : public std::en
 protected:
 	async_file_io_dispatcher_base(thread_pool &threadpool, file_flags flagsforce, file_flags flagsmask);
 public:
+	//! Destroys the dispatcher, blocking inefficiently if any ops are still in flight.
 	virtual ~async_file_io_dispatcher_base();
 
 	//! Returns the thread pool used by this dispatcher

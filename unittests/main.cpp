@@ -568,14 +568,29 @@ TEST_CASE("async_io/errors", "Tests that the async i/o error handling works")
 			hasErrorDirectly=0;
 			for(auto &i : manyfilecreates)
 			{
-				if(i.h->has_exception()) hasErrorDirectly++;
+				// If we ask for has_exception() before the async thread has exited its packaged_task
+				// this will fail, so no choice but to try { wait(); } catch { success }
+				try
+				{
+					i.h->get();
+				}
+				catch(...)
+				{
+					hasErrorDirectly++;
+				}
 			}
-			if(hasErrorDirectly!=1)
-				WARN("hasErrorDirectly!=1. Probably your compiler can't cope well with nested exception rethrows and threw away one of the throws");
+			CHECK(hasErrorDirectly==1);
 			hasErrorFromBarrier=0;
 			for(auto &i : sync1)
 			{
-				if(i.h->has_exception()) hasErrorFromBarrier++;
+				try
+				{
+					i.h->get();
+				}
+				catch(...)
+				{
+					hasErrorFromBarrier++;
+				}
 			}
 			CHECK(hasErrorFromBarrier==1);
 			CHECK_THROWS(when_all(sync1.begin(), sync1.end()).wait()); // throw variant must always throw
@@ -587,14 +602,27 @@ TEST_CASE("async_io/errors", "Tests that the async i/o error handling works")
 		hasErrorDirectly=0;
 		for(auto &i : manyfiledeletes)
 		{
-			if(i.h->has_exception()) hasErrorDirectly++;
+			try
+			{
+				i.h->get();
+			}
+			catch(...)
+			{
+				hasErrorDirectly++;
+			}
 		}
-		if(hasErrorDirectly!=1)
-			WARN("hasErrorDirectly!=1. Probably your compiler can't cope well with nested exception rethrows and threw away one of the throws");
+		CHECK(hasErrorDirectly==1);
 		hasErrorFromBarrier=0;
 		for(auto &i : sync2)
 		{
-			if(i.h->has_exception()) hasErrorFromBarrier++;
+			try
+			{
+				i.h->get();
+			}
+			catch(...)
+			{
+				hasErrorFromBarrier++;
+			}
 		}
 		CHECK(hasErrorFromBarrier==1);
 

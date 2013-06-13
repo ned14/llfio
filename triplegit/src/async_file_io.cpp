@@ -508,8 +508,14 @@ template<class F, class... Args> std::shared_ptr<detail::async_io_handle> async_
 #endif
 	{
 		exception_ptr e(async_io::make_exception_ptr(std::current_exception()));
+		DEBUG_PRINT("E %u begin\n", (unsigned) id);
 		complete_async_op(id, h, e);
+		DEBUG_PRINT("E %u end\n", (unsigned) id);
+//#ifndef _MSC_VER
+//		rethrow_exception(e);
+//#else
 		throw;
+//#endif
 	}
 }
 
