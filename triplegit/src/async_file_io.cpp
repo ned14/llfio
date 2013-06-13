@@ -512,11 +512,7 @@ template<class F, class... Args> std::shared_ptr<detail::async_io_handle> async_
 		DEBUG_PRINT("E %u begin\n", (unsigned) id);
 		complete_async_op(id, h, e);
 		DEBUG_PRINT("E %u end\n", (unsigned) id);
-//#ifndef _MSC_VER
-//		rethrow_exception(e);
-//#else
 		throw;
-//#endif
 	}
 	catch(const std::exception_ptr &)
 #else
@@ -527,11 +523,7 @@ template<class F, class... Args> std::shared_ptr<detail::async_io_handle> async_
 		DEBUG_PRINT("E %u begin\n", (unsigned) id);
 		complete_async_op(id, h, e);
 		DEBUG_PRINT("E %u end\n", (unsigned) id);
-//#ifndef _MSC_VER
-//		rethrow_exception(e);
-//#else
 		throw;
-//#endif
 	}
 }
 
@@ -719,11 +711,7 @@ template<> async_file_io_dispatcher_base::completion_returntype async_file_io_di
 	// Am I being called because my precondition threw an exception so we're actually currently inside an exception catch?
 	// If so then duplicate the same exception throw
 	if(this_e)
-//#ifndef _MSC_VER
-		rethrow_exception(this_e); // This triggers a bug in MSVC which causes it to ignore all try blocks since the exception throw. That means the op never completes.
-//#else
-//		throw; // This on the other hand is a lucky hack that it works at all (it shouldn't).
-//#endif
+		rethrow_exception(this_e);
 	else
 		return std::make_pair(true, h);
 }
