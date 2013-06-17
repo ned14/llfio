@@ -103,6 +103,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
+<tr class="memitem:a1660f56343a522a7271b36fbdcf0f259"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtriplegit_1_1async__io_1_1async__file__io__dispatcher__base.html#a1660f56343a522a7271b36fbdcf0f259">~async_file_io_dispatcher_base</a> ()</td></tr>
+<tr class="memdesc:a1660f56343a522a7271b36fbdcf0f259"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destroys the dispatcher, blocking inefficiently if any ops are still in flight.  <a href="#a1660f56343a522a7271b36fbdcf0f259"></a><br/></td></tr>
+<tr class="separator:a1660f56343a522a7271b36fbdcf0f259"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae17a53fb0dd440c3e26fb6ca648f9034"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classtriplegit_1_1async__io_1_1thread__pool.html">thread_pool</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtriplegit_1_1async__io_1_1async__file__io__dispatcher__base.html#ae17a53fb0dd440c3e26fb6ca648f9034">threadpool</a> () const </td></tr>
 <tr class="memdesc:ae17a53fb0dd440c3e26fb6ca648f9034"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the thread pool used by this dispatcher.  <a href="#ae17a53fb0dd440c3e26fb6ca648f9034"></a><br/></td></tr>
 <tr class="separator:ae17a53fb0dd440c3e26fb6ca648f9034"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -212,7 +215,33 @@ std::result_of&lt; C(Args...)&gt;<br class="typebreak"/>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Abstract base class for dispatching file i/o asynchronously. </p>
-</div><h2 class="groupheader">Member Function Documentation</h2>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a class="anchor" id="a1660f56343a522a7271b36fbdcf0f259"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual triplegit::async_io::async_file_io_dispatcher_base::~async_file_io_dispatcher_base </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Destroys the dispatcher, blocking inefficiently if any ops are still in flight. </p>
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
 <a class="anchor" id="abab6bf4b54cd79f634359bec3df83a1a"></a>
 <div class="memitem">
 <div class="memproto">
