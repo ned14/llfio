@@ -255,7 +255,7 @@ TEST_CASE("boost.graph/works", "Tests that one of the samples from Boost.Graph w
 static int task()
 {
 #ifdef __GNUC__
-	boost::async_io::thread::id this_id = boost::this_thread::get_id();
+	boost::afio::thread::id this_id = boost::this_thread::get_id();
 #else
 	std::thread::id this_id = std::this_thread::get_id();
 #endif
@@ -264,9 +264,9 @@ static int task()
 }
 TEST_CASE("async_io/thread_pool/works", "Tests that the async i/o thread pool implementation works")
 {
-	using namespace boost::async_io;
+	using namespace boost::afio;
 #ifdef __GNUC__
-	boost::async_io::thread::id this_id = boost::this_thread::get_id();
+	boost::afio::thread::id this_id = boost::this_thread::get_id();
 #else
 	std::thread::id this_id = std::this_thread::get_id();
 #endif
@@ -293,11 +293,11 @@ TEST_CASE("async_io/thread_pool/works", "Tests that the async i/o thread pool im
 }
 
 
-static void _1000_open_write_close_deletes(std::shared_ptr<boost::async_io::async_file_io_dispatcher_base> dispatcher, size_t bytes)
+static void _1000_open_write_close_deletes(std::shared_ptr<boost::afio::async_file_io_dispatcher_base> dispatcher, size_t bytes)
 {
-	using namespace boost::async_io;
+	using namespace boost::afio;
 	using namespace std;
-	using boost::async_io::future;
+	using boost::afio::future;
 	typedef std::chrono::duration<double, ratio<1>> secs_type;
 	auto mkdir(dispatcher->dir(async_path_op_req("testdir", file_flags::Create)));
 	vector<char, NiallsCPP11Utilities::aligned_allocator<char, 4096>> towrite(bytes, 'N');
@@ -385,49 +385,49 @@ static void _1000_open_write_close_deletes(std::shared_ptr<boost::async_io::asyn
 
 TEST_CASE("async_io/works/1prime", "Tests that the async i/o implementation works (primes system)")
 {
-	auto dispatcher=boost::async_io::async_file_io_dispatcher(boost::async_io::process_threadpool(), boost::async_io::file_flags::None);
+	auto dispatcher=boost::afio::async_file_io_dispatcher(boost::afio::process_threadpool(), boost::afio::file_flags::None);
 	std::cout << "\n\n1000 file opens, writes 1 byte, closes, and deletes (primes system):\n";
 	_1000_open_write_close_deletes(dispatcher, 1);
 }
 
 TEST_CASE("async_io/works/1", "Tests that the async i/o implementation works")
 {
-	auto dispatcher=boost::async_io::async_file_io_dispatcher(boost::async_io::process_threadpool(), boost::async_io::file_flags::None);
+	auto dispatcher=boost::afio::async_file_io_dispatcher(boost::afio::process_threadpool(), boost::afio::file_flags::None);
 	std::cout << "\n\n1000 file opens, writes 1 byte, closes, and deletes:\n";
 	_1000_open_write_close_deletes(dispatcher, 1);
 }
 
 TEST_CASE("async_io/works/64", "Tests that the async i/o implementation works")
 {
-	auto dispatcher=boost::async_io::async_file_io_dispatcher(boost::async_io::process_threadpool(), boost::async_io::file_flags::None);
+	auto dispatcher=boost::afio::async_file_io_dispatcher(boost::afio::process_threadpool(), boost::afio::file_flags::None);
 	std::cout << "\n\n1000 file opens, writes 64Kb, closes, and deletes:\n";
 	_1000_open_write_close_deletes(dispatcher, 65536);
 }
 
 TEST_CASE("async_io/works/1/sync", "Tests that the synchronous async i/o implementation works")
 {
-	auto dispatcher=boost::async_io::async_file_io_dispatcher(boost::async_io::process_threadpool(), boost::async_io::file_flags::OSSync);
+	auto dispatcher=boost::afio::async_file_io_dispatcher(boost::afio::process_threadpool(), boost::afio::file_flags::OSSync);
 	std::cout << "\n\n1000 file opens, writes 1 byte, closes, and deletes with synchronous i/o:\n";
 	_1000_open_write_close_deletes(dispatcher, 1);
 }
 
 TEST_CASE("async_io/works/64/sync", "Tests that the synchronous async i/o implementation works")
 {
-	auto dispatcher=boost::async_io::async_file_io_dispatcher(boost::async_io::process_threadpool(), boost::async_io::file_flags::OSSync);
+	auto dispatcher=boost::afio::async_file_io_dispatcher(boost::afio::process_threadpool(), boost::afio::file_flags::OSSync);
 	std::cout << "\n\n1000 file opens, writes 64Kb, closes, and deletes with synchronous i/o:\n";
 	_1000_open_write_close_deletes(dispatcher, 65536);
 }
 
 TEST_CASE("async_io/works/1/autoflush", "Tests that the autoflush async i/o implementation works")
 {
-	auto dispatcher=boost::async_io::async_file_io_dispatcher(boost::async_io::process_threadpool(), boost::async_io::file_flags::AutoFlush);
+	auto dispatcher=boost::afio::async_file_io_dispatcher(boost::afio::process_threadpool(), boost::afio::file_flags::AutoFlush);
 	std::cout << "\n\n1000 file opens, writes 1 byte, closes, and deletes with autoflush i/o:\n";
 	_1000_open_write_close_deletes(dispatcher, 1);
 }
 
 TEST_CASE("async_io/works/64/autoflush", "Tests that the autoflush async i/o implementation works")
 {
-	auto dispatcher=boost::async_io::async_file_io_dispatcher(boost::async_io::process_threadpool(), boost::async_io::file_flags::AutoFlush);
+	auto dispatcher=boost::afio::async_file_io_dispatcher(boost::afio::process_threadpool(), boost::afio::file_flags::AutoFlush);
 	std::cout << "\n\n1000 file opens, writes 64Kb, closes, and deletes with autoflush i/o:\n";
 	_1000_open_write_close_deletes(dispatcher, 65536);
 }
@@ -435,7 +435,7 @@ TEST_CASE("async_io/works/64/autoflush", "Tests that the autoflush async i/o imp
 #if 0
 TEST_CASE("async_io/works/1/direct", "Tests that the direct async i/o implementation works")
 {
-	auto dispatcher=boost::async_io::async_file_io_dispatcher(boost::async_io::process_threadpool(), boost::async_io::file_flags::OSDirect);
+	auto dispatcher=boost::afio::async_file_io_dispatcher(boost::afio::process_threadpool(), boost::afio::file_flags::OSDirect);
 	std::cout << "\n\n1000 file opens, writes 1 byte, closes, and deletes with direct i/o:\n";
 	_1000_open_write_close_deletes(dispatcher, 1);
 }
@@ -443,7 +443,7 @@ TEST_CASE("async_io/works/1/direct", "Tests that the direct async i/o implementa
 
 TEST_CASE("async_io/works/64/direct", "Tests that the direct async i/o implementation works")
 {
-	auto dispatcher=boost::async_io::async_file_io_dispatcher(boost::async_io::process_threadpool(), boost::async_io::file_flags::OSDirect);
+	auto dispatcher=boost::afio::async_file_io_dispatcher(boost::afio::process_threadpool(), boost::afio::file_flags::OSDirect);
 	std::cout << "\n\n1000 file opens, writes 64Kb, closes, and deletes with direct i/o:\n";
 	_1000_open_write_close_deletes(dispatcher, 65536);
 }
@@ -451,7 +451,7 @@ TEST_CASE("async_io/works/64/direct", "Tests that the direct async i/o implement
 #if 0
 TEST_CASE("async_io/works/1/directsync", "Tests that the direct synchronous async i/o implementation works")
 {
-	auto dispatcher=boost::async_io::async_file_io_dispatcher(boost::async_io::process_threadpool(), boost::async_io::file_flags::OSDirect|boost::async_io::file_flags::OSSync);
+	auto dispatcher=boost::afio::async_file_io_dispatcher(boost::afio::process_threadpool(), boost::afio::file_flags::OSDirect|boost::afio::file_flags::OSSync);
 	std::cout << "\n\n1000 file opens, writes 1 byte, closes, and deletes with direct synchronous i/o:\n";
 	_1000_open_write_close_deletes(dispatcher, 1);
 }
@@ -459,18 +459,18 @@ TEST_CASE("async_io/works/1/directsync", "Tests that the direct synchronous asyn
 
 TEST_CASE("async_io/works/64/directsync", "Tests that the direct synchronous async i/o implementation works")
 {
-	auto dispatcher=boost::async_io::async_file_io_dispatcher(boost::async_io::process_threadpool(), boost::async_io::file_flags::OSDirect|boost::async_io::file_flags::OSSync);
+	auto dispatcher=boost::afio::async_file_io_dispatcher(boost::afio::process_threadpool(), boost::afio::file_flags::OSDirect|boost::afio::file_flags::OSSync);
 	std::cout << "\n\n1000 file opens, writes 64Kb, closes, and deletes with direct synchronous i/o:\n";
 	_1000_open_write_close_deletes(dispatcher, 65536);
 }
 
 TEST_CASE("async_io/barrier", "Tests that the async i/o barrier works correctly under load")
 {
-	using namespace boost::async_io;
+	using namespace boost::afio;
 	using namespace std;
-	using boost::async_io::future;
+	using boost::afio::future;
 	using namespace NiallsCPP11Utilities;
-	using boost::async_io::off_t;
+	using boost::afio::off_t;
 	typedef std::chrono::duration<double, ratio<1>> secs_type;
 	vector<pair<size_t, int>> groups;
 	// Generate 100,000 sorted random numbers between 0-1000
@@ -554,9 +554,9 @@ TEST_CASE("async_io/barrier", "Tests that the async i/o barrier works correctly 
 
 TEST_CASE("async_io/errors", "Tests that the async i/o error handling works")
 {
-	using namespace boost::async_io;
+	using namespace boost::afio;
 	using namespace std;
-	using boost::async_io::future;
+	using boost::afio::future;
 
 	{
 		int hasErrorDirectly, hasErrorFromBarrier;
@@ -635,13 +635,13 @@ TEST_CASE("async_io/errors", "Tests that the async i/o error handling works")
 	}
 }
 
-static void evil_random_io(std::shared_ptr<boost::async_io::async_file_io_dispatcher_base> dispatcher, size_t no, size_t bytes, size_t alignment=0)
+static void evil_random_io(std::shared_ptr<boost::afio::async_file_io_dispatcher_base> dispatcher, size_t no, size_t bytes, size_t alignment=0)
 {
-	using namespace boost::async_io;
+	using namespace boost::afio;
 	using namespace std;
-	using boost::async_io::future;
+	using boost::afio::future;
 	using namespace NiallsCPP11Utilities;
-	using boost::async_io::off_t;
+	using boost::afio::off_t;
 	typedef std::chrono::duration<double, ratio<1>> secs_type;
 
 	NiallsCPP11Utilities::aligned_allocator<char, 4096> aligned_allocator;
@@ -802,7 +802,7 @@ static void evil_random_io(std::shared_ptr<boost::async_io::async_file_io_dispat
 	for(size_t n=0; n<no; n++)
 		maxfailures+=todo[n].size();
 	boost::lockfree::queue<pair<const Op *, size_t> *> failures(maxfailures);
-	auto checkHash=[&failures](Op &op, char *base, size_t, std::shared_ptr<boost::async_io::detail::async_io_handle> h) -> std::pair<bool, std::shared_ptr<boost::async_io::detail::async_io_handle>> {
+	auto checkHash=[&failures](Op &op, char *base, size_t, std::shared_ptr<boost::afio::detail::async_io_handle> h) -> std::pair<bool, std::shared_ptr<boost::afio::detail::async_io_handle>> {
 		const char *data=(const char *)(((size_t) base+(size_t) op.req.where));
 		size_t idxoffset=0;
 		for(size_t m=0; m<op.req.buffers.size(); m++)
@@ -937,7 +937,7 @@ static void evil_random_io(std::shared_ptr<boost::async_io::async_file_io_dispat
 
 TEST_CASE("async_io/torture", "Tortures the async i/o implementation")
 {
-	auto dispatcher=boost::async_io::async_file_io_dispatcher(boost::async_io::process_threadpool(), boost::async_io::file_flags::None);
+	auto dispatcher=boost::afio::async_file_io_dispatcher(boost::afio::process_threadpool(), boost::afio::file_flags::None);
 	std::cout << "\n\nSustained random i/o to 10 files of 10Mb:\n";
 #ifdef BOOST_ASIO_BUG_WORKAROUND
 	evil_random_io(dispatcher, 1, 10*1024*1024);
@@ -948,38 +948,38 @@ TEST_CASE("async_io/torture", "Tortures the async i/o implementation")
 
 TEST_CASE("async_io/torture/sync", "Tortures the synchronous async i/o implementation")
 {
-	auto dispatcher=boost::async_io::async_file_io_dispatcher(boost::async_io::process_threadpool(), boost::async_io::file_flags::OSSync);
+	auto dispatcher=boost::afio::async_file_io_dispatcher(boost::afio::process_threadpool(), boost::afio::file_flags::OSSync);
 	std::cout << "\n\nSustained random synchronous i/o to 10 files of 1Mb:\n";
 	evil_random_io(dispatcher, 10, 1*1024*1024);
 }
 
 TEST_CASE("async_io/torture/autoflush", "Tortures the autoflush async i/o implementation")
 {
-	auto dispatcher=boost::async_io::async_file_io_dispatcher(boost::async_io::process_threadpool(), boost::async_io::file_flags::AutoFlush);
+	auto dispatcher=boost::afio::async_file_io_dispatcher(boost::afio::process_threadpool(), boost::afio::file_flags::AutoFlush);
 	std::cout << "\n\nSustained random autoflush i/o to 10 files of 1Mb:\n";
 	evil_random_io(dispatcher, 10, 1*1024*1024);
 }
 
 TEST_CASE("async_io/torture/direct", "Tortures the direct async i/o implementation")
 {
-	auto dispatcher=boost::async_io::async_file_io_dispatcher(boost::async_io::process_threadpool(), boost::async_io::file_flags::OSDirect);
+	auto dispatcher=boost::afio::async_file_io_dispatcher(boost::afio::process_threadpool(), boost::afio::file_flags::OSDirect);
 	std::cout << "\n\nSustained random direct i/o to 10 files of 10Mb:\n";
 	evil_random_io(dispatcher, 10, 10*1024*1024, 4096);
 }
 
 TEST_CASE("async_io/torture/directsync", "Tortures the direct synchronous async i/o implementation")
 {
-	auto dispatcher=boost::async_io::async_file_io_dispatcher(boost::async_io::process_threadpool(), boost::async_io::file_flags::OSDirect|boost::async_io::file_flags::OSSync);
+	auto dispatcher=boost::afio::async_file_io_dispatcher(boost::afio::process_threadpool(), boost::afio::file_flags::OSDirect|boost::afio::file_flags::OSSync);
 	std::cout << "\n\nSustained random direct synchronous i/o to 10 files of 1Mb:\n";
 	evil_random_io(dispatcher, 10, 1*1024*1024, 4096);
 }
 
 TEST_CASE("async_io/sync", "Tests async fsync")
 {
-	using namespace boost::async_io;
+	using namespace boost::afio;
 	using namespace std;
 	vector<char> buffer(64, 'n');
-	auto dispatcher=boost::async_io::async_file_io_dispatcher(boost::async_io::process_threadpool(), boost::async_io::file_flags::OSSync);
+	auto dispatcher=boost::afio::async_file_io_dispatcher(boost::afio::process_threadpool(), boost::afio::file_flags::OSSync);
 	std::cout << "\n\nTesting synchronous directory and file creation:\n";
 	auto mkdir(dispatcher->dir(async_path_op_req("testdir", file_flags::Create)));
 	auto mkfile(dispatcher->file(async_path_op_req(mkdir, "testdir/foo", file_flags::Create|file_flags::ReadWrite)));

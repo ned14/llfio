@@ -106,7 +106,7 @@ namespace detail {
 		bool isDirty() const { return amDirty; }
 
 		//! Begins a commit to attached storage
-		async_io::future<void> begincommit();
+		afio::future<void> begincommit();
 		//! Attachs this collection of vertices to the given store
 		void attach(base_store &store, collection_id id)
 		{

@@ -524,7 +524,7 @@ It took 0.017878 secs to do 55934.7 file deletions per sec
 
 namespace boost {
 //! \brief The namespace containing the Boost.ASIO asynchronous file i/o implementation.
-namespace async_io {
+namespace afio {
 
 #ifdef __GNUC__
 typedef boost::thread thread;
@@ -981,7 +981,7 @@ namespace detail
 			}
 			catch(...)
 			{
-				exception_ptr e(async_io::make_exception_ptr(current_exception()));
+				exception_ptr e(afio::make_exception_ptr(current_exception()));
 				state->done.set_exception(e);
 				done=true;
 			}

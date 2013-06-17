@@ -87,30 +87,30 @@ struct iovec {
 };
 typedef ptrdiff_t ssize_t;
 static boost::detail::spinlock preadwritelock;
-ssize_t preadv(int fd, const struct iovec *iov, int iovcnt, boost::async_io::off_t offset)
+ssize_t preadv(int fd, const struct iovec *iov, int iovcnt, boost::afio::off_t offset)
 {
-	boost::async_io::off_t at=offset;
+	boost::afio::off_t at=offset;
 	ssize_t transferred;
 	lock_guard<boost::detail::spinlock> lockh(preadwritelock);
 	if(-1==_lseeki64(fd, offset, SEEK_SET)) return -1;
-	for(; iovcnt; iov++, iovcnt--, at+=(boost::async_io::off_t) transferred)
+	for(; iovcnt; iov++, iovcnt--, at+=(boost::afio::off_t) transferred)
 		if(-1==(transferred=_read(fd, iov->iov_base, (unsigned) iov->iov_len))) return -1;
 	return at-offset;
 }
-ssize_t pwritev(int fd, const struct iovec *iov, int iovcnt, boost::async_io::off_t offset)
+ssize_t pwritev(int fd, const struct iovec *iov, int iovcnt, boost::afio::off_t offset)
 {
-	boost::async_io::off_t at=offset;
+	boost::afio::off_t at=offset;
 	ssize_t transferred;
 	lock_guard<boost::detail::spinlock> lockh(preadwritelock);
 	if(-1==_lseeki64(fd, offset, SEEK_SET)) return -1;
-	for(; iovcnt; iov++, iovcnt--, at+=(boost::async_io::off_t) transferred)
+	for(; iovcnt; iov++, iovcnt--, at+=(boost::afio::off_t) transferred)
 		if(-1==(transferred=_write(fd, iov->iov_base, (unsigned) iov->iov_len))) return -1;
 	return at-offset;
 }
 #endif
 
 
-namespace boost { namespace async_io {
+namespace boost { namespace afio {
 
 thread_pool &process_threadpool()
 {
@@ -508,7 +508,7 @@ template<class F, class... Args> std::shared_ptr<detail::async_io_handle> async_
 #ifdef _MSC_VER
 	catch(const std::exception &)
 	{
-		exception_ptr e(async_io::make_exception_ptr(std::current_exception()));
+		exception_ptr e(afio::make_exception_ptr(std::current_exception()));
 		DEBUG_PRINT("E %u begin\n", (unsigned) id);
 		complete_async_op(id, h, e);
 		DEBUG_PRINT("E %u end\n", (unsigned) id);
@@ -519,7 +519,7 @@ template<class F, class... Args> std::shared_ptr<detail::async_io_handle> async_
 	catch(...)
 #endif
 	{
-		exception_ptr e(async_io::make_exception_ptr(std::current_exception()));
+		exception_ptr e(afio::make_exception_ptr(std::current_exception()));
 		DEBUG_PRINT("E %u begin\n", (unsigned) id);
 		complete_async_op(id, h, e);
 		DEBUG_PRINT("E %u end\n", (unsigned) id);
@@ -675,7 +675,7 @@ template<> async_file_io_dispatcher_base::completion_returntype async_file_io_di
 	state.first->out[idx]=std::make_pair(id, h); // This might look thread unsafe, but each idx is unique
 	if(--state.first->togo)
 		return std::make_pair(false, h);
-	exception_ptr this_e(async_io::make_exception_ptr(std::current_exception()));
+	exception_ptr this_e(afio::make_exception_ptr(std::current_exception()));
 	// Last one just completed, so issue completions for everything in out except me
 	detail::barrier_count_completed_state &s=*state.first;
 	for(idx=0; idx<s.out.size(); idx++)
@@ -692,7 +692,7 @@ template<> async_file_io_dispatcher_base::completion_returntype async_file_io_di
 #ifdef _MSC_VER
 			catch(const std::exception &)
 			{
-				exception_ptr e(async_io::make_exception_ptr(std::current_exception()));
+				exception_ptr e(afio::make_exception_ptr(std::current_exception()));
 				complete_async_op(s.out[idx].first, s.out[idx].second, e);
 			}
 			catch(const std::exception_ptr &)
@@ -700,7 +700,7 @@ template<> async_file_io_dispatcher_base::completion_returntype async_file_io_di
 			catch(...)
 #endif
 			{
-				exception_ptr e(async_io::make_exception_ptr(std::current_exception()));
+				exception_ptr e(afio::make_exception_ptr(std::current_exception()));
 				complete_async_op(s.out[idx].first, s.out[idx].second, e);
 			}
 		}
@@ -844,7 +844,7 @@ namespace detail {
 				}
 				catch(...)
 				{
-					e=async_io::make_exception_ptr(current_exception());
+					e=afio::make_exception_ptr(current_exception());
 				}
 			}
 			else

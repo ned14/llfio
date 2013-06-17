@@ -41,7 +41,7 @@ namespace detail
 		if(!randomness_cache_left)
 			fill_randomness_cache();
 		else if(randomness_cache_left<4096)
-			async_io::process_threadpool().enqueue(fill_randomness_cache);
+			afio::process_threadpool().enqueue(fill_randomness_cache);
 		size/=8;
 		for(size_t n=0; n<size; n+=randomness_cache.pop(((unsigned long long *) ptr)+n, size-n));
 	}
