@@ -24,7 +24,7 @@ File Created: Mar 2013
 
 namespace boost { namespace property_tree { template<typename Key, typename Data, typename KeyCompare = std::less<Key>> class basic_ptree; typedef basic_ptree< std::string, std::string > ptree; } }
 
-namespace triplegit
+namespace boost
 {
 
 namespace detail { void TRIPLEGIT_API prefetched_unique_id_source(void *ptr, size_t size); }
@@ -138,7 +138,7 @@ namespace detail {
 				do_batch_detach(p, begin->first, begin->second);
 		}
 	};
-}
+} // namespace detail
 /*! \class storable_vertices
 \brief The base class for a storable collection of vertices
 */
@@ -146,13 +146,13 @@ template<class derived> class storable_vertices : public detail::storable_vertic
 {
 public:
 };
-
+/*
 namespace boost
 {
 	using namespace ::boost;
 	/*! \class adjacency_list
 	\brief A stored Boost.Graph adjacency_list
-	*/
+	
 	template<class OutEdgeListS = boost::vecS, // a Sequence or an AssociativeContainer
             class VertexListS = boost::vecS, // a Sequence or a RandomAccessContainer
             class DirectedS = boost::directedS,
@@ -190,7 +190,8 @@ namespace boost
 						  const GraphProperty& p = GraphProperty()) : Base(first, last, ep_iter, n, 0, p) { }
 	};
 
-} // namespace boost
+} // namespace ::boost
+*/
 
 } // namespace
 

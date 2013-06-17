@@ -522,7 +522,7 @@ It took 0.017878 secs to do 55934.7 file deletions per sec
 
 */
 
-namespace triplegit {
+namespace boost {
 //! \brief The namespace containing the Boost.ASIO asynchronous file i/o implementation.
 namespace async_io {
 
@@ -1387,7 +1387,7 @@ inline async_io_op async_file_io_dispatcher_base::truncate(const async_io_op &op
 }
 
 
-} } // namespace
+} } // namespace boost
 
 #ifdef _MSC_VER
 #pragma warning(pop)

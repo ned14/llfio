@@ -18,7 +18,7 @@ File Created: Mar 2013
 using namespace std;
 using namespace NiallsCPP11Utilities;
 
-namespace triplegit
+namespace boost
 {
 namespace detail
 {
@@ -60,7 +60,7 @@ namespace detail
 	{
 	}
 
-} // namespace
+} // namespace detail
 
 
-} // namespace
+} // namespace boost
