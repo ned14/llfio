@@ -4,7 +4,7 @@ Provides a threadpool and asynchronous file i/o infrastructure based on Boost.AS
 File Created: Mar 2013
 */
 
-#define BOOST_MAX_NON_ASYNC_QUEUE_DEPTH 8
+#define BOOST_AFIO_MAX_NON_ASYNC_QUEUE_DEPTH 8
 //#define USE_POSIX_ON_WIN32 // Useful for testing
 
 #define _CRT_SECURE_NO_WARNINGS
@@ -30,50 +30,53 @@ File Created: Mar 2013
 // We also compile the posix compat layer for catching silly compile errors for POSIX
 #include <io.h>
 #include <direct.h>
-#define BOOST_POSIX_MKDIR(path, mode) _wmkdir(path)
-#define BOOST_POSIX_RMDIR _wrmdir
-#define BOOST_POSIX_STAT _wstat64
-#define stat _stat64
-#define S_ISREG(m) ((m) & _S_IFREG)
-#define S_ISDIR(m) ((m) & _S_IFDIR)
-#define BOOST_POSIX_OPEN _wopen
-#define BOOST_POSIX_CLOSE _close
-#define BOOST_POSIX_UNLINK _wunlink
-#define BOOST_POSIX_FSYNC _commit
-#define BOOST_POSIX_FTRUNCATE _chsize_s
+#define BOOST_AFIO_POSIX_MKDIR(path, mode) _wmkdir(path)
+#define BOOST_AFIO_POSIX_RMDIR _wrmdir
+#define BOOST_AFIO_POSIX_STAT _wstat64
+#define BOOST_AFIO _stat64
+#define BOOST_AFIO_S_ISREG(m) ((m) & _S_IFREG)
+#define BOOST_AFIO_S_ISDIR(m) ((m) & _S_IFDIR)
+#define BOOST_AFIO_POSIX_OPEN _wopen
+#define BOOST_AFIO_POSIX_CLOSE _close
+#define BOOST_AFIO_POSIX_UNLINK _wunlink
+#define BOOST_AFIO_POSIX_FSYNC _commit
+#define BOOST_AFIO_POSIX_FTRUNCATE _chsize_s
 #else
 #include <sys/uio.h>
 #include <limits.h>
-#define BOOST_POSIX_MKDIR mkdir
-#define BOOST_POSIX_RMDIR ::rmdir
-#define BOOST_POSIX_STAT stat
-#define BOOST_POSIX_OPEN open
-#define BOOST_POSIX_CLOSE ::close
-#define BOOST_POSIX_UNLINK unlink
-#define BOOST_POSIX_FSYNC fsync
-#define BOOST_POSIX_FTRUNCATE ftruncate
+#define BOOST_AFIO_POSIX_MKDIR mkdir
+#define BOOST_AFIO_POSIX_RMDIR ::rmdir
+#define BOOST_AFIO_POSIX_STAT stat
+#define BOOST_AFIO_POSIX_OPEN open
+#define BOOST_AFIO_POSIX_CLOSE ::close
+#define BOOST_AFIO_POSIX_UNLINK unlink
+#define BOOST_AFIO_POSIX_FSYNC fsync
+#define BOOST_AFIO_POSIX_FTRUNCATE ftruncate
+#define BOOST_AFIO_S_ISREG S_ISREG
+#define BOOST_AFIO_S_ISDIR S_ISDIR
+#define BOOST_AFIO_STAT stat
 #endif
 
 // libstdc++ doesn't come with std::lock_guard
-#define BOOST_LOCK_GUARD boost::lock_guard
+#define BOOST_AFIO_LOCK_GUARD boost::lock_guard
 
 #if defined(_DEBUG) && 0
-#define BOOST_DEBUG_PRINTING 1
+#define BOOST_AFIO_DEBUG_PRINTING 1
 #ifdef WIN32
-#define BOOST_DEBUG_PRINT(...) \
+#define BOOST_AFIO_DEBUG_PRINT(...) \
 	{ \
 		char buffer[16384]; \
 		sprintf(buffer, __VA_ARGS__); \
 		OutputDebugStringA(buffer); \
 	}
 #else
-#define BOOST_DEBUG_PRINT(...) \
+#define BOOST_AFIO_DEBUG_PRINT(...) \
 	{ \
 		fprintf(stderr, __VA_ARGS__); \
 	}
 #endif
 #else
-#define BOOST_DEBUG_PRINT(...)
+#define BOOST_AFIO_DEBUG_PRINT(...)
 #endif
 
 
@@ -91,7 +94,7 @@ ssize_t preadv(int fd, const struct iovec *iov, int iovcnt, boost::afio::off_t o
 {
 	boost::afio::off_t at=offset;
 	ssize_t transferred;
-	BOOST_LOCK_GUARD<boost::detail::spinlock> lockh(preadwritelock);
+	BOOST_AFIO_LOCK_GUARD<boost::detail::spinlock> lockh(preadwritelock);
 	if(-1==_lseeki64(fd, offset, SEEK_SET)) return -1;
 	for(; iovcnt; iov++, iovcnt--, at+=(boost::afio::off_t) transferred)
 		if(-1==(transferred=_read(fd, iov->iov_base, (unsigned) iov->iov_len))) return -1;
@@ -101,7 +104,7 @@ ssize_t pwritev(int fd, const struct iovec *iov, int iovcnt, boost::afio::off_t 
 {
 	boost::afio::off_t at=offset;
 	ssize_t transferred;
-	BOOST_LOCK_GUARD<boost::detail::spinlock> lockh(preadwritelock);
+	BOOST_AFIO_LOCK_GUARD<boost::detail::spinlock> lockh(preadwritelock);
 	if(-1==_lseeki64(fd, offset, SEEK_SET)) return -1;
 	for(; iovcnt; iov++, iovcnt--, at+=(boost::afio::off_t) transferred)
 		if(-1==(transferred=_write(fd, iov->iov_base, (unsigned) iov->iov_len))) return -1;
@@ -116,7 +119,7 @@ thread_pool &process_threadpool()
 {
 	// This is basically how many file i/o operations can occur at once
 	// Obviously the kernel also has a limit
-	static thread_pool ret(BOOST_MAX_NON_ASYNC_QUEUE_DEPTH);
+	static thread_pool ret(BOOST_AFIO_MAX_NON_ASYNC_QUEUE_DEPTH);
 	return ret;
 }
 
@@ -149,7 +152,7 @@ namespace detail {
 		}
 		~async_io_handle_windows()
 		{
-			BOOST_DEBUG_PRINT("D %p\n", this);
+			BOOST_AFIO_DEBUG_PRINT("D %p\n", this);
 			if(has_been_added)
 				parent->int_del_io_handle(myid);
 			if(h)
@@ -189,8 +192,8 @@ namespace detail {
 			{
 				// Flush synchronously here? I guess ...
 				if(autoflush && write_count_since_fsync())
-					ERRHOSFN(BOOST_POSIX_FSYNC(fd), path());
-				ERRHOSFN(BOOST_POSIX_CLOSE(fd), path());
+					ERRHOSFN(BOOST_AFIO_POSIX_FSYNC(fd), path());
+				ERRHOSFN(BOOST_AFIO_POSIX_CLOSE(fd), path());
 				fd=-1;
 			}
 		}
@@ -307,7 +310,7 @@ async_file_io_dispatcher_base::~async_file_io_dispatcher_base()
 	{
 		std::vector<std::shared_ptr<shared_future<std::shared_ptr<detail::async_io_handle>>>> outstanding;
 		{
-			BOOST_LOCK_GUARD<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
+			BOOST_AFIO_LOCK_GUARD<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
 			if(!p->ops.empty())
 			{
 				outstanding.reserve(p->ops.size());
@@ -325,7 +328,7 @@ async_file_io_dispatcher_base::~async_file_io_dispatcher_base()
 
 void async_file_io_dispatcher_base::int_add_io_handle(void *key, std::shared_ptr<detail::async_io_handle> h)
 {
-	BOOST_LOCK_GUARD<detail::async_file_io_dispatcher_base_p::fdslock_t> lockh(p->fdslock);
+	BOOST_AFIO_LOCK_GUARD<detail::async_file_io_dispatcher_base_p::fdslock_t> lockh(p->fdslock);
 	ANNOTATE_RWLOCK_ACQUIRED(&p->fdslock, 1);
 	p->fds.insert(make_pair(key, std::weak_ptr<detail::async_io_handle>(h)));
 	ANNOTATE_RWLOCK_RELEASED(&p->fdslock, 1);
@@ -333,7 +336,7 @@ void async_file_io_dispatcher_base::int_add_io_handle(void *key, std::shared_ptr
 
 void async_file_io_dispatcher_base::int_del_io_handle(void *key)
 {
-	BOOST_LOCK_GUARD<detail::async_file_io_dispatcher_base_p::fdslock_t> lockh(p->fdslock);
+	BOOST_AFIO_LOCK_GUARD<detail::async_file_io_dispatcher_base_p::fdslock_t> lockh(p->fdslock);
 	ANNOTATE_RWLOCK_ACQUIRED(&p->fdslock, 1);
 	p->fds.erase(key);
 	ANNOTATE_RWLOCK_RELEASED(&p->fdslock, 1);
@@ -351,14 +354,14 @@ file_flags async_file_io_dispatcher_base::fileflags(file_flags flags) const
 
 size_t async_file_io_dispatcher_base::wait_queue_depth() const
 {
-	BOOST_LOCK_GUARD<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
+	BOOST_AFIO_LOCK_GUARD<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
 	return p->ops.size();
 }
 
 size_t async_file_io_dispatcher_base::count() const
 {
 	size_t ret;
-	BOOST_LOCK_GUARD<detail::async_file_io_dispatcher_base_p::fdslock_t> lockh(p->fdslock);
+	BOOST_AFIO_LOCK_GUARD<detail::async_file_io_dispatcher_base_p::fdslock_t> lockh(p->fdslock);
 	ANNOTATE_RWLOCK_ACQUIRED(&p->fdslock, 1);
 	ret=p->fds.size();
 	ANNOTATE_RWLOCK_RELEASED(&p->fdslock, 1);
@@ -379,7 +382,7 @@ std::vector<async_io_op> async_file_io_dispatcher_base::completion(const std::ve
 	ret.reserve(callbacks.size());
 	std::vector<async_io_op>::const_iterator i;
 	std::vector<std::pair<async_op_flags, std::function<async_file_io_dispatcher_base::completion_t>>>::const_iterator c;
-	BOOST_LOCK_GUARD<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
+	BOOST_AFIO_LOCK_GUARD<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
 	detail::immediate_async_ops immediates;
 	if(ops.empty())
 	{
@@ -395,7 +398,7 @@ std::vector<async_io_op> async_file_io_dispatcher_base::completion(const std::ve
 // Called in unknown thread
 void async_file_io_dispatcher_base::complete_async_op(size_t id, std::shared_ptr<detail::async_io_handle> h, exception_ptr e)
 {
-	BOOST_LOCK_GUARD<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
+	BOOST_AFIO_LOCK_GUARD<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
 	detail::immediate_async_ops immediates;
 	// Find me in ops, remove my completions and delete me from extant ops
 	std::unordered_map<size_t, detail::async_file_io_dispatcher_op>::iterator it(p->ops.find(id));
@@ -441,7 +444,7 @@ void async_file_io_dispatcher_base::complete_async_op(size_t id, std::shared_ptr
 				else
 					*it->second.h=threadpool().enqueue(std::bind(c.second, h));
 			}
-			BOOST_DEBUG_PRINT("C %u > %u %p\n", (unsigned) id, (unsigned) c.first, h.get());
+			BOOST_AFIO_DEBUG_PRINT("C %u > %u %p\n", (unsigned) id, (unsigned) c.first, h.get());
 		}
 		// Restore it to my id
 		it=p->ops.find(id);
@@ -464,7 +467,7 @@ void async_file_io_dispatcher_base::complete_async_op(size_t id, std::shared_ptr
 			it->second.detached_promise->set_value(h);
 	}
 	p->ops.erase(it);
-	BOOST_DEBUG_PRINT("R %u %p\n", (unsigned) id, h.get());
+	BOOST_AFIO_DEBUG_PRINT("R %u %p\n", (unsigned) id, h.get());
 }
 
 // Called in unknown thread
@@ -482,7 +485,7 @@ template<class F, class... Args> std::shared_ptr<detail::async_io_handle> async_
 		{
 			// Make sure this was set up for deferred completion
 	#ifndef NDEBUG
-			BOOST_LOCK_GUARD<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
+			BOOST_AFIO_LOCK_GUARD<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
 			std::unordered_map<size_t, detail::async_file_io_dispatcher_op>::iterator it(p->ops.find(id));
 			if(p->ops.end()==it)
 			{
@@ -509,9 +512,9 @@ template<class F, class... Args> std::shared_ptr<detail::async_io_handle> async_
 	catch(const std::exception &)
 	{
 		exception_ptr e(afio::make_exception_ptr(std::current_exception()));
-		BOOST_DEBUG_PRINT("E %u begin\n", (unsigned) id);
+		BOOST_AFIO_DEBUG_PRINT("E %u begin\n", (unsigned) id);
 		complete_async_op(id, h, e);
-		BOOST_DEBUG_PRINT("E %u end\n", (unsigned) id);
+		BOOST_AFIO_DEBUG_PRINT("E %u end\n", (unsigned) id);
 		throw;
 	}
 	catch(const std::exception_ptr &)
@@ -520,9 +523,9 @@ template<class F, class... Args> std::shared_ptr<detail::async_io_handle> async_
 #endif
 	{
 		exception_ptr e(afio::make_exception_ptr(std::current_exception()));
-		BOOST_DEBUG_PRINT("E %u begin\n", (unsigned) id);
+		BOOST_AFIO_DEBUG_PRINT("E %u begin\n", (unsigned) id);
 		complete_async_op(id, h, e);
-		BOOST_DEBUG_PRINT("E %u end\n", (unsigned) id);
+		BOOST_AFIO_DEBUG_PRINT("E %u end\n", (unsigned) id);
 		throw;
 	}
 }
@@ -588,10 +591,10 @@ template<class F, class... Args> async_io_op async_file_io_dispatcher_base::chai
 	}
 	auto opsit=p->ops.insert(std::make_pair(thisid, detail::async_file_io_dispatcher_op((detail::OpType) optype, flags, ret.h)));
 	assert(opsit.second);
-	BOOST_DEBUG_PRINT("I %u < %u (%s)\n", (unsigned) thisid, (unsigned) precondition.id, detail::optypes[static_cast<int>(optype)]);
+	BOOST_AFIO_DEBUG_PRINT("I %u < %u (%s)\n", (unsigned) thisid, (unsigned) precondition.id, detail::optypes[static_cast<int>(optype)]);
 	auto unopsit=NiallsCPP11Utilities::Undoer([this, opsit, thisid](){
 		p->ops.erase(opsit.first);
-		BOOST_DEBUG_PRINT("E R %u\n", (unsigned) thisid);
+		BOOST_AFIO_DEBUG_PRINT("E R %u\n", (unsigned) thisid);
 	});
 	if(!!(flags & async_op_flags::DetachedFuture))
 	{
@@ -610,7 +613,7 @@ template<class F, class T> std::vector<async_io_op> async_file_io_dispatcher_bas
 	assert(preconditions.size()==container.size());
 	if(preconditions.size()!=container.size())
 		throw std::runtime_error("preconditions size does not match size of ops data");
-	BOOST_LOCK_GUARD<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
+	BOOST_AFIO_LOCK_GUARD<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
 	detail::immediate_async_ops immediates;
 	auto precondition_it=preconditions.cbegin();
 	auto container_it=container.cbegin();
@@ -622,7 +625,7 @@ template<class F> std::vector<async_io_op> async_file_io_dispatcher_base::chain_
 {
 	std::vector<async_io_op> ret;
 	ret.reserve(container.size());
-	BOOST_LOCK_GUARD<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
+	BOOST_AFIO_LOCK_GUARD<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
 	detail::immediate_async_ops immediates;
 	for(auto &i : container)
 		ret.push_back(chain_async_op(immediates, optype, i, flags, f, i));
@@ -632,7 +635,7 @@ template<class F> std::vector<async_io_op> async_file_io_dispatcher_base::chain_
 {
 	std::vector<async_io_op> ret;
 	ret.reserve(container.size());
-	BOOST_LOCK_GUARD<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
+	BOOST_AFIO_LOCK_GUARD<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
 	detail::immediate_async_ops immediates;
 	for(auto &i : container)
 		ret.push_back(chain_async_op(immediates, optype, i.precondition, flags, f, i));
@@ -642,7 +645,7 @@ template<class F, class T> std::vector<async_io_op> async_file_io_dispatcher_bas
 {
 	std::vector<async_io_op> ret;
 	ret.reserve(container.size());
-	BOOST_LOCK_GUARD<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
+	BOOST_AFIO_LOCK_GUARD<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
 	detail::immediate_async_ops immediates;
 	for(auto &i : container)
 		ret.push_back(chain_async_op(immediates, optype, i.precondition, flags, f, i));
@@ -855,7 +858,7 @@ namespace detail {
 				else
 					p->bytesread+=bytes_transferred;
 			}
-			BOOST_DEBUG_PRINT("H %u e=%u\n", (unsigned) id, (unsigned) ec.value());
+			BOOST_AFIO_DEBUG_PRINT("H %u e=%u\n", (unsigned) id, (unsigned) ec.value());
 			complete_async_op(id, h, e);
 		}
 		// Called in unknown thread
@@ -863,10 +866,10 @@ namespace detail {
 		{
 			async_io_handle_windows *p=static_cast<async_io_handle_windows *>(h.get());
 			assert(p);
-			BOOST_DEBUG_PRINT("R %u %p (%c) @ %u, b=%u\n", (unsigned) id, h.get(), p->path().native().back(), (unsigned) req.where, (unsigned) req.buffers.size());
+			BOOST_AFIO_DEBUG_PRINT("R %u %p (%c) @ %u, b=%u\n", (unsigned) id, h.get(), p->path().native().back(), (unsigned) req.where, (unsigned) req.buffers.size());
 #ifdef DEBUG_PRINTING
 			for(auto &b : req.buffers)
-				BOOST_DEBUG_PRINT("  R %u: %p %u\n", (unsigned) id, boost::asio::buffer_cast<const void *>(b), (unsigned) boost::asio::buffer_size(b));
+				BOOST_AFIO_DEBUG_PRINT("  R %u: %p %u\n", (unsigned) id, boost::asio::buffer_cast<const void *>(b), (unsigned) boost::asio::buffer_size(b));
 #endif
 			boost::asio::async_read_at(*p->h, req.where, req.buffers, boost::bind(&async_file_io_dispatcher_windows::boost_asio_completion_handler, this, false, id, h, boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred));
 			// Indicate we're not finished yet
@@ -877,10 +880,10 @@ namespace detail {
 		{
 			async_io_handle_windows *p=static_cast<async_io_handle_windows *>(h.get());
 			assert(p);
-			BOOST_DEBUG_PRINT("W %u %p (%c) @ %u, b=%u\n", (unsigned) id, h.get(), p->path().native().back(), (unsigned) req.where, (unsigned) req.buffers.size());
+			BOOST_AFIO_DEBUG_PRINT("W %u %p (%c) @ %u, b=%u\n", (unsigned) id, h.get(), p->path().native().back(), (unsigned) req.where, (unsigned) req.buffers.size());
 #ifdef DEBUG_PRINTING
 			for(auto &b : req.buffers)
-				BOOST_DEBUG_PRINT("  W %u: %p %u\n", (unsigned) id, boost::asio::buffer_cast<const void *>(b), (unsigned) boost::asio::buffer_size(b));
+				BOOST_AFIO_DEBUG_PRINT("  W %u: %p %u\n", (unsigned) id, boost::asio::buffer_cast<const void *>(b), (unsigned) boost::asio::buffer_size(b));
 #endif
 			boost::asio::async_write_at(*p->h, req.where, req.buffers, boost::bind(&async_file_io_dispatcher_windows::boost_asio_completion_handler, this, true, id, h, boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred));
 			// Indicate we're not finished yet
@@ -891,7 +894,7 @@ namespace detail {
 		{
 			async_io_handle_windows *p=static_cast<async_io_handle_windows *>(h.get());
 			assert(p);
-			BOOST_DEBUG_PRINT("T %u %p (%c)\n", (unsigned) id, h.get(), p->path().native().back());
+			BOOST_AFIO_DEBUG_PRINT("T %u %p (%c)\n", (unsigned) id, h.get(), p->path().native().back());
 			// This is a bit tricky ... overlapped files ignore their file position except in this one
 			// case, but clearly here we have a race condition. No choice but to rinse and repeat I guess.
 			LARGE_INTEGER size={0}, newsize;
@@ -1002,7 +1005,7 @@ namespace detail {
 		{
 			std::filesystem::path containingdir(path.parent_path());
 			std::shared_ptr<detail::async_io_handle> dirh;
-			BOOST_LOCK_GUARD<dircachelock_t> dircachelockh(dircachelock);
+			BOOST_AFIO_LOCK_GUARD<dircachelock_t> dircachelockh(dircachelock);
 			do
 			{
 				std::unordered_map<std::filesystem::path, std::weak_ptr<async_io_handle>>::iterator it=dircache.find(containingdir);
@@ -1010,7 +1013,7 @@ namespace detail {
 				{
 					if(dircache.end()!=it) dircache.erase(it);
 					dirh=std::make_shared<async_io_handle_posix>(std::shared_ptr<async_file_io_dispatcher_base>(), std::shared_ptr<detail::async_io_handle>(),
-						containingdir, false, BOOST_POSIX_OPEN(containingdir.c_str(), O_RDONLY, 0x1b0/*660*/));
+						containingdir, false, BOOST_AFIO_POSIX_OPEN(containingdir.c_str(), O_RDONLY, 0x1b0/*660*/));
 					auto _it=dircache.insert(std::make_pair(containingdir, std::weak_ptr<async_io_handle>(dirh)));
 					return dirh;
 				}
@@ -1027,7 +1030,7 @@ namespace detail {
 			req.flags=fileflags(req.flags);
 			if(!!(req.flags & (file_flags::Create|file_flags::CreateOnlyIfNotExist)))
 			{
-				ret=BOOST_POSIX_MKDIR(req.path.c_str(), 0x1f8/*770*/);
+				ret=BOOST_AFIO_POSIX_MKDIR(req.path.c_str(), 0x1f8/*770*/);
 				if(-1==ret && EEXIST==errno)
 				{
 					// Ignore already exists unless we were asked otherwise
@@ -1037,9 +1040,9 @@ namespace detail {
 				req.flags=req.flags&~(file_flags::Create|file_flags::CreateOnlyIfNotExist);
 			}
 
-			struct stat s={0};
-			ret=BOOST_POSIX_STAT(req.path.c_str(), &s);
-			if(0==ret && !S_ISDIR(s.st_mode))
+			struct BOOST_AFIO_STAT s={0};
+			ret=BOOST_AFIO_POSIX_STAT(req.path.c_str(), &s);
+			if(0==ret && !BOOST_AFIO_S_ISDIR(s.st_mode))
 				throw std::runtime_error("Not a directory");
 			if(file_flags::Read==(req.flags & file_flags::Read))
 			{
@@ -1059,7 +1062,7 @@ namespace detail {
 				auto ret=std::make_shared<async_io_handle_posix>(shared_from_this(), dirh, req.path, false, -999);
 #ifdef __linux__
 				if(!!(req.flags & (file_flags::Create|file_flags::CreateOnlyIfNotExist)) && !!(req.flags & (file_flags::AutoFlush|file_flags::OSSync)))
-					BOOST_POSIX_FSYNC(static_cast<async_io_handle_posix *>(dirh.get())->fd);
+					BOOST_AFIO_POSIX_FSYNC(static_cast<async_io_handle_posix *>(dirh.get())->fd);
 #endif
 				return std::make_pair(true, ret);
 			}
@@ -1068,7 +1071,7 @@ namespace detail {
 		completion_returntype dormdir(size_t id, std::shared_ptr<detail::async_io_handle> _, async_path_op_req req)
 		{
 			req.flags=fileflags(req.flags);
-			ERRHOSFN(BOOST_POSIX_RMDIR(req.path.c_str()), req.path);
+			ERRHOSFN(BOOST_AFIO_POSIX_RMDIR(req.path.c_str()), req.path);
 			auto ret=std::make_shared<async_io_handle_posix>(shared_from_this(), std::shared_ptr<detail::async_io_handle>(), req.path, false, -999);
 			return std::make_pair(true, ret);
 		}
@@ -1100,10 +1103,10 @@ namespace detail {
 				dirh=get_handle_to_containing_dir(req.path);
 			// If writing and autoflush and NOT synchronous, turn on autoflush
 			auto ret=std::make_shared<async_io_handle_posix>(shared_from_this(), dirh, req.path, (file_flags::AutoFlush|file_flags::Write)==(req.flags & (file_flags::AutoFlush|file_flags::Write|file_flags::OSSync)),
-				BOOST_POSIX_OPEN(req.path.c_str(), flags, 0x1b0/*660*/));
+				BOOST_AFIO_POSIX_OPEN(req.path.c_str(), flags, 0x1b0/*660*/));
 #ifdef __linux__
 			if(!!(req.flags & (file_flags::Create|file_flags::CreateOnlyIfNotExist)) && !!(req.flags & (file_flags::AutoFlush|file_flags::OSSync)))
-				BOOST_POSIX_FSYNC(static_cast<async_io_handle_posix *>(dirh.get())->fd);
+				BOOST_AFIO_POSIX_FSYNC(static_cast<async_io_handle_posix *>(dirh.get())->fd);
 #endif
 			static_cast<async_io_handle_posix *>(ret.get())->do_add_io_handle_to_parent();
 			return std::make_pair(true, ret);
@@ -1112,7 +1115,7 @@ namespace detail {
 		completion_returntype dormfile(size_t id, std::shared_ptr<detail::async_io_handle> _, async_path_op_req req)
 		{
 			req.flags=fileflags(req.flags);
-			ERRHOSFN(BOOST_POSIX_UNLINK(req.path.c_str()), req.path);
+			ERRHOSFN(BOOST_AFIO_POSIX_UNLINK(req.path.c_str()), req.path);
 			auto ret=std::make_shared<async_io_handle_posix>(shared_from_this(), std::shared_ptr<detail::async_io_handle>(), req.path, false, -999);
 			return std::make_pair(true, ret);
 		}
@@ -1122,7 +1125,7 @@ namespace detail {
 			async_io_handle_posix *p=static_cast<async_io_handle_posix *>(h.get());
 			size_t bytestobesynced=p->write_count_since_fsync();
 			if(bytestobesynced)
-				ERRHOSFN(BOOST_POSIX_FSYNC(p->fd), p->path());
+				ERRHOSFN(BOOST_AFIO_POSIX_FSYNC(p->fd), p->path());
 			p->has_ever_been_fsynced=true;
 			p->byteswrittenatlastfsync+=(long) bytestobesynced;
 			return std::make_pair(true, h);
@@ -1132,8 +1135,8 @@ namespace detail {
 		{
 			async_io_handle_posix *p=static_cast<async_io_handle_posix *>(h.get());
 			if(p->autoflush && p->write_count_since_fsync())
-				ERRHOSFN(BOOST_POSIX_FSYNC(p->fd), p->path());
-			ERRHOSFN(BOOST_POSIX_CLOSE(p->fd), p->path());
+				ERRHOSFN(BOOST_AFIO_POSIX_FSYNC(p->fd), p->path());
+			ERRHOSFN(BOOST_AFIO_POSIX_CLOSE(p->fd), p->path());
 			p->fd=-1;
 			return std::make_pair(true, h);
 		}
@@ -1145,10 +1148,10 @@ namespace detail {
 			iovec v;
 			std::vector<iovec> vecs;
 			vecs.reserve(req.buffers.size());
-			BOOST_DEBUG_PRINT("R %u %p (%c) @ %u, b=%u\n", (unsigned) id, h.get(), p->path().native().back(), (unsigned) req.where, (unsigned) req.buffers.size());
+			BOOST_AFIO_DEBUG_PRINT("R %u %p (%c) @ %u, b=%u\n", (unsigned) id, h.get(), p->path().native().back(), (unsigned) req.where, (unsigned) req.buffers.size());
 #ifdef DEBUG_PRINTING
 			for(auto &b : req.buffers)
-				BOOST_DEBUG_PRINT("  R %u: %p %u\n", (unsigned) id, boost::asio::buffer_cast<const void *>(b), (unsigned) boost::asio::buffer_size(b));
+				BOOST_AFIO_DEBUG_PRINT("  R %u: %p %u\n", (unsigned) id, boost::asio::buffer_cast<const void *>(b), (unsigned) boost::asio::buffer_size(b));
 #endif
 			for(auto &b : req.buffers)
 			{
@@ -1176,10 +1179,10 @@ namespace detail {
 			iovec v;
 			std::vector<iovec> vecs;
 			vecs.reserve(req.buffers.size());
-			BOOST_DEBUG_PRINT("W %u %p (%c) @ %u, b=%u\n", (unsigned) id, h.get(), p->path().native().back(), (unsigned) req.where, (unsigned) req.buffers.size());
+			BOOST_AFIO_DEBUG_PRINT("W %u %p (%c) @ %u, b=%u\n", (unsigned) id, h.get(), p->path().native().back(), (unsigned) req.where, (unsigned) req.buffers.size());
 #ifdef DEBUG_PRINTING
 			for(auto &b : req.buffers)
-				BOOST_DEBUG_PRINT("  W %u: %p %u\n", (unsigned) id, boost::asio::buffer_cast<const void *>(b), (unsigned) boost::asio::buffer_size(b));
+				BOOST_AFIO_DEBUG_PRINT("  W %u: %p %u\n", (unsigned) id, boost::asio::buffer_cast<const void *>(b), (unsigned) boost::asio::buffer_size(b));
 #endif
 			for(auto &b : req.buffers)
 			{
@@ -1203,8 +1206,8 @@ namespace detail {
 		completion_returntype dotruncate(size_t id, std::shared_ptr<detail::async_io_handle> h, off_t newsize)
 		{
 			async_io_handle_posix *p=static_cast<async_io_handle_posix *>(h.get());
-			BOOST_DEBUG_PRINT("T %u %p (%c)\n", (unsigned) id, h.get(), p->path().native().back());
-			ERRHOSFN(BOOST_POSIX_FTRUNCATE(p->fd, newsize), p->path());
+			BOOST_AFIO_DEBUG_PRINT("T %u %p (%c)\n", (unsigned) id, h.get(), p->path().native().back());
+			ERRHOSFN(BOOST_AFIO_POSIX_FTRUNCATE(p->fd, newsize), p->path());
 			return std::make_pair(true, h);
 		}
 
