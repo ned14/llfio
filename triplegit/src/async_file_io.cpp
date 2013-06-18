@@ -4,7 +4,7 @@ Provides a threadpool and asynchronous file i/o infrastructure based on Boost.AS
 File Created: Mar 2013
 */
 
-#define MAX_NON_ASYNC_QUEUE_DEPTH 8
+#define BOOST_MAX_NON_ASYNC_QUEUE_DEPTH 8
 //#define USE_POSIX_ON_WIN32 // Useful for testing
 
 #define _CRT_SECURE_NO_WARNINGS
@@ -116,7 +116,7 @@ thread_pool &process_threadpool()
 {
 	// This is basically how many file i/o operations can occur at once
 	// Obviously the kernel also has a limit
-	static thread_pool ret(MAX_NON_ASYNC_QUEUE_DEPTH);
+	static thread_pool ret(BOOST_MAX_NON_ASYNC_QUEUE_DEPTH);
 	return ret;
 }
 

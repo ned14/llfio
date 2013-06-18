@@ -535,7 +535,7 @@ typedef std::thread thread;
 // This isn't consistent on MSVC so hard code it
 typedef unsigned long long off_t;
 
-#define ASYNC_FILE_IO_FORWARD_STL_IMPL(M, B) \
+#define BOOST_ASYNC_FILE_IO_FORWARD_STL_IMPL(M, B) \
 template<class T> class M : public B<T> \
 { \
 public: \
@@ -549,7 +549,7 @@ public: \
 	M &operator=(const M &o) { static_cast<B<T> &&>(*this)=o; return *this; } \
 	M &operator=(M &&o) { static_cast<B<T> &&>(*this)=std::move(o); return *this; } \
 };
-#define ASYNC_FILE_IO_FORWARD_STL_IMPL_NC(M, B) \
+#define BOOST_ASYNC_FILE_IO_FORWARD_STL_IMPL_NC(M, B) \
 template<class T> class M : public B<T> \
 { \
 public: \
@@ -565,20 +565,20 @@ public: \
 when_all() and when_any() definitions borrowed from http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2012/n3428.pdf
 */
 #if BOOST_THREAD_VERSION >=4
-ASYNC_FILE_IO_FORWARD_STL_IMPL_NC(future, boost::future)
+BOOST_ASYNC_FILE_IO_FORWARD_STL_IMPL_NC(future, boost::future)
 #else
-ASYNC_FILE_IO_FORWARD_STL_IMPL_NC(future, boost::unique_future)
+BOOST_ASYNC_FILE_IO_FORWARD_STL_IMPL_NC(future, boost::unique_future)
 #endif
 /*! \class shared_future
 \brief For now, this is boost's shared_future. Will be replaced when C++'s shared_future catches up with boost's
 
 when_all() and when_any() definitions borrowed from http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2012/n3428.pdf
 */
-ASYNC_FILE_IO_FORWARD_STL_IMPL(shared_future, boost::shared_future)
+BOOST_ASYNC_FILE_IO_FORWARD_STL_IMPL(shared_future, boost::shared_future)
 /*! \class promise
 \brief For now, this is boost's promise. Will be replaced when C++'s promise catches up with boost's
 */
-ASYNC_FILE_IO_FORWARD_STL_IMPL(promise, boost::promise)
+BOOST_ASYNC_FILE_IO_FORWARD_STL_IMPL(promise, boost::promise)
 /*! \brief For now, this is boost's exception_ptr. Will be replaced when C++'s exception_ptr catches up with boost's
 */
 typedef boost::exception_ptr exception_ptr;
@@ -757,7 +757,7 @@ namespace detail {
 }
 
 
-#define ASYNC_FILEIO_DECLARE_CLASS_ENUM_AS_BITFIELD(type) \
+#define BOOST_ASYNC_FILEIO_DECLARE_CLASS_ENUM_AS_BITFIELD(type) \
 inline constexpr type operator&(type a, type b) \
 { \
 	return static_cast<type>(static_cast<size_t>(a) & static_cast<size_t>(b)); \
@@ -795,14 +795,14 @@ enum class file_flags : size_t
 	OSSync=(1<<17)		//!< Ask the OS to not complete until the data is on the physical storage. Best used only with Direct, otherwise use AutoFlush.
 
 };
-ASYNC_FILEIO_DECLARE_CLASS_ENUM_AS_BITFIELD(file_flags)
+BOOST_ASYNC_FILEIO_DECLARE_CLASS_ENUM_AS_BITFIELD(file_flags)
 enum class async_op_flags : size_t
 {
 	None=0,					//!< No flags set
 	DetachedFuture=1,		//!< The specified completion routine may choose to not complete immediately
 	ImmediateCompletion=2	//!< Call chained completion immediately instead of scheduling for later. Make SURE your completion can not block!
 };
-ASYNC_FILEIO_DECLARE_CLASS_ENUM_AS_BITFIELD(async_op_flags)
+BOOST_ASYNC_FILEIO_DECLARE_CLASS_ENUM_AS_BITFIELD(async_op_flags)
 
 
 /*! \class async_file_io_dispatcher_base
