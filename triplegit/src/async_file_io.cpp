@@ -58,22 +58,22 @@ File Created: Mar 2013
 #define BOOST_LOCK_GUARD boost::lock_guard
 
 #if defined(_DEBUG) && 0
-#define DEBUG_PRINTING 1
+#define BOOST_DEBUG_PRINTING 1
 #ifdef WIN32
-#define DEBUG_PRINT(...) \
+#define BOOST_DEBUG_PRINT(...) \
 	{ \
 		char buffer[16384]; \
 		sprintf(buffer, __VA_ARGS__); \
 		OutputDebugStringA(buffer); \
 	}
 #else
-#define DEBUG_PRINT(...) \
+#define BOOST_DEBUG_PRINT(...) \
 	{ \
 		fprintf(stderr, __VA_ARGS__); \
 	}
 #endif
 #else
-#define DEBUG_PRINT(...)
+#define BOOST_DEBUG_PRINT(...)
 #endif
 
 
@@ -149,7 +149,7 @@ namespace detail {
 		}
 		~async_io_handle_windows()
 		{
-			DEBUG_PRINT("D %p\n", this);
+			BOOST_DEBUG_PRINT("D %p\n", this);
 			if(has_been_added)
 				parent->int_del_io_handle(myid);
 			if(h)
@@ -441,7 +441,7 @@ void async_file_io_dispatcher_base::complete_async_op(size_t id, std::shared_ptr
 				else
 					*it->second.h=threadpool().enqueue(std::bind(c.second, h));
 			}
-			DEBUG_PRINT("C %u > %u %p\n", (unsigned) id, (unsigned) c.first, h.get());
+			BOOST_DEBUG_PRINT("C %u > %u %p\n", (unsigned) id, (unsigned) c.first, h.get());
 		}
 		// Restore it to my id
 		it=p->ops.find(id);
@@ -464,7 +464,7 @@ void async_file_io_dispatcher_base::complete_async_op(size_t id, std::shared_ptr
 			it->second.detached_promise->set_value(h);
 	}
 	p->ops.erase(it);
-	DEBUG_PRINT("R %u %p\n", (unsigned) id, h.get());
+	BOOST_DEBUG_PRINT("R %u %p\n", (unsigned) id, h.get());
 }
 
 // Called in unknown thread
@@ -509,9 +509,9 @@ template<class F, class... Args> std::shared_ptr<detail::async_io_handle> async_
 	catch(const std::exception &)
 	{
 		exception_ptr e(afio::make_exception_ptr(std::current_exception()));
-		DEBUG_PRINT("E %u begin\n", (unsigned) id);
+		BOOST_DEBUG_PRINT("E %u begin\n", (unsigned) id);
 		complete_async_op(id, h, e);
-		DEBUG_PRINT("E %u end\n", (unsigned) id);
+		BOOST_DEBUG_PRINT("E %u end\n", (unsigned) id);
 		throw;
 	}
 	catch(const std::exception_ptr &)
@@ -520,9 +520,9 @@ template<class F, class... Args> std::shared_ptr<detail::async_io_handle> async_
 #endif
 	{
 		exception_ptr e(afio::make_exception_ptr(std::current_exception()));
-		DEBUG_PRINT("E %u begin\n", (unsigned) id);
+		BOOST_DEBUG_PRINT("E %u begin\n", (unsigned) id);
 		complete_async_op(id, h, e);
-		DEBUG_PRINT("E %u end\n", (unsigned) id);
+		BOOST_DEBUG_PRINT("E %u end\n", (unsigned) id);
 		throw;
 	}
 }
@@ -588,10 +588,10 @@ template<class F, class... Args> async_io_op async_file_io_dispatcher_base::chai
 	}
 	auto opsit=p->ops.insert(std::make_pair(thisid, detail::async_file_io_dispatcher_op((detail::OpType) optype, flags, ret.h)));
 	assert(opsit.second);
-	DEBUG_PRINT("I %u < %u (%s)\n", (unsigned) thisid, (unsigned) precondition.id, detail::optypes[static_cast<int>(optype)]);
+	BOOST_DEBUG_PRINT("I %u < %u (%s)\n", (unsigned) thisid, (unsigned) precondition.id, detail::optypes[static_cast<int>(optype)]);
 	auto unopsit=NiallsCPP11Utilities::Undoer([this, opsit, thisid](){
 		p->ops.erase(opsit.first);
-		DEBUG_PRINT("E R %u\n", (unsigned) thisid);
+		BOOST_DEBUG_PRINT("E R %u\n", (unsigned) thisid);
 	});
 	if(!!(flags & async_op_flags::DetachedFuture))
 	{
@@ -855,7 +855,7 @@ namespace detail {
 				else
 					p->bytesread+=bytes_transferred;
 			}
-			DEBUG_PRINT("H %u e=%u\n", (unsigned) id, (unsigned) ec.value());
+			BOOST_DEBUG_PRINT("H %u e=%u\n", (unsigned) id, (unsigned) ec.value());
 			complete_async_op(id, h, e);
 		}
 		// Called in unknown thread
@@ -863,10 +863,10 @@ namespace detail {
 		{
 			async_io_handle_windows *p=static_cast<async_io_handle_windows *>(h.get());
 			assert(p);
-			DEBUG_PRINT("R %u %p (%c) @ %u, b=%u\n", (unsigned) id, h.get(), p->path().native().back(), (unsigned) req.where, (unsigned) req.buffers.size());
+			BOOST_DEBUG_PRINT("R %u %p (%c) @ %u, b=%u\n", (unsigned) id, h.get(), p->path().native().back(), (unsigned) req.where, (unsigned) req.buffers.size());
 #ifdef DEBUG_PRINTING
 			for(auto &b : req.buffers)
-				DEBUG_PRINT("  R %u: %p %u\n", (unsigned) id, boost::asio::buffer_cast<const void *>(b), (unsigned) boost::asio::buffer_size(b));
+				BOOST_DEBUG_PRINT("  R %u: %p %u\n", (unsigned) id, boost::asio::buffer_cast<const void *>(b), (unsigned) boost::asio::buffer_size(b));
 #endif
 			boost::asio::async_read_at(*p->h, req.where, req.buffers, boost::bind(&async_file_io_dispatcher_windows::boost_asio_completion_handler, this, false, id, h, boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred));
 			// Indicate we're not finished yet
@@ -877,10 +877,10 @@ namespace detail {
 		{
 			async_io_handle_windows *p=static_cast<async_io_handle_windows *>(h.get());
 			assert(p);
-			DEBUG_PRINT("W %u %p (%c) @ %u, b=%u\n", (unsigned) id, h.get(), p->path().native().back(), (unsigned) req.where, (unsigned) req.buffers.size());
+			BOOST_DEBUG_PRINT("W %u %p (%c) @ %u, b=%u\n", (unsigned) id, h.get(), p->path().native().back(), (unsigned) req.where, (unsigned) req.buffers.size());
 #ifdef DEBUG_PRINTING
 			for(auto &b : req.buffers)
-				DEBUG_PRINT("  W %u: %p %u\n", (unsigned) id, boost::asio::buffer_cast<const void *>(b), (unsigned) boost::asio::buffer_size(b));
+				BOOST_DEBUG_PRINT("  W %u: %p %u\n", (unsigned) id, boost::asio::buffer_cast<const void *>(b), (unsigned) boost::asio::buffer_size(b));
 #endif
 			boost::asio::async_write_at(*p->h, req.where, req.buffers, boost::bind(&async_file_io_dispatcher_windows::boost_asio_completion_handler, this, true, id, h, boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred));
 			// Indicate we're not finished yet
@@ -891,7 +891,7 @@ namespace detail {
 		{
 			async_io_handle_windows *p=static_cast<async_io_handle_windows *>(h.get());
 			assert(p);
-			DEBUG_PRINT("T %u %p (%c)\n", (unsigned) id, h.get(), p->path().native().back());
+			BOOST_DEBUG_PRINT("T %u %p (%c)\n", (unsigned) id, h.get(), p->path().native().back());
 			// This is a bit tricky ... overlapped files ignore their file position except in this one
 			// case, but clearly here we have a race condition. No choice but to rinse and repeat I guess.
 			LARGE_INTEGER size={0}, newsize;
@@ -1145,10 +1145,10 @@ namespace detail {
 			iovec v;
 			std::vector<iovec> vecs;
 			vecs.reserve(req.buffers.size());
-			DEBUG_PRINT("R %u %p (%c) @ %u, b=%u\n", (unsigned) id, h.get(), p->path().native().back(), (unsigned) req.where, (unsigned) req.buffers.size());
+			BOOST_DEBUG_PRINT("R %u %p (%c) @ %u, b=%u\n", (unsigned) id, h.get(), p->path().native().back(), (unsigned) req.where, (unsigned) req.buffers.size());
 #ifdef DEBUG_PRINTING
 			for(auto &b : req.buffers)
-				DEBUG_PRINT("  R %u: %p %u\n", (unsigned) id, boost::asio::buffer_cast<const void *>(b), (unsigned) boost::asio::buffer_size(b));
+				BOOST_DEBUG_PRINT("  R %u: %p %u\n", (unsigned) id, boost::asio::buffer_cast<const void *>(b), (unsigned) boost::asio::buffer_size(b));
 #endif
 			for(auto &b : req.buffers)
 			{
@@ -1176,10 +1176,10 @@ namespace detail {
 			iovec v;
 			std::vector<iovec> vecs;
 			vecs.reserve(req.buffers.size());
-			DEBUG_PRINT("W %u %p (%c) @ %u, b=%u\n", (unsigned) id, h.get(), p->path().native().back(), (unsigned) req.where, (unsigned) req.buffers.size());
+			BOOST_DEBUG_PRINT("W %u %p (%c) @ %u, b=%u\n", (unsigned) id, h.get(), p->path().native().back(), (unsigned) req.where, (unsigned) req.buffers.size());
 #ifdef DEBUG_PRINTING
 			for(auto &b : req.buffers)
-				DEBUG_PRINT("  W %u: %p %u\n", (unsigned) id, boost::asio::buffer_cast<const void *>(b), (unsigned) boost::asio::buffer_size(b));
+				BOOST_DEBUG_PRINT("  W %u: %p %u\n", (unsigned) id, boost::asio::buffer_cast<const void *>(b), (unsigned) boost::asio::buffer_size(b));
 #endif
 			for(auto &b : req.buffers)
 			{
@@ -1203,7 +1203,7 @@ namespace detail {
 		completion_returntype dotruncate(size_t id, std::shared_ptr<detail::async_io_handle> h, off_t newsize)
 		{
 			async_io_handle_posix *p=static_cast<async_io_handle_posix *>(h.get());
-			DEBUG_PRINT("T %u %p (%c)\n", (unsigned) id, h.get(), p->path().native().back());
+			BOOST_DEBUG_PRINT("T %u %p (%c)\n", (unsigned) id, h.get(), p->path().native().back());
 			ERRHOSFN(BOOST_POSIX_FTRUNCATE(p->fd, newsize), p->path());
 			return std::make_pair(true, h);
 		}

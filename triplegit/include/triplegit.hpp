@@ -16,10 +16,10 @@ File Created: Mar 2013
 \brief Declares TripleGit's main functionality
 */
 
-#ifdef TRIPLEGIT_DLL_EXPORTS
-#define TRIPLEGIT_API DLLEXPORTMARKUP
+#ifdef BOOST_AFIO_DLL_EXPORTS
+#define BOOST_AFIO_API DLLEXPORTMARKUP
 #else
-#define TRIPLEGIT_API DLLIMPORTMARKUP
+#define BOOST_AFIO_API DLLIMPORTMARKUP
 #endif
 
 namespace boost { namespace property_tree { template<typename Key, typename Data, typename KeyCompare = std::less<Key>> class basic_ptree; typedef basic_ptree< std::string, std::string > ptree; } }
@@ -27,7 +27,7 @@ namespace boost { namespace property_tree { template<typename Key, typename Data
 namespace boost
 {
 
-namespace detail { void TRIPLEGIT_API prefetched_unique_id_source(void *ptr, size_t size); }
+namespace detail { void BOOST_AFIO_API prefetched_unique_id_source(void *ptr, size_t size); }
 
 /*! \class unique_id
 \brief A unique id
@@ -60,7 +60,7 @@ public:
 /*! \class base_store
 \brief Base class for a stored graph
 */
-class TRIPLEGIT_API base_store
+class BOOST_AFIO_API base_store
 {
 public:
 	//! Returns the configuration of this graph store
@@ -81,7 +81,7 @@ public:
 
 If the filing system is read-only the store is automatically marked as read-only.
 */
-class TRIPLEGIT_API fs_store : public base_store
+class BOOST_AFIO_API fs_store : public base_store
 {
 public: 
 	//! Constructs an instance using \em path
@@ -90,7 +90,7 @@ public:
 };
 
 namespace detail {
-	class TRIPLEGIT_API storable_vertices
+	class BOOST_AFIO_API storable_vertices
 	{
 		bool amLoaded, amDirty;
 		void *begin_batch_attachdetach();

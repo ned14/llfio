@@ -36,20 +36,20 @@ File Created: Mar 2013
 #endif
 #endif
 
-#ifndef TRIPLEGIT_ASYNC_FILE_IO_API
+#ifndef BOOST_ASYNC_FILE_IO_API
 #ifdef TRIPLEGIT_DLL_EXPORTS
-#define TRIPLEGIT_ASYNC_FILE_IO_API DLLEXPORTMARKUP
+#define BOOST_ASYNC_FILE_IO_API DLLEXPORTMARKUP
 #else
-#define TRIPLEGIT_ASYNC_FILE_IO_API DLLIMPORTMARKUP
+#define BOOST_ASYNC_FILE_IO_API DLLIMPORTMARKUP
 #endif
 #endif
 
 //! \def TRIPLEGIT_VALIDATE_INPUTS Validate inputs at the point of instantiation
-#ifndef TRIPLEGIT_VALIDATE_INPUTS
+#ifndef BOOST_AFIO_VALIDATE_INPUTS
 #ifndef NDEBUG
-#define TRIPLEGIT_VALIDATE_INPUTS 1
+#define BOOST_AFIO_VALIDATE_INPUTS 1
 #else
-#define TRIPLEGIT_VALIDATE_INPUTS 0
+#define BOOST_AFIO_VALIDATE_INPUTS 0
 #endif
 #endif
 
@@ -655,7 +655,7 @@ public:
 	}
 };
 //! Returns the process threadpool
-extern TRIPLEGIT_ASYNC_FILE_IO_API thread_pool &process_threadpool();
+extern BOOST_ASYNC_FILE_IO_API thread_pool &process_threadpool();
 
 namespace detail {
 	template<class returns_t, class future_type> inline returns_t when_all_do(std::shared_ptr<std::vector<future_type>> futures)
@@ -808,7 +808,7 @@ ASYNC_FILEIO_DECLARE_CLASS_ENUM_AS_BITFIELD(async_op_flags)
 /*! \class async_file_io_dispatcher_base
 \brief Abstract base class for dispatching file i/o asynchronously
 */
-class TRIPLEGIT_ASYNC_FILE_IO_API async_file_io_dispatcher_base : public std::enable_shared_from_this<async_file_io_dispatcher_base>
+class BOOST_ASYNC_FILE_IO_API async_file_io_dispatcher_base : public std::enable_shared_from_this<async_file_io_dispatcher_base>
 {
 	//friend TRIPLEGIT_ASYNC_FILE_IO_API std::shared_ptr<async_file_io_dispatcher_base> async_file_io_dispatcher(thread_pool &threadpool=process_threadpool(), file_flags flagsforce=file_flags::None, file_flags flagsmask=file_flags::None);
 	friend struct detail::async_io_handle_posix;
@@ -915,7 +915,7 @@ Note that the number of threads in the threadpool supplied is the maximum non-as
 For fast SSDs, there isn't much gain after eight-sixteen threads, so the process threadpool is set to eight by default.
 For slow hard drives, or worse, SANs, a queue depth of 64 or higher might deliver significant benefits.
 */
-extern TRIPLEGIT_ASYNC_FILE_IO_API std::shared_ptr<async_file_io_dispatcher_base> async_file_io_dispatcher(thread_pool &threadpool=process_threadpool(), file_flags flagsforce=file_flags::None, file_flags flagsmask=file_flags::None);
+extern BOOST_ASYNC_FILE_IO_API std::shared_ptr<async_file_io_dispatcher_base> async_file_io_dispatcher(thread_pool &threadpool=process_threadpool(), file_flags flagsforce=file_flags::None, file_flags flagsmask=file_flags::None);
 
 /*! \struct async_io_op
 \brief A reference to an async operation
@@ -945,7 +945,7 @@ struct async_io_op
 private:
 	void _validate() const
 	{
-#if TRIPLEGIT_VALIDATE_INPUTS
+#if BOOST_AFIO_VALIDATE_INPUTS
 		if(!validate())
 			throw std::runtime_error("Inputs are invalid.");
 #endif
@@ -1083,7 +1083,7 @@ struct async_path_op_req
 private:
 	void _validate() const
 	{
-#if TRIPLEGIT_VALIDATE_INPUTS
+#if BOOST_AFIO_VALIDATE_INPUTS
 		if(!validate())
 			throw std::runtime_error("Inputs are invalid.");
 #endif
@@ -1123,7 +1123,7 @@ template<> struct async_data_op_req<void> // For reading
 private:
 	void _validate() const
 	{
-#if TRIPLEGIT_VALIDATE_INPUTS
+#if BOOST_AFIO_VALIDATE_INPUTS
 		if(!validate())
 			throw std::runtime_error("Inputs are invalid.");
 #endif
@@ -1161,7 +1161,7 @@ template<> struct async_data_op_req<const void> // For writing
 private:
 	void _validate() const
 	{
-#if TRIPLEGIT_VALIDATE_INPUTS
+#if BOOST_AFIO_VALIDATE_INPUTS
 		if(!validate())
 			throw std::runtime_error("Inputs are invalid.");
 #endif
