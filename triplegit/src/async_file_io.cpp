@@ -12,8 +12,8 @@ File Created: Mar 2013
 
 // This always compiles in input validation for this file only (the header file
 // disables at the point of instance validation in release builds)
-#ifndef TRIPLEGIT_NEVER_VALIDATE_INPUTS
-#define TRIPLEGIT_VALIDATE_INPUTS 1
+#ifndef BOOST_AFIO_NEVER_VALIDATE_INPUTS
+#define BOOST_AFIO_VALIDATE_INPUTS 1
 #endif
 
 #include "../include/async_file_io.hpp"
@@ -718,7 +718,7 @@ template<> async_file_io_dispatcher_base::completion_returntype async_file_io_di
 
 std::vector<async_io_op> async_file_io_dispatcher_base::barrier(const std::vector<async_io_op> &ops)
 {
-#if TRIPLEGIT_VALIDATE_INPUTS
+#if BOOST_AFIO_VALIDATE_INPUTS
 		for(auto &i : ops)
 			if(!i.validate())
 				throw std::runtime_error("Inputs are invalid.");
@@ -912,7 +912,7 @@ namespace detail {
 
 		virtual std::vector<async_io_op> dir(const std::vector<async_path_op_req> &reqs)
 		{
-#if TRIPLEGIT_VALIDATE_INPUTS
+#if BOOST_AFIO_VALIDATE_INPUTS
 			for(auto &i : reqs)
 				if(!i.validate())
 					throw std::runtime_error("Inputs are invalid.");
@@ -921,7 +921,7 @@ namespace detail {
 		}
 		virtual std::vector<async_io_op> rmdir(const std::vector<async_path_op_req> &reqs)
 		{
-#if TRIPLEGIT_VALIDATE_INPUTS
+#if BOOST_AFIO_VALIDATE_INPUTS
 			for(auto &i : reqs)
 				if(!i.validate())
 					throw std::runtime_error("Inputs are invalid.");
@@ -930,7 +930,7 @@ namespace detail {
 		}
 		virtual std::vector<async_io_op> file(const std::vector<async_path_op_req> &reqs)
 		{
-#if TRIPLEGIT_VALIDATE_INPUTS
+#if BOOST_AFIO_VALIDATE_INPUTS
 			for(auto &i : reqs)
 				if(!i.validate())
 					throw std::runtime_error("Inputs are invalid.");
@@ -939,7 +939,7 @@ namespace detail {
 		}
 		virtual std::vector<async_io_op> rmfile(const std::vector<async_path_op_req> &reqs)
 		{
-#if TRIPLEGIT_VALIDATE_INPUTS
+#if BOOST_AFIO_VALIDATE_INPUTS
 			for(auto &i : reqs)
 				if(!i.validate())
 					throw std::runtime_error("Inputs are invalid.");
@@ -948,7 +948,7 @@ namespace detail {
 		}
 		virtual std::vector<async_io_op> sync(const std::vector<async_io_op> &ops)
 		{
-#if TRIPLEGIT_VALIDATE_INPUTS
+#if BOOST_AFIO_VALIDATE_INPUTS
 			for(auto &i : ops)
 				if(!i.validate())
 					throw std::runtime_error("Inputs are invalid.");
@@ -957,7 +957,7 @@ namespace detail {
 		}
 		virtual std::vector<async_io_op> close(const std::vector<async_io_op> &ops)
 		{
-#if TRIPLEGIT_VALIDATE_INPUTS
+#if BOOST_AFIO_VALIDATE_INPUTS
 			for(auto &i : ops)
 				if(!i.validate())
 					throw std::runtime_error("Inputs are invalid.");
@@ -966,7 +966,7 @@ namespace detail {
 		}
 		virtual std::vector<async_io_op> read(const std::vector<async_data_op_req<void>> &reqs)
 		{
-#if TRIPLEGIT_VALIDATE_INPUTS
+#if BOOST_AFIO_VALIDATE_INPUTS
 			for(auto &i : reqs)
 				if(!i.validate())
 					throw std::runtime_error("Inputs are invalid.");
@@ -975,7 +975,7 @@ namespace detail {
 		}
 		virtual std::vector<async_io_op> write(const std::vector<async_data_op_req<const void>> &reqs)
 		{
-#if TRIPLEGIT_VALIDATE_INPUTS
+#if BOOST_AFIO_VALIDATE_INPUTS
 			for(auto &i : reqs)
 				if(!i.validate())
 					throw std::runtime_error("Inputs are invalid.");
@@ -984,7 +984,7 @@ namespace detail {
 		}
 		virtual std::vector<async_io_op> truncate(const std::vector<async_io_op> &ops, const std::vector<off_t> &sizes)
 		{
-#if TRIPLEGIT_VALIDATE_INPUTS
+#if BOOST_AFIO_VALIDATE_INPUTS
 			for(auto &i : ops)
 				if(!i.validate())
 					throw std::runtime_error("Inputs are invalid.");
@@ -1217,7 +1217,7 @@ namespace detail {
 
 		virtual std::vector<async_io_op> dir(const std::vector<async_path_op_req> &reqs)
 		{
-#if TRIPLEGIT_VALIDATE_INPUTS
+#if BOOST_AFIO_VALIDATE_INPUTS
 			for(auto &i : reqs)
 				if(!i.validate())
 					throw std::runtime_error("Inputs are invalid.");
@@ -1226,7 +1226,7 @@ namespace detail {
 		}
 		virtual std::vector<async_io_op> rmdir(const std::vector<async_path_op_req> &reqs)
 		{
-#if TRIPLEGIT_VALIDATE_INPUTS
+#if BOOST_AFIO_VALIDATE_INPUTS
 			for(auto &i : reqs)
 				if(!i.validate())
 					throw std::runtime_error("Inputs are invalid.");
@@ -1235,7 +1235,7 @@ namespace detail {
 		}
 		virtual std::vector<async_io_op> file(const std::vector<async_path_op_req> &reqs)
 		{
-#if TRIPLEGIT_VALIDATE_INPUTS
+#if BOOST_AFIO_VALIDATE_INPUTS
 			for(auto &i : reqs)
 				if(!i.validate())
 					throw std::runtime_error("Inputs are invalid.");
@@ -1244,7 +1244,7 @@ namespace detail {
 		}
 		virtual std::vector<async_io_op> rmfile(const std::vector<async_path_op_req> &reqs)
 		{
-#if TRIPLEGIT_VALIDATE_INPUTS
+#if BOOST_AFIO_VALIDATE_INPUTS
 			for(auto &i : reqs)
 				if(!i.validate())
 					throw std::runtime_error("Inputs are invalid.");
@@ -1253,7 +1253,7 @@ namespace detail {
 		}
 		virtual std::vector<async_io_op> sync(const std::vector<async_io_op> &ops)
 		{
-#if TRIPLEGIT_VALIDATE_INPUTS
+#if BOOST_AFIO_VALIDATE_INPUTS
 			for(auto &i : ops)
 				if(!i.validate())
 					throw std::runtime_error("Inputs are invalid.");
@@ -1262,7 +1262,7 @@ namespace detail {
 		}
 		virtual std::vector<async_io_op> close(const std::vector<async_io_op> &ops)
 		{
-#if TRIPLEGIT_VALIDATE_INPUTS
+#if BOOST_AFIO_VALIDATE_INPUTS
 			for(auto &i : ops)
 				if(!i.validate())
 					throw std::runtime_error("Inputs are invalid.");
@@ -1271,7 +1271,7 @@ namespace detail {
 		}
 		virtual std::vector<async_io_op> read(const std::vector<async_data_op_req<void>> &reqs)
 		{
-#if TRIPLEGIT_VALIDATE_INPUTS
+#if BOOST_AFIO_VALIDATE_INPUTS
 			for(auto &i : reqs)
 				if(!i.validate())
 					throw std::runtime_error("Inputs are invalid.");
@@ -1280,7 +1280,7 @@ namespace detail {
 		}
 		virtual std::vector<async_io_op> write(const std::vector<async_data_op_req<const void>> &reqs)
 		{
-#if TRIPLEGIT_VALIDATE_INPUTS
+#if BOOST_AFIO_VALIDATE_INPUTS
 			for(auto &i : reqs)
 				if(!i.validate())
 					throw std::runtime_error("Inputs are invalid.");
@@ -1289,7 +1289,7 @@ namespace detail {
 		}
 		virtual std::vector<async_io_op> truncate(const std::vector<async_io_op> &ops, const std::vector<off_t> &sizes)
 		{
-#if TRIPLEGIT_VALIDATE_INPUTS
+#if BOOST_AFIO_VALIDATE_INPUTS
 			for(auto &i : ops)
 				if(!i.validate())
 					throw std::runtime_error("Inputs are invalid.");
