@@ -36,11 +36,13 @@ File Created: Mar 2013
 #endif
 #endif
 
-#ifndef BOOST_ASYNC_FILE_IO_API
+#ifndef BOOST_AFIO_API
 #ifdef BOOST_AFIO_DLL_EXPORTS
-#define BOOST_ASYNC_FILE_IO_API DLLEXPORTMARKUP
+#define BOOST_AFIO_API DLLEXPORTMARKUP
+//#define BOOST_AFIO_API BOOST_SYMBOL_EXPORT
 #else
-#define BOOST_ASYNC_FILE_IO_API DLLIMPORTMARKUP
+#define BOOST_AFIO_API DLLIMPORTMARKUP
+//#define BOOST_AFIO_API BOOST_SYMBOL_IMPORT
 #endif
 #endif
 
@@ -535,7 +537,7 @@ typedef std::thread thread;
 // This isn't consistent on MSVC so hard code it
 typedef unsigned long long off_t;
 
-#define BOOST_ASYNC_FILE_IO_FORWARD_STL_IMPL(M, B) \
+#define BOOST_AFIO_FORWARD_STL_IMPL(M, B) \
 template<class T> class M : public B<T> \
 { \
 public: \
@@ -549,7 +551,7 @@ public: \
 	M &operator=(const M &o) { static_cast<B<T> &&>(*this)=o; return *this; } \
 	M &operator=(M &&o) { static_cast<B<T> &&>(*this)=std::move(o); return *this; } \
 };
-#define BOOST_ASYNC_FILE_IO_FORWARD_STL_IMPL_NC(M, B) \
+#define BOOST_AFIO_FORWARD_STL_IMPL_NC(M, B) \
 template<class T> class M : public B<T> \
 { \
 public: \
@@ -565,20 +567,20 @@ public: \
 when_all() and when_any() definitions borrowed from http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2012/n3428.pdf
 */
 #if BOOST_THREAD_VERSION >=4
-BOOST_ASYNC_FILE_IO_FORWARD_STL_IMPL_NC(future, boost::future)
+BOOST_AFIO_FORWARD_STL_IMPL_NC(future, boost::future)
 #else
-BOOST_ASYNC_FILE_IO_FORWARD_STL_IMPL_NC(future, boost::unique_future)
+BOOST_AFIO_FORWARD_STL_IMPL_NC(future, boost::unique_future)
 #endif
 /*! \class shared_future
 \brief For now, this is boost's shared_future. Will be replaced when C++'s shared_future catches up with boost's
 
 when_all() and when_any() definitions borrowed from http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2012/n3428.pdf
 */
-BOOST_ASYNC_FILE_IO_FORWARD_STL_IMPL(shared_future, boost::shared_future)
+BOOST_AFIO_FORWARD_STL_IMPL(shared_future, boost::shared_future)
 /*! \class promise
 \brief For now, this is boost's promise. Will be replaced when C++'s promise catches up with boost's
 */
-BOOST_ASYNC_FILE_IO_FORWARD_STL_IMPL(promise, boost::promise)
+BOOST_AFIO_FORWARD_STL_IMPL(promise, boost::promise)
 /*! \brief For now, this is boost's exception_ptr. Will be replaced when C++'s exception_ptr catches up with boost's
 */
 typedef boost::exception_ptr exception_ptr;
@@ -655,7 +657,7 @@ public:
 	}
 };
 //! Returns the process threadpool
-extern BOOST_ASYNC_FILE_IO_API thread_pool &process_threadpool();
+extern BOOST_AFIO_API thread_pool &process_threadpool();
 
 namespace detail {
 	template<class returns_t, class future_type> inline returns_t when_all_do(std::shared_ptr<std::vector<future_type>> futures)
@@ -757,7 +759,7 @@ namespace detail {
 }
 
 
-#define BOOST_ASYNC_FILEIO_DECLARE_CLASS_ENUM_AS_BITFIELD(type) \
+#define BOOST_AFIO_DECLARE_CLASS_ENUM_AS_BITFIELD(type) \
 inline constexpr type operator&(type a, type b) \
 { \
 	return static_cast<type>(static_cast<size_t>(a) & static_cast<size_t>(b)); \
@@ -795,22 +797,22 @@ enum class file_flags : size_t
 	OSSync=(1<<17)		//!< Ask the OS to not complete until the data is on the physical storage. Best used only with Direct, otherwise use AutoFlush.
 
 };
-BOOST_ASYNC_FILEIO_DECLARE_CLASS_ENUM_AS_BITFIELD(file_flags)
+BOOST_AFIO_DECLARE_CLASS_ENUM_AS_BITFIELD(file_flags)
 enum class async_op_flags : size_t
 {
 	None=0,					//!< No flags set
 	DetachedFuture=1,		//!< The specified completion routine may choose to not complete immediately
 	ImmediateCompletion=2	//!< Call chained completion immediately instead of scheduling for later. Make SURE your completion can not block!
 };
-BOOST_ASYNC_FILEIO_DECLARE_CLASS_ENUM_AS_BITFIELD(async_op_flags)
+BOOST_AFIO_DECLARE_CLASS_ENUM_AS_BITFIELD(async_op_flags)
 
 
 /*! \class async_file_io_dispatcher_base
 \brief Abstract base class for dispatching file i/o asynchronously
 */
-class BOOST_ASYNC_FILE_IO_API async_file_io_dispatcher_base : public std::enable_shared_from_this<async_file_io_dispatcher_base>
+class BOOST_AFIO_API async_file_io_dispatcher_base : public std::enable_shared_from_this<async_file_io_dispatcher_base>
 {
-	//friend TRIPLEGIT_ASYNC_FILE_IO_API std::shared_ptr<async_file_io_dispatcher_base> async_file_io_dispatcher(thread_pool &threadpool=process_threadpool(), file_flags flagsforce=file_flags::None, file_flags flagsmask=file_flags::None);
+	//friend BOOST_AFIO_API std::shared_ptr<async_file_io_dispatcher_base> async_file_io_dispatcher(thread_pool &threadpool=process_threadpool(), file_flags flagsforce=file_flags::None, file_flags flagsmask=file_flags::None);
 	friend struct detail::async_io_handle_posix;
 	friend struct detail::async_io_handle_windows;
 	friend class detail::async_file_io_dispatcher_compat;
@@ -915,7 +917,7 @@ Note that the number of threads in the threadpool supplied is the maximum non-as
 For fast SSDs, there isn't much gain after eight-sixteen threads, so the process threadpool is set to eight by default.
 For slow hard drives, or worse, SANs, a queue depth of 64 or higher might deliver significant benefits.
 */
-extern BOOST_ASYNC_FILE_IO_API std::shared_ptr<async_file_io_dispatcher_base> async_file_io_dispatcher(thread_pool &threadpool=process_threadpool(), file_flags flagsforce=file_flags::None, file_flags flagsmask=file_flags::None);
+extern BOOST_AFIO_API std::shared_ptr<async_file_io_dispatcher_base> async_file_io_dispatcher(thread_pool &threadpool=process_threadpool(), file_flags flagsforce=file_flags::None, file_flags flagsmask=file_flags::None);
 
 /*! \struct async_io_op
 \brief A reference to an async operation

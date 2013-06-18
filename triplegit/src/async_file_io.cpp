@@ -33,7 +33,7 @@ File Created: Mar 2013
 #define BOOST_AFIO_POSIX_MKDIR(path, mode) _wmkdir(path)
 #define BOOST_AFIO_POSIX_RMDIR _wrmdir
 #define BOOST_AFIO_POSIX_STAT _wstat64
-#define BOOST_AFIO _stat64
+#define BOOST_AFIO_STAT _stat64
 #define BOOST_AFIO_S_ISREG(m) ((m) & _S_IFREG)
 #define BOOST_AFIO_S_ISDIR(m) ((m) & _S_IFDIR)
 #define BOOST_AFIO_POSIX_OPEN _wopen
