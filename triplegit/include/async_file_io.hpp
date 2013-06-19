@@ -24,6 +24,7 @@ File Created: Mar 2013
 #include "boost/asio.hpp"
 #include "boost/thread/thread.hpp"
 #include "boost/thread/future.hpp"
+#include<boost/config.hpp>
 
 #if BOOST_VERSION<105300
 #error I absolutely need Boost v1.53 or higher to compile (I need lock free containers).
@@ -38,11 +39,11 @@ File Created: Mar 2013
 
 #ifndef BOOST_AFIO_API
 #ifdef BOOST_AFIO_DLL_EXPORTS
-#define BOOST_AFIO_API DLLEXPORTMARKUP
-//#define BOOST_AFIO_API BOOST_SYMBOL_EXPORT
+//#define BOOST_AFIO_API DLLEXPORTMARKUP
+#define BOOST_AFIO_API BOOST_SYMBOL_EXPORT
 #else
-#define BOOST_AFIO_API DLLIMPORTMARKUP
-//#define BOOST_AFIO_API BOOST_SYMBOL_IMPORT
+//#define BOOST_AFIO_API DLLIMPORTMARKUP
+#define BOOST_AFIO_API BOOST_SYMBOL_IMPORT
 #endif
 #endif
 

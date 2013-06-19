@@ -11,15 +11,18 @@ File Created: Mar 2013
 #include "boost/graph/adjacency_list_io.hpp"
 #include "async_file_io.hpp"
 #include <unordered_set>
+#include <boost/config.hpp>
 
 /*! \file triplgit.hpp
 \brief Declares TripleGit's main functionality
 */
 
 #ifdef BOOST_AFIO_DLL_EXPORTS
-#define BOOST_AFIO_API DLLEXPORTMARKUP
+//#define BOOST_AFIO_API DLLEXPORTMARKUP
+#define BOOST_AFIO_API BOOST_SYMBOL_EXPORT
 #else
-#define BOOST_AFIO_API DLLIMPORTMARKUP
+//#define BOOST_AFIO_API DLLIMPORTMARKUP
+#define BOOST_AFIO_API BOOST_SYMBOL_IMPORT
 #endif
 
 namespace boost { namespace property_tree { template<typename Key, typename Data, typename KeyCompare = std::less<Key>> class basic_ptree; typedef basic_ptree< std::string, std::string > ptree; } }
