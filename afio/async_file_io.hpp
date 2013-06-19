@@ -30,7 +30,7 @@ File Created: Mar 2013
 #error I absolutely need Boost v1.53 or higher to compile (I need lock free containers).
 #endif
 #if BOOST_VERSION<105400
-#ifdef BOOST_MSCV
+#ifdef BOOST_MSVC
 #pragma message(__FILE__ ": WARNING: Boost v1.53 has a memory corruption bug in boost::packaged_task<> when built under C++11 which makes this library useless. Get a newer Boost!")
 #else
 #warning Boost v1.53 has a memory corruption bug in boost::packaged_task<> when built under C++11 which makes this library useless. Get a newer Boost!
@@ -56,7 +56,7 @@ File Created: Mar 2013
 #endif
 #endif
 
-#ifdef BOOST_MSCV
+#ifdef BOOST_MSVC
 #pragma warning(push)
 #pragma warning(disable: 4251) // type needs to have dll-interface to be used by clients of class
 #endif
@@ -1392,7 +1392,7 @@ inline async_io_op async_file_io_dispatcher_base::truncate(const async_io_op &op
 
 } } // namespace boost
 
-#ifdef BOOST_MSCV
+#ifdef BOOST_MSVC
 #pragma warning(pop)
 #endif
 
