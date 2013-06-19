@@ -89,8 +89,8 @@ else:
 
 outputs={}
 
-# Build the triplegit DLL
-outputs['mylibs']=SConscript("triplegit/SConscript")
+# Build the afio DLL
+outputs['mylibs']=SConscript("afio/SConscript")
 
 # Unit tests
 sources = env.SConscript(os.path.join("unittests", "SConscript"), 'importedenv')
@@ -100,6 +100,6 @@ testlibs=outputs['mylibs']['triplegitlib'][0] + outputs['mylibs']['NiallsCPP11Ut
 testprogram_cpp = env.Program("tests", source = objects, LINKFLAGS=env['LINKFLAGSEXE'], LIBS = testlibs + env['LIBS'])
 outputs['unittests']=(testprogram_cpp, sources)
 
-# Remove triplegit lib contents from mylibs
+# Remove afio lib contents from mylibs
 del outputs['mylibs']
 Return("outputs")

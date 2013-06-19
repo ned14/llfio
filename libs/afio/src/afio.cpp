@@ -3,8 +3,8 @@
 File Created: Mar 2013
 */
 
-#include "../include/triplegit.hpp"
-#include "../include/async_file_io.hpp"
+#include "../../../afio/afio.hpp"
+#include "../../../afio/async_file_io.hpp"
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable: 4996) // Function call with parameters that may be unsafe

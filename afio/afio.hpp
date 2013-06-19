@@ -6,7 +6,7 @@ File Created: Mar 2013
 #ifndef TRIPLEGIT_H
 #define TRIPLEGIT_H
 
-#include "../../NiallsCPP11Utilities/Int128_256.hpp"
+#include "../NiallsCPP11Utilities/Int128_256.hpp"
 #include "boost/graph/adjacency_list.hpp"
 #include "boost/graph/adjacency_list_io.hpp"
 #include "async_file_io.hpp"

@@ -246,7 +246,7 @@ else:
 
 # Set up the MSVC project files
 if 'win32'==sys.platform:
-    includes = [ "include/triplegit.hpp" ]
+    includes = [ "afio/triplegit.hpp" ]
     variants = []
     projs = {}
     for buildvariant, output in buildvariants.items():
@@ -263,7 +263,7 @@ if 'win32'==sys.platform:
         #print buildtargets
         #print [str(x[1][0][0]) for x in buildtargets]
         msvsprojs+=env.MSVSProject(program+env['MSVSPROJECTSUFFIX'], srcs=items.values()[0][1], incs=includes, misc="Readme.txt", buildtarget=[x[1][0][0] for x in buildtargets], runfile=[str(x[1][0][0]) for x in buildtargets], variant=[x[0] for x in buildtargets], auto_build_solution=0)
-    msvssolution = env.MSVSSolution("triplegit.sln", projects=msvsprojs, variant=variants)
+    msvssolution = env.MSVSSolution("afio.sln", projects=msvsprojs, variant=variants)
     Depends(msvssolution, msvsprojs)
     Alias("msvcproj", msvssolution)
 

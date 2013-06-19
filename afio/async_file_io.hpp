@@ -7,8 +7,8 @@ File Created: Mar 2013
 #ifndef TRIPLEGIT_ASYNC_FILE_IO_H
 #define TRIPLEGIT_ASYNC_FILE_IO_H
 
-#include "../../NiallsCPP11Utilities/NiallsCPP11Utilities.hpp"
-#include "../../NiallsCPP11Utilities/std_filesystem.hpp"
+#include "../NiallsCPP11Utilities/NiallsCPP11Utilities.hpp"
+#include "../NiallsCPP11Utilities/std_filesystem.hpp"
 #include <type_traits>
 #include <initializer_list>
 #include <thread>

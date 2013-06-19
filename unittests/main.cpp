@@ -15,8 +15,8 @@ Created: Feb 2013
 #include <sstream>
 #include <iostream>
 #include <algorithm>
-#include "../triplegit/include/triplegit.hpp"
-#include "../triplegit/include/async_file_io.hpp"
+#include "../afio/triplegit.hpp"
+#include "../afio/async_file_io.hpp"
 #include "boost/graph/topological_sort.hpp"
 #include "boost/graph/depth_first_search.hpp"
 #include "boost/graph/dijkstra_shortest_paths.hpp"
