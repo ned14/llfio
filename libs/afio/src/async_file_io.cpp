@@ -508,7 +508,7 @@ template<class F, class... Args> std::shared_ptr<detail::async_io_handle> async_
 		}
 		return ret.second;
 	}
-#ifdef _MSC_VER
+#ifdef BOOST_MSVC
 	catch(const std::exception &)
 	{
 		exception_ptr e(afio::make_exception_ptr(std::current_exception()));
@@ -692,7 +692,7 @@ template<> async_file_io_dispatcher_base::completion_returntype async_file_io_di
 			{
 				thisresult->get();
 			}
-#ifdef _MSC_VER
+#ifdef BOOST_MSVC
 			catch(const std::exception &)
 			{
 				exception_ptr e(afio::make_exception_ptr(std::current_exception()));

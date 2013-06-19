@@ -5,12 +5,12 @@ File Created: Mar 2013
 
 #include "../../../afio/afio.hpp"
 #include "../../../afio/async_file_io.hpp"
-#ifdef _MSC_VER
+#ifdef BOOST_MSVC
 #pragma warning(push)
 #pragma warning(disable: 4996) // Function call with parameters that may be unsafe
 #endif
 #include "boost/lockfree/spsc_queue.hpp"
-#ifdef _MSC_VER
+#ifdef BOOST_MSVC
 #pragma warning(pop)
 #endif
 #include <atomic>
