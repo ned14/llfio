@@ -47,7 +47,7 @@ File Created: Mar 2013
 #endif
 #endif
 
-//! \def TRIPLEGIT_VALIDATE_INPUTS Validate inputs at the point of instantiation
+//! \def BOOST_AFIO_VALIDATE_INPUTS Validate inputs at the point of instantiation
 #ifndef BOOST_AFIO_VALIDATE_INPUTS
 #ifndef NDEBUG
 #define BOOST_AFIO_VALIDATE_INPUTS 1
@@ -523,8 +523,10 @@ It took 13.0079 secs to do 76.8762 file writes per sec
 It took 0.057255 secs to do 17465.7 file closes per sec
 It took 0.017878 secs to do 55934.7 file deletions per sec
 
+// namespaces dont show up in documentation unless I also document the parent namespace
+// this is ok for now, but will need to be fixed when we improve the docs.
 */
-
+//! \brief The namespace used by the Boost Libraries
 namespace boost {
 //! \brief The namespace containing the Boost.ASIO asynchronous file i/o implementation.
 namespace afio {

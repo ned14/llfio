@@ -1,10 +1,10 @@
-/* TripleGit
+/* Boost AFIO
 (C) 2013 Niall Douglas http://www.nedprod.com/
 File Created: Mar 2013
 */
 
-#ifndef TRIPLEGIT_H
-#define TRIPLEGIT_H
+#ifndef BOOST_AFIO_H
+#define BOOST_AFIO_H
 
 #include "../NiallsCPP11Utilities/Int128_256.hpp"
 #include "boost/graph/adjacency_list.hpp"
@@ -13,8 +13,8 @@ File Created: Mar 2013
 #include <unordered_set>
 #include <boost/config.hpp>
 
-/*! \file triplgit.hpp
-\brief Declares TripleGit's main functionality
+/*! \file afio.hpp
+\brief Declares Boost AFIO's main functionality
 */
 
 #ifdef BOOST_AFIO_DLL_EXPORTS
