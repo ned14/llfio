@@ -26,8 +26,12 @@ Created: Feb 2013
 #ifndef WIN32
 #define CATCH_CONFIG_USE_ANSI_COLOUR_CODES
 #endif
-#define CATCH_CONFIG_RUNNER
-#include "catch.hpp"
+
+
+#define BOOST_TEST_MODULE tester
+#include <boost/test/included/unit_test.hpp>
+
+
 
 enum files_e { dax_h, yow_h, boz_h, zow_h, foo_cpp, 
                foo_o, bar_cpp, bar_o, libfoobar_a,
@@ -81,16 +85,6 @@ void raninit( ranctx *x, u4 seed ) {
     }
 }
 
-
-int main (int argc, char * const argv[]) {
-    int ret=Catch::Main( argc, argv );
-#if defined(WIN32) && !defined(NDEBUG)
-	printf("Press Return to exit ...\n");
-	getchar();
-#endif
-	return ret;
-}
-
 struct print_visitor : public boost::bfs_visitor<> {
   std::ostream &out;
   print_visitor(std::ostream &_out) : out(_out) { }
@@ -135,7 +129,7 @@ template<class adjacency_list> void TestGraph(adjacency_list &g)
   
     out << endl << endl;
 	cout << out.str();
-	CHECK(out.str()=="make ordering: zow.h boz.h zig.cpp zig.o dax.h yow.h zag.cpp zag.o bar.cpp bar.o foo.cpp foo.o libfoobar.a libzigzag.a killerapp \n\n");
+	BOOST_CHECK(out.str()=="make ordering: zow.h boz.h zig.cpp zig.o dax.h yow.h zag.cpp zag.o bar.cpp bar.o foo.cpp foo.o libfoobar.a libzigzag.a killerapp \n\n");
 	out.clear();
 	out.str("");
 
@@ -184,7 +178,7 @@ time_slot[libzigzag.a] = 5
 time_slot[killerapp] = 6
 
 )";
-	CHECK(out.str()==test1);
+	BOOST_CHECK(out.str()==test1);
 	out.clear();
 	out.str("");
 
@@ -197,7 +191,7 @@ time_slot[killerapp] = 6
   }
   out << endl;
 	cout << out.str();
-	CHECK(out.str()=="A change to yow.h will cause what to be re-made?\nyow.h bar.cpp zag.cpp bar.o zag.o libfoobar.a libzigzag.a killerapp \n\n");
+	BOOST_CHECK(out.str()=="A change to yow.h will cause what to be re-made?\nyow.h bar.cpp zag.cpp bar.o zag.o libfoobar.a libzigzag.a killerapp \n\n");
 	out.clear();
 	out.str("");
 }
@@ -219,7 +213,7 @@ template<class adjacency_list> void ModifyGraph(adjacency_list &g)
   }
   out << endl;
 	cout << out.str();
-	CHECK(out.str()=="The graph has a cycle? 0\n\n");
+	BOOST_CHECK(out.str()=="The graph has a cycle? 0\n\n");
 	out.clear();
 	out.str("");
 
@@ -238,13 +232,14 @@ template<class adjacency_list> void ModifyGraph(adjacency_list &g)
     out << "The graph has a cycle now? " << has_cycle << endl;
   }
 	cout << out.str();
-	CHECK(out.str()=="adding edge bar_cpp -> dax_h\n\nThe graph has a cycle now? 1\n");
+	BOOST_CHECK(out.str()=="adding edge bar_cpp -> dax_h\n\nThe graph has a cycle now? 1\n");
 	out.clear();
 	out.str("");
 }
 
-TEST_CASE("boost.graph/works", "Tests that one of the samples from Boost.Graph works as advertised")
+BOOST_AUTO_TEST_CASE(boost_graph_works)
 {
+    BOOST_TEST_MESSAGE("Tests that one of the samples from Boost.Graph works as advertised");
 	using namespace boost;
 	typedef adjacency_list<vecS, vecS, bidirectionalS> Graph;
 	Graph g(used_by, used_by + nedges, N);
@@ -262,8 +257,9 @@ static int task()
 	std::cout << "I am worker thread " << this_id << std::endl;
 	return 78;
 }
-TEST_CASE("async_io/thread_pool/works", "Tests that the async i/o thread pool implementation works")
+BOOST_AUTO_TEST_CASE(async_io_thread_pool_works)
 {
+    BOOST_TEST_MESSAGE("Tests that the async i/o thread pool implementation works");
 	using namespace boost::afio;
 #ifdef __GNUC__
 	boost::afio::thread::id this_id = boost::this_thread::get_id();
@@ -273,7 +269,7 @@ TEST_CASE("async_io/thread_pool/works", "Tests that the async i/o thread pool im
 	std::cout << "I am main thread " << this_id << std::endl;
 	thread_pool pool(4);
 	auto r=task();
-	CHECK(r==78);
+	BOOST_CHECK(r==78);
 	std::vector<future<int>> results(8);
 	for(auto &i : results)
 	{
@@ -283,12 +279,12 @@ TEST_CASE("async_io/thread_pool/works", "Tests that the async i/o thread pool im
 	results2.push_back(pool.enqueue(task));
 	results2.push_back(pool.enqueue(task));
 	std::pair<size_t, int> allresults2=when_any(results2.begin(), results2.end()).get();
-	CHECK(allresults2.first<2);
-	CHECK(allresults2.second==78);
+	BOOST_CHECK(allresults2.first<2);
+	BOOST_CHECK(allresults2.second==78);
 	std::vector<int> allresults=when_all(results.begin(), results.end()).get();
 	for(int i : allresults)
 	{
-		CHECK(i==78);
+		BOOST_CHECK(i==78);
 	}
 }
 
@@ -380,92 +376,104 @@ static void _1000_open_write_close_deletes(std::shared_ptr<boost::afio::async_fi
 
 	// Fetch any outstanding error
 	rmdir.h->get();
-	CHECK((callcount==1000U));
+	BOOST_CHECK((callcount==1000U));
 }
 
-TEST_CASE("async_io/works/1prime", "Tests that the async i/o implementation works (primes system)")
+BOOST_AUTO_TEST_CASE(async_io_works_1prime)
 {
+    BOOST_TEST_MESSAGE( "Tests that the async i/o implementation works (primes system)");
 	auto dispatcher=boost::afio::async_file_io_dispatcher(boost::afio::process_threadpool(), boost::afio::file_flags::None);
 	std::cout << "\n\n1000 file opens, writes 1 byte, closes, and deletes (primes system):\n";
 	_1000_open_write_close_deletes(dispatcher, 1);
 }
 
-TEST_CASE("async_io/works/1", "Tests that the async i/o implementation works")
+BOOST_AUTO_TEST_CASE(async_io_works_1) 
 {
+    BOOST_TEST_MESSAGE("Tests that the async i/o implementation works");
 	auto dispatcher=boost::afio::async_file_io_dispatcher(boost::afio::process_threadpool(), boost::afio::file_flags::None);
 	std::cout << "\n\n1000 file opens, writes 1 byte, closes, and deletes:\n";
 	_1000_open_write_close_deletes(dispatcher, 1);
 }
 
-TEST_CASE("async_io/works/64", "Tests that the async i/o implementation works")
+BOOST_AUTO_TEST_CASE(async_io_works_64)
 {
+    BOOST_TEST_MESSAGE( "Tests that the async i/o implementation works");
 	auto dispatcher=boost::afio::async_file_io_dispatcher(boost::afio::process_threadpool(), boost::afio::file_flags::None);
 	std::cout << "\n\n1000 file opens, writes 64Kb, closes, and deletes:\n";
 	_1000_open_write_close_deletes(dispatcher, 65536);
 }
 
-TEST_CASE("async_io/works/1/sync", "Tests that the synchronous async i/o implementation works")
+BOOST_AUTO_TEST_CASE(async_io_works_1_sync) 
 {
+    BOOST_TEST_MESSAGE("Tests that the synchronous async i/o implementation works");
 	auto dispatcher=boost::afio::async_file_io_dispatcher(boost::afio::process_threadpool(), boost::afio::file_flags::OSSync);
 	std::cout << "\n\n1000 file opens, writes 1 byte, closes, and deletes with synchronous i/o:\n";
 	_1000_open_write_close_deletes(dispatcher, 1);
 }
 
-TEST_CASE("async_io/works/64/sync", "Tests that the synchronous async i/o implementation works")
+BOOST_AUTO_TEST_CASE(async_io_works_64_sync)
 {
+    BOOST_TEST_MESSAGE("Tests that the synchronous async i/o implementation works");
 	auto dispatcher=boost::afio::async_file_io_dispatcher(boost::afio::process_threadpool(), boost::afio::file_flags::OSSync);
 	std::cout << "\n\n1000 file opens, writes 64Kb, closes, and deletes with synchronous i/o:\n";
 	_1000_open_write_close_deletes(dispatcher, 65536);
 }
 
-TEST_CASE("async_io/works/1/autoflush", "Tests that the autoflush async i/o implementation works")
+BOOST_AUTO_TEST_CASE(async_io_works_1_autoflush)
 {
+    BOOST_TEST_MESSAGE("Tests that the autoflush async i/o implementation works");
 	auto dispatcher=boost::afio::async_file_io_dispatcher(boost::afio::process_threadpool(), boost::afio::file_flags::AutoFlush);
 	std::cout << "\n\n1000 file opens, writes 1 byte, closes, and deletes with autoflush i/o:\n";
 	_1000_open_write_close_deletes(dispatcher, 1);
 }
 
-TEST_CASE("async_io/works/64/autoflush", "Tests that the autoflush async i/o implementation works")
+BOOST_AUTO_TEST_CASE(async_io_works_64_autoflush)
 {
+    BOOST_TEST_MESSAGE("Tests that the autoflush async i/o implementation works");
 	auto dispatcher=boost::afio::async_file_io_dispatcher(boost::afio::process_threadpool(), boost::afio::file_flags::AutoFlush);
 	std::cout << "\n\n1000 file opens, writes 64Kb, closes, and deletes with autoflush i/o:\n";
 	_1000_open_write_close_deletes(dispatcher, 65536);
 }
 
 #if 0
-TEST_CASE("async_io/works/1/direct", "Tests that the direct async i/o implementation works")
+BOOST_AUTO_TEST_CASE(async_io_works_1_direct)
 {
+    BOOST_TEST_MESSAGE( "Tests that the direct async i/o implementation works");
 	auto dispatcher=boost::afio::async_file_io_dispatcher(boost::afio::process_threadpool(), boost::afio::file_flags::OSDirect);
 	std::cout << "\n\n1000 file opens, writes 1 byte, closes, and deletes with direct i/o:\n";
 	_1000_open_write_close_deletes(dispatcher, 1);
 }
 #endif
 
-TEST_CASE("async_io/works/64/direct", "Tests that the direct async i/o implementation works")
+BOOST_AUTO_TEST_CASE(async_io_works_64_direct)
 {
+    BOOST_TEST_MESSAGE( "Tests that the direct async i/o implementation works");
 	auto dispatcher=boost::afio::async_file_io_dispatcher(boost::afio::process_threadpool(), boost::afio::file_flags::OSDirect);
 	std::cout << "\n\n1000 file opens, writes 64Kb, closes, and deletes with direct i/o:\n";
 	_1000_open_write_close_deletes(dispatcher, 65536);
 }
 
 #if 0
-TEST_CASE("async_io/works/1/directsync", "Tests that the direct synchronous async i/o implementation works")
+BOOST_AUTO_TEST_CASE(async_io_works_1_directsync)
 {
+    BOOST_TEST_MESSAGE( "Tests that the direct synchronous async i/o implementation works");
 	auto dispatcher=boost::afio::async_file_io_dispatcher(boost::afio::process_threadpool(), boost::afio::file_flags::OSDirect|boost::afio::file_flags::OSSync);
 	std::cout << "\n\n1000 file opens, writes 1 byte, closes, and deletes with direct synchronous i/o:\n";
 	_1000_open_write_close_deletes(dispatcher, 1);
 }
 #endif
 
-TEST_CASE("async_io/works/64/directsync", "Tests that the direct synchronous async i/o implementation works")
+BOOST_AUTO_TEST_CASE(async_io_works_64_directsync) 
 {
+    BOOST_TEST_MESSAGE("Tests that the direct synchronous async i/o implementation works");
 	auto dispatcher=boost::afio::async_file_io_dispatcher(boost::afio::process_threadpool(), boost::afio::file_flags::OSDirect|boost::afio::file_flags::OSSync);
 	std::cout << "\n\n1000 file opens, writes 64Kb, closes, and deletes with direct synchronous i/o:\n";
 	_1000_open_write_close_deletes(dispatcher, 65536);
 }
 
-TEST_CASE("async_io/barrier", "Tests that the async i/o barrier works correctly under load")
+BOOST_AUTO_TEST_CASE(async_io_barrier)
 {
+    BOOST_TEST_MESSAGE( "Tests that the async i/o barrier works correctly under load");
 	using namespace boost::afio;
 	using namespace std;
 	using boost::afio::future;
@@ -502,7 +510,7 @@ TEST_CASE("async_io/barrier", "Tests that the async i/o barrier works correctly 
 	{
 		if(*count!=shouldbe)
 		{
-			CHECK((*count==shouldbe));
+			BOOST_CHECK((*count==shouldbe));
 			throw runtime_error("Count was not what it should have been!");
 		}
 		return true;
@@ -535,11 +543,11 @@ TEST_CASE("async_io/barrier", "Tests that the async i/o barrier works correctly 
 	}
 	auto dispatched=chrono::high_resolution_clock::now();
 	cout << "There are now " << dec << dispatcher->count() << " handles open with a queue depth of " << dispatcher->wait_queue_depth() << endl;
-	CHECK_NOTHROW(when_all(next).wait());
+	BOOST_CHECK_NO_THROW(when_all(next).wait());
 	// Retrieve any errors
 	for(auto &i : verifies)
 	{
-		CHECK_NOTHROW(i.get());
+		BOOST_CHECK_NO_THROW(i.get());
 	}
 	auto end=std::chrono::high_resolution_clock::now();
 	auto diff=chrono::duration_cast<secs_type>(end-begin);
@@ -552,8 +560,9 @@ TEST_CASE("async_io/barrier", "Tests that the async i/o barrier works correctly 
 	cout << "That's a throughput of " << opscount/diff.count() << " ops/sec" << endl;
 }
 
-TEST_CASE("async_io/errors", "Tests that the async i/o error handling works")
+BOOST_AUTO_TEST_CASE(async_io_errors)
 {
+    BOOST_MESSAGE( "Tests that the async i/o error handling works");
 	using namespace boost::afio;
 	using namespace std;
 	using boost::afio::future;
@@ -568,7 +577,7 @@ TEST_CASE("async_io/errors", "Tests that the async i/o error handling works")
 		{
 			auto manyfilecreates=dispatcher->file(filereqs); // One of these will error
 			auto sync1=dispatcher->barrier(manyfilecreates); // If barrier() doesn't throw due to errored input, barrier() will replicate errors for you
-			CHECK_NOTHROW(when_all(std::nothrow_t(), sync1.begin(), sync1.end()).wait()); // nothrow variant must never throw
+			BOOST_CHECK_NO_THROW(when_all(std::nothrow_t(), sync1.begin(), sync1.end()).wait()); // nothrow variant must never throw
 			hasErrorDirectly=0;
 			for(auto &i : manyfilecreates)
 			{
@@ -583,7 +592,7 @@ TEST_CASE("async_io/errors", "Tests that the async i/o error handling works")
 					hasErrorDirectly++;
 				}
 			}
-			CHECK(hasErrorDirectly==1);
+			BOOST_CHECK(hasErrorDirectly==1);
 			hasErrorFromBarrier=0;
 			for(auto &i : sync1)
 			{
@@ -596,13 +605,13 @@ TEST_CASE("async_io/errors", "Tests that the async i/o error handling works")
 					hasErrorFromBarrier++;
 				}
 			}
-			CHECK(hasErrorFromBarrier==1);
-			CHECK_THROWS(when_all(sync1.begin(), sync1.end()).wait()); // throw variant must always throw
+			BOOST_CHECK(hasErrorFromBarrier==1);
+			BOOST_CHECK_THROW(when_all(sync1.begin(), sync1.end()).wait(), std::exception); // throw variant must always throw
 		}
 
 		auto manyfiledeletes=dispatcher->rmfile(filereqs); // One of these will also error. Same as above.
 		auto sync2=dispatcher->barrier(manyfiledeletes);
-		CHECK_NOTHROW(when_all(std::nothrow_t(), sync2.begin(), sync2.end()).wait());
+		BOOST_CHECK_NO_THROW(when_all(std::nothrow_t(), sync2.begin(), sync2.end()).wait());
 		hasErrorDirectly=0;
 		for(auto &i : manyfiledeletes)
 		{
@@ -615,7 +624,7 @@ TEST_CASE("async_io/errors", "Tests that the async i/o error handling works")
 				hasErrorDirectly++;
 			}
 		}
-		CHECK(hasErrorDirectly==1);
+		BOOST_CHECK(hasErrorDirectly==1);
 		hasErrorFromBarrier=0;
 		for(auto &i : sync2)
 		{
@@ -628,9 +637,9 @@ TEST_CASE("async_io/errors", "Tests that the async i/o error handling works")
 				hasErrorFromBarrier++;
 			}
 		}
-		CHECK(hasErrorFromBarrier==1);
+		BOOST_CHECK(hasErrorFromBarrier==1);
 
-		CHECK_THROWS(when_all(sync2.begin(), sync2.end()).wait());
+		BOOST_CHECK_THROW(when_all(sync2.begin(), sync2.end()).wait(), std::exception);
 		auto rmdir=dispatcher->rmdir(async_path_op_req("testdir"));
 	}
 }
@@ -888,7 +897,7 @@ static void evil_random_io(std::shared_ptr<boost::afio::async_file_io_dispatcher
 	diff=chrono::duration_cast<secs_type>(closedsync-writtensync);
 	cout << "It took " << diff.count() << " secs to do " << manyfilereqs.size()/diff.count() << " file closes per sec" << endl;
 
-	CHECK(failures.empty());
+	BOOST_CHECK(failures.empty());
 	if(!failures.empty())
 	{
 		pair<Op *, size_t> *failedop;
@@ -902,7 +911,7 @@ static void evil_random_io(std::shared_ptr<boost::afio::async_file_io_dispatcher
 			cout << "   " << (failedop->first->write ? "Write to" : "Read from") << " " << to_string(failedop->first->req.where) << " at offset " << failedop->second << " into bytes " << bytes << endl;
 		}
 	}
-	INFO("Checking if the final files have exactly the right contents ... this may take a bit ...");
+	BOOST_TEST_MESSAGE("Checking if the final files have exactly the right contents ... this may take a bit ...");
 	{
 		vector<Hash256> filehashes(no);
 		Hash256::BatchAddSHA256To(no, &filehashes.front(), (const char **) &towriteptrs.front(), &towritesizes.front());
@@ -910,7 +919,7 @@ static void evil_random_io(std::shared_ptr<boost::afio::async_file_io_dispatcher
 			if(memhashes[n]!=filehashes[n])
 			{
 				string failmsg("File "+to_string(n)+" contents were not what they were supposed to be!");
-				FAIL(failmsg.c_str());
+				BOOST_TEST_MESSAGE(failmsg.c_str());
 			}
 	}
 #ifdef DEBUG_TORTURE_TEST
@@ -935,8 +944,9 @@ static void evil_random_io(std::shared_ptr<boost::afio::async_file_io_dispatcher
 	rmdir.h->get();
 }
 
-TEST_CASE("async_io/torture", "Tortures the async i/o implementation")
+BOOST_AUTO_TEST_CASE(async_io_torture)
 {
+     BOOST_TEST_MESSAGE("Tortures the async i/o implementation");
 	auto dispatcher=boost::afio::async_file_io_dispatcher(boost::afio::process_threadpool(), boost::afio::file_flags::None);
 	std::cout << "\n\nSustained random i/o to 10 files of 10Mb:\n";
 #ifdef BOOST_ASIO_BUG_WORKAROUND
@@ -946,36 +956,41 @@ TEST_CASE("async_io/torture", "Tortures the async i/o implementation")
 #endif
 }
 
-TEST_CASE("async_io/torture/sync", "Tortures the synchronous async i/o implementation")
+BOOST_AUTO_TEST_CASE(async_io_torture_sync)
 {
+    BOOST_TEST_MESSAGE( "Tortures the synchronous async i/o implementation");
 	auto dispatcher=boost::afio::async_file_io_dispatcher(boost::afio::process_threadpool(), boost::afio::file_flags::OSSync);
 	std::cout << "\n\nSustained random synchronous i/o to 10 files of 1Mb:\n";
 	evil_random_io(dispatcher, 10, 1*1024*1024);
 }
 
-TEST_CASE("async_io/torture/autoflush", "Tortures the autoflush async i/o implementation")
+BOOST_AUTO_TEST_CASE(async_io_torture_autoflush)
 {
+    BOOST_TEST_MESSAGE( "Tortures the autoflush async i/o implementation");
 	auto dispatcher=boost::afio::async_file_io_dispatcher(boost::afio::process_threadpool(), boost::afio::file_flags::AutoFlush);
 	std::cout << "\n\nSustained random autoflush i/o to 10 files of 1Mb:\n";
 	evil_random_io(dispatcher, 10, 1*1024*1024);
 }
 
-TEST_CASE("async_io/torture/direct", "Tortures the direct async i/o implementation")
+BOOST_AUTO_TEST_CASE(async_io_torture_direct)
 {
+     BOOST_TEST_MESSAGE("Tortures the direct async i/o implementation");
 	auto dispatcher=boost::afio::async_file_io_dispatcher(boost::afio::process_threadpool(), boost::afio::file_flags::OSDirect);
 	std::cout << "\n\nSustained random direct i/o to 10 files of 10Mb:\n";
 	evil_random_io(dispatcher, 10, 10*1024*1024, 4096);
 }
 
-TEST_CASE("async_io/torture/directsync", "Tortures the direct synchronous async i/o implementation")
+BOOST_AUTO_TEST_CASE(async_io_torture_directsync)
 {
+    BOOST_TEST_MESSAGE("Tortures the direct synchronous async i/o implementation");
 	auto dispatcher=boost::afio::async_file_io_dispatcher(boost::afio::process_threadpool(), boost::afio::file_flags::OSDirect|boost::afio::file_flags::OSSync);
 	std::cout << "\n\nSustained random direct synchronous i/o to 10 files of 1Mb:\n";
 	evil_random_io(dispatcher, 10, 1*1024*1024, 4096);
 }
 
-TEST_CASE("async_io/sync", "Tests async fsync")
+BOOST_AUTO_TEST_CASE(async_io_sync)
 {
+    BOOST_TEST_MESSAGE( "Tests async fsync");
 	using namespace boost::afio;
 	using namespace std;
 	vector<char> buffer(64, 'n');
@@ -989,12 +1004,13 @@ TEST_CASE("async_io/sync", "Tests async fsync")
 	auto closefile(dispatcher->close(writefile2));
 	auto delfile(dispatcher->rmfile(async_path_op_req(closefile, "testdir/foo")));
 	auto deldir(dispatcher->rmdir(async_path_op_req(delfile, "testdir")));
-	CHECK_NOTHROW(when_all(deldir).wait());
+	BOOST_CHECK_NO_THROW(when_all(deldir).wait());
 }
 
 #if 0
-TEST_CASE("triplegit/works", "Tests that one of the samples from Boost.Graph works as advertised with triplegit")
+BOOST_AUTO_TEST_CASE(afio_works)
 {
+    BOOST_TEST_MESSAGE( "Tests that one of the samples from Boost.Graph works as advertised with afio");
 	typedef boost::boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS> Graph;
 	Graph g(used_by, used_by + nedges, N);
 	g.attach(store, testgraph);
@@ -1008,6 +1024,6 @@ TEST_CASE("triplegit/works", "Tests that one of the samples from Boost.Graph wor
 	g.begincommit().wait();
 
 	Graph g3(store, testgraph);
-	CHECK(boost::isomorphism(g, g3));
+	BOOST_CHECK(boost::isomorphism(g, g3));
 }
 #endif
