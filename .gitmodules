@@ -1,5 +1,5 @@
-[submodule "unittests/CATCH"]
-	path = unittests/CATCH
+[submodule "libs/afio/test/CATCH"]
+	path = libs/afio/test/CATCH
 	url = https://github.com/philsquared/Catch.git
 [submodule "boost"]
 	path = boost
