@@ -93,7 +93,7 @@ outputs={}
 outputs['mylibs']=SConscript("afio/SConscript")
 
 # Unit tests
-sources = env.SConscript(os.path.join("unittests", "SConscript"), 'importedenv')
+sources = env.SConscript(os.path.join("libs", "afio", "test", "SConscript"), 'importedenv')
 objects = env.Object(source = sources, CCFLAGS=env['CCFLAGSEXE']) # + [myliblib]
 testlibs=outputs['mylibs']['triplegitlib'][0] + outputs['mylibs']['NiallsCPP11Utilitieslib']
 
