@@ -242,7 +242,7 @@ template<class adjacency_list> void ModifyGraph(adjacency_list &g)
 	out.clear();
 	out.str("");
 }
-BOOST_AUTO_TEST_SUITE(all)
+//BOOST_AUTO_TEST_SUITE(all)
     BOOST_AUTO_TEST_SUITE(exclude_async_io_errors)
         BOOST_AUTO_TEST_CASE(boost_graph_works)
         {
@@ -1038,5 +1038,5 @@ BOOST_AUTO_TEST_SUITE(all)
         }
         #endif
     BOOST_AUTO_TEST_SUITE_END() //end exclude_async_io_erros
-BOOST_AUTO_TEST_SUITE_END() // end all        
+//BOOST_AUTO_TEST_SUITE_END() // end all        
 
