@@ -31,6 +31,14 @@ Created: Feb 2013
 #define BOOST_TEST_MODULE tester
 #include <boost/test/included/unit_test.hpp>
 
+#define BOOST_AFIO_CHECK_THROWS(expr)\
+{\
+        try{\
+                expr;\
+                BOOST_FAIL("Exception was not thrown");\
+            }\
+        catch(...){BOOST_CHECK(true);}\
+}
 
 
 enum files_e { dax_h, yow_h, boz_h, zow_h, foo_cpp, 
@@ -606,7 +614,7 @@ BOOST_AUTO_TEST_CASE(async_io_errors)
 				}
 			}
 			BOOST_CHECK(hasErrorFromBarrier==1);
-			BOOST_CHECK_THROW(when_all(sync1.begin(), sync1.end()).wait(), std::exception); // throw variant must always throw
+			BOOST_AFIO_CHECK_THROWS(when_all(sync1.begin(), sync1.end()).wait()); // throw variant must always throw
 		}
 
 		auto manyfiledeletes=dispatcher->rmfile(filereqs); // One of these will also error. Same as above.
@@ -639,7 +647,7 @@ BOOST_AUTO_TEST_CASE(async_io_errors)
 		}
 		BOOST_CHECK(hasErrorFromBarrier==1);
 
-		BOOST_CHECK_THROW(when_all(sync2.begin(), sync2.end()).wait(), std::exception);
+		BOOST_AFIO_CHECK_THROWS(when_all(sync2.begin(), sync2.end()).wait());
 		auto rmdir=dispatcher->rmdir(async_path_op_req("testdir"));
 	}
 }
