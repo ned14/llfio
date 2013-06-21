@@ -3,7 +3,7 @@
    drd:CondRaceErr
    fun:pthread_cond_signal@*
    ...
-   fun:_ZN5boost4asio6detail15task_io_service4postISt5_BindIFZN9triplegit8async_io11thread_pool7enqueueIS4_IFSt8functionIFSt10shared_ptrINS6_6detail15async_io_handleEESD_EESD_EEEENS6_6futureINSt9result_ofIFT_vEE4typeEEESK_EUlSA_INS6_13packaged_taskIFSD_vEEEEE_SS_EEEEvSK_
+   fun:_ZN5boost4asio6detail15task_io_service4postISt5_BindIFZN9afio8async_io11thread_pool7enqueueIS4_IFSt8functionIFSt10shared_ptrINS6_6detail15async_io_handleEESD_EESD_EEEENS6_6futureINSt9result_ofIFT_vEE4typeEEESK_EUlSA_INS6_13packaged_taskIFSD_vEEEEE_SS_EEEEvSK_
    ...
 }
 {
@@ -19,7 +19,7 @@
    drd:CondRaceErr
    fun:pthread_cond_signal@*
    ...
-   fun:_ZN5boost4asio10io_service4postISt5_BindIFZN9triplegit8async_io11thread_pool7enqueueIPFivEEENS5_6futureINSt9result_ofIFT_vEE4typeEEESC_EUlSt10shared_ptrINS5_13packaged_taskIS8_EEEE_SK_EEEEvOSC_
+   fun:_ZN5boost4asio10io_service4postISt5_BindIFZN9afio8async_io11thread_pool7enqueueIPFivEEENS5_6futureINSt9result_ofIFT_vEE4typeEEESC_EUlSt10shared_ptrINS5_13packaged_taskIS8_EEEE_SK_EEEEvOSC_
    ...
 }
 {
@@ -27,7 +27,7 @@
    drd:CondRaceErr
    fun:pthread_cond_signal@*
    ...
-   fun:_ZN5boost4asio6detail15task_io_service4postISt5_BindIFZN9triplegit8async_io11thread_pool7enqueueIPFivEEENS6_6futureINSt9result_ofIFT_vEE4typeEEESD_EUlSt10shared_ptrINS6_13packaged_taskIS9_EEEE_SL_EEEEvSD_
+   fun:_ZN5boost4asio6detail15task_io_service4postISt5_BindIFZN9afio8async_io11thread_pool7enqueueIPFivEEENS6_6futureINSt9result_ofIFT_vEE4typeEEESD_EUlSt10shared_ptrINS6_13packaged_taskIS9_EEEE_SL_EEEEvSD_
    ...
 }
 {
@@ -42,8 +42,8 @@
    boostthread1
    drd:ConflictingAccess
    ...
-   fun:_ZN5boost7promiseISt6vectorISt10shared_ptrIN9triplegit8async_io6detail15async_io_handleEESaIS7_EEE9lazy_initEv
-   fun:_ZN9triplegit8async_io6detail24when_all_count_completedEmSt10shared_ptrINS1_15async_io_handleEES2_INS1_30when_all_count_completed_stateEEm
+   fun:_ZN5boost7promiseISt6vectorISt10shared_ptrIN9afio8async_io6detail15async_io_handleEESaIS7_EEE9lazy_initEv
+   fun:_ZN9afio8async_io6detail24when_all_count_completedEmSt10shared_ptrINS1_15async_io_handleEES2_INS1_30when_all_count_completed_stateEEm
    ...
 }
 {
@@ -58,7 +58,7 @@
    boostthread3
    drd:ConflictingAccess
    ...
-   fun:_ZN5boost6detail17sp_counted_impl_pINS0_11task_objectISt8functionIFSt10shared_ptrIN9triplegit8async_io6detail15async_io_handleEEvEES9_EEED0Ev
+   fun:_ZN5boost6detail17sp_counted_impl_pINS0_11task_objectISt8functionIFSt10shared_ptrIN9afio8async_io6detail15async_io_handleEEvEES9_EEED0Ev
    fun:_ZNSt14__shared_countILN9__gnu_cxx12_Lock_policyE2EED1Ev
    ...
 }
@@ -66,8 +66,8 @@
    boostthread4
    drd:ConflictingAccess
    ...
-   fun:_ZN9triplegit8async_io6detail24when_all_count_completedEmSt10shared_ptrINS1_15async_io_handleEES2_INS1_30when_all_count_completed_stateEEm
-   fun:_ZNSt17_Function_handlerIFSt4pairIbSt10shared_ptrIN9triplegit8async_io6detail15async_io_handleEEEmS6_ESt5_BindIFPFS7_mS6_S1_INS4_30when_all_count_completed_stateEEmESt12_PlaceholderILi1EESE_ILi2EESB_mEEE9_M_invokeERKSt9_Any_datamS6_
+   fun:_ZN9afio8async_io6detail24when_all_count_completedEmSt10shared_ptrINS1_15async_io_handleEES2_INS1_30when_all_count_completed_stateEEm
+   fun:_ZNSt17_Function_handlerIFSt4pairIbSt10shared_ptrIN9afio8async_io6detail15async_io_handleEEEmS6_ESt5_BindIFPFS7_mS6_S1_INS4_30when_all_count_completed_stateEEmESt12_PlaceholderILi1EESE_ILi2EESB_mEEE9_M_invokeERKSt9_Any_datamS6_
    ...
 }
 {
@@ -75,14 +75,14 @@
    drd:ConflictingAccess
    ...
    fun:_ZN5boost13packaged_taskIiEclEv
-   fun:_ZZN9triplegit8async_io11thread_pool7enqueueIPFivEEENS0_6futureINSt9result_ofIFT_vEE4typeEEES7_ENKUlSt10shared_ptrINS0_13packaged_taskIS3_EEEE_clESF_
+   fun:_ZZN9afio8async_io11thread_pool7enqueueIPFivEEENS0_6futureINSt9result_ofIFT_vEE4typeEEES7_ENKUlSt10shared_ptrINS0_13packaged_taskIS3_EEEE_clESF_
    ...
 }
 {
    boostthread6
    drd:ConflictingAccess
    ...
-   fun:_ZN5boost7promiseISt6vectorISt10shared_ptrIN9triplegit8async_io6detail15async_io_handleEESaIS7_EEE9set_valueERKS9_
-   fun:_ZN9triplegit8async_io6detail24when_all_count_completedEmSt10shared_ptrINS1_15async_io_handleEES2_INS1_30when_all_count_completed_stateEEm
+   fun:_ZN5boost7promiseISt6vectorISt10shared_ptrIN9afio8async_io6detail15async_io_handleEESaIS7_EEE9set_valueERKS9_
+   fun:_ZN9afio8async_io6detail24when_all_count_completedEmSt10shared_ptrINS1_15async_io_handleEES2_INS1_30when_all_count_completed_stateEEm
    ...
 }
