@@ -246,7 +246,7 @@ else:
 
 # Set up the MSVC project files
 if 'win32'==sys.platform:
-    includes = [ "afio/triplegit.hpp" ]
+    includes = [ "afio/afio.hpp" ]
     variants = []
     projs = {}
     for buildvariant, output in buildvariants.items():

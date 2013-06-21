@@ -104,6 +104,6 @@ else:
     myliblib = mylib
     if sys.platform=='win32':
         myliblib=mylib[1]
-outputs['triplegitlib']=(myliblib, mylib, sources)
+outputs['afiolib']=(myliblib, mylib, sources)
 
 Return("outputs")
