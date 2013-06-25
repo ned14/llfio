@@ -32,8 +32,8 @@ File Created: Mar 2013
 #include <direct.h>
 #define BOOST_AFIO_POSIX_MKDIR(path, mode) _wmkdir(path)
 #define BOOST_AFIO_POSIX_RMDIR _wrmdir
-#define BOOST_AFIO_POSIX_STAT _wstat64      //Part of the windows work around
-#define BOOST_AFIO_STAT _stat64           // BOOST_POSIX_STAT caused an error under windows because it is defined twice, need to fix this for all systems
+#define BOOST_AFIO_POSIX_STAT _wstat64
+#define BOOST_AFIO_POSIX_STAT_STRUCT struct _stat64
 #define BOOST_AFIO_POSIX_S_ISREG(m) ((m) & _S_IFREG)
 #define BOOST_AFIO_POSIX_S_ISDIR(m) ((m) & _S_IFDIR)
 #define BOOST_AFIO_POSIX_OPEN _wopen
@@ -46,8 +46,8 @@ File Created: Mar 2013
 #include <limits.h>
 #define BOOST_AFIO_POSIX_MKDIR mkdir
 #define BOOST_AFIO_POSIX_RMDIR ::rmdir
-#define BOOST_AFIO_STAT stat                // work around for windows compatability
-#define BOOST_AFIO_POSIX_STAT stat          // Original
+#define BOOST_AFIO_POSIX_STAT_STRUCT struct stat 
+#define BOOST_AFIO_POSIX_STAT stat
 #define BOOST_AFIO_POSIX_OPEN open
 #define BOOST_AFIO_POSIX_CLOSE ::close
 #define BOOST_AFIO_POSIX_UNLINK unlink
@@ -1040,7 +1040,7 @@ namespace detail {
 				req.flags=req.flags&~(file_flags::Create|file_flags::CreateOnlyIfNotExist);
 			}
 
-			struct BOOST_AFIO_STAT s={0};
+			BOOST_AFIO_POSIX_STAT_STRUCT s={0};
 			ret=BOOST_AFIO_POSIX_STAT(req.path.c_str(), &s);
 			if(0==ret && !BOOST_AFIO_POSIX_S_ISDIR(s.st_mode))
 				throw std::runtime_error("Not a directory");
