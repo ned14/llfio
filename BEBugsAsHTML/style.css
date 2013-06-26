@@ -1,0 +1,198 @@
+body {
+  font-family: "lucida grande", "sans serif";
+  font-size: 14px;
+  color: #333;
+  width: auto;
+  margin: auto;
+}
+
+div.main {
+  padding: 20px;
+  margin: auto;
+  padding-top: 0;
+  margin-top: 1em;
+  background-color: #fcfcfc;
+  -moz-border-radius: 10px;
+  
+}
+
+div.footer {
+  font-size: small;
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  margin: auto;
+  background: #305275;
+  color: #fffee7;
+  -moz-border-radius: 10px;
+}
+
+div.header {
+    font-size: xx-large;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 10px;
+    font-weight:bold;
+    padding-bottom: 10px;
+    background: #305275;
+    color: #fffee7;
+    -moz-border-radius: 10px;
+}
+
+th.target_name {
+    text-align:left;
+    border: 1px solid;
+    border-color: #305275;
+    background-color: #305275;
+    color: #fff;
+    width: auto%;
+    -moz-border-radius-topleft: 8px;
+    -moz-border-radius-topright: 8px;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+table {
+  border-style: solid;
+  border: 1px #c3d9ff;
+  border-spacing: 0px 0px;
+  width: auto;
+  padding: 0px;
+  
+  }
+
+tb { border: 1px; }
+
+tr {
+  vertical-align: top;
+  border: 1px #c3d9ff;
+  border-style: dotted;
+  width: auto;
+  padding: 0px;
+}
+
+th {
+    border-width: 1px;
+    border-style: solid;
+    border-color: #c3d9ff;
+    border-collapse: collapse;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+
+td {
+    border-width: 1px;
+    border-color: #c3d9ff;
+    border-collapse: collapse;
+    padding-left: 5px;
+    padding-right: 5px;
+    width: auto%;
+}
+
+img { border-style: none; }
+
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+p { width: auto; }
+
+p.backlink {
+  width: auto;
+  font-weight: bold;
+}
+
+a {
+  background: inherit;
+  text-decoration: none;
+}
+
+a { color: #553d41; }
+a:hover { color: #003d41; }
+a:visited { color: #305275; }
+.footer a { color: #508d91; }
+
+/* bug index pages */
+
+td.tab {
+  padding-right: 1em;
+  padding-left: 1em;
+}
+
+td.sel.tab {
+    background-color: #c3d9ff ;
+    border: 1px solid #c3d9ff;
+    font-weight:bold;    
+    -moz-border-radius-topleft: 15px;
+    -moz-border-radius-topright: 15px;
+}
+
+td.nsel.tab { 
+    border: 1px solid #c3d9ff;
+    font-weight:bold;    
+    -moz-border-radius-topleft: 5px;
+    -moz-border-radius-topright: 5px;
+}
+
+table.bug_list {
+    border-width: 1px;
+    border-style: solid;
+    border-color: #c3d9ff;
+    padding: 0px;
+    width: 100%;            
+    border: 1px solid #c3d9ff;
+}
+
+table.target_list {
+    padding: 0px;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+table.target_list.td {
+    border-width: 1px;
+}
+
+tr.wishlist { background-color: #DCFAFF;}
+tr.wishlist:hover { background-color: #C2DCE1; }
+
+tr.minor { background-color: #FFFFA6; }
+tr.minor:hover { background-color: #E6E696; }
+
+tr.serious { background-color: #FF9077;}
+tr.serious:hover { background-color: #E6826B; }
+
+tr.critical { background-color: #FF752A; }
+tr.critical:hover { background-color: #D63905;}
+
+tr.fatal { background-color: #FF3300;}
+tr.fatal:hover { background-color: #D60000;}
+
+td.uuid { width: 5%; border-style: dotted;}
+td.status { width: 5%; border-style: dotted;}
+td.severity { width: 5%; border-style: dotted;}
+td.summary { border-style: dotted;}
+td.date { width: 25%; border-style: dotted;}
+
+/* bug detail pages */
+
+td.bug_detail_label { text-align: right; border: none;}
+td.bug_detail { border: none;}
+td.bug_comment_label { text-align: right; vertical-align: top; }
+td.bug_comment { }
+
+div.comment {
+  padding: 20px;
+  padding-top: 20px;
+  margin: auto;
+  margin-top: 0;
+}
+
+div.root.comment {
+  padding: 0px;
+  /* padding-top: 0px; */
+  padding-bottom: 20px;
+}

@@ -1,0 +1,62 @@
+language: cpp
+compiler:
+  - gcc
+  - clang
+notifications:
+  email:
+#    recipients:
+#      - one@example.com
+#      - other@example.com
+    on_success: change # [always|never|change] # default: change
+    on_failure: change # [always|never|change] # default: always
+env:
+  global:
+    - secure: "LG1scRCvFAHZ2rWGLL5ShXTegKNF3+4YaT8BAZalpMWjwBbYnIbAYgFYOwCk\naUy8e5zpC8FElIctGY/9ni1wcGwQkP97YaMvcai1r0IBjbVBi8tqvqekc/5Q\n2pz8IlJXDz/WzTEVb9w7xIDfRCZq8Xiw9LpENvVwfpbrQfFJLLk="
+  matrix:
+    - _="Build test" VALGRIND=0 UNIT_TESTS=0 DEBUG=0 GCCVER="" GCOV=0
+    - _="Unit/functional tests" VALGRIND=0 UNIT_TESTS="" DEBUG=0 GCCVER="" GCOV=0
+    - _="GCC 4.8 + Unit/functional tests coverage" VALGRIND=0 CCFLAGS="--usegcov --usegcc=g++-4.8" UNIT_TESTS="" DEBUG=1 GCCVER="4.8" GCOV=1
+    - _="Memory error and leak tests" VALGRIND=memcheck UNIT_TESTS="--log_level=test_suite --run_test=all/exclude_async_io_errors" DEBUG=2 GCCVER="" GCOV=0
+    - _="Race detection tests" VALGRIND=0 CCFLAGS="--usethreadsanitize --usegcc=g++-4.8" UNIT_TESTS="" DEBUG=2 GCCVER="4.8" TSAN_OPTIONS="suppressions=libs/afio/test/tsan.supp" GCOV=0
+
+# The clang 3.2 .deb doesn't supply the needed tsan runtime library :(
+matrix:
+  exclude:
+    - compiler: clang
+      env: _="GCC 4.8 + Unit/functional tests coverage" VALGRIND=0 CCFLAGS="--usegcov --usegcc=g++-4.8" UNIT_TESTS="" DEBUG=1 GCCVER="4.8" GCOV=1
+    - compiler: clang
+      env: _="Race detection tests" VALGRIND=0 CCFLAGS="--usethreadsanitize --usegcc=g++-4.8" UNIT_TESTS="" DEBUG=2 GCCVER="4.8" TSAN_OPTIONS="suppressions=libs/afio/test/tsan.supp" GCOV=0
+
+  allow_failures:
+    - compiler: gcc
+      env: _="Race detection tests" VALGRIND=0 CCFLAGS="--usethreadsanitize --usegcc=g++-4.8" UNIT_TESTS="" DEBUG=2 GCCVER="4.8" TSAN_OPTIONS="suppressions=libs/afio/test/tsan.supp" GCOV=0
+
+before_install:
+ - sudo add-apt-repository -y ppa:apokluda/boost1.53
+ - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+ - if [ $CXX = "clang++" ]; then sudo add-apt-repository -y ppa:h-rayflood/llvm; fi
+ - sudo apt-get update -qq
+ - sudo apt-get install -qq libboost1.53-all-dev
+ - if [ $CXX = "clang++" ]; then sudo apt-get install -qq libstdc++-4.8-dev clang-3.2; fi
+ - if [ $GCCVER != "" ]; then sudo apt-get install -qq g++-$GCCVER; fi
+ - if [ $VALGRIND != "0" ]; then sudo apt-get install -qq valgrind; fi
+ - git submodule update --init --recursive
+ - wget https://github.com/ned14/boost-trunk/archive/release/Boost_1_54_0_beta1.tar.gz
+ - tar zxf Boost_1_54_0_beta1.tar.gz
+ - mv boost-trunk-release-Boost_1_54_0_beta1 boost
+
+script:
+ - if [ $DEBUG -eq 0 ]; then PREFIXPATH="x64/Release"; DEBUGBUILD=""; fi
+ - if [ $DEBUG -eq 1 ]; then PREFIXPATH="x64/Debug"; DEBUGBUILD="--debugbuild"; fi
+ - if [ $DEBUG -eq 2 ]; then PREFIXPATH="x64/Debug"; DEBUGBUILD="--optdebugbuild"; fi
+ - if [ $CC = "clang" ]; then scons -k --useclang=clang++-3.2 $DEBUGBUILD $CCFLAGS; else scons -k $DEBUGBUILD $CCFLAGS; fi
+ - if [ $VALGRIND = "memcheck" ]; then PREFIXTEST="valgrind --tool=memcheck --suppressions=libs/afio/test/memcheck.supp --track-origins=yes --track-fds=yes --leak-check=full --show-reachable=yes --error-exitcode=1"; fi
+ - if [ $VALGRIND = "drd" ]; then PREFIXTEST="valgrind --tool=drd --suppressions=libs/afio/test/drd.supp --error-exitcode=1"; fi
+ - if [ $VALGRIND = "0" ]; then PREFIXTEST=""; fi
+ 
+ - if [ $GCOV -eq 1 ]; then set -x; fi
+ - if [ "$UNIT_TESTS" != "0" ]; then $PREFIXTEST $PREFIXPATH/tests -s $UNIT_TESTS; fi
+
+after_success:
+ - if [ $GCOV -eq 1 ]; then bash libs/afio/test/update_coveralls.sh `pwd`; fi
+  
