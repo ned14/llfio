@@ -18,7 +18,7 @@ File Created: Mar 2013
 
 #include "../../../afio/async_file_io.hpp"
 #include "boost/smart_ptr/detail/spinlock.hpp"
-//#include "../../../NiallsCPP11Utilities/ErrorHandling.hpp"
+#include "../../../NiallsCPP11Utilities/ErrorHandling.hpp"
 #include "../../../NiallsCPP11Utilities/valgrind/memcheck.h"
 #include "../../../NiallsCPP11Utilities/valgrind/helgrind.h"
 #include <mutex>

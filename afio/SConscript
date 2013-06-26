@@ -93,9 +93,9 @@ outputs={}
 sources = env.SConscript(os.path.join("..", "libs", "afio", "src", "SConscript"), 'importedenv')
 libobjects = env.SharedObject(sources, CPPDEFINES=env['CPPDEFINES']+["BOOST_AFIO_DLL_EXPORTS"])
 outputs['NiallsCPP11Utilitieslib']=env.SConscript(os.path.join("..", "NiallsCPP11Utilities", "SConscript"), 'importedenv')['mylib']
-outputs['utilitieslib']=env.SConscript(os.path.join("detail","SConscript"), 'importedenv')['mylib']
+#outputs['utilitieslib']=env.SConscript(os.path.join("detail","SConscript"), 'importedenv')['mylib']
 libobjects+=outputs['NiallsCPP11Utilitieslib']
-libobjects+=outputs['utilitieslib']
+#libobjects+=outputs['utilitieslib']
 env['RPATH']+=["."]
 if env.GetOption("static"):
     mylib = env.StaticLibrary("afio", source = libobjects)
