@@ -16,7 +16,6 @@ Created: Feb 2013
 #include <iostream>
 #include <algorithm>
 #include "../../../afio/afio.hpp"
-#include "../../../afio/async_file_io.hpp"
 #include "boost/graph/topological_sort.hpp"
 #include "boost/graph/depth_first_search.hpp"
 #include "boost/graph/dijkstra_shortest_paths.hpp"

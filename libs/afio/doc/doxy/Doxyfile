@@ -15,8 +15,7 @@ ABBREVIATE_BRIEF       =
 ALWAYS_DETAILED_SEC    = YES
 INLINE_INHERITED_MEMB  = NO
 FULL_PATH_NAMES        = YES
-STRIP_FROM_PATH        = c:/_svn/boost/trunk/boost/geometry  \
-				c:/_svn/boost/trunk/libs/geometry/doc/doxygen_input/pages
+STRIP_FROM_PATH        = 
 STRIP_FROM_INC_PATH    = 
 SHORT_NAMES            = NO
 JAVADOC_AUTOBRIEF      = NO
@@ -172,57 +171,18 @@ WARN_LOGFILE           =
 #---------------------------------------------------------------------------
 # configuration options related to the input files
 #---------------------------------------------------------------------------
-INPUT                  = . .. ../../../../boost/geometry/core \
-			../../../../boost/geometry/algorithms \
-			../../../../boost/geometry/algorithms/detail \
-			../../../../boost/geometry/algorithms/detail/overlay \
-			../../../../boost/geometry/algorithms/detail/equals \
-			../../../../boost/geometry/algorithms/detail/sections \
-			../../../../boost/geometry/arithmetic \
-			../../../../boost/geometry/geometries/concepts \
-			../../../../boost/geometry/geometries \
-			../../../../boost/geometry/geometries/adapted \
-			../../../../boost/geometry/geometries/register \
-			../../../../boost/geometry/iterators \
-			../../../../boost/geometry/io/wkt \
-			../../../../boost/geometry/io/svg \
-			../../../../boost/geometry/multi/algorithms \
-			../../../../boost/geometry/multi/algorithms/detail \
-			../../../../boost/geometry/multi/core \
-			../../../../boost/geometry/multi/geometries \
-			../../../../boost/geometry/multi/geometries/register \
-			../../../../boost/geometry/multi/geometries/concepts \
-			../../../../boost/geometry/multi/strategies/cartesian \
-			../../../../boost/geometry/policies \
-			../../../../boost/geometry/policies/relate \
-			../../../../boost/geometry/strategies \
-			../../../../boost/geometry/strategies/concepts \
-			../../../../boost/geometry/strategies/agnostic \
-			../../../../boost/geometry/strategies/cartesian \
-			../../../../boost/geometry/strategies/spherical \
-			../../../../boost/geometry/strategies/transform \
-			../../../../boost/geometry/util \
-			../../../../boost/geometry/views \
+INPUT                  = ../../../../boost/afio \
 			./doxygen_input/pages \
 			./doxygen_input/groups
 INPUT_ENCODING         = UTF-8
 FILE_PATTERNS          = *.hpp
 RECURSIVE              = NO
-EXCLUDE                = ../../../../boost/geometry/util/builder.hpp \
-			../../../../boost/geometry/algorithms/parse.hpp \
-			../../../../boost/geometry/algorithms/point_on_line.hpp \
-			../../../../boost/geometry/strategies/cartesian/cart_intersect.hpp \
-			../../../../boost/geometry/util/distance_sort.hpp \
-			./doxygen_extension_examples.hpp 
+EXCLUDE                = ./doxygen_extension_examples.hpp 
 EXCLUDE_SYMLINKS       = NO
 EXCLUDE_PATTERNS       = 
 EXCLUDE_SYMBOLS        = 
 EXAMPLE_PATH           = . .. ../../example ../../example/with_external_libs \
-			doxygen_input/sourcecode \
-			../../../../boost/geometry/geometries \
-			../../../../boost/geometry/strategies \
-			../../../../boost/geometry/strategies/cartesian \
-			../../../../boost/geometry/algorithms
+			doxygen_input/sourcecode 
 EXAMPLE_PATTERNS       = 
 EXAMPLE_RECURSIVE      = NO
 IMAGE_PATH             = doxygen_input/images
