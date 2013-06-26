@@ -89,23 +89,19 @@ else:
 
 outputs={}
 
-# Build the afio DLL
-sources = env.SConscript(os.path.join("..", "libs", "afio", "src", "SConscript"), 'importedenv')
+# Build the utilities DLL
+sources = env.SConscript(os.path.join("..", "..", "libs", "afio", "detail", "SConscript"), 'importedenv')
 libobjects = env.SharedObject(sources, CPPDEFINES=env['CPPDEFINES']+["BOOST_AFIO_DLL_EXPORTS"])
-outputs['NiallsCPP11Utilitieslib']=env.SConscript(os.path.join("..", "NiallsCPP11Utilities", "SConscript"), 'importedenv')['mylib']
-outputs['utilitieslib']=env.SConscript(os.path.join("detail","SConscript"), 'importedenv')['mylib']
-libobjects+=outputs['NiallsCPP11Utilitieslib']
-libobjects+=outputs['utilitieslib']
-env['RPATH']+=["."]
+
 if env.GetOption("static"):
-    mylib = env.StaticLibrary("afio", source = libobjects)
+    mylib = env.StaticLibrary("utilitieslib", source = libobjects)
     myliblib = mylib
 else:
-    mylib = env.SharedLibrary("afio", source = libobjects)
+    mylib = env.SharedLibrary("utilitieslib", source = libobjects)
     if env['CC']=='cl': env.AddPostAction(mylib, 'mt.exe -nologo -manifest ${TARGET}.manifest -outputresource:$TARGET;2')
     myliblib = mylib
     if sys.platform=='win32':
         myliblib=mylib[1]
-outputs['afiolib']=(myliblib, mylib, sources)
+outputs['mylib']=(mylib, sources)
 
 Return("outputs")

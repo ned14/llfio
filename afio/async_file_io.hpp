@@ -7,7 +7,7 @@ File Created: Mar 2013
 #ifndef TRIPLEGIT_ASYNC_FILE_IO_H
 #define TRIPLEGIT_ASYNC_FILE_IO_H
 
-#include "../NiallsCPP11Utilities/NiallsCPP11Utilities.hpp"
+//#include "../NiallsCPP11Utilities/NiallsCPP11Utilities.hpp"
 #include "../NiallsCPP11Utilities/std_filesystem.hpp"
 #include <type_traits>
 #include <initializer_list>
@@ -24,7 +24,8 @@ File Created: Mar 2013
 #include "boost/asio.hpp"
 #include "boost/thread/thread.hpp"
 #include "boost/thread/future.hpp"
-#include<boost/config.hpp>
+#include <boost/config.hpp>
+#include "detail/Utility.hpp"
 
 #if BOOST_VERSION<105300
 #error I absolutely need Boost v1.53 or higher to compile (I need lock free containers).

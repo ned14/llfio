@@ -269,7 +269,7 @@ template <size_t offset, typename F, typename Tuple, typename... Args> void call
     typedef typename std::decay<Tuple>::type ttype;
     Impl::call_using_tuple<offset, F, Tuple, 0 == std::tuple_size<ttype>::value, std::tuple_size<ttype>::value-offset>::call(std::forward<F>(f), std::forward<Tuple>(t));
 }
-
+/*
 template<typename callable> class UndoerImpl
 {
 	callable undoer;
@@ -308,13 +308,13 @@ auto resetpos=Undoer([&s]() { s.seekg(0, std::ios::beg); });
 ...
 resetpos.dismiss();
 \endcode
-*/
+
 template<typename callable> inline UndoerImpl<callable> Undoer(callable c)
 {
 	//static_assert(!std::is_function<callable>::value && !std::is_member_function_pointer<callable>::value && !std::is_member_object_pointer<callable>::value && !has_call_operator<callable>::value, "Undoer applied to a type not providing a call operator");
 	auto foo=UndoerImpl<callable>(std::move(c));
 	return foo;
-}
+}*/
 
 
 /*! \enum allocator_alignment
