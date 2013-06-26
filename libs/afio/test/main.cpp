@@ -15,17 +15,19 @@ Created: Feb 2013
 #include <sstream>
 #include <iostream>
 #include <algorithm>
-#include "../../../afio/afio.hpp"
+//#include "../../../afio/afio.hpp"
 #include "../../../afio/async_file_io.hpp"
-#include "boost/graph/topological_sort.hpp"
-#include "boost/graph/depth_first_search.hpp"
-#include "boost/graph/dijkstra_shortest_paths.hpp"
-#include "boost/graph/visitors.hpp"
-#include "boost/graph/isomorphism.hpp"
+//#include "../../../NiallsCPP11Utilities/NiallsCPP11Utilities.hpp"
+#include "../../../NiallsCPP11Utilities/Int128_256.hpp"
+//#include "boost/graph/topological_sort.hpp"
+//#include "boost/graph/depth_first_search.hpp"
+//#include "boost/graph/dijkstra_shortest_paths.hpp"
+//#include "boost/graph/visitors.hpp"
+//#include "boost/graph/isomorphism.hpp"
 #include "boost/lockfree/queue.hpp"
-#ifndef WIN32
-#define CATCH_CONFIG_USE_ANSI_COLOUR_CODES
-#endif
+//#ifndef WIN32
+//#define CATCH_CONFIG_USE_ANSI_COLOUR_CODES
+//#endif
 
 
 #define BOOST_TEST_MODULE tester
@@ -38,7 +40,7 @@ try{\
 }catch(...){BOOST_CHECK(true);}
 
 
-
+/*
 enum files_e { dax_h, yow_h, boz_h, zow_h, foo_cpp, 
                foo_o, bar_cpp, bar_o, libfoobar_a,
                zig_cpp, zig_o, zag_cpp, zag_o, 
@@ -68,6 +70,7 @@ const std::size_t nedges = sizeof(used_by)/sizeof(Edge);
 
 //static boost::fs_store store(std::filesystem::current_path());
 //static boost::collection_id testgraph(store, "unittests.testgraph");
+*/
 
 // From http://burtleburtle.net/bob/rand/smallprng.html
 typedef unsigned int  u4;
@@ -91,6 +94,7 @@ void raninit( ranctx *x, u4 seed ) {
     }
 }
 
+/*
 struct print_visitor : public boost::bfs_visitor<> {
   std::ostream &out;
   print_visitor(std::ostream &_out) : out(_out) { }
@@ -242,9 +246,11 @@ template<class adjacency_list> void ModifyGraph(adjacency_list &g)
 	out.clear();
 	out.str("");
 }
+*/
+
 BOOST_AUTO_TEST_SUITE(all)
     BOOST_AUTO_TEST_SUITE(exclude_async_io_errors)
-        BOOST_AUTO_TEST_CASE(boost_graph_works)
+       /* BOOST_AUTO_TEST_CASE(boost_graph_works)
         {
             BOOST_TEST_MESSAGE("Tests that one of the samples from Boost.Graph works as advertised");
                 using namespace boost;
@@ -252,7 +258,7 @@ BOOST_AUTO_TEST_SUITE(all)
                 Graph g(used_by, used_by + nedges, N);
                 TestGraph<>(g);
                 ModifyGraph<>(g);
-        }
+        }*/
 
         static int task()
         {
