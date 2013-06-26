@@ -1,0 +1,6 @@
+
+
+lib afio_lib : async_file_io.cpp ../../../NiallsCPP11Utilities//utils 
+	: <include>../../../afio <toolset>gcc <cxxflags>-std=c++11 
+
+;
