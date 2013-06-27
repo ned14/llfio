@@ -1,5 +1,5 @@
 
 exe testy : main.cpp ../src//afio_lib ../../../NiallsCPP11Utilities//utils 
-	: <include>../../../boost/afio <toolset>gcc <cxxflags>-std=c++11 
+	: <include>../../../boost/afio <toolset>gcc <cxxflags>-std=c++11 <linkflags>"-l boost_system -l boost_filesystem -l boost_atomic -l boost_filesystem -l boost_thread -l pthread"
 
 ;

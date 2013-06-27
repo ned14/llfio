@@ -1,5 +1,6 @@
 #use-project /NiallsCPP11Utilities//utils ;
+#project : requirements <toolset>gcc <cxxflags>-std=c++11 <linkflags>"-l boost_system" ;
 
 build-project libs/afio/src ;
 
-#build-project libs/afio/test ;
+build-project libs/afio/test ;
