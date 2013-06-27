@@ -1,4 +1,4 @@
-
+project : usage-requirements <include>. ;
 
 lib afio_lib : afio.cpp ../../../NiallsCPP11Utilities//utils 
 	: <include>../../../boost/afio <toolset>gcc <cxxflags>-std=c++11 
