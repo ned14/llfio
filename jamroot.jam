@@ -1,3 +1,5 @@
 #use-project /NiallsCPP11Utilities//utils ;
 
 build-project libs/afio/src ;
+
+build-project libs/afio/test ;

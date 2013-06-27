@@ -90,7 +90,7 @@ else:
 outputs={}
 
 # Build the afio DLL
-outputs['mylibs']=SConscript("afio/SConscript")
+outputs['mylibs']=SConscript("boost/afio/SConscript")
 
 # Unit tests
 sources = env.SConscript(os.path.join("libs", "afio", "test", "SConscript"), 'importedenv')
