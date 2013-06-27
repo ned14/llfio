@@ -1,0 +1,43 @@
+# Boost.AFIO
+#
+# This documentation machinery is derived from Boost.Geometry
+
+# Use, modification and distribution is subject to the Boost Software License,
+# Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
+# http://www.boost.org/LICENSE_1_0.txt)
+
+
+project afio/doc ;
+
+# Auto-index, experimental. Commented otherwise does not build without.
+#using auto-index ; 
+
+using quickbook ;
+
+path-constant here : . ;
+path-constant images_location : html ;
+
+
+boostbook afio 
+    : afio.qbk
+    : <dependency>Jamfile.v2
+        <dependency>quickref.xml
+        <dependency>generated/point.qbk
+        <xsl:param>chunk.section.depth=4
+#    <auto-index>off
+#    <auto-index-internal>on
+#    <auto-index-verbose>off
+#    <xsl:param>index.on.type=1
+#       <format>html
+       <xsl:param>chunk.first.sections=1
+       <xsl:param>toc.section.depth=3
+       <xsl:param>toc.max.depth=2
+       <xsl:param>generate.section.toc.level=4
+       <xsl:param>boost.root=../../../..
+       <quickbook-define>enable_index
+       <include>$(here)
+       <format>pdf:<xsl:param>img.src.path=$(images_location)/    
+;
+
+install pdfinstall : afio/<format>pdf : <location>. <name>afio.pdf <install-type>PDF ;
+explicit pdfinstall ;

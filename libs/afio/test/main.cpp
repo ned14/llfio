@@ -15,7 +15,7 @@ Created: Feb 2013
 #include <sstream>
 #include <iostream>
 #include <algorithm>
-#include "../../../afio/async_file_io.hpp"
+#include "../../../boost/afio/afio.hpp"
 #include "../../../NiallsCPP11Utilities/Int128_256.hpp"
 #include "boost/lockfree/queue.hpp"
 
@@ -29,7 +29,6 @@ try{\
     expr;\
     BOOST_FAIL("Exception was not thrown");\
 }catch(...){BOOST_CHECK(true);}
-
 
 
 // From http://burtleburtle.net/bob/rand/smallprng.html
@@ -56,7 +55,7 @@ void raninit( ranctx *x, u4 seed ) {
 
 BOOST_AUTO_TEST_SUITE(all)
     BOOST_AUTO_TEST_SUITE(exclude_async_io_errors)
-       
+
         static int task()
         {
         #ifdef __GNUC__

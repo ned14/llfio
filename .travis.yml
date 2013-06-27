@@ -10,8 +10,8 @@ notifications:
     on_success: change # [always|never|change] # default: change
     on_failure: change # [always|never|change] # default: always
 env:
-  global:
-    - secure: "LG1scRCvFAHZ2rWGLL5ShXTegKNF3+4YaT8BAZalpMWjwBbYnIbAYgFYOwCk\naUy8e5zpC8FElIctGY/9ni1wcGwQkP97YaMvcai1r0IBjbVBi8tqvqekc/5Q\n2pz8IlJXDz/WzTEVb9w7xIDfRCZq8Xiw9LpENvVwfpbrQfFJLLk="
+#  global:
+#    - secure: "LG1scRCvFAHZ2rWGLL5ShXTegKNF3+4YaT8BAZalpMWjwBbYnIbAYgFYOwCk\naUy8e5zpC8FElIctGY/9ni1wcGwQkP97YaMvcai1r0IBjbVBi8tqvqekc/5Q\n2pz8IlJXDz/WzTEVb9w7xIDfRCZq8Xiw9LpENvVwfpbrQfFJLLk="
   matrix:
     - _="Build test" VALGRIND=0 UNIT_TESTS=0 DEBUG=0 GCCVER="" GCOV=0
     - _="Unit/functional tests" VALGRIND=0 UNIT_TESTS="" DEBUG=0 GCCVER="" GCOV=0
