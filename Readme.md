@@ -1,2 +1,2 @@
-<p align="center">Current master branch build and unit tests status on Travis CI: <a href="https://travis-ci.org/ned14/TripleGit"><img valign="middle" src="https://travis-ci.org/ned14/TripleGit.png?branch=master"/></a></p>
-<p align="center">Unit test code coverage is: <a href='https://coveralls.io/r/ned14/TripleGit'><img src='https://coveralls.io/repos/ned14/TripleGit/badge.png' alt='Coverage Status' /></a></p>
+<p align="center">Current master branch build and unit tests status on Travis CI: <a href="https://travis-ci.org/BoostGSoC/boost.afio"><img valign="middle" src="https://travis-ci.org/BoostGSoC/boost.afio.png?branch=master"/></a></p>
+<p align="center">Unit test code coverage is: <a href='https://coveralls.io/r/BoostGSoC/boost.afio'><img src='https://coveralls.io/repos/BoostGSoC/boost.afio/badge.png' alt='Coverage Status' /></a></p>

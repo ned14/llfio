@@ -90,9 +90,9 @@ else:
 outputs={}
 
 # Build the afio DLL
-sources = env.SConscript(os.path.join("..", "libs", "afio", "src", "SConscript"), 'importedenv')
+sources = env.SConscript(os.path.join("..", "..", "libs", "afio", "src", "SConscript"), 'importedenv')
 libobjects = env.SharedObject(sources, CPPDEFINES=env['CPPDEFINES']+["BOOST_AFIO_DLL_EXPORTS"])
-outputs['NiallsCPP11Utilitieslib']=env.SConscript(os.path.join("..", "NiallsCPP11Utilities", "SConscript"), 'importedenv')['mylib']
+outputs['NiallsCPP11Utilitieslib']=env.SConscript(os.path.join("..", "..", "NiallsCPP11Utilities", "SConscript"), 'importedenv')['mylib']
 libobjects+=outputs['NiallsCPP11Utilitieslib']
 env['RPATH']+=["."]
 if env.GetOption("static"):
