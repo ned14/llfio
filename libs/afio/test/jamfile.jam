@@ -1,0 +1,5 @@
+
+exe testy : main.cpp ../src//afio_lib ../../../NiallsCPP11Utilities//utils 
+	: <include>../../../boost/afio <toolset>gcc <cxxflags>-std=c++11 
+
+;
