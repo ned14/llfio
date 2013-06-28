@@ -21,8 +21,7 @@ path-constant images_location : html ;
 boostbook afio 
     : afio.qbk
     : <dependency>Jamfile.v2
-        <dependency>quickref.xml
-        <dependency>generated/point.qbk
+        <dependency>generated/async_file_io_dispatcher_base.qbk
         <xsl:param>chunk.section.depth=4
 #    <auto-index>off
 #    <auto-index-internal>on

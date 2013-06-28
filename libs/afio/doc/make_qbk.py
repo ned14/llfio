@@ -75,9 +75,5 @@ for i in core_c:
 for i in core_s:
     struct_to_quickbook(i)
 
-os.chdir("index")
-execfile("make_qbk.py")
-os.chdir("..")
-
 # Use either bjam or b2 or ../../../b2 (the last should be done on Release branch)
 os.system("..\\..\\..\\b2.exe") 

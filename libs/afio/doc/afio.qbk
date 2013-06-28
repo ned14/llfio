@@ -1,0 +1,37 @@
+[/============================================================================
+  Boost.AFIO
+
+  Use, modification and distribution is subject to the Boost Software License,
+  Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
+  http://www.boost.org/LICENSE_1_0.txt)
+=============================================================================/]
+
+[library AFIO
+    [quickbook 1.5]
+    [authors [Douglas, Niall], [Kirth, Paul]]
+    [copyright 2013 Niall Douglas and Paul Kirth]
+    [purpose Documentation of Boost.AFIO library]
+    [license
+        Distributed under the Boost Software License, Version 1.0.
+        (See accompanying file LICENSE_1_0.txt or copy at
+        [@http://www.boost.org/LICENSE_1_0.txt])
+    ]
+    [id afio]
+    [category afio]
+]
+
+[/Parts]
+
+[def __boost__ Boost]
+[def __boost_asio__ Boost.AFIO]
+[def __boost_thread__ Boost.Thread]
+
+[/Templates]
+
+[include introduction.qbk]
+[include compiling.qbk]
+[include design_rationale.qbk]
+[include quickstart.qbk]
+[include reference.qbk]
+[include release_notes.qbk]
+[include acknowledgments.qbk]
