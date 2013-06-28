@@ -13,6 +13,7 @@ project boost/afio
     : requirements
       <threading>multi #<-- do we need this?
       <link>shared:<define>BOOST_AFIO_DYN_LINK=1  #need to integrate this maybe in boost/afio/config.hpp
+      <define>BOOST_AFIO_SOURCE
       <library>../../../NiallsCPP11Utilities//utils 
 	: usage-requirements 
       <include>. 
