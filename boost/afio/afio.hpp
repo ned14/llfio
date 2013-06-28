@@ -38,14 +38,13 @@ File Created: Mar 2013
 #endif
 #endif
 
-// just to test if this works properly
-#define BOOST_AFIO_API BOOST_AFIO_DECL
+
 /*
-#ifndef BOOST_AFIO_API
+#ifndef BOOST_AFIO_DECL
 #ifdef BOOST_AFIO_DLL_EXPORTS
-#define BOOST_AFIO_API BOOST_SYMBOL_EXPORT
+#define BOOST_AFIO_DECL BOOST_SYMBOL_EXPORT
 #else
-#define BOOST_AFIO_API BOOST_SYMBOL_IMPORT
+#define BOOST_AFIO_DECL BOOST_SYMBOL_IMPORT
 #endif
 #endif
 */
@@ -663,7 +662,7 @@ public:
 	}
 };
 //! Returns the process threadpool
-extern BOOST_AFIO_API thread_pool &process_threadpool();
+extern BOOST_AFIO_DECL thread_pool &process_threadpool();
 
 namespace detail {
 	template<class returns_t, class future_type> inline returns_t when_all_do(std::shared_ptr<std::vector<future_type>> futures)
@@ -816,9 +815,9 @@ BOOST_AFIO_DECLARE_CLASS_ENUM_AS_BITFIELD(async_op_flags)
 /*! \class async_file_io_dispatcher_base
 \brief Abstract base class for dispatching file i/o asynchronously
 */
-class BOOST_AFIO_API async_file_io_dispatcher_base : public std::enable_shared_from_this<async_file_io_dispatcher_base>
+class BOOST_AFIO_DECL async_file_io_dispatcher_base : public std::enable_shared_from_this<async_file_io_dispatcher_base>
 {
-	//friend BOOST_AFIO_API std::shared_ptr<async_file_io_dispatcher_base> async_file_io_dispatcher(thread_pool &threadpool=process_threadpool(), file_flags flagsforce=file_flags::None, file_flags flagsmask=file_flags::None);
+	//friend BOOST_AFIO_DECL std::shared_ptr<async_file_io_dispatcher_base> async_file_io_dispatcher(thread_pool &threadpool=process_threadpool(), file_flags flagsforce=file_flags::None, file_flags flagsmask=file_flags::None);
 	friend struct detail::async_io_handle_posix;
 	friend struct detail::async_io_handle_windows;
 	friend class detail::async_file_io_dispatcher_compat;
@@ -923,7 +922,7 @@ Note that the number of threads in the threadpool supplied is the maximum non-as
 For fast SSDs, there isn't much gain after eight-sixteen threads, so the process threadpool is set to eight by default.
 For slow hard drives, or worse, SANs, a queue depth of 64 or higher might deliver significant benefits.
 */
-extern BOOST_AFIO_API std::shared_ptr<async_file_io_dispatcher_base> async_file_io_dispatcher(thread_pool &threadpool=process_threadpool(), file_flags flagsforce=file_flags::None, file_flags flagsmask=file_flags::None);
+extern BOOST_AFIO_DECL std::shared_ptr<async_file_io_dispatcher_base> async_file_io_dispatcher(thread_pool &threadpool=process_threadpool(), file_flags flagsforce=file_flags::None, file_flags flagsmask=file_flags::None);
 
 /*! \struct async_io_op
 \brief A reference to an async operation
