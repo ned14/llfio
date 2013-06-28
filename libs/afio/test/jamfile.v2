@@ -11,7 +11,7 @@ import testing ;
 project boost/afio/test
     : requirements
       <threading>multi
-      <library>../src//boost_afio
+      <library>../build//boost_afio
       <library>../../../NiallsCPP11Utilities//utils
       <include>../../../boost/afio 
       <toolset>gcc <cxxflags>-std=c++11 

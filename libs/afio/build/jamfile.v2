@@ -18,7 +18,7 @@ project boost/afio
 	: usage-requirements 
       <include>. 
       <link>shared:<define>BOOST_AFIO_DYN_LINK=1
-    #: source-location ../src
+    : source-location ../src
 
 ;
 
