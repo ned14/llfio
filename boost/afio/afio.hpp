@@ -4,8 +4,8 @@ Provides a threadpool and asynchronous file i/o infrastructure based on Boost.AS
 File Created: Mar 2013
 */
 
-#ifndef TRIPLEGIT_ASYNC_FILE_IO_H
-#define TRIPLEGIT_ASYNC_FILE_IO_H
+#ifndef BOOST_AFIO_HPP
+#define BOOST_AFIO_HPP
 
 //#include "../NiallsCPP11Utilities/NiallsCPP11Utilities.hpp"
 #include "../NiallsCPP11Utilities/std_filesystem.hpp"
@@ -24,7 +24,7 @@ File Created: Mar 2013
 #include "boost/asio.hpp"
 #include "boost/thread/thread.hpp"
 #include "boost/thread/future.hpp"
-#include <boost/config.hpp>
+#include "config.hpp"
 #include "detail/Utility.hpp"
 
 #if BOOST_VERSION<105300
@@ -38,15 +38,17 @@ File Created: Mar 2013
 #endif
 #endif
 
+// just to test if this works properly
+#define BOOST_AFIO_API BOOST_AFIO_DECL
+/*
 #ifndef BOOST_AFIO_API
 #ifdef BOOST_AFIO_DLL_EXPORTS
-//#define BOOST_AFIO_API DLLEXPORTMARKUP
 #define BOOST_AFIO_API BOOST_SYMBOL_EXPORT
 #else
-//#define BOOST_AFIO_API DLLIMPORTMARKUP
 #define BOOST_AFIO_API BOOST_SYMBOL_IMPORT
 #endif
 #endif
+*/
 
 //! \def BOOST_AFIO_VALIDATE_INPUTS Validate inputs at the point of instantiation
 #ifndef BOOST_AFIO_VALIDATE_INPUTS
