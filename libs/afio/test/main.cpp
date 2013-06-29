@@ -17,15 +17,8 @@ Created: Feb 2013
 #include <algorithm>
 #include "../../../boost/afio/afio.hpp"
 #include "../../../NiallsCPP11Utilities/Int128_256.hpp"
-#include "boost/graph/topological_sort.hpp"
-#include "boost/graph/depth_first_search.hpp"
-#include "boost/graph/dijkstra_shortest_paths.hpp"
-#include "boost/graph/visitors.hpp"
-#include "boost/graph/isomorphism.hpp"
 #include "boost/lockfree/queue.hpp"
-#ifndef WIN32
-#define CATCH_CONFIG_USE_ANSI_COLOUR_CODES
-#endif
+
 
 
 #define BOOST_TEST_MODULE tester
@@ -36,6 +29,7 @@ try{\
     expr;\
     BOOST_FAIL("Exception was not thrown");\
 }catch(...){BOOST_CHECK(true);}
+
 
 
 // From http://burtleburtle.net/bob/rand/smallprng.html
@@ -62,7 +56,7 @@ void raninit( ranctx *x, u4 seed ) {
 
 BOOST_AUTO_TEST_SUITE(all)
     BOOST_AUTO_TEST_SUITE(exclude_async_io_errors)
-
+       
         static int task()
         {
         #ifdef __GNUC__

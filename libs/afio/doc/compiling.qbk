@@ -1,0 +1,32 @@
+[/==============================================================================
+    Use, modification and distribution is subject to the Boost Software License,
+    Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
+    http://www.boost.org/LICENSE_1_0.txt)
+===============================================================================/]
+
+
+
+[section Compilation]
+
+[def __msvc__ MSVC]
+[def __stlport__ [@http://sourceforge.net/projects/stlport STLport]]
+
+__boost_afio__ is a headers-only library. Users only need to include the 
+library headers in their programs in order to be able to access definitions 
+and algorithms provided by the __boost_afio__ library. No linking against 
+any binaries is required. 
+
+__boost_afio__ is only dependant on headers-only __boost__ libraries.
+It does not introduce indirect dependencies on any binary libraries.
+
+In order to be able to use __boost_afio__, the only thing users need to do 
+is to download and/or install Boost  and specify location to include 
+directories, so `include` directives of this scheme will work:
+
+    #include <boost/...>
+
+[heading Supported Compilers]
+
+Todo
+
+[endsect] [/ end of Compilation]

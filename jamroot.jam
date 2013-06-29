@@ -1,0 +1,15 @@
+#  Boost.AFIO Library Jamfile
+#
+#  Copyright (c) 2013 Paul Kirth
+#
+#  Distributed under the Boost Software License, Version 1.0.
+#  (See accompanying file LICENSE_1_0.txt or copy at
+#  http://www.boost.org/LICENSE_1_0.txt)
+
+
+#use-project /NiallsCPP11Utilities//utils ;
+#project : requirements <toolset>gcc <cxxflags>-std=c++11 <linkflags>"-l boost_system" ;
+
+build-project libs/afio/build ;
+
+build-project libs/afio/test ;

@@ -1,0 +1,32 @@
+#  Boost.AFIO Library test Jamfile
+#
+#  Copyright (c) 2013 Paul Kirth
+#
+#  Distributed under the Boost Software License, Version 1.0.
+#  (See accompanying file LICENSE_1_0.txt or copy at
+#  http://www.boost.org/LICENSE_1_0.txt)
+
+import testing ;
+
+project boost/afio/test
+    : requirements
+      <threading>multi
+      <library>../build//boost_afio
+      <library>../../../NiallsCPP11Utilities//utils
+      <include>../../../boost/afio 
+      <toolset>gcc <cxxflags>-std=c++11 
+      <linkflags>"-l boost_system -l boost_filesystem -l boost_atomic -l boost_filesystem -l boost_thread -l pthread"
+    ;
+
+test-suite afio
+    : [ link main.cpp ]
+    #not ready to run this everytime
+    #: [run main.cpp ]
+    ;
+
+
+exe boost_afio_test : main.cpp   
+#	: 
+     #<library>boost_system, boost_filesystem, boost_atomic, boost_filesystem, boost_thread, pthread
+     #<library>pthread
+;

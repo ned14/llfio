@@ -91,7 +91,7 @@ outputs={}
 
 # Build the afio DLL
 sources = env.SConscript(os.path.join("..", "..", "libs", "afio", "src", "SConscript"), 'importedenv')
-libobjects = env.SharedObject(sources, CPPDEFINES=env['CPPDEFINES']+["BOOST_AFIO_DLL_EXPORTS"])
+libobjects = env.SharedObject(sources, CPPDEFINES=env['CPPDEFINES']+["BOOST_AFIO_DYN_LINK"]+["BOOST_AFIO_SOURCE"])
 outputs['NiallsCPP11Utilitieslib']=env.SConscript(os.path.join("..", "..", "NiallsCPP11Utilities", "SConscript"), 'importedenv')['mylib']
 libobjects+=outputs['NiallsCPP11Utilitieslib']
 env['RPATH']+=["."]
