@@ -48,7 +48,10 @@ before_install:
 # install boost build
  - pwd
  - ls
- - cd boost/tools/build/v2
+ - cd boost
+ - cd tools
+ - cd build
+ - cd v2
  - ./bootstrap.sh
  - b2 install
  - cd boost.afio
