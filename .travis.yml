@@ -50,12 +50,17 @@ before_install:
  - ls
  - cd boost
  - ls
+ - cd boost-trunk-release-Boost_1_54_0_beta1
+ -ls
  - cd tools
+ -ls
  - cd build
+ -ls
  - cd v2
+ -ls
  - ./bootstrap.sh
  - b2 install
- - cd boost.afio
+ - cd ../../../../../
  
 
 script:
