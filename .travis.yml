@@ -51,13 +51,13 @@ before_install:
  - cd boost
  - ls
  - cd boost-trunk-release-Boost_1_54_0_beta1
- -ls
+ - ls
  - cd tools
- -ls
+ - ls
  - cd build
- -ls
+ - ls
  - cd v2
- -ls
+ - ls
  - ./bootstrap.sh
  - b2 install
  - cd ../../../../../
