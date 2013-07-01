@@ -59,7 +59,7 @@ before_install:
  - cd v2
  - ls
  - ./bootstrap.sh
- - b2 install
+ - ./b2 install
  - cd ../../../../../
  
 
