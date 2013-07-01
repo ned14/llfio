@@ -10,7 +10,7 @@ lib utils : ErrorHandling.cpp Int128_256.cpp MappedFileInfo.cpp
       <include>hashes
       #<include>$(boost) 
       <toolset>gcc 
-      <cxxflags>-std=c++11 
+      <cxxflags>-std=c++0x 
       <link>shared:<define>NIALLSCPP11UTILITIES_DLL_EXPORTS 
       <cxxflags>"-fvisibility-inlines-hidden -fvisibility=hidden -fstrict-aliasing -Wstrict-aliasing -Wall -Wno-unused -fargument-noalias -O2 -g -fPIC" # -fopenmp"
    
