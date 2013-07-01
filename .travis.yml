@@ -46,10 +46,11 @@ before_install:
  - mv boost-trunk-release-Boost_1_54_0_beta1 boost
  
 # install boost build
- - cd ~/boost/tools/build/v2
+ - pwd
+ - cd ../boost/tools/build/v2
  - ./bootstrap.sh
  - b2 install
- - cd ../../../../
+ - cd boost.afio
  
 
 script:
