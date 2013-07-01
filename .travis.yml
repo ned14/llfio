@@ -46,8 +46,8 @@ before_install:
  - mv boost-trunk-release-Boost_1_54_0_beta1 boost
  
 # install boost build
- - /boost/tools/build/v2/boostrap.sh
- - /boost/tools/build/v2/b2 install
+ - boost/tools/build/v2/boostrap.sh
+ - boost/tools/build/v2/b2 install
  
 
 script:
