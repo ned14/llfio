@@ -46,20 +46,9 @@ before_install:
  - mv boost-trunk-release-Boost_1_54_0_beta1 boost
  
 # install boost build
- - pwd
- - ls
- - cd boost
- - ls
- - cd boost-trunk-release-Boost_1_54_0_beta1
- - ls
- - cd tools
- - ls
- - cd build
- - ls
- - cd v2
- - ls
+ - cd boost/boost-trunk-release-Boost_1_54_0_beta1/tools/build/v2
  - ./bootstrap.sh
- - ./b2 install
+ - sudo ./b2 install
  - cd ../../../../../
  
 
@@ -74,8 +63,8 @@ script:
  
 # - if [ $GCOV -eq 1 ]; then set -x; fi
 # - if [ "$UNIT_TESTS" != "0" ]; then $PREFIXTEST $PREFIXPATH/tests -s $UNIT_TESTS; fi
-- if [ $CC = "gcc" ]; then b2 release toolset=gcc --link=shared --boost=boost; fi
-- if [ $CC = "clang" ]; then b2 release toolset=clang --link=shared --boost=boost; fi
+- if [ $CC = "gcc" ]; then b2 release toolset=gcc --link=shared --boost=boost/boost-trunk-release-Boost_1_54_0_beta1; fi
+- if [ $CC = "clang" ]; then b2 release toolset=clang --link=shared --boost=boost/boost-trunk-release-Boost_1_54_0_beta1; fi
 
 after_success:
  - if [ $GCOV -eq 1 ]; then bash libs/afio/test/update_coveralls.sh `pwd`; fi
