@@ -51,7 +51,6 @@ before_install:
  - ./bootstrap.sh
  - sudo ./b2 install
  - cd ../../../../../
- - pwd
  
 
 script:
@@ -65,7 +64,7 @@ script:
  
 # - if [ $GCOV -eq 1 ]; then set -x; fi
 # - if [ "$UNIT_TESTS" != "0" ]; then $PREFIXTEST $PREFIXPATH/tests -s $UNIT_TESTS; fi
- - b2 release toolset=$CC --link=shared --boost=boost/boost-trunk-release-Boost_1_54_0_beta1; fi 
+ - b2 release toolset=$CC --link=shared --boost=boost/boost-trunk-release-Boost_1_54_0_beta1;
 
 
 after_success:
