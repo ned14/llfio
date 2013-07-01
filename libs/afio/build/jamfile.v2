@@ -33,7 +33,7 @@ project boost/afio
 
 lib boost_afio : afio.cpp 
 	: <include>../../../boost/afio 
-      <cxxflags>-std=c++11
+      <cxxflags>-std=c++0x
 
     #lots of complier flags
       <cxxflags>"-fvisibility-inlines-hidden -fstrict-aliasing -Wstrict-aliasing -Wall -Wno-unused -fargument-noalias -O2 -g -fPIC -fvisibility=hidden -fopenmp"
