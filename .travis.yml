@@ -49,6 +49,7 @@ before_install:
  - pwd
  - ls
  - cd boost
+ - ls
  - cd tools
  - cd build
  - cd v2
