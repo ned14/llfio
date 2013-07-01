@@ -20,7 +20,7 @@ project boost/afio/test
       <library>../../../NiallsCPP11Utilities//utils
      # <include>../../../boost/afio         # <--- should be include with boost_afio usage requirements
       <cxxflags>-std=c++11 
-      #<linkflags>"-l pthread"  #is this the test's dependency or boost_afio's????
+      #<linkflags>"-l pthread"      #is this the test's dependency or boost_afio's???? 
     ;
 
 

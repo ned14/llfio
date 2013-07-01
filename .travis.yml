@@ -44,18 +44,25 @@ before_install:
  - wget https://github.com/ned14/boost-trunk/archive/release/Boost_1_54_0_beta1.tar.gz
  - tar zxf Boost_1_54_0_beta1.tar.gz
  - mv boost-trunk-release-Boost_1_54_0_beta1 boost
+ 
+# install boost build
+ - /boost/tools/build/v2/boostrap.sh
+ - /boost/tools/build/v2/b2 install
+ 
 
 script:
- - if [ $DEBUG -eq 0 ]; then PREFIXPATH="x64/Release"; DEBUGBUILD=""; fi
- - if [ $DEBUG -eq 1 ]; then PREFIXPATH="x64/Debug"; DEBUGBUILD="--debugbuild"; fi
- - if [ $DEBUG -eq 2 ]; then PREFIXPATH="x64/Debug"; DEBUGBUILD="--optdebugbuild"; fi
- - if [ $CC = "clang" ]; then scons -k --useclang=clang++-3.2 $DEBUGBUILD $CCFLAGS; else scons -k $DEBUGBUILD $CCFLAGS; fi
- - if [ $VALGRIND = "memcheck" ]; then PREFIXTEST="valgrind --tool=memcheck --suppressions=libs/afio/test/memcheck.supp --track-origins=yes --track-fds=yes --leak-check=full --show-reachable=yes --error-exitcode=1"; fi
- - if [ $VALGRIND = "drd" ]; then PREFIXTEST="valgrind --tool=drd --suppressions=libs/afio/test/drd.supp --error-exitcode=1"; fi
- - if [ $VALGRIND = "0" ]; then PREFIXTEST=""; fi
+# - if [ $DEBUG -eq 0 ]; then PREFIXPATH="x64/Release"; DEBUGBUILD=""; fi
+# - if [ $DEBUG -eq 1 ]; then PREFIXPATH="x64/Debug"; DEBUGBUILD="--debugbuild"; fi
+# - if [ $DEBUG -eq 2 ]; then PREFIXPATH="x64/Debug"; DEBUGBUILD="--optdebugbuild"; fi
+# - if [ $CC = "clang" ]; then scons -k --useclang=clang++-3.2 $DEBUGBUILD $CCFLAGS; else scons -k $DEBUGBUILD $CCFLAGS; fi
+# - if [ $VALGRIND = "memcheck" ]; then PREFIXTEST="valgrind --tool=memcheck --suppressions=libs/afio/test/memcheck.supp --track-origins=yes --track-fds=yes --leak-check=full --show-reachable=yes --error-exitcode=1"; fi
+# - if [ $VALGRIND = "drd" ]; then PREFIXTEST="valgrind --tool=drd --suppressions=libs/afio/test/drd.supp --error-exitcode=1"; fi
+# - if [ $VALGRIND = "0" ]; then PREFIXTEST=""; fi
  
- - if [ $GCOV -eq 1 ]; then set -x; fi
- - if [ "$UNIT_TESTS" != "0" ]; then $PREFIXTEST $PREFIXPATH/tests -s $UNIT_TESTS; fi
+# - if [ $GCOV -eq 1 ]; then set -x; fi
+# - if [ "$UNIT_TESTS" != "0" ]; then $PREFIXTEST $PREFIXPATH/tests -s $UNIT_TESTS; fi
+- if [ $CC = "gcc" ]; then b2 release toolset=gcc --link=shared --boost=boost; fi
+- if [ $CC = "clang" ]; then b2 release toolset=clang --link=shared --boost=boost; fi
 
 after_success:
  - if [ $GCOV -eq 1 ]; then bash libs/afio/test/update_coveralls.sh `pwd`; fi
