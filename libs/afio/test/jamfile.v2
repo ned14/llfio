@@ -13,18 +13,20 @@ local boost-path = [ modules.peek : BOOST ] ;
 
 import testing ;
 
-project sandbox/boost/afio/test
+ECHO "Boost path is : " $(boost-path) ;
+
+project boost/afio/test
     : requirements
       <threading>multi
       <library>../build//boost_afio
       <library>../../../NiallsCPP11Utilities//utils
-      <library>$(boost)/libs/system/build//boost_system
-      <library>$(boost)/libs/system/build//boost_filesystem 
-      <library>$(boost)/libs/system/build//boost_atomic
-      <library>$(boost)/libs/system/build//boost_thread
+      <library>$(boost-path)/libs/system/build//boost_system
+      <library>$(boost-path)/libs/filesystem/build//boost_filesystem 
+      <library>$(boost-path)/libs/atomic/build//boost_atomic
+      <library>$(boost-path)/libs/thread/build//boost_thread
       <include>../../../boost/afio 
-      <toolset>gcc <cxxflags>-std=c++11 
-      <linkflags>"-l boost_filesystem -l boost_thread -l pthread"
+      <cxxflags>-std=c++11 
+      <linkflags>"-l pthread"
     ;
 
 
