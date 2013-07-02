@@ -31,6 +31,6 @@ if [ GLOB $(BOOST) : [ modules.peek project : JAMFILE ] ]
 
 build-project libs/afio/build ;
 
-build-project libs/afio/test ;
+build-project libs/afio/test ; #<--- run this separately for unit testing
 
 
