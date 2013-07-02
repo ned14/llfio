@@ -73,7 +73,7 @@ script:
  - if [ $VALGRIND = "0" ]; then PREFIXTEST=""; fi
  
 #runtests
-#- if [ "$UNIT_TESTS" != "0" ]; then $PREFIXTEST $PREFIXPATH/boost_afio_test -s $UNIT_TESTS; fi
+- if [ "$UNIT_TESTS" != "0" ]; then $PREFIXTEST $PREFIXPATH/boost_afio_test -s $UNIT_TESTS; fi
 
 after_success:
  - if [ $GCOV -eq 1 ]; then bash libs/afio/test/update_coveralls.sh `pwd`; fi
