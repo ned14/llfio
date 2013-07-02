@@ -24,11 +24,13 @@ project boost/afio/test
     ;
 
 
+exe boost_afio_test : main.cpp  ; #<-------- Keeping this for now to maintain consistency with previous travis-ci tests
+
 test-suite afio
     : #[ link main.cpp ]
-      [ run main.cpp ]     #<----- run b2 from test folder to build and run unit test
+      #[ run main.cpp ]     #<----- run b2 from test folder to build and run unit test
     ;
 
 
 
-#exe boost_afio_test : main.cpp  ; #<-------- do we need to make this cpp still? maybe for valgrind?
+
