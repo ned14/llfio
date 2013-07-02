@@ -52,7 +52,7 @@ before_install:
  - ./bootstrap.sh
  - sudo ./b2 install
  - cd ../../../../../
- - pwd
+
 
 script:
 # - if [ $DEBUG -eq 0 ]; then PREFIXPATH="x64/Release"; DEBUGBUILD=""; fi
@@ -77,7 +77,7 @@ script:
  - if [ "$UNIT_TESTS" != "0" ]; then b2 libs/afio/test $DEBUGBUILD toolset=$CC --link=shared --boost=/home/travis/build/BoostGSoC/boost.afio/boost/boost-trunk-release-Boost_1_54_0_beta1; fi
 
 
-#need to figure out how to either run unit tests or valgrind, or how to designate unit tests be selectivly run with valgrind, maybe <testing.launcher>valgrind ???
+
 
  - if [ $DEBUG -eq 0 ]; then PREFIXPATH="libs/afio/test/bin/gcc-4.8/release/threading-multi"; fi
  - if [ $DEBUG -eq 1 ]; then PREFIXPATH="libs/afio/test/bin/gcc-4.8/debug/threading-multi"; fi
@@ -89,8 +89,6 @@ script:
  
 
 - if [ "$UNIT_TESTS" != "0" ]; then $PREFIXTEST $PREFIXPATH/boost_afio_test -s $UNIT_TESTS; fi
-
-
 
 after_success:
  - if [ $GCOV -eq 1 ]; then bash libs/afio/test/update_coveralls.sh `pwd`; fi
