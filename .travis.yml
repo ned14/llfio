@@ -18,7 +18,7 @@ env:
 #    - _="GCC 4.8 + Unit/functional tests coverage" VALGRIND=0 CCFLAGS="--usegcov --usegcc=g++-4.8" UNIT_TESTS="" DEBUG=1 GCCVER="-4.8" GCOV=1
 
 #try to make this work as intended, not using scons, so no --usegcc, etc, cant substitute gcc for clang, so just change value of CC
-    - _="GCC 4.8 + Unit/functional tests coverage" VALGRIND=0 CC=gcc CCFLAGS="--gcov" UNIT_TESTS="" DEBUG=1 GCCVER="-4.8" GCOV=1
+    - _="GCC 4.8 + Unit/functional tests coverage" VALGRIND=0 CC=gcc CCFLAGS="-gcov" UNIT_TESTS="" DEBUG=1 GCCVER="-4.8" GCOV=1
     - _="Memory error and leak tests" VALGRIND=memcheck UNIT_TESTS="--log_level=test_suite --run_test=all/exclude_async_io_errors" DEBUG=2 GCCVER="" GCOV=0
 #    - _="Race detection tests" VALGRIND=0 CCFLAGS="--usethreadsanitize --usegcc=g++-4.8" UNIT_TESTS="" DEBUG=2 GCCVER="-4.8" TSAN_OPTIONS="suppressions=libs/afio/test/tsan.supp" GCOV=0
 
@@ -29,15 +29,18 @@ matrix:
   exclude:
     - compiler: clang
 #      env: _="GCC 4.8 + Unit/functional tests coverage" VALGRIND=0 CCFLAGS="--usegcov --usegcc=g++-4.8" UNIT_TESTS="" DEBUG=1 GCCVER="-4.8" GCOV=1
-      env: _="GCC 4.8 + Unit/functional tests coverage" VALGRIND=0 CC=gcc CCFLAGS="--gcov" UNIT_TESTS="" DEBUG=1 GCCVER="-4.8" GCOV=1
+      env: _="GCC 4.8 + Unit/functional tests coverage" VALGRIND=0 CC=gcc CCFLAGS="-gcov" UNIT_TESTS="" DEBUG=1 GCCVER="-4.8" GCOV=1
 
     - compiler: clang
       env: _="Race detection tests" VALGRIND=0 CCFLAGS="--usethreadsanitize --usegcc=g++-4.8" UNIT_TESTS="" DEBUG=2 GCCVER="-4.8" TSAN_OPTIONS="suppressions=libs/afio/test/tsan.supp" GCOV=0
 
   allow_failures:
     - compiler: gcc
-#      env: _="Race detection tests" VALGRIND=0 CCFLAGS="--usethreadsanitize --usegcc=g++-4.8" UNIT_TESTS="" DEBUG=2 GCCVER="-4.8" TSAN_OPTIONS="suppressions=libs/afio/test/tsan.supp" GCOV=0
-      env: _="Race detection tests" VALGRIND=0 CC=gcc CCFLAGS="-fthreadsanitize" UNIT_TESTS="" DEBUG=2 GCCVER="-4.8" TSAN_OPTIONS="suppressions=libs/afio/test/tsan.supp" GCOV=0
+      env: _="Race detection tests" VALGRIND=0 CCFLAGS="--usethreadsanitize --usegcc=g++-4.8" UNIT_TESTS="" DEBUG=2 GCCVER="-4.8" TSAN_OPTIONS="suppressions=libs/afio/test/tsan.supp" GCOV=0
+#      env: _="Race detection tests" VALGRIND=0 CC=gcc CCFLAGS="-fthreadsanitize" UNIT_TESTS="" DEBUG=2 GCCVER="-4.8" TSAN_OPTIONS="suppressions=libs/afio/test/tsan.supp" GCOV=0
+     - _="Race detection tests" VALGRIND=0 CC=gcc CCFLAGS="-fthreadsanitize" UNIT_TESTS="" DEBUG=2 GCCVER="-4.8" TSAN_OPTIONS="suppressions=libs/afio/test/tsan.supp" GCOV=0
+
+
 
 before_install:
  - sudo add-apt-repository -y ppa:apokluda/boost1.53
