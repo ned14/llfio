@@ -68,9 +68,9 @@ script:
 
 
 #valgrind setup
-# - if [ $VALGRIND = "memcheck" ]; then PREFIXTEST="valgrind --tool=memcheck --suppressions=libs/afio/test/memcheck.supp --track-origins=yes --track-fds=yes --leak-check=full --show-reachable=yes --error-exitcode=1"; fi
-# - if [ $VALGRIND = "drd" ]; then PREFIXTEST="valgrind --tool=drd --suppressions=libs/afio/test/drd.supp --error-exitcode=1"; fi
-# - if [ $VALGRIND = "0" ]; then PREFIXTEST=""; fi
+ - if [ $VALGRIND = "memcheck" ]; then PREFIXTEST="valgrind --tool=memcheck --suppressions=libs/afio/test/memcheck.supp --track-origins=yes --track-fds=yes --leak-check=full --show-reachable=yes --error-exitcode=1"; fi
+ - if [ $VALGRIND = "drd" ]; then PREFIXTEST="valgrind --tool=drd --suppressions=libs/afio/test/drd.supp --error-exitcode=1"; fi
+ - if [ $VALGRIND = "0" ]; then PREFIXTEST=""; fi
  
 #runtests
 #- if [ "$UNIT_TESTS" != "0" ]; then $PREFIXTEST $PREFIXPATH/boost_afio_test -s $UNIT_TESTS; fi
