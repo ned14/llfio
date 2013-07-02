@@ -47,7 +47,7 @@ before_install:
  - mv NiallsCPP_jamfile.v2 NiallsCPP11Utilities/jamfile.v2 
  
 # install boost build
- - BOOST="/home/travis/build/BoostGSoC/boost.afio/boost/boost-trunk-release-Boost_1_54_0_beta1"
+# - BOOST="/home/travis/build/BoostGSoC/boost.afio/boost/boost-trunk-release-Boost_1_54_0_beta1"
  - cd boost/boost-trunk-release-Boost_1_54_0_beta1/tools/build/v2
  - ./bootstrap.sh
  - sudo ./b2 install
@@ -57,7 +57,7 @@ script:
 # set debug/release & proper path for debug/release builds
  - if [ $DEBUG -eq 0 ]; then PREFIXPATH="libs/afio/test/bin/gcc-4.8/release/threading-multi"; DEBUGBUILD=release; fi
  - if [ $DEBUG -eq 1 ]; then PREFIXPATH="libs/afio/test/bin/gcc-4.8/debug/threading-multi"; DEBUGBUILD=debug; fi
- - if [ $DEBUG -eq 2 ]; then PREFIXPATH="libs/afio/test/bin/gcc-4.8/debug/threading-multi"; DEBUGBUILD="debug <optimization>speed" fi
+ - if [ $DEBUG -eq 2 ]; then PREFIXPATH="libs/afio/test/bin/gcc-4.8/debug/threading-multi"; DEBUGBUILD="debug <optimization>speed"; fi
 
 #build the lib
  - b2 $DEBUGBUILD toolset=$CC --link=shared --boost=/home/travis/build/BoostGSoC/boost.afio/boost/boost-trunk-release-Boost_1_54_0_beta1;
