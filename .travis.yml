@@ -15,21 +15,21 @@ env:
   matrix:
     - _="Build test" VALGRIND=0 UNIT_TESTS=0 DEBUG=0 GCCVER="" GCOV=0
     - _="Unit/functional tests" VALGRIND=0 UNIT_TESTS="" DEBUG=0 GCCVER="" GCOV=0
-    - _="GCC 4.8 + Unit/functional tests coverage" VALGRIND=0 CCFLAGS="--usegcov --usegcc=g++-4.8" UNIT_TESTS="" DEBUG=1 GCCVER="4.8" GCOV=1
+    - _="GCC 4.8 + Unit/functional tests coverage" VALGRIND=0 CCFLAGS="--usegcov --usegcc=g++-4.8" UNIT_TESTS="" DEBUG=1 GCCVER="-4.8" GCOV=1
     - _="Memory error and leak tests" VALGRIND=memcheck UNIT_TESTS="--log_level=test_suite --run_test=all/exclude_async_io_errors" DEBUG=2 GCCVER="" GCOV=0
-    - _="Race detection tests" VALGRIND=0 CCFLAGS="--usethreadsanitize --usegcc=g++-4.8" UNIT_TESTS="" DEBUG=2 GCCVER="4.8" TSAN_OPTIONS="suppressions=libs/afio/test/tsan.supp" GCOV=0
+    - _="Race detection tests" VALGRIND=0 CCFLAGS="--usethreadsanitize --usegcc=g++-4.8" UNIT_TESTS="" DEBUG=2 GCCVER="-4.8" TSAN_OPTIONS="suppressions=libs/afio/test/tsan.supp" GCOV=0
 
 # The clang 3.2 .deb doesn't supply the needed tsan runtime library :(
 matrix:
   exclude:
     - compiler: clang
-      env: _="GCC 4.8 + Unit/functional tests coverage" VALGRIND=0 CCFLAGS="--usegcov --usegcc=g++-4.8" UNIT_TESTS="" DEBUG=1 GCCVER="4.8" GCOV=1
+      env: _="GCC 4.8 + Unit/functional tests coverage" VALGRIND=0 CCFLAGS="--usegcov --usegcc=g++-4.8" UNIT_TESTS="" DEBUG=1 GCCVER="-4.8" GCOV=1
     - compiler: clang
-      env: _="Race detection tests" VALGRIND=0 CCFLAGS="--usethreadsanitize --usegcc=g++-4.8" UNIT_TESTS="" DEBUG=2 GCCVER="4.8" TSAN_OPTIONS="suppressions=libs/afio/test/tsan.supp" GCOV=0
+      env: _="Race detection tests" VALGRIND=0 CCFLAGS="--usethreadsanitize --usegcc=g++-4.8" UNIT_TESTS="" DEBUG=2 GCCVER="-4.8" TSAN_OPTIONS="suppressions=libs/afio/test/tsan.supp" GCOV=0
 
   allow_failures:
     - compiler: gcc
-      env: _="Race detection tests" VALGRIND=0 CCFLAGS="--usethreadsanitize --usegcc=g++-4.8" UNIT_TESTS="" DEBUG=2 GCCVER="4.8" TSAN_OPTIONS="suppressions=libs/afio/test/tsan.supp" GCOV=0
+      env: _="Race detection tests" VALGRIND=0 CCFLAGS="--usethreadsanitize --usegcc=g++-4.8" UNIT_TESTS="" DEBUG=2 GCCVER="-4.8" TSAN_OPTIONS="suppressions=libs/afio/test/tsan.supp" GCOV=0
 
 before_install:
  - sudo add-apt-repository -y ppa:apokluda/boost1.53
@@ -38,7 +38,7 @@ before_install:
  - sudo apt-get update -qq
  - sudo apt-get install -qq libboost1.53-all-dev
  - if [ $CXX = "clang++" ]; then sudo apt-get install -qq libstdc++-4.8-dev clang-3.2; fi
- - if [ $GCCVER != "" ]; then sudo apt-get install -qq g++-$GCCVER; fi
+ - if [ $GCCVER != "" ]; then sudo apt-get install -qq g++$GCCVER; fi
  - if [ $VALGRIND != "0" ]; then sudo apt-get install -qq valgrind; fi
  - git submodule update --init --recursive
  - wget https://github.com/ned14/boost-trunk/archive/release/Boost_1_54_0_beta1.tar.gz
@@ -60,10 +60,10 @@ script:
  - if [ $DEBUG -eq 2 ]; then PREFIXPATH="libs/afio/test/bin/gcc-4.6/debug/threading-multi"; DEBUGBUILD="debug optimization=speed"; fi
 
 #build the lib
- - b2 $DEBUGBUILD toolset=$CC$GCCVER --link=shared --boost=/home/travis/build/BoostGSoC/boost.afio/boost/boost-trunk-release-Boost_1_54_0_beta1;
+ - b2 $DEBUGBUILD toolset=$CC$GCCVER --link=shared --boost=/home/travis/build/BoostGSoC/boost.afio/boost/boost-trunk-release-Boost_1_54_0_beta1 cxxflags=$CCFLAGS;
 
 #build unit tests
- - b2 libs/afio/test $DEBUGBUILD toolset=$CC$GCCVER --link=shared --boost=/home/travis/build/BoostGSoC/boost.afio/boost/boost-trunk-release-Boost_1_54_0_beta1
+ - b2 libs/afio/test $DEBUGBUILD toolset=$CC$GCCVER --link=shared --boost=/home/travis/build/BoostGSoC/boost.afio/boost/boost-trunk-release-Boost_1_54_0_beta1 cxxflags=$CCFLAGS;
 
 
 #valgrind setup
