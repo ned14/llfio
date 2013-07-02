@@ -33,8 +33,7 @@ matrix:
 
     - compiler: clang
 #      env: _="Race detection tests" VALGRIND=0 CCFLAGS="--usethreadsanitize --usegcc=g++-4.8" UNIT_TESTS="" DEBUG=2 GCCVER="-4.8" TSAN_OPTIONS="suppressions=libs/afio/test/tsan.supp" GCOV=0
-
-       env: _="Race detection tests" VALGRIND=0 CC=gcc CCFLAGS="-fthreadsanitize" UNIT_TESTS="" DEBUG=2 GCCVER="-4.8" TSAN_OPTIONS="suppressions=libs/afio/test/tsan.supp" GCOV=0
+      env: _="Race detection tests" VALGRIND=0 CC=gcc CCFLAGS="-fthreadsanitize" UNIT_TESTS="" DEBUG=2 GCCVER="-4.8" TSAN_OPTIONS="suppressions=libs/afio/test/tsan.supp" GCOV=0
 
 
   allow_failures:
