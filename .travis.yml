@@ -60,9 +60,9 @@ before_install:
 
 script:
 # set debug/release & proper path for debug/release builds
- - if [ $DEBUG -eq 0 ]; then PREFIXPATH="libs/afio/test/bin/BUILDPATH/release/threading-multi"; DEBUGBUILD=release; fi
- - if [ $DEBUG -eq 1 ]; then PREFIXPATH="libs/afio/test/bin/BUILDPATH/debug/threading-multi"; DEBUGBUILD=debug; fi
- - if [ $DEBUG -eq 2 ]; then PREFIXPATH="libs/afio/test/bin/BUILDPATH/debug/threading-multi"; DEBUGBUILD="debug optimization=speed"; fi
+ - if [ $DEBUG -eq 0 ]; then PREFIXPATH="libs/afio/test/bin/$BUILDPATH/release/threading-multi"; DEBUGBUILD=release; fi
+ - if [ $DEBUG -eq 1 ]; then PREFIXPATH="libs/afio/test/bin/$BUILDPATH/debug/threading-multi"; DEBUGBUILD=debug; fi
+ - if [ $DEBUG -eq 2 ]; then PREFIXPATH="libs/afio/test/bin/$BUILDPATH/debug/threading-multi"; DEBUGBUILD="debug optimization=speed"; fi
 
 #try to pass gcov flags appropriatly
  - if [ $CCFLAGS != "" ]; then FLAGS="cxxflags=$CCFLAGS"; else FLAGS=""; fi
