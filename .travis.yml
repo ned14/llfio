@@ -1,4 +1,4 @@
-language: cpp
+anguage: cpp
 compiler:
   - gcc
   - clang
@@ -9,37 +9,28 @@ notifications:
 #      - other@example.com
     on_success: change # [always|never|change] # default: change
     on_failure: change # [always|never|change] # default: always
+
 env:
-#  global:
-#    - secure: "LG1scRCvFAHZ2rWGLL5ShXTegKNF3+4YaT8BAZalpMWjwBbYnIbAYgFYOwCk\naUy8e5zpC8FElIctGY/9ni1wcGwQkP97YaMvcai1r0IBjbVBi8tqvqekc/5Q\n2pz8IlJXDz/WzTEVb9w7xIDfRCZq8Xiw9LpENvVwfpbrQfFJLLk="
   matrix:
     - _="Build test" VALGRIND=0 UNIT_TESTS=0 DEBUG=0 GCCVER="-4.8" GCOV=0
     - _="Unit/functional tests" VALGRIND=0 UNIT_TESTS="" DEBUG=0 GCCVER="-4.8" GCOV=0
-#    - _="GCC 4.8 + Unit/functional tests coverage" VALGRIND=0 CCFLAGS="--usegcov --usegcc=g++-4.8" UNIT_TESTS="" DEBUG=1 GCCVER="-4.8" GCOV=1
-
-#try to make this work as intended, not using scons, so no --usegcc, etc, cant substitute gcc for clang, so just change value of CC
-    - _="GCC 4.8 + Unit/functional tests coverage" VALGRIND=0 CC=gcc CCFLAGS="-gcov" UNIT_TESTS="" DEBUG=1 GCCVER="-4.8" GCOV=1
-    - _="Memory error and leak tests" VALGRIND=memcheck UNIT_TESTS="--log_level=test_suite --run_test=all/exclude_async_io_errors" DEBUG=2 GCCVER="" GCOV=0
-#    - _="Race detection tests" VALGRIND=0 CCFLAGS="--usethreadsanitize --usegcc=g++-4.8" UNIT_TESTS="" DEBUG=2 GCCVER="-4.8" TSAN_OPTIONS="suppressions=libs/afio/test/tsan.supp" GCOV=0
-
-    - _="Race detection tests" VALGRIND=0 CC=gcc CCFLAGS="-fthreadsanitize" UNIT_TESTS="" DEBUG=2 GCCVER="-4.8" TSAN_OPTIONS="suppressions=libs/afio/test/tsan.supp" GCOV=0
+    - _="GCC 4.8 + Unit/functional tests coverage" VALGRIND=0 CCFLAGS="-fprofile-arcs -ftest-coverage" UNIT_TESTS="" DEBUG=1 GCCVER="-4.8" GCOV=1
+    - _="Memory error and leak tests" VALGRIND=memcheck UNIT_TESTS="--log_level=test_suite --run_test=all/exclude_async_io_errors" DEBUG=2 GCCVER="4.8" GCOV=0
+    - _="Race detection tests" VALGRIND=0 CCFLAGS="-fthreadsanitize" UNIT_TESTS="" DEBUG=2 GCCVER="-4.8" TSAN_OPTIONS="suppressions=libs/afio/test/tsan.supp" GCOV=0
 
 # The clang 3.2 .deb doesn't supply the needed tsan runtime library :(
 matrix:
   exclude:
     - compiler: clang
-#      env: _="GCC 4.8 + Unit/functional tests coverage" VALGRIND=0 CCFLAGS="--usegcov --usegcc=g++-4.8" UNIT_TESTS="" DEBUG=1 GCCVER="-4.8" GCOV=1
-      env: _="GCC 4.8 + Unit/functional tests coverage" VALGRIND=0 CC=gcc CCFLAGS="-gcov" UNIT_TESTS="" DEBUG=1 GCCVER="-4.8" GCOV=1
+      env: _="GCC 4.8 + Unit/functional tests coverage" VALGRIND=0 CCFLAGS="-fprofile-arcs -ftest-coverage" UNIT_TESTS="" DEBUG=1 GCCVER="-4.8" GCOV=1
 
     - compiler: clang
-#      env: _="Race detection tests" VALGRIND=0 CCFLAGS="--usethreadsanitize --usegcc=g++-4.8" UNIT_TESTS="" DEBUG=2 GCCVER="-4.8" TSAN_OPTIONS="suppressions=libs/afio/test/tsan.supp" GCOV=0
-      env: _="Race detection tests" VALGRIND=0 CC=gcc CCFLAGS="-fthreadsanitize" UNIT_TESTS="" DEBUG=2 GCCVER="-4.8" TSAN_OPTIONS="suppressions=libs/afio/test/tsan.supp" GCOV=0
+      env: _="Race detection tests" VALGRIND=0 CCFLAGS="-fthreadsanitize" UNIT_TESTS="" DEBUG=2 GCCVER="-4.8" TSAN_OPTIONS="suppressions=libs/afio/test/tsan.supp" GCOV=0
 
 
   allow_failures:
     - compiler: gcc
-      env: _="Race detection tests" VALGRIND=0 CCFLAGS="--usethreadsanitize --usegcc=g++-4.8" UNIT_TESTS="" DEBUG=2 GCCVER="-4.8" TSAN_OPTIONS="suppressions=libs/afio/test/tsan.supp" GCOV=0
-      env: _="Race detection tests" VALGRIND=0 CC=gcc CCFLAGS="-fthreadsanitize" UNIT_TESTS="" DEBUG=2 GCCVER="-4.8" TSAN_OPTIONS="suppressions=libs/afio/test/tsan.supp" GCOV=0
+      env: _="Race detection tests" VALGRIND=0 CCFLAGS="-fthreadsanitize" UNIT_TESTS="" DEBUG=2 GCCVER="-4.8" TSAN_OPTIONS="suppressions=libs/afio/test/tsan.supp" GCOV=0
 
 
 
@@ -65,13 +56,13 @@ before_install:
  - sudo ./b2 install
  - cd ../../../../../
 
- - if [ $CC = "clang" ]; then GCCVER="" ; fi
+ - if [ $CC = "clang" ]; then GCCVER=""; BUILDPAth="clang-linux-3.2"; else BUILDPATH="$CC$GCCVER"; fi
 
 script:
 # set debug/release & proper path for debug/release builds
- - if [ $DEBUG -eq 0 ]; then PREFIXPATH="libs/afio/test/bin/gcc-4.8/release/threading-multi"; DEBUGBUILD=release; fi
- - if [ $DEBUG -eq 1 ]; then PREFIXPATH="libs/afio/test/bin/gcc-4.8/debug/threading-multi"; DEBUGBUILD=debug; fi
- - if [ $DEBUG -eq 2 ]; then PREFIXPATH="libs/afio/test/bin/gcc-4.8/debug/threading-multi"; DEBUGBUILD="debug optimization=speed"; fi
+ - if [ $DEBUG -eq 0 ]; then PREFIXPATH="libs/afio/test/bin/BUILDPATH/release/threading-multi"; DEBUGBUILD=release; fi
+ - if [ $DEBUG -eq 1 ]; then PREFIXPATH="libs/afio/test/bin/BUILDPATH/debug/threading-multi"; DEBUGBUILD=debug; fi
+ - if [ $DEBUG -eq 2 ]; then PREFIXPATH="libs/afio/test/bin/BUILDPATH/debug/threading-multi"; DEBUGBUILD="debug optimization=speed"; fi
 
 #try to pass gcov flags appropriatly
  - if [ $CCFLAGS != "" ]; then FLAGS="cxxflags=$CCFLAGS"; else FLAGS=""; fi
