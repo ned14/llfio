@@ -4,7 +4,7 @@
 <title>boost::afio::async_io_op</title>
 <link rel="stylesheet" href="../../../../../../doc/src/boostbook.css" type="text/css">
 <meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
-<link rel="home" href="../../index.html" title="Chapter&#160;1.&#160;AFIO">
+<link rel="home" href="../../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 0.1">
 <link rel="up" href="../reference.html" title="Reference">
 <link rel="prev" href="boost_afio_async_file_io_dispatcher_base.html" title="boost::afio::async_file_io_dispatcher_base">
 <link rel="next" href="boost_afio_async_path_op_req.html" title="boost::afio::async_path_op_req">
@@ -27,25 +27,21 @@
 <a name="afio.reference.boost_afio_async_io_op"></a><a class="link" href="boost_afio_async_io_op.html" title="boost::afio::async_io_op">boost::afio::async_io_op</a>
 </h3></div></div></div>
 <p>
-        <a class="indexterm" name="id863840"></a><a class="indexterm" name="id863844"></a><a class="indexterm" name="id863849"></a>
+        <a class="indexterm" name="id902985"></a><a class="indexterm" name="id902989"></a><a class="indexterm" name="id902994"></a>
 A reference to an async operation.
       </p>
 <h5>
 <a name="afio.reference.boost_afio_async_io_op.h0"></a>
         <span class="phrase"><a name="afio.reference.boost_afio_async_io_op.synopsis"></a></span><a class="link" href="boost_afio_async_io_op.html#afio.reference.boost_afio_async_io_op.synopsis">Synopsis</a>
       </h5>
-<p>
-</p>
 <pre class="programlisting"><span class="keyword">struct</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_io_op</span>
 <span class="special">{</span>
   <span class="comment">// ...</span>
 <span class="special">};</span>
 </pre>
-<p>
-      </p>
 <h5>
 <a name="afio.reference.boost_afio_async_io_op.h1"></a>
-        <span class="phrase"><a name="afio.reference.boost_afio_async_io_op.constructor_s_"></a></span><a class="link" href="boost_afio_async_io_op.html#afio.reference.boost_afio_async_io_op.constructor_s_">Constructor(s)</a>
+        <span class="phrase"><a name="afio.reference.boost_afio_async_io_op.constructor_s"></a></span><a class="link" href="boost_afio_async_io_op.html#afio.reference.boost_afio_async_io_op.constructor_s">Constructor(s)</a>
       </h5>
 <div class="informaltable"><table class="table">
 <colgroup>
@@ -73,11 +69,7 @@ A reference to an async operation.
 <tbody>
 <tr>
 <td>
-                <p>
-</p>
 <pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">async_io_op</span><span class="special">()</span></pre>
-<p>
-                </p>
               </td>
 <td>
               </td>
@@ -86,11 +78,7 @@ A reference to an async operation.
 </tr>
 <tr>
 <td>
-                <p>
-</p>
 <pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">async_io_op</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">async_io_op</span> <span class="special">&amp;</span> <span class="identifier">o</span><span class="special">)</span></pre>
-<p>
-                </p>
               </td>
 <td>
               </td>
@@ -102,11 +90,7 @@ A reference to an async operation.
 </tr>
 <tr>
 <td>
-                <p>
-</p>
 <pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">async_io_op</span><span class="special">(</span><span class="identifier">async_io_op</span> <span class="special">&amp;&amp;</span> <span class="identifier">o</span><span class="special">)</span></pre>
-<p>
-                </p>
               </td>
 <td>
               </td>
@@ -118,11 +102,7 @@ A reference to an async operation.
 </tr>
 <tr>
 <td>
-                <p>
-</p>
 <pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">async_io_op</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span> <span class="identifier">async_file_io_dispatcher_base</span> <span class="special">&gt;</span> <span class="identifier">_parent</span><span class="special">,</span> <span class="identifier">size_t</span> <span class="identifier">_id</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span> <span class="identifier">shared_future</span><span class="special">&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span> <span class="identifier">detail</span><span class="special">::</span><span class="identifier">async_io_handle</span> <span class="special">&gt;&gt;&gt;</span> <span class="identifier">_handle</span><span class="special">)</span></pre>
-<p>
-                </p>
               </td>
 <td>
               </td>
@@ -142,11 +122,7 @@ A reference to an async operation.
 </tr>
 <tr>
 <td>
-                <p>
-</p>
 <pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">async_io_op</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span> <span class="identifier">async_file_io_dispatcher_base</span> <span class="special">&gt;</span> <span class="identifier">_parent</span><span class="special">,</span> <span class="identifier">size_t</span> <span class="identifier">_id</span><span class="special">)</span></pre>
-<p>
-                </p>
               </td>
 <td>
               </td>
@@ -164,7 +140,7 @@ A reference to an async operation.
 </table></div>
 <h5>
 <a name="afio.reference.boost_afio_async_io_op.h2"></a>
-        <span class="phrase"><a name="afio.reference.boost_afio_async_io_op.member_function_s_"></a></span><a class="link" href="boost_afio_async_io_op.html#afio.reference.boost_afio_async_io_op.member_function_s_">Member
+        <span class="phrase"><a name="afio.reference.boost_afio_async_io_op.member_function_s"></a></span><a class="link" href="boost_afio_async_io_op.html#afio.reference.boost_afio_async_io_op.member_function_s">Member
         Function(s)</a>
       </h5>
 <div class="informaltable"><table class="table">
@@ -198,11 +174,7 @@ A reference to an async operation.
 <tbody>
 <tr>
 <td>
-                <p>
-</p>
 <pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">async_io_op</span> <span class="special">&amp;</span> <span class="keyword">operator</span><span class="special">=(</span><span class="keyword">const</span> <span class="identifier">async_io_op</span> <span class="special">&amp;</span> <span class="identifier">o</span><span class="special">)</span></pre>
-<p>
-                </p>
               </td>
 <td>
               </td>
@@ -214,11 +186,7 @@ A reference to an async operation.
 </tr>
 <tr>
 <td>
-                <p>
-</p>
 <pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">async_io_op</span> <span class="special">&amp;</span> <span class="keyword">operator</span><span class="special">=(</span><span class="identifier">async_io_op</span> <span class="special">&amp;&amp;</span> <span class="identifier">o</span><span class="special">)</span></pre>
-<p>
-                </p>
               </td>
 <td>
               </td>
@@ -230,11 +198,7 @@ A reference to an async operation.
 </tr>
 <tr>
 <td>
-                <p>
-</p>
 <pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="keyword">bool</span> <span class="identifier">validate</span><span class="special">()</span></pre>
-<p>
-                </p>
               </td>
 <td>
                 <p>

@@ -4,7 +4,7 @@
 <title>boost::afio::async_data_op_req</title>
 <link rel="stylesheet" href="../../../../../../doc/src/boostbook.css" type="text/css">
 <meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
-<link rel="home" href="../../index.html" title="Chapter&#160;1.&#160;AFIO">
+<link rel="home" href="../../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 0.1">
 <link rel="up" href="../reference.html" title="Reference">
 <link rel="prev" href="../reference.html" title="Reference">
 <link rel="next" href="boost_afio_async_file_io_dispatcher_base.html" title="boost::afio::async_file_io_dispatcher_base">
@@ -27,7 +27,7 @@
 <a name="afio.reference.boost_afio_async_data_op_req"></a><a class="link" href="boost_afio_async_data_op_req.html" title="boost::afio::async_data_op_req">boost::afio::async_data_op_req</a>
 </h3></div></div></div>
 <p>
-        <a class="indexterm" name="id850747"></a><a class="indexterm" name="id850752"></a><a class="indexterm" name="id850756"></a>
+        <a class="indexterm" name="id891639"></a><a class="indexterm" name="id891644"></a><a class="indexterm" name="id891649"></a>
 A specialisation for any pointer to type T.
       </p>
 <h5>
@@ -42,19 +42,15 @@ A specialisation for any pointer to type T.
 <a name="afio.reference.boost_afio_async_data_op_req.h1"></a>
         <span class="phrase"><a name="afio.reference.boost_afio_async_data_op_req.synopsis"></a></span><a class="link" href="boost_afio_async_data_op_req.html#afio.reference.boost_afio_async_data_op_req.synopsis">Synopsis</a>
       </h5>
-<p>
-</p>
 <pre class="programlisting"><span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">T</span><span class="special">&gt;</span>
 <span class="keyword">struct</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_data_op_req</span>
 <span class="special">{</span>
   <span class="comment">// ...</span>
 <span class="special">};</span>
 </pre>
-<p>
-      </p>
 <h5>
 <a name="afio.reference.boost_afio_async_data_op_req.h2"></a>
-        <span class="phrase"><a name="afio.reference.boost_afio_async_data_op_req.template_parameter_s_"></a></span><a class="link" href="boost_afio_async_data_op_req.html#afio.reference.boost_afio_async_data_op_req.template_parameter_s_">Template
+        <span class="phrase"><a name="afio.reference.boost_afio_async_data_op_req.template_parameter_s"></a></span><a class="link" href="boost_afio_async_data_op_req.html#afio.reference.boost_afio_async_data_op_req.template_parameter_s">Template
         parameter(s)</a>
       </h5>
 <div class="informaltable"><table class="table">
@@ -86,7 +82,7 @@ A specialisation for any pointer to type T.
 </table></div>
 <h5>
 <a name="afio.reference.boost_afio_async_data_op_req.h3"></a>
-        <span class="phrase"><a name="afio.reference.boost_afio_async_data_op_req.constructor_s_"></a></span><a class="link" href="boost_afio_async_data_op_req.html#afio.reference.boost_afio_async_data_op_req.constructor_s_">Constructor(s)</a>
+        <span class="phrase"><a name="afio.reference.boost_afio_async_data_op_req.constructor_s"></a></span><a class="link" href="boost_afio_async_data_op_req.html#afio.reference.boost_afio_async_data_op_req.constructor_s">Constructor(s)</a>
       </h5>
 <div class="informaltable"><table class="table">
 <colgroup>
@@ -114,11 +110,7 @@ A specialisation for any pointer to type T.
 <tbody>
 <tr>
 <td>
-                <p>
-</p>
 <pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">async_data_op_req</span><span class="special">()</span></pre>
-<p>
-                </p>
               </td>
 <td>
               </td>
@@ -127,11 +119,7 @@ A specialisation for any pointer to type T.
 </tr>
 <tr>
 <td>
-                <p>
-</p>
 <pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">async_data_op_req</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">async_data_op_req</span> <span class="special">&amp;</span> <span class="identifier">o</span><span class="special">)</span></pre>
-<p>
-                </p>
               </td>
 <td>
               </td>
@@ -144,11 +132,7 @@ A specialisation for any pointer to type T.
 </tr>
 <tr>
 <td>
-                <p>
-</p>
 <pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">async_data_op_req</span><span class="special">(</span><span class="identifier">async_data_op_req</span> <span class="special">&amp;&amp;</span> <span class="identifier">o</span><span class="special">)</span></pre>
-<p>
-                </p>
               </td>
 <td>
               </td>
@@ -161,11 +145,7 @@ A specialisation for any pointer to type T.
 </tr>
 <tr>
 <td>
-                <p>
-</p>
 <pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">async_data_op_req</span><span class="special">(</span><span class="identifier">async_io_op</span> <span class="identifier">_precondition</span><span class="special">,</span> <span class="identifier">T</span> <span class="special">*</span> <span class="identifier">_buffer</span><span class="special">,</span> <span class="identifier">size_t</span> <span class="identifier">_length</span><span class="special">,</span> <span class="identifier">off_t</span> <span class="identifier">_where</span><span class="special">)</span></pre>
-<p>
-                </p>
               </td>
 <td>
               </td>
@@ -188,7 +168,7 @@ A specialisation for any pointer to type T.
 </table></div>
 <h5>
 <a name="afio.reference.boost_afio_async_data_op_req.h4"></a>
-        <span class="phrase"><a name="afio.reference.boost_afio_async_data_op_req.member_function_s_"></a></span><a class="link" href="boost_afio_async_data_op_req.html#afio.reference.boost_afio_async_data_op_req.member_function_s_">Member
+        <span class="phrase"><a name="afio.reference.boost_afio_async_data_op_req.member_function_s"></a></span><a class="link" href="boost_afio_async_data_op_req.html#afio.reference.boost_afio_async_data_op_req.member_function_s">Member
         Function(s)</a>
       </h5>
 <div class="informaltable"><table class="table">
@@ -222,11 +202,7 @@ A specialisation for any pointer to type T.
 <tbody>
 <tr>
 <td>
-                <p>
-</p>
 <pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">async_data_op_req</span> <span class="special">&amp;</span> <span class="keyword">operator</span><span class="special">=(</span><span class="keyword">const</span> <span class="identifier">async_data_op_req</span> <span class="special">&amp;</span> <span class="identifier">o</span><span class="special">)</span></pre>
-<p>
-                </p>
               </td>
 <td>
               </td>
@@ -239,11 +215,7 @@ A specialisation for any pointer to type T.
 </tr>
 <tr>
 <td>
-                <p>
-</p>
 <pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">async_data_op_req</span> <span class="special">&amp;</span> <span class="keyword">operator</span><span class="special">=(</span><span class="identifier">async_data_op_req</span> <span class="special">&amp;&amp;</span> <span class="identifier">o</span><span class="special">)</span></pre>
-<p>
-                </p>
               </td>
 <td>
               </td>

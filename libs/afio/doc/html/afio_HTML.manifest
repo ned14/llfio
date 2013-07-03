@@ -1,7 +1,6 @@
 index.html
-afio/introduction.html
-afio/compilation.html
 afio/design.html
+afio/compilation.html
 afio/quickstart.html
 afio/reference.html
 afio/reference/boost_afio_async_data_op_req.html

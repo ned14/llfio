@@ -4,8 +4,6 @@
     http://www.boost.org/LICENSE_1_0.txt)
 ===============================================================================/]
 
-[/ note the source code in this QBK is the only not (yet) checked by a compiler]
-
 [section:design Design Rationale]
 
 Todo

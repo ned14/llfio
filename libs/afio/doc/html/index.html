@@ -1,11 +1,11 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
-<title>Chapter&#160;1.&#160;AFIO</title>
+<title>Chapter&#160;1.&#160;Boost.AFIO 0.1</title>
 <link rel="stylesheet" href="../../../../doc/src/boostbook.css" type="text/css">
 <meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
-<link rel="home" href="index.html" title="Chapter&#160;1.&#160;AFIO">
-<link rel="next" href="afio/introduction.html" title="Introduction">
+<link rel="home" href="index.html" title="Chapter&#160;1.&#160;Boost.AFIO 0.1">
+<link rel="next" href="afio/design.html" title="Design Rationale">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
 <table cellpadding="2" width="100%"><tr>
@@ -17,11 +17,11 @@
 <td align="center"><a href="../../../../more/index.htm">More</a></td>
 </tr></table>
 <hr>
-<div class="spirit-nav"><a accesskey="n" href="afio/introduction.html"><img src="../../../../doc/src/images/next.png" alt="Next"></a></div>
+<div class="spirit-nav"><a accesskey="n" href="afio/design.html"><img src="../../../../doc/src/images/next.png" alt="Next"></a></div>
 <div class="chapter">
 <div class="titlepage"><div>
 <div><h2 class="title">
-<a name="afio"></a>Chapter&#160;1.&#160;AFIO</h2></div>
+<a name="afio"></a>Chapter&#160;1.&#160;Boost.AFIO 0.1</h2></div>
 <div><div class="author"><h3 class="author">
 <span class="firstname">Niall</span> <span class="surname">Douglas</span>
 </h3></div></div>
@@ -39,9 +39,8 @@
 <div class="toc">
 <p><b>Table of Contents</b></p>
 <dl class="toc">
-<dt><span class="section"><a href="afio/introduction.html">Introduction</a></span></dt>
-<dt><span class="section"><a href="afio/compilation.html">Compilation</a></span></dt>
 <dt><span class="section"><a href="afio/design.html">Design Rationale</a></span></dt>
+<dt><span class="section"><a href="afio/compilation.html">Compilation</a></span></dt>
 <dt><span class="section"><a href="afio/quickstart.html">Quick Start</a></span></dt>
 <dt><span class="section"><a href="afio/reference.html">Reference</a></span></dt>
 <dd><dl>
@@ -56,12 +55,42 @@
 <dt><span class="section"><a href="afio/acknowledgments.html">Acknowledgments</a></span></dt>
 </dl>
 </div>
+<p>
+    Boost.AFIO is batch, chainable, asynchronous closure execution engine extending
+    Boost.ASIO and Boost.Thread specialised as a portable and scalable asynchronous
+    file i/o implementation library. Implementation of this first version has been
+    kept as simple as possible (&lt; 1000 active LOC) at the cost of some performance.
+    This library was brought to Boost as part of Google Summer of Code 2013.
+  </p>
+<p>
+    Note that Boost.AFIO was originally written purely in C++11 and backported later
+    to older compilers. It requires, as an absolute minimum, a compiler with rvalue
+    reference support. Some popular compilers known to be minimally sufficient include:
+  </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+        Microsoft Visual Studio 2010.
+      </li>
+<li class="listitem">
+        GNU Compiler Collection v4.3.
+      </li>
+<li class="listitem">
+        Any clang.
+      </li>
+</ul></div>
+<p>
+    You may find the list of C++11 features in popular compilers at <a href="http://wiki.apache.org/stdcxx/C++0xCompilerSupport" target="_top">http://wiki.apache.org/stdcxx/C++0xCompilerSupport</a>
+    useful.
+  </p>
+<p>
+    As a very quick example of minimal usage:
+  </p>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
-<td align="left"><p><small>Last revised: July 02, 2013 at 22:32:01 GMT</small></p></td>
+<td align="left"><p><small>Last revised: July 03, 2013 at 23:26:38 GMT</small></p></td>
 <td align="right"><div class="copyright-footer"></div></td>
 </tr></table>
 <hr>
-<div class="spirit-nav"><a accesskey="n" href="afio/introduction.html"><img src="../../../../doc/src/images/next.png" alt="Next"></a></div>
+<div class="spirit-nav"><a accesskey="n" href="afio/design.html"><img src="../../../../doc/src/images/next.png" alt="Next"></a></div>
 </body>
 </html>

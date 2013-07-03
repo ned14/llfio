@@ -323,7 +323,7 @@ inline constexpr bool operator!(type a) \
 { \
 	return 0==static_cast<size_t>(a); \
 }
-/*! \enum open_flags
+/*! \enum file_flags
 \brief Bitwise file and directory open flags
 */
 enum class file_flags : size_t
@@ -388,17 +388,44 @@ public:
 	typedef std::pair<bool, std::shared_ptr<detail::async_io_handle>> completion_returntype;
 	typedef completion_returntype completion_t(size_t, std::shared_ptr<detail::async_io_handle>);
 	//! Invoke the specified function when each of the supplied operations complete
-	std::vector<async_io_op> completion(const std::vector<async_io_op> &ops, const std::vector<std::pair<async_op_flags, std::function<completion_t>>> &callbacks);
+	std::vector<async_io_op> completion(const std::vector<async_io_op> &ops, const std::vector<std::pair<async_op_flags, std::function<async_file_io_dispatcher_base::completion_t>>> &callbacks);
 	//! Invoke the specified function when the supplied operation completes
-	inline async_io_op completion(const async_io_op &req, const std::pair<async_op_flags, std::function<completion_t>> &callback);
+	inline async_io_op completion(const async_io_op &req, const std::pair<async_op_flags, std::function<async_file_io_dispatcher_base::completion_t>> &callback);
 
-	//! Invoke the specified callable when the supplied operation completes
+	/*! \brief Schedule a batch of asynchronous invocations of the specified bound functions when their supplied preconditions complete.
+    \return A pair with a batch of futures returning the result of each of the callables and a batch of op handles.
+    \param ops A batch of precondition op handles. If default constructed, a precondition is null.
+    \param callables A batch of bound functions to call, returning R.
+    \qbk{
+    [heading Example]
+    [call_example]
+    }
+    */
 	template<class R> inline std::pair<std::vector<future<R>>, std::vector<async_io_op>> call(const std::vector<async_io_op> &ops, const std::vector<std::function<R()>> &callables);
-	//! Invoke the specified callable when the supplied operation completes
+	//! \overload template<class R> inline std::pair<std::vector<future<R>>, std::vector<async_io_op>> call(const std::vector<async_io_op> &ops, const std::vector<std::function<R()>> &callables)
 	template<class R> std::pair<std::vector<future<R>>, std::vector<async_io_op>> call(const std::vector<std::function<R()>> &callables) { return call(std::vector<async_io_op>(), callables); }
-	//! Invoke the specified callable when the supplied operation completes
+	/*! \brief Schedule an asynchronous invocation of the specified bound function when its supplied precondition completes.
+    \return A pair with a future returning the result of the callable and an op handle.
+    \param req A precondition op handle. If default constructed, the precondition is null.
+    \param callback A bound functions to call, returning R.
+    \qbk{
+    [heading Example]
+    [call_example]
+    }
+    */
 	template<class R> inline std::pair<future<R>, async_io_op> call(const async_io_op &req, std::function<R()> callback);
-	//! Invoke the specified callable when the supplied operation completes
+	/*! \brief Schedule an asynchronous invocation of the specified unbound callable when its supplied precondition completes.
+    Note that this function essentially calls `std::bind()` on the callable and the args and passes it to the other call() overload taking a `std::function<>`.
+    You should therefore use `std::ref()` etc. as appropriate.
+    \return A pair with a future returning the result of the callable and an op handle.
+    \param req A precondition op handle. If default constructed, the precondition is null.
+    \param callback An unbound callable to call.
+    \param args An arbitrary sequence of arguments to bind to the callable.
+    \qbk{
+    [heading Example]
+    [call_example]
+    }
+    */
 	template<class C, class... Args> inline std::pair<future<typename std::result_of<C(Args...)>::type>, async_io_op> call(const async_io_op &req, C callback, Args... args);
 
 	//! Asynchronously creates directories

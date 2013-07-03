@@ -4,7 +4,7 @@
 <title>boost::afio::detail::async_io_handle</title>
 <link rel="stylesheet" href="../../../../../../doc/src/boostbook.css" type="text/css">
 <meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
-<link rel="home" href="../../index.html" title="Chapter&#160;1.&#160;AFIO">
+<link rel="home" href="../../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 0.1">
 <link rel="up" href="../reference.html" title="Reference">
 <link rel="prev" href="boost_afio_async_path_op_req.html" title="boost::afio::async_path_op_req">
 <link rel="next" href="boost_afio_thread_pool.html" title="boost::afio::thread_pool">
@@ -27,7 +27,7 @@
 <a name="afio.reference.boost_afio_detail_async_io_handle"></a><a class="link" href="boost_afio_detail_async_io_handle.html" title="boost::afio::detail::async_io_handle">boost::afio::detail::async_io_handle</a>
 </h3></div></div></div>
 <p>
-        <a class="indexterm" name="id866322"></a><a class="indexterm" name="id866327"></a><a class="indexterm" name="id866331"></a><a class="indexterm" name="id866336"></a>
+        <a class="indexterm" name="id904851"></a><a class="indexterm" name="id904856"></a><a class="indexterm" name="id904861"></a><a class="indexterm" name="id904866"></a>
 May occasionally be useful to access to discover information about an open
         handle.
       </p>
@@ -35,19 +35,15 @@ May occasionally be useful to access to discover information about an open
 <a name="afio.reference.boost_afio_detail_async_io_handle.h0"></a>
         <span class="phrase"><a name="afio.reference.boost_afio_detail_async_io_handle.synopsis"></a></span><a class="link" href="boost_afio_detail_async_io_handle.html#afio.reference.boost_afio_detail_async_io_handle.synopsis">Synopsis</a>
       </h5>
-<p>
-</p>
 <pre class="programlisting"><span class="keyword">class</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">detail</span><span class="special">::</span><span class="identifier">async_io_handle</span>
       <span class="special">:</span> <span class="keyword">public</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">enable_shared_from_this</span><span class="special">&lt;</span> <span class="identifier">async_io_handle</span> <span class="special">&gt;</span>
 <span class="special">{</span>
   <span class="comment">// ...</span>
 <span class="special">};</span>
 </pre>
-<p>
-      </p>
 <h5>
 <a name="afio.reference.boost_afio_detail_async_io_handle.h1"></a>
-        <span class="phrase"><a name="afio.reference.boost_afio_detail_async_io_handle.constructor_s_"></a></span><a class="link" href="boost_afio_detail_async_io_handle.html#afio.reference.boost_afio_detail_async_io_handle.constructor_s_">Constructor(s)</a>
+        <span class="phrase"><a name="afio.reference.boost_afio_detail_async_io_handle.constructor_s"></a></span><a class="link" href="boost_afio_detail_async_io_handle.html#afio.reference.boost_afio_detail_async_io_handle.constructor_s">Constructor(s)</a>
       </h5>
 <div class="informaltable"><table class="table">
 <colgroup>
@@ -74,11 +70,7 @@ May occasionally be useful to access to discover information about an open
 </tr></thead>
 <tbody><tr>
 <td>
-                <p>
-</p>
 <pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="special">~</span><span class="identifier">async_io_handle</span><span class="special">()</span></pre>
-<p>
-                </p>
               </td>
 <td>
               </td>
@@ -88,7 +80,7 @@ May occasionally be useful to access to discover information about an open
 </table></div>
 <h5>
 <a name="afio.reference.boost_afio_detail_async_io_handle.h2"></a>
-        <span class="phrase"><a name="afio.reference.boost_afio_detail_async_io_handle.member_function_s_"></a></span><a class="link" href="boost_afio_detail_async_io_handle.html#afio.reference.boost_afio_detail_async_io_handle.member_function_s_">Member
+        <span class="phrase"><a name="afio.reference.boost_afio_detail_async_io_handle.member_function_s"></a></span><a class="link" href="boost_afio_detail_async_io_handle.html#afio.reference.boost_afio_detail_async_io_handle.member_function_s">Member
         Function(s)</a>
       </h5>
 <div class="informaltable"><table class="table">
@@ -122,11 +114,7 @@ May occasionally be useful to access to discover information about an open
 <tbody>
 <tr>
 <td>
-                <p>
-</p>
 <pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">async_file_io_dispatcher_base</span> <span class="special">*</span> <span class="identifier">parent</span><span class="special">()</span></pre>
-<p>
-                </p>
               </td>
 <td>
                 <p>
@@ -138,11 +126,7 @@ May occasionally be useful to access to discover information about an open
 </tr>
 <tr>
 <td>
-                <p>
-</p>
 <pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="keyword">void</span> <span class="special">*</span> <span class="identifier">native_handle</span><span class="special">()</span></pre>
-<p>
-                </p>
               </td>
 <td>
                 <p>
@@ -154,11 +138,7 @@ May occasionally be useful to access to discover information about an open
 </tr>
 <tr>
 <td>
-                <p>
-</p>
 <pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="keyword">const</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">chrono</span><span class="special">::</span><span class="identifier">system_clock</span><span class="special">::</span><span class="identifier">time_point</span> <span class="special">&amp;</span> <span class="identifier">opened</span><span class="special">()</span></pre>
-<p>
-                </p>
               </td>
 <td>
                 <p>
@@ -170,11 +150,7 @@ May occasionally be useful to access to discover information about an open
 </tr>
 <tr>
 <td>
-                <p>
-</p>
 <pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="keyword">const</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">filesystem</span><span class="special">::</span><span class="identifier">path</span> <span class="special">&amp;</span> <span class="identifier">path</span><span class="special">()</span></pre>
-<p>
-                </p>
               </td>
 <td>
                 <p>
@@ -186,11 +162,7 @@ May occasionally be useful to access to discover information about an open
 </tr>
 <tr>
 <td>
-                <p>
-</p>
 <pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">off_t</span> <span class="identifier">read_count</span><span class="special">()</span></pre>
-<p>
-                </p>
               </td>
 <td>
                 <p>
@@ -202,11 +174,7 @@ May occasionally be useful to access to discover information about an open
 </tr>
 <tr>
 <td>
-                <p>
-</p>
 <pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">off_t</span> <span class="identifier">write_count</span><span class="special">()</span></pre>
-<p>
-                </p>
               </td>
 <td>
                 <p>
@@ -219,11 +187,7 @@ May occasionally be useful to access to discover information about an open
 </tr>
 <tr>
 <td>
-                <p>
-</p>
 <pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">off_t</span> <span class="identifier">write_count_since_fsync</span><span class="special">()</span></pre>
-<p>
-                </p>
               </td>
 <td>
                 <p>

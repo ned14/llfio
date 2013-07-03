@@ -4,7 +4,7 @@
 <title>boost::afio::async_file_io_dispatcher_base</title>
 <link rel="stylesheet" href="../../../../../../doc/src/boostbook.css" type="text/css">
 <meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
-<link rel="home" href="../../index.html" title="Chapter&#160;1.&#160;AFIO">
+<link rel="home" href="../../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 0.1">
 <link rel="up" href="../reference.html" title="Reference">
 <link rel="prev" href="boost_afio_async_data_op_req.html" title="boost::afio::async_data_op_req">
 <link rel="next" href="boost_afio_async_io_op.html" title="boost::afio::async_io_op">
@@ -27,26 +27,22 @@
 <a name="afio.reference.boost_afio_async_file_io_dispatcher_base"></a><a class="link" href="boost_afio_async_file_io_dispatcher_base.html" title="boost::afio::async_file_io_dispatcher_base">boost::afio::async_file_io_dispatcher_base</a>
 </h3></div></div></div>
 <p>
-        <a class="indexterm" name="id851547"></a><a class="indexterm" name="id851552"></a><a class="indexterm" name="id851557"></a>
+        <a class="indexterm" name="id892414"></a><a class="indexterm" name="id892419"></a><a class="indexterm" name="id892424"></a>
 Abstract base class for dispatching file i/o asynchronously.
       </p>
 <h5>
 <a name="afio.reference.boost_afio_async_file_io_dispatcher_base.h0"></a>
         <span class="phrase"><a name="afio.reference.boost_afio_async_file_io_dispatcher_base.synopsis"></a></span><a class="link" href="boost_afio_async_file_io_dispatcher_base.html#afio.reference.boost_afio_async_file_io_dispatcher_base.synopsis">Synopsis</a>
       </h5>
-<p>
-</p>
 <pre class="programlisting"><span class="keyword">class</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_file_io_dispatcher_base</span>
       <span class="special">:</span> <span class="keyword">public</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">enable_shared_from_this</span><span class="special">&lt;</span> <span class="identifier">async_file_io_dispatcher_base</span> <span class="special">&gt;</span>
 <span class="special">{</span>
   <span class="comment">// ...</span>
 <span class="special">};</span>
 </pre>
-<p>
-      </p>
 <h5>
 <a name="afio.reference.boost_afio_async_file_io_dispatcher_base.h1"></a>
-        <span class="phrase"><a name="afio.reference.boost_afio_async_file_io_dispatcher_base.constructor_s_"></a></span><a class="link" href="boost_afio_async_file_io_dispatcher_base.html#afio.reference.boost_afio_async_file_io_dispatcher_base.constructor_s_">Constructor(s)</a>
+        <span class="phrase"><a name="afio.reference.boost_afio_async_file_io_dispatcher_base.constructor_s"></a></span><a class="link" href="boost_afio_async_file_io_dispatcher_base.html#afio.reference.boost_afio_async_file_io_dispatcher_base.constructor_s">Constructor(s)</a>
       </h5>
 <div class="informaltable"><table class="table">
 <colgroup>
@@ -73,11 +69,7 @@ Abstract base class for dispatching file i/o asynchronously.
 </tr></thead>
 <tbody><tr>
 <td>
-                <p>
-</p>
 <pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="special">~</span><span class="identifier">async_file_io_dispatcher_base</span><span class="special">()</span></pre>
-<p>
-                </p>
               </td>
 <td>
                 <p>
@@ -91,7 +83,7 @@ Abstract base class for dispatching file i/o asynchronously.
 </table></div>
 <h5>
 <a name="afio.reference.boost_afio_async_file_io_dispatcher_base.h2"></a>
-        <span class="phrase"><a name="afio.reference.boost_afio_async_file_io_dispatcher_base.member_function_s_"></a></span><a class="link" href="boost_afio_async_file_io_dispatcher_base.html#afio.reference.boost_afio_async_file_io_dispatcher_base.member_function_s_">Member
+        <span class="phrase"><a name="afio.reference.boost_afio_async_file_io_dispatcher_base.member_function_s"></a></span><a class="link" href="boost_afio_async_file_io_dispatcher_base.html#afio.reference.boost_afio_async_file_io_dispatcher_base.member_function_s">Member
         Function(s)</a>
       </h5>
 <div class="informaltable"><table class="table">
@@ -125,11 +117,7 @@ Abstract base class for dispatching file i/o asynchronously.
 <tbody>
 <tr>
 <td>
-                <p>
-</p>
 <pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">thread_pool</span> <span class="special">&amp;</span> <span class="identifier">threadpool</span><span class="special">()</span></pre>
-<p>
-                </p>
               </td>
 <td>
                 <p>
@@ -141,11 +129,7 @@ Abstract base class for dispatching file i/o asynchronously.
 </tr>
 <tr>
 <td>
-                <p>
-</p>
 <pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">file_flags</span> <span class="identifier">fileflags</span><span class="special">(</span><span class="identifier">file_flags</span> <span class="identifier">flags</span><span class="special">)</span></pre>
-<p>
-                </p>
               </td>
 <td>
                 <p>
@@ -160,11 +144,7 @@ Abstract base class for dispatching file i/o asynchronously.
 </tr>
 <tr>
 <td>
-                <p>
-</p>
 <pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">size_t</span> <span class="identifier">wait_queue_depth</span><span class="special">()</span></pre>
-<p>
-                </p>
               </td>
 <td>
                 <p>
@@ -176,11 +156,7 @@ Abstract base class for dispatching file i/o asynchronously.
 </tr>
 <tr>
 <td>
-                <p>
-</p>
 <pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">size_t</span> <span class="identifier">count</span><span class="special">()</span></pre>
-<p>
-                </p>
               </td>
 <td>
                 <p>
@@ -192,11 +168,7 @@ Abstract base class for dispatching file i/o asynchronously.
 </tr>
 <tr>
 <td>
-                <p>
-</p>
-<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">async_io_op</span> <span class="special">&gt;</span> <span class="identifier">completion</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">async_io_op</span> <span class="special">&gt;</span> <span class="special">&amp;</span> <span class="identifier">ops</span><span class="special">,</span> <span class="keyword">const</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">pair</span><span class="special">&lt;</span> <span class="identifier">async_op_flags</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">function</span><span class="special">&lt;</span> <span class="identifier">completion_t</span> <span class="special">&gt;&gt;&gt;</span> <span class="special">&amp;</span> <span class="identifier">callbacks</span><span class="special">)</span></pre>
-<p>
-                </p>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">async_io_op</span> <span class="special">&gt;</span> <span class="identifier">completion</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">async_io_op</span> <span class="special">&gt;</span> <span class="special">&amp;</span> <span class="identifier">ops</span><span class="special">,</span> <span class="keyword">const</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">pair</span><span class="special">&lt;</span> <span class="identifier">async_op_flags</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">function</span><span class="special">&lt;</span> <span class="identifier">async_file_io_dispatcher_base</span><span class="special">::</span><span class="identifier">completion_t</span> <span class="special">&gt;&gt;&gt;</span> <span class="special">&amp;</span> <span class="identifier">callbacks</span><span class="special">)</span></pre>
               </td>
 <td>
                 <p>
@@ -211,18 +183,14 @@ Abstract base class for dispatching file i/o asynchronously.
                 </p>
                 <p>
                   <span class="bold"><strong>const std::vector&lt; std::pair&lt; async_op_flags,
-                  std::function&lt; completion_t &gt;&gt;&gt; &amp;</strong></span>:
-                  <span class="emphasis"><em>callbacks</em></span>:
+                  std::function&lt; async_file_io_dispatcher_base::completion_t &gt;&gt;&gt;
+                  &amp;</strong></span>: <span class="emphasis"><em>callbacks</em></span>:
                 </p>
               </td>
 </tr>
 <tr>
 <td>
-                <p>
-</p>
-<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">async_io_op</span> <span class="identifier">completion</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">async_io_op</span> <span class="special">&amp;</span> <span class="identifier">req</span><span class="special">,</span> <span class="keyword">const</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">pair</span><span class="special">&lt;</span> <span class="identifier">async_op_flags</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">function</span><span class="special">&lt;</span> <span class="identifier">completion_t</span> <span class="special">&gt;&gt;</span> <span class="special">&amp;</span> <span class="identifier">callback</span><span class="special">)</span></pre>
-<p>
-                </p>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">async_io_op</span> <span class="identifier">completion</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">async_io_op</span> <span class="special">&amp;</span> <span class="identifier">req</span><span class="special">,</span> <span class="keyword">const</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">pair</span><span class="special">&lt;</span> <span class="identifier">async_op_flags</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">function</span><span class="special">&lt;</span> <span class="identifier">async_file_io_dispatcher_base</span><span class="special">::</span><span class="identifier">completion_t</span> <span class="special">&gt;&gt;</span> <span class="special">&amp;</span> <span class="identifier">callback</span><span class="special">)</span></pre>
               </td>
 <td>
                 <p>
@@ -235,48 +203,47 @@ Abstract base class for dispatching file i/o asynchronously.
                 </p>
                 <p>
                   <span class="bold"><strong>const std::pair&lt; async_op_flags, std::function&lt;
-                  completion_t &gt;&gt; &amp;</strong></span>: <span class="emphasis"><em>callback</em></span>:
+                  async_file_io_dispatcher_base::completion_t &gt;&gt; &amp;</strong></span>:
+                  <span class="emphasis"><em>callback</em></span>:
                 </p>
               </td>
 </tr>
 <tr>
 <td>
-                <p>
-</p>
 <pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">R</span><span class="special">&gt;</span>
 <span class="identifier">std</span><span class="special">::</span><span class="identifier">pair</span><span class="special">&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">future</span><span class="special">&lt;</span> <span class="identifier">R</span> <span class="special">&gt;</span> <span class="special">&gt;,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">async_io_op</span> <span class="special">&gt;</span> <span class="special">&gt;</span> <span class="identifier">call</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">async_io_op</span> <span class="special">&gt;</span> <span class="special">&amp;</span> <span class="identifier">ops</span><span class="special">,</span> <span class="keyword">const</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">function</span><span class="special">&lt;</span> <span class="identifier">R</span><span class="special">()&gt;&gt;</span> <span class="special">&amp;</span> <span class="identifier">callables</span><span class="special">)</span></pre>
-<p>
-                </p>
               </td>
 <td>
                 <p>
-                  Invoke the specified callable when the supplied operation completes.
+                  Schedule a batch of asynchronous invocations of the specified bound
+                  functions when their supplied preconditions complete.
                 </p>
               </td>
 <td>
                 <p>
                   <span class="bold"><strong>const std::vector&lt; async_io_op &gt; &amp;</strong></span>:
-                  <span class="emphasis"><em>ops</em></span>:
+                  <span class="emphasis"><em>ops</em></span>: A batch of precondition op handles. If
+                  default constructed, a precondition is null.
                 </p>
                 <p>
                   <span class="bold"><strong>const std::vector&lt; std::function&lt; R()&gt;&gt;
-                  &amp;</strong></span>: <span class="emphasis"><em>callables</em></span>:
+                  &amp;</strong></span>: <span class="emphasis"><em>callables</em></span>: A batch of bound
+                  functions to call, returning R.
+                </p>
+              </td>
+<td>
+                <p>
+                  A pair with a batch of futures returning the result of each of
+                  the callables and a batch of op handles.
                 </p>
               </td>
 </tr>
 <tr>
 <td>
-                <p>
-</p>
 <pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">R</span><span class="special">&gt;</span>
 <span class="identifier">std</span><span class="special">::</span><span class="identifier">pair</span><span class="special">&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">future</span><span class="special">&lt;</span> <span class="identifier">R</span> <span class="special">&gt;</span> <span class="special">&gt;,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">async_io_op</span> <span class="special">&gt;</span> <span class="special">&gt;</span> <span class="identifier">call</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">function</span><span class="special">&lt;</span> <span class="identifier">R</span><span class="special">()&gt;&gt;</span> <span class="special">&amp;</span> <span class="identifier">callables</span><span class="special">)</span></pre>
-<p>
-                </p>
               </td>
 <td>
-                <p>
-                  Invoke the specified callable when the supplied operation completes.
-                </p>
               </td>
 <td>
                 <p>
@@ -287,60 +254,72 @@ Abstract base class for dispatching file i/o asynchronously.
 </tr>
 <tr>
 <td>
-                <p>
-</p>
 <pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">R</span><span class="special">&gt;</span>
 <span class="identifier">std</span><span class="special">::</span><span class="identifier">pair</span><span class="special">&lt;</span> <span class="identifier">future</span><span class="special">&lt;</span> <span class="identifier">R</span> <span class="special">&gt;,</span> <span class="identifier">async_io_op</span> <span class="special">&gt;</span> <span class="identifier">call</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">async_io_op</span> <span class="special">&amp;</span> <span class="identifier">req</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">function</span><span class="special">&lt;</span> <span class="identifier">R</span><span class="special">()&gt;</span> <span class="identifier">callback</span><span class="special">)</span></pre>
-<p>
-                </p>
               </td>
 <td>
                 <p>
-                  Invoke the specified callable when the supplied operation completes.
+                  Schedule an asynchronous invocation of the specified bound function
+                  when its supplied precondition completes.
                 </p>
               </td>
 <td>
                 <p>
                   <span class="bold"><strong>const async_io_op &amp;</strong></span>: <span class="emphasis"><em>req</em></span>:
+                  A precondition op handle. If default constructed, the precondition
+                  is null.
                 </p>
                 <p>
                   <span class="bold"><strong>std::function&lt; R()&gt;</strong></span>: <span class="emphasis"><em>callback</em></span>:
+                  A bound functions to call, returning R.
+                </p>
+              </td>
+<td>
+                <p>
+                  A pair with a future returning the result of the callable and an
+                  op handle.
                 </p>
               </td>
 </tr>
 <tr>
 <td>
-                <p>
-</p>
 <pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">C</span><span class="special">,</span> <span class="keyword">class</span><span class="special">...</span> <span class="identifier">Args</span><span class="special">&gt;</span>
 <span class="identifier">std</span><span class="special">::</span><span class="identifier">pair</span><span class="special">&lt;</span> <span class="identifier">future</span><span class="special">&lt;</span> <span class="keyword">typename</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">result_of</span><span class="special">&lt;</span> <span class="identifier">C</span><span class="special">(</span><span class="identifier">Args</span><span class="special">...)&gt;::</span><span class="identifier">type</span> <span class="special">&gt;,</span> <span class="identifier">async_io_op</span> <span class="special">&gt;</span> <span class="identifier">call</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">async_io_op</span> <span class="special">&amp;</span> <span class="identifier">req</span><span class="special">,</span> <span class="identifier">C</span> <span class="identifier">callback</span><span class="special">,</span> <span class="identifier">Args</span><span class="special">...</span> <span class="identifier">args</span><span class="special">)</span></pre>
-<p>
-                </p>
               </td>
 <td>
                 <p>
-                  Invoke the specified callable when the supplied operation completes.
+                  Schedule an asynchronous invocation of the specified unbound callable
+                  when its supplied precondition completes. Note that this function
+                  essentially calls <code class="literal"><code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">bind</span><span class="special">()</span></code></code> on the callable and
+                  the args and passes it to the other call() overload taking a <code class="literal"><code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">function</span><span class="special">&lt;&gt;</span></code></code>.
+                  You should therefore use <code class="literal"><code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">ref</span><span class="special">()</span></code></code> etc. as appropriate.
                 </p>
               </td>
 <td>
                 <p>
                   <span class="bold"><strong>const async_io_op &amp;</strong></span>: <span class="emphasis"><em>req</em></span>:
+                  A precondition op handle. If default constructed, the precondition
+                  is null.
                 </p>
                 <p>
                   <span class="bold"><strong>C</strong></span>: <span class="emphasis"><em>callback</em></span>:
+                  An unbound callable to call.
                 </p>
                 <p>
                   <span class="bold"><strong>Args...</strong></span>: <span class="emphasis"><em>args</em></span>:
+                  An arbitrary sequence of arguments to bind to the callable.
+                </p>
+              </td>
+<td>
+                <p>
+                  A pair with a future returning the result of the callable and an
+                  op handle.
                 </p>
               </td>
 </tr>
 <tr>
 <td>
-                <p>
-</p>
 <pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">async_io_op</span> <span class="special">&gt;</span> <span class="identifier">dir</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">async_path_op_req</span> <span class="special">&gt;</span> <span class="special">&amp;</span> <span class="identifier">reqs</span><span class="special">)</span></pre>
-<p>
-                </p>
               </td>
 <td>
                 <p>
@@ -356,11 +335,7 @@ Abstract base class for dispatching file i/o asynchronously.
 </tr>
 <tr>
 <td>
-                <p>
-</p>
 <pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">async_io_op</span> <span class="identifier">dir</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">async_path_op_req</span> <span class="special">&amp;</span> <span class="identifier">req</span><span class="special">)</span></pre>
-<p>
-                </p>
               </td>
 <td>
                 <p>
@@ -376,11 +351,7 @@ Abstract base class for dispatching file i/o asynchronously.
 </tr>
 <tr>
 <td>
-                <p>
-</p>
 <pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">async_io_op</span> <span class="special">&gt;</span> <span class="identifier">rmdir</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">async_path_op_req</span> <span class="special">&gt;</span> <span class="special">&amp;</span> <span class="identifier">reqs</span><span class="special">)</span></pre>
-<p>
-                </p>
               </td>
 <td>
                 <p>
@@ -396,11 +367,7 @@ Abstract base class for dispatching file i/o asynchronously.
 </tr>
 <tr>
 <td>
-                <p>
-</p>
 <pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">async_io_op</span> <span class="identifier">rmdir</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">async_path_op_req</span> <span class="special">&amp;</span> <span class="identifier">req</span><span class="special">)</span></pre>
-<p>
-                </p>
               </td>
 <td>
                 <p>
@@ -416,11 +383,7 @@ Abstract base class for dispatching file i/o asynchronously.
 </tr>
 <tr>
 <td>
-                <p>
-</p>
 <pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">async_io_op</span> <span class="special">&gt;</span> <span class="identifier">file</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">async_path_op_req</span> <span class="special">&gt;</span> <span class="special">&amp;</span> <span class="identifier">reqs</span><span class="special">)</span></pre>
-<p>
-                </p>
               </td>
 <td>
                 <p>
@@ -436,11 +399,7 @@ Abstract base class for dispatching file i/o asynchronously.
 </tr>
 <tr>
 <td>
-                <p>
-</p>
 <pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">async_io_op</span> <span class="identifier">file</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">async_path_op_req</span> <span class="special">&amp;</span> <span class="identifier">req</span><span class="special">)</span></pre>
-<p>
-                </p>
               </td>
 <td>
                 <p>
@@ -456,11 +415,7 @@ Abstract base class for dispatching file i/o asynchronously.
 </tr>
 <tr>
 <td>
-                <p>
-</p>
 <pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">async_io_op</span> <span class="special">&gt;</span> <span class="identifier">rmfile</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">async_path_op_req</span> <span class="special">&gt;</span> <span class="special">&amp;</span> <span class="identifier">reqs</span><span class="special">)</span></pre>
-<p>
-                </p>
               </td>
 <td>
                 <p>
@@ -476,11 +431,7 @@ Abstract base class for dispatching file i/o asynchronously.
 </tr>
 <tr>
 <td>
-                <p>
-</p>
 <pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">async_io_op</span> <span class="identifier">rmfile</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">async_path_op_req</span> <span class="special">&amp;</span> <span class="identifier">req</span><span class="special">)</span></pre>
-<p>
-                </p>
               </td>
 <td>
                 <p>
@@ -496,11 +447,7 @@ Abstract base class for dispatching file i/o asynchronously.
 </tr>
 <tr>
 <td>
-                <p>
-</p>
 <pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">async_io_op</span> <span class="special">&gt;</span> <span class="identifier">sync</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">async_io_op</span> <span class="special">&gt;</span> <span class="special">&amp;</span> <span class="identifier">ops</span><span class="special">)</span></pre>
-<p>
-                </p>
               </td>
 <td>
                 <p>
@@ -517,11 +464,7 @@ Abstract base class for dispatching file i/o asynchronously.
 </tr>
 <tr>
 <td>
-                <p>
-</p>
 <pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">async_io_op</span> <span class="identifier">sync</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">async_io_op</span> <span class="special">&amp;</span> <span class="identifier">req</span><span class="special">)</span></pre>
-<p>
-                </p>
               </td>
 <td>
                 <p>
@@ -537,11 +480,7 @@ Abstract base class for dispatching file i/o asynchronously.
 </tr>
 <tr>
 <td>
-                <p>
-</p>
 <pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">async_io_op</span> <span class="special">&gt;</span> <span class="identifier">close</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">async_io_op</span> <span class="special">&gt;</span> <span class="special">&amp;</span> <span class="identifier">ops</span><span class="special">)</span></pre>
-<p>
-                </p>
               </td>
 <td>
                 <p>
@@ -557,11 +496,7 @@ Abstract base class for dispatching file i/o asynchronously.
 </tr>
 <tr>
 <td>
-                <p>
-</p>
 <pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">async_io_op</span> <span class="identifier">close</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">async_io_op</span> <span class="special">&amp;</span> <span class="identifier">req</span><span class="special">)</span></pre>
-<p>
-                </p>
               </td>
 <td>
                 <p>
@@ -576,11 +511,7 @@ Abstract base class for dispatching file i/o asynchronously.
 </tr>
 <tr>
 <td>
-                <p>
-</p>
 <pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">async_io_op</span> <span class="special">&gt;</span> <span class="identifier">read</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">async_data_op_req</span><span class="special">&lt;</span> <span class="keyword">void</span> <span class="special">&gt;&gt;</span> <span class="special">&amp;</span> <span class="identifier">ops</span><span class="special">)</span></pre>
-<p>
-                </p>
               </td>
 <td>
                 <p>
@@ -596,11 +527,7 @@ Abstract base class for dispatching file i/o asynchronously.
 </tr>
 <tr>
 <td>
-                <p>
-</p>
 <pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">async_io_op</span> <span class="identifier">read</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">async_data_op_req</span><span class="special">&lt;</span> <span class="keyword">void</span> <span class="special">&gt;</span> <span class="special">&amp;</span> <span class="identifier">req</span><span class="special">)</span></pre>
-<p>
-                </p>
               </td>
 <td>
                 <p>
@@ -616,12 +543,8 @@ Abstract base class for dispatching file i/o asynchronously.
 </tr>
 <tr>
 <td>
-                <p>
-</p>
 <pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">T</span><span class="special">&gt;</span>
 <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">async_io_op</span> <span class="special">&gt;</span> <span class="identifier">read</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">async_data_op_req</span><span class="special">&lt;</span> <span class="identifier">T</span> <span class="special">&gt;&gt;</span> <span class="special">&amp;</span> <span class="identifier">ops</span><span class="special">)</span></pre>
-<p>
-                </p>
               </td>
 <td>
                 <p>
@@ -637,11 +560,7 @@ Abstract base class for dispatching file i/o asynchronously.
 </tr>
 <tr>
 <td>
-                <p>
-</p>
 <pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">async_io_op</span> <span class="special">&gt;</span> <span class="identifier">write</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">async_data_op_req</span><span class="special">&lt;</span> <span class="keyword">const</span> <span class="keyword">void</span> <span class="special">&gt;&gt;</span> <span class="special">&amp;</span> <span class="identifier">ops</span><span class="special">)</span></pre>
-<p>
-                </p>
               </td>
 <td>
                 <p>
@@ -657,11 +576,7 @@ Abstract base class for dispatching file i/o asynchronously.
 </tr>
 <tr>
 <td>
-                <p>
-</p>
 <pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">async_io_op</span> <span class="identifier">write</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">async_data_op_req</span><span class="special">&lt;</span> <span class="keyword">const</span> <span class="keyword">void</span> <span class="special">&gt;</span> <span class="special">&amp;</span> <span class="identifier">req</span><span class="special">)</span></pre>
-<p>
-                </p>
               </td>
 <td>
                 <p>
@@ -677,12 +592,8 @@ Abstract base class for dispatching file i/o asynchronously.
 </tr>
 <tr>
 <td>
-                <p>
-</p>
 <pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">T</span><span class="special">&gt;</span>
 <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">async_io_op</span> <span class="special">&gt;</span> <span class="identifier">write</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">async_data_op_req</span><span class="special">&lt;</span> <span class="identifier">T</span> <span class="special">&gt;&gt;</span> <span class="special">&amp;</span> <span class="identifier">ops</span><span class="special">)</span></pre>
-<p>
-                </p>
               </td>
 <td>
                 <p>
@@ -698,11 +609,7 @@ Abstract base class for dispatching file i/o asynchronously.
 </tr>
 <tr>
 <td>
-                <p>
-</p>
 <pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">async_io_op</span> <span class="special">&gt;</span> <span class="identifier">truncate</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">async_io_op</span> <span class="special">&gt;</span> <span class="special">&amp;</span> <span class="identifier">ops</span><span class="special">,</span> <span class="keyword">const</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">off_t</span> <span class="special">&gt;</span> <span class="special">&amp;</span> <span class="identifier">sizes</span><span class="special">)</span></pre>
-<p>
-                </p>
               </td>
 <td>
                 <p>
@@ -722,11 +629,7 @@ Abstract base class for dispatching file i/o asynchronously.
 </tr>
 <tr>
 <td>
-                <p>
-</p>
 <pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">async_io_op</span> <span class="identifier">truncate</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">async_io_op</span> <span class="special">&amp;</span> <span class="identifier">op</span><span class="special">,</span> <span class="identifier">off_t</span> <span class="identifier">newsize</span><span class="special">)</span></pre>
-<p>
-                </p>
               </td>
 <td>
                 <p>
@@ -744,11 +647,7 @@ Abstract base class for dispatching file i/o asynchronously.
 </tr>
 <tr>
 <td>
-                <p>
-</p>
 <pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">async_io_op</span> <span class="special">&gt;</span> <span class="identifier">barrier</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">async_io_op</span> <span class="special">&gt;</span> <span class="special">&amp;</span> <span class="identifier">ops</span><span class="special">)</span></pre>
-<p>
-                </p>
               </td>
 <td>
                 <p>
