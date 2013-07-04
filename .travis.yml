@@ -57,7 +57,7 @@ before_install:
  - cd ../../../../../
  - sudo apt-get update -qq
  - sudo apt-get upgrade -qq
- - if [ $CC = "clang" ]; then GCCVER=""; TESTPREFIX="libs/afio/test/bin/clang-linux-3.2"; else TESTPREFIX="libs/afio/test/bin/$CC$GCCVER"; fi
+ - if [ $CC = "clang" ]; then GCCVER="cxxflags="-stdlib=libstdc++""; TESTPREFIX="libs/afio/test/bin/clang-linux-3.2"; else TESTPREFIX="libs/afio/test/bin/$CC$GCCVER"; fi
  
 
 script:
