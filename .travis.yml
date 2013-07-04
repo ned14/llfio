@@ -56,7 +56,8 @@ before_install:
  - sudo ./b2 install
  - cd ../../../../../
 
- - if [ $CC = "clang" ]; then GCCVER=""; BUILDPATH="clang-linux-3.2"; else BUILDPATH="$CC$GCCVER"; fi
+ - if [ $CC = "clang" ]; then GCCVER=" cxxflags"-stdlib=libc++""; BUILDPATH="clang-linux-3.2"; else BUILDPATH="$CC$GCCVER"; fi
+ - clang++ -v
 
 script:
 # set debug/release & proper path for debug/release builds
