@@ -44,23 +44,25 @@
 <dt><span class="section"><a href="afio/quickstart.html">Quick Start</a></span></dt>
 <dt><span class="section"><a href="afio/reference.html">Reference</a></span></dt>
 <dd><dl>
-<dt><span class="section"><a href="afio/reference/boost_afio_async_data_op_req.html">boost::afio::async_data_op_req</a></span></dt>
-<dt><span class="section"><a href="afio/reference/boost_afio_async_file_io_dispatcher_base.html">boost::afio::async_file_io_dispatcher_base</a></span></dt>
-<dt><span class="section"><a href="afio/reference/boost_afio_async_io_op.html">boost::afio::async_io_op</a></span></dt>
-<dt><span class="section"><a href="afio/reference/boost_afio_async_path_op_req.html">boost::afio::async_path_op_req</a></span></dt>
-<dt><span class="section"><a href="afio/reference/boost_afio_detail_async_io_handle.html">boost::afio::detail::async_io_handle</a></span></dt>
-<dt><span class="section"><a href="afio/reference/boost_afio_thread_pool.html">boost::afio::thread_pool</a></span></dt>
+<dt><span class="section"><a href="afio/reference/async_data_op_req.html">async_data_op_req</a></span></dt>
+<dt><span class="section"><a href="afio/reference/async_file_io_dispatcher.html">async_file_io_dispatcher</a></span></dt>
+<dt><span class="section"><a href="afio/reference/async_file_io_dispatcher_base.html">async_file_io_dispatcher_base</a></span></dt>
+<dt><span class="section"><a href="afio/reference/async_io_op.html">async_io_op</a></span></dt>
+<dt><span class="section"><a href="afio/reference/async_path_op_req.html">async_path_op_req</a></span></dt>
+<dt><span class="section"><a href="afio/reference/detail_async_io_handle.html">detail::async_io_handle</a></span></dt>
+<dt><span class="section"><a href="afio/reference/thread_pool.html">thread_pool</a></span></dt>
 </dl></dd>
 <dt><span class="section"><a href="afio/release_notes.html">Release Notes</a></span></dt>
 <dt><span class="section"><a href="afio/acknowledgments.html">Acknowledgments</a></span></dt>
 </dl>
 </div>
 <p>
-    Boost.AFIO is batch, chainable, asynchronous closure execution engine extending
-    Boost.ASIO and Boost.Thread specialised as a portable and scalable asynchronous
-    file i/o implementation library. Implementation of this first version has been
-    kept as simple as possible (&lt; 1000 active LOC) at the cost of some performance.
-    This library was brought to Boost as part of Google Summer of Code 2013.
+    Boost.AFIO is a scalable, batch, chainable, asynchronous closure execution engine
+    extending Boost.ASIO and Boost.Thread specialised as a portable and scalable
+    asynchronous file i/o implementation library. Implementation of this first version
+    has been kept as simple as possible (&lt; 1000 active LOC) at the cost of some
+    performance. This library was brought to Boost as part of Google Summer of Code
+    2013.
   </p>
 <p>
     Note that Boost.AFIO was originally written purely in C++11 and backported later
@@ -85,9 +87,32 @@
 <p>
     As a very quick example of minimal usage:
   </p>
+<pre class="programlisting"><span class="comment">// Create a dispatcher instance</span>
+<span class="keyword">auto</span> <span class="identifier">dispatcher</span><span class="special">=</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_file_io_dispatcher</span><span class="special">();</span>
+
+<span class="comment">// Schedule an asynchronous call of some function with some bound set of arguments</span>
+<span class="keyword">auto</span> <span class="identifier">helloworld</span><span class="special">=</span><span class="identifier">dispatcher</span><span class="special">.</span><span class="identifier">call</span><span class="special">([](</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span> <span class="identifier">text</span><span class="special">)</span> <span class="special">{</span>
+    <span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="identifier">text</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span>
+    <span class="keyword">return</span> <span class="number">42</span><span class="special">;</span>
+<span class="special">},</span> <span class="string">"Hello world"</span><span class="special">);</span>
+
+<span class="comment">// Schedule as asynchronous call of some function to occur only after helloworld completes</span>
+<span class="keyword">auto</span> <span class="identifier">addtovalue</span><span class="special">=</span><span class="identifier">dispatcher</span><span class="special">.</span><span class="identifier">call</span><span class="special">(</span><span class="identifier">helloworld</span><span class="special">.</span><span class="identifier">second</span><span class="special">,</span> <span class="special">[](</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">future</span><span class="special">&lt;</span><span class="keyword">int</span><span class="special">&gt;</span> <span class="identifier">v</span><span class="special">)</span> <span class="special">{</span>
+    <span class="keyword">return</span> <span class="identifier">v</span><span class="special">.</span><span class="identifier">get</span><span class="special">()+</span><span class="number">1</span><span class="special">;</span>
+<span class="special">},</span> <span class="identifier">helloworld</span><span class="special">.</span><span class="identifier">first</span><span class="special">);</span>
+
+<span class="comment">// Create a boost::future&lt;&gt; representing the ops passed to when_all() and wait for it to complete</span>
+<span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">when_all</span><span class="special">(</span><span class="identifier">addtovalue</span><span class="special">.</span><span class="identifier">second</span><span class="special">).</span><span class="identifier">wait</span><span class="special">();</span>
+
+<span class="comment">// Print the result returned by the future for the lambda, which will be 43</span>
+<span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="string">"addtovalue() returned "</span> <span class="special">&lt;&lt;</span> <span class="identifier">addtovalue</span><span class="special">.</span><span class="identifier">first</span><span class="special">.</span><span class="identifier">get</span><span class="special">()</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span>
+</pre>
+<p>
+    You can also schedule an asynchronous [when_all]() using [barrier]().
+  </p>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
-<td align="left"><p><small>Last revised: July 03, 2013 at 23:26:38 GMT</small></p></td>
+<td align="left"><p><small>Last revised: July 04, 2013 at 23:29:43 GMT</small></p></td>
 <td align="right"><div class="copyright-footer"></div></td>
 </tr></table>
 <hr>

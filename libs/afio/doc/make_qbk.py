@@ -31,9 +31,9 @@ cmd = doxygen_xml2qbk_cmd
 cmd = cmd + " --xml doxy/doxygen_output/xml/%s.xml"
 cmd = cmd + " --start_include boost/afio/"
 cmd = cmd + " --convenience_header_path ../../../boost/afio/"
-cmd = cmd + " --convenience_headers geometry.hpp,geometries/geometries.hpp,multi/multi.hpp"
-cmd = cmd + " --skip_namespace boost::geometry::"
-cmd = cmd + " --copyright src/copyright_block.qbk"
+cmd = cmd + " --convenience_headers afio.hpp"
+cmd = cmd + " --skip_namespace boost::afio::"
+cmd = cmd + " --copyright copyright_block.qbk"
 cmd = cmd + " > generated/%s.qbk"
 
 def call_doxygen():
@@ -68,12 +68,15 @@ call_doxygen()
 
 core_c = [ "async_file_io_dispatcher_base", "thread_pool", "detail::async_io_handle" ]
 core_s = [ "async_data_op_req", "async_io_op", "async_path_op_req" ]
+core_g = [ "async_file_io_dispatcher", "async_file_io_dispatcher__call" ]
 
 
 for i in core_c:
     class_to_quickbook(i)
 for i in core_s:
     struct_to_quickbook(i)
+for i in core_g:
+    group_to_quickbook(i)
 
 # Use either bjam or b2 or ../../../b2 (the last should be done on Release branch)
 os.system("..\\..\\..\\b2.exe") 

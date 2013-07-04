@@ -29,7 +29,9 @@
 [def __WG21_N3562__ [@http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3562.pdf]]
 [def __WG21_N3634__ [@http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3634.pdf]]
 
-__boost_afio__ is batch, chainable, asynchronous closure execution engine extending __boost_asio__
+[import ../test/examples/call_example.cpp]
+
+__boost_afio__ is a scalable, batch, chainable, asynchronous closure execution engine extending __boost_asio__
 and __boost_thread__ specialised as a portable and scalable asynchronous file i/o implementation
 library. Implementation of this first version has been kept as simple as possible (< 1000 active
 LOC) at the cost of some performance. This library was brought to __boost__ as part of Google
@@ -48,8 +50,9 @@ You may find the list of C++11 features in popular compilers at
 
 As a very quick example of minimal usage:
 
+[call_example]
 
-
+You can also schedule an asynchronous [when_all]() using [barrier]().
 
 [include design_rationale.qbk]
 [include compiling.qbk]

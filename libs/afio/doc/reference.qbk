@@ -9,6 +9,7 @@
 [section:reference Reference]
 
 [include generated/async_data_op_req.qbk]
+[include generated/async_file_io_dispatcher.qbk]
 [include generated/async_file_io_dispatcher_base.qbk]
 [include generated/async_io_op.qbk]
 [include generated/async_path_op_req.qbk]
