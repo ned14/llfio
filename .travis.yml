@@ -57,7 +57,7 @@ before_install:
  - cd ../../../../../
 
  - if [ $CC = "clang" ]; then GCCVER=""; BUILDPATH="clang-linux-3.2"; else BUILDPATH="$CC$GCCVER"; fi
- - clang++ -v hello.cpp
+ - clang++ -v hello.cpp -pthread
 
 script:
 # set debug/release & proper path for debug/release builds
