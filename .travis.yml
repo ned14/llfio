@@ -48,6 +48,8 @@ before_install:
  - tar zxf Boost_1_54_0_beta1.tar.gz
  - mv boost-trunk-release-Boost_1_54_0_beta1 boost
  - mv NiallsCPP_jamfile.v2 NiallsCPP11Utilities/jamfile.v2 
+#HOME should be defined per the travis-ci docs. Maybe boost build cant user-config.jam?
+ - mv user-config.jam $HOME
  
 # install boost build
 # - BOOST="/home/travis/build/BoostGSoC/boost.afio/boost/boost-trunk-release-Boost_1_54_0_beta1"
@@ -58,7 +60,7 @@ before_install:
  - sudo apt-get update -qq
  - sudo apt-get upgrade -qq
  - if [ $CC = "clang" ]; then GCCVER=" cxxflags="-stdlib=libstdc++""; TESTPREFIX="libs/afio/test/bin/clang-linux-3.2"; else TESTPREFIX="libs/afio/test/bin/$CC$GCCVER"; fi
- - clang++-3.2 hello.cpp
+
 
 script:
 # set debug/release & proper path for debug/release builds
