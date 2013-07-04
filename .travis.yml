@@ -35,6 +35,7 @@ matrix:
 
 
 before_install:
+ - clang++ -v
  - sudo add-apt-repository -y ppa:apokluda/boost1.53
  - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
  - if [ $CXX = "clang++" ]; then sudo add-apt-repository -y ppa:h-rayflood/llvm; fi
@@ -58,6 +59,7 @@ before_install:
 
  - if [ $CC = "clang" ]; then GCCVER=""; BUILDPATH="clang-linux-3.2"; else BUILDPATH="$CC$GCCVER"; fi
  - clang++ -v
+ - clang++ hello.cpp
 
 script:
 # set debug/release & proper path for debug/release builds
