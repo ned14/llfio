@@ -41,14 +41,15 @@ before_install:
  - sudo apt-get update -qq
  - sudo apt-get install -qq libboost1.53-all-dev
  - if [ $CXX = "clang++" ]; then sudo apt-get install -qq libstdc++-4.8-dev clang-3.2; fi
- - if [ $GCCVER != "" ]; then sudo apt-get install -qq g++$GCCVER; fi
+ - if [ $CC = "gcc" ]; then sudo apt-get install -qq g++$GCCVER; fi
  - if [ $VALGRIND != "0" ]; then sudo apt-get install -qq valgrind; fi
  - git submodule update --init --recursive
  - wget https://github.com/ned14/boost-trunk/archive/release/Boost_1_54_0_beta1.tar.gz
  - tar zxf Boost_1_54_0_beta1.tar.gz
  - mv boost-trunk-release-Boost_1_54_0_beta1 boost
  - mv NiallsCPP_jamfile.v2 NiallsCPP11Utilities/jamfile.v2 
-#HOME should be defined per the travis-ci docs. Maybe boost build cant user-config.jam?
+
+#HOME should be defined per the travis-ci docs as /home/travis
  - mv user-config.jam $HOME
  
 # install boost build
@@ -57,9 +58,13 @@ before_install:
  - ./bootstrap.sh
  - sudo ./b2 install
  - cd ../../../../../
+
+#update all packages
  - sudo apt-get update -qq
  - sudo apt-get upgrade -qq
- - if [ $CC = "clang" ]; then GCCVER=" cxxflags="-stdlib=libstdc++""; TESTPREFIX="libs/afio/test/bin/clang-linux-3.2"; else TESTPREFIX="libs/afio/test/bin/$CC$GCCVER"; fi
+
+#set GCCVER for clang and TESTPREFIX for all compilers
+ - if [ $CC = "clang" ]; then GCCVER=""; TESTPREFIX="libs/afio/test/bin/clang-linux-3.2"; else TESTPREFIX="libs/afio/test/bin/$CC$GCCVER"; fi
 
 
 script:
@@ -68,8 +73,12 @@ script:
  - if [ $DEBUG -eq 1 ]; then PREFIXPATH="$TESTPREFIX/debug/threading-multi"; DEBUGBUILD=debug; fi
  - if [ $DEBUG -eq 2 ]; then PREFIXPATH="$TESTPREFIX/debug/optimization-speed/threading-multi"; DEBUGBUILD="debug optimization=speed"; fi
 
-#try to pass gcov flags appropriatly
+
+#try to pass compiler flags appropriatly
  - if [ $CCFLAGS != "" ]; then FLAGS="cxxflags="$CCFLAGS""; else FLAGS=""; fi
+
+#try to link gcov appropriatly
+ - if [ $GCOV = "1" ] then FLAGS="$FLAGS linkflags=-lgcov" ;
 
 #build the lib
  - b2 $DEBUGBUILD toolset=$CC$GCCVER --link=shared --boost=/home/travis/build/BoostGSoC/boost.afio/boost/boost-trunk-release-Boost_1_54_0_beta1 $FLAGS;
@@ -84,9 +93,6 @@ script:
  - if [ $VALGRIND = "0" ]; then PREFIXTEST=""; fi
  
 #runtests
- - echo $PREFIXTEST
- - echo $PREFIXPATH
- - echo $UNIT_TESTS
  - if [ $GCOV -eq 1 ]; then set -x; fi
  - if [ "$UNIT_TESTS" != "0" ]; then $PREFIXTEST $PREFIXPATH/boost_afio_test -s $UNIT_TESTS; fi
 
