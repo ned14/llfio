@@ -52,7 +52,7 @@ As a very quick example of minimal usage:
 
 [call_example]
 
-You can also schedule an asynchronous [when_all]() using [barrier]().
+You can also schedule an asynchronous [funcref boost::afio::when_all] using [memberref boost::afio::async_file_io_dispatcher_base::call].
 
 [include design_rationale.qbk]
 [include compiling.qbk]

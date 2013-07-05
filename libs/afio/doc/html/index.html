@@ -45,12 +45,51 @@
 <dt><span class="section"><a href="afio/reference.html">Reference</a></span></dt>
 <dd><dl>
 <dt><span class="section"><a href="afio/reference/async_data_op_req.html">async_data_op_req</a></span></dt>
+<dt><span class="section"><a href="afio/reference/async_data_op_req_constt_.html">async_data_op_req&lt;
+      const T &gt;</a></span></dt>
+<dt><span class="section"><a href="afio/reference/async_data_op_req_conststd_array_t_n__.html">async_data_op_req&lt;
+      const std::array&lt; T, N &gt; &gt;</a></span></dt>
+<dt><span class="section"><a href="afio/reference/async_data_op_req_conststd_basic_string_c_t_a__.html">async_data_op_req&lt;
+      const std::basic_string&lt; C, T, A &gt; &gt;</a></span></dt>
+<dt><span class="section"><a href="afio/reference/async_data_op_req_conststd_vector_t_a__.html">async_data_op_req&lt;
+      const std::vector&lt; T, A &gt; &gt;</a></span></dt>
+<dt><span class="section"><a href="afio/reference/async_data_op_req_constvoid_.html">async_data_op_req&lt;
+      const void &gt;</a></span></dt>
+<dt><span class="section"><a href="afio/reference/async_data_op_req_std_array_t_n__.html">async_data_op_req&lt;
+      std::array&lt; T, N &gt; &gt;</a></span></dt>
+<dt><span class="section"><a href="afio/reference/async_data_op_req_std_basic_string_c_t_a__.html">async_data_op_req&lt;
+      std::basic_string&lt; C, T, A &gt; &gt;</a></span></dt>
+<dt><span class="section"><a href="afio/reference/async_data_op_req_std_vector_t_a__.html">async_data_op_req&lt;
+      std::vector&lt; T, A &gt; &gt;</a></span></dt>
+<dt><span class="section"><a href="afio/reference/async_data_op_req_void_.html">async_data_op_req&lt;
+      void &gt;</a></span></dt>
+<dt><span class="section"><a href="afio/reference/async_op_flags.html">async_op_flags</a></span></dt>
 <dt><span class="section"><a href="afio/reference/async_file_io_dispatcher.html">async_file_io_dispatcher</a></span></dt>
 <dt><span class="section"><a href="afio/reference/async_file_io_dispatcher_base.html">async_file_io_dispatcher_base</a></span></dt>
+<dd><dl>
+<dt><span class="section"><a href="afio/reference/async_file_io_dispatcher_base/call_2_batch_bound_functions.html">call
+        (batch bound functions)</a></span></dt>
+<dt><span class="section"><a href="afio/reference/async_file_io_dispatcher_base/call_1_convenience_batch_bound_functions_without_preconditions.html">call
+        (convenience batch bound functions without preconditions)</a></span></dt>
+<dt><span class="section"><a href="afio/reference/async_file_io_dispatcher_base/call_2_convenience_single_bound_function.html">call
+        (convenience single bound function)</a></span></dt>
+<dt><span class="section"><a href="afio/reference/async_file_io_dispatcher_base/call_3_convenience_single_unbound_callable.html">call
+        (convenience single unbound callable)</a></span></dt>
+</dl></dd>
 <dt><span class="section"><a href="afio/reference/async_io_op.html">async_io_op</a></span></dt>
 <dt><span class="section"><a href="afio/reference/async_path_op_req.html">async_path_op_req</a></span></dt>
 <dt><span class="section"><a href="afio/reference/detail_async_io_handle.html">detail::async_io_handle</a></span></dt>
+<dt><span class="section"><a href="afio/reference/file_flags.html">file_flags</a></span></dt>
+<dt><span class="section"><a href="afio/reference/process_threadpool.html">process_threadpool</a></span></dt>
 <dt><span class="section"><a href="afio/reference/thread_pool.html">thread_pool</a></span></dt>
+<dt><span class="section"><a href="afio/reference/when_all.html">when_all</a></span></dt>
+<dt><span class="section"><a href="afio/reference/when_any.html">when_any (iterator range)</a></span></dt>
+<dt><span class="section"><a href="afio/reference/when_all_3.html">when_all</a></span></dt>
+<dt><span class="section"><a href="afio/reference/when_all_2.html">when_all</a></span></dt>
+<dt><span class="section"><a href="afio/reference/when_all_2_0.html">when_all</a></span></dt>
+<dt><span class="section"><a href="afio/reference/when_all_1.html">when_all</a></span></dt>
+<dt><span class="section"><a href="afio/reference/when_all_2_1.html">when_all</a></span></dt>
+<dt><span class="section"><a href="afio/reference/when_all_1_0.html">when_all</a></span></dt>
 </dl></dd>
 <dt><span class="section"><a href="afio/release_notes.html">Release Notes</a></span></dt>
 <dt><span class="section"><a href="afio/acknowledgments.html">Acknowledgments</a></span></dt>
@@ -108,11 +147,12 @@
 <span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="string">"addtovalue() returned "</span> <span class="special">&lt;&lt;</span> <span class="identifier">addtovalue</span><span class="special">.</span><span class="identifier">first</span><span class="special">.</span><span class="identifier">get</span><span class="special">()</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span>
 </pre>
 <p>
-    You can also schedule an asynchronous [when_all]() using [barrier]().
+    You can also schedule an asynchronous <code class="computeroutput">boost::afio::when_all</code>
+    using <code class="computeroutput">boost::afio::async_file_io_dispatcher_base::call</code>.
   </p>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
-<td align="left"><p><small>Last revised: July 04, 2013 at 23:29:43 GMT</small></p></td>
+<td align="left"><p><small>Last revised: July 05, 2013 at 23:33:19 GMT</small></p></td>
 <td align="right"><div class="copyright-footer"></div></td>
 </tr></table>
 <hr>

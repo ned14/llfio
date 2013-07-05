@@ -203,7 +203,9 @@ public:
 		return task->get_future();
 	}
 };
-//! Returns the process threadpool
+/*! \brief Returns the process threadpool
+\ingroup process_threadpool
+*/
 extern BOOST_AFIO_DECL thread_pool &process_threadpool();
 
 namespace detail {
@@ -221,7 +223,10 @@ namespace detail {
 		return std::make_pair(std::distance(futures->begin(), it), std::move(it->get()));
 	}
 }
-//! Returns a future vector of results from all the supplied futures
+/*! \brief Returns a future vector of results from all the supplied futures
+\ingroup when_all_futures
+\qbk{distinguish, iterator range}
+*/
 template <class InputIterator> inline future<std::vector<typename std::decay<decltype(((typename InputIterator::value_type *) 0)->get())>::type>> when_all(InputIterator first, InputIterator last)
 {
 	typedef typename InputIterator::value_type future_type;
@@ -235,7 +240,10 @@ template <class InputIterator> inline future<std::vector<typename std::decay<dec
 }
 //! Returns a future tuple of results from all the supplied futures
 //template <typename... T> inline future<std::tuple<typename std::decay<T...>::type>> when_all(T&&... futures);
-//! Returns a future result from the first of the supplied futures
+/*! \brief Returns a future result from the first of the supplied futures
+\ingroup when_all_futures
+\qbk{distinguish, iterator range}
+*/
 template <class InputIterator> inline future<std::pair<size_t, typename std::decay<decltype(((typename InputIterator::value_type *) 0)->get())>::type>> when_any(InputIterator first, InputIterator last)
 {
 	typedef typename InputIterator::value_type future_type;
@@ -325,6 +333,7 @@ inline constexpr bool operator!(type a) \
 }
 /*! \enum file_flags
 \brief Bitwise file and directory open flags
+\ingroup file_flags
 */
 enum class file_flags : size_t
 {
@@ -345,6 +354,10 @@ enum class file_flags : size_t
 
 };
 BOOST_AFIO_DECLARE_CLASS_ENUM_AS_BITFIELD(file_flags)
+/*! \enum async_op_flags
+\brief Bitwise async_op_flags flags
+\ingroup async_op_flags
+*/
 enum class async_op_flags : size_t
 {
 	None=0,					//!< No flags set
@@ -356,6 +369,10 @@ BOOST_AFIO_DECLARE_CLASS_ENUM_AS_BITFIELD(async_op_flags)
 
 /*! \class async_file_io_dispatcher_base
 \brief Abstract base class for dispatching file i/o asynchronously
+
+\qbk{
+[include generated/group_async_file_io_dispatcher__call.qbk]
+}
 */
 class BOOST_AFIO_DECL async_file_io_dispatcher_base : public std::enable_shared_from_this<async_file_io_dispatcher_base>
 {
@@ -393,21 +410,37 @@ public:
 	inline async_io_op completion(const async_io_op &req, const std::pair<async_op_flags, std::function<async_file_io_dispatcher_base::completion_t>> &callback);
 
 	/*! \brief Schedule a batch of asynchronous invocations of the specified bound functions when their supplied preconditions complete.
+    \qbk{
+    [link call_2_batch_with_preconditions More ...]
+    }
     \return A pair with a batch of futures returning the result of each of the callables and a batch of op handles.
     \param ops A batch of precondition op handles. If default constructed, a precondition is null.
     \param callables A batch of bound functions to call, returning R.
+    \ingroup async_file_io_dispatcher__call
+    \qbk{distinguish, batch bound functions}
     \qbk{
     [heading Example]
     [call_example]
     }
     */
 	template<class R> inline std::pair<std::vector<future<R>>, std::vector<async_io_op>> call(const std::vector<async_io_op> &ops, const std::vector<std::function<R()>> &callables);
-	//! \overload template<class R> inline std::pair<std::vector<future<R>>, std::vector<async_io_op>> call(const std::vector<async_io_op> &ops, const std::vector<std::function<R()>> &callables)
+	/*! \brief Schedule a batch of asynchronous invocations of the specified bound functions when their supplied preconditions complete.
+    \return A pair with a batch of futures returning the result of each of the callables and a batch of op handles.
+    \param callables A batch of bound functions to call, returning R.
+    \ingroup async_file_io_dispatcher__call
+    \qbk{distinguish, convenience batch bound functions without preconditions}
+    \qbk{
+    [heading Example]
+    [call_example]
+    }
+    */
 	template<class R> std::pair<std::vector<future<R>>, std::vector<async_io_op>> call(const std::vector<std::function<R()>> &callables) { return call(std::vector<async_io_op>(), callables); }
 	/*! \brief Schedule an asynchronous invocation of the specified bound function when its supplied precondition completes.
     \return A pair with a future returning the result of the callable and an op handle.
     \param req A precondition op handle. If default constructed, the precondition is null.
     \param callback A bound functions to call, returning R.
+    \ingroup async_file_io_dispatcher__call
+    \qbk{distinguish, convenience single bound function}
     \qbk{
     [heading Example]
     [call_example]
@@ -421,6 +454,11 @@ public:
     \param req A precondition op handle. If default constructed, the precondition is null.
     \param callback An unbound callable to call.
     \param args An arbitrary sequence of arguments to bind to the callable.
+    
+    Some descriptive text.
+    
+    \ingroup async_file_io_dispatcher__call
+    \qbk{distinguish, convenience single unbound callable}
     \qbk{
     [heading Example]
     [call_example]
@@ -490,6 +528,12 @@ protected:
 Note that the number of threads in the threadpool supplied is the maximum non-async op queue depth (e.g. file opens, closes etc.).
 For fast SSDs, there isn't much gain after eight-sixteen threads, so the process threadpool is set to eight by default.
 For slow hard drives, or worse, SANs, a queue depth of 64 or higher might deliver significant benefits.
+
+\ingroup async_file_io_dispatcher
+\qbk{
+[heading Example]
+[call_example]
+}
 */
 extern BOOST_AFIO_DECL std::shared_ptr<async_file_io_dispatcher_base> async_file_io_dispatcher(thread_pool &threadpool=process_threadpool(), file_flags flagsforce=file_flags::None, file_flags flagsmask=file_flags::None);
 
@@ -568,7 +612,10 @@ namespace detail
 	}
 }
 
-//! \brief Convenience overload for a vector of async_io_op. Does not retrieve exceptions.
+/*! \brief Convenience overload for a vector of async_io_op. Does not retrieve exceptions.
+\ingroup when_all_ops
+\qbk{distinguish, vector batch of ops, no throw}
+*/
 inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(std::nothrow_t, std::vector<async_io_op>::iterator first, std::vector<async_io_op>::iterator last)
 {
 	if(first==last)
@@ -583,7 +630,10 @@ inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(st
 	inputs.front().parent->completion(inputs, callbacks);
 	return state->done.get_future();
 }
-//! \brief Convenience overload for a vector of async_io_op. Retrieves exceptions.
+/*! \brief Convenience overload for a vector of async_io_op. Retrieves exceptions.
+\ingroup when_all_ops
+\qbk{distinguish, vector batch of ops, throws}
+*/
 inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(std::vector<async_io_op>::iterator first, std::vector<async_io_op>::iterator last)
 {
 	if(first==last)
@@ -598,7 +648,10 @@ inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(st
 	inputs.front().parent->completion(inputs, callbacks);
 	return state->done.get_future();
 }
-//! \brief Convenience overload for a list of async_io_op.  Does not retrieve exceptions.
+/*! \brief Convenience overload for a list of async_io_op.  Does not retrieve exceptions.
+\ingroup when_all_ops
+\qbk{distinguish, initializer_list batch of ops, no throw}
+*/
 inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(std::nothrow_t _, std::initializer_list<async_io_op> _ops)
 {
 	std::vector<async_io_op> ops;
@@ -607,7 +660,10 @@ inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(st
 		ops.push_back(std::move(i));
 	return when_all(_, ops.begin(), ops.end());
 }
-//! \brief Convenience overload for a list of async_io_op. Retrieves exceptions.
+/*! \brief Convenience overload for a list of async_io_op. Retrieves exceptions.
+\ingroup when_all_ops
+\qbk{distinguish, initializer_list batch of ops, throws}
+*/
 inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(std::initializer_list<async_io_op> _ops)
 {
 	std::vector<async_io_op> ops;
@@ -616,13 +672,19 @@ inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(st
 		ops.push_back(std::move(i));
 	return when_all(ops.begin(), ops.end());
 }
-//! \brief Convenience overload for a single async_io_op.  Does not retrieve exceptions.
+/*! \brief Convenience overload for a single async_io_op.  Does not retrieve exceptions.
+\ingroup when_all_ops
+\qbk{distinguish, convenience single op, no throw}
+*/
 inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(std::nothrow_t _, async_io_op op)
 {
 	std::vector<async_io_op> ops(1, op);
 	return when_all(_, ops.begin(), ops.end());
 }
-//! \brief Convenience overload for a single async_io_op.  Retrieves exceptions.
+/*! \brief Convenience overload for a single async_io_op.  Retrieves exceptions.
+\ingroup when_all_ops
+\qbk{distinguish, convenience single op, throws}
+*/
 inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(async_io_op op)
 {
 	std::vector<async_io_op> ops(1, op);

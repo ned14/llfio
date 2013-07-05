@@ -1,16 +1,12 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 # ===========================================================================
-#  Copyright (c) 2007-2012 Barend Gehrels, Amsterdam, the Netherlands.
-#  Copyright (c) 2008-2012 Bruno Lalande, Paris, France.
-#  Copyright (c) 2009-2012 Mateusz Loskot (mateusz@loskot.net), London, UK
-# 
 #  Use, modification and distribution is subject to the Boost Software License,
 #  Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 #  http://www.boost.org/LICENSE_1_0.txt)
 # ============================================================================
 
-import os, sys
+import os, sys, glob
 
 os.chdir(os.path.dirname(sys.argv[0]))
 
@@ -28,7 +24,7 @@ if not os.path.exists("generated"):
     os.mkdir("generated")
 
 cmd = doxygen_xml2qbk_cmd
-cmd = cmd + " --xml doxy/doxygen_output/xml/%s.xml"
+cmd = cmd + " --xml %s"
 cmd = cmd + " --start_include boost/afio/"
 cmd = cmd + " --convenience_header_path ../../../boost/afio/"
 cmd = cmd + " --convenience_headers afio.hpp"
@@ -40,43 +36,58 @@ def call_doxygen():
     os.chdir("doxy");
     os.system(doxygen_cmd)
     os.chdir("..")
-
-def group_to_quickbook(section):
-    os.system(cmd % ("group__" + section.replace("_", "__"), section))
-
-def struct_to_quickbook(section):
-    p = section.find("::")
-    if p > 0:
-        ns = section[:p]
-        item = section[p+2:]
-        section = ns + "_" + item
-        os.system(cmd % ("structboost_1_1afio_1_1" + ns.replace("_", "__") + "_1_1" + item.replace("_", "__"), section))
-    else:
-        os.system(cmd % ("structboost_1_1afio_1_1" + section.replace("_", "__"), section))
-
-def class_to_quickbook(section):
-    p = section.find("::")
-    if p > 0:
-        ns = section[:p]
-        item = section[p+2:]
-        section = ns + "_" + item
-        os.system(cmd % ("classboost_1_1afio_1_1" + ns.replace("_", "__") + "_1_1" + item.replace("_", "__"), section))
-    else:
-        os.system(cmd % ("classboost_1_1afio_1_1" + section.replace("_", "__"), section))
+    
+def path2identifier(prefix, i):
+    i=i[len(prefix):-4]
+    return i.replace('__', '_')
 
 call_doxygen()
 
-core_c = [ "async_file_io_dispatcher_base", "thread_pool", "detail::async_io_handle" ]
-core_s = [ "async_data_op_req", "async_io_op", "async_path_op_req" ]
-core_g = [ "async_file_io_dispatcher", "async_file_io_dispatcher__call" ]
-
-
-for i in core_c:
-    class_to_quickbook(i)
-for i in core_s:
-    struct_to_quickbook(i)
-for i in core_g:
-    group_to_quickbook(i)
+# Add all classes
+for i in glob.glob("doxy/doxygen_output/xml/classboost_1_1afio_1_1*.xml"):
+    os.system(cmd % (i, "class_"+path2identifier("doxy/doxygen_output/xml/classboost_1_1afio_1_1", i)));
+# Add all structs
+for i in glob.glob("doxy/doxygen_output/xml/structboost_1_1afio_1_1*.xml"):
+    os.system(cmd % (i, "struct_"+path2identifier("doxy/doxygen_output/xml/structboost_1_1afio_1_1", i)));
+# Add all namespaces
+for i in glob.glob("doxy/doxygen_output/xml/namespaceboost_1_1*.xml"):
+    os.system(cmd % (i, "namespace_"+path2identifier("doxy/doxygen_output/xml/namespaceboost_1_1", i)));
+# Add all groups
+for i in glob.glob("doxy/doxygen_output/xml/group__*.xml"):
+    os.system(cmd % (i, "group_"+path2identifier("doxy/doxygen_output/xml/group__", i)));
+    
+# Patch broken index term generation
+for i in glob.glob("generated/struct_async_data_op_req_3_01*.qbk"):
+    with open(i, "r+b") as ih:
+        t=ih.read();
+        # Fix erroneous expansions of nested types
+        t=t.replace("</primary></indexterm><indexterm><primary>", "::")
+        # Fix failure to escape < and >
+        it1=t.find("<indexterm><primary>")+20
+        it2=t.find("</primary></indexterm>", it1)
+        indexterm=t[it1:it2]
+        indexterm=indexterm.replace("<", "&lt;")
+        indexterm=indexterm.replace(">", "&gt;")
+        t=t[:it1]+indexterm+t[it2:]
+        # Fix failure to collapse section ids
+        si1=t.find("[section:async_data_op_req<")
+        if si1!=-1:
+            si1+=26;
+            si2=si1+1
+            count=1
+            while count>0:
+                if t[si2]=='<': count+=1
+                elif t[si2]=='>': count-=1
+                si2+=1
+            postfix=t[si1:si2]
+            postfix=postfix.replace("<", "_")
+            postfix=postfix.replace(">", "_")
+            postfix=postfix.replace(",", "_")
+            postfix=postfix.replace(" ", "")
+            t=t[:si1]+postfix+t[si2:]
+        ih.seek(0)
+        ih.truncate(0)
+        ih.write(t)
 
 # Use either bjam or b2 or ../../../b2 (the last should be done on Release branch)
 os.system("..\\..\\..\\b2.exe") 

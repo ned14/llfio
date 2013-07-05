@@ -7,6 +7,11 @@
 // Note that group descriptions are (currently) not used.
 
 /*!
-\defgroup async_file_io_dispatcher__call x
+\defgroup process_threadpool x
+\defgroup when_all_futures x
+\defgroup file_flags x
+\defgroup async_op_flags x
+\defgroup async_file_io_dispatcher_base__call x
 \defgroup async_file_io_dispatcher x
+\defgroup when_all_ops x
 */
