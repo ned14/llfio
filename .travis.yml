@@ -78,7 +78,7 @@ script:
  - if [ $CCFLAGS != "" ]; then FLAGS="cxxflags="$CCFLAGS""; else FLAGS=""; fi
 
 #try to link gcov appropriatly
- - if [ $GCOV = "1" ] then FLAGS="$FLAGS linkflags=-lgcov" ; fi
+ - if [ $GCOV -eq 1 ]; then FLAGS="$FLAGS linkflags=-lgcov"; fi
 
 #build the lib
  - b2 $DEBUGBUILD toolset=$CC$GCCVER --link=shared --boost=/home/travis/build/BoostGSoC/boost.afio/boost/boost-trunk-release-Boost_1_54_0_beta1 $FLAGS;
