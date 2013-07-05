@@ -31,6 +31,7 @@ try{\
 }catch(...){BOOST_CHECK(true);}
 
 
+
 // From http://burtleburtle.net/bob/rand/smallprng.html
 typedef unsigned int  u4;
 typedef struct ranctx { u4 a; u4 b; u4 c; u4 d; } ranctx;
@@ -55,7 +56,7 @@ void raninit( ranctx *x, u4 seed ) {
 
 BOOST_AUTO_TEST_SUITE(all)
     BOOST_AUTO_TEST_SUITE(exclude_async_io_errors)
-
+       
         static int task()
         {
         #ifdef __GNUC__

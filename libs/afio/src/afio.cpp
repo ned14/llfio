@@ -27,6 +27,7 @@ File Created: Mar 2013
 #include <sys/stat.h>
 #ifdef WIN32
 #include <Windows.h>
+
 // We also compile the posix compat layer for catching silly compile errors for POSIX
 #include <io.h>
 #include <direct.h>

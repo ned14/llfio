@@ -1,0 +1,16 @@
+import modules ;
+
+local boost-path = [ modules.peek : BOOST ] ;
+
+
+project : usage-requirements <include>. ; #<include>$(boost) ;
+
+lib utils : ErrorHandling.cpp Int128_256.cpp MappedFileInfo.cpp 
+    : <include>valgrind 
+      <include>hashes
+      #<include>$(boost) 
+      <cxxflags>-std=c++0x 
+      <link>shared:<define>NIALLSCPP11UTILITIES_DLL_EXPORTS 
+      <cxxflags>"-fvisibility-inlines-hidden -fvisibility=hidden -fstrict-aliasing -Wstrict-aliasing -Wall -Wno-unused -fargument-noalias -O2 -g -fPIC" # -fopenmp"
+   
+;

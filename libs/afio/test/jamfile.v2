@@ -1,0 +1,36 @@
+#  Boost.AFIO Library test Jamfile
+#
+#  Copyright (c) 2013 Paul Kirth
+#
+#  Distributed under the Boost Software License, Version 1.0.
+#  (See accompanying file LICENSE_1_0.txt or copy at
+#  http://www.boost.org/LICENSE_1_0.txt)
+
+
+import modules ;
+
+local boost-path = [ modules.peek : BOOST ] ;
+
+import testing ;
+
+project boost/afio/test
+    : requirements
+      <threading>multi
+      <library>../build//boost_afio
+      <library>../../../NiallsCPP11Utilities//utils
+     # <include>../../../boost/afio         # <--- should be include with boost_afio usage requirements
+      <cxxflags>-std=c++0x 
+      #<linkflags>"-l pthread"      #is this the test's dependency or boost_afio's???? 
+    ;
+
+
+exe boost_afio_test : main.cpp  ; #<-------- Keeping this for now to maintain consistency with previous travis-ci tests
+
+test-suite afio
+    : #[ link main.cpp ]
+      #[ run main.cpp ]     #<----- run b2 from test folder to build and run unit test
+    ;
+
+
+
+
