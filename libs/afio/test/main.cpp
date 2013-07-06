@@ -16,9 +16,10 @@ Created: Feb 2013
 #include <iostream>
 #include <algorithm>
 #include "../../../boost/afio/afio.hpp"
-#include "../../../NiallsCPP11Utilities/Int128_256.hpp"
+#include "../../../boost/afio/detail/Int128_256.hpp"
 #include "../../../boost/afio/detail/Aligned_Allocator.hpp"
 #include "boost/lockfree/queue.hpp"
+#include "../../../boost/afio/detail/Undoer.hpp"
 
 
 
@@ -718,7 +719,7 @@ BOOST_AUTO_TEST_SUITE(all)
                         cout << "The following hash failures occurred:" << endl;
                         while(failures.pop(failedop))
                         {
-                                auto undofailedop=Undoer([&failedop]{ delete failedop; });
+                                auto undofailedop=boost::afio::detail::Undoer([&failedop]{ delete failedop; });
                                 size_t bytes=0;
                                 for(auto &b : failedop->first->req.buffers)
                                         bytes+=boost::asio::buffer_size(b);
