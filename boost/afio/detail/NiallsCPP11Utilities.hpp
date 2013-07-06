@@ -49,7 +49,6 @@ Tested on the following compilers:
 #include <unordered_map>
 #include <typeinfo>
 #include <string>
-#include <type_traits>
 #include <list>
 #include <streambuf>
 #include <ios>
@@ -165,6 +164,8 @@ membuf mb(foo, sizeof(foo));
 std::istream reader(&mb);
 \endcode
 */
+    
+    
 struct membuf : public std::streambuf
 {
 	char *s;
@@ -269,52 +270,6 @@ template <size_t offset, typename F, typename Tuple, typename... Args> void call
     typedef typename std::decay<Tuple>::type ttype;
     Impl::call_using_tuple<offset, F, Tuple, 0 == std::tuple_size<ttype>::value, std::tuple_size<ttype>::value-offset>::call(std::forward<F>(f), std::forward<Tuple>(t));
 }
-/*
-template<typename callable> class UndoerImpl
-{
-	callable undoer;
-	bool _dismissed;
-
-#if !defined(_MSC_VER) || _MSC_VER>1700
-	UndoerImpl() = delete;
-	UndoerImpl(const UndoerImpl &) = delete;
-	UndoerImpl &operator=(const UndoerImpl &) = delete;
-#else
-	UndoerImpl();
-	UndoerImpl(const UndoerImpl &);
-	UndoerImpl &operator=(const UndoerImpl &);
-#endif
-	explicit UndoerImpl(callable &&c) : undoer(std::move(c)), _dismissed(false) { }
-	void int_trigger() { if(!_dismissed && !is_nullptr(undoer)) { undoer(); _dismissed=true; } }
-public:
-	UndoerImpl(UndoerImpl &&o) : undoer(std::move(o.undoer)), _dismissed(o._dismissed) { o._dismissed=true; }
-	UndoerImpl &operator=(UndoerImpl &&o) { int_trigger(); undoer=std::move(o.undoer); _dismissed=o._dismissed; o._dismissed=true; return *this; }
-	template<typename _callable> friend UndoerImpl<_callable> Undoer(_callable c);
-	~UndoerImpl() { int_trigger(); }
-	//! Returns if the Undoer is dismissed
-	bool dismissed() const { return _dismissed; }
-	//! Dismisses the Undoer
-	void dismiss(bool d=true) { _dismissed=d; }
-	//! Undismisses the Undoer
-	void undismiss(bool d=true) { _dismissed=!d; }
-};
-
-
-/*! \brief Alexandrescu style rollbacks, a la C++ 11.
-
-Example of usage:
-\code
-auto resetpos=Undoer([&s]() { s.seekg(0, std::ios::beg); });
-...
-resetpos.dismiss();
-\endcode
-
-template<typename callable> inline UndoerImpl<callable> Undoer(callable c)
-{
-	//static_assert(!std::is_function<callable>::value && !std::is_member_function_pointer<callable>::value && !std::is_member_object_pointer<callable>::value && !has_call_operator<callable>::value, "Undoer applied to a type not providing a call operator");
-	auto foo=UndoerImpl<callable>(std::move(c));
-	return foo;
-}*/
 
 
 /*! \enum allocator_alignment

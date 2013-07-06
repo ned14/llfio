@@ -17,6 +17,7 @@ Created: Feb 2013
 #include <algorithm>
 #include "../../../boost/afio/afio.hpp"
 #include "../../../NiallsCPP11Utilities/Int128_256.hpp"
+#include "../../../boost/afio/detail/Aligned_Allocator.hpp"
 #include "boost/lockfree/queue.hpp"
 
 
@@ -106,7 +107,7 @@ BOOST_AUTO_TEST_SUITE(all)
                 using boost::afio::future;
                 typedef std::chrono::duration<double, ratio<1>> secs_type;
                 auto mkdir(dispatcher->dir(async_path_op_req("testdir", file_flags::Create)));
-                vector<char, NiallsCPP11Utilities::aligned_allocator<char, 4096>> towrite(bytes, 'N');
+                vector<char, boost::afio::detail::aligned_allocator<char, 4096>> towrite(bytes, 'N');
                 assert(!(((size_t) &towrite.front()) & 4095));
 
                 // Wait for six seconds to let filing system recover and prime SpeedStep
@@ -466,8 +467,8 @@ BOOST_AUTO_TEST_SUITE(all)
                 using boost::afio::off_t;
                 typedef std::chrono::duration<double, ratio<1>> secs_type;
 
-                NiallsCPP11Utilities::aligned_allocator<char, 4096> aligned_allocator;
-                vector<vector<char, NiallsCPP11Utilities::aligned_allocator<char, 4096>>> towrite(no);
+                boost::afio::detail::aligned_allocator<char, 4096> aligned_allocator;
+                vector<vector<char, boost::afio::detail::aligned_allocator<char, 4096>>> towrite(no);
                 vector<char *> towriteptrs(no);
                 vector<size_t> towritesizes(no);
         #ifdef DEBUG_TORTURE_TEST
@@ -487,7 +488,7 @@ BOOST_AUTO_TEST_SUITE(all)
                         async_data_op_req<char> req;
                 };
                 static_assert(!(sizeof(PadSizeToMultipleOf<Op, 32>)&31), "Op's stored size must be a multiple of 32 bytes");
-                vector<vector<PadSizeToMultipleOf<Op, 32>, NiallsCPP11Utilities::aligned_allocator<Op, 32>>> todo(no);
+                vector<vector<PadSizeToMultipleOf<Op, 32>, boost::afio::detail::aligned_allocator<Op, 32>>> todo(no);
         #endif
                 for(size_t n=0; n<no; n++)
                 {
