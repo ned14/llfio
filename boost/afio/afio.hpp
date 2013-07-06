@@ -8,7 +8,7 @@ File Created: Mar 2013
 #define BOOST_AFIO_HPP
 
 //#include "../NiallsCPP11Utilities/NiallsCPP11Utilities.hpp"
-#include "../NiallsCPP11Utilities/std_filesystem.hpp"
+//#include "../NiallsCPP11Utilities/std_filesystem.hpp"
 #include <type_traits>
 #include <initializer_list>
 #include <thread>
