@@ -18,9 +18,9 @@ File Created: Mar 2013
 
 #include "../../../boost/afio/afio.hpp"
 #include "boost/smart_ptr/detail/spinlock.hpp"
-#include "../../../NiallsCPP11Utilities/ErrorHandling.hpp"
-#include "../../../NiallsCPP11Utilities/valgrind/memcheck.h"
-#include "../../../NiallsCPP11Utilities/valgrind/helgrind.h"
+#include "../../../boost/afio/detail/ErrorHandling.hpp"
+#include "../../../boost/afio/detail/valgrind/memcheck.h"
+#include "../../../boost/afio/detail/valgrind/helgrind.h"
 #include <mutex>
 
 #include <fcntl.h>
