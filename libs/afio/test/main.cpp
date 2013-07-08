@@ -289,7 +289,7 @@ BOOST_AUTO_TEST_SUITE(all)
                 using namespace boost::afio;
                 using namespace std;
                 using boost::afio::future;
-                using namespace NiallsCPP11Utilities;
+                using namespace boost::afio::detail;
                 using boost::afio::off_t;
                 typedef std::chrono::duration<double, ratio<1>> secs_type;
                 vector<pair<size_t, int>> groups;
@@ -464,7 +464,7 @@ BOOST_AUTO_TEST_SUITE(all)
                 using namespace boost::afio;
                 using namespace std;
                 using boost::afio::future;
-                using namespace NiallsCPP11Utilities;
+                using namespace boost::afio::detail;
                 using boost::afio::off_t;
                 typedef std::chrono::duration<double, ratio<1>> secs_type;
 

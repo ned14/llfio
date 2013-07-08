@@ -8,24 +8,11 @@
 #ifndef ALIGNED_ALLOCATOR_HPP
 #define	ALIGNED_ALLOCATOR_HPP
 
-//#include <cassert>
-
-//#include <vector>
+#include <vector>
 #include <memory>
 #include <type_traits>
-//#include <functional>
-//#include <algorithm>
-//nclude <map>
-//#include <unordered_map>
 #include <typeinfo>
-//#include <string>
-
-//#include <list>
-//#include <streambuf>
-//#include <ios>
-//#include <iostream>
-//#include <cstddef>
-//#include <stdexcept>
+#include <cstddef>
 
 
 //! \def TYPEALIGNMENT(bytes) The markup this compiler uses to mark a type as having some given alignment
@@ -43,7 +30,16 @@
 #endif
 #endif
 
-
+//! \def PACKEDTYPE(typedecl) The markup this compiler uses to pack a structure as tightly as possible
+#ifndef PACKEDTYPE
+#ifdef _MSC_VER
+#define PACKEDTYPE(typedecl) __pragma(pack(push, 1)) typedecl __pragma(pack(pop))
+#elif defined(__GNUC__)
+#define PACKEDTYPE(typedecl) typedecl __attribute__((packed))
+#else
+#define PACKEDTYPE(typedecl) unknown_type_pack_markup_for_this_compiler
+#endif
+#endif
 
 
 

@@ -12,7 +12,9 @@ AVX2 accelerated 256 bit integer implementation. Falls back to SSE2/NEON 128 bit
 \brief Provides the Int128 and Int256 hardware accelerated types
 */
 
-#include "NiallsCPP11Utilities.hpp"
+//#include "NiallsCPP11Utilities.hpp"
+#include "Aligned_Allocator.hpp"
+#include "../config.hpp"
 #include <cstring>
 #include <exception>
 #include <string>
@@ -84,14 +86,17 @@ inline unsigned _mm_movemask_epi8_neon(uint32x4_t Input)
 #define HAVE_M256 0
 #endif
 
-namespace NiallsCPP11Utilities {
-
+namespace boost {
+    namespace afio {
+        namespace detail {
+            
+        
 /*! \class Int128
 \brief Declares a 128 bit SSE2/NEON compliant container. WILL throw exception if initialised unaligned.
 
 Implemented as a __m128i or NEON uint32x4_t if available, otherwise as long longs.
 */
-class NIALLSCPP11UTILITIES_API TYPEALIGNMENT(16) Int128
+class  TYPEALIGNMENT(16) Int128
 {
 	union
 	{
@@ -209,7 +214,7 @@ public:
 
 Implemented as a __m256i if available (AVX2), otherwise two __m128i's or two NEON uint32x4_t's if available, otherwise as many long longs.
 */
-class NIALLSCPP11UTILITIES_API TYPEALIGNMENT(32) Int256
+class  TYPEALIGNMENT(32) Int256
 {
 	union
 	{
@@ -349,7 +354,7 @@ Intel Atom: Performance on 32 bit is approx. 3.38 cycles/byte
 
 ARM Cortex-A15: Performance on 32 bit is approx. 1.49 cycles/byte.
 */
-class NIALLSCPP11UTILITIES_API Hash128 : public Int128
+class  Hash128 : public Int128
 {
 	static Int128 int_init()
 	{
@@ -393,7 +398,7 @@ incremental hashing if you want the "correct" hash to be output. Internally, thi
 to cope with non-block multiple incremental data. For speed, and for ease of programming the SSE2 SIMD units, the batch implementation
 currently throws an exception if you supply non-64 byte multiples to AddSHA256ToBatch() except as the final increment before FinishBatch().
 */
-class NIALLSCPP11UTILITIES_API Hash256 : public Int256
+class  Hash256 : public Int256
 {
 	static Int256 int_init()
 	{
@@ -430,47 +435,53 @@ public:
 	static void BatchAddSHA256To(size_t no, Hash256 *hashs, const char **data, size_t *length);
 };
 
-} //namespace
+        } //namespace detail
+    }//namespace afio
+}//namespace boost
 
 namespace std
 {
 	//! Defines a hash for a Int128 (simply truncates)
-	template<> class hash<NiallsCPP11Utilities::Int128>
+	template<> class hash<boost::afio::detail::Int128>
 	{
 	public:
-		size_t operator()(const NiallsCPP11Utilities::Int128 &v) const
+		size_t operator()(const boost::afio::detail::Int128 &v) const
 		{
 			return v.asSize_t();
 		}
 	};
 	//! Defines a hash for a Int256 (simply truncates)
-	template<> class hash<NiallsCPP11Utilities::Int256>
+	template<> class hash<boost::afio::detail::Int256>
 	{
 	public:
-		size_t operator()(const NiallsCPP11Utilities::Int256 &v) const
+		size_t operator()(const boost::afio::detail::Int256 &v) const
 		{
 			return v.asSize_t();
 		}
 	};
-#define TYPE_TO_BE_OVERRIDEN_FOR_STL_ALLOCATOR_USAGE NiallsCPP11Utilities::Int128
+#define TYPE_TO_BE_OVERRIDEN_FOR_STL_ALLOCATOR_USAGE boost::afio::detail::Int128
 #include "incl_stl_allocator_override.hpp"
 #undef TYPE_TO_BE_OVERRIDEN_FOR_STL_ALLOCATOR_USAGE
-#define TYPE_TO_BE_OVERRIDEN_FOR_STL_ALLOCATOR_USAGE NiallsCPP11Utilities::Hash128
+#define TYPE_TO_BE_OVERRIDEN_FOR_STL_ALLOCATOR_USAGE boost::afio::detail::Hash128
 #include "incl_stl_allocator_override.hpp"
 #undef TYPE_TO_BE_OVERRIDEN_HashFOR_STL_ALLOCATOR_USAGE
-#define TYPE_TO_BE_OVERRIDEN_FOR_STL_ALLOCATOR_USAGE NiallsCPP11Utilities::Int256
+#define TYPE_TO_BE_OVERRIDEN_FOR_STL_ALLOCATOR_USAGE boost::afio::detail::Int256
 #include "incl_stl_allocator_override.hpp"
 #undef TYPE_TO_BE_OVERRIDEN_FOR_STL_ALLOCATOR_USAGE
-#define TYPE_TO_BE_OVERRIDEN_FOR_STL_ALLOCATOR_USAGE NiallsCPP11Utilities::Hash256
+#define TYPE_TO_BE_OVERRIDEN_FOR_STL_ALLOCATOR_USAGE boost::afio::detail::Hash256
 #include "incl_stl_allocator_override.hpp"
 #undef TYPE_TO_BE_OVERRIDEN_FOR_STL_ALLOCATOR_USAGE
 }
 
-namespace NiallsCPP11Utilities {
+namespace boost {
+    namespace afio {
+        namespace detail {
 	inline void Int128::FillFastRandom(std::vector<Int128> &ints) { FillFastRandom(ints.data(), ints.size()); }
 	inline void Int128::FillQualityRandom(std::vector<Int128> &ints) { FillQualityRandom(ints.data(), ints.size()); }
 	inline void Int256::FillFastRandom(std::vector<Int256> &ints) { FillFastRandom(ints.data(), ints.size()); }
 	inline void Int256::FillQualityRandom(std::vector<Int256> &ints) { FillQualityRandom(ints.data(), ints.size()); }
-}
+        } //namespace detail
+    }//namespace afio
+}//namespace boost
 
 #endif

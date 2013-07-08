@@ -1,7 +1,7 @@
 	//! Stop the default std::vector<> doing unaligned storage
-	template<> class vector<TYPE_TO_BE_OVERRIDEN_FOR_STL_ALLOCATOR_USAGE, allocator<TYPE_TO_BE_OVERRIDEN_FOR_STL_ALLOCATOR_USAGE>> : public vector<TYPE_TO_BE_OVERRIDEN_FOR_STL_ALLOCATOR_USAGE, NiallsCPP11Utilities::aligned_allocator<TYPE_TO_BE_OVERRIDEN_FOR_STL_ALLOCATOR_USAGE>>
+	template<> class vector<TYPE_TO_BE_OVERRIDEN_FOR_STL_ALLOCATOR_USAGE, allocator<TYPE_TO_BE_OVERRIDEN_FOR_STL_ALLOCATOR_USAGE>> : public vector<TYPE_TO_BE_OVERRIDEN_FOR_STL_ALLOCATOR_USAGE, boost::afio::detail::aligned_allocator<TYPE_TO_BE_OVERRIDEN_FOR_STL_ALLOCATOR_USAGE>>
 	{
-		typedef vector<TYPE_TO_BE_OVERRIDEN_FOR_STL_ALLOCATOR_USAGE, NiallsCPP11Utilities::aligned_allocator<TYPE_TO_BE_OVERRIDEN_FOR_STL_ALLOCATOR_USAGE>> Base;
+		typedef vector<TYPE_TO_BE_OVERRIDEN_FOR_STL_ALLOCATOR_USAGE, boost::afio::detail::aligned_allocator<TYPE_TO_BE_OVERRIDEN_FOR_STL_ALLOCATOR_USAGE>> Base;
 	public:
 		explicit vector (const allocator_type& alloc = allocator_type()) : Base(alloc) { }
 		explicit vector (size_type n) : Base(n) { }

@@ -38,8 +38,11 @@ which isn't fast, but it's the fastest reasonably good 256 bit hash I can make q
 #error ALLOW_UNALIGNED_READS needs to be zero for ARM compatibility
 #endif
 
-namespace NiallsCPP11Utilities {
-
+namespace boost {
+    namespace afio {
+        namespace detail {
+            
+        
 template<class generator_type> void FillRandom(char *buffer, size_t length)
 {
 	// No speed benefit so disabled
@@ -477,4 +480,6 @@ void Hash256::BatchAddSHA256To(size_t no, Hash256 *hashs, const char **data, siz
 
 
 
-} // namespace
+        } //namespace detail
+    }//namespace afio
+}//namespace boost
