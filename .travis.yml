@@ -46,8 +46,7 @@ before_install:
  - git submodule update --init --recursive
  - wget https://github.com/ned14/boost-trunk/archive/release/Boost_1_54_0.tar.gz
  - tar zxf Boost_1_54_0.tar.gz
- - mv boost-trunk-release-Boost_1_54_0 $HOME
- - mv boost-trunk-release-Boost_1_54_0 boost
+ - mv boost-trunk-release-Boost_1_54_0 $HOME/boost
 
 
 #HOME should be defined per the travis-ci docs as /home/travis
