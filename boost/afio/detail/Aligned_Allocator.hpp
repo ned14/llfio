@@ -13,31 +13,32 @@
 #include <type_traits>
 #include <typeinfo>
 #include <cstddef>
+#include "../config.hpp"
 
 
-//! \def TYPEALIGNMENT(bytes) The markup this compiler uses to mark a type as having some given alignment
-#ifndef TYPEALIGNMENT
+//! \def BOOST_AFIO_TYPEALIGNMENT(bytes) The markup this compiler uses to mark a type as having some given alignment
+#ifndef BOOST_AFIO_TYPEALIGNMENT
 #if __cplusplus>=201103L && GCC_VERSION > 40900
-#define TYPEALIGNMENT(bytes) alignas(bytes)
+#define BOOST_AFIO_TYPEALIGNMENT(bytes) alignas(bytes)
 #else
-#ifdef _MSC_VER
-#define TYPEALIGNMENT(bytes) __declspec(align(bytes))
+#ifdef BOOST_MSVC
+#define BOOST_AFIO_TYPEALIGNMENT(bytes) __declspec(align(bytes))
 #elif defined(__GNUC__)
-#define TYPEALIGNMENT(bytes) __attribute__((aligned(bytes)))
+#define BOOST_AFIO_TYPEALIGNMENT(bytes) __attribute__((aligned(bytes)))
 #else
-#define TYPEALIGNMENT(bytes) unknown_type_alignment_markup_for_this_compiler
+#define BOOST_AFIO_TYPEALIGNMENT(bytes) unknown_type_alignment_markup_for_this_compiler
 #endif
 #endif
 #endif
 
-//! \def PACKEDTYPE(typedecl) The markup this compiler uses to pack a structure as tightly as possible
-#ifndef PACKEDTYPE
-#ifdef _MSC_VER
-#define PACKEDTYPE(typedecl) __pragma(pack(push, 1)) typedecl __pragma(pack(pop))
+//! \def BOOST_AFIO_PACKEDTYPE(typedecl) The markup this compiler uses to pack a structure as tightly as possible
+#ifndef BOOST_AFIO_PACKEDTYPE
+#ifdef BOOST_MSVC
+#define BOOST_AFIO_PACKEDTYPE(typedecl) __pragma(pack(push, 1)) typedecl __pragma(pack(pop))
 #elif defined(__GNUC__)
-#define PACKEDTYPE(typedecl) typedecl __attribute__((packed))
+#define BOOST_AFIO_PACKEDTYPE(typedecl) typedecl __attribute__((packed))
 #else
-#define PACKEDTYPE(typedecl) unknown_type_pack_markup_for_this_compiler
+#define BOOST_AFIO_PACKEDTYPE(typedecl) unknown_type_pack_markup_for_this_compiler
 #endif
 #endif
 
@@ -56,7 +57,7 @@ enum class allocator_alignment : size_t
 	M256   = 32				//!< The alignment for a 256 bit vector.
 };      
             
-#ifdef WIN32
+#ifdef BOOST_WINDOWS
 	extern "C" void *_aligned_malloc(size_t size, size_t alignment);
 	extern "C" void _aligned_free(void *blk);
 #else
@@ -64,7 +65,7 @@ enum class allocator_alignment : size_t
 #endif
     inline void* allocate_aligned_memory(size_t align, size_t size)
 	{
-#ifdef WIN32
+#ifdef BOOST_WINDOWS
 		return _aligned_malloc(size, align);
 #else
 		void *ret=nullptr;
@@ -74,7 +75,7 @@ enum class allocator_alignment : size_t
 	}
     inline void deallocate_aligned_memory(void* ptr) noexcept
 	{
-#ifdef WIN32
+#ifdef BOOST_WINDOWS
 		_aligned_free(ptr);
 #else
 		free(ptr);
@@ -141,7 +142,7 @@ public:
     deallocate(pointer p, size_type) noexcept
     { return detail::deallocate_aligned_memory(p); }
 
-#if !defined(_MSC_VER) || _MSC_VER>1700
+#if !defined(BOOST_MSVC) || BOOST_MSVC>1700
     template <class U, class ...Args>
     void
     construct(U* p, Args&&... args)

@@ -9,7 +9,7 @@ which isn't fast, but it's the fastest reasonably good 256 bit hash I can make q
 */
 
 #include "Int128_256.hpp"
-#ifdef _MSC_VER
+#ifdef BOOST_MSVC
 #pragma warning(push, 0)
 #endif
 #include "hashes/cityhash/src/city.cc"
@@ -21,14 +21,14 @@ which isn't fast, but it's the fastest reasonably good 256 bit hash I can make q
 #if HAVE_NEON128
 #include "hashes/sha256/sha256-neon.c"
 #endif
-#ifdef _MSC_VER
+#ifdef BOOST_MSVC
 #pragma warning(pop)
 #endif
 #ifdef _OPENMP
 #include <omp.h>
 #endif
 #include <random>
-#ifdef WIN32
+#ifdef BOOST_WINDOWS
 #include <malloc.h>
 #else
 #include <alloca.h>
@@ -209,7 +209,7 @@ struct HashOp
 		FastHash,
 		SHA256
 	} hashType;
-	struct TYPEALIGNMENT(32) Scratch
+	struct BOOST_AFIO_TYPEALIGNMENT(32) Scratch
 	{
 		char d[64];
 		size_t pos, length;
@@ -398,7 +398,7 @@ static void _FinishBatch(HashOp *h)
 			// First run is to find all hashes with scratchpos>=56 as these need an extra round
 			for(size_t n=0; n<h->no; n++)
 			{
-				PACKEDTYPE(struct termination_t
+				BOOST_AFIO_PACKEDTYPE(struct termination_t
 				{
 					char data[56];
 					uint64_t length;

@@ -14,7 +14,6 @@ AVX2 accelerated 256 bit integer implementation. Falls back to SSE2/NEON 128 bit
 
 //#include "NiallsCPP11Utilities.hpp"
 #include "Aligned_Allocator.hpp"
-#include "../config.hpp"
 #include <cstring>
 #include <exception>
 #include <string>
@@ -23,7 +22,7 @@ AVX2 accelerated 256 bit integer implementation. Falls back to SSE2/NEON 128 bit
 \brief Turns on support for the __m256i hardware accelerated type
 */
 #ifndef HAVE_M256
-#ifdef _MSC_VER
+#ifdef BOOST_MSVC
 #if _M_IX86_FP>=3 || defined(__AVX2__)
 #define HAVE_M256 1
 #include <immintrin.h>
@@ -40,7 +39,7 @@ AVX2 accelerated 256 bit integer implementation. Falls back to SSE2/NEON 128 bit
 \brief Turns on support for the __m128i hardware accelerated type
 */
 #ifndef HAVE_M128
-#ifdef _MSC_VER
+#ifdef BOOST_MSVC
 #if _M_IX86_FP>=2 || defined(_M_AMD64) || _M_ARM_FP>=40
 #define HAVE_M128 1
 #include <emmintrin.h>
@@ -96,7 +95,7 @@ namespace boost {
 
 Implemented as a __m128i or NEON uint32x4_t if available, otherwise as long longs.
 */
-class  TYPEALIGNMENT(16) Int128
+class  BOOST_AFIO_TYPEALIGNMENT(16) Int128
 {
 	union
 	{
@@ -214,7 +213,7 @@ public:
 
 Implemented as a __m256i if available (AVX2), otherwise two __m128i's or two NEON uint32x4_t's if available, otherwise as many long longs.
 */
-class  TYPEALIGNMENT(32) Int256
+class  BOOST_AFIO_TYPEALIGNMENT(32) Int256
 {
 	union
 	{
@@ -359,7 +358,7 @@ class  Hash128 : public Int128
 	static Int128 int_init()
 	{
 		// First 32 bits of the fractional parts of the square roots of the first 8 primes 2..19
-		static TYPEALIGNMENT(16) const unsigned int_iv[]={0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a,
+		static BOOST_AFIO_TYPEALIGNMENT(16) const unsigned int_iv[]={0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a,
 			0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19};
 		return *((Int128 *) int_iv);
 	}
@@ -403,7 +402,7 @@ class  Hash256 : public Int256
 	static Int256 int_init()
 	{
 		// First 32 bits of the fractional parts of the square roots of the first 8 primes 2..19
-		static TYPEALIGNMENT(32) const unsigned int_iv[]={0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a,
+		static BOOST_AFIO_TYPEALIGNMENT(32) const unsigned int_iv[]={0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a,
 			0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19};
 		return *((Int256 *) int_iv);
 	}
