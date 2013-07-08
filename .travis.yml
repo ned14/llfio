@@ -35,25 +35,26 @@ matrix:
 
 
 before_install:
- - sudo add-apt-repository -y ppa:apokluda/boost1.53
+# - sudo add-apt-repository -y ppa:apokluda/boost1.53
  - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
  - if [ $CXX = "clang++" ]; then sudo add-apt-repository -y ppa:h-rayflood/llvm; fi
  - sudo apt-get update -qq
- - sudo apt-get install -qq libboost1.53-all-dev
+# - sudo apt-get install -qq libboost1.53-all-dev
  - if [ $CXX = "clang++" ]; then sudo apt-get install -qq libstdc++-4.8-dev clang-3.2; fi
  - if [ $CC = "gcc" ]; then sudo apt-get install -qq g++$GCCVER; fi
  - if [ $VALGRIND != "0" ]; then sudo apt-get install -qq valgrind; fi
  - git submodule update --init --recursive
  - wget https://github.com/ned14/boost-trunk/archive/release/Boost_1_54_0.tar.gz
  - tar zxf Boost_1_54_0.tar.gz
- - mv boost-trunk-release-Boost_1_54_0 /$HOME/boost
+ - mv boost-trunk-release-Boost_1_54_0 $HOME
+ - mv boost-trunk-release-Boost_1_54_0 boost
 
 
 #HOME should be defined per the travis-ci docs as /home/travis
  - mv user-config.jam $HOME
  
 # install boost build
- - BOOST="/$HOME/boost
+ - BOOST="$HOME/boost"
  - cd ~/boost/tools/build/v2
  - ./bootstrap.sh
  - sudo ./b2 install
