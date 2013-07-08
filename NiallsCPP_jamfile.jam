@@ -1,3 +1,0 @@
-project : usage-requirements <include>. ;
-
-lib utils : ErrorHandling.cpp Int128_256.cpp MappedFileInfo.cpp : <include>valgrind <include>hashes <toolset>gcc <cxxflags>-std=c++11 ;

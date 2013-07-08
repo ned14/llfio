@@ -6,24 +6,38 @@
 #  (See accompanying file LICENSE_1_0.txt or copy at
 #  http://www.boost.org/LICENSE_1_0.txt)
 
-#Is this Right?
 
+import modules ;
+
+local boost-path = [ modules.peek : BOOST ] ;
+
+
+#Is this Right?
 
 project boost/afio
     : requirements
-      <threading>multi #<-- do we need this?
-      <link>shared:<define>BOOST_AFIO_DYN_LINK=1  #need to integrate this maybe in boost/afio/config.hpp
+      <threading>multi                          #<-- do we need this?
+      <link>shared:<define>BOOST_AFIO_DYN_LINK=1  
       <define>BOOST_AFIO_SOURCE
       #<library>../../../NiallsCPP11Utilities//utils 
 	: usage-requirements 
       <include>. 
       <link>shared:<define>BOOST_AFIO_DYN_LINK=1
+      <library>$(boost-path)/libs/system/build//boost_system
+      <library>$(boost-path)/libs/filesystem/build//boost_filesystem 
+      <library>$(boost-path)/libs/atomic/build//boost_atomic
+      <library>$(boost-path)/libs/thread/build//boost_thread
     : source-location ../src
 
 ;
 
 lib boost_afio : afio.cpp 
-	: <include>../../../boost/afio <toolset>gcc <cxxflags>-std=c++11 
+	: <include>../../../boost/afio 
+      <cxxflags>-std=c++0x
+
+    #lots of complier flags
+      <cxxflags>"-fvisibility-inlines-hidden -fstrict-aliasing -Wstrict-aliasing -Wall -Wno-unused -fargument-noalias -O2 -g -fPIC -fvisibility=hidden -fopenmp"
+      <linkflags>"-l pthread"
 
 ;
 

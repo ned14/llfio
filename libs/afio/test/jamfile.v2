@@ -6,6 +6,11 @@
 #  (See accompanying file LICENSE_1_0.txt or copy at
 #  http://www.boost.org/LICENSE_1_0.txt)
 
+
+import modules ;
+
+local boost-path = [ modules.peek : BOOST ] ;
+
 import testing ;
 
 project boost/afio/test
@@ -13,20 +18,19 @@ project boost/afio/test
       <threading>multi
       <library>../build//boost_afio
       <library>../../../NiallsCPP11Utilities//utils
-      <include>../../../boost/afio 
-      <toolset>gcc <cxxflags>-std=c++11 
-      <linkflags>"-l boost_system -l boost_filesystem -l boost_atomic -l boost_filesystem -l boost_thread -l pthread"
+     # <include>../../../boost/afio         # <--- should be include with boost_afio usage requirements
+      <cxxflags>-std=c++0x 
+      #<linkflags>"-l pthread"      #is this the test's dependency or boost_afio's???? 
     ;
+
+
+exe boost_afio_test : main.cpp  ; #<-------- Keeping this for now to maintain consistency with previous travis-ci tests
 
 test-suite afio
-    : [ link main.cpp ]
-    #not ready to run this everytime
-    #: [run main.cpp ]
+    : #[ link main.cpp ]
+      #[ run main.cpp ]     #<----- run b2 from test folder to build and run unit test
     ;
 
 
-exe boost_afio_test : main.cpp   
-#	: 
-     #<library>boost_system, boost_filesystem, boost_atomic, boost_filesystem, boost_thread, pthread
-     #<library>pthread
-;
+
+
