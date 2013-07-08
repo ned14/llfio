@@ -27,7 +27,7 @@
 <a name="afio.reference.when_all_2_1"></a><a class="link" href="when_all_2_1.html" title="when_all">when_all</a>
 </h3></div></div></div>
 <p>
-        <a class="indexterm" name="id927452"></a>
+        <a class="indexterm" name="id912331"></a>
 Convenience overload for a single async_io_op. Does not retrieve exceptions.
       </p>
 <h5>
@@ -83,6 +83,9 @@ Convenience overload for a single async_io_op. Does not retrieve exceptions.
                 </p>
               </td>
 <td>
+                <p>
+                  An instance of std::nothrow_t.
+                </p>
               </td>
 </tr>
 <tr>
@@ -99,16 +102,29 @@ Convenience overload for a single async_io_op. Does not retrieve exceptions.
                 </p>
               </td>
 <td>
+                <p>
+                  An async_io_op to wait upon.
+                </p>
               </td>
 </tr>
 </tbody>
 </table></div>
 <h5>
 <a name="afio.reference.when_all_2_1.h2"></a>
+        <span class="phrase"><a name="afio.reference.when_all_2_1.returns"></a></span><a class="link" href="when_all_2_1.html#afio.reference.when_all_2_1.returns">Returns</a>
+      </h5>
+<p>
+        A future vector of shared_ptr's to detail::async_io_handle.
+      </p>
+<h5>
+<a name="afio.reference.when_all_2_1.h3"></a>
         <span class="phrase"><a name="afio.reference.when_all_2_1.header"></a></span><a class="link" href="when_all_2_1.html#afio.reference.when_all_2_1.header">Header</a>
       </h5>
 <p>
         <code class="computeroutput"><span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">boost</span><span class="special">/</span><span class="identifier">afio</span><span class="special">/</span><span class="identifier">afio</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span></code>
+      </p>
+<p>
+        distinguish, convenience single op, no throw
       </p>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>

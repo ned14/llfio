@@ -27,7 +27,7 @@
 <a name="afio.reference.when_all_1"></a><a class="link" href="when_all_1.html" title="when_all">when_all</a>
 </h3></div></div></div>
 <p>
-        <a class="indexterm" name="id927169"></a>
+        <a class="indexterm" name="id912024"></a>
 Convenience overload for a list of async_io_op. Retrieves exceptions.
       </p>
 <h5>
@@ -82,15 +82,28 @@ Convenience overload for a list of async_io_op. Retrieves exceptions.
                 </p>
               </td>
 <td>
+                <p>
+                  A std::initializer_list&lt;&gt; of async_io_op's to wait upon.
+                </p>
               </td>
 </tr></tbody>
 </table></div>
 <h5>
 <a name="afio.reference.when_all_1.h2"></a>
+        <span class="phrase"><a name="afio.reference.when_all_1.returns"></a></span><a class="link" href="when_all_1.html#afio.reference.when_all_1.returns">Returns</a>
+      </h5>
+<p>
+        A future vector of shared_ptr's to detail::async_io_handle.
+      </p>
+<h5>
+<a name="afio.reference.when_all_1.h3"></a>
         <span class="phrase"><a name="afio.reference.when_all_1.header"></a></span><a class="link" href="when_all_1.html#afio.reference.when_all_1.header">Header</a>
       </h5>
 <p>
         <code class="computeroutput"><span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">boost</span><span class="special">/</span><span class="identifier">afio</span><span class="special">/</span><span class="identifier">afio</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span></code>
+      </p>
+<p>
+        distinguish, initializer_list batch of ops, throws
       </p>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>

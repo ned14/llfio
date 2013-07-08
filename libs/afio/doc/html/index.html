@@ -2,7 +2,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
 <title>Chapter&#160;1.&#160;Boost.AFIO 0.1</title>
-<link rel="stylesheet" href="../../../../doc/src/boostbook.css" type="text/css">
+<link rel="stylesheet" href="myboostbook.css" type="text/css">
 <meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
 <link rel="home" href="index.html" title="Chapter&#160;1.&#160;Boost.AFIO 0.1">
 <link rel="next" href="afio/design.html" title="Design Rationale">
@@ -82,26 +82,35 @@
 <dt><span class="section"><a href="afio/reference/file_flags.html">file_flags</a></span></dt>
 <dt><span class="section"><a href="afio/reference/process_threadpool.html">process_threadpool</a></span></dt>
 <dt><span class="section"><a href="afio/reference/thread_pool.html">thread_pool</a></span></dt>
-<dt><span class="section"><a href="afio/reference/when_all.html">when_all</a></span></dt>
-<dt><span class="section"><a href="afio/reference/when_any.html">when_any (iterator range)</a></span></dt>
-<dt><span class="section"><a href="afio/reference/when_all_3.html">when_all</a></span></dt>
-<dt><span class="section"><a href="afio/reference/when_all_2.html">when_all</a></span></dt>
-<dt><span class="section"><a href="afio/reference/when_all_2_0.html">when_all</a></span></dt>
-<dt><span class="section"><a href="afio/reference/when_all_1.html">when_all</a></span></dt>
-<dt><span class="section"><a href="afio/reference/when_all_2_1.html">when_all</a></span></dt>
-<dt><span class="section"><a href="afio/reference/when_all_1_0.html">when_all</a></span></dt>
+<dt><span class="section"><a href="afio/reference/when_all.html">when_all (from WG21 N3634 (Improvements
+      to std::future&lt;T&gt; and Related APIs) for range of futures)</a></span></dt>
+<dt><span class="section"><a href="afio/reference/when_any.html">when_any (from WG21 N3634 (Improvements
+      to std::future&lt;T&gt; and Related APIs) for range of futures)</a></span></dt>
+<dt><span class="section"><a href="afio/reference/when_all_3_vector_batch_of_ops_not_exception_propagating.html">when_all
+      (vector batch of ops not exception propagating)</a></span></dt>
+<dt><span class="section"><a href="afio/reference/when_all_2_vector_batch_of_ops_exception_propagating.html">when_all
+      (vector batch of ops exception propagating)</a></span></dt>
+<dt><span class="section"><a href="afio/reference/when_all_2_initializer_list_batch_of_ops_not_exception_propagating.html">when_all
+      (initializer_list batch of ops not exception propagating)</a></span></dt>
+<dt><span class="section"><a href="afio/reference/when_all_1_initializer_list_batch_of_ops_exception_propagating.html">when_all
+      (initializer_list batch of ops exception propagating)</a></span></dt>
+<dt><span class="section"><a href="afio/reference/when_all_2_convenience_single_op_not_exception_propagating.html">when_all
+      (convenience single op not exception propagating)</a></span></dt>
+<dt><span class="section"><a href="afio/reference/when_all_1_convenience_single_op_exception_propagating.html">when_all
+      (convenience single op exception propagating)</a></span></dt>
 </dl></dd>
 <dt><span class="section"><a href="afio/release_notes.html">Release Notes</a></span></dt>
 <dt><span class="section"><a href="afio/acknowledgments.html">Acknowledgments</a></span></dt>
 </dl>
 </div>
 <p>
-    Boost.AFIO is a scalable, batch, chainable, asynchronous closure execution engine
-    extending Boost.ASIO and Boost.Thread specialised as a portable and scalable
-    asynchronous file i/o implementation library. Implementation of this first version
-    has been kept as simple as possible (&lt; 1000 active LOC) at the cost of some
-    performance. This library was brought to Boost as part of Google Summer of Code
-    2013.
+    Boost.AFIO is a linear scalable, batch, chainable, asynchronous closure execution
+    engine extending <a href="http://www.boost.org/libs/asio/" target="_top">Boost.ASIO</a>
+    and <a href="http://www.boost.org/libs/thread/" target="_top">Boost.Thread</a> specialised
+    as a portable asynchronous file i/o implementation library. Implementation of
+    this first version has been kept as simple as possible (&lt; 1000 active LOC)
+    at the cost of some performance. This library was brought to Boost as part of
+    Google Summer of Code 2013.
   </p>
 <p>
     Note that Boost.AFIO was originally written purely in C++11 and backported later
@@ -146,13 +155,9 @@
 <span class="comment">// Print the result returned by the future for the lambda, which will be 43</span>
 <span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="string">"addtovalue() returned "</span> <span class="special">&lt;&lt;</span> <span class="identifier">addtovalue</span><span class="special">.</span><span class="identifier">first</span><span class="special">.</span><span class="identifier">get</span><span class="special">()</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span>
 </pre>
-<p>
-    You can also schedule an asynchronous <code class="computeroutput">boost::afio::when_all</code>
-    using <code class="computeroutput">boost::afio::async_file_io_dispatcher_base::call</code>.
-  </p>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
-<td align="left"><p><small>Last revised: July 05, 2013 at 23:33:19 GMT</small></p></td>
+<td align="left"><p><small>Last revised: July 08, 2013 at 23:32:24 GMT</small></p></td>
 <td align="right"><div class="copyright-footer"></div></td>
 </tr></table>
 <hr>

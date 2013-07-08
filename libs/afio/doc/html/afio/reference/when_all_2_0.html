@@ -7,7 +7,7 @@
 <link rel="home" href="../../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 0.1">
 <link rel="up" href="../reference.html" title="Reference">
 <link rel="prev" href="when_all_2.html" title="when_all">
-<link rel="next" href="when_all_1.html" title="when_all">
+<link rel="next" href="when_all_1_initializer_list_batch_of_ops.html" title=",_throws when_all (initializer_list batch of ops, throws)">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
 <table cellpadding="2" width="100%"><tr>
@@ -20,14 +20,14 @@
 </tr></table>
 <hr>
 <div class="spirit-nav">
-<a accesskey="p" href="when_all_2.html"><img src="../../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../reference.html"><img src="../../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="when_all_1.html"><img src="../../../../../../doc/src/images/next.png" alt="Next"></a>
+<a accesskey="p" href="when_all_2.html"><img src="../../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../reference.html"><img src="../../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="when_all_1_initializer_list_batch_of_ops.html"><img src="../../../../../../doc/src/images/next.png" alt="Next"></a>
 </div>
 <div class="section">
 <div class="titlepage"><div><div><h3 class="title">
 <a name="afio.reference.when_all_2_0"></a><a class="link" href="when_all_2_0.html" title="when_all">when_all</a>
 </h3></div></div></div>
 <p>
-        <a class="indexterm" name="id925747"></a>
+        <a class="indexterm" name="id936782"></a>
 Convenience overload for a list of async_io_op. Does not retrieve exceptions.
       </p>
 <h5>
@@ -83,6 +83,9 @@ Convenience overload for a list of async_io_op. Does not retrieve exceptions.
                 </p>
               </td>
 <td>
+                <p>
+                  An instance of std::nothrow_t.
+                </p>
               </td>
 </tr>
 <tr>
@@ -99,16 +102,29 @@ Convenience overload for a list of async_io_op. Does not retrieve exceptions.
                 </p>
               </td>
 <td>
+                <p>
+                  A std::initializer_list&lt;&gt; of async_io_op's to wait upon.
+                </p>
               </td>
 </tr>
 </tbody>
 </table></div>
 <h5>
 <a name="afio.reference.when_all_2_0.h2"></a>
+        <span class="phrase"><a name="afio.reference.when_all_2_0.returns"></a></span><a class="link" href="when_all_2_0.html#afio.reference.when_all_2_0.returns">Returns</a>
+      </h5>
+<p>
+        A future vector of shared_ptr's to detail::async_io_handle.
+      </p>
+<h5>
+<a name="afio.reference.when_all_2_0.h3"></a>
         <span class="phrase"><a name="afio.reference.when_all_2_0.header"></a></span><a class="link" href="when_all_2_0.html#afio.reference.when_all_2_0.header">Header</a>
       </h5>
 <p>
         <code class="computeroutput"><span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">boost</span><span class="special">/</span><span class="identifier">afio</span><span class="special">/</span><span class="identifier">afio</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span></code>
+      </p>
+<p>
+        distinguish, initializer_list batch of ops, no throw
       </p>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
@@ -121,7 +137,7 @@ Convenience overload for a list of async_io_op. Does not retrieve exceptions.
 </tr></table>
 <hr>
 <div class="spirit-nav">
-<a accesskey="p" href="when_all_2.html"><img src="../../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../reference.html"><img src="../../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="when_all_1.html"><img src="../../../../../../doc/src/images/next.png" alt="Next"></a>
+<a accesskey="p" href="when_all_2.html"><img src="../../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../reference.html"><img src="../../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="when_all_1_initializer_list_batch_of_ops.html"><img src="../../../../../../doc/src/images/next.png" alt="Next"></a>
 </div>
 </body>
 </html>

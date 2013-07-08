@@ -6,7 +6,7 @@
 <meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
 <link rel="home" href="../../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 0.1">
 <link rel="up" href="../reference.html" title="Reference">
-<link rel="prev" href="when_any.html" title="when_any (iterator range)">
+<link rel="prev" href="when_any.html" title="when_any (from WG21 N3634 (Improvements to std::future&lt;T&gt; and Related APIs, iterator range of futures)">
 <link rel="next" href="when_all_2.html" title="when_all">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
@@ -27,14 +27,14 @@
 <a name="afio.reference.when_all_3"></a><a class="link" href="when_all_3.html" title="when_all">when_all</a>
 </h3></div></div></div>
 <p>
-        <a class="indexterm" name="id925010"></a>
+        <a class="indexterm" name="id935977"></a>
 Convenience overload for a vector of async_io_op. Does not retrieve exceptions.
       </p>
 <h5>
 <a name="afio.reference.when_all_3.h0"></a>
         <span class="phrase"><a name="afio.reference.when_all_3.synopsis"></a></span><a class="link" href="when_all_3.html#afio.reference.when_all_3.synopsis">Synopsis</a>
       </h5>
-<pre class="programlisting"><span class="identifier">future</span><span class="special">&lt;</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span><span class="identifier">detail</span><span class="special">::</span><span class="identifier">async_io_handle</span><span class="special">&gt;</span> <span class="special">&gt;</span> <span class="special">&gt;</span> <span class="identifier">when_all</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">nothrow_t</span> <span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">async_io_op</span> <span class="special">&gt;::</span><span class="identifier">iterator</span> <span class="identifier">first</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">async_io_op</span> <span class="special">&gt;::</span><span class="identifier">iterator</span> <span class="identifier">last</span><span class="special">)</span></pre>
+<pre class="programlisting"><span class="identifier">future</span><span class="special">&lt;</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span><span class="identifier">detail</span><span class="special">::</span><span class="identifier">async_io_handle</span><span class="special">&gt;</span> <span class="special">&gt;</span> <span class="special">&gt;</span> <span class="identifier">when_all</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">nothrow_t</span> <span class="identifier">_</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">async_io_op</span> <span class="special">&gt;::</span><span class="identifier">iterator</span> <span class="identifier">first</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">async_io_op</span> <span class="special">&gt;::</span><span class="identifier">iterator</span> <span class="identifier">last</span><span class="special">)</span></pre>
 <h5>
 <a name="afio.reference.when_all_3.h1"></a>
         <span class="phrase"><a name="afio.reference.when_all_3.parameters"></a></span><a class="link" href="when_all_3.html#afio.reference.when_all_3.parameters">Parameters</a>
@@ -78,8 +78,14 @@ Convenience overload for a vector of async_io_op. Does not retrieve exceptions.
 <td>
               </td>
 <td>
+                <p>
+                  _
+                </p>
               </td>
 <td>
+                <p>
+                  An instance of std::nothrow_t.
+                </p>
               </td>
 </tr>
 <tr>
@@ -96,6 +102,9 @@ Convenience overload for a vector of async_io_op. Does not retrieve exceptions.
                 </p>
               </td>
 <td>
+                <p>
+                  A vector iterator pointing to the first async_io_op to wait upon.
+                </p>
               </td>
 </tr>
 <tr>
@@ -112,16 +121,29 @@ Convenience overload for a vector of async_io_op. Does not retrieve exceptions.
                 </p>
               </td>
 <td>
+                <p>
+                  A vector iterator pointing after the last async_io_op to wait upon.
+                </p>
               </td>
 </tr>
 </tbody>
 </table></div>
 <h5>
 <a name="afio.reference.when_all_3.h2"></a>
+        <span class="phrase"><a name="afio.reference.when_all_3.returns"></a></span><a class="link" href="when_all_3.html#afio.reference.when_all_3.returns">Returns</a>
+      </h5>
+<p>
+        A future vector of shared_ptr's to detail::async_io_handle.
+      </p>
+<h5>
+<a name="afio.reference.when_all_3.h3"></a>
         <span class="phrase"><a name="afio.reference.when_all_3.header"></a></span><a class="link" href="when_all_3.html#afio.reference.when_all_3.header">Header</a>
       </h5>
 <p>
         <code class="computeroutput"><span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">boost</span><span class="special">/</span><span class="identifier">afio</span><span class="special">/</span><span class="identifier">afio</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span></code>
+      </p>
+<p>
+        distinguish, vector batch of ops, no throw
       </p>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>

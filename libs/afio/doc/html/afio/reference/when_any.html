@@ -1,13 +1,13 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
-<title>when_any (iterator range)</title>
-<link rel="stylesheet" href="../../../../../../doc/src/boostbook.css" type="text/css">
+<title>when_any (from WG21 N3634 (Improvements to std::future&lt;T&gt; and Related APIs) for range of futures)</title>
+<link rel="stylesheet" href="../../myboostbook.css" type="text/css">
 <meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
 <link rel="home" href="../../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 0.1">
 <link rel="up" href="../reference.html" title="Reference">
-<link rel="prev" href="when_all.html" title="when_all">
-<link rel="next" href="when_all_3.html" title="when_all">
+<link rel="prev" href="when_all.html" title="when_all (from WG21 N3634 (Improvements to std::future&lt;T&gt; and Related APIs) for range of futures)">
+<link rel="next" href="when_all_3_vector_batch_of_ops_not_exception_propagating.html" title="when_all (vector batch of ops not exception propagating)">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
 <table cellpadding="2" width="100%"><tr>
@@ -20,14 +20,15 @@
 </tr></table>
 <hr>
 <div class="spirit-nav">
-<a accesskey="p" href="when_all.html"><img src="../../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../reference.html"><img src="../../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="when_all_3.html"><img src="../../../../../../doc/src/images/next.png" alt="Next"></a>
+<a accesskey="p" href="when_all.html"><img src="../../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../reference.html"><img src="../../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="when_all_3_vector_batch_of_ops_not_exception_propagating.html"><img src="../../../../../../doc/src/images/next.png" alt="Next"></a>
 </div>
 <div class="section">
 <div class="titlepage"><div><div><h3 class="title">
-<a name="afio.reference.when_any"></a><a class="link" href="when_any.html" title="when_any (iterator range)">when_any (iterator range)</a>
+<a name="afio.reference.when_any"></a><a class="link" href="when_any.html" title="when_any (from WG21 N3634 (Improvements to std::future&lt;T&gt; and Related APIs) for range of futures)">when_any (from WG21 N3634 (Improvements
+      to std::future&lt;T&gt; and Related APIs) for range of futures)</a>
 </h3></div></div></div>
 <p>
-        <a class="indexterm" name="id924604"></a>
+        <a class="indexterm" name="id938333"></a>
 Returns a future tuple of results from all the supplied futures.
       </p>
 <h5>
@@ -35,7 +36,13 @@ Returns a future tuple of results from all the supplied futures.
         <span class="phrase"><a name="afio.reference.when_any.description"></a></span><a class="link" href="when_any.html#afio.reference.when_any.description">Description</a>
       </h5>
 <p>
-        Returns a future result from the first of the supplied futures
+        Returns a future result from the first of the supplied futures to become
+        available
+      </p>
+<p>
+        This is an implementation of WG21 N3634's when_any() which uses process_threadpool()
+        to allow you to create a future which only becomes available when the first
+        of the supplied futures become available.
       </p>
 <h5>
 <a name="afio.reference.when_any.h1"></a>
@@ -110,6 +117,9 @@ Returns a future tuple of results from all the supplied futures.
                 </p>
               </td>
 <td>
+                <p>
+                  An iterator pointing to the first future to wait upon
+                </p>
               </td>
 </tr>
 <tr>
@@ -126,12 +136,22 @@ Returns a future tuple of results from all the supplied futures.
                 </p>
               </td>
 <td>
+                <p>
+                  An iterator pointing to after the last future to wait upon
+                </p>
               </td>
 </tr>
 </tbody>
 </table></div>
 <h5>
 <a name="afio.reference.when_any.h3"></a>
+        <span class="phrase"><a name="afio.reference.when_any.returns"></a></span><a class="link" href="when_any.html#afio.reference.when_any.returns">Returns</a>
+      </h5>
+<p>
+        A future pair of the first future to become available and its result
+      </p>
+<h5>
+<a name="afio.reference.when_any.h4"></a>
         <span class="phrase"><a name="afio.reference.when_any.header"></a></span><a class="link" href="when_any.html#afio.reference.when_any.header">Header</a>
       </h5>
 <p>
@@ -148,7 +168,7 @@ Returns a future tuple of results from all the supplied futures.
 </tr></table>
 <hr>
 <div class="spirit-nav">
-<a accesskey="p" href="when_all.html"><img src="../../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../reference.html"><img src="../../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="when_all_3.html"><img src="../../../../../../doc/src/images/next.png" alt="Next"></a>
+<a accesskey="p" href="when_all.html"><img src="../../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../reference.html"><img src="../../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="when_all_3_vector_batch_of_ops_not_exception_propagating.html"><img src="../../../../../../doc/src/images/next.png" alt="Next"></a>
 </div>
 </body>
 </html>

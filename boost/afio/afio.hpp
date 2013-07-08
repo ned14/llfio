@@ -224,8 +224,16 @@ namespace detail {
 	}
 }
 /*! \brief Returns a future vector of results from all the supplied futures
+
+This is an implementation of WG21 N3634's when_all() which uses process_threadpool()
+to allow you to create a future which only becomes available when all the supplied
+futures become available.
+
+\return A future vector of the results of the input futures
+\param first An iterator pointing to the first item to wait upon
+\param last An iterator pointing to after the last future to wait upon
 \ingroup when_all_futures
-\qbk{distinguish, iterator range}
+\qbk{distinguish, from ___WG21_N3634__ for range of futures}
 */
 template <class InputIterator> inline future<std::vector<typename std::decay<decltype(((typename InputIterator::value_type *) 0)->get())>::type>> when_all(InputIterator first, InputIterator last)
 {
@@ -240,9 +248,17 @@ template <class InputIterator> inline future<std::vector<typename std::decay<dec
 }
 //! Returns a future tuple of results from all the supplied futures
 //template <typename... T> inline future<std::tuple<typename std::decay<T...>::type>> when_all(T&&... futures);
-/*! \brief Returns a future result from the first of the supplied futures
+/*! \brief Returns a future result from the first of the supplied futures to become available
+
+This is an implementation of WG21 N3634's when_any() which uses process_threadpool()
+to allow you to create a future which only becomes available when the first of the supplied
+futures become available.
+
+\return A future pair of the first future to become available and its result
+\param first An iterator pointing to the first future to wait upon
+\param last An iterator pointing to after the last future to wait upon
 \ingroup when_all_futures
-\qbk{distinguish, iterator range}
+\qbk{distinguish, from ___WG21_N3634__ for range of futures}
 */
 template <class InputIterator> inline future<std::pair<size_t, typename std::decay<decltype(((typename InputIterator::value_type *) 0)->get())>::type>> when_any(InputIterator first, InputIterator last)
 {
@@ -413,6 +429,7 @@ public:
     \qbk{
     [link call_2_batch_with_preconditions More ...]
     }
+
     \return A pair with a batch of futures returning the result of each of the callables and a batch of op handles.
     \param ops A batch of precondition op handles. If default constructed, a precondition is null.
     \param callables A batch of bound functions to call, returning R.
@@ -523,12 +540,14 @@ protected:
 };
 /*! \brief Instatiates the best available async_file_io_dispatcher implementation for this system.
 
-\em flagsforce is ORed with any opened file flags. The NOT of \em flags mask is ANDed with any opened flags.
-
 Note that the number of threads in the threadpool supplied is the maximum non-async op queue depth (e.g. file opens, closes etc.).
 For fast SSDs, there isn't much gain after eight-sixteen threads, so the process threadpool is set to eight by default.
 For slow hard drives, or worse, SANs, a queue depth of 64 or higher might deliver significant benefits.
 
+\return A shared_ptr to the best available async_file_io_dispatcher implementation for this system.
+\param threadpool The threadpool instance to use for asynchronous dispatch.
+\param flagsforce The flags to bitwise OR with any opened file flags. Used to force on certain flags.
+\param flagsmask The flags to bitwise AND with any opened file flags. Used to force off certain flags.
 \ingroup async_file_io_dispatcher
 \qbk{
 [heading Example]
@@ -613,10 +632,17 @@ namespace detail
 }
 
 /*! \brief Convenience overload for a vector of async_io_op. Does not retrieve exceptions.
+
+Returns a result when all the supplied ops complete. Does not propagate exception states.
+
+\return A future vector of shared_ptr's to detail::async_io_handle.
+\param _ An instance of std::nothrow_t.
+\param first A vector iterator pointing to the first async_io_op to wait upon.
+\param last A vector iterator pointing after the last async_io_op to wait upon.
 \ingroup when_all_ops
-\qbk{distinguish, vector batch of ops, no throw}
+\qbk{distinguish, vector batch of ops not exception propagating}
 */
-inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(std::nothrow_t, std::vector<async_io_op>::iterator first, std::vector<async_io_op>::iterator last)
+inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(std::nothrow_t _, std::vector<async_io_op>::iterator first, std::vector<async_io_op>::iterator last)
 {
 	if(first==last)
 		return future<std::vector<std::shared_ptr<detail::async_io_handle>>>();
@@ -631,8 +657,14 @@ inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(st
 	return state->done.get_future();
 }
 /*! \brief Convenience overload for a vector of async_io_op. Retrieves exceptions.
+
+Returns a result when all the supplied ops complete. Propagates exception states.
+
+\return A future vector of shared_ptr's to detail::async_io_handle.
+\param first A vector iterator pointing to the first async_io_op to wait upon.
+\param last A vector iterator pointing after the last async_io_op to wait upon.
 \ingroup when_all_ops
-\qbk{distinguish, vector batch of ops, throws}
+\qbk{distinguish, vector batch of ops exception propagating}
 */
 inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(std::vector<async_io_op>::iterator first, std::vector<async_io_op>::iterator last)
 {
@@ -649,8 +681,14 @@ inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(st
 	return state->done.get_future();
 }
 /*! \brief Convenience overload for a list of async_io_op.  Does not retrieve exceptions.
+
+Returns a result when all the supplied ops complete. Does not propagate exception states.
+
+\return A future vector of shared_ptr's to detail::async_io_handle.
+\param _ An instance of std::nothrow_t.
+\param _ops A std::initializer_list<> of async_io_op's to wait upon.
 \ingroup when_all_ops
-\qbk{distinguish, initializer_list batch of ops, no throw}
+\qbk{distinguish, initializer_list batch of ops not exception propagating}
 */
 inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(std::nothrow_t _, std::initializer_list<async_io_op> _ops)
 {
@@ -661,8 +699,13 @@ inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(st
 	return when_all(_, ops.begin(), ops.end());
 }
 /*! \brief Convenience overload for a list of async_io_op. Retrieves exceptions.
+
+Returns a result when all the supplied ops complete. Propagates exception states.
+
+\return A future vector of shared_ptr's to detail::async_io_handle.
+\param _ops A std::initializer_list<> of async_io_op's to wait upon.
 \ingroup when_all_ops
-\qbk{distinguish, initializer_list batch of ops, throws}
+\qbk{distinguish, initializer_list batch of ops exception propagating}
 */
 inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(std::initializer_list<async_io_op> _ops)
 {
@@ -673,8 +716,14 @@ inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(st
 	return when_all(ops.begin(), ops.end());
 }
 /*! \brief Convenience overload for a single async_io_op.  Does not retrieve exceptions.
+
+Returns a result when the supplied op completes. Does not propagate exception states.
+
+\return A future vector of shared_ptr's to detail::async_io_handle.
+\param _ An instance of std::nothrow_t.
+\param op An async_io_op to wait upon.
 \ingroup when_all_ops
-\qbk{distinguish, convenience single op, no throw}
+\qbk{distinguish, convenience single op not exception propagating}
 */
 inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(std::nothrow_t _, async_io_op op)
 {
@@ -682,8 +731,13 @@ inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(st
 	return when_all(_, ops.begin(), ops.end());
 }
 /*! \brief Convenience overload for a single async_io_op.  Retrieves exceptions.
+
+Returns a result when the supplied op completes. Propagates exception states.
+
+\return A future vector of shared_ptr's to detail::async_io_handle.
+\param op An async_io_op to wait upon.
 \ingroup when_all_ops
-\qbk{distinguish, convenience single op, throws}
+\qbk{distinguish, convenience single op exception propagating}
 */
 inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(async_io_op op)
 {
@@ -730,6 +784,8 @@ private:
 
 /*! \struct async_data_op_req
 \brief A convenience bundle of precondition, data and where. Data \b MUST stay around until the operation completes.
+
+\tparam T Specialised for void
 */
 template<> struct async_data_op_req<void> // For reading
 {
@@ -767,6 +823,8 @@ private:
 #endif
 	}
 };
+/*! \brief A convenience bundle of precondition, data and where. Data \b MUST stay around until the operation completes.
+*/
 template<> struct async_data_op_req<const void> // For writing
 {
 	async_io_op precondition;
@@ -815,6 +873,7 @@ template<class T> struct async_data_op_req : public async_data_op_req<void>
 	async_data_op_req &operator=(async_data_op_req &&o) { static_cast<async_data_op_req<void>>(*this)=std::move(o); return *this; }
 	async_data_op_req(async_io_op _precondition, T *_buffer, size_t _length, off_t _where) : async_data_op_req<void>(std::move(_precondition), static_cast<void *>(_buffer), _length, _where) { }
 };
+//! \brief A specialisation for any pointer to type const T
 template<class T> struct async_data_op_req<const T> : public async_data_op_req<const void>
 {
 	async_data_op_req() { }
@@ -836,6 +895,7 @@ template<class T, class A> struct async_data_op_req<std::vector<T, A>> : public 
 	async_data_op_req &operator=(async_data_op_req &&o) { static_cast<async_data_op_req<void>>(*this)=std::move(o); return *this; }
 	async_data_op_req(async_io_op _precondition, std::vector<T, A> &v, off_t _where) : async_data_op_req<void>(std::move(_precondition), static_cast<void *>(&v.front()), v.size()*sizeof(T), _where) { }
 };
+//! \brief A specialisation for any const std::vector<T, A>
 template<class T, class A> struct async_data_op_req<const std::vector<T, A>> : public async_data_op_req<const void>
 {
 	async_data_op_req() { }
@@ -857,6 +917,7 @@ template<class T, size_t N> struct async_data_op_req<std::array<T, N>> : public 
 	async_data_op_req &operator=(async_data_op_req &&o) { static_cast<async_data_op_req<void>>(*this)=std::move(o); return *this; }
 	async_data_op_req(async_io_op _precondition, std::array<T, N> &v, off_t _where) : async_data_op_req<void>(std::move(_precondition), static_cast<void *>(&v.front()), v.size()*sizeof(T), _where) { }
 };
+//! \brief A specialisation for any const std::array<T, N>
 template<class T, size_t N> struct async_data_op_req<const std::array<T, N>> : public async_data_op_req<const void>
 {
 	async_data_op_req() { }
@@ -878,6 +939,7 @@ template<class C, class T, class A> struct async_data_op_req<std::basic_string<C
 	async_data_op_req &operator=(async_data_op_req &&o) { static_cast<async_data_op_req<void>>(*this)=std::move(o); return *this; }
 	async_data_op_req(async_io_op _precondition, std::basic_string<C, T, A> &v, off_t _where) : async_data_op_req<void>(std::move(_precondition), static_cast<void *>(&v.front()), v.size()*sizeof(A), _where) { }
 };
+//! \brief A specialisation for any const std::basic_string<C, T, A>
 template<class C, class T, class A> struct async_data_op_req<const std::basic_string<C, T, A>> : public async_data_op_req<const void>
 {
 	async_data_op_req() { }

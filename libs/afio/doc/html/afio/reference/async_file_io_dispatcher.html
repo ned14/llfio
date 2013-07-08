@@ -2,7 +2,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
 <title>async_file_io_dispatcher</title>
-<link rel="stylesheet" href="../../../../../../doc/src/boostbook.css" type="text/css">
+<link rel="stylesheet" href="../../myboostbook.css" type="text/css">
 <meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
 <link rel="home" href="../../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 0.1">
 <link rel="up" href="../reference.html" title="Reference">
@@ -27,7 +27,7 @@
 <a name="afio.reference.async_file_io_dispatcher"></a><a class="link" href="async_file_io_dispatcher.html" title="async_file_io_dispatcher">async_file_io_dispatcher</a>
 </h3></div></div></div>
 <p>
-        <a class="indexterm" name="id911927"></a>
+        <a class="indexterm" name="id924696"></a>
 Instatiates the best available async_file_io_dispatcher implementation for
         this system.
       </p>
@@ -35,10 +35,6 @@ Instatiates the best available async_file_io_dispatcher implementation for
 <a name="afio.reference.async_file_io_dispatcher.h0"></a>
         <span class="phrase"><a name="afio.reference.async_file_io_dispatcher.description"></a></span><a class="link" href="async_file_io_dispatcher.html#afio.reference.async_file_io_dispatcher.description">Description</a>
       </h5>
-<p>
-        <span class="emphasis"><em>flagsforce</em></span> is ORed with any opened file flags. The NOT
-        of <span class="emphasis"><em>flags</em></span> mask is ANDed with any opened flags.
-      </p>
 <p>
         Note that the number of threads in the threadpool supplied is the maximum
         non-async op queue depth (e.g. file opens, closes etc.). For fast SSDs, there
@@ -99,6 +95,9 @@ Instatiates the best available async_file_io_dispatcher implementation for
                 </p>
               </td>
 <td>
+                <p>
+                  The threadpool instance to use for asynchronous dispatch.
+                </p>
               </td>
 </tr>
 <tr>
@@ -115,6 +114,10 @@ Instatiates the best available async_file_io_dispatcher implementation for
                 </p>
               </td>
 <td>
+                <p>
+                  The flags to bitwise OR with any opened file flags. Used to force
+                  on certain flags.
+                </p>
               </td>
 </tr>
 <tr>
@@ -131,19 +134,31 @@ Instatiates the best available async_file_io_dispatcher implementation for
                 </p>
               </td>
 <td>
+                <p>
+                  The flags to bitwise AND with any opened file flags. Used to force
+                  off certain flags.
+                </p>
               </td>
 </tr>
 </tbody>
 </table></div>
 <h5>
 <a name="afio.reference.async_file_io_dispatcher.h3"></a>
+        <span class="phrase"><a name="afio.reference.async_file_io_dispatcher.returns"></a></span><a class="link" href="async_file_io_dispatcher.html#afio.reference.async_file_io_dispatcher.returns">Returns</a>
+      </h5>
+<p>
+        A shared_ptr to the best available async_file_io_dispatcher implementation
+        for this system.
+      </p>
+<h5>
+<a name="afio.reference.async_file_io_dispatcher.h4"></a>
         <span class="phrase"><a name="afio.reference.async_file_io_dispatcher.header"></a></span><a class="link" href="async_file_io_dispatcher.html#afio.reference.async_file_io_dispatcher.header">Header</a>
       </h5>
 <p>
         <code class="computeroutput"><span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">boost</span><span class="special">/</span><span class="identifier">afio</span><span class="special">/</span><span class="identifier">afio</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span></code>
       </p>
 <h5>
-<a name="afio.reference.async_file_io_dispatcher.h4"></a>
+<a name="afio.reference.async_file_io_dispatcher.h5"></a>
         <span class="phrase"><a name="afio.reference.async_file_io_dispatcher.example"></a></span><a class="link" href="async_file_io_dispatcher.html#afio.reference.async_file_io_dispatcher.example">Example</a>
       </h5>
 <pre class="programlisting"><span class="comment">// Create a dispatcher instance</span>

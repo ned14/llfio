@@ -33,6 +33,7 @@ boostbook afio
        <xsl:param>toc.max.depth=3
        <xsl:param>generate.section.toc.level=4
        <xsl:param>boost.root=../../../..
+       <xsl:param>html.stylesheet=myboostbook.css
        <quickbook-define>enable_index
        <include>$(here)
        <format>pdf:<xsl:param>img.src.path=$(images_location)/    
