@@ -47,7 +47,7 @@ before_install:
  - wget https://github.com/ned14/boost-trunk/archive/release/Boost_1_54_0_beta1.tar.gz
  - tar zxf Boost_1_54_0_beta1.tar.gz
  - mv boost-trunk-release-Boost_1_54_0_beta1 boost
- - mv NiallsCPP_jamfile.v2 NiallsCPP11Utilities/jamfile.v2 
+
 
 #HOME should be defined per the travis-ci docs as /home/travis
  - mv user-config.jam $HOME
