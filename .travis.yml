@@ -57,7 +57,7 @@ before_install:
  - cd ~/boost/tools/build/v2
  - ./bootstrap.sh
  - sudo ./b2 install
- - cd ~/BoostGSoC/boost.afio
+ - cd ~/build/BoostGSoC/boost.afio
 
 
 #update all packages
