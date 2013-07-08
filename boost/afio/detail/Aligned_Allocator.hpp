@@ -27,6 +27,26 @@
 //#include <cstddef>
 //#include <stdexcept>
 
+
+//! \def TYPEALIGNMENT(bytes) The markup this compiler uses to mark a type as having some given alignment
+#ifndef TYPEALIGNMENT
+#if __cplusplus>=201103L && GCC_VERSION > 40900
+#define TYPEALIGNMENT(bytes) alignas(bytes)
+#else
+#ifdef _MSC_VER
+#define TYPEALIGNMENT(bytes) __declspec(align(bytes))
+#elif defined(__GNUC__)
+#define TYPEALIGNMENT(bytes) __attribute__((aligned(bytes)))
+#else
+#define TYPEALIGNMENT(bytes) unknown_type_alignment_markup_for_this_compiler
+#endif
+#endif
+#endif
+
+
+
+
+
 namespace boost{
     namespace afio{
         namespace detail {
