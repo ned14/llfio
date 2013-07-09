@@ -94,7 +94,7 @@ script:
 #build the lib
 # - b2 $DEBUGBUILD toolset=$CC$GCCVER --link=shared --boost=$BOOST $FLAGS;
  - cd $BOOST
- - ./bootstrap.sh --with-libraries=afio --prefix=$BOOST
+ - ./bootstrap.sh --with-libraries=afio,filesystem,thread,system,atomic  --prefix=$BOOST
  - b2 install $DEBUGBUILD toolset=$CC$GCCVER link=shared $FLAGS;
 # - cd $PROJECTPATH
 

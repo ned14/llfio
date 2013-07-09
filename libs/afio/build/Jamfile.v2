@@ -45,4 +45,4 @@ lib boost_afio : afio.cpp ../detail/ErrorHandling.cpp
 
 ;
 
-boost-install boost_afio : <install-dependencies>on ;
+boost-install boost_afio ;
