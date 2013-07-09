@@ -17,7 +17,7 @@ project boost/afio/test
     : requirements
       <threading>multi
 #      <library>../build//boost_afio
-      <library>boost/afio//boost_afio
+      <library>/boost/afio//boost_afio
       <cxxflags>-std=c++0x 
       #<linkflags>"-l pthread"      #is this the test's dependency or boost_afio's???? 
     ;
