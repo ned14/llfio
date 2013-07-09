@@ -58,7 +58,7 @@ before_install:
  - cd $BOOST/tools/build/v2
  - ./bootstrap.sh
  - sudo ./b2 install
- - PROJECTPATH="~/build/BoostGSoC/boost.afio"
+ - PROJECTPATH="/~/build/BoostGSoC/boost.afio"
  - cd $PROJECTPATH
 
 
