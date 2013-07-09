@@ -44,6 +44,8 @@
 # Configure specific gcc version, giving alternative name to use.
 # using gcc : 3.2 : g++-3.2 ;
 
+using gcc : : g++-4.6 ;
+
 # -------------------
 # CLANG configuration.
 # -------------------

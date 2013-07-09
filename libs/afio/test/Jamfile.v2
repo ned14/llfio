@@ -1,0 +1,44 @@
+#  Boost.AFIO Library test Jamfile
+#
+#  Copyright (c) 2013 Paul Kirth
+#
+#  Distributed under the Boost Software License, Version 1.0.
+#  (See accompanying file LICENSE_1_0.txt or copy at
+#  http://www.boost.org/LICENSE_1_0.txt)
+
+
+#import modules ;
+
+#local boost-path = [ modules.peek : BOOST_ROOT ] ; #can probably get rid of this
+
+import testing ;
+
+project boost/afio/test
+    : requirements
+      <threading>multi
+      <library>/boost/afio//boost_afio
+      <toolset>gcc:<cxxflags>-std=c++0x 
+      <toolset>clang:<cxxflags>-std=c++0x 
+      <toolset>msvc:<cxxflags>/openmp
+      #<linkflags>"-l pthread"      #is this the test's dependency or boost_afio's???? 
+    ;
+
+
+exe boost_afio_test : main.cpp   ../detail/SpookyV2.cpp
+    : <include>../../../boost/afio/detail
+
+;
+
+test-suite afio  
+    : #[ link main.cpp ../detail/SpookyV2.cpp
+      #  : <cxxflags>-std=c++0x <library>/boost/afio//boost_afio <include>../../../boost/afio/detail ]
+    
+#      [ run main.cpp ../detail/SpookyV2.cpp 
+#        : #args
+#        : #input files
+#        : <cxxflags>-std=c++0x <library>/boost/afio//boost_afio <include>../../../boost/afio/detail ]
+    ;
+
+
+
+

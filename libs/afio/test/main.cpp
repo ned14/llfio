@@ -16,8 +16,10 @@ Created: Feb 2013
 #include <iostream>
 #include <algorithm>
 #include "../../../boost/afio/afio.hpp"
-#include "../../../NiallsCPP11Utilities/Int128_256.hpp"
+#include "../../../boost/afio/detail/SpookyV2.h"
+#include "../../../boost/afio/detail/Aligned_Allocator.hpp"
 #include "boost/lockfree/queue.hpp"
+#include "../../../boost/afio/detail/Undoer.hpp"
 
 
 
@@ -106,7 +108,7 @@ BOOST_AUTO_TEST_SUITE(all)
                 using boost::afio::future;
                 typedef std::chrono::duration<double, ratio<1>> secs_type;
                 auto mkdir(dispatcher->dir(async_path_op_req("testdir", file_flags::Create)));
-                vector<char, NiallsCPP11Utilities::aligned_allocator<char, 4096>> towrite(bytes, 'N');
+                vector<char, boost::afio::detail::aligned_allocator<char, 4096>> towrite(bytes, 'N');
                 assert(!(((size_t) &towrite.front()) & 4095));
 
                 // Wait for six seconds to let filing system recover and prime SpeedStep
@@ -287,7 +289,7 @@ BOOST_AUTO_TEST_SUITE(all)
                 using namespace boost::afio;
                 using namespace std;
                 using boost::afio::future;
-                using namespace NiallsCPP11Utilities;
+                using namespace boost::afio::detail;
                 using boost::afio::off_t;
                 typedef std::chrono::duration<double, ratio<1>> secs_type;
                 vector<pair<size_t, int>> groups;
@@ -462,12 +464,12 @@ BOOST_AUTO_TEST_SUITE(all)
                 using namespace boost::afio;
                 using namespace std;
                 using boost::afio::future;
-                using namespace NiallsCPP11Utilities;
+                using namespace boost::afio::detail;
                 using boost::afio::off_t;
                 typedef std::chrono::duration<double, ratio<1>> secs_type;
 
-                NiallsCPP11Utilities::aligned_allocator<char, 4096> aligned_allocator;
-                vector<vector<char, NiallsCPP11Utilities::aligned_allocator<char, 4096>>> towrite(no);
+                boost::afio::detail::aligned_allocator<char, 4096> aligned_allocator;
+                vector<vector<char, boost::afio::detail::aligned_allocator<char, 4096>>> towrite(no);
                 vector<char *> towriteptrs(no);
                 vector<size_t> towritesizes(no);
         #ifdef DEBUG_TORTURE_TEST
@@ -487,7 +489,7 @@ BOOST_AUTO_TEST_SUITE(all)
                         async_data_op_req<char> req;
                 };
                 static_assert(!(sizeof(PadSizeToMultipleOf<Op, 32>)&31), "Op's stored size must be a multiple of 32 bytes");
-                vector<vector<PadSizeToMultipleOf<Op, 32>, NiallsCPP11Utilities::aligned_allocator<Op, 32>>> todo(no);
+                vector<vector<PadSizeToMultipleOf<Op, 32>, boost::afio::detail::aligned_allocator<Op, 32>>> todo(no);
         #endif
                 for(size_t n=0; n<no; n++)
                 {
@@ -572,6 +574,7 @@ BOOST_AUTO_TEST_SUITE(all)
                                 {
                                         op.hash=Hash256();
                                         op.hash.AddSHA256To((const char *)(((size_t)towriteptrs[n]+(size_t) op.req.where)), thisbytes);
+                                     //__sha256_osol((const char *)(((size_t)towriteptrs[n]+(size_t) op.req.where)), thisbytes);
         #ifdef _DEBUG
                                         cout << "<=SHA256 of " << thisbytes << " bytes at " << op.req.where << " is " << op.hash.asHexString() << endl;
         #endif
@@ -591,12 +594,32 @@ BOOST_AUTO_TEST_SUITE(all)
                 auto end=std::chrono::high_resolution_clock::now();
                 auto diff=chrono::duration_cast<secs_type>(end-begin);
                 cout << "It took " << diff.count() << " secs to simulate torture test in RAM" << endl;
-                begin=std::chrono::high_resolution_clock::now();
-                vector<Hash256> memhashes(no);
-                Hash256::BatchAddSHA256To(no, &memhashes.front(), (const char **) &towriteptrs.front(), &towritesizes.front());
-                end=std::chrono::high_resolution_clock::now();
+                begin=std::chrono::high_resolution_clock::now(); // start timer for hashes
+                
+                // a vector to hold the hash values from SpookyHash
+                //SpookyHash returns 2 64bit integers for a 128 bit hash, so we store them as a pair
+                vector<std::pair<uint64, uint64>> memhashes(no);
+                //  variables to seed and return the hashed values
+                uint64 hash1, hash2, seed;
+                seed = 1; //initialize the seed value. Completely arbitrary, but it needs to remain consistent 
+              
+                for(size_t i = 0; i < no; ++i)
+                {
+                    // set up seeds and a variables to store hash values
+                    hash1 = seed;
+                    hash2 = seed;
+                    
+                    //hash the data from towriteptrs
+                    SpookyHash::Hash128(towriteptrs[i], towritesizes[i], &hash1, &hash2);
+                    
+                    // store the hash values for this data in memhashes for later comparison
+                    memhashes[i]= std::make_pair(hash1, hash2);
+                    
+                }
+                
+                end=std::chrono::high_resolution_clock::now(); // end timer for hashes
                 diff=chrono::duration_cast<secs_type>(end-begin);
-                cout << "It took " << diff.count() << " secs to SHA256 the results" << endl;
+                cout << "It took " << diff.count() << " secs to hash the results" << endl;
                 for(size_t n=0; n<no; n++)
                         memset(towriteptrs[n], 0, towritesizes[n]);
 
@@ -717,7 +740,7 @@ BOOST_AUTO_TEST_SUITE(all)
                         cout << "The following hash failures occurred:" << endl;
                         while(failures.pop(failedop))
                         {
-                                auto undofailedop=Undoer([&failedop]{ delete failedop; });
+                                auto undofailedop=boost::afio::detail::Undoer([&failedop]{ delete failedop; });
                                 size_t bytes=0;
                                 for(auto &b : failedop->first->req.buffers)
                                         bytes+=boost::asio::buffer_size(b);
@@ -726,14 +749,29 @@ BOOST_AUTO_TEST_SUITE(all)
                 }
                 BOOST_TEST_MESSAGE("Checking if the final files have exactly the right contents ... this may take a bit ...");
                 {
-                        vector<Hash256> filehashes(no);
-                        Hash256::BatchAddSHA256To(no, &filehashes.front(), (const char **) &towriteptrs.front(), &towritesizes.front());
-                        for(size_t n=0; n<no; n++)
-                                if(memhashes[n]!=filehashes[n])
-                                {
-                                        string failmsg("File "+to_string(n)+" contents were not what they were supposed to be!");
-                                        BOOST_TEST_MESSAGE(failmsg.c_str());
-                                }
+                    // a vector for holding hash results from SpookyHash
+                    //SpookyHash returns 2 64bit integers for a 128 bit hash, so we store them as a pair
+                    vector<std::pair<uint64, uint64>> filehashes(no);
+
+                    for(size_t i = 0; i < no; ++i)
+                    {
+                        // set up seeds and a variables to store hash values
+                        hash1 = seed;
+                        hash2 = seed; 
+                        
+                        // hash the data from towriteptrs
+                        SpookyHash::Hash128(towriteptrs[i], towritesizes[i], &hash1, &hash2);
+
+                        // store the hash values for this data in filehashes for a later comparison
+                        filehashes[i]= std::make_pair(hash1, hash2);
+
+                    }
+                    for(size_t n=0; n<no; n++)
+                        if(memhashes[n]!=filehashes[n]) // compare hash values from ram and actual IO
+                        {
+                                string failmsg("File "+to_string(n)+" contents were not what they were supposed to be!");
+                                BOOST_TEST_MESSAGE(failmsg.c_str());
+                        }
                 }
         #ifdef DEBUG_TORTURE_TEST
                 for(ptrdiff_t n=0; n<(ptrdiff_t) no; n++)
@@ -820,26 +858,6 @@ BOOST_AUTO_TEST_SUITE(all)
                 BOOST_CHECK_NO_THROW(when_all(deldir).wait());
         }
 
-        #if 0
-        BOOST_AUTO_TEST_CASE(afio_works)
-        {
-            BOOST_TEST_MESSAGE( "Tests that one of the samples from Boost.Graph works as advertised with afio");
-                typedef boost::boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS> Graph;
-                Graph g(used_by, used_by + nedges, N);
-                g.attach(store, testgraph);
-                g.begincommit().wait();
-                TestGraph<>(g);
-
-                Graph g2(store, testgraph);
-                TestGraph<>(g2);
-
-                ModifyGraph<>(g);
-                g.begincommit().wait();
-
-                Graph g3(store, testgraph);
-                BOOST_CHECK(boost::isomorphism(g, g3));
-        }
-        #endif
     BOOST_AUTO_TEST_SUITE_END() //end exclude_async_io_erros
 BOOST_AUTO_TEST_SUITE_END() // end all        
 

@@ -1,0 +1,52 @@
+#  Boost.AFIO Library Jamfile
+#
+#  Copyright (c) Paul Kirth 2013.
+#
+#  Distributed under the Boost Software License, Version 1.0.
+#  (See accompanying file LICENSE_1_0.txt or copy at
+#  http://www.boost.org/LICENSE_1_0.txt)
+
+
+#import modules ;
+
+#local boost-path = [ modules.peek : BOOST_ROOT ] ; #probably dont need this any more
+
+#Is this Right?
+
+project boost/afio
+    : requirements
+      <threading>multi                          #<-- do we need this?
+      <link>shared:<define>BOOST_AFIO_DYN_LINK=1  
+      <define>BOOST_AFIO_SOURCE
+	: usage-requirements 
+      <include>. 
+
+      <library>/boost/system//boost_system
+      <library>/boost/filesystem//boost_filesystem 
+      <library>/boost/atomic//boost_atomic
+      <library>/boost/thread//boost_thread
+
+    #These might be better when we're actually a part of boost      
+#      <library>$../../libs/system/build//boost_system
+#      <library>$../../libs/filesystem/build//boost_filesystem 
+#      <library>$../../libs/atomic/build//boost_atomic
+#      <library>$../../libs/thread/build//boost_thread
+
+
+      <link>shared:<define>BOOST_AFIO_DYN_LINK=1
+    : source-location ../src
+
+;
+
+lib boost_afio : afio.cpp ../detail/ErrorHandling.cpp
+	: <include>../../../boost/afio 
+      <include>../../../boost/afio/detail
+      <toolset>gcc:<cxxflags>"-std=c++0x -fvisibility-inlines-hidden -fstrict-aliasing -Wstrict-aliasing -Wall -Wno-unused -fargument-noalias -O2 -g -fPIC -fvisibility=hidden -fopenmp"
+      <toolset>clang:<cxxflags>"-std=c++0x -fvisibility-inlines-hidden -fstrict-aliasing -Wstrict-aliasing -Wall -Wno-unused -fargument-noalias -O2 -g -fPIC -fvisibility=hidden -fopenmp"
+      <toolset>msvc:<cxxflags>/openmp
+      <target-os>linux:<linkflags>"-l pthread"
+      <target-os>freebsd:<linkflags>"-l pthread"
+
+;
+
+boost-install boost_afio ;
