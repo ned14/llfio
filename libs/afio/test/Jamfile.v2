@@ -16,15 +16,14 @@ import testing ;
 project boost/afio/test
     : requirements
       <threading>multi
-      <library>../build//boost_afio
-     # <library>../../../NiallsCPP11Utilities//utils
-     # <include>../../../boost/afio         # <--- should be include with boost_afio usage requirements
+#      <library>../build//boost_afio
+      <library>boost/afio//boost_afio
       <cxxflags>-std=c++0x 
       #<linkflags>"-l pthread"      #is this the test's dependency or boost_afio's???? 
     ;
 
 
-exe boost_afio_test : main.cpp  ../detail/Int128_256.cpp #<-------- Keeping this for now to maintain consistency with previous travis-ci tests
+exe boost_afio_test : main.cpp  ../detail/Int128_256.cpp 
     : <include>../../../boost/afio/detail
 
 ;
