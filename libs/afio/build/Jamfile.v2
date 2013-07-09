@@ -22,14 +22,14 @@ project boost/afio
 	: usage-requirements 
       <include>. 
       <link>shared:<define>BOOST_AFIO_DYN_LINK=1
-#      <library>$(boost-path)/libs/system/build//boost_system
-#      <library>$(boost-path)/libs/filesystem/build//boost_filesystem 
-#      <library>$(boost-path)/libs/atomic/build//boost_atomic
-#      <library>$(boost-path)/libs/thread/build//boost_thread
-      <library>$../../libs/system/build//boost_system
-      <library>$../../libs/filesystem/build//boost_filesystem 
-      <library>$../../libs/atomic/build//boost_atomic
-      <library>$../../libs/thread/build//boost_thread
+      <library>$(boost-path)/libs/system/build//boost_system
+      <library>$(boost-path)/libs/filesystem/build//boost_filesystem 
+      <library>$(boost-path)/libs/atomic/build//boost_atomic
+      <library>$(boost-path)/libs/thread/build//boost_thread
+#      <library>$../../libs/system/build//boost_system
+#      <library>$../../libs/filesystem/build//boost_filesystem 
+#      <library>$../../libs/atomic/build//boost_atomic
+#      <library>$../../libs/thread/build//boost_thread
     : source-location ../src
 
 ;
@@ -45,4 +45,4 @@ lib boost_afio : afio.cpp ../detail/ErrorHandling.cpp
 
 ;
 
-boost-install boost_afio ;
+boost-install boost_afio : <install-dependencies>on ;
