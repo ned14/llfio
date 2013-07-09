@@ -18,6 +18,10 @@ project boost/afio/test
       <threading>multi
 #      <library>../build//boost_afio
       <library>/boost/afio//boost_afio
+      <library>/boost/system//boost_system
+      <library>/boost/filesystem//boost_filesystem 
+      <library>/boost/atomic//boost_atomic
+      <library>/boost/thread//boost_thread
       <cxxflags>-std=c++0x 
       #<linkflags>"-l pthread"      #is this the test's dependency or boost_afio's???? 
     ;
