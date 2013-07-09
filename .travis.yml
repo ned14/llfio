@@ -55,7 +55,7 @@ before_install:
  - mv user-config.jam $HOME
  
 # install boost build
- - cd ~/boost/tools/build/v2
+ - cd $BOOST/tools/build/v2
  - ./bootstrap.sh
  - sudo ./b2 install
  - PROJECTPATH="~/build/BoostGSoC/boost.afio"
