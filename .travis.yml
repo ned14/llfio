@@ -94,13 +94,12 @@ script:
 #build the lib
 # - b2 $DEBUGBUILD toolset=$CC$GCCVER --link=shared --boost=$BOOST $FLAGS;
  - cd $BOOST
- - ./bootstrap.sh --show-libraries
- - ./bootstrap.sh --with-libraries=afio
+ - ./bootstrap.sh --with-libraries=afio --prefix=$BOOST
  - b2 install $DEBUGBUILD toolset=$CC$GCCVER link=shared $FLAGS;
 # - cd $PROJECTPATH
 
 #build unit tests
- - b2 libs/afio/test $DEBUGBUILD toolset=$CC$GCCVER --link=shared --boost=$BOOST $FLAGS;
+ - b2 libs/afio/test $DEBUGBUILD toolset=$CC$GCCVER --link=shared $FLAGS;
 
 
 #valgrind setup
