@@ -572,9 +572,9 @@ BOOST_AUTO_TEST_SUITE(all)
         #ifndef DEBUG_TORTURE_TEST
                                 if(!op.write)
                                 {
-                                        //op.hash=Hash256();
-                                        //op.hash.AddSHA256To((const char *)(((size_t)towriteptrs[n]+(size_t) op.req.where)), thisbytes);
-                                     __sha256_osol((const char *)(((size_t)towriteptrs[n]+(size_t) op.req.where)), thisbytes);
+                                        op.hash=Hash256();
+                                        op.hash.AddSHA256To((const char *)(((size_t)towriteptrs[n]+(size_t) op.req.where)), thisbytes);
+                                     //__sha256_osol((const char *)(((size_t)towriteptrs[n]+(size_t) op.req.where)), thisbytes);
         #ifdef _DEBUG
                                         cout << "<=SHA256 of " << thisbytes << " bytes at " << op.req.where << " is " << op.hash.asHexString() << endl;
         #endif
