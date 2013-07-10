@@ -666,3 +666,10 @@ body div.chapter div.toc dl.toc dd dl dd dl, body div.section div.toc dl.toc dd 
   -webkit-column-width: 30em;
   column-width: 30em;
 }
+
+/* Stop APIs consuming all the horizontal space */
+div.informaltable table tbody tr td pre.table-programlisting {
+  white-space: pre-wrap;
+  padding-left: 4em;
+  text-indent: -4em;
+}

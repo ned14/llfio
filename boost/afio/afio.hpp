@@ -223,17 +223,20 @@ namespace detail {
 		return std::make_pair(std::distance(futures->begin(), it), std::move(it->get()));
 	}
 }
-/*! \brief Returns a future vector of results from all the supplied futures
+/*! \brief Makes a future vector of results from all the supplied futures
 
 This is an implementation of WG21 N3634's when_all() which uses process_threadpool()
 to allow you to create a future which only becomes available when all the supplied
 futures become available.
 
 \return A future vector of the results of the input futures
+\tparam InputIterator A type modelling an iterator
 \param first An iterator pointing to the first item to wait upon
 \param last An iterator pointing to after the last future to wait upon
 \ingroup when_all_futures
 \qbk{distinguish, from ___WG21_N3634__ for range of futures}
+\complexity{O(N)}
+\exceptionmodel{The same as a future}
 */
 template <class InputIterator> inline future<std::vector<typename std::decay<decltype(((typename InputIterator::value_type *) 0)->get())>::type>> when_all(InputIterator first, InputIterator last)
 {
@@ -248,17 +251,20 @@ template <class InputIterator> inline future<std::vector<typename std::decay<dec
 }
 //! Returns a future tuple of results from all the supplied futures
 //template <typename... T> inline future<std::tuple<typename std::decay<T...>::type>> when_all(T&&... futures);
-/*! \brief Returns a future result from the first of the supplied futures to become available
+/*! \brief Makes a future result from the first of the supplied futures to become available
 
 This is an implementation of WG21 N3634's when_any() which uses process_threadpool()
 to allow you to create a future which only becomes available when the first of the supplied
 futures become available.
 
 \return A future pair of the first future to become available and its result
+\tparam InputIterator A type modelling an iterator
 \param first An iterator pointing to the first future to wait upon
 \param last An iterator pointing to after the last future to wait upon
 \ingroup when_all_futures
 \qbk{distinguish, from ___WG21_N3634__ for range of futures}
+\complexity{The same as boost::wait_for_any()}
+\exceptionmodel{The same as a future}
 */
 template <class InputIterator> inline future<std::pair<size_t, typename std::decay<decltype(((typename InputIterator::value_type *) 0)->get())>::type>> when_any(InputIterator first, InputIterator last)
 {
@@ -631,9 +637,7 @@ namespace detail
 	}
 }
 
-/*! \brief Convenience overload for a vector of async_io_op. Does not retrieve exceptions.
-
-Returns a result when all the supplied ops complete. Does not propagate exception states.
+/*! \brief Returns a result when all the supplied ops complete. Does not propagate exception states.
 
 \return A future vector of shared_ptr's to detail::async_io_handle.
 \param _ An instance of std::nothrow_t.
@@ -641,6 +645,8 @@ Returns a result when all the supplied ops complete. Does not propagate exceptio
 \param last A vector iterator pointing after the last async_io_op to wait upon.
 \ingroup when_all_ops
 \qbk{distinguish, vector batch of ops not exception propagating}
+\complexity{O(N) to dispatch. O(N/threadpool) to complete, but at least one cache line is contended between threads.}
+\exceptionmodel{Non propagating}
 */
 inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(std::nothrow_t _, std::vector<async_io_op>::iterator first, std::vector<async_io_op>::iterator last)
 {
@@ -656,15 +662,15 @@ inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(st
 	inputs.front().parent->completion(inputs, callbacks);
 	return state->done.get_future();
 }
-/*! \brief Convenience overload for a vector of async_io_op. Retrieves exceptions.
-
-Returns a result when all the supplied ops complete. Propagates exception states.
+/*! \brief Returns a result when all the supplied ops complete. Propagates exception states.
 
 \return A future vector of shared_ptr's to detail::async_io_handle.
 \param first A vector iterator pointing to the first async_io_op to wait upon.
 \param last A vector iterator pointing after the last async_io_op to wait upon.
 \ingroup when_all_ops
 \qbk{distinguish, vector batch of ops exception propagating}
+\complexity{O(N) to dispatch. O(N/threadpool) to complete, but at least one cache line is contended between threads.}
+\exceptionmodel{Propagating}
 */
 inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(std::vector<async_io_op>::iterator first, std::vector<async_io_op>::iterator last)
 {
@@ -680,15 +686,15 @@ inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(st
 	inputs.front().parent->completion(inputs, callbacks);
 	return state->done.get_future();
 }
-/*! \brief Convenience overload for a list of async_io_op.  Does not retrieve exceptions.
-
-Returns a result when all the supplied ops complete. Does not propagate exception states.
+/*! \brief Returns a result when all the supplied ops complete. Does not propagate exception states.
 
 \return A future vector of shared_ptr's to detail::async_io_handle.
 \param _ An instance of std::nothrow_t.
 \param _ops A std::initializer_list<> of async_io_op's to wait upon.
 \ingroup when_all_ops
 \qbk{distinguish, initializer_list batch of ops not exception propagating}
+\complexity{O(N) to dispatch. O(N/threadpool) to complete, but at least one cache line is contended between threads.}
+\exceptionmodel{Non propagating}
 */
 inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(std::nothrow_t _, std::initializer_list<async_io_op> _ops)
 {
@@ -698,14 +704,14 @@ inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(st
 		ops.push_back(std::move(i));
 	return when_all(_, ops.begin(), ops.end());
 }
-/*! \brief Convenience overload for a list of async_io_op. Retrieves exceptions.
-
-Returns a result when all the supplied ops complete. Propagates exception states.
+/*! \brief Returns a result when all the supplied ops complete. Propagates exception states.
 
 \return A future vector of shared_ptr's to detail::async_io_handle.
 \param _ops A std::initializer_list<> of async_io_op's to wait upon.
 \ingroup when_all_ops
 \qbk{distinguish, initializer_list batch of ops exception propagating}
+\complexity{O(N) to dispatch. O(N/threadpool) to complete, but at least one cache line is contended between threads.}
+\exceptionmodel{Propagating}
 */
 inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(std::initializer_list<async_io_op> _ops)
 {
@@ -715,29 +721,29 @@ inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(st
 		ops.push_back(std::move(i));
 	return when_all(ops.begin(), ops.end());
 }
-/*! \brief Convenience overload for a single async_io_op.  Does not retrieve exceptions.
-
-Returns a result when the supplied op completes. Does not propagate exception states.
+/*! \brief Returns a result when the supplied op completes. Does not propagate exception states.
 
 \return A future vector of shared_ptr's to detail::async_io_handle.
 \param _ An instance of std::nothrow_t.
 \param op An async_io_op to wait upon.
 \ingroup when_all_ops
 \qbk{distinguish, convenience single op not exception propagating}
+\complexity{O(1) to dispatch. O(1) to complete.}
+\exceptionmodel{Non propagating}
 */
 inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(std::nothrow_t _, async_io_op op)
 {
 	std::vector<async_io_op> ops(1, op);
 	return when_all(_, ops.begin(), ops.end());
 }
-/*! \brief Convenience overload for a single async_io_op.  Retrieves exceptions.
-
-Returns a result when the supplied op completes. Propagates exception states.
+/*! \brief Returns a result when the supplied op completes. Propagates exception states.
 
 \return A future vector of shared_ptr's to detail::async_io_handle.
 \param op An async_io_op to wait upon.
 \ingroup when_all_ops
 \qbk{distinguish, convenience single op exception propagating}
+\complexity{O(1) to dispatch. O(1) to complete.}
+\exceptionmodel{Non propagating}
 */
 inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(async_io_op op)
 {
@@ -782,24 +788,38 @@ private:
 	}
 };
 
-/*! \struct async_data_op_req
-\brief A convenience bundle of precondition, data and where. Data \b MUST stay around until the operation completes.
-
-\tparam T Specialised for void
-*/
+//! \brief A convenience bundle of precondition, data and where for reading into a void *. Data \b MUST stay around until the operation completes.
 template<> struct async_data_op_req<void> // For reading
 {
-	async_io_op precondition;
+	async_io_op precondition;	//!< An optional precondition for this operation
+	//! A sequence of mutable __boost_asio__ buffers to read into
 	std::vector<boost::asio::mutable_buffer> buffers;
+	//! The offset from which to read
 	off_t where;
+	//! \constr
 	async_data_op_req() { }
+	//! \cconstr
 	async_data_op_req(const async_data_op_req &o) : precondition(o.precondition), buffers(o.buffers), where(o.where) { }
+	//! \mconstr
 	async_data_op_req(async_data_op_req &&o) : precondition(std::move(o.precondition)), buffers(std::move(o.buffers)), where(std::move(o.where)) { }
+	//! \cassign
 	async_data_op_req &operator=(const async_data_op_req &o) { precondition=o.precondition; buffers=o.buffers; where=o.where; return *this; }
+	//! \massign
 	async_data_op_req &operator=(async_data_op_req &&o) { precondition=std::move(o.precondition); buffers=std::move(o.buffers); where=std::move(o.where); return *this; }
+	/*! \brief Constructs an instance.
+	\param _precondition An optional precondition for this operation
+	\param _buffer A pointer to memory into which to read
+	\param _length The number of bytes to read
+	\param _where The offset from which to read
+	*/
 	async_data_op_req(async_io_op _precondition, void *_buffer, size_t _length, off_t _where) : precondition(std::move(_precondition)), where(_where) { buffers.reserve(1); buffers.push_back(boost::asio::mutable_buffer(_buffer, _length)); _validate(); }
+	/*! \brief Constructs an instance.
+	\param _precondition An optional precondition for this operation
+	\param _buffers A sequence of mutable __boost_asio__ buffers to read into
+	\param _where The offset from which to read
+	*/
 	async_data_op_req(async_io_op _precondition, std::vector<boost::asio::mutable_buffer> _buffers, off_t _where) : precondition(std::move(_precondition)), buffers(_buffers), where(_where) { _validate(); }
-	//! Validates contents
+	//! Validates contents for correctness \return True if contents are correct
 	bool validate() const
 	{
 		if(!precondition.validate()) return false;

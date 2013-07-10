@@ -12,22 +12,22 @@
 [section:when_all when_all (from ___WG21_N3634__ for range of futures)]
 
 '''<indexterm><primary>when_all</primary></indexterm>'''
-Returns a future vector of results from all the supplied futures. 
+Makes a future vector of results from all the supplied futures. 
 
 [heading Description]
 This is an implementation of WG21 N3634's when\u005fall() which uses process\u005fthreadpool() to allow you to create a future which only becomes available when all the supplied futures become available.
 
 [heading Synopsis]
-``template<class InputIterator>
-future<std::vector<typename std::decay<decltype(((typename InputIterator::value_type *) 0)->get())>::type> when_all(InputIterator first, InputIterator last)``
+``template<class InputIterator, >
+future<std::vector<typename std::decay<decltype(((typename InputIterator::value_type *) 0)->get())>::type> > when_all(InputIterator first, InputIterator last)``
 
 [heading Parameters]
 
 [table
 [[Type] [Concept] [Name] [Description] ]
 [[class InputIterator] [] [ - ] [Must be specified]]
-[[InputIterator] [] [first] [An iterator pointing to the first item to wait upon ]]
-[[InputIterator] [] [last] [An iterator pointing to after the last future to wait upon]]
+[[InputIterator] [A type modelling an iterator ] [first] [An iterator pointing to the first item to wait upon ]]
+[[InputIterator] [A type modelling an iterator ] [last] [An iterator pointing to after the last future to wait upon]]
 ]
 
 
@@ -36,6 +36,9 @@ A future vector of the results of the input futures
 
 [heading Header]
 `#include <boost/afio/afio.hpp>`
+
+[heading Complexity]O(N)
+[heading Exception Model]The same as a future
 
 
 [endsect]
@@ -46,21 +49,21 @@ A future vector of the results of the input futures
 Returns a future tuple of results from all the supplied futures. 
 
 [heading Description]
-Returns a future result from the first of the supplied futures to become available
+Makes a future result from the first of the supplied futures to become available
 
 This is an implementation of WG21 N3634's when\u005fany() which uses process\u005fthreadpool() to allow you to create a future which only becomes available when the first of the supplied futures become available.
 
 [heading Synopsis]
-``template<class InputIterator>
-future<std::pair<size_t, typename std::decay<decltype(((typename InputIterator::value_type *) 0)->get())>::type> when_any(InputIterator first, InputIterator last)``
+``template<class InputIterator, >
+future<std::pair<size_t, typename std::decay<decltype(((typename InputIterator::value_type *) 0)->get())>::type> > when_any(InputIterator first, InputIterator last)``
 
 [heading Parameters]
 
 [table
 [[Type] [Concept] [Name] [Description] ]
 [[class InputIterator] [] [ - ] [Must be specified]]
-[[InputIterator] [] [first] [An iterator pointing to the first future to wait upon ]]
-[[InputIterator] [] [last] [An iterator pointing to after the last future to wait upon]]
+[[InputIterator] [A type modelling an iterator ] [first] [An iterator pointing to the first future to wait upon ]]
+[[InputIterator] [A type modelling an iterator ] [last] [An iterator pointing to after the last future to wait upon]]
 ]
 
 
@@ -69,6 +72,9 @@ A future pair of the first future to become available and its result
 
 [heading Header]
 `#include <boost/afio/afio.hpp>`
+
+[heading Complexity]The same as boost::wait_for_any()
+[heading Exception Model]The same as a future
 
 
 [endsect]

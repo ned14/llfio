@@ -37,7 +37,14 @@ TAB_SIZE               = 8
 # \param* for various parameters
 # \return* for various return cases
 ALIASES                = qbk{1}="\xmlonly <qbk>\1</qbk> \endxmlonly" \
-			qbk{2}="\xmlonly <qbk.\1>\2</qbk.\1> \endxmlonly"
+			qbk{2}="\xmlonly <qbk.\1>\2</qbk.\1> \endxmlonly" \
+			complexity{1}="\xmlonly <qbk>[heading Complexity]\1</qbk> \endxmlonly" \
+			exceptionmodel{1}="\xmlonly <qbk>[heading Exception Model]\1</qbk> \endxmlonly \exception ... \1" \
+			constr="Default constructor." \
+			cconstr="Copy constructor." \
+			mconstr="Move constructor." \
+			cassign="Copy assignment." \
+			massign="Move assignment."
 OPTIMIZE_OUTPUT_FOR_C  = NO
 OPTIMIZE_OUTPUT_JAVA   = NO
 OPTIMIZE_FOR_FORTRAN   = NO

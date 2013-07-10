@@ -22,6 +22,10 @@ C:\BoostBook\bin\xsltproc.exe
 C:\BoostBook\xml\docbook-xsl
 ...
 
+Note that the link on the above page to the Docbook XSL gives you the -ns version
+which won't work. You need the -1 version from
+http://sourceforge.net/projects/docbook/files/docbook-xsl/1.78.1/
+
 4. Compile Boost QuickBook and copy the output binary into BoostBook\bin.
 
 5. Compile libs/geometry/doc/src/docutils/tools/doxygen_xml2qbk and copy the

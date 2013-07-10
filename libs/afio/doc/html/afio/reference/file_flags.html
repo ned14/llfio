@@ -27,14 +27,27 @@
 <a name="afio.reference.file_flags"></a><a class="link" href="file_flags.html" title="file_flags">file_flags</a>
 </h3></div></div></div>
 <p>
-        <a class="indexterm" name="id937096"></a>
+        <a class="indexterm" name="id872262"></a>
+<a class="indexterm" name="id872246"></a>
+<a class="indexterm" name="id872239"></a>
+<a class="indexterm" name="id872264"></a>
+<a class="indexterm" name="id872302"></a>
+<a class="indexterm" name="id872266"></a>
+<a class="indexterm" name="id872282"></a>
+<a class="indexterm" name="id872272"></a>
+<a class="indexterm" name="id872300"></a>
+<a class="indexterm" name="id872327"></a>
+<a class="indexterm" name="id872310"></a>
+<a class="indexterm" name="id872322"></a>
+<a class="indexterm" name="id872308"></a>
+<a class="indexterm" name="id872314"></a>
 Bitwise file and directory open flags.
       </p>
 <h5>
 <a name="afio.reference.file_flags.h0"></a>
         <span class="phrase"><a name="afio.reference.file_flags.synopsis"></a></span><a class="link" href="file_flags.html#afio.reference.file_flags.synopsis">Synopsis</a>
       </h5>
-<pre class="programlisting"><span class="keyword">enum</span> <span class="identifier">file_flags</span></pre>
+<pre class="programlisting"><span class="keyword">enum</span> <span class="identifier">file_flags</span> <span class="special">{</span><span class="identifier">None</span> <span class="special">=</span> <span class="number">0</span><span class="special">,</span> <span class="identifier">Read</span> <span class="special">=</span> <span class="number">1</span><span class="special">,</span> <span class="identifier">Write</span> <span class="special">=</span> <span class="number">2</span><span class="special">,</span> <span class="identifier">ReadWrite</span> <span class="special">=</span> <span class="number">3</span><span class="special">,</span> <span class="identifier">Append</span> <span class="special">=</span> <span class="number">4</span><span class="special">,</span> <span class="identifier">Truncate</span> <span class="special">=</span> <span class="number">8</span><span class="special">,</span> <span class="identifier">Create</span> <span class="special">=</span> <span class="number">16</span><span class="special">,</span> <span class="identifier">CreateOnlyIfNotExist</span> <span class="special">=</span> <span class="number">32</span><span class="special">,</span> <span class="identifier">AutoFlush</span> <span class="special">=</span> <span class="number">64</span><span class="special">,</span> <span class="identifier">WillBeSequentiallyAccessed</span> <span class="special">=</span> <span class="number">128</span><span class="special">,</span> <span class="identifier">FastDirectoryEnumeration</span> <span class="special">=</span> <span class="number">256</span><span class="special">,</span> <span class="identifier">OSDirect</span> <span class="special">=</span> <span class="special">(</span><span class="number">1</span><span class="special">&lt;&lt;</span><span class="number">16</span><span class="special">),</span> <span class="identifier">OSSync</span> <span class="special">=</span> <span class="special">(</span><span class="number">1</span><span class="special">&lt;&lt;</span><span class="number">17</span><span class="special">)};</span></pre>
 <h5>
 <a name="afio.reference.file_flags.h1"></a>
         <span class="phrase"><a name="afio.reference.file_flags.values"></a></span><a class="link" href="file_flags.html#afio.reference.file_flags.values">Values</a>
@@ -44,18 +57,180 @@ Bitwise file and directory open flags.
 <col>
 <col>
 </colgroup>
-<tbody><tr>
-<td>
+<thead><tr>
+<th>
                 <p>
                   Value
                 </p>
-              </td>
-<td>
+              </th>
+<th>
                 <p>
                   Description
                 </p>
+              </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                <p>
+                  None
+                </p>
               </td>
-</tr></tbody>
+<td>
+                <p>
+                  No flags set.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  Read
+                </p>
+              </td>
+<td>
+                <p>
+                  Read access.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  Write
+                </p>
+              </td>
+<td>
+                <p>
+                  Write access.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  ReadWrite
+                </p>
+              </td>
+<td>
+                <p>
+                  Read and write access.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  Append
+                </p>
+              </td>
+<td>
+                <p>
+                  Append only.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  Truncate
+                </p>
+              </td>
+<td>
+                <p>
+                  Truncate existing file to zero.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  Create
+                </p>
+              </td>
+<td>
+                <p>
+                  Open and create if doesn't exist.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  CreateOnlyIfNotExist
+                </p>
+              </td>
+<td>
+                <p>
+                  Create and open only if doesn't exist.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  AutoFlush
+                </p>
+              </td>
+<td>
+                <p>
+                  Automatically initiate an asynchronous flush just before file close,
+                  and fuse both operations so both must complete for close to complete.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  WillBeSequentiallyAccessed
+                </p>
+              </td>
+<td>
+                <p>
+                  Will be exclusively either read or written sequentially. If you're
+                  exclusively writing sequentially, <span class="emphasis"><em>strongly</em></span>
+                  consider turning on OSDirect too.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  FastDirectoryEnumeration
+                </p>
+              </td>
+<td>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  OSDirect
+                </p>
+              </td>
+<td>
+                <p>
+                  Hold a file handle open to the containing directory of each open
+                  file (POSIX only). Bypass the OS file buffers (only really useful
+                  for writing large files. Note you must 4Kb align everything if
+                  this is on)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  OSSync
+                </p>
+              </td>
+<td>
+                <p>
+                  Ask the OS to not complete until the data is on the physical storage.
+                  Best used only with Direct, otherwise use AutoFlush.
+                </p>
+              </td>
+</tr>
+</tbody>
 </table></div>
 <h5>
 <a name="afio.reference.file_flags.h2"></a>

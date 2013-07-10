@@ -28,7 +28,10 @@
       void &gt;</a>
 </h3></div></div></div>
 <p>
-        <a class="indexterm" name="id923782"></a>
+        <a class="indexterm" name="id857288"></a>
+A convenience bundle of precondition, data and where for reading into a void
+        *. Data <span class="bold"><strong>MUST</strong></span> stay around until the operation
+        completes.
       </p>
 <h5>
 <a name="afio.reference.async_data_op_req_void_.h0"></a>
@@ -46,6 +49,7 @@
       </h5>
 <div class="informaltable"><table class="table">
 <colgroup>
+<col>
 <col>
 <col>
 <col>
@@ -78,15 +82,22 @@
 <pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">async_data_op_req</span><span class="special">()</span></pre>
               </td>
 <td>
+                <p>
+                  Default constructor.
+                </p>
               </td>
 <td>
               </td>
+<td class="auto-generated">&#160;</td>
 </tr>
 <tr>
 <td>
 <pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">async_data_op_req</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">async_data_op_req</span> <span class="special">&amp;</span> <span class="identifier">o</span><span class="special">)</span></pre>
               </td>
 <td>
+                <p>
+                  Copy constructor.
+                </p>
               </td>
 <td>
                 <p>
@@ -94,12 +105,16 @@
                   <span class="emphasis"><em>o</em></span>:
                 </p>
               </td>
+<td class="auto-generated">&#160;</td>
 </tr>
 <tr>
 <td>
 <pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">async_data_op_req</span><span class="special">(</span><span class="identifier">async_data_op_req</span> <span class="special">&amp;&amp;</span> <span class="identifier">o</span><span class="special">)</span></pre>
               </td>
 <td>
+                <p>
+                  Move constructor.
+                </p>
               </td>
 <td>
                 <p>
@@ -107,12 +122,16 @@
                   <span class="emphasis"><em>o</em></span>:
                 </p>
               </td>
+<td class="auto-generated">&#160;</td>
 </tr>
 <tr>
 <td>
 <pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">async_data_op_req</span> <span class="special">&amp;</span> <span class="keyword">operator</span><span class="special">=(</span><span class="keyword">const</span> <span class="identifier">async_data_op_req</span> <span class="special">&amp;</span> <span class="identifier">o</span><span class="special">)</span></pre>
               </td>
 <td>
+                <p>
+                  Copy assignment.
+                </p>
               </td>
 <td>
                 <p>
@@ -120,12 +139,16 @@
                   <span class="emphasis"><em>o</em></span>:
                 </p>
               </td>
+<td class="auto-generated">&#160;</td>
 </tr>
 <tr>
 <td>
 <pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">async_data_op_req</span> <span class="special">&amp;</span> <span class="keyword">operator</span><span class="special">=(</span><span class="identifier">async_data_op_req</span> <span class="special">&amp;&amp;</span> <span class="identifier">o</span><span class="special">)</span></pre>
               </td>
 <td>
+                <p>
+                  Move assignment.
+                </p>
               </td>
 <td>
                 <p>
@@ -133,46 +156,62 @@
                   <span class="emphasis"><em>o</em></span>:
                 </p>
               </td>
+<td class="auto-generated">&#160;</td>
 </tr>
 <tr>
 <td>
 <pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">async_data_op_req</span><span class="special">(</span><span class="identifier">async_io_op</span> <span class="identifier">_precondition</span><span class="special">,</span> <span class="keyword">void</span> <span class="special">*</span> <span class="identifier">_buffer</span><span class="special">,</span> <span class="identifier">size_t</span> <span class="identifier">_length</span><span class="special">,</span> <span class="identifier">off_t</span> <span class="identifier">_where</span><span class="special">)</span></pre>
               </td>
 <td>
+                <p>
+                  Constructs an instance.
+                </p>
               </td>
 <td>
                 <p>
                   <span class="bold"><strong>async_io_op</strong></span>: <span class="emphasis"><em>_precondition</em></span>:
+                  An optional precondition for this operation
                 </p>
                 <p>
                   <span class="bold"><strong>void *</strong></span>: <span class="emphasis"><em>_buffer</em></span>:
+                  A pointer to memory into which to read
                 </p>
                 <p>
                   <span class="bold"><strong>size_t</strong></span>: <span class="emphasis"><em>_length</em></span>:
+                  The number of bytes to read
                 </p>
                 <p>
                   <span class="bold"><strong>off_t</strong></span>: <span class="emphasis"><em>_where</em></span>:
+                  The offset from which to read
                 </p>
               </td>
+<td class="auto-generated">&#160;</td>
 </tr>
 <tr>
 <td>
 <pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">async_data_op_req</span><span class="special">(</span><span class="identifier">async_io_op</span> <span class="identifier">_precondition</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">asio</span><span class="special">::</span><span class="identifier">mutable_buffer</span> <span class="special">&gt;</span> <span class="identifier">_buffers</span><span class="special">,</span> <span class="identifier">off_t</span> <span class="identifier">_where</span><span class="special">)</span></pre>
               </td>
 <td>
+                <p>
+                  Constructs an instance.
+                </p>
               </td>
 <td>
                 <p>
                   <span class="bold"><strong>async_io_op</strong></span>: <span class="emphasis"><em>_precondition</em></span>:
+                  An optional precondition for this operation
                 </p>
                 <p>
                   <span class="bold"><strong>std::vector&lt; boost::asio::mutable_buffer
-                  &gt;</strong></span>: <span class="emphasis"><em>_buffers</em></span>:
+                  &gt;</strong></span>: <span class="emphasis"><em>_buffers</em></span>: A sequence of mutable
+                  <span class="bold"><strong>boost_asio</strong></span> buffers to read into
                 </p>
                 <p>
                   <span class="bold"><strong>off_t</strong></span>: <span class="emphasis"><em>_where</em></span>:
+                  The offset from which to read
                 </p>
               </td>
+<td class="auto-generated">&#160;</td>
 </tr>
 <tr>
 <td>
@@ -180,10 +219,15 @@
               </td>
 <td>
                 <p>
-                  Validates contents.
+                  Validates contents for correctness.
                 </p>
               </td>
 <td>
+              </td>
+<td>
+                <p>
+                  True if contents are correct
+                </p>
               </td>
 </tr>
 </tbody>

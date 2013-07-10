@@ -12,10 +12,7 @@
 [section:when_all_3_vector_batch_of_ops_not_exception_propagating when_all (vector batch of ops not exception propagating)]
 
 '''<indexterm><primary>when_all</primary></indexterm>'''
-Convenience overload for a vector of async\u005fio\u005fop. Does not retrieve exceptions. 
-
-[heading Description]
-Returns a result when all the supplied ops complete. Does not propagate exception states.
+Returns a result when all the supplied ops complete. Does not propagate exception states. 
 
 [heading Synopsis]
 ``future<std::vector<std::shared_ptr<detail::async_io_handle> > > when_all(std::nothrow_t _, std::vector< async_io_op >::iterator first, std::vector< async_io_op >::iterator last)``
@@ -36,16 +33,16 @@ A future vector of shared\u005fptr's to detail::async\u005fio\u005fhandle.
 [heading Header]
 `#include <boost/afio/afio.hpp>`
 
+[heading Complexity]O(N) to dispatch. O(N/threadpool) to complete, but at least one cache line is contended between threads.
+[heading Exception Model]Non propagating
+
 
 [endsect]
 
 [section:when_all_2_vector_batch_of_ops_exception_propagating when_all (vector batch of ops exception propagating)]
 
 '''<indexterm><primary>when_all</primary></indexterm>'''
-Convenience overload for a vector of async\u005fio\u005fop. Retrieves exceptions. 
-
-[heading Description]
-Returns a result when all the supplied ops complete. Propagates exception states.
+Returns a result when all the supplied ops complete. Propagates exception states. 
 
 [heading Synopsis]
 ``future<std::vector<std::shared_ptr<detail::async_io_handle> > > when_all(std::vector< async_io_op >::iterator first, std::vector< async_io_op >::iterator last)``
@@ -65,16 +62,16 @@ A future vector of shared\u005fptr's to detail::async\u005fio\u005fhandle.
 [heading Header]
 `#include <boost/afio/afio.hpp>`
 
+[heading Complexity]O(N) to dispatch. O(N/threadpool) to complete, but at least one cache line is contended between threads.
+[heading Exception Model]Propagating
+
 
 [endsect]
 
 [section:when_all_2_initializer_list_batch_of_ops_not_exception_propagating when_all (initializer_list batch of ops not exception propagating)]
 
 '''<indexterm><primary>when_all</primary></indexterm>'''
-Convenience overload for a list of async\u005fio\u005fop. Does not retrieve exceptions. 
-
-[heading Description]
-Returns a result when all the supplied ops complete. Does not propagate exception states.
+Returns a result when all the supplied ops complete. Does not propagate exception states. 
 
 [heading Synopsis]
 ``future<std::vector<std::shared_ptr<detail::async_io_handle> > > when_all(std::nothrow_t _, std::initializer_list< async_io_op > _ops)``
@@ -94,16 +91,16 @@ A future vector of shared\u005fptr's to detail::async\u005fio\u005fhandle.
 [heading Header]
 `#include <boost/afio/afio.hpp>`
 
+[heading Complexity]O(N) to dispatch. O(N/threadpool) to complete, but at least one cache line is contended between threads.
+[heading Exception Model]Non propagating
+
 
 [endsect]
 
 [section:when_all_1_initializer_list_batch_of_ops_exception_propagating when_all (initializer_list batch of ops exception propagating)]
 
 '''<indexterm><primary>when_all</primary></indexterm>'''
-Convenience overload for a list of async\u005fio\u005fop. Retrieves exceptions. 
-
-[heading Description]
-Returns a result when all the supplied ops complete. Propagates exception states.
+Returns a result when all the supplied ops complete. Propagates exception states. 
 
 [heading Synopsis]
 ``future<std::vector<std::shared_ptr<detail::async_io_handle> > > when_all(std::initializer_list< async_io_op > _ops)``
@@ -122,16 +119,16 @@ A future vector of shared\u005fptr's to detail::async\u005fio\u005fhandle.
 [heading Header]
 `#include <boost/afio/afio.hpp>`
 
+[heading Complexity]O(N) to dispatch. O(N/threadpool) to complete, but at least one cache line is contended between threads.
+[heading Exception Model]Propagating
+
 
 [endsect]
 
 [section:when_all_2_convenience_single_op_not_exception_propagating when_all (convenience single op not exception propagating)]
 
 '''<indexterm><primary>when_all</primary></indexterm>'''
-Convenience overload for a single async\u005fio\u005fop. Does not retrieve exceptions. 
-
-[heading Description]
-Returns a result when the supplied op completes. Does not propagate exception states.
+Returns a result when the supplied op completes. Does not propagate exception states. 
 
 [heading Synopsis]
 ``future<std::vector<std::shared_ptr<detail::async_io_handle> > > when_all(std::nothrow_t _, async_io_op op)``
@@ -151,16 +148,16 @@ A future vector of shared\u005fptr's to detail::async\u005fio\u005fhandle.
 [heading Header]
 `#include <boost/afio/afio.hpp>`
 
+[heading Complexity]O(1) to dispatch. O(1) to complete.
+[heading Exception Model]Non propagating
+
 
 [endsect]
 
 [section:when_all_1_convenience_single_op_exception_propagating when_all (convenience single op exception propagating)]
 
 '''<indexterm><primary>when_all</primary></indexterm>'''
-Convenience overload for a single async\u005fio\u005fop. Retrieves exceptions. 
-
-[heading Description]
-Returns a result when the supplied op completes. Propagates exception states.
+Returns a result when the supplied op completes. Propagates exception states. 
 
 [heading Synopsis]
 ``future<std::vector<std::shared_ptr<detail::async_io_handle> > > when_all(async_io_op op)``
@@ -178,6 +175,9 @@ A future vector of shared\u005fptr's to detail::async\u005fio\u005fhandle.
 
 [heading Header]
 `#include <boost/afio/afio.hpp>`
+
+[heading Complexity]O(1) to dispatch. O(1) to complete.
+[heading Exception Model]Non propagating
 
 
 [endsect]

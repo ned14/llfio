@@ -27,14 +27,17 @@
 <a name="afio.reference.async_op_flags"></a><a class="link" href="async_op_flags.html" title="async_op_flags">async_op_flags</a>
 </h3></div></div></div>
 <p>
-        <a class="indexterm" name="id924548"></a>
+        <a class="indexterm" name="id858074"></a>
+<a class="indexterm" name="id858096"></a>
+<a class="indexterm" name="id858077"></a>
+<a class="indexterm" name="id858138"></a>
 Bitwise async_op_flags flags.
       </p>
 <h5>
 <a name="afio.reference.async_op_flags.h0"></a>
         <span class="phrase"><a name="afio.reference.async_op_flags.synopsis"></a></span><a class="link" href="async_op_flags.html#afio.reference.async_op_flags.synopsis">Synopsis</a>
       </h5>
-<pre class="programlisting"><span class="keyword">enum</span> <span class="identifier">async_op_flags</span></pre>
+<pre class="programlisting"><span class="keyword">enum</span> <span class="identifier">async_op_flags</span> <span class="special">{</span><span class="identifier">None</span> <span class="special">=</span> <span class="number">0</span><span class="special">,</span> <span class="identifier">DetachedFuture</span> <span class="special">=</span> <span class="number">1</span><span class="special">,</span> <span class="identifier">ImmediateCompletion</span> <span class="special">=</span> <span class="number">2</span><span class="special">};</span></pre>
 <h5>
 <a name="afio.reference.async_op_flags.h1"></a>
         <span class="phrase"><a name="afio.reference.async_op_flags.values"></a></span><a class="link" href="async_op_flags.html#afio.reference.async_op_flags.values">Values</a>
@@ -44,18 +47,57 @@ Bitwise async_op_flags flags.
 <col>
 <col>
 </colgroup>
-<tbody><tr>
-<td>
+<thead><tr>
+<th>
                 <p>
                   Value
                 </p>
-              </td>
-<td>
+              </th>
+<th>
                 <p>
                   Description
                 </p>
+              </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                <p>
+                  None
+                </p>
               </td>
-</tr></tbody>
+<td>
+                <p>
+                  No flags set.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  DetachedFuture
+                </p>
+              </td>
+<td>
+                <p>
+                  The specified completion routine may choose to not complete immediately.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  ImmediateCompletion
+                </p>
+              </td>
+<td>
+                <p>
+                  Call chained completion immediately instead of scheduling for later.
+                  Make SURE your completion can not block!
+                </p>
+              </td>
+</tr>
+</tbody>
 </table></div>
 <h5>
 <a name="afio.reference.async_op_flags.h2"></a>

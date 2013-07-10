@@ -14,9 +14,6 @@
 '''<indexterm><primary>async_data_op_req</primary></indexterm>'''
 A specialisation for any pointer to type T. 
 
-[heading Description]
-A convenience bundle of precondition, data and where. Data [*MUST] stay around until the operation completes.
-
 [heading Synopsis]
 ``template<class T>
 struct async_data_op_req
@@ -28,7 +25,7 @@ struct async_data_op_req
 [heading Template parameter(s)]
 [table
 [[Parameter] [Description]]
-[[class T] [Specialised for void ]]
+[[class T] []]
 ]
 
 [heading Constructor(s)]
