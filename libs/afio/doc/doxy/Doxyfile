@@ -13,7 +13,7 @@ BRIEF_MEMBER_DESC      = YES
 REPEAT_BRIEF           = YES
 ABBREVIATE_BRIEF       = 
 ALWAYS_DETAILED_SEC    = YES
-INLINE_INHERITED_MEMB  = NO
+INLINE_INHERITED_MEMB  = YES
 FULL_PATH_NAMES        = YES
 STRIP_FROM_PATH        = 
 STRIP_FROM_INC_PATH    = 
@@ -39,12 +39,23 @@ TAB_SIZE               = 8
 ALIASES                = qbk{1}="\xmlonly <qbk>\1</qbk> \endxmlonly" \
 			qbk{2}="\xmlonly <qbk.\1>\2</qbk.\1> \endxmlonly" \
 			complexity{1}="\xmlonly <qbk>[heading Complexity]\1</qbk> \endxmlonly" \
-			exceptionmodel{1}="\xmlonly <qbk>[heading Exception Model]\1</qbk> \endxmlonly \exception ... \1" \
+			exceptionmodel{1}="\xmlonly <qbk>[heading Exception Model]\1</qbk> \endxmlonly" \
+            exceptionmodelstd="\exceptionmodel{Propagates exceptions of any input preconditions with an errored state at the point of dispatch, and throws a `std::runtime_error` if any inputs have values which could not possibly be correct.}" \
 			constr="Default constructor." \
 			cconstr="Copy constructor." \
 			mconstr="Move constructor." \
 			cassign="Copy assignment." \
-			massign="Move assignment."
+			massign="Move assignment." \
+            async_data_op_req1="\brief Constructs an instance. \
+	\param _precondition An optional precondition for this operation \
+	\param v A pointer to memory or reference to object into which to read or write \
+	\param _where The offset at which to transfer" \
+            async_data_op_req2="\brief Constructs an instance. \
+	\param _precondition An optional precondition for this operation \
+	\param _buffers A sequence of mutable/const Boost.ASIO buffers to read into/write from \
+	\param _where The offset at which to transfer" \
+            qexample{1}="\xmlonly <qbk>[heading Example][\1]</qbk> \endxmlonly"
+
 OPTIMIZE_OUTPUT_FOR_C  = NO
 OPTIMIZE_OUTPUT_JAVA   = NO
 OPTIMIZE_FOR_FORTRAN   = NO
@@ -187,13 +198,7 @@ PREDEFINED             = BOOST_CONCEPT_REQUIRES(x)= \
                          BOOST_CONCEPT_ASSERT(x) = \
                          BOOST_STATIC_ASSERT(x) = \
                          DOXYGEN_SHOULD_SKIP_THIS \
-                         DOXYGEN_NO_DISPATCH \
-                         DOXYGEN_NO_IMPL \
-                         DOXYGEN_NO_DETAIL \
-                         DOXYGEN_NO_CONCEPT_MEMBERS \
-                         DOXYGEN_NO_TRAITS_SPECIALIZATIONS \
-                         DOXYGEN_NO_STRATEGY_SPECIALIZATIONS \
-                         DOXYGEN_NO_SPECIALIZATIONS
+                         DOXYGEN_NO_CLASS_ENUMS
 EXPAND_AS_DEFINED      = 
 SKIP_FUNCTION_MACROS   = YES
 

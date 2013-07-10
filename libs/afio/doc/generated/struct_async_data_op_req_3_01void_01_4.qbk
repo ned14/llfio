@@ -62,15 +62,15 @@ A convenience bundle of precondition, data and where for reading into a void *. 
 
 
 ]]
-[[`` async_data_op_req(async_io_op _precondition, void * _buffer, size_t _length, off_t _where)``
+[[`` async_data_op_req(async_io_op _precondition, void * v, size_t _length, off_t _where)``
 
 ] [Constructs an instance. ] [[* async_io_op]: ['_precondition]:  An optional precondition for this operation 
 
-[* void *]: ['_buffer]:  A pointer to memory into which to read 
+[* void *]: ['v]:  A pointer to memory or reference to object into which to read or write 
 
-[* size_t]: ['_length]:  The number of bytes to read 
+[* size_t]: ['_length]:  The number of bytes to transfer 
 
-[* off_t]: ['_where]:  The offset from which to read 
+[* off_t]: ['_where]:  The offset at which to transfer 
 
 
 
@@ -80,9 +80,9 @@ A convenience bundle of precondition, data and where for reading into a void *. 
 
 ] [Constructs an instance. ] [[* async_io_op]: ['_precondition]:  An optional precondition for this operation 
 
-[* std::vector< boost::asio::mutable_buffer >]: ['_buffers]:  A sequence of mutable [*boost_asio] buffers to read into 
+[* std::vector< boost::asio::mutable_buffer >]: ['_buffers]:  A sequence of mutable/const Boost.ASIO buffers to read into/write from 
 
-[* off_t]: ['_where]:  The offset from which to read 
+[* off_t]: ['_where]:  The offset at which to transfer 
 
 
 

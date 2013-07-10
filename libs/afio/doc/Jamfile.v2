@@ -29,8 +29,8 @@ boostbook afio
 #    <xsl:param>index.on.type=1
 #       <format>html
        <xsl:param>chunk.first.sections=1
-       <xsl:param>toc.section.depth=3
-       <xsl:param>toc.max.depth=3
+       <xsl:param>toc.section.depth=4
+       <xsl:param>toc.max.depth=4
        <xsl:param>generate.section.toc.level=4
        <xsl:param>boost.root=../../../..
        <xsl:param>html.stylesheet=myboostbook.css

@@ -28,7 +28,7 @@
       to std::future&lt;T&gt; and Related APIs) for range of futures)</a>
 </h3></div></div></div>
 <p>
-        <a class="indexterm" name="id875778"></a>
+        <a class="indexterm" name="id925326"></a>
 Returns a future tuple of results from all the supplied futures.
       </p>
 <h5>
@@ -48,7 +48,7 @@ Returns a future tuple of results from all the supplied futures.
         <span class="phrase"><a name="afio.reference.when_any.synopsis"></a></span><a class="link" href="when_any.html#afio.reference.when_any.synopsis">Synopsis</a>
       </h5>
 <pre class="programlisting"><span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">InputIterator</span><span class="special">,</span> <span class="special">&gt;</span>
-<span class="identifier">future</span><span class="special">&lt;</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">pair</span><span class="special">&lt;</span><span class="identifier">size_t</span><span class="special">,</span> <span class="keyword">typename</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">decay</span><span class="special">&lt;</span><span class="keyword">decltype</span><span class="special">(((</span><span class="keyword">typename</span> <span class="identifier">InputIterator</span><span class="special">::</span><span class="identifier">value_type</span> <span class="special">*)</span> <span class="number">0</span><span class="special">)-&gt;</span><span class="identifier">get</span><span class="special">())&gt;::</span><span class="identifier">type</span><span class="special">&gt;</span> <span class="special">&gt;</span> <span class="identifier">when_any</span><span class="special">(</span><span class="identifier">InputIterator</span> <span class="identifier">first</span><span class="special">,</span> <span class="identifier">InputIterator</span> <span class="identifier">last</span><span class="special">)</span></pre>
+<span class="identifier">future</span><span class="special">&lt;</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">pair</span><span class="special">&lt;</span><span class="identifier">size_t</span><span class="special">,</span> <span class="keyword">typename</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">decay</span><span class="special">&lt;</span><span class="keyword">decltype</span><span class="special">(((</span><span class="keyword">typename</span> <span class="identifier">InputIterator</span><span class="special">::</span><span class="identifier">value_type</span> <span class="special">*)</span> <span class="number">0</span><span class="special">)-&gt;</span><span class="identifier">get</span><span class="special">())&gt;::</span><span class="identifier">type</span><span class="special">&gt;</span> <span class="identifier">when_any</span><span class="special">(</span><span class="identifier">InputIterator</span> <span class="identifier">first</span><span class="special">,</span> <span class="identifier">InputIterator</span> <span class="identifier">last</span><span class="special">)</span></pre>
 <h5>
 <a name="afio.reference.when_any.h2"></a>
         <span class="phrase"><a name="afio.reference.when_any.parameters"></a></span><a class="link" href="when_any.html#afio.reference.when_any.parameters">Parameters</a>

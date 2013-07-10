@@ -44,8 +44,8 @@ Bitwise file and directory open flags.
 [[CreateOnlyIfNotExist] [Create and open only if doesn't exist. ]]
 [[AutoFlush] [Automatically initiate an asynchronous flush just before file close, and fuse both operations so both must complete for close to complete. ]]
 [[WillBeSequentiallyAccessed] [Will be exclusively either read or written sequentially. If you're exclusively writing sequentially, ['strongly] consider turning on OSDirect too. ]]
-[[FastDirectoryEnumeration] []]
-[[OSDirect] [Hold a file handle open to the containing directory of each open file (POSIX only). Bypass the OS file buffers (only really useful for writing large files. Note you must 4Kb align everything if this is on) ]]
+[[FastDirectoryEnumeration] [Hold a file handle open to the containing directory of each open file for fast directory enumeration (POSIX only). ]]
+[[OSDirect] [Bypass the OS file buffers (only really useful for writing large files. Note you must 4Kb align everything if this is on) ]]
 [[OSSync] [Ask the OS to not complete until the data is on the physical storage. Best used only with Direct, otherwise use AutoFlush. ]]
 ]
 

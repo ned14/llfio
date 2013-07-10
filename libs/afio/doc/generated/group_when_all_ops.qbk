@@ -91,7 +91,7 @@ A future vector of shared\u005fptr's to detail::async\u005fio\u005fhandle.
 [heading Header]
 `#include <boost/afio/afio.hpp>`
 
-[heading Complexity]O(N) to dispatch. O(N/threadpool) to complete, but at least one cache line is contended between threads.
+[heading Complexity]Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete, but at least one cache line is heavily contended between threads.
 [heading Exception Model]Non propagating
 
 
@@ -119,7 +119,7 @@ A future vector of shared\u005fptr's to detail::async\u005fio\u005fhandle.
 [heading Header]
 `#include <boost/afio/afio.hpp>`
 
-[heading Complexity]O(N) to dispatch. O(N/threadpool) to complete, but at least one cache line is contended between threads.
+[heading Complexity]Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete, but at least one cache line is heavily contended between threads.
 [heading Exception Model]Propagating
 
 

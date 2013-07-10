@@ -14,6 +14,9 @@
 '''<indexterm><primary>process_threadpool</primary></indexterm>'''
 Returns the process threadpool. 
 
+[heading Description]
+On first use, this instantiates a default thread\u005fpool running eight threads. 
+
 [heading Synopsis]
 ``BOOST_AFIO_DECL thread_pool& process_threadpool()``
 

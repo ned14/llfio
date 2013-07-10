@@ -12,7 +12,7 @@
 [section:async_data_op_req async_data_op_req]
 
 '''<indexterm><primary>async_data_op_req</primary></indexterm>'''
-A specialisation for any pointer to type T. 
+A convenience bundle of precondition, data and where for reading into a single T *. Data [*MUST] stay around until the operation completes. 
 
 [heading Synopsis]
 ``template<class T>
@@ -25,7 +25,7 @@ struct async_data_op_req
 [heading Template parameter(s)]
 [table
 [[Parameter] [Description]]
-[[class T] []]
+[[class T] [Any writable type T ]]
 ]
 
 [heading Constructor(s)]
@@ -33,13 +33,13 @@ struct async_data_op_req
 [[Function] [Description] [Parameters] ]
 [[``async_data_op_req()``
 
-] [] [
+] [Default constructor. ] [
 
 
 ]]
 [[``async_data_op_req(const async_data_op_req & o)``
 
-] [] [[* const async_data_op_req &]: ['o]:  
+] [Copy constructor. ] [[* const async_data_op_req &]: ['o]:  
 
 
 
@@ -47,21 +47,21 @@ struct async_data_op_req
 ]]
 [[``async_data_op_req(async_data_op_req && o)``
 
-] [] [[* async_data_op_req &&]: ['o]:  
+] [Move constructor. ] [[* async_data_op_req &&]: ['o]:  
 
 
 
 
 ]]
-[[``async_data_op_req(async_io_op _precondition, T * _buffer, size_t _length, off_t _where)``
+[[``async_data_op_req(async_io_op _precondition, T * v, size_t _length, off_t _where)``
 
-] [] [[* async_io_op]: ['_precondition]:  
+] [Constructs an instance. ] [[* async_io_op]: ['_precondition]:  An optional precondition for this operation 
 
-[* T *]: ['_buffer]:  
+[* T *]: ['v]:  A pointer to memory or reference to object into which to read or write 
 
-[* size_t]: ['_length]:  
+[* size_t]: ['_length]:  The number of bytes to transfer 
 
-[* off_t]: ['_where]:  
+[* off_t]: ['_where]:  The offset at which to transfer 
 
 
 
@@ -74,7 +74,7 @@ struct async_data_op_req
 [[Function] [Description] [Parameters]  [Returns]]
 [[``async_data_op_req & operator=(const async_data_op_req & o)``
 
-] [] [[* const async_data_op_req &]: ['o]:  
+] [Copy assignment. ] [[* const async_data_op_req &]: ['o]:  
 
 
 
@@ -82,7 +82,7 @@ struct async_data_op_req
 ]]
 [[``async_data_op_req & operator=(async_data_op_req && o)``
 
-] [] [[* async_data_op_req &&]: ['o]:  
+] [Move assignment. ] [[* async_data_op_req &&]: ['o]:  
 
 
 

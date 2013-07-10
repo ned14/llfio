@@ -39,17 +39,26 @@ File Created: Mar 2013
 #endif
 
 
-/*
 #ifndef BOOST_AFIO_DECL
 #ifdef BOOST_AFIO_DLL_EXPORTS
 #define BOOST_AFIO_DECL BOOST_SYMBOL_EXPORT
 #else
+/*! \brief Defines the API decoration for any exportable symbols
+\ingroup macros
+*/
 #define BOOST_AFIO_DECL BOOST_SYMBOL_IMPORT
 #endif
 #endif
-*/
 
-//! \def BOOST_AFIO_VALIDATE_INPUTS Validate inputs at the point of instantiation
+
+/*! \brief Validate inputs at the point of instantiation.
+
+Turns on the checking of inputs for validity and throwing of exception conditions
+at the point of instantiation rather than waiting until those inputs are sent
+for dispatch. This, being very useful for debugging, defaults to 1 except when
+`NDEBUG` is defined i.e. final release builds.
+\ingroup macros
+*/
 #ifndef BOOST_AFIO_VALIDATE_INPUTS
 #ifndef NDEBUG
 #define BOOST_AFIO_VALIDATE_INPUTS 1
@@ -204,6 +213,8 @@ public:
 	}
 };
 /*! \brief Returns the process threadpool
+
+On first use, this instantiates a default thread_pool running eight threads.
 \ingroup process_threadpool
 */
 extern BOOST_AFIO_DECL thread_pool &process_threadpool();
@@ -357,7 +368,11 @@ inline constexpr bool operator!(type a) \
 \brief Bitwise file and directory open flags
 \ingroup file_flags
 */
+#ifdef DOXYGEN_NO_CLASS_ENUMS
+enum file_flags
+#else
 enum class file_flags : size_t
+#endif
 {
 	None=0,				//!< No flags set
 	Read=1,				//!< Read access
@@ -369,7 +384,7 @@ enum class file_flags : size_t
 	CreateOnlyIfNotExist=32, //!< Create and open only if doesn't exist
 	AutoFlush=64,		//!< Automatically initiate an asynchronous flush just before file close, and fuse both operations so both must complete for close to complete.
 	WillBeSequentiallyAccessed=128, //!< Will be exclusively either read or written sequentially. If you're exclusively writing sequentially, \em strongly consider turning on OSDirect too.
-	FastDirectoryEnumeration=256, //! Hold a file handle open to the containing directory of each open file (POSIX only).
+	FastDirectoryEnumeration=256, //!< Hold a file handle open to the containing directory of each open file for fast directory enumeration (POSIX only).
 
 	OSDirect=(1<<16),	//!< Bypass the OS file buffers (only really useful for writing large files. Note you must 4Kb align everything if this is on)
 	OSSync=(1<<17)		//!< Ask the OS to not complete until the data is on the physical storage. Best used only with Direct, otherwise use AutoFlush.
@@ -380,7 +395,11 @@ BOOST_AFIO_DECLARE_CLASS_ENUM_AS_BITFIELD(file_flags)
 \brief Bitwise async_op_flags flags
 \ingroup async_op_flags
 */
+#ifdef DOXYGEN_NO_CLASS_ENUMS
+enum async_op_flags
+#else
 enum class async_op_flags : size_t
+#endif
 {
 	None=0,					//!< No flags set
 	DetachedFuture=1,		//!< The specified completion routine may choose to not complete immediately
@@ -393,7 +412,8 @@ BOOST_AFIO_DECLARE_CLASS_ENUM_AS_BITFIELD(async_op_flags)
 \brief Abstract base class for dispatching file i/o asynchronously
 
 \qbk{
-[include generated/group_async_file_io_dispatcher__call.qbk]
+[include generated/group_async_file_io_dispatcher_base__completion.qbk]
+[include generated/group_async_file_io_dispatcher_base__call.qbk]
 }
 */
 class BOOST_AFIO_DECL async_file_io_dispatcher_base : public std::enable_shared_from_this<async_file_io_dispatcher_base>
@@ -417,75 +437,89 @@ public:
 
 	//! Returns the thread pool used by this dispatcher
 	thread_pool &threadpool() const;
-	//! Returns file flags as would be used after forcing and masking
+	//! Returns file flags as would be used after forcing and masking bits passed during construction
 	file_flags fileflags(file_flags flags) const;
 	//! Returns the current wait queue depth of this dispatcher
 	size_t wait_queue_depth() const;
 	//! Returns the number of open items in this dispatcher
 	size_t count() const;
 
+    //! The type returned by a completion handler \ingroup async_file_io_dispatcher_base__completion
 	typedef std::pair<bool, std::shared_ptr<detail::async_io_handle>> completion_returntype;
+    //! The type of a completion handler \ingroup async_file_io_dispatcher_base__completion
 	typedef completion_returntype completion_t(size_t, std::shared_ptr<detail::async_io_handle>);
-	//! Invoke the specified function when each of the supplied operations complete
+	/*! \brief Invoke the specified functions when each of the supplied operations complete
+    \return A batch of op handles
+    \param ops A batch of precondition op handles.
+    \param callbacks A batch of pairs of op flags and bound completion handler functions of type `completion_t`
+    \ingroup async_file_io_dispatcher_base__completion
+    \qbk{distinguish, batch bound functions}
+    \complexity{Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete.}
+    \exceptionmodelstd
+    \qexample{completion_example}
+    */
 	std::vector<async_io_op> completion(const std::vector<async_io_op> &ops, const std::vector<std::pair<async_op_flags, std::function<async_file_io_dispatcher_base::completion_t>>> &callbacks);
-	//! Invoke the specified function when the supplied operation completes
+	/*! \brief Invoke the specified single function when the supplied single operation completes
+    \return An op handle
+    \param req A precondition op handle
+    \param callback A pair of op flag and bound completion handler function of type `completion_t`
+    \ingroup async_file_io_dispatcher_base__completion
+    \qbk{distinguish, convenience single bound function}
+    \complexity{Amortised O(1) to dispatch. Amortised O(1) to complete.}
+    \exceptionmodelstd
+    \qexample{completion_example}
+    */
 	inline async_io_op completion(const async_io_op &req, const std::pair<async_op_flags, std::function<async_file_io_dispatcher_base::completion_t>> &callback);
 
 	/*! \brief Schedule a batch of asynchronous invocations of the specified bound functions when their supplied preconditions complete.
-    \qbk{
-    [link call_2_batch_with_preconditions More ...]
-    }
-
     \return A pair with a batch of futures returning the result of each of the callables and a batch of op handles.
+    \tparam R A compiler deduced return type of the bound functions.
     \param ops A batch of precondition op handles. If default constructed, a precondition is null.
     \param callables A batch of bound functions to call, returning R.
-    \ingroup async_file_io_dispatcher__call
+    \ingroup async_file_io_dispatcher_base__call
     \qbk{distinguish, batch bound functions}
-    \qbk{
-    [heading Example]
-    [call_example]
-    }
+    \complexity{Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete.}
+    \exceptionmodelstd
+    \qexample{call_example}
     */
 	template<class R> inline std::pair<std::vector<future<R>>, std::vector<async_io_op>> call(const std::vector<async_io_op> &ops, const std::vector<std::function<R()>> &callables);
 	/*! \brief Schedule a batch of asynchronous invocations of the specified bound functions when their supplied preconditions complete.
     \return A pair with a batch of futures returning the result of each of the callables and a batch of op handles.
+    \tparam R A compiler deduced return type of the bound functions.
     \param callables A batch of bound functions to call, returning R.
-    \ingroup async_file_io_dispatcher__call
+    \ingroup async_file_io_dispatcher_base__call
     \qbk{distinguish, convenience batch bound functions without preconditions}
-    \qbk{
-    [heading Example]
-    [call_example]
-    }
+    \complexity{Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete.}
+    \exceptionmodelstd
+    \qexample{call_example}
     */
 	template<class R> std::pair<std::vector<future<R>>, std::vector<async_io_op>> call(const std::vector<std::function<R()>> &callables) { return call(std::vector<async_io_op>(), callables); }
 	/*! \brief Schedule an asynchronous invocation of the specified bound function when its supplied precondition completes.
     \return A pair with a future returning the result of the callable and an op handle.
+    \tparam R A compiler deduced return type of the bound functions.
     \param req A precondition op handle. If default constructed, the precondition is null.
     \param callback A bound functions to call, returning R.
     \ingroup async_file_io_dispatcher__call
     \qbk{distinguish, convenience single bound function}
-    \qbk{
-    [heading Example]
-    [call_example]
-    }
+    \complexity{Amortised O(1) to dispatch. Amortised O(1) to complete.}
+    \exceptionmodelstd
+    \qexample{call_example}
     */
 	template<class R> inline std::pair<future<R>, async_io_op> call(const async_io_op &req, std::function<R()> callback);
 	/*! \brief Schedule an asynchronous invocation of the specified unbound callable when its supplied precondition completes.
     Note that this function essentially calls `std::bind()` on the callable and the args and passes it to the other call() overload taking a `std::function<>`.
     You should therefore use `std::ref()` etc. as appropriate.
     \return A pair with a future returning the result of the callable and an op handle.
+    \tparam C Any callable type.
+    \tparam Args Any sequence of argument types.
     \param req A precondition op handle. If default constructed, the precondition is null.
     \param callback An unbound callable to call.
     \param args An arbitrary sequence of arguments to bind to the callable.
-    
-    Some descriptive text.
-    
-    \ingroup async_file_io_dispatcher__call
+    \ingroup async_file_io_dispatcher_base__call
     \qbk{distinguish, convenience single unbound callable}
-    \qbk{
-    [heading Example]
-    [call_example]
-    }
+    \complexity{Amortised O(1) to dispatch. Amortised O(1) to complete.}
+    \exceptionmodelstd
+    \qexample{call_example}
     */
 	template<class C, class... Args> inline std::pair<future<typename std::result_of<C(Args...)>::type>, async_io_op> call(const async_io_op &req, C callback, Args... args);
 
@@ -693,7 +727,7 @@ inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(st
 \param _ops A std::initializer_list<> of async_io_op's to wait upon.
 \ingroup when_all_ops
 \qbk{distinguish, initializer_list batch of ops not exception propagating}
-\complexity{O(N) to dispatch. O(N/threadpool) to complete, but at least one cache line is contended between threads.}
+\complexity{Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete, but at least one cache line is heavily contended between threads.}
 \exceptionmodel{Non propagating}
 */
 inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(std::nothrow_t _, std::initializer_list<async_io_op> _ops)
@@ -710,7 +744,7 @@ inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(st
 \param _ops A std::initializer_list<> of async_io_op's to wait upon.
 \ingroup when_all_ops
 \qbk{distinguish, initializer_list batch of ops exception propagating}
-\complexity{O(N) to dispatch. O(N/threadpool) to complete, but at least one cache line is contended between threads.}
+\complexity{Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete, but at least one cache line is heavily contended between threads.}
 \exceptionmodel{Propagating}
 */
 inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(std::initializer_list<async_io_op> _ops)
@@ -788,11 +822,12 @@ private:
 	}
 };
 
-//! \brief A convenience bundle of precondition, data and where for reading into a void *. Data \b MUST stay around until the operation completes.
+//! \brief A convenience bundle of precondition, data and where for reading into a void *. Data \b MUST stay around until the operation completes. \ingroup async_data_op_req
 template<> struct async_data_op_req<void> // For reading
 {
-	async_io_op precondition;	//!< An optional precondition for this operation
-	//! A sequence of mutable __boost_asio__ buffers to read into
+    //! An optional precondition for this operation
+	async_io_op precondition;
+	//! A sequence of mutable Boost.ASIO buffers to read into
 	std::vector<boost::asio::mutable_buffer> buffers;
 	//! The offset from which to read
 	off_t where;
@@ -806,18 +841,9 @@ template<> struct async_data_op_req<void> // For reading
 	async_data_op_req &operator=(const async_data_op_req &o) { precondition=o.precondition; buffers=o.buffers; where=o.where; return *this; }
 	//! \massign
 	async_data_op_req &operator=(async_data_op_req &&o) { precondition=std::move(o.precondition); buffers=std::move(o.buffers); where=std::move(o.where); return *this; }
-	/*! \brief Constructs an instance.
-	\param _precondition An optional precondition for this operation
-	\param _buffer A pointer to memory into which to read
-	\param _length The number of bytes to read
-	\param _where The offset from which to read
-	*/
-	async_data_op_req(async_io_op _precondition, void *_buffer, size_t _length, off_t _where) : precondition(std::move(_precondition)), where(_where) { buffers.reserve(1); buffers.push_back(boost::asio::mutable_buffer(_buffer, _length)); _validate(); }
-	/*! \brief Constructs an instance.
-	\param _precondition An optional precondition for this operation
-	\param _buffers A sequence of mutable __boost_asio__ buffers to read into
-	\param _where The offset from which to read
-	*/
+	//! \async_data_op_req1 \param _length The number of bytes to transfer
+	async_data_op_req(async_io_op _precondition, void *v, size_t _length, off_t _where) : precondition(std::move(_precondition)), where(_where) { buffers.reserve(1); buffers.push_back(boost::asio::mutable_buffer(v, _length)); _validate(); }
+	//! \async_data_op_req2
 	async_data_op_req(async_io_op _precondition, std::vector<boost::asio::mutable_buffer> _buffers, off_t _where) : precondition(std::move(_precondition)), buffers(_buffers), where(_where) { _validate(); }
 	//! Validates contents for correctness \return True if contents are correct
 	bool validate() const
@@ -843,23 +869,34 @@ private:
 #endif
 	}
 };
-/*! \brief A convenience bundle of precondition, data and where. Data \b MUST stay around until the operation completes.
-*/
+//! \brief A convenience bundle of precondition, data and where for writing from a const void *. Data \b MUST stay around until the operation completes. \ingroup async_data_op_req
 template<> struct async_data_op_req<const void> // For writing
 {
+    //! An optional precondition for this operation
 	async_io_op precondition;
+	//! A sequence of const Boost.ASIO buffers to write from
 	std::vector<boost::asio::const_buffer> buffers;
+	//! The offset into which to write
 	off_t where;
+	//! \constr
 	async_data_op_req() { }
+	//! \cconstr
 	async_data_op_req(const async_data_op_req &o) : precondition(o.precondition), buffers(o.buffers), where(o.where) { }
+	//! \mconstr
 	async_data_op_req(async_data_op_req &&o) : precondition(std::move(o.precondition)), buffers(std::move(o.buffers)), where(std::move(o.where)) { }
+	//! \cconstr
 	async_data_op_req(const async_data_op_req<void> &o) : precondition(o.precondition), where(o.where) { buffers.reserve(o.buffers.capacity()); for(auto &i: o.buffers) buffers.push_back(i); }
+	//! \mconstr
 	async_data_op_req(async_data_op_req<void> &&o) : precondition(std::move(o.precondition)), where(o.where) { buffers.reserve(o.buffers.capacity()); for(auto &&i: o.buffers) buffers.push_back(std::move(i)); }
+	//! \cassign
 	async_data_op_req &operator=(const async_data_op_req &o) { precondition=o.precondition; buffers=o.buffers; where=o.where; return *this; }
+	//! \massign
 	async_data_op_req &operator=(async_data_op_req &&o) { precondition=std::move(o.precondition); buffers=std::move(o.buffers); where=std::move(o.where); return *this; }
-	async_data_op_req(async_io_op _precondition, const void *_buffer, size_t _length, off_t _where) : precondition(std::move(_precondition)), where(_where) { buffers.reserve(1); buffers.push_back(boost::asio::const_buffer(_buffer, _length)); _validate(); }
+	//! \async_data_op_req1 \param _length The number of bytes to transfer
+	async_data_op_req(async_io_op _precondition, const void *v, size_t _length, off_t _where) : precondition(std::move(_precondition)), where(_where) { buffers.reserve(1); buffers.push_back(boost::asio::const_buffer(v, _length)); _validate(); }
+	//! \async_data_op_req2
 	async_data_op_req(async_io_op _precondition, std::vector<boost::asio::const_buffer> _buffers, off_t _where) : precondition(std::move(_precondition)), buffers(_buffers), where(_where) { _validate(); }
-	//! Validates contents
+	//! Validates contents for correctness \return True if contents are correct
 	bool validate() const
 	{
 		if(!precondition.validate()) return false;
@@ -883,92 +920,148 @@ private:
 #endif
 	}
 };
-//! \brief A specialisation for any pointer to type T
+//! \brief A convenience bundle of precondition, data and where for reading into a single T *. Data \b MUST stay around until the operation completes. \tparam T Any writable type T \ingroup async_data_op_req
 template<class T> struct async_data_op_req : public async_data_op_req<void>
 {
+    //! \constr
 	async_data_op_req() { }
+    //! \cconstr
 	async_data_op_req(const async_data_op_req &o) : async_data_op_req<void>(o) { }
+    //! \mconstr
 	async_data_op_req(async_data_op_req &&o) : async_data_op_req<void>(std::move(o)) { }
+    //! \cassign
 	async_data_op_req &operator=(const async_data_op_req &o) { static_cast<async_data_op_req<void>>(*this)=o; return *this; }
+    //! \massign
 	async_data_op_req &operator=(async_data_op_req &&o) { static_cast<async_data_op_req<void>>(*this)=std::move(o); return *this; }
-	async_data_op_req(async_io_op _precondition, T *_buffer, size_t _length, off_t _where) : async_data_op_req<void>(std::move(_precondition), static_cast<void *>(_buffer), _length, _where) { }
+    //! \async_data_op_req1 \param _length The number of bytes to transfer
+	async_data_op_req(async_io_op _precondition, T *v, size_t _length, off_t _where) : async_data_op_req<void>(std::move(_precondition), static_cast<void *>(v), _length, _where) { }
 };
-//! \brief A specialisation for any pointer to type const T
+//! \brief A convenience bundle of precondition, data and where for writing from a single const T *. Data \b MUST stay around until the operation completes. \tparam T Any readable type T \ingroup async_data_op_req
 template<class T> struct async_data_op_req<const T> : public async_data_op_req<const void>
 {
+    //! \constr
 	async_data_op_req() { }
+    //! \cconstr
 	async_data_op_req(const async_data_op_req &o) : async_data_op_req<const void>(o) { }
+    //! \mconstr
 	async_data_op_req(async_data_op_req &&o) : async_data_op_req<const void>(std::move(o)) { }
+    //! \cconstr
 	async_data_op_req(const async_data_op_req<T> &o) : async_data_op_req<const void>(o) { }
+    //! \mconstr
 	async_data_op_req(async_data_op_req<T> &&o) : async_data_op_req<const void>(std::move(o)) { }
+    //! \cassign
 	async_data_op_req &operator=(const async_data_op_req &o) { static_cast<async_data_op_req<const void>>(*this)=o; return *this; }
+    //! \massign
 	async_data_op_req &operator=(async_data_op_req &&o) { static_cast<async_data_op_req<const void>>(*this)=std::move(o); return *this; }
-	async_data_op_req(async_io_op _precondition, const T *_buffer, size_t _length, off_t _where) : async_data_op_req<const void>(std::move(_precondition), static_cast<const void *>(_buffer), _length, _where) { }
+    //! \async_data_op_req1 \param _length The number of bytes to transfer
+	async_data_op_req(async_io_op _precondition, const T *v, size_t _length, off_t _where) : async_data_op_req<const void>(std::move(_precondition), static_cast<const void *>(v), _length, _where) { }
 };
-//! \brief A specialisation for any std::vector<T, A>
+//! \brief A convenience bundle of precondition, data and where for reading into a `std::vector<T, A>`. Data \b MUST stay around until the operation completes. \tparam T Any type \tparam A Any STL allocator \ingroup async_data_op_req
 template<class T, class A> struct async_data_op_req<std::vector<T, A>> : public async_data_op_req<void>
 {
+    //! \constr
 	async_data_op_req() { }
+    //! \cconstr
 	async_data_op_req(const async_data_op_req &o) : async_data_op_req<void>(o) { }
+    //! \mconstr
 	async_data_op_req(async_data_op_req &&o) : async_data_op_req<void>(std::move(o)) { }
+    //! \cassign
 	async_data_op_req &operator=(const async_data_op_req &o) { static_cast<async_data_op_req<void>>(*this)=o; return *this; }
+    //! \massign
 	async_data_op_req &operator=(async_data_op_req &&o) { static_cast<async_data_op_req<void>>(*this)=std::move(o); return *this; }
+    //! \async_data_op_req1
 	async_data_op_req(async_io_op _precondition, std::vector<T, A> &v, off_t _where) : async_data_op_req<void>(std::move(_precondition), static_cast<void *>(&v.front()), v.size()*sizeof(T), _where) { }
 };
-//! \brief A specialisation for any const std::vector<T, A>
+//! \brief A convenience bundle of precondition, data and where for writing from a `const std::vector<T, A>`. Data \b MUST stay around until the operation completes. \tparam T Any type \tparam A Any STL allocator \ingroup async_data_op_req
 template<class T, class A> struct async_data_op_req<const std::vector<T, A>> : public async_data_op_req<const void>
 {
+    //! \constr
 	async_data_op_req() { }
+    //! \cconstr
 	async_data_op_req(const async_data_op_req &o) : async_data_op_req<const void>(o) { }
+    //! \mconstr
 	async_data_op_req(async_data_op_req &&o) : async_data_op_req<const void>(std::move(o)) { }
+    //! \cconstr
 	async_data_op_req(const async_data_op_req<std::vector<T, A>> &o) : async_data_op_req<const void>(o) { }
+    //! \mconstr
 	async_data_op_req(async_data_op_req<std::vector<T, A>> &&o) : async_data_op_req<const void>(std::move(o)) { }
+    //! \cassign
 	async_data_op_req &operator=(const async_data_op_req &o) { static_cast<async_data_op_req<const void>>(*this)=o; return *this; }
+    //! \massign
 	async_data_op_req &operator=(async_data_op_req &&o) { static_cast<async_data_op_req<const void>>(*this)=std::move(o); return *this; }
+    //! \async_data_op_req1
 	async_data_op_req(async_io_op _precondition, const std::vector<T, A> &v, off_t _where) : async_data_op_req<const void>(std::move(_precondition), static_cast<const void *>(&v.front()), v.size()*sizeof(T), _where) { }
 };
-//! \brief A specialisation for any std::array<T, N>
+//! \brief A convenience bundle of precondition, data and where for reading into a `std::array<T, N>`. Data \b MUST stay around until the operation completes. \tparam T Any type \tparam N Any compile-time size \ingroup async_data_op_req
 template<class T, size_t N> struct async_data_op_req<std::array<T, N>> : public async_data_op_req<void>
 {
+    //! \constr
 	async_data_op_req() { }
+    //! \cconstr
 	async_data_op_req(const async_data_op_req &o) : async_data_op_req<void>(o) { }
+    //! \mconstr
 	async_data_op_req(async_data_op_req &&o) : async_data_op_req<void>(std::move(o)) { }
+    //! \cassign
 	async_data_op_req &operator=(const async_data_op_req &o) { static_cast<async_data_op_req<void>>(*this)=o; return *this; }
+    //! \massign
 	async_data_op_req &operator=(async_data_op_req &&o) { static_cast<async_data_op_req<void>>(*this)=std::move(o); return *this; }
+    //! \async_data_op_req1
 	async_data_op_req(async_io_op _precondition, std::array<T, N> &v, off_t _where) : async_data_op_req<void>(std::move(_precondition), static_cast<void *>(&v.front()), v.size()*sizeof(T), _where) { }
 };
-//! \brief A specialisation for any const std::array<T, N>
+//! \brief A convenience bundle of precondition, data and where for writing from a `const std::array<T, N>`. Data \b MUST stay around until the operation completes. \tparam T Any type \tparam N Any compile-time size \ingroup async_data_op_req
 template<class T, size_t N> struct async_data_op_req<const std::array<T, N>> : public async_data_op_req<const void>
 {
+    //! \constr
 	async_data_op_req() { }
+    //! \cconstr
 	async_data_op_req(const async_data_op_req &o) : async_data_op_req<const void>(o) { }
+    //! \mconstr
 	async_data_op_req(async_data_op_req &&o) : async_data_op_req<const void>(std::move(o)) { }
+    //! \cassign
 	async_data_op_req &operator=(const async_data_op_req &o) { static_cast<async_data_op_req<const void>>(*this)=o; return *this; }
+    //! \massign
 	async_data_op_req &operator=(async_data_op_req &&o) { static_cast<async_data_op_req<const void>>(*this)=std::move(o); return *this; }
+    //! \cconstr
 	async_data_op_req(const async_data_op_req<std::array<T, N>> &o) : async_data_op_req<const void>(o) { }
+    //! \mconstr
 	async_data_op_req(async_data_op_req<std::array<T, N>> &&o) : async_data_op_req<const void>(std::move(o)) { }
+    //! \async_data_op_req1
 	async_data_op_req(async_io_op _precondition, const std::array<T, N> &v, off_t _where) : async_data_op_req<const void>(std::move(_precondition), static_cast<const void *>(&v.front()), v.size()*sizeof(T), _where) { }
 };
-//! \brief A specialisation for any std::basic_string<C, T, A>
+//! \brief A convenience bundle of precondition, data and where for reading into a `std::basic_string<C, T, A>`. Data \b MUST stay around until the operation completes. \tparam C Any character type \tparam T Character traits type \tparam A Any STL allocator \ingroup async_data_op_req
 template<class C, class T, class A> struct async_data_op_req<std::basic_string<C, T, A>> : public async_data_op_req<void>
 {
+    //! \constr
 	async_data_op_req() { }
+    //! \cconstr
 	async_data_op_req(const async_data_op_req &o) : async_data_op_req<void>(o) { }
+    //! \mconstr
 	async_data_op_req(async_data_op_req &&o) : async_data_op_req<void>(std::move(o)) { }
+    //! \cassign
 	async_data_op_req &operator=(const async_data_op_req &o) { static_cast<async_data_op_req<void>>(*this)=o; return *this; }
+    //! \mconstr
 	async_data_op_req &operator=(async_data_op_req &&o) { static_cast<async_data_op_req<void>>(*this)=std::move(o); return *this; }
+    //! \async_data_op_req1
 	async_data_op_req(async_io_op _precondition, std::basic_string<C, T, A> &v, off_t _where) : async_data_op_req<void>(std::move(_precondition), static_cast<void *>(&v.front()), v.size()*sizeof(A), _where) { }
 };
-//! \brief A specialisation for any const std::basic_string<C, T, A>
+//! \brief A convenience bundle of precondition, data and where for writing from a `const std::basic_string<C, T, A>`. Data \b MUST stay around until the operation completes.  \tparam C Any character type \tparam T Character traits type \tparam A Any STL allocator \ingroup async_data_op_req
 template<class C, class T, class A> struct async_data_op_req<const std::basic_string<C, T, A>> : public async_data_op_req<const void>
 {
+    //! \constr
 	async_data_op_req() { }
+    //! \cconstr
 	async_data_op_req(const async_data_op_req &o) : async_data_op_req<const void>(o) { }
+    //! \mconstr
 	async_data_op_req(async_data_op_req &&o) : async_data_op_req<const void>(std::move(o)) { }
+    //! \cconstr
 	async_data_op_req(const async_data_op_req<std::basic_string<C, T, A>> &o) : async_data_op_req<const void>(o) { }
+    //! \mconstr
 	async_data_op_req(async_data_op_req<std::basic_string<C, T, A>> &&o) : async_data_op_req<const void>(std::move(o)) { }
+    //! \cassign
 	async_data_op_req &operator=(const async_data_op_req &o) { static_cast<async_data_op_req<const void>>(*this)=o; return *this; }
+    //! \mconstr
 	async_data_op_req &operator=(async_data_op_req &&o) { static_cast<async_data_op_req<const void>>(*this)=std::move(o); return *this; }
+    //! \async_data_op_req1
 	async_data_op_req(async_io_op _precondition, const std::basic_string<C, T, A> &v, off_t _where) : async_data_op_req<const void>(std::move(_precondition), static_cast<const void *>(&v.front()), v.size()*sizeof(A), _where) { }
 };
 

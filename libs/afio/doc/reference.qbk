@@ -8,6 +8,14 @@
 
 [section:reference Reference]
 
+[section:macros_flags Macros and Flags]
+[include generated/group_macros.qbk]
+[include generated/group_async_op_flags.qbk]
+[include generated/group_file_flags.qbk]
+[endsect]
+
+[section:types Types]
+[section:async_data_op_req async_data_op_req]
 [include generated/struct_async_data_op_req.qbk]
 [include generated/struct_async_data_op_req_3_01const_01_t_01_4.qbk]
 [include generated/struct_async_data_op_req_3_01const_01std_1_1array_3_01_t_00_01_n_01_4_01_4.qbk]
@@ -18,16 +26,24 @@
 [include generated/struct_async_data_op_req_3_01std_1_1basic_string_3_01_c_00_01_t_00_01_a_01_4_01_4.qbk]
 [include generated/struct_async_data_op_req_3_01std_1_1vector_3_01_t_00_01_a_01_4_01_4.qbk]
 [include generated/struct_async_data_op_req_3_01void_01_4.qbk]
-[include generated/group_async_op_flags.qbk]
-[include generated/group_async_file_io_dispatcher.qbk]
+[endsect]
+
 [include generated/class_async_file_io_dispatcher_base.qbk]
 [include generated/struct_async_io_op.qbk]
 [include generated/struct_async_path_op_req.qbk]
 [include generated/class_detail_1_1async_io_handle.qbk]
-[include generated/group_file_flags.qbk]
-[include generated/group_process_threadpool.qbk]
 [include generated/class_thread_pool.qbk]
+[endsect]
+
+[section:functions Functions]
+[include generated/group_async_file_io_dispatcher.qbk]
+[include generated/group_process_threadpool.qbk]
+[section:when_all_futures when_all() (futures)]
 [include generated/group_when_all_futures.qbk]
+[endsect]
+[section:when_all_ops when_all() (ops)]
 [include generated/group_when_all_ops.qbk]
+[endsect]
+[endsect]
 
 [endsect] [/reference]

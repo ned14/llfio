@@ -1,0 +1,253 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>call (convenience single unbound callable)</title>
+<link rel="stylesheet" href="../../../../myboostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../../../../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 0.1">
+<link rel="up" href="../async_file_io_dispatcher_base.html" title="async_file_io_dispatcher_base">
+<link rel="prev" href="call_1_convenience_batch_bound_functions_without_preconditions.html" title="call (convenience batch bound functions without preconditions)">
+<link rel="next" href="../async_io_op.html" title="async_io_op">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr>
+<td valign="top"><img alt="Boost C++ Libraries" width="277" height="86" src="../../../../../../../../boost.png"></td>
+<td align="center"><a href="../../../../../../../../index.html">Home</a></td>
+<td align="center"><a href="../../../../../../../../libs/libraries.htm">Libraries</a></td>
+<td align="center"><a href="http://www.boost.org/users/people.html">People</a></td>
+<td align="center"><a href="http://www.boost.org/users/faq.html">FAQ</a></td>
+<td align="center"><a href="../../../../../../../../more/index.htm">More</a></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="call_1_convenience_batch_bound_functions_without_preconditions.html"><img src="../../../../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../async_file_io_dispatcher_base.html"><img src="../../../../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../../../index.html"><img src="../../../../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="../async_io_op.html"><img src="../../../../../../../../doc/src/images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h5 class="title">
+<a name="afio.reference.types.async_file_io_dispatcher_base.call_3_convenience_single_unbound_callable"></a><a class="link" href="call_3_convenience_single_unbound_callable.html" title="call (convenience single unbound callable)">call
+          (convenience single unbound callable)</a>
+</h5></div></div></div>
+<p>
+            <a class="indexterm" name="id923978"></a>
+Schedule an asynchronous invocation of the specified unbound callable
+            when its supplied precondition completes. Note that this function essentially
+            calls <code class="literal"><code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">bind</span><span class="special">()</span></code></code>
+            on the callable and the args and passes it to the other call() overload
+            taking a <code class="literal"><code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">function</span><span class="special">&lt;&gt;</span></code></code>. You should therefore
+            use <code class="literal"><code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">ref</span><span class="special">()</span></code></code>
+            etc. as appropriate.
+          </p>
+<h6>
+<a name="afio.reference.types.async_file_io_dispatcher_base.call_3_convenience_single_unbound_callable.h0"></a>
+            <span class="phrase"><a name="afio.reference.types.async_file_io_dispatcher_base.call_3_convenience_single_unbound_callable.synopsis"></a></span><a class="link" href="call_3_convenience_single_unbound_callable.html#afio.reference.types.async_file_io_dispatcher_base.call_3_convenience_single_unbound_callable.synopsis">Synopsis</a>
+          </h6>
+<pre class="programlisting"><span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">C</span><span class="special">,</span> <span class="keyword">class</span><span class="special">...</span> <span class="identifier">Args</span><span class="special">,</span> <span class="special">&gt;</span>
+<span class="identifier">std</span><span class="special">::</span><span class="identifier">pair</span><span class="special">&lt;</span> <span class="identifier">future</span><span class="special">&lt;</span> <span class="keyword">typename</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">result_of</span><span class="special">&lt;</span> <span class="identifier">C</span><span class="special">(</span><span class="identifier">Args</span><span class="special">...)&gt;::</span><span class="identifier">type</span> <span class="special">&gt;,</span> <span class="identifier">async_io_op</span> <span class="special">&gt;</span> <span class="identifier">async_file_io_dispatcher_base</span><span class="special">::</span><span class="identifier">call</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">async_io_op</span> <span class="special">&amp;</span> <span class="identifier">req</span><span class="special">,</span> <span class="identifier">C</span> <span class="identifier">callback</span><span class="special">,</span> <span class="identifier">Args</span><span class="special">...</span> <span class="identifier">args</span><span class="special">)</span></pre>
+<h6>
+<a name="afio.reference.types.async_file_io_dispatcher_base.call_3_convenience_single_unbound_callable.h1"></a>
+            <span class="phrase"><a name="afio.reference.types.async_file_io_dispatcher_base.call_3_convenience_single_unbound_callable.parameters"></a></span><a class="link" href="call_3_convenience_single_unbound_callable.html#afio.reference.types.async_file_io_dispatcher_base.call_3_convenience_single_unbound_callable.parameters">Parameters</a>
+          </h6>
+<div class="informaltable"><table class="table">
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                    <p>
+                      Type
+                    </p>
+                  </th>
+<th>
+                    <p>
+                      Concept
+                    </p>
+                  </th>
+<th>
+                    <p>
+                      Name
+                    </p>
+                  </th>
+<th>
+                    <p>
+                      Description
+                    </p>
+                  </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                    <p>
+                      class C
+                    </p>
+                  </td>
+<td>
+                  </td>
+<td>
+                    <p>
+                      -
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      Must be specified
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      Args
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      Any sequence of argument types.
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      -
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      Must be specified
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      const async_io_op &amp;
+                    </p>
+                  </td>
+<td>
+                  </td>
+<td>
+                    <p>
+                      req
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      A precondition op handle. If default constructed, the precondition
+                      is null.
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      C
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      Any callable type.
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      callback
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      An unbound callable to call.
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      Args...
+                    </p>
+                  </td>
+<td>
+                  </td>
+<td>
+                    <p>
+                      args
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      An arbitrary sequence of arguments to bind to the callable.
+                    </p>
+                  </td>
+</tr>
+</tbody>
+</table></div>
+<h6>
+<a name="afio.reference.types.async_file_io_dispatcher_base.call_3_convenience_single_unbound_callable.h2"></a>
+            <span class="phrase"><a name="afio.reference.types.async_file_io_dispatcher_base.call_3_convenience_single_unbound_callable.returns"></a></span><a class="link" href="call_3_convenience_single_unbound_callable.html#afio.reference.types.async_file_io_dispatcher_base.call_3_convenience_single_unbound_callable.returns">Returns</a>
+          </h6>
+<p>
+            A pair with a future returning the result of the callable and an op handle.
+          </p>
+<h6>
+<a name="afio.reference.types.async_file_io_dispatcher_base.call_3_convenience_single_unbound_callable.h3"></a>
+            <span class="phrase"><a name="afio.reference.types.async_file_io_dispatcher_base.call_3_convenience_single_unbound_callable.header"></a></span><a class="link" href="call_3_convenience_single_unbound_callable.html#afio.reference.types.async_file_io_dispatcher_base.call_3_convenience_single_unbound_callable.header">Header</a>
+          </h6>
+<p>
+            <code class="computeroutput"><span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">boost</span><span class="special">/</span><span class="identifier">afio</span><span class="special">/</span><span class="identifier">afio</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span></code>
+          </p>
+<h6>
+<a name="afio.reference.types.async_file_io_dispatcher_base.call_3_convenience_single_unbound_callable.h4"></a>
+            <span class="phrase"><a name="afio.reference.types.async_file_io_dispatcher_base.call_3_convenience_single_unbound_callable.complexity"></a></span><a class="link" href="call_3_convenience_single_unbound_callable.html#afio.reference.types.async_file_io_dispatcher_base.call_3_convenience_single_unbound_callable.complexity">Complexity</a>
+          </h6>
+<p>
+            Amortised O(1) to dispatch. Amortised O(1) to complete.
+          </p>
+<h6>
+<a name="afio.reference.types.async_file_io_dispatcher_base.call_3_convenience_single_unbound_callable.h5"></a>
+            <span class="phrase"><a name="afio.reference.types.async_file_io_dispatcher_base.call_3_convenience_single_unbound_callable.exception_model"></a></span><a class="link" href="call_3_convenience_single_unbound_callable.html#afio.reference.types.async_file_io_dispatcher_base.call_3_convenience_single_unbound_callable.exception_model">Exception
+            Model</a>
+          </h6>
+<p>
+            Propagates exceptions of any input preconditions with an errored state
+            at the point of dispatch, and throws a <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">runtime_error</span></code>
+            if any inputs have values which could not possibly be correct.
+          </p>
+<h6>
+<a name="afio.reference.types.async_file_io_dispatcher_base.call_3_convenience_single_unbound_callable.h6"></a>
+            <span class="phrase"><a name="afio.reference.types.async_file_io_dispatcher_base.call_3_convenience_single_unbound_callable.example"></a></span><a class="link" href="call_3_convenience_single_unbound_callable.html#afio.reference.types.async_file_io_dispatcher_base.call_3_convenience_single_unbound_callable.example">Example</a>
+          </h6>
+<pre class="programlisting"><span class="comment">// Create a dispatcher instance</span>
+<span class="keyword">auto</span> <span class="identifier">dispatcher</span><span class="special">=</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_file_io_dispatcher</span><span class="special">();</span>
+
+<span class="comment">// Schedule an asynchronous call of some function with some bound set of arguments</span>
+<span class="keyword">auto</span> <span class="identifier">helloworld</span><span class="special">=</span><span class="identifier">dispatcher</span><span class="special">.</span><span class="identifier">call</span><span class="special">([](</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span> <span class="identifier">text</span><span class="special">)</span> <span class="special">{</span>
+    <span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="identifier">text</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span>
+    <span class="keyword">return</span> <span class="number">42</span><span class="special">;</span>
+<span class="special">},</span> <span class="string">"Hello world"</span><span class="special">);</span>
+
+<span class="comment">// Schedule as asynchronous call of some function to occur only after helloworld completes</span>
+<span class="keyword">auto</span> <span class="identifier">addtovalue</span><span class="special">=</span><span class="identifier">dispatcher</span><span class="special">.</span><span class="identifier">call</span><span class="special">(</span><span class="identifier">helloworld</span><span class="special">.</span><span class="identifier">second</span><span class="special">,</span> <span class="special">[](</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">future</span><span class="special">&lt;</span><span class="keyword">int</span><span class="special">&gt;</span> <span class="identifier">v</span><span class="special">)</span> <span class="special">{</span>
+    <span class="keyword">return</span> <span class="identifier">v</span><span class="special">.</span><span class="identifier">get</span><span class="special">()+</span><span class="number">1</span><span class="special">;</span>
+<span class="special">},</span> <span class="identifier">helloworld</span><span class="special">.</span><span class="identifier">first</span><span class="special">);</span>
+
+<span class="comment">// Create a boost::future&lt;&gt; representing the ops passed to when_all() and wait for it to complete</span>
+<span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">when_all</span><span class="special">(</span><span class="identifier">addtovalue</span><span class="special">.</span><span class="identifier">second</span><span class="special">).</span><span class="identifier">wait</span><span class="special">();</span>
+
+<span class="comment">// Print the result returned by the future for the lambda, which will be 43</span>
+<span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="string">"addtovalue() returned "</span> <span class="special">&lt;&lt;</span> <span class="identifier">addtovalue</span><span class="special">.</span><span class="identifier">first</span><span class="special">.</span><span class="identifier">get</span><span class="special">()</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span>
+</pre>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2013 Niall Douglas and Paul Kirth<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="call_1_convenience_batch_bound_functions_without_preconditions.html"><img src="../../../../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../async_file_io_dispatcher_base.html"><img src="../../../../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../../../index.html"><img src="../../../../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="../async_io_op.html"><img src="../../../../../../../../doc/src/images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

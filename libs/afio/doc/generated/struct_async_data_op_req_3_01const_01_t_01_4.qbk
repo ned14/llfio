@@ -12,10 +12,10 @@
 [section:async_data_op_req_constt_ async_data_op_req< const T >]
 
 '''<indexterm><primary>async_data_op_req&lt; const T &gt;</primary></indexterm>'''
-A specialisation for any pointer to type const T. 
+A convenience bundle of precondition, data and where for writing from a single const T *. Data [*MUST] stay around until the operation completes. 
 
 [heading Synopsis]
-``template<class T>
+``template<class T, >
 struct async_data_op_req< const T >
       : public async_data_op_req< const void >
 {
@@ -27,20 +27,30 @@ struct async_data_op_req< const T >
 [table
 [[Parameter] [Description]]
 [[class T] []]
+[[] [Any readable type T ]]
 ]
 
 [heading Member Function(s)]
 [table
 [[Function] [Description] [Parameters]  [Returns]]
+[[``bool validate()``
+
+] [Validates contents for correctness. ] [
+
+][
+True if contents are correct 
+
+
+]]
 [[`` async_data_op_req()``
 
-] [] [
+] [Default constructor. ] [
 
 
 ]]
 [[`` async_data_op_req(const async_data_op_req & o)``
 
-] [] [[* const async_data_op_req &]: ['o]:  
+] [Copy constructor. ] [[* const async_data_op_req &]: ['o]:  
 
 
 
@@ -48,7 +58,7 @@ struct async_data_op_req< const T >
 ]]
 [[`` async_data_op_req(async_data_op_req && o)``
 
-] [] [[* async_data_op_req &&]: ['o]:  
+] [Move constructor. ] [[* async_data_op_req &&]: ['o]:  
 
 
 
@@ -56,7 +66,7 @@ struct async_data_op_req< const T >
 ]]
 [[`` async_data_op_req(const async_data_op_req< T > & o)``
 
-] [] [[* const async_data_op_req< T > &]: ['o]:  
+] [Copy constructor. ] [[* const async_data_op_req< T > &]: ['o]:  
 
 
 
@@ -64,7 +74,7 @@ struct async_data_op_req< const T >
 ]]
 [[`` async_data_op_req(async_data_op_req< T > && o)``
 
-] [] [[* async_data_op_req< T > &&]: ['o]:  
+] [Move constructor. ] [[* async_data_op_req< T > &&]: ['o]:  
 
 
 
@@ -72,7 +82,7 @@ struct async_data_op_req< const T >
 ]]
 [[``async_data_op_req & operator=(const async_data_op_req & o)``
 
-] [] [[* const async_data_op_req &]: ['o]:  
+] [Copy assignment. ] [[* const async_data_op_req &]: ['o]:  
 
 
 
@@ -80,21 +90,21 @@ struct async_data_op_req< const T >
 ]]
 [[``async_data_op_req & operator=(async_data_op_req && o)``
 
-] [] [[* async_data_op_req &&]: ['o]:  
+] [Move assignment. ] [[* async_data_op_req &&]: ['o]:  
 
 
 
 
 ]]
-[[`` async_data_op_req(async_io_op _precondition, const T * _buffer, size_t _length, off_t _where)``
+[[`` async_data_op_req(async_io_op _precondition, const T * v, size_t _length, off_t _where)``
 
-] [] [[* async_io_op]: ['_precondition]:  
+] [Constructs an instance. ] [[* async_io_op]: ['_precondition]:  An optional precondition for this operation 
 
-[* const T *]: ['_buffer]:  
+[* const T *]: ['v]:  A pointer to memory or reference to object into which to read or write 
 
-[* size_t]: ['_length]:  
+[* size_t]: ['_length]:  The number of bytes to transfer 
 
-[* off_t]: ['_where]:  
+[* off_t]: ['_where]:  The offset at which to transfer 
 
 
 

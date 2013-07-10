@@ -12,10 +12,10 @@
 [section:async_data_op_req_conststd_basic_string_c_t_a__ async_data_op_req< const std::basic_string< C, T, A > >]
 
 '''<indexterm><primary>async_data_op_req&lt; const std::basic_string&lt; C, T, A &gt; &gt;</primary></indexterm>'''
-A specialisation for any const std::basic_string<C, T, A> 
+A convenience bundle of precondition, data and where for writing from a [^`const std::basic_string<C, T, A>`]. Data [*MUST] stay around until the operation completes. 
 
 [heading Synopsis]
-``template<class C, class T, class A>
+``template<class C, class T, class A, , , >
 struct async_data_op_req< const std::basic_string< C, T, A > >
       : public async_data_op_req< const void >
 {
@@ -29,20 +29,32 @@ struct async_data_op_req< const std::basic_string< C, T, A > >
 [[class C] []]
 [[class T] []]
 [[class A] []]
+[[] [Any character type ]]
+[[] [Character traits type ]]
+[[] [Any STL allocator ]]
 ]
 
 [heading Member Function(s)]
 [table
 [[Function] [Description] [Parameters]  [Returns]]
+[[``bool validate()``
+
+] [Validates contents for correctness. ] [
+
+][
+True if contents are correct 
+
+
+]]
 [[`` async_data_op_req()``
 
-] [] [
+] [Default constructor. ] [
 
 
 ]]
 [[`` async_data_op_req(const async_data_op_req & o)``
 
-] [] [[* const async_data_op_req &]: ['o]:  
+] [Copy constructor. ] [[* const async_data_op_req &]: ['o]:  
 
 
 
@@ -50,7 +62,7 @@ struct async_data_op_req< const std::basic_string< C, T, A > >
 ]]
 [[`` async_data_op_req(async_data_op_req && o)``
 
-] [] [[* async_data_op_req &&]: ['o]:  
+] [Move constructor. ] [[* async_data_op_req &&]: ['o]:  
 
 
 
@@ -58,7 +70,7 @@ struct async_data_op_req< const std::basic_string< C, T, A > >
 ]]
 [[`` async_data_op_req(const async_data_op_req< std::basic_string< C, T, A >> & o)``
 
-] [] [[* const async_data_op_req< std::basic_string< C, T, A >> &]: ['o]:  
+] [Copy constructor. ] [[* const async_data_op_req< std::basic_string< C, T, A >> &]: ['o]:  
 
 
 
@@ -66,7 +78,7 @@ struct async_data_op_req< const std::basic_string< C, T, A > >
 ]]
 [[`` async_data_op_req(async_data_op_req< std::basic_string< C, T, A >> && o)``
 
-] [] [[* async_data_op_req< std::basic_string< C, T, A >> &&]: ['o]:  
+] [Move constructor. ] [[* async_data_op_req< std::basic_string< C, T, A >> &&]: ['o]:  
 
 
 
@@ -74,7 +86,7 @@ struct async_data_op_req< const std::basic_string< C, T, A > >
 ]]
 [[``async_data_op_req & operator=(const async_data_op_req & o)``
 
-] [] [[* const async_data_op_req &]: ['o]:  
+] [Copy assignment. ] [[* const async_data_op_req &]: ['o]:  
 
 
 
@@ -82,7 +94,7 @@ struct async_data_op_req< const std::basic_string< C, T, A > >
 ]]
 [[``async_data_op_req & operator=(async_data_op_req && o)``
 
-] [] [[* async_data_op_req &&]: ['o]:  
+] [Move constructor. ] [[* async_data_op_req &&]: ['o]:  
 
 
 
@@ -90,11 +102,11 @@ struct async_data_op_req< const std::basic_string< C, T, A > >
 ]]
 [[`` async_data_op_req(async_io_op _precondition, const std::basic_string< C, T, A > & v, off_t _where)``
 
-] [] [[* async_io_op]: ['_precondition]:  
+] [Constructs an instance. ] [[* async_io_op]: ['_precondition]:  An optional precondition for this operation 
 
-[* const std::basic_string< C, T, A > &]: ['v]:  
+[* const std::basic_string< C, T, A > &]: ['v]:  A pointer to memory or reference to object into which to read or write 
 
-[* off_t]: ['_where]:  
+[* off_t]: ['_where]:  The offset at which to transfer 
 
 
 
