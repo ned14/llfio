@@ -89,124 +89,7 @@ namespace boost {
     namespace afio {
         namespace detail {
             
-        
-/*! \class Int128
-\brief Declares a 128 bit SSE2/NEON compliant container. WILL throw exception if initialised unaligned.
-
-Implemented as a __m128i or NEON uint32x4_t if available, otherwise as long longs.
-*/
-class  BOOST_AFIO_TYPEALIGNMENT(16) Int128
-{
-	union
-	{
-		char asBytes[16];
-		unsigned int asInts[4];
-		unsigned long long asLongLongs[2];
-		size_t asSize_t;
-#if HAVE_M128
-		__m128i asM128;
-#endif
-#if HAVE_NEON128
-		uint32x4_t asNEON;
-#endif
-#ifdef __GNUC__
-		int __attribute__ ((vector_size(16))) vect16;
-#endif
-	} mydata;
-	void int_testAlignment() const
-	{
-#ifndef NDEBUG
-		if(((size_t)this) & 15) throw std::runtime_error("This object must be aligned to 16 bytes in memory!");
-#endif
-	}
-	static char int_tohex(int x)
-	{
-		return (char)((x>9) ? 'a'+x-10 : '0'+x);
-	}
-public:
-	//! Constructs an empty int
-	Int128() { int_testAlignment(); memset(this, 0, sizeof(*this)); }
-#if HAVE_M128
-	Int128(const Int128 &o) { int_testAlignment(); mydata.asM128=_mm_load_si128(&o.mydata.asM128); }
-	Int128 &operator=(const Int128 &o) { mydata.asM128=_mm_load_si128(&o.mydata.asM128); return *this; }
-	explicit Int128(const char *bytes) { int_testAlignment(); mydata.asM128=_mm_loadu_si128((const __m128i *) bytes); }
-	bool operator==(const Int128 &o) const
-	{
-		__m128i result;
-		result=_mm_cmpeq_epi32(mydata.asM128, o.mydata.asM128);
-		unsigned r=_mm_movemask_epi8(result);
-		return r==0xffff;
-	}
-#elif HAVE_NEON128
-	Int128(const Int128 &o) { int_testAlignment(); mydata.asNEON=o.mydata.asNEON; }
-	Int128 &operator=(const Int128 &o) { mydata.asNEON=o.mydata.asNEON; return *this; }
-	explicit Int128(const char *bytes) { int_testAlignment(); mydata.asNEON=vld1q_u32((const uint32_t *) bytes); }
-	bool operator==(const Int128 &o) const
-	{
-		uint32x4_t result;
-		result=vceqq_u32(mydata.asNEON, o.mydata.asNEON);
-		unsigned r=_mm_movemask_epi8_neon(result);
-		return r==0xffff;
-	}
-#else
-	//! Copies another int
-	Int128(const Int128 &o) { int_testAlignment(); memcpy(mydata.asBytes, o.mydata.asBytes, sizeof(mydata.asBytes)); }
-	//! Copies another int
-	Int128 &operator=(const Int128 &o) { memcpy(mydata.asBytes, o.mydata.asBytes, sizeof(mydata.asBytes)); return *this; }
-	//! Constructs a int from unaligned data
-	explicit Int128(const char *bytes) { int_testAlignment(); memcpy(mydata.asBytes, bytes, sizeof(mydata.asBytes)); }
-	bool operator==(const Int128 &o) const { return !memcmp(mydata.asBytes, o.mydata.asBytes, sizeof(mydata.asBytes)); }
-#endif
-	Int128(Int128 &&o) { *this=o; }
-	Int128 &operator=(Int128 &&o) { *this=o; return *this; }
-	bool operator!=(const Int128 &o) const { return !(*this==o); }
-	bool operator>(const Int128 &o) const { return memcmp(mydata.asBytes, o.mydata.asBytes, sizeof(mydata.asBytes))>0; }
-	bool operator<(const Int128 &o) const { return o>*this; }
-	bool operator>=(const Int128 &o) const { return !(o>*this); }
-	bool operator<=(const Int128 &o) const { return !(*this>o); }
-	//! Returns the int as bytes
-	const char *asBytes() const { return mydata.asBytes; }
-	//! Returns the int as ints
-	const unsigned int *asInts() const { return mydata.asInts; }
-	//! Returns the int as long longs
-	const unsigned long long *asLongLongs() const { return mydata.asLongLongs; }
-	//! Returns the front of the int as a size_t
-	size_t asSize_t() const { return mydata.asSize_t; }
-	//! Returns the int as a 64 character hexadecimal string
-	std::string asHexString() const
-	{
-		std::string ret(32, '0');
-		for(int i=0; i<16; i++)
-		{
-			unsigned char c=mydata.asBytes[i];
-			ret[i*2]=int_tohex(c>>4);
-			ret[i*2+1]=int_tohex(c&15);
-		}
-		return ret;
-	}
-	/*! \brief Fast gets \em no random Int128s.
-
-	Intel Ivy Bridge: Performance on 32 bit is approx. 2.95 cycles/byte. Performance on 64 bit is approx. 1.52 cycles/byte.
-
-	Intel Atom: Performance on 32 bit is approx. 9.38 cycles/byte. 
-	
-	ARM Cortex-A15: Performance on 32 bit is approx. 26.17 cycles/byte.
-	*/
-	static void FillFastRandom(Int128 *ints, size_t no);
-	//! Fast fills a vector with random Int128s
-	static inline void FillFastRandom(std::vector<Int128> &ints);
-	/*! \brief Quality gets \em no random Int128s.
-
-	Intel Ivy Bridge: Performance on 32 bit is approx. 2.95 cycles/byte. Performance on 64 bit is approx. 1.52 cycles/byte.
-
-	Intel Atom: Performance on 32 bit is approx. 9.38 cycles/byte. 
-	
-	ARM Cortex-A15: Performance on 32 bit is approx. 26.84 cycles/byte.
-	*/
-	static void FillQualityRandom(Int128 *ints, size_t no);
-	//! Quality fills a vector with random Int128s
-	static inline void FillQualityRandom(std::vector<Int128> &ints);
-};
+ 
 
 /*! \class Int256
 \brief Declares a 256 bit AVX2/SSE2/NEON compliant container. WILL throw exception if initialised unaligned.
@@ -342,35 +225,6 @@ public:
 	static inline void FillQualityRandom(std::vector<Int256> &ints);
 };
 
-/*! \class Hash128
-\brief Provides a 128 bit hash.
-
-To use this you must compile Int128_256.cpp.
-
-Intel Ivy Bridge: Fasthash (SpookyHash) performance on 32 bit is approx. 1.17 cycles/byte. Performance on 64 bit is approx. 0.31 cycles/byte.
-
-Intel Atom: Performance on 32 bit is approx. 3.38 cycles/byte
-
-ARM Cortex-A15: Performance on 32 bit is approx. 1.49 cycles/byte.
-*/
-class  Hash128 : public Int128
-{
-	static Int128 int_init()
-	{
-		// First 32 bits of the fractional parts of the square roots of the first 8 primes 2..19
-		static BOOST_AFIO_TYPEALIGNMENT(16) const unsigned int_iv[]={0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a,
-			0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19};
-		return *((Int128 *) int_iv);
-	}
-public:
-	//! Constructs an instance
-	Hash128() : Int128(int_init()) { }
-	explicit Hash128(const char *bytes) : Int128(bytes) { }
-	//! Adds fast hashed data to this hash.
-	void AddFastHashTo(const char *data, size_t length);
-	//! Batch adds fast hashed data to hashes.
-	static void BatchAddFastHashTo(size_t no, Hash128 *hashs, const char **data, size_t *length);
-};
 
 /*! \class Hash256
 \brief Provides a 256 bit hash.
@@ -410,8 +264,7 @@ public:
 	//! Constructs an instance
 	Hash256() : Int256(int_init()) { }
 	explicit Hash256(const char *bytes) : Int256(bytes) { }
-	//! Adds fast hashed data to this hash. Uses two threads if given >=1024 bytes and OpenMP support.
-	void AddFastHashTo(const char *data, size_t length);
+	
 	//! Adds SHA-256 data to this hash as a single operation.
 	void AddSHA256To(const char *data, size_t length);
 
@@ -422,14 +275,11 @@ public:
 	//! Begins an incremental batch hash. Tip: use FinishBatch(h, false) to avoid recreating this.
 	static BatchHashOp BeginBatch(size_t no, Hash256 *hashs);
 	//! Adds data to an incremental fast hash operation. Don't mix this with AddSHA256ToBatch() on the same BatchHashOp.
-	static void AddFastHashToBatch(BatchHashOp h, size_t items, const BatchItem *datas);
-	//! Adds data to an incremental SHA-256 operation. Don't mix this with AddSHA256ToBatch() on the same BatchHashOp.
+	
 	static void AddSHA256ToBatch(BatchHashOp h, size_t items, const BatchItem *datas);
 	//! Finishes an incremental batch hash
 	static void FinishBatch(BatchHashOp h, bool free=true);
 
-	//! Batch adds fast hashed data to hashes as a single operation.
-	static void BatchAddFastHashTo(size_t no, Hash256 *hashs, const char **data, size_t *length);
 	//! Batch adds SHA-256 data to hashes as a single operation.
 	static void BatchAddSHA256To(size_t no, Hash256 *hashs, const char **data, size_t *length);
 };
@@ -440,15 +290,6 @@ public:
 
 namespace std
 {
-	//! Defines a hash for a Int128 (simply truncates)
-	template<> class hash<boost::afio::detail::Int128>
-	{
-	public:
-		size_t operator()(const boost::afio::detail::Int128 &v) const
-		{
-			return v.asSize_t();
-		}
-	};
 	//! Defines a hash for a Int256 (simply truncates)
 	template<> class hash<boost::afio::detail::Int256>
 	{
@@ -458,12 +299,6 @@ namespace std
 			return v.asSize_t();
 		}
 	};
-#define TYPE_TO_BE_OVERRIDEN_FOR_STL_ALLOCATOR_USAGE boost::afio::detail::Int128
-#include "incl_stl_allocator_override.hpp"
-#undef TYPE_TO_BE_OVERRIDEN_FOR_STL_ALLOCATOR_USAGE
-#define TYPE_TO_BE_OVERRIDEN_FOR_STL_ALLOCATOR_USAGE boost::afio::detail::Hash128
-#include "incl_stl_allocator_override.hpp"
-#undef TYPE_TO_BE_OVERRIDEN_HashFOR_STL_ALLOCATOR_USAGE
 #define TYPE_TO_BE_OVERRIDEN_FOR_STL_ALLOCATOR_USAGE boost::afio::detail::Int256
 #include "incl_stl_allocator_override.hpp"
 #undef TYPE_TO_BE_OVERRIDEN_FOR_STL_ALLOCATOR_USAGE
@@ -475,8 +310,6 @@ namespace std
 namespace boost {
     namespace afio {
         namespace detail {
-	inline void Int128::FillFastRandom(std::vector<Int128> &ints) { FillFastRandom(ints.data(), ints.size()); }
-	inline void Int128::FillQualityRandom(std::vector<Int128> &ints) { FillQualityRandom(ints.data(), ints.size()); }
 	inline void Int256::FillFastRandom(std::vector<Int256> &ints) { FillFastRandom(ints.data(), ints.size()); }
 	inline void Int256::FillQualityRandom(std::vector<Int256> &ints) { FillQualityRandom(ints.data(), ints.size()); }
         } //namespace detail

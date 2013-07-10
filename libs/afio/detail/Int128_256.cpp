@@ -74,38 +74,7 @@ template<class generator_type> void FillRandom(char *buffer, size_t length)
 	}
 }
 
-void Int128::FillFastRandom(Int128 *ints, size_t no)
-{
-	size_t length=no*sizeof(*ints);
-	if(no && no!=length/sizeof(*ints)) abort();
-#if HAVE_M128 || HAVE_NEON128
-	// The Mersenne Twister's SIMD implementation beats all else
-#ifdef __LP64__
-	typedef mt19937_64 generator_type;
-#else
-	typedef mt19937 generator_type;
-#endif
-#else
-#ifdef __LP64__
-	typedef ranlux48_base generator_type;
-#else
-	typedef ranlux24_base generator_type;
-#endif
-#endif
-	FillRandom<generator_type>((char *) ints, length);
-}
 
-void Int128::FillQualityRandom(Int128 *ints, size_t no)
-{
-	size_t length=no*sizeof(*ints);
-	if(no && no!=length/sizeof(*ints)) abort();
-#ifdef __LP64__
-	typedef mt19937_64 generator_type;
-#else
-	typedef mt19937 generator_type;
-#endif
-	FillRandom<generator_type>((char *) ints, length);
-}
 
 void Int256::FillFastRandom(Int256 *ints, size_t no)
 {
@@ -138,36 +107,6 @@ void Int256::FillQualityRandom(Int256 *ints, size_t no)
 	typedef mt19937 generator_type;
 #endif
 	FillRandom<generator_type>((char *) ints, length);
-}
-
-void Hash128::AddFastHashTo(const char *data, size_t length)
-{
-	uint64 *spookyhash=(uint64 *) const_cast<unsigned long long *>(asLongLongs());
-	SpookyHash::Hash128(data, length, spookyhash, spookyhash+1);
-}
-
-void Hash128::BatchAddFastHashTo(size_t no, Hash128 *hashs, const char **data, size_t *length)
-{
-	// TODO: Implement a SIMD version of SpookyHash, and parallelise that too :)
-#pragma omp parallel for schedule(dynamic)
-	for(ptrdiff_t n=0; n<(ptrdiff_t) no; n++)
-		hashs[n].AddFastHashTo(data[n], length[n]);
-}
-
-
-void Hash256::AddFastHashTo(const char *data, size_t length)
-{
-	uint64 *spookyhash=(uint64 *) const_cast<unsigned long long *>(asLongLongs());
-	uint128 cityhash=*(uint128 *)(asLongLongs()+2);
-#pragma omp parallel for if(length>=1024)
-	for(int n=0; n<2; n++)
-	{
-		if(!n)
-			SpookyHash::Hash128(data, length, spookyhash, spookyhash+1);
-		else
-			cityhash=CityHash128WithSeed(data, length, cityhash);
-	}
-	*(uint128 *)(asLongLongs()+2)=cityhash;
 }
 
 void Hash256::AddSHA256To(const char *data, size_t length)
@@ -237,20 +176,7 @@ Hash256::BatchHashOp Hash256::BeginBatch(size_t no, Hash256 *hashs)
 {
 	return new HashOp(no, hashs);
 }
-void Hash256::AddFastHashToBatch(BatchHashOp _h, size_t items, const BatchItem *datas)
-{
-	auto h=(HashOp *) _h;
-	if(h->hashType==HashOp::HashType::Unknown)
-		h->hashType=HashOp::HashType::FastHash;
-	else if(h->hashType!=HashOp::HashType::FastHash)
-		throw std::runtime_error("You can't add a fast hash to a SHA-256 hash");
-#pragma omp parallel for schedule(dynamic)
-	for(ptrdiff_t n=0; n<(ptrdiff_t) items; n++)
-	{
-		auto &data=datas[n];
-		h->hashs[get<0>(data)].AddFastHashTo(get<1>(data), get<2>(data));
-	}
-}
+
 void Hash256::AddSHA256ToBatch(BatchHashOp _h, size_t no, const BatchItem *datas)
 {
 	auto h=(HashOp *) _h;
@@ -458,15 +384,6 @@ void Hash256::FinishBatch(BatchHashOp _h, bool free)
 		h->hashType=HashOp::HashType::Unknown;
 }
 
-void Hash256::BatchAddFastHashTo(size_t no, Hash256 *hashs, const char **data, size_t *length)
-{
-	HashOp h(no, hashs);
-	BatchItem *items=(BatchItem *) alloca(sizeof(BatchItem)*no);
-	for(size_t n=0; n<no; n++)
-		items[n]=BatchItem(n, data[n], length[n]);
-	AddFastHashToBatch(&h, no, items);
-	_FinishBatch(&h);
-}
 
 void Hash256::BatchAddSHA256To(size_t no, Hash256 *hashs, const char **data, size_t *length)
 {
