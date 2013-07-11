@@ -27,15 +27,8 @@ File Created: Mar 2013
 #include "config.hpp"
 #include "detail/Utility.hpp"
 
-#if BOOST_VERSION<105300
-#error I absolutely need Boost v1.53 or higher to compile (I need lock free containers).
-#endif
 #if BOOST_VERSION<105400
-#ifdef BOOST_MSVC
-#pragma message(__FILE__ ": WARNING: Boost v1.53 has a memory corruption bug in boost::packaged_task<> when built under C++11 which makes this library useless. Get a newer Boost!")
-#else
-#warning Boost v1.53 has a memory corruption bug in boost::packaged_task<> when built under C++11 which makes this library useless. Get a newer Boost!
-#endif
+#error Boosts before v1.54 have a memory corruption bug in boost::packaged_task<> when built under C++11 which makes this library useless. Get a newer Boost!
 #endif
 
 
@@ -186,13 +179,16 @@ class thread_pool {
 	boost::asio::io_service service;
 	boost::asio::io_service::work working;
 public:
-	//! Constructs a thread pool of \em no workers
+	/*! Constructs a thread pool of \em no workers
+    \param no The number of worker threads to create
+    */
 	explicit thread_pool(size_t no) : working(service)
 	{
 		workers.reserve(no);
 		for(size_t n=0; n<no; n++)
 			workers.push_back(std::unique_ptr<thread>(new thread(worker(this))));
 	}
+    //! Destroys the thread pool, waiting for worker threads to exit beforehand.
 	~thread_pool()
 	{
 		service.stop();
@@ -309,7 +305,8 @@ namespace detail {
 	class async_file_io_dispatcher_windows;
 	class async_file_io_dispatcher_linux;
 	class async_file_io_dispatcher_qnx;
-	//! \brief May occasionally be useful to access to discover information about an open handle
+	/*! \brief The abstract base class encapsulating a platform-specific file handle
+    */
 	class async_io_handle : public std::enable_shared_from_this<async_io_handle>
 	{
 		friend class async_file_io_dispatcher_base;
@@ -330,7 +327,7 @@ namespace detail {
 		virtual ~async_io_handle() { }
 		//! Returns the parent of this io handle
 		async_file_io_dispatcher_base *parent() const { return _parent; }
-		//! Returns the native handle of this io handle
+		//! Returns the native handle of this io handle. On POSIX, you can cast this to a fd using `(int)(size_t) native_handle()`. On Windows it's a simple `(HANDLE) native_handle()`.
 		virtual void *native_handle() const=0;
 		//! Returns when this handle was opened
 		const std::chrono::system_clock::time_point &opened() const { return _opened; }
@@ -411,9 +408,13 @@ BOOST_AFIO_DECLARE_CLASS_ENUM_AS_BITFIELD(async_op_flags)
 /*! \class async_file_io_dispatcher_base
 \brief Abstract base class for dispatching file i/o asynchronously
 
+This is a reference counted instance with platform-specific implementation optionally hidden in object code.
+
 \qbk{
 [include generated/group_async_file_io_dispatcher_base__completion.qbk]
 [include generated/group_async_file_io_dispatcher_base__call.qbk]
+[include generated/group_async_file_io_dispatcher_base__filedirops.qbk]
+[include generated/group_async_file_io_dispatcher_base__barrier.qbk]
 }
 */
 class BOOST_AFIO_DECL async_file_io_dispatcher_base : public std::enable_shared_from_this<async_file_io_dispatcher_base>
@@ -448,7 +449,7 @@ public:
 	typedef std::pair<bool, std::shared_ptr<detail::async_io_handle>> completion_returntype;
     //! The type of a completion handler \ingroup async_file_io_dispatcher_base__completion
 	typedef completion_returntype completion_t(size_t, std::shared_ptr<detail::async_io_handle>);
-	/*! \brief Invoke the specified functions when each of the supplied operations complete
+	/*! \brief Schedule a batch of asynchronous invocations of the specified functions when their supplied operations complete.
     \return A batch of op handles
     \param ops A batch of precondition op handles.
     \param callbacks A batch of pairs of op flags and bound completion handler functions of type `completion_t`
@@ -459,12 +460,12 @@ public:
     \qexample{completion_example}
     */
 	std::vector<async_io_op> completion(const std::vector<async_io_op> &ops, const std::vector<std::pair<async_op_flags, std::function<async_file_io_dispatcher_base::completion_t>>> &callbacks);
-	/*! \brief Invoke the specified single function when the supplied single operation completes
+	/*! \brief Schedule the asynchronous invocation of the specified single function when the supplied single operation completes.
     \return An op handle
     \param req A precondition op handle
     \param callback A pair of op flag and bound completion handler function of type `completion_t`
     \ingroup async_file_io_dispatcher_base__completion
-    \qbk{distinguish, convenience single bound function}
+    \qbk{distinguish, single bound function}
     \complexity{Amortised O(1) to dispatch. Amortised O(1) to complete.}
     \exceptionmodelstd
     \qexample{completion_example}
@@ -472,6 +473,10 @@ public:
 	inline async_io_op completion(const async_io_op &req, const std::pair<async_op_flags, std::function<async_file_io_dispatcher_base::completion_t>> &callback);
 
 	/*! \brief Schedule a batch of asynchronous invocations of the specified bound functions when their supplied preconditions complete.
+    
+    This is effectively a convenience wrapper for `completion()`. It creates a packaged_task matching the `completion_t`
+    handler specification and calls the specified arbitrary callable, always returning completion on exit.
+    
     \return A pair with a batch of futures returning the result of each of the callables and a batch of op handles.
     \tparam R A compiler deduced return type of the bound functions.
     \param ops A batch of precondition op handles. If default constructed, a precondition is null.
@@ -484,23 +489,33 @@ public:
     */
 	template<class R> inline std::pair<std::vector<future<R>>, std::vector<async_io_op>> call(const std::vector<async_io_op> &ops, const std::vector<std::function<R()>> &callables);
 	/*! \brief Schedule a batch of asynchronous invocations of the specified bound functions when their supplied preconditions complete.
+
+    This is effectively a convenience wrapper for `completion()`. It creates a packaged_task matching the `completion_t`
+    handler specification and calls the specified arbitrary callable, always returning completion on exit. If you
+    are seeing performance issues, using `completion()` directly will have much less overhead.
+    
     \return A pair with a batch of futures returning the result of each of the callables and a batch of op handles.
     \tparam R A compiler deduced return type of the bound functions.
     \param callables A batch of bound functions to call, returning R.
     \ingroup async_file_io_dispatcher_base__call
-    \qbk{distinguish, convenience batch bound functions without preconditions}
+    \qbk{distinguish, batch bound functions without preconditions}
     \complexity{Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete.}
     \exceptionmodelstd
     \qexample{call_example}
     */
 	template<class R> std::pair<std::vector<future<R>>, std::vector<async_io_op>> call(const std::vector<std::function<R()>> &callables) { return call(std::vector<async_io_op>(), callables); }
 	/*! \brief Schedule an asynchronous invocation of the specified bound function when its supplied precondition completes.
+
+    This is effectively a convenience wrapper for `completion()`. It creates a packaged_task matching the `completion_t`
+    handler specification and calls the specified arbitrary callable, always returning completion on exit. If you
+    are seeing performance issues, using `completion()` directly will have much less overhead.
+    
     \return A pair with a future returning the result of the callable and an op handle.
     \tparam R A compiler deduced return type of the bound functions.
     \param req A precondition op handle. If default constructed, the precondition is null.
     \param callback A bound functions to call, returning R.
     \ingroup async_file_io_dispatcher__call
-    \qbk{distinguish, convenience single bound function}
+    \qbk{distinguish, single bound function}
     \complexity{Amortised O(1) to dispatch. Amortised O(1) to complete.}
     \exceptionmodelstd
     \qexample{call_example}
@@ -509,6 +524,11 @@ public:
 	/*! \brief Schedule an asynchronous invocation of the specified unbound callable when its supplied precondition completes.
     Note that this function essentially calls `std::bind()` on the callable and the args and passes it to the other call() overload taking a `std::function<>`.
     You should therefore use `std::ref()` etc. as appropriate.
+
+    This is effectively a convenience wrapper for `completion()`. It creates a packaged_task matching the `completion_t`
+    handler specification and calls the specified arbitrary callable, always returning completion on exit. If you
+    are seeing performance issues, using `completion()` directly will have much less overhead.
+    
     \return A pair with a future returning the result of the callable and an op handle.
     \tparam C Any callable type.
     \tparam Args Any sequence of argument types.
@@ -516,56 +536,238 @@ public:
     \param callback An unbound callable to call.
     \param args An arbitrary sequence of arguments to bind to the callable.
     \ingroup async_file_io_dispatcher_base__call
-    \qbk{distinguish, convenience single unbound callable}
+    \qbk{distinguish, single unbound callable}
     \complexity{Amortised O(1) to dispatch. Amortised O(1) to complete.}
     \exceptionmodelstd
     \qexample{call_example}
     */
 	template<class C, class... Args> inline std::pair<future<typename std::result_of<C(Args...)>::type>, async_io_op> call(const async_io_op &req, C callback, Args... args);
 
-	//! Asynchronously creates directories
+	/*! \brief Schedule a batch of asynchronous directory creations and opens after optional preconditions.
+    \return A batch of op handles.
+    \param reqs A batch of `async_path_op_req` structures.
+    \ingroup async_file_io_dispatcher_base__filedirops
+    \qbk{distinguish, batch}
+    \complexity{Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete if directory creation is constant time.}
+    \exceptionmodelstd
+    \qexample{filedir_example}
+    */
 	virtual std::vector<async_io_op> dir(const std::vector<async_path_op_req> &reqs)=0;
-	//! Asynchronously creates a directory
+	/*! \brief Schedule an asynchronous directory creation and open after an optional precondition.
+    \return An op handle.
+    \param req An `async_path_op_req` structure.
+    \ingroup async_file_io_dispatcher_base__filedirops
+    \qbk{distinguish, single}
+    \complexity{Amortised O(1) to dispatch. Amortised O(1) to complete if directory creation is constant time.}
+    \exceptionmodelstd
+    \qexample{filedir_example}
+    */
 	inline async_io_op dir(const async_path_op_req &req);
-	//! Asynchronously deletes directories
+	/*! \brief Schedule a batch of asynchronous directory deletions after optional preconditions.
+    \return A batch of op handles.
+    \param reqs A batch of `async_path_op_req` structures.
+    \ingroup async_file_io_dispatcher_base__filedirops
+    \qbk{distinguish, batch}
+    \complexity{Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete if directory deletion is constant time.}
+    \exceptionmodelstd
+    \qexample{filedir_example}
+    */
 	virtual std::vector<async_io_op> rmdir(const std::vector<async_path_op_req> &reqs)=0;
-	//! Asynchronously deletes a directory
+	/*! \brief Schedule an asynchronous directory deletion after an optional precondition.
+    \return An op handle.
+    \param req An `async_path_op_req` structure.
+    \ingroup async_file_io_dispatcher_base__filedirops
+    \qbk{distinguish, single}
+    \complexity{Amortised O(1) to dispatch. Amortised O(1) to complete if directory deletion is constant time.}
+    \exceptionmodelstd
+    \qexample{filedir_example}
+    */
 	inline async_io_op rmdir(const async_path_op_req &req);
-	//! Asynchronously opens or creates files
+	/*! \brief Schedule a batch of asynchronous file creations and opens after optional preconditions.
+    \return A batch of op handles.
+    \param reqs A batch of `async_path_op_req` structures.
+    \ingroup async_file_io_dispatcher_base__filedirops
+    \qbk{distinguish, batch}
+    \complexity{Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete if file creation is constant time.}
+    \exceptionmodelstd
+    \qexample{filedir_example}
+    */
 	virtual std::vector<async_io_op> file(const std::vector<async_path_op_req> &reqs)=0;
-	//! Asynchronously opens or creates a file
+	/*! \brief Schedule an asynchronous file creation and open after an optional precondition.
+    \return An op handle.
+    \param req An `async_path_op_req` structure.
+    \ingroup async_file_io_dispatcher_base__filedirops
+    \qbk{distinguish, single}
+    \complexity{Amortised O(1) to dispatch. Amortised O(1) to complete if file creation is constant time.}
+    \exceptionmodelstd
+    \qexample{filedir_example}
+    */
 	inline async_io_op file(const async_path_op_req &req);
-	//! Asynchronously deletes files
+	/*! \brief Schedule a batch of asynchronous file deletions after optional preconditions.
+    \return A batch of op handles.
+    \param reqs A batch of `async_path_op_req` structures.
+    \ingroup async_file_io_dispatcher_base__filedirops
+    \qbk{distinguish, batch}
+    \complexity{Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete if file deletion is constant time.}
+    \exceptionmodelstd
+    \qexample{filedir_example}
+    */
 	virtual std::vector<async_io_op> rmfile(const std::vector<async_path_op_req> &reqs)=0;
-	//! Asynchronously deletes files
+	/*! \brief Schedule an asynchronous file deletion after an optional precondition.
+    \return An op handle.
+    \param req An `async_path_op_req` structure.
+    \ingroup async_file_io_dispatcher_base__filedirops
+    \qbk{distinguish, single}
+    \complexity{Amortised O(1) to dispatch. Amortised O(1) to complete if file deletion is constant time.}
+    \exceptionmodelstd
+    \qexample{filedir_example}
+    */
 	inline async_io_op rmfile(const async_path_op_req &req);
-	//! Asynchronously synchronises items with physical storage once they complete
+	/*! \brief Schedule a batch of asynchronous content synchronisations with physical storage after preceding operations.
+    \return A batch of op handles.
+    \param ops A batch of op handles.
+    \ingroup async_file_io_dispatcher_base__filedirops
+    \qbk{distinguish, batch}
+    \complexity{Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete if content synchronisation is constant time (which is extremely unlikely).}
+    \exceptionmodelstd
+    \qexample{sync_example}
+    */
 	virtual std::vector<async_io_op> sync(const std::vector<async_io_op> &ops)=0;
-	//! Asynchronously synchronises an item with physical storage once it completes
+	/*! \brief Schedule an asynchronous content synchronisation with physical storage after a preceding operation.
+    \return An op handle.
+    \param req An op handle.
+    \ingroup async_file_io_dispatcher_base__filedirops
+    \qbk{distinguish, single}
+    \complexity{Amortised O(1) to dispatch. Amortised O(1) to complete if content synchronisation is constant time (which is extremely unlikely).}
+    \exceptionmodelstd
+    \qexample{sync_example}
+    */
 	inline async_io_op sync(const async_io_op &req);
-	//! Asynchronously closes connections to items once they complete
+	/*! \brief Schedule a batch of asynchronous file or directory handle closes after preceding operations.
+    \return A batch of op handles.
+    \param ops A batch of op handles.
+    \ingroup async_file_io_dispatcher_base__filedirops
+    \qbk{distinguish, batch}
+    \complexity{Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete if closing handles is constant time.}
+    \exceptionmodelstd
+    \qexample{filedir_example}
+    */
 	virtual std::vector<async_io_op> close(const std::vector<async_io_op> &ops)=0;
-	//! Asynchronously closes the connection to an item once it completes
+	/*! \brief Schedule an asynchronous file or directory handle close after a preceding operation.
+    \return An op handle.
+    \param req An op handle.
+    \ingroup async_file_io_dispatcher_base__filedirops
+    \qbk{distinguish, single}
+    \complexity{Amortised O(1) to dispatch. Amortised O(1) to complete if closing handles is constant time.}
+    \exceptionmodelstd
+    \qexample{filedir_example}
+    */
 	inline async_io_op close(const async_io_op &req);
 
-	//! Asynchronously reads data from items
+	/*! \brief Schedule a batch of asynchronous data reads after preceding operations.
+    \return A batch of op handles.
+    \param ops A batch of `async_data_op_req<void>` structures.
+    \ingroup async_file_io_dispatcher_base__filedirops
+    \qbk{distinguish, batch}
+    \complexity{Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete if reading data is constant time.}
+    \exceptionmodelstd
+    \qexample{readwrite_example}
+    */
 	virtual std::vector<async_io_op> read(const std::vector<async_data_op_req<void>> &ops)=0;
-	//! Asynchronously reads data from an item
+	/*! \brief Schedule an asynchronous data read after a preceding operation.
+    \return An op handle.
+    \param req An `async_data_op_req<void>` structure.
+    \ingroup async_file_io_dispatcher_base__filedirops
+    \qbk{distinguish, single}
+    \complexity{Amortised O(1) to dispatch. Amortised O(1) to complete if reading data is constant time.}
+    \exceptionmodelstd
+    \qexample{readwrite_example}
+    */
 	inline async_io_op read(const async_data_op_req<void> &req);
-	//! Asynchronously reads data from items
+	/*! \brief Schedule a batch of asynchronous data reads after preceding operations.
+    \return A batch of op handles.
+    \tparam T Any arbitrary type.
+    \param ops A batch of `async_data_op_req<T>` structures.
+    \ingroup async_file_io_dispatcher_base__filedirops
+    \qbk{distinguish, batch}
+    \complexity{Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete if reading data is constant time.}
+    \exceptionmodelstd
+    \qexample{readwrite_example}
+    */
 	template<class T> inline std::vector<async_io_op> read(const std::vector<async_data_op_req<T>> &ops);
-	//! Asynchronously writes data to items
+	/*! \brief Schedule a batch of asynchronous data writes after preceding operations.
+    \return A batch of op handles.
+    \param ops A batch of `async_data_op_req<const void>` structures.
+    \ingroup async_file_io_dispatcher_base__filedirops
+    \qbk{distinguish, batch}
+    \complexity{Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete if writing data is constant time.}
+    \exceptionmodelstd
+    \qexample{readwrite_example}
+    */
 	virtual std::vector<async_io_op> write(const std::vector<async_data_op_req<const void>> &ops)=0;
-	//! Asynchronously writes data to an item
+	/*! \brief Schedule an asynchronous data write after a preceding operation.
+    \return An op handle.
+    \param req An `async_data_op_req<const void>` structure.
+    \ingroup async_file_io_dispatcher_base__filedirops
+    \qbk{distinguish, single}
+    \complexity{Amortised O(1) to dispatch. Amortised O(1) to complete if writing data is constant time.}
+    \exceptionmodelstd
+    \qexample{readwrite_example}
+    */
 	inline async_io_op write(const async_data_op_req<const void> &req);
-	//! Asynchronously writes data to items
+	/*! \brief Schedule a batch of asynchronous data writes after preceding operations.
+    \return A batch of op handles.
+    \tparam T Any arbitrary type.
+    \param ops A batch of `async_data_op_req<T>` structures.
+    \ingroup async_file_io_dispatcher_base__filedirops
+    \qbk{distinguish, batch}
+    \complexity{Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete if writing data is constant time.}
+    \exceptionmodelstd
+    \qexample{readwrite_example}
+    */
 	template<class T> inline std::vector<async_io_op> write(const std::vector<async_data_op_req<T>> &ops);
 
-	//! Truncates the lengths of items
+	/*! \brief Schedule a batch of asynchronous file length truncations after preceding operations.
+    \return A batch of op handles.
+    \param ops A batch of op handles.
+    \param sizes A batch of new lengths.
+    \ingroup async_file_io_dispatcher_base__filedirops
+    \qbk{distinguish, batch}
+    \complexity{Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete if truncating file lengths is constant time.}
+    \exceptionmodelstd
+    \qexample{truncate_example}
+    */
 	virtual std::vector<async_io_op> truncate(const std::vector<async_io_op> &ops, const std::vector<off_t> &sizes)=0;
-	//! Truncates the length of an item
+	/*! \brief Schedule an asynchronous data write after a preceding operation.
+    \return An op handle.
+    \param op An op handle.
+    \param newsize The new size for the file.
+    \ingroup async_file_io_dispatcher_base__filedirops
+    \qbk{distinguish, single}
+    \complexity{Amortised O(1) to dispatch. Amortised O(1) to complete if truncating file lengths is constant time.}
+    \exceptionmodelstd
+    \qexample{truncate_example}
+    */
 	inline async_io_op truncate(const async_io_op &op, off_t newsize);
-	//! Completes each of the supplied ops when and only when the last of the supplied ops completes
+	/*! \brief Schedule an asynchronous synchronisation of preceding operations.
+    
+    If you perform many asynchronous operations of unequal duration but wish to schedule one of more operations
+    to occur only after \b all of those operations have completed, this is the correct function to use. The returned
+    batch of ops exactly match the input batch of ops (including their exception states), but they will only
+    complete when the last of the input batch of ops completes.
+    
+    \note If an input op is in an exceptioned state at the point of entry into this function, this function
+    will propagate the exception there and then. \em Only error states which occur \em after this function
+    has been scheduled are propagated into the output set of ops.
+    
+    \return A batch of op handles.
+    \param ops A batch of op handles.
+    \ingroup async_file_io_dispatcher_base__barrier
+    \qbk{distinguish, batch}
+    \complexity{Amortised O(N) to dispatch. Amortised O(N) to complete.}
+    \exceptionmodel{See detailed description above.}
+    \qexample{barrier_example}
+    */
 	std::vector<async_io_op> barrier(const std::vector<async_io_op> &ops);
 protected:
 	void complete_async_op(size_t id, std::shared_ptr<detail::async_io_handle> h, exception_ptr e=exception_ptr());
@@ -597,7 +799,12 @@ For slow hard drives, or worse, SANs, a queue depth of 64 or higher might delive
 extern BOOST_AFIO_DECL std::shared_ptr<async_file_io_dispatcher_base> async_file_io_dispatcher(thread_pool &threadpool=process_threadpool(), file_flags flagsforce=file_flags::None, file_flags flagsmask=file_flags::None);
 
 /*! \struct async_io_op
-\brief A reference to an async operation
+\brief A reference to an asynchronous operation
+
+The id field is always valid (and non-zero) if this reference is valid. The h field, being the shared state
+between all references referring to the same op, only becomes a non-default shared_future when the op has
+actually begun execution. You should therefore \b never try waiting via h->get() until you are absolutely sure
+that the op has already started.
 */
 struct async_io_op
 {
@@ -605,12 +812,26 @@ struct async_io_op
 	size_t id;											//!< A unique id for this operation
 	std::shared_ptr<shared_future<std::shared_ptr<detail::async_io_handle>>> h;	//!< A future handle to the item being operated upon
 
+    //! \constr
 	async_io_op() : id(0), h(std::make_shared<shared_future<std::shared_ptr<detail::async_io_handle>>>()) { }
+    //! \cconstr
 	async_io_op(const async_io_op &o) : parent(o.parent), id(o.id), h(o.h) { }
+    //! \mconstr
 	async_io_op(async_io_op &&o) : parent(std::move(o.parent)), id(std::move(o.id)), h(std::move(o.h)) { }
+    /*! Constructs an instance.
+    \param _parent The dispatcher this op belongs to.
+    \param _id The unique non-zero id of this op.
+    \param _handle A shared_ptr to shared state between all instances of this reference.
+    */
 	async_io_op(std::shared_ptr<async_file_io_dispatcher_base> _parent, size_t _id, std::shared_ptr<shared_future<std::shared_ptr<detail::async_io_handle>>> _handle) : parent(_parent), id(_id), h(std::move(_handle)) { _validate(); }
+    /*! Constructs an instance.
+    \param _parent The dispatcher this op belongs to.
+    \param _id The unique non-zero id of this op.
+    */
 	async_io_op(std::shared_ptr<async_file_io_dispatcher_base> _parent, size_t _id) : parent(_parent), id(_id), h(std::make_shared<shared_future<std::shared_ptr<detail::async_io_handle>>>()) { }
+    //! \cassign
 	async_io_op &operator=(const async_io_op &o) { parent=o.parent; id=o.id; h=o.h; return *this; }
+    //! \massign
 	async_io_op &operator=(async_io_op &&o) { parent=std::move(o.parent); id=std::move(o.id); h=std::move(o.h); return *this; }
 	//! Validates contents
 	bool validate() const
@@ -790,21 +1011,49 @@ inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(as
 */
 struct async_path_op_req
 {
-	std::filesystem::path path;
-	file_flags flags;
-	async_io_op precondition;
+	std::filesystem::path path; //!< The filing system path to be used for this operation
+	file_flags flags;           //!< The flags to be used for this operation (note they can be overriden by flags passed during dispatcher construction).
+	async_io_op precondition;   //!< An optional precondition for this operation
+    //! \constr
 	async_path_op_req() : flags(file_flags::None) { }
-	//! Fails is path is not absolute
+	/*! \brief Constructs an instance.
+    
+    Note that this will fail if path is not absolute.
+    
+    \param _path The filing system path to be used. Must be absolute.
+    \param _flags The flags to be used.
+    */
 	async_path_op_req(std::filesystem::path _path, file_flags _flags=file_flags::None) : path(_path), flags(_flags) { if(!path.is_absolute()) throw std::runtime_error("Non-absolute path"); }
-	//! Fails is path is not absolute
+	/*! \brief Constructs an instance.
+    
+    Note that this will fail if path is not absolute.
+    
+    \param _precondition The precondition for this operation.
+    \param _path The filing system path to be used. Must be absolute.
+    \param _flags The flags to be used.
+    */
 	async_path_op_req(async_io_op _precondition, std::filesystem::path _path, file_flags _flags=file_flags::None) : path(_path), flags(_flags), precondition(std::move(_precondition)) { _validate(); if(!path.is_absolute()) throw std::runtime_error("Non-absolute path"); }
-	//! Constructs on the basis of a string. make_preferred() and absolute() are called in this case.
+	/*! \brief Constructs an instance.
+    \param _path The filing system leaf or path to be used. make_preferred() and absolute() will be used to convert the string into an absolute path.
+    \param _flags The flags to be used.
+    */
 	async_path_op_req(std::string _path, file_flags _flags=file_flags::None) : path(std::filesystem::absolute(std::filesystem::path(_path).make_preferred())), flags(_flags) { _validate(); }
-	//! Constructs on the basis of a string. make_preferred() and absolute() are called in this case.
+	/*! \brief Constructs an instance.
+    \param _precondition The precondition for this operation.
+    \param _path The filing system leaf or path to be used. make_preferred() and absolute() will be used to convert the string into an absolute path.
+    \param _flags The flags to be used.
+    */
 	async_path_op_req(async_io_op _precondition, std::string _path, file_flags _flags=file_flags::None) : path(std::filesystem::absolute(std::filesystem::path(_path).make_preferred())), flags(_flags), precondition(std::move(_precondition)) { _validate(); }
-	//! Constructs on the basis of a string. make_preferred() and absolute() are called in this case.
+	/*! \brief Constructs an instance.
+    \param _path The filing system leaf or path to be used. make_preferred() and absolute() will be used to convert the string into an absolute path.
+    \param _flags The flags to be used.
+    */
 	async_path_op_req(const char *_path, file_flags _flags=file_flags::None) : path(std::filesystem::absolute(std::filesystem::path(_path).make_preferred())), flags(_flags) { _validate(); }
-	//! Constructs on the basis of a string. make_preferred() and absolute() are called in this case.
+	/*! \brief Constructs an instance.
+    \param _precondition The precondition for this operation.
+    \param _path The filing system leaf or path to be used. make_preferred() and absolute() will be used to convert the string into an absolute path.
+    \param _flags The flags to be used.
+    */
 	async_path_op_req(async_io_op _precondition, const char *_path, file_flags _flags=file_flags::None) : path(std::filesystem::absolute(std::filesystem::path(_path).make_preferred())), flags(_flags), precondition(std::move(_precondition)) { _validate(); }
 	//! Validates contents
 	bool validate() const

@@ -12,7 +12,7 @@
 [section:detail_async_io_handle detail::async_io_handle]
 
 '''<indexterm><primary>detail</primary></indexterm><indexterm><primary>async_io_handle</primary></indexterm>'''
-May occasionally be useful to access to discover information about an open handle. 
+The abstract base class encapsulating a platform-specific file handle. 
 
 [heading Synopsis]
 ``class detail::async_io_handle
@@ -44,7 +44,7 @@ May occasionally be useful to access to discover information about an open handl
 ]]
 [[``void * native_handle()``
 
-] [Returns the native handle of this io handle. ] [
+] [Returns the native handle of this io handle. On POSIX, you can cast this to a fd using [^`(int)(size_t) ``native_handle()`]. On Windows it's a simple [^`(HANDLE) ``native_handle()`]. ] [
 
 
 ]]

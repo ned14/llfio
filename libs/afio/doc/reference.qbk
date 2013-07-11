@@ -14,7 +14,7 @@
 [include generated/group_file_flags.qbk]
 [endsect]
 
-[section:types Types]
+[section:structs Structures]
 [section:async_data_op_req async_data_op_req]
 [include generated/struct_async_data_op_req.qbk]
 [include generated/struct_async_data_op_req_3_01const_01_t_01_4.qbk]
@@ -27,10 +27,11 @@
 [include generated/struct_async_data_op_req_3_01std_1_1vector_3_01_t_00_01_a_01_4_01_4.qbk]
 [include generated/struct_async_data_op_req_3_01void_01_4.qbk]
 [endsect]
-
-[include generated/class_async_file_io_dispatcher_base.qbk]
 [include generated/struct_async_io_op.qbk]
 [include generated/struct_async_path_op_req.qbk]
+[endsect]
+[section:classes Classes]
+[include generated/class_async_file_io_dispatcher_base.qbk]
 [include generated/class_detail_1_1async_io_handle.qbk]
 [include generated/class_thread_pool.qbk]
 [endsect]

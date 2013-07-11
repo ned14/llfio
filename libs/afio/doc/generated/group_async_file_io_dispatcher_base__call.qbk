@@ -14,6 +14,9 @@
 '''<indexterm><primary>call</primary></indexterm>'''
 Schedule a batch of asynchronous invocations of the specified bound functions when their supplied preconditions complete. 
 
+[heading Description]
+This is effectively a convenience wrapper for [^`completion()`]. It creates a packaged\u005ftask matching the [^`completion_t`] handler specification and calls the specified arbitrary callable, always returning completion on exit.
+
 [heading Synopsis]
 ``template<class R, >
 std::pair< std::vector< future< R > >, std::vector< async_io_op > > async_file_io_dispatcher_base::call(const std::vector< async_io_op > & ops, const std::vector< std::function< R()>> & callables)``
@@ -42,10 +45,13 @@ A pair with a batch of futures returning the result of each of the callables and
 
 [endsect]
 
-[section:call_1_convenience_batch_bound_functions_without_preconditions call (convenience batch bound functions without preconditions)]
+[section:call_1_batch_bound_functions_without_preconditions call (batch bound functions without preconditions)]
 
 '''<indexterm><primary>call</primary></indexterm>'''
 Schedule a batch of asynchronous invocations of the specified bound functions when their supplied preconditions complete. 
+
+[heading Description]
+This is effectively a convenience wrapper for [^`completion()`]. It creates a packaged\u005ftask matching the [^`completion_t`] handler specification and calls the specified arbitrary callable, always returning completion on exit. If you are seeing performance issues, using [^`completion()`] directly will have much less overhead.
 
 [heading Synopsis]
 ``template<class R, >
@@ -74,10 +80,13 @@ A pair with a batch of futures returning the result of each of the callables and
 
 [endsect]
 
-[section:call_3_convenience_single_unbound_callable call (convenience single unbound callable)]
+[section:call_3_single_unbound_callable call (single unbound callable)]
 
 '''<indexterm><primary>call</primary></indexterm>'''
 Schedule an asynchronous invocation of the specified unbound callable when its supplied precondition completes. Note that this function essentially calls [^`std::bind()`] on the callable and the args and passes it to the other call() overload taking a [^`std::function<>`]. You should therefore use [^`std::ref()`] etc. as appropriate. 
+
+[heading Description]
+This is effectively a convenience wrapper for [^`completion()`]. It creates a packaged\u005ftask matching the [^`completion_t`] handler specification and calls the specified arbitrary callable, always returning completion on exit. If you are seeing performance issues, using [^`completion()`] directly will have much less overhead.
 
 [heading Synopsis]
 ``template<class C, class... Args, >

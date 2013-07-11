@@ -26,7 +26,7 @@ A very simple thread pool based on Boost.ASIO and std::thread.
 [[Function] [Description] [Parameters] ]
 [[``thread_pool(size_t no)``
 
-] [Constructs a thread pool of ['no] workers. ] [[* size_t]: ['no]:  
+] [] [[* size_t]: ['no]:  The number of worker threads to create 
 
 
 
@@ -34,7 +34,7 @@ A very simple thread pool based on Boost.ASIO and std::thread.
 ]]
 [[``~thread_pool()``
 
-] [] [
+] [Destroys the thread pool, waiting for worker threads to exit beforehand. ] [
 
 
 ]]

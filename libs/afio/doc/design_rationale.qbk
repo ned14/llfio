@@ -6,6 +6,32 @@
 
 [section:design Design Rationale]
 
-Todo
+__boost_afio__ came about out of the need for a scalable, high performance, portable asynchronous
+file i/o implementation library for a forthcoming filing system based graph store ACID compliant
+persistence layer called TripleGit (with which I hope to implement portable Component Objects for
+C++ extending C++ Modules, which is why I am unfortunately unable to reuse [@http://unqlite.org/ the UnQLite embedded
+NoSQL database engine] which is otherwise exactly what I need). The fact that one was needed at all came as a bit of a surprise: one
+thinks of these things as done and dusted decades ago, but it turns out that
+[@http://nikhilm.github.io/uvbook/filesystem.html libuv], a C library, is good enough for most
+people needing asynchronous file i/o. However as great as libuv is, it isn't very C++-ish, and
+hooking it in with __boost_asio__ (parts of which are expected to enter the ISO C++ language
+standard) isn't particularly clean. I therefore resolved to write a native Boost asynchronous
+file i/o implementation, and keep it as simple as possible.
+
+__boost_afio__ is actually, of course, really a different take on Google's __WG21_N3562__
+and Microsoft's __WG21_N3634__. Both Google and Microsoft, like many other big iron C++ users, have much need to
+asynchronously execute large numbers of closures (bound function objects) with various
+dependencies between the completion of one or more closures and the ability to start
+one or more other closures. What one effectively does is to create a 'dependency chain'
+of small items to be executed, and then fire as many compute resources as possible at
+those chains, executing as many of them simultaneously as is permitted by the requirements
+of the dependency chains. __boost_afio__ differs from N3562 by directly extending Boost.ASIO,
+so if you're already using Boost.ASIO to do your networking, well it's a real cinch to
+add in asynchronous closure execution e.g. if a packet of data arrives, do this set of
+operations according to this dependency chain. __boost_afio__ differs from N3634 by going
+a lot further than N3634 does by having explicit support for both Boost.ASIO and
+targeted file i/o support infrastructure. __boost_afio__ therefore lies somewhere in
+between N3562 and N3634 in terms of complexity, but instead of specifying a new system
+of executors it uses Boost.ASIO as the executor.
 
 [endsect] [/ end of section Design Rationale]

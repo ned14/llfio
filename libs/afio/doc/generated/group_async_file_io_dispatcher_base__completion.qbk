@@ -12,7 +12,7 @@
 [section:completion_2_batch_bound_functions completion (batch bound functions)]
 
 '''<indexterm><primary>completion</primary></indexterm>'''
-Invoke the specified functions when each of the supplied operations complete. 
+Schedule a batch of asynchronous invocations of the specified functions when their supplied operations complete. 
 
 [heading Synopsis]
 ``std::vector<async_io_op> async_file_io_dispatcher_base::completion(const std::vector< async_io_op > & ops, const std::vector< std::pair< async_op_flags, std::function< async_file_io_dispatcher_base::completion_t >>> & callbacks)``
@@ -39,10 +39,10 @@ A batch of op handles
 
 [endsect]
 
-[section:completion_2_convenience_single_bound_function completion (convenience single bound function)]
+[section:completion_2_single_bound_function completion (single bound function)]
 
 '''<indexterm><primary>completion</primary></indexterm>'''
-Invoke the specified single function when the supplied single operation completes. 
+Schedule the asynchronous invocation of the specified single function when the supplied single operation completes. 
 
 [heading Synopsis]
 ``async_io_op async_file_io_dispatcher_base::completion(const async_io_op & req, const std::pair< async_op_flags, std::function< async_file_io_dispatcher_base::completion_t >> & callback)``

@@ -29,17 +29,59 @@
 <div class="toc"><dl class="toc">
 <dt><span class="section"><a href="async_file_io_dispatcher_base/completion_2_batch_bound_functions.html">completion
           (batch bound functions)</a></span></dt>
-<dt><span class="section"><a href="async_file_io_dispatcher_base/completion_2_convenience_single_bound_function.html">completion
-          (convenience single bound function)</a></span></dt>
+<dt><span class="section"><a href="async_file_io_dispatcher_base/completion_2_single_bound_function.html">completion
+          (single bound function)</a></span></dt>
 <dt><span class="section"><a href="async_file_io_dispatcher_base/call_2_batch_bound_functions.html">call
           (batch bound functions)</a></span></dt>
-<dt><span class="section"><a href="async_file_io_dispatcher_base/call_1_convenience_batch_bound_functions_without_preconditions.html">call
-          (convenience batch bound functions without preconditions)</a></span></dt>
-<dt><span class="section"><a href="async_file_io_dispatcher_base/call_3_convenience_single_unbound_callable.html">call
-          (convenience single unbound callable)</a></span></dt>
+<dt><span class="section"><a href="async_file_io_dispatcher_base/call_1_batch_bound_functions_without_preconditions.html">call
+          (batch bound functions without preconditions)</a></span></dt>
+<dt><span class="section"><a href="async_file_io_dispatcher_base/call_3_single_unbound_callable.html">call
+          (single unbound callable)</a></span></dt>
+<dt><span class="section"><a href="async_file_io_dispatcher_base/close_1_batch.html">close
+          (batch)</a></span></dt>
+<dt><span class="section"><a href="async_file_io_dispatcher_base/close_1_single.html">close
+          (single)</a></span></dt>
+<dt><span class="section"><a href="async_file_io_dispatcher_base/dir_1_batch.html">dir
+          (batch)</a></span></dt>
+<dt><span class="section"><a href="async_file_io_dispatcher_base/dir_1_single.html">dir
+          (single)</a></span></dt>
+<dt><span class="section"><a href="async_file_io_dispatcher_base/file_1_batch.html">file
+          (batch)</a></span></dt>
+<dt><span class="section"><a href="async_file_io_dispatcher_base/file_1_single.html">file
+          (single)</a></span></dt>
+<dt><span class="section"><a href="async_file_io_dispatcher_base/read_1_batch.html">read
+          (batch)</a></span></dt>
+<dt><span class="section"><a href="async_file_io_dispatcher_base/read_1_single.html">read
+          (single)</a></span></dt>
+<dt><span class="section"><a href="async_file_io_dispatcher_base/read_1_batch0.html">read
+          (batch)</a></span></dt>
+<dt><span class="section"><a href="async_file_io_dispatcher_base/rmdir_1_batch.html">rmdir
+          (batch)</a></span></dt>
+<dt><span class="section"><a href="async_file_io_dispatcher_base/rmdir_1_single.html">rmdir
+          (single)</a></span></dt>
+<dt><span class="section"><a href="async_file_io_dispatcher_base/rmfile_1_batch.html">rmfile
+          (batch)</a></span></dt>
+<dt><span class="section"><a href="async_file_io_dispatcher_base/rmfile_1_single.html">rmfile
+          (single)</a></span></dt>
+<dt><span class="section"><a href="async_file_io_dispatcher_base/sync_1_batch.html">sync
+          (batch)</a></span></dt>
+<dt><span class="section"><a href="async_file_io_dispatcher_base/sync_1_single.html">sync
+          (single)</a></span></dt>
+<dt><span class="section"><a href="async_file_io_dispatcher_base/truncate_2_batch.html">truncate
+          (batch)</a></span></dt>
+<dt><span class="section"><a href="async_file_io_dispatcher_base/truncate_2_single.html">truncate
+          (single)</a></span></dt>
+<dt><span class="section"><a href="async_file_io_dispatcher_base/write_1_batch.html">write
+          (batch)</a></span></dt>
+<dt><span class="section"><a href="async_file_io_dispatcher_base/write_1_single.html">write
+          (single)</a></span></dt>
+<dt><span class="section"><a href="async_file_io_dispatcher_base/write_1_batch0.html">write
+          (batch)</a></span></dt>
+<dt><span class="section"><a href="async_file_io_dispatcher_base/barrier.html">barrier
+          (batch)</a></span></dt>
 </dl></div>
 <p>
-          <a class="indexterm" name="id914314"></a>
+          <a class="indexterm" name="id909945"></a>
 Abstract base class for dispatching file i/o asynchronously.
         </p>
 <h6>
@@ -103,6 +145,7 @@ Abstract base class for dispatching file i/o asynchronously.
 <col>
 <col>
 <col>
+<col>
 </colgroup>
 <thead><tr>
 <th>
@@ -138,6 +181,7 @@ Abstract base class for dispatching file i/o asynchronously.
                 </td>
 <td>
                 </td>
+<td class="auto-generated">&#160;</td>
 </tr>
 <tr>
 <td>
@@ -154,6 +198,7 @@ Abstract base class for dispatching file i/o asynchronously.
                     <span class="bold"><strong>file_flags</strong></span>: <span class="emphasis"><em>flags</em></span>:
                   </p>
                 </td>
+<td class="auto-generated">&#160;</td>
 </tr>
 <tr>
 <td>
@@ -166,6 +211,7 @@ Abstract base class for dispatching file i/o asynchronously.
                 </td>
 <td>
                 </td>
+<td class="auto-generated">&#160;</td>
 </tr>
 <tr>
 <td>
@@ -178,6 +224,7 @@ Abstract base class for dispatching file i/o asynchronously.
                 </td>
 <td>
                 </td>
+<td class="auto-generated">&#160;</td>
 </tr>
 <tr>
 <td>
@@ -185,8 +232,8 @@ Abstract base class for dispatching file i/o asynchronously.
                 </td>
 <td>
                   <p>
-                    Invoke the specified functions when each of the supplied operations
-                    complete.
+                    Schedule a batch of asynchronous invocations of the specified
+                    functions when their supplied operations complete.
                   </p>
                 </td>
 <td>
@@ -215,8 +262,8 @@ Abstract base class for dispatching file i/o asynchronously.
                 </td>
 <td>
                   <p>
-                    Invoke the specified single function when the supplied single
-                    operation completes.
+                    Schedule the asynchronous invocation of the specified single
+                    function when the supplied single operation completes.
                   </p>
                 </td>
 <td>
@@ -365,13 +412,21 @@ Abstract base class for dispatching file i/o asynchronously.
                 </td>
 <td>
                   <p>
-                    Asynchronously creates directories.
+                    Schedule a batch of asynchronous directory creations and opens
+                    after optional preconditions.
                   </p>
                 </td>
 <td>
                   <p>
                     <span class="bold"><strong>const std::vector&lt; async_path_op_req
-                    &gt; &amp;</strong></span>: <span class="emphasis"><em>reqs</em></span>:
+                    &gt; &amp;</strong></span>: <span class="emphasis"><em>reqs</em></span>: A batch of
+                    <code class="literal"><code class="computeroutput"><span class="identifier">async_path_op_req</span></code></code>
+                    structures.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    A batch of op handles.
                   </p>
                 </td>
 </tr>
@@ -381,13 +436,20 @@ Abstract base class for dispatching file i/o asynchronously.
                 </td>
 <td>
                   <p>
-                    Asynchronously creates a directory.
+                    Schedule an asynchronous directory creation and open after an
+                    optional precondition.
                   </p>
                 </td>
 <td>
                   <p>
                     <span class="bold"><strong>const async_path_op_req &amp;</strong></span>:
-                    <span class="emphasis"><em>req</em></span>:
+                    <span class="emphasis"><em>req</em></span>: An <code class="literal"><code class="computeroutput"><span class="identifier">async_path_op_req</span></code></code>
+                    structure.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    An op handle.
                   </p>
                 </td>
 </tr>
@@ -397,13 +459,21 @@ Abstract base class for dispatching file i/o asynchronously.
                 </td>
 <td>
                   <p>
-                    Asynchronously deletes directories.
+                    Schedule a batch of asynchronous directory deletions after optional
+                    preconditions.
                   </p>
                 </td>
 <td>
                   <p>
                     <span class="bold"><strong>const std::vector&lt; async_path_op_req
-                    &gt; &amp;</strong></span>: <span class="emphasis"><em>reqs</em></span>:
+                    &gt; &amp;</strong></span>: <span class="emphasis"><em>reqs</em></span>: A batch of
+                    <code class="literal"><code class="computeroutput"><span class="identifier">async_path_op_req</span></code></code>
+                    structures.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    A batch of op handles.
                   </p>
                 </td>
 </tr>
@@ -413,13 +483,20 @@ Abstract base class for dispatching file i/o asynchronously.
                 </td>
 <td>
                   <p>
-                    Asynchronously deletes a directory.
+                    Schedule an asynchronous directory deletion after an optional
+                    precondition.
                   </p>
                 </td>
 <td>
                   <p>
                     <span class="bold"><strong>const async_path_op_req &amp;</strong></span>:
-                    <span class="emphasis"><em>req</em></span>:
+                    <span class="emphasis"><em>req</em></span>: An <code class="literal"><code class="computeroutput"><span class="identifier">async_path_op_req</span></code></code>
+                    structure.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    An op handle.
                   </p>
                 </td>
 </tr>
@@ -429,13 +506,21 @@ Abstract base class for dispatching file i/o asynchronously.
                 </td>
 <td>
                   <p>
-                    Asynchronously opens or creates files.
+                    Schedule a batch of asynchronous file creations and opens after
+                    optional preconditions.
                   </p>
                 </td>
 <td>
                   <p>
                     <span class="bold"><strong>const std::vector&lt; async_path_op_req
-                    &gt; &amp;</strong></span>: <span class="emphasis"><em>reqs</em></span>:
+                    &gt; &amp;</strong></span>: <span class="emphasis"><em>reqs</em></span>: A batch of
+                    <code class="literal"><code class="computeroutput"><span class="identifier">async_path_op_req</span></code></code>
+                    structures.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    A batch of op handles.
                   </p>
                 </td>
 </tr>
@@ -445,13 +530,20 @@ Abstract base class for dispatching file i/o asynchronously.
                 </td>
 <td>
                   <p>
-                    Asynchronously opens or creates a file.
+                    Schedule an asynchronous file creation and open after an optional
+                    precondition.
                   </p>
                 </td>
 <td>
                   <p>
                     <span class="bold"><strong>const async_path_op_req &amp;</strong></span>:
-                    <span class="emphasis"><em>req</em></span>:
+                    <span class="emphasis"><em>req</em></span>: An <code class="literal"><code class="computeroutput"><span class="identifier">async_path_op_req</span></code></code>
+                    structure.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    An op handle.
                   </p>
                 </td>
 </tr>
@@ -461,13 +553,21 @@ Abstract base class for dispatching file i/o asynchronously.
                 </td>
 <td>
                   <p>
-                    Asynchronously deletes files.
+                    Schedule a batch of asynchronous file deletions after optional
+                    preconditions.
                   </p>
                 </td>
 <td>
                   <p>
                     <span class="bold"><strong>const std::vector&lt; async_path_op_req
-                    &gt; &amp;</strong></span>: <span class="emphasis"><em>reqs</em></span>:
+                    &gt; &amp;</strong></span>: <span class="emphasis"><em>reqs</em></span>: A batch of
+                    <code class="literal"><code class="computeroutput"><span class="identifier">async_path_op_req</span></code></code>
+                    structures.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    A batch of op handles.
                   </p>
                 </td>
 </tr>
@@ -477,13 +577,19 @@ Abstract base class for dispatching file i/o asynchronously.
                 </td>
 <td>
                   <p>
-                    Asynchronously deletes files.
+                    Schedule an asynchronous file deletion after an optional precondition.
                   </p>
                 </td>
 <td>
                   <p>
                     <span class="bold"><strong>const async_path_op_req &amp;</strong></span>:
-                    <span class="emphasis"><em>req</em></span>:
+                    <span class="emphasis"><em>req</em></span>: An <code class="literal"><code class="computeroutput"><span class="identifier">async_path_op_req</span></code></code>
+                    structure.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    An op handle.
                   </p>
                 </td>
 </tr>
@@ -493,14 +599,19 @@ Abstract base class for dispatching file i/o asynchronously.
                 </td>
 <td>
                   <p>
-                    Asynchronously synchronises items with physical storage once
-                    they complete.
+                    Schedule a batch of asynchronous content synchronisations with
+                    physical storage after preceding operations.
                   </p>
                 </td>
 <td>
                   <p>
                     <span class="bold"><strong>const std::vector&lt; async_io_op &gt;
-                    &amp;</strong></span>: <span class="emphasis"><em>ops</em></span>:
+                    &amp;</strong></span>: <span class="emphasis"><em>ops</em></span>: A batch of op handles.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    A batch of op handles.
                   </p>
                 </td>
 </tr>
@@ -510,13 +621,19 @@ Abstract base class for dispatching file i/o asynchronously.
                 </td>
 <td>
                   <p>
-                    Asynchronously synchronises an item with physical storage once
-                    it completes.
+                    Schedule an asynchronous content synchronisation with physical
+                    storage after a preceding operation.
                   </p>
                 </td>
 <td>
                   <p>
                     <span class="bold"><strong>const async_io_op &amp;</strong></span>: <span class="emphasis"><em>req</em></span>:
+                    An op handle.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    An op handle.
                   </p>
                 </td>
 </tr>
@@ -526,13 +643,19 @@ Abstract base class for dispatching file i/o asynchronously.
                 </td>
 <td>
                   <p>
-                    Asynchronously closes connections to items once they complete.
+                    Schedule a batch of asynchronous file or directory handle closes
+                    after preceding operations.
                   </p>
                 </td>
 <td>
                   <p>
                     <span class="bold"><strong>const std::vector&lt; async_io_op &gt;
-                    &amp;</strong></span>: <span class="emphasis"><em>ops</em></span>:
+                    &amp;</strong></span>: <span class="emphasis"><em>ops</em></span>: A batch of op handles.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    A batch of op handles.
                   </p>
                 </td>
 </tr>
@@ -542,12 +665,19 @@ Abstract base class for dispatching file i/o asynchronously.
                 </td>
 <td>
                   <p>
-                    Asynchronously closes the connection to an item once it completes.
+                    Schedule an asynchronous file or directory handle close after
+                    a preceding operation.
                   </p>
                 </td>
 <td>
                   <p>
                     <span class="bold"><strong>const async_io_op &amp;</strong></span>: <span class="emphasis"><em>req</em></span>:
+                    An op handle.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    An op handle.
                   </p>
                 </td>
 </tr>
@@ -557,13 +687,19 @@ Abstract base class for dispatching file i/o asynchronously.
                 </td>
 <td>
                   <p>
-                    Asynchronously reads data from items.
+                    Schedule a batch of asynchronous data reads after preceding operations.
                   </p>
                 </td>
 <td>
                   <p>
                     <span class="bold"><strong>const std::vector&lt; async_data_op_req&lt;
-                    void &gt;&gt; &amp;</strong></span>: <span class="emphasis"><em>ops</em></span>:
+                    void &gt;&gt; &amp;</strong></span>: <span class="emphasis"><em>ops</em></span>: A batch
+                    of <code class="literal"><code class="computeroutput"><span class="identifier">async_data_op_req</span></code><code class="computeroutput"><span class="special">&lt;</span><span class="keyword">void</span><span class="special">&gt;</span></code></code> structures.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    A batch of op handles.
                   </p>
                 </td>
 </tr>
@@ -573,30 +709,41 @@ Abstract base class for dispatching file i/o asynchronously.
                 </td>
 <td>
                   <p>
-                    Asynchronously reads data from an item.
+                    Schedule an asynchronous data read after a preceding operation.
                   </p>
                 </td>
 <td>
                   <p>
                     <span class="bold"><strong>const async_data_op_req&lt; void &gt; &amp;</strong></span>:
-                    <span class="emphasis"><em>req</em></span>:
+                    <span class="emphasis"><em>req</em></span>: An <code class="literal"><code class="computeroutput"><span class="identifier">async_data_op_req</span></code><code class="computeroutput"><span class="special">&lt;</span><span class="keyword">void</span><span class="special">&gt;</span></code></code> structure.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    An op handle.
                   </p>
                 </td>
 </tr>
 <tr>
 <td>
-<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">T</span><span class="special">&gt;</span>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">T</span><span class="special">,</span> <span class="special">&gt;</span>
 <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">async_io_op</span> <span class="special">&gt;</span> <span class="identifier">read</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">async_data_op_req</span><span class="special">&lt;</span> <span class="identifier">T</span> <span class="special">&gt;&gt;</span> <span class="special">&amp;</span> <span class="identifier">ops</span><span class="special">)</span></pre>
                 </td>
 <td>
                   <p>
-                    Asynchronously reads data from items.
+                    Schedule a batch of asynchronous data reads after preceding operations.
                   </p>
                 </td>
 <td>
                   <p>
                     <span class="bold"><strong>const std::vector&lt; async_data_op_req&lt;
-                    T &gt;&gt; &amp;</strong></span>: <span class="emphasis"><em>ops</em></span>:
+                    T &gt;&gt; &amp;</strong></span>: <span class="emphasis"><em>ops</em></span>: A batch
+                    of <code class="literal"><code class="computeroutput"><span class="identifier">async_data_op_req</span></code><code class="computeroutput"><span class="special">&lt;</span><span class="identifier">T</span><span class="special">&gt;</span></code></code> structures.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    A batch of op handles.
                   </p>
                 </td>
 </tr>
@@ -606,13 +753,22 @@ Abstract base class for dispatching file i/o asynchronously.
                 </td>
 <td>
                   <p>
-                    Asynchronously writes data to items.
+                    Schedule a batch of asynchronous data writes after preceding
+                    operations.
                   </p>
                 </td>
 <td>
                   <p>
                     <span class="bold"><strong>const std::vector&lt; async_data_op_req&lt;
                     const void &gt;&gt; &amp;</strong></span>: <span class="emphasis"><em>ops</em></span>:
+                    A batch of <code class="literal"><code class="computeroutput"><span class="identifier">async_data_op_req</span></code><code class="computeroutput"><span class="special">&lt;</span><span class="keyword">const</span>
+                    <span class="keyword">void</span><span class="special">&gt;</span></code></code>
+                    structures.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    A batch of op handles.
                   </p>
                 </td>
 </tr>
@@ -622,30 +778,44 @@ Abstract base class for dispatching file i/o asynchronously.
                 </td>
 <td>
                   <p>
-                    Asynchronously writes data to an item.
+                    Schedule an asynchronous data write after a preceding operation.
                   </p>
                 </td>
 <td>
                   <p>
                     <span class="bold"><strong>const async_data_op_req&lt; const void
-                    &gt; &amp;</strong></span>: <span class="emphasis"><em>req</em></span>:
+                    &gt; &amp;</strong></span>: <span class="emphasis"><em>req</em></span>: An <code class="literal"><code class="computeroutput"><span class="identifier">async_data_op_req</span></code><code class="computeroutput"><span class="special">&lt;</span><span class="keyword">const</span>
+                    <span class="keyword">void</span><span class="special">&gt;</span></code></code>
+                    structure.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    An op handle.
                   </p>
                 </td>
 </tr>
 <tr>
 <td>
-<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">T</span><span class="special">&gt;</span>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">T</span><span class="special">,</span> <span class="special">&gt;</span>
 <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">async_io_op</span> <span class="special">&gt;</span> <span class="identifier">write</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">async_data_op_req</span><span class="special">&lt;</span> <span class="identifier">T</span> <span class="special">&gt;&gt;</span> <span class="special">&amp;</span> <span class="identifier">ops</span><span class="special">)</span></pre>
                 </td>
 <td>
                   <p>
-                    Asynchronously writes data to items.
+                    Schedule a batch of asynchronous data writes after preceding
+                    operations.
                   </p>
                 </td>
 <td>
                   <p>
                     <span class="bold"><strong>const std::vector&lt; async_data_op_req&lt;
-                    T &gt;&gt; &amp;</strong></span>: <span class="emphasis"><em>ops</em></span>:
+                    T &gt;&gt; &amp;</strong></span>: <span class="emphasis"><em>ops</em></span>: A batch
+                    of <code class="literal"><code class="computeroutput"><span class="identifier">async_data_op_req</span></code><code class="computeroutput"><span class="special">&lt;</span><span class="identifier">T</span><span class="special">&gt;</span></code></code> structures.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    A batch of op handles.
                   </p>
                 </td>
 </tr>
@@ -655,17 +825,23 @@ Abstract base class for dispatching file i/o asynchronously.
                 </td>
 <td>
                   <p>
-                    Truncates the lengths of items.
+                    Schedule a batch of asynchronous file length truncations after
+                    preceding operations.
                   </p>
                 </td>
 <td>
                   <p>
                     <span class="bold"><strong>const std::vector&lt; async_io_op &gt;
-                    &amp;</strong></span>: <span class="emphasis"><em>ops</em></span>:
+                    &amp;</strong></span>: <span class="emphasis"><em>ops</em></span>: A batch of op handles.
                   </p>
                   <p>
                     <span class="bold"><strong>const std::vector&lt; off_t &gt; &amp;</strong></span>:
-                    <span class="emphasis"><em>sizes</em></span>:
+                    <span class="emphasis"><em>sizes</em></span>: A batch of new lengths.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    A batch of op handles.
                   </p>
                 </td>
 </tr>
@@ -675,15 +851,22 @@ Abstract base class for dispatching file i/o asynchronously.
                 </td>
 <td>
                   <p>
-                    Truncates the length of an item.
+                    Schedule an asynchronous data write after a preceding operation.
                   </p>
                 </td>
 <td>
                   <p>
                     <span class="bold"><strong>const async_io_op &amp;</strong></span>: <span class="emphasis"><em>op</em></span>:
+                    An op handle.
                   </p>
                   <p>
                     <span class="bold"><strong>off_t</strong></span>: <span class="emphasis"><em>newsize</em></span>:
+                    The new size for the file.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    An op handle.
                   </p>
                 </td>
 </tr>
@@ -693,14 +876,18 @@ Abstract base class for dispatching file i/o asynchronously.
                 </td>
 <td>
                   <p>
-                    Completes each of the supplied ops when and only when the last
-                    of the supplied ops completes.
+                    Schedule an asynchronous synchronisation of preceding operations.
                   </p>
                 </td>
 <td>
                   <p>
                     <span class="bold"><strong>const std::vector&lt; async_io_op &gt;
-                    &amp;</strong></span>: <span class="emphasis"><em>ops</em></span>:
+                    &amp;</strong></span>: <span class="emphasis"><em>ops</em></span>: A batch of op handles.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    A batch of op handles.
                   </p>
                 </td>
 </tr>

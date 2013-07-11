@@ -28,18 +28,30 @@
           (convenience batch bound functions without preconditions)</a>
 </h5></div></div></div>
 <p>
-            <a class="indexterm" name="id921263"></a>
+            <a class="indexterm" name="id934809"></a>
 Schedule a batch of asynchronous invocations of the specified bound functions
             when their supplied preconditions complete.
           </p>
 <h6>
 <a name="afio.reference.types.async_file_io_dispatcher_base.call_1_convenience_batch_bound_functions_without_preconditions.h0"></a>
+            <span class="phrase"><a name="afio.reference.types.async_file_io_dispatcher_base.call_1_convenience_batch_bound_functions_without_preconditions.description"></a></span><a class="link" href="call_1_convenience_batch_bound_functions_without_preconditions.html#afio.reference.types.async_file_io_dispatcher_base.call_1_convenience_batch_bound_functions_without_preconditions.description">Description</a>
+          </h6>
+<p>
+            This is effectively a convenience wrapper for <code class="literal"><code class="computeroutput"><span class="identifier">completion</span><span class="special">()</span></code></code>.
+            It creates a packaged_task matching the <code class="literal"><code class="computeroutput"><span class="identifier">completion_t</span></code></code>
+            handler specification and calls the specified arbitrary callable, always
+            returning completion on exit. If you are seeing performance issues, using
+            <code class="literal"><code class="computeroutput"><span class="identifier">completion</span><span class="special">()</span></code></code>
+            directly will have much less overhead.
+          </p>
+<h6>
+<a name="afio.reference.types.async_file_io_dispatcher_base.call_1_convenience_batch_bound_functions_without_preconditions.h1"></a>
             <span class="phrase"><a name="afio.reference.types.async_file_io_dispatcher_base.call_1_convenience_batch_bound_functions_without_preconditions.synopsis"></a></span><a class="link" href="call_1_convenience_batch_bound_functions_without_preconditions.html#afio.reference.types.async_file_io_dispatcher_base.call_1_convenience_batch_bound_functions_without_preconditions.synopsis">Synopsis</a>
           </h6>
 <pre class="programlisting"><span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">R</span><span class="special">,</span> <span class="special">&gt;</span>
 <span class="identifier">std</span><span class="special">::</span><span class="identifier">pair</span><span class="special">&lt;</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span><span class="identifier">future</span><span class="special">&lt;</span><span class="identifier">R</span><span class="special">&gt;</span> <span class="special">&gt;,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span><span class="identifier">async_io_op</span><span class="special">&gt;</span> <span class="special">&gt;</span> <span class="identifier">async_file_io_dispatcher_base</span><span class="special">::</span><span class="identifier">call</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">function</span><span class="special">&lt;</span> <span class="identifier">R</span><span class="special">()&gt;&gt;</span> <span class="special">&amp;</span> <span class="identifier">callables</span><span class="special">)</span></pre>
 <h6>
-<a name="afio.reference.types.async_file_io_dispatcher_base.call_1_convenience_batch_bound_functions_without_preconditions.h1"></a>
+<a name="afio.reference.types.async_file_io_dispatcher_base.call_1_convenience_batch_bound_functions_without_preconditions.h2"></a>
             <span class="phrase"><a name="afio.reference.types.async_file_io_dispatcher_base.call_1_convenience_batch_bound_functions_without_preconditions.parameters"></a></span><a class="link" href="call_1_convenience_batch_bound_functions_without_preconditions.html#afio.reference.types.async_file_io_dispatcher_base.call_1_convenience_batch_bound_functions_without_preconditions.parameters">Parameters</a>
           </h6>
 <div class="informaltable"><table class="table">
@@ -135,7 +147,7 @@ Schedule a batch of asynchronous invocations of the specified bound functions
 </tbody>
 </table></div>
 <h6>
-<a name="afio.reference.types.async_file_io_dispatcher_base.call_1_convenience_batch_bound_functions_without_preconditions.h2"></a>
+<a name="afio.reference.types.async_file_io_dispatcher_base.call_1_convenience_batch_bound_functions_without_preconditions.h3"></a>
             <span class="phrase"><a name="afio.reference.types.async_file_io_dispatcher_base.call_1_convenience_batch_bound_functions_without_preconditions.returns"></a></span><a class="link" href="call_1_convenience_batch_bound_functions_without_preconditions.html#afio.reference.types.async_file_io_dispatcher_base.call_1_convenience_batch_bound_functions_without_preconditions.returns">Returns</a>
           </h6>
 <p>
@@ -143,21 +155,21 @@ Schedule a batch of asynchronous invocations of the specified bound functions
             and a batch of op handles.
           </p>
 <h6>
-<a name="afio.reference.types.async_file_io_dispatcher_base.call_1_convenience_batch_bound_functions_without_preconditions.h3"></a>
+<a name="afio.reference.types.async_file_io_dispatcher_base.call_1_convenience_batch_bound_functions_without_preconditions.h4"></a>
             <span class="phrase"><a name="afio.reference.types.async_file_io_dispatcher_base.call_1_convenience_batch_bound_functions_without_preconditions.header"></a></span><a class="link" href="call_1_convenience_batch_bound_functions_without_preconditions.html#afio.reference.types.async_file_io_dispatcher_base.call_1_convenience_batch_bound_functions_without_preconditions.header">Header</a>
           </h6>
 <p>
             <code class="computeroutput"><span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">boost</span><span class="special">/</span><span class="identifier">afio</span><span class="special">/</span><span class="identifier">afio</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span></code>
           </p>
 <h6>
-<a name="afio.reference.types.async_file_io_dispatcher_base.call_1_convenience_batch_bound_functions_without_preconditions.h4"></a>
+<a name="afio.reference.types.async_file_io_dispatcher_base.call_1_convenience_batch_bound_functions_without_preconditions.h5"></a>
             <span class="phrase"><a name="afio.reference.types.async_file_io_dispatcher_base.call_1_convenience_batch_bound_functions_without_preconditions.complexity"></a></span><a class="link" href="call_1_convenience_batch_bound_functions_without_preconditions.html#afio.reference.types.async_file_io_dispatcher_base.call_1_convenience_batch_bound_functions_without_preconditions.complexity">Complexity</a>
           </h6>
 <p>
             Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete.
           </p>
 <h6>
-<a name="afio.reference.types.async_file_io_dispatcher_base.call_1_convenience_batch_bound_functions_without_preconditions.h5"></a>
+<a name="afio.reference.types.async_file_io_dispatcher_base.call_1_convenience_batch_bound_functions_without_preconditions.h6"></a>
             <span class="phrase"><a name="afio.reference.types.async_file_io_dispatcher_base.call_1_convenience_batch_bound_functions_without_preconditions.exception_model"></a></span><a class="link" href="call_1_convenience_batch_bound_functions_without_preconditions.html#afio.reference.types.async_file_io_dispatcher_base.call_1_convenience_batch_bound_functions_without_preconditions.exception_model">Exception
             Model</a>
           </h6>
@@ -167,7 +179,7 @@ Schedule a batch of asynchronous invocations of the specified bound functions
             if any inputs have values which could not possibly be correct.
           </p>
 <h6>
-<a name="afio.reference.types.async_file_io_dispatcher_base.call_1_convenience_batch_bound_functions_without_preconditions.h6"></a>
+<a name="afio.reference.types.async_file_io_dispatcher_base.call_1_convenience_batch_bound_functions_without_preconditions.h7"></a>
             <span class="phrase"><a name="afio.reference.types.async_file_io_dispatcher_base.call_1_convenience_batch_bound_functions_without_preconditions.example"></a></span><a class="link" href="call_1_convenience_batch_bound_functions_without_preconditions.html#afio.reference.types.async_file_io_dispatcher_base.call_1_convenience_batch_bound_functions_without_preconditions.example">Example</a>
           </h6>
 <pre class="programlisting"><span class="comment">// Create a dispatcher instance</span>
