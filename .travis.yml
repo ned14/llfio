@@ -12,11 +12,11 @@ notifications:
 
 env:
   matrix:
-    - _="Build test" VALGRIND=0 UNIT_TESTS=0 DEBUG=0 GCCVER="-4.8" GCOV=0
-    - _="Unit/functional tests" VALGRIND=0 UNIT_TESTS="" DEBUG=0 GCCVER="-4.8" GCOV=0
+    - _="Build test" VALGRIND=0 UNIT_TESTS=0 DEBUG=0 GCCVER="" GCOV=0
+    - _="Unit/functional tests" VALGRIND=0 UNIT_TESTS="" DEBUG=0 GCCVER="" GCOV=0
     - _="GCC 4.8 + Unit/functional tests coverage" VALGRIND=0 CCFLAGS="-fprofile-arcs -ftest-coverage" UNIT_TESTS="" DEBUG=1 GCCVER="-4.8" GCOV=1
     - _="Memory error and leak tests" VALGRIND=memcheck UNIT_TESTS="--log_level=test_suite --run_test=all/exclude_async_io_errors" DEBUG=2 GCCVER="-4.8" GCOV=0
-    - _="Race detection tests" VALGRIND=0 CCFLAGS="-fsanitize=thread" UNIT_TESTS="" DEBUG=2 GCCVER="-4.8" TSAN_OPTIONS="suppressions=libs/afio/test/tsan.supp" GCOV=0
+    - _="Race detection tests" VALGRIND=0 CCFLAGS="-fsanitize=thread" UNIT_TESTS="" DEBUG=2 GCCVER="" TSAN_OPTIONS="suppressions=libs/afio/test/tsan.supp" GCOV=0
 
 # The clang 3.2 .deb doesn't supply the needed tsan runtime library :(
 matrix:
@@ -25,12 +25,12 @@ matrix:
       env: _="GCC 4.8 + Unit/functional tests coverage" VALGRIND=0 CCFLAGS="-fprofile-arcs -ftest-coverage" UNIT_TESTS="" DEBUG=1 GCCVER="-4.8" GCOV=1
 
     - compiler: clang
-      env: _="Race detection tests" VALGRIND=0 CCFLAGS="-fsanitize=thread" UNIT_TESTS="" DEBUG=2 GCCVER="-4.8" TSAN_OPTIONS="suppressions=libs/afio/test/tsan.supp" GCOV=0
+      env: _="Race detection tests" VALGRIND=0 CCFLAGS="-fsanitize=thread" UNIT_TESTS="" DEBUG=2 GCCVER="" TSAN_OPTIONS="suppressions=libs/afio/test/tsan.supp" GCOV=0
 
 
   allow_failures:
     - compiler: gcc
-      env: _="Race detection tests" VALGRIND=0 CCFLAGS="-fsanitize=thread" UNIT_TESTS="" DEBUG=2 GCCVER="-4.8" TSAN_OPTIONS="suppressions=libs/afio/test/tsan.supp" GCOV=0
+      env: _="Race detection tests" VALGRIND=0 CCFLAGS="-fsanitize=thread" UNIT_TESTS="" DEBUG=2 GCCVER="" TSAN_OPTIONS="suppressions=libs/afio/test/tsan.supp" GCOV=0
 
 
 
@@ -39,7 +39,7 @@ before_install:
  - if [ $CXX = "clang++" ]; then sudo add-apt-repository -y ppa:h-rayflood/llvm; fi
  - sudo apt-get update -qq
  - if [ $CXX = "clang++" ]; then sudo apt-get install -qq libstdc++-4.8-dev clang-3.2; fi
- - if [ $CC = "gcc" ]; then sudo apt-get install -qq g++$GCCVER; fi
+ - if [ $GCCVER != "" ]; then sudo apt-get install -qq g++$GCCVER; fi
  - if [ $VALGRIND != "0" ]; then sudo apt-get install -qq valgrind; fi
  - git submodule update --init --recursive
  - wget https://github.com/ned14/boost-trunk/archive/release/Boost_1_54_0.tar.gz
@@ -60,14 +60,14 @@ before_install:
  - cd $PROJECTPATH
 
 #set GCCVER for clang and TESTPREFIX for all compilers 
- - if [ $CC = "clang" ]; then GCCVER=""; TESTPREFIX="bin.v2/libs/afio/test/clang-linux-3.2"; else TESTPREFIX="bin.v2/libs/afio/test/$CC$GCCVER"; fi
+ - if [ $CC = "clang" ]; then GCCVER=""; TESTPREFIX="bin.v2/libs/afio/test/clang-linux"; else TESTPREFIX="bin.v2/libs/afio/test/$CC"; fi
 
 
 script:
 # set debug/release & proper path for debug/release builds
- - if [ $DEBUG -eq 0 ]; then PREFIXPATH="$TESTPREFIX/release/threading-multi"; DEBUGBUILD=release; fi
- - if [ $DEBUG -eq 1 ]; then PREFIXPATH="$TESTPREFIX/debug/threading-multi"; DEBUGBUILD=debug; fi
- - if [ $DEBUG -eq 2 ]; then PREFIXPATH="$TESTPREFIX/debug/optimization-speed/threading-multi"; DEBUGBUILD="debug optimization=speed"; fi
+ - if [ $DEBUG -eq 0 ]; then PREFIXPATH="$TESTPREFIX*/release/threading-multi"; DEBUGBUILD=release; fi
+ - if [ $DEBUG -eq 1 ]; then PREFIXPATH="$TESTPREFIX*/debug/threading-multi"; DEBUGBUILD=debug; fi
+ - if [ $DEBUG -eq 2 ]; then PREFIXPATH="$TESTPREFIX*/debug/optimization-speed/threading-multi"; DEBUGBUILD="debug optimization=speed"; fi
 
 
 #try to pass compiler flags appropriatly

@@ -594,30 +594,32 @@ BOOST_AUTO_TEST_SUITE(all)
                 auto end=std::chrono::high_resolution_clock::now();
                 auto diff=chrono::duration_cast<secs_type>(end-begin);
                 cout << "It took " << diff.count() << " secs to simulate torture test in RAM" << endl;
-                begin=std::chrono::high_resolution_clock::now();
+                begin=std::chrono::high_resolution_clock::now(); // start timer for hashes
                 
-                // a vector to hold the hash values from spookyhash
+                // a vector to hold the hash values from SpookyHash
+                //SpookyHash returns 2 64bit integers for a 128 bit hash, so we store them as a pair
                 vector<std::pair<uint64, uint64>> memhashes(no);
                 //  variables to seed and return the hashed values
                 uint64 hash1, hash2, seed;
                 seed = 1; //initialize the seed value. Completely arbitrary, but it needs to remain consistent 
+              
                 for(size_t i = 0; i < no; ++i)
                 {
                     // set up seeds and a variables to store hash values
                     hash1 = seed;
                     hash2 = seed;
                     
-                    //hash the data
+                    //hash the data from towriteptrs
                     SpookyHash::Hash128(towriteptrs[i], towritesizes[i], &hash1, &hash2);
                     
-                    // store the hash values for this data somewhere
+                    // store the hash values for this data in memhashes for later comparison
                     memhashes[i]= std::make_pair(hash1, hash2);
                     
                 }
                 
-                end=std::chrono::high_resolution_clock::now();
+                end=std::chrono::high_resolution_clock::now(); // end timer for hashes
                 diff=chrono::duration_cast<secs_type>(end-begin);
-                cout << "It took " << diff.count() << " secs to SHA256 the results" << endl;
+                cout << "It took " << diff.count() << " secs to hash the results" << endl;
                 for(size_t n=0; n<no; n++)
                         memset(towriteptrs[n], 0, towritesizes[n]);
 
@@ -747,25 +749,29 @@ BOOST_AUTO_TEST_SUITE(all)
                 }
                 BOOST_TEST_MESSAGE("Checking if the final files have exactly the right contents ... this may take a bit ...");
                 {
-                        vector<std::pair<uint64, uint64>> filehashes(no);
+                    // a vector for holding hash results from SpookyHash
+                    //SpookyHash returns 2 64bit integers for a 128 bit hash, so we store them as a pair
+                    vector<std::pair<uint64, uint64>> filehashes(no);
+
+                    for(size_t i = 0; i < no; ++i)
+                    {
+                        // set up seeds and a variables to store hash values
+                        hash1 = seed;
+                        hash2 = seed; 
                         
-                        for(size_t i = 0; i < no; ++i)
+                        // hash the data from towriteptrs
+                        SpookyHash::Hash128(towriteptrs[i], towritesizes[i], &hash1, &hash2);
+
+                        // store the hash values for this data in filehashes for a later comparison
+                        filehashes[i]= std::make_pair(hash1, hash2);
+
+                    }
+                    for(size_t n=0; n<no; n++)
+                        if(memhashes[n]!=filehashes[n]) // compare hash values from ram and actual IO
                         {
-                            // set up seeds and a variables to store hash values
-                            hash1 = seed;
-                            hash2 = seed; 
-                            SpookyHash::Hash128(towriteptrs[i], towritesizes[i], &hash1, &hash2);
-
-                            // store the hash values for this data somewhere
-                            filehashes[i]= std::make_pair(hash1, hash2);
-
+                                string failmsg("File "+to_string(n)+" contents were not what they were supposed to be!");
+                                BOOST_TEST_MESSAGE(failmsg.c_str());
                         }
-                        for(size_t n=0; n<no; n++)
-                                if(memhashes[n]!=filehashes[n])
-                                {
-                                        string failmsg("File "+to_string(n)+" contents were not what they were supposed to be!");
-                                        BOOST_TEST_MESSAGE(failmsg.c_str());
-                                }
                 }
         #ifdef DEBUG_TORTURE_TEST
                 for(ptrdiff_t n=0; n<(ptrdiff_t) no; n++)
@@ -852,26 +858,6 @@ BOOST_AUTO_TEST_SUITE(all)
                 BOOST_CHECK_NO_THROW(when_all(deldir).wait());
         }
 
-        #if 0
-        BOOST_AUTO_TEST_CASE(afio_works)
-        {
-            BOOST_TEST_MESSAGE( "Tests that one of the samples from Boost.Graph works as advertised with afio");
-                typedef boost::boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS> Graph;
-                Graph g(used_by, used_by + nedges, N);
-                g.attach(store, testgraph);
-                g.begincommit().wait();
-                TestGraph<>(g);
-
-                Graph g2(store, testgraph);
-                TestGraph<>(g2);
-
-                ModifyGraph<>(g);
-                g.begincommit().wait();
-
-                Graph g3(store, testgraph);
-                BOOST_CHECK(boost::isomorphism(g, g3));
-        }
-        #endif
     BOOST_AUTO_TEST_SUITE_END() //end exclude_async_io_erros
 BOOST_AUTO_TEST_SUITE_END() // end all        
 
