@@ -27,7 +27,7 @@ project boost/afio/test
     ;
 
 
-exe boost_afio_test : main.cpp  ../detail/Int128_256.cpp 
+exe boost_afio_test : main.cpp   ../detail/SpookyV2.cpp
     : <include>../../../boost/afio/detail
 
 ;

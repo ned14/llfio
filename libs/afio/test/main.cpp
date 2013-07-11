@@ -16,7 +16,7 @@ Created: Feb 2013
 #include <iostream>
 #include <algorithm>
 #include "../../../boost/afio/afio.hpp"
-#include "../../../boost/afio/detail/Int128_256.hpp"
+#include "../../../boost/afio/detail/SpookyV2.h"
 #include "../../../boost/afio/detail/Aligned_Allocator.hpp"
 #include "boost/lockfree/queue.hpp"
 #include "../../../boost/afio/detail/Undoer.hpp"
@@ -595,8 +595,26 @@ BOOST_AUTO_TEST_SUITE(all)
                 auto diff=chrono::duration_cast<secs_type>(end-begin);
                 cout << "It took " << diff.count() << " secs to simulate torture test in RAM" << endl;
                 begin=std::chrono::high_resolution_clock::now();
-                vector<Hash256> memhashes(no);
-                Hash256::BatchAddSHA256To(no, &memhashes.front(), (const char **) &towriteptrs.front(), &towritesizes.front());
+                
+                // a vector to hold the hash values from spookyhash
+                vector<std::pair<uint64, uint64>> memhashes(no);
+                //  variables to seed and return the hashed values
+                uint64 hash1, hash2, seed;
+                seed = 1; //initialize the seed value. Completely arbitrary, but it needs to remain consistent 
+                for(size_t i = 0; i < no; ++i)
+                {
+                    // set up seeds and a variables to store hash values
+                    hash1 = seed;
+                    hash2 = seed;
+                    
+                    //hash the data
+                    SpookyHash::Hash128(towriteptrs[i], towritesizes[i], &hash1, &hash2);
+                    
+                    // store the hash values for this data somewhere
+                    memhashes[i]= std::make_pair(hash1, hash2);
+                    
+                }
+                
                 end=std::chrono::high_resolution_clock::now();
                 diff=chrono::duration_cast<secs_type>(end-begin);
                 cout << "It took " << diff.count() << " secs to SHA256 the results" << endl;
@@ -729,8 +747,19 @@ BOOST_AUTO_TEST_SUITE(all)
                 }
                 BOOST_TEST_MESSAGE("Checking if the final files have exactly the right contents ... this may take a bit ...");
                 {
-                        vector<Hash256> filehashes(no);
-                        Hash256::BatchAddSHA256To(no, &filehashes.front(), (const char **) &towriteptrs.front(), &towritesizes.front());
+                        vector<std::pair<uint64, uint64>> filehashes(no);
+                        
+                        for(size_t i = 0; i < no; ++i)
+                        {
+                            // set up seeds and a variables to store hash values
+                            hash1 = seed;
+                            hash2 = seed; 
+                            SpookyHash::Hash128(towriteptrs[i], towritesizes[i], &hash1, &hash2);
+
+                            // store the hash values for this data somewhere
+                            filehashes[i]= std::make_pair(hash1, hash2);
+
+                        }
                         for(size_t n=0; n<no; n++)
                                 if(memhashes[n]!=filehashes[n])
                                 {
