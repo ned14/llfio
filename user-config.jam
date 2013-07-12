@@ -45,7 +45,6 @@
 # using gcc : 3.2 : g++-3.2 ;
 
 using gcc : : g++ ;
-using gcc : 4.6 : g++-4.6 ;
 using gcc : 4.7 : g++-4.7 ;
 using gcc : 4.8 : g++-4.8 ;
 
