@@ -7,7 +7,7 @@
 <link rel="home" href="../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 0.1">
 <link rel="up" href="../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 0.1">
 <link rel="prev" href="../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 0.1">
-<link rel="next" href="compilation.html" title="Compilation">
+<link rel="next" href="design/overview.html" title="A quick overview of the design">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
 <table cellpadding="2" width="100%"><tr>
@@ -20,26 +20,23 @@
 </tr></table>
 <hr>
 <div class="spirit-nav">
-<a accesskey="p" href="../index.html"><img src="../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="compilation.html"><img src="../../../../../doc/src/images/next.png" alt="Next"></a>
+<a accesskey="p" href="../index.html"><img src="../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="design/overview.html"><img src="../../../../../doc/src/images/next.png" alt="Next"></a>
 </div>
 <div class="section">
 <div class="titlepage"><div><div><h2 class="title" style="clear: both">
 <a name="afio.design"></a><a class="link" href="design.html" title="Design Rationale">Design Rationale</a>
 </h2></div></div></div>
+<div class="toc"><dl class="toc"><dt><span class="section"><a href="design/overview.html">A quick overview of the design</a></span></dt></dl></div>
 <p>
       Boost.AFIO came about out of the need for a scalable, high performance, portable
       asynchronous file i/o implementation library for a forthcoming filing system
-      based graph store ACID compliant persistence layer called TripleGit (with which
-      I hope to implement portable Component Objects for C++ extending C++ Modules,
-      which is why I am unfortunately unable to reuse <a href="http://unqlite.org/" target="_top">the
-      UnQLite embedded NoSQL database engine</a> which is otherwise exactly what
-      I need). The fact that one was needed at all came as a bit of a surprise: one
-      thinks of these things as done and dusted decades ago, but it turns out that
-      <a href="http://nikhilm.github.io/uvbook/filesystem.html" target="_top">libuv</a>,
-      a C library, is good enough for most people needing asynchronous file i/o.
-      However as great as libuv is, it isn't very C++-ish, and hooking it in with
-      <a href="http://www.boost.org/libs/asio/" target="_top">Boost.ASIO</a> (parts of which
-      are expected to enter the ISO C++ language standard) isn't particularly clean.
+      based graph store ACID compliant transactional persistence layer called TripleGit
+      -- call it a <span class="quote">&#8220;<span class="quote">SQLite3 but for graphstores"</span>&#8221;</span><a href="#ftn.afio.design.f0" class="footnote" name="afio.design.f0"><sup class="footnote">[1]</sup></a>. The fact that a portable asynchronous file i/o library for C++
+      was needed at all came as a bit of a surprise: one thinks of these things as
+      done and dusted decades ago, but it turns out that the fully featured <a href="http://nikhilm.github.io/uvbook/filesystem.html" target="_top">libuv</a>, a C library,
+      is good enough for most people needing portable asynchronous file i/o. However
+      as great as libuv is, it isn't very C++-ish, and hooking it in with <a href="http://www.boost.org/libs/asio/" target="_top">Boost.ASIO</a> (parts of which are
+      expected to enter the ISO C++ language standard) isn't particularly clean.
       I therefore resolved to write a native Boost asynchronous file i/o implementation,
       and keep it as simple as possible.
     </p>
@@ -50,19 +47,30 @@
       Google and Microsoft, like many other big iron C++ users, have much need to
       asynchronously execute large numbers of closures (bound function objects) with
       various dependencies between the completion of one or more closures and the
-      ability to start one or more other closures. What one effectively does is to
-      create a 'dependency chain' of small items to be executed, and then fire as
-      many compute resources as possible at those chains, executing as many of them
-      simultaneously as is permitted by the requirements of the dependency chains.
-      Boost.AFIO differs from N3562 by directly extending Boost.ASIO, so if you're
-      already using Boost.ASIO to do your networking, well it's a real cinch to add
-      in asynchronous closure execution e.g. if a packet of data arrives, do this
-      set of operations according to this dependency chain. Boost.AFIO differs from
-      N3634 by going a lot further than N3634 does by having explicit support for
-      both Boost.ASIO and targeted file i/o support infrastructure. Boost.AFIO therefore
-      lies somewhere in between N3562 and N3634 in terms of complexity, but instead
-      of specifying a new system of executors it uses Boost.ASIO as the executor.
+      ability to schedule one or more other closures. What one effectively does is
+      to create a <span class="emphasis"><em>dependency chain</em></span> of small items to be executed,
+      and then fire as many compute resources as possible at those chains, executing
+      as many of them simultaneously as is permitted by the requirements of the dependency
+      chains. Boost.AFIO differs from N3562 by directly extending Boost.ASIO, so
+      if you're already using Boost.ASIO to do your networking, well it's a real
+      cinch to add in asynchronous closure execution e.g. <span class="quote">&#8220;<span class="quote">if a packet of data
+      arrives, do this set of operations according to this dependency chain</span>&#8221;</span>.
+      Boost.AFIO differs from N3634 by going a lot further than N3634 does by having
+      explicit support for both Boost.ASIO and targeted file i/o support infrastructure.
+      Boost.AFIO therefore lies somewhere in between N3562 and N3634 in terms of
+      complexity, but instead of specifying a new system of executors it uses Boost.ASIO
+      central dispatch engine as the executor.
     </p>
+<div class="footnotes">
+<br><hr style="width:100; text-align:left;margin-left: 0">
+<div id="ftn.afio.design.f0" class="footnote"><p><a href="#afio.design.f0" class="para"><sup class="para">[1] </sup></a>
+        The <a href="http://unqlite.org/" target="_top">UnQLite embedded NoSQL database engine</a>
+        is exactly one of those of course. Unfortunately I intend TripleGit for implementing
+        portable Component Objects for C++ extending C++ Modules, which means I need
+        a database engine suitable for incorporation into a dynamic linker, which
+        unfortunately is not quite UnQLite.
+      </p></div>
+</div>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
 <td align="left"></td>
@@ -74,7 +82,7 @@
 </tr></table>
 <hr>
 <div class="spirit-nav">
-<a accesskey="p" href="../index.html"><img src="../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="compilation.html"><img src="../../../../../doc/src/images/next.png" alt="Next"></a>
+<a accesskey="p" href="../index.html"><img src="../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="design/overview.html"><img src="../../../../../doc/src/images/next.png" alt="Next"></a>
 </div>
 </body>
 </html>

@@ -673,3 +673,9 @@ div.informaltable table tbody tr td pre.table-programlisting {
   padding-left: 4em;
   text-indent: -4em;
 }
+
+/* Put some spacing between list items */
+div.orderedlist ol.orderedlist li.listitem, div.itemizedlist ul.itemizedlist li.listitem {
+  padding-top: 0.25em;
+  padding-bottom: 0.25em;
+}
