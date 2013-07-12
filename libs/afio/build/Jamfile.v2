@@ -7,10 +7,9 @@
 #  http://www.boost.org/LICENSE_1_0.txt)
 
 
-import modules ;
+#import modules ;
 
-#local boost-path = [ modules.peek : BOOST ] ;
-
+#local boost-path = [ modules.peek : BOOST_ROOT ] ; #probably dont need this any more
 
 #Is this Right?
 
@@ -21,15 +20,21 @@ project boost/afio
       <define>BOOST_AFIO_SOURCE
 	: usage-requirements 
       <include>. 
-      <link>shared:<define>BOOST_AFIO_DYN_LINK=1
-      <library>$(boost-path)/libs/system/build//boost_system
-      <library>$(boost-path)/libs/filesystem/build//boost_filesystem 
-      <library>$(boost-path)/libs/atomic/build//boost_atomic
-      <library>$(boost-path)/libs/thread/build//boost_thread
+
+      <library>/boost/system//boost_system
+      <library>/boost/filesystem//boost_filesystem 
+      <library>/boost/atomic//boost_atomic
+      <library>/boost/thread//boost_thread
+      
+#      <library>$(boost-path)/libs/system/build//boost_system
+#      <library>$(boost-path)/libs/filesystem/build//boost_filesystem 
+#      <library>$(boost-path)/libs/atomic/build//boost_atomic
+#      <library>$(boost-path)/libs/thread/build//boost_thread
 #      <library>$../../libs/system/build//boost_system
 #      <library>$../../libs/filesystem/build//boost_filesystem 
 #      <library>$../../libs/atomic/build//boost_atomic
 #      <library>$../../libs/thread/build//boost_thread
+      <link>shared:<define>BOOST_AFIO_DYN_LINK=1
     : source-location ../src
 
 ;
