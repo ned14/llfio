@@ -94,7 +94,7 @@ script:
 #build unit tests
  - b2 libs/afio/test $DEBUGBUILD toolset=$CC$GCCVER --link=shared $FLAGS;
 
- - cat libs/afio/test/bin/main.test/*/*/*/main.output
+ - cat bin.v2/libs/afio/test/main.test/*/*/*/main.output
 
 
 #valgrind setup
