@@ -62,7 +62,7 @@ before_install:
 #set GCCVER for clang and TESTPREFIX for all compilers 
  - if [ $CC = "clang" ]; then GCCVER=""; TESTPREFIX="bin.v2/libs/afio/test/clang-linux"; else TESTPREFIX="bin.v2/libs/afio/test/$CC"; fi
 
- - if [ $CC="gcc" ] && [ $GCCVER="" ]; then GCCVER="-4.6" ; fi
+ - if( [ $CC=gcc ] && [ $GCCVER="" ] ) ; then GCCVER="-4.6" ; fi
 
  - echo $GCCVER
 
