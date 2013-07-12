@@ -94,7 +94,8 @@ script:
 #build unit tests
  - b2 libs/afio/test $DEBUGBUILD toolset=$CC$GCCVER --link=shared $FLAGS;
 
- - cat bin.v2/libs/afio/test/main.test/*/*/main.output
+#if we want to use the built in bjam test runner we can get test output this way
+# - cat bin.v2/libs/afio/test/main.test/*/*/main.output #may need to specify path better on valgrind tests
 
 
 #valgrind setup
@@ -103,8 +104,8 @@ script:
  - if [ $VALGRIND = "0" ]; then PREFIXTEST=""; fi
  
 #runtests
-# - if [ $GCOV -eq 1 ]; then set -x; fi
-# - if [ "$UNIT_TESTS" != "0" ]; then $PREFIXTEST $PREFIXPATH/boost_afio_test -s $UNIT_TESTS; fi
+ - if [ $GCOV -eq 1 ]; then set -x; fi
+ - if [ "$UNIT_TESTS" != "0" ]; then $PREFIXTEST $PREFIXPATH/boost_afio_test -s $UNIT_TESTS; fi
 
 after_success:
  - if [ $GCOV -eq 1 ]; then bash libs/afio/test/update_coveralls.sh `pwd`; fi

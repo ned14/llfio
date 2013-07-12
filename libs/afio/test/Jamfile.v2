@@ -13,33 +13,28 @@
 
 import testing ;
 
-#project boost/afio/test
-#    : requirements
-#      <threading>multi
-#      <library>../build//boost_afio
-#      <library>/boost/afio//boost_afio
-#      <library>/boost/system//boost_system
-#      <library>/boost/filesystem//boost_filesystem 
-#      <library>/boost/atomic//boost_atomic
-#      <library>/boost/thread//boost_thread
-#      <cxxflags>-std=c++0x 
-#      #<linkflags>"-l pthread"      #is this the test's dependency or boost_afio's???? 
-#    ;
+project boost/afio/test
+    : requirements
+      <threading>multi
+      <library>/boost/afio//boost_afio
+      <cxxflags>-std=c++0x 
+      #<linkflags>"-l pthread"      #is this the test's dependency or boost_afio's???? 
+    ;
 
 
-#exe boost_afio_test : main.cpp   ../detail/SpookyV2.cpp
-#    : <include>../../../boost/afio/detail
+exe boost_afio_test : main.cpp   ../detail/SpookyV2.cpp
+    : <include>../../../boost/afio/detail
 
-#;
+;
 
 test-suite afio  
     : #[ link main.cpp ../detail/SpookyV2.cpp
       #  : <cxxflags>-std=c++0x <library>/boost/afio//boost_afio <include>../../../boost/afio/detail ]
     
-      [ run main.cpp ../detail/SpookyV2.cpp 
-        : #args
-        : #input files
-        : <cxxflags>-std=c++0x <library>/boost/afio//boost_afio <include>../../../boost/afio/detail ]
+#      [ run main.cpp ../detail/SpookyV2.cpp 
+#        : #args
+#        : #input files
+#        : <cxxflags>-std=c++0x <library>/boost/afio//boost_afio <include>../../../boost/afio/detail ]
     ;
 
 
