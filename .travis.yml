@@ -25,7 +25,7 @@ matrix:
       env: _="GCC 4.8 + Unit/functional tests coverage" VALGRIND=0 CCFLAGS="-fprofile-arcs -ftest-coverage" UNIT_TESTS="" DEBUG=1 GCCVER="-4.8" GCOV=1
 
     - compiler: clang
-      env: _="Race detection tests" VALGRIND=0 CCFLAGS="-fsanitize=thread" UNIT_TESTS="" DEBUG=2 GCCVER="" TSAN_OPTIONS="suppressions=libs/afio/test/tsan.supp" GCOV=0
+      env: _="Race detection tests" VALGRIND=0 CCFLAGS="-fsanitize=thread" UNIT_TESTS="" DEBUG=2 GCCVER="-4.8" TSAN_OPTIONS="suppressions=libs/afio/test/tsan.supp" GCOV=0
 
 
   allow_failures:
