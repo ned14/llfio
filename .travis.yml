@@ -30,7 +30,7 @@ matrix:
 
   allow_failures:
     - compiler: gcc
-      env: _="Race detection tests" VALGRIND=0 CCFLAGS="-fsanitize=thread" UNIT_TESTS="" DEBUG=2 GCCVER="" TSAN_OPTIONS="suppressions=libs/afio/test/tsan.supp" GCOV=0
+      env: _="Race detection tests" VALGRIND=0 CCFLAGS="-fsanitize=thread" UNIT_TESTS="" DEBUG=2 GCCVER="-4.8" TSAN_OPTIONS="suppressions=libs/afio/test/tsan.supp" GCOV=0
 
 
 
