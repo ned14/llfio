@@ -30,6 +30,7 @@ cmd = cmd + " --convenience_header_path ../../../boost/afio/"
 cmd = cmd + " --convenience_headers afio.hpp"
 cmd = cmd + " --skip_namespace boost::afio::"
 cmd = cmd + " --copyright copyright_block.qbk"
+#cmd = cmd + " --output_style alt"
 cmd = cmd + " > generated/%s.qbk"
 
 def call_doxygen():
