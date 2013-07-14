@@ -247,15 +247,14 @@ An op handle.
 Schedule a batch of asynchronous data reads after preceding operations. 
 
 [heading Synopsis]
-``template<class T, >
+``template<class T>
 std::vector< async_io_op > async_file_io_dispatcher_base::read(const std::vector< async_data_op_req< T >> & ops)``
 
 [heading Parameters]
 
 [table
 [[Type] [Concept] [Name] [Description] ]
-[[class T] [] [ - ] [Must be specified]]
-[[T] [Any arbitrary type. ] [ - ] [Must be specified]]
+[[class T] [Any arbitrary type. ] [ - ] [Must be specified]]
 [[const std::vector< async_data_op_req< T >> &] [] [ops] [A batch of [^`async_data_op_req``<T>`] structures.]]
 ]
 
@@ -571,15 +570,14 @@ An op handle.
 Schedule a batch of asynchronous data writes after preceding operations. 
 
 [heading Synopsis]
-``template<class T, >
+``template<class T>
 std::vector< async_io_op > async_file_io_dispatcher_base::write(const std::vector< async_data_op_req< T >> & ops)``
 
 [heading Parameters]
 
 [table
 [[Type] [Concept] [Name] [Description] ]
-[[class T] [] [ - ] [Must be specified]]
-[[T] [Any arbitrary type. ] [ - ] [Must be specified]]
+[[class T] [Any arbitrary type. ] [ - ] [Must be specified]]
 [[const std::vector< async_data_op_req< T >> &] [] [ops] [A batch of [^`async_data_op_req``<T>`] structures.]]
 ]
 

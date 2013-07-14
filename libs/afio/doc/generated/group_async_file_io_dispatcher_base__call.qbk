@@ -18,15 +18,14 @@ Schedule a batch of asynchronous invocations of the specified bound functions wh
 This is effectively a convenience wrapper for [^`completion()`]. It creates a packaged\u005ftask matching the [^`completion_t`] handler specification and calls the specified arbitrary callable, always returning completion on exit.
 
 [heading Synopsis]
-``template<class R, >
+``template<class R>
 std::pair< std::vector< future< R > >, std::vector< async_io_op > > async_file_io_dispatcher_base::call(const std::vector< async_io_op > & ops, const std::vector< std::function< R()>> & callables)``
 
 [heading Parameters]
 
 [table
 [[Type] [Concept] [Name] [Description] ]
-[[class R] [] [ - ] [Must be specified]]
-[[R] [A compiler deduced return type of the bound functions. ] [ - ] [Must be specified]]
+[[class R] [A compiler deduced return type of the bound functions. ] [ - ] [Must be specified]]
 [[const std::vector< async_io_op > &] [] [ops] [A batch of precondition op handles. If default constructed, a precondition is null. ]]
 [[const std::vector< std::function< R()>> &] [] [callables] [A batch of bound functions to call, returning R.]]
 ]
@@ -54,15 +53,14 @@ Schedule a batch of asynchronous invocations of the specified bound functions wh
 This is effectively a convenience wrapper for [^`completion()`]. It creates a packaged\u005ftask matching the [^`completion_t`] handler specification and calls the specified arbitrary callable, always returning completion on exit. If you are seeing performance issues, using [^`completion()`] directly will have much less overhead.
 
 [heading Synopsis]
-``template<class R, >
+``template<class R>
 std::pair<std::vector<future<R> >, std::vector<async_io_op> > async_file_io_dispatcher_base::call(const std::vector< std::function< R()>> & callables)``
 
 [heading Parameters]
 
 [table
 [[Type] [Concept] [Name] [Description] ]
-[[class R] [] [ - ] [Must be specified]]
-[[R] [A compiler deduced return type of the bound functions. ] [ - ] [Must be specified]]
+[[class R] [A compiler deduced return type of the bound functions. ] [ - ] [Must be specified]]
 [[const std::vector< std::function< R()>> &] [] [callables] [A batch of bound functions to call, returning R.]]
 ]
 
@@ -89,17 +87,17 @@ Schedule an asynchronous invocation of the specified unbound callable when its s
 This is effectively a convenience wrapper for [^`completion()`]. It creates a packaged\u005ftask matching the [^`completion_t`] handler specification and calls the specified arbitrary callable, always returning completion on exit. If you are seeing performance issues, using [^`completion()`] directly will have much less overhead.
 
 [heading Synopsis]
-``template<class C, class... Args, >
+``template<class C, class... Args>
 std::pair< future< typename std::result_of< C(Args...)>::type >, async_io_op > async_file_io_dispatcher_base::call(const async_io_op & req, C callback, Args... args)``
 
 [heading Parameters]
 
 [table
 [[Type] [Concept] [Name] [Description] ]
-[[class C] [] [ - ] [Must be specified]]
+[[class C] [Any callable type. ] [ - ] [Must be specified]]
 [[Args] [Any sequence of argument types. ] [ - ] [Must be specified]]
 [[const async_io_op &] [] [req] [A precondition op handle. If default constructed, the precondition is null. ]]
-[[C] [Any callable type. ] [callback] [An unbound callable to call. ]]
+[[C] [] [callback] [An unbound callable to call. ]]
 [[Args...] [] [args] [An arbitrary sequence of arguments to bind to the callable.]]
 ]
 

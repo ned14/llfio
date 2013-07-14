@@ -237,7 +237,7 @@ to allow you to create a future which only becomes available when all the suppli
 futures become available.
 
 \return A future vector of the results of the input futures
-\tparam InputIterator A type modelling an iterator
+\tparam "class InputIterator" A type modelling an iterator
 \param first An iterator pointing to the first item to wait upon
 \param last An iterator pointing to after the last future to wait upon
 \ingroup when_all_futures
@@ -265,7 +265,7 @@ to allow you to create a future which only becomes available when the first of t
 futures become available.
 
 \return A future pair of the first future to become available and its result
-\tparam InputIterator A type modelling an iterator
+\tparam "class InputIterator" A type modelling an iterator
 \param first An iterator pointing to the first future to wait upon
 \param last An iterator pointing to after the last future to wait upon
 \ingroup when_all_futures
@@ -409,8 +409,10 @@ BOOST_AFIO_DECLARE_CLASS_ENUM_AS_BITFIELD(async_op_flags)
 \brief Abstract base class for dispatching file i/o asynchronously
 
 This is a reference counted instance with platform-specific implementation optionally hidden in object code.
+Construct an instance using the `boost::afio::async_file_io_dispatcher()` function.
 
 \qbk{
+[/ link afio.reference.functions.async_file_io_dispatcher `async_file_io_dispatcher()`]
 [include generated/group_async_file_io_dispatcher_base__completion.qbk]
 [include generated/group_async_file_io_dispatcher_base__call.qbk]
 [include generated/group_async_file_io_dispatcher_base__filedirops.qbk]
@@ -478,7 +480,7 @@ public:
     handler specification and calls the specified arbitrary callable, always returning completion on exit.
     
     \return A pair with a batch of futures returning the result of each of the callables and a batch of op handles.
-    \tparam R A compiler deduced return type of the bound functions.
+    \tparam "class R" A compiler deduced return type of the bound functions.
     \param ops A batch of precondition op handles. If default constructed, a precondition is null.
     \param callables A batch of bound functions to call, returning R.
     \ingroup async_file_io_dispatcher_base__call
@@ -495,7 +497,7 @@ public:
     are seeing performance issues, using `completion()` directly will have much less overhead.
     
     \return A pair with a batch of futures returning the result of each of the callables and a batch of op handles.
-    \tparam R A compiler deduced return type of the bound functions.
+    \tparam "class R" A compiler deduced return type of the bound functions.
     \param callables A batch of bound functions to call, returning R.
     \ingroup async_file_io_dispatcher_base__call
     \qbk{distinguish, batch bound functions without preconditions}
@@ -511,7 +513,7 @@ public:
     are seeing performance issues, using `completion()` directly will have much less overhead.
     
     \return A pair with a future returning the result of the callable and an op handle.
-    \tparam R A compiler deduced return type of the bound functions.
+    \tparam "class R" A compiler deduced return type of the bound functions.
     \param req A precondition op handle. If default constructed, the precondition is null.
     \param callback A bound functions to call, returning R.
     \ingroup async_file_io_dispatcher__call
@@ -530,7 +532,7 @@ public:
     are seeing performance issues, using `completion()` directly will have much less overhead.
     
     \return A pair with a future returning the result of the callable and an op handle.
-    \tparam C Any callable type.
+    \tparam "class C" Any callable type.
     \tparam Args Any sequence of argument types.
     \param req A precondition op handle. If default constructed, the precondition is null.
     \param callback An unbound callable to call.
@@ -686,7 +688,7 @@ public:
 	inline async_io_op read(const async_data_op_req<void> &req);
 	/*! \brief Schedule a batch of asynchronous data reads after preceding operations.
     \return A batch of op handles.
-    \tparam T Any arbitrary type.
+    \tparam "class T" Any arbitrary type.
     \param ops A batch of `async_data_op_req<T>` structures.
     \ingroup async_file_io_dispatcher_base__filedirops
     \qbk{distinguish, batch}
@@ -717,7 +719,7 @@ public:
 	inline async_io_op write(const async_data_op_req<const void> &req);
 	/*! \brief Schedule a batch of asynchronous data writes after preceding operations.
     \return A batch of op handles.
-    \tparam T Any arbitrary type.
+    \tparam "class T" Any arbitrary type.
     \param ops A batch of `async_data_op_req<T>` structures.
     \ingroup async_file_io_dispatcher_base__filedirops
     \qbk{distinguish, batch}
@@ -1169,7 +1171,7 @@ private:
 #endif
 	}
 };
-//! \brief A convenience bundle of precondition, data and where for reading into a single T *. Data \b MUST stay around until the operation completes. \tparam T Any writable type T \ingroup async_data_op_req
+//! \brief A convenience bundle of precondition, data and where for reading into a single T *. Data \b MUST stay around until the operation completes. \tparam "class T" Any writable type T \ingroup async_data_op_req
 template<class T> struct async_data_op_req : public async_data_op_req<void>
 {
     //! \constr
@@ -1185,7 +1187,7 @@ template<class T> struct async_data_op_req : public async_data_op_req<void>
     //! \async_data_op_req1 \param _length The number of bytes to transfer
 	async_data_op_req(async_io_op _precondition, T *v, size_t _length, off_t _where) : async_data_op_req<void>(std::move(_precondition), static_cast<void *>(v), _length, _where) { }
 };
-//! \brief A convenience bundle of precondition, data and where for writing from a single const T *. Data \b MUST stay around until the operation completes. \tparam T Any readable type T \ingroup async_data_op_req
+//! \brief A convenience bundle of precondition, data and where for writing from a single const T *. Data \b MUST stay around until the operation completes. \tparam "class T" Any readable type T \ingroup async_data_op_req
 template<class T> struct async_data_op_req<const T> : public async_data_op_req<const void>
 {
     //! \constr
@@ -1205,7 +1207,7 @@ template<class T> struct async_data_op_req<const T> : public async_data_op_req<c
     //! \async_data_op_req1 \param _length The number of bytes to transfer
 	async_data_op_req(async_io_op _precondition, const T *v, size_t _length, off_t _where) : async_data_op_req<const void>(std::move(_precondition), static_cast<const void *>(v), _length, _where) { }
 };
-//! \brief A convenience bundle of precondition, data and where for reading into a `std::vector<T, A>`. Data \b MUST stay around until the operation completes. \tparam T Any type \tparam A Any STL allocator \ingroup async_data_op_req
+//! \brief A convenience bundle of precondition, data and where for reading into a `std::vector<T, A>`. Data \b MUST stay around until the operation completes. \tparam "class T" Any type \tparam "class A" Any STL allocator \ingroup async_data_op_req
 template<class T, class A> struct async_data_op_req<std::vector<T, A>> : public async_data_op_req<void>
 {
     //! \constr
@@ -1221,7 +1223,7 @@ template<class T, class A> struct async_data_op_req<std::vector<T, A>> : public 
     //! \async_data_op_req1
 	async_data_op_req(async_io_op _precondition, std::vector<T, A> &v, off_t _where) : async_data_op_req<void>(std::move(_precondition), static_cast<void *>(&v.front()), v.size()*sizeof(T), _where) { }
 };
-//! \brief A convenience bundle of precondition, data and where for writing from a `const std::vector<T, A>`. Data \b MUST stay around until the operation completes. \tparam T Any type \tparam A Any STL allocator \ingroup async_data_op_req
+//! \brief A convenience bundle of precondition, data and where for writing from a `const std::vector<T, A>`. Data \b MUST stay around until the operation completes. \tparam "class T" Any type \tparam "class A" Any STL allocator \ingroup async_data_op_req
 template<class T, class A> struct async_data_op_req<const std::vector<T, A>> : public async_data_op_req<const void>
 {
     //! \constr
@@ -1241,7 +1243,7 @@ template<class T, class A> struct async_data_op_req<const std::vector<T, A>> : p
     //! \async_data_op_req1
 	async_data_op_req(async_io_op _precondition, const std::vector<T, A> &v, off_t _where) : async_data_op_req<const void>(std::move(_precondition), static_cast<const void *>(&v.front()), v.size()*sizeof(T), _where) { }
 };
-//! \brief A convenience bundle of precondition, data and where for reading into a `std::array<T, N>`. Data \b MUST stay around until the operation completes. \tparam T Any type \tparam N Any compile-time size \ingroup async_data_op_req
+//! \brief A convenience bundle of precondition, data and where for reading into a `std::array<T, N>`. Data \b MUST stay around until the operation completes. \tparam "class T" Any type \tparam N Any compile-time size \ingroup async_data_op_req
 template<class T, size_t N> struct async_data_op_req<std::array<T, N>> : public async_data_op_req<void>
 {
     //! \constr
@@ -1257,7 +1259,7 @@ template<class T, size_t N> struct async_data_op_req<std::array<T, N>> : public 
     //! \async_data_op_req1
 	async_data_op_req(async_io_op _precondition, std::array<T, N> &v, off_t _where) : async_data_op_req<void>(std::move(_precondition), static_cast<void *>(&v.front()), v.size()*sizeof(T), _where) { }
 };
-//! \brief A convenience bundle of precondition, data and where for writing from a `const std::array<T, N>`. Data \b MUST stay around until the operation completes. \tparam T Any type \tparam N Any compile-time size \ingroup async_data_op_req
+//! \brief A convenience bundle of precondition, data and where for writing from a `const std::array<T, N>`. Data \b MUST stay around until the operation completes. \tparam "class T" Any type \tparam N Any compile-time size \ingroup async_data_op_req
 template<class T, size_t N> struct async_data_op_req<const std::array<T, N>> : public async_data_op_req<const void>
 {
     //! \constr
@@ -1277,7 +1279,7 @@ template<class T, size_t N> struct async_data_op_req<const std::array<T, N>> : p
     //! \async_data_op_req1
 	async_data_op_req(async_io_op _precondition, const std::array<T, N> &v, off_t _where) : async_data_op_req<const void>(std::move(_precondition), static_cast<const void *>(&v.front()), v.size()*sizeof(T), _where) { }
 };
-//! \brief A convenience bundle of precondition, data and where for reading into a `std::basic_string<C, T, A>`. Data \b MUST stay around until the operation completes. \tparam C Any character type \tparam T Character traits type \tparam A Any STL allocator \ingroup async_data_op_req
+//! \brief A convenience bundle of precondition, data and where for reading into a `std::basic_string<C, T, A>`. Data \b MUST stay around until the operation completes. \tparam "class C" Any character type \tparam "class T" Character traits type \tparam "class A" Any STL allocator \ingroup async_data_op_req
 template<class C, class T, class A> struct async_data_op_req<std::basic_string<C, T, A>> : public async_data_op_req<void>
 {
     //! \constr
@@ -1293,7 +1295,7 @@ template<class C, class T, class A> struct async_data_op_req<std::basic_string<C
     //! \async_data_op_req1
 	async_data_op_req(async_io_op _precondition, std::basic_string<C, T, A> &v, off_t _where) : async_data_op_req<void>(std::move(_precondition), static_cast<void *>(&v.front()), v.size()*sizeof(A), _where) { }
 };
-//! \brief A convenience bundle of precondition, data and where for writing from a `const std::basic_string<C, T, A>`. Data \b MUST stay around until the operation completes.  \tparam C Any character type \tparam T Character traits type \tparam A Any STL allocator \ingroup async_data_op_req
+//! \brief A convenience bundle of precondition, data and where for writing from a `const std::basic_string<C, T, A>`. Data \b MUST stay around until the operation completes.  \tparam "class C" Any character type \tparam "class T" Character traits type \tparam "class A" Any STL allocator \ingroup async_data_op_req
 template<class C, class T, class A> struct async_data_op_req<const std::basic_string<C, T, A>> : public async_data_op_req<const void>
 {
     //! \constr

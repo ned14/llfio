@@ -28,7 +28,7 @@
           const T &gt;</a>
 </h5></div></div></div>
 <p>
-            <a class="indexterm" name="id886098"></a>
+            <a class="indexterm" name="id859959"></a>
 A convenience bundle of precondition, data and where for writing from
             a single const T *. Data <span class="bold"><strong>MUST</strong></span> stay around
             until the operation completes.
@@ -37,11 +37,13 @@ A convenience bundle of precondition, data and where for writing from
 <a name="afio.reference.structs.async_data_op_req.async_data_op_req_constt_.h0"></a>
             <span class="phrase"><a name="afio.reference.structs.async_data_op_req.async_data_op_req_constt_.synopsis"></a></span><a class="link" href="async_data_op_req_constt_.html#afio.reference.structs.async_data_op_req.async_data_op_req_constt_.synopsis">Synopsis</a>
           </h6>
-<pre class="programlisting"><span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">T</span><span class="special">,</span> <span class="special">&gt;</span>
+<pre class="programlisting"><span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">T</span><span class="special">&gt;</span>
 <span class="keyword">struct</span> <span class="identifier">async_data_op_req</span><span class="special">&lt;</span> <span class="keyword">const</span> <span class="identifier">T</span> <span class="special">&gt;</span>
       <span class="special">:</span> <span class="keyword">public</span> <span class="identifier">async_data_op_req</span><span class="special">&lt;</span> <span class="keyword">const</span> <span class="keyword">void</span> <span class="special">&gt;</span>
 <span class="special">{</span>
-  <span class="comment">// ...</span>
+  <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">asio</span><span class="special">::</span><span class="identifier">const_buffer</span> <span class="special">&gt;</span> <span class="identifier">buffers</span><span class="special">;</span>  <span class="comment">// A sequence of const Boost.ASIO buffers to write from. </span>
+  <span class="identifier">async_io_op</span> <span class="identifier">precondition</span><span class="special">;</span>                          <span class="comment">// An optional precondition for this operation. </span>
+  <span class="identifier">off_t</span> <span class="identifier">where</span><span class="special">;</span>                                       <span class="comment">// The offset into which to write. </span>
 <span class="special">};</span>
 </pre>
 <h6>
@@ -66,26 +68,18 @@ A convenience bundle of precondition, data and where for writing from
                     </p>
                   </th>
 </tr></thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>
                     <p>
                       class T
                     </p>
                   </td>
 <td>
-                  </td>
-</tr>
-<tr>
-<td>
-                  </td>
-<td>
                     <p>
                       Any readable type T
                     </p>
                   </td>
-</tr>
-</tbody>
+</tr></tbody>
 </table></div>
 <h6>
 <a name="afio.reference.structs.async_data_op_req.async_data_op_req_constt_.h2"></a>

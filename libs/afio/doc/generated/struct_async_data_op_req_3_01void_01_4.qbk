@@ -17,7 +17,9 @@ A convenience bundle of precondition, data and where for reading into a void *. 
 [heading Synopsis]
 ``struct async_data_op_req< void >
 {
-  // ...
+  std::vector< boost::asio::mutable_buffer > buffers;  // A sequence of mutable Boost.ASIO buffers to read into. 
+  async_io_op precondition;                            // An optional precondition for this operation. 
+  off_t where;                                         // The offset from which to read. 
 };
 ``
 
@@ -64,13 +66,13 @@ A convenience bundle of precondition, data and where for reading into a void *. 
 ]]
 [[`` async_data_op_req(async_io_op _precondition, void * v, size_t _length, off_t _where)``
 
-] [Constructs an instance. ] [[* async_io_op]: ['_precondition]:  An optional precondition for this operation 
+] [Constructs an instance. ] [[* async_io_op]: ['_precondition]:  An optional precondition for this operation
 
-[* void *]: ['v]:  A pointer to memory or reference to object into which to read or write 
+[* void *]: ['v]:  A pointer to memory or reference to object into which to read or write
 
 [* size_t]: ['_length]:  The number of bytes to transfer 
 
-[* off_t]: ['_where]:  The offset at which to transfer 
+[* off_t]: ['_where]:  The offset at which to transfer
 
 
 
@@ -78,9 +80,9 @@ A convenience bundle of precondition, data and where for reading into a void *. 
 ]]
 [[`` async_data_op_req(async_io_op _precondition, std::vector< boost::asio::mutable_buffer > _buffers, off_t _where)``
 
-] [Constructs an instance. ] [[* async_io_op]: ['_precondition]:  An optional precondition for this operation 
+] [Constructs an instance. ] [[* async_io_op]: ['_precondition]:  An optional precondition for this operation
 
-[* std::vector< boost::asio::mutable_buffer >]: ['_buffers]:  A sequence of mutable/const Boost.ASIO buffers to read into/write from 
+[* std::vector< boost::asio::mutable_buffer >]: ['_buffers]:  A sequence of mutable/const Boost.ASIO buffers to read into/write from
 
 [* off_t]: ['_where]:  The offset at which to transfer 
 

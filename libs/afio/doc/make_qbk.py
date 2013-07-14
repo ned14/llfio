@@ -6,7 +6,7 @@
 #  http://www.boost.org/LICENSE_1_0.txt)
 # ============================================================================
 
-import os, sys, glob
+import os, sys, glob, shutil
 
 os.chdir(os.path.dirname(sys.argv[0]))
 
@@ -20,8 +20,11 @@ if 'DOXYGEN_XML2QBK' in os.environ:
 else:
     doxygen_xml2qbk_cmd = 'doxygen_xml2qbk'
 
-if not os.path.exists("generated"):
-    os.mkdir("generated")
+if os.path.exists("generated"):
+    shutil.rmtree("generated", True)
+if os.path.exists("html/afio"):
+    shutil.rmtree("html/afio", True)
+os.mkdir("generated")
 
 cmd = doxygen_xml2qbk_cmd
 cmd = cmd + " --xml %s"

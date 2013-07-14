@@ -27,7 +27,7 @@
 <a name="afio.reference.structs.async_io_op"></a><a class="link" href="async_io_op.html" title="async_io_op">async_io_op</a>
 </h4></div></div></div>
 <p>
-          <a class="indexterm" name="id898354"></a>
+          <a class="indexterm" name="id871033"></a>
 A reference to an asynchronous operation.
         </p>
 <h6>
@@ -48,7 +48,9 @@ A reference to an asynchronous operation.
         </h6>
 <pre class="programlisting"><span class="keyword">struct</span> <span class="identifier">async_io_op</span>
 <span class="special">{</span>
-  <span class="comment">// ...</span>
+  <span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span> <span class="identifier">shared_future</span><span class="special">&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span> <span class="identifier">detail</span><span class="special">::</span><span class="identifier">async_io_handle</span> <span class="special">&gt;</span> <span class="special">&gt;</span> <span class="special">&gt;</span> <span class="identifier">h</span><span class="special">;</span>  <span class="comment">// A future handle to the item being operated upon. </span>
+  <span class="identifier">size_t</span> <span class="identifier">id</span><span class="special">;</span>                                                                         <span class="comment">// A unique id for this operation. </span>
+  <span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span> <span class="identifier">async_file_io_dispatcher_base</span> <span class="special">&gt;</span> <span class="identifier">parent</span><span class="special">;</span>                           <span class="comment">// The parent dispatcher. </span>
 <span class="special">};</span>
 </pre>
 <h6>

@@ -28,7 +28,7 @@
           const void &gt;</a>
 </h5></div></div></div>
 <p>
-            <a class="indexterm" name="id892155"></a>
+            <a class="indexterm" name="id865326"></a>
 A convenience bundle of precondition, data and where for writing from
             a const void *. Data <span class="bold"><strong>MUST</strong></span> stay around
             until the operation completes.
@@ -39,7 +39,9 @@ A convenience bundle of precondition, data and where for writing from
           </h6>
 <pre class="programlisting"><span class="keyword">struct</span> <span class="identifier">async_data_op_req</span><span class="special">&lt;</span> <span class="keyword">const</span> <span class="keyword">void</span> <span class="special">&gt;</span>
 <span class="special">{</span>
-  <span class="comment">// ...</span>
+  <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">asio</span><span class="special">::</span><span class="identifier">const_buffer</span> <span class="special">&gt;</span> <span class="identifier">buffers</span><span class="special">;</span>  <span class="comment">// A sequence of const Boost.ASIO buffers to write from. </span>
+  <span class="identifier">async_io_op</span> <span class="identifier">precondition</span><span class="special">;</span>                          <span class="comment">// An optional precondition for this operation. </span>
+  <span class="identifier">off_t</span> <span class="identifier">where</span><span class="special">;</span>                                       <span class="comment">// The offset into which to write. </span>
 <span class="special">};</span>
 </pre>
 <h6>

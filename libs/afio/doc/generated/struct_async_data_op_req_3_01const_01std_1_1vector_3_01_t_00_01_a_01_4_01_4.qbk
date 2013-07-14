@@ -15,21 +15,21 @@
 A convenience bundle of precondition, data and where for writing from a [^`const std::vector<T, A>`]. Data [*MUST] stay around until the operation completes. 
 
 [heading Synopsis]
-``template<class T, class A, , >
+``template<class T, class A>
 struct async_data_op_req< const std::vector< T, A > >
       : public async_data_op_req< const void >
 {
-  // ...
+  std::vector< boost::asio::const_buffer > buffers;  // A sequence of const Boost.ASIO buffers to write from. 
+  async_io_op precondition;                          // An optional precondition for this operation. 
+  off_t where;                                       // The offset into which to write. 
 };
 ``
 
 [heading Template parameter(s)]
 [table
 [[Parameter] [Description]]
-[[class T] []]
-[[class A] []]
-[[] [Any type ]]
-[[] [Any STL allocator ]]
+[[class T] [Any type]]
+[[class A] [Any STL allocator ]]
 ]
 
 [heading Member Function(s)]
@@ -100,9 +100,9 @@ True if contents are correct
 ]]
 [[`` async_data_op_req(async_io_op _precondition, const std::vector< T, A > & v, off_t _where)``
 
-] [Constructs an instance. ] [[* async_io_op]: ['_precondition]:  An optional precondition for this operation 
+] [Constructs an instance. ] [[* async_io_op]: ['_precondition]:  An optional precondition for this operation
 
-[* const std::vector< T, A > &]: ['v]:  A pointer to memory or reference to object into which to read or write 
+[* const std::vector< T, A > &]: ['v]:  A pointer to memory or reference to object into which to read or write
 
 [* off_t]: ['_where]:  The offset at which to transfer 
 

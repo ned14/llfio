@@ -40,6 +40,7 @@
 
 [import ../test/examples/call_example.cpp]
 
+[section:introduction Introduction]
 __boost_afio__ is a linear scalable, batch, chainable, asynchronous closure execution engine extending __boost_asio__
 and __boost_thread__ specialised as a portable asynchronous file i/o implementation
 library. Implementation of this first version has been kept as simple as possible (< 1000 active
@@ -52,9 +53,13 @@ compilers known to be minimally sufficient include:
 
 * Microsoft Visual Studio 2010.
 * GNU Compiler Collection v4.3.
-* Any clang.
+* clang v2.9.
 
-You may find the list of C++11 features in popular compilers at
+Note that just because a compiler will compile the code does not mean performance will be good:
+in particular, your compiler needs to be able to choose move construction where a copy
+constructor is also available (known as rvalue references v2.1) and auto-generate implicit
+move constructors when all member data types have move constructors (known as rvalue references
+v3.0). You may find the list of C++11 features in popular compilers at
 [@http://wiki.apache.org/stdcxx/C++0xCompilerSupport] useful.
 
 As a very quick example of minimal usage:
@@ -62,6 +67,8 @@ As a very quick example of minimal usage:
 [call_example]
 
 [/ You can also schedule an asynchronous [link reference.when_all when_all()] using [link reference.async_file_io_dispatcher_base.barrier barrier()]. /]
+
+[endsect] [/introduction]
 
 [include design_rationale.qbk]
 [include compiling.qbk]

@@ -8,7 +8,7 @@
 
 __boost_afio__ came about out of the need for a scalable, high performance, portable asynchronous
 file i/o implementation library for a forthcoming filing system based graph store ACID compliant transactional
-persistence layer called TripleGit -- call it a ["SQLite3 but for graphstores"][footnote The
+persistence layer called TripleGit -- call it a ["SQLite3 but for graphstores][footnote The
 [@http://unqlite.org/ UnQLite embedded NoSQL database engine] is exactly one of those of course.
 Unfortunately I intend TripleGit for implementing portable Component Objects for
 C++ extending C++ Modules, which means I need a database engine suitable for incorporation into
@@ -24,10 +24,10 @@ file i/o implementation, and keep it as simple as possible.
 __boost_afio__ is actually, of course, really a different take on Google's __WG21_N3562__
 and Microsoft's __WG21_N3634__. Both Google and Microsoft, like many other big iron C++ users, have much need to
 asynchronously execute large numbers of closures (bound function objects) with various
-dependencies between the completion of one or more closures and the ability to schedule
+dependencies between the completion of one or more closures before allowing the starting of
 one or more other closures. What one effectively does is to create a ['dependency chain]
 of small items to be executed, and then fire as many compute resources as possible at
-those chains, executing as many of them simultaneously as is permitted by the requirements
+those chains, with the engine executing as many of them simultaneously as is permitted by the requirements
 of the dependency chains. __boost_afio__ differs from N3562 by directly extending Boost.ASIO,
 so if you're already using Boost.ASIO to do your networking, well it's a real cinch to
 add in asynchronous closure execution e.g. ["if a packet of data arrives, do this set of
@@ -37,18 +37,32 @@ targeted file i/o support infrastructure. __boost_afio__ therefore lies somewher
 between N3562 and N3634 in terms of complexity, but instead of specifying a new system
 of executors it uses Boost.ASIO central dispatch engine as the executor.
 
+As I mentioned earlier, __boost_afio__ version 1 is intentionally as simple as possible, even though
+that has consequences for performance where closure dispatch is plenty fast enough for a single state
+of the art SATA3 SSD (~150k IOPS)[footnote Achieving this throughput requires a four core or higher CPU.], but not enough
+for PCIe SSDs which can achieve anywhere between
+250k IOPS and 10m IOPS for the really high end models. This is because it is expected that N3562 and N3634
+will be adjusted in the light of __boost_afio__'s design, and hopefully a merged proposal
+covering all three approaches to the same thing (i.e. a fusion of schedulers and executors
+with the existing executor model implemented by Boost.ASIO) will emerge, which may well prompt a version 2 of
+AFIO.
+
 [section:overview A quick overview of the design]
 
-__boost_afio__ is amongst the smallest standalone libraries in the Boost C++ libraries.
+__boost_afio__ version 1 is amongst the smallest standalone libraries in the Boost C++ libraries.
 Its total active lines of code is less than 1,000 lines, and implementing its documentatation and
 other associated necessities for Boost peer review took longer than writing and debugging
 the code itself. Yet despite its shortness of length, AFIO has some unusual design choices,
-and probably what some might initially think before they've used it is an unintuitive API.
+and probably what some might initially think (before they've used it) is an unintuitive API.
 
 Some quick terminology:
 
-* __afio_op__ is a reference to a scheduled operation.
-I'll call this an ["op reference] from now on for convenience.
+* __afio_op__ is a reference to a scheduled operation. I'll call this an ["op reference] or just
+plain ["op] from now on for convenience. There can be many op references, but only one unique op.
+You can distinguish between ops using their dispatcher parent pointer and the id field, which
+is always a unique non-zero `size_t` value[footnote Until, that is, a `size_t` wraps. The code
+handles this correctly by the way, always ensuring every newly allocated integer id is always
+non-zero and always not yet in the hash table of currently known operations.].
 * __afio_when_all__ returns a future which will become
 ready when all the ops passed in as input have completed. One can therefore wait for
 a given set of ops to complete using `when_all(ops).wait()`.
@@ -68,10 +82,12 @@ POSIX functions). Yet, and especially if it's within the same directory, a batch
 can be [*very] significantly faster than a multitude of single APIs.
  
  As much as AFIO is as constrained by the system-level filing system API as anyone else,
- AFIO employs a thread pool as a crude method of dispatching multiple filing system
+ AFIO employs a thread pool as a crude universally portable method of dispatching multiple filing system
  operations at the same time. For those platforms which support a less crude method of
  delivering batches of filing system operations e.g. an actual batch API, that is
- used instead.
+ used instead. Additionally, micro-kernel platforms are always able to multiplex ['any] set
+ of asynchronous syscalls using a single thread, so for those platforms no thread pool
+ is needed at all.
  
 # Error reporting [*always] follows the ["earliest possible reporting] rule. As absolutely
 everything is asynchronous in AFIO, that also means that exception handling also occurs
@@ -90,23 +106,42 @@ The rules are as follows:
  operation errored, just go ahead and check for it manually using the `h` member which
  is a shared_ptr to a future -- if that future contains an exception, your precondition
  has errored.
+ # The only exception to the preceding rule is the `barrier()` call which [*DOES] propagate
+ errored state to its output. Something which catches a lot of people is that the first
+ rule also applies to `barrier()`, so if an input op is errored on entry to `barrier()`,
+ it rethrows there and then.
 
 # Keep things very, very simple for this first version of AFIO. That means no direct ACL nor
 permissions support, no direct ability to cancel scheduled operations, no direct ability
 to delay scheduling (e.g. on the basis of a timer) etc. What you get is the bare essentials,
 but it is very straightforward to wrap up functionality from __boost_filesystem__ or
-__boost_iostreams__ as an asynchronous closure operation using __afio_call__.
+__boost_iostreams__ as an asynchronous closure operation using __afio_call__, and timers
+are provided already by __boost_asio__ which can be wrapped as preconditions for other
+operations.
 
-# Assume a certain amount of long-implemented C++11 features which have been around for many years, like the `auto` keyword and
-move construction (i.e. rvalue references). This is important, because while AFIO won't compile with C++03
-compilers and probably never will which some will feel is a big problem, we can make use of returning fairly oblique and lengthy
+ It also means that we use the native standard C++ library futures and promises (or their
+ Boost.Thread equivalents) plus other multithreading facilities. These are not as fast
+ as custom written support could be, but they do have the big advantage of enabling easy
+ interoperation with other C++ code. Besides, as libraries such as __boost_afio__ start to
+ tax standard C++ library multithreading implementations in novel ways, I am sure that
+ the performance penalty will decrease over time.
+
+# Assume a certain amount of long-implemented C++11 features which have been around for at
+least three years in all major compilers, like the `auto` keyword, move construction (i.e.
+rvalue references) and lambdas (which are obviously useful for convenient closure writing).
+This is important, because while AFIO won't compile with C++03
+compilers and probably never will (which some will feel is a big problem), we can make use of returning fairly oblique and lengthy
 to type return types which won't bother the programmer because they'll be using `auto`
 for return types. Similarly, we pass around plenty of `std::vector<async_io_op>` by
 ['value] as a convenient lightweight batch op container which would ordinarily be suicidal for
-performance under C++03, but under C++11 the compiler simply move constructs. On top of
-that, passing around by value lets the compiler easily perform alias optimisations
+performance under C++03, but under C++11 the compiler simply move constructs the contents
+by swapping as little as sixteen bytes [footnote Note that on older compilers with
+earlier versions of C++11 support, automatic use of move construction where a copy
+constructor is also available isn't implemented. We try to use `std::move()` where
+we can to help the compiler, but in truth there is no substitute for a modern C++11
+implementation.]. On top of that, passing around by value lets the compiler easily perform alias optimisations
 with no need for a `restrict` keyword, so in general AFIO passes things around by value
-wherever possible.
+wherever possible and lets the compiler figure out the optimal course of action.
  
 [endsect] [/overview]
 
