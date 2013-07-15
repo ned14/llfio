@@ -43,7 +43,7 @@ lib boost_afio : afio.cpp ../detail/ErrorHandling.cpp
       <include>../../../boost/afio/detail
       <toolset>gcc:<cxxflags>"-std=c++0x -fvisibility-inlines-hidden -fstrict-aliasing -Wstrict-aliasing -Wall -Wno-unused -fargument-noalias -O2 -g -fPIC -fvisibility=hidden -fopenmp"
       <toolset>clang:<cxxflags>"-std=c++0x -fvisibility-inlines-hidden -fstrict-aliasing -Wstrict-aliasing -Wall -Wno-unused -fargument-noalias -O2 -g -fPIC -fvisibility=hidden -fopenmp"
-
+      <toolset>msvc:<cxxflags>/openmp
       <target-os>linux:<linkflags>"-l pthread"
       <target-os>freebsd:<linkflags>"-l pthread"
 
