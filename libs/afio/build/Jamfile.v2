@@ -25,15 +25,14 @@ project boost/afio
       <library>/boost/filesystem//boost_filesystem 
       <library>/boost/atomic//boost_atomic
       <library>/boost/thread//boost_thread
-      
-#      <library>$(boost-path)/libs/system/build//boost_system
-#      <library>$(boost-path)/libs/filesystem/build//boost_filesystem 
-#      <library>$(boost-path)/libs/atomic/build//boost_atomic
-#      <library>$(boost-path)/libs/thread/build//boost_thread
+
+    #These might be better when we're actually a part of boost      
 #      <library>$../../libs/system/build//boost_system
 #      <library>$../../libs/filesystem/build//boost_filesystem 
 #      <library>$../../libs/atomic/build//boost_atomic
 #      <library>$../../libs/thread/build//boost_thread
+
+
       <link>shared:<define>BOOST_AFIO_DYN_LINK=1
     : source-location ../src
 
