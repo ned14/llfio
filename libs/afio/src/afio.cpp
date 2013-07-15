@@ -135,7 +135,7 @@ namespace detail {
 
 		static HANDLE int_checkHandle(HANDLE h, const std::filesystem::path &path)
 		{
-			ERRHWINFN(INVALID_HANDLE_VALUE!=h, path);
+			BOOST_AFIO_ERRHWINFN(INVALID_HANDLE_VALUE!=h, path);
 			return h;
 		}
 		async_io_handle_windows(std::shared_ptr<async_file_io_dispatcher_base> _parent, const std::filesystem::path &path) : async_io_handle(_parent.get(), path), parent(_parent), myid(nullptr), has_been_added(false), autoflush(false) { }
@@ -159,7 +159,7 @@ namespace detail {
 			if(h)
 			{
 				if(autoflush && write_count_since_fsync())
-					ERRHWINFN(FlushFileBuffers(h->native_handle()), path());
+					BOOST_AFIO_ERRHWINFN(FlushFileBuffers(h->native_handle()), path());
 				h->close();
 			}
 		}
@@ -774,7 +774,7 @@ namespace detail {
 		completion_returntype dormdir(size_t id, std::shared_ptr<detail::async_io_handle> _, async_path_op_req req)
 		{
 			req.flags=fileflags(req.flags);
-			ERRHWINFN(RemoveDirectory(req.path.c_str()), req.path);
+			BOOST_AFIO_ERRHWINFN(RemoveDirectory(req.path.c_str()), req.path);
 			auto ret=std::make_shared<async_io_handle_windows>(shared_from_this(), req.path);
 			return std::make_pair(true, ret);
 		}
@@ -808,7 +808,7 @@ namespace detail {
 		completion_returntype dormfile(size_t id, std::shared_ptr<detail::async_io_handle> _, async_path_op_req req)
 		{
 			req.flags=fileflags(req.flags);
-			ERRHWINFN(DeleteFile(req.path.c_str()), req.path);
+			BOOST_AFIO_ERRHWINFN(DeleteFile(req.path.c_str()), req.path);
 			auto ret=std::make_shared<async_io_handle_windows>(shared_from_this(), req.path);
 			return std::make_pair(true, ret);
 		}
@@ -819,7 +819,7 @@ namespace detail {
 			size_t bytestobesynced=p->write_count_since_fsync();
 			assert(p);
 			if(bytestobesynced)
-				ERRHWINFN(FlushFileBuffers(p->h->native_handle()), p->path());
+				BOOST_AFIO_ERRHWINFN(FlushFileBuffers(p->h->native_handle()), p->path());
 			p->byteswrittenatlastfsync+=(long) bytestobesynced;
 			return std::make_pair(true, h);
 		}
@@ -830,7 +830,7 @@ namespace detail {
 			assert(p);
 			// Windows doesn't provide an async fsync so do it synchronously
 			if(p->autoflush && p->write_count_since_fsync())
-				ERRHWINFN(FlushFileBuffers(p->h->native_handle()), p->path());
+				BOOST_AFIO_ERRHWINFN(FlushFileBuffers(p->h->native_handle()), p->path());
 			p->h->close();
 			p->h.reset();
 			return std::make_pair(true, h);
@@ -844,7 +844,7 @@ namespace detail {
 				// boost::system::system_error makes no attempt to ask windows for what the error code means :(
 				try
 				{
-					ERRGWINFN(ec.value(), h->path());
+					BOOST_AFIO_ERRGWINFN(ec.value(), h->path());
 				}
 				catch(...)
 				{
@@ -902,9 +902,9 @@ namespace detail {
 			newsize.QuadPart=_newsize;
 			while(size.QuadPart!=newsize.QuadPart)
 			{
-				ERRHWINFN(SetFilePointerEx(p->h->native_handle(), newsize, NULL, FILE_BEGIN), p->path());
-				ERRHWINFN(SetEndOfFile(p->h->native_handle()), p->path());
-				ERRHWINFN(GetFileSizeEx(p->h->native_handle(), &size), p->path());
+				BOOST_AFIO_ERRHWINFN(SetFilePointerEx(p->h->native_handle(), newsize, NULL, FILE_BEGIN), p->path());
+				BOOST_AFIO_ERRHWINFN(SetEndOfFile(p->h->native_handle()), p->path());
+				BOOST_AFIO_ERRHWINFN(GetFileSizeEx(p->h->native_handle(), &size), p->path());
 			}
 			return std::make_pair(true, h);
 		}
