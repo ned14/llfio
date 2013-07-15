@@ -17,7 +17,9 @@ project boost/afio/test
     : requirements
       <threading>multi
       <library>/boost/afio//boost_afio
-      <cxxflags>-std=c++0x 
+      <toolset>gcc:<cxxflags>-std=c++0x 
+      <toolset>clang:<cxxflags>-std=c++0x 
+      <toolset>msvc:<cxxflags>/openmp
       #<linkflags>"-l pthread"      #is this the test's dependency or boost_afio's???? 
     ;
 
