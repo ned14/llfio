@@ -1,9 +1,5 @@
 #include "test_functions.h"
 
-
-
-
-
 static void _1000_open_write_close_deletes(std::shared_ptr<boost::afio::async_file_io_dispatcher_base> dispatcher, size_t bytes)
 {
         using namespace boost::afio;
