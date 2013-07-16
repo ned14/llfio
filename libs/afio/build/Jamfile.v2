@@ -40,12 +40,14 @@ project boost/afio
 
 lib boost_afio : afio.cpp ../detail/ErrorHandling.cpp
 	: <include>../../../boost/afio 
-      <include>../../../boost/afio/detail
-      <toolset>gcc:<cxxflags>"-std=c++0x -fvisibility-inlines-hidden -fstrict-aliasing -Wstrict-aliasing -Wall -Wno-unused -fargument-noalias -O2 -g -fPIC -fvisibility=hidden -fopenmp"
-      <toolset>clang:<cxxflags>"-std=c++0x -fvisibility-inlines-hidden -fstrict-aliasing -Wstrict-aliasing -Wall -Wno-unused -fargument-noalias -O2 -g -fPIC -fvisibility=hidden -fopenmp"
-      <toolset>msvc:<cxxflags>/openmp
-      <target-os>linux:<linkflags>"-l pthread"
-      <target-os>freebsd:<linkflags>"-l pthread"
+          <include>../../../boost/afio/detail
+          <toolset>gcc:<cxxflags>"-std=c++0x -fvisibility-inlines-hidden -fstrict-aliasing -Wstrict-aliasing -Wall -Wno-unused -fargument-noalias -O2 -g -fPIC -fvisibility=hidden -fopenmp"
+          <toolset>clang:<cxxflags>"-std=c++0x -fvisibility-inlines-hidden -fstrict-aliasing -Wstrict-aliasing -Wall -Wno-unused -fargument-noalias -O2 -g -fPIC -fvisibility=hidden -fopenmp"
+#          <toolset>msvc:<cxxflags>"/openmp /EHsc /GF /Gy /Zi /O1 /MTd /Oy-"
+#          <toolset>msvc:<linkflags>"/DEBUG /LARGEADDRESSAWARE /DYNAMICBASE /NXCOMPAT /OPT:REF/VERSION:1.00.0"
+#          <toolset>msvc:<define>"WIN32, _WINDOWS, UNICODE, _UNICODE"
+          <target-os>linux:<linkflags>"-l pthread"
+          <target-os>freebsd:<linkflags>"-l pthread"
 
 ;
 
