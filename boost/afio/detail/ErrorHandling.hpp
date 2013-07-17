@@ -6,25 +6,17 @@ File Created: Nov 2012
 #ifndef NIALLSCPP11UTILITIES_ERRORHANDLING_H
 #define NIALLSCPP11UTILITIES_ERRORHANDLING_H
 
-//#include "NiallsCPP11Utilities.hpp"
+#include "../config.hpp"
 #include "std_filesystem.hpp"
 #include <string>
-#include <boost/config.hpp>
 #include <stdexcept>
+
+
 
 #if defined(BOOST_MSVC) && BOOST_MSVC<=1700 && !defined(__func__)
 #define __func__ __FUNCTION__
 #endif
 
-#ifndef BOOST_AFIO_API
-#ifdef BOOST_AFIO_DLL_EXPORTS
-//#define BOOST_AFIO_API DLLEXPORTMARKUP
-#define BOOST_AFIO_API BOOST_SYMBOL_EXPORT
-#else
-//#define BOOST_AFIO_API DLLIMPORTMARKUP
-#define BOOST_AFIO_API BOOST_SYMBOL_IMPORT
-#endif
-#endif
 
 #ifdef EXCEPTION_DISABLESOURCEINFO
 #define EXCEPTION_FILE(p) (const char *) 0
@@ -41,7 +33,7 @@ namespace boost{
         namespace detail{
     
             #ifdef BOOST_WINDOWS
-                    extern BOOST_AFIO_API void int_throwWinError(const char *file, const char *function, int lineno, unsigned code, const std::filesystem::path *filename=0);
+                    extern BOOST_AFIO_DECL void int_throwWinError(const char *file, const char *function, int lineno, unsigned code, const std::filesystem::path *filename=0);
                     extern "C" unsigned __stdcall GetLastError();
             #define BOOST_AFIO_ERRGWIN(code)				{ boost::afio::detail::int_throwWinError(EXCEPTION_FILE(0), EXCEPTION_FUNCTION(0), EXCEPTION_LINE(0), code); }
             #define BOOST_AFIO_ERRGWINFN(code, filename)	{ boost::afio::detail::int_throwWinError(EXCEPTION_FILE(0), EXCEPTION_FUNCTION(0), EXCEPTION_LINE(0), code, &(filename)); }
@@ -49,7 +41,7 @@ namespace boost{
             #define BOOST_AFIO_ERRHWINFN(exp, filename)	{ unsigned __errcode=(unsigned)(exp); if(!__errcode) BOOST_AFIO_ERRGWINFN(GetLastError(), filename); }
             #endif
 
-                    extern BOOST_AFIO_API void int_throwOSError(const char *file, const char *function, int lineno, int code, const std::filesystem::path *filename=0);
+                    extern BOOST_AFIO_DECL void int_throwOSError(const char *file, const char *function, int lineno, int code, const std::filesystem::path *filename=0);
             #define BOOST_AFIO_ERRGWIN(code)				{ boost::afio::detail::int_throwWinError(EXCEPTION_FILE(0), EXCEPTION_FUNCTION(0), EXCEPTION_LINE(0), code); }
             #define BOOST_AFIO_ERRGWINFN(code, filename)	{ boost::afio::detail::int_throwWinError(EXCEPTION_FILE(0), EXCEPTION_FUNCTION(0), EXCEPTION_LINE(0), code, &(filename)); }
             /*! Use this macro to wrap BOOST_WINDOWS functions. For anything setting errno, use ERRHOS().
@@ -64,11 +56,11 @@ namespace boost{
             /*! Use this macro to wrap POSIX, UNIX or CLib functions. On BOOST_WINDOWS, the includes anything in
             MSVCRT which sets errno
             */
-            #define ERRHOS(exp)					{ int __errcode=(exp); if(__errcode<0) BOOST_AFIO_ERRGOS(errno); }
+            #define BOOST_AFIO_ERRHOS(exp)					{ int __errcode=(exp); if(__errcode<0) BOOST_AFIO_ERRGOS(errno); }
             /*! Use this macro to wrap POSIX, UNIX or CLib functions taking a filename. On BOOST_WINDOWS, the includes anything in
             MSVCRT which sets errno
             */
-            #define ERRHOSFN(exp, filename)		{ int __errcode=(exp); if(__errcode<0) BOOST_AFIO_ERRGOSFN(errno, filename); }
+            #define BOOST_AFIO_ERRHOSFN(exp, filename)		{ int __errcode=(exp); if(__errcode<0) BOOST_AFIO_ERRGOSFN(errno, filename); }
         }//namespace detail
     }//namespace afio
 }// namespace boost

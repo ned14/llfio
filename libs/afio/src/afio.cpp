@@ -175,7 +175,7 @@ namespace detail {
 		async_io_handle_posix(std::shared_ptr<async_file_io_dispatcher_base> _parent, std::shared_ptr<detail::async_io_handle> _dirh, const std::filesystem::path &path, bool _autoflush, int _fd) : async_io_handle(_parent.get(), path), parent(_parent), dirh(_dirh), fd(_fd), has_been_added(false), autoflush(_autoflush),has_ever_been_fsynced(false)
 		{
 			if(fd!=-999)
-				ERRHOSFN(fd, path);
+				BOOST_AFIO_ERRHOSFN(fd, path);
 		}
 		virtual void *native_handle() const { return (void *)(size_t) fd; }
 
@@ -193,8 +193,8 @@ namespace detail {
 			{
 				// Flush synchronously here? I guess ...
 				if(autoflush && write_count_since_fsync())
-					ERRHOSFN(BOOST_AFIO_POSIX_FSYNC(fd), path());
-				ERRHOSFN(BOOST_AFIO_POSIX_CLOSE(fd), path());
+					BOOST_AFIO_ERRHOSFN(BOOST_AFIO_POSIX_FSYNC(fd), path());
+				BOOST_AFIO_ERRHOSFN(BOOST_AFIO_POSIX_CLOSE(fd), path());
 				fd=-1;
 			}
 		}
@@ -1072,7 +1072,7 @@ namespace detail {
 		completion_returntype dormdir(size_t id, std::shared_ptr<detail::async_io_handle> _, async_path_op_req req)
 		{
 			req.flags=fileflags(req.flags);
-			ERRHOSFN(BOOST_AFIO_POSIX_RMDIR(req.path.c_str()), req.path);
+			BOOST_AFIO_ERRHOSFN(BOOST_AFIO_POSIX_RMDIR(req.path.c_str()), req.path);
 			auto ret=std::make_shared<async_io_handle_posix>(shared_from_this(), std::shared_ptr<detail::async_io_handle>(), req.path, false, -999);
 			return std::make_pair(true, ret);
 		}
@@ -1116,7 +1116,7 @@ namespace detail {
 		completion_returntype dormfile(size_t id, std::shared_ptr<detail::async_io_handle> _, async_path_op_req req)
 		{
 			req.flags=fileflags(req.flags);
-			ERRHOSFN(BOOST_AFIO_POSIX_UNLINK(req.path.c_str()), req.path);
+			BOOST_AFIO_ERRHOSFN(BOOST_AFIO_POSIX_UNLINK(req.path.c_str()), req.path);
 			auto ret=std::make_shared<async_io_handle_posix>(shared_from_this(), std::shared_ptr<detail::async_io_handle>(), req.path, false, -999);
 			return std::make_pair(true, ret);
 		}
@@ -1126,7 +1126,7 @@ namespace detail {
 			async_io_handle_posix *p=static_cast<async_io_handle_posix *>(h.get());
 			size_t bytestobesynced=p->write_count_since_fsync();
 			if(bytestobesynced)
-				ERRHOSFN(BOOST_AFIO_POSIX_FSYNC(p->fd), p->path());
+				BOOST_AFIO_ERRHOSFN(BOOST_AFIO_POSIX_FSYNC(p->fd), p->path());
 			p->has_ever_been_fsynced=true;
 			p->byteswrittenatlastfsync+=(long) bytestobesynced;
 			return std::make_pair(true, h);
@@ -1136,8 +1136,8 @@ namespace detail {
 		{
 			async_io_handle_posix *p=static_cast<async_io_handle_posix *>(h.get());
 			if(p->autoflush && p->write_count_since_fsync())
-				ERRHOSFN(BOOST_AFIO_POSIX_FSYNC(p->fd), p->path());
-			ERRHOSFN(BOOST_AFIO_POSIX_CLOSE(p->fd), p->path());
+				BOOST_AFIO_ERRHOSFN(BOOST_AFIO_POSIX_FSYNC(p->fd), p->path());
+			BOOST_AFIO_ERRHOSFN(BOOST_AFIO_POSIX_CLOSE(p->fd), p->path());
 			p->fd=-1;
 			return std::make_pair(true, h);
 		}
@@ -1164,7 +1164,7 @@ namespace detail {
 			for(size_t n=0; n<vecs.size(); n+=IOV_MAX)
 			{
 				ssize_t _bytesread;
-				ERRHOSFN((int) (_bytesread=preadv(p->fd, (&vecs.front())+n, std::min((int) (vecs.size()-n), IOV_MAX), req.where+bytesread)), p->path());
+				BOOST_AFIO_ERRHOSFN((int) (_bytesread=preadv(p->fd, (&vecs.front())+n, std::min((int) (vecs.size()-n), IOV_MAX), req.where+bytesread)), p->path());
 				p->bytesread+=_bytesread;
 				bytesread+=_bytesread;
 			}
@@ -1195,7 +1195,7 @@ namespace detail {
 			for(size_t n=0; n<vecs.size(); n+=IOV_MAX)
 			{
 				ssize_t _byteswritten;
-				ERRHOSFN((int) (_byteswritten=pwritev(p->fd, (&vecs.front())+n, std::min((int) (vecs.size()-n), IOV_MAX), req.where+byteswritten)), p->path());
+				BOOST_AFIO_ERRHOSFN((int) (_byteswritten=pwritev(p->fd, (&vecs.front())+n, std::min((int) (vecs.size()-n), IOV_MAX), req.where+byteswritten)), p->path());
 				p->byteswritten+=_byteswritten;
 				byteswritten+=_byteswritten;
 			}
@@ -1208,7 +1208,7 @@ namespace detail {
 		{
 			async_io_handle_posix *p=static_cast<async_io_handle_posix *>(h.get());
 			BOOST_AFIO_DEBUG_PRINT("T %u %p (%c)\n", (unsigned) id, h.get(), p->path().native().back());
-			ERRHOSFN(BOOST_AFIO_POSIX_FTRUNCATE(p->fd, newsize), p->path());
+			BOOST_AFIO_ERRHOSFN(BOOST_AFIO_POSIX_FTRUNCATE(p->fd, newsize), p->path());
 			return std::make_pair(true, h);
 		}
 
