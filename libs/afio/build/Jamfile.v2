@@ -17,7 +17,7 @@ project boost/afio
     : requirements
       <threading>multi                          #<-- do we need this?
       <link>shared:<define>BOOST_AFIO_DYN_LINK=1  
-      <link>shared:<define>BOOST_AFIO_SOURCE
+      <link>shared:<define>BOOST_AFIO_SOURCE=1
       
       <library>/boost/system//boost_system
       <library>/boost/filesystem//boost_filesystem 
@@ -36,6 +36,7 @@ project boost/afio
       <include>. 
    
      <link>shared:<define>BOOST_AFIO_DYN_LINK=1
+     <link>shared:<define>BOOST_AFIO_SOURCE=1
     : source-location ../src
 
 ;
