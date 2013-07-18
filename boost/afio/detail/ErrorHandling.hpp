@@ -13,7 +13,7 @@ File Created: Nov 2012
 
 
 
-#if defined(BOOST_MSVC) && BOOST_MSVC<=1700 && !defined(__func__)
+#if defined(BOOST_MSVC) && BOOST_MSVC<=1800 && !defined(__func__)
 #define __func__ __FUNCTION__
 #endif
 
