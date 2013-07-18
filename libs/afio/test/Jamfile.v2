@@ -6,11 +6,6 @@
 #  (See accompanying file LICENSE_1_0.txt or copy at
 #  http://www.boost.org/LICENSE_1_0.txt)
 
-
-#import modules ;
-
-#local boost-path = [ modules.peek : BOOST_ROOT ] ; #can probably get rid of this
-
 import testing ;
 
 project boost/afio/test
