@@ -39,7 +39,7 @@ local reqs = ../detail/SpookyV2.cpp   ;
 local VALGRIND_ARGS = [ MATCH --valgrind=(.*) : $(.argv) ] ;
 ECHO $(VALGRIND_ARGS) ;
 
-#if "--run-all"       in $(.argv)
+#if "--run-all"   in $(.argv)
 #{
 #  test-suite-afio
 #    :  [ run test_all.cpp $(reqs) ]
@@ -47,11 +47,9 @@ ECHO $(VALGRIND_ARGS) ;
 #}
 #else
 
-if "--link-test"     in $(.argv)  
+if "--link-test"  in $(.argv)  
 {    
-    ECHO "LINK ONLY!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" ;
-
-    test-suite afio
+   test-suite afio-link
     : [ link async_io_threadpool_test.cpp  $(reqs) ]
       [ link async_io_works_1_prime_test.cpp $(reqs) ]
       [ link async_io_works_1_test.cpp $(reqs) ]
@@ -79,9 +77,7 @@ if "--link-test"     in $(.argv)
 else if $(VALGRIND_ARGS)
 {
    
-    ECHO "RUN WITH VALGRIND!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" ;
-
-    test-suite afio
+   test-suite afio-valgrind
     : [ run async_io_threadpool_test.cpp $(reqs) : $(VALGRIND_ARGS) : : <testing.launcher>valgrind ]
       [ run async_io_works_1_prime_test.cpp $(reqs) : $(VALGRIND_ARGS) : : <testing.launcher>valgrind ]
       [ run async_io_works_1_test.cpp $(reqs) : $(VALGRIND_ARGS) : : <testing.launcher>valgrind ]
@@ -95,9 +91,9 @@ else if $(VALGRIND_ARGS)
       [ run async_io_works_1_directsync_test.cpp $(reqs) : $(VALGRIND_ARGS) : : <testing.launcher>valgrind ]
       [ run async_io_works_64_directsync_test.cpp $(reqs) : $(VALGRIND_ARGS) : : <testing.launcher>valgrind ]
       [ run async_io_barrier_test.cpp $(reqs) : $(VALGRIND_ARGS) : : <testing.launcher>valgrind ]
-      [ run async_io_errors_test.cpp $(reqs) : $(VALGRIND_ARGS) : <testing.launcher>valgrind ]
+      [ run async_io_errors_test.cpp $(reqs) : $(VALGRIND_ARGS) : : <testing.launcher>valgrind ]
       [ run async_io_torture_test.cpp $(reqs) : $(VALGRIND_ARGS) : : <testing.launcher>valgrind ]
-      [ run async_io_torture_sync_test.cpp $(reqs) : $(VALGRIND_ARGS) : <testing.launcher>valgrind ]
+      [ run async_io_torture_sync_test.cpp $(reqs) : $(VALGRIND_ARGS) : : <testing.launcher>valgrind ]
       [ run async_io_torture_autoflush_test.cpp $(reqs) : $(VALGRIND_ARGS) : : <testing.launcher>valgrind ]
       [ run async_io_torture_direct_test.cpp $(reqs) : $(VALGRIND_ARGS) : : <testing.launcher>valgrind ]
       [ run async_io_torture_direct_sync_test.cpp $(reqs) : $(VALGRIND_ARGS) : : <testing.launcher>valgrind ]
@@ -109,8 +105,6 @@ else if $(VALGRIND_ARGS)
 }    
 else
 {    
-    ECHO "RUN NO VALGRIND!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" ;
-    
     test-suite afio
     : [ run async_io_threadpool_test.cpp $(reqs) ]
       [ run async_io_works_1_prime_test.cpp $(reqs) ]
