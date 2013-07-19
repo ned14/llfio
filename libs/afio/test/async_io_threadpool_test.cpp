@@ -3,27 +3,7 @@
 Created: Feb 2013
 */
 
-
-//#include <utility>
-//#include <sstream>
-#include <iostream>
-#//include <algorithm>
-#include "../../../boost/afio/afio.hpp"
-
-//if we're building the tests all together don't define the test main
-#ifdef BOOST_AFIO_STANDALONE_TESTS
-    #define BOOST_TEST_MODULE tester   //must be defined before unit_test.hpp is included
-#endif
-
-#include <boost/test/included/unit_test.hpp>
-
-//define a simple macro to check any exception using Boost.Test
-#define BOOST_AFIO_CHECK_THROWS(expr)\
-try{\
-    expr;\
-    BOOST_FAIL("Exception was not thrown");\
-}catch(...){BOOST_CHECK(true);}
-
+#include "test_functions.h"
 
  static int task()
 {

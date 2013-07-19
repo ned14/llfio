@@ -7,11 +7,13 @@
 #  http://www.boost.org/LICENSE_1_0.txt)
 
 
-#import modules ;
+import modules ;
+.argv = [ modules.peek : ARGV ] ;
 
 #local boost-path = [ modules.peek : BOOST_ROOT ] ; #can probably get rid of this
 
 import testing ;
+
 
 project boost/afio/test
     : requirements
@@ -26,21 +28,94 @@ project boost/afio/test
     ;
 
 
-exe boost_afio_test : main.cpp   ../detail/SpookyV2.cpp
-    : <include>../../../boost/afio/detail
+#exe boost_afio_test : main.cpp   ../detail/SpookyV2.cpp
+#    : <include>../../../boost/afio/detail
 
-;
+#;
 
-test-suite afio  
-    : #[ link main.cpp ../detail/SpookyV2.cpp
-      #  : <cxxflags>-std=c++0x <library>/boost/afio//boost_afio <include>../../../boost/afio/detail ]
+
+if "--link-test"     in $(.argv)  
+{    
     
-#      [ run main.cpp ../detail/SpookyV2.cpp 
-#        : #args
-#        : #input files
-#        : <cxxflags>-std=c++0x <library>/boost/afio//boost_afio <include>../../../boost/afio/detail ]
+    test-suite afio
+    : [ link async_io_threadpool_test.cpp ]
+      [ link async_io_works_1_prime_test.cpp ]
+      [ link async_io_works_1_test.cpp ]
+      [ link async_io_works_64_test.cpp ]
+      [ link async_io_works_1_sync_test.cpp ]
+      [ link async_io_works_64_sync_test.cpp ]
+      [ link async_io_works_1_autoflush_test.cpp ]
+      [ link async_io_works_64_autoflush_test.cpp ]
+      [ link async_io_works_1_direct_test.cpp ]
+      [ link async_io_works_64_direct_test.cpp ]
+      [ link async_io_works_1_directsync_test.cpp ]
+      [ link async_io_works_64_directsync_test.cpp ]
+      [ link async_io_barrier_test.cpp ]
+      [ link async_io_errors_test.cpp ]
+      [ link async_io_torture_test.cpp ]
+      [ link async_io_torture_sync_test.cpp ]
+      [ link async_io_torture_autoflush_test.cpp ]
+      [ link async_io_torture_direct_test.cpp ]
+      [ link async_io_torture_direct_sync_test.cpp ]
+      [ link async_io_sync_test.cpp ]
+      [ link test_all.cpp ]
+      
+    ;
+}
+else if "--valgrind"     in $(.argv)  
+{
+    test-suite afio
+    : [ run async_io_threadpool_test.cpp : : : <testing.launcher>valgrind ]
+      [ run async_io_works_1_prime_test.cpp : : : <testing.launcher>valgrind ]
+      [ run async_io_works_1_test.cpp : : : <testing.launcher>valgrind ]
+      [ run async_io_works_64_test.cpp : : : <testing.launcher>valgrind ]
+      [ run async_io_works_1_sync_test.cpp : : : <testing.launcher>valgrind ]
+      [ run async_io_works_64_sync_test.cpp : : : <testing.launcher>valgrind ]
+      [ run async_io_works_1_autoflush_test.cpp : : : <testing.launcher>valgrind ]
+      [ run async_io_works_64_autoflush_test.cpp : : : <testing.launcher>valgrind ]
+      [ run async_io_works_1_direct_test.cpp : : : <testing.launcher>valgrind ]
+      [ run async_io_works_64_direct_test.cpp : : : <testing.launcher>valgrind ]
+      [ run async_io_works_1_directsync_test.cpp : : : <testing.launcher>valgrind ]
+      [ run async_io_works_64_directsync_test.cpp : : : <testing.launcher>valgrind ]
+      [ run async_io_barrier_test.cpp : : : <testing.launcher>valgrind ]
+      [ run async_io_errors_test.cpp : : : <testing.launcher>valgrind ]
+      [ run async_io_torture_test.cpp : : : <testing.launcher>valgrind ]
+      [ run async_io_torture_sync_test.cpp : : : <testing.launcher>valgrind ]
+      [ run async_io_torture_autoflush_test.cpp : : : <testing.launcher>valgrind ]
+      [ run async_io_torture_direct_test.cpp : : : <testing.launcher>valgrind ]
+      [ run async_io_torture_direct_sync_test.cpp : : : <testing.launcher>valgrind ]
+      [ run async_io_sync_test.cpp : : : <testing.launcher>valgrind ]
+      #[ run test_all.cpp : : : <testing.launcher>valgrind ]
+      
     ;
 
-
-
-
+}    
+else
+{    
+    
+    test-suite afio
+    : [ run async_io_threadpool_test.cpp ]
+      [ run async_io_works_1_prime_test.cpp ]
+      [ run async_io_works_1_test.cpp ]
+      [ run async_io_works_64_test.cpp ]
+      [ run async_io_works_1_sync_test.cpp ]
+      [ run async_io_works_64_sync_test.cpp ]
+      [ run async_io_works_1_autoflush_test.cpp ]
+      [ run async_io_works_64_autoflush_test.cpp ]
+      [ run async_io_works_1_direct_test.cpp ]
+      [ run async_io_works_64_direct_test.cpp ]
+      [ run async_io_works_1_directsync_test.cpp ]
+      [ run async_io_works_64_directsync_test.cpp ]
+      [ run async_io_barrier_test.cpp ]
+      [ run async_io_errors_test.cpp ]
+      [ run async_io_errors_test.cpp ]
+      [ run async_io_torture_test.cpp ]
+      [ run async_io_torture_sync_test.cpp ]
+      [ run async_io_torture_autoflush_test.cpp ]
+      [ run async_io_torture_direct_test.cpp ]
+      [ run async_io_torture_directsync_test.cpp ]
+      [ run async_io_sync_test.cpp ]
+      #[ run test_all.cpp ]
+      
+    ;
+}
