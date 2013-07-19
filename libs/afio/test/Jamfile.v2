@@ -54,7 +54,8 @@ if "--link-test"     in $(.argv)
       [ link async_io_errors_test.cpp ]
       [ link async_io_torture_test.cpp ../detail/SpookyV2.cpp 
         : <include>../../../boost/afio/detail ]
-      [ link async_io_torture_sync_test.cpp ]
+      [ link async_io_torture_sync_test.cpp ../detail/SpookyV2.cpp 
+        : <include>../../../boost/afio/detail ]
       [ link async_io_torture_autoflush_test.cpp ../detail/SpookyV2.cpp 
         : <include>../../../boost/afio/detail ]
       [ link async_io_torture_direct_test.cpp ../detail/SpookyV2.cpp 
@@ -119,7 +120,7 @@ else
       [ run async_io_torture_sync_test.cpp ]
       [ run async_io_torture_autoflush_test.cpp ]
       [ run async_io_torture_direct_test.cpp ]
-      [ run async_io_torture_directsync_test.cpp ]
+      [ run async_io_torture_direct_sync_test.cpp ]
       [ run async_io_sync_test.cpp ]
       #[ run test_all.cpp ]
       
