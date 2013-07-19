@@ -27,9 +27,8 @@ Created: Feb 2013
 
 
 //if we're building the tests all together don't define the test main
-#ifdef BOOST_AFIO_STANDALONE_TESTS
-        //must be defined before unit_test.hpp is included
-#    define BOOST_TEST_MAIN
+#ifndef BOOST_AFIO_TEST_ALL
+#    define BOOST_TEST_MAIN  //must be defined before unit_test.hpp is included
 #endif
 
 #include <boost/test/included/unit_test.hpp>
