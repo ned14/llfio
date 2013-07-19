@@ -101,7 +101,7 @@ script:
 #Build and run tests
  - if [ $GCOV -eq 1 ]; then set -x; fi
  - if [ $UNIT_TEST != "0" ]; then TEST_TYPE=""; fi
- - if [ $VALGRIND != "0" ]; then TEST_TYPE="--valgrind"
+ - if [ $VALGRIND != "0" ]; then TEST_TYPE="--valgrind" ; fi
  #- if [ "$UNIT_TESTS" != "0" ]; then $PREFIXTEST $PREFIXPATH/boost_afio_test -s $UNIT_TESTS; fi
 # Not sure if we can pass the valgrind flags into the unit tests, but so far it hasnt crashed :)
  - b2 libs/afio/test $DEBUGBUILD toolset=$CC$GCCVER $TEST_TYPE --link-test $FLAGS $PREFIXTEST;
