@@ -99,7 +99,7 @@ else if "--valgrind"     in $(.argv)
       [ run async_io_sync_test.cpp ../detail/SpookyV2.cpp 
         : <include>../../../boost/afio/detail : : <testing.launcher>valgrind ]
       #[ run test_all.cpp ../detail/SpookyV2.cpp 
-        : <include>../../../boost/afio/detail : : <testing.launcher>valgrind ]
+      #  : <include>../../../boost/afio/detail : : <testing.launcher>valgrind ]
       
     ;
 
@@ -135,7 +135,7 @@ else
       [ run async_io_sync_test.cpp ../detail/SpookyV2.cpp 
         : <include>../../../boost/afio/detail ]
       #[ run test_all.cpp ../detail/SpookyV2.cpp 
-        : <include>../../../boost/afio/detail ]
+       # : <include>../../../boost/afio/detail ]
       
     ;
 }
