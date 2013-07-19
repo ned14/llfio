@@ -155,7 +155,7 @@ static void _1000_open_write_close_deletes(std::shared_ptr<boost::afio::async_fi
 }
 
 
-static void evil_random_io(std::shared_ptr<boost::afio::async_file_io_dispatcher_base> dispatcher, size_t no, size_t bytes, size_t alignment)
+static void evil_random_io(std::shared_ptr<boost::afio::async_file_io_dispatcher_base> dispatcher, size_t no, size_t bytes, size_t alignment=0)
 {
     using namespace boost::afio;
     using namespace std;
