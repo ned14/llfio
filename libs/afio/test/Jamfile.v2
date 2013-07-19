@@ -18,8 +18,9 @@ import testing ;
 project boost/afio/test
     : requirements
       <threading>multi
+      <include>../../../boost/afio/detail
       <library>/boost/afio//boost_afio
-      <toolset>gcc:<cxxflags>-std=c++0x 
+      <toolset>gcc:<cxxflags>"-std=c++0x -Wno-unused-local-typedefs" 
       <toolset>clang:<cxxflags>-std=c++0x 
       <toolset>msvc:<cxxflags>"/openmp /EHsc /GF /Gy /Zi /Od /MTd"
       <toolset>msvc:<linkflags>"/DEBUG /LARGEADDRESSAWARE /DYNAMICBASE /NXCOMPAT /OPT:REF /MANIFEST" # /VERSION:1.00.0"
@@ -33,73 +34,60 @@ project boost/afio/test
 
 #;
 
+local reqs = ../detail/SpookyV2.cpp   ;
 
 if "--link-test"     in $(.argv)  
 {    
     
     test-suite afio
-    : [ link async_io_threadpool_test.cpp ]
-      [ link async_io_works_1_prime_test.cpp ]
-      [ link async_io_works_1_test.cpp ]
-      [ link async_io_works_64_test.cpp ]
-      [ link async_io_works_1_sync_test.cpp ]
-      [ link async_io_works_64_sync_test.cpp ]
-      [ link async_io_works_1_autoflush_test.cpp ]
-      [ link async_io_works_64_autoflush_test.cpp ]
-      [ link async_io_works_1_direct_test.cpp ]
-      [ link async_io_works_64_direct_test.cpp ]
-      [ link async_io_works_1_directsync_test.cpp ]
-      [ link async_io_works_64_directsync_test.cpp ]
-      [ link async_io_barrier_test.cpp ]
-      [ link async_io_errors_test.cpp ]
-      [ link async_io_torture_test.cpp ../detail/SpookyV2.cpp 
-        : <include>../../../boost/afio/detail ]
-      [ link async_io_torture_sync_test.cpp ../detail/SpookyV2.cpp 
-        : <include>../../../boost/afio/detail ]
-      [ link async_io_torture_autoflush_test.cpp ../detail/SpookyV2.cpp 
-        : <include>../../../boost/afio/detail ]
-      [ link async_io_torture_direct_test.cpp ../detail/SpookyV2.cpp 
-        : <include>../../../boost/afio/detail ]
-      [ link async_io_torture_direct_sync_test.cpp ../detail/SpookyV2.cpp 
-        : <include>../../../boost/afio/detail ]
-      [ link async_io_sync_test.cpp ../detail/SpookyV2.cpp 
-        : <include>../../../boost/afio/detail ]
-      [ link test_all.cpp ../detail/SpookyV2.cpp 
-        : <include>../../../boost/afio/detail ]
+    : [ link async_io_threadpool_test.cpp  $(reqs) ]
+      [ link async_io_works_1_prime_test.cpp $(reqs) ]
+      [ link async_io_works_1_test.cpp $(reqs) ]
+      [ link async_io_works_64_test.cpp $(reqs) ]
+      [ link async_io_works_1_sync_test.cpp $(reqs) ]
+      [ link async_io_works_64_sync_test.cpp $(reqs) ]
+      [ link async_io_works_1_autoflush_test.cpp $(reqs) ]
+      [ link async_io_works_64_autoflush_test.cpp $(reqs) ]
+      [ link async_io_works_1_direct_test.cpp $(reqs) ]
+      [ link async_io_works_64_direct_test.cpp $(reqs) ]
+      [ link async_io_works_1_directsync_test.cpp $(reqs) ]
+      [ link async_io_works_64_directsync_test.cpp $(reqs) ]
+      [ link async_io_barrier_test.cpp $(reqs) ]
+      [ link async_io_errors_test.cpp $(reqs) ]
+      [ link async_io_torture_test.cpp $(reqs) ]
+      [ link async_io_torture_sync_test.cpp $(reqs) ]
+      [ link async_io_torture_autoflush_test.cpp $(reqs) ]
+      [ link async_io_torture_direct_test.cpp $(reqs) ]
+      [ link async_io_torture_direct_sync_test.cpp $(reqs) ]
+      [ link async_io_sync_test.cpp $(reqs) ]
+      [ link test_all.cpp $(reqs) ]
       
     ;
 }
 else if "--valgrind"     in $(.argv)  
 {
     test-suite afio
-    : [ run async_io_threadpool_test.cpp : : : <testing.launcher>valgrind ]
-      [ run async_io_works_1_prime_test.cpp : : : <testing.launcher>valgrind ]
-      [ run async_io_works_1_test.cpp : : : <testing.launcher>valgrind ]
-      [ run async_io_works_64_test.cpp : : : <testing.launcher>valgrind ]
-      [ run async_io_works_1_sync_test.cpp : : : <testing.launcher>valgrind ]
-      [ run async_io_works_64_sync_test.cpp : : : <testing.launcher>valgrind ]
-      [ run async_io_works_1_autoflush_test.cpp : : : <testing.launcher>valgrind ]
-      [ run async_io_works_64_autoflush_test.cpp : : : <testing.launcher>valgrind ]
-      [ run async_io_works_1_direct_test.cpp : : : <testing.launcher>valgrind ]
-      [ run async_io_works_64_direct_test.cpp : : : <testing.launcher>valgrind ]
-      [ run async_io_works_1_directsync_test.cpp : : : <testing.launcher>valgrind ]
-      [ run async_io_works_64_directsync_test.cpp : : : <testing.launcher>valgrind ]
-      [ run async_io_barrier_test.cpp : : : <testing.launcher>valgrind ]
-      [ run async_io_errors_test.cpp  : : <testing.launcher>valgrind ]
-      [ run async_io_torture_test.cpp ../detail/SpookyV2.cpp 
-        : <include>../../../boost/afio/detail : : <testing.launcher>valgrind ]
-      [ run async_io_torture_sync_test.cpp ../detail/SpookyV2.cpp 
-        : <include>../../../boost/afio/detail : : <testing.launcher>valgrind ]
-      [ run async_io_torture_autoflush_test.cpp ../detail/SpookyV2.cpp 
-        : <include>../../../boost/afio/detail : : <testing.launcher>valgrind ]
-      [ run async_io_torture_direct_test.cpp ../detail/SpookyV2.cpp 
-        : <include>../../../boost/afio/detail : : <testing.launcher>valgrind ]
-      [ run async_io_torture_direct_sync_test.cpp ../detail/SpookyV2.cpp 
-        : <include>../../../boost/afio/detail : : <testing.launcher>valgrind ]
-      [ run async_io_sync_test.cpp ../detail/SpookyV2.cpp 
-        : <include>../../../boost/afio/detail : : <testing.launcher>valgrind ]
-      #[ run test_all.cpp ../detail/SpookyV2.cpp 
-      #  : <include>../../../boost/afio/detail : : <testing.launcher>valgrind ]
+    : [ run async_io_threadpool_test.cpp $(reqs) : : : <testing.launcher>valgrind ]
+      [ run async_io_works_1_prime_test.cpp $(reqs) : : : <testing.launcher>valgrind ]
+      [ run async_io_works_1_test.cpp $(reqs) : : : <testing.launcher>valgrind ]
+      [ run async_io_works_64_test.cpp $(reqs) : : : <testing.launcher>valgrind ]
+      [ run async_io_works_1_sync_test.cpp $(reqs) : : : <testing.launcher>valgrind ]
+      [ run async_io_works_64_sync_test.cpp $(reqs) : : : <testing.launcher>valgrind ]
+      [ run async_io_works_1_autoflush_test.cpp $(reqs) : : : <testing.launcher>valgrind ]
+      [ run async_io_works_64_autoflush_test.cpp $(reqs) : : : <testing.launcher>valgrind ]
+      [ run async_io_works_1_direct_test.cpp $(reqs) : : : <testing.launcher>valgrind ]
+      [ run async_io_works_64_direct_test.cpp $(reqs) : : : <testing.launcher>valgrind ]
+      [ run async_io_works_1_directsync_test.cpp $(reqs) : : : <testing.launcher>valgrind ]
+      [ run async_io_works_64_directsync_test.cpp $(reqs) : : : <testing.launcher>valgrind ]
+      [ run async_io_barrier_test.cpp $(reqs) : : : <testing.launcher>valgrind ]
+      [ run async_io_errors_test.cpp $(reqs) : : <testing.launcher>valgrind ]
+      [ run async_io_torture_test.cpp $(reqs) : : : <testing.launcher>valgrind ]
+      [ run async_io_torture_sync_test.cpp $(reqs) : : <testing.launcher>valgrind ]
+      [ run async_io_torture_autoflush_test.cpp $(reqs) : : : <testing.launcher>valgrind ]
+      [ run async_io_torture_direct_test.cpp $(reqs) : : : <testing.launcher>valgrind ]
+      [ run async_io_torture_direct_sync_test.cpp $(reqs) : : : <testing.launcher>valgrind ]
+      [ run async_io_sync_test.cpp $(reqs) : : : <testing.launcher>valgrind ]
+      #[ run test_all.cpp $(reqs) : : : <testing.launcher>valgrind ]
       
     ;
 
@@ -108,34 +96,27 @@ else
 {    
     
     test-suite afio
-    : [ run async_io_threadpool_test.cpp ]
-      [ run async_io_works_1_prime_test.cpp ]
-      [ run async_io_works_1_test.cpp ]
-      [ run async_io_works_64_test.cpp ]
-      [ run async_io_works_1_sync_test.cpp ]
-      [ run async_io_works_64_sync_test.cpp ]
-      [ run async_io_works_1_autoflush_test.cpp ]
-      [ run async_io_works_64_autoflush_test.cpp ]
-      [ run async_io_works_1_direct_test.cpp ]
-      [ run async_io_works_64_direct_test.cpp ]
-      [ run async_io_works_1_directsync_test.cpp ]
-      [ run async_io_works_64_directsync_test.cpp ]
-      [ run async_io_barrier_test.cpp ]
-      [ run async_io_errors_test.cpp ]
-      [ run async_io_torture_test.cpp ../detail/SpookyV2.cpp 
-        : <include>../../../boost/afio/detail ]
-      [ run async_io_torture_sync_test.cpp ../detail/SpookyV2.cpp 
-        : <include>../../../boost/afio/detail ]
-      [ run async_io_torture_autoflush_test.cpp ../detail/SpookyV2.cpp 
-        : <include>../../../boost/afio/detail ]
-      [ run async_io_torture_direct_test.cpp ../detail/SpookyV2.cpp 
-        : <include>../../../boost/afio/detail ]
-      [ run async_io_torture_direct_sync_test.cpp ../detail/SpookyV2.cpp 
-        : <include>../../../boost/afio/detail ]
-      [ run async_io_sync_test.cpp ../detail/SpookyV2.cpp 
-        : <include>../../../boost/afio/detail ]
-      #[ run test_all.cpp ../detail/SpookyV2.cpp 
-       # : <include>../../../boost/afio/detail ]
+    : [ run async_io_threadpool_test.cpp $(reqs) ]
+      [ run async_io_works_1_prime_test.cpp $(reqs) ]
+      [ run async_io_works_1_test.cpp $(reqs) ]
+      [ run async_io_works_64_test.cpp $(reqs) ]
+      [ run async_io_works_1_sync_test.cpp $(reqs) ]
+      [ run async_io_works_64_sync_test.cpp $(reqs) ]
+      [ run async_io_works_1_autoflush_test.cpp $(reqs) ]
+      [ run async_io_works_64_autoflush_test.cpp $(reqs) ]
+      [ run async_io_works_1_direct_test.cpp $(reqs) ]
+      [ run async_io_works_64_direct_test.cpp $(reqs) ]
+      [ run async_io_works_1_directsync_test.cpp $(reqs) ]
+      [ run async_io_works_64_directsync_test.cpp $(reqs) ]
+      [ run async_io_barrier_test.cpp $(reqs) ]
+      [ run async_io_errors_test.cpp $(reqs) ]
+      [ run async_io_torture_test.cpp $(reqs) ]
+      [ run async_io_torture_sync_test.cpp $(reqs) ]
+      [ run async_io_torture_autoflush_test.cpp $(reqs) ]
+      [ run async_io_torture_direct_test.cpp $(reqs) ]
+      [ run async_io_torture_direct_sync_test.cpp $(reqs) ]
+      [ run async_io_sync_test.cpp $(reqs) ]
+      #[ run test_all.cpp $(reqs) ]
       
     ;
 }
