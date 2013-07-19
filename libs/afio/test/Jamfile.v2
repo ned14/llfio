@@ -85,14 +85,21 @@ else if "--valgrind"     in $(.argv)
       [ run async_io_works_1_directsync_test.cpp : : : <testing.launcher>valgrind ]
       [ run async_io_works_64_directsync_test.cpp : : : <testing.launcher>valgrind ]
       [ run async_io_barrier_test.cpp : : : <testing.launcher>valgrind ]
-      [ run async_io_errors_test.cpp : : : <testing.launcher>valgrind ]
-      [ run async_io_torture_test.cpp : : : <testing.launcher>valgrind ]
-      [ run async_io_torture_sync_test.cpp : : : <testing.launcher>valgrind ]
-      [ run async_io_torture_autoflush_test.cpp : : : <testing.launcher>valgrind ]
-      [ run async_io_torture_direct_test.cpp : : : <testing.launcher>valgrind ]
-      [ run async_io_torture_direct_sync_test.cpp : : : <testing.launcher>valgrind ]
-      [ run async_io_sync_test.cpp : : : <testing.launcher>valgrind ]
-      #[ run test_all.cpp : : : <testing.launcher>valgrind ]
+      [ run async_io_errors_test.cpp  : : <testing.launcher>valgrind ]
+      [ run async_io_torture_test.cpp ../detail/SpookyV2.cpp 
+        : <include>../../../boost/afio/detail : : <testing.launcher>valgrind ]
+      [ run async_io_torture_sync_test.cpp ../detail/SpookyV2.cpp 
+        : <include>../../../boost/afio/detail : : <testing.launcher>valgrind ]
+      [ run async_io_torture_autoflush_test.cpp ../detail/SpookyV2.cpp 
+        : <include>../../../boost/afio/detail : : <testing.launcher>valgrind ]
+      [ run async_io_torture_direct_test.cpp ../detail/SpookyV2.cpp 
+        : <include>../../../boost/afio/detail : : <testing.launcher>valgrind ]
+      [ run async_io_torture_direct_sync_test.cpp ../detail/SpookyV2.cpp 
+        : <include>../../../boost/afio/detail : : <testing.launcher>valgrind ]
+      [ run async_io_sync_test.cpp ../detail/SpookyV2.cpp 
+        : <include>../../../boost/afio/detail : : <testing.launcher>valgrind ]
+      #[ run test_all.cpp ../detail/SpookyV2.cpp 
+        : <include>../../../boost/afio/detail : : <testing.launcher>valgrind ]
       
     ;
 
@@ -115,14 +122,20 @@ else
       [ run async_io_works_64_directsync_test.cpp ]
       [ run async_io_barrier_test.cpp ]
       [ run async_io_errors_test.cpp ]
-      [ run async_io_errors_test.cpp ]
-      [ run async_io_torture_test.cpp ]
-      [ run async_io_torture_sync_test.cpp ]
-      [ run async_io_torture_autoflush_test.cpp ]
-      [ run async_io_torture_direct_test.cpp ]
-      [ run async_io_torture_direct_sync_test.cpp ]
-      [ run async_io_sync_test.cpp ]
-      #[ run test_all.cpp ]
+      [ run async_io_torture_test.cpp ../detail/SpookyV2.cpp 
+        : <include>../../../boost/afio/detail ]
+      [ run async_io_torture_sync_test.cpp ../detail/SpookyV2.cpp 
+        : <include>../../../boost/afio/detail ]
+      [ run async_io_torture_autoflush_test.cpp ../detail/SpookyV2.cpp 
+        : <include>../../../boost/afio/detail ]
+      [ run async_io_torture_direct_test.cpp ../detail/SpookyV2.cpp 
+        : <include>../../../boost/afio/detail ]
+      [ run async_io_torture_direct_sync_test.cpp ../detail/SpookyV2.cpp 
+        : <include>../../../boost/afio/detail ]
+      [ run async_io_sync_test.cpp ../detail/SpookyV2.cpp 
+        : <include>../../../boost/afio/detail ]
+      #[ run test_all.cpp ../detail/SpookyV2.cpp 
+        : <include>../../../boost/afio/detail ]
       
     ;
 }
