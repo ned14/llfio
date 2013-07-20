@@ -2,7 +2,7 @@
 #define BOOST_TEST_MODULE tester
 #define BOOST_AFIO_TEST_ALL            
 
-#include "test_functions.h"
+#include "test_functions.hpp"
 
 BOOST_AUTO_TEST_SUITE(all)
 #include "async_io_threadpool_test.cpp"
