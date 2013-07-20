@@ -82,7 +82,7 @@ POSIX functions). Yet, and especially if it's within the same directory, a batch
 can be [*very] significantly faster than a multitude of single APIs.
  
  As much as AFIO is as constrained by the system-level filing system API as anyone else,
- AFIO employs a thread pool as a crude universally portable method of dispatching multiple filing system
+ AFIO employs a thread pool as a crude, universally portable method of dispatching multiple filing system
  operations at the same time. For those platforms which support a less crude method of
  delivering batches of filing system operations e.g. an actual batch API, that is
  used instead. Additionally, micro-kernel platforms are always able to multiplex ['any] set
@@ -124,7 +124,7 @@ operations.
  as custom written support could be, but they do have the big advantage of enabling easy
  interoperation with other C++ code. Besides, as libraries such as __boost_afio__ start to
  tax standard C++ library multithreading implementations in novel ways, I am sure that
- the performance penalty will decrease over time.
+ the performance penalty will decrease over time as STL vendors do their tuning.
 
 # Assume a certain amount of long-implemented C++11 features which have been around for at
 least three years in all major compilers, like the `auto` keyword, move construction (i.e.
@@ -142,7 +142,153 @@ we can to help the compiler, but in truth there is no substitute for a modern C+
 implementation.]. On top of that, passing around by value lets the compiler easily perform alias optimisations
 with no need for a `restrict` keyword, so in general AFIO passes things around by value
 wherever possible and lets the compiler figure out the optimal course of action.
- 
+
+# Lastly, even though no filing system known to this author currently supports such a
+feature, __boost_afio__ implements ['write ordering constraints] at the whole file level
+as well as the traditionally supported individual write level. This part will need some
+explaining, so it gets a whole section to itself.
+
 [endsect] [/overview]
+
+[section:acid_write_ordering Write ordering constraints, and how these can
+be used to achieve the Durability in ACID without needing `fsync()`]
+
+[*ACID] stands for Atomic Consistent Isolated Durable, and it is a key requirement for
+database implementations which manage data you don't want to lose, which tends to be
+a common use case. While achieving all four is non-trivial, achieving Durability is
+simultaneously both the easiest and the hardest of the four. This is because the easy
+way of ensuring durability is to always wait for each write to reach non-volatile storage,
+yet such a naive solution is typically exceptionally slow. Achieving performant
+data durability is without doubt a wicked hard problem in computer science.
+
+[section:background Background]
+
+Filing system implementations traditionally offer three methods of ensuring that writes
+have reached non-volatile storage:
+
+# The family of `fsync()` or its equivalent functions, which flush any cached written
+data not yet stored onto non-volatile storage. These are usually synchronous operations,
+in that they do not return until they have finished. A big caveat with these functions
+is that some filing systems e.g. ext3 flush ['every] bit of pending write data for
+the filing system instead of just the pending writes for the file handle specified i.e. they
+are equivalent to a synchronous `sync()` as described below.
+
+# The family of `O_SYNC` or its equivalent per file handle flags, which simply
+disable any form of write back caching. These usually make all data write functions
+not return until written data has reached non-volatile storage.
+
+# The whole filing system cached written data flush, often performed by a function
+like `sync()`. Unlike the previous two, this is usually an asynchronous operation
+and there is usually no portable way of knowing when it has completed.
+
+There is also the matter of the difference between data and ['meta]data: metadata
+is the stuff a filing system stores such that it knows about your data. For each
+of the first two of the above three families of functions, most systems provide
+three variants: flush metadata, flush data, and flush both metadata and data.
+
+All major filing systems on all major platforms provide the above three families of
+function to ensure data reaches non-volatile storage. Most of the major filing systems
+in recent versions of major platforms have additionally added significant extra guarantees
+regarding metadata alone: for example, UFS with soft updates (from BSD) guarantees
+consistency of metadata through imposing a write order on metadata writes. Similarly,
+recent versions of ext4 guarantee that metadata older than five seconds is sent to
+non-volatile storage, again by imposing a write order. On NTFS and HFS+, directory metadata
+is guaranteed to be sent to non-volatile storage on any file close: this ensures
+that a newly created file at least shows up in its directory, even if the file's
+contents is corrupted or lost. Once again, write ordering, especially when combined
+with Copy On Write (COW) of changed structures, is the tool internally used to ensure
+that the filing system's metadata is always kept in a recoverable state.
+
+Most people think of `fsync()`, `O_SYNC` and `sync()` in terms of flushing caches.
+An alternative way of thinking about them is that they impose a write order on
+writes to non-volatile storage. There is no doubt that they are a very crude and
+highly inefficient way of doing so, but they do open the option of ['emulating]
+native filing system support for write ordering constraints.
+
+[endsect] [/background]
+
+[section:write_ordering_data Write ordering data and durability: why does it matter?]
+
+What you're about to read is probably too much detail for AFIO and reads more like a
+description of how the aforementioned forthcoming TripleGit graph store database
+implements durability. Nevertheless, as many users of AFIO will likely want to know how to ensure
+written data is never lost, this discussion is probably useful.
+
+A performant way for a database to achieve the Consistent and Isolated part is to allow
+abortable, garbage collectable concurrent writes of new data into separate partitions, and to push
+the atomicity enforcement into a very small piece of ordering logic in order to reduce
+transaction contention by multiple writers as much as possible. Generally,
+the ordering logic will make use of some sort of intent log which records what
+the database intends to do (and generally you want that intent log on as low latency
+a device as possible). Generally speaking, that intent log is usually some form
+of atomically appended record -- and usefully every major filing system supports
+atomic appends to a file. What you then traditionally do to implement a transaction
+is to write your data to the filing
+system, ensure it has reached non-volatile storage, append the knowledge it
+definitely is on non-volatile storage to the intent log, and then ensure your
+append also has reached non-volatile storage. This is presently the only way to ensure
+that valuable data definitely can not be lost. The obvious
+problem is that this method involves writing all your data with `O_SYNC` and using `fsync()`
+on the intent log. This might perform okay with a single writer, but with multiple
+writers performance is usually awful, especially on storage incapable of high
+queue depths and potentially many hundreds of milliseconds of latency (e.g. SD Cards).
+
+This raises an alternative: write all your data, but keep a hash like a SHA of its contents
+as you write it. When you write your intent log, append all the SHAs of the items
+you just wrote and skip `O_DATA` and `fsync()` completely. If power gets removed
+before all the data is written to non-volatile storage, you can figure out that
+the database is dirty easily enough, and you simply parse from the end of the intent
+log backwards, checking each item's contents to ensure their SHAs match up, throwing
+away any transaction where any file is missing or any file's contents don't match.
+On a filing system such as ext4 where data is guaranteed to be sent to non-volatile
+storage after one minute[footnote This is the default, and it may be changed by a
+system e.g. I have seen thirty minutes set for laptops.], and of course so long as you don't mind losing up to one
+minute's worth of data, this solution can have much better performance than the
+previous solution with lots of simultaneous writers.
+
+The problem though is that while better, performance is still far less than optimal.
+Firstly, you have to calculate a whole load of hashes all the time, and that isn't trivial
+especially on lower end platforms like a mobile phone where 25-30 cycles per byte
+SHA256 performance might be typical. Secondly, dirty database reconstruction is
+rather like how ext2 had to call `fsck` on boot: a whole load of time and i/o
+must be expended to fix up damage in the store, and while it's running one generally
+must wait (one can work around this using metadata journaling to shortcut having
+to figure out what is good and bad, but I digress).
+
+What would be really, really useful is if the filing system exposed its internal
+write ordering constraint implementation to user mode code, so one could say ["schedule writing A, B,
+C and D in any order whenever you get round to it, but you ['must] write all
+of those before you write any of E, F and G]. Such an ability gives maximum
+scope to the filing system to reorder and coalesce writes as it sees fit,
+but still allows database implementations to ensure that a transaction's intent
+log entry can never appear without all the data it refers to. Such an ability
+would eliminate the need for expensive dirty database checking and reconstruction,
+or any journalling infrastructure used to skip the manual integrity checking.
+
+In lieu of the lack of just such a facility, we can implementat a reasonable
+emulation in some circumstances. For some filing systems like btrfs or ZFS,
+or filing systems with certain mount options e.g. ext3/4 with the option journal=data, one knows
+that a file's modified timestamp [*always] equals when it was last written to, and moreover
+one is guaranteed that a write is either fully applied or not (i.e. partial data
+writes, including desynchronisation of file contents from file metadata, is
+guaranteed to never happen). This lets you shortcut checking the intent log: simply
+rewind to where the intent log first matches the filing system metadata, and
+proceed to check intent log entries and filing system metadata for the duration
+which you know is the maximum time between `sync()` invocations by the system.
+Additionally if the database user is savvy enough to place the data store in its
+own partition, manually calling something like Linux's `syncfs()` more frequently than
+the system's cron job does will ensure that the distance between the end of the
+intent log and the most recently fully stored data isn't too long.
+
+TODO FINISH.
+
+
+
+In the hope that one day filing systems might actually expose their preexisting
+non-`fsync()` write ordering constraints like I just described, AFIO makes
+available such a facility using the XXX `file_flags` member. 
+[endsect] [/write_ordering_data]
+
+[endsect] [/acid_write_ordering]
 
 [endsect] [/ end of section Design Rationale]
