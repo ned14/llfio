@@ -34,16 +34,21 @@ project boost/afio/test
 
 #;
 
+# the required cpp file for the unit tests (for some reason gcc wants this availible to all tests)
 local reqs = ../detail/SpookyV2.cpp   ;
 
-local test-type = link ;
+# look in the commandline args for "--valgrind=" and capture its contents in VALGRIND_ARGS
 local VALGRIND_ARGS = [ MATCH --valgrind=(.*) : $(.argv) ] ;
 
+
+# if we're doing a valgrind build, set up the test launcher
 if $(VALGRIND_ARGS)
 {
   launcher =  <testing.launcher>valgrind ;
 }
 
+
+# link tests (just compile and links targets)
 if "--link-test"  in $(.argv)  
 {  
     test-suite afio-link
@@ -70,16 +75,16 @@ if "--link-test"  in $(.argv)
         [ link test_all.cpp $(reqs) ]
     ;
 }
-else 
+else # run actual tests
 {
-    if "--test-all" in $(.argv)
+    if "--test-all" in $(.argv)   # run the whole test suite at once
     {
         test-suite afio
           : [ run test_all.cpp  $(reqs) : $(VALGRIND_ARGS) : : $(launcher) ] 
 
         ;
     }
-    else
+    else        # otherwise run individual test files
     {
         test-suite afio-valgrind
           : [ run async_io_threadpool_test.cpp $(reqs) : $(VALGRIND_ARGS) : : $(launcher) ]
