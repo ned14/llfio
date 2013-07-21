@@ -24,7 +24,6 @@ File Created: Mar 2013
 #include "../../../boost/afio/detail/ErrorHandling.hpp"
 #include "../../../boost/afio/detail/valgrind/memcheck.h"
 #include "../../../boost/afio/detail/valgrind/helgrind.h"
-#include <mutex>
 
 #include <fcntl.h>
 #include <sys/stat.h>
