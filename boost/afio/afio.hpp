@@ -37,13 +37,13 @@ File Created: Mar 2013
 #include "boost/thread/recursive_mutex.hpp"
 namespace boost { namespace afio {
 typedef boost::thread thread;
-inline exception_ptr current_exception() { return boost::current_exception(); }
+inline boost::exception_ptr current_exception() { return boost::current_exception(); }
 typedef boost::recursive_mutex recursive_mutex;
 } }
 #else
 namespace boost { namespace afio {
 typedef std::thread thread;
-inline exception_ptr current_exception() { return std::current_exception(); }
+inline std::exception_ptr current_exception() { return std::current_exception(); }
 typedef std::recursive_mutex recursive_mutex;
 } }
 #endif
