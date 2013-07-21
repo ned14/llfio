@@ -19,6 +19,7 @@ File Created: Mar 2013
 #include <type_traits>
 #include <initializer_list>
 #include <thread>
+#include <mutex>
 #include <atomic>
 #include <exception>
 //#define BOOST_THREAD_VERSION 4
