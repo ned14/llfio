@@ -16,13 +16,14 @@ File Created: Nov 2012
 #define __func__ __FUNCTION__
 #endif
 
-#ifndef BOOST_AFIO_API
+#ifndef BOOST_AFIO_DECL
 #ifdef BOOST_AFIO_DLL_EXPORTS
-//#define BOOST_AFIO_API DLLEXPORTMARKUP
-#define BOOST_AFIO_API BOOST_SYMBOL_EXPORT
+#define BOOST_AFIO_DECL BOOST_SYMBOL_EXPORT
 #else
-//#define BOOST_AFIO_API DLLIMPORTMARKUP
-#define BOOST_AFIO_API BOOST_SYMBOL_IMPORT
+/*! \brief Defines the API decoration for any exportable symbols
+\ingroup macros
+*/
+#define BOOST_AFIO_DECL BOOST_SYMBOL_IMPORT
 #endif
 #endif
 
@@ -41,7 +42,7 @@ namespace boost{
         namespace detail{
     
             #ifdef BOOST_WINDOWS
-                    extern BOOST_AFIO_API void int_throwWinError(const char *file, const char *function, int lineno, unsigned code, const std::filesystem::path *filename=0);
+                    extern BOOST_AFIO_DECL void int_throwWinError(const char *file, const char *function, int lineno, unsigned code, const std::filesystem::path *filename=0);
                     extern "C" unsigned __stdcall GetLastError();
             #define BOOST_AFIO_ERRGWIN(code)				{ boost::afio::detail::int_throwWinError(EXCEPTION_FILE(0), EXCEPTION_FUNCTION(0), EXCEPTION_LINE(0), code); }
             #define BOOST_AFIO_ERRGWINFN(code, filename)	{ boost::afio::detail::int_throwWinError(EXCEPTION_FILE(0), EXCEPTION_FUNCTION(0), EXCEPTION_LINE(0), code, &(filename)); }
@@ -49,7 +50,7 @@ namespace boost{
             #define BOOST_AFIO_ERRHWINFN(exp, filename)	{ unsigned __errcode=(unsigned)(exp); if(!__errcode) BOOST_AFIO_ERRGWINFN(GetLastError(), filename); }
             #endif
 
-                    extern BOOST_AFIO_API void int_throwOSError(const char *file, const char *function, int lineno, int code, const std::filesystem::path *filename=0);
+                    extern BOOST_AFIO_DECL void int_throwOSError(const char *file, const char *function, int lineno, int code, const std::filesystem::path *filename=0);
             #define BOOST_AFIO_ERRGWIN(code)				{ boost::afio::detail::int_throwWinError(EXCEPTION_FILE(0), EXCEPTION_FUNCTION(0), EXCEPTION_LINE(0), code); }
             #define BOOST_AFIO_ERRGWINFN(code, filename)	{ boost::afio::detail::int_throwWinError(EXCEPTION_FILE(0), EXCEPTION_FUNCTION(0), EXCEPTION_LINE(0), code, &(filename)); }
             /*! Use this macro to wrap BOOST_WINDOWS functions. For anything setting errno, use ERRHOS().

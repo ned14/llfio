@@ -7,16 +7,21 @@ File Created: Mar 2013
 #ifndef BOOST_AFIO_HPP
 #define BOOST_AFIO_HPP
 
-//#include "../NiallsCPP11Utilities/NiallsCPP11Utilities.hpp"
-//#include "../NiallsCPP11Utilities/std_filesystem.hpp"
-#include <type_traits>
-#include <initializer_list>
-#include <thread>
-#include <atomic>
-#include <exception>
+// Fix up mingw weirdness
+#if !defined(WIN32) && defined(_WIN32)
+#define WIN32 1
+#endif
+// Boost ASIO needs this
 #if !defined(_WIN32_WINNT) && defined(WIN32)
 #define _WIN32_WINNT 0x0501
 #endif
+
+#include <type_traits>
+#include <initializer_list>
+#include <thread>
+#include <mutex>
+#include <atomic>
+#include <exception>
 //#define BOOST_THREAD_VERSION 4
 //#define BOOST_THREAD_PROVIDES_VARIADIC_THREAD
 //#define BOOST_THREAD_DONT_PROVIDE_FUTURE
@@ -26,6 +31,25 @@ File Created: Mar 2013
 #include "boost/thread/future.hpp"
 #include "config.hpp"
 #include "detail/Utility.hpp"
+
+// Map in C++11 stuff if available
+#if defined(__GLIBCXX__) && __GLIBCXX__<=20120920
+#include "boost/exception_ptr.hpp"
+#include "boost/thread/recursive_mutex.hpp"
+namespace boost { namespace afio {
+typedef boost::thread thread;
+inline boost::thread::id get_this_thread_id() { return boost::this_thread::get_id(); }
+inline boost::exception_ptr current_exception() { return boost::current_exception(); }
+typedef boost::recursive_mutex recursive_mutex;
+} }
+#else
+namespace boost { namespace afio {
+typedef std::thread thread;
+inline std::thread::id get_this_thread_id() { return std::this_thread::get_id(); }
+inline std::exception_ptr current_exception() { return std::current_exception(); }
+typedef std::recursive_mutex recursive_mutex;
+} }
+#endif
 
 #if BOOST_VERSION<105400
 #error Boosts before v1.54 have a memory corruption bug in boost::packaged_task<> when built under C++11 which makes this library useless. Get a newer Boost!
@@ -76,12 +100,6 @@ for dispatch. This, being very useful for debugging, defaults to 1 except when
 namespace boost {
 //! \brief The namespace containing the Boost.ASIO asynchronous file i/o implementation.
 namespace afio {
-
-#ifdef __GNUC__
-typedef boost::thread thread;
-#else
-typedef std::thread thread;
-#endif
 
 // This isn't consistent on MSVC so hard code it
 typedef unsigned long long off_t;
@@ -135,7 +153,6 @@ BOOST_AFIO_FORWARD_STL_IMPL(promise, boost::promise)
 typedef boost::exception_ptr exception_ptr;
 template<class T> inline exception_ptr make_exception_ptr(const T &e) { return boost::copy_exception(e); }
 using boost::rethrow_exception;
-using std::current_exception;
 /*! \brief For now, this is an emulation of std::packaged_task based on boost's packaged_task.
 We have to drop the Args... support because it segfaults MSVC Nov 2012 CTP.
 */
@@ -883,7 +900,7 @@ namespace detail
 			}
 			catch(...)
 			{
-				exception_ptr e(afio::make_exception_ptr(current_exception()));
+				exception_ptr e(afio::make_exception_ptr(afio::current_exception()));
 				state->done.set_exception(e);
 				done=true;
 			}

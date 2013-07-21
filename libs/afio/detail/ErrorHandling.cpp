@@ -8,6 +8,9 @@ File Created: Nov 2012
 #include "ErrorHandling.hpp"
 #include <locale>
 #include <cstring>
+#include "boost/exception/to_string.hpp"
+
+using boost::to_string;
 
 #ifdef WIN32
 #define WIN32_LEAN_AND_MEAN 1
@@ -18,12 +21,12 @@ namespace boost {
         namespace detail{
 
             using namespace std;
-
+			
             void int_throwWinError(const char *file, const char *function, int lineno, unsigned code, const std::filesystem::path *filename)
             {
                     DWORD len;
-                    TCHAR buffer[1024];
-                    len=FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, 0, code, 0, buffer, sizeof(buffer)/sizeof(TCHAR), 0);
+                    char buffer[1024];
+                    len=FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, 0, code, 0, buffer, sizeof(buffer), 0);
                     // Remove annoying CRLF at end of message sometimes
                     while(10==buffer[len-1])
                     {
@@ -35,8 +38,7 @@ namespace boost {
                                     len--;
                             }
                     }
-                    wstring_convert<codecvt_utf8_utf16<TCHAR>, TCHAR> UTF16toUTF8;
-                    string errstr(UTF16toUTF8.to_bytes(buffer, buffer+len));
+                    string errstr(buffer, buffer+len);
                     errstr.append(" ("+to_string(code)+") in '"+string(file)+"':"+string(function)+":"+to_string(lineno));
                     if(ERROR_FILE_NOT_FOUND==code || ERROR_PATH_NOT_FOUND==code)
                     {
