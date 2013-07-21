@@ -30,7 +30,7 @@ lib boost_afio : afio.cpp ../detail/ErrorHandling.cpp
       <include>../../../boost/afio/detail
       <toolset>gcc:<cxxflags>"-std=c++0x -fvisibility-inlines-hidden -fstrict-aliasing -Wstrict-aliasing -Wno-unused -fargument-noalias -fvisibility=hidden -fopenmp"
       <toolset>gcc:<linkflags>"-lgomp"
-      <toolset>gcc-mingw:<cxxflags>"-DWIN32 -D_UNICODE -DUNICODE"
+      <toolset>gcc-mingw:<cxxflags>"-march=i686 -DWIN32 -D_UNICODE -DUNICODE"
       <toolset>clang:<cxxflags>"-std=c++0x -fvisibility-inlines-hidden -fstrict-aliasing -Wstrict-aliasing -Wno-unused -fargument-noalias -fvisibility=hidden -fopenmp"
       <toolset>msvc:<cxxflags>/openmp
       <target-os>linux:<linkflags>"-lpthread"

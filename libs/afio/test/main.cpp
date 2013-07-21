@@ -11,6 +11,11 @@ Created: Feb 2013
 #define BOOST_ASIO_BUG_WORKAROUND 1
 #endif
 
+#ifdef __MINGW32__
+// Mingw doesn't define putenv() needed by Boost.Test
+extern int putenv(char*);
+#endif
+
 #include <utility>
 #include <sstream>
 #include <iostream>
@@ -22,11 +27,6 @@ Created: Feb 2013
 #include "../../../boost/afio/detail/Undoer.hpp"
 
 
-// Mingw doesn't define putenv() needed by Boost.Test
-#include <cstdlib>
-#ifdef __MINGW32__
-extern int putenv(char*);
-#endif
 #define BOOST_TEST_MODULE tester
 #include <boost/test/included/unit_test.hpp>
 
