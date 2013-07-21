@@ -33,7 +33,7 @@ File Created: Mar 2013
 #include "detail/Utility.hpp"
 
 // Map in C++11 stuff if available
-#if defined(__GLIBCXX__) && __GLIBCXX__<20120322
+#if defined(__GLIBCXX__) && __GLIBCXX__<=20120920
 #include "boost/exception_ptr.hpp"
 #include "boost/thread/recursive_mutex.hpp"
 namespace boost { namespace afio {
