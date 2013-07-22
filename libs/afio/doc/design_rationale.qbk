@@ -275,6 +275,24 @@ guaranteed to never happen). This lets you shortcut checking the intent log: sim
 rewind to where the intent log first matches the filing system metadata, and
 proceed to check intent log entries and filing system metadata for the duration
 which you know is the maximum time between `sync()` invocations by the system.
+
+ZFS, interestingly, adds an even stronger guarantee due to its use of transaction
+groups which are, for all intents and purposes, partial snapshots issued once every
+five seconds in ZFSs before the addition of the ZFS Write Throttle. Data writes may occur in any order within
+a transaction group, but transaction group commits are strongly tied to the wall
+clock and are [*always] committed sequentially, and so long as it takes less than
+five seconds to write five seconds of buffered writes, all is good. Since the
+addition of the ZFS Write Throttle, the default settings are to buffer up to
+thirty seconds of writes before pacing the acceptance of new write data to match
+the speed of the non-volatile storage (which may be a ZIL if you're doing
+synchronous writes). This implies up to
+thirty seconds of buffered data could be lost, but note that ZFS still guarantees
+transaction group sequential write order.
+
+[footnote http://www.c0t0d0s0.org/archives/5343-Insights-into-ZFS-today-The-nature-of-writing-things.html]
+
+TODO
+
 Additionally if the database user is savvy enough to place the data store in its
 own partition, manually calling something like Linux's `syncfs()` more frequently than
 the system's cron job does will ensure that the distance between the end of the
