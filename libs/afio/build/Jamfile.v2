@@ -12,33 +12,14 @@ project boost/afio
       <link>shared:<define>BOOST_AFIO_DYN_LINK=1  
       <link>shared:<define>BOOST_AFIO_SOURCE=1
       
-
-
-   #These might be better when we're actually a part of boost (these don't wrok with a symlink)     
-#      <library>$../../libs/system/build//boost_system
-#      <library>$../../libs/filesystem/build//boost_filesystem 
-#      <library>$../../libs/atomic/build//boost_atomic
-#      <library>$../../libs/thread/build//boost_thread
-
-
     : usage-requirements 
       <include>. 
-      #<link>shared:<library>/boost/system//boost_system
-      #<link>shared:<library>/boost/filesystem//boost_filesystem 
-      #<link>shared:<library>/boost/atomic//boost_atomic
-      #<link>shared:<library>/boost/thread//boost_thread
-
-
       <link>shared:<library>../../system/build//boost_system
       <link>shared:<library>../../filesystem/build//boost_filesystem 
       <link>shared:<library>../../atomic/build//boost_atomic
       <link>shared:<library>../../thread/build//boost_thread
-
-
-
-
-     <link>shared:<define>BOOST_AFIO_DYN_LINK=1
-     <link>shared:<define>BOOST_AFIO_SOURCE=1
+      <link>shared:<define>BOOST_AFIO_DYN_LINK=1
+      <link>shared:<define>BOOST_AFIO_SOURCE=1
     : source-location ../src
 
 ;
@@ -47,16 +28,10 @@ lib boost_afio
     : #sources
       afio.cpp 
       ../detail/ErrorHandling.cpp
-      #/boost/system//boost_system
-      #/boost/filesystem//boost_filesystem 
-      #/boost/atomic//boost_atomic
-      #/boost/thread//boost_thread
       ../../system/build//boost_system
       ../../filesystem/build//boost_filesystem 
       ../../atomic/build//boost_atomic
       ../../thread/build//boost_thread
-
-
 
   : #includes 
       <include>../../../boost/afio 

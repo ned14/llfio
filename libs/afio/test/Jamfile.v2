@@ -28,7 +28,6 @@ project boost/afio/test
       #<linkflags>"-l pthread"      #is this the test's dependency or boost_afio's???? 
     ;
 
-
 #exe boost_afio_test : main.cpp   ../detail/SpookyV2.cpp
 #    : <include>../../../boost/afio/detail
 
