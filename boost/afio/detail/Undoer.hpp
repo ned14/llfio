@@ -15,10 +15,13 @@
 #include<boost/config.hpp>
 #include <utility>
 
-#if defined(BOOST_MSVC) && BOOST_MSVC<=1800 && !defined(noexcept)
+#ifdef BOOST_NO_NOEXCEPT
+//#if defined(BOOST_MSVC) && BOOST_MSVC<=1800 && !defined(noexcept)
 #define noexcept throw()
 #endif
-#if defined(BOOST_MSVC) && BOOST_MSVC<=1800 && !defined(constexpr)
+
+#ifdef BOOST_NO_CONSTEXPR
+//#if defined(BOOST_MSVC) && BOOST_MSVC<=1800 && !defined(constexpr)
 #define constexpr const
 #endif
 #if defined(__GNUC__) && !defined(GCC_VERSION)
@@ -49,8 +52,8 @@ namespace boost{
             {
                     callable undoer;
                     bool _dismissed;
-
-            #if !defined(BOOST_MSVC) || BOOST_MSVC>1800
+            #ifndef BOOST_NO_DEFAULTED_FUNCTIONS
+            //#if !defined(BOOST_MSVC) || BOOST_MSVC>1800
                     UndoerImpl() = delete;
                     UndoerImpl(const UndoerImpl &) = delete;
                     UndoerImpl &operator=(const UndoerImpl &) = delete;
