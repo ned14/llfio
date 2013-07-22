@@ -23,10 +23,19 @@ project boost/afio
 
     : usage-requirements 
       <include>. 
-      <link>shared:<library>/boost/system//boost_system
-      <link>shared:<library>/boost/filesystem//boost_filesystem 
-      <link>shared:<library>/boost/atomic//boost_atomic
-      <link>shared:<library>/boost/thread//boost_thread
+      #<link>shared:<library>/boost/system//boost_system
+      #<link>shared:<library>/boost/filesystem//boost_filesystem 
+      #<link>shared:<library>/boost/atomic//boost_atomic
+      #<link>shared:<library>/boost/thread//boost_thread
+
+
+      <link>shared:<library>../../system/build//boost_system
+      <link>shared:<library>../../filesystem/build//boost_filesystem 
+      <link>shared:<library>../../atomic/build//boost_atomic
+      <link>shared:<library>../../thread/build//boost_thread
+
+
+
 
      <link>shared:<define>BOOST_AFIO_DYN_LINK=1
      <link>shared:<define>BOOST_AFIO_SOURCE=1
@@ -38,10 +47,16 @@ lib boost_afio
     : #sources
       afio.cpp 
       ../detail/ErrorHandling.cpp
-      /boost/system//boost_system
-      /boost/filesystem//boost_filesystem 
-      /boost/atomic//boost_atomic
-      /boost/thread//boost_thread
+      #/boost/system//boost_system
+      #/boost/filesystem//boost_filesystem 
+      #/boost/atomic//boost_atomic
+      #/boost/thread//boost_thread
+      ../../system/build//boost_system
+      ../../filesystem/build//boost_filesystem 
+      ../../atomic/build//boost_atomic
+      ../../thread/build//boost_thread
+
+
 
   : #includes 
       <include>../../../boost/afio 

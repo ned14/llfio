@@ -15,17 +15,6 @@
 #include<boost/config.hpp>
 #include <utility>
 
-/*  Try to replace these with boost macros
-#ifdef BOOST_NO_CXX11_NOEXCEPT
-//#if defined(BOOST_MSVC) && BOOST_MSVC<=1700 && !defined(noexcept)
-#define noexcept throw()
-#endif
-#ifdef BOOST_NO_CONSTEXPR
-//#if defined(BOOST_MSVC) && BOOST_MSVC<=1700 && !defined(constexpr)
-#define constexpr const
-#endif
-
-*/
 #if defined(__GNUC__) && !defined(GCC_VERSION)
 #define GCC_VERSION (__GNUC__ * 10000 \
 				   + __GNUC_MINOR__ * 100 \

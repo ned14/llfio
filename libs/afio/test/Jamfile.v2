@@ -19,7 +19,7 @@ project boost/afio/test
     : requirements
       <threading>multi
       <include>../../../boost/afio/detail
-      <library>/boost/afio//boost_afio
+      <library>../../afio/build//boost_afio
       <toolset>gcc:<cxxflags>"-std=c++0x -Wno-unused-local-typedefs" 
       <toolset>clang:<cxxflags>-std=c++0x 
       <toolset>msvc:<cxxflags>"/openmp /EHsc /GF /Gy /Zi /Od /MTd"

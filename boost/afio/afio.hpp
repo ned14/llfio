@@ -765,19 +765,19 @@ namespace detail {
 
 
 #define BOOST_AFIO_DECLARE_CLASS_ENUM_AS_BITFIELD(type) \
-inline BOOST_CONSTEXPR_OR_CONST type operator&(type a, type b) \
+inline BOOST_CONSTEXPR type operator&(type a, type b) \
 { \
 	return static_cast<type>(static_cast<size_t>(a) & static_cast<size_t>(b)); \
 } \
-inline BOOST_CONSTEXPR_OR_CONST type operator|(type a, type b) \
+inline BOOST_CONSTEXPR type operator|(type a, type b) \
 { \
 	return static_cast<type>(static_cast<size_t>(a) | static_cast<size_t>(b)); \
 } \
-inline BOOST_CONSTEXPR_OR_CONST type operator~(type a) \
+inline BOOST_CONSTEXPR type operator~(type a) \
 { \
 	return static_cast<type>(~static_cast<size_t>(a)); \
 } \
-inline BOOST_CONSTEXPR_OR_CONST bool operator!(type a) \
+inline BOOST_CONSTEXPR bool operator!(type a) \
 { \
 	return 0==static_cast<size_t>(a); \
 }
