@@ -375,7 +375,7 @@ BOOST_AUTO_TEST_SUITE(all)
 
     BOOST_AUTO_TEST_CASE(async_io_errors)
     {
-        BOOST_MESSAGE( "Tests that the async i/o error handling works");
+        BOOST_TEST_MESSAGE( "Tests that the async i/o error handling works");
             using namespace boost::afio;
             using namespace std;
             using boost::afio::future;

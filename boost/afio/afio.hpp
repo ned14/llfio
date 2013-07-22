@@ -14,6 +14,7 @@ File Created: Mar 2013
 #include <thread>
 #include <atomic>
 #include <exception>
+#include <algorithm> // Boost.ASIO needs std::min and std::max
 #if !defined(_WIN32_WINNT) && defined(WIN32)
 #define _WIN32_WINNT 0x0501
 #endif
