@@ -47,32 +47,22 @@ if $(VALGRIND_ARGS)
 }
 
 
+local test_files = [ glob  *.cpp : main.cpp ] ;
+
 # link tests (just compile and links targets)
 if "--link-test"  in $(.argv)  
 {  
-    test-suite afio-link
-      : [ link async_io_threadpool_test.cpp $(reqs) ]
-        [ link async_io_works_1_prime_test.cpp $(reqs) ]
-        [ link async_io_works_1_test.cpp $(reqs) ]
-        [ link async_io_works_64_test.cpp $(reqs) ]
-        [ link async_io_works_1_sync_test.cpp $(reqs) ]
-        [ link async_io_works_64_sync_test.cpp $(reqs) ]
-        [ link async_io_works_1_autoflush_test.cpp $(reqs) ]
-        [ link async_io_works_64_autoflush_test.cpp $(reqs) ]
-        [ link async_io_works_1_direct_test.cpp $(reqs) ]
-        [ link async_io_works_64_direct_test.cpp $(reqs) ]
-        [ link async_io_works_1_directsync_test.cpp $(reqs) ]
-        [ link async_io_works_64_directsync_test.cpp $(reqs) ]
-        [ link async_io_barrier_test.cpp $(reqs) ]
-        [ link async_io_errors_test.cpp $(reqs) ]
-        [ link async_io_torture_test.cpp $(reqs) ]
-        [ link async_io_torture_sync_test.cpp $(reqs) ]
-        [ link async_io_torture_autoflush_test.cpp $(reqs) ]
-        [ link async_io_torture_direct_test.cpp $(reqs) ]
-        [ link async_io_torture_direct_sync_test.cpp $(reqs) ]
-        [ link async_io_sync_test.cpp $(reqs) ]
-        [ link test_all.cpp $(reqs) ]
-    ;
+    # We can't use the test-suite if we're going to use a for loop
+    #test-suite afio-link
+    #  : [ for local x in $(test_files) {  link $(x) $(reqs) ; }  ]
+    #;
+
+    for local x in $(test_files)
+    {
+        link $(x) $(reqs) ;
+    }
+
+
 }
 else # run actual tests
 {
@@ -85,27 +75,8 @@ else # run actual tests
     }
     else        # otherwise run individual test files
     {
-        test-suite afio-valgrind
-          : [ run async_io_threadpool_test.cpp $(reqs) : $(VALGRIND_ARGS) : : $(launcher) ]
-            [ run async_io_works_1_prime_test.cpp $(reqs) : $(VALGRIND_ARGS) : : $(launcher) ]
-            [ run async_io_works_1_test.cpp $(reqs) : $(VALGRIND_ARGS) : : $(launcher) ]
-            [ run async_io_works_64_test.cpp $(reqs) : $(VALGRIND_ARGS) : : $(launcher) ]
-            [ run async_io_works_1_sync_test.cpp $(reqs) : $(VALGRIND_ARGS) : : $(launcher) ]
-            [ run async_io_works_64_sync_test.cpp $(reqs) : $(VALGRIND_ARGS) : : $(launcher) ]
-            [ run async_io_works_1_autoflush_test.cpp $(reqs) : $(VALGRIND_ARGS) : : $(launcher) ]
-            [ run async_io_works_64_autoflush_test.cpp $(reqs) : $(VALGRIND_ARGS) : : $(launcher) ]
-            [ run async_io_works_1_direct_test.cpp $(reqs) : $(VALGRIND_ARGS) : : $(launcher) ]
-            [ run async_io_works_64_direct_test.cpp $(reqs) : $(VALGRIND_ARGS) : : $(launcher) ]
-            [ run async_io_works_1_directsync_test.cpp $(reqs) : $(VALGRIND_ARGS) : : $(launcher) ]
-            [ run async_io_works_64_directsync_test.cpp $(reqs) : $(VALGRIND_ARGS) : : $(launcher) ]
-            [ run async_io_barrier_test.cpp $(reqs) : $(VALGRIND_ARGS) : : $(launcher) ]
-            [ run async_io_errors_test.cpp $(reqs) : $(VALGRIND_ARGS) : : $(launcher) ]
-            [ run async_io_torture_test.cpp $(reqs) : $(VALGRIND_ARGS) : : $(launcher) ]
-            [ run async_io_torture_sync_test.cpp $(reqs) : $(VALGRIND_ARGS) : : $(launcher) ]
-            [ run async_io_torture_autoflush_test.cpp $(reqs) : $(VALGRIND_ARGS) : : $(launcher) ]
-            [ run async_io_torture_direct_test.cpp $(reqs) : $(VALGRIND_ARGS) : : $(launcher) ]
-            [ run async_io_torture_direct_sync_test.cpp $(reqs) : $(VALGRIND_ARGS) : : $(launcher) ]
-            [ run async_io_sync_test.cpp $(reqs) : $(VALGRIND_ARGS) : : $(launcher) ]
-          ;
+        for local file in $(test_files)
+        { run $(file) $(reqs) : $(VALGRIND_ARGS) : : $(launcher) ; }
+
     }
 }
