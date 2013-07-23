@@ -56,9 +56,9 @@ before_install:
  - mv user-config.jam $HOME
 
 #auto generate the files to be included for test_all.cpp
- - cd libs/afio/test
- - chmod u+x test_file_glob.sh
- - ./test_file_glob.sh
+# - cd libs/afio/test
+# - chmod u+x test_file_glob.sh
+# - ./test_file_glob.sh
 
 # install boost build
  - cd $BOOST/tools/build/v2

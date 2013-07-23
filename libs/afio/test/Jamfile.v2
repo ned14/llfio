@@ -12,6 +12,7 @@ import modules ;
 
 #local boost-path = [ modules.peek : BOOST_ROOT ] ; #can probably get rid of this
 
+import os ;
 import testing ;
 
 
@@ -47,8 +48,15 @@ if $(VALGRIND_ARGS)
 }
 
 #auto generate the test_all.cpp
-#SHELL "libs/afio/test/test_file_glob.sh"  ;
-
+if [ os.name ] = "NT" 
+{ 
+    local str = "for /f \"delims=\" %i in ('dir /b /a-d /s test_file_glob.bat') do \"%~fi\""  ;
+    SHELL $(str) ;
+}
+else 
+{ 
+    SHELL "$(find -name test_file_glob.sh)"  ; 
+}
 local test_files = [ glob  *.cpp : main.cpp ] ;
 
 # link tests (just compile and links targets)
