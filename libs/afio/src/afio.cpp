@@ -836,7 +836,7 @@ namespace detail {
 			return std::make_pair(true, h);
 		}
 		// Called in unknown thread
-		void boost_asio_completion_handler(bool is_write, size_t id, std::shared_ptr<detail::async_io_handle> h, const boost::system::error_code &ec, size_t bytes_transferred)
+		void boost_asio_completion_handler(bool is_write, size_t id, std::shared_ptr<detail::async_io_handle> h, std::shared_ptr<std::pair<std::atomic<bool>, std::atomic<size_t>>> bytes_to_transfer, const boost::system::error_code &ec, size_t bytes_transferred)
 		{
 			exception_ptr e;
 			if(ec)
@@ -849,7 +849,12 @@ namespace detail {
 				catch(...)
 				{
 					e=afio::make_exception_ptr(current_exception());
+					bool exp=false;
+					// If someone else has already returned an error, simply exit
+					if(bytes_to_transfer->first.compare_exchange_strong(exp, true))
+						return;
 				}
+				complete_async_op(id, h, e);
 			}
 			else
 			{
@@ -858,9 +863,11 @@ namespace detail {
 					p->byteswritten+=bytes_transferred;
 				else
 					p->bytesread+=bytes_transferred;
+				if(!(bytes_to_transfer->second-=bytes_transferred))
+					complete_async_op(id, h, e);
+				printf("e %u=-%u, %u\n", (unsigned) id, (unsigned) bytes_transferred, (unsigned) bytes_to_transfer->second);
+				BOOST_AFIO_DEBUG_PRINT("H %u e=%u\n", (unsigned) id, (unsigned) ec.value());
 			}
-			BOOST_AFIO_DEBUG_PRINT("H %u e=%u\n", (unsigned) id, (unsigned) ec.value());
-			complete_async_op(id, h, e);
 		}
 		// Called in unknown thread
 		completion_returntype doread(size_t id, std::shared_ptr<detail::async_io_handle> h, async_data_op_req<void> req)
@@ -872,7 +879,15 @@ namespace detail {
 			for(auto &b : req.buffers)
 				BOOST_AFIO_DEBUG_PRINT("  R %u: %p %u\n", (unsigned) id, boost::asio::buffer_cast<const void *>(b), (unsigned) boost::asio::buffer_size(b));
 #endif
-			boost::asio::async_read_at(*p->h, req.where, req.buffers, boost::bind(&async_file_io_dispatcher_windows::boost_asio_completion_handler, this, false, id, h, boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred));
+			// boost::asio::async_read_at() seems to have a bug and only transfers 64Kb per buffer
+			// boost::asio::windows::random_access_handle::async_read_some_at() clearly bothers
+			// with the first buffer only.
+			size_t amount=0;
+			for(auto &b : req.buffers)
+				amount+=boost::asio::buffer_size(b);
+			printf("sr %u=%u\n", (unsigned) id, (unsigned) amount);
+			auto bytes_to_transfer=std::make_shared<std::pair<std::atomic<bool>, std::atomic<size_t>>>(std::make_pair(false, amount));
+			p->h->async_read_some_at(req.where, req.buffers, boost::bind(&async_file_io_dispatcher_windows::boost_asio_completion_handler, this, false, id, h, bytes_to_transfer, boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred));
 			// Indicate we're not finished yet
 			return std::make_pair(false, h);
 		}
@@ -886,7 +901,15 @@ namespace detail {
 			for(auto &b : req.buffers)
 				BOOST_AFIO_DEBUG_PRINT("  W %u: %p %u\n", (unsigned) id, boost::asio::buffer_cast<const void *>(b), (unsigned) boost::asio::buffer_size(b));
 #endif
-			boost::asio::async_write_at(*p->h, req.where, req.buffers, boost::bind(&async_file_io_dispatcher_windows::boost_asio_completion_handler, this, true, id, h, boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred));
+			// boost::asio::async_write_at() seems to have a bug and only transfers 64Kb per buffer
+			// boost::asio::windows::random_access_handle::async_write_some_at() clearly bothers
+			// with the first buffer only.
+			size_t amount=0;
+			for (auto &b : req.buffers)
+				amount+=boost::asio::buffer_size(b);
+			printf("sw %u=%u\n", (unsigned) id, (unsigned) amount);
+			auto bytes_to_transfer=std::make_shared<std::pair<std::atomic<bool>, std::atomic<size_t>>>(std::make_pair(false, amount));
+			p->h->async_write_some_at(req.where, req.buffers, boost::bind(&async_file_io_dispatcher_windows::boost_asio_completion_handler, this, true, id, h, bytes_to_transfer, boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred));
 			// Indicate we're not finished yet
 			return std::make_pair(false, h);
 		}

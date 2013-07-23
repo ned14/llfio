@@ -85,6 +85,7 @@
     <NMakePreprocessorDefinitions>WIN32;_DEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
     <NMakeBuildCommandLine>..\..\..\b2 address-model=64</NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>..\..\..\b2 address-model=64 -a</NMakeReBuildCommandLine>
+    <IncludePath>$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSDK_IncludePath);..\..\..</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <NMakeOutput>afio.exe</NMakeOutput>

@@ -14,7 +14,7 @@ project boost/afio/test
       <library>/boost/afio//boost_afio
       <toolset>gcc:<cxxflags>-std=c++0x 
       <toolset>clang:<cxxflags>-std=c++0x 
-      <toolset>msvc:<cxxflags>"/openmp /EHsc /GF /Gy"
+      <toolset>msvc:<cxxflags>"/openmp /EHsc /GF /Gy /bigobj"
       <toolset>msvc:<linkflags>"/LARGEADDRESSAWARE /DYNAMICBASE /NXCOMPAT /OPT:REF /MANIFEST" # /VERSION:1.00.0"
       <toolset>msvc:<define>WIN32 <toolset>msvc:<define>_WINDOWS  <toolset>msvc:<define>UNICODE <toolset>msvc:<define>_UNICODE
       #<linkflags>"-l pthread"      #is this the test's dependency or boost_afio's???? 
