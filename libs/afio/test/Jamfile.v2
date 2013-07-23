@@ -46,6 +46,8 @@ if $(VALGRIND_ARGS)
   launcher =  <testing.launcher>valgrind ;
 }
 
+#auto generate the test_all.cpp
+#SHELL "libs/afio/test/test_file_glob.sh"  ;
 
 local test_files = [ glob  *.cpp : main.cpp ] ;
 
