@@ -1,9 +1,8 @@
 #! /bin/sh
 
+> ${0%/*}/test_cpps.txt
 
-> test_cpps.txt
-
-for filename in *_test.cpp
+for filename in ${0%/*}/*_test.cpp
 do
-    echo "#include \"$filename\""  >> test_cpps.txt
+    echo "#include \"${filename##${0%/*}/}\""  >> ${0%/*}/test_cpps.txt
 done
