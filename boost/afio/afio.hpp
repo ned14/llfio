@@ -25,7 +25,7 @@ File Created: Mar 2013
 #include "boost/thread/future.hpp"
 #include <boost\foreach.hpp>
 
-#if defined(BOOST_MSVC) && (BOOST_MSVC <= 1600)
+#if defined(_CPPLIB_VER) && _CPPLIB_VER <540 // Dinkumware without <atomic>
 #include <boost\atomic.hpp>
 typedef boost::thread thread; 
 #define BOOST_AFIO_USE_BOOST_ATOMIC
@@ -238,7 +238,7 @@ public:
 	~thread_pool()
 	{
 		service.stop();
-		for(auto &i : workers)
+		BOOST_FOREACH(auto &i, workers)
 			i->join();
 	}
 	//! Returns the underlying io_service
@@ -576,7 +576,7 @@ namespace detail
 			bool done=false;
 			try
 			{
-				for(auto &i : state->out)
+				BOOST_FOREACH(auto &i, state->out)
 					i.get();
 			}
 			catch(...)
@@ -602,7 +602,7 @@ inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(st
 	std::vector<std::pair<async_op_flags, std::function<async_file_io_dispatcher_base::completion_t>>> callbacks;
 	callbacks.reserve(inputs.size());
 	size_t idx=0;
-	for(auto &i : inputs)
+	BOOST_FOREACH(auto &i, inputs)
 		callbacks.push_back(std::make_pair(async_op_flags::ImmediateCompletion, std::bind(&detail::when_all_count_completed_nothrow, std::placeholders::_1, std::placeholders::_2, state, idx++)));
 	inputs.front().parent->completion(inputs, callbacks);
 	return state->done.get_future();
@@ -617,7 +617,7 @@ inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(st
 	std::vector<std::pair<async_op_flags, std::function<async_file_io_dispatcher_base::completion_t>>> callbacks;
 	callbacks.reserve(inputs.size());
 	size_t idx=0;
-	for(auto &i : inputs)
+	BOOST_FOREACH(auto &i, inputs)
 		callbacks.push_back(std::make_pair(async_op_flags::ImmediateCompletion, std::bind(&detail::when_all_count_completed, std::placeholders::_1, std::placeholders::_2, state, idx++)));
 	inputs.front().parent->completion(inputs, callbacks);
 	return state->done.get_future();
@@ -627,7 +627,7 @@ inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(st
 {
 	std::vector<async_io_op> ops;
 	ops.reserve(_ops.size());
-	for(auto &&i : _ops)
+	BOOST_FOREACH(auto &&i, _ops)
 		ops.push_back(std::move(i));
 	return when_all(_, ops.begin(), ops.end());
 }
@@ -636,7 +636,7 @@ inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(st
 {
 	std::vector<async_io_op> ops;
 	ops.reserve(_ops.size());
-	for(auto &&i : _ops)
+	BOOST_FOREACH(auto &&i, _ops)
 		ops.push_back(std::move(i));
 	return when_all(ops.begin(), ops.end());
 }
@@ -710,7 +710,7 @@ template<> struct async_data_op_req<void> // For reading
 	{
 		if(!precondition.validate()) return false;
 		if(buffers.empty()) return false;
-		for(auto &b : buffers)
+		BOOST_FOREACH(auto &b, buffers)
 		{
 			if(!boost::asio::buffer_cast<const void *>(b) || !boost::asio::buffer_size(b)) return false;
 			if(!!(precondition.parent->fileflags(file_flags::None)&file_flags::OSDirect))
@@ -737,8 +737,8 @@ template<> struct async_data_op_req<const void> // For writing
 	async_data_op_req() { }
 	async_data_op_req(const async_data_op_req &o) : precondition(o.precondition), buffers(o.buffers), where(o.where) { }
 	async_data_op_req(async_data_op_req &&o) : precondition(std::move(o.precondition)), buffers(std::move(o.buffers)), where(std::move(o.where)) { }
-	async_data_op_req(const async_data_op_req<void> &o) : precondition(o.precondition), where(o.where) { buffers.reserve(o.buffers.capacity()); for(auto &i: o.buffers) buffers.push_back(i); }
-	async_data_op_req(async_data_op_req<void> &&o) : precondition(std::move(o.precondition)), where(o.where) { buffers.reserve(o.buffers.capacity()); for(auto &&i: o.buffers) buffers.push_back(std::move(i)); }
+	async_data_op_req(const async_data_op_req<void> &o) : precondition(o.precondition), where(o.where) { buffers.reserve(o.buffers.capacity()); BOOST_FOREACH(auto &i, o.buffers) buffers.push_back(i); }
+	async_data_op_req(async_data_op_req<void> &&o) : precondition(std::move(o.precondition)), where(o.where) { buffers.reserve(o.buffers.capacity()); BOOST_FOREACH(auto &&i, o.buffers) buffers.push_back(std::move(i)); }
 	async_data_op_req &operator=(const async_data_op_req &o) { precondition=o.precondition; buffers=o.buffers; where=o.where; return *this; }
 	async_data_op_req &operator=(async_data_op_req &&o) { precondition=std::move(o.precondition); buffers=std::move(o.buffers); where=std::move(o.where); return *this; }
 	async_data_op_req(async_io_op _precondition, const void *_buffer, size_t _length, off_t _where) : precondition(std::move(_precondition)), where(_where) { buffers.reserve(1); buffers.push_back(boost::asio::const_buffer(_buffer, _length)); _validate(); }
@@ -748,7 +748,7 @@ template<> struct async_data_op_req<const void> // For writing
 	{
 		if(!precondition.validate()) return false;
 		if(buffers.empty()) return false;
-		for(auto &b : buffers)
+		BOOST_FOREACH(auto &b , buffers)
 		{
 			if(!boost::asio::buffer_cast<const void *>(b) || !boost::asio::buffer_size(b)) return false;
 			if(!!(precondition.parent->fileflags(file_flags::None)&file_flags::OSDirect))
@@ -888,7 +888,7 @@ template<class R> inline std::pair<std::vector<future<R>>, std::vector<async_io_
 		(*c)();
 		return std::make_pair(true, _);
 	};
-	for(auto &t : callables)
+	BOOST_FOREACH(auto &t, callables)
 	{
 		std::shared_ptr<tasktype> c(std::make_shared<tasktype>(std::function<R()>(t)));
 		retfutures.push_back(c->get_future());
