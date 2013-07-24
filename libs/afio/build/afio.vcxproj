@@ -79,6 +79,7 @@
     <NMakePreprocessorDefinitions>WIN32;_DEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
     <NMakeBuildCommandLine>..\..\..\b2</NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>..\..\..\b2 -a</NMakeReBuildCommandLine>
+    <IncludePath>C:\Users\Project Kyo\Documents\GitHub\boost;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <NMakeOutput>afio.exe</NMakeOutput>

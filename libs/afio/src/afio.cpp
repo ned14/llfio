@@ -657,7 +657,7 @@ namespace detail
 {
 	struct barrier_count_completed_state
 	{
-		std::atomic<size_t> togo;
+		atomic<size_t> togo;
 		std::vector<std::pair<size_t, std::shared_ptr<detail::async_io_handle>>> out;
 		std::vector<std::shared_ptr<shared_future<std::shared_ptr<detail::async_io_handle>>>> outsharedstates;
 		barrier_count_completed_state(const std::vector<async_io_op> &ops) : togo(ops.size()), out(ops.size())
