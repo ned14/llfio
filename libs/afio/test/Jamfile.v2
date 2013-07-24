@@ -55,7 +55,7 @@ if [ os.name ] = "NT"
 }
 else 
 { 
-    SHELL "$(find -name test_file_glob.sh)"  ; 
+    SHELL  [ SHELL "find -L -name test_file_glob.sh" ]  ; 
 }
 local test_files = [ glob  *.cpp : main.cpp ] ;
 
