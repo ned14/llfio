@@ -59,7 +59,7 @@ namespace boost {
                     }
             }
 
-            } // namespace detail
+        } // namespace detail
     }//namespace afio
 }//namespace boost
 
