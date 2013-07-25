@@ -1349,7 +1349,7 @@ namespace detail {
 		virtual std::vector<async_io_op> write(const std::vector<async_data_op_req<const void>> &reqs)
 		{
 #if BOOST_AFIO_VALIDATE_INPUTS
-			BOOST_FOREACH((auto &i, reqs)
+			BOOST_FOREACH(auto &i, reqs)
             {
 				if(!i.validate())
                     throw std::runtime_error("Inputs are invalid.");
