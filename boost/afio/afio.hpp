@@ -564,7 +564,7 @@ public:
     \exceptionmodelstd
     \qexample{call_example}
     */
-	template<class C, class... Args> inline std::pair<future<typename std::result_of<C(Args...)>::type>, async_io_op> call(const async_io_op &req, C callback, Args... args);
+	template<class C, class... Args> inline std::pair<future<typename boost::result_of<C(Args...)>::type>, async_io_op> call(const async_io_op &req, C callback, Args... args);
 
 	/*! \brief Schedule a batch of asynchronous directory creations and opens after optional preconditions.
     \return A batch of op handles.
@@ -1391,7 +1391,7 @@ template<class R> inline std::pair<future<R>, async_io_op> async_file_io_dispatc
 	std::pair<std::vector<future<R>>, std::vector<async_io_op>> ret(call(i, c));
 	return std::make_pair(std::move(ret.first.front()), ret.second.front());
 }
-template<class C, class... Args> inline std::pair<future<typename std::result_of<C(Args...)>::type>, async_io_op> async_file_io_dispatcher_base::call(const async_io_op &req, C callback, Args... args)
+template<class C, class... Args> inline std::pair<future<typename boost::result_of<C(Args...)>::type>, async_io_op> async_file_io_dispatcher_base::call(const async_io_op &req, C callback, Args... args)
 {
 	typedef typename std::result_of<C(Args...)>::type rettype;
 	return call(req, std::bind<rettype()>(callback, args...));

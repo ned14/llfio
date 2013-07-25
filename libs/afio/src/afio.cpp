@@ -44,7 +44,7 @@ File Created: Mar 2013
 #define BOOST_AFIO_POSIX_UNLINK _wunlink
 #define BOOST_AFIO_POSIX_FSYNC _commit
 #define BOOST_AFIO_POSIX_FTRUNCATE winftruncate
-static inline int winftruncate(int fd, off_t _newsize)
+static inline int winftruncate(int fd, boost::afio::off_t _newsize)
 {
 	// This is a bit tricky ... overlapped files ignore their file position except in this one
 	// case, but clearly here we have a race condition. No choice but to rinse and repeat I guess.
