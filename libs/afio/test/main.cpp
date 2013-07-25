@@ -140,9 +140,9 @@ BOOST_AUTO_TEST_SUITE(all)
                 auto manydeletedfiles(dispatcher->rmfile(manyfilereqs));
 
                 // As a test of call() which involves significant template metaprogramming, have a do nothing callback
-                std::atomic<size_t> callcount(0);
-                typedef int (*callable_type)(std::atomic<size_t> *, int);
-                callable_type callable=[](std::atomic<size_t> *callcount, int i) { ++*callcount; return i; };
+                boost::afio::atomic<size_t> callcount(0);
+                typedef int (*callable_type)(boost::afio::atomic<size_t> *, int);
+                callable_type callable=[](boost::afio::atomic<size_t> *callcount, int i) { ++*callcount; return i; };
                 std::vector<std::function<int()>> callables;
                 callables.reserve(1000);
                 for(size_t n=0; n<1000; n++)
@@ -312,12 +312,12 @@ BOOST_AUTO_TEST_SUITE(all)
                                 lastnumber=i;
                         }
                 }
-                atomic<size_t> callcount[1000];
+                boost::afio::atomic<size_t> callcount[1000];
                 memset(&callcount, 0, sizeof(callcount));
                 vector<future<bool>> verifies;
                 verifies.reserve(groups.size());
-                auto inccount=[](atomic<size_t> *count){ for(volatile size_t n=0; n<10000; n++); (*count)++; };
-                auto verifybarrier=[](atomic<size_t> *count, size_t shouldbe)
+                auto inccount=[](boost::afio::atomic<size_t> *count){ for(volatile size_t n=0; n<10000; n++); (*count)++; };
+                auto verifybarrier=[](boost::afio::atomic<size_t> *count, size_t shouldbe)
                 {
                         if(*count!=shouldbe)
                         {
