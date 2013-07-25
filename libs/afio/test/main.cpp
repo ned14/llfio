@@ -11,6 +11,11 @@ Created: Feb 2013
 #define BOOST_ASIO_BUG_WORKAROUND 1
 #endif
 
+#ifdef __MINGW32__
+// Mingw doesn't define putenv() needed by Boost.Test
+extern int putenv(char*);
+#endif
+
 #include <utility>
 #include <sstream>
 #include <iostream>
@@ -20,7 +25,6 @@ Created: Feb 2013
 #include "../../../boost/afio/detail/Aligned_Allocator.hpp"
 #include "boost/lockfree/queue.hpp"
 #include "../../../boost/afio/detail/Undoer.hpp"
-
 
 
 #define BOOST_TEST_MODULE tester
@@ -60,11 +64,7 @@ BOOST_AUTO_TEST_SUITE(all)
     BOOST_AUTO_TEST_SUITE(exclude_async_io_errors)
         static int task()
         {
-        #ifdef __GNUC__
-                boost::afio::thread::id this_id = boost::this_thread::get_id();
-        #else
-                std::thread::id this_id = std::this_thread::get_id();
-        #endif
+                boost::afio::thread::id this_id = boost::afio::get_this_thread_id();
                 std::cout << "I am worker thread " << this_id << std::endl;
                 return 78;
         }
@@ -72,11 +72,7 @@ BOOST_AUTO_TEST_SUITE(all)
         {
             BOOST_TEST_MESSAGE("Tests that the async i/o thread pool implementation works");
                 using namespace boost::afio;
-        #ifdef __GNUC__
-                boost::afio::thread::id this_id = boost::this_thread::get_id();
-        #else
-                std::thread::id this_id = std::this_thread::get_id();
-        #endif
+                boost::afio::thread::id this_id = boost::afio::get_this_thread_id();
                 std::cout << "I am main thread " << this_id << std::endl;
                 thread_pool pool(4);
                 auto r=task();
@@ -119,7 +115,7 @@ BOOST_AUTO_TEST_SUITE(all)
                 std::vector<async_path_op_req> manyfilereqs;
                 manyfilereqs.reserve(1000);
                 for(size_t n=0; n<1000; n++)
-                        manyfilereqs.push_back(async_path_op_req(mkdir, "testdir/"+std::to_string(n), file_flags::Create|file_flags::Write));
+                        manyfilereqs.push_back(async_path_op_req(mkdir, "testdir/"+boost::to_string(n), file_flags::Create|file_flags::Write));
                 auto manyopenfiles(dispatcher->file(manyfilereqs));
 
                 // Write to each of those 1000 files as they are opened
@@ -625,7 +621,7 @@ BOOST_AUTO_TEST_SUITE(all)
                 std::vector<async_path_op_req> manyfilereqs;
                 manyfilereqs.reserve(no);
                 for(size_t n=0; n<no; n++)
-                        manyfilereqs.push_back(async_path_op_req(mkdir, "testdir/"+std::to_string(n), file_flags::Create|file_flags::ReadWrite));
+                        manyfilereqs.push_back(async_path_op_req(mkdir, "testdir/"+boost::to_string(n), file_flags::Create|file_flags::ReadWrite));
                 auto manyopenfiles(dispatcher->file(manyfilereqs));
                 std::vector<off_t> sizes(no, bytes);
                 auto manywrittenfiles(dispatcher->truncate(manyopenfiles, sizes));
@@ -734,7 +730,7 @@ BOOST_AUTO_TEST_SUITE(all)
                                 size_t bytes=0;
                                 for(auto &b : failedop->first->req.buffers)
                                         bytes+=boost::asio::buffer_size(b);
-                                cout << "   " << (failedop->first->write ? "Write to" : "Read from") << " " << to_string(failedop->first->req.where) << " at offset " << failedop->second << " into bytes " << bytes << endl;
+                                cout << "   " << (failedop->first->write ? "Write to" : "Read from") << " " << boost::to_string(failedop->first->req.where) << " at offset " << failedop->second << " into bytes " << bytes << endl;
                         }
                 }
                 BOOST_TEST_MESSAGE("Checking if the final files have exactly the right contents ... this may take a bit ...");
@@ -759,7 +755,7 @@ BOOST_AUTO_TEST_SUITE(all)
                     for(size_t n=0; n<no; n++)
                         if(memhashes[n]!=filehashes[n]) // compare hash values from ram and actual IO
                         {
-                                string failmsg("File "+to_string(n)+" contents were not what they were supposed to be!");
+                                string failmsg("File "+boost::to_string(n)+" contents were not what they were supposed to be!");
                                 BOOST_TEST_MESSAGE(failmsg.c_str());
                         }
                 }

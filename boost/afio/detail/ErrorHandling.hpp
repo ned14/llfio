@@ -17,6 +17,16 @@ File Created: Nov 2012
 #define __func__ __FUNCTION__
 #endif
 
+#ifndef BOOST_AFIO_DECL
+#ifdef BOOST_AFIO_DLL_EXPORTS
+#define BOOST_AFIO_DECL BOOST_SYMBOL_EXPORT
+#else
+/*! \brief Defines the API decoration for any exportable symbols
+\ingroup macros
+*/
+#define BOOST_AFIO_DECL BOOST_SYMBOL_IMPORT
+#endif
+#endif
 
 #ifdef EXCEPTION_DISABLESOURCEINFO
 #define EXCEPTION_FILE(p) (const char *) 0

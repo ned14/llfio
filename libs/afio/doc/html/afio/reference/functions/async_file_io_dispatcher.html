@@ -1,0 +1,198 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>async_file_io_dispatcher</title>
+<link rel="stylesheet" href="../../../myboostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../../../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 0.1">
+<link rel="up" href="../functions.html" title="Functions">
+<link rel="prev" href="../functions.html" title="Functions">
+<link rel="next" href="process_threadpool.html" title="process_threadpool">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr>
+<td valign="top"><img alt="Boost C++ Libraries" width="277" height="86" src="../../../../../../../boost.png"></td>
+<td align="center"><a href="../../../../../../../index.html">Home</a></td>
+<td align="center"><a href="../../../../../../../libs/libraries.htm">Libraries</a></td>
+<td align="center"><a href="http://www.boost.org/users/people.html">People</a></td>
+<td align="center"><a href="http://www.boost.org/users/faq.html">FAQ</a></td>
+<td align="center"><a href="../../../../../../../more/index.htm">More</a></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../functions.html"><img src="../../../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../functions.html"><img src="../../../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="process_threadpool.html"><img src="../../../../../../../doc/src/images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h4 class="title">
+<a name="afio.reference.functions.async_file_io_dispatcher"></a><a class="link" href="async_file_io_dispatcher.html" title="async_file_io_dispatcher">async_file_io_dispatcher</a>
+</h4></div></div></div>
+<p>
+          <a class="indexterm" name="id901873"></a>
+Instatiates the best available async_file_io_dispatcher implementation
+          for this system.
+        </p>
+<h6>
+<a name="afio.reference.functions.async_file_io_dispatcher.h0"></a>
+          <span class="phrase"><a name="afio.reference.functions.async_file_io_dispatcher.description"></a></span><a class="link" href="async_file_io_dispatcher.html#afio.reference.functions.async_file_io_dispatcher.description">Description</a>
+        </h6>
+<p>
+          Note that the number of threads in the threadpool supplied is the maximum
+          non-async op queue depth (e.g. file opens, closes etc.). For fast SSDs,
+          there isn't much gain after eight-sixteen threads, so the process threadpool
+          is set to eight by default. For slow hard drives, or worse, SANs, a queue
+          depth of 64 or higher might deliver significant benefits.
+        </p>
+<h6>
+<a name="afio.reference.functions.async_file_io_dispatcher.h1"></a>
+          <span class="phrase"><a name="afio.reference.functions.async_file_io_dispatcher.synopsis"></a></span><a class="link" href="async_file_io_dispatcher.html#afio.reference.functions.async_file_io_dispatcher.synopsis">Synopsis</a>
+        </h6>
+<pre class="programlisting"><span class="identifier">BOOST_AFIO_DECL</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span><span class="identifier">async_file_io_dispatcher_base</span><span class="special">&gt;</span> <span class="identifier">async_file_io_dispatcher</span><span class="special">(</span><span class="identifier">thread_pool</span> <span class="special">&amp;</span> <span class="identifier">threadpool</span> <span class="special">=</span> <span class="identifier">process_threadpool</span><span class="special">(),</span> <span class="identifier">file_flags</span> <span class="identifier">flagsforce</span> <span class="special">=</span> <span class="identifier">file_flags</span><span class="special">::</span><span class="identifier">None</span><span class="special">,</span> <span class="identifier">file_flags</span> <span class="identifier">flagsmask</span> <span class="special">=</span> <span class="identifier">file_flags</span><span class="special">::</span><span class="identifier">None</span><span class="special">)</span></pre>
+<h6>
+<a name="afio.reference.functions.async_file_io_dispatcher.h2"></a>
+          <span class="phrase"><a name="afio.reference.functions.async_file_io_dispatcher.parameters"></a></span><a class="link" href="async_file_io_dispatcher.html#afio.reference.functions.async_file_io_dispatcher.parameters">Parameters</a>
+        </h6>
+<div class="informaltable"><table class="table">
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                  <p>
+                    Type
+                  </p>
+                </th>
+<th>
+                  <p>
+                    Concept
+                  </p>
+                </th>
+<th>
+                  <p>
+                    Name
+                  </p>
+                </th>
+<th>
+                  <p>
+                    Description
+                  </p>
+                </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                  <p>
+                    thread_pool &amp;
+                  </p>
+                </td>
+<td>
+                </td>
+<td>
+                  <p>
+                    threadpool
+                  </p>
+                </td>
+<td>
+                  <p>
+                    The threadpool instance to use for asynchronous dispatch.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    file_flags
+                  </p>
+                </td>
+<td>
+                </td>
+<td>
+                  <p>
+                    flagsforce
+                  </p>
+                </td>
+<td>
+                  <p>
+                    The flags to bitwise OR with any opened file flags. Used to force
+                    on certain flags.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    file_flags
+                  </p>
+                </td>
+<td>
+                </td>
+<td>
+                  <p>
+                    flagsmask
+                  </p>
+                </td>
+<td>
+                  <p>
+                    The flags to bitwise AND with any opened file flags. Used to
+                    force off certain flags.
+                  </p>
+                </td>
+</tr>
+</tbody>
+</table></div>
+<h6>
+<a name="afio.reference.functions.async_file_io_dispatcher.h3"></a>
+          <span class="phrase"><a name="afio.reference.functions.async_file_io_dispatcher.returns"></a></span><a class="link" href="async_file_io_dispatcher.html#afio.reference.functions.async_file_io_dispatcher.returns">Returns</a>
+        </h6>
+<p>
+          A shared_ptr to the best available async_file_io_dispatcher implementation
+          for this system.
+        </p>
+<h6>
+<a name="afio.reference.functions.async_file_io_dispatcher.h4"></a>
+          <span class="phrase"><a name="afio.reference.functions.async_file_io_dispatcher.header"></a></span><a class="link" href="async_file_io_dispatcher.html#afio.reference.functions.async_file_io_dispatcher.header">Header</a>
+        </h6>
+<p>
+          <code class="computeroutput"><span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">boost</span><span class="special">/</span><span class="identifier">afio</span><span class="special">/</span><span class="identifier">afio</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span></code>
+        </p>
+<h6>
+<a name="afio.reference.functions.async_file_io_dispatcher.h5"></a>
+          <span class="phrase"><a name="afio.reference.functions.async_file_io_dispatcher.example"></a></span><a class="link" href="async_file_io_dispatcher.html#afio.reference.functions.async_file_io_dispatcher.example">Example</a>
+        </h6>
+<pre class="programlisting"><span class="comment">// Create a dispatcher instance</span>
+<span class="keyword">auto</span> <span class="identifier">dispatcher</span><span class="special">=</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_file_io_dispatcher</span><span class="special">();</span>
+
+<span class="comment">// Schedule an asynchronous call of some function with some bound set of arguments</span>
+<span class="keyword">auto</span> <span class="identifier">helloworld</span><span class="special">=</span><span class="identifier">dispatcher</span><span class="special">.</span><span class="identifier">call</span><span class="special">([](</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span> <span class="identifier">text</span><span class="special">)</span> <span class="special">{</span>
+    <span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="identifier">text</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span>
+    <span class="keyword">return</span> <span class="number">42</span><span class="special">;</span>
+<span class="special">},</span> <span class="string">"Hello world"</span><span class="special">);</span>
+
+<span class="comment">// Schedule as asynchronous call of some function to occur only after helloworld completes</span>
+<span class="keyword">auto</span> <span class="identifier">addtovalue</span><span class="special">=</span><span class="identifier">dispatcher</span><span class="special">.</span><span class="identifier">call</span><span class="special">(</span><span class="identifier">helloworld</span><span class="special">.</span><span class="identifier">second</span><span class="special">,</span> <span class="special">[](</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">future</span><span class="special">&lt;</span><span class="keyword">int</span><span class="special">&gt;</span> <span class="identifier">v</span><span class="special">)</span> <span class="special">{</span>
+    <span class="keyword">return</span> <span class="identifier">v</span><span class="special">.</span><span class="identifier">get</span><span class="special">()+</span><span class="number">1</span><span class="special">;</span>
+<span class="special">},</span> <span class="identifier">helloworld</span><span class="special">.</span><span class="identifier">first</span><span class="special">);</span>
+
+<span class="comment">// Create a boost::future&lt;&gt; representing the ops passed to when_all() and wait for it to complete</span>
+<span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">when_all</span><span class="special">(</span><span class="identifier">addtovalue</span><span class="special">.</span><span class="identifier">second</span><span class="special">).</span><span class="identifier">wait</span><span class="special">();</span>
+
+<span class="comment">// Print the result returned by the future for the lambda, which will be 43</span>
+<span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="string">"addtovalue() returned "</span> <span class="special">&lt;&lt;</span> <span class="identifier">addtovalue</span><span class="special">.</span><span class="identifier">first</span><span class="special">.</span><span class="identifier">get</span><span class="special">()</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span>
+</pre>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2013 Niall Douglas and Paul Kirth<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../functions.html"><img src="../../../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../functions.html"><img src="../../../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="process_threadpool.html"><img src="../../../../../../../doc/src/images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>
