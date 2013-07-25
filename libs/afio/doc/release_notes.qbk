@@ -1,0 +1,37 @@
+[/============================================================================
+  Boost.AFIO
+  
+  Use, modification and distribution is subject to the Boost Software License,
+  Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
+  http://www.boost.org/LICENSE_1_0.txt)
+=============================================================================/]
+
+[section:release_notes Release Notes]
+
+[/=================]
+[heading Boost 1.55]
+[/=================]
+
+[*Additional functionality]
+
+* None
+
+[*Documentation]
+
+* None
+
+[*Bugfixes]
+
+* None
+
+
+[*Solved tickets]
+
+* [@https://svn.boost.org/trac/boost/ticket/7462 7462] None
+
+[*Internal changes]
+
+* None
+
+
+[endsect]

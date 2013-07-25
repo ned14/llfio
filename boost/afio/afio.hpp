@@ -7,11 +7,19 @@ File Created: Mar 2013
 #ifndef BOOST_AFIO_HPP
 #define BOOST_AFIO_HPP
 
-//#include "../NiallsCPP11Utilities/NiallsCPP11Utilities.hpp"
-//#include "../NiallsCPP11Utilities/std_filesystem.hpp"
+// Fix up mingw weirdness
+#if !defined(WIN32) && defined(_WIN32)
+#define WIN32 1
+#endif
+// Boost ASIO needs this
+#if !defined(_WIN32_WINNT) && defined(WIN32)
+#define _WIN32_WINNT 0x0501
+#endif
+
 #include <type_traits>
 #include <initializer_list>
 #include <thread>
+#include <mutex>
 #include <atomic>
 #include <exception>
 #include <algorithm> // Boost.ASIO needs std::min and std::max
@@ -28,29 +36,50 @@ File Created: Mar 2013
 #include "config.hpp"
 #include "detail/Utility.hpp"
 
-#if BOOST_VERSION<105300
-#error I absolutely need Boost v1.53 or higher to compile (I need lock free containers).
-#endif
-#if BOOST_VERSION<105400
-#ifdef BOOST_MSVC
-#pragma message(__FILE__ ": WARNING: Boost v1.53 has a memory corruption bug in boost::packaged_task<> when built under C++11 which makes this library useless. Get a newer Boost!")
+// Map in C++11 stuff if available
+#if defined(__GLIBCXX__) && __GLIBCXX__<=20120920
+#include "boost/exception_ptr.hpp"
+#include "boost/thread/recursive_mutex.hpp"
+namespace boost { namespace afio {
+typedef boost::thread thread;
+inline boost::thread::id get_this_thread_id() { return boost::this_thread::get_id(); }
+inline boost::exception_ptr current_exception() { return boost::current_exception(); }
+typedef boost::recursive_mutex recursive_mutex;
+} }
 #else
-#warning Boost v1.53 has a memory corruption bug in boost::packaged_task<> when built under C++11 which makes this library useless. Get a newer Boost!
+namespace boost { namespace afio {
+typedef std::thread thread;
+inline std::thread::id get_this_thread_id() { return std::this_thread::get_id(); }
+inline std::exception_ptr current_exception() { return std::current_exception(); }
+typedef std::recursive_mutex recursive_mutex;
+} }
 #endif
+
+#if BOOST_VERSION<105400
+#error Boosts before v1.54 have a memory corruption bug in boost::packaged_task<> when built under C++11 which makes this library useless. Get a newer Boost!
 #endif
 
 
-/*
 #ifndef BOOST_AFIO_DECL
 #ifdef BOOST_AFIO_DLL_EXPORTS
 #define BOOST_AFIO_DECL BOOST_SYMBOL_EXPORT
 #else
+/*! \brief Defines the API decoration for any exportable symbols
+\ingroup macros
+*/
 #define BOOST_AFIO_DECL BOOST_SYMBOL_IMPORT
 #endif
 #endif
-*/
 
-//! \def BOOST_AFIO_VALIDATE_INPUTS Validate inputs at the point of instantiation
+
+/*! \brief Validate inputs at the point of instantiation.
+
+Turns on the checking of inputs for validity and throwing of exception conditions
+at the point of instantiation rather than waiting until those inputs are sent
+for dispatch. This, being very useful for debugging, defaults to 1 except when
+`NDEBUG` is defined i.e. final release builds.
+\ingroup macros
+*/
 #ifndef BOOST_AFIO_VALIDATE_INPUTS
 #ifndef NDEBUG
 #define BOOST_AFIO_VALIDATE_INPUTS 1
@@ -64,481 +93,17 @@ File Created: Mar 2013
 #pragma warning(disable: 4251) // type needs to have dll-interface to be used by clients of class
 #endif
 
-/*! \file async_file_io.hpp
+/*! \file afio.hpp
 \brief Provides a batch asynchronous file i/o implementation based on Boost.ASIO
 
-My Seagate 7200rpm drive:
-
------------------------------------------------------------------------
-CrystalDiskMark 3.0.2 x64 (C) 2007-2013 hiyohiyo
-                           Crystal Dew World : http://crystalmark.info/
------------------------------------------------------------------------
-* MB/s = 1,000,000 byte/s [SATA/300 = 300,000,000 byte/s]
-
-           Sequential Read :    46.012 MB/s
-          Sequential Write :    44.849 MB/s
-         Random Read 512KB :    26.367 MB/s
-        Random Write 512KB :    23.521 MB/s
-    Random Read 4KB (QD=1) :     0.487 MB/s [   118.8 IOPS]
-   Random Write 4KB (QD=1) :     0.771 MB/s [   188.3 IOPS]
-   Random Read 4KB (QD=32) :     0.819 MB/s [   199.8 IOPS]
-  Random Write 4KB (QD=32) :     0.789 MB/s [   192.6 IOPS]
-
-  Test : 1000 MB [G: 99.0% (178.2/180.1 GB)] (x5)
-  Date : 2013/04/13 23:02:23
-    OS : Windows 8  [6.2 Build 9200] (x64)
-  
-
-Windows IOCP backend, 3.5Ghz Ivy Bridge Windows 8 x64 on 
-my Seagate 7200rpm drive:
-
-1000 file opens, writes 1 byte, closes, and deletes:
-It took 0.26311 secs to do all operations
-  It took 0.0079942 secs to dispatch all operations
-  It took 0.255116 secs to finish all operations
-
-It took 0.0899875 secs to do 11112.7 file opens per sec
-It took 0.0100023 secs to do 99977 file writes per sec
-It took 0.0210025 secs to do 47613.4 file closes per sec
-It took 0.142118 secs to do 7036.43 file deletions per sec
-
-
-1000 file opens, writes 64Kb, closes, and deletes:
-It took 1.01195 secs to do all operations
-  It took 0.0079939 secs to dispatch all operations
-  It took 1.00396 secs to finish all operations
-
-It took 0.10599 secs to do 9434.83 file opens per sec
-It took 0.0410053 secs to do 24387.1 file writes per sec
-It took 0.769099 secs to do 1300.22 file closes per sec
-It took 0.0958558 secs to do 10432.3 file deletions per sec
-
-
-1000 file opens, writes 1 byte, closes, and deletes with synchronous i/o:
-It took 9.28653 secs to do all operations
-  It took 0.142254 secs to dispatch all operations
-  It took 9.14427 secs to finish all operations
-
-It took 8.92534 secs to do 112.041 file opens per sec
-It took 0.112127 secs to do 8918.5 file writes per sec
-It took 0.177022 secs to do 5649.03 file closes per sec
-It took 0.0720397 secs to do 13881.2 file deletions per sec
-
-
-1000 file opens, writes 64Kb, closes, and deletes with synchronous i/o:
-It took 3.03522 secs to do all operations
-  It took 0.0212259 secs to dispatch all operations
-  It took 3.01399 secs to finish all operations
-
-It took 1.92052 secs to do 520.694 file opens per sec
-It took 0.0720104 secs to do 13886.9 file writes per sec
-It took 0.806102 secs to do 1240.54 file closes per sec
-It took 0.236588 secs to do 4226.75 file deletions per sec
-
-
-1000 file opens, writes 1 byte, closes, and deletes with autoflush i/o:
-It took 11.9628 secs to do all operations
-  It took 0.0080006 secs to dispatch all operations
-  It took 11.9548 secs to finish all operations
-
-It took 0.0940122 secs to do 10636.9 file opens per sec
-It took 0.46754 secs to do 2138.85 file writes per sec
-It took 11.2472 secs to do 88.9107 file closes per sec
-It took 0.154042 secs to do 6491.76 file deletions per sec
-
-
-1000 file opens, writes 64Kb, closes, and deletes with autoflush i/o:
-It took 14.5824 secs to do all operations
-  It took 0.0080019 secs to dispatch all operations
-  It took 14.5744 secs to finish all operations
-
-It took 0.0980132 secs to do 10202.7 file opens per sec
-It took 0.465669 secs to do 2147.45 file writes per sec
-It took 13.8906 secs to do 71.9913 file closes per sec
-It took 0.128166 secs to do 7802.36 file deletions per sec
-
-
-
-POSIX compat backend, 3.5Ghz Ivy Bridge Linux 3.2 x64 on 
-my Seagate 7200rpm drive:
-
-1000 file opens, writes 1 byte, closes, and deletes:
-It took 0.03907 secs to do all operations
-  It took 0.00425 secs to dispatch all operations
-  It took 0.03482 secs to finish all operations
-
-It took 0.015097 secs to do 66238.3 file opens per sec
-It took 0.009744 secs to do 102627 file writes per sec
-It took 0.008307 secs to do 120380 file closes per sec
-It took 0.005922 secs to do 168862 file deletions per sec
-
-
-1000 file opens, writes 64Kb, closes, and deletes:
-It took 0.039257 secs to do all operations
-  It took 0.004198 secs to dispatch all operations
-  It took 0.035059 secs to finish all operations
-
-It took 0.017462 secs to do 57267.2 file opens per sec
-It took 0.010241 secs to do 97646.7 file writes per sec
-It took 0.007234 secs to do 138236 file closes per sec
-It took 0.00432 secs to do 231481 file deletions per sec
-
-
-1000 file opens, writes 1 byte, closes, and deletes with synchronous i/o:
-It took 7.53982 secs to do all operations
-  It took 0.003997 secs to dispatch all operations
-  It took 7.53582 secs to finish all operations
-
-It took 6.35027 secs to do 157.473 file opens per sec
-It took 1.18224 secs to do 845.848 file writes per sec
-It took 0.005773 secs to do 173220 file closes per sec
-It took 0.001528 secs to do 654450 file deletions per sec
-
-
-1000 file opens, writes 64Kb, closes, and deletes with synchronous i/o:
-It took 7.97113 secs to do all operations
-  It took 0.004116 secs to dispatch all operations
-  It took 7.96701 secs to finish all operations
-
-It took 6.32829 secs to do 158.021 file opens per sec
-It took 1.63634 secs to do 611.12 file writes per sec
-It took 0.004897 secs to do 204207 file closes per sec
-It took 0.001605 secs to do 623053 file deletions per sec
-
-
-1000 file opens, writes 1 byte, closes, and deletes with autoflush i/o:
-It took 7.46535 secs to do all operations
-  It took 0.00405 secs to dispatch all operations
-  It took 7.4613 secs to finish all operations
-
-It took 6.30895 secs to do 158.505 file opens per sec
-It took 1.12623 secs to do 887.922 file writes per sec
-It took 0.02834 secs to do 35285.8 file closes per sec
-It took 0.001838 secs to do 544070 file deletions per sec
-
-
-1000 file opens, writes 64Kb, closes, and deletes with autoflush i/o:
-It took 8.0235 secs to do all operations
-  It took 0.00419 secs to dispatch all operations
-  It took 8.01931 secs to finish all operations
-
-It took 6.29931 secs to do 158.748 file opens per sec
-It took 1.68728 secs to do 592.67 file writes per sec
-It took 0.035096 secs to do 28493.3 file closes per sec
-It took 0.001815 secs to do 550964 file deletions per sec
-
-
-
-
-My Samsung 256Gb 830 SSD:
------------------------------------------------------------------------
-CrystalDiskMark 3.0.2 x64 (C) 2007-2013 hiyohiyo
-                           Crystal Dew World : http://crystalmark.info/
------------------------------------------------------------------------
-* MB/s = 1,000,000 byte/s [SATA/300 = 300,000,000 byte/s]
-
-           Sequential Read :   478.802 MB/s
-          Sequential Write :   406.425 MB/s
-         Random Read 512KB :   337.185 MB/s
-        Random Write 512KB :   390.353 MB/s
-    Random Read 4KB (QD=1) :    21.235 MB/s [  5184.4 IOPS]
-   Random Write 4KB (QD=1) :    58.373 MB/s [ 14251.1 IOPS]
-   Random Read 4KB (QD=32) :   301.170 MB/s [ 73527.7 IOPS]
-  Random Write 4KB (QD=32) :   148.339 MB/s [ 36215.5 IOPS]
-
-  Test : 1000 MB [C: 72.2% (57.3/79.4 GB)] (x5)
-  Date : 2013/04/13 23:10:09
-    OS : Windows 8  [6.2 Build 9200] (x64)
-
-
-Windows IOCP backend, 3.5Ghz Ivy Bridge Windows 8 x64 on 
-my Samsung 256Gb 830 SSD drive:
-
-1000 file opens, writes 1 byte, closes, and deletes:
-It took 0.187081 secs to do all operations
-  It took 0.0079831 secs to dispatch all operations
-  It took 0.179098 secs to finish all operations
-
-It took 0.0789921 secs to do 12659.5 file opens per sec
-It took 0.0110014 secs to do 90897.5 file writes per sec
-It took 0.0250035 secs to do 39994.4 file closes per sec
-It took 0.0720843 secs to do 13872.6 file deletions per sec
-
-
-1000 file opens, writes 64Kb, closes, and deletes:
-It took 0.924099 secs to do all operations
-  It took 0.007996 secs to dispatch all operations
-  It took 0.916103 secs to finish all operations
-
-It took 0.0859878 secs to do 11629.6 file opens per sec
-It took 0.0230033 secs to do 43472 file writes per sec
-It took 0.7571 secs to do 1320.83 file closes per sec
-It took 0.0580077 secs to do 17239.1 file deletions per sec
-
-
-1000 file opens, writes 1 byte, closes, and deletes with synchronous i/o:
-It took 2.98316 secs to do all operations
-  It took 0.0446 secs to dispatch all operations
-  It took 2.93856 secs to finish all operations
-
-It took 2.71914 secs to do 367.763 file opens per sec
-It took 0.0359893 secs to do 27786 file writes per sec
-It took 0.151021 secs to do 6621.6 file closes per sec
-It took 0.0770071 secs to do 12985.8 file deletions per sec
-
-
-1000 file opens, writes 64Kb, closes, and deletes with synchronous i/o:
-It took 1.65352 secs to do all operations
-  It took 0.0149789 secs to dispatch all operations
-  It took 1.63854 secs to finish all operations
-
-It took 0.714499 secs to do 1399.58 file opens per sec
-It took 0.0420066 secs to do 23805.8 file writes per sec
-It took 0.835109 secs to do 1197.45 file closes per sec
-It took 0.0619072 secs to do 16153.2 file deletions per sec
-
-
-1000 file opens, writes 1 byte, closes, and deletes with autoflush i/o:
-It took 2.70265 secs to do all operations
-  It took 0.0089945 secs to dispatch all operations
-  It took 2.69366 secs to finish all operations
-
-It took 0.0759873 secs to do 13160.1 file opens per sec
-It took 0.0334323 secs to do 29911.2 file writes per sec
-It took 2.46722 secs to do 405.315 file closes per sec
-It took 0.126015 secs to do 7935.54 file deletions per sec
-
-
-1000 file opens, writes 64Kb, closes, and deletes with autoflush i/o:
-It took 2.79222 secs to do all operations
-  It took 0.0079943 secs to dispatch all operations
-  It took 2.78422 secs to finish all operations
-
-It took 0.0829872 secs to do 12050.1 file opens per sec
-It took 0.0381194 secs to do 26233.4 file writes per sec
-It took 2.6111 secs to do 382.98 file closes per sec
-It took 0.0600064 secs to do 16664.9 file deletions per sec
-
-
-1000 file opens, writes 1 byte, closes, and deletes with direct i/o:
-It took 0.178027 secs to do all operations
-  It took 0.0070116 secs to dispatch all operations
-  It took 0.171015 secs to finish all operations
-
-It took 0.0629898 secs to do 15875.6 file opens per sec
-It took 0.0110008 secs to do 90902.5 file writes per sec
-It took 0.0190018 secs to do 52626.6 file closes per sec
-It took 0.0850346 secs to do 11759.9 file deletions per sec
-
-
-1000 file opens, writes 64Kb, closes, and deletes with direct i/o:
-It took 1.67592 secs to do all operations
-  It took 0.0169852 secs to dispatch all operations
-  It took 1.65893 secs to finish all operations
-
-It took 0.711476 secs to do 1405.53 file opens per sec
-It took 0.0163148 secs to do 61294 file writes per sec
-It took 0.890117 secs to do 1123.45 file closes per sec
-It took 0.058008 secs to do 17239 file deletions per sec
-
-
-1000 file opens, writes 1 byte, closes, and deletes with direct synchronous i/o:
-
-It took 0.309121 secs to do all operations
-  It took 0.00698 secs to dispatch all operations
-  It took 0.302141 secs to finish all operations
-
-It took 0.138198 secs to do 7235.99 file opens per sec
-It took 0.0142443 secs to do 70203.5 file writes per sec
-It took 0.0796398 secs to do 12556.5 file closes per sec
-It took 0.0770388 secs to do 12980.5 file deletions per sec
-
-
-1000 file opens, writes 64Kb, closes, and deletes with direct synchronous i/o:
-It took 1.95023 secs to do all operations
-  It took 0.020987 secs to dispatch all operations
-  It took 1.92924 secs to finish all operations
-
-It took 0.967097 secs to do 1034.02 file opens per sec
-It took 0.0290068 secs to do 34474.7 file writes per sec
-It took 0.901115 secs to do 1109.74 file closes per sec
-It took 0.0530077 secs to do 18865.2 file deletions per sec
-
-
-
-
-
-iozone -e -I -a -s 1000M -r 4k -r 512k -i 0 -i 1 -i 2
-                                                            random  random    bkwd   record   stride                                   
-              KB  reclen   write rewrite    read    reread    read   write    read  rewrite     read   fwrite frewrite   fread  freread
-         1024000       4    2528    3044    12000    11693   11337     931                                                          
-         1024000     512   17393   17039    68703    68524   67958    3881                                                          
-
-iozone -e -I -s 31M -r 4k -t 32 -T -i 0 -i 2
-
-        Children see throughput for 2 initial writers = 1502.15 KB/sec
-        Parent sees throughput for 2 initial writers = 1502.13 KB/sec
-        Min throughput per thread = 751.07 KB/sec
-        Max throughput per thread = 751.08 KB/sec
-        Avg throughput per thread = 751.07 KB/sec
-        Min xfer = 511992.00 KB
-
-        Children see throughput for 2 rewriters = 1537.12 KB/sec
-        Parent sees throughput for 2 rewriters = 1537.11 KB/sec
-        Min throughput per thread = 768.34 KB/sec
-        Max throughput per thread = 768.77 KB/sec
-        Avg throughput per thread = 768.56 KB/sec
-        Min xfer = 511716.00 KB
-
-        Children see throughput for 2 random readers = 9044.48 KB/sec
-        Parent sees throughput for 2 random readers = 9044.42 KB/sec
-        Min throughput per thread = 4521.79 KB/sec
-        Max throughput per thread = 4522.69 KB/sec
-        Avg throughput per thread = 4522.24 KB/sec
-        Min xfer = 511900.00 KB
-
-        Children see throughput for 2 random writers = 825.19 KB/sec
-        Parent sees throughput for 2 random writers = 825.14 KB/sec
-        Min throughput per thread = 412.52 KB/sec
-        Max throughput per thread = 412.67 KB/sec
-        Avg throughput per thread = 412.60 KB/sec
-        Min xfer = 511812.00 KB
-
-
-From these I infer:
-
-           Sequential Read :   67.09 MB/s
-          Sequential Write :   16.98 MB/s
-         Random Read 512KB :   66.36 MB/s
-        Random Write 512KB :    3.79 MB/s
-    Random Read 4KB (QD=1) :   11.42 MB/s [ 2834.3 IOPS]
-   Random Write 4KB (QD=1) :    0.91 MB/s [  232.8 IOPS]
-   Random Read 4KB (QD=32) :      ? MB/s  [      ? IOPS]
-  Random Write 4KB (QD=32) :      ? MB/s  [      ? IOPS]
-
-
-POSIX compat backend, 1.7Ghz ARM Cortex-A15 Linux 3.4 on 
-Samsung Chromebook eMMC internal drive:
-
-1000 file opens, writes 1 byte, closes, and deletes:
-It took 0.386876 secs to do all operations
-  It took 0.110156 secs to dispatch all operations
-  It took 0.27672 secs to finish all operations
-
-It took 0.181143 secs to do 5520.5 file opens per sec
-It took 0.094321 secs to do 10602.1 file writes per sec
-It took 0.070552 secs to do 14173.9 file closes per sec
-It took 0.04086 secs to do 24473.8 file deletions per sec
-
-
-1000 file opens, writes 64Kb, closes, and deletes:
-It took 0.425939 secs to do all operations
-  It took 0.147966 secs to dispatch all operations
-  It took 0.277973 secs to finish all operations
-
-It took 0.17901 secs to do 5586.28 file opens per sec
-It took 0.152722 secs to do 6547.85 file writes per sec
-It took 0.054538 secs to do 18335.8 file closes per sec
-It took 0.039669 secs to do 25208.6 file deletions per sec
-
-
-1000 file opens, writes 1 byte, closes, and deletes with synchronous i/o:
-It took 19.4941 secs to do all operations
-  It took 0.07904 secs to dispatch all operations
-  It took 19.4151 secs to finish all operations
-
-It took 13.323 secs to do 75.058 file opens per sec
-It took 6.06393 secs to do 164.909 file writes per sec
-It took 0.071753 secs to do 13936.7 file closes per sec
-It took 0.035389 secs to do 28257.4 file deletions per sec
-
-
-1000 file opens, writes 64Kb, closes, and deletes with synchronous i/o:
-It took 22.8757 secs to do all operations
-  It took 0.102336 secs to dispatch all operations
-  It took 22.7734 secs to finish all operations
-
-It took 5.35023 secs to do 186.908 file opens per sec
-It took 17.498 secs to do 57.1495 file writes per sec
-It took 0.014796 secs to do 67585.8 file closes per sec
-It took 0.012747 secs to do 78449.8 file deletions per sec
-
-
-1000 file opens, writes 1 byte, closes, and deletes with autoflush i/o:
-It took 13.2068 secs to do all operations
-  It took 0.085519 secs to dispatch all operations
-  It took 13.1213 secs to finish all operations
-
-It took 9.65411 secs to do 103.583 file opens per sec
-It took 3.40673 secs to do 293.537 file writes per sec
-It took 0.119205 secs to do 8388.91 file closes per sec
-It took 0.02677 secs to do 37355.2 file deletions per sec
-
-
-1000 file opens, writes 64Kb, closes, and deletes with autoflush i/o:
-It took 24.0624 secs to do all operations
-  It took 0.092833 secs to dispatch all operations
-  It took 23.9695 secs to finish all operations
-
-It took 12.9862 secs to do 77.0047 file opens per sec
-It took 10.8002 secs to do 92.5906 file writes per sec
-It took 0.219705 secs to do 4551.56 file closes per sec
-It took 0.05619 secs to do 17796.8 file deletions per sec
-
-
-1000 file opens, writes 1 byte, closes, and deletes with direct i/o:
-[Started testing]
-
-[Running: async_io/works/1/direct]
-unittests/main.cpp:266: !(((size_t) &towrite.front()) & 4095) failed with unexpected exception with message: 'Invalid argument (22) in 'triplegit/src/async_file_io.cpp':dowrite:884'
-[Finished: 'async_io/works/1/direct' 1 test case failed (1 of 2 assertions failed)]
-
-
-1000 file opens, writes 64Kb, closes, and deletes with direct i/o:
-It took 6.84248 secs to do all operations
-  It took 0.125639 secs to dispatch all operations
-  It took 6.71684 secs to finish all operations
-
-It took 0.204354 secs to do 4893.47 file opens per sec
-It took 6.58176 secs to do 151.935 file writes per sec
-It took 0.025033 secs to do 39947.3 file closes per sec
-It took 0.031331 secs to do 31917.3 file deletions per sec
-
-
-1000 file opens, writes 1 byte, closes, and deletes with direct synchronous i/o:
-It took 7.00683 secs to do all operations
-  It took 0.054578 secs to dispatch all operations
-  It took 6.95225 secs to finish all operations
-
-It took 6.88883 secs to do 145.163 file opens per sec
-It took 0.057979 secs to do 17247.6 file writes per sec
-It took 0.030898 secs to do 32364.6 file closes per sec
-It took 0.029125 secs to do 34334.8 file deletions per sec
-
-
-1000 file opens, writes 64Kb, closes, and deletes with direct synchronous i/o:
-It took 24.9112 secs to do all operations
-  It took 0.058847 secs to dispatch all operations
-  It took 24.8524 secs to finish all operations
-
-It took 11.8282 secs to do 84.5438 file opens per sec
-It took 13.0079 secs to do 76.8762 file writes per sec
-It took 0.057255 secs to do 17465.7 file closes per sec
-It took 0.017878 secs to do 55934.7 file deletions per sec
-
+*/
 // namespaces dont show up in documentation unless I also document the parent namespace
 // this is ok for now, but will need to be fixed when we improve the docs.
-*/
+
 //! \brief The namespace used by the Boost Libraries
 namespace boost {
 //! \brief The namespace containing the Boost.ASIO asynchronous file i/o implementation.
 namespace afio {
-
-#ifdef __GNUC__
-typedef boost::thread thread;
-#else
-typedef std::thread thread;
-#endif
 
 // This isn't consistent on MSVC so hard code it
 typedef unsigned long long off_t;
@@ -592,7 +157,6 @@ BOOST_AFIO_FORWARD_STL_IMPL(promise, boost::promise)
 typedef boost::exception_ptr exception_ptr;
 template<class T> inline exception_ptr make_exception_ptr(const T &e) { return boost::copy_exception(e); }
 using boost::rethrow_exception;
-using std::current_exception;
 /*! \brief For now, this is an emulation of std::packaged_task based on boost's packaged_task.
 We have to drop the Args... support because it segfaults MSVC Nov 2012 CTP.
 */
@@ -636,13 +200,16 @@ class thread_pool {
 	boost::asio::io_service service;
 	boost::asio::io_service::work working;
 public:
-	//! Constructs a thread pool of \em no workers
+	/*! Constructs a thread pool of \em no workers
+    \param no The number of worker threads to create
+    */
 	explicit thread_pool(size_t no) : working(service)
 	{
 		workers.reserve(no);
 		for(size_t n=0; n<no; n++)
 			workers.push_back(std::unique_ptr<thread>(new thread(worker(this))));
 	}
+    //! Destroys the thread pool, waiting for worker threads to exit beforehand.
 	~thread_pool()
 	{
 		service.stop();
@@ -662,7 +229,11 @@ public:
 		return task->get_future();
 	}
 };
-//! Returns the process threadpool
+/*! \brief Returns the process threadpool
+
+On first use, this instantiates a default thread_pool running eight threads.
+\ingroup process_threadpool
+*/
 extern BOOST_AFIO_DECL thread_pool &process_threadpool();
 
 namespace detail {
@@ -680,7 +251,21 @@ namespace detail {
 		return std::make_pair(std::distance(futures->begin(), it), std::move(it->get()));
 	}
 }
-//! Returns a future vector of results from all the supplied futures
+/*! \brief Makes a future vector of results from all the supplied futures
+
+This is an implementation of WG21 N3634's when_all() which uses process_threadpool()
+to allow you to create a future which only becomes available when all the supplied
+futures become available.
+
+\return A future vector of the results of the input futures
+\tparam "class InputIterator" A type modelling an iterator
+\param first An iterator pointing to the first item to wait upon
+\param last An iterator pointing to after the last future to wait upon
+\ingroup when_all_futures
+\qbk{distinguish, from ___WG21_N3634__ for range of futures}
+\complexity{O(N)}
+\exceptionmodel{The same as a future}
+*/
 template <class InputIterator> inline future<std::vector<typename std::decay<decltype(((typename InputIterator::value_type *) 0)->get())>::type>> when_all(InputIterator first, InputIterator last)
 {
 	typedef typename InputIterator::value_type future_type;
@@ -694,7 +279,21 @@ template <class InputIterator> inline future<std::vector<typename std::decay<dec
 }
 //! Returns a future tuple of results from all the supplied futures
 //template <typename... T> inline future<std::tuple<typename std::decay<T...>::type>> when_all(T&&... futures);
-//! Returns a future result from the first of the supplied futures
+/*! \brief Makes a future result from the first of the supplied futures to become available
+
+This is an implementation of WG21 N3634's when_any() which uses process_threadpool()
+to allow you to create a future which only becomes available when the first of the supplied
+futures become available.
+
+\return A future pair of the first future to become available and its result
+\tparam "class InputIterator" A type modelling an iterator
+\param first An iterator pointing to the first future to wait upon
+\param last An iterator pointing to after the last future to wait upon
+\ingroup when_all_futures
+\qbk{distinguish, from ___WG21_N3634__ for range of futures}
+\complexity{The same as boost::wait_for_any()}
+\exceptionmodel{The same as a future}
+*/
 template <class InputIterator> inline future<std::pair<size_t, typename std::decay<decltype(((typename InputIterator::value_type *) 0)->get())>::type>> when_any(InputIterator first, InputIterator last)
 {
 	typedef typename InputIterator::value_type future_type;
@@ -727,7 +326,8 @@ namespace detail {
 	class async_file_io_dispatcher_windows;
 	class async_file_io_dispatcher_linux;
 	class async_file_io_dispatcher_qnx;
-	//! \brief May occasionally be useful to access to discover information about an open handle
+	/*! \brief The abstract base class encapsulating a platform-specific file handle
+    */
 	class async_io_handle : public std::enable_shared_from_this<async_io_handle>
 	{
 		friend class async_file_io_dispatcher_base;
@@ -748,7 +348,7 @@ namespace detail {
 		virtual ~async_io_handle() { }
 		//! Returns the parent of this io handle
 		async_file_io_dispatcher_base *parent() const { return _parent; }
-		//! Returns the native handle of this io handle
+		//! Returns the native handle of this io handle. On POSIX, you can cast this to a fd using `(int)(size_t) native_handle()`. On Windows it's a simple `(HANDLE) native_handle()`.
 		virtual void *native_handle() const=0;
 		//! Returns when this handle was opened
 		const std::chrono::system_clock::time_point &opened() const { return _opened; }
@@ -782,10 +382,15 @@ inline constexpr bool operator!(type a) \
 { \
 	return 0==static_cast<size_t>(a); \
 }
-/*! \enum open_flags
+/*! \enum file_flags
 \brief Bitwise file and directory open flags
+\ingroup file_flags
 */
+#ifdef DOXYGEN_NO_CLASS_ENUMS
+enum file_flags
+#else
 enum class file_flags : size_t
+#endif
 {
 	None=0,				//!< No flags set
 	Read=1,				//!< Read access
@@ -797,14 +402,22 @@ enum class file_flags : size_t
 	CreateOnlyIfNotExist=32, //!< Create and open only if doesn't exist
 	AutoFlush=64,		//!< Automatically initiate an asynchronous flush just before file close, and fuse both operations so both must complete for close to complete.
 	WillBeSequentiallyAccessed=128, //!< Will be exclusively either read or written sequentially. If you're exclusively writing sequentially, \em strongly consider turning on OSDirect too.
-	FastDirectoryEnumeration=256, //! Hold a file handle open to the containing directory of each open file (POSIX only).
+	FastDirectoryEnumeration=256, //!< Hold a file handle open to the containing directory of each open file for fast directory enumeration (POSIX only).
 
 	OSDirect=(1<<16),	//!< Bypass the OS file buffers (only really useful for writing large files. Note you must 4Kb align everything if this is on)
 	OSSync=(1<<17)		//!< Ask the OS to not complete until the data is on the physical storage. Best used only with Direct, otherwise use AutoFlush.
 
 };
 BOOST_AFIO_DECLARE_CLASS_ENUM_AS_BITFIELD(file_flags)
+/*! \enum async_op_flags
+\brief Bitwise async_op_flags flags
+\ingroup async_op_flags
+*/
+#ifdef DOXYGEN_NO_CLASS_ENUMS
+enum async_op_flags
+#else
 enum class async_op_flags : size_t
+#endif
 {
 	None=0,					//!< No flags set
 	DetachedFuture=1,		//!< The specified completion routine may choose to not complete immediately
@@ -815,6 +428,17 @@ BOOST_AFIO_DECLARE_CLASS_ENUM_AS_BITFIELD(async_op_flags)
 
 /*! \class async_file_io_dispatcher_base
 \brief Abstract base class for dispatching file i/o asynchronously
+
+This is a reference counted instance with platform-specific implementation optionally hidden in object code.
+Construct an instance using the `boost::afio::async_file_io_dispatcher()` function.
+
+\qbk{
+[/ link afio.reference.functions.async_file_io_dispatcher `async_file_io_dispatcher()`]
+[include generated/group_async_file_io_dispatcher_base__completion.qbk]
+[include generated/group_async_file_io_dispatcher_base__call.qbk]
+[include generated/group_async_file_io_dispatcher_base__filedirops.qbk]
+[include generated/group_async_file_io_dispatcher_base__barrier.qbk]
+}
 */
 class BOOST_AFIO_DECL async_file_io_dispatcher_base : public std::enable_shared_from_this<async_file_io_dispatcher_base>
 {
@@ -837,72 +461,336 @@ public:
 
 	//! Returns the thread pool used by this dispatcher
 	thread_pool &threadpool() const;
-	//! Returns file flags as would be used after forcing and masking
+	//! Returns file flags as would be used after forcing and masking bits passed during construction
 	file_flags fileflags(file_flags flags) const;
 	//! Returns the current wait queue depth of this dispatcher
 	size_t wait_queue_depth() const;
 	//! Returns the number of open items in this dispatcher
 	size_t count() const;
 
+    //! The type returned by a completion handler \ingroup async_file_io_dispatcher_base__completion
 	typedef std::pair<bool, std::shared_ptr<detail::async_io_handle>> completion_returntype;
+    //! The type of a completion handler \ingroup async_file_io_dispatcher_base__completion
 	typedef completion_returntype completion_t(size_t, std::shared_ptr<detail::async_io_handle>);
-	//! Invoke the specified function when each of the supplied operations complete
-	std::vector<async_io_op> completion(const std::vector<async_io_op> &ops, const std::vector<std::pair<async_op_flags, std::function<completion_t>>> &callbacks);
-	//! Invoke the specified function when the supplied operation completes
-	inline async_io_op completion(const async_io_op &req, const std::pair<async_op_flags, std::function<completion_t>> &callback);
+	/*! \brief Schedule a batch of asynchronous invocations of the specified functions when their supplied operations complete.
+    \return A batch of op handles
+    \param ops A batch of precondition op handles.
+    \param callbacks A batch of pairs of op flags and bound completion handler functions of type `completion_t`
+    \ingroup async_file_io_dispatcher_base__completion
+    \qbk{distinguish, batch bound functions}
+    \complexity{Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete.}
+    \exceptionmodelstd
+    \qexample{completion_example}
+    */
+	std::vector<async_io_op> completion(const std::vector<async_io_op> &ops, const std::vector<std::pair<async_op_flags, std::function<async_file_io_dispatcher_base::completion_t>>> &callbacks);
+	/*! \brief Schedule the asynchronous invocation of the specified single function when the supplied single operation completes.
+    \return An op handle
+    \param req A precondition op handle
+    \param callback A pair of op flag and bound completion handler function of type `completion_t`
+    \ingroup async_file_io_dispatcher_base__completion
+    \qbk{distinguish, single bound function}
+    \complexity{Amortised O(1) to dispatch. Amortised O(1) to complete.}
+    \exceptionmodelstd
+    \qexample{completion_example}
+    */
+	inline async_io_op completion(const async_io_op &req, const std::pair<async_op_flags, std::function<async_file_io_dispatcher_base::completion_t>> &callback);
 
-	//! Invoke the specified callable when the supplied operation completes
+	/*! \brief Schedule a batch of asynchronous invocations of the specified bound functions when their supplied preconditions complete.
+    
+    This is effectively a convenience wrapper for `completion()`. It creates a packaged_task matching the `completion_t`
+    handler specification and calls the specified arbitrary callable, always returning completion on exit.
+    
+    \return A pair with a batch of futures returning the result of each of the callables and a batch of op handles.
+    \tparam "class R" A compiler deduced return type of the bound functions.
+    \param ops A batch of precondition op handles. If default constructed, a precondition is null.
+    \param callables A batch of bound functions to call, returning R.
+    \ingroup async_file_io_dispatcher_base__call
+    \qbk{distinguish, batch bound functions}
+    \complexity{Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete.}
+    \exceptionmodelstd
+    \qexample{call_example}
+    */
 	template<class R> inline std::pair<std::vector<future<R>>, std::vector<async_io_op>> call(const std::vector<async_io_op> &ops, const std::vector<std::function<R()>> &callables);
-	//! Invoke the specified callable when the supplied operation completes
+	/*! \brief Schedule a batch of asynchronous invocations of the specified bound functions when their supplied preconditions complete.
+
+    This is effectively a convenience wrapper for `completion()`. It creates a packaged_task matching the `completion_t`
+    handler specification and calls the specified arbitrary callable, always returning completion on exit. If you
+    are seeing performance issues, using `completion()` directly will have much less overhead.
+    
+    \return A pair with a batch of futures returning the result of each of the callables and a batch of op handles.
+    \tparam "class R" A compiler deduced return type of the bound functions.
+    \param callables A batch of bound functions to call, returning R.
+    \ingroup async_file_io_dispatcher_base__call
+    \qbk{distinguish, batch bound functions without preconditions}
+    \complexity{Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete.}
+    \exceptionmodelstd
+    \qexample{call_example}
+    */
 	template<class R> std::pair<std::vector<future<R>>, std::vector<async_io_op>> call(const std::vector<std::function<R()>> &callables) { return call(std::vector<async_io_op>(), callables); }
-	//! Invoke the specified callable when the supplied operation completes
+	/*! \brief Schedule an asynchronous invocation of the specified bound function when its supplied precondition completes.
+
+    This is effectively a convenience wrapper for `completion()`. It creates a packaged_task matching the `completion_t`
+    handler specification and calls the specified arbitrary callable, always returning completion on exit. If you
+    are seeing performance issues, using `completion()` directly will have much less overhead.
+    
+    \return A pair with a future returning the result of the callable and an op handle.
+    \tparam "class R" A compiler deduced return type of the bound functions.
+    \param req A precondition op handle. If default constructed, the precondition is null.
+    \param callback A bound functions to call, returning R.
+    \ingroup async_file_io_dispatcher__call
+    \qbk{distinguish, single bound function}
+    \complexity{Amortised O(1) to dispatch. Amortised O(1) to complete.}
+    \exceptionmodelstd
+    \qexample{call_example}
+    */
 	template<class R> inline std::pair<future<R>, async_io_op> call(const async_io_op &req, std::function<R()> callback);
-	//! Invoke the specified callable when the supplied operation completes
+	/*! \brief Schedule an asynchronous invocation of the specified unbound callable when its supplied precondition completes.
+    Note that this function essentially calls `std::bind()` on the callable and the args and passes it to the other call() overload taking a `std::function<>`.
+    You should therefore use `std::ref()` etc. as appropriate.
+
+    This is effectively a convenience wrapper for `completion()`. It creates a packaged_task matching the `completion_t`
+    handler specification and calls the specified arbitrary callable, always returning completion on exit. If you
+    are seeing performance issues, using `completion()` directly will have much less overhead.
+    
+    \return A pair with a future returning the result of the callable and an op handle.
+    \tparam "class C" Any callable type.
+    \tparam Args Any sequence of argument types.
+    \param req A precondition op handle. If default constructed, the precondition is null.
+    \param callback An unbound callable to call.
+    \param args An arbitrary sequence of arguments to bind to the callable.
+    \ingroup async_file_io_dispatcher_base__call
+    \qbk{distinguish, single unbound callable}
+    \complexity{Amortised O(1) to dispatch. Amortised O(1) to complete.}
+    \exceptionmodelstd
+    \qexample{call_example}
+    */
 	template<class C, class... Args> inline std::pair<future<typename std::result_of<C(Args...)>::type>, async_io_op> call(const async_io_op &req, C callback, Args... args);
 
-	//! Asynchronously creates directories
+	/*! \brief Schedule a batch of asynchronous directory creations and opens after optional preconditions.
+    \return A batch of op handles.
+    \param reqs A batch of `async_path_op_req` structures.
+    \ingroup async_file_io_dispatcher_base__filedirops
+    \qbk{distinguish, batch}
+    \complexity{Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete if directory creation is constant time.}
+    \exceptionmodelstd
+    \qexample{filedir_example}
+    */
 	virtual std::vector<async_io_op> dir(const std::vector<async_path_op_req> &reqs)=0;
-	//! Asynchronously creates a directory
+	/*! \brief Schedule an asynchronous directory creation and open after an optional precondition.
+    \return An op handle.
+    \param req An `async_path_op_req` structure.
+    \ingroup async_file_io_dispatcher_base__filedirops
+    \qbk{distinguish, single}
+    \complexity{Amortised O(1) to dispatch. Amortised O(1) to complete if directory creation is constant time.}
+    \exceptionmodelstd
+    \qexample{filedir_example}
+    */
 	inline async_io_op dir(const async_path_op_req &req);
-	//! Asynchronously deletes directories
+	/*! \brief Schedule a batch of asynchronous directory deletions after optional preconditions.
+    \return A batch of op handles.
+    \param reqs A batch of `async_path_op_req` structures.
+    \ingroup async_file_io_dispatcher_base__filedirops
+    \qbk{distinguish, batch}
+    \complexity{Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete if directory deletion is constant time.}
+    \exceptionmodelstd
+    \qexample{filedir_example}
+    */
 	virtual std::vector<async_io_op> rmdir(const std::vector<async_path_op_req> &reqs)=0;
-	//! Asynchronously deletes a directory
+	/*! \brief Schedule an asynchronous directory deletion after an optional precondition.
+    \return An op handle.
+    \param req An `async_path_op_req` structure.
+    \ingroup async_file_io_dispatcher_base__filedirops
+    \qbk{distinguish, single}
+    \complexity{Amortised O(1) to dispatch. Amortised O(1) to complete if directory deletion is constant time.}
+    \exceptionmodelstd
+    \qexample{filedir_example}
+    */
 	inline async_io_op rmdir(const async_path_op_req &req);
-	//! Asynchronously opens or creates files
+	/*! \brief Schedule a batch of asynchronous file creations and opens after optional preconditions.
+    \return A batch of op handles.
+    \param reqs A batch of `async_path_op_req` structures.
+    \ingroup async_file_io_dispatcher_base__filedirops
+    \qbk{distinguish, batch}
+    \complexity{Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete if file creation is constant time.}
+    \exceptionmodelstd
+    \qexample{filedir_example}
+    */
 	virtual std::vector<async_io_op> file(const std::vector<async_path_op_req> &reqs)=0;
-	//! Asynchronously opens or creates a file
+	/*! \brief Schedule an asynchronous file creation and open after an optional precondition.
+    \return An op handle.
+    \param req An `async_path_op_req` structure.
+    \ingroup async_file_io_dispatcher_base__filedirops
+    \qbk{distinguish, single}
+    \complexity{Amortised O(1) to dispatch. Amortised O(1) to complete if file creation is constant time.}
+    \exceptionmodelstd
+    \qexample{filedir_example}
+    */
 	inline async_io_op file(const async_path_op_req &req);
-	//! Asynchronously deletes files
+	/*! \brief Schedule a batch of asynchronous file deletions after optional preconditions.
+    \return A batch of op handles.
+    \param reqs A batch of `async_path_op_req` structures.
+    \ingroup async_file_io_dispatcher_base__filedirops
+    \qbk{distinguish, batch}
+    \complexity{Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete if file deletion is constant time.}
+    \exceptionmodelstd
+    \qexample{filedir_example}
+    */
 	virtual std::vector<async_io_op> rmfile(const std::vector<async_path_op_req> &reqs)=0;
-	//! Asynchronously deletes files
+	/*! \brief Schedule an asynchronous file deletion after an optional precondition.
+    \return An op handle.
+    \param req An `async_path_op_req` structure.
+    \ingroup async_file_io_dispatcher_base__filedirops
+    \qbk{distinguish, single}
+    \complexity{Amortised O(1) to dispatch. Amortised O(1) to complete if file deletion is constant time.}
+    \exceptionmodelstd
+    \qexample{filedir_example}
+    */
 	inline async_io_op rmfile(const async_path_op_req &req);
-	//! Asynchronously synchronises items with physical storage once they complete
+	/*! \brief Schedule a batch of asynchronous content synchronisations with physical storage after preceding operations.
+    \return A batch of op handles.
+    \param ops A batch of op handles.
+    \ingroup async_file_io_dispatcher_base__filedirops
+    \qbk{distinguish, batch}
+    \complexity{Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete if content synchronisation is constant time (which is extremely unlikely).}
+    \exceptionmodelstd
+    \qexample{sync_example}
+    */
 	virtual std::vector<async_io_op> sync(const std::vector<async_io_op> &ops)=0;
-	//! Asynchronously synchronises an item with physical storage once it completes
+	/*! \brief Schedule an asynchronous content synchronisation with physical storage after a preceding operation.
+    \return An op handle.
+    \param req An op handle.
+    \ingroup async_file_io_dispatcher_base__filedirops
+    \qbk{distinguish, single}
+    \complexity{Amortised O(1) to dispatch. Amortised O(1) to complete if content synchronisation is constant time (which is extremely unlikely).}
+    \exceptionmodelstd
+    \qexample{sync_example}
+    */
 	inline async_io_op sync(const async_io_op &req);
-	//! Asynchronously closes connections to items once they complete
+	/*! \brief Schedule a batch of asynchronous file or directory handle closes after preceding operations.
+    \return A batch of op handles.
+    \param ops A batch of op handles.
+    \ingroup async_file_io_dispatcher_base__filedirops
+    \qbk{distinguish, batch}
+    \complexity{Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete if closing handles is constant time.}
+    \exceptionmodelstd
+    \qexample{filedir_example}
+    */
 	virtual std::vector<async_io_op> close(const std::vector<async_io_op> &ops)=0;
-	//! Asynchronously closes the connection to an item once it completes
+	/*! \brief Schedule an asynchronous file or directory handle close after a preceding operation.
+    \return An op handle.
+    \param req An op handle.
+    \ingroup async_file_io_dispatcher_base__filedirops
+    \qbk{distinguish, single}
+    \complexity{Amortised O(1) to dispatch. Amortised O(1) to complete if closing handles is constant time.}
+    \exceptionmodelstd
+    \qexample{filedir_example}
+    */
 	inline async_io_op close(const async_io_op &req);
 
-	//! Asynchronously reads data from items
+	/*! \brief Schedule a batch of asynchronous data reads after preceding operations.
+    \return A batch of op handles.
+    \param ops A batch of `async_data_op_req<void>` structures.
+    \ingroup async_file_io_dispatcher_base__filedirops
+    \qbk{distinguish, batch}
+    \complexity{Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete if reading data is constant time.}
+    \exceptionmodelstd
+    \qexample{readwrite_example}
+    */
 	virtual std::vector<async_io_op> read(const std::vector<async_data_op_req<void>> &ops)=0;
-	//! Asynchronously reads data from an item
+	/*! \brief Schedule an asynchronous data read after a preceding operation.
+    \return An op handle.
+    \param req An `async_data_op_req<void>` structure.
+    \ingroup async_file_io_dispatcher_base__filedirops
+    \qbk{distinguish, single}
+    \complexity{Amortised O(1) to dispatch. Amortised O(1) to complete if reading data is constant time.}
+    \exceptionmodelstd
+    \qexample{readwrite_example}
+    */
 	inline async_io_op read(const async_data_op_req<void> &req);
-	//! Asynchronously reads data from items
+	/*! \brief Schedule a batch of asynchronous data reads after preceding operations.
+    \return A batch of op handles.
+    \tparam "class T" Any arbitrary type.
+    \param ops A batch of `async_data_op_req<T>` structures.
+    \ingroup async_file_io_dispatcher_base__filedirops
+    \qbk{distinguish, batch}
+    \complexity{Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete if reading data is constant time.}
+    \exceptionmodelstd
+    \qexample{readwrite_example}
+    */
 	template<class T> inline std::vector<async_io_op> read(const std::vector<async_data_op_req<T>> &ops);
-	//! Asynchronously writes data to items
+	/*! \brief Schedule a batch of asynchronous data writes after preceding operations.
+    \return A batch of op handles.
+    \param ops A batch of `async_data_op_req<const void>` structures.
+    \ingroup async_file_io_dispatcher_base__filedirops
+    \qbk{distinguish, batch}
+    \complexity{Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete if writing data is constant time.}
+    \exceptionmodelstd
+    \qexample{readwrite_example}
+    */
 	virtual std::vector<async_io_op> write(const std::vector<async_data_op_req<const void>> &ops)=0;
-	//! Asynchronously writes data to an item
+	/*! \brief Schedule an asynchronous data write after a preceding operation.
+    \return An op handle.
+    \param req An `async_data_op_req<const void>` structure.
+    \ingroup async_file_io_dispatcher_base__filedirops
+    \qbk{distinguish, single}
+    \complexity{Amortised O(1) to dispatch. Amortised O(1) to complete if writing data is constant time.}
+    \exceptionmodelstd
+    \qexample{readwrite_example}
+    */
 	inline async_io_op write(const async_data_op_req<const void> &req);
-	//! Asynchronously writes data to items
+	/*! \brief Schedule a batch of asynchronous data writes after preceding operations.
+    \return A batch of op handles.
+    \tparam "class T" Any arbitrary type.
+    \param ops A batch of `async_data_op_req<T>` structures.
+    \ingroup async_file_io_dispatcher_base__filedirops
+    \qbk{distinguish, batch}
+    \complexity{Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete if writing data is constant time.}
+    \exceptionmodelstd
+    \qexample{readwrite_example}
+    */
 	template<class T> inline std::vector<async_io_op> write(const std::vector<async_data_op_req<T>> &ops);
 
-	//! Truncates the lengths of items
+	/*! \brief Schedule a batch of asynchronous file length truncations after preceding operations.
+    \return A batch of op handles.
+    \param ops A batch of op handles.
+    \param sizes A batch of new lengths.
+    \ingroup async_file_io_dispatcher_base__filedirops
+    \qbk{distinguish, batch}
+    \complexity{Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete if truncating file lengths is constant time.}
+    \exceptionmodelstd
+    \qexample{truncate_example}
+    */
 	virtual std::vector<async_io_op> truncate(const std::vector<async_io_op> &ops, const std::vector<off_t> &sizes)=0;
-	//! Truncates the length of an item
+	/*! \brief Schedule an asynchronous data write after a preceding operation.
+    \return An op handle.
+    \param op An op handle.
+    \param newsize The new size for the file.
+    \ingroup async_file_io_dispatcher_base__filedirops
+    \qbk{distinguish, single}
+    \complexity{Amortised O(1) to dispatch. Amortised O(1) to complete if truncating file lengths is constant time.}
+    \exceptionmodelstd
+    \qexample{truncate_example}
+    */
 	inline async_io_op truncate(const async_io_op &op, off_t newsize);
-	//! Completes each of the supplied ops when and only when the last of the supplied ops completes
+	/*! \brief Schedule an asynchronous synchronisation of preceding operations.
+    
+    If you perform many asynchronous operations of unequal duration but wish to schedule one of more operations
+    to occur only after \b all of those operations have completed, this is the correct function to use. The returned
+    batch of ops exactly match the input batch of ops (including their exception states), but they will only
+    complete when the last of the input batch of ops completes.
+    
+    \note If an input op is in an exceptioned state at the point of entry into this function, this function
+    will propagate the exception there and then. \em Only error states which occur \em after this function
+    has been scheduled are propagated into the output set of ops.
+    
+    \return A batch of op handles.
+    \param ops A batch of op handles.
+    \ingroup async_file_io_dispatcher_base__barrier
+    \qbk{distinguish, batch}
+    \complexity{Amortised O(N) to dispatch. Amortised O(N) to complete.}
+    \exceptionmodel{See detailed description above.}
+    \qexample{barrier_example}
+    */
 	std::vector<async_io_op> barrier(const std::vector<async_io_op> &ops);
 protected:
 	void complete_async_op(size_t id, std::shared_ptr<detail::async_io_handle> h, exception_ptr e=exception_ptr());
@@ -917,16 +805,29 @@ protected:
 };
 /*! \brief Instatiates the best available async_file_io_dispatcher implementation for this system.
 
-\em flagsforce is ORed with any opened file flags. The NOT of \em flags mask is ANDed with any opened flags.
-
 Note that the number of threads in the threadpool supplied is the maximum non-async op queue depth (e.g. file opens, closes etc.).
 For fast SSDs, there isn't much gain after eight-sixteen threads, so the process threadpool is set to eight by default.
 For slow hard drives, or worse, SANs, a queue depth of 64 or higher might deliver significant benefits.
+
+\return A shared_ptr to the best available async_file_io_dispatcher implementation for this system.
+\param threadpool The threadpool instance to use for asynchronous dispatch.
+\param flagsforce The flags to bitwise OR with any opened file flags. Used to force on certain flags.
+\param flagsmask The flags to bitwise AND with any opened file flags. Used to force off certain flags.
+\ingroup async_file_io_dispatcher
+\qbk{
+[heading Example]
+[call_example]
+}
 */
 extern BOOST_AFIO_DECL std::shared_ptr<async_file_io_dispatcher_base> async_file_io_dispatcher(thread_pool &threadpool=process_threadpool(), file_flags flagsforce=file_flags::None, file_flags flagsmask=file_flags::None);
 
 /*! \struct async_io_op
-\brief A reference to an async operation
+\brief A reference to an asynchronous operation
+
+The id field is always valid (and non-zero) if this reference is valid. The h field, being the shared state
+between all references referring to the same op, only becomes a non-default shared_future when the op has
+actually begun execution. You should therefore \b never try waiting via h->get() until you are absolutely sure
+that the op has already started.
 */
 struct async_io_op
 {
@@ -934,12 +835,26 @@ struct async_io_op
 	size_t id;											//!< A unique id for this operation
 	std::shared_ptr<shared_future<std::shared_ptr<detail::async_io_handle>>> h;	//!< A future handle to the item being operated upon
 
+    //! \constr
 	async_io_op() : id(0), h(std::make_shared<shared_future<std::shared_ptr<detail::async_io_handle>>>()) { }
+    //! \cconstr
 	async_io_op(const async_io_op &o) : parent(o.parent), id(o.id), h(o.h) { }
+    //! \mconstr
 	async_io_op(async_io_op &&o) : parent(std::move(o.parent)), id(std::move(o.id)), h(std::move(o.h)) { }
+    /*! Constructs an instance.
+    \param _parent The dispatcher this op belongs to.
+    \param _id The unique non-zero id of this op.
+    \param _handle A shared_ptr to shared state between all instances of this reference.
+    */
 	async_io_op(std::shared_ptr<async_file_io_dispatcher_base> _parent, size_t _id, std::shared_ptr<shared_future<std::shared_ptr<detail::async_io_handle>>> _handle) : parent(_parent), id(_id), h(std::move(_handle)) { _validate(); }
+    /*! Constructs an instance.
+    \param _parent The dispatcher this op belongs to.
+    \param _id The unique non-zero id of this op.
+    */
 	async_io_op(std::shared_ptr<async_file_io_dispatcher_base> _parent, size_t _id) : parent(_parent), id(_id), h(std::make_shared<shared_future<std::shared_ptr<detail::async_io_handle>>>()) { }
+    //! \cassign
 	async_io_op &operator=(const async_io_op &o) { parent=o.parent; id=o.id; h=o.h; return *this; }
+    //! \massign
 	async_io_op &operator=(async_io_op &&o) { parent=std::move(o.parent); id=std::move(o.id); h=std::move(o.h); return *this; }
 	//! Validates contents
 	bool validate() const
@@ -989,7 +904,7 @@ namespace detail
 			}
 			catch(...)
 			{
-				exception_ptr e(afio::make_exception_ptr(current_exception()));
+				exception_ptr e(afio::make_exception_ptr(afio::current_exception()));
 				state->done.set_exception(e);
 				done=true;
 			}
@@ -1000,8 +915,18 @@ namespace detail
 	}
 }
 
-//! \brief Convenience overload for a vector of async_io_op. Does not retrieve exceptions.
-inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(std::nothrow_t, std::vector<async_io_op>::iterator first, std::vector<async_io_op>::iterator last)
+/*! \brief Returns a result when all the supplied ops complete. Does not propagate exception states.
+
+\return A future vector of shared_ptr's to detail::async_io_handle.
+\param _ An instance of std::nothrow_t.
+\param first A vector iterator pointing to the first async_io_op to wait upon.
+\param last A vector iterator pointing after the last async_io_op to wait upon.
+\ingroup when_all_ops
+\qbk{distinguish, vector batch of ops not exception propagating}
+\complexity{O(N) to dispatch. O(N/threadpool) to complete, but at least one cache line is contended between threads.}
+\exceptionmodel{Non propagating}
+*/
+inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(std::nothrow_t _, std::vector<async_io_op>::iterator first, std::vector<async_io_op>::iterator last)
 {
 	if(first==last)
 		return future<std::vector<std::shared_ptr<detail::async_io_handle>>>();
@@ -1015,7 +940,16 @@ inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(st
 	inputs.front().parent->completion(inputs, callbacks);
 	return state->done.get_future();
 }
-//! \brief Convenience overload for a vector of async_io_op. Retrieves exceptions.
+/*! \brief Returns a result when all the supplied ops complete. Propagates exception states.
+
+\return A future vector of shared_ptr's to detail::async_io_handle.
+\param first A vector iterator pointing to the first async_io_op to wait upon.
+\param last A vector iterator pointing after the last async_io_op to wait upon.
+\ingroup when_all_ops
+\qbk{distinguish, vector batch of ops exception propagating}
+\complexity{O(N) to dispatch. O(N/threadpool) to complete, but at least one cache line is contended between threads.}
+\exceptionmodel{Propagating}
+*/
 inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(std::vector<async_io_op>::iterator first, std::vector<async_io_op>::iterator last)
 {
 	if(first==last)
@@ -1030,7 +964,16 @@ inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(st
 	inputs.front().parent->completion(inputs, callbacks);
 	return state->done.get_future();
 }
-//! \brief Convenience overload for a list of async_io_op.  Does not retrieve exceptions.
+/*! \brief Returns a result when all the supplied ops complete. Does not propagate exception states.
+
+\return A future vector of shared_ptr's to detail::async_io_handle.
+\param _ An instance of std::nothrow_t.
+\param _ops A std::initializer_list<> of async_io_op's to wait upon.
+\ingroup when_all_ops
+\qbk{distinguish, initializer_list batch of ops not exception propagating}
+\complexity{Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete, but at least one cache line is heavily contended between threads.}
+\exceptionmodel{Non propagating}
+*/
 inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(std::nothrow_t _, std::initializer_list<async_io_op> _ops)
 {
 	std::vector<async_io_op> ops;
@@ -1039,7 +982,15 @@ inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(st
 		ops.push_back(std::move(i));
 	return when_all(_, ops.begin(), ops.end());
 }
-//! \brief Convenience overload for a list of async_io_op. Retrieves exceptions.
+/*! \brief Returns a result when all the supplied ops complete. Propagates exception states.
+
+\return A future vector of shared_ptr's to detail::async_io_handle.
+\param _ops A std::initializer_list<> of async_io_op's to wait upon.
+\ingroup when_all_ops
+\qbk{distinguish, initializer_list batch of ops exception propagating}
+\complexity{Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete, but at least one cache line is heavily contended between threads.}
+\exceptionmodel{Propagating}
+*/
 inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(std::initializer_list<async_io_op> _ops)
 {
 	std::vector<async_io_op> ops;
@@ -1048,13 +999,30 @@ inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(st
 		ops.push_back(std::move(i));
 	return when_all(ops.begin(), ops.end());
 }
-//! \brief Convenience overload for a single async_io_op.  Does not retrieve exceptions.
+/*! \brief Returns a result when the supplied op completes. Does not propagate exception states.
+
+\return A future vector of shared_ptr's to detail::async_io_handle.
+\param _ An instance of std::nothrow_t.
+\param op An async_io_op to wait upon.
+\ingroup when_all_ops
+\qbk{distinguish, convenience single op not exception propagating}
+\complexity{O(1) to dispatch. O(1) to complete.}
+\exceptionmodel{Non propagating}
+*/
 inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(std::nothrow_t _, async_io_op op)
 {
 	std::vector<async_io_op> ops(1, op);
 	return when_all(_, ops.begin(), ops.end());
 }
-//! \brief Convenience overload for a single async_io_op.  Retrieves exceptions.
+/*! \brief Returns a result when the supplied op completes. Propagates exception states.
+
+\return A future vector of shared_ptr's to detail::async_io_handle.
+\param op An async_io_op to wait upon.
+\ingroup when_all_ops
+\qbk{distinguish, convenience single op exception propagating}
+\complexity{O(1) to dispatch. O(1) to complete.}
+\exceptionmodel{Non propagating}
+*/
 inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(async_io_op op)
 {
 	std::vector<async_io_op> ops(1, op);
@@ -1066,21 +1034,49 @@ inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(as
 */
 struct async_path_op_req
 {
-	std::filesystem::path path;
-	file_flags flags;
-	async_io_op precondition;
+	std::filesystem::path path; //!< The filing system path to be used for this operation
+	file_flags flags;           //!< The flags to be used for this operation (note they can be overriden by flags passed during dispatcher construction).
+	async_io_op precondition;   //!< An optional precondition for this operation
+    //! \constr
 	async_path_op_req() : flags(file_flags::None) { }
-	//! Fails is path is not absolute
+	/*! \brief Constructs an instance.
+    
+    Note that this will fail if path is not absolute.
+    
+    \param _path The filing system path to be used. Must be absolute.
+    \param _flags The flags to be used.
+    */
 	async_path_op_req(std::filesystem::path _path, file_flags _flags=file_flags::None) : path(_path), flags(_flags) { if(!path.is_absolute()) throw std::runtime_error("Non-absolute path"); }
-	//! Fails is path is not absolute
+	/*! \brief Constructs an instance.
+    
+    Note that this will fail if path is not absolute.
+    
+    \param _precondition The precondition for this operation.
+    \param _path The filing system path to be used. Must be absolute.
+    \param _flags The flags to be used.
+    */
 	async_path_op_req(async_io_op _precondition, std::filesystem::path _path, file_flags _flags=file_flags::None) : path(_path), flags(_flags), precondition(std::move(_precondition)) { _validate(); if(!path.is_absolute()) throw std::runtime_error("Non-absolute path"); }
-	//! Constructs on the basis of a string. make_preferred() and absolute() are called in this case.
+	/*! \brief Constructs an instance.
+    \param _path The filing system leaf or path to be used. make_preferred() and absolute() will be used to convert the string into an absolute path.
+    \param _flags The flags to be used.
+    */
 	async_path_op_req(std::string _path, file_flags _flags=file_flags::None) : path(std::filesystem::absolute(std::filesystem::path(_path).make_preferred())), flags(_flags) { _validate(); }
-	//! Constructs on the basis of a string. make_preferred() and absolute() are called in this case.
+	/*! \brief Constructs an instance.
+    \param _precondition The precondition for this operation.
+    \param _path The filing system leaf or path to be used. make_preferred() and absolute() will be used to convert the string into an absolute path.
+    \param _flags The flags to be used.
+    */
 	async_path_op_req(async_io_op _precondition, std::string _path, file_flags _flags=file_flags::None) : path(std::filesystem::absolute(std::filesystem::path(_path).make_preferred())), flags(_flags), precondition(std::move(_precondition)) { _validate(); }
-	//! Constructs on the basis of a string. make_preferred() and absolute() are called in this case.
+	/*! \brief Constructs an instance.
+    \param _path The filing system leaf or path to be used. make_preferred() and absolute() will be used to convert the string into an absolute path.
+    \param _flags The flags to be used.
+    */
 	async_path_op_req(const char *_path, file_flags _flags=file_flags::None) : path(std::filesystem::absolute(std::filesystem::path(_path).make_preferred())), flags(_flags) { _validate(); }
-	//! Constructs on the basis of a string. make_preferred() and absolute() are called in this case.
+	/*! \brief Constructs an instance.
+    \param _precondition The precondition for this operation.
+    \param _path The filing system leaf or path to be used. make_preferred() and absolute() will be used to convert the string into an absolute path.
+    \param _flags The flags to be used.
+    */
 	async_path_op_req(async_io_op _precondition, const char *_path, file_flags _flags=file_flags::None) : path(std::filesystem::absolute(std::filesystem::path(_path).make_preferred())), flags(_flags), precondition(std::move(_precondition)) { _validate(); }
 	//! Validates contents
 	bool validate() const
@@ -1098,22 +1094,30 @@ private:
 	}
 };
 
-/*! \struct async_data_op_req
-\brief A convenience bundle of precondition, data and where. Data \b MUST stay around until the operation completes.
-*/
+//! \brief A convenience bundle of precondition, data and where for reading into a void *. Data \b MUST stay around until the operation completes. \ingroup async_data_op_req
 template<> struct async_data_op_req<void> // For reading
 {
+    //! An optional precondition for this operation
 	async_io_op precondition;
+	//! A sequence of mutable Boost.ASIO buffers to read into
 	std::vector<boost::asio::mutable_buffer> buffers;
+	//! The offset from which to read
 	off_t where;
+	//! \constr
 	async_data_op_req() { }
+	//! \cconstr
 	async_data_op_req(const async_data_op_req &o) : precondition(o.precondition), buffers(o.buffers), where(o.where) { }
+	//! \mconstr
 	async_data_op_req(async_data_op_req &&o) : precondition(std::move(o.precondition)), buffers(std::move(o.buffers)), where(std::move(o.where)) { }
+	//! \cassign
 	async_data_op_req &operator=(const async_data_op_req &o) { precondition=o.precondition; buffers=o.buffers; where=o.where; return *this; }
+	//! \massign
 	async_data_op_req &operator=(async_data_op_req &&o) { precondition=std::move(o.precondition); buffers=std::move(o.buffers); where=std::move(o.where); return *this; }
-	async_data_op_req(async_io_op _precondition, void *_buffer, size_t _length, off_t _where) : precondition(std::move(_precondition)), where(_where) { buffers.reserve(1); buffers.push_back(boost::asio::mutable_buffer(_buffer, _length)); _validate(); }
+	//! \async_data_op_req1 \param _length The number of bytes to transfer
+	async_data_op_req(async_io_op _precondition, void *v, size_t _length, off_t _where) : precondition(std::move(_precondition)), where(_where) { buffers.reserve(1); buffers.push_back(boost::asio::mutable_buffer(v, _length)); _validate(); }
+	//! \async_data_op_req2
 	async_data_op_req(async_io_op _precondition, std::vector<boost::asio::mutable_buffer> _buffers, off_t _where) : precondition(std::move(_precondition)), buffers(_buffers), where(_where) { _validate(); }
-	//! Validates contents
+	//! Validates contents for correctness \return True if contents are correct
 	bool validate() const
 	{
 		if(!precondition.validate()) return false;
@@ -1137,21 +1141,34 @@ private:
 #endif
 	}
 };
+//! \brief A convenience bundle of precondition, data and where for writing from a const void *. Data \b MUST stay around until the operation completes. \ingroup async_data_op_req
 template<> struct async_data_op_req<const void> // For writing
 {
+    //! An optional precondition for this operation
 	async_io_op precondition;
+	//! A sequence of const Boost.ASIO buffers to write from
 	std::vector<boost::asio::const_buffer> buffers;
+	//! The offset into which to write
 	off_t where;
+	//! \constr
 	async_data_op_req() { }
+	//! \cconstr
 	async_data_op_req(const async_data_op_req &o) : precondition(o.precondition), buffers(o.buffers), where(o.where) { }
+	//! \mconstr
 	async_data_op_req(async_data_op_req &&o) : precondition(std::move(o.precondition)), buffers(std::move(o.buffers)), where(std::move(o.where)) { }
+	//! \cconstr
 	async_data_op_req(const async_data_op_req<void> &o) : precondition(o.precondition), where(o.where) { buffers.reserve(o.buffers.capacity()); for(auto &i: o.buffers) buffers.push_back(i); }
+	//! \mconstr
 	async_data_op_req(async_data_op_req<void> &&o) : precondition(std::move(o.precondition)), where(o.where) { buffers.reserve(o.buffers.capacity()); for(auto &&i: o.buffers) buffers.push_back(std::move(i)); }
+	//! \cassign
 	async_data_op_req &operator=(const async_data_op_req &o) { precondition=o.precondition; buffers=o.buffers; where=o.where; return *this; }
+	//! \massign
 	async_data_op_req &operator=(async_data_op_req &&o) { precondition=std::move(o.precondition); buffers=std::move(o.buffers); where=std::move(o.where); return *this; }
-	async_data_op_req(async_io_op _precondition, const void *_buffer, size_t _length, off_t _where) : precondition(std::move(_precondition)), where(_where) { buffers.reserve(1); buffers.push_back(boost::asio::const_buffer(_buffer, _length)); _validate(); }
+	//! \async_data_op_req1 \param _length The number of bytes to transfer
+	async_data_op_req(async_io_op _precondition, const void *v, size_t _length, off_t _where) : precondition(std::move(_precondition)), where(_where) { buffers.reserve(1); buffers.push_back(boost::asio::const_buffer(v, _length)); _validate(); }
+	//! \async_data_op_req2
 	async_data_op_req(async_io_op _precondition, std::vector<boost::asio::const_buffer> _buffers, off_t _where) : precondition(std::move(_precondition)), buffers(_buffers), where(_where) { _validate(); }
-	//! Validates contents
+	//! Validates contents for correctness \return True if contents are correct
 	bool validate() const
 	{
 		if(!precondition.validate()) return false;
@@ -1175,88 +1192,148 @@ private:
 #endif
 	}
 };
-//! \brief A specialisation for any pointer to type T
+//! \brief A convenience bundle of precondition, data and where for reading into a single T *. Data \b MUST stay around until the operation completes. \tparam "class T" Any writable type T \ingroup async_data_op_req
 template<class T> struct async_data_op_req : public async_data_op_req<void>
 {
+    //! \constr
 	async_data_op_req() { }
+    //! \cconstr
 	async_data_op_req(const async_data_op_req &o) : async_data_op_req<void>(o) { }
+    //! \mconstr
 	async_data_op_req(async_data_op_req &&o) : async_data_op_req<void>(std::move(o)) { }
+    //! \cassign
 	async_data_op_req &operator=(const async_data_op_req &o) { static_cast<async_data_op_req<void>>(*this)=o; return *this; }
+    //! \massign
 	async_data_op_req &operator=(async_data_op_req &&o) { static_cast<async_data_op_req<void>>(*this)=std::move(o); return *this; }
-	async_data_op_req(async_io_op _precondition, T *_buffer, size_t _length, off_t _where) : async_data_op_req<void>(std::move(_precondition), static_cast<void *>(_buffer), _length, _where) { }
+    //! \async_data_op_req1 \param _length The number of bytes to transfer
+	async_data_op_req(async_io_op _precondition, T *v, size_t _length, off_t _where) : async_data_op_req<void>(std::move(_precondition), static_cast<void *>(v), _length, _where) { }
 };
+//! \brief A convenience bundle of precondition, data and where for writing from a single const T *. Data \b MUST stay around until the operation completes. \tparam "class T" Any readable type T \ingroup async_data_op_req
 template<class T> struct async_data_op_req<const T> : public async_data_op_req<const void>
 {
+    //! \constr
 	async_data_op_req() { }
+    //! \cconstr
 	async_data_op_req(const async_data_op_req &o) : async_data_op_req<const void>(o) { }
+    //! \mconstr
 	async_data_op_req(async_data_op_req &&o) : async_data_op_req<const void>(std::move(o)) { }
+    //! \cconstr
 	async_data_op_req(const async_data_op_req<T> &o) : async_data_op_req<const void>(o) { }
+    //! \mconstr
 	async_data_op_req(async_data_op_req<T> &&o) : async_data_op_req<const void>(std::move(o)) { }
+    //! \cassign
 	async_data_op_req &operator=(const async_data_op_req &o) { static_cast<async_data_op_req<const void>>(*this)=o; return *this; }
+    //! \massign
 	async_data_op_req &operator=(async_data_op_req &&o) { static_cast<async_data_op_req<const void>>(*this)=std::move(o); return *this; }
-	async_data_op_req(async_io_op _precondition, const T *_buffer, size_t _length, off_t _where) : async_data_op_req<const void>(std::move(_precondition), static_cast<const void *>(_buffer), _length, _where) { }
+    //! \async_data_op_req1 \param _length The number of bytes to transfer
+	async_data_op_req(async_io_op _precondition, const T *v, size_t _length, off_t _where) : async_data_op_req<const void>(std::move(_precondition), static_cast<const void *>(v), _length, _where) { }
 };
-//! \brief A specialisation for any std::vector<T, A>
+//! \brief A convenience bundle of precondition, data and where for reading into a `std::vector<T, A>`. Data \b MUST stay around until the operation completes. \tparam "class T" Any type \tparam "class A" Any STL allocator \ingroup async_data_op_req
 template<class T, class A> struct async_data_op_req<std::vector<T, A>> : public async_data_op_req<void>
 {
+    //! \constr
 	async_data_op_req() { }
+    //! \cconstr
 	async_data_op_req(const async_data_op_req &o) : async_data_op_req<void>(o) { }
+    //! \mconstr
 	async_data_op_req(async_data_op_req &&o) : async_data_op_req<void>(std::move(o)) { }
+    //! \cassign
 	async_data_op_req &operator=(const async_data_op_req &o) { static_cast<async_data_op_req<void>>(*this)=o; return *this; }
+    //! \massign
 	async_data_op_req &operator=(async_data_op_req &&o) { static_cast<async_data_op_req<void>>(*this)=std::move(o); return *this; }
+    //! \async_data_op_req1
 	async_data_op_req(async_io_op _precondition, std::vector<T, A> &v, off_t _where) : async_data_op_req<void>(std::move(_precondition), static_cast<void *>(&v.front()), v.size()*sizeof(T), _where) { }
 };
+//! \brief A convenience bundle of precondition, data and where for writing from a `const std::vector<T, A>`. Data \b MUST stay around until the operation completes. \tparam "class T" Any type \tparam "class A" Any STL allocator \ingroup async_data_op_req
 template<class T, class A> struct async_data_op_req<const std::vector<T, A>> : public async_data_op_req<const void>
 {
+    //! \constr
 	async_data_op_req() { }
+    //! \cconstr
 	async_data_op_req(const async_data_op_req &o) : async_data_op_req<const void>(o) { }
+    //! \mconstr
 	async_data_op_req(async_data_op_req &&o) : async_data_op_req<const void>(std::move(o)) { }
+    //! \cconstr
 	async_data_op_req(const async_data_op_req<std::vector<T, A>> &o) : async_data_op_req<const void>(o) { }
+    //! \mconstr
 	async_data_op_req(async_data_op_req<std::vector<T, A>> &&o) : async_data_op_req<const void>(std::move(o)) { }
+    //! \cassign
 	async_data_op_req &operator=(const async_data_op_req &o) { static_cast<async_data_op_req<const void>>(*this)=o; return *this; }
+    //! \massign
 	async_data_op_req &operator=(async_data_op_req &&o) { static_cast<async_data_op_req<const void>>(*this)=std::move(o); return *this; }
+    //! \async_data_op_req1
 	async_data_op_req(async_io_op _precondition, const std::vector<T, A> &v, off_t _where) : async_data_op_req<const void>(std::move(_precondition), static_cast<const void *>(&v.front()), v.size()*sizeof(T), _where) { }
 };
-//! \brief A specialisation for any std::array<T, N>
+//! \brief A convenience bundle of precondition, data and where for reading into a `std::array<T, N>`. Data \b MUST stay around until the operation completes. \tparam "class T" Any type \tparam N Any compile-time size \ingroup async_data_op_req
 template<class T, size_t N> struct async_data_op_req<std::array<T, N>> : public async_data_op_req<void>
 {
+    //! \constr
 	async_data_op_req() { }
+    //! \cconstr
 	async_data_op_req(const async_data_op_req &o) : async_data_op_req<void>(o) { }
+    //! \mconstr
 	async_data_op_req(async_data_op_req &&o) : async_data_op_req<void>(std::move(o)) { }
+    //! \cassign
 	async_data_op_req &operator=(const async_data_op_req &o) { static_cast<async_data_op_req<void>>(*this)=o; return *this; }
+    //! \massign
 	async_data_op_req &operator=(async_data_op_req &&o) { static_cast<async_data_op_req<void>>(*this)=std::move(o); return *this; }
+    //! \async_data_op_req1
 	async_data_op_req(async_io_op _precondition, std::array<T, N> &v, off_t _where) : async_data_op_req<void>(std::move(_precondition), static_cast<void *>(&v.front()), v.size()*sizeof(T), _where) { }
 };
+//! \brief A convenience bundle of precondition, data and where for writing from a `const std::array<T, N>`. Data \b MUST stay around until the operation completes. \tparam "class T" Any type \tparam N Any compile-time size \ingroup async_data_op_req
 template<class T, size_t N> struct async_data_op_req<const std::array<T, N>> : public async_data_op_req<const void>
 {
+    //! \constr
 	async_data_op_req() { }
+    //! \cconstr
 	async_data_op_req(const async_data_op_req &o) : async_data_op_req<const void>(o) { }
+    //! \mconstr
 	async_data_op_req(async_data_op_req &&o) : async_data_op_req<const void>(std::move(o)) { }
+    //! \cassign
 	async_data_op_req &operator=(const async_data_op_req &o) { static_cast<async_data_op_req<const void>>(*this)=o; return *this; }
+    //! \massign
 	async_data_op_req &operator=(async_data_op_req &&o) { static_cast<async_data_op_req<const void>>(*this)=std::move(o); return *this; }
+    //! \cconstr
 	async_data_op_req(const async_data_op_req<std::array<T, N>> &o) : async_data_op_req<const void>(o) { }
+    //! \mconstr
 	async_data_op_req(async_data_op_req<std::array<T, N>> &&o) : async_data_op_req<const void>(std::move(o)) { }
+    //! \async_data_op_req1
 	async_data_op_req(async_io_op _precondition, const std::array<T, N> &v, off_t _where) : async_data_op_req<const void>(std::move(_precondition), static_cast<const void *>(&v.front()), v.size()*sizeof(T), _where) { }
 };
-//! \brief A specialisation for any std::basic_string<C, T, A>
+//! \brief A convenience bundle of precondition, data and where for reading into a `std::basic_string<C, T, A>`. Data \b MUST stay around until the operation completes. \tparam "class C" Any character type \tparam "class T" Character traits type \tparam "class A" Any STL allocator \ingroup async_data_op_req
 template<class C, class T, class A> struct async_data_op_req<std::basic_string<C, T, A>> : public async_data_op_req<void>
 {
+    //! \constr
 	async_data_op_req() { }
+    //! \cconstr
 	async_data_op_req(const async_data_op_req &o) : async_data_op_req<void>(o) { }
+    //! \mconstr
 	async_data_op_req(async_data_op_req &&o) : async_data_op_req<void>(std::move(o)) { }
+    //! \cassign
 	async_data_op_req &operator=(const async_data_op_req &o) { static_cast<async_data_op_req<void>>(*this)=o; return *this; }
+    //! \mconstr
 	async_data_op_req &operator=(async_data_op_req &&o) { static_cast<async_data_op_req<void>>(*this)=std::move(o); return *this; }
+    //! \async_data_op_req1
 	async_data_op_req(async_io_op _precondition, std::basic_string<C, T, A> &v, off_t _where) : async_data_op_req<void>(std::move(_precondition), static_cast<void *>(&v.front()), v.size()*sizeof(A), _where) { }
 };
+//! \brief A convenience bundle of precondition, data and where for writing from a `const std::basic_string<C, T, A>`. Data \b MUST stay around until the operation completes.  \tparam "class C" Any character type \tparam "class T" Character traits type \tparam "class A" Any STL allocator \ingroup async_data_op_req
 template<class C, class T, class A> struct async_data_op_req<const std::basic_string<C, T, A>> : public async_data_op_req<const void>
 {
+    //! \constr
 	async_data_op_req() { }
+    //! \cconstr
 	async_data_op_req(const async_data_op_req &o) : async_data_op_req<const void>(o) { }
+    //! \mconstr
 	async_data_op_req(async_data_op_req &&o) : async_data_op_req<const void>(std::move(o)) { }
+    //! \cconstr
 	async_data_op_req(const async_data_op_req<std::basic_string<C, T, A>> &o) : async_data_op_req<const void>(o) { }
+    //! \mconstr
 	async_data_op_req(async_data_op_req<std::basic_string<C, T, A>> &&o) : async_data_op_req<const void>(std::move(o)) { }
+    //! \cassign
 	async_data_op_req &operator=(const async_data_op_req &o) { static_cast<async_data_op_req<const void>>(*this)=o; return *this; }
+    //! \mconstr
 	async_data_op_req &operator=(async_data_op_req &&o) { static_cast<async_data_op_req<const void>>(*this)=std::move(o); return *this; }
+    //! \async_data_op_req1
 	async_data_op_req(async_io_op _precondition, const std::basic_string<C, T, A> &v, off_t _where) : async_data_op_req<const void>(std::move(_precondition), static_cast<const void *>(&v.front()), v.size()*sizeof(A), _where) { }
 };
 

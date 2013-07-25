@@ -13,23 +13,6 @@ project boost/afio
       <link>shared:<define>BOOST_AFIO_SOURCE=1
       
 
-
-   #These might be better when we're actually a part of boost (these don't wrok with a symlink)     
-#      <library>$../../libs/system/build//boost_system
-#      <library>$../../libs/filesystem/build//boost_filesystem 
-#      <library>$../../libs/atomic/build//boost_atomic
-#      <library>$../../libs/thread/build//boost_thread
-
-
-    : usage-requirements 
-      <include>. 
-      <link>shared:<library>/boost/system//boost_system
-      <link>shared:<library>/boost/filesystem//boost_filesystem 
-      <link>shared:<library>/boost/atomic//boost_atomic
-      <link>shared:<library>/boost/thread//boost_thread
-
-     <link>shared:<define>BOOST_AFIO_DYN_LINK=1
-     <link>shared:<define>BOOST_AFIO_SOURCE=1
     : source-location ../src
 
 ;
@@ -46,10 +29,11 @@ lib boost_afio
 	: #includes 
       <include>../../../boost/afio 
       <include>../../../boost/afio/detail
-      
-    #Compiler settings
-      <toolset>gcc:<cxxflags>"-std=c++0x -fvisibility-inlines-hidden -fstrict-aliasing -Wstrict-aliasing -Wall -Wno-unused -fargument-noalias -O2 -g -fPIC -fvisibility=hidden -fopenmp -Wno-unused-typedefs"
-      <toolset>clang:<cxxflags>"-std=c++0x -fvisibility-inlines-hidden -fstrict-aliasing -Wstrict-aliasing -Wall -Wno-unused -fargument-noalias -O2 -g -fPIC -fvisibility=hidden -fopenmp"
+      <toolset>gcc:<cxxflags>"-std=c++0x -fvisibility-inlines-hidden -fstrict-aliasing -Wstrict-aliasing -Wno-unused -fargument-noalias -fvisibility=hidden -fopenmp"
+      <toolset>gcc:<linkflags>"-lgomp"
+      <toolset>gcc-mingw:<cxxflags>"-march=i686 -DWIN32 -D_UNICODE -DUNICODE"
+      <toolset>clang:<cxxflags>"-std=c++0x -fvisibility-inlines-hidden -fstrict-aliasing -Wstrict-aliasing -Wno-unused -fargument-noalias -fvisibility=hidden -fopenmp"
+      <toolset>msvc:<cxxflags>/openmp
       <toolset>msvc:<cxxflags>"/openmp /EHsc /GF /Gy "
       <toolset>msvc:<linkflags>"/LARGEADDRESSAWARE /DYNAMICBASE /NXCOMPAT /OPT:REF /MANIFEST" # /VERSION:1.00.0"
       <toolset>msvc:<define>WIN32 
@@ -58,8 +42,14 @@ lib boost_afio
       <toolset>msvc:<define>_UNICODE
         
       #OS specific dependencies
-      <target-os>linux:<linkflags>"-l pthread"
-      <target-os>freebsd:<linkflags>"-l pthread"
+      <target-os>linux:<linkflags>"-lpthread"
+      <target-os>freebsd:<linkflags>"-lpthread"
+      <target-os>windows:<linkflags>"-lws2_32"
+      <link>shared:<define>BOOST_AFIO_DYN_LINK=1
+      <link>shared:<library>../../system/build//boost_system
+      <link>shared:<library>../../filesystem/build//boost_filesystem
+      <link>shared:<library>../../atomic/build//boost_atomic
+      <link>shared:<library>../../thread/build//boost_thread
 
     : #usage requirements
 

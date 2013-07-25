@@ -1,0 +1,102 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Design Rationale</title>
+<link rel="stylesheet" href="../myboostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 0.1">
+<link rel="up" href="../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 0.1">
+<link rel="prev" href="introduction.html" title="Introduction">
+<link rel="next" href="design/overview.html" title="A quick overview of the design">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr>
+<td valign="top"><img alt="Boost C++ Libraries" width="277" height="86" src="../../../../../boost.png"></td>
+<td align="center"><a href="../../../../../index.html">Home</a></td>
+<td align="center"><a href="../../../../../libs/libraries.htm">Libraries</a></td>
+<td align="center"><a href="http://www.boost.org/users/people.html">People</a></td>
+<td align="center"><a href="http://www.boost.org/users/faq.html">FAQ</a></td>
+<td align="center"><a href="../../../../../more/index.htm">More</a></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="introduction.html"><img src="../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="design/overview.html"><img src="../../../../../doc/src/images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="afio.design"></a><a class="link" href="design.html" title="Design Rationale">Design Rationale</a>
+</h2></div></div></div>
+<div class="toc"><dl class="toc"><dt><span class="section"><a href="design/overview.html">A quick overview of the design</a></span></dt></dl></div>
+<p>
+      Boost.AFIO came about out of the need for a scalable, high performance, portable
+      asynchronous file i/o implementation library for a forthcoming filing system
+      based graph store ACID compliant transactional persistence layer called TripleGit
+      -- call it a <span class="quote">&#8220;<span class="quote">SQLite3 but for graphstores</span>&#8221;</span><a href="#ftn.afio.design.f0" class="footnote" name="afio.design.f0"><sup class="footnote">[1]</sup></a>. The fact that a portable asynchronous file i/o library for C++
+      was needed at all came as a bit of a surprise: one thinks of these things as
+      done and dusted decades ago, but it turns out that the fully featured <a href="http://nikhilm.github.io/uvbook/filesystem.html" target="_top">libuv</a>, a C library,
+      is good enough for most people needing portable asynchronous file i/o. However
+      as great as libuv is, it isn't very C++-ish, and hooking it in with <a href="http://www.boost.org/libs/asio/" target="_top">Boost.ASIO</a> (parts of which are
+      expected to enter the ISO C++ language standard) isn't particularly clean.
+      I therefore resolved to write a native Boost asynchronous file i/o implementation,
+      and keep it as simple as possible.
+    </p>
+<p>
+      Boost.AFIO is actually, of course, really a different take on Google's <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3562.pdf" target="_top">WG21
+      N3562 (Executors and schedulers)</a> and Microsoft's <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3634.pdf" target="_top">WG21
+      N3634 (Improvements to std::future&lt;T&gt; and Related APIs)</a>. Both
+      Google and Microsoft, like many other big iron C++ users, have much need to
+      asynchronously execute large numbers of closures (bound function objects) with
+      various dependencies between the completion of one or more closures before
+      allowing the starting of one or more other closures. What one effectively does
+      is to create a <span class="emphasis"><em>dependency chain</em></span> of small items to be executed,
+      and then fire as many compute resources as possible at those chains, with the
+      engine executing as many of them simultaneously as is permitted by the requirements
+      of the dependency chains. Boost.AFIO differs from N3562 by directly extending
+      Boost.ASIO, so if you're already using Boost.ASIO to do your networking, well
+      it's a real cinch to add in asynchronous closure execution e.g. <span class="quote">&#8220;<span class="quote">if a
+      packet of data arrives, do this set of operations according to this dependency
+      chain</span>&#8221;</span>. Boost.AFIO differs from N3634 by going a lot further than N3634
+      does by having explicit support for both Boost.ASIO and targeted file i/o support
+      infrastructure. Boost.AFIO therefore lies somewhere in between N3562 and N3634
+      in terms of complexity, but instead of specifying a new system of executors
+      it uses Boost.ASIO central dispatch engine as the executor.
+    </p>
+<p>
+      As I mentioned earlier, Boost.AFIO version 1 is intentionally as simple as
+      possible, even though that has consequences for performance where closure dispatch
+      is plenty fast enough for a single state of the art SATA3 SSD (~150k IOPS)<a href="#ftn.afio.design.f1" class="footnote" name="afio.design.f1"><sup class="footnote">[2]</sup></a>, but not enough for PCIe SSDs which can achieve anywhere between
+      250k IOPS and 10m IOPS for the really high end models. This is because it is
+      expected that N3562 and N3634 will be adjusted in the light of Boost.AFIO's
+      design, and hopefully a merged proposal covering all three approaches to the
+      same thing (i.e. a fusion of schedulers and executors with the existing executor
+      model implemented by Boost.ASIO) will emerge, which may well prompt a version
+      2 of AFIO.
+    </p>
+<div class="footnotes">
+<br><hr style="width:100; text-align:left;margin-left: 0">
+<div id="ftn.afio.design.f0" class="footnote"><p><a href="#afio.design.f0" class="para"><sup class="para">[1] </sup></a>
+        The <a href="http://unqlite.org/" target="_top">UnQLite embedded NoSQL database engine</a>
+        is exactly one of those of course. Unfortunately I intend TripleGit for implementing
+        portable Component Objects for C++ extending C++ Modules, which means I need
+        a database engine suitable for incorporation into a dynamic linker, which
+        unfortunately is not quite UnQLite.
+      </p></div>
+<div id="ftn.afio.design.f1" class="footnote"><p><a href="#afio.design.f1" class="para"><sup class="para">[2] </sup></a>
+        Achieving this throughput requires a four core or higher CPU.
+      </p></div>
+</div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2013 Niall Douglas and Paul Kirth<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="introduction.html"><img src="../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="design/overview.html"><img src="../../../../../doc/src/images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

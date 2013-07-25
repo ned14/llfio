@@ -16,12 +16,14 @@ File Created: Mar 2013
 #define BOOST_AFIO_VALIDATE_INPUTS 1
 #endif
 
+// Get Mingw to assume we are on at least Windows 2000
+#define __MSVCRT_VERSION__ 0x601
+
 #include "../../../boost/afio/afio.hpp"
 #include "boost/smart_ptr/detail/spinlock.hpp"
 #include "../../../boost/afio/detail/ErrorHandling.hpp"
 #include "../../../boost/afio/detail/valgrind/memcheck.h"
 #include "../../../boost/afio/detail/valgrind/helgrind.h"
-#include <mutex>
 
 #include <fcntl.h>
 #include <sys/stat.h>
@@ -34,14 +36,28 @@ File Created: Mar 2013
 #define BOOST_AFIO_POSIX_MKDIR(path, mode) _wmkdir(path)
 #define BOOST_AFIO_POSIX_RMDIR _wrmdir
 #define BOOST_AFIO_POSIX_STAT _wstat64
-#define BOOST_AFIO_POSIX_STAT_STRUCT struct _stat64
+#define BOOST_AFIO_POSIX_STAT_STRUCT struct __stat64
 #define BOOST_AFIO_POSIX_S_ISREG(m) ((m) & _S_IFREG)
 #define BOOST_AFIO_POSIX_S_ISDIR(m) ((m) & _S_IFDIR)
 #define BOOST_AFIO_POSIX_OPEN _wopen
 #define BOOST_AFIO_POSIX_CLOSE _close
 #define BOOST_AFIO_POSIX_UNLINK _wunlink
 #define BOOST_AFIO_POSIX_FSYNC _commit
-#define BOOST_AFIO_POSIX_FTRUNCATE _chsize_s
+#define BOOST_AFIO_POSIX_FTRUNCATE winftruncate
+static inline int winftruncate(int fd, off_t _newsize)
+{
+	// This is a bit tricky ... overlapped files ignore their file position except in this one
+	// case, but clearly here we have a race condition. No choice but to rinse and repeat I guess.
+	LARGE_INTEGER size={0}, newsize={0};
+	HANDLE h=(HANDLE) _get_osfhandle(fd);
+	newsize.QuadPart=_newsize;
+	while(size.QuadPart!=newsize.QuadPart)
+	{
+		BOOST_AFIO_ERRHWIN(SetFilePointerEx(h, newsize, NULL, FILE_BEGIN));
+		BOOST_AFIO_ERRHWIN(SetEndOfFile(h));
+		BOOST_AFIO_ERRHWIN(GetFileSizeEx(h, &size));
+	}
+}
 #else
 #include <sys/uio.h>
 #include <limits.h>
@@ -253,7 +269,7 @@ namespace detail {
 		file_flags flagsforce, flagsmask;
 
 		typedef boost::detail::spinlock fdslock_t;
-		typedef std::recursive_mutex opslock_t;
+		typedef recursive_mutex opslock_t;
 		fdslock_t fdslock; std::unordered_map<void *, std::weak_ptr<async_io_handle>> fds;
 		opslock_t opslock; size_t monotoniccount; std::unordered_map<size_t, async_file_io_dispatcher_op> ops;
 
@@ -512,7 +528,7 @@ template<class F, class... Args> std::shared_ptr<detail::async_io_handle> async_
 #ifdef BOOST_MSVC
 	catch(const std::exception &)
 	{
-		exception_ptr e(afio::make_exception_ptr(std::current_exception()));
+		exception_ptr e(afio::make_exception_ptr(afio::current_exception()));
 		BOOST_AFIO_DEBUG_PRINT("E %u begin\n", (unsigned) id);
 		complete_async_op(id, h, e);
 		BOOST_AFIO_DEBUG_PRINT("E %u end\n", (unsigned) id);
@@ -523,7 +539,7 @@ template<class F, class... Args> std::shared_ptr<detail::async_io_handle> async_
 	catch(...)
 #endif
 	{
-		exception_ptr e(afio::make_exception_ptr(std::current_exception()));
+		exception_ptr e(afio::make_exception_ptr(afio::current_exception()));
 		BOOST_AFIO_DEBUG_PRINT("E %u begin\n", (unsigned) id);
 		complete_async_op(id, h, e);
 		BOOST_AFIO_DEBUG_PRINT("E %u end\n", (unsigned) id);
@@ -679,7 +695,7 @@ template<> async_file_io_dispatcher_base::completion_returntype async_file_io_di
 	state.first->out[idx]=std::make_pair(id, h); // This might look thread unsafe, but each idx is unique
 	if(--state.first->togo)
 		return std::make_pair(false, h);
-	exception_ptr this_e(afio::make_exception_ptr(std::current_exception()));
+	exception_ptr this_e(afio::make_exception_ptr(afio::current_exception()));
 	// Last one just completed, so issue completions for everything in out except me
 	detail::barrier_count_completed_state &s=*state.first;
 	for(idx=0; idx<s.out.size(); idx++)
@@ -696,7 +712,7 @@ template<> async_file_io_dispatcher_base::completion_returntype async_file_io_di
 #ifdef BOOST_MSVC
 			catch(const std::exception &)
 			{
-				exception_ptr e(afio::make_exception_ptr(std::current_exception()));
+				exception_ptr e(afio::make_exception_ptr(afio::current_exception()));
 				complete_async_op(s.out[idx].first, s.out[idx].second, e);
 			}
 			catch(const std::exception_ptr &)
@@ -704,7 +720,7 @@ template<> async_file_io_dispatcher_base::completion_returntype async_file_io_di
 			catch(...)
 #endif
 			{
-				exception_ptr e(afio::make_exception_ptr(std::current_exception()));
+				exception_ptr e(afio::make_exception_ptr(afio::current_exception()));
 				complete_async_op(s.out[idx].first, s.out[idx].second, e);
 			}
 		}
@@ -848,7 +864,7 @@ namespace detail {
 				}
 				catch(...)
 				{
-					e=afio::make_exception_ptr(current_exception());
+					e=afio::make_exception_ptr(afio::current_exception());
 				}
 			}
 			else
@@ -898,7 +914,7 @@ namespace detail {
 			BOOST_AFIO_DEBUG_PRINT("T %u %p (%c)\n", (unsigned) id, h.get(), p->path().native().back());
 			// This is a bit tricky ... overlapped files ignore their file position except in this one
 			// case, but clearly here we have a race condition. No choice but to rinse and repeat I guess.
-			LARGE_INTEGER size={0}, newsize;
+			LARGE_INTEGER size={0}, newsize={0};
 			newsize.QuadPart=_newsize;
 			while(size.QuadPart!=newsize.QuadPart)
 			{

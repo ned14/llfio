@@ -1,0 +1,201 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>A quick overview of the design</title>
+<link rel="stylesheet" href="../../myboostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 0.1">
+<link rel="up" href="../design.html" title="Design Rationale">
+<link rel="prev" href="../design.html" title="Design Rationale">
+<link rel="next" href="../compilation.html" title="Compilation">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr>
+<td valign="top"><img alt="Boost C++ Libraries" width="277" height="86" src="../../../../../../boost.png"></td>
+<td align="center"><a href="../../../../../../index.html">Home</a></td>
+<td align="center"><a href="../../../../../../libs/libraries.htm">Libraries</a></td>
+<td align="center"><a href="http://www.boost.org/users/people.html">People</a></td>
+<td align="center"><a href="http://www.boost.org/users/faq.html">FAQ</a></td>
+<td align="center"><a href="../../../../../../more/index.htm">More</a></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../design.html"><img src="../../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../design.html"><img src="../../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="../compilation.html"><img src="../../../../../../doc/src/images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="afio.design.overview"></a><a class="link" href="overview.html" title="A quick overview of the design">A quick overview of the design</a>
+</h3></div></div></div>
+<p>
+        Boost.AFIO version 1 is amongst the smallest standalone libraries in the
+        Boost C++ libraries. Its total active lines of code is less than 1,000 lines,
+        and implementing its documentatation and other associated necessities for
+        Boost peer review took longer than writing and debugging the code itself.
+        Yet despite its shortness of length, AFIO has some unusual design choices,
+        and probably what some might initially think (before they've used it) is
+        an unintuitive API.
+      </p>
+<p>
+        Some quick terminology:
+      </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+            <a class="link" href="../reference/structs/async_io_op.html" title="async_io_op"><code class="computeroutput"><span class="keyword">struct</span>
+            <span class="identifier">async_io_op</span></code></a> is a reference
+            to a scheduled operation. I'll call this an <span class="quote">&#8220;<span class="quote">op reference</span>&#8221;</span>
+            or just plain <span class="quote">&#8220;<span class="quote">op</span>&#8221;</span> from now on for convenience. There can
+            be many op references, but only one unique op. You can distinguish between
+            ops using their dispatcher parent pointer and the id field, which is
+            always a unique non-zero <code class="computeroutput"><span class="identifier">size_t</span></code>
+            value<a href="#ftn.afio.design.overview.f0" class="footnote" name="afio.design.overview.f0"><sup class="footnote">[3]</sup></a>.
+          </li>
+<li class="listitem">
+            <a class="link" href="../reference/functions/when_all_ops.html" title="when_all() (ops)"><code class="computeroutput"><span class="identifier">when_all</span><span class="special">()</span></code></a> returns a future which will
+            become ready when all the ops passed in as input have completed. One
+            can therefore wait for a given set of ops to complete using <code class="computeroutput"><span class="identifier">when_all</span><span class="special">(</span><span class="identifier">ops</span><span class="special">).</span><span class="identifier">wait</span><span class="special">()</span></code>.
+          </li>
+<li class="listitem">
+            <a class="link" href="../reference/classes/async_file_io_dispatcher_base/barrier.html" title="barrier (batch)"><code class="computeroutput"><span class="identifier">async_file_io_dispatcher_base</span><span class="special">::</span><span class="identifier">barrier</span><span class="special">()</span></code></a>
+            schedules a synchronisation of its input batch of ops by only completing
+            any of its output batch (which is a duplicate of its input) when the
+            very last one of its inputs completes.
+          </li>
+</ul></div>
+<p>
+        Here were the design imperatives underpinning the AFIO design:
+      </p>
+<div class="orderedlist"><ol class="orderedlist" type="1">
+<li class="listitem">
+            Everything, absolutely everything happens asynchronously. If you want
+            synchronous, wait for the asynchronous operation to complete (and make
+            this easy to program, see above).
+          </li>
+<li class="listitem">
+            Everything, absolutely everything is batch. This is one of my big bugbears
+            with filing system API design: they do everything in units of a single
+            file operation at a time (with the notable exception of the <code class="computeroutput"><span class="identifier">readv</span><span class="special">()</span></code>
+            and <code class="computeroutput"><span class="identifier">writev</span><span class="special">()</span></code>
+            scatter/gather file i/o family of POSIX functions). Yet, and especially
+            if it's within the same directory, a batch API can be <span class="bold"><strong>very</strong></span>
+            significantly faster than a multitude of single APIs.
+            <p>
+              As much as AFIO is as constrained by the system-level filing system
+              API as anyone else, AFIO employs a thread pool as a crude universally
+              portable method of dispatching multiple filing system operations at
+              the same time. For those platforms which support a less crude method
+              of delivering batches of filing system operations e.g. an actual batch
+              API, that is used instead. Additionally, micro-kernel platforms are
+              always able to multiplex <span class="emphasis"><em>any</em></span> set of asynchronous
+              syscalls using a single thread, so for those platforms no thread pool
+              is needed at all.
+            </p>
+          </li>
+<li class="listitem">
+            Error reporting <span class="bold"><strong>always</strong></span> follows the
+            <span class="quote">&#8220;<span class="quote">earliest possible reporting</span>&#8221;</span> rule. As absolutely everything
+            is asynchronous in AFIO, that also means that exception handling also
+            occurs asynchronously. So how are exceptions delivered to something which
+            might make use of them? The rules are as follows:
+            <div class="orderedlist"><ol class="orderedlist" type="a">
+<li class="listitem">
+                  If you try to use an op reference as an input and that reference
+                  is errored at the point of use, the exception contained by that
+                  op is immediately rethrown.
+                </li>
+<li class="listitem">
+                  If you use an op reference that has not yet completed (and therefore
+                  its error state is currently unknown) as an input to a <code class="computeroutput"><span class="identifier">when_all</span><span class="special">()</span></code>
+                  function, and that input later errors during the wait, if that
+                  <code class="computeroutput"><span class="identifier">when_all</span><span class="special">()</span></code>
+                  function is not a <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">nothrow_t</span></code>
+                  variant the exception will be rethrown.
+                </li>
+<li class="listitem">
+                  If you schedule an operation with a precondition which errors,
+                  that exception is <span class="bold"><strong>NOT</strong></span> propagated
+                  to its dependencies. This is because you usually don't want that
+                  to happen e.g. if you run out of disc space during a write, you
+                  don't want all further operations to fail. If your dependent operation
+                  really needs to know if its preceding operation errored, just go
+                  ahead and check for it manually using the <code class="computeroutput"><span class="identifier">h</span></code>
+                  member which is a shared_ptr to a future -- if that future contains
+                  an exception, your precondition has errored.
+                </li>
+<li class="listitem">
+                  The only exception to the preceding rule is the <code class="computeroutput"><span class="identifier">barrier</span><span class="special">()</span></code> call which <span class="bold"><strong>DOES</strong></span>
+                  propagate errored state to its output. Something which catches
+                  a lot of people is that the first rule also applies to <code class="computeroutput"><span class="identifier">barrier</span><span class="special">()</span></code>,
+                  so if an input op is errored on entry to <code class="computeroutput"><span class="identifier">barrier</span><span class="special">()</span></code>, it rethrows there and then.
+                </li>
+</ol></div>
+          </li>
+<li class="listitem">
+            Keep things very, very simple for this first version of AFIO. That means
+            no direct ACL nor permissions support, no direct ability to cancel scheduled
+            operations, no direct ability to delay scheduling (e.g. on the basis
+            of a timer) etc. What you get is the bare essentials, but it is very
+            straightforward to wrap up functionality from <a href="http://www.boost.org/libs/filesystem/" target="_top">Boost.Filesystem</a>
+            or <a href="http://www.boost.org/libs/iostreams/" target="_top">Boost.Iostreams</a>
+            as an asynchronous closure operation using <a class="link" href="../reference/classes/async_file_io_dispatcher_base/call_2_batch_bound_functions.html" title="call (batch bound functions)"><code class="computeroutput"><span class="identifier">async_file_io_dispatcher_base</span><span class="special">::</span><span class="identifier">call</span><span class="special">()</span></code></a>,
+            and timers are provided already by <a href="http://www.boost.org/libs/asio/" target="_top">Boost.ASIO</a>
+            which can be wrapped as preconditions for other operations.
+            <p>
+              It also means that we use the native standard C++ library futures and
+              promises (or their Boost.Thread equivalents) plus other multithreading
+              facilities. These are not as fast as custom written support could be,
+              but they do have the big advantage of enabling easy interoperation
+              with other C++ code. Besides, as libraries such as Boost.AFIO start
+              to tax standard C++ library multithreading implementations in novel
+              ways, I am sure that the performance penalty will decrease over time.
+            </p>
+          </li>
+<li class="listitem">
+            Assume a certain amount of long-implemented C++11 features which have
+            been around for at least three years in all major compilers, like the
+            <code class="computeroutput"><span class="keyword">auto</span></code> keyword, move construction
+            (i.e. rvalue references) and lambdas (which are obviously useful for
+            convenient closure writing). This is important, because while AFIO won't
+            compile with C++03 compilers and probably never will (which some will
+            feel is a big problem), we can make use of returning fairly oblique and
+            lengthy to type return types which won't bother the programmer because
+            they'll be using <code class="computeroutput"><span class="keyword">auto</span></code> for
+            return types. Similarly, we pass around plenty of <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span><span class="identifier">async_io_op</span><span class="special">&gt;</span></code> by <span class="emphasis"><em>value</em></span> as
+            a convenient lightweight batch op container which would ordinarily be
+            suicidal for performance under C++03, but under C++11 the compiler simply
+            move constructs the contents by swapping as little as sixteen bytes
+            <a href="#ftn.afio.design.overview.f1" class="footnote" name="afio.design.overview.f1"><sup class="footnote">[4]</sup></a>. On top of that, passing around by value lets the compiler
+            easily perform alias optimisations with no need for a <code class="computeroutput"><span class="identifier">restrict</span></code>
+            keyword, so in general AFIO passes things around by value wherever possible
+            and lets the compiler figure out the optimal course of action.
+          </li>
+</ol></div>
+<div class="footnotes">
+<br><hr style="width:100; text-align:left;margin-left: 0">
+<div id="ftn.afio.design.overview.f0" class="footnote"><p><a href="#afio.design.overview.f0" class="para"><sup class="para">[3] </sup></a>
+              Until, that is, a <code class="computeroutput"><span class="identifier">size_t</span></code>
+              wraps. The code handles this correctly by the way, always ensuring
+              every newly allocated integer id is always non-zero and always not
+              yet in the hash table of currently known operations.
+            </p></div>
+<div id="ftn.afio.design.overview.f1" class="footnote"><p><a href="#afio.design.overview.f1" class="para"><sup class="para">[4] </sup></a>
+              Note that on older compilers with earlier versions of C++11 support,
+              automatic use of move construction where a copy constructor is also
+              available isn't implemented. We try to use <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">move</span><span class="special">()</span></code> where we can to help the compiler,
+              but in truth there is no substitute for a modern C++11 implementation.
+            </p></div>
+</div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2013 Niall Douglas and Paul Kirth<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../design.html"><img src="../../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../design.html"><img src="../../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="../compilation.html"><img src="../../../../../../doc/src/images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>
