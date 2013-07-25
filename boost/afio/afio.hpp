@@ -11,8 +11,6 @@ File Created: Mar 2013
 //#include "../NiallsCPP11Utilities/std_filesystem.hpp"
 #include <type_traits>
 #include <initializer_list>
-#include <thread>
-#include <atomic>
 #include <exception>
 #include <algorithm> // Boost.ASIO needs std::min and std::max
 #if !defined(_WIN32_WINNT) && defined(WIN32)
@@ -25,8 +23,23 @@ File Created: Mar 2013
 #include "boost/asio.hpp"
 #include "boost/thread/thread.hpp"
 #include "boost/thread/future.hpp"
+#include "boost/foreach.hpp"
+
+#if defined(_CPPLIB_VER) && _CPPLIB_VER <540 // Dinkumware without <atomic>
+#include <boost\atomic.hpp>
+typedef boost::thread thread; 
+#define BOOST_AFIO_USE_BOOST_ATOMIC
+#else
+#include <thread>
+#include <atomic>
+typedef std::thread thread;
+#endif
+
+
 #include "config.hpp"
 #include "detail/Utility.hpp"
+
+
 
 #if BOOST_VERSION<105300
 #error I absolutely need Boost v1.53 or higher to compile (I need lock free containers).
@@ -64,480 +77,16 @@ File Created: Mar 2013
 #pragma warning(disable: 4251) // type needs to have dll-interface to be used by clients of class
 #endif
 
-/*! \file async_file_io.hpp
-\brief Provides a batch asynchronous file i/o implementation based on Boost.ASIO
-
-My Seagate 7200rpm drive:
-
------------------------------------------------------------------------
-CrystalDiskMark 3.0.2 x64 (C) 2007-2013 hiyohiyo
-                           Crystal Dew World : http://crystalmark.info/
------------------------------------------------------------------------
-* MB/s = 1,000,000 byte/s [SATA/300 = 300,000,000 byte/s]
-
-           Sequential Read :    46.012 MB/s
-          Sequential Write :    44.849 MB/s
-         Random Read 512KB :    26.367 MB/s
-        Random Write 512KB :    23.521 MB/s
-    Random Read 4KB (QD=1) :     0.487 MB/s [   118.8 IOPS]
-   Random Write 4KB (QD=1) :     0.771 MB/s [   188.3 IOPS]
-   Random Read 4KB (QD=32) :     0.819 MB/s [   199.8 IOPS]
-  Random Write 4KB (QD=32) :     0.789 MB/s [   192.6 IOPS]
-
-  Test : 1000 MB [G: 99.0% (178.2/180.1 GB)] (x5)
-  Date : 2013/04/13 23:02:23
-    OS : Windows 8  [6.2 Build 9200] (x64)
-  
-
-Windows IOCP backend, 3.5Ghz Ivy Bridge Windows 8 x64 on 
-my Seagate 7200rpm drive:
-
-1000 file opens, writes 1 byte, closes, and deletes:
-It took 0.26311 secs to do all operations
-  It took 0.0079942 secs to dispatch all operations
-  It took 0.255116 secs to finish all operations
-
-It took 0.0899875 secs to do 11112.7 file opens per sec
-It took 0.0100023 secs to do 99977 file writes per sec
-It took 0.0210025 secs to do 47613.4 file closes per sec
-It took 0.142118 secs to do 7036.43 file deletions per sec
-
-
-1000 file opens, writes 64Kb, closes, and deletes:
-It took 1.01195 secs to do all operations
-  It took 0.0079939 secs to dispatch all operations
-  It took 1.00396 secs to finish all operations
-
-It took 0.10599 secs to do 9434.83 file opens per sec
-It took 0.0410053 secs to do 24387.1 file writes per sec
-It took 0.769099 secs to do 1300.22 file closes per sec
-It took 0.0958558 secs to do 10432.3 file deletions per sec
-
-
-1000 file opens, writes 1 byte, closes, and deletes with synchronous i/o:
-It took 9.28653 secs to do all operations
-  It took 0.142254 secs to dispatch all operations
-  It took 9.14427 secs to finish all operations
-
-It took 8.92534 secs to do 112.041 file opens per sec
-It took 0.112127 secs to do 8918.5 file writes per sec
-It took 0.177022 secs to do 5649.03 file closes per sec
-It took 0.0720397 secs to do 13881.2 file deletions per sec
-
-
-1000 file opens, writes 64Kb, closes, and deletes with synchronous i/o:
-It took 3.03522 secs to do all operations
-  It took 0.0212259 secs to dispatch all operations
-  It took 3.01399 secs to finish all operations
-
-It took 1.92052 secs to do 520.694 file opens per sec
-It took 0.0720104 secs to do 13886.9 file writes per sec
-It took 0.806102 secs to do 1240.54 file closes per sec
-It took 0.236588 secs to do 4226.75 file deletions per sec
-
-
-1000 file opens, writes 1 byte, closes, and deletes with autoflush i/o:
-It took 11.9628 secs to do all operations
-  It took 0.0080006 secs to dispatch all operations
-  It took 11.9548 secs to finish all operations
-
-It took 0.0940122 secs to do 10636.9 file opens per sec
-It took 0.46754 secs to do 2138.85 file writes per sec
-It took 11.2472 secs to do 88.9107 file closes per sec
-It took 0.154042 secs to do 6491.76 file deletions per sec
-
-
-1000 file opens, writes 64Kb, closes, and deletes with autoflush i/o:
-It took 14.5824 secs to do all operations
-  It took 0.0080019 secs to dispatch all operations
-  It took 14.5744 secs to finish all operations
-
-It took 0.0980132 secs to do 10202.7 file opens per sec
-It took 0.465669 secs to do 2147.45 file writes per sec
-It took 13.8906 secs to do 71.9913 file closes per sec
-It took 0.128166 secs to do 7802.36 file deletions per sec
-
-
-
-POSIX compat backend, 3.5Ghz Ivy Bridge Linux 3.2 x64 on 
-my Seagate 7200rpm drive:
-
-1000 file opens, writes 1 byte, closes, and deletes:
-It took 0.03907 secs to do all operations
-  It took 0.00425 secs to dispatch all operations
-  It took 0.03482 secs to finish all operations
-
-It took 0.015097 secs to do 66238.3 file opens per sec
-It took 0.009744 secs to do 102627 file writes per sec
-It took 0.008307 secs to do 120380 file closes per sec
-It took 0.005922 secs to do 168862 file deletions per sec
-
-
-1000 file opens, writes 64Kb, closes, and deletes:
-It took 0.039257 secs to do all operations
-  It took 0.004198 secs to dispatch all operations
-  It took 0.035059 secs to finish all operations
-
-It took 0.017462 secs to do 57267.2 file opens per sec
-It took 0.010241 secs to do 97646.7 file writes per sec
-It took 0.007234 secs to do 138236 file closes per sec
-It took 0.00432 secs to do 231481 file deletions per sec
-
-
-1000 file opens, writes 1 byte, closes, and deletes with synchronous i/o:
-It took 7.53982 secs to do all operations
-  It took 0.003997 secs to dispatch all operations
-  It took 7.53582 secs to finish all operations
-
-It took 6.35027 secs to do 157.473 file opens per sec
-It took 1.18224 secs to do 845.848 file writes per sec
-It took 0.005773 secs to do 173220 file closes per sec
-It took 0.001528 secs to do 654450 file deletions per sec
-
-
-1000 file opens, writes 64Kb, closes, and deletes with synchronous i/o:
-It took 7.97113 secs to do all operations
-  It took 0.004116 secs to dispatch all operations
-  It took 7.96701 secs to finish all operations
-
-It took 6.32829 secs to do 158.021 file opens per sec
-It took 1.63634 secs to do 611.12 file writes per sec
-It took 0.004897 secs to do 204207 file closes per sec
-It took 0.001605 secs to do 623053 file deletions per sec
-
-
-1000 file opens, writes 1 byte, closes, and deletes with autoflush i/o:
-It took 7.46535 secs to do all operations
-  It took 0.00405 secs to dispatch all operations
-  It took 7.4613 secs to finish all operations
-
-It took 6.30895 secs to do 158.505 file opens per sec
-It took 1.12623 secs to do 887.922 file writes per sec
-It took 0.02834 secs to do 35285.8 file closes per sec
-It took 0.001838 secs to do 544070 file deletions per sec
-
-
-1000 file opens, writes 64Kb, closes, and deletes with autoflush i/o:
-It took 8.0235 secs to do all operations
-  It took 0.00419 secs to dispatch all operations
-  It took 8.01931 secs to finish all operations
-
-It took 6.29931 secs to do 158.748 file opens per sec
-It took 1.68728 secs to do 592.67 file writes per sec
-It took 0.035096 secs to do 28493.3 file closes per sec
-It took 0.001815 secs to do 550964 file deletions per sec
-
-
-
-
-My Samsung 256Gb 830 SSD:
------------------------------------------------------------------------
-CrystalDiskMark 3.0.2 x64 (C) 2007-2013 hiyohiyo
-                           Crystal Dew World : http://crystalmark.info/
------------------------------------------------------------------------
-* MB/s = 1,000,000 byte/s [SATA/300 = 300,000,000 byte/s]
-
-           Sequential Read :   478.802 MB/s
-          Sequential Write :   406.425 MB/s
-         Random Read 512KB :   337.185 MB/s
-        Random Write 512KB :   390.353 MB/s
-    Random Read 4KB (QD=1) :    21.235 MB/s [  5184.4 IOPS]
-   Random Write 4KB (QD=1) :    58.373 MB/s [ 14251.1 IOPS]
-   Random Read 4KB (QD=32) :   301.170 MB/s [ 73527.7 IOPS]
-  Random Write 4KB (QD=32) :   148.339 MB/s [ 36215.5 IOPS]
-
-  Test : 1000 MB [C: 72.2% (57.3/79.4 GB)] (x5)
-  Date : 2013/04/13 23:10:09
-    OS : Windows 8  [6.2 Build 9200] (x64)
-
-
-Windows IOCP backend, 3.5Ghz Ivy Bridge Windows 8 x64 on 
-my Samsung 256Gb 830 SSD drive:
-
-1000 file opens, writes 1 byte, closes, and deletes:
-It took 0.187081 secs to do all operations
-  It took 0.0079831 secs to dispatch all operations
-  It took 0.179098 secs to finish all operations
-
-It took 0.0789921 secs to do 12659.5 file opens per sec
-It took 0.0110014 secs to do 90897.5 file writes per sec
-It took 0.0250035 secs to do 39994.4 file closes per sec
-It took 0.0720843 secs to do 13872.6 file deletions per sec
-
-
-1000 file opens, writes 64Kb, closes, and deletes:
-It took 0.924099 secs to do all operations
-  It took 0.007996 secs to dispatch all operations
-  It took 0.916103 secs to finish all operations
-
-It took 0.0859878 secs to do 11629.6 file opens per sec
-It took 0.0230033 secs to do 43472 file writes per sec
-It took 0.7571 secs to do 1320.83 file closes per sec
-It took 0.0580077 secs to do 17239.1 file deletions per sec
-
-
-1000 file opens, writes 1 byte, closes, and deletes with synchronous i/o:
-It took 2.98316 secs to do all operations
-  It took 0.0446 secs to dispatch all operations
-  It took 2.93856 secs to finish all operations
-
-It took 2.71914 secs to do 367.763 file opens per sec
-It took 0.0359893 secs to do 27786 file writes per sec
-It took 0.151021 secs to do 6621.6 file closes per sec
-It took 0.0770071 secs to do 12985.8 file deletions per sec
-
-
-1000 file opens, writes 64Kb, closes, and deletes with synchronous i/o:
-It took 1.65352 secs to do all operations
-  It took 0.0149789 secs to dispatch all operations
-  It took 1.63854 secs to finish all operations
-
-It took 0.714499 secs to do 1399.58 file opens per sec
-It took 0.0420066 secs to do 23805.8 file writes per sec
-It took 0.835109 secs to do 1197.45 file closes per sec
-It took 0.0619072 secs to do 16153.2 file deletions per sec
-
-
-1000 file opens, writes 1 byte, closes, and deletes with autoflush i/o:
-It took 2.70265 secs to do all operations
-  It took 0.0089945 secs to dispatch all operations
-  It took 2.69366 secs to finish all operations
-
-It took 0.0759873 secs to do 13160.1 file opens per sec
-It took 0.0334323 secs to do 29911.2 file writes per sec
-It took 2.46722 secs to do 405.315 file closes per sec
-It took 0.126015 secs to do 7935.54 file deletions per sec
-
-
-1000 file opens, writes 64Kb, closes, and deletes with autoflush i/o:
-It took 2.79222 secs to do all operations
-  It took 0.0079943 secs to dispatch all operations
-  It took 2.78422 secs to finish all operations
-
-It took 0.0829872 secs to do 12050.1 file opens per sec
-It took 0.0381194 secs to do 26233.4 file writes per sec
-It took 2.6111 secs to do 382.98 file closes per sec
-It took 0.0600064 secs to do 16664.9 file deletions per sec
-
-
-1000 file opens, writes 1 byte, closes, and deletes with direct i/o:
-It took 0.178027 secs to do all operations
-  It took 0.0070116 secs to dispatch all operations
-  It took 0.171015 secs to finish all operations
-
-It took 0.0629898 secs to do 15875.6 file opens per sec
-It took 0.0110008 secs to do 90902.5 file writes per sec
-It took 0.0190018 secs to do 52626.6 file closes per sec
-It took 0.0850346 secs to do 11759.9 file deletions per sec
-
-
-1000 file opens, writes 64Kb, closes, and deletes with direct i/o:
-It took 1.67592 secs to do all operations
-  It took 0.0169852 secs to dispatch all operations
-  It took 1.65893 secs to finish all operations
-
-It took 0.711476 secs to do 1405.53 file opens per sec
-It took 0.0163148 secs to do 61294 file writes per sec
-It took 0.890117 secs to do 1123.45 file closes per sec
-It took 0.058008 secs to do 17239 file deletions per sec
-
-
-1000 file opens, writes 1 byte, closes, and deletes with direct synchronous i/o:
-
-It took 0.309121 secs to do all operations
-  It took 0.00698 secs to dispatch all operations
-  It took 0.302141 secs to finish all operations
-
-It took 0.138198 secs to do 7235.99 file opens per sec
-It took 0.0142443 secs to do 70203.5 file writes per sec
-It took 0.0796398 secs to do 12556.5 file closes per sec
-It took 0.0770388 secs to do 12980.5 file deletions per sec
-
-
-1000 file opens, writes 64Kb, closes, and deletes with direct synchronous i/o:
-It took 1.95023 secs to do all operations
-  It took 0.020987 secs to dispatch all operations
-  It took 1.92924 secs to finish all operations
-
-It took 0.967097 secs to do 1034.02 file opens per sec
-It took 0.0290068 secs to do 34474.7 file writes per sec
-It took 0.901115 secs to do 1109.74 file closes per sec
-It took 0.0530077 secs to do 18865.2 file deletions per sec
-
-
-
-
-
-iozone -e -I -a -s 1000M -r 4k -r 512k -i 0 -i 1 -i 2
-                                                            random  random    bkwd   record   stride                                   
-              KB  reclen   write rewrite    read    reread    read   write    read  rewrite     read   fwrite frewrite   fread  freread
-         1024000       4    2528    3044    12000    11693   11337     931                                                          
-         1024000     512   17393   17039    68703    68524   67958    3881                                                          
-
-iozone -e -I -s 31M -r 4k -t 32 -T -i 0 -i 2
-
-        Children see throughput for 2 initial writers = 1502.15 KB/sec
-        Parent sees throughput for 2 initial writers = 1502.13 KB/sec
-        Min throughput per thread = 751.07 KB/sec
-        Max throughput per thread = 751.08 KB/sec
-        Avg throughput per thread = 751.07 KB/sec
-        Min xfer = 511992.00 KB
-
-        Children see throughput for 2 rewriters = 1537.12 KB/sec
-        Parent sees throughput for 2 rewriters = 1537.11 KB/sec
-        Min throughput per thread = 768.34 KB/sec
-        Max throughput per thread = 768.77 KB/sec
-        Avg throughput per thread = 768.56 KB/sec
-        Min xfer = 511716.00 KB
-
-        Children see throughput for 2 random readers = 9044.48 KB/sec
-        Parent sees throughput for 2 random readers = 9044.42 KB/sec
-        Min throughput per thread = 4521.79 KB/sec
-        Max throughput per thread = 4522.69 KB/sec
-        Avg throughput per thread = 4522.24 KB/sec
-        Min xfer = 511900.00 KB
-
-        Children see throughput for 2 random writers = 825.19 KB/sec
-        Parent sees throughput for 2 random writers = 825.14 KB/sec
-        Min throughput per thread = 412.52 KB/sec
-        Max throughput per thread = 412.67 KB/sec
-        Avg throughput per thread = 412.60 KB/sec
-        Min xfer = 511812.00 KB
-
-
-From these I infer:
-
-           Sequential Read :   67.09 MB/s
-          Sequential Write :   16.98 MB/s
-         Random Read 512KB :   66.36 MB/s
-        Random Write 512KB :    3.79 MB/s
-    Random Read 4KB (QD=1) :   11.42 MB/s [ 2834.3 IOPS]
-   Random Write 4KB (QD=1) :    0.91 MB/s [  232.8 IOPS]
-   Random Read 4KB (QD=32) :      ? MB/s  [      ? IOPS]
-  Random Write 4KB (QD=32) :      ? MB/s  [      ? IOPS]
-
-
-POSIX compat backend, 1.7Ghz ARM Cortex-A15 Linux 3.4 on 
-Samsung Chromebook eMMC internal drive:
-
-1000 file opens, writes 1 byte, closes, and deletes:
-It took 0.386876 secs to do all operations
-  It took 0.110156 secs to dispatch all operations
-  It took 0.27672 secs to finish all operations
-
-It took 0.181143 secs to do 5520.5 file opens per sec
-It took 0.094321 secs to do 10602.1 file writes per sec
-It took 0.070552 secs to do 14173.9 file closes per sec
-It took 0.04086 secs to do 24473.8 file deletions per sec
-
-
-1000 file opens, writes 64Kb, closes, and deletes:
-It took 0.425939 secs to do all operations
-  It took 0.147966 secs to dispatch all operations
-  It took 0.277973 secs to finish all operations
-
-It took 0.17901 secs to do 5586.28 file opens per sec
-It took 0.152722 secs to do 6547.85 file writes per sec
-It took 0.054538 secs to do 18335.8 file closes per sec
-It took 0.039669 secs to do 25208.6 file deletions per sec
-
-
-1000 file opens, writes 1 byte, closes, and deletes with synchronous i/o:
-It took 19.4941 secs to do all operations
-  It took 0.07904 secs to dispatch all operations
-  It took 19.4151 secs to finish all operations
-
-It took 13.323 secs to do 75.058 file opens per sec
-It took 6.06393 secs to do 164.909 file writes per sec
-It took 0.071753 secs to do 13936.7 file closes per sec
-It took 0.035389 secs to do 28257.4 file deletions per sec
-
-
-1000 file opens, writes 64Kb, closes, and deletes with synchronous i/o:
-It took 22.8757 secs to do all operations
-  It took 0.102336 secs to dispatch all operations
-  It took 22.7734 secs to finish all operations
-
-It took 5.35023 secs to do 186.908 file opens per sec
-It took 17.498 secs to do 57.1495 file writes per sec
-It took 0.014796 secs to do 67585.8 file closes per sec
-It took 0.012747 secs to do 78449.8 file deletions per sec
-
-
-1000 file opens, writes 1 byte, closes, and deletes with autoflush i/o:
-It took 13.2068 secs to do all operations
-  It took 0.085519 secs to dispatch all operations
-  It took 13.1213 secs to finish all operations
-
-It took 9.65411 secs to do 103.583 file opens per sec
-It took 3.40673 secs to do 293.537 file writes per sec
-It took 0.119205 secs to do 8388.91 file closes per sec
-It took 0.02677 secs to do 37355.2 file deletions per sec
-
-
-1000 file opens, writes 64Kb, closes, and deletes with autoflush i/o:
-It took 24.0624 secs to do all operations
-  It took 0.092833 secs to dispatch all operations
-  It took 23.9695 secs to finish all operations
-
-It took 12.9862 secs to do 77.0047 file opens per sec
-It took 10.8002 secs to do 92.5906 file writes per sec
-It took 0.219705 secs to do 4551.56 file closes per sec
-It took 0.05619 secs to do 17796.8 file deletions per sec
-
-
-1000 file opens, writes 1 byte, closes, and deletes with direct i/o:
-[Started testing]
-
-[Running: async_io/works/1/direct]
-unittests/main.cpp:266: !(((size_t) &towrite.front()) & 4095) failed with unexpected exception with message: 'Invalid argument (22) in 'triplegit/src/async_file_io.cpp':dowrite:884'
-[Finished: 'async_io/works/1/direct' 1 test case failed (1 of 2 assertions failed)]
-
-
-1000 file opens, writes 64Kb, closes, and deletes with direct i/o:
-It took 6.84248 secs to do all operations
-  It took 0.125639 secs to dispatch all operations
-  It took 6.71684 secs to finish all operations
-
-It took 0.204354 secs to do 4893.47 file opens per sec
-It took 6.58176 secs to do 151.935 file writes per sec
-It took 0.025033 secs to do 39947.3 file closes per sec
-It took 0.031331 secs to do 31917.3 file deletions per sec
-
-
-1000 file opens, writes 1 byte, closes, and deletes with direct synchronous i/o:
-It took 7.00683 secs to do all operations
-  It took 0.054578 secs to dispatch all operations
-  It took 6.95225 secs to finish all operations
-
-It took 6.88883 secs to do 145.163 file opens per sec
-It took 0.057979 secs to do 17247.6 file writes per sec
-It took 0.030898 secs to do 32364.6 file closes per sec
-It took 0.029125 secs to do 34334.8 file deletions per sec
-
-
-1000 file opens, writes 64Kb, closes, and deletes with direct synchronous i/o:
-It took 24.9112 secs to do all operations
-  It took 0.058847 secs to dispatch all operations
-  It took 24.8524 secs to finish all operations
-
-It took 11.8282 secs to do 84.5438 file opens per sec
-It took 13.0079 secs to do 76.8762 file writes per sec
-It took 0.057255 secs to do 17465.7 file closes per sec
-It took 0.017878 secs to do 55934.7 file deletions per sec
-
 // namespaces dont show up in documentation unless I also document the parent namespace
 // this is ok for now, but will need to be fixed when we improve the docs.
-*/
+
 //! \brief The namespace used by the Boost Libraries
 namespace boost {
 //! \brief The namespace containing the Boost.ASIO asynchronous file i/o implementation.
 namespace afio {
 
-#ifdef __GNUC__
+#ifdef __GNUC__ 
 typedef boost::thread thread;
-#else
-typedef std::thread thread;
 #endif
 
 // This isn't consistent on MSVC so hard code it
@@ -616,6 +165,49 @@ public:
 	packaged_task &operator=(packaged_task &&o) { static_cast<Base &&>(*this)=std::move(o); return *this; }
 };
 
+
+template <class T> 
+class atomic  
+#ifdef BOOST_AFIO_USE_BOOST_ATOMIC
+	: public boost::atomic<T>
+{
+	typedef boost::atomic<T> Base;
+#else
+	: public std::atomic<T>
+{
+	typedef std::atomic<T> Base;
+#endif
+
+public:
+	atomic(): Base() {}
+	BOOST_CONSTEXPR atomic(T v) BOOST_NOEXCEPT : Base(v) {}
+	T operator=(T v) volatile BOOST_NOEXCEPT { return Base::operator=(v); } 
+
+	//boost atomic doesn't have the non-volatile version
+#ifndef BOOST_AFIO_USE_BOOST_ATOMIC
+	T operator=(T v) BOOST_NOEXCEPT { return Base::operator=(v); }
+#endif
+
+#ifdef BOOST_NO_CXX11_DELETED_FUNCTIONS
+private:
+    atomic(const atomic &) /* =delete */ ;
+    atomic & operator=(const atomic &) volatile /* =delete */ ;
+
+#ifndef BOOST_AFIO_USE_BOOST_ATOMIC	
+	atomic& operator=(const atomic&);
+#endif
+
+#else
+    atomic(const atomic &) = delete;
+    atomic & operator=(const atomic &) volatile = delete;
+
+#ifndef BOOST_AFIO_USE_BOOST_ATOMIC	
+	atomic& operator=(const atomic&) = delete;
+#endif
+
+#endif
+};//end boost::afio::atomic
+
 /*! \class thread_pool
 \brief A very simple thread pool based on Boost.ASIO and std::thread
 */
@@ -646,8 +238,8 @@ public:
 	~thread_pool()
 	{
 		service.stop();
-		for(auto &i : workers)
-			i->join();
+		BOOST_FOREACH(auto &i, workers)
+        {	i->join();}
 	}
 	//! Returns the underlying io_service
 	boost::asio::io_service &io_service() { return service; }
@@ -742,7 +334,7 @@ namespace detail {
 		std::chrono::system_clock::time_point _opened;
 		std::filesystem::path _path; // guaranteed canonical
 	protected:
-		std::atomic<off_t> bytesread, byteswritten, byteswrittenatlastfsync;
+		atomic<off_t> bytesread, byteswritten, byteswrittenatlastfsync;
 		async_io_handle(async_file_io_dispatcher_base *parent, const std::filesystem::path &path) : _parent(parent), _opened(std::chrono::system_clock::now()), _path(path), bytesread(0), byteswritten(0), byteswrittenatlastfsync(0) { }
 	public:
 		virtual ~async_io_handle() { }
@@ -964,7 +556,7 @@ namespace detail
 {
 	struct when_all_count_completed_state
 	{
-		std::atomic<size_t> togo;
+		atomic<size_t> togo;
 		std::vector<std::shared_ptr<detail::async_io_handle>> out;
 		promise<std::vector<std::shared_ptr<detail::async_io_handle>>> done;
 		when_all_count_completed_state(size_t outsize) : togo(outsize), out(outsize) { }
@@ -984,8 +576,8 @@ namespace detail
 			bool done=false;
 			try
 			{
-				for(auto &i : state->out)
-					i.get();
+				BOOST_FOREACH(auto &i, state->out)
+                {	i.get();}
 			}
 			catch(...)
 			{
@@ -1010,8 +602,10 @@ inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(st
 	std::vector<std::pair<async_op_flags, std::function<async_file_io_dispatcher_base::completion_t>>> callbacks;
 	callbacks.reserve(inputs.size());
 	size_t idx=0;
-	for(auto &i : inputs)
-		callbacks.push_back(std::make_pair(async_op_flags::ImmediateCompletion, std::bind(&detail::when_all_count_completed_nothrow, std::placeholders::_1, std::placeholders::_2, state, idx++)));
+	BOOST_FOREACH(auto &i, inputs)
+    {	
+        callbacks.push_back(std::make_pair(async_op_flags::ImmediateCompletion, std::bind(&detail::when_all_count_completed_nothrow, std::placeholders::_1, std::placeholders::_2, state, idx++)));
+    }
 	inputs.front().parent->completion(inputs, callbacks);
 	return state->done.get_future();
 }
@@ -1025,8 +619,10 @@ inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(st
 	std::vector<std::pair<async_op_flags, std::function<async_file_io_dispatcher_base::completion_t>>> callbacks;
 	callbacks.reserve(inputs.size());
 	size_t idx=0;
-	for(auto &i : inputs)
-		callbacks.push_back(std::make_pair(async_op_flags::ImmediateCompletion, std::bind(&detail::when_all_count_completed, std::placeholders::_1, std::placeholders::_2, state, idx++)));
+	BOOST_FOREACH(auto &i, inputs)
+    {	
+        callbacks.push_back(std::make_pair(async_op_flags::ImmediateCompletion, std::bind(&detail::when_all_count_completed, std::placeholders::_1, std::placeholders::_2, state, idx++)));
+    }
 	inputs.front().parent->completion(inputs, callbacks);
 	return state->done.get_future();
 }
@@ -1035,8 +631,8 @@ inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(st
 {
 	std::vector<async_io_op> ops;
 	ops.reserve(_ops.size());
-	for(auto &&i : _ops)
-		ops.push_back(std::move(i));
+	BOOST_FOREACH(auto &&i, _ops)
+    {	ops.push_back(std::move(i));}
 	return when_all(_, ops.begin(), ops.end());
 }
 //! \brief Convenience overload for a list of async_io_op. Retrieves exceptions.
@@ -1044,8 +640,8 @@ inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(st
 {
 	std::vector<async_io_op> ops;
 	ops.reserve(_ops.size());
-	for(auto &&i : _ops)
-		ops.push_back(std::move(i));
+	BOOST_FOREACH(auto &&i, _ops)
+    {	ops.push_back(std::move(i));}
 	return when_all(ops.begin(), ops.end());
 }
 //! \brief Convenience overload for a single async_io_op.  Does not retrieve exceptions.
@@ -1118,7 +714,7 @@ template<> struct async_data_op_req<void> // For reading
 	{
 		if(!precondition.validate()) return false;
 		if(buffers.empty()) return false;
-		for(auto &b : buffers)
+		BOOST_FOREACH(auto &b, buffers)
 		{
 			if(!boost::asio::buffer_cast<const void *>(b) || !boost::asio::buffer_size(b)) return false;
 			if(!!(precondition.parent->fileflags(file_flags::None)&file_flags::OSDirect))
@@ -1145,8 +741,8 @@ template<> struct async_data_op_req<const void> // For writing
 	async_data_op_req() { }
 	async_data_op_req(const async_data_op_req &o) : precondition(o.precondition), buffers(o.buffers), where(o.where) { }
 	async_data_op_req(async_data_op_req &&o) : precondition(std::move(o.precondition)), buffers(std::move(o.buffers)), where(std::move(o.where)) { }
-	async_data_op_req(const async_data_op_req<void> &o) : precondition(o.precondition), where(o.where) { buffers.reserve(o.buffers.capacity()); for(auto &i: o.buffers) buffers.push_back(i); }
-	async_data_op_req(async_data_op_req<void> &&o) : precondition(std::move(o.precondition)), where(o.where) { buffers.reserve(o.buffers.capacity()); for(auto &&i: o.buffers) buffers.push_back(std::move(i)); }
+    async_data_op_req(const async_data_op_req<void> &o) : precondition(o.precondition), where(o.where) { buffers.reserve(o.buffers.capacity()); BOOST_FOREACH(auto &i, o.buffers){ buffers.push_back(i);} }
+    async_data_op_req(async_data_op_req<void> &&o) : precondition(std::move(o.precondition)), where(o.where) { buffers.reserve(o.buffers.capacity()); BOOST_FOREACH(auto &&i, o.buffers){ buffers.push_back(std::move(i)); }}
 	async_data_op_req &operator=(const async_data_op_req &o) { precondition=o.precondition; buffers=o.buffers; where=o.where; return *this; }
 	async_data_op_req &operator=(async_data_op_req &&o) { precondition=std::move(o.precondition); buffers=std::move(o.buffers); where=std::move(o.where); return *this; }
 	async_data_op_req(async_io_op _precondition, const void *_buffer, size_t _length, off_t _where) : precondition(std::move(_precondition)), where(_where) { buffers.reserve(1); buffers.push_back(boost::asio::const_buffer(_buffer, _length)); _validate(); }
@@ -1156,7 +752,7 @@ template<> struct async_data_op_req<const void> // For writing
 	{
 		if(!precondition.validate()) return false;
 		if(buffers.empty()) return false;
-		for(auto &b : buffers)
+		BOOST_FOREACH(auto &b , buffers)
 		{
 			if(!boost::asio::buffer_cast<const void *>(b) || !boost::asio::buffer_size(b)) return false;
 			if(!!(precondition.parent->fileflags(file_flags::None)&file_flags::OSDirect))
@@ -1296,7 +892,7 @@ template<class R> inline std::pair<std::vector<future<R>>, std::vector<async_io_
 		(*c)();
 		return std::make_pair(true, _);
 	};
-	for(auto &t : callables)
+	BOOST_FOREACH(auto &t, callables)
 	{
 		std::shared_ptr<tasktype> c(std::make_shared<tasktype>(std::function<R()>(t)));
 		retfutures.push_back(c->get_future());
