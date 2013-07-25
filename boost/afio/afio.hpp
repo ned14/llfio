@@ -239,7 +239,7 @@ public:
 	{
 		service.stop();
 		BOOST_FOREACH(auto &i, workers)
-			i->join();
+        {	i->join();}
 	}
 	//! Returns the underlying io_service
 	boost::asio::io_service &io_service() { return service; }
@@ -577,7 +577,7 @@ namespace detail
 			try
 			{
 				BOOST_FOREACH(auto &i, state->out)
-					i.get();
+                {	i.get();}
 			}
 			catch(...)
 			{
@@ -603,7 +603,7 @@ inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(st
 	callbacks.reserve(inputs.size());
 	size_t idx=0;
 	BOOST_FOREACH(auto &i, inputs)
-		callbacks.push_back(std::make_pair(async_op_flags::ImmediateCompletion, std::bind(&detail::when_all_count_completed_nothrow, std::placeholders::_1, std::placeholders::_2, state, idx++)));
+    {	callbacks.push_back(std::make_pair(async_op_flags::ImmediateCompletion, std::bind(&detail::when_all_count_completed_nothrow, std::placeholders::_1, std::placeholders::_2, state, idx++)));}
 	inputs.front().parent->completion(inputs, callbacks);
 	return state->done.get_future();
 }
@@ -618,7 +618,7 @@ inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(st
 	callbacks.reserve(inputs.size());
 	size_t idx=0;
 	BOOST_FOREACH(auto &i, inputs)
-		callbacks.push_back(std::make_pair(async_op_flags::ImmediateCompletion, std::bind(&detail::when_all_count_completed, std::placeholders::_1, std::placeholders::_2, state, idx++)));
+    {	callbacks.push_back(std::make_pair(async_op_flags::ImmediateCompletion, std::bind(&detail::when_all_count_completed, std::placeholders::_1, std::placeholders::_2, state, idx++)));}
 	inputs.front().parent->completion(inputs, callbacks);
 	return state->done.get_future();
 }
@@ -628,7 +628,7 @@ inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(st
 	std::vector<async_io_op> ops;
 	ops.reserve(_ops.size());
 	BOOST_FOREACH(auto &&i, _ops)
-		ops.push_back(std::move(i));
+    {	ops.push_back(std::move(i));}
 	return when_all(_, ops.begin(), ops.end());
 }
 //! \brief Convenience overload for a list of async_io_op. Retrieves exceptions.
@@ -637,7 +637,7 @@ inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(st
 	std::vector<async_io_op> ops;
 	ops.reserve(_ops.size());
 	BOOST_FOREACH(auto &&i, _ops)
-		ops.push_back(std::move(i));
+    {	ops.push_back(std::move(i));}
 	return when_all(ops.begin(), ops.end());
 }
 //! \brief Convenience overload for a single async_io_op.  Does not retrieve exceptions.
@@ -737,8 +737,8 @@ template<> struct async_data_op_req<const void> // For writing
 	async_data_op_req() { }
 	async_data_op_req(const async_data_op_req &o) : precondition(o.precondition), buffers(o.buffers), where(o.where) { }
 	async_data_op_req(async_data_op_req &&o) : precondition(std::move(o.precondition)), buffers(std::move(o.buffers)), where(std::move(o.where)) { }
-	async_data_op_req(const async_data_op_req<void> &o) : precondition(o.precondition), where(o.where) { buffers.reserve(o.buffers.capacity()); BOOST_FOREACH(auto &i, o.buffers) buffers.push_back(i); }
-	async_data_op_req(async_data_op_req<void> &&o) : precondition(std::move(o.precondition)), where(o.where) { buffers.reserve(o.buffers.capacity()); BOOST_FOREACH(auto &&i, o.buffers) buffers.push_back(std::move(i)); }
+    async_data_op_req(const async_data_op_req<void> &o) : precondition(o.precondition), where(o.where) { buffers.reserve(o.buffers.capacity()); BOOST_FOREACH(auto &i, o.buffers){ buffers.push_back(i);} }
+    async_data_op_req(async_data_op_req<void> &&o) : precondition(std::move(o.precondition)), where(o.where) { buffers.reserve(o.buffers.capacity()); BOOST_FOREACH(auto &&i, o.buffers){ buffers.push_back(std::move(i)); }}
 	async_data_op_req &operator=(const async_data_op_req &o) { precondition=o.precondition; buffers=o.buffers; where=o.where; return *this; }
 	async_data_op_req &operator=(async_data_op_req &&o) { precondition=std::move(o.precondition); buffers=std::move(o.buffers); where=std::move(o.where); return *this; }
 	async_data_op_req(async_io_op _precondition, const void *_buffer, size_t _length, off_t _where) : precondition(std::move(_precondition)), where(_where) { buffers.reserve(1); buffers.push_back(boost::asio::const_buffer(_buffer, _length)); _validate(); }
