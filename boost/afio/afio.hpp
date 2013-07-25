@@ -206,7 +206,7 @@ class atomic
 
 public:
 	atomic(): Base() {}
-	BOOST_CONSTEXPR atomic(T v) BOOST_NOEXCEPT : Base(std::forward<T> v) {}
+	BOOST_CONSTEXPR atomic(T v) BOOST_NOEXCEPT : Base(std::forward<T>(v)) {}
 	
 #ifdef BOOST_NO_CXX11_DELETED_FUNCTIONS
 private:
