@@ -238,11 +238,11 @@ size_t async_file_io_dispatcher_base::page_size() BOOST_NOEXCEPT_OR_NOTHROW
 	return pagesize;
 }
 
-thread_pool &process_threadpool()
+std_thread_pool &process_threadpool()
 {
 	// This is basically how many file i/o operations can occur at once
 	// Obviously the kernel also has a limit
-	static thread_pool ret(BOOST_AFIO_MAX_NON_ASYNC_QUEUE_DEPTH);
+	static std_thread_pool ret(BOOST_AFIO_MAX_NON_ASYNC_QUEUE_DEPTH);
 	return ret;
 }
 
@@ -371,7 +371,7 @@ namespace detail {
 	};
 	struct async_file_io_dispatcher_base_p
 	{
-		thread_pool &pool;
+		thread_source &pool;
 		file_flags flagsforce, flagsmask;
 
 		typedef boost::detail::spinlock fdslock_t;
@@ -379,7 +379,7 @@ namespace detail {
 		fdslock_t fdslock; std::unordered_map<void *, std::weak_ptr<async_io_handle>> fds;
 		opslock_t opslock; size_t monotoniccount; std::unordered_map<size_t, async_file_io_dispatcher_op> ops;
 
-		async_file_io_dispatcher_base_p(thread_pool &_pool, file_flags _flagsforce, file_flags _flagsmask) : pool(_pool),
+		async_file_io_dispatcher_base_p(thread_source &_pool, file_flags _flagsforce, file_flags _flagsmask) : pool(_pool),
 			flagsforce(_flagsforce), flagsmask(_flagsmask), monotoniccount(0)
 		{
 			// Boost's spinlock is so lightweight it has no constructor ...
@@ -423,7 +423,7 @@ namespace detail {
 	};
 }
 
-async_file_io_dispatcher_base::async_file_io_dispatcher_base(thread_pool &threadpool, file_flags flagsforce, file_flags flagsmask) : p(new detail::async_file_io_dispatcher_base_p(threadpool, flagsforce, flagsmask))
+async_file_io_dispatcher_base::async_file_io_dispatcher_base(thread_source &threadpool, file_flags flagsforce, file_flags flagsmask) : p(new detail::async_file_io_dispatcher_base_p(threadpool, flagsforce, flagsmask))
 {
 }
 
@@ -465,7 +465,7 @@ void async_file_io_dispatcher_base::int_del_io_handle(void *key)
 	ANNOTATE_RWLOCK_RELEASED(&p->fdslock, 1);
 }
 
-thread_pool &async_file_io_dispatcher_base::threadpool() const
+thread_source &async_file_io_dispatcher_base::threadsource() const
 {
 	return p->pool;
 }
@@ -562,10 +562,10 @@ void async_file_io_dispatcher_base::complete_async_op(size_t id, std::shared_ptr
 				if(it->second.detached_promise)
 				{
 					*it->second.h=it->second.detached_promise->get_future();
-					threadpool().enqueue(std::bind(c.second, h));
+					threadsource().enqueue(std::bind(c.second, h));
 				}
 				else
-					*it->second.h=threadpool().enqueue(std::bind(c.second, h));
+					*it->second.h=threadsource().enqueue(std::bind(c.second, h));
 			}
 			BOOST_AFIO_DEBUG_PRINT("C %u > %u %p\n", (unsigned) id, (unsigned) c.first, h.get());
 		}
@@ -710,7 +710,7 @@ template<class F, class... Args> async_io_op async_file_io_dispatcher_base::chai
 		if(!!(flags & async_op_flags::ImmediateCompletion))
 			*ret.h=immediates.enqueue(std::bind(boundf.second, h)).share();
 		else
-			*ret.h=threadpool().enqueue(std::bind(boundf.second, h)).share();
+			*ret.h=threadsource().enqueue(std::bind(boundf.second, h)).share();
 	}
 	auto opsit=p->ops.insert(std::make_pair(thisid, detail::async_file_io_dispatcher_op((detail::OpType) optype, flags, ret.h)));
 	assert(opsit.second);
@@ -1115,7 +1115,7 @@ namespace detail {
 		}
 
 	public:
-		async_file_io_dispatcher_windows(thread_pool &threadpool, file_flags flagsforce, file_flags flagsmask) : async_file_io_dispatcher_base(threadpool, flagsforce, flagsmask), pagesize(page_size())
+		async_file_io_dispatcher_windows(thread_source &threadpool, file_flags flagsforce, file_flags flagsmask) : async_file_io_dispatcher_base(threadpool, flagsforce, flagsmask), pagesize(page_size())
 		{
 		}
 
@@ -1419,7 +1419,7 @@ namespace detail {
 
 
 	public:
-		async_file_io_dispatcher_compat(thread_pool &threadpool, file_flags flagsforce, file_flags flagsmask) : async_file_io_dispatcher_base(threadpool, flagsforce, flagsmask)
+		async_file_io_dispatcher_compat(thread_source &threadpool, file_flags flagsforce, file_flags flagsmask) : async_file_io_dispatcher_base(threadpool, flagsforce, flagsmask)
 		{
 		}
 
@@ -1508,7 +1508,7 @@ namespace detail {
 	};
 }
 
-std::shared_ptr<async_file_io_dispatcher_base> async_file_io_dispatcher(thread_pool &threadpool, file_flags flagsforce, file_flags flagsmask)
+std::shared_ptr<async_file_io_dispatcher_base> make_async_file_io_dispatcher(thread_source &threadpool, file_flags flagsforce, file_flags flagsmask)
 {
 #if defined(WIN32) && !defined(USE_POSIX_ON_WIN32)
 	return std::make_shared<detail::async_file_io_dispatcher_windows>(threadpool, flagsforce, flagsmask);

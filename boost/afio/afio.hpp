@@ -180,42 +180,17 @@ public:
 	packaged_task &operator=(packaged_task &&o) { static_cast<Base &&>(*this)=std::move(o); return *this; }
 };
 
-/*! \class thread_pool
-\brief A very simple thread pool based on Boost.ASIO and std::thread
+/*! \class thread_source
+\brief A source of thread workers
 */
-class thread_pool {
-	class worker
-	{
-		thread_pool *pool;
-	public:
-		explicit worker(thread_pool *p) : pool(p) { }
-		void operator()()
-		{
-			pool->service.run();
-		}
-	};
-	friend class worker;
-
-	std::vector< std::unique_ptr<thread> > workers;
+class thread_source {
+protected:
 	boost::asio::io_service service;
 	boost::asio::io_service::work working;
+	thread_source() : working(service)
+	{
+	}
 public:
-	/*! Constructs a thread pool of \em no workers
-    \param no The number of worker threads to create
-    */
-	explicit thread_pool(size_t no) : working(service)
-	{
-		workers.reserve(no);
-		for(size_t n=0; n<no; n++)
-			workers.push_back(std::unique_ptr<thread>(new thread(worker(this))));
-	}
-    //! Destroys the thread pool, waiting for worker threads to exit beforehand.
-	~thread_pool()
-	{
-		service.stop();
-		for(auto &i : workers)
-			i->join();
-	}
 	//! Returns the underlying io_service
 	boost::asio::io_service &io_service() { return service; }
 	//! Sends some callable entity to the thread pool for execution
@@ -229,12 +204,48 @@ public:
 		return task->get_future();
 	}
 };
+
+/*! \class std_thread_pool
+\brief A very simple thread pool based on std::thread or boost::thread
+*/
+class std_thread_pool : public thread_source {
+	class worker
+	{
+		std_thread_pool *pool;
+	public:
+		explicit worker(std_thread_pool *p) : pool(p) { }
+		void operator()()
+		{
+			pool->service.run();
+		}
+	};
+	friend class worker;
+
+	std::vector< std::unique_ptr<thread> > workers;
+public:
+	/*! Constructs a thread pool of \em no workers
+    \param no The number of worker threads to create
+    */
+	explicit std_thread_pool(size_t no)
+	{
+		workers.reserve(no);
+		for(size_t n=0; n<no; n++)
+			workers.push_back(std::unique_ptr<thread>(new thread(worker(this))));
+	}
+    //! Destroys the thread pool, waiting for worker threads to exit beforehand.
+	~std_thread_pool()
+	{
+		service.stop();
+		for(auto &i : workers)
+			i->join();
+	}
+};
 /*! \brief Returns the process threadpool
 
-On first use, this instantiates a default thread_pool running eight threads.
+On first use, this instantiates a default std_thread_pool running eight threads.
 \ingroup process_threadpool
 */
-extern BOOST_AFIO_DECL thread_pool &process_threadpool();
+extern BOOST_AFIO_DECL std_thread_pool &process_threadpool();
 
 namespace detail {
 	template<class returns_t, class future_type> inline returns_t when_all_do(std::shared_ptr<std::vector<future_type>> futures)
@@ -445,7 +456,7 @@ Construct an instance using the `boost::afio::async_file_io_dispatcher()` functi
 */
 class BOOST_AFIO_DECL async_file_io_dispatcher_base : public std::enable_shared_from_this<async_file_io_dispatcher_base>
 {
-	//friend BOOST_AFIO_DECL std::shared_ptr<async_file_io_dispatcher_base> async_file_io_dispatcher(thread_pool &threadpool=process_threadpool(), file_flags flagsforce=file_flags::None, file_flags flagsmask=file_flags::None);
+	//friend BOOST_AFIO_DECL std::shared_ptr<async_file_io_dispatcher_base> async_file_io_dispatcher(thread_source &threadpool=process_threadpool(), file_flags flagsforce=file_flags::None, file_flags flagsmask=file_flags::None);
 	friend struct detail::async_io_handle_posix;
 	friend struct detail::async_io_handle_windows;
 	friend class detail::async_file_io_dispatcher_compat;
@@ -457,13 +468,13 @@ class BOOST_AFIO_DECL async_file_io_dispatcher_base : public std::enable_shared_
 	void int_add_io_handle(void *key, std::shared_ptr<detail::async_io_handle> h);
 	void int_del_io_handle(void *key);
 protected:
-	async_file_io_dispatcher_base(thread_pool &threadpool, file_flags flagsforce, file_flags flagsmask);
+	async_file_io_dispatcher_base(thread_source &threadpool, file_flags flagsforce, file_flags flagsmask);
 public:
 	//! Destroys the dispatcher, blocking inefficiently if any ops are still in flight.
 	virtual ~async_file_io_dispatcher_base();
 
-	//! Returns the thread pool used by this dispatcher
-	thread_pool &threadpool() const;
+	//! Returns the thread source used by this dispatcher
+	thread_source &threadsource() const;
 	//! Returns file flags as would be used after forcing and masking bits passed during construction
 	file_flags fileflags(file_flags flags) const;
 	//! Returns the current wait queue depth of this dispatcher
@@ -842,7 +853,7 @@ For slow hard drives, or worse, SANs, a queue depth of 64 or higher might delive
 [call_example]
 }
 */
-extern BOOST_AFIO_DECL std::shared_ptr<async_file_io_dispatcher_base> async_file_io_dispatcher(thread_pool &threadpool=process_threadpool(), file_flags flagsforce=file_flags::None, file_flags flagsmask=file_flags::None);
+extern BOOST_AFIO_DECL std::shared_ptr<async_file_io_dispatcher_base> make_async_file_io_dispatcher(thread_source &threadpool=process_threadpool(), file_flags flagsforce=file_flags::None, file_flags flagsmask=file_flags::None);
 
 /*! \struct async_io_op
 \brief A reference to an asynchronous operation
