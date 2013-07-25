@@ -115,7 +115,7 @@ ssize_t preadv(int fd, const struct iovec *iov, int iovcnt, boost::afio::off_t o
 	if(-1==_lseeki64(fd, offset, SEEK_SET)) return -1;
 	for(; iovcnt; iov++, iovcnt--, at+=(boost::afio::off_t) transferred)
 		if(-1==(transferred=_read(fd, iov->iov_base, (unsigned) iov->iov_len))) return -1;
-	return at-offset;
+	return (ssize_t)(at-offset);
 }
 ssize_t pwritev(int fd, const struct iovec *iov, int iovcnt, boost::afio::off_t offset)
 {
@@ -125,7 +125,7 @@ ssize_t pwritev(int fd, const struct iovec *iov, int iovcnt, boost::afio::off_t 
 	if(-1==_lseeki64(fd, offset, SEEK_SET)) return -1;
 	for(; iovcnt; iov++, iovcnt--, at+=(boost::afio::off_t) transferred)
 		if(-1==(transferred=_write(fd, iov->iov_base, (unsigned) iov->iov_len))) return -1;
-	return at-offset;
+	return (ssize_t)(at-offset);
 }
 #endif
 
@@ -832,11 +832,11 @@ namespace detail {
 		completion_returntype dosync(size_t id, std::shared_ptr<detail::async_io_handle> h, async_io_op)
 		{
 			async_io_handle_windows *p=static_cast<async_io_handle_windows *>(h.get());
-			size_t bytestobesynced=p->write_count_since_fsync();
+			off_t bytestobesynced=p->write_count_since_fsync();
 			assert(p);
 			if(bytestobesynced)
 				BOOST_AFIO_ERRHWINFN(FlushFileBuffers(p->h->native_handle()), p->path());
-			p->byteswrittenatlastfsync+=(long) bytestobesynced;
+			p->byteswrittenatlastfsync+=bytestobesynced;
 			return std::make_pair(true, h);
 		}
 		// Called in unknown thread
@@ -1140,11 +1140,11 @@ namespace detail {
 		completion_returntype dosync(size_t id, std::shared_ptr<detail::async_io_handle> h, async_io_op)
 		{
 			async_io_handle_posix *p=static_cast<async_io_handle_posix *>(h.get());
-			size_t bytestobesynced=p->write_count_since_fsync();
+			off_t bytestobesynced=p->write_count_since_fsync();
 			if(bytestobesynced)
 				BOOST_AFIO_ERRHOSFN(BOOST_AFIO_POSIX_FSYNC(p->fd), p->path());
 			p->has_ever_been_fsynced=true;
-			p->byteswrittenatlastfsync+=(long) bytestobesynced;
+			p->byteswrittenatlastfsync+=bytestobesynced;
 			return std::make_pair(true, h);
 		}
 		// Called in unknown thread

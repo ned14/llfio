@@ -32,6 +32,7 @@ lib boost_afio
       <toolset>gcc:<cxxflags>"-std=c++0x -fvisibility-inlines-hidden -fstrict-aliasing -Wstrict-aliasing -Wno-unused -fargument-noalias -fvisibility=hidden -fopenmp"
       <toolset>gcc:<linkflags>"-lgomp"
       <toolset>gcc-mingw:<cxxflags>"-march=i686 -DWIN32 -D_UNICODE -DUNICODE"
+      <toolset>gcc-mingw:<linkflags>"-lws2_32"
       <toolset>clang:<cxxflags>"-std=c++0x -fvisibility-inlines-hidden -fstrict-aliasing -Wstrict-aliasing -Wno-unused -fargument-noalias -fvisibility=hidden -fopenmp"
       <toolset>msvc:<cxxflags>/openmp
       <toolset>msvc:<cxxflags>"/openmp /EHsc /GF /Gy "
@@ -44,7 +45,6 @@ lib boost_afio
       #OS specific dependencies
       <target-os>linux:<linkflags>"-lpthread"
       <target-os>freebsd:<linkflags>"-lpthread"
-      <target-os>windows:<linkflags>"-lws2_32"
       <link>shared:<define>BOOST_AFIO_DYN_LINK=1
       <link>shared:<library>../../system/build//boost_system
       <link>shared:<library>../../filesystem/build//boost_filesystem
