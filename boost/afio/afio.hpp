@@ -185,7 +185,7 @@ public:
 
 	//boost atomic doesn't have the non-volatile version
 #ifndef BOOST_AFIO_USE_BOOST_ATOMIC
-	T operator=(T v) BOOST_NOEXECPT { return Base::operator=(v); }
+	T operator=(T v) BOOST_NOEXCEPT { return Base::operator=(v); }
 #endif
 
 #ifdef BOOST_NO_CXX11_DELETED_FUNCTIONS
@@ -194,7 +194,7 @@ private:
     atomic & operator=(const atomic &) volatile /* =delete */ ;
 
 #ifndef BOOST_AFIO_USE_BOOST_ATOMIC	
-	atomic& operator=const atomic&);
+	atomic& operator=(const atomic&);
 #endif
 
 #else
@@ -202,7 +202,7 @@ private:
     atomic & operator=(const atomic &) volatile = delete;
 
 #ifndef BOOST_AFIO_USE_BOOST_ATOMIC	
-	atomic& operator=const atomic&) = delete;
+	atomic& operator=(const atomic&) = delete;
 #endif
 
 #endif
