@@ -6,11 +6,6 @@ Created: Feb 2013
 // If defined, uses a ton more memory and is many orders of magnitude slower.
 #define DEBUG_TORTURE_TEST 1
 
-// Get Boost.ASIO on Windows IOCP working
-#if defined(_DEBUG) && defined(WIN32)
-#define BOOST_ASIO_BUG_WORKAROUND 1
-#endif
-
 #ifdef __MINGW32__
 // Mingw doesn't define putenv() needed by Boost.Test
 extern int putenv(char*);
@@ -62,7 +57,7 @@ void raninit( ranctx *x, u4 seed ) {
 
 BOOST_AUTO_TEST_SUITE(all)
     BOOST_AUTO_TEST_SUITE(exclude_async_io_errors)
-       
+
         static int task()
         {
                 boost::afio::thread::id this_id = boost::afio::get_this_thread_id();
@@ -503,9 +498,7 @@ BOOST_AUTO_TEST_SUITE(all)
                 // SHA256 out the results
                 // We then replay the same with real storage to see if it matches
                 auto begin=std::chrono::high_resolution_clock::now();
-        #ifndef BOOST_ASIO_BUG_WORKAROUND
         #pragma omp parallel for
-        #endif
                 for(ptrdiff_t n=0; n<(ptrdiff_t) no; n++)
                 {
                         ranctx gen;
@@ -528,17 +521,10 @@ BOOST_AUTO_TEST_SUITE(all)
         #else
                                 ranctx writeseed=op.seed=gen;
         #endif
-        #ifdef BOOST_ASIO_BUG_WORKAROUND
-                                //if(toissue>4) toissue=4;
-                                toissue=1; // clamp for now. I think Boost.ASIO on Win IOCP seems to dislike more than one buffer at a time ?!?
-        #endif
                                 for(m=0; m<toissue; m++)
                                 {
                                         u4 s=ranval(&gen) & ((256*1024-1)&~63); // Must be a multiple of 64 bytes for SHA256
                                         if(s<64) s=64;
-        #ifdef BOOST_ASIO_BUG_WORKAROUND
-                                        if(s>65536) s=65536; // clamp for now. I think Boost.ASIO won't transfer more than 64Kb at a time anyway ... ?!?
-        #endif
                                         if(alignment)
                                                 s=(s+4095)&~(alignment-1);
                                         if(thisbytes+s>1024*1024) break;
@@ -668,9 +654,7 @@ BOOST_AUTO_TEST_SUITE(all)
                         }
                         return make_pair(true, h);
                 };
-        #ifndef BOOST_ASIO_BUG_WORKAROUND
         #pragma omp parallel for
-        #endif
                 for(ptrdiff_t n=0; n<(ptrdiff_t) no; n++)
                 {
                         for(Op &op : todo[n])
@@ -796,11 +780,7 @@ BOOST_AUTO_TEST_SUITE(all)
              BOOST_TEST_MESSAGE("Tortures the async i/o implementation");
                 auto dispatcher=boost::afio::async_file_io_dispatcher(boost::afio::process_threadpool(), boost::afio::file_flags::None);
                 std::cout << "\n\nSustained random i/o to 10 files of 10Mb:\n";
-        #ifdef BOOST_ASIO_BUG_WORKAROUND
-                evil_random_io(dispatcher, 1, 10*1024*1024);
-        #else
                 evil_random_io(dispatcher, 10, 10*1024*1024);
-        #endif
         }
 
         BOOST_AUTO_TEST_CASE(async_io_torture_sync)

@@ -317,54 +317,6 @@ struct async_io_op;
 struct async_path_op_req;
 template<class T> struct async_data_op_req;
 
-namespace detail {
-
-	struct async_io_handle_posix;
-	struct async_io_handle_windows;
-	struct async_file_io_dispatcher_base_p;
-	class async_file_io_dispatcher_compat;
-	class async_file_io_dispatcher_windows;
-	class async_file_io_dispatcher_linux;
-	class async_file_io_dispatcher_qnx;
-	/*! \brief The abstract base class encapsulating a platform-specific file handle
-    */
-	class async_io_handle : public std::enable_shared_from_this<async_io_handle>
-	{
-		friend class async_file_io_dispatcher_base;
-		friend struct async_io_handle_posix;
-		friend struct async_io_handle_windows;
-		friend class async_file_io_dispatcher_compat;
-		friend class async_file_io_dispatcher_windows;
-		friend class async_file_io_dispatcher_linux;
-		friend class async_file_io_dispatcher_qnx;
-
-		async_file_io_dispatcher_base *_parent;
-		std::chrono::system_clock::time_point _opened;
-		std::filesystem::path _path; // guaranteed canonical
-	protected:
-		std::atomic<off_t> bytesread, byteswritten, byteswrittenatlastfsync;
-		async_io_handle(async_file_io_dispatcher_base *parent, const std::filesystem::path &path) : _parent(parent), _opened(std::chrono::system_clock::now()), _path(path), bytesread(0), byteswritten(0), byteswrittenatlastfsync(0) { }
-	public:
-		virtual ~async_io_handle() { }
-		//! Returns the parent of this io handle
-		async_file_io_dispatcher_base *parent() const { return _parent; }
-		//! Returns the native handle of this io handle. On POSIX, you can cast this to a fd using `(int)(size_t) native_handle()`. On Windows it's a simple `(HANDLE) native_handle()`.
-		virtual void *native_handle() const=0;
-		//! Returns when this handle was opened
-		const std::chrono::system_clock::time_point &opened() const { return _opened; }
-		//! Returns the path of this io handle
-		const std::filesystem::path &path() const { return _path; }
-		//! Returns how many bytes have been read since this handle was opened.
-		off_t read_count() const { return bytesread; }
-		//! Returns how many bytes have been written since this handle was opened.
-		off_t write_count() const { return byteswritten; }
-		//! Returns how many bytes have been written since this handle was last fsynced.
-		off_t write_count_since_fsync() const { return byteswritten-byteswrittenatlastfsync; }
-	};
-	struct immediate_async_ops;
-}
-
-
 #define BOOST_AFIO_DECLARE_CLASS_ENUM_AS_BITFIELD(type) \
 inline constexpr type operator&(type a, type b) \
 { \
@@ -424,6 +376,57 @@ enum class async_op_flags : size_t
 	ImmediateCompletion=2	//!< Call chained completion immediately instead of scheduling for later. Make SURE your completion can not block!
 };
 BOOST_AFIO_DECLARE_CLASS_ENUM_AS_BITFIELD(async_op_flags)
+
+
+namespace detail {
+
+	struct async_io_handle_posix;
+	struct async_io_handle_windows;
+	struct async_file_io_dispatcher_base_p;
+	class async_file_io_dispatcher_compat;
+	class async_file_io_dispatcher_windows;
+	class async_file_io_dispatcher_linux;
+	class async_file_io_dispatcher_qnx;
+	/*! \brief The abstract base class encapsulating a platform-specific file handle
+	*/
+	class async_io_handle : public std::enable_shared_from_this<async_io_handle>
+	{
+		friend class async_file_io_dispatcher_base;
+		friend struct async_io_handle_posix;
+		friend struct async_io_handle_windows;
+		friend class async_file_io_dispatcher_compat;
+		friend class async_file_io_dispatcher_windows;
+		friend class async_file_io_dispatcher_linux;
+		friend class async_file_io_dispatcher_qnx;
+
+		async_file_io_dispatcher_base *_parent;
+		std::chrono::system_clock::time_point _opened;
+		std::filesystem::path _path; // guaranteed canonical
+		file_flags _flags;
+	protected:
+		std::atomic<off_t> bytesread, byteswritten, byteswrittenatlastfsync;
+		async_io_handle(async_file_io_dispatcher_base *parent, const std::filesystem::path &path, file_flags flags) : _parent(parent), _opened(std::chrono::system_clock::now()), _flags(flags), _path(path), bytesread(0), byteswritten(0), byteswrittenatlastfsync(0) { }
+	public:
+		virtual ~async_io_handle() { }
+		//! Returns the parent of this io handle
+		async_file_io_dispatcher_base *parent() const { return _parent; }
+		//! Returns the native handle of this io handle. On POSIX, you can cast this to a fd using `(int)(size_t) native_handle()`. On Windows it's a simple `(HANDLE) native_handle()`.
+		virtual void *native_handle() const=0;
+		//! Returns when this handle was opened
+		const std::chrono::system_clock::time_point &opened() const { return _opened; }
+		//! Returns the path of this io handle
+		const std::filesystem::path &path() const { return _path; }
+		//! Returns the final flags used when this handle was opened
+		file_flags flags() const { return _flags; }
+		//! Returns how many bytes have been read since this handle was opened.
+		off_t read_count() const { return bytesread; }
+		//! Returns how many bytes have been written since this handle was opened.
+		off_t write_count() const { return byteswritten; }
+		//! Returns how many bytes have been written since this handle was last fsynced.
+		off_t write_count_since_fsync() const { return byteswritten-byteswrittenatlastfsync; }
+	};
+	struct immediate_async_ops;
+}
 
 
 /*! \class async_file_io_dispatcher_base
@@ -688,6 +691,8 @@ public:
 	inline async_io_op close(const async_io_op &req);
 
 	/*! \brief Schedule a batch of asynchronous data reads after preceding operations.
+
+	\direct_io_note
     \return A batch of op handles.
     \param ops A batch of `async_data_op_req<void>` structures.
     \ingroup async_file_io_dispatcher_base__filedirops
@@ -698,7 +703,9 @@ public:
     */
 	virtual std::vector<async_io_op> read(const std::vector<async_data_op_req<void>> &ops)=0;
 	/*! \brief Schedule an asynchronous data read after a preceding operation.
-    \return An op handle.
+
+	\direct_io_note
+	\return An op handle.
     \param req An `async_data_op_req<void>` structure.
     \ingroup async_file_io_dispatcher_base__filedirops
     \qbk{distinguish, single}
@@ -708,7 +715,9 @@ public:
     */
 	inline async_io_op read(const async_data_op_req<void> &req);
 	/*! \brief Schedule a batch of asynchronous data reads after preceding operations.
-    \return A batch of op handles.
+
+	\direct_io_note
+	\return A batch of op handles.
     \tparam "class T" Any arbitrary type.
     \param ops A batch of `async_data_op_req<T>` structures.
     \ingroup async_file_io_dispatcher_base__filedirops
@@ -719,7 +728,9 @@ public:
     */
 	template<class T> inline std::vector<async_io_op> read(const std::vector<async_data_op_req<T>> &ops);
 	/*! \brief Schedule a batch of asynchronous data writes after preceding operations.
-    \return A batch of op handles.
+
+	\direct_io_note
+	\return A batch of op handles.
     \param ops A batch of `async_data_op_req<const void>` structures.
     \ingroup async_file_io_dispatcher_base__filedirops
     \qbk{distinguish, batch}
@@ -729,7 +740,9 @@ public:
     */
 	virtual std::vector<async_io_op> write(const std::vector<async_data_op_req<const void>> &ops)=0;
 	/*! \brief Schedule an asynchronous data write after a preceding operation.
-    \return An op handle.
+
+	\direct_io_note
+	\return An op handle.
     \param req An `async_data_op_req<const void>` structure.
     \ingroup async_file_io_dispatcher_base__filedirops
     \qbk{distinguish, single}
@@ -739,7 +752,9 @@ public:
     */
 	inline async_io_op write(const async_data_op_req<const void> &req);
 	/*! \brief Schedule a batch of asynchronous data writes after preceding operations.
-    \return A batch of op handles.
+
+	\direct_io_note
+	\return A batch of op handles.
     \tparam "class T" Any arbitrary type.
     \param ops A batch of `async_data_op_req<T>` structures.
     \ingroup async_file_io_dispatcher_base__filedirops
@@ -792,6 +807,14 @@ public:
     \qexample{barrier_example}
     */
 	std::vector<async_io_op> barrier(const std::vector<async_io_op> &ops);
+
+	/*! \brief Returns the page size of this architecture which is useful for calculating direct i/o multiples.
+	\return The page size of this architecture.
+	\ingroup async_file_io_dispatcher_base__misc
+	\complexity{Whatever the system API takes (one would hope constant time).}
+	\exceptionmodel{Never throws any exception.}
+	*/
+	static size_t page_size() BOOST_NOEXCEPT_OR_NOTHROW;
 protected:
 	void complete_async_op(size_t id, std::shared_ptr<detail::async_io_handle> h, exception_ptr e=exception_ptr());
 	completion_returntype invoke_user_completion(size_t id, std::shared_ptr<detail::async_io_handle> h, std::function<completion_t> callback);
