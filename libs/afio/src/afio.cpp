@@ -253,15 +253,15 @@ namespace detail {
 		std::shared_ptr<async_file_io_dispatcher_base> parent;
 		std::unique_ptr<boost::asio::windows::random_access_handle> h;
 		void *myid;
-		bool has_been_added, autoflush;
+		bool has_been_added, SyncOnClose;
 
 		static HANDLE int_checkHandle(HANDLE h, const std::filesystem::path &path)
 		{
 			BOOST_AFIO_ERRHWINFN(INVALID_HANDLE_VALUE!=h, path);
 			return h;
 		}
-		async_io_handle_windows(std::shared_ptr<async_file_io_dispatcher_base> _parent, const std::filesystem::path &path, file_flags flags) : async_io_handle(_parent.get(), path, flags), parent(_parent), myid(nullptr), has_been_added(false), autoflush(false) { }
-		async_io_handle_windows(std::shared_ptr<async_file_io_dispatcher_base> _parent, const std::filesystem::path &path, file_flags flags, bool _autoflush, HANDLE _h) : async_io_handle(_parent.get(), path, flags), parent(_parent), h(new boost::asio::windows::random_access_handle(process_threadpool().io_service(), int_checkHandle(_h, path))), myid(_h), has_been_added(false), autoflush(_autoflush) { }
+		async_io_handle_windows(std::shared_ptr<async_file_io_dispatcher_base> _parent, const std::filesystem::path &path, file_flags flags) : async_io_handle(_parent.get(), path, flags), parent(_parent), myid(nullptr), has_been_added(false), SyncOnClose(false) { }
+		async_io_handle_windows(std::shared_ptr<async_file_io_dispatcher_base> _parent, const std::filesystem::path &path, file_flags flags, bool _SyncOnClose, HANDLE _h) : async_io_handle(_parent.get(), path, flags), parent(_parent), h(new boost::asio::windows::random_access_handle(process_threadpool().io_service(), int_checkHandle(_h, path))), myid(_h), has_been_added(false), SyncOnClose(_SyncOnClose) { }
 		virtual void *native_handle() const { return myid; }
 
 		// You can't use shared_from_this() in a constructor so ...
@@ -280,7 +280,7 @@ namespace detail {
 				parent->int_del_io_handle(myid);
 			if(h)
 			{
-				if(autoflush && write_count_since_fsync())
+				if(SyncOnClose && write_count_since_fsync())
 					BOOST_AFIO_ERRHWINFN(FlushFileBuffers(h->native_handle()), path());
 				h->close();
 			}
@@ -292,9 +292,9 @@ namespace detail {
 		std::shared_ptr<async_file_io_dispatcher_base> parent;
 		std::shared_ptr<detail::async_io_handle> dirh;
 		int fd;
-		bool has_been_added, autoflush, has_ever_been_fsynced;
+		bool has_been_added, SyncOnClose, has_ever_been_fsynced;
 
-		async_io_handle_posix(std::shared_ptr<async_file_io_dispatcher_base> _parent, std::shared_ptr<detail::async_io_handle> _dirh, const std::filesystem::path &path, file_flags flags, bool _autoflush, int _fd) : async_io_handle(_parent.get(), path, flags), parent(_parent), dirh(_dirh), fd(_fd), has_been_added(false), autoflush(_autoflush),has_ever_been_fsynced(false)
+		async_io_handle_posix(std::shared_ptr<async_file_io_dispatcher_base> _parent, std::shared_ptr<detail::async_io_handle> _dirh, const std::filesystem::path &path, file_flags flags, bool _SyncOnClose, int _fd) : async_io_handle(_parent.get(), path, flags), parent(_parent), dirh(_dirh), fd(_fd), has_been_added(false), SyncOnClose(_SyncOnClose),has_ever_been_fsynced(false)
 		{
 			if(fd!=-999)
 				BOOST_AFIO_ERRHOSFN(fd, path);
@@ -314,7 +314,7 @@ namespace detail {
 			if(fd>=0)
 			{
 				// Flush synchronously here? I guess ...
-				if(autoflush && write_count_since_fsync())
+				if(SyncOnClose && write_count_since_fsync())
 					BOOST_AFIO_ERRHOSFN(BOOST_AFIO_POSIX_FSYNC(fd), path());
 				BOOST_AFIO_ERRHOSFN(BOOST_AFIO_POSIX_CLOSE(fd), path());
 				fd=-1;
@@ -472,7 +472,20 @@ thread_source &async_file_io_dispatcher_base::threadsource() const
 
 file_flags async_file_io_dispatcher_base::fileflags(file_flags flags) const
 {
-	return (flags&~p->flagsmask)|p->flagsforce;
+	file_flags ret=(flags&~p->flagsmask)|p->flagsforce;
+	if(!!(ret&file_flags::EnforceDependencyWriteOrder))
+	{
+		// The logic (for now) is this:
+		// If the data is sequentially accessed, we won't be seeking much
+		// so turn on AlwaysSync.
+		// If not sequentially accessed and we might therefore be seeking,
+		// turn on SyncOnClose.
+		if(!!(ret&file_flags::WillBeSequentiallyAccessed))
+			ret=ret|file_flags::AlwaysSync;
+		else
+			ret=ret|file_flags::SyncOnClose;
+	}
+	return ret;
 }
 
 size_t async_file_io_dispatcher_base::wait_queue_depth() const
@@ -919,9 +932,9 @@ namespace detail {
 			if(!!(req.flags & file_flags::WillBeSequentiallyAccessed))
 				flags|=FILE_FLAG_SEQUENTIAL_SCAN;
 			if(!!(req.flags & file_flags::OSDirect)) flags|=FILE_FLAG_NO_BUFFERING;
-			if(!!(req.flags & file_flags::OSSync)) flags|=FILE_FLAG_WRITE_THROUGH;
-			// If writing and autoflush and NOT synchronous, turn on autoflush
-			auto ret=std::make_shared<async_io_handle_windows>(shared_from_this(), req.path, req.flags, (file_flags::AutoFlush|file_flags::Write)==(req.flags & (file_flags::AutoFlush|file_flags::Write|file_flags::OSSync)),
+			if(!!(req.flags & file_flags::AlwaysSync)) flags|=FILE_FLAG_WRITE_THROUGH;
+			// If writing and SyncOnClose and NOT synchronous, turn on SyncOnClose
+			auto ret=std::make_shared<async_io_handle_windows>(shared_from_this(), req.path, req.flags, (file_flags::SyncOnClose|file_flags::Write)==(req.flags & (file_flags::SyncOnClose|file_flags::Write|file_flags::AlwaysSync)),
 				CreateFile(req.path.c_str(), access, FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,
 					NULL, creation, flags, NULL));
 			static_cast<async_io_handle_windows *>(ret.get())->do_add_io_handle_to_parent();
@@ -952,7 +965,7 @@ namespace detail {
 			async_io_handle_windows *p=static_cast<async_io_handle_windows *>(h.get());
 			assert(p);
 			// Windows doesn't provide an async fsync so do it synchronously
-			if(p->autoflush && p->write_count_since_fsync())
+			if(p->SyncOnClose && p->write_count_since_fsync())
 				BOOST_AFIO_ERRHWINFN(FlushFileBuffers(p->h->native_handle()), p->path());
 			p->h->close();
 			p->h.reset();
@@ -1260,14 +1273,14 @@ namespace detail {
 				std::shared_ptr<detail::async_io_handle> dirh;
 #ifdef __linux__
 				// Need to fsync the containing directory, otherwise the file isn't guaranteed to appear where we just created it
-				if(!!(req.flags & (file_flags::Create|file_flags::CreateOnlyIfNotExist)) && !!(req.flags & (file_flags::AutoFlush|file_flags::OSSync)))
+				if(!!(req.flags & (file_flags::Create|file_flags::CreateOnlyIfNotExist)) && !!(req.flags & (file_flags::SyncOnClose|file_flags::AlwaysSync)))
 					req.flags=req.flags|file_flags::FastDirectoryEnumeration;
 #endif
 				if(!!(req.flags & file_flags::FastDirectoryEnumeration))
 					dirh=get_handle_to_containing_dir(req.path);
 				auto ret=std::make_shared<async_io_handle_posix>(shared_from_this(), dirh, req.path, req.flags, false, -999);
 #ifdef __linux__
-				if(!!(req.flags & (file_flags::Create|file_flags::CreateOnlyIfNotExist)) && !!(req.flags & (file_flags::AutoFlush|file_flags::OSSync)))
+				if(!!(req.flags & (file_flags::Create|file_flags::CreateOnlyIfNotExist)) && !!(req.flags & (file_flags::SyncOnClose|file_flags::AlwaysSync)))
 					BOOST_AFIO_POSIX_FSYNC(static_cast<async_io_handle_posix *>(dirh.get())->fd);
 #endif
 				return std::make_pair(true, ret);
@@ -1298,20 +1311,20 @@ namespace detail {
 			if(!!(req.flags & file_flags::OSDirect)) flags|=O_DIRECT;
 #endif
 #ifdef O_SYNC
-			if(!!(req.flags & file_flags::OSSync)) flags|=O_SYNC;
+			if(!!(req.flags & file_flags::AlwaysSync)) flags|=O_SYNC;
 #endif
 #ifdef __linux__
 			// Need to fsync the containing directory, otherwise the file isn't guaranteed to appear where we just created it
-			if((flags & O_CREAT) && !!(req.flags & (file_flags::AutoFlush|file_flags::OSSync)))
+			if((flags & O_CREAT) && !!(req.flags & (file_flags::SyncOnClose|file_flags::AlwaysSync)))
 				req.flags=req.flags|file_flags::FastDirectoryEnumeration;
 #endif
 			if(!!(req.flags & file_flags::FastDirectoryEnumeration))
 				dirh=get_handle_to_containing_dir(req.path);
-			// If writing and autoflush and NOT synchronous, turn on autoflush
-			auto ret=std::make_shared<async_io_handle_posix>(shared_from_this(), dirh, req.path, req.flags, (file_flags::AutoFlush|file_flags::Write)==(req.flags & (file_flags::AutoFlush|file_flags::Write|file_flags::OSSync)),
+			// If writing and SyncOnClose and NOT synchronous, turn on SyncOnClose
+			auto ret=std::make_shared<async_io_handle_posix>(shared_from_this(), dirh, req.path, req.flags, (file_flags::SyncOnClose|file_flags::Write)==(req.flags & (file_flags::SyncOnClose|file_flags::Write|file_flags::AlwaysSync)),
 				BOOST_AFIO_POSIX_OPEN(req.path.c_str(), flags, 0x1b0/*660*/));
 #ifdef __linux__
-			if(!!(req.flags & (file_flags::Create|file_flags::CreateOnlyIfNotExist)) && !!(req.flags & (file_flags::AutoFlush|file_flags::OSSync)))
+			if(!!(req.flags & (file_flags::Create|file_flags::CreateOnlyIfNotExist)) && !!(req.flags & (file_flags::SyncOnClose|file_flags::AlwaysSync)))
 				BOOST_AFIO_POSIX_FSYNC(static_cast<async_io_handle_posix *>(dirh.get())->fd);
 #endif
 			static_cast<async_io_handle_posix *>(ret.get())->do_add_io_handle_to_parent();
@@ -1340,7 +1353,7 @@ namespace detail {
 		completion_returntype doclose(size_t id, std::shared_ptr<detail::async_io_handle> h, async_io_op)
 		{
 			async_io_handle_posix *p=static_cast<async_io_handle_posix *>(h.get());
-			if(p->autoflush && p->write_count_since_fsync())
+			if(p->SyncOnClose && p->write_count_since_fsync())
 				BOOST_AFIO_ERRHOSFN(BOOST_AFIO_POSIX_FSYNC(p->fd), p->path());
 			BOOST_AFIO_ERRHOSFN(BOOST_AFIO_POSIX_CLOSE(p->fd), p->path());
 			p->fd=-1;
