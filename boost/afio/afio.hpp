@@ -603,7 +603,9 @@ inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(st
 	callbacks.reserve(inputs.size());
 	size_t idx=0;
 	BOOST_FOREACH(auto &i, inputs)
-    {	callbacks.push_back(std::make_pair(async_op_flags::ImmediateCompletion, std::bind(&detail::when_all_count_completed_nothrow, std::placeholders::_1, std::placeholders::_2, state, idx++)));}
+    {	
+        callbacks.push_back(std::make_pair(async_op_flags::ImmediateCompletion, std::bind(&detail::when_all_count_completed_nothrow, std::placeholders::_1, std::placeholders::_2, state, idx++)));
+    }
 	inputs.front().parent->completion(inputs, callbacks);
 	return state->done.get_future();
 }
@@ -618,7 +620,9 @@ inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(st
 	callbacks.reserve(inputs.size());
 	size_t idx=0;
 	BOOST_FOREACH(auto &i, inputs)
-    {	callbacks.push_back(std::make_pair(async_op_flags::ImmediateCompletion, std::bind(&detail::when_all_count_completed, std::placeholders::_1, std::placeholders::_2, state, idx++)));}
+    {	
+        callbacks.push_back(std::make_pair(async_op_flags::ImmediateCompletion, std::bind(&detail::when_all_count_completed, std::placeholders::_1, std::placeholders::_2, state, idx++)));
+    }
 	inputs.front().parent->completion(inputs, callbacks);
 	return state->done.get_future();
 }
