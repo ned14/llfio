@@ -17,10 +17,19 @@ project boost/afio/test
     : requirements
       <threading>multi
       <library>/boost/afio//boost_afio
-      <toolset>gcc:<cxxflags>-std=c++0x 
-      <toolset>clang:<cxxflags>-std=c++0x 
+      <toolset>gcc:<cxxflags>"-std=c++0x -fvisibility-inlines-hidden -fstrict-aliasing -Wstrict-aliasing -Wno-unused -fargument-noalias -fvisibility=hidden -fopenmp"
+      <toolset>gcc-mingw:<cxxflags>"-march=i686 -DWIN32 -D_UNICODE -DUNICODE"
+      <toolset>gcc:<linkflags>"-lgomp"
+      <toolset>clang:<cxxflags>"-std=c++0x -fvisibility-inlines-hidden -fstrict-aliasing -Wstrict-aliasing -Wno-unused -fargument-noalias -fvisibility=hidden -fopenmp"
       <toolset>msvc:<cxxflags>/openmp
-      #<linkflags>"-l pthread"      #is this the test's dependency or boost_afio's???? 
+      <target-os>linux:<linkflags>"-lpthread"
+      <target-os>freebsd:<linkflags>"-lpthread"
+      <target-os>windows:<linkflags>"-lws2_32"
+      <link>shared:<define>BOOST_AFIO_DYN_LINK=1
+      <link>shared:<library>../../system/build//boost_system
+      <link>shared:<library>../../filesystem/build//boost_filesystem
+      <link>shared:<library>../../atomic/build//boost_atomic
+      <link>shared:<library>../../thread/build//boost_thread
     ;
 
 

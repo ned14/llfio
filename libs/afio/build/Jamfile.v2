@@ -21,19 +21,6 @@ project boost/afio
 	: usage-requirements 
       <include>. 
 
-      <library>/boost/system//boost_system
-      <library>/boost/filesystem//boost_filesystem 
-      <library>/boost/atomic//boost_atomic
-      <library>/boost/thread//boost_thread
-
-    #These might be better when we're actually a part of boost      
-#      <library>$../../libs/system/build//boost_system
-#      <library>$../../libs/filesystem/build//boost_filesystem 
-#      <library>$../../libs/atomic/build//boost_atomic
-#      <library>$../../libs/thread/build//boost_thread
-
-
-      <link>shared:<define>BOOST_AFIO_DYN_LINK=1
     : source-location ../src
 
 ;
@@ -41,11 +28,19 @@ project boost/afio
 lib boost_afio : afio.cpp ../detail/ErrorHandling.cpp
 	: <include>../../../boost/afio 
       <include>../../../boost/afio/detail
-      <toolset>gcc:<cxxflags>"-std=c++0x -fvisibility-inlines-hidden -fstrict-aliasing -Wstrict-aliasing -Wall -Wno-unused -fargument-noalias -O2 -g -fPIC -fvisibility=hidden -fopenmp"
-      <toolset>clang:<cxxflags>"-std=c++0x -fvisibility-inlines-hidden -fstrict-aliasing -Wstrict-aliasing -Wall -Wno-unused -fargument-noalias -O2 -g -fPIC -fvisibility=hidden -fopenmp"
+      <toolset>gcc:<cxxflags>"-std=c++0x -fvisibility-inlines-hidden -fstrict-aliasing -Wstrict-aliasing -Wno-unused -fargument-noalias -fvisibility=hidden -fopenmp"
+      <toolset>gcc:<linkflags>"-lgomp"
+      <toolset>gcc-mingw:<cxxflags>"-march=i686 -DWIN32 -D_UNICODE -DUNICODE"
+      <toolset>clang:<cxxflags>"-std=c++0x -fvisibility-inlines-hidden -fstrict-aliasing -Wstrict-aliasing -Wno-unused -fargument-noalias -fvisibility=hidden -fopenmp"
       <toolset>msvc:<cxxflags>/openmp
-      <target-os>linux:<linkflags>"-l pthread"
-      <target-os>freebsd:<linkflags>"-l pthread"
+      <target-os>linux:<linkflags>"-lpthread"
+      <target-os>freebsd:<linkflags>"-lpthread"
+      <target-os>windows:<linkflags>"-lws2_32"
+      <link>shared:<define>BOOST_AFIO_DYN_LINK=1
+      <link>shared:<library>../../system/build//boost_system
+      <link>shared:<library>../../filesystem/build//boost_filesystem
+      <link>shared:<library>../../atomic/build//boost_atomic
+      <link>shared:<library>../../thread/build//boost_thread
 
 ;
 
