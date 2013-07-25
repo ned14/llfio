@@ -23,7 +23,7 @@ File Created: Mar 2013
 #include "boost/asio.hpp"
 #include "boost/thread/thread.hpp"
 #include "boost/thread/future.hpp"
-#include <boost\foreach.hpp>
+#include "boost/foreach.hpp"
 
 #if defined(_CPPLIB_VER) && _CPPLIB_VER <540 // Dinkumware without <atomic>
 #include <boost\atomic.hpp>
