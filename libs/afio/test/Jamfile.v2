@@ -6,7 +6,15 @@
 #  (See accompanying file LICENSE_1_0.txt or copy at
 #  http://www.boost.org/LICENSE_1_0.txt)
 
+
+import modules ;
+.argv = [ modules.peek : ARGV ] ;
+
+#local boost-path = [ modules.peek : BOOST_ROOT ] ; #can probably get rid of this
+
+import os ;
 import testing ;
+
 
 project boost/afio/test
     : requirements
@@ -20,6 +28,9 @@ project boost/afio/test
       <toolset>msvc:<cxxflags>"/openmp /EHsc /GF /Gy /bigobj"
       <toolset>msvc:<linkflags>"/LARGEADDRESSAWARE /DYNAMICBASE /NXCOMPAT /OPT:REF /MANIFEST" # /VERSION:1.00.0"
       <toolset>msvc:<define>WIN32 <toolset>msvc:<define>_WINDOWS  <toolset>msvc:<define>UNICODE <toolset>msvc:<define>_UNICODE
+      <toolset>msvc:<cxxflags>"/openmp /EHsc /GF /Gy"
+      <toolset>msvc:<linkflags>"/LARGEADDRESSAWARE /DYNAMICBASE /NXCOMPAT /OPT:REF /MANIFEST" # /VERSION:1.00.0"
+      <toolset>msvc:<define>WIN32 <toolset>msvc:<define>_WINDOWS  <toolset>msvc:<define>UNICODE <toolset>msvc:<define>_UNICODE
       <target-os>linux:<linkflags>"-lpthread"
       <target-os>freebsd:<linkflags>"-lpthread"
       <link>shared:<define>BOOST_AFIO_DYN_LINK=1
@@ -29,22 +40,64 @@ project boost/afio/test
       <link>shared:<library>../../thread/build//boost_thread
     ;
 
+#exe boost_afio_test : main.cpp   ../detail/SpookyV2.cpp
+#    : <include>../../../boost/afio/detail
 
-exe boost_afio_test : main.cpp   ../detail/SpookyV2.cpp
-    : <include>../../../boost/afio/detail
+#;
 
-;
+# the required cpp file for the unit tests (for some reason gcc wants this availible to all tests)
+local reqs = ../detail/SpookyV2.cpp   ;
 
-test-suite afio  
-    : #[ link main.cpp ../detail/SpookyV2.cpp
-      #  : <cxxflags>-std=c++0x <library>/boost/afio//boost_afio <include>../../../boost/afio/detail ]
-    
-#      [ run main.cpp ../detail/SpookyV2.cpp 
-#        : #args
-#        : #input files
-#        : <cxxflags>-std=c++0x <library>/boost/afio//boost_afio <include>../../../boost/afio/detail ]
-    ;
+# look in the commandline args for "--valgrind=" and capture its contents in VALGRIND_ARGS
+local VALGRIND_ARGS = [ MATCH --valgrind=(.*) : $(.argv) ] ;
 
 
+# if we're doing a valgrind build, set up the test launcher
+if $(VALGRIND_ARGS)
+{
+  launcher =  <testing.launcher>valgrind ;
+}
+
+#auto generate the test_all.cpp
+if [ os.name ] = "NT" 
+{ 
+    local str = "for /f \"delims=\" %i in ('dir /b /a-d /s test_file_glob.bat') do \"%~fi\""  ;
+    SHELL $(str) ;
+}
+else 
+{ 
+    SHELL  [ SHELL "find -L -name test_file_glob.sh" ]  ; 
+}
+local test_files = [ glob  *.cpp : main.cpp ] ;
+
+# link tests (just compile and links targets)
+if "--link-test"  in $(.argv)  
+{  
+    # We can't use the test-suite if we're going to use a for loop
+    #test-suite afio-link
+    #  : [ for local x in $(test_files) {  link $(x) $(reqs) ; }  ]
+    #;
+
+    for local x in $(test_files)
+    {
+        link $(x) $(reqs) ;
+    }
 
 
+}
+else # run actual tests
+{
+    if "--test-all" in $(.argv)   # run the whole test suite at once
+    {
+        test-suite afio
+          : [ run test_all.cpp  $(reqs) : $(VALGRIND_ARGS) : : $(launcher) ] 
+
+        ;
+    }
+    else        # otherwise run individual test files
+    {
+        for local file in $(test_files)
+        { run $(file) $(reqs) : $(VALGRIND_ARGS) : : $(launcher) ; }
+
+    }
+}

@@ -1,4 +1,4 @@
-#include "test_functions.h"
+#include "test_functions.hpp"
 
 
 BOOST_AUTO_TEST_CASE(async_io_works_1_autoflush)

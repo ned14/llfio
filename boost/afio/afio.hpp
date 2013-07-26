@@ -329,19 +329,19 @@ struct async_path_op_req;
 template<class T> struct async_data_op_req;
 
 #define BOOST_AFIO_DECLARE_CLASS_ENUM_AS_BITFIELD(type) \
-inline constexpr type operator&(type a, type b) \
+inline BOOST_CONSTEXPR type operator&(type a, type b) \
 { \
 	return static_cast<type>(static_cast<size_t>(a) & static_cast<size_t>(b)); \
 } \
-inline constexpr type operator|(type a, type b) \
+inline BOOST_CONSTEXPR type operator|(type a, type b) \
 { \
 	return static_cast<type>(static_cast<size_t>(a) | static_cast<size_t>(b)); \
 } \
-inline constexpr type operator~(type a) \
+inline BOOST_CONSTEXPR type operator~(type a) \
 { \
 	return static_cast<type>(~static_cast<size_t>(a)); \
 } \
-inline constexpr bool operator!(type a) \
+inline BOOST_CONSTEXPR bool operator!(type a) \
 { \
 	return 0==static_cast<size_t>(a); \
 }

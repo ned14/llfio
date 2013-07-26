@@ -15,12 +15,6 @@
 #include<boost/config.hpp>
 #include <utility>
 
-#if defined(BOOST_MSVC) && BOOST_MSVC<=1800 && !defined(noexcept)
-#define noexcept throw()
-#endif
-#if defined(BOOST_MSVC) && BOOST_MSVC<=1800 && !defined(constexpr)
-#define constexpr const
-#endif
 #if defined(__GNUC__) && !defined(GCC_VERSION)
 #define GCC_VERSION (__GNUC__ * 10000 \
 				   + __GNUC_MINOR__ * 100 \
@@ -34,14 +28,14 @@ namespace boost{
         namespace detail{
             
             namespace Impl {
-                    template<typename T, bool iscomparable> struct is_nullptr { bool operator()(T c) const noexcept { return !c; } };
-                    template<typename T> struct is_nullptr<T, false> { bool operator()(T) const noexcept { return false; } };
+                    template<typename T, bool iscomparable> struct is_nullptr { bool operator()(T c) const BOOST_NOEXCEPT_OR_NOTHROW { return !c; } };
+                    template<typename T> struct is_nullptr<T, false> { bool operator()(T) const BOOST_NOEXCEPT_OR_NOTHROW { return false; } };
             }
             //! Compile-time safe detector of if \em v is nullptr (can cope with non-pointer convertibles)
             #if defined(__GNUC__) && GCC_VERSION<40900
-            template<typename T> bool is_nullptr(T v) noexcept { return Impl::is_nullptr<T, std::is_constructible<bool, T>::value>()(std::forward<T>(v)); }
+            template<typename T> bool is_nullptr(T v) BOOST_NOEXCEPT_OR_NOTHROW { return Impl::is_nullptr<T, std::is_constructible<bool, T>::value>()(std::forward<T>(v)); }
             #else
-            template<typename T> bool is_nullptr(T v) noexcept { return Impl::is_nullptr<T, std::is_trivially_constructible<bool, T>::value>()(std::forward<T>(v)); }
+            template<typename T> bool is_nullptr(T v) BOOST_NOEXCEPT_OR_NOTHROW { return Impl::is_nullptr<T, std::is_trivially_constructible<bool, T>::value>()(std::forward<T>(v)); }
             #endif
 
             
@@ -49,8 +43,8 @@ namespace boost{
             {
                     callable undoer;
                     bool _dismissed;
-
-            #if !defined(BOOST_MSVC) || BOOST_MSVC>1800
+            #ifndef BOOST_NO_CXX11_DEFAULTED_FUNCTIONS
+            //#if !defined(BOOST_MSVC) || BOOST_MSVC>1700
                     UndoerImpl() = delete;
                     UndoerImpl(const UndoerImpl &) = delete;
                     UndoerImpl &operator=(const UndoerImpl &) = delete;

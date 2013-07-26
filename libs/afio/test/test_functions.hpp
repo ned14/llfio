@@ -1,4 +1,67 @@
-#include "test_functions.h"
+/* Unit tests for TripleGit
+(C) 2013 Niall Douglas http://www.nedprod.com/
+Created: Feb 2013
+*/
+
+#ifndef BOOST_AFIO_TEST_FUNCTIONS_HPP
+#define BOOST_AFIO_TEST_FUNCTIONS_HPP
+
+
+// If defined, uses a ton more memory and is many orders of magnitude slower.
+#define DEBUG_TORTURE_TEST 1
+
+// Get Boost.ASIO on Windows IOCP working
+#if defined(_DEBUG) && defined(WIN32)
+#define BOOST_ASIO_BUG_WORKAROUND 1
+#endif
+
+#include <utility>
+#include <sstream>
+#include <iostream>
+#include <algorithm>
+#include "boost/lockfree/queue.hpp"
+#include "../../../boost/afio/afio.hpp"
+#include "../../../boost/afio/detail/SpookyV2.h"
+#include "../../../boost/afio/detail/Aligned_Allocator.hpp"
+#include "../../../boost/afio/detail/Undoer.hpp"
+
+
+//if we're building the tests all together don't define the test main
+#ifndef BOOST_AFIO_TEST_ALL
+#    define BOOST_TEST_MAIN  //must be defined before unit_test.hpp is included
+#endif
+
+#include <boost/test/included/unit_test.hpp>
+
+//define a simple macro to check any exception using Boost.Test
+#define BOOST_AFIO_CHECK_THROWS(expr)\
+try{\
+    expr;\
+    BOOST_FAIL("Exception was not thrown");\
+}catch(...){BOOST_CHECK(true);}
+
+// From http://burtleburtle.net/bob/rand/smallprng.html
+typedef unsigned int  u4;
+typedef struct ranctx { u4 a; u4 b; u4 c; u4 d; } ranctx;
+
+#define rot(x,k) (((x)<<(k))|((x)>>(32-(k))))
+u4 ranval(ranctx *x) {
+    u4 e = x->a - rot(x->b, 27);
+    x->a = x->b ^ rot(x->c, 17);
+    x->b = x->c + x->d;
+    x->c = x->d + e;
+    x->d = e + x->a;
+    return x->d;
+}
+
+void raninit(ranctx *x, u4 seed) {
+    u4 i;
+    x->a = 0xf1ea5eed, x->b = x->c = x->d = seed;
+    for (i = 0; i < 20; ++i) {
+        (void) ranval(x);
+    }
+}
+
 
 static void _1000_open_write_close_deletes(std::shared_ptr<boost::afio::async_file_io_dispatcher_base> dispatcher, size_t bytes)
 {
@@ -426,3 +489,5 @@ static void evil_random_io(std::shared_ptr<boost::afio::async_file_io_dispatcher
     // Fetch any outstanding error
     rmdir.h->get();
 }
+
+#endif
