@@ -33,7 +33,7 @@ Created: Feb 2013
     #endif
     
         std::cout << "I am main thread " << this_id << std::endl;
-        thread_pool pool(4);
+        std_thread_pool pool(4);
         auto r=task();
         BOOST_CHECK(r==78);
         std::vector<future<int>> results(8);

@@ -2,14 +2,14 @@
 
 BOOST_AUTO_TEST_CASE(async_io_errors)
 {
-    BOOST_MESSAGE("Tests that the async i/o error handling works");
+	BOOST_TEST_MESSAGE("Tests that the async i/o error handling works");
     using namespace boost::afio;
     using namespace std;
     using boost::afio::future;
 
     {
         int hasErrorDirectly, hasErrorFromBarrier;
-        auto dispatcher = async_file_io_dispatcher();
+        auto dispatcher = make_async_file_io_dispatcher();
         auto mkdir(dispatcher->dir(async_path_op_req("testdir", file_flags::Create)));
         vector<async_path_op_req> filereqs;
         filereqs.push_back(async_path_op_req(mkdir, "testdir/a", file_flags::CreateOnlyIfNotExist));

@@ -10,18 +10,13 @@ Created: Feb 2013
 // If defined, uses a ton more memory and is many orders of magnitude slower.
 #define DEBUG_TORTURE_TEST 1
 
-// Get Boost.ASIO on Windows IOCP working
-#if defined(_DEBUG) && defined(WIN32)
-#define BOOST_ASIO_BUG_WORKAROUND 1
-#endif
-
 #include <utility>
 #include <sstream>
 #include <iostream>
 #include <algorithm>
 #include "boost/lockfree/queue.hpp"
 #include "../../../boost/afio/afio.hpp"
-#include "../../../boost/afio/detail/SpookyV2.h"
+#include "../detail/SpookyV2.h"
 #include "../../../boost/afio/detail/Aligned_Allocator.hpp"
 #include "../../../boost/afio/detail/Undoer.hpp"
 
@@ -202,9 +197,7 @@ static void evil_random_io(std::shared_ptr<boost::afio::async_file_io_dispatcher
     // SHA256 out the results
     // We then replay the same with real storage to see if it matches
     auto begin=std::chrono::high_resolution_clock::now();
-#ifndef BOOST_ASIO_BUG_WORKAROUND
 #pragma omp parallel for
-#endif
     for(ptrdiff_t n=0; n<(ptrdiff_t) no; n++)
     {
             ranctx gen;
@@ -227,17 +220,10 @@ static void evil_random_io(std::shared_ptr<boost::afio::async_file_io_dispatcher
 #else
                     ranctx writeseed=op.seed=gen;
 #endif
-#ifdef BOOST_ASIO_BUG_WORKAROUND
-                    //if(toissue>4) toissue=4;
-                    toissue=1; // clamp for now. I think Boost.ASIO on Win IOCP seems to dislike more than one buffer at a time ?!?
-#endif
                     for(m=0; m<toissue; m++)
                     {
                             u4 s=ranval(&gen) & ((256*1024-1)&~63); // Must be a multiple of 64 bytes for SHA256
                             if(s<64) s=64;
-#ifdef BOOST_ASIO_BUG_WORKAROUND
-                            if(s>65536) s=65536; // clamp for now. I think Boost.ASIO won't transfer more than 64Kb at a time anyway ... ?!?
-#endif
                             if(alignment)
                                     s=(s+4095)&~(alignment-1);
                             if(thisbytes+s>1024*1024) break;
@@ -367,9 +353,7 @@ static void evil_random_io(std::shared_ptr<boost::afio::async_file_io_dispatcher
             }
             return make_pair(true, h);
     };
-#ifndef BOOST_ASIO_BUG_WORKAROUND
 #pragma omp parallel for
-#endif
     for(ptrdiff_t n=0; n<(ptrdiff_t) no; n++)
     {
             for(Op &op : todo[n])

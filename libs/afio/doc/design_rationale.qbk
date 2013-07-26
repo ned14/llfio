@@ -287,7 +287,10 @@ thirty seconds of writes before pacing the acceptance of new write data to match
 the speed of the non-volatile storage (which may be a ZIL if you're doing
 synchronous writes). This implies up to
 thirty seconds of buffered data could be lost, but note that ZFS still guarantees
-transaction group sequential write order.
+transaction group sequential write order. Therefore, what ZFS is in fact guaranteeing
+is this: ['we may reorder your write by up to five seconds away from the sequence
+in which you wrote it and other writes surrounding it. Other than that, we guarantee
+the order in which you write is the order in which that data reaches physical storage.]
 
 [footnote http://www.c0t0d0s0.org/archives/5343-Insights-into-ZFS-today-The-nature-of-writing-things.html]
 
