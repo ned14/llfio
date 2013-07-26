@@ -686,7 +686,7 @@ template<class F, class... Args> async_io_op async_file_io_dispatcher_base::chai
 	// Bind supplied implementation routine to this, unique id and any args they passed
 	typename detail::async_file_io_dispatcher_op::completion_t boundf(std::make_pair(thisid, std::bind(wrapperf, this, thisid, std::placeholders::_1, f, args...)));
 	// Make a new async_io_op ready for returning
-	async_io_op ret(shared_from_this(), thisid);
+	async_io_op ret(this, thisid);
 	bool done=false;
 	if(precondition.id)
 	{
