@@ -28,10 +28,12 @@
     <ClInclude Include="..\..\..\boost\afio\config.hpp" />
     <ClInclude Include="..\..\..\boost\afio\detail\Aligned_Allocator.hpp" />
     <ClInclude Include="..\..\..\boost\afio\detail\ErrorHandling.hpp" />
+    <ClInclude Include="..\..\..\boost\afio\detail\Preprocessor_variadic.hpp" />
     <ClInclude Include="..\..\..\boost\afio\detail\SpookyV2.h" />
     <ClInclude Include="..\..\..\boost\afio\detail\std_filesystem.hpp" />
     <ClInclude Include="..\..\..\boost\afio\detail\Undoer.hpp" />
     <ClInclude Include="..\..\..\boost\afio\detail\Utility.hpp" />
+    <ClInclude Include="..\..\..\boost\afio\detail\variadic.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{31A5E53D-7416-4E1D-891A-1C69EF8553BD}</ProjectGuid>

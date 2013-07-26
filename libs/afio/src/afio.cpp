@@ -499,7 +499,9 @@ void async_file_io_dispatcher_base::complete_async_op(size_t id, std::shared_ptr
 	BOOST_AFIO_DEBUG_PRINT("R %u %p\n", (unsigned) id, h.get());
 }
 
-// Called in unknown thread
+
+#ifndef BOOST_NO_CXX11_VARIADIC_TEMPLATES
+// Called in unknown thread 
 template<class F, class... Args> std::shared_ptr<detail::async_io_handle> async_file_io_dispatcher_base::invoke_async_op_completions(size_t id, std::shared_ptr<detail::async_io_handle> h, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, Args...), Args... args)
 {
 	try
@@ -560,7 +562,98 @@ template<class F, class... Args> std::shared_ptr<detail::async_io_handle> async_
 		throw;
 	}
 }
+#else
 
+
+
+// we cant use any preprocessor directive inside of the macro, so take care of it beforehand
+#ifdef BOOST_MSVC
+#define BOOST_AFIO_CATCH_HELPER \
+	catch(const std::exception &)\
+	{\
+		exception_ptr e(afio::make_exception_ptr(afio::current_exception()));\
+		BOOST_AFIO_DEBUG_PRINT("E %u begin\n", (unsigned) id);\
+		complete_async_op(id, h, e);\
+		BOOST_AFIO_DEBUG_PRINT("E %u end\n", (unsigned) id);\
+		throw;\
+	}\
+	catch(const std::exception_ptr &)
+#else
+#define BOOST_AFIO_CATCH_HELPER \
+	    catch(...)
+#endif
+
+
+
+
+
+#define BOOST_PP_LOCAL_MACRO(N)                                                                     \
+    template <class F                                                                               \
+    BOOST_PP_COMMA_IF(N)                                                                            \
+    BOOST_PP_ENUM_PARAMS(N, class A)>                                                               \
+    std::shared_ptr<detail::async_io_handle>                                                        \
+    async_file_io_dispatcher_base::invoke_async_op_completions                                                                     \
+    (size_t id, std::shared_ptr<detail::async_io_handle> h,                                         \
+    completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>                  \
+    BOOST_PP_COMMA_IF(N)                                                                            \
+    BOOST_PP_ENUM(N, a))                                                                            \
+    BOOST_PP_COMMA_IF(N)                                                                            \
+    BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))     /* parameters end */                                  \
+    {                                                                                               \
+	    try\
+	    {\
+		    completion_returntype ret((static_cast<F *>(this)->*f)(id, hBOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, class a)));\
+		    /* If boolean is false, reschedule completion notification setting it to ret.second, otherwise complete now */ \
+		    if(ret.first)   \
+		    {\
+			    complete_async_op(id, ret.second);\
+		    }\
+		    else\
+		    {\
+			    /* Make sure this was set up for deferred completion*/ \
+			    BOOST_AFIO_LOCK_GUARD<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);\
+			    std::unordered_map<size_t, detail::async_file_io_dispatcher_op>::iterator it(p->ops.find(id));\
+			    if(p->ops.end()==it)\
+			    {\
+				    std::vector<size_t> opsids;\
+				    BOOST_FOREACH(auto &i, p->ops)\
+                    {\
+					    opsids.push_back(i.first);\
+                    }\
+				    std::sort(opsids.begin(), opsids.end());\
+				    throw std::runtime_error("Failed to find this operation in list of currently executing operations");\
+			    }\
+			    if(!it->second.detached_promise)\
+			    {\
+				    /* If this trips, it means a completion handler tried to defer signalling*/ \
+				    /* completion but it hadn't been set up with a detached future*/ \
+				    assert(0);\
+				    std::terminate();\
+			    }\
+		    }\
+		    return ret.second;\
+	    }\
+        BOOST_AFIO_CATCH_HELPER \
+	    {\
+		    exception_ptr e(afio::make_exception_ptr(afio::current_exception()));\
+		    BOOST_AFIO_DEBUG_PRINT("E %u begin\n", (unsigned) id);\
+		    complete_async_op(id, h, e);\
+		    BOOST_AFIO_DEBUG_PRINT("E %u end\n", (unsigned) id);\
+		    throw;\
+	    }\
+    } //end of invoke_async_op_completions
+  
+#define BOOST_PP_LOCAL_LIMITS     (0, BOOST_AFIO_MAX_PARAMETERS) //should this be 0 or 1 for the min????
+#include BOOST_PP_LOCAL_ITERATE()
+
+#undef BOOST_AFIO_CATCH_HELPER
+
+#endif
+
+
+
+
+#ifndef BOOST_NO_CXX11_VARIADIC_TEMPLATES
 // You MUST hold opslock before entry!
 template<class F, class... Args> async_io_op async_file_io_dispatcher_base::chain_async_op(detail::immediate_async_ops &immediates, int optype, const async_io_op &precondition, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, Args...), Args... args)
 {	
@@ -639,6 +732,108 @@ template<class F, class... Args> async_io_op async_file_io_dispatcher_base::chai
 	undep.dismiss();
 	return ret;
 }
+
+#else
+
+// removed because we can't have preprocessor directives inside of a macro
+  #if 0 //ndef NDEBUG
+	    if(!p->ops.empty())
+	    {
+		    std::vector<size_t> opsids;
+		    BOOST_FOREACH(auto &i, p->ops)
+            {
+			    opsids.push_back(i.first);
+            }
+		    std::sort(opsids.begin(), opsids.end());
+		    assert(thisid==opsids.back()+1);
+	    }
+    #endif
+
+#define BOOST_PP_LOCAL_MACRO(N)                                                                     \
+    template <class F                                /* template start */                           \
+    BOOST_PP_COMMA_IF(N)                                                                            \
+    BOOST_PP_ENUM_PARAMS(N, class A)>                /* template end */                             \
+    async_io_op                                      /* return type */                              \
+    async_io_op async_file_io_dispatcher_base::chain_async_op       /* function name */             \
+    (detail::immediate_async_ops &immediates, int optype,           /* parameters start */          \
+    const async_io_op &precondition,async_op_flags flags,                                           \
+    completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>                  \
+    BOOST_PP_COMMA_IF(N)                                                                            \
+    BOOST_PP_ENUM(N, a))                                                                            \
+    BOOST_PP_COMMA_IF(N)                                                                            \
+    BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))     /* parameters end */                                  \
+    {\
+	    size_t thisid=0;\
+	    while(!(thisid=++p->monotoniccount));\
+	    /* Wrap supplied implementation routine with a completion dispatcher*/ \
+	    auto wrapperf=&async_file_io_dispatcher_base::invoke_async_op_completions<F BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, class A)>;\
+	    /* Bind supplied implementation routine to this, unique id and any args they passed*/ \
+	    typename detail::async_file_io_dispatcher_op::completion_t boundf(std::make_pair(thisid, std::bind(wrapperf, this, thisid, std::placeholders::_1, fBOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, class a))));\
+	    /* Make a new async_io_op ready for returning*/\
+	    async_io_op ret(shared_from_this(), thisid);\
+	    bool done=false;\
+	    if(precondition.id)\
+	    {\
+		    /* If still in flight, chain boundf to be executed when precondition completes*/ \
+		    auto dep(p->ops.find(precondition.id));\
+		    if(p->ops.end()!=dep)\
+		    {\
+			    dep->second.completions.push_back(boundf);\
+			    done=true;\
+		    }\
+	    }\
+	    auto undep=boost::afio::detail::Undoer([done, this, precondition](){\
+		    if(done)\
+		    {\
+			    auto dep(p->ops.find(precondition.id));\
+			    dep->second.completions.pop_back();\
+		    }\
+	    });\
+	    if(!done)\
+	    {\
+		    /* Bind input handle now and queue immediately to next available thread worker*/ \
+		    std::shared_ptr<detail::async_io_handle> h;\
+		    /* Boost's shared_future has get() as non-const which is weird, because it doesn't*/ \
+		    /* delete the data after retrieval.*/ \
+		    if(precondition.h->valid())\
+			    h=const_cast<shared_future<std::shared_ptr<detail::async_io_handle>> &>(*precondition.h).get();\
+		    else if(precondition.id)\
+		    {\
+			    /* It should never happen that precondition.id is valid but removed from extant ops*/\
+			    /* which indicates it completed and yet h remains invalid*/ \
+			    assert(0);\
+			    std::terminate();\
+		    }\
+		    if(!!(flags & async_op_flags::ImmediateCompletion))\
+			    *ret.h=immediates.enqueue(std::bind(boundf.second, h)).share();\
+		    else\
+			    *ret.h=threadpool().enqueue(std::bind(boundf.second, h)).share();\
+	    }\
+	    auto opsit=p->ops.insert(std::make_pair(thisid, detail::async_file_io_dispatcher_op((detail::OpType) optype, flags, ret.h)));\
+	    assert(opsit.second);\
+	    BOOST_AFIO_DEBUG_PRINT("I %u < %u (%s)\n", (unsigned) thisid, (unsigned) precondition.id, detail::optypes[static_cast<int>(optype)]);\
+	    auto unopsit=boost::afio::detail::Undoer([this, opsit, thisid](){\
+		    p->ops.erase(opsit.first);\
+		    BOOST_AFIO_DEBUG_PRINT("E R %u\n", (unsigned) thisid);\
+	    });\
+	    if(!!(flags & async_op_flags::DetachedFuture))\
+	    {\
+		    opsit.first->second.detached_promise.reset(new promise<std::shared_ptr<detail::async_io_handle>>);\
+		    if(!done)\
+			    *opsit.first->second.h=opsit.first->second.detached_promise->get_future();\
+	    }\
+	    unopsit.dismiss();\
+	    undep.dismiss();\
+	    return ret;\
+    }
+
+  
+#define BOOST_PP_LOCAL_LIMITS     (0, BOOST_AFIO_MAX_PARAMETERS) //should this be 0 or 1 for the min????
+#include BOOST_PP_LOCAL_ITERATE()
+
+#endif
+
+
 template<class F, class T> std::vector<async_io_op> async_file_io_dispatcher_base::chain_async_ops(int optype, const std::vector<async_io_op> &preconditions, const std::vector<T> &container, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, T))
 {
 	std::vector<async_io_op> ret;

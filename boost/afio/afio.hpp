@@ -18,7 +18,6 @@ File Created: Mar 2013
 
 #include <type_traits>
 #include <initializer_list>
-#include <mutex>
 #include <exception>
 #include <algorithm> // Boost.ASIO needs std::min and std::max
 #if !defined(_WIN32_WINNT) && defined(WIN32)
@@ -32,14 +31,17 @@ File Created: Mar 2013
 #include "boost/thread/thread.hpp"
 #include "boost/thread/future.hpp"
 #include "boost/foreach.hpp"
+#include "detail/Preprocessor_variadic.hpp"
 
-#if defined(_CPPLIB_VER) && _CPPLIB_VER <540 // Dinkumware without <atomic>
+
+#if defined(BOOST_MSVC) && BOOST_MSVC < 1700// Dinkumware without <atomic>
 #include <boost\atomic.hpp>
 typedef boost::thread thread; 
 #define BOOST_AFIO_USE_BOOST_ATOMIC
 #else
 #include <thread>
 #include <atomic>
+#include <mutex>
 typedef std::thread thread;
 #endif
 
@@ -48,7 +50,7 @@ typedef std::thread thread;
 #include "detail/Utility.hpp"
 
 // Map in C++11 stuff if available
-#if defined(__GLIBCXX__) && __GLIBCXX__<=20120920
+#if (defined(__GLIBCXX__) && __GLIBCXX__<=20120920) || (defined(BOOST_MSVC) && BOOST_MSVC < 1700)
 #include "boost/exception_ptr.hpp"
 #include "boost/thread/recursive_mutex.hpp"
 namespace boost { namespace afio {
@@ -422,11 +424,11 @@ inline constexpr bool operator!(type a) \
 \brief Bitwise file and directory open flags
 \ingroup file_flags
 */
-#ifdef DOXYGEN_NO_CLASS_ENUMS
+//#ifdef DOXYGEN_NO_CLASS_ENUMS
 enum file_flags
-#else
-enum class file_flags : size_t
-#endif
+//#else
+//enum class file_flags : size_t
+//#endif
 {
 	None=0,				//!< No flags set
 	Read=1,				//!< Read access
@@ -580,7 +582,13 @@ public:
     \qexample{call_example}
     */
 	template<class R> inline std::pair<future<R>, async_io_op> call(const async_io_op &req, std::function<R()> callback);
-	/*! \brief Schedule an asynchronous invocation of the specified unbound callable when its supplied precondition completes.
+
+    
+    
+    
+#ifndef BOOST_NO_CXX11_VARIADIC_TEMPLATES
+     
+    /*! \brief Schedule an asynchronous invocation of the specified unbound callable when its supplied precondition completes.
     Note that this function essentially calls `std::bind()` on the callable and the args and passes it to the other call() overload taking a `std::function<>`.
     You should therefore use `std::ref()` etc. as appropriate.
 
@@ -601,6 +609,25 @@ public:
     \qexample{call_example}
     */
 	template<class C, class... Args> inline std::pair<future<typename boost::result_of<C(Args...)>::type>, async_io_op> call(const async_io_op &req, C callback, Args... args);
+
+#else   //define a version compatable with c++03
+
+#define BOOST_PP_LOCAL_MACRO(N)                                                                     \
+    template <class C                                                                               \
+    BOOST_PP_COMMA_IF(N) \                                                                                  \
+    BOOST_PP_ENUM_PARAMS(N, class A)>                                                               \
+    std::pair<future<typename boost::result_of<C(BOOST_PP_ENUM(N, A))>::type>, async_io_op>         \
+    call (const async_io_op &req, C callback BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, a));     
+
+  
+#define BOOST_PP_LOCAL_LIMITS     (0, BOOST_AFIO_MAX_PARAMETERS) //should this be 0 or 1 for the min????
+#include BOOST_PP_LOCAL_ITERATE()
+
+#endif
+
+
+
+
 
 	/*! \brief Schedule a batch of asynchronous directory creations and opens after optional preconditions.
     \return A batch of op handles.
@@ -831,13 +858,57 @@ public:
 protected:
 	void complete_async_op(size_t id, std::shared_ptr<detail::async_io_handle> h, exception_ptr e=exception_ptr());
 	completion_returntype invoke_user_completion(size_t id, std::shared_ptr<detail::async_io_handle> h, std::function<completion_t> callback);
-	template<class F, class... Args> std::shared_ptr<detail::async_io_handle> invoke_async_op_completions(size_t id, std::shared_ptr<detail::async_io_handle> h, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, Args...), Args... args);
-	template<class F, class... Args> async_io_op chain_async_op(detail::immediate_async_ops &immediates, int optype, const async_io_op &precondition, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, Args...), Args... args);
 	template<class F, class T> std::vector<async_io_op> chain_async_ops(int optype, const std::vector<async_io_op> &preconditions, const std::vector<T> &container, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, T));
 	template<class F> std::vector<async_io_op> chain_async_ops(int optype, const std::vector<async_io_op> &container, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, async_io_op));
 	template<class F> std::vector<async_io_op> chain_async_ops(int optype, const std::vector<async_path_op_req> &container, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, async_path_op_req));
 	template<class F, class T> std::vector<async_io_op> chain_async_ops(int optype, const std::vector<async_data_op_req<T>> &container, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, async_data_op_req<T>));
 	template<class T> async_file_io_dispatcher_base::completion_returntype dobarrier(size_t id, std::shared_ptr<detail::async_io_handle> h, T);
+
+#ifndef BOOST_NO_CXX11_VARIADIC_TEMPLATES
+    
+    template<class F, class... Args> std::shared_ptr<detail::async_io_handle> invoke_async_op_completions(size_t id, std::shared_ptr<detail::async_io_handle> h, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, Args...), Args... args);
+	template<class F, class... Args> async_io_op chain_async_op(detail::immediate_async_ops &immediates, int optype, const async_io_op &precondition, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, Args...), Args... args);
+
+#else
+
+#define BOOST_PP_LOCAL_MACRO(N)                                                                     \
+    template <class F                                                                               \
+    BOOST_PP_COMMA_IF(N)                                                                            \
+    BOOST_PP_ENUM_PARAMS(N, class A)>                                                               \
+    std::shared_ptr<detail::async_io_handle>                                                        \
+    invoke_async_op_completions                                                                     \
+    (size_t id, std::shared_ptr<detail::async_io_handle> h,                                         \
+    completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>                  \
+    BOOST_PP_COMMA_IF(N)                                                                            \
+    BOOST_PP_ENUM(N, a))                                                                            \
+    BOOST_PP_COMMA_IF(N)                                                                            \
+    BOOST_PP_ENUM_BINARY_PARAMS(N, A, a));     /* parameters end */     
+
+  
+#define BOOST_PP_LOCAL_LIMITS     (0, BOOST_AFIO_MAX_PARAMETERS) //should this be 0 or 1 for the min????
+#include BOOST_PP_LOCAL_ITERATE()
+
+
+
+#define BOOST_PP_LOCAL_MACRO(N)                                                                     \
+    template <class F                                /* template start */                           \
+    BOOST_PP_COMMA_IF(N)                                                                            \
+    BOOST_PP_ENUM_PARAMS(N, class A)>                /* template end */                             \
+    async_io_op                                      /* return type */                              \
+    chain_async_op                                   /* function name */                            \
+    (detail::immediate_async_ops &immediates, int optype,           /* parameters start */          \
+    const async_io_op &precondition,async_op_flags flags,                                           \
+    completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>                  \
+    BOOST_PP_COMMA_IF(N)                                                                            \
+    BOOST_PP_ENUM(N, a))                                                                            \
+    BOOST_PP_COMMA_IF(N)                                                                            \
+    BOOST_PP_ENUM_BINARY_PARAMS(N, A, a));     /* parameters end */
+
+  
+#define BOOST_PP_LOCAL_LIMITS     (0, BOOST_AFIO_MAX_PARAMETERS) //should this be 0 or 1 for the min????
+#include BOOST_PP_LOCAL_ITERATE()
+
+#endif
 };
 /*! \brief Instatiates the best available async_file_io_dispatcher implementation for this system.
 
@@ -1431,11 +1502,34 @@ template<class R> inline std::pair<future<R>, async_io_op> async_file_io_dispatc
 	std::pair<std::vector<future<R>>, std::vector<async_io_op>> ret(call(i, c));
 	return std::make_pair(std::move(ret.first.front()), ret.second.front());
 }
+
+#ifndef BOOST_NO_CXX11_VARIADIC_TEMPLATES
+
 template<class C, class... Args> inline std::pair<future<typename boost::result_of<C(Args...)>::type>, async_io_op> async_file_io_dispatcher_base::call(const async_io_op &req, C callback, Args... args)
 {
 	typedef typename std::result_of<C(Args...)>::type rettype;
 	return call(req, std::bind<rettype()>(callback, args...));
 }
+
+#else
+
+#define BOOST_PP_LOCAL_MACRO(N)                                                                         \
+    template <class C                                                                                   \
+    BOOST_PP_COMMA_IF(N)                                                                                \
+    BOOST_PP_ENUM_PARAMS(N, class A)>                                                                   \
+    std::pair<future<typename boost::result_of<C(BOOST_PP_ENUM(N, a))>::type>, async_io_op>             \
+    call (const async_io_op &req, C callback BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, a)) \
+    {                                                                                                   \
+        typedef typename std::result_of<C(BOOST_PP_ENUM(N, A))>::type rettype;                                      \
+    	return call(req, std::bind<rettype()>(callback, BOOST_PP_ENUM(N, a)));                                      \
+    }
+  
+#define BOOST_PP_LOCAL_LIMITS     (0, BOOST_AFIO_MAX_PARAMETERS) //should this be 0 or 1 for the min????
+#include BOOST_PP_LOCAL_ITERATE()
+
+
+#endif
+
 inline async_io_op async_file_io_dispatcher_base::dir(const async_path_op_req &req)
 {
 	std::vector<async_path_op_req> i;
