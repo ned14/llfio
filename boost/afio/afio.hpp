@@ -1129,103 +1129,108 @@ private:
 	}
 };
 
-//! \brief A convenience bundle of precondition, data and where for reading into a void *. Data \b MUST stay around until the operation completes. \ingroup async_data_op_req
-template<> struct async_data_op_req<void> // For reading
+namespace detail
 {
-    //! An optional precondition for this operation
-	async_io_op precondition;
-	//! A sequence of mutable Boost.ASIO buffers to read into
-	std::vector<boost::asio::mutable_buffer> buffers;
-	//! The offset from which to read
-	off_t where;
-	//! \constr
-	async_data_op_req() { }
-	//! \cconstr
-	async_data_op_req(const async_data_op_req &o) : precondition(o.precondition), buffers(o.buffers), where(o.where) { }
-	//! \mconstr
-	async_data_op_req(async_data_op_req &&o) : precondition(std::move(o.precondition)), buffers(std::move(o.buffers)), where(std::move(o.where)) { }
-	//! \cassign
-	async_data_op_req &operator=(const async_data_op_req &o) { precondition=o.precondition; buffers=o.buffers; where=o.where; return *this; }
-	//! \massign
-	async_data_op_req &operator=(async_data_op_req &&o) { precondition=std::move(o.precondition); buffers=std::move(o.buffers); where=std::move(o.where); return *this; }
-	//! \async_data_op_req1 \param _length The number of bytes to transfer
-	async_data_op_req(async_io_op _precondition, void *v, size_t _length, off_t _where) : precondition(std::move(_precondition)), where(_where) { buffers.reserve(1); buffers.push_back(boost::asio::mutable_buffer(v, _length)); _validate(); }
-	//! \async_data_op_req2
-	async_data_op_req(async_io_op _precondition, std::vector<boost::asio::mutable_buffer> _buffers, off_t _where) : precondition(std::move(_precondition)), buffers(_buffers), where(_where) { _validate(); }
-	//! Validates contents for correctness \return True if contents are correct
-	bool validate() const
+	template<bool for_writing> class async_data_op_req_impl;
+	template<bool for_writing> struct async_data_op_req_impl_type_selector
 	{
-		if(!precondition.validate()) return false;
-		if(buffers.empty()) return false;
-		for(auto &b : buffers)
+		typedef boost::asio::const_buffer boost_asio_buffer_type;
+		typedef const void *void_type;
+		typedef async_data_op_req_impl<false> conversion_type;
+	};
+	template<> struct async_data_op_req_impl_type_selector<false>
+	{
+		typedef boost::asio::mutable_buffer boost_asio_buffer_type;
+		typedef void *void_type;
+		typedef nullptr_t conversion_type;
+	};
+	template<bool for_writing> class async_data_op_req_impl
+	{
+		typedef typename async_data_op_req_impl_type_selector<for_writing>::boost_asio_buffer_type boost_asio_buffer_type;
+		typedef typename async_data_op_req_impl_type_selector<for_writing>::void_type void_type;
+		typedef typename async_data_op_req_impl_type_selector<for_writing>::conversion_type conversion_type;
+	public:
+		//! An optional precondition for this operation
+		async_io_op precondition;
+		//! A sequence of mutable Boost.ASIO buffers to read into
+		std::vector<boost_asio_buffer_type> buffers;
+		//! The offset from which to read
+		off_t where;
+		//! \constr
+		async_data_op_req_impl() { }
+		//! \cconstr
+		async_data_op_req_impl(const async_data_op_req_impl &o) : precondition(o.precondition), buffers(o.buffers), where(o.where) { }
+		//! \mconstr
+		async_data_op_req_impl(async_data_op_req_impl &&o) : precondition(std::move(o.precondition)), buffers(std::move(o.buffers)), where(std::move(o.where)) { }
+		//! \cconstr
+		async_data_op_req_impl(const conversion_type &o) : precondition(o.precondition), where(o.where) { buffers.reserve(o.buffers.capacity()); for(auto &i: o.buffers) buffers.push_back(i); }
+		//! \mconstr
+		async_data_op_req_impl(conversion_type &&o) : precondition(std::move(o.precondition)), where(std::move(o.where)) { buffers.reserve(o.buffers.capacity()); for(auto &&i: o.buffers) buffers.push_back(std::move(i)); }
+		//! \cassign
+		async_data_op_req_impl &operator=(const async_data_op_req_impl &o) { precondition=o.precondition; buffers=o.buffers; where=o.where; return *this; }
+		//! \massign
+		async_data_op_req_impl &operator=(async_data_op_req_impl &&o) { precondition=std::move(o.precondition); buffers=std::move(o.buffers); where=std::move(o.where); return *this; }
+		//! \async_data_op_req1 \param _length The number of bytes to transfer
+		async_data_op_req_impl(async_io_op _precondition, void_type v, size_t _length, off_t _where) : precondition(std::move(_precondition)), where(_where) { buffers.reserve(1); buffers.push_back(boost_asio_buffer_type(v, _length)); _validate(); }
+		//! \async_data_op_req2
+		template<class T> async_data_op_req_impl(async_io_op _precondition, std::vector<T> _buffers, off_t _where) : precondition(std::move(_precondition)), buffers(std::move(_buffers)), where(_where) { _validate(); }
+		//! Validates contents for correctness \return True if contents are correct
+		bool validate() const
 		{
-			if(!boost::asio::buffer_cast<const void *>(b) || !boost::asio::buffer_size(b)) return false;
-			if(!!(precondition.parent->fileflags(file_flags::None)&file_flags::OSDirect))
+			if(!precondition.validate()) return false;
+			if(buffers.empty()) return false;
+			for(auto &b : buffers)
 			{
-				if(((size_t)boost::asio::buffer_cast<const void *>(b) & 4095) || (boost::asio::buffer_size(b) & 4095)) return false;
+				if(!boost::asio::buffer_cast<const void *>(b) || !boost::asio::buffer_size(b)) return false;
+				if(!!(precondition.parent->fileflags(file_flags::None)&file_flags::OSDirect))
+				{
+					if(((size_t) boost::asio::buffer_cast<const void *>(b) & 4095) || (boost::asio::buffer_size(b) & 4095)) return false;
+				}
 			}
+			return true;
 		}
-		return true;
-	}
-private:
-	void _validate() const
-	{
+	private:
+		void _validate() const
+		{
 #if BOOST_AFIO_VALIDATE_INPUTS
-		if(!validate())
-			throw std::runtime_error("Inputs are invalid.");
+			if(!validate())
+				throw std::runtime_error("Inputs are invalid.");
 #endif
-	}
+		}
+	};
+}
+
+//! \brief A convenience bundle of precondition, data and where for reading into a void *. Data \b MUST stay around until the operation completes. \ingroup async_data_op_req
+template<> struct async_data_op_req<void> : public detail::async_data_op_req_impl<false>
+{
+	//! \constr
+	async_data_op_req() : detail::async_data_op_req_impl<false>() {}
+	//! \cconstr
+	async_data_op_req(const async_data_op_req &o) : detail::async_data_op_req_impl<false>(o) {}
+	//! \mconstr
+	async_data_op_req(async_data_op_req &&o) : detail::async_data_op_req_impl<false>(std::move(o)) {}
+	//! \async_data_op_req1 \param _length The number of bytes to transfer
+	async_data_op_req(async_io_op _precondition, void *v, size_t _length, off_t _where) : detail::async_data_op_req_impl<false>(std::move(_precondition), v, _length, _where) { }
+	//! \async_data_op_req2
+	async_data_op_req(async_io_op _precondition, std::vector<boost::asio::mutable_buffer> _buffers, off_t _where) : detail::async_data_op_req_impl<false>(std::move(_precondition), std::move(_buffers), _where) { }
 };
 //! \brief A convenience bundle of precondition, data and where for writing from a const void *. Data \b MUST stay around until the operation completes. \ingroup async_data_op_req
-template<> struct async_data_op_req<const void> // For writing
+template<> struct async_data_op_req<const void> : public detail::async_data_op_req_impl<true>
 {
-    //! An optional precondition for this operation
-	async_io_op precondition;
-	//! A sequence of const Boost.ASIO buffers to write from
-	std::vector<boost::asio::const_buffer> buffers;
-	//! The offset into which to write
-	off_t where;
 	//! \constr
-	async_data_op_req() { }
+	async_data_op_req() : detail::async_data_op_req_impl<true>() {}
 	//! \cconstr
-	async_data_op_req(const async_data_op_req &o) : precondition(o.precondition), buffers(o.buffers), where(o.where) { }
+	async_data_op_req(const async_data_op_req &o) : detail::async_data_op_req_impl<true>(o) {}
 	//! \mconstr
-	async_data_op_req(async_data_op_req &&o) : precondition(std::move(o.precondition)), buffers(std::move(o.buffers)), where(std::move(o.where)) { }
+	async_data_op_req(async_data_op_req &&o) : detail::async_data_op_req_impl<true>(std::move(o)) {}
 	//! \cconstr
-	async_data_op_req(const async_data_op_req<void> &o) : precondition(o.precondition), where(o.where) { buffers.reserve(o.buffers.capacity()); for(auto &i: o.buffers) buffers.push_back(i); }
+	async_data_op_req(const async_data_op_req<void> &o) : detail::async_data_op_req_impl<true>(o) {}
 	//! \mconstr
-	async_data_op_req(async_data_op_req<void> &&o) : precondition(std::move(o.precondition)), where(o.where) { buffers.reserve(o.buffers.capacity()); for(auto &&i: o.buffers) buffers.push_back(std::move(i)); }
-	//! \cassign
-	async_data_op_req &operator=(const async_data_op_req &o) { precondition=o.precondition; buffers=o.buffers; where=o.where; return *this; }
-	//! \massign
-	async_data_op_req &operator=(async_data_op_req &&o) { precondition=std::move(o.precondition); buffers=std::move(o.buffers); where=std::move(o.where); return *this; }
+	async_data_op_req(async_data_op_req<void> &&o) : detail::async_data_op_req_impl<true>(std::move(o)) {}
 	//! \async_data_op_req1 \param _length The number of bytes to transfer
-	async_data_op_req(async_io_op _precondition, const void *v, size_t _length, off_t _where) : precondition(std::move(_precondition)), where(_where) { buffers.reserve(1); buffers.push_back(boost::asio::const_buffer(v, _length)); _validate(); }
+	async_data_op_req(async_io_op _precondition, const void *v, size_t _length, off_t _where) : detail::async_data_op_req_impl<true>(std::move(_precondition), v, _length, _where) {}
 	//! \async_data_op_req2
-	async_data_op_req(async_io_op _precondition, std::vector<boost::asio::const_buffer> _buffers, off_t _where) : precondition(std::move(_precondition)), buffers(_buffers), where(_where) { _validate(); }
-	//! Validates contents for correctness \return True if contents are correct
-	bool validate() const
-	{
-		if(!precondition.validate()) return false;
-		if(buffers.empty()) return false;
-		for(auto &b : buffers)
-		{
-			if(!boost::asio::buffer_cast<const void *>(b) || !boost::asio::buffer_size(b)) return false;
-			if(!!(precondition.parent->fileflags(file_flags::None)&file_flags::OSDirect))
-			{
-				if(((size_t)boost::asio::buffer_cast<const void *>(b) & 4095) || (boost::asio::buffer_size(b) & 4095)) return false;
-			}
-		}
-		return true;
-	}
-private:
-	void _validate() const
-	{
-#if BOOST_AFIO_VALIDATE_INPUTS
-		if(!validate())
-			throw std::runtime_error("Inputs are invalid.");
-#endif
-	}
+	async_data_op_req(async_io_op _precondition, std::vector<boost::asio::const_buffer> _buffers, off_t _where) : detail::async_data_op_req_impl<true>(std::move(_precondition), _buffers, _where) {}
 };
 //! \brief A convenience bundle of precondition, data and where for reading into a single T *. Data \b MUST stay around until the operation completes. \tparam "class T" Any writable type T \ingroup async_data_op_req
 template<class T> struct async_data_op_req : public async_data_op_req<void>
