@@ -438,6 +438,7 @@ namespace detail {
 		off_t write_count_since_fsync() const { return byteswritten-byteswrittenatlastfsync; }
 	};
 	struct immediate_async_ops;
+	template<bool for_writing> class async_data_op_req_impl;
 }
 
 
@@ -707,76 +708,72 @@ public:
 
 	\direct_io_note
     \return A batch of op handles.
-    \param ops A batch of `async_data_op_req<void>` structures.
+	\tparam "class T" Any type.
+    \param ops A batch of async_data_op_req<T> structures.
     \ingroup async_file_io_dispatcher_base__filedirops
     \qbk{distinguish, batch}
     \complexity{Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete if reading data is constant time.}
     \exceptionmodelstd
     \qexample{readwrite_example}
     */
-	virtual std::vector<async_io_op> read(const std::vector<async_data_op_req<void>> &ops)=0;
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+	virtual std::vector<async_io_op> read(const std::vector<detail::async_data_op_req_impl<false>> &ops)=0;
+	template<class T> inline std::vector<async_io_op> read(const std::vector<async_data_op_req<T>> &ops);
+#else
+	template<class T> virtual std::vector<async_io_op> read(const std::vector<async_data_op_req<T>> &ops)=0;
+#endif
 	/*! \brief Schedule an asynchronous data read after a preceding operation.
 
 	\direct_io_note
 	\return An op handle.
-    \param req An `async_data_op_req<void>` structure.
+	\tparam "class T" Any type.
+	\param req An async_data_op_req<T> structure.
     \ingroup async_file_io_dispatcher_base__filedirops
     \qbk{distinguish, single}
     \complexity{Amortised O(1) to dispatch. Amortised O(1) to complete if reading data is constant time.}
     \exceptionmodelstd
     \qexample{readwrite_example}
     */
-	inline async_io_op read(const async_data_op_req<void> &req);
-	/*! \brief Schedule a batch of asynchronous data reads after preceding operations.
-
-	\direct_io_note
-	\return A batch of op handles.
-    \tparam "class T" Any arbitrary type.
-    \param ops A batch of `async_data_op_req<T>` structures.
-    \ingroup async_file_io_dispatcher_base__filedirops
-    \qbk{distinguish, batch}
-    \complexity{Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete if reading data is constant time.}
-    \exceptionmodelstd
-    \qexample{readwrite_example}
-    */
-	template<class T> inline std::vector<async_io_op> read(const std::vector<async_data_op_req<T>> &ops);
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+	inline async_io_op read(const detail::async_data_op_req_impl<false> &req);
+#else
+	template<class T> inline async_io_op read(const async_data_op_req<T> &req);
+#endif
 	/*! \brief Schedule a batch of asynchronous data writes after preceding operations.
 
 	\direct_io_note
 	\return A batch of op handles.
-    \param ops A batch of `async_data_op_req<const void>` structures.
+	\tparam "class T" Any type.
+	\param ops A batch of async_data_op_req<const T> structures.
     \ingroup async_file_io_dispatcher_base__filedirops
     \qbk{distinguish, batch}
     \complexity{Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete if writing data is constant time.}
     \exceptionmodelstd
     \qexample{readwrite_example}
     */
-	virtual std::vector<async_io_op> write(const std::vector<async_data_op_req<const void>> &ops)=0;
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+	virtual std::vector<async_io_op> write(const std::vector<detail::async_data_op_req_impl<true>> &ops)=0;
+	template<class T> inline std::vector<async_io_op> write(const std::vector<async_data_op_req<T>> &ops);
+#else
+	template<class T> virtual std::vector<async_io_op> write(const std::vector<async_data_op_req<const T>> &ops)=0;
+#endif
 	/*! \brief Schedule an asynchronous data write after a preceding operation.
 
 	\direct_io_note
 	\return An op handle.
-    \param req An `async_data_op_req<const void>` structure.
+	\tparam "class T" Any type.
+	\param req An async_data_op_req<const T> structure.
     \ingroup async_file_io_dispatcher_base__filedirops
     \qbk{distinguish, single}
     \complexity{Amortised O(1) to dispatch. Amortised O(1) to complete if writing data is constant time.}
     \exceptionmodelstd
     \qexample{readwrite_example}
     */
-	inline async_io_op write(const async_data_op_req<const void> &req);
-	/*! \brief Schedule a batch of asynchronous data writes after preceding operations.
-
-	\direct_io_note
-	\return A batch of op handles.
-    \tparam "class T" Any arbitrary type.
-    \param ops A batch of `async_data_op_req<T>` structures.
-    \ingroup async_file_io_dispatcher_base__filedirops
-    \qbk{distinguish, batch}
-    \complexity{Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete if writing data is constant time.}
-    \exceptionmodelstd
-    \qexample{readwrite_example}
-    */
-	template<class T> inline std::vector<async_io_op> write(const std::vector<async_data_op_req<T>> &ops);
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+	inline async_io_op write(const detail::async_data_op_req_impl<true> &req);
+#else
+	template<class T> inline async_io_op write(const async_data_op_req<const T> &req);
+#endif
 
 	/*! \brief Schedule a batch of asynchronous file length truncations after preceding operations.
     \return A batch of op handles.
@@ -836,7 +833,7 @@ protected:
 	template<class F, class T> std::vector<async_io_op> chain_async_ops(int optype, const std::vector<async_io_op> &preconditions, const std::vector<T> &container, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, T));
 	template<class F> std::vector<async_io_op> chain_async_ops(int optype, const std::vector<async_io_op> &container, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, async_io_op));
 	template<class F> std::vector<async_io_op> chain_async_ops(int optype, const std::vector<async_path_op_req> &container, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, async_path_op_req));
-	template<class F, class T> std::vector<async_io_op> chain_async_ops(int optype, const std::vector<async_data_op_req<T>> &container, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, async_data_op_req<T>));
+	template<class F, bool iswrite> std::vector<async_io_op> chain_async_ops(int optype, const std::vector<detail::async_data_op_req_impl<iswrite>> &container, async_op_flags flags, completion_returntype(F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, detail::async_data_op_req_impl<iswrite>));
 	template<class T> async_file_io_dispatcher_base::completion_returntype dobarrier(size_t id, std::shared_ptr<detail::async_io_handle> h, T);
 };
 /*! \brief Instatiates the best available async_file_io_dispatcher implementation for this system.
@@ -1202,6 +1199,62 @@ namespace detail
 	};
 }
 
+/*! \struct async_data_op_req
+\brief A convenience bundle of precondition, data and where for reading into a single `T *`. Data \b MUST stay around until the operation completes.
+\tparam T Any readable type T
+\ingroup async_data_op_req
+*/
+template<class T> struct async_data_op_req : public detail::async_data_op_req_impl<false>
+{
+#ifdef DOXYGEN_SHOULD_SKIP_THIS
+	//! An optional precondition for this operation
+	async_io_op precondition;
+	//! A sequence of mutable Boost.ASIO buffers to read into
+	std::vector<boost_asio_buffer_type> buffers;
+	//! The offset from which to read
+	off_t where;
+#endif
+	//! \constr
+	async_data_op_req() { }
+	//! \cconstr
+	async_data_op_req(const async_data_op_req &o) : detail::async_data_op_req_impl<false>(o) { }
+	//! \mconstr
+	async_data_op_req(async_data_op_req &&o) : detail::async_data_op_req_impl<false>(std::move(o)) { }
+	//! \cassign
+	async_data_op_req &operator=(const async_data_op_req &o) { static_cast<detail::async_data_op_req_impl<false>>(*this)=o; return *this; }
+	//! \massign
+	async_data_op_req &operator=(async_data_op_req &&o) { static_cast<detail::async_data_op_req_impl<false>>(*this)=std::move(o); return *this; }
+	//! \async_data_op_req1 \param _length The number of bytes to transfer
+	async_data_op_req(async_io_op _precondition, T *v, size_t _length, off_t _where) : detail::async_data_op_req_impl<false>(std::move(_precondition), static_cast<void *>(v), _length, _where) { }
+	};
+	//! \brief A convenience bundle of precondition, data and where for writing from a single `const T *`. Data \b MUST stay around until the operation completes. \tparam "class T" Any readable type T \ingroup async_data_op_req
+	template<class T> struct async_data_op_req<const T> : public detail::async_data_op_req_impl<true>
+	{
+#ifdef DOXYGEN_SHOULD_SKIP_THIS
+		//! An optional precondition for this operation
+		async_io_op precondition;
+		//! A sequence of mutable Boost.ASIO buffers to read into
+		std::vector<boost_asio_buffer_type> buffers;
+		//! The offset from which to read
+		off_t where;
+#endif
+		//! \constr
+		async_data_op_req() { }
+		//! \cconstr
+		async_data_op_req(const async_data_op_req &o) : detail::async_data_op_req_impl<true>(o) { }
+		//! \mconstr
+		async_data_op_req(async_data_op_req &&o) : detail::async_data_op_req_impl<true>(std::move(o)) { }
+		//! \cconstr
+		async_data_op_req(const async_data_op_req<T> &o) : detail::async_data_op_req_impl<true>(o) { }
+		//! \mconstr
+		async_data_op_req(async_data_op_req<T> &&o) : detail::async_data_op_req_impl<true>(std::move(o)) { }
+		//! \cassign
+		async_data_op_req &operator=(const async_data_op_req &o) { static_cast<detail::async_data_op_req_impl<true>>(*this)=o; return *this; }
+		//! \massign
+		async_data_op_req &operator=(async_data_op_req &&o) { static_cast<detail::async_data_op_req_impl<true>>(*this)=std::move(o); return *this; }
+		//! \async_data_op_req1 \param _length The number of bytes to transfer
+		async_data_op_req(async_io_op _precondition, const T *v, size_t _length, off_t _where) : detail::async_data_op_req_impl<true>(std::move(_precondition), static_cast<const void *>(v), _length, _where) { }
+};
 //! \brief A convenience bundle of precondition, data and where for reading into a `void *`. Data \b MUST stay around until the operation completes. \ingroup async_data_op_req
 template<> struct async_data_op_req<void> : public detail::async_data_op_req_impl<false>
 {
@@ -1250,60 +1303,8 @@ template<> struct async_data_op_req<const void> : public detail::async_data_op_r
 	//! \async_data_op_req2
 	async_data_op_req(async_io_op _precondition, std::vector<boost::asio::const_buffer> _buffers, off_t _where) : detail::async_data_op_req_impl<true>(std::move(_precondition), _buffers, _where) {}
 };
-//! \brief A convenience bundle of precondition, data and where for reading into a single `T *`. Data \b MUST stay around until the operation completes. \tparam "class T" Any writable type T \ingroup async_data_op_req
-template<class T> struct async_data_op_req : public async_data_op_req<void>
-{
-#ifdef DOXYGEN_SHOULD_SKIP_THIS
-	//! An optional precondition for this operation
-	async_io_op precondition;
-	//! A sequence of mutable Boost.ASIO buffers to read into
-	std::vector<boost_asio_buffer_type> buffers;
-	//! The offset from which to read
-	off_t where;
-#endif
-	//! \constr
-	async_data_op_req() { }
-    //! \cconstr
-	async_data_op_req(const async_data_op_req &o) : async_data_op_req<void>(o) { }
-    //! \mconstr
-	async_data_op_req(async_data_op_req &&o) : async_data_op_req<void>(std::move(o)) { }
-    //! \cassign
-	async_data_op_req &operator=(const async_data_op_req &o) { static_cast<async_data_op_req<void>>(*this)=o; return *this; }
-    //! \massign
-	async_data_op_req &operator=(async_data_op_req &&o) { static_cast<async_data_op_req<void>>(*this)=std::move(o); return *this; }
-    //! \async_data_op_req1 \param _length The number of bytes to transfer
-	async_data_op_req(async_io_op _precondition, T *v, size_t _length, off_t _where) : async_data_op_req<void>(std::move(_precondition), static_cast<void *>(v), _length, _where) { }
-};
-//! \brief A convenience bundle of precondition, data and where for writing from a single `const T *`. Data \b MUST stay around until the operation completes. \tparam "class T" Any readable type T \ingroup async_data_op_req
-template<class T> struct async_data_op_req<const T> : public async_data_op_req<const void>
-{
-#ifdef DOXYGEN_SHOULD_SKIP_THIS
-	//! An optional precondition for this operation
-	async_io_op precondition;
-	//! A sequence of mutable Boost.ASIO buffers to read into
-	std::vector<boost_asio_buffer_type> buffers;
-	//! The offset from which to read
-	off_t where;
-#endif
-	//! \constr
-	async_data_op_req() { }
-    //! \cconstr
-	async_data_op_req(const async_data_op_req &o) : async_data_op_req<const void>(o) { }
-    //! \mconstr
-	async_data_op_req(async_data_op_req &&o) : async_data_op_req<const void>(std::move(o)) { }
-    //! \cconstr
-	async_data_op_req(const async_data_op_req<T> &o) : async_data_op_req<const void>(o) { }
-    //! \mconstr
-	async_data_op_req(async_data_op_req<T> &&o) : async_data_op_req<const void>(std::move(o)) { }
-    //! \cassign
-	async_data_op_req &operator=(const async_data_op_req &o) { static_cast<async_data_op_req<const void>>(*this)=o; return *this; }
-    //! \massign
-	async_data_op_req &operator=(async_data_op_req &&o) { static_cast<async_data_op_req<const void>>(*this)=std::move(o); return *this; }
-    //! \async_data_op_req1 \param _length The number of bytes to transfer
-	async_data_op_req(async_io_op _precondition, const T *v, size_t _length, off_t _where) : async_data_op_req<const void>(std::move(_precondition), static_cast<const void *>(v), _length, _where) { }
-};
 //! \brief A convenience bundle of precondition, data and where for reading into a `std::vector<T, A>`. Data \b MUST stay around until the operation completes. \tparam "class T" Any type \tparam "class A" Any STL allocator \ingroup async_data_op_req
-template<class T, class A> struct async_data_op_req<std::vector<T, A>> : public async_data_op_req<void>
+template<class T, class A> struct async_data_op_req<std::vector<T, A>> : public detail::async_data_op_req_impl<false>
 {
 #ifdef DOXYGEN_SHOULD_SKIP_THIS
 	//! An optional precondition for this operation
@@ -1316,18 +1317,18 @@ template<class T, class A> struct async_data_op_req<std::vector<T, A>> : public 
 	//! \constr
 	async_data_op_req() { }
     //! \cconstr
-	async_data_op_req(const async_data_op_req &o) : async_data_op_req<void>(o) { }
+	async_data_op_req(const async_data_op_req &o) : detail::async_data_op_req_impl<false>(o) { }
     //! \mconstr
-	async_data_op_req(async_data_op_req &&o) : async_data_op_req<void>(std::move(o)) { }
+	async_data_op_req(async_data_op_req &&o) : detail::async_data_op_req_impl<false>(std::move(o)) { }
     //! \cassign
-	async_data_op_req &operator=(const async_data_op_req &o) { static_cast<async_data_op_req<void>>(*this)=o; return *this; }
+	async_data_op_req &operator=(const async_data_op_req &o) { static_cast<detail::async_data_op_req_impl<false>>(*this)=o; return *this; }
     //! \massign
-	async_data_op_req &operator=(async_data_op_req &&o) { static_cast<async_data_op_req<void>>(*this)=std::move(o); return *this; }
+	async_data_op_req &operator=(async_data_op_req &&o) { static_cast<detail::async_data_op_req_impl<false>>(*this)=std::move(o); return *this; }
     //! \async_data_op_req1
-	async_data_op_req(async_io_op _precondition, std::vector<T, A> &v, off_t _where) : async_data_op_req<void>(std::move(_precondition), static_cast<void *>(&v.front()), v.size()*sizeof(T), _where) { }
+	async_data_op_req(async_io_op _precondition, std::vector<T, A> &v, off_t _where) : detail::async_data_op_req_impl<false>(std::move(_precondition), static_cast<void *>(&v.front()), v.size()*sizeof(T), _where) { }
 };
 //! \brief A convenience bundle of precondition, data and where for writing from a `const std::vector<T, A>`. Data \b MUST stay around until the operation completes. \tparam "class T" Any type \tparam "class A" Any STL allocator \ingroup async_data_op_req
-template<class T, class A> struct async_data_op_req<const std::vector<T, A>> : public async_data_op_req<const void>
+template<class T, class A> struct async_data_op_req<const std::vector<T, A>> : public detail::async_data_op_req_impl<true>
 {
 #ifdef DOXYGEN_SHOULD_SKIP_THIS
 	//! An optional precondition for this operation
@@ -1340,22 +1341,22 @@ template<class T, class A> struct async_data_op_req<const std::vector<T, A>> : p
 	//! \constr
 	async_data_op_req() { }
     //! \cconstr
-	async_data_op_req(const async_data_op_req &o) : async_data_op_req<const void>(o) { }
+	async_data_op_req(const async_data_op_req &o) : detail::async_data_op_req_impl<true>(o) { }
     //! \mconstr
-	async_data_op_req(async_data_op_req &&o) : async_data_op_req<const void>(std::move(o)) { }
+	async_data_op_req(async_data_op_req &&o) : detail::async_data_op_req_impl<true>(std::move(o)) { }
     //! \cconstr
-	async_data_op_req(const async_data_op_req<std::vector<T, A>> &o) : async_data_op_req<const void>(o) { }
+	async_data_op_req(const async_data_op_req<std::vector<T, A>> &o) : detail::async_data_op_req_impl<true>(o) { }
     //! \mconstr
-	async_data_op_req(async_data_op_req<std::vector<T, A>> &&o) : async_data_op_req<const void>(std::move(o)) { }
+	async_data_op_req(async_data_op_req<std::vector<T, A>> &&o) : detail::async_data_op_req_impl<true>(std::move(o)) { }
     //! \cassign
-	async_data_op_req &operator=(const async_data_op_req &o) { static_cast<async_data_op_req<const void>>(*this)=o; return *this; }
+	async_data_op_req &operator=(const async_data_op_req &o) { static_cast<detail::async_data_op_req_impl<true>>(*this)=o; return *this; }
     //! \massign
-	async_data_op_req &operator=(async_data_op_req &&o) { static_cast<async_data_op_req<const void>>(*this)=std::move(o); return *this; }
+	async_data_op_req &operator=(async_data_op_req &&o) { static_cast<detail::async_data_op_req_impl<true>>(*this)=std::move(o); return *this; }
     //! \async_data_op_req1
-	async_data_op_req(async_io_op _precondition, const std::vector<T, A> &v, off_t _where) : async_data_op_req<const void>(std::move(_precondition), static_cast<const void *>(&v.front()), v.size()*sizeof(T), _where) { }
+	async_data_op_req(async_io_op _precondition, const std::vector<T, A> &v, off_t _where) : detail::async_data_op_req_impl<true>(std::move(_precondition), static_cast<const void *>(&v.front()), v.size()*sizeof(T), _where) { }
 };
 //! \brief A convenience bundle of precondition, data and where for reading into a `std::array<T, N>`. Data \b MUST stay around until the operation completes. \tparam "class T" Any type \tparam N Any compile-time size \ingroup async_data_op_req
-template<class T, size_t N> struct async_data_op_req<std::array<T, N>> : public async_data_op_req<void>
+template<class T, size_t N> struct async_data_op_req<std::array<T, N>> : public detail::async_data_op_req_impl<false>
 {
 #ifdef DOXYGEN_SHOULD_SKIP_THIS
 	//! An optional precondition for this operation
@@ -1368,18 +1369,18 @@ template<class T, size_t N> struct async_data_op_req<std::array<T, N>> : public 
 	//! \constr
 	async_data_op_req() { }
     //! \cconstr
-	async_data_op_req(const async_data_op_req &o) : async_data_op_req<void>(o) { }
+	async_data_op_req(const async_data_op_req &o) : detail::async_data_op_req_impl<false>(o) { }
     //! \mconstr
-	async_data_op_req(async_data_op_req &&o) : async_data_op_req<void>(std::move(o)) { }
+	async_data_op_req(async_data_op_req &&o) : detail::async_data_op_req_impl<false>(std::move(o)) { }
     //! \cassign
-	async_data_op_req &operator=(const async_data_op_req &o) { static_cast<async_data_op_req<void>>(*this)=o; return *this; }
+	async_data_op_req &operator=(const async_data_op_req &o) { static_cast<detail::async_data_op_req_impl<false>>(*this)=o; return *this; }
     //! \massign
-	async_data_op_req &operator=(async_data_op_req &&o) { static_cast<async_data_op_req<void>>(*this)=std::move(o); return *this; }
+	async_data_op_req &operator=(async_data_op_req &&o) { static_cast<detail::async_data_op_req_impl<false>>(*this)=std::move(o); return *this; }
     //! \async_data_op_req1
-	async_data_op_req(async_io_op _precondition, std::array<T, N> &v, off_t _where) : async_data_op_req<void>(std::move(_precondition), static_cast<void *>(&v.front()), v.size()*sizeof(T), _where) { }
+	async_data_op_req(async_io_op _precondition, std::array<T, N> &v, off_t _where) : detail::async_data_op_req_impl<false>(std::move(_precondition), static_cast<void *>(&v.front()), v.size()*sizeof(T), _where) { }
 };
 //! \brief A convenience bundle of precondition, data and where for writing from a `const std::array<T, N>`. Data \b MUST stay around until the operation completes. \tparam "class T" Any type \tparam N Any compile-time size \ingroup async_data_op_req
-template<class T, size_t N> struct async_data_op_req<const std::array<T, N>> : public async_data_op_req<const void>
+template<class T, size_t N> struct async_data_op_req<const std::array<T, N>> : public detail::async_data_op_req_impl<true>
 {
 #ifdef DOXYGEN_SHOULD_SKIP_THIS
 	//! An optional precondition for this operation
@@ -1392,22 +1393,22 @@ template<class T, size_t N> struct async_data_op_req<const std::array<T, N>> : p
 	//! \constr
 	async_data_op_req() { }
     //! \cconstr
-	async_data_op_req(const async_data_op_req &o) : async_data_op_req<const void>(o) { }
+	async_data_op_req(const async_data_op_req &o) : detail::async_data_op_req_impl<true>(o) { }
     //! \mconstr
-	async_data_op_req(async_data_op_req &&o) : async_data_op_req<const void>(std::move(o)) { }
+	async_data_op_req(async_data_op_req &&o) : detail::async_data_op_req_impl<true>(std::move(o)) { }
     //! \cassign
-	async_data_op_req &operator=(const async_data_op_req &o) { static_cast<async_data_op_req<const void>>(*this)=o; return *this; }
+	async_data_op_req &operator=(const async_data_op_req &o) { static_cast<detail::async_data_op_req_impl<true>>(*this)=o; return *this; }
     //! \massign
-	async_data_op_req &operator=(async_data_op_req &&o) { static_cast<async_data_op_req<const void>>(*this)=std::move(o); return *this; }
+	async_data_op_req &operator=(async_data_op_req &&o) { static_cast<detail::async_data_op_req_impl<true>>(*this)=std::move(o); return *this; }
     //! \cconstr
-	async_data_op_req(const async_data_op_req<std::array<T, N>> &o) : async_data_op_req<const void>(o) { }
+	async_data_op_req(const async_data_op_req<std::array<T, N>> &o) : detail::async_data_op_req_impl<true>(o) { }
     //! \mconstr
-	async_data_op_req(async_data_op_req<std::array<T, N>> &&o) : async_data_op_req<const void>(std::move(o)) { }
+	async_data_op_req(async_data_op_req<std::array<T, N>> &&o) : detail::async_data_op_req_impl<true>(std::move(o)) { }
     //! \async_data_op_req1
-	async_data_op_req(async_io_op _precondition, const std::array<T, N> &v, off_t _where) : async_data_op_req<const void>(std::move(_precondition), static_cast<const void *>(&v.front()), v.size()*sizeof(T), _where) { }
+	async_data_op_req(async_io_op _precondition, const std::array<T, N> &v, off_t _where) : detail::async_data_op_req_impl<true>(std::move(_precondition), static_cast<const void *>(&v.front()), v.size()*sizeof(T), _where) { }
 };
 //! \brief A convenience bundle of precondition, data and where for reading into a `std::basic_string<C, T, A>`. Data \b MUST stay around until the operation completes. \tparam "class C" Any character type \tparam "class T" Character traits type \tparam "class A" Any STL allocator \ingroup async_data_op_req
-template<class C, class T, class A> struct async_data_op_req<std::basic_string<C, T, A>> : public async_data_op_req<void>
+template<class C, class T, class A> struct async_data_op_req<std::basic_string<C, T, A>> : public detail::async_data_op_req_impl<false>
 {
 #ifdef DOXYGEN_SHOULD_SKIP_THIS
 	//! An optional precondition for this operation
@@ -1420,18 +1421,18 @@ template<class C, class T, class A> struct async_data_op_req<std::basic_string<C
 	//! \constr
 	async_data_op_req() { }
     //! \cconstr
-	async_data_op_req(const async_data_op_req &o) : async_data_op_req<void>(o) { }
+	async_data_op_req(const async_data_op_req &o) : detail::async_data_op_req_impl<false>(o) { }
     //! \mconstr
-	async_data_op_req(async_data_op_req &&o) : async_data_op_req<void>(std::move(o)) { }
+	async_data_op_req(async_data_op_req &&o) : detail::async_data_op_req_impl<false>(std::move(o)) { }
     //! \cassign
-	async_data_op_req &operator=(const async_data_op_req &o) { static_cast<async_data_op_req<void>>(*this)=o; return *this; }
+	async_data_op_req &operator=(const async_data_op_req &o) { static_cast<detail::async_data_op_req_impl<false>>(*this)=o; return *this; }
     //! \mconstr
-	async_data_op_req &operator=(async_data_op_req &&o) { static_cast<async_data_op_req<void>>(*this)=std::move(o); return *this; }
+	async_data_op_req &operator=(async_data_op_req &&o) { static_cast<detail::async_data_op_req_impl<false>>(*this)=std::move(o); return *this; }
     //! \async_data_op_req1
-	async_data_op_req(async_io_op _precondition, std::basic_string<C, T, A> &v, off_t _where) : async_data_op_req<void>(std::move(_precondition), static_cast<void *>(&v.front()), v.size()*sizeof(A), _where) { }
+	async_data_op_req(async_io_op _precondition, std::basic_string<C, T, A> &v, off_t _where) : detail::async_data_op_req_impl<false>(std::move(_precondition), static_cast<void *>(&v.front()), v.size()*sizeof(A), _where) { }
 };
 //! \brief A convenience bundle of precondition, data and where for writing from a `const std::basic_string<C, T, A>`. Data \b MUST stay around until the operation completes.  \tparam "class C" Any character type \tparam "class T" Character traits type \tparam "class A" Any STL allocator \ingroup async_data_op_req
-template<class C, class T, class A> struct async_data_op_req<const std::basic_string<C, T, A>> : public async_data_op_req<const void>
+template<class C, class T, class A> struct async_data_op_req<const std::basic_string<C, T, A>> : public detail::async_data_op_req_impl<true>
 {
 #ifdef DOXYGEN_SHOULD_SKIP_THIS
 	//! An optional precondition for this operation
@@ -1444,32 +1445,30 @@ template<class C, class T, class A> struct async_data_op_req<const std::basic_st
 	//! \constr
 	async_data_op_req() { }
     //! \cconstr
-	async_data_op_req(const async_data_op_req &o) : async_data_op_req<const void>(o) { }
+	async_data_op_req(const async_data_op_req &o) : detail::async_data_op_req_impl<true>(o) { }
     //! \mconstr
-	async_data_op_req(async_data_op_req &&o) : async_data_op_req<const void>(std::move(o)) { }
+	async_data_op_req(async_data_op_req &&o) : detail::async_data_op_req_impl<true>(std::move(o)) { }
     //! \cconstr
-	async_data_op_req(const async_data_op_req<std::basic_string<C, T, A>> &o) : async_data_op_req<const void>(o) { }
+	async_data_op_req(const async_data_op_req<std::basic_string<C, T, A>> &o) : detail::async_data_op_req_impl<true>(o) { }
     //! \mconstr
-	async_data_op_req(async_data_op_req<std::basic_string<C, T, A>> &&o) : async_data_op_req<const void>(std::move(o)) { }
+	async_data_op_req(async_data_op_req<std::basic_string<C, T, A>> &&o) : detail::async_data_op_req_impl<true>(std::move(o)) { }
     //! \cassign
-	async_data_op_req &operator=(const async_data_op_req &o) { static_cast<async_data_op_req<const void>>(*this)=o; return *this; }
+	async_data_op_req &operator=(const async_data_op_req &o) { static_cast<detail::async_data_op_req_impl<true>>(*this)=o; return *this; }
     //! \mconstr
-	async_data_op_req &operator=(async_data_op_req &&o) { static_cast<async_data_op_req<const void>>(*this)=std::move(o); return *this; }
+	async_data_op_req &operator=(async_data_op_req &&o) { static_cast<detail::async_data_op_req_impl<true>>(*this)=std::move(o); return *this; }
     //! \async_data_op_req1
-	async_data_op_req(async_io_op _precondition, const std::basic_string<C, T, A> &v, off_t _where) : async_data_op_req<const void>(std::move(_precondition), static_cast<const void *>(&v.front()), v.size()*sizeof(A), _where) { }
+	async_data_op_req(async_io_op _precondition, const std::basic_string<C, T, A> &v, off_t _where) : detail::async_data_op_req_impl<true>(std::move(_precondition), static_cast<const void *>(&v.front()), v.size()*sizeof(A), _where) { }
 };
 
 namespace detail {
-	template<bool isconst> struct void_type_selector { typedef void type; };
-	template<> struct void_type_selector<true> { typedef const void type; };
-	template<class T> struct async_file_io_dispatcher_rwconverter
+	template<bool iswrite, class T> struct async_file_io_dispatcher_rwconverter
 	{
-		typedef async_data_op_req<typename void_type_selector<std::is_const<T>::value>::type> return_type;
+		typedef detail::async_data_op_req_impl<iswrite> return_type;
 		const std::vector<return_type> &operator()(const std::vector<async_data_op_req<T>> &ops)
 		{
 			typedef async_data_op_req<T> reqT;
-			static_assert(std::is_convertible<reqT, return_type>::value, "async_data_op_req<T> is not convertible to async_data_op_req<[const] void>");
-			static_assert(sizeof(return_type)==sizeof(reqT), "async_data_op_req<T> does not have the same size as async_data_op_req<[const] void>");
+			static_assert(std::is_convertible<reqT, return_type>::value, "async_data_op_req<T> is not convertible to detail::async_data_op_req_impl<constness>");
+			static_assert(sizeof(return_type)==sizeof(reqT), "async_data_op_req<T> does not have the same size as detail::async_data_op_req_impl<constness>");
 			return reinterpret_cast<const std::vector<return_type> &>(ops);
 		}
 	};
@@ -1560,27 +1559,29 @@ inline async_io_op async_file_io_dispatcher_base::close(const async_io_op &req)
 	i.push_back(req);
 	return std::move(close(i).front());
 }
-inline async_io_op async_file_io_dispatcher_base::read(const async_data_op_req<void> &req)
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+inline async_io_op async_file_io_dispatcher_base::read(const detail::async_data_op_req_impl<false> &req)
 {
-	std::vector<async_data_op_req<void>> i;
+	std::vector<detail::async_data_op_req_impl<false>> i;
 	i.reserve(1);
 	i.push_back(req);
 	return std::move(read(i).front());
 }
-inline async_io_op async_file_io_dispatcher_base::write(const async_data_op_req<const void> &req)
+inline async_io_op async_file_io_dispatcher_base::write(const detail::async_data_op_req_impl<true> &req)
 {
-	std::vector<async_data_op_req<const void>> i;
+	std::vector<detail::async_data_op_req_impl<true>> i;
 	i.reserve(1);
 	i.push_back(req);
 	return std::move(write(i).front());
 }
+#endif
 template<class T> inline std::vector<async_io_op> async_file_io_dispatcher_base::read(const std::vector<async_data_op_req<T>> &ops)
 {
-	return read(detail::async_file_io_dispatcher_rwconverter<T>()(ops));
+	return read(detail::async_file_io_dispatcher_rwconverter<false, T>()(ops));
 }
 template<class T> inline std::vector<async_io_op> async_file_io_dispatcher_base::write(const std::vector<async_data_op_req<T>> &ops)
 {
-	return write(detail::async_file_io_dispatcher_rwconverter<T>()(ops));
+	return write(detail::async_file_io_dispatcher_rwconverter<true, T>()(ops));
 }
 inline async_io_op async_file_io_dispatcher_base::truncate(const async_io_op &op, off_t newsize)
 {

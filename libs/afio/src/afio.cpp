@@ -777,7 +777,7 @@ template<class F> std::vector<async_io_op> async_file_io_dispatcher_base::chain_
 		ret.push_back(chain_async_op(immediates, optype, i.precondition, flags, f, i));
 	return ret;
 }
-template<class F, class T> std::vector<async_io_op> async_file_io_dispatcher_base::chain_async_ops(int optype, const std::vector<async_data_op_req<T>> &container, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, async_data_op_req<T>))
+template<class F, bool iswrite> std::vector<async_io_op> async_file_io_dispatcher_base::chain_async_ops(int optype, const std::vector<detail::async_data_op_req_impl<iswrite>> &container, async_op_flags flags, completion_returntype(F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, detail::async_data_op_req_impl<iswrite>))
 {
 	std::vector<async_io_op> ret;
 	ret.reserve(container.size());
@@ -1004,9 +1004,8 @@ namespace detail {
 				BOOST_AFIO_DEBUG_PRINT("H %u e=%u\n", (unsigned) id, (unsigned) ec.value());
 			}
 		}
-		template<class T> void doreadwrite(size_t id, std::shared_ptr<detail::async_io_handle> h, async_data_op_req<T> req, async_io_handle_windows *p)
+		template<bool iswrite> void doreadwrite(size_t id, std::shared_ptr<detail::async_io_handle> h, detail::async_data_op_req_impl<iswrite> req, async_io_handle_windows *p)
 		{
-			BOOST_CONSTEXPR_OR_CONST bool iswrite=std::is_same<T, const void>::value;
 			// boost::asio::async_read_at() seems to have a bug and only transfers 64Kb per buffer
 			// boost::asio::windows::random_access_handle::async_read_some_at() clearly bothers
 			// with the first buffer only. Same goes for both async write functions.
@@ -1027,7 +1026,7 @@ namespace detail {
 				for(size_t n=0; n<pages; n++)
 				{
 					// Be careful of 32 bit void * sign extension here ...
-					elems[n].Alignment=((size_t) boost::asio::buffer_cast<T *>(*bufferit))+thisbufferoffset;
+					elems[n].Alignment=((size_t) boost::asio::buffer_cast<const void *>(*bufferit))+thisbufferoffset;
 					thisbufferoffset+=pagesize;
 					if(thisbufferoffset>=boost::asio::buffer_size(*bufferit))
 					{
@@ -1061,9 +1060,9 @@ namespace detail {
 					ol.get()->Offset=(DWORD) ((req.where+offset) & 0xffffffff);
 					ol.get()->OffsetHigh=(DWORD) (((req.where+offset)>>32) & 0xffffffff);
 					BOOL ok=iswrite ? WriteFile
-						(p->h->native_handle(), boost::asio::buffer_cast<T *>(b), (DWORD) boost::asio::buffer_size(b), NULL, ol.get())
+						(p->h->native_handle(), boost::asio::buffer_cast<const void *>(b), (DWORD) boost::asio::buffer_size(b), NULL, ol.get())
 						: ReadFile
-						(p->h->native_handle(), (LPVOID) boost::asio::buffer_cast<T *>(b), (DWORD) boost::asio::buffer_size(b), NULL, ol.get());
+						(p->h->native_handle(), (LPVOID) boost::asio::buffer_cast<const void *>(b), (DWORD) boost::asio::buffer_size(b), NULL, ol.get());
 					DWORD errcode=GetLastError();
 					if(!ok && ERROR_IO_PENDING!=errcode)
 					{
@@ -1077,7 +1076,7 @@ namespace detail {
 			}
 		}
 		// Called in unknown thread
-		completion_returntype doread(size_t id, std::shared_ptr<detail::async_io_handle> h, async_data_op_req<void> req)
+		completion_returntype doread(size_t id, std::shared_ptr<detail::async_io_handle> h, detail::async_data_op_req_impl<false> req)
 		{
 			async_io_handle_windows *p=static_cast<async_io_handle_windows *>(h.get());
 			assert(p);
@@ -1091,7 +1090,7 @@ namespace detail {
 			return std::make_pair(false, h);
 		}
 		// Called in unknown thread
-		completion_returntype dowrite(size_t id, std::shared_ptr<detail::async_io_handle> h, async_data_op_req<const void> req)
+		completion_returntype dowrite(size_t id, std::shared_ptr<detail::async_io_handle> h, detail::async_data_op_req_impl<true> req)
 		{
 			async_io_handle_windows *p=static_cast<async_io_handle_windows *>(h.get());
 			assert(p);
@@ -1186,7 +1185,7 @@ namespace detail {
 #endif
 			return chain_async_ops((int) detail::OpType::close, ops, async_op_flags::None, &async_file_io_dispatcher_windows::doclose);
 		}
-		virtual std::vector<async_io_op> read(const std::vector<async_data_op_req<void>> &reqs)
+		virtual std::vector<async_io_op> read(const std::vector<detail::async_data_op_req_impl<false>> &reqs)
 		{
 #if BOOST_AFIO_VALIDATE_INPUTS
 			for(auto &i : reqs)
@@ -1195,7 +1194,7 @@ namespace detail {
 #endif
 			return chain_async_ops((int) detail::OpType::read, reqs, async_op_flags::DetachedFuture|async_op_flags::ImmediateCompletion, &async_file_io_dispatcher_windows::doread);
 		}
-		virtual std::vector<async_io_op> write(const std::vector<async_data_op_req<const void>> &reqs)
+		virtual std::vector<async_io_op> write(const std::vector<detail::async_data_op_req_impl<true>> &reqs)
 		{
 #if BOOST_AFIO_VALIDATE_INPUTS
 			for(auto &i : reqs)
@@ -1360,7 +1359,7 @@ namespace detail {
 			return std::make_pair(true, h);
 		}
 		// Called in unknown thread
-		completion_returntype doread(size_t id, std::shared_ptr<detail::async_io_handle> h, async_data_op_req<void> req)
+		completion_returntype doread(size_t id, std::shared_ptr<detail::async_io_handle> h, detail::async_data_op_req_impl<false> req)
 		{
 			async_io_handle_posix *p=static_cast<async_io_handle_posix *>(h.get());
 			ssize_t bytesread=0, bytestoread=0;
@@ -1391,7 +1390,7 @@ namespace detail {
 			return std::make_pair(true, h);
 		}
 		// Called in unknown thread
-		completion_returntype dowrite(size_t id, std::shared_ptr<detail::async_io_handle> h, async_data_op_req<const void> req)
+		completion_returntype dowrite(size_t id, std::shared_ptr<detail::async_io_handle> h, detail::async_data_op_req_impl<true> req)
 		{
 			async_io_handle_posix *p=static_cast<async_io_handle_posix *>(h.get());
 			ssize_t byteswritten=0, bytestowrite=0;
@@ -1491,7 +1490,7 @@ namespace detail {
 #endif
 			return chain_async_ops((int) detail::OpType::close, ops, async_op_flags::None, &async_file_io_dispatcher_compat::doclose);
 		}
-		virtual std::vector<async_io_op> read(const std::vector<async_data_op_req<void>> &reqs)
+		virtual std::vector<async_io_op> read(const std::vector<detail::async_data_op_req_impl<false>> &reqs)
 		{
 #if BOOST_AFIO_VALIDATE_INPUTS
 			for(auto &i : reqs)
@@ -1500,7 +1499,7 @@ namespace detail {
 #endif
 			return chain_async_ops((int) detail::OpType::read, reqs, async_op_flags::None, &async_file_io_dispatcher_compat::doread);
 		}
-		virtual std::vector<async_io_op> write(const std::vector<async_data_op_req<const void>> &reqs)
+		virtual std::vector<async_io_op> write(const std::vector<detail::async_data_op_req_impl<true>> &reqs)
 		{
 #if BOOST_AFIO_VALIDATE_INPUTS
 			for(auto &i : reqs)
