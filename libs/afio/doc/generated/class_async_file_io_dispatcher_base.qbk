@@ -279,9 +279,10 @@ An op handle.
 
 
 ]]
-[[``std::vector< async_io_op > read(const std::vector< async_data_op_req< void >> & ops)``
+[[``template<class T>
+std::vector< async_io_op > read(const std::vector< async_data_op_req< T >> & ops)``
 
-] [Schedule a batch of asynchronous data reads after preceding operations. ] [[* const std::vector< async_data_op_req< void >> &]: ['ops]:  A batch of [^`async_data_op_req``<void>`] structures.
+] [Schedule a batch of asynchronous data reads after preceding operations. ] [[* const std::vector< async_data_op_req< T >> &]: ['ops]:  A batch of async_data_op_req<T> structures.
 
 
 
@@ -290,43 +291,28 @@ A batch of op handles.
 
 
 ]]
-[[``async_io_op read(const async_data_op_req< void > & req)``
+[[``template<class T>
+async_io_op read(const async_data_op_req< T > & req)``
 
-] [Schedule an asynchronous data read after a preceding operation. ] [[* const async_data_op_req< void > &]: ['req]:  An [^`async_data_op_req``<void>`] structure.
+] [Schedule an asynchronous data read after a preceding operation. ] [[* const async_data_op_req< T > &]: ['req]:  
 
 
 
 
 ]]
 [[``template<class T>
-std::vector< async_io_op > read(const std::vector< async_data_op_req< T >> & ops)``
+std::vector< async_io_op > write(const std::vector< async_data_op_req< const T >> & ops)``
 
-] [Schedule a batch of asynchronous data reads after preceding operations. ] [[* const std::vector< async_data_op_req< T >> &]: ['ops]:  A batch of [^`async_data_op_req``<T>`] structures.
-
-
-
-
-]]
-[[``std::vector< async_io_op > write(const std::vector< async_data_op_req< const void >> & ops)``
-
-] [Schedule a batch of asynchronous data writes after preceding operations. ] [[* const std::vector< async_data_op_req< const void >> &]: ['ops]:  A batch of [^`async_data_op_req``<const void>`] structures.
-
-
-
-
-]]
-[[``async_io_op write(const async_data_op_req< const void > & req)``
-
-] [Schedule an asynchronous data write after a preceding operation. ] [[* const async_data_op_req< const void > &]: ['req]:  An [^`async_data_op_req``<const void>`] structure.
+] [Schedule a batch of asynchronous data writes after preceding operations. ] [[* const std::vector< async_data_op_req< const T >> &]: ['ops]:  
 
 
 
 
 ]]
 [[``template<class T>
-std::vector< async_io_op > write(const std::vector< async_data_op_req< T >> & ops)``
+async_io_op write(const async_data_op_req< const T > & req)``
 
-] [Schedule a batch of asynchronous data writes after preceding operations. ] [[* const std::vector< async_data_op_req< T >> &]: ['ops]:  A batch of [^`async_data_op_req``<T>`] structures.
+] [Schedule an asynchronous data write after a preceding operation. ] [[* const async_data_op_req< const T > &]: ['req]:  
 
 
 
@@ -375,6 +361,15 @@ A batch of op handles.
 
 ][
 The page size of this architecture.
+
+
+]]
+[[``template<class T>
+std::vector< async_io_op > write(const std::vector< async_data_op_req< T >> & ops)``
+
+] [] [[* const std::vector< async_data_op_req< T >> &]: ['ops]:  
+
+
 
 
 ]]

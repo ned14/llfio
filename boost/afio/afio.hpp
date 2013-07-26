@@ -1207,10 +1207,10 @@ namespace detail
 template<class T> struct async_data_op_req : public detail::async_data_op_req_impl<false>
 {
 #ifdef DOXYGEN_SHOULD_SKIP_THIS
-	//! An optional precondition for this operation
+	//! A precondition containing an open file handle for this operation
 	async_io_op precondition;
 	//! A sequence of mutable Boost.ASIO buffers to read into
-	std::vector<boost_asio_buffer_type> buffers;
+	std::vector<boost::asio::mutable_buffer> buffers;
 	//! The offset from which to read
 	off_t where;
 #endif
@@ -1231,11 +1231,11 @@ template<class T> struct async_data_op_req : public detail::async_data_op_req_im
 	template<class T> struct async_data_op_req<const T> : public detail::async_data_op_req_impl<true>
 	{
 #ifdef DOXYGEN_SHOULD_SKIP_THIS
-		//! An optional precondition for this operation
+		//! A precondition containing an open file handle for this operation
 		async_io_op precondition;
-		//! A sequence of mutable Boost.ASIO buffers to read into
-		std::vector<boost_asio_buffer_type> buffers;
-		//! The offset from which to read
+		//! A sequence of const Boost.ASIO buffers to write from
+		std::vector<boost::asio::const_buffer> buffers;
+		//! The offset at which to write
 		off_t where;
 #endif
 		//! \constr
@@ -1259,10 +1259,10 @@ template<class T> struct async_data_op_req : public detail::async_data_op_req_im
 template<> struct async_data_op_req<void> : public detail::async_data_op_req_impl<false>
 {
 #ifdef DOXYGEN_SHOULD_SKIP_THIS
-	//! An optional precondition for this operation
+	//! A precondition containing an open file handle for this operation
 	async_io_op precondition;
 	//! A sequence of mutable Boost.ASIO buffers to read into
-	std::vector<boost_asio_buffer_type> buffers;
+	std::vector<boost::asio::mutable_buffer> buffers;
 	//! The offset from which to read
 	off_t where;
 #endif
@@ -1281,11 +1281,11 @@ template<> struct async_data_op_req<void> : public detail::async_data_op_req_imp
 template<> struct async_data_op_req<const void> : public detail::async_data_op_req_impl<true>
 {
 #ifdef DOXYGEN_SHOULD_SKIP_THIS
-	//! An optional precondition for this operation
+	//! A precondition containing an open file handle for this operation
 	async_io_op precondition;
-	//! A sequence of mutable Boost.ASIO buffers to read into
-	std::vector<boost_asio_buffer_type> buffers;
-	//! The offset from which to read
+	//! A sequence of const Boost.ASIO buffers to write from
+	std::vector<boost::asio::const_buffer> buffers;
+	//! The offset at which to write
 	off_t where;
 #endif
 	//! \constr
@@ -1307,10 +1307,10 @@ template<> struct async_data_op_req<const void> : public detail::async_data_op_r
 template<class T, class A> struct async_data_op_req<std::vector<T, A>> : public detail::async_data_op_req_impl<false>
 {
 #ifdef DOXYGEN_SHOULD_SKIP_THIS
-	//! An optional precondition for this operation
+	//! A precondition containing an open file handle for this operation
 	async_io_op precondition;
 	//! A sequence of mutable Boost.ASIO buffers to read into
-	std::vector<boost_asio_buffer_type> buffers;
+	std::vector<boost::asio::mutable_buffer> buffers;
 	//! The offset from which to read
 	off_t where;
 #endif
@@ -1331,11 +1331,11 @@ template<class T, class A> struct async_data_op_req<std::vector<T, A>> : public 
 template<class T, class A> struct async_data_op_req<const std::vector<T, A>> : public detail::async_data_op_req_impl<true>
 {
 #ifdef DOXYGEN_SHOULD_SKIP_THIS
-	//! An optional precondition for this operation
+	//! A precondition containing an open file handle for this operation
 	async_io_op precondition;
-	//! A sequence of mutable Boost.ASIO buffers to read into
-	std::vector<boost_asio_buffer_type> buffers;
-	//! The offset from which to read
+	//! A sequence of const Boost.ASIO buffers to write from
+	std::vector<boost::asio::const_buffer> buffers;
+	//! The offset at which to write
 	off_t where;
 #endif
 	//! \constr
@@ -1359,10 +1359,10 @@ template<class T, class A> struct async_data_op_req<const std::vector<T, A>> : p
 template<class T, size_t N> struct async_data_op_req<std::array<T, N>> : public detail::async_data_op_req_impl<false>
 {
 #ifdef DOXYGEN_SHOULD_SKIP_THIS
-	//! An optional precondition for this operation
+	//! A precondition containing an open file handle for this operation
 	async_io_op precondition;
 	//! A sequence of mutable Boost.ASIO buffers to read into
-	std::vector<boost_asio_buffer_type> buffers;
+	std::vector<boost::asio::mutable_buffer> buffers;
 	//! The offset from which to read
 	off_t where;
 #endif
@@ -1383,11 +1383,11 @@ template<class T, size_t N> struct async_data_op_req<std::array<T, N>> : public 
 template<class T, size_t N> struct async_data_op_req<const std::array<T, N>> : public detail::async_data_op_req_impl<true>
 {
 #ifdef DOXYGEN_SHOULD_SKIP_THIS
-	//! An optional precondition for this operation
+	//! A precondition containing an open file handle for this operation
 	async_io_op precondition;
-	//! A sequence of mutable Boost.ASIO buffers to read into
-	std::vector<boost_asio_buffer_type> buffers;
-	//! The offset from which to read
+	//! A sequence of const Boost.ASIO buffers to write from
+	std::vector<boost::asio::const_buffer> buffers;
+	//! The offset at which to write
 	off_t where;
 #endif
 	//! \constr
@@ -1411,10 +1411,10 @@ template<class T, size_t N> struct async_data_op_req<const std::array<T, N>> : p
 template<class C, class T, class A> struct async_data_op_req<std::basic_string<C, T, A>> : public detail::async_data_op_req_impl<false>
 {
 #ifdef DOXYGEN_SHOULD_SKIP_THIS
-	//! An optional precondition for this operation
+	//! A precondition containing an open file handle for this operation
 	async_io_op precondition;
 	//! A sequence of mutable Boost.ASIO buffers to read into
-	std::vector<boost_asio_buffer_type> buffers;
+	std::vector<boost::asio::mutable_buffer> buffers;
 	//! The offset from which to read
 	off_t where;
 #endif
@@ -1435,11 +1435,11 @@ template<class C, class T, class A> struct async_data_op_req<std::basic_string<C
 template<class C, class T, class A> struct async_data_op_req<const std::basic_string<C, T, A>> : public detail::async_data_op_req_impl<true>
 {
 #ifdef DOXYGEN_SHOULD_SKIP_THIS
-	//! An optional precondition for this operation
+	//! A precondition containing an open file handle for this operation
 	async_io_op precondition;
-	//! A sequence of mutable Boost.ASIO buffers to read into
-	std::vector<boost_asio_buffer_type> buffers;
-	//! The offset from which to read
+	//! A sequence of const Boost.ASIO buffers to write from
+	std::vector<boost::asio::const_buffer> buffers;
+	//! The offset at which to write
 	off_t where;
 #endif
 	//! \constr

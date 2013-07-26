@@ -17,9 +17,11 @@ A convenience bundle of precondition, data and where for reading into a [^`std::
 [heading Synopsis]
 ``template<class T, class A>
 struct async_data_op_req< std::vector< T, A > >
-      : public async_data_op_req< void >
+      : public detail::async_data_op_req_impl< false >
 {
-  // ...
+  std::vector< boost::asio::mutable_buffer > buffers;  // A sequence of mutable Boost.ASIO buffers to read into. 
+  async_io_op precondition;                            // A precondition containing an open file handle for this operation. 
+  off_t where;                                         // The offset from which to read. 
 };
 ``
 

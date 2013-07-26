@@ -27,7 +27,7 @@
 <a name="afio.reference.structs.async_path_op_req"></a><a class="link" href="async_path_op_req.html" title="async_path_op_req">async_path_op_req</a>
 </h4></div></div></div>
 <p>
-          <a class="indexterm" name="id920099"></a>
+          <a class="indexterm" name="id950549"></a>
 A convenience bundle of path and flags, with optional precondition.
         </p>
 <h6>
@@ -36,7 +36,9 @@ A convenience bundle of path and flags, with optional precondition.
         </h6>
 <pre class="programlisting"><span class="keyword">struct</span> <span class="identifier">async_path_op_req</span>
 <span class="special">{</span>
-  <span class="comment">// ...</span>
+  <span class="identifier">file_flags</span> <span class="identifier">flags</span><span class="special">;</span>            <span class="comment">// The flags to be used for this operation (note they can be overriden by flags passed during dispatcher construction). </span>
+  <span class="identifier">std</span><span class="special">::</span><span class="identifier">filesystem</span><span class="special">::</span><span class="identifier">path</span> <span class="identifier">path</span><span class="special">;</span>  <span class="comment">// The filing system path to be used for this operation. </span>
+  <span class="identifier">async_io_op</span> <span class="identifier">precondition</span><span class="special">;</span>    <span class="comment">// An optional precondition for this operation </span>
 <span class="special">};</span>
 </pre>
 <h6>

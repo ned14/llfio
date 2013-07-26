@@ -27,7 +27,7 @@
 <a name="afio.reference.structs.async_data_op_req.async_data_op_req"></a><a class="link" href="async_data_op_req.html" title="async_data_op_req">async_data_op_req</a>
 </h5></div></div></div>
 <p>
-            <a class="indexterm" name="id907747"></a>
+            <a class="indexterm" name="id937238"></a>
 A convenience bundle of precondition, data and where for reading into
             a single <code class="literal"><code class="computeroutput"><span class="identifier">T</span> <span class="special">*</span></code></code>. Data <span class="bold"><strong>MUST</strong></span>
             stay around until the operation completes.
@@ -36,10 +36,13 @@ A convenience bundle of precondition, data and where for reading into
 <a name="afio.reference.structs.async_data_op_req.async_data_op_req.h0"></a>
             <span class="phrase"><a name="afio.reference.structs.async_data_op_req.async_data_op_req.synopsis"></a></span><a class="link" href="async_data_op_req.html#afio.reference.structs.async_data_op_req.async_data_op_req.synopsis">Synopsis</a>
           </h6>
-<pre class="programlisting"><span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">T</span><span class="special">,</span> <span class="special">&gt;</span>
+<pre class="programlisting"><span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">T</span><span class="special">&gt;</span>
 <span class="keyword">struct</span> <span class="identifier">async_data_op_req</span>
+      <span class="special">:</span> <span class="keyword">public</span> <span class="identifier">detail</span><span class="special">::</span><span class="identifier">async_data_op_req_impl</span><span class="special">&lt;</span> <span class="keyword">false</span> <span class="special">&gt;</span>
 <span class="special">{</span>
-  <span class="comment">// ...</span>
+  <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">asio</span><span class="special">::</span><span class="identifier">mutable_buffer</span> <span class="special">&gt;</span> <span class="identifier">buffers</span><span class="special">;</span>  <span class="comment">// A sequence of mutable Boost.ASIO buffers to read into. </span>
+  <span class="identifier">async_io_op</span> <span class="identifier">precondition</span><span class="special">;</span>                            <span class="comment">// A precondition containing an open file handle for this operation. </span>
+  <span class="identifier">off_t</span> <span class="identifier">where</span><span class="special">;</span>                                         <span class="comment">// The offset from which to read. </span>
 <span class="special">};</span>
 </pre>
 <h6>
@@ -64,26 +67,18 @@ A convenience bundle of precondition, data and where for reading into
                     </p>
                   </th>
 </tr></thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>
                     <p>
                       class T
                     </p>
                   </td>
 <td>
-                  </td>
-</tr>
-<tr>
-<td>
-                  </td>
-<td>
                     <p>
-                      Any writable type T
+                      Any readable type T
                     </p>
                   </td>
-</tr>
-</tbody>
+</tr></tbody>
 </table></div>
 <h6>
 <a name="afio.reference.structs.async_data_op_req.async_data_op_req.h2"></a>
@@ -222,6 +217,23 @@ A convenience bundle of precondition, data and where for reading into
                   </th>
 </tr></thead>
 <tbody>
+<tr>
+<td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="keyword">bool</span> <span class="identifier">validate</span><span class="special">()</span></pre>
+                  </td>
+<td>
+                    <p>
+                      Validates contents for correctness.
+                    </p>
+                  </td>
+<td>
+                  </td>
+<td>
+                    <p>
+                      True if contents are correct
+                    </p>
+                  </td>
+</tr>
 <tr>
 <td>
 <pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">async_data_op_req</span> <span class="special">&amp;</span> <span class="keyword">operator</span><span class="special">=(</span><span class="keyword">const</span> <span class="identifier">async_data_op_req</span> <span class="special">&amp;</span> <span class="identifier">o</span><span class="special">)</span></pre>

@@ -41,7 +41,6 @@ afio/reference/classes/async_file_io_dispatcher_base/file_1_batch.html
 afio/reference/classes/async_file_io_dispatcher_base/file_1_single.html
 afio/reference/classes/async_file_io_dispatcher_base/read_1_batch.html
 afio/reference/classes/async_file_io_dispatcher_base/read_1_single.html
-afio/reference/classes/async_file_io_dispatcher_base/read_1_batch0.html
 afio/reference/classes/async_file_io_dispatcher_base/rmdir_1_batch.html
 afio/reference/classes/async_file_io_dispatcher_base/rmdir_1_single.html
 afio/reference/classes/async_file_io_dispatcher_base/rmfile_1_batch.html
@@ -52,7 +51,6 @@ afio/reference/classes/async_file_io_dispatcher_base/truncate_2_batch.html
 afio/reference/classes/async_file_io_dispatcher_base/truncate_2_single.html
 afio/reference/classes/async_file_io_dispatcher_base/write_1_batch.html
 afio/reference/classes/async_file_io_dispatcher_base/write_1_single.html
-afio/reference/classes/async_file_io_dispatcher_base/write_1_batch0.html
 afio/reference/classes/async_file_io_dispatcher_base/barrier.html
 afio/reference/classes/async_file_io_dispatcher_base/page_size.html
 afio/reference/classes/detail_async_io_handle.html

@@ -18,7 +18,9 @@ The implementation of all async_data_op_req specialisations.
 ``template<bool for_writing>
 class detail::async_data_op_req_impl
 {
-  // ...
+  std::vector< boost_asio_buffer_type > buffers;  // A sequence of mutable Boost.ASIO buffers to read into. 
+  async_io_op precondition;                       // An optional precondition for this operation. 
+  off_t where;                                    // The offset from which to read. 
 };
 ``
 
