@@ -60,6 +60,12 @@ The abstract base class encapsulating a platform-specific file handle.
 
 
 ]]
+[[``file_flags flags()``
+
+] [Returns the final flags used when this handle was opened. ] [
+
+
+]]
 [[``off_t read_count()``
 
 ] [Returns how many bytes have been read since this handle was opened. ] [

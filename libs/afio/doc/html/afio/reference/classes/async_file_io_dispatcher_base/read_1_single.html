@@ -28,16 +28,23 @@
           (single)</a>
 </h5></div></div></div>
 <p>
-            <a class="indexterm" name="id888643"></a>
+            <a class="indexterm" name="id936946"></a>
 Schedule an asynchronous data read after a preceding operation.
           </p>
 <h6>
 <a name="afio.reference.classes.async_file_io_dispatcher_base.read_1_single.h0"></a>
+            <span class="phrase"><a name="afio.reference.classes.async_file_io_dispatcher_base.read_1_single.description"></a></span><a class="link" href="read_1_single.html#afio.reference.classes.async_file_io_dispatcher_base.read_1_single.description">Description</a>
+          </h6>
+<pre class="programlisting"><span class="identifier">Note</span> <span class="identifier">that</span> <span class="identifier">on</span> <span class="identifier">Windows</span> <span class="keyword">this</span> <span class="identifier">call</span> <span class="identifier">issues</span> <span class="identifier">a</span> <span class="identifier">separate</span> <span class="identifier">async</span> <span class="identifier">file</span> <span class="identifier">operation</span> <span class="keyword">for</span> <span class="identifier">each</span> <span class="identifier">buffer</span> <span class="identifier">supplied</span><span class="special">,</span> <span class="identifier">thus</span> <span class="identifier">making</span> <span class="identifier">scatter</span><span class="special">/</span><span class="identifier">gather</span> <span class="identifier">i</span><span class="special">/</span><span class="identifier">o</span> <span class="identifier">no</span> <span class="identifier">more</span> <span class="identifier">efficient</span> <span class="identifier">than</span> <span class="identifier">making</span> <span class="identifier">separate</span> <span class="identifier">calls</span><span class="special">.</span> <span class="identifier">The</span> <span class="identifier">big</span> <span class="identifier">exception</span> <span class="identifier">to</span> <span class="keyword">this</span> <span class="identifier">is</span> <span class="identifier">when</span> <span class="identifier">doing</span> <span class="identifier">unbuffered</span> <span class="identifier">i</span><span class="special">/</span><span class="identifier">o</span> <span class="special">(</span><span class="identifier">file</span><span class="special">\</span><span class="identifier">u005fflags</span><span class="special">::</span><span class="identifier">OSDirect</span><span class="special">)</span> <span class="keyword">for</span> <span class="identifier">which</span> <span class="identifier">Windows</span> <span class="identifier">provides</span> <span class="identifier">special</span> <span class="identifier">scatter</span><span class="special">/</span><span class="identifier">gather</span> <span class="identifier">i</span><span class="special">/</span><span class="identifier">o</span> <span class="identifier">functions</span><span class="special">.</span>
+<span class="special">\</span><span class="keyword">return</span> <span class="identifier">An</span> <span class="identifier">op</span> <span class="identifier">handle</span><span class="special">.</span>
+</pre>
+<h6>
+<a name="afio.reference.classes.async_file_io_dispatcher_base.read_1_single.h1"></a>
             <span class="phrase"><a name="afio.reference.classes.async_file_io_dispatcher_base.read_1_single.synopsis"></a></span><a class="link" href="read_1_single.html#afio.reference.classes.async_file_io_dispatcher_base.read_1_single.synopsis">Synopsis</a>
           </h6>
 <pre class="programlisting"><span class="identifier">async_io_op</span> <span class="identifier">async_file_io_dispatcher_base</span><span class="special">::</span><span class="identifier">read</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">async_data_op_req</span><span class="special">&lt;</span> <span class="keyword">void</span> <span class="special">&gt;</span> <span class="special">&amp;</span> <span class="identifier">req</span><span class="special">)</span></pre>
 <h6>
-<a name="afio.reference.classes.async_file_io_dispatcher_base.read_1_single.h1"></a>
+<a name="afio.reference.classes.async_file_io_dispatcher_base.read_1_single.h2"></a>
             <span class="phrase"><a name="afio.reference.classes.async_file_io_dispatcher_base.read_1_single.parameters"></a></span><a class="link" href="read_1_single.html#afio.reference.classes.async_file_io_dispatcher_base.read_1_single.parameters">Parameters</a>
           </h6>
 <div class="informaltable"><table class="table">
@@ -89,13 +96,6 @@ Schedule an asynchronous data read after a preceding operation.
                   </td>
 </tr></tbody>
 </table></div>
-<h6>
-<a name="afio.reference.classes.async_file_io_dispatcher_base.read_1_single.h2"></a>
-            <span class="phrase"><a name="afio.reference.classes.async_file_io_dispatcher_base.read_1_single.returns"></a></span><a class="link" href="read_1_single.html#afio.reference.classes.async_file_io_dispatcher_base.read_1_single.returns">Returns</a>
-          </h6>
-<p>
-            An op handle.
-          </p>
 <h6>
 <a name="afio.reference.classes.async_file_io_dispatcher_base.read_1_single.h3"></a>
             <span class="phrase"><a name="afio.reference.classes.async_file_io_dispatcher_base.read_1_single.header"></a></span><a class="link" href="read_1_single.html#afio.reference.classes.async_file_io_dispatcher_base.read_1_single.header">Header</a>

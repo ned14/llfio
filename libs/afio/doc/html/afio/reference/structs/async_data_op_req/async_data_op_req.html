@@ -27,16 +27,16 @@
 <a name="afio.reference.structs.async_data_op_req.async_data_op_req"></a><a class="link" href="async_data_op_req.html" title="async_data_op_req">async_data_op_req</a>
 </h5></div></div></div>
 <p>
-            <a class="indexterm" name="id855822"></a>
+            <a class="indexterm" name="id907747"></a>
 A convenience bundle of precondition, data and where for reading into
-            a single T *. Data <span class="bold"><strong>MUST</strong></span> stay around
-            until the operation completes.
+            a single <code class="literal"><code class="computeroutput"><span class="identifier">T</span> <span class="special">*</span></code></code>. Data <span class="bold"><strong>MUST</strong></span>
+            stay around until the operation completes.
           </p>
 <h6>
 <a name="afio.reference.structs.async_data_op_req.async_data_op_req.h0"></a>
             <span class="phrase"><a name="afio.reference.structs.async_data_op_req.async_data_op_req.synopsis"></a></span><a class="link" href="async_data_op_req.html#afio.reference.structs.async_data_op_req.async_data_op_req.synopsis">Synopsis</a>
           </h6>
-<pre class="programlisting"><span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">T</span><span class="special">&gt;</span>
+<pre class="programlisting"><span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">T</span><span class="special">,</span> <span class="special">&gt;</span>
 <span class="keyword">struct</span> <span class="identifier">async_data_op_req</span>
 <span class="special">{</span>
   <span class="comment">// ...</span>
@@ -64,18 +64,26 @@ A convenience bundle of precondition, data and where for reading into
                     </p>
                   </th>
 </tr></thead>
-<tbody><tr>
+<tbody>
+<tr>
 <td>
                     <p>
                       class T
                     </p>
                   </td>
 <td>
+                  </td>
+</tr>
+<tr>
+<td>
+                  </td>
+<td>
                     <p>
                       Any writable type T
                     </p>
                   </td>
-</tr></tbody>
+</tr>
+</tbody>
 </table></div>
 <h6>
 <a name="afio.reference.structs.async_data_op_req.async_data_op_req.h2"></a>

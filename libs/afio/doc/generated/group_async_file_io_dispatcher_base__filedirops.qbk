@@ -188,6 +188,13 @@ An op handle.
 '''<indexterm><primary>read</primary></indexterm>'''
 Schedule a batch of asynchronous data reads after preceding operations. 
 
+[heading Description]
+
+``
+Note that on Windows this call issues a separate async file operation for each buffer supplied, thus making scatter/gather i/o no more efficient than making separate calls. The big exception to this is when doing unbuffered i/o (file\u005fflags::OSDirect) for which Windows provides special scatter/gather i/o functions.
+``
+
+
 [heading Synopsis]
 ``virtual std::vector<async_io_op> async_file_io_dispatcher_base::read(const std::vector< async_data_op_req< void >> & ops)``
 
@@ -217,6 +224,14 @@ A batch of op handles.
 '''<indexterm><primary>read</primary></indexterm>'''
 Schedule an asynchronous data read after a preceding operation. 
 
+[heading Description]
+
+``
+Note that on Windows this call issues a separate async file operation for each buffer supplied, thus making scatter/gather i/o no more efficient than making separate calls. The big exception to this is when doing unbuffered i/o (file\u005fflags::OSDirect) for which Windows provides special scatter/gather i/o functions.
+\return An op handle.
+``
+
+
 [heading Synopsis]
 ``async_io_op async_file_io_dispatcher_base::read(const async_data_op_req< void > & req)``
 
@@ -227,9 +242,6 @@ Schedule an asynchronous data read after a preceding operation.
 [[const async_data_op_req< void > &] [] [req] [An [^`async_data_op_req``<void>`] structure.]]
 ]
 
-
-[heading Returns]
-An op handle. 
 
 [heading Header]
 `#include <boost/afio/afio.hpp>`
@@ -246,6 +258,14 @@ An op handle.
 '''<indexterm><primary>read</primary></indexterm>'''
 Schedule a batch of asynchronous data reads after preceding operations. 
 
+[heading Description]
+
+``
+Note that on Windows this call issues a separate async file operation for each buffer supplied, thus making scatter/gather i/o no more efficient than making separate calls. The big exception to this is when doing unbuffered i/o (file\u005fflags::OSDirect) for which Windows provides special scatter/gather i/o functions.
+\return A batch of op handles.
+``
+
+
 [heading Synopsis]
 ``template<class T>
 std::vector< async_io_op > async_file_io_dispatcher_base::read(const std::vector< async_data_op_req< T >> & ops)``
@@ -258,9 +278,6 @@ std::vector< async_io_op > async_file_io_dispatcher_base::read(const std::vector
 [[const std::vector< async_data_op_req< T >> &] [] [ops] [A batch of [^`async_data_op_req``<T>`] structures.]]
 ]
 
-
-[heading Returns]
-A batch of op handles. 
 
 [heading Header]
 `#include <boost/afio/afio.hpp>`
@@ -511,6 +528,14 @@ An op handle.
 '''<indexterm><primary>write</primary></indexterm>'''
 Schedule a batch of asynchronous data writes after preceding operations. 
 
+[heading Description]
+
+``
+Note that on Windows this call issues a separate async file operation for each buffer supplied, thus making scatter/gather i/o no more efficient than making separate calls. The big exception to this is when doing unbuffered i/o (file\u005fflags::OSDirect) for which Windows provides special scatter/gather i/o functions.
+\return A batch of op handles.
+``
+
+
 [heading Synopsis]
 ``virtual std::vector<async_io_op> async_file_io_dispatcher_base::write(const std::vector< async_data_op_req< const void >> & ops)``
 
@@ -521,9 +546,6 @@ Schedule a batch of asynchronous data writes after preceding operations.
 [[const std::vector< async_data_op_req< const void >> &] [] [ops] [A batch of [^`async_data_op_req``<const void>`] structures.]]
 ]
 
-
-[heading Returns]
-A batch of op handles. 
 
 [heading Header]
 `#include <boost/afio/afio.hpp>`
@@ -540,6 +562,14 @@ A batch of op handles.
 '''<indexterm><primary>write</primary></indexterm>'''
 Schedule an asynchronous data write after a preceding operation. 
 
+[heading Description]
+
+``
+Note that on Windows this call issues a separate async file operation for each buffer supplied, thus making scatter/gather i/o no more efficient than making separate calls. The big exception to this is when doing unbuffered i/o (file\u005fflags::OSDirect) for which Windows provides special scatter/gather i/o functions.
+\return An op handle.
+``
+
+
 [heading Synopsis]
 ``async_io_op async_file_io_dispatcher_base::write(const async_data_op_req< const void > & req)``
 
@@ -550,9 +580,6 @@ Schedule an asynchronous data write after a preceding operation.
 [[const async_data_op_req< const void > &] [] [req] [An [^`async_data_op_req``<const void>`] structure.]]
 ]
 
-
-[heading Returns]
-An op handle. 
 
 [heading Header]
 `#include <boost/afio/afio.hpp>`
@@ -569,6 +596,14 @@ An op handle.
 '''<indexterm><primary>write</primary></indexterm>'''
 Schedule a batch of asynchronous data writes after preceding operations. 
 
+[heading Description]
+
+``
+Note that on Windows this call issues a separate async file operation for each buffer supplied, thus making scatter/gather i/o no more efficient than making separate calls. The big exception to this is when doing unbuffered i/o (file\u005fflags::OSDirect) for which Windows provides special scatter/gather i/o functions.
+\return A batch of op handles.
+``
+
+
 [heading Synopsis]
 ``template<class T>
 std::vector< async_io_op > async_file_io_dispatcher_base::write(const std::vector< async_data_op_req< T >> & ops)``
@@ -581,9 +616,6 @@ std::vector< async_io_op > async_file_io_dispatcher_base::write(const std::vecto
 [[const std::vector< async_data_op_req< T >> &] [] [ops] [A batch of [^`async_data_op_req``<T>`] structures.]]
 ]
 
-
-[heading Returns]
-A batch of op handles. 
 
 [heading Header]
 `#include <boost/afio/afio.hpp>`

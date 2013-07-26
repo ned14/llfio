@@ -7,7 +7,7 @@
 <link rel="home" href="../../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 0.1">
 <link rel="up" href="../design.html" title="Design Rationale">
 <link rel="prev" href="../design.html" title="Design Rationale">
-<link rel="next" href="../compilation.html" title="Compilation">
+<link rel="next" href="acid_write_ordering.html" title="Write ordering constraints, and how these can be used to achieve the Durability in ACID without needing fsync()">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
 <table cellpadding="2" width="100%"><tr>
@@ -20,7 +20,7 @@
 </tr></table>
 <hr>
 <div class="spirit-nav">
-<a accesskey="p" href="../design.html"><img src="../../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../design.html"><img src="../../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="../compilation.html"><img src="../../../../../../doc/src/images/next.png" alt="Next"></a>
+<a accesskey="p" href="../design.html"><img src="../../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../design.html"><img src="../../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="acid_write_ordering.html"><img src="../../../../../../doc/src/images/next.png" alt="Next"></a>
 </div>
 <div class="section">
 <div class="titlepage"><div><div><h3 class="title">
@@ -80,7 +80,7 @@
             significantly faster than a multitude of single APIs.
             <p>
               As much as AFIO is as constrained by the system-level filing system
-              API as anyone else, AFIO employs a thread pool as a crude universally
+              API as anyone else, AFIO employs a thread pool as a crude, universally
               portable method of dispatching multiple filing system operations at
               the same time. For those platforms which support a less crude method
               of delivering batches of filing system operations e.g. an actual batch
@@ -146,7 +146,8 @@
               but they do have the big advantage of enabling easy interoperation
               with other C++ code. Besides, as libraries such as Boost.AFIO start
               to tax standard C++ library multithreading implementations in novel
-              ways, I am sure that the performance penalty will decrease over time.
+              ways, I am sure that the performance penalty will decrease over time
+              as STL vendors do their tuning.
             </p>
           </li>
 <li class="listitem">
@@ -167,6 +168,13 @@
             easily perform alias optimisations with no need for a <code class="computeroutput"><span class="identifier">restrict</span></code>
             keyword, so in general AFIO passes things around by value wherever possible
             and lets the compiler figure out the optimal course of action.
+          </li>
+<li class="listitem">
+            Lastly, even though no filing system known to this author currently supports
+            such a feature, Boost.AFIO implements <span class="emphasis"><em>write ordering constraints</em></span>
+            at the whole file level as well as the traditionally supported individual
+            write level. This part will need some explaining, so it gets a whole
+            section to itself.
           </li>
 </ol></div>
 <div class="footnotes">
@@ -195,7 +203,7 @@
 </tr></table>
 <hr>
 <div class="spirit-nav">
-<a accesskey="p" href="../design.html"><img src="../../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../design.html"><img src="../../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="../compilation.html"><img src="../../../../../../doc/src/images/next.png" alt="Next"></a>
+<a accesskey="p" href="../design.html"><img src="../../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../design.html"><img src="../../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="acid_write_ordering.html"><img src="../../../../../../doc/src/images/next.png" alt="Next"></a>
 </div>
 </body>
 </html>

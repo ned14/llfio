@@ -453,6 +453,7 @@ Construct an instance using the `boost::afio::async_file_io_dispatcher()` functi
 [include generated/group_async_file_io_dispatcher_base__call.qbk]
 [include generated/group_async_file_io_dispatcher_base__filedirops.qbk]
 [include generated/group_async_file_io_dispatcher_base__barrier.qbk]
+[include generated/group_async_file_io_dispatcher_base__misc.qbk]
 }
 */
 class BOOST_AFIO_DECL async_file_io_dispatcher_base : public std::enable_shared_from_this<async_file_io_dispatcher_base>
@@ -1144,6 +1145,7 @@ namespace detail
 		typedef void *void_type;
 		typedef nullptr_t conversion_type;
 	};
+	//! \brief The implementation of all async_data_op_req specialisations. \tparam for_writing Whether this implementation is for writing data. \ingroup async_data_op_req
 	template<bool for_writing> class async_data_op_req_impl
 	{
 		typedef typename async_data_op_req_impl_type_selector<for_writing>::boost_asio_buffer_type boost_asio_buffer_type;
@@ -1172,7 +1174,7 @@ namespace detail
 		async_data_op_req_impl &operator=(async_data_op_req_impl &&o) { precondition=std::move(o.precondition); buffers=std::move(o.buffers); where=std::move(o.where); return *this; }
 		//! \async_data_op_req1 \param _length The number of bytes to transfer
 		async_data_op_req_impl(async_io_op _precondition, void_type v, size_t _length, off_t _where) : precondition(std::move(_precondition)), where(_where) { buffers.reserve(1); buffers.push_back(boost_asio_buffer_type(v, _length)); _validate(); }
-		//! \async_data_op_req2
+		//! \async_data_op_req2 \tparam "class T" boost_asio_buffer_type
 		template<class T> async_data_op_req_impl(async_io_op _precondition, std::vector<T> _buffers, off_t _where) : precondition(std::move(_precondition)), buffers(std::move(_buffers)), where(_where) { _validate(); }
 		//! Validates contents for correctness \return True if contents are correct
 		bool validate() const
@@ -1200,9 +1202,17 @@ namespace detail
 	};
 }
 
-//! \brief A convenience bundle of precondition, data and where for reading into a void *. Data \b MUST stay around until the operation completes. \ingroup async_data_op_req
+//! \brief A convenience bundle of precondition, data and where for reading into a `void *`. Data \b MUST stay around until the operation completes. \ingroup async_data_op_req
 template<> struct async_data_op_req<void> : public detail::async_data_op_req_impl<false>
 {
+#ifdef DOXYGEN_SHOULD_SKIP_THIS
+	//! An optional precondition for this operation
+	async_io_op precondition;
+	//! A sequence of mutable Boost.ASIO buffers to read into
+	std::vector<boost_asio_buffer_type> buffers;
+	//! The offset from which to read
+	off_t where;
+#endif
 	//! \constr
 	async_data_op_req() : detail::async_data_op_req_impl<false>() {}
 	//! \cconstr
@@ -1214,9 +1224,17 @@ template<> struct async_data_op_req<void> : public detail::async_data_op_req_imp
 	//! \async_data_op_req2
 	async_data_op_req(async_io_op _precondition, std::vector<boost::asio::mutable_buffer> _buffers, off_t _where) : detail::async_data_op_req_impl<false>(std::move(_precondition), std::move(_buffers), _where) { }
 };
-//! \brief A convenience bundle of precondition, data and where for writing from a const void *. Data \b MUST stay around until the operation completes. \ingroup async_data_op_req
+//! \brief A convenience bundle of precondition, data and where for writing from a `const void *`. Data \b MUST stay around until the operation completes. \ingroup async_data_op_req
 template<> struct async_data_op_req<const void> : public detail::async_data_op_req_impl<true>
 {
+#ifdef DOXYGEN_SHOULD_SKIP_THIS
+	//! An optional precondition for this operation
+	async_io_op precondition;
+	//! A sequence of mutable Boost.ASIO buffers to read into
+	std::vector<boost_asio_buffer_type> buffers;
+	//! The offset from which to read
+	off_t where;
+#endif
 	//! \constr
 	async_data_op_req() : detail::async_data_op_req_impl<true>() {}
 	//! \cconstr
@@ -1232,10 +1250,18 @@ template<> struct async_data_op_req<const void> : public detail::async_data_op_r
 	//! \async_data_op_req2
 	async_data_op_req(async_io_op _precondition, std::vector<boost::asio::const_buffer> _buffers, off_t _where) : detail::async_data_op_req_impl<true>(std::move(_precondition), _buffers, _where) {}
 };
-//! \brief A convenience bundle of precondition, data and where for reading into a single T *. Data \b MUST stay around until the operation completes. \tparam "class T" Any writable type T \ingroup async_data_op_req
+//! \brief A convenience bundle of precondition, data and where for reading into a single `T *`. Data \b MUST stay around until the operation completes. \tparam "class T" Any writable type T \ingroup async_data_op_req
 template<class T> struct async_data_op_req : public async_data_op_req<void>
 {
-    //! \constr
+#ifdef DOXYGEN_SHOULD_SKIP_THIS
+	//! An optional precondition for this operation
+	async_io_op precondition;
+	//! A sequence of mutable Boost.ASIO buffers to read into
+	std::vector<boost_asio_buffer_type> buffers;
+	//! The offset from which to read
+	off_t where;
+#endif
+	//! \constr
 	async_data_op_req() { }
     //! \cconstr
 	async_data_op_req(const async_data_op_req &o) : async_data_op_req<void>(o) { }
@@ -1248,10 +1274,18 @@ template<class T> struct async_data_op_req : public async_data_op_req<void>
     //! \async_data_op_req1 \param _length The number of bytes to transfer
 	async_data_op_req(async_io_op _precondition, T *v, size_t _length, off_t _where) : async_data_op_req<void>(std::move(_precondition), static_cast<void *>(v), _length, _where) { }
 };
-//! \brief A convenience bundle of precondition, data and where for writing from a single const T *. Data \b MUST stay around until the operation completes. \tparam "class T" Any readable type T \ingroup async_data_op_req
+//! \brief A convenience bundle of precondition, data and where for writing from a single `const T *`. Data \b MUST stay around until the operation completes. \tparam "class T" Any readable type T \ingroup async_data_op_req
 template<class T> struct async_data_op_req<const T> : public async_data_op_req<const void>
 {
-    //! \constr
+#ifdef DOXYGEN_SHOULD_SKIP_THIS
+	//! An optional precondition for this operation
+	async_io_op precondition;
+	//! A sequence of mutable Boost.ASIO buffers to read into
+	std::vector<boost_asio_buffer_type> buffers;
+	//! The offset from which to read
+	off_t where;
+#endif
+	//! \constr
 	async_data_op_req() { }
     //! \cconstr
 	async_data_op_req(const async_data_op_req &o) : async_data_op_req<const void>(o) { }
@@ -1271,7 +1305,15 @@ template<class T> struct async_data_op_req<const T> : public async_data_op_req<c
 //! \brief A convenience bundle of precondition, data and where for reading into a `std::vector<T, A>`. Data \b MUST stay around until the operation completes. \tparam "class T" Any type \tparam "class A" Any STL allocator \ingroup async_data_op_req
 template<class T, class A> struct async_data_op_req<std::vector<T, A>> : public async_data_op_req<void>
 {
-    //! \constr
+#ifdef DOXYGEN_SHOULD_SKIP_THIS
+	//! An optional precondition for this operation
+	async_io_op precondition;
+	//! A sequence of mutable Boost.ASIO buffers to read into
+	std::vector<boost_asio_buffer_type> buffers;
+	//! The offset from which to read
+	off_t where;
+#endif
+	//! \constr
 	async_data_op_req() { }
     //! \cconstr
 	async_data_op_req(const async_data_op_req &o) : async_data_op_req<void>(o) { }
@@ -1287,7 +1329,15 @@ template<class T, class A> struct async_data_op_req<std::vector<T, A>> : public 
 //! \brief A convenience bundle of precondition, data and where for writing from a `const std::vector<T, A>`. Data \b MUST stay around until the operation completes. \tparam "class T" Any type \tparam "class A" Any STL allocator \ingroup async_data_op_req
 template<class T, class A> struct async_data_op_req<const std::vector<T, A>> : public async_data_op_req<const void>
 {
-    //! \constr
+#ifdef DOXYGEN_SHOULD_SKIP_THIS
+	//! An optional precondition for this operation
+	async_io_op precondition;
+	//! A sequence of mutable Boost.ASIO buffers to read into
+	std::vector<boost_asio_buffer_type> buffers;
+	//! The offset from which to read
+	off_t where;
+#endif
+	//! \constr
 	async_data_op_req() { }
     //! \cconstr
 	async_data_op_req(const async_data_op_req &o) : async_data_op_req<const void>(o) { }
@@ -1307,7 +1357,15 @@ template<class T, class A> struct async_data_op_req<const std::vector<T, A>> : p
 //! \brief A convenience bundle of precondition, data and where for reading into a `std::array<T, N>`. Data \b MUST stay around until the operation completes. \tparam "class T" Any type \tparam N Any compile-time size \ingroup async_data_op_req
 template<class T, size_t N> struct async_data_op_req<std::array<T, N>> : public async_data_op_req<void>
 {
-    //! \constr
+#ifdef DOXYGEN_SHOULD_SKIP_THIS
+	//! An optional precondition for this operation
+	async_io_op precondition;
+	//! A sequence of mutable Boost.ASIO buffers to read into
+	std::vector<boost_asio_buffer_type> buffers;
+	//! The offset from which to read
+	off_t where;
+#endif
+	//! \constr
 	async_data_op_req() { }
     //! \cconstr
 	async_data_op_req(const async_data_op_req &o) : async_data_op_req<void>(o) { }
@@ -1323,7 +1381,15 @@ template<class T, size_t N> struct async_data_op_req<std::array<T, N>> : public 
 //! \brief A convenience bundle of precondition, data and where for writing from a `const std::array<T, N>`. Data \b MUST stay around until the operation completes. \tparam "class T" Any type \tparam N Any compile-time size \ingroup async_data_op_req
 template<class T, size_t N> struct async_data_op_req<const std::array<T, N>> : public async_data_op_req<const void>
 {
-    //! \constr
+#ifdef DOXYGEN_SHOULD_SKIP_THIS
+	//! An optional precondition for this operation
+	async_io_op precondition;
+	//! A sequence of mutable Boost.ASIO buffers to read into
+	std::vector<boost_asio_buffer_type> buffers;
+	//! The offset from which to read
+	off_t where;
+#endif
+	//! \constr
 	async_data_op_req() { }
     //! \cconstr
 	async_data_op_req(const async_data_op_req &o) : async_data_op_req<const void>(o) { }
@@ -1343,7 +1409,15 @@ template<class T, size_t N> struct async_data_op_req<const std::array<T, N>> : p
 //! \brief A convenience bundle of precondition, data and where for reading into a `std::basic_string<C, T, A>`. Data \b MUST stay around until the operation completes. \tparam "class C" Any character type \tparam "class T" Character traits type \tparam "class A" Any STL allocator \ingroup async_data_op_req
 template<class C, class T, class A> struct async_data_op_req<std::basic_string<C, T, A>> : public async_data_op_req<void>
 {
-    //! \constr
+#ifdef DOXYGEN_SHOULD_SKIP_THIS
+	//! An optional precondition for this operation
+	async_io_op precondition;
+	//! A sequence of mutable Boost.ASIO buffers to read into
+	std::vector<boost_asio_buffer_type> buffers;
+	//! The offset from which to read
+	off_t where;
+#endif
+	//! \constr
 	async_data_op_req() { }
     //! \cconstr
 	async_data_op_req(const async_data_op_req &o) : async_data_op_req<void>(o) { }
@@ -1359,7 +1433,15 @@ template<class C, class T, class A> struct async_data_op_req<std::basic_string<C
 //! \brief A convenience bundle of precondition, data and where for writing from a `const std::basic_string<C, T, A>`. Data \b MUST stay around until the operation completes.  \tparam "class C" Any character type \tparam "class T" Character traits type \tparam "class A" Any STL allocator \ingroup async_data_op_req
 template<class C, class T, class A> struct async_data_op_req<const std::basic_string<C, T, A>> : public async_data_op_req<const void>
 {
-    //! \constr
+#ifdef DOXYGEN_SHOULD_SKIP_THIS
+	//! An optional precondition for this operation
+	async_io_op precondition;
+	//! A sequence of mutable Boost.ASIO buffers to read into
+	std::vector<boost_asio_buffer_type> buffers;
+	//! The offset from which to read
+	off_t where;
+#endif
+	//! \constr
 	async_data_op_req() { }
     //! \cconstr
 	async_data_op_req(const async_data_op_req &o) : async_data_op_req<const void>(o) { }
