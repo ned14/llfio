@@ -7,7 +7,6 @@ File Created: Mar 2013
 #ifndef BOOST_AFIO_HPP
 #define BOOST_AFIO_HPP
 
-#define DOXYGEN_NO_CLASS_ENUMS
 // Fix up mingw weirdness
 #if !defined(WIN32) && defined(_WIN32)
 #define WIN32 1
@@ -52,6 +51,10 @@ using namespace std;
 
 #include "config.hpp"
 #include "detail/Utility.hpp"
+
+#ifdef BOOST_NO_CXX11_SCOPED_ENUMS
+#define DOXYGEN_NO_CLASS_ENUMS
+#endif
 
 // Map in C++11 stuff if available
 #if (defined(__GLIBCXX__) && __GLIBCXX__<=20120920) || (defined(BOOST_MSVC) && BOOST_MSVC < 1700)
