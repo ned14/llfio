@@ -7,6 +7,7 @@ File Created: Mar 2013
 #ifndef BOOST_AFIO_HPP
 #define BOOST_AFIO_HPP
 
+#define DOXYGEN_NO_CLASS_ENUMS
 // Fix up mingw weirdness
 #if !defined(WIN32) && defined(_WIN32)
 #define WIN32 1

@@ -215,8 +215,11 @@ namespace detail {
 			}
 		}
 	};
-
+#ifdef DOXYGEN_NO_CLASS_ENUMS
+    enum OpType
+#else
 	enum class OpType
+#endif
 	{
 		Unknown,
 		UserCompletion,
@@ -279,7 +282,9 @@ namespace detail {
 			// Boost's spinlock is so lightweight it has no constructor ...
 			fdslock.unlock();
 			ANNOTATE_RWLOCK_CREATE(&fdslock);
+        #if !defined(BOOST_MSVC)|| BOOST_MSVC >= 1700
 			ops.reserve(10000);
+        #endif
 		}
 		~async_file_io_dispatcher_base_p()
 		{
@@ -353,7 +358,7 @@ void async_file_io_dispatcher_base::int_add_io_handle(void *key, std::shared_ptr
 {
 	BOOST_AFIO_LOCK_GUARD<detail::async_file_io_dispatcher_base_p::fdslock_t> lockh(p->fdslock);
 	ANNOTATE_RWLOCK_ACQUIRED(&p->fdslock, 1);
-	p->fds.insert(make_pair(key, std::weak_ptr<detail::async_io_handle>(h)));
+	p->fds.insert(std::make_pair(key, std::weak_ptr<detail::async_io_handle>(h)));
 	ANNOTATE_RWLOCK_RELEASED(&p->fdslock, 1);
 }
 
@@ -971,7 +976,7 @@ std::vector<async_io_op> async_file_io_dispatcher_base::barrier(const std::vecto
 	size_t idx=0;
 	BOOST_FOREACH(auto &op, ops)
     {
-		statev.push_back(make_pair(state, idx++));
+		statev.push_back(std::make_pair(state, idx++));
     }
 	return chain_async_ops((int) detail::OpType::barrier, ops, statev, async_op_flags::ImmediateCompletion|async_op_flags::DetachedFuture, &async_file_io_dispatcher_base::dobarrier<std::pair<std::shared_ptr<detail::barrier_count_completed_state>, size_t>>);
 }
@@ -1075,7 +1080,7 @@ namespace detail {
 			return std::make_pair(true, h);
 		}
 		// Called in unknown thread
-		void boost_asio_completion_handler(bool is_write, size_t id, std::shared_ptr<detail::async_io_handle> h, std::shared_ptr<std::pair<std::atomic<bool>, std::atomic<size_t>>> bytes_to_transfer, const boost::system::error_code &ec, size_t bytes_transferred)
+		void boost_asio_completion_handler(bool is_write, size_t id, std::shared_ptr<detail::async_io_handle> h, std::shared_ptr<std::pair<boost::afio::atomic<bool>, boost::afio::atomic<size_t>>> bytes_to_transfer, const boost::system::error_code &ec, size_t bytes_transferred)
 		{
 			exception_ptr e;
 			if(ec)
@@ -1125,7 +1130,7 @@ namespace detail {
 			for(auto &b : req.buffers)
 				amount+=boost::asio::buffer_size(b);
 			//printf("sr %u=%u\n", (unsigned) id, (unsigned) amount);
-			auto bytes_to_transfer=std::make_shared<std::pair<std::atomic<bool>, std::atomic<size_t>>>(std::make_pair(false, amount));
+			auto bytes_to_transfer=std::make_shared<std::pair<boost::afio::atomic<bool>, boost::afio::atomic<size_t>>>(std::make_pair(false, amount));
 			p->h->async_read_some_at(req.where, req.buffers, boost::bind(&async_file_io_dispatcher_windows::boost_asio_completion_handler, this, false, id, h, bytes_to_transfer, boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred));
 			// Indicate we're not finished yet
 			return std::make_pair(false, h);
@@ -1147,7 +1152,7 @@ namespace detail {
 			for (auto &b : req.buffers)
 				amount+=boost::asio::buffer_size(b);
 			//printf("sw %u=%u\n", (unsigned) id, (unsigned) amount);
-			auto bytes_to_transfer=std::make_shared<std::pair<std::atomic<bool>, std::atomic<size_t>>>(std::make_pair(false, amount));
+			auto bytes_to_transfer=std::make_shared<std::pair<boost::afio::atomic<bool>, boost::afio::atomic<size_t>>>(std::make_pair(false, amount));
 			p->h->async_write_some_at(req.where, req.buffers, boost::bind(&async_file_io_dispatcher_windows::boost_asio_completion_handler, this, true, id, h, bytes_to_transfer, boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred));
 			// Indicate we're not finished yet
 			return std::make_pair(false, h);
