@@ -33,6 +33,7 @@ File Created: Mar 2013
 #include "boost/thread/future.hpp"
 #include "boost/foreach.hpp"
 #include "detail/Preprocessor_variadic.hpp"
+#include <boost/detail/scoped_enum_emulation.hpp>
 
 
 #if defined(BOOST_MSVC) && BOOST_MSVC < 1700// Dinkumware without <atomic>
@@ -427,6 +428,7 @@ inline constexpr bool operator!(type a) \
 \brief Bitwise file and directory open flags
 \ingroup file_flags
 */
+
 #ifdef DOXYGEN_NO_CLASS_ENUMS
 enum file_flags
 #else

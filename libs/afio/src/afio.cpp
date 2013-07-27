@@ -1127,8 +1127,10 @@ namespace detail {
 			// boost::asio::windows::random_access_handle::async_read_some_at() clearly bothers
 			// with the first buffer only.
 			size_t amount=0;
-			for(auto &b : req.buffers)
-				amount+=boost::asio::buffer_size(b);
+			BOOST_FOREACH(auto &b, req.buffers)
+			{
+                amount+=boost::asio::buffer_size(b);
+            }
 			//printf("sr %u=%u\n", (unsigned) id, (unsigned) amount);
 			auto bytes_to_transfer=std::make_shared<std::pair<boost::afio::atomic<bool>, boost::afio::atomic<size_t>>>(std::make_pair(false, amount));
 			p->h->async_read_some_at(req.where, req.buffers, boost::bind(&async_file_io_dispatcher_windows::boost_asio_completion_handler, this, false, id, h, bytes_to_transfer, boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred));
@@ -1149,8 +1151,10 @@ namespace detail {
 			// boost::asio::windows::random_access_handle::async_write_some_at() clearly bothers
 			// with the first buffer only.
 			size_t amount=0;
-			for (auto &b : req.buffers)
-				amount+=boost::asio::buffer_size(b);
+			BOOST_FOREACH(auto &b, req.buffers)
+			{
+                amount+=boost::asio::buffer_size(b);
+            }
 			//printf("sw %u=%u\n", (unsigned) id, (unsigned) amount);
 			auto bytes_to_transfer=std::make_shared<std::pair<boost::afio::atomic<bool>, boost::afio::atomic<size_t>>>(std::make_pair(false, amount));
 			p->h->async_write_some_at(req.where, req.buffers, boost::bind(&async_file_io_dispatcher_windows::boost_asio_completion_handler, this, true, id, h, bytes_to_transfer, boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred));
