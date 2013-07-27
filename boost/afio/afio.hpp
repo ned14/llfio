@@ -38,14 +38,14 @@ File Created: Mar 2013
 #include <boost/atomic.hpp>
 #include <boost/chrono.hpp>
 typedef boost::thread thread; 
-#define chrono boost::chrono
+using namespace boost;
 #define BOOST_AFIO_USE_BOOST_ATOMIC
 #else
 #include <thread>
 #include <atomic>
 #include <mutex>
 typedef std::thread thread;
-typedef std::chrono chrono
+using namespace std;
 #endif
 
 #include "config.hpp"
