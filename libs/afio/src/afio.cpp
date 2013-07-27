@@ -596,7 +596,7 @@ template<class F, class... Args> std::shared_ptr<detail::async_io_handle> async_
     (size_t id, std::shared_ptr<detail::async_io_handle> h,                                         \
     completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>                  \
     BOOST_PP_COMMA_IF(N)                                                                            \
-    BOOST_PP_ENUM(N, a))                                                                            \
+    BOOST_PP_ENUM_PARAMS(N, a))                                                                            \
     BOOST_PP_COMMA_IF(N)                                                                            \
     BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))     /* parameters end */                                  \
     {                                                                                               \
@@ -759,7 +759,7 @@ template<class F, class... Args> async_io_op async_file_io_dispatcher_base::chai
     const async_io_op &precondition,async_op_flags flags,                                           \
     completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>                  \
     BOOST_PP_COMMA_IF(N)                                                                            \
-    BOOST_PP_ENUM(N, a))                                                                            \
+    BOOST_PP_ENUM_PARAMS(N, a))                                                                            \
     BOOST_PP_COMMA_IF(N)                                                                            \
     BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))     /* parameters end */                                  \
     {\

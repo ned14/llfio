@@ -618,7 +618,7 @@ public:
     template <class C                                                                               \
     BOOST_PP_COMMA_IF(N) \                                                                          \
     BOOST_PP_ENUM_PARAMS(N, class A)>                                                               \
-    std::pair<future<typename boost::result_of<C(BOOST_PP_ENUM(N, A))>::type>, async_io_op>         \
+    std::pair<future<typename boost::result_of<C(BOOST_PP_ENUM_PARAMS(N, A))>::type>, async_io_op>         \
     call (const async_io_op &req, C callback BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, a));     
 
   
@@ -882,7 +882,7 @@ protected:
     (size_t id, std::shared_ptr<detail::async_io_handle> h,                                         \
     completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>                  \
     BOOST_PP_COMMA_IF(N)                                                                            \
-    BOOST_PP_ENUM(N, a))                                                                            \
+    BOOST_PP_ENUM_PARAMS(N, a))                                                                            \
     BOOST_PP_COMMA_IF(N)                                                                            \
     BOOST_PP_ENUM_BINARY_PARAMS(N, A, a));     /* parameters end */     
 
@@ -902,7 +902,7 @@ protected:
     const async_io_op &precondition,async_op_flags flags,                                           \
     completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>                  \
     BOOST_PP_COMMA_IF(N)                                                                            \
-    BOOST_PP_ENUM(N, a))                                                                            \
+    BOOST_PP_ENUM_PARAMS(N, a))                                                                            \
     BOOST_PP_COMMA_IF(N)                                                                            \
     BOOST_PP_ENUM_BINARY_PARAMS(N, A, a));     /* parameters end */
 
@@ -1519,11 +1519,11 @@ template<class C, class... Args> inline std::pair<future<typename boost::result_
     template <class C                                                                                   \
     BOOST_PP_COMMA_IF(N)                                                                                \
     BOOST_PP_ENUM_PARAMS(N, class A)>                                                                   \
-    std::pair<future<typename boost::result_of<C(BOOST_PP_ENUM(N, A))>::type>, async_io_op>             \
+    std::pair<future<typename boost::result_of<C(BOOST_PP_ENUM_PARAMS(N, A))>::type>, async_io_op>             \
     call (const async_io_op &req, C callback BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, a)) \
     {                                                                                                   \
-        typedef typename std::result_of<C(BOOST_PP_ENUM(N, A))>::type rettype;                                      \
-    	return call(req, std::bind<rettype()>(callback, BOOST_PP_ENUM(N, a)));                                      \
+        typedef typename std::result_of<C(BOOST_PP_ENUM_PARAMS(N, A))>::type rettype;                                      \
+    	return call(req, std::bind<rettype()>(callback, BOOST_PP_ENUM_PARAMS(N, a)));                                      \
     }
   
 #define BOOST_PP_LOCAL_LIMITS     (0, BOOST_AFIO_MAX_PARAMETERS) //should this be 0 or 1 for the min????
