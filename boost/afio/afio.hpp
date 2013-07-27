@@ -616,13 +616,13 @@ public:
 
 #define BOOST_PP_LOCAL_MACRO(N)                                                                     \
     template <class C                                                                               \
-    BOOST_PP_COMMA_IF(N) \                                                                          \
+    BOOST_PP_COMMA_IF(N)                                                                            \
     BOOST_PP_ENUM_PARAMS(N, class A)>                                                               \
-    std::pair<future<typename boost::result_of<C(BOOST_PP_ENUM_PARAMS(N, A))>::type>, async_io_op>         \
+    inline std::pair<future<typename boost::result_of<C(BOOST_PP_ENUM_PARAMS(N, A))>::type>, async_io_op>  \
     call (const async_io_op &req, C callback BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, a));     
 
   
-#define BOOST_PP_LOCAL_LIMITS     (0, BOOST_AFIO_MAX_PARAMETERS) //should this be 0 or 1 for the min????
+#define BOOST_PP_LOCAL_LIMITS     (1, BOOST_AFIO_MAX_PARAMETERS) //should this be 0 or 1 for the min????
 #include BOOST_PP_LOCAL_ITERATE()
 
 #endif
@@ -869,7 +869,7 @@ protected:
 #ifndef BOOST_NO_CXX11_VARIADIC_TEMPLATES
     
     template<class F, class... Args> std::shared_ptr<detail::async_io_handle> invoke_async_op_completions(size_t id, std::shared_ptr<detail::async_io_handle> h, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, Args...), Args... args);
-	template<class F, class... Args> async_io_op chain_async_op(detail::immediate_async_ops &immediates, int optype, const async_io_op &precondition, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, Args...), Args... args);
+    template<class F, class... Args> async_io_op chain_async_op(detail::immediate_async_ops &immediates, int optype, const async_io_op &precondition, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, Args...), Args... args);
 
 #else
 
@@ -882,11 +882,10 @@ protected:
     (size_t id, std::shared_ptr<detail::async_io_handle> h,                                         \
     completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>                  \
     BOOST_PP_COMMA_IF(N)                                                                            \
-    BOOST_PP_ENUM_PARAMS(N, a))                                                                            \
+    BOOST_PP_ENUM_PARAMS(N, A))                                                                     \
     BOOST_PP_COMMA_IF(N)                                                                            \
     BOOST_PP_ENUM_BINARY_PARAMS(N, A, a));     /* parameters end */     
 
-  
 #define BOOST_PP_LOCAL_LIMITS     (0, BOOST_AFIO_MAX_PARAMETERS) //should this be 0 or 1 for the min????
 #include BOOST_PP_LOCAL_ITERATE()
 
@@ -902,7 +901,7 @@ protected:
     const async_io_op &precondition,async_op_flags flags,                                           \
     completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>                  \
     BOOST_PP_COMMA_IF(N)                                                                            \
-    BOOST_PP_ENUM_PARAMS(N, a))                                                                            \
+    BOOST_PP_ENUM_PARAMS(N, A))                                                                            \
     BOOST_PP_COMMA_IF(N)                                                                            \
     BOOST_PP_ENUM_BINARY_PARAMS(N, A, a));     /* parameters end */
 
@@ -1515,18 +1514,18 @@ template<class C, class... Args> inline std::pair<future<typename boost::result_
 
 #else
 
-#define BOOST_PP_LOCAL_MACRO(N)                                                                         \
-    template <class C                                                                                   \
-    BOOST_PP_COMMA_IF(N)                                                                                \
-    BOOST_PP_ENUM_PARAMS(N, class A)>                                                                   \
-    std::pair<future<typename boost::result_of<C(BOOST_PP_ENUM_PARAMS(N, A))>::type>, async_io_op>             \
-    call (const async_io_op &req, C callback BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, a)) \
-    {                                                                                                   \
-        typedef typename std::result_of<C(BOOST_PP_ENUM_PARAMS(N, A))>::type rettype;                                      \
-    	return call(req, std::bind<rettype()>(callback, BOOST_PP_ENUM_PARAMS(N, a)));                                      \
+#define BOOST_PP_LOCAL_MACRO(N)                                                                                         \
+    template <class C                                                                                                   \
+    BOOST_PP_COMMA_IF(N)                                                                                                \
+    BOOST_PP_ENUM_PARAMS(N, class A)>                                                                                   \
+    inline std::pair<future<typename boost::result_of<C(BOOST_PP_ENUM_PARAMS(N, A))>::type>, async_io_op>               \
+    call (const async_io_op &req, C callback BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))                 \
+    {                                                                                                                   \
+        typedef typename std::result_of<C(BOOST_PP_ENUM_PARAMS(N, A))>::type rettype;                                   \
+    	return call(req, std::bind<rettype()>(callback, BOOST_PP_ENUM_PARAMS(N, a)));                                   \
     }
   
-#define BOOST_PP_LOCAL_LIMITS     (0, BOOST_AFIO_MAX_PARAMETERS) //should this be 0 or 1 for the min????
+#define BOOST_PP_LOCAL_LIMITS     (1, BOOST_AFIO_MAX_PARAMETERS) //should this be 0 or 1 for the min????
 #include BOOST_PP_LOCAL_ITERATE()
 
 

@@ -592,17 +592,17 @@ template<class F, class... Args> std::shared_ptr<detail::async_io_handle> async_
     BOOST_PP_COMMA_IF(N)                                                                            \
     BOOST_PP_ENUM_PARAMS(N, class A)>                                                               \
     std::shared_ptr<detail::async_io_handle>                                                        \
-    async_file_io_dispatcher_base::invoke_async_op_completions                                                                     \
+    async_file_io_dispatcher_base::invoke_async_op_completions                                      \
     (size_t id, std::shared_ptr<detail::async_io_handle> h,                                         \
     completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>                  \
     BOOST_PP_COMMA_IF(N)                                                                            \
-    BOOST_PP_ENUM_PARAMS(N, a))                                                                            \
+    BOOST_PP_ENUM_PARAMS(N, A))                                                                     \
     BOOST_PP_COMMA_IF(N)                                                                            \
     BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))     /* parameters end */                                  \
     {                                                                                               \
 	    try\
 	    {\
-		    completion_returntype ret((static_cast<F *>(this)->*f)(id, hBOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, class a)));\
+		    completion_returntype ret((static_cast<F *>(this)->*f)(id, h BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a)));\
 		    /* If boolean is false, reschedule completion notification setting it to ret.second, otherwise complete now */ \
 		    if(ret.first)   \
 		    {\
@@ -754,21 +754,21 @@ template<class F, class... Args> async_io_op async_file_io_dispatcher_base::chai
     BOOST_PP_COMMA_IF(N)                                                                            \
     BOOST_PP_ENUM_PARAMS(N, class A)>                /* template end */                             \
     async_io_op                                      /* return type */                              \
-    async_io_op async_file_io_dispatcher_base::chain_async_op       /* function name */             \
+    async_file_io_dispatcher_base::chain_async_op       /* function name */             \
     (detail::immediate_async_ops &immediates, int optype,           /* parameters start */          \
     const async_io_op &precondition,async_op_flags flags,                                           \
     completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>                  \
     BOOST_PP_COMMA_IF(N)                                                                            \
-    BOOST_PP_ENUM_PARAMS(N, a))                                                                            \
+    BOOST_PP_ENUM_PARAMS(N, A))                                                                     \
     BOOST_PP_COMMA_IF(N)                                                                            \
     BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))     /* parameters end */                                  \
     {\
 	    size_t thisid=0;\
 	    while(!(thisid=++p->monotoniccount));\
 	    /* Wrap supplied implementation routine with a completion dispatcher*/ \
-	    auto wrapperf=&async_file_io_dispatcher_base::invoke_async_op_completions<F BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, class A)>;\
+	    auto wrapperf=&async_file_io_dispatcher_base::invoke_async_op_completions<F BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, A)>;\
 	    /* Bind supplied implementation routine to this, unique id and any args they passed*/ \
-	    typename detail::async_file_io_dispatcher_op::completion_t boundf(std::make_pair(thisid, std::bind(wrapperf, this, thisid, std::placeholders::_1, fBOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, class a))));\
+	    typename detail::async_file_io_dispatcher_op::completion_t boundf(std::make_pair(thisid, std::bind(wrapperf, this, thisid, std::placeholders::_1, f BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a))));\
 	    /* Make a new async_io_op ready for returning*/\
 	    async_io_op ret(shared_from_this(), thisid);\
 	    bool done=false;\
