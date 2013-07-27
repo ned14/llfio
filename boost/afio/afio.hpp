@@ -35,16 +35,18 @@ File Created: Mar 2013
 
 
 #if defined(BOOST_MSVC) && BOOST_MSVC < 1700// Dinkumware without <atomic>
-#include <boost\atomic.hpp>
+#include <boost/atomic.hpp>
+#include <boost/chrono.hpp>
 typedef boost::thread thread; 
+#define chrono boost::chrono
 #define BOOST_AFIO_USE_BOOST_ATOMIC
 #else
 #include <thread>
 #include <atomic>
 #include <mutex>
 typedef std::thread thread;
+typedef std::chrono chrono
 #endif
-
 
 #include "config.hpp"
 #include "detail/Utility.hpp"
@@ -377,11 +379,11 @@ namespace detail {
 		friend class async_file_io_dispatcher_qnx;
 
 		async_file_io_dispatcher_base *_parent;
-		std::chrono::system_clock::time_point _opened;
+		chrono::system_clock::time_point _opened;
 		std::filesystem::path _path; // guaranteed canonical
 	protected:
 		atomic<off_t> bytesread, byteswritten, byteswrittenatlastfsync;
-		async_io_handle(async_file_io_dispatcher_base *parent, const std::filesystem::path &path) : _parent(parent), _opened(std::chrono::system_clock::now()), _path(path), bytesread(0), byteswritten(0), byteswrittenatlastfsync(0) { }
+		async_io_handle(async_file_io_dispatcher_base *parent, const std::filesystem::path &path) : _parent(parent), _opened(chrono::system_clock::now()), _path(path), bytesread(0), byteswritten(0), byteswrittenatlastfsync(0) { }
 	public:
 		virtual ~async_io_handle() { }
 		//! Returns the parent of this io handle
@@ -389,7 +391,7 @@ namespace detail {
 		//! Returns the native handle of this io handle. On POSIX, you can cast this to a fd using `(int)(size_t) native_handle()`. On Windows it's a simple `(HANDLE) native_handle()`.
 		virtual void *native_handle() const=0;
 		//! Returns when this handle was opened
-		const std::chrono::system_clock::time_point &opened() const { return _opened; }
+		const chrono::system_clock::time_point &opened() const { return _opened; }
 		//! Returns the path of this io handle
 		const std::filesystem::path &path() const { return _path; }
 		//! Returns how many bytes have been read since this handle was opened.
@@ -424,11 +426,11 @@ inline constexpr bool operator!(type a) \
 \brief Bitwise file and directory open flags
 \ingroup file_flags
 */
-//#ifdef DOXYGEN_NO_CLASS_ENUMS
+#ifdef DOXYGEN_NO_CLASS_ENUMS
 enum file_flags
-//#else
-//enum class file_flags : size_t
-//#endif
+#else
+enum class file_flags : size_t
+#endif
 {
 	None=0,				//!< No flags set
 	Read=1,				//!< Read access
@@ -614,7 +616,7 @@ public:
 
 #define BOOST_PP_LOCAL_MACRO(N)                                                                     \
     template <class C                                                                               \
-    BOOST_PP_COMMA_IF(N) \                                                                                  \
+    BOOST_PP_COMMA_IF(N) \                                                                          \
     BOOST_PP_ENUM_PARAMS(N, class A)>                                                               \
     std::pair<future<typename boost::result_of<C(BOOST_PP_ENUM(N, A))>::type>, async_io_op>         \
     call (const async_io_op &req, C callback BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, a));     
@@ -1517,7 +1519,7 @@ template<class C, class... Args> inline std::pair<future<typename boost::result_
     template <class C                                                                                   \
     BOOST_PP_COMMA_IF(N)                                                                                \
     BOOST_PP_ENUM_PARAMS(N, class A)>                                                                   \
-    std::pair<future<typename boost::result_of<C(BOOST_PP_ENUM(N, a))>::type>, async_io_op>             \
+    std::pair<future<typename boost::result_of<C(BOOST_PP_ENUM(N, A))>::type>, async_io_op>             \
     call (const async_io_op &req, C callback BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, a)) \
     {                                                                                                   \
         typedef typename std::result_of<C(BOOST_PP_ENUM(N, A))>::type rettype;                                      \
