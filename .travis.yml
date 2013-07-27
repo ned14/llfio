@@ -89,10 +89,10 @@ script:
 #build the lib
  - cd $BOOST
  - ./bootstrap.sh --with-libraries=afio --prefix=$BOOST
- - b2 install $DEBUGBUILD toolset=$CC$GCCVER link=shared $FLAGS;
+ - b2 install $DEBUGBUILD toolset=$CC$GCCVER link=shared define=BOOST_NO_CXX11_VARIADIC_TEMPLATES $FLAGS;
 
 #build unit tests
- - b2 libs/afio/test $DEBUGBUILD toolset=$CC$GCCVER --link=shared $FLAGS;
+ - b2 libs/afio/test $DEBUGBUILD toolset=$CC$GCCVER --link=shared define=BOOST_NO_CXX11_VARIADIC_TEMPLATES $FLAGS;
 
 #if we want to use the built in bjam test runner we can get test output this way
 # - cat bin.v2/libs/afio/test/main.test/*/*/main.output #may need to specify path better on valgrind tests
