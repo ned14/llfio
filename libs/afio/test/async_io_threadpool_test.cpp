@@ -7,11 +7,7 @@ Created: Feb 2013
 
  static int task()
 {
-    #ifdef __GNUC__
-        boost::afio::thread::id this_id = boost::this_thread::get_id();
-    #else
-        std::thread::id this_id = std::this_thread::get_id();
-    #endif
+   boost::afio::thread::id this_id = boost::afio::get_this_thread_id();
         std::cout << "I am worker thread " << this_id << std::endl;
         return 78;
 }
@@ -26,11 +22,7 @@ Created: Feb 2013
     BOOST_TEST_MESSAGE("Tests that the async i/o thread pool implementation works");
     using namespace boost::afio;
     
-    #ifdef __GNUC__
-        boost::afio::thread::id this_id = boost::this_thread::get_id();
-    #else
-        std::thread::id this_id = std::this_thread::get_id();
-    #endif
+    boost::afio::thread::id this_id = boost::afio::get_this_thread_id();
     
         std::cout << "I am main thread " << this_id << std::endl;
         std_thread_pool pool(4);

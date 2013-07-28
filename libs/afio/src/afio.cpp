@@ -21,6 +21,7 @@ File Created: Mar 2013
 
 #include "../../../boost/afio/afio.hpp"
 #include "boost/smart_ptr/detail/spinlock.hpp"
+#include "../../../boost/afio/detail/std_filesystem.hpp"
 #include "../../../boost/afio/detail/ErrorHandling.hpp"
 #include "../../../boost/afio/detail/valgrind/memcheck.h"
 #include "../../../boost/afio/detail/valgrind/helgrind.h"
@@ -364,7 +365,7 @@ namespace detail {
 		std::vector<completion_t> completions;
 		async_file_io_dispatcher_op(OpType _optype, async_op_flags _flags, std::shared_ptr<shared_future<std::shared_ptr<detail::async_io_handle>>> _h)
 			: optype(_optype), flags(_flags), h(_h) { }
-		async_file_io_dispatcher_op(async_file_io_dispatcher_op &&o) : optype(o.optype), flags(std::move(o.flags)), h(std::move(o.h)),
+		async_file_io_dispatcher_op(async_file_io_dispatcher_op &&o) BOOST_NOEXCEPT_OR_NOTHROW : optype(o.optype), flags(std::move(o.flags)), h(std::move(o.h)),
 			detached_promise(std::move(o.detached_promise)), completions(std::move(o.completions)) { }
 	private:
 		async_file_io_dispatcher_op(const async_file_io_dispatcher_op &o);
@@ -1218,7 +1219,7 @@ namespace detail {
 	{
 		// Keep an optional weak reference counted index of containing directories on POSIX
 		typedef boost::detail::spinlock dircachelock_t;
-		dircachelock_t dircachelock; std::unordered_map<std::filesystem::path, std::weak_ptr<async_io_handle>> dircache;
+		dircachelock_t dircachelock; std::unordered_map<std::filesystem::path, std::weak_ptr<async_io_handle>, std::hash<std::filesystem::path>> dircache;
 		std::shared_ptr<detail::async_io_handle> get_handle_to_containing_dir(const std::filesystem::path &path)
 		{
 			std::filesystem::path containingdir(path.parent_path());
@@ -1226,7 +1227,7 @@ namespace detail {
 			BOOST_AFIO_LOCK_GUARD<dircachelock_t> dircachelockh(dircachelock);
 			do
 			{
-				std::unordered_map<std::filesystem::path, std::weak_ptr<async_io_handle>>::iterator it=dircache.find(containingdir);
+				std::unordered_map<std::filesystem::path, std::weak_ptr<async_io_handle>, std::hash<std::filesystem::path>>::iterator it=dircache.find(containingdir);
 				if(dircache.end()==it || it->second.expired())
 				{
 					if(dircache.end()!=it) dircache.erase(it);
