@@ -52,9 +52,9 @@ using namespace std;
 #include "config.hpp"
 #include "detail/Utility.hpp"
 
-#ifdef BOOST_NO_CXX11_SCOPED_ENUMS
-#define DOXYGEN_NO_CLASS_ENUMS
-#endif
+//#ifdef BOOST_NO_CXX11_SCOPED_ENUMS
+//#define DOXYGEN_NO_CLASS_ENUMS
+//#endif
 
 // Map in C++11 stuff if available
 #if (defined(__GLIBCXX__) && __GLIBCXX__<=20120920) || (defined(BOOST_MSVC) && BOOST_MSVC < 1700)
@@ -411,29 +411,31 @@ namespace detail {
 
 
 #define BOOST_AFIO_DECLARE_CLASS_ENUM_AS_BITFIELD(type) \
-inline constexpr type operator&(type a, type b) \
+inline BOOST_CONSTEXPR_OR_CONST type operator&(type a, type b) \
 { \
 	return static_cast<type>(static_cast<size_t>(a) & static_cast<size_t>(b)); \
 } \
-inline constexpr type operator|(type a, type b) \
+inline BOOST_CONSTEXPR_OR_CONST type operator|(type a, type b) \
 { \
 	return static_cast<type>(static_cast<size_t>(a) | static_cast<size_t>(b)); \
 } \
-inline constexpr type operator~(type a) \
+inline BOOST_CONSTEXPR_OR_CONST type operator~(type a) \
 { \
 	return static_cast<type>(~static_cast<size_t>(a)); \
 } \
-inline constexpr bool operator!(type a) \
+inline BOOST_CONSTEXPR_OR_CONST bool operator!(type a) \
 { \
 	return 0==static_cast<size_t>(a); \
 }
+
 /*! \enum file_flags
 \brief Bitwise file and directory open flags
 \ingroup file_flags
 */
-
 #ifdef DOXYGEN_NO_CLASS_ENUMS
 enum file_flags
+#elif defined(BOOST_NO_CXX11_SCOPED_ENUMS)
+BOOST_SCOPED_ENUM_UT_DECLARE_BEGIN(file_flags, size_t)
 #else
 enum class file_flags : size_t
 #endif
@@ -453,14 +455,23 @@ enum class file_flags : size_t
 	OSDirect=(1<<16),	//!< Bypass the OS file buffers (only really useful for writing large files. Note you must 4Kb align everything if this is on)
 	OSSync=(1<<17)		//!< Ask the OS to not complete until the data is on the physical storage. Best used only with Direct, otherwise use AutoFlush.
 
-};
+}
+#ifdef BOOST_NO_CXX11_SCOPED_ENUMS
+BOOST_SCOPED_ENUM_DECLARE_END(file_flags)
+BOOST_AFIO_DECLARE_CLASS_ENUM_AS_BITFIELD(file_flags::enum_type)
+#else
+;
 BOOST_AFIO_DECLARE_CLASS_ENUM_AS_BITFIELD(file_flags)
+#endif
+
 /*! \enum async_op_flags
 \brief Bitwise async_op_flags flags
 \ingroup async_op_flags
 */
 #ifdef DOXYGEN_NO_CLASS_ENUMS
-enum async_op_flags
+enum file_flags
+#elif defined(BOOST_NO_CXX11_SCOPED_ENUMS)
+BOOST_SCOPED_ENUM_UT_DECLARE_BEGIN(async_op_flags, size_t)
 #else
 enum class async_op_flags : size_t
 #endif
@@ -468,9 +479,14 @@ enum class async_op_flags : size_t
 	None=0,					//!< No flags set
 	DetachedFuture=1,		//!< The specified completion routine may choose to not complete immediately
 	ImmediateCompletion=2	//!< Call chained completion immediately instead of scheduling for later. Make SURE your completion can not block!
-};
+}
+#ifdef BOOST_NO_CXX11_SCOPED_ENUMS
+BOOST_SCOPED_ENUM_DECLARE_END(async_op_flags)
+BOOST_AFIO_DECLARE_CLASS_ENUM_AS_BITFIELD(async_op_flags::enum_type)
+#else
+;
 BOOST_AFIO_DECLARE_CLASS_ENUM_AS_BITFIELD(async_op_flags)
-
+#endif
 
 /*! \class async_file_io_dispatcher_base
 \brief Abstract base class for dispatching file i/o asynchronously

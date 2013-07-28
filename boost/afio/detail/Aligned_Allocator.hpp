@@ -47,16 +47,23 @@
 namespace boost{
     namespace afio{
         namespace detail {
-            
+#ifdef BOOST_NO_CXX11_SCOPED_ENUMS
+BOOST_SCOPED_ENUM_DECLARE_BEGIN(allocator_alignment)
+#else
 enum class allocator_alignment : size_t
+#endif
 {
     Default = sizeof(void*), //!< The default alignment on this machine.
     SSE    = 16,			//!< The alignment for SSE. Better to use M128 for NEON et al support.
 	M128   = 16,			//!< The alignment for a 128 bit vector.
     AVX    = 32,			//!< The alignment for AVX. Better to use M256 for NEON et al support.
 	M256   = 32				//!< The alignment for a 256 bit vector.
-};      
-            
+}
+#ifdef BOOST_NO_CXX11_SCOPED_ENUMS
+BOOST_SCOPED_ENUM_DECLARE_END(allocator_alignment)
+#else
+;      
+#endif            
 #ifdef BOOST_WINDOWS
 	extern "C" void *_aligned_malloc(size_t size, size_t alignment);
 	extern "C" void _aligned_free(void *blk);

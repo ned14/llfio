@@ -215,11 +215,14 @@ namespace detail {
 			}
 		}
 	};
-#ifdef DOXYGEN_NO_CLASS_ENUMS
-    enum OpType
-#else
-	enum class OpType
-#endif
+
+    #ifdef DOXYGEN_NO_CLASS_ENUMS
+    enum file_flags
+    #elif defined(BOOST_NO_CXX11_SCOPED_ENUMS)
+    BOOST_SCOPED_ENUM_DECLARE_BEGIN(OpType)
+    #else
+    enum class OpType 
+    #endif
 	{
 		Unknown,
 		UserCompletion,
@@ -235,7 +238,12 @@ namespace detail {
 		barrier,
 
 		Last
-	};
+	}
+   #ifdef BOOST_NO_CXX11_SCOPED_ENUMS
+    BOOST_SCOPED_ENUM_DECLARE_END(OpType)
+    #else
+    ;
+    #endif
 	static const char *optypes[]={
 		"unknown",
 		"UserCompletion",
