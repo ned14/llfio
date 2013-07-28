@@ -16,8 +16,8 @@ Jenkins CI build and unit test bot status:
 <th>VS2010</th><th>VS2012</th><th>VS2013</th><th>Mingw</th><th>Mingw-w64</th>
 </tr>
 <tr align="center">
-<td>?</td>
-<td>?</td><td>?</td><td>?</td><td>?</td><td>?</td>
+<td><div style="position:relative; width:42px; overflow:hidden;"><a href='https://ci.nedprod.com/job/Boost.AFIO%20Build%20FreeBSD%2010%20clang%203.3/'><img src='https://ci.nedprod.com/buildStatus/icon?job=Boost.AFIO Build FreeBSD 10 clang 3.3' style="margin-left:-58px;"></a></div></td>
+<td><div style="position:relative; width:42px; overflow:hidden;"><a href='https://ci.nedprod.com/job/Boost.AFIO%20Build%20WinXP%20VS2010/'><img src='https://ci.nedprod.com/buildStatus/icon?job=Boost.AFIO Build WinXP VS2010' style="margin-left:-58px;"></a></div></td><td>?</td><td>?</td><td><div style="position:relative; width:42px; overflow:hidden;"><a href='https://ci.nedprod.com/job/Boost.AFIO%20Build%20WinXP%20Mingw32/'><img src='https://ci.nedprod.com/buildStatus/icon?job=Boost.AFIO Build WinXP Mingw32' style="margin-left:-58px;"></a></div></td><td>?</td>
 </tr>
 </table>
 </p>
