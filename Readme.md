@@ -1,5 +1,6 @@
 <p align="center">
 Jenkins CI build and unit test bot status:
+</p>
 <table border="1" cellpadding="2">
 <tr><th>Static analysis</th><th colspan="6">Linux</th>
 <tr><th>clang + oclint</th>
@@ -20,6 +21,5 @@ Jenkins CI build and unit test bot status:
 <td><div style="position:relative; width:42px; overflow:hidden;"><a href='https://ci.nedprod.com/job/Boost.AFIO%20Build%20WinXP%20VS2010/'><img src='https://ci.nedprod.com/buildStatus/icon?job=Boost.AFIO Build WinXP VS2010' style="margin-left:-58px;"></a></div></td><td>?</td><td>?</td><td><div style="position:relative; width:42px; overflow:hidden;"><a href='https://ci.nedprod.com/job/Boost.AFIO%20Build%20WinXP%20Mingw32/'><img src='https://ci.nedprod.com/buildStatus/icon?job=Boost.AFIO Build WinXP Mingw32' style="margin-left:-58px;"></a></div></td><td>?</td>
 </tr>
 </table>
-</p>
 <p align="center">Unit test code coverage is: <a href='https://coveralls.io/r/BoostGSoC/boost.afio'><img src='https://coveralls.io/repos/BoostGSoC/boost.afio/badge.png' alt='Coverage Status' /></a></p>
 <p align="center">Current master branch build and unit tests status on Travis CI: <a href="https://travis-ci.org/BoostGSoC/boost.afio"><img valign="middle" src="https://travis-ci.org/BoostGSoC/boost.afio.png?branch=master"/></a></p>
