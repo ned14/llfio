@@ -417,7 +417,7 @@ namespace detail {
 		file_flags _flags;
 	protected:
 		std::atomic<off_t> bytesread, byteswritten, byteswrittenatlastfsync;
-		async_io_handle(async_file_io_dispatcher_base *parent, const std::filesystem::path &path, file_flags flags) : _parent(parent), _opened(std::chrono::system_clock::now()), _flags(flags), _path(path), bytesread(0), byteswritten(0), byteswrittenatlastfsync(0) { }
+		async_io_handle(async_file_io_dispatcher_base *parent, const std::filesystem::path &path, file_flags flags) : _parent(parent), _opened(std::chrono::system_clock::now()), _path(path), _flags(flags), bytesread(0), byteswritten(0), byteswrittenatlastfsync(0) { }
 	public:
 		virtual ~async_io_handle() { }
 		//! Returns the parent of this io handle
@@ -1140,7 +1140,7 @@ namespace detail
 	{
 		typedef boost::asio::mutable_buffer boost_asio_buffer_type;
 		typedef void *void_type;
-		typedef nullptr_t conversion_type;
+		typedef std::nullptr_t conversion_type;
 	};
 	//! \brief The implementation of all async_data_op_req specialisations. \tparam for_writing Whether this implementation is for writing data. \ingroup async_data_op_req
 	template<bool for_writing> class async_data_op_req_impl
