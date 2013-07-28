@@ -114,23 +114,23 @@ template<class T> class M : public B<T> \
 public: \
 	M() { } \
 	M(const B<T> &o) : B<T>(o) { } \
-	M(B<T> &&o) : B<T>(std::move(o)) { } \
+	M(B<T> &&o) BOOST_NOEXCEPT_OR_NOTHROW : B<T>(std::move(o)) { } \
 	M(const M &o) : B<T>(o) { } \
-	M(M &&o) : B<T>(std::move(o)) { } \
+	M(M &&o) BOOST_NOEXCEPT_OR_NOTHROW : B<T>(std::move(o)) { } \
 	M &operator=(const B<T> &o) { static_cast<B<T> &&>(*this)=o; return *this; } \
-	M &operator=(B<T> &&o) { static_cast<B<T> &&>(*this)=std::move(o); return *this; } \
+	M &operator=(B<T> &&o) BOOST_NOEXCEPT_OR_NOTHROW { static_cast<B<T> &&>(*this)=std::move(o); return *this; } \
 	M &operator=(const M &o) { static_cast<B<T> &&>(*this)=o; return *this; } \
-	M &operator=(M &&o) { static_cast<B<T> &&>(*this)=std::move(o); return *this; } \
+	M &operator=(M &&o) BOOST_NOEXCEPT_OR_NOTHROW { static_cast<B<T> &&>(*this)=std::move(o); return *this; } \
 };
 #define BOOST_AFIO_FORWARD_STL_IMPL_NC(M, B) \
 template<class T> class M : public B<T> \
 { \
 public: \
 	M() { } \
-	M(B<T> &&o) : B<T>(std::move(o)) { } \
-	M(M &&o) : B<T>(std::move(o)) { } \
-	M &operator=(B<T> &&o) { static_cast<B<T> &&>(*this)=std::move(o); return *this; } \
-	M &operator=(M &&o) { static_cast<B<T> &&>(*this)=std::move(o); return *this; } \
+	M(B<T> &&o) BOOST_NOEXCEPT_OR_NOTHROW : B<T>(std::move(o)) { } \
+	M(M &&o) BOOST_NOEXCEPT_OR_NOTHROW : B<T>(std::move(o)) { } \
+	M &operator=(B<T> &&o) BOOST_NOEXCEPT_OR_NOTHROW { static_cast<B<T> &&>(*this)=std::move(o); return *this; } \
+	M &operator=(M &&o) BOOST_NOEXCEPT_OR_NOTHROW { static_cast<B<T> &&>(*this)=std::move(o); return *this; } \
 };
 /*! \class future
 \brief For now, this is boost's future. Will be replaced when C++'s future catches up with boost's
@@ -173,11 +173,11 @@ template<class R> class packaged_task<R()>
 #endif
 public:
 	packaged_task() { }
-	packaged_task(Base &&o) : Base(std::move(o)) { }
-	packaged_task(packaged_task &&o) : Base(static_cast<Base &&>(o)) { }
-	template<class T> packaged_task(T &&o) : Base(std::forward<T>(o)) { }
-	packaged_task &operator=(Base &&o) { static_cast<Base &&>(*this)=std::move(o); return *this; }
-	packaged_task &operator=(packaged_task &&o) { static_cast<Base &&>(*this)=std::move(o); return *this; }
+	packaged_task(Base &&o) BOOST_NOEXCEPT_OR_NOTHROW : Base(std::move(o)) { }
+	packaged_task(packaged_task &&o) BOOST_NOEXCEPT_OR_NOTHROW : Base(static_cast<Base &&>(o)) { }
+	template<class T> packaged_task(T &&o) BOOST_NOEXCEPT_OR_NOTHROW : Base(std::forward<T>(o)) { }
+	packaged_task &operator=(Base &&o) BOOST_NOEXCEPT_OR_NOTHROW { static_cast<Base &&>(*this)=std::move(o); return *this; }
+	packaged_task &operator=(packaged_task &&o) BOOST_NOEXCEPT_OR_NOTHROW { static_cast<Base &&>(*this)=std::move(o); return *this; }
 };
 
 /*! \class thread_pool
@@ -840,7 +840,7 @@ struct async_io_op
     //! \cconstr
 	async_io_op(const async_io_op &o) : parent(o.parent), id(o.id), h(o.h) { }
     //! \mconstr
-	async_io_op(async_io_op &&o) : parent(std::move(o.parent)), id(std::move(o.id)), h(std::move(o.h)) { }
+	async_io_op(async_io_op &&o) BOOST_NOEXCEPT_OR_NOTHROW : parent(std::move(o.parent)), id(std::move(o.id)), h(std::move(o.h)) { }
     /*! Constructs an instance.
     \param _parent The dispatcher this op belongs to.
     \param _id The unique non-zero id of this op.
@@ -855,7 +855,7 @@ struct async_io_op
     //! \cassign
 	async_io_op &operator=(const async_io_op &o) { parent=o.parent; id=o.id; h=o.h; return *this; }
     //! \massign
-	async_io_op &operator=(async_io_op &&o) { parent=std::move(o.parent); id=std::move(o.id); h=std::move(o.h); return *this; }
+	async_io_op &operator=(async_io_op &&o) BOOST_NOEXCEPT_OR_NOTHROW { parent=std::move(o.parent); id=std::move(o.id); h=std::move(o.h); return *this; }
 	//! Validates contents
 	bool validate() const
 	{
@@ -1108,11 +1108,11 @@ template<> struct async_data_op_req<void> // For reading
 	//! \cconstr
 	async_data_op_req(const async_data_op_req &o) : precondition(o.precondition), buffers(o.buffers), where(o.where) { }
 	//! \mconstr
-	async_data_op_req(async_data_op_req &&o) : precondition(std::move(o.precondition)), buffers(std::move(o.buffers)), where(std::move(o.where)) { }
+	async_data_op_req(async_data_op_req &&o) BOOST_NOEXCEPT_OR_NOTHROW : precondition(std::move(o.precondition)), buffers(std::move(o.buffers)), where(std::move(o.where)) { }
 	//! \cassign
 	async_data_op_req &operator=(const async_data_op_req &o) { precondition=o.precondition; buffers=o.buffers; where=o.where; return *this; }
 	//! \massign
-	async_data_op_req &operator=(async_data_op_req &&o) { precondition=std::move(o.precondition); buffers=std::move(o.buffers); where=std::move(o.where); return *this; }
+	async_data_op_req &operator=(async_data_op_req &&o) BOOST_NOEXCEPT_OR_NOTHROW { precondition=std::move(o.precondition); buffers=std::move(o.buffers); where=std::move(o.where); return *this; }
 	//! \async_data_op_req1 \param _length The number of bytes to transfer
 	async_data_op_req(async_io_op _precondition, void *v, size_t _length, off_t _where) : precondition(std::move(_precondition)), where(_where) { buffers.reserve(1); buffers.push_back(boost::asio::mutable_buffer(v, _length)); _validate(); }
 	//! \async_data_op_req2
@@ -1155,15 +1155,15 @@ template<> struct async_data_op_req<const void> // For writing
 	//! \cconstr
 	async_data_op_req(const async_data_op_req &o) : precondition(o.precondition), buffers(o.buffers), where(o.where) { }
 	//! \mconstr
-	async_data_op_req(async_data_op_req &&o) : precondition(std::move(o.precondition)), buffers(std::move(o.buffers)), where(std::move(o.where)) { }
+	async_data_op_req(async_data_op_req &&o) BOOST_NOEXCEPT_OR_NOTHROW : precondition(std::move(o.precondition)), buffers(std::move(o.buffers)), where(std::move(o.where)) { }
 	//! \cconstr
 	async_data_op_req(const async_data_op_req<void> &o) : precondition(o.precondition), where(o.where) { buffers.reserve(o.buffers.capacity()); for(auto &i: o.buffers) buffers.push_back(i); }
 	//! \mconstr
-	async_data_op_req(async_data_op_req<void> &&o) : precondition(std::move(o.precondition)), where(o.where) { buffers.reserve(o.buffers.capacity()); for(auto &&i: o.buffers) buffers.push_back(std::move(i)); }
+	async_data_op_req(async_data_op_req<void> &&o) BOOST_NOEXCEPT_OR_NOTHROW : precondition(std::move(o.precondition)), where(o.where) { buffers.reserve(o.buffers.capacity()); for(auto &&i: o.buffers) buffers.push_back(std::move(i)); }
 	//! \cassign
 	async_data_op_req &operator=(const async_data_op_req &o) { precondition=o.precondition; buffers=o.buffers; where=o.where; return *this; }
 	//! \massign
-	async_data_op_req &operator=(async_data_op_req &&o) { precondition=std::move(o.precondition); buffers=std::move(o.buffers); where=std::move(o.where); return *this; }
+	async_data_op_req &operator=(async_data_op_req &&o) BOOST_NOEXCEPT_OR_NOTHROW { precondition=std::move(o.precondition); buffers=std::move(o.buffers); where=std::move(o.where); return *this; }
 	//! \async_data_op_req1 \param _length The number of bytes to transfer
 	async_data_op_req(async_io_op _precondition, const void *v, size_t _length, off_t _where) : precondition(std::move(_precondition)), where(_where) { buffers.reserve(1); buffers.push_back(boost::asio::const_buffer(v, _length)); _validate(); }
 	//! \async_data_op_req2
@@ -1200,11 +1200,11 @@ template<class T> struct async_data_op_req : public async_data_op_req<void>
     //! \cconstr
 	async_data_op_req(const async_data_op_req &o) : async_data_op_req<void>(o) { }
     //! \mconstr
-	async_data_op_req(async_data_op_req &&o) : async_data_op_req<void>(std::move(o)) { }
+	async_data_op_req(async_data_op_req &&o) BOOST_NOEXCEPT_OR_NOTHROW : async_data_op_req<void>(std::move(o)) { }
     //! \cassign
 	async_data_op_req &operator=(const async_data_op_req &o) { static_cast<async_data_op_req<void>>(*this)=o; return *this; }
     //! \massign
-	async_data_op_req &operator=(async_data_op_req &&o) { static_cast<async_data_op_req<void>>(*this)=std::move(o); return *this; }
+	async_data_op_req &operator=(async_data_op_req &&o) BOOST_NOEXCEPT_OR_NOTHROW { static_cast<async_data_op_req<void>>(*this)=std::move(o); return *this; }
     //! \async_data_op_req1 \param _length The number of bytes to transfer
 	async_data_op_req(async_io_op _precondition, T *v, size_t _length, off_t _where) : async_data_op_req<void>(std::move(_precondition), static_cast<void *>(v), _length, _where) { }
 };
@@ -1216,15 +1216,15 @@ template<class T> struct async_data_op_req<const T> : public async_data_op_req<c
     //! \cconstr
 	async_data_op_req(const async_data_op_req &o) : async_data_op_req<const void>(o) { }
     //! \mconstr
-	async_data_op_req(async_data_op_req &&o) : async_data_op_req<const void>(std::move(o)) { }
+	async_data_op_req(async_data_op_req &&o) BOOST_NOEXCEPT_OR_NOTHROW : async_data_op_req<const void>(std::move(o)) { }
     //! \cconstr
 	async_data_op_req(const async_data_op_req<T> &o) : async_data_op_req<const void>(o) { }
     //! \mconstr
-	async_data_op_req(async_data_op_req<T> &&o) : async_data_op_req<const void>(std::move(o)) { }
+	async_data_op_req(async_data_op_req<T> &&o) BOOST_NOEXCEPT_OR_NOTHROW : async_data_op_req<const void>(std::move(o)) { }
     //! \cassign
 	async_data_op_req &operator=(const async_data_op_req &o) { static_cast<async_data_op_req<const void>>(*this)=o; return *this; }
     //! \massign
-	async_data_op_req &operator=(async_data_op_req &&o) { static_cast<async_data_op_req<const void>>(*this)=std::move(o); return *this; }
+	async_data_op_req &operator=(async_data_op_req &&o) BOOST_NOEXCEPT_OR_NOTHROW { static_cast<async_data_op_req<const void>>(*this)=std::move(o); return *this; }
     //! \async_data_op_req1 \param _length The number of bytes to transfer
 	async_data_op_req(async_io_op _precondition, const T *v, size_t _length, off_t _where) : async_data_op_req<const void>(std::move(_precondition), static_cast<const void *>(v), _length, _where) { }
 };
@@ -1236,11 +1236,11 @@ template<class T, class A> struct async_data_op_req<std::vector<T, A>> : public 
     //! \cconstr
 	async_data_op_req(const async_data_op_req &o) : async_data_op_req<void>(o) { }
     //! \mconstr
-	async_data_op_req(async_data_op_req &&o) : async_data_op_req<void>(std::move(o)) { }
+	async_data_op_req(async_data_op_req &&o) BOOST_NOEXCEPT_OR_NOTHROW : async_data_op_req<void>(std::move(o)) { }
     //! \cassign
 	async_data_op_req &operator=(const async_data_op_req &o) { static_cast<async_data_op_req<void>>(*this)=o; return *this; }
     //! \massign
-	async_data_op_req &operator=(async_data_op_req &&o) { static_cast<async_data_op_req<void>>(*this)=std::move(o); return *this; }
+	async_data_op_req &operator=(async_data_op_req &&o) BOOST_NOEXCEPT_OR_NOTHROW { static_cast<async_data_op_req<void>>(*this)=std::move(o); return *this; }
     //! \async_data_op_req1
 	async_data_op_req(async_io_op _precondition, std::vector<T, A> &v, off_t _where) : async_data_op_req<void>(std::move(_precondition), static_cast<void *>(&v.front()), v.size()*sizeof(T), _where) { }
 };
@@ -1252,15 +1252,15 @@ template<class T, class A> struct async_data_op_req<const std::vector<T, A>> : p
     //! \cconstr
 	async_data_op_req(const async_data_op_req &o) : async_data_op_req<const void>(o) { }
     //! \mconstr
-	async_data_op_req(async_data_op_req &&o) : async_data_op_req<const void>(std::move(o)) { }
+	async_data_op_req(async_data_op_req &&o) BOOST_NOEXCEPT_OR_NOTHROW : async_data_op_req<const void>(std::move(o)) { }
     //! \cconstr
 	async_data_op_req(const async_data_op_req<std::vector<T, A>> &o) : async_data_op_req<const void>(o) { }
     //! \mconstr
-	async_data_op_req(async_data_op_req<std::vector<T, A>> &&o) : async_data_op_req<const void>(std::move(o)) { }
+	async_data_op_req(async_data_op_req<std::vector<T, A>> &&o) BOOST_NOEXCEPT_OR_NOTHROW : async_data_op_req<const void>(std::move(o)) { }
     //! \cassign
 	async_data_op_req &operator=(const async_data_op_req &o) { static_cast<async_data_op_req<const void>>(*this)=o; return *this; }
     //! \massign
-	async_data_op_req &operator=(async_data_op_req &&o) { static_cast<async_data_op_req<const void>>(*this)=std::move(o); return *this; }
+	async_data_op_req &operator=(async_data_op_req &&o) BOOST_NOEXCEPT_OR_NOTHROW { static_cast<async_data_op_req<const void>>(*this)=std::move(o); return *this; }
     //! \async_data_op_req1
 	async_data_op_req(async_io_op _precondition, const std::vector<T, A> &v, off_t _where) : async_data_op_req<const void>(std::move(_precondition), static_cast<const void *>(&v.front()), v.size()*sizeof(T), _where) { }
 };
@@ -1272,11 +1272,11 @@ template<class T, size_t N> struct async_data_op_req<std::array<T, N>> : public 
     //! \cconstr
 	async_data_op_req(const async_data_op_req &o) : async_data_op_req<void>(o) { }
     //! \mconstr
-	async_data_op_req(async_data_op_req &&o) : async_data_op_req<void>(std::move(o)) { }
+	async_data_op_req(async_data_op_req &&o) BOOST_NOEXCEPT_OR_NOTHROW : async_data_op_req<void>(std::move(o)) { }
     //! \cassign
 	async_data_op_req &operator=(const async_data_op_req &o) { static_cast<async_data_op_req<void>>(*this)=o; return *this; }
     //! \massign
-	async_data_op_req &operator=(async_data_op_req &&o) { static_cast<async_data_op_req<void>>(*this)=std::move(o); return *this; }
+	async_data_op_req &operator=(async_data_op_req &&o) BOOST_NOEXCEPT_OR_NOTHROW { static_cast<async_data_op_req<void>>(*this)=std::move(o); return *this; }
     //! \async_data_op_req1
 	async_data_op_req(async_io_op _precondition, std::array<T, N> &v, off_t _where) : async_data_op_req<void>(std::move(_precondition), static_cast<void *>(&v.front()), v.size()*sizeof(T), _where) { }
 };
@@ -1288,15 +1288,15 @@ template<class T, size_t N> struct async_data_op_req<const std::array<T, N>> : p
     //! \cconstr
 	async_data_op_req(const async_data_op_req &o) : async_data_op_req<const void>(o) { }
     //! \mconstr
-	async_data_op_req(async_data_op_req &&o) : async_data_op_req<const void>(std::move(o)) { }
+	async_data_op_req(async_data_op_req &&o) BOOST_NOEXCEPT_OR_NOTHROW : async_data_op_req<const void>(std::move(o)) { }
     //! \cassign
 	async_data_op_req &operator=(const async_data_op_req &o) { static_cast<async_data_op_req<const void>>(*this)=o; return *this; }
     //! \massign
-	async_data_op_req &operator=(async_data_op_req &&o) { static_cast<async_data_op_req<const void>>(*this)=std::move(o); return *this; }
+	async_data_op_req &operator=(async_data_op_req &&o) BOOST_NOEXCEPT_OR_NOTHROW { static_cast<async_data_op_req<const void>>(*this)=std::move(o); return *this; }
     //! \cconstr
 	async_data_op_req(const async_data_op_req<std::array<T, N>> &o) : async_data_op_req<const void>(o) { }
     //! \mconstr
-	async_data_op_req(async_data_op_req<std::array<T, N>> &&o) : async_data_op_req<const void>(std::move(o)) { }
+	async_data_op_req(async_data_op_req<std::array<T, N>> &&o) BOOST_NOEXCEPT_OR_NOTHROW : async_data_op_req<const void>(std::move(o)) { }
     //! \async_data_op_req1
 	async_data_op_req(async_io_op _precondition, const std::array<T, N> &v, off_t _where) : async_data_op_req<const void>(std::move(_precondition), static_cast<const void *>(&v.front()), v.size()*sizeof(T), _where) { }
 };
@@ -1308,11 +1308,11 @@ template<class C, class T, class A> struct async_data_op_req<std::basic_string<C
     //! \cconstr
 	async_data_op_req(const async_data_op_req &o) : async_data_op_req<void>(o) { }
     //! \mconstr
-	async_data_op_req(async_data_op_req &&o) : async_data_op_req<void>(std::move(o)) { }
+	async_data_op_req(async_data_op_req &&o) BOOST_NOEXCEPT_OR_NOTHROW : async_data_op_req<void>(std::move(o)) { }
     //! \cassign
 	async_data_op_req &operator=(const async_data_op_req &o) { static_cast<async_data_op_req<void>>(*this)=o; return *this; }
     //! \mconstr
-	async_data_op_req &operator=(async_data_op_req &&o) { static_cast<async_data_op_req<void>>(*this)=std::move(o); return *this; }
+	async_data_op_req &operator=(async_data_op_req &&o) BOOST_NOEXCEPT_OR_NOTHROW { static_cast<async_data_op_req<void>>(*this)=std::move(o); return *this; }
     //! \async_data_op_req1
 	async_data_op_req(async_io_op _precondition, std::basic_string<C, T, A> &v, off_t _where) : async_data_op_req<void>(std::move(_precondition), static_cast<void *>(&v.front()), v.size()*sizeof(A), _where) { }
 };
@@ -1324,15 +1324,15 @@ template<class C, class T, class A> struct async_data_op_req<const std::basic_st
     //! \cconstr
 	async_data_op_req(const async_data_op_req &o) : async_data_op_req<const void>(o) { }
     //! \mconstr
-	async_data_op_req(async_data_op_req &&o) : async_data_op_req<const void>(std::move(o)) { }
+	async_data_op_req(async_data_op_req &&o) BOOST_NOEXCEPT_OR_NOTHROW : async_data_op_req<const void>(std::move(o)) { }
     //! \cconstr
 	async_data_op_req(const async_data_op_req<std::basic_string<C, T, A>> &o) : async_data_op_req<const void>(o) { }
     //! \mconstr
-	async_data_op_req(async_data_op_req<std::basic_string<C, T, A>> &&o) : async_data_op_req<const void>(std::move(o)) { }
+	async_data_op_req(async_data_op_req<std::basic_string<C, T, A>> &&o) BOOST_NOEXCEPT_OR_NOTHROW : async_data_op_req<const void>(std::move(o)) { }
     //! \cassign
 	async_data_op_req &operator=(const async_data_op_req &o) { static_cast<async_data_op_req<const void>>(*this)=o; return *this; }
     //! \mconstr
-	async_data_op_req &operator=(async_data_op_req &&o) { static_cast<async_data_op_req<const void>>(*this)=std::move(o); return *this; }
+	async_data_op_req &operator=(async_data_op_req &&o) BOOST_NOEXCEPT_OR_NOTHROW { static_cast<async_data_op_req<const void>>(*this)=std::move(o); return *this; }
     //! \async_data_op_req1
 	async_data_op_req(async_io_op _precondition, const std::basic_string<C, T, A> &v, off_t _where) : async_data_op_req<const void>(std::move(_precondition), static_cast<const void *>(&v.front()), v.size()*sizeof(A), _where) { }
 };
