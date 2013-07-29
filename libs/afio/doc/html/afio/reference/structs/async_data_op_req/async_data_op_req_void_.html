@@ -28,19 +28,21 @@
           void &gt;</a>
 </h5></div></div></div>
 <p>
-            <a class="indexterm" name="id866244"></a>
+            <a class="indexterm" name="id948814"></a>
 A convenience bundle of precondition, data and where for reading into
-            a void *. Data <span class="bold"><strong>MUST</strong></span> stay around until
-            the operation completes.
+            a <code class="literal"><code class="computeroutput"><span class="keyword">void</span> <span class="special">*</span></code></code>.
+            Data <span class="bold"><strong>MUST</strong></span> stay around until the operation
+            completes.
           </p>
 <h6>
 <a name="afio.reference.structs.async_data_op_req.async_data_op_req_void_.h0"></a>
             <span class="phrase"><a name="afio.reference.structs.async_data_op_req.async_data_op_req_void_.synopsis"></a></span><a class="link" href="async_data_op_req_void_.html#afio.reference.structs.async_data_op_req.async_data_op_req_void_.synopsis">Synopsis</a>
           </h6>
 <pre class="programlisting"><span class="keyword">struct</span> <span class="identifier">async_data_op_req</span><span class="special">&lt;</span> <span class="keyword">void</span> <span class="special">&gt;</span>
+      <span class="special">:</span> <span class="keyword">public</span> <span class="identifier">detail</span><span class="special">::</span><span class="identifier">async_data_op_req_impl</span><span class="special">&lt;</span> <span class="keyword">false</span> <span class="special">&gt;</span>
 <span class="special">{</span>
   <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">asio</span><span class="special">::</span><span class="identifier">mutable_buffer</span> <span class="special">&gt;</span> <span class="identifier">buffers</span><span class="special">;</span>  <span class="comment">// A sequence of mutable Boost.ASIO buffers to read into. </span>
-  <span class="identifier">async_io_op</span> <span class="identifier">precondition</span><span class="special">;</span>                            <span class="comment">// An optional precondition for this operation. </span>
+  <span class="identifier">async_io_op</span> <span class="identifier">precondition</span><span class="special">;</span>                            <span class="comment">// A precondition containing an open file handle for this operation. </span>
   <span class="identifier">off_t</span> <span class="identifier">where</span><span class="special">;</span>                                         <span class="comment">// The offset from which to read. </span>
 <span class="special">};</span>
 </pre>
@@ -51,7 +53,6 @@ A convenience bundle of precondition, data and where for reading into
           </h6>
 <div class="informaltable"><table class="table">
 <colgroup>
-<col>
 <col>
 <col>
 <col>
@@ -81,6 +82,23 @@ A convenience bundle of precondition, data and where for reading into
 <tbody>
 <tr>
 <td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="keyword">bool</span> <span class="identifier">validate</span><span class="special">()</span></pre>
+                  </td>
+<td>
+                    <p>
+                      Validates contents for correctness.
+                    </p>
+                  </td>
+<td>
+                  </td>
+<td>
+                    <p>
+                      True if contents are correct
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
 <pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">async_data_op_req</span><span class="special">()</span></pre>
                   </td>
 <td>
@@ -90,7 +108,6 @@ A convenience bundle of precondition, data and where for reading into
                   </td>
 <td>
                   </td>
-<td class="auto-generated">&#160;</td>
 </tr>
 <tr>
 <td>
@@ -107,7 +124,6 @@ A convenience bundle of precondition, data and where for reading into
                       <span class="emphasis"><em>o</em></span>:
                     </p>
                   </td>
-<td class="auto-generated">&#160;</td>
 </tr>
 <tr>
 <td>
@@ -124,41 +140,6 @@ A convenience bundle of precondition, data and where for reading into
                       <span class="emphasis"><em>o</em></span>:
                     </p>
                   </td>
-<td class="auto-generated">&#160;</td>
-</tr>
-<tr>
-<td>
-<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">async_data_op_req</span> <span class="special">&amp;</span> <span class="keyword">operator</span><span class="special">=(</span><span class="keyword">const</span> <span class="identifier">async_data_op_req</span> <span class="special">&amp;</span> <span class="identifier">o</span><span class="special">)</span></pre>
-                  </td>
-<td>
-                    <p>
-                      Copy assignment.
-                    </p>
-                  </td>
-<td>
-                    <p>
-                      <span class="bold"><strong>const async_data_op_req &amp;</strong></span>:
-                      <span class="emphasis"><em>o</em></span>:
-                    </p>
-                  </td>
-<td class="auto-generated">&#160;</td>
-</tr>
-<tr>
-<td>
-<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">async_data_op_req</span> <span class="special">&amp;</span> <span class="keyword">operator</span><span class="special">=(</span><span class="identifier">async_data_op_req</span> <span class="special">&amp;&amp;</span> <span class="identifier">o</span><span class="special">)</span></pre>
-                  </td>
-<td>
-                    <p>
-                      Move assignment.
-                    </p>
-                  </td>
-<td>
-                    <p>
-                      <span class="bold"><strong>async_data_op_req &amp;&amp;</strong></span>:
-                      <span class="emphasis"><em>o</em></span>:
-                    </p>
-                  </td>
-<td class="auto-generated">&#160;</td>
 </tr>
 <tr>
 <td>
@@ -188,7 +169,6 @@ A convenience bundle of precondition, data and where for reading into
                       The offset at which to transfer
                     </p>
                   </td>
-<td class="auto-generated">&#160;</td>
 </tr>
 <tr>
 <td>
@@ -212,24 +192,6 @@ A convenience bundle of precondition, data and where for reading into
                     <p>
                       <span class="bold"><strong>off_t</strong></span>: <span class="emphasis"><em>_where</em></span>:
                       The offset at which to transfer
-                    </p>
-                  </td>
-<td class="auto-generated">&#160;</td>
-</tr>
-<tr>
-<td>
-<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="keyword">bool</span> <span class="identifier">validate</span><span class="special">()</span></pre>
-                  </td>
-<td>
-                    <p>
-                      Validates contents for correctness.
-                    </p>
-                  </td>
-<td>
-                  </td>
-<td>
-                    <p>
-                      True if contents are correct
                     </p>
                   </td>
 </tr>

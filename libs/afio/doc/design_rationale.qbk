@@ -151,15 +151,22 @@ explaining, so it gets a whole section to itself.
 [endsect] [/overview]
 
 [section:acid_write_ordering Write ordering constraints, and how these can
-be used to achieve the Durability in ACID without needing `fsync()`]
+be used to achieve some of the Durability in ACID without needing `fsync()`]
 
 [*ACID] stands for Atomic Consistent Isolated Durable, and it is a key requirement for
 database implementations which manage data you don't want to lose, which tends to be
-a common use case. While achieving all four is non-trivial, achieving Durability is
+a common use case in databases. Whilst achieving all four is non-trivial, achieving Durability is
 simultaneously both the easiest and the hardest of the four. This is because the easy
 way of ensuring durability is to always wait for each write to reach non-volatile storage,
 yet such a naive solution is typically exceptionally slow. Achieving performant
 data durability is without doubt a wicked hard problem in computer science.
+
+Because a majority of users of __boost__afio__ are going to be people needing
+some form of data persistence guarantees, this section is a short essay on the current
+state of data persistence on various popular platforms. Any errors or omissions, both
+of which are probable, are entirely the fault of this author Niall Douglas. Note also that
+the forthcoming information was probably correct around the summer of 2013, and it highly
+likely to become less correct over time.
 
 [section:background Background]
 
@@ -184,57 +191,71 @@ and there is usually no portable way of knowing when it has completed.
 There is also the matter of the difference between data and ['meta]data: metadata
 is the stuff a filing system stores such that it knows about your data. For each
 of the first two of the above three families of functions, most systems provide
-three variants: flush metadata, flush data, and flush both metadata and data.
+three variants: flush metadata, flush data, and flush both metadata and data, so
+for clarity:
 
-All major filing systems on all major platforms provide the above three families of
-function to ensure data reaches non-volatile storage. Most of the major filing systems
-in recent versions of major platforms have additionally added significant extra guarantees
-regarding metadata alone: for example, UFS with soft updates (from BSD) guarantees
-consistency of metadata through imposing a write order on metadata writes. Similarly,
-recent versions of ext4 guarantee that metadata older than five seconds is sent to
-non-volatile storage, again by imposing a write order. On NTFS and HFS+, directory metadata
-is guaranteed to be sent to non-volatile storage on any file close: this ensures
-that a newly created file at least shows up in its directory, even if the file's
-contents is corrupted or lost. Once again, write ordering, especially when combined
-with Copy On Write (COW) of changed structures, is the tool internally used to ensure
-that the filing system's metadata is always kept in a recoverable state.
+[table:data_persistence_types Mechanisms for enforcing data persistence onto physical storage
+  [[][Flush file metadata][Flush file data][Flush both metadata and data]]
+  [[Once off][`fsync(parentdir_fd)`][`fdatasync(fd)`][`fsync(fd)`]]
+  [[Always][Varies[footnote Many filing systems (NTFS, HFS+, ext3 with `data=ordered`, ext4 with `alloc_on_commit`) keep back a metadata flush until when a file handle close causes data to finish reaching physical storage. This ensures that files don't appear in directories with zero sizes.]][`fcntl(fd, F_SETFL, O_DSYNC)`][`fcntl(fd, F_SETFL, O_SYNC)`]]
+]
+
+In addition to manually flushing data to physical storage, every filing system also
+implements some form of timer based flush whereby a piece of written data will always
+be sent to physical storage within some predefined period of time after the write.
+Most filing systems implement different timeouts for metadata and data, but typically
+on almost all production filing systems -- unless they are in a power-saving laptop mode --
+any data write is guaranteed to be sent to non-volatile storage within one minute.
+Let me be clear here for later argument's sake: ['the filing system is allowed to
+reorder writes by up to one minute in time from the order in which they were issued].
+Or put another way, most filing systems have a one minute temporal constraint on
+write order.
 
 Most people think of `fsync()`, `O_SYNC` and `sync()` in terms of flushing caches.
 An alternative way of thinking about them is that they impose a write order on
-writes to non-volatile storage. There is no doubt that they are a very crude and
+writes to non-volatile storage in addition to the timeout based write order. There
+is no doubt that they are a very crude and
 highly inefficient way of doing so, but they do open the option of ['emulating]
-native filing system support for write ordering constraints.
+native filing system support for write ordering constraints when nothing else better
+is available. So why is the ability to constrain write ordering important?
 
 [endsect] [/background]
 
 [section:write_ordering_data Write ordering data and durability: why does it matter?]
 
-What you're about to read is probably too much detail for AFIO and reads more like a
-description of how the aforementioned forthcoming TripleGit graph store database
-implements durability. Nevertheless, as many users of AFIO will likely want to know how to ensure
-written data is never lost, this discussion is probably useful.
+Implementing performant Durability essentially reduces down to answering two questions: (i) how long does it take to restore
+a consistent state after an unexpected power loss, and (ii) how much of your most recent data are
+you willing to lose? AFIO has been designed and written as the asynchronous file i/o
+portability layer for the forthcoming direct
+filing system graphstore database TripleGit which implements late Durability i.e.
+you are guaranteed that your writes from some wall clock distance from now can never
+be lost. As discussing how TripleGit will use AFIO is probably useful to many others,
+that is what the remainder of this section does.
 
-A performant way for a database to achieve the Consistent and Isolated part is to allow
-abortable, garbage collectable concurrent writes of new data into separate partitions, and to push
+TripleGit will achieve the Consistent and Isolated parts of being a reliable database by placing
+abortable, garbage collectable concurrent writes of new data into separate files, and pushing
 the atomicity enforcement into a very small piece of ordering logic in order to reduce
-transaction contention by multiple writers as much as possible. Generally,
-the ordering logic will make use of some sort of intent log which records what
+transaction contention by multiple writers as much as possible.
+The ordering logic will make use of an atomic append only intent log which records what
 the database intends to do (and generally you want that intent log on as low latency
-a device as possible). Generally speaking, that intent log is usually some form
-of atomically appended record -- and usefully every major filing system supports
-atomic appends to a file. What you then traditionally do to implement a transaction
-is to write your data to the filing
+a device as possible) -- and usefully every major filing system supports
+atomic appends to a file. If you wish to never lose most recent data, to implement a transaction
+one writes your data to the filing
 system, ensure it has reached non-volatile storage, append the knowledge it
 definitely is on non-volatile storage to the intent log, and then ensure your
 append also has reached non-volatile storage. This is presently the only way to ensure
-that valuable data definitely can not be lost. The obvious
+that valuable data definitely can not be lost on any filing system that I know of. The obvious
 problem is that this method involves writing all your data with `O_SYNC` and using `fsync()`
 on the intent log. This might perform okay with a single writer, but with multiple
 writers performance is usually awful, especially on storage incapable of high
 queue depths and potentially many hundreds of milliseconds of latency (e.g. SD Cards).
+TripleGit of course will offer such a facility, at both the per-graph and per-update
+levels.
 
 This raises an alternative: write all your data, but keep a hash like a SHA of its contents
-as you write it. When you write your intent log, append all the SHAs of the items
+as you write it[footnote TripleGit actually uses a different, much faster 256 bit hash by
+default, but can use SHA256 on a per-graph basis.]. When you write your intent log,
+atomically append all the SHAs of the items
 you just wrote and skip `O_DATA` and `fsync()` completely. If power gets removed
 before all the data is written to non-volatile storage, you can figure out that
 the database is dirty easily enough, and you simply parse from the end of the intent
@@ -252,7 +273,7 @@ especially on lower end platforms like a mobile phone where 25-30 cycles per byt
 SHA256 performance might be typical. Secondly, dirty database reconstruction is
 rather like how ext2 had to call `fsck` on boot: a whole load of time and i/o
 must be expended to fix up damage in the store, and while it's running one generally
-must wait (one can work around this using metadata journaling to shortcut having
+must wait (one can work around this using ext3/4 metadata journaling to shortcut having
 to figure out what is good and bad, but I digress).
 
 What would be really, really useful is if the filing system exposed its internal
@@ -287,7 +308,10 @@ thirty seconds of writes before pacing the acceptance of new write data to match
 the speed of the non-volatile storage (which may be a ZIL if you're doing
 synchronous writes). This implies up to
 thirty seconds of buffered data could be lost, but note that ZFS still guarantees
-transaction group sequential write order.
+transaction group sequential write order. Therefore, what ZFS is in fact guaranteeing
+is this: ['we may reorder your write by up to five seconds away from the sequence
+in which you wrote it and other writes surrounding it. Other than that, we guarantee
+the order in which you write is the order in which that data reaches physical storage.]
 
 [footnote http://www.c0t0d0s0.org/archives/5343-Insights-into-ZFS-today-The-nature-of-writing-things.html]
 

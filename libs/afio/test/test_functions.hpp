@@ -10,9 +10,9 @@ Created: Feb 2013
 // If defined, uses a ton more memory and is many orders of magnitude slower.
 #define DEBUG_TORTURE_TEST 1
 
-// Get Boost.ASIO on Windows IOCP working
-#if defined(_DEBUG) && defined(WIN32)
-#define BOOST_ASIO_BUG_WORKAROUND 1
+#ifdef __MINGW32__
+// Mingw doesn't define putenv() needed by Boost.Test
+extern int putenv(char*);
 #endif
 
 #include <utility>
@@ -21,7 +21,7 @@ Created: Feb 2013
 #include <algorithm>
 #include "boost/lockfree/queue.hpp"
 #include "../../../boost/afio/afio.hpp"
-#include "../../../boost/afio/detail/SpookyV2.h"
+#include "../detail/SpookyV2.h"
 #include "../../../boost/afio/detail/Aligned_Allocator.hpp"
 #include "../../../boost/afio/detail/Undoer.hpp"
 
@@ -82,7 +82,7 @@ static void _1000_open_write_close_deletes(std::shared_ptr<boost::afio::async_fi
         std::vector<async_path_op_req> manyfilereqs;
         manyfilereqs.reserve(1000);
         for(size_t n=0; n<1000; n++)
-                manyfilereqs.push_back(async_path_op_req(mkdir, "testdir/"+std::to_string(n), file_flags::Create|file_flags::Write));
+                manyfilereqs.push_back(async_path_op_req(mkdir, "testdir/"+boost::to_string(n), file_flags::Create|file_flags::Write));
         auto manyopenfiles(dispatcher->file(manyfilereqs));
 
         // Write to each of those 1000 files as they are opened
@@ -202,9 +202,7 @@ static void evil_random_io(std::shared_ptr<boost::afio::async_file_io_dispatcher
     // SHA256 out the results
     // We then replay the same with real storage to see if it matches
     auto begin=std::chrono::high_resolution_clock::now();
-#ifndef BOOST_ASIO_BUG_WORKAROUND
 #pragma omp parallel for
-#endif
     for(ptrdiff_t n=0; n<(ptrdiff_t) no; n++)
     {
             ranctx gen;
@@ -227,17 +225,10 @@ static void evil_random_io(std::shared_ptr<boost::afio::async_file_io_dispatcher
 #else
                     ranctx writeseed=op.seed=gen;
 #endif
-#ifdef BOOST_ASIO_BUG_WORKAROUND
-                    //if(toissue>4) toissue=4;
-                    toissue=1; // clamp for now. I think Boost.ASIO on Win IOCP seems to dislike more than one buffer at a time ?!?
-#endif
                     for(m=0; m<toissue; m++)
                     {
                             u4 s=ranval(&gen) & ((256*1024-1)&~63); // Must be a multiple of 64 bytes for SHA256
                             if(s<64) s=64;
-#ifdef BOOST_ASIO_BUG_WORKAROUND
-                            if(s>65536) s=65536; // clamp for now. I think Boost.ASIO won't transfer more than 64Kb at a time anyway ... ?!?
-#endif
                             if(alignment)
                                     s=(s+4095)&~(alignment-1);
                             if(thisbytes+s>1024*1024) break;
@@ -328,7 +319,7 @@ static void evil_random_io(std::shared_ptr<boost::afio::async_file_io_dispatcher
     std::vector<async_path_op_req> manyfilereqs;
     manyfilereqs.reserve(no);
     for(size_t n=0; n<no; n++)
-            manyfilereqs.push_back(async_path_op_req(mkdir, "testdir/"+std::to_string(n), file_flags::Create|file_flags::ReadWrite));
+            manyfilereqs.push_back(async_path_op_req(mkdir, "testdir/"+boost::to_string(n), file_flags::Create|file_flags::ReadWrite));
     auto manyopenfiles(dispatcher->file(manyfilereqs));
     std::vector<off_t> sizes(no, bytes);
     auto manywrittenfiles(dispatcher->truncate(manyopenfiles, sizes));
@@ -367,9 +358,7 @@ static void evil_random_io(std::shared_ptr<boost::afio::async_file_io_dispatcher
             }
             return make_pair(true, h);
     };
-#ifndef BOOST_ASIO_BUG_WORKAROUND
 #pragma omp parallel for
-#endif
     for(ptrdiff_t n=0; n<(ptrdiff_t) no; n++)
     {
             for(Op &op : todo[n])
@@ -439,7 +428,7 @@ static void evil_random_io(std::shared_ptr<boost::afio::async_file_io_dispatcher
                     size_t bytes=0;
                     for(auto &b : failedop->first->req.buffers)
                             bytes+=boost::asio::buffer_size(b);
-                    cout << "   " << (failedop->first->write ? "Write to" : "Read from") << " " << to_string(failedop->first->req.where) << " at offset " << failedop->second << " into bytes " << bytes << endl;
+                    cout << "   " << (failedop->first->write ? "Write to" : "Read from") << " " << boost::to_string(failedop->first->req.where) << " at offset " << failedop->second << " into bytes " << bytes << endl;
             }
     }
     BOOST_TEST_MESSAGE("Checking if the final files have exactly the right contents ... this may take a bit ...");
@@ -464,7 +453,7 @@ static void evil_random_io(std::shared_ptr<boost::afio::async_file_io_dispatcher
         for(size_t n=0; n<no; n++)
             if(memhashes[n]!=filehashes[n]) // compare hash values from ram and actual IO
             {
-                    string failmsg("File "+to_string(n)+" contents were not what they were supposed to be!");
+                    string failmsg("File "+boost::to_string(n)+" contents were not what they were supposed to be!");
                     BOOST_TEST_MESSAGE(failmsg.c_str());
             }
     }

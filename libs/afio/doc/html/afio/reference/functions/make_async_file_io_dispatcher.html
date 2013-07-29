@@ -1,7 +1,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
-<title>async_file_io_dispatcher</title>
+<title>make_async_file_io_dispatcher</title>
 <link rel="stylesheet" href="../../../myboostbook.css" type="text/css">
 <meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
 <link rel="home" href="../../../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 0.1">
@@ -24,16 +24,16 @@
 </div>
 <div class="section">
 <div class="titlepage"><div><div><h4 class="title">
-<a name="afio.reference.functions.async_file_io_dispatcher"></a><a class="link" href="async_file_io_dispatcher.html" title="async_file_io_dispatcher">async_file_io_dispatcher</a>
+<a name="afio.reference.functions.make_async_file_io_dispatcher"></a><a class="link" href="make_async_file_io_dispatcher.html" title="make_async_file_io_dispatcher">make_async_file_io_dispatcher</a>
 </h4></div></div></div>
 <p>
-          <a class="indexterm" name="id901873"></a>
+          <a class="indexterm" name="id983222"></a>
 Instatiates the best available async_file_io_dispatcher implementation
           for this system.
         </p>
 <h6>
-<a name="afio.reference.functions.async_file_io_dispatcher.h0"></a>
-          <span class="phrase"><a name="afio.reference.functions.async_file_io_dispatcher.description"></a></span><a class="link" href="async_file_io_dispatcher.html#afio.reference.functions.async_file_io_dispatcher.description">Description</a>
+<a name="afio.reference.functions.make_async_file_io_dispatcher.h0"></a>
+          <span class="phrase"><a name="afio.reference.functions.make_async_file_io_dispatcher.description"></a></span><a class="link" href="make_async_file_io_dispatcher.html#afio.reference.functions.make_async_file_io_dispatcher.description">Description</a>
         </h6>
 <p>
           Note that the number of threads in the threadpool supplied is the maximum
@@ -43,13 +43,13 @@ Instatiates the best available async_file_io_dispatcher implementation
           depth of 64 or higher might deliver significant benefits.
         </p>
 <h6>
-<a name="afio.reference.functions.async_file_io_dispatcher.h1"></a>
-          <span class="phrase"><a name="afio.reference.functions.async_file_io_dispatcher.synopsis"></a></span><a class="link" href="async_file_io_dispatcher.html#afio.reference.functions.async_file_io_dispatcher.synopsis">Synopsis</a>
+<a name="afio.reference.functions.make_async_file_io_dispatcher.h1"></a>
+          <span class="phrase"><a name="afio.reference.functions.make_async_file_io_dispatcher.synopsis"></a></span><a class="link" href="make_async_file_io_dispatcher.html#afio.reference.functions.make_async_file_io_dispatcher.synopsis">Synopsis</a>
         </h6>
-<pre class="programlisting"><span class="identifier">BOOST_AFIO_DECL</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span><span class="identifier">async_file_io_dispatcher_base</span><span class="special">&gt;</span> <span class="identifier">async_file_io_dispatcher</span><span class="special">(</span><span class="identifier">thread_pool</span> <span class="special">&amp;</span> <span class="identifier">threadpool</span> <span class="special">=</span> <span class="identifier">process_threadpool</span><span class="special">(),</span> <span class="identifier">file_flags</span> <span class="identifier">flagsforce</span> <span class="special">=</span> <span class="identifier">file_flags</span><span class="special">::</span><span class="identifier">None</span><span class="special">,</span> <span class="identifier">file_flags</span> <span class="identifier">flagsmask</span> <span class="special">=</span> <span class="identifier">file_flags</span><span class="special">::</span><span class="identifier">None</span><span class="special">)</span></pre>
+<pre class="programlisting"><span class="identifier">BOOST_AFIO_DECL</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span><span class="identifier">async_file_io_dispatcher_base</span><span class="special">&gt;</span> <span class="identifier">make_async_file_io_dispatcher</span><span class="special">(</span><span class="identifier">thread_source</span> <span class="special">&amp;</span> <span class="identifier">threadpool</span> <span class="special">=</span> <span class="identifier">process_threadpool</span><span class="special">(),</span> <span class="identifier">file_flags</span> <span class="identifier">flagsforce</span> <span class="special">=</span> <span class="identifier">file_flags</span><span class="special">::</span><span class="identifier">None</span><span class="special">,</span> <span class="identifier">file_flags</span> <span class="identifier">flagsmask</span> <span class="special">=</span> <span class="identifier">file_flags</span><span class="special">::</span><span class="identifier">None</span><span class="special">)</span></pre>
 <h6>
-<a name="afio.reference.functions.async_file_io_dispatcher.h2"></a>
-          <span class="phrase"><a name="afio.reference.functions.async_file_io_dispatcher.parameters"></a></span><a class="link" href="async_file_io_dispatcher.html#afio.reference.functions.async_file_io_dispatcher.parameters">Parameters</a>
+<a name="afio.reference.functions.make_async_file_io_dispatcher.h2"></a>
+          <span class="phrase"><a name="afio.reference.functions.make_async_file_io_dispatcher.parameters"></a></span><a class="link" href="make_async_file_io_dispatcher.html#afio.reference.functions.make_async_file_io_dispatcher.parameters">Parameters</a>
         </h6>
 <div class="informaltable"><table class="table">
 <colgroup>
@@ -84,7 +84,7 @@ Instatiates the best available async_file_io_dispatcher implementation
 <tr>
 <td>
                   <p>
-                    thread_pool &amp;
+                    thread_source &amp;
                   </p>
                 </td>
 <td>
@@ -143,23 +143,23 @@ Instatiates the best available async_file_io_dispatcher implementation
 </tbody>
 </table></div>
 <h6>
-<a name="afio.reference.functions.async_file_io_dispatcher.h3"></a>
-          <span class="phrase"><a name="afio.reference.functions.async_file_io_dispatcher.returns"></a></span><a class="link" href="async_file_io_dispatcher.html#afio.reference.functions.async_file_io_dispatcher.returns">Returns</a>
+<a name="afio.reference.functions.make_async_file_io_dispatcher.h3"></a>
+          <span class="phrase"><a name="afio.reference.functions.make_async_file_io_dispatcher.returns"></a></span><a class="link" href="make_async_file_io_dispatcher.html#afio.reference.functions.make_async_file_io_dispatcher.returns">Returns</a>
         </h6>
 <p>
           A shared_ptr to the best available async_file_io_dispatcher implementation
           for this system.
         </p>
 <h6>
-<a name="afio.reference.functions.async_file_io_dispatcher.h4"></a>
-          <span class="phrase"><a name="afio.reference.functions.async_file_io_dispatcher.header"></a></span><a class="link" href="async_file_io_dispatcher.html#afio.reference.functions.async_file_io_dispatcher.header">Header</a>
+<a name="afio.reference.functions.make_async_file_io_dispatcher.h4"></a>
+          <span class="phrase"><a name="afio.reference.functions.make_async_file_io_dispatcher.header"></a></span><a class="link" href="make_async_file_io_dispatcher.html#afio.reference.functions.make_async_file_io_dispatcher.header">Header</a>
         </h6>
 <p>
           <code class="computeroutput"><span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">boost</span><span class="special">/</span><span class="identifier">afio</span><span class="special">/</span><span class="identifier">afio</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span></code>
         </p>
 <h6>
-<a name="afio.reference.functions.async_file_io_dispatcher.h5"></a>
-          <span class="phrase"><a name="afio.reference.functions.async_file_io_dispatcher.example"></a></span><a class="link" href="async_file_io_dispatcher.html#afio.reference.functions.async_file_io_dispatcher.example">Example</a>
+<a name="afio.reference.functions.make_async_file_io_dispatcher.h5"></a>
+          <span class="phrase"><a name="afio.reference.functions.make_async_file_io_dispatcher.example"></a></span><a class="link" href="make_async_file_io_dispatcher.html#afio.reference.functions.make_async_file_io_dispatcher.example">Example</a>
         </h6>
 <pre class="programlisting"><span class="comment">// Create a dispatcher instance</span>
 <span class="keyword">auto</span> <span class="identifier">dispatcher</span><span class="special">=</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_file_io_dispatcher</span><span class="special">();</span>

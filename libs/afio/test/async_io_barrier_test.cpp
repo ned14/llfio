@@ -45,7 +45,7 @@ BOOST_AUTO_TEST_CASE(async_io_barrier)
         return true;
     };
     // For each of those runs, dispatch ops and a barrier for them
-    auto dispatcher = async_file_io_dispatcher();
+    auto dispatcher = make_async_file_io_dispatcher();
     auto begin = std::chrono::high_resolution_clock::now();
     size_t opscount = 0;
     async_io_op next;

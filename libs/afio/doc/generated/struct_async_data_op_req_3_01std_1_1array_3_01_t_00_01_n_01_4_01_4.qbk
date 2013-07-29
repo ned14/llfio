@@ -17,10 +17,10 @@ A convenience bundle of precondition, data and where for reading into a [^`std::
 [heading Synopsis]
 ``template<class T, size_t N>
 struct async_data_op_req< std::array< T, N > >
-      : public async_data_op_req< void >
+      : public detail::async_data_op_req_impl< false >
 {
   std::vector< boost::asio::mutable_buffer > buffers;  // A sequence of mutable Boost.ASIO buffers to read into. 
-  async_io_op precondition;                            // An optional precondition for this operation. 
+  async_io_op precondition;                            // A precondition containing an open file handle for this operation. 
   off_t where;                                         // The offset from which to read. 
 };
 ``
@@ -28,7 +28,7 @@ struct async_data_op_req< std::array< T, N > >
 [heading Template parameter(s)]
 [table
 [[Parameter] [Description]]
-[[class T] [Any type]]
+[[class T] [Any type ]]
 [[size_t N] [Any compile-time size ]]
 ]
 
@@ -84,9 +84,9 @@ True if contents are correct
 ]]
 [[`` async_data_op_req(async_io_op _precondition, std::array< T, N > & v, off_t _where)``
 
-] [Constructs an instance. ] [[* async_io_op]: ['_precondition]:  An optional precondition for this operation
+] [Constructs an instance. ] [[* async_io_op]: ['_precondition]:  An optional precondition for this operation 
 
-[* std::array< T, N > &]: ['v]:  A pointer to memory or reference to object into which to read or write
+[* std::array< T, N > &]: ['v]:  A pointer to memory or reference to object into which to read or write 
 
 [* off_t]: ['_where]:  The offset at which to transfer 
 

@@ -37,13 +37,17 @@ File Created: Mar 2013
 #include "detail/Utility.hpp"
 
 // Map in C++11 stuff if available
-#if defined(__GLIBCXX__) && __GLIBCXX__<=20120920
+#if defined(__GLIBCXX__) && __GLIBCXX__<=20120920 // <= GCC 4.7.2
 #include "boost/exception_ptr.hpp"
 #include "boost/thread/recursive_mutex.hpp"
 namespace boost { namespace afio {
 typedef boost::thread thread;
 inline boost::thread::id get_this_thread_id() { return boost::this_thread::get_id(); }
 inline boost::exception_ptr current_exception() { return boost::current_exception(); }
+// TODO FIXME: This ought to work, but doesn't. I should investigate. In the meantime, users of older compilers will see 'unknown_exception'.
+//#define BOOST_AFIO_THROW(x) boost::throw_exception(boost::enable_current_exception(x))
+#define BOOST_AFIO_THROW(x) throw x
+#define BOOST_AFIO_RETHROW throw
 typedef boost::recursive_mutex recursive_mutex;
 } }
 #else
@@ -51,6 +55,8 @@ namespace boost { namespace afio {
 typedef std::thread thread;
 inline std::thread::id get_this_thread_id() { return std::this_thread::get_id(); }
 inline std::exception_ptr current_exception() { return std::current_exception(); }
+#define BOOST_AFIO_THROW(x) throw x
+#define BOOST_AFIO_RETHROW throw
 typedef std::recursive_mutex recursive_mutex;
 } }
 #endif
@@ -180,42 +186,17 @@ public:
 	packaged_task &operator=(packaged_task &&o) BOOST_NOEXCEPT_OR_NOTHROW { static_cast<Base &&>(*this)=std::move(o); return *this; }
 };
 
-/*! \class thread_pool
-\brief A very simple thread pool based on Boost.ASIO and std::thread
+/*! \class thread_source
+\brief A source of thread workers
 */
-class thread_pool {
-	class worker
-	{
-		thread_pool *pool;
-	public:
-		explicit worker(thread_pool *p) : pool(p) { }
-		void operator()()
-		{
-			pool->service.run();
-		}
-	};
-	friend class worker;
-
-	std::vector< std::unique_ptr<thread> > workers;
+class thread_source {
+protected:
 	boost::asio::io_service service;
 	boost::asio::io_service::work working;
+	thread_source() : working(service)
+	{
+	}
 public:
-	/*! Constructs a thread pool of \em no workers
-    \param no The number of worker threads to create
-    */
-	explicit thread_pool(size_t no) : working(service)
-	{
-		workers.reserve(no);
-		for(size_t n=0; n<no; n++)
-			workers.push_back(std::unique_ptr<thread>(new thread(worker(this))));
-	}
-    //! Destroys the thread pool, waiting for worker threads to exit beforehand.
-	~thread_pool()
-	{
-		service.stop();
-		for(auto &i : workers)
-			i->join();
-	}
 	//! Returns the underlying io_service
 	boost::asio::io_service &io_service() { return service; }
 	//! Sends some callable entity to the thread pool for execution
@@ -229,12 +210,48 @@ public:
 		return task->get_future();
 	}
 };
+
+/*! \class std_thread_pool
+\brief A very simple thread pool based on std::thread or boost::thread
+*/
+class std_thread_pool : public thread_source {
+	class worker
+	{
+		std_thread_pool *pool;
+	public:
+		explicit worker(std_thread_pool *p) : pool(p) { }
+		void operator()()
+		{
+			pool->service.run();
+		}
+	};
+	friend class worker;
+
+	std::vector< std::unique_ptr<thread> > workers;
+public:
+	/*! Constructs a thread pool of \em no workers
+    \param no The number of worker threads to create
+    */
+	explicit std_thread_pool(size_t no)
+	{
+		workers.reserve(no);
+		for(size_t n=0; n<no; n++)
+			workers.push_back(std::unique_ptr<thread>(new thread(worker(this))));
+	}
+    //! Destroys the thread pool, waiting for worker threads to exit beforehand.
+	~std_thread_pool()
+	{
+		service.stop();
+		for(auto &i : workers)
+			i->join();
+	}
+};
 /*! \brief Returns the process threadpool
 
-On first use, this instantiates a default thread_pool running eight threads.
+On first use, this instantiates a default std_thread_pool running eight threads.
 \ingroup process_threadpool
 */
-extern BOOST_AFIO_DECL thread_pool &process_threadpool();
+extern BOOST_AFIO_DECL std_thread_pool &process_threadpool();
 
 namespace detail {
 	template<class returns_t, class future_type> inline returns_t when_all_do(std::shared_ptr<std::vector<future_type>> futures)
@@ -317,54 +334,6 @@ struct async_io_op;
 struct async_path_op_req;
 template<class T> struct async_data_op_req;
 
-namespace detail {
-
-	struct async_io_handle_posix;
-	struct async_io_handle_windows;
-	struct async_file_io_dispatcher_base_p;
-	class async_file_io_dispatcher_compat;
-	class async_file_io_dispatcher_windows;
-	class async_file_io_dispatcher_linux;
-	class async_file_io_dispatcher_qnx;
-	/*! \brief The abstract base class encapsulating a platform-specific file handle
-    */
-	class async_io_handle : public std::enable_shared_from_this<async_io_handle>
-	{
-		friend class async_file_io_dispatcher_base;
-		friend struct async_io_handle_posix;
-		friend struct async_io_handle_windows;
-		friend class async_file_io_dispatcher_compat;
-		friend class async_file_io_dispatcher_windows;
-		friend class async_file_io_dispatcher_linux;
-		friend class async_file_io_dispatcher_qnx;
-
-		async_file_io_dispatcher_base *_parent;
-		std::chrono::system_clock::time_point _opened;
-		std::filesystem::path _path; // guaranteed canonical
-	protected:
-		std::atomic<off_t> bytesread, byteswritten, byteswrittenatlastfsync;
-		async_io_handle(async_file_io_dispatcher_base *parent, const std::filesystem::path &path) : _parent(parent), _opened(std::chrono::system_clock::now()), _path(path), bytesread(0), byteswritten(0), byteswrittenatlastfsync(0) { }
-	public:
-		virtual ~async_io_handle() { }
-		//! Returns the parent of this io handle
-		async_file_io_dispatcher_base *parent() const { return _parent; }
-		//! Returns the native handle of this io handle. On POSIX, you can cast this to a fd using `(int)(size_t) native_handle()`. On Windows it's a simple `(HANDLE) native_handle()`.
-		virtual void *native_handle() const=0;
-		//! Returns when this handle was opened
-		const std::chrono::system_clock::time_point &opened() const { return _opened; }
-		//! Returns the path of this io handle
-		const std::filesystem::path &path() const { return _path; }
-		//! Returns how many bytes have been read since this handle was opened.
-		off_t read_count() const { return bytesread; }
-		//! Returns how many bytes have been written since this handle was opened.
-		off_t write_count() const { return byteswritten; }
-		//! Returns how many bytes have been written since this handle was last fsynced.
-		off_t write_count_since_fsync() const { return byteswritten-byteswrittenatlastfsync; }
-	};
-	struct immediate_async_ops;
-}
-
-
 #define BOOST_AFIO_DECLARE_CLASS_ENUM_AS_BITFIELD(type) \
 inline BOOST_CONSTEXPR type operator&(type a, type b) \
 { \
@@ -400,13 +369,14 @@ enum class file_flags : size_t
 	Truncate=8,			//!< Truncate existing file to zero
 	Create=16,			//!< Open and create if doesn't exist
 	CreateOnlyIfNotExist=32, //!< Create and open only if doesn't exist
-	AutoFlush=64,		//!< Automatically initiate an asynchronous flush just before file close, and fuse both operations so both must complete for close to complete.
 	WillBeSequentiallyAccessed=128, //!< Will be exclusively either read or written sequentially. If you're exclusively writing sequentially, \em strongly consider turning on OSDirect too.
 	FastDirectoryEnumeration=256, //!< Hold a file handle open to the containing directory of each open file for fast directory enumeration (POSIX only).
 
 	OSDirect=(1<<16),	//!< Bypass the OS file buffers (only really useful for writing large files. Note you must 4Kb align everything if this is on)
-	OSSync=(1<<17)		//!< Ask the OS to not complete until the data is on the physical storage. Best used only with Direct, otherwise use AutoFlush.
 
+	AlwaysSync=(1<<24),		//!< Ask the OS to not complete until the data is on the physical storage. Best used only with OSDirect, otherwise use SyncOnClose.
+	SyncOnClose=(1<<25),	//!< Automatically initiate an asynchronous flush just before file close, and fuse both operations so both must complete for close to complete.
+	EnforceDependencyWriteOrder=(1<<26) //!< Ensure that data writes to files reach physical storage in the same order as the op dependencies close files. Does NOT enforce ordering of individual data writes, ONLY all file writes accumulated before a file close.
 };
 BOOST_AFIO_DECLARE_CLASS_ENUM_AS_BITFIELD(file_flags)
 /*! \enum async_op_flags
@@ -426,6 +396,58 @@ enum class async_op_flags : size_t
 BOOST_AFIO_DECLARE_CLASS_ENUM_AS_BITFIELD(async_op_flags)
 
 
+namespace detail {
+
+	struct async_io_handle_posix;
+	struct async_io_handle_windows;
+	struct async_file_io_dispatcher_base_p;
+	class async_file_io_dispatcher_compat;
+	class async_file_io_dispatcher_windows;
+	class async_file_io_dispatcher_linux;
+	class async_file_io_dispatcher_qnx;
+	/*! \brief The abstract base class encapsulating a platform-specific file handle
+	*/
+	class async_io_handle : public std::enable_shared_from_this<async_io_handle>
+	{
+		friend class async_file_io_dispatcher_base;
+		friend struct async_io_handle_posix;
+		friend struct async_io_handle_windows;
+		friend class async_file_io_dispatcher_compat;
+		friend class async_file_io_dispatcher_windows;
+		friend class async_file_io_dispatcher_linux;
+		friend class async_file_io_dispatcher_qnx;
+
+		async_file_io_dispatcher_base *_parent;
+		std::chrono::system_clock::time_point _opened;
+		std::filesystem::path _path; // guaranteed canonical
+		file_flags _flags;
+	protected:
+		std::atomic<off_t> bytesread, byteswritten, byteswrittenatlastfsync;
+		async_io_handle(async_file_io_dispatcher_base *parent, const std::filesystem::path &path, file_flags flags) : _parent(parent), _opened(std::chrono::system_clock::now()), _path(path), _flags(flags), bytesread(0), byteswritten(0), byteswrittenatlastfsync(0) { }
+	public:
+		virtual ~async_io_handle() { }
+		//! Returns the parent of this io handle
+		async_file_io_dispatcher_base *parent() const { return _parent; }
+		//! Returns the native handle of this io handle. On POSIX, you can cast this to a fd using `(int)(size_t) native_handle()`. On Windows it's a simple `(HANDLE) native_handle()`.
+		virtual void *native_handle() const=0;
+		//! Returns when this handle was opened
+		const std::chrono::system_clock::time_point &opened() const { return _opened; }
+		//! Returns the path of this io handle
+		const std::filesystem::path &path() const { return _path; }
+		//! Returns the final flags used when this handle was opened
+		file_flags flags() const { return _flags; }
+		//! Returns how many bytes have been read since this handle was opened.
+		off_t read_count() const { return bytesread; }
+		//! Returns how many bytes have been written since this handle was opened.
+		off_t write_count() const { return byteswritten; }
+		//! Returns how many bytes have been written since this handle was last fsynced.
+		off_t write_count_since_fsync() const { return byteswritten-byteswrittenatlastfsync; }
+	};
+	struct immediate_async_ops;
+	template<bool for_writing> class async_data_op_req_impl;
+}
+
+
 /*! \class async_file_io_dispatcher_base
 \brief Abstract base class for dispatching file i/o asynchronously
 
@@ -438,11 +460,12 @@ Construct an instance using the `boost::afio::async_file_io_dispatcher()` functi
 [include generated/group_async_file_io_dispatcher_base__call.qbk]
 [include generated/group_async_file_io_dispatcher_base__filedirops.qbk]
 [include generated/group_async_file_io_dispatcher_base__barrier.qbk]
+[include generated/group_async_file_io_dispatcher_base__misc.qbk]
 }
 */
 class BOOST_AFIO_DECL async_file_io_dispatcher_base : public std::enable_shared_from_this<async_file_io_dispatcher_base>
 {
-	//friend BOOST_AFIO_DECL std::shared_ptr<async_file_io_dispatcher_base> async_file_io_dispatcher(thread_pool &threadpool=process_threadpool(), file_flags flagsforce=file_flags::None, file_flags flagsmask=file_flags::None);
+	//friend BOOST_AFIO_DECL std::shared_ptr<async_file_io_dispatcher_base> async_file_io_dispatcher(thread_source &threadpool=process_threadpool(), file_flags flagsforce=file_flags::None, file_flags flagsmask=file_flags::None);
 	friend struct detail::async_io_handle_posix;
 	friend struct detail::async_io_handle_windows;
 	friend class detail::async_file_io_dispatcher_compat;
@@ -454,13 +477,13 @@ class BOOST_AFIO_DECL async_file_io_dispatcher_base : public std::enable_shared_
 	void int_add_io_handle(void *key, std::shared_ptr<detail::async_io_handle> h);
 	void int_del_io_handle(void *key);
 protected:
-	async_file_io_dispatcher_base(thread_pool &threadpool, file_flags flagsforce, file_flags flagsmask);
+	async_file_io_dispatcher_base(thread_source &threadpool, file_flags flagsforce, file_flags flagsmask);
 public:
 	//! Destroys the dispatcher, blocking inefficiently if any ops are still in flight.
 	virtual ~async_file_io_dispatcher_base();
 
-	//! Returns the thread pool used by this dispatcher
-	thread_pool &threadpool() const;
+	//! Returns the thread source used by this dispatcher
+	thread_source &threadsource() const;
 	//! Returns file flags as would be used after forcing and masking bits passed during construction
 	file_flags fileflags(file_flags flags) const;
 	//! Returns the current wait queue depth of this dispatcher
@@ -564,7 +587,7 @@ public:
     \exceptionmodelstd
     \qexample{call_example}
     */
-	template<class C, class... Args> inline std::pair<future<typename std::result_of<C(Args...)>::type>, async_io_op> call(const async_io_op &req, C callback, Args... args);
+	template<class C, class... Args> inline std::pair<future<typename boost::result_of<C(Args...)>::type>, async_io_op> call(const async_io_op &req, C callback, Args... args);
 
 	/*! \brief Schedule a batch of asynchronous directory creations and opens after optional preconditions.
     \return A batch of op handles.
@@ -688,67 +711,75 @@ public:
 	inline async_io_op close(const async_io_op &req);
 
 	/*! \brief Schedule a batch of asynchronous data reads after preceding operations.
+
+	\direct_io_note
     \return A batch of op handles.
-    \param ops A batch of `async_data_op_req<void>` structures.
+	\tparam "class T" Any type.
+    \param ops A batch of async_data_op_req<T> structures.
     \ingroup async_file_io_dispatcher_base__filedirops
     \qbk{distinguish, batch}
     \complexity{Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete if reading data is constant time.}
     \exceptionmodelstd
     \qexample{readwrite_example}
     */
-	virtual std::vector<async_io_op> read(const std::vector<async_data_op_req<void>> &ops)=0;
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+	virtual std::vector<async_io_op> read(const std::vector<detail::async_data_op_req_impl<false>> &ops)=0;
+	template<class T> inline std::vector<async_io_op> read(const std::vector<async_data_op_req<T>> &ops);
+#else
+	template<class T> virtual std::vector<async_io_op> read(const std::vector<async_data_op_req<T>> &ops)=0;
+#endif
 	/*! \brief Schedule an asynchronous data read after a preceding operation.
-    \return An op handle.
-    \param req An `async_data_op_req<void>` structure.
+
+	\direct_io_note
+	\return An op handle.
+	\tparam "class T" Any type.
+	\param req An async_data_op_req<T> structure.
     \ingroup async_file_io_dispatcher_base__filedirops
     \qbk{distinguish, single}
     \complexity{Amortised O(1) to dispatch. Amortised O(1) to complete if reading data is constant time.}
     \exceptionmodelstd
     \qexample{readwrite_example}
     */
-	inline async_io_op read(const async_data_op_req<void> &req);
-	/*! \brief Schedule a batch of asynchronous data reads after preceding operations.
-    \return A batch of op handles.
-    \tparam "class T" Any arbitrary type.
-    \param ops A batch of `async_data_op_req<T>` structures.
-    \ingroup async_file_io_dispatcher_base__filedirops
-    \qbk{distinguish, batch}
-    \complexity{Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete if reading data is constant time.}
-    \exceptionmodelstd
-    \qexample{readwrite_example}
-    */
-	template<class T> inline std::vector<async_io_op> read(const std::vector<async_data_op_req<T>> &ops);
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+	inline async_io_op read(const detail::async_data_op_req_impl<false> &req);
+#else
+	template<class T> inline async_io_op read(const async_data_op_req<T> &req);
+#endif
 	/*! \brief Schedule a batch of asynchronous data writes after preceding operations.
-    \return A batch of op handles.
-    \param ops A batch of `async_data_op_req<const void>` structures.
+
+	\direct_io_note
+	\return A batch of op handles.
+	\tparam "class T" Any type.
+	\param ops A batch of async_data_op_req<const T> structures.
     \ingroup async_file_io_dispatcher_base__filedirops
     \qbk{distinguish, batch}
     \complexity{Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete if writing data is constant time.}
     \exceptionmodelstd
     \qexample{readwrite_example}
     */
-	virtual std::vector<async_io_op> write(const std::vector<async_data_op_req<const void>> &ops)=0;
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+	virtual std::vector<async_io_op> write(const std::vector<detail::async_data_op_req_impl<true>> &ops)=0;
+	template<class T> inline std::vector<async_io_op> write(const std::vector<async_data_op_req<T>> &ops);
+#else
+	template<class T> virtual std::vector<async_io_op> write(const std::vector<async_data_op_req<const T>> &ops)=0;
+#endif
 	/*! \brief Schedule an asynchronous data write after a preceding operation.
-    \return An op handle.
-    \param req An `async_data_op_req<const void>` structure.
+
+	\direct_io_note
+	\return An op handle.
+	\tparam "class T" Any type.
+	\param req An async_data_op_req<const T> structure.
     \ingroup async_file_io_dispatcher_base__filedirops
     \qbk{distinguish, single}
     \complexity{Amortised O(1) to dispatch. Amortised O(1) to complete if writing data is constant time.}
     \exceptionmodelstd
     \qexample{readwrite_example}
     */
-	inline async_io_op write(const async_data_op_req<const void> &req);
-	/*! \brief Schedule a batch of asynchronous data writes after preceding operations.
-    \return A batch of op handles.
-    \tparam "class T" Any arbitrary type.
-    \param ops A batch of `async_data_op_req<T>` structures.
-    \ingroup async_file_io_dispatcher_base__filedirops
-    \qbk{distinguish, batch}
-    \complexity{Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete if writing data is constant time.}
-    \exceptionmodelstd
-    \qexample{readwrite_example}
-    */
-	template<class T> inline std::vector<async_io_op> write(const std::vector<async_data_op_req<T>> &ops);
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+	inline async_io_op write(const detail::async_data_op_req_impl<true> &req);
+#else
+	template<class T> inline async_io_op write(const async_data_op_req<const T> &req);
+#endif
 
 	/*! \brief Schedule a batch of asynchronous file length truncations after preceding operations.
     \return A batch of op handles.
@@ -792,6 +823,14 @@ public:
     \qexample{barrier_example}
     */
 	std::vector<async_io_op> barrier(const std::vector<async_io_op> &ops);
+
+	/*! \brief Returns the page size of this architecture which is useful for calculating direct i/o multiples.
+	\return The page size of this architecture.
+	\ingroup async_file_io_dispatcher_base__misc
+	\complexity{Whatever the system API takes (one would hope constant time).}
+	\exceptionmodel{Never throws any exception.}
+	*/
+	static size_t page_size() BOOST_NOEXCEPT_OR_NOTHROW;
 protected:
 	void complete_async_op(size_t id, std::shared_ptr<detail::async_io_handle> h, exception_ptr e=exception_ptr());
 	completion_returntype invoke_user_completion(size_t id, std::shared_ptr<detail::async_io_handle> h, std::function<completion_t> callback);
@@ -800,7 +839,7 @@ protected:
 	template<class F, class T> std::vector<async_io_op> chain_async_ops(int optype, const std::vector<async_io_op> &preconditions, const std::vector<T> &container, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, T));
 	template<class F> std::vector<async_io_op> chain_async_ops(int optype, const std::vector<async_io_op> &container, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, async_io_op));
 	template<class F> std::vector<async_io_op> chain_async_ops(int optype, const std::vector<async_path_op_req> &container, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, async_path_op_req));
-	template<class F, class T> std::vector<async_io_op> chain_async_ops(int optype, const std::vector<async_data_op_req<T>> &container, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, async_data_op_req<T>));
+	template<class F, bool iswrite> std::vector<async_io_op> chain_async_ops(int optype, const std::vector<detail::async_data_op_req_impl<iswrite>> &container, async_op_flags flags, completion_returntype(F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, detail::async_data_op_req_impl<iswrite>));
 	template<class T> async_file_io_dispatcher_base::completion_returntype dobarrier(size_t id, std::shared_ptr<detail::async_io_handle> h, T);
 };
 /*! \brief Instatiates the best available async_file_io_dispatcher implementation for this system.
@@ -819,7 +858,7 @@ For slow hard drives, or worse, SANs, a queue depth of 64 or higher might delive
 [call_example]
 }
 */
-extern BOOST_AFIO_DECL std::shared_ptr<async_file_io_dispatcher_base> async_file_io_dispatcher(thread_pool &threadpool=process_threadpool(), file_flags flagsforce=file_flags::None, file_flags flagsmask=file_flags::None);
+extern BOOST_AFIO_DECL std::shared_ptr<async_file_io_dispatcher_base> make_async_file_io_dispatcher(thread_source &threadpool=process_threadpool(), file_flags flagsforce=file_flags::None, file_flags flagsmask=file_flags::None);
 
 /*! \struct async_io_op
 \brief A reference to an asynchronous operation
@@ -831,12 +870,12 @@ that the op has already started.
 */
 struct async_io_op
 {
-	std::shared_ptr<async_file_io_dispatcher_base> parent; //!< The parent dispatcher
+	async_file_io_dispatcher_base *parent;				//!< The parent dispatcher
 	size_t id;											//!< A unique id for this operation
 	std::shared_ptr<shared_future<std::shared_ptr<detail::async_io_handle>>> h;	//!< A future handle to the item being operated upon
 
     //! \constr
-	async_io_op() : id(0), h(std::make_shared<shared_future<std::shared_ptr<detail::async_io_handle>>>()) { }
+	async_io_op() : parent(nullptr), id(0), h(std::make_shared<shared_future<std::shared_ptr<detail::async_io_handle>>>()) { }
     //! \cconstr
 	async_io_op(const async_io_op &o) : parent(o.parent), id(o.id), h(o.h) { }
     //! \mconstr
@@ -846,12 +885,12 @@ struct async_io_op
     \param _id The unique non-zero id of this op.
     \param _handle A shared_ptr to shared state between all instances of this reference.
     */
-	async_io_op(std::shared_ptr<async_file_io_dispatcher_base> _parent, size_t _id, std::shared_ptr<shared_future<std::shared_ptr<detail::async_io_handle>>> _handle) : parent(_parent), id(_id), h(std::move(_handle)) { _validate(); }
+	async_io_op(async_file_io_dispatcher_base *_parent, size_t _id, std::shared_ptr<shared_future<std::shared_ptr<detail::async_io_handle>>> _handle) : parent(_parent), id(_id), h(std::move(_handle)) { _validate(); }
     /*! Constructs an instance.
     \param _parent The dispatcher this op belongs to.
     \param _id The unique non-zero id of this op.
     */
-	async_io_op(std::shared_ptr<async_file_io_dispatcher_base> _parent, size_t _id) : parent(_parent), id(_id), h(std::make_shared<shared_future<std::shared_ptr<detail::async_io_handle>>>()) { }
+	async_io_op(async_file_io_dispatcher_base *_parent, size_t _id) : parent(_parent), id(_id), h(std::make_shared<shared_future<std::shared_ptr<detail::async_io_handle>>>()) { }
     //! \cassign
 	async_io_op &operator=(const async_io_op &o) { parent=o.parent; id=o.id; h=o.h; return *this; }
     //! \massign
@@ -870,7 +909,7 @@ private:
 	{
 #if BOOST_AFIO_VALIDATE_INPUTS
 		if(!validate())
-			throw std::runtime_error("Inputs are invalid.");
+			BOOST_AFIO_THROW(std::runtime_error("Inputs are invalid."));
 #endif
 	}
 };
@@ -879,10 +918,11 @@ namespace detail
 {
 	struct when_all_count_completed_state
 	{
+		std::vector<async_io_op> inputs;
 		std::atomic<size_t> togo;
 		std::vector<std::shared_ptr<detail::async_io_handle>> out;
 		promise<std::vector<std::shared_ptr<detail::async_io_handle>>> done;
-		when_all_count_completed_state(size_t outsize) : togo(outsize), out(outsize) { }
+		when_all_count_completed_state(std::vector<async_io_op>::iterator first, std::vector<async_io_op>::iterator last) : inputs(first, last), togo(inputs.size()), out(inputs.size()) { }
 	};
 	inline async_file_io_dispatcher_base::completion_returntype when_all_count_completed_nothrow(size_t, std::shared_ptr<detail::async_io_handle> h, std::shared_ptr<detail::when_all_count_completed_state> state, size_t idx)
 	{
@@ -896,20 +936,30 @@ namespace detail
 		state->out[idx]=h; // This might look thread unsafe, but each idx is unique
 		if(!--state->togo)
 		{
-			bool done=false;
-			try
+			// If the last completion is throwing an exception, throw that, else scan inputs for exception states
+			exception_ptr this_e(afio::make_exception_ptr(afio::current_exception()));
+			if(this_e)
+				state->done.set_exception(this_e);
+			else
 			{
-				for(auto &i : state->out)
-					i.get();
+				bool done=false;
+				try
+				{
+					for(auto &i : state->inputs)
+					{
+						shared_future<std::shared_ptr<detail::async_io_handle>> *future=i.h.get();
+						future->get();
+					}
+				}
+				catch(...)
+				{
+					exception_ptr e(afio::make_exception_ptr(afio::current_exception()));
+					state->done.set_exception(e);
+					done=true;
+				}
+				if(!done)
+					state->done.set_value(state->out);
 			}
-			catch(...)
-			{
-				exception_ptr e(afio::make_exception_ptr(afio::current_exception()));
-				state->done.set_exception(e);
-				done=true;
-			}
-			if(!done)
-				state->done.set_value(state->out);
 		}
 		return std::make_pair(true, h);
 	}
@@ -930,8 +980,8 @@ inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(st
 {
 	if(first==last)
 		return future<std::vector<std::shared_ptr<detail::async_io_handle>>>();
-	std::vector<async_io_op> inputs(first, last);
-	auto state(std::make_shared<detail::when_all_count_completed_state>(inputs.size()));
+	auto state(std::make_shared<detail::when_all_count_completed_state>(first, last));
+	std::vector<async_io_op> &inputs=state->inputs;
 	std::vector<std::pair<async_op_flags, std::function<async_file_io_dispatcher_base::completion_t>>> callbacks;
 	callbacks.reserve(inputs.size());
 	size_t idx=0;
@@ -954,8 +1004,8 @@ inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(st
 {
 	if(first==last)
 		return future<std::vector<std::shared_ptr<detail::async_io_handle>>>();
-	std::vector<async_io_op> inputs(first, last);
-	auto state(std::make_shared<detail::when_all_count_completed_state>(inputs.size()));
+	auto state(std::make_shared<detail::when_all_count_completed_state>(first, last));
+	std::vector<async_io_op> &inputs=state->inputs;
 	std::vector<std::pair<async_op_flags, std::function<async_file_io_dispatcher_base::completion_t>>> callbacks;
 	callbacks.reserve(inputs.size());
 	size_t idx=0;
@@ -1046,7 +1096,7 @@ struct async_path_op_req
     \param _path The filing system path to be used. Must be absolute.
     \param _flags The flags to be used.
     */
-	async_path_op_req(std::filesystem::path _path, file_flags _flags=file_flags::None) : path(_path), flags(_flags) { if(!path.is_absolute()) throw std::runtime_error("Non-absolute path"); }
+	async_path_op_req(std::filesystem::path _path, file_flags _flags=file_flags::None) : path(_path), flags(_flags) { if(!path.is_absolute()) BOOST_AFIO_THROW(std::runtime_error("Non-absolute path")); }
 	/*! \brief Constructs an instance.
     
     Note that this will fail if path is not absolute.
@@ -1055,7 +1105,7 @@ struct async_path_op_req
     \param _path The filing system path to be used. Must be absolute.
     \param _flags The flags to be used.
     */
-	async_path_op_req(async_io_op _precondition, std::filesystem::path _path, file_flags _flags=file_flags::None) : path(_path), flags(_flags), precondition(std::move(_precondition)) { _validate(); if(!path.is_absolute()) throw std::runtime_error("Non-absolute path"); }
+	async_path_op_req(async_io_op _precondition, std::filesystem::path _path, file_flags _flags=file_flags::None) : path(_path), flags(_flags), precondition(std::move(_precondition)) { _validate(); if(!path.is_absolute()) BOOST_AFIO_THROW(std::runtime_error("Non-absolute path")); }
 	/*! \brief Constructs an instance.
     \param _path The filing system leaf or path to be used. make_preferred() and absolute() will be used to convert the string into an absolute path.
     \param _flags The flags to be used.
@@ -1089,265 +1139,353 @@ private:
 	{
 #if BOOST_AFIO_VALIDATE_INPUTS
 		if(!validate())
-			throw std::runtime_error("Inputs are invalid.");
+			BOOST_AFIO_THROW(std::runtime_error("Inputs are invalid."));
 #endif
 	}
 };
 
-//! \brief A convenience bundle of precondition, data and where for reading into a void *. Data \b MUST stay around until the operation completes. \ingroup async_data_op_req
-template<> struct async_data_op_req<void> // For reading
+namespace detail
 {
-    //! An optional precondition for this operation
+	template<bool for_writing> class async_data_op_req_impl;
+	template<bool for_writing> struct async_data_op_req_impl_type_selector
+	{
+		typedef boost::asio::const_buffer boost_asio_buffer_type;
+		typedef const void *void_type;
+		typedef async_data_op_req_impl<false> conversion_type;
+	};
+	template<> struct async_data_op_req_impl_type_selector<false>
+	{
+		typedef boost::asio::mutable_buffer boost_asio_buffer_type;
+		typedef void *void_type;
+		typedef std::nullptr_t conversion_type;
+	};
+	//! \brief The implementation of all async_data_op_req specialisations. \tparam for_writing Whether this implementation is for writing data. \ingroup async_data_op_req
+	template<bool for_writing> class async_data_op_req_impl
+	{
+		typedef typename async_data_op_req_impl_type_selector<for_writing>::boost_asio_buffer_type boost_asio_buffer_type;
+		typedef typename async_data_op_req_impl_type_selector<for_writing>::void_type void_type;
+		typedef typename async_data_op_req_impl_type_selector<for_writing>::conversion_type conversion_type;
+	public:
+		//! An optional precondition for this operation
+		async_io_op precondition;
+		//! A sequence of mutable Boost.ASIO buffers to read into
+		std::vector<boost_asio_buffer_type> buffers;
+		//! The offset from which to read
+		off_t where;
+		//! \constr
+		async_data_op_req_impl() { }
+		//! \cconstr
+		async_data_op_req_impl(const async_data_op_req_impl &o) : precondition(o.precondition), buffers(o.buffers), where(o.where) { }
+		//! \mconstr
+		async_data_op_req_impl(async_data_op_req_impl &&o) BOOST_NOEXCEPT_OR_NOTHROW : precondition(std::move(o.precondition)), buffers(std::move(o.buffers)), where(std::move(o.where)) { }
+		//! \cconstr
+		async_data_op_req_impl(const conversion_type &o) : precondition(o.precondition), where(o.where) { buffers.reserve(o.buffers.capacity()); for(auto &i: o.buffers) buffers.push_back(i); }
+		//! \mconstr
+		async_data_op_req_impl(conversion_type &&o) BOOST_NOEXCEPT_OR_NOTHROW : precondition(std::move(o.precondition)), where(std::move(o.where)) { buffers.reserve(o.buffers.capacity()); for(auto &&i: o.buffers) buffers.push_back(std::move(i)); }
+		//! \cassign
+		async_data_op_req_impl &operator=(const async_data_op_req_impl &o) { precondition=o.precondition; buffers=o.buffers; where=o.where; return *this; }
+		//! \massign
+		async_data_op_req_impl &operator=(async_data_op_req_impl &&o) BOOST_NOEXCEPT_OR_NOTHROW { precondition=std::move(o.precondition); buffers=std::move(o.buffers); where=std::move(o.where); return *this; }
+		//! \async_data_op_req1 \param _length The number of bytes to transfer
+		async_data_op_req_impl(async_io_op _precondition, void_type v, size_t _length, off_t _where) : precondition(std::move(_precondition)), where(_where) { buffers.reserve(1); buffers.push_back(boost_asio_buffer_type(v, _length)); _validate(); }
+		//! \async_data_op_req2 \tparam "class T" boost_asio_buffer_type
+		template<class T> async_data_op_req_impl(async_io_op _precondition, std::vector<T> _buffers, off_t _where) : precondition(std::move(_precondition)), buffers(std::move(_buffers)), where(_where) { _validate(); }
+		//! Validates contents for correctness \return True if contents are correct
+		bool validate() const
+		{
+			if(!precondition.validate()) return false;
+			if(buffers.empty()) return false;
+			for(auto &b : buffers)
+			{
+				if(!boost::asio::buffer_cast<const void *>(b) || !boost::asio::buffer_size(b)) return false;
+				if(!!(precondition.parent->fileflags(file_flags::None)&file_flags::OSDirect))
+				{
+					if(((size_t) boost::asio::buffer_cast<const void *>(b) & 4095) || (boost::asio::buffer_size(b) & 4095)) return false;
+				}
+			}
+			return true;
+		}
+	private:
+		void _validate() const
+		{
+#if BOOST_AFIO_VALIDATE_INPUTS
+			if(!validate())
+				BOOST_AFIO_THROW(std::runtime_error("Inputs are invalid."));
+#endif
+		}
+	};
+}
+
+/*! \struct async_data_op_req
+\brief A convenience bundle of precondition, data and where for reading into a single `T *`. Data \b MUST stay around until the operation completes.
+\tparam T Any readable type T
+\ingroup async_data_op_req
+*/
+template<class T> struct async_data_op_req : public detail::async_data_op_req_impl<false>
+{
+#ifdef DOXYGEN_SHOULD_SKIP_THIS
+	//! A precondition containing an open file handle for this operation
 	async_io_op precondition;
 	//! A sequence of mutable Boost.ASIO buffers to read into
 	std::vector<boost::asio::mutable_buffer> buffers;
 	//! The offset from which to read
 	off_t where;
+#endif
 	//! \constr
 	async_data_op_req() { }
 	//! \cconstr
-	async_data_op_req(const async_data_op_req &o) : precondition(o.precondition), buffers(o.buffers), where(o.where) { }
+	async_data_op_req(const async_data_op_req &o) : detail::async_data_op_req_impl<false>(o) { }
 	//! \mconstr
-	async_data_op_req(async_data_op_req &&o) BOOST_NOEXCEPT_OR_NOTHROW : precondition(std::move(o.precondition)), buffers(std::move(o.buffers)), where(std::move(o.where)) { }
+	async_data_op_req(async_data_op_req &&o) BOOST_NOEXCEPT_OR_NOTHROW : detail::async_data_op_req_impl<false>(std::move(o)) { }
 	//! \cassign
-	async_data_op_req &operator=(const async_data_op_req &o) { precondition=o.precondition; buffers=o.buffers; where=o.where; return *this; }
+	async_data_op_req &operator=(const async_data_op_req &o) { static_cast<detail::async_data_op_req_impl<false>>(*this)=o; return *this; }
 	//! \massign
-	async_data_op_req &operator=(async_data_op_req &&o) BOOST_NOEXCEPT_OR_NOTHROW { precondition=std::move(o.precondition); buffers=std::move(o.buffers); where=std::move(o.where); return *this; }
+	async_data_op_req &operator=(async_data_op_req &&o) BOOST_NOEXCEPT_OR_NOTHROW { static_cast<detail::async_data_op_req_impl<false>>(*this)=std::move(o); return *this; }
 	//! \async_data_op_req1 \param _length The number of bytes to transfer
-	async_data_op_req(async_io_op _precondition, void *v, size_t _length, off_t _where) : precondition(std::move(_precondition)), where(_where) { buffers.reserve(1); buffers.push_back(boost::asio::mutable_buffer(v, _length)); _validate(); }
-	//! \async_data_op_req2
-	async_data_op_req(async_io_op _precondition, std::vector<boost::asio::mutable_buffer> _buffers, off_t _where) : precondition(std::move(_precondition)), buffers(_buffers), where(_where) { _validate(); }
-	//! Validates contents for correctness \return True if contents are correct
-	bool validate() const
+	async_data_op_req(async_io_op _precondition, T *v, size_t _length, off_t _where) : detail::async_data_op_req_impl<false>(std::move(_precondition), static_cast<void *>(v), _length, _where) { }
+	};
+	//! \brief A convenience bundle of precondition, data and where for writing from a single `const T *`. Data \b MUST stay around until the operation completes. \tparam "class T" Any readable type T \ingroup async_data_op_req
+	template<class T> struct async_data_op_req<const T> : public detail::async_data_op_req_impl<true>
 	{
-		if(!precondition.validate()) return false;
-		if(buffers.empty()) return false;
-		for(auto &b : buffers)
-		{
-			if(!boost::asio::buffer_cast<const void *>(b) || !boost::asio::buffer_size(b)) return false;
-			if(!!(precondition.parent->fileflags(file_flags::None)&file_flags::OSDirect))
-			{
-				if(((size_t)boost::asio::buffer_cast<const void *>(b) & 4095) || (boost::asio::buffer_size(b) & 4095)) return false;
-			}
-		}
-		return true;
-	}
-private:
-	void _validate() const
-	{
-#if BOOST_AFIO_VALIDATE_INPUTS
-		if(!validate())
-			throw std::runtime_error("Inputs are invalid.");
+#ifdef DOXYGEN_SHOULD_SKIP_THIS
+		//! A precondition containing an open file handle for this operation
+		async_io_op precondition;
+		//! A sequence of const Boost.ASIO buffers to write from
+		std::vector<boost::asio::const_buffer> buffers;
+		//! The offset at which to write
+		off_t where;
 #endif
-	}
+		//! \constr
+		async_data_op_req() { }
+		//! \cconstr
+		async_data_op_req(const async_data_op_req &o) : detail::async_data_op_req_impl<true>(o) { }
+		//! \mconstr
+		async_data_op_req(async_data_op_req &&o) BOOST_NOEXCEPT_OR_NOTHROW : detail::async_data_op_req_impl<true>(std::move(o)) { }
+		//! \cconstr
+		async_data_op_req(const async_data_op_req<T> &o) : detail::async_data_op_req_impl<true>(o) { }
+		//! \mconstr
+		async_data_op_req(async_data_op_req<T> &&o) BOOST_NOEXCEPT_OR_NOTHROW : detail::async_data_op_req_impl<true>(std::move(o)) { }
+		//! \cassign
+		async_data_op_req &operator=(const async_data_op_req &o) { static_cast<detail::async_data_op_req_impl<true>>(*this)=o; return *this; }
+		//! \massign
+		async_data_op_req &operator=(async_data_op_req &&o) BOOST_NOEXCEPT_OR_NOTHROW { static_cast<detail::async_data_op_req_impl<true>>(*this)=std::move(o); return *this; }
+		//! \async_data_op_req1 \param _length The number of bytes to transfer
+		async_data_op_req(async_io_op _precondition, const T *v, size_t _length, off_t _where) : detail::async_data_op_req_impl<true>(std::move(_precondition), static_cast<const void *>(v), _length, _where) { }
 };
-//! \brief A convenience bundle of precondition, data and where for writing from a const void *. Data \b MUST stay around until the operation completes. \ingroup async_data_op_req
-template<> struct async_data_op_req<const void> // For writing
+//! \brief A convenience bundle of precondition, data and where for reading into a `void *`. Data \b MUST stay around until the operation completes. \ingroup async_data_op_req
+template<> struct async_data_op_req<void> : public detail::async_data_op_req_impl<false>
 {
-    //! An optional precondition for this operation
+#ifdef DOXYGEN_SHOULD_SKIP_THIS
+	//! A precondition containing an open file handle for this operation
+	async_io_op precondition;
+	//! A sequence of mutable Boost.ASIO buffers to read into
+	std::vector<boost::asio::mutable_buffer> buffers;
+	//! The offset from which to read
+	off_t where;
+#endif
+	//! \constr
+	async_data_op_req() : detail::async_data_op_req_impl<false>() {}
+	//! \cconstr
+	async_data_op_req(const async_data_op_req &o) : detail::async_data_op_req_impl<false>(o) {}
+	//! \mconstr
+	async_data_op_req(async_data_op_req &&o) BOOST_NOEXCEPT_OR_NOTHROW : detail::async_data_op_req_impl<false>(std::move(o)) {}
+	//! \async_data_op_req1 \param _length The number of bytes to transfer
+	async_data_op_req(async_io_op _precondition, void *v, size_t _length, off_t _where) : detail::async_data_op_req_impl<false>(std::move(_precondition), v, _length, _where) { }
+	//! \async_data_op_req2
+	async_data_op_req(async_io_op _precondition, std::vector<boost::asio::mutable_buffer> _buffers, off_t _where) : detail::async_data_op_req_impl<false>(std::move(_precondition), std::move(_buffers), _where) { }
+};
+//! \brief A convenience bundle of precondition, data and where for writing from a `const void *`. Data \b MUST stay around until the operation completes. \ingroup async_data_op_req
+template<> struct async_data_op_req<const void> : public detail::async_data_op_req_impl<true>
+{
+#ifdef DOXYGEN_SHOULD_SKIP_THIS
+	//! A precondition containing an open file handle for this operation
 	async_io_op precondition;
 	//! A sequence of const Boost.ASIO buffers to write from
 	std::vector<boost::asio::const_buffer> buffers;
-	//! The offset into which to write
+	//! The offset at which to write
 	off_t where;
-	//! \constr
-	async_data_op_req() { }
-	//! \cconstr
-	async_data_op_req(const async_data_op_req &o) : precondition(o.precondition), buffers(o.buffers), where(o.where) { }
-	//! \mconstr
-	async_data_op_req(async_data_op_req &&o) BOOST_NOEXCEPT_OR_NOTHROW : precondition(std::move(o.precondition)), buffers(std::move(o.buffers)), where(std::move(o.where)) { }
-	//! \cconstr
-	async_data_op_req(const async_data_op_req<void> &o) : precondition(o.precondition), where(o.where) { buffers.reserve(o.buffers.capacity()); for(auto &i: o.buffers) buffers.push_back(i); }
-	//! \mconstr
-	async_data_op_req(async_data_op_req<void> &&o) BOOST_NOEXCEPT_OR_NOTHROW : precondition(std::move(o.precondition)), where(o.where) { buffers.reserve(o.buffers.capacity()); for(auto &&i: o.buffers) buffers.push_back(std::move(i)); }
-	//! \cassign
-	async_data_op_req &operator=(const async_data_op_req &o) { precondition=o.precondition; buffers=o.buffers; where=o.where; return *this; }
-	//! \massign
-	async_data_op_req &operator=(async_data_op_req &&o) BOOST_NOEXCEPT_OR_NOTHROW { precondition=std::move(o.precondition); buffers=std::move(o.buffers); where=std::move(o.where); return *this; }
-	//! \async_data_op_req1 \param _length The number of bytes to transfer
-	async_data_op_req(async_io_op _precondition, const void *v, size_t _length, off_t _where) : precondition(std::move(_precondition)), where(_where) { buffers.reserve(1); buffers.push_back(boost::asio::const_buffer(v, _length)); _validate(); }
-	//! \async_data_op_req2
-	async_data_op_req(async_io_op _precondition, std::vector<boost::asio::const_buffer> _buffers, off_t _where) : precondition(std::move(_precondition)), buffers(_buffers), where(_where) { _validate(); }
-	//! Validates contents for correctness \return True if contents are correct
-	bool validate() const
-	{
-		if(!precondition.validate()) return false;
-		if(buffers.empty()) return false;
-		for(auto &b : buffers)
-		{
-			if(!boost::asio::buffer_cast<const void *>(b) || !boost::asio::buffer_size(b)) return false;
-			if(!!(precondition.parent->fileflags(file_flags::None)&file_flags::OSDirect))
-			{
-				if(((size_t)boost::asio::buffer_cast<const void *>(b) & 4095) || (boost::asio::buffer_size(b) & 4095)) return false;
-			}
-		}
-		return true;
-	}
-private:
-	void _validate() const
-	{
-#if BOOST_AFIO_VALIDATE_INPUTS
-		if(!validate())
-			throw std::runtime_error("Inputs are invalid.");
 #endif
-	}
-};
-//! \brief A convenience bundle of precondition, data and where for reading into a single T *. Data \b MUST stay around until the operation completes. \tparam "class T" Any writable type T \ingroup async_data_op_req
-template<class T> struct async_data_op_req : public async_data_op_req<void>
-{
-    //! \constr
-	async_data_op_req() { }
-    //! \cconstr
-	async_data_op_req(const async_data_op_req &o) : async_data_op_req<void>(o) { }
-    //! \mconstr
-	async_data_op_req(async_data_op_req &&o) BOOST_NOEXCEPT_OR_NOTHROW : async_data_op_req<void>(std::move(o)) { }
-    //! \cassign
-	async_data_op_req &operator=(const async_data_op_req &o) { static_cast<async_data_op_req<void>>(*this)=o; return *this; }
-    //! \massign
-	async_data_op_req &operator=(async_data_op_req &&o) BOOST_NOEXCEPT_OR_NOTHROW { static_cast<async_data_op_req<void>>(*this)=std::move(o); return *this; }
-    //! \async_data_op_req1 \param _length The number of bytes to transfer
-	async_data_op_req(async_io_op _precondition, T *v, size_t _length, off_t _where) : async_data_op_req<void>(std::move(_precondition), static_cast<void *>(v), _length, _where) { }
-};
-//! \brief A convenience bundle of precondition, data and where for writing from a single const T *. Data \b MUST stay around until the operation completes. \tparam "class T" Any readable type T \ingroup async_data_op_req
-template<class T> struct async_data_op_req<const T> : public async_data_op_req<const void>
-{
-    //! \constr
-	async_data_op_req() { }
-    //! \cconstr
-	async_data_op_req(const async_data_op_req &o) : async_data_op_req<const void>(o) { }
-    //! \mconstr
-	async_data_op_req(async_data_op_req &&o) BOOST_NOEXCEPT_OR_NOTHROW : async_data_op_req<const void>(std::move(o)) { }
-    //! \cconstr
-	async_data_op_req(const async_data_op_req<T> &o) : async_data_op_req<const void>(o) { }
-    //! \mconstr
-	async_data_op_req(async_data_op_req<T> &&o) BOOST_NOEXCEPT_OR_NOTHROW : async_data_op_req<const void>(std::move(o)) { }
-    //! \cassign
-	async_data_op_req &operator=(const async_data_op_req &o) { static_cast<async_data_op_req<const void>>(*this)=o; return *this; }
-    //! \massign
-	async_data_op_req &operator=(async_data_op_req &&o) BOOST_NOEXCEPT_OR_NOTHROW { static_cast<async_data_op_req<const void>>(*this)=std::move(o); return *this; }
-    //! \async_data_op_req1 \param _length The number of bytes to transfer
-	async_data_op_req(async_io_op _precondition, const T *v, size_t _length, off_t _where) : async_data_op_req<const void>(std::move(_precondition), static_cast<const void *>(v), _length, _where) { }
+	//! \constr
+	async_data_op_req() : detail::async_data_op_req_impl<true>() {}
+	//! \cconstr
+	async_data_op_req(const async_data_op_req &o) : detail::async_data_op_req_impl<true>(o) {}
+	//! \mconstr
+	async_data_op_req(async_data_op_req &&o) BOOST_NOEXCEPT_OR_NOTHROW : detail::async_data_op_req_impl<true>(std::move(o)) {}
+	//! \cconstr
+	async_data_op_req(const async_data_op_req<void> &o) : detail::async_data_op_req_impl<true>(o) {}
+	//! \mconstr
+	async_data_op_req(async_data_op_req<void> &&o) BOOST_NOEXCEPT_OR_NOTHROW : detail::async_data_op_req_impl<true>(std::move(o)) {}
+	//! \async_data_op_req1 \param _length The number of bytes to transfer
+	async_data_op_req(async_io_op _precondition, const void *v, size_t _length, off_t _where) : detail::async_data_op_req_impl<true>(std::move(_precondition), v, _length, _where) {}
+	//! \async_data_op_req2
+	async_data_op_req(async_io_op _precondition, std::vector<boost::asio::const_buffer> _buffers, off_t _where) : detail::async_data_op_req_impl<true>(std::move(_precondition), _buffers, _where) {}
 };
 //! \brief A convenience bundle of precondition, data and where for reading into a `std::vector<T, A>`. Data \b MUST stay around until the operation completes. \tparam "class T" Any type \tparam "class A" Any STL allocator \ingroup async_data_op_req
-template<class T, class A> struct async_data_op_req<std::vector<T, A>> : public async_data_op_req<void>
+template<class T, class A> struct async_data_op_req<std::vector<T, A>> : public detail::async_data_op_req_impl<false>
 {
-    //! \constr
+#ifdef DOXYGEN_SHOULD_SKIP_THIS
+	//! A precondition containing an open file handle for this operation
+	async_io_op precondition;
+	//! A sequence of mutable Boost.ASIO buffers to read into
+	std::vector<boost::asio::mutable_buffer> buffers;
+	//! The offset from which to read
+	off_t where;
+#endif
+	//! \constr
 	async_data_op_req() { }
     //! \cconstr
-	async_data_op_req(const async_data_op_req &o) : async_data_op_req<void>(o) { }
+	async_data_op_req(const async_data_op_req &o) : detail::async_data_op_req_impl<false>(o) { }
     //! \mconstr
-	async_data_op_req(async_data_op_req &&o) BOOST_NOEXCEPT_OR_NOTHROW : async_data_op_req<void>(std::move(o)) { }
+	async_data_op_req(async_data_op_req &&o) BOOST_NOEXCEPT_OR_NOTHROW : detail::async_data_op_req_impl<false>(std::move(o)) { }
     //! \cassign
-	async_data_op_req &operator=(const async_data_op_req &o) { static_cast<async_data_op_req<void>>(*this)=o; return *this; }
+	async_data_op_req &operator=(const async_data_op_req &o) { static_cast<detail::async_data_op_req_impl<false>>(*this)=o; return *this; }
     //! \massign
-	async_data_op_req &operator=(async_data_op_req &&o) BOOST_NOEXCEPT_OR_NOTHROW { static_cast<async_data_op_req<void>>(*this)=std::move(o); return *this; }
+	async_data_op_req &operator=(async_data_op_req &&o) BOOST_NOEXCEPT_OR_NOTHROW { static_cast<detail::async_data_op_req_impl<false>>(*this)=std::move(o); return *this; }
     //! \async_data_op_req1
-	async_data_op_req(async_io_op _precondition, std::vector<T, A> &v, off_t _where) : async_data_op_req<void>(std::move(_precondition), static_cast<void *>(&v.front()), v.size()*sizeof(T), _where) { }
+	async_data_op_req(async_io_op _precondition, std::vector<T, A> &v, off_t _where) : detail::async_data_op_req_impl<false>(std::move(_precondition), static_cast<void *>(&v.front()), v.size()*sizeof(T), _where) { }
 };
 //! \brief A convenience bundle of precondition, data and where for writing from a `const std::vector<T, A>`. Data \b MUST stay around until the operation completes. \tparam "class T" Any type \tparam "class A" Any STL allocator \ingroup async_data_op_req
-template<class T, class A> struct async_data_op_req<const std::vector<T, A>> : public async_data_op_req<const void>
+template<class T, class A> struct async_data_op_req<const std::vector<T, A>> : public detail::async_data_op_req_impl<true>
 {
-    //! \constr
+#ifdef DOXYGEN_SHOULD_SKIP_THIS
+	//! A precondition containing an open file handle for this operation
+	async_io_op precondition;
+	//! A sequence of const Boost.ASIO buffers to write from
+	std::vector<boost::asio::const_buffer> buffers;
+	//! The offset at which to write
+	off_t where;
+#endif
+	//! \constr
 	async_data_op_req() { }
     //! \cconstr
-	async_data_op_req(const async_data_op_req &o) : async_data_op_req<const void>(o) { }
+	async_data_op_req(const async_data_op_req &o) : detail::async_data_op_req_impl<true>(o) { }
     //! \mconstr
-	async_data_op_req(async_data_op_req &&o) BOOST_NOEXCEPT_OR_NOTHROW : async_data_op_req<const void>(std::move(o)) { }
+	async_data_op_req(async_data_op_req &&o) BOOST_NOEXCEPT_OR_NOTHROW : detail::async_data_op_req_impl<true>(std::move(o)) { }
     //! \cconstr
-	async_data_op_req(const async_data_op_req<std::vector<T, A>> &o) : async_data_op_req<const void>(o) { }
+	async_data_op_req(const async_data_op_req<std::vector<T, A>> &o) : detail::async_data_op_req_impl<true>(o) { }
     //! \mconstr
-	async_data_op_req(async_data_op_req<std::vector<T, A>> &&o) BOOST_NOEXCEPT_OR_NOTHROW : async_data_op_req<const void>(std::move(o)) { }
+	async_data_op_req(async_data_op_req<std::vector<T, A>> &&o) BOOST_NOEXCEPT_OR_NOTHROW : detail::async_data_op_req_impl<true>(std::move(o)) { }
     //! \cassign
-	async_data_op_req &operator=(const async_data_op_req &o) { static_cast<async_data_op_req<const void>>(*this)=o; return *this; }
+	async_data_op_req &operator=(const async_data_op_req &o) { static_cast<detail::async_data_op_req_impl<true>>(*this)=o; return *this; }
     //! \massign
-	async_data_op_req &operator=(async_data_op_req &&o) BOOST_NOEXCEPT_OR_NOTHROW { static_cast<async_data_op_req<const void>>(*this)=std::move(o); return *this; }
+	async_data_op_req &operator=(async_data_op_req &&o) BOOST_NOEXCEPT_OR_NOTHROW { static_cast<detail::async_data_op_req_impl<true>>(*this)=std::move(o); return *this; }
     //! \async_data_op_req1
-	async_data_op_req(async_io_op _precondition, const std::vector<T, A> &v, off_t _where) : async_data_op_req<const void>(std::move(_precondition), static_cast<const void *>(&v.front()), v.size()*sizeof(T), _where) { }
+	async_data_op_req(async_io_op _precondition, const std::vector<T, A> &v, off_t _where) : detail::async_data_op_req_impl<true>(std::move(_precondition), static_cast<const void *>(&v.front()), v.size()*sizeof(T), _where) { }
 };
 //! \brief A convenience bundle of precondition, data and where for reading into a `std::array<T, N>`. Data \b MUST stay around until the operation completes. \tparam "class T" Any type \tparam N Any compile-time size \ingroup async_data_op_req
-template<class T, size_t N> struct async_data_op_req<std::array<T, N>> : public async_data_op_req<void>
+template<class T, size_t N> struct async_data_op_req<std::array<T, N>> : public detail::async_data_op_req_impl<false>
 {
-    //! \constr
+#ifdef DOXYGEN_SHOULD_SKIP_THIS
+	//! A precondition containing an open file handle for this operation
+	async_io_op precondition;
+	//! A sequence of mutable Boost.ASIO buffers to read into
+	std::vector<boost::asio::mutable_buffer> buffers;
+	//! The offset from which to read
+	off_t where;
+#endif
+	//! \constr
 	async_data_op_req() { }
     //! \cconstr
-	async_data_op_req(const async_data_op_req &o) : async_data_op_req<void>(o) { }
+	async_data_op_req(const async_data_op_req &o) : detail::async_data_op_req_impl<false>(o) { }
     //! \mconstr
-	async_data_op_req(async_data_op_req &&o) BOOST_NOEXCEPT_OR_NOTHROW : async_data_op_req<void>(std::move(o)) { }
+	async_data_op_req(async_data_op_req &&o) BOOST_NOEXCEPT_OR_NOTHROW : detail::async_data_op_req_impl<false>(std::move(o)) { }
     //! \cassign
-	async_data_op_req &operator=(const async_data_op_req &o) { static_cast<async_data_op_req<void>>(*this)=o; return *this; }
+	async_data_op_req &operator=(const async_data_op_req &o) { static_cast<detail::async_data_op_req_impl<false>>(*this)=o; return *this; }
     //! \massign
-	async_data_op_req &operator=(async_data_op_req &&o) BOOST_NOEXCEPT_OR_NOTHROW { static_cast<async_data_op_req<void>>(*this)=std::move(o); return *this; }
+	async_data_op_req &operator=(async_data_op_req &&o) BOOST_NOEXCEPT_OR_NOTHROW { static_cast<detail::async_data_op_req_impl<false>>(*this)=std::move(o); return *this; }
     //! \async_data_op_req1
-	async_data_op_req(async_io_op _precondition, std::array<T, N> &v, off_t _where) : async_data_op_req<void>(std::move(_precondition), static_cast<void *>(&v.front()), v.size()*sizeof(T), _where) { }
+	async_data_op_req(async_io_op _precondition, std::array<T, N> &v, off_t _where) : detail::async_data_op_req_impl<false>(std::move(_precondition), static_cast<void *>(&v.front()), v.size()*sizeof(T), _where) { }
 };
 //! \brief A convenience bundle of precondition, data and where for writing from a `const std::array<T, N>`. Data \b MUST stay around until the operation completes. \tparam "class T" Any type \tparam N Any compile-time size \ingroup async_data_op_req
-template<class T, size_t N> struct async_data_op_req<const std::array<T, N>> : public async_data_op_req<const void>
+template<class T, size_t N> struct async_data_op_req<const std::array<T, N>> : public detail::async_data_op_req_impl<true>
 {
-    //! \constr
+#ifdef DOXYGEN_SHOULD_SKIP_THIS
+	//! A precondition containing an open file handle for this operation
+	async_io_op precondition;
+	//! A sequence of const Boost.ASIO buffers to write from
+	std::vector<boost::asio::const_buffer> buffers;
+	//! The offset at which to write
+	off_t where;
+#endif
+	//! \constr
 	async_data_op_req() { }
     //! \cconstr
-	async_data_op_req(const async_data_op_req &o) : async_data_op_req<const void>(o) { }
+	async_data_op_req(const async_data_op_req &o) : detail::async_data_op_req_impl<true>(o) { }
     //! \mconstr
-	async_data_op_req(async_data_op_req &&o) BOOST_NOEXCEPT_OR_NOTHROW : async_data_op_req<const void>(std::move(o)) { }
+	async_data_op_req(async_data_op_req &&o) BOOST_NOEXCEPT_OR_NOTHROW : detail::async_data_op_req_impl<true>(std::move(o)) { }
     //! \cassign
-	async_data_op_req &operator=(const async_data_op_req &o) { static_cast<async_data_op_req<const void>>(*this)=o; return *this; }
+	async_data_op_req &operator=(const async_data_op_req &o) { static_cast<detail::async_data_op_req_impl<true>>(*this)=o; return *this; }
     //! \massign
-	async_data_op_req &operator=(async_data_op_req &&o) BOOST_NOEXCEPT_OR_NOTHROW { static_cast<async_data_op_req<const void>>(*this)=std::move(o); return *this; }
+	async_data_op_req &operator=(async_data_op_req &&o) BOOST_NOEXCEPT_OR_NOTHROW { static_cast<detail::async_data_op_req_impl<true>>(*this)=std::move(o); return *this; }
     //! \cconstr
-	async_data_op_req(const async_data_op_req<std::array<T, N>> &o) : async_data_op_req<const void>(o) { }
+	async_data_op_req(const async_data_op_req<std::array<T, N>> &o) : detail::async_data_op_req_impl<true>(o) { }
     //! \mconstr
-	async_data_op_req(async_data_op_req<std::array<T, N>> &&o) BOOST_NOEXCEPT_OR_NOTHROW : async_data_op_req<const void>(std::move(o)) { }
+	async_data_op_req(async_data_op_req<std::array<T, N>> &&o) BOOST_NOEXCEPT_OR_NOTHROW : detail::async_data_op_req_impl<true>(std::move(o)) { }
     //! \async_data_op_req1
-	async_data_op_req(async_io_op _precondition, const std::array<T, N> &v, off_t _where) : async_data_op_req<const void>(std::move(_precondition), static_cast<const void *>(&v.front()), v.size()*sizeof(T), _where) { }
+	async_data_op_req(async_io_op _precondition, const std::array<T, N> &v, off_t _where) : detail::async_data_op_req_impl<true>(std::move(_precondition), static_cast<const void *>(&v.front()), v.size()*sizeof(T), _where) { }
 };
 //! \brief A convenience bundle of precondition, data and where for reading into a `std::basic_string<C, T, A>`. Data \b MUST stay around until the operation completes. \tparam "class C" Any character type \tparam "class T" Character traits type \tparam "class A" Any STL allocator \ingroup async_data_op_req
-template<class C, class T, class A> struct async_data_op_req<std::basic_string<C, T, A>> : public async_data_op_req<void>
+template<class C, class T, class A> struct async_data_op_req<std::basic_string<C, T, A>> : public detail::async_data_op_req_impl<false>
 {
-    //! \constr
+#ifdef DOXYGEN_SHOULD_SKIP_THIS
+	//! A precondition containing an open file handle for this operation
+	async_io_op precondition;
+	//! A sequence of mutable Boost.ASIO buffers to read into
+	std::vector<boost::asio::mutable_buffer> buffers;
+	//! The offset from which to read
+	off_t where;
+#endif
+	//! \constr
 	async_data_op_req() { }
     //! \cconstr
-	async_data_op_req(const async_data_op_req &o) : async_data_op_req<void>(o) { }
+	async_data_op_req(const async_data_op_req &o) : detail::async_data_op_req_impl<false>(o) { }
     //! \mconstr
-	async_data_op_req(async_data_op_req &&o) BOOST_NOEXCEPT_OR_NOTHROW : async_data_op_req<void>(std::move(o)) { }
+	async_data_op_req(async_data_op_req &&o) BOOST_NOEXCEPT_OR_NOTHROW : detail::async_data_op_req_impl<false>(std::move(o)) { }
     //! \cassign
-	async_data_op_req &operator=(const async_data_op_req &o) { static_cast<async_data_op_req<void>>(*this)=o; return *this; }
+	async_data_op_req &operator=(const async_data_op_req &o) { static_cast<detail::async_data_op_req_impl<false>>(*this)=o; return *this; }
     //! \mconstr
-	async_data_op_req &operator=(async_data_op_req &&o) BOOST_NOEXCEPT_OR_NOTHROW { static_cast<async_data_op_req<void>>(*this)=std::move(o); return *this; }
+	async_data_op_req &operator=(async_data_op_req &&o) BOOST_NOEXCEPT_OR_NOTHROW { static_cast<detail::async_data_op_req_impl<false>>(*this)=std::move(o); return *this; }
     //! \async_data_op_req1
-	async_data_op_req(async_io_op _precondition, std::basic_string<C, T, A> &v, off_t _where) : async_data_op_req<void>(std::move(_precondition), static_cast<void *>(&v.front()), v.size()*sizeof(A), _where) { }
+	async_data_op_req(async_io_op _precondition, std::basic_string<C, T, A> &v, off_t _where) : detail::async_data_op_req_impl<false>(std::move(_precondition), static_cast<void *>(&v.front()), v.size()*sizeof(A), _where) { }
 };
 //! \brief A convenience bundle of precondition, data and where for writing from a `const std::basic_string<C, T, A>`. Data \b MUST stay around until the operation completes.  \tparam "class C" Any character type \tparam "class T" Character traits type \tparam "class A" Any STL allocator \ingroup async_data_op_req
-template<class C, class T, class A> struct async_data_op_req<const std::basic_string<C, T, A>> : public async_data_op_req<const void>
+template<class C, class T, class A> struct async_data_op_req<const std::basic_string<C, T, A>> : public detail::async_data_op_req_impl<true>
 {
-    //! \constr
+#ifdef DOXYGEN_SHOULD_SKIP_THIS
+	//! A precondition containing an open file handle for this operation
+	async_io_op precondition;
+	//! A sequence of const Boost.ASIO buffers to write from
+	std::vector<boost::asio::const_buffer> buffers;
+	//! The offset at which to write
+	off_t where;
+#endif
+	//! \constr
 	async_data_op_req() { }
     //! \cconstr
-	async_data_op_req(const async_data_op_req &o) : async_data_op_req<const void>(o) { }
+	async_data_op_req(const async_data_op_req &o) : detail::async_data_op_req_impl<true>(o) { }
     //! \mconstr
-	async_data_op_req(async_data_op_req &&o) BOOST_NOEXCEPT_OR_NOTHROW : async_data_op_req<const void>(std::move(o)) { }
+	async_data_op_req(async_data_op_req &&o) BOOST_NOEXCEPT_OR_NOTHROW : detail::async_data_op_req_impl<true>(std::move(o)) { }
     //! \cconstr
-	async_data_op_req(const async_data_op_req<std::basic_string<C, T, A>> &o) : async_data_op_req<const void>(o) { }
+	async_data_op_req(const async_data_op_req<std::basic_string<C, T, A>> &o) : detail::async_data_op_req_impl<true>(o) { }
     //! \mconstr
-	async_data_op_req(async_data_op_req<std::basic_string<C, T, A>> &&o) BOOST_NOEXCEPT_OR_NOTHROW : async_data_op_req<const void>(std::move(o)) { }
+	async_data_op_req(async_data_op_req<std::basic_string<C, T, A>> &&o) BOOST_NOEXCEPT_OR_NOTHROW : detail::async_data_op_req_impl<true>(std::move(o)) { }
     //! \cassign
-	async_data_op_req &operator=(const async_data_op_req &o) { static_cast<async_data_op_req<const void>>(*this)=o; return *this; }
+	async_data_op_req &operator=(const async_data_op_req &o) { static_cast<detail::async_data_op_req_impl<true>>(*this)=o; return *this; }
     //! \mconstr
-	async_data_op_req &operator=(async_data_op_req &&o) BOOST_NOEXCEPT_OR_NOTHROW { static_cast<async_data_op_req<const void>>(*this)=std::move(o); return *this; }
+	async_data_op_req &operator=(async_data_op_req &&o) BOOST_NOEXCEPT_OR_NOTHROW { static_cast<detail::async_data_op_req_impl<true>>(*this)=std::move(o); return *this; }
     //! \async_data_op_req1
-	async_data_op_req(async_io_op _precondition, const std::basic_string<C, T, A> &v, off_t _where) : async_data_op_req<const void>(std::move(_precondition), static_cast<const void *>(&v.front()), v.size()*sizeof(A), _where) { }
+	async_data_op_req(async_io_op _precondition, const std::basic_string<C, T, A> &v, off_t _where) : detail::async_data_op_req_impl<true>(std::move(_precondition), static_cast<const void *>(&v.front()), v.size()*sizeof(A), _where) { }
 };
 
 namespace detail {
-	template<bool isconst> struct void_type_selector { typedef void type; };
-	template<> struct void_type_selector<true> { typedef const void type; };
-	template<class T> struct async_file_io_dispatcher_rwconverter
+	template<bool iswrite, class T> struct async_file_io_dispatcher_rwconverter
 	{
-		typedef async_data_op_req<typename void_type_selector<std::is_const<T>::value>::type> return_type;
+		typedef detail::async_data_op_req_impl<iswrite> return_type;
 		const std::vector<return_type> &operator()(const std::vector<async_data_op_req<T>> &ops)
 		{
 			typedef async_data_op_req<T> reqT;
-			static_assert(std::is_convertible<reqT, return_type>::value, "async_data_op_req<T> is not convertible to async_data_op_req<[const] void>");
-			static_assert(sizeof(return_type)==sizeof(reqT), "async_data_op_req<T> does not have the same size as async_data_op_req<[const] void>");
+			static_assert(std::is_convertible<reqT, return_type>::value, "async_data_op_req<T> is not convertible to detail::async_data_op_req_impl<constness>");
+			static_assert(sizeof(return_type)==sizeof(reqT), "async_data_op_req<T> does not have the same size as detail::async_data_op_req_impl<constness>");
 			return reinterpret_cast<const std::vector<return_type> &>(ops);
 		}
 	};
@@ -1391,7 +1529,7 @@ template<class R> inline std::pair<future<R>, async_io_op> async_file_io_dispatc
 	std::pair<std::vector<future<R>>, std::vector<async_io_op>> ret(call(i, c));
 	return std::make_pair(std::move(ret.first.front()), ret.second.front());
 }
-template<class C, class... Args> inline std::pair<future<typename std::result_of<C(Args...)>::type>, async_io_op> async_file_io_dispatcher_base::call(const async_io_op &req, C callback, Args... args)
+template<class C, class... Args> inline std::pair<future<typename boost::result_of<C(Args...)>::type>, async_io_op> async_file_io_dispatcher_base::call(const async_io_op &req, C callback, Args... args)
 {
 	typedef typename std::result_of<C(Args...)>::type rettype;
 	return call(req, std::bind<rettype()>(callback, args...));
@@ -1438,27 +1576,29 @@ inline async_io_op async_file_io_dispatcher_base::close(const async_io_op &req)
 	i.push_back(req);
 	return std::move(close(i).front());
 }
-inline async_io_op async_file_io_dispatcher_base::read(const async_data_op_req<void> &req)
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+inline async_io_op async_file_io_dispatcher_base::read(const detail::async_data_op_req_impl<false> &req)
 {
-	std::vector<async_data_op_req<void>> i;
+	std::vector<detail::async_data_op_req_impl<false>> i;
 	i.reserve(1);
 	i.push_back(req);
 	return std::move(read(i).front());
 }
-inline async_io_op async_file_io_dispatcher_base::write(const async_data_op_req<const void> &req)
+inline async_io_op async_file_io_dispatcher_base::write(const detail::async_data_op_req_impl<true> &req)
 {
-	std::vector<async_data_op_req<const void>> i;
+	std::vector<detail::async_data_op_req_impl<true>> i;
 	i.reserve(1);
 	i.push_back(req);
 	return std::move(write(i).front());
 }
+#endif
 template<class T> inline std::vector<async_io_op> async_file_io_dispatcher_base::read(const std::vector<async_data_op_req<T>> &ops)
 {
-	return read(detail::async_file_io_dispatcher_rwconverter<T>()(ops));
+	return read(detail::async_file_io_dispatcher_rwconverter<false, T>()(ops));
 }
 template<class T> inline std::vector<async_io_op> async_file_io_dispatcher_base::write(const std::vector<async_data_op_req<T>> &ops)
 {
-	return write(detail::async_file_io_dispatcher_rwconverter<T>()(ops));
+	return write(detail::async_file_io_dispatcher_rwconverter<true, T>()(ops));
 }
 inline async_io_op async_file_io_dispatcher_base::truncate(const async_io_op &op, off_t newsize)
 {

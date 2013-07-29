@@ -53,8 +53,6 @@
           (batch)</a></span></dt>
 <dt><span class="section"><a href="async_file_io_dispatcher_base/read_1_single.html">read
           (single)</a></span></dt>
-<dt><span class="section"><a href="async_file_io_dispatcher_base/read_1_batch0.html">read
-          (batch)</a></span></dt>
 <dt><span class="section"><a href="async_file_io_dispatcher_base/rmdir_1_batch.html">rmdir
           (batch)</a></span></dt>
 <dt><span class="section"><a href="async_file_io_dispatcher_base/rmdir_1_single.html">rmdir
@@ -75,13 +73,12 @@
           (batch)</a></span></dt>
 <dt><span class="section"><a href="async_file_io_dispatcher_base/write_1_single.html">write
           (single)</a></span></dt>
-<dt><span class="section"><a href="async_file_io_dispatcher_base/write_1_batch0.html">write
-          (batch)</a></span></dt>
 <dt><span class="section"><a href="async_file_io_dispatcher_base/barrier.html">barrier
           (batch)</a></span></dt>
+<dt><span class="section"><a href="async_file_io_dispatcher_base/page_size.html">page_size</a></span></dt>
 </dl></div>
 <p>
-          <a class="indexterm" name="id873497"></a>
+          <a class="indexterm" name="id952881"></a>
 Abstract base class for dispatching file i/o asynchronously.
         </p>
 <h6>
@@ -154,7 +151,6 @@ Abstract base class for dispatching file i/o asynchronously.
 <col>
 <col>
 <col>
-<col>
 </colgroup>
 <thead><tr>
 <th>
@@ -181,16 +177,15 @@ Abstract base class for dispatching file i/o asynchronously.
 <tbody>
 <tr>
 <td>
-<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">thread_pool</span> <span class="special">&amp;</span> <span class="identifier">threadpool</span><span class="special">()</span></pre>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">thread_source</span> <span class="special">&amp;</span> <span class="identifier">threadsource</span><span class="special">()</span></pre>
                 </td>
 <td>
                   <p>
-                    Returns the thread pool used by this dispatcher.
+                    Returns the thread source used by this dispatcher.
                   </p>
                 </td>
 <td>
                 </td>
-<td class="auto-generated">&#160;</td>
 </tr>
 <tr>
 <td>
@@ -207,7 +202,6 @@ Abstract base class for dispatching file i/o asynchronously.
                     <span class="bold"><strong>file_flags</strong></span>: <span class="emphasis"><em>flags</em></span>:
                   </p>
                 </td>
-<td class="auto-generated">&#160;</td>
 </tr>
 <tr>
 <td>
@@ -220,7 +214,6 @@ Abstract base class for dispatching file i/o asynchronously.
                 </td>
 <td>
                 </td>
-<td class="auto-generated">&#160;</td>
 </tr>
 <tr>
 <td>
@@ -233,7 +226,6 @@ Abstract base class for dispatching file i/o asynchronously.
                 </td>
 <td>
                 </td>
-<td class="auto-generated">&#160;</td>
 </tr>
 <tr>
 <td>
@@ -381,7 +373,7 @@ Abstract base class for dispatching file i/o asynchronously.
 <tr>
 <td>
 <pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">C</span><span class="special">,</span> <span class="keyword">class</span><span class="special">...</span> <span class="identifier">Args</span><span class="special">&gt;</span>
-<span class="identifier">std</span><span class="special">::</span><span class="identifier">pair</span><span class="special">&lt;</span> <span class="identifier">future</span><span class="special">&lt;</span> <span class="keyword">typename</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">result_of</span><span class="special">&lt;</span> <span class="identifier">C</span><span class="special">(</span><span class="identifier">Args</span><span class="special">...)&gt;::</span><span class="identifier">type</span> <span class="special">&gt;,</span> <span class="identifier">async_io_op</span> <span class="special">&gt;</span> <span class="identifier">call</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">async_io_op</span> <span class="special">&amp;</span> <span class="identifier">req</span><span class="special">,</span> <span class="identifier">C</span> <span class="identifier">callback</span><span class="special">,</span> <span class="identifier">Args</span><span class="special">...</span> <span class="identifier">args</span><span class="special">)</span></pre>
+<span class="identifier">std</span><span class="special">::</span><span class="identifier">pair</span><span class="special">&lt;</span> <span class="identifier">future</span><span class="special">&lt;</span> <span class="keyword">typename</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">result_of</span><span class="special">&lt;</span> <span class="identifier">C</span><span class="special">(</span><span class="identifier">Args</span><span class="special">...)&gt;::</span><span class="identifier">type</span> <span class="special">&gt;,</span> <span class="identifier">async_io_op</span> <span class="special">&gt;</span> <span class="identifier">call</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">async_io_op</span> <span class="special">&amp;</span> <span class="identifier">req</span><span class="special">,</span> <span class="identifier">C</span> <span class="identifier">callback</span><span class="special">,</span> <span class="identifier">Args</span><span class="special">...</span> <span class="identifier">args</span><span class="special">)</span></pre>
                 </td>
 <td>
                   <p>
@@ -692,49 +684,6 @@ Abstract base class for dispatching file i/o asynchronously.
 </tr>
 <tr>
 <td>
-<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">async_io_op</span> <span class="special">&gt;</span> <span class="identifier">read</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">async_data_op_req</span><span class="special">&lt;</span> <span class="keyword">void</span> <span class="special">&gt;&gt;</span> <span class="special">&amp;</span> <span class="identifier">ops</span><span class="special">)</span></pre>
-                </td>
-<td>
-                  <p>
-                    Schedule a batch of asynchronous data reads after preceding operations.
-                  </p>
-                </td>
-<td>
-                  <p>
-                    <span class="bold"><strong>const std::vector&lt; async_data_op_req&lt;
-                    void &gt;&gt; &amp;</strong></span>: <span class="emphasis"><em>ops</em></span>: A batch
-                    of <code class="literal"><code class="computeroutput"><span class="identifier">async_data_op_req</span></code><code class="computeroutput"><span class="special">&lt;</span><span class="keyword">void</span><span class="special">&gt;</span></code></code> structures.
-                  </p>
-                </td>
-<td>
-                  <p>
-                    A batch of op handles.
-                  </p>
-                </td>
-</tr>
-<tr>
-<td>
-<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">async_io_op</span> <span class="identifier">read</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">async_data_op_req</span><span class="special">&lt;</span> <span class="keyword">void</span> <span class="special">&gt;</span> <span class="special">&amp;</span> <span class="identifier">req</span><span class="special">)</span></pre>
-                </td>
-<td>
-                  <p>
-                    Schedule an asynchronous data read after a preceding operation.
-                  </p>
-                </td>
-<td>
-                  <p>
-                    <span class="bold"><strong>const async_data_op_req&lt; void &gt; &amp;</strong></span>:
-                    <span class="emphasis"><em>req</em></span>: An <code class="literal"><code class="computeroutput"><span class="identifier">async_data_op_req</span></code><code class="computeroutput"><span class="special">&lt;</span><span class="keyword">void</span><span class="special">&gt;</span></code></code> structure.
-                  </p>
-                </td>
-<td>
-                  <p>
-                    An op handle.
-                  </p>
-                </td>
-</tr>
-<tr>
-<td>
 <pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">T</span><span class="special">&gt;</span>
 <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">async_io_op</span> <span class="special">&gt;</span> <span class="identifier">read</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">async_data_op_req</span><span class="special">&lt;</span> <span class="identifier">T</span> <span class="special">&gt;&gt;</span> <span class="special">&amp;</span> <span class="identifier">ops</span><span class="special">)</span></pre>
                 </td>
@@ -747,7 +696,7 @@ Abstract base class for dispatching file i/o asynchronously.
                   <p>
                     <span class="bold"><strong>const std::vector&lt; async_data_op_req&lt;
                     T &gt;&gt; &amp;</strong></span>: <span class="emphasis"><em>ops</em></span>: A batch
-                    of <code class="literal"><code class="computeroutput"><span class="identifier">async_data_op_req</span></code><code class="computeroutput"><span class="special">&lt;</span><span class="identifier">T</span><span class="special">&gt;</span></code></code> structures.
+                    of async_data_op_req&lt;T&gt; structures.
                   </p>
                 </td>
 <td>
@@ -758,7 +707,25 @@ Abstract base class for dispatching file i/o asynchronously.
 </tr>
 <tr>
 <td>
-<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">async_io_op</span> <span class="special">&gt;</span> <span class="identifier">write</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">async_data_op_req</span><span class="special">&lt;</span> <span class="keyword">const</span> <span class="keyword">void</span> <span class="special">&gt;&gt;</span> <span class="special">&amp;</span> <span class="identifier">ops</span><span class="special">)</span></pre>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">T</span><span class="special">&gt;</span>
+<span class="identifier">async_io_op</span> <span class="identifier">read</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">async_data_op_req</span><span class="special">&lt;</span> <span class="identifier">T</span> <span class="special">&gt;</span> <span class="special">&amp;</span> <span class="identifier">req</span><span class="special">)</span></pre>
+                </td>
+<td>
+                  <p>
+                    Schedule an asynchronous data read after a preceding operation.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <span class="bold"><strong>const async_data_op_req&lt; T &gt; &amp;</strong></span>:
+                    <span class="emphasis"><em>req</em></span>:
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">T</span><span class="special">&gt;</span>
+<span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">async_io_op</span> <span class="special">&gt;</span> <span class="identifier">write</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">async_data_op_req</span><span class="special">&lt;</span> <span class="keyword">const</span> <span class="identifier">T</span> <span class="special">&gt;&gt;</span> <span class="special">&amp;</span> <span class="identifier">ops</span><span class="special">)</span></pre>
                 </td>
 <td>
                   <p>
@@ -769,21 +736,14 @@ Abstract base class for dispatching file i/o asynchronously.
 <td>
                   <p>
                     <span class="bold"><strong>const std::vector&lt; async_data_op_req&lt;
-                    const void &gt;&gt; &amp;</strong></span>: <span class="emphasis"><em>ops</em></span>:
-                    A batch of <code class="literal"><code class="computeroutput"><span class="identifier">async_data_op_req</span></code><code class="computeroutput"><span class="special">&lt;</span><span class="keyword">const</span>
-                    <span class="keyword">void</span><span class="special">&gt;</span></code></code>
-                    structures.
-                  </p>
-                </td>
-<td>
-                  <p>
-                    A batch of op handles.
+                    const T &gt;&gt; &amp;</strong></span>: <span class="emphasis"><em>ops</em></span>:
                   </p>
                 </td>
 </tr>
 <tr>
 <td>
-<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">async_io_op</span> <span class="identifier">write</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">async_data_op_req</span><span class="special">&lt;</span> <span class="keyword">const</span> <span class="keyword">void</span> <span class="special">&gt;</span> <span class="special">&amp;</span> <span class="identifier">req</span><span class="special">)</span></pre>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">T</span><span class="special">&gt;</span>
+<span class="identifier">async_io_op</span> <span class="identifier">write</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">async_data_op_req</span><span class="special">&lt;</span> <span class="keyword">const</span> <span class="identifier">T</span> <span class="special">&gt;</span> <span class="special">&amp;</span> <span class="identifier">req</span><span class="special">)</span></pre>
                 </td>
 <td>
                   <p>
@@ -792,39 +752,8 @@ Abstract base class for dispatching file i/o asynchronously.
                 </td>
 <td>
                   <p>
-                    <span class="bold"><strong>const async_data_op_req&lt; const void
-                    &gt; &amp;</strong></span>: <span class="emphasis"><em>req</em></span>: An <code class="literal"><code class="computeroutput"><span class="identifier">async_data_op_req</span></code><code class="computeroutput"><span class="special">&lt;</span><span class="keyword">const</span>
-                    <span class="keyword">void</span><span class="special">&gt;</span></code></code>
-                    structure.
-                  </p>
-                </td>
-<td>
-                  <p>
-                    An op handle.
-                  </p>
-                </td>
-</tr>
-<tr>
-<td>
-<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">T</span><span class="special">&gt;</span>
-<span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">async_io_op</span> <span class="special">&gt;</span> <span class="identifier">write</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">async_data_op_req</span><span class="special">&lt;</span> <span class="identifier">T</span> <span class="special">&gt;&gt;</span> <span class="special">&amp;</span> <span class="identifier">ops</span><span class="special">)</span></pre>
-                </td>
-<td>
-                  <p>
-                    Schedule a batch of asynchronous data writes after preceding
-                    operations.
-                  </p>
-                </td>
-<td>
-                  <p>
-                    <span class="bold"><strong>const std::vector&lt; async_data_op_req&lt;
-                    T &gt;&gt; &amp;</strong></span>: <span class="emphasis"><em>ops</em></span>: A batch
-                    of <code class="literal"><code class="computeroutput"><span class="identifier">async_data_op_req</span></code><code class="computeroutput"><span class="special">&lt;</span><span class="identifier">T</span><span class="special">&gt;</span></code></code> structures.
-                  </p>
-                </td>
-<td>
-                  <p>
-                    A batch of op handles.
+                    <span class="bold"><strong>const async_data_op_req&lt; const T &gt;
+                    &amp;</strong></span>: <span class="emphasis"><em>req</em></span>:
                   </p>
                 </td>
 </tr>
@@ -897,6 +826,38 @@ Abstract base class for dispatching file i/o asynchronously.
 <td>
                   <p>
                     A batch of op handles.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">size_t</span> <span class="identifier">page_size</span><span class="special">()</span></pre>
+                </td>
+<td>
+                  <p>
+                    Returns the page size of this architecture which is useful for
+                    calculating direct i/o multiples.
+                  </p>
+                </td>
+<td>
+                </td>
+<td>
+                  <p>
+                    The page size of this architecture.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">T</span><span class="special">&gt;</span>
+<span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">async_io_op</span> <span class="special">&gt;</span> <span class="identifier">write</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">async_data_op_req</span><span class="special">&lt;</span> <span class="identifier">T</span> <span class="special">&gt;&gt;</span> <span class="special">&amp;</span> <span class="identifier">ops</span><span class="special">)</span></pre>
+                </td>
+<td>
+                </td>
+<td>
+                  <p>
+                    <span class="bold"><strong>const std::vector&lt; async_data_op_req&lt;
+                    T &gt;&gt; &amp;</strong></span>: <span class="emphasis"><em>ops</em></span>:
                   </p>
                 </td>
 </tr>

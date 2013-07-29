@@ -6,6 +6,7 @@ File Created: Nov 2012
 #define _CRT_SECURE_NO_WARNINGS
 
 #include "ErrorHandling.hpp"
+#include "afio.hpp"
 #include <locale>
 #include <cstring>
 #include "boost/exception/to_string.hpp"
@@ -13,7 +14,9 @@ File Created: Nov 2012
 using boost::to_string;
 
 #ifdef WIN32
+#ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN 1
+#endif
 #include <Windows.h>
 #include <codecvt>
 
@@ -44,20 +47,20 @@ namespace boost {
                     if(ERROR_FILE_NOT_FOUND==code || ERROR_PATH_NOT_FOUND==code)
                     {
                             errstr="File '"+filename->generic_string()+"' not found [Host OS Error: "+errstr+"]";
-                            throw ios_base::failure(errstr);
+                            BOOST_AFIO_THROW(ios_base::failure(errstr));
                     }
                     else if(ERROR_ACCESS_DENIED==code || ERROR_EA_ACCESS_DENIED==code)
                     {
                             errstr="Access to '"+filename->generic_string()+"' denied [Host OS Error: "+errstr+"]";
-                            throw ios_base::failure(errstr);
+                            BOOST_AFIO_THROW(ios_base::failure(errstr));
                     }
                     else if(ERROR_NO_DATA==code || ERROR_BROKEN_PIPE==code || ERROR_PIPE_NOT_CONNECTED==code || ERROR_PIPE_LISTENING==code)
                     {
-                            throw ios_base::failure(errstr);
+                            BOOST_AFIO_THROW(ios_base::failure(errstr));
                     }
                     else
                     {
-                            throw ios_base::failure(errstr);
+                            BOOST_AFIO_THROW(ios_base::failure(errstr));
                     }
             }
 
@@ -85,16 +88,16 @@ namespace boost {
                     if(ENOENT==code || ENOTDIR==code)
                     {
                             errstr="File '"+filename->generic_string()+"' not found [Host OS Error: "+errstr+"]";
-                            throw ios_base::failure(errstr);
+                            BOOST_AFIO_THROW(ios_base::failure(errstr));
                     }
                     else if(EACCES==code)
                     {
                             errstr="Access to '"+filename->generic_string()+"' denied [Host OS Error: "+errstr+"]";
-                            throw ios_base::failure(errstr);
+                            BOOST_AFIO_THROW(ios_base::failure(errstr));
                     }
                     else
                     {
-                            throw ios_base::failure(errstr);
+                            BOOST_AFIO_THROW(ios_base::failure(errstr));
                     }
             }// end int_throwOSError
         }// namespace detail

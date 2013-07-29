@@ -16,6 +16,7 @@
 \defgroup async_file_io_dispatcher_base__call x
 \defgroup async_file_io_dispatcher_base__filedirops x
 \defgroup async_file_io_dispatcher_base__barrier x
+\defgroup async_file_io_dispatcher_base__misc x
 \defgroup async_file_io_dispatcher x
 \defgroup when_all_ops x
 \defgroup async_data_op_req x

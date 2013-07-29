@@ -19,7 +19,7 @@ This is an implementation of WG21 N3634's when\u005fall() which uses process\u00
 
 [heading Synopsis]
 ``template<class InputIterator>
-future<std::vector<typename std::decay<decltype(((typename InputIterator::value_type *) 0)->get())>::type> > when_all(InputIterator first, InputIterator last)``
+future<std::vector<typename std::decay<decltype(((typename InputIterator::value_type *) 0)->get())>::type> when_all(InputIterator first, InputIterator last)``
 
 [heading Parameters]
 
@@ -55,7 +55,7 @@ This is an implementation of WG21 N3634's when\u005fany() which uses process\u00
 
 [heading Synopsis]
 ``template<class InputIterator>
-future<std::pair<size_t, typename std::decay<decltype(((typename InputIterator::value_type *) 0)->get())>::type> > when_any(InputIterator first, InputIterator last)``
+future<std::pair<size_t, typename std::decay<decltype(((typename InputIterator::value_type *) 0)->get())>::type> when_any(InputIterator first, InputIterator last)``
 
 [heading Parameters]
 

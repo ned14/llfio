@@ -12,13 +12,14 @@
 [section:async_data_op_req_void_ async_data_op_req< void >]
 
 '''<indexterm><primary>async_data_op_req&lt; void &gt;</primary></indexterm>'''
-A convenience bundle of precondition, data and where for reading into a void *. Data [*MUST] stay around until the operation completes. 
+A convenience bundle of precondition, data and where for reading into a [^`void *`]. Data [*MUST] stay around until the operation completes. 
 
 [heading Synopsis]
 ``struct async_data_op_req< void >
+      : public detail::async_data_op_req_impl< false >
 {
   std::vector< boost::asio::mutable_buffer > buffers;  // A sequence of mutable Boost.ASIO buffers to read into. 
-  async_io_op precondition;                            // An optional precondition for this operation. 
+  async_io_op precondition;                            // A precondition containing an open file handle for this operation. 
   off_t where;                                         // The offset from which to read. 
 };
 ``
@@ -26,6 +27,15 @@ A convenience bundle of precondition, data and where for reading into a void *. 
 [heading Member Function(s)]
 [table
 [[Function] [Description] [Parameters]  [Returns]]
+[[``bool validate()``
+
+] [Validates contents for correctness. ] [
+
+][
+True if contents are correct 
+
+
+]]
 [[`` async_data_op_req()``
 
 ] [Default constructor. ] [
@@ -48,41 +58,13 @@ A convenience bundle of precondition, data and where for reading into a void *. 
 
 
 ]]
-[[``async_data_op_req & operator=(const async_data_op_req & o)``
-
-] [Copy assignment. ] [[* const async_data_op_req &]: ['o]:  
-
-
-
-
-]]
-[[``async_data_op_req & operator=(async_data_op_req && o)``
-
-] [Move assignment. ] [[* async_data_op_req &&]: ['o]:  
-
-
-
-
-]]
 [[`` async_data_op_req(async_io_op _precondition, void * v, size_t _length, off_t _where)``
 
-] [Constructs an instance. ] [[* async_io_op]: ['_precondition]:  An optional precondition for this operation
+] [Constructs an instance. ] [[* async_io_op]: ['_precondition]:  An optional precondition for this operation 
 
-[* void *]: ['v]:  A pointer to memory or reference to object into which to read or write
+[* void *]: ['v]:  A pointer to memory or reference to object into which to read or write 
 
 [* size_t]: ['_length]:  The number of bytes to transfer 
-
-[* off_t]: ['_where]:  The offset at which to transfer
-
-
-
-
-]]
-[[`` async_data_op_req(async_io_op _precondition, std::vector< boost::asio::mutable_buffer > _buffers, off_t _where)``
-
-] [Constructs an instance. ] [[* async_io_op]: ['_precondition]:  An optional precondition for this operation
-
-[* std::vector< boost::asio::mutable_buffer >]: ['_buffers]:  A sequence of mutable/const Boost.ASIO buffers to read into/write from
 
 [* off_t]: ['_where]:  The offset at which to transfer 
 
@@ -90,12 +72,15 @@ A convenience bundle of precondition, data and where for reading into a void *. 
 
 
 ]]
-[[``bool validate()``
+[[`` async_data_op_req(async_io_op _precondition, std::vector< boost::asio::mutable_buffer > _buffers, off_t _where)``
 
-] [Validates contents for correctness. ] [
+] [Constructs an instance. ] [[* async_io_op]: ['_precondition]:  An optional precondition for this operation 
 
-][
-True if contents are correct 
+[* std::vector< boost::asio::mutable_buffer >]: ['_buffers]:  A sequence of mutable/const Boost.ASIO buffers to read into/write from 
+
+[* off_t]: ['_where]:  The offset at which to transfer 
+
+
 
 
 ]]

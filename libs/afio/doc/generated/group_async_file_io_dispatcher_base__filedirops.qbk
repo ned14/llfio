@@ -188,14 +188,23 @@ An op handle.
 '''<indexterm><primary>read</primary></indexterm>'''
 Schedule a batch of asynchronous data reads after preceding operations. 
 
+[heading Description]
+
+``
+Note that on Windows this call issues a separate async file operation for each buffer supplied, thus making scatter/gather i/o no more efficient than making separate calls. The big exception to this is when doing unbuffered page aligned i/o for which Windows provides special scatter/gather i/o functions.
+``
+
+
 [heading Synopsis]
-``virtual std::vector<async_io_op> async_file_io_dispatcher_base::read(const std::vector< async_data_op_req< void >> & ops)``
+``template<class T>
+std::vector< async_io_op > async_file_io_dispatcher_base::read(const std::vector< async_data_op_req< T >> & ops)``
 
 [heading Parameters]
 
 [table
 [[Type] [Concept] [Name] [Description] ]
-[[const std::vector< async_data_op_req< void >> &] [] [ops] [A batch of [^`async_data_op_req``<void>`] structures.]]
+[[class T] [Any type. ] [ - ] [Must be specified]]
+[[const std::vector< async_data_op_req< T >> &] [] [ops] [A batch of async_data_op_req<T> structures.]]
 ]
 
 
@@ -217,55 +226,33 @@ A batch of op handles.
 '''<indexterm><primary>read</primary></indexterm>'''
 Schedule an asynchronous data read after a preceding operation. 
 
+[heading Description]
+
+``
+Note that on Windows this call issues a separate async file operation for each buffer supplied, thus making scatter/gather i/o no more efficient than making separate calls. The big exception to this is when doing unbuffered page aligned i/o for which Windows provides special scatter/gather i/o functions.
+\return An op handle.
+\tparam "class T" Any type.
+\param req An async\u005fdata\u005fop\u005freq<T> structure.
+``
+
+
 [heading Synopsis]
-``async_io_op async_file_io_dispatcher_base::read(const async_data_op_req< void > & req)``
+``template<class T>
+async_io_op async_file_io_dispatcher_base::read(const async_data_op_req< T > & req)``
 
 [heading Parameters]
 
 [table
 [[Type] [Concept] [Name] [Description] ]
-[[const async_data_op_req< void > &] [] [req] [An [^`async_data_op_req``<void>`] structure.]]
+[[class T] [] [ - ] [Must be specified]]
+[[const async_data_op_req< T > &] [] [req] []]
 ]
 
-
-[heading Returns]
-An op handle. 
 
 [heading Header]
 `#include <boost/afio/afio.hpp>`
 
 [heading Complexity]Amortised O(1) to dispatch. Amortised O(1) to complete if reading data is constant time.
-[heading Exception Model]Propagates exceptions of any input preconditions with an errored state at the point of dispatch, and throws a `std::runtime_error` if any inputs have values which could not possibly be correct.
-[heading Example][readwrite_example]
-
-
-[endsect]
-
-[section:read_1_batch read (batch)]
-
-'''<indexterm><primary>read</primary></indexterm>'''
-Schedule a batch of asynchronous data reads after preceding operations. 
-
-[heading Synopsis]
-``template<class T>
-std::vector< async_io_op > async_file_io_dispatcher_base::read(const std::vector< async_data_op_req< T >> & ops)``
-
-[heading Parameters]
-
-[table
-[[Type] [Concept] [Name] [Description] ]
-[[class T] [Any arbitrary type. ] [ - ] [Must be specified]]
-[[const std::vector< async_data_op_req< T >> &] [] [ops] [A batch of [^`async_data_op_req``<T>`] structures.]]
-]
-
-
-[heading Returns]
-A batch of op handles. 
-
-[heading Header]
-`#include <boost/afio/afio.hpp>`
-
-[heading Complexity]Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete if reading data is constant time.
 [heading Exception Model]Propagates exceptions of any input preconditions with an errored state at the point of dispatch, and throws a `std::runtime_error` if any inputs have values which could not possibly be correct.
 [heading Example][readwrite_example]
 
@@ -511,19 +498,28 @@ An op handle.
 '''<indexterm><primary>write</primary></indexterm>'''
 Schedule a batch of asynchronous data writes after preceding operations. 
 
+[heading Description]
+
+``
+Note that on Windows this call issues a separate async file operation for each buffer supplied, thus making scatter/gather i/o no more efficient than making separate calls. The big exception to this is when doing unbuffered page aligned i/o for which Windows provides special scatter/gather i/o functions.
+\return A batch of op handles.
+\tparam "class T" Any type.
+\param ops A batch of async\u005fdata\u005fop\u005freq<const T> structures.
+``
+
+
 [heading Synopsis]
-``virtual std::vector<async_io_op> async_file_io_dispatcher_base::write(const std::vector< async_data_op_req< const void >> & ops)``
+``template<class T>
+virtual std::vector<async_io_op> async_file_io_dispatcher_base::write(const std::vector< async_data_op_req< const T >> & ops)``
 
 [heading Parameters]
 
 [table
 [[Type] [Concept] [Name] [Description] ]
-[[const std::vector< async_data_op_req< const void >> &] [] [ops] [A batch of [^`async_data_op_req``<const void>`] structures.]]
+[[class T] [] [ - ] [Must be specified]]
+[[const std::vector< async_data_op_req< const T >> &] [] [ops] []]
 ]
 
-
-[heading Returns]
-A batch of op handles. 
 
 [heading Header]
 `#include <boost/afio/afio.hpp>`
@@ -540,55 +536,33 @@ A batch of op handles.
 '''<indexterm><primary>write</primary></indexterm>'''
 Schedule an asynchronous data write after a preceding operation. 
 
+[heading Description]
+
+``
+Note that on Windows this call issues a separate async file operation for each buffer supplied, thus making scatter/gather i/o no more efficient than making separate calls. The big exception to this is when doing unbuffered page aligned i/o for which Windows provides special scatter/gather i/o functions.
+\return An op handle.
+\tparam "class T" Any type.
+\param req An async\u005fdata\u005fop\u005freq<const T> structure.
+``
+
+
 [heading Synopsis]
-``async_io_op async_file_io_dispatcher_base::write(const async_data_op_req< const void > & req)``
+``template<class T>
+async_io_op async_file_io_dispatcher_base::write(const async_data_op_req< const T > & req)``
 
 [heading Parameters]
 
 [table
 [[Type] [Concept] [Name] [Description] ]
-[[const async_data_op_req< const void > &] [] [req] [An [^`async_data_op_req``<const void>`] structure.]]
+[[class T] [] [ - ] [Must be specified]]
+[[const async_data_op_req< const T > &] [] [req] []]
 ]
 
-
-[heading Returns]
-An op handle. 
 
 [heading Header]
 `#include <boost/afio/afio.hpp>`
 
 [heading Complexity]Amortised O(1) to dispatch. Amortised O(1) to complete if writing data is constant time.
-[heading Exception Model]Propagates exceptions of any input preconditions with an errored state at the point of dispatch, and throws a `std::runtime_error` if any inputs have values which could not possibly be correct.
-[heading Example][readwrite_example]
-
-
-[endsect]
-
-[section:write_1_batch write (batch)]
-
-'''<indexterm><primary>write</primary></indexterm>'''
-Schedule a batch of asynchronous data writes after preceding operations. 
-
-[heading Synopsis]
-``template<class T>
-std::vector< async_io_op > async_file_io_dispatcher_base::write(const std::vector< async_data_op_req< T >> & ops)``
-
-[heading Parameters]
-
-[table
-[[Type] [Concept] [Name] [Description] ]
-[[class T] [Any arbitrary type. ] [ - ] [Must be specified]]
-[[const std::vector< async_data_op_req< T >> &] [] [ops] [A batch of [^`async_data_op_req``<T>`] structures.]]
-]
-
-
-[heading Returns]
-A batch of op handles. 
-
-[heading Header]
-`#include <boost/afio/afio.hpp>`
-
-[heading Complexity]Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete if writing data is constant time.
 [heading Exception Model]Propagates exceptions of any input preconditions with an errored state at the point of dispatch, and throws a `std::runtime_error` if any inputs have values which could not possibly be correct.
 [heading Example][readwrite_example]
 

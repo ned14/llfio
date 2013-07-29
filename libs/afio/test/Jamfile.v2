@@ -22,15 +22,14 @@ project boost/afio/test
       <library>/boost/afio//boost_afio
       <toolset>gcc:<cxxflags>"-std=c++0x -fvisibility-inlines-hidden -fstrict-aliasing -Wstrict-aliasing -Wno-unused -fargument-noalias -fvisibility=hidden -fopenmp"
       <toolset>gcc-mingw:<cxxflags>"-march=i686 -DWIN32 -D_UNICODE -DUNICODE"
+      <toolset>gcc-mingw:<linkflags>"-lws2_32"
       <toolset>gcc:<linkflags>"-lgomp"
       <toolset>clang:<cxxflags>"-std=c++0x -fvisibility-inlines-hidden -fstrict-aliasing -Wstrict-aliasing -Wno-unused -fargument-noalias -fvisibility=hidden -fopenmp"
-      <toolset>msvc:<cxxflags>/openmp
-      <toolset>msvc:<cxxflags>"/openmp /EHsc /GF /Gy"
+      <toolset>msvc:<cxxflags>"/openmp /EHsc /GF /Gy /bigobj"
       <toolset>msvc:<linkflags>"/LARGEADDRESSAWARE /DYNAMICBASE /NXCOMPAT /OPT:REF /MANIFEST" # /VERSION:1.00.0"
       <toolset>msvc:<define>WIN32 <toolset>msvc:<define>_WINDOWS  <toolset>msvc:<define>UNICODE <toolset>msvc:<define>_UNICODE
       <target-os>linux:<linkflags>"-lpthread"
       <target-os>freebsd:<linkflags>"-lpthread"
-      <target-os>windows:<linkflags>"-lws2_32"
       <link>shared:<define>BOOST_AFIO_DYN_LINK=1
       <link>shared:<library>../../system/build//boost_system
       <link>shared:<library>../../filesystem/build//boost_filesystem
@@ -66,7 +65,17 @@ else
 { 
     SHELL  [ SHELL "find -L -name test_file_glob.sh" ]  ; 
 }
-local test_files = [ glob  *.cpp : main.cpp ] ;
+
+# Let user limit test_files
+local test_files = [ MATCH ^--test=(.*)$ : $(.argv) ] ;
+if $(test_files)
+{
+}
+else
+{
+    test_files = [ glob  *.cpp : main.cpp ] ;
+}
+
 
 # link tests (just compile and links targets)
 if "--link-test"  in $(.argv)  

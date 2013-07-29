@@ -39,9 +39,9 @@ This is a reference counted instance with platform-specific implementation optio
 [heading Member Function(s)]
 [table
 [[Function] [Description] [Parameters]  [Returns]]
-[[``thread_pool & threadpool()``
+[[``thread_source & threadsource()``
 
-] [Returns the thread pool used by this dispatcher. ] [
+] [Returns the thread source used by this dispatcher. ] [
 
 
 ]]
@@ -132,7 +132,7 @@ A pair with a future returning the result of the callable and an op handle.
 
 ]]
 [[``template<class C, class... Args>
-std::pair< future< typename std::result_of< C(Args...)>::type >, async_io_op > call(const async_io_op & req, C callback, Args... args)``
+std::pair< future< typename boost::result_of< C(Args...)>::type >, async_io_op > call(const async_io_op & req, C callback, Args... args)``
 
 ] [Schedule an asynchronous invocation of the specified unbound callable when its supplied precondition completes. Note that this function essentially calls [^`std::bind()`] on the callable and the args and passes it to the other call() overload taking a [^`std::function<>`]. You should therefore use [^`std::ref()`] etc. as appropriate. ] [[* const async_io_op &]: ['req]:  A precondition op handle. If default constructed, the precondition is null. 
 
@@ -279,71 +279,42 @@ An op handle.
 
 
 ]]
-[[``std::vector< async_io_op > read(const std::vector< async_data_op_req< void >> & ops)``
-
-] [Schedule a batch of asynchronous data reads after preceding operations. ] [[* const std::vector< async_data_op_req< void >> &]: ['ops]:  A batch of [^`async_data_op_req``<void>`] structures.
-
-
-
-][
-A batch of op handles. 
-
-
-]]
-[[``async_io_op read(const async_data_op_req< void > & req)``
-
-] [Schedule an asynchronous data read after a preceding operation. ] [[* const async_data_op_req< void > &]: ['req]:  An [^`async_data_op_req``<void>`] structure.
-
-
-
-][
-An op handle. 
-
-
-]]
 [[``template<class T>
 std::vector< async_io_op > read(const std::vector< async_data_op_req< T >> & ops)``
 
-] [Schedule a batch of asynchronous data reads after preceding operations. ] [[* const std::vector< async_data_op_req< T >> &]: ['ops]:  A batch of [^`async_data_op_req``<T>`] structures.
+] [Schedule a batch of asynchronous data reads after preceding operations. ] [[* const std::vector< async_data_op_req< T >> &]: ['ops]:  A batch of async_data_op_req<T> structures.
 
 
 
 ][
 A batch of op handles. 
-
-
-]]
-[[``std::vector< async_io_op > write(const std::vector< async_data_op_req< const void >> & ops)``
-
-] [Schedule a batch of asynchronous data writes after preceding operations. ] [[* const std::vector< async_data_op_req< const void >> &]: ['ops]:  A batch of [^`async_data_op_req``<const void>`] structures.
-
-
-
-][
-A batch of op handles. 
-
-
-]]
-[[``async_io_op write(const async_data_op_req< const void > & req)``
-
-] [Schedule an asynchronous data write after a preceding operation. ] [[* const async_data_op_req< const void > &]: ['req]:  An [^`async_data_op_req``<const void>`] structure.
-
-
-
-][
-An op handle. 
 
 
 ]]
 [[``template<class T>
-std::vector< async_io_op > write(const std::vector< async_data_op_req< T >> & ops)``
+async_io_op read(const async_data_op_req< T > & req)``
 
-] [Schedule a batch of asynchronous data writes after preceding operations. ] [[* const std::vector< async_data_op_req< T >> &]: ['ops]:  A batch of [^`async_data_op_req``<T>`] structures.
+] [Schedule an asynchronous data read after a preceding operation. ] [[* const async_data_op_req< T > &]: ['req]:  
 
 
 
-][
-A batch of op handles. 
+
+]]
+[[``template<class T>
+std::vector< async_io_op > write(const std::vector< async_data_op_req< const T >> & ops)``
+
+] [Schedule a batch of asynchronous data writes after preceding operations. ] [[* const std::vector< async_data_op_req< const T >> &]: ['ops]:  
+
+
+
+
+]]
+[[``template<class T>
+async_io_op write(const async_data_op_req< const T > & req)``
+
+] [Schedule an asynchronous data write after a preceding operation. ] [[* const async_data_op_req< const T > &]: ['req]:  
+
+
 
 
 ]]
@@ -384,6 +355,24 @@ A batch of op handles.
 
 
 ]]
+[[``size_t page_size()``
+
+] [Returns the page size of this architecture which is useful for calculating direct i/o multiples. ] [
+
+][
+The page size of this architecture.
+
+
+]]
+[[``template<class T>
+std::vector< async_io_op > write(const std::vector< async_data_op_req< T >> & ops)``
+
+] [] [[* const std::vector< async_data_op_req< T >> &]: ['ops]:  
+
+
+
+
+]]
 ]
 
 [heading Header]
@@ -394,6 +383,7 @@ A batch of op handles.
 [include generated/group_async_file_io_dispatcher_base__call.qbk]
 [include generated/group_async_file_io_dispatcher_base__filedirops.qbk]
 [include generated/group_async_file_io_dispatcher_base__barrier.qbk]
+[include generated/group_async_file_io_dispatcher_base__misc.qbk]
 
 [endsect]
 

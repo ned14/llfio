@@ -15,7 +15,7 @@
 
 
 [heading Synopsis]
-``template<class T>
+``template<bool iswrite, class T>
 struct detail::async_file_io_dispatcher_rwconverter
 {
   // ...
@@ -25,6 +25,7 @@ struct detail::async_file_io_dispatcher_rwconverter
 [heading Template parameter(s)]
 [table
 [[Parameter] [Description]]
+[[bool iswrite] []]
 [[class T] []]
 ]
 

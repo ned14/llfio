@@ -68,24 +68,24 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <NMakeOutput>unittests.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>WIN32;_DEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
-    <NMakeBuildCommandLine>..\..\..\b2 address-model=64</NMakeBuildCommandLine>
-    <NMakeReBuildCommandLine>..\..\..\b2 address-model=64 -a</NMakeReBuildCommandLine>
+    <NMakeBuildCommandLine>..\..\..\b2 address-model=64 link=static</NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine>..\..\..\b2 address-model=64 link=static -a</NMakeReBuildCommandLine>
+    <IncludePath>$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSDK_IncludePath);..\..\..</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <NMakeOutput>unittests.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>WIN32;NDEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
+    <NMakeBuildCommandLine>..\..\..\b2 release</NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine>..\..\..\b2 release -a</NMakeReBuildCommandLine>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <NMakeOutput>unittests.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>WIN32;NDEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
+    <NMakeBuildCommandLine>..\..\..\b2 address-model=64 link=static release --link-test</NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine>..\..\..\b2 address-model=64 link=static release -a</NMakeReBuildCommandLine>
   </PropertyGroup>
   <ItemDefinitionGroup>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\build\afio.vcxproj">
-      <Project>{31a5e53d-7416-4e1d-891a-1c69ef8553bd}</Project>
-    </ProjectReference>
-  </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
   </ItemGroup>

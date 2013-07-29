@@ -6,7 +6,7 @@ BOOST_AUTO_TEST_CASE(async_io_sync)
     using namespace boost::afio;
     using namespace std;
     vector<char> buffer(64, 'n');
-    auto dispatcher = boost::afio::async_file_io_dispatcher(boost::afio::process_threadpool(), boost::afio::file_flags::OSSync);
+	auto dispatcher = boost::afio::make_async_file_io_dispatcher(boost::afio::process_threadpool(), boost::afio::file_flags::AlwaysSync);
     std::cout << "\n\nTesting synchronous directory and file creation:\n";
     auto mkdir(dispatcher->dir(async_path_op_req("testdir", file_flags::Create)));
     auto mkfile(dispatcher->file(async_path_op_req(mkdir, "testdir/foo", file_flags::Create | file_flags::ReadWrite)));

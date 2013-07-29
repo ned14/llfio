@@ -12,20 +12,23 @@
 [section:async_data_op_req async_data_op_req]
 
 '''<indexterm><primary>async_data_op_req</primary></indexterm>'''
-A convenience bundle of precondition, data and where for reading into a single T *. Data [*MUST] stay around until the operation completes. 
+A convenience bundle of precondition, data and where for reading into a single [^`T *`]. Data [*MUST] stay around until the operation completes. 
 
 [heading Synopsis]
 ``template<class T>
 struct async_data_op_req
+      : public detail::async_data_op_req_impl< false >
 {
-  // ...
+  std::vector< boost::asio::mutable_buffer > buffers;  // A sequence of mutable Boost.ASIO buffers to read into. 
+  async_io_op precondition;                            // A precondition containing an open file handle for this operation. 
+  off_t where;                                         // The offset from which to read. 
 };
 ``
 
 [heading Template parameter(s)]
 [table
 [[Parameter] [Description]]
-[[class T] [Any writable type T ]]
+[[class T] [Any readable type T ]]
 ]
 
 [heading Constructor(s)]
@@ -55,13 +58,13 @@ struct async_data_op_req
 ]]
 [[``async_data_op_req(async_io_op _precondition, T * v, size_t _length, off_t _where)``
 
-] [Constructs an instance. ] [[* async_io_op]: ['_precondition]:  An optional precondition for this operation
+] [Constructs an instance. ] [[* async_io_op]: ['_precondition]:  An optional precondition for this operation 
 
-[* T *]: ['v]:  A pointer to memory or reference to object into which to read or write
+[* T *]: ['v]:  A pointer to memory or reference to object into which to read or write 
 
 [* size_t]: ['_length]:  The number of bytes to transfer 
 
-[* off_t]: ['_where]:  The offset at which to transfer
+[* off_t]: ['_where]:  The offset at which to transfer 
 
 
 
@@ -72,6 +75,15 @@ struct async_data_op_req
 [heading Member Function(s)]
 [table
 [[Function] [Description] [Parameters]  [Returns]]
+[[``bool validate()``
+
+] [Validates contents for correctness. ] [
+
+][
+True if contents are correct 
+
+
+]]
 [[``async_data_op_req & operator=(const async_data_op_req & o)``
 
 ] [Copy assignment. ] [[* const async_data_op_req &]: ['o]:  

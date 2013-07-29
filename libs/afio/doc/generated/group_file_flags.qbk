@@ -20,15 +20,16 @@
 '''<indexterm><primary>Truncate</primary></indexterm>'''
 '''<indexterm><primary>Create</primary></indexterm>'''
 '''<indexterm><primary>CreateOnlyIfNotExist</primary></indexterm>'''
-'''<indexterm><primary>AutoFlush</primary></indexterm>'''
 '''<indexterm><primary>WillBeSequentiallyAccessed</primary></indexterm>'''
 '''<indexterm><primary>FastDirectoryEnumeration</primary></indexterm>'''
 '''<indexterm><primary>OSDirect</primary></indexterm>'''
-'''<indexterm><primary>OSSync</primary></indexterm>'''
+'''<indexterm><primary>AlwaysSync</primary></indexterm>'''
+'''<indexterm><primary>SyncOnClose</primary></indexterm>'''
+'''<indexterm><primary>EnforceDependencyWriteOrder</primary></indexterm>'''
 Bitwise file and directory open flags. 
 
 [heading Synopsis]
-``enum file_flags {None = 0, Read = 1, Write = 2, ReadWrite = 3, Append = 4, Truncate = 8, Create = 16, CreateOnlyIfNotExist = 32, AutoFlush = 64, WillBeSequentiallyAccessed = 128, FastDirectoryEnumeration = 256, OSDirect = (1<<16), OSSync = (1<<17)};``
+``enum file_flags {None = 0, Read = 1, Write = 2, ReadWrite = 3, Append = 4, Truncate = 8, Create = 16, CreateOnlyIfNotExist = 32, WillBeSequentiallyAccessed = 128, FastDirectoryEnumeration = 256, OSDirect = (1<<16), AlwaysSync = (1<<24), SyncOnClose = (1<<25), EnforceDependencyWriteOrder = (1<<26)};``
 
 [heading Values]
 
@@ -42,11 +43,12 @@ Bitwise file and directory open flags.
 [[Truncate] [Truncate existing file to zero. ]]
 [[Create] [Open and create if doesn't exist. ]]
 [[CreateOnlyIfNotExist] [Create and open only if doesn't exist. ]]
-[[AutoFlush] [Automatically initiate an asynchronous flush just before file close, and fuse both operations so both must complete for close to complete. ]]
 [[WillBeSequentiallyAccessed] [Will be exclusively either read or written sequentially. If you're exclusively writing sequentially, ['strongly] consider turning on OSDirect too. ]]
 [[FastDirectoryEnumeration] [Hold a file handle open to the containing directory of each open file for fast directory enumeration (POSIX only). ]]
 [[OSDirect] [Bypass the OS file buffers (only really useful for writing large files. Note you must 4Kb align everything if this is on) ]]
-[[OSSync] [Ask the OS to not complete until the data is on the physical storage. Best used only with Direct, otherwise use AutoFlush. ]]
+[[AlwaysSync] [Ask the OS to not complete until the data is on the physical storage. Best used only with OSDirect, otherwise use SyncOnClose. ]]
+[[SyncOnClose] [Automatically initiate an asynchronous flush just before file close, and fuse both operations so both must complete for close to complete. ]]
+[[EnforceDependencyWriteOrder] [Ensure that data writes to files reach physical storage in the same order as the op dependencies close files. Does NOT enforce ordering of individual data writes, ONLY all file writes accumulated before a file close. ]]
 ]
 
 
