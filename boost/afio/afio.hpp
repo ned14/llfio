@@ -37,13 +37,17 @@ File Created: Mar 2013
 #include "detail/Utility.hpp"
 
 // Map in C++11 stuff if available
-#if defined(__GLIBCXX__) && __GLIBCXX__<=20120920
+#if defined(__GLIBCXX__) && __GLIBCXX__<=20120920 // <= GCC 4.7.2
 #include "boost/exception_ptr.hpp"
 #include "boost/thread/recursive_mutex.hpp"
 namespace boost { namespace afio {
 typedef boost::thread thread;
 inline boost::thread::id get_this_thread_id() { return boost::this_thread::get_id(); }
 inline boost::exception_ptr current_exception() { return boost::current_exception(); }
+// TODO FIXME: This ought to work, but doesn't. I should investigate. In the meantime, users of older compilers will see 'unknown_exception'.
+//#define BOOST_AFIO_THROW(x) boost::throw_exception(boost::enable_current_exception(x))
+#define BOOST_AFIO_THROW(x) throw x
+#define BOOST_AFIO_RETHROW throw
 typedef boost::recursive_mutex recursive_mutex;
 } }
 #else
@@ -51,6 +55,8 @@ namespace boost { namespace afio {
 typedef std::thread thread;
 inline std::thread::id get_this_thread_id() { return std::this_thread::get_id(); }
 inline std::exception_ptr current_exception() { return std::current_exception(); }
+#define BOOST_AFIO_THROW(x) throw x
+#define BOOST_AFIO_RETHROW throw
 typedef std::recursive_mutex recursive_mutex;
 } }
 #endif
@@ -903,7 +909,7 @@ private:
 	{
 #if BOOST_AFIO_VALIDATE_INPUTS
 		if(!validate())
-			throw std::runtime_error("Inputs are invalid.");
+			BOOST_AFIO_THROW(std::runtime_error("Inputs are invalid."));
 #endif
 	}
 };
@@ -912,10 +918,11 @@ namespace detail
 {
 	struct when_all_count_completed_state
 	{
+		std::vector<async_io_op> inputs;
 		std::atomic<size_t> togo;
 		std::vector<std::shared_ptr<detail::async_io_handle>> out;
 		promise<std::vector<std::shared_ptr<detail::async_io_handle>>> done;
-		when_all_count_completed_state(size_t outsize) : togo(outsize), out(outsize) { }
+		when_all_count_completed_state(std::vector<async_io_op>::iterator first, std::vector<async_io_op>::iterator last) : inputs(first, last), togo(inputs.size()), out(inputs.size()) { }
 	};
 	inline async_file_io_dispatcher_base::completion_returntype when_all_count_completed_nothrow(size_t, std::shared_ptr<detail::async_io_handle> h, std::shared_ptr<detail::when_all_count_completed_state> state, size_t idx)
 	{
@@ -929,20 +936,30 @@ namespace detail
 		state->out[idx]=h; // This might look thread unsafe, but each idx is unique
 		if(!--state->togo)
 		{
-			bool done=false;
-			try
+			// If the last completion is throwing an exception, throw that, else scan inputs for exception states
+			exception_ptr this_e(afio::make_exception_ptr(afio::current_exception()));
+			if(this_e)
+				state->done.set_exception(this_e);
+			else
 			{
-				for(auto &i : state->out)
-					i.get();
+				bool done=false;
+				try
+				{
+					for(auto &i : state->inputs)
+					{
+						shared_future<std::shared_ptr<detail::async_io_handle>> *future=i.h.get();
+						future->get();
+					}
+				}
+				catch(...)
+				{
+					exception_ptr e(afio::make_exception_ptr(afio::current_exception()));
+					state->done.set_exception(e);
+					done=true;
+				}
+				if(!done)
+					state->done.set_value(state->out);
 			}
-			catch(...)
-			{
-				exception_ptr e(afio::make_exception_ptr(afio::current_exception()));
-				state->done.set_exception(e);
-				done=true;
-			}
-			if(!done)
-				state->done.set_value(state->out);
 		}
 		return std::make_pair(true, h);
 	}
@@ -963,8 +980,8 @@ inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(st
 {
 	if(first==last)
 		return future<std::vector<std::shared_ptr<detail::async_io_handle>>>();
-	std::vector<async_io_op> inputs(first, last);
-	auto state(std::make_shared<detail::when_all_count_completed_state>(inputs.size()));
+	auto state(std::make_shared<detail::when_all_count_completed_state>(first, last));
+	std::vector<async_io_op> &inputs=state->inputs;
 	std::vector<std::pair<async_op_flags, std::function<async_file_io_dispatcher_base::completion_t>>> callbacks;
 	callbacks.reserve(inputs.size());
 	size_t idx=0;
@@ -987,8 +1004,8 @@ inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(st
 {
 	if(first==last)
 		return future<std::vector<std::shared_ptr<detail::async_io_handle>>>();
-	std::vector<async_io_op> inputs(first, last);
-	auto state(std::make_shared<detail::when_all_count_completed_state>(inputs.size()));
+	auto state(std::make_shared<detail::when_all_count_completed_state>(first, last));
+	std::vector<async_io_op> &inputs=state->inputs;
 	std::vector<std::pair<async_op_flags, std::function<async_file_io_dispatcher_base::completion_t>>> callbacks;
 	callbacks.reserve(inputs.size());
 	size_t idx=0;
@@ -1079,7 +1096,7 @@ struct async_path_op_req
     \param _path The filing system path to be used. Must be absolute.
     \param _flags The flags to be used.
     */
-	async_path_op_req(std::filesystem::path _path, file_flags _flags=file_flags::None) : path(_path), flags(_flags) { if(!path.is_absolute()) throw std::runtime_error("Non-absolute path"); }
+	async_path_op_req(std::filesystem::path _path, file_flags _flags=file_flags::None) : path(_path), flags(_flags) { if(!path.is_absolute()) BOOST_AFIO_THROW(std::runtime_error("Non-absolute path")); }
 	/*! \brief Constructs an instance.
     
     Note that this will fail if path is not absolute.
@@ -1088,7 +1105,7 @@ struct async_path_op_req
     \param _path The filing system path to be used. Must be absolute.
     \param _flags The flags to be used.
     */
-	async_path_op_req(async_io_op _precondition, std::filesystem::path _path, file_flags _flags=file_flags::None) : path(_path), flags(_flags), precondition(std::move(_precondition)) { _validate(); if(!path.is_absolute()) throw std::runtime_error("Non-absolute path"); }
+	async_path_op_req(async_io_op _precondition, std::filesystem::path _path, file_flags _flags=file_flags::None) : path(_path), flags(_flags), precondition(std::move(_precondition)) { _validate(); if(!path.is_absolute()) BOOST_AFIO_THROW(std::runtime_error("Non-absolute path")); }
 	/*! \brief Constructs an instance.
     \param _path The filing system leaf or path to be used. make_preferred() and absolute() will be used to convert the string into an absolute path.
     \param _flags The flags to be used.
@@ -1122,7 +1139,7 @@ private:
 	{
 #if BOOST_AFIO_VALIDATE_INPUTS
 		if(!validate())
-			throw std::runtime_error("Inputs are invalid.");
+			BOOST_AFIO_THROW(std::runtime_error("Inputs are invalid."));
 #endif
 	}
 };
@@ -1193,7 +1210,7 @@ namespace detail
 		{
 #if BOOST_AFIO_VALIDATE_INPUTS
 			if(!validate())
-				throw std::runtime_error("Inputs are invalid.");
+				BOOST_AFIO_THROW(std::runtime_error("Inputs are invalid."));
 #endif
 		}
 	};

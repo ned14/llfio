@@ -65,7 +65,17 @@ else
 { 
     SHELL  [ SHELL "find -L -name test_file_glob.sh" ]  ; 
 }
-local test_files = [ glob  *.cpp : main.cpp ] ;
+
+# Let user limit test_files
+local test_files = [ MATCH ^--test=(.*)$ : $(.argv) ] ;
+if $(test_files)
+{
+}
+else
+{
+    test_files = [ glob  *.cpp : main.cpp ] ;
+}
+
 
 # link tests (just compile and links targets)
 if "--link-test"  in $(.argv)  
