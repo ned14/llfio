@@ -214,9 +214,9 @@ class atomic
 {
 	typedef boost::atomic<T> Base;
 #else
-	: public boost::afio::atomic<T>
+	: public std::atomic<T>
 {
-	typedef boost::afio::atomic<T> Base;
+	typedef std::atomic<T> Base;
 #endif
 
 public:
