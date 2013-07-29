@@ -718,7 +718,7 @@ template<class F, class... Args> async_io_op async_file_io_dispatcher_base::chai
 		else
 			*ret.h=threadsource().enqueue(std::bind(boundf.second, h)).share();
 	}
-	auto opsit=p->ops.insert(std::make_pair(thisid, detail::async_file_io_dispatcher_op((detail::OpType) optype, flags, ret.h)));
+	auto opsit=p->ops.insert(std::make_pair(thisid, std::move(detail::async_file_io_dispatcher_op((detail::OpType) optype, flags, ret.h))));
 	assert(opsit.second);
 	BOOST_AFIO_DEBUG_PRINT("I %u < %u (%s)\n", (unsigned) thisid, (unsigned) precondition.id, detail::optypes[static_cast<int>(optype)]);
 	auto unopsit=boost::afio::detail::Undoer([this, opsit, thisid](){
