@@ -18,7 +18,6 @@ using boost::to_string;
 #define WIN32_LEAN_AND_MEAN 1
 #endif
 #include <Windows.h>
-#include <codecvt>
 
 namespace boost {
     namespace afio{
