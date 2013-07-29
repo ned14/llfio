@@ -367,8 +367,6 @@ namespace detail {
 			: optype(_optype), flags(_flags), h(_h) { }
 		async_file_io_dispatcher_op(async_file_io_dispatcher_op &&o) BOOST_NOEXCEPT_OR_NOTHROW : optype(o.optype), flags(std::move(o.flags)), h(std::move(o.h)),
 			detached_promise(std::move(o.detached_promise)), completions(std::move(o.completions)) { }
-	private:
-		async_file_io_dispatcher_op(const async_file_io_dispatcher_op &o);
 	};
 	struct async_file_io_dispatcher_base_p
 	{

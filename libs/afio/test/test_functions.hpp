@@ -10,6 +10,11 @@ Created: Feb 2013
 // If defined, uses a ton more memory and is many orders of magnitude slower.
 #define DEBUG_TORTURE_TEST 1
 
+#ifdef __MINGW32__
+// Mingw doesn't define putenv() needed by Boost.Test
+extern int putenv(char*);
+#endif
+
 #include <utility>
 #include <sstream>
 #include <iostream>
@@ -77,7 +82,7 @@ static void _1000_open_write_close_deletes(std::shared_ptr<boost::afio::async_fi
         std::vector<async_path_op_req> manyfilereqs;
         manyfilereqs.reserve(1000);
         for(size_t n=0; n<1000; n++)
-                manyfilereqs.push_back(async_path_op_req(mkdir, "testdir/"+std::to_string(n), file_flags::Create|file_flags::Write));
+                manyfilereqs.push_back(async_path_op_req(mkdir, "testdir/"+boost::to_string(n), file_flags::Create|file_flags::Write));
         auto manyopenfiles(dispatcher->file(manyfilereqs));
 
         // Write to each of those 1000 files as they are opened
@@ -314,7 +319,7 @@ static void evil_random_io(std::shared_ptr<boost::afio::async_file_io_dispatcher
     std::vector<async_path_op_req> manyfilereqs;
     manyfilereqs.reserve(no);
     for(size_t n=0; n<no; n++)
-            manyfilereqs.push_back(async_path_op_req(mkdir, "testdir/"+std::to_string(n), file_flags::Create|file_flags::ReadWrite));
+            manyfilereqs.push_back(async_path_op_req(mkdir, "testdir/"+boost::to_string(n), file_flags::Create|file_flags::ReadWrite));
     auto manyopenfiles(dispatcher->file(manyfilereqs));
     std::vector<off_t> sizes(no, bytes);
     auto manywrittenfiles(dispatcher->truncate(manyopenfiles, sizes));
@@ -423,7 +428,7 @@ static void evil_random_io(std::shared_ptr<boost::afio::async_file_io_dispatcher
                     size_t bytes=0;
                     for(auto &b : failedop->first->req.buffers)
                             bytes+=boost::asio::buffer_size(b);
-                    cout << "   " << (failedop->first->write ? "Write to" : "Read from") << " " << to_string(failedop->first->req.where) << " at offset " << failedop->second << " into bytes " << bytes << endl;
+                    cout << "   " << (failedop->first->write ? "Write to" : "Read from") << " " << boost::to_string(failedop->first->req.where) << " at offset " << failedop->second << " into bytes " << bytes << endl;
             }
     }
     BOOST_TEST_MESSAGE("Checking if the final files have exactly the right contents ... this may take a bit ...");
@@ -448,7 +453,7 @@ static void evil_random_io(std::shared_ptr<boost::afio::async_file_io_dispatcher
         for(size_t n=0; n<no; n++)
             if(memhashes[n]!=filehashes[n]) // compare hash values from ram and actual IO
             {
-                    string failmsg("File "+to_string(n)+" contents were not what they were supposed to be!");
+                    string failmsg("File "+boost::to_string(n)+" contents were not what they were supposed to be!");
                     BOOST_TEST_MESSAGE(failmsg.c_str());
             }
     }

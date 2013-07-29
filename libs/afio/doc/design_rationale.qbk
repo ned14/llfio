@@ -151,15 +151,22 @@ explaining, so it gets a whole section to itself.
 [endsect] [/overview]
 
 [section:acid_write_ordering Write ordering constraints, and how these can
-be used to achieve the Durability in ACID without needing `fsync()`]
+be used to achieve some of the Durability in ACID without needing `fsync()`]
 
 [*ACID] stands for Atomic Consistent Isolated Durable, and it is a key requirement for
 database implementations which manage data you don't want to lose, which tends to be
-a common use case. While achieving all four is non-trivial, achieving Durability is
+a common use case in databases. Whilst achieving all four is non-trivial, achieving Durability is
 simultaneously both the easiest and the hardest of the four. This is because the easy
 way of ensuring durability is to always wait for each write to reach non-volatile storage,
 yet such a naive solution is typically exceptionally slow. Achieving performant
 data durability is without doubt a wicked hard problem in computer science.
+
+Because a majority of users of __boost__afio__ are going to be people needing
+some form of data persistence guarantees, this section is a short essay on the current
+state of data persistence on various popular platforms. Any errors or omissions, both
+of which are probable, are entirely the fault of this author Niall Douglas. Note also that
+the forthcoming information was probably correct around the summer of 2013, and it highly
+likely to become less correct over time.
 
 [section:background Background]
 
@@ -184,35 +191,41 @@ and there is usually no portable way of knowing when it has completed.
 There is also the matter of the difference between data and ['meta]data: metadata
 is the stuff a filing system stores such that it knows about your data. For each
 of the first two of the above three families of functions, most systems provide
-three variants: flush metadata, flush data, and flush both metadata and data.
+three variants: flush metadata, flush data, and flush both metadata and data, so
+for clarity:
 
-All major filing systems on all major platforms provide the above three families of
-function to ensure data reaches non-volatile storage. Most of the major filing systems
-in recent versions of major platforms have additionally added significant extra guarantees
-regarding metadata alone: for example, UFS with soft updates (from BSD) guarantees
-consistency of metadata through imposing a write order on metadata writes. Similarly,
-recent versions of ext4 guarantee that metadata older than five seconds is sent to
-non-volatile storage, again by imposing a write order. On NTFS and HFS+, directory metadata
-is guaranteed to be sent to non-volatile storage on any file close: this ensures
-that a newly created file at least shows up in its directory, even if the file's
-contents is corrupted or lost. Once again, write ordering, especially when combined
-with Copy On Write (COW) of changed structures, is the tool internally used to ensure
-that the filing system's metadata is always kept in a recoverable state.
+[table:data_persistence_types Mechanisms for enforcing data persistence onto physical storage
+  [[][Flush file metadata][Flush file data][Flush both metadata and data]]
+  [[Once off][`fsync(parentdir_fd)`][`fdatasync(fd)`][`fsync(fd)`]]
+  [[Always][Varies[footnote Many filing systems (NTFS, HFS+, ext3 with `data=ordered`, ext4 with `alloc_on_commit`) keep back a metadata flush until when a file handle close causes data to finish reaching physical storage. This ensures that files don't appear in directories with zero sizes.]][`fcntl(fd, F_SETFL, O_DSYNC)`][`fcntl(fd, F_SETFL, O_SYNC)`]]
+]
+
+In addition to manually flushing data to physical storage, every filing system also
+implements some form of timer based flush whereby a piece of written data will always
+be sent to physical storage within some predefined period of time after the write.
+Most filing systems implement different timeouts for metadata and data, but typically
+on almost all production filing systems -- unless they are in a power-saving laptop mode --
+any data write is guaranteed to be sent to non-volatile storage within one minute.
+Let me be clear here for later argument's sake: ['the filing system is allowed to
+reorder writes by up to one minute in time from the order in which they were issued].
+Or put another way, most filing systems have a one minute temporal constraint on
+write order.
 
 Most people think of `fsync()`, `O_SYNC` and `sync()` in terms of flushing caches.
 An alternative way of thinking about them is that they impose a write order on
-writes to non-volatile storage. There is no doubt that they are a very crude and
+writes to non-volatile storage in addition to the timeout based write order. There
+is no doubt that they are a very crude and
 highly inefficient way of doing so, but they do open the option of ['emulating]
-native filing system support for write ordering constraints.
+native filing system support for write ordering constraints when nothing else better
+is available. So why is the ability to constrain write ordering important?
 
 [endsect] [/background]
 
 [section:write_ordering_data Write ordering data and durability: why does it matter?]
 
-What you're about to read is probably too much detail for AFIO and reads more like a
-description of how the aforementioned forthcoming TripleGit graph store database
-implements durability. Nevertheless, as many users of AFIO will likely want to know how to ensure
-written data is never lost, this discussion is probably useful.
+Implementing performant Durability consists of answering two questions: (i) how long does it take to restore
+a consistent state after an unexpected power loss, and (ii) how much most recent data are
+you willing to lose?
 
 A performant way for a database to achieve the Consistent and Isolated part is to allow
 abortable, garbage collectable concurrent writes of new data into separate partitions, and to push
