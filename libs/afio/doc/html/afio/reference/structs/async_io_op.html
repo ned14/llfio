@@ -27,7 +27,7 @@
 <a name="afio.reference.structs.async_io_op"></a><a class="link" href="async_io_op.html" title="async_io_op">async_io_op</a>
 </h4></div></div></div>
 <p>
-          <a class="indexterm" name="id871033"></a>
+          <a class="indexterm" name="id949612"></a>
 A reference to an asynchronous operation.
         </p>
 <h6>
@@ -50,7 +50,7 @@ A reference to an asynchronous operation.
 <span class="special">{</span>
   <span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span> <span class="identifier">shared_future</span><span class="special">&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span> <span class="identifier">detail</span><span class="special">::</span><span class="identifier">async_io_handle</span> <span class="special">&gt;</span> <span class="special">&gt;</span> <span class="special">&gt;</span> <span class="identifier">h</span><span class="special">;</span>  <span class="comment">// A future handle to the item being operated upon. </span>
   <span class="identifier">size_t</span> <span class="identifier">id</span><span class="special">;</span>                                                                         <span class="comment">// A unique id for this operation. </span>
-  <span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span> <span class="identifier">async_file_io_dispatcher_base</span> <span class="special">&gt;</span> <span class="identifier">parent</span><span class="special">;</span>                           <span class="comment">// The parent dispatcher. </span>
+  <span class="identifier">async_file_io_dispatcher_base</span> <span class="special">*</span> <span class="identifier">parent</span><span class="special">;</span>                                            <span class="comment">// The parent dispatcher. </span>
 <span class="special">};</span>
 </pre>
 <h6>
@@ -125,15 +125,15 @@ A reference to an asynchronous operation.
 </tr>
 <tr>
 <td>
-<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">async_io_op</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span> <span class="identifier">async_file_io_dispatcher_base</span> <span class="special">&gt;</span> <span class="identifier">_parent</span><span class="special">,</span> <span class="identifier">size_t</span> <span class="identifier">_id</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span> <span class="identifier">shared_future</span><span class="special">&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span> <span class="identifier">detail</span><span class="special">::</span><span class="identifier">async_io_handle</span> <span class="special">&gt;&gt;&gt;</span> <span class="identifier">_handle</span><span class="special">)</span></pre>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">async_io_op</span><span class="special">(</span><span class="identifier">async_file_io_dispatcher_base</span> <span class="special">*</span> <span class="identifier">_parent</span><span class="special">,</span> <span class="identifier">size_t</span> <span class="identifier">_id</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span> <span class="identifier">shared_future</span><span class="special">&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span> <span class="identifier">detail</span><span class="special">::</span><span class="identifier">async_io_handle</span> <span class="special">&gt;&gt;&gt;</span> <span class="identifier">_handle</span><span class="special">)</span></pre>
                 </td>
 <td>
                 </td>
 <td>
                   <p>
-                    <span class="bold"><strong>std::shared_ptr&lt; async_file_io_dispatcher_base
-                    &gt;</strong></span>: <span class="emphasis"><em>_parent</em></span>: The dispatcher
-                    this op belongs to.
+                    <span class="bold"><strong>async_file_io_dispatcher_base *</strong></span>:
+                    <span class="emphasis"><em>_parent</em></span>: The dispatcher this op belongs
+                    to.
                   </p>
                   <p>
                     <span class="bold"><strong>size_t</strong></span>: <span class="emphasis"><em>_id</em></span>:
@@ -148,15 +148,15 @@ A reference to an asynchronous operation.
 </tr>
 <tr>
 <td>
-<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">async_io_op</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span> <span class="identifier">async_file_io_dispatcher_base</span> <span class="special">&gt;</span> <span class="identifier">_parent</span><span class="special">,</span> <span class="identifier">size_t</span> <span class="identifier">_id</span><span class="special">)</span></pre>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">async_io_op</span><span class="special">(</span><span class="identifier">async_file_io_dispatcher_base</span> <span class="special">*</span> <span class="identifier">_parent</span><span class="special">,</span> <span class="identifier">size_t</span> <span class="identifier">_id</span><span class="special">)</span></pre>
                 </td>
 <td>
                 </td>
 <td>
                   <p>
-                    <span class="bold"><strong>std::shared_ptr&lt; async_file_io_dispatcher_base
-                    &gt;</strong></span>: <span class="emphasis"><em>_parent</em></span>: The dispatcher
-                    this op belongs to.
+                    <span class="bold"><strong>async_file_io_dispatcher_base *</strong></span>:
+                    <span class="emphasis"><em>_parent</em></span>: The dispatcher this op belongs
+                    to.
                   </p>
                   <p>
                     <span class="bold"><strong>size_t</strong></span>: <span class="emphasis"><em>_id</em></span>:

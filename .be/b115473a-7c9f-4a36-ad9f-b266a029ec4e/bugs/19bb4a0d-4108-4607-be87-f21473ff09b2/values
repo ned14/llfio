@@ -9,7 +9,7 @@ reporter: '"Niall Douglas \(s \[underscore\] sourceforge {at} nedprod \[dot\] co
 severity: minor
 
 
-status: open
+status: fixed
 
 
 summary: Torture test fails on Windows IOCP backend. Either it's a bug in Boost.ASIO

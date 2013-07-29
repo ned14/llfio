@@ -12,16 +12,16 @@
 [section:async_data_op_req_constt_ async_data_op_req< const T >]
 
 '''<indexterm><primary>async_data_op_req&lt; const T &gt;</primary></indexterm>'''
-A convenience bundle of precondition, data and where for writing from a single const T *. Data [*MUST] stay around until the operation completes. 
+A convenience bundle of precondition, data and where for writing from a single [^`const T *`]. Data [*MUST] stay around until the operation completes. 
 
 [heading Synopsis]
 ``template<class T>
 struct async_data_op_req< const T >
-      : public async_data_op_req< const void >
+      : public detail::async_data_op_req_impl< true >
 {
   std::vector< boost::asio::const_buffer > buffers;  // A sequence of const Boost.ASIO buffers to write from. 
-  async_io_op precondition;                          // An optional precondition for this operation. 
-  off_t where;                                       // The offset into which to write. 
+  async_io_op precondition;                          // A precondition containing an open file handle for this operation. 
+  off_t where;                                       // The offset at which to write. 
 };
 ``
 
@@ -99,13 +99,13 @@ True if contents are correct
 ]]
 [[`` async_data_op_req(async_io_op _precondition, const T * v, size_t _length, off_t _where)``
 
-] [Constructs an instance. ] [[* async_io_op]: ['_precondition]:  An optional precondition for this operation
+] [Constructs an instance. ] [[* async_io_op]: ['_precondition]:  An optional precondition for this operation 
 
-[* const T *]: ['v]:  A pointer to memory or reference to object into which to read or write
+[* const T *]: ['v]:  A pointer to memory or reference to object into which to read or write 
 
 [* size_t]: ['_length]:  The number of bytes to transfer 
 
-[* off_t]: ['_where]:  The offset at which to transfer
+[* off_t]: ['_where]:  The offset at which to transfer 
 
 
 

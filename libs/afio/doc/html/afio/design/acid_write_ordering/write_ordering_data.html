@@ -1,0 +1,175 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Write ordering data and durability: why does it matter?</title>
+<link rel="stylesheet" href="../../../myboostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../../../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 0.1">
+<link rel="up" href="../acid_write_ordering.html" title="Write ordering constraints, and how these can be used to achieve the Durability in ACID without needing fsync()">
+<link rel="prev" href="background.html" title="Background">
+<link rel="next" href="../../compilation.html" title="Compilation">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr>
+<td valign="top"><img alt="Boost C++ Libraries" width="277" height="86" src="../../../../../../../boost.png"></td>
+<td align="center"><a href="../../../../../../../index.html">Home</a></td>
+<td align="center"><a href="../../../../../../../libs/libraries.htm">Libraries</a></td>
+<td align="center"><a href="http://www.boost.org/users/people.html">People</a></td>
+<td align="center"><a href="http://www.boost.org/users/faq.html">FAQ</a></td>
+<td align="center"><a href="../../../../../../../more/index.htm">More</a></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="background.html"><img src="../../../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../acid_write_ordering.html"><img src="../../../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="../../compilation.html"><img src="../../../../../../../doc/src/images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h4 class="title">
+<a name="afio.design.acid_write_ordering.write_ordering_data"></a><a class="link" href="write_ordering_data.html" title="Write ordering data and durability: why does it matter?">Write
+        ordering data and durability: why does it matter?</a>
+</h4></div></div></div>
+<p>
+          What you're about to read is probably too much detail for AFIO and reads
+          more like a description of how the aforementioned forthcoming TripleGit
+          graph store database implements durability. Nevertheless, as many users
+          of AFIO will likely want to know how to ensure written data is never lost,
+          this discussion is probably useful.
+        </p>
+<p>
+          A performant way for a database to achieve the Consistent and Isolated
+          part is to allow abortable, garbage collectable concurrent writes of new
+          data into separate partitions, and to push the atomicity enforcement into
+          a very small piece of ordering logic in order to reduce transaction contention
+          by multiple writers as much as possible. Generally, the ordering logic
+          will make use of some sort of intent log which records what the database
+          intends to do (and generally you want that intent log on as low latency
+          a device as possible). Generally speaking, that intent log is usually some
+          form of atomically appended record -- and usefully every major filing system
+          supports atomic appends to a file. What you then traditionally do to implement
+          a transaction is to write your data to the filing system, ensure it has
+          reached non-volatile storage, append the knowledge it definitely is on
+          non-volatile storage to the intent log, and then ensure your append also
+          has reached non-volatile storage. This is presently the only way to ensure
+          that valuable data definitely can not be lost. The obvious problem is that
+          this method involves writing all your data with <code class="computeroutput"><span class="identifier">O_SYNC</span></code>
+          and using <code class="computeroutput"><span class="identifier">fsync</span><span class="special">()</span></code>
+          on the intent log. This might perform okay with a single writer, but with
+          multiple writers performance is usually awful, especially on storage incapable
+          of high queue depths and potentially many hundreds of milliseconds of latency
+          (e.g. SD Cards).
+        </p>
+<p>
+          This raises an alternative: write all your data, but keep a hash like a
+          SHA of its contents as you write it. When you write your intent log, append
+          all the SHAs of the items you just wrote and skip <code class="computeroutput"><span class="identifier">O_DATA</span></code>
+          and <code class="computeroutput"><span class="identifier">fsync</span><span class="special">()</span></code>
+          completely. If power gets removed before all the data is written to non-volatile
+          storage, you can figure out that the database is dirty easily enough, and
+          you simply parse from the end of the intent log backwards, checking each
+          item's contents to ensure their SHAs match up, throwing away any transaction
+          where any file is missing or any file's contents don't match. On a filing
+          system such as ext4 where data is guaranteed to be sent to non-volatile
+          storage after one minute<a href="#ftn.afio.design.acid_write_ordering.write_ordering_data.f0" class="footnote" name="afio.design.acid_write_ordering.write_ordering_data.f0"><sup class="footnote">[5]</sup></a>, and of course so long as you don't mind losing up to one minute's
+          worth of data, this solution can have much better performance than the
+          previous solution with lots of simultaneous writers.
+        </p>
+<p>
+          The problem though is that while better, performance is still far less
+          than optimal. Firstly, you have to calculate a whole load of hashes all
+          the time, and that isn't trivial especially on lower end platforms like
+          a mobile phone where 25-30 cycles per byte SHA256 performance might be
+          typical. Secondly, dirty database reconstruction is rather like how ext2
+          had to call <code class="computeroutput"><span class="identifier">fsck</span></code> on boot:
+          a whole load of time and i/o must be expended to fix up damage in the store,
+          and while it's running one generally must wait (one can work around this
+          using metadata journaling to shortcut having to figure out what is good
+          and bad, but I digress).
+        </p>
+<p>
+          What would be really, really useful is if the filing system exposed its
+          internal write ordering constraint implementation to user mode code, so
+          one could say <span class="quote">&#8220;<span class="quote">schedule writing A, B, C and D in any order whenever
+          you get round to it, but you <span class="emphasis"><em>must</em></span> write all of those
+          before you write any of E, F and G</span>&#8221;</span>. Such an ability gives maximum
+          scope to the filing system to reorder and coalesce writes as it sees fit,
+          but still allows database implementations to ensure that a transaction's
+          intent log entry can never appear without all the data it refers to. Such
+          an ability would eliminate the need for expensive dirty database checking
+          and reconstruction, or any journalling infrastructure used to skip the
+          manual integrity checking.
+        </p>
+<p>
+          In lieu of the lack of just such a facility, we can implementat a reasonable
+          emulation in some circumstances. For some filing systems like btrfs or
+          ZFS, or filing systems with certain mount options e.g. ext3/4 with the
+          option journal=data, one knows that a file's modified timestamp <span class="bold"><strong>always</strong></span> equals when it was last written to, and moreover
+          one is guaranteed that a write is either fully applied or not (i.e. partial
+          data writes, including desynchronisation of file contents from file metadata,
+          is guaranteed to never happen). This lets you shortcut checking the intent
+          log: simply rewind to where the intent log first matches the filing system
+          metadata, and proceed to check intent log entries and filing system metadata
+          for the duration which you know is the maximum time between <code class="computeroutput"><span class="identifier">sync</span><span class="special">()</span></code>
+          invocations by the system.
+        </p>
+<p>
+          ZFS, interestingly, adds an even stronger guarantee due to its use of transaction
+          groups which are, for all intents and purposes, partial snapshots issued
+          once every five seconds in ZFSs before the addition of the ZFS Write Throttle.
+          Data writes may occur in any order within a transaction group, but transaction
+          group commits are strongly tied to the wall clock and are <span class="bold"><strong>always</strong></span>
+          committed sequentially, and so long as it takes less than five seconds
+          to write five seconds of buffered writes, all is good. Since the addition
+          of the ZFS Write Throttle, the default settings are to buffer up to thirty
+          seconds of writes before pacing the acceptance of new write data to match
+          the speed of the non-volatile storage (which may be a ZIL if you're doing
+          synchronous writes). This implies up to thirty seconds of buffered data
+          could be lost, but note that ZFS still guarantees transaction group sequential
+          write order.
+        </p>
+<p>
+          <a href="#ftn.afio.design.acid_write_ordering.write_ordering_data.f1" class="footnote" name="afio.design.acid_write_ordering.write_ordering_data.f1"><sup class="footnote">[6]</sup></a>
+        </p>
+<p>
+          TODO
+        </p>
+<p>
+          Additionally if the database user is savvy enough to place the data store
+          in its own partition, manually calling something like Linux's <code class="computeroutput"><span class="identifier">syncfs</span><span class="special">()</span></code>
+          more frequently than the system's cron job does will ensure that the distance
+          between the end of the intent log and the most recently fully stored data
+          isn't too long.
+        </p>
+<p>
+          TODO FINISH.
+        </p>
+<p>
+          In the hope that one day filing systems might actually expose their preexisting
+          non-<code class="computeroutput"><span class="identifier">fsync</span><span class="special">()</span></code>
+          write ordering constraints like I just described, AFIO makes available
+          such a facility using the XXX <code class="computeroutput"><span class="identifier">file_flags</span></code>
+          member.
+        </p>
+<div class="footnotes">
+<br><hr style="width:100; text-align:left;margin-left: 0">
+<div id="ftn.afio.design.acid_write_ordering.write_ordering_data.f0" class="footnote"><p><a href="#afio.design.acid_write_ordering.write_ordering_data.f0" class="para"><sup class="para">[5] </sup></a>
+            This is the default, and it may be changed by a system e.g. I have seen
+            thirty minutes set for laptops.
+          </p></div>
+<div id="ftn.afio.design.acid_write_ordering.write_ordering_data.f1" class="footnote"><p><a href="#afio.design.acid_write_ordering.write_ordering_data.f1" class="para"><sup class="para">[6] </sup></a>
+            http://www.c0t0d0s0.org/archives/5343-Insights-into-ZFS-today-The-nature-of-writing-things.html
+          </p></div>
+</div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2013 Niall Douglas and Paul Kirth<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="background.html"><img src="../../../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../acid_write_ordering.html"><img src="../../../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="../../compilation.html"><img src="../../../../../../../doc/src/images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

@@ -80,7 +80,7 @@ BOOST_SCOPED_ENUM_DECLARE_END(allocator_alignment)
 		return ret;
 #endif
 	}
-    inline void deallocate_aligned_memory(void* ptr) noexcept
+    inline void deallocate_aligned_memory(void* ptr) BOOST_NOEXCEPT_OR_NOTHROW
 	{
 #ifdef BOOST_WINDOWS
 		_aligned_free(ptr);
@@ -114,23 +114,23 @@ public:
     struct rebind { typedef aligned_allocator<U, Align> other; };
 
 public:
-    aligned_allocator() noexcept
+    aligned_allocator() BOOST_NOEXCEPT_OR_NOTHROW
     {}
 
     template <class U>
-    aligned_allocator(const aligned_allocator<U, Align>&) noexcept
+    aligned_allocator(const aligned_allocator<U, Align>&) BOOST_NOEXCEPT_OR_NOTHROW
     {}
 
     size_type
-    max_size() const noexcept
+    max_size() const BOOST_NOEXCEPT_OR_NOTHROW
     { return (size_type(~0) - size_type(Align)) / sizeof(T); }
 
     pointer
-    address(reference x) const noexcept
+    address(reference x) const BOOST_NOEXCEPT_OR_NOTHROW
     { return std::addressof(x); }
 
     const_pointer
-    address(const_reference x) const noexcept
+    address(const_reference x) const BOOST_NOEXCEPT_OR_NOTHROW
     { return std::addressof(x); }
 
     pointer
@@ -146,7 +146,7 @@ public:
     }
 
     void
-    deallocate(pointer p, size_type) noexcept
+    deallocate(pointer p, size_type) BOOST_NOEXCEPT_OR_NOTHROW
     { return detail::deallocate_aligned_memory(p); }
 
 #if !defined(BOOST_MSVC) || BOOST_MSVC>1700
@@ -210,19 +210,19 @@ public:
     struct rebind { typedef aligned_allocator<U, Align> other; };
 
 public:
-    aligned_allocator() noexcept
+    aligned_allocator() BOOST_NOEXCEPT_OR_NOTHROW
     {}
 
     template <class U>
-    aligned_allocator(const aligned_allocator<U, Align>&) noexcept
+    aligned_allocator(const aligned_allocator<U, Align>&) BOOST_NOEXCEPT_OR_NOTHROW
     {}
 
     size_type
-    max_size() const noexcept
+    max_size() const BOOST_NOEXCEPT_OR_NOTHROW
     { return (size_type(~0) - size_type(Align)) / sizeof(T); }
 
     const_pointer
-    address(const_reference x) const noexcept
+    address(const_reference x) const BOOST_NOEXCEPT_OR_NOTHROW
     { return std::addressof(x); }
 
     pointer
@@ -238,7 +238,7 @@ public:
     }
 
     void
-    deallocate(pointer p, size_type) noexcept
+    deallocate(pointer p, size_type) BOOST_NOEXCEPT_OR_NOTHROW
     { return detail::deallocate_aligned_memory(p); }
 
     template <class U, class ...Args>
@@ -254,13 +254,13 @@ public:
 template <typename T, size_t TAlign, typename U, size_t UAlign>
 inline
 bool
-operator== (const aligned_allocator<T,TAlign>&, const aligned_allocator<U, UAlign>&) noexcept
+operator== (const aligned_allocator<T,TAlign>&, const aligned_allocator<U, UAlign>&) BOOST_NOEXCEPT_OR_NOTHROW
 { return TAlign == UAlign; }
 
 template <typename T, size_t TAlign, typename U, size_t UAlign>
 inline
 bool
-operator!= (const aligned_allocator<T,TAlign>&, const aligned_allocator<U, UAlign>&) noexcept
+operator!= (const aligned_allocator<T,TAlign>&, const aligned_allocator<U, UAlign>&) BOOST_NOEXCEPT_OR_NOTHROW
 { return TAlign != UAlign; }
 
 

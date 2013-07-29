@@ -22,7 +22,7 @@ The id field is always valid (and non-zero) if this reference is valid. The h fi
 {
   std::shared_ptr< shared_future< std::shared_ptr< detail::async_io_handle > > > h;  // A future handle to the item being operated upon. 
   size_t id;                                                                         // A unique id for this operation. 
-  std::shared_ptr< async_file_io_dispatcher_base > parent;                           // The parent dispatcher. 
+  async_file_io_dispatcher_base * parent;                                            // The parent dispatcher. 
 };
 ``
 
@@ -51,9 +51,9 @@ The id field is always valid (and non-zero) if this reference is valid. The h fi
 
 
 ]]
-[[``async_io_op(std::shared_ptr< async_file_io_dispatcher_base > _parent, size_t _id, std::shared_ptr< shared_future< std::shared_ptr< detail::async_io_handle >>> _handle)``
+[[``async_io_op(async_file_io_dispatcher_base * _parent, size_t _id, std::shared_ptr< shared_future< std::shared_ptr< detail::async_io_handle >>> _handle)``
 
-] [] [[* std::shared_ptr< async_file_io_dispatcher_base >]: ['_parent]:  The dispatcher this op belongs to. 
+] [] [[* async_file_io_dispatcher_base *]: ['_parent]:  The dispatcher this op belongs to. 
 
 [* size_t]: ['_id]:  The unique non-zero id of this op. 
 
@@ -63,9 +63,9 @@ The id field is always valid (and non-zero) if this reference is valid. The h fi
 
 
 ]]
-[[``async_io_op(std::shared_ptr< async_file_io_dispatcher_base > _parent, size_t _id)``
+[[``async_io_op(async_file_io_dispatcher_base * _parent, size_t _id)``
 
-] [] [[* std::shared_ptr< async_file_io_dispatcher_base >]: ['_parent]:  The dispatcher this op belongs to. 
+] [] [[* async_file_io_dispatcher_base *]: ['_parent]:  The dispatcher this op belongs to. 
 
 [* size_t]: ['_id]:  The unique non-zero id of this op. 
 

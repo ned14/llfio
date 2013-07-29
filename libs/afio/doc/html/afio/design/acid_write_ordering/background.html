@@ -1,0 +1,104 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Background</title>
+<link rel="stylesheet" href="../../../myboostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../../../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 0.1">
+<link rel="up" href="../acid_write_ordering.html" title="Write ordering constraints, and how these can be used to achieve the Durability in ACID without needing fsync()">
+<link rel="prev" href="../acid_write_ordering.html" title="Write ordering constraints, and how these can be used to achieve the Durability in ACID without needing fsync()">
+<link rel="next" href="write_ordering_data.html" title="Write ordering data and durability: why does it matter?">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr>
+<td valign="top"><img alt="Boost C++ Libraries" width="277" height="86" src="../../../../../../../boost.png"></td>
+<td align="center"><a href="../../../../../../../index.html">Home</a></td>
+<td align="center"><a href="../../../../../../../libs/libraries.htm">Libraries</a></td>
+<td align="center"><a href="http://www.boost.org/users/people.html">People</a></td>
+<td align="center"><a href="http://www.boost.org/users/faq.html">FAQ</a></td>
+<td align="center"><a href="../../../../../../../more/index.htm">More</a></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../acid_write_ordering.html"><img src="../../../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../acid_write_ordering.html"><img src="../../../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="write_ordering_data.html"><img src="../../../../../../../doc/src/images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h4 class="title">
+<a name="afio.design.acid_write_ordering.background"></a><a class="link" href="background.html" title="Background">Background</a>
+</h4></div></div></div>
+<p>
+          Filing system implementations traditionally offer three methods of ensuring
+          that writes have reached non-volatile storage:
+        </p>
+<div class="orderedlist"><ol class="orderedlist" type="1">
+<li class="listitem">
+              The family of <code class="computeroutput"><span class="identifier">fsync</span><span class="special">()</span></code> or its equivalent functions, which
+              flush any cached written data not yet stored onto non-volatile storage.
+              These are usually synchronous operations, in that they do not return
+              until they have finished. A big caveat with these functions is that
+              some filing systems e.g. ext3 flush <span class="emphasis"><em>every</em></span> bit
+              of pending write data for the filing system instead of just the pending
+              writes for the file handle specified i.e. they are equivalent to a
+              synchronous <code class="computeroutput"><span class="identifier">sync</span><span class="special">()</span></code>
+              as described below.
+            </li>
+<li class="listitem">
+              The family of <code class="computeroutput"><span class="identifier">O_SYNC</span></code>
+              or its equivalent per file handle flags, which simply disable any form
+              of write back caching. These usually make all data write functions
+              not return until written data has reached non-volatile storage.
+            </li>
+<li class="listitem">
+              The whole filing system cached written data flush, often performed
+              by a function like <code class="computeroutput"><span class="identifier">sync</span><span class="special">()</span></code>. Unlike the previous two, this is
+              usually an asynchronous operation and there is usually no portable
+              way of knowing when it has completed.
+            </li>
+</ol></div>
+<p>
+          There is also the matter of the difference between data and <span class="emphasis"><em>meta</em></span>data:
+          metadata is the stuff a filing system stores such that it knows about your
+          data. For each of the first two of the above three families of functions,
+          most systems provide three variants: flush metadata, flush data, and flush
+          both metadata and data.
+        </p>
+<p>
+          All major filing systems on all major platforms provide the above three
+          families of function to ensure data reaches non-volatile storage. Most
+          of the major filing systems in recent versions of major platforms have
+          additionally added significant extra guarantees regarding metadata alone:
+          for example, UFS with soft updates (from BSD) guarantees consistency of
+          metadata through imposing a write order on metadata writes. Similarly,
+          recent versions of ext4 guarantee that metadata older than five seconds
+          is sent to non-volatile storage, again by imposing a write order. On NTFS
+          and HFS+, directory metadata is guaranteed to be sent to non-volatile storage
+          on any file close: this ensures that a newly created file at least shows
+          up in its directory, even if the file's contents is corrupted or lost.
+          Once again, write ordering, especially when combined with Copy On Write
+          (COW) of changed structures, is the tool internally used to ensure that
+          the filing system's metadata is always kept in a recoverable state.
+        </p>
+<p>
+          Most people think of <code class="computeroutput"><span class="identifier">fsync</span><span class="special">()</span></code>, <code class="computeroutput"><span class="identifier">O_SYNC</span></code>
+          and <code class="computeroutput"><span class="identifier">sync</span><span class="special">()</span></code>
+          in terms of flushing caches. An alternative way of thinking about them
+          is that they impose a write order on writes to non-volatile storage. There
+          is no doubt that they are a very crude and highly inefficient way of doing
+          so, but they do open the option of <span class="emphasis"><em>emulating</em></span> native
+          filing system support for write ordering constraints.
+        </p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2013 Niall Douglas and Paul Kirth<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../acid_write_ordering.html"><img src="../../../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../acid_write_ordering.html"><img src="../../../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="write_ordering_data.html"><img src="../../../../../../../doc/src/images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

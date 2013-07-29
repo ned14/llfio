@@ -28,16 +28,23 @@
           (batch)</a>
 </h5></div></div></div>
 <p>
-            <a class="indexterm" name="id888238"></a>
+            <a class="indexterm" name="id966567"></a>
 Schedule a batch of asynchronous data reads after preceding operations.
           </p>
 <h6>
 <a name="afio.reference.classes.async_file_io_dispatcher_base.read_1_batch.h0"></a>
-            <span class="phrase"><a name="afio.reference.classes.async_file_io_dispatcher_base.read_1_batch.synopsis"></a></span><a class="link" href="read_1_batch.html#afio.reference.classes.async_file_io_dispatcher_base.read_1_batch.synopsis">Synopsis</a>
+            <span class="phrase"><a name="afio.reference.classes.async_file_io_dispatcher_base.read_1_batch.description"></a></span><a class="link" href="read_1_batch.html#afio.reference.classes.async_file_io_dispatcher_base.read_1_batch.description">Description</a>
           </h6>
-<pre class="programlisting"><span class="keyword">virtual</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span><span class="identifier">async_io_op</span><span class="special">&gt;</span> <span class="identifier">async_file_io_dispatcher_base</span><span class="special">::</span><span class="identifier">read</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">async_data_op_req</span><span class="special">&lt;</span> <span class="keyword">void</span> <span class="special">&gt;&gt;</span> <span class="special">&amp;</span> <span class="identifier">ops</span><span class="special">)</span></pre>
+<pre class="programlisting"><span class="identifier">Note</span> <span class="identifier">that</span> <span class="identifier">on</span> <span class="identifier">Windows</span> <span class="keyword">this</span> <span class="identifier">call</span> <span class="identifier">issues</span> <span class="identifier">a</span> <span class="identifier">separate</span> <span class="identifier">async</span> <span class="identifier">file</span> <span class="identifier">operation</span> <span class="keyword">for</span> <span class="identifier">each</span> <span class="identifier">buffer</span> <span class="identifier">supplied</span><span class="special">,</span> <span class="identifier">thus</span> <span class="identifier">making</span> <span class="identifier">scatter</span><span class="special">/</span><span class="identifier">gather</span> <span class="identifier">i</span><span class="special">/</span><span class="identifier">o</span> <span class="identifier">no</span> <span class="identifier">more</span> <span class="identifier">efficient</span> <span class="identifier">than</span> <span class="identifier">making</span> <span class="identifier">separate</span> <span class="identifier">calls</span><span class="special">.</span> <span class="identifier">The</span> <span class="identifier">big</span> <span class="identifier">exception</span> <span class="identifier">to</span> <span class="keyword">this</span> <span class="identifier">is</span> <span class="identifier">when</span> <span class="identifier">doing</span> <span class="identifier">unbuffered</span> <span class="identifier">page</span> <span class="identifier">aligned</span> <span class="identifier">i</span><span class="special">/</span><span class="identifier">o</span> <span class="keyword">for</span> <span class="identifier">which</span> <span class="identifier">Windows</span> <span class="identifier">provides</span> <span class="identifier">special</span> <span class="identifier">scatter</span><span class="special">/</span><span class="identifier">gather</span> <span class="identifier">i</span><span class="special">/</span><span class="identifier">o</span> <span class="identifier">functions</span><span class="special">.</span>
+</pre>
 <h6>
 <a name="afio.reference.classes.async_file_io_dispatcher_base.read_1_batch.h1"></a>
+            <span class="phrase"><a name="afio.reference.classes.async_file_io_dispatcher_base.read_1_batch.synopsis"></a></span><a class="link" href="read_1_batch.html#afio.reference.classes.async_file_io_dispatcher_base.read_1_batch.synopsis">Synopsis</a>
+          </h6>
+<pre class="programlisting"><span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">T</span><span class="special">&gt;</span>
+<span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">async_io_op</span> <span class="special">&gt;</span> <span class="identifier">async_file_io_dispatcher_base</span><span class="special">::</span><span class="identifier">read</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">async_data_op_req</span><span class="special">&lt;</span> <span class="identifier">T</span> <span class="special">&gt;&gt;</span> <span class="special">&amp;</span> <span class="identifier">ops</span><span class="special">)</span></pre>
+<h6>
+<a name="afio.reference.classes.async_file_io_dispatcher_base.read_1_batch.h2"></a>
             <span class="phrase"><a name="afio.reference.classes.async_file_io_dispatcher_base.read_1_batch.parameters"></a></span><a class="link" href="read_1_batch.html#afio.reference.classes.async_file_io_dispatcher_base.read_1_batch.parameters">Parameters</a>
           </h6>
 <div class="informaltable"><table class="table">
@@ -69,10 +76,33 @@ Schedule a batch of asynchronous data reads after preceding operations.
                     </p>
                   </th>
 </tr></thead>
-<tbody><tr>
+<tbody>
+<tr>
 <td>
                     <p>
-                      const std::vector&lt; async_data_op_req&lt; void &gt;&gt; &amp;
+                      class T
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      Any type.
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      -
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      Must be specified
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      const std::vector&lt; async_data_op_req&lt; T &gt;&gt; &amp;
                     </p>
                   </td>
 <td>
@@ -84,27 +114,28 @@ Schedule a batch of asynchronous data reads after preceding operations.
                   </td>
 <td>
                     <p>
-                      A batch of <code class="literal"><code class="computeroutput"><span class="identifier">async_data_op_req</span></code><code class="computeroutput"><span class="special">&lt;</span><span class="keyword">void</span><span class="special">&gt;</span></code></code> structures.
+                      A batch of async_data_op_req&lt;T&gt; structures.
                     </p>
                   </td>
-</tr></tbody>
+</tr>
+</tbody>
 </table></div>
 <h6>
-<a name="afio.reference.classes.async_file_io_dispatcher_base.read_1_batch.h2"></a>
+<a name="afio.reference.classes.async_file_io_dispatcher_base.read_1_batch.h3"></a>
             <span class="phrase"><a name="afio.reference.classes.async_file_io_dispatcher_base.read_1_batch.returns"></a></span><a class="link" href="read_1_batch.html#afio.reference.classes.async_file_io_dispatcher_base.read_1_batch.returns">Returns</a>
           </h6>
 <p>
             A batch of op handles.
           </p>
 <h6>
-<a name="afio.reference.classes.async_file_io_dispatcher_base.read_1_batch.h3"></a>
+<a name="afio.reference.classes.async_file_io_dispatcher_base.read_1_batch.h4"></a>
             <span class="phrase"><a name="afio.reference.classes.async_file_io_dispatcher_base.read_1_batch.header"></a></span><a class="link" href="read_1_batch.html#afio.reference.classes.async_file_io_dispatcher_base.read_1_batch.header">Header</a>
           </h6>
 <p>
             <code class="computeroutput"><span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">boost</span><span class="special">/</span><span class="identifier">afio</span><span class="special">/</span><span class="identifier">afio</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span></code>
           </p>
 <h6>
-<a name="afio.reference.classes.async_file_io_dispatcher_base.read_1_batch.h4"></a>
+<a name="afio.reference.classes.async_file_io_dispatcher_base.read_1_batch.h5"></a>
             <span class="phrase"><a name="afio.reference.classes.async_file_io_dispatcher_base.read_1_batch.complexity"></a></span><a class="link" href="read_1_batch.html#afio.reference.classes.async_file_io_dispatcher_base.read_1_batch.complexity">Complexity</a>
           </h6>
 <p>
@@ -112,7 +143,7 @@ Schedule a batch of asynchronous data reads after preceding operations.
             reading data is constant time.
           </p>
 <h6>
-<a name="afio.reference.classes.async_file_io_dispatcher_base.read_1_batch.h5"></a>
+<a name="afio.reference.classes.async_file_io_dispatcher_base.read_1_batch.h6"></a>
             <span class="phrase"><a name="afio.reference.classes.async_file_io_dispatcher_base.read_1_batch.exception_model"></a></span><a class="link" href="read_1_batch.html#afio.reference.classes.async_file_io_dispatcher_base.read_1_batch.exception_model">Exception
             Model</a>
           </h6>
@@ -122,7 +153,7 @@ Schedule a batch of asynchronous data reads after preceding operations.
             if any inputs have values which could not possibly be correct.
           </p>
 <h6>
-<a name="afio.reference.classes.async_file_io_dispatcher_base.read_1_batch.h6"></a>
+<a name="afio.reference.classes.async_file_io_dispatcher_base.read_1_batch.h7"></a>
             <span class="phrase"><a name="afio.reference.classes.async_file_io_dispatcher_base.read_1_batch.example"></a></span><a class="link" href="read_1_batch.html#afio.reference.classes.async_file_io_dispatcher_base.read_1_batch.example">Example</a>
           </h6>
 <p>

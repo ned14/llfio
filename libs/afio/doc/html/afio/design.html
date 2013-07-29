@@ -26,7 +26,17 @@
 <div class="titlepage"><div><div><h2 class="title" style="clear: both">
 <a name="afio.design"></a><a class="link" href="design.html" title="Design Rationale">Design Rationale</a>
 </h2></div></div></div>
-<div class="toc"><dl class="toc"><dt><span class="section"><a href="design/overview.html">A quick overview of the design</a></span></dt></dl></div>
+<div class="toc"><dl class="toc">
+<dt><span class="section"><a href="design/overview.html">A quick overview of the design</a></span></dt>
+<dt><span class="section"><a href="design/acid_write_ordering.html">Write ordering constraints,
+      and how these can be used to achieve the Durability in ACID without needing
+      <code class="computeroutput"><span class="identifier">fsync</span><span class="special">()</span></code></a></span></dt>
+<dd><dl>
+<dt><span class="section"><a href="design/acid_write_ordering/background.html">Background</a></span></dt>
+<dt><span class="section"><a href="design/acid_write_ordering/write_ordering_data.html">Write
+        ordering data and durability: why does it matter?</a></span></dt>
+</dl></dd>
+</dl></div>
 <p>
       Boost.AFIO came about out of the need for a scalable, high performance, portable
       asynchronous file i/o implementation library for a forthcoming filing system

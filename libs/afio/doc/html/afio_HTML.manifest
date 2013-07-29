@@ -2,6 +2,9 @@ index.html
 afio/introduction.html
 afio/design.html
 afio/design/overview.html
+afio/design/acid_write_ordering.html
+afio/design/acid_write_ordering/background.html
+afio/design/acid_write_ordering/write_ordering_data.html
 afio/compilation.html
 afio/quickstart.html
 afio/reference.html
@@ -38,7 +41,6 @@ afio/reference/classes/async_file_io_dispatcher_base/file_1_batch.html
 afio/reference/classes/async_file_io_dispatcher_base/file_1_single.html
 afio/reference/classes/async_file_io_dispatcher_base/read_1_batch.html
 afio/reference/classes/async_file_io_dispatcher_base/read_1_single.html
-afio/reference/classes/async_file_io_dispatcher_base/read_1_batch0.html
 afio/reference/classes/async_file_io_dispatcher_base/rmdir_1_batch.html
 afio/reference/classes/async_file_io_dispatcher_base/rmdir_1_single.html
 afio/reference/classes/async_file_io_dispatcher_base/rmfile_1_batch.html
@@ -49,12 +51,12 @@ afio/reference/classes/async_file_io_dispatcher_base/truncate_2_batch.html
 afio/reference/classes/async_file_io_dispatcher_base/truncate_2_single.html
 afio/reference/classes/async_file_io_dispatcher_base/write_1_batch.html
 afio/reference/classes/async_file_io_dispatcher_base/write_1_single.html
-afio/reference/classes/async_file_io_dispatcher_base/write_1_batch0.html
 afio/reference/classes/async_file_io_dispatcher_base/barrier.html
+afio/reference/classes/async_file_io_dispatcher_base/page_size.html
 afio/reference/classes/detail_async_io_handle.html
 afio/reference/classes/thread_pool.html
 afio/reference/functions.html
-afio/reference/functions/async_file_io_dispatcher.html
+afio/reference/functions/make_async_file_io_dispatcher.html
 afio/reference/functions/process_threadpool.html
 afio/reference/functions/when_all_futures.html
 afio/reference/functions/when_all_futures/when_all.html

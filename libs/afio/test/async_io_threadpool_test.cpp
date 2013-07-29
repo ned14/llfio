@@ -3,35 +3,11 @@
 Created: Feb 2013
 */
 
-
-//#include <utility>
-//#include <sstream>
-#include <iostream>
-#//include <algorithm>
-#include "../../../boost/afio/afio.hpp"
-
-//if we're building the tests all together don't define the test main
-#ifdef BOOST_AFIO_STANDALONE_TESTS
-    #define BOOST_TEST_MODULE tester   //must be defined before unit_test.hpp is included
-#endif
-
-#include <boost/test/included/unit_test.hpp>
-
-//define a simple macro to check any exception using Boost.Test
-#define BOOST_AFIO_CHECK_THROWS(expr)\
-try{\
-    expr;\
-    BOOST_FAIL("Exception was not thrown");\
-}catch(...){BOOST_CHECK(true);}
-
+#include "test_functions.hpp"
 
  static int task()
 {
-    #ifdef __GNUC__
-        boost::afio::thread::id this_id = boost::this_thread::get_id();
-    #else
-        std::thread::id this_id = std::this_thread::get_id();
-    #endif
+   boost::afio::thread::id this_id = boost::afio::get_this_thread_id();
         std::cout << "I am worker thread " << this_id << std::endl;
         return 78;
 }
@@ -46,14 +22,10 @@ try{\
     BOOST_TEST_MESSAGE("Tests that the async i/o thread pool implementation works");
     using namespace boost::afio;
     
-    #ifdef __GNUC__
-        boost::afio::thread::id this_id = boost::this_thread::get_id();
-    #else
-        std::thread::id this_id = std::this_thread::get_id();
-    #endif
+    boost::afio::thread::id this_id = boost::afio::get_this_thread_id();
     
         std::cout << "I am main thread " << this_id << std::endl;
-        thread_pool pool(4);
+        std_thread_pool pool(4);
         auto r=task();
         BOOST_CHECK(r==78);
         std::vector<future<int>> results(8);

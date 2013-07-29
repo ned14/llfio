@@ -27,27 +27,28 @@
 <a name="afio.reference.macros_flags.file_flags"></a><a class="link" href="file_flags.html" title="file_flags">file_flags</a>
 </h4></div></div></div>
 <p>
-          <a class="indexterm" name="id855062"></a>
-<a class="indexterm" name="id855083"></a>
-<a class="indexterm" name="id855078"></a>
-<a class="indexterm" name="id855082"></a>
-<a class="indexterm" name="id855104"></a>
-<a class="indexterm" name="id855108"></a>
-<a class="indexterm" name="id855107"></a>
-<a class="indexterm" name="id855100"></a>
-<a class="indexterm" name="id855119"></a>
-<a class="indexterm" name="id855087"></a>
-<a class="indexterm" name="id855134"></a>
-<a class="indexterm" name="id855149"></a>
-<a class="indexterm" name="id855153"></a>
-<a class="indexterm" name="id855126"></a>
+          <a class="indexterm" name="id936421"></a>
+<a class="indexterm" name="id936427"></a>
+<a class="indexterm" name="id936433"></a>
+<a class="indexterm" name="id936439"></a>
+<a class="indexterm" name="id936445"></a>
+<a class="indexterm" name="id936451"></a>
+<a class="indexterm" name="id936457"></a>
+<a class="indexterm" name="id936463"></a>
+<a class="indexterm" name="id936469"></a>
+<a class="indexterm" name="id936475"></a>
+<a class="indexterm" name="id936481"></a>
+<a class="indexterm" name="id936487"></a>
+<a class="indexterm" name="id936493"></a>
+<a class="indexterm" name="id936499"></a>
+<a class="indexterm" name="id936505"></a>
 Bitwise file and directory open flags.
         </p>
 <h6>
 <a name="afio.reference.macros_flags.file_flags.h0"></a>
           <span class="phrase"><a name="afio.reference.macros_flags.file_flags.synopsis"></a></span><a class="link" href="file_flags.html#afio.reference.macros_flags.file_flags.synopsis">Synopsis</a>
         </h6>
-<pre class="programlisting"><span class="keyword">enum</span> <span class="identifier">file_flags</span> <span class="special">{</span><span class="identifier">None</span> <span class="special">=</span> <span class="number">0</span><span class="special">,</span> <span class="identifier">Read</span> <span class="special">=</span> <span class="number">1</span><span class="special">,</span> <span class="identifier">Write</span> <span class="special">=</span> <span class="number">2</span><span class="special">,</span> <span class="identifier">ReadWrite</span> <span class="special">=</span> <span class="number">3</span><span class="special">,</span> <span class="identifier">Append</span> <span class="special">=</span> <span class="number">4</span><span class="special">,</span> <span class="identifier">Truncate</span> <span class="special">=</span> <span class="number">8</span><span class="special">,</span> <span class="identifier">Create</span> <span class="special">=</span> <span class="number">16</span><span class="special">,</span> <span class="identifier">CreateOnlyIfNotExist</span> <span class="special">=</span> <span class="number">32</span><span class="special">,</span> <span class="identifier">AutoFlush</span> <span class="special">=</span> <span class="number">64</span><span class="special">,</span> <span class="identifier">WillBeSequentiallyAccessed</span> <span class="special">=</span> <span class="number">128</span><span class="special">,</span> <span class="identifier">FastDirectoryEnumeration</span> <span class="special">=</span> <span class="number">256</span><span class="special">,</span> <span class="identifier">OSDirect</span> <span class="special">=</span> <span class="special">(</span><span class="number">1</span><span class="special">&lt;&lt;</span><span class="number">16</span><span class="special">),</span> <span class="identifier">OSSync</span> <span class="special">=</span> <span class="special">(</span><span class="number">1</span><span class="special">&lt;&lt;</span><span class="number">17</span><span class="special">)};</span></pre>
+<pre class="programlisting"><span class="keyword">enum</span> <span class="identifier">file_flags</span> <span class="special">{</span><span class="identifier">None</span> <span class="special">=</span> <span class="number">0</span><span class="special">,</span> <span class="identifier">Read</span> <span class="special">=</span> <span class="number">1</span><span class="special">,</span> <span class="identifier">Write</span> <span class="special">=</span> <span class="number">2</span><span class="special">,</span> <span class="identifier">ReadWrite</span> <span class="special">=</span> <span class="number">3</span><span class="special">,</span> <span class="identifier">Append</span> <span class="special">=</span> <span class="number">4</span><span class="special">,</span> <span class="identifier">Truncate</span> <span class="special">=</span> <span class="number">8</span><span class="special">,</span> <span class="identifier">Create</span> <span class="special">=</span> <span class="number">16</span><span class="special">,</span> <span class="identifier">CreateOnlyIfNotExist</span> <span class="special">=</span> <span class="number">32</span><span class="special">,</span> <span class="identifier">WillBeSequentiallyAccessed</span> <span class="special">=</span> <span class="number">128</span><span class="special">,</span> <span class="identifier">FastDirectoryEnumeration</span> <span class="special">=</span> <span class="number">256</span><span class="special">,</span> <span class="identifier">OSDirect</span> <span class="special">=</span> <span class="special">(</span><span class="number">1</span><span class="special">&lt;&lt;</span><span class="number">16</span><span class="special">),</span> <span class="identifier">AlwaysSync</span> <span class="special">=</span> <span class="special">(</span><span class="number">1</span><span class="special">&lt;&lt;</span><span class="number">24</span><span class="special">),</span> <span class="identifier">SyncOnClose</span> <span class="special">=</span> <span class="special">(</span><span class="number">1</span><span class="special">&lt;&lt;</span><span class="number">25</span><span class="special">),</span> <span class="identifier">EnforceDependencyWriteOrder</span> <span class="special">=</span> <span class="special">(</span><span class="number">1</span><span class="special">&lt;&lt;</span><span class="number">26</span><span class="special">)};</span></pre>
 <h6>
 <a name="afio.reference.macros_flags.file_flags.h1"></a>
           <span class="phrase"><a name="afio.reference.macros_flags.file_flags.values"></a></span><a class="link" href="file_flags.html#afio.reference.macros_flags.file_flags.values">Values</a>
@@ -169,20 +170,6 @@ Bitwise file and directory open flags.
 <tr>
 <td>
                   <p>
-                    AutoFlush
-                  </p>
-                </td>
-<td>
-                  <p>
-                    Automatically initiate an asynchronous flush just before file
-                    close, and fuse both operations so both must complete for close
-                    to complete.
-                  </p>
-                </td>
-</tr>
-<tr>
-<td>
-                  <p>
                     WillBeSequentiallyAccessed
                   </p>
                 </td>
@@ -223,13 +210,42 @@ Bitwise file and directory open flags.
 <tr>
 <td>
                   <p>
-                    OSSync
+                    AlwaysSync
                   </p>
                 </td>
 <td>
                   <p>
                     Ask the OS to not complete until the data is on the physical
-                    storage. Best used only with Direct, otherwise use AutoFlush.
+                    storage. Best used only with OSDirect, otherwise use SyncOnClose.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    SyncOnClose
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Automatically initiate an asynchronous flush just before file
+                    close, and fuse both operations so both must complete for close
+                    to complete.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    EnforceDependencyWriteOrder
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Ensure that data writes to files reach physical storage in the
+                    same order as the op dependencies close files. Does NOT enforce
+                    ordering of individual data writes, ONLY all file writes accumulated
+                    before a file close.
                   </p>
                 </td>
 </tr>

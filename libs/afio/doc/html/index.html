@@ -41,7 +41,17 @@
 <dl class="toc">
 <dt><span class="section"><a href="afio/introduction.html">Introduction</a></span></dt>
 <dt><span class="section"><a href="afio/design.html">Design Rationale</a></span></dt>
-<dd><dl><dt><span class="section"><a href="afio/design/overview.html">A quick overview of the design</a></span></dt></dl></dd>
+<dd><dl>
+<dt><span class="section"><a href="afio/design/overview.html">A quick overview of the design</a></span></dt>
+<dt><span class="section"><a href="afio/design/acid_write_ordering.html">Write ordering constraints,
+      and how these can be used to achieve the Durability in ACID without needing
+      <code class="computeroutput"><span class="identifier">fsync</span><span class="special">()</span></code></a></span></dt>
+<dd><dl>
+<dt><span class="section"><a href="afio/design/acid_write_ordering/background.html">Background</a></span></dt>
+<dt><span class="section"><a href="afio/design/acid_write_ordering/write_ordering_data.html">Write
+        ordering data and durability: why does it matter?</a></span></dt>
+</dl></dd>
+</dl></dd>
 <dt><span class="section"><a href="afio/compilation.html">Compilation</a></span></dt>
 <dt><span class="section"><a href="afio/quickstart.html">Quick Start</a></span></dt>
 <dt><span class="section"><a href="afio/reference.html">Reference</a></span></dt>
@@ -109,8 +119,6 @@
           (batch)</a></span></dt>
 <dt><span class="section"><a href="afio/reference/classes/async_file_io_dispatcher_base/read_1_single.html">read
           (single)</a></span></dt>
-<dt><span class="section"><a href="afio/reference/classes/async_file_io_dispatcher_base/read_1_batch0.html">read
-          (batch)</a></span></dt>
 <dt><span class="section"><a href="afio/reference/classes/async_file_io_dispatcher_base/rmdir_1_batch.html">rmdir
           (batch)</a></span></dt>
 <dt><span class="section"><a href="afio/reference/classes/async_file_io_dispatcher_base/rmdir_1_single.html">rmdir
@@ -131,17 +139,16 @@
           (batch)</a></span></dt>
 <dt><span class="section"><a href="afio/reference/classes/async_file_io_dispatcher_base/write_1_single.html">write
           (single)</a></span></dt>
-<dt><span class="section"><a href="afio/reference/classes/async_file_io_dispatcher_base/write_1_batch0.html">write
-          (batch)</a></span></dt>
 <dt><span class="section"><a href="afio/reference/classes/async_file_io_dispatcher_base/barrier.html">barrier
           (batch)</a></span></dt>
+<dt><span class="section"><a href="afio/reference/classes/async_file_io_dispatcher_base/page_size.html">page_size</a></span></dt>
 </dl></dd>
 <dt><span class="section"><a href="afio/reference/classes/detail_async_io_handle.html">detail::async_io_handle</a></span></dt>
 <dt><span class="section"><a href="afio/reference/classes/thread_pool.html">thread_pool</a></span></dt>
 </dl></dd>
 <dt><span class="section"><a href="afio/reference/functions.html">Functions</a></span></dt>
 <dd><dl>
-<dt><span class="section"><a href="afio/reference/functions/async_file_io_dispatcher.html">async_file_io_dispatcher</a></span></dt>
+<dt><span class="section"><a href="afio/reference/functions/make_async_file_io_dispatcher.html">make_async_file_io_dispatcher</a></span></dt>
 <dt><span class="section"><a href="afio/reference/functions/process_threadpool.html">process_threadpool</a></span></dt>
 <dt><span class="section"><a href="afio/reference/functions/when_all_futures.html">when_all()
         (futures)</a></span></dt>
@@ -176,7 +183,7 @@
 </div>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
-<td align="left"><p><small>Last revised: July 14, 2013 at 00:43:46 GMT</small></p></td>
+<td align="left"><p><small>Last revised: July 26, 2013 at 22:41:51 GMT</small></p></td>
 <td align="right"><div class="copyright-footer"></div></td>
 </tr></table>
 <hr>

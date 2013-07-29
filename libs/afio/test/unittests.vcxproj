@@ -82,7 +82,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <NMakeOutput>unittests.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>WIN32;NDEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
-    <NMakeBuildCommandLine>..\..\..\b2 address-model=64 link=static release</NMakeBuildCommandLine>
+    <NMakeBuildCommandLine>..\..\..\b2 address-model=64 link=static release --link-test</NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>..\..\..\b2 address-model=64 link=static release -a</NMakeReBuildCommandLine>
   </PropertyGroup>
   <ItemDefinitionGroup>

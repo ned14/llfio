@@ -15,7 +15,7 @@ env:
     - _="Build test" VALGRIND=0 UNIT_TESTS=0 DEBUG=0 GCCVER="" GCOV=0
     - _="Unit/functional tests" VALGRIND=0 UNIT_TESTS="" DEBUG=0 GCCVER="" GCOV=0
     - _="GCC 4.8 + Unit/functional tests coverage" VALGRIND=0 CCFLAGS="-fprofile-arcs -ftest-coverage" UNIT_TESTS="" DEBUG=1 GCCVER="-4.8" GCOV=1
-    - _="Memory error and leak tests" VALGRIND=memcheck UNIT_TESTS="--log_level=test_suite --run_test=all/exclude_async_io_errors" DEBUG=2 GCCVER="-4.8" GCOV=0
+    - _="Memory error and leak tests" VALGRIND=memcheck UNIT_TESTS="--log_level=test_suite --run_test=all/exclude_async_io_errors" DEBUG=2 GCCVER="" GCOV=0
     - _="Race detection tests" VALGRIND=0 CCFLAGS="-fsanitize=thread" UNIT_TESTS="" DEBUG=2 GCCVER="-4.8" TSAN_OPTIONS="suppressions=libs/afio/test/tsan.supp" GCOV=0
 
 # The clang 3.2 .deb doesn't supply the needed tsan runtime library :(
@@ -47,12 +47,19 @@ before_install:
  - mv boost-trunk-release-Boost_1_54_0 $HOME/boost-trunk
  - BOOST="$HOME/boost-trunk"
  - PROJECTPATH="$HOME/build/BoostGSoC/boost.afio"
+
+#create symbolic links for afio
  - ln -s $PROJECTPATH/boost/afio/ $BOOST/boost/afio
  - ln -s $PROJECTPATH/libs/afio/ $BOOST/libs/afio
 
 #HOME should be defined per the travis-ci docs as /home/travis
  - mv user-config.jam $HOME
- 
+
+#auto generate the files to be included for test_all.cpp
+# - cd libs/afio/test
+# - chmod u+x test_file_glob.sh
+# - ./test_file_glob.sh
+
 # install boost build
  - cd $BOOST/tools/build/v2
  - ./bootstrap.sh
@@ -89,24 +96,27 @@ script:
 #build the lib
  - cd $BOOST
  - ./bootstrap.sh --with-libraries=afio --prefix=$BOOST
- - b2 install $DEBUGBUILD toolset=$CC$GCCVER link=shared define=BOOST_NO_CXX11_VARIADIC_TEMPLATES $FLAGS;
+ - b2 install $DEBUGBUILD toolset=$CC$GCCVER link=shared $FLAGS;
 
-#build unit tests
- - b2 libs/afio/test $DEBUGBUILD toolset=$CC$GCCVER --link=shared define=BOOST_NO_CXX11_VARIADIC_TEMPLATES $FLAGS;
+#valgrind setup
+ - if [ $VALGRIND = "memcheck" ]; then PREFIXTEST="--tool=memcheck --suppressions=libs/afio/test/memcheck.supp --track-origins=yes --track-fds=yes --leak-check=full --show-reachable=yes --error-exitcode=1"; fi
+ - if [ $VALGRIND = "drd" ]; then PREFIXTEST="--tool=drd --suppressions=libs/afio/test/drd.supp --error-exitcode=1"; fi
+ - if [ $VALGRIND = "0" ]; then PREFIXTEST=""; fi
+
+ - TEST_TYPE="--link-test"
+
+#Build and run tests
+ - if [ $GCOV -eq 1 ]; then set -x; fi
+ - if [ $UNIT_TEST != "0" ]; then TEST_TYPE=""; fi
+ - if [ $VALGRIND != "0" ]; then TEST_TYPE="--valgrind="$PREFIXTEST"" ; fi
+ #- if [ "$UNIT_TESTS" != "0" ]; then $PREFIXTEST $PREFIXPATH/boost_afio_test -s $UNIT_TESTS; fi
+# Not sure if we can pass the valgrind flags into the unit tests, but so far it hasnt crashed :)
+ - b2 libs/afio/test $DEBUGBUILD link=shared toolset=$CC$GCCVER $TEST_TYPE --test-all $FLAGS ;
 
 #if we want to use the built in bjam test runner we can get test output this way
 # - cat bin.v2/libs/afio/test/main.test/*/*/main.output #may need to specify path better on valgrind tests
 
 
-#valgrind setup
- - if [ $VALGRIND = "memcheck" ]; then PREFIXTEST="valgrind --tool=memcheck --suppressions=libs/afio/test/memcheck.supp --track-origins=yes --track-fds=yes --leak-check=full --show-reachable=yes --error-exitcode=1"; fi
- - if [ $VALGRIND = "drd" ]; then PREFIXTEST="valgrind --tool=drd --suppressions=libs/afio/test/drd.supp --error-exitcode=1"; fi
- - if [ $VALGRIND = "0" ]; then PREFIXTEST=""; fi
- 
-#runtests
- - if [ $GCOV -eq 1 ]; then set -x; fi
- - if [ "$UNIT_TESTS" != "0" ]; then $PREFIXTEST $PREFIXPATH/boost_afio_test -s $UNIT_TESTS; fi
 
 after_success:
  - if [ $GCOV -eq 1 ]; then bash libs/afio/test/update_coveralls.sh `pwd`; fi
-  

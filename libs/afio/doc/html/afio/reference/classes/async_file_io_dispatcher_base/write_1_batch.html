@@ -28,16 +28,26 @@
           (batch)</a>
 </h5></div></div></div>
 <p>
-            <a class="indexterm" name="id895205"></a>
+            <a class="indexterm" name="id977751"></a>
 Schedule a batch of asynchronous data writes after preceding operations.
           </p>
 <h6>
 <a name="afio.reference.classes.async_file_io_dispatcher_base.write_1_batch.h0"></a>
-            <span class="phrase"><a name="afio.reference.classes.async_file_io_dispatcher_base.write_1_batch.synopsis"></a></span><a class="link" href="write_1_batch.html#afio.reference.classes.async_file_io_dispatcher_base.write_1_batch.synopsis">Synopsis</a>
+            <span class="phrase"><a name="afio.reference.classes.async_file_io_dispatcher_base.write_1_batch.description"></a></span><a class="link" href="write_1_batch.html#afio.reference.classes.async_file_io_dispatcher_base.write_1_batch.description">Description</a>
           </h6>
-<pre class="programlisting"><span class="keyword">virtual</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span><span class="identifier">async_io_op</span><span class="special">&gt;</span> <span class="identifier">async_file_io_dispatcher_base</span><span class="special">::</span><span class="identifier">write</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">async_data_op_req</span><span class="special">&lt;</span> <span class="keyword">const</span> <span class="keyword">void</span> <span class="special">&gt;&gt;</span> <span class="special">&amp;</span> <span class="identifier">ops</span><span class="special">)</span></pre>
+<pre class="programlisting"><span class="identifier">Note</span> <span class="identifier">that</span> <span class="identifier">on</span> <span class="identifier">Windows</span> <span class="keyword">this</span> <span class="identifier">call</span> <span class="identifier">issues</span> <span class="identifier">a</span> <span class="identifier">separate</span> <span class="identifier">async</span> <span class="identifier">file</span> <span class="identifier">operation</span> <span class="keyword">for</span> <span class="identifier">each</span> <span class="identifier">buffer</span> <span class="identifier">supplied</span><span class="special">,</span> <span class="identifier">thus</span> <span class="identifier">making</span> <span class="identifier">scatter</span><span class="special">/</span><span class="identifier">gather</span> <span class="identifier">i</span><span class="special">/</span><span class="identifier">o</span> <span class="identifier">no</span> <span class="identifier">more</span> <span class="identifier">efficient</span> <span class="identifier">than</span> <span class="identifier">making</span> <span class="identifier">separate</span> <span class="identifier">calls</span><span class="special">.</span> <span class="identifier">The</span> <span class="identifier">big</span> <span class="identifier">exception</span> <span class="identifier">to</span> <span class="keyword">this</span> <span class="identifier">is</span> <span class="identifier">when</span> <span class="identifier">doing</span> <span class="identifier">unbuffered</span> <span class="identifier">page</span> <span class="identifier">aligned</span> <span class="identifier">i</span><span class="special">/</span><span class="identifier">o</span> <span class="keyword">for</span> <span class="identifier">which</span> <span class="identifier">Windows</span> <span class="identifier">provides</span> <span class="identifier">special</span> <span class="identifier">scatter</span><span class="special">/</span><span class="identifier">gather</span> <span class="identifier">i</span><span class="special">/</span><span class="identifier">o</span> <span class="identifier">functions</span><span class="special">.</span>
+<span class="special">\</span><span class="keyword">return</span> <span class="identifier">A</span> <span class="identifier">batch</span> <span class="identifier">of</span> <span class="identifier">op</span> <span class="identifier">handles</span><span class="special">.</span>
+<span class="special">\</span><span class="identifier">tparam</span> <span class="string">"class T"</span> <span class="identifier">Any</span> <span class="identifier">type</span><span class="special">.</span>
+<span class="special">\</span><span class="identifier">param</span> <span class="identifier">ops</span> <span class="identifier">A</span> <span class="identifier">batch</span> <span class="identifier">of</span> <span class="identifier">async</span><span class="special">\</span><span class="identifier">u005fdata</span><span class="special">\</span><span class="identifier">u005fop</span><span class="special">\</span><span class="identifier">u005freq</span><span class="special">&lt;</span><span class="keyword">const</span> <span class="identifier">T</span><span class="special">&gt;</span> <span class="identifier">structures</span><span class="special">.</span>
+</pre>
 <h6>
 <a name="afio.reference.classes.async_file_io_dispatcher_base.write_1_batch.h1"></a>
+            <span class="phrase"><a name="afio.reference.classes.async_file_io_dispatcher_base.write_1_batch.synopsis"></a></span><a class="link" href="write_1_batch.html#afio.reference.classes.async_file_io_dispatcher_base.write_1_batch.synopsis">Synopsis</a>
+          </h6>
+<pre class="programlisting"><span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">T</span><span class="special">&gt;</span>
+<span class="keyword">virtual</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span><span class="identifier">async_io_op</span><span class="special">&gt;</span> <span class="identifier">async_file_io_dispatcher_base</span><span class="special">::</span><span class="identifier">write</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">async_data_op_req</span><span class="special">&lt;</span> <span class="keyword">const</span> <span class="identifier">T</span> <span class="special">&gt;&gt;</span> <span class="special">&amp;</span> <span class="identifier">ops</span><span class="special">)</span></pre>
+<h6>
+<a name="afio.reference.classes.async_file_io_dispatcher_base.write_1_batch.h2"></a>
             <span class="phrase"><a name="afio.reference.classes.async_file_io_dispatcher_base.write_1_batch.parameters"></a></span><a class="link" href="write_1_batch.html#afio.reference.classes.async_file_io_dispatcher_base.write_1_batch.parameters">Parameters</a>
           </h6>
 <div class="informaltable"><table class="table">
@@ -69,10 +79,30 @@ Schedule a batch of asynchronous data writes after preceding operations.
                     </p>
                   </th>
 </tr></thead>
-<tbody><tr>
+<tbody>
+<tr>
 <td>
                     <p>
-                      const std::vector&lt; async_data_op_req&lt; const void &gt;&gt;
+                      class T
+                    </p>
+                  </td>
+<td>
+                  </td>
+<td>
+                    <p>
+                      -
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      Must be specified
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      const std::vector&lt; async_data_op_req&lt; const T &gt;&gt;
                       &amp;
                     </p>
                   </td>
@@ -84,21 +114,10 @@ Schedule a batch of asynchronous data writes after preceding operations.
                     </p>
                   </td>
 <td>
-                    <p>
-                      A batch of <code class="literal"><code class="computeroutput"><span class="identifier">async_data_op_req</span></code><code class="computeroutput"><span class="special">&lt;</span><span class="keyword">const</span>
-                      <span class="keyword">void</span><span class="special">&gt;</span></code></code>
-                      structures.
-                    </p>
                   </td>
-</tr></tbody>
+</tr>
+</tbody>
 </table></div>
-<h6>
-<a name="afio.reference.classes.async_file_io_dispatcher_base.write_1_batch.h2"></a>
-            <span class="phrase"><a name="afio.reference.classes.async_file_io_dispatcher_base.write_1_batch.returns"></a></span><a class="link" href="write_1_batch.html#afio.reference.classes.async_file_io_dispatcher_base.write_1_batch.returns">Returns</a>
-          </h6>
-<p>
-            A batch of op handles.
-          </p>
 <h6>
 <a name="afio.reference.classes.async_file_io_dispatcher_base.write_1_batch.h3"></a>
             <span class="phrase"><a name="afio.reference.classes.async_file_io_dispatcher_base.write_1_batch.header"></a></span><a class="link" href="write_1_batch.html#afio.reference.classes.async_file_io_dispatcher_base.write_1_batch.header">Header</a>

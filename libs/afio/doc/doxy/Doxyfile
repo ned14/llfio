@@ -41,6 +41,7 @@ ALIASES                = qbk{1}="\xmlonly <qbk>\1</qbk> \endxmlonly" \
 			complexity{1}="\xmlonly <qbk>[heading Complexity]\1</qbk> \endxmlonly" \
 			exceptionmodel{1}="\xmlonly <qbk>[heading Exception Model]\1</qbk> \endxmlonly" \
             exceptionmodelstd="\exceptionmodel{Propagates exceptions of any input preconditions with an errored state at the point of dispatch, and throws a `std::runtime_error` if any inputs have values which could not possibly be correct.}" \
+            direct_io_note="Note that on Windows this call issues a separate async file operation for each buffer supplied, thus making scatter/gather i/o no more efficient than making separate calls. The big exception to this is when doing unbuffered page aligned i/o for which Windows provides special scatter/gather i/o functions." \
 			constr="Default constructor." \
 			cconstr="Copy constructor." \
 			mconstr="Move constructor." \

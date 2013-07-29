@@ -15,10 +15,10 @@
 Returns the process threadpool. 
 
 [heading Description]
-On first use, this instantiates a default thread\u005fpool running eight threads. 
+On first use, this instantiates a default std\u005fthread\u005fpool running eight threads. 
 
 [heading Synopsis]
-``BOOST_AFIO_DECL thread_pool& process_threadpool()``
+``BOOST_AFIO_DECL std_thread_pool& process_threadpool()``
 
 [heading Parameters]
 

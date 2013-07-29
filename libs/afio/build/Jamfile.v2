@@ -12,7 +12,10 @@ project boost/afio
       <link>shared:<define>BOOST_AFIO_DYN_LINK=1  
       <link>shared:<define>BOOST_AFIO_SOURCE=1
       
+    : usage-requirements 
+      <include>. 
 
+      <link>shared:<define>BOOST_AFIO_SOURCE=1
     : source-location ../src
 
 ;
@@ -21,12 +24,12 @@ lib boost_afio
     : #sources
       afio.cpp 
       ../detail/ErrorHandling.cpp
-      /boost/system//boost_system
-      /boost/filesystem//boost_filesystem 
-      /boost/atomic//boost_atomic
-      /boost/thread//boost_thread
+      ../../system/build//boost_system
+      ../../filesystem/build//boost_filesystem 
+      ../../atomic/build//boost_atomic
+      ../../thread/build//boost_thread
 
-	: #includes 
+  : #includes 
       <include>../../../boost/afio 
       <include>../../../boost/afio/detail
       <toolset>gcc:<cxxflags>"-std=c++0x -fvisibility-inlines-hidden -fstrict-aliasing -Wstrict-aliasing -Wno-unused -fargument-noalias -fvisibility=hidden -fopenmp"
@@ -34,7 +37,6 @@ lib boost_afio
       <toolset>gcc-mingw:<cxxflags>"-march=i686 -DWIN32 -D_UNICODE -DUNICODE"
       <toolset>gcc-mingw:<linkflags>"-lws2_32"
       <toolset>clang:<cxxflags>"-std=c++0x -fvisibility-inlines-hidden -fstrict-aliasing -Wstrict-aliasing -Wno-unused -fargument-noalias -fvisibility=hidden -fopenmp"
-      <toolset>msvc:<cxxflags>/openmp
       <toolset>msvc:<cxxflags>"/openmp /EHsc /GF /Gy "
       <toolset>msvc:<linkflags>"/LARGEADDRESSAWARE /DYNAMICBASE /NXCOMPAT /OPT:REF /MANIFEST" # /VERSION:1.00.0"
       <toolset>msvc:<define>WIN32 
@@ -56,3 +58,5 @@ lib boost_afio
 ;
 
 boost-install boost_afio ;
+
+

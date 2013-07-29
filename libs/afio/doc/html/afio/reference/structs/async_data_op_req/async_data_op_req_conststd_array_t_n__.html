@@ -28,7 +28,7 @@
           const std::array&lt; T, N &gt; &gt;</a>
 </h5></div></div></div>
 <p>
-            <a class="indexterm" name="id858812"></a>
+            <a class="indexterm" name="id939270"></a>
 A convenience bundle of precondition, data and where for writing from
             a <code class="literal"><code class="computeroutput"><span class="keyword">const</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">array</span><span class="special">&lt;</span><span class="identifier">T</span><span class="special">,</span> <span class="identifier">N</span><span class="special">&gt;</span></code></code>. Data <span class="bold"><strong>MUST</strong></span>
             stay around until the operation completes.
@@ -39,11 +39,11 @@ A convenience bundle of precondition, data and where for writing from
           </h6>
 <pre class="programlisting"><span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">T</span><span class="special">,</span> <span class="identifier">size_t</span> <span class="identifier">N</span><span class="special">&gt;</span>
 <span class="keyword">struct</span> <span class="identifier">async_data_op_req</span><span class="special">&lt;</span> <span class="keyword">const</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">array</span><span class="special">&lt;</span> <span class="identifier">T</span><span class="special">,</span> <span class="identifier">N</span> <span class="special">&gt;</span> <span class="special">&gt;</span>
-      <span class="special">:</span> <span class="keyword">public</span> <span class="identifier">async_data_op_req</span><span class="special">&lt;</span> <span class="keyword">const</span> <span class="keyword">void</span> <span class="special">&gt;</span>
+      <span class="special">:</span> <span class="keyword">public</span> <span class="identifier">detail</span><span class="special">::</span><span class="identifier">async_data_op_req_impl</span><span class="special">&lt;</span> <span class="keyword">true</span> <span class="special">&gt;</span>
 <span class="special">{</span>
   <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">asio</span><span class="special">::</span><span class="identifier">const_buffer</span> <span class="special">&gt;</span> <span class="identifier">buffers</span><span class="special">;</span>  <span class="comment">// A sequence of const Boost.ASIO buffers to write from. </span>
-  <span class="identifier">async_io_op</span> <span class="identifier">precondition</span><span class="special">;</span>                          <span class="comment">// An optional precondition for this operation. </span>
-  <span class="identifier">off_t</span> <span class="identifier">where</span><span class="special">;</span>                                       <span class="comment">// The offset into which to write. </span>
+  <span class="identifier">async_io_op</span> <span class="identifier">precondition</span><span class="special">;</span>                          <span class="comment">// A precondition containing an open file handle for this operation. </span>
+  <span class="identifier">off_t</span> <span class="identifier">where</span><span class="special">;</span>                                       <span class="comment">// The offset at which to write. </span>
 <span class="special">};</span>
 </pre>
 <h6>
