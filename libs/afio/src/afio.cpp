@@ -110,12 +110,12 @@ static inline bool wintruncate(HANDLE h, boost::afio::off_t newsize)
 
 	// From http://undocumented.ntinternals.net/UserMode/Undocumented%20Functions/NT%20Objects/File/NtSetInformationFile.html
 	// and http://msdn.microsoft.com/en-us/library/windows/hardware/ff567096(v=vs.85).aspx
-	typedef NTSTATUS(NTAPI *NtSetInformationFile_t)(
-		_In_   HANDLE FileHandle,
-		_Out_  PIO_STATUS_BLOCK IoStatusBlock,
-		_In_   PVOID FileInformation,
-		_In_   ULONG Length,
-		_In_   FILE_INFORMATION_CLASS FileInformationClass
+	typedef NTSTATUS (NTAPI *NtSetInformationFile_t)(
+		/*_In_*/   HANDLE FileHandle,
+		/*_Out_*/  PIO_STATUS_BLOCK IoStatusBlock,
+		/*_In_*/   PVOID FileInformation,
+		/*_In_*/   ULONG Length,
+		/*_In_*/   FILE_INFORMATION_CLASS FileInformationClass
 		);
 
 	static NtSetInformationFile_t NtSetInformationFile;
@@ -718,7 +718,7 @@ template<class F, class... Args> async_io_op async_file_io_dispatcher_base::chai
 		else
 			*ret.h=threadsource().enqueue(std::bind(boundf.second, h)).share();
 	}
-	auto opsit=p->ops.insert(std::make_pair(thisid, detail::async_file_io_dispatcher_op((detail::OpType) optype, flags, ret.h)));
+	auto opsit=p->ops.insert(std::move(std::make_pair(thisid, std::move(detail::async_file_io_dispatcher_op((detail::OpType) optype, flags, ret.h)))));
 	assert(opsit.second);
 	BOOST_AFIO_DEBUG_PRINT("I %u < %u (%s)\n", (unsigned) thisid, (unsigned) precondition.id, detail::optypes[static_cast<int>(optype)]);
 	auto unopsit=boost::afio::detail::Undoer([this, opsit, thisid](){
@@ -998,7 +998,8 @@ namespace detail {
 			size_t amount=0;
 			for(auto &b : req.buffers)
 				amount+=boost::asio::buffer_size(b);
-			auto bytes_to_transfer=std::make_shared<std::pair<std::atomic<bool>, std::atomic<size_t>>>(std::make_pair(false, amount));
+			auto bytes_to_transfer=std::make_shared<std::pair<std::atomic<bool>, std::atomic<size_t>>>();
+			bytes_to_transfer->second=amount;
 			// Are we using direct i/o, because then we get the magic scatter/gather special functions?
 			if(!!(p->flags() & file_flags::OSDirect))
 			{
