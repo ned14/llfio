@@ -14,9 +14,10 @@ File Created: Nov 2012
 using boost::to_string;
 
 #ifdef WIN32
+#ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN 1
+#endif
 #include <Windows.h>
-#include <codecvt>
 
 namespace boost {
     namespace afio{

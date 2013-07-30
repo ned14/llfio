@@ -16,8 +16,14 @@ File Created: Mar 2013
 #define _WIN32_WINNT 0x0501
 #endif
 
+#include "boost/config.hpp"
 #include <type_traits>
+#ifndef BOOST_NO_CXX11_HDR_INITIALIZER_LIST
 #include <initializer_list>
+#endif
+#include <thread>
+#include <mutex>
+#include <atomic>
 #include <exception>
 #include <algorithm> // Boost.ASIO needs std::min and std::max
 #if !defined(_WIN32_WINNT) && defined(WIN32)
@@ -51,10 +57,6 @@ using namespace std;
 
 #include "config.hpp"
 #include "detail/Utility.hpp"
-
-//#ifdef BOOST_NO_CXX11_SCOPED_ENUMS
-//#define DOXYGEN_NO_CLASS_ENUMS
-//#endif
 
 // Map in C++11 stuff if available
 #if (defined(__GLIBCXX__) && __GLIBCXX__<=20120920) || (defined(BOOST_MSVC) && BOOST_MSVC < 1700)
@@ -1148,6 +1150,7 @@ inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(st
 	inputs.front().parent->completion(inputs, callbacks);
 	return state->done.get_future();
 }
+#ifndef BOOST_NO_CXX11_HDR_INITIALIZER_LIST
 /*! \brief Returns a result when all the supplied ops complete. Does not propagate exception states.
 
 \return A future vector of shared_ptr's to detail::async_io_handle.
@@ -1183,6 +1186,7 @@ inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(st
     {	ops.push_back(std::move(i));}
 	return when_all(ops.begin(), ops.end());
 }
+#endif
 /*! \brief Returns a result when the supplied op completes. Does not propagate exception states.
 
 \return A future vector of shared_ptr's to detail::async_io_handle.
