@@ -1211,7 +1211,7 @@ namespace detail {
                 amount+=boost::asio::buffer_size(b);
             }
 			auto bytes_to_transfer=std::make_shared<std::pair<boost::afio::atomic<bool>, boost::afio::atomic<size_t>>>();
-			bytes_to_transfer->second=amount;
+			bytes_to_transfer->second.store(amount);//mingw choked on operator=, thought amount was atomic&, so changed to store to avoid issue
 			// Are we using direct i/o, because then we get the magic scatter/gather special functions?
 			if(!!(p->flags() & file_flags::OSDirect))
 			{

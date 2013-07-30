@@ -223,7 +223,7 @@ public:
 	BOOST_CONSTEXPR atomic(T v) BOOST_NOEXCEPT : Base(std::forward<T>(v)) {}
 	
 #ifdef BOOST_NO_CXX11_DELETED_FUNCTIONS
-private:
+//private:
     atomic(const atomic &) /* =delete */ ;
 #else
     atomic(const atomic &) = delete;
