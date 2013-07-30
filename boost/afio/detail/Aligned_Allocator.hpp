@@ -241,10 +241,19 @@ public:
     deallocate(pointer p, size_type) BOOST_NOEXCEPT_OR_NOTHROW
     { return detail::deallocate_aligned_memory(p); }
 
+#ifndef BOOST_NO_CXX11_VARIADIC_TEMPLATES    
     template <class U, class ...Args>
     void
     construct(U* p, Args&&... args)
     { ::new(reinterpret_cast<void*>(p)) U(std::forward<Args>(args)...); }
+#else
+    #define BOOST_PP_LOCAL_MACRO(N)                                             \
+    template <class U                                                           \
+    BOOST_PP_ENUM_TRAILING_PARAMS(N, class A)>                                  \
+    void                                                                        \
+    construct(U* p BOOST_PP_ENUM__TRAILING_BINARY_PARAMS(N, A, a))              \
+    { ::new(reinterpret_cast<void*>(p)) U(std::forward<A0>(a0) BOOST_PP_ENUM_SHIFTED_BINARY_PARAMS(N, A, a)); }
+#endif
 
     void
     destroy(pointer p)
