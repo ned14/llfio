@@ -21,9 +21,6 @@ File Created: Mar 2013
 #ifndef BOOST_NO_CXX11_HDR_INITIALIZER_LIST
 #include <initializer_list>
 #endif
-#include <thread>
-#include <mutex>
-#include <atomic>
 #include <exception>
 #include <algorithm> // Boost.ASIO needs std::min and std::max
 #if !defined(_WIN32_WINNT) && defined(WIN32)
