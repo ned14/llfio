@@ -693,24 +693,6 @@ template<class F, class... Args> std::shared_ptr<detail::async_io_handle> async_
 
 // we cant use any preprocessor directive inside of the macro, so take care of it beforehand
 #ifdef BOOST_MSVC
-#define BOOST_AFIO_CATCH_HELPER \
-	catch(const std::exception &)\
-	{\
-		exception_ptr e(afio::make_exception_ptr(afio::current_exception()));\
-		BOOST_AFIO_DEBUG_PRINT("E %u begin\n", (unsigned) id);\
-		complete_async_op(id, h, e);\
-		BOOST_AFIO_DEBUG_PRINT("E %u end\n", (unsigned) id);\
-		throw;\
-	}\
-	catch(const std::exception_ptr &)
-#else
-#define BOOST_AFIO_CATCH_HELPER \
-	    catch(...)
-#endif
-
-
-
-
 
 #define BOOST_PP_LOCAL_MACRO(N)                                                                     \
     template <class F                                                                               \
@@ -746,7 +728,7 @@ template<class F, class... Args> std::shared_ptr<detail::async_io_handle> async_
 					    opsids.push_back(i.first);\
                     }\
 				    std::sort(opsids.begin(), opsids.end());\
-				    throw std::runtime_error("Failed to find this operation in list of currently executing operations");\
+				    BOOST_AFIO_THROW(std::runtime_error("Failed to find this operation in list of currently executing operations"));\
 			    }\
 			    if(!it->second.detached_promise)\
 			    {\
@@ -758,21 +740,18 @@ template<class F, class... Args> std::shared_ptr<detail::async_io_handle> async_
 		    }\
 		    return ret.second;\
 	    }\
-        BOOST_AFIO_CATCH_HELPER \
+        catch(...)\
 	    {\
 		    exception_ptr e(afio::make_exception_ptr(afio::current_exception()));\
 		    BOOST_AFIO_DEBUG_PRINT("E %u begin\n", (unsigned) id);\
 		    complete_async_op(id, h, e);\
 		    BOOST_AFIO_DEBUG_PRINT("E %u end\n", (unsigned) id);\
-		    throw;\
+		    BOOST_AFIO_RETHROW;\
 	    }\
     } //end of invoke_async_op_completions
   
 #define BOOST_PP_LOCAL_LIMITS     (0, BOOST_AFIO_MAX_PARAMETERS) //should this be 0 or 1 for the min????
 #include BOOST_PP_LOCAL_ITERATE()
-
-#undef BOOST_AFIO_CATCH_HELPER
-
 #endif
 
 
