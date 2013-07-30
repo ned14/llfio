@@ -41,14 +41,14 @@ File Created: Mar 2013
 #if defined(BOOST_MSVC) && BOOST_MSVC < 1700// Dinkumware without <atomic>
 #include <boost/atomic.hpp>
 #include <boost/chrono.hpp>
-typedef boost::thread thread; 
+//typedef boost::thread thread; 
 using namespace boost;
 #define BOOST_AFIO_USE_BOOST_ATOMIC
 #else
 #include <thread>
 #include <atomic>
 #include <mutex>
-typedef std::thread thread;
+//typedef std::thread thread;
 using namespace std;
 #endif
 
@@ -961,7 +961,7 @@ protected:
     const async_io_op &precondition,async_op_flags flags,                                           \
     completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>                  \
     BOOST_PP_COMMA_IF(N)                                                                            \
-    BOOST_PP_ENUM_PARAMS(N, A))                                                                            \
+    BOOST_PP_ENUM_PARAMS(N, A))                                                                     \
     BOOST_PP_COMMA_IF(N)                                                                            \
     BOOST_PP_ENUM_BINARY_PARAMS(N, A, a));     /* parameters end */
 

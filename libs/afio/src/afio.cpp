@@ -689,11 +689,6 @@ template<class F, class... Args> std::shared_ptr<detail::async_io_handle> async_
 }
 #else
 
-
-
-// we cant use any preprocessor directive inside of the macro, so take care of it beforehand
-#ifdef BOOST_MSVC
-
 #define BOOST_PP_LOCAL_MACRO(N)                                                                     \
     template <class F                                                                               \
     BOOST_PP_COMMA_IF(N)                                                                            \
