@@ -76,6 +76,13 @@ else
     test_files = [ glob  *.cpp : main.cpp ] ;
 }
 
+if "--jenkins" in in $(.argv)  
+{
+    local JENKINS_ARGS = "--report_level=detailed --report_format=xml" ;
+}
+
+
+
 
 # link tests (just compile and links targets)
 if "--link-test"  in $(.argv)  
@@ -97,14 +104,14 @@ else # run actual tests
     if "--test-all" in $(.argv)   # run the whole test suite at once
     {
         test-suite afio
-          : [ run test_all.cpp  $(reqs) : $(VALGRIND_ARGS) : : $(launcher) ] 
+          : [ run test_all.cpp  $(reqs) : $(VALGRIND_ARGS) $(JENKINS_ARGS) : : $(launcher) ] 
 
         ;
     }
     else        # otherwise run individual test files
     {
         for local file in $(test_files)
-        { run $(file) $(reqs) : $(VALGRIND_ARGS) : : $(launcher) ; }
+        { run $(file) $(reqs) : $(VALGRIND_ARGS) $(JENKINS_ARGS) : : $(launcher) ; }
 
     }
 }

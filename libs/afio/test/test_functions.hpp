@@ -68,14 +68,14 @@ static void _1000_open_write_close_deletes(std::shared_ptr<boost::afio::async_fi
         using namespace boost::afio;
         using namespace std;
         using boost::afio::future;
-        typedef std::chrono::duration<double, ratio<1>> secs_type;
+        typedef chrono::duration<double, ratio<1>> secs_type;
         auto mkdir(dispatcher->dir(async_path_op_req("testdir", file_flags::Create)));
         vector<char, boost::afio::detail::aligned_allocator<char, 4096>> towrite(bytes, 'N');
         assert(!(((size_t) &towrite.front()) & 4095));
 
         // Wait for six seconds to let filing system recover and prime SpeedStep
-        auto begin=std::chrono::high_resolution_clock::now();
-        while(std::chrono::duration_cast<secs_type>(std::chrono::high_resolution_clock::now()-begin).count()<6);
+        auto begin=chrono::high_resolution_clock::now();
+        while(chrono::duration_cast<secs_type>(chrono::high_resolution_clock::now()-begin).count()<6);
 
         // Start opening 1000 files
         begin=chrono::high_resolution_clock::now();
@@ -161,7 +161,7 @@ static void evil_random_io(std::shared_ptr<boost::afio::async_file_io_dispatcher
     using boost::afio::future;
     using namespace boost::afio::detail;
     using boost::afio::off_t;
-    typedef std::chrono::duration<double, ratio<1>> secs_type;
+    typedef chrono::duration<double, ratio<1>> secs_type;
 
     boost::afio::detail::aligned_allocator<char, 4096> aligned_allocator;
     vector<vector<char, boost::afio::detail::aligned_allocator<char, 4096>>> towrite(no);
@@ -201,7 +201,7 @@ static void evil_random_io(std::shared_ptr<boost::afio::async_file_io_dispatcher
     // We simulate what we _ought_ to see appear in storage during the test and
     // SHA256 out the results
     // We then replay the same with real storage to see if it matches
-    auto begin=std::chrono::high_resolution_clock::now();
+    auto begin=chrono::high_resolution_clock::now();
 #pragma omp parallel for
     for(ptrdiff_t n=0; n<(ptrdiff_t) no; n++)
     {
@@ -277,10 +277,10 @@ static void evil_random_io(std::shared_ptr<boost::afio::async_file_io_dispatcher
                     bytessofar+=thisbytes;
             }
     }
-    auto end=std::chrono::high_resolution_clock::now();
+    auto end=chrono::high_resolution_clock::now();
     auto diff=chrono::duration_cast<secs_type>(end-begin);
     cout << "It took " << diff.count() << " secs to simulate torture test in RAM" << endl;
-    begin=std::chrono::high_resolution_clock::now(); // start timer for hashes
+    begin=chrono::high_resolution_clock::now(); // start timer for hashes
                 
     // a vector to hold the hash values from SpookyHash
     //SpookyHash returns 2 64bit integers for a 128 bit hash, so we store them as a pair
@@ -303,7 +303,7 @@ static void evil_random_io(std::shared_ptr<boost::afio::async_file_io_dispatcher
                     
     }
                 
-    end=std::chrono::high_resolution_clock::now(); // end timer for hashes
+    end=chrono::high_resolution_clock::now(); // end timer for hashes
     diff=chrono::duration_cast<secs_type>(end-begin);
     cout << "It took " << diff.count() << " secs to hash the results" << endl;
     for(size_t n=0; n<no; n++)
@@ -311,11 +311,11 @@ static void evil_random_io(std::shared_ptr<boost::afio::async_file_io_dispatcher
 
     auto mkdir(dispatcher->dir(async_path_op_req("testdir", file_flags::Create)));
     // Wait for three seconds to let filing system recover and prime SpeedStep
-    //begin=std::chrono::high_resolution_clock::now();
-    //while(std::chrono::duration_cast<secs_type>(std::chrono::high_resolution_clock::now()-begin).count()<3);
+    //begin=chrono::high_resolution_clock::now();
+    //while(chrono::duration_cast<secs_type>(chrono::high_resolution_clock::now()-begin).count()<3);
 
     // Open our test files
-    begin=std::chrono::high_resolution_clock::now();
+    begin=chrono::high_resolution_clock::now();
     std::vector<async_path_op_req> manyfilereqs;
     manyfilereqs.reserve(no);
     for(size_t n=0; n<no; n++)
