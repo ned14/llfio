@@ -1,7 +1,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
-<title>Write ordering constraints, and how these can be used to achieve the Durability in ACID without needing fsync()</title>
+<title>Write ordering constraints, and how these can be used to achieve some of the Durability in ACID without needing fsync()</title>
 <link rel="stylesheet" href="../../myboostbook.css" type="text/css">
 <meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
 <link rel="home" href="../../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 0.1">
@@ -24,9 +24,9 @@
 </div>
 <div class="section">
 <div class="titlepage"><div><div><h3 class="title">
-<a name="afio.design.acid_write_ordering"></a><a class="link" href="acid_write_ordering.html" title="Write ordering constraints, and how these can be used to achieve the Durability in ACID without needing fsync()">Write ordering constraints,
-      and how these can be used to achieve the Durability in ACID without needing
-      <code class="computeroutput"><span class="identifier">fsync</span><span class="special">()</span></code></a>
+<a name="afio.design.acid_write_ordering"></a><a class="link" href="acid_write_ordering.html" title="Write ordering constraints, and how these can be used to achieve some of the Durability in ACID without needing fsync()">Write ordering constraints,
+      and how these can be used to achieve some of the Durability in ACID without
+      needing <code class="computeroutput"><span class="identifier">fsync</span><span class="special">()</span></code></a>
 </h3></div></div></div>
 <div class="toc"><dl class="toc">
 <dt><span class="section"><a href="acid_write_ordering/background.html">Background</a></span></dt>
@@ -36,12 +36,22 @@
 <p>
         <span class="bold"><strong>ACID</strong></span> stands for Atomic Consistent Isolated
         Durable, and it is a key requirement for database implementations which manage
-        data you don't want to lose, which tends to be a common use case. While achieving
-        all four is non-trivial, achieving Durability is simultaneously both the
-        easiest and the hardest of the four. This is because the easy way of ensuring
-        durability is to always wait for each write to reach non-volatile storage,
-        yet such a naive solution is typically exceptionally slow. Achieving performant
-        data durability is without doubt a wicked hard problem in computer science.
+        data you don't want to lose, which tends to be a common use case in databases.
+        Whilst achieving all four is non-trivial, achieving Durability is simultaneously
+        both the easiest and the hardest of the four. This is because the easy way
+        of ensuring durability is to always wait for each write to reach non-volatile
+        storage, yet such a naive solution is typically exceptionally slow. Achieving
+        performant data durability is without doubt a wicked hard problem in computer
+        science.
+      </p>
+<p>
+        Because a majority of users of __boost__afio__ are going to be people needing
+        some form of data persistence guarantees, this section is a short essay on
+        the current state of data persistence on various popular platforms. Any errors
+        or omissions, both of which are probable, are entirely the fault of this
+        author Niall Douglas. Note also that the forthcoming information was probably
+        correct around the summer of 2013, and it highly likely to become less correct
+        over time.
       </p>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>

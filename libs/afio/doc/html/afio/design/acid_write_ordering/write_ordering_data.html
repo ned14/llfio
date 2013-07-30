@@ -5,7 +5,7 @@
 <link rel="stylesheet" href="../../../myboostbook.css" type="text/css">
 <meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
 <link rel="home" href="../../../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 0.1">
-<link rel="up" href="../acid_write_ordering.html" title="Write ordering constraints, and how these can be used to achieve the Durability in ACID without needing fsync()">
+<link rel="up" href="../acid_write_ordering.html" title="Write ordering constraints, and how these can be used to achieve some of the Durability in ACID without needing fsync()">
 <link rel="prev" href="background.html" title="Background">
 <link rel="next" href="../../compilation.html" title="Compilation">
 </head>
@@ -28,39 +28,46 @@
         ordering data and durability: why does it matter?</a>
 </h4></div></div></div>
 <p>
-          What you're about to read is probably too much detail for AFIO and reads
-          more like a description of how the aforementioned forthcoming TripleGit
-          graph store database implements durability. Nevertheless, as many users
-          of AFIO will likely want to know how to ensure written data is never lost,
-          this discussion is probably useful.
+          Implementing performant Durability essentially reduces down to answering
+          two questions: (i) how long does it take to restore a consistent state
+          after an unexpected power loss, and (ii) how much of your most recent data
+          are you willing to lose? AFIO has been designed and written as the asynchronous
+          file i/o portability layer for the forthcoming direct filing system graphstore
+          database TripleGit which, like as with ZFS, implements late Durability
+          i.e. you are guaranteed that your writes from some wall clock distance
+          from now can never be lost. As discussing how TripleGit will use AFIO is
+          probably useful to many others, that is what the remainder of this section
+          does.
         </p>
 <p>
-          A performant way for a database to achieve the Consistent and Isolated
-          part is to allow abortable, garbage collectable concurrent writes of new
-          data into separate partitions, and to push the atomicity enforcement into
+          TripleGit will achieve the Consistent and Isolated parts of being a reliable
+          database by placing abortable, garbage collectable concurrent writes of
+          new data into separate files, and pushing the atomicity enforcement into
           a very small piece of ordering logic in order to reduce transaction contention
-          by multiple writers as much as possible. Generally, the ordering logic
-          will make use of some sort of intent log which records what the database
-          intends to do (and generally you want that intent log on as low latency
-          a device as possible). Generally speaking, that intent log is usually some
-          form of atomically appended record -- and usefully every major filing system
-          supports atomic appends to a file. What you then traditionally do to implement
-          a transaction is to write your data to the filing system, ensure it has
-          reached non-volatile storage, append the knowledge it definitely is on
+          by multiple writers as much as possible. The ordering logic will make use
+          of an atomic append only intent log which records what the database intends
+          to do (and generally you want that intent log on as low latency a device
+          as possible) -- and usefully every major filing system supports atomic
+          appends to a file. If you wish to never lose most recent data, to implement
+          a transaction one writes your data to the filing system, ensure it has
+          reached non-volatile storage, appends the knowledge it definitely is on
           non-volatile storage to the intent log, and then ensure your append also
           has reached non-volatile storage. This is presently the only way to ensure
-          that valuable data definitely can not be lost. The obvious problem is that
-          this method involves writing all your data with <code class="computeroutput"><span class="identifier">O_SYNC</span></code>
-          and using <code class="computeroutput"><span class="identifier">fsync</span><span class="special">()</span></code>
+          that valuable data definitely is never lost on any filing system that I
+          know of. The obvious problem is that this method involves writing all your
+          data with <code class="computeroutput"><span class="identifier">O_SYNC</span></code> and using
+          <code class="computeroutput"><span class="identifier">fsync</span><span class="special">()</span></code>
           on the intent log. This might perform okay with a single writer, but with
           multiple writers performance is usually awful, especially on storage incapable
           of high queue depths and potentially many hundreds of milliseconds of latency
-          (e.g. SD Cards).
+          (e.g. SD Cards). Despite the performance issues, there are many valid use
+          cases for especially precious data, and TripleGit of course will offer
+          such a facility, at both the per-graph and per-update levels.
         </p>
 <p>
-          This raises an alternative: write all your data, but keep a hash like a
-          SHA of its contents as you write it. When you write your intent log, append
-          all the SHAs of the items you just wrote and skip <code class="computeroutput"><span class="identifier">O_DATA</span></code>
+          TripleGit's normal persistence strategy is a bit more clever: write all
+          your data, but keep a hash like a SHA of its contents as you write it<a href="#ftn.afio.design.acid_write_ordering.write_ordering_data.f0" class="footnote" name="afio.design.acid_write_ordering.write_ordering_data.f0"><sup class="footnote">[5]</sup></a>. When you write your intent log, atomically append all the
+          SHAs of the items you just wrote and skip <code class="computeroutput"><span class="identifier">O_DATA</span></code>
           and <code class="computeroutput"><span class="identifier">fsync</span><span class="special">()</span></code>
           completely. If power gets removed before all the data is written to non-volatile
           storage, you can figure out that the database is dirty easily enough, and
@@ -68,7 +75,7 @@
           item's contents to ensure their SHAs match up, throwing away any transaction
           where any file is missing or any file's contents don't match. On a filing
           system such as ext4 where data is guaranteed to be sent to non-volatile
-          storage after one minute<a href="#ftn.afio.design.acid_write_ordering.write_ordering_data.f0" class="footnote" name="afio.design.acid_write_ordering.write_ordering_data.f0"><sup class="footnote">[5]</sup></a>, and of course so long as you don't mind losing up to one minute's
+          storage after one minute<a href="#ftn.afio.design.acid_write_ordering.write_ordering_data.f1" class="footnote" name="afio.design.acid_write_ordering.write_ordering_data.f1"><sup class="footnote">[6]</sup></a>, and of course so long as you don't mind losing up to one minute's
           worth of data, this solution can have much better performance than the
           previous solution with lots of simultaneous writers.
         </p>
@@ -80,9 +87,7 @@
           typical. Secondly, dirty database reconstruction is rather like how ext2
           had to call <code class="computeroutput"><span class="identifier">fsck</span></code> on boot:
           a whole load of time and i/o must be expended to fix up damage in the store,
-          and while it's running one generally must wait (one can work around this
-          using metadata journaling to shortcut having to figure out what is good
-          and bad, but I digress).
+          and while it's running one generally must wait.
         </p>
 <p>
           What would be really, really useful is if the filing system exposed its
@@ -94,52 +99,112 @@
           but still allows database implementations to ensure that a transaction's
           intent log entry can never appear without all the data it refers to. Such
           an ability would eliminate the need for expensive dirty database checking
-          and reconstruction, or any journalling infrastructure used to skip the
-          manual integrity checking.
+          and reconstruction, or the need for any journalling infrastructure used
+          to skip the manual integrity checking.
         </p>
 <p>
-          In lieu of the lack of just such a facility, we can implementat a reasonable
-          emulation in some circumstances. For some filing systems like btrfs or
-          ZFS, or filing systems with certain mount options e.g. ext3/4 with the
-          option journal=data, one knows that a file's modified timestamp <span class="bold"><strong>always</strong></span> equals when it was last written to, and moreover
-          one is guaranteed that a write is either fully applied or not (i.e. partial
-          data writes, including desynchronisation of file contents from file metadata,
-          is guaranteed to never happen). This lets you shortcut checking the intent
-          log: simply rewind to where the intent log first matches the filing system
-          metadata, and proceed to check intent log entries and filing system metadata
-          for the duration which you know is the maximum time between <code class="computeroutput"><span class="identifier">sync</span><span class="special">()</span></code>
-          invocations by the system.
-        </p>
-<p>
-          ZFS, interestingly, adds an even stronger guarantee due to its use of transaction
-          groups which are, for all intents and purposes, partial snapshots issued
-          once every five seconds in ZFSs before the addition of the ZFS Write Throttle.
-          Data writes may occur in any order within a transaction group, but transaction
-          group commits are strongly tied to the wall clock and are <span class="bold"><strong>always</strong></span>
-          committed sequentially, and so long as it takes less than five seconds
-          to write five seconds of buffered writes, all is good. Since the addition
-          of the ZFS Write Throttle, the default settings are to buffer up to thirty
+          Unfortunately I know of no filing system which makes publicly available
+          such a facility. The closest that I know of is ZFS which internally uses
+          a concept of transaction groups which are, for all intents and purposes,
+          partial whole filing system snapshots issued once every five seconds. Data
+          writes may be reordered into any order within a transaction group, but
+          transaction group commits are strongly tied to the wall clock and are
+          <span class="bold"><strong>always</strong></span> committed sequentially. Since the
+          addition of the ZFS Write Throttle, the default settings are to accept
+          new writes as fast as RAM can handle, buffering up to thirty wall clock
           seconds of writes before pacing the acceptance of new write data to match
           the speed of the non-volatile storage (which may be a ZIL if you're doing
           synchronous writes). This implies up to thirty seconds of buffered data
           could be lost, but note that ZFS still guarantees transaction group sequential
-          write order.
+          write order. Therefore, what ZFS is in fact guaranteeing is this: <span class="quote">&#8220;<span class="quote">we
+          may reorder your write by up to five seconds away from the sequence in
+          which you wrote it and other writes surrounding it. Other than that, we
+          guarantee the order in which you write is the order in which that data
+          reaches physical storage.</span>&#8221;</span> <a href="#ftn.afio.design.acid_write_ordering.write_ordering_data.f2" class="footnote" name="afio.design.acid_write_ordering.write_ordering_data.f2"><sup class="footnote">[7]</sup></a>
         </p>
 <p>
-          <a href="#ftn.afio.design.acid_write_ordering.write_ordering_data.f1" class="footnote" name="afio.design.acid_write_ordering.write_ordering_data.f1"><sup class="footnote">[6]</sup></a>
+          Unfortunately, while such guarantees reduce the dirty check time down to
+          the last five seconds of history, because one cannot control which transaction
+          group gets which writes, it does not allow us to eliminate dirty checking
+          entirely. One can, thankfully, skip SHA hashing because ZFS guarantees
+          file and metadata will always match and as TripleGit always copy on writes
+          data, either a copy's length matches the intent log's or it doesn't (i.e.
+          the file's length as reported by the filing system really is how much true
+          data it contains), plus the file modified timestamp always reflects the
+          actual last modifed timestamp of the data. Note that ext3 and ext4 can
+          also guarantee that file and metadata will always match using the (IOPS
+          expensive) mount option <code class="computeroutput"><span class="identifier">journal</span><span class="special">=</span><span class="identifier">data</span></code>,
+          which can be detected from <code class="computeroutput"><span class="special">/</span><span class="identifier">proc</span><span class="special">/</span><span class="identifier">mounts</span></code>.
         </p>
 <p>
-          TODO
+          For those working without the luxury of ZFS, here is a quick table of power
+          loss safety. Once again, I reiterate that errors and omissions are my fault
+          alone.
         </p>
-<p>
-          Additionally if the database user is savvy enough to place the data store
-          in its own partition, manually calling something like Linux's <code class="computeroutput"><span class="identifier">syncfs</span><span class="special">()</span></code>
-          more frequently than the system's cron job does will ensure that the distance
-          between the end of the intent log and the most recently fully stored data
-          isn't too long.
-        </p>
-<p>
-          TODO FINISH.
+<div class="table">
+<a name="afio.design.acid_write_ordering.write_ordering_data.power_loss_safety"></a><p class="title"><b>Table&#160;1.2.&#160;Power loss safety matrix: What can you lose if power is suddenly
+          lost?</b></p>
+<div class="table-contents"><table class="table" summary="Power loss safety matrix: What can you lose if power is suddenly
+          lost?">
+<colgroup>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                </th>
+<th>
+                  <p>
+                    Metadata no longer matches data
+                  </p>
+                </th>
+<th>
+                  <p>
+                    Newly created file content
+                  </p>
+                </th>
+<th>
+                  <p>
+                    File data content rewrite
+                  </p>
+                </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                  <p>
+                    FAT32
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <td align="center">&#10004;</td>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    &#10008;
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    Always
+                  </p>
+                </td>
+<td>
+                </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break"><p>
+          NTFS, HFS+, ext3 with <code class="computeroutput"><span class="identifier">data</span><span class="special">=</span><span class="identifier">ordered</span></code>,
+          ext4 with <code class="computeroutput"><span class="identifier">alloc_on_commit</span></code>)
+          keep back a metadata flush until when a file handle close causes data to
+          finish reaching physical storage. This ensures that files don't appear
+          in directories with zero sizes
         </p>
 <p>
           In the hope that one day filing systems might actually expose their preexisting
@@ -151,11 +216,16 @@
 <div class="footnotes">
 <br><hr style="width:100; text-align:left;margin-left: 0">
 <div id="ftn.afio.design.acid_write_ordering.write_ordering_data.f0" class="footnote"><p><a href="#afio.design.acid_write_ordering.write_ordering_data.f0" class="para"><sup class="para">[5] </sup></a>
-            This is the default, and it may be changed by a system e.g. I have seen
-            thirty minutes set for laptops.
+            TripleGit actually uses a different, much faster 256 bit hash by default,
+            but one can force use of SHA256 on a per-graph basis.
           </p></div>
 <div id="ftn.afio.design.acid_write_ordering.write_ordering_data.f1" class="footnote"><p><a href="#afio.design.acid_write_ordering.write_ordering_data.f1" class="para"><sup class="para">[6] </sup></a>
-            http://www.c0t0d0s0.org/archives/5343-Insights-into-ZFS-today-The-nature-of-writing-things.html
+            This is the default, and it may be changed by a system e.g. I have seen
+            thirty minutes set for laptops. Note that the Linux-specific call <code class="computeroutput"><span class="identifier">syncfs</span><span class="special">()</span></code>
+            lets one artifically schedule whole filing system flushes.
+          </p></div>
+<div id="ftn.afio.design.acid_write_ordering.write_ordering_data.f2" class="footnote"><p><a href="#afio.design.acid_write_ordering.write_ordering_data.f2" class="para"><sup class="para">[7] </sup></a>
+            Source: http://www.c0t0d0s0.org/archives/5343-Insights-into-ZFS-today-The-nature-of-writing-things.html
           </p></div>
 </div>
 </div>

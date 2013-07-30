@@ -24,6 +24,8 @@
 
 [def __boost__ Boost]
 [def __boost_afio__ Boost.AFIO]
+[def __tick__ \u2714]
+[def __cross__ \u2718]
 [def __boost_asio__ [@http://www.boost.org/libs/asio/ Boost.ASIO]]
 [def __boost_thread__ [@http://www.boost.org/libs/thread/ Boost.Thread]]
 [def __boost_filesystem__ [@http://www.boost.org/libs/filesystem/ Boost.Filesystem]]
