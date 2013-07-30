@@ -30,12 +30,12 @@ BOOST_AUTO_TEST_CASE(async_io_barrier)
             lastnumber = i;
         }
     }
-    atomic<size_t> callcount[1000];
+    boost::afio::atomic<size_t> callcount[1000];
     memset(&callcount, 0, sizeof(callcount));
     vector<future<bool>> verifies;
     verifies.reserve(groups.size());
-    auto inccount = [](atomic<size_t> *count){ for (volatile size_t n = 0; n < 10000; n++); (*count)++; };
-    auto verifybarrier = [](atomic<size_t> *count, size_t shouldbe)
+    auto inccount = [](boost::afio::atomic<size_t> *count){ for (volatile size_t n = 0; n < 10000; n++); (*count)++; };
+    auto verifybarrier = [](boost::afio::atomic<size_t> *count, size_t shouldbe)
     {
         if (*count != shouldbe)
         {
