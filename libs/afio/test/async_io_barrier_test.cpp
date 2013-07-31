@@ -6,10 +6,11 @@ BOOST_AUTO_TEST_CASE(async_io_barrier)
     using namespace boost::afio;
     using namespace std;
     using boost::afio::future;
+	using boost::afio::ratio;
     using namespace boost::afio::detail;
     using boost::afio::off_t;
 	namespace chrono = boost::afio::chrono;
-    typedef std::chrono::duration<double, ratio<1>> secs_type;
+    typedef chrono::duration<double, ratio<1>> secs_type;
     vector<pair<size_t, int>> groups;
     // Generate 100,000 sorted random numbers between 0-1000
     {
@@ -47,7 +48,7 @@ BOOST_AUTO_TEST_CASE(async_io_barrier)
     };
     // For each of those runs, dispatch ops and a barrier for them
     auto dispatcher = make_async_file_io_dispatcher();
-    auto begin = std::chrono::high_resolution_clock::now();
+    auto begin = chrono::high_resolution_clock::now();
     size_t opscount = 0;
     async_io_op next;
     bool isfirst = true;
@@ -79,7 +80,7 @@ BOOST_AUTO_TEST_CASE(async_io_barrier)
     {
         BOOST_CHECK_NO_THROW(i.get());
     }
-    auto end = std::chrono::high_resolution_clock::now();
+    auto end = chrono::high_resolution_clock::now();
     auto diff = chrono::duration_cast<secs_type>(end - begin);
     cout << "It took " << diff.count() << " secs to do " << opscount << " operations" << endl;
     diff = chrono::duration_cast<secs_type>(dispatched - begin);

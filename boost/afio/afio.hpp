@@ -27,6 +27,7 @@ File Created: Mar 2013
 #endif
 #include <exception>
 #include <algorithm> // Boost.ASIO needs std::min and std::max
+#include <cstdint>
 #if !defined(_WIN32_WINNT) && defined(WIN32)
 #define _WIN32_WINNT 0x0501
 #endif
@@ -231,20 +232,39 @@ public:
 };//end boost::afio::atomic
 
 // Map in a chrono implementation
+namespace chrono { namespace detail {
+	template<typename T> struct ratioToBase { typedef T type; };
+} }
+template <std::intmax_t N, std::intmax_t D = 1> class ratio
+#ifdef BOOST_AFIO_USE_BOOST_CHRONO
+	: public boost::ratio<N, D>
+{
+	typedef boost::ratio<N, D> Base;
+#else
+	: public std::ratio<N, D>
+{
+	typedef std::ratio<N, D> Base;
+#endif
+	template<typename T> friend struct chrono::detail::ratioToBase;
+public:
+	static BOOST_CONSTEXPR_OR_CONST std::intmax_t num=N;
+	static BOOST_CONSTEXPR_OR_CONST std::intmax_t den=D;
+};
 namespace chrono {
 	namespace detail
 	{
+		template<std::intmax_t N, std::intmax_t D> struct ratioToBase<ratio<N, D>> { typedef typename ratio<N, D>::Base type; };
 		template<typename T> struct durationToBase { typedef T type; };
 	}
-	template<class Rep, class Period = std::ratio<1> > class duration
+	template<class Rep, class Period = ratio<1> > class duration
 #ifdef BOOST_AFIO_USE_BOOST_CHRONO
-		: public boost::chrono::duration<Rep, Period>
+		: public boost::chrono::duration<Rep, typename detail::ratioToBase<Period>::type>
 	{
-		typedef boost::chrono::duration<Rep, Period> Base;
+		typedef boost::chrono::duration<Rep, typename detail::ratioToBase<Period>::type> Base;
 #else
-		: public std::chrono::duration<Rep, Period>
+		: public std::chrono::duration<Rep, typename detail::ratioToBase<Period>::type>
 	{
-		typedef std::chrono::duration<Rep, Period> Base;
+		typedef std::chrono::duration<Rep, typename detail::ratioToBase<Period>::type> Base;
 #endif
 		template<typename T> friend struct detail::durationToBase;
 	public:
@@ -266,7 +286,7 @@ namespace chrono {
 	using boost::chrono::high_resolution_clock;
 	template <class ToDuration, class Rep, class Period> BOOST_CONSTEXPR ToDuration duration_cast(const boost::chrono::duration<Rep,Period> &d)
 	{
-		return boost::chrono::duration_cast<typename detail::durationToBase<ToDuration>::type, Rep, Period>(d);
+		return boost::chrono::duration_cast<typename detail::durationToBase<ToDuration>::type, Rep, typename detail::ratioToBase<Period>::type>(d);
 	}
 #else
 	using std::chrono::system_clock;
