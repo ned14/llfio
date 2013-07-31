@@ -100,7 +100,7 @@ static void _1000_open_write_close_deletes(std::shared_ptr<boost::afio::async_fi
 
         // Delete each of those 1000 files once they are closed
         auto it(manyclosedfiles.begin());
-        for(auto &i : manyfilereqs)
+        BOOST_FOREACH(auto &i, manyfilereqs)
                 i.precondition=*it++;
         auto manydeletedfiles(dispatcher->rmfile(manyfilereqs));
 
@@ -273,7 +273,7 @@ static void evil_random_io(std::shared_ptr<boost::afio::async_file_io_dispatcher
 #ifdef _DEBUG
                     // Quickly make sure none of these exceed 10Mb
                     off_t end=op.req.where;
-                    for(auto &b : op.req.buffers)
+                    BOOST_FOREACH(auto &b, op.req.buffers)
                             end+=boost::asio::buffer_size(b);
                     assert(end<=bytes);
 #endif
@@ -365,7 +365,7 @@ static void evil_random_io(std::shared_ptr<boost::afio::async_file_io_dispatcher
 #pragma omp parallel for
     for(ptrdiff_t n=0; n<(ptrdiff_t) no; n++)
     {
-            for(Op &op : todo[n])
+            BOOST_FOREACH(Op &op, todo[n])
             {
                     op.req.precondition=manywrittenfiles[n];
                     if(op.write)
@@ -404,7 +404,7 @@ static void evil_random_io(std::shared_ptr<boost::afio::async_file_io_dispatcher
     off_t readed=0, written=0;
     size_t ops=0;
     diff=chrono::duration_cast<secs_type>(end-begin);
-    for(auto &i : manyclosedfiles)
+    BOOST_FOREACH(auto &i, manyclosedfiles)
     {
             readed+=i.h->get()->read_count();
             written+=i.h->get()->write_count();
@@ -430,7 +430,7 @@ static void evil_random_io(std::shared_ptr<boost::afio::async_file_io_dispatcher
             {
                     auto undofailedop=boost::afio::detail::Undoer([&failedop]{ delete failedop; });
                     size_t bytes=0;
-                    for(auto &b : failedop->first->req.buffers)
+                    BOOST_FOREACH(auto &b, failedop->first->req.buffers)
                             bytes+=boost::asio::buffer_size(b);
                     cout << "   " << (failedop->first->write ? "Write to" : "Read from") << " " << boost::to_string(failedop->first->req.where) << " at offset " << failedop->second << " into bytes " << bytes << endl;
             }
@@ -464,16 +464,16 @@ static void evil_random_io(std::shared_ptr<boost::afio::async_file_io_dispatcher
 #ifdef DEBUG_TORTURE_TEST
     for(ptrdiff_t n=0; n<(ptrdiff_t) no; n++)
     {
-            for(Op &op : todo[n])
+            BOOST_FOREACH(Op &op, todo[n])
             {
-                    for(auto &i : op.data)
+                    BOOST_FOREACH(auto &i, op.data)
                             aligned_allocator.deallocate(i, 0);
             }
     }
 #endif
     // Delete each of those files once they are closed
     auto it(manyclosedfiles.begin());
-    for(auto &i : manyfilereqs)
+    BOOST_FOREACH(auto &i, manyfilereqs)
             i.precondition=*it++;
     auto manydeletedfiles(dispatcher->rmfile(manyfilereqs));
     // Wait for all files to delete

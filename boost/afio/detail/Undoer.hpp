@@ -15,6 +15,9 @@
 #include "boost/config.hpp"
 #include <utility>
 #include <type_traits>
+#if defined(_MSC_VER) && BOOST_MSVC<1700
+#include <boost/type_traits/is_convertible.hpp>
+#endif
 
 namespace boost{
     namespace afio{

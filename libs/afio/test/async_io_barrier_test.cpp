@@ -24,7 +24,7 @@ BOOST_AUTO_TEST_CASE(async_io_barrier)
 
         // Collapse into a collection of runs of the same number
         int lastnumber = -1;
-        for (auto &i : manynumbers)
+        BOOST_FOREACH(auto &i, manynumbers)
         {
             if (i != lastnumber)
                 groups.push_back(make_pair(0, i));
@@ -52,7 +52,7 @@ BOOST_AUTO_TEST_CASE(async_io_barrier)
     size_t opscount = 0;
     async_io_op next;
     bool isfirst = true;
-    for (auto &run : groups)
+    BOOST_FOREACH(auto &run, groups)
     {
         vector<function<void()>> thisgroupcalls(run.first, bind(inccount, &callcount[run.second]));
         vector<async_io_op> thisgroupcallops;
@@ -76,7 +76,7 @@ BOOST_AUTO_TEST_CASE(async_io_barrier)
     cout << "There are now " << dec << dispatcher->count() << " handles open with a queue depth of " << dispatcher->wait_queue_depth() << endl;
     BOOST_CHECK_NO_THROW(when_all(next).wait());
     // Retrieve any errors
-    for (auto &i : verifies)
+    BOOST_FOREACH(auto &i, verifies)
     {
         BOOST_CHECK_NO_THROW(i.get());
     }
