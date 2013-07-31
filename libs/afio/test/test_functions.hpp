@@ -155,7 +155,9 @@ static void _1000_open_write_close_deletes(std::shared_ptr<boost::afio::async_fi
         BOOST_CHECK((callcount==1000U));
 }
 
-
+#ifdef DEBUG_TORTURE_TEST
+static u4 mkfill() { static char ret='0'; if(ret+1>'z') ret='0'; return ret++; }
+#endif
 static void evil_random_io(std::shared_ptr<boost::afio::async_file_io_dispatcher_base> dispatcher, size_t no, size_t bytes, size_t alignment=0)
 {
     using namespace boost::afio;
@@ -198,9 +200,6 @@ static void evil_random_io(std::shared_ptr<boost::afio::async_file_io_dispatcher
             towriteptrs[n]=&towrite[n].front();
             towritesizes[n]=bytes;
     }
-#ifdef DEBUG_TORTURE_TEST
-    auto mkfill=[]{ static char ret='0'; if(ret+1>'z') ret='0'; return ret++; };
-#endif
     // We create no lots of random writes and reads representing about 100% of bytes
     // We simulate what we _ought_ to see appear in storage during the test and
     // SHA256 out the results
