@@ -76,7 +76,6 @@ else
     test_files = [ glob  *.cpp : main.cpp ] ;
 }
 
-
 # link tests (just compile and links targets)
 if "--link-test"  in $(.argv)  
 {  

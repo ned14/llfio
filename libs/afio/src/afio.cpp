@@ -401,8 +401,11 @@ namespace detail {
 			// Boost's spinlock is so lightweight it has no constructor ...
 			fdslock.unlock();
 			ANNOTATE_RWLOCK_CREATE(&fdslock);
-        #if !defined(BOOST_MSVC)|| BOOST_MSVC >= 1700
+        
+        #if !defined(BOOST_MSVC)|| BOOST_MSVC >= 1700 // MSVC 2010 doesn't support reserve
 			ops.reserve(10000);
+        #else
+            ops.rehash(std::ceil(10000 / ops.max_load_factor()));
         #endif
 		}
 		~async_file_io_dispatcher_base_p()
