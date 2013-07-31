@@ -133,7 +133,7 @@
           data it contains), plus the file modified timestamp always reflects the
           actual last modifed timestamp of the data. Note that ext3 and ext4 can
           also guarantee that file and metadata will always match using the (IOPS
-          expensive) mount option <code class="computeroutput"><span class="identifier">journal</span><span class="special">=</span><span class="identifier">data</span></code>,
+          expensive) mount option <code class="computeroutput"><span class="identifier">data</span><span class="special">=</span><span class="identifier">journal</span></code>,
           which can be detected from <code class="computeroutput"><span class="special">/</span><span class="identifier">proc</span><span class="special">/</span><span class="identifier">mounts</span></code>.
         </p>
 <p>
@@ -149,23 +149,25 @@
 <colgroup>
 <col>
 <col>
+<col>
+<col>
 </colgroup>
 <thead><tr>
 <th>
                 </th>
 <th>
                   <p>
-                    Metadata no longer matches data
+                    Metadata no longer matches data<a href="#ftn.afio.design.acid_write_ordering.write_ordering_data.f3" class="footnote" name="afio.design.acid_write_ordering.write_ordering_data.f3"><sup class="footnote">[a]</sup></a>
                   </p>
                 </th>
 <th>
                   <p>
-                    Newly created file content
+                    Newly created file content corrupted
                   </p>
                 </th>
 <th>
                   <p>
-                    File data content rewrite
+                    File data content rewrite corrupted
                   </p>
                 </th>
 </tr></thead>
@@ -178,7 +180,166 @@
                 </td>
 <td>
                   <p>
-                    <td align="center">&#10004;</td>
+                    &#10004;
+                  </p>
+                </td>
+<td>
+                  <p>
+                    &#10004;
+                  </p>
+                </td>
+<td>
+                  <p>
+                    &#10004;
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    ext2
+                  </p>
+                </td>
+<td>
+                  <p>
+                    &#10004;
+                  </p>
+                </td>
+<td>
+                  <p>
+                    &#10004;
+                  </p>
+                </td>
+<td>
+                  <p>
+                    &#10004;
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    ext3/4 <code class="computeroutput"><span class="identifier">data</span><span class="special">=</span><span class="identifier">writeback</span></code>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    &#10004;
+                  </p>
+                </td>
+<td>
+                  <p>
+                    &#10004;
+                  </p>
+                </td>
+<td>
+                  <p>
+                    &#10004;
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    ext3/4 <code class="computeroutput"><span class="identifier">data</span><span class="special">=</span><span class="identifier">ordered</span></code> (default)
+                  </p>
+                </td>
+<td>
+                  <p>
+                    &#10008;
+                  </p>
+                </td>
+<td>
+                  <p>
+                    &#10008;
+                  </p>
+                </td>
+<td>
+                  <p>
+                    &#10004;
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    UFS + soft updates
+                  </p>
+                </td>
+<td>
+                  <p>
+                    &#10008;
+                  </p>
+                </td>
+<td>
+                  <p>
+                    &#10008;
+                  </p>
+                </td>
+<td>
+                  <p>
+                    &#10004;
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    HFS+
+                  </p>
+                </td>
+<td>
+                  <p>
+                    &#10008;
+                  </p>
+                </td>
+<td>
+                  <p>
+                    &#10008;
+                  </p>
+                </td>
+<td>
+                  <p>
+                    &#10004;
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    NTFS
+                  </p>
+                </td>
+<td>
+                  <p>
+                    &#10008;
+                  </p>
+                </td>
+<td>
+                  <p>
+                    &#10008;
+                  </p>
+                </td>
+<td>
+                  <p>
+                    &#10004;
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    ext3/4 <code class="computeroutput"><span class="identifier">data</span><span class="special">=</span><span class="identifier">journal</span></code>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    &#10008;
+                  </p>
+                </td>
+<td>
+                  <p>
+                    &#10008;
                   </p>
                 </td>
 <td>
@@ -190,30 +351,57 @@
 <tr>
 <td>
                   <p>
-                    Always
+                    BTRFS
                   </p>
                 </td>
 <td>
+                  <p>
+                    &#10008;
+                  </p>
+                </td>
+<td>
+                  <p>
+                    &#10008;
+                  </p>
+                </td>
+<td>
+                  <p>
+                    &#10008;
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    ZFS
+                  </p>
+                </td>
+<td>
+                  <p>
+                    &#10008;
+                  </p>
+                </td>
+<td>
+                  <p>
+                    &#10008;
+                  </p>
+                </td>
+<td>
+                  <p>
+                    &#10008;
+                  </p>
                 </td>
 </tr>
 </tbody>
+<tbody class="footnotes"><tr><td colspan="4"><div id="ftn.afio.design.acid_write_ordering.write_ordering_data.f3" class="footnote"><p><a href="#afio.design.acid_write_ordering.write_ordering_data.f3" class="para"><sup class="para">[a] </sup></a>
+                      This doesn't mean that metadata is corrupted, this means for
+                      example that a file is said to have 100Kb but is in fact partially
+                      garbage because metadata was updated before data was fully
+                      changed on storage.
+                    </p></div></td></tr></tbody>
 </table></div>
 </div>
-<br class="table-break"><p>
-          NTFS, HFS+, ext3 with <code class="computeroutput"><span class="identifier">data</span><span class="special">=</span><span class="identifier">ordered</span></code>,
-          ext4 with <code class="computeroutput"><span class="identifier">alloc_on_commit</span></code>)
-          keep back a metadata flush until when a file handle close causes data to
-          finish reaching physical storage. This ensures that files don't appear
-          in directories with zero sizes
-        </p>
-<p>
-          In the hope that one day filing systems might actually expose their preexisting
-          non-<code class="computeroutput"><span class="identifier">fsync</span><span class="special">()</span></code>
-          write ordering constraints like I just described, AFIO makes available
-          such a facility using the XXX <code class="computeroutput"><span class="identifier">file_flags</span></code>
-          member.
-        </p>
-<div class="footnotes">
+<br class="table-break"><div class="footnotes">
 <br><hr style="width:100; text-align:left;margin-left: 0">
 <div id="ftn.afio.design.acid_write_ordering.write_ordering_data.f0" class="footnote"><p><a href="#afio.design.acid_write_ordering.write_ordering_data.f0" class="para"><sup class="para">[5] </sup></a>
             TripleGit actually uses a different, much faster 256 bit hash by default,
