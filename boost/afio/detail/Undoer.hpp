@@ -12,16 +12,8 @@
 \brief Declares Undoer class and implementation
 */
 
-#include<boost/config.hpp>
+#include "boost/config.hpp"
 #include <utility>
-
-#if defined(__GNUC__) && !defined(GCC_VERSION)
-#define GCC_VERSION (__GNUC__ * 10000 \
-				   + __GNUC_MINOR__ * 100 \
-				   + __GNUC_PATCHLEVEL__)
-#endif
-
-
 
 namespace boost{
     namespace afio{
@@ -32,7 +24,7 @@ namespace boost{
                     template<typename T> struct is_nullptr<T, false> { bool operator()(T) const BOOST_NOEXCEPT_OR_NOTHROW { return false; } };
             }
             //! Compile-time safe detector of if \em v is nullptr (can cope with non-pointer convertibles)
-            #if defined(__GNUC__) && GCC_VERSION<40900
+            #if (defined(__GNUC__) && BOOST_GCC<40900) || (defined(_MSC_VER) && BOOST_MSVC<1700)
             template<typename T> bool is_nullptr(T v) BOOST_NOEXCEPT_OR_NOTHROW { return Impl::is_nullptr<T, std::is_constructible<bool, T>::value>()(std::forward<T>(v)); }
             #else
             template<typename T> bool is_nullptr(T v) BOOST_NOEXCEPT_OR_NOTHROW { return Impl::is_nullptr<T, std::is_trivially_constructible<bool, T>::value>()(std::forward<T>(v)); }
