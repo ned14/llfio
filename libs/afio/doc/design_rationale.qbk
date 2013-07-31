@@ -320,18 +320,18 @@ For those working without the luxury of ZFS, here is a quick table of power loss
 Once again, I reiterate that errors and omissions are my fault alone.
 
 [table:power_loss_safety Power loss safety matrix: What can you lose if power is suddenly lost?
-  [[][Metadata no longer matches data[footnote This doesn't mean that metadata is corrupted,
-  this means for example that a file is said to have 100Kb but is in fact partially garbage because metadata was updated before data was fully changed on storage.]][Newly created file content corrupted][File data content rewrite corrupted]]
-  [[FAT32][__tick__][__tick__][__tick__]]
-  [[ext2][__tick__][__tick__][__tick__]]
-  [[ext3/4 `data=writeback`][__tick__][__tick__][__tick__]]
-  [[ext3/4 `data=ordered` (default)][__cross__][__cross__][__tick__]]
-  [[UFS + soft updates][__cross__][__cross__][__tick__]]
-  [[HFS+][__cross__][__cross__][__tick__]]
-  [[NTFS][__cross__][__cross__][__tick__]]
-  [[ext3/4 `data=journal`][__cross__][__cross__][__cross__]]
-  [[BTRFS][__cross__][__cross__][__cross__]]
-  [[ZFS][__cross__][__cross__][__cross__]]
+  [[][[role aligncenter Metadata no longer matches data[footnote This doesn't mean that metadata is corrupted,
+  this means for example that a file is said to have 100Kb but is in fact partially garbage because metadata was updated before data was fully changed on storage.]]][[role aligncenter Newly created file content corrupted]][[role aligncenter File data content rewrite corrupted]][[role aligncenter Max seconds of writes reordered without using `fsync()`]][[role aligncenter Max seconds of writes lost]]]
+  [[[role alignright FAT32]][__tick__][__tick__][__tick__][][]]
+  [[[role alignright ext2]][__tick__][__tick__][__tick__][[role aligncenter 5]][[role aligncenter 5]]]
+  [[[role alignright ext3/4 `data=writeback`]][__tick__][__tick__][__tick__][[role aligncenter 5/60]][[role aligncenter 60]]]
+  [[[role alignright ext3/4 `data=ordered` (default)]][__cross__][__cross__][__tick__][[role aligncenter 5/60]][[role aligncenter 60]]]
+  [[[role alignright UFS + soft updates]][__cross__][__cross__][__tick__][][]]
+  [[[role alignright HFS+]][__cross__][__cross__][__tick__][][]]
+  [[[role alignright NTFS]][__cross__][__cross__][__tick__][][]]
+  [[[role alignright ext3/4 `data=journal`]][__cross__][__cross__][__cross__][[role aligncenter 60]][[role aligncenter 60]]]
+  [[[role alignright BTRFS]][__cross__][__cross__][__cross__][][]]
+  [[[role alignright ZFS]][__cross__][__cross__][__cross__][[role aligncenter 5]][[role aligncenter 30]]]
 ]
 
 

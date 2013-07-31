@@ -25,8 +25,8 @@ directories, so `include` directives of this scheme will work:
 
     #include <boost/...>
 
-[heading Supported Compilers]
+[heading Supported Compilers And Current Trunk Build And Unit Test State]
 
-Todo
+[import ../../../../Readme.md]
 
 [endsect] [/ end of Compilation]
