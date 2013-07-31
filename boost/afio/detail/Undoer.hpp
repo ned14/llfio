@@ -14,6 +14,7 @@
 
 #include "boost/config.hpp"
 #include <utility>
+#include <type_traits>
 
 namespace boost{
     namespace afio{

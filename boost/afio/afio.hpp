@@ -43,13 +43,17 @@ File Created: Mar 2013
 
 
 #if defined(BOOST_MSVC) && BOOST_MSVC < 1700// Dinkumware without <atomic>
-#include <boost/atomic.hpp>
-#include <boost/chrono.hpp>
+#include "boost/atomic.hpp"
+#include "boost/chrono.hpp"
+namespace boost { namespace afio { using namespace boost::chrono; } }
 #define BOOST_AFIO_USE_BOOST_ATOMIC
+#define BOOST_AFIO_USE_BOOST_CHRONO
 #else
+#include <chrono>
 #include <thread>
 #include <atomic>
 #include <mutex>
+namespace boost { namespace afio { using namespace std::chrono; } }
 #endif
 
 #include "config.hpp"
@@ -63,9 +67,7 @@ namespace boost { namespace afio {
 typedef boost::thread thread;
 inline boost::thread::id get_this_thread_id() { return boost::this_thread::get_id(); }
 inline boost::exception_ptr current_exception() { return boost::current_exception(); }
-// TODO FIXME: This ought to work, but doesn't. I should investigate. In the meantime, users of older compilers will see 'unknown_exception'.
-//#define BOOST_AFIO_THROW(x) boost::throw_exception(boost::enable_current_exception(x))
-#define BOOST_AFIO_THROW(x) throw x
+#define BOOST_AFIO_THROW(x) boost::throw_exception(boost::enable_current_exception(x))
 #define BOOST_AFIO_RETHROW throw
 typedef boost::recursive_mutex recursive_mutex;
 } }
