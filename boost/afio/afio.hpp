@@ -234,6 +234,8 @@ public:
 \brief A source of thread workers
 */
 class thread_source {
+private:
+	template<class R> static void invoke_packagedtask(std::shared_ptr<packaged_task<R()>> t) { (*t)(); }
 protected:
 	boost::asio::io_service service;
 	boost::asio::io_service::work working;
@@ -250,8 +252,7 @@ public:
 		// Somewhat annoyingly, io_service.post() needs its parameter to be copy constructible,
 		// and packaged_task is only move constructible, so ...
 		auto task=std::make_shared<packaged_task<R()>>(std::move(f));
-		void (*doer)(std::shared_ptr<packaged_task<R()>>) = [](std::shared_ptr<packaged_task<R()>> t) { (*t)(); };
-		service.post(std::bind(doer, task));
+		service.post(std::bind(&thread_source::invoke_packagedtask<R>, task));
 		return task->get_future();
 	}
 };
