@@ -141,11 +141,10 @@
 </tr>
 </tbody>
 <tbody class="footnotes"><tr><td colspan="4"><div id="ftn.afio.design.acid_write_ordering.background.f0" class="footnote"><p><a href="#afio.design.acid_write_ordering.background.f0" class="para"><sup class="para">[a] </sup></a>
-                      Many filing systems (NTFS, HFS+, ext3 with <code class="computeroutput"><span class="identifier">data</span><span class="special">=</span><span class="identifier">ordered</span></code>,
-                      ext4 with <code class="computeroutput"><span class="identifier">alloc_on_commit</span></code>)
-                      keep back a metadata flush until when a file handle close causes
-                      data to finish reaching physical storage. This ensures that
-                      files don't appear in directories with zero sizes.
+                      Many filing systems (NTFS, HFS+, ext3/4 with <code class="computeroutput"><span class="identifier">data</span><span class="special">=</span><span class="identifier">ordered</span></code>) keep back a metadata
+                      flush until when a file handle close causes data to finish
+                      reaching physical storage. This ensures that files don't appear
+                      in directories with zero sizes.
                     </p></div></td></tr></tbody>
 </table></div>
 </div>
