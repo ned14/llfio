@@ -45,7 +45,7 @@ File Created: Mar 2013
 #if defined(BOOST_MSVC) && BOOST_MSVC < 1700// Dinkumware without <atomic>
 #include "boost/atomic.hpp"
 #include "boost/chrono.hpp"
-namespace boost { namespace afio { using namespace boost::chrono; } }
+namespace boost { namespace afio { namespace detail { } using namespace boost::chrono; using namespace boost::afio::detail; } }
 #define BOOST_AFIO_USE_BOOST_ATOMIC
 #define BOOST_AFIO_USE_BOOST_CHRONO
 #else
@@ -53,7 +53,7 @@ namespace boost { namespace afio { using namespace boost::chrono; } }
 #include <thread>
 #include <atomic>
 #include <mutex>
-namespace boost { namespace afio { using namespace std::chrono; } }
+namespace boost { namespace afio { namespace detail { } using namespace std::chrono; using namespace boost::afio::detail; } }
 #endif
 
 #include "config.hpp"
