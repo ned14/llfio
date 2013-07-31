@@ -8,6 +8,7 @@ BOOST_AUTO_TEST_CASE(async_io_barrier)
     using boost::afio::future;
     using namespace boost::afio::detail;
     using boost::afio::off_t;
+	namespace chrono = boost::afio::chrono;
     typedef std::chrono::duration<double, ratio<1>> secs_type;
     vector<pair<size_t, int>> groups;
     // Generate 100,000 sorted random numbers between 0-1000

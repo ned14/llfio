@@ -45,7 +45,6 @@ File Created: Mar 2013
 #if defined(BOOST_MSVC) && BOOST_MSVC < 1700// Dinkumware without <atomic>
 #include "boost/atomic.hpp"
 #include "boost/chrono.hpp"
-namespace boost { namespace afio { namespace detail { } using namespace boost::chrono; using namespace boost::afio::detail; } }
 #define BOOST_AFIO_USE_BOOST_ATOMIC
 #define BOOST_AFIO_USE_BOOST_CHRONO
 #else
@@ -53,7 +52,6 @@ namespace boost { namespace afio { namespace detail { } using namespace boost::c
 #include <thread>
 #include <atomic>
 #include <mutex>
-namespace boost { namespace afio { namespace detail { } using namespace std::chrono; using namespace boost::afio::detail; } }
 #endif
 
 #include "config.hpp"
@@ -207,7 +205,7 @@ public:
 	packaged_task &operator=(packaged_task &&o) BOOST_NOEXCEPT_OR_NOTHROW { static_cast<Base &&>(*this)=std::move(o); return *this; }
 };
 
-
+// Map in an atomic implementation
 template <class T> 
 class atomic  
 #ifdef BOOST_AFIO_USE_BOOST_ATOMIC
@@ -226,11 +224,59 @@ public:
 	
 #ifdef BOOST_NO_CXX11_DELETED_FUNCTIONS
 //private:
-    atomic(const atomic &) /* =delete */ ;
+    atomic(const Base &) /* =delete */ ;
 #else
-    atomic(const atomic &) = delete;
+    atomic(const Base &) = delete;
 #endif
 };//end boost::afio::atomic
+
+// Map in a chrono implementation
+namespace chrono {
+	namespace detail
+	{
+		template<typename T> struct durationToBase { typedef T type; };
+	}
+	template<class Rep, class Period = std::ratio<1> > class duration
+#ifdef BOOST_AFIO_USE_BOOST_CHRONO
+		: public boost::chrono::duration<Rep, Period>
+	{
+		typedef boost::chrono::duration<Rep, Period> Base;
+#else
+		: public std::chrono::duration<Rep, Period>
+	{
+		typedef std::chrono::duration<Rep, Period> Base;
+#endif
+		template<typename T> friend struct detail::durationToBase;
+	public:
+		BOOST_CONSTEXPR duration() : Base() { }
+		duration(const Base &o) : Base(o) { }
+		template<class Rep2> BOOST_CONSTEXPR explicit duration(const Rep2 &r) : Base(r) { }
+#ifdef BOOST_AFIO_USE_BOOST_CHRONO
+		template<class Rep2, class Period2> BOOST_CONSTEXPR duration(const boost::chrono::duration<Rep2,Period2> &d) : Base(d) { }
+#else
+		template<class Rep2, class Period2> BOOST_CONSTEXPR duration(const std::chrono::duration<Rep2,Period2> &d) : Base(d) { }
+#endif
+	};
+	namespace detail
+	{
+		template<class Rep, class Period> struct durationToBase<duration<Rep, Period>> { typedef typename duration<Rep, Period>::Base type; };
+	}
+#ifdef BOOST_AFIO_USE_BOOST_CHRONO
+	using boost::chrono::system_clock;
+	using boost::chrono::high_resolution_clock;
+	template <class ToDuration, class Rep, class Period> BOOST_CONSTEXPR ToDuration duration_cast(const boost::chrono::duration<Rep,Period> &d)
+	{
+		return boost::chrono::duration_cast<typename detail::durationToBase<ToDuration>::type, Rep, Period>(d);
+	}
+#else
+	using std::chrono::system_clock;
+	using std::chrono::high_resolution_clock;
+	template <class ToDuration, class Rep, class Period> BOOST_CONSTEXPR ToDuration duration_cast(const std::chrono::duration<Rep,Period> &d)
+	{
+		return std::chrono::duration_cast<typename detail::durationToBase<ToDuration>::type, Rep, Period>(d);
+	}
+#endif
+}
 
 /*! \class thread_source
 \brief A source of thread workers

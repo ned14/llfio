@@ -68,6 +68,7 @@ static void _1000_open_write_close_deletes(std::shared_ptr<boost::afio::async_fi
         using namespace boost::afio;
         using namespace std;
         using boost::afio::future;
+		namespace chrono = boost::afio::chrono;
         typedef chrono::duration<double, ratio<1>> secs_type;
         auto mkdir(dispatcher->dir(async_path_op_req("testdir", file_flags::Create)));
         vector<char, boost::afio::detail::aligned_allocator<char, 4096>> towrite(bytes, 'N');
@@ -161,6 +162,7 @@ static void evil_random_io(std::shared_ptr<boost::afio::async_file_io_dispatcher
     using boost::afio::future;
     using namespace boost::afio::detail;
     using boost::afio::off_t;
+	namespace chrono = boost::afio::chrono;
     typedef chrono::duration<double, ratio<1>> secs_type;
 
     boost::afio::detail::aligned_allocator<char, 4096> aligned_allocator;
