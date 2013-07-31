@@ -18,6 +18,7 @@
 ``struct detail::when_all_count_completed_state
 {
   promise< std::vector< std::shared_ptr< detail::async_io_handle > > > done;  // 
+  std::vector< async_io_op > inputs;                                          // 
   std::vector< std::shared_ptr< detail::async_io_handle > > out;              // 
   std::atomic< size_t > togo;                                                 // 
 };
@@ -26,9 +27,11 @@
 [heading Constructor(s)]
 [table
 [[Function] [Description] [Parameters] ]
-[[``when_all_count_completed_state(size_t outsize)``
+[[``when_all_count_completed_state(std::vector< async_io_op >::iterator first, std::vector< async_io_op >::iterator last)``
 
-] [] [[* size_t]: ['outsize]:  
+] [] [[* std::vector< async_io_op >::iterator]: ['first]:  
+
+[* std::vector< async_io_op >::iterator]: ['last]:  
 
 
 

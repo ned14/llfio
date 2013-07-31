@@ -5,8 +5,8 @@
 <link rel="stylesheet" href="../../../myboostbook.css" type="text/css">
 <meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
 <link rel="home" href="../../../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 0.1">
-<link rel="up" href="../acid_write_ordering.html" title="Write ordering constraints, and how these can be used to achieve the Durability in ACID without needing fsync()">
-<link rel="prev" href="../acid_write_ordering.html" title="Write ordering constraints, and how these can be used to achieve the Durability in ACID without needing fsync()">
+<link rel="up" href="../acid_write_ordering.html" title="Write ordering constraints, and how these can be used to achieve some of the Durability in ACID without needing fsync()">
+<link rel="prev" href="../acid_write_ordering.html" title="Write ordering constraints, and how these can be used to achieve some of the Durability in ACID without needing fsync()">
 <link rel="next" href="write_ordering_data.html" title="Write ordering data and durability: why does it matter?">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
@@ -60,32 +60,118 @@
           metadata is the stuff a filing system stores such that it knows about your
           data. For each of the first two of the above three families of functions,
           most systems provide three variants: flush metadata, flush data, and flush
-          both metadata and data.
+          both metadata and data, so for clarity:
         </p>
-<p>
-          All major filing systems on all major platforms provide the above three
-          families of function to ensure data reaches non-volatile storage. Most
-          of the major filing systems in recent versions of major platforms have
-          additionally added significant extra guarantees regarding metadata alone:
-          for example, UFS with soft updates (from BSD) guarantees consistency of
-          metadata through imposing a write order on metadata writes. Similarly,
-          recent versions of ext4 guarantee that metadata older than five seconds
-          is sent to non-volatile storage, again by imposing a write order. On NTFS
-          and HFS+, directory metadata is guaranteed to be sent to non-volatile storage
-          on any file close: this ensures that a newly created file at least shows
-          up in its directory, even if the file's contents is corrupted or lost.
-          Once again, write ordering, especially when combined with Copy On Write
-          (COW) of changed structures, is the tool internally used to ensure that
-          the filing system's metadata is always kept in a recoverable state.
+<div class="table">
+<a name="afio.design.acid_write_ordering.background.data_persistence_types"></a><p class="title"><b>Table&#160;1.1.&#160;Mechanisms for enforcing data persistence onto physical storage</b></p>
+<div class="table-contents"><table class="table" summary="Mechanisms for enforcing data persistence onto physical storage">
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                </th>
+<th>
+                  <p>
+                    Flush file metadata
+                  </p>
+                </th>
+<th>
+                  <p>
+                    Flush file data
+                  </p>
+                </th>
+<th>
+                  <p>
+                    Flush both metadata and data
+                  </p>
+                </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                  <p>
+                    Once off
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <code class="computeroutput"><span class="identifier">fsync</span><span class="special">(</span><span class="identifier">parentdir_fd</span><span class="special">)</span></code>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <code class="computeroutput"><span class="identifier">fdatasync</span><span class="special">(</span><span class="identifier">fd</span><span class="special">)</span></code>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <code class="computeroutput"><span class="identifier">fsync</span><span class="special">(</span><span class="identifier">fd</span><span class="special">)</span></code>
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    Always
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Varies<a href="#ftn.afio.design.acid_write_ordering.background.f0" class="footnote" name="afio.design.acid_write_ordering.background.f0"><sup class="footnote">[a]</sup></a>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <code class="computeroutput"><span class="identifier">fcntl</span><span class="special">(</span><span class="identifier">fd</span><span class="special">,</span>
+                    <span class="identifier">F_SETFL</span><span class="special">,</span>
+                    <span class="identifier">O_DSYNC</span><span class="special">)</span></code>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <code class="computeroutput"><span class="identifier">fcntl</span><span class="special">(</span><span class="identifier">fd</span><span class="special">,</span>
+                    <span class="identifier">F_SETFL</span><span class="special">,</span>
+                    <span class="identifier">O_SYNC</span><span class="special">)</span></code>
+                  </p>
+                </td>
+</tr>
+</tbody>
+<tbody class="footnotes"><tr><td colspan="4"><div id="ftn.afio.design.acid_write_ordering.background.f0" class="footnote"><p><a href="#afio.design.acid_write_ordering.background.f0" class="para"><sup class="para">[a] </sup></a>
+                      Many filing systems (NTFS, HFS+, ext3 with <code class="computeroutput"><span class="identifier">data</span><span class="special">=</span><span class="identifier">ordered</span></code>,
+                      ext4 with <code class="computeroutput"><span class="identifier">alloc_on_commit</span></code>)
+                      keep back a metadata flush until when a file handle close causes
+                      data to finish reaching physical storage. This ensures that
+                      files don't appear in directories with zero sizes.
+                    </p></div></td></tr></tbody>
+</table></div>
+</div>
+<br class="table-break"><p>
+          In addition to manually flushing data to physical storage, every filing
+          system also implements some form of timer based flush whereby a piece of
+          written data will always be sent to physical storage within some predefined
+          period of time after the write. Most filing systems implement different
+          timeouts for metadata and data, but typically on almost all production
+          filing systems -- unless they are in a power-saving laptop mode -- any
+          data write is guaranteed to be sent to non-volatile storage within one
+          minute. Let me be clear here for later argument's sake: <span class="emphasis"><em>the filing
+          system is allowed to reorder writes by up to one minute in time from the
+          order in which they were issued</em></span>. Or put another way, most filing
+          systems have a one minute temporal constraint on write order.
         </p>
 <p>
           Most people think of <code class="computeroutput"><span class="identifier">fsync</span><span class="special">()</span></code>, <code class="computeroutput"><span class="identifier">O_SYNC</span></code>
           and <code class="computeroutput"><span class="identifier">sync</span><span class="special">()</span></code>
           in terms of flushing caches. An alternative way of thinking about them
-          is that they impose a write order on writes to non-volatile storage. There
-          is no doubt that they are a very crude and highly inefficient way of doing
-          so, but they do open the option of <span class="emphasis"><em>emulating</em></span> native
-          filing system support for write ordering constraints.
+          is that they impose a write order on writes to non-volatile storage in
+          addition to the timeout based write order. There is no doubt that they
+          are a very crude and highly inefficient way of doing so, but they do open
+          the option of <span class="emphasis"><em>emulating</em></span> native filing system support
+          for write ordering constraints when nothing else better is available. So
+          why is the ability to constrain write ordering important?
         </p>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>

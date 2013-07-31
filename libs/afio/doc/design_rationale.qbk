@@ -227,7 +227,7 @@ Implementing performant Durability essentially reduces down to answering two que
 a consistent state after an unexpected power loss, and (ii) how much of your most recent data are
 you willing to lose? AFIO has been designed and written as the asynchronous file i/o
 portability layer for the forthcoming direct
-filing system graphstore database TripleGit which implements late Durability i.e.
+filing system graphstore database TripleGit which, like as with ZFS, implements late Durability i.e.
 you are guaranteed that your writes from some wall clock distance from now can never
 be lost. As discussing how TripleGit will use AFIO is probably useful to many others,
 that is what the remainder of this section does.
@@ -241,20 +241,21 @@ the database intends to do (and generally you want that intent log on as low lat
 a device as possible) -- and usefully every major filing system supports
 atomic appends to a file. If you wish to never lose most recent data, to implement a transaction
 one writes your data to the filing
-system, ensure it has reached non-volatile storage, append the knowledge it
+system, ensure it has reached non-volatile storage, appends the knowledge it
 definitely is on non-volatile storage to the intent log, and then ensure your
 append also has reached non-volatile storage. This is presently the only way to ensure
-that valuable data definitely can not be lost on any filing system that I know of. The obvious
+that valuable data definitely is never lost on any filing system that I know of. The obvious
 problem is that this method involves writing all your data with `O_SYNC` and using `fsync()`
 on the intent log. This might perform okay with a single writer, but with multiple
 writers performance is usually awful, especially on storage incapable of high
 queue depths and potentially many hundreds of milliseconds of latency (e.g. SD Cards).
-TripleGit of course will offer such a facility, at both the per-graph and per-update
+Despite the performance issues, there are many valid use cases for especially precious
+data, and TripleGit of course will offer such a facility, at both the per-graph and per-update
 levels.
 
-This raises an alternative: write all your data, but keep a hash like a SHA of its contents
+TripleGit's normal persistence strategy is a bit more clever: write all your data, but keep a hash like a SHA of its contents
 as you write it[footnote TripleGit actually uses a different, much faster 256 bit hash by
-default, but can use SHA256 on a per-graph basis.]. When you write your intent log,
+default, but one can force use of SHA256 on a per-graph basis.]. When you write your intent log,
 atomically append all the SHAs of the items
 you just wrote and skip `O_DATA` and `fsync()` completely. If power gets removed
 before all the data is written to non-volatile storage, you can figure out that
@@ -263,7 +264,9 @@ log backwards, checking each item's contents to ensure their SHAs match up, thro
 away any transaction where any file is missing or any file's contents don't match.
 On a filing system such as ext4 where data is guaranteed to be sent to non-volatile
 storage after one minute[footnote This is the default, and it may be changed by a
-system e.g. I have seen thirty minutes set for laptops.], and of course so long as you don't mind losing up to one
+system e.g. I have seen thirty minutes set for laptops. Note that the Linux-specific
+call `syncfs()` lets one artifically schedule whole filing system flushes.], and of
+course so long as you don't mind losing up to one
 minute's worth of data, this solution can have much better performance than the
 previous solution with lots of simultaneous writers.
 
@@ -273,8 +276,7 @@ especially on lower end platforms like a mobile phone where 25-30 cycles per byt
 SHA256 performance might be typical. Secondly, dirty database reconstruction is
 rather like how ext2 had to call `fsck` on boot: a whole load of time and i/o
 must be expended to fix up damage in the store, and while it's running one generally
-must wait (one can work around this using ext3/4 metadata journaling to shortcut having
-to figure out what is good and bad, but I digress).
+must wait.
 
 What would be really, really useful is if the filing system exposed its internal
 write ordering constraint implementation to user mode code, so one could say ["schedule writing A, B,
@@ -284,47 +286,47 @@ scope to the filing system to reorder and coalesce writes as it sees fit,
 but still allows database implementations to ensure that a transaction's intent
 log entry can never appear without all the data it refers to. Such an ability
 would eliminate the need for expensive dirty database checking and reconstruction,
-or any journalling infrastructure used to skip the manual integrity checking.
+or the need for any journalling infrastructure used to skip the manual integrity checking.
 
-In lieu of the lack of just such a facility, we can implementat a reasonable
-emulation in some circumstances. For some filing systems like btrfs or ZFS,
-or filing systems with certain mount options e.g. ext3/4 with the option journal=data, one knows
-that a file's modified timestamp [*always] equals when it was last written to, and moreover
-one is guaranteed that a write is either fully applied or not (i.e. partial data
-writes, including desynchronisation of file contents from file metadata, is
-guaranteed to never happen). This lets you shortcut checking the intent log: simply
-rewind to where the intent log first matches the filing system metadata, and
-proceed to check intent log entries and filing system metadata for the duration
-which you know is the maximum time between `sync()` invocations by the system.
-
-ZFS, interestingly, adds an even stronger guarantee due to its use of transaction
-groups which are, for all intents and purposes, partial snapshots issued once every
-five seconds in ZFSs before the addition of the ZFS Write Throttle. Data writes may occur in any order within
+Unfortunately I know of no filing system which makes publicly available such
+a facility. The closest that I know of is ZFS which internally uses a concept of transaction
+groups which are, for all intents and purposes, partial whole filing system snapshots issued once every
+five seconds. Data writes may be reordered into any order within
 a transaction group, but transaction group commits are strongly tied to the wall
-clock and are [*always] committed sequentially, and so long as it takes less than
-five seconds to write five seconds of buffered writes, all is good. Since the
-addition of the ZFS Write Throttle, the default settings are to buffer up to
-thirty seconds of writes before pacing the acceptance of new write data to match
+clock and are [*always] committed sequentially. Since the
+addition of the ZFS Write Throttle, the default settings are to accept new writes
+as fast as RAM can handle, buffering up to
+thirty wall clock seconds of writes before pacing the acceptance of new write data to match
 the speed of the non-volatile storage (which may be a ZIL if you're doing
 synchronous writes). This implies up to
 thirty seconds of buffered data could be lost, but note that ZFS still guarantees
 transaction group sequential write order. Therefore, what ZFS is in fact guaranteeing
-is this: ['we may reorder your write by up to five seconds away from the sequence
+is this: ["we may reorder your write by up to five seconds away from the sequence
 in which you wrote it and other writes surrounding it. Other than that, we guarantee
 the order in which you write is the order in which that data reaches physical storage.]
+[footnote Source: http://www.c0t0d0s0.org/archives/5343-Insights-into-ZFS-today-The-nature-of-writing-things.html]
 
-[footnote http://www.c0t0d0s0.org/archives/5343-Insights-into-ZFS-today-The-nature-of-writing-things.html]
+Unfortunately, while such guarantees reduce the dirty check time down to the last five
+seconds of history, because one cannot control which transaction group gets which
+writes, it does not allow us to eliminate dirty checking entirely. One can, thankfully,
+skip SHA hashing because ZFS guarantees file and metadata will always match and as TripleGit always
+copy on writes data, either a copy's length matches the intent log's or it doesn't (i.e.
+the file's length as reported by the filing system really is how much true data it contains), plus the file
+modified timestamp always reflects the actual last modifed timestamp of the data. Note that
+ext3 and ext4 can also guarantee that file and metadata will always match using
+the (IOPS expensive) mount option `journal=data`, which can be detected from `/proc/mounts`.
 
-TODO
+For those working without the luxury of ZFS, here is a quick table of power loss safety.
+Once again, I reiterate that errors and omissions are my fault alone.
 
-Additionally if the database user is savvy enough to place the data store in its
-own partition, manually calling something like Linux's `syncfs()` more frequently than
-the system's cron job does will ensure that the distance between the end of the
-intent log and the most recently fully stored data isn't too long.
+[table:power_loss_safety Power loss safety matrix: What can you lose if power is suddenly lost?
+  [[][Metadata no longer matches data][Newly created file content][File data content rewrite]]
+  [[FAT32]['''<entry align="center">'''__tick__'''</entry>'''][__cross__]]
+  [[Always][]]
+]
 
-TODO FINISH.
 
-
+NTFS, HFS+, ext3 with `data=ordered`, ext4 with `alloc_on_commit`) keep back a metadata flush until when a file handle close causes data to finish reaching physical storage. This ensures that files don't appear in directories with zero sizes 
 
 In the hope that one day filing systems might actually expose their preexisting
 non-`fsync()` write ordering constraints like I just described, AFIO makes
