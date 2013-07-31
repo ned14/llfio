@@ -250,7 +250,8 @@ public:
 		// Somewhat annoyingly, io_service.post() needs its parameter to be copy constructible,
 		// and packaged_task is only move constructible, so ...
 		auto task=std::make_shared<packaged_task<R()>>(std::move(f));
-		service.post(std::bind([](std::shared_ptr<packaged_task<R()>> t) { (*t)(); }, task));
+		void (*doer)(std::shared_ptr<packaged_task<R()>>) = [](std::shared_ptr<packaged_task<R()>> t) { (*t)(); };
+		service.post(std::bind(doer, task));
 		return task->get_future();
 	}
 };
