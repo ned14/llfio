@@ -15,6 +15,10 @@ File Created: Mar 2013
 #if !defined(_WIN32_WINNT) && defined(WIN32)
 #define _WIN32_WINNT 0x0501
 #endif
+// VS2010 needs D_VARIADIC_MAX set to at least six
+#if defined(_MSC_VER) && _MSC_VER<1700 && (!defined(_VARIADIC_MAX) || _VARIADIC_MAX<6)
+#error _VARIADIC_MAX needs to be set to at least six to compile Boost.AFIO
+#endif
 
 #include "boost/config.hpp"
 #include <type_traits>
@@ -41,15 +45,11 @@ File Created: Mar 2013
 #if defined(BOOST_MSVC) && BOOST_MSVC < 1700// Dinkumware without <atomic>
 #include <boost/atomic.hpp>
 #include <boost/chrono.hpp>
-//typedef boost::thread thread; 
-using namespace boost;
 #define BOOST_AFIO_USE_BOOST_ATOMIC
 #else
 #include <thread>
 #include <atomic>
 #include <mutex>
-//typedef std::thread thread;
-using namespace std;
 #endif
 
 #include "config.hpp"
@@ -438,7 +438,7 @@ BOOST_AFIO_DECLARE_CLASS_ENUM_AS_BITFIELD(file_flags)
 \ingroup async_op_flags
 */
 #ifdef DOXYGEN_NO_CLASS_ENUMS
-enum file_flags
+enum async_op_flags
 #elif defined(BOOST_NO_CXX11_SCOPED_ENUMS)
 BOOST_SCOPED_ENUM_UT_DECLARE_BEGIN(async_op_flags, size_t)
 #else
