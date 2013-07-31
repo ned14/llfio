@@ -1712,10 +1712,12 @@ template<class R> inline std::pair<std::vector<future<R>>, std::vector<async_io_
 	std::vector<std::pair<async_op_flags, std::function<completion_t>>> callbacks;
 	retfutures.reserve(callables.size());
 	callbacks.reserve(callables.size());
-	auto f=[](size_t, std::shared_ptr<detail::async_io_handle> _, std::shared_ptr<tasktype> c) {
+	std::function<std::pair<bool, std::shared_ptr<detail::async_io_handle>> (size_t, std::shared_ptr<detail::async_io_handle>, std::shared_ptr<tasktype>)> f=[](size_t, std::shared_ptr<detail::async_io_handle> _, std::shared_ptr<tasktype> c) -> std::pair<bool, std::shared_ptr<detail::async_io_handle>> {
 		(*c)();
 		return std::make_pair(true, _);
 	};
+
+    
 	BOOST_FOREACH(auto &t, callables)
 	{
 		std::shared_ptr<tasktype> c(std::make_shared<tasktype>(std::function<R()>(t)));

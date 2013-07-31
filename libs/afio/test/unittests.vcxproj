@@ -90,12 +90,35 @@
   <ItemDefinitionGroup>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="async_io_barrier_test.cpp" />
+    <ClCompile Include="async_io_errors_test.cpp" />
+    <ClCompile Include="async_io_sync_test.cpp" />
+    <ClCompile Include="async_io_threadpool_test.cpp" />
+    <ClCompile Include="async_io_torture_autoflush_test.cpp" />
+    <ClCompile Include="async_io_torture_direct_sync_test.cpp" />
+    <ClCompile Include="async_io_torture_direct_test.cpp" />
+    <ClCompile Include="async_io_torture_sync_test.cpp" />
+    <ClCompile Include="async_io_torture_test.cpp" />
+    <ClCompile Include="async_io_works_1_autoflush_test.cpp" />
+    <ClCompile Include="async_io_works_1_directsync_test.cpp" />
+    <ClCompile Include="async_io_works_1_direct_test.cpp" />
+    <ClCompile Include="async_io_works_1_prime_test.cpp" />
+    <ClCompile Include="async_io_works_1_sync_test.cpp" />
+    <ClCompile Include="async_io_works_1_test.cpp" />
+    <ClCompile Include="async_io_works_64_autoflush_test.cpp" />
+    <ClCompile Include="async_io_works_64_directsync_test.cpp" />
+    <ClCompile Include="async_io_works_64_direct_test.cpp" />
+    <ClCompile Include="async_io_works_64_sync_test.cpp" />
+    <ClCompile Include="async_io_works_64_test.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\build\afio.vcxproj">
       <Project>{31a5e53d-7416-4e1d-891a-1c69ef8553bd}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="test_functions.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

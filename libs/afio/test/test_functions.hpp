@@ -153,7 +153,7 @@ static void _1000_open_write_close_deletes(std::shared_ptr<boost::afio::async_fi
         // Fetch any outstanding error
         rmdir.h->get();
         BOOST_CHECK((callcount==1000U));
-}
+}//*/
 
 #ifdef DEBUG_TORTURE_TEST
 static u4 mkfill() { static char ret='0'; if(ret+1>'z') ret='0'; return ret++; }
@@ -335,22 +335,24 @@ static void evil_random_io(std::shared_ptr<boost::afio::async_file_io_dispatcher
     size_t maxfailures=0;
     for(size_t n=0; n<no; n++)
             maxfailures+=todo[n].size();
-    boost::lockfree::queue<pair<const Op *, size_t> *> failures(maxfailures);
-    auto checkHash=[&failures](Op &op, char *base, size_t, std::shared_ptr<boost::afio::detail::async_io_handle> h) -> std::pair<bool, std::shared_ptr<boost::afio::detail::async_io_handle>> {
+    boost::lockfree::queue<std::pair<const Op *, size_t> *> failures(maxfailures);
+    std::function<std::pair<bool, std::shared_ptr<boost::afio::detail::async_io_handle>> (Op &, char *, size_t, std::shared_ptr<boost::afio::detail::async_io_handle>)> checkHash=[&failures](Op &op, char *base, size_t, std::shared_ptr<boost::afio::detail::async_io_handle> h) -> std::pair<bool, std::shared_ptr<boost::afio::detail::async_io_handle>> {
             const char *data=(const char *)(((size_t) base+(size_t) op.req.where));
             size_t idxoffset=0;
             for(size_t m=0; m<op.req.buffers.size(); m++)
             {
                     const char *buffer=op.data[m];
                     size_t idx;
-                    for(idx=0; idx<boost::asio::buffer_size(op.req.buffers[m]); idx++)
+                    for(idx=0; idx < boost::asio::buffer_size(op.req.buffers[m]); idx++)
                     {
                             if(data[idx]!=buffer[idx])
                             {
-                                    failures.push(new pair<const Op *, size_t>(make_pair(&op, idxoffset+idx)));
+                               // auto stupid = new std::pair<const Op *, size_t>(std::make_pair(&op, idxoffset+idx));
+                                //failures.push(new std::pair<const Op *, size_t>(std::make_pair(&op, idxoffset+idx))); //causes compiler error on msvc 2010
+                                    //failures.push(std::make_pair(&op, (size_t)(idxoffset+idx)));
 #ifdef _DEBUG
-                                    string contents(data, 8), shouldbe(buffer, 8);
-                                    cout << "Contents of file at " << op.req.where << " +" << idx << " contains " << contents << " instead of " << shouldbe << endl;
+                                    std::string contents(data, 8), shouldbe(buffer, 8);
+                                    std::cout << "Contents of file at " << op.req.where << " +" << idx << " contains " << contents << " instead of " << shouldbe << std::endl;
 #endif
                                     break;
                             }
@@ -359,7 +361,7 @@ static void evil_random_io(std::shared_ptr<boost::afio::async_file_io_dispatcher
                     data+=boost::asio::buffer_size(op.req.buffers[m]);
                     idxoffset+=boost::asio::buffer_size(op.req.buffers[m]);
             }
-            return make_pair(true, h);
+            return std::make_pair(true, h);
     };
 #pragma omp parallel for
     for(ptrdiff_t n=0; n<(ptrdiff_t) no; n++)
@@ -480,6 +482,6 @@ static void evil_random_io(std::shared_ptr<boost::afio::async_file_io_dispatcher
     auto rmdir(dispatcher->rmdir(async_path_op_req("testdir")));
     // Fetch any outstanding error
     rmdir.h->get();
-}
+}//*/
 
 #endif

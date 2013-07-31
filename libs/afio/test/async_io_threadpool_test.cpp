@@ -30,7 +30,7 @@ Created: Feb 2013
         BOOST_CHECK(r==78);
         std::vector<future<int>> results(8);
         
-        for(auto &i : results)
+        BOOST_FOREACH(auto &i, results)
         {
             i=std::move(pool.enqueue(task));
         }
@@ -43,7 +43,7 @@ Created: Feb 2013
         BOOST_CHECK(allresults2.second==78);
         std::vector<int> allresults=when_all(results.begin(), results.end()).get();
         
-        for(int i : allresults)
+        BOOST_FOREACH(int i, allresults)
         {
             BOOST_CHECK(i==78);
         }
