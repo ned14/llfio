@@ -62,7 +62,7 @@ void raninit(ranctx *x, u4 seed) {
     }
 }
 
-
+static int donothing(boost::afio::atomic<size_t> *callcount, int i) { ++*callcount; return i; }
 static void _1000_open_write_close_deletes(std::shared_ptr<boost::afio::async_file_io_dispatcher_base> dispatcher, size_t bytes)
 {
         using namespace boost::afio;
@@ -107,7 +107,7 @@ static void _1000_open_write_close_deletes(std::shared_ptr<boost::afio::async_fi
         // As a test of call() which involves significant template metaprogramming, have a do nothing callback
         boost::afio::atomic<size_t> callcount(0);
         typedef int (*callable_type)(boost::afio::atomic<size_t> *, int);
-        callable_type callable=[](boost::afio::atomic<size_t> *callcount, int i) { ++*callcount; return i; };
+        callable_type callable=donothing;
         std::vector<std::function<int()>> callables;
         callables.reserve(1000);
         for(size_t n=0; n<1000; n++)

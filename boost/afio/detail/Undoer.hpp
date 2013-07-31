@@ -15,9 +15,6 @@
 #include "boost/config.hpp"
 #include <utility>
 #include <type_traits>
-#if defined(_MSC_VER) && BOOST_MSVC<1700
-#include <boost/type_traits/is_convertible.hpp>
-#endif
 
 namespace boost{
     namespace afio{
@@ -29,7 +26,7 @@ namespace boost{
             }
             //! Compile-time safe detector of if \em v is nullptr (can cope with non-pointer convertibles)
 			#if defined(_MSC_VER) && BOOST_MSVC<1700
-            template<typename T> bool is_nullptr(T v) BOOST_NOEXCEPT_OR_NOTHROW { return Impl::is_nullptr<T, boost::is_constructible<bool, T>::value>()(std::forward<T>(v)); }
+            template<typename T> bool is_nullptr(T v) BOOST_NOEXCEPT_OR_NOTHROW { return Impl::is_nullptr<T, std::is_convertible<bool, T>::value>()(std::forward<T>(v)); }
             #elif defined(__GNUC__) && BOOST_GCC<40900
             template<typename T> bool is_nullptr(T v) BOOST_NOEXCEPT_OR_NOTHROW { return Impl::is_nullptr<T, std::is_constructible<bool, T>::value>()(std::forward<T>(v)); }
             #else
