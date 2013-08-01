@@ -1712,7 +1712,7 @@ template<class R> inline std::pair<std::vector<future<R>>, std::vector<async_io_
 	std::vector<std::pair<async_op_flags, std::function<completion_t>>> callbacks;
 	retfutures.reserve(callables.size());
 	callbacks.reserve(callables.size());
-	auto f=[](size_t, std::shared_ptr<detail::async_io_handle> _, exception_ptr, std::shared_ptr<tasktype> c) {
+	auto f=[](size_t, std::shared_ptr<detail::async_io_handle> _, exception_ptr *, std::shared_ptr<tasktype> c) {
 		(*c)();
 		return std::make_pair(true, _);
 	};
@@ -1720,7 +1720,7 @@ template<class R> inline std::pair<std::vector<future<R>>, std::vector<async_io_
 	{
 		std::shared_ptr<tasktype> c(std::make_shared<tasktype>(std::function<R()>(t)));
 		retfutures.push_back(c->get_future());
-		callbacks.push_back(std::make_pair(async_op_flags::None, std::bind(f, std::placeholders::_1, std::placeholders::_2, std::move(c))));
+		callbacks.push_back(std::make_pair(async_op_flags::None, std::bind(f, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::move(c))));
 	}
 	return std::make_pair(std::move(retfutures), completion(ops, callbacks));
 }

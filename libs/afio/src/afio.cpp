@@ -1017,7 +1017,6 @@ template<> async_file_io_dispatcher_base::completion_returntype async_file_io_di
 	state.first->out[idx]=std::make_pair(id, h); // This might look thread unsafe, but each idx is unique
 	if(--state.first->togo)
 		return std::make_pair(false, h);
-	exception_ptr this_e(afio::make_exception_ptr(afio::current_exception()));
 	// Last one just completed, so issue completions for everything in out except me
 	detail::barrier_count_completed_state &s=*state.first;
 	for(idx=0; idx<s.out.size(); idx++)
@@ -1043,8 +1042,8 @@ template<> async_file_io_dispatcher_base::completion_returntype async_file_io_di
 	idx=state.second;
 	// Am I being called because my precondition threw an exception so we're actually currently inside an exception catch?
 	// If so then duplicate the same exception throw
-	if(this_e)
-		rethrow_exception(this_e);
+	if(e && *e)
+		rethrow_exception(*e);
 	else
 		return std::make_pair(true, h);
 }
