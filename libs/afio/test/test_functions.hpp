@@ -155,6 +155,28 @@ static void _1000_open_write_close_deletes(std::shared_ptr<boost::afio::async_fi
         BOOST_CHECK((callcount==1000U));
 }//*/
 
+
+
+#ifdef DEBUG_TORTURE_TEST
+    struct Op
+    {
+            bool write;
+            std::vector<char *> data;
+            boost::afio::async_data_op_req<char> req;
+    };
+    
+#else
+    struct Op
+    {
+            Hash256 hash; // Only used for reading
+            bool write;
+            ranctx seed;
+            async_data_op_req<char> req;
+    };
+    //static_assert(!(sizeof(PadSizeToMultipleOf<Op, 32>)&31), "Op's stored size must be a multiple of 32 bytes");
+   // vector<vector<PadSizeToMultipleOf<Op, 32>, boost::afio::detail::aligned_allocator<Op, 32>>> todo(no);
+#endif
+
 #ifdef DEBUG_TORTURE_TEST
 static u4 mkfill() { static char ret='0'; if(ret+1>'z') ret='0'; return ret++; }
 #endif
@@ -173,25 +195,14 @@ static void evil_random_io(std::shared_ptr<boost::afio::async_file_io_dispatcher
     vector<vector<char, boost::afio::detail::aligned_allocator<char, 4096>>> towrite(no);
     vector<char *> towriteptrs(no);
     vector<size_t> towritesizes(no);
+
 #ifdef DEBUG_TORTURE_TEST
-    struct Op
-    {
-            bool write;
-            vector<char *> data;
-            async_data_op_req<char> req;
-    };
-    vector<vector<Op>> todo(no);
+    std::vector<vector<Op>> todo(no);
 #else
-    struct Op
-    {
-            Hash256 hash; // Only used for reading
-            bool write;
-            ranctx seed;
-            async_data_op_req<char> req;
-    };
     static_assert(!(sizeof(PadSizeToMultipleOf<Op, 32>)&31), "Op's stored size must be a multiple of 32 bytes");
     vector<vector<PadSizeToMultipleOf<Op, 32>, boost::afio::detail::aligned_allocator<Op, 32>>> todo(no);
 #endif
+
     for(size_t n=0; n<no; n++)
     {
             towrite[n].reserve(bytes);
@@ -335,10 +346,13 @@ static void evil_random_io(std::shared_ptr<boost::afio::async_file_io_dispatcher
     size_t maxfailures=0;
     for(size_t n=0; n<no; n++)
             maxfailures+=todo[n].size();
+
     boost::lockfree::queue<std::pair<const Op *, size_t> *> failures(maxfailures);
     std::function<std::pair<bool, std::shared_ptr<boost::afio::detail::async_io_handle>> (Op &, char *, size_t, std::shared_ptr<boost::afio::detail::async_io_handle>)> checkHash=[&failures](Op &op, char *base, size_t, std::shared_ptr<boost::afio::detail::async_io_handle> h) -> std::pair<bool, std::shared_ptr<boost::afio::detail::async_io_handle>> {
             const char *data=(const char *)(((size_t) base+(size_t) op.req.where));
             size_t idxoffset=0;
+            
+
             for(size_t m=0; m<op.req.buffers.size(); m++)
             {
                     const char *buffer=op.data[m];
@@ -347,9 +361,8 @@ static void evil_random_io(std::shared_ptr<boost::afio::async_file_io_dispatcher
                     {
                             if(data[idx]!=buffer[idx])
                             {
-                               // auto stupid = new std::pair<const Op *, size_t>(std::make_pair(&op, idxoffset+idx));
-                                //failures.push(new std::pair<const Op *, size_t>(std::make_pair(&op, idxoffset+idx))); //causes compiler error on msvc 2010
-                                    //failures.push(std::make_pair(&op, (size_t)(idxoffset+idx)));
+                                
+                                failures.push(new std::pair<const Op *, size_t>(std::make_pair(&op, idxoffset+idx))); //causes compiler error on msvc 2010
 #ifdef _DEBUG
                                     std::string contents(data, 8), shouldbe(buffer, 8);
                                     std::cout << "Contents of file at " << op.req.where << " +" << idx << " contains " << contents << " instead of " << shouldbe << std::endl;
