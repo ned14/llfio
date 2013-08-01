@@ -20,7 +20,9 @@ File Created: Mar 2013
 #error _VARIADIC_MAX needs to be set to at least six to compile Boost.AFIO
 #endif
 
-#include "boost/config.hpp"
+
+#include "config.hpp"
+#include "detail/Utility.hpp"
 #include <type_traits>
 #ifndef BOOST_NO_CXX11_HDR_INITIALIZER_LIST
 #include <initializer_list>
@@ -55,8 +57,6 @@ File Created: Mar 2013
 #include <mutex>
 #endif
 
-#include "config.hpp"
-#include "detail/Utility.hpp"
 
 // Map in C++11 stuff if available
 #if (defined(__GLIBCXX__) && __GLIBCXX__<=20120920) || (defined(BOOST_MSVC) && BOOST_MSVC < 1700)
@@ -403,6 +403,7 @@ template <class InputIterator> inline future<std::vector<typename std::decay<dec
 	typedef typename std::decay<decltype(((typename InputIterator::value_type *) 0)->get())>::type value_type;
 	typedef std::vector<value_type> returns_t;
 	// Take a copy of the futures supplied to us (which may invalidate them)
+    // std::shared_ptr<std::vector<future_type>> futures;
 	auto futures=std::make_shared<std::vector<future_type>>(std::make_move_iterator(first), std::make_move_iterator(last));
 	// Bind to my delegate and invoke
 	std::function<returns_t ()> waitforall(std::move(std::bind(&detail::when_all_do<returns_t, future_type>, futures)));
@@ -432,6 +433,7 @@ template <class InputIterator> inline future<std::pair<size_t, typename std::dec
 	typedef std::pair<size_t, typename std::decay<decltype(((typename InputIterator::value_type *) 0)->get())>::type> returns_t;
 	// Take a copy of the futures supplied to us (which may invalidate them)
 	auto futures=std::make_shared<std::vector<future_type>>(std::make_move_iterator(first), std::make_move_iterator(last));
+    //std::shared_ptr<std::vector<future_type>> futures;
 	// Bind to my delegate and invoke
 	std::function<returns_t ()> waitforall(std::move(std::bind(&detail::when_any_do<returns_t, future_type>, futures)));
 	return process_threadpool().enqueue(std::move(waitforall));

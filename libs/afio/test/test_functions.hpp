@@ -23,8 +23,7 @@ extern int putenv(char*);
 #include "../../../boost/afio/afio.hpp"
 #include "../detail/SpookyV2.h"
 #include "../../../boost/afio/detail/Aligned_Allocator.hpp"
-#include "../../../boost/afio/detail/Undoer.hpp"
-
+//#include "../../../boost/afio/detail/Undoer.hpp"
 
 //if we're building the tests all together don't define the test main
 #ifndef BOOST_AFIO_TEST_ALL
@@ -155,8 +154,6 @@ static void _1000_open_write_close_deletes(std::shared_ptr<boost::afio::async_fi
         BOOST_CHECK((callcount==1000U));
 }//*/
 
-
-
 #ifdef DEBUG_TORTURE_TEST
     struct Op
     {
@@ -164,7 +161,6 @@ static void _1000_open_write_close_deletes(std::shared_ptr<boost::afio::async_fi
             std::vector<char *> data;
             boost::afio::async_data_op_req<char> req;
     };
-    
 #else
     struct Op
     {
@@ -173,20 +169,19 @@ static void _1000_open_write_close_deletes(std::shared_ptr<boost::afio::async_fi
             ranctx seed;
             async_data_op_req<char> req;
     };
-    //static_assert(!(sizeof(PadSizeToMultipleOf<Op, 32>)&31), "Op's stored size must be a multiple of 32 bytes");
-   // vector<vector<PadSizeToMultipleOf<Op, 32>, boost::afio::detail::aligned_allocator<Op, 32>>> todo(no);
 #endif
 
 #ifdef DEBUG_TORTURE_TEST
 static u4 mkfill() { static char ret='0'; if(ret+1>'z') ret='0'; return ret++; }
 #endif
+
 static void evil_random_io(std::shared_ptr<boost::afio::async_file_io_dispatcher_base> dispatcher, size_t no, size_t bytes, size_t alignment=0)
 {
-    using namespace boost::afio;
+    //using namespace boost::afio;
     using namespace std;
     using boost::afio::future;
 	using boost::afio::ratio;
-    using namespace boost::afio::detail;
+    //using namespace boost::afio::detail;
     using boost::afio::off_t;
 	namespace chrono = boost::afio::chrono;
     typedef chrono::duration<double, ratio<1>> secs_type;
@@ -195,7 +190,7 @@ static void evil_random_io(std::shared_ptr<boost::afio::async_file_io_dispatcher
     vector<vector<char, boost::afio::detail::aligned_allocator<char, 4096>>> towrite(no);
     vector<char *> towriteptrs(no);
     vector<size_t> towritesizes(no);
-
+    
 #ifdef DEBUG_TORTURE_TEST
     std::vector<vector<Op>> todo(no);
 #else
@@ -323,17 +318,17 @@ static void evil_random_io(std::shared_ptr<boost::afio::async_file_io_dispatcher
     for(size_t n=0; n<no; n++)
             memset(towriteptrs[n], 0, towritesizes[n]);
 
-    auto mkdir(dispatcher->dir(async_path_op_req("testdir", file_flags::Create)));
+    auto mkdir(dispatcher->dir(boost::afio::async_path_op_req("testdir", boost::afio::file_flags::Create)));
     // Wait for three seconds to let filing system recover and prime SpeedStep
     //begin=chrono::high_resolution_clock::now();
     //while(chrono::duration_cast<secs_type>(chrono::high_resolution_clock::now()-begin).count()<3);
 
     // Open our test files
     begin=chrono::high_resolution_clock::now();
-    std::vector<async_path_op_req> manyfilereqs;
+    std::vector<boost::afio::async_path_op_req> manyfilereqs;
     manyfilereqs.reserve(no);
     for(size_t n=0; n<no; n++)
-            manyfilereqs.push_back(async_path_op_req(mkdir, "testdir/"+boost::to_string(n), file_flags::Create|file_flags::ReadWrite));
+            manyfilereqs.push_back(boost::afio::async_path_op_req(mkdir, "testdir/"+boost::to_string(n), boost::afio::file_flags::Create|boost::afio::file_flags::ReadWrite));
     auto manyopenfiles(dispatcher->file(manyfilereqs));
     std::vector<off_t> sizes(no, bytes);
     auto manywrittenfiles(dispatcher->truncate(manyopenfiles, sizes));
@@ -341,7 +336,6 @@ static void evil_random_io(std::shared_ptr<boost::afio::async_file_io_dispatcher
     for(size_t n=0; n<manywrittenfiles.size(); n++)
             cout << n << ": " << manywrittenfiles[n].id << " (" << manywrittenfiles[n].h->get()->path() << ") " << endl;
 #endif
-
     // Schedule a replay of our in-RAM simulation
     size_t maxfailures=0;
     for(size_t n=0; n<no; n++)
@@ -351,7 +345,6 @@ static void evil_random_io(std::shared_ptr<boost::afio::async_file_io_dispatcher
     std::function<std::pair<bool, std::shared_ptr<boost::afio::detail::async_io_handle>> (Op &, char *, size_t, std::shared_ptr<boost::afio::detail::async_io_handle>)> checkHash=[&failures](Op &op, char *base, size_t, std::shared_ptr<boost::afio::detail::async_io_handle> h) -> std::pair<bool, std::shared_ptr<boost::afio::detail::async_io_handle>> {
             const char *data=(const char *)(((size_t) base+(size_t) op.req.where));
             size_t idxoffset=0;
-            
 
             for(size_t m=0; m<op.req.buffers.size(); m++)
             {
@@ -387,12 +380,12 @@ static void evil_random_io(std::shared_ptr<boost::afio::async_file_io_dispatcher
                             manywrittenfiles[n]=dispatcher->write(op.req);
                     }
                     else
-                            manywrittenfiles[n]=dispatcher->completion(dispatcher->read(op.req), std::make_pair(async_op_flags::ImmediateCompletion, std::bind(checkHash, ref(op), towriteptrs[n], placeholders::_1, placeholders::_2)));
+                            manywrittenfiles[n]=dispatcher->completion(dispatcher->read(op.req), std::make_pair(boost::afio::async_op_flags::ImmediateCompletion, std::bind(checkHash, ref(op), towriteptrs[n], placeholders::_1, placeholders::_2)));
             }
             // After replay, read the entire file into memory
-            manywrittenfiles[n]=dispatcher->read(async_data_op_req<char>(manywrittenfiles[n], towriteptrs[n], towritesizes[n], 0));
+            manywrittenfiles[n]=dispatcher->read(boost::afio::async_data_op_req<char>(manywrittenfiles[n], towriteptrs[n], towritesizes[n], 0));
     }
-
+   
     // Close each of those files
     auto manyclosedfiles(dispatcher->close(manywrittenfiles));
     auto dispatched=chrono::high_resolution_clock::now();
@@ -442,11 +435,11 @@ static void evil_random_io(std::shared_ptr<boost::afio::async_file_io_dispatcher
             cout << "The following hash failures occurred:" << endl;
             while(failures.pop(failedop))
             {
-                    auto undofailedop=boost::afio::detail::Undoer([&failedop]{ delete failedop; });
-                    size_t bytes=0;
-                    BOOST_FOREACH(auto &b, failedop->first->req.buffers)
-                            bytes+=boost::asio::buffer_size(b);
-                    cout << "   " << (failedop->first->write ? "Write to" : "Read from") << " " << boost::to_string(failedop->first->req.where) << " at offset " << failedop->second << " into bytes " << bytes << endl;
+                auto undofailedop=boost::afio::detail::Undoer([&failedop]{ delete failedop; });
+                size_t bytes=0;
+                BOOST_FOREACH(auto &b, failedop->first->req.buffers)
+                    bytes+=boost::asio::buffer_size(b);
+                cout << "   " << (failedop->first->write ? "Write to" : "Read from") << " " << boost::to_string(failedop->first->req.where) << " at offset " << failedop->second << " into bytes " << bytes << endl;
             }
     }
     BOOST_TEST_MESSAGE("Checking if the final files have exactly the right contents ... this may take a bit ...");
@@ -492,7 +485,7 @@ static void evil_random_io(std::shared_ptr<boost::afio::async_file_io_dispatcher
     auto manydeletedfiles(dispatcher->rmfile(manyfilereqs));
     // Wait for all files to delete
     when_all(manydeletedfiles.begin(), manydeletedfiles.end()).wait();
-    auto rmdir(dispatcher->rmdir(async_path_op_req("testdir")));
+    auto rmdir(dispatcher->rmdir(boost::afio::async_path_op_req("testdir")));
     // Fetch any outstanding error
     rmdir.h->get();
 }//*/
