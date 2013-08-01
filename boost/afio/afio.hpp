@@ -37,15 +37,10 @@ File Created: Mar 2013
 //#define BOOST_THREAD_PROVIDES_VARIADIC_THREAD
 //#define BOOST_THREAD_DONT_PROVIDE_FUTURE
 //#define BOOST_THREAD_PROVIDES_SIGNATURE_PACKAGED_TASK
-#include "boost/asio.hpp"
-#include "boost/thread/thread.hpp"
-#include "boost/thread/future.hpp"
-#include "boost/foreach.hpp"
-#include "detail/Preprocessor_variadic.hpp"
-#include <boost/detail/scoped_enum_emulation.hpp>
 
 
 #if defined(BOOST_MSVC) && BOOST_MSVC < 1700// Dinkumware without <atomic>
+#define BOOST_MOVE_USE_STANDARD_LIBRARY_MOVE   // there must be a better workaround than this to solve the boost::move, std::move conflict
 #include "boost/atomic.hpp"
 #include "boost/chrono.hpp"
 #define BOOST_AFIO_USE_BOOST_ATOMIC
@@ -56,6 +51,13 @@ File Created: Mar 2013
 #include <atomic>
 #include <mutex>
 #endif
+
+#include "boost/asio.hpp"
+#include "boost/thread/thread.hpp"
+#include "boost/thread/future.hpp"
+#include "boost/foreach.hpp"
+#include "detail/Preprocessor_variadic.hpp"
+#include <boost/detail/scoped_enum_emulation.hpp>
 
 
 // Map in C++11 stuff if available
