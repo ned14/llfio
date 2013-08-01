@@ -1144,6 +1144,8 @@ namespace detail
 				bool done=false;
 				try
 				{
+					// Retrieve the result of each input, waiting for it if it is between decrementing the
+					// atomic and signalling its future.
 					BOOST_FOREACH(auto &i, state->inputs)
 					{
 						shared_future<std::shared_ptr<detail::async_io_handle>> *future=i.h.get();
