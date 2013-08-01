@@ -168,7 +168,7 @@ static inline int winftruncate(int fd, boost::afio::off_t _newsize)
 // libstdc++ doesn't come with std::lock_guard
 #define BOOST_AFIO_LOCK_GUARD boost::lock_guard
 
-#if defined(_DEBUG) && 0
+#if defined(DEBUG) && 0
 #define BOOST_AFIO_DEBUG_PRINTING 1
 #ifdef WIN32
 #define BOOST_AFIO_DEBUG_PRINT(...) \
@@ -685,6 +685,7 @@ template<class F, class... Args> std::shared_ptr<detail::async_io_handle> async_
 	catch(...)
 	{
 		exception_ptr e(afio::make_exception_ptr(afio::current_exception()));
+		assert(e);
 		BOOST_AFIO_DEBUG_PRINT("E %u begin\n", (unsigned) id);
 		complete_async_op(id, h, e);
 		BOOST_AFIO_DEBUG_PRINT("E %u end\n", (unsigned) id);
@@ -777,7 +778,7 @@ template<class F, class... Args> async_io_op async_file_io_dispatcher_base::chai
 	// Wrap supplied implementation routine with a completion dispatcher
 	auto wrapperf=&async_file_io_dispatcher_base::invoke_async_op_completions<F, Args...>;
 	// Bind supplied implementation routine to this, unique id and any args they passed
-	typename detail::async_file_io_dispatcher_op::completion_t boundf(std::make_pair(thisid, std::bind(wrapperf, this, thisid, std::placeholders::_1, nullptr, f, args...)));
+	typename detail::async_file_io_dispatcher_op::completion_t boundf(std::make_pair(thisid, std::bind(wrapperf, this, thisid, std::placeholders::_1, std::placeholders::_2, f, args...)));
 	// Make a new async_io_op ready for returning
 	async_io_op ret(this, thisid);
 	bool done=false;
@@ -871,7 +872,7 @@ template<class F, class... Args> async_io_op async_file_io_dispatcher_base::chai
 	    /* Wrap supplied implementation routine with a completion dispatcher*/ \
 	    auto wrapperf=&async_file_io_dispatcher_base::invoke_async_op_completions<F BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, A)>;\
 	    /* Bind supplied implementation routine to this, unique id and any args they passed*/ \
-	    typename detail::async_file_io_dispatcher_op::completion_t boundf(std::make_pair(thisid, std::bind(wrapperf, this, thisid, std::placeholders::_1, nullptr, f BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a))));\
+	    typename detail::async_file_io_dispatcher_op::completion_t boundf(std::make_pair(thisid, std::bind(wrapperf, this, thisid, std::placeholders::_1, std::placeholders::_2, f BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a))));\
 	    /* Make a new async_io_op ready for returning*/\
 	    async_io_op ret(this, thisid);\
 	    bool done=false;\
@@ -1023,20 +1024,22 @@ template<> async_file_io_dispatcher_base::completion_returntype async_file_io_di
 	{
 		if(idx==state.second) continue;
 		shared_future<std::shared_ptr<detail::async_io_handle>> *thisresult=state.first->outsharedstates[idx].get();
-		if(thisresult->has_exception())
+		// This seems excessive but I don't see any other legal way to extract the exception ...
+		bool success=false;
+		try
 		{
-			// This seems excessive but I don't see any other legal way to extract the exception ...
-			try
-			{
-				thisresult->get();
-			}
-			catch(...)
-			{
-				exception_ptr e(afio::make_exception_ptr(afio::current_exception()));
-				complete_async_op(s.out[idx].first, s.out[idx].second, e);
-			}
+			// Always must wait on the others, because some may be between decrementing the
+			// atomic and returning their result to here. Any waiting is likely short.
+			thisresult->get();
+			success=true;
 		}
-		else
+		catch(...)
+		{
+			exception_ptr e(afio::make_exception_ptr(afio::current_exception()));
+			assert(e);
+			complete_async_op(s.out[idx].first, s.out[idx].second, e);
+		}
+		if(success)
 			complete_async_op(s.out[idx].first, s.out[idx].second);
 	}
 	idx=state.second;
