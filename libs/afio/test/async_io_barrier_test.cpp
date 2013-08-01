@@ -12,13 +12,13 @@ BOOST_AUTO_TEST_CASE(async_io_barrier)
 	namespace chrono = boost::afio::chrono;
     typedef chrono::duration<double, ratio<1>> secs_type;
     vector<pair<size_t, int>> groups;
-    // Generate 100,000 sorted random numbers between 0-1000
+    // Generate 500,000 sorted random numbers between 0-1000
     {
         ranctx gen;
         raninit(&gen, 0x78adbcff);
         vector<int> manynumbers;
-        manynumbers.reserve(100000);
-        for (size_t n = 0; n < 100000; n++)
+        manynumbers.reserve(500000);
+        for (size_t n = 0; n < 500000; n++)
             manynumbers.push_back(ranval(&gen) % 1000);
         sort(manynumbers.begin(), manynumbers.end());
 
@@ -36,7 +36,7 @@ BOOST_AUTO_TEST_CASE(async_io_barrier)
     memset(&callcount, 0, sizeof(callcount));
     vector<future<bool>> verifies;
     verifies.reserve(groups.size());
-    auto inccount = [](boost::afio::atomic<size_t> *count){ for (volatile size_t n = 0; n < 10000; n++); (*count)++; };
+    auto inccount = [](boost::afio::atomic<size_t> *count){ /*for (volatile size_t n = 0; n < 10000; n++);*/ (*count)++; };
     auto verifybarrier = [](boost::afio::atomic<size_t> *count, size_t shouldbe)
     {
         if (*count != shouldbe)

@@ -625,7 +625,7 @@ public:
     //! The type returned by a completion handler \ingroup async_file_io_dispatcher_base__completion
 	typedef std::pair<bool, std::shared_ptr<detail::async_io_handle>> completion_returntype;
     //! The type of a completion handler \ingroup async_file_io_dispatcher_base__completion
-	typedef completion_returntype completion_t(size_t, std::shared_ptr<detail::async_io_handle>);
+	typedef completion_returntype completion_t(size_t, std::shared_ptr<detail::async_io_handle>, exception_ptr *);
 	/*! \brief Schedule a batch of asynchronous invocations of the specified functions when their supplied operations complete.
     \return A batch of op handles
     \param ops A batch of precondition op handles.
@@ -989,17 +989,17 @@ public:
 	static size_t page_size() BOOST_NOEXCEPT_OR_NOTHROW;
 protected:
 	void complete_async_op(size_t id, std::shared_ptr<detail::async_io_handle> h, exception_ptr e=exception_ptr());
-	completion_returntype invoke_user_completion(size_t id, std::shared_ptr<detail::async_io_handle> h, std::function<completion_t> callback);
-	template<class F, class T> std::vector<async_io_op> chain_async_ops(int optype, const std::vector<async_io_op> &preconditions, const std::vector<T> &container, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, T));
-	template<class F> std::vector<async_io_op> chain_async_ops(int optype, const std::vector<async_io_op> &container, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, async_io_op));
-	template<class F> std::vector<async_io_op> chain_async_ops(int optype, const std::vector<async_path_op_req> &container, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, async_path_op_req));
-	template<class F, bool iswrite> std::vector<async_io_op> chain_async_ops(int optype, const std::vector<detail::async_data_op_req_impl<iswrite>> &container, async_op_flags flags, completion_returntype(F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, detail::async_data_op_req_impl<iswrite>));
-	template<class T> async_file_io_dispatcher_base::completion_returntype dobarrier(size_t id, std::shared_ptr<detail::async_io_handle> h, T);
+	completion_returntype invoke_user_completion(size_t id, std::shared_ptr<detail::async_io_handle> h, exception_ptr *e, std::function<completion_t> callback);
+	template<class F, class T> std::vector<async_io_op> chain_async_ops(int optype, const std::vector<async_io_op> &preconditions, const std::vector<T> &container, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, exception_ptr *, T));
+	template<class F> std::vector<async_io_op> chain_async_ops(int optype, const std::vector<async_io_op> &container, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, exception_ptr *, async_io_op));
+	template<class F> std::vector<async_io_op> chain_async_ops(int optype, const std::vector<async_path_op_req> &container, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, exception_ptr *, async_path_op_req));
+	template<class F, bool iswrite> std::vector<async_io_op> chain_async_ops(int optype, const std::vector<detail::async_data_op_req_impl<iswrite>> &container, async_op_flags flags, completion_returntype(F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, exception_ptr *, detail::async_data_op_req_impl<iswrite>));
+	template<class T> async_file_io_dispatcher_base::completion_returntype dobarrier(size_t id, std::shared_ptr<detail::async_io_handle> h, exception_ptr *, T);
 
 #ifndef BOOST_NO_CXX11_VARIADIC_TEMPLATES
     
-    template<class F, class... Args> std::shared_ptr<detail::async_io_handle> invoke_async_op_completions(size_t id, std::shared_ptr<detail::async_io_handle> h, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, Args...), Args... args);
-    template<class F, class... Args> async_io_op chain_async_op(detail::immediate_async_ops &immediates, int optype, const async_io_op &precondition, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, Args...), Args... args);
+    template<class F, class... Args> std::shared_ptr<detail::async_io_handle> invoke_async_op_completions(size_t id, std::shared_ptr<detail::async_io_handle> h, exception_ptr *e, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, exception_ptr *, Args...), Args... args);
+    template<class F, class... Args> async_io_op chain_async_op(detail::immediate_async_ops &immediates, int optype, const async_io_op &precondition, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, exception_ptr *, Args...), Args... args);
 
 #else
 
@@ -1009,8 +1009,8 @@ protected:
     BOOST_PP_ENUM_PARAMS(N, class A)>                                                               \
     std::shared_ptr<detail::async_io_handle>                                                        \
     invoke_async_op_completions                                                                     \
-    (size_t id, std::shared_ptr<detail::async_io_handle> h,                                         \
-    completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>                  \
+    (size_t id, std::shared_ptr<detail::async_io_handle> h, exception_ptr *,                        \
+    completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, exception_ptr * \
     BOOST_PP_COMMA_IF(N)                                                                            \
     BOOST_PP_ENUM_PARAMS(N, A))                                                                     \
     BOOST_PP_COMMA_IF(N)                                                                            \
@@ -1029,7 +1029,7 @@ protected:
     chain_async_op                                   /* function name */                            \
     (detail::immediate_async_ops &immediates, int optype,           /* parameters start */          \
     const async_io_op &precondition,async_op_flags flags,                                           \
-    completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>                  \
+    completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, exception_ptr * \
     BOOST_PP_COMMA_IF(N)                                                                            \
     BOOST_PP_ENUM_PARAMS(N, A))                                                                     \
     BOOST_PP_COMMA_IF(N)                                                                            \
@@ -1144,6 +1144,8 @@ namespace detail
 				bool done=false;
 				try
 				{
+					// Retrieve the result of each input, waiting for it if it is between decrementing the
+					// atomic and signalling its future.
 					BOOST_FOREACH(auto &i, state->inputs)
 					{
 						shared_future<std::shared_ptr<detail::async_io_handle>> *future=i.h.get();
@@ -1712,7 +1714,7 @@ template<class R> inline std::pair<std::vector<future<R>>, std::vector<async_io_
 	std::vector<std::pair<async_op_flags, std::function<completion_t>>> callbacks;
 	retfutures.reserve(callables.size());
 	callbacks.reserve(callables.size());
-	auto f=[](size_t, std::shared_ptr<detail::async_io_handle> _, std::shared_ptr<tasktype> c) {
+	auto f=[](size_t, std::shared_ptr<detail::async_io_handle> _, exception_ptr *, std::shared_ptr<tasktype> c) {
 		(*c)();
 		return std::make_pair(true, _);
 	};
@@ -1720,7 +1722,7 @@ template<class R> inline std::pair<std::vector<future<R>>, std::vector<async_io_
 	{
 		std::shared_ptr<tasktype> c(std::make_shared<tasktype>(std::function<R()>(t)));
 		retfutures.push_back(c->get_future());
-		callbacks.push_back(std::make_pair(async_op_flags::None, std::bind(f, std::placeholders::_1, std::placeholders::_2, std::move(c))));
+		callbacks.push_back(std::make_pair(async_op_flags::None, std::bind(f, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::move(c))));
 	}
 	return std::make_pair(std::move(retfutures), completion(ops, callbacks));
 }

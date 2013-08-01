@@ -1,11 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2010
+# Visual Studio 2012
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "afio", "build\afio.vcxproj", "{31A5E53D-7416-4E1D-891A-1C69EF8553BD}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "unittests", "test\unittests.vcxproj", "{4324A554-FA77-4276-A4A0-657E9849D1C3}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Foo", "C:\Users\ned\Documents\Visual Studio 2010\Projects\Foo\Foo\Foo.vcxproj", "{170AB866-186C-4078-9A34-B58DE8495DEF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -25,7 +23,6 @@ Global
 		{31A5E53D-7416-4E1D-891A-1C69EF8553BD}.Debug|Win32.ActiveCfg = Debug|Win32
 		{31A5E53D-7416-4E1D-891A-1C69EF8553BD}.Debug|Win32.Build.0 = Debug|Win32
 		{31A5E53D-7416-4E1D-891A-1C69EF8553BD}.Debug|x64.ActiveCfg = Debug|x64
-		{31A5E53D-7416-4E1D-891A-1C69EF8553BD}.Debug|x64.Build.0 = Debug|x64
 		{31A5E53D-7416-4E1D-891A-1C69EF8553BD}.Release|Any CPU.ActiveCfg = Release|Win32
 		{31A5E53D-7416-4E1D-891A-1C69EF8553BD}.Release|Mixed Platforms.ActiveCfg = Release|Win32
 		{31A5E53D-7416-4E1D-891A-1C69EF8553BD}.Release|Mixed Platforms.Build.0 = Release|Win32
@@ -47,18 +44,6 @@ Global
 		{4324A554-FA77-4276-A4A0-657E9849D1C3}.Release|Win32.Build.0 = Release|Win32
 		{4324A554-FA77-4276-A4A0-657E9849D1C3}.Release|x64.ActiveCfg = Release|x64
 		{4324A554-FA77-4276-A4A0-657E9849D1C3}.Release|x64.Build.0 = Release|x64
-		{170AB866-186C-4078-9A34-B58DE8495DEF}.Debug|Any CPU.ActiveCfg = Debug|Win32
-		{170AB866-186C-4078-9A34-B58DE8495DEF}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
-		{170AB866-186C-4078-9A34-B58DE8495DEF}.Debug|Mixed Platforms.Build.0 = Debug|Win32
-		{170AB866-186C-4078-9A34-B58DE8495DEF}.Debug|Win32.ActiveCfg = Debug|Win32
-		{170AB866-186C-4078-9A34-B58DE8495DEF}.Debug|Win32.Build.0 = Debug|Win32
-		{170AB866-186C-4078-9A34-B58DE8495DEF}.Debug|x64.ActiveCfg = Debug|Win32
-		{170AB866-186C-4078-9A34-B58DE8495DEF}.Release|Any CPU.ActiveCfg = Release|Win32
-		{170AB866-186C-4078-9A34-B58DE8495DEF}.Release|Mixed Platforms.ActiveCfg = Release|Win32
-		{170AB866-186C-4078-9A34-B58DE8495DEF}.Release|Mixed Platforms.Build.0 = Release|Win32
-		{170AB866-186C-4078-9A34-B58DE8495DEF}.Release|Win32.ActiveCfg = Release|Win32
-		{170AB866-186C-4078-9A34-B58DE8495DEF}.Release|Win32.Build.0 = Release|Win32
-		{170AB866-186C-4078-9A34-B58DE8495DEF}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
