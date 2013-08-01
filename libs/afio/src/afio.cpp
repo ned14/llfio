@@ -1092,6 +1092,7 @@ namespace detail {
 					if(!(req.flags & file_flags::CreateOnlyIfNotExist))
 						ret=1;
 				}
+				BOOST_AFIO_ERRHWINFN(ret, req.path);
 				req.flags=req.flags&~(file_flags::Create|file_flags::CreateOnlyIfNotExist);
 			}
 			DWORD attr=GetFileAttributes(req.path.c_str());
@@ -1476,6 +1477,7 @@ namespace detail {
 					if(!(req.flags & file_flags::CreateOnlyIfNotExist))
 						ret=0;
 				}
+				BOOST_AFIO_ERRHOSFN(ret, req.path);
 				req.flags=req.flags&~(file_flags::Create|file_flags::CreateOnlyIfNotExist);
 			}
 
