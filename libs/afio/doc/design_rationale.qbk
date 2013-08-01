@@ -197,7 +197,7 @@ for clarity:
 [table:data_persistence_types Mechanisms for enforcing data persistence onto physical storage
   [[][Flush file metadata][Flush file data][Flush both metadata and data]]
   [[Once off][`fsync(parentdir_fd)`][`fdatasync(fd)`][`fsync(fd)`]]
-  [[Always][Varies[footnote Many filing systems (NTFS, HFS+, ext3 with `data=ordered`, ext4 with `alloc_on_commit`) keep back a metadata flush until when a file handle close causes data to finish reaching physical storage. This ensures that files don't appear in directories with zero sizes.]][`fcntl(fd, F_SETFL, O_DSYNC)`][`fcntl(fd, F_SETFL, O_SYNC)`]]
+  [[Always][Varies[footnote Many filing systems (NTFS, HFS+, ext3/4 with `data=ordered`) keep back a metadata flush until when a file handle close causes data to finish reaching physical storage. This ensures that files don't appear in directories with zero sizes.]][`fcntl(fd, F_SETFL, O_DSYNC)`][`fcntl(fd, F_SETFL, O_SYNC)`]]
 ]
 
 In addition to manually flushing data to physical storage, every filing system also
@@ -314,23 +314,27 @@ copy on writes data, either a copy's length matches the intent log's or it doesn
 the file's length as reported by the filing system really is how much true data it contains), plus the file
 modified timestamp always reflects the actual last modifed timestamp of the data. Note that
 ext3 and ext4 can also guarantee that file and metadata will always match using
-the (IOPS expensive) mount option `journal=data`, which can be detected from `/proc/mounts`.
+the (IOPS expensive) mount option `data=journal`, which can be detected from `/proc/mounts`.
 
 For those working without the luxury of ZFS, here is a quick table of power loss safety.
 Once again, I reiterate that errors and omissions are my fault alone.
 
 [table:power_loss_safety Power loss safety matrix: What can you lose if power is suddenly lost?
-  [[][Metadata no longer matches data][Newly created file content][File data content rewrite]]
-  [[FAT32]['''<entry align="center">'''__tick__'''</entry>'''][__cross__]]
-  [[Always][]]
+  [[][[role aligncenter Metadata no longer matches data[footnote This doesn't mean that metadata is corrupted,
+  this means for example that a file is said to have 100Kb but is in fact partially garbage because metadata was updated before data was fully changed on storage.]]][[role aligncenter Newly created file content corrupted]][[role aligncenter File data content rewrite corrupted]][[role aligncenter Max seconds of writes reordered without using `fsync()`]][[role aligncenter Max seconds of writes lost]]]
+  [[[role alignright FAT32]][__tick__][__tick__][__tick__][][]]
+  [[[role alignright ext2]][__tick__][__tick__][__tick__][[role aligncenter 5]][[role aligncenter 5]]]
+  [[[role alignright ext3/4 `data=writeback`]][__tick__][__tick__][__tick__][[role aligncenter 5/60]][[role aligncenter 60]]]
+  [[[role alignright ext3/4 `data=ordered` (default)]][__cross__][__cross__][__tick__][[role aligncenter 5/60]][[role aligncenter 60]]]
+  [[[role alignright UFS + soft updates]][__cross__][__cross__][__tick__][][]]
+  [[[role alignright HFS+]][__cross__][__cross__][__tick__][][]]
+  [[[role alignright NTFS]][__cross__][__cross__][__tick__][][]]
+  [[[role alignright ext3/4 `data=journal`]][__cross__][__cross__][__cross__][[role aligncenter 60]][[role aligncenter 60]]]
+  [[[role alignright BTRFS]][__cross__][__cross__][__cross__][][]]
+  [[[role alignright ZFS]][__cross__][__cross__][__cross__][[role aligncenter 5]][[role aligncenter 30]]]
 ]
 
 
-NTFS, HFS+, ext3 with `data=ordered`, ext4 with `alloc_on_commit`) keep back a metadata flush until when a file handle close causes data to finish reaching physical storage. This ensures that files don't appear in directories with zero sizes 
-
-In the hope that one day filing systems might actually expose their preexisting
-non-`fsync()` write ordering constraints like I just described, AFIO makes
-available such a facility using the XXX `file_flags` member. 
 [endsect] [/write_ordering_data]
 
 [endsect] [/acid_write_ordering]

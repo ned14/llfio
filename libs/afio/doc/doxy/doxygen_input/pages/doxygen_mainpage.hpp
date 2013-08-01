@@ -14,7 +14,9 @@
 /*!
 \mainpage Boost.AFIO
 
-Hello
+Welcome to the Boost.AFIO documentation. You may find the more formal documentation at
+https://ci.nedprod.com/view/All/job/Boost.AFIO%20Build%20Documentation/Boost.AFIO_Documentation/?
+of use. It also includes a full reference manual.
 
 */
 

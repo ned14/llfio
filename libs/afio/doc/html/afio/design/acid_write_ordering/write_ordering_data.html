@@ -11,16 +11,16 @@
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
 <table cellpadding="2" width="100%"><tr>
-<td valign="top"><img alt="Boost C++ Libraries" width="277" height="86" src="../../../../../../../boost.png"></td>
-<td align="center"><a href="../../../../../../../index.html">Home</a></td>
-<td align="center"><a href="../../../../../../../libs/libraries.htm">Libraries</a></td>
+<td valign="top"><img alt="Boost C++ Libraries" width="277" height="86" src="../../../../../boost.png"></td>
+<td align="center"><a href="../../../../../index.html">Home</a></td>
+<td align="center"><a href="../../../../../libs/libraries.htm">Libraries</a></td>
 <td align="center"><a href="http://www.boost.org/users/people.html">People</a></td>
 <td align="center"><a href="http://www.boost.org/users/faq.html">FAQ</a></td>
-<td align="center"><a href="../../../../../../../more/index.htm">More</a></td>
+<td align="center"><a href="../../../../../more/index.htm">More</a></td>
 </tr></table>
 <hr>
 <div class="spirit-nav">
-<a accesskey="p" href="background.html"><img src="../../../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../acid_write_ordering.html"><img src="../../../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="../../compilation.html"><img src="../../../../../../../doc/src/images/next.png" alt="Next"></a>
+<a accesskey="p" href="background.html"><img src="../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../acid_write_ordering.html"><img src="../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="../../compilation.html"><img src="../../../../../doc/src/images/next.png" alt="Next"></a>
 </div>
 <div class="section">
 <div class="titlepage"><div><div><h4 class="title">
@@ -133,7 +133,7 @@
           data it contains), plus the file modified timestamp always reflects the
           actual last modifed timestamp of the data. Note that ext3 and ext4 can
           also guarantee that file and metadata will always match using the (IOPS
-          expensive) mount option <code class="computeroutput"><span class="identifier">journal</span><span class="special">=</span><span class="identifier">data</span></code>,
+          expensive) mount option <code class="computeroutput"><span class="identifier">data</span><span class="special">=</span><span class="identifier">journal</span></code>,
           which can be detected from <code class="computeroutput"><span class="special">/</span><span class="identifier">proc</span><span class="special">/</span><span class="identifier">mounts</span></code>.
         </p>
 <p>
@@ -149,23 +149,38 @@
 <colgroup>
 <col>
 <col>
+<col>
+<col>
+<col>
+<col>
 </colgroup>
 <thead><tr>
 <th>
                 </th>
 <th>
                   <p>
-                    Metadata no longer matches data
+                    <span class="aligncenter">Metadata no longer matches data<a href="#ftn.afio.design.acid_write_ordering.write_ordering_data.f3" class="footnote" name="afio.design.acid_write_ordering.write_ordering_data.f3"><sup class="footnote">[a]</sup></a></span>
                   </p>
                 </th>
 <th>
                   <p>
-                    Newly created file content
+                    <span class="aligncenter">Newly created file content corrupted</span>
                   </p>
                 </th>
 <th>
                   <p>
-                    File data content rewrite
+                    <span class="aligncenter">File data content rewrite corrupted</span>
+                  </p>
+                </th>
+<th>
+                  <p>
+                    <span class="aligncenter">Max seconds of writes reordered without
+                    using <code class="computeroutput"><span class="identifier">fsync</span><span class="special">()</span></code></span>
+                  </p>
+                </th>
+<th>
+                  <p>
+                    <span class="aligncenter">Max seconds of writes lost</span>
                   </p>
                 </th>
 </tr></thead>
@@ -173,47 +188,304 @@
 <tr>
 <td>
                   <p>
-                    FAT32
+                    <span class="alignright">FAT32</span>
                   </p>
                 </td>
 <td>
                   <p>
-                    <td align="center">&#10004;</td>
+                    <span class="aligncenter"><span class="green">&#10004;</span></span>
                   </p>
                 </td>
 <td>
                   <p>
-                    &#10008;
+                    <span class="aligncenter"><span class="green">&#10004;</span></span>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <span class="aligncenter"><span class="green">&#10004;</span></span>
+                  </p>
+                </td>
+<td>
+                </td>
+<td>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <span class="alignright">ext2</span>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <span class="aligncenter"><span class="green">&#10004;</span></span>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <span class="aligncenter"><span class="green">&#10004;</span></span>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <span class="aligncenter"><span class="green">&#10004;</span></span>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <span class="aligncenter">5</span>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <span class="aligncenter">5</span>
                   </p>
                 </td>
 </tr>
 <tr>
 <td>
                   <p>
-                    Always
+                    <span class="alignright">ext3/4 <code class="computeroutput"><span class="identifier">data</span><span class="special">=</span><span class="identifier">writeback</span></code></span>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <span class="aligncenter"><span class="green">&#10004;</span></span>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <span class="aligncenter"><span class="green">&#10004;</span></span>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <span class="aligncenter"><span class="green">&#10004;</span></span>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <span class="aligncenter">5/60</span>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <span class="aligncenter">60</span>
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <span class="alignright">ext3/4 <code class="computeroutput"><span class="identifier">data</span><span class="special">=</span><span class="identifier">ordered</span></code>
+                    (default)</span>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <span class="aligncenter"><span class="red">&#10008;</span></span>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <span class="aligncenter"><span class="red">&#10008;</span></span>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <span class="aligncenter"><span class="green">&#10004;</span></span>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <span class="aligncenter">5/60</span>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <span class="aligncenter">60</span>
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <span class="alignright">UFS + soft updates</span>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <span class="aligncenter"><span class="red">&#10008;</span></span>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <span class="aligncenter"><span class="red">&#10008;</span></span>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <span class="aligncenter"><span class="green">&#10004;</span></span>
                   </p>
                 </td>
 <td>
                 </td>
+<td>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <span class="alignright">HFS+</span>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <span class="aligncenter"><span class="red">&#10008;</span></span>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <span class="aligncenter"><span class="red">&#10008;</span></span>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <span class="aligncenter"><span class="green">&#10004;</span></span>
+                  </p>
+                </td>
+<td>
+                </td>
+<td>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <span class="alignright">NTFS</span>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <span class="aligncenter"><span class="red">&#10008;</span></span>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <span class="aligncenter"><span class="red">&#10008;</span></span>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <span class="aligncenter"><span class="green">&#10004;</span></span>
+                  </p>
+                </td>
+<td>
+                </td>
+<td>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <span class="alignright">ext3/4 <code class="computeroutput"><span class="identifier">data</span><span class="special">=</span><span class="identifier">journal</span></code></span>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <span class="aligncenter"><span class="red">&#10008;</span></span>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <span class="aligncenter"><span class="red">&#10008;</span></span>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <span class="aligncenter"><span class="red">&#10008;</span></span>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <span class="aligncenter">60</span>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <span class="aligncenter">60</span>
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <span class="alignright">BTRFS</span>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <span class="aligncenter"><span class="red">&#10008;</span></span>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <span class="aligncenter"><span class="red">&#10008;</span></span>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <span class="aligncenter"><span class="red">&#10008;</span></span>
+                  </p>
+                </td>
+<td>
+                </td>
+<td>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <span class="alignright">ZFS</span>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <span class="aligncenter"><span class="red">&#10008;</span></span>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <span class="aligncenter"><span class="red">&#10008;</span></span>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <span class="aligncenter"><span class="red">&#10008;</span></span>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <span class="aligncenter">5</span>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <span class="aligncenter">30</span>
+                  </p>
+                </td>
 </tr>
 </tbody>
+<tbody class="footnotes"><tr><td colspan="6"><div id="ftn.afio.design.acid_write_ordering.write_ordering_data.f3" class="footnote"><p><a href="#afio.design.acid_write_ordering.write_ordering_data.f3" class="para"><sup class="para">[a] </sup></a>
+                      This doesn't mean that metadata is corrupted, this means for
+                      example that a file is said to have 100Kb but is in fact partially
+                      garbage because metadata was updated before data was fully
+                      changed on storage.
+                    </p></div></td></tr></tbody>
 </table></div>
 </div>
-<br class="table-break"><p>
-          NTFS, HFS+, ext3 with <code class="computeroutput"><span class="identifier">data</span><span class="special">=</span><span class="identifier">ordered</span></code>,
-          ext4 with <code class="computeroutput"><span class="identifier">alloc_on_commit</span></code>)
-          keep back a metadata flush until when a file handle close causes data to
-          finish reaching physical storage. This ensures that files don't appear
-          in directories with zero sizes
-        </p>
-<p>
-          In the hope that one day filing systems might actually expose their preexisting
-          non-<code class="computeroutput"><span class="identifier">fsync</span><span class="special">()</span></code>
-          write ordering constraints like I just described, AFIO makes available
-          such a facility using the XXX <code class="computeroutput"><span class="identifier">file_flags</span></code>
-          member.
-        </p>
-<div class="footnotes">
+<br class="table-break"><div class="footnotes">
 <br><hr style="width:100; text-align:left;margin-left: 0">
 <div id="ftn.afio.design.acid_write_ordering.write_ordering_data.f0" class="footnote"><p><a href="#afio.design.acid_write_ordering.write_ordering_data.f0" class="para"><sup class="para">[5] </sup></a>
             TripleGit actually uses a different, much faster 256 bit hash by default,
@@ -239,7 +511,7 @@
 </tr></table>
 <hr>
 <div class="spirit-nav">
-<a accesskey="p" href="background.html"><img src="../../../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../acid_write_ordering.html"><img src="../../../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="../../compilation.html"><img src="../../../../../../../doc/src/images/next.png" alt="Next"></a>
+<a accesskey="p" href="background.html"><img src="../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../acid_write_ordering.html"><img src="../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="../../compilation.html"><img src="../../../../../doc/src/images/next.png" alt="Next"></a>
 </div>
 </body>
 </html>

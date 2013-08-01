@@ -679,3 +679,10 @@ div.orderedlist ol.orderedlist li.listitem, div.itemizedlist ul.itemizedlist li.
   padding-top: 0.25em;
   padding-bottom: 0.25em;
 }
+
+/* Add text alignment and text colours */
+span.aligncenter { display: inline-block; width: 100%; text-align: center; }
+span.alignright { display: inline-block; width: 100%; text-align: right; }
+span.alignjustify { display: inline-block; width: 100%; text-align: justify; }
+span.red { color: red; }
+span.green { color: green; }

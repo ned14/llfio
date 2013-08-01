@@ -32,7 +32,7 @@ boostbook afio
        <xsl:param>toc.section.depth=4
        <xsl:param>toc.max.depth=4
        <xsl:param>generate.section.toc.level=4
-       <xsl:param>boost.root=../../../..
+       <xsl:param>boost.root=../..
        <xsl:param>html.stylesheet=myboostbook.css
        <quickbook-define>enable_index
        <include>$(here)
