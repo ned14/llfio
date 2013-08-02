@@ -3,8 +3,8 @@ Jenkins CI status:<br/>build<br/>unit tests
 </p>
 <center>
 <table border="1" cellpadding="2">
-<tr><th>Static analysis</th><th colspan="5">Linux</th>
-<th>clang + oclint</th>
+<tr><th>Static analysis</th><th colspan="5">Linux</th></tr>
+<tr><th>clang + oclint</th>
 <th>GCC 4.6 + libstdc++ 4.6</th><th>GCC 4.7 + libstdc++ 4.7</th><th>GCC 4.8 + libstdc++ 4.8</th><th>clang 3.2 + libstdc++ 4.8</th><th>clang 3.3 + libstdc++ 4.8</th>
 </tr>
 <tr align="center">
