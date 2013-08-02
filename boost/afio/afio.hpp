@@ -59,7 +59,7 @@ File Created: Mar 2013
 #include "detail/Utility.hpp"
 
 // Map in C++11 stuff if available
-#if (defined(__GLIBCXX__) && __GLIBCXX__<=20120920) || (defined(BOOST_MSVC) && BOOST_MSVC < 1700)
+#if (defined(__GLIBCXX__) && __GLIBCXX__<=20120920 /* <= GCC 4.7 */) || (defined(BOOST_MSVC) && BOOST_MSVC < 1700)
 #include "boost/exception_ptr.hpp"
 #include "boost/thread/recursive_mutex.hpp"
 namespace boost { namespace afio {
@@ -174,6 +174,7 @@ BOOST_AFIO_FORWARD_STL_IMPL_NC(future, boost::unique_future)
 when_all() and when_any() definitions borrowed from http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2012/n3428.pdf
 */
 BOOST_AFIO_FORWARD_STL_IMPL(shared_future, boost::shared_future)
+using boost::future_status;
 /*! \class promise
 \brief For now, this is boost's promise. Will be replaced when C++'s promise catches up with boost's
 */
@@ -276,6 +277,8 @@ namespace chrono {
 #else
 		template<class Rep2, class Period2> BOOST_CONSTEXPR duration(const std::chrono::duration<Rep2,Period2> &d) : Base(d) { }
 #endif
+		// This fellow needs to be convertible to boost::chrono::duration too.
+		boost::chrono::duration<Rep, boost::ratio<Period::num, Period::den>> toBoost() const { return boost::chrono::duration<Rep, boost::ratio<Period::num, Period::den>>(Base::count()); }
 	};
 	namespace detail
 	{
