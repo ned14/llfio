@@ -73,7 +73,8 @@ if $(test_files)
 }
 else
 {
-    test_files = [ glob  *.cpp : main.cpp ] ;
+    test_files = [ glob  *.cpp : main.cpp test_all.cpp ] ;
+    test_files_all = [ glob  *.cpp : main.cpp ] ;
 }
 
 # link tests (just compile and links targets)
@@ -100,9 +101,14 @@ else # run actual tests
 
         ;
     }
-    else        # otherwise run individual test files
+    else if "--test-each" in $(.argv)
     {
         for local file in $(test_files)
+        { run $(file) $(reqs) : $(VALGRIND_ARGS) --log_format=XML --log_sink=results.xml --log_level=all --report_level=no : : $(launcher) ; }
+    }
+    else        # otherwise run individual test files
+    {
+        for local file in $(test_files_all)
         { run $(file) $(reqs) : $(VALGRIND_ARGS) : : $(launcher) ; }
 
     }
