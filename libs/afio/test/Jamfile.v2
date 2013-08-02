@@ -104,7 +104,7 @@ else # run actual tests
     else if "--test-each" in $(.argv)
     {
         for local file in $(test_files)
-        { run $(file) $(reqs) : $(VALGRIND_ARGS) --log_format=XML --log_sink=results.xml --log_level=all --report_level=no : : $(launcher) ; }
+        { run $(file) $(reqs) : $(VALGRIND_ARGS) --log_format=XML --log_sink=$(file)_results.xml --log_level=all --report_level=no : : $(launcher) ; }
     }
     else        # otherwise run individual test files
     {
