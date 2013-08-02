@@ -97,14 +97,14 @@ else # run actual tests
     if "--test-all" in $(.argv)   # run the whole test suite at once
     {
         test-suite afio
-          : [ run test_all.cpp  $(reqs) : $(VALGRIND_ARGS) : : $(launcher) ] 
+          : [ run test_all.cpp  $(reqs) : $(VALGRIND_ARGS) --log_format=XML --log_sink=results.xml --log_level=all --report_level=no : : $(launcher) ] 
 
         ;
     }
     else if "--test-each" in $(.argv)
     {
         for local file in $(test_files)
-        { run $(file) $(reqs) : $(VALGRIND_ARGS) --log_format=XML --log_sink=$(file)_results.xml --log_level=all --report_level=no : : $(launcher) ; }
+        { run $(file) $(reqs) : $(VALGRIND_ARGS) --log_format=XML --log_sink=results.xml --log_level=all --report_level=no : : $(launcher) ; }
     }
     else        # otherwise run individual test files
     {
