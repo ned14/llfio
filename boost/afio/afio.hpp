@@ -16,10 +16,9 @@ File Created: Mar 2013
 #define _WIN32_WINNT 0x0501
 #endif
 // VS2010 needs D_VARIADIC_MAX set to at least six
-#if defined(_MSC_VER) && _MSC_VER<1700 && (!defined(_VARIADIC_MAX) || _VARIADIC_MAX<6)
+#if defined(BOOST_MSVC) && BOOST_MSVC < 1700 && (!defined(_VARIADIC_MAX) || _VARIADIC_MAX < 6)
 #error _VARIADIC_MAX needs to be set to at least six to compile Boost.AFIO
 #endif
-
 
 #include "config.hpp"
 #include "detail/Utility.hpp"
@@ -30,9 +29,7 @@ File Created: Mar 2013
 #include <exception>
 #include <algorithm> // Boost.ASIO needs std::min and std::max
 #include <cstdint>
-#if !defined(_WIN32_WINNT) && defined(WIN32)
-#define _WIN32_WINNT 0x0501
-#endif
+
 //#define BOOST_THREAD_VERSION 4
 //#define BOOST_THREAD_PROVIDES_VARIADIC_THREAD
 //#define BOOST_THREAD_DONT_PROVIDE_FUTURE
@@ -84,18 +81,6 @@ typedef std::recursive_mutex recursive_mutex;
 
 #if BOOST_VERSION<105400
 #error Boosts before v1.54 have a memory corruption bug in boost::packaged_task<> when built under C++11 which makes this library useless. Get a newer Boost!
-#endif
-
-
-#ifndef BOOST_AFIO_DECL
-#ifdef BOOST_AFIO_DLL_EXPORTS
-#define BOOST_AFIO_DECL BOOST_SYMBOL_EXPORT
-#else
-/*! \brief Defines the API decoration for any exportable symbols
-\ingroup macros
-*/
-#define BOOST_AFIO_DECL BOOST_SYMBOL_IMPORT
-#endif
 #endif
 
 
