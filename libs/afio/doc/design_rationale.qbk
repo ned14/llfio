@@ -342,16 +342,16 @@ is a quick table of power loss data safety. Once again, I reiterate that errors 
 [table:power_loss_safety Power loss safety matrix: What non-trivially reconstructible data can you lose if power is suddenly lost?
   [[][[role aligncenter Metadata no longer matches data[footnote This doesn't mean that metadata is corrupted,
   this means for example that a file is said to have 100Kb but is in fact partially garbage because metadata was updated before data was fully changed on storage.]]][[role aligncenter Newly created file content corrupted]][[role aligncenter File data content rewrite corrupted]][[role aligncenter Default max seconds of writes reordered without using `fsync()`]][[role aligncenter Default max seconds of writes lost]]]
-  [[[role alignright FAT32]][__tick__][__tick__][__tick__][?][?]]
-  [[[role alignright ext2]][__tick__][__tick__][__tick__][[role aligncenter 5]][[role aligncenter 5]]]
-  [[[role alignright ext3/4 `data=writeback`]][__tick__][__tick__][__tick__][[role aligncenter 5/60]][[role aligncenter 60]]]
-  [[[role alignright ext3/4 `data=ordered` (default)]][__cross__][__cross__][__tick__][[role aligncenter 5/60]][[role aligncenter 60]]]
-  [[[role alignright UFS + soft updates]][__cross__][__cross__][__tick__][][]]
-  [[[role alignright HFS+]][__cross__][__cross__][__tick__][][]]
-  [[[role alignright NTFS]][__cross__][__cross__][__tick__][][]]
-  [[[role alignright ext3/4 `data=journal`]][__cross__][__cross__][__cross__][[role aligncenter 60]][[role aligncenter 60]]]
-  [[[role alignright BTRFS]][__cross__][__cross__][__cross__][][]]
-  [[[role alignright ZFS]][__cross__][__cross__][__cross__][[role aligncenter 5]][[role aligncenter 30]]]
+  [[[role alignright FAT32]][__itick__][__itick__][__itick__][?][?]]
+  [[[role alignright ext2]][__itick__][__itick__][__itick__][[role aligncenter 5]][[role aligncenter 5]]]
+  [[[role alignright ext3/4 `data=writeback`]][__itick__][__itick__][__itick__][[role aligncenter 5[footnote This is the `commit` mount setting. Source: https://www.kernel.org/doc/Documentation/filesystems/ext4.txt]]][[role aligncenter 30[footnote This is the `/proc/sys/vm/dirty_expire_centiseconds` value. Source: http://www.westnet.com/~gsmith/content/linux-pdflush.htm]]]]
+  [[[role alignright ext3/4 `data=ordered` (default)]][__icross__][__icross__][__itick__][[role aligncenter 5]][[role aligncenter 30]]]
+  [[[role alignright UFS + soft updates[footnote Source: http://www.freebsd.org/cgi/man.cgi?query=syncer]]][__icross__][__icross__][__itick__][30][30]]
+  [[[role alignright HFS+]][__icross__][__icross__][__itick__][?][?]]
+  [[[role alignright NTFS[footnote Source: http://technet.microsoft.com/en-us/library/bb742613.aspx]]][__icross__][__icross__][__itick__][Until idle or write limit][Until idle or write limit]]
+  [[[role alignright ext3/4 `data=journal`]][__icross__][__icross__][__icross__][[role aligncenter 5]][[role aligncenter 5]]]
+  [[[role alignright BTRFS[footnote Source: https://wiki.archlinux.org/index.php/Btrfs]]][__icross__][__icross__][__icross__][[role aligncenter 30]][[role aligncenter 30]]]
+  [[[role alignright ZFS]][__icross__][__icross__][__icross__][[role aligncenter 5]][[role aligncenter 30]]]
 ]
 
 
