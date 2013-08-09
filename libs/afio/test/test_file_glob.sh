@@ -1,4 +1,4 @@
-#! /bin/sh
+#!/bin/sh
 
 > ${0%/*}/test_cpps.txt
 
