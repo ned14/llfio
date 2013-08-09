@@ -452,9 +452,10 @@ async_file_io_dispatcher_base::async_file_io_dispatcher_base(thread_source &thre
 
 async_file_io_dispatcher_base::~async_file_io_dispatcher_base()
 {
+	std::unordered_map<shared_future<std::shared_ptr<detail::async_io_handle>> *, std::pair<size_t, future_status>> reallyoutstanding;
 	for(;;)
 	{
-		std::vector<std::shared_ptr<shared_future<std::shared_ptr<detail::async_io_handle>>>> outstanding;
+		std::vector<std::pair<size_t, std::shared_ptr<shared_future<std::shared_ptr<detail::async_io_handle>>>>> outstanding;
 		{
 			BOOST_AFIO_LOCK_GUARD<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
 			if(!p->ops.empty())
@@ -463,14 +464,52 @@ async_file_io_dispatcher_base::~async_file_io_dispatcher_base()
 				BOOST_FOREACH(auto &op, p->ops)
 				{
 					if(op.second.h->valid())
-						outstanding.push_back(op.second.h);
+					{
+						auto it=reallyoutstanding.find(op.second.h.get());
+						if(reallyoutstanding.end()!=it)
+						{
+							if(it->second.first>=5)
+							{
+								static const char *statuses[]={"ready", "timeout", "deferred", "unknown"};
+								std::cerr << "WARNING: ~async_file_dispatcher_base() detects stuck async_io_op\n"
+								"   id=" << op.first << " status=" << statuses[(((int) it->second.second)>=0 && ((int) it->second.second)<=2) ? (int) it->second.second : 3] << " usecount=" << op.second.h.use_count() << " failcount=" << it->second.first << " Completions:";
+								BOOST_FOREACH(auto &c, op.second.completions)
+								{
+									std::cerr << " id=" << c.first;
+								}
+								std::cerr << std::endl;
+							}
+						}
+						outstanding.push_back(std::make_pair(op.first, op.second.h));
+					}
 				}
 			}
 		}
 		if(outstanding.empty()) break;
+		size_t mincount=(size_t)-1;
 		BOOST_FOREACH(auto &op, outstanding)
 		{
-			op->wait();
+			future_status status=op.second->wait_for(chrono::duration<int, ratio<1, 10>>(1).toBoost());
+			switch(status)
+			{
+			case future_status::ready:
+				reallyoutstanding.erase(op.second.get());
+				break;
+			case future_status::deferred:
+				// Probably pending on others, but log
+			case future_status::timeout:
+				auto it=reallyoutstanding.find(op.second.get());
+				if(reallyoutstanding.end()==it)
+					it=reallyoutstanding.insert(std::make_pair(op.second.get(), std::make_pair(0, status))).first;
+				it->second.first++;
+				if(it->second.first<mincount) mincount=it->second.first;
+				break;
+			}
+		}
+		if(mincount>=10) // i.e. nothing is changing
+		{
+			std::cerr << "WARNING: ~async_file_dispatcher_base() sees no change in " << reallyoutstanding.size() << " stuck async_io_ops, so exiting destructor wait" << std::endl;
+			break;
 		}
 	}
 	delete p;
