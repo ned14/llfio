@@ -73,7 +73,8 @@ if $(test_files)
 }
 else
 {
-    test_files = [ glob  *.cpp : main.cpp ] ;
+    test_files = [ glob  *.cpp : main.cpp test_all.cpp ] ;
+    test_files_all = [ glob  *.cpp : main.cpp ] ;
 }
 
 # link tests (just compile and links targets)
@@ -96,13 +97,18 @@ else # run actual tests
     if "--test-all" in $(.argv)   # run the whole test suite at once
     {
         test-suite afio
-          : [ run test_all.cpp  $(reqs) : $(VALGRIND_ARGS) : : $(launcher) ] 
+          : [ run test_all.cpp  $(reqs) : $(VALGRIND_ARGS) --log_format=XML --log_sink=results.xml --log_level=all --report_level=no : : $(launcher) ] 
 
         ;
     }
-    else        # otherwise run individual test files
+    else if "--test-each" in $(.argv)
     {
         for local file in $(test_files)
+        { run $(file) $(reqs) : $(VALGRIND_ARGS) --log_format=XML --log_sink=results.xml --log_level=all --report_level=no : : $(launcher) ; }
+    }
+    else        # otherwise run individual test files
+    {
+        for local file in $(test_files_all)
         { run $(file) $(reqs) : $(VALGRIND_ARGS) : : $(launcher) ; }
 
     }
