@@ -56,14 +56,14 @@ if $(VALGRIND_ARGS)
 }
 
 #auto generate the test_all.cpp
-if [ os.name ] = "NT" 
+if [ os.name ] = "NT" && [ os.environ MSYSCON ] = ""
 { 
     local str = "for /f \"delims=\" %i in ('dir /b /a-d /s test_file_glob.bat') do \"%~fi\""  ;
     SHELL $(str) ;
 }
 else 
 { 
-    SHELL  [ SHELL "find -L -name test_file_glob.sh" ]  ; 
+    SHELL  [ SHELL "find -L . -name test_file_glob.sh" ]  ; 
 }
 
 # Let user limit test_files
