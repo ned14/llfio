@@ -33,6 +33,8 @@ lib boost_afio
       <include>../../../boost/afio 
       <include>../../../boost/afio/detail
       <toolset>gcc:<cxxflags>"-std=c++0x -fvisibility-inlines-hidden -fstrict-aliasing -Wstrict-aliasing -Wno-unused -fargument-noalias -fvisibility=hidden -fopenmp"
+      <toolset>gcc-mingw:<cxxflags>"-DWIN32 -D_UNICODE -DUNICODE"
+      <toolset>gcc-mingw:<linkflags>"-lws2_32"
       <toolset>gcc:<linkflags>"-lgomp"
       <toolset>clang:<cxxflags>"-std=c++0x -fvisibility-inlines-hidden -fstrict-aliasing -Wstrict-aliasing -Wno-unused -fargument-noalias -fvisibility=hidden -fopenmp"
       <toolset>msvc:<cxxflags>"/openmp /EHsc /GF /Gy /D_VARIADIC_MAX=6"
