@@ -1,4 +1,4 @@
-@ECHO OFF
+@ECHO ON
 
 ECHO. 2> %~dp0test_cpps.txt
 

@@ -58,8 +58,7 @@ if $(VALGRIND_ARGS)
 #auto generate the test_all.cpp
 if [ os.name ] = "NT"
 { 
-    local str = "for /f \"delims=\" %i in ('dir /b /a-d /s test_file_glob.bat') do \"%~fi\""  ;
-	SHELL "echo $(str)";
+    local str = "for /f \"delims=\" %i in ('dir /b /a-d /s test_file_glob.bat') do \"%~fi\"" ;
     SHELL $(str) ;
 }
 else 
