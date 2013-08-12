@@ -28,7 +28,7 @@ directories, so `include` directives of this scheme will work:
 [heading Supported Compilers And Current Trunk Build And Unit Test State]
 
 '''
-<informaltable frame="all" border="1">
+<informaltable frame="all" border="1" color="black">
 <tgroup cols="6" align="center">
 <colspec colname='c1'/>
 <colspec colname='c2'/>
@@ -38,8 +38,6 @@ directories, so `include` directives of this scheme will work:
 <colspec colname='c6'/>
 <thead>
 <row><entry>Static analysis</entry><entry namest="c2" nameend="c6">Linux</entry></row>
-</thead>
-<thead>
 <row><entry>clang + oclint</entry>
 <entry>GCC 4.6 + libstdc++ 4.6</entry>
 <entry>GCC 4.7 + libstdc++ 4.7</entry>
