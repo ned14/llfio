@@ -36,8 +36,7 @@ File Created: Mar 2013
 //#define BOOST_THREAD_PROVIDES_SIGNATURE_PACKAGED_TASK
 
 
-#if defined(BOOST_MSVC) && BOOST_MSVC < 1700// Dinkumware without <atomic>
-#define BOOST_MOVE_USE_STANDARD_LIBRARY_MOVE   // there must be a better workaround than this to solve the boost::move, std::move conflict
+#if defined(BOOST_MSVC) && BOOST_MSVC < 1700 // Dinkumware without <atomic>
 #include "boost/atomic.hpp"
 #include "boost/chrono.hpp"
 #define BOOST_AFIO_USE_BOOST_ATOMIC
@@ -392,7 +391,7 @@ template <class InputIterator> inline future<std::vector<typename std::decay<dec
 	typedef typename std::decay<decltype(((typename InputIterator::value_type *) 0)->get())>::type value_type;
 	typedef std::vector<value_type> returns_t;
 	// Take a copy of the futures supplied to us (which may invalidate them)
-	auto futures=std::make_shared<std::vector<future_type>>(std::make_move_iterator(first), std::make_move_iterator(last));
+	auto futures=std::make_shared<std::vector<future_type>>(boost::make_move_iterator(first), boost::make_move_iterator(last));
 	// Bind to my delegate and invoke
 	std::function<returns_t ()> waitforall(std::move(std::bind(&detail::when_all_do<returns_t, future_type>, futures)));
 	return process_threadpool().enqueue(std::move(waitforall));
@@ -420,7 +419,7 @@ template <class InputIterator> inline future<std::pair<size_t, typename std::dec
 	typedef typename std::decay<decltype(((typename InputIterator::value_type *) 0)->get())>::type value_type;
 	typedef std::pair<size_t, typename std::decay<decltype(((typename InputIterator::value_type *) 0)->get())>::type> returns_t;
 	// Take a copy of the futures supplied to us (which may invalidate them)
-	auto futures=std::make_shared<std::vector<future_type>>(std::make_move_iterator(first), std::make_move_iterator(last));
+	auto futures=std::make_shared<std::vector<future_type>>(boost::make_move_iterator(first), boost::make_move_iterator(last));
 	// Bind to my delegate and invoke
 	std::function<returns_t ()> waitforall(std::move(std::bind(&detail::when_any_do<returns_t, future_type>, futures)));
 	return process_threadpool().enqueue(std::move(waitforall));

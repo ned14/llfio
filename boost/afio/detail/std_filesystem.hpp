@@ -16,7 +16,12 @@ namespace std { namespace filesystem { using namespace tr2::filesystem; } }
 #include "boost/filesystem/fstream.hpp"
 namespace std {
 	namespace filesystem { using namespace boost::filesystem; using boost::filesystem::path; }
+// Dinkumware defines hash as a class
+#ifdef _CPPLIB_VER
+	template<class T> class hash;
+#else
 	template<class T> struct hash;
+#endif
 	template<> struct hash<boost::filesystem::path>
 	{
 	public:
