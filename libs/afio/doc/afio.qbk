@@ -67,6 +67,14 @@ move constructors when all member data types have move constructors (known as rv
 v3.0). You may find the list of C++11 features in popular compilers at
 [@http://wiki.apache.org/stdcxx/C++0xCompilerSupport] useful.
 
+Similarly, just because a compiler will compile the code does not mean that programming using
+that compiler and __boost_afio__ isn't a waste of your time. In particular, you should avoid
+VS2010 if at all possible unless you enjoy debugging internal compiler errors. If you really
+need to target Windows XP, we [*strongly] suggest you use the VS2010 toolset in VS2012 or VS2013
+as that has a multitude of broken VS2010 STL header fixes, plus it uses a much more debugged
+compiler. If you really need to develop on Windows XP, strongly consider Mingw-w64 instead of
+VS2010.
+
 As a very quick example of minimal usage:
 
 [call_example]
