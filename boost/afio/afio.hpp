@@ -391,7 +391,12 @@ template <class InputIterator> inline future<std::vector<typename std::decay<dec
 	typedef typename std::decay<decltype(((typename InputIterator::value_type *) 0)->get())>::type value_type;
 	typedef std::vector<value_type> returns_t;
 	// Take a copy of the futures supplied to us (which may invalidate them)
+	// VS2010 uses a non-namespace qualified move() in its headers, which generates an ambiguous resolution error
+#if defined(BOOST_MSVC) && BOOST_MSVC < 1700 // <= VS2010
 	auto futures=std::make_shared<std::vector<future_type>>(boost::make_move_iterator(first), boost::make_move_iterator(last));
+#else
+	auto futures=std::make_shared<std::vector<future_type>>(std::make_move_iterator(first), std::make_move_iterator(last));
+#endif
 	// Bind to my delegate and invoke
 	std::function<returns_t ()> waitforall(std::move(std::bind(&detail::when_all_do<returns_t, future_type>, futures)));
 	return process_threadpool().enqueue(std::move(waitforall));
@@ -419,7 +424,12 @@ template <class InputIterator> inline future<std::pair<size_t, typename std::dec
 	typedef typename std::decay<decltype(((typename InputIterator::value_type *) 0)->get())>::type value_type;
 	typedef std::pair<size_t, typename std::decay<decltype(((typename InputIterator::value_type *) 0)->get())>::type> returns_t;
 	// Take a copy of the futures supplied to us (which may invalidate them)
+	// VS2010 uses a non-namespace qualified move() in its headers, which generates an ambiguous resolution error
+#if defined(BOOST_MSVC) && BOOST_MSVC < 1700 // <= VS2010
 	auto futures=std::make_shared<std::vector<future_type>>(boost::make_move_iterator(first), boost::make_move_iterator(last));
+#else
+	auto futures=std::make_shared<std::vector<future_type>>(std::make_move_iterator(first), std::make_move_iterator(last));
+#endif
 	// Bind to my delegate and invoke
 	std::function<returns_t ()> waitforall(std::move(std::bind(&detail::when_any_do<returns_t, future_type>, futures)));
 	return process_threadpool().enqueue(std::move(waitforall));
