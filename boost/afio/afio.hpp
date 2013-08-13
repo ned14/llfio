@@ -20,8 +20,8 @@ File Created: Mar 2013
 #error _VARIADIC_MAX needs to be set to at least six to compile Boost.AFIO
 #endif
 
-#include "config.hpp"
 #include "detail/Utility.hpp"
+#include "config.hpp"
 #include <type_traits>
 #ifndef BOOST_NO_CXX11_HDR_INITIALIZER_LIST
 #include <initializer_list>
