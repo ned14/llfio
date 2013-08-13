@@ -658,7 +658,7 @@ sub {
     
     
 /* Make TOC subsections multi-column */
-body div.chapter div.toc dl.toc dd dl dd dl dd dl, body div.section div.toc dl.toc dd dl dd dl{
+body div.chapter div.toc dl dd dl dd dl dd dl, body div.section div.toc dl dd dl dd dl {
   -moz-column-count:auto;
   -webkit-column-count:auto;
   column-count:auto;

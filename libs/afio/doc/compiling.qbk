@@ -28,7 +28,99 @@ directories, so `include` directives of this scheme will work:
 [heading Supported Compilers And Current Trunk Build And Unit Test State]
 
 '''
-todo remake CI table in QuickBook
+<informaltable frame="all" border="1" color="black">
+<tgroup cols="6" align="center">
+<colspec colname='c1'/>
+<colspec colname='c2'/>
+<colspec colname='c3'/>
+<colspec colname='c4'/>
+<colspec colname='c5'/>
+<colspec colname='c6'/>
+<thead>
+<row><entry>Static analysis</entry><entry namest="c2" nameend="c6">Linux</entry></row>
+<row><entry>clang + oclint</entry>
+<entry>GCC 4.6 + libstdc++ 4.6</entry>
+<entry>GCC 4.7 + libstdc++ 4.7</entry>
+<entry>GCC 4.8 + libstdc++ 4.8</entry>
+<entry>clang 3.2 + libstdc++ 4.8</entry>
+<entry>clang 3.3 + libstdc++ 4.8</entry>
+</row>
+</thead>
+<tbody>
+<row>
+<entry><ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Static%20Analysis%20Pre-Check/"><imageobject><imagedata fileref="https://ci.nedprod.com/buildStatus/icon?job=Boost.AFIO%20Static%20Analysis%20Pre-Check"/></imageobject></ulink></entry>
+<entry><ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Build%20Linux%20GCC%204.6/"><imageobject><imagedata fileref="https://ci.nedprod.com/buildStatus/icon?job=Boost.AFIO%20Build%20Linux%20GCC%204.6"/></imageobject></ulink></entry>
+<entry><ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Build%20Linux%20GCC%204.7/"><imageobject><imagedata fileref="https://ci.nedprod.com/buildStatus/icon?job=Boost.AFIO%20Build%20Linux%20GCC%204.7"/></imageobject></ulink></entry>
+<entry><ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Build%20Linux%20GCC%204.8/"><imageobject><imagedata fileref="https://ci.nedprod.com/buildStatus/icon?job=Boost.AFIO%20Build%20Linux%20GCC%204.8"/></imageobject></ulink></entry>
+<entry><ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Build%20Linux%20clang%203.2/"><imageobject><imagedata fileref="https://ci.nedprod.com/buildStatus/icon?job=Boost.AFIO%20Build%20Linux%20clang%203.2"/></imageobject></ulink></entry>
+<entry><ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Build%20Linux%20clang%203.3/"><imageobject><imagedata fileref="https://ci.nedprod.com/buildStatus/icon?job=Boost.AFIO%20Build%20Linux%20clang%203.3"/></imageobject></ulink></entry>
+</row>
+<row>
+<entry>N/A</entry>
+<entry><ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Test%20Linux%20GCC%204.6/"><imageobject><imagedata fileref="https://ci.nedprod.com/buildStatus/icon?job=Boost.AFIO%20Test%20Linux%20GCC%204.6"/></imageobject></ulink></entry>
+<entry><ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Test%20Linux%20GCC%204.7/"><imageobject><imagedata fileref="https://ci.nedprod.com/buildStatus/icon?job=Boost.AFIO%20Test%20Linux%20GCC%204.7"/></imageobject></ulink></entry>
+<entry><ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Test%20Linux%20GCC%204.8/"><imageobject><imagedata fileref="https://ci.nedprod.com/buildStatus/icon?job=Boost.AFIO%20Test%20Linux%20GCC%204.8"/></imageobject></ulink></entry>
+<entry><ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Test%20Linux%20clang%203.2/"><imageobject><imagedata fileref="https://ci.nedprod.com/buildStatus/icon?job=Boost.AFIO%20Test%20Linux%20clang%203.2"/></imageobject></ulink></entry>
+<entry><ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Test%20Linux%20clang%203.3/"><imageobject><imagedata fileref="https://ci.nedprod.com/buildStatus/icon?job=Boost.AFIO%20Test%20Linux%20clang%203.3"/></imageobject></ulink></entry>
+</row>
+</tbody>
+</tgroup>
+</informaltable>
+
+<informaltable frame="all">
+<tgroup cols="8" align="center" rowsep="1" colsep="1">
+<colspec colname='c1'/>
+<colspec colname='c2'/>
+<colspec colname='c3'/>
+<colspec colname='c4'/>
+<colspec colname='c5'/>
+<colspec colname='c6'/>
+<colspec colname='c7'/>
+<colspec colname='c8'/>
+<thead>
+<row>
+<entry namest="c1" nameend="c2">Linux</entry>
+<entry>FreeBSD</entry>
+<entry namest="c4" nameend="c6">WinXP</entry>
+<entry namest="c7" nameend="c8">Win7</entry>
+</row>
+<row>
+<entry>clang 3.1 + libc++ 2013-07</entry>
+<entry>clang 3.3 + libc++ 2013-07</entry>
+<entry>clang 3.3 + libc++</entry>
+<entry>VS2010</entry>
+<entry>Mingw</entry>
+<entry>Mingw-w64</entry>
+<entry>VS2012</entry>
+<entry>VS2013</entry>
+</row>
+</thead>
+<tbody>
+<row>
+<entry><ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Build%20Linux%20clang%203.1/"><imageobject><imagedata fileref="https://ci.nedprod.com/buildStatus/icon?job=Boost.AFIO%20Build%20Linux%20clang%203.1"/></imageobject></ulink></entry>
+<entry><ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Build%20Linux%20clang%203.3%20%2B%20libc%2B%2B/"><imageobject><imagedata fileref="https://ci.nedprod.com/buildStatus/icon?job=Boost.AFIO%20Build%20Linux%20clang%203.3%20%2B%20libc%2B%2B"/></imageobject></ulink></entry>
+<entry><ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Build%20FreeBSD%2010%20clang%203.3/"><imageobject><imagedata fileref="https://ci.nedprod.com/buildStatus/icon?job=Boost.AFIO%20Build%20FreeBSD%2010%20clang%203.3"/></imageobject></ulink></entry>
+<entry><ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Build%20WinXP%20VS2010/"><imageobject><imagedata fileref="https://ci.nedprod.com/buildStatus/icon?job=Boost.AFIO%20Build%20WinXP%20VS2010"/></imageobject></ulink></entry>
+<entry><ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Build%20WinXP%20Mingw32/"><imageobject><imagedata fileref="https://ci.nedprod.com/buildStatus/icon?job=Boost.AFIO%20Build%20WinXP%20Mingw32"/></imageobject></ulink></entry>
+<entry>planned</entry>
+<entry>known working</entry>
+<entry>known working</entry>
+</row>
+
+<row>
+<entry><ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Test%20Linux%20clang%203.1/"><imageobject><imagedata fileref="https://ci.nedprod.com/buildStatus/icon?job=Boost.AFIO%20Test%20Linux%20clang%203.1"/></imageobject></ulink></entry>
+<entry><ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Test%20Linux%20clang%203.3%20%2B%20libc%2B%2B/"><imageobject><imagedata fileref="https://ci.nedprod.com/buildStatus/icon?job=Boost.AFIO%20Test%20Linux%20 clang%203.3%20%2B%20libc%2B%2B"/></imageobject></ulink></entry>
+<entry><ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Test%20FreeBSD%2010%20clang%203.3/"><imageobject><imagedata fileref="https://ci.nedprod.com/buildStatus/icon?job=Boost.AFIO%20Test%20FreeBSD%2010%20clang%203.3"/></imageobject></ulink></entry>
+<entry><ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Test%20WinXP%20VS2010/"><imageobject><imagedata fileref="https://ci.nedprod.com/buildStatus/icon?job=Boost.AFIO%20Test%20WinXP%20VS2010"/></imageobject></ulink></entry>
+<entry><ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Test%20WinXP%20Mingw32/"><imageobject><imagedata fileref="https://ci.nedprod.com/buildStatus/icon?job=Boost.AFIO%20Test%20WinXP%20Mingw32"/></imageobject></ulink></entry>
+<entry>planned</entry>
+<entry>known working</entry>
+<entry>known working</entry>
+</row>
+
+</tbody>
+</tgroup>
+</informaltable>
 '''
 
 [endsect] [/ end of Compilation]

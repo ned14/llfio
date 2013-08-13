@@ -36,13 +36,18 @@ BOOST_AUTO_TEST_CASE(async_io_barrier)
     memset(&callcount, 0, sizeof(callcount));
     vector<future<bool>> verifies;
     verifies.reserve(groups.size());
+#if defined(BOOST_MSVC) && BOOST_MSVC < 1700 // <= VS2010
+    std::function<void (boost::afio::atomic<size_t> *count)> inccount = [](boost::afio::atomic<size_t> *count){ /*for (volatile size_t n = 0; n < 10000; n++);*/ (*count)++; };
+    std::function<bool(boost::afio::atomic<size_t> *, size_t)> verifybarrier = [](boost::afio::atomic<size_t> *count, size_t shouldbe) ->bool
+#else
     auto inccount = [](boost::afio::atomic<size_t> *count){ /*for (volatile size_t n = 0; n < 10000; n++);*/ (*count)++; };
     auto verifybarrier = [](boost::afio::atomic<size_t> *count, size_t shouldbe)
+#endif
     {
         if (*count != shouldbe)
         {
             BOOST_CHECK((*count == shouldbe));
-            throw runtime_error("Count was not what it should have been!");
+            throw std::runtime_error("Count was not what it should have been!");
         }
         return true;
     };
@@ -54,7 +59,7 @@ BOOST_AUTO_TEST_CASE(async_io_barrier)
     bool isfirst = true;
     BOOST_FOREACH(auto &run, groups)
     {
-        vector<function<void()>> thisgroupcalls(run.first, bind(inccount, &callcount[run.second]));
+        vector<function<void()>> thisgroupcalls(run.first, std::bind(inccount, &callcount[run.second]));
         vector<async_io_op> thisgroupcallops;
         if (isfirst)
         {

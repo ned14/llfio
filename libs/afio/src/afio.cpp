@@ -21,8 +21,6 @@ File Created: Mar 2013
 
 #include "../../../boost/afio/afio.hpp"
 #include "boost/smart_ptr/detail/spinlock.hpp"
-#include "../../../boost/afio/detail/std_filesystem.hpp"
-#include "../../../boost/afio/detail/ErrorHandling.hpp"
 #include "../../../boost/afio/detail/valgrind/memcheck.h"
 #include "../../../boost/afio/detail/valgrind/helgrind.h"
 
@@ -1479,7 +1477,7 @@ namespace detail {
 	{
 		// Keep an optional weak reference counted index of containing directories on POSIX
 		typedef boost::detail::spinlock dircachelock_t;
-		dircachelock_t dircachelock; std::unordered_map<std::filesystem::path, std::weak_ptr<async_io_handle>, std::hash<std::filesystem::path>> dircache;
+		dircachelock_t dircachelock; std::unordered_map<std::filesystem::path, std::weak_ptr<async_io_handle>, std::filesystem_hash> dircache;
 		std::shared_ptr<detail::async_io_handle> get_handle_to_containing_dir(const std::filesystem::path &path)
 		{
 			std::filesystem::path containingdir(path.parent_path());
@@ -1487,7 +1485,7 @@ namespace detail {
 			BOOST_AFIO_LOCK_GUARD<dircachelock_t> dircachelockh(dircachelock);
 			do
 			{
-				std::unordered_map<std::filesystem::path, std::weak_ptr<async_io_handle>, std::hash<std::filesystem::path>>::iterator it=dircache.find(containingdir);
+				std::unordered_map<std::filesystem::path, std::weak_ptr<async_io_handle>, std::filesystem_hash>::iterator it=dircache.find(containingdir);
 				if(dircache.end()==it || it->second.expired())
 				{
 					if(dircache.end()!=it) dircache.erase(it);

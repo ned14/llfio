@@ -16,11 +16,12 @@ File Created: Mar 2013
 #define _WIN32_WINNT 0x0501
 #endif
 // VS2010 needs D_VARIADIC_MAX set to at least six
-#if defined(_MSC_VER) && _MSC_VER<1700 && (!defined(_VARIADIC_MAX) || _VARIADIC_MAX<6)
+#if defined(BOOST_MSVC) && BOOST_MSVC < 1700 && (!defined(_VARIADIC_MAX) || _VARIADIC_MAX < 6)
 #error _VARIADIC_MAX needs to be set to at least six to compile Boost.AFIO
 #endif
 
-#include "boost/config.hpp"
+#include "config.hpp"
+#include "detail/Utility.hpp"
 #include <type_traits>
 #ifndef BOOST_NO_CXX11_HDR_INITIALIZER_LIST
 #include <initializer_list>
@@ -28,22 +29,14 @@ File Created: Mar 2013
 #include <exception>
 #include <algorithm> // Boost.ASIO needs std::min and std::max
 #include <cstdint>
-#if !defined(_WIN32_WINNT) && defined(WIN32)
-#define _WIN32_WINNT 0x0501
-#endif
+
 //#define BOOST_THREAD_VERSION 4
 //#define BOOST_THREAD_PROVIDES_VARIADIC_THREAD
 //#define BOOST_THREAD_DONT_PROVIDE_FUTURE
 //#define BOOST_THREAD_PROVIDES_SIGNATURE_PACKAGED_TASK
-#include "boost/asio.hpp"
-#include "boost/thread/thread.hpp"
-#include "boost/thread/future.hpp"
-#include "boost/foreach.hpp"
-#include "detail/Preprocessor_variadic.hpp"
-#include <boost/detail/scoped_enum_emulation.hpp>
 
 
-#if defined(BOOST_MSVC) && BOOST_MSVC < 1700// Dinkumware without <atomic>
+#if defined(BOOST_MSVC) && BOOST_MSVC < 1700 // Dinkumware without <atomic>
 #include "boost/atomic.hpp"
 #include "boost/chrono.hpp"
 #define BOOST_AFIO_USE_BOOST_ATOMIC
@@ -55,8 +48,12 @@ File Created: Mar 2013
 #include <mutex>
 #endif
 
-#include "config.hpp"
-#include "detail/Utility.hpp"
+#include "boost/asio.hpp"
+#include "boost/thread/thread.hpp"
+#include "boost/thread/future.hpp"
+#include "boost/foreach.hpp"
+#include "detail/Preprocessor_variadic.hpp"
+#include <boost/detail/scoped_enum_emulation.hpp>
 
 // Map in C++11 stuff if available
 #if (defined(__GLIBCXX__) && __GLIBCXX__<=20120920 /* <= GCC 4.7 */) || (defined(BOOST_MSVC) && BOOST_MSVC < 1700)
@@ -83,18 +80,6 @@ typedef std::recursive_mutex recursive_mutex;
 
 #if BOOST_VERSION<105400
 #error Boosts before v1.54 have a memory corruption bug in boost::packaged_task<> when built under C++11 which makes this library useless. Get a newer Boost!
-#endif
-
-
-#ifndef BOOST_AFIO_DECL
-#ifdef BOOST_AFIO_DLL_EXPORTS
-#define BOOST_AFIO_DECL BOOST_SYMBOL_EXPORT
-#else
-/*! \brief Defines the API decoration for any exportable symbols
-\ingroup macros
-*/
-#define BOOST_AFIO_DECL BOOST_SYMBOL_IMPORT
-#endif
 #endif
 
 
@@ -406,7 +391,12 @@ template <class InputIterator> inline future<std::vector<typename std::decay<dec
 	typedef typename std::decay<decltype(((typename InputIterator::value_type *) 0)->get())>::type value_type;
 	typedef std::vector<value_type> returns_t;
 	// Take a copy of the futures supplied to us (which may invalidate them)
+	// VS2010 uses a non-namespace qualified move() in its headers, which generates an ambiguous resolution error
+#if defined(BOOST_MSVC) && BOOST_MSVC < 1700 // <= VS2010
+	auto futures=std::make_shared<std::vector<future_type>>(boost::make_move_iterator(first), boost::make_move_iterator(last));
+#else
 	auto futures=std::make_shared<std::vector<future_type>>(std::make_move_iterator(first), std::make_move_iterator(last));
+#endif
 	// Bind to my delegate and invoke
 	std::function<returns_t ()> waitforall(std::move(std::bind(&detail::when_all_do<returns_t, future_type>, futures)));
 	return process_threadpool().enqueue(std::move(waitforall));
@@ -434,7 +424,12 @@ template <class InputIterator> inline future<std::pair<size_t, typename std::dec
 	typedef typename std::decay<decltype(((typename InputIterator::value_type *) 0)->get())>::type value_type;
 	typedef std::pair<size_t, typename std::decay<decltype(((typename InputIterator::value_type *) 0)->get())>::type> returns_t;
 	// Take a copy of the futures supplied to us (which may invalidate them)
+	// VS2010 uses a non-namespace qualified move() in its headers, which generates an ambiguous resolution error
+#if defined(BOOST_MSVC) && BOOST_MSVC < 1700 // <= VS2010
+	auto futures=std::make_shared<std::vector<future_type>>(boost::make_move_iterator(first), boost::make_move_iterator(last));
+#else
 	auto futures=std::make_shared<std::vector<future_type>>(std::make_move_iterator(first), std::make_move_iterator(last));
+#endif
 	// Bind to my delegate and invoke
 	std::function<returns_t ()> waitforall(std::move(std::bind(&detail::when_any_do<returns_t, future_type>, futures)));
 	return process_threadpool().enqueue(std::move(waitforall));
@@ -1710,6 +1705,13 @@ inline async_io_op async_file_io_dispatcher_base::completion(const async_io_op &
 	i.push_back(callback);
 	return std::move(completion(r, i).front());
 }
+namespace detail {
+	template<class tasktype> std::pair<bool, std::shared_ptr<detail::async_io_handle>> doCall(size_t, std::shared_ptr<detail::async_io_handle> _, exception_ptr *, std::shared_ptr<tasktype> c)
+	{
+		(*c)();
+		return std::make_pair(true, _);
+	}
+}
 template<class R> inline std::pair<std::vector<future<R>>, std::vector<async_io_op>> async_file_io_dispatcher_base::call(const std::vector<async_io_op> &ops, const std::vector<std::function<R()>> &callables)
 {
 	typedef packaged_task<R()> tasktype;
@@ -1717,15 +1719,12 @@ template<class R> inline std::pair<std::vector<future<R>>, std::vector<async_io_
 	std::vector<std::pair<async_op_flags, std::function<completion_t>>> callbacks;
 	retfutures.reserve(callables.size());
 	callbacks.reserve(callables.size());
-	auto f=[](size_t, std::shared_ptr<detail::async_io_handle> _, exception_ptr *, std::shared_ptr<tasktype> c) {
-		(*c)();
-		return std::make_pair(true, _);
-	};
+    
 	BOOST_FOREACH(auto &t, callables)
 	{
 		std::shared_ptr<tasktype> c(std::make_shared<tasktype>(std::function<R()>(t)));
 		retfutures.push_back(c->get_future());
-		callbacks.push_back(std::make_pair(async_op_flags::None, std::bind(f, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::move(c))));
+		callbacks.push_back(std::make_pair(async_op_flags::None, std::bind(&detail::doCall<tasktype>, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::move(c))));
 	}
 	return std::make_pair(std::move(retfutures), completion(ops, callbacks));
 }

@@ -46,7 +46,7 @@ BOOST_AUTO_TEST_CASE(async_io_errors)
 					BOOST_CHECK_NO_THROW(future2.get()); // nothrow variant must never throw
 					BOOST_AFIO_CHECK_THROWS(future2e.get()); // throw variant must always throw
 					hasErrorDirectly = 0;
-					for (auto &i : manyfilecreates)
+					BOOST_FOREACH (auto &i, manyfilecreates)
 					{
 						// If we ask for has_exception() before the async thread has exited its packaged_task
 						// this will fail, so no choice but to try { wait(); } catch { success }
@@ -62,7 +62,7 @@ BOOST_AUTO_TEST_CASE(async_io_errors)
 					//std::cout << "hasErrorDirectly = " << hasErrorDirectly << std::endl;
 					BOOST_CHECK(hasErrorDirectly == 1);
 					hasErrorFromBarrier = 0;
-					for (auto &i : sync1)
+					BOOST_FOREACH (auto &i, sync1)
 					{
 						try
 						{
