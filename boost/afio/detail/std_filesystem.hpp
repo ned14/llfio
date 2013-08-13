@@ -16,11 +16,14 @@ namespace std { namespace filesystem { using namespace tr2::filesystem; } }
 #include "boost/filesystem/fstream.hpp"
 namespace std {
 	namespace filesystem { using namespace boost::filesystem; using boost::filesystem::path; }
-// Dinkumware defines hash as a class
-#ifdef _CPPLIB_VER
-	template<class T> class hash;
-#else
+	// Some MSVC headers define std::hash as a class
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable:4099) // warning C4099: 'std::hash' : type name first seen using 'class' now seen using 'struct'
+#endif
 	template<class T> struct hash;
+#ifdef _MSC_VER
+#pragma warning(pop)
 #endif
 	template<> struct hash<boost::filesystem::path>
 	{
