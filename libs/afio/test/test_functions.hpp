@@ -23,7 +23,6 @@ extern int putenv(char*);
 #include "../../../boost/afio/afio.hpp"
 #include "../detail/SpookyV2.h"
 #include "../../../boost/afio/detail/Aligned_Allocator.hpp"
-//#include "../../../boost/afio/detail/Undoer.hpp"
 
 //if we're building the tests all together don't define the test main
 #ifndef BOOST_AFIO_TEST_ALL
@@ -177,11 +176,9 @@ static u4 mkfill() { static char ret='0'; if(ret+1>'z') ret='0'; return ret++; }
 
 static void evil_random_io(std::shared_ptr<boost::afio::async_file_io_dispatcher_base> dispatcher, size_t no, size_t bytes, size_t alignment=0)
 {
-    //using namespace boost::afio;
     using namespace std;
     using boost::afio::future;
 	using boost::afio::ratio;
-    //using namespace boost::afio::detail;
     using boost::afio::off_t;
 	namespace chrono = boost::afio::chrono;
     typedef chrono::duration<double, ratio<1>> secs_type;
@@ -342,7 +339,11 @@ static void evil_random_io(std::shared_ptr<boost::afio::async_file_io_dispatcher
             maxfailures+=todo[n].size();
 
     boost::lockfree::queue<std::pair<const Op *, size_t> *> failures(maxfailures);
+#if defined(BOOST_MSVC) && BOOST_MSVC < 1700 // <= VS2010
     std::function<std::pair<bool, std::shared_ptr<boost::afio::detail::async_io_handle>> (Op &, char *, size_t, std::shared_ptr<boost::afio::detail::async_io_handle>)> checkHash=[&failures](Op &op, char *base, size_t, std::shared_ptr<boost::afio::detail::async_io_handle> h) -> std::pair<bool, std::shared_ptr<boost::afio::detail::async_io_handle>> {
+#else
+    auto checkHash=[&failures](Op &op, char *base, size_t, std::shared_ptr<boost::afio::detail::async_io_handle> h) -> std::pair<bool, std::shared_ptr<boost::afio::detail::async_io_handle>> {
+#endif
             const char *data=(const char *)(((size_t) base+(size_t) op.req.where));
             size_t idxoffset=0;
 

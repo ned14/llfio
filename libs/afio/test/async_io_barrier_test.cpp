@@ -36,8 +36,13 @@ BOOST_AUTO_TEST_CASE(async_io_barrier)
     memset(&callcount, 0, sizeof(callcount));
     vector<future<bool>> verifies;
     verifies.reserve(groups.size());
+#if defined(BOOST_MSVC) && BOOST_MSVC < 1700 // <= VS2010
     std::function<void (boost::afio::atomic<size_t> *count)> inccount = [](boost::afio::atomic<size_t> *count){ /*for (volatile size_t n = 0; n < 10000; n++);*/ (*count)++; };
     std::function<bool(boost::afio::atomic<size_t> *, size_t)> verifybarrier = [](boost::afio::atomic<size_t> *count, size_t shouldbe) ->bool
+#else
+    auto inccount = [](boost::afio::atomic<size_t> *count){ /*for (volatile size_t n = 0; n < 10000; n++);*/ (*count)++; };
+    auto verifybarrier = [](boost::afio::atomic<size_t> *count, size_t shouldbe)
+#endif
     {
         if (*count != shouldbe)
         {
