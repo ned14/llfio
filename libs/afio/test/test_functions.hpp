@@ -36,7 +36,12 @@ extern int putenv(char*);
 try{\
     expr;\
     BOOST_FAIL("Exception was not thrown");\
-}catch(...){BOOST_CHECK(true);}
+}catch(...){/*BOOST_CHECK(true);*/}
+#define BOOST_AFIO_CHECK_NO_THROW(expr)\
+try{\
+    expr;\
+	/*BOOST_CHECK(true);*/ \
+}catch(...){BOOST_FAIL("Exception was thrown");}
 
 // From http://burtleburtle.net/bob/rand/smallprng.html
 typedef unsigned int  u4;

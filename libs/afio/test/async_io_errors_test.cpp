@@ -41,9 +41,9 @@ BOOST_AUTO_TEST_CASE(async_io_errors)
 					auto future2e = when_all(sync1.begin(), sync1.end());
 					// If any of the above threw due to context switches, they'll repeat
 
-					BOOST_CHECK_NO_THROW(future1.get()); // nothrow variant must never throw
+					BOOST_AFIO_CHECK_NO_THROW(future1.get()); // nothrow variant must never throw
 					BOOST_AFIO_CHECK_THROWS(future1e.get()); // throw variant must always throw
-					BOOST_CHECK_NO_THROW(future2.get()); // nothrow variant must never throw
+					BOOST_AFIO_CHECK_NO_THROW(future2.get()); // nothrow variant must never throw
 					BOOST_AFIO_CHECK_THROWS(future2e.get()); // throw variant must always throw
 					hasErrorDirectly = 0;
 					BOOST_FOREACH (auto &i, manyfilecreates)
@@ -60,7 +60,8 @@ BOOST_AUTO_TEST_CASE(async_io_errors)
 						}
 					}
 					//std::cout << "hasErrorDirectly = " << hasErrorDirectly << std::endl;
-					BOOST_CHECK(hasErrorDirectly == 1);
+					if(hasErrorDirectly != 1)
+						BOOST_CHECK(hasErrorDirectly == 1);
 					hasErrorFromBarrier = 0;
 					BOOST_FOREACH (auto &i, sync1)
 					{
@@ -74,7 +75,8 @@ BOOST_AUTO_TEST_CASE(async_io_errors)
 						}
 					}
 					//std::cout << "hasErrorFromBarrier = " << hasErrorFromBarrier << std::endl;
-					BOOST_CHECK(hasErrorFromBarrier == 1);
+					if(hasErrorFromBarrier != 1)
+						BOOST_CHECK(hasErrorFromBarrier == 1);
 				}
 				catch(...)
 				{

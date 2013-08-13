@@ -79,11 +79,11 @@ BOOST_AUTO_TEST_CASE(async_io_barrier)
     }
     auto dispatched = chrono::high_resolution_clock::now();
     cout << "There are now " << dec << dispatcher->count() << " handles open with a queue depth of " << dispatcher->wait_queue_depth() << endl;
-    BOOST_CHECK_NO_THROW(when_all(next).wait());
+    BOOST_AFIO_CHECK_NO_THROW(when_all(next).wait());
     // Retrieve any errors
     BOOST_FOREACH(auto &i, verifies)
     {
-        BOOST_CHECK_NO_THROW(i.get());
+        BOOST_AFIO_CHECK_NO_THROW(i.get());
     }
     auto end = chrono::high_resolution_clock::now();
     auto diff = chrono::duration_cast<secs_type>(end - begin);
