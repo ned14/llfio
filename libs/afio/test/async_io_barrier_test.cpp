@@ -17,7 +17,7 @@ BOOST_AUTO_TEST_CASE(async_io_barrier)
 #if defined(DEBUG) || defined(_DEBUG)
 		50000
 #else
-		250000
+		100000
 #endif
 		;
     {
