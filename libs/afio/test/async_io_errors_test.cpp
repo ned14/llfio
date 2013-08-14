@@ -94,8 +94,10 @@ BOOST_AUTO_TEST_CASE(async_io_errors)
 			} while(false);
         }
 
-        auto manyfiledeletes = dispatcher->rmfile(filereqs); // One or both of these will also error. Same as above.
-        auto rmdir = dispatcher->rmdir(async_path_op_req(manyfiledeletes.back(), "testdir"));
+		if(filesystem::exists("testdir/a"))
+			filesystem::remove("testdir/a");
+		if(filesystem::exists("testdir"))
+			filesystem::remove("testdir");
     }
 	// Add a single output to validate the test
 	BOOST_CHECK(true);
