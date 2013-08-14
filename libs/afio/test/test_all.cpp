@@ -1,5 +1,4 @@
  // Make sure we properly define the main for the test suite
-#define BOOST_TEST_MODULE tester
 #define BOOST_AFIO_TEST_ALL            
 
 #include "test_functions.hpp"

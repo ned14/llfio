@@ -2,7 +2,7 @@
 
 BOOST_AUTO_TEST_CASE(async_io_barrier)
 {
-    BOOST_TEST_MESSAGE("Tests that the async i/o barrier works correctly under load");
+    BOOST_AFIO_TEST_CONFIG("Tests that the async i/o barrier works correctly under load", 120);
     using namespace boost::afio;
     using namespace std;
     using boost::afio::future;

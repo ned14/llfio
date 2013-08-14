@@ -28,6 +28,9 @@ extern int putenv(char*);
 #ifndef BOOST_AFIO_TEST_ALL
 #    define BOOST_TEST_MAIN  //must be defined before unit_test.hpp is included
 #endif
+#ifndef BOOST_TEST_MODULE
+#define BOOST_TEST_MODULE Boost.AFIO
+#endif
 
 #include <boost/test/included/unit_test.hpp>
 
@@ -42,6 +45,11 @@ try{\
     expr;\
 	/*BOOST_CHECK(true);*/ \
 }catch(...){BOOST_FAIL("Exception was thrown");}
+
+// Define a unit test description and timeout
+#define BOOST_AFIO_TEST_CONFIG(desc, timeout) \
+	BOOST_TEST_MESSAGE(desc); \
+	boost::unit_test::unit_test_monitor_t::instance().p_timeout.set(timeout)
 
 // From http://burtleburtle.net/bob/rand/smallprng.html
 typedef unsigned int  u4;

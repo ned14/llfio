@@ -2,7 +2,7 @@
 
 BOOST_AUTO_TEST_CASE(async_io_sync)
 {
-    BOOST_TEST_MESSAGE("Tests async fsync");
+    BOOST_AFIO_TEST_CONFIG("Tests async fsync", 5);
     using namespace boost::afio;
     using namespace std;
     vector<char> buffer(64, 'n');

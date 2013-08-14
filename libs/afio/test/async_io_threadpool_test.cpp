@@ -19,7 +19,7 @@ Created: Feb 2013
  
  BOOST_AUTO_TEST_CASE(async_io_thread_pool_works)
 {
-    BOOST_TEST_MESSAGE("Tests that the async i/o thread pool implementation works");
+    BOOST_AFIO_TEST_CONFIG("Tests that the async i/o thread pool implementation works", 10);
     using namespace boost::afio;
     
     boost::afio::thread::id this_id = boost::afio::get_this_thread_id();
