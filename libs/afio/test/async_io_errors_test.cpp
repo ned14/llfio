@@ -18,7 +18,10 @@ BOOST_AUTO_TEST_CASE(async_io_errors)
          * was for the good anyway, but still painful). So, let's really hammer this API
          * such that it never, ever slightly fails to function ever again!
          */
-#if defined(BOOST_MSVC) && BOOST_MSVC < 1800 /* <= VS2012 */ && (defined(DEBUG) || defined(_DEBUG))
+#if defined(BOOST_MSVC) && BOOST_MSVC < 1700 /* <= VS2010 */
+		// Throwing exceptions in VS2010 randomly causes segfaults :(
+        for(size_t n=0; n<500; n++)
+#elif defined(BOOST_MSVC) && BOOST_MSVC < 1800 /* <= VS2012 */ && (defined(DEBUG) || defined(_DEBUG))
 		// Throwing exceptions is unbelievably slow on VS2012 and earlier if running inside a debugger
         for(size_t n=0; n<5000; n++)
 #else
