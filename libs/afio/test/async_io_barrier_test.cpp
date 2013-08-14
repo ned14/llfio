@@ -101,4 +101,6 @@ BOOST_AUTO_TEST_CASE(async_io_barrier)
     cout << "  It took " << diff.count() << " secs to finish all operations" << endl << endl;
     diff = chrono::duration_cast<secs_type>(end - begin);
     cout << "That's a throughput of " << opscount / diff.count() << " ops/sec" << endl;
+	// Add a single output to validate the test
+	BOOST_CHECK(true);
 }
