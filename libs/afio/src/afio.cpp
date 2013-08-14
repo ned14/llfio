@@ -1055,6 +1055,11 @@ template<> async_file_io_dispatcher_base::completion_returntype async_file_io_di
 	state.first->out[idx]=std::make_pair(id, h); // This might look thread unsafe, but each idx is unique
 	if(--state.first->togo)
 		return std::make_pair(false, h);
+#if 1
+	// On the basis that probably the preceding decrementing thread has yet to signal their future,
+	// give up my timeslice
+	boost::this_thread::yield();
+#endif
 	// Last one just completed, so issue completions for everything in out except me
 	detail::barrier_count_completed_state &s=*state.first;
 	for(idx=0; idx<s.out.size(); idx++)

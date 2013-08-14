@@ -56,7 +56,7 @@ File Created: Mar 2013
 #include <boost/detail/scoped_enum_emulation.hpp>
 
 // Map in C++11 stuff if available
-#if (defined(__GLIBCXX__) && __GLIBCXX__<=20120920 /* <= GCC 4.7 */) || (defined(BOOST_MSVC) && BOOST_MSVC < 1700)
+#if (defined(__GLIBCXX__) && __GLIBCXX__<=20120920 /* <= GCC 4.7 */) || (defined(BOOST_MSVC) && BOOST_MSVC < 1700 /* <= VS2010 */)
 #include "boost/exception_ptr.hpp"
 #include "boost/thread/recursive_mutex.hpp"
 namespace boost { namespace afio {
@@ -324,6 +324,16 @@ class std_thread_pool : public thread_source {
 		explicit worker(std_thread_pool *p) : pool(p) { }
 		void operator()()
 		{
+#if defined(BOOST_MSVC) && BOOST_MSVC < 1700 /* <= VS2010 */
+			// VS2010 segfaults if you ever do a try { throw; } catch(...) without an exception ever having been thrown :(
+			try
+			{
+				throw std::exception();
+			}
+			catch(...)
+			{
+			}
+#endif
 			pool->service.run();
 		}
 	};

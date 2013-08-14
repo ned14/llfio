@@ -18,7 +18,12 @@ BOOST_AUTO_TEST_CASE(async_io_errors)
          * was for the good anyway, but still painful). So, let's really hammer this API
          * such that it never, ever slightly fails to function ever again!
          */
+#if defined(BOOST_MSVC) && BOOST_MSVC < 1800 /* <= VS2012 */ && (defined(DEBUG) || defined(_DEBUG))
+		// Throwing exceptions is unbelievably slow on VS2012 and earlier if running inside a debugger
+        for(size_t n=0; n<5000; n++)
+#else
         for(size_t n=0; n<50000; n++)
+#endif
         {
 			// The following is a fundamentally unstable unit test - if manyfilecreates completes before
 			// sync1, sync1 will throw on the spot
