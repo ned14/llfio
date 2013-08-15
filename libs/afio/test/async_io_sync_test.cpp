@@ -1,8 +1,7 @@
 #include "test_functions.hpp"
 
-BOOST_AUTO_TEST_CASE(async_io_sync)
+BOOST_AFIO_AUTO_TEST_CASE(async_io_sync, "Tests async fsync", 5)
 {
-    BOOST_AFIO_TEST_CONFIG("Tests async fsync", 5);
     using namespace boost::afio;
     using namespace std;
     vector<char> buffer(64, 'n');

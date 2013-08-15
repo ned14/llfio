@@ -47,9 +47,26 @@ try{\
 }catch(...){BOOST_FAIL("Exception was thrown");}
 
 // Define a unit test description and timeout
-#define BOOST_AFIO_TEST_CONFIG(desc, timeout) \
-	BOOST_TEST_MESSAGE(desc); \
-	boost::unit_test::unit_test_monitor_t::instance().p_timeout.set(timeout)
+#define BOOST_AFIO_AUTO_TEST_CASE(test_name, desc, timeout)             \
+struct test_name : public BOOST_AUTO_TEST_CASE_FIXTURE { void test_method(); }; \
+                                                                        \
+static void BOOST_AUTO_TC_INVOKER( test_name )()                        \
+{                                                                       \
+    test_name t;                                                        \
+	boost::unit_test::unit_test_monitor_t::instance().p_timeout.set(timeout); \
+	BOOST_TEST_MESSAGE(desc);                                           \
+	boost::unit_test::unit_test_monitor_t::instance().execute([&]() -> int {t.test_method(); return 0; }); \
+}                                                                       \
+                                                                        \
+struct BOOST_AUTO_TC_UNIQUE_ID( test_name ) {};                         \
+                                                                        \
+BOOST_AUTO_TU_REGISTRAR( test_name )(                                   \
+    boost::unit_test::make_test_case(                                   \
+        &BOOST_AUTO_TC_INVOKER( test_name ), #test_name ),              \
+    boost::unit_test::ut_detail::auto_tc_exp_fail<                      \
+        BOOST_AUTO_TC_UNIQUE_ID( test_name )>::instance()->value() );   \
+                                                                        \
+void test_name::test_method()                                           \
 
 // From http://burtleburtle.net/bob/rand/smallprng.html
 typedef unsigned int  u4;

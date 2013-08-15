@@ -1,8 +1,7 @@
 #include "test_functions.hpp"
 
-BOOST_AUTO_TEST_CASE(async_io_errors)
+BOOST_AFIO_AUTO_TEST_CASE(async_io_errors, "Tests that the async i/o error handling works", 120)
 {
-    BOOST_AFIO_TEST_CONFIG("Tests that the async i/o error handling works", 120);
     using namespace boost::afio;
     using namespace std;
     using boost::afio::future;
