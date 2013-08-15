@@ -14,9 +14,9 @@ BOOST_AFIO_AUTO_TEST_CASE(async_io_barrier, "Tests that the async i/o barrier wo
     // Generate 500,000 sorted random numbers between 0-1000
 	static const size_t numbers=
 #if defined(DEBUG) || defined(_DEBUG)
-		50000
+		5000
 #else
-		100000
+		10000
 #endif
 		;
     {
