@@ -16,6 +16,22 @@ File Created: Mar 2013
 #define BOOST_AFIO_VALIDATE_INPUTS 1
 #endif
 
+// Define this to have every allocated op take a backtrace from where it was allocated
+#ifndef BOOST_AFIO_OP_STACKBACKTRACEDEPTH
+#ifndef NDEBUG
+#define BOOST_AFIO_OP_STACKBACKTRACEDEPTH 32
+#endif
+#endif
+
+// Currently we only support glibc's stack backtracer
+#ifdef BOOST_AFIO_OP_STACKBACKTRACEDEPTH
+#ifdef __linux__
+#include <execinfo.h>
+#else
+#undef BOOST_AFIO_OP_STACKBACKTRACEDEPTH
+#endif
+#endif
+
 // Get Mingw to assume we are on at least Windows 2000
 #define __MSVCRT_VERSION__ 0x601
 
@@ -372,10 +388,26 @@ namespace detail {
 		std::unique_ptr<promise<std::shared_ptr<detail::async_io_handle>>> detached_promise;
 		typedef std::pair<size_t, std::function<std::shared_ptr<detail::async_io_handle> (std::shared_ptr<detail::async_io_handle>, exception_ptr *)>> completion_t;
 		std::vector<completion_t> completions;
+#ifdef BOOST_AFIO_OP_STACKBACKTRACEDEPTH
+		std::vector<void *> stack;
+		void fillStack()
+		{
+			stack.reserve(BOOST_AFIO_OP_STACKBACKTRACEDEPTH);
+			stack.resize(BOOST_AFIO_OP_STACKBACKTRACEDEPTH);
+			stack.resize(backtrace(&stack.front(), stack.size()));
+		}
+#else
+		void fillStack() { }
+#endif
 		async_file_io_dispatcher_op(OpType _optype, async_op_flags _flags, std::shared_ptr<shared_future<std::shared_ptr<detail::async_io_handle>>> _h)
-			: optype(_optype), flags(_flags), h(_h) { }
+			: optype(_optype), flags(_flags), h(_h) { fillStack(); }
 		async_file_io_dispatcher_op(async_file_io_dispatcher_op &&o) BOOST_NOEXCEPT_OR_NOTHROW : optype(o.optype), flags(std::move(o.flags)), h(std::move(o.h)),
-			detached_promise(std::move(o.detached_promise)), completions(std::move(o.completions)) { }
+			detached_promise(std::move(o.detached_promise)), completions(std::move(o.completions))
+#ifdef BOOST_AFIO_OP_STACKBACKTRACEDEPTH
+			, stack(std::move(o.stack))
+#endif
+			{
+			}
 	private:
 		async_file_io_dispatcher_op(const async_file_io_dispatcher_op &o)
 #ifndef BOOST_NO_CXX11_DELETED_FUNCTIONS
@@ -400,11 +432,11 @@ namespace detail {
 			fdslock.unlock();
 			ANNOTATE_RWLOCK_CREATE(&fdslock);
         
-        #if !defined(BOOST_MSVC)|| BOOST_MSVC >= 1700 // MSVC 2010 doesn't support reserve
+#if !defined(BOOST_MSVC)|| BOOST_MSVC >= 1700 // MSVC 2010 doesn't support reserve
 			ops.reserve(10000);
-        #else
-            ops.rehash((size_t) std::ceil(10000 / ops.max_load_factor()));
-        #endif
+#else
+			ops.rehash((size_t) std::ceil(10000 / ops.max_load_factor()));
+#endif
 		}
 		~async_file_io_dispatcher_base_p()
 		{
@@ -476,6 +508,17 @@ async_file_io_dispatcher_base::~async_file_io_dispatcher_base()
 									std::cerr << " id=" << c.first;
 								}
 								std::cerr << std::endl;
+#ifdef BOOST_AFIO_OP_STACKBACKTRACEDEPTH
+								std::cerr << "  Allocation backtrace:" << std::endl;
+								size_t size=op.second.stack.size();
+								char **strings=backtrace_symbols(&op.second.stack.front(), size);
+								auto unstrings=boost::afio::detail::Undoer([strings]{free(strings);});
+								for(size_t i2=0; i2<size; i2++)
+								{	// Format can be <file path>(<mangled symbol>+0x<offset>) [<pc>]
+									// or can be <file path> [<pc>]
+									std::cerr << "    " << strings[i2] << std::endl;
+								}
+#endif
 							}
 						}
 						outstanding.push_back(std::make_pair(op.first, op.second.h));
