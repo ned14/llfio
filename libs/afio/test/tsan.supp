@@ -1,1 +1,16 @@
+# These are from GCC
 race:boost::detail::future_object_base::~future_object_base()
+
+# These are from clang
+fun:*pthread_mutex_destroy*
+src:*boost/smart_ptr/scoped_ptr.hpp
+fun:*scoped_ptr*
+src:*boost/smart_ptr/detail/sp_counted_impl.hpp
+fun:*sp_counted_base*
+src:*boost/exception/detail/exception_ptr.hpp
+fun:*current_exception_std_exception_wrapper*
+src:*boost/exception/exception.hpp
+fun:*refcount_ptr*
+fun:*exception_detail*
+src:boost/smart_ptr/detail/shared_count.hpp
+fun:*shared_count*
