@@ -1062,7 +1062,7 @@ template<class F, class... Args> async_io_op async_file_io_dispatcher_base::chai
 
 #endif
 
-
+// General non-specialised implementation taking some arbitrary parameter T
 template<class F, class T> std::vector<async_io_op> async_file_io_dispatcher_base::chain_async_ops(int optype, const std::vector<async_io_op> &preconditions, const std::vector<T> &container, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, exception_ptr *, T))
 {
 	std::vector<async_io_op> ret;
@@ -1078,6 +1078,7 @@ template<class F, class T> std::vector<async_io_op> async_file_io_dispatcher_bas
 		ret.push_back(chain_async_op(immediates, optype, *precondition_it, flags, f, *container_it));
 	return ret;
 }
+// Generic op receiving specialisation i.e. precondition is also input op. Skips sanity checking.
 template<class F> std::vector<async_io_op> async_file_io_dispatcher_base::chain_async_ops(int optype, const std::vector<async_io_op> &container, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, exception_ptr *, async_io_op))
 {
 	std::vector<async_io_op> ret;
@@ -1090,6 +1091,7 @@ template<class F> std::vector<async_io_op> async_file_io_dispatcher_base::chain_
     }
 	return ret;
 }
+// Dir/file open specialisation
 template<class F> std::vector<async_io_op> async_file_io_dispatcher_base::chain_async_ops(int optype, const std::vector<async_path_op_req> &container, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, exception_ptr *, async_path_op_req))
 {
 	std::vector<async_io_op> ret;
@@ -1102,6 +1104,7 @@ template<class F> std::vector<async_io_op> async_file_io_dispatcher_base::chain_
     }
 	return ret;
 }
+// Data read and write specialisation
 template<class F, bool iswrite> std::vector<async_io_op> async_file_io_dispatcher_base::chain_async_ops(int optype, const std::vector<detail::async_data_op_req_impl<iswrite>> &container, async_op_flags flags, completion_returntype(F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, exception_ptr *, detail::async_data_op_req_impl<iswrite>))
 {
 	std::vector<async_io_op> ret;
@@ -1121,13 +1124,13 @@ namespace detail
 	{
 		atomic<size_t> togo;
 		std::vector<std::pair<size_t, std::shared_ptr<detail::async_io_handle>>> out;
-		std::vector<std::shared_ptr<shared_future<std::shared_ptr<detail::async_io_handle>>>> outsharedstates;
+		std::vector<std::shared_ptr<shared_future<std::shared_ptr<detail::async_io_handle>>>> insharedstates;
 		barrier_count_completed_state(const std::vector<async_io_op> &ops) : togo(ops.size()), out(ops.size())
 		{
-			outsharedstates.reserve(ops.size());
+			insharedstates.reserve(ops.size());
 			BOOST_FOREACH(auto &i, ops)
 			{
-				outsharedstates.push_back(i.h);
+				insharedstates.push_back(i.h);
 			}
 		}
 	};
@@ -1140,7 +1143,8 @@ types, but hey it works and is non-header so so what ...
 template<> async_file_io_dispatcher_base::completion_returntype async_file_io_dispatcher_base::dobarrier<std::pair<std::shared_ptr<detail::barrier_count_completed_state>, size_t>>(size_t id, std::shared_ptr<detail::async_io_handle> h, exception_ptr *e, std::pair<std::shared_ptr<detail::barrier_count_completed_state>, size_t> state)
 {
 	size_t idx=state.second;
-	state.first->out[idx]=std::make_pair(id, h); // This might look thread unsafe, but each idx is unique
+	detail::barrier_count_completed_state &s=*state.first;
+	s.out[idx]=std::make_pair(id, h); // This might look thread unsafe, but each idx is unique
 	if(--state.first->togo)
 		return std::make_pair(false, h);
 #if 1
@@ -1148,19 +1152,32 @@ template<> async_file_io_dispatcher_base::completion_returntype async_file_io_di
 	// give up my timeslice
 	boost::this_thread::yield();
 #endif
+#if 1
+	// Rather than potentially expend a syscall per wait on each input op to complete, compose a list of input futures and wait on them all
+	std::vector<shared_future<std::shared_ptr<detail::async_io_handle>>> notready;
+	notready.reserve(s.insharedstates.size()-1);
+	for(idx=0; idx<s.insharedstates.size(); idx++)
+	{
+		shared_future<std::shared_ptr<detail::async_io_handle>> &f=*s.insharedstates[idx];
+		if(idx==state.second || f.is_ready()) continue;
+		notready.push_back(f);
+	}
+	if(!notready.empty())
+		boost::wait_for_all(notready.begin(), notready.end());
+#endif
 	// Last one just completed, so issue completions for everything in out except me
-	detail::barrier_count_completed_state &s=*state.first;
 	for(idx=0; idx<s.out.size(); idx++)
 	{
 		if(idx==state.second) continue;
-		shared_future<std::shared_ptr<detail::async_io_handle>> *thisresult=state.first->outsharedstates[idx].get();
+		shared_future<std::shared_ptr<detail::async_io_handle>> &thisresult=*s.insharedstates[idx];
 		// This seems excessive but I don't see any other legal way to extract the exception ...
 		bool success=false;
+		// TODO: If I include the wait_for_all above, we need only fetch this if thisresult.has_exception().
 		try
 		{
 			// Always must wait on the others, because some may be between decrementing the
 			// atomic and returning their result to here. Any waiting is likely short.
-			thisresult->get();
+			thisresult.get();
 			success=true;
 		}
 		catch(...)
@@ -1192,6 +1209,7 @@ std::vector<async_io_op> async_file_io_dispatcher_base::barrier(const std::vecto
 #endif
 	// Create a shared state for the completions to be attached to all the items we are waiting upon
 	auto state(std::make_shared<detail::barrier_count_completed_state>(ops));
+	// Create each of the parameters to be sent to each dobarrier
 	std::vector<std::pair<std::shared_ptr<detail::barrier_count_completed_state>, size_t>> statev;
 	statev.reserve(ops.size());
 	size_t idx=0;
