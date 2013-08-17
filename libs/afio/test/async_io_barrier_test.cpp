@@ -11,12 +11,12 @@ BOOST_AFIO_AUTO_TEST_CASE(async_io_barrier, "Tests that the async i/o barrier wo
 	namespace chrono = boost::afio::chrono;
     typedef chrono::duration<double, ratio<1>> secs_type;
     vector<pair<size_t, int>> groups;
-    // Generate 500,000 sorted random numbers between 0-1000
+    // Generate 500,000 sorted random numbers between 0-10000
 	static const size_t numbers=
-#if defined(DEBUG) || defined(_DEBUG)
-		5000
+#if defined(BOOST_MSVC) && BOOST_MSVC < 1800 /* <= VS2012 */ && (defined(DEBUG) || defined(_DEBUG))
+		16000
 #else
-		10000
+		160000
 #endif
 		;
     {
@@ -25,7 +25,7 @@ BOOST_AFIO_AUTO_TEST_CASE(async_io_barrier, "Tests that the async i/o barrier wo
         vector<int> manynumbers;
         manynumbers.reserve(numbers);
         for (size_t n = 0; n < numbers; n++)
-            manynumbers.push_back(ranval(&gen) % 1000);
+            manynumbers.push_back(ranval(&gen) % 10000);
         sort(manynumbers.begin(), manynumbers.end());
 
         // Collapse into a collection of runs of the same number
@@ -38,7 +38,7 @@ BOOST_AFIO_AUTO_TEST_CASE(async_io_barrier, "Tests that the async i/o barrier wo
             lastnumber = i;
         }
     }
-    boost::afio::atomic<size_t> callcount[1000];
+    boost::afio::atomic<size_t> callcount[10000];
     memset(&callcount, 0, sizeof(callcount));
     vector<future<bool>> verifies;
     verifies.reserve(groups.size());
@@ -82,7 +82,8 @@ BOOST_AFIO_AUTO_TEST_CASE(async_io_barrier, "Tests that the async i/o barrier wo
         auto verify = dispatcher->call(thisgroupbarriered.front(), std::function<bool()>(std::bind(verifybarrier, &callcount[run.second], run.first)));
         verifies.push_back(std::move(verify.first));
         next = verify.second;
-        opscount += run.first + 2;
+	// barrier() adds an immediate op per op
+        opscount += run.first*2 + 1;
     }
     auto dispatched = chrono::high_resolution_clock::now();
     cout << "There are now " << dec << dispatcher->count() << " handles open with a queue depth of " << dispatcher->wait_queue_depth() << endl;
