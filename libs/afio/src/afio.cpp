@@ -19,16 +19,18 @@ File Created: Mar 2013
 // Define this to have every allocated op take a backtrace from where it was allocated
 #ifndef BOOST_AFIO_OP_STACKBACKTRACEDEPTH
 #ifndef NDEBUG
-#define BOOST_AFIO_OP_STACKBACKTRACEDEPTH 32
+#define BOOST_AFIO_OP_STACKBACKTRACEDEPTH 8
 #endif
 #endif
 
 // Currently we only support glibc's stack backtracer
 #ifdef BOOST_AFIO_OP_STACKBACKTRACEDEPTH
-#ifdef __linux__
-#include <execinfo.h>
+#include <dlfcn.h>
+#if 0
+#define UNW_LOCAL_ONLY
+#include <libunwind.h>
 #else
-#undef BOOST_AFIO_OP_STACKBACKTRACEDEPTH
+#include <execinfo.h>
 #endif
 #endif
 
@@ -392,9 +394,25 @@ namespace detail {
 		std::vector<void *> stack;
 		void fillStack()
 		{
+#ifdef UNW_LOCAL_ONLY
+			// libunwind seems a bit more accurate than glibc's backtrace()
+			unw_context_t uc;
+			unw_cursor_t cursor;
+			unw_getcontext(&uc);
+			stack.reserve(BOOST_AFIO_OP_STACKBACKTRACEDEPTH);
+			unw_init_local(&cursor, &uc);
+			size_t n=0;
+			while(unw_step(&cursor)>0 && n++<BOOST_AFIO_OP_STACKBACKTRACEDEPTH)
+			{
+				unw_word_t ip;
+				unw_get_reg(&cursor, UNW_REG_IP, &ip);
+				stack.push_back((void *) ip);
+			}
+#else
 			stack.reserve(BOOST_AFIO_OP_STACKBACKTRACEDEPTH);
 			stack.resize(BOOST_AFIO_OP_STACKBACKTRACEDEPTH);
 			stack.resize(backtrace(&stack.front(), stack.size()));
+#endif
 		}
 #else
 		void fillStack() { }
@@ -510,13 +528,35 @@ async_file_io_dispatcher_base::~async_file_io_dispatcher_base()
 								std::cerr << std::endl;
 #ifdef BOOST_AFIO_OP_STACKBACKTRACEDEPTH
 								std::cerr << "  Allocation backtrace:" << std::endl;
-								size_t size=op.second.stack.size();
-								char **strings=backtrace_symbols(&op.second.stack.front(), size);
-								auto unstrings=boost::afio::detail::Undoer([strings]{free(strings);});
-								for(size_t i2=0; i2<size; i2++)
-								{	// Format can be <file path>(<mangled symbol>+0x<offset>) [<pc>]
-									// or can be <file path> [<pc>]
-									std::cerr << "    " << strings[i2] << std::endl;
+								size_t n=0;
+								BOOST_FOREACH(void *addr, op.second.stack)
+								{
+									Dl_info info;
+									std::cerr << "    " << ++n << ". 0x" << std::hex << addr << std::dec << ": ";
+									if(dladdr(addr, &info))
+									{
+										// This is hacky ...
+										if(info.dli_fname)
+										{
+											char buffer2[4096];
+											sprintf(buffer2, "/usr/bin/addr2line -C -f -i -e %s %lx", info.dli_fname, (long)((size_t) addr - (size_t) info.dli_fbase));
+											FILE *ih=popen(buffer2, "r");
+											auto unih=boost::afio::detail::Undoer([&ih]{ if(ih) pclose(ih); });
+											if(ih)
+											{
+												size_t length=fread(buffer2, 1, sizeof(buffer2), ih);
+												buffer2[length]=0;
+												std::string buffer(buffer2, length-1);
+												boost::replace_all(buffer, "\n", "\n       ");
+												std::cerr << buffer << " (+0x" << std::hex << ((size_t) addr - (size_t) info.dli_saddr) << ")" << std::dec;
+											}
+											else std::cerr << info.dli_fname << ":0 (+0x" << std::hex << ((size_t) addr - (size_t) info.dli_fbase) << ")" << std::dec;
+										}
+										else std::cerr << "unknown:0";
+									}
+									else
+										std::cerr << "completely unknown";
+									std::cerr << std::endl;
 								}
 #endif
 							}
