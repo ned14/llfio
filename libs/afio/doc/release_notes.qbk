@@ -44,9 +44,9 @@ process close. What does this mean?]
 This means that you scheduled ops with a dispatcher which did not complete in a timely fashion before you tried to destroy
 that dispatcher. This generally indicates a bug in your code, which can include:
 
-1. An op is still running in some thread pool and you didn't use __afio_when_all__ to wait for it to complete before trying
+# An op is still running in some thread pool and you didn't use __afio_when_all__ to wait for it to complete before trying
 to destroy the dispatcher.
-2. An op's precondition never completed and therefore the op was never started.
+# An op's precondition never completed and therefore the op was never started.
 
 Tracking down the cause of the latter in particular is very similar to tracking down race conditions i.e. it's hard, and we
 as the authors of __boost_afio__ know just how hard! If you are on POSIX, recompiling AFIO with the macro
