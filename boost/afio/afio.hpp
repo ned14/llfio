@@ -15,9 +15,9 @@ File Created: Mar 2013
 #if !defined(_WIN32_WINNT) && defined(WIN32)
 #define _WIN32_WINNT 0x0501
 #endif
-// VS2010 needs D_VARIADIC_MAX set to at least six
-#if defined(BOOST_MSVC) && BOOST_MSVC < 1700 && (!defined(_VARIADIC_MAX) || _VARIADIC_MAX < 6)
-#error _VARIADIC_MAX needs to be set to at least six to compile Boost.AFIO
+// VS2010 needs D_VARIADIC_MAX set to at least seven
+#if defined(BOOST_MSVC) && BOOST_MSVC < 1700 && (!defined(_VARIADIC_MAX) || _VARIADIC_MAX < 7)
+#error _VARIADIC_MAX needs to be set to at least seven to compile Boost.AFIO
 #endif
 
 #include "config.hpp"
@@ -196,6 +196,40 @@ BOOST_AFIO_FORWARD_STL_IMPL(promise, boost::promise)
 typedef boost::exception_ptr exception_ptr;
 template<class T> inline exception_ptr make_exception_ptr(const T &e) { return boost::copy_exception(e); }
 using boost::rethrow_exception;
+template<typename T> exception_ptr get_exception_ptr(future<T> &f)
+{
+	// This seems excessive but I don't see any other legal way to extract the exception ...
+	bool success=false;
+	try
+	{
+		f.get();
+		success=true;
+	}
+	catch(...)
+	{
+		exception_ptr e(afio::make_exception_ptr(afio::current_exception()));
+		assert(e);
+		return e;
+	}
+	return exception_ptr();
+}
+template<typename T> exception_ptr get_exception_ptr(shared_future<T> &f)
+{
+	// This seems excessive but I don't see any other legal way to extract the exception ...
+	bool success=false;
+	try
+	{
+		f.get();
+		success=true;
+	}
+	catch(...)
+	{
+		exception_ptr e(afio::make_exception_ptr(afio::current_exception()));
+		assert(e);
+		return e;
+	}
+	return exception_ptr();
+}
 /*! \brief For now, this is an emulation of std::packaged_task based on boost's packaged_task.
 We have to drop the Args... support because it segfaults MSVC Nov 2012 CTP.
 */
@@ -1034,7 +1068,7 @@ protected:
 #ifndef BOOST_NO_CXX11_VARIADIC_TEMPLATES
     
     template<class F, class... Args> std::shared_ptr<detail::async_io_handle> invoke_async_op_completions(size_t id, std::shared_ptr<detail::async_io_handle> h, exception_ptr *e, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, exception_ptr *, Args...), Args... args);
-    template<class F, class... Args> async_io_op chain_async_op(detail::immediate_async_ops &immediates, int optype, const async_io_op &precondition, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, exception_ptr *, Args...), Args... args);
+    template<class F, class... Args> async_io_op chain_async_op(exception_ptr *he, detail::immediate_async_ops &immediates, int optype, const async_io_op &precondition, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, exception_ptr *, Args...), Args... args);
 
 #else
 
@@ -1062,7 +1096,7 @@ protected:
     BOOST_PP_ENUM_PARAMS(N, class A)>                /* template end */                             \
     async_io_op                                      /* return type */                              \
     chain_async_op                                   /* function name */                            \
-    (detail::immediate_async_ops &immediates, int optype,           /* parameters start */          \
+    (exception_ptr *he, detail::immediate_async_ops &immediates, int optype,           /* parameters start */          \
     const async_io_op &precondition,async_op_flags flags,                                           \
     completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, exception_ptr * \
     BOOST_PP_COMMA_IF(N)                                                                            \

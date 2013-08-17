@@ -25,7 +25,7 @@ project boost/afio/test
       <toolset>gcc-mingw:<linkflags>"-lws2_32"
       <toolset>gcc:<linkflags>"-lgomp -ldl"
       <toolset>clang:<cxxflags>"-std=c++0x -fvisibility-inlines-hidden -fstrict-aliasing -Wstrict-aliasing -Wno-unused -fvisibility=hidden -fopenmp -fasynchronous-unwind-tables"
-      <toolset>msvc:<cxxflags>"/openmp /GF /Gy /bigobj /D_VARIADIC_MAX=6"
+      <toolset>msvc:<cxxflags>"/openmp /GF /Gy /bigobj /D_VARIADIC_MAX=8"
       <toolset>msvc:<linkflags>"/LARGEADDRESSAWARE /DYNAMICBASE /NXCOMPAT" # /VERSION:1.00.0"
       <toolset>msvc:<define>WIN32 <toolset>msvc:<define>_WINDOWS  <toolset>msvc:<define>UNICODE <toolset>msvc:<define>_UNICODE
       <target-os>linux:<linkflags>"-lpthread"

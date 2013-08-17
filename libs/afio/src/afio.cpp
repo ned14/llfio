@@ -17,19 +17,19 @@ File Created: Mar 2013
 #endif
 
 // Define this to have every allocated op take a backtrace from where it was allocated
-#ifndef BOOST_AFIO_OP_STACKBACKTRACEDEPTH
-#ifndef NDEBUG
-#define BOOST_AFIO_OP_STACKBACKTRACEDEPTH 8
-#endif
-#endif
+//#ifndef BOOST_AFIO_OP_STACKBACKTRACEDEPTH
+//#ifndef NDEBUG
+//#define BOOST_AFIO_OP_STACKBACKTRACEDEPTH 8
+//#endif
+//#endif
 
 #ifdef BOOST_AFIO_OP_STACKBACKTRACEDEPTH
 #include <dlfcn.h>
+// Set to 1 to use libunwind instead of glibc's stack backtracer
 #if 0
 #define UNW_LOCAL_ONLY
 #include <libunwind.h>
 #else
-// Currently we only support glibc's stack backtracer
 #ifdef __linux__
 #include <execinfo.h>
 #else
@@ -523,8 +523,8 @@ async_file_io_dispatcher_base::~async_file_io_dispatcher_base()
 							if(it->second.first>=5)
 							{
 								static const char *statuses[]={"ready", "timeout", "deferred", "unknown"};
-								std::cerr << "WARNING: ~async_file_dispatcher_base() detects stuck async_io_op\n"
-								"   id=" << op.first << " status=" << statuses[(((int) it->second.second)>=0 && ((int) it->second.second)<=2) ? (int) it->second.second : 3] << " usecount=" << op.second.h.use_count() << " failcount=" << it->second.first << " Completions:";
+								std::cerr << "WARNING: ~async_file_dispatcher_base() detects stuck async_io_op in total of " << p->ops.size() << " extant ops\n"
+								"   id=" << op.first << " type=" << detail::optypes[static_cast<size_t>(op.second.optype)] << " flags=0x" << std::hex << static_cast<size_t>(op.second.flags) << std::dec << " status=" << statuses[(((int) it->second.second)>=0 && ((int) it->second.second)<=2) ? (int) it->second.second : 3] << " handle_usecount=" << op.second.h.use_count() << " failcount=" << it->second.first << " Completions:";
 								BOOST_FOREACH(auto &c, op.second.completions)
 								{
 									std::cerr << " id=" << c.first;
@@ -670,17 +670,18 @@ std::vector<async_io_op> async_file_io_dispatcher_base::completion(const std::ve
 	std::vector<async_io_op>::const_iterator i;
 	std::vector<std::pair<async_op_flags, std::function<async_file_io_dispatcher_base::completion_t>>>::const_iterator c;
 	BOOST_AFIO_LOCK_GUARD<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
+	exception_ptr he;
 	detail::immediate_async_ops immediates;
 	if(ops.empty())
 	{
 		async_io_op empty;
 		BOOST_FOREACH(auto & c, callbacks)
 		{
-			ret.push_back(chain_async_op(immediates, (int) detail::OpType::UserCompletion, empty, c.first, &async_file_io_dispatcher_base::invoke_user_completion, c.second));
+			ret.push_back(chain_async_op(&he, immediates, (int) detail::OpType::UserCompletion, empty, c.first, &async_file_io_dispatcher_base::invoke_user_completion, c.second));
 		}
 	}
 	else for(i=ops.begin(), c=callbacks.begin(); i!=ops.end() && c!=callbacks.end(); ++i, ++c)
-			ret.push_back(chain_async_op(immediates, (int) detail::OpType::UserCompletion, *i, c->first, &async_file_io_dispatcher_base::invoke_user_completion, c->second));
+			ret.push_back(chain_async_op(&he, immediates, (int) detail::OpType::UserCompletion, *i, c->first, &async_file_io_dispatcher_base::invoke_user_completion, c->second));
 	return ret;
 }
 
@@ -690,7 +691,7 @@ void async_file_io_dispatcher_base::complete_async_op(size_t id, std::shared_ptr
 	BOOST_AFIO_LOCK_GUARD<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
 	detail::immediate_async_ops immediates;
 	// Find me in ops, remove my completions and delete me from extant ops
-	std::unordered_map<size_t, detail::async_file_io_dispatcher_op>::iterator it(p->ops.find(id));
+	std::unordered_map<size_t, detail::async_file_io_dispatcher_op>::iterator it=p->ops.find(id);
 	if(p->ops.end()==it)
 	{
 #ifndef NDEBUG
@@ -704,11 +705,19 @@ void async_file_io_dispatcher_base::complete_async_op(size_t id, std::shared_ptr
 		BOOST_AFIO_THROW_FATAL(std::runtime_error("Failed to find this operation in list of currently executing operations"));
 	}
 	// Erase me from ops on exit from this function
-	auto eraseit=boost::afio::detail::Undoer([this, &it]{ p->ops.erase(it); });
+	auto eraseit=boost::afio::detail::Undoer([this, id]{
+		std::unordered_map<size_t, detail::async_file_io_dispatcher_op>::iterator it=p->ops.find(id);
+		if(p->ops.end()==it)
+		{
+			BOOST_AFIO_THROW_FATAL(std::runtime_error("Failed to find this operation in list of currently executing operations"));
+		}
+		p->ops.erase(it);
+	});
 	if(!it->second.completions.empty())
 	{
 		// Remove completions as we're about to modify p->ops which will invalidate it
 		std::vector<detail::async_file_io_dispatcher_op::completion_t> completions(std::move(it->second.completions));
+		assert(it->second.completions.empty());
 		BOOST_FOREACH(auto &c, completions)
 		{
 			exception_ptr *immediate_e=(!!e) ? &e : nullptr;
@@ -757,6 +766,7 @@ void async_file_io_dispatcher_base::complete_async_op(size_t id, std::shared_ptr
 	}
 	if(it->second.detached_promise)
 	{
+		auto delpromise=boost::afio::detail::Undoer([&it]{ it->second.detached_promise.reset(); });
 		if(e)
 			it->second.detached_promise->set_exception(e);
 		else
@@ -884,7 +894,7 @@ template<class F, class... Args> std::shared_ptr<detail::async_io_handle> async_
 
 #ifndef BOOST_NO_CXX11_VARIADIC_TEMPLATES
 // You MUST hold opslock before entry!
-template<class F, class... Args> async_io_op async_file_io_dispatcher_base::chain_async_op(detail::immediate_async_ops &immediates, int optype, const async_io_op &precondition, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, exception_ptr *, Args...), Args... args)
+template<class F, class... Args> async_io_op async_file_io_dispatcher_base::chain_async_op(exception_ptr *he, detail::immediate_async_ops &immediates, int optype, const async_io_op &precondition, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, exception_ptr *, Args...), Args... args)
 {	
 	size_t thisid=0;
 	while(!(thisid=++p->monotoniccount));
@@ -928,10 +938,21 @@ template<class F, class... Args> async_io_op async_file_io_dispatcher_base::chai
 	{
 		// Bind input handle now and queue immediately to next available thread worker
 		std::shared_ptr<detail::async_io_handle> h;
-		// Boost's shared_future has get() as non-const which is weird, because it doesn't
-		// delete the data after retrieval.
+		exception_ptr *_he=nullptr;
 		if(precondition.h->valid())
-			h=const_cast<shared_future<std::shared_ptr<detail::async_io_handle>> &>(*precondition.h).get();
+		{
+			// Boost's shared_future has get() as non-const which is weird, because it doesn't
+			// delete the data after retrieval.
+			shared_future<std::shared_ptr<detail::async_io_handle>> &f=const_cast<shared_future<std::shared_ptr<detail::async_io_handle>> &>(*precondition.h);
+			// The reason we don't throw here is consistency: we throw at point of batch API entry
+			// if any of the preconditions are errored, but if they became errored between then and
+			// now we can hardly abort half way through a batch op without leaving around stuck ops.
+			// No, instead we simulate as if the precondition had not yet become ready.
+			if(precondition.h->has_exception())
+				*he=get_exception_ptr(f), _he=he;
+			else
+				h=f.get();
+		}
 		else if(precondition.id)
 		{
 			// It should never happen that precondition.id is valid but removed from extant ops
@@ -940,7 +961,9 @@ template<class F, class... Args> async_io_op async_file_io_dispatcher_base::chai
 			std::terminate();
 		}
 		if(!!(flags & async_op_flags::ImmediateCompletion))
-			*ret.h=immediates.enqueue(std::bind(boundf.second, h, nullptr)).share();
+		{
+			*ret.h=immediates.enqueue(std::bind(boundf.second, h, _he)).share();
+		}
 		else
 			*ret.h=threadsource().enqueue(std::bind(boundf.second, h, nullptr)).share();
 	}
@@ -1024,6 +1047,7 @@ template<class F, class... Args> async_io_op async_file_io_dispatcher_base::chai
 		    std::shared_ptr<detail::async_io_handle> h;\
 		    /* Boost's shared_future has get() as non-const which is weird, because it doesn't*/ \
 		    /* delete the data after retrieval.*/ \
+		    fixme; \
 		    if(precondition.h->valid())\
 			    h=const_cast<shared_future<std::shared_ptr<detail::async_io_handle>> &>(*precondition.h).get();\
 		    else if(precondition.id)\
@@ -1071,11 +1095,12 @@ template<class F, class T> std::vector<async_io_op> async_file_io_dispatcher_bas
 	if(preconditions.size()!=container.size())
 		BOOST_AFIO_THROW(std::runtime_error("preconditions size does not match size of ops data"));
 	BOOST_AFIO_LOCK_GUARD<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
+	exception_ptr he;
 	detail::immediate_async_ops immediates;
 	auto precondition_it=preconditions.cbegin();
 	auto container_it=container.cbegin();
 	for(; precondition_it!=preconditions.cend() && container_it!=container.cend(); ++precondition_it, ++container_it)
-		ret.push_back(chain_async_op(immediates, optype, *precondition_it, flags, f, *container_it));
+		ret.push_back(chain_async_op(&he, immediates, optype, *precondition_it, flags, f, *container_it));
 	return ret;
 }
 // Generic op receiving specialisation i.e. precondition is also input op. Skips sanity checking.
@@ -1084,10 +1109,11 @@ template<class F> std::vector<async_io_op> async_file_io_dispatcher_base::chain_
 	std::vector<async_io_op> ret;
 	ret.reserve(container.size());
 	BOOST_AFIO_LOCK_GUARD<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
+	exception_ptr he;
 	detail::immediate_async_ops immediates;
 	BOOST_FOREACH(auto &i, container)
     {
-		ret.push_back(chain_async_op(immediates, optype, i, flags, f, i));
+		ret.push_back(chain_async_op(&he, immediates, optype, i, flags, f, i));
     }
 	return ret;
 }
@@ -1097,10 +1123,11 @@ template<class F> std::vector<async_io_op> async_file_io_dispatcher_base::chain_
 	std::vector<async_io_op> ret;
 	ret.reserve(container.size());
 	BOOST_AFIO_LOCK_GUARD<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
+	exception_ptr he;
 	detail::immediate_async_ops immediates;
 	BOOST_FOREACH(auto &i, container)
     {
-		ret.push_back(chain_async_op(immediates, optype, i.precondition, flags, f, i));
+		ret.push_back(chain_async_op(&he, immediates, optype, i.precondition, flags, f, i));
     }
 	return ret;
 }
@@ -1110,10 +1137,11 @@ template<class F, bool iswrite> std::vector<async_io_op> async_file_io_dispatche
 	std::vector<async_io_op> ret;
 	ret.reserve(container.size());
 	BOOST_AFIO_LOCK_GUARD<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
+	exception_ptr he;
 	detail::immediate_async_ops immediates;
 	BOOST_FOREACH(auto &i, container)
     {
-		ret.push_back(chain_async_op(immediates, optype, i.precondition, flags, f, i));
+		ret.push_back(chain_async_op(&he, immediates, optype, i.precondition, flags, f, i));
     }
 	return ret;
 }
@@ -1152,6 +1180,9 @@ template<> async_file_io_dispatcher_base::completion_returntype async_file_io_di
 	// give up my timeslice
 	boost::this_thread::yield();
 #endif
+#ifdef __GNUC__
+#warning Remove this temporary code!
+#endif
 	// Lock all insharedstates
 	std::vector<std::shared_ptr<shared_future<std::shared_ptr<detail::async_io_handle>>>> insharedstates;
 	insharedstates.reserve(s.insharedstates.size());
@@ -1188,24 +1219,9 @@ template<> async_file_io_dispatcher_base::completion_returntype async_file_io_di
 			continue;
 		}
 		shared_future<std::shared_ptr<detail::async_io_handle>> &thisresult=*insharedstates[idx];
-		// This seems excessive but I don't see any other legal way to extract the exception ...
-		bool success=false;
 		// TODO: If I include the wait_for_all above, we need only fetch this if thisresult.has_exception().
-		try
-		{
-			// Always must wait on the others, because some may be between decrementing the
-			// atomic and returning their result to here. Any waiting is likely short.
-			thisresult.get();
-			success=true;
-		}
-		catch(...)
-		{
-			exception_ptr e(afio::make_exception_ptr(afio::current_exception()));
-			assert(e);
-			complete_async_op(s.out[idx].first, s.out[idx].second, e);
-		}
-		if(success)
-			complete_async_op(s.out[idx].first, s.out[idx].second);
+		exception_ptr e(get_exception_ptr(thisresult));
+		complete_async_op(s.out[idx].first, s.out[idx].second, e);
 	}
 	idx=state.second;
 	// Am I being called because my precondition threw an exception so we're actually currently inside an exception catch?

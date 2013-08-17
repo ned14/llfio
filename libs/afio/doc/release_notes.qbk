@@ -35,3 +35,28 @@
 
 
 [endsect]
+
+[section:FAQ Frequently Asked Questions]
+
+[section:stuck_ops I'm seeing ["WARNING: `~async_file_dispatcher_base()` detects stuck `async_io_op` in total of X ops] during
+process close. What does this mean?]
+
+This means that you scheduled ops with a dispatcher which did not complete in a timely fashion before you tried to destroy
+that dispatcher. This generally indicates a bug in your code, which can include:
+
+1. An op is still running in some thread pool and you didn't use __afio_when_all__ to wait for it to complete before trying
+to destroy the dispatcher.
+2. An op's precondition never completed and therefore the op was never started.
+
+Tracking down the cause of the latter in particular is very similar to tracking down race conditions i.e. it's hard, and we
+as the authors of __boost_afio__ know just how hard! If you are on POSIX, recompiling AFIO with the macro
+`BOOST_AFIO_OP_STACKBACKTRACEDEPTH` set to a reasonable depth like 8 will have AFIO take a stack backtrace for every op
+allocated which it then will print during the stuck ops warnings. This can be helpful to identify which ops exactly are
+stuck, and then you can figure out which preconditions of theirs are the cause.
+
+Note that `BOOST_AFIO_OP_STACKBACKTRACEDEPTH` has two implementations, one based on glibc `backtrace()` and the other based
+on libunwind. The latter is more portable, but requires explicit linking with libunwind, so we have defaulted to the former.
+
+[endsect] [/stuck_ops]
+
+[endsect] [/FAQ]

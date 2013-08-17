@@ -65,6 +65,7 @@ BOOST_AFIO_AUTO_TEST_CASE(async_io_barrier, "Tests that the async i/o barrier wo
     bool isfirst = true;
     BOOST_FOREACH(auto &run, groups)
     {
+        assert(run.first>0);
         vector<function<void()>> thisgroupcalls(run.first, std::bind(inccount, &callcount[run.second]));
         vector<async_io_op> thisgroupcallops;
         if (isfirst)

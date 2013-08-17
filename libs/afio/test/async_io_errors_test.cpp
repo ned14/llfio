@@ -91,13 +91,15 @@ BOOST_AFIO_AUTO_TEST_CASE(async_io_errors, "Tests that the async i/o error handl
 					continue;
 				}
 			} while(false);
-        }
+		}
 
+		//while(dispatcher->wait_queue_depth()>0)
+		//	boost::this_thread::yield();
 		if(filesystem::exists("testdir/a"))
 			filesystem::remove("testdir/a");
 		if(filesystem::exists("testdir"))
 			filesystem::remove("testdir");
-    }
+	}
 	// Add a single output to validate the test
 	BOOST_CHECK(true);
 }
