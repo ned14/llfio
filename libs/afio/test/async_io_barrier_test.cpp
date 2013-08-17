@@ -13,7 +13,7 @@ BOOST_AFIO_AUTO_TEST_CASE(async_io_barrier, "Tests that the async i/o barrier wo
     vector<pair<size_t, int>> groups;
     // Generate 500,000 sorted random numbers between 0-10000
 	static const size_t numbers=
-#if defined(BOOST_MSVC) && BOOST_MSVC < 1800 /* <= VS2012 */ && (defined(DEBUG) || defined(_DEBUG))
+#if defined(BOOST_MSVC) && BOOST_MSVC < 1700 /* <= VS2010 */ && (defined(DEBUG) || defined(_DEBUG))
 		16000
 #else
 		160000

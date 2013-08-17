@@ -1007,7 +1007,7 @@ template<class F, class... Args> async_io_op async_file_io_dispatcher_base::chai
     BOOST_PP_ENUM_PARAMS(N, class A)>                /* template end */                             \
     async_io_op                                      /* return type */                              \
     async_file_io_dispatcher_base::chain_async_op       /* function name */             \
-    (detail::immediate_async_ops &immediates, int optype,           /* parameters start */          \
+    (exception_ptr *he, detail::immediate_async_ops &immediates, int optype,           /* parameters start */          \
     const async_io_op &precondition,async_op_flags flags,                                           \
     completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, exception_ptr * \
     BOOST_PP_COMMA_IF(N)                                                                            \
@@ -1045,23 +1045,35 @@ template<class F, class... Args> async_io_op async_file_io_dispatcher_base::chai
 	    {\
 		    /* Bind input handle now and queue immediately to next available thread worker*/ \
 		    std::shared_ptr<detail::async_io_handle> h;\
-		    /* Boost's shared_future has get() as non-const which is weird, because it doesn't*/ \
-		    /* delete the data after retrieval.*/ \
-		    fixme; \
-		    if(precondition.h->valid())\
-			    h=const_cast<shared_future<std::shared_ptr<detail::async_io_handle>> &>(*precondition.h).get();\
-		    else if(precondition.id)\
-		    {\
-			    /* It should never happen that precondition.id is valid but removed from extant ops*/\
-			    /* which indicates it completed and yet h remains invalid*/ \
-			    assert(0);\
-			    std::terminate();\
-		    }\
-		    if(!!(flags & async_op_flags::ImmediateCompletion))\
-			    *ret.h=immediates.enqueue(std::bind(boundf.second, h, nullptr)).share();\
-		    else\
-			    *ret.h=threadsource().enqueue(std::bind(boundf.second, h, nullptr)).share();\
-	    }\
+			exception_ptr *_he=nullptr; \
+			if(precondition.h->valid()) \
+			{ \
+				/* Boost's shared_future has get() as non-const which is weird, because it doesn't*/ \
+				/* delete the data after retrieval.*/ \
+				shared_future<std::shared_ptr<detail::async_io_handle>> &f=const_cast<shared_future<std::shared_ptr<detail::async_io_handle>> &>(*precondition.h);\
+				/* The reason we don't throw here is consistency: we throw at point of batch API entry*/ \
+				/* if any of the preconditions are errored, but if they became errored between then and*/ \
+				/* now we can hardly abort half way through a batch op without leaving around stuck ops.*/ \
+				/* No, instead we simulate as if the precondition had not yet become ready.*/ \
+				if(precondition.h->has_exception()) \
+					*he=get_exception_ptr(f), _he=he;\
+				else \
+					h=f.get();\
+			}\
+			else if(precondition.id)\
+			{\
+				/* It should never happen that precondition.id is valid but removed from extant ops*/\
+				/* which indicates it completed and yet h remains invalid*/\
+				assert(0);\
+				std::terminate();\
+			}\
+			if(!!(flags & async_op_flags::ImmediateCompletion))\
+			{\
+				*ret.h=immediates.enqueue(std::bind(boundf.second, h, _he)).share();\
+			}\
+			else\
+				*ret.h=threadsource().enqueue(std::bind(boundf.second, h, nullptr)).share();\
+		}\
 	    auto opsit=p->ops.insert(std::move(std::make_pair(thisid, std::move(detail::async_file_io_dispatcher_op((detail::OpType) optype, flags, ret.h)))));\
 	    assert(opsit.second);\
 	    BOOST_AFIO_DEBUG_PRINT("I %u < %u (%s)\n", (unsigned) thisid, (unsigned) precondition.id, detail::optypes[static_cast<int>(optype)]);\

@@ -85,6 +85,10 @@ typedef std::recursive_mutex recursive_mutex;
 // Need some portable way of throwing a really absolutely definitely fatal exception
 // If we guaranteed had noexcept, this would be easy, but for compilers without noexcept
 // we'll bounce through extern "C" as well just to be sure
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable: 4297) // function assumed not to throw an exception but does __declspec(nothrow) or throw() was specified on the function
+#endif
 namespace boost { namespace afio { namespace detail {
 	template<class T> inline void do_throw_fatal_exception(const T &v) BOOST_NOEXCEPT_OR_NOTHROW
 	{
@@ -107,6 +111,9 @@ namespace boost { namespace afio { namespace detail {
 } } }
 #ifndef BOOST_AFIO_THROW_FATAL
 #define BOOST_AFIO_THROW_FATAL(x) boost::afio::detail::throw_fatal_exception(x)
+#endif
+#ifdef _MSC_VER
+#pragma warning(pop)
 #endif
 
 
