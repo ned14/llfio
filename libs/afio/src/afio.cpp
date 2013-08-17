@@ -23,14 +23,18 @@ File Created: Mar 2013
 #endif
 #endif
 
-// Currently we only support glibc's stack backtracer
 #ifdef BOOST_AFIO_OP_STACKBACKTRACEDEPTH
 #include <dlfcn.h>
 #if 0
 #define UNW_LOCAL_ONLY
 #include <libunwind.h>
 #else
+// Currently we only support glibc's stack backtracer
+#ifdef __linux__
 #include <execinfo.h>
+#else
+#undef BOOST_AFIO_OP_STACKBACKTRACEDEPTH
+#endif
 #endif
 #endif
 
@@ -697,8 +701,10 @@ void async_file_io_dispatcher_base::complete_async_op(size_t id, std::shared_ptr
 		}
 		std::sort(opsids.begin(), opsids.end());
 #endif
-		BOOST_AFIO_THROW(std::runtime_error("Failed to find this operation in list of currently executing operations"));
+		BOOST_AFIO_THROW_FATAL(std::runtime_error("Failed to find this operation in list of currently executing operations"));
 	}
+	// Erase me from ops on exit from this function
+	auto eraseit=boost::afio::detail::Undoer([this, &it]{ p->ops.erase(it); });
 	if(!it->second.completions.empty())
 	{
 		// Remove completions as we're about to modify p->ops which will invalidate it
@@ -709,7 +715,7 @@ void async_file_io_dispatcher_base::complete_async_op(size_t id, std::shared_ptr
 			// Enqueue each completion
 			it=p->ops.find(c.first);
 			if(p->ops.end()==it)
-				BOOST_AFIO_THROW(std::runtime_error("Failed to find this completion operation in list of currently executing operations"));
+				BOOST_AFIO_THROW_FATAL(std::runtime_error("Failed to find this completion operation in list of currently executing operations"));
 			if(!!(it->second.flags & async_op_flags::ImmediateCompletion))
 			{
 				// If he was set up with a detached future, use that instead
@@ -746,7 +752,7 @@ void async_file_io_dispatcher_base::complete_async_op(size_t id, std::shared_ptr
 			}
 			std::sort(opsids.begin(), opsids.end());
 	#endif
-			BOOST_AFIO_THROW(std::runtime_error("Failed to find this operation in list of currently executing operations"));
+			BOOST_AFIO_THROW_FATAL(std::runtime_error("Failed to find this operation in list of currently executing operations"));
 		}
 	}
 	if(it->second.detached_promise)
@@ -756,7 +762,6 @@ void async_file_io_dispatcher_base::complete_async_op(size_t id, std::shared_ptr
 		else
 			it->second.detached_promise->set_value(h);
 	}
-	p->ops.erase(it);
 	BOOST_AFIO_DEBUG_PRINT("R %u %p\n", (unsigned) id, h.get());
 }
 
@@ -789,7 +794,7 @@ template<class F, class... Args> std::shared_ptr<detail::async_io_handle> async_
                 }
 				std::sort(opsids.begin(), opsids.end());
 	#endif
-				BOOST_AFIO_THROW(std::runtime_error("Failed to find this operation in list of currently executing operations"));
+				BOOST_AFIO_THROW_FATAL(std::runtime_error("Failed to find this operation in list of currently executing operations"));
 			}
 			if(!it->second.detached_promise)
 			{
@@ -848,7 +853,7 @@ template<class F, class... Args> std::shared_ptr<detail::async_io_handle> async_
 					    opsids.push_back(i.first);\
                     }\
 				    std::sort(opsids.begin(), opsids.end());\
-				    BOOST_AFIO_THROW(std::runtime_error("Failed to find this operation in list of currently executing operations"));\
+				    BOOST_AFIO_THROW_FATAL(std::runtime_error("Failed to find this operation in list of currently executing operations"));\
 			    }\
 			    if(!it->second.detached_promise)\
 			    {\
@@ -1121,9 +1126,9 @@ namespace detail
 		{
 			outsharedstates.reserve(ops.size());
 			BOOST_FOREACH(auto &i, ops)
-            {
+			{
 				outsharedstates.push_back(i.h);
-            }
+			}
 		}
 	};
 }
@@ -1191,9 +1196,9 @@ std::vector<async_io_op> async_file_io_dispatcher_base::barrier(const std::vecto
 	statev.reserve(ops.size());
 	size_t idx=0;
 	BOOST_FOREACH(auto &op, ops)
-    {
+	{
 		statev.push_back(std::make_pair(state, idx++));
-    }
+	}
 	return chain_async_ops((int) detail::OpType::barrier, ops, statev, async_op_flags::ImmediateCompletion|async_op_flags::DetachedFuture, &async_file_io_dispatcher_base::dobarrier<std::pair<std::shared_ptr<detail::barrier_count_completed_state>, size_t>>);
 }
 
@@ -1736,7 +1741,7 @@ namespace detail {
 				bytesread+=_bytesread;
 			}
 			if(bytesread!=bytestoread)
-				BOOST_AFIO_THROW(std::runtime_error("Failed to read all buffers"));
+				BOOST_AFIO_THROW_FATAL(std::runtime_error("Failed to read all buffers"));
 			return std::make_pair(true, h);
 		}
 		// Called in unknown thread
@@ -1769,7 +1774,7 @@ namespace detail {
 				byteswritten+=_byteswritten;
 			}
 			if(byteswritten!=bytestowrite)
-				BOOST_AFIO_THROW(std::runtime_error("Failed to write all buffers"));
+				BOOST_AFIO_THROW_FATAL(std::runtime_error("Failed to write all buffers"));
 			return std::make_pair(true, h);
 		}
 		// Called in unknown thread

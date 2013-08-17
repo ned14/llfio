@@ -55,6 +55,10 @@ File Created: Mar 2013
 #include "detail/Preprocessor_variadic.hpp"
 #include <boost/detail/scoped_enum_emulation.hpp>
 
+#if BOOST_VERSION<105400
+#error Boosts before v1.54 have a memory corruption bug in boost::packaged_task<> when built under C++11 which makes this library useless. Get a newer Boost!
+#endif
+
 // Map in C++11 stuff if available
 #if (defined(__GLIBCXX__) && __GLIBCXX__<=20120920 /* <= GCC 4.7 */) || (defined(BOOST_MSVC) && BOOST_MSVC < 1700 /* <= VS2010 */)
 #include "boost/exception_ptr.hpp"
@@ -78,8 +82,31 @@ typedef std::recursive_mutex recursive_mutex;
 } }
 #endif
 
-#if BOOST_VERSION<105400
-#error Boosts before v1.54 have a memory corruption bug in boost::packaged_task<> when built under C++11 which makes this library useless. Get a newer Boost!
+// Need some portable way of throwing a really absolutely definitely fatal exception
+// If we guaranteed had noexcept, this would be easy, but for compilers without noexcept
+// we'll bounce through extern "C" as well just to be sure
+namespace boost { namespace afio { namespace detail {
+	template<class T> inline void do_throw_fatal_exception(const T &v) BOOST_NOEXCEPT_OR_NOTHROW
+	{
+		throw v;
+	}
+	extern "C" inline void boost_afio_do_throw_fatal_exception(std::function<void()> impl) BOOST_NOEXCEPT_OR_NOTHROW { impl(); }
+	template<class T> inline void throw_fatal_exception(const T &v) BOOST_NOEXCEPT_OR_NOTHROW
+	{
+		// In case the extern "C" fails to terminate, trap and terminate here
+		try
+		{
+			std::function<void()> doer=std::bind(&do_throw_fatal_exception<T>, std::ref(v));
+			boost_afio_do_throw_fatal_exception(doer);
+		}
+		catch(...)
+		{
+			std::terminate(); // Sadly won't produce much of a useful error message
+		}
+	}
+} } }
+#ifndef BOOST_AFIO_THROW_FATAL
+#define BOOST_AFIO_THROW_FATAL(x) boost::afio::detail::throw_fatal_exception(x)
 #endif
 
 
