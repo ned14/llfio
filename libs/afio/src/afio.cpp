@@ -1124,7 +1124,7 @@ namespace detail
 	{
 		atomic<size_t> togo;
 		std::vector<std::pair<size_t, std::shared_ptr<detail::async_io_handle>>> out;
-		std::vector<std::shared_ptr<shared_future<std::shared_ptr<detail::async_io_handle>>>> insharedstates;
+		std::vector<std::weak_ptr<shared_future<std::shared_ptr<detail::async_io_handle>>>> insharedstates;
 		barrier_count_completed_state(const std::vector<async_io_op> &ops) : togo(ops.size()), out(ops.size())
 		{
 			insharedstates.reserve(ops.size());
@@ -1152,15 +1152,26 @@ template<> async_file_io_dispatcher_base::completion_returntype async_file_io_di
 	// give up my timeslice
 	boost::this_thread::yield();
 #endif
+	// Lock all insharedstates
+	std::vector<std::shared_ptr<shared_future<std::shared_ptr<detail::async_io_handle>>>> insharedstates;
+	insharedstates.reserve(s.insharedstates.size());
+	for(idx=0; idx<s.insharedstates.size(); idx++)
+	{
+		std::shared_ptr<shared_future<std::shared_ptr<detail::async_io_handle>>> f(s.insharedstates[idx].lock());
+		insharedstates.push_back(f);
+	}
 #if 1
 	// Rather than potentially expend a syscall per wait on each input op to complete, compose a list of input futures and wait on them all
 	std::vector<shared_future<std::shared_ptr<detail::async_io_handle>>> notready;
 	notready.reserve(s.insharedstates.size()-1);
 	for(idx=0; idx<s.insharedstates.size(); idx++)
 	{
-		shared_future<std::shared_ptr<detail::async_io_handle>> &f=*s.insharedstates[idx];
-		if(idx==state.second || f.is_ready()) continue;
-		notready.push_back(f);
+		if(insharedstates[idx])
+		{
+			shared_future<std::shared_ptr<detail::async_io_handle>> &f=*insharedstates[idx];
+			if(idx==state.second || f.is_ready()) continue;
+			notready.push_back(f);
+		}
 	}
 	if(!notready.empty())
 		boost::wait_for_all(notready.begin(), notready.end());
@@ -1169,7 +1180,14 @@ template<> async_file_io_dispatcher_base::completion_returntype async_file_io_di
 	for(idx=0; idx<s.out.size(); idx++)
 	{
 		if(idx==state.second) continue;
-		shared_future<std::shared_ptr<detail::async_io_handle>> &thisresult=*s.insharedstates[idx];
+		if(!insharedstates[idx])
+		{
+			// Input op has gone away before the barrier completed
+			// Report that as an exception
+			complete_async_op(s.out[idx].first, s.out[idx].second, afio::make_exception_ptr(std::runtime_error("Op deleted during barrier operation")));
+			continue;
+		}
+		shared_future<std::shared_ptr<detail::async_io_handle>> &thisresult=*insharedstates[idx];
 		// This seems excessive but I don't see any other legal way to extract the exception ...
 		bool success=false;
 		// TODO: If I include the wait_for_all above, we need only fetch this if thisresult.has_exception().
