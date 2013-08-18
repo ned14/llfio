@@ -67,17 +67,17 @@ script:
 
 
 #try to pass compiler flags appropriatly
- - if [ "$CCFLAGS" != "" ]; then FLAGS="cxxflags="$CCFLAGS""; else FLAGS=""; fi
+ - if [ "$CCFLAGS" != "" ]; then FLAGS="cxxflags=\"$CCFLAGS\""; else FLAGS=""; fi
 
 #try to link gcov appropriatly
- - if [ $GCOV -eq 1 ]; then FLAGS="$FLAGS --test-all linkflags=-lgcov"; fi
+ - if [ $GCOV -eq 1 ]; then FLAGS="$FLAGS --test-all linkflags=\"-lgcov\""; fi
 
 ### I dont think suppressing these warnings is actually doing anything, and they are not actually supressed
 #try to suppress some clang warnings
- - if [ $CC = "clang" ]; then FLAGS="$FLAGS cxxflags="-Wno-mismatched-tags""; fi
+# - if [ $CC = "clang" ]; then FLAGS="$FLAGS cxxflags="-Wno-mismatched-tags""; fi
 
 #try to suppress some gcc warnings
- - if [ $CC = "gcc" ]; then FLAGS="$FLAGS cxxflags="-Wno-unused-local-typedefs""; fi
+# - if [ $CC = "gcc" ]; then FLAGS="$FLAGS cxxflags="-Wno-unused-local-typedefs""; fi
 
 
 #valgrind setup
