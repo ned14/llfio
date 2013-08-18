@@ -79,6 +79,7 @@ else
 local test_files = [ MATCH ^--test=(.*)$ : $(.argv) ] ;
 if $(test_files)
 {
+    test_files_all = $(test_files)
 }
 else
 {
