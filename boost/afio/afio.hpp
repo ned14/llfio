@@ -66,7 +66,12 @@ File Created: Mar 2013
 namespace boost { namespace afio {
 typedef boost::thread thread;
 inline boost::thread::id get_this_thread_id() { return boost::this_thread::get_id(); }
-inline boost::exception_ptr current_exception() { return boost::current_exception(); }
+#if defined(BOOST_MSVC) && BOOST_MSVC < 1700 /* <= VS2010 */
+namespace detail { struct vs2010_lack_of_decent_current_exception_support_hack_t { }; BOOST_AFIO_DECL boost::exception_ptr &vs2010_lack_of_decent_current_exception_support_hack(); }
+inline boost::exception_ptr current_exception() { boost::exception_ptr ret=boost::current_exception(); return (ret==detail::vs2010_lack_of_decent_current_exception_support_hack()) ? boost::exception_ptr() : ret; }
+#else
+inline boost::exception_ptr current_exception() { boost::current_exception(); }
+#endif
 #define BOOST_AFIO_THROW(x) boost::throw_exception(boost::enable_current_exception(x))
 #define BOOST_AFIO_RETHROW throw
 typedef boost::recursive_mutex recursive_mutex;
@@ -400,13 +405,16 @@ class std_thread_pool : public thread_source {
 			// VS2010 segfaults if you ever do a try { throw; } catch(...) without an exception ever having been thrown :(
 			try
 			{
-				throw std::exception();
+				throw detail::vs2010_lack_of_decent_current_exception_support_hack_t();
 			}
 			catch(...)
 			{
+				detail::vs2010_lack_of_decent_current_exception_support_hack()=boost::current_exception();
+				pool->service.run();
 			}
-#endif
+#else
 			pool->service.run();
+#endif
 		}
 	};
 	friend class worker;
@@ -425,7 +433,12 @@ public:
     //! Destroys the thread pool, waiting for worker threads to exit beforehand.
 	~std_thread_pool()
 	{
-		service.stop();
+		// Windows seems to like occasionally ignoring the stop(), so pulse it until it works
+		while(!service.stopped())
+		{
+			service.stop();
+			boost::this_thread::yield();
+		}
 		BOOST_FOREACH(auto &i, workers)
         {	i->join();}
 	}
@@ -1258,6 +1271,16 @@ inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(st
 {
 	if(first==last)
 		return future<std::vector<std::shared_ptr<detail::async_io_handle>>>();
+#if defined(BOOST_MSVC) && BOOST_MSVC < 1700 /* <= VS2010 */
+	// VS2010 segfaults if you ever do a try { throw; } catch(...) without an exception ever having been thrown :(
+	try
+	{
+		throw detail::vs2010_lack_of_decent_current_exception_support_hack_t();
+	}
+	catch(...)
+	{
+		detail::vs2010_lack_of_decent_current_exception_support_hack()=boost::current_exception();
+#endif
 	auto state(std::make_shared<detail::when_all_count_completed_state>(first, last));
 	std::vector<async_io_op> &inputs=state->inputs;
 	std::vector<std::pair<async_op_flags, std::function<async_file_io_dispatcher_base::completion_t>>> callbacks;
@@ -1269,6 +1292,9 @@ inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(st
     }
 	inputs.front().parent->completion(inputs, callbacks);
 	return state->done.get_future();
+#if defined(BOOST_MSVC) && BOOST_MSVC < 1700 /* <= VS2010 */
+	}
+#endif
 }
 /*! \brief Returns a result when all the supplied ops complete. Propagates exception states.
 
@@ -1284,6 +1310,16 @@ inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(st
 {
 	if(first==last)
 		return future<std::vector<std::shared_ptr<detail::async_io_handle>>>();
+#if defined(BOOST_MSVC) && BOOST_MSVC < 1700 /* <= VS2010 */
+	// VS2010 segfaults if you ever do a try { throw; } catch(...) without an exception ever having been thrown :(
+	try
+	{
+		throw detail::vs2010_lack_of_decent_current_exception_support_hack_t();
+	}
+	catch(...)
+	{
+		detail::vs2010_lack_of_decent_current_exception_support_hack()=boost::current_exception();
+#endif
 	auto state(std::make_shared<detail::when_all_count_completed_state>(first, last));
 	std::vector<async_io_op> &inputs=state->inputs;
 	std::vector<std::pair<async_op_flags, std::function<async_file_io_dispatcher_base::completion_t>>> callbacks;
@@ -1295,6 +1331,9 @@ inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(st
     }
 	inputs.front().parent->completion(inputs, callbacks);
 	return state->done.get_future();
+#if defined(BOOST_MSVC) && BOOST_MSVC < 1700 /* <= VS2010 */
+	}
+#endif
 }
 #ifndef BOOST_NO_CXX11_HDR_INITIALIZER_LIST
 /*! \brief Returns a result when all the supplied ops complete. Does not propagate exception states.
