@@ -94,7 +94,7 @@ script:
 # Not sure if we can pass the valgrind flags into the unit tests, but so far it hasnt crashed :)
  - cd $BOOST
  - if [ $GCOV -eq 1 ]; then set -x; fi
- - ./b2 libs/afio/test $DEBUGBUILD link=shared toolset=$CC$GCCVER $TEST_TYPE $FLAGS ;
+ - eval "./b2 libs/afio/test $DEBUGBUILD link=shared toolset=$CC$GCCVER $TEST_TYPE $FLAGS"
 
 #if we want to use the built in bjam test runner we can get test output this way
 # - cat bin.v2/libs/afio/test/main.test/*/*/main.output #may need to specify path better on valgrind tests
