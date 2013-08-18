@@ -43,6 +43,7 @@
 [def __afio_call__ [link afio.reference.classes.async_file_io_dispatcher_base.call_2_batch_bound_functions `async_file_io_dispatcher_base::call()`]]
 [def __afio_barrier__ [link afio.reference.classes.async_file_io_dispatcher_base.barrier `async_file_io_dispatcher_base::barrier()`]]
 
+[import ../test/examples/current_exception_hack.cpp]
 [import ../test/examples/call_example.cpp]
 
 [section:introduction Introduction]
