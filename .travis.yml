@@ -56,23 +56,8 @@ before_install:
 
 #HOME should be defined per the travis-ci docs as /home/travis
  - mv user-config.jam $HOME
-
-#auto generate the files to be included for test_all.cpp
-# - cd libs/afio/test
-# - chmod u+x test_file_glob.sh
-# - ./test_file_glob.sh
-
-# install boost build
- - cd $BOOST/tools/build/v2
+ - cd $BOOST
  - ./bootstrap.sh
- - sudo ./b2 install
- - cd $PROJECTPATH
-
-#set GCCVER for clang and TESTPREFIX for all compilers 
- - if [ $CC = "clang" ]; then GCCVER=""; TESTPREFIX="bin.v2/libs/afio/test/clang-linux"; else TESTPREFIX="bin.v2/libs/afio/test/$CC"; fi
-
-# - if( [ $CC = "gcc" ] && [ $GCCVER ="" ] ) ; then GCCVER="-4.6" ; fi
-
 
 script:
 # set debug/release & proper path for debug/release builds
@@ -85,7 +70,7 @@ script:
  - if [ $CCFLAGS != "" ]; then FLAGS="cxxflags="$CCFLAGS""; else FLAGS=""; fi
 
 #try to link gcov appropriatly
- - if [ $GCOV -eq 1 ]; then FLAGS="$FLAGS linkflags=-lgcov"; fi
+ - if [ $GCOV -eq 1 ]; then FLAGS="$FLAGS --test-all linkflags=-lgcov"; fi
 
 ### I dont think suppressing these warnings is actually doing anything, and they are not actually supressed
 #try to suppress some clang warnings
@@ -97,15 +82,13 @@ script:
 
 #build the lib
  - cd $BOOST
- - ./bootstrap.sh --with-libraries=afio --prefix=$BOOST
- - b2 install $DEBUGBUILD toolset=$CC$GCCVER link=shared $FLAGS;
 
 #valgrind setup
  - if [ $VALGRIND = "memcheck" ]; then PREFIXTEST="--tool=memcheck --suppressions=libs/afio/test/memcheck.supp --track-origins=yes --track-fds=yes --leak-check=full --show-reachable=yes --error-exitcode=1"; fi
  - if [ $VALGRIND = "drd" ]; then PREFIXTEST="--tool=drd --suppressions=libs/afio/test/drd.supp --error-exitcode=1"; fi
  - if [ $VALGRIND = "0" ]; then PREFIXTEST=""; fi
 
- - TEST_TYPE="--test-each"
+ - if [ $GCOV -eq 1 ]; then TEST_TYPE="--test-all"; else TEST_TYPE="--test-each"; fi
 
 #Build and run tests
  - if [ $GCOV -eq 1 ]; then set -x; fi
@@ -121,4 +104,4 @@ script:
 
 
 after_success:
- - if [ $GCOV -eq 1 ]; then bash libs/afio/test/update_coveralls.sh `pwd`; fi
+ - if [ $GCOV -eq 1 ]; then bash -x libs/afio/test/update_coveralls.sh `pwd`; fi
