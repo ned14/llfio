@@ -41,25 +41,7 @@ VS2010 and Mingw32 (not Mingw-w64, which is fine) if not called from within a `c
 to detect if an immediately called completion routine was called during the process of
 handling an exception thrown from an earlier completion routine. In other words, it's
 unavoidable with our C++11 assuming design. The solution we adopted is not pretty, but it does work:
-'''<source><![CDATA[
-#ifdef BOOST_AFIO_NEED_CURRENT_EXCEPTION_HACK
-// VS2010 and Mingw32 segfaults if you ever do a try { throw; } catch(...) without an exception ever having been thrown :(
-try
-{
-  throw boost::afio::detail::vs2010_lack_of_decent_current_exception_support_hack_t();
-}
-catch(...)
-{
-  boost::afio::detail::vs2010_lack_of_decent_current_exception_support_hack()=boost::current_exception();
-#endif
-  
-... do your AFIO using code ...
-  
-#ifdef BOOST_AFIO_NEED_CURRENT_EXCEPTION_HACK
-}
-#endif
-]]></source>
-'''
+ [current_exception_hack]
  If you're going to use __boost_afio__ on VS2010 or Mingw32, you'll need to wrap all AFIO using code with
  the same stanza. As mentioned earlier, Mingw-w64 doesn't have any of these problems and is in fact
  recommended for Windows XP.
