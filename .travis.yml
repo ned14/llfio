@@ -11,12 +11,14 @@ notifications:
     on_failure: change # [always|never|change] # default: always
 
 env:
+  # Coveralls.io API key
+  secure: "LU8flpdvLjaFIVgy8oqhHzy92AUPRgw3bRv+/Q91fnWNrvbeRVMEOj+vML+zDS7iU3L2ZbppNf/1YkavGhHh9HfD8PC0dYPEmU0xjS/3WdoKxMd0MCYUZxQ+6zgx3GLgZS2NxciVlruZSs9Q+hKbguvvjwGGSVin6LlMmC2KqGA="
   matrix:
-    - _="Build test" VALGRIND=0 UNIT_TESTS=0 DEBUG=0 GCCVER="" GCOV=0
-    - _="Unit/functional tests" VALGRIND=0 UNIT_TESTS="" DEBUG=0 GCCVER="" GCOV=0
+    #- _="Build test" VALGRIND=0 UNIT_TESTS=0 DEBUG=0 GCCVER="" GCOV=0
+    #- _="Unit/functional tests" VALGRIND=0 UNIT_TESTS="" DEBUG=0 GCCVER="" GCOV=0
     - _="GCC 4.8 + Unit/functional tests coverage" VALGRIND=0 CCFLAGS="-fprofile-arcs -ftest-coverage" UNIT_TESTS=1 DEBUG=1 GCCVER="-4.8" GCOV=1
-    - _="Memory error and leak tests" VALGRIND=memcheck UNIT_TESTS=1 DEBUG=2 GCCVER="" GCOV=0
-    - _="Race detection tests" VALGRIND=0 CCFLAGS="-fsanitize=thread" UNIT_TESTS=1 DEBUG=2 GCCVER="-4.8" TSAN_OPTIONS="suppressions=libs/afio/test/tsan.supp" GCOV=0
+    #- _="Memory error and leak tests" VALGRIND=memcheck UNIT_TESTS=1 DEBUG=2 GCCVER="" GCOV=0
+    #- _="Race detection tests" VALGRIND=0 CCFLAGS="-fsanitize=thread" UNIT_TESTS=1 DEBUG=2 GCCVER="-4.8" TSAN_OPTIONS="suppressions=libs/afio/test/tsan.supp" GCOV=0
 
 # The clang 3.2 .deb doesn't supply the needed tsan runtime library :(
 matrix:
@@ -24,13 +26,13 @@ matrix:
     - compiler: clang
       env: _="GCC 4.8 + Unit/functional tests coverage" VALGRIND=0 CCFLAGS="-fprofile-arcs -ftest-coverage" UNIT_TESTS=1 DEBUG=1 GCCVER="-4.8" GCOV=1
 
-    - compiler: clang
-      env: _="Race detection tests" VALGRIND=0 CCFLAGS="-fsanitize=thread" UNIT_TESTS=1 DEBUG=2 GCCVER="-4.8" TSAN_OPTIONS="suppressions=libs/afio/test/tsan.supp" GCOV=0
+    #- compiler: clang
+    #  env: _="Race detection tests" VALGRIND=0 CCFLAGS="-fsanitize=thread" UNIT_TESTS=1 DEBUG=2 GCCVER="-4.8" TSAN_OPTIONS="suppressions=libs/afio/test/tsan.supp" GCOV=0
 
 
   allow_failures:
-    - compiler: gcc
-      env: _="Race detection tests" VALGRIND=0 CCFLAGS="-fsanitize=thread" UNIT_TESTS=1 DEBUG=2 GCCVER="-4.8" TSAN_OPTIONS="suppressions=libs/afio/test/tsan.supp" GCOV=0
+    #- compiler: gcc
+    #  env: _="Race detection tests" VALGRIND=0 CCFLAGS="-fsanitize=thread" UNIT_TESTS=1 DEBUG=2 GCCVER="-4.8" TSAN_OPTIONS="suppressions=libs/afio/test/tsan.supp" GCOV=0
 
 
 
