@@ -80,9 +80,6 @@ script:
  - if [$CC = "gcc" ]; then FLAGS="$FLAGS cxxflags="-Wno-unused-local-typedefs""; fi
 
 
-#build the lib
- - cd $BOOST
-
 #valgrind setup
  - if [ $VALGRIND = "memcheck" ]; then PREFIXTEST="--tool=memcheck --suppressions=libs/afio/test/memcheck.supp --track-origins=yes --track-fds=yes --leak-check=full --show-reachable=yes --error-exitcode=1"; fi
  - if [ $VALGRIND = "drd" ]; then PREFIXTEST="--tool=drd --suppressions=libs/afio/test/drd.supp --error-exitcode=1"; fi
@@ -91,12 +88,13 @@ script:
  - if [ $GCOV -eq 1 ]; then TEST_TYPE="--test-all"; else TEST_TYPE="--test-each"; fi
 
 #Build and run tests
- - if [ $GCOV -eq 1 ]; then set -x; fi
  - if [ $UNIT_TEST -eq 0 ]; then TEST_TYPE="--link-test"; fi
  - if [ $VALGRIND != "0" ]; then TEST_TYPE="--valgrind="$PREFIXTEST"" ; fi
  #- if [ "$UNIT_TESTS" != "0" ]; then $PREFIXTEST $PREFIXPATH/boost_afio_test -s $UNIT_TESTS; fi
 # Not sure if we can pass the valgrind flags into the unit tests, but so far it hasnt crashed :)
- - b2 libs/afio/test $DEBUGBUILD link=shared toolset=$CC$GCCVER $TEST_TYPE $FLAGS ;
+ - cd $BOOST
+ - if [ $GCOV -eq 1 ]; then set -x; fi
+ - ./b2 libs/afio/test $DEBUGBUILD link=shared toolset=$CC$GCCVER $TEST_TYPE $FLAGS ;
 
 #if we want to use the built in bjam test runner we can get test output this way
 # - cat bin.v2/libs/afio/test/main.test/*/*/main.output #may need to specify path better on valgrind tests
