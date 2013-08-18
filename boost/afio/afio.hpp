@@ -89,6 +89,9 @@ typedef std::recursive_mutex recursive_mutex;
 #pragma warning(push)
 #pragma warning(disable: 4297) // function assumed not to throw an exception but does __declspec(nothrow) or throw() was specified on the function
 #endif
+#ifdef BOOST_AFIO_COMPILING_FOR_GCOV
+#define BOOST_AFIO_THROW_FATAL(x) std::terminate()
+#else
 namespace boost { namespace afio { namespace detail {
 	template<class T> inline void do_throw_fatal_exception(const T &v) BOOST_NOEXCEPT_OR_NOTHROW
 	{
@@ -111,6 +114,7 @@ namespace boost { namespace afio { namespace detail {
 } } }
 #ifndef BOOST_AFIO_THROW_FATAL
 #define BOOST_AFIO_THROW_FATAL(x) boost::afio::detail::throw_fatal_exception(x)
+#endif
 #endif
 #ifdef _MSC_VER
 #pragma warning(pop)
@@ -1218,21 +1222,18 @@ namespace detail
 			else
 			{
 				bool done=false;
-				try
+				// Retrieve the result of each input, waiting for it if it is between decrementing the
+				// atomic and signalling its future.
+				BOOST_FOREACH(auto &i, state->inputs)
 				{
-					// Retrieve the result of each input, waiting for it if it is between decrementing the
-					// atomic and signalling its future.
-					BOOST_FOREACH(auto &i, state->inputs)
+					shared_future<std::shared_ptr<detail::async_io_handle>> &future=*i.h;
+					auto e(get_exception_ptr(future));
+					if(e)
 					{
-						shared_future<std::shared_ptr<detail::async_io_handle>> *future=i.h.get();
-						future->get();
+						state->done.set_exception(e);
+						done=true;
+						break;
 					}
-				}
-				catch(...)
-				{
-					exception_ptr e(afio::make_exception_ptr(afio::current_exception()));
-					state->done.set_exception(e);
-					done=true;
 				}
 				if(!done)
 					state->done.set_value(state->out);

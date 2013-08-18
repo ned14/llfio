@@ -504,6 +504,7 @@ async_file_io_dispatcher_base::async_file_io_dispatcher_base(thread_source &thre
 
 async_file_io_dispatcher_base::~async_file_io_dispatcher_base()
 {
+#ifndef BOOST_AFIO_COMPILING_FOR_GCOV
 	std::unordered_map<shared_future<std::shared_ptr<detail::async_io_handle>> *, std::pair<size_t, future_status>> reallyoutstanding;
 	for(;;)
 	{
@@ -597,6 +598,7 @@ async_file_io_dispatcher_base::~async_file_io_dispatcher_base()
 			break;
 		}
 	}
+#endif
 	delete p;
 }
 
