@@ -67,7 +67,7 @@ script:
 
 
 #try to pass compiler flags appropriatly
- - if [ $CCFLAGS != "" ]; then FLAGS="cxxflags=\"$CCFLAGS\""; else FLAGS=""; fi
+ - if [ "$CCFLAGS" != "" ]; then FLAGS="cxxflags="$CCFLAGS""; else FLAGS=""; fi
 
 #try to link gcov appropriatly
  - if [ $GCOV -eq 1 ]; then FLAGS="$FLAGS --test-all linkflags=-lgcov"; fi
