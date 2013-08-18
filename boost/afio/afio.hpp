@@ -66,9 +66,11 @@ File Created: Mar 2013
 namespace boost { namespace afio {
 typedef boost::thread thread;
 inline boost::thread::id get_this_thread_id() { return boost::this_thread::get_id(); }
-#if defined(BOOST_MSVC) && BOOST_MSVC < 1700 /* <= VS2010 */
+// Both VS2010 and Mingw32 need this, but not Mingw-w64
+#if (defined(BOOST_MSVC) && BOOST_MSVC < 1700 /* <= VS2010 */) || (defined(__MINGW32__) && !defined(__MINGW64_VERSION_MAJOR))
 namespace detail { struct vs2010_lack_of_decent_current_exception_support_hack_t { }; BOOST_AFIO_DECL boost::exception_ptr &vs2010_lack_of_decent_current_exception_support_hack(); }
 inline boost::exception_ptr current_exception() { boost::exception_ptr ret=boost::current_exception(); return (ret==detail::vs2010_lack_of_decent_current_exception_support_hack()) ? boost::exception_ptr() : ret; }
+#define BOOST_AFIO_NEED_CURRENT_EXCEPTION_HACK
 #else
 inline boost::exception_ptr current_exception() { boost::current_exception(); }
 #endif
@@ -401,7 +403,7 @@ class std_thread_pool : public thread_source {
 		explicit worker(std_thread_pool *p) : pool(p) { }
 		void operator()()
 		{
-#if defined(BOOST_MSVC) && BOOST_MSVC < 1700 /* <= VS2010 */
+#ifdef BOOST_AFIO_NEED_CURRENT_EXCEPTION_HACK
 			// VS2010 segfaults if you ever do a try { throw; } catch(...) without an exception ever having been thrown :(
 			try
 			{
@@ -1271,7 +1273,7 @@ inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(st
 {
 	if(first==last)
 		return future<std::vector<std::shared_ptr<detail::async_io_handle>>>();
-#if defined(BOOST_MSVC) && BOOST_MSVC < 1700 /* <= VS2010 */
+#ifdef BOOST_AFIO_NEED_CURRENT_EXCEPTION_HACK
 	// VS2010 segfaults if you ever do a try { throw; } catch(...) without an exception ever having been thrown :(
 	try
 	{
@@ -1292,7 +1294,7 @@ inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(st
     }
 	inputs.front().parent->completion(inputs, callbacks);
 	return state->done.get_future();
-#if defined(BOOST_MSVC) && BOOST_MSVC < 1700 /* <= VS2010 */
+#ifdef BOOST_AFIO_NEED_CURRENT_EXCEPTION_HACK
 	}
 #endif
 }
@@ -1310,7 +1312,7 @@ inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(st
 {
 	if(first==last)
 		return future<std::vector<std::shared_ptr<detail::async_io_handle>>>();
-#if defined(BOOST_MSVC) && BOOST_MSVC < 1700 /* <= VS2010 */
+#ifdef BOOST_AFIO_NEED_CURRENT_EXCEPTION_HACK
 	// VS2010 segfaults if you ever do a try { throw; } catch(...) without an exception ever having been thrown :(
 	try
 	{
@@ -1331,7 +1333,7 @@ inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(st
     }
 	inputs.front().parent->completion(inputs, callbacks);
 	return state->done.get_future();
-#if defined(BOOST_MSVC) && BOOST_MSVC < 1700 /* <= VS2010 */
+#ifdef BOOST_AFIO_NEED_CURRENT_EXCEPTION_HACK
 	}
 #endif
 }

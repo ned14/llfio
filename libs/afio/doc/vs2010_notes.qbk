@@ -6,7 +6,7 @@
   http://www.boost.org/LICENSE_1_0.txt)
 =============================================================================/]
 
-[section:vs2010_notes Notes on using AFIO with Microsoft Visual Studio 2010]
+[section:vs2010_notes Notes on using AFIO with Microsoft Visual Studio 2010 and Mingw32]
 
 Due to the portability requirement of Boost peer review, we had to backport
 __boost_afio__ (originally a pure C++11 library) to the last three major compiler
@@ -37,28 +37,32 @@ compiler errors.
 # Don't use `using namespace` instead of fully namespaced typenames, as the Koenig lookup
 in VS2010 easily gets confused in C++11 and causes internal compiler errors.
 # You need to work around the fact that `boost::current_exception()` causes segfaults on
-VS2010 if not called from within a `catch` clause, and unfortunately AFIO needs that
+VS2010 and Mingw32 (not Mingw-w64, which is fine) if not called from within a `catch` clause, and unfortunately AFIO needs that
 to detect if an immediately called completion routine was called during the process of
 handling an exception thrown from an earlier completion routine. In other words, it's
 unavoidable with our C++11 assuming design. The solution we adopted is not pretty, but it does work:
-
-  #if defined(BOOST_MSVC) && BOOST_MSVC < 1700 /* <= VS2010 */
-	// VS2010 segfaults if you ever do a try { throw; } catch(...) without an exception ever having been thrown :(
-	try
-	{
-		throw boost::afio::detail::vs2010_lack_of_decent_current_exception_support_hack_t();
-	}
-	catch(...)
-	{
-		boost::afio::detail::vs2010_lack_of_decent_current_exception_support_hack()=boost::current_exception();
-  #endif
-  ... do your AFIO using code ...
-  #if defined(BOOST_MSVC) && BOOST_MSVC < 1700 /* <= VS2010 */
-    }
-  #endif
+'''<source><![CDATA[
+#ifdef BOOST_AFIO_NEED_CURRENT_EXCEPTION_HACK
+// VS2010 and Mingw32 segfaults if you ever do a try { throw; } catch(...) without an exception ever having been thrown :(
+try
+{
+  throw boost::afio::detail::vs2010_lack_of_decent_current_exception_support_hack_t();
+}
+catch(...)
+{
+  boost::afio::detail::vs2010_lack_of_decent_current_exception_support_hack()=boost::current_exception();
+#endif
   
- If you're using to use __boost_afio__ on VS2010, you'll need to wrap all AFIO using code with
- the same stanza.
+... do your AFIO using code ...
+  
+#ifdef BOOST_AFIO_NEED_CURRENT_EXCEPTION_HACK
+}
+#endif
+]]></source>
+'''
+ If you're going to use __boost_afio__ on VS2010 or Mingw32, you'll need to wrap all AFIO using code with
+ the same stanza. As mentioned earlier, Mingw-w64 doesn't have any of these problems and is in fact
+ recommended for Windows XP.
 
 # Even with all of the above, performance of binaries produced by VS2010 is poor - expect
 a performance drop from VS2012 of about 2x and of about 3x from a fully compliant C++11 compiler.

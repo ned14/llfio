@@ -243,7 +243,7 @@ ssize_t pwritev(int fd, const struct iovec *iov, int iovcnt, boost::afio::off_t 
 
 namespace boost { namespace afio {
 
-#if defined(BOOST_MSVC) && BOOST_MSVC < 1700 /* <= VS2010 */
+#ifdef BOOST_AFIO_NEED_CURRENT_EXCEPTION_HACK
 	namespace detail { boost::exception_ptr &vs2010_lack_of_decent_current_exception_support_hack() { static boost::exception_ptr v; return v; } }
 #endif
 
