@@ -17,7 +17,7 @@ cat >coverage.json <<EOF
   "source_files": [
 EOF
 
-for file in $(find * -iname '*.gcov' -print | egrep 'boost#afio')
+for file in $(find * -iname '*.gcov' -print | egrep 'boost#afio|libs#afio#detail|libs#afio#src' | egrep -v 'valgrind')
 do
   cat >>coverage.json <<EOF
     {
