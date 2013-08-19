@@ -1,4 +1,4 @@
-#include "test_functions.hpp"
+#include "../test_functions.hpp"
 
 BOOST_AFIO_AUTO_TEST_CASE(async_io_errors, "Tests that the async i/o error handling works", 120)
 {

@@ -1,4 +1,4 @@
-#include "test_functions.hpp"
+#include "../test_functions.hpp"
 
 BOOST_AFIO_AUTO_TEST_CASE(async_io_works_64_directsync, "Tests that the direct synchronous async i/o implementation works", 60)
 {

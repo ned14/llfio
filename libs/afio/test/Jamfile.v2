@@ -77,6 +77,7 @@ else
 
 # Let user limit test_files
 local test_files = [ MATCH ^--test=(.*)$ : $(.argv) ] ;
+local example_files = [ glob examples/*.cpp ] ;
 if $(test_files)
 {
     test_files_all = $(test_files) ;
@@ -91,6 +92,10 @@ else
 if "--link-test"  in $(.argv)  
 {  
     for local x in $(test_files_all)
+    {
+        link $(x) $(reqs) ;
+    }
+    for local x in $(example_files)
     {
         link $(x) $(reqs) ;
     }

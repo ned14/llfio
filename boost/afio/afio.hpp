@@ -819,7 +819,7 @@ public:
     \exceptionmodelstd
     \qexample{call_example}
     */
-	template<class C, class... Args> inline std::pair<future<typename boost::result_of<C(Args...)>::type>, async_io_op> call(const async_io_op &req, C callback, Args... args);
+	template<class C, class... Args> inline std::pair<future<typename std::result_of<C(Args...)>::type>, async_io_op> call(const async_io_op &req, C callback, Args... args);
 
 #else   //define a version compatable with c++03
 
@@ -827,7 +827,7 @@ public:
     template <class C                                                                               \
     BOOST_PP_COMMA_IF(N)                                                                            \
     BOOST_PP_ENUM_PARAMS(N, class A)>                                                               \
-    inline std::pair<future<typename boost::result_of<C(BOOST_PP_ENUM_PARAMS(N, A))>::type>, async_io_op>  \
+    inline std::pair<future<typename std::result_of<C(BOOST_PP_ENUM_PARAMS(N, A))>::type>, async_io_op>  \
     call (const async_io_op &req, C callback BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, a));     
 
   
@@ -1861,10 +1861,10 @@ template<class R> inline std::pair<future<R>, async_io_op> async_file_io_dispatc
 
 #ifndef BOOST_NO_CXX11_VARIADIC_TEMPLATES
 
-template<class C, class... Args> inline std::pair<future<typename boost::result_of<C(Args...)>::type>, async_io_op> async_file_io_dispatcher_base::call(const async_io_op &req, C callback, Args... args)
+template<class C, class... Args> inline std::pair<future<typename std::result_of<C(Args...)>::type>, async_io_op> async_file_io_dispatcher_base::call(const async_io_op &req, C callback, Args... args)
 {
 	typedef typename std::result_of<C(Args...)>::type rettype;
-	return call(req, std::bind<rettype()>(callback, args...));
+	return call(req, std::function<rettype()>(std::bind<rettype>(callback, args...)));
 }
 
 #else
@@ -1873,11 +1873,11 @@ template<class C, class... Args> inline std::pair<future<typename boost::result_
     template <class C                                                                                                   \
     BOOST_PP_COMMA_IF(N)                                                                                                \
     BOOST_PP_ENUM_PARAMS(N, class A)>                                                                                   \
-    inline std::pair<future<typename boost::result_of<C(BOOST_PP_ENUM_PARAMS(N, A))>::type>, async_io_op>               \
-    call (const async_io_op &req, C callback BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))                 \
+    inline std::pair<future<typename std::result_of<C(BOOST_PP_ENUM_PARAMS(N, A))>::type>, async_io_op>               \
+    async_file_io_dispatcher_base::call (const async_io_op &req, C callback BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))                 \
     {                                                                                                                   \
         typedef typename std::result_of<C(BOOST_PP_ENUM_PARAMS(N, A))>::type rettype;                                   \
-    	return call(req, std::bind<rettype()>(callback, BOOST_PP_ENUM_PARAMS(N, a)));                                   \
+    	return call(req, std::function<rettype()>(std::bind<rettype>(callback, BOOST_PP_ENUM_PARAMS(N, a))));                                   \
     }
   
 #define BOOST_PP_LOCAL_LIMITS     (1, BOOST_AFIO_MAX_PARAMETERS) //should this be 0 or 1 for the min????
