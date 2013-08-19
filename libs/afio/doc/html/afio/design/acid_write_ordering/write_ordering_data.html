@@ -49,9 +49,9 @@
           to do (and generally you want that intent log on as low latency a device
           as possible) -- and usefully every major filing system supports atomic
           appends to a file. If you wish to never lose most recent data, to implement
-          a transaction one writes your data to the filing system, ensure it has
+          a transaction one writes one's data to the filing system, ensure it has
           reached non-volatile storage, appends the knowledge it definitely is on
-          non-volatile storage to the intent log, and then ensure your append also
+          non-volatile storage to the intent log, and then ensure one's append also
           has reached non-volatile storage. This is presently the only way to ensure
           that valuable data definitely is never lost on any filing system that I
           know of. The obvious problem is that this method involves writing all your
@@ -66,7 +66,7 @@
         </p>
 <p>
           TripleGit's normal persistence strategy is a bit more clever: write all
-          your data, but keep a hash like a SHA of its contents as you write it<a href="#ftn.afio.design.acid_write_ordering.write_ordering_data.f0" class="footnote" name="afio.design.acid_write_ordering.write_ordering_data.f0"><sup class="footnote">[5]</sup></a>. When you write your intent log, atomically append all the
+          your data, but keep a hash like a SHA of its contents as you write it<a href="#ftn.afio.design.acid_write_ordering.write_ordering_data.f0" class="footnote" name="afio.design.acid_write_ordering.write_ordering_data.f0"><sup class="footnote">[7]</sup></a>. When you write your intent log, atomically append all the
           SHAs of the items you just wrote and skip <code class="computeroutput"><span class="identifier">O_DATA</span></code>
           and <code class="computeroutput"><span class="identifier">fsync</span><span class="special">()</span></code>
           completely. If power gets removed before all the data is written to non-volatile
@@ -75,7 +75,7 @@
           item's contents to ensure their SHAs match up, throwing away any transaction
           where any file is missing or any file's contents don't match. On a filing
           system such as ext4 where data is guaranteed to be sent to non-volatile
-          storage after one minute<a href="#ftn.afio.design.acid_write_ordering.write_ordering_data.f1" class="footnote" name="afio.design.acid_write_ordering.write_ordering_data.f1"><sup class="footnote">[6]</sup></a>, and of course so long as you don't mind losing up to one minute's
+          storage after one minute<a href="#ftn.afio.design.acid_write_ordering.write_ordering_data.f1" class="footnote" name="afio.design.acid_write_ordering.write_ordering_data.f1"><sup class="footnote">[8]</sup></a>, and of course so long as you don't mind losing up to one minute's
           worth of data, this solution can have much better performance than the
           previous solution with lots of simultaneous writers.
         </p>
@@ -113,39 +113,45 @@
           addition of the ZFS Write Throttle, the default settings are to accept
           new writes as fast as RAM can handle, buffering up to thirty wall clock
           seconds of writes before pacing the acceptance of new write data to match
-          the speed of the non-volatile storage (which may be a ZIL if you're doing
-          synchronous writes). This implies up to thirty seconds of buffered data
-          could be lost, but note that ZFS still guarantees transaction group sequential
-          write order. Therefore, what ZFS is in fact guaranteeing is this: <span class="quote">&#8220;<span class="quote">we
-          may reorder your write by up to five seconds away from the sequence in
-          which you wrote it and other writes surrounding it. Other than that, we
-          guarantee the order in which you write is the order in which that data
-          reaches physical storage.</span>&#8221;</span> <a href="#ftn.afio.design.acid_write_ordering.write_ordering_data.f2" class="footnote" name="afio.design.acid_write_ordering.write_ordering_data.f2"><sup class="footnote">[7]</sup></a>
+          the speed of the non-volatile storage (which may be a ZIL device if you're
+          doing synchronous writes). This implies up to thirty seconds of buffered
+          data could be lost, but note that ZFS still guarantees transaction group
+          sequential write order. Therefore, what ZFS is in fact guaranteeing is
+          this: <span class="quote">&#8220;<span class="quote">we may reorder your write by up to five seconds away from
+          the sequence in which you wrote it and other writes surrounding it. Other
+          than that, we guarantee the order in which you write is the order in which
+          that data reaches physical storage.</span>&#8221;</span> <a href="#ftn.afio.design.acid_write_ordering.write_ordering_data.f2" class="footnote" name="afio.design.acid_write_ordering.write_ordering_data.f2"><sup class="footnote">[9]</sup></a>
         </p>
 <p>
-          Unfortunately, while such guarantees reduce the dirty check time down to
-          the last five seconds of history, because one cannot control which transaction
-          group gets which writes, it does not allow us to eliminate dirty checking
-          entirely. One can, thankfully, skip SHA hashing because ZFS guarantees
-          file and metadata will always match and as TripleGit always copy on writes
-          data, either a copy's length matches the intent log's or it doesn't (i.e.
-          the file's length as reported by the filing system really is how much true
+          What this means is this: on ZFS, TripleGit can turn off all write synchronisation
+          and replace it with a five second delay between writing new data and updating
+          the intent log, and in so doing guaranteeing that the intent log's contents
+          will always refer to data definitely on storage (or rather, close enough
+          that one need not perform a lot of repair work on first use after power
+          loss). One can additionally skip SHA hashing because ZFS guarantees file
+          and metadata will always match and as TripleGit always copy on writes data,
+          either a copy's length matches the intent log's or it doesn't (i.e. the
+          file's length as reported by the filing system really is how much true
           data it contains), plus the file modified timestamp always reflects the
-          actual last modifed timestamp of the data. Note that ext3 and ext4 can
-          also guarantee that file and metadata will always match using the (IOPS
-          expensive) mount option <code class="computeroutput"><span class="identifier">data</span><span class="special">=</span><span class="identifier">journal</span></code>,
-          which can be detected from <code class="computeroutput"><span class="special">/</span><span class="identifier">proc</span><span class="special">/</span><span class="identifier">mounts</span></code>.
+          actual last modifed timestamp of the data.
         </p>
 <p>
-          For those working without the luxury of ZFS, here is a quick table of power
-          loss safety. Once again, I reiterate that errors and omissions are my fault
-          alone.
+          Note that ext3 and ext4 can also guarantee that file and metadata will
+          always match using the (IOPS expensive) mount option <code class="computeroutput"><span class="identifier">data</span><span class="special">=</span><span class="identifier">journal</span></code>,
+          which can be detected from <code class="computeroutput"><span class="special">/</span><span class="identifier">proc</span><span class="special">/</span><span class="identifier">mounts</span></code>. If combined with the proprietary
+          Linux call <code class="computeroutput"><span class="identifier">syncfs</span><span class="special">()</span></code>,
+          one can reasonably emulate ZFS's behaviour, albeit rather inefficiently.
+        </p>
+<p>
+          Sadly, most use of TripleGit and Boost.AFIO will be without the luxury
+          of ZFS, so here is a quick table of power loss data safety. Once again,
+          I reiterate that errors and omissions are my fault alone.
         </p>
 <div class="table">
-<a name="afio.design.acid_write_ordering.write_ordering_data.power_loss_safety"></a><p class="title"><b>Table&#160;1.2.&#160;Power loss safety matrix: What can you lose if power is suddenly
-          lost?</b></p>
-<div class="table-contents"><table class="table" summary="Power loss safety matrix: What can you lose if power is suddenly
-          lost?">
+<a name="afio.design.acid_write_ordering.write_ordering_data.power_loss_safety"></a><p class="title"><b>Table&#160;1.2.&#160;Power loss safety matrix: What non-trivially reconstructible data
+          can you lose if power is suddenly lost?</b></p>
+<div class="table-contents"><table class="table" summary="Power loss safety matrix: What non-trivially reconstructible data
+          can you lose if power is suddenly lost?">
 <colgroup>
 <col>
 <col>
@@ -174,13 +180,13 @@
                 </th>
 <th>
                   <p>
-                    <span class="aligncenter">Max seconds of writes reordered without
-                    using <code class="computeroutput"><span class="identifier">fsync</span><span class="special">()</span></code></span>
+                    <span class="aligncenter">Default max seconds of writes reordered
+                    without using <code class="computeroutput"><span class="identifier">fsync</span><span class="special">()</span></code></span>
                   </p>
                 </th>
 <th>
                   <p>
-                    <span class="aligncenter">Max seconds of writes lost</span>
+                    <span class="aligncenter">Default max seconds of writes lost</span>
                   </p>
                 </th>
 </tr></thead>
@@ -193,22 +199,28 @@
                 </td>
 <td>
                   <p>
-                    <span class="aligncenter"><span class="green">&#10004;</span></span>
+                    <span class="aligncenter"><span class="red">&#10004;</span></span>
                   </p>
                 </td>
 <td>
                   <p>
-                    <span class="aligncenter"><span class="green">&#10004;</span></span>
+                    <span class="aligncenter"><span class="red">&#10004;</span></span>
                   </p>
                 </td>
 <td>
                   <p>
-                    <span class="aligncenter"><span class="green">&#10004;</span></span>
+                    <span class="aligncenter"><span class="red">&#10004;</span></span>
                   </p>
                 </td>
 <td>
+                  <p>
+                    ?
+                  </p>
                 </td>
 <td>
+                  <p>
+                    ?
+                  </p>
                 </td>
 </tr>
 <tr>
@@ -219,17 +231,17 @@
                 </td>
 <td>
                   <p>
-                    <span class="aligncenter"><span class="green">&#10004;</span></span>
+                    <span class="aligncenter"><span class="red">&#10004;</span></span>
                   </p>
                 </td>
 <td>
                   <p>
-                    <span class="aligncenter"><span class="green">&#10004;</span></span>
+                    <span class="aligncenter"><span class="red">&#10004;</span></span>
                   </p>
                 </td>
 <td>
                   <p>
-                    <span class="aligncenter"><span class="green">&#10004;</span></span>
+                    <span class="aligncenter"><span class="red">&#10004;</span></span>
                   </p>
                 </td>
 <td>
@@ -251,27 +263,27 @@
                 </td>
 <td>
                   <p>
-                    <span class="aligncenter"><span class="green">&#10004;</span></span>
+                    <span class="aligncenter"><span class="red">&#10004;</span></span>
                   </p>
                 </td>
 <td>
                   <p>
-                    <span class="aligncenter"><span class="green">&#10004;</span></span>
+                    <span class="aligncenter"><span class="red">&#10004;</span></span>
                   </p>
                 </td>
 <td>
                   <p>
-                    <span class="aligncenter"><span class="green">&#10004;</span></span>
+                    <span class="aligncenter"><span class="red">&#10004;</span></span>
                   </p>
                 </td>
 <td>
                   <p>
-                    <span class="aligncenter">5/60</span>
+                    <span class="aligncenter">5<a href="#ftn.afio.design.acid_write_ordering.write_ordering_data.f4" class="footnote" name="afio.design.acid_write_ordering.write_ordering_data.f4"><sup class="footnote">[b]</sup></a></span>
                   </p>
                 </td>
 <td>
                   <p>
-                    <span class="aligncenter">60</span>
+                    <span class="aligncenter">30<a href="#ftn.afio.design.acid_write_ordering.write_ordering_data.f5" class="footnote" name="afio.design.acid_write_ordering.write_ordering_data.f5"><sup class="footnote">[c]</sup></a></span>
                   </p>
                 </td>
 </tr>
@@ -284,54 +296,60 @@
                 </td>
 <td>
                   <p>
-                    <span class="aligncenter"><span class="red">&#10008;</span></span>
+                    <span class="aligncenter"><span class="green">&#10008;</span></span>
                   </p>
                 </td>
 <td>
                   <p>
-                    <span class="aligncenter"><span class="red">&#10008;</span></span>
+                    <span class="aligncenter"><span class="green">&#10008;</span></span>
                   </p>
                 </td>
 <td>
                   <p>
-                    <span class="aligncenter"><span class="green">&#10004;</span></span>
+                    <span class="aligncenter"><span class="red">&#10004;</span></span>
                   </p>
                 </td>
 <td>
                   <p>
-                    <span class="aligncenter">5/60</span>
+                    <span class="aligncenter">5</span>
                   </p>
                 </td>
 <td>
                   <p>
-                    <span class="aligncenter">60</span>
+                    <span class="aligncenter">30</span>
                   </p>
                 </td>
 </tr>
 <tr>
 <td>
                   <p>
-                    <span class="alignright">UFS + soft updates</span>
+                    <span class="alignright">UFS + soft updates<a href="#ftn.afio.design.acid_write_ordering.write_ordering_data.f6" class="footnote" name="afio.design.acid_write_ordering.write_ordering_data.f6"><sup class="footnote">[d]</sup></a></span>
                   </p>
                 </td>
 <td>
                   <p>
-                    <span class="aligncenter"><span class="red">&#10008;</span></span>
+                    <span class="aligncenter"><span class="green">&#10008;</span></span>
                   </p>
                 </td>
 <td>
                   <p>
-                    <span class="aligncenter"><span class="red">&#10008;</span></span>
+                    <span class="aligncenter"><span class="green">&#10008;</span></span>
                   </p>
                 </td>
 <td>
                   <p>
-                    <span class="aligncenter"><span class="green">&#10004;</span></span>
+                    <span class="aligncenter"><span class="red">&#10004;</span></span>
                   </p>
                 </td>
 <td>
+                  <p>
+                    30
+                  </p>
                 </td>
 <td>
+                  <p>
+                    30
+                  </p>
                 </td>
 </tr>
 <tr>
@@ -342,48 +360,60 @@
                 </td>
 <td>
                   <p>
-                    <span class="aligncenter"><span class="red">&#10008;</span></span>
+                    <span class="aligncenter"><span class="green">&#10008;</span></span>
                   </p>
                 </td>
 <td>
                   <p>
-                    <span class="aligncenter"><span class="red">&#10008;</span></span>
+                    <span class="aligncenter"><span class="green">&#10008;</span></span>
                   </p>
                 </td>
 <td>
                   <p>
-                    <span class="aligncenter"><span class="green">&#10004;</span></span>
+                    <span class="aligncenter"><span class="red">&#10004;</span></span>
                   </p>
                 </td>
 <td>
+                  <p>
+                    ?
+                  </p>
                 </td>
 <td>
+                  <p>
+                    ?
+                  </p>
                 </td>
 </tr>
 <tr>
 <td>
                   <p>
-                    <span class="alignright">NTFS</span>
+                    <span class="alignright">NTFS<a href="#ftn.afio.design.acid_write_ordering.write_ordering_data.f7" class="footnote" name="afio.design.acid_write_ordering.write_ordering_data.f7"><sup class="footnote">[e]</sup></a></span>
                   </p>
                 </td>
 <td>
                   <p>
-                    <span class="aligncenter"><span class="red">&#10008;</span></span>
+                    <span class="aligncenter"><span class="green">&#10008;</span></span>
                   </p>
                 </td>
 <td>
                   <p>
-                    <span class="aligncenter"><span class="red">&#10008;</span></span>
+                    <span class="aligncenter"><span class="green">&#10008;</span></span>
                   </p>
                 </td>
 <td>
                   <p>
-                    <span class="aligncenter"><span class="green">&#10004;</span></span>
+                    <span class="aligncenter"><span class="red">&#10004;</span></span>
                   </p>
                 </td>
 <td>
+                  <p>
+                    Until idle or write limit
+                  </p>
                 </td>
 <td>
+                  <p>
+                    Until idle or write limit
+                  </p>
                 </td>
 </tr>
 <tr>
@@ -394,54 +424,60 @@
                 </td>
 <td>
                   <p>
-                    <span class="aligncenter"><span class="red">&#10008;</span></span>
+                    <span class="aligncenter"><span class="green">&#10008;</span></span>
                   </p>
                 </td>
 <td>
                   <p>
-                    <span class="aligncenter"><span class="red">&#10008;</span></span>
+                    <span class="aligncenter"><span class="green">&#10008;</span></span>
                   </p>
                 </td>
 <td>
                   <p>
-                    <span class="aligncenter"><span class="red">&#10008;</span></span>
+                    <span class="aligncenter"><span class="green">&#10008;</span></span>
                   </p>
                 </td>
 <td>
                   <p>
-                    <span class="aligncenter">60</span>
+                    <span class="aligncenter">5</span>
                   </p>
                 </td>
 <td>
                   <p>
-                    <span class="aligncenter">60</span>
+                    <span class="aligncenter">5</span>
                   </p>
                 </td>
 </tr>
 <tr>
 <td>
                   <p>
-                    <span class="alignright">BTRFS</span>
+                    <span class="alignright">BTRFS<a href="#ftn.afio.design.acid_write_ordering.write_ordering_data.f8" class="footnote" name="afio.design.acid_write_ordering.write_ordering_data.f8"><sup class="footnote">[f]</sup></a></span>
                   </p>
                 </td>
 <td>
                   <p>
-                    <span class="aligncenter"><span class="red">&#10008;</span></span>
+                    <span class="aligncenter"><span class="green">&#10008;</span></span>
                   </p>
                 </td>
 <td>
                   <p>
-                    <span class="aligncenter"><span class="red">&#10008;</span></span>
+                    <span class="aligncenter"><span class="green">&#10008;</span></span>
                   </p>
                 </td>
 <td>
                   <p>
-                    <span class="aligncenter"><span class="red">&#10008;</span></span>
+                    <span class="aligncenter"><span class="green">&#10008;</span></span>
                   </p>
                 </td>
 <td>
+                  <p>
+                    <span class="aligncenter">30</span>
+                  </p>
                 </td>
 <td>
+                  <p>
+                    <span class="aligncenter">30</span>
+                  </p>
                 </td>
 </tr>
 <tr>
@@ -452,17 +488,17 @@
                 </td>
 <td>
                   <p>
-                    <span class="aligncenter"><span class="red">&#10008;</span></span>
+                    <span class="aligncenter"><span class="green">&#10008;</span></span>
                   </p>
                 </td>
 <td>
                   <p>
-                    <span class="aligncenter"><span class="red">&#10008;</span></span>
+                    <span class="aligncenter"><span class="green">&#10008;</span></span>
                   </p>
                 </td>
 <td>
                   <p>
-                    <span class="aligncenter"><span class="red">&#10008;</span></span>
+                    <span class="aligncenter"><span class="green">&#10008;</span></span>
                   </p>
                 </td>
 <td>
@@ -477,26 +513,45 @@
                 </td>
 </tr>
 </tbody>
-<tbody class="footnotes"><tr><td colspan="6"><div id="ftn.afio.design.acid_write_ordering.write_ordering_data.f3" class="footnote"><p><a href="#afio.design.acid_write_ordering.write_ordering_data.f3" class="para"><sup class="para">[a] </sup></a>
+<tbody class="footnotes"><tr><td colspan="6">
+<div id="ftn.afio.design.acid_write_ordering.write_ordering_data.f3" class="footnote"><p><a href="#afio.design.acid_write_ordering.write_ordering_data.f3" class="para"><sup class="para">[a] </sup></a>
                       This doesn't mean that metadata is corrupted, this means for
                       example that a file is said to have 100Kb but is in fact partially
                       garbage because metadata was updated before data was fully
                       changed on storage.
-                    </p></div></td></tr></tbody>
+                    </p></div>
+<div id="ftn.afio.design.acid_write_ordering.write_ordering_data.f4" class="footnote"><p><a href="#afio.design.acid_write_ordering.write_ordering_data.f4" class="para"><sup class="para">[b] </sup></a>
+                      This is the <code class="computeroutput"><span class="identifier">commit</span></code>
+                      mount setting. Source: https://www.kernel.org/doc/Documentation/filesystems/ext4.txt
+                    </p></div>
+<div id="ftn.afio.design.acid_write_ordering.write_ordering_data.f5" class="footnote"><p><a href="#afio.design.acid_write_ordering.write_ordering_data.f5" class="para"><sup class="para">[c] </sup></a>
+                      This is the <code class="computeroutput"><span class="special">/</span><span class="identifier">proc</span><span class="special">/</span><span class="identifier">sys</span><span class="special">/</span><span class="identifier">vm</span><span class="special">/</span><span class="identifier">dirty_expire_centiseconds</span></code>
+                      value. Source: http://www.westnet.com/~gsmith/content/linux-pdflush.htm
+                    </p></div>
+<div id="ftn.afio.design.acid_write_ordering.write_ordering_data.f6" class="footnote"><p><a href="#afio.design.acid_write_ordering.write_ordering_data.f6" class="para"><sup class="para">[d] </sup></a>
+                      Source: http://www.freebsd.org/cgi/man.cgi?query=syncer
+                    </p></div>
+<div id="ftn.afio.design.acid_write_ordering.write_ordering_data.f7" class="footnote"><p><a href="#afio.design.acid_write_ordering.write_ordering_data.f7" class="para"><sup class="para">[e] </sup></a>
+                      Source: http://technet.microsoft.com/en-us/library/bb742613.aspx
+                    </p></div>
+<div id="ftn.afio.design.acid_write_ordering.write_ordering_data.f8" class="footnote"><p><a href="#afio.design.acid_write_ordering.write_ordering_data.f8" class="para"><sup class="para">[f] </sup></a>
+                      Source: https://wiki.archlinux.org/index.php/Btrfs
+                    </p></div>
+</td></tr></tbody>
 </table></div>
 </div>
 <br class="table-break"><div class="footnotes">
 <br><hr style="width:100; text-align:left;margin-left: 0">
-<div id="ftn.afio.design.acid_write_ordering.write_ordering_data.f0" class="footnote"><p><a href="#afio.design.acid_write_ordering.write_ordering_data.f0" class="para"><sup class="para">[5] </sup></a>
+<div id="ftn.afio.design.acid_write_ordering.write_ordering_data.f0" class="footnote"><p><a href="#afio.design.acid_write_ordering.write_ordering_data.f0" class="para"><sup class="para">[7] </sup></a>
             TripleGit actually uses a different, much faster 256 bit hash by default,
             but one can force use of SHA256 on a per-graph basis.
           </p></div>
-<div id="ftn.afio.design.acid_write_ordering.write_ordering_data.f1" class="footnote"><p><a href="#afio.design.acid_write_ordering.write_ordering_data.f1" class="para"><sup class="para">[6] </sup></a>
+<div id="ftn.afio.design.acid_write_ordering.write_ordering_data.f1" class="footnote"><p><a href="#afio.design.acid_write_ordering.write_ordering_data.f1" class="para"><sup class="para">[8] </sup></a>
             This is the default, and it may be changed by a system e.g. I have seen
             thirty minutes set for laptops. Note that the Linux-specific call <code class="computeroutput"><span class="identifier">syncfs</span><span class="special">()</span></code>
             lets one artifically schedule whole filing system flushes.
           </p></div>
-<div id="ftn.afio.design.acid_write_ordering.write_ordering_data.f2" class="footnote"><p><a href="#afio.design.acid_write_ordering.write_ordering_data.f2" class="para"><sup class="para">[7] </sup></a>
+<div id="ftn.afio.design.acid_write_ordering.write_ordering_data.f2" class="footnote"><p><a href="#afio.design.acid_write_ordering.write_ordering_data.f2" class="para"><sup class="para">[9] </sup></a>
             Source: http://www.c0t0d0s0.org/archives/5343-Insights-into-ZFS-today-The-nature-of-writing-things.html
           </p></div>
 </div>

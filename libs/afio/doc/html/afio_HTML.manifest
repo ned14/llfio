@@ -68,5 +68,8 @@ afio/reference/functions/when_all_ops/when_all_2_initializer_list_batch_of_ops_n
 afio/reference/functions/when_all_ops/when_all_1_initializer_list_batch_of_ops_exception_propagating.html
 afio/reference/functions/when_all_ops/when_all_2_convenience_single_op_not_exception_propagating.html
 afio/reference/functions/when_all_ops/when_all_1_convenience_single_op_exception_propagating.html
+afio/vs2010_notes.html
 afio/release_notes.html
+afio/FAQ.html
+afio/FAQ/stuck_ops.html
 afio/acknowledgments.html

@@ -28,8 +28,8 @@ struct async_data_op_req< std::basic_string< C, T, A > >
 [heading Template parameter(s)]
 [table
 [[Parameter] [Description]]
-[[class C] [Any character type ]]
-[[class T] [Character traits type ]]
+[[class C] [Any character type]]
+[[class T] [Character traits type]]
 [[class A] [Any STL allocator ]]
 ]
 
@@ -85,9 +85,9 @@ True if contents are correct
 ]]
 [[`` async_data_op_req(async_io_op _precondition, std::basic_string< C, T, A > & v, off_t _where)``
 
-] [Constructs an instance. ] [[* async_io_op]: ['_precondition]:  An optional precondition for this operation 
+] [Constructs an instance. ] [[* async_io_op]: ['_precondition]:  An optional precondition for this operation
 
-[* std::basic_string< C, T, A > &]: ['v]:  A pointer to memory or reference to object into which to read or write 
+[* std::basic_string< C, T, A > &]: ['v]:  A pointer to memory or reference to object into which to read or write
 
 [* off_t]: ['_where]:  The offset at which to transfer 
 

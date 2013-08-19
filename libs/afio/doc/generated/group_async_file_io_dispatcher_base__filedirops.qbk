@@ -32,7 +32,7 @@ A batch of op handles.
 `#include <boost/afio/afio.hpp>`
 
 [heading Complexity]Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete if closing handles is constant time.
-[heading Exception Model]Propagates exceptions of any input preconditions with an errored state at the point of dispatch, and throws a `std::runtime_error` if any inputs have values which could not possibly be correct.
+[heading Exception Model]Propagates exceptions of any input preconditions with an errored state at the point of dispatch, and throws a `std::runtime_error` if any inputs have values which could not possibly be correct. Once a batch of input ops has been verified at the point of entry as not errored, you are guaranteed that the batch is atomically scheduled as a whole, unless one of the following conditions occurs: (i) A failure to allocate memory occurs.
 [heading Example][filedir_example]
 
 
@@ -61,7 +61,7 @@ An op handle.
 `#include <boost/afio/afio.hpp>`
 
 [heading Complexity]Amortised O(1) to dispatch. Amortised O(1) to complete if closing handles is constant time.
-[heading Exception Model]Propagates exceptions of any input preconditions with an errored state at the point of dispatch, and throws a `std::runtime_error` if any inputs have values which could not possibly be correct.
+[heading Exception Model]Propagates exceptions of any input preconditions with an errored state at the point of dispatch, and throws a `std::runtime_error` if any inputs have values which could not possibly be correct. Once a batch of input ops has been verified at the point of entry as not errored, you are guaranteed that the batch is atomically scheduled as a whole, unless one of the following conditions occurs: (i) A failure to allocate memory occurs.
 [heading Example][filedir_example]
 
 
@@ -90,7 +90,7 @@ A batch of op handles.
 `#include <boost/afio/afio.hpp>`
 
 [heading Complexity]Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete if directory creation is constant time.
-[heading Exception Model]Propagates exceptions of any input preconditions with an errored state at the point of dispatch, and throws a `std::runtime_error` if any inputs have values which could not possibly be correct.
+[heading Exception Model]Propagates exceptions of any input preconditions with an errored state at the point of dispatch, and throws a `std::runtime_error` if any inputs have values which could not possibly be correct. Once a batch of input ops has been verified at the point of entry as not errored, you are guaranteed that the batch is atomically scheduled as a whole, unless one of the following conditions occurs: (i) A failure to allocate memory occurs.
 [heading Example][filedir_example]
 
 
@@ -119,7 +119,7 @@ An op handle.
 `#include <boost/afio/afio.hpp>`
 
 [heading Complexity]Amortised O(1) to dispatch. Amortised O(1) to complete if directory creation is constant time.
-[heading Exception Model]Propagates exceptions of any input preconditions with an errored state at the point of dispatch, and throws a `std::runtime_error` if any inputs have values which could not possibly be correct.
+[heading Exception Model]Propagates exceptions of any input preconditions with an errored state at the point of dispatch, and throws a `std::runtime_error` if any inputs have values which could not possibly be correct. Once a batch of input ops has been verified at the point of entry as not errored, you are guaranteed that the batch is atomically scheduled as a whole, unless one of the following conditions occurs: (i) A failure to allocate memory occurs.
 [heading Example][filedir_example]
 
 
@@ -148,7 +148,7 @@ A batch of op handles.
 `#include <boost/afio/afio.hpp>`
 
 [heading Complexity]Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete if file creation is constant time.
-[heading Exception Model]Propagates exceptions of any input preconditions with an errored state at the point of dispatch, and throws a `std::runtime_error` if any inputs have values which could not possibly be correct.
+[heading Exception Model]Propagates exceptions of any input preconditions with an errored state at the point of dispatch, and throws a `std::runtime_error` if any inputs have values which could not possibly be correct. Once a batch of input ops has been verified at the point of entry as not errored, you are guaranteed that the batch is atomically scheduled as a whole, unless one of the following conditions occurs: (i) A failure to allocate memory occurs.
 [heading Example][filedir_example]
 
 
@@ -177,7 +177,7 @@ An op handle.
 `#include <boost/afio/afio.hpp>`
 
 [heading Complexity]Amortised O(1) to dispatch. Amortised O(1) to complete if file creation is constant time.
-[heading Exception Model]Propagates exceptions of any input preconditions with an errored state at the point of dispatch, and throws a `std::runtime_error` if any inputs have values which could not possibly be correct.
+[heading Exception Model]Propagates exceptions of any input preconditions with an errored state at the point of dispatch, and throws a `std::runtime_error` if any inputs have values which could not possibly be correct. Once a batch of input ops has been verified at the point of entry as not errored, you are guaranteed that the batch is atomically scheduled as a whole, unless one of the following conditions occurs: (i) A failure to allocate memory occurs.
 [heading Example][filedir_example]
 
 
@@ -197,7 +197,7 @@ Note that on Windows this call issues a separate async file operation for each b
 
 [heading Synopsis]
 ``template<class T>
-std::vector< async_io_op > async_file_io_dispatcher_base::read(const std::vector< async_data_op_req< T >> & ops)``
+virtual std::vector<async_io_op> async_file_io_dispatcher_base::read(const std::vector< async_data_op_req< T >> & ops)``
 
 [heading Parameters]
 
@@ -215,7 +215,7 @@ A batch of op handles.
 `#include <boost/afio/afio.hpp>`
 
 [heading Complexity]Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete if reading data is constant time.
-[heading Exception Model]Propagates exceptions of any input preconditions with an errored state at the point of dispatch, and throws a `std::runtime_error` if any inputs have values which could not possibly be correct.
+[heading Exception Model]Propagates exceptions of any input preconditions with an errored state at the point of dispatch, and throws a `std::runtime_error` if any inputs have values which could not possibly be correct. Once a batch of input ops has been verified at the point of entry as not errored, you are guaranteed that the batch is atomically scheduled as a whole, unless one of the following conditions occurs: (i) A failure to allocate memory occurs.
 [heading Example][readwrite_example]
 
 
@@ -230,9 +230,6 @@ Schedule an asynchronous data read after a preceding operation.
 
 ``
 Note that on Windows this call issues a separate async file operation for each buffer supplied, thus making scatter/gather i/o no more efficient than making separate calls. The big exception to this is when doing unbuffered page aligned i/o for which Windows provides special scatter/gather i/o functions.
-\return An op handle.
-\tparam "class T" Any type.
-\param req An async\u005fdata\u005fop\u005freq<T> structure.
 ``
 
 
@@ -244,16 +241,19 @@ async_io_op async_file_io_dispatcher_base::read(const async_data_op_req< T > & r
 
 [table
 [[Type] [Concept] [Name] [Description] ]
-[[class T] [] [ - ] [Must be specified]]
-[[const async_data_op_req< T > &] [] [req] []]
+[[class T] [Any type. ] [ - ] [Must be specified]]
+[[const async_data_op_req< T > &] [] [req] [An async_data_op_req<T> structure.]]
 ]
 
+
+[heading Returns]
+An op handle. 
 
 [heading Header]
 `#include <boost/afio/afio.hpp>`
 
 [heading Complexity]Amortised O(1) to dispatch. Amortised O(1) to complete if reading data is constant time.
-[heading Exception Model]Propagates exceptions of any input preconditions with an errored state at the point of dispatch, and throws a `std::runtime_error` if any inputs have values which could not possibly be correct.
+[heading Exception Model]Propagates exceptions of any input preconditions with an errored state at the point of dispatch, and throws a `std::runtime_error` if any inputs have values which could not possibly be correct. Once a batch of input ops has been verified at the point of entry as not errored, you are guaranteed that the batch is atomically scheduled as a whole, unless one of the following conditions occurs: (i) A failure to allocate memory occurs.
 [heading Example][readwrite_example]
 
 
@@ -282,7 +282,7 @@ A batch of op handles.
 `#include <boost/afio/afio.hpp>`
 
 [heading Complexity]Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete if directory deletion is constant time.
-[heading Exception Model]Propagates exceptions of any input preconditions with an errored state at the point of dispatch, and throws a `std::runtime_error` if any inputs have values which could not possibly be correct.
+[heading Exception Model]Propagates exceptions of any input preconditions with an errored state at the point of dispatch, and throws a `std::runtime_error` if any inputs have values which could not possibly be correct. Once a batch of input ops has been verified at the point of entry as not errored, you are guaranteed that the batch is atomically scheduled as a whole, unless one of the following conditions occurs: (i) A failure to allocate memory occurs.
 [heading Example][filedir_example]
 
 
@@ -311,7 +311,7 @@ An op handle.
 `#include <boost/afio/afio.hpp>`
 
 [heading Complexity]Amortised O(1) to dispatch. Amortised O(1) to complete if directory deletion is constant time.
-[heading Exception Model]Propagates exceptions of any input preconditions with an errored state at the point of dispatch, and throws a `std::runtime_error` if any inputs have values which could not possibly be correct.
+[heading Exception Model]Propagates exceptions of any input preconditions with an errored state at the point of dispatch, and throws a `std::runtime_error` if any inputs have values which could not possibly be correct. Once a batch of input ops has been verified at the point of entry as not errored, you are guaranteed that the batch is atomically scheduled as a whole, unless one of the following conditions occurs: (i) A failure to allocate memory occurs.
 [heading Example][filedir_example]
 
 
@@ -340,7 +340,7 @@ A batch of op handles.
 `#include <boost/afio/afio.hpp>`
 
 [heading Complexity]Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete if file deletion is constant time.
-[heading Exception Model]Propagates exceptions of any input preconditions with an errored state at the point of dispatch, and throws a `std::runtime_error` if any inputs have values which could not possibly be correct.
+[heading Exception Model]Propagates exceptions of any input preconditions with an errored state at the point of dispatch, and throws a `std::runtime_error` if any inputs have values which could not possibly be correct. Once a batch of input ops has been verified at the point of entry as not errored, you are guaranteed that the batch is atomically scheduled as a whole, unless one of the following conditions occurs: (i) A failure to allocate memory occurs.
 [heading Example][filedir_example]
 
 
@@ -369,7 +369,7 @@ An op handle.
 `#include <boost/afio/afio.hpp>`
 
 [heading Complexity]Amortised O(1) to dispatch. Amortised O(1) to complete if file deletion is constant time.
-[heading Exception Model]Propagates exceptions of any input preconditions with an errored state at the point of dispatch, and throws a `std::runtime_error` if any inputs have values which could not possibly be correct.
+[heading Exception Model]Propagates exceptions of any input preconditions with an errored state at the point of dispatch, and throws a `std::runtime_error` if any inputs have values which could not possibly be correct. Once a batch of input ops has been verified at the point of entry as not errored, you are guaranteed that the batch is atomically scheduled as a whole, unless one of the following conditions occurs: (i) A failure to allocate memory occurs.
 [heading Example][filedir_example]
 
 
@@ -398,7 +398,7 @@ A batch of op handles.
 `#include <boost/afio/afio.hpp>`
 
 [heading Complexity]Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete if content synchronisation is constant time (which is extremely unlikely).
-[heading Exception Model]Propagates exceptions of any input preconditions with an errored state at the point of dispatch, and throws a `std::runtime_error` if any inputs have values which could not possibly be correct.
+[heading Exception Model]Propagates exceptions of any input preconditions with an errored state at the point of dispatch, and throws a `std::runtime_error` if any inputs have values which could not possibly be correct. Once a batch of input ops has been verified at the point of entry as not errored, you are guaranteed that the batch is atomically scheduled as a whole, unless one of the following conditions occurs: (i) A failure to allocate memory occurs.
 [heading Example][sync_example]
 
 
@@ -427,7 +427,7 @@ An op handle.
 `#include <boost/afio/afio.hpp>`
 
 [heading Complexity]Amortised O(1) to dispatch. Amortised O(1) to complete if content synchronisation is constant time (which is extremely unlikely).
-[heading Exception Model]Propagates exceptions of any input preconditions with an errored state at the point of dispatch, and throws a `std::runtime_error` if any inputs have values which could not possibly be correct.
+[heading Exception Model]Propagates exceptions of any input preconditions with an errored state at the point of dispatch, and throws a `std::runtime_error` if any inputs have values which could not possibly be correct. Once a batch of input ops has been verified at the point of entry as not errored, you are guaranteed that the batch is atomically scheduled as a whole, unless one of the following conditions occurs: (i) A failure to allocate memory occurs.
 [heading Example][sync_example]
 
 
@@ -457,7 +457,7 @@ A batch of op handles.
 `#include <boost/afio/afio.hpp>`
 
 [heading Complexity]Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete if truncating file lengths is constant time.
-[heading Exception Model]Propagates exceptions of any input preconditions with an errored state at the point of dispatch, and throws a `std::runtime_error` if any inputs have values which could not possibly be correct.
+[heading Exception Model]Propagates exceptions of any input preconditions with an errored state at the point of dispatch, and throws a `std::runtime_error` if any inputs have values which could not possibly be correct. Once a batch of input ops has been verified at the point of entry as not errored, you are guaranteed that the batch is atomically scheduled as a whole, unless one of the following conditions occurs: (i) A failure to allocate memory occurs.
 [heading Example][truncate_example]
 
 
@@ -487,7 +487,7 @@ An op handle.
 `#include <boost/afio/afio.hpp>`
 
 [heading Complexity]Amortised O(1) to dispatch. Amortised O(1) to complete if truncating file lengths is constant time.
-[heading Exception Model]Propagates exceptions of any input preconditions with an errored state at the point of dispatch, and throws a `std::runtime_error` if any inputs have values which could not possibly be correct.
+[heading Exception Model]Propagates exceptions of any input preconditions with an errored state at the point of dispatch, and throws a `std::runtime_error` if any inputs have values which could not possibly be correct. Once a batch of input ops has been verified at the point of entry as not errored, you are guaranteed that the batch is atomically scheduled as a whole, unless one of the following conditions occurs: (i) A failure to allocate memory occurs.
 [heading Example][truncate_example]
 
 
@@ -502,9 +502,6 @@ Schedule a batch of asynchronous data writes after preceding operations.
 
 ``
 Note that on Windows this call issues a separate async file operation for each buffer supplied, thus making scatter/gather i/o no more efficient than making separate calls. The big exception to this is when doing unbuffered page aligned i/o for which Windows provides special scatter/gather i/o functions.
-\return A batch of op handles.
-\tparam "class T" Any type.
-\param ops A batch of async\u005fdata\u005fop\u005freq<const T> structures.
 ``
 
 
@@ -516,16 +513,19 @@ virtual std::vector<async_io_op> async_file_io_dispatcher_base::write(const std:
 
 [table
 [[Type] [Concept] [Name] [Description] ]
-[[class T] [] [ - ] [Must be specified]]
-[[const std::vector< async_data_op_req< const T >> &] [] [ops] []]
+[[class T] [Any type. ] [ - ] [Must be specified]]
+[[const std::vector< async_data_op_req< const T >> &] [] [ops] [A batch of async_data_op_req<const T> structures.]]
 ]
 
+
+[heading Returns]
+A batch of op handles. 
 
 [heading Header]
 `#include <boost/afio/afio.hpp>`
 
 [heading Complexity]Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete if writing data is constant time.
-[heading Exception Model]Propagates exceptions of any input preconditions with an errored state at the point of dispatch, and throws a `std::runtime_error` if any inputs have values which could not possibly be correct.
+[heading Exception Model]Propagates exceptions of any input preconditions with an errored state at the point of dispatch, and throws a `std::runtime_error` if any inputs have values which could not possibly be correct. Once a batch of input ops has been verified at the point of entry as not errored, you are guaranteed that the batch is atomically scheduled as a whole, unless one of the following conditions occurs: (i) A failure to allocate memory occurs.
 [heading Example][readwrite_example]
 
 
@@ -540,9 +540,6 @@ Schedule an asynchronous data write after a preceding operation.
 
 ``
 Note that on Windows this call issues a separate async file operation for each buffer supplied, thus making scatter/gather i/o no more efficient than making separate calls. The big exception to this is when doing unbuffered page aligned i/o for which Windows provides special scatter/gather i/o functions.
-\return An op handle.
-\tparam "class T" Any type.
-\param req An async\u005fdata\u005fop\u005freq<const T> structure.
 ``
 
 
@@ -554,16 +551,19 @@ async_io_op async_file_io_dispatcher_base::write(const async_data_op_req< const 
 
 [table
 [[Type] [Concept] [Name] [Description] ]
-[[class T] [] [ - ] [Must be specified]]
-[[const async_data_op_req< const T > &] [] [req] []]
+[[class T] [Any type. ] [ - ] [Must be specified]]
+[[const async_data_op_req< const T > &] [] [req] [An async_data_op_req<const T> structure.]]
 ]
 
+
+[heading Returns]
+An op handle. 
 
 [heading Header]
 `#include <boost/afio/afio.hpp>`
 
 [heading Complexity]Amortised O(1) to dispatch. Amortised O(1) to complete if writing data is constant time.
-[heading Exception Model]Propagates exceptions of any input preconditions with an errored state at the point of dispatch, and throws a `std::runtime_error` if any inputs have values which could not possibly be correct.
+[heading Exception Model]Propagates exceptions of any input preconditions with an errored state at the point of dispatch, and throws a `std::runtime_error` if any inputs have values which could not possibly be correct. Once a batch of input ops has been verified at the point of entry as not errored, you are guaranteed that the batch is atomically scheduled as a whole, unless one of the following conditions occurs: (i) A failure to allocate memory occurs.
 [heading Example][readwrite_example]
 
 

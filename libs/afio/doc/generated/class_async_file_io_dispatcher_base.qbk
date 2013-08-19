@@ -132,7 +132,7 @@ A pair with a future returning the result of the callable and an op handle.
 
 ]]
 [[``template<class C, class... Args>
-std::pair< future< typename boost::result_of< C(Args...)>::type >, async_io_op > call(const async_io_op & req, C callback, Args... args)``
+std::pair< future< typename std::result_of< C(Args...)>::type >, async_io_op > call(const async_io_op & req, C callback, Args... args)``
 
 ] [Schedule an asynchronous invocation of the specified unbound callable when its supplied precondition completes. Note that this function essentially calls [^`std::bind()`] on the callable and the args and passes it to the other call() overload taking a [^`std::function<>`]. You should therefore use [^`std::ref()`] etc. as appropriate. ] [[* const async_io_op &]: ['req]:  A precondition op handle. If default constructed, the precondition is null. 
 
@@ -294,27 +294,36 @@ A batch of op handles.
 [[``template<class T>
 async_io_op read(const async_data_op_req< T > & req)``
 
-] [Schedule an asynchronous data read after a preceding operation. ] [[* const async_data_op_req< T > &]: ['req]:  
+] [Schedule an asynchronous data read after a preceding operation. ] [[* const async_data_op_req< T > &]: ['req]:  An async_data_op_req<T> structure.
 
 
+
+][
+An op handle. 
 
 
 ]]
 [[``template<class T>
 std::vector< async_io_op > write(const std::vector< async_data_op_req< const T >> & ops)``
 
-] [Schedule a batch of asynchronous data writes after preceding operations. ] [[* const std::vector< async_data_op_req< const T >> &]: ['ops]:  
+] [Schedule a batch of asynchronous data writes after preceding operations. ] [[* const std::vector< async_data_op_req< const T >> &]: ['ops]:  A batch of async_data_op_req<const T> structures.
 
 
+
+][
+A batch of op handles. 
 
 
 ]]
 [[``template<class T>
 async_io_op write(const async_data_op_req< const T > & req)``
 
-] [Schedule an asynchronous data write after a preceding operation. ] [[* const async_data_op_req< const T > &]: ['req]:  
+] [Schedule an asynchronous data write after a preceding operation. ] [[* const async_data_op_req< const T > &]: ['req]:  An async_data_op_req<const T> structure.
 
 
+
+][
+An op handle. 
 
 
 ]]
@@ -361,6 +370,15 @@ A batch of op handles.
 
 ][
 The page size of this architecture.
+
+
+]]
+[[``template<class T>
+std::vector< async_io_op > read(const std::vector< async_data_op_req< T >> & ops)``
+
+] [] [[* const std::vector< async_data_op_req< T >> &]: ['ops]:  
+
+
 
 
 ]]

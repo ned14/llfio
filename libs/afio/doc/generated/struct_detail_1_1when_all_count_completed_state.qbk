@@ -20,7 +20,7 @@
   promise< std::vector< std::shared_ptr< detail::async_io_handle > > > done;  // 
   std::vector< async_io_op > inputs;                                          // 
   std::vector< std::shared_ptr< detail::async_io_handle > > out;              // 
-  std::atomic< size_t > togo;                                                 // 
+  atomic< size_t > togo;                                                      // 
 };
 ``
 

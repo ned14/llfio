@@ -47,7 +47,9 @@
             be many op references, but only one unique op. You can distinguish between
             ops using their dispatcher parent pointer and the id field, which is
             always a unique non-zero <code class="computeroutput"><span class="identifier">size_t</span></code>
-            value<a href="#ftn.afio.design.overview.f0" class="footnote" name="afio.design.overview.f0"><sup class="footnote">[3]</sup></a>.
+            value<a href="#ftn.afio.design.overview.f0" class="footnote" name="afio.design.overview.f0"><sup class="footnote">[3]</sup></a>. An op's id is guaranteed to be unique within its dispatcher
+            until its last op reference is destructed, at which point that id becomes
+            available for reuse.
           </li>
 <li class="listitem">
             <a class="link" href="../reference/functions/when_all_ops.html" title="when_all() (ops)"><code class="computeroutput"><span class="identifier">when_all</span><span class="special">()</span></code></a> returns a future which will
@@ -58,7 +60,8 @@
             <a class="link" href="../reference/classes/async_file_io_dispatcher_base/barrier.html" title="barrier (batch)"><code class="computeroutput"><span class="identifier">async_file_io_dispatcher_base</span><span class="special">::</span><span class="identifier">barrier</span><span class="special">()</span></code></a>
             schedules a synchronisation of its input batch of ops by only completing
             any of its output batch (which is a duplicate of its input) when the
-            very last one of its inputs completes.
+            very last one of its inputs completes. This is effectively an asynchronous
+            <code class="computeroutput"><span class="identifier">when_all</span><span class="special">()</span></code>.
           </li>
 </ul></div>
 <p>
@@ -80,14 +83,15 @@
             significantly faster than a multitude of single APIs.
             <p>
               As much as AFIO is as constrained by the system-level filing system
-              API as anyone else, AFIO employs a thread pool as a crude, universally
-              portable method of dispatching multiple filing system operations at
-              the same time. For those platforms which support a less crude method
-              of delivering batches of filing system operations e.g. an actual batch
-              API, that is used instead. Additionally, micro-kernel platforms are
-              always able to multiplex <span class="emphasis"><em>any</em></span> set of asynchronous
-              syscalls using a single thread, so for those platforms no thread pool
-              is needed at all.
+              API as anyone else, AFIO employs a thread source (which is probably
+              a thread pool, but could be anything) as a crude, universally portable
+              method of dispatching multiple filing system operations at the same
+              time. For those platforms which support a less crude method of delivering
+              batches of filing system operations e.g. an actual batch API, that
+              is used instead. Additionally, micro-kernel platforms are always able
+              to multiplex <span class="emphasis"><em>any</em></span> set of asynchronous syscalls
+              using a single thread, so for those platforms no thread pool is needed
+              at all.
             </p>
           </li>
 <li class="listitem">
@@ -108,7 +112,8 @@
                   function, and that input later errors during the wait, if that
                   <code class="computeroutput"><span class="identifier">when_all</span><span class="special">()</span></code>
                   function is not a <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">nothrow_t</span></code>
-                  variant the exception will be rethrown.
+                  variant the exception will be rethrown at the point that one waits
+                  on the future returned by the <code class="computeroutput"><span class="identifier">when_all</span><span class="special">()</span></code>.
                 </li>
 <li class="listitem">
                   If you schedule an operation with a precondition which errors,
@@ -119,13 +124,16 @@
                   really needs to know if its preceding operation errored, just go
                   ahead and check for it manually using the <code class="computeroutput"><span class="identifier">h</span></code>
                   member which is a shared_ptr to a future -- if that future contains
-                  an exception, your precondition has errored.
+                  an exception, your precondition has errored<a href="#ftn.afio.design.overview.f1" class="footnote" name="afio.design.overview.f1"><sup class="footnote">[4]</sup></a>.
                 </li>
 <li class="listitem">
                   The only exception to the preceding rule is the <code class="computeroutput"><span class="identifier">barrier</span><span class="special">()</span></code> call which <span class="bold"><strong>DOES</strong></span>
                   propagate errored state to its output. Something which catches
                   a lot of people is that the first rule also applies to <code class="computeroutput"><span class="identifier">barrier</span><span class="special">()</span></code>,
-                  so if an input op is errored on entry to <code class="computeroutput"><span class="identifier">barrier</span><span class="special">()</span></code>, it rethrows there and then.
+                  so if an input op is errored on entry to <code class="computeroutput"><span class="identifier">barrier</span><span class="special">()</span></code>, it rethrows there and then,
+                  but if that input op errored a microsecond after the <code class="computeroutput"><span class="identifier">barrier</span><span class="special">()</span></code>
+                  started, then it does not rethrow but instead propagates the errored
+                  state into its output.
                 </li>
 </ol></div>
           </li>
@@ -140,14 +148,15 @@
             and timers are provided already by <a href="http://www.boost.org/libs/asio/" target="_top">Boost.ASIO</a>
             which can be wrapped as preconditions for other operations.
             <p>
-              It also means that we use the native standard C++ library futures and
-              promises (or their Boost.Thread equivalents) plus other multithreading
-              facilities. These are not as fast as custom written support could be,
-              but they do have the big advantage of enabling easy interoperation
-              with other C++ code. Besides, as libraries such as Boost.AFIO start
-              to tax standard C++ library multithreading implementations in novel
-              ways, I am sure that the performance penalty will decrease over time
-              as STL vendors do their tuning.
+              It also means that we use the native standard C++ library multithreading
+              facilities (with the exception of futures and promises where we always
+              currently use Boost's implementations due to their much superior feature
+              set). These are not as fast as custom written support could be, but
+              they do have the big advantage of enabling easy interoperation with
+              other C++ code. Besides, as libraries such as Boost.AFIO start to tax
+              standard C++ library multithreading implementations in novel ways,
+              I am sure that the performance penalty will decrease over time as STL
+              vendors do their tuning.
             </p>
           </li>
 <li class="listitem">
@@ -164,7 +173,7 @@
             a convenient lightweight batch op container which would ordinarily be
             suicidal for performance under C++03, but under C++11 the compiler simply
             move constructs the contents by swapping as little as sixteen bytes
-            <a href="#ftn.afio.design.overview.f1" class="footnote" name="afio.design.overview.f1"><sup class="footnote">[4]</sup></a>. On top of that, passing around by value lets the compiler
+            <a href="#ftn.afio.design.overview.f2" class="footnote" name="afio.design.overview.f2"><sup class="footnote">[5]</sup></a>. On top of that, passing around by value lets the compiler
             easily perform alias optimisations with no need for a <code class="computeroutput"><span class="identifier">restrict</span></code>
             keyword, so in general AFIO passes things around by value wherever possible
             and lets the compiler figure out the optimal course of action.
@@ -186,6 +195,11 @@
               yet in the hash table of currently known operations.
             </p></div>
 <div id="ftn.afio.design.overview.f1" class="footnote"><p><a href="#afio.design.overview.f1" class="para"><sup class="para">[4] </sup></a>
+                    There is a single exception to this: where an immediate completion
+                    handler is being invoked from an operation which has errored.
+                    See reference documentation on this.
+                  </p></div>
+<div id="ftn.afio.design.overview.f2" class="footnote"><p><a href="#afio.design.overview.f2" class="para"><sup class="para">[5] </sup></a>
               Note that on older compilers with earlier versions of C++11 support,
               automatic use of move construction where a copy constructor is also
               available isn't implemented. We try to use <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">move</span><span class="special">()</span></code> where we can to help the compiler,

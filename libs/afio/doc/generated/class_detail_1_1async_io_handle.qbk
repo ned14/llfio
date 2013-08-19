@@ -48,7 +48,7 @@ The abstract base class encapsulating a platform-specific file handle.
 
 
 ]]
-[[``const std::chrono::system_clock::time_point & opened()``
+[[``const chrono::system_clock::time_point & opened()``
 
 ] [Returns when this handle was opened. ] [
 

@@ -39,17 +39,18 @@
       Note that Boost.AFIO was originally written purely in C++11 and backported
       later to older compilers. It requires, as an absolute minimum, a compiler with
       rvalue reference support. Some popular compilers known to be minimally sufficient
-      include:
+      thanks to our Jenkins CI bot include:
     </p>
 <div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
 <li class="listitem">
-          Microsoft Visual Studio 2010.
+          Microsoft Visual Studio 2010, released in 2010.
         </li>
 <li class="listitem">
-          GNU Compiler Collection v4.3.
+          GNU Compiler Collection v4.6, released in 2011, but may work with as early
+          as GCC v4.3.
         </li>
 <li class="listitem">
-          clang v2.9.
+          clang v3.1, released in 2012, but may work with as early as clang v2.9.
         </li>
 </ul></div>
 <p>
@@ -59,27 +60,35 @@
       v2.1) and auto-generate implicit move constructors when all member data types
       have move constructors (known as rvalue references v3.0). You may find the
       list of C++11 features in popular compilers at <a href="http://wiki.apache.org/stdcxx/C++0xCompilerSupport" target="_top">http://wiki.apache.org/stdcxx/C++0xCompilerSupport</a>
-      useful.
+      useful. Similarly, just because a compiler will compile the code does not mean
+      that programming using that compiler and Boost.AFIO isn't a waste of your time.
+      In particular, you should <span class="bold"><strong>avoid VS2010 and Mingw32 (not
+      Mingw-w64 which is fine) if at all possible</strong></span>, but if you can't,
+      <a class="link" href="vs2010_notes.html" title="Notes on using AFIO with Microsoft Visual Studio 2010 and Mingw32">we have written a guide especially for VS2010
+      and Mingw32</a>.
     </p>
 <p>
       As a very quick example of minimal usage:
     </p>
 <pre class="programlisting"><span class="comment">// Create a dispatcher instance</span>
-<span class="keyword">auto</span> <span class="identifier">dispatcher</span><span class="special">=</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_file_io_dispatcher</span><span class="special">();</span>
+<span class="keyword">auto</span> <span class="identifier">dispatcher</span><span class="special">=</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">make_async_file_io_dispatcher</span><span class="special">();</span>
 
 <span class="comment">// Schedule an asynchronous call of some function with some bound set of arguments</span>
-<span class="keyword">auto</span> <span class="identifier">helloworld</span><span class="special">=</span><span class="identifier">dispatcher</span><span class="special">.</span><span class="identifier">call</span><span class="special">([](</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span> <span class="identifier">text</span><span class="special">)</span> <span class="special">{</span>
+<span class="keyword">auto</span> <span class="identifier">helloworld</span><span class="special">=</span><span class="identifier">dispatcher</span><span class="special">-&gt;</span><span class="identifier">call</span><span class="special">(</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_io_op</span><span class="special">()</span> <span class="comment">/* no precondition */</span><span class="special">,</span> <span class="special">[](</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span> <span class="identifier">text</span><span class="special">)</span> <span class="special">-&gt;</span> <span class="keyword">int</span> <span class="special">{</span>
     <span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="identifier">text</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span>
     <span class="keyword">return</span> <span class="number">42</span><span class="special">;</span>
-<span class="special">},</span> <span class="string">"Hello world"</span><span class="special">);</span>
+<span class="special">},</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span><span class="special">(</span><span class="string">"Hello world"</span><span class="special">));</span> <span class="comment">// Returns a pair of &lt;future, op ref&gt;</span>
 
 <span class="comment">// Schedule as asynchronous call of some function to occur only after helloworld completes</span>
-<span class="keyword">auto</span> <span class="identifier">addtovalue</span><span class="special">=</span><span class="identifier">dispatcher</span><span class="special">.</span><span class="identifier">call</span><span class="special">(</span><span class="identifier">helloworld</span><span class="special">.</span><span class="identifier">second</span><span class="special">,</span> <span class="special">[](</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">future</span><span class="special">&lt;</span><span class="keyword">int</span><span class="special">&gt;</span> <span class="identifier">v</span><span class="special">)</span> <span class="special">{</span>
+<span class="keyword">auto</span> <span class="identifier">addtovalue</span><span class="special">=</span><span class="identifier">dispatcher</span><span class="special">-&gt;</span><span class="identifier">call</span><span class="special">(</span><span class="identifier">helloworld</span><span class="special">.</span><span class="identifier">second</span><span class="special">,</span> <span class="special">[](</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">future</span><span class="special">&lt;</span><span class="keyword">int</span><span class="special">&gt;</span> <span class="special">&amp;</span><span class="identifier">v</span><span class="special">)</span> <span class="special">-&gt;</span> <span class="keyword">int</span> <span class="special">{</span>
+    <span class="comment">// v is highly likely to be ready very soon by the time we are called</span>
     <span class="keyword">return</span> <span class="identifier">v</span><span class="special">.</span><span class="identifier">get</span><span class="special">()+</span><span class="number">1</span><span class="special">;</span>
-<span class="special">},</span> <span class="identifier">helloworld</span><span class="special">.</span><span class="identifier">first</span><span class="special">);</span>
+<span class="special">},</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">ref</span><span class="special">(</span><span class="identifier">helloworld</span><span class="special">.</span><span class="identifier">first</span><span class="special">));</span>
 
-<span class="comment">// Create a boost::future&lt;&gt; representing the ops passed to when_all() and wait for it to complete</span>
-<span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">when_all</span><span class="special">(</span><span class="identifier">addtovalue</span><span class="special">.</span><span class="identifier">second</span><span class="special">).</span><span class="identifier">wait</span><span class="special">();</span>
+<span class="comment">// Create a boost::future&lt;&gt; representing the ops passed to when_all()</span>
+<span class="keyword">auto</span> <span class="identifier">future</span><span class="special">=</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">when_all</span><span class="special">(</span><span class="identifier">addtovalue</span><span class="special">.</span><span class="identifier">second</span><span class="special">);</span>
+<span class="comment">// ... and wait for it to complete</span>
+<span class="identifier">future</span><span class="special">.</span><span class="identifier">wait</span><span class="special">();</span>
 
 <span class="comment">// Print the result returned by the future for the lambda, which will be 43</span>
 <span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="string">"addtovalue() returned "</span> <span class="special">&lt;&lt;</span> <span class="identifier">addtovalue</span><span class="special">.</span><span class="identifier">first</span><span class="special">.</span><span class="identifier">get</span><span class="special">()</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span>
