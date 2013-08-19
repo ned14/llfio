@@ -1220,7 +1220,6 @@ template<> async_file_io_dispatcher_base::completion_returntype async_file_io_di
 		exception_ptr e(get_exception_ptr(thisresult));
 		complete_async_op(s.out[idx].first, s.out[idx].second, e);
 	}
-	idx=state.second;
 	// Am I being called because my precondition threw an exception so we're actually currently inside an exception catch?
 	// If so then duplicate the same exception throw
 	if(e && *e)
