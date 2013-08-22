@@ -84,7 +84,15 @@ if $(test_files)
 }
 else
 {
-    test_files = [ glob tests/*.cpp ] ;
+    # Don't do any of the fsyncing tests on the CI, as it murders the poor hard drive
+    if "--running-in-ci" in $(.argv)
+	{
+        test_files = [ glob tests/*.cpp : tests/*sync* tests/*autoflush* ] ;
+	}
+	else
+	{
+        test_files = [ glob tests/*.cpp ] ;
+	}
     test_files_all = $(test_files) test_all.cpp ;
 }
 
@@ -104,11 +112,13 @@ else # run actual tests
 {
     if [ os.name ] = "NT"
     {
-        SHELL "del results*.xml" ;
+        SHELL "rmdir /S results_tests" ;
+        SHELL "mkdir results_tests" ;
     }
     else
     {
-        SHELL "rm results*.xml" ;
+        SHELL "rm -rf results_tests" ;
+        SHELL "mkdir results_tests" ;
     }
     if "--test-all" in $(.argv)   # run the whole test suite at once
     {
