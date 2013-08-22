@@ -55,6 +55,7 @@ static inline void watchdog_thread(size_t timeout)
 	boost::unique_lock<boost::mutex> lock(m);
 	if(boost::cv_status::timeout==cv.wait_for(lock, d))
 	{
+		BOOST_CHECK_MESSAGE(false, "Test timed out");
 		std::cerr << "Test timed out" << std::endl;
 		abort();
 	}
