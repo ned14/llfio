@@ -87,7 +87,7 @@ else
     # Don't do any of the fsyncing tests on the CI, as it murders the poor hard drive
     if "--running-in-ci" in $(.argv)
 	{
-        test_files = [ glob tests/*.cpp : tests/*sync* tests/*autoflush* ] ;
+        test_files = [ glob tests/*.cpp : tests/*sync_test.cpp tests/*autoflush_test.cpp ] ;
 	}
 	else
 	{
@@ -112,7 +112,7 @@ else # run actual tests
 {
     if [ os.name ] = "NT"
     {
-        SHELL "rmdir /S results_tests" ;
+        SHELL "rmdir /S /Q results_tests" ;
         SHELL "mkdir results_tests" ;
     }
     else
