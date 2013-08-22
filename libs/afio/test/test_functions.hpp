@@ -46,6 +46,20 @@ try{\
 	/*BOOST_CHECK(true);*/ \
 }catch(...){BOOST_FAIL("Exception was thrown");}
 
+// Boost.Test uses alarm() to timeout tests, which is nearly useless. Hence do our own.
+static inline void watchdog_thread(size_t timeout)
+{
+	boost::chrono::duration<size_t> d(timeout);
+	boost::mutex m;
+	boost::condition_variable cv;
+	boost::unique_lock<boost::mutex> lock(m);
+	if(boost::cv_status::timeout==cv.wait_for(lock, d))
+	{
+		std::cerr << "Test timed out" << std::endl;
+		abort();
+	}
+}
+
 // Define a unit test description and timeout
 #define BOOST_AFIO_AUTO_TEST_CASE(test_name, desc, timeout)             \
 struct test_name : public BOOST_AUTO_TEST_CASE_FIXTURE { void test_method(); }; \
@@ -55,7 +69,8 @@ static void BOOST_AUTO_TC_INVOKER( test_name )()                        \
     test_name t;                                                        \
 	boost::unit_test::unit_test_monitor_t::instance().p_timeout.set(timeout); \
 	BOOST_TEST_MESSAGE(desc);                                           \
-	boost::unit_test::unit_test_monitor_t::instance().execute([&]() -> int {t.test_method(); return 0; }); \
+	boost::thread watchdog(watchdog_thread, timeout);                   \
+	boost::unit_test::unit_test_monitor_t::instance().execute([&]() -> int { t.test_method(); watchdog.interrupt(); watchdog.join(); return 0; }); \
 }                                                                       \
                                                                         \
 struct BOOST_AUTO_TC_UNIQUE_ID( test_name ) {};                         \
