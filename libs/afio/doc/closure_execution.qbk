@@ -338,18 +338,16 @@ __boost_afio__ provides several methods to synchronize results for asynchronous 
 
 [table Comparison of N3558 with __boost_afio__ Equivalents
     [ [N3558 Feature] [__boost_afio__ Equivalent] ]
-    [ [`future<int> f1 = async([]() { return 123; });`] 
-      [```
-auto dispatcher = boost::afio::make_async_file_io_dispatcher();
-std::pair<future<int>, async_io_op> someop = dispatcher->call(boost::afio::async_io_op(), []() { 
-    return 123; }); 
-        ```] ]
     [ [```
+future<int> f1 = async([]() { return 123; });
 future<string> f2 = f1.then([](future<int> f) {
     return f.get().to_string(); // here .get() won’t block
  });
         ```] 
       [```
+auto dispatcher = boost::afio::make_async_file_io_dispatcher();
+std::pair<future<int>, async_io_op> someop = dispatcher->call(boost::afio::async_io_op(), []() { 
+    return 123; }); 
 std::pair<future<string>, async_io_op> chainedfuture = dispatcher->call(someop.second, [](future<int> f){ 
     return f.get().to_string();}, someop.first);
         ```] ]
