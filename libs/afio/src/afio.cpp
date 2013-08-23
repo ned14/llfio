@@ -1233,7 +1233,7 @@ std::vector<async_io_op> async_file_io_dispatcher_base::barrier(const std::vecto
 #if BOOST_AFIO_VALIDATE_INPUTS
 		BOOST_FOREACH(auto &i, ops)
         {
-			if(!i.validate())
+			if(!i.validate(false))
 				BOOST_AFIO_THROW(std::runtime_error("Inputs are invalid."));
         }
 #endif
@@ -1382,6 +1382,7 @@ namespace detail {
 					complete_async_op(id, h);
 				BOOST_AFIO_DEBUG_PRINT("H %u e=%u\n", (unsigned) id, (unsigned) ec.value());
 			}
+			//std::cout << "id=" << id << " total=" << bytes_to_transfer->second << " this=" << bytes_transferred << std::endl;
 		}
 		template<bool iswrite> void doreadwrite(size_t id, std::shared_ptr<detail::async_io_handle> h, exception_ptr *, detail::async_data_op_req_impl<iswrite> req, async_io_handle_windows *p)
 		{

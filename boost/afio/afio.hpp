@@ -373,8 +373,8 @@ private:
 	template<class R> static void invoke_packagedtask(std::shared_ptr<packaged_task<R()>> t) { (*t)(); }
 protected:
 	boost::asio::io_service service;
-	boost::asio::io_service::work working;
-	thread_source() : working(service)
+	std::unique_ptr<boost::asio::io_service::work> working;
+	thread_source() : working(new boost::asio::io_service::work(service))
 	{
 	}
 public:
@@ -433,16 +433,23 @@ public:
 			workers.push_back(std::unique_ptr<thread>(new thread(worker(this))));
 	}
     //! Destroys the thread pool, waiting for worker threads to exit beforehand.
+	void destroy()
+	{
+		if(!service.stopped())
+		{
+			// Tell the threads there is no more work to do
+			working.reset();
+			BOOST_FOREACH(auto &i, workers) { i->join(); }
+			// For some reason ASIO occasionally thinks there is still more work to do
+			if(!service.stopped())
+				service.run();
+			service.stop();
+			service.reset();
+		}
+	}
 	~std_thread_pool()
 	{
-		// Windows seems to like occasionally ignoring the stop(), so pulse it until it works
-		while(!service.stopped())
-		{
-			service.stop();
-			boost::this_thread::yield();
-		}
-		BOOST_FOREACH(auto &i, workers)
-        {	i->join();}
+		destroy();
 	}
 };
 /*! \brief Returns the process threadpool
@@ -1190,12 +1197,16 @@ struct async_io_op
     //! \massign
 	async_io_op &operator=(async_io_op &&o) BOOST_NOEXCEPT_OR_NOTHROW { parent=std::move(o.parent); id=std::move(o.id); h=std::move(o.h); return *this; }
 	//! Validates contents
-	bool validate() const
+	bool validate(bool check_handle=true) const
 	{
 		if(!parent || !id) return false;
 		// If h is valid and ready and contains an exception, throw it now
 		if(h->valid() && h->is_ready() /*h->wait_for(seconds(0))==future_status::ready*/)
-			h->get();
+			if(!check_handle)
+				h->get();
+			else
+				if(!h->get().get())
+					return false;
 		return true;
 	}
 private:
