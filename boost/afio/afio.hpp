@@ -1222,11 +1222,13 @@ struct async_io_op
 		if(!parent || !id) return false;
 		// If h is valid and ready and contains an exception, throw it now
 		if(h->valid() && h->is_ready() /*h->wait_for(seconds(0))==future_status::ready*/)
+		{
 			if(!check_handle)
 				h->get();
 			else
 				if(!h->get().get())
 					return false;
+		}
 		return true;
 	}
 private:
