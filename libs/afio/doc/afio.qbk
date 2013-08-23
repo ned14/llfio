@@ -81,7 +81,6 @@ As a very quick example of minimal usage:
 
 [include design_rationale.qbk]
 [include compiling.qbk]
-[include closure_execution.qbk]
 [include quickstart.qbk]
 [include reference.qbk]
 [include vs2010_notes.qbk]
