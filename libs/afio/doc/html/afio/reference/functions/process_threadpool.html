@@ -27,7 +27,7 @@
 <a name="afio.reference.functions.process_threadpool"></a><a class="link" href="process_threadpool.html" title="process_threadpool">process_threadpool</a>
 </h4></div></div></div>
 <p>
-          <a class="indexterm" name="id901412"></a>
+          <a class="indexterm" name="id895181"></a>
 Returns the process threadpool.
         </p>
 <h6>
@@ -35,14 +35,14 @@ Returns the process threadpool.
           <span class="phrase"><a name="afio.reference.functions.process_threadpool.description"></a></span><a class="link" href="process_threadpool.html#afio.reference.functions.process_threadpool.description">Description</a>
         </h6>
 <p>
-          On first use, this instantiates a default std_thread_pool running eight
-          threads.
+          On first use, this instantiates a default std_thread_pool running <code class="literal"><code class="computeroutput"><span class="identifier">BOOST_AFIO_MAX_NON_ASYNC_QUEUE_DEPTH</span></code></code>
+          threads which will remain until its shared count reaches zero.
         </p>
 <h6>
 <a name="afio.reference.functions.process_threadpool.h1"></a>
           <span class="phrase"><a name="afio.reference.functions.process_threadpool.synopsis"></a></span><a class="link" href="process_threadpool.html#afio.reference.functions.process_threadpool.synopsis">Synopsis</a>
         </h6>
-<pre class="programlisting"><span class="identifier">BOOST_AFIO_DECL</span> <span class="identifier">std_thread_pool</span><span class="special">&amp;</span> <span class="identifier">process_threadpool</span><span class="special">()</span></pre>
+<pre class="programlisting"><span class="identifier">BOOST_AFIO_DECL</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span><span class="identifier">std_thread_pool</span><span class="special">&gt;</span> <span class="identifier">process_threadpool</span><span class="special">()</span></pre>
 <h6>
 <a name="afio.reference.functions.process_threadpool.h2"></a>
           <span class="phrase"><a name="afio.reference.functions.process_threadpool.parameters"></a></span><a class="link" href="process_threadpool.html#afio.reference.functions.process_threadpool.parameters">Parameters</a>

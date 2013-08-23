@@ -94,9 +94,11 @@ The id field is always valid (and non-zero) if this reference is valid. The h fi
 
 
 ]]
-[[``bool validate()``
+[[``bool validate(bool check_handle = true)``
 
-] [Validates contents. ] [
+] [Validates contents. ] [[* bool]: ['check_handle]:  
+
+
 
 
 ]]

@@ -371,9 +371,14 @@ namespace chrono {
 }
 
 /*! \class thread_source
-\brief A source of thread workers
+\brief Abstract base class for a source of thread workers
+
+This instantiates a `boost::asio::io_service` and a latchable `boost::asio::io_service::work` to keep any threads working.
+Note that in Boost 1.54, and possibly later versions, `boost::asio::io_service` on Windows appears to dislike being
+destructed during static data deinit, hence why this inherits from `std::enable_shared_from_this<>` in order that it
+may be reference count deleted before static data deinit occurs.
 */
-class thread_source {
+class thread_source : public std::enable_shared_from_this<thread_source> {
 private:
 	template<class R> static void invoke_packagedtask(std::shared_ptr<packaged_task<R()>> t) { (*t)(); }
 protected:
@@ -382,10 +387,14 @@ protected:
 	thread_source() : working(new boost::asio::io_service::work(service))
 	{
 	}
+	thread_source(size_t concurrency_hint) : service(concurrency_hint), working(new boost::asio::io_service::work(service))
+	{
+	}
+	virtual ~thread_source() { }
 public:
 	//! Returns the underlying io_service
 	boost::asio::io_service &io_service() { return service; }
-	//! Sends some callable entity to the thread pool for execution
+	//! Sends some callable entity to the thread pool for execution \return A future for the enqueued callable \tparam "class F" Any callable type \param f Any instance of a callable type F
 	template<class F> future<typename std::result_of<F()>::type> enqueue(F f)
 	{
 		typedef typename std::result_of<F()>::type R;
@@ -428,12 +437,17 @@ class std_thread_pool : public thread_source {
 
 	std::vector< std::unique_ptr<thread> > workers;
 public:
-	/*! Constructs a thread pool of \em no workers
+	/*! \brief Constructs a thread pool of \em no workers
     \param no The number of worker threads to create
     */
 	explicit std_thread_pool(size_t no)
 	{
-		workers.reserve(no);
+		add_workers(no);
+	}
+	//! Adds more workers to the thread pool \param no The number of worker threads to add
+	void add_workers(size_t no)
+	{
+		workers.reserve(workers.size()+no);
 		for(size_t n=0; n<no; n++)
 			workers.push_back(std::unique_ptr<thread>(new thread(worker(this))));
 	}
@@ -445,6 +459,7 @@ public:
 			// Tell the threads there is no more work to do
 			working.reset();
 			BOOST_FOREACH(auto &i, workers) { i->join(); }
+			workers.clear();
 			// For some reason ASIO occasionally thinks there is still more work to do
 			if(!service.stopped())
 				service.run();
@@ -459,10 +474,10 @@ public:
 };
 /*! \brief Returns the process threadpool
 
-On first use, this instantiates a default std_thread_pool running eight threads.
+On first use, this instantiates a default std_thread_pool running `BOOST_AFIO_MAX_NON_ASYNC_QUEUE_DEPTH` threads which will remain until its shared count reaches zero.
 \ingroup process_threadpool
 */
-extern BOOST_AFIO_DECL std_thread_pool &process_threadpool();
+extern BOOST_AFIO_DECL std::shared_ptr<std_thread_pool> process_threadpool();
 
 namespace detail {
 	template<class returns_t, class future_type> inline returns_t when_all_do(std::shared_ptr<std::vector<future_type>> futures)
@@ -508,7 +523,7 @@ template <class InputIterator> inline future<std::vector<typename std::decay<dec
 #endif
 	// Bind to my delegate and invoke
 	std::function<returns_t ()> waitforall(std::move(std::bind(&detail::when_all_do<returns_t, future_type>, futures)));
-	return process_threadpool().enqueue(std::move(waitforall));
+	return process_threadpool()->enqueue(std::move(waitforall));
 }
 //! Returns a future tuple of results from all the supplied futures
 //template <typename... T> inline future<std::tuple<typename std::decay<T...>::type>> when_all(T&&... futures);
@@ -541,7 +556,7 @@ template <class InputIterator> inline future<std::pair<size_t, typename std::dec
 #endif
 	// Bind to my delegate and invoke
 	std::function<returns_t ()> waitforall(std::move(std::bind(&detail::when_any_do<returns_t, future_type>, futures)));
-	return process_threadpool().enqueue(std::move(waitforall));
+	return process_threadpool()->enqueue(std::move(waitforall));
 }
 //! Returns a future result from the first of the supplied futures
 /*template <typename... T> inline future<std::pair<size_t, typename std::decay<T>::type>> when_any(T&&... futures)
@@ -715,13 +730,13 @@ class BOOST_AFIO_DECL async_file_io_dispatcher_base : public std::enable_shared_
 	void int_add_io_handle(void *key, std::shared_ptr<detail::async_io_handle> h);
 	void int_del_io_handle(void *key);
 protected:
-	async_file_io_dispatcher_base(thread_source &threadpool, file_flags flagsforce, file_flags flagsmask);
+	async_file_io_dispatcher_base(std::shared_ptr<thread_source> threadpool, file_flags flagsforce, file_flags flagsmask);
 public:
 	//! Destroys the dispatcher, blocking inefficiently if any ops are still in flight.
 	virtual ~async_file_io_dispatcher_base();
 
 	//! Returns the thread source used by this dispatcher
-	thread_source &threadsource() const;
+	std::weak_ptr<thread_source> threadsource() const;
 	//! Returns file flags as would be used after forcing and masking bits passed during construction
 	file_flags fileflags(file_flags flags) const;
 	//! Returns the current wait queue depth of this dispatcher
@@ -1164,7 +1179,7 @@ For slow hard drives, or worse, SANs, a queue depth of 64 or higher might delive
 [call_example]
 }
 */
-extern BOOST_AFIO_DECL std::shared_ptr<async_file_io_dispatcher_base> make_async_file_io_dispatcher(thread_source &threadpool=process_threadpool(), file_flags flagsforce=file_flags::None, file_flags flagsmask=file_flags::None);
+extern BOOST_AFIO_DECL std::shared_ptr<async_file_io_dispatcher_base> make_async_file_io_dispatcher(std::shared_ptr<thread_source> threadpool=process_threadpool(), file_flags flagsforce=file_flags::None, file_flags flagsmask=file_flags::None);
 
 /*! \struct async_io_op
 \brief A reference to an asynchronous operation

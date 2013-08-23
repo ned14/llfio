@@ -33,7 +33,8 @@
 [section:classes Classes]
 [include generated/class_async_file_io_dispatcher_base.qbk]
 [include generated/class_detail_1_1async_io_handle.qbk]
-[include generated/class_thread_pool.qbk]
+[include generated/class_thread_source.qbk]
+[include generated/class_std_thread_pool.qbk]
 [endsect]
 
 [section:functions Functions]

@@ -54,7 +54,8 @@ afio/reference/classes/async_file_io_dispatcher_base/write_1_single.html
 afio/reference/classes/async_file_io_dispatcher_base/barrier.html
 afio/reference/classes/async_file_io_dispatcher_base/page_size.html
 afio/reference/classes/detail_async_io_handle.html
-afio/reference/classes/thread_pool.html
+afio/reference/classes/thread_source.html
+afio/reference/classes/std_thread_pool.html
 afio/reference/functions.html
 afio/reference/functions/make_async_file_io_dispatcher.html
 afio/reference/functions/process_threadpool.html
