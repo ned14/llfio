@@ -47,6 +47,11 @@ File Created: Mar 2013
 #include <atomic>
 #include <mutex>
 #endif
+#if (defined(__MINGW32__) && !defined(__MINGW64_VERSION_MAJOR)) // Mingw32 not Mingw-w64
+// Mingw32's std::atomic isn't threadsafe :)
+#include "boost/atomic.hpp"
+#define BOOST_AFIO_USE_BOOST_ATOMIC
+#endif
 
 #include "boost/asio.hpp"
 #include "boost/thread/thread.hpp"
