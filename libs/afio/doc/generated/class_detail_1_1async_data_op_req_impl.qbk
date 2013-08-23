@@ -73,13 +73,13 @@ class detail::async_data_op_req_impl
 ]]
 [[``async_data_op_req_impl(async_io_op _precondition, void_type v, size_t _length, off_t _where)``
 
-] [Constructs an instance. ] [[* async_io_op]: ['_precondition]:  An optional precondition for this operation 
+] [Constructs an instance. ] [[* async_io_op]: ['_precondition]:  An optional precondition for this operation
 
-[* void_type]: ['v]:  A pointer to memory or reference to object into which to read or write 
+[* void_type]: ['v]:  A pointer to memory or reference to object into which to read or write
 
 [* size_t]: ['_length]:  The number of bytes to transfer 
 
-[* off_t]: ['_where]:  The offset at which to transfer 
+[* off_t]: ['_where]:  The offset at which to transfer
 
 
 
@@ -88,11 +88,11 @@ class detail::async_data_op_req_impl
 [[``template<class T>
 async_data_op_req_impl(async_io_op _precondition, std::vector< T > _buffers, off_t _where)``
 
-] [Constructs an instance. ] [[* async_io_op]: ['_precondition]:  An optional precondition for this operation 
+] [Constructs an instance. ] [[* async_io_op]: ['_precondition]:  An optional precondition for this operation
 
-[* std::vector< T >]: ['_buffers]:  A sequence of mutable/const Boost.ASIO buffers to read into/write from 
+[* std::vector< T >]: ['_buffers]:  A sequence of mutable/const Boost.ASIO buffers to read into/write from
 
-[* off_t]: ['_where]:  The offset at which to transfer 
+[* off_t]: ['_where]:  The offset at which to transfer
 
 
 

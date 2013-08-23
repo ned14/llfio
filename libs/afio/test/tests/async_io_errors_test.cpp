@@ -1,4 +1,4 @@
-#include "test_functions.hpp"
+#include "../test_functions.hpp"
 
 BOOST_AFIO_AUTO_TEST_CASE(async_io_errors, "Tests that the async i/o error handling works", 120)
 {
@@ -17,7 +17,7 @@ BOOST_AFIO_AUTO_TEST_CASE(async_io_errors, "Tests that the async i/o error handl
          * was for the good anyway, but still painful). So, let's really hammer this API
          * such that it never, ever slightly fails to function ever again!
          */
-#if defined(BOOST_MSVC) && BOOST_MSVC < 1700 /* <= VS2010 */
+#if defined(BOOST_AFIO_RUNNING_IN_CI) || (defined(BOOST_MSVC) && BOOST_MSVC < 1700) /* <= VS2010 */
 		// Throwing exceptions in VS2010 randomly causes segfaults :(
         for(size_t n=0; n<500; n++)
 #elif defined(BOOST_MSVC) && BOOST_MSVC < 1800 /* <= VS2012 */ && (defined(DEBUG) || defined(_DEBUG))
@@ -91,13 +91,15 @@ BOOST_AFIO_AUTO_TEST_CASE(async_io_errors, "Tests that the async i/o error handl
 					continue;
 				}
 			} while(false);
-        }
+		}
 
+		//while(dispatcher->wait_queue_depth()>0)
+		//	boost::this_thread::yield();
 		if(filesystem::exists("testdir/a"))
 			filesystem::remove("testdir/a");
 		if(filesystem::exists("testdir"))
 			filesystem::remove("testdir");
-    }
+	}
 	// Add a single output to validate the test
 	BOOST_CHECK(true);
 }

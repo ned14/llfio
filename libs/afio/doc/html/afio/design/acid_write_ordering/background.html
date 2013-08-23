@@ -46,13 +46,20 @@
               The family of <code class="computeroutput"><span class="identifier">O_SYNC</span></code>
               or its equivalent per file handle flags, which simply disable any form
               of write back caching. These usually make all data write functions
-              not return until written data has reached non-volatile storage.
+              not return until written data has reached non-volatile storage. This
+              flag, for all intents and purposes, effectively asks for <span class="quote">&#8220;<span class="quote">old
+              fashioned</span>&#8221;</span> filing system behaviour.
             </li>
 <li class="listitem">
               The whole filing system cached written data flush, often performed
               by a function like <code class="computeroutput"><span class="identifier">sync</span><span class="special">()</span></code>. Unlike the previous two, this is
               usually an asynchronous operation and there is usually no portable
-              way of knowing when it has completed.
+              way of knowing when it has completed. Nevertheless, it is important
+              because on traditional Unix implementations data persistence is simply
+              <code class="computeroutput"><span class="identifier">sync</span><span class="special">()</span></code>
+              on a regular period cronjob, and while modern Unix implementations
+              usually no longer do this, the end implementation has not fundamentally
+              changed much<a href="#ftn.afio.design.acid_write_ordering.background.f0" class="footnote" name="afio.design.acid_write_ordering.background.f0"><sup class="footnote">[6]</sup></a>.
             </li>
 </ol></div>
 <p>
@@ -121,7 +128,7 @@
                 </td>
 <td>
                   <p>
-                    Varies<a href="#ftn.afio.design.acid_write_ordering.background.f0" class="footnote" name="afio.design.acid_write_ordering.background.f0"><sup class="footnote">[a]</sup></a>
+                    Varies<a href="#ftn.afio.design.acid_write_ordering.background.f1" class="footnote" name="afio.design.acid_write_ordering.background.f1"><sup class="footnote">[a]</sup></a>
                   </p>
                 </td>
 <td>
@@ -140,11 +147,11 @@
                 </td>
 </tr>
 </tbody>
-<tbody class="footnotes"><tr><td colspan="4"><div id="ftn.afio.design.acid_write_ordering.background.f0" class="footnote"><p><a href="#afio.design.acid_write_ordering.background.f0" class="para"><sup class="para">[a] </sup></a>
+<tbody class="footnotes"><tr><td colspan="4"><div id="ftn.afio.design.acid_write_ordering.background.f1" class="footnote"><p><a href="#afio.design.acid_write_ordering.background.f1" class="para"><sup class="para">[a] </sup></a>
                       Many filing systems (NTFS, HFS+, ext3/4 with <code class="computeroutput"><span class="identifier">data</span><span class="special">=</span><span class="identifier">ordered</span></code>) keep back a metadata
                       flush until when a file handle close causes data to finish
-                      reaching physical storage. This ensures that files don't appear
-                      in directories with zero sizes.
+                      reaching physical storage. This ensures that file entries don't
+                      appear in directories with zero sizes.
                     </p></div></td></tr></tbody>
 </table></div>
 </div>
@@ -165,13 +172,22 @@
           Most people think of <code class="computeroutput"><span class="identifier">fsync</span><span class="special">()</span></code>, <code class="computeroutput"><span class="identifier">O_SYNC</span></code>
           and <code class="computeroutput"><span class="identifier">sync</span><span class="special">()</span></code>
           in terms of flushing caches. An alternative way of thinking about them
-          is that they impose a write order on writes to non-volatile storage in
-          addition to the timeout based write order. There is no doubt that they
-          are a very crude and highly inefficient way of doing so, but they do open
-          the option of <span class="emphasis"><em>emulating</em></span> native filing system support
-          for write ordering constraints when nothing else better is available. So
-          why is the ability to constrain write ordering important?
+          is that they impose an order on writes to non-volatile storage which acts
+          above and beyond the timeout based write order. There is no doubt that
+          they are a very crude and highly inefficient way of doing so because they
+          are all or nothing, but they do open the option of <span class="emphasis"><em>emulating</em></span>
+          native filing system support for write ordering constraints when nothing
+          else better is available. So why is the ability to constrain write ordering
+          important?
         </p>
+<div class="footnotes">
+<br><hr style="width:100; text-align:left;margin-left: 0">
+<div id="ftn.afio.design.acid_write_ordering.background.f0" class="footnote"><p><a href="#afio.design.acid_write_ordering.background.f0" class="para"><sup class="para">[6] </sup></a>
+                The main change is that individual writes get an individual lifetime
+                before they must be written to storage rather flushing everything
+                according to some external wall clock.
+              </p></div>
+</div>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
 <td align="left"></td>

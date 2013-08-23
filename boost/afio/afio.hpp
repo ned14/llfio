@@ -15,9 +15,9 @@ File Created: Mar 2013
 #if !defined(_WIN32_WINNT) && defined(WIN32)
 #define _WIN32_WINNT 0x0501
 #endif
-// VS2010 needs D_VARIADIC_MAX set to at least six
-#if defined(BOOST_MSVC) && BOOST_MSVC < 1700 && (!defined(_VARIADIC_MAX) || _VARIADIC_MAX < 6)
-#error _VARIADIC_MAX needs to be set to at least six to compile Boost.AFIO
+// VS2010 needs D_VARIADIC_MAX set to at least seven
+#if defined(BOOST_MSVC) && BOOST_MSVC < 1700 && (!defined(_VARIADIC_MAX) || _VARIADIC_MAX < 7)
+#error _VARIADIC_MAX needs to be set to at least seven to compile Boost.AFIO
 #endif
 
 #include "config.hpp"
@@ -55,6 +55,10 @@ File Created: Mar 2013
 #include "detail/Preprocessor_variadic.hpp"
 #include <boost/detail/scoped_enum_emulation.hpp>
 
+#if BOOST_VERSION<105400
+#error Boosts before v1.54 have a memory corruption bug in boost::packaged_task<> when built under C++11 which makes this library useless. Get a newer Boost!
+#endif
+
 // Map in C++11 stuff if available
 #if (defined(__GLIBCXX__) && __GLIBCXX__<=20120920 /* <= GCC 4.7 */) || (defined(BOOST_MSVC) && BOOST_MSVC < 1700 /* <= VS2010 */)
 #include "boost/exception_ptr.hpp"
@@ -62,7 +66,14 @@ File Created: Mar 2013
 namespace boost { namespace afio {
 typedef boost::thread thread;
 inline boost::thread::id get_this_thread_id() { return boost::this_thread::get_id(); }
-inline boost::exception_ptr current_exception() { return boost::current_exception(); }
+// Both VS2010 and Mingw32 need this, but not Mingw-w64
+#if (defined(BOOST_MSVC) && BOOST_MSVC < 1700 /* <= VS2010 */) || (defined(__MINGW32__) && !defined(__MINGW64_VERSION_MAJOR))
+namespace detail { struct vs2010_lack_of_decent_current_exception_support_hack_t { }; BOOST_AFIO_DECL boost::exception_ptr &vs2010_lack_of_decent_current_exception_support_hack(); }
+inline boost::exception_ptr current_exception() { boost::exception_ptr ret=boost::current_exception(); return (ret==detail::vs2010_lack_of_decent_current_exception_support_hack()) ? boost::exception_ptr() : ret; }
+#define BOOST_AFIO_NEED_CURRENT_EXCEPTION_HACK
+#else
+inline boost::exception_ptr current_exception() { boost::current_exception(); }
+#endif
 #define BOOST_AFIO_THROW(x) boost::throw_exception(boost::enable_current_exception(x))
 #define BOOST_AFIO_RETHROW throw
 typedef boost::recursive_mutex recursive_mutex;
@@ -78,8 +89,42 @@ typedef std::recursive_mutex recursive_mutex;
 } }
 #endif
 
-#if BOOST_VERSION<105400
-#error Boosts before v1.54 have a memory corruption bug in boost::packaged_task<> when built under C++11 which makes this library useless. Get a newer Boost!
+// Need some portable way of throwing a really absolutely definitely fatal exception
+// If we guaranteed had noexcept, this would be easy, but for compilers without noexcept
+// we'll bounce through extern "C" as well just to be sure
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable: 4297) // function assumed not to throw an exception but does __declspec(nothrow) or throw() was specified on the function
+#endif
+#ifdef BOOST_AFIO_COMPILING_FOR_GCOV
+#define BOOST_AFIO_THROW_FATAL(x) std::terminate()
+#else
+namespace boost { namespace afio { namespace detail {
+	template<class T> inline void do_throw_fatal_exception(const T &v) BOOST_NOEXCEPT_OR_NOTHROW
+	{
+		throw v;
+	}
+	extern "C" inline void boost_afio_do_throw_fatal_exception(std::function<void()> impl) BOOST_NOEXCEPT_OR_NOTHROW { impl(); }
+	template<class T> inline void throw_fatal_exception(const T &v) BOOST_NOEXCEPT_OR_NOTHROW
+	{
+		// In case the extern "C" fails to terminate, trap and terminate here
+		try
+		{
+			std::function<void()> doer=std::bind(&do_throw_fatal_exception<T>, std::ref(v));
+			boost_afio_do_throw_fatal_exception(doer);
+		}
+		catch(...)
+		{
+			std::terminate(); // Sadly won't produce much of a useful error message
+		}
+	}
+} } }
+#ifndef BOOST_AFIO_THROW_FATAL
+#define BOOST_AFIO_THROW_FATAL(x) boost::afio::detail::throw_fatal_exception(x)
+#endif
+#endif
+#ifdef _MSC_VER
+#pragma warning(pop)
 #endif
 
 
@@ -169,6 +214,40 @@ BOOST_AFIO_FORWARD_STL_IMPL(promise, boost::promise)
 typedef boost::exception_ptr exception_ptr;
 template<class T> inline exception_ptr make_exception_ptr(const T &e) { return boost::copy_exception(e); }
 using boost::rethrow_exception;
+template<typename T> exception_ptr get_exception_ptr(future<T> &f)
+{
+	// This seems excessive but I don't see any other legal way to extract the exception ...
+	bool success=false;
+	try
+	{
+		f.get();
+		success=true;
+	}
+	catch(...)
+	{
+		exception_ptr e(afio::make_exception_ptr(afio::current_exception()));
+		assert(e);
+		return e;
+	}
+	return exception_ptr();
+}
+template<typename T> exception_ptr get_exception_ptr(shared_future<T> &f)
+{
+	// This seems excessive but I don't see any other legal way to extract the exception ...
+	bool success=false;
+	try
+	{
+		f.get();
+		success=true;
+	}
+	catch(...)
+	{
+		exception_ptr e(afio::make_exception_ptr(afio::current_exception()));
+		assert(e);
+		return e;
+	}
+	return exception_ptr();
+}
 /*! \brief For now, this is an emulation of std::packaged_task based on boost's packaged_task.
 We have to drop the Args... support because it segfaults MSVC Nov 2012 CTP.
 */
@@ -324,17 +403,20 @@ class std_thread_pool : public thread_source {
 		explicit worker(std_thread_pool *p) : pool(p) { }
 		void operator()()
 		{
-#if defined(BOOST_MSVC) && BOOST_MSVC < 1700 /* <= VS2010 */
+#ifdef BOOST_AFIO_NEED_CURRENT_EXCEPTION_HACK
 			// VS2010 segfaults if you ever do a try { throw; } catch(...) without an exception ever having been thrown :(
 			try
 			{
-				throw std::exception();
+				throw detail::vs2010_lack_of_decent_current_exception_support_hack_t();
 			}
 			catch(...)
 			{
+				detail::vs2010_lack_of_decent_current_exception_support_hack()=boost::current_exception();
+				pool->service.run();
 			}
-#endif
+#else
 			pool->service.run();
+#endif
 		}
 	};
 	friend class worker;
@@ -353,7 +435,12 @@ public:
     //! Destroys the thread pool, waiting for worker threads to exit beforehand.
 	~std_thread_pool()
 	{
-		service.stop();
+		// Windows seems to like occasionally ignoring the stop(), so pulse it until it works
+		while(!service.stopped())
+		{
+			service.stop();
+			boost::this_thread::yield();
+		}
 		BOOST_FOREACH(auto &i, workers)
         {	i->join();}
 	}
@@ -732,7 +819,7 @@ public:
     \exceptionmodelstd
     \qexample{call_example}
     */
-	template<class C, class... Args> inline std::pair<future<typename boost::result_of<C(Args...)>::type>, async_io_op> call(const async_io_op &req, C callback, Args... args);
+	template<class C, class... Args> inline std::pair<future<typename std::result_of<C(Args...)>::type>, async_io_op> call(const async_io_op &req, C callback, Args... args);
 
 #else   //define a version compatable with c++03
 
@@ -740,7 +827,7 @@ public:
     template <class C                                                                               \
     BOOST_PP_COMMA_IF(N)                                                                            \
     BOOST_PP_ENUM_PARAMS(N, class A)>                                                               \
-    inline std::pair<future<typename boost::result_of<C(BOOST_PP_ENUM_PARAMS(N, A))>::type>, async_io_op>  \
+    inline std::pair<future<typename std::result_of<C(BOOST_PP_ENUM_PARAMS(N, A))>::type>, async_io_op>  \
     call (const async_io_op &req, C callback BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, a));     
 
   
@@ -1007,7 +1094,7 @@ protected:
 #ifndef BOOST_NO_CXX11_VARIADIC_TEMPLATES
     
     template<class F, class... Args> std::shared_ptr<detail::async_io_handle> invoke_async_op_completions(size_t id, std::shared_ptr<detail::async_io_handle> h, exception_ptr *e, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, exception_ptr *, Args...), Args... args);
-    template<class F, class... Args> async_io_op chain_async_op(detail::immediate_async_ops &immediates, int optype, const async_io_op &precondition, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, exception_ptr *, Args...), Args... args);
+    template<class F, class... Args> async_io_op chain_async_op(exception_ptr *he, detail::immediate_async_ops &immediates, int optype, const async_io_op &precondition, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, exception_ptr *, Args...), Args... args);
 
 #else
 
@@ -1035,7 +1122,7 @@ protected:
     BOOST_PP_ENUM_PARAMS(N, class A)>                /* template end */                             \
     async_io_op                                      /* return type */                              \
     chain_async_op                                   /* function name */                            \
-    (detail::immediate_async_ops &immediates, int optype,           /* parameters start */          \
+    (exception_ptr *he, detail::immediate_async_ops &immediates, int optype,           /* parameters start */          \
     const async_io_op &precondition,async_op_flags flags,                                           \
     completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, exception_ptr * \
     BOOST_PP_COMMA_IF(N)                                                                            \
@@ -1150,21 +1237,18 @@ namespace detail
 			else
 			{
 				bool done=false;
-				try
+				// Retrieve the result of each input, waiting for it if it is between decrementing the
+				// atomic and signalling its future.
+				BOOST_FOREACH(auto &i, state->inputs)
 				{
-					// Retrieve the result of each input, waiting for it if it is between decrementing the
-					// atomic and signalling its future.
-					BOOST_FOREACH(auto &i, state->inputs)
+					shared_future<std::shared_ptr<detail::async_io_handle>> &future=*i.h;
+					auto e(get_exception_ptr(future));
+					if(e)
 					{
-						shared_future<std::shared_ptr<detail::async_io_handle>> *future=i.h.get();
-						future->get();
+						state->done.set_exception(e);
+						done=true;
+						break;
 					}
-				}
-				catch(...)
-				{
-					exception_ptr e(afio::make_exception_ptr(afio::current_exception()));
-					state->done.set_exception(e);
-					done=true;
 				}
 				if(!done)
 					state->done.set_value(state->out);
@@ -1189,6 +1273,16 @@ inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(st
 {
 	if(first==last)
 		return future<std::vector<std::shared_ptr<detail::async_io_handle>>>();
+#ifdef BOOST_AFIO_NEED_CURRENT_EXCEPTION_HACK
+	// VS2010 segfaults if you ever do a try { throw; } catch(...) without an exception ever having been thrown :(
+	try
+	{
+		throw detail::vs2010_lack_of_decent_current_exception_support_hack_t();
+	}
+	catch(...)
+	{
+		detail::vs2010_lack_of_decent_current_exception_support_hack()=boost::current_exception();
+#endif
 	auto state(std::make_shared<detail::when_all_count_completed_state>(first, last));
 	std::vector<async_io_op> &inputs=state->inputs;
 	std::vector<std::pair<async_op_flags, std::function<async_file_io_dispatcher_base::completion_t>>> callbacks;
@@ -1200,6 +1294,9 @@ inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(st
     }
 	inputs.front().parent->completion(inputs, callbacks);
 	return state->done.get_future();
+#ifdef BOOST_AFIO_NEED_CURRENT_EXCEPTION_HACK
+	}
+#endif
 }
 /*! \brief Returns a result when all the supplied ops complete. Propagates exception states.
 
@@ -1215,6 +1312,16 @@ inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(st
 {
 	if(first==last)
 		return future<std::vector<std::shared_ptr<detail::async_io_handle>>>();
+#ifdef BOOST_AFIO_NEED_CURRENT_EXCEPTION_HACK
+	// VS2010 segfaults if you ever do a try { throw; } catch(...) without an exception ever having been thrown :(
+	try
+	{
+		throw detail::vs2010_lack_of_decent_current_exception_support_hack_t();
+	}
+	catch(...)
+	{
+		detail::vs2010_lack_of_decent_current_exception_support_hack()=boost::current_exception();
+#endif
 	auto state(std::make_shared<detail::when_all_count_completed_state>(first, last));
 	std::vector<async_io_op> &inputs=state->inputs;
 	std::vector<std::pair<async_op_flags, std::function<async_file_io_dispatcher_base::completion_t>>> callbacks;
@@ -1226,6 +1333,9 @@ inline future<std::vector<std::shared_ptr<detail::async_io_handle>>> when_all(st
     }
 	inputs.front().parent->completion(inputs, callbacks);
 	return state->done.get_future();
+#ifdef BOOST_AFIO_NEED_CURRENT_EXCEPTION_HACK
+	}
+#endif
 }
 #ifndef BOOST_NO_CXX11_HDR_INITIALIZER_LIST
 /*! \brief Returns a result when all the supplied ops complete. Does not propagate exception states.
@@ -1751,10 +1861,10 @@ template<class R> inline std::pair<future<R>, async_io_op> async_file_io_dispatc
 
 #ifndef BOOST_NO_CXX11_VARIADIC_TEMPLATES
 
-template<class C, class... Args> inline std::pair<future<typename boost::result_of<C(Args...)>::type>, async_io_op> async_file_io_dispatcher_base::call(const async_io_op &req, C callback, Args... args)
+template<class C, class... Args> inline std::pair<future<typename std::result_of<C(Args...)>::type>, async_io_op> async_file_io_dispatcher_base::call(const async_io_op &req, C callback, Args... args)
 {
 	typedef typename std::result_of<C(Args...)>::type rettype;
-	return call(req, std::bind<rettype()>(callback, args...));
+	return call(req, std::function<rettype()>(std::bind<rettype>(callback, args...)));
 }
 
 #else
@@ -1763,11 +1873,11 @@ template<class C, class... Args> inline std::pair<future<typename boost::result_
     template <class C                                                                                                   \
     BOOST_PP_COMMA_IF(N)                                                                                                \
     BOOST_PP_ENUM_PARAMS(N, class A)>                                                                                   \
-    inline std::pair<future<typename boost::result_of<C(BOOST_PP_ENUM_PARAMS(N, A))>::type>, async_io_op>               \
-    call (const async_io_op &req, C callback BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))                 \
+    inline std::pair<future<typename std::result_of<C(BOOST_PP_ENUM_PARAMS(N, A))>::type>, async_io_op>               \
+    async_file_io_dispatcher_base::call (const async_io_op &req, C callback BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))                 \
     {                                                                                                                   \
         typedef typename std::result_of<C(BOOST_PP_ENUM_PARAMS(N, A))>::type rettype;                                   \
-    	return call(req, std::bind<rettype()>(callback, BOOST_PP_ENUM_PARAMS(N, a)));                                   \
+    	return call(req, std::function<rettype()>(std::bind<rettype>(callback, BOOST_PP_ENUM_PARAMS(N, a))));                                   \
     }
   
 #define BOOST_PP_LOCAL_LIMITS     (1, BOOST_AFIO_MAX_PARAMETERS) //should this be 0 or 1 for the min????

@@ -15,26 +15,35 @@ import modules ;
 import os ;
 import testing ;
 
+# If we're running in a CI, reduce the length of the unit tests considerably
+rule running-in-ci ( properties * )
+{
+   if "--running-in-ci" in $(.argv) 
+   {
+      return <define>BOOST_AFIO_RUNNING_IN_CI ;
+   }
+}
 
 project boost/afio/test
     : requirements
       <threading>multi
       <library>/boost/afio//boost_afio
-      <toolset>gcc:<cxxflags>"-std=c++0x -fvisibility-inlines-hidden -fstrict-aliasing -Wstrict-aliasing -Wno-unused -fargument-noalias -fvisibility=hidden -fopenmp"
+      <toolset>gcc:<cxxflags>"-std=c++0x -fvisibility-inlines-hidden -fstrict-aliasing -Wstrict-aliasing -Wno-unused -fargument-noalias -fvisibility=hidden -fopenmp -fasynchronous-unwind-tables"
       <toolset>gcc-mingw:<cxxflags>"-DWIN32 -D_UNICODE -DUNICODE"
       <toolset>gcc-mingw:<linkflags>"-lws2_32"
       <toolset>gcc:<linkflags>"-lgomp"
-      <toolset>clang:<cxxflags>"-std=c++0x -fvisibility-inlines-hidden -fstrict-aliasing -Wstrict-aliasing -Wno-unused -fvisibility=hidden -fopenmp"
-      <toolset>msvc:<cxxflags>"/openmp /GF /Gy /bigobj /D_VARIADIC_MAX=6"
+      <toolset>clang:<cxxflags>"-std=c++0x -fvisibility-inlines-hidden -fstrict-aliasing -Wstrict-aliasing -Wno-unused -fvisibility=hidden -fopenmp -fasynchronous-unwind-tables"
+      <toolset>msvc:<cxxflags>"/openmp /GF /Gy /bigobj /D_VARIADIC_MAX=8"
       <toolset>msvc:<linkflags>"/LARGEADDRESSAWARE /DYNAMICBASE /NXCOMPAT" # /VERSION:1.00.0"
       <toolset>msvc:<define>WIN32 <toolset>msvc:<define>_WINDOWS  <toolset>msvc:<define>UNICODE <toolset>msvc:<define>_UNICODE
-      <target-os>linux:<linkflags>"-lpthread"
+      <target-os>linux:<linkflags>"-lpthread -ldl"
       <target-os>freebsd:<linkflags>"-lpthread"
       <link>shared:<define>BOOST_AFIO_DYN_LINK=1
       <link>shared:<library>../../system/build//boost_system
       <link>shared:<library>../../filesystem/build//boost_filesystem
       <link>shared:<library>../../atomic/build//boost_atomic
       <link>shared:<library>../../thread/build//boost_thread
+	  <conditional>@running-in-ci
     ;
 
 #exe boost_afio_test : main.cpp   ../detail/SpookyV2.cpp
@@ -68,13 +77,23 @@ else
 
 # Let user limit test_files
 local test_files = [ MATCH ^--test=(.*)$ : $(.argv) ] ;
+local example_files = [ glob examples/*.cpp ] ;
 if $(test_files)
 {
+    test_files_all = $(test_files) ;
 }
 else
 {
-    test_files = [ glob  *.cpp : main.cpp test_all.cpp ] ;
-    test_files_all = [ glob  *.cpp : main.cpp ] ;
+    # Don't do any of the fsyncing tests on the CI, as it murders the poor hard drive
+    if "--running-in-ci" in $(.argv)
+	{
+        test_files = [ glob tests/*.cpp : tests/*sync_test.cpp tests/*autoflush_test.cpp ] ;
+	}
+	else
+	{
+        test_files = [ glob tests/*.cpp ] ;
+	}
+    test_files_all = $(test_files) test_all.cpp ;
 }
 
 # link tests (just compile and links targets)
@@ -84,16 +103,22 @@ if "--link-test"  in $(.argv)
     {
         link $(x) $(reqs) ;
     }
+    for local x in $(example_files)
+    {
+        link $(x) $(reqs) ;
+    }
 }
 else # run actual tests
 {
     if [ os.name ] = "NT"
     {
-        SHELL "del results*.xml" ;
+        SHELL "rmdir /S /Q results_tests" ;
+        SHELL "mkdir results_tests" ;
     }
     else
     {
-        SHELL "rm results*.xml" ;
+        SHELL "rm -rf results_tests" ;
+        SHELL "mkdir results_tests" ;
     }
     if "--test-all" in $(.argv)   # run the whole test suite at once
     {

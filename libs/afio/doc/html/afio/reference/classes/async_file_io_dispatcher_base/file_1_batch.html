@@ -28,7 +28,7 @@
           (batch)</a>
 </h5></div></div></div>
 <p>
-            <a class="indexterm" name="id874772"></a>
+            <a class="indexterm" name="id884839"></a>
 Schedule a batch of asynchronous file creations and opens after optional
             preconditions.
           </p>
@@ -121,7 +121,11 @@ Schedule a batch of asynchronous file creations and opens after optional
 <p>
             Propagates exceptions of any input preconditions with an errored state
             at the point of dispatch, and throws a <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">runtime_error</span></code>
-            if any inputs have values which could not possibly be correct.
+            if any inputs have values which could not possibly be correct. Once a
+            batch of input ops has been verified at the point of entry as not errored,
+            you are guaranteed that the batch is atomically scheduled as a whole,
+            unless one of the following conditions occurs: (i) A failure to allocate
+            memory occurs.
           </p>
 <h6>
 <a name="afio.reference.classes.async_file_io_dispatcher_base.file_1_batch.h6"></a>

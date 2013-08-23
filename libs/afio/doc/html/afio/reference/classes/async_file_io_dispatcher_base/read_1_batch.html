@@ -28,7 +28,7 @@
           (batch)</a>
 </h5></div></div></div>
 <p>
-            <a class="indexterm" name="id873275"></a>
+            <a class="indexterm" name="id888287"></a>
 Schedule a batch of asynchronous data reads after preceding operations.
           </p>
 <h6>
@@ -42,7 +42,7 @@ Schedule a batch of asynchronous data reads after preceding operations.
             <span class="phrase"><a name="afio.reference.classes.async_file_io_dispatcher_base.read_1_batch.synopsis"></a></span><a class="link" href="read_1_batch.html#afio.reference.classes.async_file_io_dispatcher_base.read_1_batch.synopsis">Synopsis</a>
           </h6>
 <pre class="programlisting"><span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">T</span><span class="special">&gt;</span>
-<span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">async_io_op</span> <span class="special">&gt;</span> <span class="identifier">async_file_io_dispatcher_base</span><span class="special">::</span><span class="identifier">read</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">async_data_op_req</span><span class="special">&lt;</span> <span class="identifier">T</span> <span class="special">&gt;&gt;</span> <span class="special">&amp;</span> <span class="identifier">ops</span><span class="special">)</span></pre>
+<span class="keyword">virtual</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span><span class="identifier">async_io_op</span><span class="special">&gt;</span> <span class="identifier">async_file_io_dispatcher_base</span><span class="special">::</span><span class="identifier">read</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">async_data_op_req</span><span class="special">&lt;</span> <span class="identifier">T</span> <span class="special">&gt;&gt;</span> <span class="special">&amp;</span> <span class="identifier">ops</span><span class="special">)</span></pre>
 <h6>
 <a name="afio.reference.classes.async_file_io_dispatcher_base.read_1_batch.h2"></a>
             <span class="phrase"><a name="afio.reference.classes.async_file_io_dispatcher_base.read_1_batch.parameters"></a></span><a class="link" href="read_1_batch.html#afio.reference.classes.async_file_io_dispatcher_base.read_1_batch.parameters">Parameters</a>
@@ -150,7 +150,11 @@ Schedule a batch of asynchronous data reads after preceding operations.
 <p>
             Propagates exceptions of any input preconditions with an errored state
             at the point of dispatch, and throws a <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">runtime_error</span></code>
-            if any inputs have values which could not possibly be correct.
+            if any inputs have values which could not possibly be correct. Once a
+            batch of input ops has been verified at the point of entry as not errored,
+            you are guaranteed that the batch is atomically scheduled as a whole,
+            unless one of the following conditions occurs: (i) A failure to allocate
+            memory occurs.
           </p>
 <h6>
 <a name="afio.reference.classes.async_file_io_dispatcher_base.read_1_batch.h7"></a>

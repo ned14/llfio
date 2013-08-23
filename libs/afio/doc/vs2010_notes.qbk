@@ -6,7 +6,7 @@
   http://www.boost.org/LICENSE_1_0.txt)
 =============================================================================/]
 
-[section:vs2010_notes Notes on using AFIO with Microsoft Visual Studio 2010]
+[section:vs2010_notes Notes on using AFIO with Microsoft Visual Studio 2010 and Mingw32]
 
 Due to the portability requirement of Boost peer review, we had to backport
 __boost_afio__ (originally a pure C++11 library) to the last three major compiler
@@ -16,12 +16,11 @@ worst experience for us was backporting to VS2010.
 
 Unfortunately, because VS2010 is the last Visual Studio which will work on Microsoft Windows
 XP, and therefore as much as we would have loved to have dumped it, we had to do
-the backport. The code in this library compiles on VS2010, but its unit tests are
-not stable due to several severe bugs in the compiler or its runtime around which
-did not find solutions. Because of that here is our first note:
+the backport. The code in this library compiles and passes its unit tests on VS2010, but
+only at the cost of making demands on client code. Therefore:
 
-[*If you possibly can, use VS2012 or later with its VS2010 inbuilt toolset to target
-Windows XP.] The VS2010 toolset bundled with VS2012 and later has many, many errors
+[*If you possibly can, use VS2012 SP3 or later with its Windows XP toolset to target
+Windows XP.] The toolset bundled with VS2012 and later has many, many errors
 with the headers and bugs with the runtime fixed and it uses a much superior compiler.
 The only problem, of course, is that VS2012 and later won't run on Windows XP, so if
 you really must develop on Windows XP, strongly consider Mingw-w64 instead of
@@ -32,27 +31,25 @@ If so, we hope you enjoy debugging internal compiler errors :) which are unfortu
 only fixable through a lot of trial and error. Still:
 
 # Don't use lambdas, or if you do, assign them to a `std::function` immediately. You'll
-see this in AFIO code. Using lambdas makes the STL trip up everywhere (lambda support
+see this in AFIO code. Using lambdas makes the VS2010 STL trip up everywhere (lambda support
 wasn't really implemented in the STL shipped with VS2010) plus increases internal
 compiler errors.
 # Don't use `using namespace` instead of fully namespaced typenames, as the Koenig lookup
 in VS2010 easily gets confused in C++11 and causes internal compiler errors.
-# Accept that exception propagation in __afio_barrier__ and __afio_when_all__ [*will] cause
-segfaults! The cause of this bug is that VS2010 doesn't like the following code when no
-exception is being thrown, probably due to a race condition in its exception throwing
-runtime which causes it to try dereferencing a null pointer:
+# You need to work around the fact that `boost::current_exception()` causes segfaults on
+VS2010 and Mingw32 (not Mingw-w64, which is fine) if not called from within a `catch` clause, and unfortunately AFIO needs that
+to detect if an immediately called completion routine was called during the process of
+handling an exception thrown from an earlier completion routine. In other words, it's
+unavoidable with our C++11 assuming design. The solution we adopted is not pretty, but it does work:
 
-    try {
-        throw;
-    } catch(...)
+ [current_exception_hack]
 
- Unfortunately this is exactly what boost::current_exception() does, and AFIO needs that
- to detect if an immediately called completion routine was called during the process of
- handling an exception thrown from an earlier completion routine. We could work around it
- with a major code refactor, but seeing as it's fixed in the VS2010 runtime bundled with
- VS2012 and later we suggest you go use that instead.
-# Even with all of the above, performance of binaries produced by VS2010 is abysmal - you
-may see some of our unit tests divide iteration counts by a factor of 100 it's so bad.
+ If you're going to use __boost_afio__ on VS2010 or Mingw32, you'll need to wrap all AFIO using code with
+ the same stanza. As mentioned earlier, Mingw-w64 doesn't have any of these problems and is in fact
+ recommended for Windows XP.
+
+# Even with all of the above, performance of binaries produced by VS2010 is poor - expect
+a performance drop from VS2012 of about 2x and of about 3x from a fully compliant C++11 compiler.
 This is caused by the lack of VS2010 STL support for rvalue references, plus that the
 compiler will never willingly use rvalue taking overloads. As a result, a very great
 deal of memory gets copied around which should get optimised out.

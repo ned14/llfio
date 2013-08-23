@@ -43,6 +43,7 @@
 [def __afio_call__ [link afio.reference.classes.async_file_io_dispatcher_base.call_2_batch_bound_functions `async_file_io_dispatcher_base::call()`]]
 [def __afio_barrier__ [link afio.reference.classes.async_file_io_dispatcher_base.barrier `async_file_io_dispatcher_base::barrier()`]]
 
+[import ../test/examples/current_exception_hack.cpp]
 [import ../test/examples/call_example.cpp]
 
 [section:introduction Introduction]
@@ -54,11 +55,11 @@ Summer of Code 2013.
 
 Note that __boost_afio__ was originally written purely in C++11 and backported later to older compilers.
 It requires, as an absolute minimum, a compiler with rvalue reference support. Some popular
-compilers known to be minimally sufficient include:
+compilers known to be minimally sufficient thanks to our Jenkins CI bot include:
 
-* Microsoft Visual Studio 2010.
-* GNU Compiler Collection v4.3.
-* clang v2.9.
+* Microsoft Visual Studio 2010, released in 2010.
+* GNU Compiler Collection v4.6, released in 2011, but may work with as early as GCC v4.3.
+* clang v3.1, released in 2012, but may work with as early as clang v2.9.
 
 Note that just because a compiler will compile the code does not mean performance will be good:
 in particular, your compiler needs to be able to choose move construction where a copy
@@ -67,8 +68,8 @@ move constructors when all member data types have move constructors (known as rv
 v3.0). You may find the list of C++11 features in popular compilers at
 [@http://wiki.apache.org/stdcxx/C++0xCompilerSupport] useful. Similarly, just because a compiler
 will compile the code does not mean that programming using that compiler and __boost_afio__
-isn't a waste of your time. In particular, you should [*avoid VS2010 if at all possible], but
-if you can't, [link afio.vs2010_notes we have written a guide especially for VS2010].
+isn't a waste of your time. In particular, you should [*avoid VS2010 and Mingw32 (not Mingw-w64
+which is fine) if at all possible], but if you can't, [link afio.vs2010_notes we have written a guide especially for VS2010 and Mingw32].
 
 As a very quick example of minimal usage:
 

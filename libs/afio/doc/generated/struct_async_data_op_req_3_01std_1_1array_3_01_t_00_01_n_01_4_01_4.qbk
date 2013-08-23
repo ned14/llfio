@@ -28,7 +28,7 @@ struct async_data_op_req< std::array< T, N > >
 [heading Template parameter(s)]
 [table
 [[Parameter] [Description]]
-[[class T] [Any type ]]
+[[class T] [Any type]]
 [[size_t N] [Any compile-time size ]]
 ]
 
@@ -84,9 +84,9 @@ True if contents are correct
 ]]
 [[`` async_data_op_req(async_io_op _precondition, std::array< T, N > & v, off_t _where)``
 
-] [Constructs an instance. ] [[* async_io_op]: ['_precondition]:  An optional precondition for this operation 
+] [Constructs an instance. ] [[* async_io_op]: ['_precondition]:  An optional precondition for this operation
 
-[* std::array< T, N > &]: ['v]:  A pointer to memory or reference to object into which to read or write 
+[* std::array< T, N > &]: ['v]:  A pointer to memory or reference to object into which to read or write
 
 [* off_t]: ['_where]:  The offset at which to transfer 
 
