@@ -39,7 +39,7 @@ This is a reference counted instance with platform-specific implementation optio
 [heading Member Function(s)]
 [table
 [[Function] [Description] [Parameters]  [Returns]]
-[[``thread_source & threadsource()``
+[[``std::weak_ptr< thread_source > threadsource()``
 
 ] [Returns the thread source used by this dispatcher. ] [
 

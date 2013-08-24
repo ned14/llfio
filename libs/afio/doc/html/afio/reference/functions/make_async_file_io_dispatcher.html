@@ -27,7 +27,7 @@
 <a name="afio.reference.functions.make_async_file_io_dispatcher"></a><a class="link" href="make_async_file_io_dispatcher.html" title="make_async_file_io_dispatcher">make_async_file_io_dispatcher</a>
 </h4></div></div></div>
 <p>
-          <a class="indexterm" name="id900389"></a>
+          <a class="indexterm" name="id896326"></a>
 Instatiates the best available async_file_io_dispatcher implementation
           for this system.
         </p>
@@ -46,7 +46,7 @@ Instatiates the best available async_file_io_dispatcher implementation
 <a name="afio.reference.functions.make_async_file_io_dispatcher.h1"></a>
           <span class="phrase"><a name="afio.reference.functions.make_async_file_io_dispatcher.synopsis"></a></span><a class="link" href="make_async_file_io_dispatcher.html#afio.reference.functions.make_async_file_io_dispatcher.synopsis">Synopsis</a>
         </h6>
-<pre class="programlisting"><span class="identifier">BOOST_AFIO_DECL</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span><span class="identifier">async_file_io_dispatcher_base</span><span class="special">&gt;</span> <span class="identifier">make_async_file_io_dispatcher</span><span class="special">(</span><span class="identifier">thread_source</span> <span class="special">&amp;</span> <span class="identifier">threadpool</span> <span class="special">=</span> <span class="identifier">process_threadpool</span><span class="special">(),</span> <span class="identifier">file_flags</span> <span class="identifier">flagsforce</span> <span class="special">=</span> <span class="identifier">file_flags</span><span class="special">::</span><span class="identifier">None</span><span class="special">,</span> <span class="identifier">file_flags</span> <span class="identifier">flagsmask</span> <span class="special">=</span> <span class="identifier">file_flags</span><span class="special">::</span><span class="identifier">None</span><span class="special">)</span></pre>
+<pre class="programlisting"><span class="identifier">BOOST_AFIO_DECL</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span><span class="identifier">async_file_io_dispatcher_base</span><span class="special">&gt;</span> <span class="identifier">make_async_file_io_dispatcher</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span> <span class="identifier">thread_source</span> <span class="special">&gt;</span> <span class="identifier">threadpool</span> <span class="special">=</span> <span class="identifier">process_threadpool</span><span class="special">(),</span> <span class="identifier">file_flags</span> <span class="identifier">flagsforce</span> <span class="special">=</span> <span class="identifier">file_flags</span><span class="special">::</span><span class="identifier">None</span><span class="special">,</span> <span class="identifier">file_flags</span> <span class="identifier">flagsmask</span> <span class="special">=</span> <span class="identifier">file_flags</span><span class="special">::</span><span class="identifier">None</span><span class="special">)</span></pre>
 <h6>
 <a name="afio.reference.functions.make_async_file_io_dispatcher.h2"></a>
           <span class="phrase"><a name="afio.reference.functions.make_async_file_io_dispatcher.parameters"></a></span><a class="link" href="make_async_file_io_dispatcher.html#afio.reference.functions.make_async_file_io_dispatcher.parameters">Parameters</a>
@@ -84,7 +84,7 @@ Instatiates the best available async_file_io_dispatcher implementation
 <tr>
 <td>
                   <p>
-                    thread_source &amp;
+                    std::shared_ptr&lt; thread_source &gt;
                   </p>
                 </td>
 <td>

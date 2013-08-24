@@ -4,7 +4,11 @@ Provides a threadpool and asynchronous file i/o infrastructure based on Boost.AS
 File Created: Mar 2013
 */
 
+//#define BOOST_AFIO_MAX_NON_ASYNC_QUEUE_DEPTH 1
+
+#ifndef BOOST_AFIO_MAX_NON_ASYNC_QUEUE_DEPTH
 #define BOOST_AFIO_MAX_NON_ASYNC_QUEUE_DEPTH 8
+#endif
 //#define USE_POSIX_ON_WIN32 // Useful for testing
 
 #define _CRT_SECURE_NO_WARNINGS
@@ -263,11 +267,22 @@ size_t async_file_io_dispatcher_base::page_size() BOOST_NOEXCEPT_OR_NOTHROW
 	return pagesize;
 }
 
-std_thread_pool &process_threadpool()
+std::shared_ptr<std_thread_pool> process_threadpool()
 {
 	// This is basically how many file i/o operations can occur at once
 	// Obviously the kernel also has a limit
-	static std_thread_pool ret(BOOST_AFIO_MAX_NON_ASYNC_QUEUE_DEPTH);
+	static std::weak_ptr<std_thread_pool> shared;
+	static boost::detail::spinlock lock;
+	std::shared_ptr<std_thread_pool> ret(shared.lock());
+	if(!ret)
+	{
+		BOOST_AFIO_LOCK_GUARD<boost::detail::spinlock> lockh(lock);
+		ret=shared.lock();
+		if(!ret)
+		{
+			shared=ret=std::make_shared<std_thread_pool>(BOOST_AFIO_MAX_NON_ASYNC_QUEUE_DEPTH);
+		}
+	}
 	return ret;
 }
 
@@ -286,7 +301,7 @@ namespace detail {
 			return h;
 		}
 		async_io_handle_windows(std::shared_ptr<async_file_io_dispatcher_base> _parent, const std::filesystem::path &path, file_flags flags) : async_io_handle(_parent.get(), path, flags), parent(_parent), myid(nullptr), has_been_added(false), SyncOnClose(false) { }
-		async_io_handle_windows(std::shared_ptr<async_file_io_dispatcher_base> _parent, const std::filesystem::path &path, file_flags flags, bool _SyncOnClose, HANDLE _h) : async_io_handle(_parent.get(), path, flags), parent(_parent), h(new boost::asio::windows::random_access_handle(process_threadpool().io_service(), int_checkHandle(_h, path))), myid(_h), has_been_added(false), SyncOnClose(_SyncOnClose) { }
+		inline async_io_handle_windows(std::shared_ptr<async_file_io_dispatcher_base> _parent, const std::filesystem::path &path, file_flags flags, bool _SyncOnClose, HANDLE _h);
 		virtual void *native_handle() const { return myid; }
 
 		// You can't use shared_from_this() in a constructor so ...
@@ -397,6 +412,9 @@ namespace detail {
 		std::shared_ptr<shared_future<std::shared_ptr<detail::async_io_handle>>> h;
 		std::unique_ptr<promise<std::shared_ptr<detail::async_io_handle>>> detached_promise;
 		typedef std::pair<size_t, std::function<std::shared_ptr<detail::async_io_handle> (std::shared_ptr<detail::async_io_handle>, exception_ptr *)>> completion_t;
+#ifndef NDEBUG
+		completion_t boundf; // Useful for debugging
+#endif
 		std::vector<completion_t> completions;
 #ifdef BOOST_AFIO_OP_STACKBACKTRACEDEPTH
 		std::vector<void *> stack;
@@ -425,10 +443,17 @@ namespace detail {
 #else
 		void fillStack() { }
 #endif
-		async_file_io_dispatcher_op(OpType _optype, async_op_flags _flags, std::shared_ptr<shared_future<std::shared_ptr<detail::async_io_handle>>> _h)
-			: optype(_optype), flags(_flags), h(_h) { fillStack(); }
+		async_file_io_dispatcher_op(OpType _optype, async_op_flags _flags, std::shared_ptr<shared_future<std::shared_ptr<detail::async_io_handle>>> _h, completion_t _boundf)
+			: optype(_optype), flags(_flags), h(_h)
+#ifndef NDEBUG
+			, boundf(_boundf)
+#endif
+		{ fillStack(); }
 		async_file_io_dispatcher_op(async_file_io_dispatcher_op &&o) BOOST_NOEXCEPT_OR_NOTHROW : optype(o.optype), flags(std::move(o.flags)), h(std::move(o.h)),
 			detached_promise(std::move(o.detached_promise)), completions(std::move(o.completions))
+#ifndef NDEBUG
+			, boundf(std::move(o.boundf))
+#endif
 #ifdef BOOST_AFIO_OP_STACKBACKTRACEDEPTH
 			, stack(std::move(o.stack))
 #endif
@@ -443,7 +468,7 @@ namespace detail {
 	};
 	struct async_file_io_dispatcher_base_p
 	{
-		thread_source &pool;
+		std::shared_ptr<thread_source> pool;
 		file_flags flagsforce, flagsmask;
 
 		typedef boost::detail::spinlock fdslock_t;
@@ -451,7 +476,7 @@ namespace detail {
 		fdslock_t fdslock; std::unordered_map<void *, std::weak_ptr<async_io_handle>> fds;
 		opslock_t opslock; size_t monotoniccount; std::unordered_map<size_t, async_file_io_dispatcher_op> ops;
 
-		async_file_io_dispatcher_base_p(thread_source &_pool, file_flags _flagsforce, file_flags _flagsmask) : pool(_pool),
+		async_file_io_dispatcher_base_p(std::shared_ptr<thread_source> _pool, file_flags _flagsforce, file_flags _flagsmask) : pool(_pool),
 			flagsforce(_flagsforce), flagsmask(_flagsmask), monotoniccount(0)
 		{
 			// Boost's spinlock is so lightweight it has no constructor ...
@@ -469,6 +494,9 @@ namespace detail {
 			ANNOTATE_RWLOCK_DESTROY(&fdslock);
 		}
 	};
+#if defined(WIN32)
+	inline async_io_handle_windows::async_io_handle_windows(std::shared_ptr<async_file_io_dispatcher_base> _parent, const std::filesystem::path &path, file_flags flags, bool _SyncOnClose, HANDLE _h) : async_io_handle(_parent.get(), path, flags), parent(_parent), h(new boost::asio::windows::random_access_handle(_parent->p->pool->io_service(), int_checkHandle(_h, path))), myid(_h), has_been_added(false), SyncOnClose(_SyncOnClose) { }
+#endif
 	class async_file_io_dispatcher_compat;
 	class async_file_io_dispatcher_windows;
 	class async_file_io_dispatcher_linux;
@@ -502,7 +530,7 @@ namespace detail {
 	};
 }
 
-async_file_io_dispatcher_base::async_file_io_dispatcher_base(thread_source &threadpool, file_flags flagsforce, file_flags flagsmask) : p(new detail::async_file_io_dispatcher_base_p(threadpool, flagsforce, flagsmask))
+async_file_io_dispatcher_base::async_file_io_dispatcher_base(std::shared_ptr<thread_source> threadpool, file_flags flagsforce, file_flags flagsmask) : p(new detail::async_file_io_dispatcher_base_p(threadpool, flagsforce, flagsmask))
 {
 }
 
@@ -622,7 +650,7 @@ void async_file_io_dispatcher_base::int_del_io_handle(void *key)
 	ANNOTATE_RWLOCK_RELEASED(&p->fdslock, 1);
 }
 
-thread_source &async_file_io_dispatcher_base::threadsource() const
+std::weak_ptr<thread_source> async_file_io_dispatcher_base::threadsource() const
 {
 	return p->pool;
 }
@@ -748,10 +776,10 @@ void async_file_io_dispatcher_base::complete_async_op(size_t id, std::shared_ptr
 				if(it->second.detached_promise)
 				{
 					*it->second.h=it->second.detached_promise->get_future();
-					threadsource().enqueue(std::bind(c.second, h, nullptr));
+					p->pool->enqueue(std::bind(c.second, h, nullptr));
 				}
 				else
-					*it->second.h=threadsource().enqueue(std::bind(c.second, h, nullptr));
+					*it->second.h=p->pool->enqueue(std::bind(c.second, h, nullptr));
 			}
 			BOOST_AFIO_DEBUG_PRINT("C %u > %u %p\n", (unsigned) id, (unsigned) c.first, h.get());
 		}
@@ -971,9 +999,9 @@ template<class F, class... Args> async_io_op async_file_io_dispatcher_base::chai
 			*ret.h=immediates.enqueue(std::bind(boundf.second, h, _he)).share();
 		}
 		else
-			*ret.h=threadsource().enqueue(std::bind(boundf.second, h, nullptr)).share();
+			*ret.h=p->pool->enqueue(std::bind(boundf.second, h, nullptr)).share();
 	}
-	auto opsit=p->ops.insert(std::move(std::make_pair(thisid, std::move(detail::async_file_io_dispatcher_op((detail::OpType) optype, flags, ret.h)))));
+	auto opsit=p->ops.insert(std::move(std::make_pair(thisid, std::move(detail::async_file_io_dispatcher_op((detail::OpType) optype, flags, ret.h, boundf)))));
 	assert(opsit.second);
 	BOOST_AFIO_DEBUG_PRINT("I %u < %u (%s)\n", (unsigned) thisid, (unsigned) precondition.id, detail::optypes[static_cast<int>(optype)]);
 	auto unopsit=boost::afio::detail::Undoer([this, opsit, thisid](){
@@ -1078,9 +1106,9 @@ template<class F, class... Args> async_io_op async_file_io_dispatcher_base::chai
 				*ret.h=immediates.enqueue(std::bind(boundf.second, h, _he)).share();\
 			}\
 			else\
-				*ret.h=threadsource().enqueue(std::bind(boundf.second, h, nullptr)).share();\
+				*ret.h=p->pool->enqueue(std::bind(boundf.second, h, nullptr)).share();\
 		}\
-	    auto opsit=p->ops.insert(std::move(std::make_pair(thisid, std::move(detail::async_file_io_dispatcher_op((detail::OpType) optype, flags, ret.h)))));\
+	    auto opsit=p->ops.insert(std::move(std::make_pair(thisid, std::move(detail::async_file_io_dispatcher_op((detail::OpType) optype, flags, ret.h, boundf)))));\
 	    assert(opsit.second);\
 	    BOOST_AFIO_DEBUG_PRINT("I %u < %u (%s)\n", (unsigned) thisid, (unsigned) precondition.id, detail::optypes[static_cast<int>(optype)]);\
 	    auto unopsit=boost::afio::detail::Undoer([this, opsit, thisid](){\
@@ -1233,7 +1261,7 @@ std::vector<async_io_op> async_file_io_dispatcher_base::barrier(const std::vecto
 #if BOOST_AFIO_VALIDATE_INPUTS
 		BOOST_FOREACH(auto &i, ops)
         {
-			if(!i.validate())
+			if(!i.validate(false))
 				BOOST_AFIO_THROW(std::runtime_error("Inputs are invalid."));
         }
 #endif
@@ -1382,6 +1410,7 @@ namespace detail {
 					complete_async_op(id, h);
 				BOOST_AFIO_DEBUG_PRINT("H %u e=%u\n", (unsigned) id, (unsigned) ec.value());
 			}
+			//std::cout << "id=" << id << " total=" << bytes_to_transfer->second << " this=" << bytes_transferred << std::endl;
 		}
 		template<bool iswrite> void doreadwrite(size_t id, std::shared_ptr<detail::async_io_handle> h, exception_ptr *, detail::async_data_op_req_impl<iswrite> req, async_io_handle_windows *p)
 		{
@@ -1427,6 +1456,7 @@ namespace detail {
 				DWORD errcode=GetLastError();
 				if(!ok && ERROR_IO_PENDING!=errcode)
 				{
+					//std::cerr << "ERROR " << errcode << std::endl;
 					boost::system::error_code ec(errcode, boost::asio::error::get_system_category());
 					ol.complete(ec, 0);
 				}
@@ -1448,6 +1478,7 @@ namespace detail {
 					DWORD errcode=GetLastError();
 					if(!ok && ERROR_IO_PENDING!=errcode)
 					{
+						//std::cerr << "ERROR " << errcode << std::endl;
 						boost::system::error_code ec(errcode, boost::asio::error::get_system_category());
 						ol.complete(ec, 0);
 					}
@@ -1509,7 +1540,7 @@ namespace detail {
 		}
 
 	public:
-		async_file_io_dispatcher_windows(thread_source &threadpool, file_flags flagsforce, file_flags flagsmask) : async_file_io_dispatcher_base(threadpool, flagsforce, flagsmask), pagesize(page_size())
+		async_file_io_dispatcher_windows(std::shared_ptr<thread_source> threadpool, file_flags flagsforce, file_flags flagsmask) : async_file_io_dispatcher_base(threadpool, flagsforce, flagsmask), pagesize(page_size())
 		{
 		}
 
@@ -1836,7 +1867,7 @@ namespace detail {
 
 
 	public:
-		async_file_io_dispatcher_compat(thread_source &threadpool, file_flags flagsforce, file_flags flagsmask) : async_file_io_dispatcher_base(threadpool, flagsforce, flagsmask)
+		async_file_io_dispatcher_compat(std::shared_ptr<thread_source> threadpool, file_flags flagsforce, file_flags flagsmask) : async_file_io_dispatcher_base(threadpool, flagsforce, flagsmask)
 		{
 		}
 
@@ -1943,7 +1974,7 @@ namespace detail {
 	};
 }
 
-std::shared_ptr<async_file_io_dispatcher_base> make_async_file_io_dispatcher(thread_source &threadpool, file_flags flagsforce, file_flags flagsmask)
+std::shared_ptr<async_file_io_dispatcher_base> make_async_file_io_dispatcher(std::shared_ptr<thread_source> threadpool, file_flags flagsforce, file_flags flagsmask)
 {
 #if defined(WIN32) && !defined(USE_POSIX_ON_WIN32)
 	return std::make_shared<detail::async_file_io_dispatcher_windows>(threadpool, flagsforce, flagsmask);

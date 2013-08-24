@@ -77,6 +77,5 @@
    fun:allocate_dtv
    fun:_dl_allocate_tls
    fun:pthread_create@@GLIBC_2.1
-   fun:pthread_create@GLIBC_2.0
    ...
 }

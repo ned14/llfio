@@ -6,9 +6,11 @@ Created: Feb 2013
 #ifndef BOOST_AFIO_TEST_FUNCTIONS_HPP
 #define BOOST_AFIO_TEST_FUNCTIONS_HPP
 
-
-// If defined, uses a ton more memory and is many orders of magnitude slower.
+// Uses a ton more memory and is many orders of magnitude slower, but no longer optional.
 #define DEBUG_TORTURE_TEST 1
+
+// Reduces CPU cores used to execute, which can be useful for certain kinds of race condition.
+//#define MAXIMUM_TEST_CPUS 1
 
 #ifdef __MINGW32__
 // Mingw doesn't define putenv() needed by Boost.Test
@@ -32,6 +34,10 @@ extern int putenv(char*);
 #define BOOST_TEST_MODULE Boost.AFIO
 #endif
 
+#ifdef _MSC_VER
+#pragma warning(disable: 4535) // calling _set_se_translator() requires /EHa
+#endif
+
 #include <boost/test/included/unit_test.hpp>
 
 //define a simple macro to check any exception using Boost.Test
@@ -46,17 +52,51 @@ try{\
 	/*BOOST_CHECK(true);*/ \
 }catch(...){BOOST_FAIL("Exception was thrown");}
 
+// Force maximum CPUs available to threads in this process, if available on this platform
+#ifdef MAXIMUM_TEST_CPUS
+static inline void set_maximum_cpus(size_t no=MAXIMUM_TEST_CPUS)
+{
+#ifdef WIN32
+	DWORD_PTR mask=0;
+	for(size_t n=0; n<no; n++)
+		mask|=(size_t)1<<n;
+	if(!SetProcessAffinityMask(GetCurrentProcess(), mask))
+	{
+		std::cerr << "ERROR: Failed to set process affinity mask due to reason " << GetLastError() << std::endl;
+		abort();
+	}
+#endif
+}
+#else
+static inline void set_maximum_cpus(size_t no=0) { }
+#endif
+
 // Boost.Test uses alarm() to timeout tests, which is nearly useless. Hence do our own.
 static inline void watchdog_thread(size_t timeout)
 {
+	boost::afio::detail::set_threadname("watchdog_thread");
+	bool docountdown=timeout>10;
+	if(docountdown) timeout-=10;
 	boost::chrono::duration<size_t> d(timeout);
 	boost::mutex m;
 	boost::condition_variable cv;
 	boost::unique_lock<boost::mutex> lock(m);
 	if(boost::cv_status::timeout==cv.wait_for(lock, d))
 	{
+		if(docountdown)
+		{
+			std::cerr << "Test about to time out ...";
+			d=boost::chrono::duration<size_t>(1);
+			for(size_t n=0; n<10; n++)
+			{
+				if(boost::cv_status::timeout!=cv.wait_for(lock, d))
+					return;
+				std::cerr << " " << 10-n;
+			}
+			std::cerr << " ... ";
+		}
 		BOOST_CHECK_MESSAGE(false, "Test timed out");
-		std::cerr << "Test timed out" << std::endl;
+		std::cerr << "Test timed out, aborting" << std::endl;
 		abort();
 	}
 }
@@ -70,6 +110,7 @@ static void BOOST_AUTO_TC_INVOKER( test_name )()                        \
     test_name t;                                                        \
 	boost::unit_test::unit_test_monitor_t::instance().p_timeout.set(timeout); \
 	BOOST_TEST_MESSAGE(desc);                                           \
+	set_maximum_cpus();                                \
 	boost::thread watchdog(watchdog_thread, timeout);                   \
 	boost::unit_test::unit_test_monitor_t::instance().execute([&]() -> int { t.test_method(); watchdog.interrupt(); watchdog.join(); return 0; }); \
 }                                                                       \

@@ -12,10 +12,14 @@
 [section:thread_source thread_source]
 
 '''<indexterm><primary>thread_source</primary></indexterm>'''
-A source of thread workers. 
+Abstract base class for a source of thread workers. 
+
+[heading Description]
+This instantiates a [^`boost::asio::io_service`] and a latchable [^`boost::asio::io_service::work`] to keep any threads working. Note that in Boost 1.54, and possibly later versions, [^`boost::asio::io_service`] on Windows appears to dislike being destructed during static data deinit, hence why this inherits from [^`std::enable_shared_from_this<>`] in order that it may be reference count deleted before static data deinit occurs. 
 
 [heading Synopsis]
 ``class thread_source
+      : public std::enable_shared_from_this< thread_source >
 {
   // ...
 };
@@ -33,9 +37,12 @@ A source of thread workers.
 [[``template<class F>
 future< typename std::result_of< F()>::type > enqueue(F f)``
 
-] [Sends some callable entity to the thread pool for execution. ] [[* F]: ['f]:  
+] [Sends some callable entity to the thread pool for execution. ] [[* F]: ['f]:  Any instance of a callable type F 
 
 
+
+][
+A future for the enqueued callable
 
 
 ]]
