@@ -13,8 +13,8 @@
 
 
 __boost_afio__ can be viewed as an an asynchronous, chainable, batch executable, closure 
-execution engine. While this is a somewhat intimidating characterization,the core concept 
-of such an engine is actually fairly straight forward.  The next few sections will attempt 
+execution engine. While this is a somewhat intimidating characterization, the core concept 
+of such an engine is fairly straight forward. The following sections will attempt 
 to clear up exactly what this title means, and to give the user a reference for how it 
 can be used when compared to some better known implementations. If you are already 
 familiar with what an asynchronous, chainable, batch executable, closure execution engine 
@@ -24,7 +24,7 @@ is you may wish to skip this section.
 [heading: Closure Execution Engines]
 
 
-First, it will be useful to introduce some core concepts before moving on to a more indepth 
+First, it will be useful to introduce some core ideas before moving on to a more indepth 
 look at closure execution engines. Let us begin with a simple definition of a closure. 
 Wikipedia.org suplies a clear definition:
 
@@ -46,12 +46,12 @@ forward.
 
 
 Now that we have a basic idea of what a closure is, consider the role that a closure execution 
-engine plays: to execute the closures supplied to it.  How the engine works is largely driven by 
+engine plays: to execute the closures supplied to it. How the engine works is largely driven by 
 its design goals and performance criteria. A simplistic analogy is to consider a rocket engine 
 and a combustion engine found in an automobile: both engines fill similar roles (vehicle 
 propulsion) but are quite different in how they work and perform the basic task of vehicle 
-locomotion, ie their design goals and performance criteria are completely different. So a closure 
-execution engine is a fairly generic term, and says nothing about the implementation.
+locomotion, ie their design goals and performance criteria are completely different. A closure 
+execution engine is a fairly general term, and implies little about the underlying implementation.
 
 
 Earlier we defined __boost_afio__ as a specialized type of closure execution engine: an asynchronous, 
@@ -61,29 +61,32 @@ executable aren't quite as daunting.
 
 
 *Asynchonous: closures can be completed in an asynchronous fashion, rather than with traditional 
-sequential blocking behavior. 
-*Chainable: closures can be chained together, so that dependent 
-operations can be scheduled for execution after the closures they depend on have been completed. 
+sequential blocking behavior. Note that asynchronous does not necessarily imply concurrency. 
+*Chainable: closures can be chained together, so that dependent operations can be scheduled 
+for execution after the closures they depend on have been completed. 
 *Batch Executable: A group of closures can be  scheduled for execution. 
 
 
-So, __boost_afio__ can execute batches of sequential closures for asynchronous completion. What this means 
-for users is that it is possible to break up a series of sequential tasks into a closures, and 
+So, __boost_afio__ can execute batches of sequential closures for asynchronous completion. What this
+ means for users is that it is possible to break up a series of sequential tasks into a closures, and 
 have __boost_afio__ schedule them for asynchronous completion while the main thread is free to complete 
 other work. 
+
+__boost_afio__ is primarily implemented as a threadpool that executes the closures fed to it based on
+some internal logic. In essence __boost_afio__ creates a thread whose responsibility it is to schedule closures for execution within a threadpool. This allows user code to schedule some operations for future completion, and even to schedule a series of operations to be executed one after another, while leaving the main application free to complete other work while waiting for closures to execute. This ability to chain closures together makes it possible to schedule work to begin as soon as it is able, and avoids waiting for an entire set of operations to complete before any other tasks can begin. 
 
 
 Because __boost_afio__'s main focus is on file I/O, we've selected an example where the I/O operations are 
 the source of blocking behavior. Take a simple example of reading in an array of integers from a 
 file, and then preforming some calculations with the entries of the array. Traditionally a user 
-would be required to open the file and read the contents of the entire file before  storing 
-the data in array before beginning computations. With __boost_afio__ it is possible to schedule
-the file to be opened, then for each integer to be read into memory, and have a calculation 
-scheduled for immediate execution after the specific data it required finished being read from file into memory. Finally, the file can be scheduled to be closed after all read operations have been completed, 
-all without waiting for the entire contents of the file to finish being read. This is a trivial 
-example, but it illustrates very well how closures can be used and scheduled to improve performance. 
-These benefits are not limited to file I/O, and the closures can be virtually any non-blocking task 
-and still improve performance over sequential execution.
+would be required to open the file and read the contents of the entire file before storing 
+the data in an array, so that computations with that data can begin. With __boost_afio__ it is possible to
+schedule the file to be opened, then for each integer to be read into memory, and have a calculation 
+scheduled for immediate execution after the specific data it requires has finished being read into
+memory. Finally, the file can be scheduled to be closed after all read operations have been completed.
+This is a trivial example, but it serves to illustrate how closures can be used and scheduled to improve
+performance. These benefits are not limited to file I/O, and improvements can be gained from using other
+types closurse wisely. 
 
 
 [*Traditonal example:]
@@ -205,12 +208,13 @@ int main()
 ```
 
 
-While the example above is a bit trivial, it serves as a good example of basic functionality. For a small
-array of only 10 integers, this is a bit of overkill, but for a very large array, or a more complicated
-scenario, the benefits may bequite large. Additionally the examples show that the new code is still readable,
-concise, and clear, all while giving the user the benefit of asynchronous execution of discrete tasks. It is
-important to understand that not every set of tasks are readily translatable into a series of asynchronous
-operations, but for those that are __boost_afio__ provides a powerful tool for scheduling and executing them.
+While the example above is a bit contrived, it serves as a good example of the basic functionality
+__boost_afio__ brings to the table. For a small array of only 10 integers, this is a bit of overkill,
+but for a very large array, or a more complicated bit of code, the benefits may be quite impressive.
+These basic examples show that the new code is still readable, concise, and clear, all while giving the 
+user the benefit of asynchronous execution of discrete tasks. It is important to understand that not every 
+set of tasks are readily translatable into a series of asynchronous operations, but for those that are 
+__boost_afio__ provides a powerful tool for scheduling and executing them.
 
 
 [heading How __boost_afio__ Relates to Exisiting Closure Execution Engines]
@@ -224,15 +228,29 @@ proposed in those papers?
 [*Abstract Executor]
 
 
-`class executor` has an __boost_afio__ equivalent in `class async_file_io_dispatcher_base` (hence refereed to as “ `dispatcher` ” for brevity). The two classes are similar in that both are abstract base classes, and both are largely responsible for scheduling closures for execution. Technically `dispatcher` does not have an analog for `executor::add(std::function<void()>)` as the methods it uses to schedule closures for execution do not accept `std::function<void()>`. There is, however, a mechanism for adding closures for future execution: `completion()`, and its convenience wrapper `call()`. Both of these functions allow the user to schedule closures for future execution, though in slightly different ways. Additionally dispatcher provides several specialized versions of `executor::add()` in the form of specialized file operations (eg. `file, open, close, dir, rmdir`, etc.), which schedule these tasks for future execution. 
+`class executor` has an __boost_afio__ equivalent in `class async_file_io_dispatcher_base` (hence referred
+to as “ `dispatcher` ” for brevity). The two classes are similar in that both are abstract base classes, 
+and both are largely responsible for scheduling closures for execution. Technically `dispatcher` does not 
+have an analog for `executor::add(std::function<void()>)` as the methods it uses to schedule closures for 
+execution do not accept `std::function<void()>`. There is, however, a mechanism for adding closures for 
+future execution: `completion()`, and its convenience wrapper `call()`. Both of these functions allow the 
+user to schedule closures for future execution, though in slightly different ways. Additionally,
+`dispatcher` provides several specialized versions of `executor::add()` in the form of specialized file 
+operations (eg. `file, open, close, dir, rmdir`, etc.), which schedule these tasks for future execution. 
 
-Because __boost_afio__ is designed to be chainable and batch executable, its functions tend to return futures, or vectors of futures, to obtain results from currently scheduled tasks, or chain a series of tasks together. While there is nothing in N3562 to forbidding such behavior, it doesn't explicitly call for it either.  
+Because __boost_afio__ is designed to be chainable and batch executable, its functions tend to return 
+futures, or vectors of futures, to obtain results from currently scheduled tasks, or chain a series of 
+tasks together. While there is nothing in N3562 to forbidding such behavior, it doesn't explicitly call for 
+it either.  
 
 
 [*Executor Factory]
 
 
-__boost_afio__ does provide an executor factory function `make_async_file_io_dispatcher()`, which is responsible for creating new dispatchers.  Unlike the proposed factory functions in N3378, there is no distinction made between factories. This is similar to `singleton_inline_executor()` from N3562, except `make_async_file_io_dispatcher()` is not guaranteed to return a singleton. 
+__boost_afio__ does provide an executor factory function `make_async_file_io_dispatcher()`, which is 
+responsible for creating new dispatchers. Unlike the proposed factory functions in N3378, there is no 
+distinction made between factories. This is similar to `singleton_inline_executor()` from N3562, except 
+`make_async_file_io_dispatcher()` is not guaranteed to return a singleton. 
 
 
 [*Scheduled Executors]
