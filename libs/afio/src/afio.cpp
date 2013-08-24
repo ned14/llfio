@@ -4,6 +4,8 @@ Provides a threadpool and asynchronous file i/o infrastructure based on Boost.AS
 File Created: Mar 2013
 */
 
+//#define BOOST_AFIO_MAX_NON_ASYNC_QUEUE_DEPTH 1
+
 #ifndef BOOST_AFIO_MAX_NON_ASYNC_QUEUE_DEPTH
 #define BOOST_AFIO_MAX_NON_ASYNC_QUEUE_DEPTH 8
 #endif
@@ -410,6 +412,9 @@ namespace detail {
 		std::shared_ptr<shared_future<std::shared_ptr<detail::async_io_handle>>> h;
 		std::unique_ptr<promise<std::shared_ptr<detail::async_io_handle>>> detached_promise;
 		typedef std::pair<size_t, std::function<std::shared_ptr<detail::async_io_handle> (std::shared_ptr<detail::async_io_handle>, exception_ptr *)>> completion_t;
+#ifndef NDEBUG
+		completion_t boundf; // Useful for debugging
+#endif
 		std::vector<completion_t> completions;
 #ifdef BOOST_AFIO_OP_STACKBACKTRACEDEPTH
 		std::vector<void *> stack;
@@ -438,10 +443,17 @@ namespace detail {
 #else
 		void fillStack() { }
 #endif
-		async_file_io_dispatcher_op(OpType _optype, async_op_flags _flags, std::shared_ptr<shared_future<std::shared_ptr<detail::async_io_handle>>> _h)
-			: optype(_optype), flags(_flags), h(_h) { fillStack(); }
+		async_file_io_dispatcher_op(OpType _optype, async_op_flags _flags, std::shared_ptr<shared_future<std::shared_ptr<detail::async_io_handle>>> _h, completion_t _boundf)
+			: optype(_optype), flags(_flags), h(_h)
+#ifndef NDEBUG
+			, boundf(_boundf)
+#endif
+		{ fillStack(); }
 		async_file_io_dispatcher_op(async_file_io_dispatcher_op &&o) BOOST_NOEXCEPT_OR_NOTHROW : optype(o.optype), flags(std::move(o.flags)), h(std::move(o.h)),
 			detached_promise(std::move(o.detached_promise)), completions(std::move(o.completions))
+#ifndef NDEBUG
+			, boundf(std::move(o.boundf))
+#endif
 #ifdef BOOST_AFIO_OP_STACKBACKTRACEDEPTH
 			, stack(std::move(o.stack))
 #endif
@@ -989,7 +1001,7 @@ template<class F, class... Args> async_io_op async_file_io_dispatcher_base::chai
 		else
 			*ret.h=p->pool->enqueue(std::bind(boundf.second, h, nullptr)).share();
 	}
-	auto opsit=p->ops.insert(std::move(std::make_pair(thisid, std::move(detail::async_file_io_dispatcher_op((detail::OpType) optype, flags, ret.h)))));
+	auto opsit=p->ops.insert(std::move(std::make_pair(thisid, std::move(detail::async_file_io_dispatcher_op((detail::OpType) optype, flags, ret.h, boundf)))));
 	assert(opsit.second);
 	BOOST_AFIO_DEBUG_PRINT("I %u < %u (%s)\n", (unsigned) thisid, (unsigned) precondition.id, detail::optypes[static_cast<int>(optype)]);
 	auto unopsit=boost::afio::detail::Undoer([this, opsit, thisid](){
@@ -1096,7 +1108,7 @@ template<class F, class... Args> async_io_op async_file_io_dispatcher_base::chai
 			else\
 				*ret.h=p->pool->enqueue(std::bind(boundf.second, h, nullptr)).share();\
 		}\
-	    auto opsit=p->ops.insert(std::move(std::make_pair(thisid, std::move(detail::async_file_io_dispatcher_op((detail::OpType) optype, flags, ret.h)))));\
+	    auto opsit=p->ops.insert(std::move(std::make_pair(thisid, std::move(detail::async_file_io_dispatcher_op((detail::OpType) optype, flags, ret.h, boundf)))));\
 	    assert(opsit.second);\
 	    BOOST_AFIO_DEBUG_PRINT("I %u < %u (%s)\n", (unsigned) thisid, (unsigned) precondition.id, detail::optypes[static_cast<int>(optype)]);\
 	    auto unopsit=boost::afio::detail::Undoer([this, opsit, thisid](){\
@@ -1444,6 +1456,7 @@ namespace detail {
 				DWORD errcode=GetLastError();
 				if(!ok && ERROR_IO_PENDING!=errcode)
 				{
+					//std::cerr << "ERROR " << errcode << std::endl;
 					boost::system::error_code ec(errcode, boost::asio::error::get_system_category());
 					ol.complete(ec, 0);
 				}
@@ -1465,6 +1478,7 @@ namespace detail {
 					DWORD errcode=GetLastError();
 					if(!ok && ERROR_IO_PENDING!=errcode)
 					{
+						//std::cerr << "ERROR " << errcode << std::endl;
 						boost::system::error_code ec(errcode, boost::asio::error::get_system_category());
 						ol.complete(ec, 0);
 					}

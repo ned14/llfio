@@ -93,6 +93,46 @@ inline std::exception_ptr current_exception() { return std::current_exception();
 typedef std::recursive_mutex recursive_mutex;
 } }
 #endif
+namespace boost { namespace afio { namespace detail {
+#ifdef _MSC_VER
+static inline void set_threadname(const char *threadName)
+{
+	const DWORD MS_VC_EXCEPTION=0x406D1388;
+
+#pragma pack(push,8)
+	typedef struct tagTHREADNAME_INFO
+	{
+	   DWORD dwType; // Must be 0x1000.
+	   LPCSTR szName; // Pointer to name (in user addr space).
+	   DWORD dwThreadID; // Thread ID (-1=caller thread).
+	   DWORD dwFlags; // Reserved for future use, must be zero.
+	} THREADNAME_INFO;
+#pragma pack(pop)
+   THREADNAME_INFO info;
+   info.dwType = 0x1000;
+   info.szName = threadName;
+   info.dwThreadID = -1;
+   info.dwFlags = 0;
+
+   __try
+   {
+      RaiseException( MS_VC_EXCEPTION, 0, sizeof(info)/sizeof(ULONG_PTR), (ULONG_PTR*)&info );
+   }
+   __except(EXCEPTION_EXECUTE_HANDLER)
+   {
+   }
+}
+#elif defined(__linux__)
+static inline void set_threadname(const char *threadName)
+{
+	pthread_setname_np(pthread_self(), threadName);
+}
+#else
+static inline void set_threadname(const char *threadName)
+{
+}
+#endif
+} } }
 
 // Need some portable way of throwing a really absolutely definitely fatal exception
 // If we guaranteed had noexcept, this would be easy, but for compilers without noexcept
@@ -417,6 +457,7 @@ class std_thread_pool : public thread_source {
 		explicit worker(std_thread_pool *p) : pool(p) { }
 		void operator()()
 		{
+			detail::set_threadname("boost::afio::std_thread_pool worker");
 #ifdef BOOST_AFIO_NEED_CURRENT_EXCEPTION_HACK
 			// VS2010 segfaults if you ever do a try { throw; } catch(...) without an exception ever having been thrown :(
 			try
@@ -441,6 +482,21 @@ public:
     \param no The number of worker threads to create
     */
 	explicit std_thread_pool(size_t no)
+#ifdef WIN32
+		// ASIO has some race condition in its IOCP backend where it loses write completion
+		// wakeups (not read, only write)
+		//
+		// If I had to take a guess, if you think about it with sockets no one is ever
+		// going to write to some socket from multiple threads simultaneously because
+		// you would interleave the outflow. As a result, ASIO is probably not fully
+		// debugged for the situation where someone is actually writing from multiple
+		// threads simultaneously.
+		//
+		// The following tells ASIO to tell its IOCP completion port to serialise port
+		// completion dispatch. No it does not improve performance, but it's a lot better than
+		// sticking a giant mutex around all write operations.
+		: thread_source(1)
+#endif
 	{
 		add_workers(no);
 	}
