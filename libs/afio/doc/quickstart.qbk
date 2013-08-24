@@ -311,8 +311,4 @@ process_value(v);
     
 ]
  
-[endsect] [/ end of Closure Execution Engines]
-
-
-
 [endsect]
