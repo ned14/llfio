@@ -11,7 +11,7 @@
 This Quick Start section shows some of the features.
 
 
-[heading Closure Execution Engines]
+[section Closure Execution Engines]
 
 [def __msvc__ MSVC]
 [def __stlport__ [@http://sourceforge.net/projects/stlport STLport]]
@@ -26,7 +26,7 @@ familiar with what an asynchronous, chainable, batch executable, closure executi
 is you may wish to skip this section. 
 
 
-[h3 The Basics]
+[section The Basics]
 
 
 First, it will be useful to introduce some core ideas before moving on to a more indepth 
@@ -80,6 +80,7 @@ other work.
 __boost_afio__ is primarily implemented as a threadpool that executes the closures fed to it based on
 some internal logic. In essence __boost_afio__ creates a thread whose responsibility it is to schedule closures for execution within a threadpool. This allows user code to schedule some operations for future completion, and even to schedule a series of operations to be executed one after another, while leaving the main application free to complete other work while waiting for closures to execute. This ability to chain closures together makes it possible to schedule work to begin as soon as it is able, and avoids waiting for an entire set of operations to complete before any other tasks can begin. 
 
+[section Examples]
 
 Because __boost_afio__'s main focus is on file I/O, we've selected an example where the I/O operations are 
 the source of blocking behavior. Take a simple example of reading in an array of integers from a 
@@ -110,8 +111,10 @@ user the benefit of asynchronous execution of discrete tasks. It is important to
 set of tasks are readily translatable into a series of asynchronous operations, but for those that are 
 __boost_afio__ provides a powerful tool for scheduling and executing them.
 
+[endsect]
+[endsect]
 
-[h3 How __boost_afio__ Relates to Exisiting Closure Execution Engines]
+[section How __boost_afio__ Relates to Exisiting Closure Execution Engines]
 
 Proposals N3562 and its predecessor N3378  outline an executor library based on internal 
 implementations of similar facilities at Google and Microsoft. __boost_afio__ is based, in part, on some of 
@@ -184,12 +187,12 @@ __boost_afio__ provides several methods to synchronize results for asynchronous 
 
 
 
-[h3 Comparison of AFIO with other Closure Execution Engines]
+[section Comparison of AFIO with other Closure Execution Engines]
 
 The following tables illustrate how __boost_afio__ relates to some proposed closure execution engines. 
 These proposals are related to the internal implementations of such systems at Google and Microsoft.
-[@www.open-std.org/jtc1/sc22/wg21/docs/papers/2012/n3378.pdf N3378] was Google's initial proposal for such 
-an engine, and its successor, [@www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3562.pdf N3562] was a 
+[@http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2012/n3378.pdf N3378] was Google's initial proposal for such 
+an engine, and its successor, [@http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3562.pdf N3562] was a 
 joint effort between Microsoft and Google. Anyone wishing to compare __boost_afio__ to an engine related to 
 one of these proposals should find the following tables useful.
 
@@ -254,11 +257,11 @@ one of these proposals should find the following tables useful.
     [ [`serial_executor::underlying_executor()`] [No Equivalent] ]
     [ [`class thread_pool`] [`std_thread_pool`] ]
 ]
+[endsect]
 
-
-[h3 Other Useful Comparisons]
+[section Other Useful Comparisons]
 __boost_afio__ also incorporates some important concepts presented in 
-[@www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3558.pdf N3558]. If you're not familiar with that 
+[@http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3558.pdf N3558]. If you're not familiar with that 
 proposal we encourage you to read it, as that proposal presents some important concepts about asynchronous 
 operations.  The following table outlines some of the proposed features from N3558 with their 
 __boost_afio_equivalents
@@ -310,5 +313,7 @@ process_value(v);
     [ [`make_ready_future()`] [No Equivalent] ]
     
 ]
- 
+[endsect]
+[endsect]
+[endsect][/ end of Closure Execution Engines]
 [endsect]
