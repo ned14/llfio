@@ -60,4 +60,8 @@ int main()
     return 0;
 }
 //]
-#endif
+#else
+int main()
+{
+    return 0;
+}
