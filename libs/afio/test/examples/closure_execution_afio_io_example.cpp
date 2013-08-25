@@ -1,3 +1,4 @@
+#include <boost/afio/afio.hpp>
 #if !(defined(BOOST_MSVC) && BOOST_MSVC < 1700) // Don't bother with VS2010, its result_of can't cope.
 //[closure_execution_afio_example
 #include <iostream>
