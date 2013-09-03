@@ -70,13 +70,11 @@ File Created: Mar 2013
 #define BOOST_AFIO_POSIX_FSYNC _commit
 #define BOOST_AFIO_POSIX_FTRUNCATE winftruncate
 
-// WinVista and later have the SetFileInformationByHandle() function, but for WinXP
-// compatibility we use the kernel syscall directly
-static inline bool wintruncate(HANDLE h, boost::afio::off_t newsize)
+namespace windows_nt_kernel
 {
 	// From http://undocumented.ntinternals.net/UserMode/Undocumented%20Functions/NT%20Objects/File/FILE_INFORMATION_CLASS.html
 	typedef enum _FILE_INFORMATION_CLASS {
-		FileDirectoryInformation=1,
+		FileDirectoryInformation                 = 1,
 		FileFullDirectoryInformation,
 		FileBothDirectoryInformation,
 		FileBasicInformation,
@@ -104,21 +102,49 @@ static inline bool wintruncate(HANDLE h, boost::afio::off_t newsize)
 		FileMailslotQueryInformation,
 		FileMailslotSetInformation,
 		FileCompressionInformation,
-		FileCopyOnWriteInformation,
+		FileObjectIdInformation,
 		FileCompletionInformation,
 		FileMoveClusterInformation,
 		FileQuotaInformation,
 		FileReparsePointInformation,
 		FileNetworkOpenInformation,
-		FileObjectIdInformation,
+		FileAttributeTagInformation,
 		FileTrackingInformation,
-		FileOleDirectoryInformation,
-		FileContentIndexInformation,
-		FileInheritContentIndexInformation,
-		FileOleInformation,
+		FileIdBothDirectoryInformation,
+		FileIdFullDirectoryInformation,
+		FileValidDataLengthInformation,
+		FileShortNameInformation,
+		FileIoCompletionNotificationInformation,
+		FileIoStatusBlockRangeInformation,
+		FileIoPriorityHintInformation,
+		FileSfioReserveInformation,
+		FileSfioVolumeInformation,
+		FileHardLinkInformation,
+		FileProcessIdsUsingFileInformation,
+		FileNormalizedNameInformation,
+		FileNetworkPhysicalNameInformation,
+		FileIdGlobalTxDirectoryInformation,
+		FileIsRemoteDeviceInformation,
+		FileAttributeCacheInformation,
+		FileNumaNodeInformation,
+		FileStandardLinkInformation,
+		FileRemoteProtocolInformation,
 		FileMaximumInformation
 	} FILE_INFORMATION_CLASS, *PFILE_INFORMATION_CLASS;
 
+	typedef enum  { 
+	  FileFsVolumeInformation       = 1,
+	  FileFsLabelInformation        = 2,
+	  FileFsSizeInformation         = 3,
+	  FileFsDeviceInformation       = 4,
+	  FileFsAttributeInformation    = 5,
+	  FileFsControlInformation      = 6,
+	  FileFsFullSizeInformation     = 7,
+	  FileFsObjectIdInformation     = 8,
+	  FileFsDriverPathInformation   = 9,
+	  FileFsVolumeFlagsInformation  = 10,
+	  FileFsSectorSizeInformation   = 11
+	} FS_INFORMATION_CLASS;
 #ifndef NTSTATUS
 #define NTSTATUS LONG
 #endif
@@ -132,6 +158,113 @@ static inline bool wintruncate(HANDLE h, boost::afio::off_t newsize)
 		ULONG_PTR Information;
 	} IO_STATUS_BLOCK, *PIO_STATUS_BLOCK;
 
+	// From http://msdn.microsoft.com/en-us/library/windows/desktop/aa380518(v=vs.85).aspx
+	typedef struct _LSA_UNICODE_STRING {
+	  USHORT Length;
+	  USHORT MaximumLength;
+	  PWSTR  Buffer;
+	} LSA_UNICODE_STRING, *PLSA_UNICODE_STRING, UNICODE_STRING, *PUNICODE_STRING;
+
+	// From http://msdn.microsoft.com/en-us/library/windows/hardware/ff557749(v=vs.85).aspx
+	typedef struct _OBJECT_ATTRIBUTES {
+	  ULONG           Length;
+	  HANDLE          RootDirectory;
+	  PUNICODE_STRING ObjectName;
+	  ULONG           Attributes;
+	  PVOID           SecurityDescriptor;
+	  PVOID           SecurityQualityOfService;
+	}  OBJECT_ATTRIBUTES, *POBJECT_ATTRIBUTES;
+
+	typedef struct _RTLP_CURDIR_REF
+	{
+		LONG RefCount;
+		HANDLE Handle;
+	} RTLP_CURDIR_REF, *PRTLP_CURDIR_REF;
+
+	typedef struct RTL_RELATIVE_NAME_U {
+		UNICODE_STRING RelativeName;
+		HANDLE ContainingDirectory;
+		PRTLP_CURDIR_REF CurDirRef;
+	} RTL_RELATIVE_NAME_U, *PRTL_RELATIVE_NAME_U;
+
+	// From http://undocumented.ntinternals.net/UserMode/Undocumented%20Functions/NT%20Objects/File/NtQueryInformationFile.html
+	// and http://msdn.microsoft.com/en-us/library/windows/hardware/ff567052(v=vs.85).aspx
+	typedef NTSTATUS (NTAPI *NtQueryInformationFile_t)(
+		/*_In_*/   HANDLE FileHandle,
+		/*_Out_*/  PIO_STATUS_BLOCK IoStatusBlock,
+		/*_Out_*/  PVOID FileInformation,
+		/*_In_*/   ULONG Length,
+		/*_In_*/   FILE_INFORMATION_CLASS FileInformationClass
+		);
+
+	// From http://msdn.microsoft.com/en-us/library/windows/hardware/ff567070(v=vs.85).aspx
+	typedef NTSTATUS (NTAPI *NtQueryVolumeInformationFile_t)(
+		/*_In_*/   HANDLE FileHandle,
+		/*_Out_*/  PIO_STATUS_BLOCK IoStatusBlock,
+		/*_Out_*/  PVOID FsInformation,
+		/*_In_*/   ULONG Length,
+		/*_In_*/   FS_INFORMATION_CLASS FsInformationClass
+		);
+
+	// From http://msdn.microsoft.com/en-us/library/windows/hardware/ff566492(v=vs.85).aspx
+	typedef NTSTATUS (NTAPI *NtOpenDirectoryObject_t)(
+	  /*_Out_*/  PHANDLE DirectoryHandle,
+	  /*_In_*/   ACCESS_MASK DesiredAccess,
+	  /*_In_*/   POBJECT_ATTRIBUTES ObjectAttributes
+	);
+
+
+	// From http://msdn.microsoft.com/en-us/library/windows/hardware/ff567011(v=vs.85).aspx
+	typedef NTSTATUS (NTAPI *NtOpenFile_t)(
+	  /*_Out_*/  PHANDLE FileHandle,
+	  /*_In_*/   ACCESS_MASK DesiredAccess,
+	  /*_In_*/   POBJECT_ATTRIBUTES ObjectAttributes,
+	  /*_Out_*/  PIO_STATUS_BLOCK IoStatusBlock,
+	  /*_In_*/   ULONG ShareAccess,
+	  /*_In_*/   ULONG OpenOptions
+	);
+
+	// From http://msdn.microsoft.com/en-us/library/windows/hardware/ff566424(v=vs.85).aspx
+	typedef NTSTATUS (NTAPI *NtCreateFile_t)(
+	  /*_Out_*/     PHANDLE FileHandle,
+	  /*_In_*/      ACCESS_MASK DesiredAccess,
+	  /*_In_*/      POBJECT_ATTRIBUTES ObjectAttributes,
+	  /*_Out_*/     PIO_STATUS_BLOCK IoStatusBlock,
+	  /*_In_opt_*/  PLARGE_INTEGER AllocationSize,
+	  /*_In_*/      ULONG FileAttributes,
+	  /*_In_*/      ULONG ShareAccess,
+	  /*_In_*/      ULONG CreateDisposition,
+	  /*_In_*/      ULONG CreateOptions,
+	  /*_In_opt_*/  PVOID EaBuffer,
+	  /*_In_*/      ULONG EaLength
+	);
+
+	typedef NTSTATUS (NTAPI *NtClose_t)(
+	  /*_Out_*/  HANDLE FileHandle
+	);
+
+	typedef BOOLEAN (NTAPI *RtlDosPathNameToNtPathName_U_t)(
+                             PCWSTR DosName,
+                             PUNICODE_STRING NtName,
+                             PCWSTR *PartName,
+                             PRTL_RELATIVE_NAME_U RelativeName);
+
+	// From http://undocumented.ntinternals.net/UserMode/Undocumented%20Functions/NT%20Objects/File/NtQueryDirectoryFile.html
+	// and http://msdn.microsoft.com/en-us/library/windows/hardware/ff567047(v=vs.85).aspx
+	typedef NTSTATUS (NTAPI *NtQueryDirectoryFile_t)(
+		/*_In_*/      HANDLE FileHandle,
+		/*_In_opt_*/  HANDLE Event,
+		/*_In_opt_*/  void *ApcRoutine,
+		/*_In_opt_*/  PVOID ApcContext,
+		/*_Out_*/     PIO_STATUS_BLOCK IoStatusBlock,
+		/*_Out_*/     PVOID FileInformation,
+		/*_In_*/      ULONG Length,
+		/*_In_*/      FILE_INFORMATION_CLASS FileInformationClass,
+		/*_In_*/      BOOLEAN ReturnSingleEntry,
+		/*_In_opt_*/  PUNICODE_STRING FileName,
+		/*_In_*/      BOOLEAN RestartScan
+		);
+
 	// From http://undocumented.ntinternals.net/UserMode/Undocumented%20Functions/NT%20Objects/File/NtSetInformationFile.html
 	// and http://msdn.microsoft.com/en-us/library/windows/hardware/ff567096(v=vs.85).aspx
 	typedef NTSTATUS (NTAPI *NtSetInformationFile_t)(
@@ -142,10 +275,157 @@ static inline bool wintruncate(HANDLE h, boost::afio::off_t newsize)
 		/*_In_*/   FILE_INFORMATION_CLASS FileInformationClass
 		);
 
+	typedef struct _FILE_BASIC_INFORMATION {
+	  LARGE_INTEGER CreationTime;
+	  LARGE_INTEGER LastAccessTime;
+	  LARGE_INTEGER LastWriteTime;
+	  LARGE_INTEGER ChangeTime;
+	  ULONG         FileAttributes;
+	} FILE_BASIC_INFORMATION, *PFILE_BASIC_INFORMATION;
+
+	typedef struct _FILE_STANDARD_INFORMATION {
+	  LARGE_INTEGER AllocationSize;
+	  LARGE_INTEGER EndOfFile;
+	  ULONG         NumberOfLinks;
+	  BOOLEAN       DeletePending;
+	  BOOLEAN       Directory;
+	} FILE_STANDARD_INFORMATION, *PFILE_STANDARD_INFORMATION;
+
+	typedef struct _FILE_INTERNAL_INFORMATION {
+	  LARGE_INTEGER IndexNumber;
+	} FILE_INTERNAL_INFORMATION, *PFILE_INTERNAL_INFORMATION;
+
+	typedef struct _FILE_EA_INFORMATION {
+	  ULONG EaSize;
+	} FILE_EA_INFORMATION, *PFILE_EA_INFORMATION;
+
+	typedef struct _FILE_ACCESS_INFORMATION {
+	  ACCESS_MASK AccessFlags;
+	} FILE_ACCESS_INFORMATION, *PFILE_ACCESS_INFORMATION;
+
+	typedef struct _FILE_POSITION_INFORMATION {
+	  LARGE_INTEGER CurrentByteOffset;
+	} FILE_POSITION_INFORMATION, *PFILE_POSITION_INFORMATION;
+
+	typedef struct _FILE_MODE_INFORMATION {
+	  ULONG Mode;
+	} FILE_MODE_INFORMATION, *PFILE_MODE_INFORMATION;
+
+	typedef struct _FILE_ALIGNMENT_INFORMATION {
+	  ULONG AlignmentRequirement;
+	} FILE_ALIGNMENT_INFORMATION, *PFILE_ALIGNMENT_INFORMATION;
+
+	typedef struct _FILE_NAME_INFORMATION {
+	  ULONG FileNameLength;
+	  WCHAR FileName[1];
+	} FILE_NAME_INFORMATION, *PFILE_NAME_INFORMATION;
+
+	typedef struct _FILE_ALL_INFORMATION {
+	  FILE_BASIC_INFORMATION     BasicInformation;
+	  FILE_STANDARD_INFORMATION  StandardInformation;
+	  FILE_INTERNAL_INFORMATION  InternalInformation;
+	  FILE_EA_INFORMATION        EaInformation;
+	  FILE_ACCESS_INFORMATION    AccessInformation;
+	  FILE_POSITION_INFORMATION  PositionInformation;
+	  FILE_MODE_INFORMATION      ModeInformation;
+	  FILE_ALIGNMENT_INFORMATION AlignmentInformation;
+	  FILE_NAME_INFORMATION      NameInformation;
+	} FILE_ALL_INFORMATION, *PFILE_ALL_INFORMATION;
+
+	typedef struct _FILE_FS_SECTOR_SIZE_INFORMATION {
+	  ULONG LogicalBytesPerSector;
+	  ULONG PhysicalBytesPerSectorForAtomicity;
+	  ULONG PhysicalBytesPerSectorForPerformance;
+	  ULONG FileSystemEffectivePhysicalBytesPerSectorForAtomicity;
+	  ULONG Flags;
+	  ULONG ByteOffsetForSectorAlignment;
+	  ULONG ByteOffsetForPartitionAlignment;
+	} FILE_FS_SECTOR_SIZE_INFORMATION, *PFILE_FS_SECTOR_SIZE_INFORMATION;
+
+	// From http://msdn.microsoft.com/en-us/library/windows/hardware/ff540310(v=vs.85).aspx
+	typedef struct _FILE_ID_FULL_DIR_INFORMATION  {
+	  ULONG         NextEntryOffset;
+	  ULONG         FileIndex;
+	  LARGE_INTEGER CreationTime;
+	  LARGE_INTEGER LastAccessTime;
+	  LARGE_INTEGER LastWriteTime;
+	  LARGE_INTEGER ChangeTime;
+	  LARGE_INTEGER EndOfFile;
+	  LARGE_INTEGER AllocationSize;
+	  ULONG         FileAttributes;
+	  ULONG         FileNameLength;
+	  ULONG         EaSize;
+	  LARGE_INTEGER FileId;
+	  WCHAR         FileName[1];
+	} FILE_ID_FULL_DIR_INFORMATION, *PFILE_ID_FULL_DIR_INFORMATION;
+
+	static NtQueryInformationFile_t NtQueryInformationFile;
+	static NtQueryVolumeInformationFile_t NtQueryVolumeInformationFile;
+	static NtOpenDirectoryObject_t NtOpenDirectoryObject;
+	static NtOpenFile_t NtOpenFile;
+	static NtCreateFile_t NtCreateFile;
+	static NtClose_t NtClose;
+	static RtlDosPathNameToNtPathName_U_t RtlDosPathNameToNtPathName_U;
+	static NtQueryDirectoryFile_t NtQueryDirectoryFile;
 	static NtSetInformationFile_t NtSetInformationFile;
-	if(!NtSetInformationFile)
-		if(!(NtSetInformationFile=(NtSetInformationFile_t) GetProcAddress(GetModuleHandleA("NTDLL.DLL"), "NtSetInformationFile")))
-			abort();
+
+	static void init()
+	{
+		if(!NtQueryInformationFile)
+			if(!(NtQueryInformationFile=(NtQueryInformationFile_t) GetProcAddress(GetModuleHandleA("NTDLL.DLL"), "NtQueryInformationFile")))
+				abort();
+		if(!NtQueryVolumeInformationFile)
+			if(!(NtQueryVolumeInformationFile=(NtQueryVolumeInformationFile_t) GetProcAddress(GetModuleHandleA("NTDLL.DLL"), "NtQueryVolumeInformationFile")))
+				abort();
+		if(!NtOpenDirectoryObject)
+			if(!(NtOpenDirectoryObject=(NtOpenDirectoryObject_t) GetProcAddress(GetModuleHandleA("NTDLL.DLL"), "NtOpenDirectoryObject")))
+				abort();
+		if(!NtOpenFile)
+			if(!(NtOpenFile=(NtOpenFile_t) GetProcAddress(GetModuleHandleA("NTDLL.DLL"), "NtOpenFile")))
+				abort();
+		if(!NtCreateFile)
+			if(!(NtCreateFile=(NtCreateFile_t) GetProcAddress(GetModuleHandleA("NTDLL.DLL"), "NtCreateFile")))
+				abort();
+		if(!NtClose)
+			if(!(NtClose=(NtClose_t) GetProcAddress(GetModuleHandleA("NTDLL.DLL"), "NtClose")))
+				abort();
+		if(!RtlDosPathNameToNtPathName_U)
+			if(!(RtlDosPathNameToNtPathName_U=(RtlDosPathNameToNtPathName_U_t) GetProcAddress(GetModuleHandleA("NTDLL.DLL"), "RtlDosPathNameToNtPathName_U")))
+				abort();
+		if(!NtQueryDirectoryFile)
+			if(!(NtQueryDirectoryFile=(NtQueryDirectoryFile_t) GetProcAddress(GetModuleHandleA("NTDLL.DLL"), "NtQueryDirectoryFile")))
+				abort();
+		if(!NtSetInformationFile)
+			if(!(NtSetInformationFile=(NtSetInformationFile_t) GetProcAddress(GetModuleHandleA("NTDLL.DLL"), "NtSetInformationFile")))
+				abort();
+	}
+
+	static inline uint16_t to_st_type(ULONG FileAttributes, uint16_t mode=0)
+	{
+		if(FileAttributes&FILE_ATTRIBUTE_REPARSE_POINT)
+			mode|=S_IFLNK;
+		else if(FileAttributes&FILE_ATTRIBUTE_DIRECTORY)
+			mode|=S_IFDIR;
+		else
+			mode|=S_IFREG;
+		return mode;
+	}
+
+	static inline boost::afio::chrono::system_clock::time_point to_timepoint(LARGE_INTEGER time)
+	{
+#error fixme
+		static BOOST_CONSTEXPR_OR_CONST long long TIMESPEC_TO_FILETIME_OFFSET=(((long long)27111902 << 32) + (long long)3577643008);
+		boost::afio::chrono::duration<unsigned long long, boost::afio::ratio<1, 10000000 /* 100ns intervals per second*/>> duration(time.QuadPart - TIMESPEC_TO_FILETIME_OFFSET);
+		return boost::afio::chrono::system_clock::time_point(duration);
+	}
+} // namespace
+
+// WinVista and later have the SetFileInformationByHandle() function, but for WinXP
+// compatibility we use the kernel syscall directly
+static inline bool wintruncate(HANDLE h, boost::afio::off_t newsize)
+{
+	windows_nt_kernel::init();
+	using namespace windows_nt_kernel;
 	IO_STATUS_BLOCK isb={ 0 };
 	if(0/*STATUS_SUCCESS*/!=NtSetInformationFile(h, &isb, &newsize, sizeof(newsize), FileEndOfFileInformation))
 	{
@@ -300,8 +580,8 @@ namespace detail {
 			BOOST_AFIO_ERRHWINFN(INVALID_HANDLE_VALUE!=h, path);
 			return h;
 		}
-		async_io_handle_windows(std::shared_ptr<async_file_io_dispatcher_base> _parent, const std::filesystem::path &path, file_flags flags) : async_io_handle(_parent.get(), path, flags), parent(_parent), myid(nullptr), has_been_added(false), SyncOnClose(false) { }
-		inline async_io_handle_windows(std::shared_ptr<async_file_io_dispatcher_base> _parent, const std::filesystem::path &path, file_flags flags, bool _SyncOnClose, HANDLE _h);
+		async_io_handle_windows(std::shared_ptr<async_file_io_dispatcher_base> _parent, std::shared_ptr<detail::async_io_handle> _dirh, const std::filesystem::path &path, file_flags flags) : async_io_handle(_parent.get(), std::move(_dirh), path, flags), parent(_parent), myid(nullptr), has_been_added(false), SyncOnClose(false) { }
+		inline async_io_handle_windows(std::shared_ptr<async_file_io_dispatcher_base> _parent, std::shared_ptr<detail::async_io_handle> _dirh, const std::filesystem::path &path, file_flags flags, bool _SyncOnClose, HANDLE _h);
 		virtual void *native_handle() const { return myid; }
 
 		// You can't use shared_from_this() in a constructor so ...
@@ -325,16 +605,61 @@ namespace detail {
 				h->close();
 			}
 		}
+		virtual stat_t stat(metadata_flags wanted) const
+		{
+			windows_nt_kernel::init();
+			using namespace windows_nt_kernel;
+			stat_t stat(nullptr);
+			IO_STATUS_BLOCK isb={ 0 };
+			NTSTATUS ntval=0;
+
+			HANDLE h=myid;
+			std::filesystem::path::value_type buffer[sizeof(FILE_ALL_INFORMATION)/sizeof(std::filesystem::path::value_type)+32769];
+			FILE_ALL_INFORMATION &fai=*(FILE_ALL_INFORMATION *)buffer;
+			FILE_FS_SECTOR_SIZE_INFORMATION ffssi={0};
+			bool needInternal=!!(wanted&metadata_flags::ino);
+			bool needBasic=(!!(wanted&metadata_flags::type) || !!(wanted&metadata_flags::atim) || !!(wanted&metadata_flags::mtim) || !!(wanted&metadata_flags::ctim) || !!(wanted&metadata_flags::birthtim));
+			bool needStandard=(!!(wanted&metadata_flags::nlink) || !!(wanted&metadata_flags::size) || !!(wanted&metadata_flags::allocated) || !!(wanted&metadata_flags::blocks));
+			// It's not widely known that the NT kernel supplies a stat() equivalent i.e. get me everything in a single syscall
+			// However fetching FileAlignmentInformation which comes with FILE_ALL_INFORMATION is slow as it touches the device driver,
+			// so only use if we need more than one item
+			if((needInternal+needBasic+needStandard)>=2)
+				ntval|=NtQueryInformationFile(h, &isb, &fai, sizeof(buffer), FileAllInformation);
+			else
+			{
+				if(needInternal)
+					ntval|=NtQueryInformationFile(h, &isb, &fai.InternalInformation, sizeof(fai.InternalInformation), FileInternalInformation);
+				if(needBasic)
+					ntval|=NtQueryInformationFile(h, &isb, &fai.BasicInformation, sizeof(fai.BasicInformation), FileBasicInformation);
+				if(needStandard)
+					ntval|=NtQueryInformationFile(h, &isb, &fai.StandardInformation, sizeof(fai.StandardInformation), FileStandardInformation);
+			}
+			if(!!(wanted&metadata_flags::blocks) || !!(wanted&metadata_flags::blksize))
+				ntval|=NtQueryVolumeInformationFile(h, &isb, &ffssi, sizeof(ffssi), FileFsSectorSizeInformation);
+			if(0/*STATUS_SUCCESS*/!=ntval)
+				BOOST_AFIO_THROW(std::ios_base::failure("Failed to stat file '"+path().generic_string()+"'"));
+			if(!!(wanted&metadata_flags::ino)) { stat.st_ino=fai.InternalInformation.IndexNumber.QuadPart; }
+			if(!!(wanted&metadata_flags::type)) { stat.st_type=to_st_type(fai.BasicInformation.FileAttributes); }
+			if(!!(wanted&metadata_flags::nlink)) { stat.st_nlink=(int16_t) fai.StandardInformation.NumberOfLinks; }
+			if(!!(wanted&metadata_flags::atim)) { stat.st_atim=to_timepoint(fai.BasicInformation.LastAccessTime); }
+			if(!!(wanted&metadata_flags::mtim)) { stat.st_mtim=to_timepoint(fai.BasicInformation.LastWriteTime); }
+			if(!!(wanted&metadata_flags::ctim)) { stat.st_ctim=to_timepoint(fai.BasicInformation.ChangeTime); }
+			if(!!(wanted&metadata_flags::size)) { stat.st_size=fai.StandardInformation.EndOfFile.QuadPart; }
+			if(!!(wanted&metadata_flags::allocated)) { stat.st_allocated=fai.StandardInformation.AllocationSize.QuadPart; }
+			if(!!(wanted&metadata_flags::blocks)) { stat.st_blocks=fai.StandardInformation.AllocationSize.QuadPart/ffssi.PhysicalBytesPerSectorForPerformance; }
+			if(!!(wanted&metadata_flags::blksize)) { stat.st_blksize=(uint16_t) ffssi.PhysicalBytesPerSectorForPerformance; }
+			if(!!(wanted&metadata_flags::birthtim)) { stat.st_birthtim=to_timepoint(fai.BasicInformation.CreationTime); }
+			return stat;
+		}
 	};
 #endif
 	struct async_io_handle_posix : public async_io_handle
 	{
 		std::shared_ptr<async_file_io_dispatcher_base> parent;
-		std::shared_ptr<detail::async_io_handle> dirh;
 		int fd;
 		bool has_been_added, SyncOnClose, has_ever_been_fsynced;
 
-		async_io_handle_posix(std::shared_ptr<async_file_io_dispatcher_base> _parent, std::shared_ptr<detail::async_io_handle> _dirh, const std::filesystem::path &path, file_flags flags, bool _SyncOnClose, int _fd) : async_io_handle(_parent.get(), path, flags), parent(_parent), dirh(_dirh), fd(_fd), has_been_added(false), SyncOnClose(_SyncOnClose),has_ever_been_fsynced(false)
+		async_io_handle_posix(std::shared_ptr<async_file_io_dispatcher_base> _parent, std::shared_ptr<detail::async_io_handle> _dirh, const std::filesystem::path &path, file_flags flags, bool _SyncOnClose, int _fd) : async_io_handle(_parent.get(), std::move(_dirh), path, flags), parent(_parent), fd(_fd), has_been_added(false), SyncOnClose(_SyncOnClose),has_ever_been_fsynced(false)
 		{
 			if(fd!=-999)
 				BOOST_AFIO_ERRHOSFN(fd, path);
@@ -360,6 +685,9 @@ namespace detail {
 				fd=-1;
 			}
 		}
+		virtual stat_t stat(metadata_flags wanted) const
+		{
+		}
 	};
 
     #ifdef DOXYGEN_NO_CLASS_ENUMS
@@ -382,6 +710,7 @@ namespace detail {
 		write,
 		truncate,
 		barrier,
+		enumerate,
 
 		Last
 	}
@@ -402,7 +731,8 @@ namespace detail {
 		"read",
 		"write",
 		"truncate",
-		"barrier"
+		"barrier",
+		"enumerate"
 	};
 	static_assert(static_cast<size_t>(OpType::Last)==sizeof(optypes)/sizeof(*optypes), "You forgot to fix up the strings matching OpType");
 	struct async_file_io_dispatcher_op
@@ -495,7 +825,7 @@ namespace detail {
 		}
 	};
 #if defined(WIN32)
-	inline async_io_handle_windows::async_io_handle_windows(std::shared_ptr<async_file_io_dispatcher_base> _parent, const std::filesystem::path &path, file_flags flags, bool _SyncOnClose, HANDLE _h) : async_io_handle(_parent.get(), path, flags), parent(_parent), h(new boost::asio::windows::random_access_handle(_parent->p->pool->io_service(), int_checkHandle(_h, path))), myid(_h), has_been_added(false), SyncOnClose(_SyncOnClose) { }
+	inline async_io_handle_windows::async_io_handle_windows(std::shared_ptr<async_file_io_dispatcher_base> _parent, std::shared_ptr<detail::async_io_handle> _dirh, const std::filesystem::path &path, file_flags flags, bool _SyncOnClose, HANDLE _h) : async_io_handle(_parent.get(), std::move(_dirh), path, flags), parent(_parent), h(new boost::asio::windows::random_access_handle(_parent->p->pool->io_service(), int_checkHandle(_h, path))), myid(_h), has_been_added(false), SyncOnClose(_SyncOnClose) { }
 #endif
 	class async_file_io_dispatcher_compat;
 	class async_file_io_dispatcher_windows;
@@ -1191,6 +1521,26 @@ template<class F, bool iswrite> std::vector<async_io_op> async_file_io_dispatche
     }
 	return ret;
 }
+// Directory enumerate specialisation
+template<class F> std::pair<std::vector<future<std::pair<std::vector<detail::directory_entry>, bool>>>, std::vector<async_io_op>> async_file_io_dispatcher_base::chain_async_ops(int optype, const std::vector<async_enumerate_op_req> &container, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, exception_ptr *, async_enumerate_op_req, std::shared_ptr<promise<std::pair<std::vector<detail::directory_entry>, bool>>> ret))
+{
+	typedef std::pair<std::vector<detail::directory_entry>, bool> retitemtype;
+	std::vector<async_io_op> ret;
+	std::vector<future<retitemtype>> retfutures;
+	ret.reserve(container.size());
+	retfutures.reserve(container.size());
+	BOOST_AFIO_LOCK_GUARD<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
+	exception_ptr he;
+	detail::immediate_async_ops immediates;
+	BOOST_FOREACH(auto &i, container)
+    {
+		// Unfortunately older C++0x compilers don't cope well with feeding move only std::future<> into std::bind
+		auto transport=std::make_shared<promise<retitemtype>>();
+		retfutures.push_back(std::move(transport->get_future()));
+		ret.push_back(chain_async_op(&he, immediates, optype, i.precondition, flags, f, i, transport));
+    }
+	return std::make_pair(std::move(retfutures), std::move(ret));
+}
 
 namespace detail
 {
@@ -1538,6 +1888,11 @@ namespace detail {
 #endif
 			return std::make_pair(true, h);
 		}
+		// Called in unknown thread
+		completion_returntype doenumerate(size_t id, std::shared_ptr<detail::async_io_handle> h, exception_ptr *, async_enumerate_op_req req, std::shared_ptr<promise<std::pair<std::vector<detail::directory_entry>, bool>>> ret)
+		{
+			return std::make_pair(true, h);
+		}
 
 	public:
 		async_file_io_dispatcher_windows(std::shared_ptr<thread_source> threadpool, file_flags flagsforce, file_flags flagsmask) : async_file_io_dispatcher_base(threadpool, flagsforce, flagsmask), pagesize(page_size())
@@ -1642,6 +1997,17 @@ namespace detail {
             }
 #endif
 			return chain_async_ops((int) detail::OpType::truncate, ops, sizes, async_op_flags::None, &async_file_io_dispatcher_windows::dotruncate);
+		}
+		virtual std::pair<std::vector<future<std::pair<std::vector<detail::directory_entry>, bool>>>, std::vector<async_io_op>> enumerate(const std::vector<async_enumerate_op_req> &reqs)
+		{
+#if BOOST_AFIO_VALIDATE_INPUTS
+			BOOST_FOREACH(auto &i, reqs)
+            {
+				if(!i.validate())
+					BOOST_AFIO_THROW(std::runtime_error("Inputs are invalid."));
+            }
+#endif
+			return chain_async_ops((int) detail::OpType::enumerate, reqs, async_op_flags::None, &async_file_io_dispatcher_windows::doenumerate);
 		}
 	};
 #endif
@@ -1864,7 +2230,11 @@ namespace detail {
 			BOOST_AFIO_ERRHOSFN(BOOST_AFIO_POSIX_FTRUNCATE(p->fd, newsize), p->path());
 			return std::make_pair(true, h);
 		}
-
+		// Called in unknown thread
+		completion_returntype doenumerate(size_t id, std::shared_ptr<detail::async_io_handle> h, exception_ptr *, async_enumerate_op_req req, std::shared_ptr<promise<std::pair<std::vector<detail::directory_entry>, bool>>> ret)
+		{
+			return std::make_pair(true, h);
+		}
 
 	public:
 		async_file_io_dispatcher_compat(std::shared_ptr<thread_source> threadpool, file_flags flagsforce, file_flags flagsmask) : async_file_io_dispatcher_base(threadpool, flagsforce, flagsmask)
@@ -1970,6 +2340,17 @@ namespace detail {
             }
 #endif
 			return chain_async_ops((int) detail::OpType::truncate, ops, sizes, async_op_flags::None, &async_file_io_dispatcher_compat::dotruncate);
+		}
+		virtual std::pair<std::vector<future<std::pair<std::vector<detail::directory_entry>, bool>>>, std::vector<async_io_op>> enumerate(const std::vector<async_enumerate_op_req> &reqs)
+		{
+#if BOOST_AFIO_VALIDATE_INPUTS
+			BOOST_FOREACH(auto &i, reqs)
+            {
+				if(!i.validate())
+					BOOST_AFIO_THROW(std::runtime_error("Inputs are invalid."));
+            }
+#endif
+			return chain_async_ops((int) detail::OpType::enumerate, reqs, async_op_flags::None, &async_file_io_dispatcher_compat::doenumerate);
 		}
 	};
 }
