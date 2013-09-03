@@ -625,6 +625,7 @@ class async_file_io_dispatcher_base;
 struct async_io_op;
 struct async_path_op_req;
 template<class T> struct async_data_op_req;
+struct async_enumerate_op_req;
 
 #define BOOST_AFIO_DECLARE_CLASS_ENUM_AS_BITFIELD(type) \
 inline BOOST_CONSTEXPR type operator&(type a, type b) \
@@ -665,7 +666,7 @@ enum class file_flags : size_t
 	Create=16,			//!< Open and create if doesn't exist
 	CreateOnlyIfNotExist=32, //!< Create and open only if doesn't exist
 	WillBeSequentiallyAccessed=128, //!< Will be exclusively either read or written sequentially. If you're exclusively writing sequentially, \em strongly consider turning on OSDirect too.
-	FastDirectoryEnumeration=256, //!< Hold a file handle open to the containing directory of each open file for fast directory enumeration (POSIX only).
+	FastDirectoryEnumeration=256, //!< Hold a file handle open to the containing directory of each open file for fast directory enumeration.
 
 	OSDirect=(1<<16),	//!< Bypass the OS file buffers (only really useful for writing large files. Note you must 4Kb align everything if this is on)
 
@@ -706,6 +707,166 @@ BOOST_AFIO_DECLARE_CLASS_ENUM_AS_BITFIELD(async_op_flags)
 #endif
 
 namespace detail {
+
+	/*! \enum metadata_flags
+	\brief Bitflags for availability of metadata
+	\ingroup directory_enumeration
+	*/
+#ifdef DOXYGEN_NO_CLASS_ENUMS
+	enum metadata_flags
+#elif defined(BOOST_NO_CXX11_SCOPED_ENUMS)
+	BOOST_SCOPED_ENUM_UT_DECLARE_BEGIN(metadata_flags, size_t)
+#else
+	enum class metadata_flags : size_t
+#endif
+	{
+		None=0,
+		dev=1<<0,
+		ino=1<<1,
+		type=1<<2,
+		mode=1<<3,
+		nlink=1<<4,
+		uid=1<<5,
+		gid=1<<6,
+		rdev=1<<7,
+		atim=1<<8,
+		mtim=1<<9,
+		ctim=1<<10,
+		size=1<<11,
+		allocated=1<<12,
+		blocks=1<<13,
+		blksize=1<<14,
+		flags=1<<15,
+		gen=1<<16,
+		birthtim=1<<17,
+		All=(size_t)-1       //!< Return the maximum possible metadata.
+	}
+#ifdef BOOST_NO_CXX11_SCOPED_ENUMS
+	BOOST_SCOPED_ENUM_DECLARE_END(metadata_flags)
+	BOOST_AFIO_DECLARE_CLASS_ENUM_AS_BITFIELD(metadata_flags::enum_type)
+#else
+	;
+	BOOST_AFIO_DECLARE_CLASS_ENUM_AS_BITFIELD(metadata_flags)
+#endif
+	/*! \brief Metadata about a directory entry
+
+	This structure looks somewhat like a `struct stat`, and indeed it was derived from BSD's `struct stat`.
+	However there are a number of changes to better interoperate with modern practice, specifically:
+
+	1. inode value containers are forced to 64 bits.
+	2. Timestamps use C++11's `std::chrono::system_clock::time_point` or Boost equivalent. The resolution
+	of these may or may not equal what a `struct timespec` can do depending on your STL.
+	3. The type of a file, which is available on Windows and on POSIX without needing a `lstat()`, is provided by `st_type`.
+	*/
+	struct stat_t
+	{
+		uint64_t        st_dev;                       /*!< inode of device containing file (POSIX) */
+		uint64_t        st_ino;                       /*!< inode of file (Windows, POSIX) */
+		uint16_t        st_type;                      /*!< type of file (Windows, POSIX) */
+		uint16_t        st_mode;                      /*!< type and perms of file (POSIX) */
+		int16_t         st_nlink;                     /*!< number of hard links (Windows, POSIX) */
+		int16_t         st_uid;                       /*!< user ID of the file (POSIX) */
+		int16_t         st_gid;                       /*!< group ID of the file (POSIX) */
+		dev_t           st_rdev;                      /*!< id of file if special (POSIX) */
+		chrono::system_clock::time_point st_atim;     /*!< time of last access (Windows, POSIX) */
+		chrono::system_clock::time_point st_mtim;     /*!< time of last data modification (Windows, POSIX) */
+		chrono::system_clock::time_point st_ctim;     /*!< time of last status change (Windows, POSIX) */
+		off_t           st_size;                      /*!< file size, in bytes (Windows, POSIX) */
+		off_t           st_allocated;                 /*!< bytes allocated for file (Windows, POSIX) */
+		off_t           st_blocks;                    /*!< number of blocks allocated (Windows, POSIX) */
+		uint16_t        st_blksize;                   /*!< block size used by this device (Windows, POSIX) */
+		uint32_t        st_flags;                     /*!< user defined flags for file (FreeBSD, OS X) */
+		uint32_t        st_gen;                       /*!< file generation number (FreeBSD, OS X)*/
+		chrono::system_clock::time_point st_birthtim; /*!< time of file creation (Windows, FreeBSD, OS X) */
+
+		//! Constructs a UNINITIALIZED instance i.e. full of random garbage
+		stat_t() { }
+		//! Constructs a zeroed instance
+		stat_t(nullptr_t) : st_dev(0), st_ino(0), st_type(0), st_mode(0), st_nlink(0), st_uid(0), st_gid(0), st_rdev(0),
+		st_size(0), st_allocated(0), st_blocks(0), st_blksize(0), st_flags(0), st_gen(0) { }
+	};
+
+	/*! \brief The abstract base class for an entry in a directory with lazily filled metadata
+	*/
+	class BOOST_AFIO_DECL directory_entry
+	{
+		std::filesystem::path leafname;
+		stat_t stat;
+		metadata_flags have_metadata;
+		virtual void _int_fetch(metadata_flags wanted, std::filesystem::path prefix=std::filesystem::path())=0;
+	public:
+		//! Constructs an instance
+		directory_entry() : stat(nullptr), have_metadata(metadata_flags::None) { }
+		virtual ~directory_entry() { }
+		bool operator==(const directory_entry& rhs) const BOOST_NOEXCEPT_OR_NOTHROW { return leafname == rhs.leafname; }
+		bool operator!=(const directory_entry& rhs) const BOOST_NOEXCEPT_OR_NOTHROW { return leafname != rhs.leafname; }
+		bool operator< (const directory_entry& rhs) const BOOST_NOEXCEPT_OR_NOTHROW { return leafname < rhs.leafname; }
+		bool operator<=(const directory_entry& rhs) const BOOST_NOEXCEPT_OR_NOTHROW { return leafname <= rhs.leafname; }
+		bool operator> (const directory_entry& rhs) const BOOST_NOEXCEPT_OR_NOTHROW { return leafname > rhs.leafname; }
+		bool operator>=(const directory_entry& rhs) const BOOST_NOEXCEPT_OR_NOTHROW { return leafname >= rhs.leafname; }
+		//! The name of the directory entry
+		std::filesystem::path name() const BOOST_NOEXCEPT_OR_NOTHROW { return leafname; }
+		//! A bitfield of what metadata is ready right now
+		metadata_flags metadata_ready() const BOOST_NOEXCEPT_OR_NOTHROW { return have_metadata; }
+		//! Fetches the specified metadata, returning that newly available. This is a blocking call.
+		metadata_flags fetch_metadata(std::filesystem::path prefix, metadata_flags wanted)
+		{
+			metadata_flags tofetch;
+			wanted=wanted&metadata_supported();
+			tofetch=wanted&~have_metadata;
+			if(!!tofetch) _int_fetch(tofetch, prefix);
+			return have_metadata;
+		}
+		//! Fetches a fast path `stat_t` structure which is missing those fields not fast to fetch on this platform.
+		stat_t full_stat(std::filesystem::path prefix, metadata_flags wanted=directory_entry::metadata_fastpath())
+		{
+			fetch_metadata(prefix, wanted);
+			return stat;
+		}
+#define BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(field) \
+	auto st_##field(std::filesystem::path prefix=std::filesystem::path()) -> decltype(stat.st_##field) { if(!(have_metadata&metadata_flags::field)) { _int_fetch(metadata_flags::field, prefix); } return stat.st_##field; }
+		//! Returns st_dev
+		BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(dev)
+		//! Returns st_ino
+		BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(ino)
+		//! Returns st_type
+		BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(type)
+		//! Returns st_mode
+		BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(mode)
+		//! Returns st_nlink
+		BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(nlink)
+		//! Returns st_uid
+		BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(uid)
+		//! Returns st_gid
+		BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(gid)
+		//! Returns st_rdev
+		BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(rdev)
+		//! Returns st_atim
+		BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(atim)
+		//! Returns st_mtim
+		BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(mtim)
+		//! Returns st_ctim
+		BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(ctim)
+		//! Returns st_size
+		BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(size)
+		//! Returns st_allocated
+		BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(allocated)
+		//! Returns st_blocks
+		BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(blocks)
+		//! Returns st_blksize
+		BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(blksize)
+		//! Returns st_flags
+		BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(flags)
+		//! Returns st_gen
+		BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(gen)
+		//! Returns st_birthtim
+		BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(birthtim)
+
+		//! A bitfield of what metadata is available on this platform. This doesn't mean all is available for every filing system.
+		static metadata_flags metadata_supported() BOOST_NOEXCEPT_OR_NOTHROW;
+		//! A bitfield of what metadata is fast on this platform. This doesn't mean all is available for every filing system.
+		static metadata_flags metadata_fastpath() BOOST_NOEXCEPT_OR_NOTHROW;
+	};
 
 	struct async_io_handle_posix;
 	struct async_io_handle_windows;
@@ -751,6 +912,8 @@ namespace detail {
 		off_t write_count() const { return byteswritten; }
 		//! Returns how many bytes have been written since this handle was last fsynced.
 		off_t write_count_since_fsync() const { return byteswritten-byteswrittenatlastfsync; }
+		//! Returns a mostly filled stat_t structure for the file or directory referenced by this handle. Use `metadata_flags::All` if you want it as complete as your platform allows, even at the cost of severe performance loss.
+		virtual stat_t stat(metadata_flags wanted=directory_entry::metadata_fastpath()) const=0;
 	};
 	struct immediate_async_ops;
 	template<bool for_writing> class async_data_op_req_impl;
@@ -1126,7 +1289,7 @@ public:
     \qexample{truncate_example}
     */
 	virtual std::vector<async_io_op> truncate(const std::vector<async_io_op> &ops, const std::vector<off_t> &sizes)=0;
-	/*! \brief Schedule an asynchronous data write after a preceding operation.
+	/*! \brief Schedule an asynchronous file length truncation after a preceding operation.
     \return An op handle.
     \param op An op handle.
     \param newsize The new size for the file.
@@ -1137,6 +1300,17 @@ public:
     \qexample{truncate_example}
     */
 	inline async_io_op truncate(const async_io_op &op, off_t newsize);
+	/*! \brief Schedule an asynchronous directory enumeration after a preceding operation.
+    \return A batch of future vectors of directory entries with boolean returning false if done.
+    \param reqs A batch of enumeration requests.
+    \ingroup async_file_io_dispatcher_base__enumerate
+    \qbk{distinguish, batch}
+    \complexity{Amortised O(N) to dispatch. Amortised O(N/threadpool*M) to complete where M is the average number of entries in each directory.}
+    \exceptionmodelstd
+    \qexample{enumerate_example}
+    */
+	virtual std::pair<std::vector<future<std::pair<std::vector<detail::directory_entry>, bool>>>, std::vector<async_io_op>> enumerate(const std::vector<async_enumerate_op_req> &reqs);
+
 	/*! \brief Schedule an asynchronous synchronisation of preceding operations.
     
     If you perform many asynchronous operations of unequal duration but wish to schedule one of more operations
@@ -1890,6 +2064,40 @@ template<class C, class T, class A> struct async_data_op_req<const std::basic_st
     //! \async_data_op_req1
 	async_data_op_req(async_io_op _precondition, const std::basic_string<C, T, A> &v, off_t _where) : detail::async_data_op_req_impl<true>(std::move(_precondition), static_cast<const void *>(&v.front()), v.size()*sizeof(A), _where) { }
 };
+
+/*! \struct async_enumerate_op_req
+\brief A convenience bundle of precondition, number of items to enumerate and item pattern match.
+*/
+struct async_enumerate_op_req
+{
+	async_io_op precondition;    //!< A precondition for this operation
+	size_t maxitems;             //!< The maximum number of items to return in this request
+	std::filesystem::path glob;  //!< An optional shell glob by which to filter the items returned. Done kernel side on Windows, user side on POSIX.
+    //! \constr
+	async_enumerate_op_req() : maxitems(0) { }
+	/*! \brief Constructs an instance.
+    
+    \param _precondition The precondition for this operation.
+    \param _maxitems The maximum number of items to return in this request.
+    \param _glob An optional shell glob by which to filter the items returned. Done kernel side on Windows, user side on POSIX.
+    */
+	async_enumerate_op_req(async_io_op _precondition, size_t _maxitems, std::filesystem::path _glob=std::filesystem::path()) : precondition(std::move(_precondition)), maxitems(_maxitems), glob(std::move(_glob)) { _validate(); }
+	//! Validates contents
+	bool validate() const
+	{
+		if(!maxitems) return false;
+		return !precondition.id || precondition.validate();
+	}
+private:
+	void _validate() const
+	{
+#if BOOST_AFIO_VALIDATE_INPUTS
+		if(!validate())
+			BOOST_AFIO_THROW(std::runtime_error("Inputs are invalid."));
+#endif
+	}
+};
+
 
 namespace detail {
 	template<bool iswrite, class T> struct async_file_io_dispatcher_rwconverter
