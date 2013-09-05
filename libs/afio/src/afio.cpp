@@ -148,6 +148,12 @@ namespace windows_nt_kernel
 #ifndef NTSTATUS
 #define NTSTATUS LONG
 #endif
+#ifndef STATUS_TIMEOUT
+#define STATUS_TIMEOUT 0x00000102
+#endif
+#ifndef STATUS_PENDING
+#define STATUS_PENDING 0x00000103
+#endif
 
 	// From http://msdn.microsoft.com/en-us/library/windows/hardware/ff550671(v=vs.85).aspx
 	typedef struct _IO_STATUS_BLOCK {
@@ -186,6 +192,51 @@ namespace windows_nt_kernel
 		HANDLE ContainingDirectory;
 		PRTLP_CURDIR_REF CurDirRef;
 	} RTL_RELATIVE_NAME_U, *PRTL_RELATIVE_NAME_U;
+
+	typedef enum _KWAIT_REASON
+	{
+			 Executive = 0,
+			 FreePage = 1,
+			 PageIn = 2,
+			 PoolAllocation = 3,
+			 DelayExecution = 4,
+			 Suspended = 5,
+			 UserRequest = 6,
+			 WrExecutive = 7,
+			 WrFreePage = 8,
+			 WrPageIn = 9,
+			 WrPoolAllocation = 10,
+			 WrDelayExecution = 11,
+			 WrSuspended = 12,
+			 WrUserRequest = 13,
+			 WrEventPair = 14,
+			 WrQueue = 15,
+			 WrLpcReceive = 16,
+			 WrLpcReply = 17,
+			 WrVirtualMemory = 18,
+			 WrPageOut = 19,
+			 WrRendezvous = 20,
+			 Spare2 = 21,
+			 Spare3 = 22,
+			 Spare4 = 23,
+			 Spare5 = 24,
+			 WrCalloutStack = 25,
+			 WrKernel = 26,
+			 WrResource = 27,
+			 WrPushLock = 28,
+			 WrMutex = 29,
+			 WrQuantumEnd = 30,
+			 WrDispatchInt = 31,
+			 WrPreempted = 32,
+			 WrYieldExecution = 33,
+			 WrFastMutex = 34,
+			 WrGuardedMutex = 35,
+			 WrRundown = 36,
+			 MaximumWaitReason = 37
+	} KWAIT_REASON;
+
+	typedef enum _KPROCESSOR_MODE { KernelMode, UserMode, MaximumMode } KPROCESSOR_MODE;
+
 
 	// From http://undocumented.ntinternals.net/UserMode/Undocumented%20Functions/NT%20Objects/File/NtQueryInformationFile.html
 	// and http://msdn.microsoft.com/en-us/library/windows/hardware/ff567052(v=vs.85).aspx
@@ -273,6 +324,14 @@ namespace windows_nt_kernel
 		/*_In_*/   PVOID FileInformation,
 		/*_In_*/   ULONG Length,
 		/*_In_*/   FILE_INFORMATION_CLASS FileInformationClass
+		);
+
+	typedef NTSTATUS (NTAPI *KeWaitForSingleObject_t)(
+		  /*_In_*/      PVOID Object,
+		  /*_In_*/      KWAIT_REASON WaitReason,
+		  /*_In_*/      KPROCESSOR_MODE WaitMode,
+		  /*_In_*/      BOOLEAN Alertable,
+		  /*_In_opt_*/  PLARGE_INTEGER Timeout
 		);
 
 	typedef struct _FILE_BASIC_INFORMATION {
@@ -368,8 +427,9 @@ namespace windows_nt_kernel
 	static RtlDosPathNameToNtPathName_U_t RtlDosPathNameToNtPathName_U;
 	static NtQueryDirectoryFile_t NtQueryDirectoryFile;
 	static NtSetInformationFile_t NtSetInformationFile;
+	static KeWaitForSingleObject_t KeWaitForSingleObject;
 
-	static void init()
+	static void doinit()
 	{
 		if(!NtQueryInformationFile)
 			if(!(NtQueryInformationFile=(NtQueryInformationFile_t) GetProcAddress(GetModuleHandleA("NTDLL.DLL"), "NtQueryInformationFile")))
@@ -398,6 +458,18 @@ namespace windows_nt_kernel
 		if(!NtSetInformationFile)
 			if(!(NtSetInformationFile=(NtSetInformationFile_t) GetProcAddress(GetModuleHandleA("NTDLL.DLL"), "NtSetInformationFile")))
 				abort();
+		if(!KeWaitForSingleObject)
+			if(!(KeWaitForSingleObject=(KeWaitForSingleObject_t) GetProcAddress(GetModuleHandleA("NTDLL.DLL"), "KeWaitForSingleObject")))
+				abort();
+	}
+	static inline void init()
+	{
+		static bool initialised=false;
+		if(!initialised)
+		{
+			doinit();
+			initialised=true;
+		}
 	}
 
 	static inline uint16_t to_st_type(ULONG FileAttributes, uint16_t mode=0)
@@ -413,10 +485,25 @@ namespace windows_nt_kernel
 
 	static inline boost::afio::chrono::system_clock::time_point to_timepoint(LARGE_INTEGER time)
 	{
-#error fixme
-		static BOOST_CONSTEXPR_OR_CONST long long TIMESPEC_TO_FILETIME_OFFSET=(((long long)27111902 << 32) + (long long)3577643008);
-		boost::afio::chrono::duration<unsigned long long, boost::afio::ratio<1, 10000000 /* 100ns intervals per second*/>> duration(time.QuadPart - TIMESPEC_TO_FILETIME_OFFSET);
+		// We make the big assumption that the STL's system_clock is based on the time_t epoch 1st Jan 1970.
+		static BOOST_CONSTEXPR_OR_CONST unsigned long long FILETIME_OFFSET_TO_1970=(((unsigned long long)27111902 << 32) + (unsigned long long)3577643008);
+		boost::afio::chrono::duration<unsigned long long, boost::afio::ratio<1, 10000000 /* 100ns intervals per second*/>> duration(time.QuadPart - FILETIME_OFFSET_TO_1970);
 		return boost::afio::chrono::system_clock::time_point(duration);
+	}
+
+	// Adapted from http://www.cprogramming.com/snippets/source-code/convert-ntstatus-win32-error
+	// Could use RtlNtStatusToDosError() instead
+	static inline void SetWin32LastErrorFromNtStatus(NTSTATUS ntstatus)
+	{
+		DWORD br;
+		OVERLAPPED o;
+ 
+		o.Internal = ntstatus;
+		o.InternalHigh = 0;
+		o.Offset = 0;
+		o.OffsetHigh = 0;
+		o.hEvent = 0;
+		GetOverlappedResult(NULL, &o, &br, FALSE);
 	}
 } // namespace
 
@@ -567,6 +654,161 @@ std::shared_ptr<std_thread_pool> process_threadpool()
 }
 
 namespace detail {
+
+	metadata_flags directory_entry::metadata_supported() BOOST_NOEXCEPT_OR_NOTHROW
+	{
+		metadata_flags ret;
+#ifdef WIN32
+		ret=metadata_flags::None
+			//| metadata_flags::dev
+			| metadata_flags::ino        // FILE_INTERNAL_INFORMATION, enumerated
+			| metadata_flags::type       // FILE_BASIC_INFORMATION, enumerated
+			//| metadata_flags::mode
+			| metadata_flags::nlink      // FILE_STANDARD_INFORMATION
+			//| metadata_flags::uid
+			//| metadata_flags::gid
+			//| metadata_flags::rdev
+			| metadata_flags::atim       // FILE_BASIC_INFORMATION, enumerated
+			| metadata_flags::mtim       // FILE_BASIC_INFORMATION, enumerated
+			| metadata_flags::ctim       // FILE_BASIC_INFORMATION, enumerated
+			| metadata_flags::size       // FILE_STANDARD_INFORMATION, enumerated
+			| metadata_flags::allocated  // FILE_STANDARD_INFORMATION, enumerated
+			| metadata_flags::blocks
+			| metadata_flags::blksize    // FILE_ALIGNMENT_INFORMATION
+			//| metadata_flags::flags
+			//| metadata_flags::gen
+			| metadata_flags::birthtim   // FILE_BASIC_INFORMATION, enumerated
+			;
+#elif defined(__linux__)
+		ret=metadata_flags::None
+			| metadata_flags::dev
+			| metadata_flags::ino
+			| metadata_flags::type
+			| metadata_flags::mode
+			| metadata_flags::nlink
+			| metadata_flags::uid
+			| metadata_flags::gid
+			| metadata_flags::rdev
+			| metadata_flags::atim
+			| metadata_flags::mtim
+			| metadata_flags::ctim
+			| metadata_flags::size
+			| metadata_flags::allocated
+			| metadata_flags::blocks
+			| metadata_flags::blksize
+		// Sadly these must wait until someone fixes the Linux stat() call e.g. the xstat() proposal.
+			//| metadata_flags::flags
+			//| metadata_flags::gen
+			//| metadata_flags::birthtim
+		// According to http://computer-forensics.sans.org/blog/2011/03/14/digital-forensics-understanding-ext4-part-2-timestamps
+		// ext4 keeps birth time at offset 144 to 151 in the inode. If we ever got round to it, birthtime could be hacked.
+			;
+#else
+		// Kinda assumes FreeBSD or OS X really ...
+		ret=metadata_flags::None
+			| metadata_flags::dev
+			| metadata_flags::ino
+			| metadata_flags::type
+			| metadata_flags::mode
+			| metadata_flags::nlink
+			| metadata_flags::uid
+			| metadata_flags::gid
+			| metadata_flags::rdev
+			| metadata_flags::atim
+			| metadata_flags::mtim
+			| metadata_flags::ctim
+			| metadata_flags::size
+			| metadata_flags::allocated
+			| metadata_flags::blocks
+			| metadata_flags::blksize
+#define HAVE_STAT_FLAGS
+			| metadata_flags::flags
+#define HAVE_STAT_GEN
+			| metadata_flags::gen
+#define HAVE_BIRTHTIMESPEC
+			| metadata_flags::birthtim
+			;
+#endif
+		return ret;
+	}
+
+	metadata_flags directory_entry::metadata_fastpath() BOOST_NOEXCEPT_OR_NOTHROW
+	{
+		metadata_flags ret;
+#ifdef WIN32
+		ret=metadata_flags::None
+			//| metadata_flags::dev
+			| metadata_flags::ino        // FILE_INTERNAL_INFORMATION, enumerated
+			| metadata_flags::type       // FILE_BASIC_INFORMATION, enumerated
+			//| metadata_flags::mode
+			//| metadata_flags::nlink      // FILE_STANDARD_INFORMATION
+			//| metadata_flags::uid
+			//| metadata_flags::gid
+			//| metadata_flags::rdev
+			| metadata_flags::atim       // FILE_BASIC_INFORMATION, enumerated
+			| metadata_flags::mtim       // FILE_BASIC_INFORMATION, enumerated
+			| metadata_flags::ctim       // FILE_BASIC_INFORMATION, enumerated
+			| metadata_flags::size       // FILE_STANDARD_INFORMATION, enumerated
+			| metadata_flags::allocated  // FILE_STANDARD_INFORMATION, enumerated
+			//| metadata_flags::blocks
+			//| metadata_flags::blksize    // FILE_ALIGNMENT_INFORMATION
+			//| metadata_flags::flags
+			//| metadata_flags::gen
+			| metadata_flags::birthtim   // FILE_BASIC_INFORMATION, enumerated
+			;
+#elif defined(__linux__)
+		ret=metadata_flags::None
+			| metadata_flags::dev
+			| metadata_flags::ino
+			| metadata_flags::type
+			| metadata_flags::mode
+			| metadata_flags::nlink
+			| metadata_flags::uid
+			| metadata_flags::gid
+			| metadata_flags::rdev
+			| metadata_flags::atim
+			| metadata_flags::mtim
+			| metadata_flags::ctim
+			| metadata_flags::size
+			| metadata_flags::allocated
+			| metadata_flags::blocks
+			| metadata_flags::blksize
+		// Sadly these must wait until someone fixes the Linux stat() call e.g. the xstat() proposal.
+			//| metadata_flags::flags
+			//| metadata_flags::gen
+			//| metadata_flags::birthtim
+		// According to http://computer-forensics.sans.org/blog/2011/03/14/digital-forensics-understanding-ext4-part-2-timestamps
+		// ext4 keeps birth time at offset 144 to 151 in the inode. If we ever got round to it, birthtime could be hacked.
+			;
+#else
+		// Kinda assumes FreeBSD or OS X really ...
+		ret=metadata_flags::None
+			| metadata_flags::dev
+			| metadata_flags::ino
+			| metadata_flags::type
+			| metadata_flags::mode
+			| metadata_flags::nlink
+			| metadata_flags::uid
+			| metadata_flags::gid
+			| metadata_flags::rdev
+			| metadata_flags::atim
+			| metadata_flags::mtim
+			| metadata_flags::ctim
+			| metadata_flags::size
+			| metadata_flags::allocated
+			| metadata_flags::blocks
+			| metadata_flags::blksize
+#define HAVE_STAT_FLAGS
+			| metadata_flags::flags
+#define HAVE_STAT_GEN
+			| metadata_flags::gen
+#define HAVE_BIRTHTIMESPEC
+			| metadata_flags::birthtim
+			;
+#endif
+		return ret;
+	}
+
 #if defined(WIN32)
 	struct async_io_handle_windows : public async_io_handle
 	{
@@ -611,7 +853,7 @@ namespace detail {
 			using namespace windows_nt_kernel;
 			stat_t stat(nullptr);
 			IO_STATUS_BLOCK isb={ 0 };
-			NTSTATUS ntval=0;
+			NTSTATUS ntstat;
 
 			HANDLE h=myid;
 			std::filesystem::path::value_type buffer[sizeof(FILE_ALL_INFORMATION)/sizeof(std::filesystem::path::value_type)+32769];
@@ -624,20 +866,43 @@ namespace detail {
 			// However fetching FileAlignmentInformation which comes with FILE_ALL_INFORMATION is slow as it touches the device driver,
 			// so only use if we need more than one item
 			if((needInternal+needBasic+needStandard)>=2)
-				ntval|=NtQueryInformationFile(h, &isb, &fai, sizeof(buffer), FileAllInformation);
+			{
+				ntstat=NtQueryInformationFile(h, &isb, &fai, sizeof(buffer), FileAllInformation);
+				if(STATUS_PENDING==ntstat)
+					ntstat=KeWaitForSingleObject(h, UserRequest, UserMode, FALSE, NULL);
+				BOOST_AFIO_ERRHNTFN(ntstat, path());
+			}
 			else
 			{
 				if(needInternal)
-					ntval|=NtQueryInformationFile(h, &isb, &fai.InternalInformation, sizeof(fai.InternalInformation), FileInternalInformation);
+				{
+					ntstat=NtQueryInformationFile(h, &isb, &fai.InternalInformation, sizeof(fai.InternalInformation), FileInternalInformation);
+					if(STATUS_PENDING==ntstat)
+						ntstat=KeWaitForSingleObject(h, UserRequest, UserMode, FALSE, NULL);
+					BOOST_AFIO_ERRHNTFN(ntstat, path());
+				}
 				if(needBasic)
-					ntval|=NtQueryInformationFile(h, &isb, &fai.BasicInformation, sizeof(fai.BasicInformation), FileBasicInformation);
+				{
+					ntstat=NtQueryInformationFile(h, &isb, &fai.BasicInformation, sizeof(fai.BasicInformation), FileBasicInformation);
+					if(STATUS_PENDING==ntstat)
+						ntstat=KeWaitForSingleObject(h, UserRequest, UserMode, FALSE, NULL);
+					BOOST_AFIO_ERRHNTFN(ntstat, path());
+				}
 				if(needStandard)
-					ntval|=NtQueryInformationFile(h, &isb, &fai.StandardInformation, sizeof(fai.StandardInformation), FileStandardInformation);
+				{
+					ntstat=NtQueryInformationFile(h, &isb, &fai.StandardInformation, sizeof(fai.StandardInformation), FileStandardInformation);
+					if(STATUS_PENDING==ntstat)
+						ntstat=KeWaitForSingleObject(h, UserRequest, UserMode, FALSE, NULL);
+					BOOST_AFIO_ERRHNTFN(ntstat, path());
+				}
 			}
 			if(!!(wanted&metadata_flags::blocks) || !!(wanted&metadata_flags::blksize))
-				ntval|=NtQueryVolumeInformationFile(h, &isb, &ffssi, sizeof(ffssi), FileFsSectorSizeInformation);
-			if(0/*STATUS_SUCCESS*/!=ntval)
-				BOOST_AFIO_THROW(std::ios_base::failure("Failed to stat file '"+path().generic_string()+"'"));
+			{
+				ntstat=NtQueryVolumeInformationFile(h, &isb, &ffssi, sizeof(ffssi), FileFsSectorSizeInformation);
+				if(STATUS_PENDING==ntstat)
+					ntstat=KeWaitForSingleObject(h, UserRequest, UserMode, FALSE, NULL);
+				BOOST_AFIO_ERRHNTFN(ntstat, path());
+			}
 			if(!!(wanted&metadata_flags::ino)) { stat.st_ino=fai.InternalInformation.IndexNumber.QuadPart; }
 			if(!!(wanted&metadata_flags::type)) { stat.st_type=to_st_type(fai.BasicInformation.FileAttributes); }
 			if(!!(wanted&metadata_flags::nlink)) { stat.st_nlink=(int16_t) fai.StandardInformation.NumberOfLinks; }
@@ -687,6 +952,7 @@ namespace detail {
 		}
 		virtual stat_t stat(metadata_flags wanted) const
 		{
+			//TODO
 		}
 	};
 
@@ -803,8 +1069,10 @@ namespace detail {
 
 		typedef boost::detail::spinlock fdslock_t;
 		typedef recursive_mutex opslock_t;
+		typedef boost::detail::spinlock dircachelock_t;
 		fdslock_t fdslock; std::unordered_map<void *, std::weak_ptr<async_io_handle>> fds;
 		opslock_t opslock; size_t monotoniccount; std::unordered_map<size_t, async_file_io_dispatcher_op> ops;
+		dircachelock_t dircachelock; std::unordered_map<std::filesystem::path, std::weak_ptr<async_io_handle>, std::filesystem_hash> dirhcache;
 
 		async_file_io_dispatcher_base_p(std::shared_ptr<thread_source> _pool, file_flags _flagsforce, file_flags _flagsmask) : pool(_pool),
 			flagsforce(_flagsforce), flagsmask(_flagsmask), monotoniccount(0)
@@ -822,6 +1090,41 @@ namespace detail {
 		~async_file_io_dispatcher_base_p()
 		{
 			ANNOTATE_RWLOCK_DESTROY(&fdslock);
+		}
+
+		// Returns a handle to a directory from the cache, or creates a new directory handle.
+		template<class F> std::shared_ptr<detail::async_io_handle> get_handle_to_dir(F *parent, size_t id, exception_ptr *e, async_path_op_req req, typename async_file_io_dispatcher_base::completion_returntype (F::*dofile)(size_t, std::shared_ptr<detail::async_io_handle>, exception_ptr *, async_path_op_req))
+		{
+			std::shared_ptr<detail::async_io_handle> dirh;
+			BOOST_AFIO_LOCK_GUARD<dircachelock_t> dircachelockh(dircachelock);
+			do
+			{
+				std::unordered_map<std::filesystem::path, std::weak_ptr<async_io_handle>, std::filesystem_hash>::iterator it=dirhcache.find(req.path);
+				if(dirhcache.end()==it || it->second.expired())
+				{
+					if(dirhcache.end()!=it) dirhcache.erase(it);
+					auto result=(parent->*dofile)(id, /* known null */dirh, e, req);
+					if(!result.first) abort();
+					dirh=std::move(result.second);
+					if(dirh)
+					{
+						auto _it=dirhcache.insert(std::make_pair(req.path, std::weak_ptr<async_io_handle>(dirh)));
+						return dirh;
+					}
+					else
+						abort();
+				}
+				else
+					dirh=std::shared_ptr<async_io_handle>(it->second);
+			} while(!dirh);
+			return dirh;
+		}
+		// Returns a handle to a containing directory from the cache, or creates a new directory handle.
+		template<class F> std::shared_ptr<detail::async_io_handle> get_handle_to_containing_dir(F *parent, size_t id, exception_ptr *e, async_path_op_req req, typename async_file_io_dispatcher_base::completion_returntype (F::*dofile)(size_t, std::shared_ptr<detail::async_io_handle>, exception_ptr *, async_path_op_req))
+		{
+			req.path=req.path.parent_path();
+			req.flags=req.flags&~file_flags::FastDirectoryEnumeration;
+			return get_handle_to_dir(parent, id, e, req, dofile);
 		}
 	};
 #if defined(WIN32)
@@ -1633,34 +1936,22 @@ namespace detail {
 #if defined(WIN32)
 	class async_file_io_dispatcher_windows : public async_file_io_dispatcher_base
 	{
+		friend class detail::directory_entry;
 		size_t pagesize;
 		// Called in unknown thread
 		completion_returntype dodir(size_t id, std::shared_ptr<detail::async_io_handle> _, exception_ptr *e, async_path_op_req req)
 		{
 			BOOL ret=0;
-			req.flags=fileflags(req.flags);
-			if(!!(req.flags & (file_flags::Create|file_flags::CreateOnlyIfNotExist)))
+			req.flags=fileflags(req.flags)|file_flags::int_opening_dir;
+			if(!(req.flags & file_flags::UniqueDirectoryHandle) && !!(req.flags & file_flags::Read) && !(req.flags & file_flags::Write))
 			{
-				ret=CreateDirectory(req.path.c_str(), NULL);
-				if(!ret && ERROR_ALREADY_EXISTS==GetLastError())
-				{
-					// Ignore already exists unless we were asked otherwise
-					if(!(req.flags & file_flags::CreateOnlyIfNotExist))
-						ret=1;
-				}
-				BOOST_AFIO_ERRHWINFN(ret, req.path);
-				req.flags=req.flags&~(file_flags::Create|file_flags::CreateOnlyIfNotExist);
+				// Return a copy of the one in the dir cache if available
+				return std::make_pair(true, p->get_handle_to_dir(this, id, e, req, &async_file_io_dispatcher_windows::dofile));
 			}
-			DWORD attr=GetFileAttributes(req.path.c_str());
-			if(INVALID_FILE_ATTRIBUTES!=attr && !(attr & FILE_ATTRIBUTE_DIRECTORY))
-				BOOST_AFIO_THROW(std::runtime_error("Not a directory"));
-			if(!!(req.flags & file_flags::Read))
-				return dofile(id, _, e, req);
 			else
 			{
-				// Create empty handle so
-				auto ret=std::make_shared<async_io_handle_windows>(shared_from_this(), req.path, req.flags);
-				return std::make_pair(true, ret);
+				// With the NT kernel, you create a directory by creating a file.
+				return dofile(id, _, e, req);
 			}
 		}
 		// Called in unknown thread
@@ -1668,32 +1959,74 @@ namespace detail {
 		{
 			req.flags=fileflags(req.flags);
 			BOOST_AFIO_ERRHWINFN(RemoveDirectory(req.path.c_str()), req.path);
-			auto ret=std::make_shared<async_io_handle_windows>(shared_from_this(), req.path, req.flags);
+			auto ret=std::make_shared<async_io_handle_windows>(shared_from_this(), std::shared_ptr<detail::async_io_handle>(), req.path, req.flags);
 			return std::make_pair(true, ret);
 		}
 		// Called in unknown thread
-		completion_returntype dofile(size_t id, std::shared_ptr<detail::async_io_handle>, exception_ptr *, async_path_op_req req)
+		completion_returntype dofile(size_t id, std::shared_ptr<detail::async_io_handle>, exception_ptr *e, async_path_op_req req)
 		{
-			DWORD access=0, creation=0, flags=FILE_ATTRIBUTE_NORMAL|FILE_FLAG_OVERLAPPED;
+			std::shared_ptr<detail::async_io_handle> dirh;
+			DWORD access=0, creatdisp=0, flags=0x4000/*FILE_OPEN_FOR_BACKUP_INTENT*/, attribs=FILE_ATTRIBUTE_NORMAL;
 			req.flags=fileflags(req.flags);
-			if(!!(req.flags & file_flags::Append)) access|=FILE_APPEND_DATA|SYNCHRONIZE;
+			if(!!(req.flags & file_flags::int_opening_dir))
+			{
+				flags|=0x01/*FILE_DIRECTORY_FILE*/;
+				access|=FILE_LIST_DIRECTORY|FILE_TRAVERSE;
+			}
 			else
 			{
-				if(!!(req.flags & file_flags::Read)) access|=GENERIC_READ;
-				if(!!(req.flags & file_flags::Write)) access|=GENERIC_WRITE;
+				flags|=0x040/*FILE_NON_DIRECTORY_FILE*/;
+				access|=FILE_READ_ATTRIBUTES;
+				if(!!(req.flags & file_flags::Append)) access|=FILE_APPEND_DATA|SYNCHRONIZE;
+				else
+				{
+					if(!!(req.flags & file_flags::Read)) access|=GENERIC_READ;
+					if(!!(req.flags & file_flags::Write)) access|=GENERIC_WRITE;
+				}
 			}
-			if(!!(req.flags & file_flags::CreateOnlyIfNotExist)) creation|=CREATE_NEW;
-			else if(!!(req.flags & file_flags::Create)) creation|=CREATE_ALWAYS;
-			else if(!!(req.flags & file_flags::Truncate)) creation|=TRUNCATE_EXISTING;
-			else creation|=OPEN_EXISTING;
+			if(!!(req.flags & file_flags::CreateOnlyIfNotExist)) creatdisp|=0x00000002/*FILE_CREATE*/;
+			else if(!!(req.flags & file_flags::Create)) creatdisp|=0x00000000/*FILE_SUPERSEDE*/;
+			else if(!!(req.flags & file_flags::Truncate)) creatdisp|=0x00000004/*FILE_OVERWRITE*/;
+			else creatdisp|=0x00000001/*FILE_OPEN*/;
 			if(!!(req.flags & file_flags::WillBeSequentiallyAccessed))
-				flags|=FILE_FLAG_SEQUENTIAL_SCAN;
-			if(!!(req.flags & file_flags::OSDirect)) flags|=FILE_FLAG_NO_BUFFERING;
-			if(!!(req.flags & file_flags::AlwaysSync)) flags|=FILE_FLAG_WRITE_THROUGH;
+				flags|=0x00000004/*FILE_SEQUENTIAL_ONLY*/;
+			else if(!!(req.flags & file_flags::WillBeRandomlyAccessed))
+				flags|=0x00000800/*FILE_RANDOM_ACCESS*/;
+			if(!!(req.flags & file_flags::OSDirect)) flags|=0x00000008/*FILE_NO_INTERMEDIATE_BUFFERING*/;
+			if(!!(req.flags & file_flags::AlwaysSync)) flags|=0x00000002/*FILE_WRITE_THROUGH*/;
+			if(!!(req.flags & file_flags::FastDirectoryEnumeration))
+				dirh=p->get_handle_to_containing_dir(this, id, e, req, &async_file_io_dispatcher_windows::dofile);
+
+			windows_nt_kernel::init();
+			using namespace windows_nt_kernel;
+			HANDLE h=nullptr;
+			IO_STATUS_BLOCK isb={ 0 };
+			OBJECT_ATTRIBUTES oa={sizeof(OBJECT_ATTRIBUTES)};
+			UNICODE_STRING path;
+			std::filesystem::path::value_type buffer[32769];
+			// If it's a DOS path, invoke the kernel's magic function DOS path conversion function and have
+			// PATH use buffer, else have PATH use req.path directly
+			if(isalpha(req.path.native()[0]) && req.path.native()[1]==':')
+			{
+				path.Buffer=buffer;
+				path.Length=path.MaximumLength=(USHORT) sizeof(buffer);
+				RtlDosPathNameToNtPathName_U(req.path.c_str(), &path, NULL, NULL);
+				// If it's a DOS path, ignore case differences
+				oa.Attributes=0x40/*OBJ_CASE_INSENSITIVE*/;
+			}
+			else
+			{
+				path.Buffer=const_cast<std::filesystem::path::value_type *>(req.path.c_str());
+				path.MaximumLength=(path.Length=(USHORT) (req.path.native().size()*sizeof(std::filesystem::path::value_type)))+sizeof(std::filesystem::path::value_type);
+			}
+			oa.ObjectName=&path;
+			// Should I bother with oa.RootDirectory? For now, no.
+			BOOST_AFIO_ERRHNTFN(NtCreateFile(&h, access, &oa, &isb, NULL, 0, FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,
+				creatdisp, flags, NULL, 0), req.path);
 			// If writing and SyncOnClose and NOT synchronous, turn on SyncOnClose
-			auto ret=std::make_shared<async_io_handle_windows>(shared_from_this(), req.path, req.flags, (file_flags::SyncOnClose|file_flags::Write)==(req.flags & (file_flags::SyncOnClose|file_flags::Write|file_flags::AlwaysSync)),
-				CreateFile(req.path.c_str(), access, FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,
-					NULL, creation, flags, NULL));
+			auto ret=std::make_shared<async_io_handle_windows>(shared_from_this(), dirh, req.path, req.flags,
+				(file_flags::SyncOnClose|file_flags::Write)==(req.flags & (file_flags::SyncOnClose|file_flags::Write|file_flags::AlwaysSync)),
+				h);
 			static_cast<async_io_handle_windows *>(ret.get())->do_add_io_handle_to_parent();
 			return std::make_pair(true, ret);
 		}
@@ -1702,7 +2035,7 @@ namespace detail {
 		{
 			req.flags=fileflags(req.flags);
 			BOOST_AFIO_ERRHWINFN(DeleteFile(req.path.c_str()), req.path);
-			auto ret=std::make_shared<async_io_handle_windows>(shared_from_this(), req.path, req.flags);
+			auto ret=std::make_shared<async_io_handle_windows>(shared_from_this(), std::shared_ptr<detail::async_io_handle>(), req.path, req.flags);
 			return std::make_pair(true, ret);
 		}
 		// Called in unknown thread
@@ -1729,7 +2062,7 @@ namespace detail {
 			return std::make_pair(true, h);
 		}
 		// Called in unknown thread
-		void boost_asio_completion_handler(bool is_write, size_t id, std::shared_ptr<detail::async_io_handle> h, exception_ptr *, std::shared_ptr<std::pair<boost::afio::atomic<bool>, boost::afio::atomic<size_t>>> bytes_to_transfer, const boost::system::error_code &ec, size_t bytes_transferred)
+		void boost_asio_readwrite_completion_handler(bool is_write, size_t id, std::shared_ptr<detail::async_io_handle> h, exception_ptr *, std::shared_ptr<std::pair<boost::afio::atomic<bool>, boost::afio::atomic<size_t>>> bytes_to_transfer, const boost::system::error_code &ec, size_t bytes_transferred)
 		{
 			if(ec)
 			{
@@ -1796,7 +2129,7 @@ namespace detail {
 					}
 				}
 				elems[pages].Alignment=0;
-				boost::asio::windows::overlapped_ptr ol(p->h->get_io_service(), boost::bind(&async_file_io_dispatcher_windows::boost_asio_completion_handler, this, iswrite, id, h, nullptr, bytes_to_transfer, boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred));
+				boost::asio::windows::overlapped_ptr ol(p->h->get_io_service(), boost::bind(&async_file_io_dispatcher_windows::boost_asio_readwrite_completion_handler, this, iswrite, id, h, nullptr, bytes_to_transfer, boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred));
 				ol.get()->Offset=(DWORD) (req.where & 0xffffffff);
 				ol.get()->OffsetHigh=(DWORD) ((req.where>>32) & 0xffffffff);
 				BOOL ok=iswrite ? WriteFileGather
@@ -1818,7 +2151,7 @@ namespace detail {
 				size_t offset=0;
 				BOOST_FOREACH(auto &b, req.buffers)
 				{
-					boost::asio::windows::overlapped_ptr ol(p->h->get_io_service(), boost::bind(&async_file_io_dispatcher_windows::boost_asio_completion_handler, this, iswrite, id, h, nullptr, bytes_to_transfer, boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred));
+					boost::asio::windows::overlapped_ptr ol(p->h->get_io_service(), boost::bind(&async_file_io_dispatcher_windows::boost_asio_readwrite_completion_handler, this, iswrite, id, h, nullptr, bytes_to_transfer, boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred));
 					ol.get()->Offset=(DWORD) ((req.where+offset) & 0xffffffff);
 					ol.get()->OffsetHigh=(DWORD) (((req.where+offset)>>32) & 0xffffffff);
 					BOOL ok=iswrite ? WriteFile
@@ -1889,9 +2222,102 @@ namespace detail {
 			return std::make_pair(true, h);
 		}
 		// Called in unknown thread
+		void boost_asio_enumerate_completion_handler(size_t id, std::shared_ptr<detail::async_io_handle> h, exception_ptr *, std::shared_ptr<std::tuple<std::shared_ptr<promise<std::pair<std::vector<detail::directory_entry>, bool>>>, std::unique_ptr<windows_nt_kernel::FILE_ID_FULL_DIR_INFORMATION[]>, size_t>> state, const boost::system::error_code &ec, size_t bytes_transferred)
+		{
+			if(ec)
+			{
+				if(ERROR_NO_MORE_FILES==ec.value())
+				{
+					std::get<0>(*state)->set_value(std::make_pair(std::vector<directory_entry>(), false));
+					complete_async_op(id, h);
+					return;
+				}
+				exception_ptr e;
+				// boost::system::system_error makes no attempt to ask windows for what the error code means :(
+				try
+				{
+					BOOST_AFIO_ERRGWINFN(ec.value(), h->path());
+				}
+				catch(...)
+				{
+					e=afio::make_exception_ptr(afio::current_exception());
+				}
+				std::get<0>(*state)->set_exception(e);
+				complete_async_op(id, h, e);
+			}
+			else
+			{
+				async_io_handle_windows *p=static_cast<async_io_handle_windows *>(h.get());
+				using windows_nt_kernel::FILE_ID_FULL_DIR_INFORMATION;
+				using windows_nt_kernel::to_st_type;
+				using windows_nt_kernel::to_timepoint;
+				std::vector<directory_entry> _ret;
+				_ret.reserve(std::get<2>(*state));
+				directory_entry item;
+				// This is what windows returns with each enumeration
+				item.have_metadata=directory_entry::metadata_fastpath();
+				bool done=false;
+				for(FILE_ID_FULL_DIR_INFORMATION *ffdi=std::get<1>(*state).get(); !done; ffdi=(FILE_ID_FULL_DIR_INFORMATION *)((size_t) ffdi + ffdi->NextEntryOffset))
+				{
+					size_t length=ffdi->FileNameLength/sizeof(std::filesystem::path::value_type);
+					if(length<=2 && '.'==ffdi->FileName[0])
+						if(1==length || '.'==ffdi->FileName[1]) continue;
+					std::filesystem::path::string_type leafname(ffdi->FileName, length);
+					item.leafname=std::move(leafname);
+					item.stat.st_ino=ffdi->FileId.QuadPart;
+					item.stat.st_type=to_st_type(ffdi->FileAttributes);
+					item.stat.st_atim=to_timepoint(ffdi->LastAccessTime);
+					item.stat.st_mtim=to_timepoint(ffdi->LastWriteTime);
+					item.stat.st_ctim=to_timepoint(ffdi->ChangeTime);
+					item.stat.st_size=ffdi->EndOfFile.QuadPart;
+					item.stat.st_allocated=ffdi->AllocationSize.QuadPart;
+					item.stat.st_birthtim=to_timepoint(ffdi->CreationTime);
+					_ret.push_back(std::move(item));
+					if(!ffdi->NextEntryOffset) done=true;
+				}
+				std::get<0>(*state)->set_value(std::make_pair(std::move(_ret), true));
+				complete_async_op(id, h);
+			}
+		}
+		// Called in unknown thread
 		completion_returntype doenumerate(size_t id, std::shared_ptr<detail::async_io_handle> h, exception_ptr *, async_enumerate_op_req req, std::shared_ptr<promise<std::pair<std::vector<detail::directory_entry>, bool>>> ret)
 		{
-			return std::make_pair(true, h);
+			async_io_handle_windows *p=static_cast<async_io_handle_windows *>(h.get());
+			windows_nt_kernel::init();
+			using namespace windows_nt_kernel;
+
+			NTSTATUS ntstat;
+			IO_STATUS_BLOCK isb={ 0 };
+			UNICODE_STRING _glob;
+			if(!req.glob.empty())
+			{
+				_glob.Buffer=const_cast<std::filesystem::path::value_type *>(req.glob.c_str());
+				_glob.Length=_glob.MaximumLength=(USHORT) req.glob.native().size();
+			}
+
+			// A bit messy this, but necessary
+			auto state=std::make_shared<std::tuple<std::shared_ptr<promise<std::pair<std::vector<detail::directory_entry>, bool>>>,
+				std::unique_ptr<windows_nt_kernel::FILE_ID_FULL_DIR_INFORMATION[]>, size_t>>(
+				std::move(ret),
+				std::unique_ptr<FILE_ID_FULL_DIR_INFORMATION[]>(new FILE_ID_FULL_DIR_INFORMATION[req.maxitems]),
+				req.maxitems
+				);
+			boost::asio::windows::overlapped_ptr ol(p->h->get_io_service(), boost::bind(&async_file_io_dispatcher_windows::boost_asio_enumerate_completion_handler, this, id, h, nullptr, state, boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred));
+
+			ntstat=NtQueryDirectoryFile(p->h->native_handle(), ol.get()->hEvent, NULL, NULL, &isb, std::get<1>(*state).get(), (ULONG)(sizeof(FILE_ID_FULL_DIR_INFORMATION)*req.maxitems),
+				FileIdFullDirectoryInformation, FALSE, req.glob.empty() ? NULL : &_glob, FALSE);
+			if(STATUS_PENDING!=ntstat)
+			{
+				//std::cerr << "ERROR " << errcode << std::endl;
+				SetWin32LastErrorFromNtStatus(ntstat);
+				boost::system::error_code ec(GetLastError(), boost::asio::error::get_system_category());
+				ol.complete(ec, 0);
+			}
+			else
+				ol.release();
+
+			// Indicate we're not finished yet
+			return std::make_pair(false, h);
 		}
 
 	public:
@@ -2010,39 +2436,54 @@ namespace detail {
 			return chain_async_ops((int) detail::OpType::enumerate, reqs, async_op_flags::None, &async_file_io_dispatcher_windows::doenumerate);
 		}
 	};
+
+	void directory_entry::_int_fetch(metadata_flags wanted, std::shared_ptr<async_io_handle> dirh)
+	{
+		windows_nt_kernel::init();
+		using namespace windows_nt_kernel;
+		bool slowPath=(!!(wanted&metadata_flags::nlink) || !!(wanted&metadata_flags::blocks) || !!(wanted&metadata_flags::blksize));
+		if(!slowPath)
+		{
+			// Fast path skips opening a handle per file by enumerating the containing directory using a glob
+			// exactly matching the leafname. This is about 10x quicker, so it's very much worth it.
+			std::filesystem::path::value_type buffer[sizeof(FILE_ALL_INFORMATION)/sizeof(std::filesystem::path::value_type)+32769];
+			IO_STATUS_BLOCK isb={ 0 };
+			UNICODE_STRING _glob;
+			NTSTATUS ntstat;
+			_glob.Buffer=const_cast<std::filesystem::path::value_type *>(leafname.c_str());
+			_glob.MaximumLength=(_glob.Length=(USHORT) (leafname.native().size()*sizeof(std::filesystem::path::value_type)))+sizeof(std::filesystem::path::value_type);
+			FILE_ID_FULL_DIR_INFORMATION *ffdi=(FILE_ID_FULL_DIR_INFORMATION *) buffer;
+			ntstat=NtQueryDirectoryFile(dirh->native_handle(), NULL, NULL, NULL, &isb, ffdi, sizeof(buffer),
+				FileIdFullDirectoryInformation, TRUE, &_glob, FALSE);
+			if(STATUS_PENDING==ntstat)
+				ntstat=KeWaitForSingleObject(dirh->native_handle(), UserRequest, UserMode, FALSE, NULL);
+			BOOST_AFIO_ERRHNTFN(ntstat, dirh->path());
+			if(!!(wanted&metadata_flags::ino)) { stat.st_ino=ffdi->FileId.QuadPart; }
+			if(!!(wanted&metadata_flags::type)) { stat.st_type=to_st_type(ffdi->FileAttributes); }
+			if(!!(wanted&metadata_flags::atim)) { stat.st_atim=to_timepoint(ffdi->LastAccessTime); }
+			if(!!(wanted&metadata_flags::mtim)) { stat.st_mtim=to_timepoint(ffdi->LastWriteTime); }
+			if(!!(wanted&metadata_flags::ctim)) { stat.st_ctim=to_timepoint(ffdi->ChangeTime); }
+			if(!!(wanted&metadata_flags::size)) { stat.st_size=ffdi->EndOfFile.QuadPart; }
+			if(!!(wanted&metadata_flags::allocated)) { stat.st_allocated=ffdi->AllocationSize.QuadPart; }
+			if(!!(wanted&metadata_flags::birthtim)) { stat.st_birthtim=to_timepoint(ffdi->CreationTime); }
+		}
+		else
+		{
+			// No choice here, open a handle and stat it.
+			async_file_io_dispatcher_windows *dispatcher=static_cast<async_file_io_dispatcher_windows *>(dirh->parent());
+			async_path_op_req req(dirh->path()/name(), file_flags::Read);
+			auto fileh=dispatcher->dofile(0, std::shared_ptr<detail::async_io_handle>(), nullptr, req).second;
+			stat=fileh->stat(wanted);
+		}
+	}
 #endif
 	class async_file_io_dispatcher_compat : public async_file_io_dispatcher_base
 	{
-		// Keep an optional weak reference counted index of containing directories on POSIX
-		typedef boost::detail::spinlock dircachelock_t;
-		dircachelock_t dircachelock; std::unordered_map<std::filesystem::path, std::weak_ptr<async_io_handle>, std::filesystem_hash> dircache;
-		std::shared_ptr<detail::async_io_handle> get_handle_to_containing_dir(const std::filesystem::path &path)
-		{
-			std::filesystem::path containingdir(path.parent_path());
-			std::shared_ptr<detail::async_io_handle> dirh;
-			BOOST_AFIO_LOCK_GUARD<dircachelock_t> dircachelockh(dircachelock);
-			do
-			{
-				std::unordered_map<std::filesystem::path, std::weak_ptr<async_io_handle>, std::filesystem_hash>::iterator it=dircache.find(containingdir);
-				if(dircache.end()==it || it->second.expired())
-				{
-					if(dircache.end()!=it) dircache.erase(it);
-					dirh=std::make_shared<async_io_handle_posix>(std::shared_ptr<async_file_io_dispatcher_base>(), std::shared_ptr<detail::async_io_handle>(),
-						containingdir, fileflags(file_flags()), false, BOOST_AFIO_POSIX_OPEN(containingdir.c_str(), O_RDONLY, 0x1b0/*660*/));
-					auto _it=dircache.insert(std::make_pair(containingdir, std::weak_ptr<async_io_handle>(dirh)));
-					return dirh;
-				}
-				else
-					dirh=std::shared_ptr<async_io_handle>(it->second);
-			} while(!dirh);
-			return dirh;
-		}
-
 		// Called in unknown thread
 		completion_returntype dodir(size_t id, std::shared_ptr<detail::async_io_handle> _, exception_ptr *e, async_path_op_req req)
 		{
 			int ret=0;
-			req.flags=fileflags(req.flags);
+			req.flags=fileflags(req.flags)|file_flags::int_opening_dir;
 			if(!!(req.flags & (file_flags::Create|file_flags::CreateOnlyIfNotExist)))
 			{
 				ret=BOOST_AFIO_POSIX_MKDIR(req.path.c_str(), 0x1f8/*770*/);
@@ -2060,27 +2501,14 @@ namespace detail {
 			ret=BOOST_AFIO_POSIX_STAT(req.path.c_str(), &s);
 			if(0==ret && !BOOST_AFIO_POSIX_S_ISDIR(s.st_mode))
 				BOOST_AFIO_THROW(std::runtime_error("Not a directory"));
-			if(file_flags::Read==(req.flags & file_flags::Read))
+			if(!(req.flags & file_flags::UniqueDirectoryHandle) && !!(req.flags & file_flags::Read) && !(req.flags & file_flags::Write))
 			{
-				return dofile(id, _, e, req);
+				// Return a copy of the one in the dir cache if available
+				return std::make_pair(true, p->get_handle_to_dir(this, id, e, req, &async_file_io_dispatcher_compat::dofile));
 			}
 			else
 			{
-				// Create dummy handle so
-				std::shared_ptr<detail::async_io_handle> dirh;
-#ifdef __linux__
-				// Need to fsync the containing directory, otherwise the file isn't guaranteed to appear where we just created it
-				if(!!(req.flags & (file_flags::Create|file_flags::CreateOnlyIfNotExist)) && !!(req.flags & (file_flags::SyncOnClose|file_flags::AlwaysSync)))
-					req.flags=req.flags|file_flags::FastDirectoryEnumeration;
-#endif
-				if(!!(req.flags & file_flags::FastDirectoryEnumeration))
-					dirh=get_handle_to_containing_dir(req.path);
-				auto ret=std::make_shared<async_io_handle_posix>(shared_from_this(), dirh, req.path, req.flags, false, -999);
-#ifdef __linux__
-				if(!!(req.flags & (file_flags::Create|file_flags::CreateOnlyIfNotExist)) && !!(req.flags & (file_flags::SyncOnClose|file_flags::AlwaysSync)))
-					BOOST_AFIO_POSIX_FSYNC(static_cast<async_io_handle_posix *>(dirh.get())->fd);
-#endif
-				return std::make_pair(true, ret);
+				return dofile(id, _, e, req);
 			}
 		}
 		// Called in unknown thread
@@ -2092,7 +2520,7 @@ namespace detail {
 			return std::make_pair(true, ret);
 		}
 		// Called in unknown thread
-		completion_returntype dofile(size_t id, std::shared_ptr<detail::async_io_handle>, exception_ptr *, async_path_op_req req)
+		completion_returntype dofile(size_t id, std::shared_ptr<detail::async_io_handle>, exception_ptr *e, async_path_op_req req)
 		{
 			int flags=0;
 			std::shared_ptr<detail::async_io_handle> dirh;
@@ -2110,20 +2538,14 @@ namespace detail {
 #ifdef O_SYNC
 			if(!!(req.flags & file_flags::AlwaysSync)) flags|=O_SYNC;
 #endif
-#ifdef __linux__
-			// Need to fsync the containing directory, otherwise the file isn't guaranteed to appear where we just created it
-			if((flags & O_CREAT) && !!(req.flags & (file_flags::SyncOnClose|file_flags::AlwaysSync)))
-				req.flags=req.flags|file_flags::FastDirectoryEnumeration;
+#ifdef O_DIRECTORY
+			if(!!(req.flags & file_flags::int_opening_dir)) flags|=O_DIRECTORY;
 #endif
 			if(!!(req.flags & file_flags::FastDirectoryEnumeration))
-				dirh=get_handle_to_containing_dir(req.path);
+				dirh=p->get_handle_to_containing_dir(this, id, e, req, &async_file_io_dispatcher_compat::dofile);
 			// If writing and SyncOnClose and NOT synchronous, turn on SyncOnClose
 			auto ret=std::make_shared<async_io_handle_posix>(shared_from_this(), dirh, req.path, req.flags, (file_flags::SyncOnClose|file_flags::Write)==(req.flags & (file_flags::SyncOnClose|file_flags::Write|file_flags::AlwaysSync)),
 				BOOST_AFIO_POSIX_OPEN(req.path.c_str(), flags, 0x1b0/*660*/));
-#ifdef __linux__
-			if(!!(req.flags & (file_flags::Create|file_flags::CreateOnlyIfNotExist)) && !!(req.flags & (file_flags::SyncOnClose|file_flags::AlwaysSync)))
-				BOOST_AFIO_POSIX_FSYNC(static_cast<async_io_handle_posix *>(dirh.get())->fd);
-#endif
 			static_cast<async_io_handle_posix *>(ret.get())->do_add_io_handle_to_parent();
 			return std::make_pair(true, ret);
 		}

@@ -20,6 +20,13 @@ File Created: Mar 2013
 #error _VARIADIC_MAX needs to be set to at least seven to compile Boost.AFIO
 #endif
 
+// Define this to serialise thread job dispatch in order to work around a race condition in ASIO on Win32
+#ifdef WIN32
+#ifndef BOOST_AFIO_WORK_AROUND_LOST_ASIO_WRITE_COMPLETION_WAKEUPS
+#define BOOST_AFIO_WORK_AROUND_LOST_ASIO_WRITE_COMPLETION_WAKEUPS 1
+#endif
+#endif
+
 #include "config.hpp"
 #include "detail/Utility.hpp"
 #include <type_traits>
@@ -482,7 +489,7 @@ public:
     \param no The number of worker threads to create
     */
 	explicit std_thread_pool(size_t no)
-#ifdef WIN32
+#if BOOST_AFIO_WORK_AROUND_LOST_ASIO_WRITE_COMPLETION_WAKEUPS
 		// ASIO has some race condition in its IOCP backend where it loses write completion
 		// wakeups (not read, only write)
 		//
@@ -665,14 +672,20 @@ enum class file_flags : size_t
 	Truncate=8,			//!< Truncate existing file to zero
 	Create=16,			//!< Open and create if doesn't exist
 	CreateOnlyIfNotExist=32, //!< Create and open only if doesn't exist
-	WillBeSequentiallyAccessed=128, //!< Will be exclusively either read or written sequentially. If you're exclusively writing sequentially, \em strongly consider turning on OSDirect too.
-	FastDirectoryEnumeration=256, //!< Hold a file handle open to the containing directory of each open file for fast directory enumeration.
 
-	OSDirect=(1<<16),	//!< Bypass the OS file buffers (only really useful for writing large files. Note you must 4Kb align everything if this is on)
+	WillBeSequentiallyAccessed=128, //!< Will be exclusively either read or written sequentially. If you're exclusively writing sequentially, \em strongly consider turning on OSDirect too.
+	WillBeRandomlyAccessed=256, //!< Will be randomly accessed, so don't bother with read-ahead. If you're using this, \em strongly consider turning on OSDirect too.
+
+	FastDirectoryEnumeration=(1<<10), //!< Hold a file handle open to the containing directory of each open file for fast directory enumeration.
+	UniqueDirectoryHandle=(1<<11), //!< Return a unique directory handle rather than a shared directory handle
+
+	OSDirect=(1<<16),	//!< Bypass the OS file buffers (only really useful for writing large files, or a lot of random reads and writes. Note you must 4Kb align everything if this is on)
 
 	AlwaysSync=(1<<24),		//!< Ask the OS to not complete until the data is on the physical storage. Best used only with OSDirect, otherwise use SyncOnClose.
 	SyncOnClose=(1<<25),	//!< Automatically initiate an asynchronous flush just before file close, and fuse both operations so both must complete for close to complete.
-	EnforceDependencyWriteOrder=(1<<26) //!< Ensure that data writes to files reach physical storage in the same order as the op dependencies close files. Does NOT enforce ordering of individual data writes, ONLY all file writes accumulated before a file close.
+	EnforceDependencyWriteOrder=(1<<26), //!< Ensure that data writes to files reach physical storage in the same order as the op dependencies close files. Does NOT enforce ordering of individual data writes, ONLY all file writes accumulated before a file close.
+
+	int_opening_dir=(1<<31) //!< Internal use only. Don't use.
 }
 #ifdef BOOST_NO_CXX11_SCOPED_ENUMS
 BOOST_SCOPED_ENUM_DECLARE_END(file_flags)
@@ -707,6 +720,7 @@ BOOST_AFIO_DECLARE_CLASS_ENUM_AS_BITFIELD(async_op_flags)
 #endif
 
 namespace detail {
+	class async_io_handle;
 
 	/*! \enum metadata_flags
 	\brief Bitflags for availability of metadata
@@ -790,14 +804,18 @@ namespace detail {
 	*/
 	class BOOST_AFIO_DECL directory_entry
 	{
+		friend class async_file_io_dispatcher_compat;
+		friend class async_file_io_dispatcher_windows;
+		friend class async_file_io_dispatcher_linux;
+		friend class async_file_io_dispatcher_qnx;
+
 		std::filesystem::path leafname;
 		stat_t stat;
 		metadata_flags have_metadata;
-		virtual void _int_fetch(metadata_flags wanted, std::filesystem::path prefix=std::filesystem::path())=0;
+		void _int_fetch(metadata_flags wanted, std::shared_ptr<async_io_handle> dirh);
 	public:
 		//! Constructs an instance
 		directory_entry() : stat(nullptr), have_metadata(metadata_flags::None) { }
-		virtual ~directory_entry() { }
 		bool operator==(const directory_entry& rhs) const BOOST_NOEXCEPT_OR_NOTHROW { return leafname == rhs.leafname; }
 		bool operator!=(const directory_entry& rhs) const BOOST_NOEXCEPT_OR_NOTHROW { return leafname != rhs.leafname; }
 		bool operator< (const directory_entry& rhs) const BOOST_NOEXCEPT_OR_NOTHROW { return leafname < rhs.leafname; }
@@ -809,22 +827,22 @@ namespace detail {
 		//! A bitfield of what metadata is ready right now
 		metadata_flags metadata_ready() const BOOST_NOEXCEPT_OR_NOTHROW { return have_metadata; }
 		//! Fetches the specified metadata, returning that newly available. This is a blocking call.
-		metadata_flags fetch_metadata(std::filesystem::path prefix, metadata_flags wanted)
+		metadata_flags fetch_metadata(std::shared_ptr<async_io_handle> dirh, metadata_flags wanted)
 		{
 			metadata_flags tofetch;
 			wanted=wanted&metadata_supported();
 			tofetch=wanted&~have_metadata;
-			if(!!tofetch) _int_fetch(tofetch, prefix);
+			if(!!tofetch) _int_fetch(tofetch, dirh);
 			return have_metadata;
 		}
 		//! Fetches a fast path `stat_t` structure which is missing those fields not fast to fetch on this platform.
-		stat_t full_stat(std::filesystem::path prefix, metadata_flags wanted=directory_entry::metadata_fastpath())
+		stat_t full_stat(std::shared_ptr<async_io_handle> dirh, metadata_flags wanted=directory_entry::metadata_fastpath())
 		{
-			fetch_metadata(prefix, wanted);
+			fetch_metadata(dirh, wanted);
 			return stat;
 		}
 #define BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(field) \
-	auto st_##field(std::filesystem::path prefix=std::filesystem::path()) -> decltype(stat.st_##field) { if(!(have_metadata&metadata_flags::field)) { _int_fetch(metadata_flags::field, prefix); } return stat.st_##field; }
+	auto st_##field(std::shared_ptr<async_io_handle> dirh) -> decltype(stat.st_##field) { if(!(have_metadata&metadata_flags::field)) { _int_fetch(metadata_flags::field, dirh); } return stat.st_##field; }
 		//! Returns st_dev
 		BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(dev)
 		//! Returns st_ino
@@ -1090,6 +1108,10 @@ public:
 
 
 	/*! \brief Schedule a batch of asynchronous directory creations and opens after optional preconditions.
+
+	Note that if there is already a handle open to the directory requested, that will be returned instead of
+	a new handle unless `file_flags::UniqueDirectoryHandle` is specified.
+
     \return A batch of op handles.
     \param reqs A batch of `async_path_op_req` structures.
     \ingroup async_file_io_dispatcher_base__filedirops
@@ -1100,6 +1122,10 @@ public:
     */
 	virtual std::vector<async_io_op> dir(const std::vector<async_path_op_req> &reqs)=0;
 	/*! \brief Schedule an asynchronous directory creation and open after an optional precondition.
+
+	Note that if there is already a handle open to the directory requested, that will be returned instead of
+	a new handle unless `file_flags::UniqueDirectoryHandle` is specified.
+
     \return An op handle.
     \param req An `async_path_op_req` structure.
     \ingroup async_file_io_dispatcher_base__filedirops
@@ -1304,6 +1330,12 @@ public:
     */
 	inline async_io_op truncate(const async_io_op &op, off_t newsize);
 	/*! \brief Schedule an asynchronous directory enumeration after a preceding operation.
+
+	By default `dir()` returns shared handles i.e. `dir("foo")` and `dir("foo")` will return the exact same
+	handle, and therefore enumerating not all of the entries at once is a race condition. The solution is
+	to either set `maxitems` to a value large enough to guarantee a directory will be enumerated in a single
+	shot, or to open a separate directory handle using the `file_flags::UniqueDirectoryHandle` flag.
+
     \return A batch of future vectors of directory entries with boolean returning false if done.
     \param reqs A batch of enumeration requests.
     \ingroup async_file_io_dispatcher_base__enumerate
@@ -1312,7 +1344,7 @@ public:
     \exceptionmodelstd
     \qexample{enumerate_example}
     */
-	virtual std::pair<std::vector<future<std::pair<std::vector<detail::directory_entry>, bool>>>, std::vector<async_io_op>> enumerate(const std::vector<async_enumerate_op_req> &reqs);
+	virtual std::pair<std::vector<future<std::pair<std::vector<detail::directory_entry>, bool>>>, std::vector<async_io_op>> enumerate(const std::vector<async_enumerate_op_req> &reqs)=0;
 
 	/*! \brief Schedule an asynchronous synchronisation of preceding operations.
     
