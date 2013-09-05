@@ -847,7 +847,7 @@ namespace detail {
 				h->close();
 			}
 		}
-		virtual stat_t stat(metadata_flags wanted) const
+		virtual stat_t lstat(metadata_flags wanted) const
 		{
 			windows_nt_kernel::init();
 			using namespace windows_nt_kernel;
@@ -950,7 +950,7 @@ namespace detail {
 				fd=-1;
 			}
 		}
-		virtual stat_t stat(metadata_flags wanted) const
+		virtual stat_t lstat(metadata_flags wanted) const
 		{
 			//TODO
 		}
@@ -2473,7 +2473,7 @@ namespace detail {
 			async_file_io_dispatcher_windows *dispatcher=static_cast<async_file_io_dispatcher_windows *>(dirh->parent());
 			async_path_op_req req(dirh->path()/name(), file_flags::Read);
 			auto fileh=dispatcher->dofile(0, std::shared_ptr<detail::async_io_handle>(), nullptr, req).second;
-			stat=fileh->stat(wanted);
+			stat=fileh->lstat(wanted);
 		}
 	}
 #endif

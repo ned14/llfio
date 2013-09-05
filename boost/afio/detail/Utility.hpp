@@ -11,6 +11,7 @@
 
 #include <unordered_map>
 #include <sys/types.h>
+#include <sys/stat.h>
 #ifdef WIN32
 #ifndef S_IFLNK
 #define S_IFLNK 0x1400

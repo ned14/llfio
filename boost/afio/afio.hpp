@@ -814,8 +814,10 @@ namespace detail {
 		metadata_flags have_metadata;
 		void _int_fetch(metadata_flags wanted, std::shared_ptr<async_io_handle> dirh);
 	public:
-		//! Constructs an instance
+		//! \constr
 		directory_entry() : stat(nullptr), have_metadata(metadata_flags::None) { }
+		//! \constr
+		directory_entry(std::filesystem::path _leafname, stat_t __stat, metadata_flags _have_metadata) : leafname(_leafname), stat(__stat), have_metadata(_have_metadata) { }
 		bool operator==(const directory_entry& rhs) const BOOST_NOEXCEPT_OR_NOTHROW { return leafname == rhs.leafname; }
 		bool operator!=(const directory_entry& rhs) const BOOST_NOEXCEPT_OR_NOTHROW { return leafname != rhs.leafname; }
 		bool operator< (const directory_entry& rhs) const BOOST_NOEXCEPT_OR_NOTHROW { return leafname < rhs.leafname; }
@@ -836,7 +838,7 @@ namespace detail {
 			return have_metadata;
 		}
 		//! Fetches a fast path `stat_t` structure which is missing those fields not fast to fetch on this platform.
-		stat_t full_stat(std::shared_ptr<async_io_handle> dirh, metadata_flags wanted=directory_entry::metadata_fastpath())
+		stat_t full_lstat(std::shared_ptr<async_io_handle> dirh, metadata_flags wanted=directory_entry::metadata_fastpath())
 		{
 			fetch_metadata(dirh, wanted);
 			return stat;
@@ -934,7 +936,13 @@ namespace detail {
 		//! Returns how many bytes have been written since this handle was last fsynced.
 		off_t write_count_since_fsync() const { return byteswritten-byteswrittenatlastfsync; }
 		//! Returns a mostly filled stat_t structure for the file or directory referenced by this handle. Use `metadata_flags::All` if you want it as complete as your platform allows, even at the cost of severe performance loss.
-		virtual stat_t stat(metadata_flags wanted=directory_entry::metadata_fastpath()) const=0;
+		virtual stat_t lstat(metadata_flags wanted=directory_entry::metadata_fastpath()) const=0;
+		//! Returns a mostly filled directory_entry for the file or directory referenced by this handle. Use `metadata_flags::All` if you want it as complete as your platform allows, even at the cost of severe performance loss.
+		directory_entry direntry(metadata_flags wanted=directory_entry::metadata_fastpath()) const
+		{
+			wanted=wanted&directory_entry::metadata_supported();
+			return directory_entry(_path.leaf(), lstat(wanted), wanted);
+		}
 	};
 	struct immediate_async_ops;
 	template<bool for_writing> class async_data_op_req_impl;
