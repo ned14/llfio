@@ -193,50 +193,6 @@ namespace windows_nt_kernel
 		PRTLP_CURDIR_REF CurDirRef;
 	} RTL_RELATIVE_NAME_U, *PRTL_RELATIVE_NAME_U;
 
-	typedef enum _KWAIT_REASON
-	{
-			 Executive = 0,
-			 FreePage = 1,
-			 PageIn = 2,
-			 PoolAllocation = 3,
-			 DelayExecution = 4,
-			 Suspended = 5,
-			 UserRequest = 6,
-			 WrExecutive = 7,
-			 WrFreePage = 8,
-			 WrPageIn = 9,
-			 WrPoolAllocation = 10,
-			 WrDelayExecution = 11,
-			 WrSuspended = 12,
-			 WrUserRequest = 13,
-			 WrEventPair = 14,
-			 WrQueue = 15,
-			 WrLpcReceive = 16,
-			 WrLpcReply = 17,
-			 WrVirtualMemory = 18,
-			 WrPageOut = 19,
-			 WrRendezvous = 20,
-			 Spare2 = 21,
-			 Spare3 = 22,
-			 Spare4 = 23,
-			 Spare5 = 24,
-			 WrCalloutStack = 25,
-			 WrKernel = 26,
-			 WrResource = 27,
-			 WrPushLock = 28,
-			 WrMutex = 29,
-			 WrQuantumEnd = 30,
-			 WrDispatchInt = 31,
-			 WrPreempted = 32,
-			 WrYieldExecution = 33,
-			 WrFastMutex = 34,
-			 WrGuardedMutex = 35,
-			 WrRundown = 36,
-			 MaximumWaitReason = 37
-	} KWAIT_REASON;
-
-	typedef enum _KPROCESSOR_MODE { KernelMode, UserMode, MaximumMode } KPROCESSOR_MODE;
-
 
 	// From http://undocumented.ntinternals.net/UserMode/Undocumented%20Functions/NT%20Objects/File/NtQueryInformationFile.html
 	// and http://msdn.microsoft.com/en-us/library/windows/hardware/ff567052(v=vs.85).aspx
@@ -326,12 +282,11 @@ namespace windows_nt_kernel
 		/*_In_*/   FILE_INFORMATION_CLASS FileInformationClass
 		);
 
-	typedef NTSTATUS (NTAPI *KeWaitForSingleObject_t)(
-		  /*_In_*/      PVOID Object,
-		  /*_In_*/      KWAIT_REASON WaitReason,
-		  /*_In_*/      KPROCESSOR_MODE WaitMode,
-		  /*_In_*/      BOOLEAN Alertable,
-		  /*_In_opt_*/  PLARGE_INTEGER Timeout
+	// From http://msdn.microsoft.com/en-us/library/ms648412(v=vs.85).aspx
+	typedef NTSTATUS (NTAPI *NtWaitForSingleObject_t)(
+		/*_In_*/  HANDLE Handle,
+		/*_In_*/  BOOLEAN Alertable,
+		/*_In_*/  PLARGE_INTEGER Timeout
 		);
 
 	typedef struct _FILE_BASIC_INFORMATION {
@@ -427,7 +382,7 @@ namespace windows_nt_kernel
 	static RtlDosPathNameToNtPathName_U_t RtlDosPathNameToNtPathName_U;
 	static NtQueryDirectoryFile_t NtQueryDirectoryFile;
 	static NtSetInformationFile_t NtSetInformationFile;
-	static KeWaitForSingleObject_t KeWaitForSingleObject;
+	static NtWaitForSingleObject_t NtWaitForSingleObject;
 
 	static void doinit()
 	{
@@ -458,8 +413,8 @@ namespace windows_nt_kernel
 		if(!NtSetInformationFile)
 			if(!(NtSetInformationFile=(NtSetInformationFile_t) GetProcAddress(GetModuleHandleA("NTDLL.DLL"), "NtSetInformationFile")))
 				abort();
-		if(!KeWaitForSingleObject)
-			if(!(KeWaitForSingleObject=(KeWaitForSingleObject_t) GetProcAddress(GetModuleHandleA("NTDLL.DLL"), "KeWaitForSingleObject")))
+		if(!NtWaitForSingleObject)
+			if(!(NtWaitForSingleObject=(NtWaitForSingleObject_t) GetProcAddress(GetModuleHandleA("NTDLL.DLL"), "NtWaitForSingleObject")))
 				abort();
 	}
 	static inline void init()
@@ -716,7 +671,7 @@ namespace detail {
 			{
 				ntstat=NtQueryInformationFile(h, &isb, &fai, sizeof(buffer), FileAllInformation);
 				if(STATUS_PENDING==ntstat)
-					ntstat=KeWaitForSingleObject(h, UserRequest, UserMode, FALSE, NULL);
+					ntstat=NtWaitForSingleObject(h, FALSE, NULL);
 				BOOST_AFIO_ERRHNTFN(ntstat, path());
 			}
 			else
@@ -725,21 +680,21 @@ namespace detail {
 				{
 					ntstat=NtQueryInformationFile(h, &isb, &fai.InternalInformation, sizeof(fai.InternalInformation), FileInternalInformation);
 					if(STATUS_PENDING==ntstat)
-						ntstat=KeWaitForSingleObject(h, UserRequest, UserMode, FALSE, NULL);
+						ntstat=NtWaitForSingleObject(h, FALSE, NULL);
 					BOOST_AFIO_ERRHNTFN(ntstat, path());
 				}
 				if(needBasic)
 				{
 					ntstat=NtQueryInformationFile(h, &isb, &fai.BasicInformation, sizeof(fai.BasicInformation), FileBasicInformation);
 					if(STATUS_PENDING==ntstat)
-						ntstat=KeWaitForSingleObject(h, UserRequest, UserMode, FALSE, NULL);
+						ntstat=NtWaitForSingleObject(h, FALSE, NULL);
 					BOOST_AFIO_ERRHNTFN(ntstat, path());
 				}
 				if(needStandard)
 				{
 					ntstat=NtQueryInformationFile(h, &isb, &fai.StandardInformation, sizeof(fai.StandardInformation), FileStandardInformation);
 					if(STATUS_PENDING==ntstat)
-						ntstat=KeWaitForSingleObject(h, UserRequest, UserMode, FALSE, NULL);
+						ntstat=NtWaitForSingleObject(h, FALSE, NULL);
 					BOOST_AFIO_ERRHNTFN(ntstat, path());
 				}
 			}
@@ -747,7 +702,7 @@ namespace detail {
 			{
 				ntstat=NtQueryVolumeInformationFile(h, &isb, &ffssi, sizeof(ffssi), FileFsSectorSizeInformation);
 				if(STATUS_PENDING==ntstat)
-					ntstat=KeWaitForSingleObject(h, UserRequest, UserMode, FALSE, NULL);
+					ntstat=NtWaitForSingleObject(h, FALSE, NULL);
 				BOOST_AFIO_ERRHNTFN(ntstat, path());
 			}
 			if(!!(wanted&metadata_flags::ino)) { stat.st_ino=fai.InternalInformation.IndexNumber.QuadPart; }
@@ -1968,7 +1923,7 @@ namespace detail {
 		completion_returntype dofile(size_t id, std::shared_ptr<async_io_handle>, exception_ptr *e, async_path_op_req req)
 		{
 			std::shared_ptr<async_io_handle> dirh;
-			DWORD access=0, creatdisp=0, flags=0x4000/*FILE_OPEN_FOR_BACKUP_INTENT*/, attribs=FILE_ATTRIBUTE_NORMAL;
+			DWORD access=FILE_READ_ATTRIBUTES, creatdisp=0, flags=0x4000/*FILE_OPEN_FOR_BACKUP_INTENT*/|0x00200000/*FILE_OPEN_REPARSE_POINT*/, attribs=FILE_ATTRIBUTE_NORMAL;
 			req.flags=fileflags(req.flags);
 			if(!!(req.flags & file_flags::int_opening_dir))
 			{
@@ -1978,7 +1933,6 @@ namespace detail {
 			else
 			{
 				flags|=0x040/*FILE_NON_DIRECTORY_FILE*/;
-				access|=FILE_READ_ATTRIBUTES;
 				if(!!(req.flags & file_flags::Append)) access|=FILE_APPEND_DATA|SYNCHRONIZE;
 				else
 				{
@@ -1987,8 +1941,8 @@ namespace detail {
 				}
 			}
 			if(!!(req.flags & file_flags::CreateOnlyIfNotExist)) creatdisp|=0x00000002/*FILE_CREATE*/;
-			else if(!!(req.flags & file_flags::Create)) creatdisp|=0x00000000/*FILE_SUPERSEDE*/;
-			else if(!!(req.flags & file_flags::Truncate)) creatdisp|=0x00000004/*FILE_OVERWRITE*/;
+			else if(!!(req.flags & file_flags::Create)) creatdisp|=0x00000003/*FILE_OPEN_IF*/;
+			else if(!!(req.flags & file_flags::Truncate)) creatdisp|=0x00000005/*FILE_OVERWRITE_IF*/;
 			else creatdisp|=0x00000001/*FILE_OPEN*/;
 			if(!!(req.flags & file_flags::WillBeSequentiallyAccessed))
 				flags|=0x00000004/*FILE_SEQUENTIAL_ONLY*/;
@@ -2459,7 +2413,7 @@ void directory_entry::_int_fetch(metadata_flags wanted, std::shared_ptr<async_io
 		ntstat=NtQueryDirectoryFile(dirh->native_handle(), NULL, NULL, NULL, &isb, ffdi, sizeof(buffer),
 			FileIdFullDirectoryInformation, TRUE, &_glob, FALSE);
 		if(STATUS_PENDING==ntstat)
-			ntstat=KeWaitForSingleObject(dirh->native_handle(), UserRequest, UserMode, FALSE, NULL);
+			ntstat=NtWaitForSingleObject(dirh->native_handle(), FALSE, NULL);
 		BOOST_AFIO_ERRHNTFN(ntstat, dirh->path());
 		if(!!(wanted&metadata_flags::ino)) { stat.st_ino=ffdi->FileId.QuadPart; }
 		if(!!(wanted&metadata_flags::type)) { stat.st_type=to_st_type(ffdi->FileAttributes); }

@@ -53,8 +53,8 @@ namespace boost{
                     extern BOOST_AFIO_DECL void int_throwNTError(const char *file, const char *function, int lineno, unsigned code, const std::filesystem::path *filename=0);
 #define BOOST_AFIO_ERRGNT(code)				{ boost::afio::detail::int_throwNTError(EXCEPTION_FILE(0), EXCEPTION_FUNCTION(0), EXCEPTION_LINE(0), code); }
 #define BOOST_AFIO_ERRGNTFN(code, filename)	{ boost::afio::detail::int_throwNTError(EXCEPTION_FILE(0), EXCEPTION_FUNCTION(0), EXCEPTION_LINE(0), code, &(filename)); }
-#define BOOST_AFIO_ERRHNT(exp)				{ unsigned __errcode=(unsigned)(exp); if(!__errcode) BOOST_AFIO_ERRGWIN(__errcode); }
-#define BOOST_AFIO_ERRHNTFN(exp, filename)	{ unsigned __errcode=(unsigned)(exp); if(!__errcode) BOOST_AFIO_ERRGWINFN(__errcode, filename); }
+#define BOOST_AFIO_ERRHNT(exp)				{ unsigned __errcode=(unsigned)(exp); if(0/*STATUS_SUCCESS*/!=__errcode) BOOST_AFIO_ERRGNT(__errcode); }
+#define BOOST_AFIO_ERRHNTFN(exp, filename)	{ unsigned __errcode=(unsigned)(exp); if(0/*STATUS_SUCCESS*/!=__errcode) BOOST_AFIO_ERRGNTFN(__errcode, filename); }
 #endif
 
                     extern BOOST_AFIO_DECL void int_throwOSError(const char *file, const char *function, int lineno, int code, const std::filesystem::path *filename=0);
