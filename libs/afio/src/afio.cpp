@@ -653,161 +653,8 @@ std::shared_ptr<std_thread_pool> process_threadpool()
 	return ret;
 }
 
+
 namespace detail {
-
-	metadata_flags directory_entry::metadata_supported() BOOST_NOEXCEPT_OR_NOTHROW
-	{
-		metadata_flags ret;
-#ifdef WIN32
-		ret=metadata_flags::None
-			//| metadata_flags::dev
-			| metadata_flags::ino        // FILE_INTERNAL_INFORMATION, enumerated
-			| metadata_flags::type       // FILE_BASIC_INFORMATION, enumerated
-			//| metadata_flags::mode
-			| metadata_flags::nlink      // FILE_STANDARD_INFORMATION
-			//| metadata_flags::uid
-			//| metadata_flags::gid
-			//| metadata_flags::rdev
-			| metadata_flags::atim       // FILE_BASIC_INFORMATION, enumerated
-			| metadata_flags::mtim       // FILE_BASIC_INFORMATION, enumerated
-			| metadata_flags::ctim       // FILE_BASIC_INFORMATION, enumerated
-			| metadata_flags::size       // FILE_STANDARD_INFORMATION, enumerated
-			| metadata_flags::allocated  // FILE_STANDARD_INFORMATION, enumerated
-			| metadata_flags::blocks
-			| metadata_flags::blksize    // FILE_ALIGNMENT_INFORMATION
-			//| metadata_flags::flags
-			//| metadata_flags::gen
-			| metadata_flags::birthtim   // FILE_BASIC_INFORMATION, enumerated
-			;
-#elif defined(__linux__)
-		ret=metadata_flags::None
-			| metadata_flags::dev
-			| metadata_flags::ino
-			| metadata_flags::type
-			| metadata_flags::mode
-			| metadata_flags::nlink
-			| metadata_flags::uid
-			| metadata_flags::gid
-			| metadata_flags::rdev
-			| metadata_flags::atim
-			| metadata_flags::mtim
-			| metadata_flags::ctim
-			| metadata_flags::size
-			| metadata_flags::allocated
-			| metadata_flags::blocks
-			| metadata_flags::blksize
-		// Sadly these must wait until someone fixes the Linux stat() call e.g. the xstat() proposal.
-			//| metadata_flags::flags
-			//| metadata_flags::gen
-			//| metadata_flags::birthtim
-		// According to http://computer-forensics.sans.org/blog/2011/03/14/digital-forensics-understanding-ext4-part-2-timestamps
-		// ext4 keeps birth time at offset 144 to 151 in the inode. If we ever got round to it, birthtime could be hacked.
-			;
-#else
-		// Kinda assumes FreeBSD or OS X really ...
-		ret=metadata_flags::None
-			| metadata_flags::dev
-			| metadata_flags::ino
-			| metadata_flags::type
-			| metadata_flags::mode
-			| metadata_flags::nlink
-			| metadata_flags::uid
-			| metadata_flags::gid
-			| metadata_flags::rdev
-			| metadata_flags::atim
-			| metadata_flags::mtim
-			| metadata_flags::ctim
-			| metadata_flags::size
-			| metadata_flags::allocated
-			| metadata_flags::blocks
-			| metadata_flags::blksize
-#define HAVE_STAT_FLAGS
-			| metadata_flags::flags
-#define HAVE_STAT_GEN
-			| metadata_flags::gen
-#define HAVE_BIRTHTIMESPEC
-			| metadata_flags::birthtim
-			;
-#endif
-		return ret;
-	}
-
-	metadata_flags directory_entry::metadata_fastpath() BOOST_NOEXCEPT_OR_NOTHROW
-	{
-		metadata_flags ret;
-#ifdef WIN32
-		ret=metadata_flags::None
-			//| metadata_flags::dev
-			| metadata_flags::ino        // FILE_INTERNAL_INFORMATION, enumerated
-			| metadata_flags::type       // FILE_BASIC_INFORMATION, enumerated
-			//| metadata_flags::mode
-			//| metadata_flags::nlink      // FILE_STANDARD_INFORMATION
-			//| metadata_flags::uid
-			//| metadata_flags::gid
-			//| metadata_flags::rdev
-			| metadata_flags::atim       // FILE_BASIC_INFORMATION, enumerated
-			| metadata_flags::mtim       // FILE_BASIC_INFORMATION, enumerated
-			| metadata_flags::ctim       // FILE_BASIC_INFORMATION, enumerated
-			| metadata_flags::size       // FILE_STANDARD_INFORMATION, enumerated
-			| metadata_flags::allocated  // FILE_STANDARD_INFORMATION, enumerated
-			//| metadata_flags::blocks
-			//| metadata_flags::blksize    // FILE_ALIGNMENT_INFORMATION
-			//| metadata_flags::flags
-			//| metadata_flags::gen
-			| metadata_flags::birthtim   // FILE_BASIC_INFORMATION, enumerated
-			;
-#elif defined(__linux__)
-		ret=metadata_flags::None
-			| metadata_flags::dev
-			| metadata_flags::ino
-			| metadata_flags::type
-			| metadata_flags::mode
-			| metadata_flags::nlink
-			| metadata_flags::uid
-			| metadata_flags::gid
-			| metadata_flags::rdev
-			| metadata_flags::atim
-			| metadata_flags::mtim
-			| metadata_flags::ctim
-			| metadata_flags::size
-			| metadata_flags::allocated
-			| metadata_flags::blocks
-			| metadata_flags::blksize
-		// Sadly these must wait until someone fixes the Linux stat() call e.g. the xstat() proposal.
-			//| metadata_flags::flags
-			//| metadata_flags::gen
-			//| metadata_flags::birthtim
-		// According to http://computer-forensics.sans.org/blog/2011/03/14/digital-forensics-understanding-ext4-part-2-timestamps
-		// ext4 keeps birth time at offset 144 to 151 in the inode. If we ever got round to it, birthtime could be hacked.
-			;
-#else
-		// Kinda assumes FreeBSD or OS X really ...
-		ret=metadata_flags::None
-			| metadata_flags::dev
-			| metadata_flags::ino
-			| metadata_flags::type
-			| metadata_flags::mode
-			| metadata_flags::nlink
-			| metadata_flags::uid
-			| metadata_flags::gid
-			| metadata_flags::rdev
-			| metadata_flags::atim
-			| metadata_flags::mtim
-			| metadata_flags::ctim
-			| metadata_flags::size
-			| metadata_flags::allocated
-			| metadata_flags::blocks
-			| metadata_flags::blksize
-#define HAVE_STAT_FLAGS
-			| metadata_flags::flags
-#define HAVE_STAT_GEN
-			| metadata_flags::gen
-#define HAVE_BIRTHTIMESPEC
-			| metadata_flags::birthtim
-			;
-#endif
-		return ret;
-	}
 
 #if defined(WIN32)
 	struct async_io_handle_windows : public async_io_handle
@@ -822,8 +669,8 @@ namespace detail {
 			BOOST_AFIO_ERRHWINFN(INVALID_HANDLE_VALUE!=h, path);
 			return h;
 		}
-		async_io_handle_windows(std::shared_ptr<async_file_io_dispatcher_base> _parent, std::shared_ptr<detail::async_io_handle> _dirh, const std::filesystem::path &path, file_flags flags) : async_io_handle(_parent.get(), std::move(_dirh), path, flags), parent(_parent), myid(nullptr), has_been_added(false), SyncOnClose(false) { }
-		inline async_io_handle_windows(std::shared_ptr<async_file_io_dispatcher_base> _parent, std::shared_ptr<detail::async_io_handle> _dirh, const std::filesystem::path &path, file_flags flags, bool _SyncOnClose, HANDLE _h);
+		async_io_handle_windows(std::shared_ptr<async_file_io_dispatcher_base> _parent, std::shared_ptr<async_io_handle> _dirh, const std::filesystem::path &path, file_flags flags) : async_io_handle(_parent.get(), std::move(_dirh), path, flags), parent(_parent), myid(nullptr), has_been_added(false), SyncOnClose(false) { }
+		inline async_io_handle_windows(std::shared_ptr<async_file_io_dispatcher_base> _parent, std::shared_ptr<async_io_handle> _dirh, const std::filesystem::path &path, file_flags flags, bool _SyncOnClose, HANDLE _h);
 		virtual void *native_handle() const { return myid; }
 
 		// You can't use shared_from_this() in a constructor so ...
@@ -924,7 +771,7 @@ namespace detail {
 		int fd;
 		bool has_been_added, SyncOnClose, has_ever_been_fsynced;
 
-		async_io_handle_posix(std::shared_ptr<async_file_io_dispatcher_base> _parent, std::shared_ptr<detail::async_io_handle> _dirh, const std::filesystem::path &path, file_flags flags, bool _SyncOnClose, int _fd) : async_io_handle(_parent.get(), std::move(_dirh), path, flags), parent(_parent), fd(_fd), has_been_added(false), SyncOnClose(_SyncOnClose),has_ever_been_fsynced(false)
+		async_io_handle_posix(std::shared_ptr<async_file_io_dispatcher_base> _parent, std::shared_ptr<async_io_handle> _dirh, const std::filesystem::path &path, file_flags flags, bool _SyncOnClose, int _fd) : async_io_handle(_parent.get(), std::move(_dirh), path, flags), parent(_parent), fd(_fd), has_been_added(false), SyncOnClose(_SyncOnClose),has_ever_been_fsynced(false)
 		{
 			if(fd!=-999)
 				BOOST_AFIO_ERRHOSFN(fd, path);
@@ -1005,9 +852,9 @@ namespace detail {
 	{
 		OpType optype;
 		async_op_flags flags;
-		std::shared_ptr<shared_future<std::shared_ptr<detail::async_io_handle>>> h;
-		std::unique_ptr<promise<std::shared_ptr<detail::async_io_handle>>> detached_promise;
-		typedef std::pair<size_t, std::function<std::shared_ptr<detail::async_io_handle> (std::shared_ptr<detail::async_io_handle>, exception_ptr *)>> completion_t;
+		std::shared_ptr<shared_future<std::shared_ptr<async_io_handle>>> h;
+		std::unique_ptr<promise<std::shared_ptr<async_io_handle>>> detached_promise;
+		typedef std::pair<size_t, std::function<std::shared_ptr<async_io_handle> (std::shared_ptr<async_io_handle>, exception_ptr *)>> completion_t;
 #ifndef NDEBUG
 		completion_t boundf; // Useful for debugging
 #endif
@@ -1039,7 +886,7 @@ namespace detail {
 #else
 		void fillStack() { }
 #endif
-		async_file_io_dispatcher_op(OpType _optype, async_op_flags _flags, std::shared_ptr<shared_future<std::shared_ptr<detail::async_io_handle>>> _h, completion_t _boundf)
+		async_file_io_dispatcher_op(OpType _optype, async_op_flags _flags, std::shared_ptr<shared_future<std::shared_ptr<async_io_handle>>> _h, completion_t _boundf)
 			: optype(_optype), flags(_flags), h(_h)
 #ifndef NDEBUG
 			, boundf(_boundf)
@@ -1093,9 +940,9 @@ namespace detail {
 		}
 
 		// Returns a handle to a directory from the cache, or creates a new directory handle.
-		template<class F> std::shared_ptr<detail::async_io_handle> get_handle_to_dir(F *parent, size_t id, exception_ptr *e, async_path_op_req req, typename async_file_io_dispatcher_base::completion_returntype (F::*dofile)(size_t, std::shared_ptr<detail::async_io_handle>, exception_ptr *, async_path_op_req))
+		template<class F> std::shared_ptr<async_io_handle> get_handle_to_dir(F *parent, size_t id, exception_ptr *e, async_path_op_req req, typename async_file_io_dispatcher_base::completion_returntype (F::*dofile)(size_t, std::shared_ptr<async_io_handle>, exception_ptr *, async_path_op_req))
 		{
-			std::shared_ptr<detail::async_io_handle> dirh;
+			std::shared_ptr<async_io_handle> dirh;
 			BOOST_AFIO_LOCK_GUARD<dircachelock_t> dircachelockh(dircachelock);
 			do
 			{
@@ -1120,7 +967,7 @@ namespace detail {
 			return dirh;
 		}
 		// Returns a handle to a containing directory from the cache, or creates a new directory handle.
-		template<class F> std::shared_ptr<detail::async_io_handle> get_handle_to_containing_dir(F *parent, size_t id, exception_ptr *e, async_path_op_req req, typename async_file_io_dispatcher_base::completion_returntype (F::*dofile)(size_t, std::shared_ptr<detail::async_io_handle>, exception_ptr *, async_path_op_req))
+		template<class F> std::shared_ptr<async_io_handle> get_handle_to_containing_dir(F *parent, size_t id, exception_ptr *e, async_path_op_req req, typename async_file_io_dispatcher_base::completion_returntype (F::*dofile)(size_t, std::shared_ptr<async_io_handle>, exception_ptr *, async_path_op_req))
 		{
 			req.path=req.path.parent_path();
 			req.flags=req.flags&~file_flags::FastDirectoryEnumeration;
@@ -1128,7 +975,7 @@ namespace detail {
 		}
 	};
 #if defined(WIN32)
-	inline async_io_handle_windows::async_io_handle_windows(std::shared_ptr<async_file_io_dispatcher_base> _parent, std::shared_ptr<detail::async_io_handle> _dirh, const std::filesystem::path &path, file_flags flags, bool _SyncOnClose, HANDLE _h) : async_io_handle(_parent.get(), std::move(_dirh), path, flags), parent(_parent), h(new boost::asio::windows::random_access_handle(_parent->p->pool->io_service(), int_checkHandle(_h, path))), myid(_h), has_been_added(false), SyncOnClose(_SyncOnClose) { }
+	inline async_io_handle_windows::async_io_handle_windows(std::shared_ptr<async_file_io_dispatcher_base> _parent, std::shared_ptr<async_io_handle> _dirh, const std::filesystem::path &path, file_flags flags, bool _SyncOnClose, HANDLE _h) : async_io_handle(_parent.get(), std::move(_dirh), path, flags), parent(_parent), h(new boost::asio::windows::random_access_handle(_parent->p->pool->io_service(), int_checkHandle(_h, path))), myid(_h), has_been_added(false), SyncOnClose(_SyncOnClose) { }
 #endif
 	class async_file_io_dispatcher_compat;
 	class async_file_io_dispatcher_windows;
@@ -1136,7 +983,7 @@ namespace detail {
 	class async_file_io_dispatcher_qnx;
 	struct immediate_async_ops
 	{
-		typedef std::shared_ptr<detail::async_io_handle> rettype;
+		typedef std::shared_ptr<async_io_handle> rettype;
 		typedef rettype retfuncttype();
 		std::vector<packaged_task<retfuncttype>> toexecute;
 
@@ -1163,6 +1010,161 @@ namespace detail {
 	};
 }
 
+metadata_flags directory_entry::metadata_supported() BOOST_NOEXCEPT_OR_NOTHROW
+{
+	metadata_flags ret;
+#ifdef WIN32
+	ret=metadata_flags::None
+		//| metadata_flags::dev
+		| metadata_flags::ino        // FILE_INTERNAL_INFORMATION, enumerated
+		| metadata_flags::type       // FILE_BASIC_INFORMATION, enumerated
+		//| metadata_flags::mode
+		| metadata_flags::nlink      // FILE_STANDARD_INFORMATION
+		//| metadata_flags::uid
+		//| metadata_flags::gid
+		//| metadata_flags::rdev
+		| metadata_flags::atim       // FILE_BASIC_INFORMATION, enumerated
+		| metadata_flags::mtim       // FILE_BASIC_INFORMATION, enumerated
+		| metadata_flags::ctim       // FILE_BASIC_INFORMATION, enumerated
+		| metadata_flags::size       // FILE_STANDARD_INFORMATION, enumerated
+		| metadata_flags::allocated  // FILE_STANDARD_INFORMATION, enumerated
+		| metadata_flags::blocks
+		| metadata_flags::blksize    // FILE_ALIGNMENT_INFORMATION
+		//| metadata_flags::flags
+		//| metadata_flags::gen
+		| metadata_flags::birthtim   // FILE_BASIC_INFORMATION, enumerated
+		;
+#elif defined(__linux__)
+	ret=metadata_flags::None
+		| metadata_flags::dev
+		| metadata_flags::ino
+		| metadata_flags::type
+		| metadata_flags::mode
+		| metadata_flags::nlink
+		| metadata_flags::uid
+		| metadata_flags::gid
+		| metadata_flags::rdev
+		| metadata_flags::atim
+		| metadata_flags::mtim
+		| metadata_flags::ctim
+		| metadata_flags::size
+		| metadata_flags::allocated
+		| metadata_flags::blocks
+		| metadata_flags::blksize
+	// Sadly these must wait until someone fixes the Linux stat() call e.g. the xstat() proposal.
+		//| metadata_flags::flags
+		//| metadata_flags::gen
+		//| metadata_flags::birthtim
+	// According to http://computer-forensics.sans.org/blog/2011/03/14/digital-forensics-understanding-ext4-part-2-timestamps
+	// ext4 keeps birth time at offset 144 to 151 in the inode. If we ever got round to it, birthtime could be hacked.
+		;
+#else
+	// Kinda assumes FreeBSD or OS X really ...
+	ret=metadata_flags::None
+		| metadata_flags::dev
+		| metadata_flags::ino
+		| metadata_flags::type
+		| metadata_flags::mode
+		| metadata_flags::nlink
+		| metadata_flags::uid
+		| metadata_flags::gid
+		| metadata_flags::rdev
+		| metadata_flags::atim
+		| metadata_flags::mtim
+		| metadata_flags::ctim
+		| metadata_flags::size
+		| metadata_flags::allocated
+		| metadata_flags::blocks
+		| metadata_flags::blksize
+#define HAVE_STAT_FLAGS
+		| metadata_flags::flags
+#define HAVE_STAT_GEN
+		| metadata_flags::gen
+#define HAVE_BIRTHTIMESPEC
+		| metadata_flags::birthtim
+		;
+#endif
+	return ret;
+}
+
+metadata_flags directory_entry::metadata_fastpath() BOOST_NOEXCEPT_OR_NOTHROW
+{
+	metadata_flags ret;
+#ifdef WIN32
+	ret=metadata_flags::None
+		//| metadata_flags::dev
+		| metadata_flags::ino        // FILE_INTERNAL_INFORMATION, enumerated
+		| metadata_flags::type       // FILE_BASIC_INFORMATION, enumerated
+		//| metadata_flags::mode
+		//| metadata_flags::nlink      // FILE_STANDARD_INFORMATION
+		//| metadata_flags::uid
+		//| metadata_flags::gid
+		//| metadata_flags::rdev
+		| metadata_flags::atim       // FILE_BASIC_INFORMATION, enumerated
+		| metadata_flags::mtim       // FILE_BASIC_INFORMATION, enumerated
+		| metadata_flags::ctim       // FILE_BASIC_INFORMATION, enumerated
+		| metadata_flags::size       // FILE_STANDARD_INFORMATION, enumerated
+		| metadata_flags::allocated  // FILE_STANDARD_INFORMATION, enumerated
+		//| metadata_flags::blocks
+		//| metadata_flags::blksize    // FILE_ALIGNMENT_INFORMATION
+		//| metadata_flags::flags
+		//| metadata_flags::gen
+		| metadata_flags::birthtim   // FILE_BASIC_INFORMATION, enumerated
+		;
+#elif defined(__linux__)
+	ret=metadata_flags::None
+		| metadata_flags::dev
+		| metadata_flags::ino
+		| metadata_flags::type
+		| metadata_flags::mode
+		| metadata_flags::nlink
+		| metadata_flags::uid
+		| metadata_flags::gid
+		| metadata_flags::rdev
+		| metadata_flags::atim
+		| metadata_flags::mtim
+		| metadata_flags::ctim
+		| metadata_flags::size
+		| metadata_flags::allocated
+		| metadata_flags::blocks
+		| metadata_flags::blksize
+	// Sadly these must wait until someone fixes the Linux stat() call e.g. the xstat() proposal.
+		//| metadata_flags::flags
+		//| metadata_flags::gen
+		//| metadata_flags::birthtim
+	// According to http://computer-forensics.sans.org/blog/2011/03/14/digital-forensics-understanding-ext4-part-2-timestamps
+	// ext4 keeps birth time at offset 144 to 151 in the inode. If we ever got round to it, birthtime could be hacked.
+		;
+#else
+	// Kinda assumes FreeBSD or OS X really ...
+	ret=metadata_flags::None
+		| metadata_flags::dev
+		| metadata_flags::ino
+		| metadata_flags::type
+		| metadata_flags::mode
+		| metadata_flags::nlink
+		| metadata_flags::uid
+		| metadata_flags::gid
+		| metadata_flags::rdev
+		| metadata_flags::atim
+		| metadata_flags::mtim
+		| metadata_flags::ctim
+		| metadata_flags::size
+		| metadata_flags::allocated
+		| metadata_flags::blocks
+		| metadata_flags::blksize
+#define HAVE_STAT_FLAGS
+		| metadata_flags::flags
+#define HAVE_STAT_GEN
+		| metadata_flags::gen
+#define HAVE_BIRTHTIMESPEC
+		| metadata_flags::birthtim
+		;
+#endif
+	return ret;
+}
+
+
 async_file_io_dispatcher_base::async_file_io_dispatcher_base(std::shared_ptr<thread_source> threadpool, file_flags flagsforce, file_flags flagsmask) : p(new detail::async_file_io_dispatcher_base_p(threadpool, flagsforce, flagsmask))
 {
 }
@@ -1170,10 +1172,10 @@ async_file_io_dispatcher_base::async_file_io_dispatcher_base(std::shared_ptr<thr
 async_file_io_dispatcher_base::~async_file_io_dispatcher_base()
 {
 #ifndef BOOST_AFIO_COMPILING_FOR_GCOV
-	std::unordered_map<shared_future<std::shared_ptr<detail::async_io_handle>> *, std::pair<size_t, future_status>> reallyoutstanding;
+	std::unordered_map<shared_future<std::shared_ptr<async_io_handle>> *, std::pair<size_t, future_status>> reallyoutstanding;
 	for(;;)
 	{
-		std::vector<std::pair<size_t, std::shared_ptr<shared_future<std::shared_ptr<detail::async_io_handle>>>>> outstanding;
+		std::vector<std::pair<size_t, std::shared_ptr<shared_future<std::shared_ptr<async_io_handle>>>>> outstanding;
 		{
 			BOOST_AFIO_LOCK_GUARD<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
 			if(!p->ops.empty())
@@ -1267,11 +1269,11 @@ async_file_io_dispatcher_base::~async_file_io_dispatcher_base()
 	delete p;
 }
 
-void async_file_io_dispatcher_base::int_add_io_handle(void *key, std::shared_ptr<detail::async_io_handle> h)
+void async_file_io_dispatcher_base::int_add_io_handle(void *key, std::shared_ptr<async_io_handle> h)
 {
 	BOOST_AFIO_LOCK_GUARD<detail::async_file_io_dispatcher_base_p::fdslock_t> lockh(p->fdslock);
 	ANNOTATE_RWLOCK_ACQUIRED(&p->fdslock, 1);
-	p->fds.insert(std::make_pair(key, std::weak_ptr<detail::async_io_handle>(h)));
+	p->fds.insert(std::make_pair(key, std::weak_ptr<async_io_handle>(h)));
 	ANNOTATE_RWLOCK_RELEASED(&p->fdslock, 1);
 }
 
@@ -1323,7 +1325,7 @@ size_t async_file_io_dispatcher_base::count() const
 }
 
 // Called in unknown thread
-async_file_io_dispatcher_base::completion_returntype async_file_io_dispatcher_base::invoke_user_completion(size_t id, std::shared_ptr<detail::async_io_handle> h, exception_ptr *e, std::function<async_file_io_dispatcher_base::completion_t> callback)
+async_file_io_dispatcher_base::completion_returntype async_file_io_dispatcher_base::invoke_user_completion(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr *e, std::function<async_file_io_dispatcher_base::completion_t> callback)
 {
 	return callback(id, h, e);
 }
@@ -1353,7 +1355,7 @@ std::vector<async_io_op> async_file_io_dispatcher_base::completion(const std::ve
 }
 
 // Called in unknown thread
-void async_file_io_dispatcher_base::complete_async_op(size_t id, std::shared_ptr<detail::async_io_handle> h, exception_ptr e)
+void async_file_io_dispatcher_base::complete_async_op(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr e)
 {
 	BOOST_AFIO_LOCK_GUARD<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
 	detail::immediate_async_ops immediates;
@@ -1445,7 +1447,7 @@ void async_file_io_dispatcher_base::complete_async_op(size_t id, std::shared_ptr
 
 #ifndef BOOST_NO_CXX11_VARIADIC_TEMPLATES
 // Called in unknown thread 
-template<class F, class... Args> std::shared_ptr<detail::async_io_handle> async_file_io_dispatcher_base::invoke_async_op_completions(size_t id, std::shared_ptr<detail::async_io_handle> h, exception_ptr *e, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, exception_ptr *, Args...), Args... args)
+template<class F, class... Args> std::shared_ptr<async_io_handle> async_file_io_dispatcher_base::invoke_async_op_completions(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr *e, completion_returntype (F::*f)(size_t, std::shared_ptr<async_io_handle>, exception_ptr *, Args...), Args... args)
 {
 	try
 	{
@@ -1500,10 +1502,10 @@ template<class F, class... Args> std::shared_ptr<detail::async_io_handle> async_
     template <class F                                                                               \
     BOOST_PP_COMMA_IF(N)                                                                            \
     BOOST_PP_ENUM_PARAMS(N, class A)>                                                               \
-    std::shared_ptr<detail::async_io_handle>                                                        \
+    std::shared_ptr<async_io_handle>                                                        \
     async_file_io_dispatcher_base::invoke_async_op_completions                                      \
-    (size_t id, std::shared_ptr<detail::async_io_handle> h, exception_ptr *e,                        \
-    completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, exception_ptr * \
+    (size_t id, std::shared_ptr<async_io_handle> h, exception_ptr *e,                        \
+    completion_returntype (F::*f)(size_t, std::shared_ptr<async_io_handle>, exception_ptr * \
     BOOST_PP_COMMA_IF(N)                                                                            \
     BOOST_PP_ENUM_PARAMS(N, A))                                                                     \
     BOOST_PP_COMMA_IF(N)                                                                            \
@@ -1561,7 +1563,7 @@ template<class F, class... Args> std::shared_ptr<detail::async_io_handle> async_
 
 #ifndef BOOST_NO_CXX11_VARIADIC_TEMPLATES
 // You MUST hold opslock before entry!
-template<class F, class... Args> async_io_op async_file_io_dispatcher_base::chain_async_op(exception_ptr *he, detail::immediate_async_ops &immediates, int optype, const async_io_op &precondition, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, exception_ptr *, Args...), Args... args)
+template<class F, class... Args> async_io_op async_file_io_dispatcher_base::chain_async_op(exception_ptr *he, detail::immediate_async_ops &immediates, int optype, const async_io_op &precondition, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<async_io_handle>, exception_ptr *, Args...), Args... args)
 {	
 	size_t thisid=0;
 	while(!(thisid=++p->monotoniccount));
@@ -1604,13 +1606,13 @@ template<class F, class... Args> async_io_op async_file_io_dispatcher_base::chai
 	if(!done)
 	{
 		// Bind input handle now and queue immediately to next available thread worker
-		std::shared_ptr<detail::async_io_handle> h;
+		std::shared_ptr<async_io_handle> h;
 		exception_ptr *_he=nullptr;
 		if(precondition.h->valid())
 		{
 			// Boost's shared_future has get() as non-const which is weird, because it doesn't
 			// delete the data after retrieval.
-			shared_future<std::shared_ptr<detail::async_io_handle>> &f=const_cast<shared_future<std::shared_ptr<detail::async_io_handle>> &>(*precondition.h);
+			shared_future<std::shared_ptr<async_io_handle>> &f=const_cast<shared_future<std::shared_ptr<async_io_handle>> &>(*precondition.h);
 			// The reason we don't throw here is consistency: we throw at point of batch API entry
 			// if any of the preconditions are errored, but if they became errored between then and
 			// now we can hardly abort half way through a batch op without leaving around stuck ops.
@@ -1643,7 +1645,7 @@ template<class F, class... Args> async_io_op async_file_io_dispatcher_base::chai
 	});
 	if(!!(flags & async_op_flags::DetachedFuture))
 	{
-		opsit.first->second.detached_promise.reset(new promise<std::shared_ptr<detail::async_io_handle>>);
+		opsit.first->second.detached_promise.reset(new promise<std::shared_ptr<async_io_handle>>);
 		if(!done)
 			*opsit.first->second.h=opsit.first->second.detached_promise->get_future();
 	}
@@ -1676,7 +1678,7 @@ template<class F, class... Args> async_io_op async_file_io_dispatcher_base::chai
     async_file_io_dispatcher_base::chain_async_op       /* function name */             \
     (exception_ptr *he, detail::immediate_async_ops &immediates, int optype,           /* parameters start */          \
     const async_io_op &precondition,async_op_flags flags,                                           \
-    completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, exception_ptr * \
+    completion_returntype (F::*f)(size_t, std::shared_ptr<async_io_handle>, exception_ptr * \
     BOOST_PP_COMMA_IF(N)                                                                            \
     BOOST_PP_ENUM_PARAMS(N, A))                                                                     \
     BOOST_PP_COMMA_IF(N)                                                                            \
@@ -1711,13 +1713,13 @@ template<class F, class... Args> async_io_op async_file_io_dispatcher_base::chai
 	    if(!done)\
 	    {\
 		    /* Bind input handle now and queue immediately to next available thread worker*/ \
-		    std::shared_ptr<detail::async_io_handle> h;\
+		    std::shared_ptr<async_io_handle> h;\
 			exception_ptr *_he=nullptr; \
 			if(precondition.h->valid()) \
 			{ \
 				/* Boost's shared_future has get() as non-const which is weird, because it doesn't*/ \
 				/* delete the data after retrieval.*/ \
-				shared_future<std::shared_ptr<detail::async_io_handle>> &f=const_cast<shared_future<std::shared_ptr<detail::async_io_handle>> &>(*precondition.h);\
+				shared_future<std::shared_ptr<async_io_handle>> &f=const_cast<shared_future<std::shared_ptr<async_io_handle>> &>(*precondition.h);\
 				/* The reason we don't throw here is consistency: we throw at point of batch API entry*/ \
 				/* if any of the preconditions are errored, but if they became errored between then and*/ \
 				/* now we can hardly abort half way through a batch op without leaving around stuck ops.*/ \
@@ -1750,7 +1752,7 @@ template<class F, class... Args> async_io_op async_file_io_dispatcher_base::chai
 	    });\
 	    if(!!(flags & async_op_flags::DetachedFuture))\
 	    {\
-		    opsit.first->second.detached_promise.reset(new promise<std::shared_ptr<detail::async_io_handle>>);\
+		    opsit.first->second.detached_promise.reset(new promise<std::shared_ptr<async_io_handle>>);\
 		    if(!done)\
 			    *opsit.first->second.h=opsit.first->second.detached_promise->get_future();\
 	    }\
@@ -1766,7 +1768,7 @@ template<class F, class... Args> async_io_op async_file_io_dispatcher_base::chai
 #endif
 
 // General non-specialised implementation taking some arbitrary parameter T
-template<class F, class T> std::vector<async_io_op> async_file_io_dispatcher_base::chain_async_ops(int optype, const std::vector<async_io_op> &preconditions, const std::vector<T> &container, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, exception_ptr *, T))
+template<class F, class T> std::vector<async_io_op> async_file_io_dispatcher_base::chain_async_ops(int optype, const std::vector<async_io_op> &preconditions, const std::vector<T> &container, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<async_io_handle>, exception_ptr *, T))
 {
 	std::vector<async_io_op> ret;
 	ret.reserve(container.size());
@@ -1783,7 +1785,7 @@ template<class F, class T> std::vector<async_io_op> async_file_io_dispatcher_bas
 	return ret;
 }
 // Generic op receiving specialisation i.e. precondition is also input op. Skips sanity checking.
-template<class F> std::vector<async_io_op> async_file_io_dispatcher_base::chain_async_ops(int optype, const std::vector<async_io_op> &container, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, exception_ptr *, async_io_op))
+template<class F> std::vector<async_io_op> async_file_io_dispatcher_base::chain_async_ops(int optype, const std::vector<async_io_op> &container, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<async_io_handle>, exception_ptr *, async_io_op))
 {
 	std::vector<async_io_op> ret;
 	ret.reserve(container.size());
@@ -1797,7 +1799,7 @@ template<class F> std::vector<async_io_op> async_file_io_dispatcher_base::chain_
 	return ret;
 }
 // Dir/file open specialisation
-template<class F> std::vector<async_io_op> async_file_io_dispatcher_base::chain_async_ops(int optype, const std::vector<async_path_op_req> &container, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, exception_ptr *, async_path_op_req))
+template<class F> std::vector<async_io_op> async_file_io_dispatcher_base::chain_async_ops(int optype, const std::vector<async_path_op_req> &container, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<async_io_handle>, exception_ptr *, async_path_op_req))
 {
 	std::vector<async_io_op> ret;
 	ret.reserve(container.size());
@@ -1811,7 +1813,7 @@ template<class F> std::vector<async_io_op> async_file_io_dispatcher_base::chain_
 	return ret;
 }
 // Data read and write specialisation
-template<class F, bool iswrite> std::vector<async_io_op> async_file_io_dispatcher_base::chain_async_ops(int optype, const std::vector<detail::async_data_op_req_impl<iswrite>> &container, async_op_flags flags, completion_returntype(F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, exception_ptr *, detail::async_data_op_req_impl<iswrite>))
+template<class F, bool iswrite> std::vector<async_io_op> async_file_io_dispatcher_base::chain_async_ops(int optype, const std::vector<detail::async_data_op_req_impl<iswrite>> &container, async_op_flags flags, completion_returntype(F::*f)(size_t, std::shared_ptr<async_io_handle>, exception_ptr *, detail::async_data_op_req_impl<iswrite>))
 {
 	std::vector<async_io_op> ret;
 	ret.reserve(container.size());
@@ -1825,9 +1827,9 @@ template<class F, bool iswrite> std::vector<async_io_op> async_file_io_dispatche
 	return ret;
 }
 // Directory enumerate specialisation
-template<class F> std::pair<std::vector<future<std::pair<std::vector<detail::directory_entry>, bool>>>, std::vector<async_io_op>> async_file_io_dispatcher_base::chain_async_ops(int optype, const std::vector<async_enumerate_op_req> &container, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<detail::async_io_handle>, exception_ptr *, async_enumerate_op_req, std::shared_ptr<promise<std::pair<std::vector<detail::directory_entry>, bool>>> ret))
+template<class F> std::pair<std::vector<future<std::pair<std::vector<directory_entry>, bool>>>, std::vector<async_io_op>> async_file_io_dispatcher_base::chain_async_ops(int optype, const std::vector<async_enumerate_op_req> &container, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<async_io_handle>, exception_ptr *, async_enumerate_op_req, std::shared_ptr<promise<std::pair<std::vector<directory_entry>, bool>>> ret))
 {
-	typedef std::pair<std::vector<detail::directory_entry>, bool> retitemtype;
+	typedef std::pair<std::vector<directory_entry>, bool> retitemtype;
 	std::vector<async_io_op> ret;
 	std::vector<future<retitemtype>> retfutures;
 	ret.reserve(container.size());
@@ -1850,8 +1852,8 @@ namespace detail
 	struct barrier_count_completed_state
 	{
 		atomic<size_t> togo;
-		std::vector<std::pair<size_t, std::shared_ptr<detail::async_io_handle>>> out;
-		std::vector<std::shared_ptr<shared_future<std::shared_ptr<detail::async_io_handle>>>> insharedstates;
+		std::vector<std::pair<size_t, std::shared_ptr<async_io_handle>>> out;
+		std::vector<std::shared_ptr<shared_future<std::shared_ptr<async_io_handle>>>> insharedstates;
 		barrier_count_completed_state(const std::vector<async_io_op> &ops) : togo(ops.size()), out(ops.size())
 		{
 			insharedstates.reserve(ops.size());
@@ -1866,8 +1868,8 @@ namespace detail
 /* This is extremely naughty ... you really shouldn't be using templates to hide implementation
 types, but hey it works and is non-header so so what ...
 */
-//template<class T> async_file_io_dispatcher_base::completion_returntype async_file_io_dispatcher_base::dobarrier(size_t id, std::shared_ptr<detail::async_io_handle> h, T state);
-template<> async_file_io_dispatcher_base::completion_returntype async_file_io_dispatcher_base::dobarrier<std::pair<std::shared_ptr<detail::barrier_count_completed_state>, size_t>>(size_t id, std::shared_ptr<detail::async_io_handle> h, exception_ptr *e, std::pair<std::shared_ptr<detail::barrier_count_completed_state>, size_t> state)
+//template<class T> async_file_io_dispatcher_base::completion_returntype async_file_io_dispatcher_base::dobarrier(size_t id, std::shared_ptr<async_io_handle> h, T state);
+template<> async_file_io_dispatcher_base::completion_returntype async_file_io_dispatcher_base::dobarrier<std::pair<std::shared_ptr<detail::barrier_count_completed_state>, size_t>>(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr *e, std::pair<std::shared_ptr<detail::barrier_count_completed_state>, size_t> state)
 {
 	size_t idx=state.second;
 	detail::barrier_count_completed_state &s=*state.first;
@@ -1881,11 +1883,11 @@ template<> async_file_io_dispatcher_base::completion_returntype async_file_io_di
 #endif
 #if 1
 	// Rather than potentially expend a syscall per wait on each input op to complete, compose a list of input futures and wait on them all
-	std::vector<shared_future<std::shared_ptr<detail::async_io_handle>>> notready;
+	std::vector<shared_future<std::shared_ptr<async_io_handle>>> notready;
 	notready.reserve(s.insharedstates.size()-1);
 	for(idx=0; idx<s.insharedstates.size(); idx++)
 	{
-		shared_future<std::shared_ptr<detail::async_io_handle>> &f=*s.insharedstates[idx];
+		shared_future<std::shared_ptr<async_io_handle>> &f=*s.insharedstates[idx];
 		if(idx==state.second || f.is_ready()) continue;
 		notready.push_back(f);
 	}
@@ -1896,7 +1898,7 @@ template<> async_file_io_dispatcher_base::completion_returntype async_file_io_di
 	for(idx=0; idx<s.out.size(); idx++)
 	{
 		if(idx==state.second) continue;
-		shared_future<std::shared_ptr<detail::async_io_handle>> &thisresult=*s.insharedstates[idx];
+		shared_future<std::shared_ptr<async_io_handle>> &thisresult=*s.insharedstates[idx];
 		// TODO: If I include the wait_for_all above, we need only fetch this if thisresult.has_exception().
 		exception_ptr e(get_exception_ptr(thisresult));
 		complete_async_op(s.out[idx].first, s.out[idx].second, e);
@@ -1932,14 +1934,14 @@ std::vector<async_io_op> async_file_io_dispatcher_base::barrier(const std::vecto
 }
 
 
-namespace detail {
 #if defined(WIN32)
+namespace detail {
 	class async_file_io_dispatcher_windows : public async_file_io_dispatcher_base
 	{
-		friend class detail::directory_entry;
+		friend class directory_entry;
 		size_t pagesize;
 		// Called in unknown thread
-		completion_returntype dodir(size_t id, std::shared_ptr<detail::async_io_handle> _, exception_ptr *e, async_path_op_req req)
+		completion_returntype dodir(size_t id, std::shared_ptr<async_io_handle> _, exception_ptr *e, async_path_op_req req)
 		{
 			BOOL ret=0;
 			req.flags=fileflags(req.flags)|file_flags::int_opening_dir;
@@ -1955,17 +1957,17 @@ namespace detail {
 			}
 		}
 		// Called in unknown thread
-		completion_returntype dormdir(size_t id, std::shared_ptr<detail::async_io_handle> _, exception_ptr *, async_path_op_req req)
+		completion_returntype dormdir(size_t id, std::shared_ptr<async_io_handle> _, exception_ptr *, async_path_op_req req)
 		{
 			req.flags=fileflags(req.flags);
 			BOOST_AFIO_ERRHWINFN(RemoveDirectory(req.path.c_str()), req.path);
-			auto ret=std::make_shared<async_io_handle_windows>(shared_from_this(), std::shared_ptr<detail::async_io_handle>(), req.path, req.flags);
+			auto ret=std::make_shared<async_io_handle_windows>(shared_from_this(), std::shared_ptr<async_io_handle>(), req.path, req.flags);
 			return std::make_pair(true, ret);
 		}
 		// Called in unknown thread
-		completion_returntype dofile(size_t id, std::shared_ptr<detail::async_io_handle>, exception_ptr *e, async_path_op_req req)
+		completion_returntype dofile(size_t id, std::shared_ptr<async_io_handle>, exception_ptr *e, async_path_op_req req)
 		{
-			std::shared_ptr<detail::async_io_handle> dirh;
+			std::shared_ptr<async_io_handle> dirh;
 			DWORD access=0, creatdisp=0, flags=0x4000/*FILE_OPEN_FOR_BACKUP_INTENT*/, attribs=FILE_ATTRIBUTE_NORMAL;
 			req.flags=fileflags(req.flags);
 			if(!!(req.flags & file_flags::int_opening_dir))
@@ -2031,15 +2033,15 @@ namespace detail {
 			return std::make_pair(true, ret);
 		}
 		// Called in unknown thread
-		completion_returntype dormfile(size_t id, std::shared_ptr<detail::async_io_handle> _, exception_ptr *, async_path_op_req req)
+		completion_returntype dormfile(size_t id, std::shared_ptr<async_io_handle> _, exception_ptr *, async_path_op_req req)
 		{
 			req.flags=fileflags(req.flags);
 			BOOST_AFIO_ERRHWINFN(DeleteFile(req.path.c_str()), req.path);
-			auto ret=std::make_shared<async_io_handle_windows>(shared_from_this(), std::shared_ptr<detail::async_io_handle>(), req.path, req.flags);
+			auto ret=std::make_shared<async_io_handle_windows>(shared_from_this(), std::shared_ptr<async_io_handle>(), req.path, req.flags);
 			return std::make_pair(true, ret);
 		}
 		// Called in unknown thread
-		completion_returntype dosync(size_t id, std::shared_ptr<detail::async_io_handle> h, exception_ptr *, async_io_op)
+		completion_returntype dosync(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr *, async_io_op)
 		{
 			async_io_handle_windows *p=static_cast<async_io_handle_windows *>(h.get());
 			off_t bytestobesynced=p->write_count_since_fsync();
@@ -2050,7 +2052,7 @@ namespace detail {
 			return std::make_pair(true, h);
 		}
 		// Called in unknown thread
-		completion_returntype doclose(size_t id, std::shared_ptr<detail::async_io_handle> h, exception_ptr *, async_io_op)
+		completion_returntype doclose(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr *, async_io_op)
 		{
 			async_io_handle_windows *p=static_cast<async_io_handle_windows *>(h.get());
 			assert(p);
@@ -2062,7 +2064,7 @@ namespace detail {
 			return std::make_pair(true, h);
 		}
 		// Called in unknown thread
-		void boost_asio_readwrite_completion_handler(bool is_write, size_t id, std::shared_ptr<detail::async_io_handle> h, exception_ptr *, std::shared_ptr<std::pair<boost::afio::atomic<bool>, boost::afio::atomic<size_t>>> bytes_to_transfer, const boost::system::error_code &ec, size_t bytes_transferred)
+		void boost_asio_readwrite_completion_handler(bool is_write, size_t id, std::shared_ptr<async_io_handle> h, exception_ptr *, std::shared_ptr<std::pair<boost::afio::atomic<bool>, boost::afio::atomic<size_t>>> bytes_to_transfer, const boost::system::error_code &ec, size_t bytes_transferred)
 		{
 			if(ec)
 			{
@@ -2095,7 +2097,7 @@ namespace detail {
 			}
 			//std::cout << "id=" << id << " total=" << bytes_to_transfer->second << " this=" << bytes_transferred << std::endl;
 		}
-		template<bool iswrite> void doreadwrite(size_t id, std::shared_ptr<detail::async_io_handle> h, exception_ptr *, detail::async_data_op_req_impl<iswrite> req, async_io_handle_windows *p)
+		template<bool iswrite> void doreadwrite(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr *, detail::async_data_op_req_impl<iswrite> req, async_io_handle_windows *p)
 		{
 			// boost::asio::async_read_at() seems to have a bug and only transfers 64Kb per buffer
 			// boost::asio::windows::random_access_handle::async_read_some_at() clearly bothers
@@ -2172,7 +2174,7 @@ namespace detail {
 			}
 		}
 		// Called in unknown thread
-		completion_returntype doread(size_t id, std::shared_ptr<detail::async_io_handle> h, exception_ptr *e, detail::async_data_op_req_impl<false> req)
+		completion_returntype doread(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr *e, detail::async_data_op_req_impl<false> req)
 		{
 			async_io_handle_windows *p=static_cast<async_io_handle_windows *>(h.get());
 			assert(p);
@@ -2186,7 +2188,7 @@ namespace detail {
 			return std::make_pair(false, h);
 		}
 		// Called in unknown thread
-		completion_returntype dowrite(size_t id, std::shared_ptr<detail::async_io_handle> h, exception_ptr *e, detail::async_data_op_req_impl<true> req)
+		completion_returntype dowrite(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr *e, detail::async_data_op_req_impl<true> req)
 		{
 			async_io_handle_windows *p=static_cast<async_io_handle_windows *>(h.get());
 			assert(p);
@@ -2200,7 +2202,7 @@ namespace detail {
 			return std::make_pair(false, h);
 		}
 		// Called in unknown thread
-		completion_returntype dotruncate(size_t id, std::shared_ptr<detail::async_io_handle> h, exception_ptr *, off_t _newsize)
+		completion_returntype dotruncate(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr *, off_t _newsize)
 		{
 			async_io_handle_windows *p=static_cast<async_io_handle_windows *>(h.get());
 			assert(p);
@@ -2222,7 +2224,7 @@ namespace detail {
 			return std::make_pair(true, h);
 		}
 		// Called in unknown thread
-		void boost_asio_enumerate_completion_handler(size_t id, std::shared_ptr<detail::async_io_handle> h, exception_ptr *, std::shared_ptr<std::tuple<std::shared_ptr<promise<std::pair<std::vector<detail::directory_entry>, bool>>>, std::unique_ptr<windows_nt_kernel::FILE_ID_FULL_DIR_INFORMATION[]>, size_t>> state, const boost::system::error_code &ec, size_t bytes_transferred)
+		void boost_asio_enumerate_completion_handler(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr *, std::shared_ptr<std::tuple<std::shared_ptr<promise<std::pair<std::vector<directory_entry>, bool>>>, std::unique_ptr<windows_nt_kernel::FILE_ID_FULL_DIR_INFORMATION[]>, size_t>> state, const boost::system::error_code &ec, size_t bytes_transferred)
 		{
 			if(ec)
 			{
@@ -2280,7 +2282,7 @@ namespace detail {
 			}
 		}
 		// Called in unknown thread
-		completion_returntype doenumerate(size_t id, std::shared_ptr<detail::async_io_handle> h, exception_ptr *, async_enumerate_op_req req, std::shared_ptr<promise<std::pair<std::vector<detail::directory_entry>, bool>>> ret)
+		completion_returntype doenumerate(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr *, async_enumerate_op_req req, std::shared_ptr<promise<std::pair<std::vector<directory_entry>, bool>>> ret)
 		{
 			async_io_handle_windows *p=static_cast<async_io_handle_windows *>(h.get());
 			windows_nt_kernel::init();
@@ -2296,7 +2298,7 @@ namespace detail {
 			}
 
 			// A bit messy this, but necessary
-			auto state=std::make_shared<std::tuple<std::shared_ptr<promise<std::pair<std::vector<detail::directory_entry>, bool>>>,
+			auto state=std::make_shared<std::tuple<std::shared_ptr<promise<std::pair<std::vector<directory_entry>, bool>>>,
 				std::unique_ptr<windows_nt_kernel::FILE_ID_FULL_DIR_INFORMATION[]>, size_t>>(
 				std::move(ret),
 				std::unique_ptr<FILE_ID_FULL_DIR_INFORMATION[]>(new FILE_ID_FULL_DIR_INFORMATION[req.maxitems]),
@@ -2424,7 +2426,7 @@ namespace detail {
 #endif
 			return chain_async_ops((int) detail::OpType::truncate, ops, sizes, async_op_flags::None, &async_file_io_dispatcher_windows::dotruncate);
 		}
-		virtual std::pair<std::vector<future<std::pair<std::vector<detail::directory_entry>, bool>>>, std::vector<async_io_op>> enumerate(const std::vector<async_enumerate_op_req> &reqs)
+		virtual std::pair<std::vector<future<std::pair<std::vector<directory_entry>, bool>>>, std::vector<async_io_op>> enumerate(const std::vector<async_enumerate_op_req> &reqs)
 		{
 #if BOOST_AFIO_VALIDATE_INPUTS
 			BOOST_FOREACH(auto &i, reqs)
@@ -2436,51 +2438,53 @@ namespace detail {
 			return chain_async_ops((int) detail::OpType::enumerate, reqs, async_op_flags::None, &async_file_io_dispatcher_windows::doenumerate);
 		}
 	};
+} //namespace
 
-	void directory_entry::_int_fetch(metadata_flags wanted, std::shared_ptr<async_io_handle> dirh)
+void directory_entry::_int_fetch(metadata_flags wanted, std::shared_ptr<async_io_handle> dirh)
+{
+	windows_nt_kernel::init();
+	using namespace windows_nt_kernel;
+	bool slowPath=(!!(wanted&metadata_flags::nlink) || !!(wanted&metadata_flags::blocks) || !!(wanted&metadata_flags::blksize));
+	if(!slowPath)
 	{
-		windows_nt_kernel::init();
-		using namespace windows_nt_kernel;
-		bool slowPath=(!!(wanted&metadata_flags::nlink) || !!(wanted&metadata_flags::blocks) || !!(wanted&metadata_flags::blksize));
-		if(!slowPath)
-		{
-			// Fast path skips opening a handle per file by enumerating the containing directory using a glob
-			// exactly matching the leafname. This is about 10x quicker, so it's very much worth it.
-			std::filesystem::path::value_type buffer[sizeof(FILE_ALL_INFORMATION)/sizeof(std::filesystem::path::value_type)+32769];
-			IO_STATUS_BLOCK isb={ 0 };
-			UNICODE_STRING _glob;
-			NTSTATUS ntstat;
-			_glob.Buffer=const_cast<std::filesystem::path::value_type *>(leafname.c_str());
-			_glob.MaximumLength=(_glob.Length=(USHORT) (leafname.native().size()*sizeof(std::filesystem::path::value_type)))+sizeof(std::filesystem::path::value_type);
-			FILE_ID_FULL_DIR_INFORMATION *ffdi=(FILE_ID_FULL_DIR_INFORMATION *) buffer;
-			ntstat=NtQueryDirectoryFile(dirh->native_handle(), NULL, NULL, NULL, &isb, ffdi, sizeof(buffer),
-				FileIdFullDirectoryInformation, TRUE, &_glob, FALSE);
-			if(STATUS_PENDING==ntstat)
-				ntstat=KeWaitForSingleObject(dirh->native_handle(), UserRequest, UserMode, FALSE, NULL);
-			BOOST_AFIO_ERRHNTFN(ntstat, dirh->path());
-			if(!!(wanted&metadata_flags::ino)) { stat.st_ino=ffdi->FileId.QuadPart; }
-			if(!!(wanted&metadata_flags::type)) { stat.st_type=to_st_type(ffdi->FileAttributes); }
-			if(!!(wanted&metadata_flags::atim)) { stat.st_atim=to_timepoint(ffdi->LastAccessTime); }
-			if(!!(wanted&metadata_flags::mtim)) { stat.st_mtim=to_timepoint(ffdi->LastWriteTime); }
-			if(!!(wanted&metadata_flags::ctim)) { stat.st_ctim=to_timepoint(ffdi->ChangeTime); }
-			if(!!(wanted&metadata_flags::size)) { stat.st_size=ffdi->EndOfFile.QuadPart; }
-			if(!!(wanted&metadata_flags::allocated)) { stat.st_allocated=ffdi->AllocationSize.QuadPart; }
-			if(!!(wanted&metadata_flags::birthtim)) { stat.st_birthtim=to_timepoint(ffdi->CreationTime); }
-		}
-		else
-		{
-			// No choice here, open a handle and stat it.
-			async_file_io_dispatcher_windows *dispatcher=static_cast<async_file_io_dispatcher_windows *>(dirh->parent());
-			async_path_op_req req(dirh->path()/name(), file_flags::Read);
-			auto fileh=dispatcher->dofile(0, std::shared_ptr<detail::async_io_handle>(), nullptr, req).second;
-			stat=fileh->lstat(wanted);
-		}
+		// Fast path skips opening a handle per file by enumerating the containing directory using a glob
+		// exactly matching the leafname. This is about 10x quicker, so it's very much worth it.
+		std::filesystem::path::value_type buffer[sizeof(FILE_ALL_INFORMATION)/sizeof(std::filesystem::path::value_type)+32769];
+		IO_STATUS_BLOCK isb={ 0 };
+		UNICODE_STRING _glob;
+		NTSTATUS ntstat;
+		_glob.Buffer=const_cast<std::filesystem::path::value_type *>(leafname.c_str());
+		_glob.MaximumLength=(_glob.Length=(USHORT) (leafname.native().size()*sizeof(std::filesystem::path::value_type)))+sizeof(std::filesystem::path::value_type);
+		FILE_ID_FULL_DIR_INFORMATION *ffdi=(FILE_ID_FULL_DIR_INFORMATION *) buffer;
+		ntstat=NtQueryDirectoryFile(dirh->native_handle(), NULL, NULL, NULL, &isb, ffdi, sizeof(buffer),
+			FileIdFullDirectoryInformation, TRUE, &_glob, FALSE);
+		if(STATUS_PENDING==ntstat)
+			ntstat=KeWaitForSingleObject(dirh->native_handle(), UserRequest, UserMode, FALSE, NULL);
+		BOOST_AFIO_ERRHNTFN(ntstat, dirh->path());
+		if(!!(wanted&metadata_flags::ino)) { stat.st_ino=ffdi->FileId.QuadPart; }
+		if(!!(wanted&metadata_flags::type)) { stat.st_type=to_st_type(ffdi->FileAttributes); }
+		if(!!(wanted&metadata_flags::atim)) { stat.st_atim=to_timepoint(ffdi->LastAccessTime); }
+		if(!!(wanted&metadata_flags::mtim)) { stat.st_mtim=to_timepoint(ffdi->LastWriteTime); }
+		if(!!(wanted&metadata_flags::ctim)) { stat.st_ctim=to_timepoint(ffdi->ChangeTime); }
+		if(!!(wanted&metadata_flags::size)) { stat.st_size=ffdi->EndOfFile.QuadPart; }
+		if(!!(wanted&metadata_flags::allocated)) { stat.st_allocated=ffdi->AllocationSize.QuadPart; }
+		if(!!(wanted&metadata_flags::birthtim)) { stat.st_birthtim=to_timepoint(ffdi->CreationTime); }
 	}
+	else
+	{
+		// No choice here, open a handle and stat it.
+		detail::async_file_io_dispatcher_windows *dispatcher=static_cast<detail::async_file_io_dispatcher_windows *>(dirh->parent());
+		async_path_op_req req(dirh->path()/name(), file_flags::Read);
+		auto fileh=dispatcher->dofile(0, std::shared_ptr<async_io_handle>(), nullptr, req).second;
+		stat=fileh->lstat(wanted);
+	}
+}
 #endif
+namespace detail {
 	class async_file_io_dispatcher_compat : public async_file_io_dispatcher_base
 	{
 		// Called in unknown thread
-		completion_returntype dodir(size_t id, std::shared_ptr<detail::async_io_handle> _, exception_ptr *e, async_path_op_req req)
+		completion_returntype dodir(size_t id, std::shared_ptr<async_io_handle> _, exception_ptr *e, async_path_op_req req)
 		{
 			int ret=0;
 			req.flags=fileflags(req.flags)|file_flags::int_opening_dir;
@@ -2512,18 +2516,18 @@ namespace detail {
 			}
 		}
 		// Called in unknown thread
-		completion_returntype dormdir(size_t id, std::shared_ptr<detail::async_io_handle> _, exception_ptr *, async_path_op_req req)
+		completion_returntype dormdir(size_t id, std::shared_ptr<async_io_handle> _, exception_ptr *, async_path_op_req req)
 		{
 			req.flags=fileflags(req.flags);
 			BOOST_AFIO_ERRHOSFN(BOOST_AFIO_POSIX_RMDIR(req.path.c_str()), req.path);
-			auto ret=std::make_shared<async_io_handle_posix>(shared_from_this(), std::shared_ptr<detail::async_io_handle>(), req.path, req.flags, false, -999);
+			auto ret=std::make_shared<async_io_handle_posix>(shared_from_this(), std::shared_ptr<async_io_handle>(), req.path, req.flags, false, -999);
 			return std::make_pair(true, ret);
 		}
 		// Called in unknown thread
-		completion_returntype dofile(size_t id, std::shared_ptr<detail::async_io_handle>, exception_ptr *e, async_path_op_req req)
+		completion_returntype dofile(size_t id, std::shared_ptr<async_io_handle>, exception_ptr *e, async_path_op_req req)
 		{
 			int flags=0;
-			std::shared_ptr<detail::async_io_handle> dirh;
+			std::shared_ptr<async_io_handle> dirh;
 			req.flags=fileflags(req.flags);
 			if(!!(req.flags & file_flags::Read) && !!(req.flags & file_flags::Write)) flags|=O_RDWR;
 			else if(!!(req.flags & file_flags::Read)) flags|=O_RDONLY;
@@ -2550,15 +2554,15 @@ namespace detail {
 			return std::make_pair(true, ret);
 		}
 		// Called in unknown thread
-		completion_returntype dormfile(size_t id, std::shared_ptr<detail::async_io_handle> _, exception_ptr *, async_path_op_req req)
+		completion_returntype dormfile(size_t id, std::shared_ptr<async_io_handle> _, exception_ptr *, async_path_op_req req)
 		{
 			req.flags=fileflags(req.flags);
 			BOOST_AFIO_ERRHOSFN(BOOST_AFIO_POSIX_UNLINK(req.path.c_str()), req.path);
-			auto ret=std::make_shared<async_io_handle_posix>(shared_from_this(), std::shared_ptr<detail::async_io_handle>(), req.path, req.flags, false, -999);
+			auto ret=std::make_shared<async_io_handle_posix>(shared_from_this(), std::shared_ptr<async_io_handle>(), req.path, req.flags, false, -999);
 			return std::make_pair(true, ret);
 		}
 		// Called in unknown thread
-		completion_returntype dosync(size_t id, std::shared_ptr<detail::async_io_handle> h, exception_ptr *, async_io_op)
+		completion_returntype dosync(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr *, async_io_op)
 		{
 			async_io_handle_posix *p=static_cast<async_io_handle_posix *>(h.get());
 			off_t bytestobesynced=p->write_count_since_fsync();
@@ -2569,7 +2573,7 @@ namespace detail {
 			return std::make_pair(true, h);
 		}
 		// Called in unknown thread
-		completion_returntype doclose(size_t id, std::shared_ptr<detail::async_io_handle> h, exception_ptr *, async_io_op)
+		completion_returntype doclose(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr *, async_io_op)
 		{
 			async_io_handle_posix *p=static_cast<async_io_handle_posix *>(h.get());
 			if(p->SyncOnClose && p->write_count_since_fsync())
@@ -2579,7 +2583,7 @@ namespace detail {
 			return std::make_pair(true, h);
 		}
 		// Called in unknown thread
-		completion_returntype doread(size_t id, std::shared_ptr<detail::async_io_handle> h, exception_ptr *, detail::async_data_op_req_impl<false> req)
+		completion_returntype doread(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr *, detail::async_data_op_req_impl<false> req)
 		{
 			async_io_handle_posix *p=static_cast<async_io_handle_posix *>(h.get());
 			ssize_t bytesread=0, bytestoread=0;
@@ -2612,7 +2616,7 @@ namespace detail {
 			return std::make_pair(true, h);
 		}
 		// Called in unknown thread
-		completion_returntype dowrite(size_t id, std::shared_ptr<detail::async_io_handle> h, exception_ptr *, detail::async_data_op_req_impl<true> req)
+		completion_returntype dowrite(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr *, detail::async_data_op_req_impl<true> req)
 		{
 			async_io_handle_posix *p=static_cast<async_io_handle_posix *>(h.get());
 			ssize_t byteswritten=0, bytestowrite=0;
@@ -2645,7 +2649,7 @@ namespace detail {
 			return std::make_pair(true, h);
 		}
 		// Called in unknown thread
-		completion_returntype dotruncate(size_t id, std::shared_ptr<detail::async_io_handle> h, exception_ptr *, off_t newsize)
+		completion_returntype dotruncate(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr *, off_t newsize)
 		{
 			async_io_handle_posix *p=static_cast<async_io_handle_posix *>(h.get());
 			BOOST_AFIO_DEBUG_PRINT("T %u %p (%c)\n", (unsigned) id, h.get(), p->path().native().back());
@@ -2653,7 +2657,7 @@ namespace detail {
 			return std::make_pair(true, h);
 		}
 		// Called in unknown thread
-		completion_returntype doenumerate(size_t id, std::shared_ptr<detail::async_io_handle> h, exception_ptr *, async_enumerate_op_req req, std::shared_ptr<promise<std::pair<std::vector<detail::directory_entry>, bool>>> ret)
+		completion_returntype doenumerate(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr *, async_enumerate_op_req req, std::shared_ptr<promise<std::pair<std::vector<directory_entry>, bool>>> ret)
 		{
 			return std::make_pair(true, h);
 		}
@@ -2763,7 +2767,7 @@ namespace detail {
 #endif
 			return chain_async_ops((int) detail::OpType::truncate, ops, sizes, async_op_flags::None, &async_file_io_dispatcher_compat::dotruncate);
 		}
-		virtual std::pair<std::vector<future<std::pair<std::vector<detail::directory_entry>, bool>>>, std::vector<async_io_op>> enumerate(const std::vector<async_enumerate_op_req> &reqs)
+		virtual std::pair<std::vector<future<std::pair<std::vector<directory_entry>, bool>>>, std::vector<async_io_op>> enumerate(const std::vector<async_enumerate_op_req> &reqs)
 		{
 #if BOOST_AFIO_VALIDATE_INPUTS
 			BOOST_FOREACH(auto &i, reqs)

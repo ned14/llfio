@@ -171,7 +171,7 @@ way of ensuring durability is to always wait for each write to reach non-volatil
 yet such a naive solution is typically exceptionally slow. Achieving performant
 data durability is without doubt a wicked hard problem in computer science.
 
-Because a majority of users of __boost__afio__ are going to be people needing
+Because a majority of users of __boost_afio__ are going to be people needing
 some form of data persistence guarantees, this section is a short essay on the current
 state of data persistence on various popular platforms. Any errors or omissions, both
 of which are probable, are entirely the fault of this author Niall Douglas. Note also that

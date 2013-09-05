@@ -427,9 +427,9 @@ static void evil_random_io(std::shared_ptr<boost::afio::async_file_io_dispatcher
 
     boost::lockfree::queue<std::pair<const Op *, size_t> *> failures(maxfailures);
 #if defined(BOOST_MSVC) && BOOST_MSVC < 1700 // <= VS2010
-    std::function<std::pair<bool, std::shared_ptr<boost::afio::detail::async_io_handle>> (Op &, char *, size_t, std::shared_ptr<boost::afio::detail::async_io_handle>)> checkHash=[&failures](Op &op, char *base, size_t, std::shared_ptr<boost::afio::detail::async_io_handle> h) -> std::pair<bool, std::shared_ptr<boost::afio::detail::async_io_handle>> {
+    std::function<std::pair<bool, std::shared_ptr<boost::afio::async_io_handle>> (Op &, char *, size_t, std::shared_ptr<boost::afio::async_io_handle>)> checkHash=[&failures](Op &op, char *base, size_t, std::shared_ptr<boost::afio::async_io_handle> h) -> std::pair<bool, std::shared_ptr<boost::afio::async_io_handle>> {
 #else
-    auto checkHash=[&failures](Op &op, char *base, size_t, std::shared_ptr<boost::afio::detail::async_io_handle> h) -> std::pair<bool, std::shared_ptr<boost::afio::detail::async_io_handle>> {
+    auto checkHash=[&failures](Op &op, char *base, size_t, std::shared_ptr<boost::afio::async_io_handle> h) -> std::pair<bool, std::shared_ptr<boost::afio::async_io_handle>> {
 #endif
             const char *data=(const char *)(((size_t) base+(size_t) op.req.where));
             size_t idxoffset=0;

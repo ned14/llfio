@@ -36,9 +36,9 @@ std::ostream &operator<<(std::ostream &s, const std::chrono::system_clock::time_
     return s;
 }
 
-static boost::afio::detail::stat_t print_stat(std::shared_ptr<boost::afio::detail::async_io_handle> h)
+static boost::afio::stat_t print_stat(std::shared_ptr<boost::afio::async_io_handle> h)
 {
-	using namespace boost::afio::detail;
+	using namespace boost::afio;
 	auto entry=h->lstat(metadata_flags::All);
 	std::cout << "Entry " << h->path() << " is a ";
 	if(entry.st_type & S_IFLNK)
