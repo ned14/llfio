@@ -72,6 +72,14 @@ An op handle.
 '''<indexterm><primary>dir</primary></indexterm>'''
 Schedule a batch of asynchronous directory creations and opens after optional preconditions. 
 
+[heading Description]
+
+``
+Note that if there is already a handle open to the directory requested, that will be returned instead of
+a new handle unless file\u005fflags::UniqueDirectoryHandle is specified.
+``
+
+
 [heading Synopsis]
 ``virtual std::vector<async_io_op> async_file_io_dispatcher_base::dir(const std::vector< async_path_op_req > & reqs)``
 
@@ -100,6 +108,14 @@ A batch of op handles.
 
 '''<indexterm><primary>dir</primary></indexterm>'''
 Schedule an asynchronous directory creation and open after an optional precondition. 
+
+[heading Description]
+
+``
+Note that if there is already a handle open to the directory requested, that will be returned instead of
+a new handle unless file\u005fflags::UniqueDirectoryHandle is specified.
+``
+
 
 [heading Synopsis]
 ``async_io_op async_file_io_dispatcher_base::dir(const async_path_op_req & req)``
@@ -375,6 +391,144 @@ An op handle.
 
 [endsect]
 
+[section:rmsymlink_1_batch rmsymlink (batch)]
+
+'''<indexterm><primary>rmsymlink</primary></indexterm>'''
+Schedule a batch of asynchronous symlink deletions after optional preconditions. 
+
+[heading Synopsis]
+``virtual std::vector<async_io_op> async_file_io_dispatcher_base::rmsymlink(const std::vector< async_path_op_req > & reqs)``
+
+[heading Parameters]
+
+[table
+[[Type] [Concept] [Name] [Description] ]
+[[const std::vector< async_path_op_req > &] [] [reqs] [A batch of [^`async_path_op_req`] structures.]]
+]
+
+
+[heading Returns]
+A batch of op handles. 
+
+[heading Header]
+`#include <boost/afio/afio.hpp>`
+
+[heading Complexity]Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete if symlink deletion is constant time.
+[heading Exception Model]Propagates exceptions of any input preconditions with an errored state at the point of dispatch, and throws a `std::runtime_error` if any inputs have values which could not possibly be correct. Once a batch of input ops has been verified at the point of entry as not errored, you are guaranteed that the batch is atomically scheduled as a whole, unless one of the following conditions occurs: (i) A failure to allocate memory occurs.
+[heading Example][filedir_example]
+
+
+[endsect]
+
+[section:rmsymlink_1_single rmsymlink (single)]
+
+'''<indexterm><primary>rmsymlink</primary></indexterm>'''
+Schedule an asynchronous symlink deletion after an optional precondition. 
+
+[heading Synopsis]
+``async_io_op async_file_io_dispatcher_base::rmsymlink(const async_path_op_req & req)``
+
+[heading Parameters]
+
+[table
+[[Type] [Concept] [Name] [Description] ]
+[[const async_path_op_req &] [] [req] [An [^`async_path_op_req`] structure.]]
+]
+
+
+[heading Returns]
+An op handle. 
+
+[heading Header]
+`#include <boost/afio/afio.hpp>`
+
+[heading Complexity]Amortised O(1) to dispatch. Amortised O(1) to complete if symlink deletion is constant time.
+[heading Exception Model]Propagates exceptions of any input preconditions with an errored state at the point of dispatch, and throws a `std::runtime_error` if any inputs have values which could not possibly be correct. Once a batch of input ops has been verified at the point of entry as not errored, you are guaranteed that the batch is atomically scheduled as a whole, unless one of the following conditions occurs: (i) A failure to allocate memory occurs.
+[heading Example][filedir_example]
+
+
+[endsect]
+
+[section:symlink_1_batch symlink (batch)]
+
+'''<indexterm><primary>symlink</primary></indexterm>'''
+Schedule a batch of asynchronous symlink creations and opens after a precondition. 
+
+[heading Description]
+
+``
+Note that if creating, the target for the symlink is the precondition. On Windows directories are symlinked using a reparse
+point instead of a symlink due to the default lack of the <tt>SeCreateSymbolicLinkPrivilege</tt> for non-Administrative
+users.
+
+Note that currently on Windows non-directory symbolic links are not supported. If there is demand for this we may add support.
+``
+
+
+[heading Synopsis]
+``virtual std::vector<async_io_op> async_file_io_dispatcher_base::symlink(const std::vector< async_path_op_req > & reqs)``
+
+[heading Parameters]
+
+[table
+[[Type] [Concept] [Name] [Description] ]
+[[const std::vector< async_path_op_req > &] [] [reqs] [A batch of [^`async_path_op_req`] structures.]]
+]
+
+
+[heading Returns]
+A batch of op handles. 
+
+[heading Header]
+`#include <boost/afio/afio.hpp>`
+
+[heading Complexity]Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete if symlink creation is constant time.
+[heading Exception Model]Propagates exceptions of any input preconditions with an errored state at the point of dispatch, and throws a `std::runtime_error` if any inputs have values which could not possibly be correct. Once a batch of input ops has been verified at the point of entry as not errored, you are guaranteed that the batch is atomically scheduled as a whole, unless one of the following conditions occurs: (i) A failure to allocate memory occurs.
+[heading Example][filedir_example]
+
+
+[endsect]
+
+[section:symlink_1_single symlink (single)]
+
+'''<indexterm><primary>symlink</primary></indexterm>'''
+Schedule an asynchronous symlink creation and open after a precondition. 
+
+[heading Description]
+
+``
+Note that if creating, the target for the symlink is the precondition. On Windows directories are symlinked using a reparse
+point instead of a symlink due to the default lack of the <tt>SeCreateSymbolicLinkPrivilege</tt> for non-Administrative
+users.
+
+Note that currently on Windows non-directory symbolic links are not supported. If there is demand for this we may add support.
+``
+
+
+[heading Synopsis]
+``async_io_op async_file_io_dispatcher_base::symlink(const async_path_op_req & req)``
+
+[heading Parameters]
+
+[table
+[[Type] [Concept] [Name] [Description] ]
+[[const async_path_op_req &] [] [req] [An [^`async_path_op_req`] structure.]]
+]
+
+
+[heading Returns]
+An op handle. 
+
+[heading Header]
+`#include <boost/afio/afio.hpp>`
+
+[heading Complexity]Amortised O(1) to dispatch. Amortised O(1) to complete if symlink creation is constant time.
+[heading Exception Model]Propagates exceptions of any input preconditions with an errored state at the point of dispatch, and throws a `std::runtime_error` if any inputs have values which could not possibly be correct. Once a batch of input ops has been verified at the point of entry as not errored, you are guaranteed that the batch is atomically scheduled as a whole, unless one of the following conditions occurs: (i) A failure to allocate memory occurs.
+[heading Example][filedir_example]
+
+
+[endsect]
+
 [section:sync_1_batch sync (batch)]
 
 '''<indexterm><primary>sync</primary></indexterm>'''
@@ -466,7 +620,7 @@ A batch of op handles.
 [section:truncate_2_single truncate (single)]
 
 '''<indexterm><primary>truncate</primary></indexterm>'''
-Schedule an asynchronous data write after a preceding operation. 
+Schedule an asynchronous file length truncation after a preceding operation. 
 
 [heading Synopsis]
 ``async_io_op async_file_io_dispatcher_base::truncate(const async_io_op & op, off_t newsize)``

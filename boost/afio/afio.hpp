@@ -735,7 +735,7 @@ namespace detail {
 class async_io_handle;
 
 /*! \enum metadata_flags
-\brief Bitflags for availability of metadata
+\brief Bitflags for availability of metadata from `struct stat_t`
 \ingroup metadata_flags
 */
 #ifdef DOXYGEN_NO_CLASS_ENUMS
@@ -774,15 +774,15 @@ BOOST_AFIO_DECLARE_CLASS_ENUM_AS_BITFIELD(metadata_flags::enum_type)
 ;
 BOOST_AFIO_DECLARE_CLASS_ENUM_AS_BITFIELD(metadata_flags)
 #endif
-/*! \brief Metadata about a directory entry
+/*! \struct stat_t
+\brief Metadata about a directory entry
 
 This structure looks somewhat like a `struct stat`, and indeed it was derived from BSD's `struct stat`.
 However there are a number of changes to better interoperate with modern practice, specifically:
-
-1. inode value containers are forced to 64 bits.
-2. Timestamps use C++11's `std::chrono::system_clock::time_point` or Boost equivalent. The resolution
-of these may or may not equal what a `struct timespec` can do depending on your STL.
-3. The type of a file, which is available on Windows and on POSIX without needing a `lstat()`, is provided by `st_type`.
+(i) inode value containers are forced to 64 bits
+(ii) Timestamps use C++11's `std::chrono::system_clock::time_point` or Boost equivalent. The resolution
+of these may or may not equal what a `struct timespec` can do depending on your STL
+(iii) The type of a file, which is available on Windows and on POSIX without needing a `lstat()`, is provided by `st_type`.
 */
 struct stat_t
 {
@@ -1128,7 +1128,7 @@ public:
 	/*! \brief Schedule a batch of asynchronous directory creations and opens after optional preconditions.
 
 	Note that if there is already a handle open to the directory requested, that will be returned instead of
-	a new handle unless `file_flags::UniqueDirectoryHandle` is specified.
+	a new handle unless file_flags::UniqueDirectoryHandle is specified.
 
     \return A batch of op handles.
     \param reqs A batch of `async_path_op_req` structures.
@@ -1142,7 +1142,7 @@ public:
 	/*! \brief Schedule an asynchronous directory creation and open after an optional precondition.
 
 	Note that if there is already a handle open to the directory requested, that will be returned instead of
-	a new handle unless `file_flags::UniqueDirectoryHandle` is specified.
+	a new handle unless file_flags::UniqueDirectoryHandle is specified.
 
     \return An op handle.
     \param req An `async_path_op_req` structure.
@@ -1216,7 +1216,7 @@ public:
 	/*! \brief Schedule a batch of asynchronous symlink creations and opens after a precondition.
 
 	Note that if creating, the target for the symlink is the precondition. On Windows directories are symlinked using a reparse
-	point instead of a symlink due to the default lack of the `SeCreateSymbolicLinkPrivilege` for non-Administrative
+	point instead of a symlink due to the default lack of the <tt>SeCreateSymbolicLinkPrivilege</tt> for non-Administrative
 	users.
 
 	Note that currently on Windows non-directory symbolic links are not supported. If there is demand for this we may add support.
@@ -1233,7 +1233,7 @@ public:
 	/*! \brief Schedule an asynchronous symlink creation and open after a precondition.
 
 	Note that if creating, the target for the symlink is the precondition. On Windows directories are symlinked using a reparse
-	point instead of a symlink due to the default lack of the `SeCreateSymbolicLinkPrivilege` for non-Administrative
+	point instead of a symlink due to the default lack of the <tt>SeCreateSymbolicLinkPrivilege</tt> for non-Administrative
 	users.
 
 	Note that currently on Windows non-directory symbolic links are not supported. If there is demand for this we may add support.
@@ -1403,10 +1403,10 @@ public:
 	inline async_io_op truncate(const async_io_op &op, off_t newsize);
 	/*! \brief Schedule a batch of asynchronous directory enumerations after a preceding operations.
 
-	By default `dir()` returns shared handles i.e. `dir("foo")` and `dir("foo")` will return the exact same
+	By default dir() returns shared handles i.e. dir("foo") and dir("foo") will return the exact same
 	handle, and therefore enumerating not all of the entries at once is a race condition. The solution is
-	to either set `maxitems` to a value large enough to guarantee a directory will be enumerated in a single
-	shot, or to open a separate directory handle using the `file_flags::UniqueDirectoryHandle` flag.
+	to either set maxitems to a value large enough to guarantee a directory will be enumerated in a single
+	shot, or to open a separate directory handle using the file_flags::UniqueDirectoryHandle flag.
 
     \return A batch of future vectors of directory entries with boolean returning false if done.
     \param reqs A batch of enumeration requests.
@@ -1419,10 +1419,10 @@ public:
 	virtual std::pair<std::vector<future<std::pair<std::vector<directory_entry>, bool>>>, std::vector<async_io_op>> enumerate(const std::vector<async_enumerate_op_req> &reqs)=0;
 	/*! \brief Schedule an asynchronous directory enumeration after a preceding operation.
 
-	By default `dir()` returns shared handles i.e. `dir("foo")` and `dir("foo")` will return the exact same
+	By default dir() returns shared handles i.e. dir("foo") and dir("foo") will return the exact same
 	handle, and therefore enumerating not all of the entries at once is a race condition. The solution is
-	to either set `maxitems` to a value large enough to guarantee a directory will be enumerated in a single
-	shot, or to open a separate directory handle using the `file_flags::UniqueDirectoryHandle` flag.
+	to either set maxitems to a value large enough to guarantee a directory will be enumerated in a single
+	shot, or to open a separate directory handle using the file_flags::UniqueDirectoryHandle flag.
 
     \return A future vector of directory entries with a boolean returning false if done.
     \param req An enumeration request.

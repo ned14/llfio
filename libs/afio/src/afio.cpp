@@ -930,6 +930,8 @@ namespace detail {
 			// Boost's spinlock is so lightweight it has no constructor ...
 			fdslock.unlock();
 			ANNOTATE_RWLOCK_CREATE(&fdslock);
+			dircachelock.unlock();
+			ANNOTATE_RWLOCK_CREATE(&dircachelock);
         
 #if !defined(BOOST_MSVC)|| BOOST_MSVC >= 1700 // MSVC 2010 doesn't support reserve
 			ops.reserve(10000);
@@ -939,6 +941,7 @@ namespace detail {
 		}
 		~async_file_io_dispatcher_base_p()
 		{
+			ANNOTATE_RWLOCK_DESTROY(&dircachelock);
 			ANNOTATE_RWLOCK_DESTROY(&fdslock);
 		}
 
@@ -2008,7 +2011,7 @@ namespace detail {
 			HANDLE h=nullptr;
 			IO_STATUS_BLOCK isb={ 0 };
 			OBJECT_ATTRIBUTES oa={sizeof(OBJECT_ATTRIBUTES)};
-			std::filesystem::path path(req.path);
+			std::filesystem::path path(req.path.make_preferred());
 			UNICODE_STRING _path;
 			if(isalpha(path.native()[0]) && path.native()[1]==':')
 			{
@@ -2392,7 +2395,6 @@ namespace detail {
 			using namespace windows_nt_kernel;
 
 			NTSTATUS ntstat;
-			IO_STATUS_BLOCK isb={ 0 };
 			UNICODE_STRING _glob;
 			if(!req.glob.empty())
 			{
@@ -2409,7 +2411,9 @@ namespace detail {
 				);
 			boost::asio::windows::overlapped_ptr ol(p->h->get_io_service(), boost::bind(&async_file_io_dispatcher_windows::boost_asio_enumerate_completion_handler, this, id, h, nullptr, state, boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred));
 
-			ntstat=NtQueryDirectoryFile(p->h->native_handle(), ol.get()->hEvent, NULL, NULL, &isb, std::get<1>(*state).get(), (ULONG)(sizeof(FILE_ID_FULL_DIR_INFORMATION)*req.maxitems),
+			// It's not tremendously obvious how to call the kernel directly with an OVERLAPPED. ReactOS's sources told me how ...
+			ntstat=NtQueryDirectoryFile(p->h->native_handle(), ol.get()->hEvent, NULL, ol.get(), (PIO_STATUS_BLOCK) ol.get(),
+				std::get<1>(*state).get(), (ULONG)(sizeof(FILE_ID_FULL_DIR_INFORMATION)*req.maxitems),
 				FileIdFullDirectoryInformation, FALSE, req.glob.empty() ? NULL : &_glob, FALSE);
 			if(STATUS_PENDING!=ntstat)
 			{
@@ -2560,7 +2564,7 @@ namespace detail {
 					BOOST_AFIO_THROW(std::runtime_error("Inputs are invalid."));
             }
 #endif
-			return chain_async_ops((int) detail::OpType::enumerate, reqs, async_op_flags::None, &async_file_io_dispatcher_windows::doenumerate);
+			return chain_async_ops((int) detail::OpType::enumerate, reqs, async_op_flags::DetachedFuture|async_op_flags::ImmediateCompletion, &async_file_io_dispatcher_windows::doenumerate);
 		}
 	};
 } //namespace

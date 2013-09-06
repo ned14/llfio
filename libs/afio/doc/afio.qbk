@@ -83,9 +83,7 @@ As a very quick example of minimal usage:
 [include compiling.qbk]
 [include quickstart.qbk]
 [include reference.qbk]
-[section:advanced_topics Advanced Topics]
-  [include vs2010_notes.qbk]
-[endsect] [/advanced_topics]
+[include advanced_topics.qbk]
 [include release_notes.qbk]
 [include acknowledgments.qbk]
 

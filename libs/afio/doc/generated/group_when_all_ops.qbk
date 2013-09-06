@@ -15,7 +15,7 @@
 Returns a result when all the supplied ops complete. Does not propagate exception states. 
 
 [heading Synopsis]
-``future<std::vector<std::shared_ptr<detail::async_io_handle> > > when_all(std::nothrow_t _, std::vector< async_io_op >::iterator first, std::vector< async_io_op >::iterator last)``
+``future<std::vector<std::shared_ptr<async_io_handle> > > when_all(std::nothrow_t _, std::vector< async_io_op >::iterator first, std::vector< async_io_op >::iterator last)``
 
 [heading Parameters]
 
@@ -28,7 +28,7 @@ Returns a result when all the supplied ops complete. Does not propagate exceptio
 
 
 [heading Returns]
-A future vector of shared\u005fptr's to detail::async\u005fio\u005fhandle. 
+A future vector of shared\u005fptr's to async\u005fio\u005fhandle. 
 
 [heading Header]
 `#include <boost/afio/afio.hpp>`
@@ -45,7 +45,7 @@ A future vector of shared\u005fptr's to detail::async\u005fio\u005fhandle.
 Returns a result when all the supplied ops complete. Propagates exception states. 
 
 [heading Synopsis]
-``future<std::vector<std::shared_ptr<detail::async_io_handle> > > when_all(std::vector< async_io_op >::iterator first, std::vector< async_io_op >::iterator last)``
+``future<std::vector<std::shared_ptr<async_io_handle> > > when_all(std::vector< async_io_op >::iterator first, std::vector< async_io_op >::iterator last)``
 
 [heading Parameters]
 
@@ -57,7 +57,7 @@ Returns a result when all the supplied ops complete. Propagates exception states
 
 
 [heading Returns]
-A future vector of shared\u005fptr's to detail::async\u005fio\u005fhandle. 
+A future vector of shared\u005fptr's to async\u005fio\u005fhandle. 
 
 [heading Header]
 `#include <boost/afio/afio.hpp>`
@@ -74,7 +74,7 @@ A future vector of shared\u005fptr's to detail::async\u005fio\u005fhandle.
 Returns a result when all the supplied ops complete. Does not propagate exception states. 
 
 [heading Synopsis]
-``future<std::vector<std::shared_ptr<detail::async_io_handle> > > when_all(std::nothrow_t _, std::initializer_list< async_io_op > _ops)``
+``future<std::vector<std::shared_ptr<async_io_handle> > > when_all(std::nothrow_t _, std::initializer_list< async_io_op > _ops)``
 
 [heading Parameters]
 
@@ -86,7 +86,7 @@ Returns a result when all the supplied ops complete. Does not propagate exceptio
 
 
 [heading Returns]
-A future vector of shared\u005fptr's to detail::async\u005fio\u005fhandle. 
+A future vector of shared\u005fptr's to async\u005fio\u005fhandle. 
 
 [heading Header]
 `#include <boost/afio/afio.hpp>`
@@ -103,7 +103,7 @@ A future vector of shared\u005fptr's to detail::async\u005fio\u005fhandle.
 Returns a result when all the supplied ops complete. Propagates exception states. 
 
 [heading Synopsis]
-``future<std::vector<std::shared_ptr<detail::async_io_handle> > > when_all(std::initializer_list< async_io_op > _ops)``
+``future<std::vector<std::shared_ptr<async_io_handle> > > when_all(std::initializer_list< async_io_op > _ops)``
 
 [heading Parameters]
 
@@ -114,7 +114,7 @@ Returns a result when all the supplied ops complete. Propagates exception states
 
 
 [heading Returns]
-A future vector of shared\u005fptr's to detail::async\u005fio\u005fhandle. 
+A future vector of shared\u005fptr's to async\u005fio\u005fhandle. 
 
 [heading Header]
 `#include <boost/afio/afio.hpp>`
@@ -131,7 +131,7 @@ A future vector of shared\u005fptr's to detail::async\u005fio\u005fhandle.
 Returns a result when the supplied op completes. Does not propagate exception states. 
 
 [heading Synopsis]
-``future<std::vector<std::shared_ptr<detail::async_io_handle> > > when_all(std::nothrow_t _, async_io_op op)``
+``future<std::vector<std::shared_ptr<async_io_handle> > > when_all(std::nothrow_t _, async_io_op op)``
 
 [heading Parameters]
 
@@ -143,7 +143,7 @@ Returns a result when the supplied op completes. Does not propagate exception st
 
 
 [heading Returns]
-A future vector of shared\u005fptr's to detail::async\u005fio\u005fhandle. 
+A future vector of shared\u005fptr's to async\u005fio\u005fhandle. 
 
 [heading Header]
 `#include <boost/afio/afio.hpp>`
@@ -160,7 +160,7 @@ A future vector of shared\u005fptr's to detail::async\u005fio\u005fhandle.
 Returns a result when the supplied op completes. Propagates exception states. 
 
 [heading Synopsis]
-``future<std::vector<std::shared_ptr<detail::async_io_handle> > > when_all(async_io_op op)``
+``future<std::vector<std::shared_ptr<async_io_handle> > > when_all(async_io_op op)``
 
 [heading Parameters]
 
@@ -171,7 +171,7 @@ Returns a result when the supplied op completes. Propagates exception states.
 
 
 [heading Returns]
-A future vector of shared\u005fptr's to detail::async\u005fio\u005fhandle. 
+A future vector of shared\u005fptr's to async\u005fio\u005fhandle. 
 
 [heading Header]
 `#include <boost/afio/afio.hpp>`
