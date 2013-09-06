@@ -152,6 +152,7 @@ void raninit(ranctx *x, u4 seed) {
 static int donothing(boost::afio::atomic<size_t> *callcount, int i) { ++*callcount; return i; }
 static void _1000_open_write_close_deletes(std::shared_ptr<boost::afio::async_file_io_dispatcher_base> dispatcher, size_t bytes)
 {
+	try {
         using namespace boost::afio;
         using namespace std;
         using boost::afio::future;
@@ -240,7 +241,11 @@ static void _1000_open_write_close_deletes(std::shared_ptr<boost::afio::async_fi
         // Fetch any outstanding error
         rmdir.h->get();
         BOOST_CHECK((callcount==1000U));
-}//*/
+	} catch(...) {
+		std::cerr << boost::current_exception_diagnostic_information(true) << std::endl;
+		throw;
+	}
+}
 
 #ifdef DEBUG_TORTURE_TEST
     struct Op
@@ -265,6 +270,7 @@ static u4 mkfill() { static char ret='0'; if(ret+1>'z') ret='0'; return ret++; }
 
 static void evil_random_io(std::shared_ptr<boost::afio::async_file_io_dispatcher_base> dispatcher, size_t no, size_t bytes, size_t alignment=0)
 {
+	try {
     using namespace std;
     using boost::afio::future;
 	using boost::afio::ratio;
@@ -578,17 +584,21 @@ static void evil_random_io(std::shared_ptr<boost::afio::async_file_io_dispatcher
     auto rmdir(dispatcher->rmdir(boost::afio::async_path_op_req("testdir")));
     // Fetch any outstanding error
     rmdir.h->get();
-}//*/
+	} catch(...) {
+		std::cerr << boost::current_exception_diagnostic_information(true) << std::endl;
+		throw;
+	}
+}
 
 
-static std::ostream &operator<<(std::ostream &s, const std::chrono::system_clock::time_point &ts)
+static std::ostream &operator<<(std::ostream &s, const boost::afio::chrono::system_clock::time_point &ts)
 {
 	char buf[32];
     struct tm *t;
     size_t len=sizeof(buf);
     size_t ret;
-	time_t v=std::chrono::system_clock::to_time_t(ts);
-	std::chrono::system_clock::duration remainder(ts-std::chrono::system_clock::from_time_t(v));
+	time_t v=boost::afio::chrono::system_clock::to_time_t(ts);
+	boost::afio::chrono::system_clock::duration remainder(ts-boost::afio::chrono::system_clock::from_time_t(v));
 
 #ifdef _MSC_VER
 	_tzset();

@@ -54,6 +54,7 @@ File Created: Mar 2013
 #include "../../../boost/afio/detail/valgrind/memcheck.h"
 #include "../../../boost/afio/detail/valgrind/helgrind.h"
 
+#include <fcntl.h>
 #ifdef WIN32
 #include <Windows.h>
 #include <winioctl.h>
@@ -63,8 +64,9 @@ File Created: Mar 2013
 #include <direct.h>
 #define BOOST_AFIO_POSIX_MKDIR(path, mode) _wmkdir(path)
 #define BOOST_AFIO_POSIX_RMDIR _wrmdir
-#define BOOST_AFIO_POSIX_STAT _wstat64
 #define BOOST_AFIO_POSIX_STAT_STRUCT struct __stat64
+#define BOOST_AFIO_POSIX_STAT _wstat64
+#define BOOST_AFIO_POSIX_LSTAT _wstat64
 #define BOOST_AFIO_POSIX_OPEN _wopen
 #define BOOST_AFIO_POSIX_CLOSE _close
 #define BOOST_AFIO_POSIX_UNLINK _wunlink
@@ -517,6 +519,22 @@ static inline int winftruncate(int fd, boost::afio::off_t _newsize)
 	}
 #endif
 }
+static inline void fill_stat_t(boost::afio::stat_t &stat, BOOST_AFIO_POSIX_STAT_STRUCT s, boost::afio::metadata_flags wanted)
+{
+	using namespace boost::afio;
+	if(!!(wanted&metadata_flags::dev)) { stat.st_dev=s.st_dev; }
+	if(!!(wanted&metadata_flags::ino)) { stat.st_ino=s.st_ino; }
+	if(!!(wanted&metadata_flags::type)) { stat.st_type=s.st_mode; }
+	if(!!(wanted&metadata_flags::mode)) { stat.st_mode=s.st_mode; }
+	if(!!(wanted&metadata_flags::nlink)) { stat.st_nlink=s.st_nlink; }
+	if(!!(wanted&metadata_flags::uid)) { stat.st_uid=s.st_uid; }
+	if(!!(wanted&metadata_flags::gid)) { stat.st_gid=s.st_gid; }
+	if(!!(wanted&metadata_flags::rdev)) { stat.st_rdev=s.st_rdev; }
+	if(!!(wanted&metadata_flags::atim)) { stat.st_atim=chrono::system_clock::from_time_t(s.st_atime); }
+	if(!!(wanted&metadata_flags::mtim)) { stat.st_mtim=chrono::system_clock::from_time_t(s.st_mtime); }
+	if(!!(wanted&metadata_flags::birthtim)) { stat.st_birthtim=chrono::system_clock::from_time_t(s.st_ctime); }
+	if(!!(wanted&metadata_flags::size)) { stat.st_size=s.st_size; }
+}
 #else
 #include <dirent.h>     /* Defines DT_* constants */
 #include <sys/syscall.h>
@@ -541,7 +559,7 @@ static inline boost::afio::chrono::system_clock::time_point to_timepoint(struct 
 	boost::afio::chrono::duration<unsigned long long, boost::afio::ratio<1, 1000000>> duration(ts.tv_sec*1000000ULL+ts.tv_nsec/1000);
 	return boost::afio::chrono::system_clock::time_point(duration);
 }
-static inline void fill_stat_t(boost::afio::stat_t &stat, struct stat s, boost::afio::metadata_flags wanted)
+static inline void fill_stat_t(boost::afio::stat_t &stat, BOOST_AFIO_POSIX_STAT_STRUCT s, boost::afio::metadata_flags wanted)
 {
 	using namespace boost::afio;
 	if(!!(wanted&metadata_flags::dev)) { stat.st_dev=s.st_dev; }
@@ -835,7 +853,7 @@ namespace detail {
 		virtual stat_t lstat(metadata_flags wanted) const
 		{
 			stat_t stat(nullptr);
-			struct stat s={0};
+			BOOST_AFIO_POSIX_STAT_STRUCT s={0};
 			BOOST_AFIO_ERRHOSFN(BOOST_AFIO_POSIX_LSTAT(path().c_str(), &s), path());
 			fill_stat_t(stat, s, wanted);
 			return stat;
@@ -2036,6 +2054,8 @@ namespace detail {
 				access|=FILE_LIST_DIRECTORY|FILE_TRAVERSE;
 				if(!!(req.flags & file_flags::Read)) access|=GENERIC_READ;
 				if(!!(req.flags & file_flags::Write)) access|=GENERIC_WRITE;
+				// Windows doesn't like opening directories without buffering.
+				if(!!(req.flags & file_flags::OSDirect)) req.flags=req.flags & ~file_flags::OSDirect;
 			}
 			else
 			{
@@ -2077,7 +2097,8 @@ namespace detail {
 			_path.MaximumLength=(_path.Length=(USHORT) (path.native().size()*sizeof(std::filesystem::path::value_type)))+sizeof(std::filesystem::path::value_type);
 			oa.ObjectName=&_path;
 			// Should I bother with oa.RootDirectory? For now, no.
-			BOOST_AFIO_ERRHNTFN(NtCreateFile(&h, access, &oa, &isb, NULL, 0, FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,
+			LARGE_INTEGER AllocationSize={0};
+			BOOST_AFIO_ERRHNTFN(NtCreateFile(&h, access, &oa, &isb, &AllocationSize, FILE_ATTRIBUTE_NORMAL, FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,
 				creatdisp, flags, NULL, 0), req.path);
 			// If writing and SyncOnClose and NOT synchronous, turn on SyncOnClose
 			auto ret=std::make_shared<async_io_handle_windows>(shared_from_this(), dirh, req.path, req.flags,
@@ -2709,6 +2730,9 @@ namespace detail {
 		// Called in unknown thread
 		completion_returntype dosymlink(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr *e, async_path_op_req req)
 		{
+#ifdef WIN32
+			BOOST_AFIO_THROW(std::runtime_error("Creating symbolic links via MSVCRT is not supported on Windows."));
+#else
 			req.flags=fileflags(req.flags)|file_flags::int_opening_link;
 			BOOST_AFIO_ERRHOSFN(BOOST_AFIO_POSIX_SYMLINK(h->path().c_str(), req.path.c_str()), req.path);
 			BOOST_AFIO_POSIX_STAT_STRUCT s={0};
@@ -2717,6 +2741,7 @@ namespace detail {
 				return dofile(id, h, e, req);
 			else
 				return dodir(id, h, e, req);
+#endif
 		}
 		// Called in unknown thread
 		completion_returntype dormsymlink(size_t id, std::shared_ptr<async_io_handle> _, exception_ptr *, async_path_op_req req)
@@ -2825,6 +2850,9 @@ namespace detail {
 		completion_returntype doenumerate(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr *, async_enumerate_op_req req, std::shared_ptr<promise<std::pair<std::vector<directory_entry>, bool>>> ret)
 		{
 			async_io_handle_posix *p=static_cast<async_io_handle_posix *>(h.get());
+#ifdef WIN32
+			BOOST_AFIO_THROW(std::runtime_error("Enumerating directories via MSVCRT is not supported."));
+#else
 #ifdef __linux__
 			// Linux kernel defines a weird dirent with type packed at the end of d_name, so override default dirent
 			struct dirent {
@@ -2908,6 +2936,7 @@ namespace detail {
 				_ret.push_back(std::move(item));
 			}
 			ret->set_value(std::make_pair(std::move(_ret), thisbatchdone));
+#endif
 			return std::make_pair(true, h);
 		}
 
@@ -3097,10 +3126,10 @@ void directory_entry::_int_fetch(metadata_flags wanted, std::shared_ptr<async_io
 	else
 #endif
 	{
-		struct stat s={0};
+		BOOST_AFIO_POSIX_STAT_STRUCT s={0};
 		std::filesystem::path path(dirh->path());
 		path/=leafname;
-		BOOST_AFIO_ERRHOSFN(lstat(path.c_str(), &s), path);
+		BOOST_AFIO_ERRHOSFN(BOOST_AFIO_POSIX_LSTAT(path.c_str(), &s), path);
 		fill_stat_t(stat, s, wanted);
 	}
 }
