@@ -617,7 +617,7 @@ static std::ostream &operator<<(std::ostream &s, const boost::afio::chrono::syst
     	s << "<bad timespec>";
         return s;
     }
-    len -= ret - 1;
+    //len -= ret - 1;
 
     sprintf(&buf[strlen(buf)], ".%09ld", remainder.count());
     s << buf;
