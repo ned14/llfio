@@ -858,10 +858,10 @@ namespace detail {
 		std::shared_ptr<shared_future<std::shared_ptr<async_io_handle>>> h;
 		std::unique_ptr<promise<std::shared_ptr<async_io_handle>>> detached_promise;
 		typedef std::pair<size_t, std::function<std::shared_ptr<async_io_handle> (std::shared_ptr<async_io_handle>, exception_ptr *)>> completion_t;
+		std::vector<completion_t> completions;
 #ifndef NDEBUG
 		completion_t boundf; // Useful for debugging
 #endif
-		std::vector<completion_t> completions;
 #ifdef BOOST_AFIO_OP_STACKBACKTRACEDEPTH
 		std::vector<void *> stack;
 		void fillStack()

@@ -685,8 +685,8 @@ enum class file_flags : size_t
 	SyncOnClose=(1<<25),	//!< Automatically initiate an asynchronous flush just before file close, and fuse both operations so both must complete for close to complete.
 	EnforceDependencyWriteOrder=(1<<26), //!< Ensure that data writes to files reach physical storage in the same order as the op dependencies close files. Does NOT enforce ordering of individual data writes, ONLY all file writes accumulated before a file close.
 
-	int_opening_link=(1<<30), //!< Internal use only. Don't use.
-	int_opening_dir=(1<<31) //!< Internal use only. Don't use.
+	int_opening_link=(1<<29), //!< Internal use only. Don't use.
+	int_opening_dir=(1<<30) //!< Internal use only. Don't use.
 }
 #ifdef BOOST_NO_CXX11_SCOPED_ENUMS
 BOOST_SCOPED_ENUM_DECLARE_END(file_flags)
@@ -808,7 +808,7 @@ struct stat_t
 	//! Constructs a UNINITIALIZED instance i.e. full of random garbage
 	stat_t() { }
 	//! Constructs a zeroed instance
-	stat_t(nullptr_t) : st_dev(0), st_ino(0), st_type(0), st_mode(0), st_nlink(0), st_uid(0), st_gid(0), st_rdev(0),
+	stat_t(std::nullptr_t) : st_dev(0), st_ino(0), st_type(0), st_mode(0), st_nlink(0), st_uid(0), st_gid(0), st_rdev(0),
 	st_size(0), st_allocated(0), st_blocks(0), st_blksize(0), st_flags(0), st_gen(0) { }
 };
 
