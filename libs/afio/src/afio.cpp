@@ -27,6 +27,10 @@ File Created: Mar 2013
 //#endif
 //#endif
 
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
+
 #ifdef BOOST_AFIO_OP_STACKBACKTRACEDEPTH
 #include <dlfcn.h>
 // Set to 1 to use libunwind instead of glibc's stack backtracer
@@ -50,8 +54,6 @@ File Created: Mar 2013
 #include "../../../boost/afio/detail/valgrind/memcheck.h"
 #include "../../../boost/afio/detail/valgrind/helgrind.h"
 
-#include <fcntl.h>
-#include <sys/stat.h>
 #ifdef WIN32
 #include <Windows.h>
 #include <winioctl.h>
@@ -63,8 +65,6 @@ File Created: Mar 2013
 #define BOOST_AFIO_POSIX_RMDIR _wrmdir
 #define BOOST_AFIO_POSIX_STAT _wstat64
 #define BOOST_AFIO_POSIX_STAT_STRUCT struct __stat64
-#define BOOST_AFIO_POSIX_S_ISREG(m) ((m) & _S_IFREG)
-#define BOOST_AFIO_POSIX_S_ISDIR(m) ((m) & _S_IFDIR)
 #define BOOST_AFIO_POSIX_OPEN _wopen
 #define BOOST_AFIO_POSIX_CLOSE _close
 #define BOOST_AFIO_POSIX_UNLINK _wunlink
@@ -518,19 +518,57 @@ static inline int winftruncate(int fd, boost::afio::off_t _newsize)
 #endif
 }
 #else
+#include <dirent.h>     /* Defines DT_* constants */
+#include <sys/syscall.h>
+#include <fnmatch.h>
 #include <sys/uio.h>
 #include <limits.h>
 #define BOOST_AFIO_POSIX_MKDIR mkdir
 #define BOOST_AFIO_POSIX_RMDIR ::rmdir
 #define BOOST_AFIO_POSIX_STAT_STRUCT struct stat 
 #define BOOST_AFIO_POSIX_STAT stat
+#define BOOST_AFIO_POSIX_LSTAT ::lstat
 #define BOOST_AFIO_POSIX_OPEN open
+#define BOOST_AFIO_POSIX_SYMLINK ::symlink
 #define BOOST_AFIO_POSIX_CLOSE ::close
 #define BOOST_AFIO_POSIX_UNLINK unlink
 #define BOOST_AFIO_POSIX_FSYNC fsync
 #define BOOST_AFIO_POSIX_FTRUNCATE ftruncate
-#define BOOST_AFIO_POSIX_S_ISREG S_ISREG
-#define BOOST_AFIO_POSIX_S_ISDIR S_ISDIR
+
+static inline boost::afio::chrono::system_clock::time_point to_timepoint(struct timespec ts)
+{
+	// We make the big assumption that the STL's system_clock is based on the time_t epoch 1st Jan 1970.
+	boost::afio::chrono::duration<unsigned long long, boost::afio::ratio<1, 1000000>> duration(ts.tv_sec*1000000ULL+ts.tv_nsec/1000);
+	return boost::afio::chrono::system_clock::time_point(duration);
+}
+static inline void fill_stat_t(boost::afio::stat_t &stat, struct stat s, boost::afio::metadata_flags wanted)
+{
+	using namespace boost::afio;
+	if(!!(wanted&metadata_flags::dev)) { stat.st_dev=s.st_dev; }
+	if(!!(wanted&metadata_flags::ino)) { stat.st_ino=s.st_ino; }
+	if(!!(wanted&metadata_flags::type)) { stat.st_type=s.st_mode; }
+	if(!!(wanted&metadata_flags::mode)) { stat.st_mode=s.st_mode; }
+	if(!!(wanted&metadata_flags::nlink)) { stat.st_nlink=s.st_nlink; }
+	if(!!(wanted&metadata_flags::uid)) { stat.st_uid=s.st_uid; }
+	if(!!(wanted&metadata_flags::gid)) { stat.st_gid=s.st_gid; }
+	if(!!(wanted&metadata_flags::rdev)) { stat.st_rdev=s.st_rdev; }
+	if(!!(wanted&metadata_flags::atim)) { stat.st_atim=to_timepoint(s.st_atim); }
+	if(!!(wanted&metadata_flags::mtim)) { stat.st_mtim=to_timepoint(s.st_mtim); }
+	if(!!(wanted&metadata_flags::ctim)) { stat.st_ctim=to_timepoint(s.st_ctim); }
+	if(!!(wanted&metadata_flags::size)) { stat.st_size=s.st_size; }
+	if(!!(wanted&metadata_flags::allocated)) { stat.st_allocated=s.st_blocks*s.st_blksize; }
+	if(!!(wanted&metadata_flags::blocks)) { stat.st_blocks=s.st_blocks; }
+	if(!!(wanted&metadata_flags::blksize)) { stat.st_blksize=s.st_blksize; }
+#ifdef HAVE_STAT_FLAGS
+	if(!!(wanted&metadata_flags::flags)) { stat.st_flags=s.st_flags; }
+#endif
+#ifdef HAVE_STAT_GEN
+	if(!!(wanted&metadata_flags::gen)) { stat.st_gen=s.st_gen; }
+#endif
+#ifdef HAVE_BIRTHTIMESPEC
+	if(!!(wanted&metadata_flags::birthtim)) { stat.st_birthtim=to_timepoint(s.st_birthtim); }
+#endif
+}
 #endif
 
 // libstdc++ doesn't come with std::lock_guard
@@ -742,6 +780,8 @@ namespace detail {
 		}
 		virtual std::filesystem::path target() const
 		{
+			if(!opened_as_symlink())
+				return std::filesystem::path();
 			windows_nt_kernel::init();
 			using namespace windows_nt_kernel;
 			char buffer[sizeof(REPARSE_DATA_BUFFER)+32769];
@@ -794,11 +834,25 @@ namespace detail {
 		}
 		virtual stat_t lstat(metadata_flags wanted) const
 		{
-			// TODO
+			stat_t stat(nullptr);
+			struct stat s={0};
+			BOOST_AFIO_ERRHOSFN(BOOST_AFIO_POSIX_LSTAT(path().c_str(), &s), path());
+			fill_stat_t(stat, s, wanted);
+			return stat;
 		}
 		virtual std::filesystem::path target() const
 		{
-			// TODO
+#ifdef _MSC_VER
+			return std::filesystem::path();
+#else
+			if(!opened_as_symlink())
+				return std::filesystem::path();
+			char buffer[PATH_MAX+1];
+			ssize_t len;
+			if((len = readlink(path().c_str(), buffer, sizeof(buffer)-1)) == -1)
+			    BOOST_AFIO_ERRGOS(-1);
+			return std::filesystem::path::string_type(buffer, len);
+#endif
 		}
 	};
 
@@ -2487,7 +2541,7 @@ namespace detail {
 					BOOST_AFIO_THROW(std::runtime_error("Inputs are invalid."));
             }
 #endif
-			return chain_async_ops((int) detail::OpType::symlink, reqs, async_op_flags::DetachedFuture|async_op_flags::ImmediateCompletion, &async_file_io_dispatcher_windows::dosymlink);
+			return chain_async_ops((int) detail::OpType::symlink, reqs, async_op_flags::DetachedFuture, &async_file_io_dispatcher_windows::dosymlink);
 		}
 		virtual std::vector<async_io_op> rmsymlink(const std::vector<async_path_op_req> &reqs)
 		{
@@ -2568,46 +2622,6 @@ namespace detail {
 		}
 	};
 } //namespace
-
-void directory_entry::_int_fetch(metadata_flags wanted, std::shared_ptr<async_io_handle> dirh)
-{
-	windows_nt_kernel::init();
-	using namespace windows_nt_kernel;
-	bool slowPath=(!!(wanted&metadata_flags::nlink) || !!(wanted&metadata_flags::blocks) || !!(wanted&metadata_flags::blksize));
-	if(!slowPath)
-	{
-		// Fast path skips opening a handle per file by enumerating the containing directory using a glob
-		// exactly matching the leafname. This is about 10x quicker, so it's very much worth it.
-		std::filesystem::path::value_type buffer[sizeof(FILE_ALL_INFORMATION)/sizeof(std::filesystem::path::value_type)+32769];
-		IO_STATUS_BLOCK isb={ 0 };
-		UNICODE_STRING _glob;
-		NTSTATUS ntstat;
-		_glob.Buffer=const_cast<std::filesystem::path::value_type *>(leafname.c_str());
-		_glob.MaximumLength=(_glob.Length=(USHORT) (leafname.native().size()*sizeof(std::filesystem::path::value_type)))+sizeof(std::filesystem::path::value_type);
-		FILE_ID_FULL_DIR_INFORMATION *ffdi=(FILE_ID_FULL_DIR_INFORMATION *) buffer;
-		ntstat=NtQueryDirectoryFile(dirh->native_handle(), NULL, NULL, NULL, &isb, ffdi, sizeof(buffer),
-			FileIdFullDirectoryInformation, TRUE, &_glob, FALSE);
-		if(STATUS_PENDING==ntstat)
-			ntstat=NtWaitForSingleObject(dirh->native_handle(), FALSE, NULL);
-		BOOST_AFIO_ERRHNTFN(ntstat, dirh->path());
-		if(!!(wanted&metadata_flags::ino)) { stat.st_ino=ffdi->FileId.QuadPart; }
-		if(!!(wanted&metadata_flags::type)) { stat.st_type=to_st_type(ffdi->FileAttributes); }
-		if(!!(wanted&metadata_flags::atim)) { stat.st_atim=to_timepoint(ffdi->LastAccessTime); }
-		if(!!(wanted&metadata_flags::mtim)) { stat.st_mtim=to_timepoint(ffdi->LastWriteTime); }
-		if(!!(wanted&metadata_flags::ctim)) { stat.st_ctim=to_timepoint(ffdi->ChangeTime); }
-		if(!!(wanted&metadata_flags::size)) { stat.st_size=ffdi->EndOfFile.QuadPart; }
-		if(!!(wanted&metadata_flags::allocated)) { stat.st_allocated=ffdi->AllocationSize.QuadPart; }
-		if(!!(wanted&metadata_flags::birthtim)) { stat.st_birthtim=to_timepoint(ffdi->CreationTime); }
-	}
-	else
-	{
-		// No choice here, open a handle and stat it.
-		detail::async_file_io_dispatcher_windows *dispatcher=static_cast<detail::async_file_io_dispatcher_windows *>(dirh->parent());
-		async_path_op_req req(dirh->path()/name(), file_flags::Read);
-		auto fileh=dispatcher->dofile(0, std::shared_ptr<async_io_handle>(), nullptr, req).second;
-		stat=fileh->lstat(wanted);
-	}
-}
 #endif
 namespace detail {
 	class async_file_io_dispatcher_compat : public async_file_io_dispatcher_base
@@ -2632,7 +2646,7 @@ namespace detail {
 
 			BOOST_AFIO_POSIX_STAT_STRUCT s={0};
 			ret=BOOST_AFIO_POSIX_STAT(req.path.c_str(), &s);
-			if(0==ret && !BOOST_AFIO_POSIX_S_ISDIR(s.st_mode))
+			if(0==ret && S_IFDIR!=(s.st_mode&S_IFDIR))
 				BOOST_AFIO_THROW(std::runtime_error("Not a directory"));
 			if(!(req.flags & file_flags::UniqueDirectoryHandle) && !!(req.flags & file_flags::Read) && !(req.flags & file_flags::Write))
 			{
@@ -2691,11 +2705,16 @@ namespace detail {
 			return std::make_pair(true, ret);
 		}
 		// Called in unknown thread
-		completion_returntype dosymlink(size_t id, std::shared_ptr<async_io_handle>, exception_ptr *e, async_path_op_req req)
+		completion_returntype dosymlink(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr *e, async_path_op_req req)
 		{
-			req.flags=fileflags(req.flags);
-			auto ret=std::make_shared<async_io_handle_posix>(shared_from_this(), std::shared_ptr<async_io_handle>(), req.path, req.flags, false, -999);
-			return std::make_pair(true, ret);
+			req.flags=fileflags(req.flags)|file_flags::int_opening_link;
+			BOOST_AFIO_ERRHOSFN(BOOST_AFIO_POSIX_SYMLINK(h->path().c_str(), req.path.c_str()), req.path);
+			BOOST_AFIO_POSIX_STAT_STRUCT s={0};
+			BOOST_AFIO_ERRHOS(BOOST_AFIO_POSIX_STAT(req.path.c_str(), &s));
+			if(S_IFDIR!=(s.st_mode&S_IFDIR))
+				return dofile(id, h, e, req);
+			else
+				return dodir(id, h, e, req);
 		}
 		// Called in unknown thread
 		completion_returntype dormsymlink(size_t id, std::shared_ptr<async_io_handle> _, exception_ptr *, async_path_op_req req)
@@ -2803,6 +2822,89 @@ namespace detail {
 		// Called in unknown thread
 		completion_returntype doenumerate(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr *, async_enumerate_op_req req, std::shared_ptr<promise<std::pair<std::vector<directory_entry>, bool>>> ret)
 		{
+			async_io_handle_posix *p=static_cast<async_io_handle_posix *>(h.get());
+#ifdef __linux__
+			// Linux kernel defines a weird dirent with type packed at the end of d_name, so override default dirent
+			struct dirent {
+			   long           d_ino;
+			   off_t          d_off;
+			   unsigned short d_reclen;
+			   char           d_name[];
+			};
+			// Unlike FreeBSD, Linux doesn't define a getdents() function, so we'll do that here.
+			typedef int (*getdents_t)(int, char *, int);
+			getdents_t getdents=(getdents_t)([](int fd, char *buf, int count) -> int { return syscall(SYS_getdents, fd, buf, count); });
+#endif
+			auto buffer=std::unique_ptr<dirent[]>(new dirent[req.maxitems]);
+			int bytes=getdents(p->fd, (char *) buffer.get(), sizeof(dirent)*req.maxitems);
+			BOOST_AFIO_ERRHOS(bytes);
+			if(!bytes)
+			{
+				ret->set_value(std::make_pair(std::vector<directory_entry>(), false));
+				return std::make_pair(true, h);
+			}
+			std::vector<directory_entry> _ret;
+			_ret.reserve(req.maxitems);
+			directory_entry item;
+			// This is what POSIX returns with getdents()
+			item.have_metadata=item.have_metadata|metadata_flags::ino|metadata_flags::type;
+			bool done=false;
+			for(dirent *dent=buffer.get(); !done; dent=(dirent *)((size_t) dent + dent->d_reclen))
+			{
+				if(!(bytes-=dent->d_reclen)) done=true;
+				if(!dent->d_ino)
+					continue;
+				size_t length=strchr(dent->d_name, 0)-dent->d_name;
+				if(length<=2 && '.'==dent->d_name[0])
+					if(1==length || '.'==dent->d_name[1]) continue;
+				if(!req.glob.empty() && fnmatch(req.glob.native().c_str(), dent->d_name, 0)) continue;
+				std::filesystem::path::string_type leafname(dent->d_name, length);
+				item.leafname=std::move(leafname);
+				item.stat.st_ino=dent->d_ino;
+				char d_type=
+#ifdef __linux__
+						*((char *) dent + dent->d_reclen - 1)
+#else
+						dent->d_type
+#endif
+						;
+				if(DT_UNKNOWN==d_type)
+					item.have_metadata=item.have_metadata&~metadata_flags::type;
+				else
+				{
+					item.have_metadata=item.have_metadata|metadata_flags::type;
+					switch(d_type)
+					{
+					case DT_BLK:
+						item.stat.st_type=S_IFBLK;
+						break;
+					case DT_CHR:
+						item.stat.st_type=S_IFCHR;
+						break;
+					case DT_DIR:
+						item.stat.st_type=S_IFDIR;
+						break;
+					case DT_FIFO:
+						item.stat.st_type=S_IFIFO;
+						break;
+					case DT_LNK:
+						item.stat.st_type=S_IFLNK;
+						break;
+					case DT_REG:
+						item.stat.st_type=S_IFREG;
+						break;
+					case DT_SOCK:
+						item.stat.st_type=S_IFSOCK;
+						break;
+					default:
+						item.have_metadata=item.have_metadata&~metadata_flags::type;
+						item.stat.st_type=0;
+						break;
+					}
+				}
+				_ret.push_back(std::move(item));
+			}
+			ret->set_value(std::make_pair(std::move(_ret), true));
 			return std::make_pair(true, h);
 		}
 
@@ -2945,6 +3047,59 @@ namespace detail {
 			return chain_async_ops((int) detail::OpType::enumerate, reqs, async_op_flags::None, &async_file_io_dispatcher_compat::doenumerate);
 		}
 	};
+}
+
+void directory_entry::_int_fetch(metadata_flags wanted, std::shared_ptr<async_io_handle> dirh)
+{
+#ifdef WIN32
+	detail::async_file_io_dispatcher_windows *dispatcher=dynamic_cast<detail::async_file_io_dispatcher_windows *>(dirh->parent());
+	if(dispatcher)
+	{
+		windows_nt_kernel::init();
+		using namespace windows_nt_kernel;
+		bool slowPath=(!!(wanted&metadata_flags::nlink) || !!(wanted&metadata_flags::blocks) || !!(wanted&metadata_flags::blksize));
+		if(!slowPath)
+		{
+			// Fast path skips opening a handle per file by enumerating the containing directory using a glob
+			// exactly matching the leafname. This is about 10x quicker, so it's very much worth it.
+			std::filesystem::path::value_type buffer[sizeof(FILE_ALL_INFORMATION)/sizeof(std::filesystem::path::value_type)+32769];
+			IO_STATUS_BLOCK isb={ 0 };
+			UNICODE_STRING _glob;
+			NTSTATUS ntstat;
+			_glob.Buffer=const_cast<std::filesystem::path::value_type *>(leafname.c_str());
+			_glob.MaximumLength=(_glob.Length=(USHORT) (leafname.native().size()*sizeof(std::filesystem::path::value_type)))+sizeof(std::filesystem::path::value_type);
+			FILE_ID_FULL_DIR_INFORMATION *ffdi=(FILE_ID_FULL_DIR_INFORMATION *) buffer;
+			ntstat=NtQueryDirectoryFile(dirh->native_handle(), NULL, NULL, NULL, &isb, ffdi, sizeof(buffer),
+				FileIdFullDirectoryInformation, TRUE, &_glob, FALSE);
+			if(STATUS_PENDING==ntstat)
+				ntstat=NtWaitForSingleObject(dirh->native_handle(), FALSE, NULL);
+			BOOST_AFIO_ERRHNTFN(ntstat, dirh->path());
+			if(!!(wanted&metadata_flags::ino)) { stat.st_ino=ffdi->FileId.QuadPart; }
+			if(!!(wanted&metadata_flags::type)) { stat.st_type=to_st_type(ffdi->FileAttributes); }
+			if(!!(wanted&metadata_flags::atim)) { stat.st_atim=to_timepoint(ffdi->LastAccessTime); }
+			if(!!(wanted&metadata_flags::mtim)) { stat.st_mtim=to_timepoint(ffdi->LastWriteTime); }
+			if(!!(wanted&metadata_flags::ctim)) { stat.st_ctim=to_timepoint(ffdi->ChangeTime); }
+			if(!!(wanted&metadata_flags::size)) { stat.st_size=ffdi->EndOfFile.QuadPart; }
+			if(!!(wanted&metadata_flags::allocated)) { stat.st_allocated=ffdi->AllocationSize.QuadPart; }
+			if(!!(wanted&metadata_flags::birthtim)) { stat.st_birthtim=to_timepoint(ffdi->CreationTime); }
+		}
+		else
+		{
+			// No choice here, open a handle and stat it.
+			async_path_op_req req(dirh->path()/name(), file_flags::Read);
+			auto fileh=dispatcher->dofile(0, std::shared_ptr<async_io_handle>(), nullptr, req).second;
+			stat=fileh->lstat(wanted);
+		}
+	}
+	else
+#endif
+	{
+		struct stat s={0};
+		std::filesystem::path path(dirh->path());
+		path/=leafname;
+		BOOST_AFIO_ERRHOSFN(lstat(path.c_str(), &s), path);
+		fill_stat_t(stat, s, wanted);
+	}
 }
 
 std::shared_ptr<async_file_io_dispatcher_base> make_async_file_io_dispatcher(std::shared_ptr<thread_source> threadpool, file_flags flagsforce, file_flags flagsmask)

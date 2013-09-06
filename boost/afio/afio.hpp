@@ -787,23 +787,23 @@ of these may or may not equal what a `struct timespec` can do depending on your 
 struct stat_t
 {
 	uint64_t        st_dev;                       /*!< inode of device containing file (POSIX) */
-	uint64_t        st_ino;                       /*!< inode of file (Windows, POSIX) */
-	uint16_t        st_type;                      /*!< type of file (Windows, POSIX) */
-	uint16_t        st_mode;                      /*!< type and perms of file (POSIX) */
-	int16_t         st_nlink;                     /*!< number of hard links (Windows, POSIX) */
-	int16_t         st_uid;                       /*!< user ID of the file (POSIX) */
-	int16_t         st_gid;                       /*!< group ID of the file (POSIX) */
-	dev_t           st_rdev;                      /*!< id of file if special (POSIX) */
-	chrono::system_clock::time_point st_atim;     /*!< time of last access (Windows, POSIX) */
-	chrono::system_clock::time_point st_mtim;     /*!< time of last data modification (Windows, POSIX) */
-	chrono::system_clock::time_point st_ctim;     /*!< time of last status change (Windows, POSIX) */
-	off_t           st_size;                      /*!< file size, in bytes (Windows, POSIX) */
-	off_t           st_allocated;                 /*!< bytes allocated for file (Windows, POSIX) */
-	off_t           st_blocks;                    /*!< number of blocks allocated (Windows, POSIX) */
-	uint16_t        st_blksize;                   /*!< block size used by this device (Windows, POSIX) */
-	uint32_t        st_flags;                     /*!< user defined flags for file (FreeBSD, OS X) */
-	uint32_t        st_gen;                       /*!< file generation number (FreeBSD, OS X)*/
-	chrono::system_clock::time_point st_birthtim; /*!< time of file creation (Windows, FreeBSD, OS X) */
+	uint64_t        st_ino;                       /*!< inode of file                   (Windows, POSIX) */
+	uint16_t        st_type;                      /*!< type of file                    (Windows, POSIX) */
+	uint16_t        st_mode;                      /*!< type and perms of file          (POSIX) */
+	int16_t         st_nlink;                     /*!< number of hard links            (Windows, POSIX) */
+	int16_t         st_uid;                       /*!< user ID of the file             (POSIX) */
+	int16_t         st_gid;                       /*!< group ID of the file            (POSIX) */
+	dev_t           st_rdev;                      /*!< id of file if special           (POSIX) */
+	chrono::system_clock::time_point st_atim;     /*!< time of last access             (Windows, POSIX) */
+	chrono::system_clock::time_point st_mtim;     /*!< time of last data modification  (Windows, POSIX) */
+	chrono::system_clock::time_point st_ctim;     /*!< time of last status change      (Windows, POSIX) */
+	off_t           st_size;                      /*!< file size, in bytes             (Windows, POSIX) */
+	off_t           st_allocated;                 /*!< bytes allocated for file        (Windows, POSIX) */
+	off_t           st_blocks;                    /*!< number of blocks allocated      (Windows, POSIX) */
+	uint16_t        st_blksize;                   /*!< block size used by this device  (Windows, POSIX) */
+	uint32_t        st_flags;                     /*!< user defined flags for file     (FreeBSD, OS X) */
+	uint32_t        st_gen;                       /*!< file generation number          (FreeBSD, OS X)*/
+	chrono::system_clock::time_point st_birthtim; /*!< time of file creation           (Windows, FreeBSD, OS X) */
 
 	//! Constructs a UNINITIALIZED instance i.e. full of random garbage
 	stat_t() { }

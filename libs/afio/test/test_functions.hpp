@@ -620,14 +620,14 @@ static boost::afio::stat_t print_stat(std::shared_ptr<boost::afio::async_io_hand
 	using namespace boost::afio;
 	auto entry=h->lstat(metadata_flags::All);
 	std::cout << "Entry " << h->path() << " is a ";
-	if(entry.st_type & S_IFLNK)
+	if(S_IFLNK==(entry.st_type & S_IFLNK))
 		std::cout << "link";
-	else if(entry.st_type & S_IFDIR)
+	else if(S_IFDIR==(entry.st_type & S_IFDIR))
 		std::cout << "directory";
 	else
 		std::cout << "file";
 	std::cout << " and it has the following information:" << std::endl;
-	if(entry.st_type & S_IFLNK)
+	if(S_IFLNK==(entry.st_type & S_IFLNK))
 	{
 		std::cout << "  Target=" << h->target() << std::endl;
 	}
@@ -660,9 +660,9 @@ static void print_stat(std::shared_ptr<boost::afio::async_io_handle> dirh, boost
 	using namespace boost::afio;
 	std::cout << "Entry " << direntry.name() << " is a ";
 	auto entry=direntry.full_lstat(dirh);
-	if(entry.st_type & S_IFLNK)
+	if(S_IFLNK==(entry.st_type & S_IFLNK))
 		std::cout << "link";
-	else if(entry.st_type & S_IFDIR)
+	else if(S_IFDIR==(entry.st_type & S_IFDIR))
 		std::cout << "directory";
 	else
 		std::cout << "file";
