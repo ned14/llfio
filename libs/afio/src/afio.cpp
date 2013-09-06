@@ -54,6 +54,7 @@ File Created: Mar 2013
 #include <sys/stat.h>
 #ifdef WIN32
 #include <Windows.h>
+#include <winioctl.h>
 
 // We also compile the posix compat layer for catching silly compile errors for POSIX
 #include <io.h>
@@ -181,18 +182,6 @@ namespace windows_nt_kernel
 	  PVOID           SecurityQualityOfService;
 	}  OBJECT_ATTRIBUTES, *POBJECT_ATTRIBUTES;
 
-	typedef struct _RTLP_CURDIR_REF
-	{
-		LONG RefCount;
-		HANDLE Handle;
-	} RTLP_CURDIR_REF, *PRTLP_CURDIR_REF;
-
-	typedef struct RTL_RELATIVE_NAME_U {
-		UNICODE_STRING RelativeName;
-		HANDLE ContainingDirectory;
-		PRTLP_CURDIR_REF CurDirRef;
-	} RTL_RELATIVE_NAME_U, *PRTL_RELATIVE_NAME_U;
-
 
 	// From http://undocumented.ntinternals.net/UserMode/Undocumented%20Functions/NT%20Objects/File/NtQueryInformationFile.html
 	// and http://msdn.microsoft.com/en-us/library/windows/hardware/ff567052(v=vs.85).aspx
@@ -249,12 +238,6 @@ namespace windows_nt_kernel
 	typedef NTSTATUS (NTAPI *NtClose_t)(
 	  /*_Out_*/  HANDLE FileHandle
 	);
-
-	typedef BOOLEAN (NTAPI *RtlDosPathNameToNtPathName_U_t)(
-                             PCWSTR DosName,
-                             PUNICODE_STRING NtName,
-                             PCWSTR *PartName,
-                             PRTL_RELATIVE_NAME_U RelativeName);
 
 	// From http://undocumented.ntinternals.net/UserMode/Undocumented%20Functions/NT%20Objects/File/NtQueryDirectoryFile.html
 	// and http://msdn.microsoft.com/en-us/library/windows/hardware/ff567047(v=vs.85).aspx
@@ -373,13 +356,39 @@ namespace windows_nt_kernel
 	  WCHAR         FileName[1];
 	} FILE_ID_FULL_DIR_INFORMATION, *PFILE_ID_FULL_DIR_INFORMATION;
 
+	// From http://msdn.microsoft.com/en-us/library/windows/hardware/ff552012(v=vs.85).aspx
+	typedef struct _REPARSE_DATA_BUFFER {
+	  ULONG  ReparseTag;
+	  USHORT ReparseDataLength;
+	  USHORT Reserved;
+	  union {
+		struct {
+		  USHORT SubstituteNameOffset;
+		  USHORT SubstituteNameLength;
+		  USHORT PrintNameOffset;
+		  USHORT PrintNameLength;
+		  ULONG  Flags;
+		  WCHAR  PathBuffer[1];
+		} SymbolicLinkReparseBuffer;
+		struct {
+		  USHORT SubstituteNameOffset;
+		  USHORT SubstituteNameLength;
+		  USHORT PrintNameOffset;
+		  USHORT PrintNameLength;
+		  WCHAR  PathBuffer[1];
+		} MountPointReparseBuffer;
+		struct {
+		  UCHAR DataBuffer[1];
+		} GenericReparseBuffer;
+	  };
+	} REPARSE_DATA_BUFFER, *PREPARSE_DATA_BUFFER;
+
 	static NtQueryInformationFile_t NtQueryInformationFile;
 	static NtQueryVolumeInformationFile_t NtQueryVolumeInformationFile;
 	static NtOpenDirectoryObject_t NtOpenDirectoryObject;
 	static NtOpenFile_t NtOpenFile;
 	static NtCreateFile_t NtCreateFile;
 	static NtClose_t NtClose;
-	static RtlDosPathNameToNtPathName_U_t RtlDosPathNameToNtPathName_U;
 	static NtQueryDirectoryFile_t NtQueryDirectoryFile;
 	static NtSetInformationFile_t NtSetInformationFile;
 	static NtWaitForSingleObject_t NtWaitForSingleObject;
@@ -404,9 +413,6 @@ namespace windows_nt_kernel
 		if(!NtClose)
 			if(!(NtClose=(NtClose_t) GetProcAddress(GetModuleHandleA("NTDLL.DLL"), "NtClose")))
 				abort();
-		if(!RtlDosPathNameToNtPathName_U)
-			if(!(RtlDosPathNameToNtPathName_U=(RtlDosPathNameToNtPathName_U_t) GetProcAddress(GetModuleHandleA("NTDLL.DLL"), "RtlDosPathNameToNtPathName_U")))
-				abort();
 		if(!NtQueryDirectoryFile)
 			if(!(NtQueryDirectoryFile=(NtQueryDirectoryFile_t) GetProcAddress(GetModuleHandleA("NTDLL.DLL"), "NtQueryDirectoryFile")))
 				abort();
@@ -425,6 +431,14 @@ namespace windows_nt_kernel
 			doinit();
 			initialised=true;
 		}
+	}
+
+	static inline std::filesystem::path ntpath_from_dospath(std::filesystem::path p)
+	{
+		// This is pretty easy thanks to a convenient symlink in the NT kernel root directory ...
+		std::filesystem::path base("\\??");
+		base/=p;
+		return base;
 	}
 
 	static inline uint16_t to_st_type(ULONG FileAttributes, uint16_t mode=0)
@@ -771,6 +785,7 @@ namespace detail {
 		dir,
 		rmdir,
 		file,
+		symlink,
 		rmfile,
 		sync,
 		close,
@@ -793,6 +808,7 @@ namespace detail {
 		"dir",
 		"rmdir",
 		"file",
+		"symlink",
 		"rmfile",
 		"sync",
 		"close",
@@ -1929,6 +1945,8 @@ namespace detail {
 			{
 				flags|=0x01/*FILE_DIRECTORY_FILE*/;
 				access|=FILE_LIST_DIRECTORY|FILE_TRAVERSE;
+				if(!!(req.flags & file_flags::Read)) access|=GENERIC_READ;
+				if(!!(req.flags & file_flags::Write)) access|=GENERIC_WRITE;
 			}
 			else
 			{
@@ -1958,24 +1976,17 @@ namespace detail {
 			HANDLE h=nullptr;
 			IO_STATUS_BLOCK isb={ 0 };
 			OBJECT_ATTRIBUTES oa={sizeof(OBJECT_ATTRIBUTES)};
-			UNICODE_STRING path;
-			std::filesystem::path::value_type buffer[32769];
-			// If it's a DOS path, invoke the kernel's magic function DOS path conversion function and have
-			// PATH use buffer, else have PATH use req.path directly
-			if(isalpha(req.path.native()[0]) && req.path.native()[1]==':')
+			std::filesystem::path path(req.path);
+			UNICODE_STRING _path;
+			if(isalpha(path.native()[0]) && path.native()[1]==':')
 			{
-				path.Buffer=buffer;
-				path.Length=path.MaximumLength=(USHORT) sizeof(buffer);
-				RtlDosPathNameToNtPathName_U(req.path.c_str(), &path, NULL, NULL);
+				path=ntpath_from_dospath(path);
 				// If it's a DOS path, ignore case differences
 				oa.Attributes=0x40/*OBJ_CASE_INSENSITIVE*/;
 			}
-			else
-			{
-				path.Buffer=const_cast<std::filesystem::path::value_type *>(req.path.c_str());
-				path.MaximumLength=(path.Length=(USHORT) (req.path.native().size()*sizeof(std::filesystem::path::value_type)))+sizeof(std::filesystem::path::value_type);
-			}
-			oa.ObjectName=&path;
+			_path.Buffer=const_cast<std::filesystem::path::value_type *>(path.c_str());
+			_path.MaximumLength=(_path.Length=(USHORT) (path.native().size()*sizeof(std::filesystem::path::value_type)))+sizeof(std::filesystem::path::value_type);
+			oa.ObjectName=&_path;
 			// Should I bother with oa.RootDirectory? For now, no.
 			BOOST_AFIO_ERRHNTFN(NtCreateFile(&h, access, &oa, &isb, NULL, 0, FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,
 				creatdisp, flags, NULL, 0), req.path);
@@ -1985,6 +1996,102 @@ namespace detail {
 				h);
 			static_cast<async_io_handle_windows *>(ret.get())->do_add_io_handle_to_parent();
 			return std::make_pair(true, ret);
+		}
+		// Called in unknown thread
+		void boost_asio_symlink_completion_handler(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr *, std::shared_ptr<std::unique_ptr<std::filesystem::path::value_type[]>> buffer, const boost::system::error_code &ec, size_t bytes_transferred)
+		{
+			if(ec)
+			{
+				exception_ptr e;
+				// boost::system::system_error makes no attempt to ask windows for what the error code means :(
+				try
+				{
+					BOOST_AFIO_ERRGWINFN(ec.value(), h->path());
+				}
+				catch(...)
+				{
+					e=afio::make_exception_ptr(afio::current_exception());
+				}
+				complete_async_op(id, h, e);
+			}
+			else
+			{
+				complete_async_op(id, h);
+			}
+		}
+		// Called in unknown thread
+		completion_returntype dosymlink(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr *e, async_path_op_req req)
+		{
+			async_io_handle_windows *p=static_cast<async_io_handle_windows *>(h.get());
+			// For safety, best not create unless doesn't exist
+			if(!!(req.flags&file_flags::Create))
+			{
+				req.flags=req.flags&~file_flags::Create;
+				req.flags=req.flags|file_flags::CreateOnlyIfNotExist;
+			}
+			// If not creating, simply open
+			if(!(req.flags&file_flags::CreateOnlyIfNotExist))
+			{
+				return dodir(id, h, e, req);
+			}
+			if(!!(h->flags()&file_flags::int_opening_dir))
+			{
+				// Create a directory junction
+				windows_nt_kernel::init();
+				using namespace windows_nt_kernel;
+				// First we need a new directory with write access
+				req.flags=req.flags|file_flags::Write;
+				completion_returntype ret=dodir(id, h, e, req);
+				assert(ret.first);
+				std::filesystem::path destpath(h->path());
+				size_t destpathbytes=destpath.native().size()*sizeof(std::filesystem::path::value_type);
+				size_t buffersize=sizeof(REPARSE_DATA_BUFFER)+destpathbytes*2+256;
+				auto buffer=std::make_shared<std::unique_ptr<std::filesystem::path::value_type[]>>(new std::filesystem::path::value_type[buffersize]);
+				REPARSE_DATA_BUFFER *rpd=(REPARSE_DATA_BUFFER *) buffer->get();
+				memset(rpd, 0, sizeof(*rpd));
+				rpd->ReparseTag=IO_REPARSE_TAG_MOUNT_POINT;
+				if(isalpha(destpath.native()[0]) && destpath.native()[1]==':')
+				{
+					destpath=ntpath_from_dospath(destpath);
+					destpathbytes=destpath.native().size()*sizeof(std::filesystem::path::value_type);
+					memcpy(rpd->MountPointReparseBuffer.PathBuffer, destpath.c_str(), destpathbytes+sizeof(std::filesystem::path::value_type));
+					rpd->MountPointReparseBuffer.SubstituteNameOffset=0;
+					rpd->MountPointReparseBuffer.SubstituteNameLength=(USHORT)destpathbytes;
+					rpd->MountPointReparseBuffer.PrintNameOffset=(USHORT)(destpathbytes+sizeof(std::filesystem::path::value_type));
+					rpd->MountPointReparseBuffer.PrintNameLength=(USHORT)(h->path().native().size()*sizeof(std::filesystem::path::value_type));
+					memcpy(rpd->MountPointReparseBuffer.PathBuffer+rpd->MountPointReparseBuffer.PrintNameOffset/sizeof(std::filesystem::path::value_type), h->path().c_str(), rpd->MountPointReparseBuffer.PrintNameLength+sizeof(std::filesystem::path::value_type));
+				}
+				else
+				{
+					memcpy(rpd->MountPointReparseBuffer.PathBuffer, destpath.c_str(), destpathbytes+sizeof(std::filesystem::path::value_type));
+					rpd->MountPointReparseBuffer.SubstituteNameOffset=0;
+					rpd->MountPointReparseBuffer.SubstituteNameLength=(USHORT)destpathbytes;
+					rpd->MountPointReparseBuffer.PrintNameOffset=(USHORT)(destpathbytes+sizeof(std::filesystem::path::value_type));
+					rpd->MountPointReparseBuffer.PrintNameLength=(USHORT)destpathbytes;
+					memcpy(rpd->MountPointReparseBuffer.PathBuffer+rpd->MountPointReparseBuffer.PrintNameOffset/sizeof(std::filesystem::path::value_type), h->path().c_str(), rpd->MountPointReparseBuffer.PrintNameLength+sizeof(std::filesystem::path::value_type));
+				}
+				size_t headerlen=offsetof(REPARSE_DATA_BUFFER, MountPointReparseBuffer);
+				size_t reparsebufferheaderlen=offsetof(REPARSE_DATA_BUFFER, MountPointReparseBuffer.PathBuffer)-headerlen;
+				rpd->ReparseDataLength=(USHORT)(rpd->MountPointReparseBuffer.SubstituteNameLength+rpd->MountPointReparseBuffer.PrintNameLength+2*sizeof(std::filesystem::path::value_type)+reparsebufferheaderlen);
+				boost::asio::windows::overlapped_ptr ol(p->h->get_io_service(), boost::bind(&async_file_io_dispatcher_windows::boost_asio_symlink_completion_handler, this, id, ret.second, nullptr, buffer, boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred));
+				BOOL ok=DeviceIoControl(ret.second->native_handle(), FSCTL_SET_REPARSE_POINT, rpd, (DWORD)(rpd->ReparseDataLength+headerlen), NULL, 0, NULL, ol.get());
+				DWORD errcode=GetLastError();
+				if(!ok && ERROR_IO_PENDING!=errcode)
+				{
+					//std::cerr << "ERROR " << errcode << std::endl;
+					boost::system::error_code ec(errcode, boost::asio::error::get_system_category());
+					ol.complete(ec, 0);
+				}
+				else
+					ol.release();
+				// Indicate we're not finished yet
+				return std::make_pair(false, h);
+			}
+			else
+			{
+				// Create a symbolic link to a file
+				BOOST_AFIO_THROW(std::runtime_error("Creating symbolic links to files is not yet supported on Windows. It wouldn't work without Administrator privileges anyway."));
+			}
 		}
 		// Called in unknown thread
 		completion_returntype dormfile(size_t id, std::shared_ptr<async_io_handle> _, exception_ptr *, async_path_op_req req)
@@ -2314,6 +2421,17 @@ namespace detail {
 #endif
 			return chain_async_ops((int) detail::OpType::file, reqs, async_op_flags::None, &async_file_io_dispatcher_windows::dofile);
 		}
+		virtual std::vector<async_io_op> symlink(const std::vector<async_path_op_req> &reqs)
+		{
+#if BOOST_AFIO_VALIDATE_INPUTS
+			BOOST_FOREACH(auto &i, reqs)
+            {
+				if(!i.validate())
+					BOOST_AFIO_THROW(std::runtime_error("Inputs are invalid."));
+            }
+#endif
+			return chain_async_ops((int) detail::OpType::symlink, reqs, async_op_flags::DetachedFuture|async_op_flags::ImmediateCompletion, &async_file_io_dispatcher_windows::dosymlink);
+		}
 		virtual std::vector<async_io_op> rmfile(const std::vector<async_path_op_req> &reqs)
 		{
 #if BOOST_AFIO_VALIDATE_INPUTS
@@ -2508,6 +2626,12 @@ namespace detail {
 			return std::make_pair(true, ret);
 		}
 		// Called in unknown thread
+		completion_returntype dosymlink(size_t id, std::shared_ptr<async_io_handle>, exception_ptr *e, async_path_op_req req)
+		{
+			auto ret=std::make_shared<async_io_handle_posix>(shared_from_this(), std::shared_ptr<async_io_handle>(), req.path, req.flags, false, -999);
+			return std::make_pair(true, ret);
+		}
+		// Called in unknown thread
 		completion_returntype dormfile(size_t id, std::shared_ptr<async_io_handle> _, exception_ptr *, async_path_op_req req)
 		{
 			req.flags=fileflags(req.flags);
@@ -2654,6 +2778,17 @@ namespace detail {
             }
 #endif
 			return chain_async_ops((int) detail::OpType::file, reqs, async_op_flags::None, &async_file_io_dispatcher_compat::dofile);
+		}
+		virtual std::vector<async_io_op> symlink(const std::vector<async_path_op_req> &reqs)
+		{
+#if BOOST_AFIO_VALIDATE_INPUTS
+			BOOST_FOREACH(auto &i, reqs)
+            {
+				if(!i.validate())
+					BOOST_AFIO_THROW(std::runtime_error("Inputs are invalid."));
+            }
+#endif
+			return chain_async_ops((int) detail::OpType::symlink, reqs, async_op_flags::None, &async_file_io_dispatcher_compat::dosymlink);
 		}
 		virtual std::vector<async_io_op> rmfile(const std::vector<async_path_op_req> &reqs)
 		{

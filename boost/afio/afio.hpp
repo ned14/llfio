@@ -1184,6 +1184,40 @@ public:
     \qexample{filedir_example}
     */
 	inline async_io_op file(const async_path_op_req &req);
+	/*! \brief Schedule a batch of asynchronous symlink creations and opens after a precondition.
+
+	Note that if creating, the target for the symlink is the precondition. On Windows directories are symlinked using a reparse
+	point instead of a symlink due to the default lack of the `SeCreateSymbolicLinkPrivilege` for non-Administrative
+	users.
+
+	Note that currently on Windows non-directory symbolic links are not supported. If there is demand for this we may add support.
+
+    \return A batch of op handles.
+    \param reqs A batch of `async_path_op_req` structures.
+    \ingroup async_file_io_dispatcher_base__filedirops
+    \qbk{distinguish, batch}
+    \complexity{Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete if symlink creation is constant time.}
+    \exceptionmodelstd
+    \qexample{filedir_example}
+    */
+	virtual std::vector<async_io_op> symlink(const std::vector<async_path_op_req> &reqs)=0;
+	/*! \brief Schedule an asynchronous symlink creation and open after a precondition.
+
+	Note that if creating, the target for the symlink is the precondition. On Windows directories are symlinked using a reparse
+	point instead of a symlink due to the default lack of the `SeCreateSymbolicLinkPrivilege` for non-Administrative
+	users.
+
+	Note that currently on Windows non-directory symbolic links are not supported. If there is demand for this we may add support.
+
+    \return An op handle.
+    \param req An `async_path_op_req` structure.
+    \ingroup async_file_io_dispatcher_base__filedirops
+    \qbk{distinguish, single}
+    \complexity{Amortised O(1) to dispatch. Amortised O(1) to complete if symlink creation is constant time.}
+    \exceptionmodelstd
+    \qexample{filedir_example}
+    */
+	inline async_io_op symlink(const async_path_op_req &req);
 	/*! \brief Schedule a batch of asynchronous file deletions after optional preconditions.
     \return A batch of op handles.
     \param reqs A batch of `async_path_op_req` structures.
@@ -1338,7 +1372,7 @@ public:
     \qexample{truncate_example}
     */
 	inline async_io_op truncate(const async_io_op &op, off_t newsize);
-	/*! \brief Schedule an asynchronous directory enumeration after a preceding operation.
+	/*! \brief Schedule a batch of asynchronous directory enumerations after a preceding operations.
 
 	By default `dir()` returns shared handles i.e. `dir("foo")` and `dir("foo")` will return the exact same
 	handle, and therefore enumerating not all of the entries at once is a race condition. The solution is
@@ -1354,6 +1388,22 @@ public:
     \qexample{enumerate_example}
     */
 	virtual std::pair<std::vector<future<std::pair<std::vector<directory_entry>, bool>>>, std::vector<async_io_op>> enumerate(const std::vector<async_enumerate_op_req> &reqs)=0;
+	/*! \brief Schedule an asynchronous directory enumeration after a preceding operation.
+
+	By default `dir()` returns shared handles i.e. `dir("foo")` and `dir("foo")` will return the exact same
+	handle, and therefore enumerating not all of the entries at once is a race condition. The solution is
+	to either set `maxitems` to a value large enough to guarantee a directory will be enumerated in a single
+	shot, or to open a separate directory handle using the `file_flags::UniqueDirectoryHandle` flag.
+
+    \return A future vector of directory entries with a boolean returning false if done.
+    \param req An enumeration request.
+    \ingroup async_file_io_dispatcher_base__enumerate
+    \qbk{distinguish, single}
+    \complexity{Amortised O(1) to dispatch. Amortised O(M) to complete where M is the average number of entries in each directory.}
+    \exceptionmodelstd
+    \qexample{enumerate_example}
+    */
+	inline std::pair<future<std::pair<std::vector<directory_entry>, bool>>, async_io_op> enumerate(const async_enumerate_op_req &req);
 
 	/*! \brief Schedule an asynchronous synchronisation of preceding operations.
     
@@ -2249,6 +2299,13 @@ inline async_io_op async_file_io_dispatcher_base::file(const async_path_op_req &
 	i.push_back(req);
 	return std::move(file(i).front());
 }
+inline async_io_op async_file_io_dispatcher_base::symlink(const async_path_op_req &req)
+{
+	std::vector<async_path_op_req> i;
+	i.reserve(1);
+	i.push_back(req);
+	return std::move(symlink(i).front());
+}
 inline async_io_op async_file_io_dispatcher_base::rmfile(const async_path_op_req &req)
 {
 	std::vector<async_path_op_req> i;
@@ -2303,6 +2360,14 @@ inline async_io_op async_file_io_dispatcher_base::truncate(const async_io_op &op
 	i.reserve(1);
 	i.push_back(newsize);
 	return std::move(truncate(o, i).front());
+}
+inline std::pair<future<std::pair<std::vector<directory_entry>, bool>>, async_io_op> async_file_io_dispatcher_base::enumerate(const async_enumerate_op_req &req)
+{
+	std::vector<async_enumerate_op_req> i;
+	i.reserve(1);
+	i.push_back(req);
+	auto ret=enumerate(i);
+	return std::make_pair(std::move(ret.first.front()), std::move(ret.second.front()));
 }
 
 
