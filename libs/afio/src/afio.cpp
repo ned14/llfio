@@ -441,6 +441,14 @@ namespace windows_nt_kernel
 		return base;
 	}
 
+	static inline std::filesystem::path dospath_from_ntpath(std::filesystem::path p)
+	{
+		auto first=++p.begin();
+		if(*first=="??")
+			p=std::filesystem::path(p.native().begin()+4, p.native().end());
+		return p;
+	}
+
 	static inline uint16_t to_st_type(ULONG FileAttributes, uint16_t mode=0)
 	{
 		if(FileAttributes&FILE_ATTRIBUTE_REPARSE_POINT)
@@ -732,6 +740,24 @@ namespace detail {
 			if(!!(wanted&metadata_flags::birthtim)) { stat.st_birthtim=to_timepoint(fai.BasicInformation.CreationTime); }
 			return stat;
 		}
+		virtual std::filesystem::path target() const
+		{
+			windows_nt_kernel::init();
+			using namespace windows_nt_kernel;
+			char buffer[sizeof(REPARSE_DATA_BUFFER)+32769];
+			DWORD written=0;
+			REPARSE_DATA_BUFFER *rpd=(REPARSE_DATA_BUFFER *) buffer;
+			memset(rpd, 0, sizeof(*rpd));
+			BOOST_AFIO_ERRHWIN(DeviceIoControl(myid, FSCTL_GET_REPARSE_POINT, NULL, 0, rpd, sizeof(buffer), &written, NULL));
+			switch(rpd->ReparseTag)
+			{
+			case IO_REPARSE_TAG_MOUNT_POINT:
+				return dospath_from_ntpath(std::filesystem::path::string_type(rpd->MountPointReparseBuffer.PathBuffer+rpd->MountPointReparseBuffer.SubstituteNameOffset/sizeof(std::filesystem::path::value_type), rpd->MountPointReparseBuffer.SubstituteNameLength/sizeof(std::filesystem::path::value_type)));
+			case IO_REPARSE_TAG_SYMLINK:
+				return dospath_from_ntpath(std::filesystem::path::string_type(rpd->SymbolicLinkReparseBuffer.PathBuffer+rpd->SymbolicLinkReparseBuffer.SubstituteNameOffset/sizeof(std::filesystem::path::value_type), rpd->SymbolicLinkReparseBuffer.SubstituteNameLength/sizeof(std::filesystem::path::value_type)));
+			}
+			BOOST_AFIO_THROW(std::runtime_error("Unknown type of symbolic link."));
+		}
 	};
 #endif
 	struct async_io_handle_posix : public async_io_handle
@@ -768,7 +794,11 @@ namespace detail {
 		}
 		virtual stat_t lstat(metadata_flags wanted) const
 		{
-			//TODO
+			// TODO
+		}
+		virtual std::filesystem::path target() const
+		{
+			// TODO
 		}
 	};
 
@@ -785,8 +815,9 @@ namespace detail {
 		dir,
 		rmdir,
 		file,
-		symlink,
 		rmfile,
+		symlink,
+		rmsymlink,
 		sync,
 		close,
 		read,
@@ -808,8 +839,9 @@ namespace detail {
 		"dir",
 		"rmdir",
 		"file",
-		"symlink",
 		"rmfile",
+		"symlink",
+		"rmsymlink",
 		"sync",
 		"close",
 		"read",
@@ -1998,6 +2030,14 @@ namespace detail {
 			return std::make_pair(true, ret);
 		}
 		// Called in unknown thread
+		completion_returntype dormfile(size_t id, std::shared_ptr<async_io_handle> _, exception_ptr *, async_path_op_req req)
+		{
+			req.flags=fileflags(req.flags);
+			BOOST_AFIO_ERRHWINFN(DeleteFile(req.path.c_str()), req.path);
+			auto ret=std::make_shared<async_io_handle_windows>(shared_from_this(), std::shared_ptr<async_io_handle>(), req.path, req.flags);
+			return std::make_pair(true, ret);
+		}
+		// Called in unknown thread
 		void boost_asio_symlink_completion_handler(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr *, std::shared_ptr<std::unique_ptr<std::filesystem::path::value_type[]>> buffer, const boost::system::error_code &ec, size_t bytes_transferred)
 		{
 			if(ec)
@@ -2023,6 +2063,8 @@ namespace detail {
 		completion_returntype dosymlink(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr *e, async_path_op_req req)
 		{
 			async_io_handle_windows *p=static_cast<async_io_handle_windows *>(h.get());
+			req.flags=fileflags(req.flags);
+			req.flags=req.flags|file_flags::int_opening_link;
 			// For safety, best not create unless doesn't exist
 			if(!!(req.flags&file_flags::Create))
 			{
@@ -2094,10 +2136,10 @@ namespace detail {
 			}
 		}
 		// Called in unknown thread
-		completion_returntype dormfile(size_t id, std::shared_ptr<async_io_handle> _, exception_ptr *, async_path_op_req req)
+		completion_returntype dormsymlink(size_t id, std::shared_ptr<async_io_handle> _, exception_ptr *, async_path_op_req req)
 		{
 			req.flags=fileflags(req.flags);
-			BOOST_AFIO_ERRHWINFN(DeleteFile(req.path.c_str()), req.path);
+			BOOST_AFIO_ERRHWINFN(RemoveDirectory(req.path.c_str()), req.path);
 			auto ret=std::make_shared<async_io_handle_windows>(shared_from_this(), std::shared_ptr<async_io_handle>(), req.path, req.flags);
 			return std::make_pair(true, ret);
 		}
@@ -2421,6 +2463,17 @@ namespace detail {
 #endif
 			return chain_async_ops((int) detail::OpType::file, reqs, async_op_flags::None, &async_file_io_dispatcher_windows::dofile);
 		}
+		virtual std::vector<async_io_op> rmfile(const std::vector<async_path_op_req> &reqs)
+		{
+#if BOOST_AFIO_VALIDATE_INPUTS
+			BOOST_FOREACH(auto &i, reqs)
+            {
+				if(!i.validate())
+					BOOST_AFIO_THROW(std::runtime_error("Inputs are invalid."));
+            }
+#endif
+			return chain_async_ops((int) detail::OpType::rmfile, reqs, async_op_flags::None, &async_file_io_dispatcher_windows::dormfile);
+		}
 		virtual std::vector<async_io_op> symlink(const std::vector<async_path_op_req> &reqs)
 		{
 #if BOOST_AFIO_VALIDATE_INPUTS
@@ -2432,7 +2485,7 @@ namespace detail {
 #endif
 			return chain_async_ops((int) detail::OpType::symlink, reqs, async_op_flags::DetachedFuture|async_op_flags::ImmediateCompletion, &async_file_io_dispatcher_windows::dosymlink);
 		}
-		virtual std::vector<async_io_op> rmfile(const std::vector<async_path_op_req> &reqs)
+		virtual std::vector<async_io_op> rmsymlink(const std::vector<async_path_op_req> &reqs)
 		{
 #if BOOST_AFIO_VALIDATE_INPUTS
 			BOOST_FOREACH(auto &i, reqs)
@@ -2441,7 +2494,7 @@ namespace detail {
 					BOOST_AFIO_THROW(std::runtime_error("Inputs are invalid."));
             }
 #endif
-			return chain_async_ops((int) detail::OpType::rmfile, reqs, async_op_flags::None, &async_file_io_dispatcher_windows::dormfile);
+			return chain_async_ops((int) detail::OpType::rmsymlink, reqs, async_op_flags::None, &async_file_io_dispatcher_windows::dormsymlink);
 		}
 		virtual std::vector<async_io_op> sync(const std::vector<async_io_op> &ops)
 		{
@@ -2626,13 +2679,22 @@ namespace detail {
 			return std::make_pair(true, ret);
 		}
 		// Called in unknown thread
-		completion_returntype dosymlink(size_t id, std::shared_ptr<async_io_handle>, exception_ptr *e, async_path_op_req req)
+		completion_returntype dormfile(size_t id, std::shared_ptr<async_io_handle> _, exception_ptr *, async_path_op_req req)
 		{
+			req.flags=fileflags(req.flags);
+			BOOST_AFIO_ERRHOSFN(BOOST_AFIO_POSIX_UNLINK(req.path.c_str()), req.path);
 			auto ret=std::make_shared<async_io_handle_posix>(shared_from_this(), std::shared_ptr<async_io_handle>(), req.path, req.flags, false, -999);
 			return std::make_pair(true, ret);
 		}
 		// Called in unknown thread
-		completion_returntype dormfile(size_t id, std::shared_ptr<async_io_handle> _, exception_ptr *, async_path_op_req req)
+		completion_returntype dosymlink(size_t id, std::shared_ptr<async_io_handle>, exception_ptr *e, async_path_op_req req)
+		{
+			req.flags=fileflags(req.flags);
+			auto ret=std::make_shared<async_io_handle_posix>(shared_from_this(), std::shared_ptr<async_io_handle>(), req.path, req.flags, false, -999);
+			return std::make_pair(true, ret);
+		}
+		// Called in unknown thread
+		completion_returntype dormsymlink(size_t id, std::shared_ptr<async_io_handle> _, exception_ptr *, async_path_op_req req)
 		{
 			req.flags=fileflags(req.flags);
 			BOOST_AFIO_ERRHOSFN(BOOST_AFIO_POSIX_UNLINK(req.path.c_str()), req.path);
@@ -2779,6 +2841,17 @@ namespace detail {
 #endif
 			return chain_async_ops((int) detail::OpType::file, reqs, async_op_flags::None, &async_file_io_dispatcher_compat::dofile);
 		}
+		virtual std::vector<async_io_op> rmfile(const std::vector<async_path_op_req> &reqs)
+		{
+#if BOOST_AFIO_VALIDATE_INPUTS
+			BOOST_FOREACH(auto &i, reqs)
+            {
+				if(!i.validate())
+					BOOST_AFIO_THROW(std::runtime_error("Inputs are invalid."));
+            }
+#endif
+			return chain_async_ops((int) detail::OpType::rmfile, reqs, async_op_flags::None, &async_file_io_dispatcher_compat::dormfile);
+		}
 		virtual std::vector<async_io_op> symlink(const std::vector<async_path_op_req> &reqs)
 		{
 #if BOOST_AFIO_VALIDATE_INPUTS
@@ -2790,7 +2863,7 @@ namespace detail {
 #endif
 			return chain_async_ops((int) detail::OpType::symlink, reqs, async_op_flags::None, &async_file_io_dispatcher_compat::dosymlink);
 		}
-		virtual std::vector<async_io_op> rmfile(const std::vector<async_path_op_req> &reqs)
+		virtual std::vector<async_io_op> rmsymlink(const std::vector<async_path_op_req> &reqs)
 		{
 #if BOOST_AFIO_VALIDATE_INPUTS
 			BOOST_FOREACH(auto &i, reqs)
@@ -2799,7 +2872,7 @@ namespace detail {
 					BOOST_AFIO_THROW(std::runtime_error("Inputs are invalid."));
             }
 #endif
-			return chain_async_ops((int) detail::OpType::rmfile, reqs, async_op_flags::None, &async_file_io_dispatcher_compat::dormfile);
+			return chain_async_ops((int) detail::OpType::rmsymlink, reqs, async_op_flags::None, &async_file_io_dispatcher_compat::dormsymlink);
 		}
 		virtual std::vector<async_io_op> sync(const std::vector<async_io_op> &ops)
 		{

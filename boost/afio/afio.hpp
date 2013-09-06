@@ -685,6 +685,7 @@ enum class file_flags : size_t
 	SyncOnClose=(1<<25),	//!< Automatically initiate an asynchronous flush just before file close, and fuse both operations so both must complete for close to complete.
 	EnforceDependencyWriteOrder=(1<<26), //!< Ensure that data writes to files reach physical storage in the same order as the op dependencies close files. Does NOT enforce ordering of individual data writes, ONLY all file writes accumulated before a file close.
 
+	int_opening_link=(1<<30), //!< Internal use only. Don't use.
 	int_opening_dir=(1<<31) //!< Internal use only. Don't use.
 }
 #ifdef BOOST_NO_CXX11_SCOPED_ENUMS
@@ -933,6 +934,12 @@ public:
 	const std::filesystem::path &path() const { return _path; }
 	//! Returns the final flags used when this handle was opened
 	file_flags flags() const { return _flags; }
+	//! True if this handle was opened as a file
+	bool opened_as_file() const { return !(_flags&file_flags::int_opening_dir) && !(_flags&file_flags::int_opening_link); }
+	//! True if this handle was opened as a directory
+	bool opened_as_dir() const { return !!(_flags&file_flags::int_opening_dir); }
+	//! True if this handle was opened as a symlink
+	bool opened_as_symlink() const { return !!(_flags&file_flags::int_opening_link); }
 	//! Returns how many bytes have been read since this handle was opened.
 	off_t read_count() const { return bytesread; }
 	//! Returns how many bytes have been written since this handle was opened.
@@ -947,6 +954,8 @@ public:
 		wanted=wanted&directory_entry::metadata_supported();
 		return directory_entry(_path.leaf(), lstat(wanted), wanted);
 	}
+	//! Returns the target path of this handle if it is a symbolic link
+	virtual std::filesystem::path target() const=0;
 };
 
 /*! \class async_file_io_dispatcher_base
@@ -1184,6 +1193,26 @@ public:
     \qexample{filedir_example}
     */
 	inline async_io_op file(const async_path_op_req &req);
+	/*! \brief Schedule a batch of asynchronous file deletions after optional preconditions.
+    \return A batch of op handles.
+    \param reqs A batch of `async_path_op_req` structures.
+    \ingroup async_file_io_dispatcher_base__filedirops
+    \qbk{distinguish, batch}
+    \complexity{Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete if file deletion is constant time.}
+    \exceptionmodelstd
+    \qexample{filedir_example}
+    */
+	virtual std::vector<async_io_op> rmfile(const std::vector<async_path_op_req> &reqs)=0;
+	/*! \brief Schedule an asynchronous file deletion after an optional precondition.
+    \return An op handle.
+    \param req An `async_path_op_req` structure.
+    \ingroup async_file_io_dispatcher_base__filedirops
+    \qbk{distinguish, single}
+    \complexity{Amortised O(1) to dispatch. Amortised O(1) to complete if file deletion is constant time.}
+    \exceptionmodelstd
+    \qexample{filedir_example}
+    */
+	inline async_io_op rmfile(const async_path_op_req &req);
 	/*! \brief Schedule a batch of asynchronous symlink creations and opens after a precondition.
 
 	Note that if creating, the target for the symlink is the precondition. On Windows directories are symlinked using a reparse
@@ -1218,26 +1247,26 @@ public:
     \qexample{filedir_example}
     */
 	inline async_io_op symlink(const async_path_op_req &req);
-	/*! \brief Schedule a batch of asynchronous file deletions after optional preconditions.
+	/*! \brief Schedule a batch of asynchronous symlink deletions after optional preconditions.
     \return A batch of op handles.
     \param reqs A batch of `async_path_op_req` structures.
     \ingroup async_file_io_dispatcher_base__filedirops
     \qbk{distinguish, batch}
-    \complexity{Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete if file deletion is constant time.}
+    \complexity{Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete if symlink deletion is constant time.}
     \exceptionmodelstd
     \qexample{filedir_example}
     */
-	virtual std::vector<async_io_op> rmfile(const std::vector<async_path_op_req> &reqs)=0;
-	/*! \brief Schedule an asynchronous file deletion after an optional precondition.
+	virtual std::vector<async_io_op> rmsymlink(const std::vector<async_path_op_req> &reqs)=0;
+	/*! \brief Schedule an asynchronous symlink deletion after an optional precondition.
     \return An op handle.
     \param req An `async_path_op_req` structure.
     \ingroup async_file_io_dispatcher_base__filedirops
     \qbk{distinguish, single}
-    \complexity{Amortised O(1) to dispatch. Amortised O(1) to complete if file deletion is constant time.}
+    \complexity{Amortised O(1) to dispatch. Amortised O(1) to complete if symlink deletion is constant time.}
     \exceptionmodelstd
     \qexample{filedir_example}
     */
-	inline async_io_op rmfile(const async_path_op_req &req);
+	inline async_io_op rmsymlink(const async_path_op_req &req);
 	/*! \brief Schedule a batch of asynchronous content synchronisations with physical storage after preceding operations.
     \return A batch of op handles.
     \param ops A batch of op handles.
@@ -2299,6 +2328,13 @@ inline async_io_op async_file_io_dispatcher_base::file(const async_path_op_req &
 	i.push_back(req);
 	return std::move(file(i).front());
 }
+inline async_io_op async_file_io_dispatcher_base::rmfile(const async_path_op_req &req)
+{
+	std::vector<async_path_op_req> i;
+	i.reserve(1);
+	i.push_back(req);
+	return std::move(rmfile(i).front());
+}
 inline async_io_op async_file_io_dispatcher_base::symlink(const async_path_op_req &req)
 {
 	std::vector<async_path_op_req> i;
@@ -2306,12 +2342,12 @@ inline async_io_op async_file_io_dispatcher_base::symlink(const async_path_op_re
 	i.push_back(req);
 	return std::move(symlink(i).front());
 }
-inline async_io_op async_file_io_dispatcher_base::rmfile(const async_path_op_req &req)
+inline async_io_op async_file_io_dispatcher_base::rmsymlink(const async_path_op_req &req)
 {
 	std::vector<async_path_op_req> i;
 	i.reserve(1);
 	i.push_back(req);
-	return std::move(rmfile(i).front());
+	return std::move(rmsymlink(i).front());
 }
 inline async_io_op async_file_io_dispatcher_base::sync(const async_io_op &req)
 {
