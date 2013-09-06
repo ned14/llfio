@@ -2414,7 +2414,9 @@ namespace detail {
 				using windows_nt_kernel::to_st_type;
 				using windows_nt_kernel::to_timepoint;
 				std::vector<directory_entry> _ret;
-				_ret.reserve(std::get<2>(*state));
+				size_t maxitems=std::get<2>(*state);
+				_ret.reserve(maxitems);
+				bool thisbatchdone=(sizeof(FILE_ID_FULL_DIR_INFORMATION)*maxitems-bytes_transferred)>sizeof(FILE_ID_FULL_DIR_INFORMATION);
 				directory_entry item;
 				// This is what windows returns with each enumeration
 				item.have_metadata=directory_entry::metadata_fastpath();
@@ -2437,7 +2439,7 @@ namespace detail {
 					_ret.push_back(std::move(item));
 					if(!ffdi->NextEntryOffset) done=true;
 				}
-				std::get<0>(*state)->set_value(std::make_pair(std::move(_ret), true));
+				std::get<0>(*state)->set_value(std::make_pair(std::move(_ret), thisbatchdone));
 				complete_async_op(id, h);
 			}
 		}
@@ -2843,6 +2845,7 @@ namespace detail {
 				ret->set_value(std::make_pair(std::vector<directory_entry>(), false));
 				return std::make_pair(true, h);
 			}
+			bool thisbatchdone=(sizeof(dirent)*req.maxitems-bytes)>sizeof(dirent);
 			std::vector<directory_entry> _ret;
 			_ret.reserve(req.maxitems);
 			directory_entry item;
@@ -2904,7 +2907,7 @@ namespace detail {
 				}
 				_ret.push_back(std::move(item));
 			}
-			ret->set_value(std::make_pair(std::move(_ret), true));
+			ret->set_value(std::make_pair(std::move(_ret), thisbatchdone));
 			return std::make_pair(true, h);
 		}
 
