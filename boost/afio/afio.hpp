@@ -1014,7 +1014,7 @@ public:
     \qbk{distinguish, batch bound functions}
     \complexity{Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete.}
     \exceptionmodelstd
-    \qexample{completion_example}
+    \qexample{completion_example1}
     */
 	std::vector<async_io_op> completion(const std::vector<async_io_op> &ops, const std::vector<std::pair<async_op_flags, std::function<async_file_io_dispatcher_base::completion_t>>> &callbacks);
 	/*! \brief Schedule the asynchronous invocation of the specified single function when the supplied single operation completes.
@@ -1025,7 +1025,7 @@ public:
     \qbk{distinguish, single bound function}
     \complexity{Amortised O(1) to dispatch. Amortised O(1) to complete.}
     \exceptionmodelstd
-    \qexample{completion_example}
+    \qexample{completion_example1}
     */
 	inline async_io_op completion(const async_io_op &req, const std::pair<async_op_flags, std::function<async_file_io_dispatcher_base::completion_t>> &callback);
 
@@ -1462,8 +1462,9 @@ public:
 	\exceptionmodel{Never throws any exception.}
 	*/
 	static size_t page_size() BOOST_NOEXCEPT_OR_NOTHROW;
+        
+        void complete_async_op(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr e=exception_ptr());
 protected:
-	void complete_async_op(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr e=exception_ptr());
 	completion_returntype invoke_user_completion(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr *e, std::function<completion_t> callback);
 	template<class F, class T> std::vector<async_io_op> chain_async_ops(int optype, const std::vector<async_io_op> &preconditions, const std::vector<T> &container, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<async_io_handle>, exception_ptr *, T));
 	template<class F> std::vector<async_io_op> chain_async_ops(int optype, const std::vector<async_io_op> &container, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<async_io_handle>, exception_ptr *, async_io_op));

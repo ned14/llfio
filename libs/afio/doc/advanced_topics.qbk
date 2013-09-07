@@ -12,6 +12,10 @@
 
 TODO
 
+[completion_example1]
+
+[completion_example2]
+
 [endsect] [/custom_completion_handler]
 
 [section:vs2010_notes Notes on using AFIO with Microsoft Visual Studio 2010 and Mingw32]
