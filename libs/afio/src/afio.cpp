@@ -991,7 +991,7 @@ namespace detail {
 
 		typedef boost::detail::spinlock fdslock_t;
 		typedef recursive_mutex opslock_t;
-		typedef boost::detail::spinlock dircachelock_t;
+		typedef recursive_mutex dircachelock_t;
 		fdslock_t fdslock; std::unordered_map<void *, std::weak_ptr<async_io_handle>> fds;
 		opslock_t opslock; size_t monotoniccount; std::unordered_map<size_t, async_file_io_dispatcher_op> ops;
 		dircachelock_t dircachelock; std::unordered_map<std::filesystem::path, std::weak_ptr<async_io_handle>, std::filesystem_hash> dirhcache;
@@ -1002,8 +1002,6 @@ namespace detail {
 			// Boost's spinlock is so lightweight it has no constructor ...
 			fdslock.unlock();
 			ANNOTATE_RWLOCK_CREATE(&fdslock);
-			dircachelock.unlock();
-			ANNOTATE_RWLOCK_CREATE(&dircachelock);
         
 #if !defined(BOOST_MSVC)|| BOOST_MSVC >= 1700 // MSVC 2010 doesn't support reserve
 			ops.reserve(10000);
@@ -1013,7 +1011,6 @@ namespace detail {
 		}
 		~async_file_io_dispatcher_base_p()
 		{
-			ANNOTATE_RWLOCK_DESTROY(&dircachelock);
 			ANNOTATE_RWLOCK_DESTROY(&fdslock);
 		}
 
@@ -1242,6 +1239,16 @@ metadata_flags directory_entry::metadata_fastpath() BOOST_NOEXCEPT_OR_NOTHROW
 	return ret;
 }
 
+size_t directory_entry::compatibility_maximum() BOOST_NOEXCEPT_OR_NOTHROW
+{
+#ifdef WIN32
+	// Let's choose 100k entries. Why not!
+	return 100000;
+#else
+	// This is what glibc uses, a 32Kb buffer, and it's what OpenVZ appears to assume.
+	return 32768/sizeof(dirent);
+#endif
+}
 
 async_file_io_dispatcher_base::async_file_io_dispatcher_base(std::shared_ptr<thread_source> threadpool, file_flags flagsforce, file_flags flagsmask) : p(new detail::async_file_io_dispatcher_base_p(threadpool, flagsforce, flagsmask))
 {
@@ -2022,7 +2029,7 @@ namespace detail {
 		completion_returntype dodir(size_t id, std::shared_ptr<async_io_handle> _, exception_ptr *e, async_path_op_req req)
 		{
 			BOOL ret=0;
-			req.flags=fileflags(req.flags)|file_flags::int_opening_dir;
+			req.flags=fileflags(req.flags)|file_flags::int_opening_dir|file_flags::Read;
 			if(!(req.flags & file_flags::UniqueDirectoryHandle) && !!(req.flags & file_flags::Read) && !(req.flags & file_flags::Write))
 			{
 				// Return a copy of the one in the dir cache if available
@@ -2460,7 +2467,7 @@ namespace detail {
 					_ret.push_back(std::move(item));
 					if(!ffdi->NextEntryOffset) done=true;
 				}
-				std::get<0>(*state)->set_value(std::make_pair(std::move(_ret), thisbatchdone));
+				std::get<0>(*state)->set_value(std::make_pair(std::move(_ret), !thisbatchdone));
 				complete_async_op(id, h);
 			}
 		}
@@ -2488,10 +2495,21 @@ namespace detail {
 				);
 			boost::asio::windows::overlapped_ptr ol(p->h->get_io_service(), boost::bind(&async_file_io_dispatcher_windows::boost_asio_enumerate_completion_handler, this, id, h, nullptr, state, boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred));
 
-			// It's not tremendously obvious how to call the kernel directly with an OVERLAPPED. ReactOS's sources told me how ...
-			ntstat=NtQueryDirectoryFile(p->h->native_handle(), ol.get()->hEvent, NULL, ol.get(), (PIO_STATUS_BLOCK) ol.get(),
-				std::get<1>(*state).get(), (ULONG)(sizeof(FILE_ID_FULL_DIR_INFORMATION)*req.maxitems),
-				FileIdFullDirectoryInformation, FALSE, req.glob.empty() ? NULL : &_glob, FALSE);
+			bool done;
+			do
+			{
+				// It's not tremendously obvious how to call the kernel directly with an OVERLAPPED. ReactOS's sources told me how ...
+				ntstat=NtQueryDirectoryFile(p->h->native_handle(), ol.get()->hEvent, NULL, ol.get(), (PIO_STATUS_BLOCK) ol.get(),
+					std::get<1>(*state).get(), (ULONG)(sizeof(FILE_ID_FULL_DIR_INFORMATION)*req.maxitems),
+					FileIdFullDirectoryInformation, FALSE, req.glob.empty() ? NULL : &_glob, req.restart);
+				if(STATUS_BUFFER_OVERFLOW==ntstat)
+				{
+					req.maxitems++;
+					std::get<1>(*state)=std::unique_ptr<dirent[]>(new dirent[req.maxitems]);
+					done=false;
+				}
+				else done=true;
+			} while(!done);
 			if(STATUS_PENDING!=ntstat)
 			{
 				//std::cerr << "ERROR " << errcode << std::endl;
@@ -2653,7 +2671,7 @@ namespace detail {
 		completion_returntype dodir(size_t id, std::shared_ptr<async_io_handle> _, exception_ptr *e, async_path_op_req req)
 		{
 			int ret=0;
-			req.flags=fileflags(req.flags)|file_flags::int_opening_dir;
+			req.flags=fileflags(req.flags)|file_flags::int_opening_dir|file_flags::Read;
 			if(!!(req.flags & (file_flags::Create|file_flags::CreateOnlyIfNotExist)))
 			{
 				ret=BOOST_AFIO_POSIX_MKDIR(req.path.c_str(), 0x1f8/*770*/);
@@ -2717,7 +2735,9 @@ namespace detail {
 				if(!!(req.flags & file_flags::OSDirect))
 				{
 					req.flags=req.flags & ~file_flags::OSDirect;
+#ifdef O_DIRECT
 					flags&=~O_DIRECT;
+#endif
 				}
 			}
 			if(!!(req.flags & file_flags::FastDirectoryEnumeration))
@@ -2859,94 +2879,118 @@ namespace detail {
 		completion_returntype doenumerate(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr *, async_enumerate_op_req req, std::shared_ptr<promise<std::pair<std::vector<directory_entry>, bool>>> ret)
 		{
 			async_io_handle_posix *p=static_cast<async_io_handle_posix *>(h.get());
+			try
+			{
 #ifdef WIN32
-			BOOST_AFIO_THROW(std::runtime_error("Enumerating directories via MSVCRT is not supported."));
+				BOOST_AFIO_THROW(std::runtime_error("Enumerating directories via MSVCRT is not supported."));
 #else
 #ifdef __linux__
-			// Linux kernel defines a weird dirent with type packed at the end of d_name, so override default dirent
-			struct dirent {
-			   long           d_ino;
-			   off_t          d_off;
-			   unsigned short d_reclen;
-			   char           d_name[];
-			};
-			// Unlike FreeBSD, Linux doesn't define a getdents() function, so we'll do that here.
-			typedef int (*getdents_t)(int, char *, int);
-			getdents_t getdents=(getdents_t)([](int fd, char *buf, int count) -> int { return syscall(SYS_getdents, fd, buf, count); });
+				// Linux kernel defines a weird dirent with type packed at the end of d_name, so override default dirent
+				struct dirent {
+				   long           d_ino;
+				   off_t          d_off;
+				   unsigned short d_reclen;
+				   char           d_name[];
+				};
+				// Unlike FreeBSD, Linux doesn't define a getdents() function, so we'll do that here.
+				typedef int (*getdents_t)(int, char *, int);
+				getdents_t getdents=(getdents_t)([](int fd, char *buf, int count) -> int { return syscall(SYS_getdents, fd, buf, count); });
 #endif
-			auto buffer=std::unique_ptr<dirent[]>(new dirent[req.maxitems]);
-			int bytes=getdents(p->fd, (char *) buffer.get(), sizeof(dirent)*req.maxitems);
-			BOOST_AFIO_ERRHOS(bytes);
-			if(!bytes)
-			{
-				ret->set_value(std::make_pair(std::vector<directory_entry>(), false));
+				auto buffer=std::unique_ptr<dirent[]>(new dirent[req.maxitems]);
+				if(req.restart)
+				{
+					BOOST_AFIO_ERRHOS(lseek64(p->fd, 0, SEEK_SET));
+				}
+				int bytes;
+				bool done;
+				do
+				{
+					bytes=getdents(p->fd, (char *) buffer.get(), sizeof(dirent)*req.maxitems);
+					if(-1==bytes && EINVAL==errno)
+					{
+						req.maxitems++;
+						buffer=std::unique_ptr<dirent[]>(new dirent[req.maxitems]);
+						done=false;
+					}
+					else done=true;
+				} while(!done);
+				BOOST_AFIO_ERRHOS(bytes);
+				if(!bytes)
+				{
+					ret->set_value(std::make_pair(std::vector<directory_entry>(), false));
+					return std::make_pair(true, h);
+				}
+				bool thisbatchdone=(sizeof(dirent)*req.maxitems-bytes)>sizeof(dirent);
+				std::vector<directory_entry> _ret;
+				_ret.reserve(req.maxitems);
+				directory_entry item;
+				// This is what POSIX returns with getdents()
+				item.have_metadata=item.have_metadata|metadata_flags::ino|metadata_flags::type;
+				done=false;
+				for(dirent *dent=buffer.get(); !done; dent=(dirent *)((size_t) dent + dent->d_reclen))
+				{
+					if(!(bytes-=dent->d_reclen)) done=true;
+					if(!dent->d_ino)
+						continue;
+					size_t length=strchr(dent->d_name, 0)-dent->d_name;
+					if(length<=2 && '.'==dent->d_name[0])
+						if(1==length || '.'==dent->d_name[1]) continue;
+					if(!req.glob.empty() && fnmatch(req.glob.native().c_str(), dent->d_name, 0)) continue;
+					std::filesystem::path::string_type leafname(dent->d_name, length);
+					item.leafname=std::move(leafname);
+					item.stat.st_ino=dent->d_ino;
+					char d_type=
+#ifdef __linux__
+							*((char *) dent + dent->d_reclen - 1)
+#else
+							dent->d_type
+#endif
+							;
+					if(DT_UNKNOWN==d_type)
+						item.have_metadata=item.have_metadata&~metadata_flags::type;
+					else
+					{
+						item.have_metadata=item.have_metadata|metadata_flags::type;
+						switch(d_type)
+						{
+						case DT_BLK:
+							item.stat.st_type=S_IFBLK;
+							break;
+						case DT_CHR:
+							item.stat.st_type=S_IFCHR;
+							break;
+						case DT_DIR:
+							item.stat.st_type=S_IFDIR;
+							break;
+						case DT_FIFO:
+							item.stat.st_type=S_IFIFO;
+							break;
+						case DT_LNK:
+							item.stat.st_type=S_IFLNK;
+							break;
+						case DT_REG:
+							item.stat.st_type=S_IFREG;
+							break;
+						case DT_SOCK:
+							item.stat.st_type=S_IFSOCK;
+							break;
+						default:
+							item.have_metadata=item.have_metadata&~metadata_flags::type;
+							item.stat.st_type=0;
+							break;
+						}
+					}
+					_ret.push_back(std::move(item));
+				}
+				ret->set_value(std::make_pair(std::move(_ret), !thisbatchdone));
+#endif
 				return std::make_pair(true, h);
 			}
-			bool thisbatchdone=(sizeof(dirent)*req.maxitems-bytes)>sizeof(dirent);
-			std::vector<directory_entry> _ret;
-			_ret.reserve(req.maxitems);
-			directory_entry item;
-			// This is what POSIX returns with getdents()
-			item.have_metadata=item.have_metadata|metadata_flags::ino|metadata_flags::type;
-			bool done=false;
-			for(dirent *dent=buffer.get(); !done; dent=(dirent *)((size_t) dent + dent->d_reclen))
+			catch(...)
 			{
-				if(!(bytes-=dent->d_reclen)) done=true;
-				if(!dent->d_ino)
-					continue;
-				size_t length=strchr(dent->d_name, 0)-dent->d_name;
-				if(length<=2 && '.'==dent->d_name[0])
-					if(1==length || '.'==dent->d_name[1]) continue;
-				if(!req.glob.empty() && fnmatch(req.glob.native().c_str(), dent->d_name, 0)) continue;
-				std::filesystem::path::string_type leafname(dent->d_name, length);
-				item.leafname=std::move(leafname);
-				item.stat.st_ino=dent->d_ino;
-				char d_type=
-#ifdef __linux__
-						*((char *) dent + dent->d_reclen - 1)
-#else
-						dent->d_type
-#endif
-						;
-				if(DT_UNKNOWN==d_type)
-					item.have_metadata=item.have_metadata&~metadata_flags::type;
-				else
-				{
-					item.have_metadata=item.have_metadata|metadata_flags::type;
-					switch(d_type)
-					{
-					case DT_BLK:
-						item.stat.st_type=S_IFBLK;
-						break;
-					case DT_CHR:
-						item.stat.st_type=S_IFCHR;
-						break;
-					case DT_DIR:
-						item.stat.st_type=S_IFDIR;
-						break;
-					case DT_FIFO:
-						item.stat.st_type=S_IFIFO;
-						break;
-					case DT_LNK:
-						item.stat.st_type=S_IFLNK;
-						break;
-					case DT_REG:
-						item.stat.st_type=S_IFREG;
-						break;
-					case DT_SOCK:
-						item.stat.st_type=S_IFSOCK;
-						break;
-					default:
-						item.have_metadata=item.have_metadata&~metadata_flags::type;
-						item.stat.st_type=0;
-						break;
-					}
-				}
-				_ret.push_back(std::move(item));
+				ret->set_exception(afio::make_exception_ptr(afio::current_exception()));
+				throw;
 			}
-			ret->set_value(std::make_pair(std::move(_ret), thisbatchdone));
-#endif
-			return std::make_pair(true, h);
 		}
 
 	public:

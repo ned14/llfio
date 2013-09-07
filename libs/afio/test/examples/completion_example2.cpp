@@ -1,7 +1,9 @@
 //#define BOOST_RESULT_OF_USE_DECLTYPE 1
 #include "boost/afio/afio.hpp"
 #include <iostream>
+#if !(defined(BOOST_MSVC) && BOOST_MSVC < 1700)
 #include <future>
+#endif
 
 int main(void)
 {

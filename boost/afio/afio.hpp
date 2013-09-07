@@ -898,6 +898,8 @@ auto st_##field(std::shared_ptr<async_io_handle> dirh) -> decltype(stat.st_##fie
 	static metadata_flags metadata_supported() BOOST_NOEXCEPT_OR_NOTHROW;
 	//! A bitfield of what metadata is fast on this platform. This doesn't mean all is available for every filing system.
 	static metadata_flags metadata_fastpath() BOOST_NOEXCEPT_OR_NOTHROW;
+	//! The maximum number of entries which is "usual" to fetch at once. Use this on systems with broken directory enumeration syscall emulations (e.g. OpenVZ).
+	static size_t compatibility_maximum() BOOST_NOEXCEPT_OR_NOTHROW;
 };
 
 /*! \brief The abstract base class encapsulating a platform-specific file handle
@@ -1407,6 +1409,9 @@ public:
 	handle, and therefore enumerating not all of the entries at once is a race condition. The solution is
 	to either set maxitems to a value large enough to guarantee a directory will be enumerated in a single
 	shot, or to open a separate directory handle using the file_flags::UniqueDirectoryHandle flag.
+        
+        Note that OpenVZ seems to cope badly with large enumerations. You may find directory_entry::compatibility_maximum()
+        useful for acting as if you are glibc.
 
     \return A batch of future vectors of directory entries with boolean returning false if done.
     \param reqs A batch of enumeration requests.
@@ -1423,6 +1428,9 @@ public:
 	handle, and therefore enumerating not all of the entries at once is a race condition. The solution is
 	to either set maxitems to a value large enough to guarantee a directory will be enumerated in a single
 	shot, or to open a separate directory handle using the file_flags::UniqueDirectoryHandle flag.
+	
+	Note that OpenVZ seems to cope badly with large enumerations. You may find directory_entry::compatibility_maximum()
+	useful for acting as if you are glibc.
 
     \return A future vector of directory entries with a boolean returning false if done.
     \param req An enumeration request.
@@ -2195,18 +2203,20 @@ template<class C, class T, class A> struct async_data_op_req<const std::basic_st
 */
 struct async_enumerate_op_req
 {
-	async_io_op precondition;    //!< A precondition for this operation
-	size_t maxitems;             //!< The maximum number of items to return in this request
+	async_io_op precondition;    //!< A precondition for this operation.
+	size_t maxitems;             //!< The maximum number of items to return in this request.
+	bool restart;                //!< Restarts the enumeration for this open directory handle.
 	std::filesystem::path glob;  //!< An optional shell glob by which to filter the items returned. Done kernel side on Windows, user side on POSIX.
     //! \constr
-	async_enumerate_op_req() : maxitems(0) { }
+	async_enumerate_op_req() : maxitems(0), restart(false) { }
 	/*! \brief Constructs an instance.
     
     \param _precondition The precondition for this operation.
     \param _maxitems The maximum number of items to return in this request.
+    \param _restart Restarts the enumeration for this open directory handle.
     \param _glob An optional shell glob by which to filter the items returned. Done kernel side on Windows, user side on POSIX.
     */
-	async_enumerate_op_req(async_io_op _precondition, size_t _maxitems, std::filesystem::path _glob=std::filesystem::path()) : precondition(std::move(_precondition)), maxitems(_maxitems), glob(std::move(_glob)) { _validate(); }
+	async_enumerate_op_req(async_io_op _precondition, size_t _maxitems, bool _restart=true, std::filesystem::path _glob=std::filesystem::path()) : precondition(std::move(_precondition)), maxitems(_maxitems), restart(_restart), glob(std::move(_glob)) { _validate(); }
 	//! Validates contents
 	bool validate() const
 	{
