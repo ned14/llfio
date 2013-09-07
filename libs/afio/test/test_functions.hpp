@@ -619,7 +619,7 @@ static std::ostream &operator<<(std::ostream &s, const boost::afio::chrono::syst
     }
     //len -= ret - 1;
 
-    sprintf(&buf[strlen(buf)], ".%09ld", remainder.count());
+    sprintf(&buf[strlen(buf)], ".%09ld", (long) remainder.count());
     s << buf;
 
     return s;
