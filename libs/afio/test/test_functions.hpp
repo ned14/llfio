@@ -27,6 +27,7 @@ extern int putenv(char*);
 #include "../../../boost/afio/afio.hpp"
 #include "../detail/SpookyV2.h"
 #include "../../../boost/afio/detail/Aligned_Allocator.hpp"
+#include "../../../boost/afio/detail/valgrind/memcheck.h"
 
 //if we're building the tests all together don't define the test main
 #ifndef BOOST_AFIO_TEST_ALL
@@ -104,15 +105,20 @@ static inline void watchdog_thread(size_t timeout)
 }
 
 // Define a unit test description and timeout
-#define BOOST_AFIO_AUTO_TEST_CASE(test_name, desc, timeout)             \
+#define BOOST_AFIO_AUTO_TEST_CASE(test_name, desc, _timeout)            \
 struct test_name : public BOOST_AUTO_TEST_CASE_FIXTURE { void test_method(); }; \
                                                                         \
 static void BOOST_AUTO_TC_INVOKER( test_name )()                        \
 {                                                                       \
     test_name t;                                                        \
+    size_t timeout=_timeout;                                            \
+    if(RUNNING_ON_VALGRIND) {                                           \
+        VALGRIND_PRINTF("BOOST.AFIO TEST INVOKER: Unit test running in valgrind so tripling timeout\n"); \
+        timeout*=3;                                                     \
+    }                                                                   \
 	boost::unit_test::unit_test_monitor_t::instance().p_timeout.set(timeout); \
 	BOOST_TEST_MESSAGE(desc);                                           \
-	set_maximum_cpus();                                \
+	set_maximum_cpus();                                                 \
 	boost::thread watchdog(watchdog_thread, timeout);                   \
 	boost::unit_test::unit_test_monitor_t::instance().execute([&]() -> int { t.test_method(); watchdog.interrupt(); watchdog.join(); return 0; }); \
 }                                                                       \

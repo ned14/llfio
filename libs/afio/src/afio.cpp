@@ -157,6 +157,9 @@ namespace windows_nt_kernel
 #ifndef STATUS_PENDING
 #define STATUS_PENDING 0x00000103
 #endif
+#ifndef STATUS_BUFFER_OVERFLOW
+#define STATUS_BUFFER_OVERFLOW 0x80000005
+#endif
 
 	// From http://msdn.microsoft.com/en-us/library/windows/hardware/ff550671(v=vs.85).aspx
 	typedef struct _IO_STATUS_BLOCK {
@@ -2505,7 +2508,7 @@ namespace detail {
 				if(STATUS_BUFFER_OVERFLOW==ntstat)
 				{
 					req.maxitems++;
-					std::get<1>(*state)=std::unique_ptr<dirent[]>(new dirent[req.maxitems]);
+					std::get<1>(*state)=std::unique_ptr<FILE_ID_FULL_DIR_INFORMATION[]>(new FILE_ID_FULL_DIR_INFORMATION[req.maxitems]);
 					done=false;
 				}
 				else done=true;
