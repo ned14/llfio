@@ -2708,9 +2708,18 @@ namespace detail {
 #ifdef O_SYNC
 			if(!!(req.flags & file_flags::AlwaysSync)) flags|=O_SYNC;
 #endif
+			if(!!(req.flags & file_flags::int_opening_dir))
+			{
 #ifdef O_DIRECTORY
-			if(!!(req.flags & file_flags::int_opening_dir)) flags|=O_DIRECTORY;
+				flags|=O_DIRECTORY;
 #endif
+				// Some POSIXs don't like opening directories without buffering.
+				if(!!(req.flags & file_flags::OSDirect))
+				{
+					req.flags=req.flags & ~file_flags::OSDirect;
+					flags&=~O_DIRECT;
+				}
+			}
 			if(!!(req.flags & file_flags::FastDirectoryEnumeration))
 				dirh=p->get_handle_to_containing_dir(this, id, e, req, &async_file_io_dispatcher_compat::dofile);
 			// If writing and SyncOnClose and NOT synchronous, turn on SyncOnClose
