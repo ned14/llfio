@@ -2902,7 +2902,7 @@ namespace detail {
 				bool done;
 				do
 				{
-					bytes=getdents64(p->fd, (char *) buffer.get(), sizeof(dirent)*req.maxitems);
+					bytes=getdents(p->fd, (char *) buffer.get(), sizeof(dirent)*req.maxitems);
 					if(-1==bytes && EINVAL==errno)
 					{
 						req.maxitems++;
