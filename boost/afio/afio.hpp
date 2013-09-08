@@ -899,7 +899,7 @@ auto st_##field() -> decltype(stat.st_##field) { if(!(have_metadata&metadata_fla
 	static metadata_flags metadata_supported() BOOST_NOEXCEPT_OR_NOTHROW;
 	//! A bitfield of what metadata is fast on this platform. This doesn't mean all is available for every filing system.
 	static metadata_flags metadata_fastpath() BOOST_NOEXCEPT_OR_NOTHROW;
-	//! The maximum number of entries which is "usual" to fetch at once. Use this on systems with broken directory enumeration syscall emulations (e.g. OpenVZ).
+	//! The maximum number of entries which is "usual" to fetch at once i.e. what your libc does.
 	static size_t compatibility_maximum() BOOST_NOEXCEPT_OR_NOTHROW;
 };
 
@@ -1410,9 +1410,6 @@ public:
 	handle, and therefore enumerating not all of the entries at once is a race condition. The solution is
 	to either set maxitems to a value large enough to guarantee a directory will be enumerated in a single
 	shot, or to open a separate directory handle using the file_flags::UniqueDirectoryHandle flag.
-        
-        Note that OpenVZ seems to cope badly with large enumerations. You may find directory_entry::compatibility_maximum()
-        useful for acting as if you are glibc.
 
     \return A batch of future vectors of directory entries with boolean returning false if done.
     \param reqs A batch of enumeration requests.
@@ -1430,9 +1427,6 @@ public:
 	to either set maxitems to a value large enough to guarantee a directory will be enumerated in a single
 	shot, or to open a separate directory handle using the file_flags::UniqueDirectoryHandle flag.
 	
-	Note that OpenVZ seems to cope badly with large enumerations. You may find directory_entry::compatibility_maximum()
-	useful for acting as if you are glibc.
-
     \return A future vector of directory entries with a boolean returning false if done.
     \param req An enumeration request.
     \ingroup async_file_io_dispatcher_base__enumerate
