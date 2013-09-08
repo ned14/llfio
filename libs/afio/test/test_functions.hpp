@@ -116,7 +116,7 @@ static void BOOST_AUTO_TC_INVOKER( test_name )()                        \
         VALGRIND_PRINTF("BOOST.AFIO TEST INVOKER: Unit test running in valgrind so tripling timeout\n"); \
         timeout*=3;                                                     \
     }                                                                   \
-	boost::unit_test::unit_test_monitor_t::instance().p_timeout.set(timeout); \
+	/*boost::unit_test::unit_test_monitor_t::instance().p_timeout.set(timeout);*/ \
 	BOOST_TEST_MESSAGE(desc);                                           \
 	set_maximum_cpus();                                                 \
 	boost::thread watchdog(watchdog_thread, timeout);                   \

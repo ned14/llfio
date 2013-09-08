@@ -2923,6 +2923,7 @@ namespace detail {
 					ret->set_value(std::make_pair(std::vector<directory_entry>(), false));
 					return std::make_pair(true, h);
 				}
+				VALGRIND_MAKE_MEM_DEFINED_IF_ADDRESSABLE(buffer.get(), bytes);
 				bool thisbatchdone=(sizeof(dirent)*req.maxitems-bytes)>sizeof(dirent);
 				std::vector<directory_entry> _ret;
 				_ret.reserve(req.maxitems);
