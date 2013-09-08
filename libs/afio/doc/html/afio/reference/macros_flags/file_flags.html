@@ -27,32 +27,32 @@
 <a name="afio.reference.macros_flags.file_flags"></a><a class="link" href="file_flags.html" title="file_flags">file_flags</a>
 </h4></div></div></div>
 <p>
-          <a class="indexterm" name="id733259"></a>
-<a class="indexterm" name="id733305"></a>
-<a class="indexterm" name="id733290"></a>
-<a class="indexterm" name="id733285"></a>
-<a class="indexterm" name="id733293"></a>
-<a class="indexterm" name="id733296"></a>
-<a class="indexterm" name="id733273"></a>
-<a class="indexterm" name="id733333"></a>
-<a class="indexterm" name="id733321"></a>
-<a class="indexterm" name="id733323"></a>
-<a class="indexterm" name="id733313"></a>
-<a class="indexterm" name="id733330"></a>
-<a class="indexterm" name="id733337"></a>
-<a class="indexterm" name="id733344"></a>
-<a class="indexterm" name="id733372"></a>
-<a class="indexterm" name="id733367"></a>
-<a class="indexterm" name="id733386"></a>
-<a class="indexterm" name="id733350"></a>
-<a class="indexterm" name="id733359"></a>
+          <a class="indexterm" name="id852839"></a>
+<a class="indexterm" name="id852840"></a>
+<a class="indexterm" name="id852806"></a>
+<a class="indexterm" name="id852870"></a>
+<a class="indexterm" name="id852856"></a>
+<a class="indexterm" name="id852869"></a>
+<a class="indexterm" name="id852842"></a>
+<a class="indexterm" name="id852874"></a>
+<a class="indexterm" name="id852877"></a>
+<a class="indexterm" name="id852901"></a>
+<a class="indexterm" name="id852917"></a>
+<a class="indexterm" name="id852892"></a>
+<a class="indexterm" name="id852911"></a>
+<a class="indexterm" name="id852905"></a>
+<a class="indexterm" name="id852916"></a>
+<a class="indexterm" name="id852888"></a>
+<a class="indexterm" name="id852924"></a>
+<a class="indexterm" name="id852954"></a>
+<a class="indexterm" name="id852940"></a>
 Bitwise file and directory open flags.
         </p>
 <h6>
 <a name="afio.reference.macros_flags.file_flags.h0"></a>
           <span class="phrase"><a name="afio.reference.macros_flags.file_flags.synopsis"></a></span><a class="link" href="file_flags.html#afio.reference.macros_flags.file_flags.synopsis">Synopsis</a>
         </h6>
-<pre class="programlisting"><span class="keyword">enum</span> <span class="identifier">file_flags</span> <span class="special">{</span><span class="identifier">None</span> <span class="special">=</span> <span class="number">0</span><span class="special">,</span> <span class="identifier">Read</span> <span class="special">=</span> <span class="number">1</span><span class="special">,</span> <span class="identifier">Write</span> <span class="special">=</span> <span class="number">2</span><span class="special">,</span> <span class="identifier">ReadWrite</span> <span class="special">=</span> <span class="number">3</span><span class="special">,</span> <span class="identifier">Append</span> <span class="special">=</span> <span class="number">4</span><span class="special">,</span> <span class="identifier">Truncate</span> <span class="special">=</span> <span class="number">8</span><span class="special">,</span> <span class="identifier">Create</span> <span class="special">=</span> <span class="number">16</span><span class="special">,</span> <span class="identifier">CreateOnlyIfNotExist</span> <span class="special">=</span> <span class="number">32</span><span class="special">,</span> <span class="identifier">WillBeSequentiallyAccessed</span> <span class="special">=</span> <span class="number">128</span><span class="special">,</span> <span class="identifier">WillBeRandomlyAccessed</span> <span class="special">=</span> <span class="number">256</span><span class="special">,</span> <span class="identifier">FastDirectoryEnumeration</span> <span class="special">=</span> <span class="special">(</span><span class="number">1</span><span class="special">&lt;&lt;</span><span class="number">10</span><span class="special">),</span> <span class="identifier">UniqueDirectoryHandle</span> <span class="special">=</span> <span class="special">(</span><span class="number">1</span><span class="special">&lt;&lt;</span><span class="number">11</span><span class="special">),</span> <span class="identifier">OSDirect</span> <span class="special">=</span> <span class="special">(</span><span class="number">1</span><span class="special">&lt;&lt;</span><span class="number">16</span><span class="special">),</span> <span class="identifier">AlwaysSync</span> <span class="special">=</span> <span class="special">(</span><span class="number">1</span><span class="special">&lt;&lt;</span><span class="number">24</span><span class="special">),</span> <span class="identifier">SyncOnClose</span> <span class="special">=</span> <span class="special">(</span><span class="number">1</span><span class="special">&lt;&lt;</span><span class="number">25</span><span class="special">),</span> <span class="identifier">EnforceDependencyWriteOrder</span> <span class="special">=</span> <span class="special">(</span><span class="number">1</span><span class="special">&lt;&lt;</span><span class="number">26</span><span class="special">),</span> <span class="identifier">int_opening_link</span> <span class="special">=</span> <span class="special">(</span><span class="number">1</span><span class="special">&lt;&lt;</span><span class="number">30</span><span class="special">),</span> <span class="identifier">int_opening_dir</span> <span class="special">=</span> <span class="special">(</span><span class="number">1</span><span class="special">&lt;&lt;</span><span class="number">31</span><span class="special">)};</span></pre>
+<pre class="programlisting"><span class="keyword">enum</span> <span class="identifier">file_flags</span> <span class="special">{</span><span class="identifier">None</span> <span class="special">=</span> <span class="number">0</span><span class="special">,</span> <span class="identifier">Read</span> <span class="special">=</span> <span class="number">1</span><span class="special">,</span> <span class="identifier">Write</span> <span class="special">=</span> <span class="number">2</span><span class="special">,</span> <span class="identifier">ReadWrite</span> <span class="special">=</span> <span class="number">3</span><span class="special">,</span> <span class="identifier">Append</span> <span class="special">=</span> <span class="number">4</span><span class="special">,</span> <span class="identifier">Truncate</span> <span class="special">=</span> <span class="number">8</span><span class="special">,</span> <span class="identifier">Create</span> <span class="special">=</span> <span class="number">16</span><span class="special">,</span> <span class="identifier">CreateOnlyIfNotExist</span> <span class="special">=</span> <span class="number">32</span><span class="special">,</span> <span class="identifier">WillBeSequentiallyAccessed</span> <span class="special">=</span> <span class="number">128</span><span class="special">,</span> <span class="identifier">WillBeRandomlyAccessed</span> <span class="special">=</span> <span class="number">256</span><span class="special">,</span> <span class="identifier">FastDirectoryEnumeration</span> <span class="special">=</span> <span class="special">(</span><span class="number">1</span><span class="special">&lt;&lt;</span><span class="number">10</span><span class="special">),</span> <span class="identifier">UniqueDirectoryHandle</span> <span class="special">=</span> <span class="special">(</span><span class="number">1</span><span class="special">&lt;&lt;</span><span class="number">11</span><span class="special">),</span> <span class="identifier">OSDirect</span> <span class="special">=</span> <span class="special">(</span><span class="number">1</span><span class="special">&lt;&lt;</span><span class="number">16</span><span class="special">),</span> <span class="identifier">AlwaysSync</span> <span class="special">=</span> <span class="special">(</span><span class="number">1</span><span class="special">&lt;&lt;</span><span class="number">24</span><span class="special">),</span> <span class="identifier">SyncOnClose</span> <span class="special">=</span> <span class="special">(</span><span class="number">1</span><span class="special">&lt;&lt;</span><span class="number">25</span><span class="special">),</span> <span class="identifier">EnforceDependencyWriteOrder</span> <span class="special">=</span> <span class="special">(</span><span class="number">1</span><span class="special">&lt;&lt;</span><span class="number">26</span><span class="special">),</span> <span class="identifier">int_opening_link</span> <span class="special">=</span> <span class="special">(</span><span class="number">1</span><span class="special">&lt;&lt;</span><span class="number">29</span><span class="special">),</span> <span class="identifier">int_opening_dir</span> <span class="special">=</span> <span class="special">(</span><span class="number">1</span><span class="special">&lt;&lt;</span><span class="number">30</span><span class="special">)};</span></pre>
 <h6>
 <a name="afio.reference.macros_flags.file_flags.h1"></a>
           <span class="phrase"><a name="afio.reference.macros_flags.file_flags.values"></a></span><a class="link" href="file_flags.html#afio.reference.macros_flags.file_flags.values">Values</a>

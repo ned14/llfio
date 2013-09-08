@@ -33,7 +33,7 @@
 Bitwise file and directory open flags. 
 
 [heading Synopsis]
-``enum file_flags {None = 0, Read = 1, Write = 2, ReadWrite = 3, Append = 4, Truncate = 8, Create = 16, CreateOnlyIfNotExist = 32, WillBeSequentiallyAccessed = 128, WillBeRandomlyAccessed = 256, FastDirectoryEnumeration = (1<<10), UniqueDirectoryHandle = (1<<11), OSDirect = (1<<16), AlwaysSync = (1<<24), SyncOnClose = (1<<25), EnforceDependencyWriteOrder = (1<<26), int_opening_link = (1<<30), int_opening_dir = (1<<31)};``
+``enum file_flags {None = 0, Read = 1, Write = 2, ReadWrite = 3, Append = 4, Truncate = 8, Create = 16, CreateOnlyIfNotExist = 32, WillBeSequentiallyAccessed = 128, WillBeRandomlyAccessed = 256, FastDirectoryEnumeration = (1<<10), UniqueDirectoryHandle = (1<<11), OSDirect = (1<<16), AlwaysSync = (1<<24), SyncOnClose = (1<<25), EnforceDependencyWriteOrder = (1<<26), int_opening_link = (1<<29), int_opening_dir = (1<<30)};``
 
 [heading Values]
 

@@ -50,9 +50,9 @@ This structure looks somewhat like a [^`struct stat`], and indeed it was derived
 
 
 ]]
-[[``stat_t(nullptr_t )``
+[[``stat_t(std::nullptr_t )``
 
-] [Constructs a zeroed instance. ] [[* nullptr_t]: [']:  
+] [Constructs a zeroed instance. ] [[* std::nullptr_t]: [']:  
 
 
 

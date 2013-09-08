@@ -20,6 +20,7 @@ A convenience bundle of precondition, number of items to enumerate and item patt
   std::filesystem::path glob;  // An optional shell glob by which to filter the items returned. Done kernel side on Windows, user side on POSIX. 
   size_t maxitems;             // The maximum number of items to return in this request. 
   async_io_op precondition;    // A precondition for this operation. 
+  bool restart;                // Restarts the enumeration for this open directory handle. 
 };
 ``
 
@@ -32,11 +33,13 @@ A convenience bundle of precondition, number of items to enumerate and item patt
 
 
 ]]
-[[``async_enumerate_op_req(async_io_op _precondition, size_t _maxitems, std::filesystem::path _glob = std::filesystem::path())``
+[[``async_enumerate_op_req(async_io_op _precondition, size_t _maxitems, bool _restart = true, std::filesystem::path _glob = std::filesystem::path())``
 
 ] [Constructs an instance. ] [[* async_io_op]: ['_precondition]:  The precondition for this operation. 
 
 [* size_t]: ['_maxitems]:  The maximum number of items to return in this request. 
+
+[* bool]: ['_restart]:  Restarts the enumeration for this open directory handle. 
 
 [* std::filesystem::path]: ['_glob]:  An optional shell glob by which to filter the items returned. Done kernel side on Windows, user side on POSIX. 
 

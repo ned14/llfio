@@ -34,7 +34,7 @@ A batch of op handles
 
 [heading Complexity]Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete.
 [heading Exception Model]Propagates exceptions of any input preconditions with an errored state at the point of dispatch, and throws a `std::runtime_error` if any inputs have values which could not possibly be correct. Once a batch of input ops has been verified at the point of entry as not errored, you are guaranteed that the batch is atomically scheduled as a whole, unless one of the following conditions occurs: (i) A failure to allocate memory occurs.
-[heading Example][completion_example]
+[heading Example][completion_example1]
 
 
 [endsect]
@@ -64,7 +64,7 @@ An op handle
 
 [heading Complexity]Amortised O(1) to dispatch. Amortised O(1) to complete.
 [heading Exception Model]Propagates exceptions of any input preconditions with an errored state at the point of dispatch, and throws a `std::runtime_error` if any inputs have values which could not possibly be correct. Once a batch of input ops has been verified at the point of entry as not errored, you are guaranteed that the batch is atomically scheduled as a whole, unless one of the following conditions occurs: (i) A failure to allocate memory occurs.
-[heading Example][completion_example]
+[heading Example][completion_example1]
 
 
 [endsect]

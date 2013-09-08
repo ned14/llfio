@@ -439,6 +439,18 @@ The page size of this architecture.
 
 
 ]]
+[[``void complete_async_op(size_t id, std::shared_ptr< async_io_handle > h, exception_ptr e = exception_ptr())``
+
+] [] [[* size_t]: ['id]:  
+
+[* std::shared_ptr< async_io_handle >]: ['h]:  
+
+[* exception_ptr]: ['e]:  
+
+
+
+
+]]
 [[``template<class T>
 std::vector< async_io_op > read(const std::vector< async_data_op_req< T >> & ops)``
 

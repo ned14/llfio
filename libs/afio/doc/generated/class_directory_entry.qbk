@@ -139,6 +139,12 @@ The abstract base class for an entry in a directory with lazily filled metadata.
 
 
 ]]
+[[``size_t compatibility_maximum()``
+
+] [The maximum number of entries which is "usual" to fetch at once i.e. what your libc does. ] [
+
+
+]]
 ]
 
 [heading Header]

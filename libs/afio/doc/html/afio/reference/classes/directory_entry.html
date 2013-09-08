@@ -27,7 +27,7 @@
 <a name="afio.reference.classes.directory_entry"></a><a class="link" href="directory_entry.html" title="directory_entry">directory_entry</a>
 </h4></div></div></div>
 <p>
-          <a class="indexterm" name="id890550"></a>
+          <a class="indexterm" name="id920453"></a>
 The abstract base class for an entry in a directory with lazily filled
           metadata.
         </p>
@@ -300,6 +300,19 @@ The abstract base class for an entry in a directory with lazily filled
                   <p>
                     A bitfield of what metadata is fast on this platform. This doesn't
                     mean all is available for every filing system.
+                  </p>
+                </td>
+<td>
+                </td>
+</tr>
+<tr>
+<td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">size_t</span> <span class="identifier">compatibility_maximum</span><span class="special">()</span></pre>
+                </td>
+<td>
+                  <p>
+                    The maximum number of entries which is "usual" to fetch
+                    at once i.e. what your libc does.
                   </p>
                 </td>
 <td>
