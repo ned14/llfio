@@ -856,8 +856,8 @@ public:
 		return stat;
 	}
 #define BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(field) \
-auto st_##field(std::shared_ptr<async_io_handle> dirh) -> decltype(stat.st_##field) { if(!(have_metadata&metadata_flags::field)) { _int_fetch(metadata_flags::field, dirh); } return stat.st_##field; } \
-auto st_##field() -> decltype(stat.st_##field) { if(!(have_metadata&metadata_flags::field)) { BOOST_AFIO_THROW(std::runtime_error("Field st_" #field " not present.")); } return stat.st_##field; } \
+decltype(stat_t().st_##field) st_##field() const { if(!(have_metadata&metadata_flags::field)) { BOOST_AFIO_THROW(std::runtime_error("Field st_" #field " not present.")); } return stat.st_##field; } \
+decltype(stat_t().st_##field) st_##field(std::shared_ptr<async_io_handle> dirh) { if(!(have_metadata&metadata_flags::field)) { _int_fetch(metadata_flags::field, dirh); } return stat.st_##field; }
 	//! Returns st_dev
 	BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(dev)
 	//! Returns st_ino
