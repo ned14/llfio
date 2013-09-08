@@ -14,7 +14,9 @@ Created: Feb 2013
 
 #ifdef __MINGW32__
 // Mingw doesn't define putenv() needed by Boost.Test
-extern int putenv(char*);
+extern "C" int putenv(char*);
+// Mingw doesn't define tzset() either
+extern "C" void tzset(void);
 #endif
 
 #define _CRT_SECURE_NO_WARNINGS
@@ -28,6 +30,7 @@ extern int putenv(char*);
 #include "../detail/SpookyV2.h"
 #include "../../../boost/afio/detail/Aligned_Allocator.hpp"
 #include "../../../boost/afio/detail/valgrind/memcheck.h"
+#include <time.h>
 
 //if we're building the tests all together don't define the test main
 #ifndef BOOST_AFIO_TEST_ALL
@@ -685,7 +688,7 @@ static void print_stat(std::shared_ptr<boost::afio::async_io_handle> dirh, boost
 	std::cout << " and it has the following information:" << std::endl;
 
 #define PRINT_FIELD(field) \
-    std::cout << "  st_" #field ": "; if(!!(directory_entry::metadata_supported()&metadata_flags::field)) std::cout << entry.st_##field; else std::cout << "unknown"; std::cout << std::endl
+    std::cout << "  st_" #field ": "; if(!!(direntry.metadata_ready()&metadata_flags::field)) std::cout << entry.st_##field; else std::cout << "unknown"; std::cout << std::endl
     PRINT_FIELD(dev);
     PRINT_FIELD(ino);
     PRINT_FIELD(type);

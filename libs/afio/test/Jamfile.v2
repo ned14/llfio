@@ -29,7 +29,7 @@ project boost/afio/test
       <threading>multi
       <library>/boost/afio//boost_afio
       <toolset>gcc:<cxxflags>"-std=c++0x -fvisibility-inlines-hidden -fstrict-aliasing -Wstrict-aliasing -Wno-unused -fargument-noalias -fvisibility=hidden -fopenmp -fasynchronous-unwind-tables"
-      <toolset>gcc-mingw:<cxxflags>"-DWIN32 -D_UNICODE -DUNICODE"
+      <toolset>gcc-mingw:<cxxflags>"-DWIN32 -D_UNICODE -DUNICODE -Wno-missing-braces"
       <toolset>gcc-mingw:<linkflags>"-lws2_32"
       <toolset>gcc:<linkflags>"-lgomp"
       <toolset>clang:<cxxflags>"-std=c++0x -fvisibility-inlines-hidden -fstrict-aliasing -Wstrict-aliasing -Wno-unused -fvisibility=hidden -fopenmp -fasynchronous-unwind-tables"

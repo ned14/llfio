@@ -152,13 +152,13 @@ namespace windows_nt_kernel
 #define NTSTATUS LONG
 #endif
 #ifndef STATUS_TIMEOUT
-#define STATUS_TIMEOUT 0x00000102
+#define STATUS_TIMEOUT ((NTSTATUS) 0x00000102)
 #endif
 #ifndef STATUS_PENDING
-#define STATUS_PENDING 0x00000103
+#define STATUS_PENDING ((NTSTATUS) 0x00000103)
 #endif
 #ifndef STATUS_BUFFER_OVERFLOW
-#define STATUS_BUFFER_OVERFLOW 0x80000005
+#define STATUS_BUFFER_OVERFLOW ((NTSTATUS) 0x80000005)
 #endif
 
 	// From http://msdn.microsoft.com/en-us/library/windows/hardware/ff550671(v=vs.85).aspx
@@ -469,7 +469,11 @@ namespace windows_nt_kernel
 	{
 		// We make the big assumption that the STL's system_clock is based on the time_t epoch 1st Jan 1970.
 		static BOOST_CONSTEXPR_OR_CONST unsigned long long FILETIME_OFFSET_TO_1970=(((unsigned long long)27111902 << 32) + (unsigned long long)3577643008);
-		boost::afio::chrono::duration<unsigned long long, boost::afio::ratio<1, 10000000 /* 100ns intervals per second*/>> duration(time.QuadPart - FILETIME_OFFSET_TO_1970);
+		// Need to have this self-adapt to the STL being used
+		static BOOST_CONSTEXPR_OR_CONST unsigned long long STL_TICKS_PER_SEC=(unsigned long long) boost::afio::chrono::system_clock::period::den/boost::afio::chrono::system_clock::period::num;
+
+		unsigned long long ticks_since_1970=(time.QuadPart - FILETIME_OFFSET_TO_1970); // In 100ns increments
+		boost::afio::chrono::system_clock::duration duration(ticks_since_1970/(10000000ULL/STL_TICKS_PER_SEC));
 		return boost::afio::chrono::system_clock::time_point(duration);
 	}
 
@@ -496,12 +500,7 @@ static inline bool wintruncate(HANDLE h, boost::afio::off_t newsize)
 	windows_nt_kernel::init();
 	using namespace windows_nt_kernel;
 	IO_STATUS_BLOCK isb={ 0 };
-	if(0/*STATUS_SUCCESS*/!=NtSetInformationFile(h, &isb, &newsize, sizeof(newsize), FileEndOfFileInformation))
-	{
-		// Fake the probable Win32 error
-		SetLastError(ERROR_DISK_FULL);
-		return false;
-	}
+	BOOST_AFIO_ERRHNT(NtSetInformationFile(h, &isb, &newsize, sizeof(newsize), FileEndOfFileInformation));
 	return true;
 }
 static inline int winftruncate(int fd, boost::afio::off_t _newsize)
@@ -558,8 +557,10 @@ static inline void fill_stat_t(boost::afio::stat_t &stat, BOOST_AFIO_POSIX_STAT_
 
 static inline boost::afio::chrono::system_clock::time_point to_timepoint(struct timespec ts)
 {
+	// Need to have this self-adapt to the STL being used
+	static BOOST_CONSTEXPR_OR_CONST unsigned long long STL_TICKS_PER_SEC=(unsigned long long) boost::afio::chrono::system_clock::period::den/boost::afio::chrono::system_clock::period::num;
 	// We make the big assumption that the STL's system_clock is based on the time_t epoch 1st Jan 1970.
-	boost::afio::chrono::duration<unsigned long long, boost::afio::ratio<1, 1000000>> duration(ts.tv_sec*1000000ULL+ts.tv_nsec/1000);
+	boost::afio::chrono::system_clock::duration duration(ts.tv_sec*STL_TICKS_PER_SEC+ts.tv_nsec/(1000000000ULL/STL_TICKS_PER_SEC));
 	return boost::afio::chrono::system_clock::time_point(duration);
 }
 static inline void fill_stat_t(boost::afio::stat_t &stat, BOOST_AFIO_POSIX_STAT_STRUCT s, boost::afio::metadata_flags wanted)
@@ -805,6 +806,7 @@ namespace detail {
 				return std::filesystem::path();
 			windows_nt_kernel::init();
 			using namespace windows_nt_kernel;
+			using windows_nt_kernel::REPARSE_DATA_BUFFER;
 			char buffer[sizeof(REPARSE_DATA_BUFFER)+32769];
 			DWORD written=0;
 			REPARSE_DATA_BUFFER *rpd=(REPARSE_DATA_BUFFER *) buffer;
@@ -863,7 +865,7 @@ namespace detail {
 		}
 		virtual std::filesystem::path target() const
 		{
-#ifdef _MSC_VER
+#ifdef WIN32
 			return std::filesystem::path();
 #else
 			if(!opened_as_symlink())
@@ -2027,6 +2029,8 @@ namespace detail {
 	class async_file_io_dispatcher_windows : public async_file_io_dispatcher_base
 	{
 		friend class directory_entry;
+		friend void directory_entry::_int_fetch(metadata_flags wanted, std::shared_ptr<async_io_handle> dirh);
+
 		size_t pagesize;
 		// Called in unknown thread
 		completion_returntype dodir(size_t id, std::shared_ptr<async_io_handle> _, exception_ptr *e, async_path_op_req req)
@@ -2169,6 +2173,7 @@ namespace detail {
 				// Create a directory junction
 				windows_nt_kernel::init();
 				using namespace windows_nt_kernel;
+				using windows_nt_kernel::REPARSE_DATA_BUFFER;
 				// First we need a new directory with write access
 				req.flags=req.flags|file_flags::Write;
 				completion_returntype ret=dodir(id, h, e, req);
