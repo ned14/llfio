@@ -45,6 +45,8 @@
 
 [import ../test/examples/current_exception_hack.cpp]
 [import ../test/examples/call_example.cpp]
+[import ../test/examples/closure_execution_afio_io_example.cpp]
+[import ../test/examples/closure_execution_traditional_io_example.cpp]
 
 [section:introduction Introduction]
 __boost_afio__ is a linear scalable, batch, chainable, asynchronous closure execution engine extending __boost_asio__
