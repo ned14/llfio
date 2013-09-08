@@ -2936,13 +2936,7 @@ namespace detail {
 					std::filesystem::path::string_type leafname(dent->d_name, length);
 					item.leafname=std::move(leafname);
 					item.stat.st_ino=dent->d_ino;
-					char d_type=
-#ifdef __linux__
-							*((char *) dent + dent->d_reclen - 1)
-#else
-							dent->d_type
-#endif
-							;
+					char d_type=dent->d_type;
 					if(DT_UNKNOWN==d_type)
 						item.have_metadata=item.have_metadata&~metadata_flags::type;
 					else
