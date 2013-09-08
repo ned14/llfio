@@ -2933,7 +2933,7 @@ namespace detail {
 				done=false;
 				for(dirent *dent=buffer.get(); !done; dent=(dirent *)((size_t) dent + dent->d_reclen))
 				{
-					if(!(bytes-=dent->d_reclen)) done=true;
+					if((bytes-=dent->d_reclen)<=0) done=true;
 					if(!dent->d_ino)
 						continue;
 					size_t length=strchr(dent->d_name, 0)-dent->d_name;
