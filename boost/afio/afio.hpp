@@ -84,7 +84,7 @@ namespace detail { struct vs2010_lack_of_decent_current_exception_support_hack_t
 inline boost::exception_ptr current_exception() { boost::exception_ptr ret=boost::current_exception(); return (ret==detail::vs2010_lack_of_decent_current_exception_support_hack()) ? boost::exception_ptr() : ret; }
 #define BOOST_AFIO_NEED_CURRENT_EXCEPTION_HACK
 #else
-inline boost::exception_ptr current_exception() { boost::current_exception(); }
+inline boost::exception_ptr current_exception() { return boost::current_exception(); }
 #endif
 #define BOOST_AFIO_THROW(x) boost::throw_exception(boost::enable_current_exception(x))
 #define BOOST_AFIO_RETHROW throw
