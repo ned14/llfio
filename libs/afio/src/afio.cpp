@@ -1249,7 +1249,7 @@ size_t directory_entry::compatibility_maximum() BOOST_NOEXCEPT_OR_NOTHROW
 	return 100000;
 #else
 	// This is what glibc uses, a 32Kb buffer, and it's what OpenVZ appears to assume.
-	return 32768/sizeof(dirent64);
+	return 32768/sizeof(dirent);
 #endif
 }
 
@@ -2890,9 +2890,10 @@ namespace detail {
 #ifdef __linux__
 				// Unlike FreeBSD, Linux doesn't define a getdents() function, so we'll do that here.
 				typedef int (*getdents64_t)(int, char *, int);
-				getdents64_t getdents64=(getdents64_t)([](int fd, char *buf, int count) -> int { return syscall(SYS_getdents64, fd, buf, count); });
+				getdents64_t getdents=(getdents64_t)([](int fd, char *buf, int count) -> int { return syscall(SYS_getdents64, fd, buf, count); });
+				typedef dirent64 dirent;
 #endif
-				auto buffer=std::unique_ptr<dirent64[]>(new dirent64[req.maxitems]);
+				auto buffer=std::unique_ptr<dirent[]>(new dirent[req.maxitems]);
 				if(req.restart)
 				{
 					BOOST_AFIO_ERRHOS(lseek64(p->fd, 0, SEEK_SET));
@@ -2901,11 +2902,11 @@ namespace detail {
 				bool done;
 				do
 				{
-					bytes=getdents64(p->fd, (char *) buffer.get(), sizeof(dirent64)*req.maxitems);
+					bytes=getdents64(p->fd, (char *) buffer.get(), sizeof(dirent)*req.maxitems);
 					if(-1==bytes && EINVAL==errno)
 					{
 						req.maxitems++;
-						buffer=std::unique_ptr<dirent64[]>(new dirent64[req.maxitems]);
+						buffer=std::unique_ptr<dirent[]>(new dirent[req.maxitems]);
 						done=false;
 					}
 					else done=true;
@@ -2917,14 +2918,14 @@ namespace detail {
 					return std::make_pair(true, h);
 				}
 				VALGRIND_MAKE_MEM_DEFINED_IF_ADDRESSABLE(buffer.get(), bytes);
-				bool thisbatchdone=(sizeof(dirent64)*req.maxitems-bytes)>sizeof(dirent64);
+				bool thisbatchdone=(sizeof(dirent)*req.maxitems-bytes)>sizeof(dirent);
 				std::vector<directory_entry> _ret;
 				_ret.reserve(req.maxitems);
 				directory_entry item;
 				// This is what POSIX returns with getdents()
 				item.have_metadata=item.have_metadata|metadata_flags::ino|metadata_flags::type;
 				done=false;
-				for(dirent64 *dent=buffer.get(); !done; dent=(dirent64 *)((size_t) dent + dent->d_reclen))
+				for(dirent *dent=buffer.get(); !done; dent=(dirent *)((size_t) dent + dent->d_reclen))
 				{
 					if((bytes-=dent->d_reclen)<=0) done=true;
 					if(!dent->d_ino)
