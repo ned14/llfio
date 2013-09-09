@@ -1411,6 +1411,11 @@ public:
 	to either set maxitems to a value large enough to guarantee a directory will be enumerated in a single
 	shot, or to open a separate directory handle using the file_flags::UniqueDirectoryHandle flag.
 
+	Note that setting maxitems=1 will often cause a buffer space exhaustion, causing a second syscall
+	with an enlarged buffer. This is because AFIO can't know if the allocated buffer can hold all of
+	the filename being retrieved, so it may have to retry. Put another way, setting maxitems=1 will
+	give you the worst performance possible.
+
     \return A batch of future vectors of directory entries with boolean returning false if done.
     \param reqs A batch of enumeration requests.
     \ingroup async_file_io_dispatcher_base__enumerate
@@ -1426,6 +1431,11 @@ public:
 	handle, and therefore enumerating not all of the entries at once is a race condition. The solution is
 	to either set maxitems to a value large enough to guarantee a directory will be enumerated in a single
 	shot, or to open a separate directory handle using the file_flags::UniqueDirectoryHandle flag.
+
+	Note that setting maxitems=1 will often cause a buffer space exhaustion, causing a second syscall
+	with an enlarged buffer. This is because AFIO can't know if the allocated buffer can hold all of
+	the filename being retrieved, so it may have to retry. Put another way, setting maxitems=1 will
+	give you the worst performance possible.
 	
     \return A future vector of directory entries with a boolean returning false if done.
     \param req An enumeration request.
@@ -2199,7 +2209,7 @@ template<class C, class T, class A> struct async_data_op_req<const std::basic_st
 struct async_enumerate_op_req
 {
 	async_io_op precondition;    //!< A precondition for this operation.
-	size_t maxitems;             //!< The maximum number of items to return in this request.
+	size_t maxitems;             //!< The maximum number of items to return in this request. Note that setting to one will often invoke two syscalls.
 	bool restart;                //!< Restarts the enumeration for this open directory handle.
 	std::filesystem::path glob;  //!< An optional shell glob by which to filter the items returned. Done kernel side on Windows, user side on POSIX.
     //! \constr
@@ -2207,7 +2217,7 @@ struct async_enumerate_op_req
 	/*! \brief Constructs an instance.
     
     \param _precondition The precondition for this operation.
-    \param _maxitems The maximum number of items to return in this request.
+    \param _maxitems The maximum number of items to return in this request. Note that setting to one will often invoke two syscalls.
     \param _restart Restarts the enumeration for this open directory handle.
     \param _glob An optional shell glob by which to filter the items returned. Done kernel side on Windows, user side on POSIX.
     */
