@@ -1,13 +1,13 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
-<title>detail::async_io_handle</title>
+<title>async_io_handle</title>
 <link rel="stylesheet" href="../../../myboostbook.css" type="text/css">
 <meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
 <link rel="home" href="../../../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 0.1">
 <link rel="up" href="../classes.html" title="Classes">
 <link rel="prev" href="async_file_io_dispatcher_base/page_size.html" title="page_size">
-<link rel="next" href="thread_source.html" title="thread_source">
+<link rel="next" href="directory_entry.html" title="directory_entry">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
 <table cellpadding="2" width="100%"><tr>
@@ -20,29 +20,29 @@
 </tr></table>
 <hr>
 <div class="spirit-nav">
-<a accesskey="p" href="async_file_io_dispatcher_base/page_size.html"><img src="../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../classes.html"><img src="../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="thread_source.html"><img src="../../../../../doc/src/images/next.png" alt="Next"></a>
+<a accesskey="p" href="async_file_io_dispatcher_base/page_size.html"><img src="../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../classes.html"><img src="../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="directory_entry.html"><img src="../../../../../doc/src/images/next.png" alt="Next"></a>
 </div>
 <div class="section">
 <div class="titlepage"><div><div><h4 class="title">
-<a name="afio.reference.classes.detail_async_io_handle"></a><a class="link" href="detail_async_io_handle.html" title="detail::async_io_handle">detail::async_io_handle</a>
+<a name="afio.reference.classes.async_io_handle"></a><a class="link" href="async_io_handle.html" title="async_io_handle">async_io_handle</a>
 </h4></div></div></div>
 <p>
-          <a class="indexterm" name="id890953"></a><a class="indexterm" name="id890957"></a>
+          <a class="indexterm" name="id916931"></a>
 The abstract base class encapsulating a platform-specific file handle.
         </p>
 <h6>
-<a name="afio.reference.classes.detail_async_io_handle.h0"></a>
-          <span class="phrase"><a name="afio.reference.classes.detail_async_io_handle.synopsis"></a></span><a class="link" href="detail_async_io_handle.html#afio.reference.classes.detail_async_io_handle.synopsis">Synopsis</a>
+<a name="afio.reference.classes.async_io_handle.h0"></a>
+          <span class="phrase"><a name="afio.reference.classes.async_io_handle.synopsis"></a></span><a class="link" href="async_io_handle.html#afio.reference.classes.async_io_handle.synopsis">Synopsis</a>
         </h6>
-<pre class="programlisting"><span class="keyword">class</span> <span class="identifier">detail</span><span class="special">::</span><span class="identifier">async_io_handle</span>
+<pre class="programlisting"><span class="keyword">class</span> <span class="identifier">async_io_handle</span>
       <span class="special">:</span> <span class="keyword">public</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">enable_shared_from_this</span><span class="special">&lt;</span> <span class="identifier">async_io_handle</span> <span class="special">&gt;</span>
 <span class="special">{</span>
   <span class="comment">// ...</span>
 <span class="special">};</span>
 </pre>
 <h6>
-<a name="afio.reference.classes.detail_async_io_handle.h1"></a>
-          <span class="phrase"><a name="afio.reference.classes.detail_async_io_handle.constructor_s"></a></span><a class="link" href="detail_async_io_handle.html#afio.reference.classes.detail_async_io_handle.constructor_s">Constructor(s)</a>
+<a name="afio.reference.classes.async_io_handle.h1"></a>
+          <span class="phrase"><a name="afio.reference.classes.async_io_handle.constructor_s"></a></span><a class="link" href="async_io_handle.html#afio.reference.classes.async_io_handle.constructor_s">Constructor(s)</a>
         </h6>
 <div class="informaltable"><table class="table">
 <colgroup>
@@ -78,8 +78,8 @@ The abstract base class encapsulating a platform-specific file handle.
 </tr></tbody>
 </table></div>
 <h6>
-<a name="afio.reference.classes.detail_async_io_handle.h2"></a>
-          <span class="phrase"><a name="afio.reference.classes.detail_async_io_handle.member_function_s"></a></span><a class="link" href="detail_async_io_handle.html#afio.reference.classes.detail_async_io_handle.member_function_s">Member
+<a name="afio.reference.classes.async_io_handle.h2"></a>
+          <span class="phrase"><a name="afio.reference.classes.async_io_handle.member_function_s"></a></span><a class="link" href="async_io_handle.html#afio.reference.classes.async_io_handle.member_function_s">Member
           Function(s)</a>
         </h6>
 <div class="informaltable"><table class="table">
@@ -118,6 +118,20 @@ The abstract base class encapsulating a platform-specific file handle.
 <td>
                   <p>
                     Returns the parent of this io handle.
+                  </p>
+                </td>
+<td>
+                </td>
+</tr>
+<tr>
+<td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span> <span class="identifier">async_io_handle</span> <span class="special">&gt;</span> <span class="identifier">container</span><span class="special">()</span></pre>
+                </td>
+<td>
+                  <p>
+                    Returns a handle to the directory containing this handle. Only
+                    works if <code class="literal"><code class="computeroutput"><span class="identifier">file_flags</span><span class="special">::</span><span class="identifier">FastDirectoryEnumeration</span></code></code>
+                    was specified when this handle was opened.
                   </p>
                 </td>
 <td>
@@ -177,6 +191,42 @@ The abstract base class encapsulating a platform-specific file handle.
 </tr>
 <tr>
 <td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="keyword">bool</span> <span class="identifier">opened_as_file</span><span class="special">()</span></pre>
+                </td>
+<td>
+                  <p>
+                    True if this handle was opened as a file.
+                  </p>
+                </td>
+<td>
+                </td>
+</tr>
+<tr>
+<td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="keyword">bool</span> <span class="identifier">opened_as_dir</span><span class="special">()</span></pre>
+                </td>
+<td>
+                  <p>
+                    True if this handle was opened as a directory.
+                  </p>
+                </td>
+<td>
+                </td>
+</tr>
+<tr>
+<td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="keyword">bool</span> <span class="identifier">opened_as_symlink</span><span class="special">()</span></pre>
+                </td>
+<td>
+                  <p>
+                    True if this handle was opened as a symlink.
+                  </p>
+                </td>
+<td>
+                </td>
+</tr>
+<tr>
+<td>
 <pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">off_t</span> <span class="identifier">read_count</span><span class="special">()</span></pre>
                 </td>
 <td>
@@ -213,11 +263,59 @@ The abstract base class encapsulating a platform-specific file handle.
 <td>
                 </td>
 </tr>
+<tr>
+<td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">stat_t</span> <span class="identifier">lstat</span><span class="special">(</span><span class="identifier">metadata_flags</span> <span class="identifier">wanted</span> <span class="special">=</span> <span class="identifier">directory_entry</span><span class="special">::</span><span class="identifier">metadata_fastpath</span><span class="special">())</span></pre>
+                </td>
+<td>
+                  <p>
+                    Returns a mostly filled stat_t structure for the file or directory
+                    referenced by this handle. Use <code class="literal"><code class="computeroutput"><span class="identifier">metadata_flags</span><span class="special">::</span><span class="identifier">All</span></code></code>
+                    if you want it as complete as your platform allows, even at the
+                    cost of severe performance loss.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <span class="bold"><strong>metadata_flags</strong></span>: <span class="emphasis"><em>wanted</em></span>:
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">directory_entry</span> <span class="identifier">direntry</span><span class="special">(</span><span class="identifier">metadata_flags</span> <span class="identifier">wanted</span> <span class="special">=</span> <span class="identifier">directory_entry</span><span class="special">::</span><span class="identifier">metadata_fastpath</span><span class="special">())</span></pre>
+                </td>
+<td>
+                  <p>
+                    Returns a mostly filled directory_entry for the file or directory
+                    referenced by this handle. Use <code class="literal"><code class="computeroutput"><span class="identifier">metadata_flags</span><span class="special">::</span><span class="identifier">All</span></code></code>
+                    if you want it as complete as your platform allows, even at the
+                    cost of severe performance loss.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <span class="bold"><strong>metadata_flags</strong></span>: <span class="emphasis"><em>wanted</em></span>:
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">std</span><span class="special">::</span><span class="identifier">filesystem</span><span class="special">::</span><span class="identifier">path</span> <span class="identifier">target</span><span class="special">()</span></pre>
+                </td>
+<td>
+                  <p>
+                    Returns the target path of this handle if it is a symbolic link.
+                  </p>
+                </td>
+<td>
+                </td>
+</tr>
 </tbody>
 </table></div>
 <h6>
-<a name="afio.reference.classes.detail_async_io_handle.h3"></a>
-          <span class="phrase"><a name="afio.reference.classes.detail_async_io_handle.header"></a></span><a class="link" href="detail_async_io_handle.html#afio.reference.classes.detail_async_io_handle.header">Header</a>
+<a name="afio.reference.classes.async_io_handle.h3"></a>
+          <span class="phrase"><a name="afio.reference.classes.async_io_handle.header"></a></span><a class="link" href="async_io_handle.html#afio.reference.classes.async_io_handle.header">Header</a>
         </h6>
 <p>
           <code class="computeroutput"><span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">boost</span><span class="special">/</span><span class="identifier">afio</span><span class="special">/</span><span class="identifier">afio</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span></code>
@@ -233,7 +331,7 @@ The abstract base class encapsulating a platform-specific file handle.
 </tr></table>
 <hr>
 <div class="spirit-nav">
-<a accesskey="p" href="async_file_io_dispatcher_base/page_size.html"><img src="../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../classes.html"><img src="../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="thread_source.html"><img src="../../../../../doc/src/images/next.png" alt="Next"></a>
+<a accesskey="p" href="async_file_io_dispatcher_base/page_size.html"><img src="../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../classes.html"><img src="../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="directory_entry.html"><img src="../../../../../doc/src/images/next.png" alt="Next"></a>
 </div>
 </body>
 </html>

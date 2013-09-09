@@ -2,7 +2,7 @@
 
 > ${0%/*}/test_cpps.txt
 
-for filename in ${0%/*}/tests/*_test.cpp
+for filename in ${0%/*}/tests/*.cpp
 do
     echo "#include \"${filename##${0%/*}/}\""  >> ${0%/*}/test_cpps.txt
 done

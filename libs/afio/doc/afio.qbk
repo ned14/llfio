@@ -47,6 +47,8 @@
 [import ../test/examples/call_example.cpp]
 [import ../test/examples/closure_execution_afio_io_example.cpp]
 [import ../test/examples/closure_execution_traditional_io_example.cpp]
+[import ../test/examples/completion_example1.cpp]
+[import ../test/examples/completion_example2.cpp]
 
 [section:introduction Introduction]
 __boost_afio__ is a linear scalable, batch, chainable, asynchronous closure execution engine extending __boost_asio__
@@ -71,7 +73,7 @@ v3.0). You may find the list of C++11 features in popular compilers at
 [@http://wiki.apache.org/stdcxx/C++0xCompilerSupport] useful. Similarly, just because a compiler
 will compile the code does not mean that programming using that compiler and __boost_afio__
 isn't a waste of your time. In particular, you should [*avoid VS2010 and Mingw32 (not Mingw-w64
-which is fine) if at all possible], but if you can't, [link afio.vs2010_notes we have written a guide especially for VS2010 and Mingw32].
+which is fine) if at all possible], but if you can't, [link afio.advanced_topics.vs2010_notes we have written a guide especially for VS2010 and Mingw32].
 
 As a very quick example of minimal usage:
 
@@ -85,7 +87,7 @@ As a very quick example of minimal usage:
 [include compiling.qbk]
 [include quickstart.qbk]
 [include reference.qbk]
-[include vs2010_notes.qbk]
+[include advanced_topics.qbk]
 [include release_notes.qbk]
 [include acknowledgments.qbk]
 

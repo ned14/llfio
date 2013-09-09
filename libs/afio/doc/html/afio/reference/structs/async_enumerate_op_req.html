@@ -1,0 +1,184 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>async_enumerate_op_req</title>
+<link rel="stylesheet" href="../../../myboostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../../../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 0.1">
+<link rel="up" href="../structs.html" title="Structures">
+<link rel="prev" href="async_data_op_req/async_data_op_req_void_.html" title="async_data_op_req&lt; void &gt;">
+<link rel="next" href="async_io_op.html" title="async_io_op">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr>
+<td valign="top"><img alt="Boost C++ Libraries" width="277" height="86" src="../../../../../boost.png"></td>
+<td align="center"><a href="../../../../../index.html">Home</a></td>
+<td align="center"><a href="../../../../../libs/libraries.htm">Libraries</a></td>
+<td align="center"><a href="http://www.boost.org/users/people.html">People</a></td>
+<td align="center"><a href="http://www.boost.org/users/faq.html">FAQ</a></td>
+<td align="center"><a href="../../../../../more/index.htm">More</a></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="async_data_op_req/async_data_op_req_void_.html"><img src="../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../structs.html"><img src="../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="async_io_op.html"><img src="../../../../../doc/src/images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h4 class="title">
+<a name="afio.reference.structs.async_enumerate_op_req"></a><a class="link" href="async_enumerate_op_req.html" title="async_enumerate_op_req">async_enumerate_op_req</a>
+</h4></div></div></div>
+<p>
+          <a class="indexterm" name="id873820"></a>
+A convenience bundle of precondition, number of items to enumerate and
+          item pattern match.
+        </p>
+<h6>
+<a name="afio.reference.structs.async_enumerate_op_req.h0"></a>
+          <span class="phrase"><a name="afio.reference.structs.async_enumerate_op_req.synopsis"></a></span><a class="link" href="async_enumerate_op_req.html#afio.reference.structs.async_enumerate_op_req.synopsis">Synopsis</a>
+        </h6>
+<pre class="programlisting"><span class="keyword">struct</span> <span class="identifier">async_enumerate_op_req</span>
+<span class="special">{</span>
+  <span class="identifier">std</span><span class="special">::</span><span class="identifier">filesystem</span><span class="special">::</span><span class="identifier">path</span> <span class="identifier">glob</span><span class="special">;</span>  <span class="comment">// An optional shell glob by which to filter the items returned. Done kernel side on Windows, user side on POSIX. </span>
+  <span class="identifier">size_t</span> <span class="identifier">maxitems</span><span class="special">;</span>             <span class="comment">// The maximum number of items to return in this request. </span>
+  <span class="identifier">async_io_op</span> <span class="identifier">precondition</span><span class="special">;</span>    <span class="comment">// A precondition for this operation. </span>
+  <span class="keyword">bool</span> <span class="identifier">restart</span><span class="special">;</span>                <span class="comment">// Restarts the enumeration for this open directory handle. </span>
+<span class="special">};</span>
+</pre>
+<h6>
+<a name="afio.reference.structs.async_enumerate_op_req.h1"></a>
+          <span class="phrase"><a name="afio.reference.structs.async_enumerate_op_req.constructor_s"></a></span><a class="link" href="async_enumerate_op_req.html#afio.reference.structs.async_enumerate_op_req.constructor_s">Constructor(s)</a>
+        </h6>
+<div class="informaltable"><table class="table">
+<colgroup>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                  <p>
+                    Function
+                  </p>
+                </th>
+<th>
+                  <p>
+                    Description
+                  </p>
+                </th>
+<th>
+                  <p>
+                    Parameters
+                  </p>
+                </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">async_enumerate_op_req</span><span class="special">()</span></pre>
+                </td>
+<td>
+                  <p>
+                    Default constructor.
+                  </p>
+                </td>
+<td>
+                </td>
+</tr>
+<tr>
+<td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">async_enumerate_op_req</span><span class="special">(</span><span class="identifier">async_io_op</span> <span class="identifier">_precondition</span><span class="special">,</span> <span class="identifier">size_t</span> <span class="identifier">_maxitems</span><span class="special">,</span> <span class="keyword">bool</span> <span class="identifier">_restart</span> <span class="special">=</span> <span class="keyword">true</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">filesystem</span><span class="special">::</span><span class="identifier">path</span> <span class="identifier">_glob</span> <span class="special">=</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">filesystem</span><span class="special">::</span><span class="identifier">path</span><span class="special">())</span></pre>
+                </td>
+<td>
+                  <p>
+                    Constructs an instance.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <span class="bold"><strong>async_io_op</strong></span>: <span class="emphasis"><em>_precondition</em></span>:
+                    The precondition for this operation.
+                  </p>
+                  <p>
+                    <span class="bold"><strong>size_t</strong></span>: <span class="emphasis"><em>_maxitems</em></span>:
+                    The maximum number of items to return in this request.
+                  </p>
+                  <p>
+                    <span class="bold"><strong>bool</strong></span>: <span class="emphasis"><em>_restart</em></span>:
+                    Restarts the enumeration for this open directory handle.
+                  </p>
+                  <p>
+                    <span class="bold"><strong>std::filesystem::path</strong></span>: <span class="emphasis"><em>_glob</em></span>:
+                    An optional shell glob by which to filter the items returned.
+                    Done kernel side on Windows, user side on POSIX.
+                  </p>
+                </td>
+</tr>
+</tbody>
+</table></div>
+<h6>
+<a name="afio.reference.structs.async_enumerate_op_req.h2"></a>
+          <span class="phrase"><a name="afio.reference.structs.async_enumerate_op_req.member_function_s"></a></span><a class="link" href="async_enumerate_op_req.html#afio.reference.structs.async_enumerate_op_req.member_function_s">Member
+          Function(s)</a>
+        </h6>
+<div class="informaltable"><table class="table">
+<colgroup>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                  <p>
+                    Function
+                  </p>
+                </th>
+<th>
+                  <p>
+                    Description
+                  </p>
+                </th>
+<th>
+                  <p>
+                    Parameters
+                  </p>
+                </th>
+<th>
+                  <p>
+                    Returns
+                  </p>
+                </th>
+</tr></thead>
+<tbody><tr>
+<td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="keyword">bool</span> <span class="identifier">validate</span><span class="special">()</span></pre>
+                </td>
+<td>
+                  <p>
+                    Validates contents.
+                  </p>
+                </td>
+<td>
+                </td>
+</tr></tbody>
+</table></div>
+<h6>
+<a name="afio.reference.structs.async_enumerate_op_req.h3"></a>
+          <span class="phrase"><a name="afio.reference.structs.async_enumerate_op_req.header"></a></span><a class="link" href="async_enumerate_op_req.html#afio.reference.structs.async_enumerate_op_req.header">Header</a>
+        </h6>
+<p>
+          <code class="computeroutput"><span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">boost</span><span class="special">/</span><span class="identifier">afio</span><span class="special">/</span><span class="identifier">afio</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span></code>
+        </p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2013 Niall Douglas and Paul Kirth<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="async_data_op_req/async_data_op_req_void_.html"><img src="../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../structs.html"><img src="../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="async_io_op.html"><img src="../../../../../doc/src/images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

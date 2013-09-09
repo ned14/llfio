@@ -1,0 +1,344 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>directory_entry</title>
+<link rel="stylesheet" href="../../../myboostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../../../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 0.1">
+<link rel="up" href="../classes.html" title="Classes">
+<link rel="prev" href="async_io_handle.html" title="async_io_handle">
+<link rel="next" href="thread_source.html" title="thread_source">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr>
+<td valign="top"><img alt="Boost C++ Libraries" width="277" height="86" src="../../../../../boost.png"></td>
+<td align="center"><a href="../../../../../index.html">Home</a></td>
+<td align="center"><a href="../../../../../libs/libraries.htm">Libraries</a></td>
+<td align="center"><a href="http://www.boost.org/users/people.html">People</a></td>
+<td align="center"><a href="http://www.boost.org/users/faq.html">FAQ</a></td>
+<td align="center"><a href="../../../../../more/index.htm">More</a></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="async_io_handle.html"><img src="../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../classes.html"><img src="../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="thread_source.html"><img src="../../../../../doc/src/images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h4 class="title">
+<a name="afio.reference.classes.directory_entry"></a><a class="link" href="directory_entry.html" title="directory_entry">directory_entry</a>
+</h4></div></div></div>
+<p>
+          <a class="indexterm" name="id920453"></a>
+The abstract base class for an entry in a directory with lazily filled
+          metadata.
+        </p>
+<h6>
+<a name="afio.reference.classes.directory_entry.h0"></a>
+          <span class="phrase"><a name="afio.reference.classes.directory_entry.synopsis"></a></span><a class="link" href="directory_entry.html#afio.reference.classes.directory_entry.synopsis">Synopsis</a>
+        </h6>
+<pre class="programlisting"><span class="keyword">class</span> <span class="identifier">directory_entry</span>
+<span class="special">{</span>
+  <span class="comment">// ...</span>
+<span class="special">};</span>
+</pre>
+<h6>
+<a name="afio.reference.classes.directory_entry.h1"></a>
+          <span class="phrase"><a name="afio.reference.classes.directory_entry.constructor_s"></a></span><a class="link" href="directory_entry.html#afio.reference.classes.directory_entry.constructor_s">Constructor(s)</a>
+        </h6>
+<div class="informaltable"><table class="table">
+<colgroup>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                  <p>
+                    Function
+                  </p>
+                </th>
+<th>
+                  <p>
+                    Description
+                  </p>
+                </th>
+<th>
+                  <p>
+                    Parameters
+                  </p>
+                </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">directory_entry</span><span class="special">()</span></pre>
+                </td>
+<td>
+                  <p>
+                    Default constructor.
+                  </p>
+                </td>
+<td>
+                </td>
+</tr>
+<tr>
+<td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">directory_entry</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">filesystem</span><span class="special">::</span><span class="identifier">path</span> <span class="identifier">_leafname</span><span class="special">,</span> <span class="identifier">stat_t</span> <span class="identifier">__stat</span><span class="special">,</span> <span class="identifier">metadata_flags</span> <span class="identifier">_have_metadata</span><span class="special">)</span></pre>
+                </td>
+<td>
+                  <p>
+                    Default constructor.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <span class="bold"><strong>std::filesystem::path</strong></span>: <span class="emphasis"><em>_leafname</em></span>:
+                  </p>
+                  <p>
+                    <span class="bold"><strong>stat_t</strong></span>: <span class="emphasis"><em>__stat</em></span>:
+                  </p>
+                  <p>
+                    <span class="bold"><strong>metadata_flags</strong></span>: <span class="emphasis"><em>_have_metadata</em></span>:
+                  </p>
+                </td>
+</tr>
+</tbody>
+</table></div>
+<h6>
+<a name="afio.reference.classes.directory_entry.h2"></a>
+          <span class="phrase"><a name="afio.reference.classes.directory_entry.member_function_s"></a></span><a class="link" href="directory_entry.html#afio.reference.classes.directory_entry.member_function_s">Member
+          Function(s)</a>
+        </h6>
+<div class="informaltable"><table class="table">
+<colgroup>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                  <p>
+                    Function
+                  </p>
+                </th>
+<th>
+                  <p>
+                    Description
+                  </p>
+                </th>
+<th>
+                  <p>
+                    Parameters
+                  </p>
+                </th>
+<th>
+                  <p>
+                    Returns
+                  </p>
+                </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="keyword">bool</span> <span class="keyword">operator</span><span class="special">==(</span><span class="keyword">const</span> <span class="identifier">directory_entry</span> <span class="special">&amp;</span> <span class="identifier">rhs</span><span class="special">)</span></pre>
+                </td>
+<td>
+                </td>
+<td>
+                  <p>
+                    <span class="bold"><strong>const directory_entry &amp;</strong></span>:
+                    <span class="emphasis"><em>rhs</em></span>:
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="keyword">bool</span> <span class="keyword">operator</span><span class="special">!=(</span><span class="keyword">const</span> <span class="identifier">directory_entry</span> <span class="special">&amp;</span> <span class="identifier">rhs</span><span class="special">)</span></pre>
+                </td>
+<td>
+                </td>
+<td>
+                  <p>
+                    <span class="bold"><strong>const directory_entry &amp;</strong></span>:
+                    <span class="emphasis"><em>rhs</em></span>:
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="keyword">bool</span> <span class="keyword">operator</span><span class="special">&lt;(</span><span class="keyword">const</span> <span class="identifier">directory_entry</span> <span class="special">&amp;</span> <span class="identifier">rhs</span><span class="special">)</span></pre>
+                </td>
+<td>
+                </td>
+<td>
+                  <p>
+                    <span class="bold"><strong>const directory_entry &amp;</strong></span>:
+                    <span class="emphasis"><em>rhs</em></span>:
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="keyword">bool</span> <span class="keyword">operator</span><span class="special">&lt;=(</span><span class="keyword">const</span> <span class="identifier">directory_entry</span> <span class="special">&amp;</span> <span class="identifier">rhs</span><span class="special">)</span></pre>
+                </td>
+<td>
+                </td>
+<td>
+                  <p>
+                    <span class="bold"><strong>const directory_entry &amp;</strong></span>:
+                    <span class="emphasis"><em>rhs</em></span>:
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="keyword">bool</span> <span class="keyword">operator</span><span class="special">&gt;(</span><span class="keyword">const</span> <span class="identifier">directory_entry</span> <span class="special">&amp;</span> <span class="identifier">rhs</span><span class="special">)</span></pre>
+                </td>
+<td>
+                </td>
+<td>
+                  <p>
+                    <span class="bold"><strong>const directory_entry &amp;</strong></span>:
+                    <span class="emphasis"><em>rhs</em></span>:
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="keyword">bool</span> <span class="keyword">operator</span><span class="special">&gt;=(</span><span class="keyword">const</span> <span class="identifier">directory_entry</span> <span class="special">&amp;</span> <span class="identifier">rhs</span><span class="special">)</span></pre>
+                </td>
+<td>
+                </td>
+<td>
+                  <p>
+                    <span class="bold"><strong>const directory_entry &amp;</strong></span>:
+                    <span class="emphasis"><em>rhs</em></span>:
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">std</span><span class="special">::</span><span class="identifier">filesystem</span><span class="special">::</span><span class="identifier">path</span> <span class="identifier">name</span><span class="special">()</span></pre>
+                </td>
+<td>
+                  <p>
+                    The name of the directory entry.
+                  </p>
+                </td>
+<td>
+                </td>
+</tr>
+<tr>
+<td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">metadata_flags</span> <span class="identifier">metadata_ready</span><span class="special">()</span></pre>
+                </td>
+<td>
+                  <p>
+                    A bitfield of what metadata is ready right now.
+                  </p>
+                </td>
+<td>
+                </td>
+</tr>
+<tr>
+<td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">metadata_flags</span> <span class="identifier">fetch_metadata</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span> <span class="identifier">async_io_handle</span> <span class="special">&gt;</span> <span class="identifier">dirh</span><span class="special">,</span> <span class="identifier">metadata_flags</span> <span class="identifier">wanted</span><span class="special">)</span></pre>
+                </td>
+<td>
+                  <p>
+                    Fetches the specified metadata, returning that newly available.
+                    This is a blocking call.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <span class="bold"><strong>std::shared_ptr&lt; async_io_handle &gt;</strong></span>:
+                    <span class="emphasis"><em>dirh</em></span>:
+                  </p>
+                  <p>
+                    <span class="bold"><strong>metadata_flags</strong></span>: <span class="emphasis"><em>wanted</em></span>:
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">stat_t</span> <span class="identifier">full_lstat</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span> <span class="identifier">async_io_handle</span> <span class="special">&gt;</span> <span class="identifier">dirh</span><span class="special">,</span> <span class="identifier">metadata_flags</span> <span class="identifier">wanted</span> <span class="special">=</span> <span class="identifier">directory_entry</span><span class="special">::</span><span class="identifier">metadata_fastpath</span><span class="special">())</span></pre>
+                </td>
+<td>
+                  <p>
+                    Fetches a fast path <code class="literal"><code class="computeroutput"><span class="identifier">stat_t</span></code></code>
+                    structure which is missing those fields not fast to fetch on
+                    this platform.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <span class="bold"><strong>std::shared_ptr&lt; async_io_handle &gt;</strong></span>:
+                    <span class="emphasis"><em>dirh</em></span>:
+                  </p>
+                  <p>
+                    <span class="bold"><strong>metadata_flags</strong></span>: <span class="emphasis"><em>wanted</em></span>:
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">metadata_flags</span> <span class="identifier">metadata_supported</span><span class="special">()</span></pre>
+                </td>
+<td>
+                  <p>
+                    Returns st_dev.
+                  </p>
+                </td>
+<td>
+                </td>
+</tr>
+<tr>
+<td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">metadata_flags</span> <span class="identifier">metadata_fastpath</span><span class="special">()</span></pre>
+                </td>
+<td>
+                  <p>
+                    A bitfield of what metadata is fast on this platform. This doesn't
+                    mean all is available for every filing system.
+                  </p>
+                </td>
+<td>
+                </td>
+</tr>
+<tr>
+<td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">size_t</span> <span class="identifier">compatibility_maximum</span><span class="special">()</span></pre>
+                </td>
+<td>
+                  <p>
+                    The maximum number of entries which is "usual" to fetch
+                    at once i.e. what your libc does.
+                  </p>
+                </td>
+<td>
+                </td>
+</tr>
+</tbody>
+</table></div>
+<h6>
+<a name="afio.reference.classes.directory_entry.h3"></a>
+          <span class="phrase"><a name="afio.reference.classes.directory_entry.header"></a></span><a class="link" href="directory_entry.html#afio.reference.classes.directory_entry.header">Header</a>
+        </h6>
+<p>
+          <code class="computeroutput"><span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">boost</span><span class="special">/</span><span class="identifier">afio</span><span class="special">/</span><span class="identifier">afio</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span></code>
+        </p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2013 Niall Douglas and Paul Kirth<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="async_io_handle.html"><img src="../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../classes.html"><img src="../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="thread_source.html"><img src="../../../../../doc/src/images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

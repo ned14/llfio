@@ -1,0 +1,159 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>enumerate (single)</title>
+<link rel="stylesheet" href="../../../../myboostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../../../../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 0.1">
+<link rel="up" href="../async_file_io_dispatcher_base.html" title="async_file_io_dispatcher_base">
+<link rel="prev" href="enumerate_1_batch.html" title="enumerate (batch)">
+<link rel="next" href="page_size.html" title="page_size">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr>
+<td valign="top"><img alt="Boost C++ Libraries" width="277" height="86" src="../../../../../../boost.png"></td>
+<td align="center"><a href="../../../../../../index.html">Home</a></td>
+<td align="center"><a href="../../../../../../libs/libraries.htm">Libraries</a></td>
+<td align="center"><a href="http://www.boost.org/users/people.html">People</a></td>
+<td align="center"><a href="http://www.boost.org/users/faq.html">FAQ</a></td>
+<td align="center"><a href="../../../../../../more/index.htm">More</a></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="enumerate_1_batch.html"><img src="../../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../async_file_io_dispatcher_base.html"><img src="../../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../../../index.html"><img src="../../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="page_size.html"><img src="../../../../../../doc/src/images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h5 class="title">
+<a name="afio.reference.classes.async_file_io_dispatcher_base.enumerate_1_single"></a><a class="link" href="enumerate_1_single.html" title="enumerate (single)">enumerate
+          (single)</a>
+</h5></div></div></div>
+<p>
+            <a class="indexterm" name="id915953"></a>
+Schedule an asynchronous directory enumeration after a preceding operation.
+          </p>
+<h6>
+<a name="afio.reference.classes.async_file_io_dispatcher_base.enumerate_1_single.h0"></a>
+            <span class="phrase"><a name="afio.reference.classes.async_file_io_dispatcher_base.enumerate_1_single.description"></a></span><a class="link" href="enumerate_1_single.html#afio.reference.classes.async_file_io_dispatcher_base.enumerate_1_single.description">Description</a>
+          </h6>
+<pre class="programlisting"><span class="identifier">By</span> <span class="keyword">default</span> <span class="identifier">dir</span><span class="special">()</span> <span class="identifier">returns</span> <span class="identifier">shared</span> <span class="identifier">handles</span> <span class="identifier">i</span><span class="special">.</span><span class="identifier">e</span><span class="special">.</span> <span class="identifier">dir</span><span class="special">(</span><span class="string">"foo"</span><span class="special">)</span> <span class="keyword">and</span> <span class="identifier">dir</span><span class="special">(</span><span class="string">"foo"</span><span class="special">)</span> <span class="identifier">will</span> <span class="keyword">return</span> <span class="identifier">the</span> <span class="identifier">exact</span> <span class="identifier">same</span>
+<span class="identifier">handle</span><span class="special">,</span> <span class="keyword">and</span> <span class="identifier">therefore</span> <span class="identifier">enumerating</span> <span class="keyword">not</span> <span class="identifier">all</span> <span class="identifier">of</span> <span class="identifier">the</span> <span class="identifier">entries</span> <span class="identifier">at</span> <span class="identifier">once</span> <span class="identifier">is</span> <span class="identifier">a</span> <span class="identifier">race</span> <span class="identifier">condition</span><span class="special">.</span> <span class="identifier">The</span> <span class="identifier">solution</span> <span class="identifier">is</span>
+<span class="identifier">to</span> <span class="identifier">either</span> <span class="identifier">set</span> <span class="identifier">maxitems</span> <span class="identifier">to</span> <span class="identifier">a</span> <span class="identifier">value</span> <span class="identifier">large</span> <span class="identifier">enough</span> <span class="identifier">to</span> <span class="identifier">guarantee</span> <span class="identifier">a</span> <span class="identifier">directory</span> <span class="identifier">will</span> <span class="identifier">be</span> <span class="identifier">enumerated</span> <span class="identifier">in</span> <span class="identifier">a</span> <span class="identifier">single</span>
+<span class="identifier">shot</span><span class="special">,</span> <span class="keyword">or</span> <span class="identifier">to</span> <span class="identifier">open</span> <span class="identifier">a</span> <span class="identifier">separate</span> <span class="identifier">directory</span> <span class="identifier">handle</span> <span class="keyword">using</span> <span class="identifier">the</span> <span class="identifier">file</span><span class="special">\</span><span class="identifier">u005fflags</span><span class="special">::</span><span class="identifier">UniqueDirectoryHandle</span> <span class="identifier">flag</span><span class="special">.</span>
+</pre>
+<h6>
+<a name="afio.reference.classes.async_file_io_dispatcher_base.enumerate_1_single.h1"></a>
+            <span class="phrase"><a name="afio.reference.classes.async_file_io_dispatcher_base.enumerate_1_single.synopsis"></a></span><a class="link" href="enumerate_1_single.html#afio.reference.classes.async_file_io_dispatcher_base.enumerate_1_single.synopsis">Synopsis</a>
+          </h6>
+<pre class="programlisting"><span class="identifier">std</span><span class="special">::</span><span class="identifier">pair</span><span class="special">&lt;</span> <span class="identifier">future</span><span class="special">&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">pair</span><span class="special">&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">directory_entry</span> <span class="special">&gt;,</span> <span class="keyword">bool</span> <span class="special">&gt;</span> <span class="special">&gt;,</span> <span class="identifier">async_io_op</span> <span class="special">&gt;</span> <span class="identifier">async_file_io_dispatcher_base</span><span class="special">::</span><span class="identifier">enumerate</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">async_enumerate_op_req</span> <span class="special">&amp;</span> <span class="identifier">req</span><span class="special">)</span></pre>
+<h6>
+<a name="afio.reference.classes.async_file_io_dispatcher_base.enumerate_1_single.h2"></a>
+            <span class="phrase"><a name="afio.reference.classes.async_file_io_dispatcher_base.enumerate_1_single.parameters"></a></span><a class="link" href="enumerate_1_single.html#afio.reference.classes.async_file_io_dispatcher_base.enumerate_1_single.parameters">Parameters</a>
+          </h6>
+<div class="informaltable"><table class="table">
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                    <p>
+                      Type
+                    </p>
+                  </th>
+<th>
+                    <p>
+                      Concept
+                    </p>
+                  </th>
+<th>
+                    <p>
+                      Name
+                    </p>
+                  </th>
+<th>
+                    <p>
+                      Description
+                    </p>
+                  </th>
+</tr></thead>
+<tbody><tr>
+<td>
+                    <p>
+                      const async_enumerate_op_req &amp;
+                    </p>
+                  </td>
+<td>
+                  </td>
+<td>
+                    <p>
+                      req
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      An enumeration request.
+                    </p>
+                  </td>
+</tr></tbody>
+</table></div>
+<h6>
+<a name="afio.reference.classes.async_file_io_dispatcher_base.enumerate_1_single.h3"></a>
+            <span class="phrase"><a name="afio.reference.classes.async_file_io_dispatcher_base.enumerate_1_single.returns"></a></span><a class="link" href="enumerate_1_single.html#afio.reference.classes.async_file_io_dispatcher_base.enumerate_1_single.returns">Returns</a>
+          </h6>
+<p>
+            A future vector of directory entries with a boolean returning false if
+            done.
+          </p>
+<h6>
+<a name="afio.reference.classes.async_file_io_dispatcher_base.enumerate_1_single.h4"></a>
+            <span class="phrase"><a name="afio.reference.classes.async_file_io_dispatcher_base.enumerate_1_single.header"></a></span><a class="link" href="enumerate_1_single.html#afio.reference.classes.async_file_io_dispatcher_base.enumerate_1_single.header">Header</a>
+          </h6>
+<p>
+            <code class="computeroutput"><span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">boost</span><span class="special">/</span><span class="identifier">afio</span><span class="special">/</span><span class="identifier">afio</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span></code>
+          </p>
+<h6>
+<a name="afio.reference.classes.async_file_io_dispatcher_base.enumerate_1_single.h5"></a>
+            <span class="phrase"><a name="afio.reference.classes.async_file_io_dispatcher_base.enumerate_1_single.complexity"></a></span><a class="link" href="enumerate_1_single.html#afio.reference.classes.async_file_io_dispatcher_base.enumerate_1_single.complexity">Complexity</a>
+          </h6>
+<p>
+            Amortised O(1) to dispatch. Amortised O(M) to complete where M is the
+            average number of entries in each directory.
+          </p>
+<h6>
+<a name="afio.reference.classes.async_file_io_dispatcher_base.enumerate_1_single.h6"></a>
+            <span class="phrase"><a name="afio.reference.classes.async_file_io_dispatcher_base.enumerate_1_single.exception_model"></a></span><a class="link" href="enumerate_1_single.html#afio.reference.classes.async_file_io_dispatcher_base.enumerate_1_single.exception_model">Exception
+            Model</a>
+          </h6>
+<p>
+            Propagates exceptions of any input preconditions with an errored state
+            at the point of dispatch, and throws a <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">runtime_error</span></code>
+            if any inputs have values which could not possibly be correct. Once a
+            batch of input ops has been verified at the point of entry as not errored,
+            you are guaranteed that the batch is atomically scheduled as a whole,
+            unless one of the following conditions occurs: (i) A failure to allocate
+            memory occurs.
+          </p>
+<h6>
+<a name="afio.reference.classes.async_file_io_dispatcher_base.enumerate_1_single.h7"></a>
+            <span class="phrase"><a name="afio.reference.classes.async_file_io_dispatcher_base.enumerate_1_single.example"></a></span><a class="link" href="enumerate_1_single.html#afio.reference.classes.async_file_io_dispatcher_base.enumerate_1_single.example">Example</a>
+          </h6>
+<p>
+            [enumerate_example]
+          </p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2013 Niall Douglas and Paul Kirth<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="enumerate_1_batch.html"><img src="../../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../async_file_io_dispatcher_base.html"><img src="../../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../../../index.html"><img src="../../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="page_size.html"><img src="../../../../../../doc/src/images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

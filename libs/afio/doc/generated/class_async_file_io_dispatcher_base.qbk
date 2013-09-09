@@ -235,6 +235,50 @@ An op handle.
 
 
 ]]
+[[``std::vector< async_io_op > symlink(const std::vector< async_path_op_req > & reqs)``
+
+] [Schedule a batch of asynchronous symlink creations and opens after a precondition. ] [[* const std::vector< async_path_op_req > &]: ['reqs]:  A batch of [^`async_path_op_req`] structures.
+
+
+
+][
+A batch of op handles. 
+
+
+]]
+[[``async_io_op symlink(const async_path_op_req & req)``
+
+] [Schedule an asynchronous symlink creation and open after a precondition. ] [[* const async_path_op_req &]: ['req]:  An [^`async_path_op_req`] structure.
+
+
+
+][
+An op handle. 
+
+
+]]
+[[``std::vector< async_io_op > rmsymlink(const std::vector< async_path_op_req > & reqs)``
+
+] [Schedule a batch of asynchronous symlink deletions after optional preconditions. ] [[* const std::vector< async_path_op_req > &]: ['reqs]:  A batch of [^`async_path_op_req`] structures.
+
+
+
+][
+A batch of op handles. 
+
+
+]]
+[[``async_io_op rmsymlink(const async_path_op_req & req)``
+
+] [Schedule an asynchronous symlink deletion after an optional precondition. ] [[* const async_path_op_req &]: ['req]:  An [^`async_path_op_req`] structure.
+
+
+
+][
+An op handle. 
+
+
+]]
 [[``std::vector< async_io_op > sync(const std::vector< async_io_op > & ops)``
 
 ] [Schedule a batch of asynchronous content synchronisations with physical storage after preceding operations. ] [[* const std::vector< async_io_op > &]: ['ops]:  A batch of op handles.
@@ -342,7 +386,7 @@ A batch of op handles.
 ]]
 [[``async_io_op truncate(const async_io_op & op, off_t newsize)``
 
-] [Schedule an asynchronous data write after a preceding operation. ] [[* const async_io_op &]: ['op]:  An op handle. 
+] [Schedule an asynchronous file length truncation after a preceding operation. ] [[* const async_io_op &]: ['op]:  An op handle. 
 
 [* off_t]: ['newsize]:  The new size for the file.
 
@@ -350,6 +394,28 @@ A batch of op handles.
 
 ][
 An op handle. 
+
+
+]]
+[[``std::pair< std::vector< future< std::pair< std::vector< directory_entry >, bool > > >, std::vector< async_io_op > > enumerate(const std::vector< async_enumerate_op_req > & reqs)``
+
+] [Schedule a batch of asynchronous directory enumerations after a preceding operations. ] [[* const std::vector< async_enumerate_op_req > &]: ['reqs]:  A batch of enumeration requests.
+
+
+
+][
+A batch of future vectors of directory entries with boolean returning false if done. 
+
+
+]]
+[[``std::pair< future< std::pair< std::vector< directory_entry >, bool > >, async_io_op > enumerate(const async_enumerate_op_req & req)``
+
+] [Schedule an asynchronous directory enumeration after a preceding operation. ] [[* const async_enumerate_op_req &]: ['req]:  An enumeration request.
+
+
+
+][
+A future vector of directory entries with a boolean returning false if done. 
 
 
 ]]
@@ -370,6 +436,18 @@ A batch of op handles.
 
 ][
 The page size of this architecture.
+
+
+]]
+[[``void complete_async_op(size_t id, std::shared_ptr< async_io_handle > h, exception_ptr e = exception_ptr())``
+
+] [] [[* size_t]: ['id]:  
+
+[* std::shared_ptr< async_io_handle >]: ['h]:  
+
+[* exception_ptr]: ['e]:  
+
+
 
 
 ]]
@@ -401,6 +479,7 @@ std::vector< async_io_op > write(const std::vector< async_data_op_req< T >> & op
 [include generated/group_async_file_io_dispatcher_base__call.qbk]
 [include generated/group_async_file_io_dispatcher_base__filedirops.qbk]
 [include generated/group_async_file_io_dispatcher_base__barrier.qbk]
+[include generated/group_async_file_io_dispatcher_base__enumerate.qbk]
 [include generated/group_async_file_io_dispatcher_base__misc.qbk]
 
 [endsect]

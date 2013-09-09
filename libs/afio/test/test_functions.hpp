@@ -14,8 +14,12 @@ Created: Feb 2013
 
 #ifdef __MINGW32__
 // Mingw doesn't define putenv() needed by Boost.Test
-extern int putenv(char*);
+extern "C" int putenv(char*);
+// Mingw doesn't define tzset() either
+extern "C" void tzset(void);
 #endif
+
+#define _CRT_SECURE_NO_WARNINGS
 
 #include <utility>
 #include <sstream>
@@ -25,6 +29,8 @@ extern int putenv(char*);
 #include "../../../boost/afio/afio.hpp"
 #include "../detail/SpookyV2.h"
 #include "../../../boost/afio/detail/Aligned_Allocator.hpp"
+#include "../../../boost/afio/detail/valgrind/memcheck.h"
+#include <time.h>
 
 //if we're building the tests all together don't define the test main
 #ifndef BOOST_AFIO_TEST_ALL
@@ -102,15 +108,20 @@ static inline void watchdog_thread(size_t timeout)
 }
 
 // Define a unit test description and timeout
-#define BOOST_AFIO_AUTO_TEST_CASE(test_name, desc, timeout)             \
+#define BOOST_AFIO_AUTO_TEST_CASE(test_name, desc, _timeout)            \
 struct test_name : public BOOST_AUTO_TEST_CASE_FIXTURE { void test_method(); }; \
                                                                         \
 static void BOOST_AUTO_TC_INVOKER( test_name )()                        \
 {                                                                       \
     test_name t;                                                        \
-	boost::unit_test::unit_test_monitor_t::instance().p_timeout.set(timeout); \
+    size_t timeout=_timeout;                                            \
+    if(RUNNING_ON_VALGRIND) {                                           \
+        VALGRIND_PRINTF("BOOST.AFIO TEST INVOKER: Unit test running in valgrind so tripling timeout\n"); \
+        timeout*=3;                                                     \
+    }                                                                   \
+	/*boost::unit_test::unit_test_monitor_t::instance().p_timeout.set(timeout);*/ \
 	BOOST_TEST_MESSAGE(desc);                                           \
-	set_maximum_cpus();                                \
+	set_maximum_cpus();                                                 \
 	boost::thread watchdog(watchdog_thread, timeout);                   \
 	boost::unit_test::unit_test_monitor_t::instance().execute([&]() -> int { t.test_method(); watchdog.interrupt(); watchdog.join(); return 0; }); \
 }                                                                       \
@@ -150,6 +161,7 @@ void raninit(ranctx *x, u4 seed) {
 static int donothing(boost::afio::atomic<size_t> *callcount, int i) { ++*callcount; return i; }
 static void _1000_open_write_close_deletes(std::shared_ptr<boost::afio::async_file_io_dispatcher_base> dispatcher, size_t bytes)
 {
+	try {
         using namespace boost::afio;
         using namespace std;
         using boost::afio::future;
@@ -238,7 +250,11 @@ static void _1000_open_write_close_deletes(std::shared_ptr<boost::afio::async_fi
         // Fetch any outstanding error
         rmdir.h->get();
         BOOST_CHECK((callcount==1000U));
-}//*/
+	} catch(...) {
+		std::cerr << boost::current_exception_diagnostic_information(true) << std::endl;
+		throw;
+	}
+}
 
 #ifdef DEBUG_TORTURE_TEST
     struct Op
@@ -263,6 +279,7 @@ static u4 mkfill() { static char ret='0'; if(ret+1>'z') ret='0'; return ret++; }
 
 static void evil_random_io(std::shared_ptr<boost::afio::async_file_io_dispatcher_base> dispatcher, size_t no, size_t bytes, size_t alignment=0)
 {
+	try {
     using namespace std;
     using boost::afio::future;
 	using boost::afio::ratio;
@@ -427,9 +444,9 @@ static void evil_random_io(std::shared_ptr<boost::afio::async_file_io_dispatcher
 
     boost::lockfree::queue<std::pair<const Op *, size_t> *> failures(maxfailures);
 #if defined(BOOST_MSVC) && BOOST_MSVC < 1700 // <= VS2010
-    std::function<std::pair<bool, std::shared_ptr<boost::afio::detail::async_io_handle>> (Op &, char *, size_t, std::shared_ptr<boost::afio::detail::async_io_handle>)> checkHash=[&failures](Op &op, char *base, size_t, std::shared_ptr<boost::afio::detail::async_io_handle> h) -> std::pair<bool, std::shared_ptr<boost::afio::detail::async_io_handle>> {
+    std::function<std::pair<bool, std::shared_ptr<boost::afio::async_io_handle>> (Op &, char *, size_t, std::shared_ptr<boost::afio::async_io_handle>)> checkHash=[&failures](Op &op, char *base, size_t, std::shared_ptr<boost::afio::async_io_handle> h) -> std::pair<bool, std::shared_ptr<boost::afio::async_io_handle>> {
 #else
-    auto checkHash=[&failures](Op &op, char *base, size_t, std::shared_ptr<boost::afio::detail::async_io_handle> h) -> std::pair<bool, std::shared_ptr<boost::afio::detail::async_io_handle>> {
+    auto checkHash=[&failures](Op &op, char *base, size_t, std::shared_ptr<boost::afio::async_io_handle> h) -> std::pair<bool, std::shared_ptr<boost::afio::async_io_handle>> {
 #endif
             const char *data=(const char *)(((size_t) base+(size_t) op.req.where));
             size_t idxoffset=0;
@@ -576,6 +593,121 @@ static void evil_random_io(std::shared_ptr<boost::afio::async_file_io_dispatcher
     auto rmdir(dispatcher->rmdir(boost::afio::async_path_op_req("testdir")));
     // Fetch any outstanding error
     rmdir.h->get();
-}//*/
+	} catch(...) {
+		std::cerr << boost::current_exception_diagnostic_information(true) << std::endl;
+		throw;
+	}
+}
+
+
+static std::ostream &operator<<(std::ostream &s, const boost::afio::chrono::system_clock::time_point &ts)
+{
+	char buf[32];
+    struct tm *t;
+    size_t len=sizeof(buf);
+    size_t ret;
+	time_t v=boost::afio::chrono::system_clock::to_time_t(ts);
+	boost::afio::chrono::system_clock::duration remainder(ts-boost::afio::chrono::system_clock::from_time_t(v));
+
+#ifdef _MSC_VER
+	_tzset();
+#else
+    tzset();
+#endif
+    if ((t=localtime(&v)) == NULL)
+    {
+    	s << "<bad timespec>";
+        return s;
+    }
+
+    ret = strftime(buf, len, "%Y-%m-%d %H:%M:%S", t);
+    if (ret == 0)
+    {
+    	s << "<bad timespec>";
+        return s;
+    }
+    //len -= ret - 1;
+
+    sprintf(&buf[strlen(buf)], ".%09ld", (long) remainder.count());
+    s << buf;
+
+    return s;
+}
+
+static boost::afio::stat_t print_stat(std::shared_ptr<boost::afio::async_io_handle> h)
+{
+	using namespace boost::afio;
+	auto entry=h->lstat(metadata_flags::All);
+	std::cout << "Entry " << h->path() << " is a ";
+	if(S_IFLNK==(entry.st_type & S_IFLNK))
+		std::cout << "link";
+	else if(S_IFDIR==(entry.st_type & S_IFDIR))
+		std::cout << "directory";
+	else
+		std::cout << "file";
+	std::cout << " and it has the following information:" << std::endl;
+	if(S_IFLNK==(entry.st_type & S_IFLNK))
+	{
+		std::cout << "  Target=" << h->target() << std::endl;
+	}
+#define PRINT_FIELD(field) \
+    std::cout << "  st_" #field ": "; if(!!(directory_entry::metadata_supported()&metadata_flags::field)) std::cout << entry.st_##field; else std::cout << "unknown"; std::cout << std::endl
+    PRINT_FIELD(dev);
+    PRINT_FIELD(ino);
+    PRINT_FIELD(type);
+    PRINT_FIELD(mode);
+    PRINT_FIELD(nlink);
+    PRINT_FIELD(uid);
+    PRINT_FIELD(gid);
+    PRINT_FIELD(rdev);
+    PRINT_FIELD(atim);
+    PRINT_FIELD(mtim);
+    PRINT_FIELD(ctim);
+    PRINT_FIELD(size);
+    PRINT_FIELD(allocated);
+    PRINT_FIELD(blocks);
+    PRINT_FIELD(blksize);
+    PRINT_FIELD(flags);
+    PRINT_FIELD(gen);
+    PRINT_FIELD(birthtim);
+#undef PRINT_FIELD
+	return entry;
+}
+
+static void print_stat(std::shared_ptr<boost::afio::async_io_handle> dirh, boost::afio::directory_entry direntry)
+{
+	using namespace boost::afio;
+	std::cout << "Entry " << direntry.name() << " is a ";
+	auto entry=direntry.full_lstat(dirh);
+	if(S_IFLNK==(entry.st_type & S_IFLNK))
+		std::cout << "link";
+	else if(S_IFDIR==(entry.st_type & S_IFDIR))
+		std::cout << "directory";
+	else
+		std::cout << "file";
+	std::cout << " and it has the following information:" << std::endl;
+
+#define PRINT_FIELD(field) \
+    std::cout << "  st_" #field ": "; if(!!(direntry.metadata_ready()&metadata_flags::field)) std::cout << entry.st_##field; else std::cout << "unknown"; std::cout << std::endl
+    PRINT_FIELD(dev);
+    PRINT_FIELD(ino);
+    PRINT_FIELD(type);
+    PRINT_FIELD(mode);
+    PRINT_FIELD(nlink);
+    PRINT_FIELD(uid);
+    PRINT_FIELD(gid);
+    PRINT_FIELD(rdev);
+    PRINT_FIELD(atim);
+    PRINT_FIELD(mtim);
+    PRINT_FIELD(ctim);
+    PRINT_FIELD(size);
+    PRINT_FIELD(allocated);
+    PRINT_FIELD(blocks);
+    PRINT_FIELD(blksize);
+    PRINT_FIELD(flags);
+    PRINT_FIELD(gen);
+    PRINT_FIELD(birthtim);
+#undef PRINT_FIELD
+}
 
 #endif

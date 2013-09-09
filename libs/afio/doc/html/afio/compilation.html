@@ -131,23 +131,191 @@
 <td align="center"><a href="https://ci.nedprod.com/job/Boost.AFIO%20Build%20FreeBSD%2010%20clang%203.3/" target="_top"><img src="https://ci.nedprod.com/buildStatus/icon?job=Boost.AFIO%20Build%20FreeBSD%2010%20clang%203.3"></a></td>
 <td align="center"><a href="https://ci.nedprod.com/job/Boost.AFIO%20Build%20WinXP%20VS2010/" target="_top"><img src="https://ci.nedprod.com/buildStatus/icon?job=Boost.AFIO%20Build%20WinXP%20VS2010"></a></td>
 <td align="center"><a href="https://ci.nedprod.com/job/Boost.AFIO%20Build%20WinXP%20Mingw32/" target="_top"><img src="https://ci.nedprod.com/buildStatus/icon?job=Boost.AFIO%20Build%20WinXP%20Mingw32"></a></td>
-<td align="center">planned</td>
-<td align="center">known working</td>
-<td align="center">known working</td>
+<td align="center"><a href="https://ci.nedprod.com/job/Boost.AFIO%20Build%20WinXP%20Mingw-w64/" target="_top"><img src="https://ci.nedprod.com/buildStatus/icon?job=Boost.AFIO%20Build%20WinXP%20Mingw-w64"></a></td>
+<td align="center">Known Working</td>
+<td align="center">Known Working</td>
 </tr>
 <tr>
 <td align="center"><a href="https://ci.nedprod.com/job/Boost.AFIO%20Test%20Linux%20clang%203.1/" target="_top"><img src="https://ci.nedprod.com/buildStatus/icon?job=Boost.AFIO%20Test%20Linux%20clang%203.1"></a></td>
-<td align="center"><a href="https://ci.nedprod.com/job/Boost.AFIO%20Test%20Linux%20clang%203.3%20%2B%20libc%2B%2B/" target="_top"><img src="https://ci.nedprod.com/buildStatus/icon?job=Boost.AFIO%20Test%20Linux%20%20clang%203.3%20%2B%20libc%2B%2B"></a></td>
+<td align="center"><a href="https://ci.nedprod.com/job/Boost.AFIO%20Test%20Linux%20clang%203.3%20%2B%20libc%2B%2B/" target="_top"><img src="https://ci.nedprod.com/buildStatus/icon?job=Boost.AFIO%20Test%20Linux%20clang%203.3%20%2B%20libc%2B%2B"></a></td>
 <td align="center"><a href="https://ci.nedprod.com/job/Boost.AFIO%20Test%20FreeBSD%2010%20clang%203.3/" target="_top"><img src="https://ci.nedprod.com/buildStatus/icon?job=Boost.AFIO%20Test%20FreeBSD%2010%20clang%203.3"></a></td>
 <td align="center"><a href="https://ci.nedprod.com/job/Boost.AFIO%20Test%20WinXP%20VS2010/" target="_top"><img src="https://ci.nedprod.com/buildStatus/icon?job=Boost.AFIO%20Test%20WinXP%20VS2010"></a></td>
 <td align="center"><a href="https://ci.nedprod.com/job/Boost.AFIO%20Test%20WinXP%20Mingw32/" target="_top"><img src="https://ci.nedprod.com/buildStatus/icon?job=Boost.AFIO%20Test%20WinXP%20Mingw32"></a></td>
-<td align="center">planned</td>
-<td align="center">known working</td>
-<td align="center">known working</td>
+<td align="center"><a href="https://ci.nedprod.com/job/Boost.AFIO%20Test%20WinXP%20Mingw-w64/" target="_top"><img src="https://ci.nedprod.com/buildStatus/icon?job=Boost.AFIO%20Test%20WinXP%20Mingw-w64"></a></td>
+<td align="center">Known Working</td>
+<td align="center">Known Working</td>
 </tr>
 </tbody>
 </table></div>
 <p>
+    </p>
+<h4>
+<a name="afio.compilation.h1"></a>
+      <span class="phrase"><a name="afio.compilation.boost_afio_installation"></a></span><a class="link" href="compilation.html#afio.compilation.boost_afio_installation">Boost
+      AFIO Installation</a>
+    </h4>
+<div class="orderedlist"><ol class="orderedlist" type="1">
+<li class="listitem">
+          Download the latest version of the Boost Libraries from boost.org. At the
+          time of writing the current version is Boost 1.54. Boost AFIO will is not
+          compatible with earlier versions of Boost, so be sure to use a current
+          copy of the Boost Libraries.
+        </li>
+<li class="listitem">
+          Download Boost AFIO through GitHub at : https://github.com/BoostGSoC/boost.afio
+          We recommend using a git repository, as it will allow for future updates.
+          If you are unfamiliar with git, check the git hub website for instructions
+          on how to use git. This is a good place to start: <a href="https://help.github.com/articles/set-up-git" target="_top">https://help.github.com/articles/set-up-git</a>
+        </li>
+<li class="listitem">
+          After you have a copy of AFIO you have a few options to add it to Boost.
+          <div class="orderedlist"><ol class="orderedlist" type="a">
+<li class="listitem">
+                You can create a symbolic link of the AFIO library into your boost
+                installation
+                <p>
+                  On linux the command will be :
+                </p>
+<pre class="programlisting">
+    $ ln -s <span class="emphasis"><em>path/to/boost.afio/boost/afio</em></span> /path/to/boost_directory/boost/afio
+
+    $ ln -s <span class="emphasis"><em>path/to/boost.afio/libs/afio</em></span> /path/to/boost_directory/libs/afio
+
+</pre>
+                <p>
+                  Where <code class="computeroutput"><span class="special">/</span><span class="identifier">path</span><span class="special">/</span><span class="identifier">to</span><span class="special">/</span><span class="identifier">boost</span><span class="special">.</span><span class="identifier">afio</span></code>
+                  is the path to the Boost AFIO repo you downloaded, and <code class="computeroutput"><span class="special">/</span><span class="identifier">path</span><span class="special">/</span><span class="identifier">to</span><span class="special">/</span><span class="identifier">boost_directory</span></code>
+                  is the path to your Boost library installation.
+                </p>
+                <p>
+                  On Windows things are a bit more complicated. Not all versions
+                  of Windows support symbolic links. As a result we cannot provide
+                  instructions for every version of Windows available. But here are
+                  some instructions for Windows 7:
+                </p>
+<pre class="programlisting">
+    MKLINK /D path/to/boost_directory/boost/afio path/to/boost.afio/boost/afio
+
+    MKLINK /D path/to/boost_directory/libs/afio path/to/boost.afio/libs/afio
+
+</pre>
+                <p>
+                  If your operating system isn&#8217;t covered here, or you have difficulty
+                  using these instructions, please consult instructions for your
+                  particular operating system on how to create symbolic links. A
+                  Google search of Symbolic links and your operating system should
+                  net you the desired results.
+                </p>
+                <p>
+                  Alternatively junction points may be used in place of symbolic
+                  links. Earlier versions of Windows may benefit from this approach.
+                  Junction points can be made with the help of this Microsoft utility:
+                  <a href="http://technet.microsoft.com/en-CA/sysinternals/bb896768.aspx" target="_top">http://technet.microsoft.com/en-CA/sysinternals/bb896768.aspx</a>
+                </p>
+              </li>
+<li class="listitem">
+                You can copy it directly into Boost.
+                <p>
+                  It may be preferable to forgo symbolic links altogether and simply
+                  copy the <code class="literal">boost.afio/boost/afio</code> and <code class="literal">boost.afio/libs/afio</code>
+                  into <code class="literal">boost_directory/boost</code> and <code class="literal">boost_directory/libs
+                  respectively</code>.
+                </p>
+                <p>
+                  The advantage of symbolic links over a direct copy of the AFIO
+                  directories is that you are able to update the AFIO repo, and try
+                  the latest builds without copying the folder a second time. Otherwise
+                  they should be functionally identical.
+                </p>
+              </li>
+</ol></div>
+        </li>
+<li class="listitem">
+          To build Boost.AFIO follow the normal instructions from boost.org on how
+          to build Boost.
+          <div class="orderedlist"><ol class="orderedlist" type="a">
+<li class="listitem">
+                On <a href="http://www.boost.org/doc/libs/1_54_0/more/getting_started/index.html" target="_top">http://www.boost.org/doc/libs/1_54_0/more/getting_started/index.html</a>
+                follow the link at the bottom of the page for your operating system,
+                and look for the section titled: <span class="bold"><strong>Prepare to
+                Use a Boost Library Binary</strong></span>. This section will detail how
+                to build the Boost Libraries for your system.
+              </li>
+<li class="listitem">
+                If you don&#8217;t wish to build all of the Boost Libraries, or you wish
+                to only build certain libraries, use the <span class="bold"><strong>--with</strong></span>
+                option to only select a particular set of libraries. For example:
+<pre class="programlisting">
+  ./b2 install link=shared --with-afio
+
+</pre>
+                <p>
+                  This will build only the Boost AFIO Library and its dependencies
+                  as dynamically linked libraries, leaving all other libraries unbuilt.
+                </p>
+              </li>
+</ol></div>
+        </li>
+</ol></div>
+<p>
+      Congratulations! You have finished installing the current version of Boost.AFIO.
+    </p>
+<h4>
+<a name="afio.compilation.h2"></a>
+      <span class="phrase"><a name="afio.compilation.running_the_unit_tests"></a></span><a class="link" href="compilation.html#afio.compilation.running_the_unit_tests">Running
+      the Unit Tests</a>
+    </h4>
+<p>
+      To run the unit tests with <span class="bold"><strong>bjam</strong></span>, run <span class="bold"><strong>b2</strong></span> from the command line from inside the <span class="bold"><strong>libs/afio/tests</strong></span>
+      directory. This will run the entire suite of unit tests. Remember that this
+      requires that you have Boost.Build properly installed on your system. Please
+      consult boost.org for instructions on how to install Boost.Build. <a href="http://www.boost.org/doc/libs/1_54_0/doc/html/bbv2/installation.html" target="_top">http://www.boost.org/doc/libs/1_54_0/doc/html/bbv2/installation.html</a>
+    </p>
+<p>
+      There are a few command line arguments being used for the unit tests at the
+      moment. These won&#8217;t be available as the project nears completion, but they
+      serve a useful purpose for the project at the moment.
+    </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+          <span class="bold"><strong>--link-test</strong></span>: will only compile and link
+          the test files. This option can be combined with the <span class="bold"><strong>--test=</strong></span>
+          option to only compile and link a specific subset of unit tests. Note that
+          <span class="bold"><strong>--link-test</strong></span> supersedes <span class="bold"><strong>--test-all</strong></span>
+          and <span class="bold"><strong>--test-each</strong></span> options, and cannot be
+          combined with the other tests.
+        </li>
+<li class="listitem">
+          <span class="bold"><strong>--test-all</strong></span>: will run a comprehensive unit
+          tests that combines all the other unit tests into a single continuous test.
+          This is useful to detect errors that will only show up at longer running
+          times. Note that <span class="bold"><strong>--test-each</strong></span> is not compatible
+          with this option.
+        </li>
+<li class="listitem">
+          <span class="bold"><strong>--test-each</strong></span>: will run a series of individually
+          compiled unit tests in succession. This option forgoes the lengthy monolithic
+          test-suite in favor of a series of small tests. This option can be combined
+          with the <span class="bold"><strong>--test=</strong></span> option to only run a
+          specific subset of unit tests. Note that <span class="bold"><strong>--test-all</strong></span>
+          is not compatible with this option.
+        </li>
+<li class="listitem">
+          <span class="bold"><strong>--test=</strong></span>: will use only the test files
+          designated by the string following this flag.
+        </li>
+</ul></div>
+<p>
+      For example:
+    </p>
+<pre class="programlisting">
+    b2 link=static toolset=gcc --test="first_test.cpp second_test.cpp"
+
+</pre>
+<p>
+      will only compile and run only the tests in <code class="computeroutput"><span class="identifier">first_test</span><span class="special">.</span><span class="identifier">cpp</span></code> and
+      <code class="computeroutput"><span class="identifier">second_test</span><span class="special">.</span><span class="identifier">cpp</span></code>. All other unit tests will be ignored,
+      and all other command-line options still apply.
     </p>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>

@@ -6,7 +6,7 @@
 <meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
 <link rel="home" href="../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 0.1">
 <link rel="up" href="../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 0.1">
-<link rel="prev" href="quickstart.html" title="Quick Start">
+<link rel="prev" href="quickstart/closure_execution_engines/how_boost_afio_relates_to_exisit/other_useful_comparisons.html" title="Other Useful Comparisons">
 <link rel="next" href="reference/macros_flags.html" title="Macros and Flags">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
@@ -20,7 +20,7 @@
 </tr></table>
 <hr>
 <div class="spirit-nav">
-<a accesskey="p" href="quickstart.html"><img src="../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="reference/macros_flags.html"><img src="../../../doc/src/images/next.png" alt="Next"></a>
+<a accesskey="p" href="quickstart/closure_execution_engines/how_boost_afio_relates_to_exisit/other_useful_comparisons.html"><img src="../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="reference/macros_flags.html"><img src="../../../doc/src/images/next.png" alt="Next"></a>
 </div>
 <div class="section">
 <div class="titlepage"><div><div><h2 class="title" style="clear: both">
@@ -32,6 +32,7 @@
 <dt><span class="section"><a href="reference/macros_flags/boost_afio_validate_inputs.html">BOOST_AFIO_VALIDATE_INPUTS</a></span></dt>
 <dt><span class="section"><a href="reference/macros_flags/async_op_flags.html">async_op_flags</a></span></dt>
 <dt><span class="section"><a href="reference/macros_flags/file_flags.html">file_flags</a></span></dt>
+<dt><span class="section"><a href="reference/macros_flags/metadata_flags.html">metadata_flags</a></span></dt>
 </dl></dd>
 <dt><span class="section"><a href="reference/structs.html">Structures</a></span></dt>
 <dd><dl>
@@ -57,8 +58,10 @@
 <dt><span class="section"><a href="reference/structs/async_data_op_req/async_data_op_req_void_.html">async_data_op_req&lt;
           void &gt;</a></span></dt>
 </dl></dd>
+<dt><span class="section"><a href="reference/structs/async_enumerate_op_req.html">async_enumerate_op_req</a></span></dt>
 <dt><span class="section"><a href="reference/structs/async_io_op.html">async_io_op</a></span></dt>
 <dt><span class="section"><a href="reference/structs/async_path_op_req.html">async_path_op_req</a></span></dt>
+<dt><span class="section"><a href="reference/structs/stat_t.html">stat_t</a></span></dt>
 </dl></dd>
 <dt><span class="section"><a href="reference/classes.html">Classes</a></span></dt>
 <dd><dl>
@@ -98,6 +101,14 @@
           (batch)</a></span></dt>
 <dt><span class="section"><a href="reference/classes/async_file_io_dispatcher_base/rmfile_1_single.html">rmfile
           (single)</a></span></dt>
+<dt><span class="section"><a href="reference/classes/async_file_io_dispatcher_base/rmsymlink_1_batch.html">rmsymlink
+          (batch)</a></span></dt>
+<dt><span class="section"><a href="reference/classes/async_file_io_dispatcher_base/rmsymlink_1_single.html">rmsymlink
+          (single)</a></span></dt>
+<dt><span class="section"><a href="reference/classes/async_file_io_dispatcher_base/symlink_1_batch.html">symlink
+          (batch)</a></span></dt>
+<dt><span class="section"><a href="reference/classes/async_file_io_dispatcher_base/symlink_1_single.html">symlink
+          (single)</a></span></dt>
 <dt><span class="section"><a href="reference/classes/async_file_io_dispatcher_base/sync_1_batch.html">sync
           (batch)</a></span></dt>
 <dt><span class="section"><a href="reference/classes/async_file_io_dispatcher_base/sync_1_single.html">sync
@@ -112,9 +123,14 @@
           (single)</a></span></dt>
 <dt><span class="section"><a href="reference/classes/async_file_io_dispatcher_base/barrier.html">barrier
           (batch)</a></span></dt>
+<dt><span class="section"><a href="reference/classes/async_file_io_dispatcher_base/enumerate_1_batch.html">enumerate
+          (batch)</a></span></dt>
+<dt><span class="section"><a href="reference/classes/async_file_io_dispatcher_base/enumerate_1_single.html">enumerate
+          (single)</a></span></dt>
 <dt><span class="section"><a href="reference/classes/async_file_io_dispatcher_base/page_size.html">page_size</a></span></dt>
 </dl></dd>
-<dt><span class="section"><a href="reference/classes/detail_async_io_handle.html">detail::async_io_handle</a></span></dt>
+<dt><span class="section"><a href="reference/classes/async_io_handle.html">async_io_handle</a></span></dt>
+<dt><span class="section"><a href="reference/classes/directory_entry.html">directory_entry</a></span></dt>
 <dt><span class="section"><a href="reference/classes/thread_source.html">thread_source</a></span></dt>
 <dt><span class="section"><a href="reference/classes/std_thread_pool.html">std_thread_pool</a></span></dt>
 </dl></dd>
@@ -160,7 +176,7 @@
 </tr></table>
 <hr>
 <div class="spirit-nav">
-<a accesskey="p" href="quickstart.html"><img src="../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="reference/macros_flags.html"><img src="../../../doc/src/images/next.png" alt="Next"></a>
+<a accesskey="p" href="quickstart/closure_execution_engines/how_boost_afio_relates_to_exisit/other_useful_comparisons.html"><img src="../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="reference/macros_flags.html"><img src="../../../doc/src/images/next.png" alt="Next"></a>
 </div>
 </body>
 </html>

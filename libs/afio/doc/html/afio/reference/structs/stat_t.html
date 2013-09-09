@@ -1,0 +1,153 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>stat_t</title>
+<link rel="stylesheet" href="../../../myboostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../../../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 0.1">
+<link rel="up" href="../structs.html" title="Structures">
+<link rel="prev" href="async_path_op_req.html" title="async_path_op_req">
+<link rel="next" href="../classes.html" title="Classes">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr>
+<td valign="top"><img alt="Boost C++ Libraries" width="277" height="86" src="../../../../../boost.png"></td>
+<td align="center"><a href="../../../../../index.html">Home</a></td>
+<td align="center"><a href="../../../../../libs/libraries.htm">Libraries</a></td>
+<td align="center"><a href="http://www.boost.org/users/people.html">People</a></td>
+<td align="center"><a href="http://www.boost.org/users/faq.html">FAQ</a></td>
+<td align="center"><a href="../../../../../more/index.htm">More</a></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="async_path_op_req.html"><img src="../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../structs.html"><img src="../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="../classes.html"><img src="../../../../../doc/src/images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h4 class="title">
+<a name="afio.reference.structs.stat_t"></a><a class="link" href="stat_t.html" title="stat_t">stat_t</a>
+</h4></div></div></div>
+<p>
+          <a class="indexterm" name="id876167"></a>
+Metadata about a directory entry.
+        </p>
+<h6>
+<a name="afio.reference.structs.stat_t.h0"></a>
+          <span class="phrase"><a name="afio.reference.structs.stat_t.description"></a></span><a class="link" href="stat_t.html#afio.reference.structs.stat_t.description">Description</a>
+        </h6>
+<p>
+          This structure looks somewhat like a <code class="literal"><code class="computeroutput"><span class="keyword">struct</span>
+          <span class="identifier">stat</span></code></code>, and indeed it
+          was derived from BSD's <code class="literal"><code class="computeroutput"><span class="keyword">struct</span>
+          <span class="identifier">stat</span></code></code>. However there
+          are a number of changes to better interoperate with modern practice, specifically:
+          (i) inode value containers are forced to 64 bits (ii) Timestamps use C++11's
+          <code class="literal"><code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">chrono</span><span class="special">::</span><span class="identifier">system_clock</span><span class="special">::</span><span class="identifier">time_point</span></code></code> or Boost equivalent.
+          The resolution of these may or may not equal what a <code class="literal"><code class="computeroutput"><span class="keyword">struct</span> <span class="identifier">timespec</span></code></code>
+          can do depending on your STL (iii) The type of a file, which is available
+          on Windows and on POSIX without needing a <code class="literal"><code class="computeroutput"><span class="identifier">lstat</span><span class="special">()</span></code></code>, is provided by <code class="literal"><code class="computeroutput"><span class="identifier">st_type</span></code></code>.
+        </p>
+<h6>
+<a name="afio.reference.structs.stat_t.h1"></a>
+          <span class="phrase"><a name="afio.reference.structs.stat_t.synopsis"></a></span><a class="link" href="stat_t.html#afio.reference.structs.stat_t.synopsis">Synopsis</a>
+        </h6>
+<pre class="programlisting"><span class="keyword">struct</span> <span class="identifier">stat_t</span>
+<span class="special">{</span>
+  <span class="identifier">off_t</span> <span class="identifier">st_allocated</span><span class="special">;</span>                            <span class="comment">// bytes allocated for file (Windows, POSIX) </span>
+  <span class="identifier">chrono</span><span class="special">::</span><span class="identifier">system_clock</span><span class="special">::</span><span class="identifier">time_point</span> <span class="identifier">st_atim</span><span class="special">;</span>      <span class="comment">// time of last access (Windows, POSIX) </span>
+  <span class="identifier">chrono</span><span class="special">::</span><span class="identifier">system_clock</span><span class="special">::</span><span class="identifier">time_point</span> <span class="identifier">st_birthtim</span><span class="special">;</span>  <span class="comment">// time of file creation (Windows, FreeBSD, OS X) </span>
+  <span class="identifier">uint16_t</span> <span class="identifier">st_blksize</span><span class="special">;</span>                           <span class="comment">// block size used by this device (Windows, POSIX) </span>
+  <span class="identifier">off_t</span> <span class="identifier">st_blocks</span><span class="special">;</span>                               <span class="comment">// number of blocks allocated (Windows, POSIX) </span>
+  <span class="identifier">chrono</span><span class="special">::</span><span class="identifier">system_clock</span><span class="special">::</span><span class="identifier">time_point</span> <span class="identifier">st_ctim</span><span class="special">;</span>      <span class="comment">// time of last status change (Windows, POSIX) </span>
+  <span class="identifier">uint64_t</span> <span class="identifier">st_dev</span><span class="special">;</span>                               <span class="comment">// inode of device containing file (POSIX) </span>
+  <span class="identifier">uint32_t</span> <span class="identifier">st_flags</span><span class="special">;</span>                             <span class="comment">// user defined flags for file (FreeBSD, OS X) </span>
+  <span class="identifier">uint32_t</span> <span class="identifier">st_gen</span><span class="special">;</span>                               <span class="comment">// file generation number (FreeBSD, OS X) </span>
+  <span class="identifier">int16_t</span> <span class="identifier">st_gid</span><span class="special">;</span>                                <span class="comment">// group ID of the file (POSIX) </span>
+  <span class="identifier">uint64_t</span> <span class="identifier">st_ino</span><span class="special">;</span>                               <span class="comment">// inode of file (Windows, POSIX) </span>
+  <span class="identifier">uint16_t</span> <span class="identifier">st_mode</span><span class="special">;</span>                              <span class="comment">// type and perms of file (POSIX) </span>
+  <span class="identifier">chrono</span><span class="special">::</span><span class="identifier">system_clock</span><span class="special">::</span><span class="identifier">time_point</span> <span class="identifier">st_mtim</span><span class="special">;</span>      <span class="comment">// time of last data modification (Windows, POSIX) </span>
+  <span class="identifier">int16_t</span> <span class="identifier">st_nlink</span><span class="special">;</span>                              <span class="comment">// number of hard links (Windows, POSIX) </span>
+  <span class="identifier">dev_t</span> <span class="identifier">st_rdev</span><span class="special">;</span>                                 <span class="comment">// id of file if special (POSIX) </span>
+  <span class="identifier">off_t</span> <span class="identifier">st_size</span><span class="special">;</span>                                 <span class="comment">// file size, in bytes (Windows, POSIX) </span>
+  <span class="identifier">uint16_t</span> <span class="identifier">st_type</span><span class="special">;</span>                              <span class="comment">// type of file (Windows, POSIX) </span>
+  <span class="identifier">int16_t</span> <span class="identifier">st_uid</span><span class="special">;</span>                                <span class="comment">// user ID of the file (POSIX) </span>
+<span class="special">};</span>
+</pre>
+<h6>
+<a name="afio.reference.structs.stat_t.h2"></a>
+          <span class="phrase"><a name="afio.reference.structs.stat_t.constructor_s"></a></span><a class="link" href="stat_t.html#afio.reference.structs.stat_t.constructor_s">Constructor(s)</a>
+        </h6>
+<div class="informaltable"><table class="table">
+<colgroup>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                  <p>
+                    Function
+                  </p>
+                </th>
+<th>
+                  <p>
+                    Description
+                  </p>
+                </th>
+<th>
+                  <p>
+                    Parameters
+                  </p>
+                </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">stat_t</span><span class="special">()</span></pre>
+                </td>
+<td>
+                  <p>
+                    Constructs a UNINITIALIZED instance i.e. full of random garbage.
+                  </p>
+                </td>
+<td>
+                </td>
+</tr>
+<tr>
+<td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">stat_t</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">nullptr_t</span> <span class="special">)</span></pre>
+                </td>
+<td>
+                  <p>
+                    Constructs a zeroed instance.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <span class="bold"><strong>std::nullptr_t</strong></span>: <span class="emphasis"><em></em></span>:
+                  </p>
+                </td>
+</tr>
+</tbody>
+</table></div>
+<h6>
+<a name="afio.reference.structs.stat_t.h3"></a>
+          <span class="phrase"><a name="afio.reference.structs.stat_t.header"></a></span><a class="link" href="stat_t.html#afio.reference.structs.stat_t.header">Header</a>
+        </h6>
+<p>
+          <code class="computeroutput"><span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">boost</span><span class="special">/</span><span class="identifier">afio</span><span class="special">/</span><span class="identifier">afio</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span></code>
+        </p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2013 Niall Douglas and Paul Kirth<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="async_path_op_req.html"><img src="../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../structs.html"><img src="../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="../classes.html"><img src="../../../../../doc/src/images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

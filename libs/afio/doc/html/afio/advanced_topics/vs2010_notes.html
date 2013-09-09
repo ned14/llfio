@@ -1,0 +1,123 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Notes on using AFIO with Microsoft Visual Studio 2010 and Mingw32</title>
+<link rel="stylesheet" href="../../myboostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 0.1">
+<link rel="up" href="../advanced_topics.html" title="Advanced Topics">
+<link rel="prev" href="custom_completion_handler.html" title="How to write your own custom AFIO completion handler">
+<link rel="next" href="../release_notes.html" title="Release Notes">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr>
+<td valign="top"><img alt="Boost C++ Libraries" width="277" height="86" src="../../../../boost.png"></td>
+<td align="center"><a href="../../../../index.html">Home</a></td>
+<td align="center"><a href="../../../../libs/libraries.htm">Libraries</a></td>
+<td align="center"><a href="http://www.boost.org/users/people.html">People</a></td>
+<td align="center"><a href="http://www.boost.org/users/faq.html">FAQ</a></td>
+<td align="center"><a href="../../../../more/index.htm">More</a></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="custom_completion_handler.html"><img src="../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../advanced_topics.html"><img src="../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="../release_notes.html"><img src="../../../../doc/src/images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="afio.advanced_topics.vs2010_notes"></a><a class="link" href="vs2010_notes.html" title="Notes on using AFIO with Microsoft Visual Studio 2010 and Mingw32">Notes on using AFIO
+      with Microsoft Visual Studio 2010 and Mingw32</a>
+</h3></div></div></div>
+<p>
+        Due to the portability requirement of Boost peer review, we had to backport
+        Boost.AFIO (originally a pure C++11 library) to the last three major compiler
+        releases at the time of submission which were GCC 4.6-4.8, clang 3.1-3.3,
+        and Microsoft Visual Studio 2010-2013. Of all these compilers, by far and
+        away the worst experience for us was backporting to VS2010.
+      </p>
+<p>
+        Unfortunately, because VS2010 is the last Visual Studio which will work on
+        Microsoft Windows XP, and therefore as much as we would have loved to have
+        dumped it, we had to do the backport. The code in this library compiles and
+        passes its unit tests on VS2010, but only at the cost of making demands on
+        client code. Therefore:
+      </p>
+<p>
+        <span class="bold"><strong>If you possibly can, use VS2012 SP3 or later with its
+        Windows XP toolset to target Windows XP.</strong></span> The toolset bundled with
+        VS2012 and later has many, many errors with the headers and bugs with the
+        runtime fixed and it uses a much superior compiler. The only problem, of
+        course, is that VS2012 and later won't run on Windows XP, so if you really
+        must develop on Windows XP, strongly consider Mingw-w64 instead of VS2010.
+      </p>
+<p>
+        If you're reading on, then you must really want to use Microsoft Visual Studio
+        2010! If so, we hope you enjoy debugging internal compiler errors :) which
+        are unfortunately only fixable through a lot of trial and error. Still:
+      </p>
+<div class="orderedlist"><ol class="orderedlist" type="1">
+<li class="listitem">
+            Don't use lambdas, or if you do, assign them to a <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">function</span></code>
+            immediately. You'll see this in AFIO code. Using lambdas makes the VS2010
+            STL trip up everywhere (lambda support wasn't really implemented in the
+            STL shipped with VS2010) plus increases internal compiler errors.
+          </li>
+<li class="listitem">
+            Don't use <code class="computeroutput"><span class="keyword">using</span> <span class="keyword">namespace</span></code>
+            instead of fully namespaced typenames, as the Koenig lookup in VS2010
+            easily gets confused in C++11 and causes internal compiler errors.
+          </li>
+<li class="listitem">
+            You need to work around the fact that <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">current_exception</span><span class="special">()</span></code> causes segfaults on VS2010 and Mingw32
+            (not Mingw-w64, which is fine) if not called from within a <code class="computeroutput"><span class="keyword">catch</span></code> clause, and unfortunately AFIO needs
+            that to detect if an immediately called completion routine was called
+            during the process of handling an exception thrown from an earlier completion
+            routine. In other words, it's unavoidable with our C++11 assuming design.
+            The solution we adopted is not pretty, but it does work:
+<pre class="programlisting"><span class="preprocessor">#ifdef</span> <span class="identifier">BOOST_AFIO_NEED_CURRENT_EXCEPTION_HACK</span>
+	<span class="comment">// VS2010 and Mingw32 segfaults if you ever do a try { throw; } catch(...) without an exception ever having been thrown :(</span>
+	<span class="keyword">try</span>
+	<span class="special">{</span>
+		<span class="keyword">throw</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">detail</span><span class="special">::</span><span class="identifier">vs2010_lack_of_decent_current_exception_support_hack_t</span><span class="special">();</span>
+	<span class="special">}</span>
+	<span class="keyword">catch</span><span class="special">(...)</span>
+	<span class="special">{</span>
+		<span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">detail</span><span class="special">::</span><span class="identifier">vs2010_lack_of_decent_current_exception_support_hack</span><span class="special">()=</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">current_exception</span><span class="special">();</span>
+<span class="preprocessor">#endif</span>
+	
+	<span class="special">...</span> <span class="keyword">do</span> <span class="identifier">your</span> <span class="identifier">AFIO</span> <span class="keyword">using</span> <span class="identifier">code</span> <span class="special">...</span>
+	
+<span class="preprocessor">#ifdef</span> <span class="identifier">BOOST_AFIO_NEED_CURRENT_EXCEPTION_HACK</span>
+	<span class="special">}</span>
+<span class="preprocessor">#endif</span>
+</pre>
+            <p>
+              If you're going to use Boost.AFIO on VS2010 or Mingw32, you'll need
+              to wrap all AFIO using code with the same stanza. As mentioned earlier,
+              Mingw-w64 doesn't have any of these problems and is in fact recommended
+              for Windows XP.
+            </p>
+          </li>
+<li class="listitem">
+            Even with all of the above, performance of binaries produced by VS2010
+            is poor - expect a performance drop from VS2012 of about 2x and of about
+            3x from a fully compliant C++11 compiler. This is caused by the lack
+            of VS2010 STL support for rvalue references, plus that the compiler will
+            never willingly use rvalue taking overloads. As a result, a very great
+            deal of memory gets copied around which should get optimised out.
+          </li>
+</ol></div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2013 Niall Douglas and Paul Kirth<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="custom_completion_handler.html"><img src="../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../advanced_topics.html"><img src="../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="../release_notes.html"><img src="../../../../doc/src/images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

@@ -28,7 +28,7 @@
           (batch bound functions)</a>
 </h5></div></div></div>
 <p>
-            <a class="indexterm" name="id867885"></a>
+            <a class="indexterm" name="id883351"></a>
 Schedule a batch of asynchronous invocations of the specified functions
             when their supplied operations complete.
           </p>
@@ -152,9 +152,60 @@ Schedule a batch of asynchronous invocations of the specified functions
 <a name="afio.reference.classes.async_file_io_dispatcher_base.completion_2_batch_bound_functions.h6"></a>
             <span class="phrase"><a name="afio.reference.classes.async_file_io_dispatcher_base.completion_2_batch_bound_functions.example"></a></span><a class="link" href="completion_2_batch_bound_functions.html#afio.reference.classes.async_file_io_dispatcher_base.completion_2_batch_bound_functions.example">Example</a>
           </h6>
-<p>
-            [completion_example]
-          </p>
+<pre class="programlisting"><span class="comment">// Create a dispatcher instance</span>
+<span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_file_io_dispatcher_base</span><span class="special">&gt;</span> <span class="identifier">dispatcher</span><span class="special">=</span>
+    <span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">make_async_file_io_dispatcher</span><span class="special">();</span>
+
+<span class="comment">// Completion handlers are the lowest level completion routine available, and therefore the least</span>
+<span class="comment">// overhead but at the cost of considerable extra programmer effort. You almost certainly want</span>
+<span class="comment">// to use the call() member function instead.</span>
+
+<span class="comment">// First create some callable entity ...</span>
+<span class="keyword">auto</span> <span class="identifier">completer</span><span class="special">=[](</span>
+    <span class="comment">/* These are always the standard parameters */</span>
+    <span class="identifier">size_t</span> <span class="identifier">id</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_io_handle</span><span class="special">&gt;</span> <span class="identifier">h</span><span class="special">,</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">exception_ptr</span> <span class="special">*</span><span class="identifier">e</span><span class="special">,</span>
+    <span class="comment">/* From now on user defined parameters */</span>
+    <span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span> <span class="identifier">text</span><span class="special">)</span>
+  <span class="comment">/* This is always the return type */</span>
+  <span class="special">-&gt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">pair</span><span class="special">&lt;</span><span class="keyword">bool</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_io_handle</span><span class="special">&gt;&gt;</span>
+<span class="special">{</span>
+    <span class="comment">/* id is the unique, non-zero integer id of this op.
+       h is a shared pointer to the file handle context returned by the precondition of this op.
+       e is a pointer to an exception_ptr. It is ONLY non-null when this completion was
+       called as an immediate completion. It MAY point to a valid exception_ptr if
+       this immediate completion is being completed because its precondition threw
+       an exception.
+
+       If not an immediately completed completion, if you want to test if the precondition
+       threw an exception, you'll need to pass in its op's shared state (the h member)
+       so you can check the shared_future for an exception state.
+    */</span>
+    <span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="identifier">text</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span>
+
+    <span class="comment">// Return whether this completion has completed now or is it deferred,</span>
+    <span class="comment">// along with the handle we pass onto any completions completing on this op</span>
+    <span class="keyword">return</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">make_pair</span><span class="special">(</span><span class="keyword">true</span><span class="special">,</span> <span class="identifier">h</span><span class="special">);</span>
+<span class="special">};</span>
+
+<span class="comment">// Bind any user defined parameters to create a proper boost::afio::async_file_io_dispatcher_base::completion_t</span>
+<span class="identifier">std</span><span class="special">::</span><span class="identifier">function</span><span class="special">&lt;</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_file_io_dispatcher_base</span><span class="special">::</span><span class="identifier">completion_t</span><span class="special">&gt;</span> <span class="identifier">boundf</span><span class="special">=</span>
+    <span class="identifier">std</span><span class="special">::</span><span class="identifier">bind</span><span class="special">(</span><span class="identifier">completer</span><span class="special">,</span>
+        <span class="comment">/* The standard parameters */</span>
+        <span class="identifier">std</span><span class="special">::</span><span class="identifier">placeholders</span><span class="special">::</span><span class="identifier">_1</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">placeholders</span><span class="special">::</span><span class="identifier">_2</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">placeholders</span><span class="special">::</span><span class="identifier">_3</span><span class="special">,</span>
+        <span class="comment">/* Any values for the user defined parameters. Remember ALWAYS to pass by value! */</span>
+        <span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span><span class="special">(</span><span class="string">"Hello world"</span><span class="special">));</span>
+
+<span class="comment">// Schedule an asynchronous call of the completion with some bound set of arguments</span>
+<span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_io_op</span> <span class="identifier">helloworld</span><span class="special">=</span>
+    <span class="identifier">dispatcher</span><span class="special">-&gt;</span><span class="identifier">completion</span><span class="special">(</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_io_op</span><span class="special">()</span> <span class="comment">/* no precondition */</span><span class="special">,</span>
+        <span class="identifier">std</span><span class="special">::</span><span class="identifier">make_pair</span><span class="special">(</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_op_flags</span><span class="special">::</span><span class="identifier">None</span><span class="special">,</span> <span class="identifier">boundf</span><span class="special">));</span>
+
+<span class="comment">// Create a boost::future&lt;&gt; representing the ops passed to when_all()</span>
+<span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">future</span><span class="special">&lt;</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_io_handle</span><span class="special">&gt;&gt;&gt;</span> <span class="identifier">future</span>
+    <span class="special">=</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">when_all</span><span class="special">(</span><span class="identifier">helloworld</span><span class="special">);</span>
+<span class="comment">// ... and wait for it to complete</span>
+<span class="identifier">future</span><span class="special">.</span><span class="identifier">wait</span><span class="special">();</span>
+</pre>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
 <td align="left"></td>

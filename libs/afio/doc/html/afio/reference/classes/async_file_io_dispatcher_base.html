@@ -61,6 +61,14 @@
           (batch)</a></span></dt>
 <dt><span class="section"><a href="async_file_io_dispatcher_base/rmfile_1_single.html">rmfile
           (single)</a></span></dt>
+<dt><span class="section"><a href="async_file_io_dispatcher_base/rmsymlink_1_batch.html">rmsymlink
+          (batch)</a></span></dt>
+<dt><span class="section"><a href="async_file_io_dispatcher_base/rmsymlink_1_single.html">rmsymlink
+          (single)</a></span></dt>
+<dt><span class="section"><a href="async_file_io_dispatcher_base/symlink_1_batch.html">symlink
+          (batch)</a></span></dt>
+<dt><span class="section"><a href="async_file_io_dispatcher_base/symlink_1_single.html">symlink
+          (single)</a></span></dt>
 <dt><span class="section"><a href="async_file_io_dispatcher_base/sync_1_batch.html">sync
           (batch)</a></span></dt>
 <dt><span class="section"><a href="async_file_io_dispatcher_base/sync_1_single.html">sync
@@ -75,10 +83,14 @@
           (single)</a></span></dt>
 <dt><span class="section"><a href="async_file_io_dispatcher_base/barrier.html">barrier
           (batch)</a></span></dt>
+<dt><span class="section"><a href="async_file_io_dispatcher_base/enumerate_1_batch.html">enumerate
+          (batch)</a></span></dt>
+<dt><span class="section"><a href="async_file_io_dispatcher_base/enumerate_1_single.html">enumerate
+          (single)</a></span></dt>
 <dt><span class="section"><a href="async_file_io_dispatcher_base/page_size.html">page_size</a></span></dt>
 </dl></div>
 <p>
-          <a class="indexterm" name="id862671"></a>
+          <a class="indexterm" name="id879203"></a>
 Abstract base class for dispatching file i/o asynchronously.
         </p>
 <h6>
@@ -596,6 +608,98 @@ Abstract base class for dispatching file i/o asynchronously.
 </tr>
 <tr>
 <td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">async_io_op</span> <span class="special">&gt;</span> <span class="identifier">symlink</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">async_path_op_req</span> <span class="special">&gt;</span> <span class="special">&amp;</span> <span class="identifier">reqs</span><span class="special">)</span></pre>
+                </td>
+<td>
+                  <p>
+                    Schedule a batch of asynchronous symlink creations and opens
+                    after a precondition.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <span class="bold"><strong>const std::vector&lt; async_path_op_req
+                    &gt; &amp;</strong></span>: <span class="emphasis"><em>reqs</em></span>: A batch of
+                    <code class="literal"><code class="computeroutput"><span class="identifier">async_path_op_req</span></code></code>
+                    structures.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    A batch of op handles.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">async_io_op</span> <span class="identifier">symlink</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">async_path_op_req</span> <span class="special">&amp;</span> <span class="identifier">req</span><span class="special">)</span></pre>
+                </td>
+<td>
+                  <p>
+                    Schedule an asynchronous symlink creation and open after a precondition.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <span class="bold"><strong>const async_path_op_req &amp;</strong></span>:
+                    <span class="emphasis"><em>req</em></span>: An <code class="literal"><code class="computeroutput"><span class="identifier">async_path_op_req</span></code></code>
+                    structure.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    An op handle.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">async_io_op</span> <span class="special">&gt;</span> <span class="identifier">rmsymlink</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">async_path_op_req</span> <span class="special">&gt;</span> <span class="special">&amp;</span> <span class="identifier">reqs</span><span class="special">)</span></pre>
+                </td>
+<td>
+                  <p>
+                    Schedule a batch of asynchronous symlink deletions after optional
+                    preconditions.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <span class="bold"><strong>const std::vector&lt; async_path_op_req
+                    &gt; &amp;</strong></span>: <span class="emphasis"><em>reqs</em></span>: A batch of
+                    <code class="literal"><code class="computeroutput"><span class="identifier">async_path_op_req</span></code></code>
+                    structures.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    A batch of op handles.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">async_io_op</span> <span class="identifier">rmsymlink</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">async_path_op_req</span> <span class="special">&amp;</span> <span class="identifier">req</span><span class="special">)</span></pre>
+                </td>
+<td>
+                  <p>
+                    Schedule an asynchronous symlink deletion after an optional precondition.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <span class="bold"><strong>const async_path_op_req &amp;</strong></span>:
+                    <span class="emphasis"><em>req</em></span>: An <code class="literal"><code class="computeroutput"><span class="identifier">async_path_op_req</span></code></code>
+                    structure.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    An op handle.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
 <pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">async_io_op</span> <span class="special">&gt;</span> <span class="identifier">sync</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">async_io_op</span> <span class="special">&gt;</span> <span class="special">&amp;</span> <span class="identifier">ops</span><span class="special">)</span></pre>
                 </td>
 <td>
@@ -806,7 +910,8 @@ Abstract base class for dispatching file i/o asynchronously.
                 </td>
 <td>
                   <p>
-                    Schedule an asynchronous data write after a preceding operation.
+                    Schedule an asynchronous file length truncation after a preceding
+                    operation.
                   </p>
                 </td>
 <td>
@@ -822,6 +927,53 @@ Abstract base class for dispatching file i/o asynchronously.
 <td>
                   <p>
                     An op handle.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">std</span><span class="special">::</span><span class="identifier">pair</span><span class="special">&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">future</span><span class="special">&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">pair</span><span class="special">&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">directory_entry</span> <span class="special">&gt;,</span> <span class="keyword">bool</span> <span class="special">&gt;</span> <span class="special">&gt;</span> <span class="special">&gt;,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">async_io_op</span> <span class="special">&gt;</span> <span class="special">&gt;</span> <span class="identifier">enumerate</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">async_enumerate_op_req</span> <span class="special">&gt;</span> <span class="special">&amp;</span> <span class="identifier">reqs</span><span class="special">)</span></pre>
+                </td>
+<td>
+                  <p>
+                    Schedule a batch of asynchronous directory enumerations after
+                    a preceding operations.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <span class="bold"><strong>const std::vector&lt; async_enumerate_op_req
+                    &gt; &amp;</strong></span>: <span class="emphasis"><em>reqs</em></span>: A batch of
+                    enumeration requests.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    A batch of future vectors of directory entries with boolean returning
+                    false if done.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">std</span><span class="special">::</span><span class="identifier">pair</span><span class="special">&lt;</span> <span class="identifier">future</span><span class="special">&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">pair</span><span class="special">&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">directory_entry</span> <span class="special">&gt;,</span> <span class="keyword">bool</span> <span class="special">&gt;</span> <span class="special">&gt;,</span> <span class="identifier">async_io_op</span> <span class="special">&gt;</span> <span class="identifier">enumerate</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">async_enumerate_op_req</span> <span class="special">&amp;</span> <span class="identifier">req</span><span class="special">)</span></pre>
+                </td>
+<td>
+                  <p>
+                    Schedule an asynchronous directory enumeration after a preceding
+                    operation.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <span class="bold"><strong>const async_enumerate_op_req &amp;</strong></span>:
+                    <span class="emphasis"><em>req</em></span>: An enumeration request.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    A future vector of directory entries with a boolean returning
+                    false if done.
                   </p>
                 </td>
 </tr>
@@ -861,6 +1013,25 @@ Abstract base class for dispatching file i/o asynchronously.
 <td>
                   <p>
                     The page size of this architecture.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="keyword">void</span> <span class="identifier">complete_async_op</span><span class="special">(</span><span class="identifier">size_t</span> <span class="identifier">id</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span> <span class="identifier">async_io_handle</span> <span class="special">&gt;</span> <span class="identifier">h</span><span class="special">,</span> <span class="identifier">exception_ptr</span> <span class="identifier">e</span> <span class="special">=</span> <span class="identifier">exception_ptr</span><span class="special">())</span></pre>
+                </td>
+<td>
+                </td>
+<td>
+                  <p>
+                    <span class="bold"><strong>size_t</strong></span>: <span class="emphasis"><em>id</em></span>:
+                  </p>
+                  <p>
+                    <span class="bold"><strong>std::shared_ptr&lt; async_io_handle &gt;</strong></span>:
+                    <span class="emphasis"><em>h</em></span>:
+                  </p>
+                  <p>
+                    <span class="bold"><strong>exception_ptr</strong></span>: <span class="emphasis"><em>e</em></span>:
                   </p>
                 </td>
 </tr>

@@ -6,7 +6,7 @@
 <meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
 <link rel="home" href="../../../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 0.1">
 <link rel="up" href="../structs.html" title="Structures">
-<link rel="prev" href="async_data_op_req/async_data_op_req_void_.html" title="async_data_op_req&lt; void &gt;">
+<link rel="prev" href="async_enumerate_op_req.html" title="async_enumerate_op_req">
 <link rel="next" href="async_path_op_req.html" title="async_path_op_req">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
@@ -20,14 +20,14 @@
 </tr></table>
 <hr>
 <div class="spirit-nav">
-<a accesskey="p" href="async_data_op_req/async_data_op_req_void_.html"><img src="../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../structs.html"><img src="../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="async_path_op_req.html"><img src="../../../../../doc/src/images/next.png" alt="Next"></a>
+<a accesskey="p" href="async_enumerate_op_req.html"><img src="../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../structs.html"><img src="../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="async_path_op_req.html"><img src="../../../../../doc/src/images/next.png" alt="Next"></a>
 </div>
 <div class="section">
 <div class="titlepage"><div><div><h4 class="title">
 <a name="afio.reference.structs.async_io_op"></a><a class="link" href="async_io_op.html" title="async_io_op">async_io_op</a>
 </h4></div></div></div>
 <p>
-          <a class="indexterm" name="id860732"></a>
+          <a class="indexterm" name="id872218"></a>
 A reference to an asynchronous operation.
         </p>
 <h6>
@@ -48,9 +48,9 @@ A reference to an asynchronous operation.
         </h6>
 <pre class="programlisting"><span class="keyword">struct</span> <span class="identifier">async_io_op</span>
 <span class="special">{</span>
-  <span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span> <span class="identifier">shared_future</span><span class="special">&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span> <span class="identifier">detail</span><span class="special">::</span><span class="identifier">async_io_handle</span> <span class="special">&gt;</span> <span class="special">&gt;</span> <span class="special">&gt;</span> <span class="identifier">h</span><span class="special">;</span>  <span class="comment">// A future handle to the item being operated upon. </span>
-  <span class="identifier">size_t</span> <span class="identifier">id</span><span class="special">;</span>                                                                         <span class="comment">// A unique id for this operation. </span>
-  <span class="identifier">async_file_io_dispatcher_base</span> <span class="special">*</span> <span class="identifier">parent</span><span class="special">;</span>                                            <span class="comment">// The parent dispatcher. </span>
+  <span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span> <span class="identifier">shared_future</span><span class="special">&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span> <span class="identifier">async_io_handle</span> <span class="special">&gt;</span> <span class="special">&gt;</span> <span class="special">&gt;</span> <span class="identifier">h</span><span class="special">;</span>  <span class="comment">// A future handle to the item being operated upon. </span>
+  <span class="identifier">size_t</span> <span class="identifier">id</span><span class="special">;</span>                                                                 <span class="comment">// A unique id for this operation. </span>
+  <span class="identifier">async_file_io_dispatcher_base</span> <span class="special">*</span> <span class="identifier">parent</span><span class="special">;</span>                                    <span class="comment">// The parent dispatcher. </span>
 <span class="special">};</span>
 </pre>
 <h6>
@@ -125,7 +125,7 @@ A reference to an asynchronous operation.
 </tr>
 <tr>
 <td>
-<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">async_io_op</span><span class="special">(</span><span class="identifier">async_file_io_dispatcher_base</span> <span class="special">*</span> <span class="identifier">_parent</span><span class="special">,</span> <span class="identifier">size_t</span> <span class="identifier">_id</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span> <span class="identifier">shared_future</span><span class="special">&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span> <span class="identifier">detail</span><span class="special">::</span><span class="identifier">async_io_handle</span> <span class="special">&gt;&gt;&gt;</span> <span class="identifier">_handle</span><span class="special">)</span></pre>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">async_io_op</span><span class="special">(</span><span class="identifier">async_file_io_dispatcher_base</span> <span class="special">*</span> <span class="identifier">_parent</span><span class="special">,</span> <span class="identifier">size_t</span> <span class="identifier">_id</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span> <span class="identifier">shared_future</span><span class="special">&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span> <span class="identifier">async_io_handle</span> <span class="special">&gt;&gt;&gt;</span> <span class="identifier">_handle</span><span class="special">)</span></pre>
                 </td>
 <td>
                 </td>
@@ -141,7 +141,7 @@ A reference to an asynchronous operation.
                   </p>
                   <p>
                     <span class="bold"><strong>std::shared_ptr&lt; shared_future&lt; std::shared_ptr&lt;
-                    detail::async_io_handle &gt;&gt;&gt;</strong></span>: <span class="emphasis"><em>_handle</em></span>:
+                    async_io_handle &gt;&gt;&gt;</strong></span>: <span class="emphasis"><em>_handle</em></span>:
                     A shared_ptr to shared state between all instances of this reference.
                   </p>
                 </td>
@@ -264,7 +264,7 @@ A reference to an asynchronous operation.
 </tr></table>
 <hr>
 <div class="spirit-nav">
-<a accesskey="p" href="async_data_op_req/async_data_op_req_void_.html"><img src="../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../structs.html"><img src="../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="async_path_op_req.html"><img src="../../../../../doc/src/images/next.png" alt="Next"></a>
+<a accesskey="p" href="async_enumerate_op_req.html"><img src="../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../structs.html"><img src="../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="async_path_op_req.html"><img src="../../../../../doc/src/images/next.png" alt="Next"></a>
 </div>
 </body>
 </html>

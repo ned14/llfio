@@ -6,6 +6,18 @@
   http://www.boost.org/LICENSE_1_0.txt)
 =============================================================================/]
 
+[section:advanced_topics Advanced Topics]
+
+[section:custom_completion_handler How to write your own custom AFIO completion handler]
+
+TODO
+
+[completion_example1]
+
+[completion_example2]
+
+[endsect] [/custom_completion_handler]
+
 [section:vs2010_notes Notes on using AFIO with Microsoft Visual Studio 2010 and Mingw32]
 
 Due to the portability requirement of Boost peer review, we had to backport
@@ -54,4 +66,6 @@ This is caused by the lack of VS2010 STL support for rvalue references, plus tha
 compiler will never willingly use rvalue taking overloads. As a result, a very great
 deal of memory gets copied around which should get optimised out.
 
-[endsect]
+[endsect] [/vs2010_notes]
+
+[endsect] [/advanced_topics]
