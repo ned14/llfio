@@ -33,9 +33,9 @@
 [def __boost_thread__ [@http://www.boost.org/libs/thread/ Boost.Thread]]
 [def __boost_filesystem__ [@http://www.boost.org/libs/filesystem/ Boost.Filesystem]]
 [def __boost_iostreams__ [@http://www.boost.org/libs/iostreams/ Boost.Iostreams]]
-[def __WG21_N3562__ [@http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3562.pdf WG21 N3562 (Executors and schedulers)]]
-[def __WG21_N3634__ [@http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3634.pdf WG21 N3634 (Improvements to std::future<T> and Related APIs)]]
-[def ___WG21_N3634__ WG21 N3634 (Improvements to std::future<T> and Related APIs)]
+[def __WG21_N3562__ [@http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3731.pdf WG21 N3731 (Executors and schedulers v2)]]
+[def __WG21_N3634__ [@http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3721.pdf WG21 N3721 (Improvements to std::future<T> and Related APIs)]]
+[def ___WG21_N3634__ WG21 N3721 (Improvements to std::future<T> and Related APIs)]
 
 [/ Commonly used links]
 [def __afio_barrier__ [link afio.reference.classes.async_file_io_dispatcher_base.barrier `async_file_io_dispatcher_base::barrier()`]]
