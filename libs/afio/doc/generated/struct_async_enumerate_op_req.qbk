@@ -18,7 +18,7 @@ A convenience bundle of precondition, number of items to enumerate and item patt
 ``struct async_enumerate_op_req
 {
   std::filesystem::path glob;  // An optional shell glob by which to filter the items returned. Done kernel side on Windows, user side on POSIX. 
-  size_t maxitems;             // The maximum number of items to return in this request. 
+  size_t maxitems;             // The maximum number of items to return in this request. Note that setting to one will often invoke two syscalls. 
   async_io_op precondition;    // A precondition for this operation. 
   bool restart;                // Restarts the enumeration for this open directory handle. 
 };
@@ -37,7 +37,7 @@ A convenience bundle of precondition, number of items to enumerate and item patt
 
 ] [Constructs an instance. ] [[* async_io_op]: ['_precondition]:  The precondition for this operation. 
 
-[* size_t]: ['_maxitems]:  The maximum number of items to return in this request. 
+[* size_t]: ['_maxitems]:  The maximum number of items to return in this request. Note that setting to one will often invoke two syscalls. 
 
 [* bool]: ['_restart]:  Restarts the enumeration for this open directory handle. 
 

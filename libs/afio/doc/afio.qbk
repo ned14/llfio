@@ -38,17 +38,21 @@
 [def ___WG21_N3634__ WG21 N3634 (Improvements to std::future<T> and Related APIs)]
 
 [/ Commonly used links]
+[def __afio_barrier__ [link afio.reference.classes.async_file_io_dispatcher_base.barrier `async_file_io_dispatcher_base::barrier()`]]
+[def __afio_call__ [link afio.reference.classes.async_file_io_dispatcher_base.call_2_batch_bound_functions `async_file_io_dispatcher_base::call()`]]
+[def __afio_completion__ [link afio.reference.classes.async_file_io_dispatcher_base.completion_2_batch_bound_functions `async_file_io_dispatcher_base::completion()`]]
+[def __afio_enumerate__ [link afio.reference.classes.async_file_io_dispatcher_base.enumerate_1_batch `async_file_io_dispatcher_base::enumerate()`]]
 [def __afio_op__ [link afio.reference.structs.async_io_op `struct async_io_op`]]
 [def __afio_when_all__ [link afio.reference.functions.when_all_ops `when_all()`]]
-[def __afio_call__ [link afio.reference.classes.async_file_io_dispatcher_base.call_2_batch_bound_functions `async_file_io_dispatcher_base::call()`]]
-[def __afio_barrier__ [link afio.reference.classes.async_file_io_dispatcher_base.barrier `async_file_io_dispatcher_base::barrier()`]]
 
-[import ../test/examples/current_exception_hack.cpp]
+[import ../test/examples/barrier_example.cpp]
 [import ../test/examples/call_example.cpp]
 [import ../test/examples/closure_execution_afio_io_example.cpp]
 [import ../test/examples/closure_execution_traditional_io_example.cpp]
 [import ../test/examples/completion_example1.cpp]
 [import ../test/examples/completion_example2.cpp]
+[import ../test/examples/current_exception_hack.cpp]
+[import ../test/examples/enumerate_example.cpp]
 
 [section:introduction Introduction]
 __boost_afio__ is a linear scalable, batch, chainable, asynchronous closure execution engine extending __boost_asio__
@@ -78,8 +82,6 @@ which is fine) if at all possible], but if you can't, [link afio.advanced_topics
 As a very quick example of minimal usage:
 
 [call_example]
-
-[/ You can also schedule an asynchronous [link reference.when_all when_all()] using [link reference.async_file_io_dispatcher_base.barrier barrier()]. /]
 
 [endsect] [/introduction]
 

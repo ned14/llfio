@@ -20,6 +20,9 @@ File Created: Mar 2013
 #error _VARIADIC_MAX needs to be set to at least seven to compile Boost.AFIO
 #endif
 
+// Define this to work around ASIO's io_service.post() not coping with move-only input
+#define BOOST_AFIO_WORK_AROUND_ASIO_IO_SERVICE_POST_NO_MOVE_ONLY_SUPPORT 1
+
 // Define this to serialise thread job dispatch in order to work around a race condition in ASIO on Win32
 #ifdef WIN32
 #ifndef BOOST_AFIO_WORK_AROUND_LOST_ASIO_WRITE_COMPLETION_WAKEUPS
@@ -314,6 +317,7 @@ template<class R> class packaged_task<R()>
 	{
 		typedef boost::packaged_task<R> Base;
 #endif
+	packaged_task(const packaged_task &);
 public:
 	packaged_task() { }
 	packaged_task(Base &&o) BOOST_NOEXCEPT_OR_NOTHROW : Base(std::move(o)) { }
@@ -445,11 +449,18 @@ public:
 	template<class F> future<typename std::result_of<F()>::type> enqueue(F f)
 	{
 		typedef typename std::result_of<F()>::type R;
+#if BOOST_AFIO_WORK_AROUND_ASIO_IO_SERVICE_POST_NO_MOVE_ONLY_SUPPORT
 		// Somewhat annoyingly, io_service.post() needs its parameter to be copy constructible,
 		// and packaged_task is only move constructible, so ...
 		auto task=std::make_shared<packaged_task<R()>>(std::move(f));
 		service.post(std::bind(&thread_source::invoke_packagedtask<R>, task));
 		return task->get_future();
+#else
+		auto task=packaged_task<R()>(std::move(f));
+		auto ret=task.get_future();
+		service.post(std::move(task));
+		return std::move(ret);
+#endif
 	}
 };
 
@@ -1412,7 +1423,7 @@ public:
 	shot, or to open a separate directory handle using the file_flags::UniqueDirectoryHandle flag.
 
 	Note that setting maxitems=1 will often cause a buffer space exhaustion, causing a second syscall
-	with an enlarged buffer. This is because AFIO can't know if the allocated buffer can hold all of
+	with an enlarged buffer. This is because AFIO cannot know if the allocated buffer can hold all of
 	the filename being retrieved, so it may have to retry. Put another way, setting maxitems=1 will
 	give you the worst performance possible.
 
@@ -1433,7 +1444,7 @@ public:
 	shot, or to open a separate directory handle using the file_flags::UniqueDirectoryHandle flag.
 
 	Note that setting maxitems=1 will often cause a buffer space exhaustion, causing a second syscall
-	with an enlarged buffer. This is because AFIO can't know if the allocated buffer can hold all of
+	with an enlarged buffer. This is because AFIO cannot know if the allocated buffer can hold all of
 	the filename being retrieved, so it may have to retry. Put another way, setting maxitems=1 will
 	give you the worst performance possible.
 	
@@ -1476,7 +1487,7 @@ public:
 	*/
 	static size_t page_size() BOOST_NOEXCEPT_OR_NOTHROW;
         
-        void complete_async_op(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr e=exception_ptr());
+    void complete_async_op(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr e=exception_ptr());
 protected:
 	completion_returntype invoke_user_completion(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr *e, std::function<completion_t> callback);
 	template<class F, class T> std::vector<async_io_op> chain_async_ops(int optype, const std::vector<async_io_op> &preconditions, const std::vector<T> &container, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<async_io_handle>, exception_ptr *, T));

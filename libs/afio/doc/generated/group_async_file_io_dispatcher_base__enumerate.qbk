@@ -21,6 +21,11 @@ By default dir() returns shared handles i.e. dir("foo") and dir("foo") will retu
 handle, and therefore enumerating not all of the entries at once is a race condition. The solution is
 to either set maxitems to a value large enough to guarantee a directory will be enumerated in a single
 shot, or to open a separate directory handle using the file\u005fflags::UniqueDirectoryHandle flag.
+
+Note that setting maxitems=1 will often cause a buffer space exhaustion, causing a second syscall
+with an enlarged buffer. This is because AFIO cannot know if the allocated buffer can hold all of
+the filename being retrieved, so it may have to retry. Put another way, setting maxitems=1 will
+give you the worst performance possible.
 ``
 
 
@@ -60,6 +65,11 @@ By default dir() returns shared handles i.e. dir("foo") and dir("foo") will retu
 handle, and therefore enumerating not all of the entries at once is a race condition. The solution is
 to either set maxitems to a value large enough to guarantee a directory will be enumerated in a single
 shot, or to open a separate directory handle using the file\u005fflags::UniqueDirectoryHandle flag.
+
+Note that setting maxitems=1 will often cause a buffer space exhaustion, causing a second syscall
+with an enlarged buffer. This is because AFIO cannot know if the allocated buffer can hold all of
+the filename being retrieved, so it may have to retry. Put another way, setting maxitems=1 will
+give you the worst performance possible.
 ``
 
 
