@@ -785,7 +785,13 @@ namespace detail {
 				ntstat=NtQueryVolumeInformationFile(h, &isb, &ffssi, sizeof(ffssi), FileFsSectorSizeInformation);
 				if(STATUS_PENDING==ntstat)
 					ntstat=NtWaitForSingleObject(h, FALSE, NULL);
-				BOOST_AFIO_ERRHNTFN(ntstat, path());
+				//BOOST_AFIO_ERRHNTFN(ntstat, path());
+                if(0/*STATUS_SUCCESS*/!=ntstat)
+                {
+                    // Windows XP and Vista don't support the FILE_FS_SECTOR_SIZE_INFORMATION
+                    // API, so we'll just hardcode 512 bytes
+                    ffssi.PhysicalBytesPerSectorForPerformance=512;
+                }
 			}
 			if(!!(wanted&metadata_flags::ino)) { stat.st_ino=fai.InternalInformation.IndexNumber.QuadPart; }
 			if(!!(wanted&metadata_flags::type)) { stat.st_type=to_st_type(fai.BasicInformation.FileAttributes); }
