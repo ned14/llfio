@@ -45,7 +45,7 @@
 [def __afio_op__ [link afio.reference.structs.async_io_op `struct async_io_op`]]
 [def __afio_when_all__ [link afio.reference.functions.when_all_ops `when_all()`]]
 
-[/ yet to do are filedir_example, sync_example, readwrite_example, truncate_example ]
+[/ yet to do are filedir_example ]
 [import ../test/examples/barrier_example.cpp]
 [import ../test/examples/call_example.cpp]
 [import ../test/examples/closure_execution_afio_io_example.cpp]

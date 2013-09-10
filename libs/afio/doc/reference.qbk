@@ -43,6 +43,7 @@
 
 [section:functions Functions]
 [include generated/group_async_file_io_dispatcher.qbk]
+[include generated/group_make_async_data_op_req.qbk]
 [include generated/group_process_threadpool.qbk]
 [section:when_all_futures when_all() (futures)]
 [include generated/group_when_all_futures.qbk]

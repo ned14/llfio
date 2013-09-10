@@ -1292,7 +1292,7 @@ public:
     \qbk{distinguish, batch}
     \complexity{Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete if content synchronisation is constant time (which is extremely unlikely).}
     \exceptionmodelstd
-    \qexample{sync_example}
+    \qexample{readwrite_example}
     */
 	virtual std::vector<async_io_op> sync(const std::vector<async_io_op> &ops)=0;
 	/*! \brief Schedule an asynchronous content synchronisation with physical storage after a preceding operation.
@@ -1302,7 +1302,7 @@ public:
     \qbk{distinguish, single}
     \complexity{Amortised O(1) to dispatch. Amortised O(1) to complete if content synchronisation is constant time (which is extremely unlikely).}
     \exceptionmodelstd
-    \qexample{sync_example}
+    \qexample{readwrite_example}
     */
 	inline async_io_op sync(const async_io_op &req);
 	/*! \brief Schedule a batch of asynchronous file or directory handle closes after preceding operations.
@@ -1405,7 +1405,7 @@ public:
     \qbk{distinguish, batch}
     \complexity{Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete if truncating file lengths is constant time.}
     \exceptionmodelstd
-    \qexample{truncate_example}
+    \qexample{readwrite_example}
     */
 	virtual std::vector<async_io_op> truncate(const std::vector<async_io_op> &ops, const std::vector<off_t> &sizes)=0;
 	/*! \brief Schedule an asynchronous file length truncation after a preceding operation.
@@ -1416,7 +1416,7 @@ public:
     \qbk{distinguish, single}
     \complexity{Amortised O(1) to dispatch. Amortised O(1) to complete if truncating file lengths is constant time.}
     \exceptionmodelstd
-    \qexample{truncate_example}
+    \qexample{readwrite_example}
     */
 	inline async_io_op truncate(const async_io_op &op, off_t newsize);
 	/*! \brief Schedule a batch of asynchronous directory enumerations after a preceding operations.
@@ -1984,34 +1984,38 @@ template<class T> struct async_data_op_req : public detail::async_data_op_req_im
 	async_data_op_req &operator=(async_data_op_req &&o) BOOST_NOEXCEPT_OR_NOTHROW { static_cast<detail::async_data_op_req_impl<false>>(*this)=std::move(o); return *this; }
 	//! \async_data_op_req1 \param _length The number of bytes to transfer
 	async_data_op_req(async_io_op _precondition, T *v, size_t _length, off_t _where) : detail::async_data_op_req_impl<false>(std::move(_precondition), static_cast<void *>(v), _length, _where) { }
-	};
-	//! \brief A convenience bundle of precondition, data and where for writing from a single `const T *`. Data \b MUST stay around until the operation completes. \tparam "class T" Any readable type T \ingroup async_data_op_req
-	template<class T> struct async_data_op_req<const T> : public detail::async_data_op_req_impl<true>
-	{
+	//! \async_data_op_req1
+	template<size_t N> async_data_op_req(async_io_op _precondition, T (&v)[N], off_t _where) : detail::async_data_op_req_impl<false>(std::move(_precondition), static_cast<void *>(v), N*sizeof(T), _where) { }
+};
+//! \brief A convenience bundle of precondition, data and where for writing from a single `const T *`. Data \b MUST stay around until the operation completes. \tparam "class T" Any readable type T \ingroup async_data_op_req
+template<class T> struct async_data_op_req<const T> : public detail::async_data_op_req_impl<true>
+{
 #ifdef DOXYGEN_SHOULD_SKIP_THIS
-		//! A precondition containing an open file handle for this operation
-		async_io_op precondition;
-		//! A sequence of const Boost.ASIO buffers to write from
-		std::vector<boost::asio::const_buffer> buffers;
-		//! The offset at which to write
-		off_t where;
+	//! A precondition containing an open file handle for this operation
+	async_io_op precondition;
+	//! A sequence of const Boost.ASIO buffers to write from
+	std::vector<boost::asio::const_buffer> buffers;
+	//! The offset at which to write
+	off_t where;
 #endif
-		//! \constr
-		async_data_op_req() { }
-		//! \cconstr
-		async_data_op_req(const async_data_op_req &o) : detail::async_data_op_req_impl<true>(o) { }
-		//! \mconstr
-		async_data_op_req(async_data_op_req &&o) BOOST_NOEXCEPT_OR_NOTHROW : detail::async_data_op_req_impl<true>(std::move(o)) { }
-		//! \cconstr
-		async_data_op_req(const async_data_op_req<T> &o) : detail::async_data_op_req_impl<true>(o) { }
-		//! \mconstr
-		async_data_op_req(async_data_op_req<T> &&o) BOOST_NOEXCEPT_OR_NOTHROW : detail::async_data_op_req_impl<true>(std::move(o)) { }
-		//! \cassign
-		async_data_op_req &operator=(const async_data_op_req &o) { static_cast<detail::async_data_op_req_impl<true>>(*this)=o; return *this; }
-		//! \massign
-		async_data_op_req &operator=(async_data_op_req &&o) BOOST_NOEXCEPT_OR_NOTHROW { static_cast<detail::async_data_op_req_impl<true>>(*this)=std::move(o); return *this; }
-		//! \async_data_op_req1 \param _length The number of bytes to transfer
-		async_data_op_req(async_io_op _precondition, const T *v, size_t _length, off_t _where) : detail::async_data_op_req_impl<true>(std::move(_precondition), static_cast<const void *>(v), _length, _where) { }
+	//! \constr
+	async_data_op_req() { }
+	//! \cconstr
+	async_data_op_req(const async_data_op_req &o) : detail::async_data_op_req_impl<true>(o) { }
+	//! \mconstr
+	async_data_op_req(async_data_op_req &&o) BOOST_NOEXCEPT_OR_NOTHROW : detail::async_data_op_req_impl<true>(std::move(o)) { }
+	//! \cconstr
+	async_data_op_req(const async_data_op_req<T> &o) : detail::async_data_op_req_impl<true>(o) { }
+	//! \mconstr
+	async_data_op_req(async_data_op_req<T> &&o) BOOST_NOEXCEPT_OR_NOTHROW : detail::async_data_op_req_impl<true>(std::move(o)) { }
+	//! \cassign
+	async_data_op_req &operator=(const async_data_op_req &o) { static_cast<detail::async_data_op_req_impl<true>>(*this)=o; return *this; }
+	//! \massign
+	async_data_op_req &operator=(async_data_op_req &&o) BOOST_NOEXCEPT_OR_NOTHROW { static_cast<detail::async_data_op_req_impl<true>>(*this)=std::move(o); return *this; }
+	//! \async_data_op_req1 \param _length The number of bytes to transfer
+	async_data_op_req(async_io_op _precondition, const T *v, size_t _length, off_t _where) : detail::async_data_op_req_impl<true>(std::move(_precondition), static_cast<const void *>(v), _length, _where) { }
+	//! \async_data_op_req1
+	template<size_t N> async_data_op_req(async_io_op _precondition, const T (&v)[N], off_t _where) : detail::async_data_op_req_impl<true>(std::move(_precondition), static_cast<const void *>(v), N*sizeof(const T), _where) { }
 };
 //! \brief A convenience bundle of precondition, data and where for reading into a `void *`. Data \b MUST stay around until the operation completes. \ingroup async_data_op_req
 template<> struct async_data_op_req<void> : public detail::async_data_op_req_impl<false>
@@ -2217,6 +2221,39 @@ template<class C, class T, class A> struct async_data_op_req<const std::basic_st
     //! \async_data_op_req1
 	async_data_op_req(async_io_op _precondition, const std::basic_string<C, T, A> &v, off_t _where) : detail::async_data_op_req_impl<true>(std::move(_precondition), static_cast<const void *>(&v.front()), v.size()*sizeof(A), _where) { }
 };
+
+/*! \brief Convenience instantiator of a async_data_op_req, letting the compiler deduce the template specialisation to use.
+
+\return An async_data_op_req matching the supplied parameter type.
+\async_data_op_req1
+\ingroup make_async_data_op_req
+\qbk{
+[heading Example]
+[readwrite_example]
+}
+*/
+template<class T> inline async_data_op_req<typename std::remove_pointer<typename std::remove_reference<T>::type>::type> make_async_data_op_req(async_io_op _precondition, T &&v, off_t _where)
+{
+	typedef typename std::remove_pointer<typename std::remove_reference<T>::type>::type _T;
+	return async_data_op_req<_T>(_precondition, v, _where);
+}
+/*! \brief Convenience instantiator of a async_data_op_req, letting the compiler deduce the template specialisation to use.
+
+\return An async_data_op_req matching the supplied parameter type.
+\async_data_op_req1
+\param _length The number of bytes to transfer
+\ingroup make_async_data_op_req
+\qbk{
+[heading Example]
+[readwrite_example]
+}
+*/
+template<class T> inline async_data_op_req<typename std::remove_pointer<typename std::remove_reference<T>::type>::type> make_async_data_op_req(async_io_op _precondition, T &&v, size_t _length, off_t _where)
+{
+	typedef typename std::remove_pointer<typename std::remove_reference<T>::type>::type _T;
+	return async_data_op_req<_T>(_precondition, v, _length, _where);
+}
+
 
 /*! \struct async_enumerate_op_req
 \brief A convenience bundle of precondition, number of items to enumerate and item pattern match.

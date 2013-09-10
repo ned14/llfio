@@ -74,6 +74,8 @@ afio/reference/classes/thread_source.html
 afio/reference/classes/std_thread_pool.html
 afio/reference/functions.html
 afio/reference/functions/make_async_file_io_dispatcher.html
+afio/reference/functions/make_async_data_op_req_3.html
+afio/reference/functions/make_async_data_op_req_4.html
 afio/reference/functions/process_threadpool.html
 afio/reference/functions/when_all_futures.html
 afio/reference/functions/when_all_futures/when_all.html
