@@ -317,7 +317,11 @@ template<class R> class packaged_task<R()>
 	{
 		typedef boost::packaged_task<R> Base;
 #endif
-	packaged_task(const packaged_task &);
+#ifdef BOOST_NO_CXX11_DELETED_FUNCTIONS
+	packaged_task(const packaged_task &) /* = delete */;
+#else
+	packaged_task(const packaged_task &) = delete;
+#endif
 public:
 	packaged_task() { }
 	packaged_task(Base &&o) BOOST_NOEXCEPT_OR_NOTHROW : Base(std::move(o)) { }
