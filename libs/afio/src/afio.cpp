@@ -50,6 +50,7 @@ File Created: Mar 2013
 #define __MSVCRT_VERSION__ 0x601
 
 #include "../../../boost/afio/afio.hpp"
+#include "../../../boost/afio/detail/Aligned_Allocator.hpp"
 #include "boost/smart_ptr/detail/spinlock.hpp"
 #include "../../../boost/afio/detail/valgrind/memcheck.h"
 #include "../../../boost/afio/detail/valgrind/helgrind.h"
@@ -740,7 +741,7 @@ namespace detail {
 			NTSTATUS ntstat;
 
 			HANDLE h=myid;
-			std::filesystem::path::value_type buffer[sizeof(FILE_ALL_INFORMATION)/sizeof(std::filesystem::path::value_type)+32769];
+			BOOST_AFIO_TYPEALIGNMENT(8) std::filesystem::path::value_type buffer[sizeof(FILE_ALL_INFORMATION)/sizeof(std::filesystem::path::value_type)+32769];
 			FILE_ALL_INFORMATION &fai=*(FILE_ALL_INFORMATION *)buffer;
 			FILE_FS_SECTOR_SIZE_INFORMATION ffssi={0};
 			bool needInternal=!!(wanted&metadata_flags::ino);
@@ -813,7 +814,7 @@ namespace detail {
 			windows_nt_kernel::init();
 			using namespace windows_nt_kernel;
 			using windows_nt_kernel::REPARSE_DATA_BUFFER;
-			char buffer[sizeof(REPARSE_DATA_BUFFER)+32769];
+			BOOST_AFIO_TYPEALIGNMENT(8) char buffer[sizeof(REPARSE_DATA_BUFFER)+32769];
 			DWORD written=0;
 			REPARSE_DATA_BUFFER *rpd=(REPARSE_DATA_BUFFER *) buffer;
 			memset(rpd, 0, sizeof(*rpd));
@@ -1256,8 +1257,9 @@ size_t directory_entry::compatibility_maximum() BOOST_NOEXCEPT_OR_NOTHROW
 	// Let's choose 100k entries. Why not!
 	return 100000;
 #else
-	// This is what glibc uses, a 32Kb buffer, and it's what OpenVZ appears to assume.
-	return 32768/sizeof(dirent);
+	return 100000;
+	// This is what glibc uses, a 32Kb buffer.
+	//return 32768/sizeof(dirent);
 #endif
 }
 
@@ -3168,7 +3170,7 @@ void directory_entry::_int_fetch(metadata_flags wanted, std::shared_ptr<async_io
 		{
 			// Fast path skips opening a handle per file by enumerating the containing directory using a glob
 			// exactly matching the leafname. This is about 10x quicker, so it's very much worth it.
-			std::filesystem::path::value_type buffer[sizeof(FILE_ALL_INFORMATION)/sizeof(std::filesystem::path::value_type)+32769];
+			BOOST_AFIO_TYPEALIGNMENT(8) std::filesystem::path::value_type buffer[sizeof(FILE_ALL_INFORMATION)/sizeof(std::filesystem::path::value_type)+32769];
 			IO_STATUS_BLOCK isb={ 0 };
 			UNICODE_STRING _glob;
 			NTSTATUS ntstat;
