@@ -2232,9 +2232,9 @@ template<class C, class T, class A> struct async_data_op_req<const std::basic_st
 [readwrite_example]
 }
 */
-template<class T> inline async_data_op_req<typename std::remove_pointer<typename std::remove_reference<T>::type>::type> make_async_data_op_req(async_io_op _precondition, T &&v, off_t _where)
+template<class T> inline async_data_op_req<typename std::remove_pointer<typename std::decay<T>::type>::type> make_async_data_op_req(async_io_op _precondition, T &&v, off_t _where)
 {
-	typedef typename std::remove_pointer<typename std::remove_reference<T>::type>::type _T;
+	typedef typename std::remove_pointer<typename std::decay<T>::type>::type _T;
 	return async_data_op_req<_T>(_precondition, v, _where);
 }
 /*! \brief Convenience instantiator of a async_data_op_req, letting the compiler deduce the template specialisation to use.
@@ -2248,9 +2248,9 @@ template<class T> inline async_data_op_req<typename std::remove_pointer<typename
 [readwrite_example]
 }
 */
-template<class T> inline async_data_op_req<typename std::remove_pointer<typename std::remove_reference<T>::type>::type> make_async_data_op_req(async_io_op _precondition, T &&v, size_t _length, off_t _where)
+template<class T> inline async_data_op_req<typename std::remove_pointer<typename std::decay<T>::type>::type> make_async_data_op_req(async_io_op _precondition, T &&v, size_t _length, off_t _where)
 {
-	typedef typename std::remove_pointer<typename std::remove_reference<T>::type>::type _T;
+	typedef typename std::remove_pointer<typename std::decay<T>::type>::type _T;
 	return async_data_op_req<_T>(_precondition, v, _length, _where);
 }
 

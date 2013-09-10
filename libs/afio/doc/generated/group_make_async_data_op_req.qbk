@@ -16,7 +16,7 @@ Convenience instantiator of a async\u005fdata\u005fop\u005freq, letting the comp
 
 [heading Synopsis]
 ``template<class T>
-async_data_op_req<typename std::remove_pointer<typename std::remove_reference<T>::type>::type> make_async_data_op_req(async_io_op _precondition, T && v, off_t _where)``
+async_data_op_req<typename std::remove_pointer<typename std::decay<T>::type>::type> make_async_data_op_req(async_io_op _precondition, T && v, off_t _where)``
 
 [heading Parameters]
 
@@ -48,7 +48,7 @@ Convenience instantiator of a async\u005fdata\u005fop\u005freq, letting the comp
 
 [heading Synopsis]
 ``template<class T>
-async_data_op_req<typename std::remove_pointer<typename std::remove_reference<T>::type>::type> make_async_data_op_req(async_io_op _precondition, T && v, size_t _length, off_t _where)``
+async_data_op_req<typename std::remove_pointer<typename std::decay<T>::type>::type> make_async_data_op_req(async_io_op _precondition, T && v, size_t _length, off_t _where)``
 
 [heading Parameters]
 
