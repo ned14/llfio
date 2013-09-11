@@ -43,6 +43,7 @@
 [def __afio_completion__ [link afio.reference.classes.async_file_io_dispatcher_base.completion_2_batch_bound_functions `async_file_io_dispatcher_base::completion()`]]
 [def __afio_enumerate__ [link afio.reference.classes.async_file_io_dispatcher_base.enumerate_1_batch `async_file_io_dispatcher_base::enumerate()`]]
 [def __afio_op__ [link afio.reference.structs.async_io_op `struct async_io_op`]]
+[def __afio_handle__ [link afio.reference.classes.async_io_handle `class async_io_handle`]]
 [def __afio_when_all__ [link afio.reference.functions.when_all_ops `when_all()`]]
 
 [/ yet to do are filedir_example ]
@@ -54,6 +55,8 @@
 [import ../test/examples/completion_example2.cpp]
 [import ../test/examples/current_exception_hack.cpp]
 [import ../test/examples/enumerate_example.cpp]
+[import ../test/examples/readwrite_example.cpp]
+[import ../test/examples/readwrite_example_traditional.cpp]
 
 [section:introduction Introduction]
 __boost_afio__ is a linear scalable, batch, chainable, asynchronous closure execution engine extending __boost_asio__

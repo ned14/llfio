@@ -8,17 +8,60 @@
 
 [section:quickstart Quick Start]
 
-This Quick Start section shows some of the features.
+There are two kinds of likely __boost_afio__ users: (i) those who want to do high performance,
+scalable file input/output (ii) those who want to execute closures (self contained
+functions, think of them like C style callbacks except they can carry state) with
+the rich dependency ordered execution constraint support AFIO implements.
+
+The former ends up bleeding into the latter however, which is why AFIO also exposes
+for public usage its internal closure execution engine: for example, forthcoming
+__triplegit__ [link afio.design.acid_write_ordering.write_ordering_data often runs 128 or 256 bit hashes on every piece of data entering or
+exiting storage]. With AFIO, this is as simple as adding a hash execution closure to every
+scatter read and gather write operation -- and AFIO's flexibility lets you easily
+choose between that hash being performed before i/o (useful for preloading the L2 cache
+if scatter/gather chunks are less than 4Kb each), after i/o (useful if reading 4Kb or
+larger chunks as DMAs invalidate CPU caches), or more interestingly ['during] i/o i.e.
+in parallel (useful if writing 4Kb or larger chunks).
+
+For this quick start, the question becomes which to start with first: async file i/o
+or closures? Starting with either has merits, but we've decided on file i/o first.
+
+[section:async_file_io Asynchronous file i/o]
+
+[heading Hello World, asynchronously!]
+
+We might as well jump straight in: on the left is a traditional STL iostreams
+implementation with its equivalent in AFIO using single-shot functions (i.e. a batch
+of one) on the right.
+
+[table:hello_world Traditional STL iostreams and AFIO side by side
+  [[[readwrite_example_traditional]][[readwrite_example]]]
+]
+
+For reference, that's 16 lines of code on the left as compared to 21 lines of
+code on the right (three of which could be easily eliminated too). Admittedly the
+lines are a lot longer, and maybe less intuitive looking, but programming against
+AFIO is certainly compact!
+
+As you'll note from the bookmarked lines on the right, generally the first parameter
+into any AFIO function is the precondition op (of type __afio_op__) which must complete before the op being
+scheduled now is allowed to begin. Precondition ops don't just enforce execution order
+however, they also carry a file handle or more accurately, a ['shared future] to a
+shared pointer to a __afio_handle__ which by definition will be ready by the time your
+dependency is executed. 
+
+[endsect] [/async_file_io]
 
 
-[section Closure Execution Engines]
+[section:closure_engine Closure Execution Engines]
 
 [def __msvc__ MSVC]
 [def __stlport__ [@http://sourceforge.net/projects/stlport STLport]]
 
-
-__boost_afio__ can be viewed as an an asynchronous, chainable, batch executable, closure 
-execution engine. While this is a somewhat intimidating characterization, the core concept 
+Because some file system operations are synchronous on most platforms (creating files,
+calling `fsync()` etc.) __boost_afio__ internally needed an asynchronous, chainable, batch
+executable, closure execution engine which it also makes available for public usage.
+While this is a somewhat intimidating characterization, the core concept 
 of such an engine is fairly straight forward. The following sections will attempt 
 to clear up exactly what this title means, and to give the user a reference for how it 
 can be used when compared to some better known implementations. If you are already 

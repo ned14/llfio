@@ -157,14 +157,14 @@
 <div class="orderedlist"><ol class="orderedlist" type="1">
 <li class="listitem">
           Download the latest version of the Boost Libraries from boost.org. At the
-          time of writing the current version is Boost 1.54. Boost AFIO will is not
-          compatible with earlier versions of Boost, so be sure to use a current
-          copy of the Boost Libraries.
+          time of writing the current version is Boost 1.54. Boost AFIO is not compatible
+          with earlier versions of Boost, so be sure to use a current copy of the
+          Boost Libraries.
         </li>
 <li class="listitem">
-          Download Boost AFIO through GitHub at : https://github.com/BoostGSoC/boost.afio
+          Download Boost AFIO through GitHub at : <a href="https://github.com/BoostGSoC/boost.afio" target="_top">https://github.com/BoostGSoC/boost.afio</a>
           We recommend using a git repository, as it will allow for future updates.
-          If you are unfamiliar with git, check the git hub website for instructions
+          If you are unfamiliar with git, check the github website for instructions
           on how to use git. This is a good place to start: <a href="https://help.github.com/articles/set-up-git" target="_top">https://help.github.com/articles/set-up-git</a>
         </li>
 <li class="listitem">
@@ -172,9 +172,10 @@
           <div class="orderedlist"><ol class="orderedlist" type="a">
 <li class="listitem">
                 You can create a symbolic link of the AFIO library into your boost
-                installation
+                installation. The primary advantage of this method is that you can
+                easily pull updates to AFIO with little work.
                 <p>
-                  On linux the command will be :
+                  On POSIX the command will be :
                 </p>
 <pre class="programlisting">
     $ ln -s <span class="emphasis"><em>path/to/boost.afio/boost/afio</em></span> /path/to/boost_directory/boost/afio
@@ -214,7 +215,8 @@
                 </p>
               </li>
 <li class="listitem">
-                You can copy it directly into Boost.
+                You can copy it directly into Boost. This is the method least likely
+                to have problems.
                 <p>
                   It may be preferable to forgo symbolic links altogether and simply
                   copy the <code class="literal">boost.afio/boost/afio</code> and <code class="literal">boost.afio/libs/afio</code>
@@ -284,6 +286,10 @@
           <span class="bold"><strong>--link-test</strong></span> supersedes <span class="bold"><strong>--test-all</strong></span>
           and <span class="bold"><strong>--test-each</strong></span> options, and cannot be
           combined with the other tests.
+        </li>
+<li class="listitem">
+          <span class="bold"><strong>--running-on-ci</strong></span>: will compile, link and
+          execute only those tests which don't use <code class="computeroutput"><span class="identifier">fsync</span><span class="special">()</span></code>.
         </li>
 <li class="listitem">
           <span class="bold"><strong>--test-all</strong></span>: will run a comprehensive unit

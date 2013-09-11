@@ -1596,6 +1596,7 @@ template<class F, class... Args> std::shared_ptr<async_io_handle> async_file_io_
 }
 #else
 
+#undef BOOST_PP_LOCAL_MACRO
 #define BOOST_PP_LOCAL_MACRO(N)                                                                     \
     template <class F                                                                               \
     BOOST_PP_COMMA_IF(N)                                                                            \
@@ -1655,6 +1656,7 @@ template<class F, class... Args> std::shared_ptr<async_io_handle> async_file_io_
 #define BOOST_PP_LOCAL_LIMITS     (0, BOOST_AFIO_MAX_PARAMETERS) //should this be 0 or 1 for the min????
 #include BOOST_PP_LOCAL_ITERATE()
 #endif
+#undef BOOST_PP_LOCAL_MACRO
 
 
 
@@ -1768,6 +1770,7 @@ template<class F, class... Args> async_io_op async_file_io_dispatcher_base::chai
 	    }
     #endif
 
+#undef BOOST_PP_LOCAL_MACRO
 #define BOOST_PP_LOCAL_MACRO(N)                                                                     \
     template <class F                                /* template start */                           \
     BOOST_PP_COMMA_IF(N)                                                                            \
@@ -1862,6 +1865,7 @@ template<class F, class... Args> async_io_op async_file_io_dispatcher_base::chai
   
 #define BOOST_PP_LOCAL_LIMITS     (0, BOOST_AFIO_MAX_PARAMETERS) //should this be 0 or 1 for the min????
 #include BOOST_PP_LOCAL_ITERATE()
+#undef BOOST_PP_LOCAL_MACRO
 
 #endif
 
