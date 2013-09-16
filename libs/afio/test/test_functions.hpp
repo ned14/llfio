@@ -678,7 +678,7 @@ static void print_stat(std::shared_ptr<boost::afio::async_io_handle> dirh, boost
 {
 	using namespace boost::afio;
 	std::cout << "Entry " << direntry.name() << " is a ";
-	auto entry=direntry.full_lstat(dirh);
+	auto entry=direntry.fetch_lstat(dirh);
 	if(S_IFLNK==(entry.st_type & S_IFLNK))
 		std::cout << "link";
 	else if(S_IFDIR==(entry.st_type & S_IFDIR))

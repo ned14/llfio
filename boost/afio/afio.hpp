@@ -836,11 +836,15 @@ public:
 	bool operator<=(const directory_entry& rhs) const BOOST_NOEXCEPT_OR_NOTHROW { return leafname <= rhs.leafname; }
 	bool operator> (const directory_entry& rhs) const BOOST_NOEXCEPT_OR_NOTHROW { return leafname > rhs.leafname; }
 	bool operator>=(const directory_entry& rhs) const BOOST_NOEXCEPT_OR_NOTHROW { return leafname >= rhs.leafname; }
-	//! The name of the directory entry
+	//! \return The name of the directory entry
 	std::filesystem::path name() const BOOST_NOEXCEPT_OR_NOTHROW { return leafname; }
-	//! A bitfield of what metadata is ready right now
+	//! \return A bitfield of what metadata is ready right now
 	metadata_flags metadata_ready() const BOOST_NOEXCEPT_OR_NOTHROW { return have_metadata; }
-	//! Fetches the specified metadata, returning that newly available. This is a blocking call.
+	/*! \brief Fetches the specified metadata, returning that newly available. This is a blocking call if wanted metadata is not yet ready.
+	\return The metadata now available in this directory entry.
+	\param dirh An open handle to the entry's containing directory. You can get this from the h shared future member variable in an op ref.
+	\param wanted A bitfield of the metadata to fetch. This does not replace existing metadata.
+	*/
 	metadata_flags fetch_metadata(std::shared_ptr<async_io_handle> dirh, metadata_flags wanted)
 	{
 		metadata_flags tofetch;
@@ -849,50 +853,59 @@ public:
 		if(!!tofetch) _int_fetch(tofetch, dirh);
 		return have_metadata;
 	}
-	//! Fetches a fast path `stat_t` structure which is missing those fields not fast to fetch on this platform.
-	stat_t full_lstat(std::shared_ptr<async_io_handle> dirh, metadata_flags wanted=directory_entry::metadata_fastpath())
+	/*! \brief Returns a copy of the internal `stat_t` structure. This is a blocking call if wanted metadata is not yet ready.
+	\return A copy of the internal `stat_t` structure.
+	\param dirh An open handle to the entry's containing directory. You can get this from the h shared future member variable in an op ref.
+	\param wanted A bitfield of the metadata to fetch. This does not replace existing metadata.
+	*/
+	stat_t fetch_lstat(std::shared_ptr<async_io_handle> dirh, metadata_flags wanted=directory_entry::metadata_fastpath())
 	{
 		fetch_metadata(dirh, wanted);
 		return stat;
 	}
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
 #define BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(field) \
 decltype(stat_t().st_##field) st_##field() const { if(!(have_metadata&metadata_flags::field)) { BOOST_AFIO_THROW(std::runtime_error("Field st_" #field " not present.")); } return stat.st_##field; } \
 decltype(stat_t().st_##field) st_##field(std::shared_ptr<async_io_handle> dirh) { if(!(have_metadata&metadata_flags::field)) { _int_fetch(metadata_flags::field, dirh); } return stat.st_##field; }
-	//! Returns st_dev
+#else
+#define BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(field) \
+decltype(stat_t().st_##field) st_##field(std::shared_ptr<async_io_handle> dirh=std::shared_ptr<async_io_handle>()) { if(!(have_metadata&metadata_flags::field)) { _int_fetch(metadata_flags::field, dirh); } return stat.st_##field; }
+#endif
+	//! Returns st_dev \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from the h shared future member variable in an op ref.
 	BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(dev)
-	//! Returns st_ino
+	//! Returns st_ino \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from the h shared future member variable in an op ref.
 	BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(ino)
-	//! Returns st_type
+	//! Returns st_type \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from the h shared future member variable in an op ref.
 	BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(type)
-	//! Returns st_mode
+	//! Returns st_mode \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from the h shared future member variable in an op ref.
 	BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(mode)
-	//! Returns st_nlink
+	//! Returns st_nlink \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from the h shared future member variable in an op ref.
 	BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(nlink)
-	//! Returns st_uid
+	//! Returns st_uid \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from the h shared future member variable in an op ref.
 	BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(uid)
-	//! Returns st_gid
+	//! Returns st_gid \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from the h shared future member variable in an op ref.
 	BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(gid)
-	//! Returns st_rdev
+	//! Returns st_rdev \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from the h shared future member variable in an op ref.
 	BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(rdev)
-	//! Returns st_atim
+	//! Returns st_atim \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from the h shared future member variable in an op ref.
 	BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(atim)
-	//! Returns st_mtim
+	//! Returns st_mtim \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from the h shared future member variable in an op ref.
 	BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(mtim)
-	//! Returns st_ctim
+	//! Returns st_ctim \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from the h shared future member variable in an op ref.
 	BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(ctim)
-	//! Returns st_size
+	//! Returns st_size \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from the h shared future member variable in an op ref.
 	BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(size)
-	//! Returns st_allocated
+	//! Returns st_allocated \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from the h shared future member variable in an op ref.
 	BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(allocated)
-	//! Returns st_blocks
+	//! Returns st_blocks \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from the h shared future member variable in an op ref.
 	BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(blocks)
-	//! Returns st_blksize
+	//! Returns st_blksize \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from the h shared future member variable in an op ref.
 	BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(blksize)
-	//! Returns st_flags
+	//! Returns st_flags \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from the h shared future member variable in an op ref.
 	BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(flags)
-	//! Returns st_gen
+	//! Returns st_gen \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from the h shared future member variable in an op ref.
 	BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(gen)
-	//! Returns st_birthtim
+	//! Returns st_birthtim \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from the h shared future member variable in an op ref.
 	BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(birthtim)
 
 	//! A bitfield of what metadata is available on this platform. This doesn't mean all is available for every filing system.
@@ -949,13 +962,13 @@ public:
 	off_t write_count() const { return byteswritten; }
 	//! Returns how many bytes have been written since this handle was last fsynced.
 	off_t write_count_since_fsync() const { return byteswritten-byteswrittenatlastfsync; }
-	//! Returns a mostly filled stat_t structure for the file or directory referenced by this handle. Use `metadata_flags::All` if you want it as complete as your platform allows, even at the cost of severe performance loss.
-	virtual stat_t lstat(metadata_flags wanted=directory_entry::metadata_fastpath()) const=0;
 	//! Returns a mostly filled directory_entry for the file or directory referenced by this handle. Use `metadata_flags::All` if you want it as complete as your platform allows, even at the cost of severe performance loss.
-	directory_entry direntry(metadata_flags wanted=directory_entry::metadata_fastpath()) const
+	virtual directory_entry direntry(metadata_flags wanted=directory_entry::metadata_fastpath()) const=0;
+	//! Returns a mostly filled stat_t structure for the file or directory referenced by this handle. Use `metadata_flags::All` if you want it as complete as your platform allows, even at the cost of severe performance loss.
+	stat_t lstat(metadata_flags wanted=directory_entry::metadata_fastpath()) const
 	{
-		wanted=wanted&directory_entry::metadata_supported();
-		return directory_entry(_path.leaf(), lstat(wanted), wanted);
+		directory_entry de(direntry(wanted));
+		return de.fetch_lstat(std::shared_ptr<async_io_handle>() /* actually unneeded */, wanted);
 	}
 	//! Returns the target path of this handle if it is a symbolic link
 	virtual std::filesystem::path target() const=0;

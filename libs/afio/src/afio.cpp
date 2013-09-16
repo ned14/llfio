@@ -732,7 +732,7 @@ namespace detail {
 				h->close();
 			}
 		}
-		virtual stat_t lstat(metadata_flags wanted) const
+		virtual directory_entry direntry(metadata_flags wanted) const
 		{
 			windows_nt_kernel::init();
 			using namespace windows_nt_kernel;
@@ -805,7 +805,7 @@ namespace detail {
 			if(!!(wanted&metadata_flags::blocks)) { stat.st_blocks=fai.StandardInformation.AllocationSize.QuadPart/ffssi.PhysicalBytesPerSectorForPerformance; }
 			if(!!(wanted&metadata_flags::blksize)) { stat.st_blksize=(uint16_t) ffssi.PhysicalBytesPerSectorForPerformance; }
 			if(!!(wanted&metadata_flags::birthtim)) { stat.st_birthtim=to_timepoint(fai.BasicInformation.CreationTime); }
-			return stat;
+			return directory_entry(path().leaf(), stat, wanted);
 		}
 		virtual std::filesystem::path target() const
 		{
@@ -862,13 +862,13 @@ namespace detail {
 				fd=-1;
 			}
 		}
-		virtual stat_t lstat(metadata_flags wanted) const
+		virtual directory_entry direntry(metadata_flags wanted) const
 		{
 			stat_t stat(nullptr);
 			BOOST_AFIO_POSIX_STAT_STRUCT s={0};
 			BOOST_AFIO_ERRHOSFN(BOOST_AFIO_POSIX_LSTAT(path().c_str(), &s), path());
 			fill_stat_t(stat, s, wanted);
-			return stat;
+			return directory_entry(path().leaf(), stat, wanted);
 		}
 		virtual std::filesystem::path target() const
 		{
@@ -2260,11 +2260,18 @@ namespace detail {
 		{
 			async_io_handle_windows *p=static_cast<async_io_handle_windows *>(h.get());
 			assert(p);
-			// Windows doesn't provide an async fsync so do it synchronously
-			if(p->SyncOnClose && p->write_count_since_fsync())
-				BOOST_AFIO_ERRHWINFN(FlushFileBuffers(p->h->native_handle()), p->path());
-			p->h->close();
-			p->h.reset();
+			if(!!(p->flags() & file_flags::int_opening_dir) && !(p->flags() & file_flags::UniqueDirectoryHandle) && !!(p->flags() & file_flags::Read) && !(p->flags() & file_flags::Write))
+			{
+				// As this is a directory which may be a fast directory enumerator, ignore close
+			}
+			else
+			{
+				// Windows doesn't provide an async fsync so do it synchronously
+				if(p->SyncOnClose && p->write_count_since_fsync())
+					BOOST_AFIO_ERRHWINFN(FlushFileBuffers(p->h->native_handle()), p->path());
+				p->h->close();
+				p->h.reset();
+			}
 			return std::make_pair(true, h);
 		}
 		// Called in unknown thread
@@ -2829,10 +2836,17 @@ namespace detail {
 		completion_returntype doclose(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr *, async_io_op)
 		{
 			async_io_handle_posix *p=static_cast<async_io_handle_posix *>(h.get());
-			if(p->SyncOnClose && p->write_count_since_fsync())
-				BOOST_AFIO_ERRHOSFN(BOOST_AFIO_POSIX_FSYNC(p->fd), p->path());
-			BOOST_AFIO_ERRHOSFN(BOOST_AFIO_POSIX_CLOSE(p->fd), p->path());
-			p->fd=-1;
+			if(!!(p->flags() & file_flags::int_opening_dir) && !(p->flags() & file_flags::UniqueDirectoryHandle) && !!(p->flags() & file_flags::Read) && !(p->flags() & file_flags::Write))
+			{
+				// As this is a directory which may be a fast directory enumerator, ignore close
+			}
+			else
+			{
+				if(p->SyncOnClose && p->write_count_since_fsync())
+					BOOST_AFIO_ERRHOSFN(BOOST_AFIO_POSIX_FSYNC(p->fd), p->path());
+				BOOST_AFIO_ERRHOSFN(BOOST_AFIO_POSIX_CLOSE(p->fd), p->path());
+				p->fd=-1;
+			}
 			return std::make_pair(true, h);
 		}
 		// Called in unknown thread
@@ -3196,7 +3210,32 @@ void directory_entry::_int_fetch(metadata_flags wanted, std::shared_ptr<async_io
 			// No choice here, open a handle and stat it.
 			async_path_op_req req(dirh->path()/name(), file_flags::Read);
 			auto fileh=dispatcher->dofile(0, std::shared_ptr<async_io_handle>(), nullptr, req).second;
-			stat=fileh->lstat(wanted);
+			auto direntry=fileh->direntry(wanted);
+			wanted=wanted & direntry.metadata_ready(); // direntry() can fail to fill some entries on Win XP
+			if(!!(wanted&metadata_flags::dev)) { stat.st_dev=direntry.stat.st_dev; }
+			if(!!(wanted&metadata_flags::ino)) { stat.st_ino=direntry.stat.st_ino; }
+			if(!!(wanted&metadata_flags::type)) { stat.st_type=direntry.stat.st_mode; }
+			if(!!(wanted&metadata_flags::mode)) { stat.st_mode=direntry.stat.st_mode; }
+			if(!!(wanted&metadata_flags::nlink)) { stat.st_nlink=direntry.stat.st_nlink; }
+			if(!!(wanted&metadata_flags::uid)) { stat.st_uid=direntry.stat.st_uid; }
+			if(!!(wanted&metadata_flags::gid)) { stat.st_gid=direntry.stat.st_gid; }
+			if(!!(wanted&metadata_flags::rdev)) { stat.st_rdev=direntry.stat.st_rdev; }
+			if(!!(wanted&metadata_flags::atim)) { stat.st_atim=direntry.stat.st_atim; }
+			if(!!(wanted&metadata_flags::mtim)) { stat.st_mtim=direntry.stat.st_mtim; }
+			if(!!(wanted&metadata_flags::ctim)) { stat.st_ctim=direntry.stat.st_ctim; }
+			if(!!(wanted&metadata_flags::size)) { stat.st_size=direntry.stat.st_size; }
+			if(!!(wanted&metadata_flags::allocated)) { stat.st_allocated=direntry.stat.st_blocks*direntry.stat.st_blksize; }
+			if(!!(wanted&metadata_flags::blocks)) { stat.st_blocks=direntry.stat.st_blocks; }
+			if(!!(wanted&metadata_flags::blksize)) { stat.st_blksize=direntry.stat.st_blksize; }
+#ifdef HAVE_STAT_FLAGS
+			if(!!(wanted&metadata_flags::flags)) { stat.st_flags=direntry.stat.st_flags; }
+#endif
+#ifdef HAVE_STAT_GEN
+			if(!!(wanted&metadata_flags::gen)) { stat.st_gen=direntry.stat.st_gen; }
+#endif
+#ifdef HAVE_BIRTHTIMESPEC
+			if(!!(wanted&metadata_flags::birthtim)) { stat.st_birthtim=direntry.stat.st_birthtim; }
+#endif
 		}
 	}
 	else
@@ -3208,6 +3247,7 @@ void directory_entry::_int_fetch(metadata_flags wanted, std::shared_ptr<async_io
 		BOOST_AFIO_ERRHOSFN(BOOST_AFIO_POSIX_LSTAT(path.c_str(), &s), path);
 		fill_stat_t(stat, s, wanted);
 	}
+	have_metadata=have_metadata | wanted;
 }
 
 std::shared_ptr<async_file_io_dispatcher_base> make_async_file_io_dispatcher(std::shared_ptr<thread_source> threadpool, file_flags flagsforce, file_flags flagsmask)
