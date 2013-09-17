@@ -4,7 +4,7 @@
 
 int main(void)
 {
-#if !(defined(BOOST_MSVC) && BOOST_MSVC < 1700) && (defined(__GLIBCXX__) && __GLIBCXX__<=20120920 /* <= GCC 4.7 */)
+#if !(defined(BOOST_MSVC) && BOOST_MSVC < 1700) || (defined(__GLIBCXX__) && __GLIBCXX__<=20120920 /* <= GCC 4.7 */)
     //[readwrite_example_traditional
 		
 	try
