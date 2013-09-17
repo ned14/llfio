@@ -1422,6 +1422,18 @@ size_t async_file_io_dispatcher_base::count() const
 	return ret;
 }
 
+async_io_op async_file_io_dispatcher_base::op_from_running_id(size_t id) const
+{
+	BOOST_AFIO_LOCK_GUARD<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
+	std::unordered_map<size_t, detail::async_file_io_dispatcher_op>::iterator it=p->ops.find(id);
+	if(p->ops.end()==it)
+	{
+		BOOST_AFIO_THROW_FATAL(std::runtime_error("Failed to find this operation in list of currently executing operations"));
+	}
+	return async_io_op(const_cast<async_file_io_dispatcher_base *>(this), id, it->second.h);
+}
+
+
 // Called in unknown thread
 async_file_io_dispatcher_base::completion_returntype async_file_io_dispatcher_base::invoke_user_completion(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr *e, std::function<async_file_io_dispatcher_base::completion_t> callback)
 {

@@ -1032,6 +1032,8 @@ public:
 	size_t wait_queue_depth() const;
 	//! Returns the number of open items in this dispatcher
 	size_t count() const;
+	//! Returns an op ref for a given \b currently \b running op id, throwing a fatal exception if id not running at the point of call
+	async_io_op op_from_running_id(size_t id) const;
 
     //! The type returned by a completion handler \ingroup async_file_io_dispatcher_base__completion
 	typedef std::pair<bool, std::shared_ptr<async_io_handle>> completion_returntype;
