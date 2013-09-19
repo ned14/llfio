@@ -989,6 +989,46 @@ public:
 	virtual std::filesystem::path target() const=0;
 };
 
+#ifndef BOOST_NO_CXX11_VARIADIC_TEMPLATES
+// This is a result_of filter to work around the weird mix of brittle decltype(), SFINAE incapable
+// std::result_of and variadic template overload resolution rules in VS2013. Works on other compilers
+// too of course, it simply prefilters out the call() overloads not matching the variadic overload.
+namespace detail
+{
+#if 0
+	template<class C, class... Args> struct vs2013_variadic_overload_resolution_workaround;
+	// Match callable
+	template<class R, class... OArgs, class... Args> struct vs2013_variadic_overload_resolution_workaround<R (*)(OArgs...), Args...>
+	{
+		typedef typename std::result_of<R(*)(Args...)>::type type;
+	};
+	// Match callable
+	template<class R, class T, class... OArgs, class... Args> struct vs2013_variadic_overload_resolution_workaround<R (T::*)(OArgs...) const, Args...>
+	{
+		typedef typename std::result_of<R (T::*)(Args...) const>::type type;
+	};
+	// Match callable
+	template<class R, class T, class... OArgs, class... Args> struct vs2013_variadic_overload_resolution_workaround<R (T::*const)(OArgs...) const, Args...>
+	{
+		typedef typename std::result_of<R (T::*const)(Args...) const>::type type;
+	};
+#else
+	/*
+	call(const std::vector<async_io_op> &ops             , const std::vector<std::function<R()>> &callables              );
+	call(const std::vector<std::function<R()>> &callables                                                                );
+	call(const async_io_op &req                          , std::function<R()> callback                                   );
+	call(const async_io_op &req                          , C callback                                      , Args... args);
+	*/
+	template<class C, class... Args> struct vs2013_variadic_overload_resolution_workaround
+	{
+		typedef typename std::result_of<C(Args...)>::type type;
+	};
+	// Disable C being a const std::vector<std::function<R()>> &callables
+	template<class T, class... Args> struct vs2013_variadic_overload_resolution_workaround<std::vector<T>, Args...>;
+#endif
+}
+#endif
+
 /*! \class async_file_io_dispatcher_base
 \brief Abstract base class for dispatching file i/o asynchronously
 
@@ -1120,7 +1160,7 @@ public:
     
     
     
-#if !defined(BOOST_NO_CXX11_VARIADIC_TEMPLATES) && _MSC_VER!=1800 // VS2013 result_of is not SFINAE capable
+#if !defined(BOOST_NO_CXX11_VARIADIC_TEMPLATES)
      
     /*! \brief Schedule an asynchronous invocation of the specified unbound callable when its supplied precondition completes.
     Note that this function essentially calls `std::bind()` on the callable and the args and passes it to the other call() overload taking a `std::function<>`.
@@ -1142,7 +1182,7 @@ public:
     \exceptionmodelstd
     \qexample{call_example}
     */
-	template<class C, class... Args> inline std::pair<future<typename std::result_of<C(Args...)>::type>, async_io_op> call(const async_io_op &req, C callback, Args... args);
+	template<class C, class... Args> inline std::pair<future<typename detail::vs2013_variadic_overload_resolution_workaround<C, Args...>::type>, async_io_op> call(const async_io_op &req, C callback, Args... args);
 
 #else   //define a version compatable with c++03
 
@@ -2368,9 +2408,9 @@ template<class R> inline std::pair<future<R>, async_io_op> async_file_io_dispatc
 	return std::make_pair(std::move(ret.first.front()), ret.second.front());
 }
 
-#if !defined(BOOST_NO_CXX11_VARIADIC_TEMPLATES) && _MSC_VER!=1800 // VS2013 result_of is not SFINAE capable
+#if !defined(BOOST_NO_CXX11_VARIADIC_TEMPLATES)
 
-template<class C, class... Args> inline std::pair<future<typename std::result_of<C(Args...)>::type>, async_io_op> async_file_io_dispatcher_base::call(const async_io_op &req, C callback, Args... args)
+template<class C, class... Args> inline std::pair<future<typename detail::vs2013_variadic_overload_resolution_workaround<C, Args...>::type>, async_io_op> async_file_io_dispatcher_base::call(const async_io_op &req, C callback, Args... args)
 {
 	typedef typename std::result_of<C(Args...)>::type rettype;
 	return call(req, std::function<rettype()>(std::bind<rettype>(callback, args...)));
