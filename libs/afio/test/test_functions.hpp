@@ -14,7 +14,7 @@ Created: Feb 2013
 
 #ifdef __MINGW32__
 // Mingw doesn't define putenv() needed by Boost.Test
-extern "C" int putenv(char*);
+//extern "C" int putenv(char*);
 // Mingw doesn't define tzset() either
 extern "C" void tzset(void);
 #endif

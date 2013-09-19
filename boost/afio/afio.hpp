@@ -1018,6 +1018,7 @@ class BOOST_AFIO_DECL async_file_io_dispatcher_base : public std::enable_shared_
 	detail::async_file_io_dispatcher_base_p *p;
 	void int_add_io_handle(void *key, std::shared_ptr<async_io_handle> h);
 	void int_del_io_handle(void *key);
+	async_io_op int_op_from_scheduled_id(size_t id) const;
 protected:
 	async_file_io_dispatcher_base(std::shared_ptr<thread_source> threadpool, file_flags flagsforce, file_flags flagsmask);
 public:
@@ -1032,8 +1033,12 @@ public:
 	size_t wait_queue_depth() const;
 	//! Returns the number of open items in this dispatcher
 	size_t count() const;
-	//! Returns an op ref for a given \b currently \b running op id, throwing a fatal exception if id not running at the point of call
-	async_io_op op_from_running_id(size_t id) const;
+	/*! \brief Returns an op ref for a given \b currently \b scheduled op id, throwing a fatal exception if id not scheduled at the point of call.
+	Can be used to retrieve exception state from some op id, or one's own shared future.
+	\return An async_io_op with the same shared future as all op refs with this id.
+	\param id The unique integer id for the op.
+	*/
+	async_io_op op_from_scheduled_id(size_t id) const;
 
     //! The type returned by a completion handler \ingroup async_file_io_dispatcher_base__completion
 	typedef std::pair<bool, std::shared_ptr<async_io_handle>> completion_returntype;
@@ -1115,7 +1120,7 @@ public:
     
     
     
-#ifndef BOOST_NO_CXX11_VARIADIC_TEMPLATES
+#if !defined(BOOST_NO_CXX11_VARIADIC_TEMPLATES) && _MSC_VER!=1800 // VS2013 result_of is not SFINAE capable
      
     /*! \brief Schedule an asynchronous invocation of the specified unbound callable when its supplied precondition completes.
     Note that this function essentially calls `std::bind()` on the callable and the args and passes it to the other call() overload taking a `std::function<>`.
@@ -2363,7 +2368,7 @@ template<class R> inline std::pair<future<R>, async_io_op> async_file_io_dispatc
 	return std::make_pair(std::move(ret.first.front()), ret.second.front());
 }
 
-#ifndef BOOST_NO_CXX11_VARIADIC_TEMPLATES
+#if !defined(BOOST_NO_CXX11_VARIADIC_TEMPLATES) && _MSC_VER!=1800 // VS2013 result_of is not SFINAE capable
 
 template<class C, class... Args> inline std::pair<future<typename std::result_of<C(Args...)>::type>, async_io_op> async_file_io_dispatcher_base::call(const async_io_op &req, C callback, Args... args)
 {

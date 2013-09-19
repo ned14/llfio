@@ -469,7 +469,7 @@ namespace windows_nt_kernel
 	static inline boost::afio::chrono::system_clock::time_point to_timepoint(LARGE_INTEGER time)
 	{
 		// We make the big assumption that the STL's system_clock is based on the time_t epoch 1st Jan 1970.
-		static BOOST_CONSTEXPR_OR_CONST unsigned long long FILETIME_OFFSET_TO_1970=(((unsigned long long)27111902 << 32) + (unsigned long long)3577643008);
+		static BOOST_CONSTEXPR_OR_CONST unsigned long long FILETIME_OFFSET_TO_1970=(((unsigned long long)27111902 << 32U) + (unsigned long long)3577643008);
 		// Need to have this self-adapt to the STL being used
 		static BOOST_CONSTEXPR_OR_CONST unsigned long long STL_TICKS_PER_SEC=(unsigned long long) boost::afio::chrono::system_clock::period::den/boost::afio::chrono::system_clock::period::num;
 
@@ -1422,15 +1422,20 @@ size_t async_file_io_dispatcher_base::count() const
 	return ret;
 }
 
-async_io_op async_file_io_dispatcher_base::op_from_running_id(size_t id) const
+// Non op lock holding variant
+async_io_op async_file_io_dispatcher_base::int_op_from_scheduled_id(size_t id) const
 {
-	BOOST_AFIO_LOCK_GUARD<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
 	std::unordered_map<size_t, detail::async_file_io_dispatcher_op>::iterator it=p->ops.find(id);
 	if(p->ops.end()==it)
 	{
 		BOOST_AFIO_THROW_FATAL(std::runtime_error("Failed to find this operation in list of currently executing operations"));
 	}
 	return async_io_op(const_cast<async_file_io_dispatcher_base *>(this), id, it->second.h);
+}
+async_io_op async_file_io_dispatcher_base::op_from_scheduled_id(size_t id) const
+{
+	BOOST_AFIO_LOCK_GUARD<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
+	return int_op_from_scheduled_id(id);
 }
 
 

@@ -50,6 +50,7 @@ public:
 	// A file searching completion, called when each file read completes
 	std::pair<bool, std::shared_ptr<async_io_handle>> file_read(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr *e, std::shared_ptr<std::unique_ptr<char[]>> _buffer, size_t length)
 	{
+		std::cout << "R " << h->path() << std::endl;
 		char *buffer=_buffer->get();
 		buffer[length]=0;
 		// Search the buffer for the regular expression
@@ -69,10 +70,11 @@ public:
 	// A file reading completion, called when each file open completes
 	std::pair<bool, std::shared_ptr<async_io_handle>> file_opened(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr *e, size_t length)
 	{
+		std::cout << "F " << h->path() << std::endl;
 		// Allocate a sufficient buffer, avoiding the byte clearing vector would do
 		auto buffer=std::make_shared<std::unique_ptr<char[]>>(std::unique_ptr<char[]>(new char[length+1]));
 		// Schedule a read of the file
-		auto read=dispatcher->read(make_async_data_op_req(dispatcher->op_from_running_id(id), buffer->get(), length, 0));
+		auto read=dispatcher->read(make_async_data_op_req(dispatcher->op_from_scheduled_id(id), buffer->get(), length, 0));
 		auto read_done=dispatcher->completion(read, std::make_pair(async_op_flags::ImmediateCompletion, std::bind(&find_in_files::file_read, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, buffer, length)));
 		scheduled({read, read_done});
 		docompleted(2);
@@ -83,6 +85,7 @@ public:
 	{
 		// Get the entries from the ready future
 		std::vector<directory_entry> entries(std::move(listing->get().first));
+		std::cout << "E " << h->path() << std::endl;
 		for(auto &entry : entries)
 		{
 			// For each of the files and directories, schedule an open
@@ -102,11 +105,12 @@ public:
 		docompleted(2);
 		return std::make_pair(true, h);
 	}
-	// A directory enumerating lambda, called once per directory open in the tree
+	// A directory enumerating completion, called once per directory open in the tree
 	std::pair<bool, std::shared_ptr<async_io_handle>> dir_opened(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr *e)
 	{
+		std::cout << "D " << h->path() << std::endl;
 		// Now we have an open directory handle, schedule an enumeration
-		auto enumeration=dispatcher->enumerate(async_enumerate_op_req(dispatcher->op_from_running_id(id), 1000));
+		auto enumeration=dispatcher->enumerate(async_enumerate_op_req(dispatcher->op_from_scheduled_id(id), 1000));
 		auto listing=std::make_shared<future<std::pair<std::vector<directory_entry>, bool>>>(std::move(enumeration.first));
 		auto enumeration_done=dispatcher->completion(enumeration.second, make_pair(async_op_flags::ImmediateCompletion, std::bind(&find_in_files::dir_enumerated, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, listing)));
 		scheduled({enumeration.second, enumeration_done});
@@ -121,7 +125,7 @@ public:
 		bytesread(0), filesread(0), filesmatched(0), completed(0)
 	{
 		// Schedule the recursive enumeration of the current directory
-		auto cur_dir=dispatcher->dir(async_path_op_req("."));
+		auto cur_dir=dispatcher->dir(async_path_op_req(""));
 		cur_dir_opened=dispatcher->completion(cur_dir, std::make_pair(async_op_flags::DetachedFuture|async_op_flags::ImmediateCompletion, std::bind(&find_in_files::dir_opened, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
 		scheduled({cur_dir, cur_dir_opened});
 		// Wait until last of searches completes

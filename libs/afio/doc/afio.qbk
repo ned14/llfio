@@ -55,6 +55,8 @@
 [import ../test/examples/completion_example2.cpp]
 [import ../test/examples/current_exception_hack.cpp]
 [import ../test/examples/enumerate_example.cpp]
+[import ../test/examples/find_in_files_afio.cpp]
+[import ../test/examples/find_in_files_iostreams.cpp]
 [import ../test/examples/readwrite_example.cpp]
 [import ../test/examples/readwrite_example_traditional.cpp]
 
