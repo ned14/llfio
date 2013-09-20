@@ -26,7 +26,7 @@ File Created: Mar 2013
 // Define this to serialise thread job dispatch in order to work around a race condition in ASIO on Win32
 #ifdef WIN32
 #ifndef BOOST_AFIO_WORK_AROUND_LOST_ASIO_WRITE_COMPLETION_WAKEUPS
-#define BOOST_AFIO_WORK_AROUND_LOST_ASIO_WRITE_COMPLETION_WAKEUPS 1
+//#define BOOST_AFIO_WORK_AROUND_LOST_ASIO_WRITE_COMPLETION_WAKEUPS 1
 #endif
 #endif
 
@@ -411,6 +411,8 @@ namespace chrono {
 #ifdef BOOST_AFIO_USE_BOOST_CHRONO
 	using boost::chrono::system_clock;
 	using boost::chrono::high_resolution_clock;
+	using boost::chrono::seconds;
+	using boost::chrono::milliseconds;
 	template <class ToDuration, class Rep, class Period> BOOST_CONSTEXPR ToDuration duration_cast(const boost::chrono::duration<Rep,Period> &d)
 	{
 		return boost::chrono::duration_cast<typename detail::durationToBase<ToDuration>::type, Rep, typename detail::ratioToBase<Period>::type>(d);
@@ -418,7 +420,9 @@ namespace chrono {
 #else
 	using std::chrono::system_clock;
 	using std::chrono::high_resolution_clock;
-	template <class ToDuration, class Rep, class Period> BOOST_CONSTEXPR ToDuration duration_cast(const std::chrono::duration<Rep,Period> &d)
+	using std::chrono::seconds;
+	using std::chrono::milliseconds;
+	template <class ToDuration, class Rep, class Period> BOOST_CONSTEXPR ToDuration duration_cast(const std::chrono::duration<Rep, Period> &d)
 	{
 		return std::chrono::duration_cast<typename detail::durationToBase<ToDuration>::type, Rep, Period>(d);
 	}

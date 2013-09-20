@@ -1,14 +1,19 @@
+#include <deque>
 #include <regex>
 #include <chrono>
 #include <mutex>
+#include <future>
 #include <initializer_list>
 #include "boost/exception/diagnostic_information.hpp"
 #include "../../../boost/afio/afio.hpp"
+#include "../../../boost/afio/detail/Aligned_Allocator.hpp"
 
 /* My Intel Core i7 3770K running Windows 8 x64 with 7200rpm drive, using
 Sysinternals RAMMap to clear disc cache (http://technet.microsoft.com/en-us/sysinternals/ff700229.aspx)
 
 Warm cache:
+91 files matched out of 35854 files which was 4381743796 bytes.
+The search took 7.08847 seconds which was 5058.08 files per second or 589.515 Mb/sec.
 
 Cold cache:
 */
@@ -21,37 +26,39 @@ using namespace boost::afio;
 class find_in_files
 {
 public:
-
+	std::promise<int> finished;
 	std::regex regexpr; // The precompiled regular expression
 	std::shared_ptr<async_file_io_dispatcher_base> dispatcher;
 	recursive_mutex opslock;
-	std::vector<async_io_op> ops; // For exception gathering
-	std::atomic<size_t> bytesread, filesread, filesmatched, completed;
-	async_io_op cur_dir_opened;
+	std::deque<async_io_op> ops; // For exception gathering
+	std::atomic<size_t> bytesread, filesread, filesmatched, scheduled, completed;
+	std::vector<std::pair<std::filesystem::path, size_t>> filepaths;
 
 	// Signals finish once all scheduled ops have completed
 	void docompleted(size_t inc)
 	{
-		size_t scheduled;
-		{
-			boost::lock_guard<decltype(opslock)> lock(opslock);
-			scheduled=ops.size();
-		}
 		size_t c=(completed+=inc);
 		if(c==scheduled)
-			dispatcher->complete_async_op(cur_dir_opened.id, std::shared_ptr<async_io_handle>());
+			finished.set_value(0);
 	};
 	// Adds ops to the list of scheduled
-	void scheduled(std::initializer_list<async_io_op> list)
+	void doscheduled(std::initializer_list<async_io_op> list)
 	{
-		boost::lock_guard<decltype(opslock)> lock(opslock);
-		ops.insert(ops.end(), list.begin(), list.end());
+		scheduled+=list.size();
+		//boost::lock_guard<decltype(opslock)> lock(opslock);
+		//ops.insert(ops.end(), list.begin(), list.end());
+	}
+	void doscheduled(std::vector<async_io_op> list)
+	{
+		scheduled+=list.size();
+		//boost::lock_guard<decltype(opslock)> lock(opslock);
+		//ops.insert(ops.end(), list.begin(), list.end());
 	}
 	// A file searching completion, called when each file read completes
-	std::pair<bool, std::shared_ptr<async_io_handle>> file_read(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr *e, std::shared_ptr<std::unique_ptr<char[]>> _buffer, size_t length)
+	std::pair<bool, std::shared_ptr<async_io_handle>> file_read(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr *e, std::shared_ptr<std::vector<char, detail::aligned_allocator<char, 4096>>> _buffer, size_t length)
 	{
-		std::cout << "R " << h->path() << std::endl;
-		char *buffer=_buffer->get();
+		//std::cout << "R " << h->path() << std::endl;
+		char *buffer=_buffer->data();
 		buffer[length]=0;
 		// Search the buffer for the regular expression
 		if(std::regex_search(buffer, regexpr))
@@ -65,18 +72,23 @@ public:
 		++filesread;
 		bytesread+=length;
 		docompleted(2);
+		// Throw away the buffer now rather than later to keep memory consumption down
+		_buffer->clear();
+		// Schedule an immediate close rather than lazy close to keep file handle count down
+		auto close=dispatcher->close(dispatcher->op_from_scheduled_id(id));
 		return std::make_pair(true, h);
 	}
 	// A file reading completion, called when each file open completes
 	std::pair<bool, std::shared_ptr<async_io_handle>> file_opened(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr *e, size_t length)
 	{
-		std::cout << "F " << h->path() << std::endl;
-		// Allocate a sufficient buffer, avoiding the byte clearing vector would do
-		auto buffer=std::make_shared<std::unique_ptr<char[]>>(std::unique_ptr<char[]>(new char[length+1]));
+		//std::cout << "F " << h->path() << std::endl;
+		// Allocate a sufficient 4Kb aligned buffer
+		size_t _length=(4095+length)&~4095;
+		auto buffer=std::make_shared<std::vector<char, detail::aligned_allocator<char, 4096>>>(_length+1);
 		// Schedule a read of the file
-		auto read=dispatcher->read(make_async_data_op_req(dispatcher->op_from_scheduled_id(id), buffer->get(), length, 0));
-		auto read_done=dispatcher->completion(read, std::make_pair(async_op_flags::ImmediateCompletion, std::bind(&find_in_files::file_read, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, buffer, length)));
-		scheduled({read, read_done});
+		auto read=dispatcher->read(make_async_data_op_req(dispatcher->op_from_scheduled_id(id), buffer->data(), _length, 0));
+		auto read_done=dispatcher->completion(read, std::make_pair(async_op_flags::None/*regex search might be slow*/, std::bind(&find_in_files::file_read, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, buffer, length)));
+		doscheduled({read, read_done});
 		docompleted(2);
 		return std::make_pair(true, h);
 	}
@@ -85,22 +97,44 @@ public:
 	{
 		// Get the entries from the ready future
 		std::vector<directory_entry> entries(std::move(listing->get().first));
-		std::cout << "E " << h->path() << std::endl;
-		for(auto &entry : entries)
+		//std::cout << "E " << h->path() << std::endl;
+		// For each of the directories schedule an open and enumeration
 		{
-			// For each of the files and directories, schedule an open
-			if((entry.st_type()&S_IFDIR)==S_IFDIR)
+			std::vector<async_path_op_req> dir_reqs; dir_reqs.reserve(entries.size());
+			for(auto &entry : entries)
 			{
-				auto cur=dispatcher->dir(async_path_op_req(h->path()/entry.name()));
-				auto cur_opened=dispatcher->completion(cur, std::make_pair(async_op_flags::ImmediateCompletion, std::bind(&find_in_files::dir_opened, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
-				scheduled({cur, cur_opened});
+				if((entry.st_type()&S_IFDIR)==S_IFDIR)
+				{
+					dir_reqs.push_back(async_path_op_req(h->path()/entry.name()));
+				}
 			}
-			else if((entry.st_type()&S_IFREG)==S_IFREG)
+			std::vector<std::pair<async_op_flags, std::function<async_file_io_dispatcher_base::completion_t>>> dir_openedfs(dir_reqs.size(), std::make_pair(async_op_flags::ImmediateCompletion, std::bind(&find_in_files::dir_opened, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
+			auto dir_opens=dispatcher->dir(dir_reqs);
+			doscheduled(dir_opens);
+			auto dir_openeds=dispatcher->completion(dir_opens, dir_openedfs);
+			doscheduled(dir_openeds);
+		}
+
+		// For each of the files schedule an open and search
+		{
+			std::vector<async_path_op_req> file_reqs; file_reqs.reserve(entries.size());
+			std::vector<std::pair<async_op_flags, std::function<async_file_io_dispatcher_base::completion_t>>> file_openedfs; file_openedfs.reserve(entries.size());
+			for(auto &entry : entries)
 			{
-				auto cur=dispatcher->file(async_path_op_req(h->path()/entry.name()));
-				auto cur_opened=dispatcher->completion(cur, std::make_pair(async_op_flags::ImmediateCompletion, std::bind(&find_in_files::file_opened, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, entry.st_size())));
-				scheduled({cur, cur_opened});
+				if((entry.st_type()&S_IFREG)==S_IFREG)
+				{
+					size_t length=(size_t)entry.st_size();
+					if(length)
+					{
+						file_reqs.push_back(async_path_op_req(h->path()/entry.name(), file_flags::Read));
+						file_openedfs.push_back(std::make_pair(async_op_flags::ImmediateCompletion, std::bind(&find_in_files::file_opened, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, length)));
+					}
+				}
 			}
+			auto file_opens=dispatcher->file(file_reqs);
+			doscheduled(file_opens);
+			auto file_openeds=dispatcher->completion(file_opens, file_openedfs);
+			doscheduled(file_openeds);
 		}
 		docompleted(2);
 		return std::make_pair(true, h);
@@ -108,30 +142,72 @@ public:
 	// A directory enumerating completion, called once per directory open in the tree
 	std::pair<bool, std::shared_ptr<async_io_handle>> dir_opened(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr *e)
 	{
-		std::cout << "D " << h->path() << std::endl;
+		//std::cout << "D " << h->path() << std::endl;
 		// Now we have an open directory handle, schedule an enumeration
 		auto enumeration=dispatcher->enumerate(async_enumerate_op_req(dispatcher->op_from_scheduled_id(id), 1000));
 		auto listing=std::make_shared<future<std::pair<std::vector<directory_entry>, bool>>>(std::move(enumeration.first));
 		auto enumeration_done=dispatcher->completion(enumeration.second, make_pair(async_op_flags::ImmediateCompletion, std::bind(&find_in_files::dir_enumerated, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, listing)));
-		scheduled({enumeration.second, enumeration_done});
+		doscheduled({enumeration.second, enumeration_done});
 		docompleted(2);
 		// Complete only if not the cur dir opened
-		return std::make_pair(id!=cur_dir_opened.id, h);
+		return std::make_pair(true, h);
 	};
+	void dowait()
+	{
+		// Prepare finished
+		auto finished_waiter=finished.get_future();
+#if 0
+		// Wait till done, retrieving any exceptions as they come in to keep memory consumption down
+		std::future_status status;
+		do
+		{
+			status=finished_waiter.wait_for(std::chrono::milliseconds(1000));
+			std::cout << "\nDispatcher has " << dispatcher->count() << " fds open and " << dispatcher->wait_queue_depth() << " ops outstanding." << std::endl;
+			std::vector<async_io_op> batch; batch.reserve(10000);
+			{
+				boost::lock_guard<decltype(opslock)> lock(opslock);
+				while(status==std::future_status::timeout ? (ops.size()>5000) : !ops.empty())
+				{
+					batch.push_back(std::move(ops.front()));
+					ops.pop_front();
+				}
+			}
+			// Retrieve any exceptions
+			std::cout << "Processed " << batch.size() << " ops for exception state." << std::endl;
+			if(!batch.empty())
+				when_all(batch.begin(), batch.end()).wait();
+		} while(status==std::future_status::timeout);
+#else
+		finished_waiter.wait();
+#endif
+	}
 	// Constructor, which starts the ball rolling
 	find_in_files(const char *_regexpr) : regexpr(_regexpr),
 		// Create an AFIO dispatcher that bypasses any filing system buffers
-		dispatcher(make_async_file_io_dispatcher(process_threadpool(), file_flags::OSDirect | file_flags::AlwaysSync)),
-		bytesread(0), filesread(0), filesmatched(0), completed(0)
+		dispatcher(make_async_file_io_dispatcher(process_threadpool(), file_flags::WillBeSequentiallyAccessed|file_flags::OSDirect)),
+		bytesread(0), filesread(0), filesmatched(0), scheduled(0), completed(0)
 	{
+		filepaths.reserve(50000);
+
 		// Schedule the recursive enumeration of the current directory
+		std::cout << "\n\nStarting directory enumerations ..." << std::endl;
 		auto cur_dir=dispatcher->dir(async_path_op_req(""));
-		cur_dir_opened=dispatcher->completion(cur_dir, std::make_pair(async_op_flags::DetachedFuture|async_op_flags::ImmediateCompletion, std::bind(&find_in_files::dir_opened, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
-		scheduled({cur_dir, cur_dir_opened});
-		// Wait until last of searches completes
-		when_all(cur_dir_opened).wait();
-		// Retrieve any exceptions
-		when_all(ops.begin(), ops.end()).wait();
+		auto cur_dir_opened=dispatcher->completion(cur_dir, std::make_pair(async_op_flags::ImmediateCompletion, std::bind(&find_in_files::dir_opened, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
+		doscheduled({cur_dir, cur_dir_opened});
+		dowait();
+
+#if 0
+		// Reset the waiter, and issue the searches
+		finished=std::promise<int>();
+		std::cout << "\n\nStarting searches of " << filepaths.size() << " files ..." << std::endl;
+		for(auto &filepath : filepaths)
+		{
+			auto cur=dispatcher->file(async_path_op_req(filepath.first, file_flags::Read));
+			auto cur_opened=dispatcher->completion(cur, std::make_pair(async_op_flags::ImmediateCompletion, std::bind(&find_in_files::file_opened, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, filepath.second)));
+			doscheduled({cur, cur_opened});
+		}
+		dowait();
+#endif
 	}
 };
 

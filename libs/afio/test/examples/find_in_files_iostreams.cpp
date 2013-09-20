@@ -9,16 +9,16 @@
 Sysinternals RAMMap to clear disc cache (http://technet.microsoft.com/en-us/sysinternals/ff700229.aspx)
 
 Single threaded, warm cache:
-112 files matched out of 39085 files which was 3718593329 bytes.
-The search took 15.359 seconds which was 2544.76 files per second or 230.896 Mb/sec.
+91 files matched out of 38399 files which was 4444084599 bytes.
+The search took 6.13165 seconds which was 6262.42 files per second or 691.202 Mb/sec.
 
 Single threaded, cold cache:
 112 files matched out of 39085 files which was 3718640242 bytes.
 The search took 418.369 seconds which was 93.4224 files per second or 8.47666 Mb/sec.
 
 OpenMP, warm cache:
-112 files matched out of 38801 files which was 3718245245 bytes.
-The search took 6.30617 seconds which was 6152.86 files per second or 562.306 Mb/sec.
+91 files matched out of 38099 files which was 4443180415 bytes.
+The search took 2.74241 seconds which was 13892.5 files per second or 1545.12 Mb/sec.
 
 OpenMP, cold cache:
 112 files matched out of 39017 files which was 3718589708 bytes.
@@ -56,7 +56,7 @@ int main(int argc, const char *argv[])
 
 		// Compile the regular expression, and have OpenMP parallelise the loop
 		regex regexpr(argv[1]);
-#pragma omp parallel for schedule(dynamic)
+//#pragma omp parallel for schedule(dynamic)
 		for(int n=0; n<(int) filepaths.size(); n++)
 		{
 			// Open the file

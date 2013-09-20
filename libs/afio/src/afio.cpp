@@ -27,6 +27,26 @@ File Created: Mar 2013
 //#endif
 //#endif
 
+// Define this to have every part of AFIO print, in extremely terse text, what it is doing and why.
+#if defined(DEBUG) && 0 //|| 1
+#define BOOST_AFIO_DEBUG_PRINTING 1
+#ifdef WIN32
+#define BOOST_AFIO_DEBUG_PRINT(...) \
+	{ \
+	char buffer[16384]; \
+	sprintf(buffer, __VA_ARGS__); \
+	OutputDebugStringA(buffer); \
+	}
+#else
+#define BOOST_AFIO_DEBUG_PRINT(...) \
+	{ \
+	fprintf(stderr, __VA_ARGS__); \
+	}
+#endif
+#else
+#define BOOST_AFIO_DEBUG_PRINT(...)
+#endif
+
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE
 #endif
@@ -596,26 +616,6 @@ static inline void fill_stat_t(boost::afio::stat_t &stat, BOOST_AFIO_POSIX_STAT_
 
 // libstdc++ doesn't come with std::lock_guard
 #define BOOST_AFIO_LOCK_GUARD boost::lock_guard
-
-#if defined(DEBUG) && 0
-#define BOOST_AFIO_DEBUG_PRINTING 1
-#ifdef WIN32
-#define BOOST_AFIO_DEBUG_PRINT(...) \
-	{ \
-		char buffer[16384]; \
-		sprintf(buffer, __VA_ARGS__); \
-		OutputDebugStringA(buffer); \
-	}
-#else
-#define BOOST_AFIO_DEBUG_PRINT(...) \
-	{ \
-		fprintf(stderr, __VA_ARGS__); \
-	}
-#endif
-#else
-#define BOOST_AFIO_DEBUG_PRINT(...)
-#endif
-
 
 #ifdef WIN32
 #ifndef IOV_MAX
@@ -2109,15 +2109,15 @@ namespace detail {
 					if(!!(req.flags & file_flags::Read)) access|=GENERIC_READ;
 					if(!!(req.flags & file_flags::Write)) access|=GENERIC_WRITE;
 				}
+				if(!!(req.flags & file_flags::WillBeSequentiallyAccessed))
+					flags|=0x00000004/*FILE_SEQUENTIAL_ONLY*/;
+				else if(!!(req.flags & file_flags::WillBeRandomlyAccessed))
+					flags|=0x00000800/*FILE_RANDOM_ACCESS*/;
 			}
 			if(!!(req.flags & file_flags::CreateOnlyIfNotExist)) creatdisp|=0x00000002/*FILE_CREATE*/;
 			else if(!!(req.flags & file_flags::Create)) creatdisp|=0x00000003/*FILE_OPEN_IF*/;
 			else if(!!(req.flags & file_flags::Truncate)) creatdisp|=0x00000005/*FILE_OVERWRITE_IF*/;
 			else creatdisp|=0x00000001/*FILE_OPEN*/;
-			if(!!(req.flags & file_flags::WillBeSequentiallyAccessed))
-				flags|=0x00000004/*FILE_SEQUENTIAL_ONLY*/;
-			else if(!!(req.flags & file_flags::WillBeRandomlyAccessed))
-				flags|=0x00000800/*FILE_RANDOM_ACCESS*/;
 			if(!!(req.flags & file_flags::OSDirect)) flags|=0x00000008/*FILE_NO_INTERMEDIATE_BUFFERING*/;
 			if(!!(req.flags & file_flags::AlwaysSync)) flags|=0x00000002/*FILE_WRITE_THROUGH*/;
 			if(!!(req.flags & file_flags::FastDirectoryEnumeration))
@@ -2296,7 +2296,7 @@ namespace detail {
 			return std::make_pair(true, h);
 		}
 		// Called in unknown thread
-		void boost_asio_readwrite_completion_handler(bool is_write, size_t id, std::shared_ptr<async_io_handle> h, exception_ptr *, std::shared_ptr<std::pair<boost::afio::atomic<bool>, boost::afio::atomic<size_t>>> bytes_to_transfer, const boost::system::error_code &ec, size_t bytes_transferred)
+		void boost_asio_readwrite_completion_handler(bool is_write, size_t id, std::shared_ptr<async_io_handle> h, exception_ptr *, std::shared_ptr<std::pair<boost::afio::atomic<bool>, boost::afio::atomic<size_t>>> bytes_to_transfer, size_t bytes_this_chunk, const boost::system::error_code &ec, size_t bytes_transferred)
 		{
 			if(ec)
 			{
@@ -2323,9 +2323,9 @@ namespace detail {
 					p->byteswritten+=bytes_transferred;
 				else
 					p->bytesread+=bytes_transferred;
-				if(!(bytes_to_transfer->second-=bytes_transferred))
+				if(!(bytes_to_transfer->second-=bytes_this_chunk)) // bytes_this_chunk may not equal bytes_transferred if final 4Kb chunk of direct file
 					complete_async_op(id, h);
-				BOOST_AFIO_DEBUG_PRINT("H %u e=%u\n", (unsigned) id, (unsigned) ec.value());
+				BOOST_AFIO_DEBUG_PRINT("H %u e=%u b=%u\n", (unsigned) id, (unsigned) ec.value(), (unsigned) bytes_transferred);
 			}
 			//std::cout << "id=" << id << " total=" << bytes_to_transfer->second << " this=" << bytes_transferred << std::endl;
 		}
@@ -2363,7 +2363,7 @@ namespace detail {
 					}
 				}
 				elems[pages].Alignment=0;
-				boost::asio::windows::overlapped_ptr ol(p->h->get_io_service(), boost::bind(&async_file_io_dispatcher_windows::boost_asio_readwrite_completion_handler, this, iswrite, id, h, nullptr, bytes_to_transfer, boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred));
+				boost::asio::windows::overlapped_ptr ol(p->h->get_io_service(), boost::bind(&async_file_io_dispatcher_windows::boost_asio_readwrite_completion_handler, this, iswrite, id, h, nullptr, bytes_to_transfer, amount, boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred));
 				ol.get()->Offset=(DWORD) (req.where & 0xffffffff);
 				ol.get()->OffsetHigh=(DWORD) ((req.where>>32) & 0xffffffff);
 				BOOL ok=iswrite ? WriteFileGather
@@ -2385,7 +2385,7 @@ namespace detail {
 				size_t offset=0;
 				BOOST_FOREACH(auto &b, req.buffers)
 				{
-					boost::asio::windows::overlapped_ptr ol(p->h->get_io_service(), boost::bind(&async_file_io_dispatcher_windows::boost_asio_readwrite_completion_handler, this, iswrite, id, h, nullptr, bytes_to_transfer, boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred));
+					boost::asio::windows::overlapped_ptr ol(p->h->get_io_service(), boost::bind(&async_file_io_dispatcher_windows::boost_asio_readwrite_completion_handler, this, iswrite, id, h, nullptr, bytes_to_transfer, boost::asio::buffer_size(b), boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred));
 					ol.get()->Offset=(DWORD) ((req.where+offset) & 0xffffffff);
 					ol.get()->OffsetHigh=(DWORD) (((req.where+offset)>>32) & 0xffffffff);
 					BOOL ok=iswrite ? WriteFile
@@ -2508,7 +2508,11 @@ namespace detail {
 				{
 					size_t length=ffdi->FileNameLength/sizeof(std::filesystem::path::value_type);
 					if(length<=2 && '.'==ffdi->FileName[0])
-						if(1==length || '.'==ffdi->FileName[1]) continue;
+						if(1==length || '.'==ffdi->FileName[1])
+						{
+							if(!ffdi->NextEntryOffset) done=true;
+							continue;
+						}
 					std::filesystem::path::string_type leafname(ffdi->FileName, length);
 					item.leafname=std::move(leafname);
 					item.stat.st_ino=ffdi->FileId.QuadPart;
