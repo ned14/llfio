@@ -12,8 +12,8 @@
 Sysinternals RAMMap to clear disc cache (http://technet.microsoft.com/en-us/sysinternals/ff700229.aspx)
 
 Warm cache:
-91 files matched out of 35854 files which was 4381743796 bytes.
-The search took 7.08847 seconds which was 5058.08 files per second or 589.515 Mb/sec.
+91 files matched out of 35854 files which was 4381925721 bytes.
+The search took 4.71658 seconds which was 7601.7 files per second or 886.009 Mb/sec.
 
 Cold cache:
 */
@@ -21,6 +21,8 @@ Cold cache:
 #if !(defined(BOOST_MSVC) && BOOST_MSVC < 1700)
 //[find_in_files_afio
 using namespace boost::afio;
+
+static const async_op_flags default_immediate=async_op_flags::None; // async_op_flags::ImmediateCompletion;
 
 // Often it's easiest for a lot of nesting callbacks to carry state via a this pointer
 class find_in_files
@@ -108,7 +110,7 @@ public:
 					dir_reqs.push_back(async_path_op_req(h->path()/entry.name()));
 				}
 			}
-			std::vector<std::pair<async_op_flags, std::function<async_file_io_dispatcher_base::completion_t>>> dir_openedfs(dir_reqs.size(), std::make_pair(async_op_flags::ImmediateCompletion, std::bind(&find_in_files::dir_opened, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
+			std::vector<std::pair<async_op_flags, std::function<async_file_io_dispatcher_base::completion_t>>> dir_openedfs(dir_reqs.size(), std::make_pair(default_immediate, std::bind(&find_in_files::dir_opened, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
 			auto dir_opens=dispatcher->dir(dir_reqs);
 			doscheduled(dir_opens);
 			auto dir_openeds=dispatcher->completion(dir_opens, dir_openedfs);
@@ -127,7 +129,7 @@ public:
 					if(length)
 					{
 						file_reqs.push_back(async_path_op_req(h->path()/entry.name(), file_flags::Read));
-						file_openedfs.push_back(std::make_pair(async_op_flags::ImmediateCompletion, std::bind(&find_in_files::file_opened, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, length)));
+						file_openedfs.push_back(std::make_pair(default_immediate, std::bind(&find_in_files::file_opened, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, length)));
 					}
 				}
 			}
@@ -146,7 +148,7 @@ public:
 		// Now we have an open directory handle, schedule an enumeration
 		auto enumeration=dispatcher->enumerate(async_enumerate_op_req(dispatcher->op_from_scheduled_id(id), 1000));
 		auto listing=std::make_shared<future<std::pair<std::vector<directory_entry>, bool>>>(std::move(enumeration.first));
-		auto enumeration_done=dispatcher->completion(enumeration.second, make_pair(async_op_flags::ImmediateCompletion, std::bind(&find_in_files::dir_enumerated, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, listing)));
+		auto enumeration_done=dispatcher->completion(enumeration.second, make_pair(default_immediate, std::bind(&find_in_files::dir_enumerated, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, listing)));
 		doscheduled({enumeration.second, enumeration_done});
 		docompleted(2);
 		// Complete only if not the cur dir opened
@@ -192,7 +194,7 @@ public:
 		// Schedule the recursive enumeration of the current directory
 		std::cout << "\n\nStarting directory enumerations ..." << std::endl;
 		auto cur_dir=dispatcher->dir(async_path_op_req(""));
-		auto cur_dir_opened=dispatcher->completion(cur_dir, std::make_pair(async_op_flags::ImmediateCompletion, std::bind(&find_in_files::dir_opened, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
+		auto cur_dir_opened=dispatcher->completion(cur_dir, std::make_pair(default_immediate, std::bind(&find_in_files::dir_opened, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
 		doscheduled({cur_dir, cur_dir_opened});
 		dowait();
 
@@ -203,7 +205,7 @@ public:
 		for(auto &filepath : filepaths)
 		{
 			auto cur=dispatcher->file(async_path_op_req(filepath.first, file_flags::Read));
-			auto cur_opened=dispatcher->completion(cur, std::make_pair(async_op_flags::ImmediateCompletion, std::bind(&find_in_files::file_opened, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, filepath.second)));
+			auto cur_opened=dispatcher->completion(cur, std::make_pair(default_immediate, std::bind(&find_in_files::file_opened, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, filepath.second)));
 			doscheduled({cur, cur_opened});
 		}
 		dowait();

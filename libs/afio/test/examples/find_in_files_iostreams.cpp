@@ -56,7 +56,7 @@ int main(int argc, const char *argv[])
 
 		// Compile the regular expression, and have OpenMP parallelise the loop
 		regex regexpr(argv[1]);
-//#pragma omp parallel for schedule(dynamic)
+#pragma omp parallel for schedule(dynamic)
 		for(int n=0; n<(int) filepaths.size(); n++)
 		{
 			// Open the file
