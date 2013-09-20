@@ -59,4 +59,17 @@ on libunwind. The latter is more portable, but requires explicit linking with li
 
 [endsect] [/stuck_ops]
 
+[section:vector_use Why did you use `std::vector<>` as the ops batch container instead of a generic iterator range?]
+
+# `std::vector<async_io_op>` is the closest thing to a variable length array in C++.
+# `std::vector<async_io_op>` is well understood, particularly its performance during by-value copies and during
+`push_back()` which is by far the most common operation you do when preparing a batch.
+# `std::vector<async_io_op>` is very amenable to automatic vectorisation (not that AFIO currently does this).
+# `std::vector<async_io_op>` is easily transportable through an ABI, whereas arbitrary container iterators would need type
+erasing (i.e. slow).
+
+We are not opposed to the use of generic iterator ranges in an AFIO v2 if there is user demand for such a thing.
+
+[endsect] [/vector_use]
+
 [endsect] [/FAQ]

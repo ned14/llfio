@@ -75,7 +75,7 @@ public:
 		// Throw away the buffer now rather than later to keep memory consumption down
 		_buffer->clear();
 		// Schedule an immediate close rather than lazy close to keep file handle count down
-		auto close=dispatcher->close(dispatcher->op_from_scheduled_id(id));
+		//auto close=dispatcher->close(dispatcher->op_from_scheduled_id(id));
 		return std::make_pair(true, h);
 	}
 	// A file reading completion, called when each file open completes
@@ -184,7 +184,7 @@ public:
 	// Constructor, which starts the ball rolling
 	find_in_files(const char *_regexpr) : regexpr(_regexpr),
 		// Create an AFIO dispatcher that bypasses any filing system buffers
-		dispatcher(make_async_file_io_dispatcher(process_threadpool(), file_flags::WillBeSequentiallyAccessed|file_flags::OSDirect)),
+		dispatcher(make_async_file_io_dispatcher(process_threadpool(), file_flags::WillBeSequentiallyAccessed/*|file_flags::OSDirect*/)),
 		bytesread(0), filesread(0), filesmatched(0), scheduled(0), completed(0)
 	{
 		filepaths.reserve(50000);

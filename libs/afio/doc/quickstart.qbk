@@ -28,7 +28,7 @@ or closures? Starting with either has merits, but we've decided on file i/o firs
 
 [section:async_file_io Asynchronous file i/o]
 
-[heading Hello World, asynchronously!]
+[section:hello_world Hello World, asynchronously!]
 
 We might as well jump straight in: on the left is a traditional STL iostreams
 implementation with its equivalent in AFIO using single-shot functions (i.e. a batch
@@ -48,7 +48,86 @@ into any AFIO function is the precondition op (of type __afio_op__) which must c
 scheduled now is allowed to begin. Precondition ops don't just enforce execution order
 however, they also carry a file handle or more accurately, a ['shared future] to a
 shared pointer to a __afio_handle__ which by definition will be ready by the time your
-dependency is executed. 
+dependency is executed. Let's take a very quick look at `async_io_op`:
+
+	struct async_io_op
+	{
+		async_file_io_dispatcher_base *parent;                              //!< The parent dispatcher
+		size_t id;                                                          //!< A unique id for this operation
+		std::shared_ptr<shared_future<std::shared_ptr<async_io_handle>>> h; //!< A future handle to the item being operated upon
+	};
+
+So, because there can be many op references to an op, `h` is a shared pointer to a unique shared future,
+one of which exists per unique integer id. Right now AFIO keeps a pointer to a parent
+as well in case future AFIO's can chain ops across dispatcher instances, but for now
+it simply tells you which dispatcher the op is or was scheduled with.
+
+The shared future is valid as soon as an op is scheduled, and its result (the handle output
+by the scheduled operation) becomes available when the operation completes. If there are any
+dependencies scheduled on the operation, on completion the output handle is sent as input
+to each of dependencies.
+
+What this means is straightforward: in the example above `file()` outputs on completion
+an open file handle which is fed to `truncate()` which on completion feeds the same input
+handle to `write()` and so on. `close()` takes in the open file handle, closes it, and
+outputs a null file handle on completion to `rmfile()` which doesn't use its input file
+handle as it takes a path instead.
+
+Note that [*errors do not propagate] except under limited circumstances. If `truncate()`
+failed let's say due to lack of free space, no error state is propagated to `write()`
+(though that would surely not succeed as async writing cannot go past the current
+extent of a file). If `open()` failed, its output file handle would be null and therefore
+every subsequent action would almost certainly also fail, but the sequence of scheduled
+operations [*always] executes, regardless. In fact, in the present version of AFIO there
+is no way whatsoever to cancel a scheduled operation.
+
+[endsect] [/hello_world]
+
+[section:so_what What benefit does asynchronous file i/o bring me?]
+
+So we can schedule file i/o operations asynchronously: what's the benefit of doing that
+instead of creating separate threads of execution and executing the file i/o there instead?
+
+There are three main benefits to using AFIO over doing it by hand:
+
+# You don't have to worry about threading or race conditions or losing error state. AFIO
+does all that for you.
+# On platforms which provide native asynchronous file i/o support and/or native scatter/gather
+file i/o support, AFIO will use that
+instead of issuing multiple filing system operations using a thread pool to achieve
+concurrency. This can very significantly reduce the number of threads needed to keep your
+storage device fully occupied -- remember that ['queue depth] i.e. that metric you see all
+over storage device benchmarks is the number of operations in flight at once, which implies
+the number of threads needed. Most storage devices are IOPS limited due to SATA or SAS
+connection latencies without introducing queue depth -- in particular, modern SSDs cannot
+achieve tens of thousands of IOPS range without substantial queue depths, which without
+using a native asynchronous file i/o API means lots of threads.
+# It's very, very easy to have AFIO turn off file system caching, readahead or buffering
+on a case by case basis which makes writing scalable random synchronous file i/o applications
+much easier.
+
+What these three items mean is that writing scalable high-performance filing system code is much easier.
+Let us take a simple example, this being a simple STL iostreams, Boost Filesystem and OpenMP
+based find regular expression in files implementation:
+
+[find_in_files_iostreams]
+
+This implementation is fairly straightforward: enumerate all files in all directories below
+the current directory into a vector, fire off N threads to open each file, read it entirely
+into memory, regex it for the pattern and if found print the file's path.
+
+Let's now look at the AFIO implementation, and you should prepare yourself because it is far
+more mind bendy due to the many nestings of callbacks needed (it may remind you of WinRT or .NET
+code):
+
+[find_in_files_afio]
+
+Here the `find_in_files` class is used to carry state across the callbacks -- one could just
+as equally bind the state into each callback's parameters instead via some sort of pointer to
+a struct. But the difference in complexity is noticeable -- you're probably now asking, why
+choose this over the much clearer OpenMP and iostreams implementation?
+
+[endsect] [/so_what]
 
 [endsect] [/async_file_io]
 
