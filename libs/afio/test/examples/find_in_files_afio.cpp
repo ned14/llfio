@@ -12,17 +12,17 @@
 Sysinternals RAMMap to clear disc cache (http://technet.microsoft.com/en-us/sysinternals/ff700229.aspx)
 
 Warm cache:
-91 files matched out of 35854 files which was 4381925721 bytes.
-The search took 4.71658 seconds which was 7601.7 files per second or 886.009 Mb/sec.
+91 files matched out of 36422 files which was 6108537728 bytes.
+The search took 2.79223 seconds which was 13044 files per second or 2086.34 Mb/sec.
 
 Cold cache:
+91 files matched out of 36422 files which was 6108537728 bytes.
+The search took 388.74 seconds which was 93.6925 files per second or 14.9857 Mb/sec.
 */
 
 #if !(defined(BOOST_MSVC) && BOOST_MSVC < 1700)
 //[find_in_files_afio
 using namespace boost::afio;
-
-static const async_op_flags default_immediate=async_op_flags::None; // async_op_flags::ImmediateCompletion;
 
 // Often it's easiest for a lot of nesting callbacks to carry state via a this pointer
 class find_in_files
@@ -57,7 +57,7 @@ public:
 		//ops.insert(ops.end(), list.begin(), list.end());
 	}
 	// A file searching completion, called when each file read completes
-	std::pair<bool, std::shared_ptr<async_io_handle>> file_read(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr *e, std::shared_ptr<std::vector<char, detail::aligned_allocator<char, 4096>>> _buffer, size_t length)
+	std::pair<bool, std::shared_ptr<async_io_handle>> file_read(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr *e, std::shared_ptr<std::vector<char, detail::aligned_allocator<char, 4096, false>>> _buffer, size_t length)
 	{
 		//std::cout << "R " << h->path() << std::endl;
 		char *buffer=_buffer->data();
@@ -86,7 +86,7 @@ public:
 		//std::cout << "F " << h->path() << std::endl;
 		// Allocate a sufficient 4Kb aligned buffer
 		size_t _length=(4095+length)&~4095;
-		auto buffer=std::make_shared<std::vector<char, detail::aligned_allocator<char, 4096>>>(_length+1);
+		auto buffer=std::make_shared<std::vector<char, detail::aligned_allocator<char, 4096, false>>>(_length+1);
 		// Schedule a read of the file
 		auto read=dispatcher->read(make_async_data_op_req(dispatcher->op_from_scheduled_id(id), buffer->data(), _length, 0));
 		auto read_done=dispatcher->completion(read, std::make_pair(async_op_flags::None/*regex search might be slow*/, std::bind(&find_in_files::file_read, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, buffer, length)));
@@ -97,27 +97,52 @@ public:
 	// An enumeration parsing completion, called when each directory enumeration completes
 	std::pair<bool, std::shared_ptr<async_io_handle>> dir_enumerated(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr *e, std::shared_ptr<future<std::pair<std::vector<directory_entry>, bool>>> listing)
 	{
+		async_io_op lastdir, thisop(dispatcher->op_from_scheduled_id(id));
 		// Get the entries from the ready future
 		std::vector<directory_entry> entries(std::move(listing->get().first));
 		//std::cout << "E " << h->path() << std::endl;
 		// For each of the directories schedule an open and enumeration
+#if 0
 		{
 			std::vector<async_path_op_req> dir_reqs; dir_reqs.reserve(entries.size());
 			for(auto &entry : entries)
 			{
 				if((entry.st_type()&S_IFDIR)==S_IFDIR)
 				{
-					dir_reqs.push_back(async_path_op_req(h->path()/entry.name()));
+					dir_reqs.push_back(async_path_op_req(thisop, h->path()/entry.name()));
 				}
 			}
-			std::vector<std::pair<async_op_flags, std::function<async_file_io_dispatcher_base::completion_t>>> dir_openedfs(dir_reqs.size(), std::make_pair(default_immediate, std::bind(&find_in_files::dir_opened, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
-			auto dir_opens=dispatcher->dir(dir_reqs);
-			doscheduled(dir_opens);
-			auto dir_openeds=dispatcher->completion(dir_opens, dir_openedfs);
-			doscheduled(dir_openeds);
+			if(!dir_reqs.empty())
+			{
+				std::vector<std::pair<async_op_flags, std::function<async_file_io_dispatcher_base::completion_t>>> dir_openedfs(dir_reqs.size(), std::make_pair(async_op_flags::None, std::bind(&find_in_files::dir_opened, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
+				auto dir_opens=dispatcher->dir(dir_reqs);
+				doscheduled(dir_opens);
+				auto dir_openeds=dispatcher->completion(dir_opens, dir_openedfs);
+				doscheduled(dir_openeds);
+				// Hold back some of the concurrency
+				lastdir=dir_openeds.back();
+			}
 		}
+#else
+		// The Windows NT kernel filing system driver gets upset with too much concurrency
+		// when used with OSDirect so throttle directory enumerations to enforce some depth first traversal.
+		{
+			auto dir_openedf=std::make_pair(async_op_flags::None, std::bind(&find_in_files::dir_opened, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+			for(auto &entry : entries)
+			{
+				if((entry.st_type()&S_IFDIR)==S_IFDIR)
+				{
+					auto dir_open=dispatcher->dir(async_path_op_req(lastdir, h->path()/entry.name()));
+					auto dir_opened=dispatcher->completion(dir_open, dir_openedf);
+					doscheduled({ dir_open, dir_opened });
+					lastdir=dir_opened;
+				}
+			}
+		}
+#endif
 
 		// For each of the files schedule an open and search
+#if 0
 		{
 			std::vector<async_path_op_req> file_reqs; file_reqs.reserve(entries.size());
 			std::vector<std::pair<async_op_flags, std::function<async_file_io_dispatcher_base::completion_t>>> file_openedfs; file_openedfs.reserve(entries.size());
@@ -128,8 +153,10 @@ public:
 					size_t length=(size_t)entry.st_size();
 					if(length)
 					{
-						file_reqs.push_back(async_path_op_req(h->path()/entry.name(), file_flags::Read));
-						file_openedfs.push_back(std::make_pair(default_immediate, std::bind(&find_in_files::file_opened, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, length)));
+						file_flags flags=file_flags::Read;
+						if(length>65536) flags=flags|file_flags::OSMMap;
+						file_reqs.push_back(async_path_op_req(lastdir, h->path()/entry.name(), flags));
+						file_openedfs.push_back(std::make_pair(async_op_flags::None, std::bind(&find_in_files::file_opened, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, length)));
 					}
 				}
 			}
@@ -138,6 +165,26 @@ public:
 			auto file_openeds=dispatcher->completion(file_opens, file_openedfs);
 			doscheduled(file_openeds);
 		}
+#else
+		{
+			for(auto &entry : entries)
+			{
+				if((entry.st_type()&S_IFREG)==S_IFREG)
+				{
+					size_t length=(size_t)entry.st_size();
+					if(length)
+					{
+						file_flags flags=file_flags::Read;
+						if(length>65536) flags=flags|file_flags::OSMMap;
+						auto file_open=dispatcher->file(async_path_op_req(lastdir, h->path()/entry.name(), flags));
+						auto file_opened=dispatcher->completion(file_open, std::make_pair(async_op_flags::None, std::bind(&find_in_files::file_opened, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, length)));
+						doscheduled({ file_open, file_opened });
+						lastdir=file_opened;
+					}
+				}
+			}
+		}
+#endif
 		docompleted(2);
 		return std::make_pair(true, h);
 	}
@@ -148,7 +195,7 @@ public:
 		// Now we have an open directory handle, schedule an enumeration
 		auto enumeration=dispatcher->enumerate(async_enumerate_op_req(dispatcher->op_from_scheduled_id(id), 1000));
 		auto listing=std::make_shared<future<std::pair<std::vector<directory_entry>, bool>>>(std::move(enumeration.first));
-		auto enumeration_done=dispatcher->completion(enumeration.second, make_pair(default_immediate, std::bind(&find_in_files::dir_enumerated, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, listing)));
+		auto enumeration_done=dispatcher->completion(enumeration.second, make_pair(async_op_flags::None, std::bind(&find_in_files::dir_enumerated, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, listing)));
 		doscheduled({enumeration.second, enumeration_done});
 		docompleted(2);
 		// Complete only if not the cur dir opened
@@ -189,12 +236,16 @@ public:
 		dispatcher(make_async_file_io_dispatcher(process_threadpool(), file_flags::WillBeSequentiallyAccessed/*|file_flags::OSDirect*/)),
 		bytesread(0), filesread(0), filesmatched(0), scheduled(0), completed(0)
 	{
+#if 0
+		std::cout << "Attach profiler, and press return to continue." << std::endl;
+		getchar();
+#endif
 		filepaths.reserve(50000);
 
 		// Schedule the recursive enumeration of the current directory
 		std::cout << "\n\nStarting directory enumerations ..." << std::endl;
 		auto cur_dir=dispatcher->dir(async_path_op_req(""));
-		auto cur_dir_opened=dispatcher->completion(cur_dir, std::make_pair(default_immediate, std::bind(&find_in_files::dir_opened, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
+		auto cur_dir_opened=dispatcher->completion(cur_dir, std::make_pair(async_op_flags::None, std::bind(&find_in_files::dir_opened, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
 		doscheduled({cur_dir, cur_dir_opened});
 		dowait();
 
@@ -205,10 +256,14 @@ public:
 		for(auto &filepath : filepaths)
 		{
 			auto cur=dispatcher->file(async_path_op_req(filepath.first, file_flags::Read));
-			auto cur_opened=dispatcher->completion(cur, std::make_pair(default_immediate, std::bind(&find_in_files::file_opened, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, filepath.second)));
+			auto cur_opened=dispatcher->completion(cur, std::make_pair(async_op_flags::None, std::bind(&find_in_files::file_opened, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, filepath.second)));
 			doscheduled({cur, cur_opened});
 		}
 		dowait();
+#endif
+#if 0
+		std::cout << "Stop profiler, and press return to continue." << std::endl;
+		getchar();
 #endif
 	}
 };

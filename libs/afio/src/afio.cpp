@@ -1504,11 +1504,14 @@ void async_file_io_dispatcher_base::complete_async_op(size_t id, std::shared_ptr
 		assert(it->second.completions.empty());
 		BOOST_FOREACH(auto &c, completions)
 		{
-			exception_ptr *immediate_e=(!!e) ? &e : nullptr;
+			exception_ptr *immediate_e=&e;
 			// Enqueue each completion
 			it=p->ops.find(c.first);
 			if(p->ops.end()==it)
 				BOOST_AFIO_THROW_FATAL(std::runtime_error("Failed to find this completion operation in list of currently executing operations"));
+			// Unlock opslock during completions dispatch to increase parallelism
+			//p->opslock.unlock();
+			//auto relock=boost::afio::detail::Undoer([this]{ p->opslock.lock(); });
 			if(!!(it->second.flags & async_op_flags::ImmediateCompletion))
 			{
 				// If he was set up with a detached future, use that instead
@@ -1724,7 +1727,6 @@ template<class F, class... Args> async_io_op async_file_io_dispatcher_base::chai
 	{
 		// Bind input handle now and queue immediately to next available thread worker
 		std::shared_ptr<async_io_handle> h;
-		exception_ptr *_he=nullptr;
 		if(precondition.h->valid())
 		{
 			// Boost's shared_future has get() as non-const which is weird, because it doesn't
@@ -1735,7 +1737,7 @@ template<class F, class... Args> async_io_op async_file_io_dispatcher_base::chai
 			// now we can hardly abort half way through a batch op without leaving around stuck ops.
 			// No, instead we simulate as if the precondition had not yet become ready.
 			if(precondition.h->has_exception())
-				*he=get_exception_ptr(f), _he=he;
+				*he=get_exception_ptr(f);
 			else
 				h=f.get();
 		}
@@ -1748,7 +1750,7 @@ template<class F, class... Args> async_io_op async_file_io_dispatcher_base::chai
 		}
 		if(!!(flags & async_op_flags::ImmediateCompletion))
 		{
-			*ret.h=immediates.enqueue(std::bind(boundf.second, h, _he)).share();
+			*ret.h=immediates.enqueue(std::bind(boundf.second, h, he)).share();
 		}
 		else
 			*ret.h=p->pool->enqueue(std::bind(boundf.second, h, nullptr)).share();
@@ -2692,7 +2694,7 @@ namespace detail {
 					BOOST_AFIO_THROW(std::runtime_error("Inputs are invalid."));
             }
 #endif
-			return chain_async_ops((int) detail::OpType::read, reqs, async_op_flags::DetachedFuture|async_op_flags::ImmediateCompletion, &async_file_io_dispatcher_windows::doread);
+			return chain_async_ops((int) detail::OpType::read, reqs, async_op_flags::DetachedFuture, &async_file_io_dispatcher_windows::doread);
 		}
 		virtual std::vector<async_io_op> write(const std::vector<detail::async_data_op_req_impl<true>> &reqs)
 		{
@@ -2703,7 +2705,7 @@ namespace detail {
 					BOOST_AFIO_THROW(std::runtime_error("Inputs are invalid."));
             }
 #endif
-			return chain_async_ops((int) detail::OpType::write, reqs, async_op_flags::DetachedFuture|async_op_flags::ImmediateCompletion, &async_file_io_dispatcher_windows::dowrite);
+			return chain_async_ops((int) detail::OpType::write, reqs, async_op_flags::DetachedFuture, &async_file_io_dispatcher_windows::dowrite);
 		}
 		virtual std::vector<async_io_op> truncate(const std::vector<async_io_op> &ops, const std::vector<off_t> &sizes)
 		{
@@ -2725,7 +2727,7 @@ namespace detail {
 					BOOST_AFIO_THROW(std::runtime_error("Inputs are invalid."));
             }
 #endif
-			return chain_async_ops((int) detail::OpType::enumerate, reqs, async_op_flags::DetachedFuture|async_op_flags::ImmediateCompletion, &async_file_io_dispatcher_windows::doenumerate);
+			return chain_async_ops((int) detail::OpType::enumerate, reqs, async_op_flags::DetachedFuture, &async_file_io_dispatcher_windows::doenumerate);
 		}
 	};
 } //namespace

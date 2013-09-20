@@ -70,8 +70,8 @@ File Created: Mar 2013
 #include "detail/Preprocessor_variadic.hpp"
 #include <boost/detail/scoped_enum_emulation.hpp>
 
-#if BOOST_VERSION<105400
-#error Boosts before v1.54 have a memory corruption bug in boost::packaged_task<> when built under C++11 which makes this library useless. Get a newer Boost!
+#if BOOST_VERSION<105500
+#error Boosts before v1.55 are missing boost::future<>::get_exception_ptr() critical for good AFIO performance. Get a newer Boost!
 #endif
 
 // Map in C++11 stuff if available
@@ -269,8 +269,12 @@ BOOST_AFIO_FORWARD_STL_IMPL(promise, boost::promise)
 typedef boost::exception_ptr exception_ptr;
 template<class T> inline exception_ptr make_exception_ptr(const T &e) { return boost::copy_exception(e); }
 using boost::rethrow_exception;
-template<typename T> exception_ptr get_exception_ptr(future<T> &f)
+template<typename T> inline exception_ptr get_exception_ptr(future<T> &f)
 {
+#if 1
+	// Thanks to Vicente for adding this to Boost.Thread
+	return f.get_exception_ptr();
+#else
 	// This seems excessive but I don't see any other legal way to extract the exception ...
 	bool success=false;
 	try
@@ -285,9 +289,14 @@ template<typename T> exception_ptr get_exception_ptr(future<T> &f)
 		return e;
 	}
 	return exception_ptr();
+#endif
 }
-template<typename T> exception_ptr get_exception_ptr(shared_future<T> &f)
+template<typename T> inline exception_ptr get_exception_ptr(shared_future<T> &f)
 {
+#if 1
+	// Thanks to Vicente for adding this to Boost.Thread
+	return f.get_exception_ptr();
+#else
 	// This seems excessive but I don't see any other legal way to extract the exception ...
 	bool success=false;
 	try
@@ -302,6 +311,7 @@ template<typename T> exception_ptr get_exception_ptr(shared_future<T> &f)
 		return e;
 	}
 	return exception_ptr();
+#endif
 }
 /*! \brief For now, this is an emulation of std::packaged_task based on boost's packaged_task.
 We have to drop the Args... support because it segfaults MSVC Nov 2012 CTP.
@@ -699,6 +709,7 @@ enum class file_flags : size_t
 	UniqueDirectoryHandle=(1<<11), //!< Return a unique directory handle rather than a shared directory handle
 
 	OSDirect=(1<<16),	//!< Bypass the OS file buffers (only really useful for writing large files, or a lot of random reads and writes. Note you must 4Kb align everything if this is on)
+	OSMMap=(1<<17),		//!< Memory map files. You should pass zero for your buffer pointer during reads as it will be overwritten with some location in the memory mapped file.
 
 	AlwaysSync=(1<<24),		//!< Ask the OS to not complete until the data is on the physical storage. Best used only with OSDirect, otherwise use SyncOnClose.
 	SyncOnClose=(1<<25),	//!< Automatically initiate an asynchronous flush just before file close, and fuse both operations so both must complete for close to complete.
