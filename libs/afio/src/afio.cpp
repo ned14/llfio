@@ -697,7 +697,6 @@ namespace detail {
 #if defined(WIN32)
 	struct async_io_handle_windows : public async_io_handle
 	{
-		std::shared_ptr<async_file_io_dispatcher_base> parent;
 		std::unique_ptr<boost::asio::windows::random_access_handle> h;
 		void *myid;
 		bool has_been_added, SyncOnClose;
@@ -707,8 +706,8 @@ namespace detail {
 			BOOST_AFIO_ERRHWINFN(INVALID_HANDLE_VALUE!=h, path);
 			return h;
 		}
-		async_io_handle_windows(std::shared_ptr<async_file_io_dispatcher_base> _parent, std::shared_ptr<async_io_handle> _dirh, const std::filesystem::path &path, file_flags flags) : async_io_handle(_parent.get(), std::move(_dirh), path, flags), parent(_parent), myid(nullptr), has_been_added(false), SyncOnClose(false) { }
-		inline async_io_handle_windows(std::shared_ptr<async_file_io_dispatcher_base> _parent, std::shared_ptr<async_io_handle> _dirh, const std::filesystem::path &path, file_flags flags, bool _SyncOnClose, HANDLE _h);
+		async_io_handle_windows(async_file_io_dispatcher_base *_parent, std::shared_ptr<async_io_handle> _dirh, const std::filesystem::path &path, file_flags flags) : async_io_handle(_parent, std::move(_dirh), path, flags), myid(nullptr), has_been_added(false), SyncOnClose(false) { }
+		inline async_io_handle_windows(async_file_io_dispatcher_base *_parent, std::shared_ptr<async_io_handle> _dirh, const std::filesystem::path &path, file_flags flags, bool _SyncOnClose, HANDLE _h);
 		virtual void *native_handle() const { return myid; }
 
 		// You can't use shared_from_this() in a constructor so ...
@@ -716,7 +715,7 @@ namespace detail {
 		{
 			if(h)
 			{
-				parent->int_add_io_handle(myid, shared_from_this());
+				parent()->int_add_io_handle(myid, shared_from_this());
 				has_been_added=true;
 			}
 		}
@@ -724,7 +723,7 @@ namespace detail {
 		{
 			BOOST_AFIO_DEBUG_PRINT("D %p\n", this);
 			if(has_been_added)
-				parent->int_del_io_handle(myid);
+				parent()->int_del_io_handle(myid);
 			if(h)
 			{
 				if(SyncOnClose && write_count_since_fsync())
@@ -832,11 +831,10 @@ namespace detail {
 #endif
 	struct async_io_handle_posix : public async_io_handle
 	{
-		std::shared_ptr<async_file_io_dispatcher_base> parent;
 		int fd;
 		bool has_been_added, SyncOnClose, has_ever_been_fsynced;
 
-		async_io_handle_posix(std::shared_ptr<async_file_io_dispatcher_base> _parent, std::shared_ptr<async_io_handle> _dirh, const std::filesystem::path &path, file_flags flags, bool _SyncOnClose, int _fd) : async_io_handle(_parent.get(), std::move(_dirh), path, flags), parent(_parent), fd(_fd), has_been_added(false), SyncOnClose(_SyncOnClose),has_ever_been_fsynced(false)
+		async_io_handle_posix(async_file_io_dispatcher_base *_parent, std::shared_ptr<async_io_handle> _dirh, const std::filesystem::path &path, file_flags flags, bool _SyncOnClose, int _fd) : async_io_handle(_parent, std::move(_dirh), path, flags), fd(_fd), has_been_added(false), SyncOnClose(_SyncOnClose),has_ever_been_fsynced(false)
 		{
 			if(fd!=-999)
 				BOOST_AFIO_ERRHOSFN(fd, path);
@@ -846,13 +844,13 @@ namespace detail {
 		// You can't use shared_from_this() in a constructor so ...
 		void do_add_io_handle_to_parent()
 		{
-			parent->int_add_io_handle((void *)(size_t)fd, shared_from_this());
+			parent()->int_add_io_handle((void *)(size_t)fd, shared_from_this());
 			has_been_added=true;
 		}
 		~async_io_handle_posix()
 		{
 			if(has_been_added)
-				parent->int_del_io_handle((void *)(size_t)fd);
+				parent()->int_del_io_handle((void *)(size_t)fd);
 			if(fd>=0)
 			{
 				// Flush synchronously here? I guess ...
@@ -1062,7 +1060,7 @@ namespace detail {
 		}
 	};
 #if defined(WIN32)
-	inline async_io_handle_windows::async_io_handle_windows(std::shared_ptr<async_file_io_dispatcher_base> _parent, std::shared_ptr<async_io_handle> _dirh, const std::filesystem::path &path, file_flags flags, bool _SyncOnClose, HANDLE _h) : async_io_handle(_parent.get(), std::move(_dirh), path, flags), parent(_parent), h(new boost::asio::windows::random_access_handle(_parent->p->pool->io_service(), int_checkHandle(_h, path))), myid(_h), has_been_added(false), SyncOnClose(_SyncOnClose) { }
+	inline async_io_handle_windows::async_io_handle_windows(async_file_io_dispatcher_base *_parent, std::shared_ptr<async_io_handle> _dirh, const std::filesystem::path &path, file_flags flags, bool _SyncOnClose, HANDLE _h) : async_io_handle(_parent, std::move(_dirh), path, flags), h(new boost::asio::windows::random_access_handle(_parent->p->pool->io_service(), int_checkHandle(_h, path))), myid(_h), has_been_added(false), SyncOnClose(_SyncOnClose) { }
 #endif
 	class async_file_io_dispatcher_compat;
 	class async_file_io_dispatcher_windows;
@@ -2084,7 +2082,7 @@ namespace detail {
 		{
 			req.flags=fileflags(req.flags);
 			BOOST_AFIO_ERRHWINFN(RemoveDirectory(req.path.c_str()), req.path);
-			auto ret=std::make_shared<async_io_handle_windows>(shared_from_this(), std::shared_ptr<async_io_handle>(), req.path, req.flags);
+			auto ret=std::make_shared<async_io_handle_windows>(this, std::shared_ptr<async_io_handle>(), req.path, req.flags);
 			return std::make_pair(true, ret);
 		}
 		// Called in unknown thread
@@ -2146,7 +2144,7 @@ namespace detail {
 			BOOST_AFIO_ERRHNTFN(NtCreateFile(&h, access, &oa, &isb, &AllocationSize, FILE_ATTRIBUTE_NORMAL, FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,
 				creatdisp, flags, NULL, 0), req.path);
 			// If writing and SyncOnClose and NOT synchronous, turn on SyncOnClose
-			auto ret=std::make_shared<async_io_handle_windows>(shared_from_this(), dirh, req.path, req.flags,
+			auto ret=std::make_shared<async_io_handle_windows>(this, dirh, req.path, req.flags,
 				(file_flags::SyncOnClose|file_flags::Write)==(req.flags & (file_flags::SyncOnClose|file_flags::Write|file_flags::AlwaysSync)),
 				h);
 			static_cast<async_io_handle_windows *>(ret.get())->do_add_io_handle_to_parent();
@@ -2157,7 +2155,7 @@ namespace detail {
 		{
 			req.flags=fileflags(req.flags);
 			BOOST_AFIO_ERRHWINFN(DeleteFile(req.path.c_str()), req.path);
-			auto ret=std::make_shared<async_io_handle_windows>(shared_from_this(), std::shared_ptr<async_io_handle>(), req.path, req.flags);
+			auto ret=std::make_shared<async_io_handle_windows>(this, std::shared_ptr<async_io_handle>(), req.path, req.flags);
 			return std::make_pair(true, ret);
 		}
 		// Called in unknown thread
@@ -2264,7 +2262,7 @@ namespace detail {
 		{
 			req.flags=fileflags(req.flags);
 			BOOST_AFIO_ERRHWINFN(RemoveDirectory(req.path.c_str()), req.path);
-			auto ret=std::make_shared<async_io_handle_windows>(shared_from_this(), std::shared_ptr<async_io_handle>(), req.path, req.flags);
+			auto ret=std::make_shared<async_io_handle_windows>(this, std::shared_ptr<async_io_handle>(), req.path, req.flags);
 			return std::make_pair(true, ret);
 		}
 		// Called in unknown thread
@@ -2772,7 +2770,7 @@ namespace detail {
 		{
 			req.flags=fileflags(req.flags);
 			BOOST_AFIO_ERRHOSFN(BOOST_AFIO_POSIX_RMDIR(req.path.c_str()), req.path);
-			auto ret=std::make_shared<async_io_handle_posix>(shared_from_this(), std::shared_ptr<async_io_handle>(), req.path, req.flags, false, -999);
+			auto ret=std::make_shared<async_io_handle_posix>(this, std::shared_ptr<async_io_handle>(), req.path, req.flags, false, -999);
 			return std::make_pair(true, ret);
 		}
 		// Called in unknown thread
@@ -2811,7 +2809,7 @@ namespace detail {
 			if(!!(req.flags & file_flags::FastDirectoryEnumeration))
 				dirh=p->get_handle_to_containing_dir(this, id, e, req, &async_file_io_dispatcher_compat::dofile);
 			// If writing and SyncOnClose and NOT synchronous, turn on SyncOnClose
-			auto ret=std::make_shared<async_io_handle_posix>(shared_from_this(), dirh, req.path, req.flags, (file_flags::SyncOnClose|file_flags::Write)==(req.flags & (file_flags::SyncOnClose|file_flags::Write|file_flags::AlwaysSync)),
+			auto ret=std::make_shared<async_io_handle_posix>(this, dirh, req.path, req.flags, (file_flags::SyncOnClose|file_flags::Write)==(req.flags & (file_flags::SyncOnClose|file_flags::Write|file_flags::AlwaysSync)),
 				BOOST_AFIO_POSIX_OPEN(req.path.c_str(), flags, 0x1b0/*660*/));
 			static_cast<async_io_handle_posix *>(ret.get())->do_add_io_handle_to_parent();
 			return std::make_pair(true, ret);
@@ -2821,7 +2819,7 @@ namespace detail {
 		{
 			req.flags=fileflags(req.flags);
 			BOOST_AFIO_ERRHOSFN(BOOST_AFIO_POSIX_UNLINK(req.path.c_str()), req.path);
-			auto ret=std::make_shared<async_io_handle_posix>(shared_from_this(), std::shared_ptr<async_io_handle>(), req.path, req.flags, false, -999);
+			auto ret=std::make_shared<async_io_handle_posix>(this, std::shared_ptr<async_io_handle>(), req.path, req.flags, false, -999);
 			return std::make_pair(true, ret);
 		}
 		// Called in unknown thread
@@ -2845,7 +2843,7 @@ namespace detail {
 		{
 			req.flags=fileflags(req.flags);
 			BOOST_AFIO_ERRHOSFN(BOOST_AFIO_POSIX_UNLINK(req.path.c_str()), req.path);
-			auto ret=std::make_shared<async_io_handle_posix>(shared_from_this(), std::shared_ptr<async_io_handle>(), req.path, req.flags, false, -999);
+			auto ret=std::make_shared<async_io_handle_posix>(this, std::shared_ptr<async_io_handle>(), req.path, req.flags, false, -999);
 			return std::make_pair(true, ret);
 		}
 		// Called in unknown thread
