@@ -565,6 +565,7 @@ static inline void fill_stat_t(boost::afio::stat_t &stat, BOOST_AFIO_POSIX_STAT_
 #include <sys/syscall.h>
 #include <fnmatch.h>
 #include <sys/uio.h>
+#include <sys/mman.h>
 #include <limits.h>
 #define BOOST_AFIO_POSIX_MKDIR mkdir
 #define BOOST_AFIO_POSIX_RMDIR ::rmdir
@@ -921,7 +922,12 @@ namespace detail {
 			{
 				if(!(flags() & file_flags::Write) && !(flags() & file_flags::Append))
 				{
-					mapaddr=BOOST_AFIO_POSIX_MMAP(nullptr, mysize, PROT_READ, MAP_SHARED, fd, 0);
+					BOOST_AFIO_POSIX_STAT_STRUCT s={0};
+					if(-1!=fstat(fd, &s))
+					{
+						if((mapaddr=BOOST_AFIO_POSIX_MMAP(nullptr, s.st_size, PROT_READ, MAP_SHARED, fd, 0)))
+							mapsize=s.st_size;
+					}
 				}
 			}
 #endif
