@@ -56,6 +56,12 @@
 <dt><span class="section"><a href="afio/quickstart.html">Quick Start</a></span></dt>
 <dd><dl>
 <dt><span class="section"><a href="afio/quickstart/async_file_io.html">Asynchronous file i/o</a></span></dt>
+<dd><dl>
+<dt><span class="section"><a href="afio/quickstart/async_file_io/hello_world.html">Hello World,
+        asynchronously!</a></span></dt>
+<dt><span class="section"><a href="afio/quickstart/async_file_io/so_what.html">What benefit
+        does asynchronous file i/o bring me?</a></span></dt>
+</dl></dd>
 <dt><span class="section"><a href="afio/quickstart/closure_engine.html">Closure Execution Engines</a></span></dt>
 <dd><dl>
 <dt><span class="section"><a href="afio/quickstart/closure_engine/the_basics.html">The Basics</a></span></dt>
@@ -221,14 +227,18 @@
 </dl></dd>
 <dt><span class="section"><a href="afio/release_notes.html">Release Notes</a></span></dt>
 <dt><span class="section"><a href="afio/FAQ.html">Frequently Asked Questions</a></span></dt>
-<dd><dl><dt><span class="section"><a href="afio/FAQ/stuck_ops.html">I'm seeing <span class="quote">&#8220;<span class="quote">WARNING: <code class="computeroutput"><span class="special">~</span><span class="identifier">async_file_dispatcher_base</span><span class="special">()</span></code> detects stuck <code class="computeroutput"><span class="identifier">async_io_op</span></code>
-      in total of X ops</span>&#8221;</span> during process close. What does this mean?</a></span></dt></dl></dd>
+<dd><dl>
+<dt><span class="section"><a href="afio/FAQ/stuck_ops.html">I'm seeing <span class="quote">&#8220;<span class="quote">WARNING: <code class="computeroutput"><span class="special">~</span><span class="identifier">async_file_dispatcher_base</span><span class="special">()</span></code> detects stuck <code class="computeroutput"><span class="identifier">async_io_op</span></code>
+      in total of X ops</span>&#8221;</span> during process close. What does this mean?</a></span></dt>
+<dt><span class="section"><a href="afio/FAQ/vector_use.html">Why did you use <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;&gt;</span></code> as the ops batch container instead
+      of a generic iterator range?</a></span></dt>
+</dl></dd>
 <dt><span class="section"><a href="afio/acknowledgments.html">Acknowledgments</a></span></dt>
 </dl>
 </div>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
-<td align="left"><p><small>Last revised: September 11, 2013 at 02:10:43 GMT</small></p></td>
+<td align="left"><p><small>Last revised: September 21, 2013 at 02:26:20 GMT</small></p></td>
 <td align="right"><div class="copyright-footer"></div></td>
 </tr></table>
 <hr>

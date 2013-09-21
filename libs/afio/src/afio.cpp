@@ -93,6 +93,8 @@ File Created: Mar 2013
 #define BOOST_AFIO_POSIX_UNLINK _wunlink
 #define BOOST_AFIO_POSIX_FSYNC _commit
 #define BOOST_AFIO_POSIX_FTRUNCATE winftruncate
+#define BOOST_AFIO_POSIX_MMAP(addr, size, prot, flags, fd, offset) (-1)
+#define BOOST_AFIO_POSIX_MUNMAP(addr, size) (-1)
 
 namespace windows_nt_kernel
 {
@@ -575,6 +577,8 @@ static inline void fill_stat_t(boost::afio::stat_t &stat, BOOST_AFIO_POSIX_STAT_
 #define BOOST_AFIO_POSIX_UNLINK unlink
 #define BOOST_AFIO_POSIX_FSYNC fsync
 #define BOOST_AFIO_POSIX_FTRUNCATE ftruncate
+#define BOOST_AFIO_POSIX_MMAP mmap
+#define BOOST_AFIO_POSIX_MUNMAP munmap
 
 static inline boost::afio::chrono::system_clock::time_point to_timepoint(struct timespec ts)
 {
@@ -700,13 +704,14 @@ namespace detail {
 		std::unique_ptr<boost::asio::windows::random_access_handle> h;
 		void *myid;
 		bool has_been_added, SyncOnClose;
+		void *mapaddr;
 
 		static HANDLE int_checkHandle(HANDLE h, const std::filesystem::path &path)
 		{
 			BOOST_AFIO_ERRHWINFN(INVALID_HANDLE_VALUE!=h, path);
 			return h;
 		}
-		async_io_handle_windows(async_file_io_dispatcher_base *_parent, std::shared_ptr<async_io_handle> _dirh, const std::filesystem::path &path, file_flags flags) : async_io_handle(_parent, std::move(_dirh), path, flags), myid(nullptr), has_been_added(false), SyncOnClose(false) { }
+		async_io_handle_windows(async_file_io_dispatcher_base *_parent, std::shared_ptr<async_io_handle> _dirh, const std::filesystem::path &path, file_flags flags) : async_io_handle(_parent, std::move(_dirh), path, flags), myid(nullptr), has_been_added(false), SyncOnClose(false), mapaddr(nullptr) { }
 		inline async_io_handle_windows(async_file_io_dispatcher_base *_parent, std::shared_ptr<async_io_handle> _dirh, const std::filesystem::path &path, file_flags flags, bool _SyncOnClose, HANDLE _h);
 		virtual void *native_handle() const { return myid; }
 
@@ -724,6 +729,11 @@ namespace detail {
 			BOOST_AFIO_DEBUG_PRINT("D %p\n", this);
 			if(has_been_added)
 				parent()->int_del_io_handle(myid);
+			if(mapaddr)
+			{
+				BOOST_AFIO_ERRHWINFN(UnmapViewOfFile(mapaddr), path());
+				mapaddr=nullptr;
+			}
 			if(h)
 			{
 				if(SyncOnClose && write_count_since_fsync())
@@ -827,14 +837,31 @@ namespace detail {
 			}
 			BOOST_AFIO_THROW(std::runtime_error("Unknown type of symbolic link."));
 		}
+		virtual void *try_mapfile()
+		{
+			if(!mapaddr)
+			{
+				if(!(flags() & file_flags::Write) && !(flags() & file_flags::Append))
+				{
+					HANDLE sectionh;
+					if(INVALID_HANDLE_VALUE!=(sectionh=CreateFileMapping(myid, NULL, PAGE_READONLY, 0, 0, nullptr)))
+					{
+						auto unsectionh=boost::afio::detail::Undoer([&sectionh]{ CloseHandle(sectionh); });
+						mapaddr=MapViewOfFile(sectionh, FILE_MAP_READ, 0, 0, 0);
+					}
+				}
+			}
+			return mapaddr;
+		}
 	};
 #endif
 	struct async_io_handle_posix : public async_io_handle
 	{
 		int fd;
 		bool has_been_added, SyncOnClose, has_ever_been_fsynced;
+		void *mapaddr; size_t mapsize;
 
-		async_io_handle_posix(async_file_io_dispatcher_base *_parent, std::shared_ptr<async_io_handle> _dirh, const std::filesystem::path &path, file_flags flags, bool _SyncOnClose, int _fd) : async_io_handle(_parent, std::move(_dirh), path, flags), fd(_fd), has_been_added(false), SyncOnClose(_SyncOnClose),has_ever_been_fsynced(false)
+		async_io_handle_posix(async_file_io_dispatcher_base *_parent, std::shared_ptr<async_io_handle> _dirh, const std::filesystem::path &path, file_flags flags, bool _SyncOnClose, int _fd) : async_io_handle(_parent, std::move(_dirh), path, flags), fd(_fd), has_been_added(false), SyncOnClose(_SyncOnClose), has_ever_been_fsynced(false), mapaddr(nullptr), mapsize(0)
 		{
 			if(fd!=-999)
 				BOOST_AFIO_ERRHOSFN(fd, path);
@@ -851,6 +878,11 @@ namespace detail {
 		{
 			if(has_been_added)
 				parent()->int_del_io_handle((void *)(size_t)fd);
+			if(mapaddr)
+			{
+				BOOST_AFIO_ERRHOSFN(BOOST_AFIO_POSIX_MUNMAP(mapaddr, mapsize), path());
+				mapaddr=nullptr;
+			}
 			if(fd>=0)
 			{
 				// Flush synchronously here? I guess ...
@@ -881,6 +913,19 @@ namespace detail {
 			    BOOST_AFIO_ERRGOS(-1);
 			return std::filesystem::path::string_type(buffer, len);
 #endif
+		}
+		virtual void *try_mapfile()
+		{
+#ifndef WIN32
+			if(!mapaddr)
+			{
+				if(!(flags() & file_flags::Write) && !(flags() & file_flags::Append))
+				{
+					mapaddr=BOOST_AFIO_POSIX_MMAP(nullptr, mysize, PROT_READ, MAP_SHARED, fd, 0);
+				}
+			}
+#endif
+			return mapaddr;
 		}
 	};
 
@@ -1060,7 +1105,7 @@ namespace detail {
 		}
 	};
 #if defined(WIN32)
-	inline async_io_handle_windows::async_io_handle_windows(async_file_io_dispatcher_base *_parent, std::shared_ptr<async_io_handle> _dirh, const std::filesystem::path &path, file_flags flags, bool _SyncOnClose, HANDLE _h) : async_io_handle(_parent, std::move(_dirh), path, flags), h(new boost::asio::windows::random_access_handle(_parent->p->pool->io_service(), int_checkHandle(_h, path))), myid(_h), has_been_added(false), SyncOnClose(_SyncOnClose) { }
+	inline async_io_handle_windows::async_io_handle_windows(async_file_io_dispatcher_base *_parent, std::shared_ptr<async_io_handle> _dirh, const std::filesystem::path &path, file_flags flags, bool _SyncOnClose, HANDLE _h) : async_io_handle(_parent, std::move(_dirh), path, flags), h(new boost::asio::windows::random_access_handle(_parent->p->pool->io_service(), int_checkHandle(_h, path))), myid(_h), has_been_added(false), SyncOnClose(_SyncOnClose), mapaddr(nullptr) { }
 #endif
 	class async_file_io_dispatcher_compat;
 	class async_file_io_dispatcher_windows;
@@ -2148,6 +2193,8 @@ namespace detail {
 				(file_flags::SyncOnClose|file_flags::Write)==(req.flags & (file_flags::SyncOnClose|file_flags::Write|file_flags::AlwaysSync)),
 				h);
 			static_cast<async_io_handle_windows *>(ret.get())->do_add_io_handle_to_parent();
+			if(!(req.flags & file_flags::int_opening_dir) && !(req.flags & file_flags::int_opening_link) && !!(req.flags & file_flags::OSMMap))
+				ret->try_mapfile();
 			return std::make_pair(true, ret);
 		}
 		// Called in unknown thread
@@ -2415,9 +2462,22 @@ namespace detail {
 			BOOST_FOREACH(auto &b, req.buffers)
             {	BOOST_AFIO_DEBUG_PRINT("  R %u: %p %u\n", (unsigned) id, boost::asio::buffer_cast<const void *>(b), (unsigned) boost::asio::buffer_size(b)); }
 #endif
-			doreadwrite(id, h, e, req, p);
-			// Indicate we're not finished yet
-			return std::make_pair(false, h);
+			if(p->mapaddr)
+			{
+				void *addr=(void *)((char *) p->mapaddr + req.where);
+				BOOST_FOREACH(auto &b, req.buffers)
+				{
+					memcpy(boost::asio::buffer_cast<void *>(b), addr, boost::asio::buffer_size(b));
+					addr=(void *)((char *) addr + boost::asio::buffer_size(b));
+				}
+				return std::make_pair(true, h);
+			}
+			else
+			{
+				doreadwrite(id, h, e, req, p);
+				// Indicate we're not finished yet
+				return std::make_pair(false, h);
+			}
 		}
 		// Called in unknown thread
 		completion_returntype dowrite(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr *e, detail::async_data_op_req_impl<true> req)
@@ -2812,6 +2872,8 @@ namespace detail {
 			auto ret=std::make_shared<async_io_handle_posix>(this, dirh, req.path, req.flags, (file_flags::SyncOnClose|file_flags::Write)==(req.flags & (file_flags::SyncOnClose|file_flags::Write|file_flags::AlwaysSync)),
 				BOOST_AFIO_POSIX_OPEN(req.path.c_str(), flags, 0x1b0/*660*/));
 			static_cast<async_io_handle_posix *>(ret.get())->do_add_io_handle_to_parent();
+			if(!(req.flags & file_flags::int_opening_dir) && !(req.flags & file_flags::int_opening_link) && !!(req.flags & file_flags::OSMMap))
+				ret->try_mapfile();
 			return std::make_pair(true, ret);
 		}
 		// Called in unknown thread
@@ -2880,8 +2942,6 @@ namespace detail {
 			async_io_handle_posix *p=static_cast<async_io_handle_posix *>(h.get());
 			ssize_t bytesread=0, bytestoread=0;
 			iovec v;
-			std::vector<iovec> vecs;
-			vecs.reserve(req.buffers.size());
 			BOOST_AFIO_DEBUG_PRINT("R %u %p (%c) @ %u, b=%u\n", (unsigned) id, h.get(), p->path().native().back(), (unsigned) req.where, (unsigned) req.buffers.size());
 #ifdef DEBUG_PRINTING
 			BOOST_FOREACH(auto &b, req.buffers)
@@ -2889,6 +2949,18 @@ namespace detail {
                 BOOST_AFIO_DEBUG_PRINT("  R %u: %p %u\n", (unsigned) id, boost::asio::buffer_cast<const void *>(b), (unsigned) boost::asio::buffer_size(b));
             }
 #endif
+			if(p->mapaddr)
+			{
+				void *addr=(void *)((char *)p->mapaddr + req.where);
+				BOOST_FOREACH(auto &b, req.buffers)
+				{
+					memcpy(boost::asio::buffer_cast<void *>(b), addr, boost::asio::buffer_size(b));
+					addr=(void *)((char *)addr + boost::asio::buffer_size(b));
+				}
+				return std::make_pair(true, h);
+			}
+			std::vector<iovec> vecs;
+			vecs.reserve(req.buffers.size());
 			BOOST_FOREACH(auto &b, req.buffers)
 			{
 				v.iov_base=boost::asio::buffer_cast<void *>(b);

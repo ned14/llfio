@@ -153,11 +153,11 @@ public:
     template <class U, class ...Args>
     void
     construct(U* p, Args&&... args)
-    { if(initialize) ::new(reinterpret_cast<void*>(p)) U(std::forward<Args>(args)...); }
+    { if(initialize || !std::is_same<char, U>::value) ::new(reinterpret_cast<void*>(p)) U(std::forward<Args>(args)...); }
 #else
 	void construct( pointer p, const_reference val )
 	{
-		if(initialize) ::new(reinterpret_cast<void*>(p)) T(val);
+		if(initialize || !std::is_same<char, U>::value) ::new(reinterpret_cast<void*>(p)) T(val);
 	}
 #endif
 
@@ -245,14 +245,14 @@ public:
     template <class U, class ...Args>
     void
     construct(U* p, Args&&... args)
-    { if(initialize) ::new(reinterpret_cast<void*>(p)) U(std::forward<Args>(args)...); }
+    { if(initialize || !std::is_same<char, U>::value) ::new(reinterpret_cast<void*>(p)) U(std::forward<Args>(args)...); }
 #else
     #define BOOST_PP_LOCAL_MACRO(N)                                             \
     template <class U                                                           \
     BOOST_PP_ENUM_TRAILING_PARAMS(N, class A)>                                  \
     void                                                                        \
     construct(U* p BOOST_PP_ENUM__TRAILING_BINARY_PARAMS(N, A, a))              \
-	{ if(initialize) ::new(reinterpret_cast<void*>(p)) U(std::forward<A0>(a0) BOOST_PP_ENUM_SHIFTED_BINARY_PARAMS(N, A, a)); }
+	{ if(initialize || !std::is_same<char, U>::value) ::new(reinterpret_cast<void*>(p)) U(std::forward<A0>(a0) BOOST_PP_ENUM_SHIFTED_BINARY_PARAMS(N, A, a)); }
 #endif
 
     void

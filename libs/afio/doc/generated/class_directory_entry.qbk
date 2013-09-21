@@ -97,31 +97,187 @@ The abstract base class for an entry in a directory with lazily filled metadata.
 ]]
 [[``std::filesystem::path name()``
 
-] [The name of the directory entry. ] [
+] [] [
+
+][
+The name of the directory entry 
 
 
 ]]
 [[``metadata_flags metadata_ready()``
 
-] [A bitfield of what metadata is ready right now. ] [
+] [] [
+
+][
+A bitfield of what metadata is ready right now 
 
 
 ]]
 [[``metadata_flags fetch_metadata(std::shared_ptr< async_io_handle > dirh, metadata_flags wanted)``
 
-] [Fetches the specified metadata, returning that newly available. This is a blocking call. ] [[* std::shared_ptr< async_io_handle >]: ['dirh]:  
+] [Fetches the specified metadata, returning that newly available. This is a blocking call if wanted metadata is not yet ready. ] [[* std::shared_ptr< async_io_handle >]: ['dirh]:  An open handle to the entry's containing directory. You can get this from the h shared future member variable in an op ref. 
 
-[* metadata_flags]: ['wanted]:  
+[* metadata_flags]: ['wanted]:  A bitfield of the metadata to fetch. This does not replace existing metadata. 
+
+
+
+][
+The metadata now available in this directory entry. 
+
+
+]]
+[[``stat_t fetch_lstat(std::shared_ptr< async_io_handle > dirh, metadata_flags wanted = directory_entry::metadata_fastpath())``
+
+] [Returns a copy of the internal [^`stat_t`] structure. This is a blocking call if wanted metadata is not yet ready. ] [[* std::shared_ptr< async_io_handle >]: ['dirh]:  An open handle to the entry's containing directory. You can get this from the h shared future member variable in an op ref. 
+
+[* metadata_flags]: ['wanted]:  A bitfield of the metadata to fetch. This does not replace existing metadata. 
+
+
+
+][
+A copy of the internal [^`stat_t`] structure. 
+
+
+]]
+[[``decltype(stat_t().st_dev) st_dev(std::shared_ptr< async_io_handle > dirh = std::shared_ptr< async_io_handle >())``
+
+] [Returns st_dev. ] [[* std::shared_ptr< async_io_handle >]: ['dirh]:  An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from the h shared future member variable in an op ref. 
 
 
 
 
 ]]
-[[``stat_t full_lstat(std::shared_ptr< async_io_handle > dirh, metadata_flags wanted = directory_entry::metadata_fastpath())``
+[[``decltype(stat_t().st_ino) st_ino(std::shared_ptr< async_io_handle > dirh = std::shared_ptr< async_io_handle >())``
 
-] [Fetches a fast path [^`stat_t`] structure which is missing those fields not fast to fetch on this platform. ] [[* std::shared_ptr< async_io_handle >]: ['dirh]:  
+] [Returns st_ino. ] [[* std::shared_ptr< async_io_handle >]: ['dirh]:  An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from the h shared future member variable in an op ref. 
 
-[* metadata_flags]: ['wanted]:  
+
+
+
+]]
+[[``decltype(stat_t().st_type) st_type(std::shared_ptr< async_io_handle > dirh = std::shared_ptr< async_io_handle >())``
+
+] [Returns st_type. ] [[* std::shared_ptr< async_io_handle >]: ['dirh]:  An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from the h shared future member variable in an op ref. 
+
+
+
+
+]]
+[[``decltype(stat_t().st_mode) st_mode(std::shared_ptr< async_io_handle > dirh = std::shared_ptr< async_io_handle >())``
+
+] [Returns st_mode. ] [[* std::shared_ptr< async_io_handle >]: ['dirh]:  An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from the h shared future member variable in an op ref. 
+
+
+
+
+]]
+[[``decltype(stat_t().st_nlink) st_nlink(std::shared_ptr< async_io_handle > dirh = std::shared_ptr< async_io_handle >())``
+
+] [Returns st_nlink. ] [[* std::shared_ptr< async_io_handle >]: ['dirh]:  An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from the h shared future member variable in an op ref. 
+
+
+
+
+]]
+[[``decltype(stat_t().st_uid) st_uid(std::shared_ptr< async_io_handle > dirh = std::shared_ptr< async_io_handle >())``
+
+] [Returns st_uid. ] [[* std::shared_ptr< async_io_handle >]: ['dirh]:  An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from the h shared future member variable in an op ref. 
+
+
+
+
+]]
+[[``decltype(stat_t().st_gid) st_gid(std::shared_ptr< async_io_handle > dirh = std::shared_ptr< async_io_handle >())``
+
+] [Returns st_gid. ] [[* std::shared_ptr< async_io_handle >]: ['dirh]:  An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from the h shared future member variable in an op ref. 
+
+
+
+
+]]
+[[``decltype(stat_t().st_rdev) st_rdev(std::shared_ptr< async_io_handle > dirh = std::shared_ptr< async_io_handle >())``
+
+] [Returns st_rdev. ] [[* std::shared_ptr< async_io_handle >]: ['dirh]:  An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from the h shared future member variable in an op ref. 
+
+
+
+
+]]
+[[``decltype(stat_t().st_atim) st_atim(std::shared_ptr< async_io_handle > dirh = std::shared_ptr< async_io_handle >())``
+
+] [Returns st_atim. ] [[* std::shared_ptr< async_io_handle >]: ['dirh]:  An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from the h shared future member variable in an op ref. 
+
+
+
+
+]]
+[[``decltype(stat_t().st_mtim) st_mtim(std::shared_ptr< async_io_handle > dirh = std::shared_ptr< async_io_handle >())``
+
+] [Returns st_mtim. ] [[* std::shared_ptr< async_io_handle >]: ['dirh]:  An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from the h shared future member variable in an op ref. 
+
+
+
+
+]]
+[[``decltype(stat_t().st_ctim) st_ctim(std::shared_ptr< async_io_handle > dirh = std::shared_ptr< async_io_handle >())``
+
+] [Returns st_ctim. ] [[* std::shared_ptr< async_io_handle >]: ['dirh]:  An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from the h shared future member variable in an op ref. 
+
+
+
+
+]]
+[[``decltype(stat_t().st_size) st_size(std::shared_ptr< async_io_handle > dirh = std::shared_ptr< async_io_handle >())``
+
+] [Returns st_size. ] [[* std::shared_ptr< async_io_handle >]: ['dirh]:  An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from the h shared future member variable in an op ref. 
+
+
+
+
+]]
+[[``decltype(stat_t().st_allocated) st_allocated(std::shared_ptr< async_io_handle > dirh = std::shared_ptr< async_io_handle >())``
+
+] [Returns st_allocated. ] [[* std::shared_ptr< async_io_handle >]: ['dirh]:  An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from the h shared future member variable in an op ref. 
+
+
+
+
+]]
+[[``decltype(stat_t().st_blocks) st_blocks(std::shared_ptr< async_io_handle > dirh = std::shared_ptr< async_io_handle >())``
+
+] [Returns st_blocks. ] [[* std::shared_ptr< async_io_handle >]: ['dirh]:  An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from the h shared future member variable in an op ref. 
+
+
+
+
+]]
+[[``decltype(stat_t().st_blksize) st_blksize(std::shared_ptr< async_io_handle > dirh = std::shared_ptr< async_io_handle >())``
+
+] [Returns st_blksize. ] [[* std::shared_ptr< async_io_handle >]: ['dirh]:  An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from the h shared future member variable in an op ref. 
+
+
+
+
+]]
+[[``decltype(stat_t().st_flags) st_flags(std::shared_ptr< async_io_handle > dirh = std::shared_ptr< async_io_handle >())``
+
+] [Returns st_flags. ] [[* std::shared_ptr< async_io_handle >]: ['dirh]:  An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from the h shared future member variable in an op ref. 
+
+
+
+
+]]
+[[``decltype(stat_t().st_gen) st_gen(std::shared_ptr< async_io_handle > dirh = std::shared_ptr< async_io_handle >())``
+
+] [Returns st_gen. ] [[* std::shared_ptr< async_io_handle >]: ['dirh]:  An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from the h shared future member variable in an op ref. 
+
+
+
+
+]]
+[[``decltype(stat_t().st_birthtim) st_birthtim(std::shared_ptr< async_io_handle > dirh = std::shared_ptr< async_io_handle >())``
+
+] [Returns st_birthtim. ] [[* std::shared_ptr< async_io_handle >]: ['dirh]:  An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from the h shared future member variable in an op ref. 
 
 
 
@@ -129,7 +285,7 @@ The abstract base class for an entry in a directory with lazily filled metadata.
 ]]
 [[``metadata_flags metadata_supported()``
 
-] [Returns st_dev. ] [
+] [A bitfield of what metadata is available on this platform. This doesn't mean all is available for every filing system. ] [
 
 
 ]]

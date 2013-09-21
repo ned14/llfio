@@ -8,6 +8,8 @@ afio/design/acid_write_ordering/write_ordering_data.html
 afio/compilation.html
 afio/quickstart.html
 afio/quickstart/async_file_io.html
+afio/quickstart/async_file_io/hello_world.html
+afio/quickstart/async_file_io/so_what.html
 afio/quickstart/closure_engine.html
 afio/quickstart/closure_engine/the_basics.html
 afio/quickstart/closure_engine/the_basics/examples.html
@@ -94,4 +96,5 @@ afio/advanced_topics/vs2010_notes.html
 afio/release_notes.html
 afio/FAQ.html
 afio/FAQ/stuck_ops.html
+afio/FAQ/vector_use.html
 afio/acknowledgments.html

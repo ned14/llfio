@@ -709,7 +709,7 @@ enum class file_flags : size_t
 	UniqueDirectoryHandle=(1<<11), //!< Return a unique directory handle rather than a shared directory handle
 
 	OSDirect=(1<<16),	//!< Bypass the OS file buffers (only really useful for writing large files, or a lot of random reads and writes. Note you must 4Kb align everything if this is on)
-	OSMMap=(1<<17),		//!< Memory map files. You should pass zero for your buffer pointer during reads as it will be overwritten with some location in the memory mapped file.
+	OSMMap=(1<<17),		//!< Memory map files (for reads only).
 
 	AlwaysSync=(1<<24),		//!< Ask the OS to not complete until the data is on the physical storage. Best used only with OSDirect, otherwise use SyncOnClose.
 	SyncOnClose=(1<<25),	//!< Automatically initiate an asynchronous flush just before file close, and fuse both operations so both must complete for close to complete.
@@ -1002,6 +1002,8 @@ public:
 	}
 	//! Returns the target path of this handle if it is a symbolic link
 	virtual std::filesystem::path target() const=0;
+	//! Tries to map the file into memory. Currently only works if handle is read-only.
+	virtual void *try_mapfile()=0;
 };
 
 #ifndef BOOST_NO_CXX11_VARIADIC_TEMPLATES

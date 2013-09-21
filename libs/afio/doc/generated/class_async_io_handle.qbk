@@ -108,14 +108,6 @@ The abstract base class encapsulating a platform-specific file handle.
 
 
 ]]
-[[``stat_t lstat(metadata_flags wanted = directory_entry::metadata_fastpath())``
-
-] [Returns a mostly filled stat_t structure for the file or directory referenced by this handle. Use [^`metadata_flags::All`] if you want it as complete as your platform allows, even at the cost of severe performance loss. ] [[* metadata_flags]: ['wanted]:  
-
-
-
-
-]]
 [[``directory_entry direntry(metadata_flags wanted = directory_entry::metadata_fastpath())``
 
 ] [Returns a mostly filled directory_entry for the file or directory referenced by this handle. Use [^`metadata_flags::All`] if you want it as complete as your platform allows, even at the cost of severe performance loss. ] [[* metadata_flags]: ['wanted]:  
@@ -124,9 +116,23 @@ The abstract base class encapsulating a platform-specific file handle.
 
 
 ]]
+[[``stat_t lstat(metadata_flags wanted = directory_entry::metadata_fastpath())``
+
+] [Returns a mostly filled stat_t structure for the file or directory referenced by this handle. Use [^`metadata_flags::All`] if you want it as complete as your platform allows, even at the cost of severe performance loss. ] [[* metadata_flags]: ['wanted]:  
+
+
+
+
+]]
 [[``std::filesystem::path target()``
 
 ] [Returns the target path of this handle if it is a symbolic link. ] [
+
+
+]]
+[[``void * try_mapfile()``
+
+] [Tries to map the file into memory. Currently only works if handle is read-only. ] [
 
 
 ]]

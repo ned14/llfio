@@ -18,7 +18,17 @@ The search took 2.79223 seconds which was 13044 files per second or 2086.34 Mb/s
 Cold cache:
 91 files matched out of 36422 files which was 6108537728 bytes.
 The search took 388.74 seconds which was 93.6925 files per second or 14.9857 Mb/sec.
+
+Warm cache mmaps:
+91 files matched out of 36422 files which was 6109258426 bytes.
+The search took 1.54928 seconds which was 23508.9 files per second or 3760.6 Mb/sec.
+
+Cold cache mmaps:
+91 files matched out of 36422 files which was 6109258426 bytes.
+The search took 242.76 seconds which was 150.033 files per second or 24 Mb/sec.
 */
+
+#define USE_MMAPS
 
 #if !(defined(BOOST_MSVC) && BOOST_MSVC < 1700)
 //[find_in_files_afio
@@ -56,12 +66,8 @@ public:
 		//boost::lock_guard<decltype(opslock)> lock(opslock);
 		//ops.insert(ops.end(), list.begin(), list.end());
 	}
-	// A file searching completion, called when each file read completes
-	std::pair<bool, std::shared_ptr<async_io_handle>> file_read(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr *e, std::shared_ptr<std::vector<char, detail::aligned_allocator<char, 4096, false>>> _buffer, size_t length)
+	void dosearch(std::shared_ptr<async_io_handle> h, const char *buffer, size_t length)
 	{
-		//std::cout << "R " << h->path() << std::endl;
-		char *buffer=_buffer->data();
-		buffer[length]=0;
 		// Search the buffer for the regular expression
 		if(std::regex_search(buffer, regexpr))
 		{
@@ -73,6 +79,14 @@ public:
 		}
 		++filesread;
 		bytesread+=length;
+	}
+	// A file searching completion, called when each file read completes
+	std::pair<bool, std::shared_ptr<async_io_handle>> file_read(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr *e, std::shared_ptr<std::vector<char, detail::aligned_allocator<char, 4096, false>>> _buffer, size_t length)
+	{
+		//std::cout << "R " << h->path() << std::endl;
+		char *buffer=_buffer->data();
+		buffer[length]=0;
+		dosearch(h, buffer, length);
 		docompleted(2);
 		// Throw away the buffer now rather than later to keep memory consumption down
 		_buffer->clear();
@@ -84,13 +98,22 @@ public:
 	std::pair<bool, std::shared_ptr<async_io_handle>> file_opened(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr *e, size_t length)
 	{
 		//std::cout << "F " << h->path() << std::endl;
-		// Allocate a sufficient 4Kb aligned buffer
-		size_t _length=(4095+length)&~4095;
-		auto buffer=std::make_shared<std::vector<char, detail::aligned_allocator<char, 4096, false>>>(_length+1);
-		// Schedule a read of the file
-		auto read=dispatcher->read(make_async_data_op_req(dispatcher->op_from_scheduled_id(id), buffer->data(), _length, 0));
-		auto read_done=dispatcher->completion(read, std::make_pair(async_op_flags::None/*regex search might be slow*/, std::bind(&find_in_files::file_read, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, buffer, length)));
-		doscheduled({read, read_done});
+#ifdef USE_MMAPS
+		if(!!(h->flags() & file_flags::OSMMap))
+		{
+			dosearch(h, (const char *) h->try_mapfile(), length);
+		}
+		else
+#endif
+		{
+			// Allocate a sufficient 4Kb aligned buffer
+			size_t _length=(4095+length)&~4095;
+			auto buffer=std::make_shared<std::vector<char, detail::aligned_allocator<char, 4096, false>>>(_length+1);
+			// Schedule a read of the file
+			auto read=dispatcher->read(make_async_data_op_req(dispatcher->op_from_scheduled_id(id), buffer->data(), _length, 0));
+			auto read_done=dispatcher->completion(read, std::make_pair(async_op_flags::None/*regex search might be slow*/, std::bind(&find_in_files::file_read, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, buffer, length)));
+			doscheduled({ read, read_done });
+		}
 		docompleted(2);
 		return std::make_pair(true, h);
 	}
@@ -154,7 +177,9 @@ public:
 					if(length)
 					{
 						file_flags flags=file_flags::Read;
-						if(length>65536) flags=flags|file_flags::OSMMap;
+#ifdef USE_MMAPS
+						if(length>16384) flags=flags|file_flags::OSMMap;
+#endif
 						file_reqs.push_back(async_path_op_req(lastdir, h->path()/entry.name(), flags));
 						file_openedfs.push_back(std::make_pair(async_op_flags::None, std::bind(&find_in_files::file_opened, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, length)));
 					}
@@ -175,7 +200,9 @@ public:
 					if(length)
 					{
 						file_flags flags=file_flags::Read;
-						if(length>65536) flags=flags|file_flags::OSMMap;
+#ifdef USE_MMAPS
+						if(length>16384) flags=flags|file_flags::OSMMap;
+#endif
 						auto file_open=dispatcher->file(async_path_op_req(lastdir, h->path()/entry.name(), flags));
 						auto file_opened=dispatcher->completion(file_open, std::make_pair(async_op_flags::None, std::bind(&find_in_files::file_opened, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, length)));
 						doscheduled({ file_open, file_opened });

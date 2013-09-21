@@ -90,7 +90,7 @@ instead of creating separate threads of execution and executing the file i/o the
 
 There are three main benefits to using AFIO over doing it by hand:
 
-# You don't have to worry about threading or race conditions or losing error state. AFIO
+# You don't have to worry about threading or race conditions or losing error state (as much). AFIO
 does all that for you.
 # On platforms which provide native asynchronous file i/o support and/or native scatter/gather
 file i/o support, AFIO will use that
@@ -125,17 +125,40 @@ code, everything is asynchronous callback):
 Here the `find_in_files` class is used to carry state across the callbacks -- one could just
 as equally bind the state into each callback's parameters instead via some sort of pointer to
 a struct. But the difference in complexity is noticeable -- you're probably now asking, why
-choose this over the much clearer OpenMP and iostreams implementation?
+choose this hideous complexity over the much clearer OpenMP and iostreams implementation?
 
 Well, that's simple: do you want maximum file i/o performance? Here is a search for ["Niall] in a
-Boost working directory which contained about 6Gb of data across ~39k files:
+Boost working directory which contained about 6Gb of data across ~39k files[footnote Test machine
+was a 3.5Ghz Intel i7-3770K Microsoft Windows 8 x64 machine with Seagate ST3320620AS 7200rpm hard
+drive. Note that AFIO has a native WinIOCP backend which leverages host asynchronous file i/o support.]:
 
-[table:find_in_files_performance Find in files performance for traditional vs AFIO implementations[footnote Test machine was a 3.5Ghz Intel i7-3770K Microsoft Windows 8 x64 machine with Seagate ST3320620AS 7200rpm hard drive. Note that AFIO has a native WinIOCP backend which leverages host asynchronous file i/o support.]
-  [[][iostreams, single threaded][iostreams, OpenMP][Boost.AFIO][Boost.AFIO `file_flags::OSDirect`]]
-  [[Warm cache][779 Mb/sec][1682 Mb/sec][2086 Mb/sec][N/A]]
-  [[Cold cache[footnote File cache reset using [@http://technet.microsoft.com/en-us/sysinternals/ff700229.aspx]]][16 Mb/sec][8 Mb/sec][][13.14 Mb/sec]]
+[table:find_in_files_performance Find in files performance for traditional vs AFIO implementations
+  [[][iostreams, single threaded][iostreams, OpenMP][Boost.AFIO][Boost.AFIO `file_flags::OSDirect`][Boost.AFIO `file_flags::OSMMap`]]
+  [[Warm cache][779 Mb/sec][1682 Mb/sec][2086 Mb/sec][N/A][3761 Mb/sec]]
+  [[Cold cache[footnote File cache reset using [@http://technet.microsoft.com/en-us/sysinternals/ff700229.aspx]]][16 Mb/sec][8 Mb/sec][15 Mb/sec][13.14 Mb/sec][24 Mb/sec]]
 ]
 
+The eagle eyed amongst you will have noticed that the AFIO implementation looks hand tuned with a
+special depth first algorithm balancing concurrency with seek locality -- that's because I invested
+two days into achieving maximum possible performance as a demonstration of AFIO's power (and to find
+and fix some bottlenecks). Some might argue that this is therefore not a fair comparison to the OpenMP iostreams
+implementation.
+
+There are two parts to answering this argument. The first is that yes, the OpenMP iostreams search
+algorithm is fairly stupid and simply tries to read as many files as there are CPUs, and those files could
+be stored anywhere on the spinning disc. Because AFIO
+can issue far more concurrent file open and read requests than OpenMP, it gives a lot more scope to
+the filing system to optimise hard drive seeks and satisfy as many requests as is feasible --
+sufficiently so that with a cold cache, AFIO is little slower than a single threaded iostreams
+implementation where the filing system can spot the access pattern and prefetch quite effectively. 
+
+The second part of answering that argument is this: AFIO's very flexible op chaining structure lets you
+very easily twiddle with the execution dependency graph to achieve maximum possible performance by
+balancing concurrency (too much or too little is slower, what you need is just the right balance),
+unlike the naive OpenMP implementation which is much harder to play around with. Don't get me wrong:
+if you have plenty of time on your hands, you can implement a hand written and tuned find in files
+implementation that is faster than AFIO's implementation, but it will have taken you a lot longer,
+and the code will neither be as portable nor as maintainable.
 
 [endsect] [/so_what]
 
