@@ -94,6 +94,7 @@ BOOST_AFIO_AUTO_TEST_CASE(async_data_op_req_compilation, "Tests that all the use
 		typedef const type const_type;
 
 		type out;
+		out.fill(' ');
 		// works
 		last=dispatcher->write(async_data_op_req<const_type>(last, out, 0));
 		// auto-consts
