@@ -1817,6 +1817,13 @@ inline future<std::vector<std::shared_ptr<async_io_handle>>> when_all(std::nothr
 #endif
 	auto state(std::make_shared<detail::when_all_count_completed_state>(first, last));
 	std::vector<async_io_op> &inputs=state->inputs;
+#if BOOST_AFIO_VALIDATE_INPUTS
+	BOOST_FOREACH(auto &i, inputs)
+	{
+		if(!i.validate(false))
+			BOOST_AFIO_THROW(std::runtime_error("Inputs are invalid."));
+	}
+#endif
 	std::vector<std::pair<async_op_flags, std::function<async_file_io_dispatcher_base::completion_t>>> callbacks;
 	callbacks.reserve(inputs.size());
 	size_t idx=0;
@@ -1856,6 +1863,13 @@ inline future<std::vector<std::shared_ptr<async_io_handle>>> when_all(std::vecto
 #endif
 	auto state(std::make_shared<detail::when_all_count_completed_state>(first, last));
 	std::vector<async_io_op> &inputs=state->inputs;
+#if BOOST_AFIO_VALIDATE_INPUTS
+	BOOST_FOREACH(auto &i, inputs)
+	{
+		if(!i.validate(false))
+			BOOST_AFIO_THROW(std::runtime_error("Inputs are invalid."));
+	}
+#endif
 	std::vector<std::pair<async_op_flags, std::function<async_file_io_dispatcher_base::completion_t>>> callbacks;
 	callbacks.reserve(inputs.size());
 	size_t idx=0;

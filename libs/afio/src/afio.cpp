@@ -3071,7 +3071,11 @@ namespace detail {
 				auto buffer=std::unique_ptr<dirent[]>(new dirent[req.maxitems]);
 				if(req.restart)
 				{
+#ifdef __linux__
 					BOOST_AFIO_ERRHOS(lseek64(p->fd, 0, SEEK_SET));
+#else
+					BOOST_AFIO_ERRHOS(lseek(p->fd, 0, SEEK_SET));
+#endif
 				}
 				int bytes;
 				bool done;
