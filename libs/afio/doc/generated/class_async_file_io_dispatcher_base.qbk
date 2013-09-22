@@ -158,6 +158,28 @@ A pair with a future returning the result of the callable and an op handle.
 
 
 ]]
+[[``std::vector< async_io_op > adopt(const std::vector< std::shared_ptr< async_io_handle >> & hs)``
+
+] [Schedule a batch of third party handle adoptions. ] [[* const std::vector< std::shared_ptr< async_io_handle >> &]: ['hs]:  A batch of handles to adopt.
+
+
+
+][
+A batch of op handles. 
+
+
+]]
+[[``async_io_op adopt(std::shared_ptr< async_io_handle > h)``
+
+] [Schedule an adoption of a third party handle. ] [[* std::shared_ptr< async_io_handle >]: ['h]:  A handle to adopt.
+
+
+
+][
+An op handle. 
+
+
+]]
 [[``std::vector< async_io_op > dir(const std::vector< async_path_op_req > & reqs)``
 
 ] [Schedule a batch of asynchronous directory creations and opens after optional preconditions. ] [[* const std::vector< async_path_op_req > &]: ['reqs]:  A batch of [^`async_path_op_req`] structures.

@@ -45,6 +45,8 @@ afio/reference/classes/async_file_io_dispatcher_base/completion_2_single_bound_f
 afio/reference/classes/async_file_io_dispatcher_base/call_2_batch_bound_functions.html
 afio/reference/classes/async_file_io_dispatcher_base/call_1_batch_bound_functions_without_preconditions.html
 afio/reference/classes/async_file_io_dispatcher_base/call_3_single_unbound_callable.html
+afio/reference/classes/async_file_io_dispatcher_base/adopt_1_batch.html
+afio/reference/classes/async_file_io_dispatcher_base/adopt_1_single.html
 afio/reference/classes/async_file_io_dispatcher_base/close_1_batch.html
 afio/reference/classes/async_file_io_dispatcher_base/close_1_single.html
 afio/reference/classes/async_file_io_dispatcher_base/dir_1_batch.html
@@ -97,4 +99,5 @@ afio/release_notes.html
 afio/FAQ.html
 afio/FAQ/stuck_ops.html
 afio/FAQ/vector_use.html
+afio/FAQ/foreign_fd.html
 afio/acknowledgments.html

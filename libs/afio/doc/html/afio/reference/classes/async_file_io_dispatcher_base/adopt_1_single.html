@@ -1,13 +1,13 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
-<title>rmfile (single)</title>
+<title>adopt (single)</title>
 <link rel="stylesheet" href="../../../../myboostbook.css" type="text/css">
 <meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
 <link rel="home" href="../../../../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 0.1">
 <link rel="up" href="../async_file_io_dispatcher_base.html" title="async_file_io_dispatcher_base">
-<link rel="prev" href="rmfile_1_batch.html" title="rmfile (batch)">
-<link rel="next" href="rmsymlink_1_batch.html" title="rmsymlink (batch)">
+<link rel="prev" href="adopt_1_batch.html" title="adopt (batch)">
+<link rel="next" href="close_1_batch.html" title="close (batch)">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
 <table cellpadding="2" width="100%"><tr>
@@ -20,25 +20,35 @@
 </tr></table>
 <hr>
 <div class="spirit-nav">
-<a accesskey="p" href="rmfile_1_batch.html"><img src="../../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../async_file_io_dispatcher_base.html"><img src="../../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../../../index.html"><img src="../../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="rmsymlink_1_batch.html"><img src="../../../../../../doc/src/images/next.png" alt="Next"></a>
+<a accesskey="p" href="adopt_1_batch.html"><img src="../../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../async_file_io_dispatcher_base.html"><img src="../../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../../../index.html"><img src="../../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="close_1_batch.html"><img src="../../../../../../doc/src/images/next.png" alt="Next"></a>
 </div>
 <div class="section">
 <div class="titlepage"><div><div><h5 class="title">
-<a name="afio.reference.classes.async_file_io_dispatcher_base.rmfile_1_single"></a><a class="link" href="rmfile_1_single.html" title="rmfile (single)">rmfile
+<a name="afio.reference.classes.async_file_io_dispatcher_base.adopt_1_single"></a><a class="link" href="adopt_1_single.html" title="adopt (single)">adopt
           (single)</a>
 </h5></div></div></div>
 <p>
-            <a class="indexterm" name="id951687"></a>
-Schedule an asynchronous file deletion after an optional precondition.
+            <a class="indexterm" name="id924909"></a>
+Schedule an adoption of a third party handle.
           </p>
 <h6>
-<a name="afio.reference.classes.async_file_io_dispatcher_base.rmfile_1_single.h0"></a>
-            <span class="phrase"><a name="afio.reference.classes.async_file_io_dispatcher_base.rmfile_1_single.synopsis"></a></span><a class="link" href="rmfile_1_single.html#afio.reference.classes.async_file_io_dispatcher_base.rmfile_1_single.synopsis">Synopsis</a>
+<a name="afio.reference.classes.async_file_io_dispatcher_base.adopt_1_single.h0"></a>
+            <span class="phrase"><a name="afio.reference.classes.async_file_io_dispatcher_base.adopt_1_single.description"></a></span><a class="link" href="adopt_1_single.html#afio.reference.classes.async_file_io_dispatcher_base.adopt_1_single.description">Description</a>
           </h6>
-<pre class="programlisting"><span class="identifier">async_io_op</span> <span class="identifier">async_file_io_dispatcher_base</span><span class="special">::</span><span class="identifier">rmfile</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">async_path_op_req</span> <span class="special">&amp;</span> <span class="identifier">req</span><span class="special">)</span></pre>
+<p>
+            This function enables you to adopt third party custom async_io_handle
+            derivatives as ops into the scheduler. Think of it as if you were calling
+            file(), except the op returns the supplied handle and otherwise does
+            nothing.
+          </p>
 <h6>
-<a name="afio.reference.classes.async_file_io_dispatcher_base.rmfile_1_single.h1"></a>
-            <span class="phrase"><a name="afio.reference.classes.async_file_io_dispatcher_base.rmfile_1_single.parameters"></a></span><a class="link" href="rmfile_1_single.html#afio.reference.classes.async_file_io_dispatcher_base.rmfile_1_single.parameters">Parameters</a>
+<a name="afio.reference.classes.async_file_io_dispatcher_base.adopt_1_single.h1"></a>
+            <span class="phrase"><a name="afio.reference.classes.async_file_io_dispatcher_base.adopt_1_single.synopsis"></a></span><a class="link" href="adopt_1_single.html#afio.reference.classes.async_file_io_dispatcher_base.adopt_1_single.synopsis">Synopsis</a>
+          </h6>
+<pre class="programlisting"><span class="identifier">async_io_op</span> <span class="identifier">async_file_io_dispatcher_base</span><span class="special">::</span><span class="identifier">adopt</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span> <span class="identifier">async_io_handle</span> <span class="special">&gt;</span> <span class="identifier">h</span><span class="special">)</span></pre>
+<h6>
+<a name="afio.reference.classes.async_file_io_dispatcher_base.adopt_1_single.h2"></a>
+            <span class="phrase"><a name="afio.reference.classes.async_file_io_dispatcher_base.adopt_1_single.parameters"></a></span><a class="link" href="adopt_1_single.html#afio.reference.classes.async_file_io_dispatcher_base.adopt_1_single.parameters">Parameters</a>
           </h6>
 <div class="informaltable"><table class="table">
 <colgroup>
@@ -72,49 +82,48 @@ Schedule an asynchronous file deletion after an optional precondition.
 <tbody><tr>
 <td>
                     <p>
-                      const async_path_op_req &amp;
+                      std::shared_ptr&lt; async_io_handle &gt;
                     </p>
                   </td>
 <td>
                   </td>
 <td>
                     <p>
-                      req
+                      h
                     </p>
                   </td>
 <td>
                     <p>
-                      An <code class="literal"><code class="computeroutput"><span class="identifier">async_path_op_req</span></code></code>
-                      structure.
+                      A handle to adopt.
                     </p>
                   </td>
 </tr></tbody>
 </table></div>
 <h6>
-<a name="afio.reference.classes.async_file_io_dispatcher_base.rmfile_1_single.h2"></a>
-            <span class="phrase"><a name="afio.reference.classes.async_file_io_dispatcher_base.rmfile_1_single.returns"></a></span><a class="link" href="rmfile_1_single.html#afio.reference.classes.async_file_io_dispatcher_base.rmfile_1_single.returns">Returns</a>
+<a name="afio.reference.classes.async_file_io_dispatcher_base.adopt_1_single.h3"></a>
+            <span class="phrase"><a name="afio.reference.classes.async_file_io_dispatcher_base.adopt_1_single.returns"></a></span><a class="link" href="adopt_1_single.html#afio.reference.classes.async_file_io_dispatcher_base.adopt_1_single.returns">Returns</a>
           </h6>
 <p>
             An op handle.
           </p>
 <h6>
-<a name="afio.reference.classes.async_file_io_dispatcher_base.rmfile_1_single.h3"></a>
-            <span class="phrase"><a name="afio.reference.classes.async_file_io_dispatcher_base.rmfile_1_single.header"></a></span><a class="link" href="rmfile_1_single.html#afio.reference.classes.async_file_io_dispatcher_base.rmfile_1_single.header">Header</a>
+<a name="afio.reference.classes.async_file_io_dispatcher_base.adopt_1_single.h4"></a>
+            <span class="phrase"><a name="afio.reference.classes.async_file_io_dispatcher_base.adopt_1_single.header"></a></span><a class="link" href="adopt_1_single.html#afio.reference.classes.async_file_io_dispatcher_base.adopt_1_single.header">Header</a>
           </h6>
 <p>
             <code class="computeroutput"><span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">boost</span><span class="special">/</span><span class="identifier">afio</span><span class="special">/</span><span class="identifier">afio</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span></code>
           </p>
 <h6>
-<a name="afio.reference.classes.async_file_io_dispatcher_base.rmfile_1_single.h4"></a>
-            <span class="phrase"><a name="afio.reference.classes.async_file_io_dispatcher_base.rmfile_1_single.complexity"></a></span><a class="link" href="rmfile_1_single.html#afio.reference.classes.async_file_io_dispatcher_base.rmfile_1_single.complexity">Complexity</a>
+<a name="afio.reference.classes.async_file_io_dispatcher_base.adopt_1_single.h5"></a>
+            <span class="phrase"><a name="afio.reference.classes.async_file_io_dispatcher_base.adopt_1_single.complexity"></a></span><a class="link" href="adopt_1_single.html#afio.reference.classes.async_file_io_dispatcher_base.adopt_1_single.complexity">Complexity</a>
           </h6>
 <p>
-            Amortised O(1) to dispatch. Amortised O(1) to complete if file deletion
+            Amortised O(1) to dispatch. Amortised O(1) to complete if directory creation
             is constant time.
           </p>
 <h6>
-<a name="afio.reference.classes.async_file_io_dispatcher_base.rmfile_1_single.h5"></a>
-            <span class="phrase"><a name="afio.reference.classes.async_file_io_dispatcher_base.rmfile_1_single.exception_model"></a></span><a class="link" href="rmfile_1_single.html#afio.reference.classes.async_file_io_dispatcher_base.rmfile_1_single.exception_model">Exception
+<a name="afio.reference.classes.async_file_io_dispatcher_base.adopt_1_single.h6"></a>
+            <span class="phrase"><a name="afio.reference.classes.async_file_io_dispatcher_base.adopt_1_single.exception_model"></a></span><a class="link" href="adopt_1_single.html#afio.reference.classes.async_file_io_dispatcher_base.adopt_1_single.exception_model">Exception
             Model</a>
           </h6>
 <p>
@@ -127,8 +136,8 @@ Schedule an asynchronous file deletion after an optional precondition.
             memory occurs.
           </p>
 <h6>
-<a name="afio.reference.classes.async_file_io_dispatcher_base.rmfile_1_single.h6"></a>
-            <span class="phrase"><a name="afio.reference.classes.async_file_io_dispatcher_base.rmfile_1_single.example"></a></span><a class="link" href="rmfile_1_single.html#afio.reference.classes.async_file_io_dispatcher_base.rmfile_1_single.example">Example</a>
+<a name="afio.reference.classes.async_file_io_dispatcher_base.adopt_1_single.h7"></a>
+            <span class="phrase"><a name="afio.reference.classes.async_file_io_dispatcher_base.adopt_1_single.example"></a></span><a class="link" href="adopt_1_single.html#afio.reference.classes.async_file_io_dispatcher_base.adopt_1_single.example">Example</a>
           </h6>
 <pre class="programlisting"><span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_file_io_dispatcher_base</span><span class="special">&gt;</span> <span class="identifier">dispatcher</span><span class="special">=</span>
     <span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">make_async_file_io_dispatcher</span><span class="special">();</span>
@@ -177,7 +186,7 @@ Schedule an asynchronous file deletion after an optional precondition.
 </tr></table>
 <hr>
 <div class="spirit-nav">
-<a accesskey="p" href="rmfile_1_batch.html"><img src="../../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../async_file_io_dispatcher_base.html"><img src="../../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../../../index.html"><img src="../../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="rmsymlink_1_batch.html"><img src="../../../../../../doc/src/images/next.png" alt="Next"></a>
+<a accesskey="p" href="adopt_1_batch.html"><img src="../../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../async_file_io_dispatcher_base.html"><img src="../../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../../../index.html"><img src="../../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="close_1_batch.html"><img src="../../../../../../doc/src/images/next.png" alt="Next"></a>
 </div>
 </body>
 </html>

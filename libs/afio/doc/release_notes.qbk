@@ -9,30 +9,10 @@
 [section:release_notes Release Notes]
 
 [/=================]
-[heading Boost 1.55]
+[heading Boost 1.56]
 [/=================]
 
-[*Additional functionality]
-
-* None
-
-[*Documentation]
-
-* None
-
-[*Bugfixes]
-
-* None
-
-
-[*Solved tickets]
-
-* [@https://svn.boost.org/trac/boost/ticket/7462 7462] None
-
-[*Internal changes]
-
-* None
-
+First release.
 
 [endsect]
 
@@ -73,5 +53,19 @@ erasing (i.e. slow). As AFIO was developed initially as not header-only, this ma
 We are not opposed to the use of generic iterator ranges in an AFIO v2 if there is user demand for such a thing.
 
 [endsect] [/vector_use]
+
+[section:foreign_fd How do I configure my own file descriptor or HANDLE in AFIO?]
+
+Sometimes you receive a file descriptor or HANDLE from a third party piece of code and you need to insert it as-in
+into AFIO for use. The solution to this is very simple:
+
+# Subclass __afio_handle__ with a custom implementation for your file descriptor type. In particular, you probably
+will have custom close semantics (e.g. don't close, or invoke third party code to implement close).
+# Instantiate your custom handle implementation, and pass it into `async_file_io_dispatcher_base::adopt()`. This
+will immediately convert your custom handle type into an `async_io_op` suitable for supplying to `read()`, `write()`
+etc.
+# That's it, there is no more to it.
+
+[endsect] [/foreign_fd]
 
 [endsect] [/FAQ]
