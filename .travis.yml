@@ -44,9 +44,12 @@ before_install:
  - if [ $GCCVER != "" ]; then sudo apt-get install -qq g++$GCCVER; fi
  - if [ $VALGRIND != "0" ]; then sudo apt-get install -qq valgrind; fi
  - git submodule update --init --recursive
- - wget https://github.com/ned14/boost-trunk/archive/release/Boost_1_54_0.tar.gz
- - tar zxf Boost_1_54_0.tar.gz
- - mv boost-trunk-release-Boost_1_54_0 $HOME/boost-trunk
+# - wget https://github.com/ned14/boost-trunk/archive/release/Boost_1_54_0.tar.gz
+# - tar zxf Boost_1_54_0.tar.gz
+# - mv boost-trunk-release-Boost_1_54_0 $HOME/boost-trunk
+ - wget https://github.com/ned14/boost-trunk/archive/master.tar.gz
+ - tar zxf master.tar.gz
+ - mv boost-trunk-master $HOME/boost-trunk
  - BOOST="$HOME/boost-trunk"
  - PROJECTPATH="$HOME/build/BoostGSoC/boost.afio"
 

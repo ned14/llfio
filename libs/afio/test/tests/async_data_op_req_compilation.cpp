@@ -9,6 +9,7 @@ BOOST_AFIO_AUTO_TEST_CASE(async_data_op_req_compilation, "Tests that all the use
     auto mkfile(dispatcher->file(async_path_op_req(mkdir, "testdir/foo", file_flags::Create|file_flags::ReadWrite)));
 	auto last(dispatcher->truncate(mkfile, 256));
 	char buffer[256];
+	memset(buffer, 0, sizeof(buffer));
 	size_t length=sizeof(buffer);
 
 	// Base void * specialisation
@@ -62,6 +63,7 @@ BOOST_AFIO_AUTO_TEST_CASE(async_data_op_req_compilation, "Tests that all the use
 		typedef const type const_type;
 
 		wchar_t out[sizeof(buffer)/sizeof(wchar_t)];
+		memset(out, 0, sizeof(out));
 		// works
 		last=dispatcher->write(async_data_op_req<const_type>(last, out, 0));
 		// auto-consts
