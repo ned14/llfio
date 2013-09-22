@@ -73,6 +73,23 @@
       file i/o or closures? Starting with either has merits, but we've decided on
       file i/o first.
     </p>
+<p>
+      In either use case, using Boost.AFIO is centred around the <a class="link" href="reference/classes/async_file_io_dispatcher_base.html" title="async_file_io_dispatcher_base"><code class="computeroutput"><span class="identifier">async_file_io_dispatcher_base</span></code></a> abstract
+      base class, whose underlying platform-specific implementation class is instantiated
+      using the <a class="link" href="reference/functions/make_async_file_io_dispatcher.html" title="make_async_file_io_dispatcher"><code class="computeroutput"><span class="identifier">make_async_file_io_dispatcher</span><span class="special">()</span></code></a>
+      factory function. Once you have a <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span><span class="identifier">async_file_io_dispatcher_base</span><span class="special">&gt;</span></code>, you simply call its member functions to
+      have the dispatcher schedule asynchronous work items for you, each returning
+      a <a class="link" href="reference/structs/async_io_op.html" title="async_io_op"><code class="computeroutput"><span class="keyword">struct</span>
+      <span class="identifier">async_io_op</span></code></a>.
+    </p>
+<p>
+      All AFIO scheduling functions, or the convenience structures they take in,
+      will take as a (sometimes optional) first parameter their precondition op.
+      Only when that precondition has finished executing will its dependencies become
+      scheduled for execution. This makes expanding out multiple ops from a single
+      precondition easy, but what about reducing multiple ops down to a single precondition?
+      For that, use <a class="link" href="reference/classes/async_file_io_dispatcher_base/barrier.html" title="barrier (batch)"><code class="computeroutput"><span class="identifier">async_file_io_dispatcher_base</span><span class="special">::</span><span class="identifier">barrier</span><span class="special">()</span></code></a>.
+    </p>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
 <td align="left"></td>

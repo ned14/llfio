@@ -276,10 +276,12 @@
           it simply tells you which dispatcher the op is or was scheduled with.
         </p>
 <p>
-          The shared future is valid as soon as an op is scheduled, and its result
-          (the handle output by the scheduled operation) becomes available when the
-          operation completes. If there are any dependencies scheduled on the operation,
-          on completion the output handle is sent as input to each of dependencies.
+          The shared future is valid as soon as an op is scheduled for execution
+          (which may not occur until after any preconditions have completed), and
+          its result (the handle output by the scheduled operation) becomes available
+          when the operation completes. If there are any dependencies scheduled on
+          the operation, on completion the output handle is sent as input to each
+          of dependencies.
         </p>
 <p>
           What this means is straightforward: in the example above <code class="computeroutput"><span class="identifier">file</span><span class="special">()</span></code>
@@ -298,6 +300,14 @@
           operations <span class="bold"><strong>always</strong></span> executes, regardless.
           In fact, in the present version of AFIO there is no way whatsoever to cancel
           a scheduled operation.
+        </p>
+<p>
+          Note how we gather exceptions from ops in the <code class="computeroutput"><span class="identifier">when_all</span><span class="special">()</span></code> using an initialiser list. Not performing
+          a <code class="computeroutput"><span class="identifier">when_all</span><span class="special">()</span></code>
+          on an op is equivalent to not checking it for an error. If you just want
+          to wait for it to complete and not rethrow any exceptions encountered,
+          there is a <code class="computeroutput"><span class="identifier">when_all</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">nothrow_t</span><span class="special">(),</span>
+          <span class="special">...)</span></code> overload available.
         </p>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>

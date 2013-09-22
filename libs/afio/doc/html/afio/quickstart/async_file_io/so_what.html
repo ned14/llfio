@@ -446,12 +446,12 @@
           equally bind the state into each callback's parameters instead via some
           sort of pointer to a struct. But the difference in complexity is noticeable
           -- you're probably now asking, why choose this hideous complexity over
-          the much clearer OpenMP and iostreams implementation?
+          the much clearer OpenMP and iostreams implementation<a href="#ftn.afio.quickstart.async_file_io.so_what.f0" class="footnote" name="afio.quickstart.async_file_io.so_what.f0"><sup class="footnote">[10]</sup></a>?
         </p>
 <p>
           Well, that's simple: do you want maximum file i/o performance? Here is
           a search for <span class="quote">&#8220;<span class="quote">Niall</span>&#8221;</span> in a Boost working directory which contained
-          about 6Gb of data across ~39k files<a href="#ftn.afio.quickstart.async_file_io.so_what.f0" class="footnote" name="afio.quickstart.async_file_io.so_what.f0"><sup class="footnote">[10]</sup></a>:
+          about 6Gb of data across ~39k files<a href="#ftn.afio.quickstart.async_file_io.so_what.f1" class="footnote" name="afio.quickstart.async_file_io.so_what.f1"><sup class="footnote">[11]</sup></a>:
         </p>
 <div class="table">
 <a name="afio.quickstart.async_file_io.so_what.find_in_files_performance"></a><p class="title"><b>Table&#160;1.4.&#160;Find in files performance for traditional vs AFIO implementations</b></p>
@@ -489,7 +489,7 @@
                 </th>
 <th>
                   <p>
-                    Boost.AFIO <code class="computeroutput"><span class="identifier">file_flags</span><span class="special">::</span><span class="identifier">OSMMap</span></code>
+                    Boost.AFIO <code class="computeroutput"><span class="identifier">file_flags</span><span class="special">::</span><span class="identifier">OSMMap</span></code><a href="#ftn.afio.quickstart.async_file_io.so_what.f2" class="footnote" name="afio.quickstart.async_file_io.so_what.f2"><sup class="footnote">[a]</sup></a>
                   </p>
                 </th>
 </tr></thead>
@@ -522,14 +522,40 @@
                 </td>
 <td>
                   <p>
-                    3760.6 Mb/sec
+                    3761 Mb/sec
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                </td>
+<td>
+                  <p>
+                    +0%
+                  </p>
+                </td>
+<td>
+                  <p>
+                    +116%
+                  </p>
+                </td>
+<td>
+                  <p>
+                    +168%
+                  </p>
+                </td>
+<td>
+                </td>
+<td>
+                  <p>
+                    +383%
                   </p>
                 </td>
 </tr>
 <tr>
 <td>
                   <p>
-                    Cold cache<a href="#ftn.afio.quickstart.async_file_io.so_what.f1" class="footnote" name="afio.quickstart.async_file_io.so_what.f1"><sup class="footnote">[a]</sup></a>
+                    Cold cache<a href="#ftn.afio.quickstart.async_file_io.so_what.f3" class="footnote" name="afio.quickstart.async_file_io.so_what.f3"><sup class="footnote">[b]</sup></a>
                   </p>
                 </td>
 <td>
@@ -558,10 +584,46 @@
                   </p>
                 </td>
 </tr>
+<tr>
+<td>
+                </td>
+<td>
+                  <p>
+                    +0%
+                  </p>
+                </td>
+<td>
+                  <p>
+                    -50%
+                  </p>
+                </td>
+<td>
+                  <p>
+                    -6%
+                  </p>
+                </td>
+<td>
+                  <p>
+                    -18%
+                  </p>
+                </td>
+<td>
+                  <p>
+                    +50%
+                  </p>
+                </td>
+</tr>
 </tbody>
-<tbody class="footnotes"><tr><td colspan="6"><div id="ftn.afio.quickstart.async_file_io.so_what.f1" class="footnote"><p><a href="#afio.quickstart.async_file_io.so_what.f1" class="para"><sup class="para">[a] </sup></a>
+<tbody class="footnotes"><tr><td colspan="6">
+<div id="ftn.afio.quickstart.async_file_io.so_what.f2" class="footnote"><p><a href="#afio.quickstart.async_file_io.so_what.f2" class="para"><sup class="para">[a] </sup></a>
+                      The superiority of memory maps on Windows is because all buffered
+                      file i/o is done via memory copying to/from memory maps on
+                      Windows anyway, so eliminating that memory copy is huge.
+                    </p></div>
+<div id="ftn.afio.quickstart.async_file_io.so_what.f3" class="footnote"><p><a href="#afio.quickstart.async_file_io.so_what.f3" class="para"><sup class="para">[b] </sup></a>
                       File cache reset using <a href="http://technet.microsoft.com/en-us/sysinternals/ff700229.aspx" target="_top">http://technet.microsoft.com/en-us/sysinternals/ff700229.aspx</a>
-                    </p></div></td></tr></tbody>
+                    </p></div>
+</td></tr></tbody>
 </table></div>
 </div>
 <br class="table-break"><p>
@@ -579,24 +641,33 @@
           anywhere on the spinning disc. Because AFIO can issue far more concurrent
           file open and read requests than OpenMP, it gives a lot more scope to the
           filing system to optimise hard drive seeks and satisfy as many requests
-          as is feasible -- sufficiently so that with a cold cache, AFIO is little
+          as is feasible -- sufficiently so that with a cold cache, AFIO is a little
           slower than a single threaded iostreams implementation where the filing
-          system can spot the access pattern and prefetch quite effectively.
+          system can spot the access pattern and prefetch quite effectively. A completely
+          valid solution to the OpenMP performance deficit would be to increase thread
+          count dramatically.
         </p>
 <p>
           The second part of answering that argument is this: AFIO's very flexible
           op chaining structure lets you very easily twiddle with the execution dependency
           graph to achieve maximum possible performance by balancing concurrency
-          (too much or too little is slower, what you need is just the right balance),
-          unlike the naive OpenMP implementation which is much harder to play around
-          with. Don't get me wrong: if you have plenty of time on your hands, you
-          can implement a hand written and tuned find in files implementation that
-          is faster than AFIO's implementation, but it will have taken you a lot
-          longer, and the code will neither be as portable nor as maintainable.
+          (too much or too little is slower, what you need is just the right balance)
+          and disc seeks (enumerations are best not done in parallel, it defeats
+          any prefetching algorithm), unlike the naive OpenMP implementation which
+          is much harder to play around with. Don't get me wrong: if you have plenty
+          of time on your hands, you can implement a hand written and tuned find
+          in files implementation that is faster than AFIO's implementation, but
+          it will have taken you a lot longer, and the code will neither be as portable
+          nor as maintainable.
         </p>
 <div class="footnotes">
 <br><hr style="width:100; text-align:left;margin-left: 0">
 <div id="ftn.afio.quickstart.async_file_io.so_what.f0" class="footnote"><p><a href="#afio.quickstart.async_file_io.so_what.f0" class="para"><sup class="para">[10] </sup></a>
+            Indeed many ask the same when programming WinRT apps -- Microsoft's insistance
+            on never allowing any call to block can make simple designs explode with
+            complexities of nested callbacks.
+          </p></div>
+<div id="ftn.afio.quickstart.async_file_io.so_what.f1" class="footnote"><p><a href="#afio.quickstart.async_file_io.so_what.f1" class="para"><sup class="para">[11] </sup></a>
             Test machine was a 3.5Ghz Intel i7-3770K Microsoft Windows 8 x64 machine
             with Seagate ST3320620AS 7200rpm hard drive. Note that AFIO has a native
             WinIOCP backend which leverages host asynchronous file i/o support.

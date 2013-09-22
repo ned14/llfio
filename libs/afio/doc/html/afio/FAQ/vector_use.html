@@ -30,7 +30,7 @@
 <div class="orderedlist"><ol class="orderedlist" type="1">
 <li class="listitem">
             <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span><span class="identifier">async_io_op</span><span class="special">&gt;</span></code>
-            is the closest thing to a variable length array in C++.
+            is the closest thing to a variable length array in C++<a href="#ftn.afio.FAQ.vector_use.f0" class="footnote" name="afio.FAQ.vector_use.f0"><sup class="footnote">[14]</sup></a>, at least until C++ 14 where we will gain <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">dynarray</span><span class="special">&lt;&gt;</span></code> and dynamic array sizing.
           </li>
 <li class="listitem">
             <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span><span class="identifier">async_io_op</span><span class="special">&gt;</span></code>
@@ -40,19 +40,27 @@
           </li>
 <li class="listitem">
             <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span><span class="identifier">async_io_op</span><span class="special">&gt;</span></code>
-            is very amenable to automatic vectorisation (not that AFIO currently
-            does this).
+            is very amenable to splitting the batch across threads (not that AFIO
+            currently does this).
           </li>
 <li class="listitem">
             <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span><span class="identifier">async_io_op</span><span class="special">&gt;</span></code>
             is easily transportable through an ABI, whereas arbitrary container iterators
-            would need type erasing (i.e. slow).
+            would need type erasing (i.e. slow). As AFIO was developed initially
+            as not header-only, this made a lot of sense initially.
           </li>
 </ol></div>
 <p>
         We are not opposed to the use of generic iterator ranges in an AFIO v2 if
         there is user demand for such a thing.
       </p>
+<div class="footnotes">
+<br><hr style="width:100; text-align:left;margin-left: 0">
+<div id="ftn.afio.FAQ.vector_use.f0" class="footnote"><p><a href="#afio.FAQ.vector_use.f0" class="para"><sup class="para">[14] </sup></a>
+              Ok, there is also the oft-forgotten <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">valarray</span><span class="special">&lt;&gt;</span></code> too, but its use as a generic
+              container isn't recommended.
+            </p></div>
+</div>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
 <td align="left"></td>

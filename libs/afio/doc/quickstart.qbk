@@ -26,7 +26,27 @@ in parallel (useful if writing 4Kb or larger chunks).
 For this quick start, the question becomes which to start with first: async file i/o
 or closures? Starting with either has merits, but we've decided on file i/o first.
 
+In either use case, using __boost_afio__ is centred around the __afio_dispatcher__ abstract base class,
+whose underlying platform-specific implementation class is instantiated using the
+[link afio.reference.functions.make_async_file_io_dispatcher `make_async_file_io_dispatcher()`]
+factory function. Once you have a `std::shared_ptr<async_file_io_dispatcher_base>`,
+you simply call its member functions to have the dispatcher schedule asynchronous
+work items for you, each returning a __afio_op__.
+
+All AFIO scheduling functions, or the convenience structures they take in, will
+take as a (sometimes optional) first parameter their precondition op. Only when that
+precondition has finished executing will its dependencies become scheduled for
+execution. This makes expanding out multiple ops from a single precondition easy,
+but what about reducing multiple ops down to a single precondition? For that, use
+__afio_barrier__.
+
 [section:async_file_io Asynchronous file i/o]
+
+The asynchronous file i/o implementation consists of a number of member functions in
+the __afio_dispatcher__ abstract base class, plus an assortment of convenience
+classes and structures. They are fairly obviously named, and do fairly obvious things.
+
+First stop: Hello World in STL iostreams and its exact equivalent in AFIO.
 
 [section:hello_world Hello World, asynchronously!]
 
@@ -62,7 +82,8 @@ one of which exists per unique integer id. Right now AFIO keeps a pointer to a p
 as well in case future AFIO's can chain ops across dispatcher instances, but for now
 it simply tells you which dispatcher the op is or was scheduled with.
 
-The shared future is valid as soon as an op is scheduled, and its result (the handle output
+The shared future is valid as soon as an op is scheduled for execution (which may not occur
+until after any preconditions have completed), and its result (the handle output
 by the scheduled operation) becomes available when the operation completes. If there are any
 dependencies scheduled on the operation, on completion the output handle is sent as input
 to each of dependencies.
@@ -80,6 +101,11 @@ extent of a file). If `open()` failed, its output file handle would be null and 
 every subsequent action would almost certainly also fail, but the sequence of scheduled
 operations [*always] executes, regardless. In fact, in the present version of AFIO there
 is no way whatsoever to cancel a scheduled operation.
+
+Note how we gather exceptions from ops in the `when_all()` using an initialiser list.
+Not performing a `when_all()` on an op is equivalent to not checking it for an error.
+If you just want to wait for it to complete and not rethrow any exceptions encountered,
+there is a `when_all(std::nothrow_t(), ...)` overload available.
 
 [endsect] [/hello_world]
 
@@ -125,7 +151,9 @@ code, everything is asynchronous callback):
 Here the `find_in_files` class is used to carry state across the callbacks -- one could just
 as equally bind the state into each callback's parameters instead via some sort of pointer to
 a struct. But the difference in complexity is noticeable -- you're probably now asking, why
-choose this hideous complexity over the much clearer OpenMP and iostreams implementation?
+choose this hideous complexity over the much clearer OpenMP and iostreams implementation[footnote
+Indeed many ask the same when programming WinRT apps -- Microsoft's insistance on never allowing
+any call to block can make simple designs explode with complexities of nested callbacks.]?
 
 Well, that's simple: do you want maximum file i/o performance? Here is a search for ["Niall] in a
 Boost working directory which contained about 6Gb of data across ~39k files[footnote Test machine
@@ -133,9 +161,11 @@ was a 3.5Ghz Intel i7-3770K Microsoft Windows 8 x64 machine with Seagate ST33206
 drive. Note that AFIO has a native WinIOCP backend which leverages host asynchronous file i/o support.]:
 
 [table:find_in_files_performance Find in files performance for traditional vs AFIO implementations
-  [[][iostreams, single threaded][iostreams, OpenMP][Boost.AFIO][Boost.AFIO `file_flags::OSDirect`][Boost.AFIO `file_flags::OSMMap`]]
+  [[][iostreams, single threaded][iostreams, OpenMP][Boost.AFIO][Boost.AFIO `file_flags::OSDirect`][Boost.AFIO `file_flags::OSMMap`[footnote The superiority of memory maps on Windows is because all buffered file i/o is done via memory copying to/from memory maps on Windows anyway, so eliminating that memory copy is huge.]]]
   [[Warm cache][779 Mb/sec][1682 Mb/sec][2086 Mb/sec][N/A][3761 Mb/sec]]
+  [[][+0%][+116%][+168%][][+383%]]
   [[Cold cache[footnote File cache reset using [@http://technet.microsoft.com/en-us/sysinternals/ff700229.aspx]]][16 Mb/sec][8 Mb/sec][15 Mb/sec][13.14 Mb/sec][24 Mb/sec]]
+  [[][+0%][-50%][-6%][-18%][+50%]]
 ]
 
 The eagle eyed amongst you will have noticed that the AFIO implementation looks hand tuned with a
@@ -149,12 +179,14 @@ algorithm is fairly stupid and simply tries to read as many files as there are C
 be stored anywhere on the spinning disc. Because AFIO
 can issue far more concurrent file open and read requests than OpenMP, it gives a lot more scope to
 the filing system to optimise hard drive seeks and satisfy as many requests as is feasible --
-sufficiently so that with a cold cache, AFIO is little slower than a single threaded iostreams
-implementation where the filing system can spot the access pattern and prefetch quite effectively. 
+sufficiently so that with a cold cache, AFIO is a little slower than a single threaded iostreams
+implementation where the filing system can spot the access pattern and prefetch quite effectively.
+A completely valid solution to the OpenMP performance deficit would be to increase thread count dramatically.
 
 The second part of answering that argument is this: AFIO's very flexible op chaining structure lets you
 very easily twiddle with the execution dependency graph to achieve maximum possible performance by
-balancing concurrency (too much or too little is slower, what you need is just the right balance),
+balancing concurrency (too much or too little is slower, what you need is just the right balance)
+and disc seeks (enumerations are best not done in parallel, it defeats any prefetching algorithm),
 unlike the naive OpenMP implementation which is much harder to play around with. Don't get me wrong:
 if you have plenty of time on your hands, you can implement a hand written and tuned find in files
 implementation that is faster than AFIO's implementation, but it will have taken you a lot longer,
