@@ -714,6 +714,15 @@ namespace detail {
 		}
 		async_io_handle_windows(async_file_io_dispatcher_base *_parent, std::shared_ptr<async_io_handle> _dirh, const std::filesystem::path &path, file_flags flags) : async_io_handle(_parent, std::move(_dirh), path, flags), myid(nullptr), has_been_added(false), SyncOnClose(false), mapaddr(nullptr) { }
 		inline async_io_handle_windows(async_file_io_dispatcher_base *_parent, std::shared_ptr<async_io_handle> _dirh, const std::filesystem::path &path, file_flags flags, bool _SyncOnClose, HANDLE _h);
+		virtual void close()
+		{
+			// Windows doesn't provide an async fsync so do it synchronously
+			if(SyncOnClose && write_count_since_fsync())
+				BOOST_AFIO_ERRHWINFN(FlushFileBuffers(myid), path());
+			h->close();
+			h.reset();
+			myid=nullptr;
+		}
 		virtual void *native_handle() const { return myid; }
 
 		// You can't use shared_from_this() in a constructor so ...
@@ -867,7 +876,17 @@ namespace detail {
 			if(fd!=-999)
 				BOOST_AFIO_ERRHOSFN(fd, path);
 		}
-		virtual void *native_handle() const { return (void *)(size_t) fd; }
+		virtual void close()
+		{
+			if(fd>=0)
+			{
+				if(SyncOnClose && write_count_since_fsync())
+					BOOST_AFIO_ERRHOSFN(BOOST_AFIO_POSIX_FSYNC(fd), path());
+				BOOST_AFIO_ERRHOSFN(BOOST_AFIO_POSIX_CLOSE(fd), path());
+				fd=-1;
+			}
+		}
+		virtual void *native_handle() const { return (void *)(size_t)fd; }
 
 		// You can't use shared_from_this() in a constructor so ...
 		void do_add_io_handle_to_parent()
@@ -1937,7 +1956,7 @@ template<class F, class... Args> async_io_op async_file_io_dispatcher_base::chai
 
 #endif
 
-// General non-specialised implementation taking some arbitrary parameter T
+// General non-specialised implementation taking some arbitrary parameter T with precondition
 template<class F, class T> std::vector<async_io_op> async_file_io_dispatcher_base::chain_async_ops(int optype, const std::vector<async_io_op> &preconditions, const std::vector<T> &container, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<async_io_handle>, exception_ptr *, T))
 {
 	std::vector<async_io_op> ret;
@@ -1952,6 +1971,21 @@ template<class F, class T> std::vector<async_io_op> async_file_io_dispatcher_bas
 	auto container_it=container.cbegin();
 	for(; precondition_it!=preconditions.cend() && container_it!=container.cend(); ++precondition_it, ++container_it)
 		ret.push_back(chain_async_op(&he, immediates, optype, *precondition_it, flags, f, *container_it));
+	return ret;
+}
+// General non-specialised implementation taking some arbitrary parameter T without precondition
+template<class F, class T> std::vector<async_io_op> async_file_io_dispatcher_base::chain_async_ops(int optype, const std::vector<T> &container, async_op_flags flags, completion_returntype(F::*f)(size_t, std::shared_ptr<async_io_handle>, exception_ptr *, T))
+{
+	std::vector<async_io_op> ret;
+	ret.reserve(container.size());
+	async_io_op precondition;
+	BOOST_AFIO_LOCK_GUARD<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
+	exception_ptr he;
+	detail::immediate_async_ops immediates;
+	BOOST_FOREACH(auto &i, container)
+	{
+		ret.push_back(chain_async_op(&he, immediates, optype, precondition, flags, f, i));
+	}
 	return ret;
 }
 // Generic op receiving specialisation i.e. precondition is also input op. Skips sanity checking.
@@ -2340,11 +2374,7 @@ namespace detail {
 			}
 			else
 			{
-				// Windows doesn't provide an async fsync so do it synchronously
-				if(p->SyncOnClose && p->write_count_since_fsync())
-					BOOST_AFIO_ERRHWINFN(FlushFileBuffers(p->h->native_handle()), p->path());
-				p->h->close();
-				p->h.reset();
+				p->close();
 			}
 			return std::make_pair(true, h);
 		}
@@ -2935,10 +2965,7 @@ namespace detail {
 			}
 			else
 			{
-				if(p->SyncOnClose && p->write_count_since_fsync())
-					BOOST_AFIO_ERRHOSFN(BOOST_AFIO_POSIX_FSYNC(p->fd), p->path());
-				BOOST_AFIO_ERRHOSFN(BOOST_AFIO_POSIX_CLOSE(p->fd), p->path());
-				p->fd=-1;
+				p->close();
 			}
 			return std::make_pair(true, h);
 		}

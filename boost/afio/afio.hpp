@@ -966,6 +966,7 @@ class async_io_handle : public std::enable_shared_from_this<async_io_handle>
 protected:
 	boost::afio::atomic<off_t> bytesread, byteswritten, byteswrittenatlastfsync;
 	async_io_handle(async_file_io_dispatcher_base *parent, std::shared_ptr<async_io_handle> _dirh, const std::filesystem::path &path, file_flags flags) : _parent(parent), dirh(std::move(_dirh)), _opened(chrono::system_clock::now()), _path(path), _flags(flags), bytesread(0), byteswritten(0), byteswrittenatlastfsync(0) { }
+	virtual void close()=0;
 public:
 	virtual ~async_io_handle() { }
 	//! Returns the parent of this io handle
@@ -1078,6 +1079,10 @@ class BOOST_AFIO_DECL async_file_io_dispatcher_base : public std::enable_shared_
 	async_io_op int_op_from_scheduled_id(size_t id) const;
 protected:
 	async_file_io_dispatcher_base(std::shared_ptr<thread_source> threadpool, file_flags flagsforce, file_flags flagsmask);
+	std::pair<bool, std::shared_ptr<async_io_handle>> doadopt(size_t, std::shared_ptr<async_io_handle>, exception_ptr *, std::shared_ptr<async_io_handle> h)
+	{
+		return std::make_pair(true, h);
+	}
 public:
 	//! Destroys the dispatcher, blocking inefficiently if any ops are still in flight.
 	virtual ~async_file_io_dispatcher_base();
@@ -1220,6 +1225,39 @@ public:
 
 
 
+	/*! \brief Schedule a batch of third party handle adoptions.
+
+	This function enables you to adopt third party custom async_io_handle derivatives
+	as ops into the scheduler. Think of it as if you were calling file(), except the
+	op returns the supplied handle and otherwise does nothing.
+
+	\return A batch of op handles.
+	\param hs A batch of handles to adopt.
+	\ingroup async_file_io_dispatcher_base__filedirops
+	\qbk{distinguish, batch}
+	\complexity{Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete.}
+	\exceptionmodelstd
+	\qexample{filedir_example}
+	*/
+	std::vector<async_io_op> adopt(const std::vector<std::shared_ptr<async_io_handle>> &hs)
+	{
+		return chain_async_ops(0, hs, async_op_flags::ImmediateCompletion, &async_file_io_dispatcher_base::doadopt);
+	}
+	/*! \brief Schedule an adoption of a third party handle.
+
+	This function enables you to adopt third party custom async_io_handle derivatives
+	as ops into the scheduler. Think of it as if you were calling file(), except the
+	op returns the supplied handle and otherwise does nothing.
+
+	\return An op handle.
+	\param h A handle to adopt.
+	\ingroup async_file_io_dispatcher_base__filedirops
+	\qbk{distinguish, single}
+	\complexity{Amortised O(1) to dispatch. Amortised O(1) to complete if directory creation is constant time.}
+	\exceptionmodelstd
+	\qexample{filedir_example}
+	*/
+	inline async_io_op adopt(std::shared_ptr<async_io_handle> h);
 	/*! \brief Schedule a batch of asynchronous directory creations and opens after optional preconditions.
 
 	Note that if there is already a handle open to the directory requested, that will be returned instead of
@@ -1572,7 +1610,8 @@ public:
 protected:
 	completion_returntype invoke_user_completion(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr *e, std::function<completion_t> callback);
 	template<class F, class T> std::vector<async_io_op> chain_async_ops(int optype, const std::vector<async_io_op> &preconditions, const std::vector<T> &container, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<async_io_handle>, exception_ptr *, T));
-	template<class F> std::vector<async_io_op> chain_async_ops(int optype, const std::vector<async_io_op> &container, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<async_io_handle>, exception_ptr *, async_io_op));
+	template<class F, class T> std::vector<async_io_op> chain_async_ops(int optype, const std::vector<T> &container, async_op_flags flags, completion_returntype(F::*f)(size_t, std::shared_ptr<async_io_handle>, exception_ptr *, T));
+	template<class F> std::vector<async_io_op> chain_async_ops(int optype, const std::vector<async_io_op> &container, async_op_flags flags, completion_returntype(F::*f)(size_t, std::shared_ptr<async_io_handle>, exception_ptr *, async_io_op));
 	template<class F> std::vector<async_io_op> chain_async_ops(int optype, const std::vector<async_path_op_req> &container, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<async_io_handle>, exception_ptr *, async_path_op_req));
 	template<class F, bool iswrite> std::vector<async_io_op> chain_async_ops(int optype, const std::vector<detail::async_data_op_req_impl<iswrite>> &container, async_op_flags flags, completion_returntype(F::*f)(size_t, std::shared_ptr<async_io_handle>, exception_ptr *, detail::async_data_op_req_impl<iswrite>));
 	template<class F> std::pair<std::vector<future<std::pair<std::vector<directory_entry>, bool>>>, std::vector<async_io_op>> chain_async_ops(int optype, const std::vector<async_enumerate_op_req> &container, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<async_io_handle>, exception_ptr *, async_enumerate_op_req, std::shared_ptr<promise<std::pair<std::vector<directory_entry>, bool>>>));
@@ -2452,6 +2491,13 @@ template<class C, class... Args> inline std::pair<future<typename detail::vs2013
 
 #endif
 
+inline async_io_op async_file_io_dispatcher_base::adopt(std::shared_ptr<async_io_handle> h)
+{
+	std::vector<std::shared_ptr<async_io_handle>> i;
+	i.reserve(1);
+	i.push_back(std::move(h));
+	return std::move(adopt(i).front());
+}
 inline async_io_op async_file_io_dispatcher_base::dir(const async_path_op_req &req)
 {
 	std::vector<async_path_op_req> i;
