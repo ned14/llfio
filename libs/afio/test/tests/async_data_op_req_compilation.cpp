@@ -122,7 +122,5 @@ BOOST_AFIO_AUTO_TEST_CASE(async_data_op_req_compilation, "Tests that all the use
     auto rmfile(dispatcher->rmfile(async_path_op_req(last, "testdir/foo")));
     auto rmdir(dispatcher->rmdir(async_path_op_req(rmfile, "testdir")));
 	when_all(rmdir).wait();
-	// Results fail if time taken is zero
-	boost::this_thread::sleep_for(boost::chrono::seconds(1));
 	BOOST_CHECK(true);
 }
