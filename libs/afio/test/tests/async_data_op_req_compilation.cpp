@@ -1,6 +1,6 @@
 #include "../test_functions.hpp"
 
-BOOST_AFIO_AUTO_TEST_CASE(async_data_op_req_compilation, "Tests that all the use cases for async_data_op_req compile", 3)
+BOOST_AFIO_AUTO_TEST_CASE(async_data_op_req_compilation, "Tests that all the use cases for async_data_op_req compile", 10)
 {
 	using namespace boost::afio;
 	// Note that this test is mainly for testing metaprogramming compilation.
@@ -26,6 +26,7 @@ BOOST_AFIO_AUTO_TEST_CASE(async_data_op_req_compilation, "Tests that all the use
 		last=dispatcher->read(async_data_op_req<type>(last, out, length, 0));
 		// deduces
 		last=dispatcher->write(make_async_data_op_req(last, out, length, 0));
+		when_all(last).wait();
 	}
 	// char * specialisation
 	{
@@ -41,6 +42,7 @@ BOOST_AFIO_AUTO_TEST_CASE(async_data_op_req_compilation, "Tests that all the use
 		last=dispatcher->read(async_data_op_req<type>(last, out, length, 0));
 		// deduces
 		last=dispatcher->write(make_async_data_op_req(last, out, length, 0));
+		when_all(last).wait();
 	}
 	// char array specialisation
 	{
@@ -56,6 +58,7 @@ BOOST_AFIO_AUTO_TEST_CASE(async_data_op_req_compilation, "Tests that all the use
 		last=dispatcher->read(async_data_op_req<type>(last, out, 0));
 		// deduces
 		last=dispatcher->write(make_async_data_op_req(last, out, 0));
+		when_all(last).wait();
 	}
 	// Arbitrary integral type array specialisation
 	{
@@ -72,6 +75,7 @@ BOOST_AFIO_AUTO_TEST_CASE(async_data_op_req_compilation, "Tests that all the use
 		last=dispatcher->read(async_data_op_req<type>(last, out, 0));
 		// deduces
 		last=dispatcher->write(make_async_data_op_req(last, out, 0));
+		when_all(last).wait();
 	}
 	// vector specialisation
 	{
@@ -87,6 +91,7 @@ BOOST_AFIO_AUTO_TEST_CASE(async_data_op_req_compilation, "Tests that all the use
 		last=dispatcher->read(async_data_op_req<type>(last, out, 0));
 		// deduces
 		last=dispatcher->write(make_async_data_op_req(last, out, 0));
+		when_all(last).wait();
 	}
 	// array specialisation
 	{
@@ -103,6 +108,7 @@ BOOST_AFIO_AUTO_TEST_CASE(async_data_op_req_compilation, "Tests that all the use
 		last=dispatcher->read(async_data_op_req<type>(last, out, 0));
 		// deduces
 		last=dispatcher->write(make_async_data_op_req(last, out, 0));
+		when_all(last).wait();
 	}
 	// string specialisation
 	{
@@ -118,6 +124,7 @@ BOOST_AFIO_AUTO_TEST_CASE(async_data_op_req_compilation, "Tests that all the use
 		last=dispatcher->read(async_data_op_req<type>(last, out, 0));
 		// deduces
 		last=dispatcher->write(make_async_data_op_req(last, out, 0));
+		when_all(last).wait();
 	}
 	last=dispatcher->close(last);
     auto rmfile(dispatcher->rmfile(async_path_op_req(last, "testdir/foo")));
