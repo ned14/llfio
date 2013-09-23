@@ -172,10 +172,10 @@
           Most people think of <code class="computeroutput"><span class="identifier">fsync</span><span class="special">()</span></code>, <code class="computeroutput"><span class="identifier">O_SYNC</span></code>
           and <code class="computeroutput"><span class="identifier">sync</span><span class="special">()</span></code>
           in terms of flushing caches. An alternative way of thinking about them
-          is that they impose an order on writes to non-volatile storage which acts
-          above and beyond the timeout based write order. There is no doubt that
-          they are a very crude and highly inefficient way of doing so because they
-          are all or nothing, but they do open the option of <span class="emphasis"><em>emulating</em></span>
+          is that they <span class="emphasis"><em>impose an order on writes</em></span> to non-volatile
+          storage which acts above and beyond the timeout based write order. There
+          is no doubt that they are a very crude and highly inefficient way of doing
+          so because they are all or nothing, but they do open the option of <span class="emphasis"><em>emulating</em></span>
           native filing system support for write ordering constraints when nothing
           else better is available. So why is the ability to constrain write ordering
           important?

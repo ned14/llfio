@@ -33,22 +33,33 @@
 [def __boost_thread__ [@http://www.boost.org/libs/thread/ Boost.Thread]]
 [def __boost_filesystem__ [@http://www.boost.org/libs/filesystem/ Boost.Filesystem]]
 [def __boost_iostreams__ [@http://www.boost.org/libs/iostreams/ Boost.Iostreams]]
-[def __WG21_N3562__ [@http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3562.pdf WG21 N3562 (Executors and schedulers)]]
-[def __WG21_N3634__ [@http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3634.pdf WG21 N3634 (Improvements to std::future<T> and Related APIs)]]
-[def ___WG21_N3634__ WG21 N3634 (Improvements to std::future<T> and Related APIs)]
+[def __WG21_N3562__ [@http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3731.pdf WG21 N3731 (Executors and schedulers v2)]]
+[def __WG21_N3634__ [@http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3721.pdf WG21 N3721 (Improvements to std::future<T> and Related APIs)]]
+[def ___WG21_N3634__ WG21 N3721 (Improvements to std::future<T> and Related APIs)]
 
 [/ Commonly used links]
-[def __afio_op__ [link afio.reference.structs.async_io_op `struct async_io_op`]]
-[def __afio_when_all__ [link afio.reference.functions.when_all_ops `when_all()`]]
-[def __afio_call__ [link afio.reference.classes.async_file_io_dispatcher_base.call_2_batch_bound_functions `async_file_io_dispatcher_base::call()`]]
 [def __afio_barrier__ [link afio.reference.classes.async_file_io_dispatcher_base.barrier `async_file_io_dispatcher_base::barrier()`]]
+[def __afio_call__ [link afio.reference.classes.async_file_io_dispatcher_base.call_2_batch_bound_functions `async_file_io_dispatcher_base::call()`]]
+[def __afio_completion__ [link afio.reference.classes.async_file_io_dispatcher_base.completion_2_batch_bound_functions `async_file_io_dispatcher_base::completion()`]]
+[def __afio_dispatcher__ [link afio.reference.classes.async_file_io_dispatcher_base `async_file_io_dispatcher_base`]]
+[def __afio_enumerate__ [link afio.reference.classes.async_file_io_dispatcher_base.enumerate_1_batch `async_file_io_dispatcher_base::enumerate()`]]
+[def __afio_op__ [link afio.reference.structs.async_io_op `struct async_io_op`]]
+[def __afio_handle__ [link afio.reference.classes.async_io_handle `class async_io_handle`]]
+[def __afio_when_all__ [link afio.reference.functions.when_all_ops `when_all()`]]
 
-[import ../test/examples/current_exception_hack.cpp]
+[import ../test/examples/barrier_example.cpp]
 [import ../test/examples/call_example.cpp]
 [import ../test/examples/closure_execution_afio_io_example.cpp]
 [import ../test/examples/closure_execution_traditional_io_example.cpp]
 [import ../test/examples/completion_example1.cpp]
 [import ../test/examples/completion_example2.cpp]
+[import ../test/examples/current_exception_hack.cpp]
+[import ../test/examples/enumerate_example.cpp]
+[import ../test/examples/filedir_example.cpp]
+[import ../test/examples/find_in_files_afio.cpp]
+[import ../test/examples/find_in_files_iostreams.cpp]
+[import ../test/examples/readwrite_example.cpp]
+[import ../test/examples/readwrite_example_traditional.cpp]
 
 [section:introduction Introduction]
 __boost_afio__ is a linear scalable, batch, chainable, asynchronous closure execution engine extending __boost_asio__
@@ -78,8 +89,6 @@ which is fine) if at all possible], but if you can't, [link afio.advanced_topics
 As a very quick example of minimal usage:
 
 [call_example]
-
-[/ You can also schedule an asynchronous [link reference.when_all when_all()] using [link reference.async_file_io_dispatcher_base.barrier barrier()]. /]
 
 [endsect] [/introduction]
 

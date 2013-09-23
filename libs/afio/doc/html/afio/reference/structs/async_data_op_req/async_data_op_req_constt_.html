@@ -28,7 +28,7 @@
           const T &gt;</a>
 </h5></div></div></div>
 <p>
-            <a class="indexterm" name="id859681"></a>
+            <a class="indexterm" name="id886980"></a>
 A convenience bundle of precondition, data and where for writing from
             a single <code class="literal"><code class="computeroutput"><span class="keyword">const</span> <span class="identifier">T</span> <span class="special">*</span></code></code>.
             Data <span class="bold"><strong>MUST</strong></span> stay around until the operation
@@ -263,6 +263,32 @@ A convenience bundle of precondition, data and where for writing from
                     <p>
                       <span class="bold"><strong>size_t</strong></span>: <span class="emphasis"><em>_length</em></span>:
                       The number of bytes to transfer
+                    </p>
+                    <p>
+                      <span class="bold"><strong>off_t</strong></span>: <span class="emphasis"><em>_where</em></span>:
+                      The offset at which to transfer
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="keyword">template</span><span class="special">&lt;</span><span class="identifier">size_t</span> <span class="identifier">N</span><span class="special">&gt;</span>
+ <span class="identifier">async_data_op_req</span><span class="special">(</span><span class="identifier">async_io_op</span> <span class="identifier">_precondition</span><span class="special">,</span> <span class="keyword">const</span> <span class="identifier">T</span><span class="special">(&amp;)</span> <span class="identifier">v</span><span class="special">,</span> <span class="identifier">off_t</span> <span class="identifier">_where</span><span class="special">)</span></pre>
+                  </td>
+<td>
+                    <p>
+                      Constructs an instance.
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      <span class="bold"><strong>async_io_op</strong></span>: <span class="emphasis"><em>_precondition</em></span>:
+                      An optional precondition for this operation
+                    </p>
+                    <p>
+                      <span class="bold"><strong>const T(&amp;)</strong></span>: <span class="emphasis"><em>v</em></span>:
+                      A pointer to memory or reference to object into which to read
+                      or write
                     </p>
                     <p>
                       <span class="bold"><strong>off_t</strong></span>: <span class="emphasis"><em>_where</em></span>:

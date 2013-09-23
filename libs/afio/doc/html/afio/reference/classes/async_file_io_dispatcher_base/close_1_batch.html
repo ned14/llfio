@@ -6,7 +6,7 @@
 <meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
 <link rel="home" href="../../../../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 0.1">
 <link rel="up" href="../async_file_io_dispatcher_base.html" title="async_file_io_dispatcher_base">
-<link rel="prev" href="call_3_single_unbound_callable.html" title="call (single unbound callable)">
+<link rel="prev" href="adopt_1_single.html" title="adopt (single)">
 <link rel="next" href="close_1_single.html" title="close (single)">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
@@ -20,7 +20,7 @@
 </tr></table>
 <hr>
 <div class="spirit-nav">
-<a accesskey="p" href="call_3_single_unbound_callable.html"><img src="../../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../async_file_io_dispatcher_base.html"><img src="../../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../../../index.html"><img src="../../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="close_1_single.html"><img src="../../../../../../doc/src/images/next.png" alt="Next"></a>
+<a accesskey="p" href="adopt_1_single.html"><img src="../../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../async_file_io_dispatcher_base.html"><img src="../../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../../../index.html"><img src="../../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="close_1_single.html"><img src="../../../../../../doc/src/images/next.png" alt="Next"></a>
 </div>
 <div class="section">
 <div class="titlepage"><div><div><h5 class="title">
@@ -28,7 +28,7 @@
           (batch)</a>
 </h5></div></div></div>
 <p>
-            <a class="indexterm" name="id892911"></a>
+            <a class="indexterm" name="id923794"></a>
 Schedule a batch of asynchronous file or directory handle closes after
             preceding operations.
           </p>
@@ -130,9 +130,42 @@ Schedule a batch of asynchronous file or directory handle closes after
 <a name="afio.reference.classes.async_file_io_dispatcher_base.close_1_batch.h6"></a>
             <span class="phrase"><a name="afio.reference.classes.async_file_io_dispatcher_base.close_1_batch.example"></a></span><a class="link" href="close_1_batch.html#afio.reference.classes.async_file_io_dispatcher_base.close_1_batch.example">Example</a>
           </h6>
-<p>
-            [filedir_example]
-          </p>
+<pre class="programlisting"><span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_file_io_dispatcher_base</span><span class="special">&gt;</span> <span class="identifier">dispatcher</span><span class="special">=</span>
+    <span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">make_async_file_io_dispatcher</span><span class="special">();</span>
+
+<span class="keyword">try</span>
+<span class="special">{</span>
+    <span class="comment">// Schedule creating a directory called testdir</span>
+    <span class="keyword">auto</span> <span class="identifier">mkdir</span><span class="special">(</span><span class="identifier">dispatcher</span><span class="special">-&gt;</span><span class="identifier">dir</span><span class="special">(</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_path_op_req</span><span class="special">(</span><span class="string">"testdir"</span><span class="special">,</span>
+        <span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">file_flags</span><span class="special">::</span><span class="identifier">Create</span><span class="special">)));</span>
+    <span class="comment">// Schedule creating a file called testfile in testdir only when testdir has been created</span>
+    <span class="keyword">auto</span> <span class="identifier">mkfile</span><span class="special">(</span><span class="identifier">dispatcher</span><span class="special">-&gt;</span><span class="identifier">file</span><span class="special">(</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_path_op_req</span><span class="special">(</span><span class="identifier">mkdir</span><span class="special">,</span>
+        <span class="string">"testdir/testfile"</span><span class="special">,</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">file_flags</span><span class="special">::</span><span class="identifier">Create</span><span class="special">)));</span>
+    <span class="comment">// Schedule creating a symbolic link called linktodir to the item referred to by the precondition</span>
+    <span class="comment">// i.e. testdir. Note that on Windows you can only symbolic link directories.</span>
+    <span class="keyword">auto</span> <span class="identifier">mklink</span><span class="special">(</span><span class="identifier">dispatcher</span><span class="special">-&gt;</span><span class="identifier">symlink</span><span class="special">(</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_path_op_req</span><span class="special">(</span><span class="identifier">mkdir</span><span class="special">,</span>
+        <span class="string">"testdir/linktodir"</span><span class="special">,</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">file_flags</span><span class="special">::</span><span class="identifier">Create</span><span class="special">)));</span>
+
+    <span class="comment">// Schedule deleting the symbolic link only after when it has been created</span>
+    <span class="keyword">auto</span> <span class="identifier">rmlink</span><span class="special">(</span><span class="identifier">dispatcher</span><span class="special">-&gt;</span><span class="identifier">rmsymlink</span><span class="special">(</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_path_op_req</span><span class="special">(</span><span class="identifier">mklink</span><span class="special">,</span>
+        <span class="string">"testdir/linktodir"</span><span class="special">)));</span>
+    <span class="comment">// Schedule deleting the file only after when it has been created</span>
+    <span class="keyword">auto</span> <span class="identifier">rmfile</span><span class="special">(</span><span class="identifier">dispatcher</span><span class="special">-&gt;</span><span class="identifier">rmfile</span><span class="special">(</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_path_op_req</span><span class="special">(</span><span class="identifier">mkfile</span><span class="special">,</span>
+        <span class="string">"testdir/testfile"</span><span class="special">)));</span>
+    <span class="comment">// Schedule waiting until both the preceding operations have finished</span>
+    <span class="keyword">auto</span> <span class="identifier">barrier</span><span class="special">(</span><span class="identifier">dispatcher</span><span class="special">-&gt;</span><span class="identifier">barrier</span><span class="special">({</span><span class="identifier">rmlink</span><span class="special">,</span> <span class="identifier">rmfile</span><span class="special">}));</span>
+    <span class="comment">// Schedule deleting the directory only after the barrier completes</span>
+    <span class="keyword">auto</span> <span class="identifier">rmdir</span><span class="special">(</span><span class="identifier">dispatcher</span><span class="special">-&gt;</span><span class="identifier">rmdir</span><span class="special">(</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_path_op_req</span><span class="special">(</span><span class="identifier">barrier</span><span class="special">.</span><span class="identifier">front</span><span class="special">(),</span>
+        <span class="string">"testdir"</span><span class="special">)));</span>
+    <span class="comment">// Check ops for errors</span>
+    <span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">when_all</span><span class="special">({</span><span class="identifier">mkdir</span><span class="special">,</span> <span class="identifier">mkfile</span><span class="special">,</span> <span class="identifier">mklink</span><span class="special">,</span> <span class="identifier">rmlink</span><span class="special">,</span> <span class="identifier">rmfile</span><span class="special">,</span> <span class="identifier">rmdir</span><span class="special">}).</span><span class="identifier">wait</span><span class="special">();</span>
+<span class="special">}</span>
+<span class="keyword">catch</span><span class="special">(...)</span>
+<span class="special">{</span>
+    <span class="identifier">std</span><span class="special">::</span><span class="identifier">cerr</span> <span class="special">&lt;&lt;</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">current_exception_diagnostic_information</span><span class="special">(</span><span class="keyword">true</span><span class="special">)</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span>
+    <span class="keyword">throw</span><span class="special">;</span>
+<span class="special">}</span>
+</pre>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
 <td align="left"></td>
@@ -144,7 +177,7 @@ Schedule a batch of asynchronous file or directory handle closes after
 </tr></table>
 <hr>
 <div class="spirit-nav">
-<a accesskey="p" href="call_3_single_unbound_callable.html"><img src="../../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../async_file_io_dispatcher_base.html"><img src="../../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../../../index.html"><img src="../../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="close_1_single.html"><img src="../../../../../../doc/src/images/next.png" alt="Next"></a>
+<a accesskey="p" href="adopt_1_single.html"><img src="../../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../async_file_io_dispatcher_base.html"><img src="../../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../../../index.html"><img src="../../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="close_1_single.html"><img src="../../../../../../doc/src/images/next.png" alt="Next"></a>
 </div>
 </body>
 </html>

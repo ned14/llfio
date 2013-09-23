@@ -7,12 +7,15 @@ afio/design/acid_write_ordering/background.html
 afio/design/acid_write_ordering/write_ordering_data.html
 afio/compilation.html
 afio/quickstart.html
-afio/quickstart/closure_execution_engines.html
-afio/quickstart/closure_execution_engines/the_basics.html
-afio/quickstart/closure_execution_engines/the_basics/examples.html
-afio/quickstart/closure_execution_engines/how_boost_afio_relates_to_exisit.html
-afio/quickstart/closure_execution_engines/how_boost_afio_relates_to_exisit/comparison_of_afio_with_other_cl.html
-afio/quickstart/closure_execution_engines/how_boost_afio_relates_to_exisit/other_useful_comparisons.html
+afio/quickstart/async_file_io.html
+afio/quickstart/async_file_io/hello_world.html
+afio/quickstart/async_file_io/so_what.html
+afio/quickstart/closure_engine.html
+afio/quickstart/closure_engine/the_basics.html
+afio/quickstart/closure_engine/the_basics/examples.html
+afio/quickstart/closure_engine/how_boost_afio_relates_to_exisit.html
+afio/quickstart/closure_engine/how_boost_afio_relates_to_exisit/comparison_of_afio_with_other_cl.html
+afio/quickstart/closure_engine/how_boost_afio_relates_to_exisit/other_useful_comparisons.html
 afio/reference.html
 afio/reference/macros_flags.html
 afio/reference/macros_flags/boost_afio_validate_inputs.html
@@ -42,6 +45,8 @@ afio/reference/classes/async_file_io_dispatcher_base/completion_2_single_bound_f
 afio/reference/classes/async_file_io_dispatcher_base/call_2_batch_bound_functions.html
 afio/reference/classes/async_file_io_dispatcher_base/call_1_batch_bound_functions_without_preconditions.html
 afio/reference/classes/async_file_io_dispatcher_base/call_3_single_unbound_callable.html
+afio/reference/classes/async_file_io_dispatcher_base/adopt_1_batch.html
+afio/reference/classes/async_file_io_dispatcher_base/adopt_1_single.html
 afio/reference/classes/async_file_io_dispatcher_base/close_1_batch.html
 afio/reference/classes/async_file_io_dispatcher_base/close_1_single.html
 afio/reference/classes/async_file_io_dispatcher_base/dir_1_batch.html
@@ -74,6 +79,8 @@ afio/reference/classes/thread_source.html
 afio/reference/classes/std_thread_pool.html
 afio/reference/functions.html
 afio/reference/functions/make_async_file_io_dispatcher.html
+afio/reference/functions/make_async_data_op_req_3.html
+afio/reference/functions/make_async_data_op_req_4.html
 afio/reference/functions/process_threadpool.html
 afio/reference/functions/when_all_futures.html
 afio/reference/functions/when_all_futures/when_all.html
@@ -91,4 +98,6 @@ afio/advanced_topics/vs2010_notes.html
 afio/release_notes.html
 afio/FAQ.html
 afio/FAQ/stuck_ops.html
+afio/FAQ/vector_use.html
+afio/FAQ/foreign_fd.html
 afio/acknowledgments.html

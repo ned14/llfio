@@ -28,7 +28,7 @@
           (single)</a>
 </h5></div></div></div>
 <p>
-            <a class="indexterm" name="id911081"></a>
+            <a class="indexterm" name="id973515"></a>
 Schedule an asynchronous file length truncation after a preceding operation.
           </p>
 <h6>
@@ -150,9 +150,126 @@ Schedule an asynchronous file length truncation after a preceding operation.
 <a name="afio.reference.classes.async_file_io_dispatcher_base.truncate_2_single.h6"></a>
             <span class="phrase"><a name="afio.reference.classes.async_file_io_dispatcher_base.truncate_2_single.example"></a></span><a class="link" href="truncate_2_single.html#afio.reference.classes.async_file_io_dispatcher_base.truncate_2_single.example">Example</a>
           </h6>
-<p>
-            [truncate_example]
-          </p>
+<pre class="programlisting"><span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_file_io_dispatcher_base</span><span class="special">&gt;</span> <span class="identifier">dispatcher</span><span class="special">=</span>
+    <span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">make_async_file_io_dispatcher</span><span class="special">();</span>
+
+<span class="keyword">try</span>
+<span class="special">{</span>
+    <span class="comment">// Schedule an opening of a file called example_file.txt</span>
+    <span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_path_op_req</span> <span class="identifier">req</span><span class="special">(</span><span class="string">"example_file.txt"</span><span class="special">,</span>
+        <span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">file_flags</span><span class="special">::</span><span class="identifier">ReadWrite</span><span class="special">);</span>
+    <span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_io_op</span> <span class="identifier">openfile</span><span class="special">(</span><span class="identifier">dispatcher</span><span class="special">-&gt;</span><span class="identifier">file</span><span class="special">(</span><span class="identifier">req</span><span class="special">));</span> <a class="co" name="afio.reference.classes.async_file_io_dispatcher_base.truncate_2_single.c0" href="truncate_2_single.html#afio.reference.classes.async_file_io_dispatcher_base.truncate_2_single.c1"><img src="../../../../../../doc/src/images/callouts/1.png" alt="1" border="0"></a>
+
+    <span class="comment">// Something a bit surprising for many people is that writing off</span>
+    <span class="comment">// the end of a file in AFIO does NOT extend the file and writes</span>
+    <span class="comment">// which go past the end will simply fail instead. Why not?</span>
+    <span class="comment">// Simple: that's the convention with async file i/o. You must </span>
+    <span class="comment">// explicitly extend files before writing, like this:</span>
+    <span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_io_op</span> <span class="identifier">resizedfile</span><span class="special">(</span><span class="identifier">dispatcher</span><span class="special">-&gt;</span><span class="identifier">truncate</span><span class="special">(</span><span class="identifier">openfile</span><span class="special">,</span> <span class="number">12</span><span class="special">));</span> <a class="co" name="afio.reference.classes.async_file_io_dispatcher_base.truncate_2_single.c2" href="truncate_2_single.html#afio.reference.classes.async_file_io_dispatcher_base.truncate_2_single.c3"><img src="../../../../../../doc/src/images/callouts/2.png" alt="2" border="0"></a>
+
+    <span class="comment">// Config a write gather. You could do this of course as a batch</span>
+    <span class="comment">// of writes, but a write gather has optimised host OS support in most</span>
+    <span class="comment">// cases, so it's one syscall instead of many.</span>
+    <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">asio</span><span class="special">::</span><span class="identifier">const_buffer</span><span class="special">&gt;</span> <span class="identifier">buffers</span><span class="special">;</span>
+    <span class="identifier">buffers</span><span class="special">.</span><span class="identifier">push_back</span><span class="special">(</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">asio</span><span class="special">::</span><span class="identifier">const_buffer</span><span class="special">(</span><span class="string">"He"</span><span class="special">,</span> <span class="number">2</span><span class="special">));</span>
+    <span class="identifier">buffers</span><span class="special">.</span><span class="identifier">push_back</span><span class="special">(</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">asio</span><span class="special">::</span><span class="identifier">const_buffer</span><span class="special">(</span><span class="string">"ll"</span><span class="special">,</span> <span class="number">2</span><span class="special">));</span>
+    <span class="identifier">buffers</span><span class="special">.</span><span class="identifier">push_back</span><span class="special">(</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">asio</span><span class="special">::</span><span class="identifier">const_buffer</span><span class="special">(</span><span class="string">"o "</span><span class="special">,</span> <span class="number">2</span><span class="special">));</span>
+    <span class="identifier">buffers</span><span class="special">.</span><span class="identifier">push_back</span><span class="special">(</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">asio</span><span class="special">::</span><span class="identifier">const_buffer</span><span class="special">(</span><span class="string">"Wo"</span><span class="special">,</span> <span class="number">2</span><span class="special">));</span>
+    <span class="identifier">buffers</span><span class="special">.</span><span class="identifier">push_back</span><span class="special">(</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">asio</span><span class="special">::</span><span class="identifier">const_buffer</span><span class="special">(</span><span class="string">"rl"</span><span class="special">,</span> <span class="number">2</span><span class="special">));</span>
+    <span class="identifier">buffers</span><span class="special">.</span><span class="identifier">push_back</span><span class="special">(</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">asio</span><span class="special">::</span><span class="identifier">const_buffer</span><span class="special">(</span><span class="string">"d\n"</span><span class="special">,</span> <span class="number">2</span><span class="special">));</span>
+    <span class="comment">// Schedule the write gather to offset zero</span>
+    <span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_io_op</span> <span class="identifier">written</span><span class="special">(</span><span class="identifier">dispatcher</span><span class="special">-&gt;</span><span class="identifier">write</span><span class="special">(</span>
+        <span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">make_async_data_op_req</span><span class="special">(</span><span class="identifier">resizedfile</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">move</span><span class="special">(</span><span class="identifier">buffers</span><span class="special">),</span> <span class="number">0</span><span class="special">)));</span> <a class="co" name="afio.reference.classes.async_file_io_dispatcher_base.truncate_2_single.c4" href="truncate_2_single.html#afio.reference.classes.async_file_io_dispatcher_base.truncate_2_single.c5"><img src="../../../../../../doc/src/images/callouts/3.png" alt="3" border="0"></a>
+
+    <span class="comment">// Schedule making sure the previous batch has definitely reached physical storage</span>
+    <span class="comment">// This won't complete until the write is on disc</span>
+    <span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_io_op</span> <span class="identifier">stored</span><span class="special">(</span><span class="identifier">dispatcher</span><span class="special">-&gt;</span><span class="identifier">sync</span><span class="special">(</span><span class="identifier">written</span><span class="special">));</span> <a class="co" name="afio.reference.classes.async_file_io_dispatcher_base.truncate_2_single.c6" href="truncate_2_single.html#afio.reference.classes.async_file_io_dispatcher_base.truncate_2_single.c7"><img src="../../../../../../doc/src/images/callouts/4.png" alt="4" border="0"></a>
+
+    <span class="comment">// Schedule filling this array from the file. Note how convenient std::array</span>
+    <span class="comment">// is and completely replaces C style char buffer[bytes]</span>
+    <span class="identifier">std</span><span class="special">::</span><span class="identifier">array</span><span class="special">&lt;</span><span class="keyword">char</span><span class="special">,</span> <span class="number">12</span><span class="special">&gt;</span> <span class="identifier">buffer</span><span class="special">;</span>
+    <span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_io_op</span> <span class="identifier">read</span><span class="special">(</span><span class="identifier">dispatcher</span><span class="special">-&gt;</span><span class="identifier">read</span><span class="special">(</span>
+        <span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">make_async_data_op_req</span><span class="special">(</span><span class="identifier">stored</span><span class="special">,</span> <span class="identifier">buffer</span><span class="special">,</span> <span class="number">0</span><span class="special">)));</span> <a class="co" name="afio.reference.classes.async_file_io_dispatcher_base.truncate_2_single.c8" href="truncate_2_single.html#afio.reference.classes.async_file_io_dispatcher_base.truncate_2_single.c9"><img src="../../../../../../doc/src/images/callouts/5.png" alt="5" border="0"></a>
+
+    <span class="comment">// Schedule the closing and deleting of example_file.txt after the contents read</span>
+    <span class="identifier">req</span><span class="special">.</span><span class="identifier">precondition</span><span class="special">=</span><span class="identifier">dispatcher</span><span class="special">-&gt;</span><span class="identifier">close</span><span class="special">(</span><span class="identifier">read</span><span class="special">);</span> <a class="co" name="afio.reference.classes.async_file_io_dispatcher_base.truncate_2_single.c10" href="truncate_2_single.html#afio.reference.classes.async_file_io_dispatcher_base.truncate_2_single.c11"><img src="../../../../../../doc/src/images/callouts/6.png" alt="6" border="0"></a>
+    <span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_io_op</span> <span class="identifier">deletedfile</span><span class="special">(</span><span class="identifier">dispatcher</span><span class="special">-&gt;</span><span class="identifier">rmfile</span><span class="special">(</span><span class="identifier">req</span><span class="special">));</span> <a class="co" name="afio.reference.classes.async_file_io_dispatcher_base.truncate_2_single.c12" href="truncate_2_single.html#afio.reference.classes.async_file_io_dispatcher_base.truncate_2_single.c13"><img src="../../../../../../doc/src/images/callouts/7.png" alt="7" border="0"></a>
+
+    <span class="comment">// Wait until the buffer has been filled, checking all steps for errors</span>
+    <span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">when_all</span><span class="special">({</span><span class="identifier">openfile</span><span class="special">,</span> <span class="identifier">resizedfile</span><span class="special">,</span> <span class="identifier">written</span><span class="special">,</span> <span class="identifier">stored</span><span class="special">,</span> <span class="identifier">read</span><span class="special">}).</span><span class="identifier">wait</span><span class="special">();</span> <a class="co" name="afio.reference.classes.async_file_io_dispatcher_base.truncate_2_single.c14" href="truncate_2_single.html#afio.reference.classes.async_file_io_dispatcher_base.truncate_2_single.c15"><img src="../../../../../../doc/src/images/callouts/8.png" alt="8" border="0"></a>
+
+    <span class="comment">// There is actually a async_data_op_req&lt;std::string&gt; specialisation you</span>
+    <span class="comment">// can use to skip this bit by reading directly into a string ...</span>
+    <span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span> <span class="identifier">contents</span><span class="special">(</span><span class="identifier">buffer</span><span class="special">.</span><span class="identifier">begin</span><span class="special">(),</span> <span class="identifier">buffer</span><span class="special">.</span><span class="identifier">end</span><span class="special">());</span>
+    <span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="string">"Contents of file is '"</span> <span class="special">&lt;&lt;</span> <span class="identifier">contents</span> <span class="special">&lt;&lt;</span> <span class="string">"'"</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span>
+
+    <span class="comment">// Check remaining ops for errors</span>
+    <span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">when_all</span><span class="special">({</span><span class="identifier">req</span><span class="special">.</span><span class="identifier">precondition</span> <span class="comment">/*close*/</span><span class="special">,</span> <span class="identifier">deletedfile</span><span class="special">}).</span><span class="identifier">wait</span><span class="special">();</span>		<a class="co" name="afio.reference.classes.async_file_io_dispatcher_base.truncate_2_single.c16" href="truncate_2_single.html#afio.reference.classes.async_file_io_dispatcher_base.truncate_2_single.c17"><img src="../../../../../../doc/src/images/callouts/9.png" alt="9" border="0"></a>
+<span class="special">}</span>
+<span class="keyword">catch</span><span class="special">(...)</span>
+<span class="special">{</span>
+    <span class="identifier">std</span><span class="special">::</span><span class="identifier">cerr</span> <span class="special">&lt;&lt;</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">current_exception_diagnostic_information</span><span class="special">(</span><span class="keyword">true</span><span class="special">)</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span>
+    <span class="keyword">throw</span><span class="special">;</span>
+<span class="special">}</span>
+</pre>
+<div class="calloutlist"><table border="0" summary="Callout list">
+<tr>
+<td width="5%" valign="top" align="left"><p><a name="afio.reference.classes.async_file_io_dispatcher_base.truncate_2_single.c1"></a><a href="#afio.reference.classes.async_file_io_dispatcher_base.truncate_2_single.c0"><img src="../../../../../../doc/src/images/callouts/1.png" alt="1" border="0"></a> </p></td>
+<td valign="top" align="left"><p>
+                schedules open file as soon as possible
+              </p></td>
+</tr>
+<tr>
+<td width="5%" valign="top" align="left"><p><a name="afio.reference.classes.async_file_io_dispatcher_base.truncate_2_single.c3"></a><a href="#afio.reference.classes.async_file_io_dispatcher_base.truncate_2_single.c2"><img src="../../../../../../doc/src/images/callouts/2.png" alt="2" border="0"></a> </p></td>
+<td valign="top" align="left"><p>
+                schedules resize file ready for writing after open file completes
+              </p></td>
+</tr>
+<tr>
+<td width="5%" valign="top" align="left"><p><a name="afio.reference.classes.async_file_io_dispatcher_base.truncate_2_single.c5"></a><a href="#afio.reference.classes.async_file_io_dispatcher_base.truncate_2_single.c4"><img src="../../../../../../doc/src/images/callouts/3.png" alt="3" border="0"></a> </p></td>
+<td valign="top" align="left"><p>
+                schedules write after resize file completes
+              </p></td>
+</tr>
+<tr>
+<td width="5%" valign="top" align="left"><p><a name="afio.reference.classes.async_file_io_dispatcher_base.truncate_2_single.c7"></a><a href="#afio.reference.classes.async_file_io_dispatcher_base.truncate_2_single.c6"><img src="../../../../../../doc/src/images/callouts/4.png" alt="4" border="0"></a> </p></td>
+<td valign="top" align="left"><p>
+                schedules sync after write completes
+              </p></td>
+</tr>
+<tr>
+<td width="5%" valign="top" align="left"><p><a name="afio.reference.classes.async_file_io_dispatcher_base.truncate_2_single.c9"></a><a href="#afio.reference.classes.async_file_io_dispatcher_base.truncate_2_single.c8"><img src="../../../../../../doc/src/images/callouts/5.png" alt="5" border="0"></a> </p></td>
+<td valign="top" align="left"><p>
+                schedules read after sync completes
+              </p></td>
+</tr>
+<tr>
+<td width="5%" valign="top" align="left"><p><a name="afio.reference.classes.async_file_io_dispatcher_base.truncate_2_single.c11"></a><a href="#afio.reference.classes.async_file_io_dispatcher_base.truncate_2_single.c10"><img src="../../../../../../doc/src/images/callouts/6.png" alt="6" border="0"></a> </p></td>
+<td valign="top" align="left"><p>
+                schedules close file after read completes
+              </p></td>
+</tr>
+<tr>
+<td width="5%" valign="top" align="left"><p><a name="afio.reference.classes.async_file_io_dispatcher_base.truncate_2_single.c13"></a><a href="#afio.reference.classes.async_file_io_dispatcher_base.truncate_2_single.c12"><img src="../../../../../../doc/src/images/callouts/7.png" alt="7" border="0"></a> </p></td>
+<td valign="top" align="left"><p>
+                schedules delete file after close completes
+              </p></td>
+</tr>
+<tr>
+<td width="5%" valign="top" align="left"><p><a name="afio.reference.classes.async_file_io_dispatcher_base.truncate_2_single.c15"></a><a href="#afio.reference.classes.async_file_io_dispatcher_base.truncate_2_single.c14"><img src="../../../../../../doc/src/images/callouts/8.png" alt="8" border="0"></a> </p></td>
+<td valign="top" align="left"><p>
+                waits for file open, resize, write, sync and read to complete, throwing
+                any exceptions encountered
+              </p></td>
+</tr>
+<tr>
+<td width="5%" valign="top" align="left"><p><a name="afio.reference.classes.async_file_io_dispatcher_base.truncate_2_single.c17"></a><a href="#afio.reference.classes.async_file_io_dispatcher_base.truncate_2_single.c16"><img src="../../../../../../doc/src/images/callouts/9.png" alt="9" border="0"></a> </p></td>
+<td valign="top" align="left"><p>
+                waits for file close and delete to complete, throwing any exceptions
+                encountered
+              </p></td>
+</tr>
+</table></div>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
 <td align="left"></td>

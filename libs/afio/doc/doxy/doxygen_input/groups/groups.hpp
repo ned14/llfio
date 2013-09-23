@@ -22,4 +22,5 @@
 \defgroup async_file_io_dispatcher x
 \defgroup when_all_ops x
 \defgroup async_data_op_req x
+\defgroup make_async_data_op_req x
 */

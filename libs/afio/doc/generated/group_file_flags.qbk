@@ -25,6 +25,7 @@
 '''<indexterm><primary>FastDirectoryEnumeration</primary></indexterm>'''
 '''<indexterm><primary>UniqueDirectoryHandle</primary></indexterm>'''
 '''<indexterm><primary>OSDirect</primary></indexterm>'''
+'''<indexterm><primary>OSMMap</primary></indexterm>'''
 '''<indexterm><primary>AlwaysSync</primary></indexterm>'''
 '''<indexterm><primary>SyncOnClose</primary></indexterm>'''
 '''<indexterm><primary>EnforceDependencyWriteOrder</primary></indexterm>'''
@@ -33,7 +34,7 @@
 Bitwise file and directory open flags. 
 
 [heading Synopsis]
-``enum file_flags {None = 0, Read = 1, Write = 2, ReadWrite = 3, Append = 4, Truncate = 8, Create = 16, CreateOnlyIfNotExist = 32, WillBeSequentiallyAccessed = 128, WillBeRandomlyAccessed = 256, FastDirectoryEnumeration = (1<<10), UniqueDirectoryHandle = (1<<11), OSDirect = (1<<16), AlwaysSync = (1<<24), SyncOnClose = (1<<25), EnforceDependencyWriteOrder = (1<<26), int_opening_link = (1<<29), int_opening_dir = (1<<30)};``
+``enum file_flags {None = 0, Read = 1, Write = 2, ReadWrite = 3, Append = 4, Truncate = 8, Create = 16, CreateOnlyIfNotExist = 32, WillBeSequentiallyAccessed = 128, WillBeRandomlyAccessed = 256, FastDirectoryEnumeration = (1<<10), UniqueDirectoryHandle = (1<<11), OSDirect = (1<<16), OSMMap = (1<<17), AlwaysSync = (1<<24), SyncOnClose = (1<<25), EnforceDependencyWriteOrder = (1<<26), int_opening_link = (1<<29), int_opening_dir = (1<<30)};``
 
 [heading Values]
 
@@ -52,6 +53,7 @@ Bitwise file and directory open flags.
 [[FastDirectoryEnumeration] [Hold a file handle open to the containing directory of each open file for fast directory enumeration. ]]
 [[UniqueDirectoryHandle] [Return a unique directory handle rather than a shared directory handle. ]]
 [[OSDirect] [Bypass the OS file buffers (only really useful for writing large files, or a lot of random reads and writes. Note you must 4Kb align everything if this is on) ]]
+[[OSMMap] [Memory map files (for reads only). ]]
 [[AlwaysSync] [Ask the OS to not complete until the data is on the physical storage. Best used only with OSDirect, otherwise use SyncOnClose. ]]
 [[SyncOnClose] [Automatically initiate an asynchronous flush just before file close, and fuse both operations so both must complete for close to complete. ]]
 [[EnforceDependencyWriteOrder] [Ensure that data writes to files reach physical storage in the same order as the op dependencies close files. Does NOT enforce ordering of individual data writes, ONLY all file writes accumulated before a file close. ]]

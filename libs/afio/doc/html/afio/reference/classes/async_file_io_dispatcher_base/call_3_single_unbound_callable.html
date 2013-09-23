@@ -7,7 +7,7 @@
 <link rel="home" href="../../../../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 0.1">
 <link rel="up" href="../async_file_io_dispatcher_base.html" title="async_file_io_dispatcher_base">
 <link rel="prev" href="call_1_batch_bound_functions_without_preconditions.html" title="call (batch bound functions without preconditions)">
-<link rel="next" href="close_1_batch.html" title="close (batch)">
+<link rel="next" href="adopt_1_batch.html" title="adopt (batch)">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
 <table cellpadding="2" width="100%"><tr>
@@ -20,7 +20,7 @@
 </tr></table>
 <hr>
 <div class="spirit-nav">
-<a accesskey="p" href="call_1_batch_bound_functions_without_preconditions.html"><img src="../../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../async_file_io_dispatcher_base.html"><img src="../../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../../../index.html"><img src="../../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="close_1_batch.html"><img src="../../../../../../doc/src/images/next.png" alt="Next"></a>
+<a accesskey="p" href="call_1_batch_bound_functions_without_preconditions.html"><img src="../../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../async_file_io_dispatcher_base.html"><img src="../../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../../../index.html"><img src="../../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="adopt_1_batch.html"><img src="../../../../../../doc/src/images/next.png" alt="Next"></a>
 </div>
 <div class="section">
 <div class="titlepage"><div><div><h5 class="title">
@@ -28,7 +28,7 @@
           (single unbound callable)</a>
 </h5></div></div></div>
 <p>
-            <a class="indexterm" name="id891201"></a>
+            <a class="indexterm" name="id921386"></a>
 Schedule an asynchronous invocation of the specified unbound callable
             when its supplied precondition completes. Note that this function essentially
             calls <code class="literal"><code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">bind</span><span class="special">()</span></code></code>
@@ -54,7 +54,7 @@ Schedule an asynchronous invocation of the specified unbound callable
             <span class="phrase"><a name="afio.reference.classes.async_file_io_dispatcher_base.call_3_single_unbound_callable.synopsis"></a></span><a class="link" href="call_3_single_unbound_callable.html#afio.reference.classes.async_file_io_dispatcher_base.call_3_single_unbound_callable.synopsis">Synopsis</a>
           </h6>
 <pre class="programlisting"><span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">C</span><span class="special">,</span> <span class="keyword">class</span><span class="special">...</span> <span class="identifier">Args</span><span class="special">&gt;</span>
-<span class="identifier">std</span><span class="special">::</span><span class="identifier">pair</span><span class="special">&lt;</span> <span class="identifier">future</span><span class="special">&lt;</span> <span class="keyword">typename</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">result_of</span><span class="special">&lt;</span> <span class="identifier">C</span><span class="special">(</span><span class="identifier">Args</span><span class="special">...)&gt;::</span><span class="identifier">type</span> <span class="special">&gt;,</span> <span class="identifier">async_io_op</span> <span class="special">&gt;</span> <span class="identifier">async_file_io_dispatcher_base</span><span class="special">::</span><span class="identifier">call</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">async_io_op</span> <span class="special">&amp;</span> <span class="identifier">req</span><span class="special">,</span> <span class="identifier">C</span> <span class="identifier">callback</span><span class="special">,</span> <span class="identifier">Args</span><span class="special">...</span> <span class="identifier">args</span><span class="special">)</span></pre>
+<span class="identifier">std</span><span class="special">::</span><span class="identifier">pair</span><span class="special">&lt;</span> <span class="identifier">future</span><span class="special">&lt;</span> <span class="keyword">typename</span> <span class="identifier">detail</span><span class="special">::</span><span class="identifier">vs2013_variadic_overload_resolution_workaround</span><span class="special">&lt;</span> <span class="identifier">C</span><span class="special">,</span> <span class="identifier">Args</span><span class="special">...&gt;::</span><span class="identifier">type</span> <span class="special">&gt;,</span> <span class="identifier">async_io_op</span> <span class="special">&gt;</span> <span class="identifier">async_file_io_dispatcher_base</span><span class="special">::</span><span class="identifier">call</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">async_io_op</span> <span class="special">&amp;</span> <span class="identifier">req</span><span class="special">,</span> <span class="identifier">C</span> <span class="identifier">callback</span><span class="special">,</span> <span class="identifier">Args</span><span class="special">...</span> <span class="identifier">args</span><span class="special">)</span></pre>
 <h6>
 <a name="afio.reference.classes.async_file_io_dispatcher_base.call_3_single_unbound_callable.h2"></a>
             <span class="phrase"><a name="afio.reference.classes.async_file_io_dispatcher_base.call_3_single_unbound_callable.parameters"></a></span><a class="link" href="call_3_single_unbound_callable.html#afio.reference.classes.async_file_io_dispatcher_base.call_3_single_unbound_callable.parameters">Parameters</a>
@@ -266,7 +266,7 @@ Schedule an asynchronous invocation of the specified unbound callable
 </tr></table>
 <hr>
 <div class="spirit-nav">
-<a accesskey="p" href="call_1_batch_bound_functions_without_preconditions.html"><img src="../../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../async_file_io_dispatcher_base.html"><img src="../../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../../../index.html"><img src="../../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="close_1_batch.html"><img src="../../../../../../doc/src/images/next.png" alt="Next"></a>
+<a accesskey="p" href="call_1_batch_bound_functions_without_preconditions.html"><img src="../../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../async_file_io_dispatcher_base.html"><img src="../../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../../../index.html"><img src="../../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="adopt_1_batch.html"><img src="../../../../../../doc/src/images/next.png" alt="Next"></a>
 </div>
 </body>
 </html>

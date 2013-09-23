@@ -27,7 +27,7 @@
 <a name="afio.reference.structs.async_enumerate_op_req"></a><a class="link" href="async_enumerate_op_req.html" title="async_enumerate_op_req">async_enumerate_op_req</a>
 </h4></div></div></div>
 <p>
-          <a class="indexterm" name="id873820"></a>
+          <a class="indexterm" name="id900343"></a>
 A convenience bundle of precondition, number of items to enumerate and
           item pattern match.
         </p>
@@ -38,7 +38,7 @@ A convenience bundle of precondition, number of items to enumerate and
 <pre class="programlisting"><span class="keyword">struct</span> <span class="identifier">async_enumerate_op_req</span>
 <span class="special">{</span>
   <span class="identifier">std</span><span class="special">::</span><span class="identifier">filesystem</span><span class="special">::</span><span class="identifier">path</span> <span class="identifier">glob</span><span class="special">;</span>  <span class="comment">// An optional shell glob by which to filter the items returned. Done kernel side on Windows, user side on POSIX. </span>
-  <span class="identifier">size_t</span> <span class="identifier">maxitems</span><span class="special">;</span>             <span class="comment">// The maximum number of items to return in this request. </span>
+  <span class="identifier">size_t</span> <span class="identifier">maxitems</span><span class="special">;</span>             <span class="comment">// The maximum number of items to return in this request. Note that setting to one will often invoke two syscalls. </span>
   <span class="identifier">async_io_op</span> <span class="identifier">precondition</span><span class="special">;</span>    <span class="comment">// A precondition for this operation. </span>
   <span class="keyword">bool</span> <span class="identifier">restart</span><span class="special">;</span>                <span class="comment">// Restarts the enumeration for this open directory handle. </span>
 <span class="special">};</span>
@@ -99,7 +99,8 @@ A convenience bundle of precondition, number of items to enumerate and
                   </p>
                   <p>
                     <span class="bold"><strong>size_t</strong></span>: <span class="emphasis"><em>_maxitems</em></span>:
-                    The maximum number of items to return in this request.
+                    The maximum number of items to return in this request. Note that
+                    setting to one will often invoke two syscalls.
                   </p>
                   <p>
                     <span class="bold"><strong>bool</strong></span>: <span class="emphasis"><em>_restart</em></span>:

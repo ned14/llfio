@@ -28,7 +28,7 @@
           (single)</a>
 </h5></div></div></div>
 <p>
-            <a class="indexterm" name="id915953"></a>
+            <a class="indexterm" name="id985182"></a>
 Schedule an asynchronous directory enumeration after a preceding operation.
           </p>
 <h6>
@@ -39,6 +39,11 @@ Schedule an asynchronous directory enumeration after a preceding operation.
 <span class="identifier">handle</span><span class="special">,</span> <span class="keyword">and</span> <span class="identifier">therefore</span> <span class="identifier">enumerating</span> <span class="keyword">not</span> <span class="identifier">all</span> <span class="identifier">of</span> <span class="identifier">the</span> <span class="identifier">entries</span> <span class="identifier">at</span> <span class="identifier">once</span> <span class="identifier">is</span> <span class="identifier">a</span> <span class="identifier">race</span> <span class="identifier">condition</span><span class="special">.</span> <span class="identifier">The</span> <span class="identifier">solution</span> <span class="identifier">is</span>
 <span class="identifier">to</span> <span class="identifier">either</span> <span class="identifier">set</span> <span class="identifier">maxitems</span> <span class="identifier">to</span> <span class="identifier">a</span> <span class="identifier">value</span> <span class="identifier">large</span> <span class="identifier">enough</span> <span class="identifier">to</span> <span class="identifier">guarantee</span> <span class="identifier">a</span> <span class="identifier">directory</span> <span class="identifier">will</span> <span class="identifier">be</span> <span class="identifier">enumerated</span> <span class="identifier">in</span> <span class="identifier">a</span> <span class="identifier">single</span>
 <span class="identifier">shot</span><span class="special">,</span> <span class="keyword">or</span> <span class="identifier">to</span> <span class="identifier">open</span> <span class="identifier">a</span> <span class="identifier">separate</span> <span class="identifier">directory</span> <span class="identifier">handle</span> <span class="keyword">using</span> <span class="identifier">the</span> <span class="identifier">file</span><span class="special">\</span><span class="identifier">u005fflags</span><span class="special">::</span><span class="identifier">UniqueDirectoryHandle</span> <span class="identifier">flag</span><span class="special">.</span>
+
+<span class="identifier">Note</span> <span class="identifier">that</span> <span class="identifier">setting</span> <span class="identifier">maxitems</span><span class="special">=</span><span class="number">1</span> <span class="identifier">will</span> <span class="identifier">often</span> <span class="identifier">cause</span> <span class="identifier">a</span> <span class="identifier">buffer</span> <span class="identifier">space</span> <span class="identifier">exhaustion</span><span class="special">,</span> <span class="identifier">causing</span> <span class="identifier">a</span> <span class="identifier">second</span> <span class="identifier">syscall</span>
+<span class="identifier">with</span> <span class="identifier">an</span> <span class="identifier">enlarged</span> <span class="identifier">buffer</span><span class="special">.</span> <span class="identifier">This</span> <span class="identifier">is</span> <span class="identifier">because</span> <span class="identifier">AFIO</span> <span class="identifier">cannot</span> <span class="identifier">know</span> <span class="keyword">if</span> <span class="identifier">the</span> <span class="identifier">allocated</span> <span class="identifier">buffer</span> <span class="identifier">can</span> <span class="identifier">hold</span> <span class="identifier">all</span> <span class="identifier">of</span>
+<span class="identifier">the</span> <span class="identifier">filename</span> <span class="identifier">being</span> <span class="identifier">retrieved</span><span class="special">,</span> <span class="identifier">so</span> <span class="identifier">it</span> <span class="identifier">may</span> <span class="identifier">have</span> <span class="identifier">to</span> <span class="identifier">retry</span><span class="special">.</span> <span class="identifier">Put</span> <span class="identifier">another</span> <span class="identifier">way</span><span class="special">,</span> <span class="identifier">setting</span> <span class="identifier">maxitems</span><span class="special">=</span><span class="number">1</span> <span class="identifier">will</span>
+<span class="identifier">give</span> <span class="identifier">you</span> <span class="identifier">the</span> <span class="identifier">worst</span> <span class="identifier">performance</span> <span class="identifier">possible</span><span class="special">.</span>
 </pre>
 <h6>
 <a name="afio.reference.classes.async_file_io_dispatcher_base.enumerate_1_single.h1"></a>
@@ -139,9 +144,45 @@ Schedule an asynchronous directory enumeration after a preceding operation.
 <a name="afio.reference.classes.async_file_io_dispatcher_base.enumerate_1_single.h7"></a>
             <span class="phrase"><a name="afio.reference.classes.async_file_io_dispatcher_base.enumerate_1_single.example"></a></span><a class="link" href="enumerate_1_single.html#afio.reference.classes.async_file_io_dispatcher_base.enumerate_1_single.example">Example</a>
           </h6>
-<p>
-            [enumerate_example]
-          </p>
+<pre class="programlisting"><span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_file_io_dispatcher_base</span><span class="special">&gt;</span> <span class="identifier">dispatcher</span><span class="special">=</span>
+    <span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">make_async_file_io_dispatcher</span><span class="special">();</span>
+
+<span class="comment">// Schedule an opening of the root directory</span>
+<span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_io_op</span> <span class="identifier">rootdir</span><span class="special">(</span><span class="identifier">dispatcher</span><span class="special">-&gt;</span><span class="identifier">dir</span><span class="special">(</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_path_op_req</span><span class="special">(</span><span class="string">"/"</span><span class="special">)));</span>
+
+<span class="identifier">std</span><span class="special">::</span><span class="identifier">pair</span><span class="special">&lt;</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">directory_entry</span><span class="special">&gt;,</span> <span class="keyword">bool</span><span class="special">&gt;</span> <span class="identifier">list</span><span class="special">;</span>
+<span class="comment">// This is used to reset the enumeration to the start</span>
+<span class="keyword">bool</span> <span class="identifier">restart</span><span class="special">=</span><span class="keyword">true</span><span class="special">;</span>
+<span class="keyword">do</span>
+<span class="special">{</span>
+    <span class="comment">// Schedule an enumeration of an open directory handle</span>
+    <span class="comment">// Note it returns a future to the results and an op ref </span>
+    <span class="identifier">std</span><span class="special">::</span><span class="identifier">pair</span><span class="special">&lt;</span>
+        <span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">future</span><span class="special">&lt;</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">pair</span><span class="special">&lt;</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">directory_entry</span><span class="special">&gt;,</span> <span class="keyword">bool</span><span class="special">&gt;&gt;,</span>
+        <span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_io_op</span>
+    <span class="special">&gt;</span>  <span class="identifier">enumeration</span><span class="special">(</span>
+        <span class="identifier">dispatcher</span><span class="special">-&gt;</span><span class="identifier">enumerate</span><span class="special">(</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_enumerate_op_req</span><span class="special">(</span>
+            <span class="comment">/* This is the handle to enumerate */</span>
+            <span class="identifier">rootdir</span><span class="special">,</span>
+            <span class="comment">/* This is the maximum entries to enumerate. Note
+            the use of compatibility_maximum() which is the
+            same value your libc uses. The problem with smaller
+            enumerations is that the directory contents can change
+            out from underneath you more frequently. */</span>
+            <span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">directory_entry</span><span class="special">::</span><span class="identifier">compatibility_maximum</span><span class="special">(),</span>
+            <span class="comment">/* True if to reset enumeration */</span>
+            <span class="identifier">restart</span><span class="special">)));</span>
+    <span class="identifier">restart</span><span class="special">=</span><span class="keyword">false</span><span class="special">;</span>
+
+    <span class="comment">// People using AFIO often forget that futures can be waited</span>
+    <span class="comment">// on normally without needing to wait on the op handle</span>
+    <span class="identifier">list</span><span class="special">=</span><span class="identifier">enumeration</span><span class="special">.</span><span class="identifier">first</span><span class="special">.</span><span class="identifier">get</span><span class="special">();</span>
+    <span class="keyword">for</span><span class="special">(</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">directory_entry</span> <span class="special">&amp;</span><span class="identifier">i</span> <span class="special">:</span> <span class="identifier">list</span><span class="special">.</span><span class="identifier">first</span><span class="special">)</span>
+    <span class="special">{</span>
+        <span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="identifier">i</span><span class="special">.</span><span class="identifier">name</span><span class="special">()</span> <span class="special">&lt;&lt;</span> <span class="string">" type "</span> <span class="special">&lt;&lt;</span> <span class="identifier">i</span><span class="special">.</span><span class="identifier">st_type</span><span class="special">()</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span>
+    <span class="special">}</span>
+<span class="special">}</span> <span class="keyword">while</span><span class="special">(</span><span class="identifier">list</span><span class="special">.</span><span class="identifier">second</span><span class="special">);</span>
+</pre>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
 <td align="left"></td>

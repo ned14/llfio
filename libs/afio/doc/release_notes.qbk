@@ -9,30 +9,10 @@
 [section:release_notes Release Notes]
 
 [/=================]
-[heading Boost 1.55]
+[heading Boost 1.56]
 [/=================]
 
-[*Additional functionality]
-
-* None
-
-[*Documentation]
-
-* None
-
-[*Bugfixes]
-
-* None
-
-
-[*Solved tickets]
-
-* [@https://svn.boost.org/trac/boost/ticket/7462 7462] None
-
-[*Internal changes]
-
-* None
-
+First release.
 
 [endsect]
 
@@ -58,5 +38,34 @@ Note that `BOOST_AFIO_OP_STACKBACKTRACEDEPTH` has two implementations, one based
 on libunwind. The latter is more portable, but requires explicit linking with libunwind, so we have defaulted to the former.
 
 [endsect] [/stuck_ops]
+
+[section:vector_use Why did you use `std::vector<>` as the ops batch container instead of a generic iterator range?]
+
+# `std::vector<async_io_op>` is the closest thing to a variable length array in C++[footnote Ok, there is also
+the oft-forgotten `std::valarray<>` too, but its use as a generic container isn't recommended.], at least until C++ 14 where we
+will gain `std::dynarray<>` and dynamic array sizing.
+# `std::vector<async_io_op>` is well understood, particularly its performance during by-value copies and during
+`push_back()` which is by far the most common operation you do when preparing a batch.
+# `std::vector<async_io_op>` is very amenable to splitting the batch across threads (not that AFIO currently does this).
+# `std::vector<async_io_op>` is easily transportable through an ABI, whereas arbitrary container iterators would need type
+erasing (i.e. slow). As AFIO was developed initially as not header-only, this made a lot of sense initially.
+
+We are not opposed to the use of generic iterator ranges in an AFIO v2 if there is user demand for such a thing.
+
+[endsect] [/vector_use]
+
+[section:foreign_fd How do I configure my own file descriptor or HANDLE in AFIO?]
+
+Sometimes you receive a file descriptor or HANDLE from a third party piece of code and you need to insert it as-in
+into AFIO for use. The solution to this is very simple:
+
+# Subclass __afio_handle__ with a custom implementation for your file descriptor type. In particular, you probably
+will have custom close semantics (e.g. don't close, or invoke third party code to implement close).
+# Instantiate your custom handle implementation, and pass it into `async_file_io_dispatcher_base::adopt()`. This
+will immediately convert your custom handle type into an `async_io_op` suitable for supplying to `read()`, `write()`
+etc.
+# That's it, there is no more to it.
+
+[endsect] [/foreign_fd]
 
 [endsect] [/FAQ]

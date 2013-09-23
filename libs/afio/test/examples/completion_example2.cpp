@@ -7,7 +7,7 @@
 
 int main(void)
 {
-#if !(defined(BOOST_MSVC) && BOOST_MSVC < 1700) && (defined(__GLIBCXX__) && __GLIBCXX__<=20120920 /* <= GCC 4.7 */)
+#if !(defined(BOOST_MSVC) && BOOST_MSVC < 1700) && !(defined(__GLIBCXX__) && __GLIBCXX__<=20120920 /* <= GCC 4.7 */)
     //[completion_example2
     // Create a dispatcher instance
     std::shared_ptr<boost::afio::async_file_io_dispatcher_base> dispatcher=
@@ -39,7 +39,7 @@ int main(void)
         // Create some callable entity which will do the actual completion. It can be
         // anything you like, but you need a minimum of its integer id.
         auto completer=[](std::shared_ptr<boost::afio::async_file_io_dispatcher_base> dispatcher,
-                          size_t id, std::shared_ptr<boost::afio::async_io_handle> h)
+                          size_t id, std::shared_ptr<boost::afio::async_io_handle> h) -> int
         {
             try
             {
@@ -56,6 +56,7 @@ int main(void)
                     boost::afio::current_exception()));
                 dispatcher->complete_async_op(id, h, e);
             }
+			return 0;
         };
         // Bind the id and handle to completer, and enqueue for later asynchronous execution.
         std::async(std::launch::async, completer, dispatcher, id, h);
@@ -73,7 +74,14 @@ int main(void)
     // Schedule an asynchronous call of the completion
     boost::afio::async_io_op op=
         dispatcher->completion(boost::afio::async_io_op() /* no precondition */,
-            std::make_pair(boost::afio::async_op_flags::None, boundf));
+            std::make_pair(
+			    /* Allow me to defer completion */
+				boost::afio::async_op_flags::DetachedFuture
+				/* Complete boundf immediately after its precondition (in this
+				case as there is no precondition that means right now before
+				completion() returns) */
+				| boost::afio::async_op_flags::ImmediateCompletion,
+				boundf));
         
     // Create a boost::future<> representing the ops passed to when_all()
     boost::afio::future<std::vector<std::shared_ptr<boost::afio::async_io_handle>>> future

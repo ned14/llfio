@@ -27,7 +27,7 @@
 <a name="afio.reference.classes.directory_entry"></a><a class="link" href="directory_entry.html" title="directory_entry">directory_entry</a>
 </h4></div></div></div>
 <p>
-          <a class="indexterm" name="id920453"></a>
+          <a class="indexterm" name="id992398"></a>
 The abstract base class for an entry in a directory with lazily filled
           metadata.
         </p>
@@ -220,11 +220,13 @@ The abstract base class for an entry in a directory with lazily filled
 <pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">std</span><span class="special">::</span><span class="identifier">filesystem</span><span class="special">::</span><span class="identifier">path</span> <span class="identifier">name</span><span class="special">()</span></pre>
                 </td>
 <td>
-                  <p>
-                    The name of the directory entry.
-                  </p>
                 </td>
 <td>
+                </td>
+<td>
+                  <p>
+                    The name of the directory entry
+                  </p>
                 </td>
 </tr>
 <tr>
@@ -232,11 +234,13 @@ The abstract base class for an entry in a directory with lazily filled
 <pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">metadata_flags</span> <span class="identifier">metadata_ready</span><span class="special">()</span></pre>
                 </td>
 <td>
-                  <p>
-                    A bitfield of what metadata is ready right now.
-                  </p>
                 </td>
 <td>
+                </td>
+<td>
+                  <p>
+                    A bitfield of what metadata is ready right now
+                  </p>
                 </td>
 </tr>
 <tr>
@@ -246,37 +250,398 @@ The abstract base class for an entry in a directory with lazily filled
 <td>
                   <p>
                     Fetches the specified metadata, returning that newly available.
-                    This is a blocking call.
+                    This is a blocking call if wanted metadata is not yet ready.
                   </p>
                 </td>
 <td>
                   <p>
                     <span class="bold"><strong>std::shared_ptr&lt; async_io_handle &gt;</strong></span>:
-                    <span class="emphasis"><em>dirh</em></span>:
+                    <span class="emphasis"><em>dirh</em></span>: An open handle to the entry's containing
+                    directory. You can get this from the h shared future member variable
+                    in an op ref.
                   </p>
                   <p>
                     <span class="bold"><strong>metadata_flags</strong></span>: <span class="emphasis"><em>wanted</em></span>:
+                    A bitfield of the metadata to fetch. This does not replace existing
+                    metadata.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    The metadata now available in this directory entry.
                   </p>
                 </td>
 </tr>
 <tr>
 <td>
-<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">stat_t</span> <span class="identifier">full_lstat</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span> <span class="identifier">async_io_handle</span> <span class="special">&gt;</span> <span class="identifier">dirh</span><span class="special">,</span> <span class="identifier">metadata_flags</span> <span class="identifier">wanted</span> <span class="special">=</span> <span class="identifier">directory_entry</span><span class="special">::</span><span class="identifier">metadata_fastpath</span><span class="special">())</span></pre>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">stat_t</span> <span class="identifier">fetch_lstat</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span> <span class="identifier">async_io_handle</span> <span class="special">&gt;</span> <span class="identifier">dirh</span><span class="special">,</span> <span class="identifier">metadata_flags</span> <span class="identifier">wanted</span> <span class="special">=</span> <span class="identifier">directory_entry</span><span class="special">::</span><span class="identifier">metadata_fastpath</span><span class="special">())</span></pre>
                 </td>
 <td>
                   <p>
-                    Fetches a fast path <code class="literal"><code class="computeroutput"><span class="identifier">stat_t</span></code></code>
-                    structure which is missing those fields not fast to fetch on
-                    this platform.
+                    Returns a copy of the internal <code class="literal"><code class="computeroutput"><span class="identifier">stat_t</span></code></code>
+                    structure. This is a blocking call if wanted metadata is not
+                    yet ready.
                   </p>
                 </td>
 <td>
                   <p>
                     <span class="bold"><strong>std::shared_ptr&lt; async_io_handle &gt;</strong></span>:
-                    <span class="emphasis"><em>dirh</em></span>:
+                    <span class="emphasis"><em>dirh</em></span>: An open handle to the entry's containing
+                    directory. You can get this from the h shared future member variable
+                    in an op ref.
                   </p>
                   <p>
                     <span class="bold"><strong>metadata_flags</strong></span>: <span class="emphasis"><em>wanted</em></span>:
+                    A bitfield of the metadata to fetch. This does not replace existing
+                    metadata.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    A copy of the internal <code class="literal"><code class="computeroutput"><span class="identifier">stat_t</span></code></code>
+                    structure.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="keyword">decltype</span><span class="special">(</span><span class="identifier">stat_t</span><span class="special">().</span><span class="identifier">st_dev</span><span class="special">)</span> <span class="identifier">st_dev</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span> <span class="identifier">async_io_handle</span> <span class="special">&gt;</span> <span class="identifier">dirh</span> <span class="special">=</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span> <span class="identifier">async_io_handle</span> <span class="special">&gt;())</span></pre>
+                </td>
+<td>
+                  <p>
+                    Returns st_dev.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <span class="bold"><strong>std::shared_ptr&lt; async_io_handle &gt;</strong></span>:
+                    <span class="emphasis"><em>dirh</em></span>: An optional open handle to the entry's
+                    containing directory if fetching missing metadata is desired
+                    (an exception is thrown otherwise). You can get this from the
+                    h shared future member variable in an op ref.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="keyword">decltype</span><span class="special">(</span><span class="identifier">stat_t</span><span class="special">().</span><span class="identifier">st_ino</span><span class="special">)</span> <span class="identifier">st_ino</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span> <span class="identifier">async_io_handle</span> <span class="special">&gt;</span> <span class="identifier">dirh</span> <span class="special">=</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span> <span class="identifier">async_io_handle</span> <span class="special">&gt;())</span></pre>
+                </td>
+<td>
+                  <p>
+                    Returns st_ino.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <span class="bold"><strong>std::shared_ptr&lt; async_io_handle &gt;</strong></span>:
+                    <span class="emphasis"><em>dirh</em></span>: An optional open handle to the entry's
+                    containing directory if fetching missing metadata is desired
+                    (an exception is thrown otherwise). You can get this from the
+                    h shared future member variable in an op ref.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="keyword">decltype</span><span class="special">(</span><span class="identifier">stat_t</span><span class="special">().</span><span class="identifier">st_type</span><span class="special">)</span> <span class="identifier">st_type</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span> <span class="identifier">async_io_handle</span> <span class="special">&gt;</span> <span class="identifier">dirh</span> <span class="special">=</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span> <span class="identifier">async_io_handle</span> <span class="special">&gt;())</span></pre>
+                </td>
+<td>
+                  <p>
+                    Returns st_type.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <span class="bold"><strong>std::shared_ptr&lt; async_io_handle &gt;</strong></span>:
+                    <span class="emphasis"><em>dirh</em></span>: An optional open handle to the entry's
+                    containing directory if fetching missing metadata is desired
+                    (an exception is thrown otherwise). You can get this from the
+                    h shared future member variable in an op ref.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="keyword">decltype</span><span class="special">(</span><span class="identifier">stat_t</span><span class="special">().</span><span class="identifier">st_mode</span><span class="special">)</span> <span class="identifier">st_mode</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span> <span class="identifier">async_io_handle</span> <span class="special">&gt;</span> <span class="identifier">dirh</span> <span class="special">=</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span> <span class="identifier">async_io_handle</span> <span class="special">&gt;())</span></pre>
+                </td>
+<td>
+                  <p>
+                    Returns st_mode.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <span class="bold"><strong>std::shared_ptr&lt; async_io_handle &gt;</strong></span>:
+                    <span class="emphasis"><em>dirh</em></span>: An optional open handle to the entry's
+                    containing directory if fetching missing metadata is desired
+                    (an exception is thrown otherwise). You can get this from the
+                    h shared future member variable in an op ref.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="keyword">decltype</span><span class="special">(</span><span class="identifier">stat_t</span><span class="special">().</span><span class="identifier">st_nlink</span><span class="special">)</span> <span class="identifier">st_nlink</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span> <span class="identifier">async_io_handle</span> <span class="special">&gt;</span> <span class="identifier">dirh</span> <span class="special">=</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span> <span class="identifier">async_io_handle</span> <span class="special">&gt;())</span></pre>
+                </td>
+<td>
+                  <p>
+                    Returns st_nlink.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <span class="bold"><strong>std::shared_ptr&lt; async_io_handle &gt;</strong></span>:
+                    <span class="emphasis"><em>dirh</em></span>: An optional open handle to the entry's
+                    containing directory if fetching missing metadata is desired
+                    (an exception is thrown otherwise). You can get this from the
+                    h shared future member variable in an op ref.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="keyword">decltype</span><span class="special">(</span><span class="identifier">stat_t</span><span class="special">().</span><span class="identifier">st_uid</span><span class="special">)</span> <span class="identifier">st_uid</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span> <span class="identifier">async_io_handle</span> <span class="special">&gt;</span> <span class="identifier">dirh</span> <span class="special">=</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span> <span class="identifier">async_io_handle</span> <span class="special">&gt;())</span></pre>
+                </td>
+<td>
+                  <p>
+                    Returns st_uid.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <span class="bold"><strong>std::shared_ptr&lt; async_io_handle &gt;</strong></span>:
+                    <span class="emphasis"><em>dirh</em></span>: An optional open handle to the entry's
+                    containing directory if fetching missing metadata is desired
+                    (an exception is thrown otherwise). You can get this from the
+                    h shared future member variable in an op ref.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="keyword">decltype</span><span class="special">(</span><span class="identifier">stat_t</span><span class="special">().</span><span class="identifier">st_gid</span><span class="special">)</span> <span class="identifier">st_gid</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span> <span class="identifier">async_io_handle</span> <span class="special">&gt;</span> <span class="identifier">dirh</span> <span class="special">=</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span> <span class="identifier">async_io_handle</span> <span class="special">&gt;())</span></pre>
+                </td>
+<td>
+                  <p>
+                    Returns st_gid.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <span class="bold"><strong>std::shared_ptr&lt; async_io_handle &gt;</strong></span>:
+                    <span class="emphasis"><em>dirh</em></span>: An optional open handle to the entry's
+                    containing directory if fetching missing metadata is desired
+                    (an exception is thrown otherwise). You can get this from the
+                    h shared future member variable in an op ref.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="keyword">decltype</span><span class="special">(</span><span class="identifier">stat_t</span><span class="special">().</span><span class="identifier">st_rdev</span><span class="special">)</span> <span class="identifier">st_rdev</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span> <span class="identifier">async_io_handle</span> <span class="special">&gt;</span> <span class="identifier">dirh</span> <span class="special">=</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span> <span class="identifier">async_io_handle</span> <span class="special">&gt;())</span></pre>
+                </td>
+<td>
+                  <p>
+                    Returns st_rdev.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <span class="bold"><strong>std::shared_ptr&lt; async_io_handle &gt;</strong></span>:
+                    <span class="emphasis"><em>dirh</em></span>: An optional open handle to the entry's
+                    containing directory if fetching missing metadata is desired
+                    (an exception is thrown otherwise). You can get this from the
+                    h shared future member variable in an op ref.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="keyword">decltype</span><span class="special">(</span><span class="identifier">stat_t</span><span class="special">().</span><span class="identifier">st_atim</span><span class="special">)</span> <span class="identifier">st_atim</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span> <span class="identifier">async_io_handle</span> <span class="special">&gt;</span> <span class="identifier">dirh</span> <span class="special">=</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span> <span class="identifier">async_io_handle</span> <span class="special">&gt;())</span></pre>
+                </td>
+<td>
+                  <p>
+                    Returns st_atim.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <span class="bold"><strong>std::shared_ptr&lt; async_io_handle &gt;</strong></span>:
+                    <span class="emphasis"><em>dirh</em></span>: An optional open handle to the entry's
+                    containing directory if fetching missing metadata is desired
+                    (an exception is thrown otherwise). You can get this from the
+                    h shared future member variable in an op ref.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="keyword">decltype</span><span class="special">(</span><span class="identifier">stat_t</span><span class="special">().</span><span class="identifier">st_mtim</span><span class="special">)</span> <span class="identifier">st_mtim</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span> <span class="identifier">async_io_handle</span> <span class="special">&gt;</span> <span class="identifier">dirh</span> <span class="special">=</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span> <span class="identifier">async_io_handle</span> <span class="special">&gt;())</span></pre>
+                </td>
+<td>
+                  <p>
+                    Returns st_mtim.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <span class="bold"><strong>std::shared_ptr&lt; async_io_handle &gt;</strong></span>:
+                    <span class="emphasis"><em>dirh</em></span>: An optional open handle to the entry's
+                    containing directory if fetching missing metadata is desired
+                    (an exception is thrown otherwise). You can get this from the
+                    h shared future member variable in an op ref.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="keyword">decltype</span><span class="special">(</span><span class="identifier">stat_t</span><span class="special">().</span><span class="identifier">st_ctim</span><span class="special">)</span> <span class="identifier">st_ctim</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span> <span class="identifier">async_io_handle</span> <span class="special">&gt;</span> <span class="identifier">dirh</span> <span class="special">=</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span> <span class="identifier">async_io_handle</span> <span class="special">&gt;())</span></pre>
+                </td>
+<td>
+                  <p>
+                    Returns st_ctim.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <span class="bold"><strong>std::shared_ptr&lt; async_io_handle &gt;</strong></span>:
+                    <span class="emphasis"><em>dirh</em></span>: An optional open handle to the entry's
+                    containing directory if fetching missing metadata is desired
+                    (an exception is thrown otherwise). You can get this from the
+                    h shared future member variable in an op ref.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="keyword">decltype</span><span class="special">(</span><span class="identifier">stat_t</span><span class="special">().</span><span class="identifier">st_size</span><span class="special">)</span> <span class="identifier">st_size</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span> <span class="identifier">async_io_handle</span> <span class="special">&gt;</span> <span class="identifier">dirh</span> <span class="special">=</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span> <span class="identifier">async_io_handle</span> <span class="special">&gt;())</span></pre>
+                </td>
+<td>
+                  <p>
+                    Returns st_size.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <span class="bold"><strong>std::shared_ptr&lt; async_io_handle &gt;</strong></span>:
+                    <span class="emphasis"><em>dirh</em></span>: An optional open handle to the entry's
+                    containing directory if fetching missing metadata is desired
+                    (an exception is thrown otherwise). You can get this from the
+                    h shared future member variable in an op ref.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="keyword">decltype</span><span class="special">(</span><span class="identifier">stat_t</span><span class="special">().</span><span class="identifier">st_allocated</span><span class="special">)</span> <span class="identifier">st_allocated</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span> <span class="identifier">async_io_handle</span> <span class="special">&gt;</span> <span class="identifier">dirh</span> <span class="special">=</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span> <span class="identifier">async_io_handle</span> <span class="special">&gt;())</span></pre>
+                </td>
+<td>
+                  <p>
+                    Returns st_allocated.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <span class="bold"><strong>std::shared_ptr&lt; async_io_handle &gt;</strong></span>:
+                    <span class="emphasis"><em>dirh</em></span>: An optional open handle to the entry's
+                    containing directory if fetching missing metadata is desired
+                    (an exception is thrown otherwise). You can get this from the
+                    h shared future member variable in an op ref.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="keyword">decltype</span><span class="special">(</span><span class="identifier">stat_t</span><span class="special">().</span><span class="identifier">st_blocks</span><span class="special">)</span> <span class="identifier">st_blocks</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span> <span class="identifier">async_io_handle</span> <span class="special">&gt;</span> <span class="identifier">dirh</span> <span class="special">=</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span> <span class="identifier">async_io_handle</span> <span class="special">&gt;())</span></pre>
+                </td>
+<td>
+                  <p>
+                    Returns st_blocks.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <span class="bold"><strong>std::shared_ptr&lt; async_io_handle &gt;</strong></span>:
+                    <span class="emphasis"><em>dirh</em></span>: An optional open handle to the entry's
+                    containing directory if fetching missing metadata is desired
+                    (an exception is thrown otherwise). You can get this from the
+                    h shared future member variable in an op ref.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="keyword">decltype</span><span class="special">(</span><span class="identifier">stat_t</span><span class="special">().</span><span class="identifier">st_blksize</span><span class="special">)</span> <span class="identifier">st_blksize</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span> <span class="identifier">async_io_handle</span> <span class="special">&gt;</span> <span class="identifier">dirh</span> <span class="special">=</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span> <span class="identifier">async_io_handle</span> <span class="special">&gt;())</span></pre>
+                </td>
+<td>
+                  <p>
+                    Returns st_blksize.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <span class="bold"><strong>std::shared_ptr&lt; async_io_handle &gt;</strong></span>:
+                    <span class="emphasis"><em>dirh</em></span>: An optional open handle to the entry's
+                    containing directory if fetching missing metadata is desired
+                    (an exception is thrown otherwise). You can get this from the
+                    h shared future member variable in an op ref.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="keyword">decltype</span><span class="special">(</span><span class="identifier">stat_t</span><span class="special">().</span><span class="identifier">st_flags</span><span class="special">)</span> <span class="identifier">st_flags</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span> <span class="identifier">async_io_handle</span> <span class="special">&gt;</span> <span class="identifier">dirh</span> <span class="special">=</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span> <span class="identifier">async_io_handle</span> <span class="special">&gt;())</span></pre>
+                </td>
+<td>
+                  <p>
+                    Returns st_flags.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <span class="bold"><strong>std::shared_ptr&lt; async_io_handle &gt;</strong></span>:
+                    <span class="emphasis"><em>dirh</em></span>: An optional open handle to the entry's
+                    containing directory if fetching missing metadata is desired
+                    (an exception is thrown otherwise). You can get this from the
+                    h shared future member variable in an op ref.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="keyword">decltype</span><span class="special">(</span><span class="identifier">stat_t</span><span class="special">().</span><span class="identifier">st_gen</span><span class="special">)</span> <span class="identifier">st_gen</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span> <span class="identifier">async_io_handle</span> <span class="special">&gt;</span> <span class="identifier">dirh</span> <span class="special">=</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span> <span class="identifier">async_io_handle</span> <span class="special">&gt;())</span></pre>
+                </td>
+<td>
+                  <p>
+                    Returns st_gen.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <span class="bold"><strong>std::shared_ptr&lt; async_io_handle &gt;</strong></span>:
+                    <span class="emphasis"><em>dirh</em></span>: An optional open handle to the entry's
+                    containing directory if fetching missing metadata is desired
+                    (an exception is thrown otherwise). You can get this from the
+                    h shared future member variable in an op ref.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="keyword">decltype</span><span class="special">(</span><span class="identifier">stat_t</span><span class="special">().</span><span class="identifier">st_birthtim</span><span class="special">)</span> <span class="identifier">st_birthtim</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span> <span class="identifier">async_io_handle</span> <span class="special">&gt;</span> <span class="identifier">dirh</span> <span class="special">=</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span> <span class="identifier">async_io_handle</span> <span class="special">&gt;())</span></pre>
+                </td>
+<td>
+                  <p>
+                    Returns st_birthtim.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <span class="bold"><strong>std::shared_ptr&lt; async_io_handle &gt;</strong></span>:
+                    <span class="emphasis"><em>dirh</em></span>: An optional open handle to the entry's
+                    containing directory if fetching missing metadata is desired
+                    (an exception is thrown otherwise). You can get this from the
+                    h shared future member variable in an op ref.
                   </p>
                 </td>
 </tr>
@@ -286,7 +651,8 @@ The abstract base class for an entry in a directory with lazily filled
                 </td>
 <td>
                   <p>
-                    Returns st_dev.
+                    A bitfield of what metadata is available on this platform. This
+                    doesn't mean all is available for every filing system.
                   </p>
                 </td>
 <td>

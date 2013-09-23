@@ -128,21 +128,23 @@ directories, so `include` directives of this scheme will work:
 
 # Download the latest version of the Boost Libraries from boost.org. 
   At the time of writing the current version is Boost 1.54. 
-  Boost AFIO will is not compatible with earlier versions of Boost, 
+  Boost AFIO is not compatible with earlier versions of Boost, 
   so be sure to use a current copy of the Boost Libraries. 
 
 
-# Download Boost AFIO through GitHub at : https://github.com/BoostGSoC/boost.afio
+# Download Boost AFIO through GitHub at : [@https://github.com/BoostGSoC/boost.afio https://github.com/BoostGSoC/boost.afio]
   We recommend using a git repository, as it will allow for future updates. If you are unfamiliar 
-  with git, check the git hub website for instructions on how to use git. This is a good place to 
+  with git, check the github website for instructions on how to use git. This is a good place to 
   start: [@https://help.github.com/articles/set-up-git]
 
 
 # After you have a copy of AFIO you have a few options to add it to Boost.
 
-    # You can create a symbolic link of the AFIO library into your boost installation
+    # You can create a symbolic link of the AFIO library into your boost installation.
+	The primary advantage of this method is that you can easily pull updates to AFIO
+	with little work.
     
-    On linux the command will be :
+    On POSIX the command will be :
 
         ``
             $ ln -s /path/to/boost.afio/boost/afio/ /path/to/boost_directory/boost/afio
@@ -173,7 +175,7 @@ directories, so `include` directives of this scheme will work:
     [@http://technet.microsoft.com/en-CA/sysinternals/bb896768.aspx]
 
 
-    # You can copy it directly into Boost. 
+    # You can copy it directly into Boost. This is the method least likely to have problems.
     
     It may be preferable to forgo symbolic links altogether and simply copy the 
     [^boost.afio/boost/afio] and [^boost.afio/libs/afio] into [^boost_directory/boost] 
@@ -218,6 +220,8 @@ moment.
                 the [*--test=] option to only compile and link a specific subset of unit tests.
                 Note that [*--link-test] supersedes [*--test-all] and [*--test-each] options,
                 and cannot be combined with the other tests. 
+
+* [*--running-on-ci]: will compile, link and execute only those tests which don't use `fsync()`.
 
 * [*--test-all]:  will run a comprehensive unit tests that combines all the other unit tests into a single 
                 continuous test. This is useful to detect errors that will only show up at longer running 

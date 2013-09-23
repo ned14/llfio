@@ -95,7 +95,7 @@ BOOST_SCOPED_ENUM_DECLARE_END(allocator_alignment)
 
 Stolen from http://stackoverflow.com/questions/12942548/making-stdvector-allocate-aligned-memory
 */
-template <typename T, size_t Align=std::alignment_of<T>::value>
+template <typename T, size_t Align=std::alignment_of<T>::value, bool initialize=true>
 class aligned_allocator
 {
 public:
@@ -111,14 +111,14 @@ public:
     typedef std::true_type propagate_on_container_move_assignment;
 
     template <class U>
-    struct rebind { typedef aligned_allocator<U, Align> other; };
+    struct rebind { typedef aligned_allocator<U, Align, initialize> other; };
 
 public:
     aligned_allocator() BOOST_NOEXCEPT_OR_NOTHROW
     {}
 
     template <class U>
-    aligned_allocator(const aligned_allocator<U, Align>&) BOOST_NOEXCEPT_OR_NOTHROW
+    aligned_allocator(const aligned_allocator<U, Align, initialize>&) BOOST_NOEXCEPT_OR_NOTHROW
     {}
 
     size_type
@@ -134,7 +134,7 @@ public:
     { return std::addressof(x); }
 
     pointer
-    allocate(size_type n, typename aligned_allocator<void, Align>::const_pointer = 0)
+    allocate(size_type n, typename aligned_allocator<void, Align, initialize>::const_pointer = 0)
     {
         const size_type alignment = static_cast<size_type>( Align );
         void* ptr = detail::allocate_aligned_memory(alignment , n * sizeof(T));
@@ -153,11 +153,11 @@ public:
     template <class U, class ...Args>
     void
     construct(U* p, Args&&... args)
-    { ::new(reinterpret_cast<void*>(p)) U(std::forward<Args>(args)...); }
+    { if(initialize || !std::is_same<char, U>::value) ::new(reinterpret_cast<void*>(p)) U(std::forward<Args>(args)...); }
 #else
 	void construct( pointer p, const_reference val )
 	{
-		::new(reinterpret_cast<void*>(p)) T(val);
+		if(initialize || !std::is_same<char, T>::value) ::new(reinterpret_cast<void*>(p)) T(val);
 	}
 #endif
 
@@ -166,7 +166,7 @@ public:
     { (void) p; p->~T(); }
 };
 
-template <size_t Align> class aligned_allocator<void, Align>
+template <size_t Align, bool initialize> class aligned_allocator<void, Align, initialize>
 {
 public:
     typedef void         value_type;
@@ -178,7 +178,7 @@ public:
     typedef ptrdiff_t difference_type;
 	enum { alignment=Align };
 };
-template <size_t Align> class aligned_allocator<const void, Align>
+template <size_t Align, bool initialize> class aligned_allocator<const void, Align, initialize>
 {
 public:
     typedef const void         value_type;
@@ -191,8 +191,8 @@ public:
 	enum { alignment=Align };
 };
 
-template <typename T, size_t Align>
-class aligned_allocator<const T, Align>
+template <typename T, size_t Align, bool initialize>
+class aligned_allocator<const T, Align, initialize>
 {
 public:
     typedef T         value_type;
@@ -207,14 +207,14 @@ public:
     typedef std::true_type propagate_on_container_move_assignment;
 
     template <class U>
-    struct rebind { typedef aligned_allocator<U, Align> other; };
+    struct rebind { typedef aligned_allocator<U, Align, initialize> other; };
 
 public:
     aligned_allocator() BOOST_NOEXCEPT_OR_NOTHROW
     {}
 
     template <class U>
-    aligned_allocator(const aligned_allocator<U, Align>&) BOOST_NOEXCEPT_OR_NOTHROW
+    aligned_allocator(const aligned_allocator<U, Align, initialize>&) BOOST_NOEXCEPT_OR_NOTHROW
     {}
 
     size_type
@@ -226,7 +226,7 @@ public:
     { return std::addressof(x); }
 
     pointer
-    allocate(size_type n, typename aligned_allocator<void, Align>::const_pointer = 0)
+    allocate(size_type n, typename aligned_allocator<void, Align, initialize>::const_pointer = 0)
     {
         const size_type alignment = static_cast<size_type>( Align );
         void* ptr = detail::allocate_aligned_memory(alignment , n * sizeof(T));
@@ -245,14 +245,14 @@ public:
     template <class U, class ...Args>
     void
     construct(U* p, Args&&... args)
-    { ::new(reinterpret_cast<void*>(p)) U(std::forward<Args>(args)...); }
+    { if(initialize || !std::is_same<char, U>::value) ::new(reinterpret_cast<void*>(p)) U(std::forward<Args>(args)...); }
 #else
     #define BOOST_PP_LOCAL_MACRO(N)                                             \
     template <class U                                                           \
     BOOST_PP_ENUM_TRAILING_PARAMS(N, class A)>                                  \
     void                                                                        \
     construct(U* p BOOST_PP_ENUM__TRAILING_BINARY_PARAMS(N, A, a))              \
-    { ::new(reinterpret_cast<void*>(p)) U(std::forward<A0>(a0) BOOST_PP_ENUM_SHIFTED_BINARY_PARAMS(N, A, a)); }
+	{ if(initialize || !std::is_same<char, U>::value) ::new(reinterpret_cast<void*>(p)) U(std::forward<A0>(a0) BOOST_PP_ENUM_SHIFTED_BINARY_PARAMS(N, A, a)); }
 #endif
 
     void
@@ -260,16 +260,16 @@ public:
     { p->~T(); }
 };
 
-template <typename T, size_t TAlign, typename U, size_t UAlign>
+template <typename T, size_t TAlign, bool Tinit, typename U, size_t UAlign, bool Uinit>
 inline
 bool
-operator== (const aligned_allocator<T,TAlign>&, const aligned_allocator<U, UAlign>&) BOOST_NOEXCEPT_OR_NOTHROW
+operator== (const aligned_allocator<T,TAlign,Tinit>&, const aligned_allocator<U, UAlign, Uinit>&) BOOST_NOEXCEPT_OR_NOTHROW
 { return TAlign == UAlign; }
 
-template <typename T, size_t TAlign, typename U, size_t UAlign>
+template <typename T, size_t TAlign, bool Tinit, typename U, size_t UAlign, bool Uinit>
 inline
 bool
-operator!= (const aligned_allocator<T,TAlign>&, const aligned_allocator<U, UAlign>&) BOOST_NOEXCEPT_OR_NOTHROW
+operator!= (const aligned_allocator<T,TAlign,Tinit>&, const aligned_allocator<U, UAlign, Uinit>&) BOOST_NOEXCEPT_OR_NOTHROW
 { return TAlign != UAlign; }
 
 

@@ -28,7 +28,7 @@
           (batch)</a>
 </h5></div></div></div>
 <p>
-            <a class="indexterm" name="id912821"></a>
+            <a class="indexterm" name="id983188"></a>
 Schedule an asynchronous synchronisation of preceding operations.
           </p>
 <h6>
@@ -134,9 +134,67 @@ Schedule an asynchronous synchronisation of preceding operations.
 <a name="afio.reference.classes.async_file_io_dispatcher_base.barrier.h7"></a>
             <span class="phrase"><a name="afio.reference.classes.async_file_io_dispatcher_base.barrier.example"></a></span><a class="link" href="barrier.html#afio.reference.classes.async_file_io_dispatcher_base.barrier.example">Example</a>
           </h6>
-<p>
-            [barrier_example]
-          </p>
+<pre class="programlisting"><span class="comment">// Assume that groups is 10,000 items long with item.first being randomly</span>
+<span class="comment">// between 1 and 500. This example is adapted from the barrier() unit test.</span>
+<span class="comment">//</span>
+<span class="comment">// What we're going to do is this: for each item in groups, schedule item.first</span>
+<span class="comment">// parallel ops and a barrier which completes only when the last of that</span>
+<span class="comment">// parallel group completes. Chain the next group to only execute after the</span>
+<span class="comment">// preceding group's barrier completes. Repeat until all groups have been executed.</span>
+<span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_file_io_dispatcher_base</span><span class="special">&gt;</span> <span class="identifier">dispatcher</span><span class="special">=</span>
+    <span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">make_async_file_io_dispatcher</span><span class="special">();</span>
+<span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">pair</span><span class="special">&lt;</span><span class="identifier">size_t</span><span class="special">,</span> <span class="keyword">int</span><span class="special">&gt;&gt;</span> <span class="identifier">groups</span><span class="special">;</span>
+<span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">atomic</span><span class="special">&lt;</span><span class="identifier">size_t</span><span class="special">&gt;</span> <span class="identifier">callcount</span><span class="special">[</span><span class="number">10000</span><span class="special">];</span>
+<span class="identifier">memset</span><span class="special">(&amp;</span><span class="identifier">callcount</span><span class="special">,</span> <span class="number">0</span><span class="special">,</span> <span class="keyword">sizeof</span><span class="special">(</span><span class="identifier">callcount</span><span class="special">));</span>
+
+<span class="comment">// This lambda is what each parallel op in each group will do: increment an atomic</span>
+<span class="comment">// for that group.</span>
+<span class="keyword">auto</span> <span class="identifier">inccount</span> <span class="special">=</span> <span class="special">[](</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">atomic</span><span class="special">&lt;</span><span class="identifier">size_t</span><span class="special">&gt;</span> <span class="special">*</span><span class="identifier">count</span><span class="special">){</span> <span class="special">(*</span><span class="identifier">count</span><span class="special">)++;</span> <span class="special">};</span>
+
+<span class="comment">// This lambda is called after each barrier completes, and it checks that exactly</span>
+<span class="comment">// the right number of inccount lambdas were executed.</span>
+<span class="keyword">auto</span> <span class="identifier">verifybarrier</span> <span class="special">=</span> <span class="special">[](</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">atomic</span><span class="special">&lt;</span><span class="identifier">size_t</span><span class="special">&gt;</span> <span class="special">*</span><span class="identifier">count</span><span class="special">,</span> <span class="identifier">size_t</span> <span class="identifier">shouldbe</span><span class="special">)</span>
+<span class="special">{</span>
+    <span class="keyword">if</span> <span class="special">(*</span><span class="identifier">count</span> <span class="special">!=</span> <span class="identifier">shouldbe</span><span class="special">)</span>
+        <span class="keyword">throw</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">runtime_error</span><span class="special">(</span><span class="string">"Count was not what it should have been!"</span><span class="special">);</span>
+    <span class="keyword">return</span> <span class="keyword">true</span><span class="special">;</span>
+<span class="special">};</span>
+
+<span class="comment">// For each group, dispatch ops and a barrier for them</span>
+<span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_io_op</span> <span class="identifier">next</span><span class="special">;</span>
+<span class="keyword">bool</span> <span class="identifier">isfirst</span> <span class="special">=</span> <span class="keyword">true</span><span class="special">;</span>
+<span class="keyword">for</span><span class="special">(</span><span class="keyword">auto</span> <span class="special">&amp;</span><span class="identifier">run</span> <span class="special">:</span> <span class="identifier">groups</span><span class="special">)</span>
+<span class="special">{</span>
+    <span class="comment">// Create a vector of run.first size of bound inccount lambdas</span>
+    <span class="comment">// This will be the batch issued for this group</span>
+    <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">function</span><span class="special">&lt;</span><span class="keyword">void</span><span class="special">()&gt;&gt;</span> <span class="identifier">thisgroupcalls</span><span class="special">(</span><span class="identifier">run</span><span class="special">.</span><span class="identifier">first</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">bind</span><span class="special">(</span><span class="identifier">inccount</span><span class="special">,</span> <span class="special">&amp;</span><span class="identifier">callcount</span><span class="special">[</span><span class="identifier">run</span><span class="special">.</span><span class="identifier">second</span><span class="special">]));</span>
+    <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_io_op</span><span class="special">&gt;</span> <span class="identifier">thisgroupcallops</span><span class="special">;</span>
+    <span class="comment">// If this is the first item, schedule without precondition</span>
+    <span class="keyword">if</span> <span class="special">(</span><span class="identifier">isfirst</span><span class="special">)</span>
+    <span class="special">{</span>
+        <span class="identifier">thisgroupcallops</span> <span class="special">=</span> <span class="identifier">dispatcher</span><span class="special">-&gt;</span><span class="identifier">call</span><span class="special">(</span><span class="identifier">thisgroupcalls</span><span class="special">).</span><span class="identifier">second</span><span class="special">;</span>
+        <span class="identifier">isfirst</span> <span class="special">=</span> <span class="keyword">false</span><span class="special">;</span>
+    <span class="special">}</span>
+    <span class="keyword">else</span>
+    <span class="special">{</span>
+        <span class="comment">// Create a vector of run.first size of preconditions exactly</span>
+        <span class="comment">// matching the number in this batch. Note that the precondition</span>
+        <span class="comment">// for all of these is the preceding verify op</span>
+        <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_io_op</span><span class="special">&gt;</span> <span class="identifier">dependency</span><span class="special">(</span><span class="identifier">run</span><span class="special">.</span><span class="identifier">first</span><span class="special">,</span> <span class="identifier">next</span><span class="special">);</span>
+        <span class="identifier">thisgroupcallops</span> <span class="special">=</span> <span class="identifier">dispatcher</span><span class="special">-&gt;</span><span class="identifier">call</span><span class="special">(</span><span class="identifier">dependency</span><span class="special">,</span> <span class="identifier">thisgroupcalls</span><span class="special">).</span><span class="identifier">second</span><span class="special">;</span>
+    <span class="special">}</span>
+    <span class="comment">// barrier() is very easy: its number of output ops exactly matches its input</span>
+    <span class="comment">// but none of the output will complete until the last of the input completes</span>
+    <span class="keyword">auto</span> <span class="identifier">thisgroupbarriered</span> <span class="special">=</span> <span class="identifier">dispatcher</span><span class="special">-&gt;</span><span class="identifier">barrier</span><span class="special">(</span><span class="identifier">thisgroupcallops</span><span class="special">);</span>
+    <span class="comment">// Schedule a call of the verify lambda once barrier completes. Here we choose</span>
+    <span class="comment">// the first item of the barrier's return, but in truth any of them are good.</span>
+    <span class="keyword">auto</span> <span class="identifier">verify</span> <span class="special">=</span> <span class="identifier">dispatcher</span><span class="special">-&gt;</span><span class="identifier">call</span><span class="special">(</span><span class="identifier">thisgroupbarriered</span><span class="special">.</span><span class="identifier">front</span><span class="special">(),</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">function</span><span class="special">&lt;</span><span class="keyword">bool</span><span class="special">()&gt;(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">bind</span><span class="special">(</span><span class="identifier">verifybarrier</span><span class="special">,</span> <span class="special">&amp;</span><span class="identifier">callcount</span><span class="special">[</span><span class="identifier">run</span><span class="special">.</span><span class="identifier">second</span><span class="special">],</span> <span class="identifier">run</span><span class="special">.</span><span class="identifier">first</span><span class="special">)));</span>
+    <span class="comment">// Set the dependency for the next batch to be the just scheduled verify op</span>
+    <span class="identifier">next</span> <span class="special">=</span> <span class="identifier">verify</span><span class="special">.</span><span class="identifier">second</span><span class="special">;</span>
+<span class="special">}</span>
+<span class="comment">// next was the last op scheduled, so waiting on it waits on everything</span>
+<span class="identifier">when_all</span><span class="special">(</span><span class="identifier">next</span><span class="special">).</span><span class="identifier">wait</span><span class="special">();</span>
+</pre>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
 <td align="left"></td>

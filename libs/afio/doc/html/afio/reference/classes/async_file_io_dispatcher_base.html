@@ -37,6 +37,10 @@
           (batch bound functions without preconditions)</a></span></dt>
 <dt><span class="section"><a href="async_file_io_dispatcher_base/call_3_single_unbound_callable.html">call
           (single unbound callable)</a></span></dt>
+<dt><span class="section"><a href="async_file_io_dispatcher_base/adopt_1_batch.html">adopt
+          (batch)</a></span></dt>
+<dt><span class="section"><a href="async_file_io_dispatcher_base/adopt_1_single.html">adopt
+          (single)</a></span></dt>
 <dt><span class="section"><a href="async_file_io_dispatcher_base/close_1_batch.html">close
           (batch)</a></span></dt>
 <dt><span class="section"><a href="async_file_io_dispatcher_base/close_1_single.html">close
@@ -90,7 +94,7 @@
 <dt><span class="section"><a href="async_file_io_dispatcher_base/page_size.html">page_size</a></span></dt>
 </dl></div>
 <p>
-          <a class="indexterm" name="id879203"></a>
+          <a class="indexterm" name="id904617"></a>
 Abstract base class for dispatching file i/o asynchronously.
         </p>
 <h6>
@@ -241,6 +245,30 @@ Abstract base class for dispatching file i/o asynchronously.
 </tr>
 <tr>
 <td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">async_io_op</span> <span class="identifier">op_from_scheduled_id</span><span class="special">(</span><span class="identifier">size_t</span> <span class="identifier">id</span><span class="special">)</span></pre>
+                </td>
+<td>
+                  <p>
+                    Returns an op ref for a given <span class="bold"><strong>currently</strong></span><span class="bold"><strong>scheduled</strong></span> op id, throwing a fatal exception
+                    if id not scheduled at the point of call. Can be used to retrieve
+                    exception state from some op id, or one's own shared future.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <span class="bold"><strong>size_t</strong></span>: <span class="emphasis"><em>id</em></span>:
+                    The unique integer id for the op.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    An async_io_op with the same shared future as all op refs with
+                    this id.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
 <pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">async_io_op</span> <span class="special">&gt;</span> <span class="identifier">completion</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">async_io_op</span> <span class="special">&gt;</span> <span class="special">&amp;</span> <span class="identifier">ops</span><span class="special">,</span> <span class="keyword">const</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">pair</span><span class="special">&lt;</span> <span class="identifier">async_op_flags</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">function</span><span class="special">&lt;</span> <span class="identifier">async_file_io_dispatcher_base</span><span class="special">::</span><span class="identifier">completion_t</span> <span class="special">&gt;&gt;&gt;</span> <span class="special">&amp;</span> <span class="identifier">callbacks</span><span class="special">)</span></pre>
                 </td>
 <td>
@@ -385,7 +413,7 @@ Abstract base class for dispatching file i/o asynchronously.
 <tr>
 <td>
 <pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">C</span><span class="special">,</span> <span class="keyword">class</span><span class="special">...</span> <span class="identifier">Args</span><span class="special">&gt;</span>
-<span class="identifier">std</span><span class="special">::</span><span class="identifier">pair</span><span class="special">&lt;</span> <span class="identifier">future</span><span class="special">&lt;</span> <span class="keyword">typename</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">result_of</span><span class="special">&lt;</span> <span class="identifier">C</span><span class="special">(</span><span class="identifier">Args</span><span class="special">...)&gt;::</span><span class="identifier">type</span> <span class="special">&gt;,</span> <span class="identifier">async_io_op</span> <span class="special">&gt;</span> <span class="identifier">call</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">async_io_op</span> <span class="special">&amp;</span> <span class="identifier">req</span><span class="special">,</span> <span class="identifier">C</span> <span class="identifier">callback</span><span class="special">,</span> <span class="identifier">Args</span><span class="special">...</span> <span class="identifier">args</span><span class="special">)</span></pre>
+<span class="identifier">std</span><span class="special">::</span><span class="identifier">pair</span><span class="special">&lt;</span> <span class="identifier">future</span><span class="special">&lt;</span> <span class="keyword">typename</span> <span class="identifier">detail</span><span class="special">::</span><span class="identifier">vs2013_variadic_overload_resolution_workaround</span><span class="special">&lt;</span> <span class="identifier">C</span><span class="special">,</span> <span class="identifier">Args</span><span class="special">...&gt;::</span><span class="identifier">type</span> <span class="special">&gt;,</span> <span class="identifier">async_io_op</span> <span class="special">&gt;</span> <span class="identifier">call</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">async_io_op</span> <span class="special">&amp;</span> <span class="identifier">req</span><span class="special">,</span> <span class="identifier">C</span> <span class="identifier">callback</span><span class="special">,</span> <span class="identifier">Args</span><span class="special">...</span> <span class="identifier">args</span><span class="special">)</span></pre>
                 </td>
 <td>
                   <p>
@@ -416,6 +444,49 @@ Abstract base class for dispatching file i/o asynchronously.
                   <p>
                     A pair with a future returning the result of the callable and
                     an op handle.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">async_io_op</span> <span class="special">&gt;</span> <span class="identifier">adopt</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span> <span class="identifier">async_io_handle</span> <span class="special">&gt;&gt;</span> <span class="special">&amp;</span> <span class="identifier">hs</span><span class="special">)</span></pre>
+                </td>
+<td>
+                  <p>
+                    Schedule a batch of third party handle adoptions.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <span class="bold"><strong>const std::vector&lt; std::shared_ptr&lt;
+                    async_io_handle &gt;&gt; &amp;</strong></span>: <span class="emphasis"><em>hs</em></span>:
+                    A batch of handles to adopt.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    A batch of op handles.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">async_io_op</span> <span class="identifier">adopt</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span> <span class="identifier">async_io_handle</span> <span class="special">&gt;</span> <span class="identifier">h</span><span class="special">)</span></pre>
+                </td>
+<td>
+                  <p>
+                    Schedule an adoption of a third party handle.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <span class="bold"><strong>std::shared_ptr&lt; async_io_handle &gt;</strong></span>:
+                    <span class="emphasis"><em>h</em></span>: A handle to adopt.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    An op handle.
                   </p>
                 </td>
 </tr>

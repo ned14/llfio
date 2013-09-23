@@ -7,7 +7,7 @@
 <link rel="home" href="../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 0.1">
 <link rel="up" href="../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 0.1">
 <link rel="prev" href="compilation.html" title="Compilation">
-<link rel="next" href="quickstart/closure_execution_engines.html" title="Closure Execution Engines">
+<link rel="next" href="quickstart/async_file_io.html" title="Asynchronous file i/o">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
 <table cellpadding="2" width="100%"><tr>
@@ -20,31 +20,75 @@
 </tr></table>
 <hr>
 <div class="spirit-nav">
-<a accesskey="p" href="compilation.html"><img src="../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="quickstart/closure_execution_engines.html"><img src="../../../doc/src/images/next.png" alt="Next"></a>
+<a accesskey="p" href="compilation.html"><img src="../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="quickstart/async_file_io.html"><img src="../../../doc/src/images/next.png" alt="Next"></a>
 </div>
 <div class="section">
 <div class="titlepage"><div><div><h2 class="title" style="clear: both">
 <a name="afio.quickstart"></a><a class="link" href="quickstart.html" title="Quick Start">Quick Start</a>
 </h2></div></div></div>
 <div class="toc"><dl class="toc">
-<dt><span class="section"><a href="quickstart/closure_execution_engines.html">Closure Execution
-      Engines</a></span></dt>
+<dt><span class="section"><a href="quickstart/async_file_io.html">Asynchronous file i/o</a></span></dt>
 <dd><dl>
-<dt><span class="section"><a href="quickstart/closure_execution_engines/the_basics.html">The
-        Basics</a></span></dt>
-<dd><dl><dt><span class="section"><a href="quickstart/closure_execution_engines/the_basics/examples.html">Examples</a></span></dt></dl></dd>
-<dt><span class="section"><a href="quickstart/closure_execution_engines/how_boost_afio_relates_to_exisit.html">How
+<dt><span class="section"><a href="quickstart/async_file_io/hello_world.html">Hello World,
+        asynchronously!</a></span></dt>
+<dt><span class="section"><a href="quickstart/async_file_io/so_what.html">What benefit
+        does asynchronous file i/o bring me?</a></span></dt>
+</dl></dd>
+<dt><span class="section"><a href="quickstart/closure_engine.html">Closure Execution Engines</a></span></dt>
+<dd><dl>
+<dt><span class="section"><a href="quickstart/closure_engine/the_basics.html">The Basics</a></span></dt>
+<dd><dl><dt><span class="section"><a href="quickstart/closure_engine/the_basics/examples.html">Examples</a></span></dt></dl></dd>
+<dt><span class="section"><a href="quickstart/closure_engine/how_boost_afio_relates_to_exisit.html">How
         Boost.AFIO Relates to Exisiting Closure Execution Engines</a></span></dt>
 <dd><dl>
-<dt><span class="section"><a href="quickstart/closure_execution_engines/how_boost_afio_relates_to_exisit/comparison_of_afio_with_other_cl.html">Comparison
+<dt><span class="section"><a href="quickstart/closure_engine/how_boost_afio_relates_to_exisit/comparison_of_afio_with_other_cl.html">Comparison
           of AFIO with other Closure Execution Engines</a></span></dt>
-<dt><span class="section"><a href="quickstart/closure_execution_engines/how_boost_afio_relates_to_exisit/other_useful_comparisons.html">Other
+<dt><span class="section"><a href="quickstart/closure_engine/how_boost_afio_relates_to_exisit/other_useful_comparisons.html">Other
           Useful Comparisons</a></span></dt>
 </dl></dd>
 </dl></dd>
 </dl></div>
 <p>
-      This Quick Start section shows some of the features.
+      There are two kinds of likely Boost.AFIO users: (i) those who want to do high
+      performance, scalable file input/output (ii) those who want to execute closures
+      (self contained functions, think of them like C style callbacks except they
+      can carry state) with the rich dependency ordered execution constraint support
+      AFIO implements.
+    </p>
+<p>
+      The former ends up bleeding into the latter however, which is why AFIO also
+      exposes for public usage its internal closure execution engine: for example,
+      forthcoming TripleGit <a class="link" href="design/acid_write_ordering/write_ordering_data.html" title="Write ordering data and durability: why does it matter?">often
+      runs 128 or 256 bit hashes on every piece of data entering or exiting storage</a>.
+      With AFIO, this is as simple as adding a hash execution closure to every scatter
+      read and gather write operation -- and AFIO's flexibility lets you easily choose
+      between that hash being performed before i/o (useful for preloading the L2
+      cache if scatter/gather chunks are less than 4Kb each), after i/o (useful if
+      reading 4Kb or larger chunks as DMAs invalidate CPU caches), or more interestingly
+      <span class="emphasis"><em>during</em></span> i/o i.e. in parallel (useful if writing 4Kb or
+      larger chunks).
+    </p>
+<p>
+      For this quick start, the question becomes which to start with first: async
+      file i/o or closures? Starting with either has merits, but we've decided on
+      file i/o first.
+    </p>
+<p>
+      In either use case, using Boost.AFIO is centred around the <a class="link" href="reference/classes/async_file_io_dispatcher_base.html" title="async_file_io_dispatcher_base"><code class="computeroutput"><span class="identifier">async_file_io_dispatcher_base</span></code></a> abstract
+      base class, whose underlying platform-specific implementation class is instantiated
+      using the <a class="link" href="reference/functions/make_async_file_io_dispatcher.html" title="make_async_file_io_dispatcher"><code class="computeroutput"><span class="identifier">make_async_file_io_dispatcher</span><span class="special">()</span></code></a>
+      factory function. Once you have a <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span><span class="identifier">async_file_io_dispatcher_base</span><span class="special">&gt;</span></code>, you simply call its member functions to
+      have the dispatcher schedule asynchronous work items for you, each returning
+      a <a class="link" href="reference/structs/async_io_op.html" title="async_io_op"><code class="computeroutput"><span class="keyword">struct</span>
+      <span class="identifier">async_io_op</span></code></a>.
+    </p>
+<p>
+      All AFIO scheduling functions, or the convenience structures they take in,
+      will take as a (sometimes optional) first parameter their precondition op.
+      Only when that precondition has finished executing will its dependencies become
+      scheduled for execution. This makes expanding out multiple ops from a single
+      precondition easy, but what about reducing multiple ops down to a single precondition?
+      For that, use <a class="link" href="reference/classes/async_file_io_dispatcher_base/barrier.html" title="barrier (batch)"><code class="computeroutput"><span class="identifier">async_file_io_dispatcher_base</span><span class="special">::</span><span class="identifier">barrier</span><span class="special">()</span></code></a>.
     </p>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
@@ -57,7 +101,7 @@
 </tr></table>
 <hr>
 <div class="spirit-nav">
-<a accesskey="p" href="compilation.html"><img src="../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="quickstart/closure_execution_engines.html"><img src="../../../doc/src/images/next.png" alt="Next"></a>
+<a accesskey="p" href="compilation.html"><img src="../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="quickstart/async_file_io.html"><img src="../../../doc/src/images/next.png" alt="Next"></a>
 </div>
 </body>
 </html>

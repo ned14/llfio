@@ -1,0 +1,78 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Why did you use std::vector&lt;&gt; as the ops batch container instead of a generic iterator range?</title>
+<link rel="stylesheet" href="../../myboostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 0.1">
+<link rel="up" href="../FAQ.html" title="Frequently Asked Questions">
+<link rel="prev" href="stuck_ops.html" title="I'm seeing &#8220;WARNING: ~async_file_dispatcher_base() detects stuck async_io_op in total of X ops&#8221; during process close. What does this mean?">
+<link rel="next" href="foreign_fd.html" title="How do I configure my own file descriptor or HANDLE in AFIO?">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr>
+<td valign="top"><img alt="Boost C++ Libraries" width="277" height="86" src="../../../../boost.png"></td>
+<td align="center"><a href="../../../../index.html">Home</a></td>
+<td align="center"><a href="../../../../libs/libraries.htm">Libraries</a></td>
+<td align="center"><a href="http://www.boost.org/users/people.html">People</a></td>
+<td align="center"><a href="http://www.boost.org/users/faq.html">FAQ</a></td>
+<td align="center"><a href="../../../../more/index.htm">More</a></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="stuck_ops.html"><img src="../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../FAQ.html"><img src="../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="foreign_fd.html"><img src="../../../../doc/src/images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="afio.FAQ.vector_use"></a><a class="link" href="vector_use.html" title="Why did you use std::vector&lt;&gt; as the ops batch container instead of a generic iterator range?">Why did you use <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;&gt;</span></code> as the ops batch container instead
+      of a generic iterator range?</a>
+</h3></div></div></div>
+<div class="orderedlist"><ol class="orderedlist" type="1">
+<li class="listitem">
+            <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span><span class="identifier">async_io_op</span><span class="special">&gt;</span></code>
+            is the closest thing to a variable length array in C++<a href="#ftn.afio.FAQ.vector_use.f0" class="footnote" name="afio.FAQ.vector_use.f0"><sup class="footnote">[14]</sup></a>, at least until C++ 14 where we will gain <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">dynarray</span><span class="special">&lt;&gt;</span></code> and dynamic array sizing.
+          </li>
+<li class="listitem">
+            <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span><span class="identifier">async_io_op</span><span class="special">&gt;</span></code>
+            is well understood, particularly its performance during by-value copies
+            and during <code class="computeroutput"><span class="identifier">push_back</span><span class="special">()</span></code> which is by far the most common operation
+            you do when preparing a batch.
+          </li>
+<li class="listitem">
+            <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span><span class="identifier">async_io_op</span><span class="special">&gt;</span></code>
+            is very amenable to splitting the batch across threads (not that AFIO
+            currently does this).
+          </li>
+<li class="listitem">
+            <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span><span class="identifier">async_io_op</span><span class="special">&gt;</span></code>
+            is easily transportable through an ABI, whereas arbitrary container iterators
+            would need type erasing (i.e. slow). As AFIO was developed initially
+            as not header-only, this made a lot of sense initially.
+          </li>
+</ol></div>
+<p>
+        We are not opposed to the use of generic iterator ranges in an AFIO v2 if
+        there is user demand for such a thing.
+      </p>
+<div class="footnotes">
+<br><hr style="width:100; text-align:left;margin-left: 0">
+<div id="ftn.afio.FAQ.vector_use.f0" class="footnote"><p><a href="#afio.FAQ.vector_use.f0" class="para"><sup class="para">[14] </sup></a>
+              Ok, there is also the oft-forgotten <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">valarray</span><span class="special">&lt;&gt;</span></code> too, but its use as a generic
+              container isn't recommended.
+            </p></div>
+</div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2013 Niall Douglas and Paul Kirth<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="stuck_ops.html"><img src="../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../FAQ.html"><img src="../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="foreign_fd.html"><img src="../../../../doc/src/images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

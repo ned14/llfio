@@ -65,6 +65,17 @@ This is a reference counted instance with platform-specific implementation optio
 
 
 ]]
+[[``async_io_op op_from_scheduled_id(size_t id)``
+
+] [Returns an op ref for a given [*currently][*scheduled] op id, throwing a fatal exception if id not scheduled at the point of call. Can be used to retrieve exception state from some op id, or one's own shared future. ] [[* size_t]: ['id]:  The unique integer id for the op. 
+
+
+
+][
+An async_io_op with the same shared future as all op refs with this id. 
+
+
+]]
 [[``std::vector< async_io_op > completion(const std::vector< async_io_op > & ops, const std::vector< std::pair< async_op_flags, std::function< async_file_io_dispatcher_base::completion_t >>> & callbacks)``
 
 ] [Schedule a batch of asynchronous invocations of the specified functions when their supplied operations complete. ] [[* const std::vector< async_io_op > &]: ['ops]:  A batch of precondition op handles. 
@@ -132,7 +143,7 @@ A pair with a future returning the result of the callable and an op handle.
 
 ]]
 [[``template<class C, class... Args>
-std::pair< future< typename std::result_of< C(Args...)>::type >, async_io_op > call(const async_io_op & req, C callback, Args... args)``
+std::pair< future< typename detail::vs2013_variadic_overload_resolution_workaround< C, Args...>::type >, async_io_op > call(const async_io_op & req, C callback, Args... args)``
 
 ] [Schedule an asynchronous invocation of the specified unbound callable when its supplied precondition completes. Note that this function essentially calls [^`std::bind()`] on the callable and the args and passes it to the other call() overload taking a [^`std::function<>`]. You should therefore use [^`std::ref()`] etc. as appropriate. ] [[* const async_io_op &]: ['req]:  A precondition op handle. If default constructed, the precondition is null. 
 
@@ -144,6 +155,28 @@ std::pair< future< typename std::result_of< C(Args...)>::type >, async_io_op > c
 
 ][
 A pair with a future returning the result of the callable and an op handle. 
+
+
+]]
+[[``std::vector< async_io_op > adopt(const std::vector< std::shared_ptr< async_io_handle >> & hs)``
+
+] [Schedule a batch of third party handle adoptions. ] [[* const std::vector< std::shared_ptr< async_io_handle >> &]: ['hs]:  A batch of handles to adopt.
+
+
+
+][
+A batch of op handles. 
+
+
+]]
+[[``async_io_op adopt(std::shared_ptr< async_io_handle > h)``
+
+] [Schedule an adoption of a third party handle. ] [[* std::shared_ptr< async_io_handle >]: ['h]:  A handle to adopt.
+
+
+
+][
+An op handle. 
 
 
 ]]

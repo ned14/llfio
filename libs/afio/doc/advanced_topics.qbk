@@ -10,13 +10,115 @@
 
 [section:custom_completion_handler How to write your own custom AFIO completion handler]
 
-TODO
+If you want to extend __boost_afio__ with additional asynchronous functionality,
+you're probably going to have to implement your own custom AFIO completion handler
+which can be scheduled using __afio_completion__.
+These are the second most lowest level, second most primitive completion handler AFIO has and while a
+non-trivial amount of programmer effort to utilise, they do offer a maximum amount
+of flexibility, functionality and of course, performance[footnote If you're willing to go even ['more] low level, AFIO's
+`async_file_io_dispatcher_base` class exposes as protected member functions the variadic
+templated function `chain_async_op()` and a suite of specialised `chain_async_ops()` helper
+overloads. Therefore if you subclass `async_file_io_dispatcher_base`, you can enjoy the overhead of
+just two `std::function<>` calls, and just one of those calls when ASIO's `post()` gets fixed.]. If you are NOT extending
+AFIO with extra functionality, you almost certainly want __afio_call__ instead.
+
+Some advantages of custom completion handlers include:
+
+* Access to op id, handle and if immediately called, precondition error state.
+* Ability to schedule immediate completions which are executed instantly after
+their precondition instead of later when the thread source gets round to them.
+This is particularly useful when your host OS has real async i/o support, because
+you can use immediate completions to schedule non-blocking async i/o operations
+as quickly as possible. [*See below for the restrictions enforced on immediate completions].
+* Ability to schedule deferred completion handlers. These let you delay AFIO completion
+to some arbitrary time later e.g. when a host OS async operation completes.
+* Direct control of exception handling and error propagation.
+* Performance: completion handlers only have a [*three] nested `std::function<>` invocation
+overhead, rather than more (the fact it is three rather than two is because __boost_asio__'s `io_service.post()`
+currently cannot accept a move-only work item such as `std::packaged_task<>`, so until
+this gets fixed we have to wrap each packaged task in a `std::shared_ptr<>` and a
+`std::function<>` instance whose sole task is to invoke the packaged task -- yes, we
+agree this is daft). The reason why nesting `std::function<>` invocations is bad is
+because each entails type erasure, which requires the CPU to do an indirect jump
+(like a virtual function call) and while modern branch predictors eliminate any penalty
+for executing just one of those, they most certainly struggle when they have to execute
+a sequence of indirect jumps. For example, a single indirect jump might cost just two
+CPU cycles, while a mispredicted indirect jump might cost as much as 18-25 CPU cycles.
+
+Some disadvantages of custom completion handlers include:
+
+* Unlike __afio_call__, there is no custom return type machinery i.e. you'll have to
+implement your own. This isn't hard -- note how __afio_enumerate__'s internal completion
+handler in afio.cpp takes a shared pointer as a parameter containing the promises of output for
+the enumerations, thus allowing __afio_enumerate__ to set up a batch of futures
+corresponding to those promises and return those to the user.
+* Exception handling is rather more manual, especially for deferred completions. That
+comes of course with flexibility as well as hassle.
+
+So, let's have a look at an example of a custom AFIO completion handler, this being
+pretty much the simplest formulation possible:
 
 [completion_example1]
 
+Note how you have fair amount of flexibility of defining any input parameters you like so long as
+the standard triplet of id, handle and exception pointer are there. This is enabled basically
+through `std::bind<>` to prebind any custom parameters you may have to produce a `std::function<>`
+instance with the aforementioned standard triplet of parameters. As AFIO's completion
+implementation natively works with `std::function<>`, you effectively get custom parameter
+binds for free anyway.
+
+The above shows a simple custom completion handler -- as mentioned earlier, one can also
+do immediate completions and deferred completions, and this is an example of just those:
+
 [completion_example2]
 
+Note the new function for indicating a deferred completion: `complete_async_op()`, which
+can take a `std::exception_ptr` if you want AFIO to return an errored state. Note also the
+`boost::afio::async_op_flags` `DetachedFuture` and `ImmediateCompletion` -- if you fail to
+specify the former and try to return a `std::make_pair(false, h)` to indicate deferred
+completion from the completion handler, AFIO will throw a fatal exception as you forgot to
+specify the `DetachedFuture` flag.
+
+Ops with detached futures are more complex to set up, execute and parse out for invoking
+dependencies than normal ops. They have to have, by definition, a separate exception handling
+and exception safety enforcement mechanism all of which can be safely left to `std::packaged_task<>`
+if not enabled. You should therefore not turn on detached futures unless you really need them.
+Remember you can vary the `DetachedFuture` flag per call of `completion()` to turn them on
+only when needed.
+
+If you may add the same completion handler both as a normal completion and as an immediate
+completion, and you need to tell how you were called in the handler, the `exception_ptr *e`
+will [*always] be non-null (i.e. point to an `exception_ptr`) if the handler was called
+as an immediate. It will always be null (i.e. point to nothing) if the handler was not
+called as an immediate. Just because `e` points to a valid `exception_ptr` does not
+necessarily mean that exception point is itself not null.
+
+And finally, as much as immediate completions are vastly more efficient than normal
+completions, and you can achieve far higher throughputs with them especially as they
+involve almost no overhead to invoke, you should bear in
+mind the following substantial disadvantages of immediate completions:
+
+* Immediate completions must NEVER block, not EVER. This is because they are called while
+the oplock is held, and therefore no other op may be added, enqueued or [*completed]
+while an immediate completion is running. In other words, they hang the dispatcher.
+You can of course schedule new ops from within an immediate completion as the oplock
+is a recursive mutex.
+* Adding immediate completions to the precondition of the immediate completion being
+executed won't work -- they get thrown away, just as if the completion were not
+immediate. This does eliminate the potential for endless loops of course.
+* Immediate completions are invoked [*before] their precondition has returned their
+state to the future in the op ref, but [*after] the scheduling of any dependencies. This
+can lead to an interesting chicken and egg situation where your immediate completion
+can't know the output of its precondition if it is not an `exception_ptr` and not
+a `std::shared_ptr<boost::afio::async_io_handle> h`. One way of working around this
+problem is to make the precondition's future detached, because then the precondition's
+return state ['will] be available to its immediate completions.
+
 [endsect] [/custom_completion_handler]
+
+
+
+
 
 [section:vs2010_notes Notes on using AFIO with Microsoft Visual Studio 2010 and Mingw32]
 

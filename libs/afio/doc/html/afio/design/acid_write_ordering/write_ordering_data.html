@@ -49,14 +49,14 @@
           to do (and generally you want that intent log on as low latency a device
           as possible) -- and usefully every major filing system supports atomic
           appends to a file. If you wish to never lose most recent data, to implement
-          a transaction one writes one's data to the filing system, ensure it has
-          reached non-volatile storage, appends the knowledge it definitely is on
-          non-volatile storage to the intent log, and then ensure one's append also
-          has reached non-volatile storage. This is presently the only way to ensure
-          that valuable data definitely is never lost on any filing system that I
-          know of. The obvious problem is that this method involves writing all your
-          data with <code class="computeroutput"><span class="identifier">O_SYNC</span></code> and using
-          <code class="computeroutput"><span class="identifier">fsync</span><span class="special">()</span></code>
+          a transaction one (i) writes one's data to the filing system, (ii) ensure
+          it has reached non-volatile storage, (iii) appends the knowledge it definitely
+          is on non-volatile storage to the intent log, and then (iv) ensure one's
+          append also has reached non-volatile storage. This is presently the only
+          way to ensure that valuable data definitely is never lost on any filing
+          system that I know of. The obvious problem is that this method involves
+          writing all your data with <code class="computeroutput"><span class="identifier">O_SYNC</span></code>
+          and using <code class="computeroutput"><span class="identifier">fsync</span><span class="special">()</span></code>
           on the intent log. This might perform okay with a single writer, but with
           multiple writers performance is usually awful, especially on storage incapable
           of high queue depths and potentially many hundreds of milliseconds of latency
@@ -113,11 +113,11 @@
           addition of the ZFS Write Throttle, the default settings are to accept
           new writes as fast as RAM can handle, buffering up to thirty wall clock
           seconds of writes before pacing the acceptance of new write data to match
-          the speed of the non-volatile storage (which may be a ZIL device if you're
-          doing synchronous writes). This implies up to thirty seconds of buffered
-          data could be lost, but note that ZFS still guarantees transaction group
-          sequential write order. Therefore, what ZFS is in fact guaranteeing is
-          this: <span class="quote">&#8220;<span class="quote">we may reorder your write by up to five seconds away from
+          the speed of the non-volatile storage (which may be a ZFS Intent Log (ZIL)
+          device if you're doing synchronous writes). This implies up to thirty seconds
+          of buffered data could be lost, but note that ZFS still guarantees transaction
+          group sequential write order. Therefore, what ZFS is in fact guaranteeing
+          is this: <span class="quote">&#8220;<span class="quote">we may reorder your write by up to five seconds away from
           the sequence in which you wrote it and other writes surrounding it. Other
           than that, we guarantee the order in which you write is the order in which
           that data reaches physical storage.</span>&#8221;</span> <a href="#ftn.afio.design.acid_write_ordering.write_ordering_data.f2" class="footnote" name="afio.design.acid_write_ordering.write_ordering_data.f2"><sup class="footnote">[9]</sup></a>
@@ -126,14 +126,14 @@
           What this means is this: on ZFS, TripleGit can turn off all write synchronisation
           and replace it with a five second delay between writing new data and updating
           the intent log, and in so doing guaranteeing that the intent log's contents
-          will always refer to data definitely on storage (or rather, close enough
-          that one need not perform a lot of repair work on first use after power
-          loss). One can additionally skip SHA hashing because ZFS guarantees file
-          and metadata will always match and as TripleGit always copy on writes data,
-          either a copy's length matches the intent log's or it doesn't (i.e. the
-          file's length as reported by the filing system really is how much true
-          data it contains), plus the file modified timestamp always reflects the
-          actual last modifed timestamp of the data.
+          will <span class="bold"><strong>always</strong></span> refer to data definitely on
+          storage (or rather, close enough that one need not perform a lot of repair
+          work on first use after power loss). One can additionally skip SHA hashing
+          because ZFS guarantees file and metadata will always match and as TripleGit
+          always copy on writes data, either a copy's length matches the intent log's
+          or it doesn't (i.e. the file's length as reported by the filing system
+          really is how much true data it contains), plus the file modified timestamp
+          always reflects the actual last modifed timestamp of the data.
         </p>
 <p>
           Note that ext3 and ext4 can also guarantee that file and metadata will
@@ -145,7 +145,9 @@
 <p>
           Sadly, most use of TripleGit and Boost.AFIO will be without the luxury
           of ZFS, so here is a quick table of power loss data safety. Once again,
-          I reiterate that errors and omissions are my fault alone.
+          I reiterate that errors and omissions are my fault alone. <span class="bold"><strong>Any
+          help which can be supplied in filling in the unknowns in this table would
+          be hugely appreciated</strong></span>.
         </p>
 <div class="table">
 <a name="afio.design.acid_write_ordering.write_ordering_data.power_loss_safety"></a><p class="title"><b>Table&#160;1.2.&#160;Power loss safety matrix: What non-trivially reconstructible data
@@ -214,12 +216,12 @@
                 </td>
 <td>
                   <p>
-                    ?
+                    <span class="aligncenter">?</span>
                   </p>
                 </td>
 <td>
                   <p>
-                    ?
+                    <span class="aligncenter">?</span>
                   </p>
                 </td>
 </tr>
@@ -343,12 +345,12 @@
                 </td>
 <td>
                   <p>
-                    30
+                    <span class="aligncenter">30</span>
                   </p>
                 </td>
 <td>
                   <p>
-                    30
+                    <span class="aligncenter">30</span>
                   </p>
                 </td>
 </tr>
@@ -375,12 +377,12 @@
                 </td>
 <td>
                   <p>
-                    ?
+                    <span class="aligncenter">?</span>
                   </p>
                 </td>
 <td>
                   <p>
-                    ?
+                    <span class="aligncenter">?</span>
                   </p>
                 </td>
 </tr>
@@ -407,12 +409,12 @@
                 </td>
 <td>
                   <p>
-                    Until idle or write limit
+                    <span class="aligncenter">Until idle or write limit</span>
                   </p>
                 </td>
 <td>
                   <p>
-                    Until idle or write limit
+                    <span class="aligncenter">Until idle or write limit</span>
                   </p>
                 </td>
 </tr>
@@ -522,20 +524,20 @@
                     </p></div>
 <div id="ftn.afio.design.acid_write_ordering.write_ordering_data.f4" class="footnote"><p><a href="#afio.design.acid_write_ordering.write_ordering_data.f4" class="para"><sup class="para">[b] </sup></a>
                       This is the <code class="computeroutput"><span class="identifier">commit</span></code>
-                      mount setting. Source: https://www.kernel.org/doc/Documentation/filesystems/ext4.txt
+                      mount setting. Source: <a href="https://www.kernel.org/doc/Documentation/filesystems/ext4.txt" target="_top">https://www.kernel.org/doc/Documentation/filesystems/ext4.txt</a>
                     </p></div>
 <div id="ftn.afio.design.acid_write_ordering.write_ordering_data.f5" class="footnote"><p><a href="#afio.design.acid_write_ordering.write_ordering_data.f5" class="para"><sup class="para">[c] </sup></a>
                       This is the <code class="computeroutput"><span class="special">/</span><span class="identifier">proc</span><span class="special">/</span><span class="identifier">sys</span><span class="special">/</span><span class="identifier">vm</span><span class="special">/</span><span class="identifier">dirty_expire_centiseconds</span></code>
-                      value. Source: http://www.westnet.com/~gsmith/content/linux-pdflush.htm
+                      value. Source: <a href="http://www.westnet.com/~gsmith/content/linux-pdflush.htm" target="_top">http://www.westnet.com/~gsmith/content/linux-pdflush.htm</a>
                     </p></div>
 <div id="ftn.afio.design.acid_write_ordering.write_ordering_data.f6" class="footnote"><p><a href="#afio.design.acid_write_ordering.write_ordering_data.f6" class="para"><sup class="para">[d] </sup></a>
-                      Source: http://www.freebsd.org/cgi/man.cgi?query=syncer
+                      Source: <a href="http://www.freebsd.org/cgi/man.cgi?query=syncer" target="_top">http://www.freebsd.org/cgi/man.cgi?query=syncer</a>
                     </p></div>
 <div id="ftn.afio.design.acid_write_ordering.write_ordering_data.f7" class="footnote"><p><a href="#afio.design.acid_write_ordering.write_ordering_data.f7" class="para"><sup class="para">[e] </sup></a>
-                      Source: http://technet.microsoft.com/en-us/library/bb742613.aspx
+                      Source: <a href="http://technet.microsoft.com/en-us/library/bb742613.aspx" target="_top">http://technet.microsoft.com/en-us/library/bb742613.aspx</a>
                     </p></div>
 <div id="ftn.afio.design.acid_write_ordering.write_ordering_data.f8" class="footnote"><p><a href="#afio.design.acid_write_ordering.write_ordering_data.f8" class="para"><sup class="para">[f] </sup></a>
-                      Source: https://wiki.archlinux.org/index.php/Btrfs
+                      Source: <a href="https://wiki.archlinux.org/index.php/Btrfs" target="_top">https://wiki.archlinux.org/index.php/Btrfs</a>
                     </p></div>
 </td></tr></tbody>
 </table></div>
@@ -552,7 +554,7 @@
             lets one artifically schedule whole filing system flushes.
           </p></div>
 <div id="ftn.afio.design.acid_write_ordering.write_ordering_data.f2" class="footnote"><p><a href="#afio.design.acid_write_ordering.write_ordering_data.f2" class="para"><sup class="para">[9] </sup></a>
-            Source: http://www.c0t0d0s0.org/archives/5343-Insights-into-ZFS-today-The-nature-of-writing-things.html
+            Source: <a href="http://www.c0t0d0s0.org/archives/5343-Insights-into-ZFS-today-The-nature-of-writing-things.html" target="_top">http://www.c0t0d0s0.org/archives/5343-Insights-into-ZFS-today-The-nature-of-writing-things.html</a>
           </p></div>
 </div>
 </div>

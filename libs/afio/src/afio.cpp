@@ -27,6 +27,26 @@ File Created: Mar 2013
 //#endif
 //#endif
 
+// Define this to have every part of AFIO print, in extremely terse text, what it is doing and why.
+#if defined(DEBUG) && 0 //|| 1
+#define BOOST_AFIO_DEBUG_PRINTING 1
+#ifdef WIN32
+#define BOOST_AFIO_DEBUG_PRINT(...) \
+	{ \
+	char buffer[16384]; \
+	sprintf(buffer, __VA_ARGS__); \
+	OutputDebugStringA(buffer); \
+	}
+#else
+#define BOOST_AFIO_DEBUG_PRINT(...) \
+	{ \
+	fprintf(stderr, __VA_ARGS__); \
+	}
+#endif
+#else
+#define BOOST_AFIO_DEBUG_PRINT(...)
+#endif
+
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE
 #endif
@@ -73,6 +93,8 @@ File Created: Mar 2013
 #define BOOST_AFIO_POSIX_UNLINK _wunlink
 #define BOOST_AFIO_POSIX_FSYNC _commit
 #define BOOST_AFIO_POSIX_FTRUNCATE winftruncate
+#define BOOST_AFIO_POSIX_MMAP(addr, size, prot, flags, fd, offset) (-1)
+#define BOOST_AFIO_POSIX_MUNMAP(addr, size) (-1)
 
 namespace windows_nt_kernel
 {
@@ -469,7 +491,7 @@ namespace windows_nt_kernel
 	static inline boost::afio::chrono::system_clock::time_point to_timepoint(LARGE_INTEGER time)
 	{
 		// We make the big assumption that the STL's system_clock is based on the time_t epoch 1st Jan 1970.
-		static BOOST_CONSTEXPR_OR_CONST unsigned long long FILETIME_OFFSET_TO_1970=(((unsigned long long)27111902 << 32) + (unsigned long long)3577643008);
+		static BOOST_CONSTEXPR_OR_CONST unsigned long long FILETIME_OFFSET_TO_1970=((27111902ULL << 32U) + 3577643008ULL);
 		// Need to have this self-adapt to the STL being used
 		static BOOST_CONSTEXPR_OR_CONST unsigned long long STL_TICKS_PER_SEC=(unsigned long long) boost::afio::chrono::system_clock::period::den/boost::afio::chrono::system_clock::period::num;
 
@@ -543,6 +565,7 @@ static inline void fill_stat_t(boost::afio::stat_t &stat, BOOST_AFIO_POSIX_STAT_
 #include <sys/syscall.h>
 #include <fnmatch.h>
 #include <sys/uio.h>
+#include <sys/mman.h>
 #include <limits.h>
 #define BOOST_AFIO_POSIX_MKDIR mkdir
 #define BOOST_AFIO_POSIX_RMDIR ::rmdir
@@ -555,6 +578,8 @@ static inline void fill_stat_t(boost::afio::stat_t &stat, BOOST_AFIO_POSIX_STAT_
 #define BOOST_AFIO_POSIX_UNLINK unlink
 #define BOOST_AFIO_POSIX_FSYNC fsync
 #define BOOST_AFIO_POSIX_FTRUNCATE ftruncate
+#define BOOST_AFIO_POSIX_MMAP mmap
+#define BOOST_AFIO_POSIX_MUNMAP munmap
 
 static inline boost::afio::chrono::system_clock::time_point to_timepoint(struct timespec ts)
 {
@@ -596,26 +621,6 @@ static inline void fill_stat_t(boost::afio::stat_t &stat, BOOST_AFIO_POSIX_STAT_
 
 // libstdc++ doesn't come with std::lock_guard
 #define BOOST_AFIO_LOCK_GUARD boost::lock_guard
-
-#if defined(DEBUG) && 0
-#define BOOST_AFIO_DEBUG_PRINTING 1
-#ifdef WIN32
-#define BOOST_AFIO_DEBUG_PRINT(...) \
-	{ \
-		char buffer[16384]; \
-		sprintf(buffer, __VA_ARGS__); \
-		OutputDebugStringA(buffer); \
-	}
-#else
-#define BOOST_AFIO_DEBUG_PRINT(...) \
-	{ \
-		fprintf(stderr, __VA_ARGS__); \
-	}
-#endif
-#else
-#define BOOST_AFIO_DEBUG_PRINT(...)
-#endif
-
 
 #ifdef WIN32
 #ifndef IOV_MAX
@@ -697,18 +702,27 @@ namespace detail {
 #if defined(WIN32)
 	struct async_io_handle_windows : public async_io_handle
 	{
-		std::shared_ptr<async_file_io_dispatcher_base> parent;
 		std::unique_ptr<boost::asio::windows::random_access_handle> h;
 		void *myid;
 		bool has_been_added, SyncOnClose;
+		void *mapaddr;
 
 		static HANDLE int_checkHandle(HANDLE h, const std::filesystem::path &path)
 		{
 			BOOST_AFIO_ERRHWINFN(INVALID_HANDLE_VALUE!=h, path);
 			return h;
 		}
-		async_io_handle_windows(std::shared_ptr<async_file_io_dispatcher_base> _parent, std::shared_ptr<async_io_handle> _dirh, const std::filesystem::path &path, file_flags flags) : async_io_handle(_parent.get(), std::move(_dirh), path, flags), parent(_parent), myid(nullptr), has_been_added(false), SyncOnClose(false) { }
-		inline async_io_handle_windows(std::shared_ptr<async_file_io_dispatcher_base> _parent, std::shared_ptr<async_io_handle> _dirh, const std::filesystem::path &path, file_flags flags, bool _SyncOnClose, HANDLE _h);
+		async_io_handle_windows(async_file_io_dispatcher_base *_parent, std::shared_ptr<async_io_handle> _dirh, const std::filesystem::path &path, file_flags flags) : async_io_handle(_parent, std::move(_dirh), path, flags), myid(nullptr), has_been_added(false), SyncOnClose(false), mapaddr(nullptr) { }
+		inline async_io_handle_windows(async_file_io_dispatcher_base *_parent, std::shared_ptr<async_io_handle> _dirh, const std::filesystem::path &path, file_flags flags, bool _SyncOnClose, HANDLE _h);
+		virtual void close()
+		{
+			// Windows doesn't provide an async fsync so do it synchronously
+			if(SyncOnClose && write_count_since_fsync())
+				BOOST_AFIO_ERRHWINFN(FlushFileBuffers(myid), path());
+			h->close();
+			h.reset();
+			myid=nullptr;
+		}
 		virtual void *native_handle() const { return myid; }
 
 		// You can't use shared_from_this() in a constructor so ...
@@ -716,7 +730,7 @@ namespace detail {
 		{
 			if(h)
 			{
-				parent->int_add_io_handle(myid, shared_from_this());
+				parent()->int_add_io_handle(myid, shared_from_this());
 				has_been_added=true;
 			}
 		}
@@ -724,7 +738,12 @@ namespace detail {
 		{
 			BOOST_AFIO_DEBUG_PRINT("D %p\n", this);
 			if(has_been_added)
-				parent->int_del_io_handle(myid);
+				parent()->int_del_io_handle(myid);
+			if(mapaddr)
+			{
+				BOOST_AFIO_ERRHWINFN(UnmapViewOfFile(mapaddr), path());
+				mapaddr=nullptr;
+			}
 			if(h)
 			{
 				if(SyncOnClose && write_count_since_fsync())
@@ -828,31 +847,62 @@ namespace detail {
 			}
 			BOOST_AFIO_THROW(std::runtime_error("Unknown type of symbolic link."));
 		}
+		virtual void *try_mapfile()
+		{
+			if(!mapaddr)
+			{
+				if(!(flags() & file_flags::Write) && !(flags() & file_flags::Append))
+				{
+					HANDLE sectionh;
+					if(INVALID_HANDLE_VALUE!=(sectionh=CreateFileMapping(myid, NULL, PAGE_READONLY, 0, 0, nullptr)))
+					{
+						auto unsectionh=boost::afio::detail::Undoer([&sectionh]{ CloseHandle(sectionh); });
+						mapaddr=MapViewOfFile(sectionh, FILE_MAP_READ, 0, 0, 0);
+					}
+				}
+			}
+			return mapaddr;
+		}
 	};
 #endif
 	struct async_io_handle_posix : public async_io_handle
 	{
-		std::shared_ptr<async_file_io_dispatcher_base> parent;
 		int fd;
 		bool has_been_added, SyncOnClose, has_ever_been_fsynced;
+		void *mapaddr; size_t mapsize;
 
-		async_io_handle_posix(std::shared_ptr<async_file_io_dispatcher_base> _parent, std::shared_ptr<async_io_handle> _dirh, const std::filesystem::path &path, file_flags flags, bool _SyncOnClose, int _fd) : async_io_handle(_parent.get(), std::move(_dirh), path, flags), parent(_parent), fd(_fd), has_been_added(false), SyncOnClose(_SyncOnClose),has_ever_been_fsynced(false)
+		async_io_handle_posix(async_file_io_dispatcher_base *_parent, std::shared_ptr<async_io_handle> _dirh, const std::filesystem::path &path, file_flags flags, bool _SyncOnClose, int _fd) : async_io_handle(_parent, std::move(_dirh), path, flags), fd(_fd), has_been_added(false), SyncOnClose(_SyncOnClose), has_ever_been_fsynced(false), mapaddr(nullptr), mapsize(0)
 		{
 			if(fd!=-999)
 				BOOST_AFIO_ERRHOSFN(fd, path);
 		}
-		virtual void *native_handle() const { return (void *)(size_t) fd; }
+		virtual void close()
+		{
+			if(fd>=0)
+			{
+				if(SyncOnClose && write_count_since_fsync())
+					BOOST_AFIO_ERRHOSFN(BOOST_AFIO_POSIX_FSYNC(fd), path());
+				BOOST_AFIO_ERRHOSFN(BOOST_AFIO_POSIX_CLOSE(fd), path());
+				fd=-1;
+			}
+		}
+		virtual void *native_handle() const { return (void *)(size_t)fd; }
 
 		// You can't use shared_from_this() in a constructor so ...
 		void do_add_io_handle_to_parent()
 		{
-			parent->int_add_io_handle((void *)(size_t)fd, shared_from_this());
+			parent()->int_add_io_handle((void *)(size_t)fd, shared_from_this());
 			has_been_added=true;
 		}
 		~async_io_handle_posix()
 		{
 			if(has_been_added)
-				parent->int_del_io_handle((void *)(size_t)fd);
+				parent()->int_del_io_handle((void *)(size_t)fd);
+			if(mapaddr)
+			{
+				BOOST_AFIO_ERRHOSFN(BOOST_AFIO_POSIX_MUNMAP(mapaddr, mapsize), path());
+				mapaddr=nullptr;
+			}
 			if(fd>=0)
 			{
 				// Flush synchronously here? I guess ...
@@ -883,6 +933,24 @@ namespace detail {
 			    BOOST_AFIO_ERRGOS(-1);
 			return std::filesystem::path::string_type(buffer, len);
 #endif
+		}
+		virtual void *try_mapfile()
+		{
+#ifndef WIN32
+			if(!mapaddr)
+			{
+				if(!(flags() & file_flags::Write) && !(flags() & file_flags::Append))
+				{
+					BOOST_AFIO_POSIX_STAT_STRUCT s={0};
+					if(-1!=fstat(fd, &s))
+					{
+						if((mapaddr=BOOST_AFIO_POSIX_MMAP(nullptr, s.st_size, PROT_READ, MAP_SHARED, fd, 0)))
+							mapsize=s.st_size;
+					}
+				}
+			}
+#endif
+			return mapaddr;
 		}
 	};
 
@@ -1062,7 +1130,7 @@ namespace detail {
 		}
 	};
 #if defined(WIN32)
-	inline async_io_handle_windows::async_io_handle_windows(std::shared_ptr<async_file_io_dispatcher_base> _parent, std::shared_ptr<async_io_handle> _dirh, const std::filesystem::path &path, file_flags flags, bool _SyncOnClose, HANDLE _h) : async_io_handle(_parent.get(), std::move(_dirh), path, flags), parent(_parent), h(new boost::asio::windows::random_access_handle(_parent->p->pool->io_service(), int_checkHandle(_h, path))), myid(_h), has_been_added(false), SyncOnClose(_SyncOnClose) { }
+	inline async_io_handle_windows::async_io_handle_windows(async_file_io_dispatcher_base *_parent, std::shared_ptr<async_io_handle> _dirh, const std::filesystem::path &path, file_flags flags, bool _SyncOnClose, HANDLE _h) : async_io_handle(_parent, std::move(_dirh), path, flags), h(new boost::asio::windows::random_access_handle(_parent->p->pool->io_service(), int_checkHandle(_h, path))), myid(_h), has_been_added(false), SyncOnClose(_SyncOnClose), mapaddr(nullptr) { }
 #endif
 	class async_file_io_dispatcher_compat;
 	class async_file_io_dispatcher_windows;
@@ -1422,6 +1490,23 @@ size_t async_file_io_dispatcher_base::count() const
 	return ret;
 }
 
+// Non op lock holding variant
+async_io_op async_file_io_dispatcher_base::int_op_from_scheduled_id(size_t id) const
+{
+	std::unordered_map<size_t, detail::async_file_io_dispatcher_op>::iterator it=p->ops.find(id);
+	if(p->ops.end()==it)
+	{
+		BOOST_AFIO_THROW_FATAL(std::runtime_error("Failed to find this operation in list of currently executing operations"));
+	}
+	return async_io_op(const_cast<async_file_io_dispatcher_base *>(this), id, it->second.h);
+}
+async_io_op async_file_io_dispatcher_base::op_from_scheduled_id(size_t id) const
+{
+	BOOST_AFIO_LOCK_GUARD<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
+	return int_op_from_scheduled_id(id);
+}
+
+
 // Called in unknown thread
 async_file_io_dispatcher_base::completion_returntype async_file_io_dispatcher_base::invoke_user_completion(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr *e, std::function<async_file_io_dispatcher_base::completion_t> callback)
 {
@@ -1487,11 +1572,14 @@ void async_file_io_dispatcher_base::complete_async_op(size_t id, std::shared_ptr
 		assert(it->second.completions.empty());
 		BOOST_FOREACH(auto &c, completions)
 		{
-			exception_ptr *immediate_e=(!!e) ? &e : nullptr;
+			exception_ptr *immediate_e=&e;
 			// Enqueue each completion
 			it=p->ops.find(c.first);
 			if(p->ops.end()==it)
 				BOOST_AFIO_THROW_FATAL(std::runtime_error("Failed to find this completion operation in list of currently executing operations"));
+			// Unlock opslock during completions dispatch to increase parallelism
+			//p->opslock.unlock();
+			//auto relock=boost::afio::detail::Undoer([this]{ p->opslock.lock(); });
 			if(!!(it->second.flags & async_op_flags::ImmediateCompletion))
 			{
 				// If he was set up with a detached future, use that instead
@@ -1596,6 +1684,7 @@ template<class F, class... Args> std::shared_ptr<async_io_handle> async_file_io_
 }
 #else
 
+#undef BOOST_PP_LOCAL_MACRO
 #define BOOST_PP_LOCAL_MACRO(N)                                                                     \
     template <class F                                                                               \
     BOOST_PP_COMMA_IF(N)                                                                            \
@@ -1655,6 +1744,7 @@ template<class F, class... Args> std::shared_ptr<async_io_handle> async_file_io_
 #define BOOST_PP_LOCAL_LIMITS     (0, BOOST_AFIO_MAX_PARAMETERS) //should this be 0 or 1 for the min????
 #include BOOST_PP_LOCAL_ITERATE()
 #endif
+#undef BOOST_PP_LOCAL_MACRO
 
 
 
@@ -1705,7 +1795,6 @@ template<class F, class... Args> async_io_op async_file_io_dispatcher_base::chai
 	{
 		// Bind input handle now and queue immediately to next available thread worker
 		std::shared_ptr<async_io_handle> h;
-		exception_ptr *_he=nullptr;
 		if(precondition.h->valid())
 		{
 			// Boost's shared_future has get() as non-const which is weird, because it doesn't
@@ -1716,7 +1805,7 @@ template<class F, class... Args> async_io_op async_file_io_dispatcher_base::chai
 			// now we can hardly abort half way through a batch op without leaving around stuck ops.
 			// No, instead we simulate as if the precondition had not yet become ready.
 			if(precondition.h->has_exception())
-				*he=get_exception_ptr(f), _he=he;
+				*he=get_exception_ptr(f);
 			else
 				h=f.get();
 		}
@@ -1729,7 +1818,7 @@ template<class F, class... Args> async_io_op async_file_io_dispatcher_base::chai
 		}
 		if(!!(flags & async_op_flags::ImmediateCompletion))
 		{
-			*ret.h=immediates.enqueue(std::bind(boundf.second, h, _he)).share();
+			*ret.h=immediates.enqueue(std::bind(boundf.second, h, he)).share();
 		}
 		else
 			*ret.h=p->pool->enqueue(std::bind(boundf.second, h, nullptr)).share();
@@ -1768,6 +1857,7 @@ template<class F, class... Args> async_io_op async_file_io_dispatcher_base::chai
 	    }
     #endif
 
+#undef BOOST_PP_LOCAL_MACRO
 #define BOOST_PP_LOCAL_MACRO(N)                                                                     \
     template <class F                                /* template start */                           \
     BOOST_PP_COMMA_IF(N)                                                                            \
@@ -1862,10 +1952,11 @@ template<class F, class... Args> async_io_op async_file_io_dispatcher_base::chai
   
 #define BOOST_PP_LOCAL_LIMITS     (0, BOOST_AFIO_MAX_PARAMETERS) //should this be 0 or 1 for the min????
 #include BOOST_PP_LOCAL_ITERATE()
+#undef BOOST_PP_LOCAL_MACRO
 
 #endif
 
-// General non-specialised implementation taking some arbitrary parameter T
+// General non-specialised implementation taking some arbitrary parameter T with precondition
 template<class F, class T> std::vector<async_io_op> async_file_io_dispatcher_base::chain_async_ops(int optype, const std::vector<async_io_op> &preconditions, const std::vector<T> &container, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<async_io_handle>, exception_ptr *, T))
 {
 	std::vector<async_io_op> ret;
@@ -1880,6 +1971,21 @@ template<class F, class T> std::vector<async_io_op> async_file_io_dispatcher_bas
 	auto container_it=container.cbegin();
 	for(; precondition_it!=preconditions.cend() && container_it!=container.cend(); ++precondition_it, ++container_it)
 		ret.push_back(chain_async_op(&he, immediates, optype, *precondition_it, flags, f, *container_it));
+	return ret;
+}
+// General non-specialised implementation taking some arbitrary parameter T without precondition
+template<class F, class T> std::vector<async_io_op> async_file_io_dispatcher_base::chain_async_ops(int optype, const std::vector<T> &container, async_op_flags flags, completion_returntype(F::*f)(size_t, std::shared_ptr<async_io_handle>, exception_ptr *, T))
+{
+	std::vector<async_io_op> ret;
+	ret.reserve(container.size());
+	async_io_op precondition;
+	BOOST_AFIO_LOCK_GUARD<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
+	exception_ptr he;
+	detail::immediate_async_ops immediates;
+	BOOST_FOREACH(auto &i, container)
+	{
+		ret.push_back(chain_async_op(&he, immediates, optype, precondition, flags, f, i));
+	}
 	return ret;
 }
 // Generic op receiving specialisation i.e. precondition is also input op. Skips sanity checking.
@@ -1943,6 +2049,11 @@ template<class F> std::pair<std::vector<future<std::pair<std::vector<directory_e
 		ret.push_back(chain_async_op(&he, immediates, optype, i.precondition, flags, f, i, transport));
     }
 	return std::make_pair(std::move(retfutures), std::move(ret));
+}
+
+std::vector<async_io_op> async_file_io_dispatcher_base::adopt(const std::vector<std::shared_ptr<async_io_handle>> &hs)
+{
+	return chain_async_ops(0, hs, async_op_flags::ImmediateCompletion, &async_file_io_dispatcher_base::doadopt);
 }
 
 namespace detail
@@ -2061,7 +2172,7 @@ namespace detail {
 		{
 			req.flags=fileflags(req.flags);
 			BOOST_AFIO_ERRHWINFN(RemoveDirectory(req.path.c_str()), req.path);
-			auto ret=std::make_shared<async_io_handle_windows>(shared_from_this(), std::shared_ptr<async_io_handle>(), req.path, req.flags);
+			auto ret=std::make_shared<async_io_handle_windows>(this, std::shared_ptr<async_io_handle>(), req.path, req.flags);
 			return std::make_pair(true, ret);
 		}
 		// Called in unknown thread
@@ -2088,15 +2199,15 @@ namespace detail {
 					if(!!(req.flags & file_flags::Read)) access|=GENERIC_READ;
 					if(!!(req.flags & file_flags::Write)) access|=GENERIC_WRITE;
 				}
+				if(!!(req.flags & file_flags::WillBeSequentiallyAccessed))
+					flags|=0x00000004/*FILE_SEQUENTIAL_ONLY*/;
+				else if(!!(req.flags & file_flags::WillBeRandomlyAccessed))
+					flags|=0x00000800/*FILE_RANDOM_ACCESS*/;
 			}
 			if(!!(req.flags & file_flags::CreateOnlyIfNotExist)) creatdisp|=0x00000002/*FILE_CREATE*/;
 			else if(!!(req.flags & file_flags::Create)) creatdisp|=0x00000003/*FILE_OPEN_IF*/;
 			else if(!!(req.flags & file_flags::Truncate)) creatdisp|=0x00000005/*FILE_OVERWRITE_IF*/;
 			else creatdisp|=0x00000001/*FILE_OPEN*/;
-			if(!!(req.flags & file_flags::WillBeSequentiallyAccessed))
-				flags|=0x00000004/*FILE_SEQUENTIAL_ONLY*/;
-			else if(!!(req.flags & file_flags::WillBeRandomlyAccessed))
-				flags|=0x00000800/*FILE_RANDOM_ACCESS*/;
 			if(!!(req.flags & file_flags::OSDirect)) flags|=0x00000008/*FILE_NO_INTERMEDIATE_BUFFERING*/;
 			if(!!(req.flags & file_flags::AlwaysSync)) flags|=0x00000002/*FILE_WRITE_THROUGH*/;
 			if(!!(req.flags & file_flags::FastDirectoryEnumeration))
@@ -2123,10 +2234,12 @@ namespace detail {
 			BOOST_AFIO_ERRHNTFN(NtCreateFile(&h, access, &oa, &isb, &AllocationSize, FILE_ATTRIBUTE_NORMAL, FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,
 				creatdisp, flags, NULL, 0), req.path);
 			// If writing and SyncOnClose and NOT synchronous, turn on SyncOnClose
-			auto ret=std::make_shared<async_io_handle_windows>(shared_from_this(), dirh, req.path, req.flags,
+			auto ret=std::make_shared<async_io_handle_windows>(this, dirh, req.path, req.flags,
 				(file_flags::SyncOnClose|file_flags::Write)==(req.flags & (file_flags::SyncOnClose|file_flags::Write|file_flags::AlwaysSync)),
 				h);
 			static_cast<async_io_handle_windows *>(ret.get())->do_add_io_handle_to_parent();
+			if(!(req.flags & file_flags::int_opening_dir) && !(req.flags & file_flags::int_opening_link) && !!(req.flags & file_flags::OSMMap))
+				ret->try_mapfile();
 			return std::make_pair(true, ret);
 		}
 		// Called in unknown thread
@@ -2134,7 +2247,7 @@ namespace detail {
 		{
 			req.flags=fileflags(req.flags);
 			BOOST_AFIO_ERRHWINFN(DeleteFile(req.path.c_str()), req.path);
-			auto ret=std::make_shared<async_io_handle_windows>(shared_from_this(), std::shared_ptr<async_io_handle>(), req.path, req.flags);
+			auto ret=std::make_shared<async_io_handle_windows>(this, std::shared_ptr<async_io_handle>(), req.path, req.flags);
 			return std::make_pair(true, ret);
 		}
 		// Called in unknown thread
@@ -2241,7 +2354,7 @@ namespace detail {
 		{
 			req.flags=fileflags(req.flags);
 			BOOST_AFIO_ERRHWINFN(RemoveDirectory(req.path.c_str()), req.path);
-			auto ret=std::make_shared<async_io_handle_windows>(shared_from_this(), std::shared_ptr<async_io_handle>(), req.path, req.flags);
+			auto ret=std::make_shared<async_io_handle_windows>(this, std::shared_ptr<async_io_handle>(), req.path, req.flags);
 			return std::make_pair(true, ret);
 		}
 		// Called in unknown thread
@@ -2266,16 +2379,12 @@ namespace detail {
 			}
 			else
 			{
-				// Windows doesn't provide an async fsync so do it synchronously
-				if(p->SyncOnClose && p->write_count_since_fsync())
-					BOOST_AFIO_ERRHWINFN(FlushFileBuffers(p->h->native_handle()), p->path());
-				p->h->close();
-				p->h.reset();
+				p->close();
 			}
 			return std::make_pair(true, h);
 		}
 		// Called in unknown thread
-		void boost_asio_readwrite_completion_handler(bool is_write, size_t id, std::shared_ptr<async_io_handle> h, exception_ptr *, std::shared_ptr<std::pair<boost::afio::atomic<bool>, boost::afio::atomic<size_t>>> bytes_to_transfer, const boost::system::error_code &ec, size_t bytes_transferred)
+		void boost_asio_readwrite_completion_handler(bool is_write, size_t id, std::shared_ptr<async_io_handle> h, exception_ptr *, std::shared_ptr<std::pair<boost::afio::atomic<bool>, boost::afio::atomic<size_t>>> bytes_to_transfer, size_t bytes_this_chunk, const boost::system::error_code &ec, size_t bytes_transferred)
 		{
 			if(ec)
 			{
@@ -2302,9 +2411,9 @@ namespace detail {
 					p->byteswritten+=bytes_transferred;
 				else
 					p->bytesread+=bytes_transferred;
-				if(!(bytes_to_transfer->second-=bytes_transferred))
+				if(!(bytes_to_transfer->second-=bytes_this_chunk)) // bytes_this_chunk may not equal bytes_transferred if final 4Kb chunk of direct file
 					complete_async_op(id, h);
-				BOOST_AFIO_DEBUG_PRINT("H %u e=%u\n", (unsigned) id, (unsigned) ec.value());
+				BOOST_AFIO_DEBUG_PRINT("H %u e=%u b=%u\n", (unsigned) id, (unsigned) ec.value(), (unsigned) bytes_transferred);
 			}
 			//std::cout << "id=" << id << " total=" << bytes_to_transfer->second << " this=" << bytes_transferred << std::endl;
 		}
@@ -2342,7 +2451,7 @@ namespace detail {
 					}
 				}
 				elems[pages].Alignment=0;
-				boost::asio::windows::overlapped_ptr ol(p->h->get_io_service(), boost::bind(&async_file_io_dispatcher_windows::boost_asio_readwrite_completion_handler, this, iswrite, id, h, nullptr, bytes_to_transfer, boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred));
+				boost::asio::windows::overlapped_ptr ol(p->h->get_io_service(), boost::bind(&async_file_io_dispatcher_windows::boost_asio_readwrite_completion_handler, this, iswrite, id, h, nullptr, bytes_to_transfer, amount, boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred));
 				ol.get()->Offset=(DWORD) (req.where & 0xffffffff);
 				ol.get()->OffsetHigh=(DWORD) ((req.where>>32) & 0xffffffff);
 				BOOL ok=iswrite ? WriteFileGather
@@ -2364,7 +2473,7 @@ namespace detail {
 				size_t offset=0;
 				BOOST_FOREACH(auto &b, req.buffers)
 				{
-					boost::asio::windows::overlapped_ptr ol(p->h->get_io_service(), boost::bind(&async_file_io_dispatcher_windows::boost_asio_readwrite_completion_handler, this, iswrite, id, h, nullptr, bytes_to_transfer, boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred));
+					boost::asio::windows::overlapped_ptr ol(p->h->get_io_service(), boost::bind(&async_file_io_dispatcher_windows::boost_asio_readwrite_completion_handler, this, iswrite, id, h, nullptr, bytes_to_transfer, boost::asio::buffer_size(b), boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred));
 					ol.get()->Offset=(DWORD) ((req.where+offset) & 0xffffffff);
 					ol.get()->OffsetHigh=(DWORD) (((req.where+offset)>>32) & 0xffffffff);
 					BOOL ok=iswrite ? WriteFile
@@ -2394,9 +2503,22 @@ namespace detail {
 			BOOST_FOREACH(auto &b, req.buffers)
             {	BOOST_AFIO_DEBUG_PRINT("  R %u: %p %u\n", (unsigned) id, boost::asio::buffer_cast<const void *>(b), (unsigned) boost::asio::buffer_size(b)); }
 #endif
-			doreadwrite(id, h, e, req, p);
-			// Indicate we're not finished yet
-			return std::make_pair(false, h);
+			if(p->mapaddr)
+			{
+				void *addr=(void *)((char *) p->mapaddr + req.where);
+				BOOST_FOREACH(auto &b, req.buffers)
+				{
+					memcpy(boost::asio::buffer_cast<void *>(b), addr, boost::asio::buffer_size(b));
+					addr=(void *)((char *) addr + boost::asio::buffer_size(b));
+				}
+				return std::make_pair(true, h);
+			}
+			else
+			{
+				doreadwrite(id, h, e, req, p);
+				// Indicate we're not finished yet
+				return std::make_pair(false, h);
+			}
 		}
 		// Called in unknown thread
 		completion_returntype dowrite(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr *e, detail::async_data_op_req_impl<true> req)
@@ -2487,7 +2609,11 @@ namespace detail {
 				{
 					size_t length=ffdi->FileNameLength/sizeof(std::filesystem::path::value_type);
 					if(length<=2 && '.'==ffdi->FileName[0])
-						if(1==length || '.'==ffdi->FileName[1]) continue;
+						if(1==length || '.'==ffdi->FileName[1])
+						{
+							if(!ffdi->NextEntryOffset) done=true;
+							continue;
+						}
 					std::filesystem::path::string_type leafname(ffdi->FileName, length);
 					item.leafname=std::move(leafname);
 					item.stat.st_ino=ffdi->FileId.QuadPart;
@@ -2667,7 +2793,7 @@ namespace detail {
 					BOOST_AFIO_THROW(std::runtime_error("Inputs are invalid."));
             }
 #endif
-			return chain_async_ops((int) detail::OpType::read, reqs, async_op_flags::DetachedFuture|async_op_flags::ImmediateCompletion, &async_file_io_dispatcher_windows::doread);
+			return chain_async_ops((int) detail::OpType::read, reqs, async_op_flags::DetachedFuture, &async_file_io_dispatcher_windows::doread);
 		}
 		virtual std::vector<async_io_op> write(const std::vector<detail::async_data_op_req_impl<true>> &reqs)
 		{
@@ -2678,7 +2804,7 @@ namespace detail {
 					BOOST_AFIO_THROW(std::runtime_error("Inputs are invalid."));
             }
 #endif
-			return chain_async_ops((int) detail::OpType::write, reqs, async_op_flags::DetachedFuture|async_op_flags::ImmediateCompletion, &async_file_io_dispatcher_windows::dowrite);
+			return chain_async_ops((int) detail::OpType::write, reqs, async_op_flags::DetachedFuture, &async_file_io_dispatcher_windows::dowrite);
 		}
 		virtual std::vector<async_io_op> truncate(const std::vector<async_io_op> &ops, const std::vector<off_t> &sizes)
 		{
@@ -2700,7 +2826,7 @@ namespace detail {
 					BOOST_AFIO_THROW(std::runtime_error("Inputs are invalid."));
             }
 #endif
-			return chain_async_ops((int) detail::OpType::enumerate, reqs, async_op_flags::DetachedFuture|async_op_flags::ImmediateCompletion, &async_file_io_dispatcher_windows::doenumerate);
+			return chain_async_ops((int) detail::OpType::enumerate, reqs, async_op_flags::DetachedFuture, &async_file_io_dispatcher_windows::doenumerate);
 		}
 	};
 } //namespace
@@ -2745,7 +2871,7 @@ namespace detail {
 		{
 			req.flags=fileflags(req.flags);
 			BOOST_AFIO_ERRHOSFN(BOOST_AFIO_POSIX_RMDIR(req.path.c_str()), req.path);
-			auto ret=std::make_shared<async_io_handle_posix>(shared_from_this(), std::shared_ptr<async_io_handle>(), req.path, req.flags, false, -999);
+			auto ret=std::make_shared<async_io_handle_posix>(this, std::shared_ptr<async_io_handle>(), req.path, req.flags, false, -999);
 			return std::make_pair(true, ret);
 		}
 		// Called in unknown thread
@@ -2784,9 +2910,11 @@ namespace detail {
 			if(!!(req.flags & file_flags::FastDirectoryEnumeration))
 				dirh=p->get_handle_to_containing_dir(this, id, e, req, &async_file_io_dispatcher_compat::dofile);
 			// If writing and SyncOnClose and NOT synchronous, turn on SyncOnClose
-			auto ret=std::make_shared<async_io_handle_posix>(shared_from_this(), dirh, req.path, req.flags, (file_flags::SyncOnClose|file_flags::Write)==(req.flags & (file_flags::SyncOnClose|file_flags::Write|file_flags::AlwaysSync)),
+			auto ret=std::make_shared<async_io_handle_posix>(this, dirh, req.path, req.flags, (file_flags::SyncOnClose|file_flags::Write)==(req.flags & (file_flags::SyncOnClose|file_flags::Write|file_flags::AlwaysSync)),
 				BOOST_AFIO_POSIX_OPEN(req.path.c_str(), flags, 0x1b0/*660*/));
 			static_cast<async_io_handle_posix *>(ret.get())->do_add_io_handle_to_parent();
+			if(!(req.flags & file_flags::int_opening_dir) && !(req.flags & file_flags::int_opening_link) && !!(req.flags & file_flags::OSMMap))
+				ret->try_mapfile();
 			return std::make_pair(true, ret);
 		}
 		// Called in unknown thread
@@ -2794,7 +2922,7 @@ namespace detail {
 		{
 			req.flags=fileflags(req.flags);
 			BOOST_AFIO_ERRHOSFN(BOOST_AFIO_POSIX_UNLINK(req.path.c_str()), req.path);
-			auto ret=std::make_shared<async_io_handle_posix>(shared_from_this(), std::shared_ptr<async_io_handle>(), req.path, req.flags, false, -999);
+			auto ret=std::make_shared<async_io_handle_posix>(this, std::shared_ptr<async_io_handle>(), req.path, req.flags, false, -999);
 			return std::make_pair(true, ret);
 		}
 		// Called in unknown thread
@@ -2818,7 +2946,7 @@ namespace detail {
 		{
 			req.flags=fileflags(req.flags);
 			BOOST_AFIO_ERRHOSFN(BOOST_AFIO_POSIX_UNLINK(req.path.c_str()), req.path);
-			auto ret=std::make_shared<async_io_handle_posix>(shared_from_this(), std::shared_ptr<async_io_handle>(), req.path, req.flags, false, -999);
+			auto ret=std::make_shared<async_io_handle_posix>(this, std::shared_ptr<async_io_handle>(), req.path, req.flags, false, -999);
 			return std::make_pair(true, ret);
 		}
 		// Called in unknown thread
@@ -2842,10 +2970,7 @@ namespace detail {
 			}
 			else
 			{
-				if(p->SyncOnClose && p->write_count_since_fsync())
-					BOOST_AFIO_ERRHOSFN(BOOST_AFIO_POSIX_FSYNC(p->fd), p->path());
-				BOOST_AFIO_ERRHOSFN(BOOST_AFIO_POSIX_CLOSE(p->fd), p->path());
-				p->fd=-1;
+				p->close();
 			}
 			return std::make_pair(true, h);
 		}
@@ -2855,8 +2980,6 @@ namespace detail {
 			async_io_handle_posix *p=static_cast<async_io_handle_posix *>(h.get());
 			ssize_t bytesread=0, bytestoread=0;
 			iovec v;
-			std::vector<iovec> vecs;
-			vecs.reserve(req.buffers.size());
 			BOOST_AFIO_DEBUG_PRINT("R %u %p (%c) @ %u, b=%u\n", (unsigned) id, h.get(), p->path().native().back(), (unsigned) req.where, (unsigned) req.buffers.size());
 #ifdef DEBUG_PRINTING
 			BOOST_FOREACH(auto &b, req.buffers)
@@ -2864,6 +2987,18 @@ namespace detail {
                 BOOST_AFIO_DEBUG_PRINT("  R %u: %p %u\n", (unsigned) id, boost::asio::buffer_cast<const void *>(b), (unsigned) boost::asio::buffer_size(b));
             }
 #endif
+			if(p->mapaddr)
+			{
+				void *addr=(void *)((char *)p->mapaddr + req.where);
+				BOOST_FOREACH(auto &b, req.buffers)
+				{
+					memcpy(boost::asio::buffer_cast<void *>(b), addr, boost::asio::buffer_size(b));
+					addr=(void *)((char *)addr + boost::asio::buffer_size(b));
+				}
+				return std::make_pair(true, h);
+			}
+			std::vector<iovec> vecs;
+			vecs.reserve(req.buffers.size());
 			BOOST_FOREACH(auto &b, req.buffers)
 			{
 				v.iov_base=boost::asio::buffer_cast<void *>(b);
@@ -2941,7 +3076,11 @@ namespace detail {
 				auto buffer=std::unique_ptr<dirent[]>(new dirent[req.maxitems]);
 				if(req.restart)
 				{
+#ifdef __linux__
 					BOOST_AFIO_ERRHOS(lseek64(p->fd, 0, SEEK_SET));
+#else
+					BOOST_AFIO_ERRHOS(lseek(p->fd, 0, SEEK_SET));
+#endif
 				}
 				int bytes;
 				bool done;

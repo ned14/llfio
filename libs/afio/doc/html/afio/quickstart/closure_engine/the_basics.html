@@ -1,0 +1,132 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>The Basics</title>
+<link rel="stylesheet" href="../../../myboostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../../../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 0.1">
+<link rel="up" href="../closure_engine.html" title="Closure Execution Engines">
+<link rel="prev" href="../closure_engine.html" title="Closure Execution Engines">
+<link rel="next" href="the_basics/examples.html" title="Examples">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr>
+<td valign="top"><img alt="Boost C++ Libraries" width="277" height="86" src="../../../../../boost.png"></td>
+<td align="center"><a href="../../../../../index.html">Home</a></td>
+<td align="center"><a href="../../../../../libs/libraries.htm">Libraries</a></td>
+<td align="center"><a href="http://www.boost.org/users/people.html">People</a></td>
+<td align="center"><a href="http://www.boost.org/users/faq.html">FAQ</a></td>
+<td align="center"><a href="../../../../../more/index.htm">More</a></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../closure_engine.html"><img src="../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../closure_engine.html"><img src="../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="the_basics/examples.html"><img src="../../../../../doc/src/images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h4 class="title">
+<a name="afio.quickstart.closure_engine.the_basics"></a><a class="link" href="the_basics.html" title="The Basics">The Basics</a>
+</h4></div></div></div>
+<div class="toc"><dl class="toc"><dt><span class="section"><a href="the_basics/examples.html">Examples</a></span></dt></dl></div>
+<p>
+          First, it will be useful to introduce some core ideas before moving on
+          to a more indepth look at closure execution engines. Let us begin with
+          a simple definition of a closure. Wikipedia.org suplies a clear definition:
+        </p>
+<div class="blockquote"><blockquote class="blockquote"><p>
+            &#8220;In programming languages, a closure (also lexical closure or function
+            closure) is a function or reference to a function together with a referencing
+            environment&#8212;a table storing a reference to each of the non-local variables
+            (also called free variables or upvalues) of that function.[1] A closure&#8212;unlike
+            a plain function pointer&#8212;allows a function to access those non-local
+            variables even when invoked outside of its immediate lexical scope.&#8221;
+          </p></blockquote></div>
+<p>
+          <a href="#ftn.afio.quickstart.closure_engine.the_basics.f0" class="footnote" name="afio.quickstart.closure_engine.the_basics.f0"><sup class="footnote">[12]</sup></a>
+        </p>
+<p>
+          Basically, a closure can be thought of as an anonymous function object
+          capable of capturing local state for use outside of its lexical scope.
+          In C++ a closure strongly implies the use of a lambda expression, though
+          there are other ways to create closures. C++ is a very powerful and flexible
+          language, and how a closure is created is of less importance than what
+          it does. If you are unfamiliar with lambdas or closures in C++ we encourage
+          you to do some research on the subjects before continuing, as a basic understanding
+          of these core concepts will be important moving forward.
+        </p>
+<p>
+          Now that we have a basic idea of what a closure is, consider the role that
+          a closure execution engine plays: to execute the closures supplied to it.
+          How the engine works is largely driven by its design goals and performance
+          criteria. A simplistic analogy is to consider a rocket engine and a combustion
+          engine found in an automobile: both engines fill similar roles (vehicle
+          propulsion) but are quite different in how they work and perform the basic
+          task of vehicle locomotion, ie their design goals and performance criteria
+          are completely different. A closure execution engine is a fairly general
+          term, and implies little about the underlying implementation.
+        </p>
+<p>
+          Earlier, we defined Boost.AFIO as a specialized type of closure execution
+          engine: an asynchronous, chainable, batch executable, closure execution
+          engine. Now that we have a basic understanding of what a closure execution
+          engine is, understanding that it is asynchronous, chainable and batch executable
+          aren't quite as daunting.
+        </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+              Asynchonous: closures can be completed in an asynchronous fashion,
+              rather than with traditional sequential blocking behavior. Note that
+              asynchronous does not necessarily imply concurrency.
+            </li>
+<li class="listitem">
+              Chainable: closures can be chained together, so that dependent operations
+              can be scheduled for execution after the closures they depend on have
+              been completed.
+            </li>
+<li class="listitem">
+              Batch Executable: A group of closures can be scheduled for execution.
+            </li>
+</ul></div>
+<p>
+          So, Boost.AFIO can execute batches of sequential closures for asynchronous
+          completion. What this means for users is that it is possible to break up
+          a series of sequential tasks into a closures, and have Boost.AFIO schedule
+          them for asynchronous completion while the main thread is free to complete
+          other work.
+        </p>
+<p>
+          Boost.AFIO is primarily implemented as a threadpool that executes the closures
+          fed to it based on some internal logic. In essence Boost.AFIO creates a
+          thread whose responsibility it is to schedule closures for execution within
+          a threadpool. This allows user code to schedule some operations for future
+          completion, and even to schedule a series of operations to be executed
+          one after another, while leaving the main application free to complete
+          other work while waiting for closures to execute. This ability to chain
+          closures together makes it possible to schedule work to begin as soon as
+          it is able, and avoids waiting for an entire set of operations to complete
+          before any other tasks can begin.
+        </p>
+<div class="footnotes">
+<br><hr style="width:100; text-align:left;margin-left: 0">
+<div id="ftn.afio.quickstart.closure_engine.the_basics.f0" class="footnote"><p><a href="#afio.quickstart.closure_engine.the_basics.f0" class="para"><sup class="para">[12] </sup></a>
+            <a href="http://en.wikipedia.org/wiki/Closure_(computer_science)" target="_top">http://en.wikipedia.org/wiki/Closure_(computer_science)</a>
+            Sussman and Steele. "Scheme: An interpreter for extended lambda
+            calculus". "... a data structure containing a lambda expression,
+            and an environment to be used when that lambda expression is applied
+            to arguments." (<a href="http://en.wikisource.org/wiki/Page:Scheme_-_An_interpreter_for_extended_lambda_calculus.djvu/22" target="_top">WikiSource</a>)
+          </p></div>
+</div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2013 Niall Douglas and Paul Kirth<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../closure_engine.html"><img src="../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../closure_engine.html"><img src="../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="the_basics/examples.html"><img src="../../../../../doc/src/images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

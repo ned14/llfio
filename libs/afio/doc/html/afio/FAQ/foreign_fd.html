@@ -1,0 +1,67 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>How do I configure my own file descriptor or HANDLE in AFIO?</title>
+<link rel="stylesheet" href="../../myboostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 0.1">
+<link rel="up" href="../FAQ.html" title="Frequently Asked Questions">
+<link rel="prev" href="vector_use.html" title="Why did you use std::vector&lt;&gt; as the ops batch container instead of a generic iterator range?">
+<link rel="next" href="../acknowledgments.html" title="Acknowledgments">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr>
+<td valign="top"><img alt="Boost C++ Libraries" width="277" height="86" src="../../../../boost.png"></td>
+<td align="center"><a href="../../../../index.html">Home</a></td>
+<td align="center"><a href="../../../../libs/libraries.htm">Libraries</a></td>
+<td align="center"><a href="http://www.boost.org/users/people.html">People</a></td>
+<td align="center"><a href="http://www.boost.org/users/faq.html">FAQ</a></td>
+<td align="center"><a href="../../../../more/index.htm">More</a></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="vector_use.html"><img src="../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../FAQ.html"><img src="../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="../acknowledgments.html"><img src="../../../../doc/src/images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="afio.FAQ.foreign_fd"></a><a class="link" href="foreign_fd.html" title="How do I configure my own file descriptor or HANDLE in AFIO?">How do I configure my own file descriptor
+      or HANDLE in AFIO?</a>
+</h3></div></div></div>
+<p>
+        Sometimes you receive a file descriptor or HANDLE from a third party piece
+        of code and you need to insert it as-in into AFIO for use. The solution to
+        this is very simple:
+      </p>
+<div class="orderedlist"><ol class="orderedlist" type="1">
+<li class="listitem">
+            Subclass <a class="link" href="../reference/classes/async_io_handle.html" title="async_io_handle"><code class="computeroutput"><span class="keyword">class</span> <span class="identifier">async_io_handle</span></code></a>
+            with a custom implementation for your file descriptor type. In particular,
+            you probably will have custom close semantics (e.g. don't close, or invoke
+            third party code to implement close).
+          </li>
+<li class="listitem">
+            Instantiate your custom handle implementation, and pass it into <code class="computeroutput"><span class="identifier">async_file_io_dispatcher_base</span><span class="special">::</span><span class="identifier">adopt</span><span class="special">()</span></code>.
+            This will immediately convert your custom handle type into an <code class="computeroutput"><span class="identifier">async_io_op</span></code> suitable for supplying
+            to <code class="computeroutput"><span class="identifier">read</span><span class="special">()</span></code>,
+            <code class="computeroutput"><span class="identifier">write</span><span class="special">()</span></code>
+            etc.
+          </li>
+<li class="listitem">
+            That's it, there is no more to it.
+          </li>
+</ol></div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2013 Niall Douglas and Paul Kirth<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="vector_use.html"><img src="../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../FAQ.html"><img src="../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="../acknowledgments.html"><img src="../../../../doc/src/images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

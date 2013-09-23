@@ -28,7 +28,81 @@
       write your own custom AFIO completion handler</a>
 </h3></div></div></div>
 <p>
-        TODO
+        If you want to extend Boost.AFIO with additional asynchronous functionality,
+        you're probably going to have to implement your own custom AFIO completion
+        handler which can be scheduled using <a class="link" href="../reference/classes/async_file_io_dispatcher_base/completion_2_batch_bound_functions.html" title="completion (batch bound functions)"><code class="computeroutput"><span class="identifier">async_file_io_dispatcher_base</span><span class="special">::</span><span class="identifier">completion</span><span class="special">()</span></code></a>.
+        These are the second most lowest level, second most primitive completion
+        handler AFIO has and while a non-trivial amount of programmer effort to utilise,
+        they do offer a maximum amount of flexibility, functionality and of course,
+        performance<a href="#ftn.afio.advanced_topics.custom_completion_handler.f0" class="footnote" name="afio.advanced_topics.custom_completion_handler.f0"><sup class="footnote">[13]</sup></a>. If you are NOT extending AFIO with extra functionality, you
+        almost certainly want <a class="link" href="../reference/classes/async_file_io_dispatcher_base/call_2_batch_bound_functions.html" title="call (batch bound functions)"><code class="computeroutput"><span class="identifier">async_file_io_dispatcher_base</span><span class="special">::</span><span class="identifier">call</span><span class="special">()</span></code></a>
+        instead.
+      </p>
+<p>
+        Some advantages of custom completion handlers include:
+      </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+            Access to op id, handle and if immediately called, precondition error
+            state.
+          </li>
+<li class="listitem">
+            Ability to schedule immediate completions which are executed instantly
+            after their precondition instead of later when the thread source gets
+            round to them. This is particularly useful when your host OS has real
+            async i/o support, because you can use immediate completions to schedule
+            non-blocking async i/o operations as quickly as possible. <span class="bold"><strong>See
+            below for the restrictions enforced on immediate completions</strong></span>.
+          </li>
+<li class="listitem">
+            Ability to schedule deferred completion handlers. These let you delay
+            AFIO completion to some arbitrary time later e.g. when a host OS async
+            operation completes.
+          </li>
+<li class="listitem">
+            Direct control of exception handling and error propagation.
+          </li>
+<li class="listitem">
+            Performance: completion handlers only have a <span class="bold"><strong>three</strong></span>
+            nested <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">function</span><span class="special">&lt;&gt;</span></code>
+            invocation overhead, rather than more (the fact it is three rather than
+            two is because <a href="http://www.boost.org/libs/asio/" target="_top">Boost.ASIO</a>'s
+            <code class="computeroutput"><span class="identifier">io_service</span><span class="special">.</span><span class="identifier">post</span><span class="special">()</span></code>
+            currently cannot accept a move-only work item such as <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">packaged_task</span><span class="special">&lt;&gt;</span></code>, so until this gets fixed we
+            have to wrap each packaged task in a <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;&gt;</span></code> and a <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">function</span><span class="special">&lt;&gt;</span></code> instance whose sole task is to
+            invoke the packaged task -- yes, we agree this is daft). The reason why
+            nesting <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">function</span><span class="special">&lt;&gt;</span></code>
+            invocations is bad is because each entails type erasure, which requires
+            the CPU to do an indirect jump (like a virtual function call) and while
+            modern branch predictors eliminate any penalty for executing just one
+            of those, they most certainly struggle when they have to execute a sequence
+            of indirect jumps. For example, a single indirect jump might cost just
+            two CPU cycles, while a mispredicted indirect jump might cost as much
+            as 18-25 CPU cycles.
+          </li>
+</ul></div>
+<p>
+        Some disadvantages of custom completion handlers include:
+      </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+            Unlike <a class="link" href="../reference/classes/async_file_io_dispatcher_base/call_2_batch_bound_functions.html" title="call (batch bound functions)"><code class="computeroutput"><span class="identifier">async_file_io_dispatcher_base</span><span class="special">::</span><span class="identifier">call</span><span class="special">()</span></code></a>,
+            there is no custom return type machinery i.e. you'll have to implement
+            your own. This isn't hard -- note how <a class="link" href="../reference/classes/async_file_io_dispatcher_base/enumerate_1_batch.html" title="enumerate (batch)"><code class="computeroutput"><span class="identifier">async_file_io_dispatcher_base</span><span class="special">::</span><span class="identifier">enumerate</span><span class="special">()</span></code></a>'s
+            internal completion handler in afio.cpp takes a shared pointer as a parameter
+            containing the promises of output for the enumerations, thus allowing
+            <a class="link" href="../reference/classes/async_file_io_dispatcher_base/enumerate_1_batch.html" title="enumerate (batch)"><code class="computeroutput"><span class="identifier">async_file_io_dispatcher_base</span><span class="special">::</span><span class="identifier">enumerate</span><span class="special">()</span></code></a>
+            to set up a batch of futures corresponding to those promises and return
+            those to the user.
+          </li>
+<li class="listitem">
+            Exception handling is rather more manual, especially for deferred completions.
+            That comes of course with flexibility as well as hassle.
+          </li>
+</ul></div>
+<p>
+        So, let's have a look at an example of a custom AFIO completion handler,
+        this being pretty much the simplest formulation possible:
       </p>
 <pre class="programlisting"><span class="comment">// Create a dispatcher instance</span>
 <span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_file_io_dispatcher_base</span><span class="special">&gt;</span> <span class="identifier">dispatcher</span><span class="special">=</span>
@@ -84,6 +158,20 @@
 <span class="comment">// ... and wait for it to complete</span>
 <span class="identifier">future</span><span class="special">.</span><span class="identifier">wait</span><span class="special">();</span>
 </pre>
+<p>
+        Note how you have fair amount of flexibility of defining any input parameters
+        you like so long as the standard triplet of id, handle and exception pointer
+        are there. This is enabled basically through <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">bind</span><span class="special">&lt;&gt;</span></code> to prebind any custom parameters
+        you may have to produce a <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">function</span><span class="special">&lt;&gt;</span></code> instance with the aforementioned
+        standard triplet of parameters. As AFIO's completion implementation natively
+        works with <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">function</span><span class="special">&lt;&gt;</span></code>,
+        you effectively get custom parameter binds for free anyway.
+      </p>
+<p>
+        The above shows a simple custom completion handler -- as mentioned earlier,
+        one can also do immediate completions and deferred completions, and this
+        is an example of just those:
+      </p>
 <pre class="programlisting"><span class="comment">// Create a dispatcher instance</span>
 <span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_file_io_dispatcher_base</span><span class="special">&gt;</span> <span class="identifier">dispatcher</span><span class="special">=</span>
     <span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">make_async_file_io_dispatcher</span><span class="special">();</span>
@@ -114,7 +202,7 @@
     <span class="comment">// Create some callable entity which will do the actual completion. It can be</span>
     <span class="comment">// anything you like, but you need a minimum of its integer id.</span>
     <span class="keyword">auto</span> <span class="identifier">completer</span><span class="special">=[](</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_file_io_dispatcher_base</span><span class="special">&gt;</span> <span class="identifier">dispatcher</span><span class="special">,</span>
-                      <span class="identifier">size_t</span> <span class="identifier">id</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_io_handle</span><span class="special">&gt;</span> <span class="identifier">h</span><span class="special">)</span>
+                      <span class="identifier">size_t</span> <span class="identifier">id</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_io_handle</span><span class="special">&gt;</span> <span class="identifier">h</span><span class="special">)</span> <span class="special">-&gt;</span> <span class="keyword">int</span>
     <span class="special">{</span>
         <span class="keyword">try</span>
         <span class="special">{</span>
@@ -131,6 +219,7 @@
                 <span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">current_exception</span><span class="special">()));</span>
             <span class="identifier">dispatcher</span><span class="special">-&gt;</span><span class="identifier">complete_async_op</span><span class="special">(</span><span class="identifier">id</span><span class="special">,</span> <span class="identifier">h</span><span class="special">,</span> <span class="identifier">e</span><span class="special">);</span>
         <span class="special">}</span>
+        <span class="keyword">return</span> <span class="number">0</span><span class="special">;</span>
     <span class="special">};</span>
     <span class="comment">// Bind the id and handle to completer, and enqueue for later asynchronous execution.</span>
     <span class="identifier">std</span><span class="special">::</span><span class="identifier">async</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">launch</span><span class="special">::</span><span class="identifier">async</span><span class="special">,</span> <span class="identifier">completer</span><span class="special">,</span> <span class="identifier">dispatcher</span><span class="special">,</span> <span class="identifier">id</span><span class="special">,</span> <span class="identifier">h</span><span class="special">);</span>
@@ -148,7 +237,14 @@
 <span class="comment">// Schedule an asynchronous call of the completion</span>
 <span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_io_op</span> <span class="identifier">op</span><span class="special">=</span>
     <span class="identifier">dispatcher</span><span class="special">-&gt;</span><span class="identifier">completion</span><span class="special">(</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_io_op</span><span class="special">()</span> <span class="comment">/* no precondition */</span><span class="special">,</span>
-        <span class="identifier">std</span><span class="special">::</span><span class="identifier">make_pair</span><span class="special">(</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_op_flags</span><span class="special">::</span><span class="identifier">None</span><span class="special">,</span> <span class="identifier">boundf</span><span class="special">));</span>
+        <span class="identifier">std</span><span class="special">::</span><span class="identifier">make_pair</span><span class="special">(</span>
+            <span class="comment">/* Allow me to defer completion */</span>
+            <span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_op_flags</span><span class="special">::</span><span class="identifier">DetachedFuture</span>
+            <span class="comment">/* Complete boundf immediately after its precondition (in this
+            case as there is no precondition that means right now before
+            completion() returns) */</span>
+            <span class="special">|</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_op_flags</span><span class="special">::</span><span class="identifier">ImmediateCompletion</span><span class="special">,</span>
+            <span class="identifier">boundf</span><span class="special">));</span>
 
 <span class="comment">// Create a boost::future&lt;&gt; representing the ops passed to when_all()</span>
 <span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">future</span><span class="special">&lt;</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_io_handle</span><span class="special">&gt;&gt;&gt;</span> <span class="identifier">future</span>
@@ -156,6 +252,86 @@
 <span class="comment">// ... and wait for it to complete</span>
 <span class="identifier">future</span><span class="special">.</span><span class="identifier">wait</span><span class="special">();</span>
 </pre>
+<p>
+        Note the new function for indicating a deferred completion: <code class="computeroutput"><span class="identifier">complete_async_op</span><span class="special">()</span></code>,
+        which can take a <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">exception_ptr</span></code> if you want AFIO to return
+        an errored state. Note also the <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_op_flags</span></code>
+        <code class="computeroutput"><span class="identifier">DetachedFuture</span></code> and <code class="computeroutput"><span class="identifier">ImmediateCompletion</span></code> -- if you fail to specify
+        the former and try to return a <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">make_pair</span><span class="special">(</span><span class="keyword">false</span><span class="special">,</span>
+        <span class="identifier">h</span><span class="special">)</span></code>
+        to indicate deferred completion from the completion handler, AFIO will throw
+        a fatal exception as you forgot to specify the <code class="computeroutput"><span class="identifier">DetachedFuture</span></code>
+        flag.
+      </p>
+<p>
+        Ops with detached futures are more complex to set up, execute and parse out
+        for invoking dependencies than normal ops. They have to have, by definition,
+        a separate exception handling and exception safety enforcement mechanism
+        all of which can be safely left to <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">packaged_task</span><span class="special">&lt;&gt;</span></code> if not enabled. You should therefore
+        not turn on detached futures unless you really need them. Remember you can
+        vary the <code class="computeroutput"><span class="identifier">DetachedFuture</span></code> flag
+        per call of <code class="computeroutput"><span class="identifier">completion</span><span class="special">()</span></code>
+        to turn them on only when needed.
+      </p>
+<p>
+        If you may add the same completion handler both as a normal completion and
+        as an immediate completion, and you need to tell how you were called in the
+        handler, the <code class="computeroutput"><span class="identifier">exception_ptr</span> <span class="special">*</span><span class="identifier">e</span></code> will
+        <span class="bold"><strong>always</strong></span> be non-null (i.e. point to an <code class="computeroutput"><span class="identifier">exception_ptr</span></code>) if the handler was called
+        as an immediate. It will always be null (i.e. point to nothing) if the handler
+        was not called as an immediate. Just because <code class="computeroutput"><span class="identifier">e</span></code>
+        points to a valid <code class="computeroutput"><span class="identifier">exception_ptr</span></code>
+        does not necessarily mean that exception point is itself not null.
+      </p>
+<p>
+        And finally, as much as immediate completions are vastly more efficient than
+        normal completions, and you can achieve far higher throughputs with them
+        especially as they involve almost no overhead to invoke, you should bear
+        in mind the following substantial disadvantages of immediate completions:
+      </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+            Immediate completions must NEVER block, not EVER. This is because they
+            are called while the oplock is held, and therefore no other op may be
+            added, enqueued or <span class="bold"><strong>completed</strong></span> while an
+            immediate completion is running. In other words, they hang the dispatcher.
+            You can of course schedule new ops from within an immediate completion
+            as the oplock is a recursive mutex.
+          </li>
+<li class="listitem">
+            Adding immediate completions to the precondition of the immediate completion
+            being executed won't work -- they get thrown away, just as if the completion
+            were not immediate. This does eliminate the potential for endless loops
+            of course.
+          </li>
+<li class="listitem">
+            Immediate completions are invoked <span class="bold"><strong>before</strong></span>
+            their precondition has returned their state to the future in the op ref,
+            but <span class="bold"><strong>after</strong></span> the scheduling of any dependencies.
+            This can lead to an interesting chicken and egg situation where your
+            immediate completion can't know the output of its precondition if it
+            is not an <code class="computeroutput"><span class="identifier">exception_ptr</span></code>
+            and not a <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_io_handle</span><span class="special">&gt;</span>
+            <span class="identifier">h</span></code>. One way of working around
+            this problem is to make the precondition's future detached, because then
+            the precondition's return state <span class="emphasis"><em>will</em></span> be available
+            to its immediate completions.
+          </li>
+</ul></div>
+<div class="footnotes">
+<br><hr style="width:100; text-align:left;margin-left: 0">
+<div id="ftn.afio.advanced_topics.custom_completion_handler.f0" class="footnote"><p><a href="#afio.advanced_topics.custom_completion_handler.f0" class="para"><sup class="para">[13] </sup></a>
+          If you're willing to go even <span class="emphasis"><em>more</em></span> low level, AFIO's
+          <code class="computeroutput"><span class="identifier">async_file_io_dispatcher_base</span></code>
+          class exposes as protected member functions the variadic templated function
+          <code class="computeroutput"><span class="identifier">chain_async_op</span><span class="special">()</span></code>
+          and a suite of specialised <code class="computeroutput"><span class="identifier">chain_async_ops</span><span class="special">()</span></code> helper overloads. Therefore if you subclass
+          <code class="computeroutput"><span class="identifier">async_file_io_dispatcher_base</span></code>,
+          you can enjoy the overhead of just two <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">function</span><span class="special">&lt;&gt;</span></code> calls, and just one of those calls
+          when ASIO's <code class="computeroutput"><span class="identifier">post</span><span class="special">()</span></code>
+          gets fixed.
+        </p></div>
+</div>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
 <td align="left"></td>

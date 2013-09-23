@@ -1,0 +1,325 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>make_async_data_op_req</title>
+<link rel="stylesheet" href="../../../myboostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../../../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 0.1">
+<link rel="up" href="../functions.html" title="Functions">
+<link rel="prev" href="make_async_data_op_req_3.html" title="make_async_data_op_req">
+<link rel="next" href="process_threadpool.html" title="process_threadpool">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr>
+<td valign="top"><img alt="Boost C++ Libraries" width="277" height="86" src="../../../../../boost.png"></td>
+<td align="center"><a href="../../../../../index.html">Home</a></td>
+<td align="center"><a href="../../../../../libs/libraries.htm">Libraries</a></td>
+<td align="center"><a href="http://www.boost.org/users/people.html">People</a></td>
+<td align="center"><a href="http://www.boost.org/users/faq.html">FAQ</a></td>
+<td align="center"><a href="../../../../../more/index.htm">More</a></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="make_async_data_op_req_3.html"><img src="../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../functions.html"><img src="../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="process_threadpool.html"><img src="../../../../../doc/src/images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h4 class="title">
+<a name="afio.reference.functions.make_async_data_op_req_4"></a><a class="link" href="make_async_data_op_req_4.html" title="make_async_data_op_req">make_async_data_op_req</a>
+</h4></div></div></div>
+<p>
+          <a class="indexterm" name="id1000748"></a>
+Convenience instantiator of a async_data_op_req, letting the compiler deduce
+          the template specialisation to use.
+        </p>
+<h6>
+<a name="afio.reference.functions.make_async_data_op_req_4.h0"></a>
+          <span class="phrase"><a name="afio.reference.functions.make_async_data_op_req_4.synopsis"></a></span><a class="link" href="make_async_data_op_req_4.html#afio.reference.functions.make_async_data_op_req_4.synopsis">Synopsis</a>
+        </h6>
+<pre class="programlisting"><span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">T</span><span class="special">&gt;</span>
+<span class="identifier">async_data_op_req</span><span class="special">&lt;</span><span class="keyword">typename</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">remove_pointer</span><span class="special">&lt;</span><span class="keyword">typename</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">decay</span><span class="special">&lt;</span><span class="identifier">T</span><span class="special">&gt;::</span><span class="identifier">type</span><span class="special">&gt;::</span><span class="identifier">type</span><span class="special">&gt;</span> <span class="identifier">make_async_data_op_req</span><span class="special">(</span><span class="identifier">async_io_op</span> <span class="identifier">_precondition</span><span class="special">,</span> <span class="identifier">T</span> <span class="special">&amp;&amp;</span> <span class="identifier">v</span><span class="special">,</span> <span class="identifier">size_t</span> <span class="identifier">_length</span><span class="special">,</span> <span class="identifier">off_t</span> <span class="identifier">_where</span><span class="special">)</span></pre>
+<h6>
+<a name="afio.reference.functions.make_async_data_op_req_4.h1"></a>
+          <span class="phrase"><a name="afio.reference.functions.make_async_data_op_req_4.parameters"></a></span><a class="link" href="make_async_data_op_req_4.html#afio.reference.functions.make_async_data_op_req_4.parameters">Parameters</a>
+        </h6>
+<div class="informaltable"><table class="table">
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                  <p>
+                    Type
+                  </p>
+                </th>
+<th>
+                  <p>
+                    Concept
+                  </p>
+                </th>
+<th>
+                  <p>
+                    Name
+                  </p>
+                </th>
+<th>
+                  <p>
+                    Description
+                  </p>
+                </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                  <p>
+                    class T
+                  </p>
+                </td>
+<td>
+                </td>
+<td>
+                  <p>
+                    -
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Must be specified
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    async_io_op
+                  </p>
+                </td>
+<td>
+                </td>
+<td>
+                  <p>
+                    _precondition
+                  </p>
+                </td>
+<td>
+                  <p>
+                    An optional precondition for this operation
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    T &amp;&amp;
+                  </p>
+                </td>
+<td>
+                </td>
+<td>
+                  <p>
+                    v
+                  </p>
+                </td>
+<td>
+                  <p>
+                    A pointer to memory or reference to object into which to read
+                    or write
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    size_t
+                  </p>
+                </td>
+<td>
+                </td>
+<td>
+                  <p>
+                    _length
+                  </p>
+                </td>
+<td>
+                  <p>
+                    The number of bytes to transfer
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    off_t
+                  </p>
+                </td>
+<td>
+                </td>
+<td>
+                  <p>
+                    _where
+                  </p>
+                </td>
+<td>
+                  <p>
+                    The offset at which to transfer
+                  </p>
+                </td>
+</tr>
+</tbody>
+</table></div>
+<h6>
+<a name="afio.reference.functions.make_async_data_op_req_4.h2"></a>
+          <span class="phrase"><a name="afio.reference.functions.make_async_data_op_req_4.returns"></a></span><a class="link" href="make_async_data_op_req_4.html#afio.reference.functions.make_async_data_op_req_4.returns">Returns</a>
+        </h6>
+<p>
+          An async_data_op_req matching the supplied parameter type. Constructs an
+          instance.
+        </p>
+<h6>
+<a name="afio.reference.functions.make_async_data_op_req_4.h3"></a>
+          <span class="phrase"><a name="afio.reference.functions.make_async_data_op_req_4.header"></a></span><a class="link" href="make_async_data_op_req_4.html#afio.reference.functions.make_async_data_op_req_4.header">Header</a>
+        </h6>
+<p>
+          <code class="computeroutput"><span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">boost</span><span class="special">/</span><span class="identifier">afio</span><span class="special">/</span><span class="identifier">afio</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span></code>
+        </p>
+<h6>
+<a name="afio.reference.functions.make_async_data_op_req_4.h4"></a>
+          <span class="phrase"><a name="afio.reference.functions.make_async_data_op_req_4.example"></a></span><a class="link" href="make_async_data_op_req_4.html#afio.reference.functions.make_async_data_op_req_4.example">Example</a>
+        </h6>
+<pre class="programlisting"><span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_file_io_dispatcher_base</span><span class="special">&gt;</span> <span class="identifier">dispatcher</span><span class="special">=</span>
+    <span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">make_async_file_io_dispatcher</span><span class="special">();</span>
+
+<span class="keyword">try</span>
+<span class="special">{</span>
+    <span class="comment">// Schedule an opening of a file called example_file.txt</span>
+    <span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_path_op_req</span> <span class="identifier">req</span><span class="special">(</span><span class="string">"example_file.txt"</span><span class="special">,</span>
+        <span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">file_flags</span><span class="special">::</span><span class="identifier">ReadWrite</span><span class="special">);</span>
+    <span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_io_op</span> <span class="identifier">openfile</span><span class="special">(</span><span class="identifier">dispatcher</span><span class="special">-&gt;</span><span class="identifier">file</span><span class="special">(</span><span class="identifier">req</span><span class="special">));</span> <a class="co" name="afio.reference.functions.make_async_data_op_req_4.c0" href="make_async_data_op_req_4.html#afio.reference.functions.make_async_data_op_req_4.c1"><img src="../../../../../doc/src/images/callouts/1.png" alt="1" border="0"></a>
+
+    <span class="comment">// Something a bit surprising for many people is that writing off</span>
+    <span class="comment">// the end of a file in AFIO does NOT extend the file and writes</span>
+    <span class="comment">// which go past the end will simply fail instead. Why not?</span>
+    <span class="comment">// Simple: that's the convention with async file i/o. You must </span>
+    <span class="comment">// explicitly extend files before writing, like this:</span>
+    <span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_io_op</span> <span class="identifier">resizedfile</span><span class="special">(</span><span class="identifier">dispatcher</span><span class="special">-&gt;</span><span class="identifier">truncate</span><span class="special">(</span><span class="identifier">openfile</span><span class="special">,</span> <span class="number">12</span><span class="special">));</span> <a class="co" name="afio.reference.functions.make_async_data_op_req_4.c2" href="make_async_data_op_req_4.html#afio.reference.functions.make_async_data_op_req_4.c3"><img src="../../../../../doc/src/images/callouts/2.png" alt="2" border="0"></a>
+
+    <span class="comment">// Config a write gather. You could do this of course as a batch</span>
+    <span class="comment">// of writes, but a write gather has optimised host OS support in most</span>
+    <span class="comment">// cases, so it's one syscall instead of many.</span>
+    <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">asio</span><span class="special">::</span><span class="identifier">const_buffer</span><span class="special">&gt;</span> <span class="identifier">buffers</span><span class="special">;</span>
+    <span class="identifier">buffers</span><span class="special">.</span><span class="identifier">push_back</span><span class="special">(</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">asio</span><span class="special">::</span><span class="identifier">const_buffer</span><span class="special">(</span><span class="string">"He"</span><span class="special">,</span> <span class="number">2</span><span class="special">));</span>
+    <span class="identifier">buffers</span><span class="special">.</span><span class="identifier">push_back</span><span class="special">(</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">asio</span><span class="special">::</span><span class="identifier">const_buffer</span><span class="special">(</span><span class="string">"ll"</span><span class="special">,</span> <span class="number">2</span><span class="special">));</span>
+    <span class="identifier">buffers</span><span class="special">.</span><span class="identifier">push_back</span><span class="special">(</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">asio</span><span class="special">::</span><span class="identifier">const_buffer</span><span class="special">(</span><span class="string">"o "</span><span class="special">,</span> <span class="number">2</span><span class="special">));</span>
+    <span class="identifier">buffers</span><span class="special">.</span><span class="identifier">push_back</span><span class="special">(</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">asio</span><span class="special">::</span><span class="identifier">const_buffer</span><span class="special">(</span><span class="string">"Wo"</span><span class="special">,</span> <span class="number">2</span><span class="special">));</span>
+    <span class="identifier">buffers</span><span class="special">.</span><span class="identifier">push_back</span><span class="special">(</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">asio</span><span class="special">::</span><span class="identifier">const_buffer</span><span class="special">(</span><span class="string">"rl"</span><span class="special">,</span> <span class="number">2</span><span class="special">));</span>
+    <span class="identifier">buffers</span><span class="special">.</span><span class="identifier">push_back</span><span class="special">(</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">asio</span><span class="special">::</span><span class="identifier">const_buffer</span><span class="special">(</span><span class="string">"d\n"</span><span class="special">,</span> <span class="number">2</span><span class="special">));</span>
+    <span class="comment">// Schedule the write gather to offset zero</span>
+    <span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_io_op</span> <span class="identifier">written</span><span class="special">(</span><span class="identifier">dispatcher</span><span class="special">-&gt;</span><span class="identifier">write</span><span class="special">(</span>
+        <span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">make_async_data_op_req</span><span class="special">(</span><span class="identifier">resizedfile</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">move</span><span class="special">(</span><span class="identifier">buffers</span><span class="special">),</span> <span class="number">0</span><span class="special">)));</span> <a class="co" name="afio.reference.functions.make_async_data_op_req_4.c4" href="make_async_data_op_req_4.html#afio.reference.functions.make_async_data_op_req_4.c5"><img src="../../../../../doc/src/images/callouts/3.png" alt="3" border="0"></a>
+
+    <span class="comment">// Schedule making sure the previous batch has definitely reached physical storage</span>
+    <span class="comment">// This won't complete until the write is on disc</span>
+    <span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_io_op</span> <span class="identifier">stored</span><span class="special">(</span><span class="identifier">dispatcher</span><span class="special">-&gt;</span><span class="identifier">sync</span><span class="special">(</span><span class="identifier">written</span><span class="special">));</span> <a class="co" name="afio.reference.functions.make_async_data_op_req_4.c6" href="make_async_data_op_req_4.html#afio.reference.functions.make_async_data_op_req_4.c7"><img src="../../../../../doc/src/images/callouts/4.png" alt="4" border="0"></a>
+
+    <span class="comment">// Schedule filling this array from the file. Note how convenient std::array</span>
+    <span class="comment">// is and completely replaces C style char buffer[bytes]</span>
+    <span class="identifier">std</span><span class="special">::</span><span class="identifier">array</span><span class="special">&lt;</span><span class="keyword">char</span><span class="special">,</span> <span class="number">12</span><span class="special">&gt;</span> <span class="identifier">buffer</span><span class="special">;</span>
+    <span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_io_op</span> <span class="identifier">read</span><span class="special">(</span><span class="identifier">dispatcher</span><span class="special">-&gt;</span><span class="identifier">read</span><span class="special">(</span>
+        <span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">make_async_data_op_req</span><span class="special">(</span><span class="identifier">stored</span><span class="special">,</span> <span class="identifier">buffer</span><span class="special">,</span> <span class="number">0</span><span class="special">)));</span> <a class="co" name="afio.reference.functions.make_async_data_op_req_4.c8" href="make_async_data_op_req_4.html#afio.reference.functions.make_async_data_op_req_4.c9"><img src="../../../../../doc/src/images/callouts/5.png" alt="5" border="0"></a>
+
+    <span class="comment">// Schedule the closing and deleting of example_file.txt after the contents read</span>
+    <span class="identifier">req</span><span class="special">.</span><span class="identifier">precondition</span><span class="special">=</span><span class="identifier">dispatcher</span><span class="special">-&gt;</span><span class="identifier">close</span><span class="special">(</span><span class="identifier">read</span><span class="special">);</span> <a class="co" name="afio.reference.functions.make_async_data_op_req_4.c10" href="make_async_data_op_req_4.html#afio.reference.functions.make_async_data_op_req_4.c11"><img src="../../../../../doc/src/images/callouts/6.png" alt="6" border="0"></a>
+    <span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_io_op</span> <span class="identifier">deletedfile</span><span class="special">(</span><span class="identifier">dispatcher</span><span class="special">-&gt;</span><span class="identifier">rmfile</span><span class="special">(</span><span class="identifier">req</span><span class="special">));</span> <a class="co" name="afio.reference.functions.make_async_data_op_req_4.c12" href="make_async_data_op_req_4.html#afio.reference.functions.make_async_data_op_req_4.c13"><img src="../../../../../doc/src/images/callouts/7.png" alt="7" border="0"></a>
+
+    <span class="comment">// Wait until the buffer has been filled, checking all steps for errors</span>
+    <span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">when_all</span><span class="special">({</span><span class="identifier">openfile</span><span class="special">,</span> <span class="identifier">resizedfile</span><span class="special">,</span> <span class="identifier">written</span><span class="special">,</span> <span class="identifier">stored</span><span class="special">,</span> <span class="identifier">read</span><span class="special">}).</span><span class="identifier">wait</span><span class="special">();</span> <a class="co" name="afio.reference.functions.make_async_data_op_req_4.c14" href="make_async_data_op_req_4.html#afio.reference.functions.make_async_data_op_req_4.c15"><img src="../../../../../doc/src/images/callouts/8.png" alt="8" border="0"></a>
+
+    <span class="comment">// There is actually a async_data_op_req&lt;std::string&gt; specialisation you</span>
+    <span class="comment">// can use to skip this bit by reading directly into a string ...</span>
+    <span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span> <span class="identifier">contents</span><span class="special">(</span><span class="identifier">buffer</span><span class="special">.</span><span class="identifier">begin</span><span class="special">(),</span> <span class="identifier">buffer</span><span class="special">.</span><span class="identifier">end</span><span class="special">());</span>
+    <span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="string">"Contents of file is '"</span> <span class="special">&lt;&lt;</span> <span class="identifier">contents</span> <span class="special">&lt;&lt;</span> <span class="string">"'"</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span>
+
+    <span class="comment">// Check remaining ops for errors</span>
+    <span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">when_all</span><span class="special">({</span><span class="identifier">req</span><span class="special">.</span><span class="identifier">precondition</span> <span class="comment">/*close*/</span><span class="special">,</span> <span class="identifier">deletedfile</span><span class="special">}).</span><span class="identifier">wait</span><span class="special">();</span>		<a class="co" name="afio.reference.functions.make_async_data_op_req_4.c16" href="make_async_data_op_req_4.html#afio.reference.functions.make_async_data_op_req_4.c17"><img src="../../../../../doc/src/images/callouts/9.png" alt="9" border="0"></a>
+<span class="special">}</span>
+<span class="keyword">catch</span><span class="special">(...)</span>
+<span class="special">{</span>
+    <span class="identifier">std</span><span class="special">::</span><span class="identifier">cerr</span> <span class="special">&lt;&lt;</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">current_exception_diagnostic_information</span><span class="special">(</span><span class="keyword">true</span><span class="special">)</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span>
+    <span class="keyword">throw</span><span class="special">;</span>
+<span class="special">}</span>
+</pre>
+<div class="calloutlist"><table border="0" summary="Callout list">
+<tr>
+<td width="5%" valign="top" align="left"><p><a name="afio.reference.functions.make_async_data_op_req_4.c1"></a><a href="#afio.reference.functions.make_async_data_op_req_4.c0"><img src="../../../../../doc/src/images/callouts/1.png" alt="1" border="0"></a> </p></td>
+<td valign="top" align="left"><p>
+              schedules open file as soon as possible
+            </p></td>
+</tr>
+<tr>
+<td width="5%" valign="top" align="left"><p><a name="afio.reference.functions.make_async_data_op_req_4.c3"></a><a href="#afio.reference.functions.make_async_data_op_req_4.c2"><img src="../../../../../doc/src/images/callouts/2.png" alt="2" border="0"></a> </p></td>
+<td valign="top" align="left"><p>
+              schedules resize file ready for writing after open file completes
+            </p></td>
+</tr>
+<tr>
+<td width="5%" valign="top" align="left"><p><a name="afio.reference.functions.make_async_data_op_req_4.c5"></a><a href="#afio.reference.functions.make_async_data_op_req_4.c4"><img src="../../../../../doc/src/images/callouts/3.png" alt="3" border="0"></a> </p></td>
+<td valign="top" align="left"><p>
+              schedules write after resize file completes
+            </p></td>
+</tr>
+<tr>
+<td width="5%" valign="top" align="left"><p><a name="afio.reference.functions.make_async_data_op_req_4.c7"></a><a href="#afio.reference.functions.make_async_data_op_req_4.c6"><img src="../../../../../doc/src/images/callouts/4.png" alt="4" border="0"></a> </p></td>
+<td valign="top" align="left"><p>
+              schedules sync after write completes
+            </p></td>
+</tr>
+<tr>
+<td width="5%" valign="top" align="left"><p><a name="afio.reference.functions.make_async_data_op_req_4.c9"></a><a href="#afio.reference.functions.make_async_data_op_req_4.c8"><img src="../../../../../doc/src/images/callouts/5.png" alt="5" border="0"></a> </p></td>
+<td valign="top" align="left"><p>
+              schedules read after sync completes
+            </p></td>
+</tr>
+<tr>
+<td width="5%" valign="top" align="left"><p><a name="afio.reference.functions.make_async_data_op_req_4.c11"></a><a href="#afio.reference.functions.make_async_data_op_req_4.c10"><img src="../../../../../doc/src/images/callouts/6.png" alt="6" border="0"></a> </p></td>
+<td valign="top" align="left"><p>
+              schedules close file after read completes
+            </p></td>
+</tr>
+<tr>
+<td width="5%" valign="top" align="left"><p><a name="afio.reference.functions.make_async_data_op_req_4.c13"></a><a href="#afio.reference.functions.make_async_data_op_req_4.c12"><img src="../../../../../doc/src/images/callouts/7.png" alt="7" border="0"></a> </p></td>
+<td valign="top" align="left"><p>
+              schedules delete file after close completes
+            </p></td>
+</tr>
+<tr>
+<td width="5%" valign="top" align="left"><p><a name="afio.reference.functions.make_async_data_op_req_4.c15"></a><a href="#afio.reference.functions.make_async_data_op_req_4.c14"><img src="../../../../../doc/src/images/callouts/8.png" alt="8" border="0"></a> </p></td>
+<td valign="top" align="left"><p>
+              waits for file open, resize, write, sync and read to complete, throwing
+              any exceptions encountered
+            </p></td>
+</tr>
+<tr>
+<td width="5%" valign="top" align="left"><p><a name="afio.reference.functions.make_async_data_op_req_4.c17"></a><a href="#afio.reference.functions.make_async_data_op_req_4.c16"><img src="../../../../../doc/src/images/callouts/9.png" alt="9" border="0"></a> </p></td>
+<td valign="top" align="left"><p>
+              waits for file close and delete to complete, throwing any exceptions
+              encountered
+            </p></td>
+</tr>
+</table></div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2013 Niall Douglas and Paul Kirth<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="make_async_data_op_req_3.html"><img src="../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../functions.html"><img src="../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="process_threadpool.html"><img src="../../../../../doc/src/images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

@@ -27,7 +27,7 @@
 <a name="afio.reference.classes.async_io_handle"></a><a class="link" href="async_io_handle.html" title="async_io_handle">async_io_handle</a>
 </h4></div></div></div>
 <p>
-          <a class="indexterm" name="id916931"></a>
+          <a class="indexterm" name="id989381"></a>
 The abstract base class encapsulating a platform-specific file handle.
         </p>
 <h6>
@@ -265,24 +265,6 @@ The abstract base class encapsulating a platform-specific file handle.
 </tr>
 <tr>
 <td>
-<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">stat_t</span> <span class="identifier">lstat</span><span class="special">(</span><span class="identifier">metadata_flags</span> <span class="identifier">wanted</span> <span class="special">=</span> <span class="identifier">directory_entry</span><span class="special">::</span><span class="identifier">metadata_fastpath</span><span class="special">())</span></pre>
-                </td>
-<td>
-                  <p>
-                    Returns a mostly filled stat_t structure for the file or directory
-                    referenced by this handle. Use <code class="literal"><code class="computeroutput"><span class="identifier">metadata_flags</span><span class="special">::</span><span class="identifier">All</span></code></code>
-                    if you want it as complete as your platform allows, even at the
-                    cost of severe performance loss.
-                  </p>
-                </td>
-<td>
-                  <p>
-                    <span class="bold"><strong>metadata_flags</strong></span>: <span class="emphasis"><em>wanted</em></span>:
-                  </p>
-                </td>
-</tr>
-<tr>
-<td>
 <pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">directory_entry</span> <span class="identifier">direntry</span><span class="special">(</span><span class="identifier">metadata_flags</span> <span class="identifier">wanted</span> <span class="special">=</span> <span class="identifier">directory_entry</span><span class="special">::</span><span class="identifier">metadata_fastpath</span><span class="special">())</span></pre>
                 </td>
 <td>
@@ -301,11 +283,42 @@ The abstract base class encapsulating a platform-specific file handle.
 </tr>
 <tr>
 <td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">stat_t</span> <span class="identifier">lstat</span><span class="special">(</span><span class="identifier">metadata_flags</span> <span class="identifier">wanted</span> <span class="special">=</span> <span class="identifier">directory_entry</span><span class="special">::</span><span class="identifier">metadata_fastpath</span><span class="special">())</span></pre>
+                </td>
+<td>
+                  <p>
+                    Returns a mostly filled stat_t structure for the file or directory
+                    referenced by this handle. Use <code class="literal"><code class="computeroutput"><span class="identifier">metadata_flags</span><span class="special">::</span><span class="identifier">All</span></code></code>
+                    if you want it as complete as your platform allows, even at the
+                    cost of severe performance loss.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <span class="bold"><strong>metadata_flags</strong></span>: <span class="emphasis"><em>wanted</em></span>:
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
 <pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">std</span><span class="special">::</span><span class="identifier">filesystem</span><span class="special">::</span><span class="identifier">path</span> <span class="identifier">target</span><span class="special">()</span></pre>
                 </td>
 <td>
                   <p>
                     Returns the target path of this handle if it is a symbolic link.
+                  </p>
+                </td>
+<td>
+                </td>
+</tr>
+<tr>
+<td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="keyword">void</span> <span class="special">*</span> <span class="identifier">try_mapfile</span><span class="special">()</span></pre>
+                </td>
+<td>
+                  <p>
+                    Tries to map the file into memory. Currently only works if handle
+                    is read-only.
                   </p>
                 </td>
 <td>
