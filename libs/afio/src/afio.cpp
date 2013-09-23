@@ -3393,4 +3393,12 @@ std::shared_ptr<async_file_io_dispatcher_base> make_async_file_io_dispatcher(std
 #endif
 }
 
+static void instantiate_header_types()
+{
+	// Instantiate needed types for the DLL to export
+	auto dispatcher=make_async_file_io_dispatcher();
+	std::shared_ptr<async_io_handle> h;
+	dispatcher->adopt(h);
+}
+
 } } // namespace
