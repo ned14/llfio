@@ -157,7 +157,7 @@ public:
 #else
 	void construct( pointer p, const_reference val )
 	{
-		if(initialize || !std::is_same<char, U>::value) ::new(reinterpret_cast<void*>(p)) T(val);
+		if(initialize || !std::is_same<char, T>::value) ::new(reinterpret_cast<void*>(p)) T(val);
 	}
 #endif
 
