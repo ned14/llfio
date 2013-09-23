@@ -1239,10 +1239,7 @@ public:
 	\exceptionmodelstd
 	\qexample{filedir_example}
 	*/
-	std::vector<async_io_op> adopt(const std::vector<std::shared_ptr<async_io_handle>> &hs)
-	{
-		return chain_async_ops(0, hs, async_op_flags::ImmediateCompletion, &async_file_io_dispatcher_base::doadopt);
-	}
+	std::vector<async_io_op> adopt(const std::vector<std::shared_ptr<async_io_handle>> &hs);
 	/*! \brief Schedule an adoption of a third party handle.
 
 	This function enables you to adopt third party custom async_io_handle derivatives

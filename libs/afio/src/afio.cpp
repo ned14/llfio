@@ -491,7 +491,7 @@ namespace windows_nt_kernel
 	static inline boost::afio::chrono::system_clock::time_point to_timepoint(LARGE_INTEGER time)
 	{
 		// We make the big assumption that the STL's system_clock is based on the time_t epoch 1st Jan 1970.
-		static BOOST_CONSTEXPR_OR_CONST unsigned long long FILETIME_OFFSET_TO_1970=(((unsigned long long)27111902 << 32U) + (unsigned long long)3577643008);
+		static BOOST_CONSTEXPR_OR_CONST unsigned long long FILETIME_OFFSET_TO_1970=((27111902ULL << 32U) + 3577643008ULL);
 		// Need to have this self-adapt to the STL being used
 		static BOOST_CONSTEXPR_OR_CONST unsigned long long STL_TICKS_PER_SEC=(unsigned long long) boost::afio::chrono::system_clock::period::den/boost::afio::chrono::system_clock::period::num;
 
@@ -2051,6 +2051,11 @@ template<class F> std::pair<std::vector<future<std::pair<std::vector<directory_e
 	return std::make_pair(std::move(retfutures), std::move(ret));
 }
 
+std::vector<async_io_op> async_file_io_dispatcher_base::adopt(const std::vector<std::shared_ptr<async_io_handle>> &hs)
+{
+	return chain_async_ops(0, hs, async_op_flags::ImmediateCompletion, &async_file_io_dispatcher_base::doadopt);
+}
+
 namespace detail
 {
 	struct barrier_count_completed_state
@@ -3391,14 +3396,6 @@ std::shared_ptr<async_file_io_dispatcher_base> make_async_file_io_dispatcher(std
 #else
 	return std::make_shared<detail::async_file_io_dispatcher_compat>(threadpool, flagsforce, flagsmask);
 #endif
-}
-
-static void instantiate_header_types()
-{
-	// Instantiate needed types for the DLL to export
-	auto dispatcher=make_async_file_io_dispatcher();
-	std::shared_ptr<async_io_handle> h;
-	dispatcher->adopt(h);
 }
 
 } } // namespace
