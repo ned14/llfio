@@ -1,3 +1,5 @@
+#include "../../../boost/afio/afio.hpp"
+#if !(defined(BOOST_MSVC) && BOOST_MSVC < 1700)
 #include <deque>
 #include <regex>
 #include <chrono>
@@ -5,8 +7,8 @@
 #include <future>
 #include <initializer_list>
 #include "boost/exception/diagnostic_information.hpp"
-#include "../../../boost/afio/afio.hpp"
 #include "../../../boost/afio/detail/Aligned_Allocator.hpp"
+#endif
 
 /* My Intel Core i7 3770K running Windows 8 x64 with 7200rpm drive, using
 Sysinternals RAMMap to clear disc cache (http://technet.microsoft.com/en-us/sysinternals/ff700229.aspx)
@@ -30,7 +32,7 @@ The search took 242.76 seconds which was 150.033 files per second or 24 Mb/sec.
 
 #define USE_MMAPS
 
-#if !(defined(BOOST_MSVC) && BOOST_MSVC < 1700)
+#if !(defined(BOOST_MSVC) && BOOST_MSVC < 1700) && !(defined(__GLIBCXX__) && __GLIBCXX__<=20120920 /* <= GCC 4.7 */)
 //[find_in_files_afio
 using namespace boost::afio;
 

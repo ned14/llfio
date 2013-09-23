@@ -1,9 +1,11 @@
+#include "boost/exception/diagnostic_information.hpp"
+#if !(defined(BOOST_MSVC) && BOOST_MSVC < 1700)
 #include <iostream>
 #include <fstream>
 #include <regex>
 #include <chrono>
-#include "boost/exception/diagnostic_information.hpp"
 #include "../../../boost/afio/detail/std_filesystem.hpp" // in lieu of <filesystem>
+#endif
 
 /* My Intel Core i7 3770K running Windows 8 x64 with 7200rpm drive, using
 Sysinternals RAMMap to clear disc cache (http://technet.microsoft.com/en-us/sysinternals/ff700229.aspx)
