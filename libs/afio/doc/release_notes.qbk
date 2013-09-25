@@ -18,6 +18,42 @@ First release.
 
 [section:FAQ Frequently Asked Questions]
 
+[section:closure_performance What is the maximum throughput of AFIO's closure execution engine aka
+how many IOPS can I push with AFIO?]
+
+For v1.0, maximum throughput is approximately as follows:
+
+[table:throughput Maximum null closure execution rate on a 3.5Ghz Intel Core i7 3770K for AFIO v1.0:
+[[Operating system][`call()` unchained][`call()` chained][`completion()` unchained][`completion()` chained]]
+[[Microsoft Windows 8 x64][337955][123407][534522][143409]]
+[[Ubuntu 12.04 LTS Linux x64][][][][]]
+]
+
+While this is fast enough for consumer SSDs, we agree it is currently not great. The biggest limiter, by far, is the
+recursive mutex protecting the ops dispatch and completion implementation. Because AFIO is pure batch, dispatch
+is very rarely a problem: rather it is completion, because completion handling must always be performed per op completion
+in order to check for and dispatch, if necessary, dependencies. Currently the top consumers of CPU
+time during null closure dispatch benchmark are as follows:
+
+[table:top_consumers Top consumers of CPU time during null closure dispatch in AFIO v1.0
+[[Unchained][][Chained][]]
+[[ops Mutex][85%][ops Mutex][99.41%]]
+[[threadpool waiting for new ops][4.15%][threadpool waiting for new ops][0.26%]]
+[[operator new][2.43%][Remainder and misc][0.33%]]
+[[hash table insert][2.05%][][]]
+[[sending ops to threadpool][1.67%][][]]
+[[Remainder and misc][4.7%][][]]
+]
+
+Luckily, the mutex is not held while file i/o operations or closures are being executed, so contention on the mutex
+isn't as much of a problem during real world use and therefore is in practice nothing like as bad as things look above
+-- in fact, adding in a noop kernel syscall actually slightly improves the figures because the mutex isn't being
+contended as heavily, so the above figures for `completion()` are very reasonable max IOPS values. Nevertheless, if you were randomly
+reading or writing very small bits of data, we can see how the mutex might get in the way, and we intend to do something
+about it in a future v1.x release of __boost_afio__, most especially to eliminate the recursive mutex in favour of a spin lock.
+
+[endsect] [/closure_performance]
+
 [section:stuck_ops I'm seeing ["WARNING: `~async_file_dispatcher_base()` detects stuck `async_io_op` in total of X ops] during
 process close. What does this mean?]
 

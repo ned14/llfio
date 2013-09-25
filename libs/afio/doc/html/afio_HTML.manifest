@@ -97,6 +97,7 @@ afio/advanced_topics/custom_completion_handler.html
 afio/advanced_topics/vs2010_notes.html
 afio/release_notes.html
 afio/FAQ.html
+afio/FAQ/closure_performance.html
 afio/FAQ/stuck_ops.html
 afio/FAQ/vector_use.html
 afio/FAQ/foreign_fd.html

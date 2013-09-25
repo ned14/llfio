@@ -449,7 +449,14 @@ may be reference count deleted before static data deinit occurs.
 */
 class thread_source : public std::enable_shared_from_this<thread_source> {
 private:
-	template<class R> static void invoke_packagedtask(std::shared_ptr<packaged_task<R()>> t) { (*t)(); }
+#if BOOST_AFIO_WORK_AROUND_ASIO_IO_SERVICE_POST_NO_MOVE_ONLY_SUPPORT
+	template<class T> struct copyable_packaged_task : std::shared_ptr<packaged_task<T>>
+	{
+		template<class B> explicit copyable_packaged_task(B &&v) BOOST_NOEXCEPT_OR_NOTHROW : std::shared_ptr<packaged_task<T>>(std::move(std::make_shared<packaged_task<T>>(std::forward<B>(v)))) {}
+		copyable_packaged_task(copyable_packaged_task &&v) BOOST_NOEXCEPT_OR_NOTHROW : std::shared_ptr<packaged_task<T>>(std::move(v)) { }
+		auto operator()() -> decltype((*get())()) { return (*get())(); }
+	};
+#endif
 protected:
 	boost::asio::io_service service;
 	std::unique_ptr<boost::asio::io_service::work> working;
@@ -470,9 +477,10 @@ public:
 #if BOOST_AFIO_WORK_AROUND_ASIO_IO_SERVICE_POST_NO_MOVE_ONLY_SUPPORT
 		// Somewhat annoyingly, io_service.post() needs its parameter to be copy constructible,
 		// and packaged_task is only move constructible, so ...
-		auto task=std::make_shared<packaged_task<R()>>(std::move(f));
-		service.post(std::bind(&thread_source::invoke_packagedtask<R>, task));
-		return task->get_future();
+		auto task=copyable_packaged_task<R()>(std::move(f));
+		auto ret=task->get_future();
+		service.post(std::move(task));
+		return std::move(ret);
 #else
 		auto task=packaged_task<R()>(std::move(f));
 		auto ret=task.get_future();

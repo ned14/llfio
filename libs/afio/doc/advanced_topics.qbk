@@ -19,7 +19,7 @@ of flexibility, functionality and of course, performance[footnote If you're will
 `async_file_io_dispatcher_base` class exposes as protected member functions the variadic
 templated function `chain_async_op()` and a suite of specialised `chain_async_ops()` helper
 overloads. Therefore if you subclass `async_file_io_dispatcher_base`, you can enjoy the overhead of
-just two `std::function<>` calls, and just one of those calls when ASIO's `post()` gets fixed.]. If you are NOT extending
+just one `std::function<>` call.]. If you are NOT extending
 AFIO with extra functionality, you almost certainly want __afio_call__ instead.
 
 Some advantages of custom completion handlers include:
@@ -33,12 +33,8 @@ as quickly as possible. [*See below for the restrictions enforced on immediate c
 * Ability to schedule deferred completion handlers. These let you delay AFIO completion
 to some arbitrary time later e.g. when a host OS async operation completes.
 * Direct control of exception handling and error propagation.
-* Performance: completion handlers only have a [*three] nested `std::function<>` invocation
-overhead, rather than more (the fact it is three rather than two is because __boost_asio__'s `io_service.post()`
-currently cannot accept a move-only work item such as `std::packaged_task<>`, so until
-this gets fixed we have to wrap each packaged task in a `std::shared_ptr<>` and a
-`std::function<>` instance whose sole task is to invoke the packaged task -- yes, we
-agree this is daft). The reason why nesting `std::function<>` invocations is bad is
+* Performance: completion handlers only have a [*two] nested `std::function<>` invocation
+overhead, rather than more. The reason why nesting `std::function<>` invocations is bad is
 because each entails type erasure, which requires the CPU to do an indirect jump
 (like a virtual function call) and while modern branch predictors eliminate any penalty
 for executing just one of those, they most certainly struggle when they have to execute
@@ -99,13 +95,14 @@ involve almost no overhead to invoke, you should bear in
 mind the following substantial disadvantages of immediate completions:
 
 * Immediate completions must NEVER block, not EVER. This is because they are called while
-the oplock is held, and therefore no other op may be added, enqueued or [*completed]
+the oplock is held[footnote It is expected that in the near future the op lock will NOT
+be held during immediate completions so AFIO can remove the need for recursive mutexes,
+something which is currently a major performance problem.], and therefore no other op may be added, enqueued or [*completed]
 while an immediate completion is running. In other words, they hang the dispatcher.
-You can of course schedule new ops from within an immediate completion as the oplock
-is a recursive mutex.
 * Adding immediate completions to the precondition of the immediate completion being
 executed won't work -- they get thrown away, just as if the completion were not
-immediate. This does eliminate the potential for endless loops of course.
+immediate. This does eliminate the potential for endless loops of course. You CAN
+add completions to yourself (see the `op_from_scheduled_id()` method).
 * Immediate completions are invoked [*before] their precondition has returned their
 state to the future in the op ref, but [*after] the scheduling of any dependencies. This
 can lead to an interesting chicken and egg situation where your immediate completion

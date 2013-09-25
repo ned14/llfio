@@ -15,11 +15,18 @@ int main(void)
 	
 	auto callback=std::function<async_file_io_dispatcher_base::completion_t>([](size_t, std::shared_ptr<async_io_handle> h, exception_ptr *)
 	{
+#if 1
+		Sleep(0);
+#endif
 		return std::make_pair(true, h);
 	});
 	std::vector<async_io_op> preconditions;
 	std::vector<std::pair<async_op_flags, std::function<async_file_io_dispatcher_base::completion_t>>> callbacks(100000,
 		std::make_pair(async_op_flags::None, callback));
+#if 0
+	std::cout << "Attach profiler now and hit Return" << std::endl;
+	getchar();
+#endif
 	begin=std::chrono::high_resolution_clock::now();
 	for(size_t n=0; n<50; n++)
 		dispatcher->completion(preconditions, callbacks);

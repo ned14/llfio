@@ -1,0 +1,299 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>What is the maximum throughput of AFIO's closure execution engine?</title>
+<link rel="stylesheet" href="../../myboostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 0.1">
+<link rel="up" href="../FAQ.html" title="Frequently Asked Questions">
+<link rel="prev" href="../FAQ.html" title="Frequently Asked Questions">
+<link rel="next" href="stuck_ops.html" title="I'm seeing &#8220;WARNING: ~async_file_dispatcher_base() detects stuck async_io_op in total of X ops&#8221; during process close. What does this mean?">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr>
+<td valign="top"><img alt="Boost C++ Libraries" width="277" height="86" src="../../../../boost.png"></td>
+<td align="center"><a href="../../../../index.html">Home</a></td>
+<td align="center"><a href="../../../../libs/libraries.htm">Libraries</a></td>
+<td align="center"><a href="http://www.boost.org/users/people.html">People</a></td>
+<td align="center"><a href="http://www.boost.org/users/faq.html">FAQ</a></td>
+<td align="center"><a href="../../../../more/index.htm">More</a></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../FAQ.html"><img src="../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../FAQ.html"><img src="../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="stuck_ops.html"><img src="../../../../doc/src/images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="afio.FAQ.closure_performance"></a><a class="link" href="closure_performance.html" title="What is the maximum throughput of AFIO's closure execution engine?">What is the maximum throughput
+      of AFIO's closure execution engine?</a>
+</h3></div></div></div>
+<p>
+        For v1.0, maximum throughput is approximately as follows:
+      </p>
+<div class="table">
+<a name="afio.FAQ.closure_performance.throughput"></a><p class="title"><b>Table&#160;1.8.&#160;Maximum null closure execution rate on a 3.5Ghz Intel Core i7 3770K
+        for AFIO v1.0:</b></p>
+<div class="table-contents"><table class="table" summary="Maximum null closure execution rate on a 3.5Ghz Intel Core i7 3770K
+        for AFIO v1.0:">
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                <p>
+                  Operating system
+                </p>
+              </th>
+<th>
+                <p>
+                  <code class="computeroutput"><span class="identifier">call</span><span class="special">()</span></code>
+                  unchained
+                </p>
+              </th>
+<th>
+                <p>
+                  <code class="computeroutput"><span class="identifier">call</span><span class="special">()</span></code>
+                  chained
+                </p>
+              </th>
+<th>
+                <p>
+                  <code class="computeroutput"><span class="identifier">completion</span><span class="special">()</span></code>
+                  unchained
+                </p>
+              </th>
+<th>
+                <p>
+                  <code class="computeroutput"><span class="identifier">completion</span><span class="special">()</span></code>
+                  chained
+                </p>
+              </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                <p>
+                  Microsoft Windows 8 x64
+                </p>
+              </td>
+<td>
+                <p>
+                  337955
+                </p>
+              </td>
+<td>
+                <p>
+                  123407
+                </p>
+              </td>
+<td>
+                <p>
+                  534522
+                </p>
+              </td>
+<td>
+                <p>
+                  143409
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  Ubuntu 12.04 LTS Linux x64
+                </p>
+              </td>
+<td>
+              </td>
+<td>
+              </td>
+<td>
+              </td>
+<td>
+              </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break"><p>
+        While this is fast enough for consumer SSDs, we agree it is currently not
+        great. The biggest limiter, by far, is the recursive mutex protecting the
+        ops dispatch and completion implementation. Because AFIO is pure batch, dispatch
+        is very rarely a problem: rather it is completion, because completion handling
+        must always be performed per op completion in order to check for and dispatch,
+        if necessary, dependencies. Currently the top consumers of CPU time during
+        null closure dispatch benchmark are as follows:
+      </p>
+<div class="table">
+<a name="afio.FAQ.closure_performance.top_consumers"></a><p class="title"><b>Table&#160;1.9.&#160;Top consumers of CPU time during null closure dispatch in AFIO v1.0</b></p>
+<div class="table-contents"><table class="table" summary="Top consumers of CPU time during null closure dispatch in AFIO v1.0">
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                <p>
+                  Unchained
+                </p>
+              </th>
+<th>
+              </th>
+<th>
+                <p>
+                  Chained
+                </p>
+              </th>
+<th>
+              </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                <p>
+                  ops Mutex
+                </p>
+              </td>
+<td>
+                <p>
+                  85%
+                </p>
+              </td>
+<td>
+                <p>
+                  ops Mutex
+                </p>
+              </td>
+<td>
+                <p>
+                  99.41%
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  threadpool waiting for new ops
+                </p>
+              </td>
+<td>
+                <p>
+                  4.15%
+                </p>
+              </td>
+<td>
+                <p>
+                  threadpool waiting for new ops
+                </p>
+              </td>
+<td>
+                <p>
+                  0.26%
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  operator new
+                </p>
+              </td>
+<td>
+                <p>
+                  2.43%
+                </p>
+              </td>
+<td>
+                <p>
+                  Remainder and misc
+                </p>
+              </td>
+<td>
+                <p>
+                  0.33%
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  hash table insert
+                </p>
+              </td>
+<td>
+                <p>
+                  2.05%
+                </p>
+              </td>
+<td>
+              </td>
+<td>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  sending ops to threadpool
+                </p>
+              </td>
+<td>
+                <p>
+                  1.67%
+                </p>
+              </td>
+<td>
+              </td>
+<td>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  Remainder and misc
+                </p>
+              </td>
+<td>
+                <p>
+                  4.7%
+                </p>
+              </td>
+<td>
+              </td>
+<td>
+              </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break"><p>
+        Luckily, the mutex is not held while file i/o operations or closures are
+        being executed, so contention on the mutex isn't as much of a problem during
+        real world use and therefore is in practice nothing like as bad as things
+        look above -- in fact, adding in a noop kernel syscall actually slightly
+        improves the figures because the mutex isn't being contended as heavily,
+        so the above figures for <code class="computeroutput"><span class="identifier">completion</span><span class="special">()</span></code> are very reasonable max IOPS values. Nevertheless,
+        if you were randomly reading or writing very small bits of data, we can see
+        how the mutex might get in the way, and we intend to do something about it
+        in a future v1.x release of Boost.AFIO.
+      </p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2013 Niall Douglas and Paul Kirth<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../FAQ.html"><img src="../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../FAQ.html"><img src="../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="stuck_ops.html"><img src="../../../../doc/src/images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

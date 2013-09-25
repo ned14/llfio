@@ -1,7 +1,7 @@
 #include "boost/afio/afio.hpp"
 #include <iostream>
 
-/*  My Intel Core i7 3770K running Windows 8 x64: 143409 closures/sec
+/*  My Intel Core i7 3770K running Windows 8 x64: 123407 closures/sec
 */
 
 int main(void)
@@ -13,11 +13,10 @@ int main(void)
 	auto begin=std::chrono::high_resolution_clock::now();
 	while(std::chrono::duration_cast<secs_type>(std::chrono::high_resolution_clock::now()-begin).count()<3);
 	
-	auto callback=std::make_pair(async_op_flags::None,
-		std::function<async_file_io_dispatcher_base::completion_t>([](size_t, std::shared_ptr<async_io_handle> h, exception_ptr *)
+	auto callback=std::function<int()>([]
 	{
-		return std::make_pair(true, h);
-	}));
+		return 1;
+	});
 	size_t threads=0;
 	begin=std::chrono::high_resolution_clock::now();
 #pragma omp parallel num_threads(64)
@@ -26,7 +25,7 @@ int main(void)
 		threads++;
 		for(size_t n=0; n<50000; n++)
 		{
-			last=dispatcher->completion(last, callback);
+			last=dispatcher->call(last, callback).second;
 		}
 	}
 	auto end=std::chrono::high_resolution_clock::now();
