@@ -456,7 +456,7 @@ private:
 		copyable_packaged_task(copyable_packaged_task &&v) BOOST_NOEXCEPT_OR_NOTHROW : std::shared_ptr<packaged_task<T>>(std::move(v)) { }
 		void operator()()
 		{
-			(*get())();
+			(*std::shared_ptr<packaged_task<T>>::get())();
 		}
 	};
 #endif
