@@ -8,7 +8,7 @@
 
 [library Boost.AFIO
     [quickbook 1.7]
-    [version 0.1]
+    [version 1.0]
     [id afio]
     [category afio]
     [authors [Douglas, Niall], [Kirth, Paul]]
