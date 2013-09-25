@@ -15,7 +15,7 @@ int main(void)
 	
 	auto callback=std::function<async_file_io_dispatcher_base::completion_t>([](size_t, std::shared_ptr<async_io_handle> h, exception_ptr *)
 	{
-#if 1
+#if 0
 		Sleep(0);
 #endif
 		return std::make_pair(true, h);

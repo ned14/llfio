@@ -454,7 +454,10 @@ private:
 	{
 		template<class B> explicit copyable_packaged_task(B &&v) BOOST_NOEXCEPT_OR_NOTHROW : std::shared_ptr<packaged_task<T>>(std::move(std::make_shared<packaged_task<T>>(std::forward<B>(v)))) {}
 		copyable_packaged_task(copyable_packaged_task &&v) BOOST_NOEXCEPT_OR_NOTHROW : std::shared_ptr<packaged_task<T>>(std::move(v)) { }
-		auto operator()() -> decltype((*get())()) { return (*get())(); }
+		void operator()()
+		{
+			(*get())();
+		}
 	};
 #endif
 protected:

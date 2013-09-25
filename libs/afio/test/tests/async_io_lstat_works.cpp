@@ -5,6 +5,7 @@ BOOST_AFIO_AUTO_TEST_CASE(async_io_lstat_works, "Tests that async i/o lstat() wo
 	if(boost::filesystem::exists("testdir"))
 		boost::filesystem::remove_all("testdir");
 
+	try
 	{
 		using namespace boost::afio;
 		auto dispatcher=make_async_file_io_dispatcher();
@@ -37,5 +38,10 @@ BOOST_AFIO_AUTO_TEST_CASE(async_io_lstat_works, "Tests that async i/o lstat() wo
 		auto rmdir(dispatcher->rmdir(async_path_op_req(rmfile, "testdir/dir")));
 		auto rmtest(dispatcher->rmdir(async_path_op_req(rmdir, "testdir")));
 		when_all(rmtest).wait();
+	}
+	catch(...)
+	{
+		std::cerr << boost::current_exception_diagnostic_information(true) << std::endl;
+		BOOST_CHECK(false);
 	}
 }

@@ -69,7 +69,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <NMakeOutput>unittests.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>WIN32;_DEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
-    <NMakeBuildCommandLine>..\..\..\b2 toolset=msvc-12.0 address-model=64 debug-symbols=on link=static --link-test -j 4</NMakeBuildCommandLine>
+    <NMakeBuildCommandLine>..\..\..\b2 toolset=msvc-11.0 address-model=64 debug-symbols=on link=static --link-test -j 4</NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>..\..\..\b2 toolset=msvc-12.0 address-model=64 link=static -a</NMakeReBuildCommandLine>
     <IncludePath>$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSDK_IncludePath);..\..\..</IncludePath>
     <ExecutablePath>$(VCInstallDir)bin;$(WindowsSdkDir)bin\NETFX 4.0 Tools;$(WindowsSdkDir)bin;$(VSInstallDir)Common7\Tools\bin;$(VSInstallDir)Common7\tools;$(VSInstallDir)Common7\ide;$(ProgramFiles)\HTML Help Workshop;$(FrameworkSDKDir)\bin;$(MSBuildToolsPath32);$(VSInstallDir);$(SystemRoot)\SysWow64;$(FxCopDir);$(PATH);</ExecutablePath>

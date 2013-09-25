@@ -12,8 +12,12 @@ BOOST_AFIO_AUTO_TEST_CASE(async_io_sync, "Tests async fsync", 5)
     auto writefile1(dispatcher->write(async_data_op_req < vector < char >> (mkfile, buffer, 0)));
     auto sync1(dispatcher->sync(writefile1));
     auto writefile2(dispatcher->write(async_data_op_req < vector < char >> (sync1, buffer, 0)));
-    auto closefile(dispatcher->close(writefile2));
-    auto delfile(dispatcher->rmfile(async_path_op_req(closefile, "testdir/foo")));
+    auto closefile1(dispatcher->close(writefile2));
+	auto openfile(dispatcher->file(async_path_op_req(closefile1, "testdir/foo", file_flags::Read|file_flags::OSMMap)));
+	char b[64];
+	auto readfile(dispatcher->read(make_async_data_op_req(openfile, b, 0)));
+	auto closefile2=dispatcher->close(readfile);
+	auto delfile(dispatcher->rmfile(async_path_op_req(closefile2, "testdir/foo")));
     auto deldir(dispatcher->rmdir(async_path_op_req(delfile, "testdir")));
     BOOST_CHECK_NO_THROW(when_all(deldir).wait());
 }

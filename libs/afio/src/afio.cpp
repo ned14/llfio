@@ -716,6 +716,11 @@ namespace detail {
 		inline async_io_handle_windows(async_file_io_dispatcher_base *_parent, std::shared_ptr<async_io_handle> _dirh, const std::filesystem::path &path, file_flags flags, bool _SyncOnClose, HANDLE _h);
 		virtual void close()
 		{
+			if(mapaddr)
+			{
+				BOOST_AFIO_ERRHWINFN(UnmapViewOfFile(mapaddr), path());
+				mapaddr=nullptr;
+			}
 			// Windows doesn't provide an async fsync so do it synchronously
 			if(SyncOnClose && write_count_since_fsync())
 				BOOST_AFIO_ERRHWINFN(FlushFileBuffers(myid), path());
@@ -878,6 +883,11 @@ namespace detail {
 		}
 		virtual void close()
 		{
+			if(mapaddr)
+			{
+				BOOST_AFIO_ERRHOSFN(BOOST_AFIO_POSIX_MUNMAP(mapaddr, mapsize), path());
+				mapaddr=nullptr;
+			}
 			if(fd>=0)
 			{
 				if(SyncOnClose && write_count_since_fsync())
@@ -1496,7 +1506,7 @@ async_io_op async_file_io_dispatcher_base::int_op_from_scheduled_id(size_t id) c
 	std::unordered_map<size_t, detail::async_file_io_dispatcher_op>::iterator it=p->ops.find(id);
 	if(p->ops.end()==it)
 	{
-		BOOST_AFIO_THROW_FATAL(std::runtime_error("Failed to find this operation in list of currently executing operations"));
+		BOOST_AFIO_THROW(std::runtime_error("Failed to find this operation in list of currently executing operations"));
 	}
 	return async_io_op(const_cast<async_file_io_dispatcher_base *>(this), id, it->second.h);
 }
@@ -1646,7 +1656,6 @@ template<class F, class... Args> std::shared_ptr<async_io_handle> async_file_io_
 		else
 		{
 			// Make sure this was set up for deferred completion
-	#ifndef NDEBUG
 			BOOST_AFIO_LOCK_GUARD<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
 			std::unordered_map<size_t, detail::async_file_io_dispatcher_op>::iterator it(p->ops.find(id));
 			if(p->ops.end()==it)
@@ -1668,7 +1677,6 @@ template<class F, class... Args> std::shared_ptr<async_io_handle> async_file_io_
 				assert(0);
 				std::terminate();
 			}
-	#endif
 		}
 		return ret.second;
 	}
@@ -1902,7 +1910,6 @@ template<class F, class... Args> async_io_op async_file_io_dispatcher_base::chai
 	    {\
 		    /* Bind input handle now and queue immediately to next available thread worker*/ \
 		    std::shared_ptr<async_io_handle> h;\
-			exception_ptr *_he=nullptr; \
 			if(precondition.h->valid()) \
 			{ \
 				/* Boost's shared_future has get() as non-const which is weird, because it doesn't*/ \
@@ -1913,7 +1920,7 @@ template<class F, class... Args> async_io_op async_file_io_dispatcher_base::chai
 				/* now we can hardly abort half way through a batch op without leaving around stuck ops.*/ \
 				/* No, instead we simulate as if the precondition had not yet become ready.*/ \
 				if(precondition.h->has_exception()) \
-					*he=get_exception_ptr(f), _he=he;\
+					*he=get_exception_ptr(f);\
 				else \
 					h=f.get();\
 			}\
@@ -1926,7 +1933,7 @@ template<class F, class... Args> async_io_op async_file_io_dispatcher_base::chai
 			}\
 			if(!!(flags & async_op_flags::ImmediateCompletion))\
 			{\
-				*ret.h=immediates.enqueue(std::bind(boundf.second, h, _he)).share();\
+				*ret.h=immediates.enqueue(std::bind(boundf.second, h, he)).share();\
 			}\
 			else\
 				*ret.h=p->pool->enqueue(std::bind(boundf.second, h, nullptr)).share();\
