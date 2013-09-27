@@ -2,6 +2,7 @@
 #include <iostream>
 
 /*  My Intel Core i7 3770K running Windows 8 x64: 337955 closures/sec
+    My Intel Core i7 3770K running     Linux x64: 398537 closures/sec
 */
 
 int main(void)

@@ -25,8 +25,8 @@ For v1.0, maximum throughput is approximately as follows:
 
 [table:throughput Maximum null closure execution rate on a 3.5Ghz Intel Core i7 3770K for AFIO v1.0:
 [[Operating system][`call()` unchained][`call()` chained][`completion()` unchained][`completion()` chained]]
-[[Microsoft Windows 8 x64][337955][123407][534522][143409]]
-[[Ubuntu 12.04 LTS Linux x64][][][][]]
+[[Microsoft Windows 8 x64 with Visual Studio 2013][337955][123407][534522][143409]]
+[[Ubuntu 12.04 LTS Linux x64 with GCC 4.8][398537][164785][1140640][244907]]
 ]
 
 While this is fast enough for consumer SSDs, we agree it is currently not great. The biggest limiter, by far, is the
