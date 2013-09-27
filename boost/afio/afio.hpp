@@ -77,6 +77,7 @@ File Created: Mar 2013
 // Map in C++11 stuff if available
 #if (defined(__GLIBCXX__) && __GLIBCXX__<=20120920 /* <= GCC 4.7 */) || (defined(BOOST_MSVC) && BOOST_MSVC < 1700 /* <= VS2010 */)
 #include "boost/exception_ptr.hpp"
+#include "boost/thread/mutex.hpp"
 #include "boost/thread/recursive_mutex.hpp"
 namespace boost { namespace afio {
 typedef boost::thread thread;
@@ -91,6 +92,7 @@ inline boost::exception_ptr current_exception() { return boost::current_exceptio
 #endif
 #define BOOST_AFIO_THROW(x) boost::throw_exception(boost::enable_current_exception(x))
 #define BOOST_AFIO_RETHROW throw
+typedef boost::mutex mutex;
 typedef boost::recursive_mutex recursive_mutex;
 } }
 #else
@@ -100,6 +102,7 @@ inline std::thread::id get_this_thread_id() { return std::this_thread::get_id();
 inline std::exception_ptr current_exception() { return std::current_exception(); }
 #define BOOST_AFIO_THROW(x) throw x
 #define BOOST_AFIO_RETHROW throw
+typedef std::mutex mutex;
 typedef std::recursive_mutex recursive_mutex;
 } }
 #endif
@@ -1106,7 +1109,7 @@ public:
 	//! Returns the current wait queue depth of this dispatcher
 	size_t wait_queue_depth() const;
 	//! Returns the number of open items in this dispatcher
-	size_t count() const;
+	size_t fd_count() const;
 	/*! \brief Returns an op ref for a given \b currently \b scheduled op id, throwing a fatal exception if id not scheduled at the point of call.
 	Can be used to retrieve exception state from some op id, or one's own shared future.
 	\return An async_io_op with the same shared future as all op refs with this id.
@@ -1759,41 +1762,34 @@ namespace detail
 		promise<std::vector<std::shared_ptr<async_io_handle>>> done;
 		when_all_count_completed_state(std::vector<async_io_op>::iterator first, std::vector<async_io_op>::iterator last) : inputs(first, last), togo(inputs.size()), out(inputs.size()) { }
 	};
-	inline async_file_io_dispatcher_base::completion_returntype when_all_count_completed_nothrow(size_t, std::shared_ptr<async_io_handle> h, std::shared_ptr<detail::when_all_count_completed_state> state, size_t idx)
+	inline async_file_io_dispatcher_base::completion_returntype when_all_count_completed_nothrow(size_t, std::shared_ptr<async_io_handle> h, exception_ptr *e, std::shared_ptr<detail::when_all_count_completed_state> state, size_t idx)
 	{
 		state->out[idx]=h; // This might look thread unsafe, but each idx is unique
 		if(!--state->togo)
 			state->done.set_value(state->out);
 		return std::make_pair(true, h);
 	}
-	inline async_file_io_dispatcher_base::completion_returntype when_all_count_completed(size_t, std::shared_ptr<async_io_handle> h, std::shared_ptr<detail::when_all_count_completed_state> state, size_t idx)
+	inline async_file_io_dispatcher_base::completion_returntype when_all_count_completed(size_t, std::shared_ptr<async_io_handle> h, exception_ptr *e, std::shared_ptr<detail::when_all_count_completed_state> state, size_t idx)
 	{
 		state->out[idx]=h; // This might look thread unsafe, but each idx is unique
 		if(!--state->togo)
 		{
-			// If the last completion is throwing an exception, throw that, else scan inputs for exception states
-			exception_ptr this_e(afio::make_exception_ptr(afio::current_exception()));
-			if(this_e)
-				state->done.set_exception(this_e);
-			else
+			bool done=false;
+			// Retrieve the result of each input, waiting for it if it is between decrementing the
+			// atomic and signalling its future.
+			BOOST_FOREACH(auto &i, state->inputs)
 			{
-				bool done=false;
-				// Retrieve the result of each input, waiting for it if it is between decrementing the
-				// atomic and signalling its future.
-				BOOST_FOREACH(auto &i, state->inputs)
+				shared_future<std::shared_ptr<async_io_handle>> &future=*i.h;
+				auto e(get_exception_ptr(future));
+				if(e)
 				{
-					shared_future<std::shared_ptr<async_io_handle>> &future=*i.h;
-					auto e(get_exception_ptr(future));
-					if(e)
-					{
-						state->done.set_exception(e);
-						done=true;
-						break;
-					}
+					state->done.set_exception(e);
+					done=true;
+					break;
 				}
-				if(!done)
-					state->done.set_value(state->out);
 			}
+			if(!done)
+				state->done.set_value(state->out);
 		}
 		return std::make_pair(true, h);
 	}
@@ -1838,7 +1834,7 @@ inline future<std::vector<std::shared_ptr<async_io_handle>>> when_all(std::nothr
 	size_t idx=0;
 	BOOST_FOREACH(auto &i, inputs)
     {	
-        callbacks.push_back(std::make_pair(async_op_flags::ImmediateCompletion, std::bind(&detail::when_all_count_completed_nothrow, std::placeholders::_1, std::placeholders::_2, state, idx++)));
+		callbacks.push_back(std::make_pair(async_op_flags::ImmediateCompletion/*safe if nothrow*/, std::bind(&detail::when_all_count_completed_nothrow, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, state, idx++)));
     }
 	inputs.front().parent->completion(inputs, callbacks);
 	return state->done.get_future();
@@ -1884,7 +1880,7 @@ inline future<std::vector<std::shared_ptr<async_io_handle>>> when_all(std::vecto
 	size_t idx=0;
 	BOOST_FOREACH(auto &i, inputs)
     {	
-        callbacks.push_back(std::make_pair(async_op_flags::ImmediateCompletion, std::bind(&detail::when_all_count_completed, std::placeholders::_1, std::placeholders::_2, state, idx++)));
+		callbacks.push_back(std::make_pair(async_op_flags::None/*can't be immediate as may try to retrieve exception state of own precondition*/, std::bind(&detail::when_all_count_completed, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, state, idx++)));
     }
 	inputs.front().parent->completion(inputs, callbacks);
 	return state->done.get_future();

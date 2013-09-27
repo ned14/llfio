@@ -32,7 +32,7 @@ The search took 242.76 seconds which was 150.033 files per second or 24 Mb/sec.
 
 #define USE_MMAPS
 
-#if !(defined(BOOST_MSVC) && BOOST_MSVC < 1700) && !(defined(__GLIBCXX__) && __GLIBCXX__<=20120920 /* <= GCC 4.7 */)
+#if !defined(BOOST_NO_CXX11_HDR_INITIALIZER_LIST) && !(defined(BOOST_MSVC) && BOOST_MSVC < 1700) && !(defined(__GLIBCXX__) && __GLIBCXX__<=20120920 /* <= GCC 4.7 */)
 //[find_in_files_afio
 using namespace boost::afio;
 

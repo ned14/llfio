@@ -3,7 +3,7 @@
 
 int main(void)
 {
-#if !(defined(BOOST_MSVC) && BOOST_MSVC < 1700) && !(defined(__GLIBCXX__) && __GLIBCXX__<=20120920 /* <= GCC 4.7 */) && !defined(__clang__)
+#if !defined(BOOST_NO_CXX11_HDR_INITIALIZER_LIST) && !(defined(BOOST_MSVC) && BOOST_MSVC < 1700) && !(defined(__GLIBCXX__) && __GLIBCXX__<=20120920 /* <= GCC 4.7 */)
 	//[filedir_example
     std::shared_ptr<boost::afio::async_file_io_dispatcher_base> dispatcher=
         boost::afio::make_async_file_io_dispatcher();

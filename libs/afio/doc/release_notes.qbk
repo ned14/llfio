@@ -9,10 +9,18 @@
 [section:release_notes Release Notes]
 
 [/=================]
-[heading Boost 1.56]
+[heading Boost 1.56 AFIO v1.1]
 [/=================]
 
-First release.
+Immediate completions no longer hold the opslock, which meant the opslock could be
+changed from a recursive mutex to a spinlock. The new, more parallelised, behaviour
+illuminated a number of new race conditions in when_all() which have been fixed.
+
+[/=================]
+[heading Boost 1.55 AFIO v1.0]
+[/=================]
+
+First release for end of Google Summer of Code 2013.
 
 [endsect]
 
@@ -21,16 +29,16 @@ First release.
 [section:closure_performance What is the maximum throughput of AFIO's closure execution engine aka
 how many IOPS can I push with AFIO?]
 
-For v1.0, maximum throughput is approximately as follows:
+For v1.1, maximum throughput is approximately as follows:
 
-[table:throughput Maximum null closure execution rate on a 3.5Ghz Intel Core i7 3770K for AFIO v1.0:
+[table:throughput Maximum null closure execution rate on a 3.5Ghz Intel Core i7 3770K for AFIO v1.1:
 [[Operating system][`call()` unchained][`call()` chained][`completion()` unchained][`completion()` chained]]
-[[Microsoft Windows 8 x64 with Visual Studio 2013][337955][123407][534522][143409]]
-[[Ubuntu 12.04 LTS Linux x64 with GCC 4.8][398537][164785][1140640][244907]]
+[[Microsoft Windows 8 x64 with Visual Studio 2013][327355][93973][345881][331638]]
+[[Ubuntu 12.04 LTS Linux x64 with GCC 4.8][][][][]]
 ]
 
 While this is fast enough for consumer SSDs, we agree it is currently not great. The biggest limiter, by far, is the
-recursive mutex protecting the ops dispatch and completion implementation. Because AFIO is pure batch, dispatch
+mutex protecting the ops dispatch and completion implementation. Because AFIO is pure batch, dispatch
 is very rarely a problem: rather it is completion, because completion handling must always be performed per op completion
 in order to check for and dispatch, if necessary, dependencies. Currently the top consumers of CPU
 time during null closure dispatch benchmark are as follows:

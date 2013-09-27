@@ -1,7 +1,7 @@
 #include "boost/afio/afio.hpp"
 #include <iostream>
 
-/*  My Intel Core i7 3770K running Windows 8 x64: 152820 closures/sec
+/*  My Intel Core i7 3770K running Windows 8 x64: 331638 closures/sec
     My Intel Core i7 3770K running     Linux x64: 244907 closures/sec
 */
 
@@ -28,7 +28,7 @@ int main(void)
 	getchar();
 #endif
 	begin=std::chrono::high_resolution_clock::now();
-#pragma omp parallel num_threads(64)
+#pragma omp parallel
 	{
 		async_io_op last;
 		threads++;
