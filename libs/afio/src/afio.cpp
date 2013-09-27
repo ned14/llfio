@@ -1531,9 +1531,9 @@ std::vector<async_io_op> async_file_io_dispatcher_base::completion(const std::ve
 	ret.reserve(callbacks.size());
 	std::vector<async_io_op>::const_iterator i;
 	std::vector<std::pair<async_op_flags, std::function<async_file_io_dispatcher_base::completion_t>>>::const_iterator c;
-	BOOST_AFIO_LOCK_GUARD<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
 	exception_ptr he;
 	detail::immediate_async_ops immediates;
+	BOOST_AFIO_LOCK_GUARD<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
 	if(ops.empty())
 	{
 		async_io_op empty;
@@ -1550,8 +1550,8 @@ std::vector<async_io_op> async_file_io_dispatcher_base::completion(const std::ve
 // Called in unknown thread
 void async_file_io_dispatcher_base::complete_async_op(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr e)
 {
-	BOOST_AFIO_LOCK_GUARD<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
 	detail::immediate_async_ops immediates;
+	BOOST_AFIO_LOCK_GUARD<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
 	// Find me in ops, remove my completions and delete me from extant ops
 	std::unordered_map<size_t, detail::async_file_io_dispatcher_op>::iterator it=p->ops.find(id);
 	if(p->ops.end()==it)
@@ -1973,9 +1973,9 @@ template<class F, class T> std::vector<async_io_op> async_file_io_dispatcher_bas
 	assert(preconditions.size()==container.size());
 	if(preconditions.size()!=container.size())
 		BOOST_AFIO_THROW(std::runtime_error("preconditions size does not match size of ops data"));
-	BOOST_AFIO_LOCK_GUARD<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
 	exception_ptr he;
 	detail::immediate_async_ops immediates;
+	BOOST_AFIO_LOCK_GUARD<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
 	auto precondition_it=preconditions.cbegin();
 	auto container_it=container.cbegin();
 	for(; precondition_it!=preconditions.cend() && container_it!=container.cend(); ++precondition_it, ++container_it)
@@ -1988,9 +1988,9 @@ template<class F, class T> std::vector<async_io_op> async_file_io_dispatcher_bas
 	std::vector<async_io_op> ret;
 	ret.reserve(container.size());
 	async_io_op precondition;
-	BOOST_AFIO_LOCK_GUARD<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
 	exception_ptr he;
 	detail::immediate_async_ops immediates;
+	BOOST_AFIO_LOCK_GUARD<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
 	BOOST_FOREACH(auto &i, container)
 	{
 		ret.push_back(chain_async_op(&he, immediates, optype, precondition, flags, f, i));
@@ -2002,9 +2002,9 @@ template<class F> std::vector<async_io_op> async_file_io_dispatcher_base::chain_
 {
 	std::vector<async_io_op> ret;
 	ret.reserve(container.size());
-	BOOST_AFIO_LOCK_GUARD<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
 	exception_ptr he;
 	detail::immediate_async_ops immediates;
+	BOOST_AFIO_LOCK_GUARD<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
 	BOOST_FOREACH(auto &i, container)
     {
 		ret.push_back(chain_async_op(&he, immediates, optype, i, flags, f, i));
@@ -2016,9 +2016,9 @@ template<class F> std::vector<async_io_op> async_file_io_dispatcher_base::chain_
 {
 	std::vector<async_io_op> ret;
 	ret.reserve(container.size());
-	BOOST_AFIO_LOCK_GUARD<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
 	exception_ptr he;
 	detail::immediate_async_ops immediates;
+	BOOST_AFIO_LOCK_GUARD<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
 	BOOST_FOREACH(auto &i, container)
     {
 		ret.push_back(chain_async_op(&he, immediates, optype, i.precondition, flags, f, i));
@@ -2030,9 +2030,9 @@ template<class F, bool iswrite> std::vector<async_io_op> async_file_io_dispatche
 {
 	std::vector<async_io_op> ret;
 	ret.reserve(container.size());
-	BOOST_AFIO_LOCK_GUARD<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
 	exception_ptr he;
 	detail::immediate_async_ops immediates;
+	BOOST_AFIO_LOCK_GUARD<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
 	BOOST_FOREACH(auto &i, container)
     {
 		ret.push_back(chain_async_op(&he, immediates, optype, i.precondition, flags, f, i));
@@ -2047,9 +2047,9 @@ template<class F> std::pair<std::vector<future<std::pair<std::vector<directory_e
 	std::vector<future<retitemtype>> retfutures;
 	ret.reserve(container.size());
 	retfutures.reserve(container.size());
-	BOOST_AFIO_LOCK_GUARD<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
 	exception_ptr he;
 	detail::immediate_async_ops immediates;
+	BOOST_AFIO_LOCK_GUARD<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
 	BOOST_FOREACH(auto &i, container)
     {
 		// Unfortunately older C++0x compilers don't cope well with feeding move only std::future<> into std::bind
