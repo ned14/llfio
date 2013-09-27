@@ -1588,29 +1588,31 @@ void async_file_io_dispatcher_base::complete_async_op(size_t id, std::shared_ptr
 			if(p->ops.end()==it)
 				BOOST_AFIO_THROW_FATAL(std::runtime_error("Failed to find this completion operation in list of currently executing operations"));
 			// Unlock opslock during completions dispatch to increase parallelism
-			//p->opslock.unlock();
-			//auto relock=boost::afio::detail::Undoer([this]{ p->opslock.lock(); });
-			if(!!(it->second.flags & async_op_flags::ImmediateCompletion))
+			std::pair<const size_t, detail::async_file_io_dispatcher_op> &thisop=*it;
+			it=p->ops.end();
+			p->opslock.unlock();
+			auto relock=boost::afio::detail::Undoer([this]{ p->opslock.lock(); });
+			if(!!(thisop.second.flags & async_op_flags::ImmediateCompletion))
 			{
 				// If he was set up with a detached future, use that instead
-				if(it->second.detached_promise)
+				if(thisop.second.detached_promise)
 				{
-					*it->second.h=it->second.detached_promise->get_future();
+					*thisop.second.h=thisop.second.detached_promise->get_future();
 					immediates.enqueue(std::bind(c.second, h, immediate_e));
 				}
 				else
-					*it->second.h=immediates.enqueue(std::bind(c.second, h, immediate_e));
+					*thisop.second.h=immediates.enqueue(std::bind(c.second, h, immediate_e));
 			}
 			else
 			{
 				// If he was set up with a detached future, use that instead
-				if(it->second.detached_promise)
+				if(thisop.second.detached_promise)
 				{
-					*it->second.h=it->second.detached_promise->get_future();
+					*thisop.second.h=thisop.second.detached_promise->get_future();
 					p->pool->enqueue(std::bind(c.second, h, nullptr));
 				}
 				else
-					*it->second.h=p->pool->enqueue(std::bind(c.second, h, nullptr));
+					*thisop.second.h=p->pool->enqueue(std::bind(c.second, h, nullptr));
 			}
 			BOOST_AFIO_DEBUG_PRINT("C %u > %u %p\n", (unsigned) id, (unsigned) c.first, h.get());
 		}

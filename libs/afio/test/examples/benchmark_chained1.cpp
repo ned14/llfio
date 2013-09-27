@@ -1,7 +1,7 @@
 #include "boost/afio/afio.hpp"
 #include <iostream>
 
-/*  My Intel Core i7 3770K running Windows 8 x64: 143409 closures/sec
+/*  My Intel Core i7 3770K running Windows 8 x64: 152820 closures/sec
     My Intel Core i7 3770K running     Linux x64: 244907 closures/sec
 */
 
