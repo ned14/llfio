@@ -733,7 +733,7 @@ namespace detail {
 		// You can't use shared_from_this() in a constructor so ...
 		void do_add_io_handle_to_parent()
 		{
-			if(h)
+			if(myid)
 			{
 				parent()->int_add_io_handle(myid, shared_from_this());
 				has_been_added=true;
@@ -901,8 +901,11 @@ namespace detail {
 		// You can't use shared_from_this() in a constructor so ...
 		void do_add_io_handle_to_parent()
 		{
-			parent()->int_add_io_handle((void *)(size_t)fd, shared_from_this());
-			has_been_added=true;
+			if(fd!=-999)
+			{
+				parent()->int_add_io_handle((void *) (size_t) fd, shared_from_this());
+				has_been_added=true;
+			}
 		}
 		~async_io_handle_posix()
 		{
