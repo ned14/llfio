@@ -12,6 +12,9 @@
 [heading Boost 1.56 AFIO v1.1]
 [/=================]
 
+Completions handling no longer holds the opslock during completions dispatch,
+further improving performance.
+
 Immediate completions no longer hold the opslock, which meant the opslock could be
 changed from a recursive mutex to a spinlock. The new, more parallelised, behaviour
 illuminated a number of new race conditions in when_all() which have been fixed.
@@ -29,12 +32,13 @@ First release for end of Google Summer of Code 2013.
 [section:closure_performance What is the maximum throughput of AFIO's closure execution engine aka
 how many IOPS can I push with AFIO?]
 
-For v1.1, maximum throughput is approximately as follows:
+For v1.1, maximum throughput is approximately as follows, where the values for `call()` might be for
+use as a closure engine whereas the values for `completion()` are for max IOPS:
 
 [table:throughput Maximum null closure execution rate on a 3.5Ghz Intel Core i7 3770K for AFIO v1.1:
-[[Operating system][`call()` unchained][`call()` chained][`completion()` unchained][`completion()` chained]]
-[[Microsoft Windows 8 x64 with Visual Studio 2013][327355][93973][345881][331638]]
-[[Ubuntu 12.04 LTS Linux x64 with GCC 4.8][][][][]]
+[[Operating system][`call()` unchained][`call()` chained][`completion()` unchained][`completion()` chained][Raw ASIO]]
+[[Microsoft Windows 8 x64 with Visual Studio 2013][[role alignright 296008]][[role alignright 220940]][[role alignright 383035]][[role alignright 350825]][[role alignright 2591360]]]
+[[Ubuntu 12.04 LTS Linux x64 with GCC 4.8][][][][][]]
 ]
 
 While this is fast enough for consumer SSDs, we agree it is currently not great. The biggest limiter, by far, is the

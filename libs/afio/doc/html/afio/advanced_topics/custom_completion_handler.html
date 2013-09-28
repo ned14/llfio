@@ -4,7 +4,7 @@
 <title>How to write your own custom AFIO completion handler</title>
 <link rel="stylesheet" href="../../myboostbook.css" type="text/css">
 <meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
-<link rel="home" href="../../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 0.1">
+<link rel="home" href="../../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 1.1">
 <link rel="up" href="../advanced_topics.html" title="Advanced Topics">
 <link rel="prev" href="../advanced_topics.html" title="Advanced Topics">
 <link rel="next" href="vs2010_notes.html" title="Notes on using AFIO with Microsoft Visual Studio 2010 and Mingw32">
@@ -63,15 +63,9 @@
             Direct control of exception handling and error propagation.
           </li>
 <li class="listitem">
-            Performance: completion handlers only have a <span class="bold"><strong>three</strong></span>
+            Performance: completion handlers only have a <span class="bold"><strong>two</strong></span>
             nested <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">function</span><span class="special">&lt;&gt;</span></code>
-            invocation overhead, rather than more (the fact it is three rather than
-            two is because <a href="http://www.boost.org/libs/asio/" target="_top">Boost.ASIO</a>'s
-            <code class="computeroutput"><span class="identifier">io_service</span><span class="special">.</span><span class="identifier">post</span><span class="special">()</span></code>
-            currently cannot accept a move-only work item such as <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">packaged_task</span><span class="special">&lt;&gt;</span></code>, so until this gets fixed we
-            have to wrap each packaged task in a <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;&gt;</span></code> and a <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">function</span><span class="special">&lt;&gt;</span></code> instance whose sole task is to
-            invoke the packaged task -- yes, we agree this is daft). The reason why
-            nesting <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">function</span><span class="special">&lt;&gt;</span></code>
+            invocation overhead, rather than more. The reason why nesting <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">function</span><span class="special">&lt;&gt;</span></code>
             invocations is bad is because each entails type erasure, which requires
             the CPU to do an indirect jump (like a virtual function call) and while
             modern branch predictors eliminate any penalty for executing just one
@@ -284,25 +278,24 @@
         does not necessarily mean that exception point is itself not null.
       </p>
 <p>
-        And finally, as much as immediate completions are vastly more efficient than
-        normal completions, and you can achieve far higher throughputs with them
-        especially as they involve almost no overhead to invoke, you should bear
-        in mind the following substantial disadvantages of immediate completions:
+        And finally, as much as immediate completions are more efficient than normal
+        completions, and you can achieve far higher throughputs with them especially
+        as they involve almost no overhead to invoke, you should bear in mind the
+        following substantial disadvantages of immediate completions:
       </p>
 <div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
 <li class="listitem">
-            Immediate completions must NEVER block, not EVER. This is because they
-            are called while the oplock is held, and therefore no other op may be
-            added, enqueued or <span class="bold"><strong>completed</strong></span> while an
-            immediate completion is running. In other words, they hang the dispatcher.
-            You can of course schedule new ops from within an immediate completion
-            as the oplock is a recursive mutex.
+            <span class="bold"><strong>v1.0 ONLY</strong></span>: Immediate completions must
+            NEVER block, not EVER. This is because they are called while the oplock
+            is held<a href="#ftn.afio.advanced_topics.custom_completion_handler.f1" class="footnote" name="afio.advanced_topics.custom_completion_handler.f1"><sup class="footnote">[14]</sup></a>, and therefore no other op may be added, enqueued or <span class="bold"><strong>completed</strong></span> while an immediate completion is running.
+            In other words, they hang the dispatcher.
           </li>
 <li class="listitem">
             Adding immediate completions to the precondition of the immediate completion
             being executed won't work -- they get thrown away, just as if the completion
             were not immediate. This does eliminate the potential for endless loops
-            of course.
+            of course. You CAN add completions to yourself (see the <code class="computeroutput"><span class="identifier">op_from_scheduled_id</span><span class="special">()</span></code>
+            method).
           </li>
 <li class="listitem">
             Immediate completions are invoked <span class="bold"><strong>before</strong></span>
@@ -327,10 +320,13 @@
           <code class="computeroutput"><span class="identifier">chain_async_op</span><span class="special">()</span></code>
           and a suite of specialised <code class="computeroutput"><span class="identifier">chain_async_ops</span><span class="special">()</span></code> helper overloads. Therefore if you subclass
           <code class="computeroutput"><span class="identifier">async_file_io_dispatcher_base</span></code>,
-          you can enjoy the overhead of just two <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">function</span><span class="special">&lt;&gt;</span></code> calls, and just one of those calls
-          when ASIO's <code class="computeroutput"><span class="identifier">post</span><span class="special">()</span></code>
-          gets fixed.
+          you can enjoy the overhead of just one <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">function</span><span class="special">&lt;&gt;</span></code> call.
         </p></div>
+<div id="ftn.afio.advanced_topics.custom_completion_handler.f1" class="footnote"><p><a href="#afio.advanced_topics.custom_completion_handler.f1" class="para"><sup class="para">[14] </sup></a>
+              It is expected that in the near future the op lock will NOT be held
+              during immediate completions so AFIO can remove the need for recursive
+              mutexes, something which is currently a major performance problem.
+            </p></div>
 </div>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>

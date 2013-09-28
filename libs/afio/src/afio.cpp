@@ -1582,23 +1582,36 @@ void async_file_io_dispatcher_base::complete_async_op(size_t id, std::shared_ptr
 		// Remove completions as we're about to modify p->ops which will invalidate it
 		std::vector<detail::async_file_io_dispatcher_op::completion_t> completions(std::move(it->second.completions));
 		assert(it->second.completions.empty());
+		std::vector<std::pair<const size_t, detail::async_file_io_dispatcher_op> *> completions_ops;
+		completions_ops.reserve(completions.size());
 		BOOST_FOREACH(auto &c, completions)
 		{
-			exception_ptr *immediate_e=&e;
-			// Enqueue each completion
 			it=p->ops.find(c.first);
 			if(p->ops.end()==it)
 				BOOST_AFIO_THROW_FATAL(std::runtime_error("Failed to find this completion operation in list of currently executing operations"));
+			completions_ops.push_back(&(*it));
+			BOOST_AFIO_DEBUG_PRINT("C %u > %u %p\n", (unsigned) id, (unsigned) c.first, h.get());
+		}
+		// Unlock opslock during completions dispatch to increase parallelism
+		it=p->ops.end();
+		p->opslock.unlock();
+		auto relock=boost::afio::detail::Undoer([this]{ p->opslock.lock(); });
+		auto completions_it=completions.begin();
+		auto completions_ops_it=completions_ops.begin();
+		for(; completions_it!=completions.end(); ++completions_it, ++completions_ops_it)
+		{
+			auto &c=*completions_it;
+			auto &it=*completions_ops_it;
 			if(!!(it->second.flags & async_op_flags::ImmediateCompletion))
 			{
 				// If he was set up with a detached future, use that instead
 				if(it->second.detached_promise)
 				{
 					*it->second.h=it->second.detached_promise->get_future();
-					immediates.enqueue(std::bind(c.second, h, immediate_e));
+					immediates.enqueue(std::bind(c.second, h, &e));
 				}
 				else
-					*it->second.h=immediates.enqueue(std::bind(c.second, h, immediate_e));
+					*it->second.h=immediates.enqueue(std::bind(c.second, h, &e));
 			}
 			else
 			{
@@ -1611,7 +1624,6 @@ void async_file_io_dispatcher_base::complete_async_op(size_t id, std::shared_ptr
 				else
 					*it->second.h=p->pool->enqueue(std::bind(c.second, h, nullptr));
 			}
-			BOOST_AFIO_DEBUG_PRINT("C %u > %u %p\n", (unsigned) id, (unsigned) c.first, h.get());
 		}
 		// Restore it to my id
 		it=p->ops.find(id);

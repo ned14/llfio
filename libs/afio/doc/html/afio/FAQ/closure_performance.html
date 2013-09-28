@@ -1,10 +1,10 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
-<title>What is the maximum throughput of AFIO's closure execution engine?</title>
+<title>What is the maximum throughput of AFIO's closure execution engine aka how many IOPS can I push with AFIO?</title>
 <link rel="stylesheet" href="../../myboostbook.css" type="text/css">
 <meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
-<link rel="home" href="../../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 0.1">
+<link rel="home" href="../../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 1.1">
 <link rel="up" href="../FAQ.html" title="Frequently Asked Questions">
 <link rel="prev" href="../FAQ.html" title="Frequently Asked Questions">
 <link rel="next" href="stuck_ops.html" title="I'm seeing &#8220;WARNING: ~async_file_dispatcher_base() detects stuck async_io_op in total of X ops&#8221; during process close. What does this mean?">
@@ -24,18 +24,22 @@
 </div>
 <div class="section">
 <div class="titlepage"><div><div><h3 class="title">
-<a name="afio.FAQ.closure_performance"></a><a class="link" href="closure_performance.html" title="What is the maximum throughput of AFIO's closure execution engine?">What is the maximum throughput
-      of AFIO's closure execution engine?</a>
+<a name="afio.FAQ.closure_performance"></a><a class="link" href="closure_performance.html" title="What is the maximum throughput of AFIO's closure execution engine aka how many IOPS can I push with AFIO?">What is the maximum throughput
+      of AFIO's closure execution engine aka how many IOPS can I push with AFIO?</a>
 </h3></div></div></div>
 <p>
-        For v1.0, maximum throughput is approximately as follows:
+        For v1.1, maximum throughput is approximately as follows, where the values
+        for <code class="computeroutput"><span class="identifier">call</span><span class="special">()</span></code>
+        might be for use as a closure engine whereas the values for <code class="computeroutput"><span class="identifier">completion</span><span class="special">()</span></code>
+        are for max IOPS:
       </p>
 <div class="table">
 <a name="afio.FAQ.closure_performance.throughput"></a><p class="title"><b>Table&#160;1.8.&#160;Maximum null closure execution rate on a 3.5Ghz Intel Core i7 3770K
-        for AFIO v1.0:</b></p>
+        for AFIO v1.1:</b></p>
 <div class="table-contents"><table class="table" summary="Maximum null closure execution rate on a 3.5Ghz Intel Core i7 3770K
-        for AFIO v1.0:">
+        for AFIO v1.1:">
 <colgroup>
+<col>
 <col>
 <col>
 <col>
@@ -72,40 +76,52 @@
                   chained
                 </p>
               </th>
+<th>
+                <p>
+                  Raw ASIO
+                </p>
+              </th>
 </tr></thead>
 <tbody>
 <tr>
 <td>
                 <p>
-                  Microsoft Windows 8 x64
+                  Microsoft Windows 8 x64 with Visual Studio 2013
                 </p>
               </td>
 <td>
                 <p>
-                  337955
+                  <span class="alignright">296008</span>
                 </p>
               </td>
 <td>
                 <p>
-                  123407
+                  <span class="alignright">220940</span>
                 </p>
               </td>
 <td>
                 <p>
-                  534522
+                  <span class="alignright">383035</span>
                 </p>
               </td>
 <td>
                 <p>
-                  143409
+                  <span class="alignright">350825</span>
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="alignright">2591360</span>
                 </p>
               </td>
 </tr>
 <tr>
 <td>
                 <p>
-                  Ubuntu 12.04 LTS Linux x64
+                  Ubuntu 12.04 LTS Linux x64 with GCC 4.8
                 </p>
+              </td>
+<td>
               </td>
 <td>
               </td>
@@ -121,10 +137,10 @@
 </div>
 <br class="table-break"><p>
         While this is fast enough for consumer SSDs, we agree it is currently not
-        great. The biggest limiter, by far, is the recursive mutex protecting the
-        ops dispatch and completion implementation. Because AFIO is pure batch, dispatch
-        is very rarely a problem: rather it is completion, because completion handling
-        must always be performed per op completion in order to check for and dispatch,
+        great. The biggest limiter, by far, is the mutex protecting the ops dispatch
+        and completion implementation. Because AFIO is pure batch, dispatch is very
+        rarely a problem: rather it is completion, because completion handling must
+        always be performed per op completion in order to check for and dispatch,
         if necessary, dependencies. Currently the top consumers of CPU time during
         null closure dispatch benchmark are as follows:
       </p>
@@ -280,7 +296,8 @@
         so the above figures for <code class="computeroutput"><span class="identifier">completion</span><span class="special">()</span></code> are very reasonable max IOPS values. Nevertheless,
         if you were randomly reading or writing very small bits of data, we can see
         how the mutex might get in the way, and we intend to do something about it
-        in a future v1.x release of Boost.AFIO.
+        in a future v1.x release of Boost.AFIO, most especially to eliminate the
+        recursive mutex in favour of a spin lock.
       </p>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
