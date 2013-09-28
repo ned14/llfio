@@ -19,9 +19,10 @@ int main(void)
 		return 1;
 	});
 	std::vector<async_io_op> preconditions;
-	std::vector<std::function<int()>> callbacks(100000, callback);
+	std::vector<std::function<int()>> callbacks(100, callback);
 	begin=std::chrono::high_resolution_clock::now();
-	for(size_t n=0; n<50; n++)
+//#pragma omp parallel for schedule(dynamic)
+	for(int n=0; n<50000; n++)
 		dispatcher->call(preconditions, callbacks);
 	while(dispatcher->wait_queue_depth())
 		std::this_thread::sleep_for(std::chrono::milliseconds(1));

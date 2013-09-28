@@ -22,14 +22,15 @@ int main(void)
 		return std::make_pair(true, h);
 	});
 	std::vector<async_io_op> preconditions;
-	std::vector<std::pair<async_op_flags, std::function<async_file_io_dispatcher_base::completion_t>>> callbacks(100000,
+	std::vector<std::pair<async_op_flags, std::function<async_file_io_dispatcher_base::completion_t>>> callbacks(100,
 		std::make_pair(async_op_flags::None, callback));
 #if 0
 	std::cout << "Attach profiler now and hit Return" << std::endl;
 	getchar();
 #endif
 	begin=std::chrono::high_resolution_clock::now();
-	for(size_t n=0; n<50; n++)
+//#pragma omp parallel for schedule(dynamic)
+	for(int n=0; n<50000; n++)
 		dispatcher->completion(preconditions, callbacks);
 	while(dispatcher->wait_queue_depth())
 		std::this_thread::sleep_for(std::chrono::milliseconds(1));
