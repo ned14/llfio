@@ -714,19 +714,32 @@ namespace detail {
 		}
 		async_io_handle_windows(async_file_io_dispatcher_base *_parent, std::shared_ptr<async_io_handle> _dirh, const std::filesystem::path &path, file_flags flags) : async_io_handle(_parent, std::move(_dirh), path, flags), myid(nullptr), has_been_added(false), SyncOnClose(false), mapaddr(nullptr) { }
 		inline async_io_handle_windows(async_file_io_dispatcher_base *_parent, std::shared_ptr<async_io_handle> _dirh, const std::filesystem::path &path, file_flags flags, bool _SyncOnClose, HANDLE _h);
-		virtual void close()
+		void int_close()
 		{
+			BOOST_AFIO_DEBUG_PRINT("D %p\n", this);
+			if(has_been_added)
+			{
+				parent()->int_del_io_handle(myid);
+				has_been_added=false;
+			}
 			if(mapaddr)
 			{
 				BOOST_AFIO_ERRHWINFN(UnmapViewOfFile(mapaddr), path());
 				mapaddr=nullptr;
 			}
-			// Windows doesn't provide an async fsync so do it synchronously
-			if(SyncOnClose && write_count_since_fsync())
-				BOOST_AFIO_ERRHWINFN(FlushFileBuffers(myid), path());
-			h->close();
-			h.reset();
+			if(h)
+			{
+				// Windows doesn't provide an async fsync so do it synchronously
+				if(SyncOnClose && write_count_since_fsync())
+					BOOST_AFIO_ERRHWINFN(FlushFileBuffers(myid), path());
+				h->close();
+				h.reset();
+			}
 			myid=nullptr;
+		}
+		virtual void close()
+		{
+			int_close();
 		}
 		virtual void *native_handle() const { return myid; }
 
@@ -741,20 +754,7 @@ namespace detail {
 		}
 		~async_io_handle_windows()
 		{
-			BOOST_AFIO_DEBUG_PRINT("D %p\n", this);
-			if(has_been_added)
-				parent()->int_del_io_handle(myid);
-			if(mapaddr)
-			{
-				BOOST_AFIO_ERRHWINFN(UnmapViewOfFile(mapaddr), path());
-				mapaddr=nullptr;
-			}
-			if(h)
-			{
-				if(SyncOnClose && write_count_since_fsync())
-					BOOST_AFIO_ERRHWINFN(FlushFileBuffers(h->native_handle()), path());
-				h->close();
-			}
+			int_close();
 		}
 		virtual directory_entry direntry(metadata_flags wanted) const
 		{
@@ -881,8 +881,14 @@ namespace detail {
 			if(fd!=-999)
 				BOOST_AFIO_ERRHOSFN(fd, path);
 		}
-		virtual void close()
+		void int_close()
 		{
+			BOOST_AFIO_DEBUG_PRINT("D %p\n", this);
+			if(has_been_added)
+			{
+				parent()->int_del_io_handle((void *) (size_t) fd);
+				has_been_added=false;
+			}
 			if(mapaddr)
 			{
 				BOOST_AFIO_ERRHOSFN(BOOST_AFIO_POSIX_MUNMAP(mapaddr, mapsize), path());
@@ -895,6 +901,10 @@ namespace detail {
 				BOOST_AFIO_ERRHOSFN(BOOST_AFIO_POSIX_CLOSE(fd), path());
 				fd=-1;
 			}
+		}
+		virtual void close()
+		{
+			int_close();
 		}
 		virtual void *native_handle() const { return (void *)(size_t)fd; }
 
@@ -909,21 +919,7 @@ namespace detail {
 		}
 		~async_io_handle_posix()
 		{
-			if(has_been_added)
-				parent()->int_del_io_handle((void *)(size_t)fd);
-			if(mapaddr)
-			{
-				BOOST_AFIO_ERRHOSFN(BOOST_AFIO_POSIX_MUNMAP(mapaddr, mapsize), path());
-				mapaddr=nullptr;
-			}
-			if(fd>=0)
-			{
-				// Flush synchronously here? I guess ...
-				if(SyncOnClose && write_count_since_fsync())
-					BOOST_AFIO_ERRHOSFN(BOOST_AFIO_POSIX_FSYNC(fd), path());
-				BOOST_AFIO_ERRHOSFN(BOOST_AFIO_POSIX_CLOSE(fd), path());
-				fd=-1;
-			}
+			int_close();
 		}
 		virtual directory_entry direntry(metadata_flags wanted) const
 		{
