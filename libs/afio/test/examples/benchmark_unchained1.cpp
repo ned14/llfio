@@ -30,7 +30,7 @@ int main(void)
 	getchar();
 #endif
 	begin=std::chrono::high_resolution_clock::now();
-//#pragma omp parallel for
+#pragma omp parallel for
 	for(int n=0; n<5000000; n++)
 		dispatcher->completion(preconditions, callbacks);
 	while(dispatcher->wait_queue_depth())

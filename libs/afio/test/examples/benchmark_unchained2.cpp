@@ -21,7 +21,7 @@ int main(void)
 	std::vector<async_io_op> preconditions;
 	std::vector<std::function<int()>> callbacks(1, callback);
 	begin=std::chrono::high_resolution_clock::now();
-//#pragma omp parallel for schedule(dynamic)
+#pragma omp parallel for
 	for(int n=0; n<5000000; n++)
 		dispatcher->call(preconditions, callbacks);
 	while(dispatcher->wait_queue_depth())
