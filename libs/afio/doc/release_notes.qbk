@@ -37,16 +37,19 @@ use as a closure engine whereas the values for `completion()` might be for max f
 
 [table:throughput Maximum null closure dispatch rate on a 3.5Ghz Intel Core i7 3770K for AFIO v1.1:
 [[Operating system][`call()` unchained][`call()` chained][`completion()` unchained][`completion()` chained][Raw ASIO]]
-[[Microsoft Windows 8 x64 with Visual Studio 2013][[role alignright 200752]][[role alignright 136738]][[role alignright 420108]][[role alignright 352845]][[role alignright 2806070]]]
+[[Microsoft Windows 8 x64 with Visual Studio 2013][[role alignright 911963]][[role alignright 539156]][[role alignright 1406690]][[role alignright 622682]][[role alignright 2806070]]]
+[[Times slower than ASIO][3x][5.2x][2x][4.5x][]]
 [[Ubuntu 12.04 LTS Linux x64 with GCC 4.8][][][][][]]
+[[][][][][][]]
 ]
 
 While this is fast enough for consumer SSDs (which is the whole point of AFIO), and we would emphasise that scaling
 where the closures are doing real i/o work is close to linear thanks to careful use of no worse than O(N) algorithms throughout, we
-agree AFIO's performance is currently not great for less heavyweight closures. The biggest limiter, by far, is the
-mutex protecting the ops dispatch and completion implementation. Because AFIO is pure batch, dispatch
-is very rarely a problem: rather it is completion, because completion handling must always be performed per op completion
-in order to check for and dispatch, if necessary, dependencies. Currently the top consumers of CPU
+agree AFIO's performance is currently not great for less heavyweight closures -- unfortunately, dependency chaining is not
+free, and moreover, it is a very simple design based on a global hash table and pure C++11 STL throughout (i.e. heavy
+on the memory allocator). The biggest limiter, by far, is the spin lock protecting the ops dispatch and completion implementation.
+Because AFIO is pure batch, dispatch is very rarely a problem: rather it is completion, because completion handling must always be
+performed per op completion in order to check for and dispatch, if necessary, dependencies. Currently the top consumers of CPU
 time during null closure dispatch benchmarks are as follows:
 
 [table:top_consumers Top consumers of CPU time during null closure dispatch in AFIO v1.1 on Microsoft Windows
