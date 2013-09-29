@@ -2,7 +2,7 @@
 #include <iostream>
 
 /*  My Intel Core i7 3770K running Windows 8 x64:  420108 closures/sec
-    My Intel Core i7 3770K running     Linux x64:  closures/sec
+    My Intel Core i7 3770K running     Linux x64:  426747 closures/sec
 */
 
 int main(void)
@@ -14,7 +14,7 @@ int main(void)
 	auto begin=std::chrono::high_resolution_clock::now();
 	while(std::chrono::duration_cast<secs_type>(std::chrono::high_resolution_clock::now()-begin).count()<3);
 	
-	auto callback=(async_file_io_dispatcher_base::completion_t *)[](size_t, std::shared_ptr<async_io_handle> h, exception_ptr *)
+	async_file_io_dispatcher_base::completion_t *callback=[](size_t, std::shared_ptr<async_io_handle> h, exception_ptr *)
 	{
 #if 0
 		// Simulate an i/o op with a context switch
