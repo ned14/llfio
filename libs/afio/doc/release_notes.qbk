@@ -45,8 +45,8 @@ use as a closure engine whereas the values for `completion()` might be for max f
 
 While this is fast enough for consumer SSDs (which is the whole point of AFIO), and we would emphasise that scaling
 where the closures are doing real i/o work is close to linear thanks to careful use of no worse than O(N) algorithms throughout, we
-agree AFIO's performance is currently not great for less heavyweight closures -- unfortunately, dependency chaining is not
-free, and moreover, it is a very simple design based on a global hash table and pure C++11 STL throughout (i.e. heavy
+agree AFIO's performance is currently not great for lightweight closures -- unfortunately, dependency chaining is not
+free, and moreover, AFIO has a very simple design based on a global hash table and pure C++11 STL throughout (i.e. it's heavy
 on the memory allocator). The biggest limiter, by far, is the spin lock protecting the ops dispatch and completion implementation.
 Because AFIO is pure batch, dispatch is very rarely a problem: rather it is completion, because completion handling must always be
 performed per op completion in order to check for and dispatch, if necessary, dependencies. Currently the top consumers of CPU
@@ -54,18 +54,25 @@ time during null closure dispatch benchmarks are as follows:
 
 [table:top_consumers Top consumers of CPU time during null closure dispatch in AFIO v1.1 on Microsoft Windows
 [[Unchained][][Chained][]]
-[[ops spinlock][[role alignright 71%]][ops spinlock][[role alignright 71%]]]
-[[threadpool waiting for new ops][[role alignright 7.4%]][threadpool waiting for new ops][[role alignright 8.2%]]]
-[[memory allocator][[role alignright 3.4%]][memory allocator][[role alignright 1.9%]]]
-[[sending ops to threadpool][[role alignright 1.5%]][sending ops to threadpool][[role alignright 1.1%]]]
+[[ops lock sleep][[role alignright 40%]][ops lock sleep][[role alignright 34%]]]
+[[threadpool waiting for new ops][[role alignright 23%]][ops lock spin][[role alignright 22%]]]
+[[ops lock spin][[role alignright 8.1%]][threadpool waiting for new ops][[role alignright 14%]]]
+[[memory allocator][[role alignright 6.1%]][memory allocator][[role alignright 4.7%]]]
+[[sending ops to threadpool][[role alignright 1.0%]][sending ops to threadpool][[role alignright 4.3%]]]
 [[RtlUserThreadStart][[role alignright 10%]][RtlUserThreadStart][[role alignright 10%]]]
-[[remainder and misc][[role alignright 6.7%]][remainder and misc][[role alignright 7.8%]]]
+[[remainder and misc][[role alignright 11.8%]][remainder and misc][[role alignright 11%]]]
 ]
 
 As you can see, when the closures do no real work, one spends a huge amount of time contending the ops lock.
 Luckily, the ops lock is not held while file i/o operations or closures are being executed, so contention on the ops lock
 isn't as much of a problem during real world use i.e. you will get a significant amount of ["free] file i/o without losing
 much in maximum op dispatch throughput.
+
+And certainly a custom allocator for the hash table might make quite a difference, especially in avoiding spinning and sleeping
+the ops lock altogether by eliminating the memory allocator. Another option we might investigate in the future is using a
+different hash table implementation e.g. `concurrent_unordered_map<>` instead (though I hear it has poor single lookup
+performance, and the lack of safe erase is a huge problem for us), or any of the hash tables from
+[@http://incise.org/hash-table-benchmarks.html].
 
 [endsect] [/closure_performance]
 
