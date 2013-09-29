@@ -1,7 +1,7 @@
 #include "boost/afio/afio.hpp"
 #include <iostream>
 
-/*  My Intel Core i7 3770K running Windows 8 x64:  383035 closures/sec
+/*  My Intel Core i7 3770K running Windows 8 x64:  420108 closures/sec
     My Intel Core i7 3770K running     Linux x64:  closures/sec
 */
 
@@ -14,15 +14,16 @@ int main(void)
 	auto begin=std::chrono::high_resolution_clock::now();
 	while(std::chrono::duration_cast<secs_type>(std::chrono::high_resolution_clock::now()-begin).count()<3);
 	
-	auto callback=std::function<async_file_io_dispatcher_base::completion_t>([](size_t, std::shared_ptr<async_io_handle> h, exception_ptr *)
+	auto callback=(async_file_io_dispatcher_base::completion_t *)[](size_t, std::shared_ptr<async_io_handle> h, exception_ptr *)
 	{
 #if 0
+		// Simulate an i/o op with a context switch
 		Sleep(0);
 #endif
 		return std::make_pair(true, h);
-	});
+	};
 	std::vector<async_io_op> preconditions;
-	std::vector<std::pair<async_op_flags, std::function<async_file_io_dispatcher_base::completion_t>>> callbacks(1,
+	std::vector<std::pair<async_op_flags, async_file_io_dispatcher_base::completion_t *>> callbacks(1,
 		std::make_pair(async_op_flags::None, callback));
 #if 0
 	std::cout << "Attach profiler now and hit Return" << std::endl;

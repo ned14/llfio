@@ -1519,12 +1519,41 @@ async_io_op async_file_io_dispatcher_base::op_from_scheduled_id(size_t id) const
 }
 
 
+#ifndef BOOST_AFIO_COMPILING_FOR_GCOV
 // Called in unknown thread
-async_file_io_dispatcher_base::completion_returntype async_file_io_dispatcher_base::invoke_user_completion(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr *e, std::function<async_file_io_dispatcher_base::completion_t> callback)
+async_file_io_dispatcher_base::completion_returntype async_file_io_dispatcher_base::invoke_user_completion_fast(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr *e, async_file_io_dispatcher_base::completion_t *callback)
 {
 	return callback(id, h, e);
 }
-
+std::vector<async_io_op> async_file_io_dispatcher_base::completion(const std::vector<async_io_op> &ops, const std::vector<std::pair<async_op_flags, async_file_io_dispatcher_base::completion_t *>> &callbacks)
+{
+	if(!ops.empty() && ops.size()!=callbacks.size())
+		BOOST_AFIO_THROW(std::runtime_error("The sequence of preconditions must either be empty or exactly the same length as callbacks."));
+	std::vector<async_io_op> ret;
+	ret.reserve(callbacks.size());
+	std::vector<async_io_op>::const_iterator i;
+	std::vector<std::pair<async_op_flags, async_file_io_dispatcher_base::completion_t *>>::const_iterator c;
+	exception_ptr he;
+	detail::immediate_async_ops immediates;
+	BOOST_AFIO_LOCK_GUARD<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
+	if(ops.empty())
+	{
+		async_io_op empty;
+		BOOST_FOREACH(auto & c, callbacks)
+		{
+			ret.push_back(chain_async_op(&he, immediates, (int) detail::OpType::UserCompletion, empty, c.first, &async_file_io_dispatcher_base::invoke_user_completion_fast, c.second));
+		}
+	}
+	else for(i=ops.begin(), c=callbacks.begin(); i!=ops.end() && c!=callbacks.end(); ++i, ++c)
+		ret.push_back(chain_async_op(&he, immediates, (int) detail::OpType::UserCompletion, *i, c->first, &async_file_io_dispatcher_base::invoke_user_completion_fast, c->second));
+	return ret;
+}
+#endif
+// Called in unknown thread
+async_file_io_dispatcher_base::completion_returntype async_file_io_dispatcher_base::invoke_user_completion_slow(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr *e, std::function<async_file_io_dispatcher_base::completion_t> callback)
+{
+	return callback(id, h, e);
+}
 std::vector<async_io_op> async_file_io_dispatcher_base::completion(const std::vector<async_io_op> &ops, const std::vector<std::pair<async_op_flags, std::function<async_file_io_dispatcher_base::completion_t>>> &callbacks)
 {
 	if(!ops.empty() && ops.size()!=callbacks.size())
@@ -1541,11 +1570,11 @@ std::vector<async_io_op> async_file_io_dispatcher_base::completion(const std::ve
 		async_io_op empty;
 		BOOST_FOREACH(auto & c, callbacks)
 		{
-			ret.push_back(chain_async_op(&he, immediates, (int) detail::OpType::UserCompletion, empty, c.first, &async_file_io_dispatcher_base::invoke_user_completion, c.second));
+			ret.push_back(chain_async_op(&he, immediates, (int) detail::OpType::UserCompletion, empty, c.first, &async_file_io_dispatcher_base::invoke_user_completion_slow, c.second));
 		}
 	}
 	else for(i=ops.begin(), c=callbacks.begin(); i!=ops.end() && c!=callbacks.end(); ++i, ++c)
-			ret.push_back(chain_async_op(&he, immediates, (int) detail::OpType::UserCompletion, *i, c->first, &async_file_io_dispatcher_base::invoke_user_completion, c->second));
+			ret.push_back(chain_async_op(&he, immediates, (int) detail::OpType::UserCompletion, *i, c->first, &async_file_io_dispatcher_base::invoke_user_completion_slow, c->second));
 	return ret;
 }
 

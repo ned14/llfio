@@ -28,7 +28,7 @@
           (batch bound functions)</a>
 </h5></div></div></div>
 <p>
-            <a class="indexterm" name="id904839"></a>
+            <a class="indexterm" name="id897463"></a>
 Schedule a batch of asynchronous invocations of the specified functions
             when their supplied operations complete.
           </p>
@@ -36,7 +36,7 @@ Schedule a batch of asynchronous invocations of the specified functions
 <a name="afio.reference.classes.async_file_io_dispatcher_base.completion_2_batch_bound_functions.h0"></a>
             <span class="phrase"><a name="afio.reference.classes.async_file_io_dispatcher_base.completion_2_batch_bound_functions.synopsis"></a></span><a class="link" href="completion_2_batch_bound_functions.html#afio.reference.classes.async_file_io_dispatcher_base.completion_2_batch_bound_functions.synopsis">Synopsis</a>
           </h6>
-<pre class="programlisting"><span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span><span class="identifier">async_io_op</span><span class="special">&gt;</span> <span class="identifier">async_file_io_dispatcher_base</span><span class="special">::</span><span class="identifier">completion</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">async_io_op</span> <span class="special">&gt;</span> <span class="special">&amp;</span> <span class="identifier">ops</span><span class="special">,</span> <span class="keyword">const</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">pair</span><span class="special">&lt;</span> <span class="identifier">async_op_flags</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">function</span><span class="special">&lt;</span> <span class="identifier">async_file_io_dispatcher_base</span><span class="special">::</span><span class="identifier">completion_t</span> <span class="special">&gt;&gt;&gt;</span> <span class="special">&amp;</span> <span class="identifier">callbacks</span><span class="special">)</span></pre>
+<pre class="programlisting"><span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span><span class="identifier">async_io_op</span><span class="special">&gt;</span> <span class="identifier">async_file_io_dispatcher_base</span><span class="special">::</span><span class="identifier">completion</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">async_io_op</span> <span class="special">&gt;</span> <span class="special">&amp;</span> <span class="identifier">ops</span><span class="special">,</span> <span class="keyword">const</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">pair</span><span class="special">&lt;</span> <span class="identifier">async_op_flags</span><span class="special">,</span> <span class="identifier">async_file_io_dispatcher_base</span><span class="special">::</span><span class="identifier">completion_t</span> <span class="special">*</span> <span class="special">&gt;&gt;</span> <span class="special">&amp;</span> <span class="identifier">callbacks</span><span class="special">)</span></pre>
 <h6>
 <a name="afio.reference.classes.async_file_io_dispatcher_base.completion_2_batch_bound_functions.h1"></a>
             <span class="phrase"><a name="afio.reference.classes.async_file_io_dispatcher_base.completion_2_batch_bound_functions.parameters"></a></span><a class="link" href="completion_2_batch_bound_functions.html#afio.reference.classes.async_file_io_dispatcher_base.completion_2_batch_bound_functions.parameters">Parameters</a>
@@ -93,8 +93,8 @@ Schedule a batch of asynchronous invocations of the specified functions
 <tr>
 <td>
                     <p>
-                      const std::vector&lt; std::pair&lt; async_op_flags, std::function&lt;
-                      async_file_io_dispatcher_base::completion_t &gt;&gt;&gt; &amp;
+                      const std::vector&lt; std::pair&lt; async_op_flags, async_file_io_dispatcher_base::completion_t
+                      * &gt;&gt; &amp;
                     </p>
                   </td>
 <td>

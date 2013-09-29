@@ -32,6 +32,10 @@
       1.56 AFIO v1.1</a>
     </h4>
 <p>
+      Completions handling no longer holds the opslock during completions dispatch,
+      further improving performance.
+    </p>
+<p>
       Immediate completions no longer hold the opslock, which meant the opslock could
       be changed from a recursive mutex to a spinlock. The new, more parallelised,
       behaviour illuminated a number of new race conditions in when_all() which have

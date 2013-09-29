@@ -1,7 +1,7 @@
 #include "boost/afio/afio.hpp"
 #include <iostream>
 
-/*  My Intel Core i7 3770K running Windows 8 x64: 220940 closures/sec
+/*  My Intel Core i7 3770K running Windows 8 x64: 136738 closures/sec
     My Intel Core i7 3770K running     Linux x64:  closures/sec
 */
 
@@ -24,7 +24,7 @@ int main(void)
 	{
 		async_io_op last;
 		threads++;
-		for(size_t n=0; n<50000; n++)
+		for(size_t n=0; n<500000; n++)
 		{
 			last=dispatcher->call(last, callback).second;
 		}
@@ -33,7 +33,7 @@ int main(void)
 		std::this_thread::sleep_for(std::chrono::milliseconds(1));
 	auto end=std::chrono::high_resolution_clock::now();
 	auto diff=std::chrono::duration_cast<secs_type>(end-begin);
-	std::cout << "It took " << diff.count() << " secs to execute " << (50000*threads) << " closures which is " << (50000*threads/diff.count()) << " chained closures/sec" << std::endl;
+	std::cout << "It took " << diff.count() << " secs to execute " << (500000*threads) << " closures which is " << (500000*threads/diff.count()) << " chained closures/sec" << std::endl;
 	std::cout << "\nPress Return to exit ..." << std::endl;
 	getchar();
 #endif

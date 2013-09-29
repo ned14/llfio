@@ -31,6 +31,10 @@
           (batch bound functions)</a></span></dt>
 <dt><span class="section"><a href="async_file_io_dispatcher_base/completion_2_single_bound_function.html">completion
           (single bound function)</a></span></dt>
+<dt><span class="section"><a href="async_file_io_dispatcher_base/completion_2_batch_bound_functi0.html">completion
+          (batch bound functions)</a></span></dt>
+<dt><span class="section"><a href="async_file_io_dispatcher_base/completion_2_single_bound_funct0.html">completion
+          (single bound function)</a></span></dt>
 <dt><span class="section"><a href="async_file_io_dispatcher_base/call_2_batch_bound_functions.html">call
           (batch bound functions)</a></span></dt>
 <dt><span class="section"><a href="async_file_io_dispatcher_base/call_1_batch_bound_functions_without_preconditions.html">call
@@ -94,7 +98,7 @@
 <dt><span class="section"><a href="async_file_io_dispatcher_base/page_size.html">page_size</a></span></dt>
 </dl></div>
 <p>
-          <a class="indexterm" name="id897334"></a>
+          <a class="indexterm" name="id892292"></a>
 Abstract base class for dispatching file i/o asynchronously.
         </p>
 <h6>
@@ -264,6 +268,62 @@ Abstract base class for dispatching file i/o asynchronously.
                   <p>
                     An async_io_op with the same shared future as all op refs with
                     this id.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">async_io_op</span> <span class="special">&gt;</span> <span class="identifier">completion</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">async_io_op</span> <span class="special">&gt;</span> <span class="special">&amp;</span> <span class="identifier">ops</span><span class="special">,</span> <span class="keyword">const</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">pair</span><span class="special">&lt;</span> <span class="identifier">async_op_flags</span><span class="special">,</span> <span class="identifier">async_file_io_dispatcher_base</span><span class="special">::</span><span class="identifier">completion_t</span> <span class="special">*</span> <span class="special">&gt;&gt;</span> <span class="special">&amp;</span> <span class="identifier">callbacks</span><span class="special">)</span></pre>
+                </td>
+<td>
+                  <p>
+                    Schedule a batch of asynchronous invocations of the specified
+                    functions when their supplied operations complete.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <span class="bold"><strong>const std::vector&lt; async_io_op &gt;
+                    &amp;</strong></span>: <span class="emphasis"><em>ops</em></span>: A batch of precondition
+                    op handles.
+                  </p>
+                  <p>
+                    <span class="bold"><strong>const std::vector&lt; std::pair&lt; async_op_flags,
+                    async_file_io_dispatcher_base::completion_t * &gt;&gt; &amp;</strong></span>:
+                    <span class="emphasis"><em>callbacks</em></span>: A batch of pairs of op flags
+                    and bound completion handler functions of type <code class="literal"><code class="computeroutput"><span class="identifier">completion_t</span></code></code>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    A batch of op handles
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">async_io_op</span> <span class="identifier">completion</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">async_io_op</span> <span class="special">&amp;</span> <span class="identifier">req</span><span class="special">,</span> <span class="keyword">const</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">pair</span><span class="special">&lt;</span> <span class="identifier">async_op_flags</span><span class="special">,</span> <span class="identifier">async_file_io_dispatcher_base</span><span class="special">::</span><span class="identifier">completion_t</span> <span class="special">*</span> <span class="special">&gt;</span> <span class="special">&amp;</span> <span class="identifier">callback</span><span class="special">)</span></pre>
+                </td>
+<td>
+                  <p>
+                    Schedule the asynchronous invocation of the specified single
+                    function when the supplied single operation completes.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <span class="bold"><strong>const async_io_op &amp;</strong></span>: <span class="emphasis"><em>req</em></span>:
+                    A precondition op handle
+                  </p>
+                  <p>
+                    <span class="bold"><strong>const std::pair&lt; async_op_flags, async_file_io_dispatcher_base::completion_t
+                    * &gt; &amp;</strong></span>: <span class="emphasis"><em>callback</em></span>: A pair
+                    of op flag and bound completion handler function of type <code class="literal"><code class="computeroutput"><span class="identifier">completion_t</span></code></code>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    An op handle
                   </p>
                 </td>
 </tr>

@@ -28,15 +28,14 @@
       of AFIO's closure execution engine aka how many IOPS can I push with AFIO?</a>
 </h3></div></div></div>
 <p>
-        For v1.1, maximum throughput is approximately as follows, where the values
-        for <code class="computeroutput"><span class="identifier">call</span><span class="special">()</span></code>
-        might be for use as a closure engine whereas the values for <code class="computeroutput"><span class="identifier">completion</span><span class="special">()</span></code>
-        are for max IOPS:
+        For v1.1, maximum ops <span class="bold"><strong>dispatch</strong></span> throughput
+        is approximately as follows, where the values for <code class="computeroutput"><span class="identifier">call</span><span class="special">()</span></code> might be for use as a closure engine whereas
+        the values for <code class="computeroutput"><span class="identifier">completion</span><span class="special">()</span></code> might be for max filing system IOPS:
       </p>
 <div class="table">
-<a name="afio.FAQ.closure_performance.throughput"></a><p class="title"><b>Table&#160;1.8.&#160;Maximum null closure execution rate on a 3.5Ghz Intel Core i7 3770K
+<a name="afio.FAQ.closure_performance.throughput"></a><p class="title"><b>Table&#160;1.8.&#160;Maximum null closure dispatch rate on a 3.5Ghz Intel Core i7 3770K
         for AFIO v1.1:</b></p>
-<div class="table-contents"><table class="table" summary="Maximum null closure execution rate on a 3.5Ghz Intel Core i7 3770K
+<div class="table-contents"><table class="table" summary="Maximum null closure dispatch rate on a 3.5Ghz Intel Core i7 3770K
         for AFIO v1.1:">
 <colgroup>
 <col>
@@ -91,27 +90,27 @@
               </td>
 <td>
                 <p>
-                  <span class="alignright">296008</span>
+                  <span class="alignright">200752</span>
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="alignright">220940</span>
+                  <span class="alignright">136738</span>
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="alignright">383035</span>
+                  <span class="alignright">420108</span>
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="alignright">350825</span>
+                  <span class="alignright">352845</span>
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="alignright">2591360</span>
+                  <span class="alignright">2806070</span>
                 </p>
               </td>
 </tr>
@@ -136,17 +135,22 @@
 </table></div>
 </div>
 <br class="table-break"><p>
-        While this is fast enough for consumer SSDs, we agree it is currently not
-        great. The biggest limiter, by far, is the mutex protecting the ops dispatch
+        While this is fast enough for consumer SSDs (which is the whole point of
+        AFIO), and we would emphasise that scaling where the closures are doing real
+        i/o work is close to linear thanks to careful use of no worse than O(N) algorithms
+        throughout, we agree AFIO's performance is currently not great for less heavyweight
+        closures. The biggest limiter, by far, is the mutex protecting the ops dispatch
         and completion implementation. Because AFIO is pure batch, dispatch is very
         rarely a problem: rather it is completion, because completion handling must
         always be performed per op completion in order to check for and dispatch,
         if necessary, dependencies. Currently the top consumers of CPU time during
-        null closure dispatch benchmark are as follows:
+        null closure dispatch benchmarks are as follows:
       </p>
 <div class="table">
-<a name="afio.FAQ.closure_performance.top_consumers"></a><p class="title"><b>Table&#160;1.9.&#160;Top consumers of CPU time during null closure dispatch in AFIO v1.0</b></p>
-<div class="table-contents"><table class="table" summary="Top consumers of CPU time during null closure dispatch in AFIO v1.0">
+<a name="afio.FAQ.closure_performance.top_consumers"></a><p class="title"><b>Table&#160;1.9.&#160;Top consumers of CPU time during null closure dispatch in AFIO v1.1
+        on Microsoft Windows</b></p>
+<div class="table-contents"><table class="table" summary="Top consumers of CPU time during null closure dispatch in AFIO v1.1
+        on Microsoft Windows">
 <colgroup>
 <col>
 <col>
@@ -173,22 +177,22 @@
 <tr>
 <td>
                 <p>
-                  ops Mutex
+                  ops spinlock
                 </p>
               </td>
 <td>
                 <p>
-                  85%
+                  <span class="alignright">71%</span>
                 </p>
               </td>
 <td>
                 <p>
-                  ops Mutex
+                  ops spinlock
                 </p>
               </td>
 <td>
                 <p>
-                  99.41%
+                  <span class="alignright">71%</span>
                 </p>
               </td>
 </tr>
@@ -200,7 +204,7 @@
               </td>
 <td>
                 <p>
-                  4.15%
+                  <span class="alignright">7.4%</span>
                 </p>
               </td>
 <td>
@@ -210,46 +214,30 @@
               </td>
 <td>
                 <p>
-                  0.26%
+                  <span class="alignright">8.2%</span>
                 </p>
               </td>
 </tr>
 <tr>
 <td>
                 <p>
-                  operator new
+                  memory allocator
                 </p>
               </td>
 <td>
                 <p>
-                  2.43%
+                  <span class="alignright">3.4%</span>
                 </p>
               </td>
 <td>
                 <p>
-                  Remainder and misc
+                  memory allocator
                 </p>
               </td>
 <td>
                 <p>
-                  0.33%
+                  <span class="alignright">1.9%</span>
                 </p>
-              </td>
-</tr>
-<tr>
-<td>
-                <p>
-                  hash table insert
-                </p>
-              </td>
-<td>
-                <p>
-                  2.05%
-                </p>
-              </td>
-<td>
-              </td>
-<td>
               </td>
 </tr>
 <tr>
@@ -260,44 +248,74 @@
               </td>
 <td>
                 <p>
-                  1.67%
+                  <span class="alignright">1.5%</span>
                 </p>
               </td>
 <td>
+                <p>
+                  sending ops to threadpool
+                </p>
               </td>
 <td>
+                <p>
+                  <span class="alignright">1.1%</span>
+                </p>
               </td>
 </tr>
 <tr>
 <td>
                 <p>
-                  Remainder and misc
+                  RtlUserThreadStart
                 </p>
               </td>
 <td>
                 <p>
-                  4.7%
+                  <span class="alignright">10%</span>
                 </p>
               </td>
 <td>
+                <p>
+                  RtlUserThreadStart
+                </p>
               </td>
 <td>
+                <p>
+                  <span class="alignright">10%</span>
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  remainder and misc
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="alignright">6.7%</span>
+                </p>
+              </td>
+<td>
+                <p>
+                  remainder and misc
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="alignright">7.8%</span>
+                </p>
               </td>
 </tr>
 </tbody>
 </table></div>
 </div>
 <br class="table-break"><p>
-        Luckily, the mutex is not held while file i/o operations or closures are
-        being executed, so contention on the mutex isn't as much of a problem during
-        real world use and therefore is in practice nothing like as bad as things
-        look above -- in fact, adding in a noop kernel syscall actually slightly
-        improves the figures because the mutex isn't being contended as heavily,
-        so the above figures for <code class="computeroutput"><span class="identifier">completion</span><span class="special">()</span></code> are very reasonable max IOPS values. Nevertheless,
-        if you were randomly reading or writing very small bits of data, we can see
-        how the mutex might get in the way, and we intend to do something about it
-        in a future v1.x release of Boost.AFIO, most especially to eliminate the
-        recursive mutex in favour of a spin lock.
+        As you can see, when the closures do no real work, one spends a huge amount
+        of time contending the ops lock. Luckily, the ops lock is not held while
+        file i/o operations or closures are being executed, so contention on the
+        ops lock isn't as much of a problem during real world use i.e. you will get
+        a significant amount of <span class="quote">&#8220;<span class="quote">free</span>&#8221;</span> file i/o without losing much
+        in maximum op dispatch throughput.
       </p>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>

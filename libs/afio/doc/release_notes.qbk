@@ -32,37 +32,37 @@ First release for end of Google Summer of Code 2013.
 [section:closure_performance What is the maximum throughput of AFIO's closure execution engine aka
 how many IOPS can I push with AFIO?]
 
-For v1.1, maximum throughput is approximately as follows, where the values for `call()` might be for
-use as a closure engine whereas the values for `completion()` are for max IOPS:
+For v1.1, maximum ops [*dispatch] throughput is approximately as follows, where the values for `call()` might be for
+use as a closure engine whereas the values for `completion()` might be for max filing system IOPS:
 
-[table:throughput Maximum null closure execution rate on a 3.5Ghz Intel Core i7 3770K for AFIO v1.1:
+[table:throughput Maximum null closure dispatch rate on a 3.5Ghz Intel Core i7 3770K for AFIO v1.1:
 [[Operating system][`call()` unchained][`call()` chained][`completion()` unchained][`completion()` chained][Raw ASIO]]
-[[Microsoft Windows 8 x64 with Visual Studio 2013][[role alignright 296008]][[role alignright 220940]][[role alignright 383035]][[role alignright 350825]][[role alignright 2591360]]]
+[[Microsoft Windows 8 x64 with Visual Studio 2013][[role alignright 200752]][[role alignright 136738]][[role alignright 420108]][[role alignright 352845]][[role alignright 2806070]]]
 [[Ubuntu 12.04 LTS Linux x64 with GCC 4.8][][][][][]]
 ]
 
-While this is fast enough for consumer SSDs, we agree it is currently not great. The biggest limiter, by far, is the
+While this is fast enough for consumer SSDs (which is the whole point of AFIO), and we would emphasise that scaling
+where the closures are doing real i/o work is close to linear thanks to careful use of no worse than O(N) algorithms throughout, we
+agree AFIO's performance is currently not great for less heavyweight closures. The biggest limiter, by far, is the
 mutex protecting the ops dispatch and completion implementation. Because AFIO is pure batch, dispatch
 is very rarely a problem: rather it is completion, because completion handling must always be performed per op completion
 in order to check for and dispatch, if necessary, dependencies. Currently the top consumers of CPU
-time during null closure dispatch benchmark are as follows:
+time during null closure dispatch benchmarks are as follows:
 
-[table:top_consumers Top consumers of CPU time during null closure dispatch in AFIO v1.0
+[table:top_consumers Top consumers of CPU time during null closure dispatch in AFIO v1.1 on Microsoft Windows
 [[Unchained][][Chained][]]
-[[ops Mutex][85%][ops Mutex][99.41%]]
-[[threadpool waiting for new ops][4.15%][threadpool waiting for new ops][0.26%]]
-[[operator new][2.43%][Remainder and misc][0.33%]]
-[[hash table insert][2.05%][][]]
-[[sending ops to threadpool][1.67%][][]]
-[[Remainder and misc][4.7%][][]]
+[[ops spinlock][[role alignright 71%]][ops spinlock][[role alignright 71%]]]
+[[threadpool waiting for new ops][[role alignright 7.4%]][threadpool waiting for new ops][[role alignright 8.2%]]]
+[[memory allocator][[role alignright 3.4%]][memory allocator][[role alignright 1.9%]]]
+[[sending ops to threadpool][[role alignright 1.5%]][sending ops to threadpool][[role alignright 1.1%]]]
+[[RtlUserThreadStart][[role alignright 10%]][RtlUserThreadStart][[role alignright 10%]]]
+[[remainder and misc][[role alignright 6.7%]][remainder and misc][[role alignright 7.8%]]]
 ]
 
-Luckily, the mutex is not held while file i/o operations or closures are being executed, so contention on the mutex
-isn't as much of a problem during real world use and therefore is in practice nothing like as bad as things look above
--- in fact, adding in a noop kernel syscall actually slightly improves the figures because the mutex isn't being
-contended as heavily, so the above figures for `completion()` are very reasonable max IOPS values. Nevertheless, if you were randomly
-reading or writing very small bits of data, we can see how the mutex might get in the way, and we intend to do something
-about it in a future v1.x release of __boost_afio__, most especially to eliminate the recursive mutex in favour of a spin lock.
+As you can see, when the closures do no real work, one spends a huge amount of time contending the ops lock.
+Luckily, the ops lock is not held while file i/o operations or closures are being executed, so contention on the ops lock
+isn't as much of a problem during real world use i.e. you will get a significant amount of ["free] file i/o without losing
+much in maximum op dispatch throughput.
 
 [endsect] [/closure_performance]
 
