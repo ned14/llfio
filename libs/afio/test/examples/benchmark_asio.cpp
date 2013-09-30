@@ -2,7 +2,7 @@
 #include <iostream>
 
 /*  My Intel Core i7 3770K running Windows 8 x64: 2591360 closures/sec
-    My Intel Core i7 3770K running     Linux x64:  closures/sec
+    My Intel Core i7 3770K running     Linux x64: 1611040 closures/sec (4 threads)
 */
 
 int main(void)
@@ -23,7 +23,7 @@ int main(void)
 		--togo;
 		return 1;
 	};
-	size_t threads=0;
+	std::atomic<size_t> threads(0);
 #if 0
 	std::cout << "Attach profiler now and hit Return" << std::endl;
 	getchar();
@@ -31,7 +31,7 @@ int main(void)
 	begin=std::chrono::high_resolution_clock::now();
 #pragma omp parallel
 	{
-		threads++;
+		++threads;
 		for(size_t n=0; n<5000000; n++)
 		{
 			++togo;
