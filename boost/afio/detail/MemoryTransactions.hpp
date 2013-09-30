@@ -120,7 +120,7 @@ namespace boost
 					}
 				};
 			};
-			template<class parenttype> struct null_spin_policy : parenttype
+			struct null_spin_policy
 			{
 				template<class parenttype> struct policy : parenttype
 				{
