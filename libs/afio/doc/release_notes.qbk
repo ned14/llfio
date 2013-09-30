@@ -33,19 +33,25 @@ First release for end of Google Summer of Code 2013.
 how many IOPS can I push with AFIO?]
 
 For v1.1, maximum ops [*dispatch] throughput is approximately as follows, where the values for `call()` might be for
-use as a closure engine whereas the values for `completion()` might be for max filing system IOPS:
+use as a closure engine whereas the values for `completion()` might be for max filing system IOPS[footnote The phrase
+["might be] is important: a null closure benchmark will always have dispatch rate problems i.e. the closures being executed
+take less time to execute than the time to dispatch them, so these figures are best read as maximum dispatch rate, not
+maximum IOPS.]:
 
-[table:throughput Maximum null closure dispatch rate on a 3.5Ghz Intel Core i7 3770K for AFIO v1.1:
+[table:throughput Maximum null closure dispatch rate on a 3.5Ghz Intel Core i7 3770K for AFIO v1.1 i.e. NOT using transactional memory:
 [[Operating system][`call()` unchained][`call()` chained][`completion()` unchained][`completion()` chained][Raw ASIO]]
-[[Microsoft Windows 8 x64 with Visual Studio 2013][[role alignright 911963]][[role alignright 539156]][[role alignright 1406690]][[role alignright 622682]][[role alignright 2806070]]]
-[[Times slower than ASIO][3x][5.2x][2x][4.5x][]]
+[[Microsoft Windows 8 x64 with Visual Studio 2013][[role alignright 911963]][[role alignright 596318]][[role alignright 1555990]][[role alignright 726124]][[role alignright 2806070]]]
+[[Relative to ASIO][32%][21%][55%][26%][]]
 [[Ubuntu 12.04 LTS Linux x64 with GCC 4.8][][][][][]]
-[[][][][][][]]
+[[Relative to ASIO][][][][][]]
 ]
 
-While this is fast enough for consumer SSDs (which is the whole point of AFIO), and we would emphasise that scaling
-where the closures are doing real i/o work is close to linear thanks to careful use of no worse than O(N) algorithms throughout, we
-agree AFIO's performance is currently not great for lightweight closures -- unfortunately, dependency chaining is not
+We hope that ~720k max IOPS surely ought to be enough to max out any SATA III SSD -- it should even max out any mid range
+PCIe based SSD too, and if paired with a CPU with more cores, AFIO's almost wait free design ought to scale out fairly
+well too such that it may be able to max out even top end PCIe SSDs, some of which can push 10m IOPS now. If that isn't
+fast enough for you, you can try AFIO's experimental transactional memory support with a suitable compiler too.
+
+Nevertheless, AFIO will almost certainly be still criticised for poor performance relative to __boost_asio__. Unfortunately, dependency chaining is not
 free, and moreover, AFIO has a very simple design based on a global hash table and pure C++11 STL throughout (i.e. it's heavy
 on the memory allocator). The biggest limiter, by far, is the spin lock protecting the ops dispatch and completion implementation.
 Because AFIO is pure batch, dispatch is very rarely a problem: rather it is completion, because completion handling must always be

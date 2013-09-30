@@ -1078,8 +1078,13 @@ namespace detail {
 		std::shared_ptr<thread_source> pool;
 		file_flags flagsforce, flagsmask;
 
-		typedef detail::spinlock<size_t> fdslock_t;
-		typedef detail::spinlock<size_t> opslock_t;
+		typedef spinlock<size_t> fdslock_t;
+		typedef spinlock<size_t,
+			spins_to_transact<50>::policy,
+			spins_to_loop<150>::policy,
+			spins_to_yield<500>::policy,
+			spins_to_sleep::policy
+		> opslock_t;
 		typedef recursive_mutex dircachelock_t;
 		fdslock_t fdslock; std::unordered_map<void *, std::weak_ptr<async_io_handle>> fds;
 		opslock_t opslock; std::atomic<size_t> monotoniccount; std::unordered_map<size_t, std::shared_ptr<async_file_io_dispatcher_op>> ops;
@@ -1614,15 +1619,18 @@ void async_file_io_dispatcher_base::complete_async_op(size_t id, std::shared_ptr
 		completions.reserve(thisop->completions.size());
 		BOOST_FOREACH(auto &c, thisop->completions)
 		{
+			std::pair<const size_t, std::shared_ptr<detail::async_file_io_dispatcher_op>> *temp=nullptr;
 			BOOST_BEGIN_MEMORY_TRANSACTION(p->opslock)
 			{
 				auto it=p->ops.find(c.first);
 				if(p->ops.end()==it)
 					BOOST_AFIO_THROW_FATAL(std::runtime_error("Failed to find this completion operation in list of currently executing operations"));
-				completions.push_back(*it);
+				// unordered_map guaranteed to never relocate references
+				temp=&(*it);
 				BOOST_AFIO_DEBUG_PRINT("C %u > %u %p\n", (unsigned) id, (unsigned) c.first, h.get());
 			}
 			BOOST_END_MEMORY_TRANSACTION(p->opslock)
+			completions.push_back(*temp);
 		}
 	}
 	if(!completions.empty())
@@ -1678,7 +1686,7 @@ template<class F, class... Args> std::shared_ptr<async_io_handle> async_file_io_
 		bool has_detached_promise=false;
 		BOOST_BEGIN_MEMORY_TRANSACTION(p->opslock)
 		{
-			std::unordered_map<size_t, std::shared_ptr<detail::async_file_io_dispatcher_op>>::iterator it(p->ops.find(id));
+			auto it(p->ops.find(id));
 			if(p->ops.end()==it)
 			{
 #ifndef NDEBUG

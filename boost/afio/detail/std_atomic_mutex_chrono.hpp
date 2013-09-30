@@ -38,6 +38,7 @@ File Created: Sept 2013
 namespace boost {
 	namespace afio {
 		typedef boost::thread thread;
+		namespace this_thread=boost::this_thread;
 		inline boost::thread::id get_this_thread_id() { return boost::this_thread::get_id(); }
 		// Both VS2010 and Mingw32 need this, but not Mingw-w64
 #if (defined(BOOST_MSVC) && BOOST_MSVC < 1700 /* <= VS2010 */) || (defined(__MINGW32__) && !defined(__MINGW64_VERSION_MAJOR))
@@ -57,6 +58,7 @@ namespace boost {
 namespace boost {
 	namespace afio {
 		typedef std::thread thread;
+		namespace this_thread=std::this_thread;
 		inline std::thread::id get_this_thread_id() { return std::this_thread::get_id(); }
 		inline std::exception_ptr current_exception() { return std::current_exception(); }
 #define BOOST_AFIO_THROW(x) throw x

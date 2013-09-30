@@ -82,17 +82,15 @@ namespace boost
 					static BOOST_CONSTEXPR_OR_CONST size_t spins_to_loop=spins;
 					bool int_yield(size_t n) BOOST_NOEXCEPT_OR_NOTHROW
 					{
-						if(!parenttype::int_yield(n) && n<spins)
+						if(parenttype::int_yield(n)) return true;
+						if(n>=spins) return false;
+						if(use_pause)
 						{
-							if(use_pause)
-							{
 #ifdef BOOST_SMT_PAUSE
-								BOOST_SMT_PAUSE;
+							BOOST_SMT_PAUSE;
 #endif
-							}
-							return true;
 						}
-						return false;
+						return true;
 					}
 				};
 			};
@@ -103,33 +101,32 @@ namespace boost
 					static BOOST_CONSTEXPR_OR_CONST size_t spins_to_yield=spins;
 					bool int_yield(size_t n) BOOST_NOEXCEPT_OR_NOTHROW
 					{
-						if(!parenttype::int_yield(n) && n<spins)
-						{
-							boost::this_thread::yield();
-							return true;
-						}
-						return false;
+						if(parenttype::int_yield(n)) return true;
+						if(n>=spins) return false;
+						boost::afio::this_thread::yield();
+						return true;
 					}
 				};
 			};
-			template<size_t spins> struct spins_to_sleep
+			struct spins_to_sleep
 			{
 				template<class parenttype> struct policy : parenttype
 				{
-					static BOOST_CONSTEXPR_OR_CONST size_t spins_to_sleep=spins;
 					bool int_yield(size_t n) BOOST_NOEXCEPT_OR_NOTHROW
 					{
-						if(!parenttype::int_yield(n) && n<spins)
-						{
-							boost::this_thread::sleep_for(boost::chrono::milliseconds(1));
-							return true;
-						}
-						return false;
+						if(parenttype::int_yield(n)) return true;
+						boost::afio::this_thread::sleep_for(boost::afio::chrono::milliseconds(1));
+						return true;
 					}
 				};
 			};
-			template<class parenttype> struct null_spin_policy : parenttype { };
-			template<typename T, template<class> class spinpolicy1=spins_to_transact<50>::policy, template<class> class spinpolicy2=spins_to_loop<125>::policy, template<class> class spinpolicy3=spins_to_yield<250>::policy, template<class> class spinpolicy4=spins_to_sleep<500>::policy> class spinlock : public spinpolicy4<spinpolicy3<spinpolicy2<spinpolicy1<spinlockbase<T>>>>>
+			template<class parenttype> struct null_spin_policy : parenttype
+			{
+				template<class parenttype> struct policy : parenttype
+				{
+				};
+			};
+			template<typename T, template<class> class spinpolicy1=spins_to_transact<50>::policy, template<class> class spinpolicy2=spins_to_loop<125>::policy, template<class> class spinpolicy3=spins_to_yield<250>::policy, template<class> class spinpolicy4=spins_to_sleep::policy> class spinlock : public spinpolicy4<spinpolicy3<spinpolicy2<spinpolicy1<spinlockbase<T>>>>>
 			{
 				typedef spinpolicy4<spinpolicy3<spinpolicy2<spinpolicy1<spinlockbase<T>>>>> parenttype;
 			public:
@@ -166,6 +163,19 @@ namespace boost
 			{
 				static BOOST_CONSTEXPR_OR_CONST size_t value=spinlock<T>::spins_to_transact;
 			};
+			template<class T> inline bool is_lockable_locked(T &lockable)
+			{
+				if(lockable.try_lock())
+				{
+					lockable.unlock();
+					return true;
+				}
+				return false;
+			}
+			template<class T> inline bool is_lockable_locked(spinlock<T> &lockable)
+			{
+				return 1==lockable.v.load();
+			}
 			// WARNING: I don't have access to a Haswell CPU, so I have no idea if the below works!
 			template<class T> struct intel_tsx_transaction
 			{
@@ -180,7 +190,7 @@ namespace boost
 						unsigned state=_xbegin(); // start transaction, or cope with abort
 						if(_XBEGIN_STARTED==state)
 						{
-							if(lockable.try_lock())
+							if(!is_lockable_locked(lockable))
 							{
 								// Lock is free, so we can proceed with the transaction
 								dismissed=1; // set to abort on exception throw
@@ -225,12 +235,10 @@ namespace boost
 					{
 						if(1==dismissed)
 							_xabort(0x78);
-						else
-						{
+						else if(2==dismissed)
+							_xend();
+						else if(3==dismissed)
 							lockable.unlock();
-							if(2==dismissed)
-								_xend();
-						}
 					}
 				}
 				void commit() BOOST_NOEXCEPT_OR_NOTHROW
