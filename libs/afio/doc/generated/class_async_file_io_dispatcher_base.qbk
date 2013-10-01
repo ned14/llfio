@@ -76,26 +76,6 @@ An async_io_op with the same shared future as all op refs with this id.
 
 
 ]]
-[[``std::vector< async_io_op > completion(const std::vector< async_io_op > & ops, const std::vector< std::pair< async_op_flags, async_file_io_dispatcher_base::completion_t * >> & callbacks)``
-
-] [] [[* const std::vector< async_io_op > &]: ['ops]:  
-
-[* const std::vector< std::pair< async_op_flags, async_file_io_dispatcher_base::completion_t * >> &]: ['callbacks]:  
-
-
-
-
-]]
-[[``async_io_op completion(const async_io_op & req, const std::pair< async_op_flags, async_file_io_dispatcher_base::completion_t * > & callback)``
-
-] [] [[* const async_io_op &]: ['req]:  
-
-[* const std::pair< async_op_flags, async_file_io_dispatcher_base::completion_t * > &]: ['callback]:  
-
-
-
-
-]]
 [[``std::vector< async_io_op > completion(const std::vector< async_io_op > & ops, const std::vector< std::pair< async_op_flags, std::function< async_file_io_dispatcher_base::completion_t >>> & callbacks)``
 
 ] [Schedule a batch of asynchronous invocations of the specified functions when their supplied operations complete. ] [[* const std::vector< async_io_op > &]: ['ops]:  A batch of precondition op handles. 

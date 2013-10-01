@@ -122,27 +122,27 @@
               </td>
 <td>
                 <p>
-                  32%
+                  <span class="alignright">32%</span>
                 </p>
               </td>
 <td>
                 <p>
-                  21%
+                  <span class="alignright">21%</span>
                 </p>
               </td>
 <td>
                 <p>
-                  55%
+                  <span class="alignright">55%</span>
                 </p>
               </td>
 <td>
                 <p>
-                  26%
+                  <span class="alignright">26%</span>
                 </p>
               </td>
 <td>
                 <p>
-                  100%
+                  <span class="alignright">100%</span>
                 </p>
               </td>
 </tr>
@@ -186,27 +186,27 @@
               </td>
 <td>
                 <p>
-                  68%
+                  <span class="alignright">68%</span>
                 </p>
               </td>
 <td>
                 <p>
-                  49%
+                  <span class="alignright">49%</span>
                 </p>
               </td>
 <td>
                 <p>
-                  89%
+                  <span class="alignright">89%</span>
                 </p>
               </td>
 <td>
                 <p>
-                  60%
+                  <span class="alignright">60%</span>
                 </p>
               </td>
 <td>
                 <p>
-                  100%
+                  <span class="alignright">100%</span>
                 </p>
               </td>
 </tr>
@@ -250,27 +250,27 @@
               </td>
 <td>
                 <p>
-                  24%
+                  <span class="alignright">24%</span>
                 </p>
               </td>
 <td>
                 <p>
-                  17%
+                  <span class="alignright">17%</span>
                 </p>
               </td>
 <td>
                 <p>
-                  37%
+                  <span class="alignright">37%</span>
                 </p>
               </td>
 <td>
                 <p>
-                  23%
+                  <span class="alignright">23%</span>
                 </p>
               </td>
 <td>
                 <p>
-                  100%
+                  <span class="alignright">100%</span>
                 </p>
               </td>
 </tr>
@@ -289,8 +289,10 @@
         paired with a CPU with more cores, AFIO's almost wait free design ought to
         scale out fairly well too such that it may be able to max out even top end
         PCIe SSDs, some of which can push 10m IOPS now. If that isn't fast enough
-        for you, you can try AFIO's experimental transactional memory support with
-        a suitable compiler too.
+        for you, try AFIO on an Intel CPU with memory transaction support (on Windows
+        a runtime check will automatically replace locks with memory transactions,
+        for POSIX you need to recompile with the <code class="computeroutput"><span class="special">-</span><span class="identifier">mrtm</span></code> flag), or try support for <code class="computeroutput"><span class="identifier">__transaction_relaxed</span></code> compilers if <code class="computeroutput"><span class="identifier">BOOST_HAVE_TRANSACTIONAL_MEMORY_COMPILER</span></code>
+        is defined.
       </p>
 <p>
         Nevertheless, AFIO will almost certainly be still criticised for poor performance

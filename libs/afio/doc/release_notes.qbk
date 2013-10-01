@@ -50,17 +50,18 @@ maximum IOPS.]:
 [table:throughput Maximum null closure dispatch rate on a 3.5Ghz Intel Core i7 3770K for AFIO v1.1 i.e. NOT using transactional memory:
 [[Operating system][`call()` unchained][`call()` chained][`completion()` unchained][`completion()` chained][Raw ASIO]]
 [[Microsoft Windows 8 x64 with Visual Studio 2013][[role alignright 911963]][[role alignright 596318]][[role alignright 1555990]][[role alignright 726124]][[role alignright 2806070]]]
-[[Relative to ASIO][32%][21%][55%][26%][100%]]
+[[Relative to ASIO][[role alignright 32%]][[role alignright 21%]][[role alignright 55%]][[role alignright 26%]][[role alignright 100%]]]
 [[Ubuntu 12.04 LTS Linux x64 with GCC 4.8][[role alignright 1094780]][[role alignright 794384]][[role alignright 1432810]][[role alignright 968005]][[role alignright 1611040[footnote Unfortunately the glibc mutex used by ASIO does not scale well on modern CPUs due to having too small a spin count, so this value is for four threads instead of eight (it was the best I could get through trial and error.]]]]
-[[Relative to ASIO][68%][49%][89%][60%][100%]]
+[[Relative to ASIO][[role alignright 68%]][[role alignright 49%]][[role alignright 89%]][[role alignright 60%]][[role alignright 100%]]]
 [[Microsoft Windows 8 x64 with Visual Studio 2010][[role alignright 649015]][[role alignright 469689]][[role alignright 1021630]][[role alignright 613816]][[role alignright 2725690]]]
-[[Relative to ASIO][24%][17%][37%][23%][100%]]
+[[Relative to ASIO][[role alignright 24%]][[role alignright 17%]][[role alignright 37%]][[role alignright 23%]][[role alignright 100%]]]
 ]
 
 We hope that ~720k max IOPS surely ought to be enough to max out any SATA III SSD -- it should even max out any mid range
 PCIe based SSD too, and if paired with a CPU with more cores, AFIO's almost wait free design ought to scale out fairly
 well too such that it may be able to max out even top end PCIe SSDs, some of which can push 10m IOPS now. If that isn't
-fast enough for you, you can try AFIO's experimental transactional memory support with a suitable compiler too.
+fast enough for you, try AFIO on an Intel CPU with memory transaction support (on Windows a runtime check will automatically
+replace locks with memory transactions, for POSIX you need to recompile with the `-mrtm` flag), or try support for `__transaction_relaxed` compilers if `BOOST_HAVE_TRANSACTIONAL_MEMORY_COMPILER` is defined.
 
 Nevertheless, AFIO will almost certainly be still criticised for poor performance relative to __boost_asio__. Unfortunately, dependency chaining is not
 free, and moreover, AFIO has a very simple design based on a global hash table and pure C++11 STL throughout (i.e. it's heavy
