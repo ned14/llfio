@@ -5,6 +5,7 @@ BOOST_AFIO_AUTO_TEST_CASE(async_io_errors, "Tests that the async i/o error handl
     using namespace boost::afio;
     using namespace std;
     using boost::afio::future;
+	namespace this_thread = boost::afio::this_thread;
 
 	if(filesystem::exists("testdir/a"))
 		filesystem::remove("testdir/a");

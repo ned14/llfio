@@ -767,8 +767,10 @@ public:
 	typedef std::pair<bool, std::shared_ptr<async_io_handle>> completion_returntype;
     //! The type of a completion handler \ingroup async_file_io_dispatcher_base__completion
 	typedef completion_returntype completion_t(size_t, std::shared_ptr<async_io_handle>, exception_ptr *);
+#if defined(BOOST_AFIO_SOURCE) // Only really used for benchmarking
 	std::vector<async_io_op> completion(const std::vector<async_io_op> &ops, const std::vector<std::pair<async_op_flags, async_file_io_dispatcher_base::completion_t *>> &callbacks);
 	inline async_io_op completion(const async_io_op &req, const std::pair<async_op_flags, async_file_io_dispatcher_base::completion_t *> &callback);
+#endif
 	/*! \brief Schedule a batch of asynchronous invocations of the specified functions when their supplied operations complete.
     \return A batch of op handles
     \param ops A batch of precondition op handles.
