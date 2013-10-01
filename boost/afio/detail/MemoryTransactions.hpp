@@ -4,8 +4,8 @@ Provides yet another mechanism for serialising memory
 File Created: Sept 2013
 */
 
-#ifndef BOOST_AFIO_SPINLOCK_HPP
-#define BOOST_AFIO_SPINLOCK_HPP
+#ifndef BOOST_AFIO_MEMORY_TRANSACTIONS_HPP
+#define BOOST_AFIO_MEMORY_TRANSACTIONS_HPP
 
 // Turn this on if you have a compiler which understands __transaction_relaxed
 //#define BOOST_HAVE_TRANSACTIONAL_MEMORY_COMPILER
@@ -151,11 +151,7 @@ namespace boost
 #define BOOST_END_MEMORY_TRANSACTION(lockable)
 #elif defined(BOOST_USING_INTEL_TSX)
 #include <immintrin.h>
-#endif
-#endif // BOOST_HAVE_TRANSACTIONAL_MEMORY_COMPILER
 
-#ifndef BOOST_BEGIN_MEMORY_TRANSACTION
-#ifdef BOOST_USING_INTEL_TSX
 			template<class T> struct get_spins_to_transact
 			{
 				static BOOST_CONSTEXPR_OR_CONST size_t value=4;
@@ -255,17 +251,16 @@ namespace boost
 #define BOOST_BEGIN_MEMORY_TRANSACTION(lockable) { auto __tsx_transaction=boost::afio::detail::make_intel_tsx_transaction(lockable); {
 #define BOOST_END_MEMORY_TRANSACTION(lockable) } __tsx_transaction.commit(); }
 
-#else // BOOST_USING_INTEL_TSX
-
-#define BOOST_BEGIN_MEMORY_TRANSACTION(lockable) { boost::lock_guard<decltype(lockable)> __tsx_transaction(lockable);
-#define BOOST_END_MEMORY_TRANSACTION(lockable) }
-
 #endif // BOOST_USING_INTEL_TSX
 #endif // BOOST_BEGIN_MEMORY_TRANSACTION
+
+#ifndef BOOST_BEGIN_MEMORY_TRANSACTION
+#define BOOST_BEGIN_MEMORY_TRANSACTION(lockable) { boost::lock_guard<decltype(lockable)> __tsx_transaction(lockable);
+#define BOOST_END_MEMORY_TRANSACTION(lockable) }
 #endif // BOOST_BEGIN_MEMORY_TRANSACTION
 
 		}
 	}
 }
 
-#endif
+#endif // BOOST_AFIO_MEMORY_TRANSACTIONS_HPP

@@ -1078,6 +1078,11 @@ namespace detail {
 		std::shared_ptr<thread_source> pool;
 		file_flags flagsforce, flagsmask;
 
+		// Unfortunately gcov hangs trying to profile the spinlock, so use a standard mutex for him
+#ifdef BOOST_AFIO_COMPILING_FOR_GCOV
+		typedef mutex fdslock_t;
+		typedef mutex opslock_t;
+#else
 		typedef spinlock<size_t> fdslock_t;
 		typedef spinlock<size_t,
 			spins_to_transact<50>::policy,
@@ -1085,6 +1090,7 @@ namespace detail {
 			spins_to_yield<500>::policy,
 			spins_to_sleep::policy
 		> opslock_t;
+#endif
 		typedef recursive_mutex dircachelock_t;
 		fdslock_t fdslock; std::unordered_map<void *, std::weak_ptr<async_io_handle>> fds;
 		opslock_t opslock; std::atomic<size_t> monotoniccount; std::unordered_map<size_t, std::shared_ptr<async_file_io_dispatcher_op>> ops;
