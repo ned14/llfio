@@ -1,3 +1,4 @@
+#define BOOST_AFIO_SOURCE
 #include "boost/afio/afio.hpp"
 #include <iostream>
 

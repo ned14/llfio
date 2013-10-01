@@ -2091,6 +2091,7 @@ namespace detail {
 	};
 }
 
+#if defined(BOOST_AFIO_SOURCE) // Only really used for benchmarking
 inline async_io_op async_file_io_dispatcher_base::completion(const async_io_op &req, const std::pair<async_op_flags, async_file_io_dispatcher_base::completion_t *> &callback)
 {
 	std::vector<async_io_op> r;
@@ -2100,6 +2101,7 @@ inline async_io_op async_file_io_dispatcher_base::completion(const async_io_op &
 	i.push_back(callback);
 	return std::move(completion(r, i).front());
 }
+#endif
 inline async_io_op async_file_io_dispatcher_base::completion(const async_io_op &req, const std::pair<async_op_flags, std::function<async_file_io_dispatcher_base::completion_t>> &callback)
 {
 	std::vector<async_io_op> r;
