@@ -44,6 +44,8 @@ maximum IOPS.]:
 [[Relative to ASIO][32%][21%][55%][26%][100%]]
 [[Ubuntu 12.04 LTS Linux x64 with GCC 4.8][[role alignright 1094780]][[role alignright 794384]][[role alignright 1432810]][[role alignright 968005]][[role alignright 1611040[footnote Unfortunately the glibc mutex used by ASIO does not scale well on modern CPUs due to having too small a spin count, so this value is for four threads instead of eight (it was the best I could get through trial and error.]]]]]
 [[Relative to ASIO][68%][49%][89%][60%][100%]]
+[[Microsoft Windows 8 x64 with Visual Studio 2010][[role alignright 649015]][[role alignright 469689]][[role alignright 1021630]][[role alignright 613816]][[role alignright 2725690]]]
+[[Relative to ASIO][24%][17%][37%][23%][100%]]
 ]
 
 We hope that ~720k max IOPS surely ought to be enough to max out any SATA III SSD -- it should even max out any mid range
