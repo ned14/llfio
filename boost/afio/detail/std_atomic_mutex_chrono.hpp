@@ -12,29 +12,15 @@ File Created: Sept 2013
 
 #include <cstdint>
 
-#if defined(BOOST_MSVC) && BOOST_MSVC < 1700 // Dinkumware without <atomic>
+// Map in C++11 stuff if available
+#if (defined(__GLIBCXX__) && __GLIBCXX__<20120920 /* < GCC 4.7 */) || (defined(BOOST_MSVC) && BOOST_MSVC < 1700 /* <= VS2010 */)
+#include "boost/exception_ptr.hpp"
+#include "boost/thread/mutex.hpp"
+#include "boost/thread/recursive_mutex.hpp"
 #include "boost/atomic.hpp"
 #include "boost/chrono.hpp"
 #define BOOST_AFIO_USE_BOOST_ATOMIC
 #define BOOST_AFIO_USE_BOOST_CHRONO
-#else
-#include <chrono>
-#include <thread>
-#include <atomic>
-#include <mutex>
-#endif
-#if (defined(__MINGW32__) && !defined(__MINGW64_VERSION_MAJOR)) // Mingw32 not Mingw-w64
-// Mingw32's std::atomic isn't threadsafe :)
-#include "boost/atomic.hpp"
-#define BOOST_AFIO_USE_BOOST_ATOMIC
-#endif
-
-
-// Map in C++11 stuff if available
-#if (defined(__GLIBCXX__) && __GLIBCXX__<=20120920 /* <= GCC 4.7 */) || (defined(BOOST_MSVC) && BOOST_MSVC < 1700 /* <= VS2010 */)
-#include "boost/exception_ptr.hpp"
-#include "boost/thread/mutex.hpp"
-#include "boost/thread/recursive_mutex.hpp"
 namespace boost {
 	namespace afio {
 		typedef boost::thread thread;
@@ -55,6 +41,10 @@ namespace boost {
 	}
 }
 #else
+#include <chrono>
+#include <thread>
+#include <atomic>
+#include <mutex>
 namespace boost {
 	namespace afio {
 		typedef std::thread thread;
