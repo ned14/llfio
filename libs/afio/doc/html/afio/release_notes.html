@@ -32,14 +32,24 @@
       1.56 AFIO v1.1</a>
     </h4>
 <p>
-      Completions handling no longer holds the opslock during completions dispatch,
-      further improving performance.
-    </p>
-<p>
       Immediate completions no longer hold the opslock, which meant the opslock could
       be changed from a recursive mutex to a spinlock. The new, more parallelised,
       behaviour illuminated a number of new race conditions in when_all() which have
       been fixed.
+    </p>
+<p>
+      Completely gutted dispatch engine and replaced with a new, almost entirely
+      wait free implementation based on throwing atomics at the problem. If it weren't
+      for the spin lock around the central ops hash table, AFIO would now be an entirely
+      wait free design.
+    </p>
+<p>
+      In order to do something about that spin lock, replaced all locking in AFIO
+      (apart from the directory file handle cache) with memory transactions instead.
+      This does CPUID at runtime and will use Intel's TSX-NI memory transaction implementation
+      if available, if not it falls back to a spin lock based emulation. On memory
+      transaction capable CPUs, AFIO is now almost entirely wait free, apart from
+      when it has to fetch memory from the kernel.
     </p>
 <h4>
 <a name="afio.release_notes.h1"></a>

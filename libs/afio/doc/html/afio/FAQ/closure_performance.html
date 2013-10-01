@@ -30,13 +30,13 @@
 <p>
         For v1.1, maximum ops <span class="bold"><strong>dispatch</strong></span> throughput
         is approximately as follows, where the values for <code class="computeroutput"><span class="identifier">call</span><span class="special">()</span></code> might be for use as a closure engine whereas
-        the values for <code class="computeroutput"><span class="identifier">completion</span><span class="special">()</span></code> might be for max filing system IOPS:
+        the values for <code class="computeroutput"><span class="identifier">completion</span><span class="special">()</span></code> might be for max filing system IOPS<a href="#ftn.afio.FAQ.closure_performance.f0" class="footnote" name="afio.FAQ.closure_performance.f0"><sup class="footnote">[15]</sup></a>:
       </p>
 <div class="table">
 <a name="afio.FAQ.closure_performance.throughput"></a><p class="title"><b>Table&#160;1.8.&#160;Maximum null closure dispatch rate on a 3.5Ghz Intel Core i7 3770K
-        for AFIO v1.1:</b></p>
+        for AFIO v1.1 i.e. NOT using transactional memory:</b></p>
 <div class="table-contents"><table class="table" summary="Maximum null closure dispatch rate on a 3.5Ghz Intel Core i7 3770K
-        for AFIO v1.1:">
+        for AFIO v1.1 i.e. NOT using transactional memory:">
 <colgroup>
 <col>
 <col>
@@ -90,22 +90,22 @@
               </td>
 <td>
                 <p>
-                  <span class="alignright">200752</span>
+                  <span class="alignright">911963</span>
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="alignright">136738</span>
+                  <span class="alignright">596318</span>
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="alignright">420108</span>
+                  <span class="alignright">1555990</span>
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="alignright">352845</span>
+                  <span class="alignright">726124</span>
                 </p>
               </td>
 <td>
@@ -117,34 +117,193 @@
 <tr>
 <td>
                 <p>
+                  Relative to ASIO
+                </p>
+              </td>
+<td>
+                <p>
+                  32%
+                </p>
+              </td>
+<td>
+                <p>
+                  21%
+                </p>
+              </td>
+<td>
+                <p>
+                  55%
+                </p>
+              </td>
+<td>
+                <p>
+                  26%
+                </p>
+              </td>
+<td>
+                <p>
+                  100%
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
                   Ubuntu 12.04 LTS Linux x64 with GCC 4.8
                 </p>
               </td>
 <td>
+                <p>
+                  <span class="alignright">1094780</span>
+                </p>
               </td>
 <td>
+                <p>
+                  <span class="alignright">794384</span>
+                </p>
               </td>
 <td>
+                <p>
+                  <span class="alignright">1432810</span>
+                </p>
               </td>
 <td>
+                <p>
+                  <span class="alignright">968005</span>
+                </p>
               </td>
 <td>
+                <p>
+                  <span class="alignright">1611040<a href="#ftn.afio.FAQ.closure_performance.f1" class="footnote" name="afio.FAQ.closure_performance.f1"><sup class="footnote">[a]</sup></a></span>
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  Relative to ASIO
+                </p>
+              </td>
+<td>
+                <p>
+                  68%
+                </p>
+              </td>
+<td>
+                <p>
+                  49%
+                </p>
+              </td>
+<td>
+                <p>
+                  89%
+                </p>
+              </td>
+<td>
+                <p>
+                  60%
+                </p>
+              </td>
+<td>
+                <p>
+                  100%
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  Microsoft Windows 8 x64 with Visual Studio 2010
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="alignright">649015</span>
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="alignright">469689</span>
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="alignright">1021630</span>
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="alignright">613816</span>
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="alignright">2725690</span>
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  Relative to ASIO
+                </p>
+              </td>
+<td>
+                <p>
+                  24%
+                </p>
+              </td>
+<td>
+                <p>
+                  17%
+                </p>
+              </td>
+<td>
+                <p>
+                  37%
+                </p>
+              </td>
+<td>
+                <p>
+                  23%
+                </p>
+              </td>
+<td>
+                <p>
+                  100%
+                </p>
               </td>
 </tr>
 </tbody>
+<tbody class="footnotes"><tr><td colspan="6"><div id="ftn.afio.FAQ.closure_performance.f1" class="footnote"><p><a href="#afio.FAQ.closure_performance.f1" class="para"><sup class="para">[a] </sup></a>
+                    Unfortunately the glibc mutex used by ASIO does not scale well
+                    on modern CPUs due to having too small a spin count, so this
+                    value is for four threads instead of eight (it was the best I
+                    could get through trial and error.
+                  </p></div></td></tr></tbody>
 </table></div>
 </div>
 <br class="table-break"><p>
-        While this is fast enough for consumer SSDs (which is the whole point of
-        AFIO), and we would emphasise that scaling where the closures are doing real
-        i/o work is close to linear thanks to careful use of no worse than O(N) algorithms
-        throughout, we agree AFIO's performance is currently not great for less heavyweight
-        closures. The biggest limiter, by far, is the mutex protecting the ops dispatch
-        and completion implementation. Because AFIO is pure batch, dispatch is very
-        rarely a problem: rather it is completion, because completion handling must
-        always be performed per op completion in order to check for and dispatch,
-        if necessary, dependencies. Currently the top consumers of CPU time during
-        null closure dispatch benchmarks are as follows:
+        We hope that ~720k max IOPS surely ought to be enough to max out any SATA
+        III SSD -- it should even max out any mid range PCIe based SSD too, and if
+        paired with a CPU with more cores, AFIO's almost wait free design ought to
+        scale out fairly well too such that it may be able to max out even top end
+        PCIe SSDs, some of which can push 10m IOPS now. If that isn't fast enough
+        for you, you can try AFIO's experimental transactional memory support with
+        a suitable compiler too.
+      </p>
+<p>
+        Nevertheless, AFIO will almost certainly be still criticised for poor performance
+        relative to <a href="http://www.boost.org/libs/asio/" target="_top">Boost.ASIO</a>.
+        Unfortunately, dependency chaining is not free, and moreover, AFIO has a
+        very simple design based on a global hash table and pure C++11 STL throughout
+        (i.e. it's heavy on the memory allocator). The biggest limiter, by far, is
+        the spin lock protecting the ops dispatch and completion implementation.
+        Because AFIO is pure batch, dispatch is very rarely a problem: rather it
+        is completion, because completion handling must always be performed per op
+        completion in order to check for and dispatch, if necessary, dependencies.
+        Currently the top consumers of CPU time during null closure dispatch benchmarks
+        are as follows:
       </p>
 <div class="table">
 <a name="afio.FAQ.closure_performance.top_consumers"></a><p class="title"><b>Table&#160;1.9.&#160;Top consumers of CPU time during null closure dispatch in AFIO v1.1
@@ -177,22 +336,22 @@
 <tr>
 <td>
                 <p>
-                  ops spinlock
+                  ops lock sleep
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="alignright">71%</span>
+                  <span class="alignright">40%</span>
                 </p>
               </td>
 <td>
                 <p>
-                  ops spinlock
+                  ops lock sleep
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="alignright">71%</span>
+                  <span class="alignright">34%</span>
                 </p>
               </td>
 </tr>
@@ -204,7 +363,29 @@
               </td>
 <td>
                 <p>
-                  <span class="alignright">7.4%</span>
+                  <span class="alignright">23%</span>
+                </p>
+              </td>
+<td>
+                <p>
+                  ops lock spin
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="alignright">22%</span>
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  ops lock spin
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="alignright">8.1%</span>
                 </p>
               </td>
 <td>
@@ -214,7 +395,7 @@
               </td>
 <td>
                 <p>
-                  <span class="alignright">8.2%</span>
+                  <span class="alignright">14%</span>
                 </p>
               </td>
 </tr>
@@ -226,7 +407,7 @@
               </td>
 <td>
                 <p>
-                  <span class="alignright">3.4%</span>
+                  <span class="alignright">6.1%</span>
                 </p>
               </td>
 <td>
@@ -236,7 +417,7 @@
               </td>
 <td>
                 <p>
-                  <span class="alignright">1.9%</span>
+                  <span class="alignright">4.7%</span>
                 </p>
               </td>
 </tr>
@@ -248,7 +429,7 @@
               </td>
 <td>
                 <p>
-                  <span class="alignright">1.5%</span>
+                  <span class="alignright">1.0%</span>
                 </p>
               </td>
 <td>
@@ -258,7 +439,7 @@
               </td>
 <td>
                 <p>
-                  <span class="alignright">1.1%</span>
+                  <span class="alignright">4.3%</span>
                 </p>
               </td>
 </tr>
@@ -292,7 +473,7 @@
               </td>
 <td>
                 <p>
-                  <span class="alignright">6.7%</span>
+                  <span class="alignright">11.8%</span>
                 </p>
               </td>
 <td>
@@ -302,7 +483,7 @@
               </td>
 <td>
                 <p>
-                  <span class="alignright">7.8%</span>
+                  <span class="alignright">11%</span>
                 </p>
               </td>
 </tr>
@@ -317,6 +498,23 @@
         a significant amount of <span class="quote">&#8220;<span class="quote">free</span>&#8221;</span> file i/o without losing much
         in maximum op dispatch throughput.
       </p>
+<p>
+        And certainly a custom allocator for the hash table might make quite a difference,
+        especially in avoiding spinning and sleeping the ops lock altogether by eliminating
+        the memory allocator. Another option we might investigate in the future is
+        using a different hash table implementation e.g. <code class="computeroutput"><span class="identifier">concurrent_unordered_map</span><span class="special">&lt;&gt;</span></code> instead (though I hear it has poor
+        single lookup performance, and the lack of safe erase is a huge problem for
+        us), or any of the hash tables from <a href="http://incise.org/hash-table-benchmarks.html" target="_top">http://incise.org/hash-table-benchmarks.html</a>.
+      </p>
+<div class="footnotes">
+<br><hr style="width:100; text-align:left;margin-left: 0">
+<div id="ftn.afio.FAQ.closure_performance.f0" class="footnote"><p><a href="#afio.FAQ.closure_performance.f0" class="para"><sup class="para">[15] </sup></a>
+          The phrase <span class="quote">&#8220;<span class="quote">might be</span>&#8221;</span> is important: a null closure benchmark
+          will always have dispatch rate problems i.e. the closures being executed
+          take less time to execute than the time to dispatch them, so these figures
+          are best read as maximum dispatch rate, not maximum IOPS.
+        </p></div>
+</div>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
 <td align="left"></td>
