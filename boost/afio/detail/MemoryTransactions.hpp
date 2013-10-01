@@ -10,8 +10,12 @@ File Created: Sept 2013
 // Turn this on if you have a compiler which understands __transaction_relaxed
 //#define BOOST_HAVE_TRANSACTIONAL_MEMORY_COMPILER
 
-// Turn this on if you have Haswell TSX
-//#define BOOST_USING_INTEL_TSX
+// Turn this on if you want to use Haswell TSX where available
+#if defined(_MSC_VER) && _MSC_VER >= 1700 && ( defined(_M_IX86) || defined(_M_X64) )
+#define BOOST_USING_INTEL_TSX
+#elif defined(__GNUC__) && ( defined(__i386__) || defined(__x86_64__) ) && defined(__RTM__)
+#define BOOST_USING_INTEL_TSX
+#endif
 
 #include "std_atomic_mutex_chrono.hpp"
 
@@ -146,9 +150,6 @@ namespace boost
 #define BOOST_BEGIN_MEMORY_TRANSACTION(lockable) __transaction_relaxed
 #define BOOST_END_MEMORY_TRANSACTION(lockable)
 #elif defined(BOOST_USING_INTEL_TSX)
-#if defined(_MSC_VER) && _MSC_VER >= 1310 && ( defined(_M_IX86) || defined(_M_X64) )
-#include <immintrin.h>
-#elif defined(__GNUC__) && ( defined(__i386__) || defined(__x86_64__) )
 #include <immintrin.h>
 #endif
 #endif // BOOST_HAVE_TRANSACTIONAL_MEMORY_COMPILER
