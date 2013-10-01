@@ -192,9 +192,9 @@ namespace boost
 			{
 				static BOOST_CONSTEXPR_OR_CONST size_t value=4;
 			};
-			template<class T> struct get_spins_to_transact<spinlock<T>>
+			template<class T, template<class> class spinpolicy1, template<class> class spinpolicy2, template<class> class spinpolicy3, template<class> class spinpolicy4> struct get_spins_to_transact<spinlock<T, spinpolicy1, spinpolicy2, spinpolicy3, spinpolicy4>>
 			{
-				static BOOST_CONSTEXPR_OR_CONST size_t value=spinlock<T>::spins_to_transact;
+				static BOOST_CONSTEXPR_OR_CONST size_t value=spinlock<T, spinpolicy1, spinpolicy2, spinpolicy3, spinpolicy4>::spins_to_transact;
 			};
 			template<class T> inline bool is_lockable_locked(T &lockable)
 			{
@@ -205,11 +205,10 @@ namespace boost
 				}
 				return false;
 			}
-			template<class T> inline bool is_lockable_locked(spinlock<T> &lockable)
+			template<class T, template<class> class spinpolicy1, template<class> class spinpolicy2, template<class> class spinpolicy3, template<class> class spinpolicy4> inline bool is_lockable_locked(spinlock<T, spinpolicy1, spinpolicy2, spinpolicy3, spinpolicy4> &lockable)
 			{
 				return 1==lockable.v.load();
 			}
-			// WARNING: I don't have access to a Haswell CPU, so I have no idea if the below works!
 			template<class T> struct intel_tsx_transaction
 			{
 				T &lockable;
@@ -232,9 +231,15 @@ namespace boost
 								return;
 							}
 							// If lock is not free, we need to abort transaction as something else is running
+#if 1
 							_xabort(0x79);
+#else
+							_xend();
+#endif
+							continue;
 							// Never reaches this point
 						}
+						//std::cerr << "A=" << std::hex << state << std::endl;
 						// Transaction aborted due to too many locks or hard abort?
 						if((state & _XABORT_CAPACITY) || !(state & _XABORT_RETRY))
 						{
@@ -260,6 +265,9 @@ namespace boost
 					lockable.lock();
 					dismissed=3;
 				}
+			private:
+				intel_tsx_transaction(const intel_tsx_transaction &);
+			public:
 				intel_tsx_transaction(intel_tsx_transaction &&o) BOOST_NOEXCEPT_OR_NOTHROW : lockable(o.lockable), dismissed(o.dismissed)
 				{
 					o.dismissed=0; // disable original
@@ -271,7 +279,10 @@ namespace boost
 						if(1==dismissed)
 							_xabort(0x78);
 						else if(2==dismissed)
+						{
 							_xend();
+							//std::cerr << "TC" << std::endl;
+						}
 						else if(3==dismissed)
 							lockable.unlock();
 					}
