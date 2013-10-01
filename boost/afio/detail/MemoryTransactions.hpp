@@ -13,8 +13,12 @@ File Created: Sept 2013
 // Turn this on if you want to use Haswell TSX where available
 #if defined(_MSC_VER) && _MSC_VER >= 1700 && ( defined(_M_IX86) || defined(_M_X64) )
 #define BOOST_USING_INTEL_TSX
-#elif defined(__GNUC__) && ( defined(__i386__) || defined(__x86_64__) ) && defined(__RTM__)
+#elif defined(__GNUC__) && ( defined(__i386__) || defined(__x86_64__) )
+#ifdef __RTM__
 #define BOOST_USING_INTEL_TSX
+#elif (defined(__GLIBCXX__) && __GLIBCXX__>=20120920 // >= GCC 4.7) || (defined(__clang__) && (__clang_major__>3 || (__clang_major__==3 && __clang_minor__>=3)))
+#warning Intel RTM/TSX instruction set not enabled using -mrtm (GCC 4.7+, clang 3.3+), so cannot compile in runtime support for memory transactions. Note that turning on -mrtm will produce binaries incompatible with older CPUs (TODO FIXME: AFIO does runtime selection of RTM instructions on Windows, it therefore should do the same on POSIX)
+#endif
 #endif
 
 #include "std_atomic_mutex_chrono.hpp"

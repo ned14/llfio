@@ -42,7 +42,7 @@ BOOST_AFIO_AUTO_TEST_CASE(async_io_errors, "Tests that the async i/o error handl
 				filereqs.push_back(async_path_op_req(mkdir, "testdir/a", file_flags::CreateOnlyIfNotExist));
 				filereqs.push_back(async_path_op_req(mkdir, "testdir/a", file_flags::CreateOnlyIfNotExist));
 				while(dispatcher->fd_count()>1)
-					std::this_thread::yield();
+					this_thread::yield();
 				if(filesystem::exists("testdir/a"))
 				{
 					filesystem::remove("testdir/a");
