@@ -130,7 +130,7 @@ namespace boost
 				{
 				};
 			};
-			template<typename T, template<class> class spinpolicy1=spins_to_transact<50>::policy, template<class> class spinpolicy2=spins_to_loop<125>::policy, template<class> class spinpolicy3=spins_to_yield<250>::policy, template<class> class spinpolicy4=spins_to_sleep::policy> class spinlock : public spinpolicy4<spinpolicy3<spinpolicy2<spinpolicy1<spinlockbase<T>>>>>
+			template<typename T, template<class> class spinpolicy1=spins_to_transact<5>::policy, template<class> class spinpolicy2=spins_to_loop<125>::policy, template<class> class spinpolicy3=spins_to_yield<250>::policy, template<class> class spinpolicy4=spins_to_sleep::policy> class spinlock : public spinpolicy4<spinpolicy3<spinpolicy2<spinpolicy1<spinlockbase<T>>>>>
 			{
 				typedef spinpolicy4<spinpolicy3<spinpolicy2<spinpolicy1<spinlockbase<T>>>>> parenttype;
 			public:
@@ -151,6 +151,42 @@ namespace boost
 #define BOOST_END_MEMORY_TRANSACTION(lockable)
 #elif defined(BOOST_USING_INTEL_TSX)
 #include <immintrin.h>
+			// Adapted from http://software.intel.com/en-us/articles/how-to-detect-new-instruction-support-in-the-4th-generation-intel-core-processor-family
+			namespace intel_stuff
+			{
+				inline void run_cpuid(uint32_t eax, uint32_t ecx, uint32_t* abcd)
+				{
+#if defined(_MSC_VER)
+						__cpuidex((int *) abcd, eax, ecx);
+#else
+						uint32_t ebx, edx;
+# if defined( __i386__ ) && defined ( __PIC__ )
+						/* in case of PIC under 32-bit EBX cannot be clobbered */
+						__asm__("movl %%ebx, %%edi \n\t cpuid \n\t xchgl %%ebx, %%edi" : "=D" (ebx),
+# else
+						__asm__("cpuid" : "+b" (ebx),
+# endif
+						"+a" (eax), "+c" (ecx), "=d" (edx));
+						abcd[0] = eax; abcd[1] = ebx; abcd[2] = ecx; abcd[3] = edx;
+#endif
+				}
+				inline bool have_intel_tsx_support()
+				{
+					static int result;
+					if(result) return result==2;
+
+					uint32_t abcd[4];
+					uint32_t rtm_mask = (1 << 11);
+
+					/*  CPUID.(EAX=07H, ECX=0H):EBX.RTM[bit 11]==1  */
+					run_cpuid(7, 0, abcd);
+					if((abcd[1] & rtm_mask) != rtm_mask)
+						result=1;
+					else
+						result=2;
+					return result==2;
+				}
+			}
 
 			template<class T> struct get_spins_to_transact
 			{
@@ -184,7 +220,9 @@ namespace boost
 					size_t spins_to_transact=get_spins_to_transact<T>::value;
 					for(size_t n=0; n<spins_to_transact; n++)
 					{
-						unsigned state=_xbegin(); // start transaction, or cope with abort
+						unsigned state=_XABORT_CAPACITY;
+						if(intel_stuff::have_intel_tsx_support())
+							state=_xbegin(); // start transaction, or cope with abort
 						if(_XBEGIN_STARTED==state)
 						{
 							if(!is_lockable_locked(lockable))
