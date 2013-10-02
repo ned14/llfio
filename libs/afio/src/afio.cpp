@@ -698,6 +698,10 @@ std::shared_ptr<std_thread_pool> process_threadpool()
 
 
 namespace detail {
+	void print_fatal_exception_message_to_stderr(const char *msg)
+	{
+		std::cerr << "FATAL EXCEPTION: " << msg << std::endl;
+	}
 
 #if defined(WIN32)
     struct async_io_handle_windows : public async_io_handle
