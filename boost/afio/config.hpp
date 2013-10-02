@@ -15,7 +15,7 @@
 // most of this comes from Boost.Atomic 
 
 #ifndef BOOST_AFIO_CONFIG_HPP
-#define	BOOST_AFIO_CONFIG_HPP
+#define BOOST_AFIO_CONFIG_HPP
 
 #include <boost/config.hpp>
 #include <boost/system/api_config.hpp>  // for BOOST_POSIX_API or BOOST_WINDOWS_API
@@ -64,5 +64,5 @@
 
 #endif  // auto-linking disabled
 
-#endif	/* BOOST_AFIO_CONFIG_HPP */
+#endif  /* BOOST_AFIO_CONFIG_HPP */
 

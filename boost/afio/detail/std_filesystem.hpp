@@ -15,15 +15,15 @@ namespace std { namespace filesystem { using namespace tr2::filesystem; } }
 #include "boost/filesystem/convenience.hpp"
 #include "boost/filesystem/fstream.hpp"
 namespace std {
-	namespace filesystem { using namespace boost::filesystem; using boost::filesystem::path; }
-	struct filesystem_hash
-	{
-	public:
-		size_t operator()(const boost::filesystem::path& p) const
-		{
-			return boost::filesystem::hash_value(p);
-		}
-	};
+    namespace filesystem { using namespace boost::filesystem; using boost::filesystem::path; }
+    struct filesystem_hash
+    {
+    public:
+        size_t operator()(const boost::filesystem::path& p) const
+        {
+            return boost::filesystem::hash_value(p);
+        }
+    };
 }
 #endif
 #endif

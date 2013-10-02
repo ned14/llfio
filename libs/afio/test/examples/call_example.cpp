@@ -17,14 +17,14 @@ int main(void)
     
     // Schedule as asynchronous call of some function to occur only after helloworld completes
     auto addtovalue=dispatcher->call(helloworld.second, [](boost::afio::future<int> &v) -> int {
-		// v is highly likely to be ready very soon by the time we are called
+        // v is highly likely to be ready very soon by the time we are called
         return v.get()+1;
     }, std::ref(helloworld.first));
     
     // Create a boost::future<> representing the ops passed to when_all()
     auto future=boost::afio::when_all(addtovalue.second);
-	// ... and wait for it to complete
-	future.wait();
+    // ... and wait for it to complete
+    future.wait();
     
     // Print the result returned by the future for the lambda, which will be 43
     std::cout << "addtovalue() returned " << addtovalue.first.get() << std::endl;

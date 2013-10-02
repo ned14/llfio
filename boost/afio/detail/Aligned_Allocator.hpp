@@ -6,7 +6,7 @@
  */
 
 #ifndef ALIGNED_ALLOCATOR_HPP
-#define	ALIGNED_ALLOCATOR_HPP
+#define ALIGNED_ALLOCATOR_HPP
 
 #include <vector>
 #include <memory>
@@ -54,10 +54,10 @@ enum class allocator_alignment : size_t
 #endif
 {
     Default = sizeof(void*), //!< The default alignment on this machine.
-    SSE    = 16,			//!< The alignment for SSE. Better to use M128 for NEON et al support.
-	M128   = 16,			//!< The alignment for a 128 bit vector.
-    AVX    = 32,			//!< The alignment for AVX. Better to use M256 for NEON et al support.
-	M256   = 32				//!< The alignment for a 256 bit vector.
+    SSE    = 16,            //!< The alignment for SSE. Better to use M128 for NEON et al support.
+    M128   = 16,            //!< The alignment for a 128 bit vector.
+    AVX    = 32,            //!< The alignment for AVX. Better to use M256 for NEON et al support.
+    M256   = 32             //!< The alignment for a 256 bit vector.
 }
 #ifdef BOOST_NO_CXX11_SCOPED_ENUMS
 BOOST_SCOPED_ENUM_DECLARE_END(allocator_alignment)
@@ -65,29 +65,29 @@ BOOST_SCOPED_ENUM_DECLARE_END(allocator_alignment)
 ;      
 #endif            
 #ifdef BOOST_WINDOWS
-	extern "C" void *_aligned_malloc(size_t size, size_t alignment);
-	extern "C" void _aligned_free(void *blk);
+    extern "C" void *_aligned_malloc(size_t size, size_t alignment);
+    extern "C" void _aligned_free(void *blk);
 #else
-	extern "C" int posix_memalign(void **memptr, size_t alignment, size_t size);
+    extern "C" int posix_memalign(void **memptr, size_t alignment, size_t size);
 #endif
     inline void* allocate_aligned_memory(size_t align, size_t size)
-	{
+    {
 #ifdef BOOST_WINDOWS
-		return _aligned_malloc(size, align);
+        return _aligned_malloc(size, align);
 #else
-		void *ret=nullptr;
-		if(posix_memalign(&ret, align, size)) return nullptr;
-		return ret;
+        void *ret=nullptr;
+        if(posix_memalign(&ret, align, size)) return nullptr;
+        return ret;
 #endif
-	}
+    }
     inline void deallocate_aligned_memory(void* ptr) BOOST_NOEXCEPT_OR_NOTHROW
-	{
+    {
 #ifdef BOOST_WINDOWS
-		_aligned_free(ptr);
+        _aligned_free(ptr);
 #else
-		free(ptr);
+        free(ptr);
 #endif
-	}
+    }
        
 
 /*! \class aligned_allocator
@@ -106,7 +106,7 @@ public:
     typedef const T&  const_reference;
     typedef size_t    size_type;
     typedef ptrdiff_t difference_type;
-	enum { alignment=Align };
+    enum { alignment=Align };
 
     typedef std::true_type propagate_on_container_move_assignment;
 
@@ -155,10 +155,10 @@ public:
     construct(U* p, Args&&... args)
     { if(initialize || !std::is_same<char, U>::value) ::new(reinterpret_cast<void*>(p)) U(std::forward<Args>(args)...); }
 #else
-	void construct( pointer p, const_reference val )
-	{
-		if(initialize || !std::is_same<char, T>::value) ::new(reinterpret_cast<void*>(p)) T(val);
-	}
+    void construct( pointer p, const_reference val )
+    {
+        if(initialize || !std::is_same<char, T>::value) ::new(reinterpret_cast<void*>(p)) T(val);
+    }
 #endif
 
     void
@@ -176,7 +176,7 @@ public:
     typedef const void  const_reference;
     typedef size_t    size_type;
     typedef ptrdiff_t difference_type;
-	enum { alignment=Align };
+    enum { alignment=Align };
 };
 template <size_t Align, bool initialize> class aligned_allocator<const void, Align, initialize>
 {
@@ -188,7 +188,7 @@ public:
     typedef const void  const_reference;
     typedef size_t    size_type;
     typedef ptrdiff_t difference_type;
-	enum { alignment=Align };
+    enum { alignment=Align };
 };
 
 template <typename T, size_t Align, bool initialize>
@@ -202,7 +202,7 @@ public:
     typedef const T&  const_reference;
     typedef size_t    size_type;
     typedef ptrdiff_t difference_type;
-	enum { alignment=Align };
+    enum { alignment=Align };
 
     typedef std::true_type propagate_on_container_move_assignment;
 
@@ -252,7 +252,7 @@ public:
     BOOST_PP_ENUM_TRAILING_PARAMS(N, class A)>                                  \
     void                                                                        \
     construct(U* p BOOST_PP_ENUM__TRAILING_BINARY_PARAMS(N, A, a))              \
-	{ if(initialize || !std::is_same<char, U>::value) ::new(reinterpret_cast<void*>(p)) U(std::forward<A0>(a0) BOOST_PP_ENUM_SHIFTED_BINARY_PARAMS(N, A, a)); }
+    { if(initialize || !std::is_same<char, U>::value) ::new(reinterpret_cast<void*>(p)) U(std::forward<A0>(a0) BOOST_PP_ENUM_SHIFTED_BINARY_PARAMS(N, A, a)); }
 #endif
 
     void
@@ -276,4 +276,4 @@ operator!= (const aligned_allocator<T,TAlign,Tinit>&, const aligned_allocator<U,
         }//namespace detail
     }//namespace afio
 }//namespace boost
-#endif	/* ALIGNED_ALLOCATOR_HPP */
+#endif  /* ALIGNED_ALLOCATOR_HPP */

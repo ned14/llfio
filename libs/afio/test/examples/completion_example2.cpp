@@ -56,7 +56,7 @@ int main(void)
                     boost::afio::current_exception()));
                 dispatcher->complete_async_op(id, h, e);
             }
-			return 0;
+            return 0;
         };
         // Bind the id and handle to completer, and enqueue for later asynchronous execution.
         std::async(std::launch::async, completer, dispatcher, id, h);
@@ -75,13 +75,13 @@ int main(void)
     boost::afio::async_io_op op=
         dispatcher->completion(boost::afio::async_io_op() /* no precondition */,
             std::make_pair(
-			    /* Allow me to defer completion */
-				boost::afio::async_op_flags::DetachedFuture
-				/* Complete boundf immediately after its precondition (in this
-				case as there is no precondition that means right now before
-				completion() returns) */
-				| boost::afio::async_op_flags::ImmediateCompletion,
-				boundf));
+                /* Allow me to defer completion */
+                boost::afio::async_op_flags::DetachedFuture
+                /* Complete boundf immediately after its precondition (in this
+                case as there is no precondition that means right now before
+                completion() returns) */
+                | boost::afio::async_op_flags::ImmediateCompletion,
+                boundf));
         
     // Create a boost::future<> representing the ops passed to when_all()
     boost::afio::future<std::vector<std::shared_ptr<boost::afio::async_io_handle>>> future
