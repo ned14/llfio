@@ -84,12 +84,13 @@ BOOST_AFIO_AUTO_TEST_CASE(async_io_barrier, "Tests that the async i/o barrier wo
         auto verify = dispatcher->call(thisgroupbarriered.front(), std::function<bool()>(std::bind(verifybarrier, &callcount[run.second], run.first)));
         verifies.push_back(std::move(verify.first));
         next = verify.second;
-    // barrier() adds an immediate op per op
+        // barrier() adds an immediate op per op
         opscount += run.first*2 + 1;
     }
     auto dispatched = chrono::high_resolution_clock::now();
     cout << "There are now " << dec << dispatcher->fd_count() << " handles open with a queue depth of " << dispatcher->wait_queue_depth() << endl;
     BOOST_AFIO_CHECK_NO_THROW(when_all(next).wait());
+    cout << "There are now " << dec << dispatcher->fd_count() << " handles open with a queue depth of " << dispatcher->wait_queue_depth() << endl;
     // Retrieve any errors
     BOOST_FOREACH(auto &i, verifies)
     {
