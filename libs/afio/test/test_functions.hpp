@@ -121,6 +121,7 @@ static void BOOST_AUTO_TC_INVOKER( test_name )()                        \
     }                                                                   \
     /*boost::unit_test::unit_test_monitor_t::instance().p_timeout.set(timeout);*/ \
     BOOST_TEST_MESSAGE(desc);                                           \
+    try { boost::filesystem::remove_all("testdir"); } catch(...) { }    \
     set_maximum_cpus();                                                 \
     boost::thread watchdog(watchdog_thread, timeout);                   \
     boost::unit_test::unit_test_monitor_t::instance().execute([&]() -> int { t.test_method(); watchdog.interrupt(); watchdog.join(); return 0; }); \
