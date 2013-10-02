@@ -11,16 +11,16 @@
 Sysinternals RAMMap to clear disc cache (http://technet.microsoft.com/en-us/sysinternals/ff700229.aspx)
 
 Single threaded, warm cache:
-91 files matched out of 38967 files which was 6170927489 bytes.
-The search took 7.55024 seconds which was 5161.03 files per second or 779.453 Mb/sec.
+92 files matched out of 39279 files which was 7093894518 bytes.
+The search took 8.32834 seconds which was 4716.3 files per second or 812.318 Mb/sec.
 
 Single threaded, cold cache:
 91 files matched out of 38967 files which was 6170927489 bytes.
 The search took 369.046 seconds which was 105.588 files per second or 15.9467 Mb/sec.
 
 OpenMP, warm cache:
-91 files matched out of 38654 files which was 6169278366 bytes.
-The search took 3.49592 seconds which was 11056.9 files per second or 1682.96 Mb/sec.
+92 files matched out of 38943 files which was 7092655881 bytes.
+The search took 3.73611 seconds which was 10423.4 files per second or 1810.46 Mb/sec.
 
 OpenMP, cold cache:
 91 files matched out of 38886 files which was 6170656567 bytes.
