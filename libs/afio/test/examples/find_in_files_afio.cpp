@@ -1,5 +1,5 @@
 #include "../../../boost/afio/afio.hpp"
-#if !(defined(BOOST_MSVC) && BOOST_MSVC < 1700)
+#if !(defined(BOOST_MSVC) && BOOST_MSVC <= 1700)
 #include <deque>
 #include <regex>
 #include <chrono>
@@ -14,16 +14,16 @@
 Sysinternals RAMMap to clear disc cache (http://technet.microsoft.com/en-us/sysinternals/ff700229.aspx)
 
 Warm cache:
-91 files matched out of 36422 files which was 6108537728 bytes.
-The search took 2.79223 seconds which was 13044 files per second or 2086.34 Mb/sec.
+92 files matched out of 36734 files which was 7031545071 bytes.
+The search took 2.5173 seconds which was 14592.6 files per second or 2663.89 Mb/sec.
 
 Cold cache:
 91 files matched out of 36422 files which was 6108537728 bytes.
 The search took 388.74 seconds which was 93.6925 files per second or 14.9857 Mb/sec.
 
 Warm cache mmaps:
-91 files matched out of 36422 files which was 6109258426 bytes.
-The search took 1.54928 seconds which was 23508.9 files per second or 3760.6 Mb/sec.
+92 files matched out of 36734 files which was 7031400686 bytes.
+The search took 1.02974 seconds which was 35673.1 files per second or 6512.01 Mb/sec.
 
 Cold cache mmaps:
 91 files matched out of 36422 files which was 6109258426 bytes.
@@ -32,7 +32,7 @@ The search took 242.76 seconds which was 150.033 files per second or 24 Mb/sec.
 
 #define USE_MMAPS
 
-#if !(defined(BOOST_MSVC) && BOOST_MSVC < 1700) && !(defined(__GLIBCXX__) && __GLIBCXX__<=20120920 /* <= GCC 4.7 */)
+#if !defined(BOOST_NO_CXX11_HDR_INITIALIZER_LIST) && !(defined(BOOST_MSVC) && BOOST_MSVC < 1700) && !(defined(__GLIBCXX__) && __GLIBCXX__<=20120920 /* <= GCC 4.7 */)
 //[find_in_files_afio
 using namespace boost::afio;
 
@@ -92,8 +92,6 @@ public:
 		docompleted(2);
 		// Throw away the buffer now rather than later to keep memory consumption down
 		_buffer->clear();
-		// Schedule an immediate close rather than lazy close to keep file handle count down
-		//auto close=dispatcher->close(dispatcher->op_from_scheduled_id(id));
 		return std::make_pair(true, h);
 	}
 	// A file reading completion, called when each file open completes
@@ -128,6 +126,7 @@ public:
 		//std::cout << "E " << h->path() << std::endl;
 		// For each of the directories schedule an open and enumeration
 #if 0
+		// Algorithm 1
 		{
 			std::vector<async_path_op_req> dir_reqs; dir_reqs.reserve(entries.size());
 			for(auto &entry : entries)
@@ -149,6 +148,7 @@ public:
 			}
 		}
 #else
+		// Algorithm 2
 		// The Windows NT kernel filing system driver gets upset with too much concurrency
 		// when used with OSDirect so throttle directory enumerations to enforce some depth first traversal.
 		{
@@ -168,6 +168,7 @@ public:
 
 		// For each of the files schedule an open and search
 #if 0
+		// Algorithm 1
 		{
 			std::vector<async_path_op_req> file_reqs; file_reqs.reserve(entries.size());
 			std::vector<std::pair<async_op_flags, std::function<async_file_io_dispatcher_base::completion_t>>> file_openedfs; file_openedfs.reserve(entries.size());
@@ -193,6 +194,7 @@ public:
 			doscheduled(file_openeds);
 		}
 #else
+		// Algorithm 2
 		{
 			for(auto &entry : entries)
 			{
@@ -234,7 +236,7 @@ public:
 	{
 		// Prepare finished
 		auto finished_waiter=finished.get_future();
-#if 0
+#if 0 // Disabled to maximise performance
 		// Wait till done, retrieving any exceptions as they come in to keep memory consumption down
 		std::future_status status;
 		do
@@ -265,10 +267,6 @@ public:
 		dispatcher(make_async_file_io_dispatcher(process_threadpool(), file_flags::WillBeSequentiallyAccessed/*|file_flags::OSDirect*/)),
 		bytesread(0), filesread(0), filesmatched(0), scheduled(0), completed(0)
 	{
-#if 0
-		std::cout << "Attach profiler, and press return to continue." << std::endl;
-		getchar();
-#endif
 		filepaths.reserve(50000);
 
 		// Schedule the recursive enumeration of the current directory
@@ -277,23 +275,6 @@ public:
 		auto cur_dir_opened=dispatcher->completion(cur_dir, std::make_pair(async_op_flags::None, std::bind(&find_in_files::dir_opened, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
 		doscheduled({cur_dir, cur_dir_opened});
 		dowait();
-
-#if 0
-		// Reset the waiter, and issue the searches
-		finished=std::promise<int>();
-		std::cout << "\n\nStarting searches of " << filepaths.size() << " files ..." << std::endl;
-		for(auto &filepath : filepaths)
-		{
-			auto cur=dispatcher->file(async_path_op_req(filepath.first, file_flags::Read));
-			auto cur_opened=dispatcher->completion(cur, std::make_pair(async_op_flags::None, std::bind(&find_in_files::file_opened, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, filepath.second)));
-			doscheduled({cur, cur_opened});
-		}
-		dowait();
-#endif
-#if 0
-		std::cout << "Stop profiler, and press return to continue." << std::endl;
-		getchar();
-#endif
 	}
 };
 

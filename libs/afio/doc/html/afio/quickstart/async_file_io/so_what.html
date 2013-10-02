@@ -4,7 +4,7 @@
 <title>What benefit does asynchronous file i/o bring me?</title>
 <link rel="stylesheet" href="../../../myboostbook.css" type="text/css">
 <meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
-<link rel="home" href="../../../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 0.1">
+<link rel="home" href="../../../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 1.1">
 <link rel="up" href="../async_file_io.html" title="Asynchronous file i/o">
 <link rel="prev" href="hello_world.html" title="Hello World, asynchronously!">
 <link rel="next" href="../closure_engine.html" title="Closure Execution Engines">
@@ -205,8 +205,6 @@
 		<span class="identifier">docompleted</span><span class="special">(</span><span class="number">2</span><span class="special">);</span>
 		<span class="comment">// Throw away the buffer now rather than later to keep memory consumption down</span>
 		<span class="identifier">_buffer</span><span class="special">-&gt;</span><span class="identifier">clear</span><span class="special">();</span>
-		<span class="comment">// Schedule an immediate close rather than lazy close to keep file handle count down</span>
-		<span class="comment">//auto close=dispatcher-&gt;close(dispatcher-&gt;op_from_scheduled_id(id));</span>
 		<span class="keyword">return</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">make_pair</span><span class="special">(</span><span class="keyword">true</span><span class="special">,</span> <span class="identifier">h</span><span class="special">);</span>
 	<span class="special">}</span>
 	<span class="comment">// A file reading completion, called when each file open completes</span>
@@ -241,6 +239,7 @@
 		<span class="comment">//std::cout &lt;&lt; "E " &lt;&lt; h-&gt;path() &lt;&lt; std::endl;</span>
 		<span class="comment">// For each of the directories schedule an open and enumeration</span>
 <span class="preprocessor">#if</span> <span class="number">0</span>
+		<span class="comment">// Algorithm 1</span>
 		<span class="special">{</span>
 			<span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span><span class="identifier">async_path_op_req</span><span class="special">&gt;</span> <span class="identifier">dir_reqs</span><span class="special">;</span> <span class="identifier">dir_reqs</span><span class="special">.</span><span class="identifier">reserve</span><span class="special">(</span><span class="identifier">entries</span><span class="special">.</span><span class="identifier">size</span><span class="special">());</span>
 			<span class="keyword">for</span><span class="special">(</span><span class="keyword">auto</span> <span class="special">&amp;</span><span class="identifier">entry</span> <span class="special">:</span> <span class="identifier">entries</span><span class="special">)</span>
@@ -262,6 +261,7 @@
 			<span class="special">}</span>
 		<span class="special">}</span>
 <span class="preprocessor">#else</span>
+		<span class="comment">// Algorithm 2</span>
 		<span class="comment">// The Windows NT kernel filing system driver gets upset with too much concurrency</span>
 		<span class="comment">// when used with OSDirect so throttle directory enumerations to enforce some depth first traversal.</span>
 		<span class="special">{</span>
@@ -281,6 +281,7 @@
 
 		<span class="comment">// For each of the files schedule an open and search</span>
 <span class="preprocessor">#if</span> <span class="number">0</span>
+		<span class="comment">// Algorithm 1</span>
 		<span class="special">{</span>
 			<span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span><span class="identifier">async_path_op_req</span><span class="special">&gt;</span> <span class="identifier">file_reqs</span><span class="special">;</span> <span class="identifier">file_reqs</span><span class="special">.</span><span class="identifier">reserve</span><span class="special">(</span><span class="identifier">entries</span><span class="special">.</span><span class="identifier">size</span><span class="special">());</span>
 			<span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">pair</span><span class="special">&lt;</span><span class="identifier">async_op_flags</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">function</span><span class="special">&lt;</span><span class="identifier">async_file_io_dispatcher_base</span><span class="special">::</span><span class="identifier">completion_t</span><span class="special">&gt;&gt;&gt;</span> <span class="identifier">file_openedfs</span><span class="special">;</span> <span class="identifier">file_openedfs</span><span class="special">.</span><span class="identifier">reserve</span><span class="special">(</span><span class="identifier">entries</span><span class="special">.</span><span class="identifier">size</span><span class="special">());</span>
@@ -306,6 +307,7 @@
 			<span class="identifier">doscheduled</span><span class="special">(</span><span class="identifier">file_openeds</span><span class="special">);</span>
 		<span class="special">}</span>
 <span class="preprocessor">#else</span>
+		<span class="comment">// Algorithm 2</span>
 		<span class="special">{</span>
 			<span class="keyword">for</span><span class="special">(</span><span class="keyword">auto</span> <span class="special">&amp;</span><span class="identifier">entry</span> <span class="special">:</span> <span class="identifier">entries</span><span class="special">)</span>
 			<span class="special">{</span>
@@ -347,7 +349,7 @@
 	<span class="special">{</span>
 		<span class="comment">// Prepare finished</span>
 		<span class="keyword">auto</span> <span class="identifier">finished_waiter</span><span class="special">=</span><span class="identifier">finished</span><span class="special">.</span><span class="identifier">get_future</span><span class="special">();</span>
-<span class="preprocessor">#if</span> <span class="number">0</span>
+<span class="preprocessor">#if</span> <span class="number">0</span> <span class="comment">// Disabled to maximise performance</span>
 		<span class="comment">// Wait till done, retrieving any exceptions as they come in to keep memory consumption down</span>
 		<span class="identifier">std</span><span class="special">::</span><span class="identifier">future_status</span> <span class="identifier">status</span><span class="special">;</span>
 		<span class="keyword">do</span>
@@ -378,10 +380,6 @@
 		<span class="identifier">dispatcher</span><span class="special">(</span><span class="identifier">make_async_file_io_dispatcher</span><span class="special">(</span><span class="identifier">process_threadpool</span><span class="special">(),</span> <span class="identifier">file_flags</span><span class="special">::</span><span class="identifier">WillBeSequentiallyAccessed</span><span class="comment">/*|file_flags::OSDirect*/</span><span class="special">)),</span>
 		<span class="identifier">bytesread</span><span class="special">(</span><span class="number">0</span><span class="special">),</span> <span class="identifier">filesread</span><span class="special">(</span><span class="number">0</span><span class="special">),</span> <span class="identifier">filesmatched</span><span class="special">(</span><span class="number">0</span><span class="special">),</span> <span class="identifier">scheduled</span><span class="special">(</span><span class="number">0</span><span class="special">),</span> <span class="identifier">completed</span><span class="special">(</span><span class="number">0</span><span class="special">)</span>
 	<span class="special">{</span>
-<span class="preprocessor">#if</span> <span class="number">0</span>
-		<span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="string">"Attach profiler, and press return to continue."</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span>
-		<span class="identifier">getchar</span><span class="special">();</span>
-<span class="preprocessor">#endif</span>
 		<span class="identifier">filepaths</span><span class="special">.</span><span class="identifier">reserve</span><span class="special">(</span><span class="number">50000</span><span class="special">);</span>
 
 		<span class="comment">// Schedule the recursive enumeration of the current directory</span>
@@ -390,23 +388,6 @@
 		<span class="keyword">auto</span> <span class="identifier">cur_dir_opened</span><span class="special">=</span><span class="identifier">dispatcher</span><span class="special">-&gt;</span><span class="identifier">completion</span><span class="special">(</span><span class="identifier">cur_dir</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">make_pair</span><span class="special">(</span><span class="identifier">async_op_flags</span><span class="special">::</span><span class="identifier">None</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">bind</span><span class="special">(&amp;</span><span class="identifier">find_in_files</span><span class="special">::</span><span class="identifier">dir_opened</span><span class="special">,</span> <span class="keyword">this</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">placeholders</span><span class="special">::</span><span class="identifier">_1</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">placeholders</span><span class="special">::</span><span class="identifier">_2</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">placeholders</span><span class="special">::</span><span class="identifier">_3</span><span class="special">)));</span>
 		<span class="identifier">doscheduled</span><span class="special">({</span><span class="identifier">cur_dir</span><span class="special">,</span> <span class="identifier">cur_dir_opened</span><span class="special">});</span>
 		<span class="identifier">dowait</span><span class="special">();</span>
-
-<span class="preprocessor">#if</span> <span class="number">0</span>
-		<span class="comment">// Reset the waiter, and issue the searches</span>
-		<span class="identifier">finished</span><span class="special">=</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">promise</span><span class="special">&lt;</span><span class="keyword">int</span><span class="special">&gt;();</span>
-		<span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="string">"\n\nStarting searches of "</span> <span class="special">&lt;&lt;</span> <span class="identifier">filepaths</span><span class="special">.</span><span class="identifier">size</span><span class="special">()</span> <span class="special">&lt;&lt;</span> <span class="string">" files ..."</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span>
-		<span class="keyword">for</span><span class="special">(</span><span class="keyword">auto</span> <span class="special">&amp;</span><span class="identifier">filepath</span> <span class="special">:</span> <span class="identifier">filepaths</span><span class="special">)</span>
-		<span class="special">{</span>
-			<span class="keyword">auto</span> <span class="identifier">cur</span><span class="special">=</span><span class="identifier">dispatcher</span><span class="special">-&gt;</span><span class="identifier">file</span><span class="special">(</span><span class="identifier">async_path_op_req</span><span class="special">(</span><span class="identifier">filepath</span><span class="special">.</span><span class="identifier">first</span><span class="special">,</span> <span class="identifier">file_flags</span><span class="special">::</span><span class="identifier">Read</span><span class="special">));</span>
-			<span class="keyword">auto</span> <span class="identifier">cur_opened</span><span class="special">=</span><span class="identifier">dispatcher</span><span class="special">-&gt;</span><span class="identifier">completion</span><span class="special">(</span><span class="identifier">cur</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">make_pair</span><span class="special">(</span><span class="identifier">async_op_flags</span><span class="special">::</span><span class="identifier">None</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">bind</span><span class="special">(&amp;</span><span class="identifier">find_in_files</span><span class="special">::</span><span class="identifier">file_opened</span><span class="special">,</span> <span class="keyword">this</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">placeholders</span><span class="special">::</span><span class="identifier">_1</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">placeholders</span><span class="special">::</span><span class="identifier">_2</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">placeholders</span><span class="special">::</span><span class="identifier">_3</span><span class="special">,</span> <span class="identifier">filepath</span><span class="special">.</span><span class="identifier">second</span><span class="special">)));</span>
-			<span class="identifier">doscheduled</span><span class="special">({</span><span class="identifier">cur</span><span class="special">,</span> <span class="identifier">cur_opened</span><span class="special">});</span>
-		<span class="special">}</span>
-		<span class="identifier">dowait</span><span class="special">();</span>
-<span class="preprocessor">#endif</span>
-<span class="preprocessor">#if</span> <span class="number">0</span>
-		<span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="string">"Stop profiler, and press return to continue."</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span>
-		<span class="identifier">getchar</span><span class="special">();</span>
-<span class="preprocessor">#endif</span>
 	<span class="special">}</span>
 <span class="special">};</span>
 
@@ -451,7 +432,7 @@
 <p>
           Well, that's simple: do you want maximum file i/o performance? Here is
           a search for <span class="quote">&#8220;<span class="quote">Niall</span>&#8221;</span> in a Boost working directory which contained
-          about 6Gb of data across ~39k files<a href="#ftn.afio.quickstart.async_file_io.so_what.f1" class="footnote" name="afio.quickstart.async_file_io.so_what.f1"><sup class="footnote">[11]</sup></a>:
+          about 7Gb of data across ~35k files<a href="#ftn.afio.quickstart.async_file_io.so_what.f1" class="footnote" name="afio.quickstart.async_file_io.so_what.f1"><sup class="footnote">[11]</sup></a>:
         </p>
 <div class="table">
 <a name="afio.quickstart.async_file_io.so_what.find_in_files_performance"></a><p class="title"><b>Table&#160;1.4.&#160;Find in files performance for traditional vs AFIO implementations</b></p>
@@ -502,17 +483,17 @@
                 </td>
 <td>
                   <p>
-                    779 Mb/sec
+                    812 Mb/sec
                   </p>
                 </td>
 <td>
                   <p>
-                    1682 Mb/sec
+                    1810 Mb/sec
                   </p>
                 </td>
 <td>
                   <p>
-                    2086 Mb/sec
+                    2663 Mb/sec
                   </p>
                 </td>
 <td>
@@ -522,7 +503,7 @@
                 </td>
 <td>
                   <p>
-                    3761 Mb/sec
+                    6512 Mb/sec
                   </p>
                 </td>
 </tr>
@@ -536,19 +517,19 @@
                 </td>
 <td>
                   <p>
-                    +116%
+                    +123%
                   </p>
                 </td>
 <td>
                   <p>
-                    +168%
+                    +228%
                   </p>
                 </td>
 <td>
                 </td>
 <td>
                   <p>
-                    +383%
+                    +702%
                   </p>
                 </td>
 </tr>

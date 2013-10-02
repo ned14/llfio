@@ -71,7 +71,7 @@ File Created: Mar 2013
 
 #include "../../../boost/afio/afio.hpp"
 #include "../../../boost/afio/detail/Aligned_Allocator.hpp"
-#include "boost/smart_ptr/detail/spinlock.hpp"
+#include "../../../boost/afio/detail/MemoryTransactions.hpp"
 #include "../../../boost/afio/detail/valgrind/memcheck.h"
 #include "../../../boost/afio/detail/valgrind/helgrind.h"
 
@@ -714,26 +714,39 @@ namespace detail {
 		}
 		async_io_handle_windows(async_file_io_dispatcher_base *_parent, std::shared_ptr<async_io_handle> _dirh, const std::filesystem::path &path, file_flags flags) : async_io_handle(_parent, std::move(_dirh), path, flags), myid(nullptr), has_been_added(false), SyncOnClose(false), mapaddr(nullptr) { }
 		inline async_io_handle_windows(async_file_io_dispatcher_base *_parent, std::shared_ptr<async_io_handle> _dirh, const std::filesystem::path &path, file_flags flags, bool _SyncOnClose, HANDLE _h);
-		virtual void close()
+		void int_close()
 		{
+			BOOST_AFIO_DEBUG_PRINT("D %p\n", this);
+			if(has_been_added)
+			{
+				parent()->int_del_io_handle(myid);
+				has_been_added=false;
+			}
 			if(mapaddr)
 			{
 				BOOST_AFIO_ERRHWINFN(UnmapViewOfFile(mapaddr), path());
 				mapaddr=nullptr;
 			}
-			// Windows doesn't provide an async fsync so do it synchronously
-			if(SyncOnClose && write_count_since_fsync())
-				BOOST_AFIO_ERRHWINFN(FlushFileBuffers(myid), path());
-			h->close();
-			h.reset();
+			if(h)
+			{
+				// Windows doesn't provide an async fsync so do it synchronously
+				if(SyncOnClose && write_count_since_fsync())
+					BOOST_AFIO_ERRHWINFN(FlushFileBuffers(myid), path());
+				h->close();
+				h.reset();
+			}
 			myid=nullptr;
+		}
+		virtual void close()
+		{
+			int_close();
 		}
 		virtual void *native_handle() const { return myid; }
 
 		// You can't use shared_from_this() in a constructor so ...
 		void do_add_io_handle_to_parent()
 		{
-			if(h)
+			if(myid)
 			{
 				parent()->int_add_io_handle(myid, shared_from_this());
 				has_been_added=true;
@@ -741,20 +754,7 @@ namespace detail {
 		}
 		~async_io_handle_windows()
 		{
-			BOOST_AFIO_DEBUG_PRINT("D %p\n", this);
-			if(has_been_added)
-				parent()->int_del_io_handle(myid);
-			if(mapaddr)
-			{
-				BOOST_AFIO_ERRHWINFN(UnmapViewOfFile(mapaddr), path());
-				mapaddr=nullptr;
-			}
-			if(h)
-			{
-				if(SyncOnClose && write_count_since_fsync())
-					BOOST_AFIO_ERRHWINFN(FlushFileBuffers(h->native_handle()), path());
-				h->close();
-			}
+			int_close();
 		}
 		virtual directory_entry direntry(metadata_flags wanted) const
 		{
@@ -881,8 +881,14 @@ namespace detail {
 			if(fd!=-999)
 				BOOST_AFIO_ERRHOSFN(fd, path);
 		}
-		virtual void close()
+		void int_close()
 		{
+			BOOST_AFIO_DEBUG_PRINT("D %p\n", this);
+			if(has_been_added)
+			{
+				parent()->int_del_io_handle((void *) (size_t) fd);
+				has_been_added=false;
+			}
 			if(mapaddr)
 			{
 				BOOST_AFIO_ERRHOSFN(BOOST_AFIO_POSIX_MUNMAP(mapaddr, mapsize), path());
@@ -895,32 +901,25 @@ namespace detail {
 				BOOST_AFIO_ERRHOSFN(BOOST_AFIO_POSIX_CLOSE(fd), path());
 				fd=-1;
 			}
+		}
+		virtual void close()
+		{
+			int_close();
 		}
 		virtual void *native_handle() const { return (void *)(size_t)fd; }
 
 		// You can't use shared_from_this() in a constructor so ...
 		void do_add_io_handle_to_parent()
 		{
-			parent()->int_add_io_handle((void *)(size_t)fd, shared_from_this());
-			has_been_added=true;
+			if(fd!=-999)
+			{
+				parent()->int_add_io_handle((void *) (size_t) fd, shared_from_this());
+				has_been_added=true;
+			}
 		}
 		~async_io_handle_posix()
 		{
-			if(has_been_added)
-				parent()->int_del_io_handle((void *)(size_t)fd);
-			if(mapaddr)
-			{
-				BOOST_AFIO_ERRHOSFN(BOOST_AFIO_POSIX_MUNMAP(mapaddr, mapsize), path());
-				mapaddr=nullptr;
-			}
-			if(fd>=0)
-			{
-				// Flush synchronously here? I guess ...
-				if(SyncOnClose && write_count_since_fsync())
-					BOOST_AFIO_ERRHOSFN(BOOST_AFIO_POSIX_FSYNC(fd), path());
-				BOOST_AFIO_ERRHOSFN(BOOST_AFIO_POSIX_CLOSE(fd), path());
-				fd=-1;
-			}
+			int_close();
 		}
 		virtual directory_entry direntry(metadata_flags wanted) const
 		{
@@ -1079,20 +1078,21 @@ namespace detail {
 		std::shared_ptr<thread_source> pool;
 		file_flags flagsforce, flagsmask;
 
-		typedef boost::detail::spinlock fdslock_t;
-		typedef recursive_mutex opslock_t;
+		typedef spinlock<size_t> fdslock_t;
+		typedef spinlock<size_t,
+			spins_to_transact<50>::policy,
+			spins_to_loop<150>::policy,
+			spins_to_yield<500>::policy,
+			spins_to_sleep::policy
+		> opslock_t;
 		typedef recursive_mutex dircachelock_t;
 		fdslock_t fdslock; std::unordered_map<void *, std::weak_ptr<async_io_handle>> fds;
-		opslock_t opslock; size_t monotoniccount; std::unordered_map<size_t, async_file_io_dispatcher_op> ops;
+		opslock_t opslock; atomic<size_t> monotoniccount; std::unordered_map<size_t, std::shared_ptr<async_file_io_dispatcher_op>> ops;
 		dircachelock_t dircachelock; std::unordered_map<std::filesystem::path, std::weak_ptr<async_io_handle>, std::filesystem_hash> dirhcache;
 
 		async_file_io_dispatcher_base_p(std::shared_ptr<thread_source> _pool, file_flags _flagsforce, file_flags _flagsmask) : pool(_pool),
 			flagsforce(_flagsforce), flagsmask(_flagsmask), monotoniccount(0)
 		{
-			// Boost's spinlock is so lightweight it has no constructor ...
-			fdslock.unlock();
-			ANNOTATE_RWLOCK_CREATE(&fdslock);
-        
 #if !defined(BOOST_MSVC)|| BOOST_MSVC >= 1700 // MSVC 2010 doesn't support reserve
 			ops.reserve(10000);
 #else
@@ -1101,7 +1101,6 @@ namespace detail {
 		}
 		~async_file_io_dispatcher_base_p()
 		{
-			ANNOTATE_RWLOCK_DESTROY(&fdslock);
 		}
 
 		// Returns a handle to a directory from the cache, or creates a new directory handle.
@@ -1352,24 +1351,24 @@ async_file_io_dispatcher_base::~async_file_io_dispatcher_base()
 	for(;;)
 	{
 		std::vector<std::pair<size_t, std::shared_ptr<shared_future<std::shared_ptr<async_io_handle>>>>> outstanding;
+		BOOST_BEGIN_MEMORY_TRANSACTION(p->opslock)
 		{
-			BOOST_AFIO_LOCK_GUARD<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
 			if(!p->ops.empty())
 			{
 				outstanding.reserve(p->ops.size());
 				BOOST_FOREACH(auto &op, p->ops)
 				{
-					if(op.second.h->valid())
+					if(op.second->h->valid())
 					{
-						auto it=reallyoutstanding.find(op.second.h.get());
+						auto it=reallyoutstanding.find(op.second->h.get());
 						if(reallyoutstanding.end()!=it)
 						{
 							if(it->second.first>=5)
 							{
-								static const char *statuses[]={"ready", "timeout", "deferred", "unknown"};
+								static const char *statuses[]={ "ready", "timeout", "deferred", "unknown" };
 								std::cerr << "WARNING: ~async_file_dispatcher_base() detects stuck async_io_op in total of " << p->ops.size() << " extant ops\n"
-								"   id=" << op.first << " type=" << detail::optypes[static_cast<size_t>(op.second.optype)] << " flags=0x" << std::hex << static_cast<size_t>(op.second.flags) << std::dec << " status=" << statuses[(((int) it->second.second)>=0 && ((int) it->second.second)<=2) ? (int) it->second.second : 3] << " handle_usecount=" << op.second.h.use_count() << " failcount=" << it->second.first << " Completions:";
-								BOOST_FOREACH(auto &c, op.second.completions)
+									"   id=" << op.first << " type=" << detail::optypes[static_cast<size_t>(op.second->optype)] << " flags=0x" << std::hex << static_cast<size_t>(op.second->flags) << std::dec << " status=" << statuses[(((int) it->second.second)>=0 && ((int) it->second.second)<=2) ? (int) it->second.second : 3] << " handle_usecount=" << op.second->h.use_count() << " failcount=" << it->second.first << " Completions:";
+								BOOST_FOREACH(auto &c, op.second->completions)
 								{
 									std::cerr << " id=" << c.first;
 								}
@@ -1409,11 +1408,12 @@ async_file_io_dispatcher_base::~async_file_io_dispatcher_base()
 #endif
 							}
 						}
-						outstanding.push_back(std::make_pair(op.first, op.second.h));
+						outstanding.push_back(std::make_pair(op.first, op.second->h));
 					}
 				}
 			}
 		}
+		BOOST_END_MEMORY_TRANSACTION(p->opslock)
 		if(outstanding.empty()) break;
 		size_t mincount=(size_t)-1;
 		BOOST_FOREACH(auto &op, outstanding)
@@ -1435,7 +1435,7 @@ async_file_io_dispatcher_base::~async_file_io_dispatcher_base()
 				break;
 			}
 		}
-		if(mincount>=10) // i.e. nothing is changing
+		if(mincount>=10 && mincount!=(size_t)-1) // i.e. nothing is changing
 		{
 			std::cerr << "WARNING: ~async_file_dispatcher_base() sees no change in " << reallyoutstanding.size() << " stuck async_io_ops, so exiting destructor wait" << std::endl;
 			break;
@@ -1447,18 +1447,20 @@ async_file_io_dispatcher_base::~async_file_io_dispatcher_base()
 
 void async_file_io_dispatcher_base::int_add_io_handle(void *key, std::shared_ptr<async_io_handle> h)
 {
-	BOOST_AFIO_LOCK_GUARD<detail::async_file_io_dispatcher_base_p::fdslock_t> lockh(p->fdslock);
-	ANNOTATE_RWLOCK_ACQUIRED(&p->fdslock, 1);
-	p->fds.insert(std::make_pair(key, std::weak_ptr<async_io_handle>(h)));
-	ANNOTATE_RWLOCK_RELEASED(&p->fdslock, 1);
+	BOOST_BEGIN_MEMORY_TRANSACTION(p->fdslock)
+	{
+		p->fds.insert(std::make_pair(key, std::weak_ptr<async_io_handle>(h)));
+	}
+	BOOST_END_MEMORY_TRANSACTION(p->fdslock)
 }
 
 void async_file_io_dispatcher_base::int_del_io_handle(void *key)
 {
-	BOOST_AFIO_LOCK_GUARD<detail::async_file_io_dispatcher_base_p::fdslock_t> lockh(p->fdslock);
-	ANNOTATE_RWLOCK_ACQUIRED(&p->fdslock, 1);
-	p->fds.erase(key);
-	ANNOTATE_RWLOCK_RELEASED(&p->fdslock, 1);
+	BOOST_BEGIN_MEMORY_TRANSACTION(p->fdslock)
+	{
+		p->fds.erase(key);
+	}
+	BOOST_END_MEMORY_TRANSACTION(p->fdslock)
 }
 
 std::weak_ptr<thread_source> async_file_io_dispatcher_base::threadsource() const
@@ -1486,43 +1488,78 @@ file_flags async_file_io_dispatcher_base::fileflags(file_flags flags) const
 
 size_t async_file_io_dispatcher_base::wait_queue_depth() const
 {
-	BOOST_AFIO_LOCK_GUARD<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
-	return p->ops.size();
+	BOOST_BEGIN_MEMORY_TRANSACTION(p->opslock)
+	{
+		return p->ops.size();
+	}
+	BOOST_END_MEMORY_TRANSACTION(p->opslock)
 }
 
-size_t async_file_io_dispatcher_base::count() const
+size_t async_file_io_dispatcher_base::fd_count() const
 {
 	size_t ret;
-	BOOST_AFIO_LOCK_GUARD<detail::async_file_io_dispatcher_base_p::fdslock_t> lockh(p->fdslock);
-	ANNOTATE_RWLOCK_ACQUIRED(&p->fdslock, 1);
-	ret=p->fds.size();
-	ANNOTATE_RWLOCK_RELEASED(&p->fdslock, 1);
-	return ret;
+	BOOST_BEGIN_MEMORY_TRANSACTION(p->fdslock)
+	{
+		ret=p->fds.size();
+		return ret;
+	}
+	BOOST_END_MEMORY_TRANSACTION(p->fdslock)
 }
 
 // Non op lock holding variant
 async_io_op async_file_io_dispatcher_base::int_op_from_scheduled_id(size_t id) const
 {
-	std::unordered_map<size_t, detail::async_file_io_dispatcher_op>::iterator it=p->ops.find(id);
+	std::unordered_map<size_t, std::shared_ptr<detail::async_file_io_dispatcher_op>>::iterator it=p->ops.find(id);
 	if(p->ops.end()==it)
 	{
 		BOOST_AFIO_THROW(std::runtime_error("Failed to find this operation in list of currently executing operations"));
 	}
-	return async_io_op(const_cast<async_file_io_dispatcher_base *>(this), id, it->second.h);
+	return async_io_op(const_cast<async_file_io_dispatcher_base *>(this), id, it->second->h);
 }
 async_io_op async_file_io_dispatcher_base::op_from_scheduled_id(size_t id) const
 {
-	BOOST_AFIO_LOCK_GUARD<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
-	return int_op_from_scheduled_id(id);
+	BOOST_BEGIN_MEMORY_TRANSACTION(p->opslock)
+	{
+		return int_op_from_scheduled_id(id);
+	}
+	BOOST_END_MEMORY_TRANSACTION(p->opslock)
 }
 
 
+#ifndef BOOST_AFIO_COMPILING_FOR_GCOV
 // Called in unknown thread
-async_file_io_dispatcher_base::completion_returntype async_file_io_dispatcher_base::invoke_user_completion(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr *e, std::function<async_file_io_dispatcher_base::completion_t> callback)
+async_file_io_dispatcher_base::completion_returntype async_file_io_dispatcher_base::invoke_user_completion_fast(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr *e, async_file_io_dispatcher_base::completion_t *callback)
 {
 	return callback(id, h, e);
 }
-
+std::vector<async_io_op> async_file_io_dispatcher_base::completion(const std::vector<async_io_op> &ops, const std::vector<std::pair<async_op_flags, async_file_io_dispatcher_base::completion_t *>> &callbacks)
+{
+	if(!ops.empty() && ops.size()!=callbacks.size())
+		BOOST_AFIO_THROW(std::runtime_error("The sequence of preconditions must either be empty or exactly the same length as callbacks."));
+	std::vector<async_io_op> ret;
+	ret.reserve(callbacks.size());
+	std::vector<async_io_op>::const_iterator i;
+	std::vector<std::pair<async_op_flags, async_file_io_dispatcher_base::completion_t *>>::const_iterator c;
+	exception_ptr he;
+	detail::immediate_async_ops immediates;
+	if(ops.empty())
+	{
+		async_io_op empty;
+		BOOST_FOREACH(auto & c, callbacks)
+		{
+			ret.push_back(chain_async_op(&he, immediates, (int) detail::OpType::UserCompletion, empty, c.first, &async_file_io_dispatcher_base::invoke_user_completion_fast, c.second));
+		}
+	}
+	else for(i=ops.begin(), c=callbacks.begin(); i!=ops.end() && c!=callbacks.end(); ++i, ++c)
+		ret.push_back(chain_async_op(&he, immediates, (int) detail::OpType::UserCompletion, *i, c->first, &async_file_io_dispatcher_base::invoke_user_completion_fast, c->second));
+	return ret;
+}
+#endif
+// Called in unknown thread
+async_file_io_dispatcher_base::completion_returntype async_file_io_dispatcher_base::invoke_user_completion_slow(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr *e, std::function<async_file_io_dispatcher_base::completion_t> callback)
+{
+	return callback(id, h, e);
+}
 std::vector<async_io_op> async_file_io_dispatcher_base::completion(const std::vector<async_io_op> &ops, const std::vector<std::pair<async_op_flags, std::function<async_file_io_dispatcher_base::completion_t>>> &callbacks)
 {
 	if(!ops.empty() && ops.size()!=callbacks.size())
@@ -1531,7 +1568,6 @@ std::vector<async_io_op> async_file_io_dispatcher_base::completion(const std::ve
 	ret.reserve(callbacks.size());
 	std::vector<async_io_op>::const_iterator i;
 	std::vector<std::pair<async_op_flags, std::function<async_file_io_dispatcher_base::completion_t>>>::const_iterator c;
-	BOOST_AFIO_LOCK_GUARD<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
 	exception_ptr he;
 	detail::immediate_async_ops immediates;
 	if(ops.empty())
@@ -1539,105 +1575,103 @@ std::vector<async_io_op> async_file_io_dispatcher_base::completion(const std::ve
 		async_io_op empty;
 		BOOST_FOREACH(auto & c, callbacks)
 		{
-			ret.push_back(chain_async_op(&he, immediates, (int) detail::OpType::UserCompletion, empty, c.first, &async_file_io_dispatcher_base::invoke_user_completion, c.second));
+			ret.push_back(chain_async_op(&he, immediates, (int) detail::OpType::UserCompletion, empty, c.first, &async_file_io_dispatcher_base::invoke_user_completion_slow, c.second));
 		}
 	}
 	else for(i=ops.begin(), c=callbacks.begin(); i!=ops.end() && c!=callbacks.end(); ++i, ++c)
-			ret.push_back(chain_async_op(&he, immediates, (int) detail::OpType::UserCompletion, *i, c->first, &async_file_io_dispatcher_base::invoke_user_completion, c->second));
+			ret.push_back(chain_async_op(&he, immediates, (int) detail::OpType::UserCompletion, *i, c->first, &async_file_io_dispatcher_base::invoke_user_completion_slow, c->second));
 	return ret;
 }
 
 // Called in unknown thread
 void async_file_io_dispatcher_base::complete_async_op(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr e)
 {
-	BOOST_AFIO_LOCK_GUARD<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
 	detail::immediate_async_ops immediates;
-	// Find me in ops, remove my completions and delete me from extant ops
-	std::unordered_map<size_t, detail::async_file_io_dispatcher_op>::iterator it=p->ops.find(id);
-	if(p->ops.end()==it)
+	std::shared_ptr<detail::async_file_io_dispatcher_op> thisop;
+	std::vector<std::pair<size_t, std::shared_ptr<detail::async_file_io_dispatcher_op>>> completions;
+	bool docompletions=false;
+	BOOST_BEGIN_MEMORY_TRANSACTION(p->opslock)
 	{
+		// Find me in ops, remove my completions and delete me from extant ops
+		auto it=p->ops.find(id);
+		if(p->ops.end()==it)
+		{
 #ifndef NDEBUG
-		std::vector<size_t> opsids;
-		BOOST_FOREACH(auto &i, p->ops)
-		{
-			opsids.push_back(i.first);
-		}
-		std::sort(opsids.begin(), opsids.end());
-#endif
-		BOOST_AFIO_THROW_FATAL(std::runtime_error("Failed to find this operation in list of currently executing operations"));
-	}
-	// Erase me from ops on exit from this function
-	auto eraseit=boost::afio::detail::Undoer([this, id]{
-		std::unordered_map<size_t, detail::async_file_io_dispatcher_op>::iterator it=p->ops.find(id);
-		if(p->ops.end()==it)
-		{
-			BOOST_AFIO_THROW_FATAL(std::runtime_error("Failed to find this operation in list of currently executing operations"));
-		}
-		p->ops.erase(it);
-	});
-	if(!it->second.completions.empty())
-	{
-		// Remove completions as we're about to modify p->ops which will invalidate it
-		std::vector<detail::async_file_io_dispatcher_op::completion_t> completions(std::move(it->second.completions));
-		assert(it->second.completions.empty());
-		BOOST_FOREACH(auto &c, completions)
-		{
-			exception_ptr *immediate_e=&e;
-			// Enqueue each completion
-			it=p->ops.find(c.first);
-			if(p->ops.end()==it)
-				BOOST_AFIO_THROW_FATAL(std::runtime_error("Failed to find this completion operation in list of currently executing operations"));
-			// Unlock opslock during completions dispatch to increase parallelism
-			//p->opslock.unlock();
-			//auto relock=boost::afio::detail::Undoer([this]{ p->opslock.lock(); });
-			if(!!(it->second.flags & async_op_flags::ImmediateCompletion))
-			{
-				// If he was set up with a detached future, use that instead
-				if(it->second.detached_promise)
-				{
-					*it->second.h=it->second.detached_promise->get_future();
-					immediates.enqueue(std::bind(c.second, h, immediate_e));
-				}
-				else
-					*it->second.h=immediates.enqueue(std::bind(c.second, h, immediate_e));
-			}
-			else
-			{
-				// If he was set up with a detached future, use that instead
-				if(it->second.detached_promise)
-				{
-					*it->second.h=it->second.detached_promise->get_future();
-					p->pool->enqueue(std::bind(c.second, h, nullptr));
-				}
-				else
-					*it->second.h=p->pool->enqueue(std::bind(c.second, h, nullptr));
-			}
-			BOOST_AFIO_DEBUG_PRINT("C %u > %u %p\n", (unsigned) id, (unsigned) c.first, h.get());
-		}
-		// Restore it to my id
-		it=p->ops.find(id);
-		if(p->ops.end()==it)
-		{
-	#ifndef NDEBUG
 			std::vector<size_t> opsids;
 			BOOST_FOREACH(auto &i, p->ops)
 			{
 				opsids.push_back(i.first);
 			}
 			std::sort(opsids.begin(), opsids.end());
-	#endif
+#endif
 			BOOST_AFIO_THROW_FATAL(std::runtime_error("Failed to find this operation in list of currently executing operations"));
 		}
+		thisop=it->second;
+		// Erase me from ops
+		p->ops.erase(it);
+		// Lookup any completions before losing opslock
+		docompletions=!thisop->completions.empty();
 	}
-	if(it->second.detached_promise)
+	BOOST_END_MEMORY_TRANSACTION(p->opslock)
+	// opslock is now free
+	if(docompletions)
 	{
-		auto delpromise=boost::afio::detail::Undoer([&it]{ it->second.detached_promise.reset(); });
-		if(e)
-			it->second.detached_promise->set_exception(e);
-		else
-			it->second.detached_promise->set_value(h);
+		completions.reserve(thisop->completions.size());
+		BOOST_FOREACH(auto &c, thisop->completions)
+		{
+			std::pair<const size_t, std::shared_ptr<detail::async_file_io_dispatcher_op>> *temp=nullptr;
+			BOOST_BEGIN_MEMORY_TRANSACTION(p->opslock)
+			{
+				auto it=p->ops.find(c.first);
+				if(p->ops.end()==it)
+					BOOST_AFIO_THROW_FATAL(std::runtime_error("Failed to find this completion operation in list of currently executing operations"));
+				// unordered_map guaranteed to never relocate references
+				temp=&(*it);
+				BOOST_AFIO_DEBUG_PRINT("C %u > %u %p\n", (unsigned) id, (unsigned) c.first, h.get());
+			}
+			BOOST_END_MEMORY_TRANSACTION(p->opslock)
+			completions.push_back(*temp);
+		}
 	}
-	BOOST_AFIO_DEBUG_PRINT("R %u %p\n", (unsigned) id, h.get());
+	if(!completions.empty())
+	{
+		auto it=thisop->completions.begin();
+		BOOST_FOREACH(auto &c, completions)
+		{
+			if(!!(c.second->flags & async_op_flags::ImmediateCompletion))
+			{
+				// If he was set up with a detached future, use that instead
+				if(c.second->detached_promise)
+				{
+					*c.second->h=c.second->detached_promise->get_future();
+					immediates.enqueue(std::bind(it->second, h, &e));
+				}
+				else
+					*c.second->h=immediates.enqueue(std::bind(it->second, h, &e));
+			}
+			else
+			{
+				// If he was set up with a detached future, use that instead
+				if(c.second->detached_promise)
+				{
+					*c.second->h=c.second->detached_promise->get_future();
+					p->pool->enqueue(std::bind(it->second, h, nullptr));
+				}
+				else
+					*c.second->h=p->pool->enqueue(std::bind(it->second, h, nullptr));
+			}
+			++it;
+		}
+	}
+	if(thisop->detached_promise)
+	{
+		auto delpromise=boost::afio::detail::Undoer([&thisop]{ thisop->detached_promise.reset(); });
+		if(e)
+			thisop->detached_promise->set_exception(e);
+		else
+			thisop->detached_promise->set_value(h);
+	}
+	BOOST_AFIO_DEBUG_PRINT("X %u %p\n", (unsigned) id, h.get());
 }
 
 
@@ -1647,37 +1681,46 @@ template<class F, class... Args> std::shared_ptr<async_io_handle> async_file_io_
 {
 	try
 	{
+#ifndef NDEBUG
+		// Find our op
+		bool has_detached_promise=false;
+		BOOST_BEGIN_MEMORY_TRANSACTION(p->opslock)
+		{
+			auto it(p->ops.find(id));
+			if(p->ops.end()==it)
+			{
+#ifndef NDEBUG
+				std::vector<size_t> opsids;
+				BOOST_FOREACH(auto &i, p->ops)
+				{
+					opsids.push_back(i.first);
+				}
+				std::sort(opsids.begin(), opsids.end());
+#endif
+				BOOST_AFIO_THROW_FATAL(std::runtime_error("Failed to find this operation in list of currently executing operations"));
+			}
+			has_detached_promise=!!it->second->detached_promise;
+		}
+		BOOST_END_MEMORY_TRANSACTION(p->opslock)
+#endif
 		completion_returntype ret((static_cast<F *>(this)->*f)(id, h, e, args...));
 		// If boolean is false, reschedule completion notification setting it to ret.second, otherwise complete now
 		if(ret.first)
 		{
 			complete_async_op(id, ret.second);
 		}
+#ifndef NDEBUG
 		else
 		{
 			// Make sure this was set up for deferred completion
-			BOOST_AFIO_LOCK_GUARD<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
-			std::unordered_map<size_t, detail::async_file_io_dispatcher_op>::iterator it(p->ops.find(id));
-			if(p->ops.end()==it)
-			{
-	#ifndef NDEBUG
-				std::vector<size_t> opsids;
-				BOOST_FOREACH(auto &i, p->ops)
-                {
-					opsids.push_back(i.first);
-                }
-				std::sort(opsids.begin(), opsids.end());
-	#endif
-				BOOST_AFIO_THROW_FATAL(std::runtime_error("Failed to find this operation in list of currently executing operations"));
-			}
-			if(!it->second.detached_promise)
+			if(!has_detached_promise)
 			{
 				// If this trips, it means a completion handler tried to defer signalling
 				// completion but it hadn't been set up with a detached future
-				assert(0);
-				std::terminate();
+				BOOST_AFIO_THROW_FATAL(std::runtime_error("Completion handler tried to defer completion but was not configured with detached future"));
 			}
 		}
+#endif
 		return ret.second;
 	}
 	catch(...)
@@ -1708,36 +1751,41 @@ template<class F, class... Args> std::shared_ptr<async_io_handle> async_file_io_
     {                                                                                               \
 	    try\
 	    {\
-		    completion_returntype ret((static_cast<F *>(this)->*f)(id, h, e BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a)));\
+			/* Find our op*/ \
+			bool has_detached_promise=false; \
+			BOOST_BEGIN_MEMORY_TRANSACTION(p->opslock) \
+			{ \
+				auto it(p->ops.find(id)); \
+				if(p->ops.end()==it) \
+				{ \
+					std::vector<size_t> opsids; \
+					BOOST_FOREACH(auto &i, p->ops) \
+					{ \
+						opsids.push_back(i.first); \
+					} \
+					std::sort(opsids.begin(), opsids.end()); \
+					BOOST_AFIO_THROW_FATAL(std::runtime_error("Failed to find this operation in list of currently executing operations")); \
+				} \
+				has_detached_promise=!!it->second->detached_promise; \
+			} \
+			BOOST_END_MEMORY_TRANSACTION(p->opslock) \
+			completion_returntype ret((static_cast<F *>(this)->*f)(id, h, e BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a)));\
 		    /* If boolean is false, reschedule completion notification setting it to ret.second, otherwise complete now */ \
 		    if(ret.first)   \
 		    {\
 			    complete_async_op(id, ret.second);\
 		    }\
-		    else\
-		    {\
-			    /* Make sure this was set up for deferred completion*/ \
-			    BOOST_AFIO_LOCK_GUARD<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);\
-			    std::unordered_map<size_t, detail::async_file_io_dispatcher_op>::iterator it(p->ops.find(id));\
-			    if(p->ops.end()==it)\
-			    {\
-				    std::vector<size_t> opsids;\
-				    BOOST_FOREACH(auto &i, p->ops)\
-                    {\
-					    opsids.push_back(i.first);\
-                    }\
-				    std::sort(opsids.begin(), opsids.end());\
-				    BOOST_AFIO_THROW_FATAL(std::runtime_error("Failed to find this operation in list of currently executing operations"));\
-			    }\
-			    if(!it->second.detached_promise)\
-			    {\
-				    /* If this trips, it means a completion handler tried to defer signalling*/ \
-				    /* completion but it hadn't been set up with a detached future*/ \
-				    assert(0);\
-				    std::terminate();\
-			    }\
-		    }\
-		    return ret.second;\
+			else \
+			{ \
+				/* Make sure this was set up for deferred completion */ \
+				if(!has_detached_promise) \
+				{ \
+					/* If this trips, it means a completion handler tried to defer signalling*/ \
+					/* completion but it hadn't been set up with a detached future */ \
+					BOOST_AFIO_THROW_FATAL(std::runtime_error("Completion handler tried to defer completion but was not configured with detached future")); \
+				} \
+			} \
+			return ret.second;\
 	    }\
         catch(...)\
 	    {\
@@ -1781,22 +1829,54 @@ template<class F, class... Args> async_io_op async_file_io_dispatcher_base::chai
 	typename detail::async_file_io_dispatcher_op::completion_t boundf(std::make_pair(thisid, std::bind(wrapperf, this, thisid, std::placeholders::_1, std::placeholders::_2, f, args...)));
 	// Make a new async_io_op ready for returning
 	async_io_op ret(this, thisid);
+	auto thisop=std::make_shared<detail::async_file_io_dispatcher_op>((detail::OpType) optype, flags, ret.h, boundf);
+	if(!!(flags & async_op_flags::DetachedFuture))
+	{
+		thisop->detached_promise.reset(new promise<std::shared_ptr<async_io_handle>>);
+	}
+	{
+		auto item=std::make_pair(thisid, thisop);
+		BOOST_BEGIN_MEMORY_TRANSACTION(p->opslock)
+		{
+			auto opsit=p->ops.insert(std::move(item));
+			assert(opsit.second);
+		}
+		BOOST_END_MEMORY_TRANSACTION(p->opslock)
+	}
+	BOOST_AFIO_DEBUG_PRINT("I %u < %u (%s)\n", (unsigned) thisid, (unsigned) precondition.id, detail::optypes[static_cast<int>(optype)]);
+	auto unopsit=boost::afio::detail::Undoer([this, thisid](){
+		BOOST_BEGIN_MEMORY_TRANSACTION(p->opslock)
+		{
+			auto opsit=p->ops.find(thisid);
+			p->ops.erase(opsit);
+			BOOST_AFIO_DEBUG_PRINT("E X %u\n", (unsigned) thisid);
+		}
+		BOOST_END_MEMORY_TRANSACTION(p->opslock)
+	});
 	bool done=false;
 	if(precondition.id)
 	{
 		// If still in flight, chain boundf to be executed when precondition completes
-		auto dep(p->ops.find(precondition.id));
-		if(p->ops.end()!=dep)
+		BOOST_BEGIN_MEMORY_TRANSACTION(p->opslock)
 		{
-			dep->second.completions.push_back(boundf);
-			done=true;
+			auto dep(p->ops.find(precondition.id));
+			if(p->ops.end()!=dep)
+			{
+				dep->second->completions.push_back(boundf);
+				done=true;
+			}
 		}
+		BOOST_END_MEMORY_TRANSACTION(p->opslock)
 	}
 	auto undep=boost::afio::detail::Undoer([done, this, precondition](){
 		if(done)
 		{
-			auto dep(p->ops.find(precondition.id));
-			dep->second.completions.pop_back();
+			BOOST_BEGIN_MEMORY_TRANSACTION(p->opslock)
+			{
+				auto dep(p->ops.find(precondition.id));
+				dep->second->completions.pop_back();
+			}
+			BOOST_END_MEMORY_TRANSACTION(p->opslock)
 		}
 	});
 	if(!done)
@@ -1821,8 +1901,11 @@ template<class F, class... Args> async_io_op async_file_io_dispatcher_base::chai
 		{
 			// It should never happen that precondition.id is valid but removed from extant ops
 			// which indicates it completed and yet h remains invalid
-			assert(0);
-			std::terminate();
+			BOOST_AFIO_THROW_FATAL(std::runtime_error("Precondition was not in list of extant ops, yet its future is invalid. This should never happen for any real op, so it's probably memory corruption."));
+		}
+		if(!!(flags & async_op_flags::DetachedFuture))
+		{
+			*thisop->h=thisop->detached_promise->get_future();
 		}
 		if(!!(flags & async_op_flags::ImmediateCompletion))
 		{
@@ -1830,19 +1913,6 @@ template<class F, class... Args> async_io_op async_file_io_dispatcher_base::chai
 		}
 		else
 			*ret.h=p->pool->enqueue(std::bind(boundf.second, h, nullptr)).share();
-	}
-	auto opsit=p->ops.insert(std::move(std::make_pair(thisid, std::move(detail::async_file_io_dispatcher_op((detail::OpType) optype, flags, ret.h, boundf)))));
-	assert(opsit.second);
-	BOOST_AFIO_DEBUG_PRINT("I %u < %u (%s)\n", (unsigned) thisid, (unsigned) precondition.id, detail::optypes[static_cast<int>(optype)]);
-	auto unopsit=boost::afio::detail::Undoer([this, opsit, thisid](){
-		p->ops.erase(opsit.first);
-		BOOST_AFIO_DEBUG_PRINT("E R %u\n", (unsigned) thisid);
-	});
-	if(!!(flags & async_op_flags::DetachedFuture))
-	{
-		opsit.first->second.detached_promise.reset(new promise<std::shared_ptr<async_io_handle>>);
-		if(!done)
-			*opsit.first->second.h=opsit.first->second.detached_promise->get_future();
 	}
 	unopsit.dismiss();
 	undep.dismiss();
@@ -1888,23 +1958,55 @@ template<class F, class... Args> async_io_op async_file_io_dispatcher_base::chai
 	    typename detail::async_file_io_dispatcher_op::completion_t boundf(std::make_pair(thisid, std::bind(wrapperf, this, thisid, std::placeholders::_1, std::placeholders::_2, f BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a))));\
 	    /* Make a new async_io_op ready for returning*/\
 	    async_io_op ret(this, thisid);\
-	    bool done=false;\
+		auto thisop=std::make_shared<detail::async_file_io_dispatcher_op>((detail::OpType) optype, flags, ret.h, boundf); \
+		if(!!(flags & async_op_flags::DetachedFuture)) \
+		{ \
+			thisop->detached_promise.reset(new promise<std::shared_ptr<async_io_handle>>); \
+		} \
+		{ \
+			auto item=std::make_pair(thisid, thisop); \
+			BOOST_BEGIN_MEMORY_TRANSACTION(p->opslock) \
+			{ \
+				auto opsit=p->ops.insert(std::move(item)); \
+				assert(opsit.second); \
+			} \
+			BOOST_END_MEMORY_TRANSACTION(p->opslock) \
+		} \
+		BOOST_AFIO_DEBUG_PRINT("I %u < %u (%s)\n", (unsigned) thisid, (unsigned) precondition.id, detail::optypes[static_cast<int>(optype)]); \
+		auto unopsit=boost::afio::detail::Undoer([this, thisid](){ \
+			BOOST_BEGIN_MEMORY_TRANSACTION(p->opslock) \
+			{ \
+				auto opsit=p->ops.find(thisid); \
+				p->ops.erase(opsit); \
+				BOOST_AFIO_DEBUG_PRINT("E X %u\n", (unsigned) thisid); \
+			} \
+			BOOST_END_MEMORY_TRANSACTION(p->opslock) \
+		}); \
+		bool done=false;\
 	    if(precondition.id)\
 	    {\
 		    /* If still in flight, chain boundf to be executed when precondition completes*/ \
-		    auto dep(p->ops.find(precondition.id));\
-		    if(p->ops.end()!=dep)\
-		    {\
-			    dep->second.completions.push_back(boundf);\
-			    done=true;\
-		    }\
-	    }\
+			BOOST_BEGIN_MEMORY_TRANSACTION(p->opslock) \
+			{ \
+				auto dep(p->ops.find(precondition.id)); \
+				if(p->ops.end()!=dep) \
+				{ \
+					dep->second->completions.push_back(boundf); \
+					done=true; \
+				} \
+			} \
+			BOOST_END_MEMORY_TRANSACTION(p->opslock) \
+		}\
 	    auto undep=boost::afio::detail::Undoer([done, this, precondition](){\
 		    if(done)\
 		    {\
-			    auto dep(p->ops.find(precondition.id));\
-			    dep->second.completions.pop_back();\
-		    }\
+				BOOST_BEGIN_MEMORY_TRANSACTION(p->opslock) \
+				{ \
+					auto dep(p->ops.find(precondition.id)); \
+					dep->second->completions.pop_back(); \
+				} \
+				BOOST_END_MEMORY_TRANSACTION(p->opslock) \
+			}\
 	    });\
 	    if(!done)\
 	    {\
@@ -1928,8 +2030,7 @@ template<class F, class... Args> async_io_op async_file_io_dispatcher_base::chai
 			{\
 				/* It should never happen that precondition.id is valid but removed from extant ops*/\
 				/* which indicates it completed and yet h remains invalid*/\
-				assert(0);\
-				std::terminate();\
+				BOOST_AFIO_THROW_FATAL(std::runtime_error("Precondition was not in list of extant ops, yet its future is invalid. This should never happen for any real op, so it's probably memory corruption.")); \
 			}\
 			if(!!(flags & async_op_flags::ImmediateCompletion))\
 			{\
@@ -1938,19 +2039,6 @@ template<class F, class... Args> async_io_op async_file_io_dispatcher_base::chai
 			else\
 				*ret.h=p->pool->enqueue(std::bind(boundf.second, h, nullptr)).share();\
 		}\
-	    auto opsit=p->ops.insert(std::move(std::make_pair(thisid, std::move(detail::async_file_io_dispatcher_op((detail::OpType) optype, flags, ret.h, boundf)))));\
-	    assert(opsit.second);\
-	    BOOST_AFIO_DEBUG_PRINT("I %u < %u (%s)\n", (unsigned) thisid, (unsigned) precondition.id, detail::optypes[static_cast<int>(optype)]);\
-	    auto unopsit=boost::afio::detail::Undoer([this, opsit, thisid](){\
-		    p->ops.erase(opsit.first);\
-		    BOOST_AFIO_DEBUG_PRINT("E R %u\n", (unsigned) thisid);\
-	    });\
-	    if(!!(flags & async_op_flags::DetachedFuture))\
-	    {\
-		    opsit.first->second.detached_promise.reset(new promise<std::shared_ptr<async_io_handle>>);\
-		    if(!done)\
-			    *opsit.first->second.h=opsit.first->second.detached_promise->get_future();\
-	    }\
 	    unopsit.dismiss();\
 	    undep.dismiss();\
 	    return ret;\
@@ -1971,7 +2059,6 @@ template<class F, class T> std::vector<async_io_op> async_file_io_dispatcher_bas
 	assert(preconditions.size()==container.size());
 	if(preconditions.size()!=container.size())
 		BOOST_AFIO_THROW(std::runtime_error("preconditions size does not match size of ops data"));
-	BOOST_AFIO_LOCK_GUARD<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
 	exception_ptr he;
 	detail::immediate_async_ops immediates;
 	auto precondition_it=preconditions.cbegin();
@@ -1986,7 +2073,6 @@ template<class F, class T> std::vector<async_io_op> async_file_io_dispatcher_bas
 	std::vector<async_io_op> ret;
 	ret.reserve(container.size());
 	async_io_op precondition;
-	BOOST_AFIO_LOCK_GUARD<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
 	exception_ptr he;
 	detail::immediate_async_ops immediates;
 	BOOST_FOREACH(auto &i, container)
@@ -2000,7 +2086,6 @@ template<class F> std::vector<async_io_op> async_file_io_dispatcher_base::chain_
 {
 	std::vector<async_io_op> ret;
 	ret.reserve(container.size());
-	BOOST_AFIO_LOCK_GUARD<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
 	exception_ptr he;
 	detail::immediate_async_ops immediates;
 	BOOST_FOREACH(auto &i, container)
@@ -2014,7 +2099,6 @@ template<class F> std::vector<async_io_op> async_file_io_dispatcher_base::chain_
 {
 	std::vector<async_io_op> ret;
 	ret.reserve(container.size());
-	BOOST_AFIO_LOCK_GUARD<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
 	exception_ptr he;
 	detail::immediate_async_ops immediates;
 	BOOST_FOREACH(auto &i, container)
@@ -2028,7 +2112,6 @@ template<class F, bool iswrite> std::vector<async_io_op> async_file_io_dispatche
 {
 	std::vector<async_io_op> ret;
 	ret.reserve(container.size());
-	BOOST_AFIO_LOCK_GUARD<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
 	exception_ptr he;
 	detail::immediate_async_ops immediates;
 	BOOST_FOREACH(auto &i, container)
@@ -2045,7 +2128,6 @@ template<class F> std::pair<std::vector<future<std::pair<std::vector<directory_e
 	std::vector<future<retitemtype>> retfutures;
 	ret.reserve(container.size());
 	retfutures.reserve(container.size());
-	BOOST_AFIO_LOCK_GUARD<detail::async_file_io_dispatcher_base_p::opslock_t> opslockh(p->opslock);
 	exception_ptr he;
 	detail::immediate_async_ops immediates;
 	BOOST_FOREACH(auto &i, container)
@@ -2121,7 +2203,7 @@ template<> async_file_io_dispatcher_base::completion_returntype async_file_io_di
 	}
 	// Am I being called because my precondition threw an exception so we're actually currently inside an exception catch?
 	// If so then duplicate the same exception throw
-	if(e && *e)
+	if(*e)
 		rethrow_exception(*e);
 	else
 		return std::make_pair(true, h);
@@ -2418,9 +2500,12 @@ namespace detail {
 					p->byteswritten+=bytes_transferred;
 				else
 					p->bytesread+=bytes_transferred;
-				if(!(bytes_to_transfer->second-=bytes_this_chunk)) // bytes_this_chunk may not equal bytes_transferred if final 4Kb chunk of direct file
+				size_t togo=(bytes_to_transfer->second-=bytes_this_chunk);
+				if(!togo) // bytes_this_chunk may not equal bytes_transferred if final 4Kb chunk of direct file
 					complete_async_op(id, h);
-				BOOST_AFIO_DEBUG_PRINT("H %u e=%u b=%u\n", (unsigned) id, (unsigned) ec.value(), (unsigned) bytes_transferred);
+				if(togo>((size_t)1<<(8*sizeof(size_t)-1)))
+					BOOST_AFIO_THROW_FATAL(std::runtime_error("IOCP returned more bytes than we asked for. This is probably memory corruption."));
+				BOOST_AFIO_DEBUG_PRINT("H %u e=%u togo=%u bt=%u bc=%u\n", (unsigned) id, (unsigned) ec.value(), (unsigned) togo, (unsigned) bytes_transferred, (unsigned) bytes_this_chunk);
 			}
 			//std::cout << "id=" << id << " total=" << bytes_to_transfer->second << " this=" << bytes_transferred << std::endl;
 		}

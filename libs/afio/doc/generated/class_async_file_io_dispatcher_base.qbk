@@ -59,7 +59,7 @@ This is a reference counted instance with platform-specific implementation optio
 
 
 ]]
-[[``size_t count()``
+[[``size_t fd_count()``
 
 ] [Returns the number of open items in this dispatcher. ] [
 

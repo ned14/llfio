@@ -211,7 +211,7 @@ static void _1000_open_write_close_deletes(std::shared_ptr<boost::afio::async_fi
                 callables.push_back(std::bind(callable, &callcount, 78));
         auto manycallbacks(dispatcher->call(manydeletedfiles, std::move(callables)));
         auto dispatched=chrono::high_resolution_clock::now();
-        cout << "There are now " << dec << dispatcher->count() << " handles open with a queue depth of " << dispatcher->wait_queue_depth() << endl;
+        cout << "There are now " << dec << dispatcher->fd_count() << " handles open with a queue depth of " << dispatcher->wait_queue_depth() << endl;
 
         // Wait for all files to open
         when_all(manyopenfiles.begin(), manyopenfiles.end()).wait();
@@ -485,7 +485,7 @@ static void evil_random_io(std::shared_ptr<boost::afio::async_file_io_dispatcher
                             manywrittenfiles[n]=dispatcher->write(op.req);
                     }
                     else
-                            manywrittenfiles[n]=dispatcher->completion(dispatcher->read(op.req), std::make_pair(boost::afio::async_op_flags::ImmediateCompletion, std::bind(checkHash, ref(op), towriteptrs[n], placeholders::_1, placeholders::_2)));
+						manywrittenfiles[n]=dispatcher->completion(dispatcher->read(op.req), std::pair<boost::afio::async_op_flags, std::function<boost::afio::async_file_io_dispatcher_base::completion_t>>(boost::afio::async_op_flags::ImmediateCompletion, std::bind(checkHash, ref(op), towriteptrs[n], placeholders::_1, placeholders::_2)));
             }
             // After replay, read the entire file into memory
             manywrittenfiles[n]=dispatcher->read(boost::afio::async_data_op_req<char>(manywrittenfiles[n], towriteptrs[n], towritesizes[n], 0));
@@ -494,7 +494,7 @@ static void evil_random_io(std::shared_ptr<boost::afio::async_file_io_dispatcher
     // Close each of those files
     auto manyclosedfiles(dispatcher->close(manywrittenfiles));
     auto dispatched=chrono::high_resolution_clock::now();
-    cout << "There are now " << dec << dispatcher->count() << " handles open with a queue depth of " << dispatcher->wait_queue_depth() << endl;
+    cout << "There are now " << dec << dispatcher->fd_count() << " handles open with a queue depth of " << dispatcher->wait_queue_depth() << endl;
 
     // Wait for all files to open
     when_all(manyopenfiles.begin(), manyopenfiles.end()).wait();

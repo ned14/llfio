@@ -11,11 +11,11 @@ project boost/afio
       <threading>multi                          #<-- do we need this?
       <link>shared:<define>BOOST_AFIO_DYN_LINK=1  
       <link>shared:<define>BOOST_AFIO_SOURCE=1
+      <link>static:<define>BOOST_AFIO_SOURCE=1
       
     : usage-requirements 
       <include>. 
 
-      <link>shared:<define>BOOST_AFIO_SOURCE=1
     : source-location ../src
 
 ;

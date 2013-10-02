@@ -32,7 +32,7 @@ BOOST_AFIO_AUTO_TEST_CASE(async_io_lstat_works, "Tests that async i/o lstat() wo
 		}
 
 		// Let the handles close before deleting
-		while(dispatcher->count()) boost::this_thread::yield();
+		while(dispatcher->fd_count()) boost::this_thread::yield();
 		auto rmlink(dispatcher->rmsymlink(async_path_op_req("testdir/linktodir")));
 		auto rmfile(dispatcher->rmfile(async_path_op_req(rmlink, "testdir/dir/file")));
 		auto rmdir(dispatcher->rmdir(async_path_op_req(rmfile, "testdir/dir")));

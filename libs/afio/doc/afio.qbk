@@ -8,7 +8,7 @@
 
 [library Boost.AFIO
     [quickbook 1.7]
-    [version 1.0]
+    [version 1.1]
     [id afio]
     [category afio]
     [authors [Douglas, Niall], [Kirth, Paul]]
@@ -62,10 +62,13 @@
 [import ../test/examples/readwrite_example_traditional.cpp]
 
 [section:introduction Introduction]
-__boost_afio__ is a linear scalable, batch, chainable, asynchronous closure execution engine extending __boost_asio__
+__boost_afio__ is a linear scalable, batch, chainable, asynchronous closure execution engine
+with an almost wait free implementation[footnote It is wait free if your CPU supports memory
+transactions, apart from when the memory allocator asks the kernel for more memory.] extending __boost_asio__
 and __boost_thread__ specialised as a portable asynchronous file i/o implementation
 library. Implementation of this first version has been kept as simple as possible (< 1000 active
-LOC) at the cost of some performance. This library was brought to __boost__ as part of Google
+LOC) at the cost of some performance, though with a good compiler you can expect 25-50% of the
+performance of using raw Boost.ASIO. This library was brought to __boost__ as part of Google
 Summer of Code 2013.
 
 Note that __boost_afio__ was originally written purely in C++11 and backported later to older compilers.

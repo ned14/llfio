@@ -26,11 +26,19 @@ File Created: Mar 2013
 // Define this to serialise thread job dispatch in order to work around a race condition in ASIO on Win32
 #ifdef WIN32
 #ifndef BOOST_AFIO_WORK_AROUND_LOST_ASIO_WRITE_COMPLETION_WAKEUPS
-//#define BOOST_AFIO_WORK_AROUND_LOST_ASIO_WRITE_COMPLETION_WAKEUPS 1
+//#define BOOST_AFIO_WORK_AROUND_LOST_ASIO_WRITE_COMPLETION_WAKEUPS 1 // ASIO is now fixed
 #endif
 #endif
 
 #include "config.hpp"
+//#define BOOST_THREAD_VERSION 4
+//#define BOOST_THREAD_PROVIDES_VARIADIC_THREAD
+//#define BOOST_THREAD_DONT_PROVIDE_FUTURE
+//#define BOOST_THREAD_PROVIDES_SIGNATURE_PACKAGED_TASK
+#include "boost/asio.hpp"
+#include "boost/foreach.hpp"
+#include "detail/Preprocessor_variadic.hpp"
+#include "boost/detail/scoped_enum_emulation.hpp"
 #include "detail/Utility.hpp"
 #include <type_traits>
 #ifndef BOOST_NO_CXX11_HDR_INITIALIZER_LIST
@@ -38,150 +46,10 @@ File Created: Mar 2013
 #endif
 #include <exception>
 #include <algorithm> // Boost.ASIO needs std::min and std::max
-#include <cstdint>
-
-//#define BOOST_THREAD_VERSION 4
-//#define BOOST_THREAD_PROVIDES_VARIADIC_THREAD
-//#define BOOST_THREAD_DONT_PROVIDE_FUTURE
-//#define BOOST_THREAD_PROVIDES_SIGNATURE_PACKAGED_TASK
-
-
-#if defined(BOOST_MSVC) && BOOST_MSVC < 1700 // Dinkumware without <atomic>
-#include "boost/atomic.hpp"
-#include "boost/chrono.hpp"
-#define BOOST_AFIO_USE_BOOST_ATOMIC
-#define BOOST_AFIO_USE_BOOST_CHRONO
-#else
-#include <chrono>
-#include <thread>
-#include <atomic>
-#include <mutex>
-#endif
-#if (defined(__MINGW32__) && !defined(__MINGW64_VERSION_MAJOR)) // Mingw32 not Mingw-w64
-// Mingw32's std::atomic isn't threadsafe :)
-#include "boost/atomic.hpp"
-#define BOOST_AFIO_USE_BOOST_ATOMIC
-#endif
-
-#include "boost/asio.hpp"
-#include "boost/thread/thread.hpp"
-#include "boost/thread/future.hpp"
-#include "boost/foreach.hpp"
-#include "detail/Preprocessor_variadic.hpp"
-#include <boost/detail/scoped_enum_emulation.hpp>
 
 #if BOOST_VERSION<105500
 #error Boosts before v1.55 are missing boost::future<>::get_exception_ptr() critical for good AFIO performance. Get a newer Boost!
 #endif
-
-// Map in C++11 stuff if available
-#if (defined(__GLIBCXX__) && __GLIBCXX__<=20120920 /* <= GCC 4.7 */) || (defined(BOOST_MSVC) && BOOST_MSVC < 1700 /* <= VS2010 */)
-#include "boost/exception_ptr.hpp"
-#include "boost/thread/recursive_mutex.hpp"
-namespace boost { namespace afio {
-typedef boost::thread thread;
-inline boost::thread::id get_this_thread_id() { return boost::this_thread::get_id(); }
-// Both VS2010 and Mingw32 need this, but not Mingw-w64
-#if (defined(BOOST_MSVC) && BOOST_MSVC < 1700 /* <= VS2010 */) || (defined(__MINGW32__) && !defined(__MINGW64_VERSION_MAJOR))
-namespace detail { struct vs2010_lack_of_decent_current_exception_support_hack_t { }; BOOST_AFIO_DECL boost::exception_ptr &vs2010_lack_of_decent_current_exception_support_hack(); }
-inline boost::exception_ptr current_exception() { boost::exception_ptr ret=boost::current_exception(); return (ret==detail::vs2010_lack_of_decent_current_exception_support_hack()) ? boost::exception_ptr() : ret; }
-#define BOOST_AFIO_NEED_CURRENT_EXCEPTION_HACK
-#else
-inline boost::exception_ptr current_exception() { return boost::current_exception(); }
-#endif
-#define BOOST_AFIO_THROW(x) boost::throw_exception(boost::enable_current_exception(x))
-#define BOOST_AFIO_RETHROW throw
-typedef boost::recursive_mutex recursive_mutex;
-} }
-#else
-namespace boost { namespace afio {
-typedef std::thread thread;
-inline std::thread::id get_this_thread_id() { return std::this_thread::get_id(); }
-inline std::exception_ptr current_exception() { return std::current_exception(); }
-#define BOOST_AFIO_THROW(x) throw x
-#define BOOST_AFIO_RETHROW throw
-typedef std::recursive_mutex recursive_mutex;
-} }
-#endif
-namespace boost { namespace afio { namespace detail {
-#ifdef _MSC_VER
-static inline void set_threadname(const char *threadName)
-{
-	const DWORD MS_VC_EXCEPTION=0x406D1388;
-
-#pragma pack(push,8)
-	typedef struct tagTHREADNAME_INFO
-	{
-	   DWORD dwType; // Must be 0x1000.
-	   LPCSTR szName; // Pointer to name (in user addr space).
-	   DWORD dwThreadID; // Thread ID (-1=caller thread).
-	   DWORD dwFlags; // Reserved for future use, must be zero.
-	} THREADNAME_INFO;
-#pragma pack(pop)
-   THREADNAME_INFO info;
-   info.dwType = 0x1000;
-   info.szName = threadName;
-   info.dwThreadID = -1;
-   info.dwFlags = 0;
-
-   __try
-   {
-      RaiseException( MS_VC_EXCEPTION, 0, sizeof(info)/sizeof(ULONG_PTR), (ULONG_PTR*)&info );
-   }
-   __except(EXCEPTION_EXECUTE_HANDLER)
-   {
-   }
-}
-#elif defined(__linux__)
-static inline void set_threadname(const char *threadName)
-{
-	pthread_setname_np(pthread_self(), threadName);
-}
-#else
-static inline void set_threadname(const char *threadName)
-{
-}
-#endif
-} } }
-
-// Need some portable way of throwing a really absolutely definitely fatal exception
-// If we guaranteed had noexcept, this would be easy, but for compilers without noexcept
-// we'll bounce through extern "C" as well just to be sure
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable: 4297) // function assumed not to throw an exception but does __declspec(nothrow) or throw() was specified on the function
-#endif
-#ifdef BOOST_AFIO_COMPILING_FOR_GCOV
-#define BOOST_AFIO_THROW_FATAL(x) std::terminate()
-#else
-namespace boost { namespace afio { namespace detail {
-	template<class T> inline void do_throw_fatal_exception(const T &v) BOOST_NOEXCEPT_OR_NOTHROW
-	{
-		throw v;
-	}
-	extern "C" inline void boost_afio_do_throw_fatal_exception(std::function<void()> impl) BOOST_NOEXCEPT_OR_NOTHROW { impl(); }
-	template<class T> inline void throw_fatal_exception(const T &v) BOOST_NOEXCEPT_OR_NOTHROW
-	{
-		// In case the extern "C" fails to terminate, trap and terminate here
-		try
-		{
-			std::function<void()> doer=std::bind(&do_throw_fatal_exception<T>, std::ref(v));
-			boost_afio_do_throw_fatal_exception(doer);
-		}
-		catch(...)
-		{
-			std::terminate(); // Sadly won't produce much of a useful error message
-		}
-	}
-} } }
-#ifndef BOOST_AFIO_THROW_FATAL
-#define BOOST_AFIO_THROW_FATAL(x) boost::afio::detail::throw_fatal_exception(x)
-#endif
-#endif
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
-
 
 /*! \brief Validate inputs at the point of instantiation.
 
@@ -219,225 +87,6 @@ namespace afio {
 // This isn't consistent on MSVC so hard code it
 typedef unsigned long long off_t;
 
-#define BOOST_AFIO_FORWARD_STL_IMPL(M, B) \
-template<class T> class M : public B<T> \
-{ \
-public: \
-	M() { } \
-	M(const B<T> &o) : B<T>(o) { } \
-	M(B<T> &&o) BOOST_NOEXCEPT_OR_NOTHROW : B<T>(std::move(o)) { } \
-	M(const M &o) : B<T>(o) { } \
-	M(M &&o) BOOST_NOEXCEPT_OR_NOTHROW : B<T>(std::move(o)) { } \
-	M &operator=(const B<T> &o) { static_cast<B<T> &&>(*this)=o; return *this; } \
-	M &operator=(B<T> &&o) BOOST_NOEXCEPT_OR_NOTHROW { static_cast<B<T> &&>(*this)=std::move(o); return *this; } \
-	M &operator=(const M &o) { static_cast<B<T> &&>(*this)=o; return *this; } \
-	M &operator=(M &&o) BOOST_NOEXCEPT_OR_NOTHROW { static_cast<B<T> &&>(*this)=std::move(o); return *this; } \
-};
-#define BOOST_AFIO_FORWARD_STL_IMPL_NC(M, B) \
-template<class T> class M : public B<T> \
-{ \
-public: \
-	M() { } \
-	M(B<T> &&o) BOOST_NOEXCEPT_OR_NOTHROW : B<T>(std::move(o)) { } \
-	M(M &&o) BOOST_NOEXCEPT_OR_NOTHROW : B<T>(std::move(o)) { } \
-	M &operator=(B<T> &&o) BOOST_NOEXCEPT_OR_NOTHROW { static_cast<B<T> &&>(*this)=std::move(o); return *this; } \
-	M &operator=(M &&o) BOOST_NOEXCEPT_OR_NOTHROW { static_cast<B<T> &&>(*this)=std::move(o); return *this; } \
-};
-/*! \class future
-\brief For now, this is boost's future. Will be replaced when C++'s future catches up with boost's
-
-when_all() and when_any() definitions borrowed from http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2012/n3428.pdf
-*/
-#if BOOST_THREAD_VERSION >=4
-BOOST_AFIO_FORWARD_STL_IMPL_NC(future, boost::future)
-#else
-BOOST_AFIO_FORWARD_STL_IMPL_NC(future, boost::unique_future)
-#endif
-/*! \class shared_future
-\brief For now, this is boost's shared_future. Will be replaced when C++'s shared_future catches up with boost's
-
-when_all() and when_any() definitions borrowed from http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2012/n3428.pdf
-*/
-BOOST_AFIO_FORWARD_STL_IMPL(shared_future, boost::shared_future)
-using boost::future_status;
-/*! \class promise
-\brief For now, this is boost's promise. Will be replaced when C++'s promise catches up with boost's
-*/
-BOOST_AFIO_FORWARD_STL_IMPL(promise, boost::promise)
-/*! \brief For now, this is boost's exception_ptr. Will be replaced when C++'s exception_ptr catches up with boost's
-*/
-typedef boost::exception_ptr exception_ptr;
-template<class T> inline exception_ptr make_exception_ptr(const T &e) { return boost::copy_exception(e); }
-using boost::rethrow_exception;
-template<typename T> inline exception_ptr get_exception_ptr(future<T> &f)
-{
-#if 1
-	// Thanks to Vicente for adding this to Boost.Thread
-	return f.get_exception_ptr();
-#else
-	// This seems excessive but I don't see any other legal way to extract the exception ...
-	bool success=false;
-	try
-	{
-		f.get();
-		success=true;
-	}
-	catch(...)
-	{
-		exception_ptr e(afio::make_exception_ptr(afio::current_exception()));
-		assert(e);
-		return e;
-	}
-	return exception_ptr();
-#endif
-}
-template<typename T> inline exception_ptr get_exception_ptr(shared_future<T> &f)
-{
-#if 1
-	// Thanks to Vicente for adding this to Boost.Thread
-	return f.get_exception_ptr();
-#else
-	// This seems excessive but I don't see any other legal way to extract the exception ...
-	bool success=false;
-	try
-	{
-		f.get();
-		success=true;
-	}
-	catch(...)
-	{
-		exception_ptr e(afio::make_exception_ptr(afio::current_exception()));
-		assert(e);
-		return e;
-	}
-	return exception_ptr();
-#endif
-}
-/*! \brief For now, this is an emulation of std::packaged_task based on boost's packaged_task.
-We have to drop the Args... support because it segfaults MSVC Nov 2012 CTP.
-*/
-template<class> class packaged_task;
-template<class R> class packaged_task<R()>
-#if BOOST_THREAD_VERSION >=4
-: public boost::packaged_task<R()>
-{
-	typedef boost::packaged_task<R()> Base;
-#else
-: public boost::packaged_task<R>
-	{
-		typedef boost::packaged_task<R> Base;
-#endif
-#ifdef BOOST_NO_CXX11_DELETED_FUNCTIONS
-	packaged_task(const packaged_task &) /* = delete */;
-#else
-	packaged_task(const packaged_task &) = delete;
-#endif
-public:
-	packaged_task() { }
-	packaged_task(Base &&o) BOOST_NOEXCEPT_OR_NOTHROW : Base(std::move(o)) { }
-	packaged_task(packaged_task &&o) BOOST_NOEXCEPT_OR_NOTHROW : Base(static_cast<Base &&>(o)) { }
-	template<class T> packaged_task(T &&o) BOOST_NOEXCEPT_OR_NOTHROW : Base(std::forward<T>(o)) { }
-	packaged_task &operator=(Base &&o) BOOST_NOEXCEPT_OR_NOTHROW { static_cast<Base &&>(*this)=std::move(o); return *this; }
-	packaged_task &operator=(packaged_task &&o) BOOST_NOEXCEPT_OR_NOTHROW { static_cast<Base &&>(*this)=std::move(o); return *this; }
-};
-
-// Map in an atomic implementation
-template <class T> 
-class atomic  
-#ifdef BOOST_AFIO_USE_BOOST_ATOMIC
-	: public boost::atomic<T>
-{
-	typedef boost::atomic<T> Base;
-#else
-	: public std::atomic<T>
-{
-	typedef std::atomic<T> Base;
-#endif
-
-public:
-	atomic(): Base() {}
-	BOOST_CONSTEXPR atomic(T v) BOOST_NOEXCEPT : Base(std::forward<T>(v)) {}
-	
-#ifdef BOOST_NO_CXX11_DELETED_FUNCTIONS
-//private:
-    atomic(const Base &) /* =delete */ ;
-#else
-    atomic(const Base &) = delete;
-#endif
-};//end boost::afio::atomic
-
-// Map in a chrono implementation
-namespace chrono { namespace detail {
-	template<typename T> struct ratioToBase { typedef T type; };
-} }
-template <std::intmax_t N, std::intmax_t D = 1> class ratio
-#ifdef BOOST_AFIO_USE_BOOST_CHRONO
-	: public boost::ratio<N, D>
-{
-	typedef boost::ratio<N, D> Base;
-#else
-	: public std::ratio<N, D>
-{
-	typedef std::ratio<N, D> Base;
-#endif
-	template<typename T> friend struct chrono::detail::ratioToBase;
-public:
-	static BOOST_CONSTEXPR_OR_CONST std::intmax_t num=N;
-	static BOOST_CONSTEXPR_OR_CONST std::intmax_t den=D;
-};
-namespace chrono {
-	namespace detail
-	{
-		template<std::intmax_t N, std::intmax_t D> struct ratioToBase<ratio<N, D>> { typedef typename ratio<N, D>::Base type; };
-		template<typename T> struct durationToBase { typedef T type; };
-	}
-	template<class Rep, class Period = ratio<1> > class duration
-#ifdef BOOST_AFIO_USE_BOOST_CHRONO
-		: public boost::chrono::duration<Rep, typename detail::ratioToBase<Period>::type>
-	{
-		typedef boost::chrono::duration<Rep, typename detail::ratioToBase<Period>::type> Base;
-#else
-		: public std::chrono::duration<Rep, typename detail::ratioToBase<Period>::type>
-	{
-		typedef std::chrono::duration<Rep, typename detail::ratioToBase<Period>::type> Base;
-#endif
-		template<typename T> friend struct detail::durationToBase;
-	public:
-		BOOST_CONSTEXPR duration() : Base() { }
-		duration(const Base &o) : Base(o) { }
-		template<class Rep2> BOOST_CONSTEXPR explicit duration(const Rep2 &r) : Base(r) { }
-#ifdef BOOST_AFIO_USE_BOOST_CHRONO
-		template<class Rep2, class Period2> BOOST_CONSTEXPR duration(const boost::chrono::duration<Rep2,Period2> &d) : Base(d) { }
-#else
-		template<class Rep2, class Period2> BOOST_CONSTEXPR duration(const std::chrono::duration<Rep2,Period2> &d) : Base(d) { }
-#endif
-		// This fellow needs to be convertible to boost::chrono::duration too.
-		boost::chrono::duration<Rep, boost::ratio<Period::num, Period::den>> toBoost() const { return boost::chrono::duration<Rep, boost::ratio<Period::num, Period::den>>(Base::count()); }
-	};
-	namespace detail
-	{
-		template<class Rep, class Period> struct durationToBase<duration<Rep, Period>> { typedef typename duration<Rep, Period>::Base type; };
-	}
-#ifdef BOOST_AFIO_USE_BOOST_CHRONO
-	using boost::chrono::system_clock;
-	using boost::chrono::high_resolution_clock;
-	using boost::chrono::seconds;
-	using boost::chrono::milliseconds;
-	template <class ToDuration, class Rep, class Period> BOOST_CONSTEXPR ToDuration duration_cast(const boost::chrono::duration<Rep,Period> &d)
-	{
-		return boost::chrono::duration_cast<typename detail::durationToBase<ToDuration>::type, Rep, typename detail::ratioToBase<Period>::type>(d);
-	}
-#else
-	using std::chrono::system_clock;
-	using std::chrono::high_resolution_clock;
-	using std::chrono::seconds;
-	using std::chrono::milliseconds;
-	template <class ToDuration, class Rep, class Period> BOOST_CONSTEXPR ToDuration duration_cast(const std::chrono::duration<Rep, Period> &d)
-	{
-		return std::chrono::duration_cast<typename detail::durationToBase<ToDuration>::type, Rep, Period>(d);
-	}
-#endif
-}
 
 /*! \class thread_source
 \brief Abstract base class for a source of thread workers
@@ -1106,7 +755,7 @@ public:
 	//! Returns the current wait queue depth of this dispatcher
 	size_t wait_queue_depth() const;
 	//! Returns the number of open items in this dispatcher
-	size_t count() const;
+	size_t fd_count() const;
 	/*! \brief Returns an op ref for a given \b currently \b scheduled op id, throwing a fatal exception if id not scheduled at the point of call.
 	Can be used to retrieve exception state from some op id, or one's own shared future.
 	\return An async_io_op with the same shared future as all op refs with this id.
@@ -1118,6 +767,10 @@ public:
 	typedef std::pair<bool, std::shared_ptr<async_io_handle>> completion_returntype;
     //! The type of a completion handler \ingroup async_file_io_dispatcher_base__completion
 	typedef completion_returntype completion_t(size_t, std::shared_ptr<async_io_handle>, exception_ptr *);
+#if defined(BOOST_AFIO_SOURCE) // Only really used for benchmarking
+	std::vector<async_io_op> completion(const std::vector<async_io_op> &ops, const std::vector<std::pair<async_op_flags, async_file_io_dispatcher_base::completion_t *>> &callbacks);
+	inline async_io_op completion(const async_io_op &req, const std::pair<async_op_flags, async_file_io_dispatcher_base::completion_t *> &callback);
+#endif
 	/*! \brief Schedule a batch of asynchronous invocations of the specified functions when their supplied operations complete.
     \return A batch of op handles
     \param ops A batch of precondition op handles.
@@ -1617,7 +1270,8 @@ public:
         
     void complete_async_op(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr e=exception_ptr());
 protected:
-	completion_returntype invoke_user_completion(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr *e, std::function<completion_t> callback);
+	completion_returntype invoke_user_completion_fast(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr *e, completion_t *callback);
+	completion_returntype invoke_user_completion_slow(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr *e, std::function<completion_t> callback);
 	template<class F, class T> std::vector<async_io_op> chain_async_ops(int optype, const std::vector<async_io_op> &preconditions, const std::vector<T> &container, async_op_flags flags, completion_returntype (F::*f)(size_t, std::shared_ptr<async_io_handle>, exception_ptr *, T));
 	template<class F, class T> std::vector<async_io_op> chain_async_ops(int optype, const std::vector<T> &container, async_op_flags flags, completion_returntype(F::*f)(size_t, std::shared_ptr<async_io_handle>, exception_ptr *, T));
 	template<class F> std::vector<async_io_op> chain_async_ops(int optype, const std::vector<async_io_op> &container, async_op_flags flags, completion_returntype(F::*f)(size_t, std::shared_ptr<async_io_handle>, exception_ptr *, async_io_op));
@@ -1759,41 +1413,34 @@ namespace detail
 		promise<std::vector<std::shared_ptr<async_io_handle>>> done;
 		when_all_count_completed_state(std::vector<async_io_op>::iterator first, std::vector<async_io_op>::iterator last) : inputs(first, last), togo(inputs.size()), out(inputs.size()) { }
 	};
-	inline async_file_io_dispatcher_base::completion_returntype when_all_count_completed_nothrow(size_t, std::shared_ptr<async_io_handle> h, std::shared_ptr<detail::when_all_count_completed_state> state, size_t idx)
+	inline async_file_io_dispatcher_base::completion_returntype when_all_count_completed_nothrow(size_t, std::shared_ptr<async_io_handle> h, exception_ptr *e, std::shared_ptr<detail::when_all_count_completed_state> state, size_t idx)
 	{
 		state->out[idx]=h; // This might look thread unsafe, but each idx is unique
 		if(!--state->togo)
 			state->done.set_value(state->out);
 		return std::make_pair(true, h);
 	}
-	inline async_file_io_dispatcher_base::completion_returntype when_all_count_completed(size_t, std::shared_ptr<async_io_handle> h, std::shared_ptr<detail::when_all_count_completed_state> state, size_t idx)
+	inline async_file_io_dispatcher_base::completion_returntype when_all_count_completed(size_t, std::shared_ptr<async_io_handle> h, exception_ptr *e, std::shared_ptr<detail::when_all_count_completed_state> state, size_t idx)
 	{
 		state->out[idx]=h; // This might look thread unsafe, but each idx is unique
 		if(!--state->togo)
 		{
-			// If the last completion is throwing an exception, throw that, else scan inputs for exception states
-			exception_ptr this_e(afio::make_exception_ptr(afio::current_exception()));
-			if(this_e)
-				state->done.set_exception(this_e);
-			else
+			bool done=false;
+			// Retrieve the result of each input, waiting for it if it is between decrementing the
+			// atomic and signalling its future.
+			BOOST_FOREACH(auto &i, state->inputs)
 			{
-				bool done=false;
-				// Retrieve the result of each input, waiting for it if it is between decrementing the
-				// atomic and signalling its future.
-				BOOST_FOREACH(auto &i, state->inputs)
+				shared_future<std::shared_ptr<async_io_handle>> &future=*i.h;
+				auto e(get_exception_ptr(future));
+				if(e)
 				{
-					shared_future<std::shared_ptr<async_io_handle>> &future=*i.h;
-					auto e(get_exception_ptr(future));
-					if(e)
-					{
-						state->done.set_exception(e);
-						done=true;
-						break;
-					}
+					state->done.set_exception(e);
+					done=true;
+					break;
 				}
-				if(!done)
-					state->done.set_value(state->out);
 			}
+			if(!done)
+				state->done.set_value(state->out);
 		}
 		return std::make_pair(true, h);
 	}
@@ -1838,7 +1485,7 @@ inline future<std::vector<std::shared_ptr<async_io_handle>>> when_all(std::nothr
 	size_t idx=0;
 	BOOST_FOREACH(auto &i, inputs)
     {	
-        callbacks.push_back(std::make_pair(async_op_flags::ImmediateCompletion, std::bind(&detail::when_all_count_completed_nothrow, std::placeholders::_1, std::placeholders::_2, state, idx++)));
+		callbacks.push_back(std::make_pair(async_op_flags::ImmediateCompletion/*safe if nothrow*/, std::bind(&detail::when_all_count_completed_nothrow, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, state, idx++)));
     }
 	inputs.front().parent->completion(inputs, callbacks);
 	return state->done.get_future();
@@ -1884,7 +1531,7 @@ inline future<std::vector<std::shared_ptr<async_io_handle>>> when_all(std::vecto
 	size_t idx=0;
 	BOOST_FOREACH(auto &i, inputs)
     {	
-        callbacks.push_back(std::make_pair(async_op_flags::ImmediateCompletion, std::bind(&detail::when_all_count_completed, std::placeholders::_1, std::placeholders::_2, state, idx++)));
+		callbacks.push_back(std::make_pair(async_op_flags::None/*can't be immediate as may try to retrieve exception state of own precondition*/, std::bind(&detail::when_all_count_completed, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, state, idx++)));
     }
 	inputs.front().parent->completion(inputs, callbacks);
 	return state->done.get_future();
@@ -2444,6 +2091,17 @@ namespace detail {
 	};
 }
 
+#if defined(BOOST_AFIO_SOURCE) // Only really used for benchmarking
+inline async_io_op async_file_io_dispatcher_base::completion(const async_io_op &req, const std::pair<async_op_flags, async_file_io_dispatcher_base::completion_t *> &callback)
+{
+	std::vector<async_io_op> r;
+	std::vector<std::pair<async_op_flags, async_file_io_dispatcher_base::completion_t *>> i;
+	r.reserve(1); i.reserve(1);
+	r.push_back(req);
+	i.push_back(callback);
+	return std::move(completion(r, i).front());
+}
+#endif
 inline async_io_op async_file_io_dispatcher_base::completion(const async_io_op &req, const std::pair<async_op_flags, std::function<async_file_io_dispatcher_base::completion_t>> &callback)
 {
 	std::vector<async_io_op> r;

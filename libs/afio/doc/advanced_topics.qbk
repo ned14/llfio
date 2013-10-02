@@ -89,12 +89,12 @@ as an immediate. It will always be null (i.e. point to nothing) if the handler w
 called as an immediate. Just because `e` points to a valid `exception_ptr` does not
 necessarily mean that exception point is itself not null.
 
-And finally, as much as immediate completions are vastly more efficient than normal
+And finally, as much as immediate completions are more efficient than normal
 completions, and you can achieve far higher throughputs with them especially as they
 involve almost no overhead to invoke, you should bear in
 mind the following substantial disadvantages of immediate completions:
 
-* Immediate completions must NEVER block, not EVER. This is because they are called while
+* [*v1.0 ONLY]: Immediate completions must NEVER block, not EVER. This is because they are called while
 the oplock is held[footnote It is expected that in the near future the op lock will NOT
 be held during immediate completions so AFIO can remove the need for recursive mutexes,
 something which is currently a major performance problem.], and therefore no other op may be added, enqueued or [*completed]

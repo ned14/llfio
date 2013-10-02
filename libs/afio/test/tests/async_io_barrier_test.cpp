@@ -13,7 +13,7 @@ BOOST_AFIO_AUTO_TEST_CASE(async_io_barrier, "Tests that the async i/o barrier wo
     vector<pair<size_t, int>> groups;
     // Generate 500,000 sorted random numbers between 0-10000
 	static const size_t numbers=
-#ifdef BOOST_AFIO_RUNNING_IN_CI
+#if defined(BOOST_AFIO_RUNNING_IN_CI) || defined(BOOST_AFIO_COMPILING_FOR_GCOV)
 		1600
 #elif defined(BOOST_MSVC) && BOOST_MSVC < 1700 /* <= VS2010 */ && (defined(DEBUG) || defined(_DEBUG))
 		16000
@@ -88,7 +88,7 @@ BOOST_AFIO_AUTO_TEST_CASE(async_io_barrier, "Tests that the async i/o barrier wo
         opscount += run.first*2 + 1;
     }
     auto dispatched = chrono::high_resolution_clock::now();
-    cout << "There are now " << dec << dispatcher->count() << " handles open with a queue depth of " << dispatcher->wait_queue_depth() << endl;
+    cout << "There are now " << dec << dispatcher->fd_count() << " handles open with a queue depth of " << dispatcher->wait_queue_depth() << endl;
     BOOST_AFIO_CHECK_NO_THROW(when_all(next).wait());
     // Retrieve any errors
     BOOST_FOREACH(auto &i, verifies)

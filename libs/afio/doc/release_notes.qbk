@@ -9,10 +9,30 @@
 [section:release_notes Release Notes]
 
 [/=================]
-[heading Boost 1.56]
+[heading Boost 1.56 AFIO v1.1]
 [/=================]
 
-First release.
+Immediate completions no longer hold the opslock, which meant the opslock could be
+changed from a recursive mutex to a spinlock. The new, more parallelised, behaviour
+illuminated a number of new race conditions in when_all() which have been fixed.
+
+Completely gutted dispatch engine and replaced with a new, almost entirely wait
+free implementation based on throwing atomics at the problem. If it weren't for the spin lock around the
+central ops hash table, AFIO would now be an entirely wait free design.
+
+In order to do something about that spin lock, replaced all locking in AFIO (apart
+from the directory file handle cache) with memory transactions instead. This
+does CPUID at runtime and will use Intel's TSX-NI memory transaction implementation
+if available, if not it falls back to a spin lock based emulation. On memory
+transaction capable CPUs, AFIO is now almost entirely wait free, apart from when
+it has to fetch memory from the kernel.
+
+
+[/=================]
+[heading Boost 1.55 AFIO v1.0]
+[/=================]
+
+First release for end of Google Summer of Code 2013.
 
 [endsect]
 
@@ -21,36 +41,56 @@ First release.
 [section:closure_performance What is the maximum throughput of AFIO's closure execution engine aka
 how many IOPS can I push with AFIO?]
 
-For v1.0, maximum throughput is approximately as follows:
+For v1.1, maximum ops [*dispatch] throughput is approximately as follows, where the values for `call()` might be for
+use as a closure engine whereas the values for `completion()` might be for max filing system IOPS[footnote The phrase
+["might be] is important: a null closure benchmark will always have dispatch rate problems i.e. the closures being executed
+take less time to execute than the time to dispatch them, so these figures are best read as maximum dispatch rate, not
+maximum IOPS.]:
 
-[table:throughput Maximum null closure execution rate on a 3.5Ghz Intel Core i7 3770K for AFIO v1.0:
-[[Operating system][`call()` unchained][`call()` chained][`completion()` unchained][`completion()` chained]]
-[[Microsoft Windows 8 x64 with Visual Studio 2013][337955][123407][534522][143409]]
-[[Ubuntu 12.04 LTS Linux x64 with GCC 4.8][398537][164785][1140640][244907]]
+[table:throughput Maximum null closure dispatch rate on a 3.5Ghz Intel Core i7 3770K for AFIO v1.1 i.e. NOT using transactional memory:
+[[Operating system][`call()` unchained][`call()` chained][`completion()` unchained][`completion()` chained][Raw ASIO]]
+[[Microsoft Windows 8 x64 with Visual Studio 2013][[role alignright 911963]][[role alignright 596318]][[role alignright 1555990]][[role alignright 726124]][[role alignright 2806070]]]
+[[Relative to ASIO][[role alignright 32%]][[role alignright 21%]][[role alignright 55%]][[role alignright 26%]][[role alignright 100%]]]
+[[Ubuntu 12.04 LTS Linux x64 with GCC 4.8][[role alignright 1094780]][[role alignright 794384]][[role alignright 1432810]][[role alignright 968005]][[role alignright 1611040[footnote Unfortunately the glibc mutex used by ASIO does not scale well on modern CPUs due to having too small a spin count, so this value is for four threads instead of eight (it was the best I could get through trial and error.]]]]
+[[Relative to ASIO][[role alignright 68%]][[role alignright 49%]][[role alignright 89%]][[role alignright 60%]][[role alignright 100%]]]
+[[Microsoft Windows 8 x64 with Visual Studio 2010][[role alignright 649015]][[role alignright 469689]][[role alignright 1021630]][[role alignright 613816]][[role alignright 2725690]]]
+[[Relative to ASIO][[role alignright 24%]][[role alignright 17%]][[role alignright 37%]][[role alignright 23%]][[role alignright 100%]]]
 ]
 
-While this is fast enough for consumer SSDs, we agree it is currently not great. The biggest limiter, by far, is the
-recursive mutex protecting the ops dispatch and completion implementation. Because AFIO is pure batch, dispatch
-is very rarely a problem: rather it is completion, because completion handling must always be performed per op completion
-in order to check for and dispatch, if necessary, dependencies. Currently the top consumers of CPU
-time during null closure dispatch benchmark are as follows:
+We hope that ~720k max IOPS surely ought to be enough to max out any SATA III SSD -- it should even max out any mid range
+PCIe based SSD too, and if paired with a CPU with more cores, AFIO's almost wait free design ought to scale out fairly
+well too such that it may be able to max out even top end PCIe SSDs, some of which can push 10m IOPS now. If that isn't
+fast enough for you, try AFIO on an Intel CPU with memory transaction support (on Windows a runtime check will automatically
+replace locks with memory transactions, for POSIX you need to recompile with the `-mrtm` flag), or try support for `__transaction_relaxed` compilers if `BOOST_HAVE_TRANSACTIONAL_MEMORY_COMPILER` is defined.
 
-[table:top_consumers Top consumers of CPU time during null closure dispatch in AFIO v1.0
+Nevertheless, AFIO will almost certainly be still criticised for poor performance relative to __boost_asio__. Unfortunately, dependency chaining is not
+free, and moreover, AFIO has a very simple design based on a global hash table and pure C++11 STL throughout (i.e. it's heavy
+on the memory allocator). The biggest limiter, by far, is the spin lock protecting the ops dispatch and completion implementation.
+Because AFIO is pure batch, dispatch is very rarely a problem: rather it is completion, because completion handling must always be
+performed per op completion in order to check for and dispatch, if necessary, dependencies. Currently the top consumers of CPU
+time during null closure dispatch benchmarks are as follows:
+
+[table:top_consumers Top consumers of CPU time during null closure dispatch in AFIO v1.1 on Microsoft Windows
 [[Unchained][][Chained][]]
-[[ops Mutex][85%][ops Mutex][99.41%]]
-[[threadpool waiting for new ops][4.15%][threadpool waiting for new ops][0.26%]]
-[[operator new][2.43%][Remainder and misc][0.33%]]
-[[hash table insert][2.05%][][]]
-[[sending ops to threadpool][1.67%][][]]
-[[Remainder and misc][4.7%][][]]
+[[ops lock sleep][[role alignright 40%]][ops lock sleep][[role alignright 34%]]]
+[[threadpool waiting for new ops][[role alignright 23%]][ops lock spin][[role alignright 22%]]]
+[[ops lock spin][[role alignright 8.1%]][threadpool waiting for new ops][[role alignright 14%]]]
+[[memory allocator][[role alignright 6.1%]][memory allocator][[role alignright 4.7%]]]
+[[sending ops to threadpool][[role alignright 1.0%]][sending ops to threadpool][[role alignright 4.3%]]]
+[[RtlUserThreadStart][[role alignright 10%]][RtlUserThreadStart][[role alignright 10%]]]
+[[remainder and misc][[role alignright 11.8%]][remainder and misc][[role alignright 11%]]]
 ]
 
-Luckily, the mutex is not held while file i/o operations or closures are being executed, so contention on the mutex
-isn't as much of a problem during real world use and therefore is in practice nothing like as bad as things look above
--- in fact, adding in a noop kernel syscall actually slightly improves the figures because the mutex isn't being
-contended as heavily, so the above figures for `completion()` are very reasonable max IOPS values. Nevertheless, if you were randomly
-reading or writing very small bits of data, we can see how the mutex might get in the way, and we intend to do something
-about it in a future v1.x release of __boost_afio__, most especially to eliminate the recursive mutex in favour of a spin lock.
+As you can see, when the closures do no real work, one spends a huge amount of time contending the ops lock.
+Luckily, the ops lock is not held while file i/o operations or closures are being executed, so contention on the ops lock
+isn't as much of a problem during real world use i.e. you will get a significant amount of ["free] file i/o without losing
+much in maximum op dispatch throughput.
+
+And certainly a custom allocator for the hash table might make quite a difference, especially in avoiding spinning and sleeping
+the ops lock altogether by eliminating the memory allocator. Another option we might investigate in the future is using a
+different hash table implementation e.g. `concurrent_unordered_map<>` instead (though I hear it has poor single lookup
+performance, and the lack of safe erase is a huge problem for us), or any of the hash tables from
+[@http://incise.org/hash-table-benchmarks.html].
 
 [endsect] [/closure_performance]
 
