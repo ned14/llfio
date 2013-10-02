@@ -13,7 +13,7 @@ File Created: Sept 2013
 #include <cstdint>
 
 // Map in C++11 stuff if available
-#if (defined(__GLIBCXX__) && __GLIBCXX__<20120920 /* < GCC 4.7 */) || (defined(BOOST_MSVC) && BOOST_MSVC < 1700 /* <= VS2010 */)
+#if defined(BOOST_NO_CXX11_HDR_MUTEX) || defined(BOOST_NO_CXX11_HDR_RATIO) || defined(BOOST_NO_CXX11_HDR_CHRONO) || defined(BOOST_NO_CXX11_HDR_THREAD)
 #include "boost/exception_ptr.hpp"
 #include "boost/thread/mutex.hpp"
 #include "boost/thread/recursive_mutex.hpp"
