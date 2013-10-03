@@ -889,7 +889,7 @@ async_io_op async_file_io_dispatcher_base::op_from_scheduled_id(size_t id) const
 }
 
 
-#if defined(BOOST_AFIO_SOURCE) && !defined(BOOST_AFIO_COMPILING_FOR_GCOV)
+#if defined(BOOST_AFIO_ENABLE_BENCHMARKING_COMPLETION)
 // Called in unknown thread
 BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC async_file_io_dispatcher_base::completion_returntype async_file_io_dispatcher_base::invoke_user_completion_fast(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr *e, async_file_io_dispatcher_base::completion_t *callback)
 {

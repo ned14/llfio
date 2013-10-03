@@ -4,7 +4,7 @@
 #include <fstream>
 #include <regex>
 #include <chrono>
-#include "../../../boost/afio/detail/std_filesystem.hpp" // in lieu of <filesystem>
+#include "boost/afio/detail/std_filesystem.hpp" // in lieu of <filesystem>
 #endif
 
 /* My Intel Core i7 3770K running Windows 8 x64 with 7200rpm drive, using

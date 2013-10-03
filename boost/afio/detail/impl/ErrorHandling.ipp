@@ -24,7 +24,7 @@ namespace boost {
         namespace detail{
 
             
-            inline void int_throwWinError(const char *file, const char *function, int lineno, unsigned code, const std::filesystem::path *filename)
+            BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC void int_throwWinError(const char *file, const char *function, int lineno, unsigned code, const std::filesystem::path *filename)
             {
                     using namespace std;
                     DWORD len;
@@ -63,7 +63,7 @@ namespace boost {
                     }
             }
 
-            inline void int_throwNTError(const char *file, const char *function, int lineno, unsigned code, const std::filesystem::path *filename)
+            BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC void int_throwNTError(const char *file, const char *function, int lineno, unsigned code, const std::filesystem::path *filename)
             {
                     using namespace std;
                     DWORD len;
@@ -113,7 +113,7 @@ namespace boost {
     namespace afio{
         namespace detail{
 
-            inline void int_throwOSError(const char *file, const char *function, int lineno, int code, const std::filesystem::path *filename)
+            BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC void int_throwOSError(const char *file, const char *function, int lineno, int code, const std::filesystem::path *filename)
             {
                     using namespace std;
                     string errstr(strerror(code));

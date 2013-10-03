@@ -42,7 +42,7 @@
 #define BOOST_AFIO_DECL BOOST_SYMBOL_EXPORT
 #define BOOST_AFIO_BUILD_DLL
 #else
-#define BOOST_AFIO_DECL BOOST_SYMBOL_IMPORT
+#define BOOST_AFIO_DECL
 #endif
 #else
 # define BOOST_AFIO_DECL
@@ -73,7 +73,12 @@
 #define BOOST_AFIO_HEADERS_ONLY_FUNC_SPEC inline
 #define BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC inline
 #define BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC inline virtual
+// GCC gets upset if inline virtual functions aren't defined
+#ifdef BOOST_GCC
 #define BOOST_AFIO_HEADERS_ONLY_VIRTUAL_UNDEFINED_SPEC { BOOST_AFIO_THROW_FATAL(std::runtime_error("Attempt to call pure virtual member function")); abort(); }
+#else
+#define BOOST_AFIO_HEADERS_ONLY_VIRTUAL_UNDEFINED_SPEC =0;
+#endif
 #else
 #define BOOST_AFIO_HEADERS_ONLY_FUNC_SPEC extern BOOST_AFIO_DECL
 #define BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC

@@ -1,4 +1,4 @@
-#include "../../../boost/afio/afio.hpp"
+#include "boost/afio/afio.hpp"
 #if !(defined(BOOST_MSVC) && BOOST_MSVC <= 1700)
 #include <deque>
 #include <regex>
@@ -7,7 +7,7 @@
 #include <future>
 #include <initializer_list>
 #include "boost/exception/diagnostic_information.hpp"
-#include "../../../boost/afio/detail/Aligned_Allocator.hpp"
+#include "boost/afio/detail/Aligned_Allocator.hpp"
 #endif
 
 /* My Intel Core i7 3770K running Windows 8 x64 with 7200rpm drive, using
