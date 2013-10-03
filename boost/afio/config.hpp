@@ -17,6 +17,10 @@
 #ifndef BOOST_AFIO_CONFIG_HPP
 #define BOOST_AFIO_CONFIG_HPP
 
+#ifndef BOOST_AFIO_HEADERS_ONLY
+#define BOOST_AFIO_HEADERS_ONLY 1
+#endif
+
 #include <boost/config.hpp>
 #include <boost/system/api_config.hpp>  // for BOOST_POSIX_API or BOOST_WINDOWS_API
 #include <boost/detail/workaround.hpp> 
@@ -27,6 +31,7 @@
     !defined(BOOST_AFIO_STATIC_LINK)
 
 #if defined(BOOST_AFIO_SOURCE)
+#undef BOOST_AFIO_HEADERS_ONLY
 #define BOOST_AFIO_DECL BOOST_SYMBOL_EXPORT
 #define BOOST_AFIO_BUILD_DLL
 #else
@@ -52,6 +57,20 @@
 #include <boost/config/auto_link.hpp>
 
 #endif  // auto-linking disabled
+
+//#define BOOST_THREAD_VERSION 4
+//#define BOOST_THREAD_PROVIDES_VARIADIC_THREAD
+//#define BOOST_THREAD_DONT_PROVIDE_FUTURE
+//#define BOOST_THREAD_PROVIDES_SIGNATURE_PACKAGED_TASK
+#if BOOST_AFIO_HEADERS_ONLY == 1
+#define BOOST_AFIO_HEADERS_ONLY_FUNC_SPEC inline
+#define BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC inline
+#define BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC inline virtual
+#else
+#define BOOST_AFIO_HEADERS_ONLY_FUNC_SPEC extern BOOST_AFIO_DECL
+#define BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC
+#define BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC virtual
+#endif
 
 #endif  /* BOOST_AFIO_CONFIG_HPP */
 

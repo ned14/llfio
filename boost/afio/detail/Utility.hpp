@@ -84,10 +84,10 @@ namespace boost {
 namespace boost {
     namespace afio {
         namespace detail {
-			extern BOOST_AFIO_DECL void print_fatal_exception_message_to_stderr(const char *msg);
+            BOOST_AFIO_HEADERS_ONLY_FUNC_SPEC void print_fatal_exception_message_to_stderr(const char *msg);
             template<class T> inline void do_throw_fatal_exception(const T &v) BOOST_NOEXCEPT_OR_NOTHROW
             {
-				print_fatal_exception_message_to_stderr(v.what());
+                print_fatal_exception_message_to_stderr(v.what());
                 throw v;
             }
             extern "C" inline void boost_afio_do_throw_fatal_exception(std::function<void()> impl) BOOST_NOEXCEPT_OR_NOTHROW{ impl(); }
