@@ -623,7 +623,7 @@ class async_io_handle : public std::enable_shared_from_this<async_io_handle>
 protected:
     boost::afio::atomic<off_t> bytesread, byteswritten, byteswrittenatlastfsync;
     async_io_handle(async_file_io_dispatcher_base *parent, std::shared_ptr<async_io_handle> _dirh, const std::filesystem::path &path, file_flags flags) : _parent(parent), dirh(std::move(_dirh)), _opened(chrono::system_clock::now()), _path(path), _flags(flags), bytesread(0), byteswritten(0), byteswrittenatlastfsync(0) { }
-    BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC void close()=0;
+	BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC void close() BOOST_AFIO_HEADERS_ONLY_VIRTUAL_UNDEFINED_SPEC
 public:
     BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC ~async_io_handle() { }
     //! Returns the parent of this io handle
@@ -631,7 +631,7 @@ public:
     //! Returns a handle to the directory containing this handle. Only works if `file_flags::FastDirectoryEnumeration` was specified when this handle was opened.
     std::shared_ptr<async_io_handle> container() const { return dirh; }
     //! Returns the native handle of this io handle. On POSIX, you can cast this to a fd using `(int)(size_t) native_handle()`. On Windows it's a simple `(HANDLE) native_handle()`.
-    BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC void *native_handle() const=0;
+	BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC void *native_handle() const BOOST_AFIO_HEADERS_ONLY_VIRTUAL_UNDEFINED_SPEC
     //! Returns when this handle was opened
     const chrono::system_clock::time_point &opened() const { return _opened; }
     //! Returns the path of this io handle
@@ -651,7 +651,7 @@ public:
     //! Returns how many bytes have been written since this handle was last fsynced.
     off_t write_count_since_fsync() const { return byteswritten-byteswrittenatlastfsync; }
     //! Returns a mostly filled directory_entry for the file or directory referenced by this handle. Use `metadata_flags::All` if you want it as complete as your platform allows, even at the cost of severe performance loss.
-    BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC directory_entry direntry(metadata_flags wanted=directory_entry::metadata_fastpath()) const=0;
+	BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC directory_entry direntry(metadata_flags wanted=directory_entry::metadata_fastpath()) const BOOST_AFIO_HEADERS_ONLY_VIRTUAL_UNDEFINED_SPEC
     //! Returns a mostly filled stat_t structure for the file or directory referenced by this handle. Use `metadata_flags::All` if you want it as complete as your platform allows, even at the cost of severe performance loss.
     stat_t lstat(metadata_flags wanted=directory_entry::metadata_fastpath()) const
     {
@@ -659,9 +659,9 @@ public:
         return de.fetch_lstat(std::shared_ptr<async_io_handle>() /* actually unneeded */, wanted);
     }
     //! Returns the target path of this handle if it is a symbolic link
-    BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC std::filesystem::path target() const=0;
+	BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC std::filesystem::path target() const BOOST_AFIO_HEADERS_ONLY_VIRTUAL_UNDEFINED_SPEC
     //! Tries to map the file into memory. Currently only works if handle is read-only.
-    BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC void *try_mapfile()=0;
+	BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC void *try_mapfile() BOOST_AFIO_HEADERS_ONLY_VIRTUAL_UNDEFINED_SPEC
 };
 
 #ifndef BOOST_NO_CXX11_VARIADIC_TEMPLATES
@@ -933,7 +933,7 @@ public:
     \exceptionmodelstd
     \qexample{filedir_example}
     */
-    BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC std::vector<async_io_op> dir(const std::vector<async_path_op_req> &reqs)=0;
+	BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC std::vector<async_io_op> dir(const std::vector<async_path_op_req> &reqs) BOOST_AFIO_HEADERS_ONLY_VIRTUAL_UNDEFINED_SPEC
     /*! \brief Schedule an asynchronous directory creation and open after an optional precondition.
 
     Note that if there is already a handle open to the directory requested, that will be returned instead of
@@ -957,7 +957,7 @@ public:
     \exceptionmodelstd
     \qexample{filedir_example}
     */
-    BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC std::vector<async_io_op> rmdir(const std::vector<async_path_op_req> &reqs)=0;
+	BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC std::vector<async_io_op> rmdir(const std::vector<async_path_op_req> &reqs) BOOST_AFIO_HEADERS_ONLY_VIRTUAL_UNDEFINED_SPEC
     /*! \brief Schedule an asynchronous directory deletion after an optional precondition.
     \return An op handle.
     \param req An `async_path_op_req` structure.
@@ -977,7 +977,7 @@ public:
     \exceptionmodelstd
     \qexample{filedir_example}
     */
-    BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC std::vector<async_io_op> file(const std::vector<async_path_op_req> &reqs)=0;
+	BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC std::vector<async_io_op> file(const std::vector<async_path_op_req> &reqs) BOOST_AFIO_HEADERS_ONLY_VIRTUAL_UNDEFINED_SPEC
     /*! \brief Schedule an asynchronous file creation and open after an optional precondition.
     \return An op handle.
     \param req An `async_path_op_req` structure.
@@ -997,7 +997,7 @@ public:
     \exceptionmodelstd
     \qexample{filedir_example}
     */
-    BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC std::vector<async_io_op> rmfile(const std::vector<async_path_op_req> &reqs)=0;
+	BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC std::vector<async_io_op> rmfile(const std::vector<async_path_op_req> &reqs) BOOST_AFIO_HEADERS_ONLY_VIRTUAL_UNDEFINED_SPEC
     /*! \brief Schedule an asynchronous file deletion after an optional precondition.
     \return An op handle.
     \param req An `async_path_op_req` structure.
@@ -1024,7 +1024,7 @@ public:
     \exceptionmodelstd
     \qexample{filedir_example}
     */
-    BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC std::vector<async_io_op> symlink(const std::vector<async_path_op_req> &reqs)=0;
+	BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC std::vector<async_io_op> symlink(const std::vector<async_path_op_req> &reqs) BOOST_AFIO_HEADERS_ONLY_VIRTUAL_UNDEFINED_SPEC
     /*! \brief Schedule an asynchronous symlink creation and open after a precondition.
 
     Note that if creating, the target for the symlink is the precondition. On Windows directories are symlinked using a reparse
@@ -1051,7 +1051,7 @@ public:
     \exceptionmodelstd
     \qexample{filedir_example}
     */
-    BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC std::vector<async_io_op> rmsymlink(const std::vector<async_path_op_req> &reqs)=0;
+	BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC std::vector<async_io_op> rmsymlink(const std::vector<async_path_op_req> &reqs) BOOST_AFIO_HEADERS_ONLY_VIRTUAL_UNDEFINED_SPEC
     /*! \brief Schedule an asynchronous symlink deletion after an optional precondition.
     \return An op handle.
     \param req An `async_path_op_req` structure.
@@ -1071,7 +1071,7 @@ public:
     \exceptionmodelstd
     \qexample{readwrite_example}
     */
-    BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC std::vector<async_io_op> sync(const std::vector<async_io_op> &ops)=0;
+	BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC std::vector<async_io_op> sync(const std::vector<async_io_op> &ops) BOOST_AFIO_HEADERS_ONLY_VIRTUAL_UNDEFINED_SPEC
     /*! \brief Schedule an asynchronous content synchronisation with physical storage after a preceding operation.
     \return An op handle.
     \param req An op handle.
@@ -1091,7 +1091,7 @@ public:
     \exceptionmodelstd
     \qexample{filedir_example}
     */
-    BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC std::vector<async_io_op> close(const std::vector<async_io_op> &ops)=0;
+	BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC std::vector<async_io_op> close(const std::vector<async_io_op> &ops) BOOST_AFIO_HEADERS_ONLY_VIRTUAL_UNDEFINED_SPEC
     /*! \brief Schedule an asynchronous file or directory handle close after a preceding operation.
     \return An op handle.
     \param req An op handle.
@@ -1116,10 +1116,10 @@ public:
     \qexample{readwrite_example}
     */
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-    BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC std::vector<async_io_op> read(const std::vector<detail::async_data_op_req_impl<false>> &ops)=0;
+	BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC std::vector<async_io_op> read(const std::vector<detail::async_data_op_req_impl<false>> &ops) BOOST_AFIO_HEADERS_ONLY_VIRTUAL_UNDEFINED_SPEC
     template<class T> inline std::vector<async_io_op> read(const std::vector<async_data_op_req<T>> &ops);
 #else
-    template<class T> BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC std::vector<async_io_op> read(const std::vector<async_data_op_req<T>> &ops)=0;
+	template<class T> BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC std::vector<async_io_op> read(const std::vector<async_data_op_req<T>> &ops) BOOST_AFIO_HEADERS_ONLY_VIRTUAL_UNDEFINED_SPEC
 #endif
     /*! \brief Schedule an asynchronous data read after a preceding operation.
 
@@ -1151,10 +1151,10 @@ public:
     \qexample{readwrite_example}
     */
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-    BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC std::vector<async_io_op> write(const std::vector<detail::async_data_op_req_impl<true>> &ops)=0;
+	BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC std::vector<async_io_op> write(const std::vector<detail::async_data_op_req_impl<true>> &ops) BOOST_AFIO_HEADERS_ONLY_VIRTUAL_UNDEFINED_SPEC
     template<class T> inline std::vector<async_io_op> write(const std::vector<async_data_op_req<T>> &ops);
 #else
-    template<class T> BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC std::vector<async_io_op> write(const std::vector<async_data_op_req<const T>> &ops)=0;
+	template<class T> BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC std::vector<async_io_op> write(const std::vector<async_data_op_req<const T>> &ops) BOOST_AFIO_HEADERS_ONLY_VIRTUAL_UNDEFINED_SPEC
 #endif
     /*! \brief Schedule an asynchronous data write after a preceding operation.
 
@@ -1184,7 +1184,7 @@ public:
     \exceptionmodelstd
     \qexample{readwrite_example}
     */
-    BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC std::vector<async_io_op> truncate(const std::vector<async_io_op> &ops, const std::vector<off_t> &sizes)=0;
+	BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC std::vector<async_io_op> truncate(const std::vector<async_io_op> &ops, const std::vector<off_t> &sizes) BOOST_AFIO_HEADERS_ONLY_VIRTUAL_UNDEFINED_SPEC
     /*! \brief Schedule an asynchronous file length truncation after a preceding operation.
     \return An op handle.
     \param op An op handle.
@@ -1216,7 +1216,7 @@ public:
     \exceptionmodelstd
     \qexample{enumerate_example}
     */
-    BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC std::pair<std::vector<future<std::pair<std::vector<directory_entry>, bool>>>, std::vector<async_io_op>> enumerate(const std::vector<async_enumerate_op_req> &reqs)=0;
+	BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC std::pair<std::vector<future<std::pair<std::vector<directory_entry>, bool>>>, std::vector<async_io_op>> enumerate(const std::vector<async_enumerate_op_req> &reqs) BOOST_AFIO_HEADERS_ONLY_VIRTUAL_UNDEFINED_SPEC
     /*! \brief Schedule an asynchronous directory enumeration after a preceding operation.
 
     By default dir() returns shared handles i.e. dir("foo") and dir("foo") will return the exact same

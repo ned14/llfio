@@ -1,9 +1,9 @@
-/* 
- * File:   config.hpp
- * Author: Paul Kirth
- *
- * Created on June 18, 2013, 7:30 PM
- */
+/*
+* File:   config.hpp
+* Author: Paul Kirth
+*
+* Created on June 18, 2013, 7:30 PM
+*/
 
  //  Copyright (c) 2013 Paul Kirth
 //
@@ -20,6 +20,13 @@
 #ifndef BOOST_AFIO_HEADERS_ONLY
 #define BOOST_AFIO_HEADERS_ONLY 1
 #endif
+
+// Get Mingw to assume we are on at least Windows 2000
+#if __MSVCRT_VERSION__ < 0x601
+#undef __MSVCRT_VERSION__
+#define __MSVCRT_VERSION__ 0x601
+#endif
+
 
 #include <boost/config.hpp>
 #include <boost/system/api_config.hpp>  // for BOOST_POSIX_API or BOOST_WINDOWS_API
@@ -66,10 +73,12 @@
 #define BOOST_AFIO_HEADERS_ONLY_FUNC_SPEC inline
 #define BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC inline
 #define BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC inline virtual
+#define BOOST_AFIO_HEADERS_ONLY_VIRTUAL_UNDEFINED_SPEC { BOOST_AFIO_THROW_FATAL(std::runtime_error("Attempt to call pure virtual member function")); abort(); }
 #else
 #define BOOST_AFIO_HEADERS_ONLY_FUNC_SPEC extern BOOST_AFIO_DECL
 #define BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC
 #define BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC virtual
+#define BOOST_AFIO_HEADERS_ONLY_VIRTUAL_UNDEFINED_SPEC =0;
 #endif
 
 #endif  /* BOOST_AFIO_CONFIG_HPP */

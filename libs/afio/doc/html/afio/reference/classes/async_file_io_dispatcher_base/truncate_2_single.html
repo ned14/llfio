@@ -28,7 +28,7 @@
           (single)</a>
 </h5></div></div></div>
 <p>
-            <a class="indexterm" name="id949695"></a>
+            <a class="indexterm" name="id951081"></a>
 Schedule an asynchronous file length truncation after a preceding operation.
           </p>
 <h6>
@@ -204,7 +204,7 @@ Schedule an asynchronous file length truncation after a preceding operation.
     <span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="string">"Contents of file is '"</span> <span class="special">&lt;&lt;</span> <span class="identifier">contents</span> <span class="special">&lt;&lt;</span> <span class="string">"'"</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span>
 
     <span class="comment">// Check remaining ops for errors</span>
-    <span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">when_all</span><span class="special">({</span><span class="identifier">req</span><span class="special">.</span><span class="identifier">precondition</span> <span class="comment">/*close*/</span><span class="special">,</span> <span class="identifier">deletedfile</span><span class="special">}).</span><span class="identifier">wait</span><span class="special">();</span>		<a class="co" name="afio.reference.classes.async_file_io_dispatcher_base.truncate_2_single.c16" href="truncate_2_single.html#afio.reference.classes.async_file_io_dispatcher_base.truncate_2_single.c17"><img src="../../../../../../doc/src/images/callouts/9.png" alt="9" border="0"></a>
+    <span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">when_all</span><span class="special">({</span><span class="identifier">req</span><span class="special">.</span><span class="identifier">precondition</span> <span class="comment">/*close*/</span><span class="special">,</span> <span class="identifier">deletedfile</span><span class="special">}).</span><span class="identifier">wait</span><span class="special">();</span>        <a class="co" name="afio.reference.classes.async_file_io_dispatcher_base.truncate_2_single.c16" href="truncate_2_single.html#afio.reference.classes.async_file_io_dispatcher_base.truncate_2_single.c17"><img src="../../../../../../doc/src/images/callouts/9.png" alt="9" border="0"></a>
 <span class="special">}</span>
 <span class="keyword">catch</span><span class="special">(...)</span>
 <span class="special">{</span>

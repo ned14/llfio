@@ -68,9 +68,6 @@ File Created: Mar 2013
 #endif
 #endif
 
-// Get Mingw to assume we are on at least Windows 2000
-#define __MSVCRT_VERSION__ 0x601
-
 #include "../../afio.hpp"
 #include "../Aligned_Allocator.hpp"
 #include "../MemoryTransactions.hpp"

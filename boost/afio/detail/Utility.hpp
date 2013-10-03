@@ -8,7 +8,6 @@
 #ifndef BOOST_AFIO_UTILITY_HPP
 #define BOOST_AFIO_UTILITY_HPP
 
-
 #include <unordered_map>
 #include <sys/types.h>
 #include <sys/stat.h>

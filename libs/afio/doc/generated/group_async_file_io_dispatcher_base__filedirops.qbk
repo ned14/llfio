@@ -137,12 +137,7 @@ An op handle.
 Schedule a batch of asynchronous directory creations and opens after optional preconditions. 
 
 [heading Description]
-
-``
-Note that if there is already a handle open to the directory requested, that will be returned instead of
-a new handle unless file\u005fflags::UniqueDirectoryHandle is specified.
-``
-
+Note that if there is already a handle open to the directory requested, that will be returned instead of a new handle unless file\u005fflags::UniqueDirectoryHandle is specified.
 
 [heading Synopsis]
 ``virtual std::vector<async_io_op> async_file_io_dispatcher_base::dir(const std::vector< async_path_op_req > & reqs)``
@@ -174,12 +169,7 @@ A batch of op handles.
 Schedule an asynchronous directory creation and open after an optional precondition. 
 
 [heading Description]
-
-``
-Note that if there is already a handle open to the directory requested, that will be returned instead of
-a new handle unless file\u005fflags::UniqueDirectoryHandle is specified.
-``
-
+Note that if there is already a handle open to the directory requested, that will be returned instead of a new handle unless file\u005fflags::UniqueDirectoryHandle is specified.
 
 [heading Synopsis]
 ``async_io_op async_file_io_dispatcher_base::dir(const async_path_op_req & req)``
@@ -269,11 +259,7 @@ An op handle.
 Schedule a batch of asynchronous data reads after preceding operations. 
 
 [heading Description]
-
-``
-Note that on Windows this call issues a separate async file operation for each buffer supplied, thus making scatter/gather i/o no more efficient than making separate calls. The big exception to this is when doing unbuffered page aligned i/o for which Windows provides special scatter/gather i/o functions.
-``
-
+Note that on Windows this call issues a separate async file operation for each buffer supplied, thus making scatter/gather i/o no more efficient than making separate calls. The big exception to this is when doing unbuffered page aligned i/o for which Windows provides special scatter/gather i/o functions. 
 
 [heading Synopsis]
 ``template<class T>
@@ -307,11 +293,7 @@ A batch of op handles.
 Schedule an asynchronous data read after a preceding operation. 
 
 [heading Description]
-
-``
-Note that on Windows this call issues a separate async file operation for each buffer supplied, thus making scatter/gather i/o no more efficient than making separate calls. The big exception to this is when doing unbuffered page aligned i/o for which Windows provides special scatter/gather i/o functions.
-``
-
+Note that on Windows this call issues a separate async file operation for each buffer supplied, thus making scatter/gather i/o no more efficient than making separate calls. The big exception to this is when doing unbuffered page aligned i/o for which Windows provides special scatter/gather i/o functions. 
 
 [heading Synopsis]
 ``template<class T>
@@ -519,15 +501,9 @@ An op handle.
 Schedule a batch of asynchronous symlink creations and opens after a precondition. 
 
 [heading Description]
-
-``
-Note that if creating, the target for the symlink is the precondition. On Windows directories are symlinked using a reparse
-point instead of a symlink due to the default lack of the <tt>SeCreateSymbolicLinkPrivilege</tt> for non-Administrative
-users.
+Note that if creating, the target for the symlink is the precondition. On Windows directories are symlinked using a reparse point instead of a symlink due to the default lack of the [^`SeCreateSymbolicLinkPrivilege`] for non-Administrative users.
 
 Note that currently on Windows non-directory symbolic links are not supported. If there is demand for this we may add support.
-``
-
 
 [heading Synopsis]
 ``virtual std::vector<async_io_op> async_file_io_dispatcher_base::symlink(const std::vector< async_path_op_req > & reqs)``
@@ -559,15 +535,9 @@ A batch of op handles.
 Schedule an asynchronous symlink creation and open after a precondition. 
 
 [heading Description]
-
-``
-Note that if creating, the target for the symlink is the precondition. On Windows directories are symlinked using a reparse
-point instead of a symlink due to the default lack of the <tt>SeCreateSymbolicLinkPrivilege</tt> for non-Administrative
-users.
+Note that if creating, the target for the symlink is the precondition. On Windows directories are symlinked using a reparse point instead of a symlink due to the default lack of the [^`SeCreateSymbolicLinkPrivilege`] for non-Administrative users.
 
 Note that currently on Windows non-directory symbolic links are not supported. If there is demand for this we may add support.
-``
-
 
 [heading Synopsis]
 ``async_io_op async_file_io_dispatcher_base::symlink(const async_path_op_req & req)``
@@ -717,11 +687,7 @@ An op handle.
 Schedule a batch of asynchronous data writes after preceding operations. 
 
 [heading Description]
-
-``
-Note that on Windows this call issues a separate async file operation for each buffer supplied, thus making scatter/gather i/o no more efficient than making separate calls. The big exception to this is when doing unbuffered page aligned i/o for which Windows provides special scatter/gather i/o functions.
-``
-
+Note that on Windows this call issues a separate async file operation for each buffer supplied, thus making scatter/gather i/o no more efficient than making separate calls. The big exception to this is when doing unbuffered page aligned i/o for which Windows provides special scatter/gather i/o functions. 
 
 [heading Synopsis]
 ``template<class T>
@@ -755,11 +721,7 @@ A batch of op handles.
 Schedule an asynchronous data write after a preceding operation. 
 
 [heading Description]
-
-``
-Note that on Windows this call issues a separate async file operation for each buffer supplied, thus making scatter/gather i/o no more efficient than making separate calls. The big exception to this is when doing unbuffered page aligned i/o for which Windows provides special scatter/gather i/o functions.
-``
-
+Note that on Windows this call issues a separate async file operation for each buffer supplied, thus making scatter/gather i/o no more efficient than making separate calls. The big exception to this is when doing unbuffered page aligned i/o for which Windows provides special scatter/gather i/o functions. 
 
 [heading Synopsis]
 ``template<class T>

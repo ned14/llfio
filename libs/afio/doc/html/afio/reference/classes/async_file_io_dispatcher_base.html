@@ -94,7 +94,7 @@
 <dt><span class="section"><a href="async_file_io_dispatcher_base/page_size.html">page_size</a></span></dt>
 </dl></div>
 <p>
-          <a class="indexterm" name="id882818"></a>
+          <a class="indexterm" name="id884284"></a>
 Abstract base class for dispatching file i/o asynchronously.
         </p>
 <h6>
@@ -413,7 +413,7 @@ Abstract base class for dispatching file i/o asynchronously.
 <tr>
 <td>
 <pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">C</span><span class="special">,</span> <span class="keyword">class</span><span class="special">...</span> <span class="identifier">Args</span><span class="special">&gt;</span>
-<span class="identifier">std</span><span class="special">::</span><span class="identifier">pair</span><span class="special">&lt;</span> <span class="identifier">future</span><span class="special">&lt;</span> <span class="keyword">typename</span> <span class="identifier">detail</span><span class="special">::</span><span class="identifier">vs2013_variadic_overload_resolution_workaround</span><span class="special">&lt;</span> <span class="identifier">C</span><span class="special">,</span> <span class="identifier">Args</span><span class="special">...&gt;::</span><span class="identifier">type</span> <span class="special">&gt;,</span> <span class="identifier">async_io_op</span> <span class="special">&gt;</span> <span class="identifier">call</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">async_io_op</span> <span class="special">&amp;</span> <span class="identifier">req</span><span class="special">,</span> <span class="identifier">C</span> <span class="identifier">callback</span><span class="special">,</span> <span class="identifier">Args</span><span class="special">...</span> <span class="identifier">args</span><span class="special">)</span></pre>
+<span class="identifier">std</span><span class="special">::</span><span class="identifier">pair</span><span class="special">&lt;</span> <span class="identifier">future</span><span class="special">&lt;</span> <span class="keyword">typename</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">result_of</span><span class="special">&lt;</span> <span class="identifier">C</span><span class="special">(</span><span class="identifier">Args</span><span class="special">...)&gt;::</span><span class="identifier">type</span> <span class="special">&gt;,</span> <span class="identifier">async_io_op</span> <span class="special">&gt;</span> <span class="identifier">call</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">async_io_op</span> <span class="special">&amp;</span> <span class="identifier">req</span><span class="special">,</span> <span class="identifier">C</span> <span class="identifier">callback</span><span class="special">,</span> <span class="identifier">Args</span><span class="special">...</span> <span class="identifier">args</span><span class="special">)</span></pre>
                 </td>
 <td>
                   <p>
@@ -1103,6 +1103,25 @@ Abstract base class for dispatching file i/o asynchronously.
                   </p>
                   <p>
                     <span class="bold"><strong>exception_ptr</strong></span>: <span class="emphasis"><em>e</em></span>:
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">C</span><span class="special">,</span> <span class="keyword">class</span><span class="special">...</span> <span class="identifier">Args</span><span class="special">&gt;</span>
+<span class="identifier">std</span><span class="special">::</span><span class="identifier">pair</span><span class="special">&lt;</span> <span class="identifier">future</span><span class="special">&lt;</span> <span class="keyword">typename</span> <span class="identifier">detail</span><span class="special">::</span><span class="identifier">vs2013_variadic_overload_resolution_workaround</span><span class="special">&lt;</span> <span class="identifier">C</span><span class="special">,</span> <span class="identifier">Args</span><span class="special">...&gt;::</span><span class="identifier">type</span> <span class="special">&gt;,</span> <span class="identifier">async_io_op</span> <span class="special">&gt;</span> <span class="identifier">call</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">async_io_op</span> <span class="special">&amp;</span> <span class="identifier">req</span><span class="special">,</span> <span class="identifier">C</span> <span class="identifier">callback</span><span class="special">,</span> <span class="identifier">Args</span><span class="special">...</span> <span class="identifier">args</span><span class="special">)</span></pre>
+                </td>
+<td>
+                </td>
+<td>
+                  <p>
+                    <span class="bold"><strong>const async_io_op &amp;</strong></span>: <span class="emphasis"><em>req</em></span>:
+                  </p>
+                  <p>
+                    <span class="bold"><strong>C</strong></span>: <span class="emphasis"><em>callback</em></span>:
+                  </p>
+                  <p>
+                    <span class="bold"><strong>Args...</strong></span>: <span class="emphasis"><em>args</em></span>:
                   </p>
                 </td>
 </tr>

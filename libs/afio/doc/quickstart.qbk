@@ -301,7 +301,7 @@ __boost_afio__ provides a powerful tool for scheduling and executing them.
 [endsect]
 [endsect]
 
-[section How __boost_afio__ Relates to Exisiting Closure Execution Engines]
+[section How __boost_afio__ Relates to Existing Closure Execution Engines]
 
 Proposals N3562 and its predecessor N3378  outline an executor library based on internal 
 implementations of similar facilities at Google and Microsoft. __boost_afio__ is based, in part, on some of 
