@@ -23,7 +23,6 @@ project boost/afio
 lib boost_afio 
     : #sources
       afio.cpp 
-      ../detail/ErrorHandling.cpp
       ../../system/build//boost_system
       ../../filesystem/build//boost_filesystem 
       ../../atomic/build//boost_atomic

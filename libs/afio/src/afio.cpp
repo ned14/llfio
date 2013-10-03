@@ -4,4 +4,4 @@ Provides a threadpool and asynchronous file i/o infrastructure based on Boost.AS
 File Created: Mar 2013
 */
 
-#include "../../../boost/afio/afio.hpp"
+#include "../../../boost/afio/detail/impl/afio.ipp"

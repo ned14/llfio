@@ -107,6 +107,8 @@ if "--link-test"  in $(.argv)
     {
         link $(x) $(reqs) ;
     }
+	# Test that inline linkage works
+	link test_inline_linkage_master.cpp test_inline_linkage1.cpp test_inline_linkage2.cpp ;
 }
 else # run actual tests
 {
