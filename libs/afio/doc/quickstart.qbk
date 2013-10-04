@@ -164,8 +164,8 @@ drive. Note that AFIO has a native WinIOCP backend which leverages host asynchro
   [[][iostreams, single threaded][iostreams, OpenMP][Boost.AFIO][Boost.AFIO `file_flags::OSDirect`][Boost.AFIO `file_flags::OSMMap`[footnote The superiority of memory maps on Windows is because all buffered file i/o is done via memory copying to/from memory maps on Windows anyway, so eliminating that memory copy is huge.]]]
   [[Warm cache][812 Mb/sec][1810 Mb/sec][2663 Mb/sec][N/A][6512 Mb/sec]]
   [[][+0%][+123%][+228%][][+702%]]
-  [[Cold cache[footnote File cache reset using [@http://technet.microsoft.com/en-us/sysinternals/ff700229.aspx]]][16 Mb/sec][8 Mb/sec][15 Mb/sec][13.14 Mb/sec][24 Mb/sec]]
-  [[][+0%][-50%][-6%][-18%][+50%]]
+  [[Cold cache[footnote File cache reset using [@http://technet.microsoft.com/en-us/sysinternals/ff700229.aspx]]][16 Mb/sec][[*8 Mb/sec]][15 Mb/sec][13.14 Mb/sec][24 Mb/sec]]
+  [[][+0%][[*-50%]][-6%][-18%][+50%]]
 ]
 
 The eagle eyed amongst you will have noticed that the AFIO implementation looks hand tuned with a

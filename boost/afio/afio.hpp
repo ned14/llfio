@@ -708,7 +708,7 @@ namespace detail
 \brief Abstract base class for dispatching file i/o asynchronously
 
 This is a reference counted instance with platform-specific implementation optionally hidden in object code.
-Construct an instance using the `boost::afio::async_file_io_dispatcher()` function.
+Construct an instance using the `boost::afio::make_async_file_io_dispatcher()` function.
 
 \qbk{
 [/ link afio.reference.functions.async_file_io_dispatcher `async_file_io_dispatcher()`]
@@ -2149,7 +2149,11 @@ template<class R> inline std::pair<future<R>, async_io_op> async_file_io_dispatc
 
 #if !defined(BOOST_NO_CXX11_VARIADIC_TEMPLATES)
 
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
 template<class C, class... Args> inline std::pair<future<typename detail::vs2013_variadic_overload_resolution_workaround<C, Args...>::type>, async_io_op> async_file_io_dispatcher_base::call(const async_io_op &req, C callback, Args... args)
+#else
+template<class C, class... Args> inline std::pair<future<typename std::result_of<C(Args...)>::type>, async_io_op> async_file_io_dispatcher_base::call(const async_io_op &req, C callback, Args... args)
+#endif
 {
     typedef typename std::result_of<C(Args...)>::type rettype;
     return call(req, std::function<rettype()>(std::bind<rettype>(callback, args...)));

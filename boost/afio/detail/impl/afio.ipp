@@ -1823,6 +1823,9 @@ namespace detail {
             BOOST_AFIO_ERRHOSFN(BOOST_AFIO_POSIX_FTRUNCATE(p->fd, newsize), p->path());
             return std::make_pair(true, h);
         }
+#ifdef __linux__
+        static int int_getdents(int fd, char *buf, int count) { return syscall(SYS_getdents64, fd, buf, count); }
+#endif
         // Called in unknown thread
         completion_returntype doenumerate(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr *, async_enumerate_op_req req, std::shared_ptr<promise<std::pair<std::vector<directory_entry>, bool>>> ret)
         {
@@ -1835,7 +1838,7 @@ namespace detail {
 #ifdef __linux__
                 // Unlike FreeBSD, Linux doesn't define a getdents() function, so we'll do that here.
                 typedef int (*getdents64_t)(int, char *, int);
-                getdents64_t getdents=(getdents64_t)([](int fd, char *buf, int count) -> int { return syscall(SYS_getdents64, fd, buf, count); });
+                getdents64_t getdents=(getdents64_t)(&async_file_io_dispatcher_compat::int_getdents);
                 typedef dirent64 dirent;
 #endif
                 auto buffer=std::unique_ptr<dirent[]>(new dirent[req.maxitems]);

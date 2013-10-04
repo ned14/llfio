@@ -35,8 +35,8 @@
     </p>
 <p>
       Boost.AFIO is only dependant on headers-only Boost libraries apart from Boost.Filesystem.
-      It does not introduce indirect dependencies on any non-system supplied binary
-      libraries except for Boost.Filesystem.
+      Boost.Filesystem in turn is dependant on Boost.System. On some platforms (e.g.
+      ARM) you may also need Boost.Atomic.
     </p>
 <p>
       In order to be able to use Boost.AFIO, the only thing users need to do is to

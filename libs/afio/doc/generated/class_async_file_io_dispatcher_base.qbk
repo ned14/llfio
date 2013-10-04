@@ -15,7 +15,7 @@
 Abstract base class for dispatching file i/o asynchronously. 
 
 [heading Description]
-This is a reference counted instance with platform-specific implementation optionally hidden in object code. Construct an instance using the [^`boost::afio::async_file_io_dispatcher()`] function.
+This is a reference counted instance with platform-specific implementation optionally hidden in object code. Construct an instance using the [^`boost::afio::make_async_file_io_dispatcher()`] function.
 
 [heading Synopsis]
 ``class async_file_io_dispatcher_base
@@ -479,19 +479,6 @@ The page size of this architecture.
 [* std::shared_ptr< async_io_handle >]: ['h]:  
 
 [* exception_ptr]: ['e]:  
-
-
-
-
-]]
-[[``template<class C, class... Args>
-std::pair< future< typename detail::vs2013_variadic_overload_resolution_workaround< C, Args...>::type >, async_io_op > call(const async_io_op & req, C callback, Args... args)``
-
-] [] [[* const async_io_op &]: ['req]:  
-
-[* C]: ['callback]:  
-
-[* Args...]: ['args]:  
 
 
 

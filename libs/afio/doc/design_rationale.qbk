@@ -55,7 +55,7 @@ with more exotic varieties.
 [section:overview A quick overview of the design]
 
 __boost_afio__ version 1 is amongst the smallest standalone libraries in the Boost C++ libraries.
-Its total active lines of code is less than 1,000 lines, and implementing its documentatation and
+Its total active lines of code is around 1,000 lines, and implementing its documentatation and
 other associated necessities for Boost peer review took longer than writing and debugging
 the code itself. Yet despite its shortness of length, AFIO has some unusual design choices,
 and probably what some might initially think (before they've used it) is an unintuitive API.

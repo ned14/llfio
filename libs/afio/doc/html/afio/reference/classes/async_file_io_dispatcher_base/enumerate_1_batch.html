@@ -28,7 +28,7 @@
           (batch)</a>
 </h5></div></div></div>
 <p>
-            <a class="indexterm" name="id976723"></a>
+            <a class="indexterm" name="id992171"></a>
 Schedule a batch of asynchronous directory enumerations after a preceding
             operations.
           </p>
@@ -143,8 +143,7 @@ Schedule a batch of asynchronous directory enumerations after a preceding
             if any inputs have values which could not possibly be correct. Once a
             batch of input ops has been verified at the point of entry as not errored,
             you are guaranteed that the batch is atomically scheduled as a whole,
-            unless one of the following conditions occurs: (i) A failure to allocate
-            memory occurs.
+            unless a failure to allocate memory occurs.
           </p>
 <h6>
 <a name="afio.reference.classes.async_file_io_dispatcher_base.enumerate_1_batch.h7"></a>
