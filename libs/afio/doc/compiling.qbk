@@ -179,7 +179,7 @@ directories, so `include` directives of this scheme will work:
     
     It may be preferable to forgo symbolic links altogether and simply copy the 
     [^boost.afio/boost/afio] and [^boost.afio/libs/afio] into [^boost_directory/boost] 
-    and [^boost_directory/libs respectively]. 
+    and [^boost_directory/libs] respectively. 
 
     The advantage of symbolic links over a direct copy of the AFIO directories is that you are able 
     to update the AFIO repo, and try the latest builds without copying the folder a second time. 
