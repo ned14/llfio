@@ -28,7 +28,7 @@
           (single)</a>
 </h5></div></div></div>
 <p>
-            <a class="indexterm" name="id968287"></a>
+            <a class="indexterm" name="id946961"></a>
 Schedule an asynchronous symlink creation and open after a precondition.
           </p>
 <h6>
@@ -160,11 +160,11 @@ Schedule an asynchronous symlink creation and open after a precondition.
         <span class="string">"testdir/linktodir"</span><span class="special">,</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">file_flags</span><span class="special">::</span><span class="identifier">Create</span><span class="special">)));</span>
 
     <span class="comment">// Schedule deleting the symbolic link only after when it has been created</span>
-    <span class="keyword">auto</span> <span class="identifier">rmlink</span><span class="special">(</span><span class="identifier">dispatcher</span><span class="special">-&gt;</span><span class="identifier">rmsymlink</span><span class="special">(</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_path_op_req</span><span class="special">(</span><span class="identifier">mklink</span><span class="special">,</span>
-        <span class="string">"testdir/linktodir"</span><span class="special">)));</span>
+    <span class="keyword">auto</span> <span class="identifier">rmlink</span><span class="special">(</span><span class="identifier">dispatcher</span><span class="special">-&gt;</span><span class="identifier">rmsymlink</span><span class="special">(</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_path_op_req</span><span class="special">(</span>
+        <span class="identifier">dispatcher</span><span class="special">-&gt;</span><span class="identifier">close</span><span class="special">(</span><span class="identifier">mklink</span><span class="special">),</span> <span class="string">"testdir/linktodir"</span><span class="special">)));</span>
     <span class="comment">// Schedule deleting the file only after when it has been created</span>
-    <span class="keyword">auto</span> <span class="identifier">rmfile</span><span class="special">(</span><span class="identifier">dispatcher</span><span class="special">-&gt;</span><span class="identifier">rmfile</span><span class="special">(</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_path_op_req</span><span class="special">(</span><span class="identifier">mkfile</span><span class="special">,</span>
-        <span class="string">"testdir/testfile"</span><span class="special">)));</span>
+    <span class="keyword">auto</span> <span class="identifier">rmfile</span><span class="special">(</span><span class="identifier">dispatcher</span><span class="special">-&gt;</span><span class="identifier">rmfile</span><span class="special">(</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_path_op_req</span><span class="special">(</span>
+        <span class="identifier">dispatcher</span><span class="special">-&gt;</span><span class="identifier">close</span><span class="special">(</span><span class="identifier">mkfile</span><span class="special">),</span> <span class="string">"testdir/testfile"</span><span class="special">)));</span>
     <span class="comment">// Schedule waiting until both the preceding operations have finished</span>
     <span class="keyword">auto</span> <span class="identifier">barrier</span><span class="special">(</span><span class="identifier">dispatcher</span><span class="special">-&gt;</span><span class="identifier">barrier</span><span class="special">({</span><span class="identifier">rmlink</span><span class="special">,</span> <span class="identifier">rmfile</span><span class="special">}));</span>
     <span class="comment">// Schedule deleting the directory only after the barrier completes</span>

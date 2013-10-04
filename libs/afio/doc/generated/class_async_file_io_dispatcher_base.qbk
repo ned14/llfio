@@ -39,7 +39,7 @@ This is a reference counted instance with platform-specific implementation optio
 [heading Member Function(s)]
 [table
 [[Function] [Description] [Parameters]  [Returns]]
-[[``std::weak_ptr< thread_source > threadsource()``
+[[``std::shared_ptr< thread_source > threadsource()``
 
 ] [Returns the thread source used by this dispatcher. ] [
 
@@ -67,7 +67,7 @@ This is a reference counted instance with platform-specific implementation optio
 ]]
 [[``async_io_op op_from_scheduled_id(size_t id)``
 
-] [Returns an op ref for a given [*currently][*scheduled] op id, throwing a fatal exception if id not scheduled at the point of call. Can be used to retrieve exception state from some op id, or one's own shared future. ] [[* size_t]: ['id]:  The unique integer id for the op. 
+] [Returns an op ref for a given [*currently] scheduled op id, throwing an exception if id not scheduled at the point of call. Can be used to retrieve exception state from some op id, or one's own shared future. ] [[* size_t]: ['id]:  The unique integer id for the op. 
 
 
 

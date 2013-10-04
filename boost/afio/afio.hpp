@@ -745,14 +745,14 @@ public:
     BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC ~async_file_io_dispatcher_base();
 
     //! Returns the thread source used by this dispatcher
-    BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC std::weak_ptr<thread_source> threadsource() const;
+    BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC std::shared_ptr<thread_source> threadsource() const;
     //! Returns file flags as would be used after forcing and masking bits passed during construction
     BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC file_flags fileflags(file_flags flags) const;
     //! Returns the current wait queue depth of this dispatcher
     BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC size_t wait_queue_depth() const;
     //! Returns the number of open items in this dispatcher
     BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC size_t fd_count() const;
-    /*! \brief Returns an op ref for a given \b currently \b scheduled op id, throwing a fatal exception if id not scheduled at the point of call.
+    /*! \brief Returns an op ref for a given \b currently scheduled op id, throwing an exception if id not scheduled at the point of call.
     Can be used to retrieve exception state from some op id, or one's own shared future.
     \return An async_io_op with the same shared future as all op refs with this id.
     \param id The unique integer id for the op.
@@ -902,7 +902,7 @@ public:
     \qbk{distinguish, batch}
     \complexity{Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete.}
     \exceptionmodelstd
-    \qexample{filedir_example}
+    \qexample{adopt_example}
     */
     BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC std::vector<async_io_op> adopt(const std::vector<std::shared_ptr<async_io_handle>> &hs);
     /*! \brief Schedule an adoption of a third party handle.
@@ -917,7 +917,7 @@ public:
     \qbk{distinguish, single}
     \complexity{Amortised O(1) to dispatch. Amortised O(1) to complete if directory creation is constant time.}
     \exceptionmodelstd
-    \qexample{filedir_example}
+    \qexample{adopt_example}
     */
     inline async_io_op adopt(std::shared_ptr<async_io_handle> h);
     /*! \brief Schedule a batch of asynchronous directory creations and opens after optional preconditions.

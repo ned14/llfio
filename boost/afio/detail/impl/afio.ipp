@@ -826,7 +826,7 @@ void async_file_io_dispatcher_base::int_del_io_handle(void *key)
     BOOST_END_MEMORY_TRANSACTION(p->fdslock)
 }
 
-std::weak_ptr<thread_source> async_file_io_dispatcher_base::threadsource() const
+std::shared_ptr<thread_source> async_file_io_dispatcher_base::threadsource() const
 {
     return p->pool;
 }

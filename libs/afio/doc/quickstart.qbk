@@ -218,7 +218,7 @@ is you may wish to skip this section.
 
 First, it will be useful to introduce some core ideas before moving on to a more indepth 
 look at closure execution engines. Let us begin with a simple definition of a closure. 
-Wikipedia.org suplies a clear definition:
+Wikipedia.org supplies a clear definition:
 
 
 [:“In programming languages, a closure (also lexical closure or function closure) is a function or 

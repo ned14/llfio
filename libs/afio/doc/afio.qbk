@@ -47,6 +47,7 @@
 [def __afio_handle__ [link afio.reference.classes.async_io_handle `class async_io_handle`]]
 [def __afio_when_all__ [link afio.reference.functions.when_all_ops `when_all()`]]
 
+[import ../test/examples/adopt_example.cpp]
 [import ../test/examples/barrier_example.cpp]
 [import ../test/examples/call_example.cpp]
 [import ../test/examples/closure_execution_afio_io_example.cpp]
