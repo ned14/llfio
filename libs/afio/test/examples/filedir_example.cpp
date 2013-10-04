@@ -22,11 +22,11 @@ int main(void)
             "testdir/linktodir", boost::afio::file_flags::Create)));
 
         // Schedule deleting the symbolic link only after when it has been created
-        auto rmlink(dispatcher->rmsymlink(boost::afio::async_path_op_req(mklink,
-            "testdir/linktodir")));
+        auto rmlink(dispatcher->rmsymlink(boost::afio::async_path_op_req(
+            dispatcher->close(mklink), "testdir/linktodir")));
         // Schedule deleting the file only after when it has been created
-        auto rmfile(dispatcher->rmfile(boost::afio::async_path_op_req(mkfile,
-            "testdir/testfile")));
+        auto rmfile(dispatcher->rmfile(boost::afio::async_path_op_req(
+            dispatcher->close(mkfile), "testdir/testfile")));
         // Schedule waiting until both the preceding operations have finished
         auto barrier(dispatcher->barrier({rmlink, rmfile}));
         // Schedule deleting the directory only after the barrier completes

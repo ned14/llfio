@@ -27,6 +27,7 @@ if available, if not it falls back to a spin lock based emulation. On memory
 transaction capable CPUs, AFIO is now almost entirely wait free, apart from when
 it has to fetch memory from the kernel.
 
+Made AFIO usable as headers only.
 
 [/=================]
 [heading Boost 1.55 AFIO v1.0]
@@ -35,6 +36,9 @@ it has to fetch memory from the kernel.
 First release for end of Google Summer of Code 2013.
 
 [endsect]
+
+
+
 
 [section:FAQ Frequently Asked Questions]
 
@@ -143,5 +147,15 @@ etc.
 # That's it, there is no more to it.
 
 [endsect] [/foreign_fd]
+
+[section:slow_compile Using AFIO really slows down my compile times. Can't you do something about that?]
+
+We know about that slowdown! The solution is easy: define `BOOST_AFIO_HEADERS_ONLY` to 0 for each compiland, and
+link to the AFIO shared library instead. Do the same for ASIO by defining `BOOST_ASIO_HEADER_ONLY` to 0 for
+each compiland, and link to the ASIO shared library instead.
+
+You should notice a 6x-10x improvement to compilation time, which is a huge win during debugging.
+
+[endsect] [/slow_compile]
 
 [endsect] [/FAQ]

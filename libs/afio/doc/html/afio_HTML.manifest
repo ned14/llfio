@@ -13,9 +13,9 @@ afio/quickstart/async_file_io/so_what.html
 afio/quickstart/closure_engine.html
 afio/quickstart/closure_engine/the_basics.html
 afio/quickstart/closure_engine/the_basics/examples.html
-afio/quickstart/closure_engine/how_boost_afio_relates_to_exisit.html
-afio/quickstart/closure_engine/how_boost_afio_relates_to_exisit/comparison_of_afio_with_other_cl.html
-afio/quickstart/closure_engine/how_boost_afio_relates_to_exisit/other_useful_comparisons.html
+afio/quickstart/closure_engine/how_boost_afio_relates_to_existi.html
+afio/quickstart/closure_engine/how_boost_afio_relates_to_existi/comparison_of_afio_with_other_cl.html
+afio/quickstart/closure_engine/how_boost_afio_relates_to_existi/other_useful_comparisons.html
 afio/reference.html
 afio/reference/macros_flags.html
 afio/reference/macros_flags/boost_afio_validate_inputs.html
@@ -101,4 +101,5 @@ afio/FAQ/closure_performance.html
 afio/FAQ/stuck_ops.html
 afio/FAQ/vector_use.html
 afio/FAQ/foreign_fd.html
+afio/FAQ/slow_compile.html
 afio/acknowledgments.html

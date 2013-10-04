@@ -28,7 +28,7 @@ namespace boost {
         inline boost::thread::id get_this_thread_id() { return boost::this_thread::get_id(); }
         // Both VS2010 and Mingw32 need this, but not Mingw-w64
 #if (defined(BOOST_MSVC) && BOOST_MSVC < 1700 /* <= VS2010 */) || (defined(__MINGW32__) && !defined(__MINGW64_VERSION_MAJOR))
-        namespace detail { struct vs2010_lack_of_decent_current_exception_support_hack_t { }; BOOST_AFIO_DECL boost::exception_ptr &vs2010_lack_of_decent_current_exception_support_hack(); }
+        namespace detail { struct vs2010_lack_of_decent_current_exception_support_hack_t { }; BOOST_AFIO_HEADERS_ONLY_FUNC_SPEC boost::exception_ptr &vs2010_lack_of_decent_current_exception_support_hack(); }
         inline boost::exception_ptr current_exception() { boost::exception_ptr ret=boost::current_exception(); return (ret==detail::vs2010_lack_of_decent_current_exception_support_hack()) ? boost::exception_ptr() : ret; }
 #define BOOST_AFIO_NEED_CURRENT_EXCEPTION_HACK
 #else

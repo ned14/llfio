@@ -11,16 +11,18 @@
 [def __msvc__ MSVC]
 [def __stlport__ [@http://sourceforge.net/projects/stlport STLport]]
 
-__boost_afio__ is a headers-only library. Users only need to include the 
+__boost_afio__ is by default a headers-only library, unless you define the macro
+`BOOST_AFIO_HEADERS_ONLY` to zero before including afio.hpp. Users only need to include the 
 library headers in their programs in order to be able to access definitions 
 and algorithms provided by the __boost_afio__ library. No linking against 
 any binaries is required. 
 
-__boost_afio__ is only dependant on headers-only __boost__ libraries.
-It does not introduce indirect dependencies on any binary libraries.
+__boost_afio__ is only dependant on headers-only __boost__ libraries apart
+from Boost.Filesystem. Boost.Filesystem in turn is dependant on Boost.System.
+On some platforms (e.g. ARM) you may also need Boost.Atomic.
 
 In order to be able to use __boost_afio__, the only thing users need to do 
-is to download and/or install Boost  and specify location to include 
+is to download and/or install Boost and specify location to include 
 directories, so `include` directives of this scheme will work:
 
     #include <boost/...>
@@ -127,7 +129,7 @@ directories, so `include` directives of this scheme will work:
 [heading Boost AFIO Installation]
 
 # Download the latest version of the Boost Libraries from boost.org. 
-  At the time of writing the current version is Boost 1.54. 
+  At the time of writing the current version is Boost 1.55. 
   Boost AFIO is not compatible with earlier versions of Boost, 
   so be sure to use a current copy of the Boost Libraries. 
 
