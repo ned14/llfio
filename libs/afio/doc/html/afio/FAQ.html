@@ -4,10 +4,10 @@
 <title>Frequently Asked Questions</title>
 <link rel="stylesheet" href="../myboostbook.css" type="text/css">
 <meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
-<link rel="home" href="../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 0.1">
-<link rel="up" href="../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 0.1">
+<link rel="home" href="../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 1.1">
+<link rel="up" href="../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 1.1">
 <link rel="prev" href="release_notes.html" title="Release Notes">
-<link rel="next" href="FAQ/closure_performance.html" title="What is the maximum throughput of AFIO's closure execution engine?">
+<link rel="next" href="FAQ/closure_performance.html" title="What is the maximum throughput of AFIO's closure execution engine aka how many IOPS can I push with AFIO?">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
 <table cellpadding="2" width="100%"><tr>
@@ -28,13 +28,15 @@
 </h2></div></div></div>
 <div class="toc"><dl class="toc">
 <dt><span class="section"><a href="FAQ/closure_performance.html">What is the maximum throughput
-      of AFIO's closure execution engine?</a></span></dt>
+      of AFIO's closure execution engine aka how many IOPS can I push with AFIO?</a></span></dt>
 <dt><span class="section"><a href="FAQ/stuck_ops.html">I'm seeing <span class="quote">&#8220;<span class="quote">WARNING: <code class="computeroutput"><span class="special">~</span><span class="identifier">async_file_dispatcher_base</span><span class="special">()</span></code> detects stuck <code class="computeroutput"><span class="identifier">async_io_op</span></code>
       in total of X ops</span>&#8221;</span> during process close. What does this mean?</a></span></dt>
 <dt><span class="section"><a href="FAQ/vector_use.html">Why did you use <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;&gt;</span></code> as the ops batch container instead
       of a generic iterator range?</a></span></dt>
 <dt><span class="section"><a href="FAQ/foreign_fd.html">How do I configure my own file descriptor
       or HANDLE in AFIO?</a></span></dt>
+<dt><span class="section"><a href="FAQ/slow_compile.html">Using AFIO really slows down my
+      compile times. Can't you do something about that?</a></span></dt>
 </dl></div>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>

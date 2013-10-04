@@ -4,7 +4,7 @@
 <title>completion (batch bound functions)</title>
 <link rel="stylesheet" href="../../../../myboostbook.css" type="text/css">
 <meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
-<link rel="home" href="../../../../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 0.1">
+<link rel="home" href="../../../../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 1.1">
 <link rel="up" href="../async_file_io_dispatcher_base.html" title="async_file_io_dispatcher_base">
 <link rel="prev" href="../async_file_io_dispatcher_base.html" title="async_file_io_dispatcher_base">
 <link rel="next" href="completion_2_single_bound_function.html" title="completion (single bound function)">
@@ -28,7 +28,7 @@
           (batch bound functions)</a>
 </h5></div></div></div>
 <p>
-            <a class="indexterm" name="id903835"></a>
+            <a class="indexterm" name="id901112"></a>
 Schedule a batch of asynchronous invocations of the specified functions
             when their supplied operations complete.
           </p>
@@ -145,8 +145,7 @@ Schedule a batch of asynchronous invocations of the specified functions
             if any inputs have values which could not possibly be correct. Once a
             batch of input ops has been verified at the point of entry as not errored,
             you are guaranteed that the batch is atomically scheduled as a whole,
-            unless one of the following conditions occurs: (i) A failure to allocate
-            memory occurs.
+            unless a failure to allocate memory occurs.
           </p>
 <h6>
 <a name="afio.reference.classes.async_file_io_dispatcher_base.completion_2_batch_bound_functions.h6"></a>

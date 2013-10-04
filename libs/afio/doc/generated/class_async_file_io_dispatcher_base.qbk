@@ -15,7 +15,7 @@
 Abstract base class for dispatching file i/o asynchronously. 
 
 [heading Description]
-This is a reference counted instance with platform-specific implementation optionally hidden in object code. Construct an instance using the [^`boost::afio::async_file_io_dispatcher()`] function.
+This is a reference counted instance with platform-specific implementation optionally hidden in object code. Construct an instance using the [^`boost::afio::make_async_file_io_dispatcher()`] function.
 
 [heading Synopsis]
 ``class async_file_io_dispatcher_base
@@ -39,7 +39,7 @@ This is a reference counted instance with platform-specific implementation optio
 [heading Member Function(s)]
 [table
 [[Function] [Description] [Parameters]  [Returns]]
-[[``std::weak_ptr< thread_source > threadsource()``
+[[``std::shared_ptr< thread_source > threadsource()``
 
 ] [Returns the thread source used by this dispatcher. ] [
 
@@ -59,7 +59,7 @@ This is a reference counted instance with platform-specific implementation optio
 
 
 ]]
-[[``size_t count()``
+[[``size_t fd_count()``
 
 ] [Returns the number of open items in this dispatcher. ] [
 
@@ -67,7 +67,7 @@ This is a reference counted instance with platform-specific implementation optio
 ]]
 [[``async_io_op op_from_scheduled_id(size_t id)``
 
-] [Returns an op ref for a given [*currently][*scheduled] op id, throwing a fatal exception if id not scheduled at the point of call. Can be used to retrieve exception state from some op id, or one's own shared future. ] [[* size_t]: ['id]:  The unique integer id for the op. 
+] [Returns an op ref for a given [*currently] scheduled op id, throwing an exception if id not scheduled at the point of call. Can be used to retrieve exception state from some op id, or one's own shared future. ] [[* size_t]: ['id]:  The unique integer id for the op. 
 
 
 
@@ -143,7 +143,7 @@ A pair with a future returning the result of the callable and an op handle.
 
 ]]
 [[``template<class C, class... Args>
-std::pair< future< typename detail::vs2013_variadic_overload_resolution_workaround< C, Args...>::type >, async_io_op > call(const async_io_op & req, C callback, Args... args)``
+std::pair< future< typename std::result_of< C(Args...)>::type >, async_io_op > call(const async_io_op & req, C callback, Args... args)``
 
 ] [Schedule an asynchronous invocation of the specified unbound callable when its supplied precondition completes. Note that this function essentially calls [^`std::bind()`] on the callable and the args and passes it to the other call() overload taking a [^`std::function<>`]. You should therefore use [^`std::ref()`] etc. as appropriate. ] [[* const async_io_op &]: ['req]:  A precondition op handle. If default constructed, the precondition is null. 
 

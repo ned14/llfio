@@ -4,7 +4,7 @@
 <title>Notes on using AFIO with Microsoft Visual Studio 2010 and Mingw32</title>
 <link rel="stylesheet" href="../../myboostbook.css" type="text/css">
 <meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
-<link rel="home" href="../../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 0.1">
+<link rel="home" href="../../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 1.1">
 <link rel="up" href="../advanced_topics.html" title="Advanced Topics">
 <link rel="prev" href="custom_completion_handler.html" title="How to write your own custom AFIO completion handler">
 <link rel="next" href="../release_notes.html" title="Release Notes">
@@ -74,20 +74,20 @@
             routine. In other words, it's unavoidable with our C++11 assuming design.
             The solution we adopted is not pretty, but it does work:
 <pre class="programlisting"><span class="preprocessor">#ifdef</span> <span class="identifier">BOOST_AFIO_NEED_CURRENT_EXCEPTION_HACK</span>
-	<span class="comment">// VS2010 and Mingw32 segfaults if you ever do a try { throw; } catch(...) without an exception ever having been thrown :(</span>
-	<span class="keyword">try</span>
-	<span class="special">{</span>
-		<span class="keyword">throw</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">detail</span><span class="special">::</span><span class="identifier">vs2010_lack_of_decent_current_exception_support_hack_t</span><span class="special">();</span>
-	<span class="special">}</span>
-	<span class="keyword">catch</span><span class="special">(...)</span>
-	<span class="special">{</span>
-		<span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">detail</span><span class="special">::</span><span class="identifier">vs2010_lack_of_decent_current_exception_support_hack</span><span class="special">()=</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">current_exception</span><span class="special">();</span>
+    <span class="comment">// VS2010 and Mingw32 segfaults if you ever do a try { throw; } catch(...) without an exception ever having been thrown :(</span>
+    <span class="keyword">try</span>
+    <span class="special">{</span>
+        <span class="keyword">throw</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">detail</span><span class="special">::</span><span class="identifier">vs2010_lack_of_decent_current_exception_support_hack_t</span><span class="special">();</span>
+    <span class="special">}</span>
+    <span class="keyword">catch</span><span class="special">(...)</span>
+    <span class="special">{</span>
+        <span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">detail</span><span class="special">::</span><span class="identifier">vs2010_lack_of_decent_current_exception_support_hack</span><span class="special">()=</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">current_exception</span><span class="special">();</span>
 <span class="preprocessor">#endif</span>
-	
-	<span class="special">...</span> <span class="keyword">do</span> <span class="identifier">your</span> <span class="identifier">AFIO</span> <span class="keyword">using</span> <span class="identifier">code</span> <span class="special">...</span>
-	
+
+    <span class="special">...</span> <span class="keyword">do</span> <span class="identifier">your</span> <span class="identifier">AFIO</span> <span class="keyword">using</span> <span class="identifier">code</span> <span class="special">...</span>
+
 <span class="preprocessor">#ifdef</span> <span class="identifier">BOOST_AFIO_NEED_CURRENT_EXCEPTION_HACK</span>
-	<span class="special">}</span>
+    <span class="special">}</span>
 <span class="preprocessor">#endif</span>
 </pre>
             <p>

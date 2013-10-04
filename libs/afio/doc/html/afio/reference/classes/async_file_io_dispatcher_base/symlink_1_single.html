@@ -4,7 +4,7 @@
 <title>symlink (single)</title>
 <link rel="stylesheet" href="../../../../myboostbook.css" type="text/css">
 <meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
-<link rel="home" href="../../../../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 0.1">
+<link rel="home" href="../../../../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 1.1">
 <link rel="up" href="../async_file_io_dispatcher_base.html" title="async_file_io_dispatcher_base">
 <link rel="prev" href="symlink_1_batch.html" title="symlink (batch)">
 <link rel="next" href="sync_1_batch.html" title="sync (batch)">
@@ -28,19 +28,23 @@
           (single)</a>
 </h5></div></div></div>
 <p>
-            <a class="indexterm" name="id950634"></a>
+            <a class="indexterm" name="id946961"></a>
 Schedule an asynchronous symlink creation and open after a precondition.
           </p>
 <h6>
 <a name="afio.reference.classes.async_file_io_dispatcher_base.symlink_1_single.h0"></a>
             <span class="phrase"><a name="afio.reference.classes.async_file_io_dispatcher_base.symlink_1_single.description"></a></span><a class="link" href="symlink_1_single.html#afio.reference.classes.async_file_io_dispatcher_base.symlink_1_single.description">Description</a>
           </h6>
-<pre class="programlisting"><span class="identifier">Note</span> <span class="identifier">that</span> <span class="keyword">if</span> <span class="identifier">creating</span><span class="special">,</span> <span class="identifier">the</span> <span class="identifier">target</span> <span class="keyword">for</span> <span class="identifier">the</span> <span class="identifier">symlink</span> <span class="identifier">is</span> <span class="identifier">the</span> <span class="identifier">precondition</span><span class="special">.</span> <span class="identifier">On</span> <span class="identifier">Windows</span> <span class="identifier">directories</span> <span class="identifier">are</span> <span class="identifier">symlinked</span> <span class="keyword">using</span> <span class="identifier">a</span> <span class="identifier">reparse</span>
-<span class="identifier">point</span> <span class="identifier">instead</span> <span class="identifier">of</span> <span class="identifier">a</span> <span class="identifier">symlink</span> <span class="identifier">due</span> <span class="identifier">to</span> <span class="identifier">the</span> <span class="keyword">default</span> <span class="identifier">lack</span> <span class="identifier">of</span> <span class="identifier">the</span> <span class="special">&lt;</span><span class="identifier">tt</span><span class="special">&gt;</span><span class="identifier">SeCreateSymbolicLinkPrivilege</span><span class="special">&lt;/</span><span class="identifier">tt</span><span class="special">&gt;</span> <span class="keyword">for</span> <span class="identifier">non</span><span class="special">-</span><span class="identifier">Administrative</span>
-<span class="identifier">users</span><span class="special">.</span>
-
-<span class="identifier">Note</span> <span class="identifier">that</span> <span class="identifier">currently</span> <span class="identifier">on</span> <span class="identifier">Windows</span> <span class="identifier">non</span><span class="special">-</span><span class="identifier">directory</span> <span class="identifier">symbolic</span> <span class="identifier">links</span> <span class="identifier">are</span> <span class="keyword">not</span> <span class="identifier">supported</span><span class="special">.</span> <span class="identifier">If</span> <span class="identifier">there</span> <span class="identifier">is</span> <span class="identifier">demand</span> <span class="keyword">for</span> <span class="keyword">this</span> <span class="identifier">we</span> <span class="identifier">may</span> <span class="identifier">add</span> <span class="identifier">support</span><span class="special">.</span>
-</pre>
+<p>
+            Note that if creating, the target for the symlink is the precondition.
+            On Windows directories are symlinked using a reparse point instead of
+            a symlink due to the default lack of the <code class="literal"><code class="computeroutput"><span class="identifier">SeCreateSymbolicLinkPrivilege</span></code></code>
+            for non-Administrative users.
+          </p>
+<p>
+            Note that currently on Windows non-directory symbolic links are not supported.
+            If there is demand for this we may add support.
+          </p>
 <h6>
 <a name="afio.reference.classes.async_file_io_dispatcher_base.symlink_1_single.h1"></a>
             <span class="phrase"><a name="afio.reference.classes.async_file_io_dispatcher_base.symlink_1_single.synopsis"></a></span><a class="link" href="symlink_1_single.html#afio.reference.classes.async_file_io_dispatcher_base.symlink_1_single.synopsis">Synopsis</a>
@@ -133,8 +137,7 @@ Schedule an asynchronous symlink creation and open after a precondition.
             if any inputs have values which could not possibly be correct. Once a
             batch of input ops has been verified at the point of entry as not errored,
             you are guaranteed that the batch is atomically scheduled as a whole,
-            unless one of the following conditions occurs: (i) A failure to allocate
-            memory occurs.
+            unless a failure to allocate memory occurs.
           </p>
 <h6>
 <a name="afio.reference.classes.async_file_io_dispatcher_base.symlink_1_single.h7"></a>
@@ -157,11 +160,11 @@ Schedule an asynchronous symlink creation and open after a precondition.
         <span class="string">"testdir/linktodir"</span><span class="special">,</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">file_flags</span><span class="special">::</span><span class="identifier">Create</span><span class="special">)));</span>
 
     <span class="comment">// Schedule deleting the symbolic link only after when it has been created</span>
-    <span class="keyword">auto</span> <span class="identifier">rmlink</span><span class="special">(</span><span class="identifier">dispatcher</span><span class="special">-&gt;</span><span class="identifier">rmsymlink</span><span class="special">(</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_path_op_req</span><span class="special">(</span><span class="identifier">mklink</span><span class="special">,</span>
-        <span class="string">"testdir/linktodir"</span><span class="special">)));</span>
+    <span class="keyword">auto</span> <span class="identifier">rmlink</span><span class="special">(</span><span class="identifier">dispatcher</span><span class="special">-&gt;</span><span class="identifier">rmsymlink</span><span class="special">(</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_path_op_req</span><span class="special">(</span>
+        <span class="identifier">dispatcher</span><span class="special">-&gt;</span><span class="identifier">close</span><span class="special">(</span><span class="identifier">mklink</span><span class="special">),</span> <span class="string">"testdir/linktodir"</span><span class="special">)));</span>
     <span class="comment">// Schedule deleting the file only after when it has been created</span>
-    <span class="keyword">auto</span> <span class="identifier">rmfile</span><span class="special">(</span><span class="identifier">dispatcher</span><span class="special">-&gt;</span><span class="identifier">rmfile</span><span class="special">(</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_path_op_req</span><span class="special">(</span><span class="identifier">mkfile</span><span class="special">,</span>
-        <span class="string">"testdir/testfile"</span><span class="special">)));</span>
+    <span class="keyword">auto</span> <span class="identifier">rmfile</span><span class="special">(</span><span class="identifier">dispatcher</span><span class="special">-&gt;</span><span class="identifier">rmfile</span><span class="special">(</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_path_op_req</span><span class="special">(</span>
+        <span class="identifier">dispatcher</span><span class="special">-&gt;</span><span class="identifier">close</span><span class="special">(</span><span class="identifier">mkfile</span><span class="special">),</span> <span class="string">"testdir/testfile"</span><span class="special">)));</span>
     <span class="comment">// Schedule waiting until both the preceding operations have finished</span>
     <span class="keyword">auto</span> <span class="identifier">barrier</span><span class="special">(</span><span class="identifier">dispatcher</span><span class="special">-&gt;</span><span class="identifier">barrier</span><span class="special">({</span><span class="identifier">rmlink</span><span class="special">,</span> <span class="identifier">rmfile</span><span class="special">}));</span>
     <span class="comment">// Schedule deleting the directory only after the barrier completes</span>

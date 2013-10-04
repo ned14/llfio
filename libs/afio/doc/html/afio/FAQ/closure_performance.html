@@ -1,10 +1,10 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
-<title>What is the maximum throughput of AFIO's closure execution engine?</title>
+<title>What is the maximum throughput of AFIO's closure execution engine aka how many IOPS can I push with AFIO?</title>
 <link rel="stylesheet" href="../../myboostbook.css" type="text/css">
 <meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
-<link rel="home" href="../../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 0.1">
+<link rel="home" href="../../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 1.1">
 <link rel="up" href="../FAQ.html" title="Frequently Asked Questions">
 <link rel="prev" href="../FAQ.html" title="Frequently Asked Questions">
 <link rel="next" href="stuck_ops.html" title="I'm seeing &#8220;WARNING: ~async_file_dispatcher_base() detects stuck async_io_op in total of X ops&#8221; during process close. What does this mean?">
@@ -24,18 +24,21 @@
 </div>
 <div class="section">
 <div class="titlepage"><div><div><h3 class="title">
-<a name="afio.FAQ.closure_performance"></a><a class="link" href="closure_performance.html" title="What is the maximum throughput of AFIO's closure execution engine?">What is the maximum throughput
-      of AFIO's closure execution engine?</a>
+<a name="afio.FAQ.closure_performance"></a><a class="link" href="closure_performance.html" title="What is the maximum throughput of AFIO's closure execution engine aka how many IOPS can I push with AFIO?">What is the maximum throughput
+      of AFIO's closure execution engine aka how many IOPS can I push with AFIO?</a>
 </h3></div></div></div>
 <p>
-        For v1.0, maximum throughput is approximately as follows:
+        For v1.1, maximum ops <span class="bold"><strong>dispatch</strong></span> throughput
+        is approximately as follows, where the values for <code class="computeroutput"><span class="identifier">call</span><span class="special">()</span></code> might be for use as a closure engine whereas
+        the values for <code class="computeroutput"><span class="identifier">completion</span><span class="special">()</span></code> might be for max filing system IOPS<a href="#ftn.afio.FAQ.closure_performance.f0" class="footnote" name="afio.FAQ.closure_performance.f0"><sup class="footnote">[15]</sup></a>:
       </p>
 <div class="table">
-<a name="afio.FAQ.closure_performance.throughput"></a><p class="title"><b>Table&#160;1.8.&#160;Maximum null closure execution rate on a 3.5Ghz Intel Core i7 3770K
-        for AFIO v1.0:</b></p>
-<div class="table-contents"><table class="table" summary="Maximum null closure execution rate on a 3.5Ghz Intel Core i7 3770K
-        for AFIO v1.0:">
+<a name="afio.FAQ.closure_performance.throughput"></a><p class="title"><b>Table&#160;1.8.&#160;Maximum null closure dispatch rate on a 3.5Ghz Intel Core i7 3770K
+        for AFIO v1.1 i.e. NOT using transactional memory:</b></p>
+<div class="table-contents"><table class="table" summary="Maximum null closure dispatch rate on a 3.5Ghz Intel Core i7 3770K
+        for AFIO v1.1 i.e. NOT using transactional memory:">
 <colgroup>
+<col>
 <col>
 <col>
 <col>
@@ -72,65 +75,243 @@
                   chained
                 </p>
               </th>
+<th>
+                <p>
+                  Raw ASIO
+                </p>
+              </th>
 </tr></thead>
 <tbody>
 <tr>
 <td>
                 <p>
-                  Microsoft Windows 8 x64
+                  Microsoft Windows 8 x64 with Visual Studio 2013
                 </p>
               </td>
 <td>
                 <p>
-                  337955
+                  <span class="alignright">911963</span>
                 </p>
               </td>
 <td>
                 <p>
-                  123407
+                  <span class="alignright">596318</span>
                 </p>
               </td>
 <td>
                 <p>
-                  534522
+                  <span class="alignright">1555990</span>
                 </p>
               </td>
 <td>
                 <p>
-                  143409
+                  <span class="alignright">726124</span>
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="alignright">2806070</span>
                 </p>
               </td>
 </tr>
 <tr>
 <td>
                 <p>
-                  Ubuntu 12.04 LTS Linux x64
+                  Relative to ASIO
                 </p>
               </td>
 <td>
+                <p>
+                  <span class="alignright">32%</span>
+                </p>
               </td>
 <td>
+                <p>
+                  <span class="alignright">21%</span>
+                </p>
               </td>
 <td>
+                <p>
+                  <span class="alignright">55%</span>
+                </p>
               </td>
 <td>
+                <p>
+                  <span class="alignright">26%</span>
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="alignright">100%</span>
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  Ubuntu 12.04 LTS Linux x64 with GCC 4.8
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="alignright">1094780</span>
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="alignright">794384</span>
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="alignright">1432810</span>
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="alignright">968005</span>
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="alignright">1611040<a href="#ftn.afio.FAQ.closure_performance.f1" class="footnote" name="afio.FAQ.closure_performance.f1"><sup class="footnote">[a]</sup></a></span>
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  Relative to ASIO
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="alignright">68%</span>
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="alignright">49%</span>
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="alignright">89%</span>
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="alignright">60%</span>
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="alignright">100%</span>
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  Microsoft Windows 8 x64 with Visual Studio 2010
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="alignright">649015</span>
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="alignright">469689</span>
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="alignright">1021630</span>
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="alignright">613816</span>
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="alignright">2725690</span>
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  Relative to ASIO
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="alignright">24%</span>
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="alignright">17%</span>
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="alignright">37%</span>
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="alignright">23%</span>
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="alignright">100%</span>
+                </p>
               </td>
 </tr>
 </tbody>
+<tbody class="footnotes"><tr><td colspan="6"><div id="ftn.afio.FAQ.closure_performance.f1" class="footnote"><p><a href="#afio.FAQ.closure_performance.f1" class="para"><sup class="para">[a] </sup></a>
+                    Unfortunately the glibc mutex used by ASIO does not scale well
+                    on modern CPUs due to having too small a spin count, so this
+                    value is for four threads instead of eight (it was the best I
+                    could get through trial and error.
+                  </p></div></td></tr></tbody>
 </table></div>
 </div>
 <br class="table-break"><p>
-        While this is fast enough for consumer SSDs, we agree it is currently not
-        great. The biggest limiter, by far, is the recursive mutex protecting the
-        ops dispatch and completion implementation. Because AFIO is pure batch, dispatch
-        is very rarely a problem: rather it is completion, because completion handling
-        must always be performed per op completion in order to check for and dispatch,
-        if necessary, dependencies. Currently the top consumers of CPU time during
-        null closure dispatch benchmark are as follows:
+        We hope that ~720k max IOPS surely ought to be enough to max out any SATA
+        III SSD -- it should even max out any mid range PCIe based SSD too, and if
+        paired with a CPU with more cores, AFIO's almost wait free design ought to
+        scale out fairly well too such that it may be able to max out even top end
+        PCIe SSDs, some of which can push 10m IOPS now. If that isn't fast enough
+        for you, try AFIO on an Intel CPU with memory transaction support (on Windows
+        a runtime check will automatically replace locks with memory transactions,
+        for POSIX you need to recompile with the <code class="computeroutput"><span class="special">-</span><span class="identifier">mrtm</span></code> flag), or try support for <code class="computeroutput"><span class="identifier">__transaction_relaxed</span></code> compilers if <code class="computeroutput"><span class="identifier">BOOST_HAVE_TRANSACTIONAL_MEMORY_COMPILER</span></code>
+        is defined.
+      </p>
+<p>
+        Nevertheless, AFIO will almost certainly be still criticised for poor performance
+        relative to <a href="http://www.boost.org/libs/asio/" target="_top">Boost.ASIO</a>.
+        Unfortunately, dependency chaining is not free, and moreover, AFIO has a
+        very simple design based on a global hash table and pure C++11 STL throughout
+        (i.e. it's heavy on the memory allocator). The biggest limiter, by far, is
+        the spin lock protecting the ops dispatch and completion implementation.
+        Because AFIO is pure batch, dispatch is very rarely a problem: rather it
+        is completion, because completion handling must always be performed per op
+        completion in order to check for and dispatch, if necessary, dependencies.
+        Currently the top consumers of CPU time during null closure dispatch benchmarks
+        are as follows:
       </p>
 <div class="table">
-<a name="afio.FAQ.closure_performance.top_consumers"></a><p class="title"><b>Table&#160;1.9.&#160;Top consumers of CPU time during null closure dispatch in AFIO v1.0</b></p>
-<div class="table-contents"><table class="table" summary="Top consumers of CPU time during null closure dispatch in AFIO v1.0">
+<a name="afio.FAQ.closure_performance.top_consumers"></a><p class="title"><b>Table&#160;1.9.&#160;Top consumers of CPU time during null closure dispatch in AFIO v1.1
+        on Microsoft Windows</b></p>
+<div class="table-contents"><table class="table" summary="Top consumers of CPU time during null closure dispatch in AFIO v1.1
+        on Microsoft Windows">
 <colgroup>
 <col>
 <col>
@@ -157,22 +338,22 @@
 <tr>
 <td>
                 <p>
-                  ops Mutex
+                  ops lock sleep
                 </p>
               </td>
 <td>
                 <p>
-                  85%
+                  <span class="alignright">40%</span>
                 </p>
               </td>
 <td>
                 <p>
-                  ops Mutex
+                  ops lock sleep
                 </p>
               </td>
 <td>
                 <p>
-                  99.41%
+                  <span class="alignright">34%</span>
                 </p>
               </td>
 </tr>
@@ -184,7 +365,29 @@
               </td>
 <td>
                 <p>
-                  4.15%
+                  <span class="alignright">23%</span>
+                </p>
+              </td>
+<td>
+                <p>
+                  ops lock spin
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="alignright">22%</span>
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  ops lock spin
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="alignright">8.1%</span>
                 </p>
               </td>
 <td>
@@ -194,46 +397,30 @@
               </td>
 <td>
                 <p>
-                  0.26%
+                  <span class="alignright">14%</span>
                 </p>
               </td>
 </tr>
 <tr>
 <td>
                 <p>
-                  operator new
+                  memory allocator
                 </p>
               </td>
 <td>
                 <p>
-                  2.43%
+                  <span class="alignright">6.1%</span>
                 </p>
               </td>
 <td>
                 <p>
-                  Remainder and misc
+                  memory allocator
                 </p>
               </td>
 <td>
                 <p>
-                  0.33%
+                  <span class="alignright">4.7%</span>
                 </p>
-              </td>
-</tr>
-<tr>
-<td>
-                <p>
-                  hash table insert
-                </p>
-              </td>
-<td>
-                <p>
-                  2.05%
-                </p>
-              </td>
-<td>
-              </td>
-<td>
               </td>
 </tr>
 <tr>
@@ -244,44 +431,92 @@
               </td>
 <td>
                 <p>
-                  1.67%
+                  <span class="alignright">1.0%</span>
                 </p>
               </td>
 <td>
+                <p>
+                  sending ops to threadpool
+                </p>
               </td>
 <td>
+                <p>
+                  <span class="alignright">4.3%</span>
+                </p>
               </td>
 </tr>
 <tr>
 <td>
                 <p>
-                  Remainder and misc
+                  RtlUserThreadStart
                 </p>
               </td>
 <td>
                 <p>
-                  4.7%
+                  <span class="alignright">10%</span>
                 </p>
               </td>
 <td>
+                <p>
+                  RtlUserThreadStart
+                </p>
               </td>
 <td>
+                <p>
+                  <span class="alignright">10%</span>
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  remainder and misc
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="alignright">11.8%</span>
+                </p>
+              </td>
+<td>
+                <p>
+                  remainder and misc
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="alignright">11%</span>
+                </p>
               </td>
 </tr>
 </tbody>
 </table></div>
 </div>
 <br class="table-break"><p>
-        Luckily, the mutex is not held while file i/o operations or closures are
-        being executed, so contention on the mutex isn't as much of a problem during
-        real world use and therefore is in practice nothing like as bad as things
-        look above -- in fact, adding in a noop kernel syscall actually slightly
-        improves the figures because the mutex isn't being contended as heavily,
-        so the above figures for <code class="computeroutput"><span class="identifier">completion</span><span class="special">()</span></code> are very reasonable max IOPS values. Nevertheless,
-        if you were randomly reading or writing very small bits of data, we can see
-        how the mutex might get in the way, and we intend to do something about it
-        in a future v1.x release of Boost.AFIO.
+        As you can see, when the closures do no real work, one spends a huge amount
+        of time contending the ops lock. Luckily, the ops lock is not held while
+        file i/o operations or closures are being executed, so contention on the
+        ops lock isn't as much of a problem during real world use i.e. you will get
+        a significant amount of <span class="quote">&#8220;<span class="quote">free</span>&#8221;</span> file i/o without losing much
+        in maximum op dispatch throughput.
       </p>
+<p>
+        And certainly a custom allocator for the hash table might make quite a difference,
+        especially in avoiding spinning and sleeping the ops lock altogether by eliminating
+        the memory allocator. Another option we might investigate in the future is
+        using a different hash table implementation e.g. <code class="computeroutput"><span class="identifier">concurrent_unordered_map</span><span class="special">&lt;&gt;</span></code> instead (though I hear it has poor
+        single lookup performance, and the lack of safe erase is a huge problem for
+        us), or any of the hash tables from <a href="http://incise.org/hash-table-benchmarks.html" target="_top">http://incise.org/hash-table-benchmarks.html</a>.
+      </p>
+<div class="footnotes">
+<br><hr style="width:100; text-align:left;margin-left: 0">
+<div id="ftn.afio.FAQ.closure_performance.f0" class="footnote"><p><a href="#afio.FAQ.closure_performance.f0" class="para"><sup class="para">[15] </sup></a>
+          The phrase <span class="quote">&#8220;<span class="quote">might be</span>&#8221;</span> is important: a null closure benchmark
+          will always have dispatch rate problems i.e. the closures being executed
+          take less time to execute than the time to dispatch them, so these figures
+          are best read as maximum dispatch rate, not maximum IOPS.
+        </p></div>
+</div>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
 <td align="left"></td>

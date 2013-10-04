@@ -4,8 +4,8 @@
 <title>Design Rationale</title>
 <link rel="stylesheet" href="../myboostbook.css" type="text/css">
 <meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
-<link rel="home" href="../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 0.1">
-<link rel="up" href="../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 0.1">
+<link rel="home" href="../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 1.1">
+<link rel="up" href="../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 1.1">
 <link rel="prev" href="introduction.html" title="Introduction">
 <link rel="next" href="design/overview.html" title="A quick overview of the design">
 </head>
@@ -41,7 +41,7 @@
       Boost.AFIO came about out of the need for a scalable, high performance, portable
       asynchronous file i/o implementation library for a forthcoming filing system
       based graph store ACID compliant transactional persistence layer called TripleGit
-      -- call it a <span class="quote">&#8220;<span class="quote">SQLite3 but for graphstores</span>&#8221;</span><a href="#ftn.afio.design.f0" class="footnote" name="afio.design.f0"><sup class="footnote">[1]</sup></a>. The fact that a portable asynchronous file i/o library for C++
+      -- call it a <span class="quote">&#8220;<span class="quote">SQLite3 but for graphstores</span>&#8221;</span><a href="#ftn.afio.design.f0" class="footnote" name="afio.design.f0"><sup class="footnote">[2]</sup></a>. The fact that a portable asynchronous file i/o library for C++
       was needed at all came as a bit of a surprise: one thinks of these things as
       done and dusted decades ago, but it turns out that the fully featured <a href="http://nikhilm.github.io/uvbook/filesystem.html" target="_top">libuv</a>, a C library,
       is good enough for most people needing portable asynchronous file i/o. However
@@ -72,27 +72,32 @@
       it uses Boost.ASIO central dispatch engine as the executor.
     </p>
 <p>
-      As I mentioned earlier, Boost.AFIO version 1 is intentionally as simple as
-      possible, even though that has consequences for performance where closure dispatch
-      is plenty fast enough for a single state of the art SATA3 SSD (~150k IOPS)<a href="#ftn.afio.design.f1" class="footnote" name="afio.design.f1"><sup class="footnote">[2]</sup></a>, but not enough for PCIe SSDs which can achieve anywhere between
-      250k IOPS and 10m IOPS for the really high end models. This is because it is
-      expected that N3562 and N3634 will be adjusted in the light of Boost.AFIO's
-      design, and hopefully a merged proposal covering all three approaches to the
-      same thing (i.e. a fusion of schedulers and executors with the existing executor
-      model implemented by Boost.ASIO) will emerge, which may well prompt a version
-      2 of AFIO.
+      For v1.0, AFIO used a simple dispatch engine which kept the extant ops in a
+      hash table, and the entire dispatch engine was protected by a single giant
+      and recursive mutex. Performance never exceeded about 150k ops/sec maximum
+      on a four core Intel Ivy Bridge CPU.
+    </p>
+<p>
+      That performance was embarrassing, so for v1.1 the entire engine was rewritten
+      using vast numbers of atomics to be completely lock free, and very nearly wait
+      free if it weren't for the thin spin locks around the central ops hash table
+      (which will be replaced with memory transactions if Intel TSX extensions are
+      available, with support for <code class="computeroutput"><span class="identifier">__transaction_relaxed</span></code>
+      compilers if <code class="computeroutput"><span class="identifier">BOOST_HAVE_TRANSACTIONAL_MEMORY_COMPILER</span></code>
+      is defined). Now performance can reach 1.5m ops/sec on a four core Intel Ivy
+      Bridge CPU, or more than half of Boost.ASIO's maximum dispatch rate, which
+      probably means AFIO is close to optimal now, at least without having to replace
+      the use of STL multithreading facilities and the system memory allocator with
+      more exotic varieties.
     </p>
 <div class="footnotes">
 <br><hr style="width:100; text-align:left;margin-left: 0">
-<div id="ftn.afio.design.f0" class="footnote"><p><a href="#afio.design.f0" class="para"><sup class="para">[1] </sup></a>
+<div id="ftn.afio.design.f0" class="footnote"><p><a href="#afio.design.f0" class="para"><sup class="para">[2] </sup></a>
         The <a href="http://unqlite.org/" target="_top">UnQLite embedded NoSQL database engine</a>
         is exactly one of those of course. Unfortunately I intend TripleGit for implementing
         portable Component Objects for C++ extending C++ Modules, which means I need
         a database engine suitable for incorporation into a dynamic linker, which
         unfortunately is not quite UnQLite.
-      </p></div>
-<div id="ftn.afio.design.f1" class="footnote"><p><a href="#afio.design.f1" class="para"><sup class="para">[2] </sup></a>
-        Achieving this throughput requires a four core or higher CPU.
       </p></div>
 </div>
 </div>

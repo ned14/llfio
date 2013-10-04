@@ -55,7 +55,7 @@ try{\
 #define BOOST_AFIO_CHECK_NO_THROW(expr)\
 try{\
     expr;\
-	/*BOOST_CHECK(true);*/ \
+    /*BOOST_CHECK(true);*/ \
 }catch(...){BOOST_FAIL("Exception was thrown");}
 
 // Force maximum CPUs available to threads in this process, if available on this platform
@@ -63,14 +63,14 @@ try{\
 static inline void set_maximum_cpus(size_t no=MAXIMUM_TEST_CPUS)
 {
 #ifdef WIN32
-	DWORD_PTR mask=0;
-	for(size_t n=0; n<no; n++)
-		mask|=(size_t)1<<n;
-	if(!SetProcessAffinityMask(GetCurrentProcess(), mask))
-	{
-		std::cerr << "ERROR: Failed to set process affinity mask due to reason " << GetLastError() << std::endl;
-		abort();
-	}
+    DWORD_PTR mask=0;
+    for(size_t n=0; n<no; n++)
+        mask|=(size_t)1<<n;
+    if(!SetProcessAffinityMask(GetCurrentProcess(), mask))
+    {
+        std::cerr << "ERROR: Failed to set process affinity mask due to reason " << GetLastError() << std::endl;
+        abort();
+    }
 #endif
 }
 #else
@@ -80,31 +80,31 @@ static inline void set_maximum_cpus(size_t no=0) { }
 // Boost.Test uses alarm() to timeout tests, which is nearly useless. Hence do our own.
 static inline void watchdog_thread(size_t timeout)
 {
-	boost::afio::detail::set_threadname("watchdog_thread");
-	bool docountdown=timeout>10;
-	if(docountdown) timeout-=10;
-	boost::chrono::duration<size_t> d(timeout);
-	boost::mutex m;
-	boost::condition_variable cv;
-	boost::unique_lock<boost::mutex> lock(m);
-	if(boost::cv_status::timeout==cv.wait_for(lock, d))
-	{
-		if(docountdown)
-		{
-			std::cerr << "Test about to time out ...";
-			d=boost::chrono::duration<size_t>(1);
-			for(size_t n=0; n<10; n++)
-			{
-				if(boost::cv_status::timeout!=cv.wait_for(lock, d))
-					return;
-				std::cerr << " " << 10-n;
-			}
-			std::cerr << " ... ";
-		}
-		BOOST_CHECK_MESSAGE(false, "Test timed out");
-		std::cerr << "Test timed out, aborting" << std::endl;
-		abort();
-	}
+    boost::afio::detail::set_threadname("watchdog_thread");
+    bool docountdown=timeout>10;
+    if(docountdown) timeout-=10;
+    boost::chrono::duration<size_t> d(timeout);
+    boost::mutex m;
+    boost::condition_variable cv;
+    boost::unique_lock<boost::mutex> lock(m);
+    if(boost::cv_status::timeout==cv.wait_for(lock, d))
+    {
+        if(docountdown)
+        {
+            std::cerr << "Test about to time out ...";
+            d=boost::chrono::duration<size_t>(1);
+            for(size_t n=0; n<10; n++)
+            {
+                if(boost::cv_status::timeout!=cv.wait_for(lock, d))
+                    return;
+                std::cerr << " " << 10-n;
+            }
+            std::cerr << " ... ";
+        }
+        BOOST_CHECK_MESSAGE(false, "Test timed out");
+        std::cerr << "Test timed out, aborting" << std::endl;
+        abort();
+    }
 }
 
 // Define a unit test description and timeout
@@ -119,11 +119,12 @@ static void BOOST_AUTO_TC_INVOKER( test_name )()                        \
         VALGRIND_PRINTF("BOOST.AFIO TEST INVOKER: Unit test running in valgrind so tripling timeout\n"); \
         timeout*=3;                                                     \
     }                                                                   \
-	/*boost::unit_test::unit_test_monitor_t::instance().p_timeout.set(timeout);*/ \
-	BOOST_TEST_MESSAGE(desc);                                           \
-	set_maximum_cpus();                                                 \
-	boost::thread watchdog(watchdog_thread, timeout);                   \
-	boost::unit_test::unit_test_monitor_t::instance().execute([&]() -> int { t.test_method(); watchdog.interrupt(); watchdog.join(); return 0; }); \
+    /*boost::unit_test::unit_test_monitor_t::instance().p_timeout.set(timeout);*/ \
+    BOOST_TEST_MESSAGE(desc);                                           \
+    try { boost::filesystem::remove_all("testdir"); } catch(...) { }    \
+    set_maximum_cpus();                                                 \
+    boost::thread watchdog(watchdog_thread, timeout);                   \
+    boost::unit_test::unit_test_monitor_t::instance().execute([&]() -> int { t.test_method(); watchdog.interrupt(); watchdog.join(); return 0; }); \
 }                                                                       \
                                                                         \
 struct BOOST_AUTO_TC_UNIQUE_ID( test_name ) {};                         \
@@ -161,12 +162,12 @@ void raninit(ranctx *x, u4 seed) {
 static int donothing(boost::afio::atomic<size_t> *callcount, int i) { ++*callcount; return i; }
 static void _1000_open_write_close_deletes(std::shared_ptr<boost::afio::async_file_io_dispatcher_base> dispatcher, size_t bytes)
 {
-	try {
+    try {
         using namespace boost::afio;
         using namespace std;
         using boost::afio::future;
-		using boost::afio::ratio;
-		namespace chrono = boost::afio::chrono;
+        using boost::afio::ratio;
+        namespace chrono = boost::afio::chrono;
         typedef chrono::duration<double, ratio<1>> secs_type;
         auto mkdir(dispatcher->dir(async_path_op_req("testdir", file_flags::Create)));
         vector<char, boost::afio::detail::aligned_allocator<char, 4096>> towrite(bytes, 'N');
@@ -211,7 +212,7 @@ static void _1000_open_write_close_deletes(std::shared_ptr<boost::afio::async_fi
                 callables.push_back(std::bind(callable, &callcount, 78));
         auto manycallbacks(dispatcher->call(manydeletedfiles, std::move(callables)));
         auto dispatched=chrono::high_resolution_clock::now();
-        cout << "There are now " << dec << dispatcher->count() << " handles open with a queue depth of " << dispatcher->wait_queue_depth() << endl;
+        cout << "There are now " << dec << dispatcher->fd_count() << " handles open with a queue depth of " << dispatcher->wait_queue_depth() << endl;
 
         // Wait for all files to open
         when_all(manyopenfiles.begin(), manyopenfiles.end()).wait();
@@ -250,10 +251,10 @@ static void _1000_open_write_close_deletes(std::shared_ptr<boost::afio::async_fi
         // Fetch any outstanding error
         rmdir.h->get();
         BOOST_CHECK((callcount==1000U));
-	} catch(...) {
-		std::cerr << boost::current_exception_diagnostic_information(true) << std::endl;
-		throw;
-	}
+    } catch(...) {
+        std::cerr << boost::current_exception_diagnostic_information(true) << std::endl;
+        throw;
+    }
 }
 
 #ifdef DEBUG_TORTURE_TEST
@@ -279,12 +280,12 @@ static u4 mkfill() { static char ret='0'; if(ret+1>'z') ret='0'; return ret++; }
 
 static void evil_random_io(std::shared_ptr<boost::afio::async_file_io_dispatcher_base> dispatcher, size_t no, size_t bytes, size_t alignment=0)
 {
-	try {
+    try {
     using namespace std;
     using boost::afio::future;
-	using boost::afio::ratio;
+    using boost::afio::ratio;
     using boost::afio::off_t;
-	namespace chrono = boost::afio::chrono;
+    namespace chrono = boost::afio::chrono;
     typedef chrono::duration<double, ratio<1>> secs_type;
 
     boost::afio::detail::aligned_allocator<char, 4096> aligned_allocator;
@@ -485,7 +486,7 @@ static void evil_random_io(std::shared_ptr<boost::afio::async_file_io_dispatcher
                             manywrittenfiles[n]=dispatcher->write(op.req);
                     }
                     else
-                            manywrittenfiles[n]=dispatcher->completion(dispatcher->read(op.req), std::make_pair(boost::afio::async_op_flags::ImmediateCompletion, std::bind(checkHash, ref(op), towriteptrs[n], placeholders::_1, placeholders::_2)));
+                        manywrittenfiles[n]=dispatcher->completion(dispatcher->read(op.req), std::pair<boost::afio::async_op_flags, std::function<boost::afio::async_file_io_dispatcher_base::completion_t>>(boost::afio::async_op_flags::ImmediateCompletion, std::bind(checkHash, ref(op), towriteptrs[n], placeholders::_1, placeholders::_2)));
             }
             // After replay, read the entire file into memory
             manywrittenfiles[n]=dispatcher->read(boost::afio::async_data_op_req<char>(manywrittenfiles[n], towriteptrs[n], towritesizes[n], 0));
@@ -494,7 +495,7 @@ static void evil_random_io(std::shared_ptr<boost::afio::async_file_io_dispatcher
     // Close each of those files
     auto manyclosedfiles(dispatcher->close(manywrittenfiles));
     auto dispatched=chrono::high_resolution_clock::now();
-    cout << "There are now " << dec << dispatcher->count() << " handles open with a queue depth of " << dispatcher->wait_queue_depth() << endl;
+    cout << "There are now " << dec << dispatcher->fd_count() << " handles open with a queue depth of " << dispatcher->wait_queue_depth() << endl;
 
     // Wait for all files to open
     when_all(manyopenfiles.begin(), manyopenfiles.end()).wait();
@@ -593,37 +594,37 @@ static void evil_random_io(std::shared_ptr<boost::afio::async_file_io_dispatcher
     auto rmdir(dispatcher->rmdir(boost::afio::async_path_op_req("testdir")));
     // Fetch any outstanding error
     rmdir.h->get();
-	} catch(...) {
-		std::cerr << boost::current_exception_diagnostic_information(true) << std::endl;
-		throw;
-	}
+    } catch(...) {
+        std::cerr << boost::current_exception_diagnostic_information(true) << std::endl;
+        throw;
+    }
 }
 
 
 static std::ostream &operator<<(std::ostream &s, const boost::afio::chrono::system_clock::time_point &ts)
 {
-	char buf[32];
+    char buf[32];
     struct tm *t;
     size_t len=sizeof(buf);
     size_t ret;
-	time_t v=boost::afio::chrono::system_clock::to_time_t(ts);
-	boost::afio::chrono::system_clock::duration remainder(ts-boost::afio::chrono::system_clock::from_time_t(v));
+    time_t v=boost::afio::chrono::system_clock::to_time_t(ts);
+    boost::afio::chrono::system_clock::duration remainder(ts-boost::afio::chrono::system_clock::from_time_t(v));
 
 #ifdef _MSC_VER
-	_tzset();
+    _tzset();
 #else
     tzset();
 #endif
     if ((t=localtime(&v)) == NULL)
     {
-    	s << "<bad timespec>";
+        s << "<bad timespec>";
         return s;
     }
 
     ret = strftime(buf, len, "%Y-%m-%d %H:%M:%S", t);
     if (ret == 0)
     {
-    	s << "<bad timespec>";
+        s << "<bad timespec>";
         return s;
     }
     //len -= ret - 1;
@@ -636,20 +637,20 @@ static std::ostream &operator<<(std::ostream &s, const boost::afio::chrono::syst
 
 static boost::afio::stat_t print_stat(std::shared_ptr<boost::afio::async_io_handle> h)
 {
-	using namespace boost::afio;
-	auto entry=h->lstat(metadata_flags::All);
-	std::cout << "Entry " << h->path() << " is a ";
-	if(S_IFLNK==(entry.st_type & S_IFLNK))
-		std::cout << "link";
-	else if(S_IFDIR==(entry.st_type & S_IFDIR))
-		std::cout << "directory";
-	else
-		std::cout << "file";
-	std::cout << " and it has the following information:" << std::endl;
-	if(S_IFLNK==(entry.st_type & S_IFLNK))
-	{
-		std::cout << "  Target=" << h->target() << std::endl;
-	}
+    using namespace boost::afio;
+    auto entry=h->lstat(metadata_flags::All);
+    std::cout << "Entry " << h->path() << " is a ";
+    if(S_IFLNK==(entry.st_type & S_IFLNK))
+        std::cout << "link";
+    else if(S_IFDIR==(entry.st_type & S_IFDIR))
+        std::cout << "directory";
+    else
+        std::cout << "file";
+    std::cout << " and it has the following information:" << std::endl;
+    if(S_IFLNK==(entry.st_type & S_IFLNK))
+    {
+        std::cout << "  Target=" << h->target() << std::endl;
+    }
 #define PRINT_FIELD(field) \
     std::cout << "  st_" #field ": "; if(!!(directory_entry::metadata_supported()&metadata_flags::field)) std::cout << entry.st_##field; else std::cout << "unknown"; std::cout << std::endl
     PRINT_FIELD(dev);
@@ -671,21 +672,21 @@ static boost::afio::stat_t print_stat(std::shared_ptr<boost::afio::async_io_hand
     PRINT_FIELD(gen);
     PRINT_FIELD(birthtim);
 #undef PRINT_FIELD
-	return entry;
+    return entry;
 }
 
 static void print_stat(std::shared_ptr<boost::afio::async_io_handle> dirh, boost::afio::directory_entry direntry)
 {
-	using namespace boost::afio;
-	std::cout << "Entry " << direntry.name() << " is a ";
-	auto entry=direntry.fetch_lstat(dirh);
-	if(S_IFLNK==(entry.st_type & S_IFLNK))
-		std::cout << "link";
-	else if(S_IFDIR==(entry.st_type & S_IFDIR))
-		std::cout << "directory";
-	else
-		std::cout << "file";
-	std::cout << " and it has the following information:" << std::endl;
+    using namespace boost::afio;
+    std::cout << "Entry " << direntry.name() << " is a ";
+    auto entry=direntry.fetch_lstat(dirh);
+    if(S_IFLNK==(entry.st_type & S_IFLNK))
+        std::cout << "link";
+    else if(S_IFDIR==(entry.st_type & S_IFDIR))
+        std::cout << "directory";
+    else
+        std::cout << "file";
+    std::cout << " and it has the following information:" << std::endl;
 
 #define PRINT_FIELD(field) \
     std::cout << "  st_" #field ": "; if(!!(direntry.metadata_ready()&metadata_flags::field)) std::cout << entry.st_##field; else std::cout << "unknown"; std::cout << std::endl

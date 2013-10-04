@@ -4,7 +4,7 @@
 <title>async_file_io_dispatcher_base</title>
 <link rel="stylesheet" href="../../../myboostbook.css" type="text/css">
 <meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
-<link rel="home" href="../../../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 0.1">
+<link rel="home" href="../../../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 1.1">
 <link rel="up" href="../classes.html" title="Classes">
 <link rel="prev" href="../classes.html" title="Classes">
 <link rel="next" href="async_file_io_dispatcher_base/completion_2_batch_bound_functions.html" title="completion (batch bound functions)">
@@ -94,7 +94,7 @@
 <dt><span class="section"><a href="async_file_io_dispatcher_base/page_size.html">page_size</a></span></dt>
 </dl></div>
 <p>
-          <a class="indexterm" name="id900472"></a>
+          <a class="indexterm" name="id894654"></a>
 Abstract base class for dispatching file i/o asynchronously.
         </p>
 <h6>
@@ -103,7 +103,7 @@ Abstract base class for dispatching file i/o asynchronously.
         </h6>
 <p>
           This is a reference counted instance with platform-specific implementation
-          optionally hidden in object code. Construct an instance using the <code class="literal"><code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_file_io_dispatcher</span><span class="special">()</span></code></code>
+          optionally hidden in object code. Construct an instance using the <code class="literal"><code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">make_async_file_io_dispatcher</span><span class="special">()</span></code></code>
           function.
         </p>
 <h6>
@@ -193,7 +193,7 @@ Abstract base class for dispatching file i/o asynchronously.
 <tbody>
 <tr>
 <td>
-<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">std</span><span class="special">::</span><span class="identifier">weak_ptr</span><span class="special">&lt;</span> <span class="identifier">thread_source</span> <span class="special">&gt;</span> <span class="identifier">threadsource</span><span class="special">()</span></pre>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span> <span class="identifier">thread_source</span> <span class="special">&gt;</span> <span class="identifier">threadsource</span><span class="special">()</span></pre>
                 </td>
 <td>
                   <p>
@@ -233,7 +233,7 @@ Abstract base class for dispatching file i/o asynchronously.
 </tr>
 <tr>
 <td>
-<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">size_t</span> <span class="identifier">count</span><span class="special">()</span></pre>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">size_t</span> <span class="identifier">fd_count</span><span class="special">()</span></pre>
                 </td>
 <td>
                   <p>
@@ -249,9 +249,10 @@ Abstract base class for dispatching file i/o asynchronously.
                 </td>
 <td>
                   <p>
-                    Returns an op ref for a given <span class="bold"><strong>currently</strong></span><span class="bold"><strong>scheduled</strong></span> op id, throwing a fatal exception
-                    if id not scheduled at the point of call. Can be used to retrieve
-                    exception state from some op id, or one's own shared future.
+                    Returns an op ref for a given <span class="bold"><strong>currently</strong></span>
+                    scheduled op id, throwing an exception if id not scheduled at
+                    the point of call. Can be used to retrieve exception state from
+                    some op id, or one's own shared future.
                   </p>
                 </td>
 <td>
@@ -413,7 +414,7 @@ Abstract base class for dispatching file i/o asynchronously.
 <tr>
 <td>
 <pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">C</span><span class="special">,</span> <span class="keyword">class</span><span class="special">...</span> <span class="identifier">Args</span><span class="special">&gt;</span>
-<span class="identifier">std</span><span class="special">::</span><span class="identifier">pair</span><span class="special">&lt;</span> <span class="identifier">future</span><span class="special">&lt;</span> <span class="keyword">typename</span> <span class="identifier">detail</span><span class="special">::</span><span class="identifier">vs2013_variadic_overload_resolution_workaround</span><span class="special">&lt;</span> <span class="identifier">C</span><span class="special">,</span> <span class="identifier">Args</span><span class="special">...&gt;::</span><span class="identifier">type</span> <span class="special">&gt;,</span> <span class="identifier">async_io_op</span> <span class="special">&gt;</span> <span class="identifier">call</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">async_io_op</span> <span class="special">&amp;</span> <span class="identifier">req</span><span class="special">,</span> <span class="identifier">C</span> <span class="identifier">callback</span><span class="special">,</span> <span class="identifier">Args</span><span class="special">...</span> <span class="identifier">args</span><span class="special">)</span></pre>
+<span class="identifier">std</span><span class="special">::</span><span class="identifier">pair</span><span class="special">&lt;</span> <span class="identifier">future</span><span class="special">&lt;</span> <span class="keyword">typename</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">result_of</span><span class="special">&lt;</span> <span class="identifier">C</span><span class="special">(</span><span class="identifier">Args</span><span class="special">...)&gt;::</span><span class="identifier">type</span> <span class="special">&gt;,</span> <span class="identifier">async_io_op</span> <span class="special">&gt;</span> <span class="identifier">call</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">async_io_op</span> <span class="special">&amp;</span> <span class="identifier">req</span><span class="special">,</span> <span class="identifier">C</span> <span class="identifier">callback</span><span class="special">,</span> <span class="identifier">Args</span><span class="special">...</span> <span class="identifier">args</span><span class="special">)</span></pre>
                 </td>
 <td>
                   <p>

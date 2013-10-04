@@ -4,7 +4,7 @@
 <title>truncate (single)</title>
 <link rel="stylesheet" href="../../../../myboostbook.css" type="text/css">
 <meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
-<link rel="home" href="../../../../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 0.1">
+<link rel="home" href="../../../../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 1.1">
 <link rel="up" href="../async_file_io_dispatcher_base.html" title="async_file_io_dispatcher_base">
 <link rel="prev" href="truncate_2_batch.html" title="truncate (batch)">
 <link rel="next" href="write_1_batch.html" title="write (batch)">
@@ -28,7 +28,7 @@
           (single)</a>
 </h5></div></div></div>
 <p>
-            <a class="indexterm" name="id963556"></a>
+            <a class="indexterm" name="id956255"></a>
 Schedule an asynchronous file length truncation after a preceding operation.
           </p>
 <h6>
@@ -143,8 +143,7 @@ Schedule an asynchronous file length truncation after a preceding operation.
             if any inputs have values which could not possibly be correct. Once a
             batch of input ops has been verified at the point of entry as not errored,
             you are guaranteed that the batch is atomically scheduled as a whole,
-            unless one of the following conditions occurs: (i) A failure to allocate
-            memory occurs.
+            unless a failure to allocate memory occurs.
           </p>
 <h6>
 <a name="afio.reference.classes.async_file_io_dispatcher_base.truncate_2_single.h6"></a>
@@ -204,7 +203,7 @@ Schedule an asynchronous file length truncation after a preceding operation.
     <span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="string">"Contents of file is '"</span> <span class="special">&lt;&lt;</span> <span class="identifier">contents</span> <span class="special">&lt;&lt;</span> <span class="string">"'"</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span>
 
     <span class="comment">// Check remaining ops for errors</span>
-    <span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">when_all</span><span class="special">({</span><span class="identifier">req</span><span class="special">.</span><span class="identifier">precondition</span> <span class="comment">/*close*/</span><span class="special">,</span> <span class="identifier">deletedfile</span><span class="special">}).</span><span class="identifier">wait</span><span class="special">();</span>		<a class="co" name="afio.reference.classes.async_file_io_dispatcher_base.truncate_2_single.c16" href="truncate_2_single.html#afio.reference.classes.async_file_io_dispatcher_base.truncate_2_single.c17"><img src="../../../../../../doc/src/images/callouts/9.png" alt="9" border="0"></a>
+    <span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">when_all</span><span class="special">({</span><span class="identifier">req</span><span class="special">.</span><span class="identifier">precondition</span> <span class="comment">/*close*/</span><span class="special">,</span> <span class="identifier">deletedfile</span><span class="special">}).</span><span class="identifier">wait</span><span class="special">();</span>        <a class="co" name="afio.reference.classes.async_file_io_dispatcher_base.truncate_2_single.c16" href="truncate_2_single.html#afio.reference.classes.async_file_io_dispatcher_base.truncate_2_single.c17"><img src="../../../../../../doc/src/images/callouts/9.png" alt="9" border="0"></a>
 <span class="special">}</span>
 <span class="keyword">catch</span><span class="special">(...)</span>
 <span class="special">{</span>

@@ -8,12 +8,12 @@
 
 [library Boost.AFIO
     [quickbook 1.7]
-    [version 1.0]
+    [version 1.1]
     [id afio]
     [category afio]
     [authors [Douglas, Niall], [Kirth, Paul]]
     [copyright 2013 Niall Douglas and Paul Kirth]
-    [purpose A batch, chainable, asynchronous closure execution engine integrated into Boost.ASIO]
+    [purpose A batch, chainable, asynchronous closure execution engine integrated into Boost.ASIO, specialised as a portable asynchronous file i/o implementation library]
     [license
         Distributed under the Boost Software License, Version 1.0.
         (See accompanying file LICENSE_1_0.txt or copy at
@@ -47,6 +47,7 @@
 [def __afio_handle__ [link afio.reference.classes.async_io_handle `class async_io_handle`]]
 [def __afio_when_all__ [link afio.reference.functions.when_all_ops `when_all()`]]
 
+[import ../test/examples/adopt_example.cpp]
 [import ../test/examples/barrier_example.cpp]
 [import ../test/examples/call_example.cpp]
 [import ../test/examples/closure_execution_afio_io_example.cpp]
@@ -62,10 +63,14 @@
 [import ../test/examples/readwrite_example_traditional.cpp]
 
 [section:introduction Introduction]
-__boost_afio__ is a linear scalable, batch, chainable, asynchronous closure execution engine extending __boost_asio__
+__boost_afio__ is a linear scalable, batch, chainable, asynchronous closure execution engine
+with an almost wait free implementation[footnote It is wait free if your CPU supports memory
+transactions, apart from when the memory allocator asks the kernel for more memory.] extending __boost_asio__
 and __boost_thread__ specialised as a portable asynchronous file i/o implementation
-library. Implementation of this first version has been kept as simple as possible (< 1000 active
-LOC) at the cost of some performance. This library was brought to __boost__ as part of Google
+library. Implementation of this first version has been kept as simple as possible (~ 1000 active
+LOC) at the cost of some performance, though with a good compiler [link
+afio.FAQ.closure_performance you can expect 25-50% of the
+performance of using raw Boost.ASIO]. This library was brought to __boost__ as part of Google
 Summer of Code 2013.
 
 Note that __boost_afio__ was originally written purely in C++11 and backported later to older compilers.
@@ -85,6 +90,8 @@ v3.0). You may find the list of C++11 features in popular compilers at
 will compile the code does not mean that programming using that compiler and __boost_afio__
 isn't a waste of your time. In particular, you should [*avoid VS2010 and Mingw32 (not Mingw-w64
 which is fine) if at all possible], but if you can't, [link afio.advanced_topics.vs2010_notes we have written a guide especially for VS2010 and Mingw32].
+
+[important Note that Boost.AFIO has not passed Boost peer review, and therefore is not a part of the Boost C++ libraries]
 
 As a very quick example of minimal usage:
 

@@ -4,7 +4,7 @@
 <title>write (batch)</title>
 <link rel="stylesheet" href="../../../../myboostbook.css" type="text/css">
 <meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
-<link rel="home" href="../../../../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 0.1">
+<link rel="home" href="../../../../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 1.1">
 <link rel="up" href="../async_file_io_dispatcher_base.html" title="async_file_io_dispatcher_base">
 <link rel="prev" href="truncate_2_single.html" title="truncate (single)">
 <link rel="next" href="write_1_single.html" title="write (single)">
@@ -28,15 +28,20 @@
           (batch)</a>
 </h5></div></div></div>
 <p>
-            <a class="indexterm" name="id966615"></a>
+            <a class="indexterm" name="id962524"></a>
 Schedule a batch of asynchronous data writes after preceding operations.
           </p>
 <h6>
 <a name="afio.reference.classes.async_file_io_dispatcher_base.write_1_batch.h0"></a>
             <span class="phrase"><a name="afio.reference.classes.async_file_io_dispatcher_base.write_1_batch.description"></a></span><a class="link" href="write_1_batch.html#afio.reference.classes.async_file_io_dispatcher_base.write_1_batch.description">Description</a>
           </h6>
-<pre class="programlisting"><span class="identifier">Note</span> <span class="identifier">that</span> <span class="identifier">on</span> <span class="identifier">Windows</span> <span class="keyword">this</span> <span class="identifier">call</span> <span class="identifier">issues</span> <span class="identifier">a</span> <span class="identifier">separate</span> <span class="identifier">async</span> <span class="identifier">file</span> <span class="identifier">operation</span> <span class="keyword">for</span> <span class="identifier">each</span> <span class="identifier">buffer</span> <span class="identifier">supplied</span><span class="special">,</span> <span class="identifier">thus</span> <span class="identifier">making</span> <span class="identifier">scatter</span><span class="special">/</span><span class="identifier">gather</span> <span class="identifier">i</span><span class="special">/</span><span class="identifier">o</span> <span class="identifier">no</span> <span class="identifier">more</span> <span class="identifier">efficient</span> <span class="identifier">than</span> <span class="identifier">making</span> <span class="identifier">separate</span> <span class="identifier">calls</span><span class="special">.</span> <span class="identifier">The</span> <span class="identifier">big</span> <span class="identifier">exception</span> <span class="identifier">to</span> <span class="keyword">this</span> <span class="identifier">is</span> <span class="identifier">when</span> <span class="identifier">doing</span> <span class="identifier">unbuffered</span> <span class="identifier">page</span> <span class="identifier">aligned</span> <span class="identifier">i</span><span class="special">/</span><span class="identifier">o</span> <span class="keyword">for</span> <span class="identifier">which</span> <span class="identifier">Windows</span> <span class="identifier">provides</span> <span class="identifier">special</span> <span class="identifier">scatter</span><span class="special">/</span><span class="identifier">gather</span> <span class="identifier">i</span><span class="special">/</span><span class="identifier">o</span> <span class="identifier">functions</span><span class="special">.</span>
-</pre>
+<p>
+            Note that on Windows this call issues a separate async file operation
+            for each buffer supplied, thus making scatter/gather i/o no more efficient
+            than making separate calls. The big exception to this is when doing unbuffered
+            page aligned i/o for which Windows provides special scatter/gather i/o
+            functions.
+          </p>
 <h6>
 <a name="afio.reference.classes.async_file_io_dispatcher_base.write_1_batch.h1"></a>
             <span class="phrase"><a name="afio.reference.classes.async_file_io_dispatcher_base.write_1_batch.synopsis"></a></span><a class="link" href="write_1_batch.html#afio.reference.classes.async_file_io_dispatcher_base.write_1_batch.synopsis">Synopsis</a>
@@ -154,8 +159,7 @@ Schedule a batch of asynchronous data writes after preceding operations.
             if any inputs have values which could not possibly be correct. Once a
             batch of input ops has been verified at the point of entry as not errored,
             you are guaranteed that the batch is atomically scheduled as a whole,
-            unless one of the following conditions occurs: (i) A failure to allocate
-            memory occurs.
+            unless a failure to allocate memory occurs.
           </p>
 <h6>
 <a name="afio.reference.classes.async_file_io_dispatcher_base.write_1_batch.h7"></a>
@@ -215,7 +219,7 @@ Schedule a batch of asynchronous data writes after preceding operations.
     <span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="string">"Contents of file is '"</span> <span class="special">&lt;&lt;</span> <span class="identifier">contents</span> <span class="special">&lt;&lt;</span> <span class="string">"'"</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span>
 
     <span class="comment">// Check remaining ops for errors</span>
-    <span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">when_all</span><span class="special">({</span><span class="identifier">req</span><span class="special">.</span><span class="identifier">precondition</span> <span class="comment">/*close*/</span><span class="special">,</span> <span class="identifier">deletedfile</span><span class="special">}).</span><span class="identifier">wait</span><span class="special">();</span>		<a class="co" name="afio.reference.classes.async_file_io_dispatcher_base.write_1_batch.c16" href="write_1_batch.html#afio.reference.classes.async_file_io_dispatcher_base.write_1_batch.c17"><img src="../../../../../../doc/src/images/callouts/9.png" alt="9" border="0"></a>
+    <span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">when_all</span><span class="special">({</span><span class="identifier">req</span><span class="special">.</span><span class="identifier">precondition</span> <span class="comment">/*close*/</span><span class="special">,</span> <span class="identifier">deletedfile</span><span class="special">}).</span><span class="identifier">wait</span><span class="special">();</span>        <a class="co" name="afio.reference.classes.async_file_io_dispatcher_base.write_1_batch.c16" href="write_1_batch.html#afio.reference.classes.async_file_io_dispatcher_base.write_1_batch.c17"><img src="../../../../../../doc/src/images/callouts/9.png" alt="9" border="0"></a>
 <span class="special">}</span>
 <span class="keyword">catch</span><span class="special">(...)</span>
 <span class="special">{</span>

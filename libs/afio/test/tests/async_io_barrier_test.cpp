@@ -5,22 +5,22 @@ BOOST_AFIO_AUTO_TEST_CASE(async_io_barrier, "Tests that the async i/o barrier wo
     using namespace boost::afio;
     using namespace std;
     using boost::afio::future;
-	using boost::afio::ratio;
+    using boost::afio::ratio;
     using namespace boost::afio::detail;
     using boost::afio::off_t;
-	namespace chrono = boost::afio::chrono;
+    namespace chrono = boost::afio::chrono;
     typedef chrono::duration<double, ratio<1>> secs_type;
     vector<pair<size_t, int>> groups;
     // Generate 500,000 sorted random numbers between 0-10000
-	static const size_t numbers=
-#ifdef BOOST_AFIO_RUNNING_IN_CI
-		1600
+    static const size_t numbers=
+#if defined(BOOST_AFIO_RUNNING_IN_CI) || defined(BOOST_AFIO_COMPILING_FOR_GCOV)
+        1600
 #elif defined(BOOST_MSVC) && BOOST_MSVC < 1700 /* <= VS2010 */ && (defined(DEBUG) || defined(_DEBUG))
-		16000
+        16000
 #else
-		160000
+        160000
 #endif
-		;
+        ;
     {
         ranctx gen;
         raninit(&gen, 0x78adbcff);
@@ -84,12 +84,13 @@ BOOST_AFIO_AUTO_TEST_CASE(async_io_barrier, "Tests that the async i/o barrier wo
         auto verify = dispatcher->call(thisgroupbarriered.front(), std::function<bool()>(std::bind(verifybarrier, &callcount[run.second], run.first)));
         verifies.push_back(std::move(verify.first));
         next = verify.second;
-	// barrier() adds an immediate op per op
+        // barrier() adds an immediate op per op
         opscount += run.first*2 + 1;
     }
     auto dispatched = chrono::high_resolution_clock::now();
-    cout << "There are now " << dec << dispatcher->count() << " handles open with a queue depth of " << dispatcher->wait_queue_depth() << endl;
+    cout << "There are now " << dec << dispatcher->fd_count() << " handles open with a queue depth of " << dispatcher->wait_queue_depth() << endl;
     BOOST_AFIO_CHECK_NO_THROW(when_all(next).wait());
+    cout << "There are now " << dec << dispatcher->fd_count() << " handles open with a queue depth of " << dispatcher->wait_queue_depth() << endl;
     // Retrieve any errors
     BOOST_FOREACH(auto &i, verifies)
     {
@@ -104,6 +105,6 @@ BOOST_AFIO_AUTO_TEST_CASE(async_io_barrier, "Tests that the async i/o barrier wo
     cout << "  It took " << diff.count() << " secs to finish all operations" << endl << endl;
     diff = chrono::duration_cast<secs_type>(end - begin);
     cout << "That's a throughput of " << opscount / diff.count() << " ops/sec" << endl;
-	// Add a single output to validate the test
-	BOOST_CHECK(true);
+    // Add a single output to validate the test
+    BOOST_CHECK(true);
 }

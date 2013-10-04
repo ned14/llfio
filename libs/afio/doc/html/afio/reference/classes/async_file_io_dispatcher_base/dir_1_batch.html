@@ -4,7 +4,7 @@
 <title>dir (batch)</title>
 <link rel="stylesheet" href="../../../../myboostbook.css" type="text/css">
 <meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
-<link rel="home" href="../../../../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 0.1">
+<link rel="home" href="../../../../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 1.1">
 <link rel="up" href="../async_file_io_dispatcher_base.html" title="async_file_io_dispatcher_base">
 <link rel="prev" href="close_1_single.html" title="close (single)">
 <link rel="next" href="dir_1_single.html" title="dir (single)">
@@ -28,7 +28,7 @@
           (batch)</a>
 </h5></div></div></div>
 <p>
-            <a class="indexterm" name="id925539"></a>
+            <a class="indexterm" name="id918984"></a>
 Schedule a batch of asynchronous directory creations and opens after
             optional preconditions.
           </p>
@@ -36,9 +36,11 @@ Schedule a batch of asynchronous directory creations and opens after
 <a name="afio.reference.classes.async_file_io_dispatcher_base.dir_1_batch.h0"></a>
             <span class="phrase"><a name="afio.reference.classes.async_file_io_dispatcher_base.dir_1_batch.description"></a></span><a class="link" href="dir_1_batch.html#afio.reference.classes.async_file_io_dispatcher_base.dir_1_batch.description">Description</a>
           </h6>
-<pre class="programlisting"><span class="identifier">Note</span> <span class="identifier">that</span> <span class="keyword">if</span> <span class="identifier">there</span> <span class="identifier">is</span> <span class="identifier">already</span> <span class="identifier">a</span> <span class="identifier">handle</span> <span class="identifier">open</span> <span class="identifier">to</span> <span class="identifier">the</span> <span class="identifier">directory</span> <span class="identifier">requested</span><span class="special">,</span> <span class="identifier">that</span> <span class="identifier">will</span> <span class="identifier">be</span> <span class="identifier">returned</span> <span class="identifier">instead</span> <span class="identifier">of</span>
-<span class="identifier">a</span> <span class="keyword">new</span> <span class="identifier">handle</span> <span class="identifier">unless</span> <span class="identifier">file</span><span class="special">\</span><span class="identifier">u005fflags</span><span class="special">::</span><span class="identifier">UniqueDirectoryHandle</span> <span class="identifier">is</span> <span class="identifier">specified</span><span class="special">.</span>
-</pre>
+<p>
+            Note that if there is already a handle open to the directory requested,
+            that will be returned instead of a new handle unless file_flags::UniqueDirectoryHandle
+            is specified.
+          </p>
 <h6>
 <a name="afio.reference.classes.async_file_io_dispatcher_base.dir_1_batch.h1"></a>
             <span class="phrase"><a name="afio.reference.classes.async_file_io_dispatcher_base.dir_1_batch.synopsis"></a></span><a class="link" href="dir_1_batch.html#afio.reference.classes.async_file_io_dispatcher_base.dir_1_batch.synopsis">Synopsis</a>
@@ -131,8 +133,7 @@ Schedule a batch of asynchronous directory creations and opens after
             if any inputs have values which could not possibly be correct. Once a
             batch of input ops has been verified at the point of entry as not errored,
             you are guaranteed that the batch is atomically scheduled as a whole,
-            unless one of the following conditions occurs: (i) A failure to allocate
-            memory occurs.
+            unless a failure to allocate memory occurs.
           </p>
 <h6>
 <a name="afio.reference.classes.async_file_io_dispatcher_base.dir_1_batch.h7"></a>
@@ -155,11 +156,11 @@ Schedule a batch of asynchronous directory creations and opens after
         <span class="string">"testdir/linktodir"</span><span class="special">,</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">file_flags</span><span class="special">::</span><span class="identifier">Create</span><span class="special">)));</span>
 
     <span class="comment">// Schedule deleting the symbolic link only after when it has been created</span>
-    <span class="keyword">auto</span> <span class="identifier">rmlink</span><span class="special">(</span><span class="identifier">dispatcher</span><span class="special">-&gt;</span><span class="identifier">rmsymlink</span><span class="special">(</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_path_op_req</span><span class="special">(</span><span class="identifier">mklink</span><span class="special">,</span>
-        <span class="string">"testdir/linktodir"</span><span class="special">)));</span>
+    <span class="keyword">auto</span> <span class="identifier">rmlink</span><span class="special">(</span><span class="identifier">dispatcher</span><span class="special">-&gt;</span><span class="identifier">rmsymlink</span><span class="special">(</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_path_op_req</span><span class="special">(</span>
+        <span class="identifier">dispatcher</span><span class="special">-&gt;</span><span class="identifier">close</span><span class="special">(</span><span class="identifier">mklink</span><span class="special">),</span> <span class="string">"testdir/linktodir"</span><span class="special">)));</span>
     <span class="comment">// Schedule deleting the file only after when it has been created</span>
-    <span class="keyword">auto</span> <span class="identifier">rmfile</span><span class="special">(</span><span class="identifier">dispatcher</span><span class="special">-&gt;</span><span class="identifier">rmfile</span><span class="special">(</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_path_op_req</span><span class="special">(</span><span class="identifier">mkfile</span><span class="special">,</span>
-        <span class="string">"testdir/testfile"</span><span class="special">)));</span>
+    <span class="keyword">auto</span> <span class="identifier">rmfile</span><span class="special">(</span><span class="identifier">dispatcher</span><span class="special">-&gt;</span><span class="identifier">rmfile</span><span class="special">(</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_path_op_req</span><span class="special">(</span>
+        <span class="identifier">dispatcher</span><span class="special">-&gt;</span><span class="identifier">close</span><span class="special">(</span><span class="identifier">mkfile</span><span class="special">),</span> <span class="string">"testdir/testfile"</span><span class="special">)));</span>
     <span class="comment">// Schedule waiting until both the preceding operations have finished</span>
     <span class="keyword">auto</span> <span class="identifier">barrier</span><span class="special">(</span><span class="identifier">dispatcher</span><span class="special">-&gt;</span><span class="identifier">barrier</span><span class="special">({</span><span class="identifier">rmlink</span><span class="special">,</span> <span class="identifier">rmfile</span><span class="special">}));</span>
     <span class="comment">// Schedule deleting the directory only after the barrier completes</span>

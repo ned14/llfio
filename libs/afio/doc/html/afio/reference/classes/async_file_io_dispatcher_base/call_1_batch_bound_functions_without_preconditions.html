@@ -4,7 +4,7 @@
 <title>call (batch bound functions without preconditions)</title>
 <link rel="stylesheet" href="../../../../myboostbook.css" type="text/css">
 <meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
-<link rel="home" href="../../../../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 0.1">
+<link rel="home" href="../../../../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 1.1">
 <link rel="up" href="../async_file_io_dispatcher_base.html" title="async_file_io_dispatcher_base">
 <link rel="prev" href="call_2_batch_bound_functions.html" title="call (batch bound functions)">
 <link rel="next" href="call_3_single_unbound_callable.html" title="call (single unbound callable)">
@@ -28,7 +28,7 @@
           (batch bound functions without preconditions)</a>
 </h5></div></div></div>
 <p>
-            <a class="indexterm" name="id910248"></a>
+            <a class="indexterm" name="id907728"></a>
 Schedule a batch of asynchronous invocations of the specified bound functions
             when their supplied preconditions complete.
           </p>
@@ -160,8 +160,7 @@ Schedule a batch of asynchronous invocations of the specified bound functions
             if any inputs have values which could not possibly be correct. Once a
             batch of input ops has been verified at the point of entry as not errored,
             you are guaranteed that the batch is atomically scheduled as a whole,
-            unless one of the following conditions occurs: (i) A failure to allocate
-            memory occurs.
+            unless a failure to allocate memory occurs.
           </p>
 <h6>
 <a name="afio.reference.classes.async_file_io_dispatcher_base.call_1_batch_bound_functions_without_preconditions.h7"></a>

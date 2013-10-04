@@ -4,7 +4,7 @@
 <title>call (single unbound callable)</title>
 <link rel="stylesheet" href="../../../../myboostbook.css" type="text/css">
 <meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
-<link rel="home" href="../../../../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 0.1">
+<link rel="home" href="../../../../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 1.1">
 <link rel="up" href="../async_file_io_dispatcher_base.html" title="async_file_io_dispatcher_base">
 <link rel="prev" href="call_1_batch_bound_functions_without_preconditions.html" title="call (batch bound functions without preconditions)">
 <link rel="next" href="adopt_1_batch.html" title="adopt (batch)">
@@ -28,7 +28,7 @@
           (single unbound callable)</a>
 </h5></div></div></div>
 <p>
-            <a class="indexterm" name="id911346"></a>
+            <a class="indexterm" name="id906575"></a>
 Schedule an asynchronous invocation of the specified unbound callable
             when its supplied precondition completes. Note that this function essentially
             calls <code class="literal"><code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">bind</span><span class="special">()</span></code></code>
@@ -54,7 +54,7 @@ Schedule an asynchronous invocation of the specified unbound callable
             <span class="phrase"><a name="afio.reference.classes.async_file_io_dispatcher_base.call_3_single_unbound_callable.synopsis"></a></span><a class="link" href="call_3_single_unbound_callable.html#afio.reference.classes.async_file_io_dispatcher_base.call_3_single_unbound_callable.synopsis">Synopsis</a>
           </h6>
 <pre class="programlisting"><span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">C</span><span class="special">,</span> <span class="keyword">class</span><span class="special">...</span> <span class="identifier">Args</span><span class="special">&gt;</span>
-<span class="identifier">std</span><span class="special">::</span><span class="identifier">pair</span><span class="special">&lt;</span> <span class="identifier">future</span><span class="special">&lt;</span> <span class="keyword">typename</span> <span class="identifier">detail</span><span class="special">::</span><span class="identifier">vs2013_variadic_overload_resolution_workaround</span><span class="special">&lt;</span> <span class="identifier">C</span><span class="special">,</span> <span class="identifier">Args</span><span class="special">...&gt;::</span><span class="identifier">type</span> <span class="special">&gt;,</span> <span class="identifier">async_io_op</span> <span class="special">&gt;</span> <span class="identifier">async_file_io_dispatcher_base</span><span class="special">::</span><span class="identifier">call</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">async_io_op</span> <span class="special">&amp;</span> <span class="identifier">req</span><span class="special">,</span> <span class="identifier">C</span> <span class="identifier">callback</span><span class="special">,</span> <span class="identifier">Args</span><span class="special">...</span> <span class="identifier">args</span><span class="special">)</span></pre>
+<span class="identifier">std</span><span class="special">::</span><span class="identifier">pair</span><span class="special">&lt;</span> <span class="identifier">future</span><span class="special">&lt;</span> <span class="keyword">typename</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">result_of</span><span class="special">&lt;</span> <span class="identifier">C</span><span class="special">(</span><span class="identifier">Args</span><span class="special">...)&gt;::</span><span class="identifier">type</span> <span class="special">&gt;,</span> <span class="identifier">async_io_op</span> <span class="special">&gt;</span> <span class="identifier">async_file_io_dispatcher_base</span><span class="special">::</span><span class="identifier">call</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">async_io_op</span> <span class="special">&amp;</span> <span class="identifier">req</span><span class="special">,</span> <span class="identifier">C</span> <span class="identifier">callback</span><span class="special">,</span> <span class="identifier">Args</span><span class="special">...</span> <span class="identifier">args</span><span class="special">)</span></pre>
 <h6>
 <a name="afio.reference.classes.async_file_io_dispatcher_base.call_3_single_unbound_callable.h2"></a>
             <span class="phrase"><a name="afio.reference.classes.async_file_io_dispatcher_base.call_3_single_unbound_callable.parameters"></a></span><a class="link" href="call_3_single_unbound_callable.html#afio.reference.classes.async_file_io_dispatcher_base.call_3_single_unbound_callable.parameters">Parameters</a>
@@ -225,8 +225,7 @@ Schedule an asynchronous invocation of the specified unbound callable
             if any inputs have values which could not possibly be correct. Once a
             batch of input ops has been verified at the point of entry as not errored,
             you are guaranteed that the batch is atomically scheduled as a whole,
-            unless one of the following conditions occurs: (i) A failure to allocate
-            memory occurs.
+            unless a failure to allocate memory occurs.
           </p>
 <h6>
 <a name="afio.reference.classes.async_file_io_dispatcher_base.call_3_single_unbound_callable.h7"></a>

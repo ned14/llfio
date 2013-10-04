@@ -27,6 +27,13 @@ The many months of wrangling to achieve that win was made moot when I was downsi
 towards the end of GSoC, nevertheless my thanks are due to BlackBerry for trying to
 change itself and letting me be a part of that.
 
+* To Christopher M. Kohlhoff for providing Boost.ASIO, which has been a high benchmark
+to aspire towards.
+
+* To Vicente J. Botet Escriba for very kindly adding a method to Boost.Thread's future's
+for directly fetching their exception_ptr. This greatly improved AFIO's exception
+propagation performance.
+
 
 
 [endsect]

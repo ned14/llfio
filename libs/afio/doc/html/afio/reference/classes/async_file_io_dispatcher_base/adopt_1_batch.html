@@ -4,7 +4,7 @@
 <title>adopt (batch)</title>
 <link rel="stylesheet" href="../../../../myboostbook.css" type="text/css">
 <meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
-<link rel="home" href="../../../../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 0.1">
+<link rel="home" href="../../../../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 1.1">
 <link rel="up" href="../async_file_io_dispatcher_base.html" title="async_file_io_dispatcher_base">
 <link rel="prev" href="call_3_single_unbound_callable.html" title="call (single unbound callable)">
 <link rel="next" href="adopt_1_single.html" title="adopt (single)">
@@ -28,7 +28,7 @@
           (batch)</a>
 </h5></div></div></div>
 <p>
-            <a class="indexterm" name="id914978"></a>
+            <a class="indexterm" name="id908819"></a>
 Schedule a batch of third party handle adoptions.
           </p>
 <h6>
@@ -132,47 +132,49 @@ Schedule a batch of third party handle adoptions.
             if any inputs have values which could not possibly be correct. Once a
             batch of input ops has been verified at the point of entry as not errored,
             you are guaranteed that the batch is atomically scheduled as a whole,
-            unless one of the following conditions occurs: (i) A failure to allocate
-            memory occurs.
+            unless a failure to allocate memory occurs.
           </p>
 <h6>
 <a name="afio.reference.classes.async_file_io_dispatcher_base.adopt_1_batch.h7"></a>
             <span class="phrase"><a name="afio.reference.classes.async_file_io_dispatcher_base.adopt_1_batch.example"></a></span><a class="link" href="adopt_1_batch.html#afio.reference.classes.async_file_io_dispatcher_base.adopt_1_batch.example">Example</a>
           </h6>
-<pre class="programlisting"><span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_file_io_dispatcher_base</span><span class="special">&gt;</span> <span class="identifier">dispatcher</span><span class="special">=</span>
-    <span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">make_async_file_io_dispatcher</span><span class="special">();</span>
-
-<span class="keyword">try</span>
+<pre class="programlisting"><span class="keyword">struct</span> <span class="identifier">test_handle</span> <span class="special">:</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_io_handle</span>
 <span class="special">{</span>
-    <span class="comment">// Schedule creating a directory called testdir</span>
-    <span class="keyword">auto</span> <span class="identifier">mkdir</span><span class="special">(</span><span class="identifier">dispatcher</span><span class="special">-&gt;</span><span class="identifier">dir</span><span class="special">(</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_path_op_req</span><span class="special">(</span><span class="string">"testdir"</span><span class="special">,</span>
-        <span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">file_flags</span><span class="special">::</span><span class="identifier">Create</span><span class="special">)));</span>
-    <span class="comment">// Schedule creating a file called testfile in testdir only when testdir has been created</span>
-    <span class="keyword">auto</span> <span class="identifier">mkfile</span><span class="special">(</span><span class="identifier">dispatcher</span><span class="special">-&gt;</span><span class="identifier">file</span><span class="special">(</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_path_op_req</span><span class="special">(</span><span class="identifier">mkdir</span><span class="special">,</span>
-        <span class="string">"testdir/testfile"</span><span class="special">,</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">file_flags</span><span class="special">::</span><span class="identifier">Create</span><span class="special">)));</span>
-    <span class="comment">// Schedule creating a symbolic link called linktodir to the item referred to by the precondition</span>
-    <span class="comment">// i.e. testdir. Note that on Windows you can only symbolic link directories.</span>
-    <span class="keyword">auto</span> <span class="identifier">mklink</span><span class="special">(</span><span class="identifier">dispatcher</span><span class="special">-&gt;</span><span class="identifier">symlink</span><span class="special">(</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_path_op_req</span><span class="special">(</span><span class="identifier">mkdir</span><span class="special">,</span>
-        <span class="string">"testdir/linktodir"</span><span class="special">,</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">file_flags</span><span class="special">::</span><span class="identifier">Create</span><span class="special">)));</span>
+    <span class="identifier">test_handle</span><span class="special">(</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_file_io_dispatcher_base</span> <span class="special">*</span><span class="identifier">parent</span><span class="special">)</span> <span class="special">:</span>
+        <span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_io_handle</span><span class="special">(</span><span class="identifier">parent</span><span class="special">,</span>
+        <span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_io_handle</span><span class="special">&gt;(),</span>
+        <span class="string">"foo"</span><span class="special">,</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">file_flags</span><span class="special">::</span><span class="identifier">None</span><span class="special">)</span> <span class="special">{}</span>
+    <span class="keyword">virtual</span> <span class="keyword">void</span> <span class="identifier">close</span><span class="special">()</span>
+    <span class="special">{</span>
+        <span class="comment">// Do nothing</span>
+    <span class="special">}</span>
+    <span class="keyword">virtual</span> <span class="keyword">void</span> <span class="special">*</span><span class="identifier">native_handle</span><span class="special">()</span> <span class="keyword">const</span>
+    <span class="special">{</span>
+        <span class="keyword">return</span> <span class="keyword">nullptr</span><span class="special">;</span>
+    <span class="special">}</span>
+    <span class="keyword">virtual</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">directory_entry</span> <span class="identifier">direntry</span><span class="special">(</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">metadata_flags</span>
+        <span class="identifier">wanted</span><span class="special">=</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">directory_entry</span><span class="special">::</span><span class="identifier">metadata_fastpath</span><span class="special">())</span> <span class="keyword">const</span>
+    <span class="special">{</span>
+        <span class="keyword">return</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">directory_entry</span><span class="special">();</span>
+    <span class="special">}</span>
+    <span class="keyword">virtual</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">filesystem</span><span class="special">::</span><span class="identifier">path</span> <span class="identifier">target</span><span class="special">()</span> <span class="keyword">const</span>
+    <span class="special">{</span>
+        <span class="keyword">return</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">filesystem</span><span class="special">::</span><span class="identifier">path</span><span class="special">();</span>
+    <span class="special">}</span>
+    <span class="keyword">virtual</span> <span class="keyword">void</span> <span class="special">*</span><span class="identifier">try_mapfile</span><span class="special">()</span>
+    <span class="special">{</span>
+        <span class="keyword">return</span> <span class="keyword">nullptr</span><span class="special">;</span>
+    <span class="special">}</span>
+<span class="special">};</span>
 
-    <span class="comment">// Schedule deleting the symbolic link only after when it has been created</span>
-    <span class="keyword">auto</span> <span class="identifier">rmlink</span><span class="special">(</span><span class="identifier">dispatcher</span><span class="special">-&gt;</span><span class="identifier">rmsymlink</span><span class="special">(</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_path_op_req</span><span class="special">(</span><span class="identifier">mklink</span><span class="special">,</span>
-        <span class="string">"testdir/linktodir"</span><span class="special">)));</span>
-    <span class="comment">// Schedule deleting the file only after when it has been created</span>
-    <span class="keyword">auto</span> <span class="identifier">rmfile</span><span class="special">(</span><span class="identifier">dispatcher</span><span class="special">-&gt;</span><span class="identifier">rmfile</span><span class="special">(</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_path_op_req</span><span class="special">(</span><span class="identifier">mkfile</span><span class="special">,</span>
-        <span class="string">"testdir/testfile"</span><span class="special">)));</span>
-    <span class="comment">// Schedule waiting until both the preceding operations have finished</span>
-    <span class="keyword">auto</span> <span class="identifier">barrier</span><span class="special">(</span><span class="identifier">dispatcher</span><span class="special">-&gt;</span><span class="identifier">barrier</span><span class="special">({</span><span class="identifier">rmlink</span><span class="special">,</span> <span class="identifier">rmfile</span><span class="special">}));</span>
-    <span class="comment">// Schedule deleting the directory only after the barrier completes</span>
-    <span class="keyword">auto</span> <span class="identifier">rmdir</span><span class="special">(</span><span class="identifier">dispatcher</span><span class="special">-&gt;</span><span class="identifier">rmdir</span><span class="special">(</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">async_path_op_req</span><span class="special">(</span><span class="identifier">barrier</span><span class="special">.</span><span class="identifier">front</span><span class="special">(),</span>
-        <span class="string">"testdir"</span><span class="special">)));</span>
-    <span class="comment">// Check ops for errors</span>
-    <span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">when_all</span><span class="special">({</span><span class="identifier">mkdir</span><span class="special">,</span> <span class="identifier">mkfile</span><span class="special">,</span> <span class="identifier">mklink</span><span class="special">,</span> <span class="identifier">rmlink</span><span class="special">,</span> <span class="identifier">rmfile</span><span class="special">,</span> <span class="identifier">rmdir</span><span class="special">}).</span><span class="identifier">wait</span><span class="special">();</span>
-<span class="special">}</span>
-<span class="keyword">catch</span><span class="special">(...)</span>
+<span class="keyword">int</span> <span class="identifier">main</span><span class="special">(</span><span class="keyword">void</span><span class="special">)</span>
 <span class="special">{</span>
-    <span class="identifier">std</span><span class="special">::</span><span class="identifier">cerr</span> <span class="special">&lt;&lt;</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">current_exception_diagnostic_information</span><span class="special">(</span><span class="keyword">true</span><span class="special">)</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span>
-    <span class="keyword">throw</span><span class="special">;</span>
+    <span class="keyword">auto</span> <span class="identifier">dispatcher</span> <span class="special">=</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">make_async_file_io_dispatcher</span><span class="special">(</span>
+        <span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">process_threadpool</span><span class="special">());</span>
+    <span class="keyword">auto</span> <span class="identifier">h</span><span class="special">=</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">make_shared</span><span class="special">&lt;</span><span class="identifier">test_handle</span><span class="special">&gt;(</span><span class="identifier">dispatcher</span><span class="special">.</span><span class="identifier">get</span><span class="special">());</span>
+    <span class="keyword">auto</span> <span class="identifier">adopted</span><span class="special">=</span><span class="identifier">dispatcher</span><span class="special">-&gt;</span><span class="identifier">adopt</span><span class="special">(</span><span class="identifier">h</span><span class="special">);</span>
+    <span class="identifier">when_all</span><span class="special">(</span><span class="identifier">adopted</span><span class="special">).</span><span class="identifier">wait</span><span class="special">();</span>
+    <span class="keyword">return</span> <span class="number">0</span><span class="special">;</span>
 <span class="special">}</span>
 </pre>
 </div>

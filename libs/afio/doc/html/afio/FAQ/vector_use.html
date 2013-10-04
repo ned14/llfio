@@ -4,7 +4,7 @@
 <title>Why did you use std::vector&lt;&gt; as the ops batch container instead of a generic iterator range?</title>
 <link rel="stylesheet" href="../../myboostbook.css" type="text/css">
 <meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
-<link rel="home" href="../../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 0.1">
+<link rel="home" href="../../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 1.1">
 <link rel="up" href="../FAQ.html" title="Frequently Asked Questions">
 <link rel="prev" href="stuck_ops.html" title="I'm seeing &#8220;WARNING: ~async_file_dispatcher_base() detects stuck async_io_op in total of X ops&#8221; during process close. What does this mean?">
 <link rel="next" href="foreign_fd.html" title="How do I configure my own file descriptor or HANDLE in AFIO?">
@@ -30,7 +30,7 @@
 <div class="orderedlist"><ol class="orderedlist" type="1">
 <li class="listitem">
             <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span><span class="identifier">async_io_op</span><span class="special">&gt;</span></code>
-            is the closest thing to a variable length array in C++<a href="#ftn.afio.FAQ.vector_use.f0" class="footnote" name="afio.FAQ.vector_use.f0"><sup class="footnote">[14]</sup></a>, at least until C++ 14 where we will gain <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">dynarray</span><span class="special">&lt;&gt;</span></code> and dynamic array sizing.
+            is the closest thing to a variable length array in C++<a href="#ftn.afio.FAQ.vector_use.f0" class="footnote" name="afio.FAQ.vector_use.f0"><sup class="footnote">[16]</sup></a>, at least until C++ 14 where we will gain <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">dynarray</span><span class="special">&lt;&gt;</span></code> and dynamic array sizing.
           </li>
 <li class="listitem">
             <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span><span class="identifier">async_io_op</span><span class="special">&gt;</span></code>
@@ -56,7 +56,7 @@
       </p>
 <div class="footnotes">
 <br><hr style="width:100; text-align:left;margin-left: 0">
-<div id="ftn.afio.FAQ.vector_use.f0" class="footnote"><p><a href="#afio.FAQ.vector_use.f0" class="para"><sup class="para">[14] </sup></a>
+<div id="ftn.afio.FAQ.vector_use.f0" class="footnote"><p><a href="#afio.FAQ.vector_use.f0" class="para"><sup class="para">[16] </sup></a>
               Ok, there is also the oft-forgotten <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">valarray</span><span class="special">&lt;&gt;</span></code> too, but its use as a generic
               container isn't recommended.
             </p></div>

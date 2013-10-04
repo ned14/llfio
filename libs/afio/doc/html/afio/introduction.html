@@ -4,9 +4,9 @@
 <title>Introduction</title>
 <link rel="stylesheet" href="../myboostbook.css" type="text/css">
 <meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
-<link rel="home" href="../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 0.1">
-<link rel="up" href="../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 0.1">
-<link rel="prev" href="../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 0.1">
+<link rel="home" href="../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 1.1">
+<link rel="up" href="../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 1.1">
+<link rel="prev" href="../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 1.1">
 <link rel="next" href="design.html" title="Design Rationale">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
@@ -28,12 +28,13 @@
 </h2></div></div></div>
 <p>
       Boost.AFIO is a linear scalable, batch, chainable, asynchronous closure execution
-      engine extending <a href="http://www.boost.org/libs/asio/" target="_top">Boost.ASIO</a>
+      engine with an almost wait free implementation<a href="#ftn.afio.introduction.f0" class="footnote" name="afio.introduction.f0"><sup class="footnote">[1]</sup></a> extending <a href="http://www.boost.org/libs/asio/" target="_top">Boost.ASIO</a>
       and <a href="http://www.boost.org/libs/thread/" target="_top">Boost.Thread</a> specialised
       as a portable asynchronous file i/o implementation library. Implementation
-      of this first version has been kept as simple as possible (&lt; 1000 active
-      LOC) at the cost of some performance. This library was brought to Boost as
-      part of Google Summer of Code 2013.
+      of this first version has been kept as simple as possible (~ 1000 active LOC)
+      at the cost of some performance, though with a good compiler <a class="link" href="FAQ/closure_performance.html" title="What is the maximum throughput of AFIO's closure execution engine aka how many IOPS can I push with AFIO?">you
+      can expect 25-50% of the performance of using raw Boost.ASIO</a>. This library
+      was brought to Boost as part of Google Summer of Code 2013.
     </p>
 <p>
       Note that Boost.AFIO was originally written purely in C++11 and backported
@@ -67,6 +68,16 @@
       <a class="link" href="advanced_topics/vs2010_notes.html" title="Notes on using AFIO with Microsoft Visual Studio 2010 and Mingw32">we have written a guide especially
       for VS2010 and Mingw32</a>.
     </p>
+<div class="important"><table border="0" summary="Important">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Important]" src="../../../doc/src/images/important.png"></td>
+<th align="left">Important</th>
+</tr>
+<tr><td align="left" valign="top"><p>
+        Note that Boost.AFIO has not passed Boost peer review, and therefore is not
+        a part of the Boost C++ libraries
+      </p></td></tr>
+</table></div>
 <p>
       As a very quick example of minimal usage:
     </p>
@@ -93,6 +104,13 @@
 <span class="comment">// Print the result returned by the future for the lambda, which will be 43</span>
 <span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="string">"addtovalue() returned "</span> <span class="special">&lt;&lt;</span> <span class="identifier">addtovalue</span><span class="special">.</span><span class="identifier">first</span><span class="special">.</span><span class="identifier">get</span><span class="special">()</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span>
 </pre>
+<div class="footnotes">
+<br><hr style="width:100; text-align:left;margin-left: 0">
+<div id="ftn.afio.introduction.f0" class="footnote"><p><a href="#afio.introduction.f0" class="para"><sup class="para">[1] </sup></a>
+        It is wait free if your CPU supports memory transactions, apart from when
+        the memory allocator asks the kernel for more memory.
+      </p></div>
+</div>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
 <td align="left"></td>

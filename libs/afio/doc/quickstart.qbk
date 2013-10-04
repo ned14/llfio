@@ -156,16 +156,16 @@ Indeed many ask the same when programming WinRT apps -- Microsoft's insistance o
 any call to block can make simple designs explode with complexities of nested callbacks.]?
 
 Well, that's simple: do you want maximum file i/o performance? Here is a search for ["Niall] in a
-Boost working directory which contained about 6Gb of data across ~39k files[footnote Test machine
+Boost working directory which contained about 7Gb of data across ~35k files[footnote Test machine
 was a 3.5Ghz Intel i7-3770K Microsoft Windows 8 x64 machine with Seagate ST3320620AS 7200rpm hard
 drive. Note that AFIO has a native WinIOCP backend which leverages host asynchronous file i/o support.]:
 
 [table:find_in_files_performance Find in files performance for traditional vs AFIO implementations
   [[][iostreams, single threaded][iostreams, OpenMP][Boost.AFIO][Boost.AFIO `file_flags::OSDirect`][Boost.AFIO `file_flags::OSMMap`[footnote The superiority of memory maps on Windows is because all buffered file i/o is done via memory copying to/from memory maps on Windows anyway, so eliminating that memory copy is huge.]]]
-  [[Warm cache][779 Mb/sec][1682 Mb/sec][2086 Mb/sec][N/A][3761 Mb/sec]]
-  [[][+0%][+116%][+168%][][+383%]]
-  [[Cold cache[footnote File cache reset using [@http://technet.microsoft.com/en-us/sysinternals/ff700229.aspx]]][16 Mb/sec][8 Mb/sec][15 Mb/sec][13.14 Mb/sec][24 Mb/sec]]
-  [[][+0%][-50%][-6%][-18%][+50%]]
+  [[Warm cache][812 Mb/sec][1810 Mb/sec][2663 Mb/sec][N/A][6512 Mb/sec]]
+  [[][+0%][+123%][+228%][][+702%]]
+  [[Cold cache[footnote File cache reset using [@http://technet.microsoft.com/en-us/sysinternals/ff700229.aspx]]][16 Mb/sec][[*8 Mb/sec]][15 Mb/sec][13.14 Mb/sec][24 Mb/sec]]
+  [[][+0%][[*-50%]][-6%][-18%][+50%]]
 ]
 
 The eagle eyed amongst you will have noticed that the AFIO implementation looks hand tuned with a
@@ -218,7 +218,7 @@ is you may wish to skip this section.
 
 First, it will be useful to introduce some core ideas before moving on to a more indepth 
 look at closure execution engines. Let us begin with a simple definition of a closure. 
-Wikipedia.org suplies a clear definition:
+Wikipedia.org supplies a clear definition:
 
 
 [:“In programming languages, a closure (also lexical closure or function closure) is a function or 
@@ -301,7 +301,7 @@ __boost_afio__ provides a powerful tool for scheduling and executing them.
 [endsect]
 [endsect]
 
-[section How __boost_afio__ Relates to Exisiting Closure Execution Engines]
+[section How __boost_afio__ Relates to Existing Closure Execution Engines]
 
 Proposals N3562 and its predecessor N3378  outline an executor library based on internal 
 implementations of similar facilities at Google and Microsoft. __boost_afio__ is based, in part, on some of 

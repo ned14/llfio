@@ -4,7 +4,7 @@
 <title>make_async_data_op_req</title>
 <link rel="stylesheet" href="../../../myboostbook.css" type="text/css">
 <meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
-<link rel="home" href="../../../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 0.1">
+<link rel="home" href="../../../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 1.1">
 <link rel="up" href="../functions.html" title="Functions">
 <link rel="prev" href="make_async_data_op_req_3.html" title="make_async_data_op_req">
 <link rel="next" href="process_threadpool.html" title="process_threadpool">
@@ -27,7 +27,7 @@
 <a name="afio.reference.functions.make_async_data_op_req_4"></a><a class="link" href="make_async_data_op_req_4.html" title="make_async_data_op_req">make_async_data_op_req</a>
 </h4></div></div></div>
 <p>
-          <a class="indexterm" name="id996488"></a>
+          <a class="indexterm" name="id981657"></a>
 Convenience instantiator of a async_data_op_req, letting the compiler deduce
           the template specialisation to use.
         </p>
@@ -242,7 +242,7 @@ Convenience instantiator of a async_data_op_req, letting the compiler deduce
     <span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="string">"Contents of file is '"</span> <span class="special">&lt;&lt;</span> <span class="identifier">contents</span> <span class="special">&lt;&lt;</span> <span class="string">"'"</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span>
 
     <span class="comment">// Check remaining ops for errors</span>
-    <span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">when_all</span><span class="special">({</span><span class="identifier">req</span><span class="special">.</span><span class="identifier">precondition</span> <span class="comment">/*close*/</span><span class="special">,</span> <span class="identifier">deletedfile</span><span class="special">}).</span><span class="identifier">wait</span><span class="special">();</span>		<a class="co" name="afio.reference.functions.make_async_data_op_req_4.c16" href="make_async_data_op_req_4.html#afio.reference.functions.make_async_data_op_req_4.c17"><img src="../../../../../doc/src/images/callouts/9.png" alt="9" border="0"></a>
+    <span class="identifier">boost</span><span class="special">::</span><span class="identifier">afio</span><span class="special">::</span><span class="identifier">when_all</span><span class="special">({</span><span class="identifier">req</span><span class="special">.</span><span class="identifier">precondition</span> <span class="comment">/*close*/</span><span class="special">,</span> <span class="identifier">deletedfile</span><span class="special">}).</span><span class="identifier">wait</span><span class="special">();</span>        <a class="co" name="afio.reference.functions.make_async_data_op_req_4.c16" href="make_async_data_op_req_4.html#afio.reference.functions.make_async_data_op_req_4.c17"><img src="../../../../../doc/src/images/callouts/9.png" alt="9" border="0"></a>
 <span class="special">}</span>
 <span class="keyword">catch</span><span class="special">(...)</span>
 <span class="special">{</span>

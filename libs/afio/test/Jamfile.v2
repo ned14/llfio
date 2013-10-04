@@ -27,7 +27,7 @@ rule running-in-ci ( properties * )
 project boost/afio/test
     : requirements
       <threading>multi
-      <library>/boost/afio//boost_afio
+#      <library>/boost/afio//boost_afio
       <toolset>gcc:<cxxflags>"-std=c++0x -fvisibility-inlines-hidden -fstrict-aliasing -Wstrict-aliasing -Wno-unused -fargument-noalias -fvisibility=hidden -fopenmp -fasynchronous-unwind-tables"
       <toolset>gcc-mingw:<cxxflags>"-DWIN32 -D_UNICODE -DUNICODE -Wno-missing-braces"
       <toolset>gcc-mingw:<linkflags>"-lws2_32"
@@ -39,10 +39,10 @@ project boost/afio/test
       <target-os>linux:<linkflags>"-lpthread -ldl"
       <target-os>freebsd:<linkflags>"-lpthread"
       <link>shared:<define>BOOST_AFIO_DYN_LINK=1
-      <link>shared:<library>../../system/build//boost_system
-      <link>shared:<library>../../filesystem/build//boost_filesystem
-      <link>shared:<library>../../atomic/build//boost_atomic
-      <link>shared:<library>../../thread/build//boost_thread
+      <library>../../system/build//boost_system
+      <library>../../filesystem/build//boost_filesystem
+      <library>../../atomic/build//boost_atomic
+      <library>../../thread/build//boost_thread
 	  <conditional>@running-in-ci
     ;
 
@@ -99,6 +99,9 @@ else
 # link tests (just compile and links targets)
 if "--link-test"  in $(.argv)  
 {  
+	# Test that inline linkage works
+	link test_inline_linkage_master.cpp test_inline_linkage1.cpp test_inline_linkage2.cpp ;
+
     for local x in $(test_files_all)
     {
         link $(x) $(reqs) ;

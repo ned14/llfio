@@ -5,8 +5,8 @@ File Created: Nov 2012
 
 #define _CRT_SECURE_NO_WARNINGS
 
-#include "ErrorHandling.hpp"
-#include "afio.hpp"
+#include "../ErrorHandling.hpp"
+#include "../../afio.hpp"
 #include <locale>
 #include <cstring>
 #include "boost/exception/to_string.hpp"
@@ -23,10 +23,10 @@ namespace boost {
     namespace afio{
         namespace detail{
 
-            using namespace std;
-			
-            void int_throwWinError(const char *file, const char *function, int lineno, unsigned code, const std::filesystem::path *filename)
+            
+            BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC void int_throwWinError(const char *file, const char *function, int lineno, unsigned code, const std::filesystem::path *filename)
             {
+                    using namespace std;
                     DWORD len;
                     char buffer[1024];
                     len=FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, 0, code, 0, buffer, sizeof(buffer), 0);
@@ -63,12 +63,13 @@ namespace boost {
                     }
             }
 
-            void int_throwNTError(const char *file, const char *function, int lineno, unsigned code, const std::filesystem::path *filename)
+            BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC void int_throwNTError(const char *file, const char *function, int lineno, unsigned code, const std::filesystem::path *filename)
             {
+                    using namespace std;
                     DWORD len;
                     char buffer[1024];
                     len=FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS | FORMAT_MESSAGE_FROM_HMODULE,
-						GetModuleHandleA("NTDLL.DLL"), code, 0, buffer, sizeof(buffer), 0);
+                        GetModuleHandleA("NTDLL.DLL"), code, 0, buffer, sizeof(buffer), 0);
                     // Remove annoying CRLF at end of message sometimes
                     while(10==buffer[len-1])
                     {
@@ -102,7 +103,7 @@ namespace boost {
                     }
             }
 
-		} // namespace detail
+        } // namespace detail
     }//namespace afio
 }//namespace boost
 
@@ -111,16 +112,10 @@ namespace boost {
 namespace boost {
     namespace afio{
         namespace detail{
-            using namespace std;
 
-            void int_throwOSError(const char *file, const char *function, int lineno, int code, const std::filesystem::path *filename)
+            BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC void int_throwOSError(const char *file, const char *function, int lineno, int code, const std::filesystem::path *filename)
             {
-                    /*if(EINTR==code && QThread::current()->isBeingCancelled())
-                    {	*//* Some POSIX implementation have badly written pthread support which unpredictably returns
-                            an interrupted system call error rather than actually cancelling the thread. */
-                            /*fxmessage("WARNING: Your pthread implementation caused an interrupted system call error rather than properly cancelling a thread. You should report this to your libc maintainer!\n");
-                            QThread::current()->checkForTerminate();
-                    }*/
+                    using namespace std;
                     string errstr(strerror(code));
                     errstr.append(" ("+to_string(code)+") in '"+string(file)+"':"+string(function)+":"+to_string(lineno));
                     if(ENOENT==code || ENOTDIR==code)

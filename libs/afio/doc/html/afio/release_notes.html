@@ -4,8 +4,8 @@
 <title>Release Notes</title>
 <link rel="stylesheet" href="../myboostbook.css" type="text/css">
 <meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
-<link rel="home" href="../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 0.1">
-<link rel="up" href="../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 0.1">
+<link rel="home" href="../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 1.1">
+<link rel="up" href="../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 1.1">
 <link rel="prev" href="advanced_topics/vs2010_notes.html" title="Notes on using AFIO with Microsoft Visual Studio 2010 and Mingw32">
 <link rel="next" href="FAQ.html" title="Frequently Asked Questions">
 </head>
@@ -28,11 +28,39 @@
 </h2></div></div></div>
 <h4>
 <a name="afio.release_notes.h0"></a>
-      <span class="phrase"><a name="afio.release_notes.boost_1_56"></a></span><a class="link" href="release_notes.html#afio.release_notes.boost_1_56">Boost
-      1.56</a>
+      <span class="phrase"><a name="afio.release_notes.boost_1_56_afio_v1_1"></a></span><a class="link" href="release_notes.html#afio.release_notes.boost_1_56_afio_v1_1">Boost
+      1.56 AFIO v1.1</a>
     </h4>
 <p>
-      First release.
+      Immediate completions no longer hold the opslock, which meant the opslock could
+      be changed from a recursive mutex to a spinlock. The new, more parallelised,
+      behaviour illuminated a number of new race conditions in when_all() which have
+      been fixed.
+    </p>
+<p>
+      Completely gutted dispatch engine and replaced with a new, almost entirely
+      wait free implementation based on throwing atomics at the problem. If it weren't
+      for the spin lock around the central ops hash table, AFIO would now be an entirely
+      wait free design.
+    </p>
+<p>
+      In order to do something about that spin lock, replaced all locking in AFIO
+      (apart from the directory file handle cache) with memory transactions instead.
+      This does CPUID at runtime and will use Intel's TSX-NI memory transaction implementation
+      if available, if not it falls back to a spin lock based emulation. On memory
+      transaction capable CPUs, AFIO is now almost entirely wait free, apart from
+      when it has to fetch memory from the kernel.
+    </p>
+<p>
+      Made AFIO usable as headers only.
+    </p>
+<h4>
+<a name="afio.release_notes.h1"></a>
+      <span class="phrase"><a name="afio.release_notes.boost_1_55_afio_v1_0"></a></span><a class="link" href="release_notes.html#afio.release_notes.boost_1_55_afio_v1_0">Boost
+      1.55 AFIO v1.0</a>
+    </h4>
+<p>
+      First release for end of Google Summer of Code 2013.
     </p>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>

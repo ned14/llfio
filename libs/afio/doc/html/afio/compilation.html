@@ -4,8 +4,8 @@
 <title>Compilation</title>
 <link rel="stylesheet" href="../myboostbook.css" type="text/css">
 <meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
-<link rel="home" href="../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 0.1">
-<link rel="up" href="../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 0.1">
+<link rel="home" href="../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 1.1">
+<link rel="up" href="../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 1.1">
 <link rel="prev" href="design/acid_write_ordering/write_ordering_data.html" title="Write ordering data and durability: why does it matter?">
 <link rel="next" href="quickstart.html" title="Quick Start">
 </head>
@@ -27,13 +27,16 @@
 <a name="afio.compilation"></a><a class="link" href="compilation.html" title="Compilation">Compilation</a>
 </h2></div></div></div>
 <p>
-      Boost.AFIO is a headers-only library. Users only need to include the library
-      headers in their programs in order to be able to access definitions and algorithms
+      Boost.AFIO is by default a headers-only library, unless you define the macro
+      <code class="computeroutput"><span class="identifier">BOOST_AFIO_HEADERS_ONLY</span></code> to
+      zero before including afio.hpp. Users only need to include the library headers
+      in their programs in order to be able to access definitions and algorithms
       provided by the Boost.AFIO library. No linking against any binaries is required.
     </p>
 <p>
-      Boost.AFIO is only dependant on headers-only Boost libraries. It does not introduce
-      indirect dependencies on any binary libraries.
+      Boost.AFIO is only dependant on headers-only Boost libraries apart from Boost.Filesystem.
+      Boost.Filesystem in turn is dependant on Boost.System. On some platforms (e.g.
+      ARM) you may also need Boost.Atomic.
     </p>
 <p>
       In order to be able to use Boost.AFIO, the only thing users need to do is to
@@ -157,7 +160,7 @@
 <div class="orderedlist"><ol class="orderedlist" type="1">
 <li class="listitem">
           Download the latest version of the Boost Libraries from boost.org. At the
-          time of writing the current version is Boost 1.54. Boost AFIO is not compatible
+          time of writing the current version is Boost 1.55. Boost AFIO is not compatible
           with earlier versions of Boost, so be sure to use a current copy of the
           Boost Libraries.
         </li>

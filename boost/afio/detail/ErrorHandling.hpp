@@ -43,40 +43,40 @@ namespace boost{
         namespace detail{
     
 #ifdef BOOST_WINDOWS
-                    extern BOOST_AFIO_DECL void int_throwWinError(const char *file, const char *function, int lineno, unsigned code, const std::filesystem::path *filename=0);
+                    BOOST_AFIO_HEADERS_ONLY_FUNC_SPEC void int_throwWinError(const char *file, const char *function, int lineno, unsigned code, const std::filesystem::path *filename=0);
                     extern "C" unsigned __stdcall GetLastError();
-#define BOOST_AFIO_ERRGWIN(code)				{ boost::afio::detail::int_throwWinError(EXCEPTION_FILE(0), EXCEPTION_FUNCTION(0), EXCEPTION_LINE(0), code); }
-#define BOOST_AFIO_ERRGWINFN(code, filename)	{ boost::afio::detail::int_throwWinError(EXCEPTION_FILE(0), EXCEPTION_FUNCTION(0), EXCEPTION_LINE(0), code, &(filename)); }
-#define BOOST_AFIO_ERRHWIN(exp)				{ unsigned __errcode=(unsigned)(exp); if(!__errcode) BOOST_AFIO_ERRGWIN(GetLastError()); }
-#define BOOST_AFIO_ERRHWINFN(exp, filename)	{ unsigned __errcode=(unsigned)(exp); if(!__errcode) BOOST_AFIO_ERRGWINFN(GetLastError(), filename); }
+#define BOOST_AFIO_ERRGWIN(code)                { boost::afio::detail::int_throwWinError(EXCEPTION_FILE(0), EXCEPTION_FUNCTION(0), EXCEPTION_LINE(0), code); }
+#define BOOST_AFIO_ERRGWINFN(code, filename)    { boost::afio::detail::int_throwWinError(EXCEPTION_FILE(0), EXCEPTION_FUNCTION(0), EXCEPTION_LINE(0), code, &(filename)); }
+#define BOOST_AFIO_ERRHWIN(exp)             { unsigned __errcode=(unsigned)(exp); if(!__errcode) BOOST_AFIO_ERRGWIN(GetLastError()); }
+#define BOOST_AFIO_ERRHWINFN(exp, filename) { unsigned __errcode=(unsigned)(exp); if(!__errcode) BOOST_AFIO_ERRGWINFN(GetLastError(), filename); }
 
-                    extern BOOST_AFIO_DECL void int_throwNTError(const char *file, const char *function, int lineno, unsigned code, const std::filesystem::path *filename=0);
-#define BOOST_AFIO_ERRGNT(code)				{ boost::afio::detail::int_throwNTError(EXCEPTION_FILE(0), EXCEPTION_FUNCTION(0), EXCEPTION_LINE(0), code); }
-#define BOOST_AFIO_ERRGNTFN(code, filename)	{ boost::afio::detail::int_throwNTError(EXCEPTION_FILE(0), EXCEPTION_FUNCTION(0), EXCEPTION_LINE(0), code, &(filename)); }
-#define BOOST_AFIO_ERRHNT(exp)				{ unsigned __errcode=(unsigned)(exp); if(0/*STATUS_SUCCESS*/!=__errcode) BOOST_AFIO_ERRGNT(__errcode); }
-#define BOOST_AFIO_ERRHNTFN(exp, filename)	{ unsigned __errcode=(unsigned)(exp); if(0/*STATUS_SUCCESS*/!=__errcode) BOOST_AFIO_ERRGNTFN(__errcode, filename); }
+                    BOOST_AFIO_HEADERS_ONLY_FUNC_SPEC void int_throwNTError(const char *file, const char *function, int lineno, unsigned code, const std::filesystem::path *filename=0);
+#define BOOST_AFIO_ERRGNT(code)             { boost::afio::detail::int_throwNTError(EXCEPTION_FILE(0), EXCEPTION_FUNCTION(0), EXCEPTION_LINE(0), code); }
+#define BOOST_AFIO_ERRGNTFN(code, filename) { boost::afio::detail::int_throwNTError(EXCEPTION_FILE(0), EXCEPTION_FUNCTION(0), EXCEPTION_LINE(0), code, &(filename)); }
+#define BOOST_AFIO_ERRHNT(exp)              { unsigned __errcode=(unsigned)(exp); if(0/*STATUS_SUCCESS*/!=__errcode) BOOST_AFIO_ERRGNT(__errcode); }
+#define BOOST_AFIO_ERRHNTFN(exp, filename)  { unsigned __errcode=(unsigned)(exp); if(0/*STATUS_SUCCESS*/!=__errcode) BOOST_AFIO_ERRGNTFN(__errcode, filename); }
 #endif
 
-                    extern BOOST_AFIO_DECL void int_throwOSError(const char *file, const char *function, int lineno, int code, const std::filesystem::path *filename=0);
-#define BOOST_AFIO_ERRGWIN(code)				{ boost::afio::detail::int_throwWinError(EXCEPTION_FILE(0), EXCEPTION_FUNCTION(0), EXCEPTION_LINE(0), code); }
-#define BOOST_AFIO_ERRGWINFN(code, filename)	{ boost::afio::detail::int_throwWinError(EXCEPTION_FILE(0), EXCEPTION_FUNCTION(0), EXCEPTION_LINE(0), code, &(filename)); }
+                    BOOST_AFIO_HEADERS_ONLY_FUNC_SPEC void int_throwOSError(const char *file, const char *function, int lineno, int code, const std::filesystem::path *filename=0);
+#define BOOST_AFIO_ERRGWIN(code)                { boost::afio::detail::int_throwWinError(EXCEPTION_FILE(0), EXCEPTION_FUNCTION(0), EXCEPTION_LINE(0), code); }
+#define BOOST_AFIO_ERRGWINFN(code, filename)    { boost::afio::detail::int_throwWinError(EXCEPTION_FILE(0), EXCEPTION_FUNCTION(0), EXCEPTION_LINE(0), code, &(filename)); }
             /*! Use this macro to wrap BOOST_WINDOWS functions. For anything setting errno, use ERRHOS().
             */
-#define BOOST_AFIO_ERRHWIN(exp)				{ unsigned __errcode=(unsigned)(exp); if(!__errcode) BOOST_AFIO_ERRGWIN(GetLastError()); }
+#define BOOST_AFIO_ERRHWIN(exp)             { unsigned __errcode=(unsigned)(exp); if(!__errcode) BOOST_AFIO_ERRGWIN(GetLastError()); }
             /*! Use this macro to wrap BOOST_WINDOWS functions taking a filename. For anything setting errno, use ERRHOS().
             */
-#define BOOST_AFIO_ERRHWINFN(exp, filename)	{ unsigned __errcode=(unsigned)(exp); if(!__errcode) BOOST_AFIO_ERRGWINFN(GetLastError(), filename); }
+#define BOOST_AFIO_ERRHWINFN(exp, filename) { unsigned __errcode=(unsigned)(exp); if(!__errcode) BOOST_AFIO_ERRGWINFN(GetLastError(), filename); }
 
-#define BOOST_AFIO_ERRGOS(code)				{ boost::afio::detail::int_throwOSError(EXCEPTION_FILE(code), EXCEPTION_FUNCTION(code), EXCEPTION_LINE(code), code); }
-#define BOOST_AFIO_ERRGOSFN(code, filename)	{ boost::afio::detail::int_throwOSError(EXCEPTION_FILE(code), EXCEPTION_FUNCTION(code), EXCEPTION_LINE(code), code, &(filename)); }
+#define BOOST_AFIO_ERRGOS(code)             { boost::afio::detail::int_throwOSError(EXCEPTION_FILE(code), EXCEPTION_FUNCTION(code), EXCEPTION_LINE(code), code); }
+#define BOOST_AFIO_ERRGOSFN(code, filename) { boost::afio::detail::int_throwOSError(EXCEPTION_FILE(code), EXCEPTION_FUNCTION(code), EXCEPTION_LINE(code), code, &(filename)); }
             /*! Use this macro to wrap POSIX, UNIX or CLib functions. On BOOST_WINDOWS, the includes anything in
             MSVCRT which sets errno
             */
-#define BOOST_AFIO_ERRHOS(exp)					{ int __errcode=(exp); if(__errcode<0) BOOST_AFIO_ERRGOS(errno); }
+#define BOOST_AFIO_ERRHOS(exp)                  { int __errcode=(exp); if(__errcode<0) BOOST_AFIO_ERRGOS(errno); }
             /*! Use this macro to wrap POSIX, UNIX or CLib functions taking a filename. On BOOST_WINDOWS, the includes anything in
             MSVCRT which sets errno
             */
-#define BOOST_AFIO_ERRHOSFN(exp, filename)		{ int __errcode=(exp); if(__errcode<0) BOOST_AFIO_ERRGOSFN(errno, filename); }
+#define BOOST_AFIO_ERRHOSFN(exp, filename)      { int __errcode=(exp); if(__errcode<0) BOOST_AFIO_ERRGOSFN(errno, filename); }
         }//namespace detail
     }//namespace afio
 }// namespace boost

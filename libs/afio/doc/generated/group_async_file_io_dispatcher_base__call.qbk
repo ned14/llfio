@@ -38,7 +38,7 @@ A pair with a batch of futures returning the result of each of the callables and
 `#include <boost/afio/afio.hpp>`
 
 [heading Complexity]Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete.
-[heading Exception Model]Propagates exceptions of any input preconditions with an errored state at the point of dispatch, and throws a `std::runtime_error` if any inputs have values which could not possibly be correct. Once a batch of input ops has been verified at the point of entry as not errored, you are guaranteed that the batch is atomically scheduled as a whole, unless one of the following conditions occurs: (i) A failure to allocate memory occurs.
+[heading Exception Model]Propagates exceptions of any input preconditions with an errored state at the point of dispatch, and throws a `std::runtime_error` if any inputs have values which could not possibly be correct. Once a batch of input ops has been verified at the point of entry as not errored, you are guaranteed that the batch is atomically scheduled as a whole, unless a failure to allocate memory occurs.
 [heading Example][call_example]
 
 
@@ -72,7 +72,7 @@ A pair with a batch of futures returning the result of each of the callables and
 `#include <boost/afio/afio.hpp>`
 
 [heading Complexity]Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete.
-[heading Exception Model]Propagates exceptions of any input preconditions with an errored state at the point of dispatch, and throws a `std::runtime_error` if any inputs have values which could not possibly be correct. Once a batch of input ops has been verified at the point of entry as not errored, you are guaranteed that the batch is atomically scheduled as a whole, unless one of the following conditions occurs: (i) A failure to allocate memory occurs.
+[heading Exception Model]Propagates exceptions of any input preconditions with an errored state at the point of dispatch, and throws a `std::runtime_error` if any inputs have values which could not possibly be correct. Once a batch of input ops has been verified at the point of entry as not errored, you are guaranteed that the batch is atomically scheduled as a whole, unless a failure to allocate memory occurs.
 [heading Example][call_example]
 
 
@@ -88,7 +88,7 @@ This is effectively a convenience wrapper for [^`completion()`]. It creates a pa
 
 [heading Synopsis]
 ``template<class C, class... Args>
-std::pair< future< typename detail::vs2013_variadic_overload_resolution_workaround< C, Args...>::type >, async_io_op > async_file_io_dispatcher_base::call(const async_io_op & req, C callback, Args... args)``
+std::pair< future< typename std::result_of< C(Args...)>::type >, async_io_op > async_file_io_dispatcher_base::call(const async_io_op & req, C callback, Args... args)``
 
 [heading Parameters]
 
@@ -109,7 +109,7 @@ A pair with a future returning the result of the callable and an op handle.
 `#include <boost/afio/afio.hpp>`
 
 [heading Complexity]Amortised O(1) to dispatch. Amortised O(1) to complete.
-[heading Exception Model]Propagates exceptions of any input preconditions with an errored state at the point of dispatch, and throws a `std::runtime_error` if any inputs have values which could not possibly be correct. Once a batch of input ops has been verified at the point of entry as not errored, you are guaranteed that the batch is atomically scheduled as a whole, unless one of the following conditions occurs: (i) A failure to allocate memory occurs.
+[heading Exception Model]Propagates exceptions of any input preconditions with an errored state at the point of dispatch, and throws a `std::runtime_error` if any inputs have values which could not possibly be correct. Once a batch of input ops has been verified at the point of entry as not errored, you are guaranteed that the batch is atomically scheduled as a whole, unless a failure to allocate memory occurs.
 [heading Example][call_example]
 
 

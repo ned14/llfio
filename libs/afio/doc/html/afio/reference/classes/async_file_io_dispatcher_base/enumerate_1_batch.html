@@ -4,7 +4,7 @@
 <title>enumerate (batch)</title>
 <link rel="stylesheet" href="../../../../myboostbook.css" type="text/css">
 <meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
-<link rel="home" href="../../../../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 0.1">
+<link rel="home" href="../../../../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 1.1">
 <link rel="up" href="../async_file_io_dispatcher_base.html" title="async_file_io_dispatcher_base">
 <link rel="prev" href="barrier.html" title="barrier (batch)">
 <link rel="next" href="enumerate_1_single.html" title="enumerate (single)">
@@ -28,7 +28,7 @@
           (batch)</a>
 </h5></div></div></div>
 <p>
-            <a class="indexterm" name="id975175"></a>
+            <a class="indexterm" name="id965910"></a>
 Schedule a batch of asynchronous directory enumerations after a preceding
             operations.
           </p>
@@ -36,16 +36,21 @@ Schedule a batch of asynchronous directory enumerations after a preceding
 <a name="afio.reference.classes.async_file_io_dispatcher_base.enumerate_1_batch.h0"></a>
             <span class="phrase"><a name="afio.reference.classes.async_file_io_dispatcher_base.enumerate_1_batch.description"></a></span><a class="link" href="enumerate_1_batch.html#afio.reference.classes.async_file_io_dispatcher_base.enumerate_1_batch.description">Description</a>
           </h6>
-<pre class="programlisting"><span class="identifier">By</span> <span class="keyword">default</span> <span class="identifier">dir</span><span class="special">()</span> <span class="identifier">returns</span> <span class="identifier">shared</span> <span class="identifier">handles</span> <span class="identifier">i</span><span class="special">.</span><span class="identifier">e</span><span class="special">.</span> <span class="identifier">dir</span><span class="special">(</span><span class="string">"foo"</span><span class="special">)</span> <span class="keyword">and</span> <span class="identifier">dir</span><span class="special">(</span><span class="string">"foo"</span><span class="special">)</span> <span class="identifier">will</span> <span class="keyword">return</span> <span class="identifier">the</span> <span class="identifier">exact</span> <span class="identifier">same</span>
-<span class="identifier">handle</span><span class="special">,</span> <span class="keyword">and</span> <span class="identifier">therefore</span> <span class="identifier">enumerating</span> <span class="keyword">not</span> <span class="identifier">all</span> <span class="identifier">of</span> <span class="identifier">the</span> <span class="identifier">entries</span> <span class="identifier">at</span> <span class="identifier">once</span> <span class="identifier">is</span> <span class="identifier">a</span> <span class="identifier">race</span> <span class="identifier">condition</span><span class="special">.</span> <span class="identifier">The</span> <span class="identifier">solution</span> <span class="identifier">is</span>
-<span class="identifier">to</span> <span class="identifier">either</span> <span class="identifier">set</span> <span class="identifier">maxitems</span> <span class="identifier">to</span> <span class="identifier">a</span> <span class="identifier">value</span> <span class="identifier">large</span> <span class="identifier">enough</span> <span class="identifier">to</span> <span class="identifier">guarantee</span> <span class="identifier">a</span> <span class="identifier">directory</span> <span class="identifier">will</span> <span class="identifier">be</span> <span class="identifier">enumerated</span> <span class="identifier">in</span> <span class="identifier">a</span> <span class="identifier">single</span>
-<span class="identifier">shot</span><span class="special">,</span> <span class="keyword">or</span> <span class="identifier">to</span> <span class="identifier">open</span> <span class="identifier">a</span> <span class="identifier">separate</span> <span class="identifier">directory</span> <span class="identifier">handle</span> <span class="keyword">using</span> <span class="identifier">the</span> <span class="identifier">file</span><span class="special">\</span><span class="identifier">u005fflags</span><span class="special">::</span><span class="identifier">UniqueDirectoryHandle</span> <span class="identifier">flag</span><span class="special">.</span>
-
-<span class="identifier">Note</span> <span class="identifier">that</span> <span class="identifier">setting</span> <span class="identifier">maxitems</span><span class="special">=</span><span class="number">1</span> <span class="identifier">will</span> <span class="identifier">often</span> <span class="identifier">cause</span> <span class="identifier">a</span> <span class="identifier">buffer</span> <span class="identifier">space</span> <span class="identifier">exhaustion</span><span class="special">,</span> <span class="identifier">causing</span> <span class="identifier">a</span> <span class="identifier">second</span> <span class="identifier">syscall</span>
-<span class="identifier">with</span> <span class="identifier">an</span> <span class="identifier">enlarged</span> <span class="identifier">buffer</span><span class="special">.</span> <span class="identifier">This</span> <span class="identifier">is</span> <span class="identifier">because</span> <span class="identifier">AFIO</span> <span class="identifier">cannot</span> <span class="identifier">know</span> <span class="keyword">if</span> <span class="identifier">the</span> <span class="identifier">allocated</span> <span class="identifier">buffer</span> <span class="identifier">can</span> <span class="identifier">hold</span> <span class="identifier">all</span> <span class="identifier">of</span>
-<span class="identifier">the</span> <span class="identifier">filename</span> <span class="identifier">being</span> <span class="identifier">retrieved</span><span class="special">,</span> <span class="identifier">so</span> <span class="identifier">it</span> <span class="identifier">may</span> <span class="identifier">have</span> <span class="identifier">to</span> <span class="identifier">retry</span><span class="special">.</span> <span class="identifier">Put</span> <span class="identifier">another</span> <span class="identifier">way</span><span class="special">,</span> <span class="identifier">setting</span> <span class="identifier">maxitems</span><span class="special">=</span><span class="number">1</span> <span class="identifier">will</span>
-<span class="identifier">give</span> <span class="identifier">you</span> <span class="identifier">the</span> <span class="identifier">worst</span> <span class="identifier">performance</span> <span class="identifier">possible</span><span class="special">.</span>
-</pre>
+<p>
+            By default dir() returns shared handles i.e. dir("foo") and
+            dir("foo") will return the exact same handle, and therefore
+            enumerating not all of the entries at once is a race condition. The solution
+            is to either set maxitems to a value large enough to guarantee a directory
+            will be enumerated in a single shot, or to open a separate directory
+            handle using the file_flags::UniqueDirectoryHandle flag.
+          </p>
+<p>
+            Note that setting maxitems=1 will often cause a buffer space exhaustion,
+            causing a second syscall with an enlarged buffer. This is because AFIO
+            cannot know if the allocated buffer can hold all of the filename being
+            retrieved, so it may have to retry. Put another way, setting maxitems=1
+            will give you the worst performance possible.
+          </p>
 <h6>
 <a name="afio.reference.classes.async_file_io_dispatcher_base.enumerate_1_batch.h1"></a>
             <span class="phrase"><a name="afio.reference.classes.async_file_io_dispatcher_base.enumerate_1_batch.synopsis"></a></span><a class="link" href="enumerate_1_batch.html#afio.reference.classes.async_file_io_dispatcher_base.enumerate_1_batch.synopsis">Synopsis</a>
@@ -138,8 +143,7 @@ Schedule a batch of asynchronous directory enumerations after a preceding
             if any inputs have values which could not possibly be correct. Once a
             batch of input ops has been verified at the point of entry as not errored,
             you are guaranteed that the batch is atomically scheduled as a whole,
-            unless one of the following conditions occurs: (i) A failure to allocate
-            memory occurs.
+            unless a failure to allocate memory occurs.
           </p>
 <h6>
 <a name="afio.reference.classes.async_file_io_dispatcher_base.enumerate_1_batch.h7"></a>
