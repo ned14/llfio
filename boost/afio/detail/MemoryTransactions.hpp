@@ -169,24 +169,24 @@ namespace boost
 #elif defined(__GNUC__) && ( defined(__i386__) || defined(__x86_64__) )
             // Hack the bytes codes in for older compilers to avoid needing to compile with -mrtm
             namespace { // prevent any collisions with <immintrin.h>
-                static inline unsigned int _xbegin() BOOST_NOEXCEPT_OR_NOTHROW
+                static __attribute__((__always_inline__)) inline unsigned int _xbegin() BOOST_NOEXCEPT_OR_NOTHROW
                 {
                     unsigned int ret = BOOST_AFIO_XBEGIN_STARTED;
                     asm volatile(".byte 0xc7,0xf8 ; .long 0" : "+a" (ret) :: "memory");
                     return ret;
                 }
 
-                static inline void _xend() BOOST_NOEXCEPT_OR_NOTHROW
+                static __attribute__((__always_inline__)) inline void _xend() BOOST_NOEXCEPT_OR_NOTHROW
                 {
                     asm volatile(".byte 0x0f,0x01,0xd5" ::: "memory");
                 }
 
-                static inline void _xabort(const unsigned int status) BOOST_NOEXCEPT_OR_NOTHROW
+                static __attribute__((__always_inline__)) inline void _xabort(const unsigned int status) BOOST_NOEXCEPT_OR_NOTHROW
                 {
-                    asm volatile(".byte 0xc6,0xf8,%P0" :: "i" ((size_t) status) : "memory");
+                    asm volatile(".byte 0xc6,0xf8,%P0" :: "i" (status) : "memory");
                 }
 
-                static inline unsigned char _xtest() BOOST_NOEXCEPT_OR_NOTHROW
+                static __attribute__((__always_inline__)) inline unsigned char _xtest() BOOST_NOEXCEPT_OR_NOTHROW
                 {
                     unsigned char out;
                     asm volatile(".byte 0x0f,0x01,0xd6 ; setnz %0" : "=r" (out) :: "memory");
