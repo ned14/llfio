@@ -181,9 +181,9 @@ namespace boost
                     asm volatile(".byte 0x0f,0x01,0xd5" ::: "memory");
                 }
 
-                static inline void _xabort(const unsigned char status) BOOST_NOEXCEPT_OR_NOTHROW
+                static inline void _xabort(const unsigned int status) BOOST_NOEXCEPT_OR_NOTHROW
                 {
-                    asm volatile(".byte 0xc6,0xf8,%P0" :: "i" (status) : "memory");
+                    asm volatile(".byte 0xc6,0xf8,%P0" :: "i" ((size_t) status) : "memory");
                 }
 
                 static inline unsigned char _xtest() BOOST_NOEXCEPT_OR_NOTHROW
