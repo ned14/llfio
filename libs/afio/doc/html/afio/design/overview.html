@@ -123,8 +123,8 @@
                   don't want all further operations to fail. If your dependent operation
                   really needs to know if its preceding operation errored, just go
                   ahead and check for it manually using the <code class="computeroutput"><span class="identifier">h</span></code>
-                  member which is a shared_ptr to a future -- if that future contains
-                  an exception, your precondition has errored<a href="#ftn.afio.design.overview.f1" class="footnote" name="afio.design.overview.f1"><sup class="footnote">[4]</sup></a>.
+                  member which is a shared_ptr to a future &#8212; if that future
+                  contains an exception, your precondition has errored<a href="#ftn.afio.design.overview.f1" class="footnote" name="afio.design.overview.f1"><sup class="footnote">[4]</sup></a>.
                 </li>
 <li class="listitem">
                   The only exception to the preceding rule is the <code class="computeroutput"><span class="identifier">barrier</span><span class="special">()</span></code> call which <span class="bold"><strong>DOES</strong></span>

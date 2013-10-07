@@ -14,6 +14,9 @@
 '''<indexterm><primary>directory_entry</primary></indexterm>'''
 The abstract base class for an entry in a directory with lazily filled metadata. 
 
+[heading Description]
+Note that [^`directory_entry_hash`] will hash one of these for you, and a [^`std::hash<``directory_entry``>`] specialisation is defined for you so you ought to be able to use directory\u005fentry directly in an [^`unordered_map<>`]. 
+
 [heading Synopsis]
 ``class directory_entry
 {
@@ -37,6 +40,22 @@ The abstract base class for an entry in a directory with lazily filled metadata.
 [* stat_t]: ['__stat]:  
 
 [* metadata_flags]: ['_have_metadata]:  
+
+
+
+
+]]
+[[``directory_entry(const directory_entry & other)``
+
+] [Copy constructor. ] [[* const directory_entry &]: ['other]:  
+
+
+
+
+]]
+[[``directory_entry(directory_entry && other)``
+
+] [Move constructor. ] [[* directory_entry &&]: ['other]:  
 
 
 

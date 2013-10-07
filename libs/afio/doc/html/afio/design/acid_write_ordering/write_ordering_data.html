@@ -47,7 +47,7 @@
           by multiple writers as much as possible. The ordering logic will make use
           of an atomic append only intent log which records what the database intends
           to do (and generally you want that intent log on as low latency a device
-          as possible) -- and usefully every major filing system supports atomic
+          as possible) &#8212; and usefully every major filing system supports atomic
           appends to a file. If you wish to never lose most recent data, to implement
           a transaction one (i) writes one's data to the filing system, (ii) ensure
           it has reached non-volatile storage, (iii) appends the knowledge it definitely

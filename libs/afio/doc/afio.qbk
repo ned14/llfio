@@ -25,6 +25,7 @@
 [def __boost__ Boost]
 [def __boost_afio__ Boost.AFIO]
 [def __triplegit__ TripleGit]
+[def __dash__ \u2014]
 [def __tick__ [role aligncenter [role green \u2714]]]
 [def __itick__ [role aligncenter [role red \u2714]]]
 [def __cross__ [role aligncenter [role red \u2718]]]

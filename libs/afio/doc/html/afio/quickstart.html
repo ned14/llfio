@@ -61,10 +61,10 @@
       forthcoming TripleGit <a class="link" href="design/acid_write_ordering/write_ordering_data.html" title="Write ordering data and durability: why does it matter?">often
       runs 128 or 256 bit hashes on every piece of data entering or exiting storage</a>.
       With AFIO, this is as simple as adding a hash execution closure to every scatter
-      read and gather write operation -- and AFIO's flexibility lets you easily choose
-      between that hash being performed before i/o (useful for preloading the L2
-      cache if scatter/gather chunks are less than 4Kb each), after i/o (useful if
-      reading 4Kb or larger chunks as DMAs invalidate CPU caches), or more interestingly
+      read and gather write operation &#8212; and AFIO's flexibility lets you easily
+      choose between that hash being performed before i/o (useful for preloading
+      the L2 cache if scatter/gather chunks are less than 4Kb each), after i/o (useful
+      if reading 4Kb or larger chunks as DMAs invalidate CPU caches), or more interestingly
       <span class="emphasis"><em>during</em></span> i/o i.e. in parallel (useful if writing 4Kb or
       larger chunks).
     </p>

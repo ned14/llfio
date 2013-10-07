@@ -279,19 +279,19 @@
                     Unfortunately the glibc mutex used by ASIO does not scale well
                     on modern CPUs due to having too small a spin count, so this
                     value is for four threads instead of eight (it was the best I
-                    could get through trial and error.
+                    could get through trial and error).
                   </p></div></td></tr></tbody>
 </table></div>
 </div>
 <br class="table-break"><p>
         We hope that ~720k max IOPS surely ought to be enough to max out any SATA
-        III SSD -- it should even max out any mid range PCIe based SSD too, and if
-        paired with a CPU with more cores, AFIO's almost wait free design ought to
-        scale out fairly well too such that it may be able to max out even top end
-        PCIe SSDs, some of which can push 10m IOPS now. If that isn't fast enough
-        for you, try AFIO on an Intel CPU with memory transaction support (on Windows
-        a runtime check will automatically replace locks with memory transactions,
-        for POSIX you need to recompile with the <code class="computeroutput"><span class="special">-</span><span class="identifier">mrtm</span></code> flag), or try support for <code class="computeroutput"><span class="identifier">__transaction_relaxed</span></code> compilers if <code class="computeroutput"><span class="identifier">BOOST_HAVE_TRANSACTIONAL_MEMORY_COMPILER</span></code>
+        III SSD &#8212; it should even max out any mid range PCIe based SSD too,
+        and if paired with a CPU with more cores, AFIO's almost wait free design
+        ought to scale out fairly well too such that it may be able to max out even
+        top end PCIe SSDs, some of which can push 10m IOPS now. If that isn't fast
+        enough for you, try AFIO on an Intel CPU with memory transaction support
+        (on Windows a runtime check will automatically replace locks with memory
+        transactions, for POSIX you need to recompile with the <code class="computeroutput"><span class="special">-</span><span class="identifier">mrtm</span></code> flag), or try support for <code class="computeroutput"><span class="identifier">__transaction_relaxed</span></code> compilers if <code class="computeroutput"><span class="identifier">BOOST_HAVE_TRANSACTIONAL_MEMORY_COMPILER</span></code>
         is defined.
       </p>
 <p>

@@ -37,6 +37,7 @@ afio/reference/structs/async_data_op_req/async_data_op_req_void_.html
 afio/reference/structs/async_enumerate_op_req.html
 afio/reference/structs/async_io_op.html
 afio/reference/structs/async_path_op_req.html
+afio/reference/structs/directory_entry_hash.html
 afio/reference/structs/stat_t.html
 afio/reference/classes.html
 afio/reference/classes/async_file_io_dispatcher_base.html

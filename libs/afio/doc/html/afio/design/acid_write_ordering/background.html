@@ -161,12 +161,12 @@
           written data will always be sent to physical storage within some predefined
           period of time after the write. Most filing systems implement different
           timeouts for metadata and data, but typically on almost all production
-          filing systems -- unless they are in a power-saving laptop mode -- any
-          data write is guaranteed to be sent to non-volatile storage within one
-          minute. Let me be clear here for later argument's sake: <span class="emphasis"><em>the filing
-          system is allowed to reorder writes by up to one minute in time from the
-          order in which they were issued</em></span>. Or put another way, most filing
-          systems have a one minute temporal constraint on write order.
+          filing systems &#8212; unless they are in a power-saving laptop mode --
+          any data write is guaranteed to be sent to non-volatile storage within
+          one minute. Let me be clear here for later argument's sake: <span class="emphasis"><em>the
+          filing system is allowed to reorder writes by up to one minute in time
+          from the order in which they were issued</em></span>. Or put another way,
+          most filing systems have a one minute temporal constraint on write order.
         </p>
 <p>
           Most people think of <code class="computeroutput"><span class="identifier">fsync</span><span class="special">()</span></code>, <code class="computeroutput"><span class="identifier">O_SYNC</span></code>

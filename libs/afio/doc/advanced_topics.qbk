@@ -44,7 +44,7 @@ CPU cycles, while a mispredicted indirect jump might cost as much as 18-25 CPU c
 Some disadvantages of custom completion handlers include:
 
 * Unlike __afio_call__, there is no custom return type machinery i.e. you'll have to
-implement your own. This isn't hard -- note how __afio_enumerate__'s internal completion
+implement your own. This isn't hard __dash__ note how __afio_enumerate__'s internal completion
 handler in afio.cpp takes a shared pointer as a parameter containing the promises of output for
 the enumerations, thus allowing __afio_enumerate__ to set up a batch of futures
 corresponding to those promises and return those to the user.
@@ -63,14 +63,14 @@ instance with the aforementioned standard triplet of parameters. As AFIO's compl
 implementation natively works with `std::function<>`, you effectively get custom parameter
 binds for free anyway.
 
-The above shows a simple custom completion handler -- as mentioned earlier, one can also
+The above shows a simple custom completion handler __dash__ as mentioned earlier, one can also
 do immediate completions and deferred completions, and this is an example of just those:
 
 [completion_example2]
 
 Note the new function for indicating a deferred completion: `complete_async_op()`, which
 can take a `std::exception_ptr` if you want AFIO to return an errored state. Note also the
-`boost::afio::async_op_flags` `DetachedFuture` and `ImmediateCompletion` -- if you fail to
+`boost::afio::async_op_flags` `DetachedFuture` and `ImmediateCompletion` __dash__ if you fail to
 specify the former and try to return a `std::make_pair(false, h)` to indicate deferred
 completion from the completion handler, AFIO will throw a fatal exception as you forgot to
 specify the `DetachedFuture` flag.
@@ -100,7 +100,7 @@ be held during immediate completions so AFIO can remove the need for recursive m
 something which is currently a major performance problem.], and therefore no other op may be added, enqueued or [*completed]
 while an immediate completion is running. In other words, they hang the dispatcher.
 * Adding immediate completions to the precondition of the immediate completion being
-executed won't work -- they get thrown away, just as if the completion were not
+executed won't work __dash__ they get thrown away, just as if the completion were not
 immediate. This does eliminate the potential for endless loops of course. You CAN
 add completions to yourself (see the `op_from_scheduled_id()` method).
 * Immediate completions are invoked [*before] their precondition has returned their

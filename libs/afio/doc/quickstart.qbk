@@ -17,7 +17,7 @@ The former ends up bleeding into the latter however, which is why AFIO also expo
 for public usage its internal closure execution engine: for example, forthcoming
 __triplegit__ [link afio.design.acid_write_ordering.write_ordering_data often runs 128 or 256 bit hashes on every piece of data entering or
 exiting storage]. With AFIO, this is as simple as adding a hash execution closure to every
-scatter read and gather write operation -- and AFIO's flexibility lets you easily
+scatter read and gather write operation __dash__ and AFIO's flexibility lets you easily
 choose between that hash being performed before i/o (useful for preloading the L2 cache
 if scatter/gather chunks are less than 4Kb each), after i/o (useful if reading 4Kb or
 larger chunks as DMAs invalidate CPU caches), or more interestingly ['during] i/o i.e.
@@ -122,10 +122,10 @@ does all that for you.
 file i/o support, AFIO will use that
 instead of issuing multiple filing system operations using a thread pool to achieve
 concurrency. This can very significantly reduce the number of threads needed to keep your
-storage device fully occupied -- remember that ['queue depth] i.e. that metric you see all
+storage device fully occupied __dash__ remember that ['queue depth] i.e. that metric you see all
 over storage device benchmarks is the number of operations in flight at once, which implies
 the number of threads needed. Most storage devices are IOPS limited due to SATA or SAS
-connection latencies without introducing queue depth -- in particular, modern SSDs cannot
+connection latencies without introducing queue depth __dash__ in particular, modern SSDs cannot
 achieve tens of thousands of IOPS range without substantial queue depths, which without
 using a native asynchronous file i/o API means lots of threads.
 # It's very, very easy to have AFIO turn off file system caching, readahead or buffering
@@ -148,11 +148,11 @@ code, everything is asynchronous callback):
 
 [find_in_files_afio]
 
-Here the `find_in_files` class is used to carry state across the callbacks -- one could just
+Here the `find_in_files` class is used to carry state across the callbacks __dash__ one could just
 as equally bind the state into each callback's parameters instead via some sort of pointer to
-a struct. But the difference in complexity is noticeable -- you're probably now asking, why
+a struct. But the difference in complexity is noticeable __dash__ you're probably now asking, why
 choose this hideous complexity over the much clearer OpenMP and iostreams implementation[footnote
-Indeed many ask the same when programming WinRT apps -- Microsoft's insistance on never allowing
+Indeed many ask the same when programming WinRT apps __dash__ Microsoft's insistance on never allowing
 any call to block can make simple designs explode with complexities of nested callbacks.]?
 
 Well, that's simple: do you want maximum file i/o performance? Here is a search for ["Niall] in a
@@ -169,7 +169,7 @@ drive. Note that AFIO has a native WinIOCP backend which leverages host asynchro
 ]
 
 The eagle eyed amongst you will have noticed that the AFIO implementation looks hand tuned with a
-special depth first algorithm balancing concurrency with seek locality -- that's because I invested
+special depth first algorithm balancing concurrency with seek locality __dash__ that's because I invested
 two days into achieving maximum possible performance as a demonstration of AFIO's power (and to find
 and fix some bottlenecks). Some might argue that this is therefore not a fair comparison to the OpenMP iostreams
 implementation.
@@ -178,7 +178,7 @@ There are two parts to answering this argument. The first is that yes, the OpenM
 algorithm is fairly stupid and simply tries to read as many files as there are CPUs, and those files could
 be stored anywhere on the spinning disc. Because AFIO
 can issue far more concurrent file open and read requests than OpenMP, it gives a lot more scope to
-the filing system to optimise hard drive seeks and satisfy as many requests as is feasible --
+the filing system to optimise hard drive seeks and satisfy as many requests as is feasible __dash__
 sufficiently so that with a cold cache, AFIO is a little slower than a single threaded iostreams
 implementation where the filing system can spot the access pattern and prefetch quite effectively.
 A completely valid solution to the OpenMP performance deficit would be to increase thread count dramatically.

@@ -8,7 +8,7 @@
 
 __boost_afio__ came about out of the need for a scalable, high performance, portable asynchronous
 file i/o implementation library for a forthcoming filing system based graph store ACID compliant transactional
-persistence layer called __triplegit__ -- call it a ["SQLite3 but for graphstores][footnote The
+persistence layer called __triplegit__ __dash__ call it a ["SQLite3 but for graphstores][footnote The
 [@http://unqlite.org/ UnQLite embedded NoSQL database engine] is exactly one of those of course.
 Unfortunately I intend TripleGit for implementing portable Component Objects for
 C++ extending C++ Modules, which means I need a database engine suitable for incorporation into
@@ -114,7 +114,7 @@ The rules are as follows:
  happen e.g. if you run out of disc space during a write, you don't want all further
  operations to fail. If your dependent operation really needs to know if its preceding
  operation errored, just go ahead and check for it manually using the `h` member which
- is a shared_ptr to a future -- if that future contains an exception, your precondition
+ is a shared_ptr to a future __dash__ if that future contains an exception, your precondition
  has errored[footnote There is a single exception to this: where an immediate completion
  handler is being invoked from an operation which has errored. See [link afio.advanced_topics.custom_completion_handler
  reference documentation] on this.].
@@ -225,7 +225,7 @@ In addition to manually flushing data to physical storage, every filing system a
 implements some form of timer based flush whereby a piece of written data will always
 be sent to physical storage within some predefined period of time after the write.
 Most filing systems implement different timeouts for metadata and data, but typically
-on almost all production filing systems -- unless they are in a power-saving laptop mode --
+on almost all production filing systems __dash__ unless they are in a power-saving laptop mode --
 any data write is guaranteed to be sent to non-volatile storage within one minute.
 Let me be clear here for later argument's sake: ['the filing system is allowed to
 reorder writes by up to one minute in time from the order in which they were issued].
@@ -259,7 +259,7 @@ the atomicity enforcement into a very small piece of ordering logic in order to 
 transaction contention by multiple writers as much as possible.
 The ordering logic will make use of an atomic append only intent log which records what
 the database intends to do (and generally you want that intent log on as low latency
-a device as possible) -- and usefully every major filing system supports
+a device as possible) __dash__ and usefully every major filing system supports
 atomic appends to a file. If you wish to never lose most recent data, to implement a transaction
 one (i) writes one's data to the filing
 system, (ii) ensure it has reached non-volatile storage, (iii) appends the knowledge it
