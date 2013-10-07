@@ -83,7 +83,10 @@ public:
         bytesread+=length;
     }
     // A file searching completion, called when each file read completes
-    std::pair<bool, std::shared_ptr<async_io_handle>> file_read(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr *e, std::shared_ptr<std::vector<char, detail::aligned_allocator<char, 4096, false>>> _buffer, size_t length)
+    std::pair<bool, std::shared_ptr<async_io_handle>> file_read(size_t id, 
+        std::shared_ptr<async_io_handle> h, exception_ptr *e, 
+        std::shared_ptr<std::vector<char, detail::aligned_allocator<char, 
+        4096, false>>> _buffer, size_t length)
     {
         //std::cout << "R " << h->path() << std::endl;
         char *buffer=_buffer->data();
@@ -95,7 +98,8 @@ public:
         return std::make_pair(true, h);
     }
     // A file reading completion, called when each file open completes
-    std::pair<bool, std::shared_ptr<async_io_handle>> file_opened(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr *e, size_t length)
+    std::pair<bool, std::shared_ptr<async_io_handle>> file_opened(size_t id, 
+        std::shared_ptr<async_io_handle> h, exception_ptr *e, size_t length)
     {
         //std::cout << "F " << h->path() << std::endl;
 #ifdef USE_MMAPS
@@ -108,17 +112,24 @@ public:
         {
             // Allocate a sufficient 4Kb aligned buffer
             size_t _length=(4095+length)&~4095;
-            auto buffer=std::make_shared<std::vector<char, detail::aligned_allocator<char, 4096, false>>>(_length+1);
+            auto buffer=std::make_shared<std::vector<char, 
+                detail::aligned_allocator<char, 4096, false>>>(_length+1);
             // Schedule a read of the file
-            auto read=dispatcher->read(make_async_data_op_req(dispatcher->op_from_scheduled_id(id), buffer->data(), _length, 0));
-            auto read_done=dispatcher->completion(read, std::make_pair(async_op_flags::None/*regex search might be slow*/, std::bind(&find_in_files::file_read, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, buffer, length)));
+            auto read=dispatcher->read(make_async_data_op_req(
+                dispatcher->op_from_scheduled_id(id), buffer->data(), _length, 0));
+            auto read_done=dispatcher->completion(read, 
+                std::make_pair(async_op_flags::None/*regex search might be slow*/, 
+                        std::bind(&find_in_files::file_read, this, std::placeholders::_1, 
+                            std::placeholders::_2, std::placeholders::_3, buffer, length)));
             doscheduled({ read, read_done });
         }
         docompleted(2);
         return std::make_pair(true, h);
     }
     // An enumeration parsing completion, called when each directory enumeration completes
-    std::pair<bool, std::shared_ptr<async_io_handle>> dir_enumerated(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr *e, std::shared_ptr<future<std::pair<std::vector<directory_entry>, bool>>> listing)
+    std::pair<bool, std::shared_ptr<async_io_handle>> dir_enumerated(size_t id, 
+        std::shared_ptr<async_io_handle> h, exception_ptr *e, 
+        std::shared_ptr<future<std::pair<std::vector<directory_entry>, bool>>> listing)
     {
         async_io_op lastdir, thisop(dispatcher->op_from_scheduled_id(id));
         // Get the entries from the ready future
@@ -152,7 +163,8 @@ public:
         // The Windows NT kernel filing system driver gets upset with too much concurrency
         // when used with OSDirect so throttle directory enumerations to enforce some depth first traversal.
         {
-            auto dir_openedf=std::make_pair(async_op_flags::None, std::bind(&find_in_files::dir_opened, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+            auto dir_openedf=std::make_pair(async_op_flags::None, std::bind(&find_in_files::dir_opened, this, 
+                std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
             for(auto &entry : entries)
             {
                 if((entry.st_type()&S_IFDIR)==S_IFDIR)
@@ -208,7 +220,10 @@ public:
                         if(length>16384) flags=flags|file_flags::OSMMap;
 #endif
                         auto file_open=dispatcher->file(async_path_op_req(lastdir, h->path()/entry.name(), flags));
-                        auto file_opened=dispatcher->completion(file_open, std::make_pair(async_op_flags::None, std::bind(&find_in_files::file_opened, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, length)));
+                        auto file_opened=dispatcher->completion(file_open, 
+                            std::make_pair(async_op_flags::None, 
+                                std::bind(&find_in_files::file_opened, this, 
+                                    std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, length)));
                         doscheduled({ file_open, file_opened });
                         lastdir=file_opened;
                     }
@@ -220,13 +235,19 @@ public:
         return std::make_pair(true, h);
     }
     // A directory enumerating completion, called once per directory open in the tree
-    std::pair<bool, std::shared_ptr<async_io_handle>> dir_opened(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr *e)
+    std::pair<bool, std::shared_ptr<async_io_handle>> dir_opened(size_t id,
+     std::shared_ptr<async_io_handle> h, exception_ptr *e)
     {
         //std::cout << "D " << h->path() << std::endl;
         // Now we have an open directory handle, schedule an enumeration
-        auto enumeration=dispatcher->enumerate(async_enumerate_op_req(dispatcher->op_from_scheduled_id(id), 1000));
-        auto listing=std::make_shared<future<std::pair<std::vector<directory_entry>, bool>>>(std::move(enumeration.first));
-        auto enumeration_done=dispatcher->completion(enumeration.second, make_pair(async_op_flags::None, std::bind(&find_in_files::dir_enumerated, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, listing)));
+        auto enumeration=dispatcher->enumerate(async_enumerate_op_req(
+            dispatcher->op_from_scheduled_id(id), 1000));
+        auto listing=std::make_shared<future<std::pair<std::vector<directory_entry>, 
+            bool>>>(std::move(enumeration.first));
+        auto enumeration_done=dispatcher->completion(enumeration.second, 
+            make_pair(async_op_flags::None, 
+                std::bind(&find_in_files::dir_enumerated, this, 
+                    std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, listing)));
         doscheduled({enumeration.second, enumeration_done});
         docompleted(2);
         // Complete only if not the cur dir opened
@@ -272,7 +293,9 @@ public:
         // Schedule the recursive enumeration of the current directory
         std::cout << "\n\nStarting directory enumerations ..." << std::endl;
         auto cur_dir=dispatcher->dir(async_path_op_req(""));
-        auto cur_dir_opened=dispatcher->completion(cur_dir, std::make_pair(async_op_flags::None, std::bind(&find_in_files::dir_opened, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
+        auto cur_dir_opened=dispatcher->completion(cur_dir, std::make_pair(async_op_flags::None, 
+            std::bind(&find_in_files::dir_opened, this, 
+                std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
         doscheduled({cur_dir, cur_dir_opened});
         dowait();
     }
@@ -297,8 +320,10 @@ int main(int argc, const char *argv[])
         find_in_files finder(argv[1]);
         auto end=chrono::high_resolution_clock::now();
         auto diff=chrono::duration_cast<secs_type>(end-begin);
-        std::cout << "\n" << finder.filesmatched << " files matched out of " << finder.filesread << " files which was " << finder.bytesread << " bytes." << std::endl;
-        std::cout << "The search took " << diff.count() << " seconds which was " << finder.filesread/diff.count() << " files per second or " << (finder.bytesread/diff.count()/1024/1024) << " Mb/sec." << std::endl;
+        std::cout << "\n" << finder.filesmatched << " files matched out of " << finder.filesread 
+            << " files which was " << finder.bytesread << " bytes." << std::endl;
+        std::cout << "The search took " << diff.count() << " seconds which was " << finder.filesread/diff.count() 
+            << " files per second or " << (finder.bytesread/diff.count()/1024/1024) << " Mb/sec." << std::endl;
     }
     catch(...)
     {

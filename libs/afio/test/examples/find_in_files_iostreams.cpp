@@ -87,8 +87,10 @@ int main(int argc, const char *argv[])
         }
         auto end=chrono::high_resolution_clock::now();
         auto diff=chrono::duration_cast<secs_type>(end-begin);
-        cout << "\n" << filesmatched << " files matched out of " << filesread << " files which was " << bytesread << " bytes." << endl;
-        cout << "The search took " << diff.count() << " seconds which was " << filesread/diff.count() << " files per second or " << (bytesread/diff.count()/1024/1024) << " Mb/sec." << endl;
+        cout << "\n" << filesmatched << " files matched out of " << filesread << " files which was " 
+            << bytesread << " bytes." << endl;
+        cout << "The search took " << diff.count() << " seconds which was " << filesread/diff.count() 
+            << " files per second or " << (bytesread/diff.count()/1024/1024) << " Mb/sec." << endl;
     }
     catch(...)
     {
