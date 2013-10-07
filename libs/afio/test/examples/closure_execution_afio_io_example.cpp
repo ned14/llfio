@@ -26,14 +26,16 @@ int main()
     int ary[ary_size];
 
     //schedule the file open
-    auto opened_file = dispatcher->file(boost::afio::async_path_op_req("somefile.dat", boost::afio::file_flags::Read));
+    auto opened_file = dispatcher->file(boost::afio::async_path_op_req("somefile.dat", 
+        boost::afio::file_flags::Read));
 
     //set up vectors for the individual read operations, and the work on each integer
     std::vector<boost::afio::async_io_op> read_ops(ary_size);
     std::vector<std::function<void()>> vec_func(ary_size);
     for (int i = 0; i < ary_size; ++i)
     {
-         read_ops[i] = dispatcher->read(boost::afio::async_data_op_req<int>(opened_file, &ary[i], sizeof(int), i*sizeof(int)));
+         read_ops[i] = dispatcher->read(boost::afio::async_data_op_req<int>(opened_file, 
+            &ary[i], sizeof(int), i*sizeof(int)));
         
          vec_func[i] = std::bind([](int* a){ *a *= 2 ; }, &ary[i]);
     }
