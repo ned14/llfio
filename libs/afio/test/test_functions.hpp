@@ -25,6 +25,7 @@ extern "C" void tzset(void);
 #include <sstream>
 #include <iostream>
 #include <algorithm>
+#include <unordered_set>
 #include "boost/lockfree/queue.hpp"
 #include "../../../boost/afio/afio.hpp"
 #include "../detail/SpookyV2.h"

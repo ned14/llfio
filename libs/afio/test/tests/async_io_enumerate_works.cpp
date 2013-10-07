@@ -14,6 +14,7 @@ BOOST_AFIO_AUTO_TEST_CASE(async_io_enumerate, "Tests that async i/o enumerate() 
 
     std::cout << "The root directory contains the following items:" << std::endl << std::endl;
     std::vector<directory_entry> rootdircontents1, rootdircontents2;
+    std::unordered_set<directory_entry> rootdircontents1a, rootdircontents2a;
     // Read everything in one go
     std::pair<std::vector<directory_entry>, bool> list;
     bool first=true;
@@ -26,6 +27,7 @@ BOOST_AFIO_AUTO_TEST_CASE(async_io_enumerate, "Tests that async i/o enumerate() 
         {
             print_stat(rootdir.h->get(), i);
         }
+        rootdircontents1a.insert(list.first.begin(), list.first.end());
         rootdircontents1.insert(rootdircontents1.end(), std::make_move_iterator(list.first.begin()), std::make_move_iterator(list.first.end()));
     } while(list.second);
     // Now read everything one at a time
@@ -36,8 +38,11 @@ BOOST_AFIO_AUTO_TEST_CASE(async_io_enumerate, "Tests that async i/o enumerate() 
         first=false;
         std::cout << ".";
         list=enumeration.first.get();
+        rootdircontents2a.insert(list.first.begin(), list.first.end());
         rootdircontents2.insert(rootdircontents2.end(), std::make_move_iterator(list.first.begin()), std::make_move_iterator(list.first.end()));
     } while(list.second);
     std::cout << "rootdircontents1 has " << rootdircontents1.size() << " items and rootdircontents2 has " << rootdircontents2.size() << " items." << std::endl;
     BOOST_CHECK(rootdircontents1.size()==rootdircontents2.size());
+    BOOST_CHECK(rootdircontents1.size()==rootdircontents1a.size());
+    BOOST_CHECK(rootdircontents2.size()==rootdircontents2a.size());
 }
