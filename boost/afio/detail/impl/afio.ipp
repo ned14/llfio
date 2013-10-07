@@ -864,9 +864,9 @@ size_t async_file_io_dispatcher_base::fd_count() const
     BOOST_BEGIN_MEMORY_TRANSACTION(p->fdslock)
     {
         ret=p->fds.size();
-        return ret;
     }
     BOOST_END_MEMORY_TRANSACTION(p->fdslock)
+    return ret;
 }
 
 // Non op lock holding variant
@@ -881,11 +881,13 @@ async_io_op async_file_io_dispatcher_base::int_op_from_scheduled_id(size_t id) c
 }
 async_io_op async_file_io_dispatcher_base::op_from_scheduled_id(size_t id) const
 {
+	async_io_op ret;
     BOOST_BEGIN_MEMORY_TRANSACTION(p->opslock)
     {
-        return int_op_from_scheduled_id(id);
+        ret=int_op_from_scheduled_id(id);
     }
     BOOST_END_MEMORY_TRANSACTION(p->opslock)
+	return ret;
 }
 
 

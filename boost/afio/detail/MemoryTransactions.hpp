@@ -12,14 +12,8 @@ File Created: Sept 2013
 
 #ifndef BOOST_AFIO_COMPILING_FOR_GCOV // transaction support murders poor old gcov
 // Turn this on if you want to use Haswell TSX where available
-#if defined(_MSC_VER) && _MSC_VER >= 1700 && ( defined(_M_IX86) || defined(_M_X64) )
+#if (defined(_MSC_VER) && _MSC_VER >= 1700 && ( defined(_M_IX86) || defined(_M_X64) )) || (defined(__GNUC__) && ( defined(__i386__) || defined(__x86_64__) ))
 #define BOOST_USING_INTEL_TSX
-#elif defined(__GNUC__) && ( defined(__i386__) || defined(__x86_64__) )
-#ifdef __RTM__
-#define BOOST_USING_INTEL_TSX
-#elif (defined(__GLIBCXX__) && __GLIBCXX__>=20120920 /*>= GCC 4.7*/) || (defined(__clang__) && (__clang_major__>3 || (__clang_major__==3 && __clang_minor__>=3)))
-#warning Intel RTM/TSX instruction set not enabled using -mrtm (GCC 4.7+, clang 3.3+), so cannot compile in runtime support for memory transactions. Note that turning on -mrtm will produce binaries incompatible with older CPUs (TODO FIXME: AFIO does runtime selection of RTM instructions on Windows, it therefore should do the same on POSIX)
-#endif
 #endif
 #endif
 
@@ -156,16 +150,60 @@ namespace boost
 #define BOOST_BEGIN_MEMORY_TRANSACTION(lockable) __transaction_relaxed
 #define BOOST_END_MEMORY_TRANSACTION(lockable)
 #elif defined(BOOST_USING_INTEL_TSX)
-#include <immintrin.h>
+
+#define BOOST_AFIO_XBEGIN_STARTED   (~0u)
+#define BOOST_AFIO_XABORT_EXPLICIT  (1 << 0)
+#define BOOST_AFIO_XABORT_RETRY     (1 << 1)
+#define BOOST_AFIO_XABORT_CONFLICT  (1 << 2)
+#define BOOST_AFIO_XABORT_CAPACITY  (1 << 3)
+#define BOOST_AFIO_XABORT_DEBUG     (1 << 4)
+#define BOOST_AFIO_XABORT_NESTED    (1 << 5)
+#define BOOST_AFIO_XABORT_CODE(x)   ((unsigned char)(((x) >> 24) & 0xFF))
+
+#if defined(_MSC_VER)
+            // Declare MSVC intrinsics
+            extern "C" unsigned int  _xbegin(void);
+            extern "C" void          _xend(void);
+            extern "C" void          _xabort(const unsigned int);
+            extern "C" unsigned char _xtest(void);
+#elif defined(__GNUC__) && ( defined(__i386__) || defined(__x86_64__) )
+            // Hack the bytes codes in for older compilers to avoid needing to compile with -mrtm
+            namespace { // prevent any collisions with <immintrin.h>
+                static __attribute__((__always_inline__)) inline unsigned int _xbegin() BOOST_NOEXCEPT_OR_NOTHROW
+                {
+                    unsigned int ret = BOOST_AFIO_XBEGIN_STARTED;
+                    asm volatile(".byte 0xc7,0xf8 ; .long 0" : "+a" (ret) :: "memory");
+                    return ret;
+                }
+
+                static __attribute__((__always_inline__)) inline void _xend() BOOST_NOEXCEPT_OR_NOTHROW
+                {
+                    asm volatile(".byte 0x0f,0x01,0xd5" ::: "memory");
+                }
+
+                static __attribute__((__always_inline__)) inline void _xabort(const unsigned int status) BOOST_NOEXCEPT_OR_NOTHROW
+                {
+                    asm volatile(".byte 0xc6,0xf8,%P0" :: "i" (status) : "memory");
+                }
+
+                static __attribute__((__always_inline__)) inline unsigned char _xtest() BOOST_NOEXCEPT_OR_NOTHROW
+                {
+                    unsigned char out;
+                    asm volatile(".byte 0x0f,0x01,0xd6 ; setnz %0" : "=r" (out) :: "memory");
+                    return out;
+                }
+            }
+#endif
+
             // Adapted from http://software.intel.com/en-us/articles/how-to-detect-new-instruction-support-in-the-4th-generation-intel-core-processor-family
             namespace intel_stuff
             {
-                inline void run_cpuid(uint32_t eax, uint32_t ecx, uint32_t* abcd)
+                inline void run_cpuid(uint32_t eax, uint32_t ecx, uint32_t* abcd) BOOST_NOEXCEPT_OR_NOTHROW
                 {
 #if defined(_MSC_VER)
                         __cpuidex((int *) abcd, eax, ecx);
 #else
-                        uint32_t ebx, edx;
+                        uint32_t ebx=0, edx=0;
 # if defined( __i386__ ) && defined ( __PIC__ )
                         /* in case of PIC under 32-bit EBX cannot be clobbered */
                         __asm__("movl %%ebx, %%edi \n\t cpuid \n\t xchgl %%ebx, %%edi" : "=D" (ebx),
@@ -176,7 +214,7 @@ namespace boost
                         abcd[0] = eax; abcd[1] = ebx; abcd[2] = ecx; abcd[3] = edx;
 #endif
                 }
-                inline bool have_intel_tsx_support()
+                inline bool have_intel_tsx_support() BOOST_NOEXCEPT_OR_NOTHROW
                 {
                     static int result;
                     if(result) return result==2;
@@ -202,7 +240,7 @@ namespace boost
             {
                 static BOOST_CONSTEXPR_OR_CONST size_t value=spinlock<T, spinpolicy1, spinpolicy2, spinpolicy3, spinpolicy4>::spins_to_transact;
             };
-            template<class T> inline bool is_lockable_locked(T &lockable)
+            template<class T> inline bool is_lockable_locked(T &lockable) BOOST_NOEXCEPT_OR_NOTHROW
             {
                 if(lockable.try_lock())
                 {
@@ -211,7 +249,7 @@ namespace boost
                 }
                 return false;
             }
-            template<class T, template<class> class spinpolicy1, template<class> class spinpolicy2, template<class> class spinpolicy3, template<class> class spinpolicy4> inline bool is_lockable_locked(spinlock<T, spinpolicy1, spinpolicy2, spinpolicy3, spinpolicy4> &lockable)
+            template<class T, template<class> class spinpolicy1, template<class> class spinpolicy2, template<class> class spinpolicy3, template<class> class spinpolicy4> inline bool is_lockable_locked(spinlock<T, spinpolicy1, spinpolicy2, spinpolicy3, spinpolicy4> &lockable) BOOST_NOEXCEPT_OR_NOTHROW
             {
                 return 1==lockable.v.load();
             }
@@ -225,10 +263,10 @@ namespace boost
                     size_t spins_to_transact=get_spins_to_transact<T>::value;
                     for(size_t n=0; n<spins_to_transact; n++)
                     {
-                        unsigned state=_XABORT_CAPACITY;
+                        unsigned state=BOOST_AFIO_XABORT_CAPACITY;
                         if(intel_stuff::have_intel_tsx_support())
                             state=_xbegin(); // start transaction, or cope with abort
-                        if(_XBEGIN_STARTED==state)
+                        if(BOOST_AFIO_XBEGIN_STARTED==state)
                         {
                             if(!is_lockable_locked(lockable))
                             {
@@ -247,15 +285,15 @@ namespace boost
                         }
                         //std::cerr << "A=" << std::hex << state << std::endl;
                         // Transaction aborted due to too many locks or hard abort?
-                        if((state & _XABORT_CAPACITY) || !(state & _XABORT_RETRY))
+                        if((state & BOOST_AFIO_XABORT_CAPACITY) || !(state & BOOST_AFIO_XABORT_RETRY))
                         {
                             // Fall back onto pure locks
                             break;
                         }
                         // Was it me who aborted?
-                        if((state & _XABORT_EXPLICIT) && !(state & _XABORT_NESTED))
+                        if((state & BOOST_AFIO_XABORT_EXPLICIT) && !(state & BOOST_AFIO_XABORT_NESTED))
                         {
-                            switch(_XABORT_CODE(state))
+                            switch(BOOST_AFIO_XABORT_CODE(state))
                             {
                             case 0x78: // exception thrown
                                 throw std::runtime_error("Unknown exception thrown inside Intel TSX memory transaction");
