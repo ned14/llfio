@@ -26,7 +26,7 @@ File Created: Mar 2013
 // Define this to serialise thread job dispatch in order to work around a race condition in ASIO on Win32
 #ifdef WIN32
 #ifndef BOOST_AFIO_WORK_AROUND_LOST_ASIO_WRITE_COMPLETION_WAKEUPS
-//#define BOOST_AFIO_WORK_AROUND_LOST_ASIO_WRITE_COMPLETION_WAKEUPS 1 // ASIO is now fixed
+//#define BOOST_AFIO_WORK_AROUND_LOST_ASIO_WRITE_COMPLETION_WAKEUPS 1
 #endif
 #endif
 
@@ -37,6 +37,7 @@ File Created: Mar 2013
 #include "boost/detail/scoped_enum_emulation.hpp"
 #include "detail/Utility.hpp"
 #include <type_traits>
+#include <boost/functional/hash.hpp>
 #ifndef BOOST_NO_CXX11_HDR_INITIALIZER_LIST
 #include <initializer_list>
 #endif
@@ -513,43 +514,46 @@ class BOOST_AFIO_DECL directory_entry
     metadata_flags have_metadata;
     BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC void _int_fetch(metadata_flags wanted, std::shared_ptr<async_io_handle> dirh);
 public:
-    //! \constr
-    directory_entry() : stat(nullptr), have_metadata(metadata_flags::None) { }
-    //! \constr
-    directory_entry(std::filesystem::path _leafname, stat_t __stat, metadata_flags _have_metadata) : leafname(_leafname), stat(__stat), have_metadata(_have_metadata) { }
-    bool operator==(const directory_entry& rhs) const BOOST_NOEXCEPT_OR_NOTHROW { return leafname == rhs.leafname; }
-    bool operator!=(const directory_entry& rhs) const BOOST_NOEXCEPT_OR_NOTHROW { return leafname != rhs.leafname; }
-    bool operator< (const directory_entry& rhs) const BOOST_NOEXCEPT_OR_NOTHROW { return leafname < rhs.leafname; }
-    bool operator<=(const directory_entry& rhs) const BOOST_NOEXCEPT_OR_NOTHROW { return leafname <= rhs.leafname; }
-    bool operator> (const directory_entry& rhs) const BOOST_NOEXCEPT_OR_NOTHROW { return leafname > rhs.leafname; }
-    bool operator>=(const directory_entry& rhs) const BOOST_NOEXCEPT_OR_NOTHROW { return leafname >= rhs.leafname; }
-    //! \return The name of the directory entry
-    std::filesystem::path name() const BOOST_NOEXCEPT_OR_NOTHROW { return leafname; }
-    //! \return A bitfield of what metadata is ready right now
-    metadata_flags metadata_ready() const BOOST_NOEXCEPT_OR_NOTHROW { return have_metadata; }
-    /*! \brief Fetches the specified metadata, returning that newly available. This is a blocking call if wanted metadata is not yet ready.
-    \return The metadata now available in this directory entry.
-    \param dirh An open handle to the entry's containing directory. You can get this from the h shared future member variable in an op ref.
-    \param wanted A bitfield of the metadata to fetch. This does not replace existing metadata.
-    */
-    metadata_flags fetch_metadata(std::shared_ptr<async_io_handle> dirh, metadata_flags wanted)
-    {
-        metadata_flags tofetch;
-        wanted=wanted&metadata_supported();
-        tofetch=wanted&~have_metadata;
-        if(!!tofetch) _int_fetch(tofetch, dirh);
-        return have_metadata;
-    }
-    /*! \brief Returns a copy of the internal `stat_t` structure. This is a blocking call if wanted metadata is not yet ready.
-    \return A copy of the internal `stat_t` structure.
-    \param dirh An open handle to the entry's containing directory. You can get this from the h shared future member variable in an op ref.
-    \param wanted A bitfield of the metadata to fetch. This does not replace existing metadata.
-    */
-    stat_t fetch_lstat(std::shared_ptr<async_io_handle> dirh, metadata_flags wanted=directory_entry::metadata_fastpath())
-    {
-        fetch_metadata(dirh, wanted);
-        return stat;
-    }
+	//! \constr
+	directory_entry() : stat(nullptr), have_metadata(metadata_flags::None) { }
+	//! \constr
+	directory_entry(std::filesystem::path _leafname, stat_t __stat, metadata_flags _have_metadata) : leafname(_leafname), stat(__stat), have_metadata(_have_metadata) { }
+	// copy constructor
+	directory_entry(const directory_entry& other): stat(other.stat), leafname(other.leafname), have_metadata(other.have_metadata) {}
+	
+	bool operator==(const directory_entry& rhs) const BOOST_NOEXCEPT_OR_NOTHROW { return leafname == rhs.leafname; }
+	bool operator!=(const directory_entry& rhs) const BOOST_NOEXCEPT_OR_NOTHROW { return leafname != rhs.leafname; }
+	bool operator< (const directory_entry& rhs) const BOOST_NOEXCEPT_OR_NOTHROW { return leafname < rhs.leafname; }
+	bool operator<=(const directory_entry& rhs) const BOOST_NOEXCEPT_OR_NOTHROW { return leafname <= rhs.leafname; }
+	bool operator> (const directory_entry& rhs) const BOOST_NOEXCEPT_OR_NOTHROW { return leafname > rhs.leafname; }
+	bool operator>=(const directory_entry& rhs) const BOOST_NOEXCEPT_OR_NOTHROW { return leafname >= rhs.leafname; }
+	//! \return The name of the directory entry
+	std::filesystem::path name() const BOOST_NOEXCEPT_OR_NOTHROW { return leafname; }
+	//! \return A bitfield of what metadata is ready right now
+	metadata_flags metadata_ready() const BOOST_NOEXCEPT_OR_NOTHROW { return have_metadata; }
+	/*! \brief Fetches the specified metadata, returning that newly available. This is a blocking call if wanted metadata is not yet ready.
+	\return The metadata now available in this directory entry.
+	\param dirh An open handle to the entry's containing directory. You can get this from the h shared future member variable in an op ref.
+	\param wanted A bitfield of the metadata to fetch. This does not replace existing metadata.
+	*/
+	metadata_flags fetch_metadata(std::shared_ptr<async_io_handle> dirh, metadata_flags wanted)
+	{
+		metadata_flags tofetch;
+		wanted=wanted&metadata_supported();
+		tofetch=wanted&~have_metadata;
+		if(!!tofetch) _int_fetch(tofetch, dirh);
+		return have_metadata;
+	}
+	/*! \brief Returns a copy of the internal `stat_t` structure. This is a blocking call if wanted metadata is not yet ready.
+	\return A copy of the internal `stat_t` structure.
+	\param dirh An open handle to the entry's containing directory. You can get this from the h shared future member variable in an op ref.
+	\param wanted A bitfield of the metadata to fetch. This does not replace existing metadata.
+	*/
+	stat_t fetch_lstat(std::shared_ptr<async_io_handle> dirh, metadata_flags wanted=directory_entry::metadata_fastpath())
+	{
+		fetch_metadata(dirh, wanted);
+		return stat;
+	}
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 #define BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(field) \
 decltype(stat_t().st_##field) st_##field() const { if(!(have_metadata&metadata_flags::field)) { BOOST_AFIO_THROW(std::runtime_error("Field st_" #field " not present.")); } return stat.st_##field; } \
@@ -602,6 +606,54 @@ decltype(stat_t().st_##field) st_##field(std::shared_ptr<async_io_handle> dirh=s
     //! The maximum number of entries which is "usual" to fetch at once i.e. what your libc does.
     static BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC size_t compatibility_maximum() BOOST_NOEXCEPT_OR_NOTHROW;
 };
+
+	}//namespace afio
+}//namespace boost
+
+namespace std
+{
+	template<> struct hash<boost::afio::directory_entry>
+	{
+	public:
+		size_t operator()(const boost::afio::directory_entry& p) const
+		{
+			size_t seed = 0;
+			boost::hash_combine(seed, p.st_ino());
+			//boost::hash_combine(seed, p.st_type());
+			//boost::hash_combine(seed, p.name());
+
+	#if 0
+			try{
+	#ifndef __linux__
+				boost::hash_combine(seed, boost::hash_value(p.st_birthtim().time_since_epoch().count())); //<<------ This was perfect :(
+	#endif
+				//boost::hash_combine(seed, p.st_ctim().time_since_epoch().count());
+				//boost::hash_combine(seed, p.leafname);
+				//boost::hash_combine(seed, p.have_metadata);
+			}
+			catch(std::exception &e)
+			{
+				std::cout <<"the metadata for " << p.name() << " is: " << (std::bitset<sizeof(size_t)*8>)(size_t)p.metadata_ready() << std::endl;
+				std::cout << "this hash failed horribly <------------\n" << e.what() <<std::endl;
+				throw;
+			}
+	#endif
+			return seed;
+		}
+	};
+
+	template<> struct hash<std::filesystem::path>
+	{
+	public:
+		size_t operator()(const std::filesystem::path& p) const
+		{
+			return boost::filesystem::hash_value(p);
+		}
+	};
+}//namesapce std
+
+namespace boost{
+	namespace afio{
 
 /*! \brief The abstract base class encapsulating a platform-specific file handle
 */
