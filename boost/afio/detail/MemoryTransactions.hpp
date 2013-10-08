@@ -166,7 +166,13 @@ namespace boost
             extern "C" void          _xend(void);
             extern "C" void          _xabort(const unsigned int);
             extern "C" unsigned char _xtest(void);
+#define BOOST_AFIO_XBEGIN(...) _xbegin(__VA_ARGS__)
+#define BOOST_AFIO_XEND(...) _xend(__VA_ARGS__)
+#define BOOST_AFIO_XABORT(...) _xabort(__VA_ARGS__)
+#define BOOST_AFIO_XTEST(...) _xtest(__VA_ARGS__)
+
 #elif defined(__GNUC__) && ( defined(__i386__) || defined(__x86_64__) )
+
             // Hack the bytes codes in for older compilers to avoid needing to compile with -mrtm
             namespace { // prevent any collisions with <immintrin.h>
                 static __attribute__((__always_inline__)) inline unsigned int _xbegin() BOOST_NOEXCEPT_OR_NOTHROW
@@ -176,16 +182,6 @@ namespace boost
                     return ret;
                 }
 
-                static __attribute__((__always_inline__)) inline void _xend() BOOST_NOEXCEPT_OR_NOTHROW
-                {
-                    asm volatile(".byte 0x0f,0x01,0xd5" ::: "memory");
-                }
-
-                static __attribute__((__always_inline__)) inline void _xabort(const unsigned int status) BOOST_NOEXCEPT_OR_NOTHROW
-                {
-                    asm volatile(".byte 0xc6,0xf8,%P0" :: "i" (status) : "memory");
-                }
-
                 static __attribute__((__always_inline__)) inline unsigned char _xtest() BOOST_NOEXCEPT_OR_NOTHROW
                 {
                     unsigned char out;
@@ -193,6 +189,10 @@ namespace boost
                     return out;
                 }
             }
+#define BOOST_AFIO_XBEGIN(...) _xbegin(__VA_ARGS__)
+#define BOOST_AFIO_XEND(...) asm volatile(".byte 0x0f,0x01,0xd5" ::: "memory")
+#define BOOST_AFIO_XABORT(status) asm volatile(".byte 0xc6,0xf8,%P0" :: "i" (status) : "memory")
+#define BOOST_AFIO_XTEST(...) _xtest(__VA_ARGS__)
 #endif
 
             // Adapted from http://software.intel.com/en-us/articles/how-to-detect-new-instruction-support-in-the-4th-generation-intel-core-processor-family
@@ -265,7 +265,7 @@ namespace boost
                     {
                         unsigned state=BOOST_AFIO_XABORT_CAPACITY;
                         if(intel_stuff::have_intel_tsx_support())
-                            state=_xbegin(); // start transaction, or cope with abort
+                            state=BOOST_AFIO_XBEGIN(); // start transaction, or cope with abort
                         if(BOOST_AFIO_XBEGIN_STARTED==state)
                         {
                             if(!is_lockable_locked(lockable))
@@ -276,9 +276,9 @@ namespace boost
                             }
                             // If lock is not free, we need to abort transaction as something else is running
 #if 1
-                            _xabort(0x79);
+                            BOOST_AFIO_XABORT(0x79);
 #else
-                            _xend();
+                            BOOST_AFIO_XEND();
 #endif
                             continue;
                             // Never reaches this point
@@ -321,10 +321,10 @@ namespace boost
                     if(dismissed)
                     {
                         if(1==dismissed)
-                            _xabort(0x78);
+                            BOOST_AFIO_XABORT(0x78);
                         else if(2==dismissed)
                         {
-                            _xend();
+                            BOOST_AFIO_XEND();
                             //std::cerr << "TC" << std::endl;
                         }
                         else if(3==dismissed)
