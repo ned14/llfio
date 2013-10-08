@@ -264,6 +264,7 @@ template<class R> class packaged_task<R()>
         }
 #ifdef BOOST_AFIO_USE_BOOST_CHRONO
         using boost::chrono::system_clock;
+        using boost::chrono::steady_clock;
         using boost::chrono::high_resolution_clock;
         using boost::chrono::seconds;
         using boost::chrono::milliseconds;
@@ -273,6 +274,7 @@ template<class R> class packaged_task<R()>
         }
 #else
         using std::chrono::system_clock;
+        using std::chrono::steady_clock;
         using std::chrono::high_resolution_clock;
         using std::chrono::seconds;
         using std::chrono::milliseconds;

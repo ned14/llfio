@@ -521,11 +521,19 @@ public:
     directory_entry() : stat(nullptr), have_metadata(metadata_flags::None) { }
     //! \constr
     directory_entry(std::filesystem::path _leafname, stat_t __stat, metadata_flags _have_metadata) : leafname(_leafname), stat(__stat), have_metadata(_have_metadata) { }
-    //! \cconstr
-    directory_entry(const directory_entry& other) : leafname(other.leafname), stat(other.stat), have_metadata(other.have_metadata) {}
-    //! \mconstr
-    directory_entry(directory_entry &&other) : leafname(std::move(other.leafname)), stat(std::move(other.stat)), have_metadata(std::move(other.have_metadata)) {}
-    
+#ifndef BOOST_NO_CXX11_DEFAULTED_FUNCTIONS
+    directory_entry(const directory_entry &) = default;
+    directory_entry &operator=(const directory_entry &) = default;
+#endif
+    directory_entry(directory_entry &&o) : leafname(std::move(o.leafname)), stat(std::move(o.stat)), have_metadata(std::move(o.have_metadata)) { }
+    directory_entry &operator=(directory_entry &&o)
+    {
+        leafname=std::move(o.leafname);
+        stat=std::move(o.stat);
+        have_metadata=std::move(o.have_metadata);
+        return *this;
+    }
+
     bool operator==(const directory_entry& rhs) const BOOST_NOEXCEPT_OR_NOTHROW { return leafname == rhs.leafname; }
     bool operator!=(const directory_entry& rhs) const BOOST_NOEXCEPT_OR_NOTHROW { return leafname != rhs.leafname; }
     bool operator< (const directory_entry& rhs) const BOOST_NOEXCEPT_OR_NOTHROW { return leafname < rhs.leafname; }
@@ -1437,6 +1445,7 @@ namespace detail
         atomic<size_t> togo;
         std::vector<std::shared_ptr<async_io_handle>> out;
         promise<std::vector<std::shared_ptr<async_io_handle>>> done;
+        when_all_count_completed_state(std::vector<async_io_op> _inputs) : inputs(std::move(_inputs)), togo(inputs.size()), out(inputs.size()) { }
         when_all_count_completed_state(std::vector<async_io_op>::iterator first, std::vector<async_io_op>::iterator last) : inputs(first, last), togo(inputs.size()), out(inputs.size()) { }
     };
     inline async_file_io_dispatcher_base::completion_returntype when_all_count_completed_nothrow(size_t, std::shared_ptr<async_io_handle> h, exception_ptr *e, std::shared_ptr<detail::when_all_count_completed_state> state, size_t idx)
@@ -1470,6 +1479,72 @@ namespace detail
         }
         return std::make_pair(true, h);
     }
+    inline future<std::vector<std::shared_ptr<async_io_handle>>> when_all(std::nothrow_t _, std::shared_ptr<detail::when_all_count_completed_state> state)
+    {
+#ifdef BOOST_AFIO_NEED_CURRENT_EXCEPTION_HACK
+        // VS2010 segfaults if you ever do a try { throw; } catch(...) without an exception ever having been thrown :(
+        try
+        {
+            throw detail::vs2010_lack_of_decent_current_exception_support_hack_t();
+        }
+        catch(...)
+        {
+            detail::vs2010_lack_of_decent_current_exception_support_hack()=boost::current_exception();
+#endif
+            std::vector<async_io_op> &inputs=state->inputs;
+#if BOOST_AFIO_VALIDATE_INPUTS
+            BOOST_FOREACH(auto &i, inputs)
+            {
+                if(!i.validate(false))
+                    BOOST_AFIO_THROW(std::runtime_error("Inputs are invalid."));
+            }
+#endif
+            std::vector<std::pair<async_op_flags, std::function<async_file_io_dispatcher_base::completion_t>>> callbacks;
+            callbacks.reserve(inputs.size());
+            size_t idx=0;
+            BOOST_FOREACH(auto &i, inputs)
+            {
+                callbacks.push_back(std::make_pair(async_op_flags::ImmediateCompletion/*safe if nothrow*/, std::bind(&detail::when_all_count_completed_nothrow, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, state, idx++)));
+            }
+            inputs.front().parent->completion(inputs, callbacks);
+            return state->done.get_future();
+#ifdef BOOST_AFIO_NEED_CURRENT_EXCEPTION_HACK
+        }
+#endif
+    }
+    inline future<std::vector<std::shared_ptr<async_io_handle>>> when_all(std::shared_ptr<detail::when_all_count_completed_state> state)
+    {
+#ifdef BOOST_AFIO_NEED_CURRENT_EXCEPTION_HACK
+        // VS2010 segfaults if you ever do a try { throw; } catch(...) without an exception ever having been thrown :(
+        try
+        {
+            throw detail::vs2010_lack_of_decent_current_exception_support_hack_t();
+        }
+        catch(...)
+        {
+            detail::vs2010_lack_of_decent_current_exception_support_hack()=boost::current_exception();
+#endif
+            std::vector<async_io_op> &inputs=state->inputs;
+#if BOOST_AFIO_VALIDATE_INPUTS
+            BOOST_FOREACH(auto &i, inputs)
+            {
+                if(!i.validate(false))
+                    BOOST_AFIO_THROW(std::runtime_error("Inputs are invalid."));
+            }
+#endif
+            std::vector<std::pair<async_op_flags, std::function<async_file_io_dispatcher_base::completion_t>>> callbacks;
+            callbacks.reserve(inputs.size());
+            size_t idx=0;
+            BOOST_FOREACH(auto &i, inputs)
+            {
+                callbacks.push_back(std::make_pair(async_op_flags::None/*can't be immediate as may try to retrieve exception state of own precondition*/, std::bind(&detail::when_all_count_completed, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, state, idx++)));
+            }
+            inputs.front().parent->completion(inputs, callbacks);
+            return state->done.get_future();
+#ifdef BOOST_AFIO_NEED_CURRENT_EXCEPTION_HACK
+        }
+#endif
+    }
 }
 
 /*! \brief Returns a result when all the supplied ops complete. Does not propagate exception states.
@@ -1479,7 +1554,7 @@ namespace detail
 \param first A vector iterator pointing to the first async_io_op to wait upon.
 \param last A vector iterator pointing after the last async_io_op to wait upon.
 \ingroup when_all_ops
-\qbk{distinguish, vector batch of ops not exception propagating}
+\qbk{distinguish, iterator batch of ops not exception propagating}
 \complexity{O(N) to dispatch. O(N/threadpool) to complete, but at least one cache line is contended between threads.}
 \exceptionmodel{Non propagating}
 */
@@ -1487,37 +1562,25 @@ inline future<std::vector<std::shared_ptr<async_io_handle>>> when_all(std::nothr
 {
     if(first==last)
         return future<std::vector<std::shared_ptr<async_io_handle>>>();
-#ifdef BOOST_AFIO_NEED_CURRENT_EXCEPTION_HACK
-    // VS2010 segfaults if you ever do a try { throw; } catch(...) without an exception ever having been thrown :(
-    try
-    {
-        throw detail::vs2010_lack_of_decent_current_exception_support_hack_t();
-    }
-    catch(...)
-    {
-        detail::vs2010_lack_of_decent_current_exception_support_hack()=boost::current_exception();
-#endif
     auto state(std::make_shared<detail::when_all_count_completed_state>(first, last));
-    std::vector<async_io_op> &inputs=state->inputs;
-#if BOOST_AFIO_VALIDATE_INPUTS
-    BOOST_FOREACH(auto &i, inputs)
-    {
-        if(!i.validate(false))
-            BOOST_AFIO_THROW(std::runtime_error("Inputs are invalid."));
-    }
-#endif
-    std::vector<std::pair<async_op_flags, std::function<async_file_io_dispatcher_base::completion_t>>> callbacks;
-    callbacks.reserve(inputs.size());
-    size_t idx=0;
-    BOOST_FOREACH(auto &i, inputs)
-    {   
-        callbacks.push_back(std::make_pair(async_op_flags::ImmediateCompletion/*safe if nothrow*/, std::bind(&detail::when_all_count_completed_nothrow, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, state, idx++)));
-    }
-    inputs.front().parent->completion(inputs, callbacks);
-    return state->done.get_future();
-#ifdef BOOST_AFIO_NEED_CURRENT_EXCEPTION_HACK
-    }
-#endif
+    return detail::when_all(_, state);
+}
+/*! \brief Returns a result when all the supplied ops complete. Does not propagate exception states.
+
+\return A future vector of shared_ptr's to async_io_handle.
+\param _ An instance of std::nothrow_t.
+\param ops A vector of the async_io_ops to wait upon.
+\ingroup when_all_ops
+\qbk{distinguish, vector batch of ops not exception propagating}
+\complexity{O(N) to dispatch. O(N/threadpool) to complete, but at least one cache line is contended between threads.}
+\exceptionmodel{Non propagating}
+*/
+inline future<std::vector<std::shared_ptr<async_io_handle>>> when_all(std::nothrow_t _, std::vector<async_io_op> ops)
+{
+    if(ops.empty())
+        return future<std::vector<std::shared_ptr<async_io_handle>>>();
+    auto state(std::make_shared<detail::when_all_count_completed_state>(std::move(ops)));
+    return detail::when_all(_, state);
 }
 /*! \brief Returns a result when all the supplied ops complete. Propagates exception states.
 
@@ -1525,7 +1588,7 @@ inline future<std::vector<std::shared_ptr<async_io_handle>>> when_all(std::nothr
 \param first A vector iterator pointing to the first async_io_op to wait upon.
 \param last A vector iterator pointing after the last async_io_op to wait upon.
 \ingroup when_all_ops
-\qbk{distinguish, vector batch of ops exception propagating}
+\qbk{distinguish, iterator batch of ops exception propagating}
 \complexity{O(N) to dispatch. O(N/threadpool) to complete, but at least one cache line is contended between threads.}
 \exceptionmodel{Propagating}
 */
@@ -1533,75 +1596,25 @@ inline future<std::vector<std::shared_ptr<async_io_handle>>> when_all(std::vecto
 {
     if(first==last)
         return future<std::vector<std::shared_ptr<async_io_handle>>>();
-#ifdef BOOST_AFIO_NEED_CURRENT_EXCEPTION_HACK
-    // VS2010 segfaults if you ever do a try { throw; } catch(...) without an exception ever having been thrown :(
-    try
-    {
-        throw detail::vs2010_lack_of_decent_current_exception_support_hack_t();
-    }
-    catch(...)
-    {
-        detail::vs2010_lack_of_decent_current_exception_support_hack()=boost::current_exception();
-#endif
     auto state(std::make_shared<detail::when_all_count_completed_state>(first, last));
-    std::vector<async_io_op> &inputs=state->inputs;
-#if BOOST_AFIO_VALIDATE_INPUTS
-    BOOST_FOREACH(auto &i, inputs)
-    {
-        if(!i.validate(false))
-            BOOST_AFIO_THROW(std::runtime_error("Inputs are invalid."));
-    }
-#endif
-    std::vector<std::pair<async_op_flags, std::function<async_file_io_dispatcher_base::completion_t>>> callbacks;
-    callbacks.reserve(inputs.size());
-    size_t idx=0;
-    BOOST_FOREACH(auto &i, inputs)
-    {   
-        callbacks.push_back(std::make_pair(async_op_flags::None/*can't be immediate as may try to retrieve exception state of own precondition*/, std::bind(&detail::when_all_count_completed, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, state, idx++)));
-    }
-    inputs.front().parent->completion(inputs, callbacks);
-    return state->done.get_future();
-#ifdef BOOST_AFIO_NEED_CURRENT_EXCEPTION_HACK
-    }
-#endif
-}
-#ifndef BOOST_NO_CXX11_HDR_INITIALIZER_LIST
-/*! \brief Returns a result when all the supplied ops complete. Does not propagate exception states.
-
-\return A future vector of shared_ptr's to async_io_handle.
-\param _ An instance of std::nothrow_t.
-\param _ops A std::initializer_list<> of async_io_op's to wait upon.
-\ingroup when_all_ops
-\qbk{distinguish, initializer_list batch of ops not exception propagating}
-\complexity{Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete, but at least one cache line is heavily contended between threads.}
-\exceptionmodel{Non propagating}
-*/
-inline future<std::vector<std::shared_ptr<async_io_handle>>> when_all(std::nothrow_t _, std::initializer_list<async_io_op> _ops)
-{
-    std::vector<async_io_op> ops;
-    ops.reserve(_ops.size());
-    BOOST_FOREACH(auto &&i, _ops)
-    {   ops.push_back(std::move(i));}
-    return when_all(_, ops.begin(), ops.end());
+    return detail::when_all(state);
 }
 /*! \brief Returns a result when all the supplied ops complete. Propagates exception states.
 
 \return A future vector of shared_ptr's to async_io_handle.
-\param _ops A std::initializer_list<> of async_io_op's to wait upon.
+\param ops A vector of the async_io_ops to wait upon.
 \ingroup when_all_ops
-\qbk{distinguish, initializer_list batch of ops exception propagating}
-\complexity{Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete, but at least one cache line is heavily contended between threads.}
+\qbk{distinguish, vector batch of ops exception propagating}
+\complexity{O(N) to dispatch. O(N/threadpool) to complete, but at least one cache line is contended between threads.}
 \exceptionmodel{Propagating}
 */
-inline future<std::vector<std::shared_ptr<async_io_handle>>> when_all(std::initializer_list<async_io_op> _ops)
+inline future<std::vector<std::shared_ptr<async_io_handle>>> when_all(std::vector<async_io_op> ops)
 {
-    std::vector<async_io_op> ops;
-    ops.reserve(_ops.size());
-    BOOST_FOREACH(auto &&i, _ops)
-    {   ops.push_back(std::move(i));}
-    return when_all(ops.begin(), ops.end());
+    if(ops.empty())
+        return future<std::vector<std::shared_ptr<async_io_handle>>>();
+    auto state(std::make_shared<detail::when_all_count_completed_state>(std::move(ops)));
+    return detail::when_all(state);
 }
-#endif
 /*! \brief Returns a result when the supplied op completes. Does not propagate exception states.
 
 \return A future vector of shared_ptr's to async_io_handle.
@@ -1615,7 +1628,7 @@ inline future<std::vector<std::shared_ptr<async_io_handle>>> when_all(std::initi
 inline future<std::vector<std::shared_ptr<async_io_handle>>> when_all(std::nothrow_t _, async_io_op op)
 {
     std::vector<async_io_op> ops(1, op);
-    return when_all(_, ops.begin(), ops.end());
+    return when_all(_, ops);
 }
 /*! \brief Returns a result when the supplied op completes. Propagates exception states.
 
@@ -1629,7 +1642,7 @@ inline future<std::vector<std::shared_ptr<async_io_handle>>> when_all(std::nothr
 inline future<std::vector<std::shared_ptr<async_io_handle>>> when_all(async_io_op op)
 {
     std::vector<async_io_op> ops(1, op);
-    return when_all(ops.begin(), ops.end());
+    return when_all(ops);
 }
 
 /*! \struct async_path_op_req
