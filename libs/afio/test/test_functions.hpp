@@ -119,6 +119,24 @@ static inline void watchdog_thread(size_t timeout)
     }
 }
 
+template<class T> inline void wrap_test_method(T &t)
+{
+#ifdef BOOST_AFIO_NEED_CURRENT_EXCEPTION_HACK
+    // VS2010 segfaults if you ever do a try { throw; } catch(...) without an exception ever having been thrown :(
+    try
+    {
+        throw boost::afio::detail::vs2010_lack_of_decent_current_exception_support_hack_t();
+    }
+    catch(...)
+    {
+        boost::afio::detail::vs2010_lack_of_decent_current_exception_support_hack()=boost::current_exception();
+        t.test_method();
+    }
+#else
+    t.test_method();
+#endif
+}
+
 // Define a unit test description and timeout
 #define BOOST_AFIO_AUTO_TEST_CASE(test_name, desc, _timeout)            \
 struct test_name : public BOOST_AUTO_TEST_CASE_FIXTURE { void test_method(); }; \
@@ -136,7 +154,7 @@ static void BOOST_AUTO_TC_INVOKER( test_name )()                        \
     try { boost::filesystem::remove_all("testdir"); } catch(...) { }    \
     set_maximum_cpus();                                                 \
     boost::thread watchdog(watchdog_thread, timeout);                   \
-    boost::unit_test::unit_test_monitor_t::instance().execute([&]() -> int { t.test_method(); watchdog.interrupt(); watchdog.join(); return 0; }); \
+    boost::unit_test::unit_test_monitor_t::instance().execute([&]() -> int { wrap_test_method(t); watchdog.interrupt(); watchdog.join(); return 0; }); \
 }                                                                       \
                                                                         \
 struct BOOST_AUTO_TC_UNIQUE_ID( test_name ) {};                         \

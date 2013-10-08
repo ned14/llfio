@@ -1213,11 +1213,13 @@ template<class F, class... Args> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC async_io_o
     }
     BOOST_AFIO_DEBUG_PRINT("I %u < %u (%s)\n", (unsigned) thisid, (unsigned) precondition.id, detail::optypes[static_cast<int>(optype)]);
     auto unopsit=boost::afio::detail::Undoer([this, thisid](){
+        std::string what;
+        try { throw; } catch(std::exception &e) { what=e.what(); } catch(boost::exception &e) { what="boost exception"; } catch(...) { what="not a std exception"; }
+        BOOST_AFIO_DEBUG_PRINT("E X %u (%s)\n", (unsigned) thisid, what.c_str());
         BOOST_BEGIN_MEMORY_TRANSACTION(p->opslock)
         {
             auto opsit=p->ops.find(thisid);
             p->ops.erase(opsit);
-            BOOST_AFIO_DEBUG_PRINT("E X %u\n", (unsigned) thisid);
         }
         BOOST_END_MEMORY_TRANSACTION(p->opslock)
     });
@@ -1260,9 +1262,8 @@ template<class F, class... Args> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC async_io_o
             // if any of the preconditions are errored, but if they became errored between then and
             // now we can hardly abort half way through a batch op without leaving around stuck ops.
             // No, instead we simulate as if the precondition had not yet become ready.
-            if(precondition.h->has_exception())
-                *he=get_exception_ptr(f);
-            else
+            *he=get_exception_ptr(f);
+            if(!*he)
                 h=f.get();
         }
         else if(precondition.id)
@@ -1294,8 +1295,8 @@ template<class F, class... Args> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC async_io_o
 	            *ret.h=p->pool->enqueue(std::bind(boundf.second, h, nullptr)).share();
 		}
     }
-    unopsit.dismiss();
     undep.dismiss();
+    unopsit.dismiss();
     return ret;
 }
 

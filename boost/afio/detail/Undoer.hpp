@@ -25,34 +25,33 @@ namespace boost{
                     template<typename T> struct is_nullptr<T, false> { bool operator()(T) const BOOST_NOEXCEPT_OR_NOTHROW { return false; } };
             }
             //! Compile-time safe detector of if \em v is nullptr (can cope with non-pointer convertibles)
-            #if defined(_MSC_VER) && BOOST_MSVC<1700
+#if defined(_MSC_VER) && BOOST_MSVC<1700
             template<typename T> bool is_nullptr(T v) BOOST_NOEXCEPT_OR_NOTHROW { return Impl::is_nullptr<T, std::is_convertible<bool, T>::value>()(std::forward<T>(v)); }
-            #elif defined(__GNUC__) && BOOST_GCC<40900
+#elif defined(__GNUC__) && BOOST_GCC<40900
             template<typename T> bool is_nullptr(T v) BOOST_NOEXCEPT_OR_NOTHROW { return Impl::is_nullptr<T, std::is_constructible<bool, T>::value>()(std::forward<T>(v)); }
-            #else
+#else
             template<typename T> bool is_nullptr(T v) BOOST_NOEXCEPT_OR_NOTHROW { return Impl::is_nullptr<T, std::is_trivially_constructible<bool, T>::value>()(std::forward<T>(v)); }
-            #endif
+#endif
 
             
             template<typename callable> class UndoerImpl
             {
-                    callable undoer;
                     bool _dismissed;
-            #ifndef BOOST_NO_CXX11_DEFAULTED_FUNCTIONS
-            //#if !defined(BOOST_MSVC) || BOOST_MSVC>1700
+                    callable undoer;
+#ifndef BOOST_NO_CXX11_DEFAULTED_FUNCTIONS
                     UndoerImpl() = delete;
                     UndoerImpl(const UndoerImpl &) = delete;
                     UndoerImpl &operator=(const UndoerImpl &) = delete;
-            #else
+#else
                     UndoerImpl();
                     UndoerImpl(const UndoerImpl &);
                     UndoerImpl &operator=(const UndoerImpl &);
-            #endif
-                    explicit UndoerImpl(callable &&c) : undoer(std::move(c)), _dismissed(false) { }
+#endif
+                    explicit UndoerImpl(callable &&c) : _dismissed(false), undoer(std::move(c)) { }
                     void int_trigger() { if(!_dismissed && !is_nullptr(undoer)) { undoer(); _dismissed=true; } }
             public:
-                    UndoerImpl(UndoerImpl &&o) : undoer(std::move(o.undoer)), _dismissed(o._dismissed) { o._dismissed=true; }
-                    UndoerImpl &operator=(UndoerImpl &&o) { int_trigger(); undoer=std::move(o.undoer); _dismissed=o._dismissed; o._dismissed=true; return *this; }
+                    UndoerImpl(UndoerImpl &&o) : _dismissed(o._dismissed), undoer(std::move(o.undoer)) { o._dismissed=true; }
+                    UndoerImpl &operator=(UndoerImpl &&o) { int_trigger(); _dismissed=o._dismissed; undoer=std::move(o.undoer); o._dismissed=true; return *this; }
                     template<typename _callable> friend UndoerImpl<_callable> Undoer(_callable c);
                     ~UndoerImpl() { int_trigger(); }
                     //! Returns if the Undoer is dismissed
