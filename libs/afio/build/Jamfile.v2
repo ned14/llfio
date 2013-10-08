@@ -31,11 +31,11 @@ lib boost_afio
   : #includes 
       <include>../../../boost/afio 
       <include>../../../boost/afio/detail
-      <toolset>gcc:<cxxflags>"-std=c++0x -fvisibility-inlines-hidden -fstrict-aliasing -Wstrict-aliasing -Wno-unused -Wno-mismatched-tags -fargument-noalias -fvisibility=hidden -fopenmp -fasynchronous-unwind-tables"
+      <toolset>gcc:<cxxflags>"-std=c++0x -fvisibility-inlines-hidden -fstrict-aliasing -Wstrict-aliasing -Wno-unused -fargument-noalias -fvisibility=hidden -fopenmp -fasynchronous-unwind-tables"
       <toolset>gcc-mingw:<cxxflags>"-DWIN32 -D_UNICODE -DUNICODE -Wno-missing-braces"
       <toolset>gcc-mingw:<linkflags>"-lws2_32"
       <toolset>gcc:<linkflags>"-lgomp"
-      <toolset>clang:<cxxflags>"-std=c++0x -fvisibility-inlines-hidden -fstrict-aliasing -Wstrict-aliasing -Wno-unused -fvisibility=hidden -fopenmp -fasynchronous-unwind-tables"
+      <toolset>clang:<cxxflags>"-std=c++0x -fvisibility-inlines-hidden -fstrict-aliasing -Wstrict-aliasing -Wno-unused -Wno-mismatched-tags -fvisibility=hidden -fopenmp -fasynchronous-unwind-tables"
       <toolset>msvc:<cxxflags>"/openmp /GF /Gy /D_VARIADIC_MAX=8"
       <toolset>msvc:<linkflags>"/LARGEADDRESSAWARE /DYNAMICBASE /NXCOMPAT" # /VERSION:1.00.0"
       <toolset>msvc:<define>WIN32 
