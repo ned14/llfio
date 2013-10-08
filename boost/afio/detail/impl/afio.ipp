@@ -1014,7 +1014,7 @@ BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC void async_file_io_dispatcher_base::complet
                     immediates.enqueue(std::bind(it->second, h, &e));
                 }
                 else
-                    *c.second->h=immediates.enqueue(std::bind(it->second, h, &e));
+                    *c.second->h=immediates.enqueue(std::bind(it->second, h, &e)).share();
             }
             else
             {
@@ -1025,7 +1025,7 @@ BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC void async_file_io_dispatcher_base::complet
                     p->pool->enqueue(std::bind(it->second, h, nullptr));
                 }
                 else
-                    *c.second->h=p->pool->enqueue(std::bind(it->second, h, nullptr));
+                    *c.second->h=p->pool->enqueue(std::bind(it->second, h, nullptr)).share();
             }
             ++it;
         }
@@ -1271,16 +1271,28 @@ template<class F, class... Args> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC async_io_o
             // which indicates it completed and yet h remains invalid
             BOOST_AFIO_THROW_FATAL(std::runtime_error("Precondition was not in list of extant ops, yet its future is invalid. This should never happen for any real op, so it's probably memory corruption."));
         }
-        if(!!(flags & async_op_flags::DetachedFuture))
-        {
-            *thisop->h=thisop->detached_promise->get_future();
-        }
         if(!!(flags & async_op_flags::ImmediateCompletion))
         {
-            *ret.h=immediates.enqueue(std::bind(boundf.second, h, he)).share();
+            // If he was set up with a detached future, use that instead
+			if(!!(flags & async_op_flags::DetachedFuture))
+			{
+				*ret.h=thisop->detached_promise->get_future();
+	            immediates.enqueue(std::bind(boundf.second, h, he));
+			}
+			else
+	            *ret.h=immediates.enqueue(std::bind(boundf.second, h, he)).share();
         }
         else
-            *ret.h=p->pool->enqueue(std::bind(boundf.second, h, nullptr)).share();
+		{
+            // If he was set up with a detached future, use that instead
+			if(!!(flags & async_op_flags::DetachedFuture))
+			{
+				*ret.h=thisop->detached_promise->get_future();
+	            p->pool->enqueue(std::bind(boundf.second, h, nullptr));
+			}
+			else
+	            *ret.h=p->pool->enqueue(std::bind(boundf.second, h, nullptr)).share();
+		}
     }
     unopsit.dismiss();
     undep.dismiss();

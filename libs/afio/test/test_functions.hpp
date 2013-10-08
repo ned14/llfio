@@ -78,13 +78,13 @@ static inline void set_maximum_cpus(size_t no=MAXIMUM_TEST_CPUS)
 static inline void set_maximum_cpus(size_t no=0)
 {
 #ifdef BOOST_AFIO_USE_BOOST_ATOMIC
-	BOOST_TEST_MESSAGE("NOTE: Using Boost for atomic<>");
+    BOOST_TEST_MESSAGE("NOTE: Using Boost for atomic<>");
 #endif
 #ifdef BOOST_AFIO_USE_BOOST_CHRONO
-	BOOST_TEST_MESSAGE("NOTE: Using Boost for chrono");
+    BOOST_TEST_MESSAGE("NOTE: Using Boost for chrono");
 #endif
 #ifdef BOOST_AFIO_NEED_CURRENT_EXCEPTION_HACK
-	BOOST_TEST_MESSAGE("NOTE: Using current exception hack to work around ancient compiler");
+    BOOST_TEST_MESSAGE("NOTE: Using current exception hack to work around ancient compiler");
 #endif
 }
 #endif
