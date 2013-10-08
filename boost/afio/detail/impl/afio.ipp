@@ -851,16 +851,18 @@ file_flags async_file_io_dispatcher_base::fileflags(file_flags flags) const
 
 size_t async_file_io_dispatcher_base::wait_queue_depth() const
 {
+    size_t ret=0;
     BOOST_BEGIN_MEMORY_TRANSACTION(p->opslock)
     {
-        return p->ops.size();
+        ret=p->ops.size();
     }
     BOOST_END_MEMORY_TRANSACTION(p->opslock)
+    return ret;
 }
 
 size_t async_file_io_dispatcher_base::fd_count() const
 {
-    size_t ret;
+    size_t ret=0;
     BOOST_BEGIN_MEMORY_TRANSACTION(p->fdslock)
     {
         ret=p->fds.size();
