@@ -6,7 +6,7 @@ import os, sys
 
 for dirpath, dirnames, filenames in os.walk('.'):
 	for filename in filenames:
-		if filename[-4:]=='.hpp' or filename[-4:]=='.cpp':
+		if filename[-4:]=='.hpp' or filename[-4:]=='.cpp' or filename[-4:]=='.ipp':
 			path=os.path.join(dirpath, filename)
 			if os.path.exists(path+'.orig'):
 				os.remove(path+'.orig')

@@ -231,10 +231,10 @@ std::shared_ptr<std_thread_pool> process_threadpool()
 
 
 namespace detail {
-	BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC void print_fatal_exception_message_to_stderr(const char *msg)
-	{
-		std::cerr << "FATAL EXCEPTION: " << msg << std::endl;
-	}
+    BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC void print_fatal_exception_message_to_stderr(const char *msg)
+    {
+        std::cerr << "FATAL EXCEPTION: " << msg << std::endl;
+    }
 
     struct async_io_handle_posix : public async_io_handle
     {
@@ -883,13 +883,13 @@ async_io_op async_file_io_dispatcher_base::int_op_from_scheduled_id(size_t id) c
 }
 async_io_op async_file_io_dispatcher_base::op_from_scheduled_id(size_t id) const
 {
-	async_io_op ret;
+    async_io_op ret;
     BOOST_BEGIN_MEMORY_TRANSACTION(p->opslock)
     {
         ret=int_op_from_scheduled_id(id);
     }
     BOOST_END_MEMORY_TRANSACTION(p->opslock)
-	return ret;
+    return ret;
 }
 
 
@@ -1107,7 +1107,7 @@ template<class F, class... Args> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC std::share
     template <class F                                                                               \
     BOOST_PP_COMMA_IF(N)                                                                            \
     BOOST_PP_ENUM_PARAMS(N, class A)>                                                               \
-	BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC                                                            \
+    BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC                                                            \
     std::shared_ptr<async_io_handle>                                                        \
     async_file_io_dispatcher_base::invoke_async_op_completions                                      \
     (size_t id, std::shared_ptr<async_io_handle> h, exception_ptr *e,                        \
@@ -1275,25 +1275,25 @@ template<class F, class... Args> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC async_io_o
         if(!!(flags & async_op_flags::ImmediateCompletion))
         {
             // If he was set up with a detached future, use that instead
-			if(!!(flags & async_op_flags::DetachedFuture))
-			{
-				*ret.h=thisop->detached_promise->get_future();
-	            immediates.enqueue(std::bind(boundf.second, h, he));
-			}
-			else
-	            *ret.h=immediates.enqueue(std::bind(boundf.second, h, he)).share();
+            if(!!(flags & async_op_flags::DetachedFuture))
+            {
+                *ret.h=thisop->detached_promise->get_future();
+                immediates.enqueue(std::bind(boundf.second, h, he));
+            }
+            else
+                *ret.h=immediates.enqueue(std::bind(boundf.second, h, he)).share();
         }
         else
-		{
+        {
             // If he was set up with a detached future, use that instead
-			if(!!(flags & async_op_flags::DetachedFuture))
-			{
-				*ret.h=thisop->detached_promise->get_future();
-	            p->pool->enqueue(std::bind(boundf.second, h, nullptr));
-			}
-			else
-	            *ret.h=p->pool->enqueue(std::bind(boundf.second, h, nullptr)).share();
-		}
+            if(!!(flags & async_op_flags::DetachedFuture))
+            {
+                *ret.h=thisop->detached_promise->get_future();
+                p->pool->enqueue(std::bind(boundf.second, h, nullptr));
+            }
+            else
+                *ret.h=p->pool->enqueue(std::bind(boundf.second, h, nullptr)).share();
+        }
     }
     undep.dismiss();
     unopsit.dismiss();
@@ -1321,7 +1321,7 @@ template<class F, class... Args> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC async_io_o
     template <class F                                /* template start */                           \
     BOOST_PP_COMMA_IF(N)                                                                            \
     BOOST_PP_ENUM_PARAMS(N, class A)>                /* template end */                             \
-	BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC                                                            \
+    BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC                                                            \
     async_io_op                                      /* return type */                              \
     async_file_io_dispatcher_base::chain_async_op       /* function name */             \
     (exception_ptr *he, detail::immediate_async_ops &immediates, int optype,           /* parameters start */          \
