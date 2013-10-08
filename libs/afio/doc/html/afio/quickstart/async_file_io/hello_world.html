@@ -7,7 +7,7 @@
 <link rel="home" href="../../../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 1.1">
 <link rel="up" href="../async_file_io.html" title="Asynchronous file i/o">
 <link rel="prev" href="../async_file_io.html" title="Asynchronous file i/o">
-<link rel="next" href="so_what.html" title="What benefit does asynchronous file i/o bring me?">
+<link rel="next" href="file_concat.html" title="A less toy example">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
 <table cellpadding="2" width="100%"><tr>
@@ -20,7 +20,7 @@
 </tr></table>
 <hr>
 <div class="spirit-nav">
-<a accesskey="p" href="../async_file_io.html"><img src="../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../async_file_io.html"><img src="../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="so_what.html"><img src="../../../../../doc/src/images/next.png" alt="Next"></a>
+<a accesskey="p" href="../async_file_io.html"><img src="../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../async_file_io.html"><img src="../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="file_concat.html"><img src="../../../../../doc/src/images/next.png" alt="Next"></a>
 </div>
 <div class="section">
 <div class="titlepage"><div><div><h4 class="title">
@@ -251,6 +251,15 @@
           against AFIO is certainly compact!
         </p>
 <p>
+          This compactness of expression is not by accident: AFIO's API is intended
+          as a sort of domain specific embedded language (DSEL) for asynchronous
+          file i/o because it's hard enough writing power-loss safe sequencing of
+          filing system operations without having to mess around with boilerplate.
+          AFIO's API lets you see more clearly what happens in what sequence with
+          a minimum of vertical real estate needed (unlike Windows NT asynchronous
+          file i/o programming in particular).
+        </p>
+<p>
           As you'll note from the bookmarked lines on the right, generally the first
           parameter into any AFIO function is the precondition op (of type <a class="link" href="../../reference/structs/async_io_op.html" title="async_io_op"><code class="computeroutput"><span class="keyword">struct</span>
           <span class="identifier">async_io_op</span></code></a>) which must
@@ -276,9 +285,9 @@
           it simply tells you which dispatcher the op is or was scheduled with.
         </p>
 <p>
-          The shared future is valid as soon as an op is scheduled for execution
-          (which may not occur until after any preconditions have completed), and
-          its result (the handle output by the scheduled operation) becomes available
+          The shared future is valid as soon as an op is sent for execution to the
+          thread source (which may not occur until after any preconditions have completed),
+          and its result (the handle output by the scheduled operation) becomes available
           when the operation completes. If there are any dependencies scheduled on
           the operation, on completion the output handle is sent as input to each
           of dependencies.
@@ -320,7 +329,7 @@
 </tr></table>
 <hr>
 <div class="spirit-nav">
-<a accesskey="p" href="../async_file_io.html"><img src="../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../async_file_io.html"><img src="../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="so_what.html"><img src="../../../../../doc/src/images/next.png" alt="Next"></a>
+<a accesskey="p" href="../async_file_io.html"><img src="../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../async_file_io.html"><img src="../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="file_concat.html"><img src="../../../../../doc/src/images/next.png" alt="Next"></a>
 </div>
 </body>
 </html>

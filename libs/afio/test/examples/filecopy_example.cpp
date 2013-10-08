@@ -24,8 +24,12 @@ namespace {
         auto ihs=dispatcher->file(ihs_reqs);
         // Retrieve any error from opening the output
         when_all(oh).wait();
-        // Wait for the file handles to open so we can get their sizes (plus any failures to open)
+        // Wait for the input file handles to open so we can get their sizes
+        // (plus any failures to open)
         when_all(ihs).wait();
+
+        // Need to figure out the sizes of the sources so we can resize output
+        // correctly. We also need to allocate scratch buffers for each source.
         std::vector<std::tuple<off_t, off_t, std::unique_ptr<char[]>>> offsets;
         offsets.reserve(ihs.size());
         off_t offset=0;
@@ -42,9 +46,10 @@ namespace {
         totalbytes=offset;
         auto ohresize=dispatcher->truncate(oh, offset);
         when_all(ohresize).wait();
+
         // Schedule the parallel processing of all input files
         std::vector<async_io_op> writes(ihs.size());
-        //#pragma omp parallel for // optional, actually makes little difference
+//#pragma omp parallel for // optional, actually makes little difference
         for(int idx=0; idx<(int) ihs_reqs.size(); idx++)
         {
             async_io_op last=ihs[idx];
@@ -93,6 +98,7 @@ int main(int argc, const char *argv[])
         off_t totalbytes=0;
         std::shared_ptr<boost::afio::async_file_io_dispatcher_base> dispatcher=
             boost::afio::make_async_file_io_dispatcher();
+
         std::filesystem::path dest=argv[1];
         std::vector<std::filesystem::path> sources;
         std::cout << "Concatenating into " << dest << " the files ";
@@ -103,6 +109,7 @@ int main(int argc, const char *argv[])
             if(n<argc-1) std::cout << ", ";
         }
         std::cout << " ..." << std::endl;
+
         auto begin=chrono::steady_clock::now();
         auto h=async_concatenate_files(written, totalbytes, dispatcher, dest, sources);
         // Print progress once a second until it's done

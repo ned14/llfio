@@ -1,12 +1,12 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
-<title>What benefit does asynchronous file i/o bring me?</title>
+<title>What benefit does asynchronous file i/o bring me? A demonstration of AFIO's power</title>
 <link rel="stylesheet" href="../../../myboostbook.css" type="text/css">
 <meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
 <link rel="home" href="../../../index.html" title="Chapter&#160;1.&#160;Boost.AFIO 1.1">
 <link rel="up" href="../async_file_io.html" title="Asynchronous file i/o">
-<link rel="prev" href="hello_world.html" title="Hello World, asynchronously!">
+<link rel="prev" href="file_concat.html" title="A less toy example">
 <link rel="next" href="../closure_engine.html" title="Closure Execution Engines">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
@@ -20,20 +20,21 @@
 </tr></table>
 <hr>
 <div class="spirit-nav">
-<a accesskey="p" href="hello_world.html"><img src="../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../async_file_io.html"><img src="../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="../closure_engine.html"><img src="../../../../../doc/src/images/next.png" alt="Next"></a>
+<a accesskey="p" href="file_concat.html"><img src="../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../async_file_io.html"><img src="../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="../closure_engine.html"><img src="../../../../../doc/src/images/next.png" alt="Next"></a>
 </div>
 <div class="section">
 <div class="titlepage"><div><div><h4 class="title">
-<a name="afio.quickstart.async_file_io.so_what"></a><a class="link" href="so_what.html" title="What benefit does asynchronous file i/o bring me?">What benefit
-        does asynchronous file i/o bring me?</a>
+<a name="afio.quickstart.async_file_io.so_what"></a><a class="link" href="so_what.html" title="What benefit does asynchronous file i/o bring me? A demonstration of AFIO's power">What benefit
+        does asynchronous file i/o bring me? A demonstration of AFIO's power</a>
 </h4></div></div></div>
 <p>
-          So we can schedule file i/o operations asynchronously: what's the benefit
-          of doing that instead of creating separate threads of execution and executing
-          the file i/o there instead?
+          So we can schedule file i/o operations asynchronously with AFIO: what's
+          the benefit of doing that instead of creating separate threads of execution
+          and executing the file i/o there instead?
         </p>
 <p>
-          There are three main benefits to using AFIO over doing it by hand:
+          As a quick summary as we're about to prove our case, there are three main
+          benefits to using AFIO over doing it by hand:
         </p>
 <div class="orderedlist"><ol class="orderedlist" type="1">
 <li class="listitem">
@@ -63,9 +64,9 @@
 </ol></div>
 <p>
           What these three items mean is that writing scalable high-performance filing
-          system code is much easier. Let us take a simple example, this being a
-          simple STL iostreams, Boost Filesystem and OpenMP based find regular expression
-          in files implementation:
+          system code is much easier. Let us take a real world comparative example,
+          this being a simple STL iostreams, Boost Filesystem and OpenMP based find
+          regular expression in files implementation:
         </p>
 <pre class="programlisting"><span class="keyword">int</span> <span class="identifier">main</span><span class="special">(</span><span class="keyword">int</span> <span class="identifier">argc</span><span class="special">,</span> <span class="keyword">const</span> <span class="keyword">char</span> <span class="special">*</span><span class="identifier">argv</span><span class="special">[])</span>
 <span class="special">{</span>
@@ -455,12 +456,12 @@
           as equally bind the state into each callback's parameters instead via some
           sort of pointer to a struct. But the difference in complexity is noticeable
           &#8212; you're probably now asking, why choose this hideous complexity
-          over the much clearer OpenMP and iostreams implementation<a href="#ftn.afio.quickstart.async_file_io.so_what.f0" class="footnote" name="afio.quickstart.async_file_io.so_what.f0"><sup class="footnote">[10]</sup></a>?
+          over the much clearer OpenMP and iostreams implementation<a href="#ftn.afio.quickstart.async_file_io.so_what.f0" class="footnote" name="afio.quickstart.async_file_io.so_what.f0"><sup class="footnote">[11]</sup></a>?
         </p>
 <p>
           Well, that's simple: do you want maximum file i/o performance? Here is
           a search for <span class="quote">&#8220;<span class="quote">Niall</span>&#8221;</span> in a Boost working directory which contained
-          about 7Gb of data across ~35k files<a href="#ftn.afio.quickstart.async_file_io.so_what.f1" class="footnote" name="afio.quickstart.async_file_io.so_what.f1"><sup class="footnote">[11]</sup></a>:
+          about 7Gb of data across ~35k files<a href="#ftn.afio.quickstart.async_file_io.so_what.f1" class="footnote" name="afio.quickstart.async_file_io.so_what.f1"><sup class="footnote">[12]</sup></a>:
         </p>
 <div class="table">
 <a name="afio.quickstart.async_file_io.so_what.find_in_files_performance"></a><p class="title"><b>Table&#160;1.4.&#160;Find in files performance for traditional vs AFIO implementations</b></p>
@@ -636,6 +637,17 @@
 </table></div>
 </div>
 <br class="table-break"><p>
+          Note how AFIO outperforms the OpenMP iostreams implementation by about
+          50% for a warm cache, with only a 6% penalty for a cold cache over a single
+          threaded implementation. Note the <span class="bold"><strong>50%</strong></span>
+          penalty the OpenMP iostreams implementation suffers for a cold cache &#8212;
+          a naive multithreaded implementation causes a lot of disc seeks. If you
+          map a file into memory using <code class="computeroutput"><span class="identifier">file_flags</span><span class="special">::</span><span class="identifier">OSMMap</span></code>,
+          AFIO will <code class="computeroutput"><span class="identifier">memcpy</span><span class="special">()</span></code>
+          from that map instead of reading &#8212; or of course you can use the
+          map directly using the pointer returned by <code class="computeroutput"><span class="identifier">try_mapfile</span><span class="special">()</span></code>.
+        </p>
+<p>
           The eagle eyed amongst you will have noticed that the AFIO implementation
           looks hand tuned with a special depth first algorithm balancing concurrency
           with seek locality &#8212; that's because I invested two days into achieving
@@ -671,12 +683,12 @@
         </p>
 <div class="footnotes">
 <br><hr style="width:100; text-align:left;margin-left: 0">
-<div id="ftn.afio.quickstart.async_file_io.so_what.f0" class="footnote"><p><a href="#afio.quickstart.async_file_io.so_what.f0" class="para"><sup class="para">[10] </sup></a>
+<div id="ftn.afio.quickstart.async_file_io.so_what.f0" class="footnote"><p><a href="#afio.quickstart.async_file_io.so_what.f0" class="para"><sup class="para">[11] </sup></a>
             Indeed many ask the same when programming WinRT apps &#8212; Microsoft's
             insistance on never allowing any call to block can make simple designs
             explode with complexities of nested callbacks.
           </p></div>
-<div id="ftn.afio.quickstart.async_file_io.so_what.f1" class="footnote"><p><a href="#afio.quickstart.async_file_io.so_what.f1" class="para"><sup class="para">[11] </sup></a>
+<div id="ftn.afio.quickstart.async_file_io.so_what.f1" class="footnote"><p><a href="#afio.quickstart.async_file_io.so_what.f1" class="para"><sup class="para">[12] </sup></a>
             Test machine was a 3.5Ghz Intel i7-3770K Microsoft Windows 8 x64 machine
             with Seagate ST3320620AS 7200rpm hard drive. Note that AFIO has a native
             WinIOCP backend which leverages host asynchronous file i/o support.
@@ -693,7 +705,7 @@
 </tr></table>
 <hr>
 <div class="spirit-nav">
-<a accesskey="p" href="hello_world.html"><img src="../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../async_file_io.html"><img src="../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="../closure_engine.html"><img src="../../../../../doc/src/images/next.png" alt="Next"></a>
+<a accesskey="p" href="file_concat.html"><img src="../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../async_file_io.html"><img src="../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="../closure_engine.html"><img src="../../../../../doc/src/images/next.png" alt="Next"></a>
 </div>
 </body>
 </html>

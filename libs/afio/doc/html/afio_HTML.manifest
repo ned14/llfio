@@ -9,6 +9,7 @@ afio/compilation.html
 afio/quickstart.html
 afio/quickstart/async_file_io.html
 afio/quickstart/async_file_io/hello_world.html
+afio/quickstart/async_file_io/file_concat.html
 afio/quickstart/async_file_io/so_what.html
 afio/quickstart/closure_engine.html
 afio/quickstart/closure_engine/the_basics.html
