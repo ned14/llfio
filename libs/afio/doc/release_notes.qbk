@@ -64,8 +64,8 @@ maximum IOPS.]:
 We hope that ~720k max IOPS surely ought to be enough to max out any SATA III SSD __dash__ it should even max out any mid range
 PCIe based SSD too, and if paired with a CPU with more cores, AFIO's almost wait free design ought to scale out fairly
 well too such that it may be able to max out even top end PCIe SSDs, some of which can push 10m IOPS now. If that isn't
-fast enough for you, try AFIO on an Intel CPU with memory transaction support (on Windows a runtime check will automatically
-replace locks with memory transactions, for POSIX you need to recompile with the `-mrtm` flag), or try support for `__transaction_relaxed` compilers if `BOOST_HAVE_TRANSACTIONAL_MEMORY_COMPILER` is defined.
+fast enough for you, try AFIO on an Intel CPU with memory transaction support (a runtime check will automatically
+replace locks with TSX memory transactions), or try support for `__transaction_relaxed` compilers if `BOOST_HAVE_TRANSACTIONAL_MEMORY_COMPILER` is defined.
 
 Nevertheless, AFIO will almost certainly be still criticised for poor performance relative to __boost_asio__. Unfortunately, dependency chaining is not
 free, and moreover, AFIO has a very simple design based on a global hash table and pure C++11 STL throughout (i.e. it's heavy
