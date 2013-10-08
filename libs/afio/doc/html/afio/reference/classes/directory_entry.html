@@ -27,7 +27,7 @@
 <a name="afio.reference.classes.directory_entry"></a><a class="link" href="directory_entry.html" title="directory_entry">directory_entry</a>
 </h4></div></div></div>
 <p>
-          <a class="indexterm" name="id993172"></a>
+          <a class="indexterm" name="id969813"></a>
 The abstract base class for an entry in a directory with lazily filled
           metadata.
         </p>
@@ -113,33 +113,27 @@ The abstract base class for an entry in a directory with lazily filled
 </tr>
 <tr>
 <td>
-<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">directory_entry</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">directory_entry</span> <span class="special">&amp;</span> <span class="identifier">other</span><span class="special">)</span></pre>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">directory_entry</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">directory_entry</span> <span class="special">&amp;</span> <span class="special">)</span></pre>
                 </td>
 <td>
-                  <p>
-                    Copy constructor.
-                  </p>
                 </td>
 <td>
                   <p>
                     <span class="bold"><strong>const directory_entry &amp;</strong></span>:
-                    <span class="emphasis"><em>other</em></span>:
+                    <span class="emphasis"><em></em></span>:
                   </p>
                 </td>
 </tr>
 <tr>
 <td>
-<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">directory_entry</span><span class="special">(</span><span class="identifier">directory_entry</span> <span class="special">&amp;&amp;</span> <span class="identifier">other</span><span class="special">)</span></pre>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">directory_entry</span><span class="special">(</span><span class="identifier">directory_entry</span> <span class="special">&amp;&amp;</span> <span class="identifier">o</span><span class="special">)</span></pre>
                 </td>
 <td>
-                  <p>
-                    Move constructor.
-                  </p>
                 </td>
 <td>
                   <p>
                     <span class="bold"><strong>directory_entry &amp;&amp;</strong></span>:
-                    <span class="emphasis"><em>other</em></span>:
+                    <span class="emphasis"><em>o</em></span>:
                   </p>
                 </td>
 </tr>
@@ -179,6 +173,32 @@ The abstract base class for an entry in a directory with lazily filled
                 </th>
 </tr></thead>
 <tbody>
+<tr>
+<td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">directory_entry</span> <span class="special">&amp;</span> <span class="keyword">operator</span><span class="special">=(</span><span class="keyword">const</span> <span class="identifier">directory_entry</span> <span class="special">&amp;</span> <span class="special">)</span></pre>
+                </td>
+<td>
+                </td>
+<td>
+                  <p>
+                    <span class="bold"><strong>const directory_entry &amp;</strong></span>:
+                    <span class="emphasis"><em></em></span>:
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">directory_entry</span> <span class="special">&amp;</span> <span class="keyword">operator</span><span class="special">=(</span><span class="identifier">directory_entry</span> <span class="special">&amp;&amp;</span> <span class="identifier">o</span><span class="special">)</span></pre>
+                </td>
+<td>
+                </td>
+<td>
+                  <p>
+                    <span class="bold"><strong>directory_entry &amp;&amp;</strong></span>:
+                    <span class="emphasis"><em>o</em></span>:
+                  </p>
+                </td>
+</tr>
 <tr>
 <td>
 <pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="keyword">bool</span> <span class="keyword">operator</span><span class="special">==(</span><span class="keyword">const</span> <span class="identifier">directory_entry</span> <span class="special">&amp;</span> <span class="identifier">rhs</span><span class="special">)</span></pre>

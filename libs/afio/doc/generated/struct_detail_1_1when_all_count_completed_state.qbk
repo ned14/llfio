@@ -27,6 +27,14 @@
 [heading Constructor(s)]
 [table
 [[Function] [Description] [Parameters] ]
+[[``when_all_count_completed_state(std::vector< async_io_op > _inputs)``
+
+] [] [[* std::vector< async_io_op >]: ['_inputs]:  
+
+
+
+
+]]
 [[``when_all_count_completed_state(std::vector< async_io_op >::iterator first, std::vector< async_io_op >::iterator last)``
 
 ] [] [[* std::vector< async_io_op >::iterator]: ['first]:  

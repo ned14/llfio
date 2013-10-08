@@ -7,7 +7,7 @@
 =============================================================================/]
 
 [library Boost.AFIO
-    [quickbook 1.7]
+    [quickbook 1.6]
     [version 1.1]
     [id afio]
     [category afio]

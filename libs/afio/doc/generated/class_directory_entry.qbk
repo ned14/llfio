@@ -45,17 +45,17 @@ Note that [^`directory_entry_hash`] will hash one of these for you, and a [^`std
 
 
 ]]
-[[``directory_entry(const directory_entry & other)``
+[[``directory_entry(const directory_entry & )``
 
-] [Copy constructor. ] [[* const directory_entry &]: ['other]:  
+] [] [[* const directory_entry &]: [']:  
 
 
 
 
 ]]
-[[``directory_entry(directory_entry && other)``
+[[``directory_entry(directory_entry && o)``
 
-] [Move constructor. ] [[* directory_entry &&]: ['other]:  
+] [] [[* directory_entry &&]: ['o]:  
 
 
 
@@ -66,6 +66,22 @@ Note that [^`directory_entry_hash`] will hash one of these for you, and a [^`std
 [heading Member Function(s)]
 [table
 [[Function] [Description] [Parameters]  [Returns]]
+[[``directory_entry & operator=(const directory_entry & )``
+
+] [] [[* const directory_entry &]: [']:  
+
+
+
+
+]]
+[[``directory_entry & operator=(directory_entry && o)``
+
+] [] [[* directory_entry &&]: ['o]:  
+
+
+
+
+]]
 [[``bool operator==(const directory_entry & rhs)``
 
 ] [] [[* const directory_entry &]: ['rhs]:  
