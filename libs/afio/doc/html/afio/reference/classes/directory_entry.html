@@ -27,7 +27,7 @@
 <a name="afio.reference.classes.directory_entry"></a><a class="link" href="directory_entry.html" title="directory_entry">directory_entry</a>
 </h4></div></div></div>
 <p>
-          <a class="indexterm" name="id978742"></a>
+          <a class="indexterm" name="id977743"></a>
 The abstract base class for an entry in a directory with lazily filled
           metadata.
         </p>
@@ -319,8 +319,7 @@ The abstract base class for an entry in a directory with lazily filled
                   <p>
                     <span class="bold"><strong>std::shared_ptr&lt; async_io_handle &gt;</strong></span>:
                     <span class="emphasis"><em>dirh</em></span>: An open handle to the entry's containing
-                    directory. You can get this from the h shared future member variable
-                    in an op ref.
+                    directory. You can get this from an op ref using when_all(dirop).get().front().
                   </p>
                   <p>
                     <span class="bold"><strong>metadata_flags</strong></span>: <span class="emphasis"><em>wanted</em></span>:
@@ -349,8 +348,7 @@ The abstract base class for an entry in a directory with lazily filled
                   <p>
                     <span class="bold"><strong>std::shared_ptr&lt; async_io_handle &gt;</strong></span>:
                     <span class="emphasis"><em>dirh</em></span>: An open handle to the entry's containing
-                    directory. You can get this from the h shared future member variable
-                    in an op ref.
+                    directory. You can get this from an op ref using when_all(dirop).get().front().
                   </p>
                   <p>
                     <span class="bold"><strong>metadata_flags</strong></span>: <span class="emphasis"><em>wanted</em></span>:
@@ -379,8 +377,8 @@ The abstract base class for an entry in a directory with lazily filled
                     <span class="bold"><strong>std::shared_ptr&lt; async_io_handle &gt;</strong></span>:
                     <span class="emphasis"><em>dirh</em></span>: An optional open handle to the entry's
                     containing directory if fetching missing metadata is desired
-                    (an exception is thrown otherwise). You can get this from the
-                    h shared future member variable in an op ref.
+                    (an exception is thrown otherwise). You can get this from an
+                    op ref using when_all(dirop).get().front().
                   </p>
                 </td>
 </tr>
@@ -398,8 +396,8 @@ The abstract base class for an entry in a directory with lazily filled
                     <span class="bold"><strong>std::shared_ptr&lt; async_io_handle &gt;</strong></span>:
                     <span class="emphasis"><em>dirh</em></span>: An optional open handle to the entry's
                     containing directory if fetching missing metadata is desired
-                    (an exception is thrown otherwise). You can get this from the
-                    h shared future member variable in an op ref.
+                    (an exception is thrown otherwise). You can get this from an
+                    op ref using when_all(dirop).get().front().
                   </p>
                 </td>
 </tr>
@@ -417,8 +415,8 @@ The abstract base class for an entry in a directory with lazily filled
                     <span class="bold"><strong>std::shared_ptr&lt; async_io_handle &gt;</strong></span>:
                     <span class="emphasis"><em>dirh</em></span>: An optional open handle to the entry's
                     containing directory if fetching missing metadata is desired
-                    (an exception is thrown otherwise). You can get this from the
-                    h shared future member variable in an op ref.
+                    (an exception is thrown otherwise). You can get this from an
+                    op ref using when_all(dirop).get().front().
                   </p>
                 </td>
 </tr>
@@ -436,8 +434,8 @@ The abstract base class for an entry in a directory with lazily filled
                     <span class="bold"><strong>std::shared_ptr&lt; async_io_handle &gt;</strong></span>:
                     <span class="emphasis"><em>dirh</em></span>: An optional open handle to the entry's
                     containing directory if fetching missing metadata is desired
-                    (an exception is thrown otherwise). You can get this from the
-                    h shared future member variable in an op ref.
+                    (an exception is thrown otherwise). You can get this from an
+                    op ref using when_all(dirop).get().front().
                   </p>
                 </td>
 </tr>
@@ -455,8 +453,8 @@ The abstract base class for an entry in a directory with lazily filled
                     <span class="bold"><strong>std::shared_ptr&lt; async_io_handle &gt;</strong></span>:
                     <span class="emphasis"><em>dirh</em></span>: An optional open handle to the entry's
                     containing directory if fetching missing metadata is desired
-                    (an exception is thrown otherwise). You can get this from the
-                    h shared future member variable in an op ref.
+                    (an exception is thrown otherwise). You can get this from an
+                    op ref using when_all(dirop).get().front().
                   </p>
                 </td>
 </tr>
@@ -474,8 +472,8 @@ The abstract base class for an entry in a directory with lazily filled
                     <span class="bold"><strong>std::shared_ptr&lt; async_io_handle &gt;</strong></span>:
                     <span class="emphasis"><em>dirh</em></span>: An optional open handle to the entry's
                     containing directory if fetching missing metadata is desired
-                    (an exception is thrown otherwise). You can get this from the
-                    h shared future member variable in an op ref.
+                    (an exception is thrown otherwise). You can get this from an
+                    op ref using when_all(dirop).get().front().
                   </p>
                 </td>
 </tr>
@@ -493,8 +491,8 @@ The abstract base class for an entry in a directory with lazily filled
                     <span class="bold"><strong>std::shared_ptr&lt; async_io_handle &gt;</strong></span>:
                     <span class="emphasis"><em>dirh</em></span>: An optional open handle to the entry's
                     containing directory if fetching missing metadata is desired
-                    (an exception is thrown otherwise). You can get this from the
-                    h shared future member variable in an op ref.
+                    (an exception is thrown otherwise). You can get this from an
+                    op ref using when_all(dirop).get().front().
                   </p>
                 </td>
 </tr>
@@ -512,8 +510,8 @@ The abstract base class for an entry in a directory with lazily filled
                     <span class="bold"><strong>std::shared_ptr&lt; async_io_handle &gt;</strong></span>:
                     <span class="emphasis"><em>dirh</em></span>: An optional open handle to the entry's
                     containing directory if fetching missing metadata is desired
-                    (an exception is thrown otherwise). You can get this from the
-                    h shared future member variable in an op ref.
+                    (an exception is thrown otherwise). You can get this from an
+                    op ref using when_all(dirop).get().front().
                   </p>
                 </td>
 </tr>
@@ -531,8 +529,8 @@ The abstract base class for an entry in a directory with lazily filled
                     <span class="bold"><strong>std::shared_ptr&lt; async_io_handle &gt;</strong></span>:
                     <span class="emphasis"><em>dirh</em></span>: An optional open handle to the entry's
                     containing directory if fetching missing metadata is desired
-                    (an exception is thrown otherwise). You can get this from the
-                    h shared future member variable in an op ref.
+                    (an exception is thrown otherwise). You can get this from an
+                    op ref using when_all(dirop).get().front().
                   </p>
                 </td>
 </tr>
@@ -550,8 +548,8 @@ The abstract base class for an entry in a directory with lazily filled
                     <span class="bold"><strong>std::shared_ptr&lt; async_io_handle &gt;</strong></span>:
                     <span class="emphasis"><em>dirh</em></span>: An optional open handle to the entry's
                     containing directory if fetching missing metadata is desired
-                    (an exception is thrown otherwise). You can get this from the
-                    h shared future member variable in an op ref.
+                    (an exception is thrown otherwise). You can get this from an
+                    op ref using when_all(dirop).get().front().
                   </p>
                 </td>
 </tr>
@@ -569,8 +567,8 @@ The abstract base class for an entry in a directory with lazily filled
                     <span class="bold"><strong>std::shared_ptr&lt; async_io_handle &gt;</strong></span>:
                     <span class="emphasis"><em>dirh</em></span>: An optional open handle to the entry's
                     containing directory if fetching missing metadata is desired
-                    (an exception is thrown otherwise). You can get this from the
-                    h shared future member variable in an op ref.
+                    (an exception is thrown otherwise). You can get this from an
+                    op ref using when_all(dirop).get().front().
                   </p>
                 </td>
 </tr>
@@ -588,8 +586,8 @@ The abstract base class for an entry in a directory with lazily filled
                     <span class="bold"><strong>std::shared_ptr&lt; async_io_handle &gt;</strong></span>:
                     <span class="emphasis"><em>dirh</em></span>: An optional open handle to the entry's
                     containing directory if fetching missing metadata is desired
-                    (an exception is thrown otherwise). You can get this from the
-                    h shared future member variable in an op ref.
+                    (an exception is thrown otherwise). You can get this from an
+                    op ref using when_all(dirop).get().front().
                   </p>
                 </td>
 </tr>
@@ -607,8 +605,8 @@ The abstract base class for an entry in a directory with lazily filled
                     <span class="bold"><strong>std::shared_ptr&lt; async_io_handle &gt;</strong></span>:
                     <span class="emphasis"><em>dirh</em></span>: An optional open handle to the entry's
                     containing directory if fetching missing metadata is desired
-                    (an exception is thrown otherwise). You can get this from the
-                    h shared future member variable in an op ref.
+                    (an exception is thrown otherwise). You can get this from an
+                    op ref using when_all(dirop).get().front().
                   </p>
                 </td>
 </tr>
@@ -626,8 +624,8 @@ The abstract base class for an entry in a directory with lazily filled
                     <span class="bold"><strong>std::shared_ptr&lt; async_io_handle &gt;</strong></span>:
                     <span class="emphasis"><em>dirh</em></span>: An optional open handle to the entry's
                     containing directory if fetching missing metadata is desired
-                    (an exception is thrown otherwise). You can get this from the
-                    h shared future member variable in an op ref.
+                    (an exception is thrown otherwise). You can get this from an
+                    op ref using when_all(dirop).get().front().
                   </p>
                 </td>
 </tr>
@@ -645,8 +643,8 @@ The abstract base class for an entry in a directory with lazily filled
                     <span class="bold"><strong>std::shared_ptr&lt; async_io_handle &gt;</strong></span>:
                     <span class="emphasis"><em>dirh</em></span>: An optional open handle to the entry's
                     containing directory if fetching missing metadata is desired
-                    (an exception is thrown otherwise). You can get this from the
-                    h shared future member variable in an op ref.
+                    (an exception is thrown otherwise). You can get this from an
+                    op ref using when_all(dirop).get().front().
                   </p>
                 </td>
 </tr>
@@ -664,8 +662,8 @@ The abstract base class for an entry in a directory with lazily filled
                     <span class="bold"><strong>std::shared_ptr&lt; async_io_handle &gt;</strong></span>:
                     <span class="emphasis"><em>dirh</em></span>: An optional open handle to the entry's
                     containing directory if fetching missing metadata is desired
-                    (an exception is thrown otherwise). You can get this from the
-                    h shared future member variable in an op ref.
+                    (an exception is thrown otherwise). You can get this from an
+                    op ref using when_all(dirop).get().front().
                   </p>
                 </td>
 </tr>
@@ -683,8 +681,8 @@ The abstract base class for an entry in a directory with lazily filled
                     <span class="bold"><strong>std::shared_ptr&lt; async_io_handle &gt;</strong></span>:
                     <span class="emphasis"><em>dirh</em></span>: An optional open handle to the entry's
                     containing directory if fetching missing metadata is desired
-                    (an exception is thrown otherwise). You can get this from the
-                    h shared future member variable in an op ref.
+                    (an exception is thrown otherwise). You can get this from an
+                    op ref using when_all(dirop).get().front().
                   </p>
                 </td>
 </tr>
@@ -702,8 +700,8 @@ The abstract base class for an entry in a directory with lazily filled
                     <span class="bold"><strong>std::shared_ptr&lt; async_io_handle &gt;</strong></span>:
                     <span class="emphasis"><em>dirh</em></span>: An optional open handle to the entry's
                     containing directory if fetching missing metadata is desired
-                    (an exception is thrown otherwise). You can get this from the
-                    h shared future member variable in an op ref.
+                    (an exception is thrown otherwise). You can get this from an
+                    op ref using when_all(dirop).get().front().
                   </p>
                 </td>
 </tr>

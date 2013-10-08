@@ -27,7 +27,7 @@
 <a name="afio.reference.structs.async_io_op"></a><a class="link" href="async_io_op.html" title="async_io_op">async_io_op</a>
 </h4></div></div></div>
 <p>
-          <a class="indexterm" name="id895626"></a>
+          <a class="indexterm" name="id894136"></a>
 A reference to an asynchronous operation.
         </p>
 <h6>
@@ -40,7 +40,7 @@ A reference to an asynchronous operation.
           the same op, only becomes a non-default shared_future when the op has actually
           begun execution. You should therefore <span class="bold"><strong>never</strong></span>
           try waiting via h-&gt;get() until you are absolutely sure that the op has
-          already started.
+          already started, instead do when_all(op).get().front().
         </p>
 <h6>
 <a name="afio.reference.structs.async_io_op.h1"></a>

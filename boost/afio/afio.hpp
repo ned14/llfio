@@ -546,7 +546,7 @@ public:
     metadata_flags metadata_ready() const BOOST_NOEXCEPT_OR_NOTHROW { return have_metadata; }
     /*! \brief Fetches the specified metadata, returning that newly available. This is a blocking call if wanted metadata is not yet ready.
     \return The metadata now available in this directory entry.
-    \param dirh An open handle to the entry's containing directory. You can get this from the h shared future member variable in an op ref.
+    \param dirh An open handle to the entry's containing directory. You can get this from an op ref using when_all(dirop).get().front().
     \param wanted A bitfield of the metadata to fetch. This does not replace existing metadata.
     */
     metadata_flags fetch_metadata(std::shared_ptr<async_io_handle> dirh, metadata_flags wanted)
@@ -559,7 +559,7 @@ public:
     }
     /*! \brief Returns a copy of the internal `stat_t` structure. This is a blocking call if wanted metadata is not yet ready.
     \return A copy of the internal `stat_t` structure.
-    \param dirh An open handle to the entry's containing directory. You can get this from the h shared future member variable in an op ref.
+    \param dirh An open handle to the entry's containing directory. You can get this from an op ref using when_all(dirop).get().front().
     \param wanted A bitfield of the metadata to fetch. This does not replace existing metadata.
     */
     stat_t fetch_lstat(std::shared_ptr<async_io_handle> dirh, metadata_flags wanted=directory_entry::metadata_fastpath())
@@ -575,41 +575,41 @@ decltype(stat_t().st_##field) st_##field(std::shared_ptr<async_io_handle> dirh) 
 #define BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(field) \
 decltype(stat_t().st_##field) st_##field(std::shared_ptr<async_io_handle> dirh=std::shared_ptr<async_io_handle>()) { if(!(have_metadata&metadata_flags::field)) { _int_fetch(metadata_flags::field, dirh); } return stat.st_##field; }
 #endif
-    //! Returns st_dev \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from the h shared future member variable in an op ref.
+    //! Returns st_dev \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using when_all(dirop).get().front().
     BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(dev)
-    //! Returns st_ino \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from the h shared future member variable in an op ref.
+    //! Returns st_ino \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using when_all(dirop).get().front().
     BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(ino)
-    //! Returns st_type \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from the h shared future member variable in an op ref.
+    //! Returns st_type \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using when_all(dirop).get().front().
     BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(type)
-    //! Returns st_mode \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from the h shared future member variable in an op ref.
+    //! Returns st_mode \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using when_all(dirop).get().front().
     BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(mode)
-    //! Returns st_nlink \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from the h shared future member variable in an op ref.
+    //! Returns st_nlink \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using when_all(dirop).get().front().
     BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(nlink)
-    //! Returns st_uid \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from the h shared future member variable in an op ref.
+    //! Returns st_uid \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using when_all(dirop).get().front().
     BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(uid)
-    //! Returns st_gid \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from the h shared future member variable in an op ref.
+    //! Returns st_gid \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using when_all(dirop).get().front().
     BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(gid)
-    //! Returns st_rdev \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from the h shared future member variable in an op ref.
+    //! Returns st_rdev \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using when_all(dirop).get().front().
     BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(rdev)
-    //! Returns st_atim \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from the h shared future member variable in an op ref.
+    //! Returns st_atim \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using when_all(dirop).get().front().
     BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(atim)
-    //! Returns st_mtim \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from the h shared future member variable in an op ref.
+    //! Returns st_mtim \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using when_all(dirop).get().front().
     BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(mtim)
-    //! Returns st_ctim \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from the h shared future member variable in an op ref.
+    //! Returns st_ctim \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using when_all(dirop).get().front().
     BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(ctim)
-    //! Returns st_size \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from the h shared future member variable in an op ref.
+    //! Returns st_size \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using when_all(dirop).get().front().
     BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(size)
-    //! Returns st_allocated \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from the h shared future member variable in an op ref.
+    //! Returns st_allocated \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using when_all(dirop).get().front().
     BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(allocated)
-    //! Returns st_blocks \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from the h shared future member variable in an op ref.
+    //! Returns st_blocks \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using when_all(dirop).get().front().
     BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(blocks)
-    //! Returns st_blksize \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from the h shared future member variable in an op ref.
+    //! Returns st_blksize \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using when_all(dirop).get().front().
     BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(blksize)
-    //! Returns st_flags \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from the h shared future member variable in an op ref.
+    //! Returns st_flags \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using when_all(dirop).get().front().
     BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(flags)
-    //! Returns st_gen \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from the h shared future member variable in an op ref.
+    //! Returns st_gen \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using when_all(dirop).get().front().
     BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(gen)
-    //! Returns st_birthtim \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from the h shared future member variable in an op ref.
+    //! Returns st_birthtim \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using when_all(dirop).get().front().
     BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(birthtim)
 
     //! A bitfield of what metadata is available on this platform. This doesn't mean all is available for every filing system.
@@ -1383,7 +1383,7 @@ BOOST_AFIO_HEADERS_ONLY_FUNC_SPEC std::shared_ptr<async_file_io_dispatcher_base>
 The id field is always valid (and non-zero) if this reference is valid. The h field, being the shared state
 between all references referring to the same op, only becomes a non-default shared_future when the op has
 actually begun execution. You should therefore \b never try waiting via h->get() until you are absolutely sure
-that the op has already started.
+that the op has already started, instead do when_all(op).get().front().
 */
 struct async_io_op
 {

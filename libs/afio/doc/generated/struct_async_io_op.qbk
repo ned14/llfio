@@ -15,7 +15,7 @@
 A reference to an asynchronous operation. 
 
 [heading Description]
-The id field is always valid (and non-zero) if this reference is valid. The h field, being the shared state between all references referring to the same op, only becomes a non-default shared\u005ffuture when the op has actually begun execution. You should therefore [*never] try waiting via h->get() until you are absolutely sure that the op has already started. 
+The id field is always valid (and non-zero) if this reference is valid. The h field, being the shared state between all references referring to the same op, only becomes a non-default shared\u005ffuture when the op has actually begun execution. You should therefore [*never] try waiting via h->get() until you are absolutely sure that the op has already started, instead do when\u005fall(op).get().front(). 
 
 [heading Synopsis]
 ``struct async_io_op
