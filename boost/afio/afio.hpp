@@ -1497,6 +1497,7 @@ namespace detail
     {
 #ifdef BOOST_AFIO_NEED_CURRENT_EXCEPTION_HACK
         // VS2010 segfaults if you ever do a try { throw; } catch(...) without an exception ever having been thrown :(
+        exception_ptr e;
         try
         {
             throw detail::vs2010_lack_of_decent_current_exception_support_hack_t();
@@ -1504,32 +1505,42 @@ namespace detail
         catch(...)
         {
             detail::vs2010_lack_of_decent_current_exception_support_hack()=boost::current_exception();
+            try
+            {
 #endif
-            std::vector<async_io_op> &inputs=state->inputs;
+                std::vector<async_io_op> &inputs=state->inputs;
 #if BOOST_AFIO_VALIDATE_INPUTS
-            BOOST_FOREACH(auto &i, inputs)
-            {
-                if(!i.validate(false))
-                    BOOST_AFIO_THROW(std::runtime_error("Inputs are invalid."));
-            }
+                BOOST_FOREACH(auto &i, inputs)
+                {
+                    if(!i.validate(false))
+                        BOOST_AFIO_THROW(std::runtime_error("Inputs are invalid."));
+                }
 #endif
-            std::vector<std::pair<async_op_flags, std::function<async_file_io_dispatcher_base::completion_t>>> callbacks;
-            callbacks.reserve(inputs.size());
-            size_t idx=0;
-            BOOST_FOREACH(auto &i, inputs)
-            {
-                callbacks.push_back(std::make_pair(async_op_flags::ImmediateCompletion/*safe if nothrow*/, std::bind(&detail::when_all_count_completed_nothrow, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, state, idx++)));
-            }
-            inputs.front().parent->completion(inputs, callbacks);
-            return state->done.get_future();
+                std::vector<std::pair<async_op_flags, std::function<async_file_io_dispatcher_base::completion_t>>> callbacks;
+                callbacks.reserve(inputs.size());
+                size_t idx=0;
+                BOOST_FOREACH(auto &i, inputs)
+                {
+                    callbacks.push_back(std::make_pair(async_op_flags::ImmediateCompletion/*safe if nothrow*/, std::bind(&detail::when_all_count_completed_nothrow, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, state, idx++)));
+                }
+                inputs.front().parent->completion(inputs, callbacks);
+                return state->done.get_future();
 #ifdef BOOST_AFIO_NEED_CURRENT_EXCEPTION_HACK
+            }
+            catch(...)
+            {
+                e=afio::make_exception_ptr(afio::current_exception());
+            }
         }
+        if(e)
+            rethrow_exception(e);
 #endif
     }
     inline future<std::vector<std::shared_ptr<async_io_handle>>> when_all(std::shared_ptr<detail::when_all_count_completed_state> state)
     {
 #ifdef BOOST_AFIO_NEED_CURRENT_EXCEPTION_HACK
         // VS2010 segfaults if you ever do a try { throw; } catch(...) without an exception ever having been thrown :(
+        exception_ptr e;
         try
         {
             throw detail::vs2010_lack_of_decent_current_exception_support_hack_t();
@@ -1537,26 +1548,35 @@ namespace detail
         catch(...)
         {
             detail::vs2010_lack_of_decent_current_exception_support_hack()=boost::current_exception();
+            try
+            {
 #endif
-            std::vector<async_io_op> &inputs=state->inputs;
+                std::vector<async_io_op> &inputs=state->inputs;
 #if BOOST_AFIO_VALIDATE_INPUTS
-            BOOST_FOREACH(auto &i, inputs)
-            {
-                if(!i.validate(false))
-                    BOOST_AFIO_THROW(std::runtime_error("Inputs are invalid."));
-            }
+                BOOST_FOREACH(auto &i, inputs)
+                {
+                    if(!i.validate(false))
+                        BOOST_AFIO_THROW(std::runtime_error("Inputs are invalid."));
+                }
 #endif
-            std::vector<std::pair<async_op_flags, std::function<async_file_io_dispatcher_base::completion_t>>> callbacks;
-            callbacks.reserve(inputs.size());
-            size_t idx=0;
-            BOOST_FOREACH(auto &i, inputs)
-            {
-                callbacks.push_back(std::make_pair(async_op_flags::None/*can't be immediate as may try to retrieve exception state of own precondition*/, std::bind(&detail::when_all_count_completed, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, state, idx++)));
-            }
-            inputs.front().parent->completion(inputs, callbacks);
-            return state->done.get_future();
+                std::vector<std::pair<async_op_flags, std::function<async_file_io_dispatcher_base::completion_t>>> callbacks;
+                callbacks.reserve(inputs.size());
+                size_t idx=0;
+                BOOST_FOREACH(auto &i, inputs)
+                {
+                    callbacks.push_back(std::make_pair(async_op_flags::None/*can't be immediate as may try to retrieve exception state of own precondition*/, std::bind(&detail::when_all_count_completed, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, state, idx++)));
+                }
+                inputs.front().parent->completion(inputs, callbacks);
+                return state->done.get_future();
 #ifdef BOOST_AFIO_NEED_CURRENT_EXCEPTION_HACK
+            }
+            catch(...)
+            {
+                e=afio::make_exception_ptr(afio::current_exception());
+            }
         }
+        if(e)
+            rethrow_exception(e);
 #endif
     }
 }
