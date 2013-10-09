@@ -60,12 +60,13 @@ File Created: Mar 2013
 #define UNW_LOCAL_ONLY
 #include <libunwind.h>
 #else
-#ifdef __linux__
-#include <execinfo.h>
-#else
+#ifndef __linux__
 #undef BOOST_AFIO_OP_STACKBACKTRACEDEPTH
 #endif
 #endif
+#endif
+#ifdef __linux__
+#include <execinfo.h>
 #endif
 
 #include "../../afio.hpp"
@@ -234,6 +235,14 @@ namespace detail {
     BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC void print_fatal_exception_message_to_stderr(const char *msg)
     {
         std::cerr << "FATAL EXCEPTION: " << msg << std::endl;
+#if !defined(BOOST_AFIO_COMPILING_FOR_GCOV) && defined(__linux__)
+        void *array[20];
+        size_t size=backtrace(array, 20);
+        char **strings=backtrace_symbols(array, size);
+        for(size_t i=0; i<size; i++)
+            std::cerr << "   " << strings[i] << std::endl;
+        free(strings);
+#endif
     }
 
     struct async_io_handle_posix : public async_io_handle
