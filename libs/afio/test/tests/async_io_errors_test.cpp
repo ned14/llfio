@@ -111,19 +111,16 @@ BOOST_AFIO_AUTO_TEST_CASE(async_io_errors, "Tests that the async i/o error handl
                 }
             } while(false);
         }
-
-        //while(dispatcher->wait_queue_depth()>0)
-        //  boost::this_thread::yield();
-        if(filesystem::exists("testdir/a"))
-            filesystem::remove("testdir/a");
-        if(filesystem::exists("testdir"))
-            filesystem::remove("testdir");
     }
     catch(...)
     {
         std::cerr << boost::current_exception_diagnostic_information(true) << std::endl;
         BOOST_CHECK(false);
     }
+    if(filesystem::exists("testdir/a"))
+        filesystem::remove("testdir/a");
+    if(filesystem::exists("testdir"))
+        filesystem::remove("testdir");
     // Add a single output to validate the test
     BOOST_CHECK(true);
 }

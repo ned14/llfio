@@ -130,10 +130,17 @@ template<class T> inline void wrap_test_method(T &t)
     catch(...)
     {
         boost::afio::detail::vs2010_lack_of_decent_current_exception_support_hack()=boost::current_exception();
-        t.test_method();
+#endif
+        try
+        {
+            t.test_method();
+        }
+        catch(...)
+        {
+            std::cerr << "ERROR: unit test exits via exception. Exception was " << boost::current_exception_diagnostic_information(true) << std::endl;
+        }
+#ifdef BOOST_AFIO_NEED_CURRENT_EXCEPTION_HACK
     }
-#else
-    t.test_method();
 #endif
 }
 
@@ -517,7 +524,7 @@ static void evil_random_io(std::shared_ptr<boost::afio::async_file_io_dispatcher
                             manywrittenfiles[n]=dispatcher->write(op.req);
                     }
                     else
-                        manywrittenfiles[n]=dispatcher->completion(dispatcher->read(op.req), std::pair<boost::afio::async_op_flags, std::function<boost::afio::async_file_io_dispatcher_base::completion_t>>(boost::afio::async_op_flags::ImmediateCompletion, std::bind(checkHash, ref(op), towriteptrs[n], placeholders::_1, placeholders::_2)));
+                        manywrittenfiles[n]=dispatcher->completion(dispatcher->read(op.req), std::pair<boost::afio::async_op_flags, std::function<boost::afio::async_file_io_dispatcher_base::completion_t>>(boost::afio::async_op_flags::None, std::bind(checkHash, ref(op), towriteptrs[n], placeholders::_1, placeholders::_2)));
             }
             // After replay, read the entire file into memory
             manywrittenfiles[n]=dispatcher->read(boost::afio::async_data_op_req<char>(manywrittenfiles[n], towriteptrs[n], towritesizes[n], 0));
