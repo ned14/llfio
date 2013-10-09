@@ -10,7 +10,7 @@ Created: Feb 2013
 #define DEBUG_TORTURE_TEST 1
 
 // Reduces CPU cores used to execute, which can be useful for certain kinds of race condition.
-//#define MAXIMUM_TEST_CPUS 1
+#define MAXIMUM_TEST_CPUS 1
 
 #ifdef __MINGW32__
 // Mingw doesn't define putenv() needed by Boost.Test
@@ -72,6 +72,13 @@ static inline void set_maximum_cpus(size_t no=MAXIMUM_TEST_CPUS)
         std::cerr << "ERROR: Failed to set process affinity mask due to reason " << GetLastError() << std::endl;
         abort();
     }
+#endif
+#ifdef __linux__
+    cpu_set_t mask;
+    CPU_ZERO(&mask);
+    for(size_t n=0; n<no; n++)
+        CPU_SET(n, &mask);
+    sched_setaffinity(getpid(), sizeof(mask), &mask);
 #endif
 }
 #else
