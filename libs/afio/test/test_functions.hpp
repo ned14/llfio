@@ -29,6 +29,7 @@ extern "C" void tzset(void);
 #include "../../../boost/afio/afio.hpp"
 #include "../detail/SpookyV2.h"
 #include "../../../boost/afio/detail/Aligned_Allocator.hpp"
+#include "../../../boost/afio/detail/MemoryTransactions.hpp"
 #include "../../../boost/afio/detail/valgrind/memcheck.h"
 #include <time.h>
 
