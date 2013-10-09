@@ -103,7 +103,14 @@ private:
         copyable_packaged_task(copyable_packaged_task &&v) BOOST_NOEXCEPT_OR_NOTHROW : std::shared_ptr<packaged_task<T>>(std::move(v)) { }
         void operator()()
         {
-            (*std::shared_ptr<packaged_task<T>>::get())();
+            try
+            {
+                (*std::shared_ptr<packaged_task<T>>::get())();
+            }
+            catch(...)
+            {
+                std::cerr << "WARNING: packaged_task<> exits via exception which shouldn't happen. Exception was " << boost::current_exception_diagnostic_information(true) << std::endl;
+            }
         }
     };
 #endif
@@ -161,10 +168,17 @@ class std_thread_pool : public thread_source {
             catch(...)
             {
                 detail::vs2010_lack_of_decent_current_exception_support_hack()=boost::current_exception();
-                pool->service.run();
+#endif
+                try
+                {
+                    pool->service.run();
+                }
+                catch(...)
+                {
+                    std::cerr << "WARNING: ASIO exits via exception which shouldn't happen. Exception was " << boost::current_exception_diagnostic_information(true) << std::endl;
+                }
+#ifdef BOOST_AFIO_NEED_CURRENT_EXCEPTION_HACK
             }
-#else
-            pool->service.run();
 #endif
         }
     };
