@@ -1356,11 +1356,13 @@ template<class F, class... Args> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC async_io_o
         } \
         BOOST_AFIO_DEBUG_PRINT("I %u < %u (%s)\n", (unsigned) thisid, (unsigned) precondition.id, detail::optypes[static_cast<int>(optype)]); \
         auto unopsit=boost::afio::detail::Undoer([this, thisid](){ \
+            std::string what; \
+            try { throw; } catch(std::exception &e) { what=e.what(); } catch(boost::exception &) { what="boost exception"; } catch(...) { what="not a std exception"; } \
+            BOOST_AFIO_DEBUG_PRINT("E X %u (%s)\n", (unsigned) thisid, what.c_str()); \
             BOOST_BEGIN_MEMORY_TRANSACTION(p->opslock) \
             { \
                 auto opsit=p->ops.find(thisid); \
                 p->ops.erase(opsit); \
-                BOOST_AFIO_DEBUG_PRINT("E X %u\n", (unsigned) thisid); \
             } \
             BOOST_END_MEMORY_TRANSACTION(p->opslock) \
         }); \
@@ -1403,10 +1405,9 @@ template<class F, class... Args> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC async_io_o
                 /* if any of the preconditions are errored, but if they became errored between then and*/ \
                 /* now we can hardly abort half way through a batch op without leaving around stuck ops.*/ \
                 /* No, instead we simulate as if the precondition had not yet become ready.*/ \
-                if(precondition.h->has_exception()) \
-                    *he=get_exception_ptr(f);\
-                else \
-                    h=f.get();\
+                *he=get_exception_ptr(f); \
+                if(!*he) \
+                    h=f.get(); \
             }\
             else if(precondition.id)\
             {\
@@ -1414,12 +1415,26 @@ template<class F, class... Args> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC async_io_o
                 /* which indicates it completed and yet h remains invalid*/\
                 BOOST_AFIO_THROW_FATAL(std::runtime_error("Precondition was not in list of extant ops, yet its future is invalid. This should never happen for any real op, so it's probably memory corruption.")); \
             }\
-            if(!!(flags & async_op_flags::ImmediateCompletion))\
-            {\
-                *ret.h=immediates.enqueue(std::bind(boundf.second, h, he)).share();\
-            }\
-            else\
-                *ret.h=p->pool->enqueue(std::bind(boundf.second, h, nullptr)).share();\
+            if(!!(flags & async_op_flags::ImmediateCompletion)) \
+            { \
+                if(!!(flags & async_op_flags::DetachedFuture)) \
+                { \
+                    *ret.h=thisop->detached_promise->get_future(); \
+                    immediates.enqueue(std::bind(boundf.second, h, he)); \
+                } \
+                else \
+                    *ret.h=immediates.enqueue(std::bind(boundf.second, h, he)).share(); \
+            } \
+            else \
+            { \
+                if(!!(flags & async_op_flags::DetachedFuture)) \
+                { \
+                    *ret.h=thisop->detached_promise->get_future(); \
+                    p->pool->enqueue(std::bind(boundf.second, h, nullptr)); \
+                } \
+                else \
+                    *ret.h=p->pool->enqueue(std::bind(boundf.second, h, nullptr)).share(); \
+            } \
         }\
         unopsit.dismiss();\
         undep.dismiss();\
