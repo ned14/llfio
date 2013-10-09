@@ -10,7 +10,7 @@ Created: Feb 2013
 #define DEBUG_TORTURE_TEST 1
 
 // Reduces CPU cores used to execute, which can be useful for certain kinds of race condition.
-#define MAXIMUM_TEST_CPUS 1
+//#define MAXIMUM_TEST_CPUS 1
 
 #ifdef __MINGW32__
 // Mingw doesn't define putenv() needed by Boost.Test
@@ -294,7 +294,7 @@ static void _1000_open_write_close_deletes(std::shared_ptr<boost::afio::async_fi
         cout << "It took " << diff.count() << " secs to do " << manyfilereqs.size()/diff.count() << " file deletions per sec" << endl;
 
         // Fetch any outstanding error
-        rmdir.h->get();
+        when_all(rmdir).wait();
         BOOST_CHECK((callcount==1000U));
     } catch(...) {
         std::cerr << boost::current_exception_diagnostic_information(true) << std::endl;
@@ -481,7 +481,7 @@ static void evil_random_io(std::shared_ptr<boost::afio::async_file_io_dispatcher
     auto manywrittenfiles(dispatcher->truncate(manyopenfiles, sizes));
 #if defined(_DEBUG) && 0
     for(size_t n=0; n<manywrittenfiles.size(); n++)
-            cout << n << ": " << manywrittenfiles[n].id << " (" << manywrittenfiles[n].h->get()->path() << ") " << endl;
+            cout << n << ": " << manywrittenfiles[n].id << " (" << when_all(manywrittenfiles[n]).get().front()->path() << ") " << endl;
 #endif
     // Schedule a replay of our in-RAM simulation
     size_t maxfailures=0;
@@ -564,8 +564,8 @@ static void evil_random_io(std::shared_ptr<boost::afio::async_file_io_dispatcher
     diff=chrono::duration_cast<secs_type>(end-begin);
     BOOST_FOREACH(auto &i, manyclosedfiles)
     {
-            readed+=i.h->get()->read_count();
-            written+=i.h->get()->write_count();
+            readed+=when_all(i).get().front()->read_count();
+            written+=when_all(i).get().front()->write_count();
     }
     for(ptrdiff_t n=0; n<(ptrdiff_t) no; n++)
             ops+=todo[n].size();
@@ -583,17 +583,18 @@ static void evil_random_io(std::shared_ptr<boost::afio::async_file_io_dispatcher
     if(!failures.empty())
     {
             pair<Op *, size_t> *failedop;
-            cout << "The following hash failures occurred:" << endl;
+            cerr << "The following hash failures occurred:" << endl;
             while(failures.pop(failedop))
             {
                 auto undofailedop=boost::afio::detail::Undoer([&failedop]{ delete failedop; });
                 size_t bytes=0;
                 BOOST_FOREACH(auto &b, failedop->first->req.buffers)
                     bytes+=boost::asio::buffer_size(b);
-                cout << "   " << (failedop->first->write ? "Write to" : "Read from") << " " << boost::to_string(failedop->first->req.where) << " at offset " << failedop->second << " into bytes " << bytes << endl;
+                cerr << "   " << (failedop->first->write ? "Write to" : "Read from") << " " << boost::to_string(failedop->first->req.where) << " at offset " << failedop->second << " into bytes " << bytes << endl;
             }
     }
     BOOST_TEST_MESSAGE("Checking if the final files have exactly the right contents ... this may take a bit ...");
+    cout << "Checking if the final files have exactly the right contents ... this may take a bit ..." << endl;
     {
         // a vector for holding hash results from SpookyHash
         //SpookyHash returns 2 64bit integers for a 128 bit hash, so we store them as a pair
@@ -617,6 +618,7 @@ static void evil_random_io(std::shared_ptr<boost::afio::async_file_io_dispatcher
             {
                     string failmsg("File "+boost::to_string(n)+" contents were not what they were supposed to be!");
                     BOOST_TEST_MESSAGE(failmsg.c_str());
+                    std::cerr << failmsg << std::endl;
             }
     }
 #ifdef DEBUG_TORTURE_TEST
@@ -638,7 +640,7 @@ static void evil_random_io(std::shared_ptr<boost::afio::async_file_io_dispatcher
     when_all(manydeletedfiles.begin(), manydeletedfiles.end()).wait();
     auto rmdir(dispatcher->rmdir(boost::afio::async_path_op_req("testdir")));
     // Fetch any outstanding error
-    rmdir.h->get();
+    when_all(rmdir).wait();
     } catch(...) {
         std::cerr << boost::current_exception_diagnostic_information(true) << std::endl;
         throw;
