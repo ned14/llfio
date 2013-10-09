@@ -26,7 +26,6 @@ extern "C" void tzset(void);
 #include <iostream>
 #include <algorithm>
 #include <unordered_set>
-#include "boost/lockfree/queue.hpp"
 #include "../../../boost/afio/afio.hpp"
 #include "../detail/SpookyV2.h"
 #include "../../../boost/afio/detail/Aligned_Allocator.hpp"
@@ -484,15 +483,13 @@ static void evil_random_io(std::shared_ptr<boost::afio::async_file_io_dispatcher
             cout << n << ": " << manywrittenfiles[n].id << " (" << when_all(manywrittenfiles[n]).get().front()->path() << ") " << endl;
 #endif
     // Schedule a replay of our in-RAM simulation
-    size_t maxfailures=0;
-    for(size_t n=0; n<no; n++)
-            maxfailures+=todo[n].size();
 
-    boost::lockfree::queue<std::pair<const Op *, size_t> *> failures(maxfailures);
+    boost::afio::detail::spinlock<size_t> failureslock;
+    std::deque<std::pair<const Op *, size_t>> failures;
 #if defined(BOOST_MSVC) && BOOST_MSVC < 1700 // <= VS2010
-    std::function<std::pair<bool, std::shared_ptr<boost::afio::async_io_handle>> (Op &, char *, size_t, std::shared_ptr<boost::afio::async_io_handle>)> checkHash=[&failures](Op &op, char *base, size_t, std::shared_ptr<boost::afio::async_io_handle> h) -> std::pair<bool, std::shared_ptr<boost::afio::async_io_handle>> {
+    std::function<std::pair<bool, std::shared_ptr<boost::afio::async_io_handle>> (Op &, char *, size_t, std::shared_ptr<boost::afio::async_io_handle>)> checkHash=[&failureslock, &failures](Op &op, char *base, size_t, std::shared_ptr<boost::afio::async_io_handle> h) -> std::pair<bool, std::shared_ptr<boost::afio::async_io_handle>> {
 #else
-    auto checkHash=[&failures](Op &op, char *base, size_t, std::shared_ptr<boost::afio::async_io_handle> h) -> std::pair<bool, std::shared_ptr<boost::afio::async_io_handle>> {
+    auto checkHash=[&failureslock, &failures](Op &op, char *base, size_t, std::shared_ptr<boost::afio::async_io_handle> h) -> std::pair<bool, std::shared_ptr<boost::afio::async_io_handle>> {
 #endif
             const char *data=(const char *)(((size_t) base+(size_t) op.req.where));
             size_t idxoffset=0;
@@ -505,8 +502,11 @@ static void evil_random_io(std::shared_ptr<boost::afio::async_file_io_dispatcher
                     {
                             if(data[idx]!=buffer[idx])
                             {
-                                
-                                failures.push(new std::pair<const Op *, size_t>(std::make_pair(&op, idxoffset+idx))); //causes compiler error on msvc 2010
+                                    BOOST_BEGIN_MEMORY_TRANSACTION(failureslock)
+                                    {
+                                        failures.push_back(std::make_pair(&op, idxoffset+idx));
+                                    }
+                                    BOOST_END_MEMORY_TRANSACTION(failureslock)
 #ifdef _DEBUG
                                     std::string contents(data, 8), shouldbe(buffer, 8);
                                     std::cout << "Contents of file at " << op.req.where << " +" << idx << " contains " << contents << " instead of " << shouldbe << std::endl;
@@ -582,15 +582,15 @@ static void evil_random_io(std::shared_ptr<boost::afio::async_file_io_dispatcher
     BOOST_CHECK(failures.empty());
     if(!failures.empty())
     {
-            pair<Op *, size_t> *failedop;
             cerr << "The following hash failures occurred:" << endl;
-            while(failures.pop(failedop))
+            while(!failures.empty())
             {
-                auto undofailedop=boost::afio::detail::Undoer([&failedop]{ delete failedop; });
+                pair<const Op *, size_t> &failedop=failures.front();
                 size_t bytes=0;
-                BOOST_FOREACH(auto &b, failedop->first->req.buffers)
+                BOOST_FOREACH(auto &b, failedop.first->req.buffers)
                     bytes+=boost::asio::buffer_size(b);
-                cerr << "   " << (failedop->first->write ? "Write to" : "Read from") << " " << boost::to_string(failedop->first->req.where) << " at offset " << failedop->second << " into bytes " << bytes << endl;
+                cerr << "   " << (failedop.first->write ? "Write to" : "Read from") << " " << boost::to_string(failedop.first->req.where) << " at offset " << failedop.second << " into bytes " << bytes << endl;
+                failures.pop_front();
             }
     }
     BOOST_TEST_MESSAGE("Checking if the final files have exactly the right contents ... this may take a bit ...");
