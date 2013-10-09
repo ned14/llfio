@@ -1534,6 +1534,8 @@ namespace detail
         }
         if(e)
             rethrow_exception(e);
+        else
+            BOOST_AFIO_THROW_FATAL(std::runtime_error("Exception pointer null despite exiting via exception handling code path."));
 #endif
     }
     inline future<std::vector<std::shared_ptr<async_io_handle>>> when_all(std::shared_ptr<detail::when_all_count_completed_state> state)
@@ -1577,6 +1579,8 @@ namespace detail
         }
         if(e)
             rethrow_exception(e);
+        else
+            BOOST_AFIO_THROW_FATAL(std::runtime_error("Exception pointer null despite exiting via exception handling code path."));
 #endif
     }
 }
