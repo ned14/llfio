@@ -8,8 +8,11 @@ BOOST_AFIO_AUTO_TEST_CASE(async_data_op_req_compilation, "Tests that all the use
         // Note that this test is mainly for testing metaprogramming compilation.
         auto dispatcher=boost::afio::make_async_file_io_dispatcher();
         auto mkdir(dispatcher->dir(async_path_op_req("testdir", file_flags::Create)));
+        when_all(mkdir).wait();
         auto mkfile(dispatcher->file(async_path_op_req(mkdir, "testdir/foo", file_flags::Create|file_flags::ReadWrite)));
+        when_all(mkfile).wait();
         auto last(dispatcher->truncate(mkfile, 1024));
+        when_all(last).wait();
         char buffer[256];
         memset(buffer, 0, sizeof(buffer));
         size_t length=sizeof(buffer);
@@ -22,10 +25,13 @@ BOOST_AFIO_AUTO_TEST_CASE(async_data_op_req_compilation, "Tests that all the use
             type *out=buffer;
             // works
             last=dispatcher->write(async_data_op_req<const_type>(last, out, length, 0));
+            when_all(last).wait();
             // auto-consts
             last=dispatcher->write(async_data_op_req<type>(last, out, length, 0));
+            when_all(last).wait();
             // works
             last=dispatcher->read(async_data_op_req<type>(last, out, length, 0));
+            when_all(last).wait();
             // deduces
             last=dispatcher->write(make_async_data_op_req(last, out, length, 0));
             when_all(last).wait();
@@ -38,10 +44,13 @@ BOOST_AFIO_AUTO_TEST_CASE(async_data_op_req_compilation, "Tests that all the use
             type *out=buffer;
             // works
             last=dispatcher->write(async_data_op_req<const_type>(last, out, length, 0));
+            when_all(last).wait();
             // auto-consts
             last=dispatcher->write(async_data_op_req<type>(last, out, length, 0));
+            when_all(last).wait();
             // works
             last=dispatcher->read(async_data_op_req<type>(last, out, length, 0));
+            when_all(last).wait();
             // deduces
             last=dispatcher->write(make_async_data_op_req(last, out, length, 0));
             when_all(last).wait();
@@ -54,10 +63,13 @@ BOOST_AFIO_AUTO_TEST_CASE(async_data_op_req_compilation, "Tests that all the use
             auto &out=buffer;
             // works
             last=dispatcher->write(async_data_op_req<const_type>(last, out, 0));
+            when_all(last).wait();
             // auto-consts
             last=dispatcher->write(async_data_op_req<type>(last, out, 0));
+            when_all(last).wait();
             // works
             last=dispatcher->read(async_data_op_req<type>(last, out, 0));
+            when_all(last).wait();
             // deduces
             last=dispatcher->write(make_async_data_op_req(last, out, 0));
             when_all(last).wait();
@@ -71,10 +83,13 @@ BOOST_AFIO_AUTO_TEST_CASE(async_data_op_req_compilation, "Tests that all the use
             memset(out, 0, sizeof(out));
             // works
             last=dispatcher->write(async_data_op_req<const_type>(last, out, 0));
+            when_all(last).wait();
             // auto-consts
             last=dispatcher->write(async_data_op_req<type>(last, out, 0));
+            when_all(last).wait();
             // works
             last=dispatcher->read(async_data_op_req<type>(last, out, 0));
+            when_all(last).wait();
             // deduces
             last=dispatcher->write(make_async_data_op_req(last, out, 0));
             when_all(last).wait();
@@ -87,10 +102,13 @@ BOOST_AFIO_AUTO_TEST_CASE(async_data_op_req_compilation, "Tests that all the use
             type out(sizeof(buffer)/sizeof(type::value_type));
             // works
             last=dispatcher->write(async_data_op_req<const_type>(last, out, 0));
+            when_all(last).wait();
             // auto-consts
             last=dispatcher->write(async_data_op_req<type>(last, out, 0));
+            when_all(last).wait();
             // works
             last=dispatcher->read(async_data_op_req<type>(last, out, 0));
+            when_all(last).wait();
             // deduces
             last=dispatcher->write(make_async_data_op_req(last, out, 0));
             when_all(last).wait();
@@ -104,10 +122,13 @@ BOOST_AFIO_AUTO_TEST_CASE(async_data_op_req_compilation, "Tests that all the use
             out.fill(' ');
             // works
             last=dispatcher->write(async_data_op_req<const_type>(last, out, 0));
+            when_all(last).wait();
             // auto-consts
             last=dispatcher->write(async_data_op_req<type>(last, out, 0));
+            when_all(last).wait();
             // works
             last=dispatcher->read(async_data_op_req<type>(last, out, 0));
+            when_all(last).wait();
             // deduces
             last=dispatcher->write(make_async_data_op_req(last, out, 0));
             when_all(last).wait();
@@ -120,10 +141,13 @@ BOOST_AFIO_AUTO_TEST_CASE(async_data_op_req_compilation, "Tests that all the use
             type out(sizeof(buffer)/sizeof(type::value_type), ' ');
             // works
             last=dispatcher->write(async_data_op_req<const_type>(last, out, 0));
+            when_all(last).wait();
             // auto-consts
             last=dispatcher->write(async_data_op_req<type>(last, out, 0));
+            when_all(last).wait();
             // works
             last=dispatcher->read(async_data_op_req<type>(last, out, 0));
+            when_all(last).wait();
             // deduces
             last=dispatcher->write(make_async_data_op_req(last, out, 0));
             when_all(last).wait();
