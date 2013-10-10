@@ -9,7 +9,7 @@ namespace {
 
     // Parallel copy files in sources into dest, concatenating
     future<std::vector<std::shared_ptr<async_io_handle>>> async_concatenate_files(
-        std::atomic<off_t> &written, off_t &totalbytes,
+        atomic<off_t> &written, off_t &totalbytes,
         std::shared_ptr<async_file_io_dispatcher_base> dispatcher,
         std::filesystem::path dest, std::vector<std::filesystem::path> sources,
         size_t chunk_size=1024*1024 /* 1Mb */)
@@ -94,7 +94,7 @@ int main(int argc, const char *argv[])
     }        
     try
     {
-        std::atomic<off_t> written(0);
+        atomic<off_t> written(0);
         off_t totalbytes=0;
         std::shared_ptr<boost::afio::async_file_io_dispatcher_base> dispatcher=
             boost::afio::make_async_file_io_dispatcher();
