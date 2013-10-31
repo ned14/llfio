@@ -9,7 +9,7 @@
 [section:release_notes Release Notes]
 
 [/=================]
-[heading Boost 1.56 AFIO v1.1]
+[heading Boost 1.55 AFIO v1.1]
 [/=================]
 
 Immediate completions no longer hold the opslock, which meant the opslock could be
