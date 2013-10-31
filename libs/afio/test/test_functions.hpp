@@ -176,9 +176,9 @@ struct BOOST_AUTO_TC_UNIQUE_ID( test_name ) {};                         \
                                                                         \
 BOOST_AUTO_TU_REGISTRAR( test_name )(                                   \
     boost::unit_test::make_test_case(                                   \
-        &BOOST_AUTO_TC_INVOKER( test_name ),                            \
-        #test_name, NULL, 0 ),                                          \
-    boost::unit_test::decorator::collector::instance() );               \
+        &BOOST_AUTO_TC_INVOKER( test_name ), #test_name ),              \
+    boost::unit_test::ut_detail::auto_tc_exp_fail<                      \
+        BOOST_AUTO_TC_UNIQUE_ID( test_name )>::instance()->value() );   \
                                                                         \
 void test_name::test_method()                                           \
 
