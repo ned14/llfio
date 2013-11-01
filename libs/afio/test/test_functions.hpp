@@ -13,6 +13,7 @@ Created: Feb 2013
 //#define MAXIMUM_TEST_CPUS 1
 
 #ifdef __MINGW32__
+#include <stdlib.h> // To pull in __MINGW64_VERSION_MAJOR
 #ifndef __MINGW64_VERSION_MAJOR
 // Mingw32 doesn't define putenv() needed by Boost.Test
 extern "C" int putenv(char*);
