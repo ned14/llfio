@@ -5,8 +5,8 @@
  * Created on July 5, 2013, 6:52 PM
  */
 
-#ifndef ALIGNED_ALLOCATOR_HPP
-#define ALIGNED_ALLOCATOR_HPP
+#ifndef BOOST_AFIO_ALIGNED_ALLOCATOR_HPP
+#define BOOST_AFIO_ALIGNED_ALLOCATOR_HPP
 
 #include <vector>
 #include <memory>

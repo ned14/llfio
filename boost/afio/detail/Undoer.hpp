@@ -5,8 +5,8 @@
  * Created on June 25, 2013, 11:35 AM
  */
 
-#ifndef UNDOER_HPP
-#define UNDOER_HPP
+#ifndef BOOST_AFIO_UNDOER_HPP
+#define BOOST_AFIO_UNDOER_HPP
 
 /*! \file Undoer.hpp
 \brief Declares Undoer class and implementation

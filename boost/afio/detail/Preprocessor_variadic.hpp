@@ -1,7 +1,7 @@
 // Preprocessor_variadic.hpp
 
-#ifndef PREPROCESSOR_VARIADIC_HPP
-#define PREPROCESSOR_VARIADIC_HPP
+#ifndef BOOST_AFIO_PREPROCESSOR_VARIADIC_HPP
+#define BOOST_AFIO_PREPROCESSOR_VARIADIC_HPP
 #include <boost/preprocessor.hpp>
 
 #ifndef BOOST_AFIO_MAX_PARAMETERS

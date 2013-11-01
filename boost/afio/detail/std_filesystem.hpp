@@ -4,8 +4,8 @@ Gets a std::filesystem implementation from somewhere
 File Created: Mar 2013
 */
 
-#ifndef STD_FILESYSTEM_FROM_SOMEWHERE
-#define STD_FILESYSTEM_FROM_SOMEWHERE
+#ifndef BOOST_AFIO_STD_FILESYSTEM_FROM_SOMEWHERE
+#define BOOST_AFIO_STD_FILESYSTEM_FROM_SOMEWHERE
 #if __cplusplus > 201103L
 #include <filesystem>
 #elif defined(HAVE_TR2_FILESYSTEM)

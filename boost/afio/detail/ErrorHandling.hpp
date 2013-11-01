@@ -3,8 +3,8 @@
 File Created: Nov 2012
 */
 
-#ifndef NIALLSCPP11UTILITIES_ERRORHANDLING_H
-#define NIALLSCPP11UTILITIES_ERRORHANDLING_H
+#ifndef BOOST_AFIO_ERRORHANDLING_H
+#define BOOST_AFIO_ERRORHANDLING_H
 
 #include "../config.hpp"
 #include "std_filesystem.hpp"
