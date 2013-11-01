@@ -13,8 +13,10 @@ Created: Feb 2013
 //#define MAXIMUM_TEST_CPUS 1
 
 #ifdef __MINGW32__
-// Mingw doesn't define putenv() needed by Boost.Test
-//extern "C" int putenv(char*);
+#ifndef __MINGW64__
+// Mingw32 doesn't define putenv() needed by Boost.Test
+extern "C" int putenv(char*);
+#endif
 // Mingw doesn't define tzset() either
 extern "C" void tzset(void);
 #endif
