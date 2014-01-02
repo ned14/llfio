@@ -18,6 +18,9 @@ AFIO on an Intel Atom 220 netbook.
 Fixed failure to auto-const an async_data_op_req<boost::asio::mutable_buffer>
 when used for writing. Thanks to Bjorn Reese for reporting this.
 
+Replace use of std::runtime_error with std::invalid_argument where that makes
+sense. Thanks to Bjorn Reese for reporting this.
+
 [/=================]
 [heading Boost 1.55 AFIO v1.1]
 [/=================]

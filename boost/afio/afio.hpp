@@ -1446,7 +1446,7 @@ private:
     {
 #if BOOST_AFIO_VALIDATE_INPUTS
         if(!validate())
-            BOOST_AFIO_THROW(std::runtime_error("Inputs are invalid."));
+            BOOST_AFIO_THROW(std::invalid_argument("Inputs are invalid."));
 #endif
     }
 };
@@ -1513,7 +1513,7 @@ namespace detail
                 BOOST_FOREACH(auto &i, inputs)
                 {
                     if(!i.validate(false))
-                        BOOST_AFIO_THROW(std::runtime_error("Inputs are invalid."));
+                        BOOST_AFIO_THROW(std::invalid_argument("Inputs are invalid."));
                 }
 #endif
                 std::vector<std::pair<async_op_flags, std::function<async_file_io_dispatcher_base::completion_t>>> callbacks;
@@ -1559,7 +1559,7 @@ namespace detail
                 BOOST_FOREACH(auto &i, inputs)
                 {
                     if(!i.validate(false))
-                        BOOST_AFIO_THROW(std::runtime_error("Inputs are invalid."));
+                        BOOST_AFIO_THROW(std::invalid_argument("Inputs are invalid."));
                 }
 #endif
                 std::vector<std::pair<async_op_flags, std::function<async_file_io_dispatcher_base::completion_t>>> callbacks;
@@ -1745,7 +1745,7 @@ private:
     {
 #if BOOST_AFIO_VALIDATE_INPUTS
         if(!validate())
-            BOOST_AFIO_THROW(std::runtime_error("Inputs are invalid."));
+            BOOST_AFIO_THROW(std::invalid_argument("Inputs are invalid."));
 #endif
     }
 };
@@ -1799,7 +1799,7 @@ namespace detail
         {
 #if BOOST_AFIO_VALIDATE_INPUTS
             if(!validate())
-                BOOST_AFIO_THROW(std::runtime_error("Inputs are invalid."));
+                BOOST_AFIO_THROW(std::invalid_argument("Inputs are invalid."));
 #endif
         }
     };
@@ -1868,7 +1868,7 @@ namespace detail
         {
 #if BOOST_AFIO_VALIDATE_INPUTS
             if(!validate())
-                BOOST_AFIO_THROW(std::runtime_error("Inputs are invalid."));
+                BOOST_AFIO_THROW(std::invalid_argument("Inputs are invalid."));
 #endif
         }
     };
@@ -2306,7 +2306,7 @@ private:
     {
 #if BOOST_AFIO_VALIDATE_INPUTS
         if(!validate())
-            BOOST_AFIO_THROW(std::runtime_error("Inputs are invalid."));
+            BOOST_AFIO_THROW(std::invalid_argument("Inputs are invalid."));
 #endif
     }
 };

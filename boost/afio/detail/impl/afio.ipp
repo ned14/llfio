@@ -1621,7 +1621,7 @@ BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC std::vector<async_io_op> async_file_io_disp
         BOOST_FOREACH(auto &i, ops)
         {
             if(!i.validate(false))
-                BOOST_AFIO_THROW(std::runtime_error("Inputs are invalid."));
+                BOOST_AFIO_THROW(std::invalid_argument("Inputs are invalid."));
         }
 #endif
     // Create a shared state for the completions to be attached to all the items we are waiting upon
@@ -1990,7 +1990,7 @@ namespace detail {
             BOOST_FOREACH(auto &i, reqs)
             {
                 if(!i.validate())
-                    BOOST_AFIO_THROW(std::runtime_error("Inputs are invalid."));
+                    BOOST_AFIO_THROW(std::invalid_argument("Inputs are invalid."));
             }
 #endif
             return chain_async_ops((int) detail::OpType::dir, reqs, async_op_flags::None, &async_file_io_dispatcher_compat::dodir);
@@ -2001,7 +2001,7 @@ namespace detail {
             BOOST_FOREACH(auto &i, reqs)
             {
                 if(!i.validate())
-                    BOOST_AFIO_THROW(std::runtime_error("Inputs are invalid."));
+                    BOOST_AFIO_THROW(std::invalid_argument("Inputs are invalid."));
             }
 #endif
             return chain_async_ops((int) detail::OpType::rmdir, reqs, async_op_flags::None, &async_file_io_dispatcher_compat::dormdir);
@@ -2012,7 +2012,7 @@ namespace detail {
             BOOST_FOREACH(auto &i, reqs)
             {
                 if(!i.validate())
-                    BOOST_AFIO_THROW(std::runtime_error("Inputs are invalid."));
+                    BOOST_AFIO_THROW(std::invalid_argument("Inputs are invalid."));
             }
 #endif
             return chain_async_ops((int) detail::OpType::file, reqs, async_op_flags::None, &async_file_io_dispatcher_compat::dofile);
@@ -2023,7 +2023,7 @@ namespace detail {
             BOOST_FOREACH(auto &i, reqs)
             {
                 if(!i.validate())
-                    BOOST_AFIO_THROW(std::runtime_error("Inputs are invalid."));
+                    BOOST_AFIO_THROW(std::invalid_argument("Inputs are invalid."));
             }
 #endif
             return chain_async_ops((int) detail::OpType::rmfile, reqs, async_op_flags::None, &async_file_io_dispatcher_compat::dormfile);
@@ -2034,7 +2034,7 @@ namespace detail {
             BOOST_FOREACH(auto &i, reqs)
             {
                 if(!i.validate())
-                    BOOST_AFIO_THROW(std::runtime_error("Inputs are invalid."));
+                    BOOST_AFIO_THROW(std::invalid_argument("Inputs are invalid."));
             }
 #endif
             return chain_async_ops((int) detail::OpType::symlink, reqs, async_op_flags::None, &async_file_io_dispatcher_compat::dosymlink);
@@ -2045,7 +2045,7 @@ namespace detail {
             BOOST_FOREACH(auto &i, reqs)
             {
                 if(!i.validate())
-                    BOOST_AFIO_THROW(std::runtime_error("Inputs are invalid."));
+                    BOOST_AFIO_THROW(std::invalid_argument("Inputs are invalid."));
             }
 #endif
             return chain_async_ops((int) detail::OpType::rmsymlink, reqs, async_op_flags::None, &async_file_io_dispatcher_compat::dormsymlink);
@@ -2056,7 +2056,7 @@ namespace detail {
             BOOST_FOREACH(auto &i, ops)
             {
                 if(!i.validate())
-                    BOOST_AFIO_THROW(std::runtime_error("Inputs are invalid."));
+                    BOOST_AFIO_THROW(std::invalid_argument("Inputs are invalid."));
             }
 #endif
             return chain_async_ops((int) detail::OpType::sync, ops, async_op_flags::None, &async_file_io_dispatcher_compat::dosync);
@@ -2067,7 +2067,7 @@ namespace detail {
             BOOST_FOREACH(auto &i, ops)
             {
                 if(!i.validate())
-                    BOOST_AFIO_THROW(std::runtime_error("Inputs are invalid."));
+                    BOOST_AFIO_THROW(std::invalid_argument("Inputs are invalid."));
             }
 #endif
             return chain_async_ops((int) detail::OpType::close, ops, async_op_flags::None, &async_file_io_dispatcher_compat::doclose);
@@ -2078,7 +2078,7 @@ namespace detail {
             BOOST_FOREACH(auto &i, reqs)
             {
                 if(!i.validate())
-                    BOOST_AFIO_THROW(std::runtime_error("Inputs are invalid."));
+                    BOOST_AFIO_THROW(std::invalid_argument("Inputs are invalid."));
             }
 #endif
             return chain_async_ops((int) detail::OpType::read, reqs, async_op_flags::None, &async_file_io_dispatcher_compat::doread);
@@ -2089,7 +2089,7 @@ namespace detail {
             BOOST_FOREACH(auto &i, reqs)
             {
                 if(!i.validate())
-                    BOOST_AFIO_THROW(std::runtime_error("Inputs are invalid."));
+                    BOOST_AFIO_THROW(std::invalid_argument("Inputs are invalid."));
             }
 #endif
             return chain_async_ops((int) detail::OpType::write, reqs, async_op_flags::None, &async_file_io_dispatcher_compat::dowrite);
@@ -2100,7 +2100,7 @@ namespace detail {
             BOOST_FOREACH(auto &i, ops)
             {
                 if(!i.validate())
-                    BOOST_AFIO_THROW(std::runtime_error("Inputs are invalid."));
+                    BOOST_AFIO_THROW(std::invalid_argument("Inputs are invalid."));
             }
 #endif
             return chain_async_ops((int) detail::OpType::truncate, ops, sizes, async_op_flags::None, &async_file_io_dispatcher_compat::dotruncate);
@@ -2111,7 +2111,7 @@ namespace detail {
             BOOST_FOREACH(auto &i, reqs)
             {
                 if(!i.validate())
-                    BOOST_AFIO_THROW(std::runtime_error("Inputs are invalid."));
+                    BOOST_AFIO_THROW(std::invalid_argument("Inputs are invalid."));
             }
 #endif
             return chain_async_ops((int) detail::OpType::enumerate, reqs, async_op_flags::None, &async_file_io_dispatcher_compat::doenumerate);
