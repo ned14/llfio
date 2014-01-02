@@ -113,6 +113,26 @@ BOOST_AFIO_AUTO_TEST_CASE(async_data_op_req_compilation, "Tests that all the use
             last=dispatcher->write(make_async_data_op_req(last, out, 0));
             when_all(last).wait();
         }
+        // vector of boost::asio::mutable_buffer specialisation
+        {
+            typedef std::vector<boost::asio::mutable_buffer> type;
+            typedef std::vector<boost::asio::const_buffer> const_type;
+
+            unsigned word=0xdeadbeef;
+            type out(1, boost::asio::mutable_buffer(&word, 1));
+            // works
+            last=dispatcher->write(async_data_op_req<const_type>(last, out, 0));
+            when_all(last).wait();
+            // auto-consts
+            last=dispatcher->write(async_data_op_req<type>(last, out, 0));
+            when_all(last).wait();
+            // works
+            last=dispatcher->read(async_data_op_req<type>(last, out, 0));
+            when_all(last).wait();
+            // deduces
+            last=dispatcher->write(make_async_data_op_req(last, out, 0));
+            when_all(last).wait();
+        }
         // array specialisation
         {
             typedef std::array<char, sizeof(buffer)> type;
@@ -120,6 +140,27 @@ BOOST_AFIO_AUTO_TEST_CASE(async_data_op_req_compilation, "Tests that all the use
 
             type out;
             out.fill(' ');
+            // works
+            last=dispatcher->write(async_data_op_req<const_type>(last, out, 0));
+            when_all(last).wait();
+            // auto-consts
+            last=dispatcher->write(async_data_op_req<type>(last, out, 0));
+            when_all(last).wait();
+            // works
+            last=dispatcher->read(async_data_op_req<type>(last, out, 0));
+            when_all(last).wait();
+            // deduces
+            last=dispatcher->write(make_async_data_op_req(last, out, 0));
+            when_all(last).wait();
+        }
+        // array of boost::asio::mutable_buffer specialisation
+        {
+            typedef std::array<boost::asio::mutable_buffer, 1> type;
+            typedef std::array<boost::asio::const_buffer, 1> const_type;
+
+            unsigned word=0xdeadbeef;
+            type out;
+            out[0]=boost::asio::mutable_buffer(&word, 1);
             // works
             last=dispatcher->write(async_data_op_req<const_type>(last, out, 0));
             when_all(last).wait();

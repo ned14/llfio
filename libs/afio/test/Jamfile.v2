@@ -24,6 +24,19 @@ rule running-in-ci ( properties * )
    }
 }
 
+# If we're on Niall's Atom 220 netbook, make it so Niall isn't waiting an hour
+# or more just to compile AFIO every time I change a single character.
+rule fast-build ( properties * )
+{
+   if "--fast-build" in $(.argv) 
+   {
+      return <define>BOOST_AFIO_HEADERS_ONLY=0
+	         <define>BOOST_ASIO_SEPARATE_COMPILATION
+			 <library>../build//boost_afio
+			 ;
+   }
+}
+
 project boost/afio/test
     : requirements
       <threading>multi
@@ -45,6 +58,7 @@ project boost/afio/test
       <library>../../atomic/build//boost_atomic
       <library>../../thread/build//boost_thread
 	  <conditional>@running-in-ci
+	  <conditional>@fast-build
     ;
 
 #exe boost_afio_test : main.cpp   ../detail/SpookyV2.cpp

@@ -9,6 +9,16 @@
 [section:release_notes Release Notes]
 
 [/=================]
+[heading Boost 1.56 AFIO v1.11]
+[/=================]
+
+Added --fast-build to test Jamfile to preserve my sanity attempting to work with
+AFIO on an Intel Atom 220 netbook.
+
+Fixed failure to auto-const an async_data_op_req<boost::asio::mutable_buffer>
+when used for writing. Thanks to Bjorn Reese for reporting this.
+
+[/=================]
 [heading Boost 1.55 AFIO v1.1]
 [/=================]
 
@@ -151,10 +161,13 @@ etc.
 [section:slow_compile Using AFIO really slows down my compile times. Can't you do something about that?]
 
 We know about that slowdown! The solution is easy: define `BOOST_AFIO_HEADERS_ONLY` to 0 for each compiland, and
-link to the AFIO shared library instead. Do the same for ASIO by defining `BOOST_ASIO_HEADER_ONLY` to 0 for
-each compiland, and link to the ASIO shared library instead.
+link to the AFIO shared library instead. Do the same for ASIO by defining `BOOST_ASIO_SEPARATE_COMPILATION`
+or `BOOST_ASIO_DYN_LINK` as is appropriate to your circumstances for each compiland, and link to the ASIO
+shared library instead (which is built via `boost/asio/impl/src.hpp`, see ASIO's docs). The Jamfile.v2
+in the test directory implements an option `--fast-build` which is an example of how to do this.
 
-You should notice a 6x-10x improvement to compilation time, which is a huge win during debugging.
+You should notice a 6x-10x improvement to compilation time, which is a huge win during debugging, or
+building on low end CPUs like first gen Intel Atom's.
 
 [endsect] [/slow_compile]
 

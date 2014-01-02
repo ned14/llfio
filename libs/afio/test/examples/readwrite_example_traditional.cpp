@@ -1,6 +1,10 @@
 #include "boost/afio/afio.hpp"
 #include <iostream>
 #include <fstream>
+// Need to include a copy of ASIO
+#ifdef BOOST_ASIO_SEPARATE_COMPILATION
+#include "../../../../boost/asio/impl/src.hpp"
+#endif
 
 int main(void)
 {

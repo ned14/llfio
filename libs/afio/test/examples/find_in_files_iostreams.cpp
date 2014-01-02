@@ -5,6 +5,10 @@
 #include <regex>
 #include <chrono>
 #include "boost/afio/detail/std_filesystem.hpp" // in lieu of <filesystem>
+// Need to include a copy of ASIO
+#ifdef BOOST_ASIO_SEPARATE_COMPILATION
+#include "../../../../boost/asio/impl/src.hpp"
+#endif
 #endif
 
 /* My Intel Core i7 3770K running Windows 8 x64 with 7200rpm drive, using
