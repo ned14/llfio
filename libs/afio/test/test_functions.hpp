@@ -762,4 +762,9 @@ static void print_stat(std::shared_ptr<boost::afio::async_io_handle> dirh, boost
 #undef PRINT_FIELD
 }
 
+// Need to include a copy of ASIO
+#ifdef BOOST_ASIO_SEPARATE_COMPILATION
+#include "../../../boost/asio/impl/src.hpp"
+#endif
+
 #endif

@@ -1,6 +1,10 @@
 #define BOOST_AFIO_ENABLE_BENCHMARKING_COMPLETION
 #include "boost/afio/afio.hpp"
 #include <iostream>
+// Need to include a copy of ASIO
+#ifdef BOOST_ASIO_SEPARATE_COMPILATION
+#include "../../../../boost/asio/impl/src.hpp"
+#endif
 
 /*  My Intel Core i7 3770K running Windows 8 x64: 596318 closures/sec
     My Intel Core i7 3770K running     Linux x64: 794384 closures/sec

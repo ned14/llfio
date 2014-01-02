@@ -4,6 +4,10 @@
 #if !(defined(BOOST_MSVC) && BOOST_MSVC < 1700) && !(defined(__GLIBCXX__) && __GLIBCXX__<=20120920 /* <= GCC 4.7 */)
 #include <future>
 #endif
+// Need to include a copy of ASIO
+#ifdef BOOST_ASIO_SEPARATE_COMPILATION
+#include "../../../../boost/asio/impl/src.hpp"
+#endif
 
 int main(void)
 {
