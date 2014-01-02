@@ -1756,7 +1756,7 @@ namespace detail
     template<bool for_writing> class async_data_op_req_impl;
     template<> class async_data_op_req_impl<false>
     {
-	public:
+    public:
         //! An optional precondition for this operation
         async_io_op precondition;
         //! A sequence of mutable Boost.ASIO buffers to read into
@@ -1802,7 +1802,7 @@ namespace detail
                 BOOST_AFIO_THROW(std::runtime_error("Inputs are invalid."));
 #endif
         }
-	};
+    };
     template<> class async_data_op_req_impl<true>
     {
     public:
@@ -1832,22 +1832,22 @@ namespace detail
         async_data_op_req_impl(async_io_op _precondition, std::vector<boost::asio::const_buffer> _buffers, off_t _where) : precondition(std::move(_precondition)), buffers(std::move(_buffers)), where(_where) { _validate(); }
         //! \async_data_op_req2
         async_data_op_req_impl(async_io_op _precondition, std::vector<boost::asio::mutable_buffer> _buffers, off_t _where) : precondition(std::move(_precondition)), where(_where)
-		{
-			buffers.reserve(_buffers.capacity());
-			BOOST_FOREACH(auto &&i, _buffers)
-				buffers.push_back(std::move(i));
-			_validate();
-		}
+        {
+            buffers.reserve(_buffers.capacity());
+            BOOST_FOREACH(auto &&i, _buffers)
+                buffers.push_back(std::move(i));
+            _validate();
+        }
         //! \async_data_op_req2 \tparam "size_t N" Number of boost::asio::const_buffer
         template<size_t N> async_data_op_req_impl(async_io_op _precondition, std::array<boost::asio::const_buffer, N> _buffers, off_t _where) : precondition(std::move(_precondition)), buffers(std::make_move_iterator(_buffers.begin()), std::make_move_iterator(_buffers.end())), where(_where) { _validate(); }
         //! \async_data_op_req2 \tparam "size_t N" Number of boost::asio::mutable_buffer
         template<size_t N> async_data_op_req_impl(async_io_op _precondition, std::array<boost::asio::mutable_buffer, N> _buffers, off_t _where) : precondition(std::move(_precondition)), where(_where)
-		{
-			buffers.reserve(_buffers.size());
-			BOOST_FOREACH(auto &&i, _buffers)
-				buffers.push_back(std::move(i));
-			_validate();
-		}
+        {
+            buffers.reserve(_buffers.size());
+            BOOST_FOREACH(auto &&i, _buffers)
+                buffers.push_back(std::move(i));
+            _validate();
+        }
         //! Validates contents for correctness \return True if contents are correct
         bool validate() const
         {
