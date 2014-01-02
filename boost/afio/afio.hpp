@@ -1753,7 +1753,57 @@ private:
 namespace detail
 {
     //! \brief The implementation of all async_data_op_req specialisations. \tparam for_writing Whether this implementation is for writing data. \ingroup async_data_op_req
-    template<bool for_writing> class async_data_op_req_impl
+    template<bool for_writing> class async_data_op_req_impl;
+    template<> class async_data_op_req_impl<false>
+    {
+	public:
+        //! An optional precondition for this operation
+        async_io_op precondition;
+        //! A sequence of mutable Boost.ASIO buffers to read into
+        std::vector<boost::asio::mutable_buffer> buffers;
+        //! The offset from which to read
+        off_t where;
+        //! \constr
+        async_data_op_req_impl() { }
+        //! \cconstr
+        async_data_op_req_impl(const async_data_op_req_impl &o) : precondition(o.precondition), buffers(o.buffers), where(o.where) { }
+        //! \mconstr
+        async_data_op_req_impl(async_data_op_req_impl &&o) BOOST_NOEXCEPT_OR_NOTHROW : precondition(std::move(o.precondition)), buffers(std::move(o.buffers)), where(std::move(o.where)) { }
+        //! \cassign
+        async_data_op_req_impl &operator=(const async_data_op_req_impl &o) { precondition=o.precondition; buffers=o.buffers; where=o.where; return *this; }
+        //! \massign
+        async_data_op_req_impl &operator=(async_data_op_req_impl &&o) BOOST_NOEXCEPT_OR_NOTHROW { precondition=std::move(o.precondition); buffers=std::move(o.buffers); where=std::move(o.where); return *this; }
+        //! \async_data_op_req1 \param _length The number of bytes to transfer
+        async_data_op_req_impl(async_io_op _precondition, void *v, size_t _length, off_t _where) : precondition(std::move(_precondition)), where(_where) { buffers.reserve(1); buffers.push_back(boost::asio::mutable_buffer(v, _length)); _validate(); }
+        //! \async_data_op_req2
+        async_data_op_req_impl(async_io_op _precondition, std::vector<boost::asio::mutable_buffer> _buffers, off_t _where) : precondition(std::move(_precondition)), buffers(std::move(_buffers)), where(_where) { _validate(); }
+        //! \async_data_op_req2 \tparam "size_t N" Number of boost::asio::mutable_buffer
+        template<size_t N> async_data_op_req_impl(async_io_op _precondition, std::array<boost::asio::mutable_buffer, N> _buffers, off_t _where) : precondition(std::move(_precondition)), buffers(std::make_move_iterator(_buffers.begin()), std::make_move_iterator(_buffers.end())), where(_where) { _validate(); }
+        //! Validates contents for correctness \return True if contents are correct
+        bool validate() const
+        {
+            if(!precondition.validate()) return false;
+            if(buffers.empty()) return false;
+            BOOST_FOREACH(auto &b, buffers)
+            {
+                if(!boost::asio::buffer_cast<const void *>(b) || !boost::asio::buffer_size(b)) return false;
+                if(!!(precondition.parent->fileflags(file_flags::None)&file_flags::OSDirect))
+                {
+                    if(((size_t) boost::asio::buffer_cast<const void *>(b) & 4095) || (boost::asio::buffer_size(b) & 4095)) return false;
+                }
+            }
+            return true;
+        }
+    private:
+        void _validate() const
+        {
+#if BOOST_AFIO_VALIDATE_INPUTS
+            if(!validate())
+                BOOST_AFIO_THROW(std::runtime_error("Inputs are invalid."));
+#endif
+        }
+	};
+    template<> class async_data_op_req_impl<true>
     {
     public:
         //! An optional precondition for this operation
@@ -1822,55 +1872,6 @@ namespace detail
 #endif
         }
     };
-    template<> class async_data_op_req_impl<false>
-    {
-	public:
-        //! An optional precondition for this operation
-        async_io_op precondition;
-        //! A sequence of mutable Boost.ASIO buffers to read into
-        std::vector<boost::asio::mutable_buffer> buffers;
-        //! The offset from which to read
-        off_t where;
-        //! \constr
-        async_data_op_req_impl() { }
-        //! \cconstr
-        async_data_op_req_impl(const async_data_op_req_impl &o) : precondition(o.precondition), buffers(o.buffers), where(o.where) { }
-        //! \mconstr
-        async_data_op_req_impl(async_data_op_req_impl &&o) BOOST_NOEXCEPT_OR_NOTHROW : precondition(std::move(o.precondition)), buffers(std::move(o.buffers)), where(std::move(o.where)) { }
-        //! \cassign
-        async_data_op_req_impl &operator=(const async_data_op_req_impl &o) { precondition=o.precondition; buffers=o.buffers; where=o.where; return *this; }
-        //! \massign
-        async_data_op_req_impl &operator=(async_data_op_req_impl &&o) BOOST_NOEXCEPT_OR_NOTHROW { precondition=std::move(o.precondition); buffers=std::move(o.buffers); where=std::move(o.where); return *this; }
-        //! \async_data_op_req1 \param _length The number of bytes to transfer
-        async_data_op_req_impl(async_io_op _precondition, void *v, size_t _length, off_t _where) : precondition(std::move(_precondition)), where(_where) { buffers.reserve(1); buffers.push_back(boost::asio::mutable_buffer(v, _length)); _validate(); }
-        //! \async_data_op_req2
-        async_data_op_req_impl(async_io_op _precondition, std::vector<boost::asio::mutable_buffer> _buffers, off_t _where) : precondition(std::move(_precondition)), buffers(std::move(_buffers)), where(_where) { _validate(); }
-        //! \async_data_op_req2 \tparam "size_t N" Number of boost::asio::mutable_buffer
-        template<size_t N> async_data_op_req_impl(async_io_op _precondition, std::array<boost::asio::mutable_buffer, N> _buffers, off_t _where) : precondition(std::move(_precondition)), buffers(std::make_move_iterator(_buffers.begin()), std::make_move_iterator(_buffers.end())), where(_where) { _validate(); }
-        //! Validates contents for correctness \return True if contents are correct
-        bool validate() const
-        {
-            if(!precondition.validate()) return false;
-            if(buffers.empty()) return false;
-            BOOST_FOREACH(auto &b, buffers)
-            {
-                if(!boost::asio::buffer_cast<const void *>(b) || !boost::asio::buffer_size(b)) return false;
-                if(!!(precondition.parent->fileflags(file_flags::None)&file_flags::OSDirect))
-                {
-                    if(((size_t) boost::asio::buffer_cast<const void *>(b) & 4095) || (boost::asio::buffer_size(b) & 4095)) return false;
-                }
-            }
-            return true;
-        }
-    private:
-        void _validate() const
-        {
-#if BOOST_AFIO_VALIDATE_INPUTS
-            if(!validate())
-                BOOST_AFIO_THROW(std::runtime_error("Inputs are invalid."));
-#endif
-        }
-	};
 }
 
 /*! \struct async_data_op_req
