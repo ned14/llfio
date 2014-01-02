@@ -1779,7 +1779,9 @@ namespace detail
         async_data_op_req_impl(async_io_op _precondition, std::vector<boost::asio::mutable_buffer> _buffers, off_t _where) : precondition(std::move(_precondition)), buffers(std::move(_buffers)), where(_where) { _validate(); }
         //! \async_data_op_req2 \tparam "size_t N" Number of boost::asio::mutable_buffer
         template<size_t N> async_data_op_req_impl(async_io_op _precondition, std::array<boost::asio::mutable_buffer, N> _buffers, off_t _where) : precondition(std::move(_precondition)), buffers(std::make_move_iterator(_buffers.begin()), std::make_move_iterator(_buffers.end())), where(_where) { _validate(); }
-        //! Validates contents for correctness \return True if contents are correct
+		//! \async_data_op_req2
+		async_data_op_req_impl(async_io_op _precondition, boost::asio::mutable_buffer _buffer, off_t _where) : precondition(std::move(_precondition)), buffers(1, std::move(_buffer)), where(_where) { _validate(); }
+		//! Validates contents for correctness \return True if contents are correct
         bool validate() const
         {
             if(!precondition.validate()) return false;
@@ -1848,7 +1850,9 @@ namespace detail
                 buffers.push_back(std::move(i));
             _validate();
         }
-        //! Validates contents for correctness \return True if contents are correct
+		//! \async_data_op_req2
+		async_data_op_req_impl(async_io_op _precondition, boost::asio::const_buffer _buffer, off_t _where) : precondition(std::move(_precondition)), buffers(1, std::move(_buffer)), where(_where) { _validate(); }
+		//! Validates contents for correctness \return True if contents are correct
         bool validate() const
         {
             if(!precondition.validate()) return false;
@@ -1890,7 +1894,10 @@ template<class T> struct async_data_op_req : public detail::async_data_op_req_im
     off_t where;
 #endif
     //! \constr
-    async_data_op_req() { }
+    async_data_op_req()
+	{
+		static_assert(std::is_trivial<T>::value, "async_data_op_req<T> has not been specialised for this non-trivial type, which suggests you are trying to read or write a complex C++ type! Either add a custom specialisation, or directly instantiate an async_data_op_req with a void * and size_t length to some serialised representation.");
+	}
     //! \cconstr
     async_data_op_req(const async_data_op_req &o) : detail::async_data_op_req_impl<false>(o) { }
     //! \mconstr
@@ -1916,8 +1923,11 @@ template<class T> struct async_data_op_req<const T> : public detail::async_data_
     off_t where;
 #endif
     //! \constr
-    async_data_op_req() { }
-    //! \cconstr
+	async_data_op_req()
+	{
+		static_assert(std::is_trivial<T>::value, "async_data_op_req<T> has not been specialised for this non-trivial type, which suggests you are trying to read or write a complex C++ type! Either add a custom specialisation, or directly instantiate an async_data_op_req with a void * and size_t length to some serialised representation.");
+	}
+	//! \cconstr
     async_data_op_req(const async_data_op_req &o) : detail::async_data_op_req_impl<true>(o) { }
     //! \mconstr
     async_data_op_req(async_data_op_req &&o) BOOST_NOEXCEPT_OR_NOTHROW : detail::async_data_op_req_impl<true>(std::move(o)) { }
@@ -2241,6 +2251,58 @@ template<class C, class T, class A> struct async_data_op_req<const std::basic_st
     async_data_op_req &operator=(async_data_op_req &&o) BOOST_NOEXCEPT_OR_NOTHROW { static_cast<detail::async_data_op_req_impl<true>>(*this)=std::move(o); return *this; }
     //! \async_data_op_req1
     async_data_op_req(async_io_op _precondition, const std::basic_string<C, T, A> &v, off_t _where) : detail::async_data_op_req_impl<true>(std::move(_precondition), static_cast<const void *>(&v.front()), v.size()*sizeof(A), _where) { }
+};
+//! \brief A convenience bundle of precondition, data and where for reading into a `boost::asio::mutable_buffer`. Data \b MUST stay around until the operation completes. \ingroup async_data_op_req
+template<> struct async_data_op_req<boost::asio::mutable_buffer> : public detail::async_data_op_req_impl<false>
+{
+#ifdef DOXYGEN_SHOULD_SKIP_THIS
+    //! A precondition containing an open file handle for this operation
+    async_io_op precondition;
+    //! A sequence of mutable Boost.ASIO buffers to read into
+    std::vector<boost::asio::mutable_buffer> buffers;
+    //! The offset from which to read
+    off_t where;
+#endif
+    //! \constr
+    async_data_op_req() { }
+    //! \cconstr
+    async_data_op_req(const async_data_op_req &o) : detail::async_data_op_req_impl<false>(o) { }
+    //! \mconstr
+    async_data_op_req(async_data_op_req &&o) BOOST_NOEXCEPT_OR_NOTHROW : detail::async_data_op_req_impl<false>(std::move(o)) { }
+    //! \cassign
+    async_data_op_req &operator=(const async_data_op_req &o) { static_cast<detail::async_data_op_req_impl<false>>(*this)=o; return *this; }
+    //! \massign
+    async_data_op_req &operator=(async_data_op_req &&o) BOOST_NOEXCEPT_OR_NOTHROW { static_cast<detail::async_data_op_req_impl<false>>(*this)=std::move(o); return *this; }
+    //! \async_data_op_req1
+	async_data_op_req(async_io_op _precondition, boost::asio::mutable_buffer v, off_t _where) : detail::async_data_op_req_impl<false>(std::move(_precondition), std::move(v), _where) { }
+};
+//! \brief A convenience bundle of precondition, data and where for writing from a `boost::asio::const_buffer`. Data \b MUST stay around until the operation completes. \ingroup async_data_op_req
+template<> struct async_data_op_req<boost::asio::const_buffer> : public detail::async_data_op_req_impl<true>
+{
+#ifdef DOXYGEN_SHOULD_SKIP_THIS
+    //! A precondition containing an open file handle for this operation
+    async_io_op precondition;
+    //! A sequence of const Boost.ASIO buffers to write from
+    std::vector<boost::asio::const_buffer> buffers;
+    //! The offset at which to write
+    off_t where;
+#endif
+    //! \constr
+    async_data_op_req() { }
+    //! \cconstr
+    async_data_op_req(const async_data_op_req &o) : detail::async_data_op_req_impl<true>(o) { }
+    //! \mconstr
+    async_data_op_req(async_data_op_req &&o) BOOST_NOEXCEPT_OR_NOTHROW : detail::async_data_op_req_impl<true>(std::move(o)) { }
+    //! \cconstr
+    async_data_op_req(const async_data_op_req<boost::asio::mutable_buffer> &o) : detail::async_data_op_req_impl<true>(o) { }
+    //! \mconstr
+    async_data_op_req(async_data_op_req<boost::asio::mutable_buffer> &&o) BOOST_NOEXCEPT_OR_NOTHROW : detail::async_data_op_req_impl<true>(std::move(o)) { }
+    //! \cassign
+    async_data_op_req &operator=(const async_data_op_req &o) { static_cast<detail::async_data_op_req_impl<true>>(*this)=o; return *this; }
+    //! \massign
+    async_data_op_req &operator=(async_data_op_req &&o) BOOST_NOEXCEPT_OR_NOTHROW { static_cast<detail::async_data_op_req_impl<true>>(*this)=std::move(o); return *this; }
+    //! \async_data_op_req1
+    template<class T> async_data_op_req(async_io_op _precondition, T v, off_t _where) : detail::async_data_op_req_impl<true>(std::move(_precondition), std::move(v), _where) { }
 };
 
 /*! \brief Convenience instantiator of a async_data_op_req, letting the compiler deduce the template specialisation to use.

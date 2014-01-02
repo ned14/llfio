@@ -193,6 +193,26 @@ BOOST_AFIO_AUTO_TEST_CASE(async_data_op_req_compilation, "Tests that all the use
             last=dispatcher->write(make_async_data_op_req(last, out, 0));
             when_all(last).wait();
         }
+        // boost::asio::mutable_buffer specialisation
+        {
+            typedef boost::asio::mutable_buffer type;
+            typedef boost::asio::const_buffer const_type;
+
+            unsigned word=0xdeadbeef;
+            type out(&word, 1);
+            // works
+            last=dispatcher->write(async_data_op_req<const_type>(last, out, 0));
+            when_all(last).wait();
+            // auto-consts
+            last=dispatcher->write(async_data_op_req<type>(last, out, 0));
+            when_all(last).wait();
+            // works
+            last=dispatcher->read(async_data_op_req<type>(last, out, 0));
+            when_all(last).wait();
+            // deduces
+            last=dispatcher->write(make_async_data_op_req(last, out, 0));
+            when_all(last).wait();
+        }
         last=dispatcher->close(last);
         when_all(last).wait();
         auto rmfile(dispatcher->rmfile(async_path_op_req(last, "testdir/foo")));
