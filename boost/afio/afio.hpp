@@ -1777,9 +1777,9 @@ namespace detail
         async_data_op_req_impl(async_io_op _precondition, void *v, size_t _length, off_t _where) : precondition(std::move(_precondition)), where(_where) { buffers.reserve(1); buffers.push_back(boost::asio::mutable_buffer(v, _length)); _validate(); }
         //! \async_data_op_req2
         async_data_op_req_impl(async_io_op _precondition, std::vector<boost::asio::mutable_buffer> _buffers, off_t _where) : precondition(std::move(_precondition)), buffers(std::move(_buffers)), where(_where) { _validate(); }
-        //! \async_data_op_req2 \tparam "size_t N" Number of boost::asio::mutable_buffer
+        //! \async_data_op_req2 \tparam N Number of boost::asio::mutable_buffer
         template<size_t N> async_data_op_req_impl(async_io_op _precondition, std::array<boost::asio::mutable_buffer, N> _buffers, off_t _where) : precondition(std::move(_precondition)), buffers(std::make_move_iterator(_buffers.begin()), std::make_move_iterator(_buffers.end())), where(_where) { _validate(); }
-		//! \async_data_op_req2
+		//! \async_data_op_req3
 		async_data_op_req_impl(async_io_op _precondition, boost::asio::mutable_buffer _buffer, off_t _where) : precondition(std::move(_precondition)), buffers(1, std::move(_buffer)), where(_where) { _validate(); }
 		//! Validates contents for correctness \return True if contents are correct
         bool validate() const
@@ -1840,9 +1840,9 @@ namespace detail
                 buffers.push_back(std::move(i));
             _validate();
         }
-        //! \async_data_op_req2 \tparam "size_t N" Number of boost::asio::const_buffer
+        //! \async_data_op_req2 \tparam N Number of boost::asio::const_buffer
         template<size_t N> async_data_op_req_impl(async_io_op _precondition, std::array<boost::asio::const_buffer, N> _buffers, off_t _where) : precondition(std::move(_precondition)), buffers(std::make_move_iterator(_buffers.begin()), std::make_move_iterator(_buffers.end())), where(_where) { _validate(); }
-        //! \async_data_op_req2 \tparam "size_t N" Number of boost::asio::mutable_buffer
+        //! \async_data_op_req2 \tparam N Number of boost::asio::mutable_buffer
         template<size_t N> async_data_op_req_impl(async_io_op _precondition, std::array<boost::asio::mutable_buffer, N> _buffers, off_t _where) : precondition(std::move(_precondition)), where(_where)
         {
             buffers.reserve(_buffers.size());
@@ -1850,7 +1850,7 @@ namespace detail
                 buffers.push_back(std::move(i));
             _validate();
         }
-		//! \async_data_op_req2
+		//! \async_data_op_req3
 		async_data_op_req_impl(async_io_op _precondition, boost::asio::const_buffer _buffer, off_t _where) : precondition(std::move(_precondition)), buffers(1, std::move(_buffer)), where(_where) { _validate(); }
 		//! Validates contents for correctness \return True if contents are correct
         bool validate() const
@@ -1908,7 +1908,7 @@ template<class T> struct async_data_op_req : public detail::async_data_op_req_im
     async_data_op_req &operator=(async_data_op_req &&o) BOOST_NOEXCEPT_OR_NOTHROW { static_cast<detail::async_data_op_req_impl<false>>(*this)=std::move(o); return *this; }
     //! \async_data_op_req1 \param _length The number of bytes to transfer
     async_data_op_req(async_io_op _precondition, T *v, size_t _length, off_t _where) : detail::async_data_op_req_impl<false>(std::move(_precondition), static_cast<void *>(v), _length, _where) { }
-    //! \async_data_op_req1
+    //! \async_data_op_req1 \tparam N The size of the array
     template<size_t N> async_data_op_req(async_io_op _precondition, T (&v)[N], off_t _where) : detail::async_data_op_req_impl<false>(std::move(_precondition), static_cast<void *>(v), N*sizeof(T), _where) { }
 };
 //! \brief A convenience bundle of precondition, data and where for writing from a single `const T *`. Data \b MUST stay around until the operation completes. \tparam "class T" Any readable type T \ingroup async_data_op_req
@@ -1941,7 +1941,7 @@ template<class T> struct async_data_op_req<const T> : public detail::async_data_
     async_data_op_req &operator=(async_data_op_req &&o) BOOST_NOEXCEPT_OR_NOTHROW { static_cast<detail::async_data_op_req_impl<true>>(*this)=std::move(o); return *this; }
     //! \async_data_op_req1 \param _length The number of bytes to transfer
     async_data_op_req(async_io_op _precondition, const T *v, size_t _length, off_t _where) : detail::async_data_op_req_impl<true>(std::move(_precondition), static_cast<const void *>(v), _length, _where) { }
-    //! \async_data_op_req1
+    //! \async_data_op_req1 \tparam N The size of the array
     template<size_t N> async_data_op_req(async_io_op _precondition, const T (&v)[N], off_t _where) : detail::async_data_op_req_impl<true>(std::move(_precondition), static_cast<const void *>(v), N*sizeof(const T), _where) { }
 };
 //! \brief A convenience bundle of precondition, data and where for reading into a `void *`. Data \b MUST stay around until the operation completes. \ingroup async_data_op_req
@@ -2148,7 +2148,7 @@ template<class A> struct async_data_op_req<std::vector<boost::asio::const_buffer
     //! \async_data_op_req1
     template<class T, class A2> async_data_op_req(async_io_op _precondition, std::vector<T, A2> v, off_t _where) : detail::async_data_op_req_impl<true>(std::move(_precondition), std::move(v), _where) { }
 };
-//! \brief A convenience bundle of precondition, data and where for reading into a `std::array<boost::asio::mutable_buffer, N>`. Data \b MUST stay around until the operation completes. \tparam "size_t N" The size of the array. \ingroup async_data_op_req
+//! \brief A convenience bundle of precondition, data and where for reading into a `std::array<boost::asio::mutable_buffer, N>`. Data \b MUST stay around until the operation completes. \tparam N The size of the array. \ingroup async_data_op_req
 template<size_t N> struct async_data_op_req<std::array<boost::asio::mutable_buffer, N>> : public detail::async_data_op_req_impl<false>
 {
 #ifdef DOXYGEN_SHOULD_SKIP_THIS
@@ -2172,7 +2172,7 @@ template<size_t N> struct async_data_op_req<std::array<boost::asio::mutable_buff
     //! \async_data_op_req1
     async_data_op_req(async_io_op _precondition, std::array<boost::asio::mutable_buffer, N> v, off_t _where) : detail::async_data_op_req_impl<false>(std::move(_precondition), std::move(v), _where) { }
 };
-//! \brief A convenience bundle of precondition, data and where for writing from a `std::array<boost::asio::const_buffer, A>`. Data \b MUST stay around until the operation completes. \tparam "size_t N" The size of the array. \ingroup async_data_op_req
+//! \brief A convenience bundle of precondition, data and where for writing from a `std::array<boost::asio::const_buffer, A>`. Data \b MUST stay around until the operation completes. \tparam N The size of the array. \ingroup async_data_op_req
 template<size_t N> struct async_data_op_req<std::array<boost::asio::const_buffer, N>> : public detail::async_data_op_req_impl<true>
 {
 #ifdef DOXYGEN_SHOULD_SKIP_THIS
