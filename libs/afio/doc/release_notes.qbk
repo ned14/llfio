@@ -16,10 +16,17 @@
 reads and writes (in progress).
 
 * async_io_dispatcher_base::read_partial() to read as much of a single buffer as
-possible, rather than full buffers.
+possible, rather than only complete buffers.
 
 * Portable fast file locking which works across network shares, but can still
-utilise shared memory where possible.
+utilise shared memory when possible.
+
+* Fast, scalable portable directory contents change monitoring. It should be able
+to monitor a 1M entry directory experiencing 1% entry changes per second without
+using a shocking amount of RAM.
+
+* Integration of direct proposed Boost.Fiber library support. Potentially ASIO
+style callbacks too, if technically feasible.
 
 [/=================]
 [heading Boost 1.56 AFIO v1.11]
@@ -192,8 +199,9 @@ building on low end CPUs like first gen Intel Atom's.
 This is actually a safety checkpoint for your code: in complex, multi-process concurrent reading and writing of
 the same file, it is extremely difficult to coordinate changing file lengths with i/o in a way which
 doesn't introduce race conditions OR unacceptably low performance. AFIO therefore doesn't even
-try[footnote AFIO [*will] try after fast portable file locking support has been added, but until then no.]
-and simply requires you the programmer to ALWAYS do i/o whether reading or writing within the extent
+try[footnote AFIO [*will] try to provide a synchronised, accurate file extent after fast portable
+file locking support has been added, but until then no.]
+and simply requires you the programmer to ALWAYS do i/o, whether reading or writing, within the extent
 of a file. In other words, if you're going to read 100 bytes from offset 100 in a file, that file
 better be at least 200 bytes long or it's going to fail with a fatal application exit.
 

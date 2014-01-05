@@ -379,7 +379,7 @@ An op handle.
 [[``template<class T>
 std::vector< async_io_op > read(const std::vector< async_data_op_req< T >> & ops)``
 
-] [Schedule a batch of asynchronous data reads after preceding operations. ] [[* const std::vector< async_data_op_req< T >> &]: ['ops]:  A batch of async_data_op_req<T> structures.
+] [Schedule a batch of asynchronous data reads after preceding operations, where offset and total data read must not exceed the present file size. ] [[* const std::vector< async_data_op_req< T >> &]: ['ops]:  A batch of async_data_op_req<T> structures.
 
 
 
@@ -391,7 +391,7 @@ A batch of op handles.
 [[``template<class T>
 async_io_op read(const async_data_op_req< T > & req)``
 
-] [Schedule an asynchronous data read after a preceding operation. ] [[* const async_data_op_req< T > &]: ['req]:  An async_data_op_req<T> structure.
+] [Schedule an asynchronous data read after a preceding operation, where offset and total data read must not exceed the present file size. ] [[* const async_data_op_req< T > &]: ['req]:  An async_data_op_req<T> structure.
 
 
 
@@ -403,7 +403,7 @@ An op handle.
 [[``template<class T>
 std::vector< async_io_op > write(const std::vector< async_data_op_req< const T >> & ops)``
 
-] [Schedule a batch of asynchronous data writes after preceding operations. ] [[* const std::vector< async_data_op_req< const T >> &]: ['ops]:  A batch of async_data_op_req<const T> structures.
+] [Schedule a batch of asynchronous data writes after preceding operations, where offset and total data written must not exceed the present file size. ] [[* const std::vector< async_data_op_req< const T >> &]: ['ops]:  A batch of async_data_op_req<const T> structures.
 
 
 
@@ -415,7 +415,7 @@ A batch of op handles.
 [[``template<class T>
 async_io_op write(const async_data_op_req< const T > & req)``
 
-] [Schedule an asynchronous data write after a preceding operation. ] [[* const async_data_op_req< const T > &]: ['req]:  An async_data_op_req<const T> structure.
+] [Schedule an asynchronous data write after a preceding operation, where offset and total data written must not exceed the present file size. ] [[* const async_data_op_req< const T > &]: ['req]:  An async_data_op_req<const T> structure.
 
 
 

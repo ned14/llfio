@@ -1149,7 +1149,8 @@ public:
     */
     inline async_io_op close(const async_io_op &req);
 
-    /*! \brief Schedule a batch of asynchronous data reads after preceding operations.
+    /*! \brief Schedule a batch of asynchronous data reads after preceding operations, where
+	offset and total data read must not exceed the present file size.
 
     \direct_io_note
     \return A batch of op handles.
@@ -1167,7 +1168,8 @@ public:
 #else
     template<class T> BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC std::vector<async_io_op> read(const std::vector<async_data_op_req<T>> &ops) BOOST_AFIO_HEADERS_ONLY_VIRTUAL_UNDEFINED_SPEC
 #endif
-    /*! \brief Schedule an asynchronous data read after a preceding operation.
+    /*! \brief Schedule an asynchronous data read after a preceding operation, where
+	offset and total data read must not exceed the present file size.
 
     \direct_io_note
     \return An op handle.
@@ -1184,7 +1186,8 @@ public:
 #else
     template<class T> inline async_io_op read(const async_data_op_req<T> &req);
 #endif
-    /*! \brief Schedule a batch of asynchronous data writes after preceding operations.
+    /*! \brief Schedule a batch of asynchronous data writes after preceding operations, where
+	offset and total data written must not exceed the present file size.
 
     \direct_io_note
     \return A batch of op handles.
@@ -1202,7 +1205,8 @@ public:
 #else
     template<class T> BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC std::vector<async_io_op> write(const std::vector<async_data_op_req<const T>> &ops) BOOST_AFIO_HEADERS_ONLY_VIRTUAL_UNDEFINED_SPEC
 #endif
-    /*! \brief Schedule an asynchronous data write after a preceding operation.
+    /*! \brief Schedule an asynchronous data write after a preceding operation, where
+	offset and total data written must not exceed the present file size.
 
     \direct_io_note
     \return An op handle.

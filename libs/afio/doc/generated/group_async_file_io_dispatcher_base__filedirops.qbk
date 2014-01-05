@@ -256,7 +256,7 @@ An op handle.
 [section:read_1_batch read (batch)]
 
 '''<indexterm><primary>read</primary></indexterm>'''
-Schedule a batch of asynchronous data reads after preceding operations. 
+Schedule a batch of asynchronous data reads after preceding operations, where offset and total data read must not exceed the present file size. 
 
 [heading Description]
 Note that on Windows this call issues a separate async file operation for each buffer supplied, thus making scatter/gather i/o no more efficient than making separate calls. The big exception to this is when doing unbuffered page aligned i/o for which Windows provides special scatter/gather i/o functions. 
@@ -290,7 +290,7 @@ A batch of op handles.
 [section:read_1_single read (single)]
 
 '''<indexterm><primary>read</primary></indexterm>'''
-Schedule an asynchronous data read after a preceding operation. 
+Schedule an asynchronous data read after a preceding operation, where offset and total data read must not exceed the present file size. 
 
 [heading Description]
 Note that on Windows this call issues a separate async file operation for each buffer supplied, thus making scatter/gather i/o no more efficient than making separate calls. The big exception to this is when doing unbuffered page aligned i/o for which Windows provides special scatter/gather i/o functions. 
@@ -684,7 +684,7 @@ An op handle.
 [section:write_1_batch write (batch)]
 
 '''<indexterm><primary>write</primary></indexterm>'''
-Schedule a batch of asynchronous data writes after preceding operations. 
+Schedule a batch of asynchronous data writes after preceding operations, where offset and total data written must not exceed the present file size. 
 
 [heading Description]
 Note that on Windows this call issues a separate async file operation for each buffer supplied, thus making scatter/gather i/o no more efficient than making separate calls. The big exception to this is when doing unbuffered page aligned i/o for which Windows provides special scatter/gather i/o functions. 
@@ -718,7 +718,7 @@ A batch of op handles.
 [section:write_1_single write (single)]
 
 '''<indexterm><primary>write</primary></indexterm>'''
-Schedule an asynchronous data write after a preceding operation. 
+Schedule an asynchronous data write after a preceding operation, where offset and total data written must not exceed the present file size. 
 
 [heading Description]
 Note that on Windows this call issues a separate async file operation for each buffer supplied, thus making scatter/gather i/o no more efficient than making separate calls. The big exception to this is when doing unbuffered page aligned i/o for which Windows provides special scatter/gather i/o functions. 
