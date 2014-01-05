@@ -2357,6 +2357,14 @@ struct async_enumerate_op_req
     \param _glob An optional shell glob by which to filter the items returned. Done kernel side on Windows, user side on POSIX.
     */
     async_enumerate_op_req(async_io_op _precondition, size_t _maxitems, bool _restart=true, std::filesystem::path _glob=std::filesystem::path()) : precondition(std::move(_precondition)), maxitems(_maxitems), restart(_restart), glob(std::move(_glob)) { _validate(); }
+    /*! \brief Constructs an instance.
+    
+    \param _precondition The precondition for this operation.
+    \param _glob A shell glob by which to filter the items returned. Done kernel side on Windows, user side on POSIX.
+    \param _maxitems The maximum number of items to return in this request. Note that setting to one will often invoke two syscalls.
+    \param _restart Restarts the enumeration for this open directory handle.
+    */
+    async_enumerate_op_req(async_io_op _precondition, std::filesystem::path _glob, size_t _maxitems=2, bool _restart=true) : precondition(std::move(_precondition)), maxitems(_maxitems), restart(_restart), glob(std::move(_glob)) { _validate(); }
     //! Validates contents
     bool validate() const
     {

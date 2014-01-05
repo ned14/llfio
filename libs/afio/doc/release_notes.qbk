@@ -9,6 +9,19 @@
 [section:release_notes Release Notes]
 
 [/=================]
+[heading Anticipated forthcoming features in future versions]
+[/=================]
+
+* Async fast batch hash engine which provides transparent hashing of all async
+reads and writes (in progress).
+
+* async_io_dispatcher_base::read_partial() to read as much of a single buffer as
+possible, rather than full buffers.
+
+* Portable fast file locking which works across network shares, but can still
+utilise shared memory where possible.
+
+[/=================]
 [heading Boost 1.56 AFIO v1.11]
 [/=================]
 
@@ -173,5 +186,39 @@ You should notice a 6x-10x improvement to compilation time, which is a huge win 
 building on low end CPUs like first gen Intel Atom's.
 
 [endsect] [/slow_compile]
+
+[section:fatal_error_read Why do I get a fatal application exit with `FATAL EXCEPTION: Failed to read all buffers` when I read a file?]
+
+This is actually a safety checkpoint for your code: in complex, multi-process concurrent reading and writing of
+the same file, it is extremely difficult to coordinate changing file lengths with i/o in a way which
+doesn't introduce race conditions OR unacceptably low performance. AFIO therefore doesn't even
+try[footnote AFIO [*will] try after fast portable file locking support has been added, but until then no.]
+and simply requires you the programmer to ALWAYS do i/o whether reading or writing within the extent
+of a file. In other words, if you're going to read 100 bytes from offset 100 in a file, that file
+better be at least 200 bytes long or it's going to fail with a fatal application exit.
+
+This will probably seem harsh to anyone using AFIO for the first time, because the following
+naive code will fatal exit the application if foo.txt is not 1024 bytes or longer:
+
+[readallof_example_bad]
+
+With synchronous i/o a read of 1024 bytes will read ['up to] 1024 bytes, returning the amount
+actually read via some mechanism. With AFIO, either you
+read [*all] 1024 bytes or you read nothing, in which case a normal exception is thrown with
+whatever error the operating system returned. If a ['partial] read happens, then AFIO fatal
+exits the application with the above message as it is probably a logic error in your code.
+
+You may now wonder how to easily not exceed file extents during i/o: for writing, see
+__afio_truncate__ to ensure a file's size before writing. For reading, the following code
+is suggested:
+
+[readallof_example_single]
+
+If you're going to read many files from the same directory, it is far faster to open a
+handle to the containing directory and using enumerate to fetch the metadata:
+
+[readallof_example_many]
+
+[endsect] [/fatal_error_read]
 
 [endsect] [/FAQ]
