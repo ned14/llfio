@@ -300,10 +300,10 @@ namespace boost { namespace afio {
 #else
 #include "boost/system/system_error.hpp"
 namespace boost { namespace afio {
-    typedef boost::error_code error_code;
-    typedef boost::system_error system_error;
-    using boost::generic_category;
-    using boost::system_category;
+    typedef boost::system::error_code error_code;
+    typedef boost::system::system_error system_error;
+    using boost::system::generic_category;
+    using boost::system::system_category;
 } }
 
 #endif

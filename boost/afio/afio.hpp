@@ -23,13 +23,6 @@ File Created: Mar 2013
 // Define this to work around ASIO's io_service.post() not coping with move-only input
 #define BOOST_AFIO_WORK_AROUND_ASIO_IO_SERVICE_POST_NO_MOVE_ONLY_SUPPORT 1
 
-// Define this to serialise thread job dispatch in order to work around a race condition in ASIO on Win32
-#ifdef WIN32
-#ifndef BOOST_AFIO_WORK_AROUND_LOST_ASIO_WRITE_COMPLETION_WAKEUPS
-//#define BOOST_AFIO_WORK_AROUND_LOST_ASIO_WRITE_COMPLETION_WAKEUPS 1 // ASIO appears to be fixed as of v1.55
-#endif
-#endif
-
 #include "config.hpp"
 #include "boost/asio.hpp"
 #include "boost/foreach.hpp"
@@ -88,7 +81,6 @@ typedef unsigned long long off_t;
 /*! \class thread_source
 \brief Abstract base class for a source of thread workers
 
-This instantiates a `boost::asio::io_service` and a latchable `boost::asio::io_service::work` to keep any threads working.
 Note that in Boost 1.54, and possibly later versions, `boost::asio::io_service` on Windows appears to dislike being
 destructed during static data deinit, hence why this inherits from `std::enable_shared_from_this<>` in order that it
 may be reference count deleted before static data deinit occurs.
@@ -115,14 +107,8 @@ private:
     };
 #endif
 protected:
-    boost::asio::io_service service;
-    std::unique_ptr<boost::asio::io_service::work> working;
-    thread_source() : working(make_unique<boost::asio::io_service::work>(service))
-    {
-    }
-    thread_source(size_t concurrency_hint) : service(concurrency_hint), working(make_unique<boost::asio::io_service::work>(service))
-    {
-    }
+    boost::asio::io_service &service;
+    thread_source(boost::asio::io_service &_service) : service(_service) { }
     BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC ~thread_source() { }
 public:
     //! Returns the underlying io_service
@@ -149,6 +135,8 @@ public:
 
 /*! \class std_thread_pool
 \brief A very simple thread pool based on std::thread or boost::thread
+
+This instantiates a `boost::asio::io_service` and a latchable `boost::asio::io_service::work` to keep any threads working until the instance is destructed.
 */
 class std_thread_pool : public thread_source {
     class worker
@@ -184,27 +172,14 @@ class std_thread_pool : public thread_source {
     };
     friend class worker;
 
+    boost::asio::io_service service;
+    std::unique_ptr<boost::asio::io_service::work> working;
     std::vector< std::unique_ptr<thread> > workers;
 public:
     /*! \brief Constructs a thread pool of \em no workers
     \param no The number of worker threads to create
     */
-    explicit std_thread_pool(size_t no)
-#if BOOST_AFIO_WORK_AROUND_LOST_ASIO_WRITE_COMPLETION_WAKEUPS
-        // ASIO has some race condition in its IOCP backend where it loses write completion
-        // wakeups (not read, only write)
-        //
-        // If I had to take a guess, if you think about it with sockets no one is ever
-        // going to write to some socket from multiple threads simultaneously because
-        // you would interleave the outflow. As a result, ASIO is probably not fully
-        // debugged for the situation where someone is actually writing from multiple
-        // threads simultaneously.
-        //
-        // The following tells ASIO to tell its IOCP completion port to serialise port
-        // completion dispatch. No it does not improve performance, but it's a lot better than
-        // sticking a giant mutex around all write operations.
-        : thread_source(1)
-#endif
+    explicit std_thread_pool(size_t no) : thread_source(service), working(make_unique<boost::asio::io_service::work>(service))
     {
         add_workers(no);
     }
