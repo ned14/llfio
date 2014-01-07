@@ -40,6 +40,14 @@ execution. This makes expanding out multiple ops from a single precondition easy
 but what about reducing multiple ops down to a single precondition? For that, use
 __afio_barrier__.
 
+AFIO itself throws almost no exceptions apart from `std::invalid_argument`, though it
+can throw fatal exceptions when you're doing something unwise (and make sure to check
+the FAQ if you do see a fatal exception, it will explain what you're doing wrong). It
+does trap all operating system errors, reporting these as the appropriate `std::system_error`
+when code next gathers error state from that operation (usually using `when_all()`). One
+can of course also receive exceptions thrown by anything AFIO calls (the STL, Boost etc).
+AFIO is thought to be exception safe, except when `std::bad_alloc` is thrown.
+
 [section:async_file_io Asynchronous file i/o]
 
 The asynchronous file i/o implementation consists of a number of member functions in
