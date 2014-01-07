@@ -59,6 +59,7 @@ namespace boost {
 }
 #endif
 
+// Bring in either the C++ 11 or Boost threading library
 namespace boost { namespace afio {
 
 #define BOOST_AFIO_FORWARD_STL_IMPL(M, B) \
@@ -286,5 +287,25 @@ template<class R> class packaged_task<R()>
     }
 
 } }
+
+#ifndef BOOST_NO_CXX11_HDR_SYSTEM_ERROR
+#include <system_error>
+namespace boost { namespace afio {
+    typedef std::error_code error_code;
+    typedef std::system_error system_error;
+    using std::generic_category;
+    using std::system_category;
+} }
+
+#else
+#include "boost/system/system_error.hpp"
+namespace boost { namespace afio {
+    typedef boost::error_code error_code;
+    typedef boost::system_error system_error;
+    using boost::generic_category;
+    using boost::system_category;
+} }
+
+#endif
 
 #endif
