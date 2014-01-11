@@ -12,7 +12,7 @@
 [section:async_enumerate_op_req async_enumerate_op_req]
 
 '''<indexterm><primary>async_enumerate_op_req</primary></indexterm>'''
-A convenience bundle of precondition, number of items to enumerate and item pattern match. 
+A convenience bundle of precondition, number of items to enumerate, item pattern match and metadata to prefetch. 
 
 [heading Synopsis]
 ``struct async_enumerate_op_req
@@ -30,7 +30,7 @@ A convenience bundle of precondition, number of items to enumerate and item patt
 
 
 ]]
-[[``async_enumerate_op_req(async_io_op _precondition, size_t _maxitems, bool _restart = true, std::filesystem::path _glob = std::filesystem::path())``
+[[``async_enumerate_op_req(async_io_op _precondition, size_t _maxitems = 2, bool _restart = true, std::filesystem::path _glob = std::filesystem::path(), metadata_flags _metadata = metadata_flags::None)``
 
 ] [Constructs an instance. ] [[* async_io_op]: ['_precondition]:  The precondition for this operation. 
 
@@ -40,11 +40,13 @@ A convenience bundle of precondition, number of items to enumerate and item patt
 
 [* std::filesystem::path]: ['_glob]:  An optional shell glob by which to filter the items returned. Done kernel side on Windows, user side on POSIX. 
 
+[* metadata_flags]: ['_metadata]:  The metadata to prefetch for each item enumerated. AFIO may fetch more metadata than requested if it is cost free. 
+
 
 
 
 ]]
-[[``async_enumerate_op_req(async_io_op _precondition, std::filesystem::path _glob, size_t _maxitems = 2, bool _restart = true)``
+[[``async_enumerate_op_req(async_io_op _precondition, std::filesystem::path _glob, size_t _maxitems = 2, bool _restart = true, metadata_flags _metadata = metadata_flags::None)``
 
 ] [Constructs an instance. ] [[* async_io_op]: ['_precondition]:  The precondition for this operation. 
 
@@ -53,6 +55,24 @@ A convenience bundle of precondition, number of items to enumerate and item patt
 [* size_t]: ['_maxitems]:  The maximum number of items to return in this request. Note that setting to one will often invoke two syscalls. 
 
 [* bool]: ['_restart]:  Restarts the enumeration for this open directory handle. 
+
+[* metadata_flags]: ['_metadata]:  The metadata to prefetch for each item enumerated. AFIO may fetch more metadata than requested if it is cost free. 
+
+
+
+
+]]
+[[``async_enumerate_op_req(async_io_op _precondition, metadata_flags _metadata, size_t _maxitems = 2, bool _restart = true, std::filesystem::path _glob = std::filesystem::path())``
+
+] [Constructs an instance. ] [[* async_io_op]: ['_precondition]:  The precondition for this operation. 
+
+[* metadata_flags]: ['_metadata]:  The metadata to prefetch for each item enumerated. AFIO may fetch more metadata than requested if it is cost free. 
+
+[* size_t]: ['_maxitems]:  The maximum number of items to return in this request. Note that setting to one will often invoke two syscalls. 
+
+[* bool]: ['_restart]:  Restarts the enumeration for this open directory handle. 
+
+[* std::filesystem::path]: ['_glob]:  An optional shell glob by which to filter the items returned. Done kernel side on Windows, user side on POSIX. 
 
 
 

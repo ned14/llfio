@@ -204,8 +204,13 @@ etc.
 We know about that slowdown! The solution is easy: define `BOOST_AFIO_HEADERS_ONLY` to 0 for each compiland, and
 link to the AFIO shared library instead. Do the same for ASIO by defining `BOOST_ASIO_SEPARATE_COMPILATION`
 or `BOOST_ASIO_DYN_LINK` as is appropriate to your circumstances for each compiland, and link to the ASIO
-shared library instead (which is built via `boost/asio/impl/src.hpp`, see ASIO's docs). The Jamfile.v2
-in the test directory implements an option `--fast-build` which is an example of how to do this.
+shared library instead (which is built via `boost/asio/impl/src.hpp`, see ASIO's docs).
+
+While those alone are a significant improvement, still further improvements can be gained by
+configuring precompiled headers support for your compiler. Getting this to work correctly is, as
+always, quite brittle but is very much worth it on low end CPUs. The Jamfile.v2 in the test
+directory implements an option `--fast-build` which is an example of how to achieve maximum
+build performance with AFIO.
 
 You should notice a 6x-10x improvement to compilation time, which is a huge win during debugging, or
 building on low end CPUs like first gen Intel Atom's.
@@ -247,5 +252,17 @@ instead of using `direntry()` which is synchronous:
 [readallof_example_many]
 
 [endsect] [/fatal_error_read]
+
+[section:async_metadata `async_io_handle::direntry()` and `async_io_handle::lstat()` are
+both synchronous functions which block. How then can I get metadata about files and
+directories asynchronously?]
+
+This is easy, if not terribly obvious: call __afio_enumerate__ on the containing
+directory of the file you want metadata for with a shell glob exactly matching the
+file name and with the minimum metadata you are looking for. AFIO will then
+asynchronously fetch that metadata for you, returning it in the future `directory_entry`
+returned by `enumerate()`.
+
+[endsect] [/async_metadata]
 
 [endsect] [/FAQ]

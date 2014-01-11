@@ -14,6 +14,9 @@
 '''<indexterm><primary>std_thread_pool</primary></indexterm>'''
 A very simple thread pool based on std::thread or boost::thread. 
 
+[heading Description]
+This instantiates a [^`boost::asio::io_service`] and a latchable [^`boost::asio::io_service::work`] to keep any threads working until the instance is destructed. 
+
 [heading Synopsis]
 ``class std_thread_pool
       : public thread_source
