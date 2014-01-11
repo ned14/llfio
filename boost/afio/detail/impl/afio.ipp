@@ -1873,6 +1873,24 @@ namespace detail {
             async_io_handle_posix *p=static_cast<async_io_handle_posix *>(h.get());
             try
             {
+                auto globstr=req.glob.native();
+                // Is glob a single entry match? If so, skip enumerating.
+                if(!globstr.empty() && std::string::npos==globstr.find('*') && std::string::npos==globstr.find('?') && std::string::npos==globstr.find('['))
+                {
+                    std::vector<directory_entry> _ret;
+                    _ret.reserve(1);
+                    BOOST_AFIO_POSIX_STAT_STRUCT s={0};
+                    std::filesystem::path path(p->path());
+                    path/=req.glob;
+                    if(-1!=BOOST_AFIO_POSIX_LSTAT(path.c_str(), &s))
+                    {
+                        stat_t stat(nullptr);
+                        fill_stat_t(stat, s, req.metadata);
+                        _ret.push_back(directory_entry(path.leaf(), stat, req.metadata));
+                    }
+                    ret->set_value(std::make_pair(std::move(_ret), false));
+                    return std::make_pair(true, h);
+                }
 #ifdef WIN32
                 BOOST_AFIO_THROW(std::runtime_error("Enumerating directories via MSVCRT is not supported."));
 #else
@@ -1927,7 +1945,7 @@ namespace detail {
                     size_t length=strchr(dent->d_name, 0)-dent->d_name;
                     if(length<=2 && '.'==dent->d_name[0])
                         if(1==length || '.'==dent->d_name[1]) continue;
-                    if(!req.glob.empty() && fnmatch(req.glob.native().c_str(), dent->d_name, 0)) continue;
+                    if(!req.glob.empty() && fnmatch(globstr.c_str(), dent->d_name, 0)) continue;
                     std::filesystem::path::string_type leafname(dent->d_name, length);
                     item.leafname=std::move(leafname);
                     item.stat.st_ino=dent->d_ino;
