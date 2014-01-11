@@ -164,7 +164,7 @@ public:
         // The Windows NT kernel filing system driver gets upset with too much concurrency
         // when used with OSDirect so throttle directory enumerations to enforce some depth first traversal.
         {
-            auto dir_openedf=std::make_pair(async_op_flags::None, std::bind(&find_in_files::dir_opened, this, 
+            std::pair<async_op_flags, std::function<async_file_io_dispatcher_base::completion_t>> dir_openedf=std::make_pair(async_op_flags::None, std::bind(&find_in_files::dir_opened, this, 
                 std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
             for(auto &entry : entries)
             {
@@ -223,8 +223,9 @@ public:
                         auto file_open=dispatcher->file(async_path_op_req(lastdir, h->path()/entry.name(), flags));
                         auto file_opened=dispatcher->completion(file_open, 
                             std::make_pair(async_op_flags::None, 
-                                std::bind(&find_in_files::file_opened, this, 
-                                    std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, length)));
+                                std::function<async_file_io_dispatcher_base::completion_t>(
+                                    std::bind(&find_in_files::file_opened, this, 
+                                        std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, length))));
                         doscheduled({ file_open, file_opened });
                         lastdir=file_opened;
                     }
@@ -246,9 +247,10 @@ public:
         auto listing=std::make_shared<future<std::pair<std::vector<directory_entry>, 
             bool>>>(std::move(enumeration.first));
         auto enumeration_done=dispatcher->completion(enumeration.second, 
-            make_pair(async_op_flags::None, 
-                std::bind(&find_in_files::dir_enumerated, this, 
-                    std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, listing)));
+            make_pair(async_op_flags::None,
+                std::function<async_file_io_dispatcher_base::completion_t>(
+                    std::bind(&find_in_files::dir_enumerated, this, 
+                        std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, listing))));
         doscheduled({enumeration.second, enumeration_done});
         docompleted(2);
         // Complete only if not the cur dir opened
@@ -295,8 +297,9 @@ public:
         std::cout << "\n\nStarting directory enumerations ..." << std::endl;
         auto cur_dir=dispatcher->dir(async_path_op_req(""));
         auto cur_dir_opened=dispatcher->completion(cur_dir, std::make_pair(async_op_flags::None, 
-            std::bind(&find_in_files::dir_opened, this, 
-                std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
+            std::function<async_file_io_dispatcher_base::completion_t>(
+                std::bind(&find_in_files::dir_opened, this, 
+                    std::placeholders::_1, std::placeholders::_2, std::placeholders::_3))));
         doscheduled({cur_dir, cur_dir_opened});
         dowait();
     }
