@@ -339,7 +339,7 @@ namespace detail {
     };
 
 #ifdef DOXYGEN_NO_CLASS_ENUMS
-    enum file_flags
+    enum OpType
 #elif defined(BOOST_NO_CXX11_SCOPED_ENUMS)
     BOOST_SCOPED_ENUM_DECLARE_BEGIN(OpType)
 #else
