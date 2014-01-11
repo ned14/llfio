@@ -1,6 +1,6 @@
 #  Boost.AFIO Library test Jamfile
 #
-#  Copyright (c) 2013 Paul Kirth
+#  Copyright (c) 2013 Paul Kirth and Niall Douglas
 #
 #  Distributed under the Boost Software License, Version 1.0.
 #  (See accompanying file LICENSE_1_0.txt or copy at
@@ -14,6 +14,7 @@ import modules ;
 
 import os ;
 import testing ;
+import pch ;
 
 # If we're running in a CI, reduce the length of the unit tests considerably
 rule running-in-ci ( properties * )
@@ -32,7 +33,8 @@ rule fast-build ( properties * )
    {
       return <define>BOOST_AFIO_HEADERS_ONLY=0
 	         <define>BOOST_ASIO_SEPARATE_COMPILATION
-			 <library>../build//boost_afio
+			 <define>BOOST_ASIO_DYN_LINK
+			 <library>../build//boost_afio_dyn_asio
 			 ;
    }
 }
@@ -49,7 +51,10 @@ project boost/afio/test
       <toolset>clang:<cxxflags>"-std=c++0x -fvisibility-inlines-hidden -fstrict-aliasing -Wstrict-aliasing -Wno-unused -Wno-mismatched-tags -fvisibility=hidden -fopenmp -fasynchronous-unwind-tables"
       <toolset>msvc:<cxxflags>"/openmp /GF /Gy /bigobj /D_VARIADIC_MAX=8"
       <toolset>msvc:<linkflags>"/LARGEADDRESSAWARE /DYNAMICBASE /NXCOMPAT" # /VERSION:1.00.0"
-      <toolset>msvc:<define>WIN32 <toolset>msvc:<define>_WINDOWS  <toolset>msvc:<define>UNICODE <toolset>msvc:<define>_UNICODE
+      <toolset>msvc:<define>WIN32
+	  <toolset>msvc:<define>_WINDOWS
+	  <toolset>msvc:<define>UNICODE
+	  <toolset>msvc:<define>_UNICODE
       <target-os>linux:<linkflags>"-lpthread -ldl"
       <target-os>freebsd:<linkflags>"-lpthread"
       <link>shared:<define>BOOST_AFIO_DYN_LINK=1
@@ -57,17 +62,16 @@ project boost/afio/test
       <library>../../filesystem/build//boost_filesystem
       <library>../../atomic/build//boost_atomic
       <library>../../thread/build//boost_thread
+      <library>../../test/build//boost_test_exec_monitor
 	  <conditional>@running-in-ci
 	  <conditional>@fast-build
     ;
 
-#exe boost_afio_test : main.cpp   ../detail/SpookyV2.cpp
-#    : <include>../../../boost/afio/detail
-
-#;
-
-# the required cpp file for the unit tests (for some reason gcc wants this availible to all tests)
-local reqs = ../detail/SpookyV2.cpp   ;
+cpp-pch test_functions : test_functions.hpp : <include>. ;
+explicit test_functions ;
+cpp-pch afio_pch : afio_pch.hpp : <include>. ;
+explicit afio_pch ;
+obj spooky : ../detail/SpookyV2.cpp ;
 
 # look in the commandline args for "--valgrind=" and capture its contents in VALGRIND_ARGS
 local VALGRIND_ARGS = [ MATCH --valgrind=(.*) : $(.argv) ] ;
@@ -119,11 +123,11 @@ if "--link-test"  in $(.argv)
 
     for local x in $(test_files_all)
     {
-        link $(x) $(reqs) ;
+        link $(x) test_functions spooky ;
     }
     for local x in $(example_files)
     {
-        link $(x) $(reqs) ;
+        link $(x) afio_pch spooky ;
     }
 }
 else # run actual tests
@@ -141,19 +145,18 @@ else # run actual tests
     if "--test-all" in $(.argv)   # run the whole test suite at once
     {
         test-suite afio
-          : [ run test_all.cpp  $(reqs) : $(VALGRIND_ARGS) --log_format=XML --log_sink=results_all.xml --log_level=all --report_level=no : : $(launcher) ] 
-
+          : [ run test_all.cpp test_functions spooky : $(VALGRIND_ARGS) --log_format=XML --log_sink=results_all.xml --log_level=all --report_level=no : : $(launcher) ] 
         ;
     }
     else if "--test-each" in $(.argv) # run just the individual tests
     {
         for local file in $(test_files)
-        { run $(file) $(reqs) : $(VALGRIND_ARGS) --log_format=XML --log_sink=results_$(file).xml --log_level=all --report_level=no : : $(launcher) ; }
+        { run $(file) test_functions spooky : $(VALGRIND_ARGS) --log_format=XML --log_sink=results_$(file).xml --log_level=all --report_level=no : : $(launcher) ; }
     }
     else        # otherwise run individual tests and the whole lot at once as a separate test
     {
         for local file in $(test_files_all)
-        { run $(file) $(reqs) : $(VALGRIND_ARGS) --log_format=XML --log_sink=results_$(file).xml --log_level=all --report_level=no : : $(launcher) ; }
+        { run $(file) test_functions spooky : $(VALGRIND_ARGS) --log_format=XML --log_sink=results_$(file).xml --log_level=all --report_level=no : : $(launcher) ; }
 
     }
 }

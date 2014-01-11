@@ -1,4 +1,4 @@
-#include "boost/afio/afio.hpp"
+#include "afio_pch.hpp"
 #if !(defined(BOOST_MSVC) && BOOST_MSVC <= 1700)
 #include <deque>
 #include <regex>
@@ -8,10 +8,6 @@
 #include <initializer_list>
 #include "boost/exception/diagnostic_information.hpp"
 #include "boost/afio/detail/Aligned_Allocator.hpp"
-// Need to include a copy of ASIO
-#ifdef BOOST_ASIO_SEPARATE_COMPILATION
-#include "../../../../boost/asio/impl/src.hpp"
-#endif
 #endif
 
 /* My Intel Core i7 3770K running Windows 8 x64 with 7200rpm drive, using
@@ -245,7 +241,7 @@ public:
         //std::cout << "D " << h->path() << std::endl;
         // Now we have an open directory handle, schedule an enumeration
         auto enumeration=dispatcher->enumerate(async_enumerate_op_req(
-            dispatcher->op_from_scheduled_id(id), 1000));
+            dispatcher->op_from_scheduled_id(id), metadata_flags::size, 1000));
         auto listing=std::make_shared<future<std::pair<std::vector<directory_entry>, 
             bool>>>(std::move(enumeration.first));
         auto enumeration_done=dispatcher->completion(enumeration.second, 

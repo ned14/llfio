@@ -640,6 +640,7 @@ namespace boost { namespace afio { namespace detail {
                 directory_entry item;
                 // This is what windows returns with each enumeration
                 item.have_metadata=directory_entry::metadata_fastpath();
+                bool needmoremetadata=!!(req.metadata&~item.have_metadata);
                 bool done=false;
                 for(FILE_ID_FULL_DIR_INFORMATION *ffdi=buffer.get(); !done; ffdi=(FILE_ID_FULL_DIR_INFORMATION *)((size_t) ffdi + ffdi->NextEntryOffset))
                 {
@@ -662,6 +663,13 @@ namespace boost { namespace afio { namespace detail {
                     item.stat.st_birthtim=to_timepoint(ffdi->CreationTime);
                     _ret.push_back(std::move(item));
                     if(!ffdi->NextEntryOffset) done=true;
+                }
+                if(needmoremetadata)
+                {
+                    BOOST_FOREACH(auto &i, _ret)
+                    {
+                        i.fetch_metadata(h, req.metadata);
+                    }
                 }
                 ret->set_value(std::make_pair(std::move(_ret), !thisbatchdone));
                 complete_async_op(id, h);

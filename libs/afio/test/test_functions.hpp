@@ -29,11 +29,11 @@ extern "C" void tzset(void);
 #include <iostream>
 #include <algorithm>
 #include <unordered_set>
-#include "../../../boost/afio/afio.hpp"
+#include "boost/afio/afio.hpp"
 #include "../detail/SpookyV2.h"
-#include "../../../boost/afio/detail/Aligned_Allocator.hpp"
-#include "../../../boost/afio/detail/MemoryTransactions.hpp"
-#include "../../../boost/afio/detail/valgrind/memcheck.h"
+#include "boost/afio/detail/Aligned_Allocator.hpp"
+#include "boost/afio/detail/MemoryTransactions.hpp"
+#include "boost/afio/detail/valgrind/memcheck.h"
 #include <time.h>
 
 //if we're building the tests all together don't define the test main
@@ -48,7 +48,8 @@ extern "C" void tzset(void);
 #pragma warning(disable: 4535) // calling _set_se_translator() requires /EHa
 #endif
 
-#include <boost/test/included/unit_test.hpp>
+#include "boost/test/unit_test.hpp"
+#include "boost/test/unit_test_monitor.hpp"
 
 //define a simple macro to check any exception using Boost.Test
 #define BOOST_AFIO_CHECK_THROWS(expr)\
@@ -190,7 +191,7 @@ typedef unsigned int  u4;
 typedef struct ranctx { u4 a; u4 b; u4 c; u4 d; } ranctx;
 
 #define rot(x,k) (((x)<<(k))|((x)>>(32-(k))))
-u4 ranval(ranctx *x) {
+static u4 ranval(ranctx *x) {
     u4 e = x->a - rot(x->b, 27);
     x->a = x->b ^ rot(x->c, 17);
     x->b = x->c + x->d;
@@ -199,7 +200,7 @@ u4 ranval(ranctx *x) {
     return x->d;
 }
 
-void raninit(ranctx *x, u4 seed) {
+static void raninit(ranctx *x, u4 seed) {
     u4 i;
     x->a = 0xf1ea5eed, x->b = x->c = x->d = seed;
     for (i = 0; i < 20; ++i) {
@@ -761,10 +762,5 @@ static void print_stat(std::shared_ptr<boost::afio::async_io_handle> dirh, boost
     PRINT_FIELD(birthtim);
 #undef PRINT_FIELD
 }
-
-// Need to include a copy of ASIO
-#ifdef BOOST_ASIO_SEPARATE_COMPILATION
-#include "../../../boost/asio/impl/src.hpp"
-#endif
 
 #endif

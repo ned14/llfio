@@ -3,7 +3,7 @@
 Created: Feb 2013
 */
 
-#include "../test_functions.hpp"
+#include "test_functions.hpp"
 
  static int task()
 {

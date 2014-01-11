@@ -1,9 +1,4 @@
-#include "boost/afio/afio.hpp"
-#include <iostream>
-// Need to include a copy of ASIO
-#ifdef BOOST_ASIO_SEPARATE_COMPILATION
-#include "../../../../boost/asio/impl/src.hpp"
-#endif
+#include "afio_pch.hpp"
 
 #if !(defined(BOOST_MSVC) && BOOST_MSVC <= 1700) && !(defined(__GLIBCXX__) && __GLIBCXX__<=20120920 /* <= GCC 4.7 */) && !defined(__clang__)
 //[filecopy_example
@@ -61,7 +56,7 @@ namespace {
             auto &buffer=std::get<2>(offsets[idx]);
             for(off_t o=0; o<bytes; o+=chunk_size)
             {
-                size_t thischunk=bytes-o;
+                size_t thischunk=(size_t)(bytes-o);
                 if(thischunk>chunk_size) thischunk=chunk_size;
                 // Schedule a filling of buffer from offset o after last has completed
                 auto readchunk=dispatcher->read(make_async_data_op_req(last, buffer.get(),

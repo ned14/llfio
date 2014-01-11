@@ -12,25 +12,7 @@ project boost/afio
       <link>shared:<define>BOOST_AFIO_DYN_LINK=1  
       <link>shared:<define>BOOST_AFIO_SOURCE=1
       <link>static:<define>BOOST_AFIO_SOURCE=1
-      
-    : usage-requirements 
-      <include>. 
-
-    : source-location ../src
-
-;
-
-lib boost_afio 
-    : #sources
-      afio.cpp 
-      ../../system/build//boost_system
-      ../../filesystem/build//boost_filesystem 
-      ../../atomic/build//boost_atomic
-      ../../thread/build//boost_thread
-
-  : #includes 
       <include>../../../boost/afio 
-      <include>../../../boost/afio/detail
       <toolset>gcc:<cxxflags>"-std=c++0x -fvisibility-inlines-hidden -fstrict-aliasing -Wstrict-aliasing -Wno-unused -fargument-noalias -fvisibility=hidden -fopenmp -fasynchronous-unwind-tables"
       <toolset>gcc-mingw:<cxxflags>"-DWIN32 -D_UNICODE -DUNICODE -Wno-missing-braces"
       <toolset>gcc-mingw:<linkflags>"-lws2_32"
@@ -42,8 +24,6 @@ lib boost_afio
       <toolset>msvc:<define>_WINDOWS  
       <toolset>msvc:<define>UNICODE 
       <toolset>msvc:<define>_UNICODE
-        
-      #OS specific dependencies
       <target-os>linux:<linkflags>"-lpthread -ldl"
       <target-os>freebsd:<linkflags>"-lpthread"
       <link>shared:<define>BOOST_AFIO_DYN_LINK=1
@@ -51,10 +31,26 @@ lib boost_afio
       <link>shared:<library>../../filesystem/build//boost_filesystem
       <link>shared:<library>../../atomic/build//boost_atomic
       <link>shared:<library>../../thread/build//boost_thread
+      
+    : usage-requirements 
+      <include>. 
 
-    : #usage requirements
+    : source-location ../src
 
 ;
+
+lib boost_afio 
+    : afio.cpp 
+;
+
+# Have AFIO bundle in an exported copy of ASIO. Saves compiling
+# ASIO later which in turn speeds up compiling AFIO users.
+lib boost_afio_dyn_asio 
+    : afio.cpp 
+	: <define>BOOST_ASIO_SEPARATE_COMPILATION
+	  <define>BOOST_ASIO_DYN_LINK
+;
+explicit boost_afio_dyn_asio ;
 
 boost-install boost_afio ;
 

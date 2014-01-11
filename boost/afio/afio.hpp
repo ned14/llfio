@@ -1231,7 +1231,7 @@ public:
     Note that setting maxitems=1 will often cause a buffer space exhaustion, causing a second syscall
     with an enlarged buffer. This is because AFIO cannot know if the allocated buffer can hold all of
     the filename being retrieved, so it may have to retry. Put another way, setting maxitems=1 will
-    give you the worst performance possible.
+    give you the worst performance possible, whereas maxitems=2 will probably only return one item most of the time.
 
     \return A batch of future vectors of directory entries with boolean returning false if done.
     \param reqs A batch of enumeration requests.
@@ -1252,7 +1252,7 @@ public:
     Note that setting maxitems=1 will often cause a buffer space exhaustion, causing a second syscall
     with an enlarged buffer. This is because AFIO cannot know if the allocated buffer can hold all of
     the filename being retrieved, so it may have to retry. Put another way, setting maxitems=1 will
-    give you the worst performance possible.
+    give you the worst performance possible, whereas maxitems=2 will probably only return one item most of the time.
     
     \return A future vector of directory entries with a boolean returning false if done.
     \param req An enumeration request.
@@ -2318,7 +2318,7 @@ template<class T> inline async_data_op_req<typename std::remove_pointer<typename
 
 
 /*! \struct async_enumerate_op_req
-\brief A convenience bundle of precondition, number of items to enumerate and item pattern match.
+\brief A convenience bundle of precondition, number of items to enumerate, item pattern match and metadata to prefetch.
 */
 struct async_enumerate_op_req
 {
@@ -2326,24 +2326,36 @@ struct async_enumerate_op_req
     size_t maxitems;             //!< The maximum number of items to return in this request. Note that setting to one will often invoke two syscalls.
     bool restart;                //!< Restarts the enumeration for this open directory handle.
     std::filesystem::path glob;  //!< An optional shell glob by which to filter the items returned. Done kernel side on Windows, user side on POSIX.
+    metadata_flags metadata;     //!< The metadata to prefetch for each item enumerated. AFIO may fetch more metadata than requested if it is cost free.
     //! \constr
-    async_enumerate_op_req() : maxitems(0), restart(false) { }
+    async_enumerate_op_req() : maxitems(0), restart(false), metadata(metadata_flags::None) { }
     /*! \brief Constructs an instance.
     
     \param _precondition The precondition for this operation.
     \param _maxitems The maximum number of items to return in this request. Note that setting to one will often invoke two syscalls.
     \param _restart Restarts the enumeration for this open directory handle.
     \param _glob An optional shell glob by which to filter the items returned. Done kernel side on Windows, user side on POSIX.
+    \param _metadata The metadata to prefetch for each item enumerated. AFIO may fetch more metadata than requested if it is cost free.
     */
-    async_enumerate_op_req(async_io_op _precondition, size_t _maxitems, bool _restart=true, std::filesystem::path _glob=std::filesystem::path()) : precondition(std::move(_precondition)), maxitems(_maxitems), restart(_restart), glob(std::move(_glob)) { _validate(); }
+    async_enumerate_op_req(async_io_op _precondition, size_t _maxitems=2, bool _restart=true, std::filesystem::path _glob=std::filesystem::path(), metadata_flags _metadata=metadata_flags::None) : precondition(std::move(_precondition)), maxitems(_maxitems), restart(_restart), glob(std::move(_glob)), metadata(_metadata) { _validate(); }
     /*! \brief Constructs an instance.
     
     \param _precondition The precondition for this operation.
     \param _glob A shell glob by which to filter the items returned. Done kernel side on Windows, user side on POSIX.
     \param _maxitems The maximum number of items to return in this request. Note that setting to one will often invoke two syscalls.
     \param _restart Restarts the enumeration for this open directory handle.
+    \param _metadata The metadata to prefetch for each item enumerated. AFIO may fetch more metadata than requested if it is cost free.
     */
-    async_enumerate_op_req(async_io_op _precondition, std::filesystem::path _glob, size_t _maxitems=2, bool _restart=true) : precondition(std::move(_precondition)), maxitems(_maxitems), restart(_restart), glob(std::move(_glob)) { _validate(); }
+    async_enumerate_op_req(async_io_op _precondition, std::filesystem::path _glob, size_t _maxitems=2, bool _restart=true, metadata_flags _metadata=metadata_flags::None) : precondition(std::move(_precondition)), maxitems(_maxitems), restart(_restart), glob(std::move(_glob)), metadata(_metadata) { _validate(); }
+    /*! \brief Constructs an instance.
+    
+    \param _precondition The precondition for this operation.
+    \param _metadata The metadata to prefetch for each item enumerated. AFIO may fetch more metadata than requested if it is cost free.
+    \param _maxitems The maximum number of items to return in this request. Note that setting to one will often invoke two syscalls.
+    \param _restart Restarts the enumeration for this open directory handle.
+    \param _glob An optional shell glob by which to filter the items returned. Done kernel side on Windows, user side on POSIX.
+    */
+    async_enumerate_op_req(async_io_op _precondition, metadata_flags _metadata, size_t _maxitems=2, bool _restart=true, std::filesystem::path _glob=std::filesystem::path()) : precondition(std::move(_precondition)), maxitems(_maxitems), restart(_restart), glob(std::move(_glob)), metadata(_metadata) { _validate(); }
     //! Validates contents
     bool validate() const
     {

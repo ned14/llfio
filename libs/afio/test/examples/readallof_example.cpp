@@ -1,8 +1,4 @@
-#include "boost/afio/afio.hpp"
-// Need to include a copy of ASIO
-#ifdef BOOST_ASIO_SEPARATE_COMPILATION
-#include "../../../../boost/asio/impl/src.hpp"
-#endif
+#include "afio_pch.hpp"
 
 int main(void)
 {
@@ -22,17 +18,15 @@ int main(void)
     char input[1024];
     // Schedule enumerating the containing directory, but only for foo.txt
     auto dir_opened = dispatcher->dir(async_path_op_req("")); // "" means current directory in AFIO
-    auto file_enumed = dispatcher->enumerate(async_enumerate_op_req(dir_opened, "foo.txt"));
+    auto file_enumed = dispatcher->enumerate(async_enumerate_op_req(dir_opened, metadata_flags::size, 2, true, "foo.txt"));
     // Schedule in parallel opening the file
     auto file_opened = dispatcher->file(async_path_op_req("foo.txt"));
     // Get the directory_entry for the first result
     directory_entry &de = file_enumed.first.get().first.front(); // blocks!
-    // Get the handle to the opened directory
-    auto &dirh = when_all(dir_opened).get().front(); // blocks!
     // Schedule a file read once we know the file size
     auto file_read = dispatcher->read(make_async_data_op_req(file_opened,
         (void *) input,
-        (size_t) de.st_size(dirh), // blocks, as it may fetch the size now!
+        (size_t) de.st_size(), // won't block
         0));
     //]
 }
@@ -44,7 +38,7 @@ int main(void)
     auto file_opened = dispatcher->file(async_path_op_req("foo.txt"));
     // Wait till it is opened
     auto fileh = when_all(file_opened).get().front();
-    // Fetch ONLY the size metadata. Blocks!
+    // Fetch ONLY the size metadata. Blocks because it's synchronous!
     directory_entry de = fileh->direntry(metadata_flags::size);
     // Schedule a file read now we know the file size
     auto file_read = dispatcher->read(make_async_data_op_req(file_opened,

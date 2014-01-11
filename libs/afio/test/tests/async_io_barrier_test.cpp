@@ -1,4 +1,4 @@
-#include "../test_functions.hpp"
+#include "test_functions.hpp"
 
 BOOST_AFIO_AUTO_TEST_CASE(async_io_barrier, "Tests that the async i/o barrier works correctly under load", 180)
 {

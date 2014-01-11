@@ -1,14 +1,7 @@
-#include <boost/afio/afio.hpp>
+#include "afio_pch.hpp"
 #if !(defined(BOOST_MSVC) && BOOST_MSVC < 1700) // Don't bother with VS2010, its result_of can't cope.
 //[closure_execution_afio_example
-#include <iostream>
-#include <fstream>
 #include <vector>
-#include <boost/afio/afio.hpp>
-// Need to include a copy of ASIO
-#ifdef BOOST_ASIO_SEPARATE_COMPILATION
-#include "../../../../boost/asio/impl/src.hpp"
-#endif
 
 int main()
 {

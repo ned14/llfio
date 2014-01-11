@@ -1917,6 +1917,7 @@ namespace detail {
                 directory_entry item;
                 // This is what POSIX returns with getdents()
                 item.have_metadata=item.have_metadata|metadata_flags::ino|metadata_flags::type;
+                bool needmoremetadata=!!(req.metadata&~item.have_metadata);
                 done=false;
                 for(dirent *dent=buffer.get(); !done; dent=(dirent *)((size_t) dent + dent->d_reclen))
                 {
@@ -1966,6 +1967,15 @@ namespace detail {
                         }
                     }
                     _ret.push_back(std::move(item));
+                }
+                // NOTE: Potentially the OS didn't return type, and we're not checking
+                // for that here.
+                if(needmoremetadata)
+                {
+                    BOOST_FOREACH(auto &i, _ret)
+                    {
+                        i.fetch_metadata(h, req.metadata);
+                    }
                 }
                 ret->set_value(std::make_pair(std::move(_ret), !thisbatchdone));
 #endif

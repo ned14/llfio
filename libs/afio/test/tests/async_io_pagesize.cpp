@@ -1,4 +1,4 @@
-#include "../test_functions.hpp"
+#include "test_functions.hpp"
 
 BOOST_AFIO_AUTO_TEST_CASE(async_io_pagesize, "Tests that the page size works, and other minor functions", 3)
 {

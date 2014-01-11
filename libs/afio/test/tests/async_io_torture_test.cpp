@@ -1,4 +1,4 @@
-#include "../test_functions.hpp"
+#include "test_functions.hpp"
 
 BOOST_AFIO_AUTO_TEST_CASE(async_io_torture, "Tortures the async i/o implementation", 120)
 {

@@ -1,8 +1,4 @@
-#include "boost/afio/afio.hpp"
-// Need to include a copy of ASIO
-#ifdef BOOST_ASIO_SEPARATE_COMPILATION
-#include "../../../../boost/asio/impl/src.hpp"
-#endif
+#include "afio_pch.hpp"
 
 //[adopt_example
 struct test_handle : boost::afio::async_io_handle

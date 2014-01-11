@@ -14,6 +14,13 @@
 
 * Async fast batch hash engine which provides transparent hashing of all async
 reads and writes (in progress).
+  * New completion handler metaprogramming letting you bind add hash to each
+op easily.
+    * Automatic ASIO callback prototype spec support.
+
+* Multiple dispatcher support
+  * Integration of direct proposed Boost.Fiber library support as a secondary
+thread_source to std_thread_source.
 
 * async_io_dispatcher_base::read_partial() to read as much of a single buffer as
 possible, rather than only complete buffers.
@@ -25,8 +32,6 @@ utilise shared memory when possible.
 to monitor a 1M entry directory experiencing 1% entry changes per second without
 using a shocking amount of RAM.
 
-* Integration of direct proposed Boost.Fiber library support. Potentially ASIO
-style callbacks too, if technically feasible.
 
 [/=================]
 [heading Boost 1.56 AFIO v1.11]
@@ -43,6 +48,16 @@ sense. Thanks to Bjorn Reese for reporting this.
 
 Replaced throwing of std::ios_base::failure with std::system_error. Thanks to
 Bjorn Reese for suggesting and submitting a patch for this.
+
+async_io_dispatcher_base::enumerate() did not take a metadata_flags, and it
+was supposed to. Thanks to Bjorn Reese for reporting this.
+
+Added a unit compilation test to ensure that implicit construction from a
+single arg to the op convenience classes works as intended.
+
+Significantly optimised build system and added in precompiled headers support.
+Combined with --fast-build this provides an 8x build time improvement.
+
 
 [/=================]
 [heading Boost 1.55 AFIO v1.1]
@@ -226,7 +241,8 @@ is suggested:
 [readallof_example_single]
 
 If you're going to read many files from the same directory, it is far faster to open a
-handle to the containing directory and using enumerate to fetch the metadata:
+handle to the containing directory and using enumerate to fetch the metadata asynchronously
+instead of using `direntry()` which is synchronous:
 
 [readallof_example_many]
 
