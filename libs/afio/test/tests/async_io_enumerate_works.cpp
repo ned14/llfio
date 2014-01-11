@@ -45,4 +45,11 @@ BOOST_AFIO_AUTO_TEST_CASE(async_io_enumerate, "Tests that async i/o enumerate() 
     BOOST_CHECK(rootdircontents1.size()==rootdircontents2.size());
     BOOST_CHECK(rootdircontents1.size()==rootdircontents1a.size());
     BOOST_CHECK(rootdircontents2.size()==rootdircontents2a.size());
+    
+    // Make sure unwildcarded single glob works (it has a fastpath on POSIX)
+    auto enumeration1(dispatcher->enumerate(async_enumerate_op_req(rootdir)));
+    auto direntry1(enumeration1.first.get().first.front());
+    auto enumeration2(dispatcher->enumerate(async_enumerate_op_req(rootdir, direntry1.name())));
+    auto direntry2(enumeration2.first.get().first.front());
+    BOOST_CHECK(direntry1==direntry2);
 }
