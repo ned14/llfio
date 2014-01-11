@@ -119,8 +119,9 @@ public:
                 dispatcher->op_from_scheduled_id(id), buffer->data(), _length, 0));
             auto read_done=dispatcher->completion(read, 
                 std::make_pair(async_op_flags::None/*regex search might be slow*/, 
+                    std::function<async_file_io_dispatcher_base::completion_t>(
                         std::bind(&find_in_files::file_read, this, std::placeholders::_1, 
-                            std::placeholders::_2, std::placeholders::_3, buffer, length)));
+                            std::placeholders::_2, std::placeholders::_3, buffer, length))));
             doscheduled({ read, read_done });
         }
         docompleted(2);

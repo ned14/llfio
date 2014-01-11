@@ -1,4 +1,3 @@
-#define BOOST_AFIO_ENABLE_BENCHMARKING_COMPLETION
 #include "afio_pch.hpp"
 
 /*  My Intel Core i7 3770K running Windows 8 x64:  911963 closures/sec
