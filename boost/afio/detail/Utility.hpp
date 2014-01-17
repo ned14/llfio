@@ -9,17 +9,10 @@
 #define BOOST_AFIO_UTILITY_HPP
 
 #include <unordered_map>
-#include <sys/types.h>
-#include <sys/stat.h>
-#ifdef WIN32
-#ifndef S_IFLNK
-#define S_IFLNK 0x1400
-#endif
-#endif
 #include "Undoer.hpp"
 #include "ErrorHandling.hpp"
 
-// We'll need some future checking before relying or including  std_filesystem.hpp
+// We'll need some future checking before relying or including std_filesystem.hpp
 #include "std_filesystem.hpp"
 
 // Map in either STL or Boost

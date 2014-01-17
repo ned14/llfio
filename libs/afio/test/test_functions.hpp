@@ -692,14 +692,23 @@ static boost::afio::stat_t print_stat(std::shared_ptr<boost::afio::async_io_hand
     using namespace boost::afio;
     auto entry=h->lstat(metadata_flags::All);
     std::cout << "Entry " << h->path() << " is a ";
-    if(S_IFLNK==(entry.st_type & S_IFLNK))
+    switch(entry.st_type)
+    {
+    case std::filesystem::file_type::symlink_file:
         std::cout << "link";
-    else if(S_IFDIR==(entry.st_type & S_IFDIR))
+        break;
+    case std::filesystem::file_type::directory_file:
         std::cout << "directory";
-    else
+        break;
+    case std::filesystem::file_type::regular_file:
         std::cout << "file";
+        break;
+    default:
+        std::cout << "unknown";
+        break;
+    }
     std::cout << " and it has the following information:" << std::endl;
-    if(S_IFLNK==(entry.st_type & S_IFLNK))
+    if(std::filesystem::file_type::symlink_file==entry.st_type)
     {
         std::cout << "  Target=" << h->target() << std::endl;
     }
@@ -732,12 +741,21 @@ static void print_stat(std::shared_ptr<boost::afio::async_io_handle> dirh, boost
     using namespace boost::afio;
     std::cout << "Entry " << direntry.name() << " is a ";
     auto entry=direntry.fetch_lstat(dirh);
-    if(S_IFLNK==(entry.st_type & S_IFLNK))
+    switch(entry.st_type)
+    {
+    case std::filesystem::file_type::symlink_file:
         std::cout << "link";
-    else if(S_IFDIR==(entry.st_type & S_IFDIR))
+        break;
+    case std::filesystem::file_type::directory_file:
         std::cout << "directory";
-    else
+        break;
+    case std::filesystem::file_type::regular_file:
         std::cout << "file";
+        break;
+    default:
+        std::cout << "unknown";
+        break;
+    }
     std::cout << " and it has the following information:" << std::endl;
 
 #define PRINT_FIELD(field) \

@@ -389,15 +389,15 @@ namespace windows_nt_kernel
         return p;
     }
 
-    static inline uint16_t to_st_type(ULONG FileAttributes, uint16_t mode=0)
+    static inline std::filesystem::file_type to_st_type(ULONG FileAttributes)
     {
         if(FileAttributes&FILE_ATTRIBUTE_REPARSE_POINT)
-            mode|=S_IFLNK;
+            return std::filesystem::file_type::symlink_file;
+            //return std::filesystem::file_type::reparse_file;
         else if(FileAttributes&FILE_ATTRIBUTE_DIRECTORY)
-            mode|=S_IFDIR;
+            return std::filesystem::file_type::directory_file;
         else
-            mode|=S_IFREG;
-        return mode;
+            return std::filesystem::file_type::regular_file;
     }
 
     static inline boost::afio::chrono::system_clock::time_point to_timepoint(LARGE_INTEGER time)
@@ -461,7 +461,7 @@ static inline void fill_stat_t(boost::afio::stat_t &stat, BOOST_AFIO_POSIX_STAT_
     using namespace boost::afio;
     if(!!(wanted&metadata_flags::dev)) { stat.st_dev=s.st_dev; }
     if(!!(wanted&metadata_flags::ino)) { stat.st_ino=s.st_ino; }
-    if(!!(wanted&metadata_flags::type)) { stat.st_type=s.st_mode; }
+    if(!!(wanted&metadata_flags::type)) { stat.st_type=to_st_type(s.st_mode); }
     if(!!(wanted&metadata_flags::mode)) { stat.st_mode=s.st_mode; }
     if(!!(wanted&metadata_flags::nlink)) { stat.st_nlink=s.st_nlink; }
     if(!!(wanted&metadata_flags::uid)) { stat.st_uid=s.st_uid; }

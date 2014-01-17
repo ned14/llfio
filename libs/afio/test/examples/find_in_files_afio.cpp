@@ -168,7 +168,7 @@ public:
                 std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
             for(auto &entry : entries)
             {
-                if((entry.st_type()&S_IFDIR)==S_IFDIR)
+                if(entry.st_type()==std::filesystem::file_type::directory_file)
                 {
                     auto dir_open=dispatcher->dir(async_path_op_req(lastdir, h->path()/entry.name()));
                     auto dir_opened=dispatcher->completion(dir_open, dir_openedf);
@@ -211,7 +211,7 @@ public:
         {
             for(auto &entry : entries)
             {
-                if((entry.st_type()&S_IFREG)==S_IFREG)
+                if(entry.st_type()==std::filesystem::file_type::regular_file)
                 {
                     size_t length=(size_t)entry.st_size();
                     if(length)

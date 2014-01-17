@@ -16,11 +16,11 @@ BOOST_AFIO_AUTO_TEST_CASE(async_io_lstat_works, "Tests that async i/o lstat() wo
             auto mklink(dispatcher->symlink(async_path_op_req(mkdir, "testdir/linktodir", file_flags::Create)));
 
             auto mkdirstat=print_stat(when_all(mkdir).get().front());
-            BOOST_CHECK((mkdirstat.st_type&S_IFDIR)==S_IFDIR);
+            BOOST_CHECK(mkdirstat.st_type==std::filesystem::file_type::directory_file);
             auto mkfilestat=print_stat(when_all(mkfile).get().front());
-            BOOST_CHECK((mkfilestat.st_type&S_IFREG)==S_IFREG);
+            BOOST_CHECK(mkfilestat.st_type==std::filesystem::file_type::regular_file);
             auto mklinkstat=print_stat(when_all(mklink).get().front());
-            BOOST_CHECK((mklinkstat.st_type&S_IFLNK)==S_IFLNK);
+            BOOST_CHECK(mklinkstat.st_type==std::filesystem::file_type::symlink_file);
 
             // Some sanity stuff
             BOOST_CHECK(mkdirstat.st_ino!=mkfilestat.st_ino);

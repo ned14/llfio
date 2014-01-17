@@ -77,6 +77,44 @@ File Created: Mar 2013
 #include "ErrorHandling.ipp"
 
 #include <fcntl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#ifdef WIN32
+#ifndef S_IFSOCK
+#define S_IFSOCK 0xC000
+#endif
+#ifndef S_IFBLK
+#define S_IFBLK 0x6000
+#endif
+#ifndef S_IFIFO
+#define S_IFIFO 0x1000
+#endif
+#ifndef S_IFLNK
+#define S_IFLNK 0xA000
+#endif
+#endif
+static inline std::filesystem::file_type to_st_type(uint16_t mode)
+{
+    switch(mode & S_IFMT)
+    {
+    case S_IFBLK:
+        return std::filesystem::file_type::block_file;
+    case S_IFCHR:
+        return std::filesystem::file_type::character_file;
+    case S_IFDIR:
+        return std::filesystem::file_type::directory_file;
+    case S_IFIFO:
+        return std::filesystem::file_type::fifo_file;
+    case S_IFLNK:
+        return std::filesystem::file_type::symlink_file;
+    case S_IFREG:
+        return std::filesystem::file_type::regular_file;
+    case S_IFSOCK:
+        return std::filesystem::file_type::socket_file;
+    default:
+        return std::filesystem::file_type::type_unknown;
+    }
+}
 #ifdef WIN32
 // We also compile the posix compat layer for catching silly compile errors for POSIX
 #include <io.h>
@@ -128,7 +166,7 @@ static inline void fill_stat_t(boost::afio::stat_t &stat, BOOST_AFIO_POSIX_STAT_
     using namespace boost::afio;
     if(!!(wanted&metadata_flags::dev)) { stat.st_dev=s.st_dev; }
     if(!!(wanted&metadata_flags::ino)) { stat.st_ino=s.st_ino; }
-    if(!!(wanted&metadata_flags::type)) { stat.st_type=s.st_mode; }
+    if(!!(wanted&metadata_flags::type)) { stat.st_type=to_st_type(s.st_mode); }
     if(!!(wanted&metadata_flags::mode)) { stat.st_mode=s.st_mode; }
     if(!!(wanted&metadata_flags::nlink)) { stat.st_nlink=s.st_nlink; }
     if(!!(wanted&metadata_flags::uid)) { stat.st_uid=s.st_uid; }
@@ -1958,29 +1996,29 @@ namespace detail {
                         switch(d_type)
                         {
                         case DT_BLK:
-                            item.stat.st_type=S_IFBLK;
+                            item.stat.st_type=std::filesystem::file_type::block_file;
                             break;
                         case DT_CHR:
-                            item.stat.st_type=S_IFCHR;
+                            item.stat.st_type=std::filesystem::file_type::character_file;
                             break;
                         case DT_DIR:
-                            item.stat.st_type=S_IFDIR;
+                            item.stat.st_type=std::filesystem::file_type::directory_file;
                             break;
                         case DT_FIFO:
-                            item.stat.st_type=S_IFIFO;
+                            item.stat.st_type=std::filesystem::file_type::fifo_file;
                             break;
                         case DT_LNK:
-                            item.stat.st_type=S_IFLNK;
+                            item.stat.st_type=std::filesystem::file_type::symlink_file;
                             break;
                         case DT_REG:
-                            item.stat.st_type=S_IFREG;
+                            item.stat.st_type=std::filesystem::file_type::regular_file;
                             break;
                         case DT_SOCK:
-                            item.stat.st_type=S_IFSOCK;
+                            item.stat.st_type=std::filesystem::file_type::socket_file;
                             break;
                         default:
                             item.have_metadata=item.have_metadata&~metadata_flags::type;
-                            item.stat.st_type=0;
+                            item.stat.st_type=std::filesystem::file_type::type_unknown;
                             break;
                         }
                     }
@@ -2198,7 +2236,7 @@ BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC void directory_entry::_int_fetch(metadata_f
             wanted=wanted & direntry.metadata_ready(); // direntry() can fail to fill some entries on Win XP
             if(!!(wanted&metadata_flags::dev)) { stat.st_dev=direntry.stat.st_dev; }
             if(!!(wanted&metadata_flags::ino)) { stat.st_ino=direntry.stat.st_ino; }
-            if(!!(wanted&metadata_flags::type)) { stat.st_type=direntry.stat.st_mode; }
+            if(!!(wanted&metadata_flags::type)) { stat.st_type=direntry.stat.st_type; }
             if(!!(wanted&metadata_flags::mode)) { stat.st_mode=direntry.stat.st_mode; }
             if(!!(wanted&metadata_flags::nlink)) { stat.st_nlink=direntry.stat.st_nlink; }
             if(!!(wanted&metadata_flags::uid)) { stat.st_uid=direntry.stat.st_uid; }

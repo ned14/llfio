@@ -456,16 +456,22 @@ BOOST_AFIO_DECLARE_CLASS_ENUM_AS_BITFIELD(metadata_flags)
 
 This structure looks somewhat like a `struct stat`, and indeed it was derived from BSD's `struct stat`.
 However there are a number of changes to better interoperate with modern practice, specifically:
-(i) inode value containers are forced to 64 bits
+(i) inode value containers are forced to 64 bits.
 (ii) Timestamps use C++11's `std::chrono::system_clock::time_point` or Boost equivalent. The resolution
-of these may or may not equal what a `struct timespec` can do depending on your STL
-(iii) The type of a file, which is available on Windows and on POSIX without needing a `lstat()`, is provided by `st_type`.
+of these may or may not equal what a `struct timespec` can do depending on your STL.
+(iii) The type of a file, which is available on Windows and on POSIX without needing an additional
+syscall, is provided by `st_type` which is one of the values from `std::filesystem::file_type`. You
+should use this field in preference to checking type bits in `st_mode` as it involves fewer syscalls
+and no platform dependencies.
+
+If you want to test permission bits in `st_mode` but don't want to include platform specific
+headers, note that `std::filesystem::perms` contains definitions of the POSIX permissions flags.
 */
 struct stat_t
 {
     uint64_t        st_dev;                       /*!< inode of device containing file (POSIX) */
     uint64_t        st_ino;                       /*!< inode of file                   (Windows, POSIX) */
-    uint16_t        st_type;                      /*!< type of file                    (Windows, POSIX) */
+    std::filesystem::file_type st_type;           /*!< type of file                    (Windows, POSIX) */
     uint16_t        st_mode;                      /*!< type and perms of file          (POSIX) */
     int16_t         st_nlink;                     /*!< number of hard links            (Windows, POSIX) */
     int16_t         st_uid;                       /*!< user ID of the file             (POSIX) */
@@ -485,7 +491,7 @@ struct stat_t
     //! Constructs a UNINITIALIZED instance i.e. full of random garbage
     stat_t() { }
     //! Constructs a zeroed instance
-    stat_t(std::nullptr_t) : st_dev(0), st_ino(0), st_type(0), st_mode(0), st_nlink(0), st_uid(0), st_gid(0), st_rdev(0),
+    stat_t(std::nullptr_t) : st_dev(0), st_ino(0), st_type(std::filesystem::file_type::type_unknown), st_mode(0), st_nlink(0), st_uid(0), st_gid(0), st_rdev(0),
     st_size(0), st_allocated(0), st_blocks(0), st_blksize(0), st_flags(0), st_gen(0) { }
 };
 
