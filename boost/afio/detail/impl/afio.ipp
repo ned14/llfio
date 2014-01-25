@@ -669,7 +669,7 @@ metadata_flags directory_entry::metadata_fastpath() BOOST_NOEXCEPT_OR_NOTHROW
         //| metadata_flags::dev
         | metadata_flags::ino        // FILE_INTERNAL_INFORMATION, enumerated
         | metadata_flags::type       // FILE_BASIC_INFORMATION, enumerated
-        //| metadata_flags::mode
+        //| metadata_flags::perms
         //| metadata_flags::nlink      // FILE_STANDARD_INFORMATION
         //| metadata_flags::uid
         //| metadata_flags::gid
@@ -690,7 +690,7 @@ metadata_flags directory_entry::metadata_fastpath() BOOST_NOEXCEPT_OR_NOTHROW
         | metadata_flags::dev
         | metadata_flags::ino
         | metadata_flags::type
-        | metadata_flags::mode
+        | metadata_flags::perms
         | metadata_flags::nlink
         | metadata_flags::uid
         | metadata_flags::gid
@@ -715,7 +715,7 @@ metadata_flags directory_entry::metadata_fastpath() BOOST_NOEXCEPT_OR_NOTHROW
         | metadata_flags::dev
         | metadata_flags::ino
         | metadata_flags::type
-        | metadata_flags::mode
+        | metadata_flags::perms
         | metadata_flags::nlink
         | metadata_flags::uid
         | metadata_flags::gid
