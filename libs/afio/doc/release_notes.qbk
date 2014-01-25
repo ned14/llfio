@@ -64,6 +64,8 @@ boost::afio::stat_t::st_type() is now a boost::filesystem::file_type instead
 of replicating the POSIX file type codes. Thanks to Bjorn Reese for suggesting
 this.
 
+boost::afio::stat_t::st_mode() is now st_perms(). Also disabled unused fields in
+stat_t on Windows. Thanks to Bjorn Reese for suggesting this.
 
 
 [/=================]

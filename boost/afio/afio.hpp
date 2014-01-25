@@ -427,7 +427,7 @@ enum class metadata_flags : size_t
     dev=1<<0,
     ino=1<<1,
     type=1<<2,
-    mode=1<<3,
+    perms=1<<3,
     nlink=1<<4,
     uid=1<<5,
     gid=1<<6,
@@ -460,23 +460,32 @@ However there are a number of changes to better interoperate with modern practic
 (ii) Timestamps use C++11's `std::chrono::system_clock::time_point` or Boost equivalent. The resolution
 of these may or may not equal what a `struct timespec` can do depending on your STL.
 (iii) The type of a file, which is available on Windows and on POSIX without needing an additional
-syscall, is provided by `st_type` which is one of the values from `std::filesystem::file_type`. You
-should use this field in preference to checking type bits in `st_mode` as it involves fewer syscalls
-and no platform dependencies.
-
-If you want to test permission bits in `st_mode` but don't want to include platform specific
-headers, note that `std::filesystem::perms` contains definitions of the POSIX permissions flags.
+syscall, is provided by `st_type` which is one of the values from `std::filesystem::file_type`.
+(iv) As type is now separate from permissions, there is no longer a `st_mode`, instead being a
+`st_perms` which is solely the permissions bits. If you want to test permission bits in `st_perms`
+but don't want to include platform specific headers, note that `std::filesystem::perms` contains
+definitions of the POSIX permissions flags.
 */
 struct stat_t
 {
+#ifndef WIN32
     uint64_t        st_dev;                       /*!< inode of device containing file (POSIX) */
+#endif
     uint64_t        st_ino;                       /*!< inode of file                   (Windows, POSIX) */
     std::filesystem::file_type st_type;           /*!< type of file                    (Windows, POSIX) */
-    uint16_t        st_mode;                      /*!< type and perms of file          (POSIX) */
+#ifndef WIN32
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+	uint16_t        st_perms;
+#else
+	std::filesystem::perms st_perms;              /*!< bitfield perms of file          (POSIX) */
+#endif
+#endif
     int16_t         st_nlink;                     /*!< number of hard links            (Windows, POSIX) */
-    int16_t         st_uid;                       /*!< user ID of the file             (POSIX) */
+#ifndef WIN32
+	int16_t         st_uid;                       /*!< user ID of the file             (POSIX) */
     int16_t         st_gid;                       /*!< group ID of the file            (POSIX) */
     dev_t           st_rdev;                      /*!< id of file if special           (POSIX) */
+#endif
     chrono::system_clock::time_point st_atim;     /*!< time of last access             (Windows, POSIX) */
     chrono::system_clock::time_point st_mtim;     /*!< time of last data modification  (Windows, POSIX) */
     chrono::system_clock::time_point st_ctim;     /*!< time of last status change      (Windows, POSIX) */
@@ -484,15 +493,27 @@ struct stat_t
     off_t           st_allocated;                 /*!< bytes allocated for file        (Windows, POSIX) */
     off_t           st_blocks;                    /*!< number of blocks allocated      (Windows, POSIX) */
     uint16_t        st_blksize;                   /*!< block size used by this device  (Windows, POSIX) */
-    uint32_t        st_flags;                     /*!< user defined flags for file     (FreeBSD, OS X) */
-    uint32_t        st_gen;                       /*!< file generation number          (FreeBSD, OS X)*/
-    chrono::system_clock::time_point st_birthtim; /*!< time of file creation           (Windows, FreeBSD, OS X) */
+    uint32_t        st_flags;                     /*!< user defined flags for file     (FreeBSD, OS X, zero otherwise) */
+    uint32_t        st_gen;                       /*!< file generation number          (FreeBSD, OS X, zero otherwise)*/
+    chrono::system_clock::time_point st_birthtim; /*!< time of file creation           (Windows, FreeBSD, OS X, zero otherwise) */
 
     //! Constructs a UNINITIALIZED instance i.e. full of random garbage
     stat_t() { }
     //! Constructs a zeroed instance
-    stat_t(std::nullptr_t) : st_dev(0), st_ino(0), st_type(std::filesystem::file_type::type_unknown), st_mode(0), st_nlink(0), st_uid(0), st_gid(0), st_rdev(0),
-    st_size(0), st_allocated(0), st_blocks(0), st_blksize(0), st_flags(0), st_gen(0) { }
+    stat_t(std::nullptr_t) :
+#ifndef WIN32
+		st_dev(0),
+#endif
+		st_ino(0),
+		st_type(std::filesystem::file_type::type_unknown),
+#ifndef WIN32
+		st_perms(0),
+#endif
+		st_nlink(0),
+#ifndef WIN32
+		st_uid(0), st_gid(0), st_rdev(0),
+#endif
+        st_size(0), st_allocated(0), st_blocks(0), st_blksize(0), st_flags(0), st_gen(0) { }
 };
 
 /*! \brief The abstract base class for an entry in a directory with lazily filled metadata.
@@ -570,22 +591,28 @@ decltype(stat_t().st_##field) st_##field(std::shared_ptr<async_io_handle> dirh) 
 #define BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(field) \
 decltype(stat_t().st_##field) st_##field(std::shared_ptr<async_io_handle> dirh=std::shared_ptr<async_io_handle>()) { if(!(have_metadata&metadata_flags::field)) { _int_fetch(metadata_flags::field, dirh); } return stat.st_##field; }
 #endif
-    //! Returns st_dev \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using when_all(dirop).get().front().
+#ifndef WIN32
+	//! Returns st_dev \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using when_all(dirop).get().front().
     BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(dev)
+#endif
     //! Returns st_ino \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using when_all(dirop).get().front().
     BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(ino)
     //! Returns st_type \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using when_all(dirop).get().front().
     BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(type)
-    //! Returns st_mode \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using when_all(dirop).get().front().
-    BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(mode)
+#ifndef WIN32
+	//! Returns st_perms \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using when_all(dirop).get().front().
+    BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(perms)
+#endif
     //! Returns st_nlink \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using when_all(dirop).get().front().
     BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(nlink)
-    //! Returns st_uid \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using when_all(dirop).get().front().
+#ifndef WIN32
+	//! Returns st_uid \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using when_all(dirop).get().front().
     BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(uid)
     //! Returns st_gid \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using when_all(dirop).get().front().
     BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(gid)
     //! Returns st_rdev \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using when_all(dirop).get().front().
     BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(rdev)
+#endif
     //! Returns st_atim \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using when_all(dirop).get().front().
     BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(atim)
     //! Returns st_mtim \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using when_all(dirop).get().front().
