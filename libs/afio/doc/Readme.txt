@@ -28,10 +28,10 @@ http://sourceforge.net/projects/docbook/files/docbook-xsl/1.78.1/
 
 4. Compile Boost QuickBook and copy the output binary into BoostBook\bin.
 
-5. Apply the doxygen_xml2qbk.patch in this directory to Boost. This will add
-support for producing QuickBook documentation from public member variables.
-Compile libs/geometry/doc/src/docutils/tools/doxygen_xml2qbk and copy the
-output binary into BoostBook\bin.
+5. If on Boost prior to v1.54, apply the doxygen_xml2qbk.patch in this directory
+to Boost. This will add support for producing QuickBook documentation from public
+member variables. Compile libs/geometry/doc/src/docutils/tools/doxygen_xml2qbk
+and copy the output binary into BoostBook\bin.
 
 6. I simply can't get any version past or present of Apache FOP to work with
 the present DocBook XSLTs, so go to http://www.renderx.com/download/personal.html,
