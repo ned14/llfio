@@ -15,7 +15,7 @@
 Metadata about a directory entry. 
 
 [heading Description]
-This structure looks somewhat like a [^`struct stat`], and indeed it was derived from BSD's [^`struct stat`]. However there are a number of changes to better interoperate with modern practice, specifically: (i) inode value containers are forced to 64 bits (ii) Timestamps use C++11's [^`std::chrono::system_clock::time_point`] or Boost equivalent. The resolution of these may or may not equal what a [^`struct timespec`] can do depending on your STL (iii) The type of a file, which is available on Windows and on POSIX without needing a [^`lstat()`], is provided by [^`st_type`]. 
+This structure looks somewhat like a [^`struct stat`], and indeed it was derived from BSD's [^`struct stat`]. However there are a number of changes to better interoperate with modern practice, specifically: (i) inode value containers are forced to 64 bits. (ii) Timestamps use C++11's [^`std::chrono::system_clock::time_point`] or Boost equivalent. The resolution of these may or may not equal what a [^`struct timespec`] can do depending on your STL. (iii) The type of a file, which is available on Windows and on POSIX without needing an additional syscall, is provided by [^`st_type`] which is one of the values from [^`std::filesystem::file_type`]. (iv) As type is now separate from permissions, there is no longer a [^`st_mode`], instead being a [^`st_perms`] which is solely the permissions bits. If you want to test permission bits in [^`st_perms`] but don't want to include platform specific headers, note that [^`std::filesystem::perms`] contains definitions of the POSIX permissions flags. 
 
 [heading Synopsis]
 ``struct stat_t

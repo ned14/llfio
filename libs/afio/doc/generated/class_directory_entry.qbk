@@ -198,9 +198,9 @@ A copy of the internal [^`stat_t`] structure.
 
 
 ]]
-[[``decltype(stat_t().st_mode) st_mode(std::shared_ptr< async_io_handle > dirh = std::shared_ptr< async_io_handle >())``
+[[``decltype(stat_t().st_perms) st_perms(std::shared_ptr< async_io_handle > dirh = std::shared_ptr< async_io_handle >())``
 
-] [Returns st_mode. ] [[* std::shared_ptr< async_io_handle >]: ['dirh]:  An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using when_all(dirop).get().front(). 
+] [Returns st_perms. ] [[* std::shared_ptr< async_io_handle >]: ['dirh]:  An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using when_all(dirop).get().front(). 
 
 
 
