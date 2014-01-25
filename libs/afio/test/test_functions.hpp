@@ -715,7 +715,7 @@ static boost::afio::stat_t print_stat(std::shared_ptr<boost::afio::async_io_hand
 #define PRINT_FIELD(field) \
     std::cout << "  st_" #field ": "; if(!!(directory_entry::metadata_supported()&metadata_flags::field)) std::cout << entry.st_##field; else std::cout << "unknown"; std::cout << std::endl
 #ifndef WIN32
-	PRINT_FIELD(dev);
+    PRINT_FIELD(dev);
 #endif
     PRINT_FIELD(ino);
     PRINT_FIELD(type);

@@ -475,14 +475,14 @@ struct stat_t
     std::filesystem::file_type st_type;           /*!< type of file                    (Windows, POSIX) */
 #ifndef WIN32
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-	uint16_t        st_perms;
+    uint16_t        st_perms;
 #else
-	std::filesystem::perms st_perms;              /*!< bitfield perms of file          (POSIX) */
+    std::filesystem::perms st_perms;              /*!< bitfield perms of file          (POSIX) */
 #endif
 #endif
     int16_t         st_nlink;                     /*!< number of hard links            (Windows, POSIX) */
 #ifndef WIN32
-	int16_t         st_uid;                       /*!< user ID of the file             (POSIX) */
+    int16_t         st_uid;                       /*!< user ID of the file             (POSIX) */
     int16_t         st_gid;                       /*!< group ID of the file            (POSIX) */
     dev_t           st_rdev;                      /*!< id of file if special           (POSIX) */
 #endif
@@ -502,16 +502,16 @@ struct stat_t
     //! Constructs a zeroed instance
     stat_t(std::nullptr_t) :
 #ifndef WIN32
-		st_dev(0),
+        st_dev(0),
 #endif
-		st_ino(0),
-		st_type(std::filesystem::file_type::type_unknown),
+        st_ino(0),
+        st_type(std::filesystem::file_type::type_unknown),
 #ifndef WIN32
-		st_perms(0),
+        st_perms(0),
 #endif
-		st_nlink(0),
+        st_nlink(0),
 #ifndef WIN32
-		st_uid(0), st_gid(0), st_rdev(0),
+        st_uid(0), st_gid(0), st_rdev(0),
 #endif
         st_size(0), st_allocated(0), st_blocks(0), st_blksize(0), st_flags(0), st_gen(0) { }
 };
@@ -592,7 +592,7 @@ decltype(stat_t().st_##field) st_##field(std::shared_ptr<async_io_handle> dirh) 
 decltype(stat_t().st_##field) st_##field(std::shared_ptr<async_io_handle> dirh=std::shared_ptr<async_io_handle>()) { if(!(have_metadata&metadata_flags::field)) { _int_fetch(metadata_flags::field, dirh); } return stat.st_##field; }
 #endif
 #ifndef WIN32
-	//! Returns st_dev \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using when_all(dirop).get().front().
+    //! Returns st_dev \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using when_all(dirop).get().front().
     BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(dev)
 #endif
     //! Returns st_ino \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using when_all(dirop).get().front().
@@ -600,13 +600,13 @@ decltype(stat_t().st_##field) st_##field(std::shared_ptr<async_io_handle> dirh=s
     //! Returns st_type \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using when_all(dirop).get().front().
     BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(type)
 #ifndef WIN32
-	//! Returns st_perms \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using when_all(dirop).get().front().
+    //! Returns st_perms \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using when_all(dirop).get().front().
     BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(perms)
 #endif
     //! Returns st_nlink \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using when_all(dirop).get().front().
     BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(nlink)
 #ifndef WIN32
-	//! Returns st_uid \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using when_all(dirop).get().front().
+    //! Returns st_uid \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using when_all(dirop).get().front().
     BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(uid)
     //! Returns st_gid \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using when_all(dirop).get().front().
     BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(gid)
