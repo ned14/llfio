@@ -563,11 +563,11 @@ namespace detail {
 
         immediate_async_ops() { }
         // Returns a promise which is fulfilled when this is destructed
-		void enqueue(enqueued_task<retfuncttype> &out, std::function<retfuncttype> f, bool autosetfuture=true)
+        void enqueue(enqueued_task<retfuncttype> &out, std::function<retfuncttype> f, bool autosetfuture=true)
         {
-			out=std::move(enqueued_task<retfuncttype>(std::move(f)));
-			out.disable_auto_set_future(!autosetfuture);
-			toexecute.push_back(std::move(out));
+            out=std::move(enqueued_task<retfuncttype>(std::move(f)));
+            out.disable_auto_set_future(!autosetfuture);
+            toexecute.push_back(std::move(out));
         }
         ~immediate_async_ops()
         {
@@ -1053,14 +1053,14 @@ BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC void async_file_io_dispatcher_base::complet
         BOOST_FOREACH(auto &c, completions)
         {
             if(!!(c.second->flags & async_op_flags::immediate))
-				immediates.enqueue(c.second->enqueuement, std::bind(it->second, h, &e), false);
-			else
-				p->pool->enqueue(c.second->enqueuement, std::bind(it->second, h, nullptr), false);
-			*c.second->h=c.second->enqueuement.get_future();
+                immediates.enqueue(c.second->enqueuement, std::bind(it->second, h, &e), false);
+            else
+                p->pool->enqueue(c.second->enqueuement, std::bind(it->second, h, nullptr), false);
+            *c.second->h=c.second->enqueuement.get_future();
             ++it;
         }
     }
-	// Early set future
+    // Early set future
     if(e)
         thisop->enqueuement.set_future_exception(e);
     else
@@ -1270,11 +1270,11 @@ template<class F, class... Args> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC async_io_o
             BOOST_AFIO_THROW_FATAL(std::runtime_error("Precondition was not in list of extant ops, yet its future is invalid. This should never happen for any real op, so it's probably memory corruption."));
         }
         if(!!(flags & async_op_flags::immediate))
-			immediates.enqueue(thisop->enqueuement, std::bind(boundf.second, h, he), false);
-		else
-			p->pool->enqueue(thisop->enqueuement, std::bind(boundf.second, h, nullptr), false);
-		// Set the output shared future
-		*ret.h=thisop->enqueuement.get_future();
+            immediates.enqueue(thisop->enqueuement, std::bind(boundf.second, h, he), false);
+        else
+            p->pool->enqueue(thisop->enqueuement, std::bind(boundf.second, h, nullptr), false);
+        // Set the output shared future
+        *ret.h=thisop->enqueuement.get_future();
     }
     undep.dismiss();
     unopsit.dismiss();
@@ -1392,12 +1392,12 @@ template<class F, class... Args> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC async_io_o
                 /* which indicates it completed and yet h remains invalid*/\
                 BOOST_AFIO_THROW_FATAL(std::runtime_error("Precondition was not in list of extant ops, yet its future is invalid. This should never happen for any real op, so it's probably memory corruption.")); \
             }\
-			if(!!(flags & async_op_flags::immediate))\
-			    immediates.enqueue(thisop->enqueuement, std::bind(boundf.second, h, he), false);\
-			else\
-			    p->pool->enqueue(thisop->enqueuement, std::bind(boundf.second, h, nullptr), false);\
-			/* Set the output shared future */ \
-			*ret.h=thisop->enqueuement.get_future();\
+            if(!!(flags & async_op_flags::immediate))\
+                immediates.enqueue(thisop->enqueuement, std::bind(boundf.second, h, he), false);\
+            else\
+                p->pool->enqueue(thisop->enqueuement, std::bind(boundf.second, h, nullptr), false);\
+            /* Set the output shared future */ \
+            *ret.h=thisop->enqueuement.get_future();\
         }\
         unopsit.dismiss();\
         undep.dismiss();\

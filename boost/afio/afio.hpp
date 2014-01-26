@@ -77,42 +77,42 @@ typedef unsigned long long off_t;
 
 namespace detail
 {
-	template<class R> class enqueued_task_impl
-	{
-	protected:
-		struct Private
-		{
-			std::function<R()> task;
-			promise<R> r;
-			bool autoset;
-			atomic<int> done;
-			Private(std::function<R()> _task) : task(std::move(_task)), autoset(true), done(0) { }
-		};
-		std::shared_ptr<Private> p;
-	public:
-		//! Default constructor
-		enqueued_task_impl() { }
-		//! Constructs an enqueued task calling \em c
-		enqueued_task_impl(std::function<R()> c) : p(std::make_shared<Private>(std::move(c))) { }
-		//! Returns true if valid
-		bool valid() const BOOST_NOEXCEPT_OR_NOTHROW{ return p.get()!=nullptr; }
-			//! Swaps contents with another instance
-		void swap(enqueued_task_impl &o) BOOST_NOEXCEPT_OR_NOTHROW{ p.swap(o.p); }
-			//! Resets the contents
-		void reset() { p.reset(); }
-		//! Returns the future corresponding to the future return value of the task
-		future<R> get_future() { return p->r.get_future(); }
-		//! Sets the future corresponding to the future return value of the task.
-		void set_future_exception(exception_ptr e)
-		{
-			int _=0;
-			if(!p->done.compare_exchange_strong(_, 1))
-				return;
-			p->r.set_exception(e);
-		}
-		//! Disables the task setting the future return value.
-		void disable_auto_set_future(bool v=true) { p->autoset=!v; }
-	};
+    template<class R> class enqueued_task_impl
+    {
+    protected:
+        struct Private
+        {
+            std::function<R()> task;
+            promise<R> r;
+            bool autoset;
+            atomic<int> done;
+            Private(std::function<R()> _task) : task(std::move(_task)), autoset(true), done(0) { }
+        };
+        std::shared_ptr<Private> p;
+    public:
+        //! Default constructor
+        enqueued_task_impl() { }
+        //! Constructs an enqueued task calling \em c
+        enqueued_task_impl(std::function<R()> c) : p(std::make_shared<Private>(std::move(c))) { }
+        //! Returns true if valid
+        bool valid() const BOOST_NOEXCEPT_OR_NOTHROW{ return p.get()!=nullptr; }
+            //! Swaps contents with another instance
+        void swap(enqueued_task_impl &o) BOOST_NOEXCEPT_OR_NOTHROW{ p.swap(o.p); }
+            //! Resets the contents
+        void reset() { p.reset(); }
+        //! Returns the future corresponding to the future return value of the task
+        future<R> get_future() { return p->r.get_future(); }
+        //! Sets the future corresponding to the future return value of the task.
+        void set_future_exception(exception_ptr e)
+        {
+            int _=0;
+            if(!p->done.compare_exchange_strong(_, 1))
+                return;
+            p->r.set_exception(e);
+        }
+        //! Disables the task setting the future return value.
+        void disable_auto_set_future(bool v=true) { p->autoset=!v; }
+    };
 }
 
 template<class R> class enqueued_task;
@@ -127,65 +127,65 @@ state - if you set the future value early and then an exception is later thrown,
 // Can't have args in callable type as that segfaults VS2010
 template<class R> class enqueued_task<R()> : public detail::enqueued_task_impl<R>
 {
-	typedef detail::enqueued_task_impl<R> Base;
+    typedef detail::enqueued_task_impl<R> Base;
 public:
-	//! Default constructor
-	enqueued_task() { }
-	//! Constructs an enqueued task calling \em c
-	enqueued_task(std::function<R()> c) : Base(std::move(c)) { }
-	//! Sets the future corresponding to the future return value of the task.
-	template<class T> void set_future_value(T v)
-	{
-		int _=0;
-		if(!p->done.compare_exchange_strong(_, 1))
-			return;
-		p->r.set_value(v);
-	}
-	//! Invokes the callable, setting the future to the value it returns
-	void operator()()
-	{
-		try
-		{
-			auto v(p->task());
-			if(p->autoset) set_future_value(v);
-		}
-		catch(...)
-		{
-			auto e(afio::make_exception_ptr(afio::current_exception()));
-			if(p->autoset) set_future_exception(e);
-		}
-	}
+    //! Default constructor
+    enqueued_task() { }
+    //! Constructs an enqueued task calling \em c
+    enqueued_task(std::function<R()> c) : Base(std::move(c)) { }
+    //! Sets the future corresponding to the future return value of the task.
+    template<class T> void set_future_value(T v)
+    {
+        int _=0;
+        if(!Base::p->done.compare_exchange_strong(_, 1))
+            return;
+        Base::p->r.set_value(v);
+    }
+    //! Invokes the callable, setting the future to the value it returns
+    void operator()()
+    {
+        try
+        {
+            auto v(Base::p->task());
+            if(Base::p->autoset) set_future_value(v);
+        }
+        catch(...)
+        {
+            auto e(afio::make_exception_ptr(afio::current_exception()));
+            if(Base::p->autoset) Base::set_future_exception(e);
+        }
+    }
 };
 template<> class enqueued_task<void()> : public detail::enqueued_task_impl<void>
 {
-	typedef detail::enqueued_task_impl<void> Base;
+    typedef detail::enqueued_task_impl<void> Base;
 public:
-	//! Default constructor
-	enqueued_task() { }
-	//! Constructs an enqueued task calling \em c
-	enqueued_task(std::function<void()> c) : Base(std::move(c)) { }
-	//! Sets the future corresponding to the future return value of the task.
-	void set_future_value()
-	{
-		int _=0;
-		if(!p->done.compare_exchange_strong(_, 1))
-			return;
-		p->r.set_value();
-	}
-	//! Invokes the callable, setting the future to the value it returns
-	void operator()()
-	{
-		try
-		{
-			p->task();
-			if(p->autoset) set_future_value();
-		}
-		catch(...)
-		{
-			auto e(afio::make_exception_ptr(afio::current_exception()));
-			if(p->autoset) set_future_exception(e);
-		}
-	}
+    //! Default constructor
+    enqueued_task() { }
+    //! Constructs an enqueued task calling \em c
+    enqueued_task(std::function<void()> c) : Base(std::move(c)) { }
+    //! Sets the future corresponding to the future return value of the task.
+    void set_future_value()
+    {
+        int _=0;
+        if(!Base::p->done.compare_exchange_strong(_, 1))
+            return;
+        Base::p->r.set_value();
+    }
+    //! Invokes the callable, setting the future to the value it returns
+    void operator()()
+    {
+        try
+        {
+            Base::p->task();
+            if(Base::p->autoset) set_future_value();
+        }
+        catch(...)
+        {
+            auto e(afio::make_exception_ptr(afio::current_exception()));
+            if(Base::p->autoset) Base::set_future_exception(e);
+        }
+    }
 };
 /*! \class thread_source
 \brief Abstract base class for a source of thread workers
@@ -204,22 +204,22 @@ public:
     //! Returns the underlying io_service
     boost::asio::io_service &io_service() { return service; }
     //! Sends some callable entity to the thread pool for execution \tparam "class F" Any callable type with signature R(void) \param out An enqueued task for the enqueued callable \param f Any instance of a callable type \param autosetfuture Whether the enqueued_task will set its future on return of the callable
-	template<class F> void enqueue(enqueued_task<typename std::result_of<F()>::type()> &out, F f, bool autosetfuture=true)
-	{
-		typedef typename std::result_of<F()>::type R;
-		out=std::move(enqueued_task<R()>(std::move(f)));
-		out.disable_auto_set_future(!autosetfuture);
-		service.post(out);
+    template<class F> void enqueue(enqueued_task<typename std::result_of<F()>::type()> &out, F f, bool autosetfuture=true)
+    {
+        typedef typename std::result_of<F()>::type R;
+        out=std::move(enqueued_task<R()>(std::move(f)));
+        out.disable_auto_set_future(!autosetfuture);
+        service.post(out);
     }
-	//! Sends some callable entity to the thread pool for execution \return An enqueued task for the enqueued callable \tparam "class F" Any callable type with signature R(void) \param f Any instance of a callable type
-	template<class F> future<typename std::result_of<F()>::type> enqueue(F f)
-	{
-		typedef typename std::result_of<F()>::type R;
-		enqueued_task<R()> out(std::move(f));
-		auto ret(out.get_future());
-		service.post(out);
-		return std::move(ret);
-	}
+    //! Sends some callable entity to the thread pool for execution \return An enqueued task for the enqueued callable \tparam "class F" Any callable type with signature R(void) \param f Any instance of a callable type
+    template<class F> future<typename std::result_of<F()>::type> enqueue(F f)
+    {
+        typedef typename std::result_of<F()>::type R;
+        enqueued_task<R()> out(std::move(f));
+        auto ret(out.get_future());
+        service.post(out);
+        return std::move(ret);
+    }
 };
 
 /*! \class std_thread_pool
@@ -2549,7 +2549,7 @@ template<class R> inline std::pair<std::vector<future<R>>, std::vector<async_io_
     {
         std::shared_ptr<tasktype> c(std::make_shared<tasktype>(std::function<R()>(t)));
         retfutures.push_back(c->get_future());
-		callbacks.push_back(std::make_pair(async_op_flags::none, std::bind(&detail::doCall<tasktype>, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::move(c))));
+        callbacks.push_back(std::make_pair(async_op_flags::none, std::bind(&detail::doCall<tasktype>, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::move(c))));
     }
     return std::make_pair(std::move(retfutures), completion(ops, callbacks));
 }
