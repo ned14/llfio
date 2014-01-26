@@ -20,9 +20,6 @@ File Created: Mar 2013
 #error _VARIADIC_MAX needs to be set to at least seven to compile Boost.AFIO
 #endif
 
-// Define this to work around ASIO's io_service.post() not coping with move-only input
-#define BOOST_AFIO_WORK_AROUND_ASIO_IO_SERVICE_POST_NO_MOVE_ONLY_SUPPORT 1
-
 #include "config.hpp"
 #include "boost/asio.hpp"
 #include "boost/foreach.hpp"
@@ -85,27 +82,34 @@ Note that in Boost 1.54, and possibly later versions, `boost::asio::io_service` 
 destructed during static data deinit, hence why this inherits from `std::enable_shared_from_this<>` in order that it
 may be reference count deleted before static data deinit occurs.
 */
-class thread_source : public std::enable_shared_from_this<thread_source> {
-private:
-#if BOOST_AFIO_WORK_AROUND_ASIO_IO_SERVICE_POST_NO_MOVE_ONLY_SUPPORT
-    template<class T> struct copyable_packaged_task : std::shared_ptr<packaged_task<T>>
+class thread_source : public std::enable_shared_from_this<thread_source>
+{
+public:
+	//! \brief Effectively our own std::packaged_task<>, letting us intrude to significantly improve performance
+    template<class R> struct enqueued_task // No callable type support as it segfaults VS2010
     {
-        template<class B> explicit copyable_packaged_task(B &&v) BOOST_NOEXCEPT_OR_NOTHROW : std::shared_ptr<packaged_task<T>>(std::move(std::make_shared<packaged_task<T>>(std::forward<B>(v)))) {}
-        copyable_packaged_task(const copyable_packaged_task &v) : std::shared_ptr<packaged_task<T>>(v) { }
-        copyable_packaged_task(copyable_packaged_task &&v) BOOST_NOEXCEPT_OR_NOTHROW : std::shared_ptr<packaged_task<T>>(std::move(v)) { }
+		struct Private
+		{
+			std::function<R()> task;
+			promise<R> r;
+			Private(std::function<R()> _task) : task(std::move(_task)) { }
+		};
+		// Deliberately public and writeable
+		std::shared_ptr<Private> p;
+		enqueued_task(std::function<R()> c) : p(std::make_shared<Private>(std::move(c))) { }
+		future<R> get_future() { return p->r.get_future(); }
         void operator()()
         {
             try
             {
-                (*std::shared_ptr<packaged_task<T>>::get())();
+				p->r.set_value(p->task());
             }
             catch(...)
             {
-                std::cerr << "WARNING: packaged_task<> exits via exception which shouldn't happen. Exception was " << boost::current_exception_diagnostic_information(true) << std::endl;
+				p->r.set_exception(afio::make_exception_ptr(afio::current_exception()));
             }
         }
     };
-#endif
 protected:
     boost::asio::io_service &service;
     thread_source(boost::asio::io_service &_service) : service(_service) { }
@@ -117,19 +121,10 @@ public:
     template<class F> future<typename std::result_of<F()>::type> enqueue(F f)
     {
         typedef typename std::result_of<F()>::type R;
-#if BOOST_AFIO_WORK_AROUND_ASIO_IO_SERVICE_POST_NO_MOVE_ONLY_SUPPORT
-        // Somewhat annoyingly, io_service.post() needs its parameter to be copy constructible,
-        // and packaged_task is only move constructible, so ...
-        auto task=copyable_packaged_task<R()>(std::move(f));
-        auto ret=task->get_future();
-        service.post(std::move(task));
-        return std::move(ret);
-#else
-        auto task=packaged_task<R()>(std::move(f));
-        auto ret=task.get_future();
-        service.post(std::move(task));
-        return std::move(ret);
-#endif
+		enqueued_task<R> task(std::forward<F>(f));
+		auto ret=task.get_future();
+		service.post(std::move(task));
+		return ret;
     }
 };
 
@@ -817,9 +812,11 @@ public:
     typedef std::pair<bool, std::shared_ptr<async_io_handle>> completion_returntype;
     //! The type of a completion handler \ingroup async_file_io_dispatcher_base__completion
     typedef completion_returntype completion_t(size_t, std::shared_ptr<async_io_handle>, exception_ptr *);
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
 #if defined(BOOST_AFIO_ENABLE_BENCHMARKING_COMPLETION) || BOOST_AFIO_HEADERS_ONLY==0 // Only really used for benchmarking
     BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC std::vector<async_io_op> completion(const std::vector<async_io_op> &ops, const std::vector<std::pair<async_op_flags, async_file_io_dispatcher_base::completion_t *>> &callbacks);
     inline async_io_op completion(const async_io_op &req, const std::pair<async_op_flags, async_file_io_dispatcher_base::completion_t *> &callback);
+#endif
 #endif
     /*! \brief Schedule a batch of asynchronous invocations of the specified functions when their supplied operations complete.
     \return A batch of op handles
