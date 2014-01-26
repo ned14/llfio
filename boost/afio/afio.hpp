@@ -75,6 +75,55 @@ namespace afio {
 typedef unsigned long long off_t;
 
 
+/*! \class enqueued_task
+\brief Effectively our own std::packaged_task<>, letting us early set value to significantly improve performance
+*/
+template<class R> class enqueued_task;
+template<class R> class enqueued_task<R()> // Can't have args in callable type as that segfaults VS2010
+{
+protected:
+	struct Private
+	{
+		std::function<R()> task;
+		promise<R> r;
+		atomic<int> done;
+		Private(std::function<R()> _task) : task(std::move(_task)), done(0) { }
+	};
+	std::shared_ptr<Private> p;
+public:
+	//! Constructs an enqueued task calling \em c
+	enqueued_task(std::function<R()> c) : p(std::make_shared<Private>(std::move(c))) { }
+	//! Returns the future corresponding to the future return value of the task
+	future<R> get_future() { return p->r.get_future(); }
+	//! Sets the future corresponding to the future return value of the task.
+	void set_future_value(R v)
+	{
+		int _=0;
+		if(!p->done.compare_exchange_strong(_, 1))
+			return;
+		p->r.set_value(v);
+	}
+	//! Sets the future corresponding to the future return value of the task.
+	void set_future_exception(exception_ptr e)
+	{
+		int _=0;
+		if(!p->done.compare_exchange_strong(_, 1))
+			return;
+		p->r.set_exception(e);
+	}
+	//! Invokes the callable, setting the future to the value it returns
+	void operator()()
+	{
+		try
+		{
+			set_future_value(p->task());
+		}
+		catch(...)
+		{
+			set_future_exception(afio::make_exception_ptr(afio::current_exception()));
+		}
+	}
+};
 /*! \class thread_source
 \brief Abstract base class for a source of thread workers
 
@@ -84,32 +133,6 @@ may be reference count deleted before static data deinit occurs.
 */
 class thread_source : public std::enable_shared_from_this<thread_source>
 {
-public:
-	//! \brief Effectively our own std::packaged_task<>, letting us intrude to significantly improve performance
-    template<class R> struct enqueued_task // No callable type support as it segfaults VS2010
-    {
-		struct Private
-		{
-			std::function<R()> task;
-			promise<R> r;
-			Private(std::function<R()> _task) : task(std::move(_task)) { }
-		};
-		// Deliberately public and writeable
-		std::shared_ptr<Private> p;
-		enqueued_task(std::function<R()> c) : p(std::make_shared<Private>(std::move(c))) { }
-		future<R> get_future() { return p->r.get_future(); }
-        void operator()()
-        {
-            try
-            {
-				p->r.set_value(p->task());
-            }
-            catch(...)
-            {
-				p->r.set_exception(afio::make_exception_ptr(afio::current_exception()));
-            }
-        }
-    };
 protected:
     boost::asio::io_service &service;
     thread_source(boost::asio::io_service &_service) : service(_service) { }
@@ -121,7 +144,7 @@ public:
     template<class F> future<typename std::result_of<F()>::type> enqueue(F f)
     {
         typedef typename std::result_of<F()>::type R;
-		enqueued_task<R> task(std::forward<F>(f));
+		enqueued_task<R()> task(std::forward<F>(f));
 		auto ret=task.get_future();
 		service.post(std::move(task));
 		return ret;
