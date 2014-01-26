@@ -73,64 +73,6 @@ An op handle.
 
 [endsect]
 
-[section:close_1_batch close (batch)]
-
-'''<indexterm><primary>close</primary></indexterm>'''
-Schedule a batch of asynchronous file or directory handle closes after preceding operations. 
-
-[heading Synopsis]
-``virtual std::vector<async_io_op> async_file_io_dispatcher_base::close(const std::vector< async_io_op > & ops)``
-
-[heading Parameters]
-
-[table
-[[Type] [Concept] [Name] [Description] ]
-[[const std::vector< async_io_op > &] [] [ops] [A batch of op handles.]]
-]
-
-
-[heading Returns]
-A batch of op handles. 
-
-[heading Header]
-`#include <boost/afio/afio.hpp>`
-
-[heading Complexity]Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete if closing handles is constant time.
-[heading Exception Model]Propagates exceptions of any input preconditions with an errored state at the point of dispatch, and throws a `std::invalid_argument` if any inputs have values which could not possibly be correct. Once a batch of input ops has been verified at the point of entry as not errored, you are guaranteed that the batch is atomically scheduled as a whole, unless a failure to allocate memory occurs.
-[heading Example][filedir_example]
-
-
-[endsect]
-
-[section:close_1_single close (single)]
-
-'''<indexterm><primary>close</primary></indexterm>'''
-Schedule an asynchronous file or directory handle close after a preceding operation. 
-
-[heading Synopsis]
-``async_io_op async_file_io_dispatcher_base::close(const async_io_op & req)``
-
-[heading Parameters]
-
-[table
-[[Type] [Concept] [Name] [Description] ]
-[[const async_io_op &] [] [req] [An op handle.]]
-]
-
-
-[heading Returns]
-An op handle. 
-
-[heading Header]
-`#include <boost/afio/afio.hpp>`
-
-[heading Complexity]Amortised O(1) to dispatch. Amortised O(1) to complete if closing handles is constant time.
-[heading Exception Model]Propagates exceptions of any input preconditions with an errored state at the point of dispatch, and throws a `std::invalid_argument` if any inputs have values which could not possibly be correct. Once a batch of input ops has been verified at the point of entry as not errored, you are guaranteed that the batch is atomically scheduled as a whole, unless a failure to allocate memory occurs.
-[heading Example][filedir_example]
-
-
-[endsect]
-
 [section:dir_1_batch dir (batch)]
 
 '''<indexterm><primary>dir</primary></indexterm>'''
@@ -195,132 +137,6 @@ An op handle.
 
 [endsect]
 
-[section:file_1_batch file (batch)]
-
-'''<indexterm><primary>file</primary></indexterm>'''
-Schedule a batch of asynchronous file creations and opens after optional preconditions. 
-
-[heading Synopsis]
-``virtual std::vector<async_io_op> async_file_io_dispatcher_base::file(const std::vector< async_path_op_req > & reqs)``
-
-[heading Parameters]
-
-[table
-[[Type] [Concept] [Name] [Description] ]
-[[const std::vector< async_path_op_req > &] [] [reqs] [A batch of [^`async_path_op_req`] structures.]]
-]
-
-
-[heading Returns]
-A batch of op handles. 
-
-[heading Header]
-`#include <boost/afio/afio.hpp>`
-
-[heading Complexity]Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete if file creation is constant time.
-[heading Exception Model]Propagates exceptions of any input preconditions with an errored state at the point of dispatch, and throws a `std::invalid_argument` if any inputs have values which could not possibly be correct. Once a batch of input ops has been verified at the point of entry as not errored, you are guaranteed that the batch is atomically scheduled as a whole, unless a failure to allocate memory occurs.
-[heading Example][filedir_example]
-
-
-[endsect]
-
-[section:file_1_single file (single)]
-
-'''<indexterm><primary>file</primary></indexterm>'''
-Schedule an asynchronous file creation and open after an optional precondition. 
-
-[heading Synopsis]
-``async_io_op async_file_io_dispatcher_base::file(const async_path_op_req & req)``
-
-[heading Parameters]
-
-[table
-[[Type] [Concept] [Name] [Description] ]
-[[const async_path_op_req &] [] [req] [An [^`async_path_op_req`] structure.]]
-]
-
-
-[heading Returns]
-An op handle. 
-
-[heading Header]
-`#include <boost/afio/afio.hpp>`
-
-[heading Complexity]Amortised O(1) to dispatch. Amortised O(1) to complete if file creation is constant time.
-[heading Exception Model]Propagates exceptions of any input preconditions with an errored state at the point of dispatch, and throws a `std::invalid_argument` if any inputs have values which could not possibly be correct. Once a batch of input ops has been verified at the point of entry as not errored, you are guaranteed that the batch is atomically scheduled as a whole, unless a failure to allocate memory occurs.
-[heading Example][filedir_example]
-
-
-[endsect]
-
-[section:read_1_batch read (batch)]
-
-'''<indexterm><primary>read</primary></indexterm>'''
-Schedule a batch of asynchronous data reads after preceding operations, where offset and total data read must not exceed the present file size. 
-
-[heading Description]
-Note that on Windows this call issues a separate async file operation for each buffer supplied, thus making scatter/gather i/o no more efficient than making separate calls. The big exception to this is when doing unbuffered page aligned i/o for which Windows provides special scatter/gather i/o functions. 
-
-[heading Synopsis]
-``template<class T>
-virtual std::vector<async_io_op> async_file_io_dispatcher_base::read(const std::vector< async_data_op_req< T >> & ops)``
-
-[heading Parameters]
-
-[table
-[[Type] [Concept] [Name] [Description] ]
-[[class T] [Any type. ] [ - ] [Must be specified]]
-[[const std::vector< async_data_op_req< T >> &] [] [ops] [A batch of async_data_op_req<T> structures.]]
-]
-
-
-[heading Returns]
-A batch of op handles. 
-
-[heading Header]
-`#include <boost/afio/afio.hpp>`
-
-[heading Complexity]Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete if reading data is constant time.
-[heading Exception Model]Propagates exceptions of any input preconditions with an errored state at the point of dispatch, and throws a `std::invalid_argument` if any inputs have values which could not possibly be correct. Once a batch of input ops has been verified at the point of entry as not errored, you are guaranteed that the batch is atomically scheduled as a whole, unless a failure to allocate memory occurs.
-[heading Example][readwrite_example]
-
-
-[endsect]
-
-[section:read_1_single read (single)]
-
-'''<indexterm><primary>read</primary></indexterm>'''
-Schedule an asynchronous data read after a preceding operation, where offset and total data read must not exceed the present file size. 
-
-[heading Description]
-Note that on Windows this call issues a separate async file operation for each buffer supplied, thus making scatter/gather i/o no more efficient than making separate calls. The big exception to this is when doing unbuffered page aligned i/o for which Windows provides special scatter/gather i/o functions. 
-
-[heading Synopsis]
-``template<class T>
-async_io_op async_file_io_dispatcher_base::read(const async_data_op_req< T > & req)``
-
-[heading Parameters]
-
-[table
-[[Type] [Concept] [Name] [Description] ]
-[[class T] [Any type. ] [ - ] [Must be specified]]
-[[const async_data_op_req< T > &] [] [req] [An async_data_op_req<T> structure.]]
-]
-
-
-[heading Returns]
-An op handle. 
-
-[heading Header]
-`#include <boost/afio/afio.hpp>`
-
-[heading Complexity]Amortised O(1) to dispatch. Amortised O(1) to complete if reading data is constant time.
-[heading Exception Model]Propagates exceptions of any input preconditions with an errored state at the point of dispatch, and throws a `std::invalid_argument` if any inputs have values which could not possibly be correct. Once a batch of input ops has been verified at the point of entry as not errored, you are guaranteed that the batch is atomically scheduled as a whole, unless a failure to allocate memory occurs.
-[heading Example][readwrite_example]
-
-
-[endsect]
-
 [section:rmdir_1_batch rmdir (batch)]
 
 '''<indexterm><primary>rmdir</primary></indexterm>'''
@@ -379,6 +195,64 @@ An op handle.
 
 [endsect]
 
+[section:file_1_batch file (batch)]
+
+'''<indexterm><primary>file</primary></indexterm>'''
+Schedule a batch of asynchronous file creations and opens after optional preconditions. 
+
+[heading Synopsis]
+``virtual std::vector<async_io_op> async_file_io_dispatcher_base::file(const std::vector< async_path_op_req > & reqs)``
+
+[heading Parameters]
+
+[table
+[[Type] [Concept] [Name] [Description] ]
+[[const std::vector< async_path_op_req > &] [] [reqs] [A batch of [^`async_path_op_req`] structures.]]
+]
+
+
+[heading Returns]
+A batch of op handles. 
+
+[heading Header]
+`#include <boost/afio/afio.hpp>`
+
+[heading Complexity]Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete if file creation is constant time.
+[heading Exception Model]Propagates exceptions of any input preconditions with an errored state at the point of dispatch, and throws a `std::invalid_argument` if any inputs have values which could not possibly be correct. Once a batch of input ops has been verified at the point of entry as not errored, you are guaranteed that the batch is atomically scheduled as a whole, unless a failure to allocate memory occurs.
+[heading Example][filedir_example]
+
+
+[endsect]
+
+[section:file_1_single file (single)]
+
+'''<indexterm><primary>file</primary></indexterm>'''
+Schedule an asynchronous file creation and open after an optional precondition. 
+
+[heading Synopsis]
+``async_io_op async_file_io_dispatcher_base::file(const async_path_op_req & req)``
+
+[heading Parameters]
+
+[table
+[[Type] [Concept] [Name] [Description] ]
+[[const async_path_op_req &] [] [req] [An [^`async_path_op_req`] structure.]]
+]
+
+
+[heading Returns]
+An op handle. 
+
+[heading Header]
+`#include <boost/afio/afio.hpp>`
+
+[heading Complexity]Amortised O(1) to dispatch. Amortised O(1) to complete if file creation is constant time.
+[heading Exception Model]Propagates exceptions of any input preconditions with an errored state at the point of dispatch, and throws a `std::invalid_argument` if any inputs have values which could not possibly be correct. Once a batch of input ops has been verified at the point of entry as not errored, you are guaranteed that the batch is atomically scheduled as a whole, unless a failure to allocate memory occurs.
+[heading Example][filedir_example]
+
+
+[endsect]
+
 [section:rmfile_1_batch rmfile (batch)]
 
 '''<indexterm><primary>rmfile</primary></indexterm>'''
@@ -431,64 +305,6 @@ An op handle.
 `#include <boost/afio/afio.hpp>`
 
 [heading Complexity]Amortised O(1) to dispatch. Amortised O(1) to complete if file deletion is constant time.
-[heading Exception Model]Propagates exceptions of any input preconditions with an errored state at the point of dispatch, and throws a `std::invalid_argument` if any inputs have values which could not possibly be correct. Once a batch of input ops has been verified at the point of entry as not errored, you are guaranteed that the batch is atomically scheduled as a whole, unless a failure to allocate memory occurs.
-[heading Example][filedir_example]
-
-
-[endsect]
-
-[section:rmsymlink_1_batch rmsymlink (batch)]
-
-'''<indexterm><primary>rmsymlink</primary></indexterm>'''
-Schedule a batch of asynchronous symlink deletions after optional preconditions. 
-
-[heading Synopsis]
-``virtual std::vector<async_io_op> async_file_io_dispatcher_base::rmsymlink(const std::vector< async_path_op_req > & reqs)``
-
-[heading Parameters]
-
-[table
-[[Type] [Concept] [Name] [Description] ]
-[[const std::vector< async_path_op_req > &] [] [reqs] [A batch of [^`async_path_op_req`] structures.]]
-]
-
-
-[heading Returns]
-A batch of op handles. 
-
-[heading Header]
-`#include <boost/afio/afio.hpp>`
-
-[heading Complexity]Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete if symlink deletion is constant time.
-[heading Exception Model]Propagates exceptions of any input preconditions with an errored state at the point of dispatch, and throws a `std::invalid_argument` if any inputs have values which could not possibly be correct. Once a batch of input ops has been verified at the point of entry as not errored, you are guaranteed that the batch is atomically scheduled as a whole, unless a failure to allocate memory occurs.
-[heading Example][filedir_example]
-
-
-[endsect]
-
-[section:rmsymlink_1_single rmsymlink (single)]
-
-'''<indexterm><primary>rmsymlink</primary></indexterm>'''
-Schedule an asynchronous symlink deletion after an optional precondition. 
-
-[heading Synopsis]
-``async_io_op async_file_io_dispatcher_base::rmsymlink(const async_path_op_req & req)``
-
-[heading Parameters]
-
-[table
-[[Type] [Concept] [Name] [Description] ]
-[[const async_path_op_req &] [] [req] [An [^`async_path_op_req`] structure.]]
-]
-
-
-[heading Returns]
-An op handle. 
-
-[heading Header]
-`#include <boost/afio/afio.hpp>`
-
-[heading Complexity]Amortised O(1) to dispatch. Amortised O(1) to complete if symlink deletion is constant time.
 [heading Exception Model]Propagates exceptions of any input preconditions with an errored state at the point of dispatch, and throws a `std::invalid_argument` if any inputs have values which could not possibly be correct. Once a batch of input ops has been verified at the point of entry as not errored, you are guaranteed that the batch is atomically scheduled as a whole, unless a failure to allocate memory occurs.
 [heading Example][filedir_example]
 
@@ -563,6 +379,64 @@ An op handle.
 
 [endsect]
 
+[section:rmsymlink_1_batch rmsymlink (batch)]
+
+'''<indexterm><primary>rmsymlink</primary></indexterm>'''
+Schedule a batch of asynchronous symlink deletions after optional preconditions. 
+
+[heading Synopsis]
+``virtual std::vector<async_io_op> async_file_io_dispatcher_base::rmsymlink(const std::vector< async_path_op_req > & reqs)``
+
+[heading Parameters]
+
+[table
+[[Type] [Concept] [Name] [Description] ]
+[[const std::vector< async_path_op_req > &] [] [reqs] [A batch of [^`async_path_op_req`] structures.]]
+]
+
+
+[heading Returns]
+A batch of op handles. 
+
+[heading Header]
+`#include <boost/afio/afio.hpp>`
+
+[heading Complexity]Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete if symlink deletion is constant time.
+[heading Exception Model]Propagates exceptions of any input preconditions with an errored state at the point of dispatch, and throws a `std::invalid_argument` if any inputs have values which could not possibly be correct. Once a batch of input ops has been verified at the point of entry as not errored, you are guaranteed that the batch is atomically scheduled as a whole, unless a failure to allocate memory occurs.
+[heading Example][filedir_example]
+
+
+[endsect]
+
+[section:rmsymlink_1_single rmsymlink (single)]
+
+'''<indexterm><primary>rmsymlink</primary></indexterm>'''
+Schedule an asynchronous symlink deletion after an optional precondition. 
+
+[heading Synopsis]
+``async_io_op async_file_io_dispatcher_base::rmsymlink(const async_path_op_req & req)``
+
+[heading Parameters]
+
+[table
+[[Type] [Concept] [Name] [Description] ]
+[[const async_path_op_req &] [] [req] [An [^`async_path_op_req`] structure.]]
+]
+
+
+[heading Returns]
+An op handle. 
+
+[heading Header]
+`#include <boost/afio/afio.hpp>`
+
+[heading Complexity]Amortised O(1) to dispatch. Amortised O(1) to complete if symlink deletion is constant time.
+[heading Exception Model]Propagates exceptions of any input preconditions with an errored state at the point of dispatch, and throws a `std::invalid_argument` if any inputs have values which could not possibly be correct. Once a batch of input ops has been verified at the point of entry as not errored, you are guaranteed that the batch is atomically scheduled as a whole, unless a failure to allocate memory occurs.
+[heading Example][filedir_example]
+
+
+[endsect]
+
 [section:sync_1_batch sync (batch)]
 
 '''<indexterm><primary>sync</primary></indexterm>'''
@@ -621,20 +495,19 @@ An op handle.
 
 [endsect]
 
-[section:truncate_2_batch truncate (batch)]
+[section:close_1_batch close (batch)]
 
-'''<indexterm><primary>truncate</primary></indexterm>'''
-Schedule a batch of asynchronous file length truncations after preceding operations. 
+'''<indexterm><primary>close</primary></indexterm>'''
+Schedule a batch of asynchronous file or directory handle closes after preceding operations. 
 
 [heading Synopsis]
-``virtual std::vector<async_io_op> async_file_io_dispatcher_base::truncate(const std::vector< async_io_op > & ops, const std::vector< off_t > & sizes)``
+``virtual std::vector<async_io_op> async_file_io_dispatcher_base::close(const std::vector< async_io_op > & ops)``
 
 [heading Parameters]
 
 [table
 [[Type] [Concept] [Name] [Description] ]
-[[const std::vector< async_io_op > &] [] [ops] [A batch of op handles. ]]
-[[const std::vector< off_t > &] [] [sizes] [A batch of new lengths.]]
+[[const std::vector< async_io_op > &] [] [ops] [A batch of op handles.]]
 ]
 
 
@@ -644,27 +517,26 @@ A batch of op handles.
 [heading Header]
 `#include <boost/afio/afio.hpp>`
 
-[heading Complexity]Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete if truncating file lengths is constant time.
+[heading Complexity]Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete if closing handles is constant time.
 [heading Exception Model]Propagates exceptions of any input preconditions with an errored state at the point of dispatch, and throws a `std::invalid_argument` if any inputs have values which could not possibly be correct. Once a batch of input ops has been verified at the point of entry as not errored, you are guaranteed that the batch is atomically scheduled as a whole, unless a failure to allocate memory occurs.
-[heading Example][readwrite_example]
+[heading Example][filedir_example]
 
 
 [endsect]
 
-[section:truncate_2_single truncate (single)]
+[section:close_1_single close (single)]
 
-'''<indexterm><primary>truncate</primary></indexterm>'''
-Schedule an asynchronous file length truncation after a preceding operation. 
+'''<indexterm><primary>close</primary></indexterm>'''
+Schedule an asynchronous file or directory handle close after a preceding operation. 
 
 [heading Synopsis]
-``async_io_op async_file_io_dispatcher_base::truncate(const async_io_op & op, off_t newsize)``
+``async_io_op async_file_io_dispatcher_base::close(const async_io_op & req)``
 
 [heading Parameters]
 
 [table
 [[Type] [Concept] [Name] [Description] ]
-[[const async_io_op &] [] [op] [An op handle. ]]
-[[off_t] [] [newsize] [The new size for the file.]]
+[[const async_io_op &] [] [req] [An op handle.]]
 ]
 
 
@@ -674,7 +546,75 @@ An op handle.
 [heading Header]
 `#include <boost/afio/afio.hpp>`
 
-[heading Complexity]Amortised O(1) to dispatch. Amortised O(1) to complete if truncating file lengths is constant time.
+[heading Complexity]Amortised O(1) to dispatch. Amortised O(1) to complete if closing handles is constant time.
+[heading Exception Model]Propagates exceptions of any input preconditions with an errored state at the point of dispatch, and throws a `std::invalid_argument` if any inputs have values which could not possibly be correct. Once a batch of input ops has been verified at the point of entry as not errored, you are guaranteed that the batch is atomically scheduled as a whole, unless a failure to allocate memory occurs.
+[heading Example][filedir_example]
+
+
+[endsect]
+
+[section:read_1_batch read (batch)]
+
+'''<indexterm><primary>read</primary></indexterm>'''
+Schedule a batch of asynchronous data reads after preceding operations, where offset and total data read must not exceed the present file size. 
+
+[heading Description]
+Note that on Windows this call issues a separate async file operation for each buffer supplied, thus making scatter/gather i/o no more efficient than making separate calls. The big exception to this is when doing unbuffered page aligned i/o for which Windows provides special scatter/gather i/o functions. 
+
+[heading Synopsis]
+``template<class T>
+virtual std::vector<async_io_op> async_file_io_dispatcher_base::read(const std::vector< async_data_op_req< T >> & ops)``
+
+[heading Parameters]
+
+[table
+[[Type] [Concept] [Name] [Description] ]
+[[class T] [Any type. ] [ - ] [Must be specified]]
+[[const std::vector< async_data_op_req< T >> &] [] [ops] [A batch of async_data_op_req<T> structures.]]
+]
+
+
+[heading Returns]
+A batch of op handles. 
+
+[heading Header]
+`#include <boost/afio/afio.hpp>`
+
+[heading Complexity]Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete if reading data is constant time.
+[heading Exception Model]Propagates exceptions of any input preconditions with an errored state at the point of dispatch, and throws a `std::invalid_argument` if any inputs have values which could not possibly be correct. Once a batch of input ops has been verified at the point of entry as not errored, you are guaranteed that the batch is atomically scheduled as a whole, unless a failure to allocate memory occurs.
+[heading Example][readwrite_example]
+
+
+[endsect]
+
+[section:read_1_single read (single)]
+
+'''<indexterm><primary>read</primary></indexterm>'''
+Schedule an asynchronous data read after a preceding operation, where offset and total data read must not exceed the present file size. 
+
+[heading Description]
+Note that on Windows this call issues a separate async file operation for each buffer supplied, thus making scatter/gather i/o no more efficient than making separate calls. The big exception to this is when doing unbuffered page aligned i/o for which Windows provides special scatter/gather i/o functions. 
+
+[heading Synopsis]
+``template<class T>
+async_io_op async_file_io_dispatcher_base::read(const async_data_op_req< T > & req)``
+
+[heading Parameters]
+
+[table
+[[Type] [Concept] [Name] [Description] ]
+[[class T] [Any type. ] [ - ] [Must be specified]]
+[[const async_data_op_req< T > &] [] [req] [An async_data_op_req<T> structure.]]
+]
+
+
+[heading Returns]
+An op handle. 
+
+[heading Header]
+`#include <boost/afio/afio.hpp>`
+
+[heading Complexity]Amortised O(1) to dispatch. Amortised O(1) to complete if reading data is constant time.
 [heading Exception Model]Propagates exceptions of any input preconditions with an errored state at the point of dispatch, and throws a `std::invalid_argument` if any inputs have values which could not possibly be correct. Once a batch of input ops has been verified at the point of entry as not errored, you are guaranteed that the batch is atomically scheduled as a whole, unless a failure to allocate memory occurs.
 [heading Example][readwrite_example]
 
@@ -743,6 +683,66 @@ An op handle.
 `#include <boost/afio/afio.hpp>`
 
 [heading Complexity]Amortised O(1) to dispatch. Amortised O(1) to complete if writing data is constant time.
+[heading Exception Model]Propagates exceptions of any input preconditions with an errored state at the point of dispatch, and throws a `std::invalid_argument` if any inputs have values which could not possibly be correct. Once a batch of input ops has been verified at the point of entry as not errored, you are guaranteed that the batch is atomically scheduled as a whole, unless a failure to allocate memory occurs.
+[heading Example][readwrite_example]
+
+
+[endsect]
+
+[section:truncate_2_batch truncate (batch)]
+
+'''<indexterm><primary>truncate</primary></indexterm>'''
+Schedule a batch of asynchronous file length truncations after preceding operations. 
+
+[heading Synopsis]
+``virtual std::vector<async_io_op> async_file_io_dispatcher_base::truncate(const std::vector< async_io_op > & ops, const std::vector< off_t > & sizes)``
+
+[heading Parameters]
+
+[table
+[[Type] [Concept] [Name] [Description] ]
+[[const std::vector< async_io_op > &] [] [ops] [A batch of op handles. ]]
+[[const std::vector< off_t > &] [] [sizes] [A batch of new lengths.]]
+]
+
+
+[heading Returns]
+A batch of op handles. 
+
+[heading Header]
+`#include <boost/afio/afio.hpp>`
+
+[heading Complexity]Amortised O(N) to dispatch. Amortised O(N/threadpool) to complete if truncating file lengths is constant time.
+[heading Exception Model]Propagates exceptions of any input preconditions with an errored state at the point of dispatch, and throws a `std::invalid_argument` if any inputs have values which could not possibly be correct. Once a batch of input ops has been verified at the point of entry as not errored, you are guaranteed that the batch is atomically scheduled as a whole, unless a failure to allocate memory occurs.
+[heading Example][readwrite_example]
+
+
+[endsect]
+
+[section:truncate_2_single truncate (single)]
+
+'''<indexterm><primary>truncate</primary></indexterm>'''
+Schedule an asynchronous file length truncation after a preceding operation. 
+
+[heading Synopsis]
+``async_io_op async_file_io_dispatcher_base::truncate(const async_io_op & op, off_t newsize)``
+
+[heading Parameters]
+
+[table
+[[Type] [Concept] [Name] [Description] ]
+[[const async_io_op &] [] [op] [An op handle. ]]
+[[off_t] [] [newsize] [The new size for the file.]]
+]
+
+
+[heading Returns]
+An op handle. 
+
+[heading Header]
+`#include <boost/afio/afio.hpp>`
+
+[heading Complexity]Amortised O(1) to dispatch. Amortised O(1) to complete if truncating file lengths is constant time.
 [heading Exception Model]Propagates exceptions of any input preconditions with an errored state at the point of dispatch, and throws a `std::invalid_argument` if any inputs have values which could not possibly be correct. Once a batch of input ops has been verified at the point of entry as not errored, you are guaranteed that the batch is atomically scheduled as a whole, unless a failure to allocate memory occurs.
 [heading Example][readwrite_example]
 

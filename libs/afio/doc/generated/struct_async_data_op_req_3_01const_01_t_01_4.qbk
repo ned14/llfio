@@ -19,8 +19,8 @@ A convenience bundle of precondition, data and where for writing from a single [
 struct async_data_op_req< const T >
       : public detail::async_data_op_req_impl< true >
 {
-  std::vector< boost::asio::const_buffer > buffers;  // A sequence of const Boost.ASIO buffers to write from. 
   async_io_op precondition;                          // A precondition containing an open file handle for this operation. 
+  std::vector< boost::asio::const_buffer > buffers;  // A sequence of const Boost.ASIO buffers to write from. 
   off_t where;                                       // The offset at which to write. 
 };
 ``

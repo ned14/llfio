@@ -430,7 +430,7 @@ namespace detail {
         OpType optype;
         async_op_flags flags;
         std::shared_ptr<shared_future<std::shared_ptr<async_io_handle>>> h;
-        std::unique_ptr<promise<std::shared_ptr<async_io_handle>>> detached_promise;
+        enqueued_task<std::shared_ptr<async_io_handle>()> enqueuement;
         typedef std::pair<size_t, std::function<std::shared_ptr<async_io_handle> (std::shared_ptr<async_io_handle>, exception_ptr *)>> completion_t;
         std::vector<completion_t> completions;
 #ifndef NDEBUG
@@ -470,7 +470,7 @@ namespace detail {
 #endif
         { fillStack(); }
         async_file_io_dispatcher_op(async_file_io_dispatcher_op &&o) BOOST_NOEXCEPT_OR_NOTHROW : optype(o.optype), flags(std::move(o.flags)), h(std::move(o.h)),
-            detached_promise(std::move(o.detached_promise)), completions(std::move(o.completions))
+            enqueuement(std::move(o.enqueuement)), completions(std::move(o.completions))
 #ifndef NDEBUG
             , boundf(std::move(o.boundf))
 #endif
@@ -559,15 +559,15 @@ namespace detail {
     {
         typedef std::shared_ptr<async_io_handle> rettype;
         typedef rettype retfuncttype();
-        std::vector<packaged_task<retfuncttype>> toexecute;
+        std::vector<enqueued_task<retfuncttype>> toexecute;
 
         immediate_async_ops() { }
         // Returns a promise which is fulfilled when this is destructed
-        future<rettype> enqueue(std::function<retfuncttype> f)
+		void enqueue(enqueued_task<retfuncttype> &out, std::function<retfuncttype> f, bool autosetfuture=true)
         {
-            packaged_task<retfuncttype> t(std::move(f));
-            toexecute.push_back(std::move(t));
-            return toexecute.back().get_future();
+			out=std::move(enqueued_task<retfuncttype>(std::move(f)));
+			out.disable_auto_set_future(!autosetfuture);
+			toexecute.push_back(std::move(out));
         }
         ~immediate_async_ops()
         {
@@ -1052,39 +1052,19 @@ BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC void async_file_io_dispatcher_base::complet
         auto it=thisop->completions.begin();
         BOOST_FOREACH(auto &c, completions)
         {
-            if(!!(c.second->flags & async_op_flags::ImmediateCompletion))
-            {
-                // If he was set up with a detached future, use that instead
-                if(c.second->detached_promise)
-                {
-                    *c.second->h=c.second->detached_promise->get_future();
-                    immediates.enqueue(std::bind(it->second, h, &e));
-                }
-                else
-                    *c.second->h=immediates.enqueue(std::bind(it->second, h, &e)).share();
-            }
-            else
-            {
-                // If he was set up with a detached future, use that instead
-                if(c.second->detached_promise)
-                {
-                    *c.second->h=c.second->detached_promise->get_future();
-                    p->pool->enqueue(std::bind(it->second, h, nullptr));
-                }
-                else
-                    *c.second->h=p->pool->enqueue(std::bind(it->second, h, nullptr)).share();
-            }
+            if(!!(c.second->flags & async_op_flags::immediate))
+				immediates.enqueue(c.second->enqueuement, std::bind(it->second, h, &e), false);
+			else
+				p->pool->enqueue(c.second->enqueuement, std::bind(it->second, h, nullptr), false);
+			*c.second->h=c.second->enqueuement.get_future();
             ++it;
         }
     }
-    if(thisop->detached_promise)
-    {
-        auto delpromise=boost::afio::detail::Undoer([&thisop]{ thisop->detached_promise.reset(); });
-        if(e)
-            thisop->detached_promise->set_exception(e);
-        else
-            thisop->detached_promise->set_value(h);
-    }
+	// Early set future
+    if(e)
+        thisop->enqueuement.set_future_exception(e);
+    else
+        thisop->enqueuement.set_future_value(h);
     BOOST_AFIO_DEBUG_PRINT("X %u %p\n", (unsigned) id, h.get());
 }
 
@@ -1097,7 +1077,6 @@ template<class F, class... Args> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC std::share
     {
 #ifndef NDEBUG
         // Find our op
-        bool has_detached_promise=false;
         BOOST_BEGIN_MEMORY_TRANSACTION(p->opslock)
         {
             auto it(p->ops.find(id));
@@ -1113,7 +1092,6 @@ template<class F, class... Args> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC std::share
 #endif
                 BOOST_AFIO_THROW_FATAL(std::runtime_error("Failed to find this operation in list of currently executing operations"));
             }
-            has_detached_promise=!!it->second->detached_promise;
         }
         BOOST_END_MEMORY_TRANSACTION(p->opslock)
 #endif
@@ -1123,18 +1101,6 @@ template<class F, class... Args> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC std::share
         {
             complete_async_op(id, ret.second);
         }
-#ifndef NDEBUG
-        else
-        {
-            // Make sure this was set up for deferred completion
-            if(!has_detached_promise)
-            {
-                // If this trips, it means a completion handler tried to defer signalling
-                // completion but it hadn't been set up with a detached future
-                BOOST_AFIO_THROW_FATAL(std::runtime_error("Completion handler tried to defer completion but was not configured with detached future"));
-            }
-        }
-#endif
         return ret.second;
     }
     catch(...)
@@ -1167,7 +1133,6 @@ template<class F, class... Args> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC std::share
         try\
         {\
             /* Find our op*/ \
-            bool has_detached_promise=false; \
             BOOST_BEGIN_MEMORY_TRANSACTION(p->opslock) \
             { \
                 auto it(p->ops.find(id)); \
@@ -1181,7 +1146,6 @@ template<class F, class... Args> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC std::share
                     std::sort(opsids.begin(), opsids.end()); \
                     BOOST_AFIO_THROW_FATAL(std::runtime_error("Failed to find this operation in list of currently executing operations")); \
                 } \
-                has_detached_promise=!!it->second->detached_promise; \
             } \
             BOOST_END_MEMORY_TRANSACTION(p->opslock) \
             completion_returntype ret((static_cast<F *>(this)->*f)(id, h, e BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a)));\
@@ -1190,16 +1154,6 @@ template<class F, class... Args> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC std::share
             {\
                 complete_async_op(id, ret.second);\
             }\
-            else \
-            { \
-                /* Make sure this was set up for deferred completion */ \
-                if(!has_detached_promise) \
-                { \
-                    /* If this trips, it means a completion handler tried to defer signalling*/ \
-                    /* completion but it hadn't been set up with a detached future */ \
-                    BOOST_AFIO_THROW_FATAL(std::runtime_error("Completion handler tried to defer completion but was not configured with detached future")); \
-                } \
-            } \
             return ret.second;\
         }\
         catch(...)\
@@ -1245,10 +1199,6 @@ template<class F, class... Args> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC async_io_o
     // Make a new async_io_op ready for returning
     async_io_op ret(this, thisid);
     auto thisop=std::make_shared<detail::async_file_io_dispatcher_op>((detail::OpType) optype, flags, ret.h, boundf);
-    if(!!(flags & async_op_flags::DetachedFuture))
-    {
-        thisop->detached_promise.reset(new promise<std::shared_ptr<async_io_handle>>);
-    }
     {
         auto item=std::make_pair(thisid, thisop);
         BOOST_BEGIN_MEMORY_TRANSACTION(p->opslock)
@@ -1319,28 +1269,12 @@ template<class F, class... Args> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC async_io_o
             // which indicates it completed and yet h remains invalid
             BOOST_AFIO_THROW_FATAL(std::runtime_error("Precondition was not in list of extant ops, yet its future is invalid. This should never happen for any real op, so it's probably memory corruption."));
         }
-        if(!!(flags & async_op_flags::ImmediateCompletion))
-        {
-            // If he was set up with a detached future, use that instead
-            if(!!(flags & async_op_flags::DetachedFuture))
-            {
-                *ret.h=thisop->detached_promise->get_future();
-                immediates.enqueue(std::bind(boundf.second, h, he));
-            }
-            else
-                *ret.h=immediates.enqueue(std::bind(boundf.second, h, he)).share();
-        }
-        else
-        {
-            // If he was set up with a detached future, use that instead
-            if(!!(flags & async_op_flags::DetachedFuture))
-            {
-                *ret.h=thisop->detached_promise->get_future();
-                p->pool->enqueue(std::bind(boundf.second, h, nullptr));
-            }
-            else
-                *ret.h=p->pool->enqueue(std::bind(boundf.second, h, nullptr)).share();
-        }
+        if(!!(flags & async_op_flags::immediate))
+			immediates.enqueue(thisop->enqueuement, std::bind(boundf.second, h, he), false);
+		else
+			p->pool->enqueue(thisop->enqueuement, std::bind(boundf.second, h, nullptr), false);
+		// Set the output shared future
+		*ret.h=thisop->enqueuement.get_future();
     }
     undep.dismiss();
     unopsit.dismiss();
@@ -1388,10 +1322,6 @@ template<class F, class... Args> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC async_io_o
         /* Make a new async_io_op ready for returning*/\
         async_io_op ret(this, thisid);\
         auto thisop=std::make_shared<detail::async_file_io_dispatcher_op>((detail::OpType) optype, flags, ret.h, boundf); \
-        if(!!(flags & async_op_flags::DetachedFuture)) \
-        { \
-            thisop->detached_promise.reset(new promise<std::shared_ptr<async_io_handle>>); \
-        } \
         { \
             auto item=std::make_pair(thisid, thisop); \
             BOOST_BEGIN_MEMORY_TRANSACTION(p->opslock) \
@@ -1462,26 +1392,12 @@ template<class F, class... Args> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC async_io_o
                 /* which indicates it completed and yet h remains invalid*/\
                 BOOST_AFIO_THROW_FATAL(std::runtime_error("Precondition was not in list of extant ops, yet its future is invalid. This should never happen for any real op, so it's probably memory corruption.")); \
             }\
-            if(!!(flags & async_op_flags::ImmediateCompletion)) \
-            { \
-                if(!!(flags & async_op_flags::DetachedFuture)) \
-                { \
-                    *ret.h=thisop->detached_promise->get_future(); \
-                    immediates.enqueue(std::bind(boundf.second, h, he)); \
-                } \
-                else \
-                    *ret.h=immediates.enqueue(std::bind(boundf.second, h, he)).share(); \
-            } \
-            else \
-            { \
-                if(!!(flags & async_op_flags::DetachedFuture)) \
-                { \
-                    *ret.h=thisop->detached_promise->get_future(); \
-                    p->pool->enqueue(std::bind(boundf.second, h, nullptr)); \
-                } \
-                else \
-                    *ret.h=p->pool->enqueue(std::bind(boundf.second, h, nullptr)).share(); \
-            } \
+			if(!!(flags & async_op_flags::immediate))\
+			    immediates.enqueue(thisop->enqueuement, std::bind(boundf.second, h, he), false);\
+			else\
+			    p->pool->enqueue(thisop->enqueuement, std::bind(boundf.second, h, nullptr), false);\
+			/* Set the output shared future */ \
+			*ret.h=thisop->enqueuement.get_future();\
         }\
         unopsit.dismiss();\
         undep.dismiss();\
@@ -1586,7 +1502,7 @@ template<class F> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC std::pair<std::vector<fut
 
 BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC std::vector<async_io_op> async_file_io_dispatcher_base::adopt(const std::vector<std::shared_ptr<async_io_handle>> &hs)
 {
-    return chain_async_ops(0, hs, async_op_flags::ImmediateCompletion, &async_file_io_dispatcher_base::doadopt);
+    return chain_async_ops(0, hs, async_op_flags::immediate, &async_file_io_dispatcher_base::doadopt);
 }
 
 namespace detail
@@ -1672,7 +1588,7 @@ BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC std::vector<async_io_op> async_file_io_disp
     {
         statev.push_back(std::make_pair(state, idx++));
     }
-    return chain_async_ops((int) detail::OpType::barrier, ops, statev, async_op_flags::ImmediateCompletion|async_op_flags::DetachedFuture, &async_file_io_dispatcher_base::dobarrier<std::pair<std::shared_ptr<detail::barrier_count_completed_state>, size_t>>);
+    return chain_async_ops((int) detail::OpType::barrier, ops, statev, async_op_flags::immediate, &async_file_io_dispatcher_base::dobarrier<std::pair<std::shared_ptr<detail::barrier_count_completed_state>, size_t>>);
 }
 
 namespace detail {
@@ -2059,7 +1975,7 @@ namespace detail {
                     BOOST_AFIO_THROW(std::invalid_argument("Inputs are invalid."));
             }
 #endif
-            return chain_async_ops((int) detail::OpType::dir, reqs, async_op_flags::None, &async_file_io_dispatcher_compat::dodir);
+            return chain_async_ops((int) detail::OpType::dir, reqs, async_op_flags::none, &async_file_io_dispatcher_compat::dodir);
         }
         BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC std::vector<async_io_op> rmdir(const std::vector<async_path_op_req> &reqs)
         {
@@ -2070,7 +1986,7 @@ namespace detail {
                     BOOST_AFIO_THROW(std::invalid_argument("Inputs are invalid."));
             }
 #endif
-            return chain_async_ops((int) detail::OpType::rmdir, reqs, async_op_flags::None, &async_file_io_dispatcher_compat::dormdir);
+            return chain_async_ops((int) detail::OpType::rmdir, reqs, async_op_flags::none, &async_file_io_dispatcher_compat::dormdir);
         }
         BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC std::vector<async_io_op> file(const std::vector<async_path_op_req> &reqs)
         {
@@ -2081,7 +1997,7 @@ namespace detail {
                     BOOST_AFIO_THROW(std::invalid_argument("Inputs are invalid."));
             }
 #endif
-            return chain_async_ops((int) detail::OpType::file, reqs, async_op_flags::None, &async_file_io_dispatcher_compat::dofile);
+            return chain_async_ops((int) detail::OpType::file, reqs, async_op_flags::none, &async_file_io_dispatcher_compat::dofile);
         }
         BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC std::vector<async_io_op> rmfile(const std::vector<async_path_op_req> &reqs)
         {
@@ -2092,7 +2008,7 @@ namespace detail {
                     BOOST_AFIO_THROW(std::invalid_argument("Inputs are invalid."));
             }
 #endif
-            return chain_async_ops((int) detail::OpType::rmfile, reqs, async_op_flags::None, &async_file_io_dispatcher_compat::dormfile);
+            return chain_async_ops((int) detail::OpType::rmfile, reqs, async_op_flags::none, &async_file_io_dispatcher_compat::dormfile);
         }
         BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC std::vector<async_io_op> symlink(const std::vector<async_path_op_req> &reqs)
         {
@@ -2103,7 +2019,7 @@ namespace detail {
                     BOOST_AFIO_THROW(std::invalid_argument("Inputs are invalid."));
             }
 #endif
-            return chain_async_ops((int) detail::OpType::symlink, reqs, async_op_flags::None, &async_file_io_dispatcher_compat::dosymlink);
+            return chain_async_ops((int) detail::OpType::symlink, reqs, async_op_flags::none, &async_file_io_dispatcher_compat::dosymlink);
         }
         BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC std::vector<async_io_op> rmsymlink(const std::vector<async_path_op_req> &reqs)
         {
@@ -2114,7 +2030,7 @@ namespace detail {
                     BOOST_AFIO_THROW(std::invalid_argument("Inputs are invalid."));
             }
 #endif
-            return chain_async_ops((int) detail::OpType::rmsymlink, reqs, async_op_flags::None, &async_file_io_dispatcher_compat::dormsymlink);
+            return chain_async_ops((int) detail::OpType::rmsymlink, reqs, async_op_flags::none, &async_file_io_dispatcher_compat::dormsymlink);
         }
         BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC std::vector<async_io_op> sync(const std::vector<async_io_op> &ops)
         {
@@ -2125,7 +2041,7 @@ namespace detail {
                     BOOST_AFIO_THROW(std::invalid_argument("Inputs are invalid."));
             }
 #endif
-            return chain_async_ops((int) detail::OpType::sync, ops, async_op_flags::None, &async_file_io_dispatcher_compat::dosync);
+            return chain_async_ops((int) detail::OpType::sync, ops, async_op_flags::none, &async_file_io_dispatcher_compat::dosync);
         }
         BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC std::vector<async_io_op> close(const std::vector<async_io_op> &ops)
         {
@@ -2136,7 +2052,7 @@ namespace detail {
                     BOOST_AFIO_THROW(std::invalid_argument("Inputs are invalid."));
             }
 #endif
-            return chain_async_ops((int) detail::OpType::close, ops, async_op_flags::None, &async_file_io_dispatcher_compat::doclose);
+            return chain_async_ops((int) detail::OpType::close, ops, async_op_flags::none, &async_file_io_dispatcher_compat::doclose);
         }
         BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC std::vector<async_io_op> read(const std::vector<detail::async_data_op_req_impl<false>> &reqs)
         {
@@ -2147,7 +2063,7 @@ namespace detail {
                     BOOST_AFIO_THROW(std::invalid_argument("Inputs are invalid."));
             }
 #endif
-            return chain_async_ops((int) detail::OpType::read, reqs, async_op_flags::None, &async_file_io_dispatcher_compat::doread);
+            return chain_async_ops((int) detail::OpType::read, reqs, async_op_flags::none, &async_file_io_dispatcher_compat::doread);
         }
         BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC std::vector<async_io_op> write(const std::vector<detail::async_data_op_req_impl<true>> &reqs)
         {
@@ -2158,7 +2074,7 @@ namespace detail {
                     BOOST_AFIO_THROW(std::invalid_argument("Inputs are invalid."));
             }
 #endif
-            return chain_async_ops((int) detail::OpType::write, reqs, async_op_flags::None, &async_file_io_dispatcher_compat::dowrite);
+            return chain_async_ops((int) detail::OpType::write, reqs, async_op_flags::none, &async_file_io_dispatcher_compat::dowrite);
         }
         BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC std::vector<async_io_op> truncate(const std::vector<async_io_op> &ops, const std::vector<off_t> &sizes)
         {
@@ -2169,7 +2085,7 @@ namespace detail {
                     BOOST_AFIO_THROW(std::invalid_argument("Inputs are invalid."));
             }
 #endif
-            return chain_async_ops((int) detail::OpType::truncate, ops, sizes, async_op_flags::None, &async_file_io_dispatcher_compat::dotruncate);
+            return chain_async_ops((int) detail::OpType::truncate, ops, sizes, async_op_flags::none, &async_file_io_dispatcher_compat::dotruncate);
         }
         BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC std::pair<std::vector<future<std::pair<std::vector<directory_entry>, bool>>>, std::vector<async_io_op>> enumerate(const std::vector<async_enumerate_op_req> &reqs)
         {
@@ -2180,7 +2096,7 @@ namespace detail {
                     BOOST_AFIO_THROW(std::invalid_argument("Inputs are invalid."));
             }
 #endif
-            return chain_async_ops((int) detail::OpType::enumerate, reqs, async_op_flags::None, &async_file_io_dispatcher_compat::doenumerate);
+            return chain_async_ops((int) detail::OpType::enumerate, reqs, async_op_flags::none, &async_file_io_dispatcher_compat::doenumerate);
         }
     };
 }

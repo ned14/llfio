@@ -17,8 +17,8 @@
 [heading Synopsis]
 ``class detail::async_data_op_req_impl< true >
 {
-  std::vector< boost::asio::const_buffer > buffers;  // A sequence of mutable Boost.ASIO buffers to read into. 
   async_io_op precondition;                          // An optional precondition for this operation. 
+  std::vector< boost::asio::const_buffer > buffers;  // A sequence of mutable Boost.ASIO buffers to read into. 
   off_t where;                                       // The offset from which to read. 
 };
 ``

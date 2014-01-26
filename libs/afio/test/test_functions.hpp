@@ -536,7 +536,7 @@ static void evil_random_io(std::shared_ptr<boost::afio::async_file_io_dispatcher
                             manywrittenfiles[n]=dispatcher->write(op.req);
                     }
                     else
-                        manywrittenfiles[n]=dispatcher->completion(dispatcher->read(op.req), std::pair<boost::afio::async_op_flags, std::function<boost::afio::async_file_io_dispatcher_base::completion_t>>(boost::afio::async_op_flags::None, std::bind(checkHash, ref(op), towriteptrs[n], placeholders::_1, placeholders::_2)));
+                        manywrittenfiles[n]=dispatcher->completion(dispatcher->read(op.req), std::pair<boost::afio::async_op_flags, std::function<boost::afio::async_file_io_dispatcher_base::completion_t>>(boost::afio::async_op_flags::none, std::bind(checkHash, ref(op), towriteptrs[n], placeholders::_1, placeholders::_2)));
             }
             // After replay, read the entire file into memory
             manywrittenfiles[n]=dispatcher->read(boost::afio::async_data_op_req<char>(manywrittenfiles[n], towriteptrs[n], towritesizes[n], 0));

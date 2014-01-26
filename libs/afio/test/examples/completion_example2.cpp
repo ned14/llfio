@@ -74,12 +74,10 @@ int main(void)
     boost::afio::async_io_op op=
         dispatcher->completion(boost::afio::async_io_op() /* no precondition */,
             std::make_pair(
-                /* Allow me to defer completion */
-                boost::afio::async_op_flags::DetachedFuture
                 /* Complete boundf immediately after its precondition (in this
                 case as there is no precondition that means right now before
                 completion() returns) */
-                | boost::afio::async_op_flags::ImmediateCompletion,
+                boost::afio::async_op_flags::immediate,
                 boundf));
         
     // Create a boost::future<> representing the ops passed to when_all()

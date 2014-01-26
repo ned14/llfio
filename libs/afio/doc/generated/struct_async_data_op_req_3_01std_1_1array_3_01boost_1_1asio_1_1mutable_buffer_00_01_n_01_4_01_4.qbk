@@ -19,8 +19,8 @@ A convenience bundle of precondition, data and where for reading into a [^`std::
 struct async_data_op_req< std::array< boost::asio::mutable_buffer, N > >
       : public detail::async_data_op_req_impl< false >
 {
-  std::array< boost::asio::mutable_buffer, N > buffers;  // A sequence of mutable Boost.ASIO buffers to read into. 
   async_io_op precondition;                              // A precondition containing an open file handle for this operation. 
+  std::array< boost::asio::mutable_buffer, N > buffers;  // A sequence of mutable Boost.ASIO buffers to read into. 
   off_t where;                                           // The offset from which to read. 
 };
 ``

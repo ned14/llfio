@@ -20,9 +20,9 @@ The id field is always valid (and non-zero) if this reference is valid. The h fi
 [heading Synopsis]
 ``struct async_io_op
 {
-  std::shared_ptr< shared_future< std::shared_ptr< async_io_handle > > > h;  // A future handle to the item being operated upon. 
-  size_t id;                                                                 // A unique id for this operation. 
   async_file_io_dispatcher_base * parent;                                    // The parent dispatcher. 
+  size_t id;                                                                 // A unique id for this operation. 
+  std::shared_ptr< shared_future< std::shared_ptr< async_io_handle > > > h;  // A future handle to the item being operated upon. 
 };
 ``
 

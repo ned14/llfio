@@ -12,21 +12,19 @@
 [section:async_op_flags async_op_flags]
 
 '''<indexterm><primary>async_op_flags</primary></indexterm>'''
-'''<indexterm><primary>None</primary></indexterm>'''
-'''<indexterm><primary>DetachedFuture</primary></indexterm>'''
-'''<indexterm><primary>ImmediateCompletion</primary></indexterm>'''
+'''<indexterm><primary>none</primary></indexterm>'''
+'''<indexterm><primary>immediate</primary></indexterm>'''
 Bitwise async_op_flags flags. 
 
 [heading Synopsis]
-``enum async_op_flags {None = 0, DetachedFuture = 1, ImmediateCompletion = 2};``
+``enum async_op_flags {none = 0, immediate = 1};``
 
 [heading Values]
 
 [table
 [[Value] [Description] ]
-[[None] [No flags set. ]]
-[[DetachedFuture] [The specified completion routine may choose to not complete immediately. ]]
-[[ImmediateCompletion] [Call chained completion immediately instead of scheduling for later. Make SURE your completion can not block! ]]
+[[none] [No flags set. ]]
+[[immediate] [Call chained completion immediately instead of scheduling for later. Make SURE your completion can not block! ]]
 ]
 
 

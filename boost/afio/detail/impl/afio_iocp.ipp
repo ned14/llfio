@@ -749,7 +749,7 @@ namespace boost { namespace afio { namespace detail {
                     BOOST_AFIO_THROW(std::runtime_error("Inputs are invalid."));
             }
 #endif
-            return chain_async_ops((int) detail::OpType::dir, reqs, async_op_flags::None, &async_file_io_dispatcher_windows::dodir);
+            return chain_async_ops((int) detail::OpType::dir, reqs, async_op_flags::none, &async_file_io_dispatcher_windows::dodir);
         }
         virtual std::vector<async_io_op> rmdir(const std::vector<async_path_op_req> &reqs)
         {
@@ -760,7 +760,7 @@ namespace boost { namespace afio { namespace detail {
                     BOOST_AFIO_THROW(std::runtime_error("Inputs are invalid."));
             }
 #endif
-            return chain_async_ops((int) detail::OpType::rmdir, reqs, async_op_flags::None, &async_file_io_dispatcher_windows::dormdir);
+            return chain_async_ops((int) detail::OpType::rmdir, reqs, async_op_flags::none, &async_file_io_dispatcher_windows::dormdir);
         }
         virtual std::vector<async_io_op> file(const std::vector<async_path_op_req> &reqs)
         {
@@ -771,7 +771,7 @@ namespace boost { namespace afio { namespace detail {
                     BOOST_AFIO_THROW(std::runtime_error("Inputs are invalid."));
             }
 #endif
-            return chain_async_ops((int) detail::OpType::file, reqs, async_op_flags::None, &async_file_io_dispatcher_windows::dofile);
+            return chain_async_ops((int) detail::OpType::file, reqs, async_op_flags::none, &async_file_io_dispatcher_windows::dofile);
         }
         virtual std::vector<async_io_op> rmfile(const std::vector<async_path_op_req> &reqs)
         {
@@ -782,7 +782,7 @@ namespace boost { namespace afio { namespace detail {
                     BOOST_AFIO_THROW(std::runtime_error("Inputs are invalid."));
             }
 #endif
-            return chain_async_ops((int) detail::OpType::rmfile, reqs, async_op_flags::None, &async_file_io_dispatcher_windows::dormfile);
+            return chain_async_ops((int) detail::OpType::rmfile, reqs, async_op_flags::none, &async_file_io_dispatcher_windows::dormfile);
         }
         virtual std::vector<async_io_op> symlink(const std::vector<async_path_op_req> &reqs)
         {
@@ -793,7 +793,7 @@ namespace boost { namespace afio { namespace detail {
                     BOOST_AFIO_THROW(std::runtime_error("Inputs are invalid."));
             }
 #endif
-            return chain_async_ops((int) detail::OpType::symlink, reqs, async_op_flags::DetachedFuture, &async_file_io_dispatcher_windows::dosymlink);
+            return chain_async_ops((int) detail::OpType::symlink, reqs, async_op_flags::none, &async_file_io_dispatcher_windows::dosymlink);
         }
         virtual std::vector<async_io_op> rmsymlink(const std::vector<async_path_op_req> &reqs)
         {
@@ -804,7 +804,7 @@ namespace boost { namespace afio { namespace detail {
                     BOOST_AFIO_THROW(std::runtime_error("Inputs are invalid."));
             }
 #endif
-            return chain_async_ops((int) detail::OpType::rmsymlink, reqs, async_op_flags::None, &async_file_io_dispatcher_windows::dormsymlink);
+            return chain_async_ops((int) detail::OpType::rmsymlink, reqs, async_op_flags::none, &async_file_io_dispatcher_windows::dormsymlink);
         }
         virtual std::vector<async_io_op> sync(const std::vector<async_io_op> &ops)
         {
@@ -815,7 +815,7 @@ namespace boost { namespace afio { namespace detail {
                     BOOST_AFIO_THROW(std::runtime_error("Inputs are invalid."));
             }
 #endif
-            return chain_async_ops((int) detail::OpType::sync, ops, async_op_flags::None, &async_file_io_dispatcher_windows::dosync);
+            return chain_async_ops((int) detail::OpType::sync, ops, async_op_flags::none, &async_file_io_dispatcher_windows::dosync);
         }
         virtual std::vector<async_io_op> close(const std::vector<async_io_op> &ops)
         {
@@ -826,7 +826,7 @@ namespace boost { namespace afio { namespace detail {
                     BOOST_AFIO_THROW(std::runtime_error("Inputs are invalid."));
             }
 #endif
-            return chain_async_ops((int) detail::OpType::close, ops, async_op_flags::None, &async_file_io_dispatcher_windows::doclose);
+            return chain_async_ops((int) detail::OpType::close, ops, async_op_flags::none, &async_file_io_dispatcher_windows::doclose);
         }
         virtual std::vector<async_io_op> read(const std::vector<detail::async_data_op_req_impl<false>> &reqs)
         {
@@ -837,7 +837,7 @@ namespace boost { namespace afio { namespace detail {
                     BOOST_AFIO_THROW(std::runtime_error("Inputs are invalid."));
             }
 #endif
-            return chain_async_ops((int) detail::OpType::read, reqs, async_op_flags::DetachedFuture, &async_file_io_dispatcher_windows::doread);
+            return chain_async_ops((int) detail::OpType::read, reqs, async_op_flags::none, &async_file_io_dispatcher_windows::doread);
         }
         virtual std::vector<async_io_op> write(const std::vector<detail::async_data_op_req_impl<true>> &reqs)
         {
@@ -848,7 +848,7 @@ namespace boost { namespace afio { namespace detail {
                     BOOST_AFIO_THROW(std::runtime_error("Inputs are invalid."));
             }
 #endif
-            return chain_async_ops((int) detail::OpType::write, reqs, async_op_flags::DetachedFuture, &async_file_io_dispatcher_windows::dowrite);
+            return chain_async_ops((int) detail::OpType::write, reqs, async_op_flags::none, &async_file_io_dispatcher_windows::dowrite);
         }
         virtual std::vector<async_io_op> truncate(const std::vector<async_io_op> &ops, const std::vector<off_t> &sizes)
         {
@@ -859,7 +859,7 @@ namespace boost { namespace afio { namespace detail {
                     BOOST_AFIO_THROW(std::runtime_error("Inputs are invalid."));
             }
 #endif
-            return chain_async_ops((int) detail::OpType::truncate, ops, sizes, async_op_flags::None, &async_file_io_dispatcher_windows::dotruncate);
+            return chain_async_ops((int) detail::OpType::truncate, ops, sizes, async_op_flags::none, &async_file_io_dispatcher_windows::dotruncate);
         }
         virtual std::pair<std::vector<future<std::pair<std::vector<directory_entry>, bool>>>, std::vector<async_io_op>> enumerate(const std::vector<async_enumerate_op_req> &reqs)
         {
@@ -870,7 +870,7 @@ namespace boost { namespace afio { namespace detail {
                     BOOST_AFIO_THROW(std::runtime_error("Inputs are invalid."));
             }
 #endif
-            return chain_async_ops((int) detail::OpType::enumerate, reqs, async_op_flags::DetachedFuture, &async_file_io_dispatcher_windows::doenumerate);
+            return chain_async_ops((int) detail::OpType::enumerate, reqs, async_op_flags::none, &async_file_io_dispatcher_windows::doenumerate);
         }
     };
 } } } // namespace

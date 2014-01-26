@@ -17,8 +17,8 @@ A convenience bundle of path and flags, with optional precondition.
 [heading Synopsis]
 ``struct async_path_op_req
 {
-  file_flags flags;            // The flags to be used for this operation (note they can be overriden by flags passed during dispatcher construction). 
   std::filesystem::path path;  // The filing system path to be used for this operation. 
+  file_flags flags;            // The flags to be used for this operation (note they can be overriden by flags passed during dispatcher construction). 
   async_io_op precondition;    // An optional precondition for this operation 
 };
 ``

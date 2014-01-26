@@ -15,7 +15,7 @@
 Schedule a batch of asynchronous invocations of the specified bound functions when their supplied preconditions complete. 
 
 [heading Description]
-This is effectively a convenience wrapper for [^`completion()`]. It creates a packaged\u005ftask matching the [^`completion_t`] handler specification and calls the specified arbitrary callable, always returning completion on exit.
+This is effectively a convenience wrapper for [^`completion()`]. It creates an enqueued\u005ftask matching the [^`completion_t`] handler specification and calls the specified arbitrary callable, always returning completion on exit.
 
 [heading Synopsis]
 ``template<class R>
@@ -50,7 +50,7 @@ A pair with a batch of futures returning the result of each of the callables and
 Schedule a batch of asynchronous invocations of the specified bound functions when their supplied preconditions complete. 
 
 [heading Description]
-This is effectively a convenience wrapper for [^`completion()`]. It creates a packaged\u005ftask matching the [^`completion_t`] handler specification and calls the specified arbitrary callable, always returning completion on exit. If you are seeing performance issues, using [^`completion()`] directly will have much less overhead.
+This is effectively a convenience wrapper for [^`completion()`]. It creates an enqueued\u005ftask matching the [^`completion_t`] handler specification and calls the specified arbitrary callable, always returning completion on exit. If you are seeing performance issues, using [^`completion()`] directly will have much less overhead.
 
 [heading Synopsis]
 ``template<class R>
@@ -84,7 +84,7 @@ A pair with a batch of futures returning the result of each of the callables and
 Schedule an asynchronous invocation of the specified unbound callable when its supplied precondition completes. Note that this function essentially calls [^`std::bind()`] on the callable and the args and passes it to the other call() overload taking a [^`std::function<>`]. You should therefore use [^`std::ref()`] etc. as appropriate. 
 
 [heading Description]
-This is effectively a convenience wrapper for [^`completion()`]. It creates a packaged\u005ftask matching the [^`completion_t`] handler specification and calls the specified arbitrary callable, always returning completion on exit. If you are seeing performance issues, using [^`completion()`] directly will have much less overhead.
+This is effectively a convenience wrapper for [^`completion()`]. It creates an enqueued\u005ftask matching the [^`completion_t`] handler specification and calls the specified arbitrary callable, always returning completion on exit. If you are seeing performance issues, using [^`completion()`] directly will have much less overhead.
 
 [heading Synopsis]
 ``template<class C, class... Args>

@@ -21,7 +21,7 @@ int main(void)
     auto begin=chrono::high_resolution_clock::now();
     while(chrono::duration_cast<secs_type>(chrono::high_resolution_clock::now()-begin).count()<3);
     
-    std::pair<async_op_flags, async_file_io_dispatcher_base::completion_t *> callback(async_op_flags::None, _callback);
+    std::pair<async_op_flags, async_file_io_dispatcher_base::completion_t *> callback(async_op_flags::none, _callback);
     atomic<size_t> threads(0);
 #if 0
     std::cout << "Attach profiler now and hit Return" << std::endl;

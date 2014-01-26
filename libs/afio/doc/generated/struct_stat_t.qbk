@@ -20,24 +20,24 @@ This structure looks somewhat like a [^`struct stat`], and indeed it was derived
 [heading Synopsis]
 ``struct stat_t
 {
-  off_t st_allocated;                            // bytes allocated for file (Windows, POSIX) 
+  uint64_t st_dev;                               // inode of device containing file (POSIX only) 
+  uint64_t st_ino;                               // inode of file (Windows, POSIX) 
+  std::filesystem::file_type st_type;            // type of file (Windows, POSIX) 
+  std::filesystem::perms st_perms;               // bitfield perms of file (POSIX only) 
+  int16_t st_nlink;                              // number of hard links (Windows, POSIX) 
+  int16_t st_uid;                                // user ID of the file (POSIX only) 
+  int16_t st_gid;                                // group ID of the file (POSIX only) 
+  dev_t st_rdev;                                 // id of file if special (POSIX only) 
   chrono::system_clock::time_point st_atim;      // time of last access (Windows, POSIX) 
-  chrono::system_clock::time_point st_birthtim;  // time of file creation (Windows, FreeBSD, OS X, zero otherwise) 
-  uint16_t st_blksize;                           // block size used by this device (Windows, POSIX) 
-  off_t st_blocks;                               // number of blocks allocated (Windows, POSIX) 
+  chrono::system_clock::time_point st_mtim;      // time of last data modification (Windows, POSIX) 
   chrono::system_clock::time_point st_ctim;      // time of last status change (Windows, POSIX) 
-  uint64_t st_dev;                               // inode of device containing file (POSIX) 
+  off_t st_size;                                 // file size, in bytes (Windows, POSIX) 
+  off_t st_allocated;                            // bytes allocated for file (Windows, POSIX) 
+  off_t st_blocks;                               // number of blocks allocated (Windows, POSIX) 
+  uint16_t st_blksize;                           // block size used by this device (Windows, POSIX) 
   uint32_t st_flags;                             // user defined flags for file (FreeBSD, OS X, zero otherwise) 
   uint32_t st_gen;                               // file generation number (FreeBSD, OS X, zero otherwise) 
-  int16_t st_gid;                                // group ID of the file (POSIX) 
-  uint64_t st_ino;                               // inode of file (Windows, POSIX) 
-  chrono::system_clock::time_point st_mtim;      // time of last data modification (Windows, POSIX) 
-  int16_t st_nlink;                              // number of hard links (Windows, POSIX) 
-  std::filesystem::perms st_perms;               // bitfield perms of file (POSIX) 
-  dev_t st_rdev;                                 // id of file if special (POSIX) 
-  off_t st_size;                                 // file size, in bytes (Windows, POSIX) 
-  std::filesystem::file_type st_type;            // type of file (Windows, POSIX) 
-  int16_t st_uid;                                // user ID of the file (POSIX) 
+  chrono::system_clock::time_point st_birthtim;  // time of file creation (Windows, FreeBSD, OS X, zero otherwise) 
 };
 ``
 

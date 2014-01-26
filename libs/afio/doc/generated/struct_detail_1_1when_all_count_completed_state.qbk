@@ -17,10 +17,10 @@
 [heading Synopsis]
 ``struct detail::when_all_count_completed_state
 {
-  promise< std::vector< std::shared_ptr< async_io_handle > > > done;
   std::vector< async_io_op > inputs;
-  std::vector< std::shared_ptr< async_io_handle > > out;
   atomic< size_t > togo;
+  std::vector< std::shared_ptr< async_io_handle > > out;
+  promise< std::vector< std::shared_ptr< async_io_handle > > > done;
 };
 ``
 

@@ -17,11 +17,11 @@ A convenience bundle of precondition, number of items to enumerate, item pattern
 [heading Synopsis]
 ``struct async_enumerate_op_req
 {
-  std::filesystem::path glob;  // An optional shell glob by which to filter the items returned. Done kernel side on Windows, user side on POSIX. 
-  size_t maxitems;             // The maximum number of items to return in this request. Note that setting to one will often invoke two syscalls. 
-  metadata_flags metadata;     // The metadata to prefetch for each item enumerated. AFIO may fetch more metadata than requested if it is cost free. 
   async_io_op precondition;    // A precondition for this operation. 
+  size_t maxitems;             // The maximum number of items to return in this request. Note that setting to one will often invoke two syscalls. 
   bool restart;                // Restarts the enumeration for this open directory handle. 
+  std::filesystem::path glob;  // An optional shell glob by which to filter the items returned. Done kernel side on Windows, user side on POSIX. 
+  metadata_flags metadata;     // The metadata to prefetch for each item enumerated. AFIO may fetch more metadata than requested if it is cost free. 
 };
 ``
 

@@ -23,7 +23,7 @@ int main(void)
     
     std::vector<async_io_op> preconditions;
     std::vector<std::pair<async_op_flags, async_file_io_dispatcher_base::completion_t *>> callbacks(1,
-        std::make_pair(async_op_flags::None, callback));
+        std::make_pair(async_op_flags::none, callback));
 #if 0
     std::cout << "Attach profiler now and hit Return" << std::endl;
     getchar();

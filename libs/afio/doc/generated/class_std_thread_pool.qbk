@@ -54,14 +54,27 @@ This instantiates a [^`boost::asio::io_service`] and a latchable [^`boost::asio:
 
 ]]
 [[``template<class F>
+void enqueue(enqueued_task< typename std::result_of< F()>::type()> & out, F f, bool autosetfuture = true)``
+
+] [Sends some callable entity to the thread pool for execution. ] [[* enqueued_task< typename std::result_of< F()>::type()> &]: ['out]:  An enqueued task for the enqueued callable 
+
+[* F]: ['f]:  Any instance of a callable type 
+
+[* bool]: ['autosetfuture]:  Whether the enqueued_task will set its future on return of the callable 
+
+
+
+
+]]
+[[``template<class F>
 future< typename std::result_of< F()>::type > enqueue(F f)``
 
-] [Sends some callable entity to the thread pool for execution. ] [[* F]: ['f]:  Any instance of a callable type F 
+] [Sends some callable entity to the thread pool for execution. ] [[* F]: ['f]:  Any instance of a callable type 
 
 
 
 ][
-A future for the enqueued callable 
+An enqueued task for the enqueued callable 
 
 
 ]]

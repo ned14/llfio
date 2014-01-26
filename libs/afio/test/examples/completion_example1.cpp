@@ -51,7 +51,7 @@ int main(void)
     // Schedule an asynchronous call of the completion with some bound set of arguments
     boost::afio::async_io_op helloworld=
         dispatcher->completion(boost::afio::async_io_op() /* no precondition */,
-            std::make_pair(boost::afio::async_op_flags::None, boundf));
+            std::make_pair(boost::afio::async_op_flags::none, boundf));
         
     // Create a boost::future<> representing the ops passed to when_all()
     boost::afio::future<std::vector<std::shared_ptr<boost::afio::async_io_handle>>> future

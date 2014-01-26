@@ -67,6 +67,10 @@ this.
 boost::afio::stat_t::st_mode() is now st_perms(). Also disabled unused fields in
 stat_t on Windows. Thanks to Bjorn Reese for suggesting this.
 
+Replaced all use of packaged_task with enqueued_task, a custom implementation
+which enables many performance improvements throughout the engine and makes
+possible replacing shared_ptr<async_io_handle> in completion handlers with
+async_io_op.
 
 [/=================]
 [heading Boost 1.55 AFIO v1.1]

@@ -156,33 +156,6 @@ template<typename T> inline exception_ptr get_exception_ptr(shared_future<T> &f)
     return exception_ptr();
 #endif
 }
-/*! \brief For now, this is an emulation of std::packaged_task based on boost's packaged_task.
-We have to drop the Args... support because it segfaults MSVC Nov 2012 CTP.
-*/
-template<class> class packaged_task;
-template<class R> class packaged_task<R()>
-#if BOOST_THREAD_VERSION >=4
-    : public boost::packaged_task<R()>
-    {
-        typedef boost::packaged_task<R()> Base;
-#else
-    : public boost::packaged_task<R>
-    {
-        typedef boost::packaged_task<R> Base;
-#endif
-#ifdef BOOST_NO_CXX11_DELETED_FUNCTIONS
-        packaged_task(const packaged_task &) /* = delete */;
-#else
-        packaged_task(const packaged_task &) = delete;
-#endif
-    public:
-        packaged_task() { }
-        packaged_task(Base &&o) BOOST_NOEXCEPT_OR_NOTHROW : Base(std::move(o)) { }
-        packaged_task(packaged_task &&o) BOOST_NOEXCEPT_OR_NOTHROW : Base(static_cast<Base &&>(o)) { }
-        template<class T> packaged_task(T &&o) BOOST_NOEXCEPT_OR_NOTHROW : Base(std::forward<T>(o)) { }
-        packaged_task &operator=(Base &&o) BOOST_NOEXCEPT_OR_NOTHROW{ static_cast<Base &&>(*this)=std::move(o); return *this; }
-        packaged_task &operator=(packaged_task &&o) BOOST_NOEXCEPT_OR_NOTHROW{ static_cast<Base &&>(*this)=std::move(o); return *this; }
-    };
 
     // Map in an atomic implementation
     template <class T>

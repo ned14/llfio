@@ -44,6 +44,8 @@
 [include generated/class_async_file_io_dispatcher_base.qbk]
 [include generated/class_async_io_handle.qbk]
 [include generated/class_directory_entry.qbk]
+[include generated/class_enqueued_task_3_01_r_07_08_4.qbk]
+[include generated/class_enqueued_task_3_01void_07_08_4.qbk]
 [include generated/class_thread_source.qbk]
 [include generated/class_std_thread_pool.qbk]
 [endsect]

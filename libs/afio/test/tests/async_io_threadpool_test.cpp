@@ -5,7 +5,7 @@ Created: Feb 2013
 
 #include "test_functions.hpp"
 
- static int task()
+static int task()
 {
    boost::afio::thread::id this_id = boost::afio::get_this_thread_id();
         std::cout << "I am worker thread " << this_id << std::endl;
