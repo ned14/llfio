@@ -469,7 +469,7 @@ definitions of the POSIX permissions flags.
 struct stat_t
 {
 #ifndef WIN32
-    uint64_t        st_dev;                       /*!< inode of device containing file (POSIX) */
+    uint64_t        st_dev;                       /*!< inode of device containing file (POSIX only) */
 #endif
     uint64_t        st_ino;                       /*!< inode of file                   (Windows, POSIX) */
     std::filesystem::file_type st_type;           /*!< type of file                    (Windows, POSIX) */
@@ -477,14 +477,14 @@ struct stat_t
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
     uint16_t        st_perms;
 #else
-    std::filesystem::perms st_perms;              /*!< bitfield perms of file          (POSIX) */
+    std::filesystem::perms st_perms;              /*!< bitfield perms of file          (POSIX only) */
 #endif
 #endif
     int16_t         st_nlink;                     /*!< number of hard links            (Windows, POSIX) */
 #ifndef WIN32
-    int16_t         st_uid;                       /*!< user ID of the file             (POSIX) */
-    int16_t         st_gid;                       /*!< group ID of the file            (POSIX) */
-    dev_t           st_rdev;                      /*!< id of file if special           (POSIX) */
+    int16_t         st_uid;                       /*!< user ID of the file             (POSIX only) */
+    int16_t         st_gid;                       /*!< group ID of the file            (POSIX only) */
+    dev_t           st_rdev;                      /*!< id of file if special           (POSIX only) */
 #endif
     chrono::system_clock::time_point st_atim;     /*!< time of last access             (Windows, POSIX) */
     chrono::system_clock::time_point st_mtim;     /*!< time of last data modification  (Windows, POSIX) */
