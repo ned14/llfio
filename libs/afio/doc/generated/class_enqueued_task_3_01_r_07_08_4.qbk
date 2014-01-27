@@ -15,7 +15,7 @@
 Effectively our own custom std::packaged_task<>, with copy semantics and letting us early set value to significantly improve performance. 
 
 [heading Description]
-Unlike [^`std::packaged_task<>`], this custom variant is copyable though each copy always refers to the same internal state. Early future value setting is possible, with any subsequent value setting including that by the function being executed being ignored. Note that this behaviour opens the potential to lose exception state - if you set the future value early and then an exception is later thrown, the exception is swallowed. 
+Unlike [^`std::packaged_task<>`], this custom variant is copyable though each copy always refers to the same internal state. Early future value setting is possible, with any subsequent value setting including that by the function being executed being ignored. Note that this behaviour opens the potential to lose exception state - if you set the future value early and then an exception is later thrown, the exception is swallowed.
 
 [heading Synopsis]
 ``template<class R>
@@ -29,7 +29,7 @@ class enqueued_task< R()>
 [heading Template parameter(s)]
 [table
 [[Parameter] [Description]]
-[[class R] []]
+[[class R] [The return type of the callable which must be without parameters. ]]
 ]
 
 [heading Member Function(s)]

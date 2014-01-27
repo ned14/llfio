@@ -123,6 +123,8 @@ Unlike `std::packaged_task<>`, this custom variant is copyable though each copy 
 internal state. Early future value setting is possible, with any subsequent value setting including that
 by the function being executed being ignored. Note that this behaviour opens the potential to lose exception
 state - if you set the future value early and then an exception is later thrown, the exception is swallowed.
+
+\tparam "class R" The return type of the callable which must be without parameters.
 */
 // Can't have args in callable type as that segfaults VS2010
 template<class R> class enqueued_task<R()> : public detail::enqueued_task_impl<R>
@@ -2422,6 +2424,7 @@ template<> struct async_data_op_req<boost::asio::const_buffer> : public detail::
 \return An async_data_op_req matching the supplied parameter type.
 \async_data_op_req1
 \ingroup make_async_data_op_req
+\qbk{distinguish, length deducing}
 \qbk{
 [heading Example]
 [readwrite_example]
@@ -2438,6 +2441,7 @@ template<class T> inline async_data_op_req<typename std::remove_pointer<typename
 \async_data_op_req1
 \param _length The number of bytes to transfer
 \ingroup make_async_data_op_req
+\qbk{distinguish, length specifying}
 \qbk{
 [heading Example]
 [readwrite_example]
