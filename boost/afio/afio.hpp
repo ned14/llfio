@@ -89,6 +89,7 @@ namespace detail
             Private(std::function<R()> _task) : task(std::move(_task)), autoset(true), done(0) { }
         };
         std::shared_ptr<Private> p;
+		void validate() const { assert(p); if(!p) abort(); }
     public:
         //! Default constructor
         enqueued_task_impl() { }
@@ -101,17 +102,18 @@ namespace detail
             //! Resets the contents
         void reset() { p.reset(); }
         //! Returns the future corresponding to the future return value of the task
-        future<R> get_future() { return p->r.get_future(); }
+        future<R> get_future() { validate(); return p->r.get_future(); }
         //! Sets the future corresponding to the future return value of the task.
         void set_future_exception(exception_ptr e)
         {
             int _=0;
+			validate();
             if(!p->done.compare_exchange_strong(_, 1))
                 return;
             p->r.set_exception(e);
         }
         //! Disables the task setting the future return value.
-        void disable_auto_set_future(bool v=true) { p->autoset=!v; }
+        void disable_auto_set_future(bool v=true) { validate(); p->autoset=!v; }
     };
 }
 
@@ -139,6 +141,7 @@ public:
     template<class T> void set_future_value(T v)
     {
         int _=0;
+		Base::validate();
         if(!Base::p->done.compare_exchange_strong(_, 1))
             return;
         Base::p->r.set_value(v);
@@ -147,7 +150,7 @@ public:
     void operator()()
     {
         auto _p(Base::p);
-        assert(_p);
+		Base::validate();
         try
         {
             auto v(_p->task());
@@ -175,6 +178,7 @@ public:
     void set_future_value()
     {
         int _=0;
+		Base::validate();
         if(!Base::p->done.compare_exchange_strong(_, 1))
             return;
         Base::p->r.set_value();
@@ -183,7 +187,7 @@ public:
     void operator()()
     {
         auto _p(Base::p);
-        assert(_p);
+		Base::validate();
         try
         {
             _p->task();
