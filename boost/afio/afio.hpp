@@ -144,15 +144,20 @@ public:
     //! Invokes the callable, setting the future to the value it returns
     void operator()()
     {
+        auto _p(Base::p);
+        assert(_p);
         try
         {
-            auto v(Base::p->task());
-            if(Base::p->autoset) set_future_value(v);
+            auto v(_p->task());
+            if(_p->autoset) set_future_value(v);
         }
         catch(...)
         {
-            auto e(afio::make_exception_ptr(afio::current_exception()));
-            if(Base::p->autoset) Base::set_future_exception(e);
+            if(_p->autoset) 
+            {
+                auto e(afio::make_exception_ptr(afio::current_exception()));
+                Base::set_future_exception(e);
+            }
         }
     }
 };
@@ -175,15 +180,20 @@ public:
     //! Invokes the callable, setting the future to the value it returns
     void operator()()
     {
+        auto _p(Base::p);
+        assert(_p);
         try
         {
-            Base::p->task();
-            if(Base::p->autoset) set_future_value();
+            _p->task();
+            if(_p->autoset) set_future_value();
         }
         catch(...)
         {
-            auto e(afio::make_exception_ptr(afio::current_exception()));
-            if(Base::p->autoset) Base::set_future_exception(e);
+            if(_p->autoset) 
+            {
+                auto e(afio::make_exception_ptr(afio::current_exception()));
+                Base::set_future_exception(e);
+            }
         }
     }
 };
