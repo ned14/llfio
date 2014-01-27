@@ -567,7 +567,7 @@ namespace detail {
         {
             out=std::move(enqueued_task<retfuncttype>(std::move(f)));
             out.disable_auto_set_future(!autosetfuture);
-            toexecute.push_back(std::move(out));
+            toexecute.push_back(out);
         }
         ~immediate_async_ops()
         {

@@ -89,7 +89,7 @@ namespace detail
             Private(std::function<R()> _task) : task(std::move(_task)), autoset(true), done(0) { }
         };
         std::shared_ptr<Private> p;
-		void validate() const { assert(p); if(!p) abort(); }
+		void validate() const { assert(p); /*if(!p) abort();*/ }
     public:
         //! Default constructor
         enqueued_task_impl() { }
@@ -154,11 +154,11 @@ public:
         try
         {
             auto v(_p->task());
-            if(_p->autoset) set_future_value(v);
+            if(_p->autoset && !_p->done) set_future_value(v);
         }
         catch(...)
         {
-            if(_p->autoset) 
+            if(_p->autoset && !_p->done) 
             {
                 auto e(afio::make_exception_ptr(afio::current_exception()));
                 Base::set_future_exception(e);
@@ -191,11 +191,11 @@ public:
         try
         {
             _p->task();
-            if(_p->autoset) set_future_value();
+            if(_p->autoset && !_p->done) set_future_value();
         }
         catch(...)
         {
-            if(_p->autoset) 
+            if(_p->autoset && !_p->done) 
             {
                 auto e(afio::make_exception_ptr(afio::current_exception()));
                 Base::set_future_exception(e);
