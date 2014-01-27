@@ -116,6 +116,8 @@ for i in glob.glob("generated/class_enqueued_task*.qbk"):
             postfix=t[si1:si2]
             postfix=postfix.replace("<", "_")
             postfix=postfix.replace(">", "_")
+            postfix=postfix.replace("(", "_")
+            postfix=postfix.replace(")", "_")
             postfix=postfix.replace(",", "_")
             postfix=postfix.replace(" ", "")
             t=t[:si1]+postfix+t[si2:]
