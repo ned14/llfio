@@ -581,7 +581,7 @@ struct stat_t
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
     uint16_t        st_perms;
 #else
-    std::filesystem::perms st_perms;              /*!< bitfield perms of file          (POSIX only) */
+    std::filesystem::perms st_perms;              /*!< uint16_t bitfield perms of file (POSIX only) */
 #endif
 #endif
     int16_t         st_nlink;                     /*!< number of hard links            (Windows, POSIX) */
