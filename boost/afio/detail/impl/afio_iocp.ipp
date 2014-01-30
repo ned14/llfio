@@ -185,7 +185,7 @@ namespace boost { namespace afio { namespace detail {
 
         size_t pagesize;
         // Called in unknown thread
-		completion_returntype dodir(size_t id, async_io_op _, exception_ptr *e, async_path_op_req req)
+        completion_returntype dodir(size_t id, async_io_op _, exception_ptr *e, async_path_op_req req)
         {
             BOOL ret=0;
             req.flags=fileflags(req.flags)|file_flags::int_opening_dir|file_flags::Read;
@@ -201,15 +201,15 @@ namespace boost { namespace afio { namespace detail {
             }
         }
         // Called in unknown thread
-		completion_returntype dormdir(size_t id, async_io_op _, exception_ptr *, async_path_op_req req)
+        completion_returntype dormdir(size_t id, async_io_op _, exception_ptr *, async_path_op_req req)
         {
             req.flags=fileflags(req.flags);
             BOOST_AFIO_ERRHWINFN(RemoveDirectory(req.path.c_str()), req.path);
-			auto ret=std::make_shared<async_io_handle_windows>(this, std::shared_ptr<async_io_handle>(), req.path, req.flags);
+            auto ret=std::make_shared<async_io_handle_windows>(this, std::shared_ptr<async_io_handle>(), req.path, req.flags);
             return std::make_pair(true, ret);
         }
         // Called in unknown thread
-		completion_returntype dofile(size_t id, async_io_op, exception_ptr *e, async_path_op_req req)
+        completion_returntype dofile(size_t id, async_io_op, exception_ptr *e, async_path_op_req req)
         {
             std::shared_ptr<async_io_handle> dirh;
             DWORD access=FILE_READ_ATTRIBUTES, creatdisp=0, flags=0x4000/*FILE_OPEN_FOR_BACKUP_INTENT*/|0x00200000/*FILE_OPEN_REPARSE_POINT*/, attribs=FILE_ATTRIBUTE_NORMAL;
@@ -276,17 +276,17 @@ namespace boost { namespace afio { namespace detail {
             return std::make_pair(true, ret);
         }
         // Called in unknown thread
-		completion_returntype dormfile(size_t id, async_io_op _, exception_ptr *, async_path_op_req req)
+        completion_returntype dormfile(size_t id, async_io_op _, exception_ptr *, async_path_op_req req)
         {
             req.flags=fileflags(req.flags);
             BOOST_AFIO_ERRHWINFN(DeleteFile(req.path.c_str()), req.path);
-			auto ret=std::make_shared<async_io_handle_windows>(this, std::shared_ptr<async_io_handle>(), req.path, req.flags);
+            auto ret=std::make_shared<async_io_handle_windows>(this, std::shared_ptr<async_io_handle>(), req.path, req.flags);
             return std::make_pair(true, ret);
         }
         // Called in unknown thread
-		void boost_asio_symlink_completion_handler(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr *, std::shared_ptr<std::unique_ptr<std::filesystem::path::value_type[]>> buffer, const boost::system::error_code &ec, size_t bytes_transferred)
+        void boost_asio_symlink_completion_handler(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr *, std::shared_ptr<std::unique_ptr<std::filesystem::path::value_type[]>> buffer, const boost::system::error_code &ec, size_t bytes_transferred)
         {
-			if(ec)
+            if(ec)
             {
                 exception_ptr e;
                 // boost::system::system_error makes no attempt to ask windows for what the error code means :(
@@ -306,10 +306,10 @@ namespace boost { namespace afio { namespace detail {
             }
         }
         // Called in unknown thread
-		completion_returntype dosymlink(size_t id, async_io_op op, exception_ptr *e, async_path_op_req req)
+        completion_returntype dosymlink(size_t id, async_io_op op, exception_ptr *e, async_path_op_req req)
         {
-			std::shared_ptr<async_io_handle> h(op.get());
-			async_io_handle_windows *p=static_cast<async_io_handle_windows *>(h.get());
+            std::shared_ptr<async_io_handle> h(op.get());
+            async_io_handle_windows *p=static_cast<async_io_handle_windows *>(h.get());
             req.flags=fileflags(req.flags);
             req.flags=req.flags|file_flags::int_opening_link;
             // For safety, best not create unless doesn't exist
@@ -384,18 +384,18 @@ namespace boost { namespace afio { namespace detail {
             }
         }
         // Called in unknown thread
-		completion_returntype dormsymlink(size_t id, async_io_op _, exception_ptr *, async_path_op_req req)
+        completion_returntype dormsymlink(size_t id, async_io_op _, exception_ptr *, async_path_op_req req)
         {
             req.flags=fileflags(req.flags);
             BOOST_AFIO_ERRHWINFN(RemoveDirectory(req.path.c_str()), req.path);
-			auto ret=std::make_shared<async_io_handle_windows>(this, std::shared_ptr<async_io_handle>(), req.path, req.flags);
+            auto ret=std::make_shared<async_io_handle_windows>(this, std::shared_ptr<async_io_handle>(), req.path, req.flags);
             return std::make_pair(true, ret);
         }
         // Called in unknown thread
-		completion_returntype dosync(size_t id, async_io_op op, exception_ptr *, async_io_op)
+        completion_returntype dosync(size_t id, async_io_op op, exception_ptr *, async_io_op)
         {
-			std::shared_ptr<async_io_handle> h(op.get());
-			async_io_handle_windows *p=static_cast<async_io_handle_windows *>(h.get());
+            std::shared_ptr<async_io_handle> h(op.get());
+            async_io_handle_windows *p=static_cast<async_io_handle_windows *>(h.get());
             off_t bytestobesynced=p->write_count_since_fsync();
             assert(p);
             if(bytestobesynced)
@@ -404,10 +404,10 @@ namespace boost { namespace afio { namespace detail {
             return std::make_pair(true, h);
         }
         // Called in unknown thread
-		completion_returntype doclose(size_t id, async_io_op op, exception_ptr *, async_io_op)
+        completion_returntype doclose(size_t id, async_io_op op, exception_ptr *, async_io_op)
         {
-			std::shared_ptr<async_io_handle> h(op.get());
-			async_io_handle_windows *p=static_cast<async_io_handle_windows *>(h.get());
+            std::shared_ptr<async_io_handle> h(op.get());
+            async_io_handle_windows *p=static_cast<async_io_handle_windows *>(h.get());
             assert(p);
             if(!!(p->flags() & file_flags::int_opening_dir) && !(p->flags() & file_flags::UniqueDirectoryHandle) && !!(p->flags() & file_flags::Read) && !(p->flags() & file_flags::Write))
             {
@@ -420,9 +420,9 @@ namespace boost { namespace afio { namespace detail {
             return std::make_pair(true, h);
         }
         // Called in unknown thread
-		void boost_asio_readwrite_completion_handler(bool is_write, size_t id, std::shared_ptr<async_io_handle> h, exception_ptr *, std::shared_ptr<std::pair<boost::afio::atomic<bool>, boost::afio::atomic<size_t>>> bytes_to_transfer, size_t bytes_this_chunk, const boost::system::error_code &ec, size_t bytes_transferred)
+        void boost_asio_readwrite_completion_handler(bool is_write, size_t id, std::shared_ptr<async_io_handle> h, exception_ptr *, std::shared_ptr<std::pair<boost::afio::atomic<bool>, boost::afio::atomic<size_t>>> bytes_to_transfer, size_t bytes_this_chunk, const boost::system::error_code &ec, size_t bytes_transferred)
         {
-			if(ec)
+            if(ec)
             {
                 exception_ptr e;
                 // boost::system::system_error makes no attempt to ask windows for what the error code means :(
@@ -456,9 +456,9 @@ namespace boost { namespace afio { namespace detail {
             }
             //std::cout << "id=" << id << " total=" << bytes_to_transfer->second << " this=" << bytes_transferred << std::endl;
         }
-		template<bool iswrite> void doreadwrite(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr *, detail::async_data_op_req_impl<iswrite> req, async_io_handle_windows *p)
+        template<bool iswrite> void doreadwrite(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr *, detail::async_data_op_req_impl<iswrite> req, async_io_handle_windows *p)
         {
-			// boost::asio::async_read_at() seems to have a bug and only transfers 64Kb per buffer
+            // boost::asio::async_read_at() seems to have a bug and only transfers 64Kb per buffer
             // boost::asio::windows::random_access_handle::async_read_some_at() clearly bothers
             // with the first buffer only. Same goes for both async write functions.
             //
@@ -533,10 +533,10 @@ namespace boost { namespace afio { namespace detail {
             }
         }
         // Called in unknown thread
-		completion_returntype doread(size_t id, async_io_op op, exception_ptr *e, detail::async_data_op_req_impl<false> req)
+        completion_returntype doread(size_t id, async_io_op op, exception_ptr *e, detail::async_data_op_req_impl<false> req)
         {
-			std::shared_ptr<async_io_handle> h(op.get());
-			async_io_handle_windows *p=static_cast<async_io_handle_windows *>(h.get());
+            std::shared_ptr<async_io_handle> h(op.get());
+            async_io_handle_windows *p=static_cast<async_io_handle_windows *>(h.get());
             assert(p);
             BOOST_AFIO_DEBUG_PRINT("R %u %p (%c) @ %u, b=%u\n", (unsigned) id, h.get(), p->path().native().back(), (unsigned) req.where, (unsigned) req.buffers.size());
 #ifdef DEBUG_PRINTING
@@ -561,10 +561,10 @@ namespace boost { namespace afio { namespace detail {
             }
         }
         // Called in unknown thread
-		completion_returntype dowrite(size_t id, async_io_op op, exception_ptr *e, detail::async_data_op_req_impl<true> req)
+        completion_returntype dowrite(size_t id, async_io_op op, exception_ptr *e, detail::async_data_op_req_impl<true> req)
         {
-			std::shared_ptr<async_io_handle> h(op.get());
-			async_io_handle_windows *p=static_cast<async_io_handle_windows *>(h.get());
+            std::shared_ptr<async_io_handle> h(op.get());
+            async_io_handle_windows *p=static_cast<async_io_handle_windows *>(h.get());
             assert(p);
             BOOST_AFIO_DEBUG_PRINT("W %u %p (%c) @ %u, b=%u\n", (unsigned) id, h.get(), p->path().native().back(), (unsigned) req.where, (unsigned) req.buffers.size());
 #ifdef DEBUG_PRINTING
@@ -576,10 +576,10 @@ namespace boost { namespace afio { namespace detail {
             return std::make_pair(false, h);
         }
         // Called in unknown thread
-		completion_returntype dotruncate(size_t id, async_io_op op, exception_ptr *, off_t _newsize)
+        completion_returntype dotruncate(size_t id, async_io_op op, exception_ptr *, off_t _newsize)
         {
-			std::shared_ptr<async_io_handle> h(op.get());
-			async_io_handle_windows *p=static_cast<async_io_handle_windows *>(h.get());
+            std::shared_ptr<async_io_handle> h(op.get());
+            async_io_handle_windows *p=static_cast<async_io_handle_windows *>(h.get());
             assert(p);
             BOOST_AFIO_DEBUG_PRINT("T %u %p (%c)\n", (unsigned) id, h.get(), p->path().native().back());
 #if 1
@@ -600,11 +600,11 @@ namespace boost { namespace afio { namespace detail {
         }
         // Called in unknown thread
         typedef std::shared_ptr<std::tuple<std::shared_ptr<promise<std::pair<std::vector<directory_entry>, bool>>>, std::unique_ptr<windows_nt_kernel::FILE_ID_FULL_DIR_INFORMATION[]>, async_enumerate_op_req>> enumerate_state_t;
-		void boost_asio_enumerate_completion_handler(size_t id, async_io_op op, exception_ptr *e, enumerate_state_t state, const boost::system::error_code &ec, size_t bytes_transferred)
+        void boost_asio_enumerate_completion_handler(size_t id, async_io_op op, exception_ptr *e, enumerate_state_t state, const boost::system::error_code &ec, size_t bytes_transferred)
         {
             using windows_nt_kernel::FILE_ID_FULL_DIR_INFORMATION;
-			std::shared_ptr<async_io_handle> h(op.get());
-			std::shared_ptr<promise<std::pair<std::vector<directory_entry>, bool>>> &ret=std::get<0>(*state);
+            std::shared_ptr<async_io_handle> h(op.get());
+            std::shared_ptr<promise<std::pair<std::vector<directory_entry>, bool>>> &ret=std::get<0>(*state);
             std::unique_ptr<FILE_ID_FULL_DIR_INFORMATION[]> &buffer=std::get<1>(*state);
             async_enumerate_op_req &req=std::get<2>(*state);
             if(ec && ERROR_MORE_DATA==ec.value() && bytes_transferred<(sizeof(FILE_ID_FULL_DIR_INFORMATION)+buffer.get()->FileNameLength))
@@ -683,10 +683,10 @@ namespace boost { namespace afio { namespace detail {
             }
         }
         // Called in unknown thread
-		void doenumerate(size_t id, async_io_op op, exception_ptr *, enumerate_state_t state)
+        void doenumerate(size_t id, async_io_op op, exception_ptr *, enumerate_state_t state)
         {
-			std::shared_ptr<async_io_handle> h(op.get());
-			async_io_handle_windows *p=static_cast<async_io_handle_windows *>(h.get());
+            std::shared_ptr<async_io_handle> h(op.get());
+            async_io_handle_windows *p=static_cast<async_io_handle_windows *>(h.get());
             using namespace windows_nt_kernel;
             std::unique_ptr<FILE_ID_FULL_DIR_INFORMATION[]> &buffer=std::get<1>(*state);
             async_enumerate_op_req &req=std::get<2>(*state);
@@ -724,7 +724,7 @@ namespace boost { namespace afio { namespace detail {
                 ol.release();
         }
         // Called in unknown thread
-		completion_returntype doenumerate(size_t id, async_io_op op, exception_ptr *e, async_enumerate_op_req req, std::shared_ptr<promise<std::pair<std::vector<directory_entry>, bool>>> ret)
+        completion_returntype doenumerate(size_t id, async_io_op op, exception_ptr *e, async_enumerate_op_req req, std::shared_ptr<promise<std::pair<std::vector<directory_entry>, bool>>> ret)
         {
             windows_nt_kernel::init();
             using namespace windows_nt_kernel;

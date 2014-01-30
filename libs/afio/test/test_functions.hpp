@@ -492,9 +492,9 @@ static void evil_random_io(std::shared_ptr<boost::afio::async_file_io_dispatcher
     boost::afio::detail::spinlock<size_t> failureslock;
     std::deque<std::pair<const Op *, size_t>> failures;
 #if defined(BOOST_MSVC) && BOOST_MSVC < 1700 // <= VS2010
-	std::function<std::pair<bool, std::shared_ptr<boost::afio::async_io_handle>>(Op &, char *, size_t, boost::afio::async_io_op)> checkHash=[&failureslock, &failures](Op &op, char *base, size_t, boost::afio::async_io_op _h) -> std::pair<bool, std::shared_ptr<boost::afio::async_io_handle>> {
+    std::function<std::pair<bool, std::shared_ptr<boost::afio::async_io_handle>>(Op &, char *, size_t, boost::afio::async_io_op)> checkHash=[&failureslock, &failures](Op &op, char *base, size_t, boost::afio::async_io_op _h) -> std::pair<bool, std::shared_ptr<boost::afio::async_io_handle>> {
 #else
-	auto checkHash=[&failureslock, &failures](Op &op, char *base, size_t, boost::afio::async_io_op _h) -> std::pair<bool, std::shared_ptr<boost::afio::async_io_handle>> {
+    auto checkHash=[&failureslock, &failures](Op &op, char *base, size_t, boost::afio::async_io_op _h) -> std::pair<bool, std::shared_ptr<boost::afio::async_io_handle>> {
 #endif
             const char *data=(const char *)(((size_t) base+(size_t) op.req.where));
             size_t idxoffset=0;

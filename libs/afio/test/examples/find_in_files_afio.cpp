@@ -88,8 +88,8 @@ public:
         std::shared_ptr<std::vector<char, detail::aligned_allocator<char, 
         4096, false>>> _buffer, size_t length)
     {
-		std::shared_ptr<async_io_handle> h(op.get());
-		//std::cout << "R " << h->path() << std::endl;
+        std::shared_ptr<async_io_handle> h(op.get());
+        //std::cout << "R " << h->path() << std::endl;
         char *buffer=_buffer->data();
         buffer[length]=0;
         dosearch(h, buffer, length);
@@ -102,8 +102,8 @@ public:
     std::pair<bool, std::shared_ptr<async_io_handle>> file_opened(size_t id, 
         async_io_op op, exception_ptr *e, size_t length)
     {
-		std::shared_ptr<async_io_handle> h(op.get());
-		//std::cout << "F " << h->path() << std::endl;
+        std::shared_ptr<async_io_handle> h(op.get());
+        //std::cout << "F " << h->path() << std::endl;
 #ifdef USE_MMAPS
         if(!!(h->flags() & file_flags::OSMMap))
         {
@@ -134,8 +134,8 @@ public:
         async_io_op op, exception_ptr *e, 
         std::shared_ptr<future<std::pair<std::vector<directory_entry>, bool>>> listing)
     {
-		std::shared_ptr<async_io_handle> h(op.get());
-		async_io_op lastdir, thisop(dispatcher->op_from_scheduled_id(id));
+        std::shared_ptr<async_io_handle> h(op.get());
+        async_io_op lastdir, thisop(dispatcher->op_from_scheduled_id(id));
         // Get the entries from the ready future
         std::vector<directory_entry> entries(std::move(listing->get().first));
         //std::cout << "E " << h->path() << std::endl;
@@ -243,8 +243,8 @@ public:
     std::pair<bool, std::shared_ptr<async_io_handle>> dir_opened(size_t id,
      async_io_op op, exception_ptr *e)
     {
-		std::shared_ptr<async_io_handle> h(op.get());
-		//std::cout << "D " << h->path() << std::endl;
+        std::shared_ptr<async_io_handle> h(op.get());
+        //std::cout << "D " << h->path() << std::endl;
         // Now we have an open directory handle, schedule an enumeration
         auto enumeration=dispatcher->enumerate(async_enumerate_op_req(
             dispatcher->op_from_scheduled_id(id), metadata_flags::size, 1000));

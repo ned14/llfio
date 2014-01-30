@@ -89,10 +89,10 @@ namespace detail
             Private() : autoset(true), done(0) { }
         };
         std::shared_ptr<Private> p;
-		void validate() const { assert(p); /*if(!p) abort();*/ }
+        void validate() const { assert(p); /*if(!p) abort();*/ }
     public:
         //! Default constructor
-		enqueued_task_impl() : p(std::make_shared<Private>()) { }
+        enqueued_task_impl() : p(std::make_shared<Private>()) { }
         //! Returns true if valid
         bool valid() const BOOST_NOEXCEPT_OR_NOTHROW{ return p.get()!=nullptr; }
         //! Swaps contents with another instance
@@ -105,7 +105,7 @@ namespace detail
         void set_future_exception(exception_ptr e)
         {
             int _=0;
-			validate();
+            validate();
             if(!p->done.compare_exchange_strong(_, 1))
                 return;
             p->r.set_exception(e);
@@ -133,13 +133,11 @@ template<class R> class enqueued_task<R()> : public detail::enqueued_task_impl<R
 public:
     //! Default constructor
     enqueued_task() { }
-    //! Constructs an enqueued task calling \em c
-    enqueued_task(std::function<R()> c) : Base(std::move(c)) { }
     //! Sets the future corresponding to the future return value of the task.
     template<class T> void set_future_value(T v)
     {
         int _=0;
-		Base::validate();
+        Base::validate();
         if(!Base::p->done.compare_exchange_strong(_, 1))
             return;
         Base::p->r.set_value(v);
@@ -148,7 +146,7 @@ public:
     void operator()()
     {
         auto _p(Base::p);
-		Base::validate();
+        Base::validate();
         try
         {
             auto v(_p->task());
@@ -156,20 +154,20 @@ public:
         }
         catch(...)
         {
-			if(_p->done)
-			{
-				std::cerr << boost::current_exception_diagnostic_information(true) << std::endl;
-				BOOST_AFIO_THROW_FATAL(std::runtime_error("Exception thrown up to enqueued_task<> after future set."));
-			}
+            if(_p->done)
+            {
+                std::cerr << boost::current_exception_diagnostic_information(true) << std::endl;
+                BOOST_AFIO_THROW_FATAL(std::runtime_error("Exception thrown up to enqueued_task<> after future set."));
+            }
             if(_p->autoset && !_p->done) 
             {
                 auto e(afio::make_exception_ptr(afio::current_exception()));
                 Base::set_future_exception(e);
             }
         }
-		// Free any bound parameters in task to save memory
-		_p->task=std::function<R()>();
-		_p->r=promise<R>();
+        // Free any bound parameters in task to save memory
+        _p->task=std::function<R()>();
+        _p->r=promise<R>();
     }
 };
 template<> class enqueued_task<void()> : public detail::enqueued_task_impl<void>
@@ -178,13 +176,11 @@ template<> class enqueued_task<void()> : public detail::enqueued_task_impl<void>
 public:
     //! Default constructor
     enqueued_task() { }
-    //! Constructs an enqueued task calling \em c
-    enqueued_task(std::function<void()> c) : Base(std::move(c)) { }
     //! Sets the future corresponding to the future return value of the task.
     void set_future_value()
     {
         int _=0;
-		Base::validate();
+        Base::validate();
         if(!Base::p->done.compare_exchange_strong(_, 1))
             return;
         Base::p->r.set_value();
@@ -193,7 +189,7 @@ public:
     void operator()()
     {
         auto _p(Base::p);
-		Base::validate();
+        Base::validate();
         try
         {
             _p->task();
@@ -201,21 +197,21 @@ public:
         }
         catch(...)
         {
-			if(_p->done)
-			{
-				std::cerr << boost::current_exception_diagnostic_information(true) << std::endl;
-				BOOST_AFIO_THROW_FATAL(std::runtime_error("Exception thrown up to enqueued_task<> after future set."));
-			}
-			if(_p->autoset && !_p->done)
+            if(_p->done)
+            {
+                std::cerr << boost::current_exception_diagnostic_information(true) << std::endl;
+                BOOST_AFIO_THROW_FATAL(std::runtime_error("Exception thrown up to enqueued_task<> after future set."));
+            }
+            if(_p->autoset && !_p->done)
             {
                 auto e(afio::make_exception_ptr(afio::current_exception()));
                 Base::set_future_exception(e);
             }
         }
-		// Free any bound parameters in task to save memory
-		_p->task=std::function<void()>();
-		_p->r=promise<void>();
-	}
+        // Free any bound parameters in task to save memory
+        _p->task=std::function<void()>();
+        _p->r=promise<void>();
+    }
 };
 /*! \class thread_source
 \brief Abstract base class for a source of thread workers
@@ -840,62 +836,62 @@ The id field is always valid (and non-zero) if this reference is valid.
 */
 struct async_io_op
 {
-	async_file_io_dispatcher_base *parent;              //!< The parent dispatcher
-	size_t id;                                          //!< A unique id for this operation
-	std::shared_ptr<shared_future<std::shared_ptr<async_io_handle>>> h; //!< A future handle to the item being operated upon
+    async_file_io_dispatcher_base *parent;              //!< The parent dispatcher
+    size_t id;                                          //!< A unique id for this operation
+    std::shared_ptr<shared_future<std::shared_ptr<async_io_handle>>> h; //!< A future handle to the item being operated upon
 
-	//! \constr
-	async_io_op() : parent(nullptr), id(0), h(std::make_shared<shared_future<std::shared_ptr<async_io_handle>>>()) { }
-	//! \cconstr
-	async_io_op(const async_io_op &o) : parent(o.parent), id(o.id), h(o.h) { }
-	//! \mconstr
-	async_io_op(async_io_op &&o) BOOST_NOEXCEPT_OR_NOTHROW : parent(std::move(o.parent)), id(std::move(o.id)), h(std::move(o.h)) { }
-	/*! Constructs an instance.
-	\param _parent The dispatcher this op belongs to.
-	\param _id The unique non-zero id of this op.
-	\param _handle A shared_ptr to shared state between all instances of this reference.
-	*/
-	async_io_op(async_file_io_dispatcher_base *_parent, size_t _id, std::shared_ptr<shared_future<std::shared_ptr<async_io_handle>>> _handle, bool check_handle=true, bool validate=true) : parent(_parent), id(_id), h(std::move(_handle)) { if(validate) _validate(check_handle); }
-	/*! Constructs an instance.
-	\param _parent The dispatcher this op belongs to.
-	\param _id The unique non-zero id of this op.
-	*/
-	async_io_op(async_file_io_dispatcher_base *_parent, size_t _id) : parent(_parent), id(_id), h(std::make_shared<shared_future<std::shared_ptr<async_io_handle>>>()) { }
-	//! \cassign
-	async_io_op &operator=(const async_io_op &o) { parent=o.parent; id=o.id; h=o.h; return *this; }
-	//! \massign
-	async_io_op &operator=(async_io_op &&o) BOOST_NOEXCEPT_OR_NOTHROW{ parent=std::move(o.parent); id=std::move(o.id); h=std::move(o.h); return *this; }
-	//! Retrieves the handle or exception from the shared state. Same as h->get().
-	std::shared_ptr<async_io_handle> get(bool return_null_if_errored=false)
-	{
-		if(!return_null_if_errored)
-			return h->get();
-		auto e=get_exception_ptr(*h);
-		return e ? std::shared_ptr<async_io_handle>() : h->get();
-	}
-	//! Validates contents
-	bool validate(bool check_handle=true) const
-	{
-		if(!parent || !id) return false;
-		// If h is valid and ready and contains an exception, throw it now
-		if(h->valid() && h->is_ready() /*h->wait_for(seconds(0))==future_status::ready*/)
-		{
-			if(!check_handle)
-				h->get();
-			else
-				if(!h->get().get())
-					return false;
-		}
-		return true;
-	}
+    //! \constr
+    async_io_op() : parent(nullptr), id(0), h(std::make_shared<shared_future<std::shared_ptr<async_io_handle>>>()) { }
+    //! \cconstr
+    async_io_op(const async_io_op &o) : parent(o.parent), id(o.id), h(o.h) { }
+    //! \mconstr
+    async_io_op(async_io_op &&o) BOOST_NOEXCEPT_OR_NOTHROW : parent(std::move(o.parent)), id(std::move(o.id)), h(std::move(o.h)) { }
+    /*! Constructs an instance.
+    \param _parent The dispatcher this op belongs to.
+    \param _id The unique non-zero id of this op.
+    \param _handle A shared_ptr to shared state between all instances of this reference.
+    */
+    async_io_op(async_file_io_dispatcher_base *_parent, size_t _id, std::shared_ptr<shared_future<std::shared_ptr<async_io_handle>>> _handle, bool check_handle=true, bool validate=true) : parent(_parent), id(_id), h(std::move(_handle)) { if(validate) _validate(check_handle); }
+    /*! Constructs an instance.
+    \param _parent The dispatcher this op belongs to.
+    \param _id The unique non-zero id of this op.
+    */
+    async_io_op(async_file_io_dispatcher_base *_parent, size_t _id) : parent(_parent), id(_id), h(std::make_shared<shared_future<std::shared_ptr<async_io_handle>>>()) { }
+    //! \cassign
+    async_io_op &operator=(const async_io_op &o) { parent=o.parent; id=o.id; h=o.h; return *this; }
+    //! \massign
+    async_io_op &operator=(async_io_op &&o) BOOST_NOEXCEPT_OR_NOTHROW{ parent=std::move(o.parent); id=std::move(o.id); h=std::move(o.h); return *this; }
+    //! Retrieves the handle or exception from the shared state. Same as h->get().
+    std::shared_ptr<async_io_handle> get(bool return_null_if_errored=false)
+    {
+        if(!return_null_if_errored)
+            return h->get();
+        auto e=get_exception_ptr(*h);
+        return e ? std::shared_ptr<async_io_handle>() : h->get();
+    }
+    //! Validates contents
+    bool validate(bool check_handle=true) const
+    {
+        if(!parent || !id) return false;
+        // If h is valid and ready and contains an exception, throw it now
+        if(h->valid() && h->is_ready() /*h->wait_for(seconds(0))==future_status::ready*/)
+        {
+            if(!check_handle)
+                h->get();
+            else
+                if(!h->get().get())
+                    return false;
+        }
+        return true;
+    }
 private:
-	void _validate(bool check_handle=true) const
-	{
+    void _validate(bool check_handle=true) const
+    {
 #if BOOST_AFIO_VALIDATE_INPUTS
-		if(!validate(check_handle))
-			BOOST_AFIO_THROW(std::invalid_argument("Inputs are invalid."));
+        if(!validate(check_handle))
+            BOOST_AFIO_THROW(std::invalid_argument("Inputs are invalid."));
 #endif
-	}
+    }
 };
 
 #ifndef BOOST_NO_CXX11_VARIADIC_TEMPLATES
@@ -1511,19 +1507,19 @@ public:
     BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC void complete_async_op(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr e=exception_ptr());
 protected:
     BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC completion_returntype invoke_user_completion_fast(size_t id, async_io_op h, exception_ptr *e, completion_t *callback);
-	BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC completion_returntype invoke_user_completion_slow(size_t id, async_io_op h, exception_ptr *e, std::function<completion_t> callback);
-	template<class F, class T> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC std::vector<async_io_op> chain_async_ops(int optype, const std::vector<async_io_op> &preconditions, const std::vector<T> &container, async_op_flags flags, completion_returntype(F::*f)(size_t, async_io_op, exception_ptr *, T));
-	template<class F, class T> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC std::vector<async_io_op> chain_async_ops(int optype, const std::vector<T> &container, async_op_flags flags, completion_returntype(F::*f)(size_t, async_io_op, exception_ptr *, T));
-	template<class F> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC std::vector<async_io_op> chain_async_ops(int optype, const std::vector<async_io_op> &container, async_op_flags flags, completion_returntype(F::*f)(size_t, async_io_op, exception_ptr *, async_io_op));
-	template<class F> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC std::vector<async_io_op> chain_async_ops(int optype, const std::vector<async_path_op_req> &container, async_op_flags flags, completion_returntype(F::*f)(size_t, async_io_op, exception_ptr *, async_path_op_req));
-	template<class F, bool iswrite> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC std::vector<async_io_op> chain_async_ops(int optype, const std::vector<detail::async_data_op_req_impl<iswrite>> &container, async_op_flags flags, completion_returntype(F::*f)(size_t, async_io_op, exception_ptr *, detail::async_data_op_req_impl<iswrite>));
-	template<class F> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC std::pair<std::vector<future<std::pair<std::vector<directory_entry>, bool>>>, std::vector<async_io_op>> chain_async_ops(int optype, const std::vector<async_enumerate_op_req> &container, async_op_flags flags, completion_returntype(F::*f)(size_t, async_io_op, exception_ptr *, async_enumerate_op_req, std::shared_ptr<promise<std::pair<std::vector<directory_entry>, bool>>>));
-	template<class T> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC async_file_io_dispatcher_base::completion_returntype dobarrier(size_t id, async_io_op h, exception_ptr *, T);
+    BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC completion_returntype invoke_user_completion_slow(size_t id, async_io_op h, exception_ptr *e, std::function<completion_t> callback);
+    template<class F, class T> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC std::vector<async_io_op> chain_async_ops(int optype, const std::vector<async_io_op> &preconditions, const std::vector<T> &container, async_op_flags flags, completion_returntype(F::*f)(size_t, async_io_op, exception_ptr *, T));
+    template<class F, class T> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC std::vector<async_io_op> chain_async_ops(int optype, const std::vector<T> &container, async_op_flags flags, completion_returntype(F::*f)(size_t, async_io_op, exception_ptr *, T));
+    template<class F> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC std::vector<async_io_op> chain_async_ops(int optype, const std::vector<async_io_op> &container, async_op_flags flags, completion_returntype(F::*f)(size_t, async_io_op, exception_ptr *, async_io_op));
+    template<class F> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC std::vector<async_io_op> chain_async_ops(int optype, const std::vector<async_path_op_req> &container, async_op_flags flags, completion_returntype(F::*f)(size_t, async_io_op, exception_ptr *, async_path_op_req));
+    template<class F, bool iswrite> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC std::vector<async_io_op> chain_async_ops(int optype, const std::vector<detail::async_data_op_req_impl<iswrite>> &container, async_op_flags flags, completion_returntype(F::*f)(size_t, async_io_op, exception_ptr *, detail::async_data_op_req_impl<iswrite>));
+    template<class F> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC std::pair<std::vector<future<std::pair<std::vector<directory_entry>, bool>>>, std::vector<async_io_op>> chain_async_ops(int optype, const std::vector<async_enumerate_op_req> &container, async_op_flags flags, completion_returntype(F::*f)(size_t, async_io_op, exception_ptr *, async_enumerate_op_req, std::shared_ptr<promise<std::pair<std::vector<directory_entry>, bool>>>));
+    template<class T> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC async_file_io_dispatcher_base::completion_returntype dobarrier(size_t id, async_io_op h, exception_ptr *, T);
 
 #ifndef BOOST_NO_CXX11_VARIADIC_TEMPLATES
     
-	template<class F, class... Args> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC std::shared_ptr<async_io_handle> invoke_async_op_completions(size_t id, async_io_op h, exception_ptr *e, completion_returntype(F::*f)(size_t, async_io_op, exception_ptr *, Args...), Args... args);
-	template<class F, class... Args> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC async_io_op chain_async_op(exception_ptr *he, detail::immediate_async_ops &immediates, int optype, const async_io_op &precondition, async_op_flags flags, completion_returntype(F::*f)(size_t, async_io_op, exception_ptr *, Args...), Args... args);
+    template<class F, class... Args> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC std::shared_ptr<async_io_handle> invoke_async_op_completions(size_t id, async_io_op h, exception_ptr *e, completion_returntype(F::*f)(size_t, async_io_op, exception_ptr *, Args...), Args... args);
+    template<class F, class... Args> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC async_io_op chain_async_op(exception_ptr *he, detail::immediate_async_ops &immediates, int optype, const async_io_op &precondition, async_op_flags flags, completion_returntype(F::*f)(size_t, async_io_op, exception_ptr *, Args...), Args... args);
 
 #else
 
@@ -1534,8 +1530,8 @@ protected:
     BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC                                                            \
     std::shared_ptr<async_io_handle>                                                        \
     invoke_async_op_completions                                                                     \
-	(size_t id, async_io_op h, exception_ptr *,                        \
-	completion_returntype (F::*f)(size_t, async_io_op, exception_ptr * \
+    (size_t id, async_io_op h, exception_ptr *,                        \
+    completion_returntype (F::*f)(size_t, async_io_op, exception_ptr * \
     BOOST_PP_COMMA_IF(N)                                                                            \
     BOOST_PP_ENUM_PARAMS(N, A))                                                                     \
     BOOST_PP_COMMA_IF(N)                                                                            \
@@ -1555,7 +1551,7 @@ protected:
     chain_async_op                                   /* function name */                            \
     (exception_ptr *he, detail::immediate_async_ops &immediates, int optype,           /* parameters start */          \
     const async_io_op &precondition,async_op_flags flags,                                           \
-	completion_returntype (F::*f)(size_t, async_io_op, exception_ptr * \
+    completion_returntype (F::*f)(size_t, async_io_op, exception_ptr * \
     BOOST_PP_COMMA_IF(N)                                                                            \
     BOOST_PP_ENUM_PARAMS(N, A))                                                                     \
     BOOST_PP_COMMA_IF(N)                                                                            \
@@ -1596,18 +1592,18 @@ namespace detail
         when_all_count_completed_state(std::vector<async_io_op> _inputs) : inputs(std::move(_inputs)), togo(inputs.size()), out(inputs.size()) { }
         when_all_count_completed_state(std::vector<async_io_op>::iterator first, std::vector<async_io_op>::iterator last) : inputs(first, last), togo(inputs.size()), out(inputs.size()) { }
     };
-	inline async_file_io_dispatcher_base::completion_returntype when_all_count_completed_nothrow(size_t, async_io_op op, exception_ptr *e, std::shared_ptr<detail::when_all_count_completed_state> state, size_t idx)
+    inline async_file_io_dispatcher_base::completion_returntype when_all_count_completed_nothrow(size_t, async_io_op op, exception_ptr *e, std::shared_ptr<detail::when_all_count_completed_state> state, size_t idx)
     {
-		std::shared_ptr<async_io_handle> h(op.get(true));
+        std::shared_ptr<async_io_handle> h(op.get(true));
         state->out[idx]=h; // This might look thread unsafe, but each idx is unique
         if(!--state->togo)
             state->done.set_value(state->out);
         return std::make_pair(true, h);
     }
-	inline async_file_io_dispatcher_base::completion_returntype when_all_count_completed(size_t, async_io_op op, exception_ptr *e, std::shared_ptr<detail::when_all_count_completed_state> state, size_t idx)
+    inline async_file_io_dispatcher_base::completion_returntype when_all_count_completed(size_t, async_io_op op, exception_ptr *e, std::shared_ptr<detail::when_all_count_completed_state> state, size_t idx)
     {
-		std::shared_ptr<async_io_handle> h(op.get(true));
-		state->out[idx]=h; // This might look thread unsafe, but each idx is unique
+        std::shared_ptr<async_io_handle> h(op.get(true));
+        state->out[idx]=h; // This might look thread unsafe, but each idx is unique
         if(!--state->togo)
         {
             bool done=false;
@@ -2567,7 +2563,7 @@ inline async_io_op async_file_io_dispatcher_base::completion(const async_io_op &
     return std::move(completion(r, i).front());
 }
 namespace detail {
-	template<class tasktype> std::pair<bool, std::shared_ptr<async_io_handle>> doCall(size_t, async_io_op _, exception_ptr *, std::shared_ptr<tasktype> c)
+    template<class tasktype> std::pair<bool, std::shared_ptr<async_io_handle>> doCall(size_t, async_io_op _, exception_ptr *, std::shared_ptr<tasktype> c)
     {
         (*c)();
         return std::make_pair(true, _.get(true));
