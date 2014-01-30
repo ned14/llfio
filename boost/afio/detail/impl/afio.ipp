@@ -30,7 +30,7 @@ File Created: Mar 2013
 //#endif
 
 // Define this to have every part of AFIO print, in extremely terse text, what it is doing and why.
-#if defined(DEBUG) || 1
+#if defined(DEBUG) && 0 //|| 1
 #define BOOST_AFIO_DEBUG_PRINTING 1
 #ifdef WIN32
 #define BOOST_AFIO_DEBUG_PRINT(...) \
@@ -471,7 +471,7 @@ namespace detail {
             fillStack();
         }
         async_file_io_dispatcher_op(async_file_io_dispatcher_op &&o) BOOST_NOEXCEPT_OR_NOTHROW : optype(o.optype), flags(std::move(o.flags)),
-			enqueuement(std::move(o.enqueuement)), h(std::move(o.h)), completions(std::move(o.completions))
+            enqueuement(std::move(o.enqueuement)), h(std::move(o.h)), completions(std::move(o.completions))
 #ifndef NDEBUG
             , boundf(std::move(o.boundf))
 #endif
@@ -851,6 +851,10 @@ async_file_io_dispatcher_base::~async_file_io_dispatcher_base()
         }
     }
 #endif
+    while(!p->fds.empty())
+    {
+        boost::afio::this_thread::sleep_for(boost::afio::chrono::milliseconds(1));
+    }
     delete p;
 }
 
@@ -1065,8 +1069,8 @@ BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC void async_file_io_dispatcher_base::complet
                 immediates.enqueue(c_op->enqueuement);
             else
                 p->pool->enqueue(c_op->enqueuement);
-			BOOST_AFIO_DEBUG_PRINT("X %u %p e=%d f=%p (uc=%u, c=%u)\n", (unsigned) id, h.get(), !!e, thisop->h.get(), (unsigned) h.use_count(), (unsigned) thisop->completions.size());
-		}
+            BOOST_AFIO_DEBUG_PRINT("X %u %p e=%d f=%p (uc=%u, c=%u)\n", (unsigned) id, h.get(), !!e, thisop->h.get(), (unsigned) h.use_count(), (unsigned) thisop->completions.size());
+        }
     }
 }
 
