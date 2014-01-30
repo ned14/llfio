@@ -238,7 +238,7 @@ public:
         service.post(task);
     }
     //! Sends some callable entity to the thread pool for execution \return An enqueued task for the enqueued callable \tparam "class F" Any callable type with signature R(void) \param f Any instance of a callable type
-    template<class F> future<typename std::result_of<F()>::type> enqueue(F f)
+    template<class F> shared_future<typename std::result_of<F()>::type> enqueue(F f)
     {
         typedef typename std::result_of<F()>::type R;
         enqueued_task<R()> out(std::move(f));

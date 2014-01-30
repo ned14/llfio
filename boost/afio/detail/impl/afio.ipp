@@ -470,8 +470,8 @@ namespace detail {
             enqueuement.disable_auto_set_future();
             fillStack();
         }
-        async_file_io_dispatcher_op(async_file_io_dispatcher_op &&o) BOOST_NOEXCEPT_OR_NOTHROW : optype(o.optype), flags(std::move(o.flags)), h(std::move(o.h)),
-            enqueuement(std::move(o.enqueuement)), completions(std::move(o.completions))
+        async_file_io_dispatcher_op(async_file_io_dispatcher_op &&o) BOOST_NOEXCEPT_OR_NOTHROW : optype(o.optype), flags(std::move(o.flags)),
+			enqueuement(std::move(o.enqueuement)), h(std::move(o.h)), completions(std::move(o.completions))
 #ifndef NDEBUG
             , boundf(std::move(o.boundf))
 #endif
@@ -1065,7 +1065,8 @@ BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC void async_file_io_dispatcher_base::complet
                 immediates.enqueue(c_op->enqueuement);
             else
                 p->pool->enqueue(c_op->enqueuement);
-        }
+			BOOST_AFIO_DEBUG_PRINT("X %u %p e=%d f=%p (uc=%u, c=%u)\n", (unsigned) id, h.get(), !!e, thisop->h.get(), (unsigned) h.use_count(), (unsigned) thisop->completions.size());
+		}
     }
 }
 

@@ -42,7 +42,7 @@ BOOST_AFIO_AUTO_TEST_CASE(async_io_barrier, "Tests that the async i/o barrier wo
     }
     boost::afio::atomic<size_t> callcount[10000];
     memset(&callcount, 0, sizeof(callcount));
-    vector<future<bool>> verifies;
+    vector<shared_future<bool>> verifies;
     verifies.reserve(groups.size());
 #if defined(BOOST_MSVC) && BOOST_MSVC < 1700 // <= VS2010
     std::function<void (boost::afio::atomic<size_t> *count)> inccount = [](boost::afio::atomic<size_t> *count){ /*for (volatile size_t n = 0; n < 10000; n++);*/ (*count)++; };
