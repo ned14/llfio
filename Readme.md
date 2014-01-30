@@ -6,9 +6,9 @@ Jenkins CI status:<br/>build<br/>unit tests
 </p>
 <center>
 <table border="1" cellpadding="2">
-<tr><th>Static analysis</th><th colspan="5">Linux</th></tr>
+<tr><th>Static analysis</th><th colspan="6">Linux</th></tr>
 <tr><th>clang + oclint</th>
-<th>GCC 4.6 + libstdc++ 4.6</th><th>GCC 4.7 + libstdc++ 4.7</th><th>GCC 4.8 + libstdc++ 4.8</th><th>clang 3.2 + libstdc++ 4.8</th><th>clang 3.3 + libstdc++ 4.8</th>
+<th>GCC 4.6 + libstdc++ 4.6</th><th>GCC 4.7 + libstdc++ 4.7</th><th>GCC 4.8 + libstdc++ 4.8</th><th>clang 3.2 + libstdc++ 4.8</th><th>clang 3.3 + libstdc++ 4.8</th><th>clang 3.4 + libstdc++ 4.8</th>
 </tr>
 <tr align="center">
 <td><div style="position:relative; width:42px; overflow:hidden;"><a href='https://ci.nedprod.com/job/Boost.AFIO%20Static%20Analysis%20Pre-Check/'><img src='https://ci.nedprod.com/buildStatus/icon?job=Boost.AFIO Static Analysis Pre-Check' style="margin-left:-58px;"></a></div><div><font size="-2">N/A</font></div></td>
@@ -17,11 +17,12 @@ Jenkins CI status:<br/>build<br/>unit tests
 <td><div style="position:relative; width:42px; overflow:hidden;"><a href='https://ci.nedprod.com/job/Boost.AFIO%20Build%20Linux%20GCC%204.8/'><img src='https://ci.nedprod.com/buildStatus/icon?job=Boost.AFIO Build Linux GCC 4.8' style="margin-left:-58px;"></a></div><div style="position:relative; width:42px; overflow:hidden;"><a href='https://ci.nedprod.com/job/Boost.AFIO%20Test%20Linux%20GCC%204.8/'><img src='https://ci.nedprod.com/buildStatus/icon?job=Boost.AFIO Test Linux GCC 4.8' style="margin-left:-58px;"></a></div></td>
 <td><div style="position:relative; width:42px; overflow:hidden;"><a href='https://ci.nedprod.com/job/Boost.AFIO%20Build%20Linux%20clang%203.2/'><img src='https://ci.nedprod.com/buildStatus/icon?job=Boost.AFIO Build Linux clang 3.2' style="margin-left:-58px;"></a></div><div style="position:relative; width:42px; overflow:hidden;"><a href='https://ci.nedprod.com/job/Boost.AFIO%20Test%20Linux%20clang%203.2/'><img src='https://ci.nedprod.com/buildStatus/icon?job=Boost.AFIO Test Linux clang 3.2' style="margin-left:-58px;"></a></div></td>
 <td><div style="position:relative; width:42px; overflow:hidden;"><a href='https://ci.nedprod.com/job/Boost.AFIO%20Build%20Linux%20clang%203.3/'><img src='https://ci.nedprod.com/buildStatus/icon?job=Boost.AFIO Build Linux clang 3.3' style="margin-left:-58px;"></a></div><div style="position:relative; width:42px; overflow:hidden;"><a href='https://ci.nedprod.com/job/Boost.AFIO%20Test%20Linux%20clang%203.3/'><img src='https://ci.nedprod.com/buildStatus/icon?job=Boost.AFIO Test Linux clang 3.3' style="margin-left:-58px;"></a></div></td>
+<td><div style="position:relative; width:42px; overflow:hidden;"><a href='https://ci.nedprod.com/job/Boost.AFIO%20Build%20Linux%20clang%203.4/'><img src='https://ci.nedprod.com/buildStatus/icon?job=Boost.AFIO Build Linux clang 3.4' style="margin-left:-58px;"></a></div><div style="position:relative; width:42px; overflow:hidden;"><a href='https://ci.nedprod.com/job/Boost.AFIO%20Test%20Linux%20clang%203.4/'><img src='https://ci.nedprod.com/buildStatus/icon?job=Boost.AFIO Test Linux clang 3.4' style="margin-left:-58px;"></a></div></td>
 </tr>
 </table>
 <table border="1" cellpadding="2">
 <tr><th colspan="2">Linux</th><th>FreeBSD</th><th colspan="3">WinXP</th><th colspan="2">Win7</th></tr>
-<tr><th>clang 3.1 + libc++ 2013-07</th><th>clang 3.3 + libc++ 2013-07</th><th>clang 3.3 + libc++</th>
+<tr><th>clang 3.1 + libc++ 2013-12</th><th>clang 3.3 + libc++ 2013-12</th><th>clang 3.3 + libc++</th>
 <th>VS2010</th><th>Mingw</th><th>Mingw-w64</th><th>VS2012</th><th>VS2013</th>
 </tr>
 <tr align="center">

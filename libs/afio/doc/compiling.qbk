@@ -38,14 +38,16 @@ directories, so `include` directives of this scheme will work:
 <colspec colname='c4'/>
 <colspec colname='c5'/>
 <colspec colname='c6'/>
+<colspec colname='c7'/>
 <thead>
-<row><entry>Static analysis</entry><entry namest="c2" nameend="c6">Linux</entry></row>
+<row><entry>Static analysis</entry><entry namest="c2" nameend="c7">Linux</entry></row>
 <row><entry>clang + oclint</entry>
 <entry>GCC 4.6 + libstdc++ 4.6</entry>
 <entry>GCC 4.7 + libstdc++ 4.7</entry>
 <entry>GCC 4.8 + libstdc++ 4.8</entry>
 <entry>clang 3.2 + libstdc++ 4.8</entry>
 <entry>clang 3.3 + libstdc++ 4.8</entry>
+<entry>clang 3.4 + libstdc++ 4.8</entry>
 </row>
 </thead>
 <tbody>
@@ -56,6 +58,7 @@ directories, so `include` directives of this scheme will work:
 <entry><ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Build%20Linux%20GCC%204.8/"><imageobject><imagedata fileref="https://ci.nedprod.com/buildStatus/icon?job=Boost.AFIO%20Build%20Linux%20GCC%204.8"/></imageobject></ulink></entry>
 <entry><ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Build%20Linux%20clang%203.2/"><imageobject><imagedata fileref="https://ci.nedprod.com/buildStatus/icon?job=Boost.AFIO%20Build%20Linux%20clang%203.2"/></imageobject></ulink></entry>
 <entry><ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Build%20Linux%20clang%203.3/"><imageobject><imagedata fileref="https://ci.nedprod.com/buildStatus/icon?job=Boost.AFIO%20Build%20Linux%20clang%203.3"/></imageobject></ulink></entry>
+<entry><ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Build%20Linux%20clang%203.4/"><imageobject><imagedata fileref="https://ci.nedprod.com/buildStatus/icon?job=Boost.AFIO%20Build%20Linux%20clang%203.4"/></imageobject></ulink></entry>
 </row>
 <row>
 <entry>N/A</entry>
@@ -64,6 +67,7 @@ directories, so `include` directives of this scheme will work:
 <entry><ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Test%20Linux%20GCC%204.8/"><imageobject><imagedata fileref="https://ci.nedprod.com/buildStatus/icon?job=Boost.AFIO%20Test%20Linux%20GCC%204.8"/></imageobject></ulink></entry>
 <entry><ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Test%20Linux%20clang%203.2/"><imageobject><imagedata fileref="https://ci.nedprod.com/buildStatus/icon?job=Boost.AFIO%20Test%20Linux%20clang%203.2"/></imageobject></ulink></entry>
 <entry><ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Test%20Linux%20clang%203.3/"><imageobject><imagedata fileref="https://ci.nedprod.com/buildStatus/icon?job=Boost.AFIO%20Test%20Linux%20clang%203.3"/></imageobject></ulink></entry>
+<entry><ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Test%20Linux%20clang%203.4/"><imageobject><imagedata fileref="https://ci.nedprod.com/buildStatus/icon?job=Boost.AFIO%20Test%20Linux%20clang%203.4"/></imageobject></ulink></entry>
 </row>
 </tbody>
 </tgroup>
@@ -87,8 +91,8 @@ directories, so `include` directives of this scheme will work:
 <entry namest="c7" nameend="c8">Win7</entry>
 </row>
 <row>
-<entry>clang 3.1 + libc++ 2013-07</entry>
-<entry>clang 3.3 + libc++ 2013-07</entry>
+<entry>clang 3.1 + libc++ 2013-12</entry>
+<entry>clang 3.3 + libc++ 2013-12</entry>
 <entry>clang 3.3 + libc++</entry>
 <entry>VS2010</entry>
 <entry>Mingw</entry>
