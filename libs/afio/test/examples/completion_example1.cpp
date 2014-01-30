@@ -16,7 +16,7 @@ int main(void)
     // First create some callable entity ...
     auto completer=[](
         /* These are always the standard parameters */
-        size_t id, std::shared_ptr<boost::afio::async_io_handle> h, boost::afio::exception_ptr *e,
+        size_t id, boost::afio::async_io_op op, boost::afio::exception_ptr *e,
         /* From now on user defined parameters */
         std::string text)
       /* This is always the return type */
@@ -37,7 +37,7 @@ int main(void)
         
         // Return whether this completion has completed now or is it deferred,
         // along with the handle we pass onto any completions completing on this op
-        return std::make_pair(true, h);
+        return std::make_pair(true, op.get());
     };
     
     // Bind any user defined parameters to create a proper boost::afio::async_file_io_dispatcher_base::completion_t

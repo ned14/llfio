@@ -29,7 +29,7 @@ int main(void)
     // Create the completion, using the standard form
     auto completion=[](std::shared_ptr<boost::afio::async_file_io_dispatcher_base> dispatcher,
         /* These are always the standard parameters */
-        size_t id, std::shared_ptr<boost::afio::async_io_handle> h, boost::afio::exception_ptr *e)
+        size_t id, boost::afio::async_io_op op, boost::afio::exception_ptr *e)
       /* This is always the return type */
       -> std::pair<bool, std::shared_ptr<boost::afio::async_io_handle>>
     {
@@ -38,14 +38,14 @@ int main(void)
         // Create some callable entity which will do the actual completion. It can be
         // anything you like, but you need a minimum of its integer id.
         auto completer=[](std::shared_ptr<boost::afio::async_file_io_dispatcher_base> dispatcher,
-                          size_t id, std::shared_ptr<boost::afio::async_io_handle> h) -> int
+                          size_t id, boost::afio::async_io_op op) -> int
         {
             try
             {
                 std::cout << "I am completer" << std::endl;
 
                 // Do stuff, returning the handle you want passed onto dependencies.
-                dispatcher->complete_async_op(id, h);
+                dispatcher->complete_async_op(id, op.get());
             }
             catch(...)
             {
@@ -53,15 +53,15 @@ int main(void)
                 // do it by hand and tell AFIO about what exception state to return.
                 boost::afio::exception_ptr e(boost::afio::make_exception_ptr(
                     boost::afio::current_exception()));
-                dispatcher->complete_async_op(id, h, e);
+                dispatcher->complete_async_op(id, op.get(), e);
             }
             return 0;
         };
         // Bind the id and handle to completer, and enqueue for later asynchronous execution.
-        std::async(std::launch::async, completer, dispatcher, id, h);
+        std::async(std::launch::async, completer, dispatcher, id, op);
         
         // Indicate we are not done yet
-        return std::make_pair(false, h);
+        return std::make_pair(false, op.get());
     };
        
     // Bind any user defined parameters to create a proper boost::afio::async_file_io_dispatcher_base::completion_t
