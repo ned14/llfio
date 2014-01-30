@@ -86,19 +86,21 @@ namespace detail
             promise<R> r;
             bool autoset;
             atomic<int> done;
-            Private() : autoset(true), done(0) { }
+            Private(std::function<R()> _task) : task(std::move(_task)), autoset(true), done(0) { }
         };
         std::shared_ptr<Private> p;
         void validate() const { assert(p); /*if(!p) abort();*/ }
     public:
         //! Default constructor
-        enqueued_task_impl() : p(std::make_shared<Private>()) { }
+        enqueued_task_impl(std::function<R()> _task=std::function<R()>()) : p(std::make_shared<Private>(std::move(_task))) { }
         //! Returns true if valid
         bool valid() const BOOST_NOEXCEPT_OR_NOTHROW{ return p.get()!=nullptr; }
         //! Swaps contents with another instance
         void swap(enqueued_task_impl &o) BOOST_NOEXCEPT_OR_NOTHROW{ p.swap(o.p); }
         //! Resets the contents
         void reset() { p.reset(); }
+        //! Sets the task
+        void set_task(std::function<R()> _task) { p->task=std::move(_task); }
         //! Returns the future corresponding to the future return value of the task
         future<R> get_future() { validate(); return p->r.get_future(); }
         //! Sets the future corresponding to the future return value of the task.
@@ -132,7 +134,7 @@ template<class R> class enqueued_task<R()> : public detail::enqueued_task_impl<R
     typedef detail::enqueued_task_impl<R> Base;
 public:
     //! Default constructor
-    enqueued_task() { }
+    enqueued_task(std::function<R()> _task=std::function<R()>()) : Base(std::move(_task)) { }
     //! Sets the future corresponding to the future return value of the task.
     template<class T> void set_future_value(T v)
     {
@@ -175,7 +177,7 @@ template<> class enqueued_task<void()> : public detail::enqueued_task_impl<void>
     typedef detail::enqueued_task_impl<void> Base;
 public:
     //! Default constructor
-    enqueued_task() { }
+    enqueued_task(std::function<void()> _task=std::function<void()>()) : Base(std::move(_task)) { }
     //! Sets the future corresponding to the future return value of the task.
     void set_future_value()
     {

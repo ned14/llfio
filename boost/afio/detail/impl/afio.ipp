@@ -1036,7 +1036,7 @@ BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC void async_file_io_dispatcher_base::complet
         {
             detail::async_file_io_dispatcher_op *c_op=std::get<1>(c).get();
             BOOST_AFIO_DEBUG_PRINT("X %u (f=%u) > %u\n", (unsigned) id, (unsigned) c_op->flags, (unsigned) std::get<0>(c));
-            c_op->enqueuement->task=std::bind(std::get<2>(c), op, !!(c_op->flags & async_op_flags::immediate) ? &e : nullptr);
+            c_op->enqueuement.set_task(std::bind(std::get<2>(c), op, !!(c_op->flags & async_op_flags::immediate) ? &e : nullptr));
             if(!!(c_op->flags & async_op_flags::immediate))
                 immediates.enqueue(c_op->enqueuement);
             else
@@ -1254,7 +1254,7 @@ template<class F, class... Args> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC async_io_o
             // which indicates it completed and yet h remains invalid
             BOOST_AFIO_THROW_FATAL(std::runtime_error("Precondition was not in list of extant ops, yet its future is invalid. This should never happen for any real op, so it's probably memory corruption."));
         }
-        thisop->enqueuement->task=std::bind(std::get<2>(boundf), precondition, !!(flags & async_op_flags::immediate) ? he : nullptr);
+        thisop->enqueuement.set_task(std::bind(std::get<2>(boundf), precondition, !!(flags & async_op_flags::immediate) ? he : nullptr));
         if(!!(flags & async_op_flags::immediate))
             immediates.enqueue(thisop->enqueuement);
         else
@@ -1376,7 +1376,7 @@ template<class F, class... Args> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC async_io_o
                 /* which indicates it completed and yet h remains invalid*/\
                 BOOST_AFIO_THROW_FATAL(std::runtime_error("Precondition was not in list of extant ops, yet its future is invalid. This should never happen for any real op, so it's probably memory corruption.")); \
             }\
-            thisop->enqueuement->task=std::bind(boundf.second, precondition, !!(flags & async_op_flags::immediate) ? he : nullptr); \
+            thisop->enqueuement.set_task(std::bind(boundf.second, precondition, !!(flags & async_op_flags::immediate) ? he : nullptr)); \
             if(!!(flags & async_op_flags::immediate)) \
                 immediates.enqueue(thisop->enqueuement); \
             else \
