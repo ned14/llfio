@@ -84,9 +84,10 @@ namespace detail
         {
             std::function<R()> task;
             promise<R> r;
+            shared_future<R> f;
             bool autoset;
             atomic<int> done;
-            Private(std::function<R()> _task) : task(std::move(_task)), autoset(true), done(0) { }
+            Private(std::function<R()> _task) : task(std::move(_task)), f(r.get_future()), autoset(true), done(0) { }
         };
         std::shared_ptr<Private> p;
         void validate() const { assert(p); /*if(!p) abort();*/ }
@@ -101,9 +102,9 @@ namespace detail
         void reset() { p.reset(); }
         //! Sets the task
         void set_task(std::function<R()> _task) { p->task=std::move(_task); }
-        //! Returns the future corresponding to the future return value of the task
-        future<R> get_future() { validate(); return p->r.get_future(); }
-        //! Sets the future corresponding to the future return value of the task.
+        //! Returns the shared future corresponding to the future return value of the task
+        shared_future<R> get_future() { validate(); return p->f; }
+        //! Sets the shared future corresponding to the future return value of the task.
         void set_future_exception(exception_ptr e)
         {
             int _=0;
@@ -112,7 +113,7 @@ namespace detail
                 return;
             p->r.set_exception(e);
         }
-        //! Disables the task setting the future return value.
+        //! Disables the task setting the shared future return value.
         void disable_auto_set_future(bool v=true) { validate(); p->autoset=!v; }
     };
 }
@@ -135,7 +136,7 @@ template<class R> class enqueued_task<R()> : public detail::enqueued_task_impl<R
 public:
     //! Default constructor
     enqueued_task(std::function<R()> _task=std::function<R()>()) : Base(std::move(_task)) { }
-    //! Sets the future corresponding to the future return value of the task.
+    //! Sets the shared future corresponding to the future return value of the task.
     template<class T> void set_future_value(T v)
     {
         int _=0;
@@ -144,11 +145,12 @@ public:
             return;
         Base::p->r.set_value(v);
     }
-    //! Invokes the callable, setting the future to the value it returns
+    //! Invokes the callable, setting the shared future to the value it returns
     void operator()()
     {
         auto _p(Base::p);
         Base::validate();
+        if(!p->task) abort();
         try
         {
             auto v(_p->task());
@@ -169,7 +171,6 @@ public:
         }
         // Free any bound parameters in task to save memory
         _p->task=std::function<R()>();
-        _p->r=promise<R>();
     }
 };
 template<> class enqueued_task<void()> : public detail::enqueued_task_impl<void>
@@ -178,7 +179,7 @@ template<> class enqueued_task<void()> : public detail::enqueued_task_impl<void>
 public:
     //! Default constructor
     enqueued_task(std::function<void()> _task=std::function<void()>()) : Base(std::move(_task)) { }
-    //! Sets the future corresponding to the future return value of the task.
+    //! Sets the shared future corresponding to the future return value of the task.
     void set_future_value()
     {
         int _=0;
@@ -192,6 +193,7 @@ public:
     {
         auto _p(Base::p);
         Base::validate();
+        if(!p->task) abort();
         try
         {
             _p->task();
@@ -212,7 +214,6 @@ public:
         }
         // Free any bound parameters in task to save memory
         _p->task=std::function<void()>();
-        _p->r=promise<void>();
     }
 };
 /*! \class thread_source
@@ -1039,7 +1040,7 @@ public:
     \exceptionmodelstd
     \qexample{call_example}
     */
-    template<class R> inline std::pair<std::vector<future<R>>, std::vector<async_io_op>> call(const std::vector<async_io_op> &ops, const std::vector<std::function<R()>> &callables);
+    template<class R> inline std::pair<std::vector<shared_future<R>>, std::vector<async_io_op>> call(const std::vector<async_io_op> &ops, const std::vector<std::function<R()>> &callables);
     /*! \brief Schedule a batch of asynchronous invocations of the specified bound functions when their supplied preconditions complete.
 
     This is effectively a convenience wrapper for `completion()`. It creates an enqueued_task matching the `completion_t`
@@ -1055,7 +1056,7 @@ public:
     \exceptionmodelstd
     \qexample{call_example}
     */
-    template<class R> std::pair<std::vector<future<R>>, std::vector<async_io_op>> call(const std::vector<std::function<R()>> &callables) { return call(std::vector<async_io_op>(), callables); }
+    template<class R> std::pair<std::vector<shared_future<R>>, std::vector<async_io_op>> call(const std::vector<std::function<R()>> &callables) { return call(std::vector<async_io_op>(), callables); }
     /*! \brief Schedule an asynchronous invocation of the specified bound function when its supplied precondition completes.
 
     This is effectively a convenience wrapper for `completion()`. It creates an enqueued_task matching the `completion_t`
@@ -1072,7 +1073,7 @@ public:
     \exceptionmodelstd
     \qexample{call_example}
     */
-    template<class R> inline std::pair<future<R>, async_io_op> call(const async_io_op &req, std::function<R()> callback);
+    template<class R> inline std::pair<shared_future<R>, async_io_op> call(const async_io_op &req, std::function<R()> callback);
 
     
     
@@ -1100,9 +1101,9 @@ public:
     \qexample{call_example}
     */
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-    template<class C, class... Args> inline std::pair<future<typename detail::vs2013_variadic_overload_resolution_workaround<C, Args...>::type>, async_io_op> call(const async_io_op &req, C callback, Args... args);
+    template<class C, class... Args> inline std::pair<shared_future<typename detail::vs2013_variadic_overload_resolution_workaround<C, Args...>::type>, async_io_op> call(const async_io_op &req, C callback, Args... args);
 #else
-    template<class C, class... Args> inline std::pair<future<typename std::result_of<C(Args...)>::type>, async_io_op> call(const async_io_op &req, C callback, Args... args);
+    template<class C, class... Args> inline std::pair<shared_future<typename std::result_of<C(Args...)>::type>, async_io_op> call(const async_io_op &req, C callback, Args... args);
 #endif
 
 #else   //define a version compatable with c++03
@@ -2571,10 +2572,10 @@ namespace detail {
         return std::make_pair(true, _.get(true));
     }
 }
-template<class R> inline std::pair<std::vector<future<R>>, std::vector<async_io_op>> async_file_io_dispatcher_base::call(const std::vector<async_io_op> &ops, const std::vector<std::function<R()>> &callables)
+template<class R> inline std::pair<std::vector<shared_future<R>>, std::vector<async_io_op>> async_file_io_dispatcher_base::call(const std::vector<async_io_op> &ops, const std::vector<std::function<R()>> &callables)
 {
     typedef enqueued_task<R()> tasktype;
-    std::vector<future<R>> retfutures;
+    std::vector<shared_future<R>> retfutures;
     std::vector<std::pair<async_op_flags, std::function<completion_t>>> callbacks;
     retfutures.reserve(callables.size());
     callbacks.reserve(callables.size());
@@ -2587,23 +2588,23 @@ template<class R> inline std::pair<std::vector<future<R>>, std::vector<async_io_
     }
     return std::make_pair(std::move(retfutures), completion(ops, callbacks));
 }
-template<class R> inline std::pair<future<R>, async_io_op> async_file_io_dispatcher_base::call(const async_io_op &req, std::function<R()> callback)
+template<class R> inline std::pair<shared_future<R>, async_io_op> async_file_io_dispatcher_base::call(const async_io_op &req, std::function<R()> callback)
 {
     std::vector<async_io_op> i;
     std::vector<std::function<R()>> c;
     i.reserve(1); c.reserve(1);
     i.push_back(req);
     c.push_back(std::move(callback));
-    std::pair<std::vector<future<R>>, std::vector<async_io_op>> ret(call(i, c));
+    std::pair<std::vector<shared_future<R>>, std::vector<async_io_op>> ret(call(i, c));
     return std::make_pair(std::move(ret.first.front()), ret.second.front());
 }
 
 #if !defined(BOOST_NO_CXX11_VARIADIC_TEMPLATES)
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-template<class C, class... Args> inline std::pair<future<typename detail::vs2013_variadic_overload_resolution_workaround<C, Args...>::type>, async_io_op> async_file_io_dispatcher_base::call(const async_io_op &req, C callback, Args... args)
+template<class C, class... Args> inline std::pair<shared_future<typename detail::vs2013_variadic_overload_resolution_workaround<C, Args...>::type>, async_io_op> async_file_io_dispatcher_base::call(const async_io_op &req, C callback, Args... args)
 #else
-template<class C, class... Args> inline std::pair<future<typename std::result_of<C(Args...)>::type>, async_io_op> async_file_io_dispatcher_base::call(const async_io_op &req, C callback, Args... args)
+template<class C, class... Args> inline std::pair<shared_future<typename std::result_of<C(Args...)>::type>, async_io_op> async_file_io_dispatcher_base::call(const async_io_op &req, C callback, Args... args)
 #endif
 {
     typedef typename std::result_of<C(Args...)>::type rettype;
@@ -2616,7 +2617,7 @@ template<class C, class... Args> inline std::pair<future<typename std::result_of
     template <class C                                                                                                   \
     BOOST_PP_COMMA_IF(N)                                                                                                \
     BOOST_PP_ENUM_PARAMS(N, class A)>                                                                                   \
-    inline std::pair<future<typename std::result_of<C(BOOST_PP_ENUM_PARAMS(N, A))>::type>, async_io_op>               \
+    inline std::pair<shared_future<typename std::result_of<C(BOOST_PP_ENUM_PARAMS(N, A))>::type>, async_io_op>               \
     async_file_io_dispatcher_base::call (const async_io_op &req, C callback BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))                 \
     {                                                                                                                   \
         typedef typename std::result_of<C(BOOST_PP_ENUM_PARAMS(N, A))>::type rettype;                                   \

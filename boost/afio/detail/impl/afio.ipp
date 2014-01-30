@@ -429,8 +429,8 @@ namespace detail {
     {
         OpType optype;
         async_op_flags flags;
-        std::shared_ptr<shared_future<std::shared_ptr<async_io_handle>>> h;
         enqueued_task<std::shared_ptr<async_io_handle>()> enqueuement;
+        std::shared_ptr<shared_future<std::shared_ptr<async_io_handle>>> h;
         typedef std::tuple<size_t, std::shared_ptr<detail::async_file_io_dispatcher_op>, std::function<std::shared_ptr<async_io_handle>(async_io_op, exception_ptr *)>> completion_t;
         std::vector<completion_t> completions;
 #ifndef NDEBUG
@@ -463,9 +463,13 @@ namespace detail {
 #else
         void fillStack() { }
 #endif
-        async_file_io_dispatcher_op(OpType _optype, async_op_flags _flags, std::shared_ptr<shared_future<std::shared_ptr<async_io_handle>>> _h)
-            : optype(_optype), flags(_flags), h(_h)
-        { fillStack(); }
+        async_file_io_dispatcher_op(OpType _optype, async_op_flags _flags)
+            : optype(_optype), flags(_flags), h(std::make_shared<shared_future<std::shared_ptr<async_io_handle>>>(enqueuement.get_future()))
+        {
+            // Stop the future from being auto-set on task return
+            enqueuement.disable_auto_set_future();
+            fillStack();
+        }
         async_file_io_dispatcher_op(async_file_io_dispatcher_op &&o) BOOST_NOEXCEPT_OR_NOTHROW : optype(o.optype), flags(std::move(o.flags)), h(std::move(o.h)),
             enqueuement(std::move(o.enqueuement)), completions(std::move(o.completions))
 #ifndef NDEBUG
@@ -1024,10 +1028,30 @@ BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC void async_file_io_dispatcher_base::complet
     BOOST_END_MEMORY_TRANSACTION(p->opslock)
     // Early set future
     if(e)
+    {
         thisop->enqueuement.set_future_exception(e);
+        if(!thisop->enqueuement.get_future().is_ready())
+        {
+            int a=1;
+        }
+        assert(thisop->enqueuement.get_future().is_ready());
+        assert(thisop->h->is_ready());
+        assert(thisop->enqueuement.get_future().get_exception_ptr()==e);
+        assert(thisop->h->get_exception_ptr()==e);
+    }
     else
+    {
         thisop->enqueuement.set_future_value(h);
-    BOOST_AFIO_DEBUG_PRINT("X %u %p (uc=%u, c=%u)\n", (unsigned) id, h.get(), (unsigned) h.use_count(), (unsigned)thisop->completions.size());
+        if(!thisop->enqueuement.get_future().is_ready())
+        {
+            int a=1;
+        }
+        assert(thisop->enqueuement.get_future().is_ready());
+        assert(thisop->h->is_ready());
+        assert(thisop->enqueuement.get_future().get()==h);
+        assert(thisop->h->get()==h);
+    }
+    BOOST_AFIO_DEBUG_PRINT("X %u %p e=%p f=%p (uc=%u, c=%u)\n", (unsigned) id, h.get(), e, thisop->h.get(), (unsigned) h.use_count(), (unsigned) thisop->completions.size());
     if(!thisop->completions.empty())
     {
         // Synthesise a parent op for myself
@@ -1174,11 +1198,9 @@ template<class F, class... Args> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC async_io_o
     // Wrap supplied implementation routine with a completion dispatcher
     auto wrapperf=&async_file_io_dispatcher_base::invoke_async_op_completions<F, Args...>;
     // Make a new async_io_op ready for returning
-    async_io_op ret(this, thisid);
-    auto thisop=std::make_shared<detail::async_file_io_dispatcher_op>((detail::OpType) optype, flags, ret.h);
-    // Set the output shared future and disable auto future setting
-    thisop->enqueuement.disable_auto_set_future();
-    *ret.h=thisop->enqueuement.get_future();
+    auto thisop=std::make_shared<detail::async_file_io_dispatcher_op>((detail::OpType) optype, flags);
+    // Set the output shared future
+    async_io_op ret(this, thisid, thisop->h);
     // Bind supplied implementation routine to this, unique id and any args they passed
     typename detail::async_file_io_dispatcher_op::completion_t boundf(std::make_tuple(thisid, thisop, std::bind(wrapperf, this, thisid, std::placeholders::_1, std::placeholders::_2, f, args...)));
 #ifndef NDEBUG
@@ -1681,9 +1703,9 @@ namespace detail {
             BOOST_AFIO_POSIX_STAT_STRUCT s={0};
             BOOST_AFIO_ERRHOS(BOOST_AFIO_POSIX_STAT(req.path.c_str(), &s));
             if(S_IFDIR!=(s.st_mode&S_IFDIR))
-                return dofile(id, h, e, req);
+                return dofile(id, op, e, req);
             else
-                return dodir(id, h, e, req);
+                return dodir(id, op, e, req);
 #endif
         }
         // Called in unknown thread
