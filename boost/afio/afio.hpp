@@ -363,7 +363,7 @@ futures become available.
 \complexity{O(N)}
 \exceptionmodel{The same as a future}
 */
-template <class InputIterator> inline future<std::vector<typename std::decay<decltype(((typename InputIterator::value_type *) 0)->get())>::type>> when_all(InputIterator first, InputIterator last)
+template <class InputIterator> inline shared_future<std::vector<typename std::decay<decltype(((typename InputIterator::value_type *) 0)->get())>::type>> when_all(InputIterator first, InputIterator last)
 {
     typedef typename InputIterator::value_type future_type;
     typedef typename std::decay<decltype(((typename InputIterator::value_type *) 0)->get())>::type value_type;
@@ -396,7 +396,7 @@ futures become available.
 \complexity{The same as boost::wait_for_any()}
 \exceptionmodel{The same as a future}
 */
-template <class InputIterator> inline future<std::pair<size_t, typename std::decay<decltype(((typename InputIterator::value_type *) 0)->get())>::type>> when_any(InputIterator first, InputIterator last)
+template <class InputIterator> inline shared_future<std::pair<size_t, typename std::decay<decltype(((typename InputIterator::value_type *) 0)->get())>::type>> when_any(InputIterator first, InputIterator last)
 {
     typedef typename InputIterator::value_type future_type;
     typedef typename std::decay<decltype(((typename InputIterator::value_type *) 0)->get())>::type value_type;
