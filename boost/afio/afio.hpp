@@ -150,7 +150,7 @@ public:
     {
         auto _p(Base::p);
         Base::validate();
-        if(!p->task) abort();
+        if(!_p->task) abort();
         try
         {
             auto v(_p->task());
@@ -193,7 +193,7 @@ public:
     {
         auto _p(Base::p);
         Base::validate();
-        if(!p->task) abort();
+        if(!_p->task) abort();
         try
         {
             _p->task();

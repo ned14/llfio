@@ -1051,7 +1051,7 @@ BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC void async_file_io_dispatcher_base::complet
         assert(thisop->enqueuement.get_future().get()==h);
         assert(thisop->h->get()==h);
     }
-    BOOST_AFIO_DEBUG_PRINT("X %u %p e=%p f=%p (uc=%u, c=%u)\n", (unsigned) id, h.get(), e, thisop->h.get(), (unsigned) h.use_count(), (unsigned) thisop->completions.size());
+    BOOST_AFIO_DEBUG_PRINT("X %u %p e=%d f=%p (uc=%u, c=%u)\n", (unsigned) id, h.get(), !!e, thisop->h.get(), (unsigned) h.use_count(), (unsigned) thisop->completions.size());
     if(!thisop->completions.empty())
     {
         // Synthesise a parent op for myself
