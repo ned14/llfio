@@ -81,7 +81,7 @@ local VALGRIND_ARGS = [ MATCH --valgrind=(.*) : $(.argv) ] ;
 # if we're doing a valgrind build, set up the test launcher
 if $(VALGRIND_ARGS)
 {
-  launcher =  <testing.launcher>valgrind ;
+    launcher =  <testing.launcher>valgrind ;
 }
 
 #auto generate the test_all.cpp
@@ -119,9 +119,9 @@ else
 }
 
 # link tests (just compile and links targets)
-if "--link-test"  in $(.argv)  
+if "--link-test" in $(.argv)  
 {
-	if single_test = false
+	if single_test != true
 	{
 		# Test that inline linkage works
 		link test_inline_linkage_master.cpp test_inline_linkage1.cpp test_inline_linkage2.cpp ;
@@ -131,7 +131,7 @@ if "--link-test"  in $(.argv)
     {
         link $(x) test_functions spooky ;
     }
-	if single_test = false
+	if single_test != true
 	{
 		for local x in $(example_files)
 		{

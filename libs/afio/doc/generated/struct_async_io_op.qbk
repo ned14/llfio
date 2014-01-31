@@ -15,7 +15,7 @@
 A reference to an asynchronous operation. 
 
 [heading Description]
-The id field is always valid (and non-zero) if this reference is valid. The h field, being the shared state between all references referring to the same op, only becomes a non-default shared\u005ffuture when the op has actually begun execution. You should therefore [*never] try waiting via h->get() until you are absolutely sure that the op has already started, instead do when\u005fall(op).get().front(). 
+The id field is always valid (and non-zero) if this reference is valid. 
 
 [heading Synopsis]
 ``struct async_io_op
@@ -51,13 +51,17 @@ The id field is always valid (and non-zero) if this reference is valid. The h fi
 
 
 ]]
-[[``async_io_op(async_file_io_dispatcher_base * _parent, size_t _id, std::shared_ptr< shared_future< std::shared_ptr< async_io_handle >>> _handle)``
+[[``async_io_op(async_file_io_dispatcher_base * _parent, size_t _id, std::shared_ptr< shared_future< std::shared_ptr< async_io_handle >>> _handle, bool check_handle = true, bool validate = true)``
 
 ] [] [[* async_file_io_dispatcher_base *]: ['_parent]:  The dispatcher this op belongs to. 
 
 [* size_t]: ['_id]:  The unique non-zero id of this op. 
 
 [* std::shared_ptr< shared_future< std::shared_ptr< async_io_handle >>>]: ['_handle]:  A shared_ptr to shared state between all instances of this reference. 
+
+[* bool]: ['check_handle]:  Whether to have validation additionally check if a handle is not null 
+
+[* bool]: ['validate]:  Whether to check the inputs and shared state for valid (and not errored) values 
 
 
 
@@ -89,6 +93,14 @@ The id field is always valid (and non-zero) if this reference is valid. The h fi
 [[``async_io_op & operator=(async_io_op && o)``
 
 ] [Move assignment. ] [[* async_io_op &&]: ['o]:  
+
+
+
+
+]]
+[[``std::shared_ptr< async_io_handle > get(bool return_null_if_errored = false)``
+
+] [Retrieves the handle or exception from the shared state. Same as h->get(). ] [[* bool]: ['return_null_if_errored]:  
 
 
 

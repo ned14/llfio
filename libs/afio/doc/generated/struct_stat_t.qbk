@@ -23,7 +23,7 @@ This structure looks somewhat like a [^`struct stat`], and indeed it was derived
   uint64_t st_dev;                               // inode of device containing file (POSIX only) 
   uint64_t st_ino;                               // inode of file (Windows, POSIX) 
   std::filesystem::file_type st_type;            // type of file (Windows, POSIX) 
-  std::filesystem::perms st_perms;               // bitfield perms of file (POSIX only) 
+  std::filesystem::perms st_perms;               // uint16_t bitfield perms of file (POSIX only) 
   int16_t st_nlink;                              // number of hard links (Windows, POSIX) 
   int16_t st_uid;                                // user ID of the file (POSIX only) 
   int16_t st_gid;                                // group ID of the file (POSIX only) 

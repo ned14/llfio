@@ -14,14 +14,11 @@ int main(void)
         return 42;
     }, std::string("Hello world")); // Returns a pair of <future, op ref>
     
-    // Convert the returned future to a shared_future so it can be passed through std::bind()
-    auto helloworldfuture=helloworld.first.share();
-    
     // Schedule as asynchronous call of some function to occur only after helloworld completes
     auto addtovalue=dispatcher->call(helloworld.second, [](boost::afio::shared_future<int> v) -> int {
         // v is highly likely to be ready very soon by the time we are called
         return v.get()+1;
-    }, helloworldfuture);
+    }, helloworld.first);
     
     // Create a boost::future<> representing the ops passed to when_all()
     auto future=boost::afio::when_all(addtovalue.second);

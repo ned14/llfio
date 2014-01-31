@@ -853,6 +853,8 @@ struct async_io_op
     \param _parent The dispatcher this op belongs to.
     \param _id The unique non-zero id of this op.
     \param _handle A shared_ptr to shared state between all instances of this reference.
+	\param check_handle Whether to have validation additionally check if a handle is not null
+	\param validate Whether to check the inputs and shared state for valid (and not errored) values
     */
     async_io_op(async_file_io_dispatcher_base *_parent, size_t _id, std::shared_ptr<shared_future<std::shared_ptr<async_io_handle>>> _handle, bool check_handle=true, bool validate=true) : parent(_parent), id(_id), h(std::move(_handle)) { if(validate) _validate(check_handle); }
     /*! Constructs an instance.
@@ -969,7 +971,7 @@ class BOOST_AFIO_DECL async_file_io_dispatcher_base : public std::enable_shared_
     BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC async_io_op int_op_from_scheduled_id(size_t id) const;
 protected:
     BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC async_file_io_dispatcher_base(std::shared_ptr<thread_source> threadpool, file_flags flagsforce, file_flags flagsmask);
-    std::pair<bool, std::shared_ptr<async_io_handle>> doadopt(size_t, async_io_op, exception_ptr *, std::shared_ptr<async_io_handle> h)
+    std::pair<bool, std::shared_ptr<async_io_handle>> doadopt(size_t, async_io_op, std::shared_ptr<async_io_handle> h)
     {
         return std::make_pair(true, h);
     }
@@ -995,7 +997,7 @@ public:
     //! The type returned by a completion handler \ingroup async_file_io_dispatcher_base__completion
     typedef std::pair<bool, std::shared_ptr<async_io_handle>> completion_returntype;
     //! The type of a completion handler \ingroup async_file_io_dispatcher_base__completion
-    typedef completion_returntype completion_t(size_t, async_io_op, exception_ptr *);
+    typedef completion_returntype completion_t(size_t, async_io_op);
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 #if defined(BOOST_AFIO_ENABLE_BENCHMARKING_COMPLETION) || BOOST_AFIO_HEADERS_ONLY==0 // Only really used for benchmarking
     BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC std::vector<async_io_op> completion(const std::vector<async_io_op> &ops, const std::vector<std::pair<async_op_flags, async_file_io_dispatcher_base::completion_t *>> &callbacks);
@@ -1506,23 +1508,34 @@ public:
     \exceptionmodel{Never throws any exception.}
     */
     static BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC size_t page_size() BOOST_NOEXCEPT_OR_NOTHROW;
-        
+
+    /*! \brief Completes an operation with a handle or an error, usually used when an operation was previously deferred.
+    \ingroup async_file_io_dispatcher_base__misc
+    \complexity{O(N) where N is the number of completions dependent on this op.}
+    \exceptionmodel{Should not throw any exception except for out of memory.}
+    */
     BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC void complete_async_op(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr e=exception_ptr());
+    /*! \brief Completes an operation with an error, usually used when an operation was previously deferred.
+    \ingroup async_file_io_dispatcher_base__misc
+    \complexity{O(N) where N is the number of completions dependent on this op.}
+    \exceptionmodel{Should not throw any exception except for out of memory.}
+    */
+    void complete_async_op(size_t id, exception_ptr e) { complete_async_op(id, std::shared_ptr<async_io_handle>(), e); }
 protected:
-    BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC completion_returntype invoke_user_completion_fast(size_t id, async_io_op h, exception_ptr *e, completion_t *callback);
-    BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC completion_returntype invoke_user_completion_slow(size_t id, async_io_op h, exception_ptr *e, std::function<completion_t> callback);
-    template<class F, class T> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC std::vector<async_io_op> chain_async_ops(int optype, const std::vector<async_io_op> &preconditions, const std::vector<T> &container, async_op_flags flags, completion_returntype(F::*f)(size_t, async_io_op, exception_ptr *, T));
-    template<class F, class T> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC std::vector<async_io_op> chain_async_ops(int optype, const std::vector<T> &container, async_op_flags flags, completion_returntype(F::*f)(size_t, async_io_op, exception_ptr *, T));
-    template<class F> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC std::vector<async_io_op> chain_async_ops(int optype, const std::vector<async_io_op> &container, async_op_flags flags, completion_returntype(F::*f)(size_t, async_io_op, exception_ptr *, async_io_op));
-    template<class F> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC std::vector<async_io_op> chain_async_ops(int optype, const std::vector<async_path_op_req> &container, async_op_flags flags, completion_returntype(F::*f)(size_t, async_io_op, exception_ptr *, async_path_op_req));
-    template<class F, bool iswrite> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC std::vector<async_io_op> chain_async_ops(int optype, const std::vector<detail::async_data_op_req_impl<iswrite>> &container, async_op_flags flags, completion_returntype(F::*f)(size_t, async_io_op, exception_ptr *, detail::async_data_op_req_impl<iswrite>));
-    template<class F> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC std::pair<std::vector<future<std::pair<std::vector<directory_entry>, bool>>>, std::vector<async_io_op>> chain_async_ops(int optype, const std::vector<async_enumerate_op_req> &container, async_op_flags flags, completion_returntype(F::*f)(size_t, async_io_op, exception_ptr *, async_enumerate_op_req, std::shared_ptr<promise<std::pair<std::vector<directory_entry>, bool>>>));
-    template<class T> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC async_file_io_dispatcher_base::completion_returntype dobarrier(size_t id, async_io_op h, exception_ptr *, T);
+    BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC completion_returntype invoke_user_completion_fast(size_t id, async_io_op h, completion_t *callback);
+    BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC completion_returntype invoke_user_completion_slow(size_t id, async_io_op h, std::function<completion_t> callback);
+    template<class F, class T> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC std::vector<async_io_op> chain_async_ops(int optype, const std::vector<async_io_op> &preconditions, const std::vector<T> &container, async_op_flags flags, completion_returntype(F::*f)(size_t, async_io_op, T));
+    template<class F, class T> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC std::vector<async_io_op> chain_async_ops(int optype, const std::vector<T> &container, async_op_flags flags, completion_returntype(F::*f)(size_t, async_io_op, T));
+    template<class F> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC std::vector<async_io_op> chain_async_ops(int optype, const std::vector<async_io_op> &container, async_op_flags flags, completion_returntype(F::*f)(size_t, async_io_op, async_io_op));
+    template<class F> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC std::vector<async_io_op> chain_async_ops(int optype, const std::vector<async_path_op_req> &container, async_op_flags flags, completion_returntype(F::*f)(size_t, async_io_op, async_path_op_req));
+    template<class F, bool iswrite> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC std::vector<async_io_op> chain_async_ops(int optype, const std::vector<detail::async_data_op_req_impl<iswrite>> &container, async_op_flags flags, completion_returntype(F::*f)(size_t, async_io_op, detail::async_data_op_req_impl<iswrite>));
+    template<class F> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC std::pair<std::vector<future<std::pair<std::vector<directory_entry>, bool>>>, std::vector<async_io_op>> chain_async_ops(int optype, const std::vector<async_enumerate_op_req> &container, async_op_flags flags, completion_returntype(F::*f)(size_t, async_io_op, async_enumerate_op_req, std::shared_ptr<promise<std::pair<std::vector<directory_entry>, bool>>>));
+    template<class T> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC async_file_io_dispatcher_base::completion_returntype dobarrier(size_t id, async_io_op h, T);
 
 #ifndef BOOST_NO_CXX11_VARIADIC_TEMPLATES
     
-    template<class F, class... Args> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC std::shared_ptr<async_io_handle> invoke_async_op_completions(size_t id, async_io_op h, exception_ptr *e, completion_returntype(F::*f)(size_t, async_io_op, exception_ptr *, Args...), Args... args);
-    template<class F, class... Args> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC async_io_op chain_async_op(exception_ptr *he, detail::immediate_async_ops &immediates, int optype, const async_io_op &precondition, async_op_flags flags, completion_returntype(F::*f)(size_t, async_io_op, exception_ptr *, Args...), Args... args);
+    template<class F, class... Args> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC std::shared_ptr<async_io_handle> invoke_async_op_completions(size_t id, async_io_op h, completion_returntype(F::*f)(size_t, async_io_op, Args...), Args... args);
+    template<class F, class... Args> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC async_io_op chain_async_op(detail::immediate_async_ops &immediates, int optype, const async_io_op &precondition, async_op_flags flags, completion_returntype(F::*f)(size_t, async_io_op, Args...), Args... args);
 
 #else
 
@@ -1533,8 +1546,8 @@ protected:
     BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC                                                            \
     std::shared_ptr<async_io_handle>                                                        \
     invoke_async_op_completions                                                                     \
-    (size_t id, async_io_op h, exception_ptr *,                        \
-    completion_returntype (F::*f)(size_t, async_io_op, exception_ptr * \
+    (size_t id, async_io_op h,                        \
+    completion_returntype (F::*f)(size_t, async_io_op \
     BOOST_PP_COMMA_IF(N)                                                                            \
     BOOST_PP_ENUM_PARAMS(N, A))                                                                     \
     BOOST_PP_COMMA_IF(N)                                                                            \
@@ -1552,9 +1565,9 @@ protected:
     BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC                                                            \
     async_io_op                                      /* return type */                              \
     chain_async_op                                   /* function name */                            \
-    (exception_ptr *he, detail::immediate_async_ops &immediates, int optype,           /* parameters start */          \
+    (detail::immediate_async_ops &immediates, int optype,           /* parameters start */          \
     const async_io_op &precondition,async_op_flags flags,                                           \
-    completion_returntype (F::*f)(size_t, async_io_op, exception_ptr * \
+    completion_returntype (F::*f)(size_t, async_io_op \
     BOOST_PP_COMMA_IF(N)                                                                            \
     BOOST_PP_ENUM_PARAMS(N, A))                                                                     \
     BOOST_PP_COMMA_IF(N)                                                                            \
@@ -1595,7 +1608,7 @@ namespace detail
         when_all_count_completed_state(std::vector<async_io_op> _inputs) : inputs(std::move(_inputs)), togo(inputs.size()), out(inputs.size()) { }
         when_all_count_completed_state(std::vector<async_io_op>::iterator first, std::vector<async_io_op>::iterator last) : inputs(first, last), togo(inputs.size()), out(inputs.size()) { }
     };
-    inline async_file_io_dispatcher_base::completion_returntype when_all_count_completed_nothrow(size_t, async_io_op op, exception_ptr *e, std::shared_ptr<detail::when_all_count_completed_state> state, size_t idx)
+    inline async_file_io_dispatcher_base::completion_returntype when_all_count_completed_nothrow(size_t, async_io_op op, std::shared_ptr<detail::when_all_count_completed_state> state, size_t idx)
     {
         std::shared_ptr<async_io_handle> h(op.get(true));
         state->out[idx]=h; // This might look thread unsafe, but each idx is unique
@@ -1603,7 +1616,7 @@ namespace detail
             state->done.set_value(state->out);
         return std::make_pair(true, h);
     }
-    inline async_file_io_dispatcher_base::completion_returntype when_all_count_completed(size_t, async_io_op op, exception_ptr *e, std::shared_ptr<detail::when_all_count_completed_state> state, size_t idx)
+    inline async_file_io_dispatcher_base::completion_returntype when_all_count_completed(size_t, async_io_op op, std::shared_ptr<detail::when_all_count_completed_state> state, size_t idx)
     {
         std::shared_ptr<async_io_handle> h(op.get(true));
         state->out[idx]=h; // This might look thread unsafe, but each idx is unique
@@ -1656,7 +1669,7 @@ namespace detail
                 size_t idx=0;
                 BOOST_FOREACH(auto &i, inputs)
                 {
-                    callbacks.push_back(std::make_pair(async_op_flags::immediate/*safe if nothrow*/, std::bind(&detail::when_all_count_completed_nothrow, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, state, idx++)));
+                    callbacks.push_back(std::make_pair(async_op_flags::immediate/*safe if nothrow*/, std::bind(&detail::when_all_count_completed_nothrow, std::placeholders::_1, std::placeholders::_2, state, idx++)));
                 }
                 inputs.front().parent->completion(inputs, callbacks);
                 return state->done.get_future();
@@ -1702,7 +1715,7 @@ namespace detail
                 size_t idx=0;
                 BOOST_FOREACH(auto &i, inputs)
                 {
-                    callbacks.push_back(std::make_pair(async_op_flags::none/*can't be immediate as may try to retrieve exception state of own precondition*/, std::bind(&detail::when_all_count_completed, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, state, idx++)));
+                    callbacks.push_back(std::make_pair(async_op_flags::none/*can't be immediate as may try to retrieve exception state of own precondition*/, std::bind(&detail::when_all_count_completed, std::placeholders::_1, std::placeholders::_2, state, idx++)));
                 }
                 inputs.front().parent->completion(inputs, callbacks);
                 return state->done.get_future();
@@ -2566,7 +2579,7 @@ inline async_io_op async_file_io_dispatcher_base::completion(const async_io_op &
     return std::move(completion(r, i).front());
 }
 namespace detail {
-    template<class tasktype> std::pair<bool, std::shared_ptr<async_io_handle>> doCall(size_t, async_io_op _, exception_ptr *, std::shared_ptr<tasktype> c)
+    template<class tasktype> std::pair<bool, std::shared_ptr<async_io_handle>> doCall(size_t, async_io_op _, std::shared_ptr<tasktype> c)
     {
         (*c)();
         return std::make_pair(true, _.get(true));
@@ -2584,7 +2597,7 @@ template<class R> inline std::pair<std::vector<shared_future<R>>, std::vector<as
     {
         std::shared_ptr<tasktype> c(std::make_shared<tasktype>(std::function<R()>(t)));
         retfutures.push_back(c->get_future());
-        callbacks.push_back(std::make_pair(async_op_flags::none, std::bind(&detail::doCall<tasktype>, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::move(c))));
+        callbacks.push_back(std::make_pair(async_op_flags::none, std::bind(&detail::doCall<tasktype>, std::placeholders::_1, std::placeholders::_2, std::move(c))));
     }
     return std::make_pair(std::move(retfutures), completion(ops, callbacks));
 }

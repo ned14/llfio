@@ -36,3 +36,50 @@ The page size of this architecture.
 
 [endsect]
 
+[section:complete_async_op_3 complete_async_op]
+
+'''<indexterm><primary>complete_async_op</primary></indexterm>'''
+Completes an operation with a handle or an error, usually used when an operation was previously deferred.
+
+[heading Synopsis]
+``void async_file_io_dispatcher_base::complete_async_op(size_t id, std::shared_ptr< async_io_handle > h, exception_ptr e = exception_ptr())``
+
+[heading Parameters]
+
+[table
+[[Type] [Concept] [Name] [Description] ]
+[[size_t] [] [id] []]
+[[std::shared_ptr< async_io_handle >] [] [h] []]
+[[exception_ptr] [] [e] []]
+]
+
+
+[heading Header]
+`#include <boost/afio/afio.hpp>`
+
+
+[endsect]
+
+[section:complete_async_op_2 complete_async_op]
+
+'''<indexterm><primary>complete_async_op</primary></indexterm>'''
+Completes an operation with an error, usually used when an operation was previously deferred.
+
+[heading Synopsis]
+``void async_file_io_dispatcher_base::complete_async_op(size_t id, exception_ptr e)``
+
+[heading Parameters]
+
+[table
+[[Type] [Concept] [Name] [Description] ]
+[[size_t] [] [id] []]
+[[exception_ptr] [] [e] []]
+]
+
+
+[heading Header]
+`#include <boost/afio/afio.hpp>`
+
+
+[endsect]
+

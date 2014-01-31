@@ -55,15 +55,23 @@ class enqueued_task< R()>
 
 
 ]]
-[[``future< R > get_future()``
+[[``void set_task(std::function< R()> _task)``
 
-] [Returns the future corresponding to the future return value of the task. ] [
+] [Sets the task. ] [[* std::function< R()>]: ['_task]:  
+
+
+
+
+]]
+[[``shared_future< R > get_future()``
+
+] [Returns the shared future corresponding to the future return value of the task. ] [
 
 
 ]]
 [[``void set_future_exception(exception_ptr e)``
 
-] [Sets the future corresponding to the future return value of the task. ] [[* exception_ptr]: ['e]:  
+] [Sets the shared future corresponding to the future return value of the task. ] [[* exception_ptr]: ['e]:  
 
 
 
@@ -71,21 +79,15 @@ class enqueued_task< R()>
 ]]
 [[``void disable_auto_set_future(bool v = true)``
 
-] [Disables the task setting the future return value. ] [[* bool]: ['v]:  
+] [Disables the task setting the shared future return value. ] [[* bool]: ['v]:  
 
 
 
 
 ]]
-[[`` enqueued_task()``
+[[`` enqueued_task(std::function< R()> _task = std::function< R()>())``
 
-] [Default constructor. ] [
-
-
-]]
-[[`` enqueued_task(std::function< R()> c)``
-
-] [Constructs an enqueued task calling ['c]. ] [[* std::function< R()>]: ['c]:  
+] [Default constructor. ] [[* std::function< R()>]: ['_task]:  
 
 
 
@@ -94,7 +96,7 @@ class enqueued_task< R()>
 [[``template<class T>
 void set_future_value(T v)``
 
-] [Sets the future corresponding to the future return value of the task. ] [[* T]: ['v]:  
+] [Sets the shared future corresponding to the future return value of the task. ] [[* T]: ['v]:  
 
 
 
@@ -102,7 +104,7 @@ void set_future_value(T v)``
 ]]
 [[``void operator()()``
 
-] [Invokes the callable, setting the future to the value it returns. ] [
+] [Invokes the callable, setting the shared future to the value it returns. ] [
 
 
 ]]

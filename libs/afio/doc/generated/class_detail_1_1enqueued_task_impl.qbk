@@ -31,15 +31,9 @@ class detail::enqueued_task_impl
 [heading Constructor(s)]
 [table
 [[Function] [Description] [Parameters] ]
-[[``enqueued_task_impl()``
+[[``enqueued_task_impl(std::function< R()> _task = std::function< R()>())``
 
-] [Default constructor. ] [
-
-
-]]
-[[``enqueued_task_impl(std::function< R()> c)``
-
-] [Constructs an enqueued task calling ['c]. ] [[* std::function< R()>]: ['c]:  
+] [Default constructor. ] [[* std::function< R()>]: ['_task]:  
 
 
 
@@ -70,15 +64,23 @@ class detail::enqueued_task_impl
 
 
 ]]
-[[``future< R > get_future()``
+[[``void set_task(std::function< R()> _task)``
 
-] [Returns the future corresponding to the future return value of the task. ] [
+] [Sets the task. ] [[* std::function< R()>]: ['_task]:  
+
+
+
+
+]]
+[[``shared_future< R > get_future()``
+
+] [Returns the shared future corresponding to the future return value of the task. ] [
 
 
 ]]
 [[``void set_future_exception(exception_ptr e)``
 
-] [Sets the future corresponding to the future return value of the task. ] [[* exception_ptr]: ['e]:  
+] [Sets the shared future corresponding to the future return value of the task. ] [[* exception_ptr]: ['e]:  
 
 
 
@@ -86,7 +88,7 @@ class detail::enqueued_task_impl
 ]]
 [[``void disable_auto_set_future(bool v = true)``
 
-] [Disables the task setting the future return value. ] [[* bool]: ['v]:  
+] [Disables the task setting the shared future return value. ] [[* bool]: ['v]:  
 
 
 

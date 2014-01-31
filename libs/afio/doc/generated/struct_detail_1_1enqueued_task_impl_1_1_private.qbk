@@ -19,6 +19,7 @@
 {
   std::function< R()> task;
   promise< R > r;
+  shared_future< R > f;
   bool autoset;
   atomic< int > done;
 };
