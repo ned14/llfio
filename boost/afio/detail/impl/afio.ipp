@@ -775,7 +775,7 @@ async_file_io_dispatcher_base::~async_file_io_dispatcher_base()
                                     "   id=" << op.first << " type=" << detail::optypes[static_cast<size_t>(op.second->optype)] << " flags=0x" << std::hex << static_cast<size_t>(op.second->flags) << std::dec << " status=" << statuses[(((int) it->second.second)>=0 && ((int) it->second.second)<=2) ? (int) it->second.second : 3] << " handle_usecount=" << op.second->h.use_count() << " failcount=" << it->second.first << " Completions:";
                                 BOOST_FOREACH(auto &c, op.second->completions)
                                 {
-                                    std::cerr << " id=" << std::get<0>(c);
+                                    std::cerr << " id=" << c.first;
                                 }
                                 std::cerr << std::endl;
 #ifdef BOOST_AFIO_OP_STACKBACKTRACEDEPTH
@@ -1059,8 +1059,8 @@ BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC void async_file_io_dispatcher_base::complet
     {
         BOOST_FOREACH(auto &c, thisop->completions)
         {
-            detail::async_file_io_dispatcher_op *c_op=std::get<1>(c).get();
-            BOOST_AFIO_DEBUG_PRINT("X %u (f=%u) > %u\n", (unsigned) id, (unsigned) c_op->flags, (unsigned) std::get<0>(c));
+            detail::async_file_io_dispatcher_op *c_op=c.second.get();
+            BOOST_AFIO_DEBUG_PRINT("X %u (f=%u) > %u\n", (unsigned) id, (unsigned) c_op->flags, (unsigned) c.first);
             if(!!(c_op->flags & async_op_flags::immediate))
                 immediates.enqueue(c_op->enqueuement);
             else
