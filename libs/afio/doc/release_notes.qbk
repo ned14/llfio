@@ -36,6 +36,32 @@ using a shocking amount of RAM.
 
 
 [/=================]
+[heading Boost 1.56 AFIO v1.20]
+[/=================]
+
+This is a major refactor of AFIO's core op dispatch engine to trim it down by
+about 15%. Key breaking differences from the v1.1 series of AFIO are as follows:
+
+* Replaced all use of packaged_task with enqueued_task, a custom implementation
+which makes possible many performance improvements throughout the engine.
+* thread_source::enqueue() now can take a preprepared enqueued_task.
+* thread_source::enqueue() now always returns a shared_future instead of a future.
+This has had knock on effects throughout AFIO, so many futures are now shared_future.
+* Completion handler spec has changed from:
+ 
+  pair<bool, shared_ptr<async_io_handle>> (*)(size_t id, shared_ptr<async_io_handle> h, exception_ptr *e)
+ 
+ to:
+
+  pair<bool, shared_ptr<async_io_handle>> (*)(size_t id, async_io_op preceding)
+ 
+ This substantially improves performance, simplifies the implementation, and lets
+ completion handlers more readily retrieve the error state of preceding operations
+ and react appropriately.
+ 
+
+
+[/=================]
 [heading Boost 1.56 AFIO v1.11]
 [/=================]
 
@@ -66,11 +92,6 @@ this.
 
 boost::afio::stat_t::st_mode() is now st_perms(). Also disabled unused fields in
 stat_t on Windows. Thanks to Bjorn Reese for suggesting this.
-
-Replaced all use of packaged_task with enqueued_task, a custom implementation
-which enables many performance improvements throughout the engine and makes
-possible replacing shared_ptr<async_io_handle> in completion handlers with
-async_io_op.
 
 [/=================]
 [heading Boost 1.55 AFIO v1.1]

@@ -850,11 +850,16 @@ async_file_io_dispatcher_base::~async_file_io_dispatcher_base()
             break;
         }
     }
-#endif
-    while(!p->fds.empty())
+    for(size_t n=0; !p->fds.empty(); n++)
     {
-        boost::afio::this_thread::sleep_for(boost::afio::chrono::milliseconds(1));
+        boost::afio::this_thread::sleep_for(boost::afio::chrono::milliseconds(10));
+        if(n>300)
+        {
+            std::cerr << "WARNING: ~async_file_dispatcher_base() sees no change in " << p->fds.size() << " stuck shared_ptr<async_io_handle>'s, so exiting destructor wait" << std::endl;
+            break;
+        }
     }
+#endif
     delete p;
 }
 
