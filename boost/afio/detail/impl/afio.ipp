@@ -1004,7 +1004,7 @@ BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC void async_file_io_dispatcher_base::complet
 {
     detail::immediate_async_ops immediates;
     std::shared_ptr<detail::async_file_io_dispatcher_op> thisop;
-	BOOST_BEGIN_MEMORY_TRANSACTION(p->opslock)
+    BOOST_BEGIN_MEMORY_TRANSACTION(p->opslock)
     {
         // Find me in ops, remove my completions and delete me from extant ops
         auto it=p->ops.find(id);
@@ -1051,16 +1051,16 @@ BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC void async_file_io_dispatcher_base::complet
         assert(thisop->h->get()==h);*/
     }
     BOOST_AFIO_DEBUG_PRINT("X %u %p e=%d f=%p (uc=%u, c=%u)\n", (unsigned) id, h.get(), !!e, thisop->h.get(), (unsigned) h.use_count(), (unsigned) thisop->completions.size());
-	// Ok so this op is now removed from the ops list and its future has been set.
-	// Because chain_async_op() holds the opslock during the finding of preconditions
-	// and adding ops to its completions, we can now safely detach our completions
-	// into stack storage and process them from there without holding any locks
-	std::vector<detail::async_file_io_dispatcher_op::completion_t> completions;
-	BOOST_BEGIN_MEMORY_TRANSACTION(p->opslock)
-	{
-		completions=std::move(thisop->completions);
-	}
-	BOOST_END_MEMORY_TRANSACTION(p->opslock)
+    // Ok so this op is now removed from the ops list and its future has been set.
+    // Because chain_async_op() holds the opslock during the finding of preconditions
+    // and adding ops to its completions, we can now safely detach our completions
+    // into stack storage and process them from there without holding any locks
+    std::vector<detail::async_file_io_dispatcher_op::completion_t> completions;
+    BOOST_BEGIN_MEMORY_TRANSACTION(p->opslock)
+    {
+        completions=std::move(thisop->completions);
+    }
+    BOOST_END_MEMORY_TRANSACTION(p->opslock)
     if(!completions.empty())
     {
         BOOST_FOREACH(auto &c, completions)
@@ -1232,7 +1232,7 @@ template<class F, class... Args> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC async_io_o
     bool done=false;
     if(precondition.id)
     {
-        // If still in flight, chain completionref to be executed when precondition completes
+        // If still in flight, chain item to be executed when precondition completes
         BOOST_BEGIN_MEMORY_TRANSACTION(p->opslock)
         {
             auto dep(p->ops.find(precondition.id));

@@ -853,8 +853,8 @@ struct async_io_op
     \param _parent The dispatcher this op belongs to.
     \param _id The unique non-zero id of this op.
     \param _handle A shared_ptr to shared state between all instances of this reference.
-	\param check_handle Whether to have validation additionally check if a handle is not null
-	\param validate Whether to check the inputs and shared state for valid (and not errored) values
+    \param check_handle Whether to have validation additionally check if a handle is not null
+    \param validate Whether to check the inputs and shared state for valid (and not errored) values
     */
     async_io_op(async_file_io_dispatcher_base *_parent, size_t _id, std::shared_ptr<shared_future<std::shared_ptr<async_io_handle>>> _handle, bool check_handle=true, bool validate=true) : parent(_parent), id(_id), h(std::move(_handle)) { if(validate) _validate(check_handle); }
     /*! Constructs an instance.
