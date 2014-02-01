@@ -12,8 +12,6 @@
 [heading Anticipated forthcoming features in future versions]
 [/=================]
 
-* Replace all shared_ptr<async_io_handle> in completion_t with async_io_op.
-
 * Async fast batch hash engine which provides transparent hashing of all async
 reads and writes (in progress).
   * New completion handler metaprogramming letting you bind add hash to each
@@ -49,16 +47,23 @@ which makes possible many performance improvements throughout the engine.
 This has had knock on effects throughout AFIO, so many futures are now shared_future.
 * Completion handler spec has changed from:
  
-  pair<bool, shared_ptr<async_io_handle>> (*)(size_t id, shared_ptr<async_io_handle> h, exception_ptr *e)
+   pair<bool, shared_ptr<async_io_handle>> (*)(size_t id, shared_ptr<async_io_handle> h, exception_ptr *e)
  
- to:
+  to:
 
-  pair<bool, shared_ptr<async_io_handle>> (*)(size_t id, async_io_op preceding)
+   pair<bool, shared_ptr<async_io_handle>> (*)(size_t id, async_io_op preceding)
  
- This substantially improves performance, simplifies the implementation, and lets
- completion handlers more readily retrieve the error state of preceding operations
- and react appropriately.
- 
+  This substantially improves performance, simplifies the implementation, and lets
+  completion handlers more readily retrieve the error state of preceding operations
+  and react appropriately.
+* All restrictions on immediate completions have been removed. You can now do anything
+in an immediate completion that you can do in a normal completion.
+* async_io_op::h now always refers to a correct future i.e. the future is no longer
+lazily allocated.
+* Now that op futures are always correct, when_all(ops) has been drastically simplified
+to an implementation which literally assembles the futures into a list and passes
+them to boost::wait_for_all().
+* Added when_any(ops).
 
 
 [/=================]

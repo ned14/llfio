@@ -363,7 +363,7 @@ futures become available.
 \complexity{O(N)}
 \exceptionmodel{The same as a future}
 */
-template <class InputIterator> inline shared_future<std::vector<typename std::decay<decltype(((typename InputIterator::value_type *) 0)->get())>::type>> when_all(InputIterator first, InputIterator last)
+template <class InputIterator, typename=typename std::enable_if<std::is_constructible<shared_future<typename std::decay<decltype(((typename InputIterator::value_type *) 0)->get())>::type>, typename InputIterator::value_type>::value>::type> inline shared_future<std::vector<typename std::decay<decltype(((typename InputIterator::value_type *) 0)->get())>::type>> when_all(InputIterator first, InputIterator last)
 {
     typedef typename InputIterator::value_type future_type;
     typedef typename std::decay<decltype(((typename InputIterator::value_type *) 0)->get())>::type value_type;
@@ -396,7 +396,7 @@ futures become available.
 \complexity{The same as boost::wait_for_any()}
 \exceptionmodel{The same as a future}
 */
-template <class InputIterator> inline shared_future<std::pair<size_t, typename std::decay<decltype(((typename InputIterator::value_type *) 0)->get())>::type>> when_any(InputIterator first, InputIterator last)
+template <class InputIterator, typename=typename std::enable_if<std::is_constructible<shared_future<typename std::decay<decltype(((typename InputIterator::value_type *) 0)->get())>::type>, typename InputIterator::value_type>::value>::type> inline shared_future<std::pair<size_t, typename std::decay<decltype(((typename InputIterator::value_type *) 0)->get())>::type>> when_any(InputIterator first, InputIterator last)
 {
     typedef typename InputIterator::value_type future_type;
     typedef typename std::decay<decltype(((typename InputIterator::value_type *) 0)->get())>::type value_type;
@@ -1599,159 +1599,111 @@ BOOST_AFIO_HEADERS_ONLY_FUNC_SPEC std::shared_ptr<async_file_io_dispatcher_base>
 
 namespace detail
 {
-    struct when_all_count_completed_state
+    struct when_all_state : std::enable_shared_from_this<when_all_state>
     {
-        std::vector<async_io_op> inputs;
-        atomic<size_t> togo;
-        std::vector<std::shared_ptr<async_io_handle>> out;
-        promise<std::vector<std::shared_ptr<async_io_handle>>> done;
-        when_all_count_completed_state(std::vector<async_io_op> _inputs) : inputs(std::move(_inputs)), togo(inputs.size()), out(inputs.size()) { }
-        when_all_count_completed_state(std::vector<async_io_op>::iterator first, std::vector<async_io_op>::iterator last) : inputs(first, last), togo(inputs.size()), out(inputs.size()) { }
+        promise<std::vector<std::shared_ptr<async_io_handle>>> out;
+        std::vector<shared_future<std::shared_ptr<async_io_handle>>> in;
     };
-    inline async_file_io_dispatcher_base::completion_returntype when_all_count_completed_nothrow(size_t, async_io_op op, std::shared_ptr<detail::when_all_count_completed_state> state, size_t idx)
+    template<bool rethrow> inline void when_all_do(std::shared_ptr<when_all_state> state)
     {
-        std::shared_ptr<async_io_handle> h(op.get(true));
-        state->out[idx]=h; // This might look thread unsafe, but each idx is unique
-        if(!--state->togo)
-            state->done.set_value(state->out);
-        return std::make_pair(true, h);
+        boost::wait_for_all(state->in.begin(), state->in.end());
+        std::vector<std::shared_ptr<async_io_handle>> ret;
+        ret.reserve(state->in.size());
+        BOOST_FOREACH(auto &i, state->in)
+        {
+            auto e(get_exception_ptr(i));
+            if(e)
+            {
+                if(rethrow)
+                {
+                    state->out.set_exception(e);
+                    return;
+                }
+                ret.push_back(std::shared_ptr<async_io_handle>());
+            }
+            else
+                ret.push_back(i.get());
+        }
+        state->out.set_value(ret);
     }
-    inline async_file_io_dispatcher_base::completion_returntype when_all_count_completed(size_t, async_io_op op, std::shared_ptr<detail::when_all_count_completed_state> state, size_t idx)
+    template<bool rethrow, class Iterator> inline future<std::vector<std::shared_ptr<async_io_handle>>> when_all(Iterator first, Iterator last)
     {
-        std::shared_ptr<async_io_handle> h(op.get(true));
-        state->out[idx]=h; // This might look thread unsafe, but each idx is unique
-        if(!--state->togo)
-        {
-            bool done=false;
-            // Retrieve the result of each input, waiting for it if it is between decrementing the
-            // atomic and signalling its future.
-            BOOST_FOREACH(auto &i, state->inputs)
-            {
-                shared_future<std::shared_ptr<async_io_handle>> &future=*i.h;
-                auto e(get_exception_ptr(future));
-                if(e)
-                {
-                    state->done.set_exception(e);
-                    done=true;
-                    break;
-                }
-            }
-            if(!done)
-                state->done.set_value(state->out);
-        }
-        return std::make_pair(true, h);
+        auto state=std::make_shared<when_all_state>();
+        state->in.reserve(std::distance(first, last));
+        for(; first!=last; ++first)
+            state->in.push_back(*first->h);
+        auto ret=state->out.get_future();
+        process_threadpool()->enqueue(std::bind(&when_all_do<rethrow>, state));
+        return std::move(ret);
     }
-    inline future<std::vector<std::shared_ptr<async_io_handle>>> when_all(std::nothrow_t _, std::shared_ptr<detail::when_all_count_completed_state> state)
+    struct when_any_state : std::enable_shared_from_this<when_any_state>
     {
-#ifdef BOOST_AFIO_NEED_CURRENT_EXCEPTION_HACK
-        // VS2010 segfaults if you ever do a try { throw; } catch(...) without an exception ever having been thrown :(
-        exception_ptr e;
-        try
-        {
-            throw detail::vs2010_lack_of_decent_current_exception_support_hack_t();
-        }
-        catch(...)
-        {
-            detail::vs2010_lack_of_decent_current_exception_support_hack()=boost::current_exception();
-            try
-            {
-#endif
-                std::vector<async_io_op> &inputs=state->inputs;
-#if BOOST_AFIO_VALIDATE_INPUTS
-                BOOST_FOREACH(auto &i, inputs)
-                {
-                    if(!i.validate(false))
-                        BOOST_AFIO_THROW(std::invalid_argument("Inputs are invalid."));
-                }
-#endif
-                std::vector<std::pair<async_op_flags, std::function<async_file_io_dispatcher_base::completion_t>>> callbacks;
-                callbacks.reserve(inputs.size());
-                size_t idx=0;
-                BOOST_FOREACH(auto &i, inputs)
-                {
-                    callbacks.push_back(std::make_pair(async_op_flags::immediate/*safe if nothrow*/, std::bind(&detail::when_all_count_completed_nothrow, std::placeholders::_1, std::placeholders::_2, state, idx++)));
-                }
-                inputs.front().parent->completion(inputs, callbacks);
-                return state->done.get_future();
-#ifdef BOOST_AFIO_NEED_CURRENT_EXCEPTION_HACK
-            }
-            catch(...)
-            {
-                e=afio::make_exception_ptr(afio::current_exception());
-            }
-        }
+        promise<std::shared_ptr<async_io_handle>> out;
+        std::vector<shared_future<std::shared_ptr<async_io_handle>>> in;
+    };
+    template<bool rethrow> inline void when_any_do(std::shared_ptr<when_any_state> state)
+    {
+        auto &i=*boost::wait_for_any(state->in.begin(), state->in.end());
+        auto e(get_exception_ptr(i));
         if(e)
-            rethrow_exception(e);
+        {
+            if(rethrow)
+            {
+                state->out.set_exception(e);
+                return;
+            }
+            state->out.set_value(std::shared_ptr<async_io_handle>());
+        }
         else
-            BOOST_AFIO_THROW_FATAL(std::runtime_error("Exception pointer null despite exiting via exception handling code path."));
-        return future<std::vector<std::shared_ptr<async_io_handle>>>();
-#endif
+            state->out.set_value(i.get());
     }
-    inline future<std::vector<std::shared_ptr<async_io_handle>>> when_all(std::shared_ptr<detail::when_all_count_completed_state> state)
+    template<bool rethrow, class Iterator> inline future<std::shared_ptr<async_io_handle>> when_any(Iterator first, Iterator last)
     {
-#ifdef BOOST_AFIO_NEED_CURRENT_EXCEPTION_HACK
-        // VS2010 segfaults if you ever do a try { throw; } catch(...) without an exception ever having been thrown :(
-        exception_ptr e;
-        try
-        {
-            throw detail::vs2010_lack_of_decent_current_exception_support_hack_t();
-        }
-        catch(...)
-        {
-            detail::vs2010_lack_of_decent_current_exception_support_hack()=boost::current_exception();
-            try
-            {
-#endif
-                std::vector<async_io_op> &inputs=state->inputs;
-#if BOOST_AFIO_VALIDATE_INPUTS
-                BOOST_FOREACH(auto &i, inputs)
-                {
-                    if(!i.validate(false))
-                        BOOST_AFIO_THROW(std::invalid_argument("Inputs are invalid."));
-                }
-#endif
-                std::vector<std::pair<async_op_flags, std::function<async_file_io_dispatcher_base::completion_t>>> callbacks;
-                callbacks.reserve(inputs.size());
-                size_t idx=0;
-                BOOST_FOREACH(auto &i, inputs)
-                {
-                    callbacks.push_back(std::make_pair(async_op_flags::none/*can't be immediate as may try to retrieve exception state of own precondition*/, std::bind(&detail::when_all_count_completed, std::placeholders::_1, std::placeholders::_2, state, idx++)));
-                }
-                inputs.front().parent->completion(inputs, callbacks);
-                return state->done.get_future();
-#ifdef BOOST_AFIO_NEED_CURRENT_EXCEPTION_HACK
-            }
-            catch(...)
-            {
-                e=afio::make_exception_ptr(afio::current_exception());
-            }
-        }
-        if(e)
-            rethrow_exception(e);
-        else
-            BOOST_AFIO_THROW_FATAL(std::runtime_error("Exception pointer null despite exiting via exception handling code path."));
-        return future<std::vector<std::shared_ptr<async_io_handle>>>();
-#endif
+        auto state=std::make_shared<when_any_state>();
+        state->in.reserve(std::distance(first, last));
+        for(; first!=last; ++first)
+            state->in.push_back(*first->h);
+        auto ret=state->out.get_future();
+        process_threadpool()->enqueue(std::bind(&when_any_do<rethrow>, state));
+        return std::move(ret);
     }
 }
 
 /*! \brief Returns a result when all the supplied ops complete. Does not propagate exception states.
 
 \return A future vector of shared_ptr's to async_io_handle.
+\tparam "class Iterator" An iterator type.
 \param _ An instance of std::nothrow_t.
 \param first A vector iterator pointing to the first async_io_op to wait upon.
 \param last A vector iterator pointing after the last async_io_op to wait upon.
 \ingroup when_all_ops
 \qbk{distinguish, iterator batch of ops not exception propagating}
-\complexity{O(N) to dispatch. O(N/threadpool) to complete, but at least one cache line is contended between threads.}
+\complexity{O(N).}
 \exceptionmodel{Non propagating}
 */
-inline future<std::vector<std::shared_ptr<async_io_handle>>> when_all(std::nothrow_t _, std::vector<async_io_op>::iterator first, std::vector<async_io_op>::iterator last)
+template<class Iterator, typename=typename std::enable_if<std::is_constructible<async_io_op, typename Iterator::value_type>::value>::type> inline future<std::vector<std::shared_ptr<async_io_handle>>> when_all(std::nothrow_t _, Iterator first, Iterator last)
 {
     if(first==last)
         return future<std::vector<std::shared_ptr<async_io_handle>>>();
-    auto state(std::make_shared<detail::when_all_count_completed_state>(first, last));
-    return detail::when_all(_, state);
+    return detail::when_all<false>(first, last);
+}
+/*! \brief Returns a result when any the supplied ops complete. Does not propagate exception states.
+
+\return A future vector of shared_ptr's to async_io_handle.
+\tparam "class Iterator" An iterator type.
+\param _ An instance of std::nothrow_t.
+\param first A vector iterator pointing to the first async_io_op to wait upon.
+\param last A vector iterator pointing after the last async_io_op to wait upon.
+\ingroup when_any_ops
+\qbk{distinguish, iterator batch of ops not exception propagating}
+\complexity{O(N).}
+\exceptionmodel{Non propagating}
+*/
+template<class Iterator, typename=typename std::enable_if<std::is_constructible<async_io_op, typename Iterator::value_type>::value>::type> inline future<std::shared_ptr<async_io_handle>> when_any(std::nothrow_t _, Iterator first, Iterator last)
+{
+    if(first==last)
+        return future<std::shared_ptr<async_io_handle>>();
+    return detail::when_any<false>(first, last);
 }
 /*! \brief Returns a result when all the supplied ops complete. Does not propagate exception states.
 
@@ -1760,32 +1712,64 @@ inline future<std::vector<std::shared_ptr<async_io_handle>>> when_all(std::nothr
 \param ops A vector of the async_io_ops to wait upon.
 \ingroup when_all_ops
 \qbk{distinguish, vector batch of ops not exception propagating}
-\complexity{O(N) to dispatch. O(N/threadpool) to complete, but at least one cache line is contended between threads.}
+\complexity{O(N).}
 \exceptionmodel{Non propagating}
 */
 inline future<std::vector<std::shared_ptr<async_io_handle>>> when_all(std::nothrow_t _, std::vector<async_io_op> ops)
 {
     if(ops.empty())
         return future<std::vector<std::shared_ptr<async_io_handle>>>();
-    auto state(std::make_shared<detail::when_all_count_completed_state>(std::move(ops)));
-    return detail::when_all(_, state);
+    return detail::when_all<false>(ops.begin(), ops.end());
+}
+/*! \brief Returns a result when any the supplied ops complete. Does not propagate exception states.
+
+\return A future vector of shared_ptr's to async_io_handle.
+\param _ An instance of std::nothrow_t.
+\param ops A vector of the async_io_ops to wait upon.
+\ingroup when_any_ops
+\qbk{distinguish, vector batch of ops not exception propagating}
+\complexity{O(N).}
+\exceptionmodel{Non propagating}
+*/
+inline future<std::shared_ptr<async_io_handle>> when_any(std::nothrow_t _, std::vector<async_io_op> ops)
+{
+    if(ops.empty())
+        return future<std::shared_ptr<async_io_handle>>();
+    return detail::when_any<false>(ops.begin(), ops.end());
 }
 /*! \brief Returns a result when all the supplied ops complete. Propagates exception states.
 
 \return A future vector of shared_ptr's to async_io_handle.
+\tparam "class Iterator" An iterator type.
 \param first A vector iterator pointing to the first async_io_op to wait upon.
 \param last A vector iterator pointing after the last async_io_op to wait upon.
 \ingroup when_all_ops
 \qbk{distinguish, iterator batch of ops exception propagating}
-\complexity{O(N) to dispatch. O(N/threadpool) to complete, but at least one cache line is contended between threads.}
+\complexity{O(N).}
 \exceptionmodel{Propagating}
 */
-inline future<std::vector<std::shared_ptr<async_io_handle>>> when_all(std::vector<async_io_op>::iterator first, std::vector<async_io_op>::iterator last)
+template<class Iterator, typename=typename std::enable_if<std::is_constructible<async_io_op, typename Iterator::value_type>::value>::type> inline future<std::vector<std::shared_ptr<async_io_handle>>> when_all(Iterator first, Iterator last)
 {
     if(first==last)
         return future<std::vector<std::shared_ptr<async_io_handle>>>();
-    auto state(std::make_shared<detail::when_all_count_completed_state>(first, last));
-    return detail::when_all(state);
+    return detail::when_all<true>(first, last);
+}
+/*! \brief Returns a result when any the supplied ops complete. Propagates exception states.
+
+\return A future vector of shared_ptr's to async_io_handle.
+\tparam "class Iterator" An iterator type.
+\param first A vector iterator pointing to the first async_io_op to wait upon.
+\param last A vector iterator pointing after the last async_io_op to wait upon.
+\ingroup when_any_ops
+\qbk{distinguish, iterator batch of ops exception propagating}
+\complexity{O(N).}
+\exceptionmodel{Propagating}
+*/
+template<class Iterator, typename=typename std::enable_if<std::is_constructible<async_io_op, typename Iterator::value_type>::value>::type> inline future<std::shared_ptr<async_io_handle>> when_any(Iterator first, Iterator last)
+{
+    if(first==last)
+        return future<std::shared_ptr<async_io_handle>>();
+    return detail::when_any<true>(first, last);
 }
 /*! \brief Returns a result when all the supplied ops complete. Propagates exception states.
 
@@ -1793,15 +1777,29 @@ inline future<std::vector<std::shared_ptr<async_io_handle>>> when_all(std::vecto
 \param ops A vector of the async_io_ops to wait upon.
 \ingroup when_all_ops
 \qbk{distinguish, vector batch of ops exception propagating}
-\complexity{O(N) to dispatch. O(N/threadpool) to complete, but at least one cache line is contended between threads.}
+\complexity{O(N).}
 \exceptionmodel{Propagating}
 */
 inline future<std::vector<std::shared_ptr<async_io_handle>>> when_all(std::vector<async_io_op> ops)
 {
     if(ops.empty())
         return future<std::vector<std::shared_ptr<async_io_handle>>>();
-    auto state(std::make_shared<detail::when_all_count_completed_state>(std::move(ops)));
-    return detail::when_all(state);
+    return detail::when_all<true>(ops.begin(), ops.end());
+}
+/*! \brief Returns a result when any the supplied ops complete. Propagates exception states.
+
+\return A future vector of shared_ptr's to async_io_handle.
+\param ops A vector of the async_io_ops to wait upon.
+\ingroup when_any_ops
+\qbk{distinguish, vector batch of ops exception propagating}
+\complexity{O(N).}
+\exceptionmodel{Propagating}
+*/
+inline future<std::shared_ptr<async_io_handle>> when_any(std::vector<async_io_op> ops)
+{
+    if(ops.empty())
+        return future<std::shared_ptr<async_io_handle>>();
+    return detail::when_any<true>(ops.begin(), ops.end());
 }
 /*! \brief Returns a result when the supplied op completes. Does not propagate exception states.
 
@@ -1810,7 +1808,7 @@ inline future<std::vector<std::shared_ptr<async_io_handle>>> when_all(std::vecto
 \param op An async_io_op to wait upon.
 \ingroup when_all_ops
 \qbk{distinguish, convenience single op not exception propagating}
-\complexity{O(1) to dispatch. O(1) to complete.}
+\complexity{O(1).}
 \exceptionmodel{Non propagating}
 */
 inline future<std::vector<std::shared_ptr<async_io_handle>>> when_all(std::nothrow_t _, async_io_op op)
@@ -1824,7 +1822,7 @@ inline future<std::vector<std::shared_ptr<async_io_handle>>> when_all(std::nothr
 \param op An async_io_op to wait upon.
 \ingroup when_all_ops
 \qbk{distinguish, convenience single op exception propagating}
-\complexity{O(1) to dispatch. O(1) to complete.}
+\complexity{O(1).}
 \exceptionmodel{Non propagating}
 */
 inline future<std::vector<std::shared_ptr<async_io_handle>>> when_all(async_io_op op)

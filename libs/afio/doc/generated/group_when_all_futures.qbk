@@ -18,7 +18,7 @@ Makes a future vector of results from all the supplied futures.
 This is an implementation of WG21 N3634's when\u005fall() which uses process\u005fthreadpool() to allow you to create a future which only becomes available when all the supplied futures become available.
 
 [heading Synopsis]
-``template<class InputIterator>
+``template<class InputIterator, typename, ::type>
 shared_future<std::vector<typename std::decay<decltype(((typename InputIterator::value_type *) 0)->get())>::type> > when_all(InputIterator first, InputIterator last)``
 
 [heading Parameters]
@@ -26,6 +26,8 @@ shared_future<std::vector<typename std::decay<decltype(((typename InputIterator:
 [table
 [[Type] [Concept] [Name] [Description] ]
 [[class InputIterator] [A type modelling an iterator ] [ - ] [Must be specified]]
+[[] [] [ - ] [Must be specified]]
+[[::type] [] [ - ] [Must be specified]]
 [[InputIterator] [] [first] [An iterator pointing to the first item to wait upon ]]
 [[InputIterator] [] [last] [An iterator pointing to after the last future to wait upon]]
 ]
@@ -54,7 +56,7 @@ Makes a future result from the first of the supplied futures to become available
 This is an implementation of WG21 N3634's when\u005fany() which uses process\u005fthreadpool() to allow you to create a future which only becomes available when the first of the supplied futures become available.
 
 [heading Synopsis]
-``template<class InputIterator>
+``template<class InputIterator, typename, ::type>
 shared_future<std::pair<size_t, typename std::decay<decltype(((typename InputIterator::value_type *) 0)->get())>::type> > when_any(InputIterator first, InputIterator last)``
 
 [heading Parameters]
@@ -62,6 +64,8 @@ shared_future<std::pair<size_t, typename std::decay<decltype(((typename InputIte
 [table
 [[Type] [Concept] [Name] [Description] ]
 [[class InputIterator] [A type modelling an iterator ] [ - ] [Must be specified]]
+[[] [] [ - ] [Must be specified]]
+[[::type] [] [ - ] [Must be specified]]
 [[InputIterator] [] [first] [An iterator pointing to the first future to wait upon ]]
 [[InputIterator] [] [last] [An iterator pointing to after the last future to wait upon]]
 ]
