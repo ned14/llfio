@@ -1004,9 +1004,7 @@ BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC void async_file_io_dispatcher_base::complet
 {
     detail::immediate_async_ops immediates;
     std::shared_ptr<detail::async_file_io_dispatcher_op> thisop;
-    std::vector<std::pair<size_t, std::shared_ptr<detail::async_file_io_dispatcher_op>>> completions;
-    bool docompletions=false;
-    BOOST_BEGIN_MEMORY_TRANSACTION(p->opslock)
+	BOOST_BEGIN_MEMORY_TRANSACTION(p->opslock)
     {
         // Find me in ops, remove my completions and delete me from extant ops
         auto it=p->ops.find(id);
@@ -1025,8 +1023,6 @@ BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC void async_file_io_dispatcher_base::complet
         thisop=it->second;
         // Erase me from ops
         p->ops.erase(it);
-        // Lookup any completions before losing opslock
-        docompletions=!thisop->completions.empty();
     }
     BOOST_END_MEMORY_TRANSACTION(p->opslock)
     // Early set future
@@ -1055,9 +1051,19 @@ BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC void async_file_io_dispatcher_base::complet
         assert(thisop->h->get()==h);*/
     }
     BOOST_AFIO_DEBUG_PRINT("X %u %p e=%d f=%p (uc=%u, c=%u)\n", (unsigned) id, h.get(), !!e, thisop->h.get(), (unsigned) h.use_count(), (unsigned) thisop->completions.size());
-    if(!thisop->completions.empty())
+	// Ok so this op is now removed from the ops list and its future has been set.
+	// Because chain_async_op() holds the opslock during the finding of preconditions
+	// and adding ops to its completions, we can now safely detach our completions
+	// into stack storage and process them from there without holding any locks
+	std::vector<detail::async_file_io_dispatcher_op::completion_t> completions;
+	BOOST_BEGIN_MEMORY_TRANSACTION(p->opslock)
+	{
+		completions=std::move(thisop->completions);
+	}
+	BOOST_END_MEMORY_TRANSACTION(p->opslock)
+    if(!completions.empty())
     {
-        BOOST_FOREACH(auto &c, thisop->completions)
+        BOOST_FOREACH(auto &c, completions)
         {
             detail::async_file_io_dispatcher_op *c_op=c.second.get();
             BOOST_AFIO_DEBUG_PRINT("X %u (f=%u) > %u\n", (unsigned) id, (unsigned) c_op->flags, (unsigned) c.first);
