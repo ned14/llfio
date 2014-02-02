@@ -1114,7 +1114,7 @@ public:
     template <class C                                                                               \
     BOOST_PP_COMMA_IF(N)                                                                            \
     BOOST_PP_ENUM_PARAMS(N, class A)>                                                               \
-    inline std::pair<future<typename std::result_of<C(BOOST_PP_ENUM_PARAMS(N, A))>::type>, async_io_op>  \
+    inline std::pair<shared_future<typename std::result_of<C(BOOST_PP_ENUM_PARAMS(N, A))>::type>, async_io_op>  \
     call (const async_io_op &req, C callback BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, a));     
 
   

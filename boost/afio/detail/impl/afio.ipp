@@ -1133,7 +1133,7 @@ template<class F, class... Args> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC std::share
     std::shared_ptr<async_io_handle>                                                        \
     async_file_io_dispatcher_base::invoke_async_op_completions                                      \
     (size_t id, async_io_op op,                        \
-    completion_returntype (F::*f)(size_t, async_io_op, \
+    completion_returntype (F::*f)(size_t, async_io_op  \
     BOOST_PP_COMMA_IF(N)                                                                            \
     BOOST_PP_ENUM_PARAMS(N, A))                                                                     \
     BOOST_PP_COMMA_IF(N)                                                                            \
@@ -1141,22 +1141,6 @@ template<class F, class... Args> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC std::share
     {                                                                                               \
         try\
         {\
-            /* Find our op*/ \
-            BOOST_BEGIN_MEMORY_TRANSACTION(p->opslock) \
-            { \
-                auto it(p->ops.find(id)); \
-                if(p->ops.end()==it) \
-                { \
-                    std::vector<size_t> opsids; \
-                    BOOST_FOREACH(auto &i, p->ops) \
-                    { \
-                        opsids.push_back(i.first); \
-                    } \
-                    std::sort(opsids.begin(), opsids.end()); \
-                    BOOST_AFIO_THROW_FATAL(std::runtime_error("Failed to find this operation in list of currently executing operations")); \
-                } \
-            } \
-            BOOST_END_MEMORY_TRANSACTION(p->opslock) \
             completion_returntype ret((static_cast<F *>(this)->*f)(id, op BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a)));\
             /* If boolean is false, reschedule completion notification setting it to ret.second, otherwise complete now */ \
             if(ret.first)   \
@@ -1277,20 +1261,6 @@ template<class F, class... Args> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC async_io_o
 
 #else
 
-// removed because we can't have preprocessor directives inside of a macro
-  #if 0 //ndef NDEBUG
-        if(!p->ops.empty())
-        {
-            std::vector<size_t> opsids;
-            BOOST_FOREACH(auto &i, p->ops)
-            {
-                opsids.push_back(i.first);
-            }
-            std::sort(opsids.begin(), opsids.end());
-            assert(thisid==opsids.back()+1);
-        }
-    #endif
-
 #undef BOOST_PP_LOCAL_MACRO
 #define BOOST_PP_LOCAL_MACRO(N)                                                                     \
     template <class F                                /* template start */                           \
@@ -1301,7 +1271,7 @@ template<class F, class... Args> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC async_io_o
     async_file_io_dispatcher_base::chain_async_op       /* function name */             \
     (detail::immediate_async_ops &immediates, int optype,           /* parameters start */          \
     const async_io_op &precondition,async_op_flags flags,                                           \
-    completion_returntype (F::*f)(size_t, async_io_op, \
+    completion_returntype (F::*f)(size_t, async_io_op \
     BOOST_PP_COMMA_IF(N)                                                                            \
     BOOST_PP_ENUM_PARAMS(N, A))                                                                     \
     BOOST_PP_COMMA_IF(N)                                                                            \
@@ -1311,21 +1281,21 @@ template<class F, class... Args> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC async_io_o
         while(!(thisid=++p->monotoniccount));\
         /* Wrap supplied implementation routine with a completion dispatcher*/ \
         auto wrapperf=&async_file_io_dispatcher_base::invoke_async_op_completions<F BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, A)>;\
-        /* Bind supplied implementation routine to this, unique id and any args they passed*/ \
-        typename detail::async_file_io_dispatcher_op::completion_t boundf(std::make_pair(thisid, std::bind(wrapperf, this, thisid, std::placeholders::_1, std::placeholders::_2, f BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a))));\
-        /* Make a new async_io_op ready for returning*/\
-        async_io_op ret(this, thisid);\
-        auto thisop=std::make_shared<detail::async_file_io_dispatcher_op>((detail::OpType) optype, flags, ret.h, boundf); \
-        { \
-            auto item=std::make_pair(thisid, thisop); \
+		/* Make a new async_io_op ready for returning*/\
+		auto thisop=std::make_shared<detail::async_file_io_dispatcher_op>((detail::OpType) optype, flags); \
+		/* Bind supplied implementation routine to this, unique id, precondition and any args they passed*/ \
+		thisop->enqueuement.set_task(std::bind(wrapperf, this, thisid, precondition, f BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a)));\
+		/* Set the output shared future */
+		async_io_op ret(this, thisid, thisop->h);\
+		auto item(std::make_pair(thisid, thisop)); \
+		{ \
             BOOST_BEGIN_MEMORY_TRANSACTION(p->opslock) \
             { \
-                auto opsit=p->ops.insert(std::move(item)); \
+                auto opsit=p->ops.insert(item); \
                 assert(opsit.second); \
             } \
             BOOST_END_MEMORY_TRANSACTION(p->opslock) \
         } \
-        BOOST_AFIO_DEBUG_PRINT("I %u < %u (%s)\n", (unsigned) thisid, (unsigned) precondition.id, detail::optypes[static_cast<int>(optype)]); \
         auto unopsit=boost::afio::detail::Undoer([this, thisid](){ \
             std::string what; \
             try { throw; } catch(std::exception &e) { what=e.what(); } catch(boost::exception &) { what="boost exception"; } catch(...) { what="not a std exception"; } \
@@ -1337,7 +1307,7 @@ template<class F, class... Args> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC async_io_o
             } \
             BOOST_END_MEMORY_TRANSACTION(p->opslock) \
         }); \
-        bool done=false;\
+		bool done=false;\
         if(precondition.id)\
         {\
             /* If still in flight, chain boundf to be executed when precondition completes*/ \
@@ -1363,30 +1333,16 @@ template<class F, class... Args> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC async_io_o
                 BOOST_END_MEMORY_TRANSACTION(p->opslock) \
             }\
         });\
-        if(!done)\
+		BOOST_AFIO_DEBUG_PRINT("I %u (d=%d) < %u (%s)\n", (unsigned) thisid, done, (unsigned) precondition.id, detail::optypes[static_cast<int>(optype)]); \
+		if(!done)\
         {\
             /* Bind input handle now and queue immediately to next available thread worker*/ \
-            std::shared_ptr<async_io_handle> h;\
-            if(precondition.h->valid()) \
+            if(precondition.id && precondition.h->valid()) \
             { \
-                /* Boost's shared_future has get() as non-const which is weird, because it doesn't*/ \
-                /* delete the data after retrieval.*/ \
-                shared_future<std::shared_ptr<async_io_handle>> &f=const_cast<shared_future<std::shared_ptr<async_io_handle>> &>(*precondition.h);\
-                /* The reason we don't throw here is consistency: we throw at point of batch API entry*/ \
-                /* if any of the preconditions are errored, but if they became errored between then and*/ \
-                /* now we can hardly abort half way through a batch op without leaving around stuck ops.*/ \
-                /* No, instead we simulate as if the precondition had not yet become ready.*/ \
-                *he=get_exception_ptr(f); \
-                if(!*he) \
-                    h=f.get(); \
-            }\
-            else if(precondition.id)\
-            {\
                 /* It should never happen that precondition.id is valid but removed from extant ops*/\
                 /* which indicates it completed and yet h remains invalid*/\
                 BOOST_AFIO_THROW_FATAL(std::runtime_error("Precondition was not in list of extant ops, yet its future is invalid. This should never happen for any real op, so it's probably memory corruption.")); \
             }\
-            thisop->enqueuement.set_task(std::bind(boundf.second, precondition, !!(flags & async_op_flags::immediate) ? he : nullptr)); \
             if(!!(flags & async_op_flags::immediate)) \
                 immediates.enqueue(thisop->enqueuement); \
             else \

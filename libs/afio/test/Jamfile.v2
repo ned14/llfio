@@ -123,8 +123,8 @@ if "--link-test" in $(.argv)
 {
 	if single_test != true
 	{
-		# Test that inline linkage works
-		link test_inline_linkage_master.cpp test_inline_linkage1.cpp test_inline_linkage2.cpp ;
+		# Test that inline linkage works with variadic templates turned off
+		exe test_inline_linkage_master : test_inline_linkage_master.cpp test_inline_linkage1.cpp test_inline_linkage2.cpp : <define>BOOST_NO_CXX11_VARIADIC_TEMPLATES ;
 	}
 
     for local x in $(test_files_all)
