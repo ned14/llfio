@@ -30,7 +30,7 @@ File Created: Mar 2013
 //#endif
 
 // Define this to have every part of AFIO print, in extremely terse text, what it is doing and why.
-#if defined(DEBUG) || 1
+#if defined(DEBUG) && 0 //|| 1
 #define BOOST_AFIO_DEBUG_PRINTING 1
 #ifdef WIN32
 #define BOOST_AFIO_DEBUG_PRINT(...) \
@@ -1064,11 +1064,11 @@ BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC void async_file_io_dispatcher_base::complet
     if(!completions.empty())
     {
 #ifndef NDEBUG
-		BOOST_FOREACH(auto &c, completions)
-		{
-			if(!c.second.get())
-				std::cerr << "*** Completion id " << c.first << " has null op ptr!" << std::endl;
-		}
+        BOOST_FOREACH(auto &c, completions)
+        {
+            if(!c.second.get())
+                std::cerr << "*** Completion id " << c.first << " has null op ptr!" << std::endl;
+        }
 #endif
         BOOST_FOREACH(auto &c, completions)
         {
@@ -1241,7 +1241,7 @@ template<class F, class... Args> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC async_io_o
             BOOST_BEGIN_MEMORY_TRANSACTION(p->opslock)
             {
                 auto dep(p->ops.find(precondition.id));
-                dep->second->completions.pop_back();	// FIXME: What if there are concurrent completion adds?
+                dep->second->completions.pop_back();    // FIXME: What if there are concurrent completion adds?
             }
             BOOST_END_MEMORY_TRANSACTION(p->opslock)
         }
@@ -1288,14 +1288,14 @@ template<class F, class... Args> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC async_io_o
         while(!(thisid=++p->monotoniccount));\
         /* Wrap supplied implementation routine with a completion dispatcher*/ \
         auto wrapperf=&async_file_io_dispatcher_base::invoke_async_op_completions<F BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, A)>;\
-		/* Make a new async_io_op ready for returning*/\
-		auto thisop=std::make_shared<detail::async_file_io_dispatcher_op>((detail::OpType) optype, flags); \
-		/* Bind supplied implementation routine to this, unique id, precondition and any args they passed*/ \
-		thisop->enqueuement.set_task(std::bind(wrapperf, this, thisid, precondition, f BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a)));\
-		/* Set the output shared future */ \
-		async_io_op ret(this, thisid, thisop->h);\
-		auto item(std::make_pair(thisid, thisop)); \
-		{ \
+        /* Make a new async_io_op ready for returning*/\
+        auto thisop=std::make_shared<detail::async_file_io_dispatcher_op>((detail::OpType) optype, flags); \
+        /* Bind supplied implementation routine to this, unique id, precondition and any args they passed*/ \
+        thisop->enqueuement.set_task(std::bind(wrapperf, this, thisid, precondition, f BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a)));\
+        /* Set the output shared future */ \
+        async_io_op ret(this, thisid, thisop->h);\
+        auto item(std::make_pair(thisid, thisop)); \
+        { \
             BOOST_BEGIN_MEMORY_TRANSACTION(p->opslock) \
             { \
                 auto opsit=p->ops.insert(item); \
@@ -1314,7 +1314,7 @@ template<class F, class... Args> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC async_io_o
             } \
             BOOST_END_MEMORY_TRANSACTION(p->opslock) \
         }); \
-		bool done=false;\
+        bool done=false;\
         if(precondition.id)\
         {\
             /* If still in flight, chain item to be executed when precondition completes*/ \
@@ -1340,8 +1340,8 @@ template<class F, class... Args> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC async_io_o
                 BOOST_END_MEMORY_TRANSACTION(p->opslock) \
             }\
         });\
-		BOOST_AFIO_DEBUG_PRINT("I %u (d=%d) < %u (%s)\n", (unsigned) thisid, done, (unsigned) precondition.id, detail::optypes[static_cast<int>(optype)]); \
-		if(!done)\
+        BOOST_AFIO_DEBUG_PRINT("I %u (d=%d) < %u (%s)\n", (unsigned) thisid, done, (unsigned) precondition.id, detail::optypes[static_cast<int>(optype)]); \
+        if(!done)\
         {\
             /* Bind input handle now and queue immediately to next available thread worker*/ \
             if(precondition.id && precondition.h->valid()) \

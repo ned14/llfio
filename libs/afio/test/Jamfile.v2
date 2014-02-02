@@ -121,7 +121,7 @@ else
 # link tests (just compile and links targets)
 if "--link-test" in $(.argv)  
 {
-	if single_test != true
+	if $(single_test) != true
 	{
 		# Test that inline linkage works with variadic templates turned off
 		exe test_inline_linkage_master : test_inline_linkage_master.cpp test_inline_linkage1.cpp test_inline_linkage2.cpp : <define>BOOST_NO_CXX11_VARIADIC_TEMPLATES ;
@@ -131,7 +131,7 @@ if "--link-test" in $(.argv)
     {
         link $(x) test_functions spooky ;
     }
-	if single_test != true
+	if $(single_test) != true
 	{
 		for local x in $(example_files)
 		{

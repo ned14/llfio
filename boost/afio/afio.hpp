@@ -869,6 +869,8 @@ struct async_io_op
     //! Retrieves the handle or exception from the shared state. Same as h->get().
     std::shared_ptr<async_io_handle> get(bool return_null_if_errored=false)
     {
+        if(!parent && !id)
+            return std::shared_ptr<async_io_handle>();
         if(!return_null_if_errored)
             return h->get();
         auto e=get_exception_ptr(*h);
