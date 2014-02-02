@@ -1310,13 +1310,13 @@ template<class F, class... Args> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC async_io_o
 		bool done=false;\
         if(precondition.id)\
         {\
-            /* If still in flight, chain boundf to be executed when precondition completes*/ \
+            /* If still in flight, chain item to be executed when precondition completes*/ \
             BOOST_BEGIN_MEMORY_TRANSACTION(p->opslock) \
             { \
                 auto dep(p->ops.find(precondition.id)); \
                 if(p->ops.end()!=dep) \
                 { \
-                    dep->second->completions.push_back(boundf); \
+                    dep->second->completions.push_back(item); \
                     done=true; \
                 } \
             } \
