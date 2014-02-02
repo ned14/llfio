@@ -30,7 +30,7 @@ File Created: Mar 2013
 //#endif
 
 // Define this to have every part of AFIO print, in extremely terse text, what it is doing and why.
-#if defined(DEBUG) && 0 //|| 1
+#if defined(DEBUG) || 1
 #define BOOST_AFIO_DEBUG_PRINTING 1
 #ifdef WIN32
 #define BOOST_AFIO_DEBUG_PRINT(...) \
@@ -1063,6 +1063,13 @@ BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC void async_file_io_dispatcher_base::complet
     BOOST_END_MEMORY_TRANSACTION(p->opslock)
     if(!completions.empty())
     {
+#ifndef NDEBUG
+		BOOST_FOREACH(auto &c, completions)
+		{
+			if(!c.second.get())
+				std::cerr << "*** Completion id " << c.first << " has null op ptr!" << std::endl;
+		}
+#endif
         BOOST_FOREACH(auto &c, completions)
         {
             detail::async_file_io_dispatcher_op *c_op=c.second.get();
@@ -1234,7 +1241,7 @@ template<class F, class... Args> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC async_io_o
             BOOST_BEGIN_MEMORY_TRANSACTION(p->opslock)
             {
                 auto dep(p->ops.find(precondition.id));
-                dep->second->completions.pop_back();
+                dep->second->completions.pop_back();	// FIXME: What if there are concurrent completion adds?
             }
             BOOST_END_MEMORY_TRANSACTION(p->opslock)
         }
