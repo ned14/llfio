@@ -1285,7 +1285,7 @@ template<class F, class... Args> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC async_io_o
 		auto thisop=std::make_shared<detail::async_file_io_dispatcher_op>((detail::OpType) optype, flags); \
 		/* Bind supplied implementation routine to this, unique id, precondition and any args they passed*/ \
 		thisop->enqueuement.set_task(std::bind(wrapperf, this, thisid, precondition, f BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a)));\
-		/* Set the output shared future */
+		/* Set the output shared future */ \
 		async_io_op ret(this, thisid, thisop->h);\
 		auto item(std::make_pair(thisid, thisop)); \
 		{ \
