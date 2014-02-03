@@ -1215,7 +1215,8 @@ template<class F, class... Args> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC async_io_o
         }
         BOOST_END_MEMORY_TRANSACTION(p->opslock)
     }
-    auto unopsit=boost::afio::detail::Undoer([this, thisid](){
+	BOOST_AFIO_DEBUG_PRINT("I2 %u %p %p\n", (unsigned) thisid, thisop.get(), item.second.get());
+	auto unopsit=boost::afio::detail::Undoer([this, thisid](){
         std::string what;
         try { throw; } catch(std::exception &e) { what=e.what(); } catch(boost::exception &) { what="boost exception"; } catch(...) { what="not a std exception"; }
         BOOST_AFIO_DEBUG_PRINT("E X %u (%s)\n", (unsigned) thisid, what.c_str());
@@ -1241,7 +1242,8 @@ template<class F, class... Args> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC async_io_o
         }
         BOOST_END_MEMORY_TRANSACTION(p->opslock)
     }
-    auto undep=boost::afio::detail::Undoer([done, this, precondition, item](){
+	BOOST_AFIO_DEBUG_PRINT("I3 %u %p %p\n", (unsigned) thisid, thisop.get(), item.second.get());
+	auto undep=boost::afio::detail::Undoer([done, this, precondition, item](){
         if(done)
         {
             BOOST_BEGIN_MEMORY_TRANSACTION(p->opslock)
@@ -1261,7 +1263,7 @@ template<class F, class... Args> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC async_io_o
             BOOST_END_MEMORY_TRANSACTION(p->opslock)
         }
     });
-    BOOST_AFIO_DEBUG_PRINT("I2 %u %p %p\n", (unsigned) thisid, thisop.get(), item.second.get());
+    BOOST_AFIO_DEBUG_PRINT("I4 %u %p %p\n", (unsigned) thisid, thisop.get(), item.second.get());
     BOOST_AFIO_DEBUG_PRINT("I %u (d=%d) < %u (%s)\n", (unsigned) thisid, done, (unsigned) precondition.id, detail::optypes[static_cast<int>(optype)]);
     if(!done)
     {
