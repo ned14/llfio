@@ -1021,6 +1021,11 @@ BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC void async_file_io_dispatcher_base::complet
             BOOST_AFIO_THROW_FATAL(std::runtime_error("Failed to find this operation in list of currently executing operations"));
         }
         thisop=it->second;
+        BOOST_FOREACH(auto &c, thisop->completions)
+        {
+            if(!c.second.get())
+                std::cerr << "*** Completion id " << c.first << " has null op ptr!" << std::endl;
+        }
         // Erase me from ops
         p->ops.erase(it);
     }
@@ -1235,13 +1240,21 @@ template<class F, class... Args> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC async_io_o
         }
         BOOST_END_MEMORY_TRANSACTION(p->opslock)
     }
-    auto undep=boost::afio::detail::Undoer([done, this, precondition](){
+    auto undep=boost::afio::detail::Undoer([done, this, precondition, item](){
         if(done)
         {
             BOOST_BEGIN_MEMORY_TRANSACTION(p->opslock)
             {
                 auto dep(p->ops.find(precondition.id));
-                dep->second->completions.pop_back();    // FIXME: What if there are concurrent completion adds?
+                // Items may have been added by other threads ...
+                for(auto it=dep->second->completions.rbegin(); it!=dep->second->completions.rend(); ++it)
+                {
+                    if(it->first==item.first)
+                    {
+                        dep->second->completions.erase(it);
+                        break;
+                    }
+                }
             }
             BOOST_END_MEMORY_TRANSACTION(p->opslock)
         }
@@ -1329,13 +1342,21 @@ template<class F, class... Args> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC async_io_o
             } \
             BOOST_END_MEMORY_TRANSACTION(p->opslock) \
         }\
-        auto undep=boost::afio::detail::Undoer([done, this, precondition](){\
+        auto undep=boost::afio::detail::Undoer([done, this, precondition, item](){\
             if(done)\
             {\
                 BOOST_BEGIN_MEMORY_TRANSACTION(p->opslock) \
                 { \
                     auto dep(p->ops.find(precondition.id)); \
-                    dep->second->completions.pop_back(); \
+                    /* Items may have been added by other threads ... */ \
+                    for(auto it=dep->second->completions.rbegin(); it!=dep->second->completions.rend(); ++it) \
+                    { \
+                        if(it->first==item.first) \
+                        { \
+                            dep->second->completions.erase(it); \
+                            break; \
+                        } \
+                    } \
                 } \
                 BOOST_END_MEMORY_TRANSACTION(p->opslock) \
             }\
