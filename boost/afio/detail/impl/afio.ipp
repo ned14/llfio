@@ -1205,7 +1205,7 @@ template<class F, class... Args> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC async_io_o
     thisop->enqueuement.set_task(std::bind(wrapperf, this, thisid, precondition, f, args...));
     // Set the output shared future
     async_io_op ret(this, thisid, thisop->h);
-    auto item(std::make_pair(thisid, thisop));
+    typename detail::async_file_io_dispatcher_op::completion_t item(std::make_pair(thisid, thisop));
     {
         BOOST_BEGIN_MEMORY_TRANSACTION(p->opslock)
         {
@@ -1260,7 +1260,7 @@ template<class F, class... Args> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC async_io_o
             BOOST_END_MEMORY_TRANSACTION(p->opslock)
         }
     });
-    BOOST_AFIO_DEBUG_PRINT("I %u (d=%d) < %u (%s)\n", (unsigned) thisid, done, (unsigned) precondition.id, detail::optypes[static_cast<int>(optype)]);
+    BOOST_AFIO_DEBUG_PRINT("I %u (d=%d) %p < %u (%s)\n", (unsigned) thisid, done, item.second.get(), (unsigned) precondition.id, detail::optypes[static_cast<int>(optype)]);
     if(!done)
     {
         // Bind input handle now and queue immediately to next available thread worker
@@ -1308,7 +1308,7 @@ template<class F, class... Args> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC async_io_o
         thisop->enqueuement.set_task(std::bind(wrapperf, this, thisid, precondition, f BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a)));\
         /* Set the output shared future */ \
         async_io_op ret(this, thisid, thisop->h);\
-        auto item(std::make_pair(thisid, thisop)); \
+        typename detail::async_file_io_dispatcher_op::completion_t item(std::make_pair(thisid, thisop)); \
         { \
             BOOST_BEGIN_MEMORY_TRANSACTION(p->opslock) \
             { \
