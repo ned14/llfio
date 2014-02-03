@@ -363,7 +363,7 @@ futures become available.
 \complexity{O(N)}
 \exceptionmodel{The same as a future}
 */
-template <class InputIterator, typename=typename std::enable_if<std::is_constructible<shared_future<typename std::decay<decltype(((typename InputIterator::value_type *) 0)->get())>::type>, typename InputIterator::value_type>::value>::type> inline shared_future<std::vector<typename std::decay<decltype(((typename InputIterator::value_type *) 0)->get())>::type>> when_all(InputIterator first, InputIterator last)
+template <class InputIterator, typename ___=typename std::enable_if<std::is_constructible<shared_future<typename std::decay<decltype(((typename InputIterator::value_type *) 0)->get())>::type>, typename InputIterator::value_type>::value>::type> inline shared_future<std::vector<typename std::decay<decltype(((typename InputIterator::value_type *) 0)->get())>::type>> when_all(InputIterator first, InputIterator last)
 {
     typedef typename InputIterator::value_type future_type;
     typedef typename std::decay<decltype(((typename InputIterator::value_type *) 0)->get())>::type value_type;
@@ -396,7 +396,7 @@ futures become available.
 \complexity{The same as boost::wait_for_any()}
 \exceptionmodel{The same as a future}
 */
-template <class InputIterator, typename=typename std::enable_if<std::is_constructible<shared_future<typename std::decay<decltype(((typename InputIterator::value_type *) 0)->get())>::type>, typename InputIterator::value_type>::value>::type> inline shared_future<std::pair<size_t, typename std::decay<decltype(((typename InputIterator::value_type *) 0)->get())>::type>> when_any(InputIterator first, InputIterator last)
+template <class InputIterator, typename ___=typename std::enable_if<std::is_constructible<shared_future<typename std::decay<decltype(((typename InputIterator::value_type *) 0)->get())>::type>, typename InputIterator::value_type>::value>::type> inline shared_future<std::pair<size_t, typename std::decay<decltype(((typename InputIterator::value_type *) 0)->get())>::type>> when_any(InputIterator first, InputIterator last)
 {
     typedef typename InputIterator::value_type future_type;
     typedef typename std::decay<decltype(((typename InputIterator::value_type *) 0)->get())>::type value_type;
@@ -1683,7 +1683,7 @@ namespace detail
 \complexity{O(N).}
 \exceptionmodel{Non propagating}
 */
-template<class Iterator, typename=typename std::enable_if<std::is_constructible<async_io_op, typename Iterator::value_type>::value>::type> inline future<std::vector<std::shared_ptr<async_io_handle>>> when_all(std::nothrow_t _, Iterator first, Iterator last)
+template<class Iterator, typename ___=typename std::enable_if<std::is_constructible<async_io_op, typename Iterator::value_type>::value>::type> inline future<std::vector<std::shared_ptr<async_io_handle>>> when_all(std::nothrow_t _, Iterator first, Iterator last)
 {
     if(first==last)
         return future<std::vector<std::shared_ptr<async_io_handle>>>();
@@ -1701,7 +1701,7 @@ template<class Iterator, typename=typename std::enable_if<std::is_constructible<
 \complexity{O(N).}
 \exceptionmodel{Non propagating}
 */
-template<class Iterator, typename=typename std::enable_if<std::is_constructible<async_io_op, typename Iterator::value_type>::value>::type> inline future<std::shared_ptr<async_io_handle>> when_any(std::nothrow_t _, Iterator first, Iterator last)
+template<class Iterator, typename ___=typename std::enable_if<std::is_constructible<async_io_op, typename Iterator::value_type>::value>::type> inline future<std::shared_ptr<async_io_handle>> when_any(std::nothrow_t _, Iterator first, Iterator last)
 {
     if(first==last)
         return future<std::shared_ptr<async_io_handle>>();
@@ -1750,7 +1750,7 @@ inline future<std::shared_ptr<async_io_handle>> when_any(std::nothrow_t _, std::
 \complexity{O(N).}
 \exceptionmodel{Propagating}
 */
-template<class Iterator, typename=typename std::enable_if<std::is_constructible<async_io_op, typename Iterator::value_type>::value>::type> inline future<std::vector<std::shared_ptr<async_io_handle>>> when_all(Iterator first, Iterator last)
+template<class Iterator, typename ___=typename std::enable_if<std::is_constructible<async_io_op, typename Iterator::value_type>::value>::type> inline future<std::vector<std::shared_ptr<async_io_handle>>> when_all(Iterator first, Iterator last)
 {
     if(first==last)
         return future<std::vector<std::shared_ptr<async_io_handle>>>();
@@ -1767,7 +1767,7 @@ template<class Iterator, typename=typename std::enable_if<std::is_constructible<
 \complexity{O(N).}
 \exceptionmodel{Propagating}
 */
-template<class Iterator, typename=typename std::enable_if<std::is_constructible<async_io_op, typename Iterator::value_type>::value>::type> inline future<std::shared_ptr<async_io_handle>> when_any(Iterator first, Iterator last)
+template<class Iterator, typename ___=typename std::enable_if<std::is_constructible<async_io_op, typename Iterator::value_type>::value>::type> inline future<std::shared_ptr<async_io_handle>> when_any(Iterator first, Iterator last)
 {
     if(first==last)
         return future<std::shared_ptr<async_io_handle>>();
