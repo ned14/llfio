@@ -1247,13 +1247,14 @@ template<class F, class... Args> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC async_io_o
             {
                 auto dep(p->ops.find(precondition.id));
                 // Items may have been added by other threads ...
-                for(auto it=dep->second->completions.rbegin(); it!=dep->second->completions.rend(); ++it)
+                for(auto it=--dep->second->completions.end(); true; --it)
                 {
                     if(it->first==item.first)
                     {
                         dep->second->completions.erase(it);
                         break;
                     }
+                    if(dep->second->completions.begin()==it) break;
                 }
             }
             BOOST_END_MEMORY_TRANSACTION(p->opslock)
@@ -1349,13 +1350,14 @@ template<class F, class... Args> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC async_io_o
                 { \
                     auto dep(p->ops.find(precondition.id)); \
                     /* Items may have been added by other threads ... */ \
-                    for(auto it=dep->second->completions.rbegin(); it!=dep->second->completions.rend(); ++it) \
+                    for(auto it=--dep->second->completions.end(); true; --it) \
                     { \
                         if(it->first==item.first) \
                         { \
                             dep->second->completions.erase(it); \
                             break; \
                         } \
+                        if(dep->second->completions.begin()==it) break; \
                     } \
                 } \
                 BOOST_END_MEMORY_TRANSACTION(p->opslock) \
