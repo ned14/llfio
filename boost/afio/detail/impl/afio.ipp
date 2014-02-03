@@ -1063,13 +1063,13 @@ BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC void async_file_io_dispatcher_base::complet
     BOOST_END_MEMORY_TRANSACTION(p->opslock)
     if(!completions.empty())
     {
-#ifndef NDEBUG
+//#ifndef NDEBUG
         BOOST_FOREACH(auto &c, completions)
         {
             if(!c.second.get())
                 std::cerr << "*** Completion id " << c.first << " has null op ptr!" << std::endl;
         }
-#endif
+//#endif
         BOOST_FOREACH(auto &c, completions)
         {
             detail::async_file_io_dispatcher_op *c_op=c.second.get();
