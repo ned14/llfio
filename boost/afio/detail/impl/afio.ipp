@@ -433,7 +433,7 @@ namespace detail {
         async_op_flags flags;
         enqueued_task<std::shared_ptr<async_io_handle>()> enqueuement;
         std::shared_ptr<shared_future<std::shared_ptr<async_io_handle>>> h;
-        typedef std::pair<size_t, std::shared_ptr<detail::async_file_io_dispatcher_op>> completion_t;
+        typedef std::pair<const size_t, std::shared_ptr<detail::async_file_io_dispatcher_op>> completion_t;
         std::vector<completion_t> completions;
 #ifdef BOOST_AFIO_OP_STACKBACKTRACEDEPTH
         std::vector<void *> stack;
