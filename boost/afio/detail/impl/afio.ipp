@@ -433,7 +433,7 @@ namespace detail {
         async_op_flags flags;
         enqueued_task<std::shared_ptr<async_io_handle>()> enqueuement;
         std::shared_ptr<shared_future<std::shared_ptr<async_io_handle>>> h;
-        typedef std::pair<const size_t, std::shared_ptr<detail::async_file_io_dispatcher_op>> completion_t;
+        typedef std::pair<size_t, std::shared_ptr<detail::async_file_io_dispatcher_op>> completion_t;
         std::vector<completion_t> completions;
 #ifdef BOOST_AFIO_OP_STACKBACKTRACEDEPTH
         std::vector<void *> stack;
@@ -1021,11 +1021,6 @@ BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC void async_file_io_dispatcher_base::complet
             BOOST_AFIO_THROW_FATAL(std::runtime_error("Failed to find this operation in list of currently executing operations"));
         }
         thisop=it->second;
-        BOOST_FOREACH(auto &c, thisop->completions)
-        {
-            if(!c.second.get())
-                std::cerr << "*** Completion id " << c.first << " has null op ptr!" << std::endl;
-        }
         // Erase me from ops
         p->ops.erase(it);
     }
@@ -1206,17 +1201,21 @@ template<class F, class... Args> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC async_io_o
     // Set the output shared future
     async_io_op ret(this, thisid, thisop->h);
     typename detail::async_file_io_dispatcher_op::completion_t item(std::make_pair(thisid, thisop));
-    BOOST_AFIO_DEBUG_PRINT("I1 %u %p %p\n", (unsigned) thisid, thisop.get(), item.second.get());
     {
         BOOST_BEGIN_MEMORY_TRANSACTION(p->opslock)
         {
-            auto opsit=p->ops.insert(item);
+            /* This is a weird bug which took me several days to track down ...
+            It turns out that very new compilers will *move* insert item into
+            p->ops because item's type is not *exactly* the value_type wanted
+            by unordered_map. That destroys item for use later, which is
+            obviously _insane_. The workaround is to feed insert() a copy. */
+            auto item2(item);
+            auto opsit=p->ops.insert(std::move(item2));
             assert(opsit.second);
         }
         BOOST_END_MEMORY_TRANSACTION(p->opslock)
     }
-	BOOST_AFIO_DEBUG_PRINT("I2 %u %p %p\n", (unsigned) thisid, thisop.get(), item.second.get());
-	auto unopsit=boost::afio::detail::Undoer([this, thisid](){
+    auto unopsit=boost::afio::detail::Undoer([this, thisid](){
         std::string what;
         try { throw; } catch(std::exception &e) { what=e.what(); } catch(boost::exception &) { what="boost exception"; } catch(...) { what="not a std exception"; }
         BOOST_AFIO_DEBUG_PRINT("E X %u (%s)\n", (unsigned) thisid, what.c_str());
@@ -1242,8 +1241,7 @@ template<class F, class... Args> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC async_io_o
         }
         BOOST_END_MEMORY_TRANSACTION(p->opslock)
     }
-	BOOST_AFIO_DEBUG_PRINT("I3 %u %p %p\n", (unsigned) thisid, thisop.get(), item.second.get());
-	auto undep=boost::afio::detail::Undoer([done, this, precondition, item](){
+    auto undep=boost::afio::detail::Undoer([done, this, precondition, item](){
         if(done)
         {
             BOOST_BEGIN_MEMORY_TRANSACTION(p->opslock)
@@ -1263,7 +1261,6 @@ template<class F, class... Args> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC async_io_o
             BOOST_END_MEMORY_TRANSACTION(p->opslock)
         }
     });
-    BOOST_AFIO_DEBUG_PRINT("I4 %u %p %p\n", (unsigned) thisid, thisop.get(), item.second.get());
     BOOST_AFIO_DEBUG_PRINT("I %u (d=%d) < %u (%s)\n", (unsigned) thisid, done, (unsigned) precondition.id, detail::optypes[static_cast<int>(optype)]);
     if(!done)
     {
@@ -1316,7 +1313,13 @@ template<class F, class... Args> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC async_io_o
         { \
             BOOST_BEGIN_MEMORY_TRANSACTION(p->opslock) \
             { \
-                auto opsit=p->ops.insert(item); \
+                /* This is a weird bug which took me several days to track down ...
+                It turns out that very new compilers will *move* insert item into
+                p->ops because item's type is not *exactly* the value_type wanted
+                by unordered_map. That destroys item for use later, which is
+                obviously _insane_. The workaround is to feed insert() a copy. */ \
+                auto item2(item); \
+                auto opsit=p->ops.insert(std::move(item2)); \
                 assert(opsit.second); \
             } \
             BOOST_END_MEMORY_TRANSACTION(p->opslock) \
