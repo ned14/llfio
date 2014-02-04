@@ -708,7 +708,7 @@ public:
     metadata_flags metadata_ready() const BOOST_NOEXCEPT_OR_NOTHROW { return have_metadata; }
     /*! \brief Fetches the specified metadata, returning that newly available. This is a blocking call if wanted metadata is not yet ready.
     \return The metadata now available in this directory entry.
-    \param dirh An open handle to the entry's containing directory. You can get this from an op ref using when_all(dirop).get().front().
+    \param dirh An open handle to the entry's containing directory. You can get this from an op ref using dirop.h->get().
     \param wanted A bitfield of the metadata to fetch. This does not replace existing metadata.
     */
     metadata_flags fetch_metadata(std::shared_ptr<async_io_handle> dirh, metadata_flags wanted)
@@ -721,7 +721,7 @@ public:
     }
     /*! \brief Returns a copy of the internal `stat_t` structure. This is a blocking call if wanted metadata is not yet ready.
     \return A copy of the internal `stat_t` structure.
-    \param dirh An open handle to the entry's containing directory. You can get this from an op ref using when_all(dirop).get().front().
+    \param dirh An open handle to the entry's containing directory. You can get this from an op ref using dirop.h->get().
     \param wanted A bitfield of the metadata to fetch. This does not replace existing metadata.
     */
     stat_t fetch_lstat(std::shared_ptr<async_io_handle> dirh, metadata_flags wanted=directory_entry::metadata_fastpath())
@@ -738,46 +738,46 @@ decltype(stat_t().st_##field) st_##field(std::shared_ptr<async_io_handle> dirh) 
 decltype(stat_t().st_##field) st_##field(std::shared_ptr<async_io_handle> dirh=std::shared_ptr<async_io_handle>()) { if(!(have_metadata&metadata_flags::field)) { _int_fetch(metadata_flags::field, dirh); } return stat.st_##field; }
 #endif
 #ifndef WIN32
-    //! Returns st_dev \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using when_all(dirop).get().front().
+    //! Returns st_dev \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using dirop.h->get().
     BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(dev)
 #endif
-    //! Returns st_ino \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using when_all(dirop).get().front().
+    //! Returns st_ino \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using dirop.h->get().
     BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(ino)
-    //! Returns st_type \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using when_all(dirop).get().front().
+    //! Returns st_type \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using dirop.h->get().
     BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(type)
 #ifndef WIN32
-    //! Returns st_perms \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using when_all(dirop).get().front().
+    //! Returns st_perms \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using dirop.h->get().
     BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(perms)
 #endif
-    //! Returns st_nlink \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using when_all(dirop).get().front().
+    //! Returns st_nlink \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using dirop.h->get().
     BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(nlink)
 #ifndef WIN32
-    //! Returns st_uid \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using when_all(dirop).get().front().
+    //! Returns st_uid \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using dirop.h->get().
     BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(uid)
-    //! Returns st_gid \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using when_all(dirop).get().front().
+    //! Returns st_gid \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using dirop.h->get().
     BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(gid)
-    //! Returns st_rdev \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using when_all(dirop).get().front().
+    //! Returns st_rdev \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using dirop.h->get().
     BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(rdev)
 #endif
-    //! Returns st_atim \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using when_all(dirop).get().front().
+    //! Returns st_atim \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using dirop.h->get().
     BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(atim)
-    //! Returns st_mtim \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using when_all(dirop).get().front().
+    //! Returns st_mtim \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using dirop.h->get().
     BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(mtim)
-    //! Returns st_ctim \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using when_all(dirop).get().front().
+    //! Returns st_ctim \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using dirop.h->get().
     BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(ctim)
-    //! Returns st_size \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using when_all(dirop).get().front().
+    //! Returns st_size \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using dirop.h->get().
     BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(size)
-    //! Returns st_allocated \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using when_all(dirop).get().front().
+    //! Returns st_allocated \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using dirop.h->get().
     BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(allocated)
-    //! Returns st_blocks \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using when_all(dirop).get().front().
+    //! Returns st_blocks \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using dirop.h->get().
     BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(blocks)
-    //! Returns st_blksize \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using when_all(dirop).get().front().
+    //! Returns st_blksize \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using dirop.h->get().
     BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(blksize)
-    //! Returns st_flags \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using when_all(dirop).get().front().
+    //! Returns st_flags \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using dirop.h->get().
     BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(flags)
-    //! Returns st_gen \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using when_all(dirop).get().front().
+    //! Returns st_gen \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using dirop.h->get().
     BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(gen)
-    //! Returns st_birthtim \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using when_all(dirop).get().front().
+    //! Returns st_birthtim \param dirh An optional open handle to the entry's containing directory if fetching missing metadata is desired (an exception is thrown otherwise). You can get this from an op ref using dirop.h->get().
     BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD(birthtim)
 
     //! A bitfield of what metadata is available on this platform. This doesn't mean all is available for every filing system.
@@ -1545,12 +1545,14 @@ public:
 
     /*! \brief Completes an operation with a handle or an error, usually used when an operation was previously deferred.
     \ingroup async_file_io_dispatcher_base__misc
+    \qbk{distinguish, normal}
     \complexity{O(N) where N is the number of completions dependent on this op.}
     \exceptionmodel{Should not throw any exception except for out of memory.}
     */
     BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC void complete_async_op(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr e=exception_ptr());
     /*! \brief Completes an operation with an error, usually used when an operation was previously deferred.
     \ingroup async_file_io_dispatcher_base__misc
+    \qbk{distinguish, errored}
     \complexity{O(N) where N is the number of completions dependent on this op.}
     \exceptionmodel{Should not throw any exception except for out of memory.}
     */
@@ -1744,7 +1746,7 @@ template<class Iterator> inline typename detail::enable_if_async_op<true, typena
 \param _ An instance of std::nothrow_t.
 \param first An iterator pointing to the first async_io_op to wait upon.
 \param last An iterator pointing after the last async_io_op to wait upon.
-\ingroup when_any_ops
+\ingroup when_all_ops
 \qbk{distinguish, iterator batch of ops not exception propagating}
 \complexity{O(N).}
 \exceptionmodel{Non propagating}
@@ -1776,7 +1778,7 @@ inline future<std::vector<std::shared_ptr<async_io_handle>>> when_all(std::nothr
 \return A future vector of shared_ptr's to async_io_handle.
 \param _ An instance of std::nothrow_t.
 \param ops A vector of the async_io_ops to wait upon.
-\ingroup when_any_ops
+\ingroup when_all_ops
 \qbk{distinguish, vector batch of ops not exception propagating}
 \complexity{O(N).}
 \exceptionmodel{Non propagating}
@@ -1810,7 +1812,7 @@ template<class Iterator> inline typename detail::enable_if_async_op<true, typena
 \tparam "class Iterator" An iterator type.
 \param first An iterator pointing to the first async_io_op to wait upon.
 \param last An iterator pointing after the last async_io_op to wait upon.
-\ingroup when_any_ops
+\ingroup when_all_ops
 \qbk{distinguish, iterator batch of ops exception propagating}
 \complexity{O(N).}
 \exceptionmodel{Propagating}
@@ -1840,7 +1842,7 @@ inline future<std::vector<std::shared_ptr<async_io_handle>>> when_all(std::vecto
 
 \return A future vector of shared_ptr's to async_io_handle.
 \param ops A vector of the async_io_ops to wait upon.
-\ingroup when_any_ops
+\ingroup when_all_ops
 \qbk{distinguish, vector batch of ops exception propagating}
 \complexity{O(N).}
 \exceptionmodel{Propagating}

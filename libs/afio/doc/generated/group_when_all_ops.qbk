@@ -41,6 +41,38 @@ A future vector of shared\u005fptr's to async\u005fio\u005fhandle.
 
 [endsect]
 
+[section:when_any_3_iterator_batch_of_ops_not_exception_propagating when_any (iterator batch of ops not exception propagating)]
+
+'''<indexterm><primary>when_any</primary></indexterm>'''
+Returns a result when any the supplied ops complete. Does not propagate exception states. 
+
+[heading Synopsis]
+``template<class Iterator>
+detail::enable_if_async_op<false, typename Iterator::value_type>::type when_any(std::nothrow_t _, Iterator first, Iterator last)``
+
+[heading Parameters]
+
+[table
+[[Type] [Concept] [Name] [Description] ]
+[[class Iterator] [An iterator type. ] [ - ] [Must be specified]]
+[[std::nothrow_t] [] [_] [An instance of std::nothrow_t. ]]
+[[Iterator] [] [first] [An iterator pointing to the first async_io_op to wait upon. ]]
+[[Iterator] [] [last] [An iterator pointing after the last async_io_op to wait upon.]]
+]
+
+
+[heading Returns]
+A future vector of shared\u005fptr's to async\u005fio\u005fhandle. 
+
+[heading Header]
+`#include <boost/afio/afio.hpp>`
+
+[heading Complexity]O(N).
+[heading Exception Model]Non propagating
+
+
+[endsect]
+
 [section:when_all_2_vector_batch_of_ops_not_exception_propagating when_all (vector batch of ops not exception propagating)]
 
 '''<indexterm><primary>when_all</primary></indexterm>'''
@@ -48,6 +80,35 @@ Returns a result when all the supplied ops complete. Does not propagate exceptio
 
 [heading Synopsis]
 ``future<std::vector<std::shared_ptr<async_io_handle> > > when_all(std::nothrow_t _, std::vector< async_io_op > ops)``
+
+[heading Parameters]
+
+[table
+[[Type] [Concept] [Name] [Description] ]
+[[std::nothrow_t] [] [_] [An instance of std::nothrow_t. ]]
+[[std::vector< async_io_op >] [] [ops] [A vector of the async_io_ops to wait upon.]]
+]
+
+
+[heading Returns]
+A future vector of shared\u005fptr's to async\u005fio\u005fhandle. 
+
+[heading Header]
+`#include <boost/afio/afio.hpp>`
+
+[heading Complexity]O(N).
+[heading Exception Model]Non propagating
+
+
+[endsect]
+
+[section:when_any_2_vector_batch_of_ops_not_exception_propagating when_any (vector batch of ops not exception propagating)]
+
+'''<indexterm><primary>when_any</primary></indexterm>'''
+Returns a result when any the supplied ops complete. Does not propagate exception states. 
+
+[heading Synopsis]
+``future<std::shared_ptr<async_io_handle> > when_any(std::nothrow_t _, std::vector< async_io_op > ops)``
 
 [heading Parameters]
 
@@ -101,6 +162,37 @@ A future vector of shared\u005fptr's to async\u005fio\u005fhandle.
 
 [endsect]
 
+[section:when_any_2_iterator_batch_of_ops_exception_propagating when_any (iterator batch of ops exception propagating)]
+
+'''<indexterm><primary>when_any</primary></indexterm>'''
+Returns a result when any the supplied ops complete. Propagates exception states. 
+
+[heading Synopsis]
+``template<class Iterator>
+detail::enable_if_async_op<false, typename Iterator::value_type>::type when_any(Iterator first, Iterator last)``
+
+[heading Parameters]
+
+[table
+[[Type] [Concept] [Name] [Description] ]
+[[class Iterator] [An iterator type. ] [ - ] [Must be specified]]
+[[Iterator] [] [first] [An iterator pointing to the first async_io_op to wait upon. ]]
+[[Iterator] [] [last] [An iterator pointing after the last async_io_op to wait upon.]]
+]
+
+
+[heading Returns]
+A future vector of shared\u005fptr's to async\u005fio\u005fhandle. 
+
+[heading Header]
+`#include <boost/afio/afio.hpp>`
+
+[heading Complexity]O(N).
+[heading Exception Model]Propagating
+
+
+[endsect]
+
 [section:when_all_1_vector_batch_of_ops_exception_propagating when_all (vector batch of ops exception propagating)]
 
 '''<indexterm><primary>when_all</primary></indexterm>'''
@@ -108,6 +200,34 @@ Returns a result when all the supplied ops complete. Propagates exception states
 
 [heading Synopsis]
 ``future<std::vector<std::shared_ptr<async_io_handle> > > when_all(std::vector< async_io_op > ops)``
+
+[heading Parameters]
+
+[table
+[[Type] [Concept] [Name] [Description] ]
+[[std::vector< async_io_op >] [] [ops] [A vector of the async_io_ops to wait upon.]]
+]
+
+
+[heading Returns]
+A future vector of shared\u005fptr's to async\u005fio\u005fhandle. 
+
+[heading Header]
+`#include <boost/afio/afio.hpp>`
+
+[heading Complexity]O(N).
+[heading Exception Model]Propagating
+
+
+[endsect]
+
+[section:when_any_1_vector_batch_of_ops_exception_propagating when_any (vector batch of ops exception propagating)]
+
+'''<indexterm><primary>when_any</primary></indexterm>'''
+Returns a result when any the supplied ops complete. Propagates exception states. 
+
+[heading Synopsis]
+``future<std::shared_ptr<async_io_handle> > when_any(std::vector< async_io_op > ops)``
 
 [heading Parameters]
 
