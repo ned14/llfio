@@ -72,18 +72,24 @@ with an almost wait free implementation[footnote It is wait free if your CPU sup
 transactions, apart from when the memory allocator asks the kernel for more memory.] extending __boost_asio__
 and __boost_thread__ specialised as a portable asynchronous file i/o implementation
 library. Implementation of this first version has been kept as simple as possible (~ 1000 active
-LOC) at the cost of some performance, though with a good compiler [link
+LOC) at the cost of some performance, though with a good modern compiler [link
 afio.FAQ.closure_performance you can expect 25-50% of the
 performance of using raw Boost.ASIO]. This library was brought to __boost__ as part of Google
 Summer of Code 2013.
 
 Note that __boost_afio__ was originally written purely in C++11 and backported later to older compilers.
 It requires, as an absolute minimum, a compiler with rvalue reference support. Some popular
-compilers known to be minimally sufficient thanks to our Jenkins CI bot include:
+compilers known to be minimally sufficient thanks to [@https://ci.nedprod.com/ our Jenkins CI bot] include:
 
 * Microsoft Visual Studio 2010, released in 2010.
 * GNU Compiler Collection v4.6, released in 2011, but may work with as early as GCC v4.3.
 * clang v3.1, released in 2012, but may work with as early as clang v2.9.
+
+The Jenkins CI bot runs a full set of unit tests for all supported compilers on all supported
+platforms for every single commit to master branch and every single pull request. As of AFIO
+v1.2, it is rare to see anything except all green on the CI dashboard (apart from VS2010,
+on which changes to AFIO easily trigger internal compiler errors). [link unit_test_dashboard
+You can view the build and unit test CI dashboard for all compilers and platforms here].
 
 Note that just because a compiler will compile the code does not mean performance will be good:
 in particular, your compiler needs to be able to choose move construction where a copy
@@ -93,7 +99,11 @@ v3.0). You may find the list of C++11 features in popular compilers at
 [@http://wiki.apache.org/stdcxx/C++0xCompilerSupport] useful. Similarly, just because a compiler
 will compile the code does not mean that programming using that compiler and __boost_afio__
 isn't a waste of your time. In particular, you should [*avoid VS2010 and Mingw32 (not Mingw-w64
-which is fine) if at all possible], but if you can't, [link afio.advanced_topics.vs2010_notes we have written a guide especially for VS2010 and Mingw32].
+which is fine) if at all possible], but if you can't, [link afio.advanced_topics.vs2010_notes we have written a guide especially for VS2010 and Mingw32]. Try to use as new a compiler as possible with AFIO as
+the quality of code generated significantly improves with each major release. As an example, AFIO
+compiled with Visual Studio 2013 is about 15% faster than with Visual Studio 2012, which in turn
+was about a third faster than with Visual Studio 2010. [link afio.FAQ.closure_performance You
+can see some raw empirical benchmarks here].
 
 [important Note that Boost.AFIO has not passed Boost peer review, and therefore is not a part of the Boost C++ libraries]
 

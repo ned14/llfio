@@ -27,7 +27,8 @@ directories, so `include` directives of this scheme will work:
 
     #include <boost/...>
 
-[heading Supported Compilers And Current Trunk Build And Unit Test State]
+[heading:trunk_status Supported Compilers And Current Trunk Build And Unit Test State]
+[#unit_test_dashboard]
 
 '''
 <informaltable frame="all" border="1" color="black">
@@ -86,7 +87,7 @@ directories, so `include` directives of this scheme will work:
 <thead>
 <row>
 <entry namest="c1" nameend="c2">Linux</entry>
-<entry>FreeBSD</entry>
+<entry>FreeBSD 10 on ZFS</entry>
 <entry namest="c4" nameend="c6">WinXP</entry>
 <entry namest="c7" nameend="c8">Win7</entry>
 </row>

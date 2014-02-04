@@ -21,7 +21,7 @@ Jenkins CI status:<br/>build<br/>unit tests
 </tr>
 </table>
 <table border="1" cellpadding="2">
-<tr><th colspan="2">Linux</th><th>FreeBSD</th><th colspan="3">WinXP</th><th colspan="2">Win7</th></tr>
+<tr><th colspan="2">Linux</th><th>FreeBSD on ZFS</th><th colspan="3">WinXP</th><th colspan="2">Win7</th></tr>
 <tr><th>clang 3.1 + libc++ 2013-12</th><th>clang 3.3 + libc++ 2013-12</th><th>clang 3.3 + libc++</th>
 <th>VS2010</th><th>Mingw</th><th>Mingw-w64</th><th>VS2012</th><th>VS2013</th>
 </tr>
