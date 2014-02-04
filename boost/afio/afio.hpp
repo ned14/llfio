@@ -336,8 +336,8 @@ BOOST_AFIO_HEADERS_ONLY_FUNC_SPEC std::shared_ptr<std_thread_pool> process_threa
 namespace detail {
     template<class FutureType> struct get_future_type
     {
-        typedef decltype(std::declval<FutureType>().get()) type;
-        // typedef typename std::decay<decltype(((typename InputIterator::value_type *) 0)->get())>::type type;
+        //typedef decltype(std::declval<FutureType>().get()) type;
+        typedef typename std::decay<decltype(((FutureType *) 0)->get())>::type type;
     };
     template<class returns_t, class future_type> inline returns_t when_all_futures_do(std::shared_ptr<std::vector<future_type>> futures)
     {
