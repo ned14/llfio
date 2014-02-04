@@ -27,14 +27,14 @@ static int task()
         std_thread_pool pool(4);
         auto r=task();
         BOOST_CHECK(r==78);
-        std::vector<future<int>> results(8);
+        std::vector<shared_future<int>> results(8);
         
         BOOST_FOREACH(auto &i, results)
         {
             i=std::move(pool.enqueue(task));
         }
         
-        std::vector<future<int>> results2;
+        std::vector<shared_future<int>> results2;
         results2.push_back(pool.enqueue(task));
         results2.push_back(pool.enqueue(task));
         std::pair<size_t, int> allresults2=when_any(results2.begin(), results2.end()).get();

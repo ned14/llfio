@@ -45,15 +45,23 @@
 
 
 ]]
-[[``future< void > get_future()``
+[[``void set_task(std::function< void()> _task)``
 
-] [Returns the future corresponding to the future return value of the task. ] [
+] [Sets the task. ] [[* std::function< void()>]: ['_task]:  
+
+
+
+
+]]
+[[``shared_future< void > get_future()``
+
+] [Returns the shared future corresponding to the future return value of the task. ] [
 
 
 ]]
 [[``void set_future_exception(exception_ptr e)``
 
-] [Sets the future corresponding to the future return value of the task. ] [[* exception_ptr]: ['e]:  
+] [Sets the shared future corresponding to the future return value of the task. ] [[* exception_ptr]: ['e]:  
 
 
 
@@ -61,21 +69,15 @@
 ]]
 [[``void disable_auto_set_future(bool v = true)``
 
-] [Disables the task setting the future return value. ] [[* bool]: ['v]:  
+] [Disables the task setting the shared future return value. ] [[* bool]: ['v]:  
 
 
 
 
 ]]
-[[`` enqueued_task()``
+[[`` enqueued_task(std::function< void()> _task = std::function< void()>())``
 
-] [Default constructor. ] [
-
-
-]]
-[[`` enqueued_task(std::function< void()> c)``
-
-] [Constructs an enqueued task calling ['c]. ] [[* std::function< void()>]: ['c]:  
+] [Default constructor. ] [[* std::function< void()>]: ['_task]:  
 
 
 
@@ -83,7 +85,7 @@
 ]]
 [[``void set_future_value()``
 
-] [Sets the future corresponding to the future return value of the task. ] [
+] [Sets the shared future corresponding to the future return value of the task. ] [
 
 
 ]]

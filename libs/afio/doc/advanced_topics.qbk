@@ -24,22 +24,23 @@ AFIO with extra functionality, you almost certainly want __afio_call__ instead.
 
 Some advantages of custom completion handlers include:
 
-* Access to op id, handle and if immediately called, precondition error state.
+* Access to op id and any precondition op which was supplied at the point of scheduling.
 * Ability to schedule immediate completions which are executed instantly after
 their precondition instead of later when the thread source gets round to them.
 This is particularly useful when your host OS has real async i/o support, because
 you can use immediate completions to schedule non-blocking async i/o operations
-as quickly as possible. [*See below for the restrictions enforced on immediate completions].
-* Ability to schedule deferred completion handlers. These let you delay AFIO completion
-to some arbitrary time later e.g. when a host OS async operation completes.
-* Direct control of exception handling and error propagation.
-* Performance: completion handlers only have a [*two] nested `std::function<>` invocation
-overhead, rather than more. The reason why nesting `std::function<>` invocations is bad is
-because each entails type erasure, which requires the CPU to do an indirect jump
-(like a virtual function call) and while modern branch predictors eliminate any penalty
-for executing just one of those, they most certainly struggle when they have to execute
-a sequence of indirect jumps. For example, a single indirect jump might cost just two
-CPU cycles, while a mispredicted indirect jump might cost as much as 18-25 CPU cycles.
+as quickly as possible. Another use is taking advantage of Lx cache locality while
+the cache lines are still paged in.
+* Direct control of exception handling and error propagation, where arbitrary ops can be
+completed at any time by any thread in any circumstance.
+* Performance: completion handlers only have a single `std::function<>` invocation
+overhead, rather than more as would be the case with `call()`. The reason why nesting
+`std::function<>` invocations is bad is because each entails type erasure, which requires
+the CPU to do an indirect jump (like a virtual function call) and while modern branch
+predictors eliminate any penalty for executing just one of those, they most certainly
+struggle when they have to execute a sequence of indirect jumps. For example, a single
+indirect jump might cost just two CPU cycles, while a mispredicted indirect jump might
+cost as much as 18-25 CPU cycles.
 
 Some disadvantages of custom completion handlers include:
 
@@ -48,8 +49,7 @@ implement your own. This isn't hard __dash__ note how __afio_enumerate__'s inter
 handler in afio.cpp takes a shared pointer as a parameter containing the promises of output for
 the enumerations, thus allowing __afio_enumerate__ to set up a batch of futures
 corresponding to those promises and return those to the user.
-* Exception handling is rather more manual, especially for deferred completions. That
-comes of course with flexibility as well as hassle.
+* Exception handling is rather more manual. That comes of course with flexibility as well as hassle.
 
 So, let's have a look at an example of a custom AFIO completion handler, this being
 pretty much the simplest formulation possible:
@@ -57,59 +57,49 @@ pretty much the simplest formulation possible:
 [completion_example1]
 
 Note how you have fair amount of flexibility of defining any input parameters you like so long as
-the standard triplet of id, handle and exception pointer are there. This is enabled basically
+the standard duo of id and precondition are there. This is enabled basically
 through `std::bind<>` to prebind any custom parameters you may have to produce a `std::function<>`
-instance with the aforementioned standard triplet of parameters. As AFIO's completion
+instance with the aforementioned standard duo of parameters. As AFIO's completion
 implementation natively works with `std::function<>`, you effectively get custom parameter
 binds for free anyway.
 
 The above shows a simple custom completion handler __dash__ as mentioned earlier, one can also
-do immediate completions and deferred completions, and this is an example of just those:
+do immediate completions, and this is an example of just that:
 
 [completion_example2]
 
-Note the new function for indicating a deferred completion: `complete_async_op()`, which
-can take a `std::exception_ptr` if you want AFIO to return an errored state. Note also the
-`boost::afio::async_op_flags` `DetachedFuture` and `ImmediateCompletion` __dash__ if you fail to
-specify the former and try to return a `std::make_pair(false, h)` to indicate deferred
-completion from the completion handler, AFIO will throw a fatal exception as you forgot to
-specify the `DetachedFuture` flag.
+Note the new function for completing a deferred completion: `complete_async_op()`, which
+can take a `std::exception_ptr` if you want AFIO to return an errored state.
 
-Ops with detached futures are more complex to set up, execute and parse out for invoking
-dependencies than normal ops. They have to have, by definition, a separate exception handling
-and exception safety enforcement mechanism all of which can be safely left to `std::packaged_task<>`
-if not enabled. You should therefore not turn on detached futures unless you really need them.
-Remember you can vary the `DetachedFuture` flag per call of `completion()` to turn them on
-only when needed.
+As of AFIO v1.2 all of the constraints which were imposed on immediate completions
+are eliminated, and deferred completions were completely eliminated as now all completions
+are always deferred. Therefore, as of v1.2, you can do anything you can do in a normally
+scheduled op in an immediately scheduled op. Nevertheless, you should be aware of the
+following when using any kind of completion handler:
 
-If you may add the same completion handler both as a normal completion and as an immediate
-completion, and you need to tell how you were called in the handler, the `exception_ptr *e`
-will [*always] be non-null (i.e. point to an `exception_ptr`) if the handler was called
-as an immediate. It will always be null (i.e. point to nothing) if the handler was not
-called as an immediate. Just because `e` points to a valid `exception_ptr` does not
-necessarily mean that exception point is itself not null.
+* As far as AFIO is concerned, the precondition is completed and all knowledge of it
+deleted from AFIO's records by the time you see it in a completion handler (it is deleted
+as soon as possible to save on RAM footprint).
+* Therefore adding completions to the precondition of the completion being executed simply schedules
+them immediately (or executes them immediately if they are immediate) which may not be what
+you intended.
+* If you want to read in the handle output by the precondition for your own use, be aware
+that using the `async_io_op::get()` function will by default rethrow any exception stored
+into the precondition op. This has a useful side effect if you always do the following at
+the top of your completion handler implementation:
 
-And finally, as much as immediate completions are more efficient than normal
-completions, and you can achieve far higher throughputs with them especially as they
-involve almost no overhead to invoke, you should bear in
-mind the following substantial disadvantages of immediate completions:
+ `std::shared_ptr<async_io_handle> h(op.get());`
 
-* [*v1.0 ONLY]: Immediate completions must NEVER block, not EVER. This is because they are called while
-the oplock is held[footnote It is expected that in the near future the op lock will NOT
-be held during immediate completions so AFIO can remove the need for recursive mutexes,
-something which is currently a major performance problem.], and therefore no other op may be added, enqueued or [*completed]
-while an immediate completion is running. In other words, they hang the dispatcher.
-* Adding immediate completions to the precondition of the immediate completion being
-executed won't work __dash__ they get thrown away, just as if the completion were not
-immediate. This does eliminate the potential for endless loops of course. You CAN
-add completions to yourself (see the `op_from_scheduled_id()` method).
-* Immediate completions are invoked [*before] their precondition has returned their
-state to the future in the op ref, but [*after] the scheduling of any dependencies. This
-can lead to an interesting chicken and egg situation where your immediate completion
-can't know the output of its precondition if it is not an `exception_ptr` and not
-a `std::shared_ptr<boost::afio::async_io_handle> h`. One way of working around this
-problem is to make the precondition's future detached, because then the precondition's
-return state ['will] be available to its immediate completions.
+ ... by immediately rethrowing any precondition exception before you execute any more code.
+ You'll see this pattern very, very frequently throughout AFIO's source code and you are
+ encouraged to do the same. If you really don't want to propage exceptions immediately then do:
+
+ `std::shared_ptr<async_io_handle> h(op.get(true)); // Ignore any error state until later`
+
+ This will place a default constructed (i.e. empty) shared pointer into h if there is an
+ errored state, otherwise the correct handle. If you need to determine whether the precondition
+ is a null handle or an errored state, you can always use `get_exception_ptr()` on the
+ shared future referred to by the h member variable of the precondition op.
 
 [endsect] [/custom_completion_handler]
 

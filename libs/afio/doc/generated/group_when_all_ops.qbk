@@ -15,15 +15,18 @@
 Returns a result when all the supplied ops complete. Does not propagate exception states. 
 
 [heading Synopsis]
-``future<std::vector<std::shared_ptr<async_io_handle> > > when_all(std::nothrow_t _, std::vector< async_io_op >::iterator first, std::vector< async_io_op >::iterator last)``
+``template<class Iterator, typename>
+future<std::vector<std::shared_ptr<async_io_handle> > > when_all(std::nothrow_t _, Iterator first, Iterator last)``
 
 [heading Parameters]
 
 [table
 [[Type] [Concept] [Name] [Description] ]
+[[class Iterator] [An iterator type. ] [ - ] [Must be specified]]
+[[] [] [ - ] [Must be specified]]
 [[std::nothrow_t] [] [_] [An instance of std::nothrow_t. ]]
-[[std::vector< async_io_op >::iterator] [] [first] [A vector iterator pointing to the first async_io_op to wait upon. ]]
-[[std::vector< async_io_op >::iterator] [] [last] [A vector iterator pointing after the last async_io_op to wait upon.]]
+[[Iterator] [] [first] [A vector iterator pointing to the first async_io_op to wait upon. ]]
+[[Iterator] [] [last] [A vector iterator pointing after the last async_io_op to wait upon.]]
 ]
 
 
@@ -33,7 +36,7 @@ A future vector of shared\u005fptr's to async\u005fio\u005fhandle.
 [heading Header]
 `#include <boost/afio/afio.hpp>`
 
-[heading Complexity]O(N) to dispatch. O(N/threadpool) to complete, but at least one cache line is contended between threads.
+[heading Complexity]O(N).
 [heading Exception Model]Non propagating
 
 
@@ -62,7 +65,7 @@ A future vector of shared\u005fptr's to async\u005fio\u005fhandle.
 [heading Header]
 `#include <boost/afio/afio.hpp>`
 
-[heading Complexity]O(N) to dispatch. O(N/threadpool) to complete, but at least one cache line is contended between threads.
+[heading Complexity]O(N).
 [heading Exception Model]Non propagating
 
 
@@ -74,14 +77,17 @@ A future vector of shared\u005fptr's to async\u005fio\u005fhandle.
 Returns a result when all the supplied ops complete. Propagates exception states. 
 
 [heading Synopsis]
-``future<std::vector<std::shared_ptr<async_io_handle> > > when_all(std::vector< async_io_op >::iterator first, std::vector< async_io_op >::iterator last)``
+``template<class Iterator, typename>
+future<std::vector<std::shared_ptr<async_io_handle> > > when_all(Iterator first, Iterator last)``
 
 [heading Parameters]
 
 [table
 [[Type] [Concept] [Name] [Description] ]
-[[std::vector< async_io_op >::iterator] [] [first] [A vector iterator pointing to the first async_io_op to wait upon. ]]
-[[std::vector< async_io_op >::iterator] [] [last] [A vector iterator pointing after the last async_io_op to wait upon.]]
+[[class Iterator] [An iterator type. ] [ - ] [Must be specified]]
+[[] [] [ - ] [Must be specified]]
+[[Iterator] [] [first] [A vector iterator pointing to the first async_io_op to wait upon. ]]
+[[Iterator] [] [last] [A vector iterator pointing after the last async_io_op to wait upon.]]
 ]
 
 
@@ -91,7 +97,7 @@ A future vector of shared\u005fptr's to async\u005fio\u005fhandle.
 [heading Header]
 `#include <boost/afio/afio.hpp>`
 
-[heading Complexity]O(N) to dispatch. O(N/threadpool) to complete, but at least one cache line is contended between threads.
+[heading Complexity]O(N).
 [heading Exception Model]Propagating
 
 
@@ -119,7 +125,7 @@ A future vector of shared\u005fptr's to async\u005fio\u005fhandle.
 [heading Header]
 `#include <boost/afio/afio.hpp>`
 
-[heading Complexity]O(N) to dispatch. O(N/threadpool) to complete, but at least one cache line is contended between threads.
+[heading Complexity]O(N).
 [heading Exception Model]Propagating
 
 
@@ -148,7 +154,7 @@ A future vector of shared\u005fptr's to async\u005fio\u005fhandle.
 [heading Header]
 `#include <boost/afio/afio.hpp>`
 
-[heading Complexity]O(1) to dispatch. O(1) to complete.
+[heading Complexity]O(1).
 [heading Exception Model]Non propagating
 
 
@@ -176,7 +182,7 @@ A future vector of shared\u005fptr's to async\u005fio\u005fhandle.
 [heading Header]
 `#include <boost/afio/afio.hpp>`
 
-[heading Complexity]O(1) to dispatch. O(1) to complete.
+[heading Complexity]O(1).
 [heading Exception Model]Non propagating
 
 

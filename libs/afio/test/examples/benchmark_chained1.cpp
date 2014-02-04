@@ -4,13 +4,13 @@
     My Intel Core i7 3770K running     Linux x64: 968005 closures/sec
 */
 
-static std::pair<bool, std::shared_ptr<boost::afio::async_io_handle>> _callback(size_t, std::shared_ptr<boost::afio::async_io_handle> h, boost::afio::exception_ptr *)
+static std::pair<bool, std::shared_ptr<boost::afio::async_io_handle>> _callback(size_t, boost::afio::async_io_op op)
 {
 #if 0
     // Simulate an i/o op with a context switch
     Sleep(0);
 #endif
-    return std::make_pair(true, h);
+    return std::make_pair(true, op.get());
 };
 
 int main(void)

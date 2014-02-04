@@ -12,8 +12,6 @@
 [heading Anticipated forthcoming features in future versions]
 [/=================]
 
-* Replace all shared_ptr<async_io_handle> in completion_t with async_io_op.
-
 * Async fast batch hash engine which provides transparent hashing of all async
 reads and writes (in progress).
   * New completion handler metaprogramming letting you bind add hash to each
@@ -33,6 +31,39 @@ utilise shared memory when possible.
 * Fast, scalable portable directory contents change monitoring. It should be able
 to monitor a 1M entry directory experiencing 1% entry changes per second without
 using a shocking amount of RAM.
+
+
+[/=================]
+[heading Boost 1.56 AFIO v1.20]
+[/=================]
+
+This is a major refactor of AFIO's core op dispatch engine to trim it down by
+about 15%. Key breaking differences from the v1.1 series of AFIO are as follows:
+
+* Replaced all use of packaged_task with enqueued_task, a custom implementation
+which makes possible many performance improvements throughout the engine.
+* thread_source::enqueue() now can take a preprepared enqueued_task.
+* thread_source::enqueue() now always returns a shared_future instead of a future.
+This has had knock on effects throughout AFIO, so many futures are now shared_future.
+* Completion handler spec has changed from:
+ 
+   pair<bool, shared_ptr<async_io_handle>> (*)(size_t id, shared_ptr<async_io_handle> h, exception_ptr *e)
+ 
+  to:
+
+   pair<bool, shared_ptr<async_io_handle>> (*)(size_t id, async_io_op preceding)
+ 
+  This substantially improves performance, simplifies the implementation, and lets
+  completion handlers more readily retrieve the error state of preceding operations
+  and react appropriately.
+* All restrictions on immediate completions have been removed. You can now do anything
+in an immediate completion that you can do in a normal completion.
+* async_io_op::h now always refers to a correct future i.e. the future is no longer
+lazily allocated.
+* Now that op futures are always correct, when_all(ops) has been drastically simplified
+to an implementation which literally assembles the futures into a list and passes
+them to boost::wait_for_all().
+* Added when_any(ops).
 
 
 [/=================]
@@ -66,11 +97,6 @@ this.
 
 boost::afio::stat_t::st_mode() is now st_perms(). Also disabled unused fields in
 stat_t on Windows. Thanks to Bjorn Reese for suggesting this.
-
-Replaced all use of packaged_task with enqueued_task, a custom implementation
-which enables many performance improvements throughout the engine and makes
-possible replacing shared_ptr<async_io_handle> in completion handlers with
-async_io_op.
 
 [/=================]
 [heading Boost 1.55 AFIO v1.1]

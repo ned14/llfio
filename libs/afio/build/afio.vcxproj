@@ -19,11 +19,11 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\detail\ErrorHandling.cpp" />
     <ClCompile Include="..\detail\SpookyV2.cpp" />
     <ClCompile Include="..\src\afio.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\..\boost.afio\boost\afio\detail\impl\nt_kernel_stuff.hpp" />
     <ClInclude Include="..\..\..\boost\afio\afio.hpp" />
     <ClInclude Include="..\..\..\boost\afio\config.hpp" />
     <ClInclude Include="..\..\..\boost\afio\detail\Aligned_Allocator.hpp" />
@@ -33,7 +33,11 @@
     <ClInclude Include="..\..\..\boost\afio\detail\std_filesystem.hpp" />
     <ClInclude Include="..\..\..\boost\afio\detail\Undoer.hpp" />
     <ClInclude Include="..\..\..\boost\afio\detail\Utility.hpp" />
-    <ClInclude Include="..\..\..\boost\afio\detail\variadic.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\..\boost.afio\boost\afio\detail\impl\afio.ipp" />
+    <None Include="..\..\..\..\boost.afio\boost\afio\detail\impl\afio_iocp.ipp" />
+    <None Include="..\..\..\..\boost.afio\boost\afio\detail\impl\ErrorHandling.ipp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{31A5E53D-7416-4E1D-891A-1C69EF8553BD}</ProjectGuid>
@@ -79,7 +83,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <NMakeOutput>afio.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>WIN32;_DEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
-    <NMakeBuildCommandLine>..\..\..\b2</NMakeBuildCommandLine>
+    <NMakeBuildCommandLine>..\..\..\b2 --test=tests/async_io_adopt_test.cpp link=static --link-test</NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>..\..\..\b2 -a</NMakeReBuildCommandLine>
     <IncludePath>C:\Users\Project Kyo\Documents\GitHub\boost;$(IncludePath)</IncludePath>
   </PropertyGroup>

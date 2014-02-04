@@ -19,7 +19,7 @@ This is effectively a convenience wrapper for [^`completion()`]. It creates an e
 
 [heading Synopsis]
 ``template<class R>
-std::pair< std::vector< future< R > >, std::vector< async_io_op > > async_file_io_dispatcher_base::call(const std::vector< async_io_op > & ops, const std::vector< std::function< R()>> & callables)``
+std::pair< std::vector< shared_future< R > >, std::vector< async_io_op > > async_file_io_dispatcher_base::call(const std::vector< async_io_op > & ops, const std::vector< std::function< R()>> & callables)``
 
 [heading Parameters]
 
@@ -54,7 +54,7 @@ This is effectively a convenience wrapper for [^`completion()`]. It creates an e
 
 [heading Synopsis]
 ``template<class R>
-std::pair<std::vector<future<R> >, std::vector<async_io_op> > async_file_io_dispatcher_base::call(const std::vector< std::function< R()>> & callables)``
+std::pair<std::vector<shared_future<R> >, std::vector<async_io_op> > async_file_io_dispatcher_base::call(const std::vector< std::function< R()>> & callables)``
 
 [heading Parameters]
 
@@ -88,7 +88,7 @@ This is effectively a convenience wrapper for [^`completion()`]. It creates an e
 
 [heading Synopsis]
 ``template<class C, class... Args>
-std::pair< future< typename std::result_of< C(Args...)>::type >, async_io_op > async_file_io_dispatcher_base::call(const async_io_op & req, C callback, Args... args)``
+std::pair< shared_future< typename std::result_of< C(Args...)>::type >, async_io_op > async_file_io_dispatcher_base::call(const async_io_op & req, C callback, Args... args)``
 
 [heading Parameters]
 

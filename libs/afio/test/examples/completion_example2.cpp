@@ -13,23 +13,14 @@ int main(void)
         boost::afio::make_async_file_io_dispatcher();
     
     // One thing direct programming of completion handlers can do which call() cannot is immediate
-    // completions. These run immediately after the precondition finishes, but before the
-    // precondition releases its result or normal enqueuing of dependencies. This makes them
-    // suitable ONLY for very lightweight work, especially as they executed with the ops lock
-    // held unlike normal completions i.e. no other op may be added, enqueued or completed
-    // while an immediate completion is running. Classic uses for immediate completions are
-    // initiating an async op. You must NEVER execute a blocking call inside an immediate
-    // completion as you will hang the dispatcher.
-    
-    // Another thing direct programming can do is deferred completions, so completions which
-    // do not complete immediately but instead at some later time. This combines naturally with
-    // immediate completions: use an immediate completion to enqueue an async op and defer
-    // completion until when the async op completes.
+    // completions. These run immediately after the precondition finishes by the thread worker
+    // which executed the precondition rather than being appended to the FIFO queue. This can
+    // be useful for ensuring data is still cache-local for example.
     
     // Create the completion, using the standard form
     auto completion=[](std::shared_ptr<boost::afio::async_file_io_dispatcher_base> dispatcher,
         /* These are always the standard parameters */
-        size_t id, std::shared_ptr<boost::afio::async_io_handle> h, boost::afio::exception_ptr *e)
+        size_t id, boost::afio::async_io_op precondition)
       /* This is always the return type */
       -> std::pair<bool, std::shared_ptr<boost::afio::async_io_handle>>
     {
@@ -38,14 +29,15 @@ int main(void)
         // Create some callable entity which will do the actual completion. It can be
         // anything you like, but you need a minimum of its integer id.
         auto completer=[](std::shared_ptr<boost::afio::async_file_io_dispatcher_base> dispatcher,
-                          size_t id, std::shared_ptr<boost::afio::async_io_handle> h) -> int
+                          size_t id, boost::afio::async_io_op op) -> int
         {
             try
             {
                 std::cout << "I am completer" << std::endl;
 
                 // Do stuff, returning the handle you want passed onto dependencies.
-                dispatcher->complete_async_op(id, h);
+                // Note that op.get() rethrows any exception in op. Normally you want this.
+                dispatcher->complete_async_op(id, op.get());
             }
             catch(...)
             {
@@ -53,22 +45,22 @@ int main(void)
                 // do it by hand and tell AFIO about what exception state to return.
                 boost::afio::exception_ptr e(boost::afio::make_exception_ptr(
                     boost::afio::current_exception()));
-                dispatcher->complete_async_op(id, h, e);
+                dispatcher->complete_async_op(id, e);
             }
             return 0;
         };
         // Bind the id and handle to completer, and enqueue for later asynchronous execution.
-        std::async(std::launch::async, completer, dispatcher, id, h);
+        std::async(std::launch::async, completer, dispatcher, id, precondition);
         
         // Indicate we are not done yet
-        return std::make_pair(false, h);
+        return std::make_pair(false, precondition.get());
     };
        
     // Bind any user defined parameters to create a proper boost::afio::async_file_io_dispatcher_base::completion_t
     std::function<boost::afio::async_file_io_dispatcher_base::completion_t> boundf=
         std::bind(completion, dispatcher,
             /* The standard parameters */
-            std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+            std::placeholders::_1, std::placeholders::_2);
 
     // Schedule an asynchronous call of the completion
     boost::afio::async_io_op op=

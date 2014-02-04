@@ -16,35 +16,31 @@ int main(void)
     // First create some callable entity ...
     auto completer=[](
         /* These are always the standard parameters */
-        size_t id, std::shared_ptr<boost::afio::async_io_handle> h, boost::afio::exception_ptr *e,
+        size_t id, boost::afio::async_io_op precondition,
         /* From now on user defined parameters */
         std::string text)
       /* This is always the return type */
       -> std::pair<bool, std::shared_ptr<boost::afio::async_io_handle>>
     {
         /* id is the unique, non-zero integer id of this op.
-           h is a shared pointer to the file handle context returned by the precondition of this op.
-           e is a pointer to an exception_ptr. It is ONLY non-null when this completion was
-           called as an immediate completion. It MAY point to a valid exception_ptr if
-           this immediate completion is being completed because its precondition threw
-           an exception.
-           
-           If not an immediately completed completion, if you want to test if the precondition
-           threw an exception, you'll need to pass in its op's shared state (the h member)
-           so you can check the shared_future for an exception state.
+           precondition is the op you supplied as precondition. As it will by definition
+           have completed by now, you can fetch from its h member variable a shared pointer
+           to the shared future containing either the output async_io_handle or the error state.
         */
         std::cout << text << std::endl;
         
         // Return whether this completion has completed now or is it deferred,
         // along with the handle we pass onto any completions completing on this op
-        return std::make_pair(true, h);
+        // Note that op.get() by default rethrows any exception contained by the op.
+        // Normally this is highly desirable.
+        return std::make_pair(true, precondition.get());
     };
     
     // Bind any user defined parameters to create a proper boost::afio::async_file_io_dispatcher_base::completion_t
     std::function<boost::afio::async_file_io_dispatcher_base::completion_t> boundf=
         std::bind(completer,
             /* The standard parameters */
-            std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+            std::placeholders::_1, std::placeholders::_2,
             /* Any values for the user defined parameters. Remember ALWAYS to pass by value! */
             std::string("Hello world"));
     

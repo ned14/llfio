@@ -103,7 +103,7 @@ An op handle
 
 ]]
 [[``template<class R>
-std::pair< std::vector< future< R > >, std::vector< async_io_op > > call(const std::vector< async_io_op > & ops, const std::vector< std::function< R()>> & callables)``
+std::pair< std::vector< shared_future< R > >, std::vector< async_io_op > > call(const std::vector< async_io_op > & ops, const std::vector< std::function< R()>> & callables)``
 
 ] [Schedule a batch of asynchronous invocations of the specified bound functions when their supplied preconditions complete. ] [[* const std::vector< async_io_op > &]: ['ops]:  A batch of precondition op handles. If default constructed, a precondition is null. 
 
@@ -117,7 +117,7 @@ A pair with a batch of futures returning the result of each of the callables and
 
 ]]
 [[``template<class R>
-std::pair< std::vector< future< R > >, std::vector< async_io_op > > call(const std::vector< std::function< R()>> & callables)``
+std::pair< std::vector< shared_future< R > >, std::vector< async_io_op > > call(const std::vector< std::function< R()>> & callables)``
 
 ] [Schedule a batch of asynchronous invocations of the specified bound functions when their supplied preconditions complete. ] [[* const std::vector< std::function< R()>> &]: ['callables]:  A batch of bound functions to call, returning R.
 
@@ -129,7 +129,7 @@ A pair with a batch of futures returning the result of each of the callables and
 
 ]]
 [[``template<class R>
-std::pair< future< R >, async_io_op > call(const async_io_op & req, std::function< R()> callback)``
+std::pair< shared_future< R >, async_io_op > call(const async_io_op & req, std::function< R()> callback)``
 
 ] [Schedule an asynchronous invocation of the specified bound function when its supplied precondition completes. ] [[* const async_io_op &]: ['req]:  A precondition op handle. If default constructed, the precondition is null. 
 
@@ -143,7 +143,7 @@ A pair with a future returning the result of the callable and an op handle.
 
 ]]
 [[``template<class C, class... Args>
-std::pair< future< typename std::result_of< C(Args...)>::type >, async_io_op > call(const async_io_op & req, C callback, Args... args)``
+std::pair< shared_future< typename std::result_of< C(Args...)>::type >, async_io_op > call(const async_io_op & req, C callback, Args... args)``
 
 ] [Schedule an asynchronous invocation of the specified unbound callable when its supplied precondition completes. Note that this function essentially calls [^`std::bind()`] on the callable and the args and passes it to the other call() overload taking a [^`std::function<>`]. You should therefore use [^`std::ref()`] etc. as appropriate. ] [[* const async_io_op &]: ['req]:  A precondition op handle. If default constructed, the precondition is null. 
 
@@ -474,9 +474,19 @@ The page size of this architecture.
 ]]
 [[``void complete_async_op(size_t id, std::shared_ptr< async_io_handle > h, exception_ptr e = exception_ptr())``
 
-] [] [[* size_t]: ['id]:  
+] [Completes an operation with a handle or an error, usually used when an operation was previously deferred.] [[* size_t]: ['id]:  
 
 [* std::shared_ptr< async_io_handle >]: ['h]:  
+
+[* exception_ptr]: ['e]:  
+
+
+
+
+]]
+[[``void complete_async_op(size_t id, exception_ptr e)``
+
+] [Completes an operation with an error, usually used when an operation was previously deferred.] [[* size_t]: ['id]:  
 
 [* exception_ptr]: ['e]:  
 

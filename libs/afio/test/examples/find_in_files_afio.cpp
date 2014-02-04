@@ -84,10 +84,10 @@ public:
     }
     // A file searching completion, called when each file read completes
     std::pair<bool, std::shared_ptr<async_io_handle>> file_read(size_t id, 
-        std::shared_ptr<async_io_handle> h, exception_ptr *e, 
-        std::shared_ptr<std::vector<char, detail::aligned_allocator<char, 
-        4096, false>>> _buffer, size_t length)
+        async_io_op op, std::shared_ptr<std::vector<char,
+        detail::aligned_allocator<char, 4096, false>>> _buffer, size_t length)
     {
+        std::shared_ptr<async_io_handle> h(op.get());
         //std::cout << "R " << h->path() << std::endl;
         char *buffer=_buffer->data();
         buffer[length]=0;
@@ -99,8 +99,9 @@ public:
     }
     // A file reading completion, called when each file open completes
     std::pair<bool, std::shared_ptr<async_io_handle>> file_opened(size_t id, 
-        std::shared_ptr<async_io_handle> h, exception_ptr *e, size_t length)
+        async_io_op op, size_t length)
     {
+        std::shared_ptr<async_io_handle> h(op.get());
         //std::cout << "F " << h->path() << std::endl;
 #ifdef USE_MMAPS
         if(!!(h->flags() & file_flags::OSMMap))
@@ -121,7 +122,7 @@ public:
                 std::make_pair(async_op_flags::none/*regex search might be slow*/, 
                     std::function<async_file_io_dispatcher_base::completion_t>(
                         std::bind(&find_in_files::file_read, this, std::placeholders::_1, 
-                            std::placeholders::_2, std::placeholders::_3, buffer, length))));
+                            std::placeholders::_2, buffer, length))));
             doscheduled({ read, read_done });
         }
         docompleted(2);
@@ -129,9 +130,10 @@ public:
     }
     // An enumeration parsing completion, called when each directory enumeration completes
     std::pair<bool, std::shared_ptr<async_io_handle>> dir_enumerated(size_t id, 
-        std::shared_ptr<async_io_handle> h, exception_ptr *e, 
+        async_io_op op,
         std::shared_ptr<future<std::pair<std::vector<directory_entry>, bool>>> listing)
     {
+        std::shared_ptr<async_io_handle> h(op.get());
         async_io_op lastdir, thisop(dispatcher->op_from_scheduled_id(id));
         // Get the entries from the ready future
         std::vector<directory_entry> entries(std::move(listing->get().first));
@@ -150,7 +152,7 @@ public:
             }
             if(!dir_reqs.empty())
             {
-                std::vector<std::pair<async_op_flags, std::function<async_file_io_dispatcher_base::completion_t>>> dir_openedfs(dir_reqs.size(), std::make_pair(async_op_flags::None, std::bind(&find_in_files::dir_opened, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
+                std::vector<std::pair<async_op_flags, std::function<async_file_io_dispatcher_base::completion_t>>> dir_openedfs(dir_reqs.size(), std::make_pair(async_op_flags::None, std::bind(&find_in_files::dir_opened, this, std::placeholders::_1, std::placeholders::_2)));
                 auto dir_opens=dispatcher->dir(dir_reqs);
                 doscheduled(dir_opens);
                 auto dir_openeds=dispatcher->completion(dir_opens, dir_openedfs);
@@ -165,7 +167,7 @@ public:
         // when used with OSDirect so throttle directory enumerations to enforce some depth first traversal.
         {
             std::pair<async_op_flags, std::function<async_file_io_dispatcher_base::completion_t>> dir_openedf=std::make_pair(async_op_flags::none, std::bind(&find_in_files::dir_opened, this, 
-                std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+                std::placeholders::_1, std::placeholders::_2));
             for(auto &entry : entries)
             {
                 if(entry.st_type()==std::filesystem::file_type::directory_file)
@@ -197,7 +199,7 @@ public:
                         if(length>16384) flags=flags|file_flags::OSMMap;
 #endif
                         file_reqs.push_back(async_path_op_req(lastdir, h->path()/entry.name(), flags));
-                        file_openedfs.push_back(std::make_pair(async_op_flags::None, std::bind(&find_in_files::file_opened, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, length)));
+                        file_openedfs.push_back(std::make_pair(async_op_flags::None, std::bind(&find_in_files::file_opened, this, std::placeholders::_1, std::placeholders::_2, length)));
                     }
                 }
             }
@@ -225,7 +227,7 @@ public:
                             std::make_pair(async_op_flags::none, 
                                 std::function<async_file_io_dispatcher_base::completion_t>(
                                     std::bind(&find_in_files::file_opened, this, 
-                                        std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, length))));
+                                        std::placeholders::_1, std::placeholders::_2, length))));
                         doscheduled({ file_open, file_opened });
                         lastdir=file_opened;
                     }
@@ -238,8 +240,9 @@ public:
     }
     // A directory enumerating completion, called once per directory open in the tree
     std::pair<bool, std::shared_ptr<async_io_handle>> dir_opened(size_t id,
-     std::shared_ptr<async_io_handle> h, exception_ptr *e)
+     async_io_op op)
     {
+        std::shared_ptr<async_io_handle> h(op.get());
         //std::cout << "D " << h->path() << std::endl;
         // Now we have an open directory handle, schedule an enumeration
         auto enumeration=dispatcher->enumerate(async_enumerate_op_req(
@@ -250,7 +253,7 @@ public:
             make_pair(async_op_flags::none,
                 std::function<async_file_io_dispatcher_base::completion_t>(
                     std::bind(&find_in_files::dir_enumerated, this, 
-                        std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, listing))));
+                        std::placeholders::_1, std::placeholders::_2, listing))));
         doscheduled({enumeration.second, enumeration_done});
         docompleted(2);
         // Complete only if not the cur dir opened
@@ -299,7 +302,7 @@ public:
         auto cur_dir_opened=dispatcher->completion(cur_dir, std::make_pair(async_op_flags::none, 
             std::function<async_file_io_dispatcher_base::completion_t>(
                 std::bind(&find_in_files::dir_opened, this, 
-                    std::placeholders::_1, std::placeholders::_2, std::placeholders::_3))));
+                    std::placeholders::_1, std::placeholders::_2))));
         doscheduled({cur_dir, cur_dir_opened});
         dowait();
     }
@@ -307,7 +310,7 @@ public:
 
 int main(int argc, const char *argv[])
 {
-    using std::placeholders::_1; using std::placeholders::_2; using std::placeholders::_3;
+    using std::placeholders::_1; using std::placeholders::_2;
     using namespace boost::afio;
     typedef chrono::duration<double, ratio<1>> secs_type;
     if(argc<2)

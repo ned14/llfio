@@ -81,7 +81,7 @@ local VALGRIND_ARGS = [ MATCH --valgrind=(.*) : $(.argv) ] ;
 # if we're doing a valgrind build, set up the test launcher
 if $(VALGRIND_ARGS)
 {
-  launcher =  <testing.launcher>valgrind ;
+    launcher =  <testing.launcher>valgrind ;
 }
 
 #auto generate the test_all.cpp
@@ -101,6 +101,7 @@ local example_files = [ glob examples/*.cpp ] ;
 if $(test_files)
 {
     test_files_all = $(test_files) ;
+	single_test = true ;
 }
 else
 {
@@ -114,22 +115,29 @@ else
         test_files = [ glob tests/*.cpp ] ;
 	}
     test_files_all = $(test_files) test_all.cpp ;
+	single_test = false ;
 }
 
 # link tests (just compile and links targets)
-if "--link-test"  in $(.argv)  
-{  
-	# Test that inline linkage works
-	link test_inline_linkage_master.cpp test_inline_linkage1.cpp test_inline_linkage2.cpp ;
+if "--link-test" in $(.argv)  
+{
+	if $(single_test) != true
+	{
+		# Test that inline linkage works with variadic templates turned off
+		exe test_inline_linkage_master : test_inline_linkage_master.cpp test_inline_linkage1.cpp test_inline_linkage2.cpp : <define>BOOST_NO_CXX11_VARIADIC_TEMPLATES ;
+	}
 
     for local x in $(test_files_all)
     {
         link $(x) test_functions spooky ;
     }
-    for local x in $(example_files)
-    {
-        link $(x) afio_pch spooky ;
-    }
+	if $(single_test) != true
+	{
+		for local x in $(example_files)
+		{
+			link $(x) afio_pch spooky ;
+		}
+	}
 }
 else # run actual tests
 {
