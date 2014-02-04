@@ -334,7 +334,12 @@ On first use, this instantiates a default std_thread_pool running `BOOST_AFIO_MA
 BOOST_AFIO_HEADERS_ONLY_FUNC_SPEC std::shared_ptr<std_thread_pool> process_threadpool();
 
 namespace detail {
-    template<class returns_t, class future_type> inline returns_t when_all_do(std::shared_ptr<std::vector<future_type>> futures)
+    template<class FutureType> struct get_future_type
+    {
+        typedef decltype(std::declval<FutureType>().get()) type;
+        // typedef typename std::decay<decltype(((typename InputIterator::value_type *) 0)->get())>::type type;
+    };
+    template<class returns_t, class future_type> inline returns_t when_all_futures_do(std::shared_ptr<std::vector<future_type>> futures)
     {
         boost::wait_for_all(futures->begin(), futures->end());
         returns_t ret;
@@ -342,11 +347,62 @@ namespace detail {
         std::for_each(futures->begin(), futures->end(), [&ret](future_type &f) { ret.push_back(std::move(f.get())); });
         return ret;
     }
-    template<class returns_t, class future_type> inline returns_t when_any_do(std::shared_ptr<std::vector<future_type>> futures)
+    template <class InputIterator> inline shared_future<std::vector<typename get_future_type<typename InputIterator::value_type>::type>> when_all_futures(InputIterator first, InputIterator last)
+    {
+        typedef typename InputIterator::value_type future_type;
+        typedef typename get_future_type<future_type>::type value_type;
+        typedef std::vector<value_type> returns_t;
+        // Take a copy of the futures supplied to us (which may invalidate them)
+        // VS2010 uses a non-namespace qualified move() in its headers, which generates an ambiguous resolution error
+#if defined(BOOST_MSVC) && BOOST_MSVC < 1700 // <= VS2010
+        auto futures=std::make_shared<std::vector<future_type>>(boost::make_move_iterator(first), boost::make_move_iterator(last));
+#else
+        auto futures=std::make_shared<std::vector<future_type>>(std::make_move_iterator(first), std::make_move_iterator(last));
+#endif
+        // Bind to my delegate and invoke
+        std::function<returns_t ()> waitforall(std::move(std::bind(&when_all_futures_do<returns_t, future_type>, futures)));
+        return process_threadpool()->enqueue(std::move(waitforall));
+    }
+    template<class returns_t, class future_type> inline returns_t when_any_futures_do(std::shared_ptr<std::vector<future_type>> futures)
     {
         typename std::vector<future_type>::iterator it=boost::wait_for_any(futures->begin(), futures->end());
         return std::make_pair(std::distance(futures->begin(), it), std::move(it->get()));
     }
+    template <class InputIterator> inline shared_future<std::pair<size_t, typename get_future_type<typename InputIterator::value_type>::type>> when_any_futures(InputIterator first, InputIterator last)
+    {
+        typedef typename InputIterator::value_type future_type;
+        typedef typename get_future_type<future_type>::type value_type;
+        typedef std::pair<size_t, value_type> returns_t;
+        // Take a copy of the futures supplied to us (which may invalidate them)
+        // VS2010 uses a non-namespace qualified move() in its headers, which generates an ambiguous resolution error
+#if defined(BOOST_MSVC) && BOOST_MSVC < 1700 // <= VS2010
+        auto futures=std::make_shared<std::vector<future_type>>(boost::make_move_iterator(first), boost::make_move_iterator(last));
+#else
+        auto futures=std::make_shared<std::vector<future_type>>(std::make_move_iterator(first), std::make_move_iterator(last));
+#endif
+        // Bind to my delegate and invoke
+        std::function<returns_t ()> waitforall(std::move(std::bind(&when_any_futures_do<returns_t, future_type>, futures)));
+        return process_threadpool()->enqueue(std::move(waitforall));
+    }
+    template<bool is_all, class T> struct select_when_futures_return_type
+    {
+        typedef shared_future<std::vector<T>> type; // when_all()
+    };
+    template<class T> struct select_when_futures_return_type<false, T>
+    {
+        typedef shared_future<std::pair<size_t, T>> type; // when_any()
+    };
+    template<bool is_all, class ValueType> struct enable_if_future
+    {
+    };
+    template<bool is_all, class T> struct enable_if_future<is_all, future<T>>
+    {
+        typedef typename select_when_futures_return_type<is_all, T>::type type;
+    };
+    template<bool is_all, class T> struct enable_if_future<is_all, shared_future<T>>
+    {
+        typedef typename select_when_futures_return_type<is_all, T>::type type;
+    };
 }
 /*! \brief Makes a future vector of results from all the supplied futures
 
@@ -355,7 +411,7 @@ to allow you to create a future which only becomes available when all the suppli
 futures become available.
 
 \return A future vector of the results of the input futures
-\tparam "class InputIterator" A type modelling an iterator
+\tparam "class Iterator" A type modelling an iterator
 \param first An iterator pointing to the first item to wait upon
 \param last An iterator pointing to after the last future to wait upon
 \ingroup when_all_futures
@@ -363,25 +419,9 @@ futures become available.
 \complexity{O(N)}
 \exceptionmodel{The same as a future}
 */
-#ifdef BOOST_NO_CXX11_FUNCTION_TEMPLATE_DEFAULT_ARGS
-template <class InputIterator> inline typename std::enable_if<std::is_convertible<shared_future<typename std::decay<decltype(((typename InputIterator::value_type *) 0)->get())>::type>, typename InputIterator::value_type>::value, shared_future<std::vector<typename std::decay<decltype(((typename InputIterator::value_type *) 0)->get())>::type>>>::type when_all(InputIterator first, InputIterator last)
-#else
-template <class InputIterator, typename ___=typename std::enable_if<std::is_constructible<shared_future<typename std::decay<decltype(((typename InputIterator::value_type *) 0)->get())>::type>, typename InputIterator::value_type>::value>::type> inline shared_future<std::vector<typename std::decay<decltype(((typename InputIterator::value_type *) 0)->get())>::type>> when_all(InputIterator first, InputIterator last)
-#endif
+template<class Iterator> inline typename detail::enable_if_future<true, typename Iterator::value_type>::type when_all(Iterator first, Iterator last)
 {
-    typedef typename InputIterator::value_type future_type;
-    typedef typename std::decay<decltype(((typename InputIterator::value_type *) 0)->get())>::type value_type;
-    typedef std::vector<value_type> returns_t;
-    // Take a copy of the futures supplied to us (which may invalidate them)
-    // VS2010 uses a non-namespace qualified move() in its headers, which generates an ambiguous resolution error
-#if defined(BOOST_MSVC) && BOOST_MSVC < 1700 // <= VS2010
-    auto futures=std::make_shared<std::vector<future_type>>(boost::make_move_iterator(first), boost::make_move_iterator(last));
-#else
-    auto futures=std::make_shared<std::vector<future_type>>(std::make_move_iterator(first), std::make_move_iterator(last));
-#endif
-    // Bind to my delegate and invoke
-    std::function<returns_t ()> waitforall(std::move(std::bind(&detail::when_all_do<returns_t, future_type>, futures)));
-    return process_threadpool()->enqueue(std::move(waitforall));
+    return detail::when_all_futures(first, last);
 }
 //! Returns a future tuple of results from all the supplied futures
 //template <typename... T> inline future<std::tuple<typename std::decay<T...>::type>> when_all(T&&... futures);
@@ -400,25 +440,9 @@ futures become available.
 \complexity{The same as boost::wait_for_any()}
 \exceptionmodel{The same as a future}
 */
-#ifdef BOOST_NO_CXX11_FUNCTION_TEMPLATE_DEFAULT_ARGS
-template <class InputIterator> inline typename std::enable_if<std::is_convertible<shared_future<typename std::decay<decltype(((typename InputIterator::value_type *) 0)->get())>::type>, typename InputIterator::value_type>::value, shared_future<std::pair<size_t, typename std::decay<decltype(((typename InputIterator::value_type *) 0)->get())>::type>>>::type when_any(InputIterator first, InputIterator last)
-#else
-template <class InputIterator, typename ___=typename std::enable_if<std::is_constructible<shared_future<typename std::decay<decltype(((typename InputIterator::value_type *) 0)->get())>::type>, typename InputIterator::value_type>::value>::type> inline shared_future<std::pair<size_t, typename std::decay<decltype(((typename InputIterator::value_type *) 0)->get())>::type>> when_any(InputIterator first, InputIterator last)
-#endif
+template<class Iterator> inline typename detail::enable_if_future<false, typename Iterator::value_type>::type when_any(Iterator first, Iterator last)
 {
-    typedef typename InputIterator::value_type future_type;
-    typedef typename std::decay<decltype(((typename InputIterator::value_type *) 0)->get())>::type value_type;
-    typedef std::pair<size_t, typename std::decay<decltype(((typename InputIterator::value_type *) 0)->get())>::type> returns_t;
-    // Take a copy of the futures supplied to us (which may invalidate them)
-    // VS2010 uses a non-namespace qualified move() in its headers, which generates an ambiguous resolution error
-#if defined(BOOST_MSVC) && BOOST_MSVC < 1700 // <= VS2010
-    auto futures=std::make_shared<std::vector<future_type>>(boost::make_move_iterator(first), boost::make_move_iterator(last));
-#else
-    auto futures=std::make_shared<std::vector<future_type>>(std::make_move_iterator(first), std::make_move_iterator(last));
-#endif
-    // Bind to my delegate and invoke
-    std::function<returns_t ()> waitforall(std::move(std::bind(&detail::when_any_do<returns_t, future_type>, futures)));
-    return process_threadpool()->enqueue(std::move(waitforall));
+    return detail::when_any_futures(first, last);
 }
 //! Returns a future result from the first of the supplied futures
 /*template <typename... T> inline future<std::pair<size_t, typename std::decay<T>::type>> when_any(T&&... futures)
@@ -1614,7 +1638,7 @@ namespace detail
         promise<std::vector<std::shared_ptr<async_io_handle>>> out;
         std::vector<shared_future<std::shared_ptr<async_io_handle>>> in;
     };
-    template<bool rethrow> inline void when_all_do(std::shared_ptr<when_all_state> state)
+    template<bool rethrow> inline void when_all_ops_do(std::shared_ptr<when_all_state> state)
     {
         boost::wait_for_all(state->in.begin(), state->in.end());
         std::vector<std::shared_ptr<async_io_handle>> ret;
@@ -1636,14 +1660,14 @@ namespace detail
         }
         state->out.set_value(ret);
     }
-    template<bool rethrow, class Iterator> inline future<std::vector<std::shared_ptr<async_io_handle>>> when_all(Iterator first, Iterator last)
+    template<bool rethrow, class Iterator> inline future<std::vector<std::shared_ptr<async_io_handle>>> when_all_ops(Iterator first, Iterator last)
     {
         auto state=std::make_shared<when_all_state>();
         state->in.reserve(std::distance(first, last));
         for(; first!=last; ++first)
             state->in.push_back(*first->h);
         auto ret=state->out.get_future();
-        process_threadpool()->enqueue(std::bind(&when_all_do<rethrow>, state));
+        process_threadpool()->enqueue(std::bind(&when_all_ops_do<rethrow>, state));
         return std::move(ret);
     }
     struct when_any_state : std::enable_shared_from_this<when_any_state>
@@ -1651,7 +1675,7 @@ namespace detail
         promise<std::shared_ptr<async_io_handle>> out;
         std::vector<shared_future<std::shared_ptr<async_io_handle>>> in;
     };
-    template<bool rethrow> inline void when_any_do(std::shared_ptr<when_any_state> state)
+    template<bool rethrow> inline void when_any_ops_do(std::shared_ptr<when_any_state> state)
     {
         auto &i=*boost::wait_for_any(state->in.begin(), state->in.end());
         auto e(get_exception_ptr(i));
@@ -1667,16 +1691,32 @@ namespace detail
         else
             state->out.set_value(i.get());
     }
-    template<bool rethrow, class Iterator> inline future<std::shared_ptr<async_io_handle>> when_any(Iterator first, Iterator last)
+    template<bool rethrow, class Iterator> inline future<std::shared_ptr<async_io_handle>> when_any_ops(Iterator first, Iterator last)
     {
         auto state=std::make_shared<when_any_state>();
         state->in.reserve(std::distance(first, last));
         for(; first!=last; ++first)
             state->in.push_back(*first->h);
         auto ret=state->out.get_future();
-        process_threadpool()->enqueue(std::bind(&when_any_do<rethrow>, state));
+        process_threadpool()->enqueue(std::bind(&when_any_ops_do<rethrow>, state));
         return std::move(ret);
     }
+    template<bool is_all> struct select_when_ops_return_type
+    {
+        typedef future<std::vector<std::shared_ptr<async_io_handle>>> type; // when_all()
+    };
+    template<> struct select_when_ops_return_type<false>
+    {
+        typedef future<std::shared_ptr<async_io_handle>> type; // when_any()
+    };
+    template<bool is_all, class T> struct enable_if_async_op
+    {
+        //static_assert(std::is_same<T, T>::value, "Not an iterator of async_io_op");
+    };
+    template<bool is_all> struct enable_if_async_op<is_all, async_io_op>
+    {
+        typedef typename select_when_ops_return_type<is_all>::type type;
+    };
 }
 
 /*! \brief Returns a result when all the supplied ops complete. Does not propagate exception states.
@@ -1684,44 +1724,36 @@ namespace detail
 \return A future vector of shared_ptr's to async_io_handle.
 \tparam "class Iterator" An iterator type.
 \param _ An instance of std::nothrow_t.
-\param first A vector iterator pointing to the first async_io_op to wait upon.
-\param last A vector iterator pointing after the last async_io_op to wait upon.
+\param first An iterator pointing to the first async_io_op to wait upon.
+\param last An iterator pointing after the last async_io_op to wait upon.
 \ingroup when_all_ops
 \qbk{distinguish, iterator batch of ops not exception propagating}
 \complexity{O(N).}
 \exceptionmodel{Non propagating}
 */
-#ifdef BOOST_NO_CXX11_FUNCTION_TEMPLATE_DEFAULT_ARGS
-template<class Iterator> inline typename std::enable_if<std::is_convertible<async_io_op, typename Iterator::value_type>::value, future<std::vector<std::shared_ptr<async_io_handle>>>>::type when_all(std::nothrow_t _, Iterator first, Iterator last)
-#else
-template<class Iterator, typename ___=typename std::enable_if<std::is_constructible<async_io_op, typename Iterator::value_type>::value>::type> inline future<std::vector<std::shared_ptr<async_io_handle>>> when_all(std::nothrow_t _, Iterator first, Iterator last)
-#endif
+template<class Iterator> inline typename detail::enable_if_async_op<true, typename Iterator::value_type>::type when_all(std::nothrow_t _, Iterator first, Iterator last)
 {
     if(first==last)
         return future<std::vector<std::shared_ptr<async_io_handle>>>();
-    return detail::when_all<false>(first, last);
+    return detail::when_all_ops<false>(first, last);
 }
 /*! \brief Returns a result when any the supplied ops complete. Does not propagate exception states.
 
 \return A future vector of shared_ptr's to async_io_handle.
 \tparam "class Iterator" An iterator type.
 \param _ An instance of std::nothrow_t.
-\param first A vector iterator pointing to the first async_io_op to wait upon.
-\param last A vector iterator pointing after the last async_io_op to wait upon.
+\param first An iterator pointing to the first async_io_op to wait upon.
+\param last An iterator pointing after the last async_io_op to wait upon.
 \ingroup when_any_ops
 \qbk{distinguish, iterator batch of ops not exception propagating}
 \complexity{O(N).}
 \exceptionmodel{Non propagating}
 */
-#ifdef BOOST_NO_CXX11_FUNCTION_TEMPLATE_DEFAULT_ARGS
-template<class Iterator> inline typename std::enable_if<std::is_convertible<async_io_op, typename Iterator::value_type>::value, future<std::shared_ptr<async_io_handle>>>::type when_any(std::nothrow_t _, Iterator first, Iterator last)
-#else
-template<class Iterator, typename ___=typename std::enable_if<std::is_constructible<async_io_op, typename Iterator::value_type>::value>::type> inline future<std::shared_ptr<async_io_handle>> when_any(std::nothrow_t _, Iterator first, Iterator last)
-#endif
+template<class Iterator> inline typename detail::enable_if_async_op<false, typename Iterator::value_type>::type when_any(std::nothrow_t _, Iterator first, Iterator last)
 {
     if(first==last)
         return future<std::shared_ptr<async_io_handle>>();
-    return detail::when_any<false>(first, last);
+    return detail::when_any_ops<false>(first, last);
 }
 /*! \brief Returns a result when all the supplied ops complete. Does not propagate exception states.
 
@@ -1737,7 +1769,7 @@ inline future<std::vector<std::shared_ptr<async_io_handle>>> when_all(std::nothr
 {
     if(ops.empty())
         return future<std::vector<std::shared_ptr<async_io_handle>>>();
-    return detail::when_all<false>(ops.begin(), ops.end());
+    return detail::when_all_ops<false>(ops.begin(), ops.end());
 }
 /*! \brief Returns a result when any the supplied ops complete. Does not propagate exception states.
 
@@ -1753,49 +1785,41 @@ inline future<std::shared_ptr<async_io_handle>> when_any(std::nothrow_t _, std::
 {
     if(ops.empty())
         return future<std::shared_ptr<async_io_handle>>();
-    return detail::when_any<false>(ops.begin(), ops.end());
+    return detail::when_any_ops<false>(ops.begin(), ops.end());
 }
 /*! \brief Returns a result when all the supplied ops complete. Propagates exception states.
 
 \return A future vector of shared_ptr's to async_io_handle.
 \tparam "class Iterator" An iterator type.
-\param first A vector iterator pointing to the first async_io_op to wait upon.
-\param last A vector iterator pointing after the last async_io_op to wait upon.
+\param first An iterator pointing to the first async_io_op to wait upon.
+\param last An iterator pointing after the last async_io_op to wait upon.
 \ingroup when_all_ops
 \qbk{distinguish, iterator batch of ops exception propagating}
 \complexity{O(N).}
 \exceptionmodel{Propagating}
 */
-#ifdef BOOST_NO_CXX11_FUNCTION_TEMPLATE_DEFAULT_ARGS
-template<class Iterator> inline typename std::enable_if<std::is_convertible<async_io_op, typename Iterator::value_type>::value, future<std::vector<std::shared_ptr<async_io_handle>>>>::type when_all(Iterator first, Iterator last)
-#else
-template<class Iterator, typename ___=typename std::enable_if<std::is_constructible<async_io_op, typename Iterator::value_type>::value>::type> inline future<std::vector<std::shared_ptr<async_io_handle>>> when_all(Iterator first, Iterator last)
-#endif
+template<class Iterator> inline typename detail::enable_if_async_op<true, typename Iterator::value_type>::type when_all(Iterator first, Iterator last)
 {
     if(first==last)
         return future<std::vector<std::shared_ptr<async_io_handle>>>();
-    return detail::when_all<true>(first, last);
+    return detail::when_all_ops<true>(first, last);
 }
 /*! \brief Returns a result when any the supplied ops complete. Propagates exception states.
 
 \return A future vector of shared_ptr's to async_io_handle.
 \tparam "class Iterator" An iterator type.
-\param first A vector iterator pointing to the first async_io_op to wait upon.
-\param last A vector iterator pointing after the last async_io_op to wait upon.
+\param first An iterator pointing to the first async_io_op to wait upon.
+\param last An iterator pointing after the last async_io_op to wait upon.
 \ingroup when_any_ops
 \qbk{distinguish, iterator batch of ops exception propagating}
 \complexity{O(N).}
 \exceptionmodel{Propagating}
 */
-#ifdef BOOST_NO_CXX11_FUNCTION_TEMPLATE_DEFAULT_ARGS
-template<class Iterator> inline typename std::enable_if<std::is_convertible<async_io_op, typename Iterator::value_type>::value, future<std::shared_ptr<async_io_handle>>>::type when_any(Iterator first, Iterator last)
-#else
-template<class Iterator, typename ___=typename std::enable_if<std::is_constructible<async_io_op, typename Iterator::value_type>::value>::type> inline future<std::shared_ptr<async_io_handle>> when_any(Iterator first, Iterator last)
-#endif
+template<class Iterator> inline typename detail::enable_if_async_op<false, typename Iterator::value_type>::type when_any(Iterator first, Iterator last)
 {
     if(first==last)
         return future<std::shared_ptr<async_io_handle>>();
-    return detail::when_any<true>(first, last);
+    return detail::when_any_ops<true>(first, last);
 }
 /*! \brief Returns a result when all the supplied ops complete. Propagates exception states.
 
@@ -1810,7 +1834,7 @@ inline future<std::vector<std::shared_ptr<async_io_handle>>> when_all(std::vecto
 {
     if(ops.empty())
         return future<std::vector<std::shared_ptr<async_io_handle>>>();
-    return detail::when_all<true>(ops.begin(), ops.end());
+    return detail::when_all_ops<true>(ops.begin(), ops.end());
 }
 /*! \brief Returns a result when any the supplied ops complete. Propagates exception states.
 
@@ -1825,7 +1849,7 @@ inline future<std::shared_ptr<async_io_handle>> when_any(std::vector<async_io_op
 {
     if(ops.empty())
         return future<std::shared_ptr<async_io_handle>>();
-    return detail::when_any<true>(ops.begin(), ops.end());
+    return detail::when_any_ops<true>(ops.begin(), ops.end());
 }
 /*! \brief Returns a result when the supplied op completes. Does not propagate exception states.
 
