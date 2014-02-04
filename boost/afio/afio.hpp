@@ -432,7 +432,7 @@ to allow you to create a future which only becomes available when the first of t
 futures become available.
 
 \return A future pair of the first future to become available and its result
-\tparam "class InputIterator" A type modelling an iterator
+\tparam "class Iterator" A type modelling an iterator
 \param first An iterator pointing to the first future to wait upon
 \param last An iterator pointing to after the last future to wait upon
 \ingroup when_all_futures

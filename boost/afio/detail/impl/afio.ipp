@@ -1367,7 +1367,7 @@ template<class F, class... Args> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC async_io_o
         if(!done)\
         {\
             /* Bind input handle now and queue immediately to next available thread worker*/ \
-            if(precondition.id && precondition.h->valid()) \
+            if(precondition.id && !precondition.h->valid()) \
             { \
                 /* It should never happen that precondition.id is valid but removed from extant ops*/\
                 /* which indicates it completed and yet h remains invalid*/\
@@ -1378,8 +1378,8 @@ template<class F, class... Args> BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC async_io_o
             else \
                 p->pool->enqueue(thisop->enqueuement); \
         }\
-        unopsit.dismiss();\
         undep.dismiss();\
+        unopsit.dismiss();\
         return ret;\
     }
 
