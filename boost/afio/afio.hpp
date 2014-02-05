@@ -1023,6 +1023,7 @@ public:
     BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC size_t fd_count() const;
     /*! \brief Returns an op ref for a given \b currently scheduled op id, throwing an exception if id not scheduled at the point of call.
     Can be used to retrieve exception state from some op id, or one's own shared future.
+    
     \return An async_io_op with the same shared future as all op refs with this id.
     \param id The unique integer id for the op.
     */
@@ -1039,6 +1040,7 @@ public:
 #endif
 #endif
     /*! \brief Schedule a batch of asynchronous invocations of the specified functions when their supplied operations complete.
+    
     \return A batch of op handles
     \param ops A batch of precondition op handles.
     \param callbacks A batch of pairs of op flags and bound completion handler functions of type `completion_t`
@@ -1050,6 +1052,7 @@ public:
     */
     BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC std::vector<async_io_op> completion(const std::vector<async_io_op> &ops, const std::vector<std::pair<async_op_flags, std::function<async_file_io_dispatcher_base::completion_t>>> &callbacks);
     /*! \brief Schedule the asynchronous invocation of the specified single function when the supplied single operation completes.
+    
     \return An op handle
     \param req A precondition op handle
     \param callback A pair of op flag and bound completion handler function of type `completion_t`
@@ -1220,6 +1223,7 @@ public:
     */
     inline async_io_op dir(const async_path_op_req &req);
     /*! \brief Schedule a batch of asynchronous directory deletions after optional preconditions.
+    
     \return A batch of op handles.
     \param reqs A batch of `async_path_op_req` structures.
     \ingroup async_file_io_dispatcher_base__filedirops
@@ -1230,6 +1234,7 @@ public:
     */
     BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC std::vector<async_io_op> rmdir(const std::vector<async_path_op_req> &reqs) BOOST_AFIO_HEADERS_ONLY_VIRTUAL_UNDEFINED_SPEC
     /*! \brief Schedule an asynchronous directory deletion after an optional precondition.
+    
     \return An op handle.
     \param req An `async_path_op_req` structure.
     \ingroup async_file_io_dispatcher_base__filedirops
@@ -1240,6 +1245,7 @@ public:
     */
     inline async_io_op rmdir(const async_path_op_req &req);
     /*! \brief Schedule a batch of asynchronous file creations and opens after optional preconditions.
+    
     \return A batch of op handles.
     \param reqs A batch of `async_path_op_req` structures.
     \ingroup async_file_io_dispatcher_base__filedirops
@@ -1250,6 +1256,7 @@ public:
     */
     BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC std::vector<async_io_op> file(const std::vector<async_path_op_req> &reqs) BOOST_AFIO_HEADERS_ONLY_VIRTUAL_UNDEFINED_SPEC
     /*! \brief Schedule an asynchronous file creation and open after an optional precondition.
+    
     \return An op handle.
     \param req An `async_path_op_req` structure.
     \ingroup async_file_io_dispatcher_base__filedirops
@@ -1260,6 +1267,7 @@ public:
     */
     inline async_io_op file(const async_path_op_req &req);
     /*! \brief Schedule a batch of asynchronous file deletions after optional preconditions.
+    
     \return A batch of op handles.
     \param reqs A batch of `async_path_op_req` structures.
     \ingroup async_file_io_dispatcher_base__filedirops
@@ -1270,6 +1278,7 @@ public:
     */
     BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC std::vector<async_io_op> rmfile(const std::vector<async_path_op_req> &reqs) BOOST_AFIO_HEADERS_ONLY_VIRTUAL_UNDEFINED_SPEC
     /*! \brief Schedule an asynchronous file deletion after an optional precondition.
+    
     \return An op handle.
     \param req An `async_path_op_req` structure.
     \ingroup async_file_io_dispatcher_base__filedirops
@@ -1314,6 +1323,7 @@ public:
     */
     inline async_io_op symlink(const async_path_op_req &req);
     /*! \brief Schedule a batch of asynchronous symlink deletions after optional preconditions.
+    
     \return A batch of op handles.
     \param reqs A batch of `async_path_op_req` structures.
     \ingroup async_file_io_dispatcher_base__filedirops
@@ -1324,6 +1334,7 @@ public:
     */
     BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC std::vector<async_io_op> rmsymlink(const std::vector<async_path_op_req> &reqs) BOOST_AFIO_HEADERS_ONLY_VIRTUAL_UNDEFINED_SPEC
     /*! \brief Schedule an asynchronous symlink deletion after an optional precondition.
+    
     \return An op handle.
     \param req An `async_path_op_req` structure.
     \ingroup async_file_io_dispatcher_base__filedirops
@@ -1334,6 +1345,7 @@ public:
     */
     inline async_io_op rmsymlink(const async_path_op_req &req);
     /*! \brief Schedule a batch of asynchronous content synchronisations with physical storage after preceding operations.
+    
     \return A batch of op handles.
     \param ops A batch of op handles.
     \ingroup async_file_io_dispatcher_base__filedirops
@@ -1344,6 +1356,7 @@ public:
     */
     BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC std::vector<async_io_op> sync(const std::vector<async_io_op> &ops) BOOST_AFIO_HEADERS_ONLY_VIRTUAL_UNDEFINED_SPEC
     /*! \brief Schedule an asynchronous content synchronisation with physical storage after a preceding operation.
+    
     \return An op handle.
     \param req An op handle.
     \ingroup async_file_io_dispatcher_base__filedirops
@@ -1354,6 +1367,7 @@ public:
     */
     inline async_io_op sync(const async_io_op &req);
     /*! \brief Schedule a batch of asynchronous file or directory handle closes after preceding operations.
+    
     \return A batch of op handles.
     \param ops A batch of op handles.
     \ingroup async_file_io_dispatcher_base__filedirops
@@ -1364,6 +1378,7 @@ public:
     */
     BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC std::vector<async_io_op> close(const std::vector<async_io_op> &ops) BOOST_AFIO_HEADERS_ONLY_VIRTUAL_UNDEFINED_SPEC
     /*! \brief Schedule an asynchronous file or directory handle close after a preceding operation.
+    
     \return An op handle.
     \param req An op handle.
     \ingroup async_file_io_dispatcher_base__filedirops
@@ -1450,6 +1465,7 @@ public:
 #endif
 
     /*! \brief Schedule a batch of asynchronous file length truncations after preceding operations.
+    
     \return A batch of op handles.
     \param ops A batch of op handles.
     \param sizes A batch of new lengths.
@@ -1461,6 +1477,7 @@ public:
     */
     BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC std::vector<async_io_op> truncate(const std::vector<async_io_op> &ops, const std::vector<off_t> &sizes) BOOST_AFIO_HEADERS_ONLY_VIRTUAL_UNDEFINED_SPEC
     /*! \brief Schedule an asynchronous file length truncation after a preceding operation.
+    
     \return An op handle.
     \param op An op handle.
     \param newsize The new size for the file.
@@ -1536,6 +1553,7 @@ public:
     BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC std::vector<async_io_op> barrier(const std::vector<async_io_op> &ops);
 
     /*! \brief Returns the page size of this architecture which is useful for calculating direct i/o multiples.
+    
     \return The page size of this architecture.
     \ingroup async_file_io_dispatcher_base__misc
     \complexity{Whatever the system API takes (one would hope constant time).}
@@ -1544,6 +1562,7 @@ public:
     static BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC size_t page_size() BOOST_NOEXCEPT_OR_NOTHROW;
 
     /*! \brief Completes an operation with a handle or an error, usually used when an operation was previously deferred.
+
     \ingroup async_file_io_dispatcher_base__misc
     \qbk{distinguish, normal}
     \complexity{O(N) where N is the number of completions dependent on this op.}
@@ -1551,6 +1570,7 @@ public:
     */
     BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC void complete_async_op(size_t id, std::shared_ptr<async_io_handle> h, exception_ptr e=exception_ptr());
     /*! \brief Completes an operation with an error, usually used when an operation was previously deferred.
+
     \ingroup async_file_io_dispatcher_base__misc
     \qbk{distinguish, errored}
     \complexity{O(N) where N is the number of completions dependent on this op.}

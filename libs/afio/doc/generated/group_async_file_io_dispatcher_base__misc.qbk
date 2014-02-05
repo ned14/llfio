@@ -36,10 +36,10 @@ The page size of this architecture.
 
 [endsect]
 
-[section:complete_async_op_3 complete_async_op]
+[section:complete_async_op_3_normal complete_async_op (normal)]
 
 '''<indexterm><primary>complete_async_op</primary></indexterm>'''
-Completes an operation with a handle or an error, usually used when an operation was previously deferred.
+Completes an operation with a handle or an error, usually used when an operation was previously deferred. 
 
 [heading Synopsis]
 ``void async_file_io_dispatcher_base::complete_async_op(size_t id, std::shared_ptr< async_io_handle > h, exception_ptr e = exception_ptr())``
@@ -57,13 +57,16 @@ Completes an operation with a handle or an error, usually used when an operation
 [heading Header]
 `#include <boost/afio/afio.hpp>`
 
+[heading Complexity]O(N) where N is the number of completions dependent on this op.
+[heading Exception Model]Should not throw any exception except for out of memory.
+
 
 [endsect]
 
-[section:complete_async_op_2 complete_async_op]
+[section:complete_async_op_2_errored complete_async_op (errored)]
 
 '''<indexterm><primary>complete_async_op</primary></indexterm>'''
-Completes an operation with an error, usually used when an operation was previously deferred.
+Completes an operation with an error, usually used when an operation was previously deferred. 
 
 [heading Synopsis]
 ``void async_file_io_dispatcher_base::complete_async_op(size_t id, exception_ptr e)``
@@ -79,6 +82,9 @@ Completes an operation with an error, usually used when an operation was previou
 
 [heading Header]
 `#include <boost/afio/afio.hpp>`
+
+[heading Complexity]O(N) where N is the number of completions dependent on this op.
+[heading Exception Model]Should not throw any exception except for out of memory.
 
 
 [endsect]

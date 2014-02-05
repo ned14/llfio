@@ -474,7 +474,7 @@ The page size of this architecture.
 ]]
 [[``void complete_async_op(size_t id, std::shared_ptr< async_io_handle > h, exception_ptr e = exception_ptr())``
 
-] [Completes an operation with a handle or an error, usually used when an operation was previously deferred.] [[* size_t]: ['id]:  
+] [Completes an operation with a handle or an error, usually used when an operation was previously deferred. ] [[* size_t]: ['id]:  
 
 [* std::shared_ptr< async_io_handle >]: ['h]:  
 
@@ -486,7 +486,7 @@ The page size of this architecture.
 ]]
 [[``void complete_async_op(size_t id, exception_ptr e)``
 
-] [Completes an operation with an error, usually used when an operation was previously deferred.] [[* size_t]: ['id]:  
+] [Completes an operation with an error, usually used when an operation was previously deferred. ] [[* size_t]: ['id]:  
 
 [* exception_ptr]: ['e]:  
 
