@@ -1,0 +1,92 @@
+# Travis CI script to invoke coveralls.io coverage reporting
+# (C) 2015 Niall Douglas
+
+language: cpp
+os:
+ - linux
+ - osx
+notifications:
+  email:
+#    recipients:
+#      - one@example.com
+#      - other@example.com
+    on_success: change # [always|never|change] # default: change
+    on_failure: change # [always|never|change] # default: always
+
+env:
+  matrix:
+    - __="GCC 4.8 + Standalone unit/functional tests coverage" VALGRIND=0 CCFLAGS="-fprofile-arcs -ftest-coverage -DBOOST_AFIO_COMPILING_FOR_GCOV -DNDEBUG" GCCVER="g++-4.8" GCOV=1 UNITTESTS=1
+    - __="MacOS X build" VALGRIND=0 CCFLAGS="-DNDEBUG" GCCVER="clang++" GCOV=0 UNITTESTS=0
+    - __="MacOS X test" VALGRIND=0 CCFLAGS="-DNDEBUG" GCCVER="clang++" GCOV=0 UNITTESTS=1
+  global:
+    # Coveralls.io API key
+    - secure: "LU8flpdvLjaFIVgy8oqhHzy92AUPRgw3bRv+/Q91fnWNrvbeRVMEOj+vML+zDS7iU3L2ZbppNf/1YkavGhHh9HfD8PC0dYPEmU0xjS/3WdoKxMd0MCYUZxQ+6zgx3GLgZS2NxciVlruZSs9Q+hKbguvvjwGGSVin6LlMmC2KqGA="
+    # The next declaration is the encrypted COVERITY_SCAN_TOKEN, created
+    #   via the "travis encrypt" command using the project repo's public key
+    - secure: "ouEimnVEYE28pbGvib6ks+i3mxl1CE0nBAZuvqvVrEbbcSaauEZZCyYiL291l2j90aSPJOJzbny+AhVwsr8mNLyiI9OGRtcnCFNjOHEXPF0Ep78ebmVLX4oyqv7DEPmeJSR/va/ebCrbAbOlPBCPGOFO5UfNtwvx2qJouMtNQMI="    
+
+#addons:
+#  coverity_scan:
+#    project:
+#      name: "ned14/boost.afio"
+#      description: "Build submitted via Travis CI"
+#    notification_email: s_github@nedprod.com
+#    build_command_prepend: "cd test && bash ./test_file_glob.sh && cd .."
+#    build_command:   "$GCCVER -o test_all -g -O0 -std=c++11 test/test_all.cpp -Iinclude -Itest -DBOOST_AFIO_RUNNING_IN_CI=1 -DBOOST_CONSTEXPR= -DBOOST_CXX14_CONSTEXPR= -DBOOST_AFIO_INCLUDE_SPOOKY_IMPL=1 -Wno-constexpr-not-const -Wno-c++1y-extensions -Wno-unused-value -lboost_filesystem -lboost_system -lpthread -ldl"
+#    branch_pattern: master
+
+matrix:
+  exclude:
+    - os: linux
+    - os: osx
+  include:
+    - os: linux
+      env: __="GCC 4.8 + Standalone unit/functional tests coverage" VALGRIND=0 CCFLAGS="-fprofile-arcs -ftest-coverage -DBOOST_AFIO_COMPILING_FOR_GCOV -DNDEBUG" GCCVER="g++-4.8" GCOV=1 UNITTESTS=1
+    - os: osx
+      env: __="MacOS X build" VALGRIND=0 CCFLAGS="-DNDEBUG" GCCVER="clang++" GCOV=0 UNITTESTS=0
+    - os: osx
+      env: __="MacOS X test" VALGRIND=0 CCFLAGS="-DNDEBUG" GCCVER="clang++" GCOV=0 UNITTESTS=1
+
+
+before_install:
+ - if [ "$__" = "MacOS X build" ] && [ "$TRAVIS_OS_NAME" = "linux" ]; then exit 0; fi
+ - if [ "$__" = "MacOS X test" ] && [ "$TRAVIS_OS_NAME" = "linux" ]; then exit 0; fi
+ - if [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test; fi
+ - if [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo add-apt-repository -y ppa:afrank/boost; fi
+ - if [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo apt-get update -qq; fi
+ - if [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo apt-get install -qq libboost1.57-all-dev; fi
+ - if [ "$TRAVIS_OS_NAME" = "linux" ] && [ $GCCVER != "" ]; then sudo apt-get install -qq $GCCVER; fi
+ - git submodule update --init --recursive
+
+script:
+ - if [ -e "cov-int" ]; then ls -l cov-int; fi
+ - if [ -e "cov-int/build-log.txt" ]; then cat cov-int/build-log.txt; fi
+ - if [ -e "cov-int/scm_log.txt" ]; then cat cov-int/scm_log.txt; fi
+ - if [ "$__" = "MacOS X build" ] && [ "$TRAVIS_OS_NAME" = "linux" ]; then exit 0; fi
+ - if [ "$__" = "MacOS X test" ] && [ "$TRAVIS_OS_NAME" = "linux" ]; then exit 0; fi
+ - CCFLAGS="$CCFLAGS -g -O0 -std=c++11 test/test_all.cpp detail/SpookyV2.cpp -Iinclude -Itest -DBOOST_AFIO_RUNNING_IN_CI=1 -DBOOST_CXX14_CONSTEXPR= -Wno-constexpr-not-const -Wno-c++1y-extensions -Wno-unused-value -lboost_filesystem -lboost_system -lpthread"
+ - if [ $GCOV -eq 1 ]; then LINKFLAGS="$LINKFLAGS -lgcov"; fi
+ - cd test
+ - bash ./test_file_glob.sh
+ - cd ..
+ - $GCCVER -o test_all $CCFLAGS $LINKFLAGS
+ - if [ "$TRAVIS_OS_NAME" = "osx" ]; then launchctl limit maxfiles; fi
+ - if [ "$TRAVIS_OS_NAME" = "osx" ]; then sudo launchctl limit maxfiles 10000 10000; fi
+ - if [ "$TRAVIS_OS_NAME" = "osx" ]; then launchctl limit maxfiles; fi
+ - if [ "$TRAVIS_OS_NAME" = "osx" ]; then ulimit -a; fi
+ - if [ "$TRAVIS_OS_NAME" = "osx" ]; then ulimit -n 10000; fi
+ - if [ "$TRAVIS_OS_NAME" = "osx" ]; then ulimit -a; fi
+# - if [ "$TRAVIS_OS_NAME" = "osx" ]; then sysctl -a; fi
+ - if [ $UNITTESTS -eq 1 ]; then ./test_all; fi
+ 
+after_success:
+ - if [ "$__" = "MacOS X build" ] && [ "$TRAVIS_OS_NAME" = "linux" ]; then exit 0; fi
+ - if [ "$__" = "MacOS X test" ] && [ "$TRAVIS_OS_NAME" = "linux" ]; then exit 0; fi
+ - if [ $GCOV -eq 1 ]; then bash -x test/update_coveralls.sh `pwd`; fi
+
+after_failure:
+ - if [ "$__" = "MacOS X build" ] && [ "$TRAVIS_OS_NAME" = "linux" ]; then exit 0; fi
+ - if [ "$__" = "MacOS X test" ] && [ "$TRAVIS_OS_NAME" = "linux" ]; then exit 0; fi
+# - if [ "$TRAVIS_OS_NAME" = "osx" ]; then ls -l /cores/; fi
+# - if [ "$TRAVIS_OS_NAME" = "osx" ]; then lldb --help; fi
+ - if [ "$TRAVIS_OS_NAME" = "osx" ] && [ $UNITTESTS -eq 1 ]; then expect scripts/travis_lldb.expect; fi

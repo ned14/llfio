@@ -1,0 +1,106 @@
+[/============================================================================
+  Boost.AFIO
+
+  Use, modification and distribution is subject to the Boost Software License,
+  Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
+  http://www.boost.org/LICENSE_1_0.txt)
+=============================================================================/]
+
+[section:advanced_topics Advanced Topics]
+
+[section:custom_completion_handler How to write your own custom AFIO completion handler]
+
+If you want to extend __boost_afio__ with additional asynchronous functionality,
+you're probably going to have to implement your own custom AFIO completion handler
+which can be scheduled using __afio_completion__.
+These are the second most lowest level, second most primitive completion handler AFIO has and while a
+non-trivial amount of programmer effort to utilise, they do offer a maximum amount
+of flexibility, functionality and of course, performance[footnote If you're willing to go even ['more] low level, AFIO's
+`async_file_io_dispatcher_base` class exposes as protected member functions the variadic
+templated function `chain_async_op()` and a suite of specialised `chain_async_ops()` helper
+overloads. Therefore if you subclass `async_file_io_dispatcher_base`, you can enjoy the overhead of
+just one `std::function<>` call.]. If you are NOT extending
+AFIO with extra functionality, you almost certainly want __afio_call__ instead.
+
+Some advantages of custom completion handlers include:
+
+* Access to op id and any precondition op which was supplied at the point of scheduling.
+* Ability to schedule immediate completions which are executed instantly after
+their precondition instead of later when the thread source gets round to them.
+This is particularly useful when your host OS has real async i/o support, because
+you can use immediate completions to schedule non-blocking async i/o operations
+as quickly as possible. Another use is taking advantage of Lx cache locality while
+the cache lines are still paged in.
+* Direct control of exception handling and error propagation, where arbitrary ops can be
+completed at any time by any thread in any circumstance.
+* Performance: completion handlers only have a single `std::function<>` invocation
+overhead, rather than more as would be the case with `call()`. The reason why nesting
+`std::function<>` invocations is bad is because each entails type erasure, which requires
+the CPU to do an indirect jump (like a virtual function call) and while modern branch
+predictors eliminate any penalty for executing just one of those, they most certainly
+struggle when they have to execute a sequence of indirect jumps. For example, a single
+indirect jump might cost just two CPU cycles, while a mispredicted indirect jump might
+cost as much as 18-25 CPU cycles.
+
+Some disadvantages of custom completion handlers include:
+
+* Unlike __afio_call__, there is no custom return type machinery i.e. you'll have to
+implement your own. This isn't hard __dash__ note how __afio_enumerate__'s internal completion
+handler in afio.cpp takes a shared pointer as a parameter containing the promises of output for
+the enumerations, thus allowing __afio_enumerate__ to set up a batch of futures
+corresponding to those promises and return those to the user.
+* Exception handling is rather more manual. That comes of course with flexibility as well as hassle.
+
+So, let's have a look at an example of a custom AFIO completion handler, this being
+pretty much the simplest formulation possible:
+
+[completion_example1]
+
+Note how you have fair amount of flexibility of defining any input parameters you like so long as
+the standard duo of id and precondition are there. This is enabled basically
+through `std::bind<>` to prebind any custom parameters you may have to produce a `std::function<>`
+instance with the aforementioned standard duo of parameters. As AFIO's completion
+implementation natively works with `std::function<>`, you effectively get custom parameter
+binds for free anyway.
+
+The above shows a simple custom completion handler __dash__ as mentioned earlier, one can also
+do immediate completions, and this is an example of just that:
+
+[completion_example2]
+
+Note the new function for completing a deferred completion: `complete_async_op()`, which
+can take a `std::exception_ptr` if you want AFIO to return an errored state.
+
+As of AFIO v1.2 all of the constraints which were imposed on immediate completions
+are eliminated, and deferred completions were completely eliminated as now all completions
+are always deferred. Therefore, as of v1.2, you can do anything you can do in a normally
+scheduled op in an immediately scheduled op. Nevertheless, you should be aware of the
+following when using any kind of completion handler:
+
+* As far as AFIO is concerned, the precondition is completed and all knowledge of it
+deleted from AFIO's records by the time you see it in a completion handler (it is deleted
+as soon as possible to save on RAM footprint).
+* Therefore adding completions to the precondition of the completion being executed simply schedules
+them immediately (or executes them immediately if they are immediate) which may not be what
+you intended.
+* If you want to read in the handle output by the precondition for your own use, be aware
+that using the `async_io_op::get()` function will by default rethrow any exception stored
+into the precondition op. This has a useful side effect if you always do the following at
+the top of your completion handler implementation:
+
+ `std::shared_ptr<async_io_handle> h(op.get());`
+
+ ... by immediately rethrowing any precondition exception before you execute any more code.
+ You'll see this pattern very, very frequently throughout AFIO's source code and you are
+ encouraged to do the same. If you really don't want to propage exceptions immediately then do:
+
+ `std::shared_ptr<async_io_handle> h(op.get(true)); // Ignore any error state until later`
+
+ This will place a default constructed (i.e. empty) shared pointer into h if there is an
+ errored state, otherwise the correct handle. If you need to determine whether the precondition
+ is a null handle or an errored state, you can always use `get_exception_ptr()` on the
+ shared future referred to by the h member variable of the precondition op.
+
+[endsect] [/custom_completion_handler]
+
+[endsect] [/advanced_topics]

@@ -1,0 +1,17 @@
+[table:power_loss_safety Power loss safety matrix: What non-trivially reconstructible data can you lose if power is suddenly lost? [*Any help which can be supplied in filling in the unknowns in this table would be hugely appreciated].
+  [[][[role aligncenter Newly created file content corruptable after close]][[role aligncenter File data content rewrite corruptable after close]][[role aligncenter Cosmic ray bitrot corruptable]][[role aligncenter Can punch holes into physical storage of files[footnote This is where a filing system permits you to deallocate the physical storage of a region of a file, so a file claiming to occupy 8Mb could be reduced to 1Mb of actual storage consumption. This may sound like sparse file support, but transparent compression support also counts as it would reduce a region written with all zeros to nearly zero physical storage]]][[role aligncenter Default max seconds of writes reordered without using `fsync()`]]]
+  [[[role alignright FAT32]][__itick__][__itick__][__itick__][__cross__][[role aligncenter ?]]]
+  [[[role alignright ext2]][__itick__][__itick__][__itick__][__cross__][[role aligncenter 35]]]
+  [
+    [[role alignright ext3/4 `data=writeback`]][__itick__][__itick__][__itick__][[role aligncenter [role green ext4 only]]]
+    [[role aligncenter 35[footnote This is the `commit` mount setting added to the `/proc/sys/vm/dirty_expire_centiseconds` value. Sources: [@https://www.kernel.org/doc/Documentation/filesystems/ext4.txt] and [@http://www.westnet.com/~gsmith/content/linux-pdflush.htm]]]]
+  ]
+  [[[role alignright ext3/4 `data=ordered` (default)]][__icross__][__itick__][__itick__][[role aligncenter [role green ext4 only]]][[role aligncenter 35]]]
+  [[[role alignright UFS + soft updates[footnote Source: [@http://www.freebsd.org/cgi/man.cgi?query=syncer]]]][__icross__][__itick__][__itick__][__tick__[footnote BSD automatically detects extended regions of all bits zero, and eliminates their physical representation on storage.]][[role aligncenter 30]]]
+  [[[role alignright HFS+]][__icross__][__itick__][__itick__][__tick__][[role aligncenter ?]]]
+  [[[role alignright NTFS[footnote Source: [@http://technet.microsoft.com/en-us/library/bb742613.aspx]]]][__icross__][__itick__][__itick__][__tick__][[role aligncenter Until idle or write limit]]]
+  [[[role alignright ext3/4 `data=journal`]][__icross__][__icross__][__itick__][[role aligncenter [role green ext4 only]]][[role aligncenter 5]]]
+  [[[role alignright BTRFS[footnote Source: [@https://wiki.archlinux.org/index.php/Btrfs]]]][__icross__][__icross__][__icross__][__tick__][[role aligncenter 30]]]
+  [[[role alignright ReFS]][__icross__][[role aligncenter [role green not if integrity streams enabled]]][[role aligncenter [role green not if integrity streams enabled]]][__tick__][[role aligncenter Until idle or write limit]]]
+  [[[role alignright ZFS]][__icross__][__icross__][__icross__][__tick__][[role aligncenter 30]]]
+]

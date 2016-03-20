@@ -1,0 +1,1261 @@
+[/============================================================================
+  Boost.AFIO
+
+  Use, modification and distribution is subject to the Boost Software License,
+  Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
+  http://www.boost.org/LICENSE_1_0.txt)
+=============================================================================/]
+
+[section:quickstart Quick Start Tutorial]
+
+So why bother with __boost_afio__? What's wrong with the STL iostreams and Filesystem?
+
+The answer is that there is nothing wrong with either for 95% of use cases. Performance
+of both is pretty good in fact most of the time __dash__ which actually isn't that
+surprising as C++ is a pay-for-what-you-use systems language, and you'll see how well
+STL iostreams does later on in this tutorial.
+
+However a surprising amount of production code out there is highly unreliable when used on a filing
+system experiencing rapid change, or even just a filing system mounted on a network. In many
+ways it is when your code needs to ["grow up] from assuming a never changing static filesystem
+into a more realistic model is when you ought to reach AFIO which has hopefully abstracted away
+all those tedious platform specific and filing system specific quirks for you.
+
+The quick start tutorial is broken into two sections:
+
+# A step by step workshop in building an AFIO program which can concurrently read/write an indexed
+blobstore. This workshop was presented at CppCon 2015 and the slides and materials can be found
+at <TBD LINK>. Issues covered:
+ * Files being renamed, created or deleted by others when you are using them.
+ * Directories being renamed, created or deleted by others when you are using them.
+ * Windows only: how to correctly delete a directory tree on Windows, and why almost every
+implementation of directory tree deletion for Windows is unreliable.
+ * Techniques for avoiding filing system races:
+   * Inode checking
+   * Lock files
+   * Atomic renames
+   * Never use absolute paths
+# Real world sample mini-programs written using AFIO which show various filing system algorithms
+and strategies in action.
+ * Hello world
+ * Concatenating files
+ * Atomicity on the filing system
+ * Races on the filing system
+ * Find regular expression in files in directory tree
+
+[section:workshop Step by step workshop building an AFIO-based key-value store]
+
+[section:naive 1. World's simplest named blob store in STL iostreams]
+
+Let us imagine your application needs to persist some state across executions, and that that state
+is merely a collection of key-value items e.g.
+
+* "dog" => "I am a dog"
+* "cat" => "I am a cat"
+* "horse" => "I am a horse"
+* ...
+
+Let us imagine that you write the following low level public interface for this key-value store:
+
+[workshop_naive_interface]
+
+The macros for the monad and afio namespaces are to enforce a ['hard] version dependency. By aliasing
+into the `BOOST_AFIO_V2_NAMESPACE`, you are creating a specific dependency on v2 of the AFIO ABI. AFIO
+ships some still supported previously used ABI versions of itself in every version, so by pinning yourself
+to v2 you mean v2 and nothing but v2. If you just wanted the current AFIO, simply alias into namespace
+`boost::afio` as with other libraries, this picks up whatever the current configuration and version of
+AFIO is.
+
+The `outcome<>` comes from __boost_outcome__ which is a dependency of __boost_afio__. It has an identical
+API to `std::future<>` or more rather `boost::future<>`, so simply treat it as an always ready future.
+`outcome<>` here can return a shared pointer to the iostream, or empty (item not found), or an error, or
+an exception as you can see in this example use case:
+
+[workshop_use_naive]
+
+A perfectly straightforward and simple way of implementing `data_store` using pure C++ STL is this:
+
+[workshop_naive]
+
+Note that `outcome<T>` implicitly consumes any `T`, `std::error_code`, `std::exception_ptr` or `empty`, hence
+the ability to return any of those directly.
+
+This very simple solution assumes that the key-value store is a directory in the current path called ["store] and
+that each key-value item is simply a file called the same name as the key name.
+
+[table:conditions This solution will perform pretty well and is perfectly fine under these conditions:
+[[][Condition]]
+[[__cross__][On Microsoft Windows you don't place the store deep in a directory hierarchy and you use only short key names.]]
+[[__cross__][No third party thread or process will rename the location of the store during use.]]
+[[__cross__][The size of the values being read and written is small.]]
+[[__cross__][Only one thread or process will ever interact with the key-value store at a time.]]
+[[__cross__][You don't care what happens if your process unexpectedly exits during a modify.]]
+[[__cross__][Maximum performance isn't important to you.]]
+[[__cross__][You don't care what happens under power loss.]]
+[[__cross__][You don't need to update more than one key-value at once.]]
+]
+
+[endsect] [/ naive]
+
+[section:naive_afio 2. World's simplest named blob store in AFIO (synchronous)]
+
+Let's see the same thing as in the last section, but written using AFIO. First, the interface is identical
+to before, just with different private member variables:
+
+[workshop_naive_afio_interface]
+
+We now have a `dispatcher_ptr` and a `handle_ptr` to the store directory which is created/opened during
+construction of `data_store`. Instead of constructing to a filesystem path, we now construct to an AFIO path.
+Note that AFIO paths are always either absolute or relative to some open file handle, and therefore in this
+situation at the point of construction the current working directory will be fetched and an absolute path
+constructed. This differs from filesystem which passes through relative paths and lets the OS resolve from
+the current working directory __dash__ AFIO does it this way as the current working directory setting at some
+later point of asynchronous execution is inherently unpredictable. As the `data_store` interface is identical,
+so is the use case from the previous page. The implementation is rather different however:
+
+[workshop_naive_afio1]
+
+This is a good bit longer and looks more complex, however there is already a big if not obvious gain: third party
+processes can happily rename and move around the store directory once it has been opened and this implementation
+will work perfectly. This is because we open a handle to the store directory in the `data_store` constructor,
+and thereafter use that open handle as a base location for all leaf path operations. Except on OS X which currently
+doesn't support the POSIX race free filesystem extensions, that makes all data store operations invariant to
+store path mutation on all supported platforms.
+
+Another big gain is we are now using memory mapped files for the lookup which avoids any memory copying, and
+there is a hint we are also avoiding memory copies in the write too.
+
+You will also note that in the constructor, we specify a URI to `make_dispatcher()`. This lets you open
+different kinds of filesystem e.g. ZIP archives, HTTP sites etc. AFIO currently doesn't provide backends except
+for `file:///` i.e. the local filesystem, however future versions will. Note that a dispatcher can force on or off
+`file_flags` for all operations scheduled against that dispatcher __dash__ here we force mask out any attempt to
+open anything for writing if we are opening the store read-only.
+
+Finally, you may wonder why we only use `current_dispatcher_guard` once in the constructor. This is because
+if AFIO can deduce the dispatcher to use from any precondition you supply, you need not set the thread local
+dispatcher. As the opening of the store directory is done as an absolute path lookup and therefore takes no
+inputs specifying a dispatcher, you need to set the current dispatcher in that one situation alone.
+
+The remaining magic is in the custom iostreams implementations `idirectstream` and `odirectstream`:
+
+[workshop_naive_afio2]
+
+These are not hugely conforming iostreams implementations in order to keep them brief for the purposes of this
+tutorial. The read stream is very straightforward, we simply have `streambuf` directly use the memory map of
+the file.
+
+The write stream is a bit more complicated: we fill a 4Kb page and ['asynchronously] write it out
+using a page stealing friendly algorithm which in the usual case means the kernel simply takes possession of
+the 4Kb page as-is with no memory copying at all. At some future point it will be flushed onto storage. The
+reason this works is thanks to the special STL allocator `utils::page_allocator<>` which returns whole kernel
+page cache pages. Most kernels will mark whole pages scheduled for write with copy-on-write behaviour such that
+they can be safely DMAed by the kernel DMA engine as any subsequent write will cause a copy, so because we never write to the page between the write
+request and freeing the page, most kernels simply transfer ownership of the page from the user space process
+to the file page cache with no further processing. Hence the asynchronous write of the page tends to complete very
+quickly __dash__ indeed far faster than copying 4Kb of memory and often quicker than the time to fill another page, and hence we wait for any previous write to
+complete before scheduling the next write in order to report any errors which occurred during the write.
+
+This is the first use of asynchronous i/o in this tutorial. AFIO provides a custom `future<T>` type extending
+the lightweight monadic futures framework in __boost_outcome__, so you get all the
+[@http://www.drdobbs.com/parallel/improving-futures-and-callbacks-in-c-to/240004255 C++ 1z Concurrency TS extensions],
+[@http://blogs.msdn.com/b/vcblog/archive/2014/11/12/resumable-functions-in-c.aspx C++ 1z coroutines support] and
+[@http://www.boost.org/doc/html/thread/synchronization.html#thread.synchronization.futures Boost.Thread future extensions] in the AFIO custom `future<>`. There are also many
+additional extensions beyond what Boost.Thread or the Concurrency TS provides, including foreign future composable waits.
+
+[table:conditions This solution will perform reasonably well under these conditions:
+[[][Condition]]
+[[__tick__] [On Microsoft Windows you can place the store deep in a directory hierarchy and use long key names.]]
+[[__tick__] [Third party threads and processes can rename the location of the store during use.]]
+[[__tick__] [The size of ['all] the values being read at any given time fits into your virtual address space (which is at least 2Gb on 32 bit, 8Tb on 64 bit).]]
+[[__cross__][Only one thread or process will ever interact with the key-value store at a time.]]
+[[__cross__][You don't care what happens if your process unexpectedly exits during a modify.]]
+[[__cross__][Maximum performance isn't important to you.]]
+[[__cross__][You don't care what happens under power loss.]]
+[[__cross__][You don't need to update more than one key-value at once.]]
+]
+
+[endsect] [/ naive_afio]
+
+[section:naive_afio_async 3. World's simplest named blob store in AFIO (asynchronous)]
+
+Let's see the same exact thing as in the last section, but this time with a fully asynchronous public interface.
+Instead of returning `outcome<>`, we now return `shared_future<>`:
+
+[workshop_naive_async_afio_interface]
+
+An extension to the Concurrency TS futures is that Boost.Monad futures are also monads, and therefore implicitly
+convert from their allowed monadic input types without you needing to write `make_ready_future(T)` as with the
+Concurrency TS.
+
+You may be interested to know that the benchmarking harness code is 100% identical for all three of these
+implementations. This is because `outcome<>` is sufficiently API-identical to `future<>` that identical code can drive all
+three implementations.
+
+`write()` is now implemented by scheduling the file to be opened for write access and attaching a continuation
+which will propagate any error, and if no error returns via the shared future the shared pointer to the output stream.
+
+[workshop_naive_async_afio1]
+
+`lookup()` takes the chaining of continuations one sequence further. It schedules the file to be opened for reading
+and attaches a continuation which firstly propagates any error, and then if the file is big enough it memory maps
+the file and returns the input stream. If the file is small enough it schedules a read of the entire file, attaching
+a second continuation to return the input stream.
+
+The below pattern is 100% pure soon-to-be-standardised Concurrency TS future continuations which can be easily coroutinised
+automatically on a C++ 1z Coroutines supporting compiler (simply insert `await` before any AFIO `async_XXX` function). Apart from the fact that
+__boost_outcome__ lightweight futures also provide an `error_code` transport, there is nothing below which wouldn't
+work with an upcoming standard C++ library (unless the TS changes substantially, which is very unlikely at this late
+stage).
+
+[note This peer review edition of AFIO v1.40 provides a shim future type standing in for an eventual lightweight future
+implementation. C++ 1z coroutine support is not implemented for the shim future type.]
+
+[workshop_naive_async_afio2]
+
+The input and output stream implementations are pretty similar to before, but here they are for reference:
+
+[workshop_naive_async_afio3]
+
+
+[section:naive_racy The problems with this naive design]
+
+You might be curious as to the performance of this naive key-value blob database. I was, so I performed the
+following benchmarks on Win8.1 NTFS and Linux ext4 both on SSD using the code above. Note that the test
+uses OpenMP to parallelise the operations, so the below shows AFIO in a worst case light as will be explained
+shortly:
+
+[role aligncenter [$../../../../../libs/afio/doc/src/images/workshop_naive_insertions.png] [$../../../../../libs/afio/doc/src/images/workshop_naive_lookups.png]]
+
+I don't know about you, but I was more than quite surprised at how good the performance is considering its
+naive simplicity. As a reference comparison, with durability disabled these NoSQL key-value databases achieve
+the following performance ([@http://www.datastax.com/wp-content/themes/datastax-2014-08/files/NoSQL_Benchmarks_EndPoint.pdf source]):
+
+[table:nosql Performance for various NoSQL databases with fsync disabled on Linux ext4:
+[[][[*Our naive design]][Cassandra][Couchbase][HBase][MongoDB]]
+[[Insertion][[*25,576]][53,067][40,063][38,991][18,038]]
+[[Lookup][[*64,495]][38,235][14,503][3,955][2,752]]
+]
+
+The naive results were calculated by excluding the highest value and averaging the next three highest values.
+Now this is not a fair comparison by any means __dash__ the NoSQL databases are running over a network stack
+(which particularly penalises read performance) whereas ours is direct to the OS API more or less,
+and our naive benchmark only writes 10 bytes of value per item which is small enough to pack into the inode
+on both NTFS and ext4, so the extent allocator is never getting invoked. Still, one is used to thinking of
+the filesystem as incredibly slow and to be avoided with fancy database software __dash__ this simple test
+shows that ['recent] filesystems are competitive to fancy databases (and indeed even more so with a more
+sophisticated design than the one we used, as you will see later).
+
+[note NTFS has such poor insertion performance because Microsoft Windows performs a sequentially consistent flush of the
+containing directory on file handle close, whereas Linux doesn't even flush the containing directory after
+you fsync a file and you must explicitly fsync the directory itself. You may find the
+`afio::file_flags::temporary_file` flag of use as this hints to Windows that the file is not important,
+and it may encourage Windows to not be so careful with sequentially flushing directory changes every single written
+file close.]
+
+As is fairly obvious from the results, AFIO lags far behind iostreams at about one half to one third the performance.
+We are using AFIO's synchronous API for the most part, and that is simply a `get()` on the asynchronous API which
+introduces an unnecessary thread sleep (the fully asynchronous edition is about 0-5% faster). Much more importantly,
+because no platform provides asynchronous file open nor close, AFIO emulates asynchronicity by
+executing the file opens and closes in a threadpool which is exactly what the iostreams does via OpenMP, however there
+isn't a copy of ASIO and AFIO and all the futures and completion handlers standing in between, so the iostreams
+implementation is far faster and will [*always] be faster than AFIO if you do a lot of file opens and closes which
+is pretty much this benchmark in a nutshell.
+
+[note This peer review edition of AFIO v1.40 uses a mocked up v1.40 API based on the v1.3 series engine. Performance
+of this mockup will be considerably below the final v1.40 engine written using __boost_outcome__'s lightweight futures.]
+
+A design which makes better use of AFIO is one which is asynchronous throughout and which avoids file opens and closes
+(['tip:] always avoid file opens period if you want fast filesystem performance, they are always very slow due
+to the security checking of every single item in the path. File closes are also particularly slow on Microsoft Windows
+and Apple OS X).
+
+Some might think that the flat store of all the keys in a single directory would scale poorly to item count.
+This certainly ['used] to be true for the previous generation of filing system, however modern filing
+systems usually have between `O(log N)` to `O(1)` lookup complexity and between `O(N)` and `O(1)` insertion
+complexity __dash__ this author found excellent lookup performance with 10M items on ext4 and NTFS,
+though insertion performance was not great for NTFS (which does a directory flush each file close).
+
+[*Problem 1 with naive design:] We are doing too many file opens and closes for really good performance.
+
+[*Problem 2 with naive design:] ['Atomicity]: Writes do not atomically appear fully completed to other readers, so if one thread/process reads a value
+currently being written by another thread/process, they will see a partially written value which is a filesystem race.
+
+[*Problem 3 with naive design:] ['Consistency]: If a writer process fatal exits during a write and therefore does not complete a write, the key value store
+is corrupted.
+
+[*Problem 4 with naive design:] ['Isolation]: There is no concurrency ordering control apart from that provided by the operating system. AFIO exposes
+the strong guarantees made by operating systems as to the atomicity of read and write visibility to other readers and writers (see each
+API reference documentation page for the guarantees per API per platform), however the STL iostreams wrapper
+around AFIO ruins those guarantees (this is why AFIO does not provide iostreams wrappers).
+
+[*Problem 5 with naive design:] ['Durability]: If power loss occurs during use of the key-value store, you are at the mercy of random chance as to
+what data in what order reached physical storage. On many filing systems you aren't even guaranteed
+that extent metadata matches contents, so your value may consist of portions of valid data intermixed with
+garbage.
+
+[*Problem 6 with naive design:] Insertion and update complexity may be as poor as `O(N)` on some filesystems.
+
+[*Problem 7 with naive design:] There is no way of atomically updating two or more key-value items in a transaction.
+
+Luckily, AFIO exposes exactly the right features to make five of those seven problems go away with very few changes
+to the above code.
+
+[endsect] [/naive_racy]
+
+[endsect] [/naive_afio_async]
+
+[section:atomic_updates 4. Second attempt at a key-value store: How to implement atomic value updates and therefore Atomicity, Consistency, Isolation and Durability]
+
+The naive key-value store simply stored each key in a single flat directory, so:
+
+* "dog" => `store/dog`
+* "cat" => `store/cat`
+* "horse" => `store/horse`
+* ...
+
+When inserting or updating an item, it simply opened the filename and wrote out the contents
+thus creating races for concurrent users and potentially writing out the entire directory inode
+if that filesystem rebalances its directory contents. So how do we implement ACID-ity of updates
+with constant time updates?
+
+It is actually surprisingly simple thanks to AFIO. Firstly, we are going to reorganise the
+store's structure with a directory per key name to become this instead:
+
+* "dog" => `store/dog/0`
+* "cat" => `store/cat/0`
+* "horse" => `store/horse/0`
+* ...
+
+We are going to change the lookup semantics to this instead:
+
+# For some key, open the file `store/key/0` for reading.
+
+The insertion semantics becomes this:
+
+# For some key, open the file `store/key/tmpXXXXXXXXXXXXXXXX` for writing ['optionally] using `afio::file_flags::always_sync`
+(this causes the OS to not report write completion until the write reaches physical storage),
+creating any `store/key` directory as necessary, where `XXXXXXXXXXXXXXXX` is a cryptographically strong
+128-bit random number.
+
+# Write the new value using the output stream as normal, keeping the handle open.
+
+# Atomically rename `store/key/tmpXXXXXXXXXXXXXXXX` to `store/key/0` using AFIO's special `atomic_relink()`
+function (which because it acts on an open file handle, is invariant to path relocations of itself).
+This function does as it says, and atomically makes visible at `store/key/0` our new value for
+the key, unlinking any file previously there[footnote This operation is not possible on Microsoft
+Windows using the Win32 API __dash__ nowhere in the Win32 API is this operation made available.
+However the NT kernel API does provide this operation, hence AFIO can provide POSIX atomic relink
+guarantees on Windows.]. [*Never at any point is there not a complete and finished
+value file on physical storage at `store/key/0`][footnote This may not be true on older NFS mounts,
+or NFS mounts with the wrong configuration. See the NFS documentation. It is also possible to
+configure Samba in a way which breaks the atomicity of atomic renaming, see the Samba documentation.].
+On Linux only we then execute a sync on the directory handle for `store/key` because Linux is
+different from other operating systems in that you must explicitly request metadata updates to be sent
+to physical storage.
+
+Not that we'll be implementing this here, but the deletion semantics would be:
+
+# Atomically rename `store/key` to `store/deadXXXXXXXXXXXXXXXX` where the latter part is another 128-bit
+crypto strong random number. Note that Microsoft Windows does not permit you to rename a directory
+containing an open file, so you may need to move all the contents of the directory into a newly created
+`deadXXXXXXXXXXXXXXXX` directory instead, being careful of races caused by someone setting a new key-value
+into the directory you are trying to delete.
+
+# Recursively delete the dead directory. On Microsoft Windows, AFIO tags the items for later deletion when
+the last handle to them is closed. Remember that someone doing a lookup may still have a handle open to
+the just deleted version of the handle, but on both POSIX and Windows this is fine __dash__ the physical
+storage will be deallocated on last handle close, even (usually) under unexpected power loss.
+
+What these new semantics achieve:
+
+# [*Atomicity]: Values always appear to concurrent readers complete and finished.
+# [*Consistency]: If a writer fatal exits during a key update, the store is left in a consistent state.
+# [*Isolation]: The operating system provides strong ordering guarantees about atomic relinking,
+thus creating a sequentially consistent ordering of key-value update visibility.
+# [*(Durability)]: If power loss suddenly occurs, the key-value store will [*always] be internally
+consistent, even if `afio::file_flags::always_sync` was not specified (see below for why). 
+It may not have all the key-values in an identical order to how they were written as
+this second generation design does not implement transactions, but there will always be a complete
+value for a key which at some point was stored to that key. Strictly speaking, this means that
+durability is not fulfilled __dash__ durability means when you are told a write completes, it is
+durably stored, however for full durability simply add `afio::file_flags::always_sync`.
+# [*Much improved update complexity]: New key insertion may still be as poor as `O(N)` complexity, but
+updates of existing keys is now no worse than lookup complexity, which is a big improvement over
+the naive design. If your filing system has `O(N)` insert complexity, you could use prefix directories to
+form a binary tree, thus reducing insert complexity to `O(log N)`.
+
+Many readers will be wondering why `afio::file_flags::always_sync` is not necessary for consistency
+even under power loss, and the answer is because of journalled filing systems combined with how we are
+modifying data. If you examine [link afio.design.acid_write_ordering.write_ordering_data.power_loss_safety the table of power loss
+safety guarantees in the design rationale], you will note that journalled file systems (with write barriers
+enabled) make strong guarantees about newly created file content but not about rewritten file content:
+if a newly created file appears in the filing system, it is guaranteed to have correct contents because
+['journalled filing systems do not write an updated directory pointing to the new file until the file
+contents are on physical storage]. Our naive design of creating a brand new file per key-value update
+exploits this guarantee, so the sequentially consistent ordering of writes to physical storage, even
+without `afio::file_flags::always_sync`, is this:
+
+# Allocate extents for new file content. Write journal.
+# Write new file content to physical storage. Write journal.
+# Write new copy of directory containing atomic rename of randomly named file with deallocation
+of extents of previous file. Write journal.
+
+If power is lost at any point, during journal replay on power restore a journalled filing system will
+throw away any extents allocated for content not referenced by a directory on physical storage. The
+filing system on power restore therefore refers to a previously consistent filing system i.e. how it
+was just before power was lost. This is why the store will be consistent even under power loss[footnote
+This is as yet untested by empirical testing, however AFIO does no magic tricks, it just thinly wraps
+the operating system APIs.], though without `afio::file_flags::always_sync` you may lose up to 5-35
+seconds of updates and there may be reordering of updates by up to 5-35 seconds. Here is the table
+from the design rationale once again, for your convenience:
+
+[include power_loss_safety_table.qbk]
+
+It goes, of course, without saying that if you are [*not] on a journalled filing system then you absolutely
+need `afio::file_flags::always_sync` and on Linux you had best sync the directories containing newly written
+files too.
+
+So let's look at the code: you will be surprised at how few changes there are compared to the earlier
+asynchronous AFIO implementation. Firstly, the interface is unchanged from before:
+
+[workshop_atomic_updates_afio_interface]
+
+`lookup()` is almost identical to before, now it simply opens `key/0` instead.
+
+[workshop_atomic_updates_afio1]
+
+`write()` is a bit different. We now open the key directory, and while that is happening asynchronously
+we generate a crypto strong random name which tends to be slow. We then schedule creating that temporary
+file with the extra flag `afio::file_flags::hold_parent_open` (which incidentally can dramatically increase AFIO
+filesystem performance because a number of fast code paths can be taken e.g. fetching most metadata
+about a file on Windows will actually do a single glob directory enumeration on its parent directory when available
+which is about 20x faster. The reason it is not enabled by default is because of process file descriptor limits
+on POSIX, especially the severely low default limit on Apple OS X). In this particular case, we just want
+our temporary file to retain knowledge of its parent because we will fetch that parent later.
+
+[workshop_atomic_updates_afio2]
+
+Finally the input and output streams. The input stream is unchanged, whilst the output stream
+destructor now simply atomically renames the temp file to "0" using the parent directory handle
+as the base for the rename target in order to ensure race freedom.
+
+[workshop_atomic_updates_afio3]
+
+Obviously enough we don't have any garbage collection in here for failed or aborted writes. Thanks
+to the unique naming of those files, these are very easy to spot during a GC pass and if they had a
+last modified date several days ago they would ideal for purging. Implementing one of those is easy
+using __afio_enumerate__, and is left as an exercise for the reader.
+
+[table:conditions This second generation solution will perform reasonably well under these conditions:
+[[][Condition]]
+[[__tick__] [On Microsoft Windows you can place the store deep in a directory hierarchy and use long key names.]]
+[[__tick__] [Third party threads and processes can rename the location of the store during use.]]
+[[__tick__] [The size of ['all] the values being read at any given time fits into your virtual address space (which is at least 2Gb on 32 bit, 8Tb on 64 bit).]]
+[[__tick__] [As many processes and threads may read and write to the store concurrently as you like,
+including any mix of CIFS and NFS clients.]]
+[[__tick__] [Processes may unexpectedly exit during modifies with no consequence on consistency.]]
+[[__cross__][Maximum performance isn't important to you.]]
+[[__tick__] [Sudden power loss may not maintain original write ordering across multiple key-value
+updates, however each key will have some complete value which it had at some point in history.]]
+[[__cross__][You don't need to update more than one key-value at once.]]
+]
+
+[section:atomic_updates_problems The performance of and problems with this second generation design]
+
+Let's see how this second generation ACI(D) design benchmarks compared to the first AFIO implementation
+where the dotted lines are the previous generation design:
+
+[role aligncenter [$../../../../../libs/afio/doc/src/images/workshop_atomic_updates_insertions.png] [$../../../../../libs/afio/doc/src/images/workshop_atomic_updates_lookups.png]]
+
+Lookups are actually not better __dash__ we are comparing the synchronous naive design to an asynchronous
+design, so the asynchronous design pulls ahead a bit on Microsoft Windows. Note, though, that the extra
+directory indirection costs you a noticeable amount of performance on ext4 __dash__ perhaps as much as 15%
+once you include the 10% bump from the asynchronous API.
+
+Insertions are however diametrically slower: about four times slower on both NTFS and ext4. This is
+because atomic renames appear to not parallelise well __dash__ both filing systems are gating hard at about
+four parallel atomic renames (the number of cores on my test CPU), and if you throttle the parallelism
+by hand you'll find performance is really only half that of the first generation design which is logical
+as we are committing twice the new items to before. This is a good example of where Intel's Hyperthreading
+can really penalise overall performance sometimes: filing systems tend to parallelise linearly to real
+CPU core count only.
+
+This second generation design is actually quite solid, and assuming that the design rationale is correct
+about the sequential consistency of journalling file systems then this key-value store design is likely production code
+useful, especially if you are storing large blobs which you might like to individually memory map. What you don't have
+though is the ability to update key-values as a transaction, and insertion performance is already heading
+downwards towards less than 1000 items/second which bodes poorly for adding transaction support.
+
+Out of curiosity, how might we add transaction support to this design? One's first thought is a lock file
+of some sort, perhaps even a lock file for the entire store. AFIO v1.3 can push about 3000 exclusive lock files
+per second (see the mini-programs on atomicity following this section) so you might imagine holding a global lock
+file during reads and during a sequence of multiple atomic renames which make up committing a transaction.
+
+Unfortunately, while that strategy would work well most of the time, it falls down spectacularly in the
+situation of power loss. The problem you have is that you have no way at all of forcing the order of
+key-value updates to reach physical storage. You might think that calling `fsync()` or using `O_SYNC`
+and then writing each item sequentially might work, but imagine if power is lost in the middle of
+that sequence: how do you know if the store you are now looking at was in the middle of a transaction,
+and if so what needs to be rolled back?
+
+If you think this through, you realise that you need some form of write log from which an interrupted
+sequence of operations can be reconstituted and either completed or discarded to return a store to
+a consistent state. This write log is called a journal by journalling file systems, and is called
+various things by databases ([@https://www.sqlite.org/wal.html write ahead logging, rollback journal etc]).
+It has the special property that it is always moving forwards in time and what it records is the
+sequentially consistent history of the database.
+
+You have probably guessed what the final part of this workshop tutorial does: and indeed it is
+implementing a transactional write log.
+
+[endsect] [/atomic_updates_problems]
+
+[endsect] [/atomic_updates]
+
+
+[section:extents_theory 5. Third attempt at a key-value store: Thinking like a filing system]
+
+You should prepare yourself to now think outside your normal comfort zone, and like a filing system engineer.
+
+Modern filing systems are ['extents] based, which means that instead of your file content being stored
+as the program sees it when reading it, physical storage allocation is [*lazy]. In other words, only when
+you write first into an extent is physical storage actually allocated, and if you never write into an
+extent then no physical storage is consumed, despite that that region of the file reads as all bits zero.
+
+You can test this for yourself by the following shell command on an extents-based filing system (e.g.
+ZFS, UFS, HFS+, ext4):
+
+```
+ned@kate:~$ truncate -s 2T sparse.img
+ned@kate:~$ ls -ls sparse.img
+0 -rw-rw-r-- 1 ned ned 2199023255552 Aug 19 16:13 sparse.img
+```
+
+The first zero shows the allocated size of the file, which is zero. The maximum allocation of the file,
+which is reported as the size, is 2Tb. Let's try writing a single byte onto the end of the file:
+
+```
+ned@kate:~$ echo '0' >> sparse.img
+ned@kate:~$ ls -ls sparse.img
+4 -rw-rw-r-- 1 ned ned 2199023255554 Aug 19 16:17 sparse.img
+```
+
+The maximum allocation has increased by two bytes as you would expect. However, the actual real
+allocation is now in fact four bytes! If you were not on an extents-based filing system the
+echo append command would take a very long time to execute and you would in fact get a 2Tb
+sized file almost entirely made of zeroes!
+
+Different filing systems have different granularities of extent. ext4, for example, usually
+has a 4Kb extent granularity unless it is a partial final extent. ZFS usually has a 128Kb
+granularity, while NTFS usually has a 64Kb granularity. The key thing to remember here is
+that the granularity is usually quite chunky, so storing a single byte every 256Kb offset
+is going to be extremely wasteful of physical storage. AFIO provides enumeration of the
+allocated extents of a file using __afio_extents__.
+
+Just as you can lazily allocate physical storage for file content using extents, so too
+can you deallocate extents by ["punching holes] in a file's content storage. This simply
+eliminates the physical storage for a region, and therefore subsequent reads from that
+region will now return all bits zero. AFIO's API for doing this deallocation is
+__afio_zero__, and just to remind you of which filing systems provide extents and APIs
+to manage them, here is that power loss safety table once again:
+
+[include power_loss_safety_table.qbk]
+
+[heading Visibility of concurrent writes to concurrent readers in file i/o]
+
+The final piece of the puzzle is [*atomicity of writes]. Many people do not realise that POSIX operating
+systems are supposed to provide some strong POSIX-mandated guarantees about the visibility of file i/o to concurrent
+readers and writers, and these guarantees AFIO goes out of its way not to interfere with. These are:
+
+# The ['visibility] of a write to a file is to be atomic to all readers of the same file, including
+gather writes (note gather writes on Microsoft Windows are not atomic, but single buffer writes may be,
+see below). The POSIX-2008 wording is this:
+
+ [:['["If a `read()` of file data can be proven (by any means) to occur after a `write()` of the data, it
+must reflect that `write()`, even if the calls are made by different processes. A similar requirement
+applies to multiple write operations to the same file position. This is needed to guarantee the
+propagation of data from `write()` calls to subsequent `read()` calls.]] ([@http://pubs.opengroup.org/onlinepubs/9699919799/functions/write.html POSIX-2008])]
+
+ If you try to implement this wording, you quickly realise there is an implied mutex on each file in the
+kernel, and every read to and write from that file across the system involves holding that mutex during
+the read or write. Whether that is actually the case is unimportant, POSIX requires that it must appear
+to file i/o readers and writers that this is as if so.
+
+ In actual implementations however, the reality is somewhat different. The first obvious difficulty
+is with networked filing systems where performance would be awful if an implied mutex had to be claimed
+for every single read and write, so networked filing systems don't do that. The second big deviation
+is with memory mapped files as reading and writing raw memory does not synchronise on
+the implied per-file mutex and therefore you may see a partially written write during a read. All the
+major operating systems do just happen to synchronise i/o between memory maps and normal
+read/write so long as nobody is using `afio::file_flags::os_direct` i.e. `msync(MS_INVALIDATE)`
+is a noop on any recent major operating system, however memory map i/o still races on itself and
+on normal i/o operations. This, incidentally, is why AFIO does not provide much memory map support currently.
+
+ An additional problem beyond these is that Linux is simply non-conforming to POSIX-2008 here,
+and has unfortunately been so for a very long time. Linux does lock on a per-page granularity,
+so per 4Kb page it locks and nothing past that. This implies that if your read unfortunately
+straddles a 4Kb boundary, you have a race. XFS has implemented additional locking to solve this
+problem, but ext4 has not. You can see more detail
+[@http://jeffr-tech.livejournal.com/20707.html here] and [@http://permalink.gmane.org/gmane.comp.file-systems.ext4/27225 here].
+
+ Finally, Microsoft Windows makes no public guarantees about the atomic visibility of writes except
+that nothing is guaranteed past a sector size, and by that they are referring to the atomicity
+of a write reaching storage rather than anything about visibility to concurrent reader writers.
+From how the NT kernel IRP queue works whereby reads and writes both enter the same serialised queue,
+it seems to me that the POSIX visibility guarantees are met which would be expected as the NT kernel
+is explicitly designed to be POSIX compliant, however one should be cautious here. I note from a
+review of portable databases that none makes strong assumptions about read-write visibility ordering, and
+I assume that is for a reason __dash__ though that reason could simply be ["Linux].
+
+ [*If] you are willing to restrict your end use cases to:
+ 
+ * Any of the BSDs (these conform to POSIX).
+ * Linux with XFS (XFS implements special workarounds to conform with POSIX).
+ * Microsoft Windows with NTFS (it is thought to conform to POSIX).
+ 
+ ... then you may be able to dispense with explicit locks. You may find the __afio_statfs__ API useful
+as it can return the name of the filing system providing an open file handle.
+
+# By extension of the above, POSIX requires that the visibility of a write to a file opened for append-only access is also
+atomic to all readers and writers of the same file. Or put more succinctly, appending to
+an append-only file is atomic per syscall, so concurrent appenders are guaranteed each of
+their writes will appear to be appended in full before another appender's write. Here is
+the POSIX-2008 wording:
+
+ [:['["If the `O_APPEND` flag of the file status flags is set, the file offset shall be set to the end
+of the file prior to each write and no intervening file modification operation shall occur between
+changing the file offset and the write operation.]] ([@http://pubs.opengroup.org/onlinepubs/9699919799/functions/write.html POSIX-2008])]
+
+ You will be glad to know that this is a much better supported feature in implementations.
+The atomicity of file append even works on CIFS/Samba network shares in the usual configuration, albeit
+with a severe performance penalty (NFS network shares unfortunately do not preserve
+append atomicity because the protocol is incapable of expressing such an operation). Because
+memory maps are for a given file extent, file appends don't affect them, and because the requirement
+is merely for the atomicity of the increment of the file size, the atomicity of the visibility of the content
+appended is a separate problem to ['where] the content is appended whose increment is guaranteed
+to be atomic except on NFS.
+
+[heading The relevance of all this filing system theory to the final key-value BLOB store]
+
+Why all this matters is because you need to understand all this theory to understand why the third generation
+key-value BLOB store presented next is designed exactly the way it is. Unintuitively, it is going to
+be a set of always-growing atomically-appended sparse files. We take advantage of hole punching
+to deallocate the parts of the files no longer needed so physically consumed storage does not grow
+past what is needed, but their apparent sizes grow forever and the atomicity of the atomic append operation
+is used as the concurrency control mechanism for implementing transactional updates as effectively copy-on-write, plus as the mechanism
+for marking time to the filing system such that extents which have exceeded their maximum age and must be
+flushed to storage are always exactly those at an offset earlier in the file. Because we never open
+nor close files, we avoid the costs of security checking during path lookup, and therefore maximise performance.
+While the next example does not make use of memory maps as that would severely complicate the code, the
+on-disk file format is capable of being used directly from a memory map which would allow high performance
+scaling to hundreds of millions of key-value pairs without blinking. The only real pessimism in the
+following design is that it doesn't scale well to modifies with worse than
+`O(N^2)` complexity to concurrency of writers and worse than `O(N)` complexity to key count.
+
+We do have to take some care however. As on Linux writes are not atomic with respect to reads across
+4Kb boundaries, we are going to need some mechanism of checking if some given append is valid or not, which usefully
+can be reused to check a store for validity after a sudden power loss (just because reads and
+writes may have sequential consistency of visibility to processes has no bearing whatsoever on what order writes are flushed
+to physical storage). Any writes we make within a 4Kb boundary is probably safe e.g. to the very front
+of the store file, so long as it does not exceed 4Kb.
+
+And just to be extra special careful, we will never do a ['rewrite] of existing content exceeding
+a sector size which we'll assume is 512 bytes on a 512 byte boundary as that is publicly documented
+as guaranteed for all the major operating systems. For that reason, as you will note in the implementation
+next section, everything is aligned to a 32 byte boundary and we never rewrite more than 32 bytes which
+guarantees we will never rewrite across a 512 byte boundary, and therefore risk atomicity.
+
+[section:extents The final named blob store design]
+
+[caution This section was not finished in time for the beginning of the Boost peer review due a hard
+drive failure induced by the testing of AFIO-based key-value stores in this workshop tutorial (sigh!), but it will be finished
+shortly after I get up and running again on a new hard drive (as I write this, the drive is being cloned in between
+periods it hangs and I have to power cycle to get it back for more cloning). The page content is representative of the
+final edition, however the source code listed has not been debugged nor tuned for performance yet
+and is therefore not listed here. The benchmarks are obviously missing for this solution on the next page.]
+
+As you might have guessed from the theory on the preceding page, the final design of the key-value store is radically
+different to before. Instead of storing each value in its own file, we have this store structure instead:
+
+* `store/index`
+  
+ This always growing file is a simple linear history of snapshot state of the key-value store with a full copy of
+all the key-value pairs being written per transaction as a single shot atomic append. The blobs are referred to by
+unique integer index into a linked small blob index (see below). The key-value pairs are stored on-disk as a dense hash
+map which is very friendly to memory maps, eight bytes per entry, with the key strings stored contiguously after
+the hash array.
+
+ Each index record appended to the index is content hashed, and if during later parsing the hash does not match
+the contents the record is ignored. If after power loss the end of the index is trashed, the solution
+below will replay the history of transactions from the beginning, skipping any deallocated extents, until it finds the most recent complete
+undamaged index which does not refer to damaged blobs (see below).
+  
+* `store/large_blob_store`
+* `store/large_blob_store.ecc`
+  
+ We don't implement the large blob store in the solution below to keep the code brief, however it is intended
+to house any blob sized 4Kb or above as memory maps are a much superior way of working with larger values
+and keeping large blobs separately makes extent fragmentation from hole punching much less expensive. Unlike the other
+files, the large blob store is not necessarily always atomic appended, a deallocated extent might be reallocated
+for example. This eliminates the problem of ever exceeding a `2^64` maximum file size.
+
+ Each large blob is [*always] aligned to a 4Kb boundary to allow memory mapping. The large blob store is quite
+stupid and contains no metadata at all __dash__ it relies on the small blob store for all metadata. This
+stupidity, and the fact it is a separate file, allows you to speculatively allocate new
+blob value storage before a new value is written such that one writes directly into the final storage from
+the beginning with no unneeded memory copying. One then either commits the new value or throws it away by
+punching a hole over it. You will notice below that each blob keeps an age from a monotonically increase count
+based on updates, this is used to keep a blob pinned into existence for a period even if it is not in use.
+
+ In short, the large blob file provides a large number of useful optimisations, but is not strictly speaking
+necessary. You could just use the small blob file for all blobs, and that is what this simplified implementation
+does for brevity.
+
+ You are probably curious about the ECC file. The ECC file is a SECDED 32784,32768 Hamming code, so 16 bits (2 bytes)
+of ECC per 4096 bytes. This file allows single bit flips to be healed which can save a blob from being
+invalidated due to failing its hash check. We don't bother using this for either the index or the small
+blob store as almost all bit flips seen in a computer system stem from non-ECC RAM rather than long term
+storage, and the overhead of ECC calculation is probably not worth it except for large BLOBs given the
+statistical chance of a bit flip. AFIO provides a very fast SECDED implementation in `afio::utils::secded_ecc<>`.
+
+* `store/small_blob_store`
+  
+ The small blob store is where all the blob values live. To add a new value, one simply constructs
+a blob value record and atomically appends it in a single shot. Each blob has a hash of its content, and
+if the hash does not match its contents it is considered invalid and pending deallocation via hole punching.
+
+The operations involved in opening a data store for use become these:
+
+# Create/open the store directory.
+# Create/open for atomic append only the `index` and `small_blob_store` files.
+# Open for read write the `index` and `small_blob_store` files into a second open handle.
+# If either the `index` or `small_blob_store` files have zero length, atomic append into each their 32 byte header.
+This is racy, but safe as spurious additional 32 byte headers are ignored by the parsing code.
+# If either the `index` or `small_blob_store` files specify a last known length which is greater than the size
+reported by the operating system, or the last good index specified by the header points to a corrupted
+index, we consider either or both to be dirty. We firstly replay the
+small blob store from the beginning, skipping any deallocated extents, and we atomic append a blob store index (a map of content hashes to
+offsets in either the small or large blob store), updating the header to point at the new blob store index.
+
+ We then replay the index from the beginning, skipping any deallocated extents, matching off valid index
+records against our most recently generated blob store index. We choose the last uncorrupted index
+which does not refer to hashes of unavailable content.
+
+If two processes concurrently open the same dirty data store and both repair the store, you will note
+that the above healing process is invariant to concurrent heals. Again, the parsing code correctly skips
+spurious atomic writes.
+
+The operations involved for reading a key-value:
+
+# We reload the index and blob store index loaded into memory if it has changed (by simply checking
+if the file size for either has grown).
+# We look up the blob index mapped by the key.
+# We look up the blob store file linked to by the index and get the offset and file for the content.
+# We read the value to be delivered using the input stream, similar to the second generation key-value store.
+
+The operations involved for writing a key-value:
+
+# We hand out an output stream which records all output to memory.
+# On the destruction of the output stream, we build the gather write buffers for writing a blob with this value
+(i.e. hashing the contents etc).
+# We refresh the blob store index and see if this blob is already stored with an age less than 50. If so, we
+update its age to 0 along with all other blobs referred to by the index. If not, we atomic append the new blob
+and loop trying to atomic append an updated canonical blob store index until success (we must loop as we must
+reconcile with other concurrent writers). On success, we update the header at the front of the small blob store
+file to point at the new canonical blob store index with an incremented time count (this being a monotonically
+increasing count of successful blob store updates).
+# We refresh the index and update or add the key mapping to the map of keys to blob store index item, atomically
+appending the new index. If someone else wrote a new index between our starting index and our just written index,
+we return a transaction conflict error. On success, we update the header at the front of the
+index file to point at the new canonical index.
+# Every few thousand new indices we punch a hole earlier in index history by calling __afio_zero__. We always leave
+around a few thousand indices for replay after sudden power loss.
+
+It may now seem that there is a big race condition in between atomic appends of a new canonical index for either
+store and the updating of the header at the front of the file. This is correct, but is solved by the following
+index parsing algorithm for both store files:
+
+# Read the header at the front of the file for the hint to the current canonical index.
+# Parse each record from the hint onwards until the end of the file.
+
+In other words, a racily written hint adds a small bit of work to the parser, but nothing important. All we care
+is that it is approximately correct.
+
+We don't implement item deletion as we didn't in either of the previous two generation key-value stores, however if one were
+to implement it it would have these operations:
+
+# For all blobs in the blob store index with an age greater than 100 (this implies that writer concurrency
+must never exceed 50), and where their contiguous storage exceeds 4Kb, we remove those entries from the blob
+store index and write a new canonical blob store index.
+# If entries were removed, we calculate a set of extents to be deallocated and fire and forget a call
+to batch __afio_zero__. The extents to be deallocated are calculated by walking the small blob index
+and keeping a record of extents not referred to (i.e. the gaps between blobs stored). For each of those containing
+an aligned 4Kb quantity or more we rewrite the record header to have any parser skip the deallocated extent, and
+deallocate the rest.
+
+So let's look at our new interface file. It looks pretty similar to before, the only real change is the many new
+private member variable `handle_ptr`'s to the store files described above. Another change is that we now return
+a `outcome<ostream>` for writing but a `shared_future<istream>` for reading __dash__ this is because as explained
+earlier, writes are now fully buffered to memory before being hashed and committed as a transaction, so by explicitly
+returning a monad we are saying that this is now a synchronous operation (one could just return an already ready
+shared future, but this method makes public API assurances, and because a __boost_outcome__ future is a monad,
+your code will likely not even notice).
+
+[workshop_final_interface]
+
+More code is to come ...
+
+[table:conditions This third generation solution will perform excellently under these conditions:
+[[][Condition]]
+[[__tick__] [On Microsoft Windows you can place the store deep in a directory hierarchy and use long key names.]]
+[[__tick__] [Third party threads and processes can rename the location of the store during use.]]
+[[__tick__] [The size of ['all] the values being read at any given time fits into your virtual address space (which is at least 2Gb on 32 bit, 8Tb on 64 bit).]]
+[[__tick__] [As many processes and threads may read and write to the store concurrently as you like,
+including CIFS clients but excluding NFS clients.]]
+[[__tick__] [Processes may unexpectedly exit during modifies with no consequence on consistency.]]
+[[__tick__ __tick__] [Lookup performance is breathtakingly swift and close to invariant to item count.
+Write performance is much slower, but a lot faster than the atomic rename based design.]]
+[[__tick__ __tick__] [Sudden power loss will restore the key-value store to some point in history
+preserving the exact ordering of updates.]]
+[[__tick__] [This design allows the atomic transactional update of as many key-value item at once as you like.]]
+]
+
+
+[endsect] [/extents]
+
+[section:extents_problems The performance of and problems with this third generation design]
+
+[caution This section was not completed in time for the beginning of the Boost peer review, but
+it will be finished shortly.]
+
+[endsect] [/extents_problems]
+
+[endsect] [/extents_theory]
+
+[endsect] [/ workshop]
+
+[section:mini_programs Example mini-programs written using AFIO]
+
+[section:hello_world Hello World, asynchronously!]
+
+'''<?dbhtml-include href="disqus_identifiers/hello_world.html"?>'''
+
+We might as well jump straight in: on the left is a traditional STL iostreams
+implementation with its equivalent in AFIO free functions on the right.
+
+[table:hello_world Traditional STL iostreams and AFIO side by side
+  [[[readwrite_example_traditional]][[readwrite_example]]]
+]
+
+AFIO is based on future continuations as will be in the standard C++ library from C++ 1z onwards.
+Each continuation enforces an order of execution between the asynchronous operations.
+
+What this means is straightforward: in the example above `async_file()` outputs on completion
+an open file handle which is fed to `async_truncate()` which on completion feeds the same input
+handle to `async_write()` and so on. `async_close()` takes in the open file handle, closes it, and
+outputs a null file handle on completion to `async_rmfile()` which can still retrieve its last known
+path before being closed.
+
+'''<?dbhtml-include href="disqus_comments.html"?>'''
+
+[endsect] [/hello_world]
+
+[section:file_concat A less toy example: Concatenating files]
+
+'''<?dbhtml-include href="disqus_identifiers/file_concat.html"?>'''
+
+The Hello World example didn't really demonstrate why using AFIO is any better than using
+STL iostreams. The final example in this quick start will give a ["real world] and unfortunately
+somewhat overwhelming in complexity example of how
+AFIO can run rings around STL iostreams (complete with benchmarks!), so as an intermediate
+__dash__ and hopefully not as overwhelming __dash__
+step here is a simple file copy utility which can also concatenate multiple source files
+into a destination file[footnote My thanks to Artur Laksberg, Dev Lead of the Microsoft
+Visual C++ Parallel Libraries team, for suggesting this as a good demonstration of an
+asynchronous file i/o library. I had been until then quite stumped for an intermediate
+quick start example between the first and last examples.].
+
+[filecopy_example]
+
+This example consists of a function called `async_concatenate_files()` which will 
+asynchronously append those file paths in ['sources] into the file path in ['dest], with
+the `main()` function simply parsing arguments and printing progress every second.
+I won't explain the example hugely __dash__ it's pretty straightforward, it simply
+parallel reads all source files in `chunk_size` chunks, writing them to their appropriate
+offset into the output file. It
+is a very good example, incidentally, of why C++11 is like a whole new language over
+C++98 even for simple systems programming tasks like this one.
+
+You may note that the temporary buffers for each chunk are allocated using a special
+`page_allocator`. If your operating system allows it, regions of memory returned
+by this allocator have the maximum possible scatter gather DMA efficiency possible.
+Even if your operating system doesn't allow it, it does no harm to use this allocator
+instead of the system allocator.
+
+The chances are that this file copying implementation would be little faster than a naive
+implementation however (unless the source files are on different physical devices, in which
+case you'd see maximum performance). Some might also argue that firing a consumer producer thread per source
+file would be just as easy, albeit that output file position management across threads
+might be slightly tricky.
+
+Let us start into where the AFIO implementation starts to deliver real value add: a multiprocess safe log file and
+finding which files in a directory tree contain a regular expression.
+
+'''<?dbhtml-include href="disqus_comments.html"?>'''
+
+[endsect] [/file_concat]
+
+[section:atomic_logging Achieving atomicity on the filing system]
+
+'''<?dbhtml-include href="disqus_identifiers/atomic_logging.html"?>'''
+
+__triplegit__, the forthcoming reliable graph database store, ideally needs to allow multiple processes to
+concurrently read and write the graph store without mutual exclusion where possible. Each collection of hashes which form
+the tree which makes up some given version of the graph is itself a hashed object in the content
+addressable store, and you can have multiple named graphs in the graph store which may or may not
+share nodes. One problem as with all databases is how to efficiently issue an atomic transaction
+which updates multiple graphs simultaneously and atomically when there is the potential of concurrent
+writers also trying to issue write transactions which may, or may not, cause conflict with other
+transactions.
+
+The really naive solution is to keep a single lock file which is created using O_EXCL i.e. fail
+if you didn't create the file for the entire graph store. This serialises
+all transactions, and therefore eliminates any problems with updates clashing. This is usefully
+well supported by all operating systems, and by NFS and Samba.
+
+A less naive solution is to keep one lock file per graph, and to
+use a multiple lock and backoff strategy to lock the requisite number of graphs for some given
+transaction. The big problem with this approach is that you are unfairly penalised for especially large multi-graph transactions over others
+with smaller transactions as lock complexity is worse than linear. Nevertheless performance is actually not bad: these are results for my 3.9Ghz i7-3770K workstation
+using AFIO to implement the lock file with various numbers of concurrent writers (note that Windows provides magic
+flags for telling it about lock files, if not used expect a 40% performance reduction):
+
+[table:lock_file_performance Lock file performance on various operating systems:
+  [[writers][lock files][Win8.1 x64 NTFS HD][Win8.1 x64 NTFS SSD][Linux x64 ext4 SSD][FreeBSD 10.1 ZFS SSD]]
+  [[1][1][2468][2295][3590][9922]]
+  [[2][1][2507][2385][3583][9903]]
+  [[4][1][1966][2161][3664][9684]]
+  [[8][1][1400][1851][3703][6537]]
+  [[16][1][742][602][3833][1251]]
+  []
+  [[1][8][826][888][1378][2455]]
+  [[2][8][508][637][576][917]]
+  [[4][8][67][167][417][63]]
+  [[8][8][37][117][106][0.55]]
+  [[16][8][33][77][26][0.5]]
+]
+
+As you can see, Linux does a very good job of O(1) to waiters complexity, but performance on Windows
+and FreeBSD collapses once you exceed CPU cores. Also, Windows is sensitive to device block size __dash__ the
+hard drive outperforms the SSD because it has 512 byte sectors and the SSD has 4096 byte sectors.
+I suspect that internally Windows memcpy()'s in device native sector sizes, or is actually sending
+data to physical storage despite us marking this file as temporary. One very striking observation is
+how FreeBSD is a full 2.76x the performance of Linux and 4.32x that of Windows.
+
+A much more intelligent way of solving this problem is to figure out which graphs are common across each
+of the transactions currently pending, and to strictly order the transactions in the sequence
+which maximises throughput without updates clashing.
+One way of many distributed writers constructing a shared graph of dependencies is to append messages
+into a shared file, and then one can deploy a distributed mutual exclusion algorithm of which those
+by Suzuki and Kasami, Maekawa and Ricart and Agrawala are the most famous. This requires the ability
+to atomically append to the shared file, something guaranteed on all operating systems, but unfortunately
+not guaranteed by NFS nor Samba (though when combined with advisory file locking those do work as
+expected, albeit with poor performance). This means that on an all-Windows setup, or if on POSIX and
+not using NFS nor Samba, the atomic append method could be valuable, especially as the cost of locking
+multiple actors is pretty much the same as locking a single actor so you get eight graphs locked for
+the same cost as locking one.
+
+[table:atomic_append_performance Atomic append lock performance on various operating systems:
+  [[writers][lock files][Win8.1 x64 NTFS HD][Win8.1 x64 NTFS SSD][Linux x64 ext4 SSD][FreeBSD 10.1 ZFS SSD]]
+  [[1][1][2592][2875][1198][29]]
+  [[2][1][1284][2565][1344][25]]
+  [[4][1][1420][2384][1327][35]]
+  [[8][1][1262][1764][1254][55]]
+  [[16][1][428][520][1260][37]]
+]
+
+Linux once against does a great job of O(1) to waiters complexity, but at the third of the speed of
+a simple lock file and up to half the speed of Windows. Windows does better than Linux here especially
+on SSDs where it is faster than a simple lock file, but doesn't scale to waiters once they pass CPU core count.
+FreeBSD is two orders of magnitude slower which is because ZFS checksums and copy on writes file changes,
+so every time we append 16 bytes we are forcing a full copy of the 128Kb extent to be issued. It would
+appear that ZFS syncs its internal buffers when a different file descriptor atomic appends to the same file
+__dash__ this has the above pathological performance outcome unfortunately.
+
+This introduces the final potential solution which is that of the quagmire of advisory file locking.
+This is an area where Windows and POSIX diverge very significantly, and the interactions between
+Windows and POSIX when Windows locks regions in a file on a Samba share on a POSIX machine or when
+POSIX does byte range locking at all (there is a very fun stanza in the POSIX standard which basically
+releases all your locks on first file descriptor close) are full of quirks, races and other nasties.
+For this reason you should avoid the very temporary and experimental code currently in AFIO which
+implements Samba and NFS safe file range locking where theoretically both Windows and POSIX code
+can safely lock ranges in files concurrently, those APIs are not documented for good reason!
+Still, performance with these __dash__ despite the hoop jumping inefficiencies AFIO leaps through
+to implement relatively sane semantics __dash__ is impressive.
+
+[table:advisory_lock_file_performance Advisory lock file performance on various operating systems:
+  [[writers][lock files][Win8.1 x64 NTFS HD][Win8.1 x64 NTFS SSD][Linux x64 ext4 SSD][FreeBSD 10.1 ZFS SSD]]
+  [[1][1][5799][5166][3466][21536]]
+  [[2][1][5788][6656][2215][11654]]
+  [[4][1][5775][7020][1073][5384]]
+  [[8][1][5773][6738][518][2584]]
+  [[16][1][5695][5617][360][1326]]
+]
+
+Fascinatingly the tables suddenly switch here: Windows sees O(1) to waiters complexity, whilst
+Linux and FreeBSD sees a mostly O(N) to waiters complexity drop in performance. FreeBSD, as with the
+simple lock file performance, blows all others out of the water again in advisory lock performance too. I
+should add here that because POSIX advisory locks are per process, the Linux and FreeBSD benchmarks were
+generated by running N copies of the benchmark program whereas the NT kernel inherits the really
+excellent and well thought through file byte range locking model of DEC VMS and treats locks as
+effectively reference counted byte ranges, and therefore works as expected from a single process.
+I have yet to add process-local byte range locking to simulate sane range locking for POSIX, so
+expect the numbers above to worsen.
+
+After all of that, we are left with this locking strategy matrix for __triplegit__:
+
+[table:best_locking_strategy_matrix Fastest file system locking strategy for various operating systems:
+  [[Operating system][Best locking policy]]
+  [[Win8.1 x64 NTFS][Advisory locks fastest, then atomic append locks, finally lock files]]
+  [[Linux x64 ext4][Lock files fastest, then advisory locks, finally atomic append locks]]
+  [[FreeBSD 10.1 ZFS][Advisory locks fastest, then lock files, avoid atomic append locks at all costs]]
+]
+
+I should [*emphasise] once again that the advisory locking code is riddled with bugs and you should
+not use it in your code at this time. Once I have a CI testing all possible combinations of locking
+and nothing is erroring out I'll release that code for production use, probably in v1.4.
+
+All these benchmarks came from this benchmarking program I wrote using AFIO which illustrates how
+you might implement the techniques used above:
+
+[benchmark_atomic_log]
+
+'''<?dbhtml-include href="disqus_comments.html"?>'''
+
+[endsect] [/atomic_logging]
+
+[section:filesystem_races Handling races on the filing system]
+
+'''<?dbhtml-include href="disqus_identifiers/filesystem_races.html"?>'''
+
+Filing systems are a shared resource common to all processes on the system and sometimes the network,
+and are therefore as a globally shared resource inherently racy. Yet overwhelmingly programs, even often those written
+by world expert programmers, singularly assume
+the filing system to be a static, constant and unchanging place only modifiable by the current program,
+as indeed did until very recently the POSIX API standard which defines the common API for Linux, FreeBSD,
+Mac OS X and other Unices.
+When bug reports come in of data being lost, even very large professional corporations can make a real
+hash of testing that their ["fix] isn't worse at losing data than the previous more naive implementation.
+This is because when you program against a mental model of a static, unchanging filesystem you will become
+inevitably surprised when it happens to change at exactly the wrong moment __dash__ which of course is
+a moment you can never replicate on your developer workstation, thus making finding and fixing these
+sorts of bug highly non-trivial.
+
+In case you don't realise how much user data and productivity is lost each year to filing system races,
+just look up ["corrupted Office file] on Google and weep. Even for us programmers, if you try keeping a
+Git repository on a Samba drive expect some interesting, and moreover quite strongly associated to specific
+combinations of client accessing the repo concurrently, object database corruption from time to time.
+
+Well, there is some good news: AFIO makes maximum use of host OS filing system race safeguards, so if you
+write your code against AFIO and take note of the race guarantees section in each individual per-API
+reference documentation page, you should hopefully avoid any possibility of experiencing filing system
+races.
+
+[heading What AFIO provides for managing filing system raciness]
+
+Firstly, readers will probably be quite surprised to learn that the only operating system capable of providing
+completely race free filing system behaviour is Microsoft Windows, or rather the very well designed NT kernel API which AFIO uses directly.
+Linux provides robust file descriptor path discovery and the `XXXat()` POSIX APIs, and with those AFIO can provide pretty
+good race condition safety on Linux up to the final directory in the path.
+Mac OS X provides an unfortunately quite broken file descriptor path discovery, and additionally does not provide the `XXXat()`
+POSIX APIs and so AFIO cannot provide race protection, but can throw exceptions sometimes if it detects the filesystem
+has suddenly changed and you're about to delete the wrong file (you shouldn't rely on this, it's racy). FreeBSD provides the `XXXat()` POSIX APIs, but its file
+descriptor path discovery only works correctly for directory not file handles due to a kernel bug (I've opened
+a feature request ticket for this at [@https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=198570 https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=198570]) and therefore AFIO
+can provide only race condition safety for directories only on FreeBSD.
+
+Additionally, working with the filing system in a race safe way on POSIX requires opening a file descriptor to the
+containing directory for every operation (some proprietary Linux extensions allow this to be avoided for some operations on
+newer Linux kernels). AFIO will keep a global cache of open file handles for containing directories
+on request using the `file_flags::hold_parent_open` flag which can be enabled per dispatcher or per individual file handle open,
+this very significantly reduces the cost of race condition safety on POSIX ['for file entries only] as directories ignore
+the `file_flags::hold_parent_open` flag, though at the cost of increased file descriptor usage, which has low hard limits
+especially on OS X which is why it is disabled by default. The alternative if you don't want AFIO to bother with race safety
+is to specify the `file_flags::no_race_protection` flag per dispatcher or per individual file handle open, this causes AFIO
+to use the same maximum performance code paths as used before the v1.3 engine.
+
+[heading How to implement filing system race safety on AFIO]
+
+The essential rule for achieving maximum filing system race safety is to avoid using absolute paths where possible. If
+you want your code to also be safe on POSIX, you must additionally only assume race safety up to the final directory in
+a path __dash__ thereafter design your node to never behave racily within a single directory.
+
+The core container type for specifying a location on the filing system to AFIO is __afio_path_req__ which looks like this:
+
+    struct path_req
+    {
+        bool is_relative;              // Whether the precondition is also where this path begins.
+        afio::path path;               // The filing system path to be used for this operation.
+        file_flags flags;              // The flags to be used for this operation (note they can be overriden by flags passed during dispatcher construction).
+        future<> precondition;         // An optional precondition for this operation.
+        path_req(T &&);                // Converts T to a filesystem::path, makes it absolute, then converts to an afio::path
+        path_req(bool, T &&);          // If the bool is true, converts T to an afio::path fragment. If false, same as above overload (i.e. make absolute).
+    };
+    
+For convenience, type markup is provided for the boolean taking constructor, these being `path_req::relative` and
+`path_req::absolute`.
+
+If the path is relative, then the path of the precondition is used as the base from which the relative path fragment
+operates. On FreeBSD, Linux and Windows this base extension happens inside the kernel and so the current path of the precondition
+really doesn't matter __dash__ it could be changing a thousand times per second and it wouldn't matter. On OS X due
+to lack of the `XXXat()` POSIX APIs the path of the precondition is fetched and the extension done by hand.
+
+An AFIO extension allows you to specify a file as precondition. In this situation, if you specify an empty path
+then you mean the precondition itself which is very useful for deleting or renaming an open file handle. If you want
+a sibling file, this can be found via a path fragment starting with `../`, though note that this necessarily is racy
+to the containing directory
+(AFIO opens the containing directory of the file, ensuring the directory contains an inode matching the file, and
+then uses that directory handle as a base __dash__ the race here being if the file relocates after matching its
+containing directory).
+
+[heading Gotchas specific to Microsoft Windows]
+
+Finally, there are some gotchas specific to Microsoft Windows:
+
+1. You cannot rename a directory which has an open file handle in any process to any item anywhere within itself or its children.
+
+2. You cannot rename to a destination which has an open file handle with DELETE permissions (`file_flags::write`)
+to itself or any of its parent directories in any process. You CAN do this from a source like this, but the destination cannot be
+like this (why is this? It is not documented anywhere in Microsoft's documentation, but if I had to guess, I'd suggest that the
+atomicity of the rename is implemented by taking an op lock on the destination, an op lock not granted if any handles exist which
+could change the path suddenly. I'm not sure if Microsoft are themselves aware of this limitation).
+
+One might note that much of the utility of race protecting APIs is lost with these restrictions. However, note that one could
+emulate POSIX semantics by renaming out all the contents of a directory to be renamed to elsewhere, rename the directory, and then
+renaming the contents back in. Given the pathetic slowness of opening handles on Windows, this might seem impossibly inefficient,
+however NT provides a little known `FILE_DELETE_CHILD` permission which gives you delete/rename permission on all the children
+and subchildren of a directory with just one handle open. I learned about this flag the hard way, by it breaking in many subtle ways
+AFIO's functioning on Windows when it was requested by default, something which took several days of head scratching to track down. AFIO doesn't
+currently do this trick of renaming out and back in on Windows, but might in the future after a lot more experimentation as to if
+it is viable and reliable without surprises.
+
+On Windows opening a directory with write access requests rename/delete privileges, whereas on POSIX
+the write access request is ignored for directories as POSIX doesn't allow it anyway. This allows you to write identical code
+which works universally.
+
+As an example of some programming AFIO safely on an extremely unstable filing system, below is the functional test which verifies AFIO
+for filing system race safety.
+As you will see, a worker thread is solely dedicated to renaming directories to unique names whilst the main thread creates files
+inside those constantly changing directories, and relinks them into another directory which is also constantly changing on POSIX, but
+is stable on Windows. This is iterated for a substantial period of time to verify that nothing goes wrong.
+
+[race_protection_example]
+
+'''<?dbhtml-include href="disqus_comments.html"?>'''
+
+[endsect] [/filesystem_races]
+
+
+[section:so_what What performance benefit does asynchronous file i/o bring me? A demonstration]
+
+'''<?dbhtml-include href="disqus_identifiers/so_what.html"?>'''
+
+So we can schedule file i/o operations asynchronously with AFIO: what's the benefit of doing that
+instead of creating separate threads of execution and executing the file i/o there instead?
+
+As a quick summary as we're about to prove our case, there are three main benefits to using AFIO
+over doing it by hand:
+
+# You don't have to worry about threading or race conditions or losing error state (as much). AFIO
+does all that for you.
+# On platforms which provide native asynchronous file i/o support and/or native scatter/gather
+file i/o support, AFIO will use that
+instead of issuing multiple filing system operations using a thread pool to achieve
+concurrency. This can very significantly reduce the number of threads needed to keep your
+storage device fully occupied __dash__ remember that ['queue depth] i.e. that metric you see all
+over storage device benchmarks is the number of operations in flight at once, which implies
+the number of threads needed. Most storage devices are IOPS limited due to SATA or SAS
+connection latencies without introducing queue depth __dash__ in particular, modern SSDs cannot
+achieve tens of thousands of IOPS range without substantial queue depths, which without
+using a native asynchronous file i/o API means lots of threads.
+# It's very, very easy to have AFIO turn off file system caching, readahead or buffering
+on a case by case basis which makes writing scalable random synchronous file i/o applications
+much easier.
+
+What these three items mean is that writing scalable high-performance filing system code is much easier.
+Let us take a real world comparative example, this being a simple STL iostreams, Boost Filesystem and OpenMP
+based find regular expression in files implementation:
+
+[find_in_files_iostreams]
+
+This implementation is fairly straightforward: enumerate all files in all directories below
+the current directory into a vector, fire off N threads to open each file, read it entirely
+into memory, regex it for the pattern and if found print the file's path.
+
+Let's now look at the AFIO implementation, and you should prepare yourself because it is far
+more mind bendy due to the many nestings of callbacks needed (it may remind you of WinRT or .NET
+code, everything is asynchronous callback):
+
+[warning In the v1.4 engine we ought to gain C++ 1z stackful coroutine support which will let me rewrite
+the below to be vastly simpler and without the multitude of nested callback handlers.]
+
+[find_in_files_afio]
+
+Here the `find_in_files` class is used to carry state across the callbacks __dash__ one could just
+as equally bind the state into each callback's parameters instead via some sort of pointer to
+a struct. But the difference in complexity is noticeable __dash__ you're probably now asking, why
+choose this hideous complexity over the much clearer OpenMP and iostreams implementation[footnote
+Indeed many ask the same when programming WinRT apps __dash__ Microsoft's insistance on never allowing
+any call to block can make simple designs explode with complexities of nested callbacks.]?
+
+Well, that's simple: do you want maximum file i/o performance? Here is a search for ["Niall] in a
+Boost working directory which contained about 7Gb of data across ~35k files[footnote Test machine
+was a 3.5Ghz Intel i7-3770K Microsoft Windows 8 x64 machine with Seagate ST3320620AS 7200rpm hard
+drive. Note that AFIO has a native WinIOCP backend which leverages host asynchronous file i/o support.]:
+
+[table:find_in_files_performance Find in files performance for traditional vs AFIO implementations
+  [[][iostreams, single threaded][iostreams, OpenMP][Boost.AFIO][Boost.AFIO `file_flags::os_direct`][Boost.AFIO `file_flags::os_mmap`[footnote The superiority of memory maps on Windows is because all buffered file i/o is done via memory copying to/from memory maps on Windows anyway, so eliminating that memory copy is huge.]]]
+  [[Warm cache][812 Mb/sec][1810 Mb/sec][2663 Mb/sec][N/A][6512 Mb/sec]]
+  [[][+0%][+123%][+228%][][+702%]]
+  [[Cold cache[footnote File cache reset using [@http://technet.microsoft.com/en-us/sysinternals/ff700229.aspx]]][16 Mb/sec][[*8 Mb/sec]][15 Mb/sec][13.14 Mb/sec][24 Mb/sec]]
+  [[][+0%][[*-50%]][-6%][-18%][+50%]]
+]
+
+Note how AFIO outperforms the OpenMP iostreams implementation by about 50% for a warm cache, with only
+a 6% penalty for a cold cache over a single threaded implementation. Note the [*50%] penalty the OpenMP
+iostreams implementation suffers for a cold cache __dash__ a naive multithreaded implementation causes
+a lot of disc seeks. If you map a file into memory using `file_flags::os_mmap`, AFIO will `memcpy()` from
+that map instead of reading __dash__ or of course you can use the map directly using the pointer returned
+by `try_mapfile()`.
+
+The eagle eyed amongst you will have noticed that the AFIO implementation looks hand tuned with a
+special depth first algorithm balancing concurrency with seek locality __dash__ that's because I invested
+two days into achieving maximum possible performance as a demonstration of AFIO's power (and to find
+and fix some bottlenecks). Some might argue that this is therefore not a fair comparison to the OpenMP iostreams
+implementation.
+
+There are two parts to answering this argument. The first is that yes, the OpenMP iostreams search
+algorithm is fairly stupid and simply tries to read as many files as there are CPUs, and those files could
+be stored anywhere on the spinning disc. Because AFIO
+can issue far more concurrent file open and read requests than OpenMP, it gives a lot more scope to
+the filing system to optimise hard drive seeks and satisfy as many requests as is feasible __dash__
+sufficiently so that with a cold cache, AFIO is a little slower than a single threaded iostreams
+implementation where the filing system can spot the access pattern and prefetch quite effectively.
+A completely valid solution to the OpenMP performance deficit would be to increase thread count dramatically.
+
+The second part of answering that argument is this: AFIO's very flexible op chaining structure lets you
+very easily twiddle with the execution dependency graph to achieve maximum possible performance by
+balancing concurrency (too much or too little is slower, what you need is just the right balance)
+and disc seeks (enumerations are best not done in parallel, it defeats any prefetching algorithm),
+unlike the naive OpenMP implementation which is much harder to play around with. Don't get me wrong:
+if you have plenty of time on your hands, you can implement a hand written and tuned find in files
+implementation that is faster than AFIO's implementation, but it will have taken you a lot longer,
+and the code will neither be as portable nor as maintainable.
+
+'''<?dbhtml-include href="disqus_comments.html"?>'''
+
+[endsect] [/so_what]
+
+[endsect] [/ mini_programs]
+
+[endsect] [/quickstart]

@@ -1,0 +1,65 @@
+[/============================================================================
+  Boost.AFIO
+
+  Use, modification and distribution is subject to the Boost Software License,
+  Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
+  http://www.boost.org/LICENSE_1_0.txt)
+=============================================================================/]
+
+[section Acknowledgments]
+
+We would like to thank all the people who contributed to the development of this library, many of whom
+are not listed here but nevertheless are due our thanks. Our especial thanks goes (in chronological
+order since 2012):
+
+* To my former team at BlackBerry (of whom Tony van Eerd is best known to the C++ community) for
+the off the cuff discussions which led to me to conceptualise AFIO as an out-of-work side project.
+
+* To Google, for sponsoring Paul to work on AFIO as part of Google Summer of Code 2013.
+Paul did the lion's share of the work of porting the preexisting pure C++ 11 code
+base to Boost and to older compilers, both tasks which could never be called fun by anyone.
+
+* To the family and friends who had to put up with us during Google Summer of Code 2013
+adding 15-25 hours per week above
+and beyond our normal work hours which meant time not spent with them. This part is
+without doubt the hardest part of developing a new Boost library __dash__ what it requires
+you to sacrifice in exchange for what little free time is already left over after
+a work week.
+
+* To my former team and division at BlackBerry who successfully obtained the first ever
+corporate permission for an employee to contribute to a non-business open source project.
+The many months of wrangling to achieve that win was made moot when I was downsized
+towards the end of GSoC just weeks after gaining the landmark approval from Legal, nevertheless my thanks are due to BlackBerry for trying to
+change itself and letting me be a part of that.
+
+* To Christopher M. Kohlhoff for providing Boost.ASIO, which has been a high benchmark
+to aspire towards.
+
+* To Beman Dawes for providing Boost.Filesystem and the Filesystem TS, without which filesystem
+paths would be far more tricky to handle well in C++.
+
+* To Artur Laksberg for reviewing AFIO early on and making a number of valuable observations.
+
+* To Bjorn Reese for taking the time to be an early adopter of AFIO, and making many
+observations of where AFIO could be obviously improved, almost all of which were our
+delight to enact.
+
+* To Vicente J. Botet Escriba for very kindly adding a method to Boost.Thread's future's
+for directly fetching their exception_ptr. This greatly improved AFIO's exception
+propagation performance.
+
+* To Megan and Clara for putting up with the nightly 12am to 4am weekday after-work slots
+during 2015 which were necessary to make any progress on AFIO and its sublibraries APIBind,
+Spinlock and Monad.
+
+* To the many people on the boost-dev mailing list who contributed feedback on the design
+of the sublibraries APIBind, Spinlock and Monad.
+
+* To Ahmed Charles for volunteering to review manage AFIO after two years of waiting in the
+Boost peer review queue - thank you Ahmed!
+
+* And finally to all those who have submitted bugs and pull requests for AFIO, too many to
+list here.
+
+[endsect]
+

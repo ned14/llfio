@@ -1,0 +1,833 @@
+[/============================================================================
+  Boost.AFIO
+  
+  Use, modification and distribution is subject to the Boost Software License,
+  Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
+  http://www.boost.org/LICENSE_1_0.txt)
+=============================================================================/]
+
+[section:release_notes Release Notes]
+
+[/=================]
+[heading Known deviations in this version being presented for Boost peer review from
+version to enter Boost if accepted]
+[/=================]
+
+This peer review edition of AFIO v1.4 has been ["mocked up] with an API which should very closely
+resemble the eventual API in the v1.4 engine which will be rewritten to use the just written
+lightweight future-promise factory toolkit in forthcoming __boost_outcome__. It is, however,
+still in fact the mature v1.3 engine with a faked wrapper API simulating the v1.4 engine.
+Known deviations from the eventual v1.4 release:
+
+* AFIO's `future` is a shim type standing in for the eventual custom Boost.Monad based future.
+Continuations work, but are horribly hacked together __dash__ if your continuation returns
+a Boost.Monad future, it shims in a one way conversion to lightweight futures. If your continuation
+returns anything else, including an AFIO future, it stays within AFIO < v1.4's fairly broken future
+semantics (AFIO was first written back in 2012 when the Concurrency TS looked very different
+indeed, and AFIO has not kept up).
+
+[warning AFIO's future shim type can't do continuations on anything but `future<void>`. For
+any `future<T>` it actually executes the continuation immediately which will usually just
+happen to work through fortune as the continuation usually does a `get()`.]
+
+* Relatedly, because AFIO < v1.4 implemented future continuations atop STL and Boost futures
+using an internal hash table to look up the associated extra operation metadata per future,
+these APIs will also be vanishing:
+
+  * `async_io_dispatcher_base::completion()` - replaced with future.then()
+  * `async_io_dispatcher_base::call()` - replaced with future.then()
+  * `async_io_dispatcher_base::barrier()` - replaced with when_all().
+
+* Lightweight future-promise also enables C++ 1z coroutines, and therefore the code examples
+in the documentation can then be rewritten to use C++ 1z coroutines where appropriate. This
+should particularly aid the find regex in files tutorial example which is currently very messy.
+
+[/=================]
+[heading Anticipated forthcoming features in future versions]
+[/=================]
+
+* The v1.4 engine will be rewritten yet again to use a new custom future
+implementation whereby async_io_op shall become afio::future<T>. This should
+let the API no longer return two sets of futures when returning results
+(async_io_op therefore matches afio::future<void>), plus make best use of the
+proposed concurrent_unordered_map by finally actually processing batches of
+operations as a batch, instead of one at a time.
+
+* The v1.4 engine afio::future<T> ought to transparently support Boost.Fiber,
+this should let you program against AFIO using awaitable resumable functions
+which is much cleaner. The v1.3 engine already reduced latency by 50% over
+the v1.2 engine, but with Fibers we finally ought to eliminate the O(waiters)
+scaling for op completions in favour of O(1) to waiters.
+
+* AFIO v1.5 will abstract out all the OS specific code into a C (not C++)
+abstraction layer. This makes it far easier to reuse the same code for a later
+AFIO based Filesystem TS implementation. It also eliminates the use of C++
+exceptions at the OS specific layer. Note I may still use lambdas in the C
+abstraction layer, if compiled as C these appear as C callbacks but if compiled
+as C++ they are some callable type.
+
+* It is hoped that the v1.5 engine will have two additional bindings, one
+for Microsoft COM thanks to John Bandela's CppComponents (https://github.com/jbandela/cppcomponents)
+and another with plain C bindings (which actually wrap the COM object). Both
+these bindings have no requirement for anything Microsoft, and work as expected
+on POSIX.
+
+* The v1.5 engine will finally make use of the API support for alternative async_io_dispatcher
+implementations, adding at least one for temp file support with special temp
+file semantics, and maybe others with transparent hashing and bit flip healing
+(see below). The temp file support will allow anonymous and named temp files
+which can be device volume matched to some path, thus allowing file move to be
+done without copying. Anonymous temp files can use Linux specific facilities
+for those.
+
+* Finally, making good use of the new coroutine support the v1.5 engine should
+have an async fast batch hash engine which provides transparent hashing of all
+async reads and writes with optional SECDEC ECC calculation. Hashes will probably
+be initially limited to Blake2b (crypto strong and very fast, even on ARM) and SpookyHash
+(not crypto strong, but superbly fast and for small blocks), though I may dust off
+my 4-SHA SSE2/NEON SHA256 engine for Intel and ARM for the giggle. In addition
+to fast batch hashing, the coroutine support should make filing system tree
+algorithms enormously easier to write, so expect an optimally fast race free
+directory tree visitor, deleter, mover and copier which is the find in files
+tutorial made generic.
+
+
+[h5 In some later version, in order:]
+
+* When ignoring the close of a cached directory handle, kick out its weak_ptr from
+the central directory cache if its reference count is 1.
+
+* Individual file change monitoring. This would be very useful for implementing
+distributed mutual exclusion algorithms to avoid spinning on file updates.
+
+* Related to the preceding item, formal async lock file support with deadline
+timeouts.
+
+* Portable fast file byte range advisory locking which works across network shares,
+but can still utilise shared memory when possible.
+
+* Related to locking files, the ability to copy files (unwritten destination locked until
+complete) using a variety of algorithms (including cheap copies on btrfs [cp --reflink=auto])
+with progress notification via the file change monitoring. Extend rename file and delete file
+with lock file options.
+
+* Also related to locking files, DeleteOnClose should use advisory locks to have the
+last handle close do the file delete on POSIX.
+
+* Right now specifying an empty path with precondition to mean same as precondition is
+inefficient and racy: it opens the containing directory and uses the containing
+directory as the base with its leafname. What it should do is to duplicate the handle
+and use fnctl() etc to reopen the handle with the desired access and flags.
+
+* Extended attributes support. TripleGit could use this to avoid a second file
+handle open of metadata per graph object read. Unsure if NTFS is any faster
+opening EA though, need to test.
+
+* AFIO's stable DLL ABI is intentionally C compatible, so all one needs is a libclang
+tool for generating C wrappers for the DLL ABI which massage C arrays into pseudo std::vector
+const lvalue refs. Such C bindings would be all batch and have none of the friendliness of
+programming AFIO in C++, but they ought to work quite well.
+
+* Kernel side file <=> socket data copying via sendfile and splice on Linux. Integrating
+splice as async with ASIO is unfortunately painful :(
+
+* async_io_dispatcher_base::read_partial() to read as much of a single buffer as
+possible, rather than only complete buffers.
+
+* Fast, scalable portable directory contents change monitoring. It should be able
+to monitor a 1M entry directory experiencing 1% entry changes per second without
+using a shocking amount of RAM.
+
+* ACL support
+
+* Asynchronous file handle closing in ~async_io_handle() (currently if not
+explicitly closed, the async_io_handle destructor must synchronously close)
+
+
+[/=================]
+[heading Boost 1.59 AFIO v1.40 beta]
+[/=================]
+
+* Unit tests were not trapping exception throws from normalise_path(path_normalise::guid_all),
+link() or file(file_flags::create_compressed). This caused test failure on FAT32 and ReFS
+volumes on Windows as those operations are not supported.
+
+* Rename file_buffer_allocator to page_allocator. Fixes issue #95 from review.
+
+* Replace all use of std::cerr with BOOST_AFIO_LOG_FATAL_EXIT(). Fixes issue #104 from review.
+
+* All synchronous free functions not returning anything now return a void. Fixes issue #107 from review.
+
+* ASIO_STANDALONE is now detected using #ifdef not #if. Fixes issue #113 from review.
+
+[/=================]
+[heading Boost 1.59 AFIO v1.40 alpha 21st August 2015 Boost peer review 1 edition]
+[/=================]
+
+* Removed VS2013 support as lightweight future-promise will require VS2015:
+  * Replaced all BOOST_NOEXCEPT and BOOST_NOEXCEPT_OR_NOTHROW with noexcept
+  * Replaced all BOOST_CONSTEXPR with constexpr
+
+* Replaced camel cased items in file_flags with Boost compliant forms.
+
+* Replaced all async_io_op with afio::future<void>. async_io_op::get() is now called
+future<>::get_handle(), plus the former structure members are now member function
+accessors.
+
+* Replaced all functions returning pairs of futures with afio::future<T> instead.
+
+* Docs now contain commenting facility per reference page plus on some of the essay pages.
+
+* Online docs now include a "Try AFIO now in online compiler" button every page.
+
+* Implemented multi-version compatibility, and backported that patch to the v1.3 branch.
+The v1.3 branch is now included in the v1.4 branch as v1.
+
+* Implemented free functions for future continuation for all AFIO operations.
+
+* async_io_handle is now handle. Instead of explicit std::shared_ptr<async_io_handle>
+we now have handle_ptr.
+
+* async_file_io_dispatcher_base is now dispatcher. Instead of explicit std::shared_ptr<async_file_io_dispatcher_base>
+we now have dispatcher_ptr. make_async_io_dispatcher() is now make_dispatcher().
+
+* make_dispatcher() now takes a URI and returns a monad.
+
+* Fixed issue #84 Symlinks were never being followed on Windows.
+
+* Fixed issue #83 Fix failure to handle Dedup reparse point types.
+
+* async_data_op_req is now io_req, similarly for make_async_data_op_req.
+
+* async_enumerate_op_req is now enumerate_req.
+
+* async_path_op_req is now path_req.
+
+* Added optional additional target parameter to symlink().
+
+* Added reparse_point flag to stat_t.
+
+* Verified as working with Boost 1.59 release.
+
+* `handle::try_mapfile()` is no more, we now have `handle::map_file()` which can also
+map writeable files now plus map offsets.
+
+
+Still to do in this release:
+
+* ADD URI REGEX REGISTRATION SYSTEM (need priorities? Need to do some research. Make sure
+it's DLL unload safe).
+
+* Add unit test for multi-version use within the same translation unit.
+
+[/=================]
+[heading Boost 1.58 AFIO v1.31 18th April 2015]
+[/=================]
+
+* Added Appveyor CI support which complements the Travis CI support.
+
+* Verified as working with Boost 1.58 release.
+
+[/=================]
+[heading Boost 1.57 AFIO v1.30 18th March 2015]
+[/=================]
+
+AFIO is now a Boost.BindLib based library. This has resulted in an enormous change set
+which is only barely summarised here:
+
+* AFIO is now capable of:
+  * Being used standalone, or as a Boost module, or if you have inline namespace support in your
+  compiler then both simultaneously in the same translation unit or in the same binary, including
+  any combination of the following library dependency configurations (config macro and its default
+  is shown):
+  * Using Boost.Atomic, Boost.Chrono and Boost.Thread OR the C++ 11 STL (BOOST_AFIO_USE_BOOST_THREAD=0).
+  * Using Boost.Filesystem OR the C++ 1z Filesystem TS (BOOST_AFIO_USE_BOOST_FILESYSTEM=1, except on
+  VS2015 which provides Filesystem).
+  * Using Boost.ASIO OR standalone ASIO (ASIO_STANDALONE=1)
+  
+  That makes eight different potential configurations, and all eight can coexist in the same translation unit,
+  though you will find compilation time becomes enormous.
+
+* AFIO's unit test suite no longer requires Boost.Test, and can now alternatively use CATCH C++
+(BOOST_AFIO_USE_BOOST_UNIT_TEST=0) via BindLib.
+
+* Dropped support for these compiler versions due to insufficient C++ 11 support:
+  * Anything before GCC 4.7, as these lack template alias support.
+  * Anything before VS2013, as these lack template alias support. I took the opportunity to clean out
+  the VS2010 special code paths and all the variadic template emulation.
+
+* symlink() now can create file symbolic links on Windows (it'll probably error out due to lack of
+privileges held by the user, but it can now at least try).
+
+* Added the TemporaryFile and DeleteOnClose file_flags. These improve lock file performance on Windows
+by about 60%.
+
+* Added sparse file support. AFIO now always creates sparse file where possible, and converts any
+files it opens for writing into a sparse file where possible. You can disable that behaviour using
+the NoSparse flag.
+
+* stat_t now contains member flags indicating if a file entry is sparse and/or compressed.
+
+* Added a new api zero() which can very efficiently zero ranges in a file by deallocating them on
+physical storage (["hole punching]).
+
+* Added a new api extents() which lets you query which ranges in a file contain valid data.
+
+* Added a new api statfs() which returns a statfs_t which lets you query the volume on which a file
+or directory lives. Again, thanks to using the NT kernel API directly the structure on Windows is
+almost as complete as on POSIX.
+
+* Improved unit testing, especially unit testing of error handling, and indeed found that on Windows
+an invalid handle object generated by a failed open or an explicit close caused the next dependant
+operation to segfault. Also on Windows any errors generated during read() and write() were being lost
+and the dispatcher hanged instead of being reported (oops!).
+
+* Added an extra section to the tutorial on how to implement an atomic log file using the new
+features in AFIO.
+
+* Completely rewrote the async_data_op_req metaprogramming which assembles ASIO scatter gather buffers
+from types and containers supplied to read() and write(). The old system which had to work on VS2010
+was basically a set of repetitive hardcoded template specialisation overloads for void *, T *,
+std::array, std::vector and std::basic_string. The new much more sophisticated metaprogramming (with
+an unfortunate corresponding increase in compilation times) now understands any STL like container
+(detected using SFINAE std::begin() and std::end()), including nested STL like containers, and will
+correctly generate ASIO scatter gather buffers from say something like a std::list<std::list<std::string>>
+but also correctly coalesce buffers for trivial types such as std::vector<std::array<trivial type, N>> where it spots that
+only one ASIO scatter gather buffer is needed. Const types were supported before in that only
+an asio::const_buffer could be constructed from the limited list of supported input types, but now the
+metaprogramming asks STL like containers if their values are const (e.g. unordered_set), and if so
+it will always generate an asio::const_buffer, which of course means that such STL like containers can
+only be used for writing only and not reading.
+
+* Fixed memory corruption in async_file_io_dispatcher destructor which only occurred when there were extant ops
+during destruction.
+
+* Use rename to random name before deletion pattern in rmfile() to work around Windows refusing new file
+creation with the same name as a recently deleted file. enumerate() now filters out such zombied pending
+delete files automatically. This makes AFIO rmfile() work on Windows with POSIX semantics.
+
+* Fixed bug where direntry() was using lstat() instead of fstat() on POSIX and therefore failing if the
+file handle had been deleted.
+
+* symlink() no longer opens target file on POSIX, and instead returns a closed handle. The previous
+behaviour was throwing exceptions when the symlink was broken.
+
+* Made async_io_handle::path() virtual and now capable of asking for the current path of the file handle
+even after the file has been renamed or deleted. Doing this required a refactoring of the error generation
+code which previously consumed a const filesystem::path &, now it consumes a lambda which generates the path
+on demand.
+
+* File handles now refresh their path() to their true path on open, and again at various points during execution.
+A careful audit was undertaken to spot all instances where a fresh path is really needed versus a stale path,
+nevertheless some instances may have been missed. Nevertheless, this now means that AFIO can work with files
+whose names and locations change throughout the time that AFIO holds a path open to them, though
+note that inevitably this support will be racy if the filename changes between AFIO's refresh and the operation.
+
+* Replaced all use of filesystem::path with afio::path which on Windows enforces NT kernel path naming and
+ensures that multiple conversions from win32 path to NT paths are no longer done. Support is also now provided
+for converting the NT kernel paths AFIO uses to traditional DOS ones.
+
+* directory_entry::name() is now a string instead of a path.
+
+* Thanks to Travis CI adding Mac OS X as a CI target, added OS X support to AFIO. This involved writing an
+expect-based lldb automator to get stack backtraces of failures, which was tedious.
+
+* Added APIs random_fill() and random_string() useful for generating crypto strong random file names.
+
+* page_size() has become page_sizes(), and now can return large/huge page sizes. A file_buffer_default_size()
+new API will return the closest page size to 1Mb.
+
+* Added page_allocator, a STL allocator suitable for allocating efficient large file buffers.
+
+* stat_t flags, gen and birthtime weren't being set on FreeBSD. Sorry.
+
+* Made big changes to how async_path_op_req works and is used. Instead of hard coded overloads,
+async_path_op_req now takes a template parameter for the path and has metaprogramming for converting that into
+an afio::path. You can also now supply absolute and relative-to-the-precondition paths via
+`async_path_op_req::absolute` and `async_path_op_req::relative`, plus you can supply a bare precondition
+which finally allows rmfile() et al to directly delete inputs by op handle. Also added a depends() API
+which lets you return one op handle only when another op handle completes.
+
+* Made AFIO provide [*much] stronger filing system race condition protection. This comes with a performance
+cost, so a new file_flags::no_race_protection can disable the new semantics. Renamed file_flags::fast_directory_enumeration
+to file_flags::hold_parent_open as enabling HoldParentOpen will make most of the performance cost of race
+protection disappear.
+
+* Implemented WillBeSequentiallyAccessed and WillBeRandomlyAccessed for POSIX.
+
+* Added is_open() to async_io_handle. Made pseudo deleted file filtering optional in enumerate().
+
+* Stack backtraces are now retained per exception throw as well as per op schedule if BOOST_AFIO_OP_STACKBACKTRACEDEPTH
+is defined (defaults to yes if NDEBUG is not defined). Also added MSVC and FreeBSD support, and exceptions returned by the future
+handle now provide stack backtraces.
+
+* Added virtual member functions link(), unlink() and atomic_relink() to async_io_handle, plus adjusted the engine to
+always call these instead of performing those operations unilaterally.
+
+* Added a race protection unit test.
+
+
+
+[/=================]
+[heading Boost 1.57 AFIO v1.22 stable branch tagged]
+[/=================]
+
+Fixed buffer underflow when decoding Win32 error codes to strings. Thanks to ariccio
+for reporting this.
+
+Relocated docs from ci.nedprod.com to http://boostgsoc13.github.io/boost.afio/
+
+Updated the stale CI test dashboard copy in the DocBook edition.
+
+
+[/=================]
+[heading Boost 1.56 AFIO v1.21 10th Aug 2014]
+[/=================]
+
+Finished getting a ThreadSanitizer (tsan) + UndefinedBehaviorSanitizer (ubsan) pass
+running per-commit on Travis CI (>= v1.2 was tsan clean, I just hadn't bothered getting
+a CI to verify it to be so per commit).
+
+Fixed bug where --lto wasn't turning on the optimiser for LTO output. Sorry.
+
+Added a benchmark testing for latency under concurrency loads.
+
+Added a new FAQ entry on AFIO execution latencies.
+
+Reorganised source code structure to fit modular Boost. AFIO is now a Boost v1.56
+module just like any other. Obviously this will break source code compatibility
+with all preceding Boosts.
+
+[/=================]
+[heading Boost 1.55 AFIO v1.21 23rd Mar 2014]
+[/=================]
+
+Fixed a bug in the custom unit testing framework which was throwing away any exceptions
+being thrown by the tests (thanks to Paul Kirth for finding this and reporting it).
+Fixing this bug revealed that enumerate() with a glob on Windows has never worked
+properly and the exception thrown by MSVC's checked iterators was hiding the problem,
+so fixed that bug too.
+
+Added async_io_dispatcher_base::post_op_filter() and async_io_dispatcher_base::post_readwrite_filter(),
+including documentation examples and integrating filters into the unit testing.
+post_readwrite_filter() ought to be particularly useful to those seeking deep ASIO
+integration. Thanks to Bjorn Reese for the long discussions leading up to this
+choice of improved ASIO support.
+
+During updating the benchmarks below now I have regained access to my developer
+workstation, discovered a severe performance regression in the v1.2 engine of
+around 27% over the v1.1 engine. Steps taken:
+
+1. The shared state in every async_io_op was a shared_ptr, now it is the
+underlying shared_future. Eliminated copies of shared_ptr, now we always
+use the shared_future in enqueued_task directly. This reduced regression to 18%.
+
+2. Removed more code from inside the TSX locks. This reduced regression to 16%.
+
+3. Removed the second TSX lock from complete_async_op(). This eliminated the
+regression and actually added 2% to the v1.1 engine.
+
+4. Removed the second TSX lock from chain_async_op(). This added a further 10%
+over the v1.1 engine, so we are now 12% faster which is about right given
+the v1.2 engine removed 15% of code.
+
+Added nested TSX transaction support.
+
+The CI shows that clang 3.1 now produces segfaulting binaries with this release,
+so rather than debug clang, I simply dropped clang 3.1 support. AFIO now requires
+clang 3.2 or better.
+
+[/=================]
+[heading Boost 1.55 AFIO v1.20 5th Feb 2014]
+[/=================]
+
+This is a major refactor of AFIO's core op dispatch engine to trim it down by
+about 15%. Key breaking differences from the v1.1 series of AFIO are as follows:
+
+* Replaced all use of packaged_task with enqueued_task, a custom implementation
+which makes possible many performance improvements throughout the engine.
+* thread_source::enqueue() now can take a preprepared enqueued_task.
+* thread_source::enqueue() now always returns a shared_future instead of a future.
+This has had knock on effects throughout AFIO, so many futures are now shared_future.
+* Completion handler spec has changed from:
+ 
+   pair<bool, shared_ptr<async_io_handle>> (*)(size_t id, shared_ptr<async_io_handle> h, exception_ptr *e)
+ 
+  to:
+
+   pair<bool, shared_ptr<async_io_handle>> (*)(size_t id, async_io_op preceding)
+ 
+  This substantially improves performance, simplifies the implementation, and lets
+  completion handlers more readily retrieve the error state of preceding operations
+  and react appropriately.
+* All restrictions on immediate completions have been removed. You can now do anything
+in an immediate completion that you can do in a normal completion.
+* async_io_op::h now always refers to a correct future i.e. the future is no longer
+lazily allocated.
+* Now that op futures are always correct, when_all(ops) has been drastically simplified
+to an implementation which literally assembles the futures into a list and passes
+them to boost::wait_for_all().
+* Added when_any(ops).
+
+[/=================]
+[heading Boost 1.55 AFIO v1.11]
+[/=================]
+
+Added --fast-build to test Jamfile to preserve my sanity attempting to work with
+AFIO on an Intel Atom 220 netbook.
+
+Fixed failure to auto-const an async_data_op_req<boost::asio::mutable_buffer>
+when used for writing. Thanks to Bjorn Reese for reporting this.
+
+Replaced use of std::runtime_error with std::invalid_argument where that makes
+sense. Thanks to Bjorn Reese for reporting this.
+
+Replaced throwing of std::ios_base::failure with std::system_error. Thanks to
+Bjorn Reese for suggesting and submitting a patch for this.
+
+async_io_dispatcher_base::enumerate() did not take a metadata_flags, and it
+was supposed to. Thanks to Bjorn Reese for reporting this.
+
+Added a unit compilation test to ensure that implicit construction from a
+single arg to the op convenience classes works as intended.
+
+Significantly optimised build system and added in precompiled headers support.
+Combined with --fast-build this provides an 8x build time improvement.
+
+boost::afio::stat_t::st_type() is now a boost::filesystem::file_type instead
+of replicating the POSIX file type codes. Thanks to Bjorn Reese for suggesting
+this.
+
+boost::afio::stat_t::st_mode() is now st_perms(). Also disabled unused fields in
+stat_t on Windows. Thanks to Bjorn Reese for suggesting this.
+
+[/=================]
+[heading Boost 1.55 AFIO v1.1 1st Nov 2013]
+[/=================]
+
+Immediate completions no longer hold the opslock, which meant the opslock could be
+changed from a recursive mutex to a spinlock. The new, more parallelised, behaviour
+illuminated a number of new race conditions in when_all() which have been fixed.
+
+Completely gutted dispatch engine and replaced with a new, almost entirely wait
+free implementation based on throwing atomics at the problem. If it weren't for the spin lock around the
+central ops hash table, AFIO would now be an entirely wait free design.
+
+In order to do something about that spin lock, replaced all locking in AFIO (apart
+from the directory file handle cache) with memory transactions instead. This
+does CPUID at runtime and will use Intel's TSX-NI memory transaction implementation
+if available, if not it falls back to a spin lock based emulation. On memory
+transaction capable CPUs, AFIO is now almost entirely wait free, apart from when
+it has to fetch memory from the kernel.
+
+Made AFIO usable as headers only.
+
+[/=================]
+[heading Boost 1.55 AFIO v1.0 27th Sep 2013]
+[/=================]
+
+First release for end of Google Summer of Code 2013.
+
+[endsect]
+
+
+
+
+[section:FAQ Frequently Asked Questions]
+
+[section:closure_performance What is the maximum throughput of AFIO's closure execution engine aka
+how many IOPS can I push with AFIO?]
+
+For v1.3 of the engine, maximum ops [*dispatch] throughput is approximately as follows, where the values for `call()` might be for
+use as a closure engine whereas the values for `completion()` might be for max filing system IOPS[footnote The phrase
+["might be] is important: a null closure benchmark will always have dispatch rate problems i.e. the closures being executed
+take less time to execute than the time to dispatch them, so these figures are best read as maximum dispatch rate, not
+maximum IOPS.]:
+
+[table:throughput Maximum null closure dispatch rate on a 3.5Ghz Intel Core i7 3770K for AFIO v1.3[footnote Benchmarks compiled using `address-model=64 link=static --lto release -j 4`.]
+[[Operating system][`call()` unchained][`call()` chained][`completion()` unchained][`completion()` chained][Raw ASIO]]
+[[Microsoft Windows 8 x64 with Visual Studio 2013][[role alignright 1148070]][[role alignright 704051]][[role alignright 1850090]][[role alignright 877899]][[role alignright 2750088]]]
+[[['Relative to ASIO]][[role alignright 42%]][[role alignright 26%]][[role alignright 67%]][[role alignright 32%]][[role alignright 100%]]]
+[[['Relative to AFIO v1.21]][[role alignright +1%]][[role alignright +16%]][[role alignright +14%]][[role alignright +36%]][]]
+[[['Relative to AFIO v1.1]][[role alignright +26%]][[role alignright +18%]][[role alignright +19%]][[role alignright +20%]][]]
+
+[[][][][][][]]
+
+[[Ubuntu 14.04 LTS Linux x64 with GCC 4.9.2][[role alignright 1149470]][[role alignright 1100650]][[role alignright 1629110]][[role alignright 1308240]][[role alignright 1927300]]]
+[[['Relative to ASIO]][[role alignright 60%]][[role alignright 57%]][[role alignright 85%]][[role alignright 68%]][[role alignright 100%]]]
+[[['Relative to AFIO v1.21]][[role alignright -11%]][[role alignright +8%]][[role alignright +10%]][[role alignright +9%]][]]
+[[['Relative to AFIO v1.1]][[role alignright +5%]][[role alignright +39%]][[role alignright +14%]][[role alignright +20%]][]]
+[[][][][][][]]
+
+]
+
+We hope that ~600k min IOPS surely ought to be enough to max out any SATA III SSD __dash__ it should even max out any mid range
+PCIe based SSD too, and if paired with a CPU with more cores, AFIO's almost wait free design ought to scale out fairly
+well too such that it may be able to max out even top end PCIe SSDs, some of which can push 10m IOPS now.
+
+[endsect] [/closure_performance]
+
+[section:closure_latency What is the latency of AFIO's closure execution engine aka
+how quickly can I push a single op with AFIO?]
+
+For v1.3 of the engine on a quad core hyperthreading 3.5Ghz Intel Core i7 3770K, I found
+the following latency graph which is in CPU cycles:
+
+[role aligncenter [$afio_latencies.png]]
+
+The solid lines represent average dispatch to execution and execution finish to completion
+notification latencies and are cumulative on the left scale, whilst the dotted lines represent
+minimum latencies and are cumulative on the right scale. As one can see, one can expect a
+minimum of around 6,000 CPU cycles between dispatch and the operation beginning, and a minimum
+of around 4,000 cycles between the operation completing and its op reference becoming signalled,
+thus making total minimum latency per op around 10,000 CPU cycles, or around 2.5 microseconds.
+
+Average latency is rather worse of course, but if you don't exceed CPU cores you can expect a
+60,000 CPU cycle total latency with a 95% confidence
+interval of plus/minus 600 CPU cycles, which is 15 microseconds plus/minus 0.15 microseconds.
+Given that a filing system on a PCIe SSD might have a 80 microsecond latency, AFIO could be adding
+20% to that, however do bear in mind that a thread sleep and wake costs 52 microseconds so
+we are operating pretty close to hardware limits here.
+
+[endsect] [/closure_latency]
+
+[section:stuck_ops I'm seeing ["WARNING: `~async_file_dispatcher_base()` detects stuck `async_io_op` in total of X ops] during
+process close. What does this mean?]
+
+This means that you scheduled ops with a dispatcher which did not complete in a timely fashion before you tried to destroy
+that dispatcher. This generally indicates a bug in your code, which can include:
+
+# An op is still running in some thread pool and you didn't use __afio_when_all__ or `get()` to wait for it to complete before trying
+to destroy the dispatcher.
+# An op's precondition never completed and therefore the op was never started.
+
+Tracking down the cause of the latter in particular is very similar to tracking down race conditions i.e. it's hard, and we
+as the authors of __boost_afio__ know just how hard! Try recompiling AFIO with the macro
+`BOOST_AFIO_OP_STACKBACKTRACEDEPTH` set to a reasonable depth like 8 will have AFIO take a stack backtrace for every op
+allocated which it then will print during the stuck ops warnings. This can be helpful to identify which ops exactly are
+stuck, and then you can figure out which preconditions of theirs are the cause.
+
+Note that `BOOST_AFIO_OP_STACKBACKTRACEDEPTH` has two implementations on POSIX, one based on glibc `backtrace()` and the other based
+on libunwind. The latter is more portable, but requires explicit linking with libunwind, so we have defaulted to the former.
+
+[endsect] [/stuck_ops]
+
+[section:vector_use Why did you use `std::vector<>` as the ops batch container instead of a generic iterator range?]
+
+# `std::vector<async_io_op>` is the closest thing to a variable length array in C++[footnote Ok, there is also
+the oft-forgotten `std::valarray<>` too, but its use as a generic container isn't recommended.], at least until C++ 14 where we
+will gain `std::dynarray<>` and dynamic array sizing.
+# `std::vector<async_io_op>` is well understood, particularly its performance during by-value copies and during
+`push_back()` which is by far the most common operation you do when preparing a batch.
+# `std::vector<async_io_op>` is very amenable to splitting the batch across threads (not that AFIO currently does this).
+# `std::vector<async_io_op>` is easily transportable through an ABI, whereas arbitrary container iterators would need type
+erasing (i.e. slow). As AFIO was developed initially as not header-only, this made a lot of sense initially.
+
+We are not opposed to the use of generic iterator ranges in an AFIO v2 if there is user demand for such a thing.
+
+[endsect] [/vector_use]
+
+[section:foreign_fd How do I configure my own file descriptor or HANDLE in AFIO?]
+
+Sometimes you receive a file descriptor or HANDLE from a third party piece of code and you need to insert it as-in
+into AFIO for use. The solution to this is very simple:
+
+# Subclass __afio_handle__ with a custom implementation for your file descriptor type. In particular, you probably
+will have custom close semantics (e.g. don't close, or invoke third party code to implement close).
+# Instantiate your custom handle implementation, and pass it into `async_file_io_dispatcher_base::adopt()`. This
+will immediately convert your custom handle type into an `async_io_op` suitable for supplying to `read()`, `write()`
+etc.
+# That's it, there is no more to it.
+
+[endsect] [/foreign_fd]
+
+[section:slow_compile Using AFIO really slows down my compile times. Can't you do something about that?]
+
+You'll find a huge amount depends on your compiler. Here are some build time benchmarks for my developer workstation:
+
+[table:build_time Single thread build times for AFIO v1.3 for various compilers and options on a 3.5Ghz Intel Core i7 3770K
+[[Build flags][Microsoft Windows 8.1 x64 with Visual Studio 2013][Ubuntu 14.04 LTS Linux x64 with GCC 4.9 and gold linker][Ubuntu 14.04 LTS Linux x64 with clang 3.4 and gold linker]]
+[  [`--link-test --fast-build debug`][[role green 0m55s]][3m53s][asio failure]]
+[               [`--link-test debug`][2m10s][10m26s][5m46s]]
+[         [`--link-test --lto debug`][5m37s][GCC ICE][5m42s]]
+[       [`--link-test pch=off debug`][7m17s][[role red 12m0s]][5m45s]]
+[[`--link-test --fast-build release`][1m10s][3m22s][asio failure]]
+[             [`--link-test release`][2m58s][9m57s][8m10s]]
+[       [`--link-test --lto release`][7m30s][[role red 13m0s]][8m11s]]
+[       [standalone alltests release][0m20s][0m51s][0m42s]]
+[[standalone multiabi alltests release][0m39s][1m34s][1m13s]]
+]
+
+[table:build_time Single thread build times for AFIO v1.2 for various compilers and options on a 3.5Ghz Intel Core i7 3770K
+[[Build flags][Microsoft Windows 8 x64 with Visual Studio 2013][Ubuntu 12.04 LTS Linux x64 with GCC 4.8 and gold linker][Ubuntu 12.04 LTS Linux x64 with clang 3.4 and gold linker]]
+[  [`--link-test --fast-build debug`][01m43s][03m31s[footnote ASIO has a link error without `link=static`]][fails]]
+[               [`--link-test debug`][02m40s][06m15s][04m24s]]
+[         [`--link-test --lto debug`][[role red 09m36s]][06m23s][04m32s]]
+[       [`--link-test pch=off debug`][06m12s][08m01s][04m26s]]
+[[`--link-test --fast-build release`][02m01s][03m15s[footnote ASIO has a link error without `link=static`]][fails]]
+[             [`--link-test release`][03m09s][06m28s][06m06s]]
+[       [`--link-test --lto release`][10m24s][07m08s][06m14s]]
+]
+
+You'll note that v1.3 is substantially faster than v1.2 to build on MSVC for some odd reason, despite considerably
+more metaprogramming, code, and tests. The rises in times like with GCC and clang make more sense.
+
+The benefit of `--fast-build` grows exponentially the less powerful the CPU: on my Intel Atom 220
+netbook `--fast-build` gets total build times under five minutes which is impressive compared to
+the twenty or so minutes without that flag.
+
+`--fast-build` works by defining `BOOST_AFIO_HEADERS_ONLY` to 0 for each compiland, and
+linking to the AFIO shared library instead. It also does the same for ASIO by defining `BOOST_ASIO_SEPARATE_COMPILATION`
+and `BOOST_ASIO_DYN_LINK` for each compiland, and links to the ASIO
+shared library instead (which is built via `boost/asio/impl/src.hpp`, see ASIO's docs).
+
+[endsect] [/slow_compile]
+
+[section:fatal_error_read Why do I get a fatal application exit with `FATAL EXCEPTION: Failed to read all buffers` when I read a file?]
+
+This is actually a safety checkpoint for your code: in complex, multi-process concurrent reading and writing of
+the same file, it is extremely difficult to coordinate changing file lengths with i/o in a way which
+doesn't introduce race conditions OR unacceptably low performance. AFIO therefore doesn't even
+try[footnote AFIO [*will] try to provide a synchronised, accurate file extent after fast portable
+file locking support has been added, but until then no.]
+and simply requires you the programmer to ALWAYS do i/o, whether reading or writing, within the extent
+of a file. In other words, if you're going to read 100 bytes from offset 100 in a file, that file
+better be at least 200 bytes long or it's going to fail with a fatal application exit.
+
+This will probably seem harsh to anyone using AFIO for the first time, because the following
+naive code will fatal exit the application if foo.txt is not 1024 bytes or longer:
+
+[readallof_example_bad]
+
+With synchronous i/o a read of 1024 bytes will read ['up to] 1024 bytes, returning the amount
+actually read via some mechanism. With AFIO, either you
+read [*all] 1024 bytes or you read nothing, in which case a normal exception is thrown with
+whatever error the operating system returned. If a ['partial] read happens, then AFIO fatal
+exits the application with the above message as it is probably a logic error in your code.
+
+You may now wonder how to easily not exceed file extents during i/o: for writing, see
+__afio_truncate__ to ensure a file's size before writing, or else open a file for append-only
+in which case all writes atomically occur at the end of the file. For reading, the following code
+is suggested:
+
+[readallof_example_single]
+
+If you're going to read many files from the same directory, it is far faster to open a
+handle to the containing directory and using enumerate to fetch the metadata asynchronously
+instead of using `direntry()` which is synchronous:
+
+[readallof_example_many]
+
+[endsect] [/fatal_error_read]
+
+[section:async_metadata `async_io_handle::direntry()` and `async_io_handle::lstat()` are
+both synchronous functions which block. How then can I get metadata about files and
+directories asynchronously?]
+
+This is easy, if not terribly obvious: call __afio_enumerate__ on the containing
+directory of the file you want metadata for with a shell glob exactly matching the
+file name and with the minimum metadata you are looking for. AFIO will then
+asynchronously fetch that metadata for you, returning it in the future `directory_entry`
+returned by `enumerate()`.
+
+[endsect] [/async_metadata]
+
+[section:deleting_open_files I thought on Windows it is impossible to delete a file which
+is still open for use. How does AFIO achieve this?]
+
+On POSIX you are allowed to call `unlink()` on a file which is open for use __dash__ indeed
+this is a very convenient way of creating an anonymous private temporary file whose storage will be
+deallocated on the last file handle close. Ordinarily Windows does not permit deletion or renaming of
+files still in use, but if all open handles to that file were opened with `FILE_SHARE_DELETE` then
+it ['can] permit renames and deletions of open files.
+
+There are however some gotchas with this, and it is worth listing them here. Firstly, Windows
+never allows you to really delete an open file, rather it is flagged as delete pending and its entry
+in its directory remains visible (though no new file handles may be opened to it) and when
+the very last open handle to the file in the system is closed, only then is it truly deleted. Well,
+actually only ['sort of truly deleted], because Windows only ['appears] to remove the file entry from the directory, but
+in fact that entry is merely hidden and actually still exists and attempting to create a file with the
+same name will return an access denied error. How long it silently exists for depends on a range
+of factors, but put it this way: if your code loops creating and deleting the same file name as you
+might when operating a lock file, you're going to see lots of random spurious access denied errors and
+truly dismal lock file performance compared to POSIX.
+
+Note that this lazy file deletion is different from ["file tunnelling] whereby a file created with
+the same name as a recently deleted file silently inherits its creation time and other metadata. I
+mention this because this feature also gets in the way of POSIX file semantics, but for other reasons.
+
+AFIO works around these un-POSIX file semantics by taking a dual step to deleting files. Firstly, it renames the file to a 128
+bit cryptographically strong random name prefixed by [".afiod] into as high up the directory hierarchy
+as it is able to, and only then does it request the deletion of the file. As AFIO always
+opens files with `FILE_SHARE_DELETE` permission enabled, with that flag Windows permits renaming
+and deletion, and because the name was changed to a very random name somewhere not in its origin
+directory before deletion, you don't see those unexpected and random errors when creating files
+with the same name as a recently deleted file as you do anywhere else on Windows. Because the file
+is probably not in its original containing directory any more, deletions of that directory will
+not fail with ["directory not empty] as they otherwise normally would and indeed do in most Windows
+programs. Handy eh?
+
+Unfortunately, there are additional problems with deleting directories caused by AFIO's caching
+of directory handles in a central table __dash__ this happens by default for all directories opened
+without write permissions and without the `file_flags::unique_directory_handle` flag. Explicit close
+handle requests for these cached directories are ignored by AFIO, and therefore AFIO may hold into existence
+a directory longer than might otherwise be anticipated with the only way of forcing actual deletion
+being the destruction of any reference to that directory, something difficult to achieve in larger
+more complex codebases. Nevertheless, as it is the system which does the deletion, you are guaranteed
+by Windows that the directory will eventually be cleaned up some day, possibly in weeks or months
+on a long lived system. If you don't want this, open directories with write permissions or the
+unique directory handle flag.
+
+[endsect] [/deleting_open_files]
+
+[section:multi_abi How do I reconfigure AFIO within the same translation unit to use a different ABI?]
+
+Here is how the unit test does it:
+
+```
+// Reduce unit testing
+#define BOOST_AFIO_RUNNING_IN_CI 1
+// Use the Boost.Test emulation in Boost.BindLib as Boost.Test isn't multi ABI capable.
+#define BOOST_AFIO_USE_BOOST_UNIT_TEST 0
+
+#define STRINGIZE2(a) #a
+#define STRINGIZE(a, b) STRINGIZE2(a ## b)
+
+// Make unit test names be different
+#define BOOST_CATCH_AUTO_TEST_CASE_NAME(name) STRINGIZE(1_, name)
+
+// A copy of AFIO + unit tests completely standalone apart from Boost.Filesystem
+#define BOOST_AFIO_USE_BOOST_THREAD 0
+#define BOOST_AFIO_USE_BOOST_FILESYSTEM 1
+#define ASIO_STANDALONE 1
+#include "test_all.cpp"
+#undef BOOST_AFIO_USE_BOOST_THREAD
+#undef BOOST_AFIO_USE_BOOST_FILESYSTEM
+#undef ASIO_STANDALONE
+
+// Force unit test utilities to be reincluded
+#undef BOOST_AFIO_TEST_FUNCTIONS_HPP
+#undef BOOST_CATCH_AUTO_TEST_CASE_NAME
+#define BOOST_CATCH_AUTO_TEST_CASE_NAME(name) STRINGIZE(2_, name)
+
+// A copy of AFIO + unit tests using Boost.Thread, Boost.Filesystem and Boost.ASIO
+#define BOOST_AFIO_USE_BOOST_THREAD 1
+#define BOOST_AFIO_USE_BOOST_FILESYSTEM 1
+// ASIO_STANDALONE undefined
+#include "test_all.cpp"
+```
+
+So, simply `#undef` and re-`#define` the configuration macros you want and reinclude `afio.hpp`. You
+can do this every time you switch between configuration in a translation unit, so you can return to
+a previously included translation BUT note that you cannot later include a new header not previously
+included during that configuration's previous existence. In other words, include all the headers you
+are ever going to use in that translation unit just after the first time you configure that configuration.
+
+The situation is very similar for including hard version dependencies. You cannot include a newer version
+of AFIO after including a previous version as some version of AFIO must be the most recent version in order
+for something to live at `boost::afio`. Just always include the newest version first.
+
+[endsect] [/multi_abi]
+
+
+[endsect] [/FAQ]

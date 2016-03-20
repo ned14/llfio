@@ -1,0 +1,116 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="fs_probe.cpp" />
+    <ClCompile Include="benchmark_locking.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="include">
+      <UniqueIdentifier>{eaf8c87d-0aa9-4405-9f57-f59ccbf10dc5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{86fd8c6e-956b-41fd-b91f-779a84c30465}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\detail">
+      <UniqueIdentifier>{e6691a26-84c1-48fa-a204-7cdd745bd9d5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\detail\impl">
+      <UniqueIdentifier>{338a3cea-fb30-4109-b51f-42bd9b32d29a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\detail\impl\windows">
+      <UniqueIdentifier>{b72d7aa6-ab5d-4d37-af22-7abb240b61ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\detail\impl\posix">
+      <UniqueIdentifier>{ba2460d4-f197-423a-a6b0-455bcdf2c3d3}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\storage_profile.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\io_service.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\config.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\handle.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\lockable_handle.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\deadline.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\utils.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\statfs.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\detail\impl\windows\import.hpp">
+      <Filter>include\detail\impl\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="include\detail\child_process.hpp">
+      <Filter>include\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="include\native_handle_type.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\async_file_handle.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\file_handle.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="include\detail\impl\storage_profile.ipp">
+      <Filter>include\detail\impl</Filter>
+    </None>
+    <None Include="Readme.md" />
+    <None Include="include\detail\impl\windows\statfs.ipp">
+      <Filter>include\detail\impl\windows</Filter>
+    </None>
+    <None Include="include\detail\impl\windows\handle.ipp">
+      <Filter>include\detail\impl\windows</Filter>
+    </None>
+    <None Include="include\detail\impl\windows\io_service.ipp">
+      <Filter>include\detail\impl\windows</Filter>
+    </None>
+    <None Include="include\detail\impl\windows\storage_profile.ipp">
+      <Filter>include\detail\impl\windows</Filter>
+    </None>
+    <None Include="include\detail\impl\windows\utils.ipp">
+      <Filter>include\detail\impl\windows</Filter>
+    </None>
+    <None Include="include\detail\impl\posix\child_process.ipp">
+      <Filter>include\detail\impl\posix</Filter>
+    </None>
+    <None Include="include\detail\impl\posix\handle.ipp">
+      <Filter>include\detail\impl\posix</Filter>
+    </None>
+    <None Include="include\detail\impl\posix\io_service.ipp">
+      <Filter>include\detail\impl\posix</Filter>
+    </None>
+    <None Include="include\detail\impl\posix\statfs.ipp">
+      <Filter>include\detail\impl\posix</Filter>
+    </None>
+    <None Include="include\detail\impl\posix\storage_profile.ipp">
+      <Filter>include\detail\impl\posix</Filter>
+    </None>
+    <None Include="include\detail\impl\posix\utils.ipp">
+      <Filter>include\detail\impl\posix</Filter>
+    </None>
+    <None Include="include\detail\impl\windows\child_process.ipp">
+      <Filter>include\detail\impl\windows</Filter>
+    </None>
+    <None Include="include\detail\impl\windows\async_file_handle.ipp">
+      <Filter>include\detail\impl\windows</Filter>
+    </None>
+    <None Include="include\detail\impl\windows\file_handle.ipp">
+      <Filter>include\detail\impl\windows</Filter>
+    </None>
+  </ItemGroup>
+</Project>

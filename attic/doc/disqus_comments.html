@@ -1,0 +1,42 @@
+<div><a name="comments" /><div id="disqus_thread"></div>
+<script type="text/javascript">
+<![CDATA[
+// Get the hX element with class "title"
+var titles = document.getElementsByClassName("title");
+for (var n = 0; n < titles.length; n++) {
+  var title = titles[n];
+  if(title.lastElementChild.nodeName!="a")
+  {
+    var a_elem = document.createElement("a");
+    a_elem.setAttribute("href", "#comments");
+    var span_elem = document.createElement("span");
+    span_elem.setAttribute("class", "disqus-comment-count");
+    span_elem.setAttribute("data-disqus-identifier", disqus_identifier);
+    var text_node = document.createTextNode("Comments");
+    span_elem.appendChild(text_node);
+    a_elem.appendChild(span_elem);
+    title.parentElement.appendChild(a_elem);
+    title.setAttribute("style", "clear: both; display: inline-block;")
+  }
+}
+    /* * * CONFIGURATION VARIABLES * * */
+    var disqus_shortname = 'boostafio';
+    
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = 'https://' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
+
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+]]>
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+</div>

@@ -1,0 +1,10 @@
+spawn lldb ./test_all
+expect "*\nCurrent executable set to*"
+send "run\r"
+set timeout 120
+expect "*\r\nProcess * stopped\r\n*"
+send "bt\rthread list\rthread backtrace all\rquit\r"
+set timeout 10
+expect "*Quitting LLDB will kill one or more processes. Do you really want to proceed*"
+send "y\r"
+expect default

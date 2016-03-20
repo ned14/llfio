@@ -1,0 +1,552 @@
+Linux Asynchronous I/O Explained		    (Last updated: 13 Apr 2012)
+*******************************************************************************
+				by Vasily Tarasov <tarasov AT vasily dot name>
+
+Asynchronoes I/O (AIO) is a method for performing I/O operations so that the
+process that issued an I/O request is not blocked till the data is available.
+Instead, after an I/O request is submitted, the process continues to execute
+its code and can later check the status of the submitted request.
+
+Linux kernel provides only *5* system calls for performing asynchronoes I/O.
+Other AIO functions commonly descibed in the literature are implemented in the
+user space libraries and use the system calls internally. Some libraries can
+also emulate AIO functionality entirely in the user space without any kernel
+support.
+
+There are two main libraries in Linux that facilitate AIO, we will refer to
+them as *libaio* and *librt* (the latter one is a part of libc).
+
+In this text, I first discuss system calls, then libaio, and finaly librt.
+
+AIO System Calls
+*******************************************************************************
+						based on Linux 3.2.1 kernel
+
+AIO system call entry points are located in "fs/aio.c" file in the kernel's
+source code.  Types and constants exported to the user space reside in
+"/usr/include/linux/aio_abi.h" header file.
+
+There are only 5 AIO system calls:
+
+* int io_setup(unsigned nr_events, aio_context_t *ctxp);
+
+* int io_destroy(aio_context_t ctx);
+
+* int io_submit(aio_context_t ctx, long nr, struct iocb *cbp[]);
+
+* int io_cancel(aio_context_t ctx, struct iocb *, struct io_event *result);
+
+* int io_getevents(aio_context_t ctx, long min_nr, long nr,
+			struct io_event *events, struct timespec *timeout);
+
+I will demonstrate the usage of these system calls using a sequence of programs
+in the increasing order of their complexity.
+
+Program 1:
+
+>> snip start: 1.c  >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+00  #define _GNU_SOURCE		/* syscall() is not POSIX */
+01 
+02  #include <stdio.h>		/* for perror() */
+03  #include <unistd.h>		/* for syscall() */
+04  #include <sys/syscall.h>	/* for __NR_* definitions */
+05  #include <linux/aio_abi.h>	/* for AIO types and constants */
+06 
+07  inline int io_setup(unsigned nr, aio_context_t *ctxp)
+08  {
+09  	return syscall(__NR_io_setup, nr, ctxp);
+10  }
+11  
+12  inline int io_destroy(aio_context_t ctx) 
+13  {
+14  	return syscall(__NR_io_destroy, ctx);
+15  }
+16  
+17  int main()
+18  {
+19  	aio_context_t ctx;
+20  	int ret;
+21  
+22  	ctx = 0;
+23  
+24  	ret = io_setup(128, &ctx);
+25  	if (ret < 0) {
+26  		perror("io_setup error");
+27  		return -1;
+28  	}
+29  
+30  	ret = io_destroy(ctx);
+31  	if (ret < 0) {
+32  		perror("io_destroy error");
+33  		return -1;
+34  	}
+35  
+36  	return 0;
+37  }
+
+<< snip end: 1.c  <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+For now, ignore first 17 lines of the code and look at main() function.  In line
+24 we call io_setup() system call to create so called "AIO context" in the
+kernel. AIO context is a set of data structures that the kernel supports to
+perform AIO.  Every process can have multiple AIO contextes and as such one
+needs an identificator for every AIO context in a process (XXX: come up with a
+handy example how it can be used). Ctx variable of type aio_context_t defined in
+line 19 stores such an identificator in our example.  A pointer to ctx variable
+is passed to io_setup() as a second argument and kernel fills this variable
+with a context identifier. Interestingly, aio_context_t is actually just an
+unsigned long defined in the kernel ("linux/aio_abi.h") like that:
+
+typedef unsigned long aio_context_t;
+
+In line 22 we set ctx to 0 which is required by kernel or io_setup() fails with
+-EINVAL error.
+
+The first argument of io_setup() function - 128 in our case - is the maximum
+number of requests that can simultaneously reside in the context. This will be
+explained in more details in the next examples.
+
+In line 30 we destroy just created AIO context by calling io_destroy() system
+call with ctx as an argument.
+
+The lines above 17 are just helpers that allow to call system calls directly. We
+use glibc's syscall() function that invokes any system call by its number.  It
+is only required if one wants to call system calls directly without using AIO
+libraries'  wrapper functions (provided by libaio and librt). Notice, that
+syscall() functions's return value follows the usual conventions for indicating
+an error: -1, with errno set to a positive value that indicates the error.
+So, we check if the values returned by io_setup() and io_destroy() are less than
+zero to detect the error, and then use perror() function that will print the
+errno.
+
+In the last example we did a minimal thing: created an AIO context and then
+destroyed it immediatelly.  In the next example we submit one request to the
+context and then query its status later.
+
+Program 2:
+
+>> snip start: 2.c  >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+00  #define _GNU_SOURCE		/* syscall() is not POSIX */
+01 
+02  #include <stdio.h>		/* for perror() */
+03  #include <unistd.h>		/* for syscall() */
+04  #include <sys/syscall.h>	/* for __NR_* definitions */
+05  #include <linux/aio_abi.h>	/* for AIO types and constants */
+06  #include <fcntl.h>		/* O_RDWR */
+07  #include <string.h>		/* memset() */
+08  #include <inttypes.h>	/* uint64_t */
+09  
+10  inline int io_setup(unsigned nr, aio_context_t *ctxp)
+11  {
+12  	return syscall(__NR_io_setup, nr, ctxp);
+13  }
+14  
+15  inline int io_destroy(aio_context_t ctx) 
+16  {
+17  	return syscall(__NR_io_destroy, ctx);
+18  }
+19  
+20  inline int io_submit(aio_context_t ctx, long nr,  struct iocb **iocbpp) 
+21  {
+22  	return syscall(__NR_io_submit, ctx, nr, iocbpp);
+23  }
+24  
+25  inline int io_getevents(aio_context_t ctx, long min_nr, long max_nr,
+26  		struct io_event *events, struct timespec *timeout)
+27  {
+28  	return syscall(__NR_io_getevents, ctx, min_nr, max_nr, events, timeout);
+29  }
+30  
+31  int main()
+32  {
+33  	aio_context_t ctx;
+34  	struct iocb cb;
+35  	struct iocb *cbs[1];
+36  	char data[4096];
+37  	struct io_event events[1];
+38  	int ret;
+39  	int fd;
+40  
+41  	fd = open("/tmp/testfile", O_RDWR | O_CREAT);
+42  	if (fd < 0) {
+43  		perror("open error");
+44  		return -1;
+45  	}
+46  
+47  	ctx = 0;
+48  
+49  	ret = io_setup(128, &ctx);
+50  	if (ret < 0) {
+51  		perror("io_setup error");
+52  		return -1;
+53  	}
+54  
+55  	/* setup I/O control block */
+56  	memset(&cb, 0, sizeof(cb));
+57  	cb.aio_fildes = fd;
+58  	cb.aio_lio_opcode = IOCB_CMD_PWRITE;
+59
+60	/* command-specific options */
+61  	cb.aio_buf = (uint64_t)data;
+62  	cb.aio_offset = 0;
+63  	cb.aio_nbytes = 4096;
+64  
+65  	cbs[0] = &cb;
+66  
+67  	ret = io_submit(ctx, 1, cbs);
+68  	if (ret != 1) {
+69		if (ret < 0)
+70	  		perror("io_submit error");
+71		else
+72			fprintf(stderr, "could not sumbit IOs");
+73		return  -1;
+74	}
+75
+76	/* get the reply */
+77	ret = io_getevents(ctx, 1, 1, events, NULL);
+78	printf("%d\n", ret);
+79
+80	ret = io_destroy(ctx);
+81	if (ret < 0) {
+82		perror("io_destroy error");
+83		return -1;
+84	}
+85  
+86 	return 0;
+87  }
+
+<< snip end: 2.c  <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+Every I/O request that is submitted to an AIO context is represented by an I/O
+control block structure - struct iocb - declared in line 34.  We initialize this
+structure in lines 55-63. First, the whole structure is zeroed, then file
+descriptor (aio_fildes) and command (aio_lio_opcode) fields are set.
+
+File descriptor corresponds to a previously opened file, in our example we
+open "/tmp/testfile" file in line 41.
+
+AIO commands currently supported by Linux kernel are:
+
+IOCB_CMD_PREAD
+   positioned read; corresponds to pread() system call.
+
+IOCB_CMD_PWRITE
+   positioned write; corresponds to pwrite() system call.
+
+IOCB_CMD_FSYNC
+   sync file's data and metadata with disk; corresponds to fsync() system call.
+
+IOCB_CMD_FDSYNC
+   sync file's data and metadata with disk, but only metadata needed to access
+   modified file data is written; corresponds to fdatasync() system call.
+
+IOCB_CMD_PREADV
+   vectored positioned read, sometimes called "scattered input";
+   corresponds to pread() system call.
+
+IOCB_CMD_PWRITEV
+   vectored positioned write, sometimes called "gathered output";
+   corresponds to pwrite() system call.
+
+IOCB_CMD_NOOP
+   defined in the header file, but is not used anywhere else in the kernel.
+
+The semantics of other fields in the iocb structure depends on the command
+specified. For now, we will limit our discussion to IOCB_CMD_PREAD and
+IOCB_CMD_PWRITE commands. After understanding AIO interface for these two
+commands, we will look into the remaining ones.
+
+In lines 60-63 of our running example we set command-specific fields of iocb
+structure: aio_buf and aio_nbytes corresond to a region in memory to which
+data should be read or written to;  aio_offset is an absolute offset in a file.
+
+Now, when one I/O control block is ready, we put a pointer to it in an array
+(line 65) and then pass this array to the io_submit() system call (line 67).
+io_submit() takes AIO context ID, size of the array and the array itself as the
+arguments. Notice, that array should contain *pointers* to the iocb structures,
+not the structures themself.
+
+io_submit()'s return code can be one of the following values:
+
+A) ret = (number of iocbs sumbmitted)
+	Ideal case, all iocbs were accepted for processing.
+
+B) 0 < ret <  (number of iocbs sumbmitted)
+	io_submit() system call processes iocbs one by one starting from
+	the first entry in the passed array. If submission of some iocb fails,
+	it stops at this point and returns the index of iocb that failed.
+	There is no way to know what is the exact reason of a failure.
+	However, if the very first iocb submission fails, see point C.
+
+C) ret < 0
+	There are two reasons why this could happen:
+	1) Some error happened even before io_submit() started to iterate
+	   over iocbs in the array (e.g., AIO context was invalid). 
+	2) The submission of the very first iocb (cbx[0]) failed).
+
+So, in our example, we handle io_submit()'s return code in an unusual way. If
+return code is not equal to the number of iocbs, then that is a clear error but
+we don't know its reason (errno is not set). Consequently, we use
+fprintf(stderr, ...) function to print error notification on the screen.
+Otherwise, if return code is less than zero, then we know the error (errno is
+set) and use perror() function instead.  Notice, that in case of a single iocb
+in the array (as in our example) such a complex error handling makes less sense:
+if the first (and only) iocb fails, we are guaranteed to get an error
+information (see point C above). We handle error in a more complex way in this
+example only to reuse the same code later, when we submit multiple iocbs in a
+single io_submit() call.
+
+After iocb is submitted we can perform any other actions without waiting for I/O
+to complete. For every completed  I/O request (successfully or unsuccessfully)
+kernel creates an io_event structure. To obtain the list of io_events (and
+consequently all completed iocbs) io_getevent() system call should be used (line
+77). When calling io_getevents(), one needs to specify:
+
+a) which AIO context to get events from (ctx variable)
+
+b) a buffer where the kernel should load events to (events varaiable)
+
+c) minimal number of events one wants to get (first 1 in our program).
+   If less then this number of iocbs are currently completed,
+   io_getevents() will block till enough events appear. See point e)
+   for more details on how to control blocking time.
+     
+d) maximum number of events one wants to get. This usually is
+   the size of the events buffer (second 1 in our program)
+
+e) If not enough events are available, we don't want to wait forever.
+   One can specify a relative deadline as the last argument.
+   NULL in this case means to wait infinitely.
+   If one wants io_getevents() not to block at all then 
+   timespec timeout structure need to be initialzed to zero
+   seconds and zero nanoseconds.
+
+The return code of io_getevents can be:
+
+A) ret = (max number of events)
+	All events that fit in the user provided buffer were obtained
+	from the kernel. There might be more pending events in the kernel.
+B) (min number of events) <= ret <= (max number of events)
+	All currently available events were read from the kernel and no
+	blocking happened.
+C) 0 < ret < (min number of events)
+	All currently available events were read from the kernel and
+	we blocked to wait for the time user has specified.
+E) ret = 0
+	no events are available XXX:? does blocking happen in this case?..
+
+F) ret < 0
+	an error happened
+
+
+TO BE CONTINUED...
+
+
+/proc/sys/fs/aio-max-nr
+/proc/sys/fs/aio-nr
+
+Note that timeout is relative and will be updated if not NULL and the operation
+blocks
+
+Check how vectors a provide to vectored PREADV and PWRITEV commands.
+
+Other fields to fill/explain:
+
+        /* these are internal to the kernel/libc. */
+        __u64   aio_data;       /* data to be returned in event's data */
+        __u32   PADDED(aio_key, aio_reserved1);
+                                /* the kernel sets aio_key to the req # */
+
+        /* common fields */
++++     __u16   aio_lio_opcode; /* see IOCB_CMD_ above */
+        __s16   aio_reqprio;
+        __u32   aio_fildes;
+
+        __u64   aio_buf;
+        __u64   aio_nbytes;
+        __s64   aio_offset;
+
+        /* extra parameters */
+        __u64   aio_reserved2;  /* TODO: use this for a (struct sigevent *) */
+
+        /* flags for the "struct iocb" */
+        __u32   aio_flags;
+
+        /*
+         * if the IOCB_FLAG_RESFD flag of "aio_flags" is set, this is an
+         * eventfd to signal AIO readiness to
+         */
+        __u32   aio_resfd;
+
+*** SYNC RELATED COMMANDS ***
+IOCB_CMD_FSYNC
+   sync file's data and metadata with disk; corresponds to fsync() system call.
+
+IOCB_CMD_FDSYNC
+   sync file's data and metadata with disk, but only metadata needed to access
+   modified file data is written; corresponds to fdatasync() system call.
+
+
+*** VECTORED INPUT and OUTPUT ***
+IOCB_CMD_PREADV
+   vectored positioned read, sometimes called "scattered input";
+   corresponds to pread() system call.
+
+IOCB_CMD_PWRITEV
+   vectored positioned write, sometimes called "gathered output";
+   corresponds to pwrite() system call.
+
+*** OTHER COMMANDS ***
+IOCB_CMD_NOOP
+   defined in the header file, but is not used anywhere else in the kernel.
+
+XXX: May be discass Poll and other semi-existing commands here?...
+
+*********************************************************
+********************* LIBAIO LIBRARY ********************
+*********************************************************
+
+libaio:
+/lib64/libaio.so.1 (shared library)
+
+libaio-devel:
+/usr/include/libaio.h (header library)
+/usr/lib64/libaio.a (static library)
+
+Functions:
+
+a) Actual system call wrappers:
+
+int io_setup(int maxevents, io_context_t *ctxp);
+int io_destroy(io_context_t ctx);
+int io_submit(io_context_t ctx, long nr, struct iocb *ios[]);
+int io_cancel(io_context_t ctx, struct iocb *iocb, struct io_event *evt);
+io_getevents(io_context_t ctx_id, long min_nr, long nr, struct io_event *events, struct timespec *timeout);
+
+io_context_t is a pointer to an non-existing stucture:
+
+typedef struct io_context *io_context_t;
+
+Not a single line of code in any user tool or in the libaio library looks at the
+members of 'struct io_context'. So, gcc happily compiles the code even though
+struct io_context is not defined.  This structure is probably defined just for
+type checking. The rule of thumb when using libaio is just to declare all
+variables as io_context_t and forget that it actually is a pointer!
+
+b) Convenient macroses:
+
+static inline void io_prep_pread(struct iocb *iocb, int fd, void *buf, size_t count, long long offset)
+static inline void io_prep_pwrite(struct iocb *iocb, int fd, void *buf, size_t count, long long offset)
+static inline void io_prep_preadv(struct iocb *iocb, int fd, const struct iovec *iov, int iovcnt, long long offset)
+static inline void io_prep_pwritev(struct iocb *iocb, int fd, const struct iovec *iov, int iovcnt, long long offset)
+
+static inline void io_prep_poll(struct iocb *iocb, int fd, int events)
+static inline void io_prep_fsync(struct iocb *iocb, int fd)
+static inline void io_prep_fdsync(struct iocb *iocb, int fd)
+
+static inline int io_poll(io_context_t ctx, struct iocb *iocb, io_callback_t cb, int fd, int events)
+static inline int io_fsync(io_context_t ctx, struct iocb *iocb, io_callback_t cb, int fd)
+static inline int io_fdsync(io_context_t ctx, struct iocb *iocb, io_callback_t cb, int fd)
+
+static inline void io_set_eventfd(struct iocb *iocb, int eventfd);
+
+*********************************************************
+******** MATCHING LIBAIO AND KERNEL INTERFACE ***********
+*********************************************************
+
+libaio.h redefines some of the kernel definitions (god know why),
+but they match at the binary level. E.g., this is kernel
+exported definition of iocb:
+
+struct iocb {
+        /* these are internal to the kernel/libc. */
+        __u64   aio_data;       /* data to be returned in event's data */
+        __u32   PADDED(aio_key, aio_reserved1);
+                                /* the kernel sets aio_key to the req # */
+
+        /* common fields */
+        __u16   aio_lio_opcode; /* see IOCB_CMD_ above */
+        __s16   aio_reqprio;
+        __u32   aio_fildes;
+
+        __u64   aio_buf;
+        __u64   aio_nbytes;
+        __s64   aio_offset;
+
+        /* extra parameters */
+        __u64   aio_reserved2;  /* TODO: use this for a (struct sigevent *) */
+
+        /* flags for the "struct iocb" */
+        __u32   aio_flags;
+
+        /*
+         * if the IOCB_FLAG_RESFD flag of "aio_flags" is set, this is an
+         * eventfd to signal AIO readiness to
+         */
+        __u32   aio_resfd;
+}; /* 64 bytes */
+
+And this is definition of iocb by libaio.h:
+
+struct io_iocb_common {
+        PADDEDptr(void  *buf, __pad1);
+        PADDEDul(nbytes, __pad2);
+        long long       offset;
+        long long       __pad3;
+        unsigned        flags;
+        unsigned        resfd;
+};      /* result code is the amount read or -'ve errno */
+
+
+struct iocb {
+        PADDEDptr(void *data, __pad1);  /* Return in the io completion event */
+        PADDED(unsigned key, __pad2);   /* For use in identifying io requests */
+
+        short           aio_lio_opcode;
+        short           aio_reqprio;
+        int             aio_fildes;
+
+        union {
+                struct io_iocb_common           c;
+                struct io_iocb_vector           v;
+                struct io_iocb_poll             poll;
+                struct io_iocb_sockaddr saddr;
+        } u;
+};
+
+
+
+
+****** AIO LIBRARY *****
+
+glibc:
+/lib64/librt.so.1
+
+glibc-headers:
+/usr/include/aio.h
+
+Provide POSIX-defined interface for async I/O. 
+
+aio_read()
+aio_write()
+aio_cancel()
+aio_error()
+aio_fsync()
+aio_suspend()
+aio_return()
+
+lio_listio
+
+
+****** To discover ****
+XXX: see if these are implemented in some other kernels:
+/* These two are experimental.
+ * IOCB_CMD_PREADX = 4,
+ * IOCB_CMD_POLL = 5,
+ */
+XXX: potential resubmittion of the wrong iocb, knowing its index.
+XXX: two AIO contextes per process?
+
+

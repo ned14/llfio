@@ -1,0 +1,238 @@
+[/============================================================================
+  Boost.AFIO
+
+  Use, modification and distribution is subject to the Boost Software License,
+  Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
+  http://www.boost.org/LICENSE_1_0.txt)
+=============================================================================/]
+
+[library Boost.AFIO
+    [quickbook 1.7]
+    [version 1.40]
+    [id afio]
+    [category afio]
+    [authors [Douglas, Niall], [Kirth, Paul]]
+    [copyright 2013-2015 Niall Douglas and Paul Kirth]
+    [purpose A portable asynchronous file i/o and filesystem library extending Boost.ASIO]
+    [license
+        Distributed under the Boost Software License, Version 1.0.
+        (See accompanying file LICENSE_1_0.txt or copy at
+        [@http://www.boost.org/LICENSE_1_0.txt])
+    ]
+    [source-mode c++]
+]
+
+[def __boost__ Boost]
+[def __boost_afio__ Boost.AFIO]
+[def __boost_bindlib__ [@https://github.com/ned14/Boost.APIBind Boost.APIBind]]
+[def __boost_outcome__ [@https://ned14.github.io/boost.outcome/group__future__promise.html Boost.Outcome]]
+[def __triplegit__ TripleGit]
+[def __fileurl__ file:///]
+[def __dash__ \u2014]
+[def __tick__ [role aligncenter [role green \u2714]]]
+[def __itick__ [role aligncenter [role red \u2714]]]
+[def __cross__ [role aligncenter [role red \u2718]]]
+[def __icross__ [role aligncenter [role green \u2718]]]
+[def __boost_asio__ [@http://www.boost.org/libs/asio/ Boost.ASIO]]
+[def __boost_thread__ [@http://www.boost.org/libs/thread/ Boost.Thread]]
+[def __boost_filesystem__ [@http://www.boost.org/libs/filesystem/ Boost.Filesystem]]
+[def __boost_iostreams__ [@http://www.boost.org/libs/iostreams/ Boost.Iostreams]]
+[def __boost_test__ [@http://www.boost.org/libs/iostreams/ Boost.Test]]
+[def __catch__ [@https://github.com/philsquared/Catch]]
+
+[/ Commonly used links]
+[def __afio_enumerate_req__ [link afio.reference.structs.enumerate_req `enumerate_req`]]
+[def __afio_io_req__ [link afio.reference.structs.io_req `io_req`]]
+[def __afio_path_req__ [link afio.reference.structs.path_req `path_req`]]
+[def __afio_stat_t__ [link afio.reference.structs.stat_t `stat_t`]]
+[def __afio_statfs_t__ [link afio.reference.structs.statfs_t `statfs_t`]]
+
+[def __afio_directory_entry__ [link afio.reference.classes.directory_entry `directory_entry`]]
+[def __afio_dispatcher__ [link afio.reference.classes.dispatcher `dispatcher`]]
+[def __afio_op__ [link afio.reference.classes.future `future<T>`]]
+[def __afio_handle__ [link afio.reference.classes.handle `handle`]]
+[def __afio_path__ [link afio.reference.classes.path `path`]]
+
+[def __afio_enumerate__ [link afio.reference.functions.enumerate `async_enumerate()`]]
+[def __afio_extents__ [link afio.reference.functions.extents `async_extents()`]]
+[def __afio_make_dispatcher__ [link afio.reference.functions.make_dispatcher `make_dispatcher()`]]
+[def __afio_statfs__ [link afio.reference.functions.statfs `async_statfs()`]]
+[def __afio_truncate__ [link afio.reference.functions.truncate `async_truncate()`]]
+[def __afio_zero__ [link afio.reference.functions.zero `async_zero()`]]
+[def __afio_when_all__ `when_all_p()`]
+
+[/ Templates]
+[template raceguarantees[contents]
+'''<informaltable frame="all"><tgroup cols="2"><thead><row><entry>Operating system</entry><entry>Race guarantees under a changing file system</entry></row></thead><tbody>'''[contents]'''</tbody></tgroup></informaltable>'''
+]
+[template raceguarantee[os descr]'''<row><entry>'''[os]'''</entry><entry>'''[descr]'''</entry></row>''']
+
+[import ../example/workshop_naive.ipp]
+[import ../example/workshop_naive_afio.ipp]
+[import ../example/workshop_naive_async_afio.ipp]
+[import ../example/workshop_atomic_updates_afio.ipp]
+[import ../example/workshop_final_afio.ipp]
+
+[import ../example/adopt_example.cpp]
+[import ../example/barrier_example.cpp]
+[import ../example/benchmark_atomic_log.cpp]
+[import ../example/call_example.cpp]
+[import ../example/closure_execution_afio_io_example.cpp]
+[import ../example/closure_execution_traditional_io_example.cpp]
+[import ../example/completion_example1.cpp]
+[import ../example/completion_example2.cpp]
+[import ../example/enumerate_example.cpp]
+[import ../example/filecopy_example.cpp]
+[import ../example/filedir_example.cpp]
+[import ../example/filter_example.cpp]
+[import ../example/find_in_files_afio.cpp]
+[import ../example/find_in_files_iostreams.cpp]
+[import ../example/readallof_example.cpp]
+[import ../example/readwrite_example.cpp]
+[import ../example/readwrite_example_traditional.cpp]
+[import ../example/statfs_example.cpp]
+[import ../test/tests/atomic_log_append_test.cpp]
+[import ../test/tests/race_protection_works.cpp]
+
+[section:introduction Introduction]
+
+'''<?dbhtml-include href="disqus_identifiers/introduction.html"?>'''
+
+__boost_afio__ is a C++ library which lets you schedule an ordered dependency graph of file and filesystem
+input/output operations to be executed asynchronously to the maximum capacity of your hardware. If you want
+to do portable asynchronous filesystem and file i/o in C++, especially if you need to easily order issues of reads and writes,
+this is the correct library to be looking at.
+
+As a quick check list, if you have ever experienced any of these problems, then AFIO may be useful to you:
+
+# Your spinning magnetic rust hard drive goes bananas when some routine in your code
+  tries to do something to storage, and latency per op starts heading into the seconds range.
+
+# Your super fast SSD which is supposed to be delivering hundreds of thousands of ops/sec
+  is barely managing a tenth of its supposed ability with your code. After reading about the
+  importance of high queue depth to maximising performance from SSDs, you try opening many
+  handles to the same file and firing an army of thread pool workers at the problem to try
+  and increase queue depth, but your performance actually drops over the single threaded case.
+
+# Your code has to interact with a regularly changing filesystem and not get weird race errors e.g. you
+  try to create a new file in path /X/Y/Z, but some other program has just renamed directory /X/Y
+  to /A/B in the time between you deciding on /X/Y/Z and getting round to it.
+
+# Your code keeps file handles open a long time in a place where others might delete or rename
+  them, including any part of the directory hierarchy preceding the file.
+  
+# Deleting directory trees randomly fails on Microsoft Windows for no obvious reason.
+
+# Your code needs to read and write files concurrently to other code without resorting to
+  shared memory region tricks e.g. if the files reside on a Samba or NFS network shared drive.
+
+# Your CPU needs to be doing more useful work instead of copying memory to and from disc i/o
+  buffers. As great as the STL iostream buffering is, unless disabled it doubles the LL cache
+  pressure on your CPU, evicting other more useful data. The STL iostreams design almost certainly won't
+  allow the kernel use VM tricks to directly busmaster DMA from its buffers to the hard drive, so
+  the kernel will have to copy those buffers a third time. That means that for every 1Kb you read
+  or write you are evicted, as a minimum, 3Kb from the LL caches in your CPU, all of which must be
+  refilled with more useful data later.
+
+# Your code wants to experience various filing system features identically across platforms which
+  also work on shared Samba and NFS network drives, such as:
+  * Deleting and renaming open files.
+  * Files having unique inode values.
+  * POSIX timestamping of last accessed, last modified, last status changed and created.
+  * File extent management and traversal.
+  * Explicitly documented filing system race guarantees.
+  * Interrogation of filing system characteristics, devices and mount points.
+  * Ten million item directories, or more. We have tested twenty five million item directories on NTFS
+    and ext4 and performance was actually tolerable with under a second pause. Ten million item directories is plenty fast, and
+    one million item directories you won't notice over a ten item directory. Note that your GUI file
+    explorer will very likely hang on ten million item directories, indeed so do most command line tools.
+  * Exclusive lock files (manually operated support already there, async support coming in v1.5).
+  * File change monitoring (coming in v1.5).
+  * File byte range advisory locking (coming in v1.5).
+
+[note Lest there be any disappointment in expectations, [*using AFIO alone will not magically improve your filesystem
+performance], if anything there is a performance penalty in naive use of AFIO as a direct replacement for
+naive synchronous file i/o. What AFIO gives you is a large amount of ['control] with easy to twiddle knobs
+for benchmarking optimal filesystem strategies under various use cases. In other words, using AFIO lets you
+more easily write and test code that ['never performs really badly] in corner cases.]
+  
+__boost_afio__ is a __boost_bindlib__ based Boost library, and therefore is capable of any combination of
+the following build configurations:
+
+* Uses either Boost OR the C++ 11 STL for atomic, thread, future, chrono etc.
+* Uses either Boost OR the C++ 1y STL for Fileystem. At the time of writing, only VS2015 provides Filesystem
+in its STL though libstdc++ 6.0 is expected to also do so.
+* Uses either Boost OR standalone ASIO for the i/o engine.
+
+You may note that as a result AFIO can be used as a [@https://boostgsoc13.github.io/boost.afio/afio-stable.tar.bz2 completely standalone header-only library totally independent from
+any dependencies on Boost] which can be dropped into any existing build system as [@https://boostgsoc13.github.io/boost.afio/afio-single-header.hpp.bz2 a simple single header include]. This,
+incidentally, also extends to its unit test suite which can use either __boost_test__ OR __catch__ (actually my own thread
+safe fork of CATCH).
+
+__boost_afio__ provides a pure portable POSIX file i/o backend and specialised file i/o backends
+making use of host OS asynchronous file i/o facilities are provided for:
+
+* Windows NT IOCP (since v1.0)
+* Linux KAIO (planned, would reduce thread pool blocking for read() and write() only)
+* POSIX AIO, suitable for BSD only (planned, would reduce thread pool blocking for read() and write() only)
+* WinRT (if there is demand, currently WinRT is not supported at all)
+
+__boost_afio__ is regularly compiled and per-commit unit tested on these platforms:
+
+* Android with ext4 (libc++ STL toolchain only).
+* Apple Mac OS X 10.9 with HFS+ (should still work on 10.5). Note that OS X does not provide race free filesystem due to insufficient APIs provided.
+* FreeBSD 10.1 with ZFS (should also work on 10.0). Note that the BSDs only provide race free filesystem for directories not files due to insufficient APIs provided.
+* Linux kernels 2.6.32 to 3.13 with ext4.
+* Microsoft Windows 8.1 with NTFS (should still work on XP).
+
+__boost_afio__ extends __boost_asio__ and is therefore dependent on ASIO (Boost or standalone).
+With a good modern compiler [link afio.FAQ.closure_performance you can expect 50-90% of the
+throughput of using raw Boost.ASIO] at a latency of [link afio.FAQ.closure_latency about 60,000 +/- 600 CPU cycles to get notified
+of the completion of an operation]. This library was brought to __boost__ as part of Google
+Summer of Code 2013.
+
+__boost_afio__ is a C++ 11 only library, and it requires, as an absolute minimum, a compiler with:
+
+* Rvalue reference support.
+* Variadic templates.
+* Template aliasing.
+* Noexcept.
+* Constexpr (C++ 11).
+
+Some popular compilers known to be minimally sufficient thanks to [@https://ci.nedprod.com/ our Jenkins CI bot] include:
+
+* Microsoft Visual Studio 2015, released in 2015. v1.0-v1.2 supported VS2010, v1.3 supported VS2013.
+* GNU Compiler Collection v4.8, released in 2013. v1.0-v1.2 supported GCC 4.6, v1.3 supported GCC v4.7.
+* clang v3.3, released in 2013. v1.0-v1.3 supported clang v3.2. clang v3.1 is known to produce segfaulting binaries.
+
+The Jenkins CI bot runs a full suite of static analysis tools (currently clang and MSVC static analysers and
+clang-tidy, [@http://ispras.linuxbase.org/index.php/ABI_compliance_checker the ABI stability compliance checker] is planned),
+runtime analysis tools (currently the clang undefined behaviour
+and thread sanitisers plus valgrind memcheck) plus a full set of unit tests for all supported compilers
+on all supported platforms for every single commit to master branch and every single pull request. Additionally,
+the Travis CI bot runs a full set of code coverage for the unit tests which is pushed to coveralls.io.
+[link unit_test_dashboard You can view the build and unit test CI dashboard for all compilers and platforms here].
+
+[important Note that Boost.AFIO has not passed Boost peer review, and therefore is not a part of the Boost C++ libraries]
+
+As a very quick example of minimal usage:
+
+[filedir_example]
+
+'''<?dbhtml-include href="disqus_comments.html"?>'''
+
+[endsect] [/introduction]
+
+[include design_rationale.qbk]
+[include compiling.qbk]
+[include quickstart.qbk]
+[include reference.qbk]
+[/ [include advanced_topics.qbk]]
+[include release_notes.qbk]
+[include acknowledgments.qbk]
+
+[section:index Index]
+'''
+<index/>
+'''
+[endsect] [/index]

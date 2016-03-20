@@ -1,0 +1,2434 @@
+
+<!-- saved from url=(0089)https://www.usenix.org/legacy/event/fast08/tech/full_papers/gunawi/gunawi_html/index.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1252"><script src="https://js-agent.newrelic.com/nr-885.min.js"></script><script type="text/javascript">window.NREUM||(NREUM={}),__nr_require=function(e,t,n){function r(n){if(!t[n]){var o=t[n]={exports:{}};e[n][0].call(o.exports,function(t){var o=e[n][1][t];return r(o||t)},o,o.exports)}return t[n].exports}if("function"==typeof __nr_require)return __nr_require;for(var o=0;o<n.length;o++)r(n[o]);return r}({QJf3ax:[function(e,t){function n(){}function r(e){function t(e){return e&&e instanceof n?e:e?a(e,i,o):o()}function s(n,r,o){e&&e(n,r,o);for(var i=t(o),a=l(n),u=a.length,f=0;u>f;f++)a[f].apply(i,r);var s=c[w[n]];return s&&s.push([h,n,r,i]),i}function p(e,t){g[e]=l(e).concat(t)}function l(e){return g[e]||[]}function d(e){return f[e]=f[e]||r(s)}function v(e,t){u(e,function(e,n){t=t||"feature",w[n]=t,t in c||(c[t]=[])})}var g={},w={},h={on:p,emit:s,get:d,listeners:l,context:t,buffer:v};return h}function o(){return new n}var i="nr@context",a=e("gos"),u=e(1),c={},f={},s=t.exports=r();s.backlog=c},{1:12,gos:"7eSDFh"}],ee:[function(e,t){t.exports=e("QJf3ax")},{}],3:[function(e,t){function n(e,t){return function(){r(e,[(new Date).getTime()].concat(i(arguments)),null,t)}}var r=e("handle"),o=e(1),i=e(2);"undefined"==typeof window.newrelic&&(newrelic=NREUM);var a=["setPageViewName","addPageAction","setCustomAttribute","finished","addToTrace","inlineHit"],u=["addPageAction"],c="api-";o(a,function(e,t){newrelic[t]=n(c+t,"api")}),o(u,function(e,t){newrelic[t]=n(c+t)}),t.exports=newrelic,newrelic.noticeError=function(e){"string"==typeof e&&(e=new Error(e)),r("err",[e,(new Date).getTime()])}},{1:12,2:13,handle:"D5DuLP"}],gos:[function(e,t){t.exports=e("7eSDFh")},{}],"7eSDFh":[function(e,t){function n(e,t,n){if(r.call(e,t))return e[t];var o=n();if(Object.defineProperty&&Object.keys)try{return Object.defineProperty(e,t,{value:o,writable:!0,enumerable:!1}),o}catch(i){}return e[t]=o,o}var r=Object.prototype.hasOwnProperty;t.exports=n},{}],handle:[function(e,t){t.exports=e("D5DuLP")},{}],D5DuLP:[function(e,t){function n(e,t,n,o){r.buffer([e],o),r.emit(e,t,n)}var r=e("ee").get("handle");t.exports=n,n.ee=r},{ee:"QJf3ax"}],XL7HBI:[function(e,t){function n(e){var t=typeof e;return!e||"object"!==t&&"function"!==t?-1:e===window?0:i(e,o,function(){return r++})}var r=1,o="nr@id",i=e("gos");t.exports=n},{gos:"7eSDFh"}],id:[function(e,t){t.exports=e("XL7HBI")},{}],G9z0Bl:[function(e,t){function n(){if(!v++){var e=d.info=NREUM.info,t=f.getElementsByTagName("script")[0];if(e&&e.licenseKey&&e.applicationID&&t){u(p,function(t,n){e[t]||(e[t]=n)});var n="https"===s.split(":")[0]||e.sslForHttp;d.proto=n?"https://":"http://",a("mark",["onload",i()],null,"api");var r=f.createElement("script");r.src=d.proto+e.agent,t.parentNode.insertBefore(r,t)}}}function r(){"complete"===f.readyState&&o()}function o(){a("mark",["domContent",i()],null,"api")}function i(){return(new Date).getTime()}var a=e("handle"),u=e(1),c=window,f=c.document;NREUM.o={ST:setTimeout,XHR:c.XMLHttpRequest,REQ:c.Request,EV:c.Event,PR:c.Promise,MO:c.MutationObserver},e(2);var s=(""+location).split("?")[0],p={beacon:"bam.nr-data.net",errorBeacon:"bam.nr-data.net",agent:"js-agent.newrelic.com/nr-885.min.js"},l=window.XMLHttpRequest&&XMLHttpRequest.prototype&&XMLHttpRequest.prototype.addEventListener&&!/CriOS/.test(navigator.userAgent),d=t.exports={offset:i(),origin:s,features:{},xhrWrappable:l};f.addEventListener?(f.addEventListener("DOMContentLoaded",o,!1),c.addEventListener("load",n,!1)):(f.attachEvent("onreadystatechange",r),c.attachEvent("onload",n)),a("mark",["firstbyte",i()],null,"api");var v=0},{1:12,2:3,handle:"D5DuLP"}],loader:[function(e,t){t.exports=e("G9z0Bl")},{}],12:[function(e,t){function n(e,t){var n=[],o="",i=0;for(o in e)r.call(e,o)&&(n[i]=t(o,e[o]),i+=1);return n}var r=Object.prototype.hasOwnProperty;t.exports=n},{}],13:[function(e,t){function n(e,t,n){t||(t=0),"undefined"==typeof n&&(n=e?e.length:0);for(var r=-1,o=n-t||0,i=Array(0>o?0:o);++r<o;)i[r]=e[t+r];return i}t.exports=n},{}]},{},["G9z0Bl"]);</script>
+<title>main</title>
+<meta name="description" content="main">
+<meta name="keywords" content="main">
+<meta name="resource-type" content="document">
+<meta name="distribution" content="global">
+
+<meta name="Generator" content="LaTeX2HTML v2002-2-1">
+<meta http-equiv="Content-Style-Type" content="text/css">
+
+<link rel="STYLESHEET" href="./Error Handling is Ocassionally Correct_files/main.css">
+
+</head>
+
+<body><a href="http://www.usenix.org/"><img src="./Error Handling is Ocassionally Correct_files/new_usenix.jpg" width="288" height="232" alt="Check out the new USENIX Web site." align="right"></a>
+
+
+
+
+
+<h1 align="CENTER">EIO: <u>E</u>rror Handling <u>i</u>s <u>O</u>ccasionally Correct</h1><div>
+
+<p align="CENTER"><strong>Haryadi S. Gunawi, Cindy Rubio-González,</strong><br>
+<strong>Andrea C. Arpaci-Dusseau, Remzi H. Arpaci-Dusseau, Ben Liblit</strong></p>
+<p align="CENTER"><em>Computer Sciences Department, University of Wisconsin-Madison</em> </p>
+</div>
+
+
+<h1>Abstract</h1>
+
+<p>
+<em>The reliability of file systems depends in part on how well they
+propagate errors.  We develop a static analysis technique, EDP, that
+analyzes how file systems and storage device drivers propagate error
+codes.  Running our EDP analysis on all file systems and 3 major
+storage device drivers in Linux 2.6, we find that errors are often
+incorrectly propagated; 1153 calls (13%) drop an error code without
+handling it.
+</em>
+</p><p>
+<em>We perform a set of analyses to rank the robustness of each subsystem
+based on the completeness of its error propagation; we find that many
+popular file systems are less robust than other available choices.  We
+confirm that write errors are neglected more often than read
+errors. We also find that many violations are not corner-case
+mistakes, but perhaps intentional choices.  Finally, we show that
+inter-module calls play a part in incorrect error propagation, but
+that chained propagations do not.  In conclusion, error propagation
+appears complex and hard to perform correctly in modern systems.  </em>
+
+
+</p><h1><a name="SECTION00020000000000000000"></a>
+<a name="sec-intro"></a><br>
+1 Introduction
+</h1>
+
+<p>
+The robustness of file systems and storage systems is a major concern,
+and rightly so&nbsp;[<a href="https://www.usenix.org/legacy/event/fast08/tech/full_papers/gunawi/gunawi_html/index.html#YangEtAl04-FSErrors">32</a>].  Recent work has shown that
+file systems are especially unreliable when the underlying disk system
+does not behave as expected&nbsp;[<a href="https://www.usenix.org/legacy/event/fast08/tech/full_papers/gunawi/gunawi_html/index.html#PrabhakaranEtAl05-SOSP">20</a>].
+Specifically, many modern commodity file systems, such as Linux
+ext3&nbsp;[<a href="https://www.usenix.org/legacy/event/fast08/tech/full_papers/gunawi/gunawi_html/index.html#Tweedie98-JournalingExt2">31</a>],
+ReiserFS&nbsp;[<a href="https://www.usenix.org/legacy/event/fast08/tech/full_papers/gunawi/gunawi_html/index.html#Reiser04-ReiserFS">23</a>], IBM's JFS&nbsp;[<a href="https://www.usenix.org/legacy/event/fast08/tech/full_papers/gunawi/gunawi_html/index.html#Best00-JFS-Local">1</a>], and
+Windows NTFS&nbsp;[<a href="https://www.usenix.org/legacy/event/fast08/tech/full_papers/gunawi/gunawi_html/index.html#Solomon98-NT">27</a>], all have serious bugs and
+inconsistencies in how they handle errors from the storage system.
+However, the question remains unanswered as to why these
+fault-handling bugs are present.
+
+</p><p>
+In this paper, we investigate what we believe is one of the root
+causes of deficient fault handling: <em>incorrect error code
+propagation</em>.  To be properly handled, a low-level error code (<i>e.g.</i>, an
+"I/O error" returned from a device driver) must be correctly
+propagated to the appropriate code in the file system. Further, if the
+file system is unable to recover from the fault, it may wish to pass
+the error up to the application, again requiring correct error
+propagation.
+
+</p><p>
+Without correct error propagation, any comprehensive failure policy is
+useless: recovery mechanisms and policies cannot be invoked if the
+error is not propagated.  Incorrect error propagation has been a
+significant problem in many systems.  For example, self-healing
+systems cannot heal themselves if error signals never reach the
+self-recovery
+modules&nbsp;[<a href="https://www.usenix.org/legacy/event/fast08/tech/full_papers/gunawi/gunawi_html/index.html#EllardMegquier05-DISP">6</a>,<a href="https://www.usenix.org/legacy/event/fast08/tech/full_papers/gunawi/gunawi_html/index.html#SidiroglouEtAl05-STEM">26</a>], components
+behind an interface do not receive error
+notifications&nbsp;[<a href="https://www.usenix.org/legacy/event/fast08/tech/full_papers/gunawi/gunawi_html/index.html#KoopmanDeVale99-POSIX">16</a>], and distributed systems
+often obtain misleading error
+codes&nbsp;[<a href="https://www.usenix.org/legacy/event/fast08/tech/full_papers/gunawi/gunawi_html/index.html#KolaEtAl05-FaultInLDS">15</a>,<a href="https://www.usenix.org/legacy/event/fast08/tech/full_papers/gunawi/gunawi_html/index.html#ThainLivny02-ErrorScope">30</a>], which
+turns into frustration for human debugging.  In summary, if errors are
+not propagated, then the effort spent detecting and recovering from
+those
+errors&nbsp;[<a href="https://www.usenix.org/legacy/event/fast08/tech/full_papers/gunawi/gunawi_html/index.html#CandeaEtAl04-Reboot">4</a>,<a href="https://www.usenix.org/legacy/event/fast08/tech/full_papers/gunawi/gunawi_html/index.html#CowanEtAl98-Stackguard">5</a>,<a href="https://www.usenix.org/legacy/event/fast08/tech/full_papers/gunawi/gunawi_html/index.html#NeculaEtAl05-CCured">18</a>,<a href="https://www.usenix.org/legacy/event/fast08/tech/full_papers/gunawi/gunawi_html/index.html#QinEtAl05-Safemem">21</a>,<a href="https://www.usenix.org/legacy/event/fast08/tech/full_papers/gunawi/gunawi_html/index.html#QinEtAl05-Rx">22</a>,<a href="https://www.usenix.org/legacy/event/fast08/tech/full_papers/gunawi/gunawi_html/index.html#SwiftEtAl03-Nooks">28</a>,<a href="https://www.usenix.org/legacy/event/fast08/tech/full_papers/gunawi/gunawi_html/index.html#SwiftEtAl04-MoreNooks">29</a>]
+is worthless.
+
+</p><p>
+To analyze how errors are propagated in file and storage system code,
+we have developed a static source-code analysis technique.  Our
+technique, named <em>Error Detection and Propagation (EDP)</em> analysis,
+shows how error codes flow through the file system and storage
+drivers.  EDP performs a dataflow analysis by constructing a
+function-call graph showing how error codes propagate through return
+values and function parameters.
+
+</p><p>
+We have applied EDP analysis to all file systems and 3 major storage
+device drivers (SCSI, IDE, and Software RAID) implemented in Linux
+2.6.  We find that <em>error handling is occasionally correct</em>.
+Specifically, we see that low-level errors are sometimes lost as they
+travel through the many layers of the storage subsystem: out of the
+9022 function calls through which the analyzed error codes
+propagate, we find that 1153 calls (13%) do not correctly save the
+propagated error codes.
+
+</p><p>
+Our detailed analysis enables us to make a number of conclusions.
+First, we find that the more complex the file system (in terms of both
+lines of code and number of function calls with error codes), the more
+likely it is to incorrectly propagate errors; thus, these more complex
+file systems are more likely to suffer from silent failures.  Second,
+we observe that I/O write operations are more likely to neglect error
+codes than I/O read operations.  Third, we find that many violations
+are not corner-case mistakes: the return codes of some functions are
+consistently ignored, which makes us suspect that the omissions are
+intentional.  Finally, we show how inter-module calls play a major
+part in causing incorrect error propagation, but that chained
+propagations do not.
+
+</p><p>
+The rest of this paper is organized as follows.  We describe our
+methodology and present our results in Section&nbsp;<a href="https://www.usenix.org/legacy/event/fast08/tech/full_papers/gunawi/gunawi_html/index.html#sec-method">2</a> and
+&nbsp;<a href="https://www.usenix.org/legacy/event/fast08/tech/full_papers/gunawi/gunawi_html/index.html#sec-result">3</a> respectively.  To understand the root causes of the
+problem, we perform a set of deeper analyses in
+Section&nbsp;<a href="https://www.usenix.org/legacy/event/fast08/tech/full_papers/gunawi/gunawi_html/index.html#sec-analysis">4</a>. Section&nbsp;<a href="https://www.usenix.org/legacy/event/fast08/tech/full_papers/gunawi/gunawi_html/index.html#sec-future">5</a>
+and&nbsp;<a href="https://www.usenix.org/legacy/event/fast08/tech/full_papers/gunawi/gunawi_html/index.html#sec-related">6</a> discuss future work and related work
+respectively.  Finally, Section&nbsp;<a href="https://www.usenix.org/legacy/event/fast08/tech/full_papers/gunawi/gunawi_html/index.html#sec-conclude">7</a> concludes.
+
+</p><h1><a name="SECTION00030000000000000000"></a>
+<a name="sec-method"></a><br>
+2 Methodology
+</h1>
+
+<p>
+To understand the propagation of error codes, we have developed
+a static analysis technique that we name <em>Error Detection and
+Propagation (EDP)</em>.  In this section, we identify the components of
+Linux 2.6 that we will analyze and describe EDP.
+
+</p><p>
+
+</p><h2><a name="SECTION00031000000000000000"><br>
+2.1 Target Systems</a>
+</h2>
+
+<p>
+In this paper, we analyze how errors are propagated through the file
+systems and storage device drivers in Linux 2.6.15.4.  We examine all
+Linux implementations of file systems that are located in 51
+directories.  These file systems are of different types, including
+disk-based file systems, 
+network file systems, 
+file system protocols,
+and many others.  Our analysis follows requests through the virtual
+file system and memory management layers as well.  In addition to file
+systems, we also examine three major storage device drivers (SCSI,
+IDE, and software RAID), as well as all lower-level drivers. Beyond
+these subsystems, our tool can be used to analyze other Linux
+components as well.
+
+</p><p>
+
+</p><div align="CENTER">
+
+<p><a name="fig-method-edp"></a></p><div align="CENTER">
+<img src="./Error Handling is Ocassionally Correct_files/fig-method-edp.gif"></div>
+<br>
+<font size="-1"><i>
+Figure 1: <b>EDP Architecture.</b>The diagram shows the 
+framework for Error Detection and Propagation (EDP) analysis of file
+and storage systems code.</i></font>
+<br>
+
+</div>
+
+<p>
+
+</p><h2><a name="SECTION00032000000000000000"><br>
+2.2 EDP Analysis</a>
+</h2>
+
+<p>
+The basic mechanism of EDP is a dataflow analysis: EDP constructs a
+function-call graph covering all cases in which error codes propagate
+through return values or function parameters.  To build EDP, we
+harness C Intermediate Language (CIL)&nbsp;[<a href="https://www.usenix.org/legacy/event/fast08/tech/full_papers/gunawi/gunawi_html/index.html#Necula02-CIL">19</a>].  CIL
+performs source-to-source transformation of C programs and thus can be
+used in the analysis of large complex programs such as the Linux
+kernel. The EDP analysis is written as a CIL extension in 4000 lines
+of code in the OCaml language.
+
+</p><p>
+The abstraction that we introduce in EDP is that error codes flow
+along <em>channels</em>, where a channel is the set of function calls
+between where an error code is first generated and where it is
+terminated (<i>e.g.</i>, by being either handled or dropped).  As shown in
+Figure&nbsp;<a href="https://www.usenix.org/legacy/event/fast08/tech/full_papers/gunawi/gunawi_html/index.html#fig-method-edp">1</a>, EDP contains three major components.  The
+first component identifies the error codes that will be tracked.  The
+second constructs the channels along which the error codes propagate.
+Finally, the third component analyzes the channels and classifies each
+as being either complete or broken.
+
+</p><p>
+<br></p><div align="CENTER">
+<table cellpadding="3" border="1" align="CENTER">
+<tbody><tr><td><font color="#FFFFFF">-</font></td>
+<td align="CENTER" colspan="1"><font size="-1"><b>Single</b></font></td>
+<td align="CENTER" colspan="1"><font size="-1"><b>Full</b></font></td>
+<td align="CENTER" colspan="1"><font size="-1">
+Subsystem</font></td>
+</tr>
+<tr><td align="LEFT" colspan="1"><font size="-1"> 
+Subsystem</font></td>
+<td align="CENTER" colspan="1"><font size="-1"><b>(seconds)</b></font></td>
+<td align="CENTER" colspan="1"><font size="-1"><b>(seconds)</b></font></td>
+<td align="CENTER" colspan="1"><font size="-1">
+Size (Kloc)</font></td>
+</tr>
+<tr><td align="LEFT"><font size="-1"> 
+
+VFS        </font></td>
+<td align="CENTER"><font size="-1">   </font><font size="-1"><b>4 </b>  </font></td>
+<td align="CENTER"><font size="-1">   -  </font></td>
+<td align="CENTER"><font size="-1">  34  </font></td>
+</tr>
+<tr><td align="LEFT"><font size="-1"> 
+Mem. Mgmt. </font></td>
+<td align="CENTER"><font size="-1">   </font><font size="-1"><b>3 </b>  </font></td>
+<td align="CENTER"><font size="-1">   -  </font></td>
+<td align="CENTER"><font size="-1">  20  </font></td>
+</tr>
+<tr><td align="LEFT"><font size="-1"> 
+
+XFS       </font></td>
+<td align="CENTER"><font size="-1">   </font><font size="-1"><b>8 </b>  </font></td>
+<td align="CENTER"><font size="-1">   </font><font size="-1"><b>13 </b> </font></td>
+<td align="CENTER"><font size="-1">  71  </font></td>
+</tr>
+<tr><td align="LEFT"><font size="-1"> 
+ReiserFS  </font></td>
+<td align="CENTER"><font size="-1">   </font><font size="-1"><b>3 </b>  </font></td>
+<td align="CENTER"><font size="-1">   </font><font size="-1"><b>8  </b> </font></td>
+<td align="CENTER"><font size="-1">  24  </font></td>
+</tr>
+<tr><td align="LEFT"><font size="-1"> 
+ext3      </font></td>
+<td align="CENTER"><font size="-1">   </font><font size="-1"><b>2 </b>  </font></td>
+<td align="CENTER"><font size="-1">   </font><font size="-1"><b>7  </b> </font></td>
+<td align="CENTER"><font size="-1">  12  </font></td>
+</tr>
+<tr><td align="LEFT"><font size="-1"> 
+Apple HFS </font></td>
+<td align="CENTER"><font size="-1">   </font><font size="-1"><b>1 </b>  </font></td>
+<td align="CENTER"><font size="-1">   </font><font size="-1"><b>6  </b> </font></td>
+<td align="CENTER"><font size="-1">   5  </font></td>
+</tr>
+<tr><td align="LEFT"><font size="-1"> 
+VFAT      </font></td>
+<td align="CENTER"><font size="-1">   </font><font size="-1"><b>1 </b>  </font></td>
+<td align="CENTER"><font size="-1">   </font><font size="-1"><b>5  </b> </font></td>
+<td align="CENTER"><font size="-1">   1  </font></td>
+</tr>
+<tr><td align="LEFT" colspan="2"><font size="-1"> 
+
+All File Systems Together</font></td>
+<td align="CENTER"><font size="-1">  </font><font size="-1"><b>47 </b> </font></td>
+<td align="CENTER"><font size="-1">  372 </font></td>
+</tr>
+</tbody></table>
+
+</div>
+<br>
+<a name="table-method-performance"></a>
+<font size="-1">
+<i>Table 1: <b>EDP Performance.</b> The table shows
+the EDP runtime for different subsystems.  "Single" runtime
+represents the time to analyze each subsystem in isolation without
+interaction with other subsystems (e.g., VFS and MM).
+"Full" runtime represents the time to analyze a file system along
+with the virtual file system and the memory management.  The last row
+reports the time to analyze all of the file systems together. </i></font>
+<br>
+
+<br>
+
+<p>
+Table&nbsp;<a href="https://www.usenix.org/legacy/event/fast08/tech/full_papers/gunawi/gunawi_html/index.html#table-method-performance">1</a> reports the EDP runtime for
+different subsystems, running on a machine with 2.4 GHz Intel Pentium
+4 CPU and 512 MB of memory.  Overall, EDP analysis is fast; analyzing
+all file systems together in a single run only takes 47 seconds.  We
+now describe the three components of EDP in more detail.
+
+</p><p>
+
+</p><h3><a name="SECTION00032100000000000000"><br>
+2.2.1 Error Code Information</a>
+</h3>
+
+<p>
+The first component of EDP identifies the error codes to track.  One
+example is <tt><font size="-1">EIO</font></tt>, a generic error code that commonly indicates I/O
+failure and is used extensively throughout the file system; for
+example, in ext3, <tt><font size="-1">EIO</font></tt> touches 266 functions and propagates through
+467 calls.  Besides <tt><font size="-1">EIO</font></tt>, many kernel subsystems commonly use other
+error codes as defined in <tt><font size="-1">include/asm-generic/errno.h</font></tt>. In total,
+there are hundreds of error codes that are used for different
+purposes.  We report our findings on the propagation of 34 basic error
+codes that are mostly used across all file systems and storage device
+drivers. These error codes can be found in
+<tt><font size="-1">include/asm-generic/errno-base.h</font></tt>.
+
+</p><p>
+
+</p><h3><a name="SECTION00032200000000000000"><br>
+2.2.2 Channel Construction</a>
+</h3>
+
+<p>
+The second component of EDP constructs the <em>channel</em> in which the
+specified error codes propagate. A channel can be constructed from
+function calls and asynchronous wake-up paths; in our current
+analysis, we focus only on function calls and discuss asynchronous
+paths in Section&nbsp;<a href="https://www.usenix.org/legacy/event/fast08/tech/full_papers/gunawi/gunawi_html/index.html#sec-future-channel">5.3</a>.
+
+</p><p>
+We define a channel by its two endpoints: generation and termination.
+The <em>generation endpoint</em> is the function that exposes an error
+code, either directly through a return value (<i>e.g.</i>, the function
+contains a <tt><font size="-1">return</font></tt> <tt><font size="-1">-EIO</font></tt> statement) or indirectly through a
+function argument passed by reference.  After finding all generation
+endpoints, EDP marks each function that propagates the error codes;
+<em>propagating functions</em> receive error codes from the functions
+that they call and then simply propagate them in a return value or
+function parameter.  The <em>termination endpoint</em> is the function in
+which an error code is no longer propagated in the return value or a
+parameter of the function.
+
+</p><p>
+One of the major challenges we address when constructing error
+channels is handling function pointers. The typical approach for
+handling function pointers is to implement a points-to
+analysis&nbsp;[<a href="https://www.usenix.org/legacy/event/fast08/tech/full_papers/gunawi/gunawi_html/index.html#Hind01-PointerAnalysis">13</a>] that identifies the set of real
+functions each function pointer might point at; however,
+field-sensitive points-to analyses can be expensive.  Therefore, we
+customize our points-to analysis to exploit the systematic structure
+that these pointers exhibit.
+
+</p><p>
+First, we keep track of all structures that have function pointers.  For
+example, the VFS read and write interfaces are defined as fields in
+the <tt><font size="-1">file_ops</font></tt> structure:
+
+</p><p>
+</p><pre>   struct file_ops {
+       int (*read)  ();
+       int (*write) ();
+   };
+</pre>
+
+<p>
+Since each file system needs to define its own <tt><font size="-1">file_ops</font></tt>, we
+automatically find all global instances of such structures, look for
+the function pointer assignments within the instances, and map
+function-pointer implementations to the function pointer interfaces.
+For example, ext2 and ext3 define their file operations like this:
+
+</p><p>
+</p><pre>    struct file_ops ext2_f_ops {
+        .read  = ext2_read;
+        .write = ext2_write;
+    };
+    struct file_ops ext3_f_ops {
+        .read  = ext3_read;
+        .write = ext3_write;
+    };
+</pre>
+
+<p>
+Given such global structure instances, we add the interface
+implementations (<i>e.g.</i>, <tt><font size="-1">ext2_read</font></tt>) to the implementation list of
+the corresponding interfaces (<i>e.g.</i>,
+<tt><font size="-1">file_ops</font></tt>4#4<tt><font size="-1">read</font></tt>).  Although this technique
+connects most of the mappings, a function pointer assignment could
+still occur in an instruction rather than in a global structure
+instance.  Thus, our tool also visits all functions and finds any
+assignment that maps an implementation to an interface.  For example,
+if we find an assignment such as <tt><font size="-1">f_op-&gt;read</font></tt> <tt><font size="-1">=</font></tt>
+<tt><font size="-1">ntfs_read</font></tt>, then we add <tt><font size="-1">ntfs_read</font></tt> to the list of
+<tt><font size="-1">file_ops</font></tt>4#4<tt><font size="-1">read</font></tt> implementations.
+
+</p><p>
+In the last phase, we change function pointer calls to direct
+calls. For example, if VFS  makes an interface call such as
+<tt><font size="-1">(f_op-&gt;read)()</font></tt>, then we automatically rewrite such
+an assignment to:
+
+</p><p>
+</p><pre>    switch (...) {
+        case ext2:  ext2_read();  break;
+        case ext3:  ext3_read();  break;
+        case ntfs:  ntfs_read();  break;
+        ...
+    }
+</pre>
+
+<p>
+Across all Linux file systems and storage device drivers, there are
+191 structural interfaces (<i>e.g.</i>, <tt><font size="-1">file_ops</font></tt>), 904 function pointer
+fields (<i>e.g.</i>, <tt><font size="-1">read</font></tt>), 5039 implementations (<i>e.g.</i>, <tt><font size="-1">ext2_read</font></tt>),
+and 2685 function pointer calls (<i>e.g.</i>, <tt><font size="-1">(f_op-&gt;read)()</font></tt>).  Out of
+2865 function pointer calls, we connect all except 564 calls (20%).
+The unconnected 20% of calls are due to indirect implementation
+assignment.  For example, we cannot map assignment such as
+<tt><font size="-1">f_op-&gt;read</font></tt> <tt><font size="-1">=</font></tt> <tt><font size="-1">f</font></tt>, where <tt><font size="-1">f</font></tt> is either a local
+variable or a function parameter, and not a function name.  While it
+is feasible to traceback such assignments using stronger and more
+expensive analysis, we assume that major interfaces linking modules
+together have already been connected as part of global instances.  If
+all calls are connected, more error propagation chain can be analyzed,
+which means more violations are likely to be found.
+
+
+</p><h3><a name="SECTION00032300000000000000"><br>
+2.2.3 Channel Analysis</a>
+</h3>
+
+<p>
+The third component of EDP distinguishes two kinds of channels:
+error-complete and error-broken channels.  An <em>error-complete</em>
+channel is a channel that minimally checks the occurrence of an
+error. An error-complete channel thus has this property at its
+termination endpoint:
+
+</p><p><i>
+&nbsp;&nbsp;&nbsp;&nbsp;  &#8707; if (expr) { ... }, where <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;    errorCodeVariable &#8838; expr
+</i>
+
+
+
+</p><p>
+which states that an error code is considered checked if there exist
+an <tt><font size="-1">if</font></tt> condition whose expression contains the variable that
+stores the error code. For example, the function
+<tt><font size="-1">goodTerminationEndpoint</font></tt> in the code segment below carries an
+error-complete channel because the function saves the returned error
+code (line 2) and checks the error code (line 3):
+
+</p><p>
+</p><pre>   1 void goodTerminationEndpoint() {
+   2     int err = generationEndpoint();
+   3     if (err) 
+   4         ...
+   5 }    
+   6 int generationEndpoint() {
+   7     return -EIO;
+   8 }
+</pre>
+
+<p>
+Note that an error could be checked but not handled properly, <i>e.g.</i>&nbsp;no
+error handling in the <tt><font size="-1">if</font></tt> condition. Since error handling is
+usually specific to each file system, and hence there are many
+instances of it, we decided to be "generous" in the way we define
+how error is handled, <i>i.e.</i>&nbsp;by just checking it. More violations
+might be found when we incorporate all instances of error
+handling.
+
+</p><p>
+An <em>error-broken</em> channel is the inverse of an error-complete
+channel. In particular, the error code is either <em>unsaved</em>, <em>unchecked</em>, or <em>overwritten</em>.  For example, the function
+<tt><font size="-1">badTerminationEndpoint</font></tt> below carries an error-broken channel of
+unchecked type because the function saves the returned error code
+(line 2) but it never checks the error before the function exits
+(line 3):
+
+</p><p>
+</p><pre>   1 void badTerminationEndpoint() {
+   2     int err = generationEndpoint();
+   3     return;
+   4 }
+</pre>
+
+<p>
+An error-broken channel is a serious file system bug because it can
+lead to a silent failure.  In a few cases, we inject faults in
+error-broken channels to confirm the existence of silent failures.  We
+utilize our block-level fault injection
+technique&nbsp;[<a href="https://www.usenix.org/legacy/event/fast08/tech/full_papers/gunawi/gunawi_html/index.html#PrabhakaranEtAl05-SOSP">20</a>] to exercise error-broken
+channels that relate to disk I/O.  In a broken channel, we look for
+two pieces of information: which workload and which failure led us to
+that channel.  After finding the necessary information, we run the
+workload, inject the specific block failure, and observe the I/O
+traces and the returned error codes received in upper layers (<i>e.g.</i>, the
+application layer) to confirm whether a broken channel leads to a
+silent failure.  The reader will note that our fault-injection
+technique is limited to disk I/O related channels. To exercise all
+error-broken channels, techniques such as symbolic execution and
+directed
+testing&nbsp;[<a href="https://www.usenix.org/legacy/event/fast08/tech/full_papers/gunawi/gunawi_html/index.html#EnglerDunbar07-UnderConstrained">9</a>,<a href="https://www.usenix.org/legacy/event/fast08/tech/full_papers/gunawi/gunawi_html/index.html#GodefroidEtAl05-DART">10</a>]
+that simulate the environment of the component in test would be of
+great utility.
+
+</p><p>
+
+</p><h3><a name="SECTION00032400000000000000"><br>
+2.2.4 Limitations</a>
+</h3>
+
+<p>
+Error propagation has complex characteristics: correct error codes
+must be returned; each subsystem uses both generic and specific error
+codes; one error code could be mapped to another; error codes are
+stored not only in scalar variables but also in structures (<i>e.g.</i>,
+control blocks); and error codes flow not only through function calls
+but also asynchronously via interrupts and callbacks.
+In our static analysis, we have not modeled all these characteristics.
+Nevertheless, by just focusing on the propagation of basic error codes
+via function call, we have found numerous violations that need to be
+fixed.  A more complete tool that covers the properties above would
+uncover even more incorrect error handling.
+
+
+</p><h1><a name="SECTION00040000000000000000"></a>
+<a name="sec-result"></a><br>
+3 Results
+</h1>
+
+<p>
+We have performed EDP analysis on all file systems and storage device
+drivers in Linux 2.6.15.4.  Our analysis studies how 34 basic error
+codes (<i>e.g.</i>, <tt><font size="-1">EIO</font></tt> and <tt><font size="-1">ENOMEM</font></tt>) defined in
+<tt><font size="-1">include/asm-generic/errno-base.h</font></tt> propagate through these
+subsystems.  We examine these basic error codes because they involve
+thousands of functions and propagate across thousands of calls.
+
+</p><p>
+In these results, we distinguish two types of violations that make up
+an error-broken channel: unsaved and unchecked error codes
+(overwritten codes have been deferred to future work; see
+Section&nbsp;<a href="https://www.usenix.org/legacy/event/fast08/tech/full_papers/gunawi/gunawi_html/index.html#sec-future-overwritten">5.1</a> for more information).  
+An <em>unsaved error code</em> is found when a callee propagates an error
+code via the return value, but the caller does not save the return
+value (<i>i.e.</i>, it is treated as a void-returning call even though it
+actually returns an error code). Throughout the paper, we refer to
+this type of broken channel as a "<em>bad call</em>." An <em>unchecked
+error code</em> is found when a variable that may contain an error code is
+neither checked nor used in the future; we always refer to this case
+as an unchecked code.
+
+</p><p>
+
+</p><h2><a name="SECTION00041000000000000000"></a>
+<a name="sec-result-unsaved"></a>
+3.1 Unsaved Error Codes
+</h2>
+
+<p>
+First, we report the number of error-broken channels due to a caller
+simply not saving the returned error code (<i>i.e.</i>, the number of bad
+calls).  The simplified HFS code below shows an example of unsaved
+error code.  The function <tt><font size="-1">find_init</font></tt> accepts a new uninitialized
+<tt><font size="-1">find_data</font></tt> structure (line 2), allocates a memory space for the
+<tt><font size="-1">search_key</font></tt> field (line 3), and returns <tt><font size="-1">ENOMEM</font></tt> error code
+when the memory allocation fails (line 5).  However, one of its
+callers, <tt><font size="-1">file_lookup</font></tt>, does not save the returned error code
+(line 10) but tries to access the <tt><font size="-1">search_key</font></tt> field which still
+points to <tt><font size="-1">NULL</font></tt> (line 11).  Hence, a null-pointer dereference
+takes place and the system could crash or corrupt data.
+
+</p><p>
+</p><pre>   1 // hfs/bfind.c
+   2 int find_init(find_data *fd) {
+   3     fd-&gt;search_key = kmalloc(..)
+   4     if (!fd-&gt;search_key)
+   5         return -ENOMEM;
+   6     ...
+   7 }
+   8 // hfs/inode.c
+   9 int file_lookup() {
+  10     find_init(fd); /* NOT-SAVED E.C */
+  11     fd-&gt;search_key-&gt;cat = ...; /* BAD!! */
+  12     ...
+  13 }
+</pre>
+
+<p>
+To show how EDP is useful in finding error propagation bugs, we begin
+by showing a sample of EDP analysis for a simple file system, Apple
+HFS.  Then, we present our findings on all subsystems that we analyze,
+and finally discuss false positives.
+
+</p><p>
+
+<!-- ------------------------------------- HFS -->
+
+</p><h3><a name="SECTION00041100000000000000"><br>
+3.1.1 EDP on Apple HFS</a>
+</h3>
+
+<p>
+Figure&nbsp;<a href="https://www.usenix.org/legacy/event/fast08/tech/full_papers/gunawi/gunawi_html/index.html#fig-result-big">2</a> depicts the EDP output when analyzing the
+propagation of the 34 basic error codes in the Apple HFS file system.
+There are two important elements that EDP produces in order to ease
+the debugging process. First, EDP generates an error propagation graph
+that only includes functions and function calls through which the
+analyzed error codes propagate.  From the graph, one can easily catch
+all bad calls and functions that make the bad calls.  Second, EDP
+provides a table that presents more detailed information for each bad
+call (<i>e.g.</i>, the location where the bad call is made).
+
+
+</p><p><a name="fig-result-big"></a></p>
+
+<!-- table-->
+<table border="0" cellspacing="0" cellpadding="0" align="center">
+<tbody><tr><td>
+
+<!-- violation -->
+<div align="CENTER">
+</div><div align="CENTER"><div align="CENTER">
+</div><table width="323">
+<tbody><tr><td>
+    <table cellpadding="3" border="1" align="CENTER">
+<tbody><tr><td align="RIGHT" colspan="1"><font size="-1">
+    </font><font size="-1"><b>Viol#</b></font></td>
+<td align="CENTER" colspan="2"><font size="-1">
+    </font><font size="-1"><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Caller&nbsp;&nbsp;&#8594;&nbsp;&nbsp;Callee</b></font></td>
+<td align="LEFT" colspan="1"><font size="-1">
+    </font><font size="-1"><b>Filename</b></font></td>
+<td align="RIGHT" colspan="1"><font size="-1">
+    </font><font size="-1"><b>Line#</b></font></td>
+</tr>
+<tr><td align="CENTER"><font size="-1"> 
+    
+</font><font size="-1"><b>A</b> </font></td>
+<td align="RIGHT"><font size="-1">  file_lookup       </font></td>
+<td align="LEFT"><font size="-1">  find_init    </font></td>
+<td align="LEFT"><font size="-1">  inode.c     </font></td>
+<td align="RIGHT"><font size="-1">   493  </font></td>
+</tr>
+<tr><td align="CENTER"><font size="-1"> 
+</font><font size="-1"><b>B</b> </font></td>
+<td align="RIGHT"><font size="-1">  fill_super        </font></td>
+<td align="LEFT"><font size="-1">  find_init    </font></td>
+<td align="LEFT"><font size="-1">  super.c     </font></td>
+<td align="RIGHT"><font size="-1">   385  </font></td>
+</tr>
+<tr><td align="CENTER"><font size="-1"> 
+</font><font size="-1"><b>C</b> </font></td>
+<td align="RIGHT"><font size="-1">  lookup             </font></td>
+<td align="LEFT"><font size="-1">  find_init    </font></td>
+<td align="LEFT"><font size="-1">  dir.c       </font></td>
+<td align="RIGHT"><font size="-1">    30  </font></td>
+</tr>
+<tr><td align="CENTER"><font size="-1"> 
+</font><font size="-1"><b>D</b> </font></td>
+<td align="RIGHT"><font size="-1">  brec_updt_prnt   </font></td>
+<td align="LEFT"><font size="-1">  __brec_find    </font></td>
+<td align="LEFT"><font size="-1">  brec.c      </font></td>
+<td align="RIGHT"><font size="-1">   405  </font></td>
+</tr>
+<tr><td align="CENTER"><font size="-1"> 
+</font><font size="-1"><b>E</b> </font></td>
+<td align="RIGHT"><font size="-1">  brec_updt_prnt   </font></td>
+<td align="LEFT"><font size="-1">  __brec_find    </font></td>
+<td align="LEFT"><font size="-1">  brec.c      </font></td>
+<td align="RIGHT"><font size="-1">   345  </font></td>
+</tr>
+<tr><td align="CENTER"><font size="-1"> 
+</font><font size="-1"><b>F</b> </font></td>
+<td align="RIGHT"><font size="-1">  cat_delete        </font></td>
+<td align="LEFT"><font size="-1">  free_fork    </font></td>
+<td align="LEFT"><font size="-1">  catalog.c   </font></td>
+<td align="RIGHT"><font size="-1">   228  </font></td>
+</tr>
+<tr><td align="CENTER"><font size="-1"> 
+</font><font size="-1"><b>G</b> </font></td>
+<td align="RIGHT"><font size="-1">  cat_delete        </font></td>
+<td align="LEFT"><font size="-1">  find_init    </font></td>
+<td align="LEFT"><font size="-1">  catalog.c   </font></td>
+<td align="RIGHT"><font size="-1">   213  </font></td>
+</tr>
+<tr><td align="CENTER"><font size="-1"> 
+</font><font size="-1"><b>H</b> </font></td>
+<td align="RIGHT"><font size="-1">  cat_create        </font></td>
+<td align="LEFT"><font size="-1">  find_init    </font></td>
+<td align="LEFT"><font size="-1">  catalog.c   </font></td>
+<td align="RIGHT"><font size="-1">    95  </font></td>
+</tr>
+<tr><td align="CENTER"><font size="-1"> 
+</font><font size="-1"><b>I</b> </font></td>
+<td align="RIGHT"><font size="-1">  file_trunc        </font></td>
+<td align="LEFT"><font size="-1">  free_exts    </font></td>
+<td align="LEFT"><font size="-1">  extent.c    </font></td>
+<td align="RIGHT"><font size="-1">   507  </font></td>
+</tr>
+<tr><td align="CENTER"><font size="-1"> 
+</font><font size="-1"><b>J</b> </font></td>
+<td align="RIGHT"><font size="-1">  file_trunc        </font></td>
+<td align="LEFT"><font size="-1">  free_exts    </font></td>
+<td align="LEFT"><font size="-1">  extent.c    </font></td>
+<td align="RIGHT"><font size="-1">   497  </font></td>
+</tr>
+<tr><td align="CENTER"><font size="-1"> 
+</font><font size="-1"><b>K</b> </font></td>
+<td align="RIGHT"><font size="-1">  file_trunc        </font></td>
+<td align="LEFT"><font size="-1">  find_init    </font></td>
+<td align="LEFT"><font size="-1">  extent.c    </font></td>
+<td align="RIGHT"><font size="-1">   494  </font></td>
+</tr>
+<tr><td align="CENTER"><font size="-1"> 
+</font><font size="-1"><b>L</b> </font></td>
+<td align="RIGHT"><font size="-1">  ext_write_ext    </font></td>
+<td align="LEFT"><font size="-1">  find_init    </font></td>
+<td align="LEFT"><font size="-1">  extent.c    </font></td>
+<td align="RIGHT"><font size="-1">   135  </font></td>
+</tr>
+<tr><td align="CENTER"><font size="-1"> 
+</font><font size="-1"><b>M</b> </font></td>
+<td align="RIGHT"><font size="-1">  ext_read_ext     </font></td>
+<td align="LEFT"><font size="-1">  find_init    </font></td>
+<td align="LEFT"><font size="-1">  extent.c    </font></td>
+<td align="RIGHT"><font size="-1">   188  </font></td>
+</tr>
+<tr><td align="CENTER"><font size="-1"> 
+</font><font size="-1"><b>N</b> </font></td>
+<td align="RIGHT"><font size="-1">  brec_rmv          </font></td>
+<td align="LEFT"><font size="-1">  __brec_find    </font></td>
+<td align="LEFT"><font size="-1">  brec.c      </font></td>
+<td align="RIGHT"><font size="-1">   193  </font></td>
+</tr>
+<tr><td align="CENTER"><font size="-1"> 
+</font><font size="-1"><b>O</b> </font></td>
+<td align="RIGHT"><font size="-1">  readdir            </font></td>
+<td align="LEFT"><font size="-1">  find_init    </font></td>
+<td align="LEFT"><font size="-1">  dir.c       </font></td>
+<td align="RIGHT"><font size="-1">    68  </font></td>
+</tr>
+<tr><td align="CENTER"><font size="-1"> 
+</font><font size="-1"><b>P</b> </font></td>
+<td align="RIGHT"><font size="-1">  cat_move          </font></td>
+<td align="LEFT"><font size="-1">  find_init    </font></td>
+<td align="LEFT"><font size="-1">  catalog.c   </font></td>
+<td align="RIGHT"><font size="-1">   280  </font></td>
+</tr>
+<tr><td align="CENTER"><font size="-1"> 
+</font><font size="-1"><b>Q</b> </font></td>
+<td align="RIGHT"><font size="-1">  brec_insert       </font></td>
+<td align="LEFT"><font size="-1">  __brec_find    </font></td>
+<td align="LEFT"><font size="-1">  brec.c      </font></td>
+<td align="RIGHT"><font size="-1">   145  </font></td>
+</tr>
+<tr><td align="CENTER"><font size="-1"> 
+</font><font size="-1"><b>R</b> </font></td>
+<td align="RIGHT"><font size="-1">  free_fork         </font></td>
+<td align="LEFT"><font size="-1">  free_exts    </font></td>
+<td align="LEFT"><font size="-1">  extent.c    </font></td>
+<td align="RIGHT"><font size="-1">   307  </font></td>
+</tr>
+<tr><td align="CENTER"><font size="-1"> 
+</font><font size="-1"><b>S</b> </font></td>
+<td align="RIGHT"><font size="-1">  free_fork         </font></td>
+<td align="LEFT"><font size="-1">  find_init    </font></td>
+<td align="LEFT"><font size="-1">  extent.c    </font></td>
+<td align="RIGHT"><font size="-1">   301  </font></td>
+</tr>
+</tbody></table>
+    </td></tr>
+</tbody></table>
+
+
+</div></td>
+<td>
+<img src="./Error Handling is Ocassionally Correct_files/fig-result-big-legend.gif">
+</td></tr>
+<tr>
+<td colspan="2">
+<img src="./Error Handling is Ocassionally Correct_files/fig-result-big.gif">
+</td></tr>
+</tbody></table>
+
+<br>
+<font size="-1"><i>
+Figure 2: <b>A Sample of EDP Output.</b> The lower figure
+depicts the EDP output for the HFS file system.  Some function names
+have been shortened to improve readability.  As summarized in the
+upper right legend, a gray node with a thicker border represents a
+function that generates an error code.  The other gray node represents
+the same thing, but the function also propagates the error code
+received from its callee. A white node represents a good function,
+i.e. it either propagates the error code to its caller or if it does
+not propagate the error code it minimally checks the error code.  A
+black node represents an error-broken termination endpoint, i.e. it is
+a function that commits the violation of unsaved error codes.  The
+darker and thicker edge coming out from a black node implies a broken
+error channel (a bad call); an error code actually flows from its
+callee, but the caller drops the error code.  For ease of debugging,
+each bad call is labeled with a violation number whose detailed
+information can be found in the upper left violation table.  For
+example, violation #E found in the bottom left corner of the graph is
+a bad call made by <tt>brec_updt_prnt</tt> when calling <tt>__brec_find</tt>, 
+which can be located in <tt>fs/hfs/brec.c</tt> line
+345. 
+</i></font>
+<br>
+
+
+
+<p>
+Using the information that EDP provides, we found three major
+error-handling inconsistencies in HFS.  First, 11 out of 14 calls to
+<tt><font size="-1">find_init</font></tt> drop the returned error codes. As described earlier in
+this section, this bug could cause the system to crash or corrupt
+data.  Second, 4 out of 5 total calls to the function
+<tt><font size="-1">__brec_find</font></tt> are bad calls (as indicated by the four black
+edges, E, D, N, and Q, found in the lower left of the graph).  The
+task of this function is to find a record in an HFS node that best
+matches the given key, and return <tt><font size="-1">ENOENT</font></tt> (no entry) error code if
+it fails. The only call that saves this error code is made by the
+wrapper, <tt><font size="-1">brec_find</font></tt>.  Interestingly, all 18 calls to this wrapper
+propagate the error code properly (as indicated by all gray edges
+coming into the function).
+
+</p><p>
+Finally, 3 out of 4 calls to <tt><font size="-1">free_exts</font></tt> do not save the returned
+error code (labeled R, I, and J). This function traverses a list of
+extents and locates the extents to be freed. If the extents cannot be
+found, the function returns <tt><font size="-1">EIO</font></tt>. More interestingly, the
+developer wrote a comment "panic?" just before the return statement
+(maybe in the hope that in this failure case the callers will call
+panic, which will never happen if the error code is dropped).  By and
+large, we found similar inconsistencies in all the subsystems we
+analyzed. The fact that the fraction of bad calls over all calls to a
+function is generally high is intriguing, and will be discussed
+further in Section&nbsp;<a href="https://www.usenix.org/legacy/event/fast08/tech/full_papers/gunawi/gunawi_html/index.html#sec-analysis-inconsistent">4.3</a>.
+
+
+
+
+<!-- ------------------------------------- all -->
+
+</p><h3><a name="SECTION00041200000000000000"><br>
+3.1.2 EDP on All File Systems and Storage Drivers</a>
+</h3>
+
+<p>
+Figure&nbsp;<a href="https://www.usenix.org/legacy/event/fast08/tech/full_papers/gunawi/gunawi_html/index.html#fig-result-small-1">3</a> and&nbsp;<a href="https://www.usenix.org/legacy/event/fast08/tech/full_papers/gunawi/gunawi_html/index.html#fig-result-small-2">4</a> show EDP
+outputs for six more file systems whose error-propagation graphs
+represent an interesting sample.  EDP outputs for the rest of the file
+systems can be downloaded from our web site&nbsp;[<a href="https://www.usenix.org/legacy/event/fast08/tech/full_papers/gunawi/gunawi_html/index.html#EdpOutput">11</a>].
+A small file system such as HFS+ has simple propagation chains, yet
+bad calls are still made. More complex error propagation can be seen
+in ext3, ReiserFS, and IBM JFS; within these file systems, error-codes
+propagate throughout 180 to 340 function calls. The error propagation
+in NFS is more structured compared to other file systems. Finally,
+among all file systems we analyze, XFS has the most complex error
+propagation chain; almost 1500 function calls propagate error-codes.
+Note that each graph in Figures&nbsp;<a href="https://www.usenix.org/legacy/event/fast08/tech/full_papers/gunawi/gunawi_html/index.html#fig-result-small-1">3</a>
+and&nbsp;<a href="https://www.usenix.org/legacy/event/fast08/tech/full_papers/gunawi/gunawi_html/index.html#fig-result-small-2">4</a> was produced by analyzing each file
+system in isolation (<i>i.e.</i>, the graph only shows intra-module but not
+inter-module calls), yet they already illustrate the complexity of
+error code propagation in each file system.  Manual code inspection
+would require a tremendous amount of work to find error-propagation
+bugs.
+
+
+
+
+
+</p><p>
+
+</p><p>
+
+</p><div align="CENTER">
+
+<p><a name="fig-result-small-1"></a></p><div align="CENTER">
+<font size="+1"><b>HFS+</b></font>&nbsp;&nbsp;&nbsp;[ 22 bad / 84 calls, 26%] </div>
+  <br>
+<br>
+  <div align="CENTER">
+<img src="./Error Handling is Ocassionally Correct_files/fig-result-small-hfsplus.gif">
+</div>
+  <br>
+  
+  <br>
+<br>
+  <div align="CENTER">
+<font size="+1"><b>ext3</b></font>&nbsp;&nbsp;&nbsp;[ 37 bad / 188 calls, 20%] </div>
+  <br>
+<br>
+  <div align="CENTER">
+<img src="./Error Handling is Ocassionally Correct_files/fig-result-small-ext3.gif">
+</div>
+  <br>
+</div>
+  
+  <br>
+<br>
+  <div align="CENTER">
+<font size="+1"><b>ReiserFS</b></font>&nbsp;&nbsp;&nbsp;[ 35 bad / 218 calls, 16% ] </div>
+  <br>
+<br>
+  <div align="CENTER">
+<img src="./Error Handling is Ocassionally Correct_files/fig-result-small-reiserfs.gif"></div>
+  <br>
+<br> <br>
+<font size="-1"><i>
+Figure 3: <b>More Samples of EDP Output.</b>
+The figures illustrate the prevalent problem of incomplete
+error-propagation across different types of file systems. Details such
+as function names and violation numbers have been removed.  Gray edges
+represent calls that propagate error codes.  Black edges represent bad
+calls.  The number of edges are reported in [ X / Y , Z% ] format where X and
+Y represent the number of black and all (gray and black) edges
+respectively, and Z represents the fraction of X and Y.  For more
+information, please see the legend in Figure 2. </i></font>
+<br>
+
+
+
+<p>
+
+</p><p>
+
+</p><div align="CENTER">
+
+<p><a name="fig-result-small-2"></a></p><div align="CENTER">
+<font size="+1"><b>IBM JFS</b></font>&nbsp;&nbsp;&nbsp;[ 61 bad / 340 calls, 18% ]</div>
+ 
+  <br>
+<br>
+  <div align="CENTER">
+<img src="./Error Handling is Ocassionally Correct_files/fig-result-small-jfs.gif"></div>
+  <br>
+  
+  <br>
+<br>
+  <div align="CENTER">
+<font size="+1"><b>NFS Client</b></font>&nbsp;&nbsp;&nbsp;[ 54 bad / 446 calls, 12% ]</div>
+ 
+  <br>
+<br>
+  <div align="CENTER">
+<img src="./Error Handling is Ocassionally Correct_files/fig-result-small-nfs.gif"></div>
+  <br>
+  
+  <br>
+<br>
+  <div align="CENTER">
+<font size="+1"><b>XFS</b></font>&nbsp;&nbsp;&nbsp;[ 105 bad / 1453 calls, 7% ]</div>
+ 
+  <br>
+<br>
+  <div align="CENTER">
+<img src="./Error Handling is Ocassionally Correct_files/fig-result-small-xfs.gif"></div>
+  <br>
+<br>
+<br>
+<font size="-1"><i>
+Figure 4: <b>More Samples of EDP Output (Cont'd).</b>
+Please see caption in Figure 3.</i></font>
+<br>
+
+</div>
+
+
+
+<!-- table all -->
+<p>
+Next, we analyzed the propagation of error codes across all file
+systems and storage device drivers as a whole. All inter-module calls
+were connected by our EDP channel constructor, which connects all
+function pointer calls; hence, we were able to catch inter-module bad
+calls in addition to intra-module ones.  Table&nbsp;<a href="https://www.usenix.org/legacy/event/fast08/tech/full_papers/gunawi/gunawi_html/index.html#table-result-all">2</a>
+summarizes our findings. Note that the number of violations reported
+is higher than the ones reported in
+Figures&nbsp;<a href="https://www.usenix.org/legacy/event/fast08/tech/full_papers/gunawi/gunawi_html/index.html#fig-result-big">2</a>,&nbsp;<a href="https://www.usenix.org/legacy/event/fast08/tech/full_papers/gunawi/gunawi_html/index.html#fig-result-small-1">3</a>,
+and&nbsp;<a href="https://www.usenix.org/legacy/event/fast08/tech/full_papers/gunawi/gunawi_html/index.html#fig-result-small-2">4</a> because we catch more bugs when we
+analyze each file system in conjunction with other subsystems (<i>e.g.</i>,
+ext3 with the journaling layer, VFS, and the memory management).
+
+</p><p>
+Surprisingly, out of 9022 error channels, 1153 (or nearly 13%)
+constitute bad calls.  This appears to be a long-standing problem.  We
+ran a partial analysis in Linux 2.4 (not shown) and found that the
+magnitude of incomplete error code propagation is essentially the
+same.  In Section&nbsp;<a href="https://www.usenix.org/legacy/event/fast08/tech/full_papers/gunawi/gunawi_html/index.html#sec-analysis">4</a>, we try to dissect the root
+causes of this problem.
+
+
+
+<a name="table-result-all"></a>
+<table border="0" align="center" cellspacing="50" cellpadding="0">
+<tbody><tr><td>
+<p>
+<table cellpadding="3" cellspacing="0" border="1" align="center">
+<tbody><tr><td colspan="6" align="center" bgcolor="#FFFFCC">
+    <font size="+1"><b>File Systems</b></font></td>
+</tr>
+<tr bgcolor="#FFFFCC">
+    <td aligh="center"><font size="-1" color="white">.</font></td>
+    <td aligh="center"><b><font size="-1">Bad Calls</font></b></td>
+    <td aligh="center"><b><font size="-1">EC Calls</font></b></td>
+    <td aligh="center"><b><font size="-1">Size (kloc)</font></b></td>
+    <td aligh="center"><b><font size="-1">Frac (%)</font></b></td>
+    <td aligh="center"><b><font size="-1">Viol/kloc</font></b></td>
+</tr>
+<tr><td><font size="-1">XFS              </font></td> <td align="right"><font size="-1"><b> 101 </b></font></td><td align="right"><font size="-1"> 1457 </font></td><td align="right"><font size="-1">  71 </font></td><td align="right"><font size="-1">  6.9 </font></td><td align="right"><font size="-1">  1.4 </font></td></tr> <!-- fs/xfs/ -->
+<tr><td><font size="-1">Virtual FS       </font></td> <td align="right"><font size="-1"><b>  96 </b></font></td><td align="right"><font size="-1"> 1149 </font></td><td align="right"><font size="-1">  34 </font></td><td align="right"><font size="-1">  8.4 </font></td><td align="right"><font size="-1">  2.9 </font></td></tr> <!-- fs/vfs/ -->
+<tr><td><font size="-1">IBM JFS          </font></td> <td align="right"><font size="-1"><b>  95 </b></font></td><td align="right"><font size="-1">  390 </font></td><td align="right"><font size="-1">  17 </font></td><td align="right"><font size="-1"> 24.4 </font></td><td align="right"><font size="-1">  5.6 </font></td></tr> <!-- fs/jfs/ -->
+<tr><td><font size="-1">ext3             </font></td> <td align="right"><font size="-1"><b>  80 </b></font></td><td align="right"><font size="-1">  362 </font></td><td align="right"><font size="-1">  12 </font></td><td align="right"><font size="-1"> 22.1 </font></td><td align="right"><font size="-1">  7.2 </font></td></tr> <!-- fs/ext3/ -->
+<tr><td><font size="-1">NFS Client       </font></td> <td align="right"><font size="-1"><b>  62 </b></font></td><td align="right"><font size="-1">  482 </font></td><td align="right"><font size="-1">  18 </font></td><td align="right"><font size="-1"> 12.9 </font></td><td align="right"><font size="-1">  3.6 </font></td></tr> <!-- fs/nfs/ -->
+<tr><td><font size="-1">CIFS             </font></td> <td align="right"><font size="-1"><b>  43 </b></font></td><td align="right"><font size="-1">  339 </font></td><td align="right"><font size="-1">  21 </font></td><td align="right"><font size="-1"> 12.7 </font></td><td align="right"><font size="-1">  2.1 </font></td></tr> <!-- fs/cifs/ -->
+<tr><td><font size="-1">ReiserFS         </font></td> <td align="right"><font size="-1"><b>  42 </b></font></td><td align="right"><font size="-1">  399 </font></td><td align="right"><font size="-1">  24 </font></td><td align="right"><font size="-1"> 10.5 </font></td><td align="right"><font size="-1">  1.8 </font></td></tr> <!-- fs/reiserfs/ -->
+<tr><td><font size="-1">Mem. Mgmt.       </font></td> <td align="right"><font size="-1"><b>  40 </b></font></td><td align="right"><font size="-1">  351 </font></td><td align="right"><font size="-1">  20 </font></td><td align="right"><font size="-1"> 11.4 </font></td><td align="right"><font size="-1">  2.0 </font></td></tr> <!-- mm/ -->
+<tr><td><font size="-1">Apple HFS+       </font></td> <td align="right"><font size="-1"><b>  25 </b></font></td><td align="right"><font size="-1">   98 </font></td><td align="right"><font size="-1">   7 </font></td><td align="right"><font size="-1"> 25.5 </font></td><td align="right"><font size="-1">  3.7 </font></td></tr> <!-- fs/hfsplus/ -->
+<tr><td><font size="-1">JFFS v2          </font></td> <td align="right"><font size="-1"><b>  24 </b></font></td><td align="right"><font size="-1">  153 </font></td><td align="right"><font size="-1">  11 </font></td><td align="right"><font size="-1"> 15.7 </font></td><td align="right"><font size="-1">  2.2 </font></td></tr> <!-- fs/jffs2/ --> <!-- break drivers -->
+<tr><td><font size="-1">Apple HFS        </font></td> <td align="right"><font size="-1"><b>  20 </b></font></td><td align="right"><font size="-1">   76 </font></td><td align="right"><font size="-1">   5 </font></td><td align="right"><font size="-1"> 26.3 </font></td><td align="right"><font size="-1">  4.8 </font></td></tr> <!-- fs/hfs/ -->
+<tr><td><font size="-1">SMB              </font></td> <td align="right"><font size="-1"><b>  19 </b></font></td><td align="right"><font size="-1">  196 </font></td><td align="right"><font size="-1">   6 </font></td><td align="right"><font size="-1">  9.7 </font></td><td align="right"><font size="-1">  3.5 </font></td></tr> <!-- fs/smbfs/ -->
+<tr><td><font size="-1">ext2             </font></td> <td align="right"><font size="-1"><b>  18 </b></font></td><td align="right"><font size="-1">  103 </font></td><td align="right"><font size="-1">   6 </font></td><td align="right"><font size="-1"> 17.5 </font></td><td align="right"><font size="-1">  3.3 </font></td></tr> <!-- fs/ext2/ -->
+<tr><td><font size="-1">AFS              </font></td> <td align="right"><font size="-1"><b>  16 </b></font></td><td align="right"><font size="-1">   62 </font></td><td align="right"><font size="-1">   7 </font></td><td align="right"><font size="-1"> 25.8 </font></td><td align="right"><font size="-1">  2.6 </font></td></tr> <!-- fs/afs/ -->
+<tr><td><font size="-1">NTFS             </font></td> <td align="right"><font size="-1"><b>  15 </b></font></td><td align="right"><font size="-1">  186 </font></td><td align="right"><font size="-1">  18 </font></td><td align="right"><font size="-1">  8.1 </font></td><td align="right"><font size="-1">  0.9 </font></td></tr> <!-- fs/ntfs/ -->
+<tr><td><font size="-1">NFS Server       </font></td> <td align="right"><font size="-1"><b>  15 </b></font></td><td align="right"><font size="-1">  265 </font></td><td align="right"><font size="-1">  14 </font></td><td align="right"><font size="-1">  5.7 </font></td><td align="right"><font size="-1">  1.2 </font></td></tr> <!-- fs/nfsd/ -->
+<tr><td><font size="-1">NCP              </font></td> <td align="right"><font size="-1"><b>  13 </b></font></td><td align="right"><font size="-1">  169 </font></td><td align="right"><font size="-1">   5 </font></td><td align="right"><font size="-1">  7.7 </font></td><td align="right"><font size="-1">  2.6 </font></td></tr> <!-- fs/ncpfs/ -->
+<tr><td><font size="-1">UFS              </font></td> <td align="right"><font size="-1"><b>  12 </b></font></td><td align="right"><font size="-1">   44 </font></td><td align="right"><font size="-1">   5 </font></td><td align="right"><font size="-1"> 27.3 </font></td><td align="right"><font size="-1">  2.6 </font></td></tr> <!-- fs/ufs/ -->
+<tr><td><font size="-1">JBD              </font></td> <td align="right"><font size="-1"><b>  10 </b></font></td><td align="right"><font size="-1">   43 </font></td><td align="right"><font size="-1">   4 </font></td><td align="right"><font size="-1"> 23.3 </font></td><td align="right"><font size="-1">  2.6 </font></td></tr> <!-- fs/jbd/ -->
+<tr><td><font size="-1">FAT              </font></td> <td align="right"><font size="-1"><b>   9 </b></font></td><td align="right"><font size="-1">   81 </font></td><td align="right"><font size="-1">   4 </font></td><td align="right"><font size="-1"> 11.1 </font></td><td align="right"><font size="-1">  2.9 </font></td></tr> <!-- fs/fat/ -->
+<tr><td><font size="-1">Plan 9           </font></td> <td align="right"><font size="-1"><b>   9 </b></font></td><td align="right"><font size="-1">   80 </font></td><td align="right"><font size="-1">   4 </font></td><td align="right"><font size="-1"> 11.2 </font></td><td align="right"><font size="-1">  2.4 </font></td></tr> <!-- fs/9p/ -->
+<tr><td><font size="-1">System V         </font></td> <td align="right"><font size="-1"><b>   7 </b></font></td><td align="right"><font size="-1">   30 </font></td><td align="right"><font size="-1">   3 </font></td><td align="right"><font size="-1"> 23.3 </font></td><td align="right"><font size="-1">  3.2 </font></td></tr> <!-- fs/sysv/ -->
+<tr><td><font size="-1">JFFS             </font></td> <td align="right"><font size="-1"><b>   7 </b></font></td><td align="right"><font size="-1">   56 </font></td><td align="right"><font size="-1">   5 </font></td><td align="right"><font size="-1"> 12.5 </font></td><td align="right"><font size="-1">  1.4 </font></td></tr> <!-- fs/jffs/ -->
+<tr><td><font size="-1">UDF              </font></td> <td align="right"><font size="-1"><b>   6 </b></font></td><td align="right"><font size="-1">   50 </font></td><td align="right"><font size="-1">   9 </font></td><td align="right"><font size="-1"> 12.0 </font></td><td align="right"><font size="-1">  0.7 </font></td></tr> <!-- fs/udf/ -->
+<tr><td><font size="-1">MSDOS            </font></td> <td align="right"><font size="-1"><b>   5 </b></font></td><td align="right"><font size="-1">   39 </font></td><td align="right"><font size="-1">   1 </font></td><td align="right"><font size="-1"> 12.8 </font></td><td align="right"><font size="-1">  9.3 </font></td></tr> <!-- fs/msdos/ -->
+<tr><td><font size="-1">VFAT             </font></td> <td align="right"><font size="-1"><b>   4 </b></font></td><td align="right"><font size="-1">   39 </font></td><td align="right"><font size="-1">   1 </font></td><td align="right"><font size="-1"> 10.3 </font></td><td align="right"><font size="-1">  5.0 </font></td></tr> <!-- fs/vfat/ -->
+<tr><td><font size="-1">Minix            </font></td> <td align="right"><font size="-1"><b>   4 </b></font></td><td align="right"><font size="-1">   31 </font></td><td align="right"><font size="-1">   4 </font></td><td align="right"><font size="-1"> 12.9 </font></td><td align="right"><font size="-1">  1.2 </font></td></tr> <!-- fs/minix/ -->
+<tr><td><font size="-1">FUSE             </font></td> <td align="right"><font size="-1"><b>   4 </b></font></td><td align="right"><font size="-1">   48 </font></td><td align="right"><font size="-1">   3 </font></td><td align="right"><font size="-1">  8.3 </font></td><td align="right"><font size="-1">  1.5 </font></td></tr> <!-- fs/fuse/ --> <!-- break fs -->
+<tr><td><font size="-1">Automounter4     </font></td> <td align="right"><font size="-1"><b>   4 </b></font></td><td align="right"><font size="-1">   53 </font></td><td align="right"><font size="-1">   2 </font></td><td align="right"><font size="-1">  7.5 </font></td><td align="right"><font size="-1">  2.7 </font></td></tr> <!-- fs/autofs4/ -->
+<tr><td><font size="-1">NFS Lockd        </font></td> <td align="right"><font size="-1"><b>   3 </b></font></td><td align="right"><font size="-1">   21 </font></td><td align="right"><font size="-1">   4 </font></td><td align="right"><font size="-1"> 14.3 </font></td><td align="right"><font size="-1">  0.8 </font></td></tr> <!-- fs/lockd/ -->
+<tr><td><font size="-1">Relayfs          </font></td> <td align="right"><font size="-1"><b>   2 </b></font></td><td align="right"><font size="-1">    5 </font></td><td align="right"><font size="-1">   1 </font></td><td align="right"><font size="-1"> 40.0 </font></td><td align="right"><font size="-1">  2.7 </font></td></tr> <!-- fs/relayfs/ -->
+<tr><td><font size="-1">Partitions       </font></td> <td align="right"><font size="-1"><b>   2 </b></font></td><td align="right"><font size="-1">    3 </font></td><td align="right"><font size="-1">   4 </font></td><td align="right"><font size="-1"> 66.7 </font></td><td align="right"><font size="-1">  0.6 </font></td></tr> <!-- fs/partitions/ -->
+<tr><td><font size="-1">ISO              </font></td> <td align="right"><font size="-1"><b>   2 </b></font></td><td align="right"><font size="-1">   19 </font></td><td align="right"><font size="-1">   3 </font></td><td align="right"><font size="-1"> 10.5 </font></td><td align="right"><font size="-1">  0.7 </font></td></tr> <!-- fs/isofs/ -->
+<tr><td><font size="-1">HugeTLB Sup      </font></td> <td align="right"><font size="-1"><b>   2 </b></font></td><td align="right"><font size="-1">   10 </font></td><td align="right"><font size="-1">   1 </font></td><td align="right"><font size="-1"> 20.0 </font></td><td align="right"><font size="-1">  3.0 </font></td></tr> <!-- fs/hugetlbfs/ -->
+<tr><td><font size="-1">Compr. ROM       </font></td> <td align="right"><font size="-1"><b>   2 </b></font></td><td align="right"><font size="-1">    3 </font></td><td align="right"><font size="-1">   1 </font></td><td align="right"><font size="-1"> 66.7 </font></td><td align="right"><font size="-1">  4.5 </font></td></tr> <!-- fs/cramfs/ -->
+<tr><td><font size="-1">ADFS             </font></td> <td align="right"><font size="-1"><b>   2 </b></font></td><td align="right"><font size="-1">   30 </font></td><td align="right"><font size="-1">   2 </font></td><td align="right"><font size="-1">  6.7 </font></td><td align="right"><font size="-1">  1.3 </font></td></tr> <!-- fs/adfs/ -->
+<tr><td><font size="-1">sysfs sup.       </font></td> <td align="right"><font size="-1"><b>   1 </b></font></td><td align="right"><font size="-1">   29 </font></td><td align="right"><font size="-1">   2 </font></td><td align="right"><font size="-1">  3.4 </font></td><td align="right"><font size="-1">  0.8 </font></td></tr> <!-- fs/sysfs/ -->
+<tr><td><font size="-1">romfs sup.       </font></td> <td align="right"><font size="-1"><b>   1 </b></font></td><td align="right"><font size="-1">    3 </font></td><td align="right"><font size="-1">   1 </font></td><td align="right"><font size="-1"> 33.3 </font></td><td align="right"><font size="-1">  2.4 </font></td></tr> <!-- fs/romfs/ -->
+<tr><td><font size="-1">ramfs sup.       </font></td> <td align="right"><font size="-1"><b>   1 </b></font></td><td align="right"><font size="-1">    6 </font></td><td align="right"><font size="-1">   1 </font></td><td align="right"><font size="-1"> 16.7 </font></td><td align="right"><font size="-1">  6.0 </font></td></tr> <!-- fs/ramfs/ -->
+<tr><td><font size="-1">QNX 4            </font></td> <td align="right"><font size="-1"><b>   1 </b></font></td><td align="right"><font size="-1">    8 </font></td><td align="right"><font size="-1">   2 </font></td><td align="right"><font size="-1"> 12.5 </font></td><td align="right"><font size="-1">  0.9 </font></td></tr> <!-- fs/qnx4/ -->
+<tr><td><font size="-1">proc fs sup.     </font></td> <td align="right"><font size="-1"><b>   1 </b></font></td><td align="right"><font size="-1">   44 </font></td><td align="right"><font size="-1">   6 </font></td><td align="right"><font size="-1">  2.3 </font></td><td align="right"><font size="-1">  0.2 </font></td></tr> <!-- fs/proc/ -->
+<tr><td><font size="-1">OS/2 HPFS        </font></td> <td align="right"><font size="-1"><b>   1 </b></font></td><td align="right"><font size="-1">   18 </font></td><td align="right"><font size="-1">   6 </font></td><td align="right"><font size="-1">  5.6 </font></td><td align="right"><font size="-1">  0.2 </font></td></tr> <!-- fs/hpfs/ -->
+<tr><td><font size="-1">FreeVxFS         </font></td> <td align="right"><font size="-1"><b>   1 </b></font></td><td align="right"><font size="-1">    4 </font></td><td align="right"><font size="-1">   2 </font></td><td align="right"><font size="-1"> 25.0 </font></td><td align="right"><font size="-1">  0.7 </font></td></tr> <!-- fs/freevxfs/ -->
+<tr><td><font size="-1">EFS              </font></td> <td align="right"><font size="-1"><b>   1 </b></font></td><td align="right"><font size="-1">    3 </font></td><td align="right"><font size="-1">   1 </font></td><td align="right"><font size="-1"> 33.3 </font></td><td align="right"><font size="-1">  1.4 </font></td></tr> <!-- fs/efs/ -->
+<tr><td><font size="-1">devpts           </font></td> <td align="right"><font size="-1"><b>   1 </b></font></td><td align="right"><font size="-1">    2 </font></td><td align="right"><font size="-1">   1 </font></td><td align="right"><font size="-1"> 50.0 </font></td><td align="right"><font size="-1">  6.2 </font></td></tr> <!-- fs/devpts/ -->
+<tr><td><font size="-1">Boot FS          </font></td> <td align="right"><font size="-1"><b>   1 </b></font></td><td align="right"><font size="-1">    9 </font></td><td align="right"><font size="-1">   1 </font></td><td align="right"><font size="-1"> 11.1 </font></td><td align="right"><font size="-1">  1.2 </font></td></tr> <!-- fs/bfs/ -->
+<tr><td><font size="-1">BeOS             </font></td> <td align="right"><font size="-1"><b>   1 </b></font></td><td align="right"><font size="-1">    5 </font></td><td align="right"><font size="-1">   3 </font></td><td align="right"><font size="-1"> 20.0 </font></td><td align="right"><font size="-1">  0.5 </font></td></tr> <!-- fs/befs/ -->
+<tr><td><font size="-1">Automounter      </font></td> <td align="right"><font size="-1"><b>   1 </b></font></td><td align="right"><font size="-1">   41 </font></td><td align="right"><font size="-1">   2 </font></td><td align="right"><font size="-1">  2.4 </font></td><td align="right"><font size="-1">  1.0 </font></td></tr> <!-- fs/autofs/ -->
+<tr><td><font size="-1">Amiga FFS        </font></td> <td align="right"><font size="-1"><b>   1 </b></font></td><td align="right"><font size="-1">   34 </font></td><td align="right"><font size="-1">   3 </font></td><td align="right"><font size="-1">  2.9 </font></td><td align="right"><font size="-1">  0.3 </font></td></tr> <!-- fs/affs/ -->
+<tr><td><font size="-1">exportfs sup.    </font></td> <td align="right"><font size="-1"><b>   0 </b></font></td><td align="right"><font size="-1">    1 </font></td><td align="right"><font size="-1">   1 </font></td><td align="right"><font size="-1">  0.0 </font></td><td align="right"><font size="-1">  0.0 </font></td></tr> <!-- fs/exportfs/ -->
+<tr><td><font size="-1">Coda             </font></td> <td align="right"><font size="-1"><b>   0 </b></font></td><td align="right"><font size="-1">  149 </font></td><td align="right"><font size="-1">   3 </font></td><td align="right"><font size="-1">  0.0 </font></td><td align="right"><font size="-1">  0.0 </font></td></tr> <!-- fs/coda/ -->
+<tr><td><font size="-1"><b> Total</b>    </font></td> <td align="right"><font size="-1"><b>   0 </b></font></td><td align="right"><font size="-1"> 7278 </font></td><td align="right"><font size="-1"> 366 </font></td><td align="right"><font size="-1">   -- </font></td><td align="right"><font size="-1">   -- </font></td></tr> <!-- TOTAL = 51 -->
+<tr><td><font size="-1"><b> Average</b>  </font></td> <td align="right"><font size="-1"><b> 16.3 </b></font></td><td align="right"><font size="-1"> 142.7 </font></td><td align="right"><font size="-1">  7.2 </font></td><td align="right"><font size="-1"><b> 17.0 </b></font></td><td align="right"><font size="-1"><b>  2.4 </b></font></td></tr> <!-- 51 -->
+</tbody></table>
+</p></td><td valign="top">
+<p>
+<table cellpadding="3" cellspacing="0" border="1" align="center">
+<tbody><tr><td colspan="6" align="center" bgcolor="#FFFFCC">
+    <font size="+1"><b>Storage Drivers</b></font></td>
+</tr>
+<tr bgcolor="#FFFFCC">
+    <td aligh="center"><font size="-1" color="white">.</font></td>
+    <td aligh="center"><b><font size="-1">Bad Calls</font></b></td>
+    <td aligh="center"><b><font size="-1">EC Calls</font></b></td>
+    <td aligh="center"><b><font size="-1">Size (kloc)</font></b></td>
+    <td aligh="center"><b><font size="-1">Frac (%)</font></b></td>
+    <td aligh="center"><b><font size="-1">Viol/kloc</font></b></td>
+</tr>
+<tr><td><font size="-1">SCSI (root)         </font></td> <td align="right"><font size="-1"><b> 123 </b></font></td><td align="right"><font size="-1">  628 </font></td><td align="right"><font size="-1"> 198 </font></td><td align="right"><font size="-1"> 19.6 </font></td><td align="right"><font size="-1">  0.6 </font></td></tr> <!-- drivers/scsi/root/ -->
+<tr><td><font size="-1">IDE (root)          </font></td> <td align="right"><font size="-1"><b>  53 </b></font></td><td align="right"><font size="-1">  223 </font></td><td align="right"><font size="-1">  15 </font></td><td align="right"><font size="-1"> 23.8 </font></td><td align="right"><font size="-1">  3.5 </font></td></tr> <!-- drivers/ide/root/ -->
+<tr><td><font size="-1">Block Dev (root)    </font></td> <td align="right"><font size="-1"><b>  39 </b></font></td><td align="right"><font size="-1">  195 </font></td><td align="right"><font size="-1">  36 </font></td><td align="right"><font size="-1"> 20.0 </font></td><td align="right"><font size="-1">  1.1 </font></td></tr> <!-- drivers/block/root2/ -->
+<tr><td><font size="-1">Software RAID       </font></td> <td align="right"><font size="-1"><b>  31 </b></font></td><td align="right"><font size="-1">  290 </font></td><td align="right"><font size="-1">  32 </font></td><td align="right"><font size="-1"> 10.7 </font></td><td align="right"><font size="-1">  1.0 </font></td></tr> <!-- drivers/md/ -->
+<tr><td><font size="-1">SCSI (aacraid)      </font></td> <td align="right"><font size="-1"><b>  30 </b></font></td><td align="right"><font size="-1">   76 </font></td><td align="right"><font size="-1">   7 </font></td><td align="right"><font size="-1"> 39.5 </font></td><td align="right"><font size="-1">  4.8 </font></td></tr> <!-- drivers/scsi/aacraid/ -->
+<tr><td><font size="-1">SCSI (lpfc)         </font></td> <td align="right"><font size="-1"><b>  14 </b></font></td><td align="right"><font size="-1">   30 </font></td><td align="right"><font size="-1">  16 </font></td><td align="right"><font size="-1"> 46.7 </font></td><td align="right"><font size="-1">  0.9 </font></td></tr> <!-- drivers/scsi/lpfc/ -->
+<tr><td><font size="-1">Blk Dev (P-IDE)     </font></td> <td align="right"><font size="-1"><b>  11 </b></font></td><td align="right"><font size="-1">   17 </font></td><td align="right"><font size="-1">   8 </font></td><td align="right"><font size="-1"> 64.7 </font></td><td align="right"><font size="-1">  1.5 </font></td></tr> <!-- drivers/block/paride/ -->
+<tr><td><font size="-1">SCSI aic7xxx        </font></td> <td align="right"><font size="-1"><b>   8 </b></font></td><td align="right"><font size="-1">   62 </font></td><td align="right"><font size="-1">  37 </font></td><td align="right"><font size="-1"> 12.9 </font></td><td align="right"><font size="-1">  0.2 </font></td></tr> <!-- drivers/scsi/aic7xxx/ -->
+<tr><td><font size="-1">IDE (pci)           </font></td> <td align="right"><font size="-1"><b>   5 </b></font></td><td align="right"><font size="-1">  106 </font></td><td align="right"><font size="-1">  12 </font></td><td align="right"><font size="-1">  4.7 </font></td><td align="right"><font size="-1">  0.4 </font></td></tr> <!-- drivers/ide/pci/ -->
+<tr><td><font size="-1">IDE legacy          </font></td> <td align="right"><font size="-1"><b>   2 </b></font></td><td align="right"><font size="-1">    3 </font></td><td align="right"><font size="-1">   3 </font></td><td align="right"><font size="-1"> 66.7 </font></td><td align="right"><font size="-1">  0.8 </font></td></tr> <!-- drivers/ide/legacy/ --> <!-- break drivers -->
+<tr><td><font size="-1">Blk Layer Core      </font></td> <td align="right"><font size="-1"><b>   2 </b></font></td><td align="right"><font size="-1">   65 </font></td><td align="right"><font size="-1">   8 </font></td><td align="right"><font size="-1">  3.1 </font></td><td align="right"><font size="-1">  0.3 </font></td></tr> <!-- block/root1/ -->
+<tr><td><font size="-1">SCSI megaraid       </font></td> <td align="right"><font size="-1"><b>   1 </b></font></td><td align="right"><font size="-1">   30 </font></td><td align="right"><font size="-1">   6 </font></td><td align="right"><font size="-1">  3.3 </font></td><td align="right"><font size="-1">  0.2 </font></td></tr> <!-- drivers/scsi/megaraid/ -->
+<tr><td><font size="-1">Blk Dev (Eth)       </font></td> <td align="right"><font size="-1"><b>   1 </b></font></td><td align="right"><font size="-1">    5 </font></td><td align="right"><font size="-1">   2 </font></td><td align="right"><font size="-1"> 20.0 </font></td><td align="right"><font size="-1">  0.7 </font></td></tr> <!-- drivers/block/aoe/ -->
+<tr><td><font size="-1">SCSI (sym53c8)      </font></td> <td align="right"><font size="-1"><b>   0 </b></font></td><td align="right"><font size="-1">    6 </font></td><td align="right"><font size="-1">  10 </font></td><td align="right"><font size="-1">  0.0 </font></td><td align="right"><font size="-1">  0.0 </font></td></tr> <!-- drivers/scsi/sym53c8xx_2/ -->
+<tr><td><font size="-1">SCSI (qla2xxx)      </font></td> <td align="right"><font size="-1"><b>   0 </b></font></td><td align="right"><font size="-1">    8 </font></td><td align="right"><font size="-1">  49 </font></td><td align="right"><font size="-1">  0.0 </font></td><td align="right"><font size="-1">  0.0 </font></td></tr> <!-- drivers/scsi/qla2xxx/ -->
+<tr><td><font size="-1"><b> Total</b>       </font></td> <td align="right"><font size="-1"><b>   0 </b></font></td><td align="right"><font size="-1"> 1744 </font></td><td align="right"><font size="-1"> 430 </font></td><td align="right"><font size="-1">   -- </font></td><td align="right"><font size="-1">   -- </font></td></tr> <!-- TOTAL = 15 -->
+<tr><td><font size="-1"><b> Average</b>     </font></td> <td align="right"><font size="-1"><b> 21.3 </b></font></td><td align="right"><font size="-1"> 116.3 </font></td><td align="right"><font size="-1"> 28.6 </font></td><td align="right"><font size="-1"><b> 22.4 </b></font></td><td align="right"><font size="-1"><b>  1.1 </b></font></td></tr> <!-- 15 -->
+</tbody></table>
+</p></td></tr>
+</tbody></table>
+<br>
+<font size="-1"><i>
+Table 2: <b>Error-broken channels due to unsaved
+error codes.</b> These tables report the number of bad calls found across
+all file systems and storage device drivers in Linux 2.6.15.4.  In
+each table, from left to right column we report the name of
+the subsystem, the number of bad calls, the number of error channels
+(i.e., the number of calls to functions that propagate error codes),
+the size of the subsystem,
+the fraction of bad calls over all error-related calls (ratio of
+2nd and 3rd column), and finally the number of violations
+per Kloc (ratio of 2nd and 4th column).
+We categorize a directory as a subsystem. Thus, for storage
+drivers, since different SCSI device drivers exist in the first-level
+of the <tt>scsi/</tt> directory, we put all of them as one subsystem. SCSI
+device drivers that are located in different directories (e.g.,
+<tt>scsi/lpfc/</tt>, <tt>scsi/aacraid/</tt>) are categorized as different
+subsystems. The same principle is applied to IDE.  }
+</i></font>
+
+</p><p>
+
+
+
+</p><p>
+
+</p><h3><a name="SECTION00041300000000000000"><br>
+3.1.3 False Positives</a>
+</h3>
+
+<p>
+It is important to note that while the number of bad calls is high,
+not all bad calls could cause damage to the system.  The primary
+reason is what we call a <em>double error code</em>; some functions
+expose two or more error codes at the same time, and checking one of
+the error codes while ignoring the others can still be correct. For
+example, in the ReiserFS code below, the error code returned from
+<tt><font size="-1">sync_dirty_buffer</font></tt> does not have to be saved (line 8) <em>if
+and only if</em> the function performs the check on the second error code
+(line 9); the buffer must be checked whether it is is up-to-date.
+
+</p><p>
+</p><pre>   1 // fs/buffer.c
+   2 int sync_dirty_buffer (buffer_head* bh) {
+   3     ...
+   4     return ret; // RETURN ERROR CODE
+   5 }
+   6 // reiserfs/journal.c
+   7 int flush_commit_list() {
+   8     sync_dirty_buffer(bh); // UNSAVED EC
+   9     if (!buffer_uptodate(bh)) {
+  10         return -EIO;
+  11     }
+  12 }
+</pre>
+
+<p>
+To ensure that the number of false positives we report is not overly
+large, we manually analyze all of the code snippets to check whether a
+second error code is being checked. Note that this manual process can
+be automated if we incorporate all types of error codes into EDP.  We
+have found only a total of 39 false positives, which have been
+excluded from the numbers we report in this paper.  Thus, the high
+numbers in Table&nbsp;<a href="https://www.usenix.org/legacy/event/fast08/tech/full_papers/gunawi/gunawi_html/index.html#table-result-all">2</a> provide a hint to a real and
+critical problem.
+
+</p><p>
+
+</p><h2><a name="SECTION00042000000000000000"></a>
+<a name="sec-result-silent"></a><br>
+3.2 Silent Failures: Manifestations of Unsaved Error Codes
+</h2>
+
+<p>
+
+</p><p>
+
+</p><p>
+To show that unsaved error codes represent a serious problem that can
+lead to silent failures, we injected disk block failures in a few
+cases.  As shown in Figure&nbsp;<a href="https://www.usenix.org/legacy/event/fast08/tech/full_papers/gunawi/gunawi_html/index.html#fig-result-zoom">5</a>, one serious silent
+failure arises during file system recovery: the journaling block
+device layer (JBD) does not properly propagate any block write
+failures, including inode, directory, bitmap, superblock, and other
+block write failures.  EDP unearths these silent failures by
+pinpointing the <tt><font size="-1">journal_recover</font></tt> function, which is responsible
+for file system recovery, as it calls <tt><font size="-1">sync_blockdev</font></tt> to flush the
+dirty buffer pages owned by the block device. Unfortunately,
+<tt><font size="-1">journal_recover</font></tt> does not save the error code propagated by
+<tt><font size="-1">sync_blockdev</font></tt> in the case of block write failures.  This is an
+example where the error code is dropped in the middle of its
+propagation chain; <tt><font size="-1">sync_blockdev</font></tt> correctly propagates the <tt><font size="-1">EIO</font></tt> error codes received from the two function calls it makes.
+
+
+
+</p><div align="CENTER">
+
+<p><a name="fig-result-zoom">
+
+<table border="0" cellpadding="0" cellspacing="0">
+<tbody><tr><td>
+<img src="./Error Handling is Ocassionally Correct_files/fig-result-zoom.gif">
+</td><td>
+
+<pre>journal_recover() 
+  /* BROKEN CHANNEL */
+  sync_blockdev(); 
+
+sync_blockdev() 
+  ret = fm_fdatawrite();
+  err = fm_fdatawait();
+  if(!ret) ret = err;
+  /* PROPAGATE EIO */
+  return ret;
+</pre>
+</td></tr></tbody></table>
+
+<br>
+<font size="-1"><i>
+Figure 5: <b>Silent error in journal recovery.</b>
+In the figure on the left, EDP marks <tt>journal_recover</tt> as a termination
+endpoint of a broken channel.  The code snippet on the right shows that
+<tt>journal_recover</tt> ignores the <tt>EIO</tt> propagated by <tt>sync_blockdev</tt>.
+</i></font>
+
+<br>
+
+</a></p></div><a name="fig-result-zoom">
+
+<p>
+A similar problem occurs in the NFS server code.  From a similar
+failure injection experiment, we found that the NFS client is not
+informed when a write failure occurs during a <tt><font size="-1">sync</font></tt> operation. In
+the experiment, the client updates old data and then sends a <tt><font size="-1">sync</font></tt>
+operation with the data to the NFS server. The NFS server then invokes
+the <tt><font size="-1">nfsd_dosync</font></tt> operation, which mainly performs three
+operations similar to the <tt><font size="-1">sync_blockdev</font></tt> call above. First, the
+NFS server writes dirty pages to the disk; second, it writes dirty
+inodes and the superblock to disk; third, it waits until the ongoing
+I/O data transfer terminates. All these three operations could return
+error codes, but the implementation of <tt><font size="-1">nfsd_dosync</font></tt> does not save
+any return values.  As a result, the NFS client will never notice any
+disk write failures occurring in the server.  Thus, even a careful,
+error-robust client cannot trust the server to inform it of errors
+that occur.
+
+</p></a><p><a name="fig-result-zoom">
+In the NFS server code, we might expect that at least one return value
+would be saved and checked properly. However, no return values are
+saved, leading one to question whether the returned error codes from
+the <tt><font size="-1">write</font></tt> or <tt><font size="-1">sync</font></tt> operations are correctly handled in
+general.  It could be the case that the developers are not concerned
+about write failures. We investigate this hypothesis in
+Section&nbsp;</a><a href="https://www.usenix.org/legacy/event/fast08/tech/full_papers/gunawi/gunawi_html/index.html#sec-analysis-neglected">4.2</a>.
+
+</p><p>
+
+</p><h2><a name="SECTION00043000000000000000"></a>
+<a name="sec-result-unchecked"></a><br>
+3.3 Unchecked Error Code
+</h2>
+
+<p>
+Lastly, we report the number of error-broken channels due to a variable
+that contains an error code not being checked or used in the future.
+For example, in the IBM JFS code below, <tt><font size="-1">rc</font></tt> carries an error code
+propagated from <tt><font size="-1">txCommit</font></tt> (line 4), but <tt><font size="-1">rc</font></tt> is never checked.
+
+</p><p>
+</p><pre>  1 // jfs/jfs_txnmgr.c
+  2 int jfs_sync () {
+  3     int rc;
+  4     rc = txCommit(); // UNCHECKED 'rc'
+  5     // No usage or check of 'rc'
+  6     // after this line
+  7 }
+</pre>
+
+<p>
+This analysis can also report false positives due to the double error
+code problem described previously.  In addition, we also find the
+problem of <em>overloaded variables</em> that contribute as false
+positives.  We define a variable to be overloaded if the variable could
+contain an error code or a data value. For instance,
+<tt><font size="-1">blknum</font></tt> in the QNX4 code below is an example of an overloaded
+variable:
+
+</p><p>
+</p><pre>   1  // qnx4/dir.c
+   2 int qnx4_readdir () {
+   3     int blknum;
+   4     struct buffer_head *bh;
+   5     blknum = qnx4_block_map();
+   6     bh = sb_bread (blknum);
+   7     if (bh == NULL)
+   8         // error
+   9 }
+</pre>
+
+<p>
+In this code, <tt><font size="-1">qnx4_block_map</font></tt> could return an error code (line
+5), which is usually a negative value. <tt><font size="-1">sb_bread</font></tt> takes a block
+number and returns a buffer head that contains the data for that
+particular block (line 6). Since a negative block number will lead to
+a <tt><font size="-1">NULL</font></tt> buffer head (line 7), the error code stored in <tt><font size="-1">blknum</font></tt>
+does not have to be explicitly checked. The developer believes that
+the other part of the code will catch this error or eventually raise
+related errors.  This practice reduces the accuracy of our static
+analysis.
+
+</p><p>
+Since the number of unchecked error code reports is small, we were
+able to remove the false positives and find a total of 3 and 2
+unchecked error codes in file systems and storage drivers,
+respectively, that could lead to silent failures.
+
+</p><p>
+
+</p><h1><a name="SECTION00050000000000000000"></a>
+<a name="sec-analysis"></a><br>
+4 Analysis of Results
+</h1>
+
+<p>
+In the following sections, we present five analyses whereby we try to
+uncover the root causes and impact of incomplete error propagation.
+Since the number of unchecked and overwritten error codes is small, we
+only consider unsaved error codes (bad calls) in our analyses; thus we
+use "bad calls" and "broken channels" interchangeably from now on.
+First, we made a correlation between robustness and complexity.
+Second, we analyzed whether file systems and storage device drivers
+give different treatment to errors occurring in I/O read vs.&nbsp;I/O write
+operations. From that analysis we find that many write errors are
+neglected; hence we perform the next study in which we try to answer
+whether ignored errors are corner-case mistakes or intentional
+choices. In the final two analyses, we analyze whether chained error
+propagation and inter-module calls play major parts in causing
+incorrect error propagation.
+
+</p><p>
+
+</p><h2><a name="SECTION00051000000000000000"><br>
+4.1 Complexity and Robustness</a>
+</h2>
+
+<p>
+
+</p><p>
+<br></p><div align="CENTER">
+<table cellpadding="3" border="1" align="CENTER">
+<tbody><tr><td align="CENTER"><font size="-1">
+  </font></td>
+<td align="CENTER" colspan="2"><font size="-1"> </font><font size="-1"><b>By % Broken</b></font></td>
+<td align="CENTER" colspan="2"><font size="-1"> </font><font size="-1"><b>By Viol/Kloc</b></font></td>
+</tr>
+<tr><td align="CENTER"><font size="-1"> 
+
+Rank  </font></td>
+<td align="LEFT"><font size="-1"> FS </font></td>
+<td align="RIGHT"><font size="-1"> Frac. </font></td>
+<td align="LEFT" colspan="2"><font size="-1"> FS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Viol/Kloc</font></td>
+</tr>
+<tr><td align="CENTER"><font size="-1"> 
+
+ 1 </font></td>
+<td align="LEFT"><font size="-1"> IBM JFS       </font></td>
+<td align="RIGHT"><font size="-1"> 24.4 </font></td>
+<td align="LEFT"><font size="-1">     ext3          </font></td>
+<td align="RIGHT"><font size="-1">  7.2 </font></td>
+</tr>
+<tr><td align="CENTER"><font size="-1"> 
+ 2 </font></td>
+<td align="LEFT"><font size="-1"> ext3          </font></td>
+<td align="RIGHT"><font size="-1"> 22.1 </font></td>
+<td align="LEFT"><font size="-1">     IBM JFS       </font></td>
+<td align="RIGHT"><font size="-1">  5.6 </font></td>
+</tr>
+<tr><td align="CENTER"><font size="-1"> 
+ 3 </font></td>
+<td align="LEFT"><font size="-1"> JFFS v2       </font></td>
+<td align="RIGHT"><font size="-1"> 15.7 </font></td>
+<td align="LEFT"><font size="-1">     NFS Client    </font></td>
+<td align="RIGHT"><font size="-1">  3.6 </font></td>
+</tr>
+<tr><td align="CENTER"><font size="-1"> 
+ 4 </font></td>
+<td align="LEFT"><font size="-1"> NFS Client    </font></td>
+<td align="RIGHT"><font size="-1"> 12.9 </font></td>
+<td align="LEFT"><font size="-1">     VFS           </font></td>
+<td align="RIGHT"><font size="-1">  2.9 </font></td>
+</tr>
+<tr><td align="CENTER"><font size="-1"> 
+ 5 </font></td>
+<td align="LEFT"><font size="-1"> CIFS          </font></td>
+<td align="RIGHT"><font size="-1"> 12.7 </font></td>
+<td align="LEFT"><font size="-1">     JFFS v2       </font></td>
+<td align="RIGHT"><font size="-1">  2.2 </font></td>
+</tr>
+<tr><td align="CENTER"><font size="-1"> 
+ 6 </font></td>
+<td align="LEFT"><font size="-1"> MemMgmt       </font></td>
+<td align="RIGHT"><font size="-1"> 11.4 </font></td>
+<td align="LEFT"><font size="-1">     CIFS          </font></td>
+<td align="RIGHT"><font size="-1">  2.1 </font></td>
+</tr>
+<tr><td align="CENTER"><font size="-1"> 
+ 7 </font></td>
+<td align="LEFT"><font size="-1"> ReiserFS      </font></td>
+<td align="RIGHT"><font size="-1"> 10.5 </font></td>
+<td align="LEFT"><font size="-1">     MemMgmt       </font></td>
+<td align="RIGHT"><font size="-1">  2.0 </font></td>
+</tr>
+<tr><td align="CENTER"><font size="-1"> 
+ 8 </font></td>
+<td align="LEFT"><font size="-1"> VFS           </font></td>
+<td align="RIGHT"><font size="-1">  8.4 </font></td>
+<td align="LEFT"><font size="-1">     ReiserFS      </font></td>
+<td align="RIGHT"><font size="-1">  1.8 </font></td>
+</tr>
+<tr><td align="CENTER"><font size="-1"> 
+ 9 </font></td>
+<td align="LEFT"><font size="-1"> NTFS          </font></td>
+<td align="RIGHT"><font size="-1">  8.1 </font></td>
+<td align="LEFT"><font size="-1">     XFS           </font></td>
+<td align="RIGHT"><font size="-1">  1.4 </font></td>
+</tr>
+<tr><td align="CENTER"><font size="-1"> 
+10 </font></td>
+<td align="LEFT"><font size="-1"> XFS           </font></td>
+<td align="RIGHT"><font size="-1">  6.9 </font></td>
+<td align="LEFT"><font size="-1">     NFS Server    </font></td>
+<td align="RIGHT"><font size="-1">  1.2 </font></td>
+</tr>
+</tbody></table>
+
+</div>
+<br>
+<a name="table-analysis-robust"></a>
+
+<font size="-1"><i>
+Table 3: <b>Least Robust File Systems.</b> The table
+shows the ten least robust file systems using two ranking systems.  In
+the first ranking system, file system robustness is ranked based on
+the fraction of broken channels over all error channels (the 5th
+column of Table 2). The second ranking system
+sorts file systems based on the number of broken channels found in
+every Kloc (the 6th column of Table 2).}
+</i></font><br>
+
+<br>
+
+<p>
+
+</p><p>
+In our first analysis, we would like to correlate the number of
+mistakes in a subsystem with the complexity of that subsystem.  For
+file systems, XFS with 71 Kloc has more mistakes than other, smaller
+file systems.  However, it is not necessary that XFS is seen as the
+least robust file system.  Table&nbsp;<a href="https://www.usenix.org/legacy/event/fast08/tech/full_papers/gunawi/gunawi_html/index.html#table-analysis-robust">3</a> sorts the
+robustness of each file system based on two rankings.  In both
+rankings, we only account file systems that are at least 10 Kloc in
+size with at least 50 error-related calls, <i>i.e.</i>&nbsp;we only consider
+"complex" file systems.
+
+</p><p>
+A noteworthy observation is that ext3 and IBM JFS are ranked as the
+two least robust file systems.  This fact affirms our earlier findings
+on the robustness of ext3 and IBM JFS&nbsp;[<a href="https://www.usenix.org/legacy/event/fast08/tech/full_papers/gunawi/gunawi_html/index.html#PrabhakaranEtAl05-SOSP">20</a>].
+In this prior work, we found that ext3 and IBM JFS are inconsistent in
+dealing with different kinds of disk failures. Thus, it might be the
+case that these inconsistent policies correlate with inconsistent
+error propagation.
+
+</p><p>
+Among storage device drivers, it is interesting to compare the
+robustness of the SCSI and IDE subsystems.  If we compare SCSI and IDE
+subsystems using the first ranking system, SCSI and IDE are almost
+comparable (21% vs.&nbsp;18%).  However, if we compare them based on the
+second ranking system, then the SCSI subsystem is almost four times
+more robust than IDE (0.6 vs.&nbsp;2.1 errors/Kloc).  Nevertheless it seems
+the case that SCSI utilizes basic error codes much more than IDE does.
+
+</p><p>
+When the robustness of storage drivers and file systems is compared
+using the first ranking, on average storage drivers are less robust
+compared to file systems (22% vs.&nbsp;17%, as reported in the last rows
+of Table&nbsp;<a href="https://www.usenix.org/legacy/event/fast08/tech/full_papers/gunawi/gunawi_html/index.html#table-result-all">2</a>). On the other hand, in the second
+ranking system, storage drivers are more robust compared to file
+systems (1.1 vs.&nbsp;2.4 mistakes/Kloc).  From our point of view, the
+first ranking system is more valid because a subsystem could be
+comprised of submodules that do not necessarily use error codes; what
+is more important is the number of bad calls in the population of all
+error-related calls.
+
+</p><p>
+
+</p><h2><a name="SECTION00052000000000000000"></a>
+<a name="sec-analysis-neglected"></a><br>
+4.2 Neglected Write Errors
+</h2>
+
+<p>
+As mentioned in Section&nbsp;<a href="https://www.usenix.org/legacy/event/fast08/tech/full_papers/gunawi/gunawi_html/index.html#sec-result-silent">3.2</a>, we have observed that
+error codes propagated in <tt><font size="-1">write</font></tt> or <tt><font size="-1">sync</font></tt> operations are often
+ignored. Thus, we investigate how many write errors are neglected
+compared to read errors. This study is motivated by our findings in
+that section as well as by our earlier findings where we found that at
+least for ext3, read failures are detected, but write errors are often
+ignored&nbsp;[<a href="https://www.usenix.org/legacy/event/fast08/tech/full_papers/gunawi/gunawi_html/index.html#PrabhakaranEtAl05-SOSP">20</a>].
+
+</p><p>
+To perform this study, we filter out calls that do not relate to read
+and write operations. Since it is impractical to do that manually, we
+use a simple string comparison to mark calls that are relevant to our
+analysis. That is we only take a caller4#4callee pair
+where the callee contains the string <tt><font size="-1">read</font></tt>, <tt><font size="-1">write</font></tt>,
+<tt><font size="-1">sync</font></tt>, or <tt><font size="-1">wait</font></tt>. We include <tt><font size="-1">wait</font></tt>-type calls because in
+many cases <tt><font size="-1">wait</font></tt>-type callees (<i>e.g.</i>, <tt><font size="-1">filemap_datawait</font></tt>)
+represent waiting for one or more I/O operations and could return 
+error information on the operation. Thus, in our study,
+<tt><font size="-1">write</font></tt>-, <tt><font size="-1">sync</font></tt>-, and <tt><font size="-1">wait</font></tt>-type calls are categorized as
+write operations.
+
+</p><p>
+<br></p><div align="CENTER">
+<table cellpadding="3" border="1" align="CENTER">
+<tbody><tr><td align="CENTER" colspan="1"><font size="-1">
+  </font></td>
+<td align="CENTER" colspan="1"><font size="-1">
+  Bad </font></td>
+<td align="CENTER" colspan="1"><font size="-1">
+  EC  </font></td>
+<td align="CENTER" colspan="1"><font size="-1">
+  </font><font size="-1"><b>Frac.</b></font></td>
+</tr>
+<tr><td align="CENTER" colspan="1"><font size="-1"> 
+  Callee Type</font></td>
+<td align="CENTER" colspan="1"><font size="-1">
+  Calls </font></td>
+<td align="CENTER" colspan="1"><font size="-1">
+  Calls  </font></td>
+<td align="CENTER" colspan="1"><font size="-1">
+  </font><font size="-1"><b>(%)</b></font></td>
+</tr>
+<tr><td align="LEFT"><font size="-1"> 
+
+Read<sup>*</sup> </font></td>
+<td align="RIGHT"><font size="-1">    26  </font></td>
+<td align="RIGHT"><font size="-1">  603  </font></td>
+<td align="RIGHT"><font size="-1">  </font><font size="-1"><b>4.3</b>  </font></td>
+</tr>
+<tr><td align="LEFT"><font size="-1">  
+Sync                 </font></td>
+<td align="RIGHT"><font size="-1">    70  </font></td>
+<td align="RIGHT"><font size="-1">  236  </font></td>
+<td align="RIGHT"><font size="-1">  </font><font size="-1"><b>29.7</b>  </font></td>
+</tr>
+<tr><td align="LEFT"><font size="-1">  
+Wait                 </font></td>
+<td align="RIGHT"><font size="-1">    27  </font></td>
+<td align="RIGHT"><font size="-1">   70  </font></td>
+<td align="RIGHT"><font size="-1">  </font><font size="-1"><b>38.6</b>  </font></td>
+</tr>
+<tr><td align="LEFT"><font size="-1">  
+Write                </font></td>
+<td align="RIGHT"><font size="-1">    80  </font></td>
+<td align="RIGHT"><font size="-1">  598  </font></td>
+<td align="RIGHT"><font size="-1">  </font><font size="-1"><b>13.4</b>  </font></td>
+</tr>
+<tr><td align="LEFT"><font size="-1">  
+Sync+Wait+Write      </font></td>
+<td align="RIGHT"><font size="-1">   177  </font></td>
+<td align="RIGHT"><font size="-1">  904  </font></td>
+<td align="RIGHT"><font size="-1">  </font><font size="-1"><b>19.6</b>  </font></td>
+</tr>
+<tr><td align="CENTER" colspan="1"><font size="-1">  
+
+  Specific Callee</font></td>
+<td align="CENTER" colspan="1"><font size="-1">
+  </font></td>
+<td align="CENTER" colspan="1"><font size="-1">
+  </font></td>
+<td align="CENTER" colspan="1"><font size="-1">
+  </font></td>
+</tr>
+<tr><td align="LEFT"><font size="-1"> 
+
+</font><tt><font size="-1">filemap_fdatawait</font></tt><font size="-1">   </font></td>
+<td align="RIGHT"><font size="-1">  22  </font></td>
+<td align="RIGHT"><font size="-1">  29  </font></td>
+<td align="RIGHT"><font size="-1">  </font><font size="-1"><b>75.9</b> </font></td>
+</tr>
+<tr><td align="LEFT"><font size="-1"> 
+</font><tt><font size="-1">filemap_fdatawrite</font></tt><font size="-1">  </font></td>
+<td align="RIGHT"><font size="-1">  30  </font></td>
+<td align="RIGHT"><font size="-1">  47  </font></td>
+<td align="RIGHT"><font size="-1">  </font><font size="-1"><b>63.8</b> </font></td>
+</tr>
+<tr><td align="LEFT"><font size="-1"> 
+</font><tt><font size="-1">sync_blockdev</font></tt><font size="-1">       </font></td>
+<td align="RIGHT"><font size="-1">  15  </font></td>
+<td align="RIGHT"><font size="-1">  21  </font></td>
+<td align="RIGHT"><font size="-1">  </font><font size="-1"><b>71.4</b> </font></td>
+</tr>
+</tbody></table>
+
+</div>
+<br>
+<a name="table-ignored-writes"></a>
+
+<font size="-1"><i>
+Table 4: <b>Neglected write errors in file system code.</b>
+The table shows that read errors are handled more correctly than
+write errors.  The upper table shows the fraction of bad calls over
+four category of calls: read, sync, wait, and write. The later three
+can be categorized as a write operation. The lower table shows
+neglected write errors for three specific functions.  The 29 (*)
+violated read calls are all related to readahead and asynchronous
+read; in other words, all error codes returned in synchronous reads
+are being saved and checked.
+</i></font>
+<br>
+
+<br>
+
+<p>
+
+</p><p>
+The upper half of Table&nbsp;<a href="https://www.usenix.org/legacy/event/fast08/tech/full_papers/gunawi/gunawi_html/index.html#table-ignored-writes">4</a> reports our
+findings. The last column shows how often errors are ignored in the
+file system code. Interestingly, file systems have a tendency to
+correctly handle error codes propagated from <tt><font size="-1">read</font></tt>-type calls, but
+not those from <tt><font size="-1">write</font></tt>-type calls (4.3% vs.&nbsp;19.6%).  The 29
+(4.3%) unsaved read error codes are all found in readahead
+operations in the memory management subsystem; it might be acceptable
+to ignore prefetch read errors because such reads can be reissued in
+the future whenever the page is actually read.
+
+</p><p>
+As discussed in Section&nbsp;<a href="https://www.usenix.org/legacy/event/fast08/tech/full_papers/gunawi/gunawi_html/index.html#sec-result-unsaved">3.1</a>, a function could
+return more than one error code at the same time, and checking only
+one of them suffices. However, if we know that a certain function only
+returns a single error code and yet the caller does not save the
+return value properly, then we would know that such call is really a
+flaw.  To find real flaws in the file system code, we examined three
+important functions that we know only return single error codes:
+<tt><font size="-1">sync_blockdev</font></tt>, <tt><font size="-1">filemap_fdatawrite</font></tt>, and
+<tt><font size="-1">filemap_fdatawait</font></tt>.  A file system that does not check the
+returned error codes from these functions would obviously let failures
+go unnoticed in the upper layers.
+
+</p><p>
+The lower half of Table&nbsp;<a href="https://www.usenix.org/legacy/event/fast08/tech/full_papers/gunawi/gunawi_html/index.html#table-ignored-writes">4</a> reports our
+findings.  Many error codes returned from the three methods are simply
+not saved (&gt; 63% in all cases). Two conclusions might be drawn from
+this observation. First, this could suggest that higher-level recovery
+code does not exist (since if it exists, it will not be invoked due to
+the broken error channel), or it could be the case that errors are
+intentionally neglected.  We consider this second possibility in
+greater detail in the next section.
+
+</p><p>
+
+</p><h2><a name="SECTION00053000000000000000"></a>
+<a name="sec-analysis-inconsistent"></a><br>
+4.3 Inconsistent Calls: Corner Case or Majority?
+</h2>
+
+<p>
+</p><p>
+In this section, we consider the nature of <em>inconsistent</em> calls.
+For example, we found that 1 out of 33 calls to
+<tt><font size="-1">ide_setup_pci_device</font></tt> does not save the return value. One would
+probably consider this single call as an inconsistent implementation
+because the majority of the calls to that function save the return
+value.  On the other hand, we also found that 53 out of 54 calls to
+<tt><font size="-1">unregister_filesystem</font></tt> do not save the return error codes.
+Assuming that most kernel developers are essentially competent, this
+suggests that it may actually be safe to not check the error code
+returned from this particular function.
+
+</p><p>
+To quantify inconsistent calls, we define the <em>inconsistent call
+frequency</em> of a function as the ratio of bad calls over all
+error-related calls to the function, and correlate this frequency with
+the number of bad calls to the function.  For example, the
+inconsistent call frequencies for <tt><font size="-1">ide_setup_pci_blockdev</font></tt> and
+<tt><font size="-1">unregister_filesystem</font></tt> are 3% (1/33) and 98% (53/54)
+respectively and the numbers of bad calls are 1 and 53 respectively.
+
+</p><p>
+Figure&nbsp;<a href="https://www.usenix.org/legacy/event/fast08/tech/full_papers/gunawi/gunawi_html/index.html#fig-analysis-inconsistent">6</a> plots the cumulative
+distribution function of this behavior. The graph could be seen as a
+means to prioritize which bad calls to fix first. Bad calls that fall
+below the 20% mark could be treated as <em>corner cases</em>, <i>i.e.</i>&nbsp;we
+should be suspicious on one bad call in the midst of four good calls
+to the same function. On the other hand, bad calls that fall above the
+80% mark could hint that either different developers make the same
+mistake and ignore it, or it is probably safe to make such a mistake.
+
+</p><p>
+
+</p><div align="CENTER">
+
+<p><a name="fig-analysis-inconsistent"></a></p><div align="CENTER">
+<img src="./Error Handling is Ocassionally Correct_files/fig-analysis-cdf.gif">
+</div>
+ <br>
+<font size="-1"><i>
+Figure 6: <b>Inconsistent calls frequency.</b>
+The figure shows that inconsistent calls are not corner-case bugs.
+The x-axis represents the inconsistent-call frequency of a function.
+x=20% means that there is one bad call out of five total calls;
+x=80% means that there are four bad calls out of five total calls.
+The left y-axis counts the cumulative number of bad calls.  For example,
+below the 20% mark, there are 80 bad calls that have an
+inconsistent-call frequency of less than 20%.  
+As reported in
+Table 2, there exist a total of 1153 bad calls.
+The right y-axis shows the cumulative fraction of bad calls over
+the 1153 bad calls.  </i></font>
+
+<br>
+
+</div>
+
+
+<p>
+One perplexing phenomenon visible in the graph is that around 871 bad
+calls fall above the 50% mark.  In other words, they cannot be
+considered as corner-case bugs; the developers might be aware of these
+bad calls, but probably just ignore them.  One thing we have learned
+from our recent work on file system code is that if a file system does
+not know how to recover from a failure, it has the tendency to just
+ignore the error code. For example, ext3 ignores write failures during
+checkpointing simply because it has no recovery mechanism (<i>e.g.</i>,
+chained transactions&nbsp;[<a href="https://www.usenix.org/legacy/event/fast08/tech/full_papers/gunawi/gunawi_html/index.html#GunawiEtAl07-IOShepherd">12</a>]) to deal with such
+failures. Thus, we suspect that there are deeper design shortcomings
+behind poor error code handling; error code mismanagement may be as
+much symptom as disease.
+
+</p><p>
+Our analysis is similar to the work of Engler&nbsp;<i>et al.</i> on findings bugs
+automatically&nbsp;[<a href="https://www.usenix.org/legacy/event/fast08/tech/full_papers/gunawi/gunawi_html/index.html#EnglerEtAl01-Bugs">8</a>].  In their work, they use
+existing implementation to imply beliefs and facts. Applying their
+analysis to our case, the bad calls that fall above the 80% mark
+might be considered as good calls.
+However, since we are analyzing the specific problem of error
+propagation, we use that semantic knowledge and demand a discipline
+that promotes checking an error code in all circumstances, rather than
+one that follows majority rules.
+
+</p><p>
+
+</p><h2><a name="SECTION00054000000000000000"></a>
+<a name="sec-analysis-characteristic"></a><br>
+4.4 Characteristics of Error Channels
+</h2> 
+
+<p>
+Finally, we study whether the characteristic of an error channel has
+an impact on the robustness of error code propagation in that channel.
+In particular, we explore two characteristics of error channels: one
+based on the error propagation distance and one based on the location
+distance (inter- vs.&nbsp;intra-file calls).
+
+</p><p>
+With the first characteristic, we would like to find out whether error
+codes are lost near the generation endpoint or somewhere in the middle
+of the propagation chain. We distinguish two calls: direct-error and
+propagate-error calls.  In a <em>direct-error call</em>, the callee is an
+error-generation endpoint.  In a <em>propagate-error call</em>, the
+callee is not a generation endpoint; rather it is a function that
+propagates an error code from one of the functions that it calls,
+<i>i.e.</i>&nbsp;it is a function in the middle of the propagation chain.  Next, we
+define a <em>bad</em> direct-error (or propagate-error) call as a
+direct-error (or propagate-error) call that does not save the returned
+error code.
+
+</p><p>
+Initially, we assumed that the frequency of bad propagate-error calls
+would be higher than that of bad direct-error calls; we assumed error
+codes tend to be dropped in the middle of the chain rather than near
+the generation endpoint. It turns out that the number of bad
+direct-error and propagate-error calls are similar for file system
+code but the other way around for storage driver code.  In particular,
+for file systems, the ratio of bad over all direct-error calls is
+10%, and the ratio of bad over all propagate-error calls is 14%. For
+storage drivers, they are 20% and 15% respectively. 
+
+</p><p>
+
+</p><p>
+<br></p><div align="CENTER">
+<table cellpadding="3" border="1" align="CENTER">
+<tbody><tr><td align="CENTER" colspan="1"><font size="-1">
+   </font></td>
+<td align="CENTER" colspan="1"><font size="-1">
+   Bad </font></td>
+<td align="CENTER" colspan="1"><font size="-1">
+   EC </font></td>
+<td align="CENTER" colspan="1"><font size="-1">
+   </font><font size="-1"><b>Frac.</b> </font></td>
+</tr>
+<tr><td align="CENTER" colspan="1"><font size="-1"> 
+   </font></td>
+<td align="CENTER" colspan="1"><font size="-1">
+   Calls </font></td>
+<td align="CENTER" colspan="1"><font size="-1">
+   Calls </font></td>
+<td align="CENTER" colspan="1"><font size="-1">
+   </font><font size="-1"><b>(%)</b> </font></td>
+</tr>
+<tr><td align="CENTER" colspan="4"><font size="-1"> 
+
+ </font><font size="-1"><em>File Systems</em> </font></td>
+</tr>
+<tr><td align="LEFT"><font size="-1"> 
+
+Inter-module </font></td>
+<td align="RIGHT"><font size="-1">   307  </font></td>
+<td align="RIGHT"><font size="-1">  1944  </font></td>
+<td align="RIGHT"><font size="-1">  </font><font size="-1"><b>15.8</b>  </font></td>
+</tr>
+<tr><td align="LEFT"><font size="-1"> 
+Inter-file   </font></td>
+<td align="RIGHT"><font size="-1">   367  </font></td>
+<td align="RIGHT"><font size="-1">  2786  </font></td>
+<td align="RIGHT"><font size="-1">  </font><font size="-1"><b>13.2</b>  </font></td>
+</tr>
+<tr><td align="LEFT"><font size="-1"> 
+Intra-file   </font></td>
+<td align="RIGHT"><font size="-1">   159  </font></td>
+<td align="RIGHT"><font size="-1">  2548  </font></td>
+<td align="RIGHT"><font size="-1">  </font><font size="-1"><b>6.2</b>  </font></td>
+</tr>
+<tr><td align="CENTER" colspan="4"><font size="-1"> 
+
+ </font><font size="-1"><em>Storage Drivers</em> </font></td>
+</tr>
+<tr><td align="LEFT"><font size="-1"> 
+
+Inter-module </font></td>
+<td align="RIGHT"><font size="-1">    48  </font></td>
+<td align="RIGHT"><font size="-1">   199  </font></td>
+<td align="RIGHT"><font size="-1">  </font><font size="-1"><b>24.1</b>  </font></td>
+</tr>
+<tr><td align="LEFT"><font size="-1"> 
+Inter-file   </font></td>
+<td align="RIGHT"><font size="-1">    92  </font></td>
+<td align="RIGHT"><font size="-1">   495  </font></td>
+<td align="RIGHT"><font size="-1">  </font><font size="-1"><b>18.6</b>  </font></td>
+</tr>
+<tr><td align="LEFT"><font size="-1"> 
+Intra-file   </font></td>
+<td align="RIGHT"><font size="-1">   180  </font></td>
+<td align="RIGHT"><font size="-1">  1050  </font></td>
+<td align="RIGHT"><font size="-1">  </font><font size="-1"><b>17.1</b>  </font></td>
+</tr>
+</tbody></table>
+
+</div>
+<br>
+<a name="table-inter-module"></a>
+
+<font size="-1"><i>
+Table 5: <b>Calls based on location distance.</b> The
+table shows that the fraction of bad calls in inter-module calls is
+higher than the one in inter-file calls. Similarly, inter-file calls
+are less robust than intra-file calls.  Note that "inter-file"
+refers to cross-file calls within the same module. Inter-file calls across
+different modules are categorized as inter-module. </i></font>
+
+<br>
+
+<br>
+
+<p>
+
+</p><p>
+Lastly, in the second characteristic, we categorized calls based on
+the location distance between a caller and a callee. In particular, we
+distinguish three calls: inter-module, inter-file (but within the same
+module), and intra-file calls.  Table&nbsp;<a href="https://www.usenix.org/legacy/event/fast08/tech/full_papers/gunawi/gunawi_html/index.html#table-inter-module">5</a> reports
+that intra-file calls are more robust than inter-file calls, and
+inter-file calls are more robust than intra-file calls. For example,
+out of 1944 inter-module calls in which error codes propagate in file
+system, 307 (16%) of them are bad calls.  However, out of 2786
+inter-file calls within the same module, there are only 367 (13%) bad
+calls. Intra-file calls only exhibit 6% bad calls.  The same pattern
+occurs in storage device drivers. Thus, we conclude that the location
+distance between the caller and the callee plays a role in the
+robustness of the call.
+
+</p><p>
+
+</p><p>
+
+</p><h1><a name="SECTION00060000000000000000"></a>
+<a name="sec-future"></a><br>
+5 Future Work
+</h1>
+
+<p>
+In this section, we discuss some of the issues we previously deferred
+regarding how to build complete and accurate static error propagation
+analysis.  In general, we plan to refine our static analysis with the
+intention of uncovering more violations within the file and storage
+system stack.
+
+</p><p>
+
+</p><h2><a name="SECTION00061000000000000000"></a>
+<a name="sec-future-overwritten"></a><br>
+5.1 Overwritten Error Codes
+</h2>
+
+<p>
+In this paper, we examined broken channels that are caused by unsaved
+and unchecked error codes; broken channels can also be caused by <em>overwritten error codes</em>, in which the container that holds the error
+code is overwritten with another value before the previous error is
+checked.  For example, the CIFS code below overwrites (line 6) the
+previous error code received from another call (line 4).
+
+</p><p>
+</p><pre>  1 // cifs/transport.c 
+  2 int SendReceive () { 
+  3     int rc;
+  4     rc = cifs_sign_smb(); // PROPAGATE E.C.
+  5     ... // No use of 'rc' here
+  6     rc = smb_send(); // OVERWRITTEN
+  7 }
+</pre>
+
+<p>
+Currently, EDP detects overwritten error codes, but reports too many
+false positives to be useful.  We are in the process of fine-tuning
+EDP so that it provides more accurate output. The biggest problem we
+have encountered is due to the nature of the error hierarchy: in many
+cases, a less critical error code is overwritten with a more critical
+one.  For example, in the memory management code below, when first
+encountering a page error, the error code is set to <tt><font size="-1">EIO</font></tt> (line 6).
+Later, the function checks whether the flags of a <tt><font size="-1">map</font></tt> structure
+carry a no-space error code (line 8). If so, the <tt><font size="-1">EIO</font></tt> error code
+is overwritten (line 9) with a new error code <tt><font size="-1">ENOSPC</font></tt>.
+
+</p><p>
+</p><pre>  1 // mm/filemap.c
+  2 int wait_on_page_writeback_range (pg, map) {
+  3     int ret = 0;
+  4     ...
+  5     if (PageError(pg))
+  6         ret = -EIO;
+  7     ...
+  8     if (test_bit(AS_ENOSPC, &amp;map-&gt;flags))
+  9         ret = -ENOSPC;
+ 10     if (test_bit (AS_EIO, &amp;map-&gt;flags))
+ 11         ret = -EIO;
+ 12     return ret;
+ 13 }
+</pre>
+
+<p>
+Manually inspecting the results obtained from EDP, we have identified
+five real cases of overwritten error codes: one each in AFS and FAT,
+and three in CIFS. We believe we will find more cases as we fine-tune
+our analysis of overwritten error codes.
+
+</p><p>
+
+</p><h2><a name="SECTION00062000000000000000"></a>
+<a name="sec-future-transform"></a><br>
+5.2 Error Transformation
+</h2>
+
+<p>
+Our current EDP analysis focuses on the basic error codes that are
+stored and propagated mainly in integer containers. However, file and
+storage systems also use other specific error codes stored in complex
+structures that can be mapped to other error codes in new error
+containers; we call this issue <em>error transformation</em>.  For
+example, the block layer clears the <tt>uptodate</tt> bit stored in a
+buffer structure to signal I/O failure, while the VFS layer simply
+uses generic error codes such as <tt><font size="-1">EIO</font></tt> and <tt><font size="-1">EROFS</font></tt>.  We have observed a
+path where an error container changes five times, involving four
+different types of containers.  A complete EDP analysis must recognize
+all transformations.  With a more complete analysis, we expect to see
+even more violations.
+
+</p><p>
+
+</p><h2><a name="SECTION00063000000000000000"></a>
+<a name="sec-future-channel"></a><br>
+5.3 Asynchronous Error Channels
+</h2>
+
+<p>
+Finally, we plan to expand our definition of error channels to include
+<em>asynchronous paths</em>.  We briefly describe two examples of
+asynchronous paths and their complexities.  First, when a lower layer
+interrupts an upper one to notify it of the completion of an I/O, the
+low-level I/O error code is usually stored in a structure located in
+the heap; the receiver of the interrupt should grab the structure and
+check the error it carries, but tracking this propagation through the
+heap is not straightforward.  Another example occurs during
+journaling: a journal daemon is woken up somewhere in the <tt><font size="-1">fsync()</font></tt>
+path and propagates a journal error code via a global journal state.
+When we consider asynchronous error channels, we also expect the
+number of violations to increase.
+
+</p><p>
+
+</p><p>
+
+</p><h1><a name="SECTION00070000000000000000"></a>
+<a name="sec-related"></a><br>
+6 Related Work
+</h1>
+
+<p>
+Previous work has used static techniques to understand variety of
+problems in software systems. For example, Meta-level compilation
+(MC)&nbsp;[<a href="https://www.usenix.org/legacy/event/fast08/tech/full_papers/gunawi/gunawi_html/index.html#EnglerEtAl00-SystemRules">7</a>,<a href="https://www.usenix.org/legacy/event/fast08/tech/full_papers/gunawi/gunawi_html/index.html#EnglerEtAl01-Bugs">8</a>] enables a
+programmer to write simple, system-specific compiler extensions to
+automatically check software for rule violations. With their work, one
+can find broken channels by specifying a rule such as "a returned
+variable must be checked."
+Compared to their work, ours presents more information on how error
+propagates and convert it into graphical output for ease of analysis
+and debugging.
+
+</p><p>
+Another related project is FiSC&nbsp;[<a href="https://www.usenix.org/legacy/event/fast08/tech/full_papers/gunawi/gunawi_html/index.html#YangEtAl04-FSErrors">32</a>], which uses
+the model-checking tool CMC&nbsp;[<a href="https://www.usenix.org/legacy/event/fast08/tech/full_papers/gunawi/gunawi_html/index.html#MusuvathiEtAl02-CMC">17</a>] to find file
+system errors in the Linux kernel. Every time the file system under
+test transitions to a new state, FiSC runs a series of invariant
+checkers looking for file system errors. If an error is found, one can
+trace back the states and diagnose the sequence of actions that lead
+to the error.  One aspect of our work that is similar to FiSC is that
+we unearth silent failures.
+For example, FiSC detects a bug where a system call returns success
+after it calls a resource allocation routine that fails, <i>e.g.</i>&nbsp;due to
+memory failures.
+
+</p><p>
+In recent work, Johansson analyzes run-time error propagation based on
+interface observations&nbsp;[<a href="https://www.usenix.org/legacy/event/fast08/tech/full_papers/gunawi/gunawi_html/index.html#JohanssonSuri05-ErrorProfiling">14</a>].
+Specifically, an error is injected at the OS-driver interface by
+changing the value of a data parameter.  By observing the
+application-OS interface after the error injection, they reveal
+whether errors occurring in the OS environment (device drivers) will
+propagate through the OS and affect applications. This run-time
+technique is complementary to our work, especially to uncover the
+eventual bad effects of error-broken channels.
+
+</p><p>
+Solving the error propagation problem is also similar to solving the
+problem of unchecked exceptions.  Sacramento <i>et al.</i> found too many
+unchecked exceptions, thus doubting programmers' assurances in
+documenting exceptions&nbsp;[<a href="https://www.usenix.org/legacy/event/fast08/tech/full_papers/gunawi/gunawi_html/index.html#SacramentoEtAl06-Exception">25</a>].
+Nevertheless, since using exceptions is not a kernel programming
+style, at least at the current state, solutions to the problem of
+unchecked exceptions might not be applicable to kernel code.  Only
+recently is there an effort in employing exceptions in OS
+code&nbsp;[<a href="https://www.usenix.org/legacy/event/fast08/tech/full_papers/gunawi/gunawi_html/index.html#CabralMarques06-Exception">3</a>].
+
+</p><p>
+Our tool is also similar to
+Jex&nbsp;[<a href="https://www.usenix.org/legacy/event/fast08/tech/full_papers/gunawi/gunawi_html/index.html#RobillardMurphy00-RobustJava">24</a>]. While Jex is a static
+analysis tool that determines exception flow information in Java
+programs, our tool determines the error code flow information within
+the Linux kernel.
+
+</p><p>
+To fix the incomplete error propagation problem, developers could
+simply adopt a simple set-check-use
+methodology&nbsp;[<a href="https://www.usenix.org/legacy/event/fast08/tech/full_papers/gunawi/gunawi_html/index.html#BigriggVos02-SetCheckUse">2</a>].  However, it is
+interesting to see that this simple practice has not been applied
+thoroughly in file systems and storage device drivers.  As mentioned
+in Section&nbsp;<a href="https://www.usenix.org/legacy/event/fast08/tech/full_papers/gunawi/gunawi_html/index.html#sec-analysis-inconsistent">4.3</a>, we suspect that there are
+deeper design shortcomings behind poor error code handling.
+
+</p><p>
+
+</p><p>
+
+</p><h1><a name="SECTION00080000000000000000"></a>
+<a name="sec-conclude"></a><br>
+7 Conclusion
+</h1>
+
+<p>
+In this paper, we have analyzed the file and storage systems in Linux 2.6 and
+found that error codes are not consistently propagated.  We conclude by
+reprinting some developer comments we found near some problematic cases:
+
+</p><p>
+
+</p><p>
+
+</p><blockquote><font size="-1">CIFS -
+<em>"Not much we can do if it fails anyway, ignore rc." </em>
+</font></blockquote>
+<p>
+
+</p><blockquote><font size="-1">CIFS -
+<em>"Should we pass any errors back?" </em>
+</font></blockquote>
+<p>
+
+</p><blockquote><font size="-1">ext3 -
+<em>"Error, skip block and hope for the best." </em>
+</font></blockquote>
+<p>
+
+</p><blockquote><font size="-1">ext3 -
+<em>"There's no way of reporting error returned from
+ext3_mark_inode_dirty() to userspace.  So ignore it." </em>
+</font></blockquote>
+<p>
+
+</p><blockquote><font size="-1">IBM JFS -
+<em>"Note: todo: log error handler." </em>
+</font></blockquote>
+<p>
+
+</p><blockquote><font size="-1">ReiserFS -
+<em>"We can't do anything about an error here." </em>
+</font></blockquote>
+<p>
+
+</p><blockquote><font size="-1">XFS -
+<em>"Just ignore errors at this point. There is
+nothing we can do except to try to keep going." </em>
+</font></blockquote>
+<p>
+
+</p><blockquote><font size="-1">SCSI -
+<em>"Retval ignored?" </em>
+</font></blockquote>
+<p>
+
+</p><blockquote><font size="-1">SCSI -
+<em>"Todo: handle failure." </em>
+</font></blockquote>
+<p>
+
+
+</p><p>
+These comments from developers indicate part of the problem: even when the
+developers are aware they are not properly propagating an error, they do not
+know how to implement the correct response.  Given static analysis tools to
+identify the source of bugs (such as EDP), developers may still not be able to
+fix all bugs in a straightforward manner.  
+
+</p><p>
+Due to these observations, we believe it is thus time to rethink how
+failures are managed in large systems. Preaching that developers
+follow error handling conventions and hoping the resulting systems
+work as desired seems naive at best. New approaches to error
+detection, propagation, and recovery are needed; in the future, we
+plan to explore a range of error architectures, hoping to find methods
+that increase the level of robustness in the storage systems upon
+which we all rely.
+
+</p><p>
+
+</p><p>
+
+</p><h1><a name="SECTION00090000000000000000"><br>
+Acknowledgments</a>
+</h1>
+
+<p>
+We thank the members of the ADSL research group for their insightful
+comments.  We would also like to thank Geoff Kuenning (our shepherd)
+and the anonymous reviewers for their excellent feedback and comments,
+many of which have greatly improved this paper.  
+The second author wishes to thank the National Council on Science and
+Technology of Mexico 
+and the Secretariat of Public Education
+for their financial support.
+
+</p><p>
+This work is supported by the National Science Foundation
+under the following grants:
+CCF-0621487,
+CNS-0509474, 
+CCR-0133456, 
+as well as by generous donations from Network Appliance and Sun Microsystems.
+
+</p><p>
+Any opinions, findings, and conclusions or recommendations expressed
+in this material are those of the authors and do not necessarily
+reflect the views of NSF or other institutions.
+
+</p><p>
+
+</p><p>
+ <font size="-1">   
+   </font>
+</p><h1><a name="SECTION000100000000000000000"><br>
+Bibliography</a>
+</h1><dl compact=""><dd><p></p></dd><dt><a name="Best00-JFS-Local">1</a>
+</dt><dd>
+Steve Best.
+<br>JFS Overview.
+<br>www.ibm.com/developer works/library/l-jfs.html, 2000.
+
+<p></p></dd><dt><a name="BigriggVos02-SetCheckUse">2</a>
+</dt><dd>
+Michael&nbsp;W. Bigrigg and Jacob&nbsp;J. Vos.
+<br>The Set-Check-Use Methodology for Detecting Error Propagation
+  Failures in I/O Routines.
+<br>In <em>WDB '02</em>, Washington, DC, June 2002.
+
+<p></p></dd><dt><a name="CabralMarques06-Exception">3</a>
+</dt><dd>
+Bruno Cabral and Paulo Marques.
+<br>Making Exception Handling Work.
+<br>In <em>HotDep II</em>, Seattle, Washington, Nov 2006.
+
+<p></p></dd><dt><a name="CandeaEtAl04-Reboot">4</a>
+</dt><dd>
+George Candea, Shinichi Kawamoto, Yuichi Fujiki, Greg Friedman, and Armando
+  Fox.
+<br>Microreboot - A Technique for Cheap Recovery.
+<br>In <em>OSDI '04</em>, pages 31-44, San Francisco, CA, December 2004.
+
+<p></p></dd><dt><a name="CowanEtAl98-Stackguard">5</a>
+</dt><dd>
+Crispin Cowan, Calton Pu, Dave Maier, Heather Hinton, Jonathan Walpole, Peat
+  Bakke, Steve Beattie, Aaron Grier, Perry Wagle, and Qian Zhang.
+<br>StackGuard: Automatic adaptive detection and prevention of
+  buffer-overflow attacks.
+<br>In <em>USENIX '98 Security</em>, San Antonio, TX, January 1998.
+
+<p></p></dd><dt><a name="EllardMegquier05-DISP">6</a>
+</dt><dd>
+Daniel Ellard and James Megquier.
+<br>DISP: Practical, Efficient, Secure, and Faul-Tolerant Distributed
+  Data Storage.
+<br><em>ACM Transactions on Storage (TOS)</em>, 1(1):71-94, Feb 2005.
+
+<p></p></dd><dt><a name="EnglerEtAl00-SystemRules">7</a>
+</dt><dd>
+Dawson Engler, Benjamin Chelf, Andy Chou, and Seth Hallem.
+<br>Checking System Rules Using System-Specific, Programmer-Written
+  Compiler Extensions .
+<br>In <em>OSDI '00</em>, San Diego, CA, October 2000.
+
+<p></p></dd><dt><a name="EnglerEtAl01-Bugs">8</a>
+</dt><dd>
+Dawson Engler, David&nbsp;Yu Chen, Seth Hallem, Andy Chou, and Benjamin Chelf.
+<br>Bugs as Deviant Behavior: A General Approach to Inferring Errors in
+  Systems Code.
+<br>In <em>SOSP '01</em>, pages 57-72, Banff, Canada, October 2001.
+
+<p></p></dd><dt><a name="EnglerDunbar07-UnderConstrained">9</a>
+</dt><dd>
+Dawson&nbsp;R. Engler and Daniel Dunbar.
+<br>Under-constrained execution: making automatic code destruction easy
+  and scalable.
+<br>In <em>ISSTA '07</em>, London, United Kingdom, July 2007.
+
+<p></p></dd><dt><a name="GodefroidEtAl05-DART">10</a>
+</dt><dd>
+Patrice Godefroid, Nils Klarlund, and Koushik Sen.
+<br>DART: Directed Automated Random Testing.
+<br>In <em>PLDI '05</em>, Chicago, IL, June 2005.
+
+<p></p></dd><dt><a name="EdpOutput">11</a>
+</dt><dd>
+Haryadi&nbsp;S. Gunawi.
+<br>EDP Output for All File Systems.
+<br>www.cs.wisc.edu/adsl/Publications/eio-fast08/ readme.html.
+
+<p></p></dd><dt><a name="GunawiEtAl07-IOShepherd">12</a>
+</dt><dd>
+Haryadi&nbsp;S. Gunawi, Vijayan Prabhakaran, Swetha Krishnan, Andrea&nbsp;C.
+  Arpaci-Dusseau, and Remzi&nbsp;H. Arpaci-Dusseau.
+<br>Improving File System Reliability with I/O Shepherding.
+<br>In <em>SOSP '07</em>, pages 283-296, Stevenson, Washington, October
+  2007.
+
+<p></p></dd><dt><a name="Hind01-PointerAnalysis">13</a>
+</dt><dd>
+Michael Hind.
+<br>Pointer Analysis: Haven't We Solved This Problem Yet?
+<br>In <em>PASTE '01</em>, Snowbird, Utah, June 2001.
+
+<p></p></dd><dt><a name="JohanssonSuri05-ErrorProfiling">14</a>
+</dt><dd>
+Andreas Johansson and Neeraj Suri.
+<br>Error Propagation Profiling of Operating Systems .
+<br>In <em>DSN '05</em>, Yokohoma, Japan, June 2005.
+
+<p></p></dd><dt><a name="KolaEtAl05-FaultInLDS">15</a>
+</dt><dd>
+George Kola, Tevfik Kosar, and Miron Livny.
+<br>Faults in Large Distributed Systems and What We Can Do About Them.
+<br>In <em>Euro-Par</em>, August 2005.
+
+<p></p></dd><dt><a name="KoopmanDeVale99-POSIX">16</a>
+</dt><dd>
+Philip Koopman and John DeVale.
+<br>Comparing the Robustness of POSIX Operating Systems.
+<br>In <em>FTCS-29</em>, Madison, Wisconsin, June 1999.
+
+<p></p></dd><dt><a name="MusuvathiEtAl02-CMC">17</a>
+</dt><dd>
+Madanlal Musuvathi, David&nbsp;Y.W. Park, Andy Chou, Dawson&nbsp;R. Engler, and David&nbsp;L.
+  Dill.
+<br>CMC: A Pragmatic Approach to Model Checking Real Code.
+<br>In <em>OSDI '02</em>, Boston, MA, December 2002.
+
+<p></p></dd><dt><a name="NeculaEtAl05-CCured">18</a>
+</dt><dd>
+George&nbsp;C. Necula, Jeremy Condit, Matthew Harren, Scott McPeak, and Westley
+  Weimer.
+<br>CCured: Type-Safe Retrofitting of Legacy Software.
+<br><em>ACM Transactions on Programming Languages and Systems</em>, 27(3),
+  May 2005.
+
+<p></p></dd><dt><a name="Necula02-CIL">19</a>
+</dt><dd>
+George&nbsp;C. Necula, Scott McPeak, S.&nbsp;P. Rahul, and Westley Weimer.
+<br>Cil: An infrastructure for c program analysis and transformation.
+<br>In <em>CC '02</em>, pages 213-228, April 2002.
+
+<p></p></dd><dt><a name="PrabhakaranEtAl05-SOSP">20</a>
+</dt><dd>
+Vijayan Prabhakaran, Lakshmi&nbsp;N. Bairavasundaram, Nitin Agrawal, Haryadi&nbsp;S.
+  Gunawi, Andrea&nbsp;C. Arpaci-Dusseau, and Remzi&nbsp;H. Arpaci-Dusseau.
+<br>IRON File Systems.
+<br>In <em>SOSP '05</em>, pages 206-220, Brighton, UK, October 2005.
+
+<p></p></dd><dt><a name="QinEtAl05-Safemem">21</a>
+</dt><dd>
+Feng Qin, Shan Lu, and Yuanyuan Zhou.
+<br>Exploiting ECC-memory for detecting memory leaks and memory
+  corruption during production runs.
+<br>In <em>HPCA-11</em>, San Francisco, California, February 2005.
+
+<p></p></dd><dt><a name="QinEtAl05-Rx">22</a>
+</dt><dd>
+Feng Qin, Joseph Tucek, Jagadeesan Sundaresan, and Yuanyuan Zhou.
+<br>Rx: Treating Bugs As Allergies.
+<br>In <em>SOSP '05</em>, Brighton, UK, October 2005.
+
+<p></p></dd><dt><a name="Reiser04-ReiserFS">23</a>
+</dt><dd>
+Hans Reiser.
+<br>ReiserFS.
+<br>www.namesys.com, 2004.
+
+<p></p></dd><dt><a name="RobillardMurphy00-RobustJava">24</a>
+</dt><dd>
+Martin&nbsp;P. Robillard and Gail&nbsp;C. Murphy.
+<br>Designing Robust Java Programs with Exceptions.
+<br>In <em>FSE '00</em>, San Diego, CA, November 2000.
+
+<p></p></dd><dt><a name="SacramentoEtAl06-Exception">25</a>
+</dt><dd>
+Paulo Sacramento, Bruno Cabral, and Paulo Marques.
+<br>Unchecked Exceptions: Can the Programmer be Trusted to Document
+  Exceptions?
+<br>In <em>IVNET '06</em>, Florianopolis, Brazil, October 2006.
+
+<p></p></dd><dt><a name="SidiroglouEtAl05-STEM">26</a>
+</dt><dd>
+Stelios Sidiroglou, Michael&nbsp;E. Locasto, Stephen&nbsp;W. Boyd, and Angelos&nbsp;D.
+  Keromytis.
+<br>Building a Reactive Immune System for Software Services.
+<br>In <em>USENIX '05</em>, Anaheim, CA, April 2005.
+
+<p></p></dd><dt><a name="Solomon98-NT">27</a>
+</dt><dd>
+David&nbsp;A. Solomon.
+<br><em>Inside Windows NT</em>.
+<br>Microsoft Programming Series. Microsoft Press, 2nd edition, May 1998.
+
+<p></p></dd><dt><a name="SwiftEtAl03-Nooks">28</a>
+</dt><dd>
+Michael&nbsp;M. Swift, Brian&nbsp;N. Bershad, and Henry&nbsp;M. Levy.
+<br>Improving the Reliability of Commodity Operating Systems.
+<br>In <em>SOSP '03</em>, Bolton Landing, NY, October 2003.
+
+<p></p></dd><dt><a name="SwiftEtAl04-MoreNooks">29</a>
+</dt><dd>
+Michael&nbsp;M. Swift, Brian&nbsp;N. Bershad, and Henry&nbsp;M. Levy.
+<br>Recovering device drivers.
+<br>In <em>OSDI '04</em>, pages 1-16, San Francisco, CA, December 2004.
+
+<p></p></dd><dt><a name="ThainLivny02-ErrorScope">30</a>
+</dt><dd>
+Douglas Thain and Miron Livny.
+<br>Error Scope on a Computational Grid: Theory and Practice.
+<br>In <em>HPDC 11</em>, Edinburgh, Scotland, July 2002.
+
+<p></p></dd><dt><a name="Tweedie98-JournalingExt2">31</a>
+</dt><dd>
+Stephen&nbsp;C. Tweedie.
+<br>Journaling the Linux ext2fs File System.
+<br>In <em>The Fourth Annual Linux Expo</em>, Durham, North Carolina, May
+  1998.
+
+<p></p></dd><dt><a name="YangEtAl04-FSErrors">32</a>
+</dt><dd>
+Junfeng Yang, Paul Twohey, Dawson Engler, and Madanlal Musuvathi.
+<br>Using Model Checking to Find Serious File System Errors.
+<br>In <em>OSDI '04</em>, San Francisco, CA, December 2004.
+</dd></dl>
+
+
+<p>
+<font size="-1"></font>
+</p><p>
+
+</p><p>
+
+<br><br><br>
+<script type="text/javascript">window.NREUM||(NREUM={});NREUM.info={"beacon":"bam.nr-data.net","licenseKey":"d823139095","applicationID":"509444","transactionName":"YVJVZksCXkEEVhIMWFgYdlFNCl9cSkAVAFlfT2hAXAdZQABWEhZoWFhDbV8MRVwB","queueTime":0,"applicationTime":150,"ttGuid":"","agentToken":"","atts":"TRVWEAMYTU8=","errorBeacon":"bam.nr-data.net","agent":""}</script>
+
+</p></body></html>

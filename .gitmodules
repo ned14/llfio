@@ -1,0 +1,16 @@
+[submodule "include/boost/afio/bindlib"]
+	path = include/boost/afio/bindlib
+	url = https://github.com/ned14/Boost.BindLib.git
+	branch = master
+[submodule "include/boost/afio/v1/branch"]
+	path = include/boost/afio/v1/branch
+	url = https://github.com/BoostGSoC13/boost.afio.git
+	branch = v1.3_Boost_v1.58_branch
+[submodule "include/boost/afio/outcome"]
+	path = include/boost/afio/outcome
+	url = https://github.com/ned14/boost.outcome.git
+	branch = master
+[submodule "include/boost/afio/gsl-lite"]
+	path = include/boost/afio/gsl-lite
+	url = https://github.com/martinmoene/gsl-lite.git
+	branch = master

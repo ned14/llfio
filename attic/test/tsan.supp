@@ -1,0 +1,33 @@
+# These are from GCC
+##race:boost::detail::future_object_base::~future_object_base()
+
+# These are from clang
+##fun:*pthread_mutex_destroy*
+##src:*boost/smart_ptr/scoped_ptr.hpp
+##fun:*scoped_ptr*
+##src:*boost/smart_ptr/detail/sp_counted_impl.hpp
+##fun:*sp_counted_base*
+##src:*boost/exception/detail/exception_ptr.hpp
+##fun:*current_exception_std_exception_wrapper*
+##src:*boost/exception/exception.hpp
+##fun:*refcount_ptr*
+##fun:*exception_detail*
+##src:boost/smart_ptr/detail/shared_count.hpp
+##fun:*shared_count*
+
+# Stuff from libstdc++ not understood by tsan
+race:include/c++/*/bits/shared_ptr_base.h
+race:std::_Sp_counted_base<(__gnu_cxx::_Lock_policy)2>::_M_add_ref_lock()
+race:std::string::_Rep::_M_refdata()
+
+# Stuff from Boost not understood by tsan
+race:boost/exception/detail/exception_ptr.hpp
+race:boost/exception/exception.hpp
+race:void std::swap<boost::exception_detail::clone_base const*>
+race:boost/smart_ptr/detail/shared_count.hpp
+race:boost::detail::shared_count::swap(boost::detail::shared_count&)
+race:boost::detail::shared_count::~shared_count()
+
+# Explicitly known thread unsafe code in test_functions.hpp (false positive)
+race:boost::afio::v1_std_boost_boost::async_file_io_dispatcher_base::post_op_filter_clear()
+race:boost::afio::v1_std_boost_boost::async_file_io_dispatcher_base::post_op_filter(std::vector<std::pair<boost::afio::v1_std_boost_boost::detail::OpType, std::function<void (boost::afio::v1_std_boost_boost::detail::OpType, boost::afio::v1_std_boost_boost::async_io_op&)> >, std::allocator<std::pair<boost::afio::v1_std_boost_boost::detail::OpType, std::function<void (boost::afio::v1_std_boost_boost::detail::OpType, boost::afio::v1_std_boost_boost::async_io_op&)> > > >)

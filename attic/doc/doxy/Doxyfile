@@ -1,0 +1,248 @@
+# Doxyfile 1.5.5
+
+#---------------------------------------------------------------------------
+# Project related configuration options
+#---------------------------------------------------------------------------
+DOXYFILE_ENCODING      = UTF-8
+PROJECT_NAME           = "Boost.AFIO"
+PROJECT_NUMBER         = 
+OUTPUT_DIRECTORY       = ./doxygen_output
+CREATE_SUBDIRS         = NO
+OUTPUT_LANGUAGE        = English
+BRIEF_MEMBER_DESC      = YES
+REPEAT_BRIEF           = YES
+ABBREVIATE_BRIEF       = 
+ALWAYS_DETAILED_SEC    = YES
+INLINE_INHERITED_MEMB  = YES
+FULL_PATH_NAMES        = YES
+STRIP_FROM_PATH        = 
+STRIP_FROM_INC_PATH    = 
+SHORT_NAMES            = NO
+JAVADOC_AUTOBRIEF      = NO
+QT_AUTOBRIEF           = NO
+MULTILINE_CPP_IS_BRIEF = NO
+INHERIT_DOCS           = YES
+SEPARATE_MEMBER_PAGES  = NO
+TAB_SIZE               = 8
+
+# The aliases are shortcuts for Doxygen documentation. 
+# Within Boost.Geometry they are used in the top section, so for both
+# Doxygen documentation and QuickBook documentation.
+# They avoid repetitions and make the documentation more structured.
+# There are also qbk expressions, which might qbk defines and templates.
+
+# There are sections for
+# \brief* for various brief descriptions
+# \tparam* for various template parameters
+# \param* for various parameters
+# \return* for various return cases
+ALIASES                = qbk{1}="\xmlonly <qbk>\1</qbk> \endxmlonly" \
+			qbk{2}="\xmlonly <qbk.\1>\2</qbk.\1> \endxmlonly" \
+			raceguarantees{1}="\xmlonly <qbk>[heading Race Guarantees][raceguarantees \1 ]</qbk> \endxmlonly" \
+			complexity{1}="\xmlonly <qbk>[heading Complexity]\1</qbk> \endxmlonly" \
+			exceptionmodel{1}="\xmlonly <qbk>[heading Exception Model]\1</qbk> \endxmlonly" \
+      exceptionmodelstd="\xmlonly <qbk>[heading Exception Model]Propagates exceptions of any input preconditions with an errored state at the point of dispatch, and throws a `std::invalid_argument` if any inputs have values which could not possibly be correct. Once a batch of input ops has been verified at the point of entry as not errored, you are guaranteed that the batch is atomically scheduled as a whole, unless a failure to allocate memory occurs.</qbk> \endxmlonly" \
+      exceptionmodelfree="\xmlonly <qbk>[heading Exception Model]Propagates the exception of any input precondition with an errored state at the point of dispatch, and throws a `std::invalid_argument` if any inputs have values which could not possibly be correct. Note that error code returning functions may still throw exceptions e.g. failure to allocate memory.</qbk> \endxmlonly" \
+      direct_io_note="Note that on Windows this call issues a separate async file operation for each buffer supplied, thus making scatter/gather i/o no more efficient than making separate calls. The big exception to this is when doing unbuffered page aligned i/o for which Windows provides special scatter/gather i/o functions. You should therefore assume that only each buffer is atomically read or written rather than the full sequence of buffers at once (this also applies to POSIX systems without the preadv()/pwritev() operations)." \
+      ntkernelnamespacenote="Be aware that on Windows AFIO operates exclusively in the NT kernel namespace, NOT the Win32 namespace, and therefore paths you supply are converted by `afio::path` in NT kernel namespace paths. `normalise_path()` can convert an afio path back to a Filesystem TS path for you, but note that this may not be the path that was supplied originally. NT kernel namespace paths have a 32,767 character limit and an almost POSIX like lack of restrictions on naming or historical behaviour quirks, but as a result AFIO does not support DOS short names or any of the other historical Win32 filing system baggage." \
+      deprecate{1}="\xmlonly <qbk>[caution \1]</qbk> \endxmlonly" \
+			constr="Default constructor." \
+			cconstr="Copy constructor." \
+			mconstr="Move constructor." \
+			cassign="Copy assignment." \
+			massign="Move assignment." \
+      io_req1="\brief Constructs an instance. \
+	\param _precondition An optional precondition for this operation \
+	\param v A pointer to memory or reference to object into which to read or write \
+	\param _where The offset at which to transfer" \
+      io_req2="\brief Constructs an instance. \
+	\param _precondition An optional precondition for this operation \
+	\param _buffers A sequence of mutable/const Boost.ASIO buffers to read into/write from \
+	\param _where The offset at which to transfer" \
+      io_req3="\brief Constructs an instance. \
+	\param _precondition An optional precondition for this operation \
+	\param _buffer A mutable/const Boost.ASIO buffer to read into/write from \
+	\param _where The offset at which to transfer" \
+      qexample{1}="\xmlonly <qbk>[heading Example][\1]</qbk> \endxmlonly"
+
+OPTIMIZE_OUTPUT_FOR_C  = NO
+OPTIMIZE_OUTPUT_JAVA   = NO
+OPTIMIZE_FOR_FORTRAN   = NO
+OPTIMIZE_OUTPUT_VHDL   = NO
+BUILTIN_STL_SUPPORT    = YES
+CPP_CLI_SUPPORT        = NO
+SIP_SUPPORT            = NO
+DISTRIBUTE_GROUP_DOC   = NO
+SUBGROUPING            = YES
+TYPEDEF_HIDES_STRUCT   = NO
+#---------------------------------------------------------------------------
+# Build related configuration options
+#---------------------------------------------------------------------------
+EXTRACT_ALL            = NO
+EXTRACT_PRIVATE        = NO
+EXTRACT_STATIC         = YES
+EXTRACT_LOCAL_CLASSES  = NO
+EXTRACT_LOCAL_METHODS  = NO
+EXTRACT_ANON_NSPACES   = NO
+HIDE_UNDOC_MEMBERS     = NO
+HIDE_UNDOC_CLASSES     = NO
+HIDE_FRIEND_COMPOUNDS  = NO
+HIDE_IN_BODY_DOCS      = NO
+INTERNAL_DOCS          = NO
+CASE_SENSE_NAMES       = NO
+HIDE_SCOPE_NAMES       = NO
+SHOW_INCLUDE_FILES     = NO
+INLINE_INFO            = NO
+SORT_MEMBER_DOCS       = NO
+SORT_BRIEF_DOCS        = NO
+SORT_GROUP_NAMES       = YES
+SORT_BY_SCOPE_NAME     = YES
+GENERATE_TODOLIST      = NO
+GENERATE_TESTLIST      = YES
+GENERATE_BUGLIST       = YES
+GENERATE_DEPRECATEDLIST= YES
+ENABLED_SECTIONS       = 
+MAX_INITIALIZER_LINES  = 30
+SHOW_USED_FILES        = NO
+FILE_VERSION_FILTER    = 
+#---------------------------------------------------------------------------
+# configuration options related to warning and progress messages
+#---------------------------------------------------------------------------
+QUIET                  = YES
+WARNINGS               = YES
+WARN_IF_UNDOCUMENTED   = NO
+WARN_IF_DOC_ERROR      = YES
+WARN_NO_PARAMDOC       = NO
+WARN_FORMAT            = "$file:$line: $text"
+WARN_LOGFILE           = 
+#---------------------------------------------------------------------------
+# configuration options related to the input files
+#---------------------------------------------------------------------------
+INPUT                  = ../../include/boost/afio/v2/afio.hpp \
+			./doxygen_input/pages \
+			./doxygen_input/groups
+INPUT_ENCODING         = UTF-8
+FILE_PATTERNS          = *.hpp
+RECURSIVE              = NO
+EXCLUDE                = ./doxygen_extension_examples.hpp 
+EXCLUDE_SYMLINKS       = NO
+EXCLUDE_PATTERNS       = 
+EXCLUDE_SYMBOLS        = 
+EXAMPLE_PATH           = ../../example
+EXAMPLE_PATTERNS       = *.cpp
+EXAMPLE_RECURSIVE      = NO
+IMAGE_PATH             = doxygen_input/images
+INPUT_FILTER           = 
+FILTER_PATTERNS        = 
+FILTER_SOURCE_FILES    = NO
+#---------------------------------------------------------------------------
+# configuration options related to source browsing
+#---------------------------------------------------------------------------
+SOURCE_BROWSER         = YES
+INLINE_SOURCES         = NO
+STRIP_CODE_COMMENTS    = YES
+REFERENCED_BY_RELATION = NO
+REFERENCES_RELATION    = NO
+REFERENCES_LINK_SOURCE = NO
+USE_HTAGS              = NO
+VERBATIM_HEADERS       = NO
+#---------------------------------------------------------------------------
+# configuration options related to the alphabetical class index
+#---------------------------------------------------------------------------
+COLS_IN_ALPHA_INDEX    = 3
+IGNORE_PREFIX          = 
+#---------------------------------------------------------------------------
+# configuration options related to the HTML output
+#---------------------------------------------------------------------------
+GENERATE_HTML          = YES
+HTML_OUTPUT            = html
+HTML_FILE_EXTENSION    = .html
+HTML_HEADER            = doxygen_input/doxygen_header.html
+HTML_FOOTER            = doxygen_input/doxygen_footer.html
+HTML_STYLESHEET        = 
+GENERATE_HTMLHELP      = NO
+GENERATE_DOCSET        = NO
+DOCSET_FEEDNAME        = "Generated documentation, by Doxygen"
+DOCSET_BUNDLE_ID       = org.doxygen.Project
+HTML_DYNAMIC_SECTIONS  = NO
+CHM_FILE               = 
+HHC_LOCATION           = 
+GENERATE_CHI           = NO
+BINARY_TOC             = NO
+TOC_EXPAND             = NO
+DISABLE_INDEX          = NO
+ENUM_VALUES_PER_LINE   = 4
+GENERATE_TREEVIEW      = NO
+TREEVIEW_WIDTH         = 250
+
+#---------------------------------------------------------------------------
+# configuration options related to the XML output
+#---------------------------------------------------------------------------
+GENERATE_XML           = YES
+XML_OUTPUT             = xml
+XML_SCHEMA             = 
+XML_DTD                = 
+XML_PROGRAMLISTING     = NO
+
+#---------------------------------------------------------------------------
+# Configuration options turned off
+#---------------------------------------------------------------------------
+GENERATE_LATEX         = NO
+GENERATE_MAN           = NO
+GENERATE_RTF           = NO
+GENERATE_AUTOGEN_DEF   = NO
+GENERATE_PERLMOD       = NO
+
+
+#---------------------------------------------------------------------------
+# Configuration options related to the preprocessor   
+#---------------------------------------------------------------------------
+ENABLE_PREPROCESSING   = YES
+MACRO_EXPANSION        = YES
+EXPAND_ONLY_PREDEF     = YES
+SEARCH_INCLUDES        = YES
+INCLUDE_PATH           = 
+INCLUDE_FILE_PATTERNS  = 
+PREDEFINED             = \
+                         BOOST_CONCEPT_REQUIRES(x)= \
+                         BOOST_CONCEPT_ASSERT(x)= \
+                         BOOST_STATIC_ASSERT(x)= \
+                         BOOST_AFIO_DECL= \
+                         DOXYGEN_SHOULD_SKIP_THIS \
+                         DOXYGEN_NO_CLASS_ENUMS \
+                         BOOST_NOEXCEPT_OR_NOTHROW=noexcept \
+                         BOOST_CONSTEXPR_OR_CONST=constexpr \
+                         BOOST_CONSTEXPR=constexpr \
+                         BOOST_CXX14_CONSTEXPR=constexpr
+EXPAND_AS_DEFINED      = BOOST_AFIO_DIRECTORY_ENTRY_ACCESS_METHOD \
+                         BOOST_AFIO_HEADERS_ONLY_FUNC_SPEC \
+                         BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC \
+                         BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC \
+                         BOOST_AFIO_HEADERS_ONLY_VIRTUAL_UNDEFINED_SPEC \
+                         BOOST_AFIO_V2_NAMESPACE \
+                         BOOST_AFIO_V2_NAMESPACE_BEGIN \
+                         BOOST_AFIO_V2_NAMESPACE_END
+SKIP_FUNCTION_MACROS   = YES
+
+
+#---------------------------------------------------------------------------
+# Configuration::additions related to the search engine   
+#---------------------------------------------------------------------------
+SEARCHENGINE           = NO
+
+ALIASES += docs_adopt="This function enables you to adopt third party custom `__afio_handle__` derivatives as ops into the scheduler. Think of it as if you were calling file(), except the op returns the supplied handle and otherwise does nothing."
+ALIASES += docs_dir="Note that if there is already a handle open to the directory requested, that will be returned instead of a new handle unless file_flags::unique_directory_handle is specified. For such handles where available_to_directory_cache() is true, they cannot be explicitly closed either, you must let the reference count reach zero for that to happen.\n\nRelated types: `__afio_path_req__`"
+ALIASES += docs_rmdir="Make sure you read the docs for `__afio_handle__::unlink()` for important caveats.\n\nNote that on operating systems with an unstable `__afio_handle__::path(true)` you need to be cautious of deleting files by handle as any hard link to that file may be deleted instead of the one you intended. To work around this, portable code should delete by directory handle as the precondition and known leafname.\n\nRelated types: `__afio_path_req__`"
+ALIASES += docs_file="Be aware that any files created are by default sparse if supported on the local filing system. On Windows opening any file for writing converts it to sparse. Use file_flags::no_sparse to prevent this on those filing systems which permit it.\n\nRelated types: `__afio_path_req__`"
+ALIASES += docs_rmfile="Note that you can delete files before they are closed on Windows just as with POSIX if and only if all open handles to that file were opened with permission for the file to be deleted (AFIO always sets this). The actual file data will be deleted when the last handle is closed on the system.\n\nMake sure you read the docs for `__afio_handle__::unlink()` for important caveats.\n\nNote that on operating systems with an unstable `__afio_handle__::path(true)` you need to be cautious of deleting files by handle as any hard link to that file may be deleted instead of the one you intended. To work around this, portable code should delete by directory handle as the precondition and known leafname.\n\nRelated types: `__afio_path_req__`"
+ALIASES += docs_symlink="Note that if creating and you don't specify a target, the target for the symlink is the precondition. On Windows directories are symlinked using a reparse point instead of a symlink due to the default lack of the <tt>SeCreateSymbolicLinkPrivilege</tt> for non-Administrative users. On Windows you can open symlinks as a file and so a valid handle is output, whereas on POSIX except for Linux you cannot do this and an invalid handle is output.\n\nRelated types: `__afio_path_req__`"
+ALIASES += docs_rmsymlink="Make sure you read the docs for `__afio_handle__::unlink()` for important caveats.\n\nNote that on operating systems with an unstable `__afio_handle__::path(true)` you need to be cautious of deleting files by handle as any hard link to that file may be deleted instead of the one you intended. To work around this, portable code should delete by directory handle as the precondition and known leafname.\n\nRelated types: `__afio_path_req__`"
+ALIASES += docs_sync="It goes without saying that this call can take very significant amounts of time to complete!"
+ALIASES += docs_zero="Most extent based filing systems provide an optimised way of zeroing parts of a file by deallocating the storage backing those regions, and marking those regions as unwritten instead of actually writing zero bytes to storage. They appear as zeroes to anything reading those ranges, and have the big advantage of not consuming any actual physical storage. On Windows, extent deallocation writes zeros for ordinary files and only actually deallocates physical storage if the file is sparse or compressed (note that AFIO by default creates sparse files where possible, and converts any file opened for writing to a sparse file). For your information, deallocation on NTFS is on a 64Kb granularity, but the zeros are written at a byte granularity. On Linux, an attempt is made to use FALLOC_FL_PUNCH_HOLE which if it fails then a write of zeros corresponding to the same ranges is made instead. On FreeBSD, long runs of zeros are automatically detected and eliminated on physical storage, and so zeros are simply written. On OS X, there is no formal hole punching API that we are aware of, and so zeros are simply written."
+ALIASES += docs_close="Note this is ignored for handles where available_to_directory_cache() is true as those cannot be explicitly closed. Note that failure to explicitly schedule closing a file handle using this call means it will be [*synchronously] closed on last reference count by `__afio_handle__`. This can consume considerable time, especially if SyncOnClose is enabled."
+ALIASES += docs_read="Related types: `__afio_io_req__`"
+ALIASES += docs_write="Related types: `__afio_io_req__`"
+ALIASES += docs_truncate=""
+ALIASES += docs_enumerate="By default dir() returns shared handles i.e. dir("foo") and dir("foo") will return the exact same handle, and therefore enumerating not all of the entries at once is a race condition. The solution is to either set maxitems to a value large enough to guarantee a directory will be enumerated in a single shot, or to open a separate directory handle using the file_flags::unique_directory_handle flag.\n\nNote that setting maxitems=1 will often cause a buffer space exhaustion, causing a second syscall with an enlarged buffer. This is because AFIO cannot know if the allocated buffer can hold all of the filename being retrieved, so it may have to retry. Put another way, setting maxitems=1 will give you the worst performance possible, whereas maxitems=2 will probably only return one item most of the time.\n\nRelated types: `__afio_enumerate_req__`, `__afio_directory_entry__`, `__afio_stat_t__`"
+ALIASES += docs_extents="In a sparsely allocated file, it can be useful to know which extents contain non-zero data. Note that this call is racy (i.e. the extents are enumerated one by one on some platforms, this means they may be out of date with respect to one another) when other threads or processes are concurrently calling zero() or write() - this is a host OS API limitation."
+ALIASES += docs_statfs="Related types: `__afio_statfs_t__`"

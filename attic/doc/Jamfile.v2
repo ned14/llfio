@@ -1,0 +1,74 @@
+# Boost.AFIO
+#
+# This documentation machinery is derived from Boost.Geometry
+
+# Use, modification and distribution is subject to the Boost Software License,
+# Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
+# http://www.boost.org/LICENSE_1_0.txt)
+
+
+import os ;
+
+project afio/doc ;
+using quickbook ;
+
+path-constant here : . ;
+
+make disqus_comments.html : ./disqus_comments.html : @copy_disqus_identifiers ;
+if [ os.name ] = NT
+{
+    actions copy_disqus_identifiers
+    {
+        for %%a in ("$(>)") do set src_path=%%~dpa\disqus_identifiers
+        for %%a in ("$(<)") do set dest_path=%%~dpa\disqus_identifiers
+        robocopy /E %src_path% %dest_path%
+        copy /B $(>) $(<)
+    }
+}
+else
+{
+    actions copy_disqus_identifiers
+    {
+        cp -a `dirname $(>)`/disqus_identifiers `dirname $(<)`/disqus_identifiers 
+        cp -a $(>) $(<)
+    }
+}
+
+boostbook afio 
+    : afio.qbk
+    : <dependency>Jamfile.v2
+        <dependency>generated/class_dispatcher.qbk
+        <xsl:param>chunk.section.depth=4
+#    <auto-index>off
+#    <auto-index-internal>on
+#    <auto-index-verbose>off
+#    <xsl:param>index.on.type=1
+#       <format>html
+       <xsl:param>chunk.first.sections=1
+       <xsl:param>toc.section.depth=4
+       <xsl:param>toc.max.depth=4
+       <xsl:param>generate.section.toc.level=4
+       <xsl:param>boost.root=../..
+       <format>onehtml:<xsl:param>img.src.path=../../../../libs/afio/doc/src/images/a/b/
+       <format>html:<xsl:param>img.src.path=../../../../libs/afio/doc/src/images/a/b/
+       <format>xhtml:<xsl:param>img.src.path=../../../../libs/afio/doc/src/images/a/b/
+       <format>pdf:<xsl:param>img.src.path=../../../../../../libs/afio/doc/src/images/
+       <xsl:param>root.filename=afio
+       <xsl:param>html.stylesheet=../../libs/afio/doc/html/myboostbook.css
+       <quickbook-define>enable_index
+       <include>$(here)
+       <format>pdf:<xsl:param>boost.url.prefix=https://ci.nedprod.com/
+       <xsl:param>fop1.extensions=0
+       #<format>pdf:<xsl:param>xep.extensions=1
+       # TOC generation: this is needed for FOP 0.2, but must not be set to zero for FOP-0.9!
+       <format>pdf:<xsl:param>fop.extensions=0
+       # No indent on body text:
+       <format>pdf:<xsl:param>body.start.indent=0pt
+       # Margin size:
+       <format>pdf:<xsl:param>page.margin.inner=0.5in
+       # Margin size:
+       <format>pdf:<xsl:param>page.margin.outer=0.5in
+;
+
+install pdfinstall : afio/<format>pdf : <location>. <name>afio.pdf <install-type>PDF ;
+explicit pdfinstall ;

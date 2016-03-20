@@ -1,0 +1,1196 @@
+[/==============================================================================
+    Use, modification and distribution is subject to the Boost Software License,
+    Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
+    http://www.boost.org/LICENSE_1_0.txt)
+===============================================================================/]
+
+
+
+[section Compilation]
+
+[def __msvc__ MSVC]
+[def __stlport__ [@http://sourceforge.net/projects/stlport STLport]]
+
+__boost_afio__ is by default a headers-only library, unless you define the macro
+`BOOST_AFIO_HEADERS_ONLY` to zero before including afio.hpp. Users only need to include the 
+library headers in their programs in order to be able to access definitions 
+and algorithms provided by the __boost_afio__ library. No linking against 
+any binaries is required. 
+
+As of v1.3 of the engine, __boost_afio__ is now capable of being used standalone
+with no dependencies. You choose the dependencies by setting the following macros or
+leaving them default:
+
+* `BOOST_AFIO_USE_BOOST_THREAD` (defaults to 0 except on Mingw32 only, Mingw-w64 has a working
+std thread library): Use Boost instead of the C++ 11 STL for
+atomic, chrono, future, mutex and thread. This is useful where your C++ 11 STL is deficient
+or where Boost's facilities are more useful.
+
+* `BOOST_AFIO_USE_BOOST_FILESYSTEM` (defaults to 0 except on VS2015 and later): Use
+__boost_filesystem__ instead of the C++ 1y Filesystem TS provided by your STL. As
+currently only VS2015 provides Filesystem, it only defaults to 1 for that platform.
+
+* `ASIO_STANDALONE` (defaults to undefined): Use standalone ASIO instead of __boost_asio__.
+You will need to provide a copy of standalone ASIO on your include path.
+
+If you wish to run unit tests, you may also adjust:
+
+* `BOOST_AFIO_USE_BOOST_UNIT_TEST` (defaults to 0): Use __boost_test__ instead
+of __boost_bindlib__'s emulation based on __catch__.
+
+Thanks to __boost_bindlib__, if your compiler has inline namespace support, you can multiply use the above four build config
+macros in [*any] combination you like, ['including] within the same translation unit
+i.e. a Boost.Thread based AFIO coexists happily with a C++ 11 STL AFIO in the same compiland,
+and any combination thereof. Simply undefine the old values of the macros, and define new values
+including afio.hpp afterwards.
+
+If you do make use of __boost_filesystem__ in your AFIO build, note that
+Boost.Filesystem is dependant on Boost.System which will also need to be linked in.
+On some platforms (e.g. ARM) you may also need Boost.Atomic.
+
+After defining your build macros of choice, making latest AFIO available to your
+code is as simple as:
+
+    #include "boost.afio/include/boost/afio.hpp"     // latest version
+    #include "boost.afio/include/boost/v1/afio.hpp"  // specific version
+
+if being used standalone or if being used as part of Boost:
+
+    #include "boost/afio.hpp"          // latest version
+    #include "boost/afio/v1/afio.hpp"  // specific version
+
+[heading:trunk_status Supported Compilers And Current Trunk Build And Unit Test State]
+[#unit_test_dashboard]
+
+'''
+<informaltable frame="all" border="1" color="black">
+      <tgroup cols="6">
+        <colspec colnum="1" colname="col1"/>
+        <colspec colnum="2" colname="col2"/>
+        <colspec colnum="3" colname="col3"/>
+        <colspec colnum="4" colname="col4"/>
+        <colspec colnum="5" colname="col5"/>
+        <colspec colnum="6" colname="col6"/>
+        <thead>
+          <row>
+            <entry>OS</entry>
+            <entry>Compiler</entry>
+            <entry>STL</entry>
+            <entry>CPU</entry>
+            <entry>Build</entry>
+            <entry>Unit tests</entry>
+          </row>
+        </thead>
+        <tbody>
+          <row>
+            <entry morerows="1">Static analysis</entry>
+            <entry>clang 3.7 tidy + static analyser + GCC 4.8</entry>
+            <entry/>
+            <entry/>
+            <entry>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Static%20Analysis%20clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/buildStatus/icon?job=Boost.AFIO%20Static%20Analysis%20clang"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+            </entry>
+            <entry/>
+          </row>
+          <row>
+            <entry>VS2013</entry>
+            <entry/>
+            <entry/>
+            <entry>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Static%20Analysis%20MSVC/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/buildStatus/icon?job=Boost.AFIO%20Static%20Analysis%20MSVC"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+            </entry>
+            <entry/>
+          </row>
+          <row>
+            <entry>Thread Sanitiser</entry>
+            <entry>clang 3.4</entry>
+            <entry>libstdc++ 4.9</entry>
+            <entry>x64</entry>
+            <entry/>
+            <entry>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Sanitise%20Linux%20clang%203.4/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/buildStatus/icon?job=Boost.AFIO%20Sanitise%20Linux%20clang%203.4"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+            </entry>
+          </row>
+          <row>
+            <entry>Valgrind</entry>
+            <entry>GCC 4.8</entry>
+            <entry>libstdc++ 4.8</entry>
+            <entry>x64</entry>
+            <entry/>
+            <entry>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Valgrind%20Linux%20GCC%204.8/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/buildStatus/icon?job=Boost.AFIO%20Valgrind%20Linux%20GCC%204.8"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+            </entry>
+          </row>
+          <row>
+            <entry>Apple Mac OS X 10.9</entry>
+            <entry>clang 3.5</entry>
+            <entry>libc++</entry>
+            <entry>x64</entry>
+            <entry>
+              <ulink url="https://travis-ci.org/BoostGSoC13/boost.afio">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://travis-ci.org/BoostGSoC13/boost.afio.png?branch=master"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+            </entry>
+            <entry>
+              <ulink url="https://travis-ci.org/BoostGSoC13/boost.afio">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://travis-ci.org/BoostGSoC13/boost.afio.png?branch=master"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+            </entry>
+          </row>
+          <row>
+            <entry morerows="1">Android 5.0</entry>
+            <entry>clang 3.5</entry>
+            <entry>libc++</entry>
+            <entry>x86</entry>
+            <entry>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++11,CXX=g++-4.8,LINKTYPE=standalone,label=android-ndk/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++11,CXX=g++-4.8,LINKTYPE=standalone,label=android-ndk/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+            </entry>
+            <entry>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++11,CXX=g++-4.8,LINKTYPE=standalone,label=android-ndk/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++11,CXX=g++-4.8,LINKTYPE=standalone,label=android-ndk/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+            </entry>
+          </row>
+          <row>
+            <entry>GCC 4.8</entry>
+            <entry>libc++</entry>
+            <entry>x86</entry>
+            <entry>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++11,CXX=g++-4.8,LINKTYPE=standalone,label=android-ndk/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++11,CXX=g++-4.8,LINKTYPE=standalone,label=android-ndk/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+            </entry>
+            <entry>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++11,CXX=g++-4.8,LINKTYPE=standalone,label=android-ndk/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++11,CXX=g++-4.8,LINKTYPE=standalone,label=android-ndk/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+            </entry>
+          </row>
+          <row>
+            <entry>FreeBSD 10.1 on ZFS</entry>
+            <entry>clang 3.4</entry>
+            <entry>libc++</entry>
+            <entry>x86</entry>
+            <entry>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++11,CXX=clang++-3.3,LINKTYPE=static,label=freebsd10-clang3.3/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++11,CXX=clang++-3.3,LINKTYPE=static,label=freebsd10-clang3.3/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++11,CXX=clang++-3.3,LINKTYPE=shared,label=freebsd10-clang3.3/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++11,CXX=clang++-3.3,LINKTYPE=shared,label=freebsd10-clang3.3/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++11,CXX=clang++-3.3,LINKTYPE=standalone,label=freebsd10-clang3.3/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++11,CXX=clang++-3.3,LINKTYPE=standalone,label=freebsd10-clang3.3/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+            </entry>
+            <entry>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++11,CXX=clang++-3.3,LINKTYPE=static,label=freebsd10-clang3.3/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++11,CXX=clang++-3.3,LINKTYPE=static,label=freebsd10-clang3.3/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++11,CXX=clang++-3.3,LINKTYPE=shared,label=freebsd10-clang3.3/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++11,CXX=clang++-3.3,LINKTYPE=shared,label=freebsd10-clang3.3/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++11,CXX=clang++-3.3,LINKTYPE=standalone,label=freebsd10-clang3.3/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++11,CXX=clang++-3.3,LINKTYPE=standalone,label=freebsd10-clang3.3/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+            </entry>
+          </row>
+          <row>
+            <entry morerows="1">Ubuntu Linux 12.04 LTS</entry>
+            <entry>clang 3.3</entry>
+            <entry>libstdc++ 4.8</entry>
+            <entry>x86</entry>
+            <entry>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++11,CXX=clang++-3.3,LINKTYPE=static,label=linux-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++11,CXX=clang++-3.3,LINKTYPE=static,label=linux-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++11,CXX=clang++-3.3,LINKTYPE=shared,label=linux-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++11,CXX=clang++-3.3,LINKTYPE=shared,label=linux-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++11,CXX=clang++-3.3,LINKTYPE=standalone,label=linux-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++11,CXX=clang++-3.3,LINKTYPE=standalone,label=linux-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+            </entry>
+            <entry>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++11,CXX=clang++-3.3,LINKTYPE=static,label=linux-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++11,CXX=clang++-3.3,LINKTYPE=static,label=linux-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++11,CXX=clang++-3.3,LINKTYPE=shared,label=linux-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++11,CXX=clang++-3.3,LINKTYPE=shared,label=linux-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++11,CXX=clang++-3.3,LINKTYPE=standalone,label=linux-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++11,CXX=clang++-3.3,LINKTYPE=standalone,label=linux-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+            </entry>
+          </row>
+          <row>
+            <entry>clang 3.4</entry>
+            <entry>libstdc++ 4.8</entry>
+            <entry>x86</entry>
+            <entry>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++11,CXX=clang++-3.4,LINKTYPE=static,label=linux-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++11,CXX=clang++-3.4,LINKTYPE=static,label=linux-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++11,CXX=clang++-3.4,LINKTYPE=shared,label=linux-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++11,CXX=clang++-3.4,LINKTYPE=shared,label=linux-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++11,CXX=clang++-3.4,LINKTYPE=standalone,label=linux-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++11,CXX=clang++-3.4,LINKTYPE=standalone,label=linux-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+            </entry>
+            <entry>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++11,CXX=clang++-3.4,LINKTYPE=static,label=linux-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++11,CXX=clang++-3.4,LINKTYPE=static,label=linux-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++11,CXX=clang++-3.4,LINKTYPE=shared,label=linux-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++11,CXX=clang++-3.4,LINKTYPE=shared,label=linux-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++11,CXX=clang++-3.4,LINKTYPE=standalone,label=linux-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++11,CXX=clang++-3.4,LINKTYPE=standalone,label=linux-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+            </entry>
+          </row>
+          <row>
+            <entry morerows="7">Ubuntu Linux 14.04 LTS</entry>
+            <entry>clang 3.5</entry>
+            <entry>libstdc++ 4.9</entry>
+            <entry>x64</entry>
+            <entry>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++11,CXX=clang++-3.5,LINKTYPE=static,label=linux64-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++11,CXX=clang++-3.5,LINKTYPE=static,label=linux64-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++11,CXX=clang++-3.5,LINKTYPE=shared,label=linux64-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++11,CXX=clang++-3.5,LINKTYPE=shared,label=linux64-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++11,CXX=clang++-3.5,LINKTYPE=standalone,label=linux64-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++11,CXX=clang++-3.5,LINKTYPE=standalone,label=linux64-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+            </entry>
+            <entry>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++11,CXX=clang++-3.5,LINKTYPE=static,label=linux64-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++11,CXX=clang++-3.5,LINKTYPE=static,label=linux64-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++11,CXX=clang++-3.5,LINKTYPE=shared,label=linux64-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++11,CXX=clang++-3.5,LINKTYPE=shared,label=linux64-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++11,CXX=clang++-3.5,LINKTYPE=standalone,label=linux64-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++11,CXX=clang++-3.5,LINKTYPE=standalone,label=linux64-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+            </entry>
+          </row>
+          <row>
+            <entry>clang 3.5</entry>
+            <entry>libstdc++ 4.9</entry>
+            <entry>ARMv7</entry>
+            <entry>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++11,CXX=clang++-3.5,LINKTYPE=static,label=arm-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++11,CXX=clang++-3.5,LINKTYPE=static,label=arm-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++11,CXX=clang++-3.5,LINKTYPE=shared,label=arm-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++11,CXX=clang++-3.5,LINKTYPE=shared,label=arm-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++11,CXX=clang++-3.5,LINKTYPE=standalone,label=arm-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++11,CXX=clang++-3.5,LINKTYPE=standalone,label=arm-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+            </entry>
+            <entry>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++11,CXX=clang++-3.5,LINKTYPE=static,label=arm-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++11,CXX=clang++-3.5,LINKTYPE=static,label=arm-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++11,CXX=clang++-3.5,LINKTYPE=shared,label=arm-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++11,CXX=clang++-3.5,LINKTYPE=shared,label=arm-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++11,CXX=clang++-3.5,LINKTYPE=standalone,label=arm-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++11,CXX=clang++-3.5,LINKTYPE=standalone,label=arm-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+            </entry>
+          </row>
+          <row>
+            <entry>clang 3.6</entry>
+            <entry>libstdc++ 4.9</entry>
+            <entry>x64</entry>
+            <entry>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++11,CXX=clang++-3.6,LINKTYPE=static,label=linux64-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++11,CXX=clang++-3.6,LINKTYPE=static,label=linux64-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++11,CXX=clang++-3.6,LINKTYPE=shared,label=linux64-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++11,CXX=clang++-3.6,LINKTYPE=shared,label=linux64-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++11,CXX=clang++-3.6,LINKTYPE=standalone,label=linux64-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++11,CXX=clang++-3.6,LINKTYPE=standalone,label=linux64-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++14,CXX=clang++-3.6,LINKTYPE=static,label=linux64-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++14,CXX=clang++-3.6,LINKTYPE=static,label=linux64-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++14,CXX=clang++-3.6,LINKTYPE=shared,label=linux64-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++14,CXX=clang++-3.6,LINKTYPE=shared,label=linux64-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++14,CXX=clang++-3.6,LINKTYPE=standalone,label=linux64-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++14,CXX=clang++-3.6,LINKTYPE=standalone,label=linux64-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+            </entry>
+            <entry>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++11,CXX=clang++-3.6,LINKTYPE=static,label=linux64-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++11,CXX=clang++-3.6,LINKTYPE=static,label=linux64-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++11,CXX=clang++-3.6,LINKTYPE=shared,label=linux64-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++11,CXX=clang++-3.6,LINKTYPE=shared,label=linux64-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++11,CXX=clang++-3.6,LINKTYPE=standalone,label=linux64-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++11,CXX=clang++-3.6,LINKTYPE=standalone,label=linux64-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++14,CXX=clang++-3.6,LINKTYPE=static,label=linux64-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++14,CXX=clang++-3.6,LINKTYPE=static,label=linux64-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++14,CXX=clang++-3.6,LINKTYPE=shared,label=linux64-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++14,CXX=clang++-3.6,LINKTYPE=shared,label=linux64-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++14,CXX=clang++-3.6,LINKTYPE=standalone,label=linux64-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++14,CXX=clang++-3.6,LINKTYPE=standalone,label=linux64-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+            </entry>
+          </row>
+          <row>
+            <entry>clang 3.7</entry>
+            <entry>libstdc++ 4.9</entry>
+            <entry>x64</entry>
+            <entry>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++11,CXX=clang++-3.7,LINKTYPE=static,label=linux64-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++11,CXX=clang++-3.7,LINKTYPE=static,label=linux64-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++11,CXX=clang++-3.7,LINKTYPE=shared,label=linux64-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++11,CXX=clang++-3.7,LINKTYPE=shared,label=linux64-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++11,CXX=clang++-3.7,LINKTYPE=standalone,label=linux64-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++11,CXX=clang++-3.7,LINKTYPE=standalone,label=linux64-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++14,CXX=clang++-3.7,LINKTYPE=static,label=linux64-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++14,CXX=clang++-3.7,LINKTYPE=static,label=linux64-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++14,CXX=clang++-3.7,LINKTYPE=shared,label=linux64-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++14,CXX=clang++-3.7,LINKTYPE=shared,label=linux64-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++14,CXX=clang++-3.7,LINKTYPE=standalone,label=linux64-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++14,CXX=clang++-3.7,LINKTYPE=standalone,label=linux64-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+            </entry>
+            <entry>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++11,CXX=clang++-3.7,LINKTYPE=static,label=linux64-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++11,CXX=clang++-3.7,LINKTYPE=static,label=linux64-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++11,CXX=clang++-3.7,LINKTYPE=shared,label=linux64-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++11,CXX=clang++-3.7,LINKTYPE=shared,label=linux64-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++11,CXX=clang++-3.7,LINKTYPE=standalone,label=linux64-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++11,CXX=clang++-3.7,LINKTYPE=standalone,label=linux64-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++14,CXX=clang++-3.7,LINKTYPE=static,label=linux64-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++14,CXX=clang++-3.7,LINKTYPE=static,label=linux64-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++14,CXX=clang++-3.7,LINKTYPE=shared,label=linux64-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++14,CXX=clang++-3.7,LINKTYPE=shared,label=linux64-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++14,CXX=clang++-3.7,LINKTYPE=standalone,label=linux64-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++14,CXX=clang++-3.7,LINKTYPE=standalone,label=linux64-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+            </entry>
+          </row>
+          <row>
+            <entry>GCC 4.8</entry>
+            <entry>libstdc++ 4.8</entry>
+            <entry>x64</entry>
+            <entry>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++11,CXX=g++-4.8,LINKTYPE=static,label=linux64-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++11,CXX=g++-4.8,LINKTYPE=static,label=linux64-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++11,CXX=g++-4.8,LINKTYPE=shared,label=linux64-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++11,CXX=g++-4.8,LINKTYPE=shared,label=linux64-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++11,CXX=g++-4.8,LINKTYPE=standalone,label=linux64-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++11,CXX=g++-4.8,LINKTYPE=standalone,label=linux64-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+            </entry>
+            <entry>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++11,CXX=g++-4.8,LINKTYPE=static,label=linux64-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++11,CXX=g++-4.8,LINKTYPE=static,label=linux64-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++11,CXX=g++-4.8,LINKTYPE=shared,label=linux64-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++11,CXX=g++-4.8,LINKTYPE=shared,label=linux64-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++11,CXX=g++-4.8,LINKTYPE=standalone,label=linux64-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++11,CXX=g++-4.8,LINKTYPE=standalone,label=linux64-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+            </entry>
+          </row>
+          <row>
+            <entry>GCC 4.9</entry>
+            <entry>libstdc++ 4.9</entry>
+            <entry>x64</entry>
+            <entry>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++11,CXX=g++-4.9,LINKTYPE=static,label=linux64-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++11,CXX=g++-4.9,LINKTYPE=static,label=linux64-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++11,CXX=g++-4.9,LINKTYPE=shared,label=linux64-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++11,CXX=g++-4.9,LINKTYPE=shared,label=linux64-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++11,CXX=g++-4.9,LINKTYPE=standalone,label=linux64-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++11,CXX=g++-4.9,LINKTYPE=standalone,label=linux64-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++14,CXX=g++-4.9,LINKTYPE=static,label=linux64-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++14,CXX=g++-4.9,LINKTYPE=static,label=linux64-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++14,CXX=g++-4.9,LINKTYPE=shared,label=linux64-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++14,CXX=g++-4.9,LINKTYPE=shared,label=linux64-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++14,CXX=g++-4.9,LINKTYPE=standalone,label=linux64-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++14,CXX=g++-4.9,LINKTYPE=standalone,label=linux64-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+            </entry>
+            <entry>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++11,CXX=g++-4.9,LINKTYPE=static,label=linux64-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++11,CXX=g++-4.9,LINKTYPE=static,label=linux64-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++11,CXX=g++-4.9,LINKTYPE=shared,label=linux64-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++11,CXX=g++-4.9,LINKTYPE=shared,label=linux64-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++11,CXX=g++-4.9,LINKTYPE=standalone,label=linux64-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++11,CXX=g++-4.9,LINKTYPE=standalone,label=linux64-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++14,CXX=g++-4.9,LINKTYPE=static,label=linux64-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++14,CXX=g++-4.9,LINKTYPE=static,label=linux64-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++14,CXX=g++-4.9,LINKTYPE=shared,label=linux64-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++14,CXX=g++-4.9,LINKTYPE=shared,label=linux64-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++14,CXX=g++-4.9,LINKTYPE=standalone,label=linux64-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++14,CXX=g++-4.9,LINKTYPE=standalone,label=linux64-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+            </entry>
+          </row>
+          <row>
+            <entry>GCC 4.9</entry>
+            <entry>libstdc++ 4.9</entry>
+            <entry>ARMv7</entry>
+            <entry>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++11,CXX=g++-4.9,LINKTYPE=static,label=arm-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++11,CXX=g++-4.9,LINKTYPE=static,label=arm-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++11,CXX=g++-4.9,LINKTYPE=shared,label=arm-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++11,CXX=g++-4.9,LINKTYPE=shared,label=arm-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++11,CXX=g++-4.9,LINKTYPE=standalone,label=arm-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++11,CXX=g++-4.9,LINKTYPE=standalone,label=arm-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++14,CXX=g++-4.9,LINKTYPE=static,label=arm-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++14,CXX=g++-4.9,LINKTYPE=static,label=arm-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++14,CXX=g++-4.9,LINKTYPE=shared,label=arm-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++14,CXX=g++-4.9,LINKTYPE=shared,label=arm-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++14,CXX=g++-4.9,LINKTYPE=standalone,label=arm-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++14,CXX=g++-4.9,LINKTYPE=standalone,label=arm-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+            </entry>
+            <entry>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++11,CXX=g++-4.9,LINKTYPE=static,label=arm-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++11,CXX=g++-4.9,LINKTYPE=static,label=arm-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++11,CXX=g++-4.9,LINKTYPE=shared,label=arm-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++11,CXX=g++-4.9,LINKTYPE=shared,label=arm-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++11,CXX=g++-4.9,LINKTYPE=standalone,label=arm-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++11,CXX=g++-4.9,LINKTYPE=standalone,label=arm-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++14,CXX=g++-4.9,LINKTYPE=static,label=arm-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++14,CXX=g++-4.9,LINKTYPE=static,label=arm-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++14,CXX=g++-4.9,LINKTYPE=shared,label=arm-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++14,CXX=g++-4.9,LINKTYPE=shared,label=arm-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++14,CXX=g++-4.9,LINKTYPE=standalone,label=arm-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++14,CXX=g++-4.9,LINKTYPE=standalone,label=arm-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+            </entry>
+          </row>
+          <row>
+            <entry>GCC 5.1</entry>
+            <entry>libstdc++ 5.1</entry>
+            <entry>x64</entry>
+            <entry>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++11,CXX=g++-5,LINKTYPE=static,label=linux64-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++11,CXX=g++-5,LINKTYPE=static,label=linux64-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++11,CXX=g++-5,LINKTYPE=shared,label=linux64-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++11,CXX=g++-5,LINKTYPE=shared,label=linux64-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++11,CXX=g++-5,LINKTYPE=standalone,label=linux64-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++11,CXX=g++-5,LINKTYPE=standalone,label=linux64-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++14,CXX=g++-5,LINKTYPE=static,label=linux64-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++14,CXX=g++-5,LINKTYPE=static,label=linux64-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++14,CXX=g++-5,LINKTYPE=shared,label=linux64-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++14,CXX=g++-5,LINKTYPE=shared,label=linux64-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++14,CXX=g++-5,LINKTYPE=standalone,label=linux64-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++14,CXX=g++-5,LINKTYPE=standalone,label=linux64-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+            </entry>
+            <entry>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++11,CXX=g++-5,LINKTYPE=static,label=linux64-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++11,CXX=g++-5,LINKTYPE=static,label=linux64-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++11,CXX=g++-5,LINKTYPE=shared,label=linux64-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++11,CXX=g++-5,LINKTYPE=shared,label=linux64-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++11,CXX=g++-5,LINKTYPE=standalone,label=linux64-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++11,CXX=g++-5,LINKTYPE=standalone,label=linux64-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++14,CXX=g++-5,LINKTYPE=static,label=linux64-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++14,CXX=g++-5,LINKTYPE=static,label=linux64-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++14,CXX=g++-5,LINKTYPE=shared,label=linux64-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++14,CXX=g++-5,LINKTYPE=shared,label=linux64-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++14,CXX=g++-5,LINKTYPE=standalone,label=linux64-gcc-clang/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++14,CXX=g++-5,LINKTYPE=standalone,label=linux64-gcc-clang/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+            </entry>
+          </row>
+          <row>
+            <entry morerows="2">Microsoft Windows 8.1</entry>
+            <entry>Mingw-w64 GCC 4.8</entry>
+            <entry>libstdc++ 4.8</entry>
+            <entry>x64</entry>
+            <entry>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++11,CXX=mingw64,LINKTYPE=static,label=win8-msvc-mingw/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++11,CXX=mingw64,LINKTYPE=static,label=win8-msvc-mingw/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++11,CXX=mingw64,LINKTYPE=shared,label=win8-msvc-mingw/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++11,CXX=mingw64,LINKTYPE=shared,label=win8-msvc-mingw/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+            </entry>
+            <entry>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++11,CXX=mingw64,LINKTYPE=static,label=win8-msvc-mingw/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++11,CXX=mingw64,LINKTYPE=static,label=win8-msvc-mingw/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++11,CXX=mingw64,LINKTYPE=shared,label=win8-msvc-mingw/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++11,CXX=mingw64,LINKTYPE=shared,label=win8-msvc-mingw/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+            </entry>
+          </row>
+          <row>
+            <entry>Visual Studio 2015</entry>
+            <entry>Dinkumware</entry>
+            <entry>x64</entry>
+            <entry>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++14,CXX=msvc-14.0,LINKTYPE=static,label=win8-msvc-mingw/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++14,CXX=msvc-14.0,LINKTYPE=static,label=win8-msvc-mingw/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++14,CXX=msvc-14.0,LINKTYPE=shared,label=win8-msvc-mingw/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++14,CXX=msvc-14.0,LINKTYPE=shared,label=win8-msvc-mingw/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++14,CXX=msvc-14.0,LINKTYPE=standalone,label=win8-msvc-mingw/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++14,CXX=msvc-14.0,LINKTYPE=standalone,label=win8-msvc-mingw/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+            </entry>
+            <entry>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++14,CXX=msvc-14.0,LINKTYPE=static,label=win8-msvc-mingw/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++14,CXX=msvc-14.0,LINKTYPE=static,label=win8-msvc-mingw/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++14,CXX=msvc-14.0,LINKTYPE=shared,label=win8-msvc-mingw/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++14,CXX=msvc-14.0,LINKTYPE=shared,label=win8-msvc-mingw/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+              <ulink url="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++14,CXX=msvc-14.0,LINKTYPE=standalone,label=win8-msvc-mingw/">
+                <mediaobject>
+                  <imageobject>
+                    <imagedata fileref="https://ci.nedprod.com/job/Boost.AFIO%20Test/CPPSTD=c++14,CXX=msvc-14.0,LINKTYPE=standalone,label=win8-msvc-mingw/badge/icon"/>
+                  </imageobject>
+                </mediaobject>
+              </ulink>
+            </entry>
+          </row>
+        </tbody>
+      </tgroup>
+    </informaltable>
+'''
+
+
+[heading Boost AFIO Installation into Boost]
+
+As of v1.3 of the engine, you can simply download [@https://boostgsoc13.github.io/boost.afio/afio-stable.tar.bz2 the afio stable
+tarball] (same as git clone __boost_afio__ followed by a git submodules recursive update and init) and get to work. If however you
+wish to use AFIO as part of the Boost libraries, AFIO is also a Boost module:
+
+# Download the latest version of the Boost Libraries from boost.org. 
+  At the time of writing the current version is Boost 1.59.
+  Installing AFIO as a Boost module is not compatible with versions of Boost earlier than 1.56 as this was
+  the first Boost version to become source code modularised.
+
+
+# Download the latest Boost AFIO stable tarball from [@https://boostgsoc13.github.io/boost.afio/afio-stable.tar.bz2 https://boostgsoc13.github.io/boost.afio/afio-stable.tar.bz2].
+  We do however recommend using the git repository, as it will allow for future updates. If you are unfamiliar 
+  with git, check the github website for instructions on how to use git. This is a good place to 
+  start: [@https://help.github.com/articles/set-up-git]. Don't forget that after cloning you need to
+  do a `git submodule update --init --recursive` to have git fill in the submodules.
+
+
+# Assuming that your copy of Boost lives at /home/ned/boost do:
+
+  ``
+    cd /home/ned/boost/libs
+    tar jxf afio-stable.tar.bz2 afio
+    cd ..
+    ./b2 headers
+    ./b2 libs/afio/build cxxflags=-std=c++11
+  ``
+
+  On Microsoft Windows it's almost the same, just don't specify the `-std=c++11` if you are using VS2015.
+Note if you forget the `-std` currently you need to wipe the `bin.v2` directory to reset it as the result is cached
+by Boost.Build.
+
+#  If you'd also like to execute the unit test suite, do:
+  ``
+    ./b2 libs/afio/test cxxflags=-std=c++11
+  ``
+
+#  Similar if you'd like to build documentation, do:
+  ``
+    cd doc
+    ../b2 ../libs/afio/doc
+    ../b2 ../libs/afio/doc pdf
+  ``
+  
+  I may be missing something, but the pdf appears inside bin.v2, not in pdf for some reason.
+  Note that the PDF has some significant formatting problems.
+
+# Thanks to modular Boost, AFIO is now exactly the same as any other Boost library and can
+be used in exactly the same way as if AFIO were already part of Boost.
+
+
+[heading Running the Unit Tests]
+
+To run the unit tests as a standalone build, something like this will probably work for POSIX (it will default to clang on FreeBSD):
+
+``
+  ./standalone_alltests_gcc.sh
+  ./test_all
+``
+
+Note this has a dependency on __boost_filesystem__ as libstdc++ 4.9 (the last I tested) has insufficient Filesystem support. For VS2015:
+
+``
+  standalone_alltests_msvc.bat
+  test_all.exe
+``
+
+VS2015 ships with Filesystem, so this is totally standalone.
+
+
+To run the unit tests under Boost with [*bjam], run from the boost top directory:
+``
+  ./b2 libs/afio/test cxxflags=-std=c++11
+``
+This will run the entire suite of unit tests. Some useful command line arguments for Boost.Build:
+
+* [*--link-test]: will only compile and link the test files. This option can be combined with 
+                the [*--test=] option to only compile and link a specific subset of unit tests.
+                Note that [*--link-test] supersedes [*--test-all] and [*--test-each] options,
+                and cannot be combined with the other tests. 
+
+* [*--running-on-ci]: will compile, link and execute only those tests which don't use `fsync()`.
+
+* [*--lto]: perform link-time code assembly. On POSIX with clang, you NEED the gold linker installed for LTO
+                to work - otherwise it appears to work, but in fact is doing a normal link.
+
+* [*--test-all]:  will run a comprehensive unit tests that combines all the other unit tests into a single 
+                continuous test. This is useful to detect errors that will only show up at longer running 
+                times. Note that [*--test-each] is not compatible with this option. 
+
+* [*--test-each]: will run a series of individually compiled unit tests in succession. 
+                This option forgoes the lengthy monolithic test-suite in favor of a 
+                series of small tests. This option can be combined with the [*--test=]
+                option to only run a specific subset of unit tests. Note that [*--test-all]
+                is not compatible with this option. 
+
+* [*--test=]:    will use only the test files designated by the string following this flag. 
+
+For example: 
+
+    ``
+        b2 link=static toolset=gcc-5 cxxflags=-std=c++1z --test="first_test.cpp second_test.cpp" 
+    ``
+
+will only compile and run only the tests in `first_test.cpp` and `second_test.cpp`. All other unit tests will
+be ignored, and all other command-line options still apply.
+
+[endsect] [/ end of Compilation]

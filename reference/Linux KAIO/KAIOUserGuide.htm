@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<!-- saved from url=(0050)https://code.google.com/p/kernel/wiki/AIOUserGuide -->
+<html><script>var gapi={plusone:{render:function(){},go:function(){}}};</script><script type="text/javascript" async="" src="https://apis.google.com/js/plusone.js"></script><script>var urchinTracker=function(){},_gaq={push:function(){try {if(arguments[0][0]=='_link')window.location.href=arguments[0][1]}catch(er){}}},_gat={_createTracker:function(){}, _getTracker:function(){return{__noSuchMethod__:function(){},_link:function(o){if(o)location.href=o;},_linkByPost:function(){return true;},_getLinkerUrl:function(o){return o;},_trackEvent:function(){}}}};</script><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+ 
+ <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+ 
+ <meta name="ROBOTS" content="NOARCHIVE">
+ 
+ <link rel="icon" type="image/vnd.microsoft.icon" href="https://ssl.gstatic.com/codesite/ph/images/phosting.ico">
+ 
+ 
+ <link rel="canonical" href="http://code.google.com/p/kernel/wiki/AIOUserGuide">
+ 
+ <script type="text/javascript">
+ 
+ 
+ 
+ 
+ var codesite_token = "ABZ6GAciBR7wXJANw0lEk1JMtMA3vIzrjA:1408361093458";
+ 
+ 
+ var CS_env = {"token": "ABZ6GAciBR7wXJANw0lEk1JMtMA3vIzrjA:1408361093458", "profileUrl": "/u/nialldouglas14/", "projectName": "kernel", "assetHostPath": "https://ssl.gstatic.com/codesite/ph", "domainName": null, "projectHomeUrl": "/p/kernel", "assetVersionPath": "https://ssl.gstatic.com/codesite/ph/13997016681179179006", "loggedInUserEmail": "nialldouglas14@gmail.com", "relativeBaseUrl": ""};
+ var _gaq = _gaq || [];
+ _gaq.push(
+ ['siteTracker._setAccount', 'UA-18071-1'],
+ ['siteTracker._trackPageview']);
+ 
+ _gaq.push(
+ ['projectTracker._setAccount', 'UA-26096441-1'],
+ ['projectTracker._trackPageview']);
+ 
+ (function() {
+ var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+ ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+ (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+ })();
+ 
+ </script><script type="text/javascript" async="" src="https://ssl.google-analytics.com/ga.js"></script>
+ 
+ 
+ <title>AIOUserGuide - 
+ kernel -
+ 
+ A description of how to use AIO - 
+ Google production server Linux kernel development - Google Project Hosting
+ </title>
+ <link type="text/css" rel="stylesheet" href="./AIOUserGuide_files/core.css">
+ 
+ <link type="text/css" rel="stylesheet" href="./AIOUserGuide_files/ph_detail.css">
+ 
+ 
+ 
+ <link type="application/atom+xml" rel="alternate" href="https://code.google.com/feeds/p/kernel/gitchanges/basic?path=/AIOUserGuide.wiki&repo=wiki">
+ 
+ 
+<!--[if IE]>
+ <link type="text/css" rel="stylesheet" href="https://ssl.gstatic.com/codesite/ph/13997016681179179006/css/d_ie.css" >
+<![endif]-->
+ <style type="text/css">
+ .menuIcon.off { background: no-repeat url(https://ssl.gstatic.com/codesite/ph/images/dropdown_sprite.gif) 0 -42px }
+ .menuIcon.on { background: no-repeat url(https://ssl.gstatic.com/codesite/ph/images/dropdown_sprite.gif) 0 -28px }
+ .menuIcon.down { background: no-repeat url(https://ssl.gstatic.com/codesite/ph/images/dropdown_sprite.gif) 0 0; }
+ 
+ 
+ #maincol {
+ padding-top: 0;
+ padding-bottom: 0;
+ }
+
+ 
+ </style>
+<style type="text/css"></style></head>
+<body class="t6">
+<script type="text/javascript">
+ window.___gcfg = {lang: 'en'};
+ (function() 
+ {var po = document.createElement("script");
+ po.type = "text/javascript"; po.async = true;po.src = "https://apis.google.com/js/plusone.js";
+ var s = document.getElementsByTagName("script")[0];
+ s.parentNode.insertBefore(po, s);
+ })();
+</script>
+<div class="headbg">
+
+ <div id="gaia">
+ 
+
+ <span>
+ 
+ 
+ 
+ <a href="https://code.google.com/p/kernel/wiki/AIOUserGuide#" id="multilogin-dropdown" onclick="return false;"><u><b>nialldouglas14@gmail.com</b></u> <small>▼</small></a>
+ 
+ 
+ | <a href="https://code.google.com/u/nialldouglas14/" id="projects-dropdown" onclick="return false;"><u>My favorites</u> <small>▼</small></a>
+ | <a href="https://code.google.com/u/nialldouglas14/" onclick="_CS_click(&#39;/gb/ph/profile&#39;);" title="Profile, Updates, and Settings"><u>Profile</u></a>
+ | <a href="https://www.google.com/accounts/Logout?continue=https%3A%2F%2Fcode.google.com%2Fp%2Fkernel%2Fwiki%2FAIOUserGuide" onclick="_CS_click(&#39;/gb/ph/signout&#39;);"><u>Sign out</u></a>
+ 
+ </span>
+
+ </div>
+
+ <div class="gbh" style="left: 0pt;"></div>
+ <div class="gbh" style="right: 0pt;"></div>
+ 
+ 
+ <div style="height: 1px"></div>
+<!--[if lte IE 7]>
+<div style="text-align:center;">
+Your version of Internet Explorer is not supported. Try a browser that
+contributes to open source, such as <a href="http://www.firefox.com">Firefox</a>,
+<a href="http://www.google.com/chrome">Google Chrome</a>, or
+<a href="http://code.google.com/chrome/chromeframe/">Google Chrome Frame</a>.
+</div>
+<![endif]-->
+
+
+
+ <table style="padding:0px; margin: 0px 0px 10px 0px; width:100%" cellpadding="0" cellspacing="0" itemscope="" itemtype="http://schema.org/CreativeWork">
+ <tbody><tr style="height: 58px;">
+ 
+ 
+ 
+ <td id="plogo">
+ <link itemprop="url" href="https://code.google.com/p/kernel">
+ <a href="https://code.google.com/p/kernel/">
+ 
+ <img src="./AIOUserGuide_files/defaultlogo.png" alt="Logo" itemprop="image">
+ 
+ </a>
+ </td>
+ 
+ <td style="padding-left: 0.5em">
+ 
+ <div id="pname">
+ <a href="https://code.google.com/p/kernel/"><span itemprop="name">kernel</span></a>
+ </div>
+ 
+ <div id="psum">
+ <a id="project_summary_link" href="https://code.google.com/p/kernel/"><span itemprop="description">Google production server Linux kernel development</span></a>
+ 
+ </div>
+ 
+ 
+ </td>
+ <td style="white-space:nowrap;text-align:right; vertical-align:bottom;">
+ 
+ <form action="https://code.google.com/hosting/search">
+ <input size="30" name="q" value="" type="text">
+ 
+ <input type="submit" name="projectsearch" value="Search projects">
+ </form>
+ 
+ </td></tr>
+ </tbody></table>
+
+</div>
+
+ 
+<div id="mt" class="gtb"> 
+ <a href="https://code.google.com/p/kernel/" class="tab ">Project&nbsp;Home</a>
+ 
+ 
+ 
+ 
+ <a href="https://code.google.com/p/kernel/downloads/list" class="tab ">Downloads</a>
+ 
+ 
+ 
+ 
+ 
+ <a href="https://code.google.com/p/kernel/w/list" class="tab active">Wiki</a>
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ <a href="https://code.google.com/p/kernel/wiki/Git?tm=4" class="tab ">Source</a>
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ <div class="gtbc"></div>
+</div>
+<table cellspacing="0" cellpadding="0" width="100%" align="center" border="0" class="st">
+ <tbody><tr>
+ 
+ 
+ 
+ <td class="subt">
+ <div class="issueDetail">
+<div class="isf">
+ 
+ <span class="inIssueList"> 
+ <span>Search</span>
+ <form action="https://code.google.com/p/kernel/w/list" method="GET" style="display:inline">
+ <select id="can" name="can">
+ <option disabled="disabled">Search within:</option>
+ 
+ <option value="1">&nbsp;All wiki pages</option>
+ <option value="3">&nbsp;Featured pages</option>
+ <option value="2" selected="selected">&nbsp;Current pages</option>
+ 
+ 
+ <option value="5">&nbsp;My starred pages</option>
+ 
+ <option value="4">&nbsp;Deprecated pages</option>
+ 
+ </select>
+ <span>for</span>
+ <span id="qq"><input type="text" size="38" id="searchq" name="q" value="" autocomplete="on"></span>
+ 
+ 
+ 
+ <input type="submit" value="Search">
+ </form>
+ </span>
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+</div>
+</div>
+
+ </td>
+ 
+ 
+ 
+ 
+ 
+ 
+ <td align="right" valign="top" class="bevel-right"></td>
+ </tr>
+</tbody></table>
+
+
+<script type="text/javascript">
+ var cancelBubble = false;
+ function _go(url) { document.location = url; }
+</script>
+<div id="maincol">
+
+ 
+
+
+
+
+
+
+
+ <style type="text/css">
+ .delcom { background: #e8e8e8 }
+ .commentcontent {
+ margin: 2em;
+ padding: 0px 10px;
+ width: 66em;
+ }
+ .artifactcomment {
+ border-top: 3px solid #c3d9ff;
+ }
+ #commentform {
+ border-top: 3px solid #c3d9ff;
+ }
+ </style>
+
+<div id="wikipage">
+<table>
+ <tbody><tr>
+ 
+ 
+ <td style="vertical-align:top; padding-left:5px">
+ 
+ <div id="wikiheader">
+ 
+ <img width="15" height="15" id="star_img" src="./AIOUserGuide_files/star_off.gif" style="cursor:pointer" onclick="_CS_toggleStar(this,
+ {&#39;scope&#39;: &#39;wiki&#39;,
+ &#39;user&#39;: &#39;_CURRENT_USER&#39;,
+ &#39;item&#39;: &#39;kernel:AIOUserGuide&#39;
+ });">
+ 
+ <span style="font-size:120%;font-weight:bold">AIOUserGuide</span>
+ &nbsp;
+ <div> 
+ 
+ <i>A description of how to use AIO</i>
+ 
+ 
+ 
+ <div id="wikiauthor" style="float:right">
+ Updated <span title="Mon Apr 21 08:39:31 2014">
+ Apr 21, 2014</span>
+ 
+ by 
+
+ <a class="userlink" href="https://code.google.com/u/111678707898441125339/">dehrenb...@google.com</a>
+ 
+ </div>
+ </div>
+ </div>
+ 
+ <div id="wikicontent">
+ <div class="vt" id="wikimaincol">
+ <h1><a name="Introduction"></a>Introduction<a href="https://code.google.com/p/kernel/wiki/AIOUserGuide#Introduction" class="section_anchor"></a></h1><p>The Asynchronous Input/Output (AIO) interface allows many I/O requests to be submitted in parallel without the overhead of a thread per request. The purpose of this document is to explain how to use the Linux AIO interface, namely the function family <tt>io_setup</tt>, <tt>io_submit</tt>, <tt>io_getevents</tt>, <tt>io_destroy</tt>. Currently, the AIO interface is best for <tt>O_DIRECT</tt> access to a raw block device like a disk, flash drive or storage array. </p><h1><a name="What_is_AIO?"></a>What is AIO?<a href="https://code.google.com/p/kernel/wiki/AIOUserGuide#What_is_AIO?" class="section_anchor"></a></h1><p>Input and output functions involve a device, like a disk or flash drive, which works much slower than the CPU. Consequently, the CPU can be doing other things while waiting for an operation on the device to complete. There are multiple ways to handle this: </p><ul><li>In the <strong>synchronous I/O</strong> model, the application issues a request from a thread. The thread blocks until the operation is complete. The operating system creates the illusion that issuing the request to the device and receiving the result was just like any other operation that would proceed just on the CPU, but in reality, it may switch in other threads or processes to make use of the CPU resources and to allow other device requests to be issued to the device in parallel, originating from the same CPU. </li><li>In the <strong>asynchronous I/O (AIO)</strong> model, the application can submit one or many requests from a thread. Submitting a request does not cause the thread to block, and instead the thread can proceed to do other computations and submit further requests to the device while the original request is in flight. The application is expected to process completions and organize logical computations itself without depending on threads to organize the use of data. </li></ul><p></p><p>Asynchronous I/O can be considered “lower level” than synchronous I/O because it does not make use of a system-provided concept of threads to organize its computation. However, it is often more efficient to use AIO than synchronous I/O due the nondeterministic overhead of threads. </p><h1><a name="The_Linux_AIO_model"></a>The Linux AIO model<a href="https://code.google.com/p/kernel/wiki/AIOUserGuide#The_Linux_AIO_model" class="section_anchor"></a></h1><p>The Linux AIO model is used as follows: </p><ol><li>Open an <a href="https://code.google.com/p/kernel/wiki/AIOUserGuide#I/O_context">I/O context</a> to submit and reap I/O requests from. </li><li>Create one or more <a href="https://code.google.com/p/kernel/wiki/AIOUserGuide#Submitting_requests">request objects</a> and set them up to represent the desired operation </li><li>Submit these requests to the I/O context, which will send them down to the device driver to process on the device </li><li><a href="https://code.google.com/p/kernel/wiki/AIOUserGuide#Processing_results">Reap completions</a> from the I/O context in the form of event completion objects,  </li><li>Return to step 2 as needed. </li></ol><p></p><h1><a name="I/O_context"></a>I/O context<a href="https://code.google.com/p/kernel/wiki/AIOUserGuide#I/O_context" class="section_anchor"></a></h1><p><tt>io_context_t</tt> is a pointer-sized opaque datatype that represents an “AIO context”. It can be safely passed around by value. Requests in the form of a struct iocb are submitted to an <tt>io_context_t</tt> and completions are read from the <tt>io_context_t</tt>. Internally, this structure contains a queue of completed requests. The length of the queue forms an upper bound on the number of concurrent requests which may be submitted to the <tt>io_context_t</tt>. </p><p>To create a new io_context_t, use the function </p><pre class="prettyprint"><span class="kwd">int</span><span class="pln"> io_setup</span><span class="pun">(</span><span class="kwd">int</span><span class="pln"> maxevents</span><span class="pun">,</span><span class="pln"> io_context_t </span><span class="pun">*</span><span class="pln">ctxp</span><span class="pun">);</span></pre><p>Here, ctxp is the output and maxevents is the input. The function creates an io_context_t with an internal queue of length maxevents. To deallocate an io_context_t, use </p><pre class="prettyprint"><span class="kwd">int</span><span class="pln"> io_destroy</span><span class="pun">(</span><span class="pln">io_context_t ctx</span><span class="pun">);</span></pre><p>There is a system-wide maximum number of allocated <tt>io_context_t</tt> objects, set at 65536. </p><p>An <tt>io_context_t</tt> object can be shared between threads, both for submission and completion. No guarantees are provided about ordering of submission and completion with respect to interaction from multiple threads. There may be performance implications from sharing <tt>io_context_t</tt> objects between threads. </p><h1><a name="Submitting_requests"></a>Submitting requests<a href="https://code.google.com/p/kernel/wiki/AIOUserGuide#Submitting_requests" class="section_anchor"></a></h1><p><tt>struct iocb</tt> represents a single request for a read or write operation.  The following struct shows a simplification on the struct definition; a full definition is found in <tt>&lt;libaio.h&gt;</tt> within the libaio source code.  </p><pre class="prettyprint"><span class="kwd">struct</span><span class="pln"> iocb </span><span class="pun">{</span><span class="pln"><br>&nbsp; &nbsp; </span><span class="kwd">void</span><span class="pln"> </span><span class="pun">*</span><span class="pln">data</span><span class="pun">;</span><span class="pln"><br>&nbsp; &nbsp; </span><span class="kwd">short</span><span class="pln"> aio_lio_opcode</span><span class="pun">;</span><span class="pln"><br>&nbsp; &nbsp; </span><span class="kwd">int</span><span class="pln"> aio_fildes</span><span class="pun">;</span><span class="pln"><br><br>&nbsp; &nbsp; </span><span class="kwd">union</span><span class="pln"> </span><span class="pun">{</span><span class="pln"><br>&nbsp; &nbsp; &nbsp; &nbsp; </span><span class="kwd">struct</span><span class="pln"> </span><span class="pun">{</span><span class="pln"><br>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span><span class="kwd">void</span><span class="pln"> </span><span class="pun">*</span><span class="pln">buf</span><span class="pun">;</span><span class="pln"><br>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span><span class="kwd">unsigned</span><span class="pln"> </span><span class="kwd">long</span><span class="pln"> nbytes</span><span class="pun">;</span><span class="pln"><br>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span><span class="kwd">long</span><span class="pln"> </span><span class="kwd">long</span><span class="pln"> offset</span><span class="pun">;</span><span class="pln"><br>&nbsp; &nbsp; &nbsp; &nbsp; </span><span class="pun">}</span><span class="pln"> c</span><span class="pun">;</span><span class="pln"><br>&nbsp; &nbsp; </span><span class="pun">}</span><span class="pln"> u</span><span class="pun">;</span><span class="pln"><br></span><span class="pun">};</span></pre><p>The meaning of the fields is as follows: data is a pointer to a user-defined object used to represent the operation </p><ul><li><tt>aio_lio_opcode</tt> is a flag indicate whether the operation is a read (<tt>IO_CMD_PREAD</tt>) or a write (<tt>IO_CMD_PWRITE</tt>) or one of the other supported operations </li><li><tt>aio_fildes</tt> is the fd of the file that the iocb reads or writes </li><li><tt>buf</tt> is the pointer to memory that is read or written </li><li><tt>nbytes</tt> is the length of the request </li><li><tt>offset</tt> is the initial offset of the read or write within the file </li></ul>The convenience functions <tt>io_prep_pread</tt> and <tt>io_prep_pwrite</tt> can be used to initialize a <tt>struct iocb</tt>. <p></p><p>New operations are sent to the device with <tt>io_submit</tt>. </p><pre class="prettyprint"><span class="kwd">int</span><span class="pln"> io_submit</span><span class="pun">(</span><span class="pln">io_context_t ctx</span><span class="pun">,</span><span class="pln"> </span><span class="kwd">long</span><span class="pln"> nr</span><span class="pun">,</span><span class="pln"> </span><span class="kwd">struct</span><span class="pln"> iocb </span><span class="pun">*</span><span class="pln">ios</span><span class="pun">[]);</span></pre><p><tt>io_submit</tt> allows an array of pointers to <tt>struct iocb</tt>s to be submitted all at once. In this function call, <tt>nr</tt> is the length of the <tt>ios</tt> array. If multiple operations are sent in one array, then no ordering guarantees are given between the <tt>iocb</tt>s. Submitting in larger batches sometimes results in a performance improvement due to a reduction in CPU usage. A performance improvement also sometimes results from keeping many I/Os ‘in flight’ simultaneously. </p><p>If the submission includes too many iocbs such that the internal queue of the <tt>io_context_t</tt> would overfill on completion, then <tt>io_submit</tt> will return a non-zero number and set <tt>errno</tt> to <tt>EAGAIN</tt>. </p><p>When used under the right conditions, <tt>io_submit</tt> should not block. However, when used in certain ways, it may block, undermining the purpose of asynchronous I/O. If this is a problem for your application, be sure to use the <tt>O_DIRECT</tt> flag when opening a file, and operate on a raw block device. Work is ongoing to fix the problem. </p><h1><a name="Processing_results"></a>Processing results<a href="https://code.google.com/p/kernel/wiki/AIOUserGuide#Processing_results" class="section_anchor"></a></h1><p>Completions read from an <tt>io_context_t</tt> are of the type <tt>struct io_event</tt>, which contains the following relevant fields. </p><pre class="prettyprint"><span class="kwd">struct</span><span class="pln"> io_event </span><span class="pun">{</span><span class="pln"><br>&nbsp; &nbsp; </span><span class="kwd">void</span><span class="pln"> </span><span class="pun">*</span><span class="pln">data</span><span class="pun">;</span><span class="pln"><br>&nbsp; &nbsp; </span><span class="kwd">struct</span><span class="pln"> iocb </span><span class="pun">*</span><span class="pln">obj</span><span class="pun">;</span><span class="pln"><br>&nbsp; &nbsp; </span><span class="kwd">long</span><span class="pln"> </span><span class="kwd">long</span><span class="pln"> res</span><span class="pun">;</span><span class="pln"><br></span><span class="pun">};</span></pre><p>Here, data is the same data pointer that was passed in with the <tt>struct iocb</tt>, and obj is the original <tt>struct iocb</tt>. <tt>res</tt> is the return value of the read or write. </p><p>Completions are reaped with <tt>io_getevents</tt>.  </p><pre class="prettyprint"><span class="kwd">int</span><span class="pln"> io_getevents</span><span class="pun">(</span><span class="pln">io_context_t ctx_id</span><span class="pun">,</span><span class="pln"> </span><span class="kwd">long</span><span class="pln"> min_nr</span><span class="pun">,</span><span class="pln"> </span><span class="kwd">long</span><span class="pln"> nr</span><span class="pun">,</span><span class="pln"> </span><span class="kwd">struct</span><span class="pln"> io_event </span><span class="pun">*</span><span class="pln">events</span><span class="pun">,</span><span class="pln"> </span><span class="kwd">struct</span><span class="pln"> timespec </span><span class="pun">*</span><span class="pln">timeout</span><span class="pun">);</span></pre><p>This function has a good number of parameters, so an explanation is in order: </p><ul><li><tt>ctx_id</tt> is the io_context_t that is being reaped from. </li><li><tt>min_nr</tt> is the minimum number of io_events to return. io_gevents will block until there are min_nr completions to report, if this is not already the case when the function call is made. </li><li><tt>nr</tt> is the maximum number of completions to return. It is expected to be the length of the events array. </li><li><tt>events</tt> is an array of <tt>io_event</tt>s into which the information about completions is written. </li><li><tt>timeout</tt> is the maximum time that a call to <tt>io_getevents</tt> may block until it will return. If <tt>NULL</tt> is passed, then <tt>io_getevents</tt> will block until <tt>min_nr</tt> completions are available. </li></ul><p></p><p>The return value represents how many completions were reported, ie how much of events was written. The return value will be between <tt>0</tt> and <tt>nr</tt>. The return value may be lower than <tt>min_nr</tt> if the timeout expires; if the timeout is <tt>NULL</tt>, then the return value will be between <tt>min_nr</tt> and <tt>nr</tt>. </p><p>The parameters give a broad range of flexibility in how AIO can be used. </p><ul><li><tt>min_nr</tt> = 0 (or, equivalently, timeout = 0). This option forms a non-blocking polling technique: it will always return immediately, regardless of whether any completions are available. It makes sense to use min_nr = 0 when calling io_getevents as part of a main run-loop of an application, on each iteration. </li><li><tt>min_nr</tt> = 1. This option blocks until a single completion is available. This parameter is the minimum value which will produce a blocking call, and therefore may be the best value for low latency operations for some users. When an application notices that an <tt>eventfd</tt> corresponding to an <tt>iocb</tt> is triggered (see the next section about <tt>epoll</tt>), then the application can call <tt>io_getevents</tt> on the corresponding io_context_t with a guarantee that no blocking will occur. </li><li><tt>min_nr</tt> &gt; 1. This option waits for multiple completions to return, unless the timeout expires. Waiting for multiple completions may improve throughput due to reduced CPU usage, both due to fewer <tt>io_getevents</tt> calls and because if there is more space in the completion queue due to the removed completions, then a later <tt>io_submit</tt> call may have a larger granularity, as well as a reduced number of context switches back to the calling thread when the event is available. This option runs the risk of increasing the latency of operations, especially when the operation rate is lower. </li></ul><p></p><p>Even if <tt>min_nr</tt> = 0 or 1, it is useful to make nr a bit bigger for performance reasons: more than one event may be already complete, and it could be processed without multiple calls to <tt>io_getevents</tt>. The only cost of a larger <tt>nr</tt> value library is that the user must allocate a larger array of events and be prepared to accept them. </p><h1><a name="Use_with_epoll"></a>Use with <tt>epoll</tt><a href="https://code.google.com/p/kernel/wiki/AIOUserGuide#Use_with_epoll" class="section_anchor"></a></h1><p>Any iocb can be set to notify an eventfd on completion using the libaio function <tt>io_set_eventfd</tt>. The eventfd can be put in an epoll object. When the eventfd is triggered, then the <tt>io_getevents</tt> function can be called on the corresponding <tt>io_context_t</tt>.   </p><p>There is no way to use this API to trigger an eventfd only when multiple operations are complete--the <tt>eventfd</tt> will always be triggered on the first operation. Consequently, as described in the previous section, it will often make sense to use <tt>min_nr</tt> = 1 when using <tt>io_getevents</tt> after an <tt>epoll_wait</tt> call that indicates an eventfd involved in AIO. </p><h1><a name="Performance_considerations"></a>Performance considerations<a href="https://code.google.com/p/kernel/wiki/AIOUserGuide#Performance_considerations" class="section_anchor"></a></h1><ul><li><strong>Blocking during io_submit on ext4, on buffered operations, network access, pipes, etc.</strong> Some operations are not well-represented by the AIO interface. With completely unsupported operations like buffered reads, operations on a socket or pipes, the entire operation will be performed during the io_submit syscall, with the completion available immediately for access with io_getevents. AIO access to a file on a filesystem like ext4 is partially supported: if a metadata read is required to look up the data block (ie if the metadata is not already in memory), then the io_submit call will block on the metadata read. Certain types of file-enlarging writes are completely unsupported and block for the entire duration of the operation. </li><li><strong>CPU overhead</strong>. When performing small operations on a high-performance device and targeting a very high operation rate from single CPU, a CPU bottleneck may result. This can be resolved by submitting and reaping AIO from multiple threads. </li><li><strong>Lock contention when many CPUs or requests share an io_context_t</strong>. There are several circumstances when the kernel datastructure corresponding to an io_context_t may be accessed from multiple CPUs. For example, multiple threads may submit and get events from the same io_context_t. Some devices may use a single interrupt line for all completions. This can cause the lock to be bounced around between cores or the lock to be heavily contended, resulting in higher CPU usage and potentially lower throughput. One solution is to shard into multiple io_context_t objects, for example by thread and a hash of the address. </li><li><strong>Ensuring sufficient parallelism</strong>. Some devices require many concurrent operations to reach peak performance. This means making sure that there are several operations ‘in flight’ simultaneously. On some high-performance storage devices, when operations are small, tens or hundreds must be submitted in parallel in order to achieve maximum throughput. For disk drives, performance may improve with greater parallelism if the elevator scheduler can make better decisions with more operations simultaneously in flight, but the effect is expected to be small in many situations. </li></ul><h1><a name="Alternatives_to_Linux_AIO"></a>Alternatives to Linux AIO<a href="https://code.google.com/p/kernel/wiki/AIOUserGuide#Alternatives_to_Linux_AIO" class="section_anchor"></a></h1><ul><li><strong>Thread pool of synchronous I/O threads</strong>. This can work for many use cases, and it may be easier to program with. Unlike with AIO, all functions can be parallelized via a thread pool. Some users find that a thread pool does not work well due to the overhead of threads in terms of CPU and memory bandwidth usage from context switching. This comes up as an especially big problem with small random reads on high-performance storage devices. </li><li><strong>POSIX AIO</strong>. Another asynchronous I/O interface is POSIX AIO. It is implemented as part of glibc. However, the glibc implementation uses a thread pool internally. For cases where this is acceptable, it might be better to use your own thread pool instead. Joel Becker implemented <a href="http://oss.oracle.com/projects/libaio-oracle/files/" rel="nofollow">a version</a> of POSIX AIO based on the Linux AIO mechanism described above. IBM DeveloperWorks has <a href="http://www.ibm.com/developerworks/linux/library/l-async/index.html" rel="nofollow">a good introduction</a> to POSIX AIO. </li><li><strong>epoll</strong>. Linux has limited support for using epoll as a mechanism for asynchronous I/O. For reads to a file opened in buffered mode (that is, without <tt>O_DIRECT</tt>), if the file is opened as <tt>O_NONBLOCK</tt>, then a read will return <tt>EAGAIN</tt> until the relevant part is in memory. Writes to a buffered file are usually immediate, as they are written out with another writeback thread. However, these mechanisms don’t give the level of control over I/O that direct I/O gives. </li></ul><h1><a name="Sample_code"></a>Sample code<a href="https://code.google.com/p/kernel/wiki/AIOUserGuide#Sample_code" class="section_anchor"></a></h1><p>Below is some example code which uses Linux AIO. I wrote it at Google, so it uses the <a href="http://code.google.com/p/google-glog/" rel="nofollow">Google glog logging library</a> and the <a href="http://code.google.com/p/gflags/?redir=1" rel="nofollow">Google gflags command-line flags library</a>, as well as a loose interpretation of <a href="http://google-styleguide.googlecode.com/svn/trunk/cppguide.xml" rel="nofollow">Google’s C++ coding conventions</a>. When compiling it with gcc, pass <tt>-laio</tt> to dynamically link with libaio. (It isn’t included in glibc, so it must be explicitly included.) </p><pre class="prettyprint"><span class="com">// Code written by Daniel Ehrenberg, released into the public domain</span><span class="pln"><br><br></span><span class="com">#include</span><span class="pln"> </span><span class="str">&lt;fcntl.h&gt;</span><span class="pln"><br></span><span class="com">#include</span><span class="pln"> </span><span class="str">&lt;gflags/gflags.h&gt;</span><span class="pln"><br></span><span class="com">#include</span><span class="pln"> </span><span class="str">&lt;glog/logging.h&gt;</span><span class="pln"><br></span><span class="com">#include</span><span class="pln"> </span><span class="str">&lt;libaio.h&gt;</span><span class="pln"><br></span><span class="com">#include</span><span class="pln"> </span><span class="str">&lt;stdlib.h&gt;</span><span class="pln"><br></span><span class="com">#include</span><span class="pln"> </span><span class="str">&lt;stdio.h&gt;</span><span class="pln"><br></span><span class="com">#include</span><span class="pln"> </span><span class="str">&lt;sys/stat.h&gt;</span><span class="pln"><br></span><span class="com">#include</span><span class="pln"> </span><span class="str">&lt;sys/types.h&gt;</span><span class="pln"><br><br>DEFINE_string</span><span class="pun">(</span><span class="pln">path</span><span class="pun">,</span><span class="pln"> </span><span class="str">"/tmp/testfile"</span><span class="pun">,</span><span class="pln"> </span><span class="str">"Path to the file to manipulate"</span><span class="pun">);</span><span class="pln"><br>DEFINE_int32</span><span class="pun">(</span><span class="pln">file_size</span><span class="pun">,</span><span class="pln"> </span><span class="lit">1000</span><span class="pun">,</span><span class="pln"> </span><span class="str">"Length of file in 4k blocks"</span><span class="pun">);</span><span class="pln"><br>DEFINE_int32</span><span class="pun">(</span><span class="pln">concurrent_requests</span><span class="pun">,</span><span class="pln"> </span><span class="lit">100</span><span class="pun">,</span><span class="pln"> </span><span class="str">"Number of concurrent requests"</span><span class="pun">);</span><span class="pln"><br>DEFINE_int32</span><span class="pun">(</span><span class="pln">min_nr</span><span class="pun">,</span><span class="pln"> </span><span class="lit">1</span><span class="pun">,</span><span class="pln"> </span><span class="str">"min_nr"</span><span class="pun">);</span><span class="pln"><br>DEFINE_int32</span><span class="pun">(</span><span class="pln">max_nr</span><span class="pun">,</span><span class="pln"> </span><span class="lit">1</span><span class="pun">,</span><span class="pln"> </span><span class="str">"max_nr"</span><span class="pun">);</span><span class="pln"><br><br></span><span class="com">// The size of operation that will occur on the device</span><span class="pln"><br></span><span class="kwd">static</span><span class="pln"> </span><span class="kwd">const</span><span class="pln"> </span><span class="kwd">int</span><span class="pln"> kPageSize </span><span class="pun">=</span><span class="pln"> </span><span class="lit">4096</span><span class="pun">;</span><span class="pln"><br><br></span><span class="kwd">class</span><span class="pln"> </span><span class="typ">AIORequest</span><span class="pln"> </span><span class="pun">{</span><span class="pln"><br>&nbsp;</span><span class="kwd">public</span><span class="pun">:</span><span class="pln"><br>&nbsp; </span><span class="kwd">int</span><span class="pun">*</span><span class="pln"> buffer_</span><span class="pun">;</span><span class="pln"><br><br>&nbsp; </span><span class="kwd">virtual</span><span class="pln"> </span><span class="kwd">void</span><span class="pln"> </span><span class="typ">Complete</span><span class="pun">(</span><span class="kwd">int</span><span class="pln"> res</span><span class="pun">)</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> </span><span class="lit">0</span><span class="pun">;</span><span class="pln"><br><br>&nbsp; </span><span class="typ">AIORequest</span><span class="pun">()</span><span class="pln"> </span><span class="pun">{</span><span class="pln"><br>&nbsp; &nbsp; </span><span class="kwd">int</span><span class="pln"> ret </span><span class="pun">=</span><span class="pln"> posix_memalign</span><span class="pun">(</span><span class="kwd">reinterpret_cast</span><span class="pun">&lt;</span><span class="kwd">void</span><span class="pun">**&gt;(&amp;</span><span class="pln">buffer_</span><span class="pun">),</span><span class="pln"><br>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;kPageSize</span><span class="pun">,</span><span class="pln"> kPageSize</span><span class="pun">);</span><span class="pln"><br>&nbsp; &nbsp; CHECK_EQ</span><span class="pun">(</span><span class="pln">ret</span><span class="pun">,</span><span class="pln"> </span><span class="lit">0</span><span class="pun">);</span><span class="pln"><br>&nbsp; </span><span class="pun">}</span><span class="pln"><br><br>&nbsp; </span><span class="kwd">virtual</span><span class="pln"> </span><span class="pun">~</span><span class="typ">AIORequest</span><span class="pun">()</span><span class="pln"> </span><span class="pun">{</span><span class="pln"><br>&nbsp; &nbsp; free</span><span class="pun">(</span><span class="pln">buffer_</span><span class="pun">);</span><span class="pln"><br>&nbsp; </span><span class="pun">}</span><span class="pln"><br></span><span class="pun">};</span><span class="pln"><br><br></span><span class="kwd">class</span><span class="pln"> </span><span class="typ">Adder</span><span class="pln"> </span><span class="pun">{</span><span class="pln"><br>&nbsp;</span><span class="kwd">public</span><span class="pun">:</span><span class="pln"><br>&nbsp; </span><span class="kwd">virtual</span><span class="pln"> </span><span class="kwd">void</span><span class="pln"> </span><span class="typ">Add</span><span class="pun">(</span><span class="kwd">int</span><span class="pln"> amount</span><span class="pun">)</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> </span><span class="lit">0</span><span class="pun">;</span><span class="pln"><br><br>&nbsp; </span><span class="kwd">virtual</span><span class="pln"> </span><span class="pun">~</span><span class="typ">Adder</span><span class="pun">()</span><span class="pln"> </span><span class="pun">{</span><span class="pln"> </span><span class="pun">};</span><span class="pln"><br></span><span class="pun">};</span><span class="pln"><br><br></span><span class="kwd">class</span><span class="pln"> </span><span class="typ">AIOReadRequest</span><span class="pln"> </span><span class="pun">:</span><span class="pln"> </span><span class="kwd">public</span><span class="pln"> </span><span class="typ">AIORequest</span><span class="pln"> </span><span class="pun">{</span><span class="pln"><br>&nbsp;</span><span class="kwd">private</span><span class="pun">:</span><span class="pln"><br>&nbsp; </span><span class="typ">Adder</span><span class="pun">*</span><span class="pln"> adder_</span><span class="pun">;</span><span class="pln"><br><br>&nbsp;</span><span class="kwd">public</span><span class="pun">:</span><span class="pln"><br>&nbsp; </span><span class="typ">AIOReadRequest</span><span class="pun">(</span><span class="typ">Adder</span><span class="pun">*</span><span class="pln"> adder</span><span class="pun">)</span><span class="pln"> </span><span class="pun">:</span><span class="pln"> </span><span class="typ">AIORequest</span><span class="pun">(),</span><span class="pln"> adder_</span><span class="pun">(</span><span class="pln">adder</span><span class="pun">)</span><span class="pln"> </span><span class="pun">{</span><span class="pln"> </span><span class="pun">}</span><span class="pln"><br><br>&nbsp; </span><span class="kwd">virtual</span><span class="pln"> </span><span class="kwd">void</span><span class="pln"> </span><span class="typ">Complete</span><span class="pun">(</span><span class="kwd">int</span><span class="pln"> res</span><span class="pun">)</span><span class="pln"> </span><span class="pun">{</span><span class="pln"><br>&nbsp; &nbsp; CHECK_EQ</span><span class="pun">(</span><span class="pln">res</span><span class="pun">,</span><span class="pln"> kPageSize</span><span class="pun">)</span><span class="pln"> </span><span class="pun">&lt;&lt;</span><span class="pln"> </span><span class="str">"Read incomplete or error "</span><span class="pln"> </span><span class="pun">&lt;&lt;</span><span class="pln"> res</span><span class="pun">;</span><span class="pln"><br>&nbsp; &nbsp; </span><span class="kwd">int</span><span class="pln"> value </span><span class="pun">=</span><span class="pln"> buffer_</span><span class="pun">[</span><span class="lit">0</span><span class="pun">];</span><span class="pln"><br>&nbsp; &nbsp; LOG</span><span class="pun">(</span><span class="pln">INFO</span><span class="pun">)</span><span class="pln"> </span><span class="pun">&lt;&lt;</span><span class="pln"> </span><span class="str">"Read of "</span><span class="pln"> </span><span class="pun">&lt;&lt;</span><span class="pln"> value </span><span class="pun">&lt;&lt;</span><span class="pln"> </span><span class="str">" completed"</span><span class="pun">;</span><span class="pln"><br>&nbsp; &nbsp; adder_</span><span class="pun">-&gt;</span><span class="typ">Add</span><span class="pun">(</span><span class="pln">value</span><span class="pun">);</span><span class="pln"><br>&nbsp; </span><span class="pun">}</span><span class="pln"><br></span><span class="pun">};</span><span class="pln"><br><br></span><span class="kwd">class</span><span class="pln"> </span><span class="typ">AIOWriteRequest</span><span class="pln"> </span><span class="pun">:</span><span class="pln"> </span><span class="kwd">public</span><span class="pln"> </span><span class="typ">AIORequest</span><span class="pln"> </span><span class="pun">{</span><span class="pln"><br>&nbsp;</span><span class="kwd">private</span><span class="pun">:</span><span class="pln"><br>&nbsp; </span><span class="kwd">int</span><span class="pln"> value_</span><span class="pun">;</span><span class="pln"><br><br>&nbsp;</span><span class="kwd">public</span><span class="pun">:</span><span class="pln"><br>&nbsp; </span><span class="typ">AIOWriteRequest</span><span class="pun">(</span><span class="kwd">int</span><span class="pln"> value</span><span class="pun">)</span><span class="pln"> </span><span class="pun">:</span><span class="pln"> </span><span class="typ">AIORequest</span><span class="pun">(),</span><span class="pln"> value_</span><span class="pun">(</span><span class="pln">value</span><span class="pun">)</span><span class="pln"> </span><span class="pun">{</span><span class="pln"><br>&nbsp; &nbsp; buffer_</span><span class="pun">[</span><span class="lit">0</span><span class="pun">]</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> value</span><span class="pun">;</span><span class="pln"><br>&nbsp; </span><span class="pun">}</span><span class="pln"><br><br>&nbsp; </span><span class="kwd">virtual</span><span class="pln"> </span><span class="kwd">void</span><span class="pln"> </span><span class="typ">Complete</span><span class="pun">(</span><span class="kwd">int</span><span class="pln"> res</span><span class="pun">)</span><span class="pln"> </span><span class="pun">{</span><span class="pln"><br>&nbsp; &nbsp; CHECK_EQ</span><span class="pun">(</span><span class="pln">res</span><span class="pun">,</span><span class="pln"> kPageSize</span><span class="pun">)</span><span class="pln"> </span><span class="pun">&lt;&lt;</span><span class="pln"> </span><span class="str">"Write incomplete or error "</span><span class="pln"> </span><span class="pun">&lt;&lt;</span><span class="pln"> res</span><span class="pun">;</span><span class="pln"><br>&nbsp; &nbsp; LOG</span><span class="pun">(</span><span class="pln">INFO</span><span class="pun">)</span><span class="pln"> </span><span class="pun">&lt;&lt;</span><span class="pln"> </span><span class="str">"Write of "</span><span class="pln"> </span><span class="pun">&lt;&lt;</span><span class="pln"> value_ </span><span class="pun">&lt;&lt;</span><span class="pln"> </span><span class="str">" completed"</span><span class="pun">;</span><span class="pln"><br>&nbsp; </span><span class="pun">}</span><span class="pln"><br></span><span class="pun">};</span><span class="pln"><br><br></span><span class="kwd">class</span><span class="pln"> </span><span class="typ">AIOAdder</span><span class="pln"> </span><span class="pun">:</span><span class="pln"> </span><span class="kwd">public</span><span class="pln"> </span><span class="typ">Adder</span><span class="pln"> </span><span class="pun">{</span><span class="pln"><br>&nbsp;</span><span class="kwd">public</span><span class="pun">:</span><span class="pln"><br>&nbsp; </span><span class="kwd">int</span><span class="pln"> fd_</span><span class="pun">;</span><span class="pln"><br>&nbsp; io_context_t ioctx_</span><span class="pun">;</span><span class="pln"><br>&nbsp; </span><span class="kwd">int</span><span class="pln"> counter_</span><span class="pun">;</span><span class="pln"><br>&nbsp; </span><span class="kwd">int</span><span class="pln"> reap_counter_</span><span class="pun">;</span><span class="pln"><br>&nbsp; </span><span class="kwd">int</span><span class="pln"> sum_</span><span class="pun">;</span><span class="pln"><br>&nbsp; </span><span class="kwd">int</span><span class="pln"> length_</span><span class="pun">;</span><span class="pln"><br><br>&nbsp; </span><span class="typ">AIOAdder</span><span class="pun">(</span><span class="kwd">int</span><span class="pln"> length</span><span class="pun">)</span><span class="pln"><br>&nbsp; &nbsp; &nbsp; </span><span class="pun">:</span><span class="pln"> ioctx_</span><span class="pun">(</span><span class="lit">0</span><span class="pun">),</span><span class="pln"> counter_</span><span class="pun">(</span><span class="lit">0</span><span class="pun">),</span><span class="pln"> reap_counter_</span><span class="pun">(</span><span class="lit">0</span><span class="pun">),</span><span class="pln"> sum_</span><span class="pun">(</span><span class="lit">0</span><span class="pun">),</span><span class="pln"> length_</span><span class="pun">(</span><span class="pln">length</span><span class="pun">)</span><span class="pln"> </span><span class="pun">{</span><span class="pln"> </span><span class="pun">}</span><span class="pln"><br><br>&nbsp; </span><span class="kwd">void</span><span class="pln"> </span><span class="typ">Init</span><span class="pun">()</span><span class="pln"> </span><span class="pun">{</span><span class="pln"><br>&nbsp; &nbsp; LOG</span><span class="pun">(</span><span class="pln">INFO</span><span class="pun">)</span><span class="pln"> </span><span class="pun">&lt;&lt;</span><span class="pln"> </span><span class="str">"Opening file"</span><span class="pun">;</span><span class="pln"><br>&nbsp; &nbsp; fd_ </span><span class="pun">=</span><span class="pln"> open</span><span class="pun">(</span><span class="pln">FLAGS_path</span><span class="pun">.</span><span class="pln">c_str</span><span class="pun">(),</span><span class="pln"> O_RDWR </span><span class="pun">|</span><span class="pln"> O_DIRECT </span><span class="pun">|</span><span class="pln"> O_CREAT</span><span class="pun">,</span><span class="pln"> </span><span class="lit">0644</span><span class="pun">);</span><span class="pln"><br>&nbsp; &nbsp; PCHECK</span><span class="pun">(</span><span class="pln">fd_ </span><span class="pun">&gt;=</span><span class="pln"> </span><span class="lit">0</span><span class="pun">)</span><span class="pln"> </span><span class="pun">&lt;&lt;</span><span class="pln"> </span><span class="str">"Error opening file"</span><span class="pun">;</span><span class="pln"><br>&nbsp; &nbsp; LOG</span><span class="pun">(</span><span class="pln">INFO</span><span class="pun">)</span><span class="pln"> </span><span class="pun">&lt;&lt;</span><span class="pln"> </span><span class="str">"Allocating enough space for the sum"</span><span class="pun">;</span><span class="pln"><br>&nbsp; &nbsp; PCHECK</span><span class="pun">(</span><span class="pln">fallocate</span><span class="pun">(</span><span class="pln">fd_</span><span class="pun">,</span><span class="pln"> </span><span class="lit">0</span><span class="pun">,</span><span class="pln"> </span><span class="lit">0</span><span class="pun">,</span><span class="pln"> kPageSize </span><span class="pun">*</span><span class="pln"> length_</span><span class="pun">)</span><span class="pln"> </span><span class="pun">&gt;=</span><span class="pln"> </span><span class="lit">0</span><span class="pun">)</span><span class="pln"> </span><span class="pun">&lt;&lt;</span><span class="pln"> </span><span class="str">"Error in fallocate"</span><span class="pun">;</span><span class="pln"><br>&nbsp; &nbsp; LOG</span><span class="pun">(</span><span class="pln">INFO</span><span class="pun">)</span><span class="pln"> </span><span class="pun">&lt;&lt;</span><span class="pln"> </span><span class="str">"Setting up the io context"</span><span class="pun">;</span><span class="pln"><br>&nbsp; &nbsp; PCHECK</span><span class="pun">(</span><span class="pln">io_setup</span><span class="pun">(</span><span class="lit">100</span><span class="pun">,</span><span class="pln"> </span><span class="pun">&amp;</span><span class="pln">ioctx_</span><span class="pun">)</span><span class="pln"> </span><span class="pun">&gt;=</span><span class="pln"> </span><span class="lit">0</span><span class="pun">)</span><span class="pln"> </span><span class="pun">&lt;&lt;</span><span class="pln"> </span><span class="str">"Error in io_setup"</span><span class="pun">;</span><span class="pln"><br>&nbsp; </span><span class="pun">}</span><span class="pln"><br><br>&nbsp; </span><span class="kwd">virtual</span><span class="pln"> </span><span class="kwd">void</span><span class="pln"> </span><span class="typ">Add</span><span class="pun">(</span><span class="kwd">int</span><span class="pln"> amount</span><span class="pun">)</span><span class="pln"> </span><span class="pun">{</span><span class="pln"><br>&nbsp; &nbsp; sum_ </span><span class="pun">+=</span><span class="pln"> amount</span><span class="pun">;</span><span class="pln"><br>&nbsp; &nbsp; LOG</span><span class="pun">(</span><span class="pln">INFO</span><span class="pun">)</span><span class="pln"> </span><span class="pun">&lt;&lt;</span><span class="pln"> </span><span class="str">"Adding "</span><span class="pln"> </span><span class="pun">&lt;&lt;</span><span class="pln"> amount </span><span class="pun">&lt;&lt;</span><span class="pln"> </span><span class="str">" for a total of "</span><span class="pln"> </span><span class="pun">&lt;&lt;</span><span class="pln"> sum_</span><span class="pun">;</span><span class="pln"><br>&nbsp; </span><span class="pun">}</span><span class="pln"><br><br>&nbsp; </span><span class="kwd">void</span><span class="pln"> </span><span class="typ">SubmitWrite</span><span class="pun">()</span><span class="pln"> </span><span class="pun">{</span><span class="pln"><br>&nbsp; &nbsp; LOG</span><span class="pun">(</span><span class="pln">INFO</span><span class="pun">)</span><span class="pln"> </span><span class="pun">&lt;&lt;</span><span class="pln"> </span><span class="str">"Submitting a write to "</span><span class="pln"> </span><span class="pun">&lt;&lt;</span><span class="pln"> counter_</span><span class="pun">;</span><span class="pln"><br>&nbsp; &nbsp; </span><span class="kwd">struct</span><span class="pln"> iocb iocb</span><span class="pun">;</span><span class="pln"><br>&nbsp; &nbsp; </span><span class="kwd">struct</span><span class="pln"> iocb</span><span class="pun">*</span><span class="pln"> iocbs </span><span class="pun">=</span><span class="pln"> </span><span class="pun">&amp;</span><span class="pln">iocb</span><span class="pun">;</span><span class="pln"><br>&nbsp; &nbsp; </span><span class="typ">AIORequest</span><span class="pln"> </span><span class="pun">*</span><span class="pln">req </span><span class="pun">=</span><span class="pln"> </span><span class="kwd">new</span><span class="pln"> </span><span class="typ">AIOWriteRequest</span><span class="pun">(</span><span class="pln">counter_</span><span class="pun">);</span><span class="pln"><br>&nbsp; &nbsp; io_prep_pwrite</span><span class="pun">(&amp;</span><span class="pln">iocb</span><span class="pun">,</span><span class="pln"> fd_</span><span class="pun">,</span><span class="pln"> req</span><span class="pun">-&gt;</span><span class="pln">buffer_</span><span class="pun">,</span><span class="pln"> kPageSize</span><span class="pun">,</span><span class="pln"> counter_ </span><span class="pun">*</span><span class="pln"> kPageSize</span><span class="pun">);</span><span class="pln"><br>&nbsp; &nbsp; iocb</span><span class="pun">.</span><span class="pln">data </span><span class="pun">=</span><span class="pln"> req</span><span class="pun">;</span><span class="pln"><br>&nbsp; &nbsp; </span><span class="kwd">int</span><span class="pln"> res </span><span class="pun">=</span><span class="pln"> io_submit</span><span class="pun">(</span><span class="pln">ioctx_</span><span class="pun">,</span><span class="pln"> </span><span class="lit">1</span><span class="pun">,</span><span class="pln"> </span><span class="pun">&amp;</span><span class="pln">iocbs</span><span class="pun">);</span><span class="pln"><br>&nbsp; &nbsp; CHECK_EQ</span><span class="pun">(</span><span class="pln">res</span><span class="pun">,</span><span class="pln"> </span><span class="lit">1</span><span class="pun">);</span><span class="pln"><br>&nbsp; </span><span class="pun">}</span><span class="pln"><br><br>&nbsp; </span><span class="kwd">void</span><span class="pln"> </span><span class="typ">WriteFile</span><span class="pun">()</span><span class="pln"> </span><span class="pun">{</span><span class="pln"><br>&nbsp; &nbsp; reap_counter_ </span><span class="pun">=</span><span class="pln"> </span><span class="lit">0</span><span class="pun">;</span><span class="pln"><br>&nbsp; &nbsp; </span><span class="kwd">for</span><span class="pln"> </span><span class="pun">(</span><span class="pln">counter_ </span><span class="pun">=</span><span class="pln"> </span><span class="lit">0</span><span class="pun">;</span><span class="pln"> counter_ </span><span class="pun">&lt;</span><span class="pln"> length_</span><span class="pun">;</span><span class="pln"> counter_</span><span class="pun">++)</span><span class="pln"> </span><span class="pun">{</span><span class="pln"><br>&nbsp; &nbsp; &nbsp; </span><span class="typ">SubmitWrite</span><span class="pun">();</span><span class="pln"><br>&nbsp; &nbsp; &nbsp; </span><span class="typ">Reap</span><span class="pun">();</span><span class="pln"><br>&nbsp; &nbsp; </span><span class="pun">}</span><span class="pln"><br>&nbsp; &nbsp; </span><span class="typ">ReapRemaining</span><span class="pun">();</span><span class="pln"><br>&nbsp; </span><span class="pun">}</span><span class="pln"><br><br>&nbsp; </span><span class="kwd">void</span><span class="pln"> </span><span class="typ">SubmitRead</span><span class="pun">()</span><span class="pln"> </span><span class="pun">{</span><span class="pln"><br>&nbsp; &nbsp; LOG</span><span class="pun">(</span><span class="pln">INFO</span><span class="pun">)</span><span class="pln"> </span><span class="pun">&lt;&lt;</span><span class="pln"> </span><span class="str">"Submitting a read from "</span><span class="pln"> </span><span class="pun">&lt;&lt;</span><span class="pln"> counter_</span><span class="pun">;</span><span class="pln"><br>&nbsp; &nbsp; </span><span class="kwd">struct</span><span class="pln"> iocb iocb</span><span class="pun">;</span><span class="pln"><br>&nbsp; &nbsp; </span><span class="kwd">struct</span><span class="pln"> iocb</span><span class="pun">*</span><span class="pln"> iocbs </span><span class="pun">=</span><span class="pln"> </span><span class="pun">&amp;</span><span class="pln">iocb</span><span class="pun">;</span><span class="pln"><br>&nbsp; &nbsp; </span><span class="typ">AIORequest</span><span class="pln"> </span><span class="pun">*</span><span class="pln">req </span><span class="pun">=</span><span class="pln"> </span><span class="kwd">new</span><span class="pln"> </span><span class="typ">AIOReadRequest</span><span class="pun">(</span><span class="kwd">this</span><span class="pun">);</span><span class="pln"><br>&nbsp; &nbsp; io_prep_pread</span><span class="pun">(&amp;</span><span class="pln">iocb</span><span class="pun">,</span><span class="pln"> fd_</span><span class="pun">,</span><span class="pln"> req</span><span class="pun">-&gt;</span><span class="pln">buffer_</span><span class="pun">,</span><span class="pln"> kPageSize</span><span class="pun">,</span><span class="pln"> counter_ </span><span class="pun">*</span><span class="pln"> kPageSize</span><span class="pun">);</span><span class="pln"><br>&nbsp; &nbsp; iocb</span><span class="pun">.</span><span class="pln">data </span><span class="pun">=</span><span class="pln"> req</span><span class="pun">;</span><span class="pln"><br>&nbsp; &nbsp; </span><span class="kwd">int</span><span class="pln"> res </span><span class="pun">=</span><span class="pln"> io_submit</span><span class="pun">(</span><span class="pln">ioctx_</span><span class="pun">,</span><span class="pln"> </span><span class="lit">1</span><span class="pun">,</span><span class="pln"> </span><span class="pun">&amp;</span><span class="pln">iocbs</span><span class="pun">);</span><span class="pln"><br>&nbsp; &nbsp; CHECK_EQ</span><span class="pun">(</span><span class="pln">res</span><span class="pun">,</span><span class="pln"> </span><span class="lit">1</span><span class="pun">);</span><span class="pln"><br>&nbsp; </span><span class="pun">}</span><span class="pln"><br><br>&nbsp; </span><span class="kwd">void</span><span class="pln"> </span><span class="typ">ReadFile</span><span class="pun">()</span><span class="pln"> </span><span class="pun">{</span><span class="pln"><br>&nbsp; &nbsp; reap_counter_ </span><span class="pun">=</span><span class="pln"> </span><span class="lit">0</span><span class="pun">;</span><span class="pln"><br>&nbsp; &nbsp; </span><span class="kwd">for</span><span class="pln"> </span><span class="pun">(</span><span class="pln">counter_ </span><span class="pun">=</span><span class="pln"> </span><span class="lit">0</span><span class="pun">;</span><span class="pln"> counter_ </span><span class="pun">&lt;</span><span class="pln"> length_</span><span class="pun">;</span><span class="pln"> counter_</span><span class="pun">++)</span><span class="pln"> </span><span class="pun">{</span><span class="pln"><br>&nbsp; &nbsp; &nbsp; &nbsp; </span><span class="typ">SubmitRead</span><span class="pun">();</span><span class="pln"><br>&nbsp; &nbsp; &nbsp; &nbsp; </span><span class="typ">Reap</span><span class="pun">();</span><span class="pln"><br>&nbsp; &nbsp; </span><span class="pun">}</span><span class="pln"><br>&nbsp; &nbsp; </span><span class="typ">ReapRemaining</span><span class="pun">();</span><span class="pln"><br>&nbsp; </span><span class="pun">}</span><span class="pln"><br><br>&nbsp; </span><span class="kwd">int</span><span class="pln"> </span><span class="typ">DoReap</span><span class="pun">(</span><span class="kwd">int</span><span class="pln"> min_nr</span><span class="pun">)</span><span class="pln"> </span><span class="pun">{</span><span class="pln"><br>&nbsp; &nbsp; LOG</span><span class="pun">(</span><span class="pln">INFO</span><span class="pun">)</span><span class="pln"> </span><span class="pun">&lt;&lt;</span><span class="pln"> </span><span class="str">"Reaping between "</span><span class="pln"> </span><span class="pun">&lt;&lt;</span><span class="pln"> min_nr </span><span class="pun">&lt;&lt;</span><span class="pln"> </span><span class="str">" and "</span><span class="pln"><br>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span><span class="pun">&lt;&lt;</span><span class="pln"> FLAGS_max_nr </span><span class="pun">&lt;&lt;</span><span class="pln"> </span><span class="str">" io_events"</span><span class="pun">;</span><span class="pln"><br>&nbsp; &nbsp; </span><span class="kwd">struct</span><span class="pln"> io_event</span><span class="pun">*</span><span class="pln"> events </span><span class="pun">=</span><span class="pln"> </span><span class="kwd">new</span><span class="pln"> io_event</span><span class="pun">[</span><span class="pln">FLAGS_max_nr</span><span class="pun">];</span><span class="pln"><br>&nbsp; &nbsp; </span><span class="kwd">struct</span><span class="pln"> timespec timeout</span><span class="pun">;</span><span class="pln"><br>&nbsp; &nbsp; timeout</span><span class="pun">.</span><span class="pln">tv_sec </span><span class="pun">=</span><span class="pln"> </span><span class="lit">0</span><span class="pun">;</span><span class="pln"><br>&nbsp; &nbsp; timeout</span><span class="pun">.</span><span class="pln">tv_nsec </span><span class="pun">=</span><span class="pln"> </span><span class="lit">100000000</span><span class="pun">;</span><span class="pln"><br>&nbsp; &nbsp; </span><span class="kwd">int</span><span class="pln"> num_events</span><span class="pun">;</span><span class="pln"><br>&nbsp; &nbsp; LOG</span><span class="pun">(</span><span class="pln">INFO</span><span class="pun">)</span><span class="pln"> </span><span class="pun">&lt;&lt;</span><span class="pln"> </span><span class="str">"Calling io_getevents"</span><span class="pun">;</span><span class="pln"><br>&nbsp; &nbsp; num_events </span><span class="pun">=</span><span class="pln"> io_getevents</span><span class="pun">(</span><span class="pln">ioctx_</span><span class="pun">,</span><span class="pln"> min_nr</span><span class="pun">,</span><span class="pln"> FLAGS_max_nr</span><span class="pun">,</span><span class="pln"> events</span><span class="pun">,</span><span class="pln"><br>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span><span class="pun">&amp;</span><span class="pln">timeout</span><span class="pun">);</span><span class="pln"><br>&nbsp; &nbsp; LOG</span><span class="pun">(</span><span class="pln">INFO</span><span class="pun">)</span><span class="pln"> </span><span class="pun">&lt;&lt;</span><span class="pln"> </span><span class="str">"Calling completion function on results"</span><span class="pun">;</span><span class="pln"><br>&nbsp; &nbsp; </span><span class="kwd">for</span><span class="pln"> </span><span class="pun">(</span><span class="kwd">int</span><span class="pln"> i </span><span class="pun">=</span><span class="pln"> </span><span class="lit">0</span><span class="pun">;</span><span class="pln"> i </span><span class="pun">&lt;</span><span class="pln"> num_events</span><span class="pun">;</span><span class="pln"> i</span><span class="pun">++)</span><span class="pln"> </span><span class="pun">{</span><span class="pln"><br>&nbsp; &nbsp; &nbsp; </span><span class="kwd">struct</span><span class="pln"> io_event </span><span class="kwd">event</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> events</span><span class="pun">[</span><span class="pln">i</span><span class="pun">];</span><span class="pln"><br>&nbsp; &nbsp; &nbsp; </span><span class="typ">AIORequest</span><span class="pun">*</span><span class="pln"> req </span><span class="pun">=</span><span class="pln"> </span><span class="kwd">static_cast</span><span class="pun">&lt;</span><span class="typ">AIORequest</span><span class="pun">*&gt;(</span><span class="kwd">event</span><span class="pun">.</span><span class="pln">data</span><span class="pun">);</span><span class="pln"><br>&nbsp; &nbsp; &nbsp; req</span><span class="pun">-&gt;</span><span class="typ">Complete</span><span class="pun">(</span><span class="kwd">event</span><span class="pun">.</span><span class="pln">res</span><span class="pun">);</span><span class="pln"><br>&nbsp; &nbsp; &nbsp; </span><span class="kwd">delete</span><span class="pln"> req</span><span class="pun">;</span><span class="pln"><br>&nbsp; &nbsp; </span><span class="pun">}</span><span class="pln"><br>&nbsp; &nbsp; </span><span class="kwd">delete</span><span class="pln"> events</span><span class="pun">;</span><span class="pln"><br>&nbsp; &nbsp; <br>LOG</span><span class="pun">(</span><span class="pln">INFO</span><span class="pun">)</span><span class="pln"> </span><span class="pun">&lt;&lt;</span><span class="pln"> </span><span class="str">"Reaped "</span><span class="pln"> </span><span class="pun">&lt;&lt;</span><span class="pln"> num_events </span><span class="pun">&lt;&lt;</span><span class="pln"> </span><span class="str">" io_events"</span><span class="pun">;</span><span class="pln"><br>&nbsp; &nbsp; reap_counter_ </span><span class="pun">+=</span><span class="pln"> num_events</span><span class="pun">;</span><span class="pln"><br>&nbsp; &nbsp; </span><span class="kwd">return</span><span class="pln"> num_events</span><span class="pun">;</span><span class="pln"><br>&nbsp; </span><span class="pun">}</span><span class="pln"><br><br>&nbsp; </span><span class="kwd">void</span><span class="pln"> </span><span class="typ">Reap</span><span class="pun">()</span><span class="pln"> </span><span class="pun">{</span><span class="pln"><br>&nbsp; &nbsp; </span><span class="kwd">if</span><span class="pln"> </span><span class="pun">(</span><span class="pln">counter_ </span><span class="pun">&gt;=</span><span class="pln"> FLAGS_min_nr</span><span class="pun">)</span><span class="pln"> </span><span class="pun">{</span><span class="pln"><br>&nbsp; &nbsp; &nbsp; </span><span class="typ">DoReap</span><span class="pun">(</span><span class="pln">FLAGS_min_nr</span><span class="pun">);</span><span class="pln"><br>&nbsp; &nbsp; </span><span class="pun">}</span><span class="pln"><br>&nbsp; </span><span class="pun">}</span><span class="pln"><br><br>&nbsp; </span><span class="kwd">void</span><span class="pln"> </span><span class="typ">ReapRemaining</span><span class="pun">()</span><span class="pln"> </span><span class="pun">{</span><span class="pln"><br>&nbsp; &nbsp; </span><span class="kwd">while</span><span class="pln"> </span><span class="pun">(</span><span class="pln">reap_counter_ </span><span class="pun">&lt;</span><span class="pln"> length_</span><span class="pun">)</span><span class="pln"> </span><span class="pun">{</span><span class="pln"><br>&nbsp; &nbsp; &nbsp; </span><span class="typ">DoReap</span><span class="pun">(</span><span class="lit">1</span><span class="pun">);</span><span class="pln"><br>&nbsp; &nbsp; </span><span class="pun">}</span><span class="pln"><br>&nbsp; </span><span class="pun">}</span><span class="pln"><br><br>&nbsp; </span><span class="pun">~</span><span class="typ">AIOAdder</span><span class="pun">()</span><span class="pln"> </span><span class="pun">{</span><span class="pln"><br>&nbsp; &nbsp; LOG</span><span class="pun">(</span><span class="pln">INFO</span><span class="pun">)</span><span class="pln"> </span><span class="pun">&lt;&lt;</span><span class="pln"> </span><span class="str">"Closing AIO context and file"</span><span class="pun">;</span><span class="pln"><br>&nbsp; &nbsp; io_destroy</span><span class="pun">(</span><span class="pln">ioctx_</span><span class="pun">);</span><span class="pln"><br>&nbsp; &nbsp; close</span><span class="pun">(</span><span class="pln">fd_</span><span class="pun">);</span><span class="pln"><br>&nbsp; </span><span class="pun">}</span><span class="pln"><br><br>&nbsp; </span><span class="kwd">int</span><span class="pln"> </span><span class="typ">Sum</span><span class="pun">()</span><span class="pln"> </span><span class="pun">{</span><span class="pln"><br>&nbsp; &nbsp; LOG</span><span class="pun">(</span><span class="pln">INFO</span><span class="pun">)</span><span class="pln"> </span><span class="pun">&lt;&lt;</span><span class="pln"> </span><span class="str">"Writing consecutive integers to file"</span><span class="pun">;</span><span class="pln"><br>&nbsp; &nbsp; </span><span class="typ">WriteFile</span><span class="pun">();</span><span class="pln"><br>&nbsp; &nbsp; LOG</span><span class="pun">(</span><span class="pln">INFO</span><span class="pun">)</span><span class="pln"> </span><span class="pun">&lt;&lt;</span><span class="pln"> </span><span class="str">"Reading consecutive integers from file"</span><span class="pun">;</span><span class="pln"><br>&nbsp; &nbsp; </span><span class="typ">ReadFile</span><span class="pun">();</span><span class="pln"><br>&nbsp; &nbsp; </span><span class="kwd">return</span><span class="pln"> sum_</span><span class="pun">;</span><span class="pln"><br>&nbsp; </span><span class="pun">}</span><span class="pln"><br></span><span class="pun">};</span><span class="pln"><br><br></span><span class="kwd">int</span><span class="pln"> main</span><span class="pun">(</span><span class="kwd">int</span><span class="pln"> argc</span><span class="pun">,</span><span class="pln"> </span><span class="kwd">char</span><span class="pun">*</span><span class="pln"> argv</span><span class="pun">[])</span><span class="pln"> </span><span class="pun">{</span><span class="pln"><br>&nbsp; google</span><span class="pun">::</span><span class="typ">ParseCommandLineFlags</span><span class="pun">(&amp;</span><span class="pln">argc</span><span class="pun">,</span><span class="pln"> </span><span class="pun">&amp;</span><span class="pln">argv</span><span class="pun">,</span><span class="pln"> </span><span class="kwd">true</span><span class="pun">);</span><span class="pln"><br>&nbsp; </span><span class="typ">AIOAdder</span><span class="pln"> adder</span><span class="pun">(</span><span class="pln">FLAGS_file_size</span><span class="pun">);</span><span class="pln"><br>&nbsp; adder</span><span class="pun">.</span><span class="typ">Init</span><span class="pun">();</span><span class="pln"><br>&nbsp; </span><span class="kwd">int</span><span class="pln"> sum </span><span class="pun">=</span><span class="pln"> adder</span><span class="pun">.</span><span class="typ">Sum</span><span class="pun">();</span><span class="pln"><br>&nbsp; </span><span class="kwd">int</span><span class="pln"> expected </span><span class="pun">=</span><span class="pln"> </span><span class="pun">(</span><span class="pln">FLAGS_file_size </span><span class="pun">*</span><span class="pln"> </span><span class="pun">(</span><span class="pln">FLAGS_file_size </span><span class="pun">-</span><span class="pln"> </span><span class="lit">1</span><span class="pun">))</span><span class="pln"> </span><span class="pun">/</span><span class="pln"> </span><span class="lit">2</span><span class="pun">;</span><span class="pln"><br>&nbsp; LOG</span><span class="pun">(</span><span class="pln">INFO</span><span class="pun">)</span><span class="pln"> </span><span class="pun">&lt;&lt;</span><span class="pln"> </span><span class="str">"AIO is complete"</span><span class="pun">;</span><span class="pln"><br>&nbsp; CHECK_EQ</span><span class="pun">(</span><span class="pln">sum</span><span class="pun">,</span><span class="pln"> expected</span><span class="pun">)</span><span class="pln"> </span><span class="pun">&lt;&lt;</span><span class="pln"> </span><span class="str">"Expected "</span><span class="pln"> </span><span class="pun">&lt;&lt;</span><span class="pln"> expected </span><span class="pun">&lt;&lt;</span><span class="pln"> </span><span class="str">" Got "</span><span class="pln"> </span><span class="pun">&lt;&lt;</span><span class="pln"> sum</span><span class="pun">;</span><span class="pln"><br>&nbsp; printf</span><span class="pun">(</span><span class="str">"Successfully calculated that the sum of integers from 0"</span><span class="pln"><br>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</span><span class="str">" to %d is %d\n"</span><span class="pun">,</span><span class="pln"> FLAGS_file_size </span><span class="pun">-</span><span class="pln"> </span><span class="lit">1</span><span class="pun">,</span><span class="pln"> sum</span><span class="pun">);</span><span class="pln"><br>&nbsp; </span><span class="kwd">return</span><span class="pln"> </span><span class="lit">0</span><span class="pun">;</span><span class="pln"><br></span><span class="pun">}</span></pre>
+ </div>
+ </div>
+ </td></tr><tr>
+</tr></tbody></table>
+ </div>
+
+
+ 
+ <div id="wikicommentcol">
+ 
+
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+<div class="collapse">
+
+
+ 
+
+
+<div id="commentlist">
+
+ 
+ <div class="artifactcomment">
+ 
+ 
+ 
+ 
+ 
+ 
+ <span class="author">Comment
+ 
+ by 
+ 
+ 
+
+ <a class="userlink" href="https://code.google.com/u/103967590852603522648/">bert.hub...@gmail.com</a>,
+ 
+ </span>
+ <span class="date" title="Wed May 30 01:42:21 2012">May 30, 2012</span>
+ <div>
+<div class="commentcontent">
+<p>Hi Daniel, </p><p>Thanks for writing this fine document. I reference it from <a href="http://bert-hubert.blogspot.com/2012/05/on-linux-asynchronous-file-io.html" rel="nofollow">http://bert-hubert.blogspot.com/2012/05/on-linux-asynchronous-file-io.html</a> - thanks! </p>
+</div>
+ 
+ 
+ </div>
+ </div>
+ 
+
+ 
+ <div class="artifactcomment">
+ 
+ 
+ 
+ 
+ 
+ 
+ <span class="author">Comment
+ 
+ by 
+ 
+ 
+
+ <a class="userlink" href="https://code.google.com/u/115155307146537731796/">ersun.wa...@gmail.com</a>,
+ 
+ </span>
+ <span class="date" title="Sun Aug 12 13:57:26 2012">Aug 12, 2012</span>
+ <div>
+<div class="commentcontent">
+<p>Great write-up.  Linked here: <a href="http://webfiveoh.com/content/guides/2012/aug/mon-13th/linux-asynchronous-io-and-libaio.html" rel="nofollow">http://webfiveoh.com/content/guides/2012/aug/mon-13th/linux-asynchronous-io-and-libaio.html</a> </p>
+</div>
+ 
+ 
+ </div>
+ </div>
+ 
+
+ 
+ <div class="artifactcomment">
+ 
+ 
+ 
+ 
+ 
+ 
+ <span class="author">Comment
+ 
+ by 
+ 
+ 
+
+ <a class="userlink" href="https://code.google.com/u/103790604532162480537/">una...@gmail.com</a>,
+ 
+ </span>
+ <span class="date" title="Tue Feb 19 03:21:40 2013">Feb 19, 2013</span>
+ <div>
+<div class="commentcontent">
+<p>Epoll on linux doesn't support regular files. It always returns ENOPERM when registering them with the epollctl syscall. I've tried with ext4, btrfs, xfs &amp; jfs on Linux 3.6 with the same result. </p><pre class="prettyprint"><span class="com">#include</span><span class="pln"> </span><span class="str">&lt;sys/epoll.h&gt;</span><span class="pln"><br></span><span class="com">#include</span><span class="pln"> </span><span class="str">&lt;sys/types.h&gt;</span><span class="pln"><br></span><span class="com">#include</span><span class="pln"> </span><span class="str">&lt;sys/stat.h&gt;</span><span class="pln"><br></span><span class="com">#include</span><span class="pln"> </span><span class="str">&lt;fcntl.h&gt;</span><span class="pln"><br></span><span class="com">#include</span><span class="pln"> </span><span class="str">&lt;stdio.h&gt;</span><span class="pln"><br><br></span><span class="kwd">int</span><span class="pln"> main</span><span class="pun">(</span><span class="kwd">void</span><span class="pun">)</span><span class="pln"> </span><span class="pun">{</span><span class="pln"><br>&nbsp; &nbsp; </span><span class="kwd">int</span><span class="pln"> ep </span><span class="pun">=</span><span class="pln"> epoll_create1</span><span class="pun">(</span><span class="lit">0</span><span class="pun">);</span><span class="pln"><br>&nbsp; &nbsp; </span><span class="kwd">int</span><span class="pln"> fd </span><span class="pun">=</span><span class="pln"> open</span><span class="pun">(</span><span class="str">"/root/kernel-uek-2.6.39-300.17.2.el6uek.src.rpm"</span><span class="pun">,</span><span class="pln"> O_RDONLY</span><span class="pun">|</span><span class="pln">O_NONBLOCK</span><span class="pun">);</span><span class="pln"><br>&nbsp; &nbsp; </span><span class="kwd">struct</span><span class="pln"> epoll_event evt </span><span class="pun">=</span><span class="pln"> </span><span class="pun">{</span><span class="pln"><br>&nbsp; &nbsp; &nbsp; &nbsp; </span><span class="pun">.</span><span class="pln">events </span><span class="pun">=</span><span class="pln"> EPOLLIN<br>&nbsp; &nbsp; </span><span class="pun">};</span><span class="pln"><br><br>&nbsp; &nbsp; </span><span class="kwd">if</span><span class="pln"> </span><span class="pun">(</span><span class="pln">ep </span><span class="pun">&lt;</span><span class="pln"> </span><span class="lit">0</span><span class="pln"> </span><span class="pun">||</span><span class="pln"> fd </span><span class="pun">&lt;</span><span class="pln"> </span><span class="lit">0</span><span class="pun">)</span><span class="pln"> </span><span class="pun">{</span><span class="pln"><br>&nbsp; &nbsp; &nbsp; &nbsp; printf</span><span class="pun">(</span><span class="str">"Error opening fds.\n"</span><span class="pun">);</span><span class="pln"><br>&nbsp; &nbsp; &nbsp; &nbsp; </span><span class="kwd">return</span><span class="pln"> </span><span class="pun">-</span><span class="lit">1</span><span class="pun">;</span><span class="pln"><br>&nbsp; &nbsp; </span><span class="pun">}</span><span class="pln"><br><br>&nbsp; &nbsp; </span><span class="kwd">if</span><span class="pln"> </span><span class="pun">(</span><span class="pln">epoll_ctl</span><span class="pun">(</span><span class="pln">ep</span><span class="pun">,</span><span class="pln"> EPOLL_CTL_ADD</span><span class="pun">,</span><span class="pln"> fd</span><span class="pun">,</span><span class="pln"> </span><span class="pun">&amp;</span><span class="pln">evt</span><span class="pun">)</span><span class="pln"> </span><span class="pun">&lt;</span><span class="pln"> </span><span class="lit">0</span><span class="pun">)</span><span class="pln"> </span><span class="pun">{</span><span class="pln"><br>&nbsp; &nbsp; &nbsp; &nbsp; perror</span><span class="pun">(</span><span class="str">"epoll_ctl"</span><span class="pun">);</span><span class="pln"><br>&nbsp; &nbsp; &nbsp; &nbsp; </span><span class="kwd">return</span><span class="pln"> </span><span class="pun">-</span><span class="lit">1</span><span class="pun">;</span><span class="pln"><br>&nbsp; &nbsp; </span><span class="pun">}</span><span class="pln"><br>&nbsp; &nbsp; </span><span class="kwd">return</span><span class="pln"> </span><span class="lit">0</span><span class="pun">;</span><span class="pln"><br></span><span class="pun">}</span></pre>
+</div>
+ 
+ 
+ </div>
+ </div>
+ 
+
+ 
+ <div class="artifactcomment">
+ 
+ 
+ 
+ 
+ 
+ 
+ <span class="author">Comment
+ 
+ by 
+ 
+ 
+
+ <a class="userlink" href="https://code.google.com/u/113801981588238309041/">haghdo...@gmail.com</a>,
+ 
+ </span>
+ <span class="date" title="Fri Mar 15 22:05:23 2013">Mar 15, 2013</span>
+ <div>
+<div class="commentcontent">
+<p>Thanks for your grate article. There is a compilation error in this line num_events = io_getevents(ioctx<i>, min_nr, FLAGS_max_nr, events.get(),&amp;timeout); </i></p><p>it should be something like this  num_events = io_getevents(ioctx<i>, min_nr, FLAGS_max_nr, events,&amp;timeout); </i></p>
+</div>
+ 
+ 
+ </div>
+ </div>
+ 
+
+ 
+ <div class="artifactcomment">
+ 
+ 
+ 
+ 
+ 
+ 
+ <span class="author">Comment
+ 
+ by 
+ 
+ 
+
+ <a class="userlink" href="https://code.google.com/u/108474981592634289690/">garethb...@gmail.com</a>,
+ 
+ </span>
+ <span class="date" title="Thu Jun 13 08:56:09 2013">Jun 13, 2013</span>
+ <div>
+<div class="commentcontent">
+<p>It seems the posix_memalign is not actually required, is there some sort of performance benefit to be had by using it?? </p>
+</div>
+ 
+ 
+ </div>
+ </div>
+ 
+
+ 
+ <div class="artifactcomment">
+ 
+ 
+ 
+ 
+ 
+ 
+ <span class="author">Comment
+ 
+ by 
+ 
+ 
+
+ <a class="userlink" href="https://code.google.com/u/103724282630885316886/">vishn...@gmail.com</a>,
+ 
+ </span>
+ <span class="date" title="Fri Aug  9 15:26:44 2013">Aug 9, 2013</span>
+ <div>
+<div class="commentcontent">
+<p>The posix_memalign is required and O_DIRECT is required. If I don't align my buffers to PAGE_SIZE, kernel 2.6.32 and 3.3 and 3.5.0-37-generic return -EINVAL in event.res, but event.res2 will be zero. </p>
+</div>
+ 
+ 
+ </div>
+ </div>
+ 
+
+ 
+ <div class="artifactcomment">
+ 
+ 
+ 
+ 
+ 
+ 
+ <span class="author">Comment
+ 
+ by 
+ 
+ 
+
+ <a class="userlink" href="https://code.google.com/u/103724282630885316886/">vishn...@gmail.com</a>,
+ 
+ </span>
+ <span class="date" title="Fri Aug  9 17:52:29 2013">Aug 9, 2013</span>
+ <div>
+<div class="commentcontent">
+<p>Actually it's probably O_DIRECT that requires buffer length to be aligned to 512B and offset to be also aligned to 512B. </p>
+</div>
+ 
+ 
+ </div>
+ </div>
+ 
+
+ 
+ <div class="artifactcomment">
+ 
+ 
+ 
+ 
+ 
+ 
+ <span class="author">Comment
+ 
+ by 
+ 
+ 
+
+ <a class="userlink" href="https://code.google.com/u/104805717887225221125/">nepor...@gmail.com</a>,
+ 
+ </span>
+ <span class="date" title="Wed Nov  6 07:35:43 2013">Nov 6, 2013</span>
+ <div>
+<div class="commentcontent">
+<p>Linux 3.12 has a solution to blocking io_submit() on regular files - see <a href="http://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/?id=7869a4a6c5caa7b2e5c41ccaf46eb3371f88eea7" rel="nofollow">http://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/?id=7869a4a6c5caa7b2e5c41ccaf46eb3371f88eea7</a> </p>
+</div>
+ 
+ 
+ </div>
+ </div>
+ 
+
+ 
+ <div class="artifactcomment">
+ 
+ 
+ 
+ 
+ 
+ 
+ <span class="author">Comment
+ 
+ by  project member 
+ 
+ 
+
+ <a class="userlink" href="https://code.google.com/u/111678707898441125339/">dehrenb...@google.com</a>,
+ 
+ </span>
+ <span class="date" title="Mon Apr 21 08:32:41 2014">Apr 21, 2014</span>
+ <div>
+<div class="commentcontent">
+<p>The sample code here is released into the public domain. So feel free to copy it into whatever program you want to write. </p>
+</div>
+ 
+ 
+ </div>
+ </div>
+ 
+
+ 
+ <div class="artifactcomment">
+ 
+ 
+ 
+ 
+ 
+ 
+ <span class="author">Comment
+ 
+ by 
+ 
+ 
+
+ 
+ <span class="userlink">dehrenb...@chromium.org</span>,
+ 
+ </span>
+ <span class="date" title="Tue Jul 22 09:58:03 2014">Jul 22, 2014</span>
+ <div>
+<div class="commentcontent">
+<p>haghdo..., thanks, I've fixed the code based on your comment. </p><p>vishn..., that's right, the alignment restriction is actually based on the backing device (for ext4 at least)--if you're using a device with 4k blocks, 4k alignment is needed, otherwise your direct I/O doesn't work. </p><p>una..., that's right, you can't use epoll directly on the file; instead, you have to use it on the ioctx with the io_set_eventfd syscall. </p>
+</div>
+ 
+ 
+ </div>
+ </div>
+ 
+
+</div>
+</div>
+
+ 
+
+
+ <script type="text/javascript">
+ function delComment(sequence_num, create_time, delete_mode) {
+ var f = document.forms["delcom"];
+ f.sequence_num.value = sequence_num;
+ f.create_time.value = create_time;
+ f.mode.value = delete_mode;
+ f.submit();
+ return false;
+ }
+ </script>
+
+
+ </div>
+ 
+ 
+ 
+ 
+ 
+ <div id="commentform">
+ <form action="https://code.google.com/p/kernel/w/detail.do" method="post">
+ <table>
+ <tbody><tr><td class="vt">
+ <input type="hidden" name="pagename" value="AIOUserGuide">
+ <input type="hidden" name="token" value="ABZ6GAciBR7wXJANw0lEk1JMtMA3vIzrjA:1408361093458">
+ <div class="graytext" style="float: right;">
+ Hint: You can use <a href="http://code.google.com/p/support/wiki/WikiSyntax">Wiki Syntax.</a>
+ </div>
+ <div>Enter a comment:</div>
+ <textarea name="content" rows="6" cols="100"></textarea><br><br>
+ <input type="submit" name="submit" value="Submit">
+ </td>
+ </tr></tbody></table>
+ </form>
+ </div>
+ 
+ 
+ 
+ 
+ 
+ <form name="delcom" action="https://code.google.com/p/kernel/w/delComment.do" method="POST">
+ <input type="hidden" name="sequence_num" value="">
+ <input type="hidden" name="create_time" value="">
+ <input type="hidden" name="mode" value="">
+ <input type="hidden" name="pagename" value="AIOUserGuide">
+ <input type="hidden" name="token" value="ABZ6GAciBR7wXJANw0lEk1JMtMA3vIzrjA:1408361093458">
+ </form>
+
+
+ <script src="./AIOUserGuide_files/prettify.js"></script>
+ <script type="text/javascript">
+ prettyPrint();
+ </script>
+
+<script type="text/javascript" src="./AIOUserGuide_files/dit_scripts.js"></script>
+
+
+
+  
+ 
+ 
+ <script type="text/javascript" src="./AIOUserGuide_files/ph_core.js"></script>
+ 
+ <script type="text/javascript" src="./AIOUserGuide_files/ph_dwiki.js"></script>
+ 
+ 
+ 
+ 
+</div> 
+
+<div id="footer" dir="ltr">
+ <div class="text">
+ <a href="https://code.google.com/projecthosting/terms.html">Terms</a> -
+ <a href="http://www.google.com/privacy.html">Privacy</a> -
+ <a href="https://code.google.com/p/support/">Project Hosting Help</a>
+ </div>
+</div>
+ <div class="hostedBy" style="margin-top: -20px;">
+ <span style="vertical-align: top;">Powered by <a href="http://code.google.com/projecthosting/">Google Project Hosting</a></span>
+ </div>
+
+ 
+ 
+
+
+ 
+ 
+
+
+
+<div class="menuDiv instance0" id="menuDiv-projects-dropdown" style="display: none;"><div class="menuCategory default"></div><b class="categoryTitle projects" style="display: block;">Projects</b><div class="menuCategory projects"><a class="menuItem" href="https://code.google.com/p/easyshop-for-plone/" style="display: block;">easyshop-for-plone</a></div><b class="categoryTitle starred_projects" style="display: block;">Starred projects</b><div class="menuCategory starred_projects"><a class="menuItem" href="https://code.google.com/p/easyshop-for-plone/" style="display: block;">easyshop-for-plone</a></div><div class="menuCategory controls"><hr class="menuSeparator"><a class="menuItem" href="https://code.google.com/hosting/" style="display: block;">Find open source projects...</a><a class="menuItem" href="https://code.google.com/hosting/createProject" style="display: block;">Create a project...</a></div></div><div class="menuDiv instance1" id="menuDiv-multilogin-dropdown" style="display: none;"><div class="menuCategory default"><span class="menuText" style="display: block;"><b>nialldouglas14@gmail.com</b></span></div><div class="menuCategory controls"><hr class="menuSeparator"><a class="menuItem" href="http://www.google.com/accounts/AddSession?service=code&continue=https%3A%2F%2Fcode.google.com%2Fp%2Fkernel%2Fwiki%2FAIOUserGuide" style="display: block;"><nobr>Sign in with another account...</nobr></a></div></div></body></html>
