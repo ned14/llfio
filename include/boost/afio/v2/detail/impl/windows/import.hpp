@@ -720,18 +720,22 @@ namespace windows_nt_kernel
 // disable to prevent accidental usage
 template <class T> inline result<T> make_errored_result(NTSTATUS e, const char *extended = nullptr)
 {
+  (void) extended;
   static_assert(!std::is_same<T, T>::value, "Use make_errored_result_nt<T>(NTSTATUS).");
 }
 template <class T> inline outcome<T> make_errored_outcome(NTSTATUS e, const char *extended = nullptr)
 {
+  (void) extended;
   static_assert(!std::is_same<T, T>::value, "Use make_errored_outcome_nt<T>(NTSTATUS).");
 }
 template <class T> inline result<T> make_errored_result_nt(NTSTATUS e, const char *extended = nullptr)
 {
+  (void) extended;
   return result<T>(std::error_code(windows_nt_kernel::win32_error_from_nt_status(e), std::system_category()));
 }
 template <class T> inline outcome<T> make_errored_outcome_nt(NTSTATUS e, const char *extended = nullptr)
 {
+  (void) extended;
   return outcome<T>(std::error_code(windows_nt_kernel::win32_error_from_nt_status(e), std::system_category()));
 }
 
@@ -993,7 +997,7 @@ static inline result<ACCESS_MASK> access_mask_from_handle_mode(native_handle_typ
 static inline result<DWORD> attributes_from_handle_caching_and_flags(native_handle_type &nativeh, handle::caching _caching, handle::flag flags)
 {
   DWORD attribs = 0;
-  if(flags && handle::flag::overlapped)
+  if(flags & handle::flag::overlapped)
   {
     attribs |= FILE_FLAG_OVERLAPPED;
     nativeh.behaviour |= native_handle_type::disposition::overlapped;

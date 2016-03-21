@@ -34,6 +34,15 @@ DEALINGS IN THE SOFTWARE.
 
 BOOST_AFIO_V2_NAMESPACE_BEGIN
 
+handle::handle(const handle &o, handle::really_copy)
+{
+  _caching = o._caching;
+  _flags = o._flags;
+  _v.behaviour = o._v.behaviour;
+  if(!DuplicateHandle(GetCurrentProcess(), o._v.h, GetCurrentProcess(), &_v.h, 0, false, DUPLICATE_SAME_ACCESS))
+    throw std::system_error(GetLastError(), std::system_category());
+}
+
 handle::~handle()
 {
   if(_v)

@@ -43,7 +43,7 @@ BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(handle &h, st
   IO_STATUS_BLOCK isb = {{-1}};
   NTSTATUS ntstat;
   size_t ret = 0;
-  if((wanted && want::flags) || (wanted && want::namemax) || (wanted && want::fstypename))
+  if((wanted & want::flags) || (wanted & want::namemax) || (wanted & want::fstypename))
   {
     FILE_FS_ATTRIBUTE_INFORMATION *ffai = (FILE_FS_ATTRIBUTE_INFORMATION *) buffer;
     isb.Status = -1;
@@ -52,7 +52,7 @@ BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(handle &h, st
       ntstat = ntwait(h.native_handle().h, isb, deadline());
     if(ntstat)
       return make_errored_result_nt<size_t>(ntstat);
-    if(wanted && want::flags)
+    if(wanted & want::flags)
     {
       f_flags.rdonly = !!(ffai->FileSystemAttributes & FILE_READ_ONLY_VOLUME);
       f_flags.acls = !!(ffai->FileSystemAttributes & FILE_PERSISTENT_ACLS);
@@ -62,12 +62,12 @@ BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(handle &h, st
       f_flags.filecompression = !!(ffai->FileSystemAttributes & FILE_FILE_COMPRESSION);
       ++ret;
     }
-    if(wanted && want::namemax)
+    if(wanted & want::namemax)
     {
       f_namemax = ffai->MaximumComponentNameLength;
       ++ret;
     }
-    if(wanted && want::fstypename)
+    if(wanted & want::fstypename)
     {
       f_fstypename.resize(ffai->FileSystemNameLength / sizeof(fixme_path::value_type));
       for(size_t n = 0; n < ffai->FileSystemNameLength / sizeof(fixme_path::value_type); n++)
@@ -75,7 +75,7 @@ BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(handle &h, st
       ++ret;
     }
   }
-  if((wanted && want::bsize) || (wanted && want::blocks) || (wanted && want::bfree) || (wanted && want::bavail))
+  if((wanted & want::bsize) || (wanted & want::blocks) || (wanted & want::bfree) || (wanted & want::bavail))
   {
     FILE_FS_FULL_SIZE_INFORMATION *fffsi = (FILE_FS_FULL_SIZE_INFORMATION *) buffer;
     isb.Status = -1;
@@ -84,28 +84,28 @@ BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(handle &h, st
       ntstat = ntwait(h.native_handle().h, isb, deadline());
     if(ntstat)
       return make_errored_result_nt<size_t>(ntstat);
-    if(wanted && want::bsize)
+    if(wanted & want::bsize)
     {
       f_bsize = fffsi->BytesPerSector * fffsi->SectorsPerAllocationUnit;
       ++ret;
     }
-    if(wanted && want::blocks)
+    if(wanted & want::blocks)
     {
       f_blocks = fffsi->TotalAllocationUnits.QuadPart;
       ++ret;
     }
-    if(wanted && want::bfree)
+    if(wanted & want::bfree)
     {
       f_bfree = fffsi->ActualAvailableAllocationUnits.QuadPart;
       ++ret;
     }
-    if(wanted && want::bavail)
+    if(wanted & want::bavail)
     {
       f_bavail = fffsi->CallerAvailableAllocationUnits.QuadPart;
       ++ret;
     }
   }
-  if(wanted && want::fsid)
+  if(wanted & want::fsid)
   {
     FILE_FS_OBJECTID_INFORMATION *ffoi = (FILE_FS_OBJECTID_INFORMATION *) buffer;
     isb.Status = -1;
@@ -119,7 +119,7 @@ BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(handle &h, st
       ++ret;
     }
   }
-  if(wanted && want::iosize)
+  if(wanted & want::iosize)
   {
     FILE_FS_SECTOR_SIZE_INFORMATION *ffssi = (FILE_FS_SECTOR_SIZE_INFORMATION *) buffer;
     isb.Status = -1;
@@ -131,7 +131,7 @@ BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(handle &h, st
     f_iosize = ffssi->PhysicalBytesPerSectorForPerformance;
     ++ret;
   }
-  if((wanted && want::mntfromname) || (wanted && want::mntonname))
+  if((wanted & want::mntfromname) || (wanted & want::mntonname))
   {
     // Irrespective we need the path before figuring out the mounted device
     alignas(8) fixme_path::value_type buffer2[32769];
@@ -141,7 +141,7 @@ BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(handle &h, st
       if(!pathlen || pathlen >= sizeof(buffer2) / sizeof(*buffer2))
         return make_errored_result<size_t>(GetLastError());
       buffer2[pathlen] = 0;
-      if(wanted && want::mntfromname)
+      if(wanted & want::mntfromname)
       {
         DWORD len = GetFinalPathNameByHandle(h.native_handle().h, buffer, sizeof(buffer) / sizeof(*buffer), FILE_NAME_OPENED | VOLUME_NAME_NT);
         if(!len || len >= sizeof(buffer) / sizeof(*buffer))
@@ -162,7 +162,7 @@ BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(handle &h, st
         ++ret;
         wanted &= ~want::mntfromname;
       }
-      if(wanted && want::mntonname)
+      if(wanted & want::mntonname)
       {
         DWORD len = GetFinalPathNameByHandle(h.native_handle().h, buffer, sizeof(buffer) / sizeof(*buffer), FILE_NAME_OPENED | VOLUME_NAME_DOS);
         if(!len || len >= sizeof(buffer) / sizeof(*buffer))

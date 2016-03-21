@@ -34,6 +34,11 @@ DEALINGS IN THE SOFTWARE.
 
 #include <regex>
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4251)  // dll interface
+#endif
+
 BOOST_AFIO_V2_NAMESPACE_BEGIN
 
 namespace storage_profile
@@ -289,6 +294,10 @@ BOOST_AFIO_V2_NAMESPACE_END
 #define BOOST_AFIO_INCLUDED_BY_HEADER 1
 #include "detail/impl/storage_profile.ipp"
 #undef BOOST_AFIO_INCLUDED_BY_HEADER
+#endif
+
+#ifdef _MSC_VER
+#pragma warning(pop)
 #endif
 
 #endif

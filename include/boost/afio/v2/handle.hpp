@@ -29,14 +29,19 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
+#ifndef BOOST_AFIO_HANDLE_H
+#define BOOST_AFIO_HANDLE_H
+
 #include "deadline.h"
 #include "native_handle_type.hpp"
 
 #include <utility>  // for pair<>
 #include <vector>
 
-#ifndef BOOST_AFIO_HANDLE_H
-#define BOOST_AFIO_HANDLE_H
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4251)  // dll interface
+#endif
 
 BOOST_AFIO_V2_NAMESPACE_BEGIN
 
@@ -365,6 +370,10 @@ BOOST_AFIO_V2_NAMESPACE_END
 #include "detail/impl/posix/handle.ipp"
 #endif
 #undef BOOST_AFIO_INCLUDED_BY_HEADER
+#endif
+
+#ifdef _MSC_VER
+#pragma warning(pop)
 #endif
 
 #endif

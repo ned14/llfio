@@ -31,8 +31,8 @@ DEALINGS IN THE SOFTWARE.
 
 #define _CRT_SECURE_NO_WARNINGS 1
 
-#include "include/async_file_handle.hpp"
-#include "include/storage_profile.hpp"
+#include "boost/afio/v2/async_file_handle.hpp"
+#include "boost/afio/v2/storage_profile.hpp"
 
 #include <fstream>
 #include <iomanip>

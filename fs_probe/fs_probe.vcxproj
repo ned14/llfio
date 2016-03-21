@@ -42,115 +42,49 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\async_file_handle.hpp" />
-    <ClInclude Include="include\config.hpp" />
-    <ClInclude Include="include\deadline.h" />
-    <ClInclude Include="include\detail\child_process.hpp" />
-    <ClInclude Include="include\detail\impl\windows\import.hpp" />
-    <ClInclude Include="include\file_handle.hpp" />
-    <ClInclude Include="include\handle.hpp" />
-    <ClInclude Include="include\io_service.hpp" />
-    <ClInclude Include="include\lockable_handle.hpp" />
-    <ClInclude Include="include\native_handle_type.hpp" />
-    <ClInclude Include="include\statfs.hpp" />
-    <ClInclude Include="include\storage_profile.hpp" />
-    <ClInclude Include="include\utils.hpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="include\detail\impl\posix\child_process.ipp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug clang|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug clang|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </None>
-    <None Include="include\detail\impl\posix\handle.ipp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug clang|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug clang|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </None>
-    <None Include="include\detail\impl\posix\io_service.ipp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug clang|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug clang|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </None>
-    <None Include="include\detail\impl\posix\statfs.ipp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug clang|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug clang|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </None>
-    <None Include="include\detail\impl\posix\storage_profile.ipp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug clang|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug clang|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </None>
-    <None Include="include\detail\impl\posix\utils.ipp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug clang|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug clang|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </None>
-    <None Include="include\detail\impl\storage_profile.ipp" />
-    <None Include="include\detail\impl\windows\async_file_handle.ipp" />
-    <None Include="include\detail\impl\windows\child_process.ipp" />
-    <None Include="include\detail\impl\windows\file_handle.ipp" />
-    <None Include="include\detail\impl\windows\handle.ipp" />
-    <None Include="include\detail\impl\windows\io_service.ipp" />
-    <None Include="include\detail\impl\windows\statfs.ipp" />
-    <None Include="include\detail\impl\windows\storage_profile.ipp" />
-    <None Include="include\detail\impl\windows\utils.ipp" />
     <None Include="Readme.md" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{4FCBD8AB-30CB-41C9-91C9-E74B9DEB1495}</ProjectGuid>
+    <ProjectGuid>{61EAA66F-64FA-4399-86D1-9EA2CF7CA1B8}</ProjectGuid>
     <Keyword>MakeFileProj</Keyword>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>Makefile</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug clang|Win32'" Label="Configuration">
-    <ConfigurationType>Makefile</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>Makefile</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug clang|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v140_Clang_3_7</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -180,16 +114,22 @@
     <NMakeOutput>Project1.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>WIN32;_DEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
     <NMakeBuildCommandLine>withmsvc.bat</NMakeBuildCommandLine>
+    <CodeAnalysisRuleSet>C:\Program Files (x86)\Microsoft Visual Studio 14.0\Team Tools\Static Analysis Tools\Rule Sets\NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug clang|Win32'">
     <NMakeOutput>Project1.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>WIN32;_DEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
     <NMakeBuildCommandLine>withmsvc.bat</NMakeBuildCommandLine>
+    <CodeAnalysisRuleSet>C:\Program Files (x86)\Microsoft Visual Studio 14.0\Team Tools\Static Analysis Tools\Rule Sets\NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <NMakeOutput>Project1.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>WIN32;NDEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
     <NMakeBuildCommandLine>withmsvc.bat</NMakeBuildCommandLine>
+    <CodeAnalysisRuleSet>C:\Program Files (x86)\Microsoft Visual Studio 14.0\Team Tools\Static Analysis Tools\Rule Sets\NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <CodeAnalysisRuleSet>C:\Program Files (x86)\Microsoft Visual Studio 14.0\Team Tools\Static Analysis Tools\Rule Sets\NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
@@ -199,22 +139,24 @@
     <CodeAnalysisRuleSet>C:\Program Files (x86)\Microsoft Visual Studio 14.0\Team Tools\Static Analysis Tools\Rule Sets\NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <RunCodeAnalysis>false</RunCodeAnalysis>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <PreprocessorDefinitions>UNICODE=1;WIN32=1;_UNICODE=1;_WIN32=1;AFIO_STANDALONE=1;ASIO_STANDALONE=1</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>
-      </AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>UNICODE=1;WIN32=1;_UNICODE=1;_WIN32=1;AFIO_STANDALONE=1;ASIO_STANDALONE=1;BOOST_AFIO_HEADERS_ONLY=0;AFIO_STANDALONE=1;BOOST_AFIO_DYN_LINK</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>../include</AdditionalIncludeDirectories>
       <WarningLevel>Level4</WarningLevel>
-      <DisableSpecificWarnings>4503;4201;4100;4127;4189;4459</DisableSpecificWarnings>
+      <DisableSpecificWarnings>
+      </DisableSpecificWarnings>
       <EnablePREfast>false</EnablePREfast>
-      <AdditionalOptions>/analyze:stacksize 204800 /analyze- %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/analyze:stacksize 204800</AdditionalOptions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug clang|x64'">
     <ClCompile>
-      <PreprocessorDefinitions>UNICODE=1;WIN32=1;_UNICODE=1;_WIN32=1;AFIO_STANDALONE=1;ASIO_STANDALONE=1</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>
-      </AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>UNICODE=1;WIN32=1;_UNICODE=1;_WIN32=1;AFIO_STANDALONE=1;ASIO_STANDALONE=1;BOOST_AFIO_HEADERS_ONLY=0;AFIO_STANDALONE=1;BOOST_AFIO_DYN_LINK</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>../include</AdditionalIncludeDirectories>
       <WarningLevel>EnableAllWarnings</WarningLevel>
       <DisableSpecificWarnings>4503;4201;4100;4127;4189;4459</DisableSpecificWarnings>
       <EnablePREfast>false</EnablePREfast>
@@ -222,17 +164,43 @@
       <ExceptionHandling>Enabled</ExceptionHandling>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <CppLanguageStandard>c++1y</CppLanguageStandard>
-      <AdditionalOptions>-Wno-unused-variable %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/analyze:stacksize 204800</AdditionalOptions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <PreprocessorDefinitions>UNICODE=1;WIN32=1;_UNICODE=1;_WIN32=1;AFIO_STANDALONE=1;ASIO_STANDALONE=1</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>
-      </AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>UNICODE=1;WIN32=1;_UNICODE=1;_WIN32=1;AFIO_STANDALONE=1;ASIO_STANDALONE=1;BOOST_AFIO_HEADERS_ONLY=0;AFIO_STANDALONE=1;BOOST_AFIO_DYN_LINK</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>../include</AdditionalIncludeDirectories>
       <WarningLevel>Level4</WarningLevel>
-      <DisableSpecificWarnings>4503;4201;4100;4127;4189;4459</DisableSpecificWarnings>
+      <DisableSpecificWarnings>
+      </DisableSpecificWarnings>
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <EnablePREfast>false</EnablePREfast>
+      <AdditionalOptions>/analyze:stacksize 204800</AdditionalOptions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug clang|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>../include</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>;BOOST_AFIO_HEADERS_ONLY=0;AFIO_STANDALONE=1;BOOST_AFIO_DYN_LINK</PreprocessorDefinitions>
+      <EnablePREfast>false</EnablePREfast>
+      <AdditionalOptions>/analyze:stacksize 204800</AdditionalOptions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>../include</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>;BOOST_AFIO_HEADERS_ONLY=0;AFIO_STANDALONE=1;BOOST_AFIO_DYN_LINK</PreprocessorDefinitions>
+      <EnablePREfast>false</EnablePREfast>
+      <AdditionalOptions>/analyze:stacksize 204800</AdditionalOptions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>../include</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>;BOOST_AFIO_HEADERS_ONLY=0;AFIO_STANDALONE=1;BOOST_AFIO_DYN_LINK</PreprocessorDefinitions>
+      <EnablePREfast>false</EnablePREfast>
+      <AdditionalOptions>/analyze:stacksize 204800</AdditionalOptions>
     </ClCompile>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
