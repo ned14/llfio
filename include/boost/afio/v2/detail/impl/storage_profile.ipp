@@ -196,7 +196,7 @@ namespace storage_profile
 #endif
 
           if(sp.mem_quantity.value / 4 < chunksize)
-            chunksize = sp.mem_quantity.value / 4;
+            chunksize = (size_t)(sp.mem_quantity.value / 4);
           char *buffer = utils::page_allocator<char>().allocate(chunksize);
           auto unbuffer = BOOST_AFIO_V2_NAMESPACE::detail::Undoer([buffer, chunksize] { utils::page_allocator<char>().deallocate(buffer, chunksize); });
           // Make sure all memory is really allocated first
@@ -280,6 +280,10 @@ namespace storage_profile
     }
   }
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4459)  // off_t shadows global namespace
+#endif
   namespace concurrency
   {
     outcome<void> atomic_rewrite_quantum(storage_profile &sp, file_handle &srch) noexcept
@@ -380,7 +384,7 @@ namespace storage_profile
         // offsets not at the front of the file
         if(sp.max_aligned_atomic_rewrite.value > sp.atomic_rewrite_quantum.value)
         {
-          size_t size = sp.max_aligned_atomic_rewrite.value;
+          size_t size = (size_t) sp.max_aligned_atomic_rewrite.value;
           for(off_t offset = sp.max_aligned_atomic_rewrite.value; offset < sp.max_aligned_atomic_rewrite.value * 4; offset += sp.max_aligned_atomic_rewrite.value)
           {
             // Create two concurrent writer threads and as many reader threads as additional CPU cores
@@ -474,8 +478,8 @@ namespace storage_profile
       try
       {
         using off_t = io_service::extent_type;
-        size_t size = sp.max_aligned_atomic_rewrite.value;
-        size_t maxsize = sp.max_aligned_atomic_rewrite.value;
+        size_t size = (size_t) sp.max_aligned_atomic_rewrite.value;
+        size_t maxsize = (size_t) sp.max_aligned_atomic_rewrite.value;
         if(size > 1024)
           size = 1024;
         if(maxsize > 8192)
@@ -574,6 +578,9 @@ namespace storage_profile
       return make_ready_outcome<void>();
     }
   }
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 }
 BOOST_AFIO_V2_NAMESPACE_END
 

@@ -46,7 +46,7 @@ namespace storage_profile
 #pragma warning(push)
 #pragma warning(disable : 6387)  // MSVC sanitiser warns that GetModuleHandleA() might fail (hah!)
 #endif
-    outcome<void> os(storage_profile &sp, file_handle &h) noexcept
+    outcome<void> os(storage_profile &sp, file_handle &) noexcept
     {
       static std::string os_name, os_ver;
       if(!os_name.empty())
@@ -84,7 +84,7 @@ namespace storage_profile
 #pragma warning(pop)
 #endif
     // CPU name, architecture, physical cores
-    outcome<void> cpu(storage_profile &sp, file_handle &h) noexcept
+    outcome<void> cpu(storage_profile &sp, file_handle &) noexcept
     {
       static std::string cpu_name, cpu_architecture;
       static unsigned cpu_physical_cores;
@@ -193,7 +193,7 @@ namespace storage_profile
     }
     namespace windows
     {
-      outcome<void> _mem(storage_profile &sp, file_handle &h) noexcept
+      outcome<void> _mem(storage_profile &sp, file_handle &) noexcept
       {
         MEMORYSTATUSEX ms = {sizeof(MEMORYSTATUSEX)};
         GlobalMemoryStatusEx(&ms);
@@ -208,7 +208,7 @@ namespace storage_profile
     namespace windows
     {
       // Controller type, max transfer, max buffers. Device name, size
-      outcome<void> _device(storage_profile &sp, file_handle &h, std::string mntfromname, std::string /*fstypename*/) noexcept
+      outcome<void> _device(storage_profile &sp, file_handle &, std::string mntfromname, std::string /*fstypename*/) noexcept
       {
         try
         {

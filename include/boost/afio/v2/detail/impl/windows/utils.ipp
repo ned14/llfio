@@ -37,39 +37,42 @@ BOOST_AFIO_V2_NAMESPACE_BEGIN
 namespace utils
 {
   // Stupid MSVC ...
-  namespace detail { using namespace BOOST_AFIO_V2_NAMESPACE::detail; }
+  namespace detail
+  {
+    using namespace BOOST_AFIO_V2_NAMESPACE::detail;
+  }
 #ifdef _MSC_VER
 #pragma warning(push)
-#pragma warning(disable: 6387) // MSVC sanitiser warns that GetModuleHandleA() might fail (hah!)
+#pragma warning(disable : 6387)  // MSVC sanitiser warns that GetModuleHandleA() might fail (hah!)
 #endif
   std::vector<size_t> page_sizes(bool only_actually_available) noexcept
   {
     static spinlock<bool> lock;
     static std::vector<size_t> pagesizes, pagesizes_available;
     stl11::lock_guard<decltype(lock)> g(lock);
-    if (pagesizes.empty())
+    if(pagesizes.empty())
     {
-      typedef size_t(WINAPI *GetLargePageMinimum_t)(void);
-      SYSTEM_INFO si = { {0} };
+      typedef size_t(WINAPI * GetLargePageMinimum_t)(void);
+      SYSTEM_INFO si = {{0}};
       GetSystemInfo(&si);
       pagesizes.push_back(si.dwPageSize);
       pagesizes_available.push_back(si.dwPageSize);
-      GetLargePageMinimum_t GetLargePageMinimum_ = (GetLargePageMinimum_t)GetProcAddress(GetModuleHandleW(L"kernel32.dll"), "GetLargePageMinimum");
-      if (GetLargePageMinimum_)
+      GetLargePageMinimum_t GetLargePageMinimum_ = (GetLargePageMinimum_t) GetProcAddress(GetModuleHandleW(L"kernel32.dll"), "GetLargePageMinimum");
+      if(GetLargePageMinimum_)
       {
         windows_nt_kernel::init();
         using namespace windows_nt_kernel;
         pagesizes.push_back(GetLargePageMinimum_());
         /* Attempt to enable SeLockMemoryPrivilege */
         HANDLE token;
-        if (OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES, &token))
+        if(OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES, &token))
         {
-          auto untoken = detail::Undoer([&token] {CloseHandle(token); });
-          TOKEN_PRIVILEGES privs = { 1 };
-          if (LookupPrivilegeValue(NULL, SE_LOCK_MEMORY_NAME, &privs.Privileges[0].Luid))
+          auto untoken = detail::Undoer([&token] { CloseHandle(token); });
+          TOKEN_PRIVILEGES privs = {1};
+          if(LookupPrivilegeValue(NULL, SE_LOCK_MEMORY_NAME, &privs.Privileges[0].Luid))
           {
             privs.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
-            if (AdjustTokenPrivileges(token, FALSE, &privs, 0, NULL, NULL) && GetLastError() == S_OK)
+            if(AdjustTokenPrivileges(token, FALSE, &privs, 0, NULL, NULL) && GetLastError() == S_OK)
               pagesizes_available.push_back(GetLargePageMinimum_());
           }
         }
@@ -85,7 +88,7 @@ namespace utils
   {
     windows_nt_kernel::init();
     using namespace windows_nt_kernel;
-    if (!RtlGenRandom(buffer, (ULONG)bytes))
+    if(!RtlGenRandom(buffer, (ULONG) bytes))
     {
       BOOST_AFIO_LOG_FATAL_EXIT("afio: Kernel crypto function failed");
       std::terminate();
@@ -98,23 +101,24 @@ namespace utils
     {
       large_page_allocation ret(calculate_large_page_allocation(bytes));
       DWORD type = MEM_COMMIT | MEM_RESERVE;
-      if (ret.page_size_used>65536)
+      if(ret.page_size_used > 65536)
         type |= MEM_LARGE_PAGES;
       ret.p = VirtualAlloc(nullptr, ret.actual_size, type, PAGE_READWRITE);
-      if (!ret.p)
+      if(!ret.p)
       {
-        if (ERROR_NOT_ENOUGH_MEMORY == GetLastError())
+        if(ERROR_NOT_ENOUGH_MEMORY == GetLastError())
           ret.p = VirtualAlloc(nullptr, ret.actual_size, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
       }
-  #ifndef NDEBUG
-      else if (ret.page_size_used>65536)
+#ifndef NDEBUG
+      else if(ret.page_size_used > 65536)
         std::cout << "afio: Large page allocation successful" << std::endl;
-  #endif
+#endif
       return ret;
     }
     void deallocate_large_pages(void *p, size_t bytes)
     {
-      if (!VirtualFree(p, 0, MEM_RELEASE))
+      (void) bytes;
+      if(!VirtualFree(p, 0, MEM_RELEASE))
       {
         BOOST_AFIO_LOG_FATAL_EXIT("afio: Freeing large pages failed");
         std::terminate();

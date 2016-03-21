@@ -60,16 +60,16 @@ namespace utils
   inline size_t file_buffer_default_size() noexcept
   {
     static size_t size;
-    if (!size)
+    if(!size)
     {
       std::vector<size_t> sizes(page_sizes(true));
-      for (auto &i : sizes)
-        if (i >= 1024 * 1024)
+      for(auto &i : sizes)
+        if(i >= 1024 * 1024)
         {
           size = i;
           break;
         }
-      if (!size)
+      if(!size)
         size = 1024 * 1024;
     }
     return size;
@@ -85,36 +85,36 @@ namespace utils
   */
   BOOST_AFIO_HEADERS_ONLY_FUNC_SPEC void random_fill(char *buffer, size_t bytes);
 
-  /*! \brief Converts a number to a hex string. Out buffer can be same as in buffer.
+/*! \brief Converts a number to a hex string. Out buffer can be same as in buffer.
 
-  Note that the character range used is a 16 item table of:
+Note that the character range used is a 16 item table of:
 
-  0123456789abcdef
+0123456789abcdef
 
-  This lets one pack one byte of input into two bytes of output.
+This lets one pack one byte of input into two bytes of output.
 
-  \ingroup utils
-  \complexity{O(N) where N is the length of the number.}
-  \exceptionmodel{Throws exception if output buffer is too small for input.}
-  */
+\ingroup utils
+\complexity{O(N) where N is the length of the number.}
+\exceptionmodel{Throws exception if output buffer is too small for input.}
+*/
 #ifdef _MSC_VER
 #pragma warning(push)
-#pragma warning(disable: 6293) // MSVC sanitiser warns that we wrap n in the for loop
+#pragma warning(disable : 6293)  // MSVC sanitiser warns that we wrap n in the for loop
 #endif
   inline size_t to_hex_string(char *out, size_t outlen, const char *_in, size_t inlen)
   {
-    unsigned const char *in = (unsigned const char *)_in;
+    unsigned const char *in = (unsigned const char *) _in;
     static constexpr char table[] = "0123456789abcdef";
-    if (outlen<inlen * 2)
+    if(outlen < inlen * 2)
       throw std::invalid_argument("Output buffer too small.");
-    for (size_t n = inlen - 2; n <= inlen - 2; n -= 2)
+    for(size_t n = inlen - 2; n <= inlen - 2; n -= 2)
     {
       out[n * 2 + 3] = table[(in[n + 1] >> 4) & 0xf];
       out[n * 2 + 2] = table[in[n + 1] & 0xf];
       out[n * 2 + 1] = table[(in[n] >> 4) & 0xf];
       out[n * 2 + 0] = table[in[n] & 0xf];
     }
-    if (inlen & 1)
+    if(inlen & 1)
     {
       out[1] = table[(in[0] >> 4) & 0xf];
       out[0] = table[in[0] & 0xf];
@@ -142,39 +142,37 @@ namespace utils
   */
   inline size_t from_hex_string(char *out, size_t outlen, const char *in, size_t inlen)
   {
-    if (inlen % 2)
+    if(inlen % 2)
       throw std::invalid_argument("Input buffer not multiple of two.");
-    if (outlen<inlen / 2)
+    if(outlen < inlen / 2)
       throw std::invalid_argument("Output buffer too small.");
     bool is_invalid = false;
-    auto fromhex = [&is_invalid](char c) -> unsigned char
-    {
+    auto fromhex = [&is_invalid](char c) -> unsigned char {
 #if 1
       // ASCII starting from 48 is 0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~
       //                           48               65                              97
-      static constexpr unsigned char table[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,                                                    // +10 = 58
-        255, 255, 255, 255, 255, 255, 255,                                                                                                      // +7  = 65
-        10, 11, 12, 13, 14, 15,                                                                                                                 // +6  = 71
-        255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,       // +26 = 97
-        10, 11, 12, 13, 14, 15
-      };
+      static constexpr unsigned char table[] = {0,   1,   2,   3,   4,   5,   6,   7,   8,   9,                                                                                    // +10 = 58
+                                                255, 255, 255, 255, 255, 255, 255,                                                                                                 // +7  = 65
+                                                10,  11,  12,  13,  14,  15,                                                                                                       // +6  = 71
+                                                255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,  // +26 = 97
+                                                10,  11,  12,  13,  14,  15};
       unsigned char r = 255;
-      if (c >= 48 && c <= 102)
+      if(c >= 48 && c <= 102)
         r = table[c - 48];
-      if (r == 255)
+      if(r == 255)
         is_invalid = true;
       return r;
 #else
-      if (c >= '0' && c <= '9')
+      if(c >= '0' && c <= '9')
         return c - '0';
-      if (c >= 'a' && c <= 'f')
+      if(c >= 'a' && c <= 'f')
         return c - 'a' + 10;
-      if (c >= 'A' && c <= 'F')
+      if(c >= 'A' && c <= 'F')
         return c - 'A' + 10;
       BOOST_AFIO_THROW(std::invalid_argument("Input is not hexadecimal."));
 #endif
     };
-    for (size_t n = 0; n<inlen / 2; n += 4)
+    for(size_t n = 0; n < inlen / 2; n += 4)
     {
       unsigned char c[8];
       c[0] = fromhex(in[n * 2]);
@@ -190,12 +188,12 @@ namespace utils
       out[n + 2] = (c[5] << 4) | c[4];
       out[n + 3] = (c[7] << 4) | c[6];
     }
-    for (size_t n = inlen / 2 - (inlen / 2) % 4; n<inlen / 2; n++)
+    for(size_t n = inlen / 2 - (inlen / 2) % 4; n < inlen / 2; n++)
     {
       unsigned char c1 = fromhex(in[n * 2]), c2 = fromhex(in[n * 2 + 1]);
       out[n] = (c2 << 4) | c1;
     }
-    if (is_invalid)
+    if(is_invalid)
       throw std::invalid_argument("Input is not hexadecimal.");
     return inlen / 2;
   }
@@ -218,14 +216,14 @@ namespace utils
   }
 
 #ifndef BOOST_AFIO_SECDEC_INTRINSICS
-# if defined(__GCC__) || defined(__clang__)
-#  define BOOST_AFIO_SECDEC_INTRINSICS 1
-# elif defined(_MSC_VER) && (defined(_M_X64) || _M_IX86_FP==1)
-#  define BOOST_AFIO_SECDEC_INTRINSICS 1
-# endif
+#if defined(__GCC__) || defined(__clang__)
+#define BOOST_AFIO_SECDEC_INTRINSICS 1
+#elif defined(_MSC_VER) && (defined(_M_X64) || _M_IX86_FP == 1)
+#define BOOST_AFIO_SECDEC_INTRINSICS 1
+#endif
 #endif
 #ifndef BOOST_AFIO_SECDEC_INTRINSICS
-# define BOOST_AFIO_SECDEC_INTRINSICS 0
+#define BOOST_AFIO_SECDEC_INTRINSICS 0
 #endif
   /*! \class secded_ecc
   \brief Calculates the single error correcting double error detecting (SECDED) Hamming Error Correcting Code for a \em blocksize block of bytes. For example, a secdec_ecc<8> would be the very common 72,64 Hamming code used in ECC RAM, or secdec_ecc<4096> would be for a 32784,32768 Hamming code.
@@ -261,17 +259,17 @@ namespace utils
   \complexity{O(N) where N is the blocksize}
   \exceptionmodel{Throws constexpr exceptions in constructor only, otherwise entirely noexcept.}
   */
-  template<size_t blocksize> class secded_ecc
+  template <size_t blocksize> class secded_ecc
   {
   public:
-    typedef unsigned int result_type; //!< The largest ECC which can be calculated
+    typedef unsigned int result_type;  //!< The largest ECC which can be calculated
   private:
     static constexpr size_t bits_per_byte = 8;
     typedef unsigned char unit_type;  // The batch unit of processing
     result_type bitsvalid;
     // Many CPUs (x86) are slow doing variable bit shifts, so keep a table
-    result_type ecc_twospowers[sizeof(result_type)*bits_per_byte];
-    unsigned short ecc_table[blocksize*bits_per_byte];
+    result_type ecc_twospowers[sizeof(result_type) * bits_per_byte];
+    unsigned short ecc_table[blocksize * bits_per_byte];
     static bool _is_single_bit_set(result_type x)
     {
 #ifndef _MSC_VER
@@ -281,13 +279,13 @@ namespace utils
       static int have_popcnt = [] {
         size_t cx, dx;
 #if defined(__x86_64__)
-        asm("cpuid": "=c" (cx), "=d" (dx) : "a" (1), "b" (0), "c" (0), "d" (0));
+        asm("cpuid" : "=c"(cx), "=d"(dx) : "a"(1), "b"(0), "c"(0), "d"(0));
 #else
-        asm("pushl %%ebx\n\tcpuid\n\tpopl %%ebx\n\t": "=c" (cx), "=d" (dx) : "a" (1), "c" (0), "d" (0));
+        asm("pushl %%ebx\n\tcpuid\n\tpopl %%ebx\n\t" : "=c"(cx), "=d"(dx) : "a"(1), "c"(0), "d"(0));
 #endif
-        return (dx&(1 << 26)) != 0/*SSE2*/ && (cx&(1 << 23)) != 0/*POPCNT*/;
+        return (dx & (1 << 26)) != 0 /*SSE2*/ && (cx & (1 << 23)) != 0 /*POPCNT*/;
       }();
-      if (have_popcnt)
+      if(have_popcnt)
 #endif
       {
         unsigned count;
@@ -311,100 +309,102 @@ namespace utils
 #endif
 #endif
     }
+
   public:
     //! Constructs an instance, configuring the necessary lookup tables
     BOOST_CXX14_CONSTEXPR secded_ecc()
     {
-      for (size_t n = 0; n<sizeof(result_type)*bits_per_byte; n++)
-        ecc_twospowers[n] = ((result_type)1 << n);
-      result_type length = blocksize*bits_per_byte;
+      for(size_t n = 0; n < sizeof(result_type) * bits_per_byte; n++)
+        ecc_twospowers[n] = ((result_type) 1 << n);
+      result_type length = blocksize * bits_per_byte;
       // This is (data bits + parity bits + 1) <= 2^(parity bits)
-      for (result_type p = 1; p<sizeof(result_type)*bits_per_byte; p++)
-        if ((length + p + 1) <= ecc_twospowers[p])
+      for(result_type p = 1; p < sizeof(result_type) * bits_per_byte; p++)
+        if((length + p + 1) <= ecc_twospowers[p])
         {
           bitsvalid = p;
           break;
         }
-      if ((bits_per_byte - 1 + bitsvalid) / bits_per_byte>sizeof(result_type))
+      if((bits_per_byte - 1 + bitsvalid) / bits_per_byte > sizeof(result_type))
         throw std::runtime_error("secdec_ecc: ECC would exceed the size of result_type!");
-      for (result_type i = 0; i<blocksize*bits_per_byte; i++)
+      for(result_type i = 0; i < blocksize * bits_per_byte; i++)
       {
         // Make a code bit
         result_type b = i + 1;
-#if BOOST_AFIO_SECDEC_INTRINSICS && 0 // let constexpr do its thing
+#if BOOST_AFIO_SECDEC_INTRINSICS && 0  // let constexpr do its thing
 #ifdef _MSC_VER
         unsigned long _topbit;
         _BitScanReverse(&_topbit, b);
         result_type topbit = _topbit;
 #else
-        result_type topbit = bits_per_byte*sizeof(result_type) - __builtin_clz(b);
+        result_type topbit = bits_per_byte * sizeof(result_type) - __builtin_clz(b);
 #endif
         b += topbit;
-        if (b >= ecc_twospowers[topbit]) b++;
-        //while(b>ecc_twospowers(_topbit+1)) _topbit++;
-        //b+=_topbit;
-        //if(b>=ecc_twospowers(_topbit)) b++;
+        if(b >= ecc_twospowers[topbit])
+          b++;
+// while(b>ecc_twospowers(_topbit+1)) _topbit++;
+// b+=_topbit;
+// if(b>=ecc_twospowers(_topbit)) b++;
 #else
-        for (size_t p = 0; ecc_twospowers[p]<(b + 1); p++)
+        for(size_t p = 0; ecc_twospowers[p] < (b + 1); p++)
           b++;
 #endif
-        ecc_table[i] = (unsigned short)b;
-        if (b>(unsigned short)-1)
+        ecc_table[i] = (unsigned short) b;
+        if(b > (unsigned short) -1)
           throw std::runtime_error("secdec_ecc: Precalculated table has exceeded its bounds");
       }
     }
     //! The number of bits valid in result_type
-    constexpr result_type result_bits_valid() const noexcept
-    {
-      return bitsvalid;
-    }
+    constexpr result_type result_bits_valid() const noexcept { return bitsvalid; }
     //! Accumulate ECC from fixed size buffer
     result_type operator()(result_type ecc, const char *buffer) const noexcept
     {
-      if (blocksize<sizeof(unit_type) * 8)
+      if(blocksize < sizeof(unit_type) * 8)
         return (*this)(ecc, buffer, blocksize);
       // Process in lumps of eight
-      const unit_type *_buffer = (const unit_type *)buffer;
+      const unit_type *_buffer = (const unit_type *) buffer;
       //#pragma omp parallel for reduction(^:ecc)
-      for (size_t i = 0; i<blocksize; i += sizeof(unit_type) * 8)
+      for(size_t i = 0; i < blocksize; i += sizeof(unit_type) * 8)
       {
-        union { unsigned long long v; unit_type c[8]; };
+        union {
+          unsigned long long v;
+          unit_type c[8];
+        };
         result_type prefetch[8];
-        v = *(unsigned long long *)(&_buffer[0 + i / sizeof(unit_type)]); // min 1 cycle
-#define BOOST_AFIO_ROUND(n) \
-          prefetch[0]=ecc_table[(i+0)*8+n]; \
-          prefetch[1]=ecc_table[(i+1)*8+n]; \
-          prefetch[2]=ecc_table[(i+2)*8+n]; \
-          prefetch[3]=ecc_table[(i+3)*8+n]; \
-          prefetch[4]=ecc_table[(i+4)*8+n]; \
-          prefetch[5]=ecc_table[(i+5)*8+n]; \
-          prefetch[6]=ecc_table[(i+6)*8+n]; \
-          prefetch[7]=ecc_table[(i+7)*8+n]; \
-          if(c[0]&((unit_type)1<<n))\
-            ecc^=prefetch[0];\
-          if(c[1]&((unit_type)1<<n))\
-            ecc^=prefetch[1];\
-          if(c[2]&((unit_type)1<<n))\
-            ecc^=prefetch[2];\
-          if(c[3]&((unit_type)1<<n))\
-            ecc^=prefetch[3];\
-          if(c[4]&((unit_type)1<<n))\
-            ecc^=prefetch[4];\
-          if(c[5]&((unit_type)1<<n))\
-            ecc^=prefetch[5];\
-          if(c[6]&((unit_type)1<<n))\
-            ecc^=prefetch[6];\
-          if(c[7]&((unit_type)1<<n))\
-            ecc^=prefetch[7];
-        BOOST_AFIO_ROUND(0)                                                    // prefetch = min 8, bit test and xor = min 16, total = 24
-          BOOST_AFIO_ROUND(1)
-          BOOST_AFIO_ROUND(2)
-          BOOST_AFIO_ROUND(3)
-          BOOST_AFIO_ROUND(4)
-          BOOST_AFIO_ROUND(5)
-          BOOST_AFIO_ROUND(6)
-          BOOST_AFIO_ROUND(7)
-#undef BOOST_AFIO_ROUND                                                      // total should be 1+(8*24/3)=65
+        v = *(unsigned long long *) (&_buffer[0 + i / sizeof(unit_type)]);  // min 1 cycle
+#define BOOST_AFIO_ROUND(n)                                                                                                                                                                                                                                                                                                    \
+  prefetch[0] = ecc_table[(i + 0) * 8 + n];                                                                                                                                                                                                                                                                                    \
+  prefetch[1] = ecc_table[(i + 1) * 8 + n];                                                                                                                                                                                                                                                                                    \
+  prefetch[2] = ecc_table[(i + 2) * 8 + n];                                                                                                                                                                                                                                                                                    \
+  prefetch[3] = ecc_table[(i + 3) * 8 + n];                                                                                                                                                                                                                                                                                    \
+  prefetch[4] = ecc_table[(i + 4) * 8 + n];                                                                                                                                                                                                                                                                                    \
+  prefetch[5] = ecc_table[(i + 5) * 8 + n];                                                                                                                                                                                                                                                                                    \
+  prefetch[6] = ecc_table[(i + 6) * 8 + n];                                                                                                                                                                                                                                                                                    \
+  prefetch[7] = ecc_table[(i + 7) * 8 + n];                                                                                                                                                                                                                                                                                    \
+  if(c[0] & ((unit_type) 1 << n))                                                                                                                                                                                                                                                                                              \
+    ecc ^= prefetch[0];                                                                                                                                                                                                                                                                                                        \
+  if(c[1] & ((unit_type) 1 << n))                                                                                                                                                                                                                                                                                              \
+    ecc ^= prefetch[1];                                                                                                                                                                                                                                                                                                        \
+  if(c[2] & ((unit_type) 1 << n))                                                                                                                                                                                                                                                                                              \
+    ecc ^= prefetch[2];                                                                                                                                                                                                                                                                                                        \
+  if(c[3] & ((unit_type) 1 << n))                                                                                                                                                                                                                                                                                              \
+    ecc ^= prefetch[3];                                                                                                                                                                                                                                                                                                        \
+  if(c[4] & ((unit_type) 1 << n))                                                                                                                                                                                                                                                                                              \
+    ecc ^= prefetch[4];                                                                                                                                                                                                                                                                                                        \
+  if(c[5] & ((unit_type) 1 << n))                                                                                                                                                                                                                                                                                              \
+    ecc ^= prefetch[5];                                                                                                                                                                                                                                                                                                        \
+  if(c[6] & ((unit_type) 1 << n))                                                                                                                                                                                                                                                                                              \
+    ecc ^= prefetch[6];                                                                                                                                                                                                                                                                                                        \
+  if(c[7] & ((unit_type) 1 << n))                                                                                                                                                                                                                                                                                              \
+    ecc ^= prefetch[7];
+        BOOST_AFIO_ROUND(0)  // prefetch = min 8, bit test and xor = min 16, total = 24
+        BOOST_AFIO_ROUND(1)
+        BOOST_AFIO_ROUND(2)
+        BOOST_AFIO_ROUND(3)
+        BOOST_AFIO_ROUND(4)
+        BOOST_AFIO_ROUND(5)
+        BOOST_AFIO_ROUND(6)
+        BOOST_AFIO_ROUND(7)
+#undef BOOST_AFIO_ROUND  // total should be 1+(8*24/3)=65
       }
       return ecc;
     }
@@ -412,28 +412,28 @@ namespace utils
     //! Accumulate ECC from partial buffer where \em length <= \em blocksize
     result_type operator()(result_type ecc, const char *buffer, size_t length) const noexcept
     {
-      const unit_type *_buffer = (const unit_type *)buffer;
+      const unit_type *_buffer = (const unit_type *) buffer;
       //#pragma omp parallel for reduction(^:ecc)
-      for (size_t i = 0; i<length; i += sizeof(unit_type))
+      for(size_t i = 0; i < length; i += sizeof(unit_type))
       {
-        unit_type c = _buffer[i / sizeof(unit_type)];                 // min 1 cycle
-        if (!c)                                                    // min 1 cycle
+        unit_type c = _buffer[i / sizeof(unit_type)];  // min 1 cycle
+        if(!c)                                         // min 1 cycle
           continue;
-        char bitset[bits_per_byte*sizeof(unit_type)];
-        result_type prefetch[bits_per_byte*sizeof(unit_type)];
+        char bitset[bits_per_byte * sizeof(unit_type)];
+        result_type prefetch[bits_per_byte * sizeof(unit_type)];
         // Most compilers will roll this out
-        for (size_t n = 0; n<bits_per_byte*sizeof(unit_type); n++)   // min 16 cycles
+        for(size_t n = 0; n < bits_per_byte * sizeof(unit_type); n++)  // min 16 cycles
         {
-          bitset[n] = !!(c&((unit_type)1 << n));
-          prefetch[n] = ecc_table[i*bits_per_byte + n];               // min 8 cycles
+          bitset[n] = !!(c & ((unit_type) 1 << n));
+          prefetch[n] = ecc_table[i * bits_per_byte + n];  // min 8 cycles
         }
         result_type localecc = 0;
-        for (size_t n = 0; n<bits_per_byte*sizeof(unit_type); n++)
+        for(size_t n = 0; n < bits_per_byte * sizeof(unit_type); n++)
         {
-          if (bitset[n])                                           // min 8 cycles
-            localecc ^= prefetch[n];                                // min 8 cycles
+          if(bitset[n])               // min 8 cycles
+            localecc ^= prefetch[n];  // min 8 cycles
         }
-        ecc ^= localecc;                                            // min 1 cycle. Total cycles = min 43 cycles/byte
+        ecc ^= localecc;  // min 1 cycle. Total cycles = min 43 cycles/byte
       }
       return ecc;
     }
@@ -441,18 +441,18 @@ namespace utils
     //! Given the original ECC and the new ECC for a buffer, find the bad bit. Return (result_type)-1 if not found (e.g. ECC corrupt)
     result_type find_bad_bit(result_type good_ecc, result_type bad_ecc) const noexcept
     {
-      result_type length = blocksize*bits_per_byte, eccdiff = good_ecc^bad_ecc;
-      if (_is_single_bit_set(eccdiff))
-        return (result_type)-1;
-      for (result_type i = 0, b = 1; i<length; i++, b++)
+      result_type length = blocksize * bits_per_byte, eccdiff = good_ecc ^ bad_ecc;
+      if(_is_single_bit_set(eccdiff))
+        return (result_type) -1;
+      for(result_type i = 0, b = 1; i < length; i++, b++)
       {
         // Skip parity bits
-        while (_is_single_bit_set(b))
+        while(_is_single_bit_set(b))
           b++;
-        if (b == eccdiff)
+        if(b == eccdiff)
           return i;
       }
-      return (result_type)-1;
+      return (result_type) -1;
     }
     //! The outcomes from verify()
     enum verify_status
@@ -465,18 +465,18 @@ namespace utils
     verify_status verify(char *buffer, result_type good_ecc) const noexcept
     {
       result_type this_ecc = (*this)(0, buffer);
-      if (this_ecc == good_ecc)
-        return verify_status::okay; // no errors
+      if(this_ecc == good_ecc)
+        return verify_status::okay;  // no errors
       result_type badbit = find_bad_bit(good_ecc, this_ecc);
-      if ((result_type)-1 == badbit)
-        return verify_status::corrupt; // parity corrupt?
-      buffer[badbit / bits_per_byte] ^= (unsigned char)ecc_twospowers[badbit%bits_per_byte];
+      if((result_type) -1 == badbit)
+        return verify_status::corrupt;  // parity corrupt?
+      buffer[badbit / bits_per_byte] ^= (unsigned char) ecc_twospowers[badbit % bits_per_byte];
       this_ecc = (*this)(0, buffer);
-      if (this_ecc == good_ecc)
-        return healed; // error healed
-                       // Put the bit back
-      buffer[badbit / bits_per_byte] ^= (unsigned char)ecc_twospowers[badbit%bits_per_byte];
-      return verify_status::corrupt; // more than one bit was corrupt
+      if(this_ecc == good_ecc)
+        return healed;  // error healed
+                        // Put the bit back
+      buffer[badbit / bits_per_byte] ^= (unsigned char) ecc_twospowers[badbit % bits_per_byte];
+      return verify_status::corrupt;  // more than one bit was corrupt
     }
   };
 
@@ -487,8 +487,18 @@ namespace utils
       void *p;
       size_t page_size_used;
       size_t actual_size;
-      large_page_allocation() : p(nullptr), page_size_used(0), actual_size(0) { }
-      large_page_allocation(void *_p, size_t pagesize, size_t actual) : p(_p), page_size_used(pagesize), actual_size(actual) { }
+      large_page_allocation()
+          : p(nullptr)
+          , page_size_used(0)
+          , actual_size(0)
+      {
+      }
+      large_page_allocation(void *_p, size_t pagesize, size_t actual)
+          : p(_p)
+          , page_size_used(pagesize)
+          , actual_size(actual)
+      {
+      }
     };
     inline large_page_allocation calculate_large_page_allocation(size_t bytes)
     {
@@ -498,8 +508,8 @@ namespace utils
       {
         ret.page_size_used = pagesizes.back();
         pagesizes.pop_back();
-      } while (!pagesizes.empty() && !(bytes / ret.page_size_used));
-      ret.actual_size = (bytes + ret.page_size_used - 1)&~(ret.page_size_used - 1);
+      } while(!pagesizes.empty() && !(bytes / ret.page_size_used));
+      ret.actual_size = (bytes + ret.page_size_used - 1) & ~(ret.page_size_used - 1);
       return ret;
     }
     BOOST_AFIO_HEADERS_ONLY_FUNC_SPEC large_page_allocation allocate_large_pages(size_t bytes);
@@ -523,107 +533,83 @@ namespace utils
   Be aware that as soon as the allocation exceeds a large page size, most systems allocate in multiples of the large
   page size, so if the large page size were 2Mb and you allocate 2Mb + 1 byte, 4Mb is actually consumed.
   */
-  template <typename T>
-  class page_allocator
+  template <typename T> class page_allocator
   {
   public:
-    typedef T         value_type;
-    typedef T*        pointer;
-    typedef const T*  const_pointer;
-    typedef T& reference;
-    typedef const T&  const_reference;
-    typedef size_t    size_type;
+    typedef T value_type;
+    typedef T *pointer;
+    typedef const T *const_pointer;
+    typedef T &reference;
+    typedef const T &const_reference;
+    typedef size_t size_type;
     typedef ptrdiff_t difference_type;
     typedef std::true_type propagate_on_container_move_assignment;
     typedef std::true_type is_always_equal;
 
-    template <class U>
-    struct rebind { typedef page_allocator<U> other; };
-
-    page_allocator() noexcept
-    {}
-
-    template <class U>
-    page_allocator(const page_allocator<U>&) noexcept
-    {}
-
-    size_type
-      max_size() const noexcept
+    template <class U> struct rebind
     {
-      return size_type(~0) / sizeof(T);
-    }
+      typedef page_allocator<U> other;
+    };
 
-    pointer
-      address(reference x) const noexcept
-    {
-      return std::addressof(x);
-    }
+    page_allocator() noexcept {}
 
-    const_pointer
-      address(const_reference x) const noexcept
-    {
-      return std::addressof(x);
-    }
+    template <class U> page_allocator(const page_allocator<U> &) noexcept {}
 
-    pointer
-      allocate(size_type n, const void *hint = 0)
+    size_type max_size() const noexcept { return size_type(~0) / sizeof(T); }
+
+    pointer address(reference x) const noexcept { return std::addressof(x); }
+
+    const_pointer address(const_reference x) const noexcept { return std::addressof(x); }
+
+    pointer allocate(size_type n, const void * = 0)
     {
-      if (n>max_size())
+      if(n > max_size())
         throw std::bad_alloc();
       auto mem(detail::allocate_large_pages(n * sizeof(T)));
-      if (mem.p == nullptr)
+      if(mem.p == nullptr)
         throw std::bad_alloc();
       return reinterpret_cast<pointer>(mem.p);
     }
 
-    void
-      deallocate(pointer p, size_type n)
+    void deallocate(pointer p, size_type n)
     {
-      if (n>max_size())
+      if(n > max_size())
         throw std::bad_alloc();
       detail::deallocate_large_pages(p, n * sizeof(T));
     }
 
-    template <class U, class ...Args>
-    void
-      construct(U* p, Args&&... args)
-    {
-      ::new(reinterpret_cast<void*>(p)) U(std::forward<Args>(args)...);
-    }
+    template <class U, class... Args> void construct(U *p, Args &&... args) { ::new(reinterpret_cast<void *>(p)) U(std::forward<Args>(args)...); }
 
-    template <class U> void
-      destroy(U* p)
-    {
-      p->~U();
-    }
+    template <class U> void destroy(U *p) { p->~U(); }
   };
-  template <>
-  class page_allocator<void>
+  template <> class page_allocator<void>
   {
   public:
-    typedef void         value_type;
-    typedef void*        pointer;
-    typedef const void*  const_pointer;
+    typedef void value_type;
+    typedef void *pointer;
+    typedef const void *const_pointer;
     typedef std::true_type propagate_on_container_move_assignment;
     typedef std::true_type is_always_equal;
 
-    template <class U>
-    struct rebind { typedef page_allocator<U> other; };
+    template <class U> struct rebind
+    {
+      typedef page_allocator<U> other;
+    };
   };
-  template<class T, class U> inline bool operator==(const page_allocator<T> &, const page_allocator<U> &) noexcept { return true; }
+  template <class T, class U> inline bool operator==(const page_allocator<T> &, const page_allocator<U> &) noexcept { return true; }
 }
 
 BOOST_AFIO_V2_NAMESPACE_END
 
-# if BOOST_AFIO_HEADERS_ONLY == 1 && !defined(DOXYGEN_SHOULD_SKIP_THIS)
-#  define BOOST_AFIO_INCLUDED_BY_HEADER 1
-#  ifdef WIN32
-#   include "detail/impl/windows/utils.ipp"
-#  else
-#   include "detail/impl/posix/utils.ipp"
-#  endif
-#  undef BOOST_AFIO_INCLUDED_BY_HEADER
-# endif
+#if BOOST_AFIO_HEADERS_ONLY == 1 && !defined(DOXYGEN_SHOULD_SKIP_THIS)
+#define BOOST_AFIO_INCLUDED_BY_HEADER 1
+#ifdef WIN32
+#include "detail/impl/windows/utils.ipp"
+#else
+#include "detail/impl/posix/utils.ipp"
+#endif
+#undef BOOST_AFIO_INCLUDED_BY_HEADER
+#endif
 
 
 #endif

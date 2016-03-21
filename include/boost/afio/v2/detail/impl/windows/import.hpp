@@ -946,6 +946,7 @@ static inline bool ntsleep(const deadline &d, bool return_on_alert = false) noex
     BOOST_AFIO_WIN_DEADLINE_TO_SLEEP_LOOP(d);
     // Pump alerts and APCs
     NTSTATUS ntstat = NtDelayExecution(true, timeout);
+    (void) ntstat;
     if((d).steady)
     {
       if(stl11::chrono::steady_clock::now() >= (began_steady + stl11::chrono::nanoseconds((d).nsecs)))
