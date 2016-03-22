@@ -3,14 +3,14 @@
   "name": "Boost.AFIO",
   "authors": [ "Niall Douglas", "Paul Kirth" ],
   "maintainers": [ "Niall Douglas" ],
-  "description": "A portable asynchronous file i/o library extending Boost.ASIO.",
-  "std": [ "11" ],
+  "description": "A hard guarantee asynchronous file i/o and filesystem library.",
+  "std": [ "14" ],
   "category": [
     "Function-objects",
-	"Concurrent",
-	"Domain Specific",
-	"IO",
-	"Programming Interfaces",
-	"System"
+    "Concurrent",
+    "Domain Specific",
+    "IO",
+    "Programming Interfaces",
+    "System"
   ]
 }
