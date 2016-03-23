@@ -62,6 +62,8 @@ depend on the current afio::path setting.
 - [ ] symlink_handle
 - [ ] Missing functions on handle/file_handle from AFIO v1
 
+## Commits and tags in this git repository can be verified using:
+<pre>
 -----BEGIN PGP PUBLIC KEY BLOCK-----
 Version: GnuPG v2
 
@@ -73,3 +75,4 @@ Zvkgx4vwAP9gxeQUsp7ARMFGxfbR0xPf6fRbH+miMUg2e7rYNuHtLQD9EUoR32We
 V8SjvX4r/deKniWctvCi5JccgfUwXkVzFAk=
 =puFk
 -----END PGP PUBLIC KEY BLOCK-----
+</pre>
