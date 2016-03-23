@@ -39,6 +39,8 @@ DEALINGS IN THE SOFTWARE.
 #error You should not include windows/import.hpp on not Windows platforms
 #endif
 
+#include <sal.h>
+
 // At some future point we will not do this, and instead import symbols manually
 // to avoid the windows.h inclusion
 #if 1
@@ -53,6 +55,11 @@ BOOST_AFIO_V2_NAMESPACE_BEGIN
 
 namespace windows_nt_kernel
 {
+// Weirdly these appear to be undefined sometimes?
+#define STATUS_SUCCESS ((DWORD) 0x00000000L)
+#define STATUS_ALERTED ((DWORD) 0x00000101L)
+
+
   // From http://undocumented.ntinternals.net/UserMode/Undocumented%20Functions/NT%20Objects/File/FILE_INFORMATION_CLASS.html
   typedef enum _FILE_INFORMATION_CLASS {
     FileDirectoryInformation = 1,
@@ -184,159 +191,68 @@ namespace windows_nt_kernel
   } IMAGEHLP_LINE64, *PIMAGEHLP_LINE64;
 
   // From https://msdn.microsoft.com/en-us/library/bb432383%28v=vs.85%29.aspx
-  typedef NTSTATUS(NTAPI *NtQueryObject_t)(
-  /*_In_opt_*/ HANDLE Handle,
-  /*_In_*/ OBJECT_INFORMATION_CLASS ObjectInformationClass,
-  /*_Out_opt_*/ PVOID ObjectInformation,
-  /*_In_*/ ULONG ObjectInformationLength,
-  /*_Out_opt_*/ PULONG ReturnLength);
+  typedef NTSTATUS(NTAPI *NtQueryObject_t)(_In_opt_ HANDLE Handle, _In_ OBJECT_INFORMATION_CLASS ObjectInformationClass, _Out_opt_ PVOID ObjectInformation, _In_ ULONG ObjectInformationLength, _Out_opt_ PULONG ReturnLength);
 
   // From http://undocumented.ntinternals.net/UserMode/Undocumented%20Functions/NT%20Objects/File/NtQueryInformationFile.html
   // and http://msdn.microsoft.com/en-us/library/windows/hardware/ff567052(v=vs.85).aspx
-  typedef NTSTATUS(NTAPI *NtQueryInformationFile_t)(
-  /*_In_*/ HANDLE FileHandle,
-  /*_Out_*/ PIO_STATUS_BLOCK IoStatusBlock,
-  /*_Out_*/ PVOID FileInformation,
-  /*_In_*/ ULONG Length,
-  /*_In_*/ FILE_INFORMATION_CLASS FileInformationClass);
+  typedef NTSTATUS(NTAPI *NtQueryInformationFile_t)(_In_ HANDLE FileHandle, _Out_ PIO_STATUS_BLOCK IoStatusBlock, _Out_ PVOID FileInformation, _In_ ULONG Length, _In_ FILE_INFORMATION_CLASS FileInformationClass);
 
   // From http://msdn.microsoft.com/en-us/library/windows/hardware/ff567070(v=vs.85).aspx
-  typedef NTSTATUS(NTAPI *NtQueryVolumeInformationFile_t)(
-  /*_In_*/ HANDLE FileHandle,
-  /*_Out_*/ PIO_STATUS_BLOCK IoStatusBlock,
-  /*_Out_*/ PVOID FsInformation,
-  /*_In_*/ ULONG Length,
-  /*_In_*/ FS_INFORMATION_CLASS FsInformationClass);
+  typedef NTSTATUS(NTAPI *NtQueryVolumeInformationFile_t)(_In_ HANDLE FileHandle, _Out_ PIO_STATUS_BLOCK IoStatusBlock, _Out_ PVOID FsInformation, _In_ ULONG Length, _In_ FS_INFORMATION_CLASS FsInformationClass);
 
   // From http://msdn.microsoft.com/en-us/library/windows/hardware/ff566492(v=vs.85).aspx
-  typedef NTSTATUS(NTAPI *NtOpenDirectoryObject_t)(
-  /*_Out_*/ PHANDLE DirectoryHandle,
-  /*_In_*/ ACCESS_MASK DesiredAccess,
-  /*_In_*/ POBJECT_ATTRIBUTES ObjectAttributes);
+  typedef NTSTATUS(NTAPI *NtOpenDirectoryObject_t)(_Out_ PHANDLE DirectoryHandle, _In_ ACCESS_MASK DesiredAccess, _In_ POBJECT_ATTRIBUTES ObjectAttributes);
 
 
   // From http://msdn.microsoft.com/en-us/library/windows/hardware/ff567011(v=vs.85).aspx
-  typedef NTSTATUS(NTAPI *NtOpenFile_t)(
-  /*_Out_*/ PHANDLE FileHandle,
-  /*_In_*/ ACCESS_MASK DesiredAccess,
-  /*_In_*/ POBJECT_ATTRIBUTES ObjectAttributes,
-  /*_Out_*/ PIO_STATUS_BLOCK IoStatusBlock,
-  /*_In_*/ ULONG ShareAccess,
-  /*_In_*/ ULONG OpenOptions);
+  typedef NTSTATUS(NTAPI *NtOpenFile_t)(_Out_ PHANDLE FileHandle, _In_ ACCESS_MASK DesiredAccess, _In_ POBJECT_ATTRIBUTES ObjectAttributes, _Out_ PIO_STATUS_BLOCK IoStatusBlock, _In_ ULONG ShareAccess, _In_ ULONG OpenOptions);
 
   // From http://msdn.microsoft.com/en-us/library/windows/hardware/ff566424(v=vs.85).aspx
-  typedef NTSTATUS(NTAPI *NtCreateFile_t)(
-  /*_Out_*/ PHANDLE FileHandle,
-  /*_In_*/ ACCESS_MASK DesiredAccess,
-  /*_In_*/ POBJECT_ATTRIBUTES ObjectAttributes,
-  /*_Out_*/ PIO_STATUS_BLOCK IoStatusBlock,
-  /*_In_opt_*/ PLARGE_INTEGER AllocationSize,
-  /*_In_*/ ULONG FileAttributes,
-  /*_In_*/ ULONG ShareAccess,
-  /*_In_*/ ULONG CreateDisposition,
-  /*_In_*/ ULONG CreateOptions,
-  /*_In_opt_*/ PVOID EaBuffer,
-  /*_In_*/ ULONG EaLength);
+  typedef NTSTATUS(NTAPI *NtCreateFile_t)(_Out_ PHANDLE FileHandle, _In_ ACCESS_MASK DesiredAccess, _In_ POBJECT_ATTRIBUTES ObjectAttributes, _Out_ PIO_STATUS_BLOCK IoStatusBlock, _In_opt_ PLARGE_INTEGER AllocationSize, _In_ ULONG FileAttributes, _In_ ULONG ShareAccess, _In_ ULONG CreateDisposition,
+                                          _In_ ULONG CreateOptions, _In_opt_ PVOID EaBuffer, _In_ ULONG EaLength);
 
-  typedef NTSTATUS(NTAPI *NtDeleteFile_t)(
-  /*_In_*/ POBJECT_ATTRIBUTES ObjectAttributes);
+  typedef NTSTATUS(NTAPI *NtDeleteFile_t)(_In_ POBJECT_ATTRIBUTES ObjectAttributes);
 
-  typedef NTSTATUS(NTAPI *NtClose_t)(
-  /*_Out_*/ HANDLE FileHandle);
+  typedef NTSTATUS(NTAPI *NtClose_t)(_Out_ HANDLE FileHandle);
 
   // From http://undocumented.ntinternals.net/UserMode/Undocumented%20Functions/NT%20Objects/File/NtQueryDirectoryFile.html
   // and http://msdn.microsoft.com/en-us/library/windows/hardware/ff567047(v=vs.85).aspx
-  typedef NTSTATUS(NTAPI *NtQueryDirectoryFile_t)(
-  /*_In_*/ HANDLE FileHandle,
-  /*_In_opt_*/ HANDLE Event,
-  /*_In_opt_*/ PIO_APC_ROUTINE ApcRoutine,
-  /*_In_opt_*/ PVOID ApcContext,
-  /*_Out_*/ PIO_STATUS_BLOCK IoStatusBlock,
-  /*_Out_*/ PVOID FileInformation,
-  /*_In_*/ ULONG Length,
-  /*_In_*/ FILE_INFORMATION_CLASS FileInformationClass,
-  /*_In_*/ BOOLEAN ReturnSingleEntry,
-  /*_In_opt_*/ PUNICODE_STRING FileName,
-  /*_In_*/ BOOLEAN RestartScan);
+  typedef NTSTATUS(NTAPI *NtQueryDirectoryFile_t)(_In_ HANDLE FileHandle, _In_opt_ HANDLE Event, _In_opt_ PIO_APC_ROUTINE ApcRoutine, _In_opt_ PVOID ApcContext, _Out_ PIO_STATUS_BLOCK IoStatusBlock, _Out_ PVOID FileInformation, _In_ ULONG Length, _In_ FILE_INFORMATION_CLASS FileInformationClass,
+                                                  _In_ BOOLEAN ReturnSingleEntry, _In_opt_ PUNICODE_STRING FileName, _In_ BOOLEAN RestartScan);
 
   // From http://undocumented.ntinternals.net/UserMode/Undocumented%20Functions/NT%20Objects/File/NtSetInformationFile.html
   // and http://msdn.microsoft.com/en-us/library/windows/hardware/ff567096(v=vs.85).aspx
-  typedef NTSTATUS(NTAPI *NtSetInformationFile_t)(
-  /*_In_*/ HANDLE FileHandle,
-  /*_Out_*/ PIO_STATUS_BLOCK IoStatusBlock,
-  /*_In_*/ PVOID FileInformation,
-  /*_In_*/ ULONG Length,
-  /*_In_*/ FILE_INFORMATION_CLASS FileInformationClass);
+  typedef NTSTATUS(NTAPI *NtSetInformationFile_t)(_In_ HANDLE FileHandle, _Out_ PIO_STATUS_BLOCK IoStatusBlock, _In_ PVOID FileInformation, _In_ ULONG Length, _In_ FILE_INFORMATION_CLASS FileInformationClass);
 
   // From http://msdn.microsoft.com/en-us/library/ms648412(v=vs.85).aspx
-  typedef NTSTATUS(NTAPI *NtWaitForSingleObject_t)(
-  /*_In_*/ HANDLE Handle,
-  /*_In_*/ BOOLEAN Alertable,
-  /*_In_*/ PLARGE_INTEGER Timeout);
+  typedef NTSTATUS(NTAPI *NtWaitForSingleObject_t)(_In_ HANDLE Handle, _In_ BOOLEAN Alertable, _In_opt_ PLARGE_INTEGER Timeout);
 
-  typedef NTSTATUS(NTAPI *NtDelayExecution_t)(
-  /*_In_*/ BOOLEAN Alertable,
-  /*_In_*/ LARGE_INTEGER *Interval);
+  typedef enum _OBJECT_WAIT_TYPE { WaitAllObject, WaitAnyObject } OBJECT_WAIT_TYPE, *POBJECT_WAIT_TYPE;
+
+  typedef NTSTATUS(NTAPI *NtWaitForMultipleObjects_t)(_In_ ULONG Count, _In_ HANDLE Object[], _In_ OBJECT_WAIT_TYPE WaitType, _In_ BOOLEAN Alertable, _In_opt_ PLARGE_INTEGER Time);
+
+  typedef NTSTATUS(NTAPI *NtDelayExecution_t)(_In_ BOOLEAN Alertable, _In_opt_ LARGE_INTEGER *Interval);
 
   // From https://msdn.microsoft.com/en-us/library/windows/hardware/ff566474(v=vs.85).aspx
-  typedef NTSTATUS(NTAPI *NtLockFile_t)(
-  /*_In_*/ HANDLE FileHandle,
-  /*_In_opt_*/ HANDLE Event,
-  /*_In_opt_*/ PIO_APC_ROUTINE ApcRoutine,
-  /*_In_opt_*/ PVOID ApcContext,
-  /*_Out_*/ PIO_STATUS_BLOCK IoStatusBlock,
-  /*_In_*/ PLARGE_INTEGER ByteOffset,
-  /*_In_*/ PLARGE_INTEGER Length,
-  /*_In_*/ ULONG Key,
-  /*_In_*/ BOOLEAN FailImmediately,
-  /*_In_*/ BOOLEAN ExclusiveLock);
+  typedef NTSTATUS(NTAPI *NtLockFile_t)(_In_ HANDLE FileHandle, _In_opt_ HANDLE Event, _In_opt_ PIO_APC_ROUTINE ApcRoutine, _In_opt_ PVOID ApcContext, _Out_ PIO_STATUS_BLOCK IoStatusBlock, _In_ PLARGE_INTEGER ByteOffset, _In_ PLARGE_INTEGER Length, _In_ ULONG Key, _In_ BOOLEAN FailImmediately,
+                                        _In_ BOOLEAN ExclusiveLock);
 
   // From https://msdn.microsoft.com/en-us/library/windows/hardware/ff567118(v=vs.85).aspx
-  typedef NTSTATUS(NTAPI *NtUnlockFile_t)(
-  /*_In_*/ HANDLE FileHandle,
-  /*_Out_*/ PIO_STATUS_BLOCK IoStatusBlock,
-  /*_In_*/ PLARGE_INTEGER ByteOffset,
-  /*_In_*/ PLARGE_INTEGER Length,
-  /*_In_*/ ULONG Key);
+  typedef NTSTATUS(NTAPI *NtUnlockFile_t)(_In_ HANDLE FileHandle, _Out_ PIO_STATUS_BLOCK IoStatusBlock, _In_ PLARGE_INTEGER ByteOffset, _In_ PLARGE_INTEGER Length, _In_ ULONG Key);
 
-  typedef BOOLEAN(NTAPI *RtlGenRandom_t)(
-  /*_Out_*/ PVOID RandomBuffer,
-  /*_In_*/ ULONG RandomBufferLength);
+  typedef BOOLEAN(NTAPI *RtlGenRandom_t)(_Out_ PVOID RandomBuffer, _In_ ULONG RandomBufferLength);
 
-  typedef BOOL(WINAPI *OpenProcessToken_t)(
-  /*_In_*/ HANDLE ProcessHandle,
-  /*_In_*/ DWORD DesiredAccess,
-  /*_Out_*/ PHANDLE TokenHandle);
+  typedef BOOL(WINAPI *OpenProcessToken_t)(_In_ HANDLE ProcessHandle, _In_ DWORD DesiredAccess, _Out_ PHANDLE TokenHandle);
 
-  typedef BOOL(WINAPI *LookupPrivilegeValue_t)(
-  /*_In_opt_*/ LPCTSTR lpSystemName,
-  /*_In_*/ LPCTSTR lpName,
-  /*_Out_*/ PLUID lpLuid);
+  typedef BOOL(WINAPI *LookupPrivilegeValue_t)(_In_opt_ LPCTSTR lpSystemName, _In_ LPCTSTR lpName, _Out_ PLUID lpLuid);
 
-  typedef BOOL(WINAPI *AdjustTokenPrivileges_t)(
-  /*_In_*/ HANDLE TokenHandle,
-  /*_In_*/ BOOL DisableAllPrivileges,
-  /*_In_opt_*/ PTOKEN_PRIVILEGES NewState,
-  /*_In_*/ DWORD BufferLength,
-  /*_Out_opt_*/ PTOKEN_PRIVILEGES PreviousState,
-  /*_Out_opt_*/ PDWORD ReturnLength);
+  typedef BOOL(WINAPI *AdjustTokenPrivileges_t)(_In_ HANDLE TokenHandle, _In_ BOOL DisableAllPrivileges, _In_opt_ PTOKEN_PRIVILEGES NewState, _In_ DWORD BufferLength, _Out_opt_ PTOKEN_PRIVILEGES PreviousState, _Out_opt_ PDWORD ReturnLength);
 
-  typedef USHORT(WINAPI *RtlCaptureStackBackTrace_t)(
-  /*_In_*/ ULONG FramesToSkip,
-  /*_In_*/ ULONG FramesToCapture,
-  /*_Out_*/ PVOID *BackTrace,
-  /*_Out_opt_*/ PULONG BackTraceHash);
+  typedef USHORT(WINAPI *RtlCaptureStackBackTrace_t)(_In_ ULONG FramesToSkip, _In_ ULONG FramesToCapture, _Out_ PVOID *BackTrace, _Out_opt_ PULONG BackTraceHash);
 
-  typedef BOOL(WINAPI *SymInitialize_t)(
-  /*_In_*/ HANDLE hProcess,
-  /*_In_opt_*/ PCTSTR UserSearchPath,
-  /*_In_*/ BOOL fInvadeProcess);
+  typedef BOOL(WINAPI *SymInitialize_t)(_In_ HANDLE hProcess, _In_opt_ PCTSTR UserSearchPath, _In_ BOOL fInvadeProcess);
 
-  typedef BOOL(WINAPI *SymGetLineFromAddr64_t)(
-  /*_In_*/ HANDLE hProcess,
-  /*_In_*/ DWORD64 dwAddr,
-  /*_Out_*/ PDWORD pdwDisplacement,
-  /*_Out_*/ PIMAGEHLP_LINE64 Line);
+  typedef BOOL(WINAPI *SymGetLineFromAddr64_t)(_In_ HANDLE hProcess, _In_ DWORD64 dwAddr, _Out_ PDWORD pdwDisplacement, _Out_ PIMAGEHLP_LINE64 Line);
 
   typedef struct _FILE_BASIC_INFORMATION
   {
@@ -533,6 +449,7 @@ namespace windows_nt_kernel
   static NtQueryDirectoryFile_t NtQueryDirectoryFile;
   static NtSetInformationFile_t NtSetInformationFile;
   static NtWaitForSingleObject_t NtWaitForSingleObject;
+  static NtWaitForMultipleObjects_t NtWaitForMultipleObjects;
   static NtDelayExecution_t NtDelayExecution;
   static NtLockFile_t NtLockFile;
   static NtUnlockFile_t NtUnlockFile;
@@ -588,6 +505,9 @@ namespace windows_nt_kernel
         abort();
     if(!NtWaitForSingleObject)
       if(!(NtWaitForSingleObject = (NtWaitForSingleObject_t) GetProcAddress(ntdllh, "NtWaitForSingleObject")))
+        abort();
+    if(!NtWaitForMultipleObjects)
+      if(!(NtWaitForMultipleObjects = (NtWaitForMultipleObjects_t) GetProcAddress(ntdllh, "NtWaitForMultipleObjects")))
         abort();
     if(!NtDelayExecution)
       if(!(NtDelayExecution = (NtDelayExecution_t) GetProcAddress(ntdllh, "NtDelayExecution")))
@@ -860,7 +780,7 @@ if(d)                                                                           
   \
 stl11::chrono::system_clock::time_point end_utc;                                                                                                                                                                                                                                                                               \
   \
-alignas(8) LARGE_INTEGER _timeout;                                                                                                                                                                                                                                                                                             \
+alignas(8) LARGE_INTEGER _timeout = {0};                                                                                                                                                                                                                                                                                       \
   \
 LARGE_INTEGER *timeout = nullptr;                                                                                                                                                                                                                                                                                              \
   \

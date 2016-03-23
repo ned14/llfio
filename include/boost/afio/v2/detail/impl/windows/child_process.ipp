@@ -39,6 +39,8 @@ namespace detail
   child_process::~child_process()
   {
     wait();
+    _deinitialise_files();
+    _deinitialise_streams();
     if(_processh)
     {
       CloseHandle(_processh.h);
@@ -69,15 +71,15 @@ namespace detail
 
     STARTUPINFO si = {sizeof(STARTUPINFO)};
     si.dwFlags = STARTF_USESTDHANDLES;
-    if(!CreatePipe(&si.hStdInput, &ret._writeh.h, nullptr, 0))
+    if(!CreatePipe(&si.hStdInput, &ret._readh.h, nullptr, 0))
       return make_errored_result<child_process>(GetLastError());
-    auto &unstdinput = Undoer([&si] { CloseHandle(si.hStdInput); });
-    if(!CreatePipe(&ret._readh.h, &si.hStdOutput, nullptr, 0))
+    auto unstdinput = Undoer([&si] { CloseHandle(si.hStdInput); });
+    if(!CreatePipe(&ret._writeh.h, &si.hStdOutput, nullptr, 0))
       return make_errored_result<child_process>(GetLastError());
-    auto &unstdoutput = Undoer([&si] { CloseHandle(si.hStdOutput); });
+    auto unstdoutput = Undoer([&si] { CloseHandle(si.hStdOutput); });
     if(!CreatePipe(&ret._errh.h, &si.hStdError, nullptr, 0))
       return make_errored_result<child_process>(GetLastError());
-    auto &unstderr = Undoer([&si] { CloseHandle(si.hStdError); });
+    auto unstderr = Undoer([&si] { CloseHandle(si.hStdError); });
 
     if(!SetHandleInformation(si.hStdInput, HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT))
       return make_errored_result<child_process>(GetLastError());
@@ -105,8 +107,8 @@ namespace detail
       memcpy(envbuffere, env.first.data(), sizeof(char_type) * env.first.size());
       envbuffere += env.first.size();
       *envbuffere++ = '=';
-      memcpy(envbuffere, env.first.data(), sizeof(char_type) * (1 + env.first.size()));
-      envbuffere += env.first.size() + 1;
+      memcpy(envbuffere, env.second.data(), sizeof(char_type) * (1 + env.second.size()));
+      envbuffere += env.second.size() + 1;
     }
     *envbuffere = 0;
     if(!CreateProcess(ret._path.c_str(), argsbuffer, nullptr, nullptr, true, CREATE_NO_WINDOW | CREATE_UNICODE_ENVIRONMENT, envbuffer, nullptr, &si, &pi))
@@ -114,7 +116,7 @@ namespace detail
 
     ret._processh.h = pi.hProcess;
     CloseHandle(pi.hThread);
-    return ret;
+    return std::move(ret);
   }
 
   bool child_process::is_running() const noexcept
@@ -127,25 +129,29 @@ namespace detail
 
   result<intptr_t> child_process::wait_until(deadline d) noexcept
   {
+    if(!_processh)
+      return -1;
+    windows_nt_kernel::init();
+    using namespace windows_nt_kernel;
     BOOST_AFIO_WIN_DEADLINE_TO_SLEEP_INIT(d);
     for(;;)
     {
       BOOST_AFIO_WIN_DEADLINE_TO_SLEEP_LOOP(d);
-      HANDLE hs[2] = {_processh.h, sleep_object};
-      DWORD ret = WaitForMultipleObjectsEx(sleep_object ? 2 : 1, hs, false, sleep_interval, true);
-      switch(ret)
+      NTSTATUS ntstat = NtWaitForSingleObject(_processh.h, true, timeout);
+      switch(ntstat)
       {
-      case WAIT_IO_COMPLETION:
+      case STATUS_ALERTED:
+      case STATUS_USER_APC:
         // loop
         break;
-      case WAIT_OBJECT_0:
+      case STATUS_SUCCESS:
       {
         DWORD retcode = 0;
         if(!GetExitCodeProcess(_processh.h, &retcode))
           return make_errored_result<intptr_t>(GetLastError());
         return (intptr_t) retcode;
       }
-      case WAIT_OBJECT_0 + 1:
+      case STATUS_TIMEOUT:
       {
         // Really a timeout?
         BOOST_AFIO_WIN_DEADLINE_TO_TIMEOUT(intptr_t, d);
@@ -160,7 +166,7 @@ namespace detail
   stl1z::filesystem::path current_process_path()
   {
     stl1z::filesystem::path::string_type buffer(32768, 0);
-    DWORD len = GetModuleFileName(nullptr, const_cast<stl1z::filesystem::path::string_type::value_type *>(buffer.data()), buffer.size());
+    DWORD len = GetModuleFileName(nullptr, const_cast<stl1z::filesystem::path::string_type::value_type *>(buffer.data()), (DWORD) buffer.size());
     if(!len)
       throw std::system_error(GetLastError(), std::system_category());
     buffer.resize(len);
@@ -172,7 +178,7 @@ namespace detail
     using string_type = stl1z::filesystem::path::string_type;
     std::map<string_type, string_type> ret;
     string_type::value_type *strings = GetEnvironmentStrings();
-    auto &unstrings = Undoer([strings] { FreeEnvironmentStrings(strings); });
+    auto unstrings = Undoer([strings] { FreeEnvironmentStrings(strings); });
     for(auto *s = strings, *e = strings; *s; s = (e = e + 1))
     {
       auto *c = s;
@@ -181,7 +187,8 @@ namespace detail
         if(!c && *e == '=')
           c = e;
       }
-      ret.insert(string_type(s, c - s), string_type(c + 1, e - c - 1));
+      if(*s != '=')
+        ret.insert(std::make_pair(string_type(s, c - s), string_type(c + 1, e - c - 1)));
     }
     return ret;
   }

@@ -31,8 +31,11 @@ DEALINGS IN THE SOFTWARE.
 
 #define _CRT_SECURE_NO_WARNINGS 1
 
-#include "include/detail/child_process.hpp"
-#include "include/file_handle.hpp"
+#include "boost/afio/v2/detail/child_process.hpp"
+#include "boost/afio/v2/file_handle.hpp"
+
+#include <iostream>
+#include <vector>
 
 namespace afio = BOOST_AFIO_V2_NAMESPACE;
 
@@ -41,8 +44,10 @@ namespace append_only_mutual_exclusion
   union alignas(16) uint128 {
     unsigned char bytes[16];
 #if defined(__i386__) || defined(_M_IX86) || defined(__x86_64__) || defined(_M_X64)
+#if defined(__SSE2__) || (defined(_M_IX86_FP) && _M_IX86_FP >= 2)
     // Strongly hint to the compiler what to do here
     __m128i sse;
+#endif
 #endif
   };
   using uint64 = unsigned long long;
@@ -74,7 +79,7 @@ int main(int argc, char *argv[])
     std::cerr << "Usage: " << argv[0] << " <no of waiters>" << std::endl;
     return 1;
   }
-  if(strcmp(argv[1], "spawned"))
+  if(strcmp(argv[1], "spawned") || argc < 3)
   {
     size_t waiters = atoi(argv[1]);
     if(!waiters)
@@ -84,16 +89,24 @@ int main(int argc, char *argv[])
     }
     std::vector<afio::detail::child_process> children;
     auto mypath = afio::detail::current_process_path();
-#ifdef WIN32
-    std::vector<afio::stl1z::filesystem::path::string_type> args;
-    args.push_back(L"spawned");
+#ifdef UNICODE
+    std::vector<afio::stl1z::filesystem::path::string_type> args = {L"spawned", L"00"};
 #else
-    std::vector<afio::stl1z::filesystem::path::string_type> args;
-    args.push_back("spawned");
+    std::vector<afio::stl1z::filesystem::path::string_type> args = {"spawned", "00"};
 #endif
     auto env = afio::detail::current_process_env();
     for(size_t n = 0; n < waiters; n++)
     {
+      if(n >= 10)
+      {
+        args[1][0] = (char) ('0' + (n / 10));
+        args[1][1] = (char) ('0' + (n % 10));
+      }
+      else
+      {
+        args[1][0] = (char) ('0' + n);
+        args[1][1] = 0;
+      }
       auto child = afio::detail::child_process::launch(mypath, args, env);
       if(child.has_error())
       {
@@ -102,7 +115,72 @@ int main(int argc, char *argv[])
       }
       children.push_back(std::move(child.get()));
     }
+    // Wait for all children to tell me they are ready
+    char buffer[1024];
+    for(auto &child : children)
+    {
+      auto &i = child.cout();
+      i.get();
+      if(!child.cout().getline(buffer, sizeof(buffer)) || 0 != strncmp(buffer, "READY", 5))
+      {
+        std::cerr << "ERROR: Child wrote unexpected output '" << buffer << "'" << std::endl;
+        return 1;
+      }
+    }
+    // Issue go command to all children
+    for(auto &child : children)
+      child.cin() << "GO" << std::endl;
+    // Wait for benchmark to complete
+    std::this_thread::sleep_for(std::chrono::seconds(5));
+    // Tell children to quit
+    for(auto &child : children)
+      child.cin() << "STOP" << std::endl;
+    unsigned long long results = 0, result;
+    for(size_t n = 0; n < children.size(); n++)
+    {
+      auto &child = children[n];
+      if(!child.cout().getline(buffer, sizeof(buffer)) || 0 != strncmp(buffer, "RESULT(", 7))
+      {
+        std::cerr << "ERROR: Child wrote unexpected output '" << buffer << "'" << std::endl;
+        return 1;
+      }
+      result = atol(&buffer[7]);
+      std::cout << "Child " << n << " reports result " << result << std::endl;
+      results += result;
+    }
+    std::cout << "Total result: " << results << std::endl;
+    return 0;
   }
-  // todo
-  return 0;
+
+  // I am a spawned child. Tell parent I am ready.
+  std::cout << "READY(" << argv[2] << ")" << std::endl;
+  // Wait for parent to let me proceed
+  std::atomic<int> done(-1);
+  std::thread worker([&done] {
+    while(done == -1)
+      std::this_thread::yield();
+    while(!done)
+    {
+      // todo
+      std::this_thread::yield();
+    }
+  });
+  for(;;)
+  {
+    char buffer[1024];
+    // This blocks
+    std::cin.getline(buffer, sizeof(buffer));
+    if(0 == strcmp(buffer, "GO"))
+    {
+      // Launch worker thread
+      done = 0;
+    }
+    else if(0 == strcmp(buffer, "STOP"))
+    {
+      done = 1;
+      worker.join();
+      std::cout << "RESULTS(0)" << std::endl;
+      return 0;
+    }
+  }
 }

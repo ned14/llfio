@@ -38,6 +38,11 @@ DEALINGS IN THE SOFTWARE.
 #include <map>
 #include <vector>
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4251)  // dll interface
+#endif
+
 BOOST_AFIO_V2_NAMESPACE_BEGIN
 
 namespace detail
@@ -58,14 +63,28 @@ namespace detail
     native_handle_type _readh, _writeh, _errh;
     std::vector<stl1z::filesystem::path::string_type> _args;
     std::map<stl1z::filesystem::path::string_type, stl1z::filesystem::path::string_type> _env;
+    FILE *_stdin, *_stdout, *_stderr;
+    std::ostream *_cin;
+    std::istream *_cout, *_cerr;
 
   protected:
     child_process(stl1z::filesystem::path path, std::vector<stl1z::filesystem::path::string_type> args, std::map<stl1z::filesystem::path::string_type, stl1z::filesystem::path::string_type> env)
         : _path(std::move(path))
         , _args(std::move(args))
         , _env(std::move(env))
+        , _stdin(nullptr)
+        , _stdout(nullptr)
+        , _stderr(nullptr)
+        , _cin(nullptr)
+        , _cout(nullptr)
+        , _cerr(nullptr)
     {
     }
+
+    void _initialise_files() const;
+    void _deinitialise_files();
+    void _initialise_streams() const;
+    void _deinitialise_streams();
 
   public:
     child_process(const child_process &) = delete;
@@ -92,6 +111,50 @@ namespace detail
     //! Returns the error handle
     const native_handle_type &error_native_handle() const noexcept { return _errh; }
 
+    //! Returns the read handle as a FILE *
+    FILE *file_in() const
+    {
+      if(!_stdin)
+        _initialise_files();
+      return _stdin;
+    }
+    //! Returns the write handle as a FILE *
+    FILE *file_out() const
+    {
+      if(!_stdout)
+        _initialise_files();
+      return _stdout;
+    }
+    //! Returns the error handle as a FILE *
+    FILE *file_err() const
+    {
+      if(!_stderr)
+        _initialise_files();
+      return _stderr;
+    }
+
+    //! Returns the read handle as a ostream &
+    std::ostream &cin() const
+    {
+      if(!_cin)
+        _initialise_streams();
+      return *_cin;
+    }
+    //! Returns the write handle as a istream &
+    std::istream &cout() const
+    {
+      if(!_cout)
+        _initialise_streams();
+      return *_cout;
+    }
+    //! Returns the error handle as a istream &
+    std::istream &cerr() const
+    {
+      if(!_cerr)
+        _initialise_streams();
+      return *_cerr;
+    }
+
     //! True if child process is currently running
     bool is_running() const noexcept;
 
@@ -106,12 +169,12 @@ BOOST_AFIO_V2_NAMESPACE_END
 
 #if BOOST_AFIO_HEADERS_ONLY == 1 && !defined(DOXYGEN_SHOULD_SKIP_THIS)
 #define BOOST_AFIO_INCLUDED_BY_HEADER 1
-#ifdef WIN32
-#include "impl/windows/child_process.ipp"
-#else
-#include "impl/posix/child_process.ipp"
-#endif
+#include "impl/child_process.ipp"
 #undef BOOST_AFIO_INCLUDED_BY_HEADER
+#endif
+
+#ifdef _MSC_VER
+#pragma warning(pop)
 #endif
 
 #endif
