@@ -153,6 +153,10 @@ namespace boost
     //! Inline namespace for this version of AFIO
     inline namespace v2
     {
+      //! Collection of file system based algorithms
+      namespace algorithm
+      {
+      }
     }
   }
 }

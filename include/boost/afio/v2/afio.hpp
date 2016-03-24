@@ -2,4 +2,6 @@
 #include "statfs.hpp"
 #include "storage_profile.hpp"
 
+#include "algorithm/multiple_shared_lock.hpp"
+
 #include "detail/child_process.hpp"

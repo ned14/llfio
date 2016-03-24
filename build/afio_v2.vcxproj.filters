@@ -16,6 +16,9 @@
     <Filter Include="src\windows">
       <UniqueIdentifier>{1df00b33-25a0-48b7-9246-595e32c0b58e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include\algorithm">
+      <UniqueIdentifier>{fc296930-fe1b-408e-be8f-bc9b8b27bd4b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\boost\afio\v2\afio.hpp">
@@ -59,6 +62,9 @@
     </ClInclude>
     <ClInclude Include="..\include\boost\afio\v2\detail\impl\windows\import.hpp">
       <Filter>src\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\boost\afio\v2\algorithm\multiple_shared_lock.hpp">
+      <Filter>include\algorithm</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

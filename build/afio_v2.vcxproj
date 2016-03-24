@@ -28,6 +28,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\boost\afio\v2\afio.hpp" />
+    <ClInclude Include="..\include\boost\afio\v2\algorithm\multiple_shared_lock.hpp" />
     <ClInclude Include="..\include\boost\afio\v2\async_file_handle.hpp" />
     <ClInclude Include="..\include\boost\afio\v2\config.hpp" />
     <ClInclude Include="..\include\boost\afio\v2\deadline.h" />
