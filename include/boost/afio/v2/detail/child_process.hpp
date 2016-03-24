@@ -61,6 +61,7 @@ namespace detail
     stl1z::filesystem::path _path;
     native_handle_type _processh;
     native_handle_type _readh, _writeh, _errh;
+    native_handle_type _childreadh, _childwriteh, _childerrh;
     std::vector<stl1z::filesystem::path::string_type> _args;
     std::map<stl1z::filesystem::path::string_type, stl1z::filesystem::path::string_type> _env;
     FILE *_stdin, *_stdout, *_stderr;

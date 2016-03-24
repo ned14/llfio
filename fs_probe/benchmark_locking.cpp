@@ -79,7 +79,8 @@ int main(int argc, char *argv[])
     std::cerr << "Usage: " << argv[0] << " <no of waiters>" << std::endl;
     return 1;
   }
-  if(strcmp(argv[1], "spawned") || argc < 3)
+  // Am I the master process?
+  if(strcmp(argv[1], "spawned"))
   {
     size_t waiters = atoi(argv[1]);
     if(!waiters)
@@ -95,6 +96,7 @@ int main(int argc, char *argv[])
     std::vector<afio::stl1z::filesystem::path::string_type> args = {"spawned", "00"};
 #endif
     auto env = afio::detail::current_process_env();
+    std::cout << "Launching " << waiters << " copies of myself as a child process ..." << std::endl;
     for(size_t n = 0; n < waiters; n++)
     {
       if(n >= 10)
@@ -117,34 +119,42 @@ int main(int argc, char *argv[])
     }
     // Wait for all children to tell me they are ready
     char buffer[1024];
+    std::cout << "Waiting for all children to become ready ..." << std::endl;
     for(auto &child : children)
     {
       auto &i = child.cout();
-      i.get();
-      if(!child.cout().getline(buffer, sizeof(buffer)) || 0 != strncmp(buffer, "READY", 5))
+      if(!i.getline(buffer, sizeof(buffer)))
+      {
+        std::cerr << "ERROR: Child seems to have vanished!" << std::endl;
+        return 1;
+      }
+      if(0 != strncmp(buffer, "READY", 5))
       {
         std::cerr << "ERROR: Child wrote unexpected output '" << buffer << "'" << std::endl;
         return 1;
       }
     }
+    std::cout << "Starting benchmark ..." << std::endl;
     // Issue go command to all children
     for(auto &child : children)
       child.cin() << "GO" << std::endl;
     // Wait for benchmark to complete
     std::this_thread::sleep_for(std::chrono::seconds(5));
+    std::cout << "Stopping benchmark and telling children to report results ..." << std::endl;
     // Tell children to quit
     for(auto &child : children)
       child.cin() << "STOP" << std::endl;
     unsigned long long results = 0, result;
+    std::cout << std::endl;
     for(size_t n = 0; n < children.size(); n++)
     {
       auto &child = children[n];
-      if(!child.cout().getline(buffer, sizeof(buffer)) || 0 != strncmp(buffer, "RESULT(", 7))
+      if(!child.cout().getline(buffer, sizeof(buffer)) || 0 != strncmp(buffer, "RESULTS(", 8))
       {
         std::cerr << "ERROR: Child wrote unexpected output '" << buffer << "'" << std::endl;
         return 1;
       }
-      result = atol(&buffer[7]);
+      result = atol(&buffer[8]);
       std::cout << "Child " << n << " reports result " << result << std::endl;
       results += result;
     }
@@ -152,6 +162,11 @@ int main(int argc, char *argv[])
     return 0;
   }
 
+  if(argc < 3)
+  {
+    std::cerr << "ERROR: args too short" << std::endl;
+    return 1;
+  }
   // I am a spawned child. Tell parent I am ready.
   std::cout << "READY(" << argv[2] << ")" << std::endl;
   // Wait for parent to let me proceed
@@ -169,7 +184,10 @@ int main(int argc, char *argv[])
   {
     char buffer[1024];
     // This blocks
-    std::cin.getline(buffer, sizeof(buffer));
+    if(!std::cin.getline(buffer, sizeof(buffer)))
+    {
+      return 1;
+    }
     if(0 == strcmp(buffer, "GO"))
     {
       // Launch worker thread
@@ -179,7 +197,7 @@ int main(int argc, char *argv[])
     {
       done = 1;
       worker.join();
-      std::cout << "RESULTS(0)" << std::endl;
+      std::cout << "RESULTS(" << argv[2] << ")" << std::endl;
       return 0;
     }
   }

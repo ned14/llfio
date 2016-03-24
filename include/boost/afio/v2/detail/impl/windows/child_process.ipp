@@ -51,15 +51,30 @@ namespace detail
       CloseHandle(_readh.h);
       _readh.h = nullptr;
     }
+    if(_childreadh)
+    {
+      CloseHandle(_childreadh.h);
+      _childreadh.h = nullptr;
+    }
     if(_writeh)
     {
       CloseHandle(_writeh.h);
       _writeh.h = nullptr;
     }
+    if(_childwriteh)
+    {
+      CloseHandle(_childwriteh.h);
+      _childwriteh.h = nullptr;
+    }
     if(_errh)
     {
       CloseHandle(_errh.h);
       _errh.h = nullptr;
+    }
+    if(_childerrh)
+    {
+      CloseHandle(_childerrh.h);
+      _childerrh.h = nullptr;
     }
   }
 
@@ -71,15 +86,15 @@ namespace detail
 
     STARTUPINFO si = {sizeof(STARTUPINFO)};
     si.dwFlags = STARTF_USESTDHANDLES;
-    if(!CreatePipe(&si.hStdInput, &ret._readh.h, nullptr, 0))
+    if(!CreatePipe(&ret._childreadh.h, &ret._readh.h, nullptr, 0))
       return make_errored_result<child_process>(GetLastError());
-    auto unstdinput = Undoer([&si] { CloseHandle(si.hStdInput); });
-    if(!CreatePipe(&ret._writeh.h, &si.hStdOutput, nullptr, 0))
+    si.hStdInput = ret._childreadh.h;
+    if(!CreatePipe(&ret._writeh.h, &ret._childwriteh.h, nullptr, 0))
       return make_errored_result<child_process>(GetLastError());
-    auto unstdoutput = Undoer([&si] { CloseHandle(si.hStdOutput); });
-    if(!CreatePipe(&ret._errh.h, &si.hStdError, nullptr, 0))
+    si.hStdOutput = ret._childwriteh.h;
+    if(!CreatePipe(&ret._errh.h, &ret._childerrh.h, nullptr, 0))
       return make_errored_result<child_process>(GetLastError());
-    auto unstderr = Undoer([&si] { CloseHandle(si.hStdError); });
+    si.hStdError = ret._childerrh.h;
 
     if(!SetHandleInformation(si.hStdInput, HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT))
       return make_errored_result<child_process>(GetLastError());
@@ -90,6 +105,12 @@ namespace detail
 
     PROCESS_INFORMATION pi;
     char_type argsbuffer[32768], *argsbuffere = argsbuffer;
+    // First copy in the executable path
+    *argsbuffere++ = '"';
+    memcpy(argsbuffere, ret._path.c_str(), sizeof(char_type) * ret._path.native().size());
+    argsbuffere += ret._path.native().size();
+    *argsbuffere++ = '"';
+    *argsbuffere++ = ' ';
     for(auto &arg : ret._args)
     {
       if(argsbuffere - argsbuffer + arg.size() + 1 >= 32767)
@@ -98,7 +119,7 @@ namespace detail
       argsbuffere += arg.size();
       *argsbuffere++ = ' ';
     }
-    *argsbuffere = 0;
+    *(--argsbuffere) = 0;
     char_type envbuffer[32768], *envbuffere = envbuffer;
     for(auto &env : ret._env)
     {
