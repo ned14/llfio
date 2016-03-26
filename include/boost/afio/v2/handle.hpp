@@ -64,9 +64,9 @@ public:
     unchanged = 0,
     none = 2,        //!< No ability to read or write anything, but can synchronise (SYNCHRONIZE or 0)
     attr_read = 4,   //!< Ability to read attributes (FILE_READ_ATTRIBUTES|SYNCHRONIZE or O_RDONLY)
-    attr_write = 5,  //!< Ability to read attributes (FILE_READ_ATTRIBUTES|FILE_WRITE_ATTRIBUTES|SYNCHRONIZE or O_RDONLY)
+    attr_write = 5,  //!< Ability to read and write attributes (FILE_READ_ATTRIBUTES|FILE_WRITE_ATTRIBUTES|SYNCHRONIZE or O_RDONLY)
     read = 6,        //!< Ability to read (READ_CONTROL|FILE_READ_DATA|FILE_READ_ATTRIBUTES|FILE_READ_EA|SYNCHRONISE or O_RDONLY)
-    write = 7,       //!< Ability to write (READ_CONTROL|FILE_READ_DATA|FILE_READ_ATTRIBUTES|FILE_READ_EA|FILE_WRITE_DATA|FILE_WRITE_ATTRIBUTES|FILE_WRITE_EA|FILE_APPEND_DATA|SYNCHRONISE or O_RDWR)
+    write = 7,       //!< Ability to read and write (READ_CONTROL|FILE_READ_DATA|FILE_READ_ATTRIBUTES|FILE_READ_EA|FILE_WRITE_DATA|FILE_WRITE_ATTRIBUTES|FILE_WRITE_EA|FILE_APPEND_DATA|SYNCHRONISE or O_RDWR)
     append = 9       //!< All mainstream OSs and CIFS guarantee this is atomic with respect to all other appenders (FILE_APPEND_DATA|SYNCHRONISE or O_APPEND)
   };
   //! On opening, do we also create a new file or truncate an existing one?
@@ -113,7 +113,8 @@ public:
     */
     disable_safety_fsyncs = 1 << 1,
 
-    overlapped = 1 << 28  //!< On Windows, create any new handles with OVERLAPPED semantics
+    overlapped = 1 << 28,         //!< On Windows, create any new handles with OVERLAPPED semantics
+    byte_lock_insanity = 1 << 29  //!< Using insane POSIX byte range locks
   }
   BOOST_AFIO_BITFIELD_END(flag)
 protected:
@@ -357,6 +358,134 @@ public:
     BOOST_OUTCOME_FILTER_ERROR(v, write(reqs, d));
     return *v.data();
   }
+
+  /*! \class extent_guard
+  \brief RAII holder a locked extent of bytes in a file.
+  */
+  class extent_guard
+  {
+    friend class io_handle;
+    io_handle *_h;
+    extent_type _offset, _length;
+    bool _exclusive;
+    constexpr extent_guard()
+        : _h(nullptr)
+        , _offset(0)
+        , _length(0)
+        , _exclusive(false)
+    {
+    }
+    constexpr extent_guard(io_handle *h, extent_type offset, extent_type length, bool exclusive)
+        : _h(h)
+        , _offset(offset)
+        , _length(length)
+        , _exclusive(exclusive)
+    {
+    }
+    extent_guard(const extent_guard &) = delete;
+    extent_guard &operator=(const extent_guard &) = delete;
+
+  public:
+    //! Move constructor
+    extent_guard(extent_guard &&o) noexcept : _h(o._h), _offset(o._offset), _length(o._length), _exclusive(o._exclusive) { o.release(); }
+    //! Move assign
+    extent_guard &operator=(extent_guard &&o) noexcept
+    {
+      unlock();
+      _h = o._h;
+      _offset = o._offset;
+      _length = o._length;
+      _exclusive = o._exclusive;
+      o.release();
+      return *this;
+    }
+    ~extent_guard()
+    {
+      if(_h)
+      {
+        unlock();
+        release();
+      }
+    }
+    //! True if extent guard is valid
+    explicit operator bool() const noexcept { return _h != nullptr; }
+    //! True if extent guard is invalid
+    bool operator!() const noexcept { return _h == nullptr; }
+
+    //! The io_handle to be unlocked
+    io_handle *handle() const noexcept { return _h; }
+    //! The extent to be unlocked
+    std::tuple<extent_type, extent_type, bool> extent() const noexcept { return std::make_tuple(_offset, _length, _exclusive); }
+
+    //! Unlocks the locked extent immediately
+    void unlock() noexcept
+    {
+      if(_h)
+        _h->unlock(_offset, _length);
+    }
+
+    //! Detach this RAII unlocker from the locked state
+    void release() noexcept
+    {
+      _h = nullptr;
+      _offset = 0;
+      _length = 0;
+      _exclusive = false;
+    }
+  };
+
+  /*! \brief Tries to lock the range of bytes specified for shared or exclusive access. Be aware this passes through
+  the same semantics as the underlying OS call, including any POSIX insanity present on your platform.
+
+  \warning On older Linuxes and POSIX, this uses `fcntl()` with the well known insane POSIX
+  semantics that closing ANY handle to this file releases all bytes range locks on it. If your
+  OS isn't new enough to support the non-insane lock API, `flag::byte_lock_insanity` will be set
+  in flags() after the first call to this function.
+
+  \return An extent guard, the destruction of which will call unlock().
+  \param offset The offset to lock. Note that on POSIX the top bit is always cleared before use
+  as POSIX uses signed transport for offsets. If you want an advisory rather than mandatory lock
+  on Windows, one technique is to force top bit set so the region you lock is not the one you will
+  i/o - obviously this reduces maximum file size to (2^63)-1.
+  \param bytes The number of bytes to lock. Zero means lock the entire file using any more
+  efficient alternative algorithm where available on your platform (specifically, on BSD and OS X use
+  flock() for non-insane semantics).
+  \param exclusive Whether the lock is to be exclusive.
+  \param deadline An optional deadline by which the lock must complete, else it is cancelled.
+  \errors Any of the values POSIX fcntl() can return, ETIMEDOUT. ENOTSUP may be
+  returned if deadline i/o is not possible with this particular handle configuration (e.g.
+  non-overlapped HANDLE on Windows).
+  \mallocs The default synchronous implementation in file_handle performs no memory allocation.
+  The asynchronous implementation in async_file_handle performs one calloc and one free.
+  */
+  BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_guard> lock(extent_type offset, extent_type bytes, bool exclusive = true, deadline d = deadline()) noexcept;
+  //! \overload
+  result<extent_guard> try_lock(extent_type offset, extent_type bytes, bool exclusive = true) noexcept { return lock(offset, bytes, exclusive, deadline(stl11::chrono::seconds(0))); }
+  //! \overload Locks for shared access
+  result<extent_guard> lock(io_request<buffers_type> reqs, deadline d = deadline()) noexcept
+  {
+    size_t bytes = 0;
+    for(auto &i : reqs.buffers)
+      bytes += i.second;
+    return lock(reqs.offset, bytes, false, std::move(d));
+  }
+  //! \overload Locks for exclusive access
+  result<extent_guard> lock(io_request<const_buffers_type> reqs, deadline d = deadline()) noexcept
+  {
+    size_t bytes = 0;
+    for(auto &i : reqs.buffers)
+      bytes += i.second;
+    return lock(reqs.offset, bytes, true, std::move(d));
+  }
+
+  /*! \brief Unlocks a byte range previously locked.
+
+  \param offset The offset to unlock. This should be an offset previously locked.
+  \param bytes The number of bytes to unlock. This should be a byte extent previously locked.
+  \errors Any of the values POSIX fcntl() can return.
+  \mallocs None.
+  */
+  BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC void unlock(extent_type offset, extent_type bytes) noexcept;
 };
 
 

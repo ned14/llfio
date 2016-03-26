@@ -145,7 +145,7 @@ template <class BuffersType, class Syscall> inline io_handle::io_result<BuffersT
       ol.OffsetHigh = (reqs.offset >> 32) & 0xffffffff;
       ol.Offset = reqs.offset & 0xffffffff;
     }
-    if(!syscall(nativeh.h, req.first, (DWORD) req.second, &transferred, &ol))
+    if(!syscall(nativeh.h, req.first, (DWORD) req.second, &transferred, &ol) && ERROR_IO_PENDING != GetLastError())
       return make_errored_result<BuffersType>(GetLastError());
     reqs.offset += req.second;
   }
@@ -155,14 +155,7 @@ template <class BuffersType, class Syscall> inline io_handle::io_result<BuffersT
     for(auto &ol : ols)
     {
       deadline nd = d;
-      if(d && d.steady)
-      {
-        stl11::chrono::nanoseconds ns = stl11::chrono::duration_cast<stl11::chrono::nanoseconds>((began_steady + stl11::chrono::nanoseconds(d.nsecs)) - stl11::chrono::steady_clock::now());
-        if(ns.count() < 0)
-          nd.nsecs = 0;
-        else
-          nd.nsecs = ns.count();
-      }
+      BOOST_AFIO_WIN_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
       if(STATUS_TIMEOUT == ntwait(nativeh.h, ol, nd))
       {
         BOOST_AFIO_WIN_DEADLINE_TO_TIMEOUT(BuffersType, d);
@@ -189,6 +182,70 @@ io_handle::io_result<io_handle::buffers_type> io_handle::read(io_handle::io_requ
 io_handle::io_result<io_handle::const_buffers_type> io_handle::write(io_handle::io_request<io_handle::const_buffers_type> reqs, deadline d) noexcept
 {
   return do_read_write(_v, &WriteFile, std::move(reqs), std::move(d));
+}
+
+result<io_handle::extent_guard> io_handle::lock(io_handle::extent_type offset, io_handle::extent_type bytes, bool exclusive, deadline d) noexcept
+{
+  if(d && d.nsecs > 0 && !_v.is_overlapped())
+    return make_errored_result<io_handle::extent_guard>(ENOTSUP);
+  DWORD flags = exclusive ? LOCKFILE_EXCLUSIVE_LOCK : 0;
+  if(d && !d.nsecs)
+    flags |= LOCKFILE_FAIL_IMMEDIATELY;
+  BOOST_AFIO_WIN_DEADLINE_TO_SLEEP_INIT(d);
+  OVERLAPPED ol = {0};
+  ol.Internal = (ULONG_PTR) -1;
+  ol.OffsetHigh = (offset >> 32) & 0xffffffff;
+  ol.Offset = offset & 0xffffffff;
+  DWORD bytes_high = (DWORD)((bytes >> 32) & 0xffffffff);
+  DWORD bytes_low = (DWORD)(bytes & 0xffffffff);
+  if(!LockFileEx(_v.h, flags, 0, bytes_low, bytes_high, &ol))
+  {
+    if(ERROR_LOCK_VIOLATION == GetLastError() && d && !d.nsecs)
+      return make_errored_result<io_handle::extent_guard>(ETIMEDOUT);
+    if(ERROR_IO_PENDING != GetLastError())
+      return make_errored_result<io_handle::extent_guard>(GetLastError());
+  }
+  // If handle is overlapped, wait for completion of each i/o.
+  if(_v.is_overlapped())
+  {
+    if(STATUS_TIMEOUT == ntwait(_v.h, ol, d))
+    {
+      BOOST_AFIO_WIN_DEADLINE_TO_TIMEOUT(io_handle::extent_guard, d);
+    }
+    if(ol.Internal != 0)
+      return make_errored_result_nt<io_handle::extent_guard>((NTSTATUS) ol.Internal);
+  }
+  return extent_guard(this, offset, bytes, exclusive);
+}
+
+void io_handle::unlock(io_handle::extent_type offset, io_handle::extent_type bytes) noexcept
+{
+  OVERLAPPED ol = {0};
+  ol.Internal = (ULONG_PTR) -1;
+  ol.OffsetHigh = (offset >> 32) & 0xffffffff;
+  ol.Offset = offset & 0xffffffff;
+  DWORD bytes_high = (DWORD)((bytes >> 32) & 0xffffffff);
+  DWORD bytes_low = (DWORD)(bytes & 0xffffffff);
+  if(!UnlockFileEx(_v.h, 0, bytes_low, bytes_high, &ol))
+  {
+    if(ERROR_IO_PENDING != GetLastError())
+    {
+      auto ret = make_errored_result<void>(GetLastError());
+      BOOST_AFIO_LOG_FATAL_EXIT("io_handle::unlock() failed with " << ret.get_error().message());
+      return;
+    }
+  }
+  // If handle is overlapped, wait for completion of each i/o.
+  if(_v.is_overlapped())
+  {
+    ntwait(_v.h, ol, deadline());
+    if(ol.Internal != 0)
+    {
+      auto ret = make_errored_result_nt<void>((NTSTATUS) ol.Internal);
+      BOOST_AFIO_LOG_FATAL_EXIT("io_handle::unlock() failed with " << ret.get_error().message());
+      return;
+    }
+  }
 }
 
 BOOST_AFIO_V2_NAMESPACE_END

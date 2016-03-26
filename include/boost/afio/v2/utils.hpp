@@ -597,6 +597,85 @@ This lets one pack one byte of input into two bytes of output.
     };
   };
   template <class T, class U> inline bool operator==(const page_allocator<T> &, const page_allocator<U> &) noexcept { return true; }
+
+  /*! \union uint128
+  \brief An unsigned 128 bit value
+  */
+  union alignas(16) uint128 {
+    unsigned char as_bytes[16];
+    unsigned short as_shorts[8];
+    unsigned int as_ints[4];
+    unsigned long long as_longlongs[2];
+#if defined(__i386__) || defined(_M_IX86) || defined(__x86_64__) || defined(_M_X64)
+#if defined(__x86_64__) || defined(_M_X64) || defined(__SSE2__) || (defined(_M_IX86_FP) && _M_IX86_FP >= 2)
+    // Strongly hint to the compiler what to do here
+    __m128i as_m128i;
+#endif
+#endif
+    //! Default constructor, no bits set
+    uint128() {}
+    //! All bits zero constructor
+    constexpr uint128(std::nullptr_t)
+        : as_longlongs{0, 0}
+    {
+    }
+  };
+
+  /*! \class fast_hash
+  \brief Fast very collision resistant hash. Currently SpookyHash @ 0.3 cycles/byte.
+  */
+  class BOOST_AFIO_DECL fast_hash
+  {
+    using uint8 = unsigned char;
+    using uint64 = unsigned long long;
+
+    // number of uint64's in internal state
+    static constexpr size_t sc_numVars = 12;
+
+    // size of the internal state
+    static constexpr size_t sc_blockSize = sc_numVars * 8;
+
+    // size of buffer of unhashed data, in bytes
+    static constexpr size_t sc_bufSize = 2 * sc_blockSize;
+
+    //
+    // sc_const: a constant which:
+    //  * is not zero
+    //  * is odd
+    //  * is a not-very-regular mix of 1's and 0's
+    //  * does not need any other special mathematical properties
+    //
+    static constexpr uint64 sc_const = 0xdeadbeefdeadbeefULL;
+
+    uint64 m_data[2 * sc_numVars];  // unhashed data, for partial messages
+    uint64 m_state[sc_numVars];     // internal state of the hash
+    size_t m_length;                // total length of the input so far
+    uint8 m_remainder;              // length of unhashed data stashed in m_data
+
+    static void short_(uint128 &hash, const void *data, size_t bytes) noexcept;
+
+  public:
+    //! Initialise the hash with an optional seed
+    BOOST_CXX14_CONSTEXPR fast_hash(uint128 seed = uint128(nullptr)) noexcept
+    {
+      m_length = 0;
+      m_remainder = 0;
+      m_state[0] = seed.as_longlongs[0];
+      m_state[1] = seed.as_longlongs[1];
+    }
+
+    //! Hash input
+    void add(const char *data, size_t bytes) noexcept;
+
+    //! Finalise and return hash
+    uint128 finalise() noexcept;
+
+    //! Single shot hash of a sequence of bytes
+    static uint128 hash(const char *data, size_t bytes, uint128 seed = uint128(nullptr)) noexcept;
+
+    //! Single shot hash of a string
+    template <typename T> static uint128 hash(const std::basic_string<T> &str) noexcept { return hash((char *) str.data(), str.size() * sizeof(T)); }
+  };
 }
 
 BOOST_AFIO_V2_NAMESPACE_END

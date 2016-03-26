@@ -19,6 +19,9 @@
     <Filter Include="include\algorithm">
       <UniqueIdentifier>{fc296930-fe1b-408e-be8f-bc9b8b27bd4b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include\algorithm\shared_fs_mutex">
+      <UniqueIdentifier>{72da8d33-0611-4ca8-b687-32b792a7f2cf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\boost\afio\v2\afio.hpp">
@@ -63,8 +66,17 @@
     <ClInclude Include="..\include\boost\afio\v2\detail\impl\windows\import.hpp">
       <Filter>src\windows</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\boost\afio\v2\algorithm\multiple_shared_lock.hpp">
-      <Filter>include\algorithm</Filter>
+    <ClInclude Include="..\include\boost\afio\v2\algorithm\shared_fs_mutex\atomic_append.hpp">
+      <Filter>include\algorithm\shared_fs_mutex</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\boost\afio\v2\algorithm\shared_fs_mutex\base.hpp">
+      <Filter>include\algorithm\shared_fs_mutex</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\boost\afio\v2\algorithm\shared_fs_mutex\byte_ranges.hpp">
+      <Filter>include\algorithm\shared_fs_mutex</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\boost\afio\v2\algorithm\shared_fs_mutex\lock_files.hpp">
+      <Filter>include\algorithm\shared_fs_mutex</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

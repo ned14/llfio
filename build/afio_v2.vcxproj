@@ -28,7 +28,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\boost\afio\v2\afio.hpp" />
-    <ClInclude Include="..\include\boost\afio\v2\algorithm\multiple_shared_lock.hpp" />
+    <ClInclude Include="..\include\boost\afio\v2\algorithm\shared_fs_mutex\atomic_append.hpp" />
+    <ClInclude Include="..\include\boost\afio\v2\algorithm\shared_fs_mutex\base.hpp" />
+    <ClInclude Include="..\include\boost\afio\v2\algorithm\shared_fs_mutex\byte_ranges.hpp" />
+    <ClInclude Include="..\include\boost\afio\v2\algorithm\shared_fs_mutex\lock_files.hpp" />
     <ClInclude Include="..\include\boost\afio\v2\async_file_handle.hpp" />
     <ClInclude Include="..\include\boost\afio\v2\config.hpp" />
     <ClInclude Include="..\include\boost\afio\v2\deadline.h" />
