@@ -53,6 +53,11 @@ DEALINGS IN THE SOFTWARE.
 #include <_mingw.h>
 #endif
 
+// If I'm on winclang, I can't stop the deprecation warnings from MSVCRT unless I do this
+#if defined(_MSC_VER) && defined(__clang__)
+#define _CRT_NONSTDC_NO_DEPRECATE 1
+#endif
+
 #include "boost/afio/bindlib/include/import.h"
 
 #ifndef __cpp_exceptions

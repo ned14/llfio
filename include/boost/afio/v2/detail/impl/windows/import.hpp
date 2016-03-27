@@ -780,7 +780,7 @@ if(d)                                                                           
   \
 stl11::chrono::system_clock::time_point end_utc;                                                                                                                                                                                                                                                                               \
   \
-alignas(8) LARGE_INTEGER _timeout = {0};                                                                                                                                                                                                                                                                                       \
+alignas(8) LARGE_INTEGER _timeout = {{0}};                                                                                                                                                                                                                                                                                     \
   \
 LARGE_INTEGER *timeout = nullptr;                                                                                                                                                                                                                                                                                              \
   \

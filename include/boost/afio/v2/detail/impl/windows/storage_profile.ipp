@@ -162,14 +162,7 @@ namespace storage_profile
               __cpuid((int *) &buffer[46], 0x80000004);
             }
             else
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4996)  // use of strcpy
-#endif
-              strcpy(&buffer[14], "unbranded");
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
+              memcpy(&buffer[14], "unbranded", 10);
 
             // Trim string
             for(size_t n = 0; n < 62; n++)

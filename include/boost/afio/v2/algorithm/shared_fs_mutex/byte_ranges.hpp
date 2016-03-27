@@ -115,7 +115,7 @@ namespace algorithm
         {
           {
             auto undo = detail::Undoer([&] {
-              for(; n >= 0; n--)
+              for(; n != (size_t) -1; n--)
               {
                 _h.unlock(out.entities[n].value, 1);
               }
@@ -149,6 +149,7 @@ namespace algorithm
           // Sleep for a very short time
           std::this_thread::yield();
         } while(n < out.entities.size());
+        return make_result<void>();
       }
 
     public:
