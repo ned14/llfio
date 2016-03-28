@@ -3,7 +3,11 @@ v2 rewrite. You can view its documentation at https://ned14.github.io/boost.afio
 
 
 Todo:
-- [ ] Somehow implement make_errored_result(errcode, extended_msg)
+- [ ] Somehow implement make_errored_result(errcode, extended_msg). Also have win32_to_error_code
+store the original win32 error code before translation.
+  - Maybe keep a static ring buffer of additional metadata and store the atomic index you use
+in the monad? Static ring buffer could also record stack backtrace, time etc.
+  - Also enable general logging of all operations to the ring buffer.
 - [ ] Move caching into native_handle_type.
 - [ ] Implement [[bindlib::make_free]] which injects member functions into the enclosing
 namespace.
@@ -13,13 +17,10 @@ back into outcomes.
  - Make use of std::system_error(errno, system_category, "custom error message");
 - [ ] Get Outcome to work perfectly with exceptions and RTTI disabled, this makes
 Outcome useful in the games/audio world.
-  - [ ] Where Outcome might throw, do macro based action which could be any of:
-   - Throw an exception
-   - Call a deliberately undefined function to create a link error (release) or
-assert & trap (debug)
-   - Some user based action e.g. fatal exit
+  - When exceptions are disabled, disable outcome<T>? Just have result<T>?
   - [ ] Add unit tests proving it for all platforms.
-  - [ ] Move AFIO to being tested with exceptions and RTTI disabled.
+  - [ ] Move AFIO to being tested with exceptions and RTTI disabled. Where AFIO 
+throws, have it detect __cpp_exceptions and skip those implementations.
 - [ ] There is much duplicate and sloppy code in AFIO v2. Reduce and eliminate.
 
 - [ ] C bindings for all AFIO v2 APIs. Write libclang parser which autogenerates
