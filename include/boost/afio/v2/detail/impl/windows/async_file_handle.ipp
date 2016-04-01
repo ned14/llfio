@@ -175,16 +175,19 @@ result<async_file_handle::io_state_ptr<CompletionRoutine, BuffersType>> async_fi
 
 template <class CompletionRoutine> result<async_file_handle::io_state_ptr<CompletionRoutine, async_file_handle::buffers_type>> async_file_handle::async_read(async_file_handle::io_request<async_file_handle::buffers_type> reqs, CompletionRoutine &&completion) noexcept
 {
+  BOOST_AFIO_LOG_FUNCTION_CALL;
   return _begin_io(operation_t::read, std::move(reqs), [completion = std::forward<CompletionRoutine>(completion)](auto *state) { completion(state->parent, state->result); }, ReadFileEx);
 }
 
 template <class CompletionRoutine> result<async_file_handle::io_state_ptr<CompletionRoutine, async_file_handle::const_buffers_type>> async_file_handle::async_write(async_file_handle::io_request<async_file_handle::const_buffers_type> reqs, CompletionRoutine &&completion) noexcept
 {
+  BOOST_AFIO_LOG_FUNCTION_CALL;
   return _begin_io(operation_t::write, std::move(reqs), [completion = std::forward<CompletionRoutine>(completion)](auto *state) { completion(state->parent, state->result); }, WriteFileEx);
 }
 
 async_file_handle::io_result<async_file_handle::buffers_type> async_file_handle::read(async_file_handle::io_request<async_file_handle::buffers_type> reqs, deadline d) noexcept
 {
+  BOOST_AFIO_LOG_FUNCTION_CALL;
   io_result<buffers_type> ret;
   auto _io_state(_begin_io(operation_t::read, std::move(reqs), [&ret](auto *state) { ret = std::move(state->result); }, ReadFileEx));
   BOOST_OUTCOME_FILTER_ERROR(io_state, _io_state);
@@ -209,6 +212,7 @@ async_file_handle::io_result<async_file_handle::buffers_type> async_file_handle:
 
 async_file_handle::io_result<async_file_handle::const_buffers_type> async_file_handle::write(async_file_handle::io_request<async_file_handle::const_buffers_type> reqs, deadline d) noexcept
 {
+  BOOST_AFIO_LOG_FUNCTION_CALL;
   io_result<const_buffers_type> ret;
   auto _io_state(_begin_io(operation_t::write, std::move(reqs), [&ret](auto *state) { ret = std::move(state->result); }, WriteFileEx));
   BOOST_OUTCOME_FILTER_ERROR(io_state, _io_state);

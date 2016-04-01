@@ -36,6 +36,7 @@ BOOST_AFIO_V2_NAMESPACE_BEGIN
 
 handle::handle(const handle &o, handle::really_copy)
 {
+  BOOST_AFIO_LOG_FUNCTION_CALL;
   _caching = o._caching;
   _flags = o._flags;
   _v.behaviour = o._v.behaviour;
@@ -58,6 +59,7 @@ handle::~handle()
 
 result<void> handle::close() noexcept
 {
+  BOOST_AFIO_LOG_FUNCTION_CALL;
   if(_v)
   {
     if(are_safety_fsyncs_issued())
@@ -74,6 +76,7 @@ result<void> handle::close() noexcept
 
 result<void> handle::set_append_only(bool enable) noexcept
 {
+  BOOST_AFIO_LOG_FUNCTION_CALL;
   // This works only due to special handling in OVERLAPPED later
   if(enable)
   {
@@ -90,6 +93,7 @@ result<void> handle::set_append_only(bool enable) noexcept
 
 result<void> handle::set_kernel_caching(caching caching) noexcept
 {
+  BOOST_AFIO_LOG_FUNCTION_CALL;
   native_handle_type nativeh;
   handle::mode _mode = mode::none;
   if(is_append_only())
@@ -176,16 +180,19 @@ template <class BuffersType, class Syscall> inline io_handle::io_result<BuffersT
 
 io_handle::io_result<io_handle::buffers_type> io_handle::read(io_handle::io_request<io_handle::buffers_type> reqs, deadline d) noexcept
 {
+  BOOST_AFIO_LOG_FUNCTION_CALL;
   return do_read_write(_v, &ReadFile, std::move(reqs), std::move(d));
 }
 
 io_handle::io_result<io_handle::const_buffers_type> io_handle::write(io_handle::io_request<io_handle::const_buffers_type> reqs, deadline d) noexcept
 {
+  BOOST_AFIO_LOG_FUNCTION_CALL;
   return do_read_write(_v, &WriteFile, std::move(reqs), std::move(d));
 }
 
 result<io_handle::extent_guard> io_handle::lock(io_handle::extent_type offset, io_handle::extent_type bytes, bool exclusive, deadline d) noexcept
 {
+  BOOST_AFIO_LOG_FUNCTION_CALL;
   if(d && d.nsecs > 0 && !_v.is_overlapped())
     return make_errored_result<io_handle::extent_guard>(ENOTSUP);
   DWORD flags = exclusive ? LOCKFILE_EXCLUSIVE_LOCK : 0;
@@ -220,6 +227,7 @@ result<io_handle::extent_guard> io_handle::lock(io_handle::extent_type offset, i
 
 void io_handle::unlock(io_handle::extent_type offset, io_handle::extent_type bytes) noexcept
 {
+  BOOST_AFIO_LOG_FUNCTION_CALL;
   OVERLAPPED ol = {0};
   ol.Internal = (ULONG_PTR) -1;
   ol.OffsetHigh = (offset >> 32) & 0xffffffff;

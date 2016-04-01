@@ -74,6 +74,7 @@ namespace storage_profile
   */
   void storage_profile::write(std::ostream &out, std::regex which, size_t _indent, bool invert_match) const
   {
+    BOOST_AFIO_LOG_FUNCTION_CALL;
     std::vector<std::string> lastsection;
     auto print = [_indent, &out, &lastsection](auto &i) {
       size_t indent = _indent;

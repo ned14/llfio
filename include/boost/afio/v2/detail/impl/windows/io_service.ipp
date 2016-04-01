@@ -37,6 +37,7 @@ BOOST_AFIO_V2_NAMESPACE_BEGIN
 io_service::io_service()
     : _work_queued(0)
 {
+  BOOST_AFIO_LOG_FUNCTION_CALL;
   if(!DuplicateHandle(GetCurrentProcess(), GetCurrentThread(), GetCurrentProcess(), &_threadh, 0, false, DUPLICATE_SAME_ACCESS))
     throw std::runtime_error("Failed to create creating thread handle");
   _threadid = GetCurrentThreadId();
@@ -44,6 +45,7 @@ io_service::io_service()
 
 io_service::~io_service()
 {
+  BOOST_AFIO_LOG_FUNCTION_CALL;
   if(_work_queued)
   {
     std::cerr << "WARNING: ~io_service() sees work still queued, blocking until no work queued" << std::endl;
@@ -55,6 +57,7 @@ io_service::~io_service()
 
 result<bool> io_service::run_until(deadline d) noexcept
 {
+  BOOST_AFIO_LOG_FUNCTION_CALL;
   if(!_work_queued)
     return false;
   if(GetCurrentThreadId() != _threadid)
@@ -65,6 +68,7 @@ result<bool> io_service::run_until(deadline d) noexcept
 
 void io_service::post(detail::function_ptr<void(io_service *)> &&f)
 {
+  BOOST_AFIO_LOG_FUNCTION_CALL;
   void *data = nullptr;
   {
     post_info pi(this, std::move(f));

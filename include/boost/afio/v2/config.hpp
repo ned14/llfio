@@ -29,9 +29,38 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
+//! \def BOOST_AFIO_HEADERS_ONLY Whether AFIO is a headers only library. Defaults to 1 unless BOOST_ALL_DYN_LINK is defined.
 #if !defined(BOOST_AFIO_HEADERS_ONLY) && !defined(BOOST_ALL_DYN_LINK)
 #define BOOST_AFIO_HEADERS_ONLY 1
 #endif
+
+//! \def BOOST_AFIO_LOGGING_LEVEL How much detail to log. 0=disabled, 1=fatal, 2=error, 3=warn, 4=info, 5=debug, 6=all.
+//! Defaults to error if NDEBUG defined, else info level.
+#if !defined(BOOST_AFIO_LOGGING_LEVEL)
+#ifdef NDEBUG
+#define BOOST_AFIO_LOGGING_LEVEL 2  // error
+#else
+#define BOOST_AFIO_LOGGING_LEVEL 4  // info
+#endif
+#endif
+
+//! \def BOOST_AFIO_LOG_BACKTRACE_LEVELS Bit mask of which log levels should be stack backtraced
+//! which will slow those logs thirty fold or so. Defaults to (1<<1)|(1<<2)|(1<<3) i.e. stack backtrace
+//! on fatal, error and warn logs.
+#if !defined(BOOST_AFIO_LOG_BACKTRACE_LEVELS)
+#define BOOST_AFIO_LOG_BACKTRACE_LEVELS ((1 << 1) | (1 << 2) | (1 << 3))
+#endif
+
+//! \def BOOST_AFIO_LOGGING_MEMORY How much memory to use for the log.
+//! Defaults to 4Kb if NDEBUG defined, else 1Mb.
+#if !defined(BOOST_AFIO_LOGGING_MEMORY)
+#ifdef NDEBUG
+#define BOOST_AFIO_LOGGING_MEMORY 4096
+#else
+#define BOOST_AFIO_LOGGING_MEMORY (1024 * 1024)
+#endif
+#endif
+
 
 #if defined(_WIN32) && !defined(WIN32)
 #define WIN32 _WIN32
@@ -292,6 +321,62 @@ namespace boost
 #include BOOST_BINDLIB_INCLUDE_STL11(boost/afio/bindlib, BOOST_AFIO_V2_STL11_IMPL, ratio)
 #include BOOST_BINDLIB_INCLUDE_STL11(boost/afio/bindlib, BOOST_AFIO_V2_STL11_IMPL, thread)
 // clang-format on
+
+
+#if BOOST_AFIO_LOGGING_LEVEL
+#include "../bindlib/include/ringbuffer_log.hpp"
+
+/*! \todo TODO FIXME Replace in-memory log with memory map file backed log.
+*/
+BOOST_AFIO_V2_NAMESPACE_BEGIN
+//! The log used by AFIO
+static inline ringbuffer_log::simple_ringbuffer_log<BOOST_AFIO_LOGGING_MEMORY> &log() noexcept
+{
+  static ringbuffer_log::simple_ringbuffer_log<BOOST_AFIO_LOGGING_MEMORY> _log(static_cast<ringbuffer_log::level>(BOOST_AFIO_LOGGING_LEVEL));
+  return _log;
+}
+BOOST_AFIO_V2_NAMESPACE_END
+#endif
+
+#if BOOST_AFIO_LOGGING_LEVEL >= 1
+#define BOOST_AFIO_LOG_FATAL(message) BOOST_AFIO_V2_NAMESPACE::log().emplace_back(ringbuffer_log::level::fatal, (message), 0, 0, (BOOST_AFIO_LOG_BACKTRACE_LEVELS & (1 << 1)) ? nullptr : __func__, __LINE__)
+#else
+#define BOOST_AFIO_LOG_FATAL(message)
+#endif
+#if BOOST_AFIO_LOGGING_LEVEL >= 2
+#define BOOST_AFIO_LOG_ERROR(message) BOOST_AFIO_V2_NAMESPACE::log().emplace_back(ringbuffer_log::level::error, (message), 0, 0, (BOOST_AFIO_LOG_BACKTRACE_LEVELS & (1 << 2)) ? nullptr : __func__, __LINE__)
+// Intercept when Outcome creates an error_code_extended and log it to our log too
+#define BOOST_OUTCOME_ERROR_CODE_EXTENDED_CREATION_HOOK                                                                                                                                                                                                                                                                        \
+  if(*this)                                                                                                                                                                                                                                                                                                                    \
+  BOOST_AFIO_V2_NAMESPACE::log().emplace_back(ringbuffer_log::level::error, this->message().c_str(), this->value(), (unsigned) this->_unique_id, (BOOST_AFIO_LOG_BACKTRACE_LEVELS & (1 << 2)) ? nullptr : __func__, __LINE__)
+#else
+#define BOOST_AFIO_LOG_ERROR(message)
+#endif
+#if BOOST_AFIO_LOGGING_LEVEL >= 3
+#define BOOST_AFIO_LOG_WARN(message) BOOST_AFIO_V2_NAMESPACE::log().emplace_back(ringbuffer_log::level::warn, (message), 0, 0, (BOOST_AFIO_LOG_BACKTRACE_LEVELS & (1 << 3)) ? nullptr : __func__, __LINE__)
+#else
+#define BOOST_AFIO_LOG_WARN(message)
+#endif
+#if BOOST_AFIO_LOGGING_LEVEL >= 4
+#define BOOST_AFIO_LOG_INFO(message) BOOST_AFIO_V2_NAMESPACE::log().emplace_back(ringbuffer_log::level::info, (message), 0, 0, (BOOST_AFIO_LOG_BACKTRACE_LEVELS & (1 << 4)) ? nullptr : __func__, __LINE__)
+#else
+#define BOOST_AFIO_LOG_INFO(message)
+#endif
+#if BOOST_AFIO_LOGGING_LEVEL >= 5
+#define BOOST_AFIO_LOG_DEBUG(message) BOOST_AFIO_V2_NAMESPACE::log().emplace_back(ringbuffer_log::level::debug, (message), 0, 0, (BOOST_AFIO_LOG_BACKTRACE_LEVELS & (1 << 5)) ? nullptr : __func__, __LINE__)
+#else
+#define BOOST_AFIO_LOG_DEBUG(message)
+#endif
+#if BOOST_AFIO_LOGGING_LEVEL >= 6
+#define BOOST_AFIO_LOG_ALL(message) BOOST_AFIO_V2_NAMESPACE::log().emplace_back(ringbuffer_log::level::all, (message), 0, 0, (BOOST_AFIO_LOG_BACKTRACE_LEVELS & (1 << 6)) ? nullptr : __func__, __LINE__)
+#else
+#define BOOST_AFIO_LOG_ALL(message)
+#endif
+#ifdef _MSC_VER
+#define BOOST_AFIO_LOG_FUNCTION_CALL BOOST_AFIO_LOG_INFO(__FUNCSIG__)
+#else
+#define BOOST_AFIO_LOG_FUNCTION_CALL BOOST_AFIO_LOG_INFO(__PRETTY_FUNCTION__)
+#endif
 
 #include "boost/afio/outcome/include/boost/outcome.hpp"
 BOOST_AFIO_V2_NAMESPACE_BEGIN
