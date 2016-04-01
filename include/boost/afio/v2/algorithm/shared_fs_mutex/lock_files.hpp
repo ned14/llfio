@@ -1,7 +1,7 @@
-/* multiple_shared_lock.hpp
-Efficient many actor read-write lock
+/* lock_files.hpp
+Compatibility read-write lock
 (C) 2016 Niall Douglas http://www.nedprod.com/
-File Created: March 2016
+File Created: April 2016
 
 
 Boost Software License - Version 1.0 - August 17th, 2003
@@ -29,66 +29,138 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef BOOST_AFIO_MULTIPLE_SHARED_LOCK_HPP
-#define BOOST_AFIO_MULTIPLE_SHARED_LOCK_HPP
+#ifndef BOOST_AFIO_SHARED_FS_MUTEX_LOCK_FILES_HPP
+#define BOOST_AFIO_SHARED_FS_MUTEX_LOCK_FILES_HPP
 
-#include "../file_handle.hpp"
+#include "../../file_handle.hpp"
+#include "base.hpp"
 
 BOOST_AFIO_V2_NAMESPACE_BEGIN
 
 namespace algorithm
 {
-  /*! \class multiple_shared_lock
-  \brief Efficient many actor shared/exclusive file system based lock
-
-  Lock files scale poorly to the number of items being concurrently locked with typically an exponential
-  drop off in performance as the number of items being concurrently locked rises. This file system
-  algorithm solves this problem using IPC via a shared append-only lock file.
-
-  - Compatible with networked file systems (NFS too if the special nfs_compatibility flag is true).
-  - Invariant complexity to number of items being locked.
-  - Linear complexity to number of processes concurrently using the lock (i.e. number of waiters).
-
-  Caveats:
-  - Wasteful of disk space if used on a non-extents based filing system (e.g. FAT32, ext3).
-  It is best used in `/tmp` if possible. If you really must use a non-extents based filing
-  system, destroy and recreate the object instance periodically to force resetting the lock
-  file's length to zero.
-  - Similarly older operating systems (e.g. Linux < 3.0) do not implement extent hole punching
-  and therefore will also see excessive disk space consumption. Note at the time of writing
-  OS X doesn't implement hole punching at all.
-  - Byte range locks need to work properly on your system. Misconfiguring NFS or Samba
-  to cause byte range locks to not work right will produce bad outcomes.
-  - If your OS doesn't have sane byte range locks (OS X, BSD, older Linuxes) and multiple
-  threads in your process use the same lock file, bad things will happen due to the lack
-  of sanity in POSIX byte range locks. This may get fixed with a process-local byte range
-  lock implementation if there is demand, otherwise simply don't use the same lock file
-  from more than one thread on such systems.
-  */
-
-  class multiple_shared_lock
+  namespace shared_fs_mutex
   {
-    file_handle _h;
+    /*! \class lock_files
+    \brief Many entity exclusive compatibility file system based lock
 
-  public:
-    multiple_shared_lock() {}
-    multiple_shared_lock(const multiple_shared_lock &) = delete;
-    multiple_shared_lock &operator=(const multiple_shared_lock &) = delete;
-    multiple_shared_lock(multiple_shared_lock &&o) noexcept : _h(std::move(o._h)) {}
-    multiple_shared_lock &operator=(multiple_shared_lock &&o) noexcept
+    This is a very simple many entity shared mutex likely to work almost anywhere without surprises.
+    It works by trying to exclusively create a file called after the entity's name. If it fails to
+    exclusively create any file, it backs out all preceding locks, randomises the order
+    and tries locking them again until success. The only real reason to use this implementation
+    is its excellent compatibility with almost everything.
+
+    - Compatible with networked file systems.
+    - Exponential complexity to number of entities being concurrently locked.
+
+    Caveats:
+    - No ability to sleep until a lock becomes free, so CPUs are spun at 100%.
+    - Sudden process exit with locks held will deadlock all other users for one minute.
+    - Sudden power loss during use will deadlock first user for up to one minute.
+    - Cannot hold lock for more than one minute, else other waiters will assume your
+    process has crashed and force delete your lock files.
+    */
+    class lock_files : public shared_fs_mutex
     {
-      _h = std::move(o._h);
-      return *this;
-    }
+      file_handle::path_type _path;
+      std::vector<file_handle> _hs;
 
-    static result<multiple_shared_lock> init(file_handle::path_type lockfile) noexcept {}
+      lock_files(file_handle::path_type &&o)
+          : _path(std::move(o))
+      {
+      }
+      lock_files(const lock_files &) = delete;
+      lock_files &operator=(const lock_files &) = delete;
 
-    void lock();
-    bool try_lock();
-    result<void> try_lock_timed(deadline d);
-    void unlock();
-  };
+    public:
+      //! The type of an entity id
+      using entity_type = shared_fs_mutex::entity_type;
+      //! The type of a sequence of entities
+      using entities_type = shared_fs_mutex::entities_type;
 
+      //! Move constructor
+      lock_files(lock_files &&o) noexcept : _path(std::move(o._path)), _hs(std::move(o._hs)) {}
+      //! Move assign
+      lock_files &operator=(lock_files &&o) noexcept
+      {
+        _path = std::move(o._path);
+        _hs = std::move(o._hs);
+        return *this;
+      }
+
+      //! Initialises a shared filing system mutex using the directory at \em lockdir
+      //[[bindlib::make_free]]
+      static result<lock_files> fs_mutex_byte_ranges(file_handle::path_type lockdir) noexcept { return lock_files(std::move(lockdir)); }
+
+      //! Return the path to the directory being used for this lock
+      const file_handle::path_type &path() const noexcept { return _path; }
+
+    protected:
+      virtual result<void> _lock(entities_guard &out, deadline d) noexcept override final
+      {
+        stl11::chrono::steady_clock::time_point began_steady;
+        stl11::chrono::system_clock::time_point end_utc;
+        if(d)
+        {
+          if((d).steady)
+            began_steady = stl11::chrono::steady_clock::now();
+          else
+            end_utc = (d).to_time_point();
+        }
+        size_t n;
+        do
+        {
+          {
+            auto undo = detail::Undoer([&] {
+              for(; n != (size_t) -1; n--)
+              {
+                _h.unlock(out.entities[n].value, 1);
+              }
+            });
+            BOOST_OUTCOME_FILTER_ERROR(ret, file_handle::file(std::move(lockfile), file_handle::mode::write, file_handle::creation::if_needed, file_handle::caching::temporary));
+            for(n = 0; n < out.entities.size(); n++)
+            {
+              if(d)
+              {
+                if((d).steady)
+                {
+                  if(stl11::chrono::steady_clock::now() >= (began_steady + stl11::chrono::nanoseconds((d).nsecs)))
+                    return make_errored_result<void>(ETIMEDOUT);
+                }
+                else
+                {
+                  if(stl11::chrono::system_clock::now() >= end_utc)
+                    return make_errored_result<void>(ETIMEDOUT);
+                }
+              }
+              deadline nd(std::chrono::seconds(0));
+              BOOST_OUTCOME_FILTER_ERROR(guard, _h.lock(out.entities[n].value, 1, out.entities[n].exclusive, nd));
+              if(!guard)
+                goto failed;
+            }
+            undo.dismiss();
+            continue;
+          }
+        failed:
+          // Randomise out.entities
+          std::random_shuffle(out.entities.begin(), out.entities.end());
+          // Sleep for a very short time
+          std::this_thread::yield();
+        } while(n < out.entities.size());
+        return make_result<void>();
+      }
+
+    public:
+      virtual void unlock(entities_type entities) noexcept override final
+      {
+        for(const auto &i : entities)
+        {
+          _h.unlock(i.value, 1);
+        }
+      }
+    };
+
+  }  // namespace
 }  // namespace
 
 BOOST_AFIO_V2_NAMESPACE_END
