@@ -55,7 +55,7 @@ DEALINGS IN THE SOFTWARE.
 
 // If I'm on winclang, I can't stop the deprecation warnings from MSVCRT unless I do this
 #if defined(_MSC_VER) && defined(__clang__)
-#define _CRT_NONSTDC_NO_DEPRECATE 1
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
 #endif
 
 #include "boost/afio/bindlib/include/import.h"
