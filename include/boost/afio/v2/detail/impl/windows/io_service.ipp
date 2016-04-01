@@ -48,7 +48,7 @@ io_service::~io_service()
   BOOST_AFIO_LOG_FUNCTION_CALL;
   if(_work_queued)
   {
-    std::cerr << "WARNING: ~io_service() sees work still queued, blocking until no work queued" << std::endl;
+    fprintf(stderr, "WARNING: ~io_service() sees work still queued, blocking until no work queued\n");
     while(_work_queued)
       std::this_thread::yield();
   }

@@ -158,7 +158,7 @@ protected:
       assert(!items_to_go);
       if(items_to_go)
       {
-        BOOST_AFIO_LOG_FATAL_EXIT("FATAL: io_state destructed while i/o still in flight, the derived class should never allow this." << std::endl);
+        BOOST_AFIO_LOG_FATAL("FATAL: io_state destructed while i/o still in flight, the derived class should never allow this.");
         abort();
       }
     }

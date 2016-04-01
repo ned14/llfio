@@ -42,12 +42,12 @@ namespace utils
     static spinlock<bool> lock;
     static std::vector<size_t> pagesizes, pagesizes_available;
     stl11::lock_guard<decltype(lock)> g(lock);
-    if (pagesizes.empty())
+    if(pagesizes.empty())
     {
 #if defined(__FreeBSD__)
       pagesizes.resize(32);
       int out;
-      if(-1==(out=getpagesizes(pagesizes.data(), 32)))
+      if(-1 == (out = getpagesizes(pagesizes.data(), 32)))
       {
         pagesizes.clear();
         pagesizes.push_back(getpagesize());
@@ -56,7 +56,7 @@ namespace utils
       else
       {
         pagesizes.resize(out);
-        pagesizes_available=pagesizes;
+        pagesizes_available = pagesizes;
       }
 #elif defined(__APPLE__)
       // I can't find how to determine what the super page size is on OS X programmatically
@@ -64,33 +64,37 @@ namespace utils
       // Therefore, we hard code 2Mb
       pagesizes.push_back(getpagesize());
       pagesizes_available.push_back(getpagesize());
-      pagesizes.push_back(2*1024*1024);
-      pagesizes_available.push_back(2*1024*1024);      
+      pagesizes.push_back(2 * 1024 * 1024);
+      pagesizes_available.push_back(2 * 1024 * 1024);
 #elif defined(__linux__)
       pagesizes.push_back(getpagesize());
       pagesizes_available.push_back(getpagesize());
-      int ih=::open("/proc/meminfo", O_RDONLY);
-      if(-1!=ih)
+      int ih = ::open("/proc/meminfo", O_RDONLY);
+      if(-1 != ih)
       {
         char buffer[4096], *hugepagesize, *hugepages;
-        buffer[::read(ih, buffer, sizeof(buffer)-1)]=0;
+        buffer[ ::read(ih, buffer, sizeof(buffer) - 1)] = 0;
         ::close(ih);
-        hugepagesize=strstr(buffer, "Hugepagesize:");
-        hugepages=strstr(buffer, "HugePages_Total:");
+        hugepagesize = strstr(buffer, "Hugepagesize:");
+        hugepages = strstr(buffer, "HugePages_Total:");
         if(hugepagesize && hugepages)
         {
-          unsigned _hugepages=0, _hugepagesize=0;
-          while(*++hugepagesize!=' ');
-          while(*++hugepages!=' ');
-          while(*++hugepagesize==' ');
-          while(*++hugepages==' ');
+          unsigned _hugepages = 0, _hugepagesize = 0;
+          while(*++hugepagesize != ' ')
+            ;
+          while(*++hugepages != ' ')
+            ;
+          while(*++hugepagesize == ' ')
+            ;
+          while(*++hugepages == ' ')
+            ;
           sscanf(hugepagesize, "%u", &_hugepagesize);
           sscanf(hugepages, "%u", &_hugepages);
           if(_hugepagesize)
           {
-            pagesizes.push_back(((size_t)_hugepagesize)*1024);
+            pagesizes.push_back(((size_t) _hugepagesize) * 1024);
             if(_hugepages)
-              pagesizes_available.push_back(((size_t)_hugepagesize)*1024);
+              pagesizes_available.push_back(((size_t) _hugepagesize) * 1024);
           }
         }
       }
@@ -109,15 +113,15 @@ namespace utils
   void random_fill(char *buffer, size_t bytes)
   {
     static spinlock<bool> lock;
-    static int randomfd=-1;
-    if(-1==randomfd)
+    static int randomfd = -1;
+    if(-1 == randomfd)
     {
       stl11::lock_guard<decltype(lock)> g(lock);
-      randomfd=::open("/dev/urandom", O_RDONLY);
+      randomfd = ::open("/dev/urandom", O_RDONLY);
     }
-    if(-1==randomfd || ::read(randomfd, buffer, bytes)<bytes)
+    if(-1 == randomfd || ::read(randomfd, buffer, bytes) < bytes)
     {
-      BOOST_AFIO_LOG_FATAL_EXIT("afio: Kernel crypto function failed");
+      BOOST_AFIO_LOG_FATAL("afio: Kernel crypto function failed");
       std::terminate();
     }
   }
@@ -127,36 +131,36 @@ namespace utils
     large_page_allocation allocate_large_pages(size_t bytes)
     {
       large_page_allocation ret(calculate_large_page_allocation(bytes));
-      int flags=MAP_SHARED|MAP_ANON;
-      if(ret.page_size_used>65536)
+      int flags = MAP_SHARED | MAP_ANON;
+      if(ret.page_size_used > 65536)
       {
 #ifdef MAP_HUGETLB
-        flags|=MAP_HUGETLB;
+        flags |= MAP_HUGETLB;
 #endif
 #ifdef MAP_ALIGNED_SUPER
-        flags|=MAP_ALIGNED_SUPER;
+        flags |= MAP_ALIGNED_SUPER;
 #endif
 #ifdef VM_FLAGS_SUPERPAGE_SIZE_ANY
-        flags|=VM_FLAGS_SUPERPAGE_SIZE_ANY;
+        flags |= VM_FLAGS_SUPERPAGE_SIZE_ANY;
 #endif
       }
-      if(!(ret.p=mmap(nullptr, ret.actual_size, PROT_WRITE, flags, -1, 0)))
+      if(!(ret.p = mmap(nullptr, ret.actual_size, PROT_WRITE, flags, -1, 0)))
       {
-        if(ENOMEM==errno)
-          if((ret.p=mmap(nullptr, ret.actual_size, PROT_WRITE, MAP_SHARED|MAP_ANON, -1, 0)))
+        if(ENOMEM == errno)
+          if((ret.p = mmap(nullptr, ret.actual_size, PROT_WRITE, MAP_SHARED | MAP_ANON, -1, 0)))
             return ret;
       }
 #ifndef NDEBUG
-      else if(ret.page_size_used>65536)
+      else if(ret.page_size_used > 65536)
         std::cout << "afio: Large page allocation successful" << std::endl;
 #endif
       return ret;
     }
     void deallocate_large_pages(void *p, size_t bytes)
     {
-      if(munmap(p, bytes)<0)
+      if(munmap(p, bytes) < 0)
       {
-        BOOST_AFIO_LOG_FATAL_EXIT("afio: Freeing large pages failed");
+        BOOST_AFIO_LOG_FATAL("afio: Freeing large pages failed");
         std::terminate();
       }
     }

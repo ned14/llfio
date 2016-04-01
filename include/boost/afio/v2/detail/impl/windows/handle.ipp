@@ -52,7 +52,7 @@ handle::~handle()
     auto ret = handle::close();
     if(ret.has_error())
     {
-      BOOST_AFIO_LOG_FATAL_EXIT("handle::~handle() close failed with " << ret.get_error().message());
+      BOOST_AFIO_LOG_FATAL("handle::~handle() close failed");
     }
   }
 }
@@ -239,7 +239,7 @@ void io_handle::unlock(io_handle::extent_type offset, io_handle::extent_type byt
     if(ERROR_IO_PENDING != GetLastError())
     {
       auto ret = make_errored_result<void>(GetLastError());
-      BOOST_AFIO_LOG_FATAL_EXIT("io_handle::unlock() failed with " << ret.get_error().message());
+      BOOST_AFIO_LOG_FATAL("io_handle::unlock() failed");
       return;
     }
   }
@@ -250,7 +250,7 @@ void io_handle::unlock(io_handle::extent_type offset, io_handle::extent_type byt
     if(ol.Internal != 0)
     {
       auto ret = make_errored_result_nt<void>((NTSTATUS) ol.Internal);
-      BOOST_AFIO_LOG_FATAL_EXIT("io_handle::unlock() failed with " << ret.get_error().message());
+      BOOST_AFIO_LOG_FATAL("io_handle::unlock() failed");
       return;
     }
   }

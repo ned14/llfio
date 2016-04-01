@@ -90,7 +90,7 @@ namespace utils
     using namespace windows_nt_kernel;
     if(!RtlGenRandom(buffer, (ULONG) bytes))
     {
-      BOOST_AFIO_LOG_FATAL_EXIT("afio: Kernel crypto function failed");
+      BOOST_AFIO_LOG_FATAL("afio: Kernel crypto function failed");
       std::terminate();
     }
   }
@@ -111,7 +111,7 @@ namespace utils
       }
 #ifndef NDEBUG
       else if(ret.page_size_used > 65536)
-        std::cout << "afio: Large page allocation successful" << std::endl;
+        printf("afio: Large page allocation successful\n");
 #endif
       return ret;
     }
@@ -120,7 +120,7 @@ namespace utils
       (void) bytes;
       if(!VirtualFree(p, 0, MEM_RELEASE))
       {
-        BOOST_AFIO_LOG_FATAL_EXIT("afio: Freeing large pages failed");
+        BOOST_AFIO_LOG_FATAL("afio: Freeing large pages failed");
         std::terminate();
       }
     }

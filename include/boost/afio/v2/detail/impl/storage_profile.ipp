@@ -35,6 +35,9 @@ DEALINGS IN THE SOFTWARE.
 #include "../../utils.hpp"
 
 #include <vector>
+#ifndef NDEBUG
+#include <iostream>
+#endif
 
 #define BOOST_AFIO_STORAGE_PROFILE_TIME_DIVIDER 10
 
@@ -348,7 +351,9 @@ namespace storage_profile
                       off_t failedat = d - data;
                       if(failedat < atomic_rewrite_quantum)
                       {
+#ifndef NDEBUG
                         std::cout << "  Torn rewrite at offset " << failedat << std::endl;
+#endif
                         atomic_rewrite_quantum = failedat;
                       }
                       break;
@@ -358,7 +363,9 @@ namespace storage_profile
               }
             }));
 
+#ifndef NDEBUG
           std::cout << "direct=" << !srch.are_reads_from_cache() << " sync=" << srch.are_writes_durable() << " testing atomicity of rewrites of " << size << " bytes ..." << std::endl;
+#endif
           auto begin = stl11::chrono::high_resolution_clock::now();
           while(!failed && stl11::chrono::duration_cast<stl11::chrono::seconds>(stl11::chrono::high_resolution_clock::now() - begin).count() < (20 / BOOST_AFIO_STORAGE_PROFILE_TIME_DIVIDER))
           {
@@ -440,7 +447,9 @@ namespace storage_profile
                         off_t failedat = (d - data);
                         if(failedat < max_aligned_atomic_rewrite)
                         {
+#ifndef NDEBUG
                           std::cout << "  Torn rewrite at offset " << failedat << std::endl;
+#endif
                           max_aligned_atomic_rewrite = failedat;
                         }
                         break;
@@ -450,7 +459,9 @@ namespace storage_profile
                 }
               }));
 
+#ifndef NDEBUG
             std::cout << "direct=" << !srch.are_reads_from_cache() << " sync=" << srch.are_writes_durable() << " testing atomicity of rewrites of " << size << " bytes to offset " << offset << " ..." << std::endl;
+#endif
             auto begin = stl11::chrono::high_resolution_clock::now();
             while(!failed && stl11::chrono::duration_cast<stl11::chrono::seconds>(stl11::chrono::high_resolution_clock::now() - begin).count() < (20 / BOOST_AFIO_STORAGE_PROFILE_TIME_DIVIDER))
             {
@@ -544,7 +555,9 @@ namespace storage_profile
                           off_t failedat = (d - data) + offset;
                           if(failedat < atomic_rewrite_offset_boundary)
                           {
+#ifndef NDEBUG
                             std::cout << "  Torn rewrite at offset " << failedat << std::endl;
+#endif
                             atomic_rewrite_offset_boundary = failedat;
                           }
                           break;
@@ -554,7 +567,9 @@ namespace storage_profile
                   }
                 }));
 
+#ifndef NDEBUG
               std::cout << "direct=" << !srch.are_reads_from_cache() << " sync=" << srch.are_writes_durable() << " testing atomicity of rewrites of " << size << " bytes to offset " << offset << " ..." << std::endl;
+#endif
               auto begin = stl11::chrono::high_resolution_clock::now();
               while(!failed && stl11::chrono::duration_cast<stl11::chrono::seconds>(stl11::chrono::high_resolution_clock::now() - begin).count() < (20 / BOOST_AFIO_STORAGE_PROFILE_TIME_DIVIDER))
               {

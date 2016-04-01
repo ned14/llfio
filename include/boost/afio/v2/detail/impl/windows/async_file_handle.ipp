@@ -77,7 +77,7 @@ result<async_file_handle::io_state_ptr<CompletionRoutine, BuffersType>> async_fi
           size_t idx = ol - ols;
           if(idx >= this->items)
           {
-            BOOST_AFIO_LOG_FATAL_EXIT("async_file_handle::io_state::operator() called with invalid index " << idx);
+            BOOST_AFIO_LOG_FATAL("async_file_handle::io_state::operator() called with invalid index");
             std::terminate();
           }
           this->result.value()[idx].second = bytes_transferred;
@@ -106,12 +106,12 @@ result<async_file_handle::io_state_ptr<CompletionRoutine, BuffersType>> async_fi
 #ifndef NDEBUG
           if(res.has_error())
           {
-            BOOST_AFIO_LOG_FATAL_EXIT("async_file_handle: io_service failed due to '" << res.get_error().message() << "'");
+            BOOST_AFIO_LOG_FATAL("async_file_handle: io_service failed");
             std::terminate();
           }
           if(!res.get())
           {
-            BOOST_AFIO_LOG_FATAL_EXIT("async_file_handle: io_service returns no work when i/o has not completed");
+            BOOST_AFIO_LOG_FATAL("async_file_handle: io_service returns no work when i/o has not completed");
             std::terminate();
           }
 #endif
@@ -202,7 +202,7 @@ async_file_handle::io_result<async_file_handle::buffers_type> async_file_handle:
 #ifndef NDEBUG
     if(!ret.is_ready() && t && !t.get())
     {
-      BOOST_AFIO_LOG_FATAL_EXIT("async_file_handle: io_service returns no work when i/o has not completed");
+      BOOST_AFIO_LOG_FATAL("async_file_handle: io_service returns no work when i/o has not completed");
       std::terminate();
     }
 #endif
@@ -227,7 +227,7 @@ async_file_handle::io_result<async_file_handle::const_buffers_type> async_file_h
 #ifndef NDEBUG
     if(!ret.is_ready() && t && !t.get())
     {
-      BOOST_AFIO_LOG_FATAL_EXIT("async_file_handle: io_service returns no work when i/o has not completed");
+      BOOST_AFIO_LOG_FATAL("async_file_handle: io_service returns no work when i/o has not completed");
       std::terminate();
     }
 #endif

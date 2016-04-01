@@ -36,6 +36,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <fstream>
 #include <iomanip>
+#include <iostream>
 
 using namespace BOOST_AFIO_V2_NAMESPACE;
 #ifdef __linux__

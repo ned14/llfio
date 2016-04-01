@@ -338,10 +338,19 @@ static inline ringbuffer_log::simple_ringbuffer_log<BOOST_AFIO_LOGGING_MEMORY> &
 BOOST_AFIO_V2_NAMESPACE_END
 #endif
 
+#ifndef BOOST_AFIO_LOG_FATAL_TO_CERR
+#include <stdio.h>
+#define BOOST_AFIO_LOG_FATAL_TO_CERR(expr) fprintf(stderr, "%s\n", (expr))
+#endif
+
 #if BOOST_AFIO_LOGGING_LEVEL >= 1
-#define BOOST_AFIO_LOG_FATAL(message) BOOST_AFIO_V2_NAMESPACE::log().emplace_back(ringbuffer_log::level::fatal, (message), 0, 0, (BOOST_AFIO_LOG_BACKTRACE_LEVELS & (1 << 1)) ? nullptr : __func__, __LINE__)
+#define BOOST_AFIO_LOG_FATAL(message)                                                                                                                                                                                                                                                                                          \
+  {                                                                                                                                                                                                                                                                                                                            \
+    BOOST_AFIO_V2_NAMESPACE::log().emplace_back(ringbuffer_log::level::fatal, (message), 0, 0, (BOOST_AFIO_LOG_BACKTRACE_LEVELS & (1 << 1)) ? nullptr : __func__, __LINE__);                                                                                                                                                   \
+    BOOST_AFIO_LOG_FATAL_TO_CERR(message);                                                                                                                                                                                                                                                                                     \
+  }
 #else
-#define BOOST_AFIO_LOG_FATAL(message)
+#define BOOST_AFIO_LOG_FATAL(message) BOOST_AFIO_LOG_FATAL_TO_CERR(message)
 #endif
 #if BOOST_AFIO_LOGGING_LEVEL >= 2
 #define BOOST_AFIO_LOG_ERROR(message) BOOST_AFIO_V2_NAMESPACE::log().emplace_back(ringbuffer_log::level::error, (message), 0, 0, (BOOST_AFIO_LOG_BACKTRACE_LEVELS & (1 << 2)) ? nullptr : __func__, __LINE__)
@@ -687,11 +696,6 @@ BOOST_AFIO_V2_NAMESPACE_END
 #else
 #error Unknown compiler, cannot set BOOST_AFIO_THREAD_LOCAL
 #endif
-#endif
-
-#ifndef BOOST_AFIO_LOG_FATAL_EXIT
-#include <iostream>
-#define BOOST_AFIO_LOG_FATAL_EXIT(expr) std::cerr << expr
 #endif
 
 #endif  // BOOST_AFIO_NEED_DEFINE
