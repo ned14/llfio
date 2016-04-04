@@ -55,10 +55,14 @@ namespace algorithm
 
     Caveats:
     - No ability to sleep until a lock becomes free, so CPUs are spun at 100%.
-    - Sudden process exit with locks held will deadlock all other users for one minute.
-    - Sudden power loss during use will deadlock first user for up to one minute.
-    - Cannot hold lock for more than one minute, else other waiters will assume your
-    process has crashed and force delete your lock files.
+    - Sudden process exit with locks held will deadlock all other users.
+    - Sudden power loss during use will deadlock first user after reboot.
+
+    Fixing the stale lock problem requires asking the operating system which
+    processes currently have the problem lock file open. This isn't hard to
+    do, but is entirely OS-specific code on each of Windows, Linux and FreeBSD.
+    Implementing this is left as an exercise for the reader (contributions of
+    such OS-specific support to this class are welcome!)
     */
     class lock_files : public shared_fs_mutex
     {
@@ -90,7 +94,7 @@ namespace algorithm
 
       //! Initialises a shared filing system mutex using the directory at \em lockdir
       //[[bindlib::make_free]]
-      static result<lock_files> fs_mutex_byte_ranges(file_handle::path_type lockdir) noexcept { return lock_files(std::move(lockdir)); }
+      static result<lock_files> fs_mutex_lock_files(file_handle::path_type lockdir) noexcept { return lock_files(std::move(lockdir)); }
 
       //! Return the path to the directory being used for this lock
       const file_handle::path_type &path() const noexcept { return _path; }
@@ -108,40 +112,48 @@ namespace algorithm
             end_utc = (d).to_time_point();
         }
         size_t n;
+        std::vector<fixme_path> entity_paths(out.entities.size());
+        for(n = 0; n < out.entities.size(); n++)
+        {
+          auto v = out.entities[n].value;
+          entity_paths[n] = _path / utils::to_hex_string(span<char>((char *) &v, 16));
+        }
         do
         {
           {
             auto undo = detail::Undoer([&] {
               for(; n != (size_t) -1; n--)
               {
-                _h.unlock(out.entities[n].value, 1);
+                _hs[n].close();  // delete on close semantics deletes the file
               }
             });
-            BOOST_OUTCOME_FILTER_ERROR(ret, file_handle::file(std::move(lockfile), file_handle::mode::write, file_handle::creation::if_needed, file_handle::caching::temporary));
             for(n = 0; n < out.entities.size(); n++)
             {
-              if(d)
+              auto ret = file_handle::file(entity_paths[n], file_handle::mode::write, file_handle::creation::only_if_not_exist, file_handle::caching::temporary, file_handle::flag::delete_on_close);
+              if(ret.has_error())
               {
-                if((d).steady)
-                {
-                  if(stl11::chrono::steady_clock::now() >= (began_steady + stl11::chrono::nanoseconds((d).nsecs)))
-                    return make_errored_result<void>(ETIMEDOUT);
-                }
-                else
-                {
-                  if(stl11::chrono::system_clock::now() >= end_utc)
-                    return make_errored_result<void>(ETIMEDOUT);
-                }
+                auto &ec = ret.get_error();
+                if(ec.category() != std::generic_category() || ec.value() != EAGAIN)
+                  return ret.get_error();
+                // Collided with another locker
+                break;
               }
-              deadline nd(std::chrono::seconds(0));
-              BOOST_OUTCOME_FILTER_ERROR(guard, _h.lock(out.entities[n].value, 1, out.entities[n].exclusive, nd));
-              if(!guard)
-                goto failed;
+              _hs[n] = std::move(ret.get());
             }
-            undo.dismiss();
-            continue;
           }
-        failed:
+          if(d)
+          {
+            if((d).steady)
+            {
+              if(stl11::chrono::steady_clock::now() >= (began_steady + stl11::chrono::nanoseconds((d).nsecs)))
+                return make_errored_result<void>(ETIMEDOUT);
+            }
+            else
+            {
+              if(stl11::chrono::system_clock::now() >= end_utc)
+                return make_errored_result<void>(ETIMEDOUT);
+            }
+          }
           // Randomise out.entities
           std::random_shuffle(out.entities.begin(), out.entities.end());
           // Sleep for a very short time
@@ -153,9 +165,9 @@ namespace algorithm
     public:
       virtual void unlock(entities_type entities) noexcept override final
       {
-        for(const auto &i : entities)
+        for(auto &i : _hs)
         {
-          _h.unlock(i.value, 1);
+          i.close();  // delete on close semantics deletes the file
         }
       }
     };

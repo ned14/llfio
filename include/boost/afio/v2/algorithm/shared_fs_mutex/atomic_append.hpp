@@ -41,6 +41,7 @@ namespace algorithm
 {
   namespace shared_fs_mutex
   {
+#if !DOXYGEN_SHOULD_SKIP_THIS
     namespace atomic_append_detail
     {
 #pragma pack(push)
@@ -67,7 +68,8 @@ namespace algorithm
       };
       static_assert(sizeof(lock_request) == 128, "lock_request structure is not 128 bytes long!");
 #pragma pack(pop)
-    }
+    }  // namespace
+#endif
     /*! \class atomic_append
     \brief Scalable many entity shared/exclusive file system based lock
 
