@@ -91,7 +91,7 @@ namespace algorithm
       //[[bindlib::make_free]]
       static result<byte_ranges> fs_mutex_byte_ranges(file_handle::path_type lockfile) noexcept
       {
-        BOOST_OUTCOME_FILTER_ERROR(ret, file_handle::file(std::move(lockfile), file_handle::mode::write, file_handle::creation::if_needed, file_handle::caching::temporary));
+        BOOST_OUTCOME_FILTER_ERROR(ret, file_handle::file(std::move(lockfile), file_handle::mode::write, file_handle::creation::if_needed, file_handle::caching::temporary, file_handle::flag::delete_on_close));
         return byte_ranges(std::move(ret));
       }
 

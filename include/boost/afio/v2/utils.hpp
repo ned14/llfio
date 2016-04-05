@@ -624,7 +624,7 @@ This lets one pack one byte of input into two bytes of output.
   };
 
   /*! \class fast_hash
-  \brief Fast very collision resistant hash. Currently SpookyHash @ 0.3 cycles/byte.
+  \brief Fast very collision resistant uint128 hash. Currently SpookyHash @ 0.3 cycles/byte.
   */
   class BOOST_AFIO_DECL fast_hash
   {

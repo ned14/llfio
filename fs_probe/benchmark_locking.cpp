@@ -31,69 +31,44 @@ DEALINGS IN THE SOFTWARE.
 
 #define _CRT_SECURE_NO_WARNINGS 1
 
+#include "boost/afio/v2/algorithm/shared_fs_mutex/atomic_append.hpp"
+#include "boost/afio/v2/algorithm/shared_fs_mutex/byte_ranges.hpp"
+#include "boost/afio/v2/algorithm/shared_fs_mutex/lock_files.hpp"
 #include "boost/afio/v2/detail/child_process.hpp"
-#include "boost/afio/v2/file_handle.hpp"
 
 #include <iostream>
 #include <vector>
 
 namespace afio = BOOST_AFIO_V2_NAMESPACE;
 
-namespace append_only_mutual_exclusion
-{
-  union alignas(16) uint128 {
-    unsigned char bytes[16];
-#if defined(__i386__) || defined(_M_IX86) || defined(__x86_64__) || defined(_M_X64)
-#if defined(__SSE2__) || (defined(_M_IX86_FP) && _M_IX86_FP >= 2)
-    // Strongly hint to the compiler what to do here
-    __m128i sse;
-#endif
-#endif
-  };
-  using uint64 = unsigned long long;
-  struct header
-  {
-    uint128 hash;
-    uint64 unique_id;
-    uint64 time_t_offset;
-    uint64 first_valid_lock_request;
-    uint64 end_last_hole_punch;
-    char _padding[128 - 48];
-  };
-  static_assert(sizeof(header) == 128, "header is not 128 bytes long!");
-  struct lock_request
-  {
-    uint128 hash;
-    uint64 unique_id;
-    uint64 us_timestamp : 56;
-    uint64 want_to_lock_items : 8;
-    uint128 want_to_lock[6];
-  };
-  static_assert(sizeof(lock_request) == 128, "lock_request is not 128 bytes long!");
-}
-
 int main(int argc, char *argv[])
 {
-  if(argc < 2)
+  if(argc < 3)
   {
-    std::cerr << "Usage: " << argv[0] << " <no of waiters>" << std::endl;
+    std::cerr << "Usage: " << argv[0] << " <atomic_append|byte_ranges|lock_files> <no of waiters>" << std::endl;
     return 1;
   }
   // Am I the master process?
   if(strcmp(argv[1], "spawned"))
   {
-    size_t waiters = atoi(argv[1]);
+    size_t waiters = atoi(argv[2]);
     if(!waiters)
     {
-      std::cerr << "Usage: " << argv[0] << " <no of waiters>" << std::endl;
+      std::cerr << "Usage: " << argv[0] << " <atomic_append|byte_ranges|lock_files> <no of waiters>" << std::endl;
       return 1;
     }
     std::vector<afio::detail::child_process> children;
     auto mypath = afio::detail::current_process_path();
 #ifdef UNICODE
-    std::vector<afio::stl1z::filesystem::path::string_type> args = {L"spawned", L"00"};
+    std::vector<afio::stl1z::filesystem::path::string_type> args = {L"spawned", L"", L"", L"00"};
+    args[1].resize(strlen(argv[1]));
+    for(size_t n = 0; n < args[1].size(); n++)
+      args[1][n] = argv[1][n];
+    args[2].resize(strlen(argv[2]));
+    for(size_t n = 0; n < args[2].size(); n++)
+      args[2][n] = argv[2][n];
 #else
-    std::vector<afio::stl1z::filesystem::path::string_type> args = {"spawned", "00"};
+    std::vector<afio::stl1z::filesystem::path::string_type> args = {"spawned", argv[1], argv[2], "00"};
 #endif
     auto env = afio::detail::current_process_env();
     std::cout << "Launching " << waiters << " copies of myself as a child process ..." << std::endl;
@@ -101,13 +76,13 @@ int main(int argc, char *argv[])
     {
       if(n >= 10)
       {
-        args[1][0] = (char) ('0' + (n / 10));
-        args[1][1] = (char) ('0' + (n % 10));
+        args[2][0] = (char) ('0' + (n / 10));
+        args[2][1] = (char) ('0' + (n % 10));
       }
       else
       {
-        args[1][0] = (char) ('0' + n);
-        args[1][1] = 0;
+        args[2][0] = (char) ('0' + n);
+        args[2][1] = 0;
       }
       auto child = afio::detail::child_process::launch(mypath, args, env);
       if(child.has_error())
@@ -162,22 +137,123 @@ int main(int argc, char *argv[])
     return 0;
   }
 
-  if(argc < 3)
+  if(argc < 5)
   {
     std::cerr << "ERROR: args too short" << std::endl;
     return 1;
   }
+  enum class lock_algorithm
+  {
+    unknown,
+    atomic_append,
+    byte_ranges,
+    lock_files
+  } test = lock_algorithm::unknown;
+  bool contended = true;
+  if(!strcmp(argv[2], "atomic_append"))
+    test = lock_algorithm::atomic_append;
+  else if(!strcmp(argv[2], "byte_ranges"))
+    test = lock_algorithm::byte_ranges;
+  else if(!strcmp(argv[2], "lock_files"))
+    test = lock_algorithm::lock_files;
+  else if(!strcmp(argv[2], "!atomic_append"))
+  {
+    test = lock_algorithm::atomic_append;
+    contended = false;
+  }
+  else if(!strcmp(argv[2], "!byte_ranges"))
+  {
+    test = lock_algorithm::byte_ranges;
+    contended = false;
+  }
+  else if(!strcmp(argv[2], "!lock_files"))
+  {
+    test = lock_algorithm::lock_files;
+    contended = false;
+  }
+  if(test == lock_algorithm::unknown)
+  {
+    std::cerr << "ERROR: unknown test requested" << std::endl;
+    return 1;
+  }
+  size_t total_locks = atoi(argv[3]), this_child = atoi(argv[4]), count = 0;
+  if(!total_locks)
+  {
+    std::cerr << "ERROR: unknown total locks requested" << std::endl;
+    return 1;
+  }
   // I am a spawned child. Tell parent I am ready.
-  std::cout << "READY(" << argv[2] << ")" << std::endl;
+  std::cout << "READY(" << argv[4] << ")" << std::endl;
   // Wait for parent to let me proceed
   std::atomic<int> done(-1);
-  std::thread worker([&done] {
+  std::thread worker([test, contended, total_locks, this_child, &done, &count] {
+    std::unique_ptr<afio::algorithm::shared_fs_mutex::shared_fs_mutex> algorithm;
+    switch(test)
+    {
+    case lock_algorithm::atomic_append:
+    {
+      auto v = afio::algorithm::shared_fs_mutex::atomic_append::fs_mutex_append("lockfile");
+      if(v.has_error())
+      {
+        std::cerr << "ERROR: Creation of lock algorithm returns " << v.get_error().message() << std::endl;
+        std::terminate();
+      }
+      algorithm = std::make_unique<afio::algorithm::shared_fs_mutex::atomic_append>(std::move(v.get()));
+      break;
+    }
+    case lock_algorithm::byte_ranges:
+    {
+      auto v = afio::algorithm::shared_fs_mutex::byte_ranges::fs_mutex_byte_ranges("lockfile");
+      if(v.has_error())
+      {
+        std::cerr << "ERROR: Creation of lock algorithm returns " << v.get_error().message() << std::endl;
+        std::terminate();
+      }
+      algorithm = std::make_unique<afio::algorithm::shared_fs_mutex::byte_ranges>(std::move(v.get()));
+      break;
+    }
+    case lock_algorithm::lock_files:
+    {
+      auto v = afio::algorithm::shared_fs_mutex::lock_files::fs_mutex_lock_files(".");
+      if(v.has_error())
+      {
+        std::cerr << "ERROR: Creation of lock algorithm returns " << v.get_error().message() << std::endl;
+        std::terminate();
+      }
+      algorithm = std::make_unique<afio::algorithm::shared_fs_mutex::lock_files>(std::move(v.get()));
+      break;
+    }
+    case lock_algorithm::unknown:
+      break;
+    }
+    // Create entities named 0 to total_locks
+    std::vector<afio::algorithm::shared_fs_mutex::shared_fs_mutex::entity_type> entities(total_locks);
+    for(size_t n = 0; n < total_locks; n++)
+    {
+      if(contended)
+      {
+        entities[n].value = n;
+        entities[n].exclusive = true;
+      }
+      else
+      {
+        entities[n].value = (this_child << 16) + n;  // guaranteed unique
+        entities[n].exclusive = true;
+      }
+    }
     while(done == -1)
       std::this_thread::yield();
     while(!done)
     {
-      // todo
-      std::this_thread::yield();
+      auto result = algorithm->lock(afio::as_span(entities));
+      if(result.has_error())
+      {
+        std::cerr << "ERROR: Lock algorithms returns " << result.get_error().message() << std::endl;
+        std::terminate();
+      }
+      ++count;
+      // On destruction, will unlock the lock.
+      auto guard = std::move(result.get());
     }
   });
   for(;;)
@@ -197,7 +273,7 @@ int main(int argc, char *argv[])
     {
       done = 1;
       worker.join();
-      std::cout << "RESULTS(" << argv[2] << ")" << std::endl;
+      std::cout << "RESULTS(" << count << ")" << std::endl;
       return 0;
     }
   }

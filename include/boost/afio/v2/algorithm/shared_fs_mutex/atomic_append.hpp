@@ -106,8 +106,13 @@ namespace algorithm
     class atomic_append : public shared_fs_mutex
     {
       file_handle _h;
+      file_handle::extent_guard _guard;
 
-      atomic_append() {}
+      atomic_append(file_handle &&h, file_handle::extent_guard &&guard)
+          : _h(std::move(h))
+          , _guard(std::move(guard))
+      {
+      }
       atomic_append(const atomic_append &) = delete;
       atomic_append &operator=(const atomic_append &) = delete;
 
@@ -118,23 +123,62 @@ namespace algorithm
       using entities_type = shared_fs_mutex::entities_type;
 
       //! Move constructor
-      atomic_append(atomic_append &&o) noexcept : _h(std::move(o._h)) {}
+      atomic_append(atomic_append &&o) noexcept : _h(std::move(o._h)), _guard(std::move(o._guard)) {}
       //! Move assign
       atomic_append &operator=(atomic_append &&o) noexcept
       {
         _h = std::move(o._h);
+        _guard = std::move(o._guard);
         return *this;
       }
 
       //! Initialises a shared filing system mutex using the file at \em lockfile
       //[[bindlib::make_free]]
-      static result<atomic_append> fs_mutex_append(file_handle::path_type lockfile) noexcept {}
+      static result<atomic_append> fs_mutex_append(file_handle::path_type lockfile) noexcept
+      {
+        BOOST_OUTCOME_FILTER_ERROR(ret, file_handle::file(std::move(lockfile), file_handle::mode::write, file_handle::creation::if_needed, file_handle::caching::temporary, file_handle::flag::delete_on_close));
+        atomic_append_detail::header header;
+        // Lock the entire header for exclusive access
+        auto lockresult = ret.try_lock(0, sizeof(header), true);
+        if(lockresult.has_error())
+        {
+          if(lockresult.get_error().value() != ETIMEDOUT)
+            return lockresult.get_error();
+          // Somebody else is also using this file, so don't recreate it
+        }
+        else
+        {
+          // I am the first person to be using this (stale?) file, so write a new header and truncate
+          ret.truncate(sizeof(header));
+          memset(&header, 0, sizeof(header));
+          header.time_offset = stl11::chrono::system_clock::to_time_t(stl11::chrono::system_clock::now());
+          header.first_known_good = sizeof(header);
+          header.first_after_hole_punch = sizeof(header);
+          header.hash = utils::fast_hash::hash(((char *) &header) + 16, sizeof(header) - 16);
+          BOOST_OUTCOME_FILTER_ERROR(foo, ret.write(0, (char *) &header, sizeof(header)));
+        }
+        // Open a shared lock on first_last_user_detect to prevent other users zomping the file
+        BOOST_OUTCOME_FILTER_ERROR(guard, ret.lock(48, 8, false));
+        return atomic_append(std::move(ret), std::move(guard));
+      }
 
       //! Return the handle to file being used for this lock
       const file_handle &handle() const noexcept { return _h; }
 
     protected:
-      virtual result<void> _lock(entities_guard &out, deadline d) noexcept override final {}
+      virtual result<void> _lock(entities_guard &out, deadline d) noexcept override final
+      {
+        stl11::chrono::steady_clock::time_point began_steady;
+        stl11::chrono::system_clock::time_point end_utc;
+        if(d)
+        {
+          if((d).steady)
+            began_steady = stl11::chrono::steady_clock::now();
+          else
+            end_utc = (d).to_time_point();
+        }
+      }
+
     public:
       virtual void unlock(entities_type entities) noexcept override final {}
     };

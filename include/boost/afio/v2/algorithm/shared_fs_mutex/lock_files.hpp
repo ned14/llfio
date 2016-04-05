@@ -55,14 +55,12 @@ namespace algorithm
 
     Caveats:
     - No ability to sleep until a lock becomes free, so CPUs are spun at 100%.
-    - Sudden process exit with locks held will deadlock all other users.
+    - On POSIX sudden process exit with locks held will deadlock all other users.
     - Sudden power loss during use will deadlock first user after reboot.
 
-    Fixing the stale lock problem requires asking the operating system which
-    processes currently have the problem lock file open. This isn't hard to
-    do, but is entirely OS-specific code on each of Windows, Linux and FreeBSD.
-    Implementing this is left as an exercise for the reader (contributions of
-    such OS-specific support to this class are welcome!)
+    Fixing the stale lock problem could be quite trivial - simply byte range lock the first byte
+    in the lock file to detect when a lock file is stale. However in this situation using the
+    byte_ranges algorithm would be far superior.
     */
     class lock_files : public shared_fs_mutex
     {
@@ -132,7 +130,7 @@ namespace algorithm
               auto ret = file_handle::file(entity_paths[n], file_handle::mode::write, file_handle::creation::only_if_not_exist, file_handle::caching::temporary, file_handle::flag::delete_on_close);
               if(ret.has_error())
               {
-                auto &ec = ret.get_error();
+                const auto &ec = ret.get_error();
                 if(ec.category() != std::generic_category() || ec.value() != EAGAIN)
                   return ret.get_error();
                 // Collided with another locker
