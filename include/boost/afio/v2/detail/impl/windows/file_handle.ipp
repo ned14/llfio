@@ -36,7 +36,7 @@ BOOST_AFIO_V2_NAMESPACE_BEGIN
 
 result<file_handle> file_handle::file(file_handle::path_type _path, file_handle::mode _mode, file_handle::creation _creation, file_handle::caching _caching, file_handle::flag flags) noexcept
 {
-  BOOST_AFIO_LOG_FUNCTION_CALL;
+  BOOST_AFIO_LOG_FUNCTION_CALL(0);
   result<file_handle> ret(file_handle(std::move(_path), native_handle_type(), _caching, flags));
   native_handle_type &nativeh = ret.get()._v;
   BOOST_OUTCOME_FILTER_ERROR(access, access_mask_from_handle_mode(nativeh, _mode));
@@ -66,7 +66,7 @@ result<file_handle> file_handle::file(file_handle::path_type _path, file_handle:
 
 result<file_handle> file_handle::clone() const noexcept
 {
-  BOOST_AFIO_LOG_FUNCTION_CALL;
+  BOOST_AFIO_LOG_FUNCTION_CALL(_v.h);
   result<file_handle> ret(file_handle(_path, native_handle_type(), _caching, _flags));
   ret.value()._v.behaviour = _v.behaviour;
   if(!DuplicateHandle(GetCurrentProcess(), _v.h, GetCurrentProcess(), &ret.value()._v.h, 0, false, DUPLICATE_SAME_ACCESS))
@@ -76,7 +76,7 @@ result<file_handle> file_handle::clone() const noexcept
 
 result<file_handle::extent_type> file_handle::length() const noexcept
 {
-  BOOST_AFIO_LOG_FUNCTION_CALL;
+  BOOST_AFIO_LOG_FUNCTION_CALL(_v.h);
   FILE_END_OF_FILE_INFO feofi;
   if(!GetFileInformationByHandleEx(_v.h, FileEndOfFileInfo, &feofi, sizeof(feofi)))
     return make_errored_result<extent_type>(GetLastError());
@@ -85,7 +85,7 @@ result<file_handle::extent_type> file_handle::length() const noexcept
 
 result<file_handle::extent_type> file_handle::truncate(file_handle::extent_type newsize) noexcept
 {
-  BOOST_AFIO_LOG_FUNCTION_CALL;
+  BOOST_AFIO_LOG_FUNCTION_CALL(_v.h);
   FILE_END_OF_FILE_INFO feofi;
   feofi.EndOfFile.QuadPart = newsize;
   if(!SetFileInformationByHandle(_v.h, FileEndOfFileInfo, &feofi, sizeof(feofi)))

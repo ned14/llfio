@@ -103,7 +103,7 @@ namespace algorithm
       //[[bindlib::make_free]]
       static result<lock_files> fs_mutex_lock_files(file_handle::path_type lockdir) noexcept
       {
-        BOOST_AFIO_LOG_FUNCTION_CALL;
+        BOOST_AFIO_LOG_FUNCTION_CALL(0);
         return lock_files(std::move(lockdir));
       }
 
@@ -113,7 +113,7 @@ namespace algorithm
     protected:
       virtual result<void> _lock(entities_guard &out, deadline d, bool spin_not_sleep) noexcept override final
       {
-        BOOST_AFIO_LOG_FUNCTION_CALL;
+        BOOST_AFIO_LOG_FUNCTION_CALL(this);
         stl11::chrono::steady_clock::time_point began_steady;
         stl11::chrono::system_clock::time_point end_utc;
         if(d)
@@ -182,7 +182,7 @@ namespace algorithm
     public:
       virtual void unlock(entities_type entities, void *) noexcept override final
       {
-        BOOST_AFIO_LOG_FUNCTION_CALL;
+        BOOST_AFIO_LOG_FUNCTION_CALL(this);
         for(auto &i : _hs)
         {
           i.close();  // delete on close semantics deletes the file

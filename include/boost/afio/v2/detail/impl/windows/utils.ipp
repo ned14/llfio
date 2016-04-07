@@ -90,7 +90,7 @@ namespace utils
     using namespace windows_nt_kernel;
     if(!RtlGenRandom(buffer, (ULONG) bytes))
     {
-      BOOST_AFIO_LOG_FATAL("afio: Kernel crypto function failed");
+      BOOST_AFIO_LOG_FATAL(0, "afio: Kernel crypto function failed");
       std::terminate();
     }
   }
@@ -120,7 +120,7 @@ namespace utils
       (void) bytes;
       if(!VirtualFree(p, 0, MEM_RELEASE))
       {
-        BOOST_AFIO_LOG_FATAL("afio: Freeing large pages failed");
+        BOOST_AFIO_LOG_FATAL(p, "afio: Freeing large pages failed");
         std::terminate();
       }
     }

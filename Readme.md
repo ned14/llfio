@@ -3,11 +3,7 @@ v2 rewrite. You can view its documentation at https://ned14.github.io/boost.afio
 
 
 Todo:
-- [ ] Somehow implement make_errored_result(errcode, extended_msg). Also have win32_to_error_code
-store the original win32 error code before translation.
-  - Maybe keep a static ring buffer of additional metadata and store the atomic index you use
-in the monad? Static ring buffer could also record stack backtrace, time etc.
-  - Also enable general logging of all operations to the ring buffer.
+- [ ] Outcome's error logging needs to record current thread id ideally.
 - [ ] Move caching into native_handle_type.
 - [ ] Implement [[bindlib::make_free]] which injects member functions into the enclosing
 namespace.

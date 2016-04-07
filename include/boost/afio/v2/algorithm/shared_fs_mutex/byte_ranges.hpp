@@ -95,7 +95,7 @@ namespace algorithm
       //[[bindlib::make_free]]
       static result<byte_ranges> fs_mutex_byte_ranges(file_handle::path_type lockfile) noexcept
       {
-        BOOST_AFIO_LOG_FUNCTION_CALL;
+        BOOST_AFIO_LOG_FUNCTION_CALL(0);
         BOOST_OUTCOME_FILTER_ERROR(ret, file_handle::file(std::move(lockfile), file_handle::mode::write, file_handle::creation::if_needed, file_handle::caching::temporary, file_handle::flag::delete_on_close));
         return byte_ranges(std::move(ret));
       }
@@ -106,7 +106,7 @@ namespace algorithm
     protected:
       virtual result<void> _lock(entities_guard &out, deadline d, bool spin_not_sleep) noexcept override final
       {
-        BOOST_AFIO_LOG_FUNCTION_CALL;
+        BOOST_AFIO_LOG_FUNCTION_CALL(this);
         stl11::chrono::steady_clock::time_point began_steady;
         stl11::chrono::system_clock::time_point end_utc;
         if(d)
@@ -182,7 +182,7 @@ namespace algorithm
     public:
       virtual void unlock(entities_type entities, void *) noexcept override final
       {
-        BOOST_AFIO_LOG_FUNCTION_CALL;
+        BOOST_AFIO_LOG_FUNCTION_CALL(this);
         for(const auto &i : entities)
         {
           _h.unlock(i.value, 1);

@@ -77,7 +77,7 @@ result<async_file_handle::io_state_ptr<CompletionRoutine, BuffersType>> async_fi
           size_t idx = ol - ols;
           if(idx >= this->items)
           {
-            BOOST_AFIO_LOG_FATAL("async_file_handle::io_state::operator() called with invalid index");
+            BOOST_AFIO_LOG_FATAL(0, "async_file_handle::io_state::operator() called with invalid index");
             std::terminate();
           }
           this->result.value()[idx].second = bytes_transferred;
@@ -187,7 +187,7 @@ template <class CompletionRoutine> result<async_file_handle::io_state_ptr<Comple
 
 async_file_handle::io_result<async_file_handle::buffers_type> async_file_handle::read(async_file_handle::io_request<async_file_handle::buffers_type> reqs, deadline d) noexcept
 {
-  BOOST_AFIO_LOG_FUNCTION_CALL;
+  BOOST_AFIO_LOG_FUNCTION_CALL(_v.h);
   io_result<buffers_type> ret;
   auto _io_state(_begin_io(operation_t::read, std::move(reqs), [&ret](auto *state) { ret = std::move(state->result); }, ReadFileEx));
   BOOST_OUTCOME_FILTER_ERROR(io_state, _io_state);
@@ -212,7 +212,7 @@ async_file_handle::io_result<async_file_handle::buffers_type> async_file_handle:
 
 async_file_handle::io_result<async_file_handle::const_buffers_type> async_file_handle::write(async_file_handle::io_request<async_file_handle::const_buffers_type> reqs, deadline d) noexcept
 {
-  BOOST_AFIO_LOG_FUNCTION_CALL;
+  BOOST_AFIO_LOG_FUNCTION_CALL(_v.h);
   io_result<const_buffers_type> ret;
   auto _io_state(_begin_io(operation_t::write, std::move(reqs), [&ret](auto *state) { ret = std::move(state->result); }, WriteFileEx));
   BOOST_OUTCOME_FILTER_ERROR(io_state, _io_state);

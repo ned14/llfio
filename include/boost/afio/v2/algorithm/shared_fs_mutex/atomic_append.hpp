@@ -162,7 +162,7 @@ namespace algorithm
       //[[bindlib::make_free]]
       static result<atomic_append> fs_mutex_append(file_handle::path_type lockfile, bool nfs_compatibility = false) noexcept
       {
-        BOOST_AFIO_LOG_FUNCTION_CALL;
+        BOOST_AFIO_LOG_FUNCTION_CALL(0);
         BOOST_OUTCOME_FILTER_ERROR(ret, file_handle::file(std::move(lockfile), file_handle::mode::write, file_handle::creation::if_needed, file_handle::caching::temporary, file_handle::flag::delete_on_close));
         atomic_append_detail::header header;
         // Lock the entire header for exclusive access
@@ -197,7 +197,7 @@ namespace algorithm
     protected:
       virtual result<void> _lock(entities_guard &out, deadline d, bool spin_not_sleep) noexcept override final
       {
-        BOOST_AFIO_LOG_FUNCTION_CALL;
+        BOOST_AFIO_LOG_FUNCTION_CALL(this);
         atomic_append_detail::lock_request lock_request;
         if(out.entities.size() > sizeof(lock_request.entities) / sizeof(lock_request.entities[0]))
           return make_errored_result<void>(E2BIG);
@@ -353,10 +353,10 @@ namespace algorithm
       virtual void unlock(entities_type entities, void *hint) noexcept override final
       {
         (void) entities;
-        BOOST_AFIO_LOG_FUNCTION_CALL;
+        BOOST_AFIO_LOG_FUNCTION_CALL(this);
         if(!hint)
         {
-          BOOST_AFIO_LOG_WARN("atomic_append::unlock() currently requires a hint to work, assuming this is a failed lock.");
+          BOOST_AFIO_LOG_WARN(this, "atomic_append::unlock() currently requires a hint to work, assuming this is a failed lock.");
           return;
         }
         atomic_append_detail::lock_request record;

@@ -344,47 +344,47 @@ BOOST_AFIO_V2_NAMESPACE_END
 #endif
 
 #if BOOST_AFIO_LOGGING_LEVEL >= 1
-#define BOOST_AFIO_LOG_FATAL(message)                                                                                                                                                                                                                                                                                          \
+#define BOOST_AFIO_LOG_FATAL(inst, message)                                                                                                                                                                                                                                                                                    \
   {                                                                                                                                                                                                                                                                                                                            \
-    BOOST_AFIO_V2_NAMESPACE::log().emplace_back(ringbuffer_log::level::fatal, (message), 0, 0, (BOOST_AFIO_LOG_BACKTRACE_LEVELS & (1 << 1)) ? nullptr : __func__, __LINE__);                                                                                                                                                   \
+    BOOST_AFIO_V2_NAMESPACE::log().emplace_back(ringbuffer_log::level::fatal, (message), (unsigned) (uintptr_t)(inst), ringbuffer_log::this_thread_id(), (BOOST_AFIO_LOG_BACKTRACE_LEVELS & (1 << 1)) ? nullptr : __func__, __LINE__);                                                                                         \
     BOOST_AFIO_LOG_FATAL_TO_CERR(message);                                                                                                                                                                                                                                                                                     \
   }
 #else
-#define BOOST_AFIO_LOG_FATAL(message) BOOST_AFIO_LOG_FATAL_TO_CERR(message)
+#define BOOST_AFIO_LOG_FATAL(inst, message) BOOST_AFIO_LOG_FATAL_TO_CERR(message)
 #endif
 #if BOOST_AFIO_LOGGING_LEVEL >= 2
-#define BOOST_AFIO_LOG_ERROR(message) BOOST_AFIO_V2_NAMESPACE::log().emplace_back(ringbuffer_log::level::error, (message), 0, 0, (BOOST_AFIO_LOG_BACKTRACE_LEVELS & (1 << 2)) ? nullptr : __func__, __LINE__)
+#define BOOST_AFIO_LOG_ERROR(inst, message) BOOST_AFIO_V2_NAMESPACE::log().emplace_back(ringbuffer_log::level::error, (message), (unsigned) (uintptr_t)(inst), ringbuffer_log::this_thread_id(), (BOOST_AFIO_LOG_BACKTRACE_LEVELS & (1 << 2)) ? nullptr : __func__, __LINE__)
 // Intercept when Outcome creates an error_code_extended and log it to our log too
 #define BOOST_OUTCOME_ERROR_CODE_EXTENDED_CREATION_HOOK                                                                                                                                                                                                                                                                        \
   if(*this)                                                                                                                                                                                                                                                                                                                    \
   BOOST_AFIO_V2_NAMESPACE::log().emplace_back(ringbuffer_log::level::error, this->message().c_str(), this->value(), (unsigned) this->_unique_id, (BOOST_AFIO_LOG_BACKTRACE_LEVELS & (1 << 2)) ? nullptr : __func__, __LINE__)
 #else
-#define BOOST_AFIO_LOG_ERROR(message)
+#define BOOST_AFIO_LOG_ERROR(inst, message)
 #endif
 #if BOOST_AFIO_LOGGING_LEVEL >= 3
-#define BOOST_AFIO_LOG_WARN(message) BOOST_AFIO_V2_NAMESPACE::log().emplace_back(ringbuffer_log::level::warn, (message), 0, 0, (BOOST_AFIO_LOG_BACKTRACE_LEVELS & (1 << 3)) ? nullptr : __func__, __LINE__)
+#define BOOST_AFIO_LOG_WARN(inst, message) BOOST_AFIO_V2_NAMESPACE::log().emplace_back(ringbuffer_log::level::warn, (message), (unsigned) (uintptr_t)(inst), ringbuffer_log::this_thread_id(), (BOOST_AFIO_LOG_BACKTRACE_LEVELS & (1 << 3)) ? nullptr : __func__, __LINE__)
 #else
-#define BOOST_AFIO_LOG_WARN(message)
+#define BOOST_AFIO_LOG_WARN(inst, message)
 #endif
 #if BOOST_AFIO_LOGGING_LEVEL >= 4
-#define BOOST_AFIO_LOG_INFO(message) BOOST_AFIO_V2_NAMESPACE::log().emplace_back(ringbuffer_log::level::info, (message), 0, 0, (BOOST_AFIO_LOG_BACKTRACE_LEVELS & (1 << 4)) ? nullptr : __func__, __LINE__)
+#define BOOST_AFIO_LOG_INFO(inst, message) BOOST_AFIO_V2_NAMESPACE::log().emplace_back(ringbuffer_log::level::info, (message), (unsigned) (uintptr_t)(inst), ringbuffer_log::this_thread_id(), (BOOST_AFIO_LOG_BACKTRACE_LEVELS & (1 << 4)) ? nullptr : __func__, __LINE__)
 #else
-#define BOOST_AFIO_LOG_INFO(message)
+#define BOOST_AFIO_LOG_INFO(inst, message)
 #endif
 #if BOOST_AFIO_LOGGING_LEVEL >= 5
-#define BOOST_AFIO_LOG_DEBUG(message) BOOST_AFIO_V2_NAMESPACE::log().emplace_back(ringbuffer_log::level::debug, (message), 0, 0, (BOOST_AFIO_LOG_BACKTRACE_LEVELS & (1 << 5)) ? nullptr : __func__, __LINE__)
+#define BOOST_AFIO_LOG_DEBUG(inst, message) BOOST_AFIO_V2_NAMESPACE::log().emplace_back(ringbuffer_log::level::debug, (message), (unsigned) (uintptr_t)(inst), ringbuffer_log::this_thread_id(), (BOOST_AFIO_LOG_BACKTRACE_LEVELS & (1 << 5)) ? nullptr : __func__, __LINE__)
 #else
-#define BOOST_AFIO_LOG_DEBUG(message)
+#define BOOST_AFIO_LOG_DEBUG(inst, message)
 #endif
 #if BOOST_AFIO_LOGGING_LEVEL >= 6
-#define BOOST_AFIO_LOG_ALL(message) BOOST_AFIO_V2_NAMESPACE::log().emplace_back(ringbuffer_log::level::all, (message), 0, 0, (BOOST_AFIO_LOG_BACKTRACE_LEVELS & (1 << 6)) ? nullptr : __func__, __LINE__)
+#define BOOST_AFIO_LOG_ALL(inst, message) BOOST_AFIO_V2_NAMESPACE::log().emplace_back(ringbuffer_log::level::all, (message), (unsigned) (uintptr_t)(inst), ringbuffer_log::this_thread_id(), (BOOST_AFIO_LOG_BACKTRACE_LEVELS & (1 << 6)) ? nullptr : __func__, __LINE__)
 #else
-#define BOOST_AFIO_LOG_ALL(message)
+#define BOOST_AFIO_LOG_ALL(inst, message)
 #endif
 #ifdef _MSC_VER
-#define BOOST_AFIO_LOG_FUNCTION_CALL BOOST_AFIO_LOG_INFO(__FUNCSIG__)
+#define BOOST_AFIO_LOG_FUNCTION_CALL(inst) BOOST_AFIO_LOG_INFO(inst, __FUNCSIG__)
 #else
-#define BOOST_AFIO_LOG_FUNCTION_CALL BOOST_AFIO_LOG_INFO(__PRETTY_FUNCTION__)
+#define BOOST_AFIO_LOG_FUNCTION_CALL(inst) BOOST_AFIO_LOG_INFO(inst, __PRETTY_FUNCTION__)
 #endif
 
 #include "boost/afio/outcome/include/boost/outcome.hpp"
