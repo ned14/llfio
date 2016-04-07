@@ -615,13 +615,28 @@ This lets one pack one byte of input into two bytes of output.
 #endif
 #endif
     //! Default constructor, no bits set
-    uint128() {}
+    uint128() noexcept {}
     //! All bits zero constructor
-    constexpr uint128(std::nullptr_t)
-        : as_longlongs{0, 0}
+    constexpr uint128(std::nullptr_t) noexcept : as_longlongs{0, 0} {}
+  private:
+    static const uint128 &_allbitszero()
     {
+      static uint128 v(nullptr);
+      return v;
     }
+
+  public:
+    explicit operator bool() const noexcept { return (*this) == _allbitszero(); }
+    bool operator!() const noexcept { return (*this) != _allbitszero(); }
+    bool operator==(const uint128 &o) const noexcept { return as_longlongs[1] == o.as_longlongs[1] && as_longlongs[0] == o.as_longlongs[0]; }
+    bool operator!=(const uint128 &o) const noexcept { return as_longlongs[1] != o.as_longlongs[1] || as_longlongs[0] != o.as_longlongs[0]; }
+    bool operator<(const uint128 &o) const noexcept { return as_longlongs[0] < o.as_longlongs[0] || (as_longlongs[0] == o.as_longlongs[0] && as_longlongs[1] < o.as_longlongs[1]); }
+    bool operator<=(const uint128 &o) const noexcept { return as_longlongs[0] < o.as_longlongs[0] || (as_longlongs[0] == o.as_longlongs[0] && as_longlongs[1] <= o.as_longlongs[1]); }
+    bool operator>(const uint128 &o) const noexcept { return as_longlongs[0] > o.as_longlongs[0] || (as_longlongs[0] == o.as_longlongs[0] && as_longlongs[1] > o.as_longlongs[1]); }
+    bool operator>=(const uint128 &o) const noexcept { return as_longlongs[0] > o.as_longlongs[0] || (as_longlongs[0] == o.as_longlongs[0] && as_longlongs[1] >= o.as_longlongs[1]); }
   };
+  static_assert(sizeof(uint128) == 16, "uint128 is not 16 bytes long!");
+  static_assert(alignof(uint128) == 16, "uint128 is not aligned to 16 byte multiples!");
 
   /*! \class fast_hash
   \brief Fast very collision resistant uint128 hash. Currently SpookyHash @ 0.3 cycles/byte.
@@ -675,8 +690,8 @@ This lets one pack one byte of input into two bytes of output.
     //! Single shot hash of a sequence of bytes
     static uint128 hash(const char *data, size_t bytes, uint128 seed = uint128(nullptr)) noexcept;
 
-    //! Single shot hash of a string
-    template <typename T> static uint128 hash(const std::basic_string<T> &str) noexcept { return hash((char *) str.data(), str.size() * sizeof(T)); }
+    //! Single shot hash of a span
+    template <typename T> static uint128 hash(const span<T> &str) noexcept { return hash((char *) str.data(), str.size() * sizeof(T)); }
   };
 }
 

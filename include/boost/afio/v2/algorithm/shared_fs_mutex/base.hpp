@@ -125,16 +125,19 @@ namespace algorithm
       public:
         shared_fs_mutex *parent;
         entities_type entities;
+        void *hint;
         entities_guard() = default;
         entities_guard(shared_fs_mutex *_parent, entities_type _entities)
             : parent(_parent)
             , entities(_entities)
+            , hint(nullptr)
         {
         }
         entities_guard(shared_fs_mutex *_parent, entity_type entity)
             : _entity(entity)
             , parent(_parent)
             , entities(&_entity, 1)
+            , hint(nullptr)
         {
         }
         ~entities_guard()
@@ -153,7 +156,7 @@ namespace algorithm
         void unlock() noexcept
         {
           if(parent)
-            parent->unlock(entities);
+            parent->unlock(entities, hint);
         }
         //! Detach this RAII unlocker from the locked state
         void release() noexcept
@@ -164,21 +167,21 @@ namespace algorithm
       };
 
     protected:
-      virtual result<void> _lock(entities_guard &out, deadline d) noexcept = 0;
+      virtual result<void> _lock(entities_guard &out, deadline d, bool spin_not_sleep) noexcept = 0;
 
     public:
       //! Lock all of a sequence of entities for exclusive or shared access
-      result<entities_guard> lock(entities_type entities, deadline d = deadline()) noexcept
+      result<entities_guard> lock(entities_type entities, deadline d = deadline(), bool spin_not_sleep = false) noexcept
       {
         entities_guard ret(this, std::move(entities));
-        BOOST_OUTCOME_PROPAGATE_ERROR(_lock(ret, std::move(d)));
+        BOOST_OUTCOME_PROPAGATE_ERROR(_lock(ret, std::move(d), spin_not_sleep));
         return ret;
       }
       //! Lock a single entity for exclusive or shared access
-      result<entities_guard> lock(entity_type entity) noexcept
+      result<entities_guard> lock(entity_type entity, deadline d = deadline(), bool spin_not_sleep = false) noexcept
       {
         entities_guard ret(this, entity);
-        return lock(ret.entities);
+        return lock(ret.entities, std::move(d), spin_not_sleep);
       }
       //! Try to lock all of a sequence of entities for exclusive or shared access
       result<entities_guard> try_lock(entities_type entities) noexcept { return lock(std::move(entities), deadline(std::chrono::seconds(0))); }
@@ -189,7 +192,7 @@ namespace algorithm
         return try_lock(ret.entities);
       }
       //! Unlock a previously locked sequence of entities
-      virtual void unlock(entities_type entities) noexcept = 0;
+      virtual void unlock(entities_type entities, void *hint = nullptr) noexcept = 0;
     };
 
   }  // namespace

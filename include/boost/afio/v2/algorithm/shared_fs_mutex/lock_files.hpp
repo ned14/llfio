@@ -45,22 +45,31 @@ namespace algorithm
     \brief Many entity exclusive compatibility file system based lock
 
     This is a very simple many entity shared mutex likely to work almost anywhere without surprises.
-    It works by trying to exclusively create a file called after the entity's name. If it fails to
-    exclusively create any file, it backs out all preceding locks, randomises the order
+    It works by trying to exclusively create a file called the hex of the entity id. If it fails to
+    exclusively create any file, it deletes all previously created files, randomises the order
     and tries locking them again until success. The only real reason to use this implementation
-    is its excellent compatibility with almost everything.
+    is its excellent compatibility with almost everything, most users will want byte_ranges instead.
 
-    - Compatible with networked file systems.
+    - Compatible with all networked file systems.
     - Exponential complexity to number of entities being concurrently locked.
 
     Caveats:
     - No ability to sleep until a lock becomes free, so CPUs are spun at 100%.
-    - On POSIX sudden process exit with locks held will deadlock all other users.
-    - Sudden power loss during use will deadlock first user after reboot.
+    - On POSIX sudden process exit with locks held will deadlock all other users by leaving stale
+    files around.
+    - Costs a file descriptor per entity locked.
+    - Sudden power loss during use will deadlock first user after reboot, again due to stale files.
+    - Currently this implementation does not permit more than one lock() per instance as the lock
+    information is stored as member data. Creating multiple instances referring to the same path
+    works fine. This could be fixed easily, but it would require a memory allocation per lock and
+    user demand that this is actually a problem in practice.
+    - Leaves many 16 character long hexadecimal named files in the supplied directory which may
+    confuse users. Tip: create a hidden lockfile directory.
 
-    Fixing the stale lock problem could be quite trivial - simply byte range lock the first byte
+    Fixing the stale lock file problem could be quite trivial - simply byte range lock the first byte
     in the lock file to detect when a lock file is stale. However in this situation using the
-    byte_ranges algorithm would be far superior.
+    byte_ranges algorithm would be far superior, so implementing stale lock file clean up is left up
+    to the user.
     */
     class lock_files : public shared_fs_mutex
     {
@@ -92,14 +101,19 @@ namespace algorithm
 
       //! Initialises a shared filing system mutex using the directory at \em lockdir
       //[[bindlib::make_free]]
-      static result<lock_files> fs_mutex_lock_files(file_handle::path_type lockdir) noexcept { return lock_files(std::move(lockdir)); }
+      static result<lock_files> fs_mutex_lock_files(file_handle::path_type lockdir) noexcept
+      {
+        BOOST_AFIO_LOG_FUNCTION_CALL;
+        return lock_files(std::move(lockdir));
+      }
 
       //! Return the path to the directory being used for this lock
       const file_handle::path_type &path() const noexcept { return _path; }
 
     protected:
-      virtual result<void> _lock(entities_guard &out, deadline d) noexcept override final
+      virtual result<void> _lock(entities_guard &out, deadline d, bool spin_not_sleep) noexcept override final
       {
+        BOOST_AFIO_LOG_FUNCTION_CALL;
         stl11::chrono::steady_clock::time_point began_steady;
         stl11::chrono::system_clock::time_point end_utc;
         if(d)
@@ -110,6 +124,7 @@ namespace algorithm
             end_utc = (d).to_time_point();
         }
         size_t n;
+        // Create a set of paths to files to exclusively create
         std::vector<fixme_path> entity_paths(out.entities.size());
         for(n = 0; n < out.entities.size(); n++)
         {
@@ -139,30 +154,35 @@ namespace algorithm
               _hs[n] = std::move(ret.get());
             }
           }
-          if(d)
+          if(n != out.entities.size())
           {
-            if((d).steady)
+            if(d)
             {
-              if(stl11::chrono::steady_clock::now() >= (began_steady + stl11::chrono::nanoseconds((d).nsecs)))
-                return make_errored_result<void>(ETIMEDOUT);
+              if((d).steady)
+              {
+                if(stl11::chrono::steady_clock::now() >= (began_steady + stl11::chrono::nanoseconds((d).nsecs)))
+                  return make_errored_result<void>(ETIMEDOUT);
+              }
+              else
+              {
+                if(stl11::chrono::system_clock::now() >= end_utc)
+                  return make_errored_result<void>(ETIMEDOUT);
+              }
             }
-            else
-            {
-              if(stl11::chrono::system_clock::now() >= end_utc)
-                return make_errored_result<void>(ETIMEDOUT);
-            }
+            // Randomise out.entities
+            std::random_shuffle(out.entities.begin(), out.entities.end());
+            // Sleep for a very short time
+            if(!spin_not_sleep)
+              std::this_thread::yield();
           }
-          // Randomise out.entities
-          std::random_shuffle(out.entities.begin(), out.entities.end());
-          // Sleep for a very short time
-          std::this_thread::yield();
         } while(n < out.entities.size());
         return make_result<void>();
       }
 
     public:
-      virtual void unlock(entities_type entities) noexcept override final
+      virtual void unlock(entities_type entities, void *) noexcept override final
       {
+        BOOST_AFIO_LOG_FUNCTION_CALL;
         for(auto &i : _hs)
         {
           i.close();  // delete on close semantics deletes the file

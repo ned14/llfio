@@ -368,13 +368,6 @@ public:
     io_handle *_h;
     extent_type _offset, _length;
     bool _exclusive;
-    constexpr extent_guard()
-        : _h(nullptr)
-        , _offset(0)
-        , _length(0)
-        , _exclusive(false)
-    {
-    }
     constexpr extent_guard(io_handle *h, extent_type offset, extent_type length, bool exclusive)
         : _h(h)
         , _offset(offset)
@@ -386,6 +379,14 @@ public:
     extent_guard &operator=(const extent_guard &) = delete;
 
   public:
+    //! Default constructor
+    constexpr extent_guard()
+        : _h(nullptr)
+        , _offset(0)
+        , _length(0)
+        , _exclusive(false)
+    {
+    }
     //! Move constructor
     extent_guard(extent_guard &&o) noexcept : _h(o._h), _offset(o._offset), _length(o._length), _exclusive(o._exclusive) { o.release(); }
     //! Move assign

@@ -51,15 +51,19 @@ namespace algorithm
 
     - Compatible with networked file systems, though be cautious with older NFS.
     - Exponential complexity to number of entities being concurrently locked, though some OSs
-    provide linear complexity so long as total concurrent waiters is one.
-    - Optionally can sleep until a lock becomes free in a power-efficient manner.
+    provide linear complexity so long as total concurrent waiting processes is one.
     - Sudden process exit with lock held is recovered from.
     - Sudden power loss during use is recovered from.
+    - Safe for multithreaded usage of the same instance.
 
     Caveats:
+    - When entities being locked is more than one, no ability to sleep until a lock becomes
+    free, so CPUs are spun at 100%.
     - Byte range locks need to work properly on your system. Misconfiguring NFS or Samba
     to cause byte range locks to not work right will produce bad outcomes.
-    - Multithreaded usage on the same lock file doesn't work on many POSIXs.
+    - If your OS doesn't have sane byte range locks (OS X, BSD, older Linuxes) and multiple
+    objects in your process use the same lock file, misoperation will occur. Use lock_files
+    or share a single instance of this class per lock file in this case.
     */
     class byte_ranges : public shared_fs_mutex
     {
@@ -91,6 +95,7 @@ namespace algorithm
       //[[bindlib::make_free]]
       static result<byte_ranges> fs_mutex_byte_ranges(file_handle::path_type lockfile) noexcept
       {
+        BOOST_AFIO_LOG_FUNCTION_CALL;
         BOOST_OUTCOME_FILTER_ERROR(ret, file_handle::file(std::move(lockfile), file_handle::mode::write, file_handle::creation::if_needed, file_handle::caching::temporary, file_handle::flag::delete_on_close));
         return byte_ranges(std::move(ret));
       }
@@ -99,8 +104,9 @@ namespace algorithm
       const file_handle &handle() const noexcept { return _h; }
 
     protected:
-      virtual result<void> _lock(entities_guard &out, deadline d) noexcept override final
+      virtual result<void> _lock(entities_guard &out, deadline d, bool spin_not_sleep) noexcept override final
       {
+        BOOST_AFIO_LOG_FUNCTION_CALL;
         stl11::chrono::steady_clock::time_point began_steady;
         stl11::chrono::system_clock::time_point end_utc;
         if(d)
@@ -122,20 +128,27 @@ namespace algorithm
             });
             for(n = 0; n < out.entities.size(); n++)
             {
-              if(d)
+              deadline nd;
+              // Only for very first entity will we sleep until its lock becomes available
+              if(n)
+                nd = deadline(stl11::chrono::seconds(0));
+              else
               {
-                if((d).steady)
+                nd = deadline();
+                if(d)
                 {
-                  if(stl11::chrono::steady_clock::now() >= (began_steady + stl11::chrono::nanoseconds((d).nsecs)))
-                    return make_errored_result<void>(ETIMEDOUT);
-                }
-                else
-                {
-                  if(stl11::chrono::system_clock::now() >= end_utc)
-                    return make_errored_result<void>(ETIMEDOUT);
+                  if((d).steady)
+                  {
+                    stl11::chrono::nanoseconds ns = stl11::chrono::duration_cast<stl11::chrono::nanoseconds>((began_steady + stl11::chrono::nanoseconds((d).nsecs)) - stl11::chrono::steady_clock::now());
+                    if(ns.count() < 0)
+                      (nd).nsecs = 0;
+                    else
+                      (nd).nsecs = ns.count();
+                  }
+                  else
+                    (nd) = (d);
                 }
               }
-              deadline nd(std::chrono::seconds(0));
               BOOST_OUTCOME_FILTER_ERROR(guard, _h.lock(out.entities[n].value, 1, out.entities[n].exclusive, nd));
               if(!guard)
                 goto failed;
@@ -146,15 +159,30 @@ namespace algorithm
         failed:
           // Randomise out.entities
           std::random_shuffle(out.entities.begin(), out.entities.end());
-          // Sleep for a very short time
-          std::this_thread::yield();
+          // Sleep for a while
+          if(!spin_not_sleep)
+            std::this_thread::yield();
+          if(d)
+          {
+            if((d).steady)
+            {
+              if(stl11::chrono::steady_clock::now() >= (began_steady + stl11::chrono::nanoseconds((d).nsecs)))
+                return make_errored_result<void>(ETIMEDOUT);
+            }
+            else
+            {
+              if(stl11::chrono::system_clock::now() >= end_utc)
+                return make_errored_result<void>(ETIMEDOUT);
+            }
+          }
         } while(n < out.entities.size());
         return make_result<void>();
       }
 
     public:
-      virtual void unlock(entities_type entities) noexcept override final
+      virtual void unlock(entities_type entities, void *) noexcept override final
       {
+        BOOST_AFIO_LOG_FUNCTION_CALL;
         for(const auto &i : entities)
         {
           _h.unlock(i.value, 1);

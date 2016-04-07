@@ -50,10 +50,10 @@ namespace algorithm
       {
         uint128 hash;                   // Hash of remaining 112 bytes
         uint64 _zero;                   // Zero
-        uint64 time_offset;             // time_t in microseconds at time of creation. Used to offset us_count below.
+        uint64 time_offset;             // time_t in seconds at time of creation. Used to offset us_count below.
         uint64 first_known_good;        // offset to first known good lock_request
         uint64 first_after_hole_punch;  // offset to first byte after last hole punch
-        uint64 first_last_user_detect;  // Byte range locked to detect first and last user of the lock file
+        uint64 first_last_user_detect;  // Byte range locked to detect first and last user of the lock file (+48 offset)
         uint64 _padding[9];
       };
       static_assert(sizeof(header) == 128, "header structure is not 128 bytes long!");
@@ -77,16 +77,17 @@ namespace algorithm
     drop off in performance as the number of items being concurrently locked rises. This file system
     algorithm solves this problem using IPC via a shared append-only lock file.
 
-    - Compatible with networked file systems (NFS too if the special nfs_compatibility flag is true).
+    - Compatible with networked file systems (NFS too if the special nfs_compatibility flag is true.
+    Note turning this on is not free of cost if you don't need NFS compatibility).
     - Invariant complexity to number of entities being locked.
     - Linear complexity to number of processes concurrently using the lock (i.e. number of waiters).
-    - Very fast skip code path for when there is a just a single user.
     - Optionally can sleep until a lock becomes free in a power-efficient manner.
-    - Sudden process exit with lock held causes a stall of a second or so to the other users, but
-    is recovered correctly.
     - Sudden power loss during use is recovered from.
+    - Safe for multithreaded usage of the same instance.
 
     Caveats:
+    - Much slower than lock_files or byte_ranges for uncontended usage or small number of entities.
+    - Sudden process exit with locks held will deadlock all other users.
     - Maximum of twelve entities may be locked concurrently.
     - Wasteful of disk space if used on a non-extents based filing system (e.g. FAT32, ext3).
     It is best used in `/tmp` if possible. If you really must use a non-extents based filing
@@ -95,26 +96,48 @@ namespace algorithm
     - Similarly older operating systems (e.g. Linux < 3.0) do not implement extent hole punching
     and therefore will also see excessive disk space consumption. Note at the time of writing
     OS X doesn't implement hole punching at all.
-    - Byte range locks need to work properly on your system. Misconfiguring NFS or Samba
-    to cause byte range locks to not work right will produce bad outcomes.
     - If your OS doesn't have sane byte range locks (OS X, BSD, older Linuxes) and multiple
-    threads in your process use the same lock file, bad things will happen due to the lack
-    of sanity in POSIX byte range locks. This may get fixed with a process-local byte range
-    lock implementation if there is demand, otherwise simply don't use the same lock file
-    from more than one thread on such systems.
+    objects in your process use the same lock file, misoperation will occur. Use lock_files
+    or share a single instance of this class per lock file in this case.
+
+    \todo Implement hole punching once I port that code from AFIO v1.
+    \todo Decide on some resolution mechanism for sudden process exit.
     */
     class atomic_append : public shared_fs_mutex
     {
       file_handle _h;
-      file_handle::extent_guard _guard;
+      file_handle::extent_guard _guard;      // tags file so other users know they are not alone
+      bool _nfs_compatibility;               // Do additional locking to work around NFS's lack of atomic append
+      uint64 _unique_id;                     // My (very random) unique id
+      atomic_append_detail::header _header;  // Header as of the last time I read it
 
-      atomic_append(file_handle &&h, file_handle::extent_guard &&guard)
+      atomic_append(file_handle &&h, file_handle::extent_guard &&guard, bool nfs_compatibility)
           : _h(std::move(h))
           , _guard(std::move(guard))
+          , _nfs_compatibility(nfs_compatibility)
+          , _unique_id(0)
       {
+        utils::random_fill((char *) &_unique_id, sizeof(_unique_id));  // crypto strong random
+        (void) _read_header();
       }
       atomic_append(const atomic_append &) = delete;
       atomic_append &operator=(const atomic_append &) = delete;
+
+      result<void> _read_header()
+      {
+        bool first = true;
+        do
+        {
+          BOOST_OUTCOME_FILTER_ERROR(_, _h.read(0, (char *) &_header, sizeof(_header)));
+          (void) _;
+          if(first)
+            first = false;
+          else
+            stl11::this_thread::yield();
+          // No timeout as this should very rarely block for any significant length of time
+        } while(_header.hash != utils::fast_hash::hash(((char *) &_header) + 16, sizeof(_header) - 16));
+        return make_result<void>();
+      }
 
     public:
       //! The type of an entity id
@@ -123,19 +146,23 @@ namespace algorithm
       using entities_type = shared_fs_mutex::entities_type;
 
       //! Move constructor
-      atomic_append(atomic_append &&o) noexcept : _h(std::move(o._h)), _guard(std::move(o._guard)) {}
+      atomic_append(atomic_append &&o) noexcept : _h(std::move(o._h)), _guard(std::move(o._guard)), _nfs_compatibility(o._nfs_compatibility), _unique_id(o._unique_id), _header(o._header) {}
       //! Move assign
       atomic_append &operator=(atomic_append &&o) noexcept
       {
         _h = std::move(o._h);
         _guard = std::move(o._guard);
+        _nfs_compatibility = std::move(o._nfs_compatibility);
+        _unique_id = std::move(o._unique_id);
+        _header = std::move(o._header);
         return *this;
       }
 
       //! Initialises a shared filing system mutex using the file at \em lockfile
       //[[bindlib::make_free]]
-      static result<atomic_append> fs_mutex_append(file_handle::path_type lockfile) noexcept
+      static result<atomic_append> fs_mutex_append(file_handle::path_type lockfile, bool nfs_compatibility = false) noexcept
       {
+        BOOST_AFIO_LOG_FUNCTION_CALL;
         BOOST_OUTCOME_FILTER_ERROR(ret, file_handle::file(std::move(lockfile), file_handle::mode::write, file_handle::creation::if_needed, file_handle::caching::temporary, file_handle::flag::delete_on_close));
         atomic_append_detail::header header;
         // Lock the entire header for exclusive access
@@ -144,7 +171,7 @@ namespace algorithm
         {
           if(lockresult.get_error().value() != ETIMEDOUT)
             return lockresult.get_error();
-          // Somebody else is also using this file, so don't recreate it
+          // Somebody else is also using this file
         }
         else
         {
@@ -155,19 +182,26 @@ namespace algorithm
           header.first_known_good = sizeof(header);
           header.first_after_hole_punch = sizeof(header);
           header.hash = utils::fast_hash::hash(((char *) &header) + 16, sizeof(header) - 16);
-          BOOST_OUTCOME_FILTER_ERROR(foo, ret.write(0, (char *) &header, sizeof(header)));
+          BOOST_OUTCOME_FILTER_ERROR(_, ret.write(0, (char *) &header, sizeof(header)));
+          (void) _;
         }
         // Open a shared lock on first_last_user_detect to prevent other users zomping the file
         BOOST_OUTCOME_FILTER_ERROR(guard, ret.lock(48, 8, false));
-        return atomic_append(std::move(ret), std::move(guard));
+        // The constructor will read and cache the header
+        return atomic_append(std::move(ret), std::move(guard), nfs_compatibility);
       }
 
       //! Return the handle to file being used for this lock
       const file_handle &handle() const noexcept { return _h; }
 
     protected:
-      virtual result<void> _lock(entities_guard &out, deadline d) noexcept override final
+      virtual result<void> _lock(entities_guard &out, deadline d, bool spin_not_sleep) noexcept override final
       {
+        BOOST_AFIO_LOG_FUNCTION_CALL;
+        atomic_append_detail::lock_request lock_request;
+        if(out.entities.size() > sizeof(lock_request.entities) / sizeof(lock_request.entities[0]))
+          return make_errored_result<void>(E2BIG);
+
         stl11::chrono::steady_clock::time_point began_steady;
         stl11::chrono::system_clock::time_point end_utc;
         if(d)
@@ -177,10 +211,202 @@ namespace algorithm
           else
             end_utc = (d).to_time_point();
         }
+
+        // Write my lock request immediately
+        memset(&lock_request, 0, sizeof(lock_request));
+        lock_request.unique_id = _unique_id;
+        auto count = stl11::chrono::system_clock::now() - stl11::chrono::system_clock::from_time_t(_header.time_offset);
+        lock_request.us_count = stl11::chrono::duration_cast<stl11::chrono::microseconds>(count).count();
+        lock_request.items = out.entities.size();
+        for(size_t n = 0; n < out.entities.size(); n++)
+          lock_request.entities[n] = out.entities[n];
+        lock_request.hash = utils::fast_hash::hash(((char *) &lock_request) + 16, sizeof(lock_request) - 16);
+        BOOST_OUTCOME_FILTER_ERROR(my_lock_request_offset, _h.length());
+        {
+          _h.set_append_only(true);
+          auto undo = detail::Undoer([this] { _h.set_append_only(false); });
+          file_handle::extent_guard append_guard;
+          if(_nfs_compatibility)
+          {
+            file_handle::extent_type lastbyte = (file_handle::extent_type) -1;
+            // Lock up to the beginning of the shadow lock space
+            lastbyte &= ~(1ULL << 63);
+            BOOST_OUTCOME_FILTER_ERROR(append_guard_, _h.lock(my_lock_request_offset, lastbyte, true));
+            append_guard = std::move(append_guard_);
+          }
+          BOOST_OUTCOME_FILTER_ERROR(_, _h.write(0, (char *) &lock_request, sizeof(lock_request)));
+          (void) _;
+        }
+
+        // Find the record I just wrote
+        atomic_append_detail::lock_request record;
+        do
+        {
+          file_handle::io_result<file_handle::buffer_type> readoutcome = _h.read(my_lock_request_offset, (char *) &record, sizeof(record));
+          if(readoutcome.has_error() || readoutcome.get().second == 0)
+            continue;
+          if(record.hash != lock_request.hash)
+            my_lock_request_offset += sizeof(record);
+        } while(record.hash != lock_request.hash);
+
+        // extent_guard is now valid and will be unlocked on error
+        out.hint = (void *) my_lock_request_offset;
+
+        // Lock my record for writing so others can sleep on me
+        file_handle::extent_guard my_request_guard;
+        if(!spin_not_sleep)
+        {
+          auto lock_offset = my_lock_request_offset;
+          // Set the top bit to use the shadow lock space on Windows
+          lock_offset |= (1ULL << 63);
+          BOOST_OUTCOME_FILTER_ERROR(my_request_guard_, _h.lock(lock_offset, sizeof(lock_request), true));
+          my_request_guard = std::move(my_request_guard_);
+        }
+
+        // Read every record preceding mine until header.first_known_good
+        // TODO FIXME If distance between header.first_known_good and my_lock_request_offset
+        // is sufficient a memory map might be an idea. Would need to benchmark first.
+        auto record_offset = my_lock_request_offset - sizeof(record);
+        for(; _read_header(), record_offset >= _header.first_known_good; record_offset -= sizeof(record))
+        {
+          for(;;)
+          {
+            // Get a valid record
+            do
+            {
+              BOOST_OUTCOME_FILTER_ERROR(_, _h.read(record_offset, (char *) &record, sizeof(record)));
+              (void) _;
+              if(!record.hash && !record.unique_id)
+                break;
+              if(d)
+              {
+                if((d).steady)
+                {
+                  if(stl11::chrono::steady_clock::now() >= (began_steady + stl11::chrono::nanoseconds((d).nsecs)))
+                    return make_errored_result<void>(ETIMEDOUT);
+                }
+                else
+                {
+                  if(stl11::chrono::system_clock::now() >= end_utc)
+                    return make_errored_result<void>(ETIMEDOUT);
+                }
+              }
+            } while(record.hash != utils::fast_hash::hash(((char *) &record) + 16, sizeof(record) - 16));
+            if(!record.hash && !record.unique_id)
+              break;  // next record
+
+            // Does this record lock anything I am locking?
+            bool locks_one_of_mine = false;
+            for(const auto &entity : out.entities)
+            {
+              for(size_t n = 0; n < record.items; n++)
+              {
+                if(record.entities[n].value == entity.value)
+                {
+                  // Is the lock I want shared and the lock he wants shared?
+                  // If so, not one of mine
+                  if(record.entities[n].exclusive || entity.exclusive)
+                  {
+                    locks_one_of_mine = true;
+                    break;
+                  }
+                }
+              }
+              if(locks_one_of_mine)
+                break;
+            }
+            if(!locks_one_of_mine)
+              break;  // next record
+
+            // Sleep until this record is freed
+            file_handle::extent_guard record_guard;
+            if(spin_not_sleep)
+              stl11::this_thread::yield();
+            else
+            {
+              deadline nd;
+              if(d)
+              {
+                if((d).steady)
+                {
+                  stl11::chrono::nanoseconds ns = stl11::chrono::duration_cast<stl11::chrono::nanoseconds>((began_steady + stl11::chrono::nanoseconds((d).nsecs)) - stl11::chrono::steady_clock::now());
+                  if(ns.count() < 0)
+                    (nd).nsecs = 0;
+                  else
+                    (nd).nsecs = ns.count();
+                }
+                else
+                  (nd) = (d);
+              }
+              auto lock_offset = record_offset;
+              // Set the top bit to use the shadow lock space on Windows
+              lock_offset |= (1ULL << 63);
+              BOOST_OUTCOME_FILTER_ERROR(record_guard_, _h.lock(lock_offset, sizeof(record), false, nd));
+              record_guard = std::move(record_guard_);
+            }
+          }
+        }
+        return make_result<void>();
       }
 
     public:
-      virtual void unlock(entities_type entities) noexcept override final {}
+      virtual void unlock(entities_type entities, void *hint) noexcept override final
+      {
+        (void) entities;
+        BOOST_AFIO_LOG_FUNCTION_CALL;
+        if(!hint)
+        {
+          BOOST_AFIO_LOG_WARN("atomic_append::unlock() currently requires a hint to work, assuming this is a failed lock.");
+          return;
+        }
+        atomic_append_detail::lock_request record;
+        memset(&record, 0, sizeof(record));
+        file_handle::extent_type my_lock_request_offset = (file_handle::extent_type) hint;
+        (void) _h.write(my_lock_request_offset, (char *) &record, sizeof(record));
+        if(!(my_lock_request_offset & 4095))
+        {
+          _read_header();
+          // Forward scan records until first locked or non-zero record is found
+          // and update header with new info
+          char buffer[4096];
+          for(;;)
+          {
+#if 0  // disabled as we are using the shadow lock space on Windows
+            auto locksection = _h.try_lock(_header.first_known_good, sizeof(buffer), true);
+            if(locksection.has_error())
+              break;
+            else
+#endif
+            {
+              auto bytesread_ = _h.read(_header.first_known_good, buffer, sizeof(buffer));
+              if(!bytesread_.has_error())
+              {
+                char *bufferp = buffer;
+                for(;;)
+                {
+                  if(!memcmp(&record, bufferp, sizeof(record)))
+                  {
+                    bufferp += sizeof(record);
+                    _header.first_known_good += sizeof(record);
+                  }
+                  else
+                    break;
+                }
+              }
+              else
+                break;
+            }
+          }
+          if(!(my_lock_request_offset & (1024 * 1024 - 1)))
+          {
+            // TODO FIXME Hole punch if my_lock_request_offset is on a 1Mb boundary
+            // rewriting the front of header with the new info
+          }
+          // Rewrite the first part of the header
+          _header.hash = utils::fast_hash::hash(((char *) &_header) + 16, sizeof(_header) - 16);
+          (void) _h.write(0, (char *) &_header, 48);
+        }
+      }
     };
 
   }  // namespace
