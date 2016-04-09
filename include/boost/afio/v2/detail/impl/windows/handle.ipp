@@ -122,6 +122,7 @@ template <class BuffersType, class Syscall> inline io_handle::io_result<BuffersT
 
   BOOST_AFIO_WIN_DEADLINE_TO_SLEEP_INIT(d);
   std::array<OVERLAPPED, 64> _ols;
+  memset(_ols.data(), 0, reqs.buffers.size() * sizeof(OVERLAPPED));
   span<OVERLAPPED> ols(_ols.data(), reqs.buffers.size());
   auto ol_it = ols.begin();
   DWORD transferred = 0;
@@ -169,6 +170,8 @@ template <class BuffersType, class Syscall> inline io_handle::io_result<BuffersT
   cancel_io.dismiss();
   for(size_t n = 0; n < reqs.buffers.size(); n++)
   {
+    // It seems the NT kernel is guilty of casting bugs sometimes
+    ols[n].Internal = ols[n].Internal & 0xffffffff;
     if(ols[n].Internal != 0)
     {
       return make_errored_result_nt<BuffersType>((NTSTATUS) ols[n].Internal);
@@ -240,7 +243,7 @@ void io_handle::unlock(io_handle::extent_type offset, io_handle::extent_type byt
     {
       auto ret = make_errored_result<void>(GetLastError());
       BOOST_AFIO_LOG_FATAL(_v.h, "io_handle::unlock() failed");
-      return;
+      std::terminate();
     }
   }
   // If handle is overlapped, wait for completion of each i/o.
@@ -251,7 +254,7 @@ void io_handle::unlock(io_handle::extent_type offset, io_handle::extent_type byt
     {
       auto ret = make_errored_result_nt<void>((NTSTATUS) ol.Internal);
       BOOST_AFIO_LOG_FATAL(_v.h, "io_handle::unlock() failed");
-      return;
+      std::terminate();
     }
   }
 }

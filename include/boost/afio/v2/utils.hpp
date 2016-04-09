@@ -626,8 +626,8 @@ This lets one pack one byte of input into two bytes of output.
     }
 
   public:
-    explicit operator bool() const noexcept { return (*this) == _allbitszero(); }
-    bool operator!() const noexcept { return (*this) != _allbitszero(); }
+    explicit operator bool() const noexcept { return (*this) != _allbitszero(); }
+    bool operator!() const noexcept { return (*this) == _allbitszero(); }
     bool operator==(const uint128 &o) const noexcept { return as_longlongs[1] == o.as_longlongs[1] && as_longlongs[0] == o.as_longlongs[0]; }
     bool operator!=(const uint128 &o) const noexcept { return as_longlongs[1] != o.as_longlongs[1] || as_longlongs[0] != o.as_longlongs[0]; }
     bool operator<(const uint128 &o) const noexcept { return as_longlongs[0] < o.as_longlongs[0] || (as_longlongs[0] == o.as_longlongs[0] && as_longlongs[1] < o.as_longlongs[1]); }

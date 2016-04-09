@@ -361,6 +361,11 @@ inline BOOST_AFIO_DECL ringbuffer_log::simple_ringbuffer_log<BOOST_AFIO_LOGGING_
   static ringbuffer_log::simple_ringbuffer_log<BOOST_AFIO_LOGGING_MEMORY> _log(static_cast<ringbuffer_log::level>(BOOST_AFIO_LOGGING_LEVEL));
   return _log;
 }
+inline void record_error_into_afio_log(ringbuffer_log::level _level, const char *_message, unsigned _code1, unsigned _code2, const char *_function, unsigned lineno)
+{
+  // Here is a VERY useful place to breakpoint!
+  log().emplace_back(_level, _message, _code1, _code2, _function, lineno);
+}
 BOOST_AFIO_V2_NAMESPACE_END
 #endif
 
@@ -383,7 +388,7 @@ BOOST_AFIO_V2_NAMESPACE_END
 // Intercept when Outcome creates an error_code_extended and log it to our log too
 #define BOOST_OUTCOME_ERROR_CODE_EXTENDED_CREATION_HOOK                                                                                                                                                                                                                                                                        \
   if(*this)                                                                                                                                                                                                                                                                                                                    \
-  BOOST_AFIO_V2_NAMESPACE::log().emplace_back(ringbuffer_log::level::error, this->message().c_str(), this->value(), (unsigned) this->_unique_id, (BOOST_AFIO_LOG_BACKTRACE_LEVELS & (1 << 2)) ? nullptr : __func__, __LINE__)
+  BOOST_AFIO_V2_NAMESPACE::record_error_into_afio_log(ringbuffer_log::level::error, this->message().c_str(), this->value(), (unsigned) this->_unique_id, (BOOST_AFIO_LOG_BACKTRACE_LEVELS & (1 << 2)) ? nullptr : __func__, __LINE__)
 #else
 #define BOOST_AFIO_LOG_ERROR(inst, message)
 #endif

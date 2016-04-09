@@ -258,7 +258,7 @@ int main(int argc, char *argv[])
       auto result = algorithm->lock(afio::as_span(entities));
       if(result.has_error())
       {
-        std::cerr << "ERROR: Lock algorithms returns " << result.get_error().message() << std::endl;
+        std::cerr << "ERROR: Algorithm lock returns " << result.get_error().message() << std::endl;
         std::terminate();
       }
       ++count;

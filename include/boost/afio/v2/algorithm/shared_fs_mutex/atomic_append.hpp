@@ -117,6 +117,8 @@ namespace algorithm
           , _nfs_compatibility(nfs_compatibility)
           , _unique_id(0)
       {
+        // guard now points at a non-existing handle
+        _guard.set_handle(&_h);
         utils::random_fill((char *) &_unique_id, sizeof(_unique_id));  // crypto strong random
         (void) _read_header();
       }
@@ -146,7 +148,7 @@ namespace algorithm
       using entities_type = shared_fs_mutex::entities_type;
 
       //! Move constructor
-      atomic_append(atomic_append &&o) noexcept : _h(std::move(o._h)), _guard(std::move(o._guard)), _nfs_compatibility(o._nfs_compatibility), _unique_id(o._unique_id), _header(o._header) {}
+      atomic_append(atomic_append &&o) noexcept : _h(std::move(o._h)), _guard(std::move(o._guard)), _nfs_compatibility(o._nfs_compatibility), _unique_id(o._unique_id), _header(o._header) { _guard.set_handle(&_h); }
       //! Move assign
       atomic_append &operator=(atomic_append &&o) noexcept
       {
@@ -155,6 +157,7 @@ namespace algorithm
         _nfs_compatibility = std::move(o._nfs_compatibility);
         _unique_id = std::move(o._unique_id);
         _header = std::move(o._header);
+        _guard.set_handle(&_h);
         return *this;
       }
 
@@ -187,6 +190,8 @@ namespace algorithm
         }
         // Open a shared lock on first_last_user_detect to prevent other users zomping the file
         BOOST_OUTCOME_FILTER_ERROR(guard, ret.lock(48, 8, false));
+        if(lockresult)
+          lockresult.get().unlock();
         // The constructor will read and cache the header
         return atomic_append(std::move(ret), std::move(guard), nfs_compatibility);
       }
@@ -369,7 +374,7 @@ namespace algorithm
           // Forward scan records until first locked or non-zero record is found
           // and update header with new info
           char buffer[4096];
-          for(;;)
+          while(_header.first_known_good < my_lock_request_offset)
           {
 #if 0  // disabled as we are using the shadow lock space on Windows
             auto locksection = _h.try_lock(_header.first_known_good, sizeof(buffer), true);
@@ -379,22 +384,23 @@ namespace algorithm
 #endif
             {
               auto bytesread_ = _h.read(_header.first_known_good, buffer, sizeof(buffer));
-              if(!bytesread_.has_error())
+              if(bytesread_.has_error())
               {
-                char *bufferp = buffer;
-                for(;;)
-                {
-                  if(!memcmp(&record, bufferp, sizeof(record)))
-                  {
-                    bufferp += sizeof(record);
-                    _header.first_known_good += sizeof(record);
-                  }
-                  else
-                    break;
-                }
+                BOOST_AFIO_LOG_FATAL(this, "atomic_append::unlock() failed");
+                std::terminate();
               }
-              else
-                break;
+              char *bufferp = buffer;
+              size_t bytes_read = bytesread_.get().second;
+              for(size_t n = 0; n < bytes_read; n += sizeof(record))
+              {
+                if(!memcmp(&record, bufferp, sizeof(record)))
+                {
+                  bufferp += sizeof(record);
+                  _header.first_known_good += sizeof(record);
+                }
+                else
+                  break;
+              }
             }
           }
           if(!(my_lock_request_offset & (1024 * 1024 - 1)))

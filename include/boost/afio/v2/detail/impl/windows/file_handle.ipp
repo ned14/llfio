@@ -77,10 +77,10 @@ result<file_handle> file_handle::clone() const noexcept
 result<file_handle::extent_type> file_handle::length() const noexcept
 {
   BOOST_AFIO_LOG_FUNCTION_CALL(_v.h);
-  FILE_END_OF_FILE_INFO feofi;
-  if(!GetFileInformationByHandleEx(_v.h, FileEndOfFileInfo, &feofi, sizeof(feofi)))
+  FILE_STANDARD_INFO fsi;
+  if(!GetFileInformationByHandleEx(_v.h, FileStandardInfo, &fsi, sizeof(fsi)))
     return make_errored_result<extent_type>(GetLastError());
-  return feofi.EndOfFile.QuadPart;
+  return fsi.EndOfFile.QuadPart;
 }
 
 result<file_handle::extent_type> file_handle::truncate(file_handle::extent_type newsize) noexcept

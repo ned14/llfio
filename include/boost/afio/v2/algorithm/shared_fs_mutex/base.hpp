@@ -152,10 +152,7 @@ namespace algorithm
         ~entities_guard()
         {
           if(parent)
-          {
             unlock();
-            release();
-          }
         }
         //! True if extent guard is valid
         explicit operator bool() const noexcept { return parent != nullptr; }
@@ -165,7 +162,10 @@ namespace algorithm
         void unlock() noexcept
         {
           if(parent)
+          {
             parent->unlock(entities, hint);
+            release();
+          }
         }
         //! Detach this RAII unlocker from the locked state
         void release() noexcept

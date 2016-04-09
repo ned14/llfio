@@ -403,10 +403,7 @@ public:
     ~extent_guard()
     {
       if(_h)
-      {
         unlock();
-        release();
-      }
     }
     //! True if extent guard is valid
     explicit operator bool() const noexcept { return _h != nullptr; }
@@ -415,6 +412,8 @@ public:
 
     //! The io_handle to be unlocked
     io_handle *handle() const noexcept { return _h; }
+    //! Sets the io_handle to be unlocked
+    void set_handle(io_handle *h) noexcept { _h = h; }
     //! The extent to be unlocked
     std::tuple<extent_type, extent_type, bool> extent() const noexcept { return std::make_tuple(_offset, _length, _exclusive); }
 
@@ -422,7 +421,10 @@ public:
     void unlock() noexcept
     {
       if(_h)
+      {
         _h->unlock(_offset, _length);
+        release();
+      }
     }
 
     //! Detach this RAII unlocker from the locked state

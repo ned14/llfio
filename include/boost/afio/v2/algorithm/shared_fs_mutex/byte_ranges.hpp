@@ -152,6 +152,7 @@ namespace algorithm
               BOOST_OUTCOME_FILTER_ERROR(guard, _h.lock(out.entities[n].value, 1, out.entities[n].exclusive, nd));
               if(!guard)
                 goto failed;
+              guard.release();
             }
             undo.dismiss();
             continue;
