@@ -29,6 +29,12 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
+//! On exit dumps a CSV file of the AFIO log, one per child worker
+#define DEBUG_CSV 1
+
+//! Seconds to run the benchmark
+#define BENCHMARK_DURATION 10
+
 #define _CRT_SECURE_NO_WARNINGS 1
 
 #include "boost/afio/v2/algorithm/shared_fs_mutex/atomic_append.hpp"
@@ -36,6 +42,7 @@ DEALINGS IN THE SOFTWARE.
 #include "boost/afio/v2/algorithm/shared_fs_mutex/lock_files.hpp"
 #include "boost/afio/v2/detail/child_process.hpp"
 
+#include <fstream>
 #include <iostream>
 #include <vector>
 
@@ -47,6 +54,51 @@ DEALINGS IN THE SOFTWARE.
 
 namespace afio = BOOST_AFIO_V2_NAMESPACE;
 
+#ifdef _WIN32
+// TODO FIXME Replace with mapped_file_handle once implemented as that is portable unlike this
+static volatile size_t *shared_memory;
+static void initialise_shared_memory()
+{
+  HANDLE cfm = CreateFileMapping(INVALID_HANDLE_VALUE, nullptr, PAGE_READWRITE, 0, 8, L"benchmark_locking");
+  if(!cfm)
+    abort();
+  shared_memory = (size_t *) MapViewOfFile(cfm, FILE_MAP_WRITE, 0, 0, 0);
+  if(!shared_memory)
+    abort();
+  *shared_memory = (size_t) -1;
+}
+static void child_locks(size_t id)
+{
+  size_t current = *shared_memory;
+  if(current != (size_t) -1)
+  {
+    std::cerr << "FATAL: Lock algorithm is broken! " << current << " still holds the lock!" << std::endl;
+    std::terminate();
+  }
+  *shared_memory = id;
+}
+static void child_unlocks(size_t id)
+{
+  size_t current = *shared_memory;
+  if(current != id)
+  {
+    std::cerr << "FATAL: Lock algorithm is broken! " << current << " has stolen the lock!" << std::endl;
+    std::terminate();
+  }
+  *shared_memory = (size_t) -1;
+}
+#else
+static void initialise_shared_memory()
+{
+}
+static void child_locks(size_t id)
+{
+}
+static void child_unlocks(size_t id)
+{
+}
+#endif
+
 int main(int argc, char *argv[])
 {
   if(argc < 4)
@@ -54,7 +106,10 @@ int main(int argc, char *argv[])
     std::cerr << "Usage: " << argv[0] << " [!]<atomic_append|byte_ranges|lock_files> <entities> <no of waiters>" << std::endl;
     return 1;
   }
-  // Am I the master process?
+  initialise_shared_memory();
+
+
+  // ******** MASTER PROCESS BEGINS HERE ********
   if(strcmp(argv[1], "spawned") && strcmp(argv[1], "!spawned"))
   {
     size_t waiters = atoi(argv[3]);
@@ -63,6 +118,7 @@ int main(int argc, char *argv[])
       std::cerr << "Usage: " << argv[0] << " [!]<atomic_append|byte_ranges|lock_files> <entities> <no of waiters>" << std::endl;
       return 1;
     }
+
     std::vector<afio::detail::child_process> children;
     auto mypath = afio::detail::current_process_path();
 #ifdef UNICODE
@@ -85,15 +141,15 @@ int main(int argc, char *argv[])
     {
       if(n >= 10)
       {
-        args[3][0] = (char) ('0' + (n / 10));
-        args[3][1] = (char) ('0' + (n % 10));
+        args[4][0] = (char) ('0' + (n / 10));
+        args[4][1] = (char) ('0' + (n % 10));
       }
       else
       {
-        args[3][0] = (char) ('0' + n);
-        args[3][1] = 0;
+        args[4][0] = (char) ('0' + n);
+        args[4][1] = 0;
       }
-      auto child = afio::detail::child_process::launch(mypath, args, env);
+      auto child = afio::detail::child_process::launch(mypath, args, env, true);
       if(child.has_error())
       {
         std::cerr << "FATAL: Child " << n << " could not be launched due to " << child.get_error().message() << std::endl;
@@ -118,34 +174,47 @@ int main(int argc, char *argv[])
         return 1;
       }
     }
-    std::cout << "Starting benchmark ..." << std::endl;
+    std::cout << "Benchmarking for " << BENCHMARK_DURATION << " seconds ..." << std::endl;
     // Issue go command to all children
     for(auto &child : children)
       child.cin() << "GO" << std::endl;
     // Wait for benchmark to complete
-    std::this_thread::sleep_for(std::chrono::seconds(5));
+    std::this_thread::sleep_for(std::chrono::seconds(BENCHMARK_DURATION));
     std::cout << "Stopping benchmark and telling children to report results ..." << std::endl;
     // Tell children to quit
     for(auto &child : children)
       child.cin() << "STOP" << std::endl;
     unsigned long long results = 0, result;
     std::cout << std::endl;
+    std::ofstream oh("benchmark_locking.csv");
     for(size_t n = 0; n < children.size(); n++)
     {
       auto &child = children[n];
-      if(!child.cout().getline(buffer, sizeof(buffer)) || 0 != strncmp(buffer, "RESULTS(", 8))
+      if(!child.cout().getline(buffer, sizeof(buffer)))
       {
-        std::cerr << "ERROR: Child wrote unexpected output '" << buffer << "'" << std::endl;
+        std::cerr << "ERROR: Child seems to have vanished!" << std::endl;
+        return 1;
+      }
+      if(0 != strncmp(buffer, "RESULTS(", 8))
+      {
+        std::cerr << "ERROR: Child wrote unexpected output '" << buffer << "'." << std::endl;
         return 1;
       }
       result = atol(&buffer[8]);
       std::cout << "Child " << n << " reports result " << result << std::endl;
       results += result;
+      if(n)
+        oh << ",";
+      oh << result;
     }
-    std::cout << "Total result: " << results << std::endl;
+    results /= BENCHMARK_DURATION;
+    std::cout << "Total result: " << results << " ops/sec" << std::endl;
+    oh << "\n" << results << std::endl;
     return 0;
   }
 
+
+  // ******** CHILD PROCESS BEGINS HERE ********
   if(argc < 6)
   {
     std::cerr << "ERROR: args too short" << std::endl;
@@ -206,7 +275,7 @@ int main(int argc, char *argv[])
       if(v.has_error())
       {
         std::cerr << "ERROR: Creation of lock algorithm returns " << v.get_error().message() << std::endl;
-        std::terminate();
+        return;
       }
       algorithm = std::make_unique<afio::algorithm::shared_fs_mutex::atomic_append>(std::move(v.get()));
       break;
@@ -217,7 +286,7 @@ int main(int argc, char *argv[])
       if(v.has_error())
       {
         std::cerr << "ERROR: Creation of lock algorithm returns " << v.get_error().message() << std::endl;
-        std::terminate();
+        return;
       }
       algorithm = std::make_unique<afio::algorithm::shared_fs_mutex::byte_ranges>(std::move(v.get()));
       break;
@@ -228,7 +297,7 @@ int main(int argc, char *argv[])
       if(v.has_error())
       {
         std::cerr << "ERROR: Creation of lock algorithm returns " << v.get_error().message() << std::endl;
-        std::terminate();
+        return;
       }
       algorithm = std::make_unique<afio::algorithm::shared_fs_mutex::lock_files>(std::move(v.get()));
       break;
@@ -259,11 +328,13 @@ int main(int argc, char *argv[])
       if(result.has_error())
       {
         std::cerr << "ERROR: Algorithm lock returns " << result.get_error().message() << std::endl;
-        std::terminate();
+        return;
       }
+      child_locks(this_child);
       ++count;
-      // On destruction, will unlock the lock.
       auto guard = std::move(result.get());
+      child_unlocks(this_child);
+      guard.unlock();
     }
   });
   if(!strcmp(argv[1], "!spawned"))
@@ -310,6 +381,10 @@ int main(int argc, char *argv[])
         done = 1;
         worker.join();
         std::cout << "RESULTS(" << count << ")" << std::endl;
+#if DEBUG_CSV
+        std::ofstream s("benchmark_locking_afio_log" + std::to_string(this_child) + ".csv");
+        s << csv(afio::log());
+#endif
         return 0;
       }
     }

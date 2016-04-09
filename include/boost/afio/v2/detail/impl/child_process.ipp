@@ -53,11 +53,13 @@ namespace detail
 #ifdef _MSC_VER
     ih = _open_osfhandle((intptr_t) _readh.h, O_APPEND);
     oh = _open_osfhandle((intptr_t) _writeh.h, O_RDONLY);
-    eh = _open_osfhandle((intptr_t) _errh.h, O_RDONLY);
+    if(!_use_parent_errh)
+      eh = _open_osfhandle((intptr_t) _errh.h, O_RDONLY);
 #endif
     const_cast<child_process *>(this)->_stdin = fdopen(ih, "a");
     const_cast<child_process *>(this)->_stdout = fdopen(oh, "r");
-    const_cast<child_process *>(this)->_stderr = fdopen(eh, "r");
+    if(!_use_parent_errh)
+      const_cast<child_process *>(this)->_stderr = fdopen(eh, "r");
   }
   void child_process::_deinitialise_files()
   {
@@ -65,7 +67,8 @@ namespace detail
       return;
     fclose(_stdin);
     fclose(_stdout);
-    fclose(_stderr);
+    if(!_use_parent_errh)
+      fclose(_stderr);
 // These are now closed
 #ifdef _MSC_VER
     _readh.h = nullptr;
@@ -235,11 +238,13 @@ namespace detail
 #ifdef _MSC_VER
     ih = _open_osfhandle((intptr_t) _readh.h, O_APPEND);
     oh = _open_osfhandle((intptr_t) _writeh.h, O_RDONLY);
-    eh = _open_osfhandle((intptr_t) _errh.h, O_RDONLY);
+    if(!_use_parent_errh)
+      eh = _open_osfhandle((intptr_t) _errh.h, O_RDONLY);
 #endif
     const_cast<child_process *>(this)->_cin = new fdostream(ih);
     const_cast<child_process *>(this)->_cout = new fdistream(oh);
-    const_cast<child_process *>(this)->_cerr = new fdistream(eh);
+    if(!_use_parent_errh)
+      const_cast<child_process *>(this)->_cerr = new fdistream(eh);
   }
   void child_process::_deinitialise_streams()
   {
@@ -248,7 +253,8 @@ namespace detail
     {
       _close(static_cast<fdostream *>(_cin)->fd);
       _close(static_cast<fdistream *>(_cout)->fd);
-      _close(static_cast<fdistream *>(_cerr)->fd);
+      if(!_use_parent_errh)
+        _close(static_cast<fdistream *>(_cerr)->fd);
     }
 #endif
     delete _cin;

@@ -131,7 +131,8 @@ namespace algorithm
         do
         {
           BOOST_OUTCOME_FILTER_ERROR(_, _h.read(0, (char *) &_header, sizeof(_header)));
-          (void) _;
+          if(_.first != (char *) &_header)
+            memcpy(&_header, _.first, _.second);
           if(first)
             first = false;
           else
@@ -244,15 +245,18 @@ namespace algorithm
         }
 
         // Find the record I just wrote
-        atomic_append_detail::lock_request record;
-        do
+        for(;;)
         {
-          file_handle::io_result<file_handle::buffer_type> readoutcome = _h.read(my_lock_request_offset, (char *) &record, sizeof(record));
+          atomic_append_detail::lock_request _record, *record = &_record;
+          file_handle::io_result<file_handle::buffer_type> readoutcome = _h.read(my_lock_request_offset, (char *) &_record, sizeof(_record));
           if(readoutcome.has_error() || readoutcome.get().second == 0)
             continue;
-          if(record.hash != lock_request.hash)
-            my_lock_request_offset += sizeof(record);
-        } while(record.hash != lock_request.hash);
+          record = (atomic_append_detail::lock_request *) readoutcome.get().first;
+          if(record->hash != lock_request.hash)
+            my_lock_request_offset += sizeof(_record);
+          if(record->hash == lock_request.hash)
+            break;
+        }
 
         // extent_guard is now valid and will be unlocked on error
         out.hint = (void *) my_lock_request_offset;
@@ -271,17 +275,18 @@ namespace algorithm
         // Read every record preceding mine until header.first_known_good
         // TODO FIXME If distance between header.first_known_good and my_lock_request_offset
         // is sufficient a memory map might be an idea. Would need to benchmark first.
-        auto record_offset = my_lock_request_offset - sizeof(record);
-        for(; _read_header(), record_offset >= _header.first_known_good; record_offset -= sizeof(record))
+        atomic_append_detail::lock_request _record, *record = &_record;
+        auto record_offset = my_lock_request_offset - sizeof(_record);
+        for(; _read_header(), record_offset >= _header.first_known_good; record_offset -= sizeof(_record))
         {
           for(;;)
           {
             // Get a valid record
             do
             {
-              BOOST_OUTCOME_FILTER_ERROR(_, _h.read(record_offset, (char *) &record, sizeof(record)));
-              (void) _;
-              if(!record.hash && !record.unique_id)
+              BOOST_OUTCOME_FILTER_ERROR(_, _h.read(record_offset, (char *) &_record, sizeof(_record)));
+              record = (atomic_append_detail::lock_request *) _.first;
+              if(!record->hash && !record->unique_id)
                 break;
               if(d)
               {
@@ -296,21 +301,21 @@ namespace algorithm
                     return make_errored_result<void>(ETIMEDOUT);
                 }
               }
-            } while(record.hash != utils::fast_hash::hash(((char *) &record) + 16, sizeof(record) - 16));
-            if(!record.hash && !record.unique_id)
+            } while(record->hash != utils::fast_hash::hash(((char *) record) + 16, sizeof(_record) - 16));
+            if(!record->hash && !record->unique_id)
               break;  // next record
 
             // Does this record lock anything I am locking?
             bool locks_one_of_mine = false;
             for(const auto &entity : out.entities)
             {
-              for(size_t n = 0; n < record.items; n++)
+              for(size_t n = 0; n < record->items; n++)
               {
-                if(record.entities[n].value == entity.value)
+                if(record->entities[n].value == entity.value)
                 {
                   // Is the lock I want exclusive or the lock he wants exclusive?
                   // If so, it's one of mine
-                  if(record.entities[n].exclusive || entity.exclusive)
+                  if(record->entities[n].exclusive || entity.exclusive)
                   {
                     locks_one_of_mine = true;
                     break;
@@ -373,7 +378,7 @@ namespace algorithm
           _read_header();
           // Forward scan records until first locked or non-zero record is found
           // and update header with new info
-          char buffer[4096];
+          char _buffer[4096];
           while(_header.first_known_good < my_lock_request_offset)
           {
 #if 0  // disabled as we are using the shadow lock space on Windows
@@ -383,13 +388,13 @@ namespace algorithm
             else
 #endif
             {
-              auto bytesread_ = _h.read(_header.first_known_good, buffer, sizeof(buffer));
+              auto bytesread_ = _h.read(_header.first_known_good, _buffer, sizeof(_buffer));
               if(bytesread_.has_error())
               {
                 BOOST_AFIO_LOG_FATAL(this, "atomic_append::unlock() failed");
                 std::terminate();
               }
-              char *bufferp = buffer;
+              char *bufferp = bytesread_.get().first;
               size_t bytes_read = bytesread_.get().second;
               for(size_t n = 0; n < bytes_read; n += sizeof(record))
               {

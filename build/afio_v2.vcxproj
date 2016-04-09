@@ -55,6 +55,7 @@
     <ClInclude Include="..\include\boost\afio\v2\utils.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\include\boost\afio\v2\detail\impl\child_process.ipp" />
     <None Include="..\include\boost\afio\v2\detail\impl\posix\child_process.ipp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug LLVM|Win32'">true</ExcludedFromBuild>

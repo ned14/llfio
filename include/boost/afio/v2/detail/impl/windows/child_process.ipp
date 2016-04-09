@@ -51,51 +51,69 @@ namespace detail
       CloseHandle(_readh.h);
       _readh.h = nullptr;
     }
-    if(_childreadh)
-    {
-      CloseHandle(_childreadh.h);
-      _childreadh.h = nullptr;
-    }
     if(_writeh)
     {
       CloseHandle(_writeh.h);
       _writeh.h = nullptr;
     }
-    if(_childwriteh)
-    {
-      CloseHandle(_childwriteh.h);
-      _childwriteh.h = nullptr;
-    }
     if(_errh)
     {
-      CloseHandle(_errh.h);
+      if(!_use_parent_errh)
+        CloseHandle(_errh.h);
       _errh.h = nullptr;
-    }
-    if(_childerrh)
-    {
-      CloseHandle(_childerrh.h);
-      _childerrh.h = nullptr;
     }
   }
 
-  BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<child_process> child_process::launch(stl1z::filesystem::path __path, std::vector<stl1z::filesystem::path::string_type> __args, std::map<stl1z::filesystem::path::string_type, stl1z::filesystem::path::string_type> __env) noexcept
+  BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<child_process> child_process::launch(stl1z::filesystem::path __path, std::vector<stl1z::filesystem::path::string_type> __args, std::map<stl1z::filesystem::path::string_type, stl1z::filesystem::path::string_type> __env, bool use_parent_errh) noexcept
   {
+    windows_nt_kernel::init();
     using string_type = stl1z::filesystem::path::string_type;
     using char_type = string_type::value_type;
-    child_process ret(std::move(__path), std::move(__args), std::move(__env));
+    child_process ret(std::move(__path), use_parent_errh, std::move(__args), std::move(__env));
+    native_handle_type childreadh, childwriteh, childerrh;
 
     STARTUPINFO si = {sizeof(STARTUPINFO)};
     si.dwFlags = STARTF_USESTDHANDLES;
-    if(!CreatePipe(&ret._childreadh.h, &ret._readh.h, nullptr, 0))
+    if(!CreatePipe(&childreadh.h, &ret._readh.h, nullptr, 0))
       return make_errored_result<child_process>(GetLastError());
-    si.hStdInput = ret._childreadh.h;
-    if(!CreatePipe(&ret._writeh.h, &ret._childwriteh.h, nullptr, 0))
+    if(!CreatePipe(&ret._writeh.h, &childwriteh.h, nullptr, 0))
       return make_errored_result<child_process>(GetLastError());
-    si.hStdOutput = ret._childwriteh.h;
-    if(!CreatePipe(&ret._errh.h, &ret._childerrh.h, nullptr, 0))
-      return make_errored_result<child_process>(GetLastError());
-    si.hStdError = ret._childerrh.h;
 
+    if(use_parent_errh)
+    {
+      childerrh.h = GetStdHandle(STD_ERROR_HANDLE);
+    }
+    else
+    {
+      // stderr needs to not be buffered
+      /*if(!CreatePipe(&ret._errh.h, &childerrh.h, nullptr, 0))
+      return make_errored_result<child_process>(GetLastError());
+      */
+      char randomname[] = "\\\\.\\pipe\\pipename";
+      windows_nt_kernel::RtlGenRandom(randomname + 9, 8);
+      ret._errh.h = CreateNamedPipeA(randomname, PIPE_ACCESS_INBOUND | FILE_FLAG_FIRST_PIPE_INSTANCE | FILE_FLAG_WRITE_THROUGH, PIPE_TYPE_BYTE, 1, 0, 0, 0, nullptr);
+      if(!ret._errh.h)
+        return make_errored_result<child_process>(GetLastError());
+      childerrh.h = CreateFileA(randomname, GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, nullptr, OPEN_EXISTING, FILE_FLAG_WRITE_THROUGH, nullptr);
+      if(!childerrh.h)
+        return make_errored_result<child_process>(GetLastError());
+    }
+
+    auto unmypipes = detail::Undoer([&] {
+      CloseHandle(ret._readh.h);
+      CloseHandle(ret._writeh.h);
+      CloseHandle(ret._errh.h);
+    });
+    auto unhispipes = detail::Undoer([&] {
+      CloseHandle(childreadh.h);
+      CloseHandle(childwriteh.h);
+      if(!use_parent_errh)
+        CloseHandle(childerrh.h);
+    });
+
+    si.hStdInput = childreadh.h;
+    si.hStdOutput = childwriteh.h;
+    si.hStdError = childerrh.h;
     if(!SetHandleInformation(si.hStdInput, HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT))
       return make_errored_result<child_process>(GetLastError());
     if(!SetHandleInformation(si.hStdOutput, HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT))
@@ -132,10 +150,15 @@ namespace detail
       envbuffere += env.second.size() + 1;
     }
     *envbuffere = 0;
-    if(!CreateProcess(ret._path.c_str(), argsbuffer, nullptr, nullptr, true, CREATE_NO_WINDOW | CREATE_UNICODE_ENVIRONMENT, envbuffer, nullptr, &si, &pi))
+    if(!CreateProcess(ret._path.c_str(), argsbuffer, nullptr, nullptr, true, CREATE_UNICODE_ENVIRONMENT, envbuffer, nullptr, &si, &pi))
       return make_errored_result<child_process>(GetLastError());
-
     ret._processh.h = pi.hProcess;
+    unmypipes.dismiss();
+
+    // Wait until the primary thread has launched
+    Sleep(30);
+
+    // Close handles I no longer need
     CloseHandle(pi.hThread);
     return std::move(ret);
   }

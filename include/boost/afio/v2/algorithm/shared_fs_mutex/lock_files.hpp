@@ -147,7 +147,7 @@ namespace algorithm
               if(ret.has_error())
               {
                 const auto &ec = ret.get_error();
-                if(ec.category() != std::generic_category() || ec.value() != EAGAIN)
+                if(ec.category() != std::generic_category() || (ec.value() != EAGAIN && ec.value() != EEXIST))
                   return ret.get_error();
                 // Collided with another locker
                 break;

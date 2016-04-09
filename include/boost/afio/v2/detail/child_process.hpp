@@ -61,7 +61,7 @@ namespace detail
     stl1z::filesystem::path _path;
     native_handle_type _processh;
     native_handle_type _readh, _writeh, _errh;
-    native_handle_type _childreadh, _childwriteh, _childerrh;
+    bool _use_parent_errh;
     std::vector<stl1z::filesystem::path::string_type> _args;
     std::map<stl1z::filesystem::path::string_type, stl1z::filesystem::path::string_type> _env;
     FILE *_stdin, *_stdout, *_stderr;
@@ -69,8 +69,9 @@ namespace detail
     std::istream *_cout, *_cerr;
 
   protected:
-    child_process(stl1z::filesystem::path path, std::vector<stl1z::filesystem::path::string_type> args, std::map<stl1z::filesystem::path::string_type, stl1z::filesystem::path::string_type> env)
+    child_process(stl1z::filesystem::path path, bool use_parent_errh, std::vector<stl1z::filesystem::path::string_type> args, std::map<stl1z::filesystem::path::string_type, stl1z::filesystem::path::string_type> env)
         : _path(std::move(path))
+        , _use_parent_errh(use_parent_errh)
         , _args(std::move(args))
         , _env(std::move(env))
         , _stdin(nullptr)
@@ -95,7 +96,7 @@ namespace detail
     ~child_process();
 
     //! Launches an executable as a child process. No shell is invoked on POSIX.
-    static BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<child_process> launch(stl1z::filesystem::path path, std::vector<stl1z::filesystem::path::string_type> args, std::map<stl1z::filesystem::path::string_type, stl1z::filesystem::path::string_type> env = current_process_env()) noexcept;
+    static BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<child_process> launch(stl1z::filesystem::path path, std::vector<stl1z::filesystem::path::string_type> args, std::map<stl1z::filesystem::path::string_type, stl1z::filesystem::path::string_type> env = current_process_env(), bool use_parent_errh = false) noexcept;
 
     //! Returns the path of the executable
     const stl1z::filesystem::path &path() const noexcept { return _path; }

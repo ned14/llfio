@@ -3,8 +3,15 @@ v2 rewrite. You can view its documentation at https://ned14.github.io/boost.afio
 
 
 Todo:
+- [ ] lock_files with many waiters is scaling too linearly :)
+- [ ] Add mapped_file_handle. Need some way of explicitly converting a file_handle
+into a mapped_file_handle and vice versa.
+- [ ] Add correctness test to benchmark_locking which uses a shared mapped file
+to check that locks are indeed being observed.
+
 - [ ] Outcome's error logging needs to record current thread id ideally.
 - [ ] Move caching into native_handle_type.
+- [ ] Move locking into file_handle surely?
 - [ ] Implement [[bindlib::make_free]] which injects member functions into the enclosing
 namespace.
 - [ ] Add macro helpers to Outcome for returning outcomes out of things
@@ -21,6 +28,7 @@ throws, have it detect __cpp_exceptions and skip those implementations.
 
 - [ ] C bindings for all AFIO v2 APIs. Write libclang parser which autogenerates
 SWIG interface files from the .hpp files.
+
 
 - [ ] Add native BSD kqueues to POSIX AIO backend as is vastly more efficient.
   - http://www.informit.com/articles/article.aspx?p=607373&seqNum=4 is a

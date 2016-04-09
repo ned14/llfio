@@ -371,7 +371,9 @@ BOOST_AFIO_V2_NAMESPACE_END
 
 #ifndef BOOST_AFIO_LOG_FATAL_TO_CERR
 #include <stdio.h>
-#define BOOST_AFIO_LOG_FATAL_TO_CERR(expr) fprintf(stderr, "%s\n", (expr))
+#define BOOST_AFIO_LOG_FATAL_TO_CERR(expr)                                                                                                                                                                                                                                                                                     \
+  fprintf(stderr, "%s\n", (expr));                                                                                                                                                                                                                                                                                             \
+  fflush(stderr)
 #endif
 
 #if BOOST_AFIO_LOGGING_LEVEL >= 1

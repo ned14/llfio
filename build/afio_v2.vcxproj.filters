@@ -125,6 +125,9 @@
     <None Include="..\include\boost\afio\v2\detail\impl\posix\utils.ipp">
       <Filter>src\posix</Filter>
     </None>
+    <None Include="..\include\boost\afio\v2\detail\impl\child_process.ipp">
+      <Filter>src</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\afio.cpp">

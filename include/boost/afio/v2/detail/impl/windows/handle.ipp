@@ -222,6 +222,8 @@ result<io_handle::extent_guard> io_handle::lock(io_handle::extent_type offset, i
     {
       BOOST_AFIO_WIN_DEADLINE_TO_TIMEOUT(io_handle::extent_guard, d);
     }
+    // It seems the NT kernel is guilty of casting bugs sometimes
+    ol.Internal = ol.Internal & 0xffffffff;
     if(ol.Internal != 0)
       return make_errored_result_nt<io_handle::extent_guard>((NTSTATUS) ol.Internal);
   }
@@ -252,6 +254,8 @@ void io_handle::unlock(io_handle::extent_type offset, io_handle::extent_type byt
     ntwait(_v.h, ol, deadline());
     if(ol.Internal != 0)
     {
+      // It seems the NT kernel is guilty of casting bugs sometimes
+      ol.Internal = ol.Internal & 0xffffffff;
       auto ret = make_errored_result_nt<void>((NTSTATUS) ol.Internal);
       BOOST_AFIO_LOG_FATAL(_v.h, "io_handle::unlock() failed");
       std::terminate();
