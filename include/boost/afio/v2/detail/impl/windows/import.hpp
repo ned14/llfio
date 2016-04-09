@@ -45,7 +45,8 @@ DEALINGS IN THE SOFTWARE.
 // to avoid the windows.h inclusion
 #if 1
 #define WIN32_LEAN_AND_MEAN 1
-#include "windows.h"
+#include <windows.h>
+#include <winternl.h>
 
 #else
 #error todo
@@ -58,6 +59,7 @@ namespace windows_nt_kernel
 // Weirdly these appear to be undefined sometimes?
 #define STATUS_SUCCESS ((DWORD) 0x00000000L)
 #define STATUS_ALERTED ((DWORD) 0x00000101L)
+#define STATUS_DELETE_PENDING ((DWORD) 0xC0000056)
 
 
   // From http://undocumented.ntinternals.net/UserMode/Undocumented%20Functions/NT%20Objects/File/FILE_INFORMATION_CLASS.html
@@ -253,6 +255,8 @@ namespace windows_nt_kernel
   typedef BOOL(WINAPI *SymInitialize_t)(_In_ HANDLE hProcess, _In_opt_ PCTSTR UserSearchPath, _In_ BOOL fInvadeProcess);
 
   typedef BOOL(WINAPI *SymGetLineFromAddr64_t)(_In_ HANDLE hProcess, _In_ DWORD64 dwAddr, _Out_ PDWORD pdwDisplacement, _Out_ PIMAGEHLP_LINE64 Line);
+
+  typedef BOOLEAN(WINAPI *RtlDosPathNameToNtPathName_U_t)(__in PCWSTR DosFileName, __out PUNICODE_STRING NtFileName, __out_opt PWSTR *FilePart, __out_opt PVOID RelativeName);
 
   typedef struct _FILE_BASIC_INFORMATION
   {
@@ -460,6 +464,7 @@ namespace windows_nt_kernel
   static SymInitialize_t SymInitialize;
   static SymGetLineFromAddr64_t SymGetLineFromAddr64;
   static RtlCaptureStackBackTrace_t RtlCaptureStackBackTrace;
+  static RtlDosPathNameToNtPathName_U_t RtlDosPathNameToNtPathName_U;
 
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -468,7 +473,7 @@ namespace windows_nt_kernel
 #endif
   static inline void doinit()
   {
-    if(RtlCaptureStackBackTrace)
+    if(RtlDosPathNameToNtPathName_U)
       return;
     static stl11::mutex lock;
     stl11::lock_guard<decltype(lock)> g(lock);
@@ -545,6 +550,10 @@ namespace windows_nt_kernel
 #endif
     if(!RtlCaptureStackBackTrace)
       if(!(RtlCaptureStackBackTrace = (RtlCaptureStackBackTrace_t) GetProcAddress(ntdllh, "RtlCaptureStackBackTrace")))
+        abort();
+
+    if(!RtlDosPathNameToNtPathName_U)
+      if(!(RtlDosPathNameToNtPathName_U = (RtlDosPathNameToNtPathName_U_t) GetProcAddress(ntdllh, "RtlDosPathNameToNtPathName_U")))
         abort();
     // MAKE SURE you update the early exit check at the top to whatever the last of these is!
   }
@@ -964,6 +973,124 @@ static inline result<DWORD> attributes_from_handle_caching_and_flags(native_hand
   if(flags && handle::flag::delete_on_close)
     attribs |= FILE_FLAG_DELETE_ON_CLOSE;
   return attribs;
+}
+
+/* Our own custom CreateFileW() implementation.
+
+The Win32 CreateFileW() implementation is unfortunately slow. It also, very annoyingly,
+maps STATUS_DELETE_PENDING onto ERROR_ACCESS_DENIED instead of to ERROR_DELETE_PENDING
+which means our file open routines return EACCES, which is useless to us for detecting
+when we are trying to open files being deleted. We therefore reimplement CreateFileW()
+with a non-broken version.
+
+This edition does pretty much the same as the Win32 edition, minus support for file
+templates and lpFileName being anything but a file path.
+*/
+static inline HANDLE CreateFileW_(_In_ LPCTSTR lpFileName, _In_ DWORD dwDesiredAccess, _In_ DWORD dwShareMode, _In_opt_ LPSECURITY_ATTRIBUTES lpSecurityAttributes, _In_ DWORD dwCreationDisposition, _In_ DWORD dwFlagsAndAttributes, _In_opt_ HANDLE hTemplateFile)
+{
+  windows_nt_kernel::init();
+  using namespace windows_nt_kernel;
+  if(!lpFileName || !lpFileName[0])
+  {
+    SetLastError(ERROR_PATH_NOT_FOUND);
+    return INVALID_HANDLE_VALUE;
+  }
+  if(hTemplateFile || !lstrcmpW(lpFileName, L"CONIN$") || !lstrcmpW(lpFileName, L"CONOUT$"))
+  {
+    SetLastError(ERROR_NOT_SUPPORTED);
+    return INVALID_HANDLE_VALUE;
+  }
+  switch(dwCreationDisposition)
+  {
+  case CREATE_NEW:
+    dwCreationDisposition = FILE_CREATE;
+    break;
+  case CREATE_ALWAYS:
+    dwCreationDisposition = FILE_OVERWRITE_IF;
+    break;
+  case OPEN_EXISTING:
+    dwCreationDisposition = FILE_OPEN;
+    break;
+  case OPEN_ALWAYS:
+    dwCreationDisposition = FILE_OPEN_IF;
+    break;
+  case TRUNCATE_EXISTING:
+    dwCreationDisposition = FILE_OVERWRITE;
+    break;
+  default:
+    SetLastError(ERROR_INVALID_PARAMETER);
+    return INVALID_HANDLE_VALUE;
+  }
+  ULONG flags = 0;
+  if(!(dwFlagsAndAttributes & FILE_FLAG_OVERLAPPED))
+    flags |= FILE_SYNCHRONOUS_IO_NONALERT;
+  if(dwFlagsAndAttributes & FILE_FLAG_WRITE_THROUGH)
+    flags |= FILE_WRITE_THROUGH;
+  if(dwFlagsAndAttributes & FILE_FLAG_NO_BUFFERING)
+    flags |= FILE_NO_INTERMEDIATE_BUFFERING;
+  if(dwFlagsAndAttributes & FILE_FLAG_RANDOM_ACCESS)
+    flags |= FILE_RANDOM_ACCESS;
+  if(dwFlagsAndAttributes & FILE_FLAG_SEQUENTIAL_SCAN)
+    flags |= FILE_SEQUENTIAL_ONLY;
+  if(dwFlagsAndAttributes & FILE_FLAG_DELETE_ON_CLOSE)
+  {
+    flags |= FILE_DELETE_ON_CLOSE;
+    dwDesiredAccess |= DELETE;
+  }
+  if(dwFlagsAndAttributes & FILE_FLAG_BACKUP_SEMANTICS)
+  {
+    if(dwDesiredAccess & GENERIC_ALL)
+      flags |= FILE_OPEN_FOR_BACKUP_INTENT | FILE_OPEN_REMOTE_INSTANCE;
+    else
+    {
+      if(dwDesiredAccess & GENERIC_READ)
+        flags |= FILE_OPEN_FOR_BACKUP_INTENT;
+      if(dwDesiredAccess & GENERIC_WRITE)
+        flags |= FILE_OPEN_REMOTE_INSTANCE;
+    }
+  }
+  else
+    flags |= FILE_NON_DIRECTORY_FILE;
+  if(dwFlagsAndAttributes & FILE_FLAG_OPEN_REPARSE_POINT)
+    flags |= FILE_OPEN_REPARSE_POINT;
+  if(dwFlagsAndAttributes & FILE_FLAG_OPEN_NO_RECALL)
+    flags |= FILE_OPEN_NO_RECALL;
+
+  UNICODE_STRING NtPath;
+  if(!RtlDosPathNameToNtPathName_U(lpFileName, &NtPath, NULL, NULL))
+  {
+    SetLastError(ERROR_FILE_NOT_FOUND);
+    return INVALID_HANDLE_VALUE;
+  }
+  auto unntpath = detail::Undoer([&NtPath] {
+    if(!HeapFree(GetProcessHeap(), 0, NtPath.Buffer))
+      abort();
+  });
+
+  OBJECT_ATTRIBUTES ObjectAttributes;
+  InitializeObjectAttributes(&ObjectAttributes, &NtPath, 0, NULL, NULL);
+  if(lpSecurityAttributes)
+  {
+    if(lpSecurityAttributes->bInheritHandle)
+      ObjectAttributes.Attributes |= OBJ_INHERIT;
+    ObjectAttributes.SecurityDescriptor = lpSecurityAttributes->lpSecurityDescriptor;
+  }
+  if(!(dwFlagsAndAttributes & FILE_FLAG_POSIX_SEMANTICS))
+    ObjectAttributes.Attributes |= OBJ_CASE_INSENSITIVE;
+
+  HANDLE ret = INVALID_HANDLE_VALUE;
+  IO_STATUS_BLOCK isb = {{-1}};
+  dwFlagsAndAttributes &= ~0xfff80000;
+  NTSTATUS ntstat = NtCreateFile(&ret, dwDesiredAccess, &ObjectAttributes, &isb, NULL, dwFlagsAndAttributes, dwShareMode, dwCreationDisposition, flags, NULL, 0);
+  if(STATUS_SUCCESS == ntstat)
+    return ret;
+
+  win32_error_from_nt_status(ntstat);
+  if(STATUS_DELETE_PENDING == ntstat)
+  {
+    SetLastError(ERROR_DELETE_PENDING);
+  }
+  return INVALID_HANDLE_VALUE;
 }
 
 BOOST_AFIO_V2_NAMESPACE_END

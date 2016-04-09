@@ -57,7 +57,7 @@ result<file_handle> file_handle::file(file_handle::path_type _path, file_handle:
   }
   BOOST_OUTCOME_FILTER_ERROR(attribs, attributes_from_handle_caching_and_flags(nativeh, _caching, flags));
   nativeh.behaviour |= native_handle_type::disposition::file;
-  if(INVALID_HANDLE_VALUE == (nativeh.h = CreateFile(ret.value()._path.c_str(), access, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL, creation, attribs, NULL)))
+  if(INVALID_HANDLE_VALUE == (nativeh.h = CreateFileW_(ret.value()._path.c_str(), access, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL, creation, attribs, NULL)))
     return make_errored_result<file_handle>(GetLastError());
   if(_creation == creation::truncate && ret.value().are_safety_fsyncs_issued())
     FlushFileBuffers(nativeh.h);

@@ -303,8 +303,8 @@ namespace algorithm
               {
                 if(record.entities[n].value == entity.value)
                 {
-                  // Is the lock I want shared and the lock he wants shared?
-                  // If so, not one of mine
+                  // Is the lock I want exclusive or the lock he wants exclusive?
+                  // If so, it's one of mine
                   if(record.entities[n].exclusive || entity.exclusive)
                   {
                     locks_one_of_mine = true;

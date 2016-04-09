@@ -129,8 +129,9 @@ namespace algorithm
         for(n = 0; n < out.entities.size(); n++)
         {
           auto v = out.entities[n].value;
-          entity_paths[n] = _path / utils::to_hex_string(span<char>((char *) &v, 16));
+          entity_paths[n] = _path / utils::to_hex_string(span<char>((char *) &v, 8));
         }
+        _hs.resize(out.entities.size());
         do
         {
           {
@@ -153,6 +154,8 @@ namespace algorithm
               }
               _hs[n] = std::move(ret.get());
             }
+            if(n == out.entities.size())
+              undo.dismiss();
           }
           if(n != out.entities.size())
           {
@@ -180,7 +183,7 @@ namespace algorithm
       }
 
     public:
-      virtual void unlock(entities_type entities, void *) noexcept override final
+      virtual void unlock(entities_type, void *) noexcept override final
       {
         BOOST_AFIO_LOG_FUNCTION_CALL(this);
         for(auto &i : _hs)

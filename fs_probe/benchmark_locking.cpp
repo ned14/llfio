@@ -39,36 +39,45 @@ DEALINGS IN THE SOFTWARE.
 #include <iostream>
 #include <vector>
 
+#ifdef _WIN32
+#undef _CRT_NONSTDC_DEPRECATE
+#define _CRT_NONSTDC_DEPRECATE(a)
+#include <conio.h>  // for kbhit()
+#endif
+
 namespace afio = BOOST_AFIO_V2_NAMESPACE;
 
 int main(int argc, char *argv[])
 {
-  if(argc < 3)
+  if(argc < 4)
   {
-    std::cerr << "Usage: " << argv[0] << " <atomic_append|byte_ranges|lock_files> <no of waiters>" << std::endl;
+    std::cerr << "Usage: " << argv[0] << " [!]<atomic_append|byte_ranges|lock_files> <entities> <no of waiters>" << std::endl;
     return 1;
   }
   // Am I the master process?
-  if(strcmp(argv[1], "spawned"))
+  if(strcmp(argv[1], "spawned") && strcmp(argv[1], "!spawned"))
   {
-    size_t waiters = atoi(argv[2]);
-    if(!waiters)
+    size_t waiters = atoi(argv[3]);
+    if(!waiters || !atoi(argv[2]))
     {
-      std::cerr << "Usage: " << argv[0] << " <atomic_append|byte_ranges|lock_files> <no of waiters>" << std::endl;
+      std::cerr << "Usage: " << argv[0] << " [!]<atomic_append|byte_ranges|lock_files> <entities> <no of waiters>" << std::endl;
       return 1;
     }
     std::vector<afio::detail::child_process> children;
     auto mypath = afio::detail::current_process_path();
 #ifdef UNICODE
-    std::vector<afio::stl1z::filesystem::path::string_type> args = {L"spawned", L"", L"", L"00"};
+    std::vector<afio::stl1z::filesystem::path::string_type> args = {L"spawned", L"", L"", L"", L"00"};
     args[1].resize(strlen(argv[1]));
     for(size_t n = 0; n < args[1].size(); n++)
       args[1][n] = argv[1][n];
     args[2].resize(strlen(argv[2]));
     for(size_t n = 0; n < args[2].size(); n++)
       args[2][n] = argv[2][n];
+    args[3].resize(strlen(argv[3]));
+    for(size_t n = 0; n < args[3].size(); n++)
+      args[3][n] = argv[3][n];
 #else
-    std::vector<afio::stl1z::filesystem::path::string_type> args = {"spawned", argv[1], argv[2], "00"};
+    std::vector<afio::stl1z::filesystem::path::string_type> args = {"spawned", argv[1], argv[2], argv[3], "00"};
 #endif
     auto env = afio::detail::current_process_env();
     std::cout << "Launching " << waiters << " copies of myself as a child process ..." << std::endl;
@@ -76,13 +85,13 @@ int main(int argc, char *argv[])
     {
       if(n >= 10)
       {
-        args[2][0] = (char) ('0' + (n / 10));
-        args[2][1] = (char) ('0' + (n % 10));
+        args[3][0] = (char) ('0' + (n / 10));
+        args[3][1] = (char) ('0' + (n % 10));
       }
       else
       {
-        args[2][0] = (char) ('0' + n);
-        args[2][1] = 0;
+        args[3][0] = (char) ('0' + n);
+        args[3][1] = 0;
       }
       auto child = afio::detail::child_process::launch(mypath, args, env);
       if(child.has_error())
@@ -137,7 +146,7 @@ int main(int argc, char *argv[])
     return 0;
   }
 
-  if(argc < 5)
+  if(argc < 6)
   {
     std::cerr << "ERROR: args too short" << std::endl;
     return 1;
@@ -176,14 +185,15 @@ int main(int argc, char *argv[])
     std::cerr << "ERROR: unknown test requested" << std::endl;
     return 1;
   }
-  size_t total_locks = atoi(argv[3]), this_child = atoi(argv[4]), count = 0;
+  size_t total_locks = atoi(argv[3]), waiters = atoi(argv[4]), this_child = atoi(argv[5]), count = 0;
+  (void) waiters;
   if(!total_locks)
   {
     std::cerr << "ERROR: unknown total locks requested" << std::endl;
     return 1;
   }
   // I am a spawned child. Tell parent I am ready.
-  std::cout << "READY(" << argv[4] << ")" << std::endl;
+  std::cout << "READY(" << this_child << ")" << std::endl;
   // Wait for parent to let me proceed
   std::atomic<int> done(-1);
   std::thread worker([test, contended, total_locks, this_child, &done, &count] {
@@ -256,25 +266,51 @@ int main(int argc, char *argv[])
       auto guard = std::move(result.get());
     }
   });
-  for(;;)
+  if(!strcmp(argv[1], "!spawned"))
   {
-    char buffer[1024];
-    // This blocks
-    if(!std::cin.getline(buffer, sizeof(buffer)))
+    auto lastcount = count;
+    size_t secs = 0;
+    done = 0;
+    while(!kbhit())
     {
-      return 1;
+      std::this_thread::sleep_for(std::chrono::seconds(1));
+      ++secs;
+      std::cout << "\ncount=" << count << " (+" << (count - lastcount) << "), average=" << (count / secs) << std::endl;
+      lastcount = count;
+#if 1
+      auto it = afio::log().cbegin();
+      for(size_t n = 0; n < 10; n++)
+      {
+        if(it == afio::log().cend())
+          break;
+        std::cout << "   " << *it;
+        ++it;
+      }
+#endif
     }
-    if(0 == strcmp(buffer, "GO"))
-    {
-      // Launch worker thread
-      done = 0;
-    }
-    else if(0 == strcmp(buffer, "STOP"))
-    {
-      done = 1;
-      worker.join();
-      std::cout << "RESULTS(" << count << ")" << std::endl;
-      return 0;
-    }
+    done = 1;
+    worker.join();
   }
+  else
+    for(;;)
+    {
+      char buffer[1024];
+      // This blocks
+      if(!std::cin.getline(buffer, sizeof(buffer)))
+      {
+        return 1;
+      }
+      if(0 == strcmp(buffer, "GO"))
+      {
+        // Launch worker thread
+        done = 0;
+      }
+      else if(0 == strcmp(buffer, "STOP"))
+      {
+        done = 1;
+        worker.join();
+        std::cout << "RESULTS(" << count << ")" << std::endl;
+        return 0;
+      }
+    }
 }

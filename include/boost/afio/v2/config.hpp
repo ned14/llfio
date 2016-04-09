@@ -323,6 +323,32 @@ namespace boost
 // clang-format on
 
 
+// Bring in the Boost macro emulations
+#include "../bindlib/include/boost/config.hpp"
+
+// Configure BOOST_AFIO_DECL
+#if(defined(BOOST_AFIO_DYN_LINK) || defined(BOOST_ALL_DYN_LINK)) && !defined(BOOST_AFIO_STATIC_LINK)
+
+#if defined(BOOST_AFIO_SOURCE)
+#define BOOST_AFIO_DECL BOOST_SYMBOL_EXPORT
+#define BOOST_AFIO_BUILD_DLL
+#else
+#define BOOST_AFIO_DECL BOOST_SYMBOL_IMPORT
+#endif
+#else
+#define BOOST_AFIO_DECL
+#endif  // building a shared library
+
+
+#if !BOOST_AFIO_HAVE_CXX17_SPAN_IMPLEMENTATION
+#include "boost/afio/gsl-lite/include/gsl.h"
+BOOST_AFIO_V2_NAMESPACE_BEGIN
+template <class T> using span = gsl::span<T>;
+using gsl::as_span;
+BOOST_AFIO_V2_NAMESPACE_END
+#endif
+
+
 #if BOOST_AFIO_LOGGING_LEVEL
 #include "../bindlib/include/ringbuffer_log.hpp"
 
@@ -330,7 +356,7 @@ namespace boost
 */
 BOOST_AFIO_V2_NAMESPACE_BEGIN
 //! The log used by AFIO
-static inline ringbuffer_log::simple_ringbuffer_log<BOOST_AFIO_LOGGING_MEMORY> &log() noexcept
+inline BOOST_AFIO_DECL ringbuffer_log::simple_ringbuffer_log<BOOST_AFIO_LOGGING_MEMORY> &log() noexcept
 {
   static ringbuffer_log::simple_ringbuffer_log<BOOST_AFIO_LOGGING_MEMORY> _log(static_cast<ringbuffer_log::level>(BOOST_AFIO_LOGGING_LEVEL));
   return _log;
@@ -366,26 +392,8 @@ BOOST_AFIO_V2_NAMESPACE_END
 #else
 #define BOOST_AFIO_LOG_WARN(inst, message)
 #endif
-#if BOOST_AFIO_LOGGING_LEVEL >= 4
-#define BOOST_AFIO_LOG_INFO(inst, message) BOOST_AFIO_V2_NAMESPACE::log().emplace_back(ringbuffer_log::level::info, (message), (unsigned) (uintptr_t)(inst), ringbuffer_log::this_thread_id(), (BOOST_AFIO_LOG_BACKTRACE_LEVELS & (1 << 4)) ? nullptr : __func__, __LINE__)
-#else
-#define BOOST_AFIO_LOG_INFO(inst, message)
-#endif
-#if BOOST_AFIO_LOGGING_LEVEL >= 5
-#define BOOST_AFIO_LOG_DEBUG(inst, message) BOOST_AFIO_V2_NAMESPACE::log().emplace_back(ringbuffer_log::level::debug, (message), (unsigned) (uintptr_t)(inst), ringbuffer_log::this_thread_id(), (BOOST_AFIO_LOG_BACKTRACE_LEVELS & (1 << 5)) ? nullptr : __func__, __LINE__)
-#else
-#define BOOST_AFIO_LOG_DEBUG(inst, message)
-#endif
-#if BOOST_AFIO_LOGGING_LEVEL >= 6
-#define BOOST_AFIO_LOG_ALL(inst, message) BOOST_AFIO_V2_NAMESPACE::log().emplace_back(ringbuffer_log::level::all, (message), (unsigned) (uintptr_t)(inst), ringbuffer_log::this_thread_id(), (BOOST_AFIO_LOG_BACKTRACE_LEVELS & (1 << 6)) ? nullptr : __func__, __LINE__)
-#else
-#define BOOST_AFIO_LOG_ALL(inst, message)
-#endif
-#ifdef _MSC_VER
-#define BOOST_AFIO_LOG_FUNCTION_CALL(inst) BOOST_AFIO_LOG_INFO(inst, __FUNCSIG__)
-#else
-#define BOOST_AFIO_LOG_FUNCTION_CALL(inst) BOOST_AFIO_LOG_INFO(inst, __PRETTY_FUNCTION__)
-#endif
+
+// Need Outcome in play before I can define logging level 4
 
 #include "boost/afio/outcome/include/boost/outcome.hpp"
 BOOST_AFIO_V2_NAMESPACE_BEGIN
@@ -416,12 +424,101 @@ using BOOST_OUTCOME_V1_NAMESPACE::monad_errc;
 using BOOST_OUTCOME_V1_NAMESPACE::monad_category;
 BOOST_AFIO_V2_NAMESPACE_END
 
-#if !BOOST_AFIO_HAVE_CXX17_SPAN_IMPLEMENTATION
-#include "boost/afio/gsl-lite/include/gsl.h"
+
+#if BOOST_AFIO_LOGGING_LEVEL >= 4
+#define BOOST_AFIO_LOG_INFO(inst, message) BOOST_AFIO_V2_NAMESPACE::log().emplace_back(ringbuffer_log::level::info, (message), (unsigned) (uintptr_t)(inst), ringbuffer_log::this_thread_id(), (BOOST_AFIO_LOG_BACKTRACE_LEVELS & (1 << 4)) ? nullptr : __func__, __LINE__)
+
+// Need to expand out our namespace into a string
+#define BOOST_AFIO_LOG_STRINGIFY9(s) #s "::"
+#define BOOST_AFIO_LOG_STRINGIFY8(s) BOOST_AFIO_LOG_STRINGIFY9(s)
+#define BOOST_AFIO_LOG_STRINGIFY7(s) BOOST_AFIO_LOG_STRINGIFY8(s)
+#define BOOST_AFIO_LOG_STRINGIFY6(s) BOOST_AFIO_LOG_STRINGIFY7(s)
+#define BOOST_AFIO_LOG_STRINGIFY5(s) BOOST_AFIO_LOG_STRINGIFY6(s)
+#define BOOST_AFIO_LOG_STRINGIFY4(s) BOOST_AFIO_LOG_STRINGIFY5(s)
+#define BOOST_AFIO_LOG_STRINGIFY3(s) BOOST_AFIO_LOG_STRINGIFY4(s)
+#define BOOST_AFIO_LOG_STRINGIFY2(s) BOOST_AFIO_LOG_STRINGIFY3(s)
+#define BOOST_AFIO_LOG_STRINGIFY(s) BOOST_AFIO_LOG_STRINGIFY2(s)
 BOOST_AFIO_V2_NAMESPACE_BEGIN
-template <class T> using span = gsl::span<T>;
-using gsl::as_span;
+//! Returns the AFIO namespace as a string
+inline span<char> afio_namespace_string()
+{
+  static char buffer[64];
+  static size_t length;
+  if(length)
+    return span<char>(buffer, length);
+  const char *src = BOOST_AFIO_LOG_STRINGIFY(BOOST_AFIO_V2_NAMESPACE);
+  char *bufferp = buffer;
+  for(; *src && bufferp - buffer < sizeof(buffer); src++)
+  {
+    if(*src != ' ')
+      *bufferp++ = *src;
+  }
+  *bufferp = 0;
+  length = bufferp - buffer;
+  return span<char>(buffer, length);
+}
+//! Returns the Outcome namespace as a string
+inline span<char> outcome_namespace_string()
+{
+  static char buffer[64];
+  static size_t length;
+  if(length)
+    return span<char>(buffer, length);
+  const char *src = BOOST_AFIO_LOG_STRINGIFY(BOOST_OUTCOME_V1_NAMESPACE);
+  char *bufferp = buffer;
+  for(; *src && bufferp - buffer < sizeof(buffer); src++)
+  {
+    if(*src != ' ')
+      *bufferp++ = *src;
+  }
+  *bufferp = 0;
+  length = bufferp - buffer;
+  return span<char>(buffer, length);
+}
+//! Strips a __PRETTY_FUNCTION__ of all instances of boost::afio:: and boost::outcome::
+inline void strip_pretty_function(char *out, size_t bytes, const char *in)
+{
+  const span<char> remove1 = afio_namespace_string();
+  const span<char> remove2 = outcome_namespace_string();
+  for(--bytes; bytes && *in; --bytes)
+  {
+    if(!memcmp(in, remove1.data(), remove1.size()))
+      in += remove1.size();
+    if(!memcmp(in, remove2.data(), remove2.size()))
+      in += remove2.size();
+    *out++ = *in++;
+  }
+  *out = 0;
+}
 BOOST_AFIO_V2_NAMESPACE_END
+#ifdef _MSC_VER
+#define BOOST_AFIO_LOG_FUNCTION_CALL(inst)                                                                                                                                                                                                                                                                                     \
+  {                                                                                                                                                                                                                                                                                                                            \
+    char buffer[256];                                                                                                                                                                                                                                                                                                          \
+    BOOST_AFIO_V2_NAMESPACE::strip_pretty_function(buffer, sizeof(buffer), __FUNCSIG__);                                                                                                                                                                                                                                       \
+    BOOST_AFIO_LOG_INFO(inst, buffer);                                                                                                                                                                                                                                                                                         \
+  }
+#else
+#define BOOST_AFIO_LOG_FUNCTION_CALL(inst)                                                                                                                                                                                                                                                                                     \
+  {                                                                                                                                                                                                                                                                                                                            \
+    char buffer[256];                                                                                                                                                                                                                                                                                                          \
+    BOOST_AFIO_V2_NAMESPACE::strip_pretty_function(buffer, sizeof(buffer), __PRETTY_FUNCTION__);                                                                                                                                                                                                                               \
+    BOOST_AFIO_LOG_INFO(inst, buffer);                                                                                                                                                                                                                                                                                         \
+  }
+#endif
+#else
+#define BOOST_AFIO_LOG_INFO(inst, message)
+#define BOOST_AFIO_LOG_FUNCTION_CALL(inst)
+#endif
+#if BOOST_AFIO_LOGGING_LEVEL >= 5
+#define BOOST_AFIO_LOG_DEBUG(inst, message) BOOST_AFIO_V2_NAMESPACE::log().emplace_back(ringbuffer_log::level::debug, (message), (unsigned) (uintptr_t)(inst), ringbuffer_log::this_thread_id(), (BOOST_AFIO_LOG_BACKTRACE_LEVELS & (1 << 5)) ? nullptr : __func__, __LINE__)
+#else
+#define BOOST_AFIO_LOG_DEBUG(inst, message)
+#endif
+#if BOOST_AFIO_LOGGING_LEVEL >= 6
+#define BOOST_AFIO_LOG_ALL(inst, message) BOOST_AFIO_V2_NAMESPACE::log().emplace_back(ringbuffer_log::level::all, (message), (unsigned) (uintptr_t)(inst), ringbuffer_log::this_thread_id(), (BOOST_AFIO_LOG_BACKTRACE_LEVELS & (1 << 6)) ? nullptr : __func__, __LINE__)
+#else
+#define BOOST_AFIO_LOG_ALL(inst, message)
 #endif
 
 #include <time.h>  // for struct timespec
@@ -632,20 +729,6 @@ namespace win
 }
 
 BOOST_AFIO_V2_NAMESPACE_END
-
-///////////////////////////////////////////////////////////////////////////////
-//  Set up dll import/export options
-#if(defined(BOOST_AFIO_DYN_LINK) || defined(BOOST_ALL_DYN_LINK)) && !defined(BOOST_AFIO_STATIC_LINK)
-
-#if defined(BOOST_AFIO_SOURCE)
-#define BOOST_AFIO_DECL BOOST_SYMBOL_EXPORT
-#define BOOST_AFIO_BUILD_DLL
-#else
-#define BOOST_AFIO_DECL BOOST_SYMBOL_IMPORT
-#endif
-#else
-#define BOOST_AFIO_DECL
-#endif  // building a shared library
 
 
 ///////////////////////////////////////////////////////////////////////////////

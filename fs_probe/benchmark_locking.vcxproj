@@ -183,7 +183,7 @@
       <DisableSpecificWarnings>
       </DisableSpecificWarnings>
       <EnablePREfast>false</EnablePREfast>
-      <AdditionalOptions> /FS</AdditionalOptions>
+      <AdditionalOptions>/FS</AdditionalOptions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug LLVM|x64'">
@@ -214,6 +214,7 @@
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <DebugInformationFormat>LineNumber</DebugInformationFormat>
+      <UndefinePreprocessorDefinitions>__STDC__</UndefinePreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -225,8 +226,9 @@
       </DisableSpecificWarnings>
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
       <EnablePREfast>false</EnablePREfast>
-      <AdditionalOptions>/analyze:stacksize 204800</AdditionalOptions>
+      <AdditionalOptions>/FS /analyze:stacksize 204800</AdditionalOptions>
     </ClCompile>
+    <Link />
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug clang|Win32'">
     <ClCompile>
@@ -235,6 +237,7 @@
       <EnablePREfast>false</EnablePREfast>
       <AdditionalOptions>
       </AdditionalOptions>
+      <UndefinePreprocessorDefinitions>__STDC__</UndefinePreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -260,7 +263,7 @@
       <AdditionalIncludeDirectories>../include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NDEBUG;UNICODE=1;WIN32=1;_UNICODE=1;_WIN32=1;AFIO_STANDALONE=1;BOOST_AFIO_HEADERS_ONLY=0;AFIO_STANDALONE=1;BOOST_AFIO_DYN_LINK</PreprocessorDefinitions>
       <EnablePREfast>false</EnablePREfast>
-      <AdditionalOptions>/analyze:stacksize 204800</AdditionalOptions>
+      <AdditionalOptions>/FS /analyze:stacksize 204800</AdditionalOptions>
       <WarningLevel>Level4</WarningLevel>
     </ClCompile>
   </ItemDefinitionGroup>

@@ -188,7 +188,7 @@
       <DisableSpecificWarnings>
       </DisableSpecificWarnings>
       <EnablePREfast>false</EnablePREfast>
-      <AdditionalOptions>/analyze:stacksize 204800</AdditionalOptions>
+      <AdditionalOptions>/FS /analyze:stacksize 204800</AdditionalOptions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug LLVM|x64'">
@@ -230,7 +230,7 @@
       </DisableSpecificWarnings>
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
       <EnablePREfast>false</EnablePREfast>
-      <AdditionalOptions>/analyze:stacksize 204800</AdditionalOptions>
+      <AdditionalOptions>/FS /analyze:stacksize 204800</AdditionalOptions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug clang|Win32'">
@@ -247,7 +247,7 @@
       <AdditionalIncludeDirectories>../include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_DEBUG;UNICODE=1;WIN32=1;_UNICODE=1;_WIN32=1;AFIO_STANDALONE=1;BOOST_AFIO_HEADERS_ONLY=0;AFIO_STANDALONE=1;BOOST_AFIO_DYN_LINK</PreprocessorDefinitions>
       <EnablePREfast>false</EnablePREfast>
-      <AdditionalOptions>/analyze:stacksize 204800</AdditionalOptions>
+      <AdditionalOptions>/FS /analyze:stacksize 204800</AdditionalOptions>
       <WarningLevel>Level4</WarningLevel>
     </ClCompile>
   </ItemDefinitionGroup>
@@ -265,7 +265,7 @@
       <AdditionalIncludeDirectories>../include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NDEBUG;UNICODE=1;WIN32=1;_UNICODE=1;_WIN32=1;AFIO_STANDALONE=1;BOOST_AFIO_HEADERS_ONLY=0;AFIO_STANDALONE=1;BOOST_AFIO_DYN_LINK</PreprocessorDefinitions>
       <EnablePREfast>false</EnablePREfast>
-      <AdditionalOptions>/analyze:stacksize 204800</AdditionalOptions>
+      <AdditionalOptions>/FS /analyze:stacksize 204800</AdditionalOptions>
       <WarningLevel>Level4</WarningLevel>
     </ClCompile>
   </ItemDefinitionGroup>

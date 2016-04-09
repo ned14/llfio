@@ -332,6 +332,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;BOOST_AFIO_EXPORTS;%(PreprocessorDefinitions);UNICODE=1;_UNICODE=1;AFIO_STANDALONE=1</PreprocessorDefinitions>
       <ExceptionHandling>Enabled</ExceptionHandling>
       <CppLanguageStandard>c++1y</CppLanguageStandard>
+      <UndefinePreprocessorDefinitions>__STDC__</UndefinePreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">

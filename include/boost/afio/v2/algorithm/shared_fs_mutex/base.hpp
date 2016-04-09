@@ -140,6 +140,15 @@ namespace algorithm
             , hint(nullptr)
         {
         }
+        entities_guard(const entities_guard &) = delete;
+        entities_guard &operator=(const entities_guard &) = delete;
+        entities_guard(entities_guard &&o) noexcept : _entity(std::move(o._entity)), parent(o.parent), entities(std::move(o.entities)), hint(o.hint) { o.release(); }
+        entities_guard &operator=(entities_guard &&o) noexcept
+        {
+          this->~entities_guard();
+          new(this) entities_guard(std::move(o));
+          return *this;
+        }
         ~entities_guard()
         {
           if(parent)
@@ -175,7 +184,7 @@ namespace algorithm
       {
         entities_guard ret(this, std::move(entities));
         BOOST_OUTCOME_PROPAGATE_ERROR(_lock(ret, std::move(d), spin_not_sleep));
-        return ret;
+        return std::move(ret);
       }
       //! Lock a single entity for exclusive or shared access
       result<entities_guard> lock(entity_type entity, deadline d = deadline(), bool spin_not_sleep = false) noexcept
