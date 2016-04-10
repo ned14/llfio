@@ -50,8 +50,9 @@ namespace algorithm
     your byte range locking implementation, some NFS implementations have been known to fail to cope.
 
     - Compatible with networked file systems, though be cautious with older NFS.
+    - Linear complexity to number of concurrent users.
     - Exponential complexity to number of entities being concurrently locked, though some OSs
-    provide linear complexity so long as total concurrent waiting processes is one.
+    provide linear complexity so long as total concurrent waiting processes is CPU core count or less.
     - Sudden process exit with lock held is recovered from.
     - Sudden power loss during use is recovered from.
     - Safe for multithreaded usage of the same instance.
@@ -116,14 +117,21 @@ namespace algorithm
           else
             end_utc = (d).to_time_point();
         }
+        // Fire this if an error occurs
+        auto disableunlock = detail::Undoer([&] { out.release(); });
         size_t n;
-        do
+        for(;;)
         {
           {
             auto undo = detail::Undoer([&] {
-              for(; n != (size_t) -1; n--)
+              // 0 to (n-1) need to be closed
+              if(n > 0)
               {
-                _h.unlock(out.entities[n].value, 1);
+                --n;
+                // Now 0 to n needs to be closed
+                for(; n > 0; n--)
+                  _h.unlock(out.entities[n].value, 1);
+                _h.unlock(out.entities[0].value, 1);
               }
             });
             for(n = 0; n < out.entities.size(); n++)
@@ -149,20 +157,17 @@ namespace algorithm
                     (nd) = (d);
                 }
               }
-              BOOST_OUTCOME_FILTER_ERROR(guard, _h.lock(out.entities[n].value, 1, out.entities[n].exclusive, nd));
-              if(!guard)
+              auto outcome = _h.lock(out.entities[n].value, 1, out.entities[n].exclusive, nd);
+              if(!outcome)
                 goto failed;
-              guard.release();
+              outcome.get().release();
             }
+            // Everything is locked, exit
             undo.dismiss();
-            continue;
+            disableunlock.dismiss();
+            return make_result<void>();
           }
         failed:
-          // Randomise out.entities
-          std::random_shuffle(out.entities.begin(), out.entities.end());
-          // Sleep for a while
-          if(!spin_not_sleep)
-            std::this_thread::yield();
           if(d)
           {
             if((d).steady)
@@ -176,12 +181,16 @@ namespace algorithm
                 return make_errored_result<void>(ETIMEDOUT);
             }
           }
-        } while(n < out.entities.size());
-        return make_result<void>();
+          // Randomise out.entities
+          std::random_shuffle(out.entities.begin(), out.entities.end());
+          if(!spin_not_sleep)
+            std::this_thread::yield();
+        }
+        // return make_result<void>();
       }
 
     public:
-      virtual void unlock(entities_type entities, void *) noexcept override final
+      virtual void unlock(entities_type entities, unsigned long long) noexcept override final
       {
         BOOST_AFIO_LOG_FUNCTION_CALL(this);
         for(const auto &i : entities)

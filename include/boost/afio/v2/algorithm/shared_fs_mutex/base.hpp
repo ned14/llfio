@@ -125,19 +125,19 @@ namespace algorithm
       public:
         shared_fs_mutex *parent;
         entities_type entities;
-        void *hint;
+        unsigned long long hint;
         entities_guard() = default;
         entities_guard(shared_fs_mutex *_parent, entities_type _entities)
             : parent(_parent)
             , entities(_entities)
-            , hint(nullptr)
+            , hint(0)
         {
         }
         entities_guard(shared_fs_mutex *_parent, entity_type entity)
             : _entity(entity)
             , parent(_parent)
             , entities(&_entity, 1)
-            , hint(nullptr)
+            , hint(0)
         {
         }
         entities_guard(const entities_guard &) = delete;
@@ -201,7 +201,7 @@ namespace algorithm
         return try_lock(ret.entities);
       }
       //! Unlock a previously locked sequence of entities
-      virtual void unlock(entities_type entities, void *hint = nullptr) noexcept = 0;
+      virtual void unlock(entities_type entities, unsigned long long hint = 0) noexcept = 0;
     };
 
   }  // namespace

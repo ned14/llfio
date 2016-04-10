@@ -1,17 +1,57 @@
 This is the beginnings of the post-peer-review AFIO
 v2 rewrite. You can view its documentation at https://ned14.github.io/boost.afio/
 
+benchmark_locking sample results:
+
+Entities with 2 Waiters contended:
+
+lock_files:          1       2       4       8
+                  2261     717     337     157
+
+byte_ranges:         1       2       4       8
+                362285  192949  102511   62183
+
+atomic_append:       1       2       4       8
+                 80325   80007   76541   74635
+
+
+Entities with 4 Waiters contended (on a 4 thread CPU):
+
+lock_files:          1       2       4       8
+                  2072     634     261     107
+
+byte_ranges:         1       2       4       8
+                209192  115130   75839   22707
+
+atomic_append:       1       2       4       8
+                 54109   80027   54750   51177
+
+
+Entities with 4 Waiters uncontended (on a 4 thread CPU):
+
+lock_files:          1       2       4       8
+                                           318
+
+byte_ranges:         1       2       4       8
+                                        195175
+
+atomic_append:       1       2       4       8
+                                         56472
+
+
+
 
 Todo:
-- [ ] lock_files with many waiters is scaling too linearly :)
 - [ ] Add mapped_file_handle. Need some way of explicitly converting a file_handle
 into a mapped_file_handle and vice versa.
-- [ ] Add correctness test to benchmark_locking which uses a shared mapped file
-to check that locks are indeed being observed.
+- [ ] Rewrite correctness test in benchmark_locking to use mapped_file handle.
+- [ ] In DEBUG builds, have io_handle always not fill buffers passed to remind
+people to use pointers returned!
 
 - [ ] Outcome's error logging needs to record current thread id ideally.
 - [ ] Move caching into native_handle_type.
-- [ ] Move locking into file_handle surely?
+- [ ] Add layer between io_handle and (file|async_file)_handle for locking?
+
 - [ ] Implement [[bindlib::make_free]] which injects member functions into the enclosing
 namespace.
 - [ ] Add macro helpers to Outcome for returning outcomes out of things

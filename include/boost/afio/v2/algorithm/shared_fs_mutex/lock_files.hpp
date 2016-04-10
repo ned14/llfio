@@ -51,11 +51,13 @@ namespace algorithm
     is its excellent compatibility with almost everything, most users will want byte_ranges instead.
 
     - Compatible with all networked file systems.
-    - Exponential complexity to number of entities being concurrently locked.
+    - Linear complexity to number of concurrent users.
+    - Exponential complexity to number of contended entities being concurrently locked.
+    - Requests for shared locks are treated as if for exclusive locks.
 
     Caveats:
     - No ability to sleep until a lock becomes free, so CPUs are spun at 100%.
-    - On POSIX sudden process exit with locks held will deadlock all other users by leaving stale
+    - On POSIX only sudden process exit with locks held will deadlock all other users by leaving stale
     files around.
     - Costs a file descriptor per entity locked.
     - Sudden power loss during use will deadlock first user after reboot, again due to stale files.
@@ -136,9 +138,14 @@ namespace algorithm
         {
           {
             auto undo = detail::Undoer([&] {
-              for(; n != (size_t) -1; n--)
+              // 0 to (n-1) need to be closed
+              if(n > 0)
               {
-                _hs[n].close();  // delete on close semantics deletes the file
+                --n;
+                // Now 0 to n needs to be closed
+                for(; n > 0; n--)
+                  _hs[n].close();  // delete on close semantics deletes the file
+                _hs[0].close();
               }
             });
             for(n = 0; n < out.entities.size(); n++)
@@ -183,7 +190,7 @@ namespace algorithm
       }
 
     public:
-      virtual void unlock(entities_type, void *) noexcept override final
+      virtual void unlock(entities_type, unsigned long long) noexcept override final
       {
         BOOST_AFIO_LOG_FUNCTION_CALL(this);
         for(auto &i : _hs)

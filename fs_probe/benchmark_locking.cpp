@@ -324,16 +324,18 @@ int main(int argc, char *argv[])
       std::this_thread::yield();
     while(!done)
     {
-      auto result = algorithm->lock(afio::as_span(entities));
+      auto result = algorithm->lock(afio::as_span(entities), afio::deadline(), false);
       if(result.has_error())
       {
         std::cerr << "ERROR: Algorithm lock returns " << result.get_error().message() << std::endl;
         return;
       }
-      child_locks(this_child);
+      if(contended)
+        child_locks(this_child);
       ++count;
       auto guard = std::move(result.get());
-      child_unlocks(this_child);
+      if(contended)
+        child_unlocks(this_child);
       guard.unlock();
     }
   });

@@ -226,7 +226,7 @@
       </DisableSpecificWarnings>
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
       <EnablePREfast>false</EnablePREfast>
-      <AdditionalOptions>/FS /analyze:stacksize 204800</AdditionalOptions>
+      <AdditionalOptions>/FS /analyze:stacksize 204800 /analyze-</AdditionalOptions>
     </ClCompile>
     <Link />
   </ItemDefinitionGroup>
@@ -263,7 +263,7 @@
       <AdditionalIncludeDirectories>../include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NDEBUG;UNICODE=1;WIN32=1;_UNICODE=1;_WIN32=1;AFIO_STANDALONE=1;BOOST_AFIO_HEADERS_ONLY=0;AFIO_STANDALONE=1;BOOST_AFIO_DYN_LINK</PreprocessorDefinitions>
       <EnablePREfast>false</EnablePREfast>
-      <AdditionalOptions>/FS /analyze:stacksize 204800</AdditionalOptions>
+      <AdditionalOptions>/FS /analyze:stacksize 204800 /analyze-</AdditionalOptions>
       <WarningLevel>Level4</WarningLevel>
     </ClCompile>
   </ItemDefinitionGroup>
