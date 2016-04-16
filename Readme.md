@@ -1,56 +1,27 @@
 This is the beginnings of the post-peer-review AFIO
 v2 rewrite. You can view its documentation at https://ned14.github.io/boost.afio/
 
-benchmark_locking sample results:
-
-Entities with 2 Waiters contended:
-
-lock_files:          1       2       4       8
-                  2261     717     337     157
-
-byte_ranges:         1       2       4       8
-                362285  192949  102511   62183
-
-atomic_append:       1       2       4       8
-                 80325   80007   76541   74635
-
-
-Entities with 4 Waiters contended (on a 4 thread CPU):
-
-lock_files:          1       2       4       8
-                  2072     634     261     107
-
-byte_ranges:         1       2       4       8
-                209192  115130   75839   22707
-
-atomic_append:       1       2       4       8
-                 54109   80027   54750   51177
-
-
-Entities with 4 Waiters uncontended (on a 4 thread CPU):
-
-lock_files:          1       2       4       8
-                                           318
-
-byte_ranges:         1       2       4       8
-                                        195175
-
-atomic_append:       1       2       4       8
-                                         56472
-
-
 
 
 Todo:
-- [ ] Add mapped_file_handle. Need some way of explicitly converting a file_handle
-into a mapped_file_handle and vice versa.
-- [ ] Rewrite correctness test in benchmark_locking to use mapped_file handle.
 - [ ] In DEBUG builds, have io_handle always not fill buffers passed to remind
 people to use pointers returned!
+- [ ] Port AFIO v2 back to POSIX
+  - [ ] delete on close on Linux could be implemented using a clone() and monitoring
+parent process for exit, then trying to take a write oplock and if success
+unlinking the file.
+  - [ ] Maybe best actually to create a delete_on_close_file_handle to encapsulate
+all the hefty code for POSIX.
 
 - [ ] Outcome's error logging needs to record current thread id ideally.
 - [ ] Move caching into native_handle_type.
 - [ ] Add layer between io_handle and (file|async_file)_handle for locking?
+- [ ] delete_on_close really needs an oplocks API to work somewhat like on Windows
+(with races if every user doesn't turn on the oplocks emulation however)
+  - oplocks API can be simulated by range locks on some common byte offset
+on POSIX not Linux. Linux has proper kernel oplocks API, but there is a race between
+taking the write oplock and unlinking - a breaking open() may end up with a deleted
+file entry.
 
 - [ ] Implement [[bindlib::make_free]] which injects member functions into the enclosing
 namespace.
@@ -68,6 +39,9 @@ throws, have it detect __cpp_exceptions and skip those implementations.
 
 - [ ] C bindings for all AFIO v2 APIs. Write libclang parser which autogenerates
 SWIG interface files from the .hpp files.
+- [ ] Add mapped_file_handle. Need some way of explicitly converting a file_handle
+into a mapped_file_handle and vice versa.
+- [ ] Rewrite correctness test in benchmark_locking to use mapped_file handle.
 
 
 - [ ] Add native BSD kqueues to POSIX AIO backend as is vastly more efficient.

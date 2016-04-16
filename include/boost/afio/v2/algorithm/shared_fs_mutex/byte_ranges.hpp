@@ -122,6 +122,7 @@ namespace algorithm
         size_t n;
         for(;;)
         {
+          size_t was_contended = (size_t) -1;
           {
             auto undo = detail::Undoer([&] {
               // 0 to (n-1) need to be closed
@@ -159,7 +160,10 @@ namespace algorithm
               }
               auto outcome = _h.lock(out.entities[n].value, 1, out.entities[n].exclusive, nd);
               if(!outcome)
+              {
+                was_contended = n;
                 goto failed;
+              }
               outcome.get().release();
             }
             // Everything is locked, exit
@@ -181,8 +185,15 @@ namespace algorithm
                 return make_errored_result<void>(ETIMEDOUT);
             }
           }
-          // Randomise out.entities
+#if 1
+          // Move was_contended to front and randomise rest of out.entities
+          std::swap(out.entities[was_contended], out.entities[0]);
+          auto front = out.entities.begin();
+          ++front;
+          std::random_shuffle(front, out.entities.end());
+#else
           std::random_shuffle(out.entities.begin(), out.entities.end());
+#endif
           if(!spin_not_sleep)
             std::this_thread::yield();
         }
