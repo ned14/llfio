@@ -1,0 +1,12 @@
+var searchData=
+[
+  ['random_5fentity',['random_entity',['../classboost_1_1afio_1_1v2_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex.html#afe956d1160f89da5504f990f5acbcd23',1,'boost::afio::v2::algorithm::shared_fs_mutex::shared_fs_mutex']]],
+  ['random_5ffill',['random_fill',['../namespaceboost_1_1afio_1_1v2_1_1utils.html#a3340dfb078c236f005d543a4e8211742',1,'boost::afio::v2::utils']]],
+  ['random_5fstring',['random_string',['../namespaceboost_1_1afio_1_1v2_1_1utils.html#a07a679ff142e3f93b1bce7755961411a',1,'boost::afio::v2::utils']]],
+  ['read',['read',['../classboost_1_1afio_1_1v2_1_1io__handle.html#ac8101226d892e630b23c1b0c61cca45d',1,'boost::afio::v2::io_handle::read(io_request&lt; buffers_type &gt; reqs, deadline d=deadline()) noexcept'],['../classboost_1_1afio_1_1v2_1_1io__handle.html#ab31861fdc8b0b64735e8906099af8763',1,'boost::afio::v2::io_handle::read(extent_type offset, char *data, size_type bytes, deadline d=deadline()) noexcept'],['../structboost_1_1afio_1_1v2_1_1storage__profile_1_1storage__profile.html#aa4849d13d3d6909f6ba820a5911cadb2',1,'boost::afio::v2::storage_profile::storage_profile::read()']]],
+  ['release',['release',['../classboost_1_1afio_1_1v2_1_1handle.html#abf643414037cf74821d7e1a5828da69f',1,'boost::afio::v2::handle::release()'],['../classboost_1_1afio_1_1v2_1_1io__handle_1_1extent__guard.html#abb558af37f944722ab47383d3e6b263a',1,'boost::afio::v2::io_handle::extent_guard::release()'],['../classboost_1_1afio_1_1v2_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex_1_1entities__guard.html#a7411754f1ef608e4e8597fce6a1d89c3',1,'boost::afio::v2::algorithm::shared_fs_mutex::shared_fs_mutex::entities_guard::release()']]],
+  ['requires_5faligned_5fio',['requires_aligned_io',['../classboost_1_1afio_1_1v2_1_1handle.html#a6f13faf2736bf1887b6b6945c0a5bed1',1,'boost::afio::v2::handle::requires_aligned_io()'],['../structboost_1_1afio_1_1v2_1_1native__handle__type.html#ae506aedb33c856322dcedac262661445',1,'boost::afio::v2::native_handle_type::requires_aligned_io()']]],
+  ['result_5fbits_5fvalid',['result_bits_valid',['../classboost_1_1afio_1_1v2_1_1utils_1_1secded__ecc.html#a1be0bd1ae879c076851e8917e58c1382',1,'boost::afio::v2::utils::secded_ecc']]],
+  ['run',['run',['../classboost_1_1afio_1_1v2_1_1io__service.html#ab0a764a0bbaa893db6e921fd22fc7dcf',1,'boost::afio::v2::io_service']]],
+  ['run_5funtil',['run_until',['../classboost_1_1afio_1_1v2_1_1io__service.html#a6479c7441ec331a37345325ea8d732d1',1,'boost::afio::v2::io_service']]]
+];

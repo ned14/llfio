@@ -1,0 +1,22 @@
+var searchData=
+[
+  ['acls',['acls',['../structboost_1_1afio_1_1v2_1_1statfs__t_1_1f__flags__t.html#a243ae8205ece67b83e8cc14dde882b90',1,'boost::afio::v2::statfs_t::f_flags_t']]],
+  ['add',['add',['../classboost_1_1afio_1_1v2_1_1utils_1_1fast__hash.html#ac1e4b8e23576e11f8621e02cbad0e93f',1,'boost::afio::v2::utils::fast_hash']]],
+  ['afio_5fnamespace_5fstring',['afio_namespace_string',['../namespaceboost_1_1afio_1_1v2.html#aebdd1537e2d802614adde36bfed82cee',1,'boost::afio::v2']]],
+  ['aligned_5fio',['aligned_io',['../structboost_1_1afio_1_1v2_1_1native__handle__type_1_1disposition__base.html#a5f6ab2c3be6b5ea03685d6177ee60802a4396354a8655588538579f126982de5c',1,'boost::afio::v2::native_handle_type::disposition_base']]],
+  ['all',['all',['../classboost_1_1afio_1_1v2_1_1handle.html#aee91cd29de550a15e854459cf67583d1aa181a603769c1f98ad927e7367c7aa51',1,'boost::afio::v2::handle']]],
+  ['append',['append',['../classboost_1_1afio_1_1v2_1_1handle.html#a3a41cb212269b4f786fe239568359a47a9516dfb15f51c7ee19a4d46b8c0dbe1d',1,'boost::afio::v2::handle']]],
+  ['append_5fonly',['append_only',['../structboost_1_1afio_1_1v2_1_1native__handle__type_1_1disposition__base.html#a5f6ab2c3be6b5ea03685d6177ee60802a24ad406a7de172f7b6e2bc9f6bbc80f0',1,'boost::afio::v2::native_handle_type::disposition_base']]],
+  ['are_5freads_5ffrom_5fcache',['are_reads_from_cache',['../classboost_1_1afio_1_1v2_1_1handle.html#a622f959af5b6df5ce6229d0fae92c905',1,'boost::afio::v2::handle']]],
+  ['are_5fsafety_5ffsyncs_5fissued',['are_safety_fsyncs_issued',['../classboost_1_1afio_1_1v2_1_1handle.html#ab8685455f54c72fa83d675fc966f0f20',1,'boost::afio::v2::handle']]],
+  ['are_5fwrites_5fdurable',['are_writes_durable',['../classboost_1_1afio_1_1v2_1_1handle.html#af5a2a608248e6fb8ccba8b60ed617c1a',1,'boost::afio::v2::handle']]],
+  ['async_5ffile',['async_file',['../classboost_1_1afio_1_1v2_1_1async__file__handle.html#aefe34e7d3ffdfe605528a40351efffd3',1,'boost::afio::v2::async_file_handle']]],
+  ['async_5ffile_5fhandle',['async_file_handle',['../classboost_1_1afio_1_1v2_1_1async__file__handle.html#a653b14ff7ba8cfcccd2d18c7386d2d69',1,'boost::afio::v2::async_file_handle::async_file_handle()'],['../classboost_1_1afio_1_1v2_1_1async__file__handle.html#a1a2f109f659aab8c569caefd2cea7513',1,'boost::afio::v2::async_file_handle::async_file_handle(io_service *service, path_type path, native_handle_type h, caching caching=caching::none, flag flags=flag::none)'],['../classboost_1_1afio_1_1v2_1_1async__file__handle.html#a4937056cc03b89c8851b772c1e5ce242',1,'boost::afio::v2::async_file_handle::async_file_handle(async_file_handle &amp;&amp;o) noexcept'],['../classboost_1_1afio_1_1v2_1_1async__file__handle.html#abd574fc0fdc0fa8b9e68edc55b2c7662',1,'boost::afio::v2::async_file_handle::async_file_handle(file_handle &amp;&amp;o) noexcept'],['../classboost_1_1afio_1_1v2_1_1async__file__handle.html#aeaf098875ee606a59583e3c7643045b0',1,'boost::afio::v2::async_file_handle::async_file_handle(handle &amp;&amp;o, io_service *service, path_type path) noexcept'],['../classboost_1_1afio_1_1v2_1_1async__file__handle.html#a5badfb6318e791b57419a82288fac2c6',1,'boost::afio::v2::async_file_handle::async_file_handle(const async_file_handle &amp;o, really_copy _)']]],
+  ['async_5ffile_5fhandle',['async_file_handle',['../classboost_1_1afio_1_1v2_1_1async__file__handle.html',1,'boost::afio::v2']]],
+  ['async_5fread',['async_read',['../classboost_1_1afio_1_1v2_1_1async__file__handle.html#a88acb9804000dc613986d1d346fbefc3',1,'boost::afio::v2::async_file_handle']]],
+  ['async_5fwrite',['async_write',['../classboost_1_1afio_1_1v2_1_1async__file__handle.html#a0c4b4b75ff0d871b07f6019701ce5302',1,'boost::afio::v2::async_file_handle']]],
+  ['atomic_5fappend',['atomic_append',['../classboost_1_1afio_1_1v2_1_1algorithm_1_1shared__fs__mutex_1_1atomic__append.html#a86396e3d55a54eb6bd6db5f7115d32d0',1,'boost::afio::v2::algorithm::shared_fs_mutex::atomic_append']]],
+  ['atomic_5fappend',['atomic_append',['../classboost_1_1afio_1_1v2_1_1algorithm_1_1shared__fs__mutex_1_1atomic__append.html',1,'boost::afio::v2::algorithm::shared_fs_mutex']]],
+  ['attr_5fread',['attr_read',['../classboost_1_1afio_1_1v2_1_1handle.html#a3a41cb212269b4f786fe239568359a47aa4daf6d1e8da35af49c33bbe9ee91d79',1,'boost::afio::v2::handle']]],
+  ['attr_5fwrite',['attr_write',['../classboost_1_1afio_1_1v2_1_1handle.html#a3a41cb212269b4f786fe239568359a47a9f56aff64cb748e078ab221474132d19',1,'boost::afio::v2::handle']]]
+];
