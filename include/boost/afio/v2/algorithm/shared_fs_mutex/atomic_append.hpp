@@ -262,6 +262,8 @@ namespace algorithm
         // Read onwards from length as reported before I wrote my lock request
         // until I find my lock request. This loop should never actually iterate
         // except under extreme load conditions.
+        //! \todo Read from header.last_known_good immediately if possible in order
+        //! to avoid a duplicate read later
         for(;;)
         {
           file_handle::io_result<file_handle::buffer_type> readoutcome = _h.read(my_lock_request_offset, _buffer, sizeof(_buffer));
