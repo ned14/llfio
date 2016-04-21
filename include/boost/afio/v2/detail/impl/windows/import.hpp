@@ -659,13 +659,11 @@ template <class T> inline outcome<T> make_errored_outcome(NTSTATUS e, const char
 }
 template <class T> inline result<T> make_errored_result_nt(NTSTATUS e, const char *extended = nullptr)
 {
-  (void) extended;
-  return result<T>(std::error_code(windows_nt_kernel::win32_error_from_nt_status(e), std::system_category()));
+  return make_errored_result<T>(windows_nt_kernel::win32_error_from_nt_status(e), extended);
 }
 template <class T> inline outcome<T> make_errored_outcome_nt(NTSTATUS e, const char *extended = nullptr)
 {
-  (void) extended;
-  return outcome<T>(std::error_code(windows_nt_kernel::win32_error_from_nt_status(e), std::system_category()));
+  return make_errored_outcome<T>(windows_nt_kernel::win32_error_from_nt_status(e), extended);
 }
 
 #if 0

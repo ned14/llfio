@@ -8,9 +8,9 @@ yet.
 | NEW in v2 | Boost peer review feedback |     |
 | --------- | -------------------------- | --- |
 | ✔ | ✔ | Universal native handle/fd abstraction instead of `void *`.
-| ✔ | ✔ | Perfectly/Ideally low memory allocation per op (usually none).
+| ✔ | ✔ | Perfectly/Ideally low memory (de)allocation per op (usually none).
 | ✔ | ✔ | noexcept API throughout returning error_code for failure instead of throwing exceptions.
-| ✔ | ✔ | AFIO v1 handle type split into hierarchy of types:<ol><li>handle - provides open, close, get path, clone, set/unset append only, change caching, characteristics<li>io_handle - adds synchronous scatter-gather i/o<li>file_handle - adds open/create file, get and set maximum extent<li>async_file_handle - adds asynchronous scatter-gather i/o</ol>
+| ✔ | ✔ | AFIO v1 handle type split into hierarchy of types:<ol><li>handle - provides open, close, get path, clone, set/unset append only, change caching, characteristics<li>io_handle - adds synchronous scatter-gather i/o, byte range locking<li>file_handle - adds open/create file, get and set maximum extent<li>async_file_handle - adds asynchronous scatter-gather i/o</ol>
 | ✔ | ✔ | Cancelable i/o (made possible thanks to dropping XP support).
 | ✔ | ✔ | All shared_ptr usage removed as all use of multiple threads removed.
 | ✔ | ✔ | Use of std::vector to transport scatter-gather sequences replaced with C++ 17 `span<>`.

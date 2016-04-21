@@ -55,6 +55,10 @@ namespace detail
 
   /*! \class child_process
   \brief Launches and manages a child process with stdin, stdout and stderr.
+
+  \todo If we ever make more use of child_process, its handles need to be managed by
+  handle and use async_pipe_handle or something as the handle implementation to avoid
+  deadlocking stdout and stderr.
   */
   class BOOST_AFIO_DECL child_process
   {

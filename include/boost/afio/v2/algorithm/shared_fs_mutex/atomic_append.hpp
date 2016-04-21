@@ -101,6 +101,8 @@ namespace algorithm
 
     \todo Implement hole punching once I port that code from AFIO v1.
     \todo Decide on some resolution mechanism for sudden process exit.
+    \todo There is a 1 out of 2^64-2 chance of unique id collision. It would be nice if we
+    actually formally checked that our chosen unique id is actually unique.
     */
     class atomic_append : public shared_fs_mutex
     {
