@@ -4,6 +4,15 @@ v2 rewrite. You can view its documentation at https://ned14.github.io/boost.afio
 
 
 Todo:
+- [ ] Raise Bindlib and Outcome on Travis and Appveyor as they regressed!!!
+- [ ] algorithm::atomic_append needs improvements:
+  - Trap if append exceeds 2^63 and do something useful with that
+  - Fix the known inefficiencies in the implementation:
+    - We have an extra read() during locking between the scanning for our lock
+    request and scanning for other lock requests
+    - During scan when hashes mismatch we reload a suboptimal range
+   Loses SMB and NFS compatibility:
+    - We reload header when a memory mapped header would be much faster
 - [ ] In DEBUG builds, have io_handle always not fill buffers passed to remind
 people to use pointers returned!
 - [ ] Port AFIO v2 back to POSIX
@@ -39,8 +48,11 @@ throws, have it detect __cpp_exceptions and skip those implementations.
 
 - [ ] C bindings for all AFIO v2 APIs. Write libclang parser which autogenerates
 SWIG interface files from the .hpp files.
-- [ ] Add mapped_file_handle. Need some way of explicitly converting a file_handle
-into a mapped_file_handle and vice versa.
+- [ ] Add mapped_file_handle
+  - Need some way of explicitly converting a file_handle into a mapped_file_handle
+and vice versa.
+  - Could speculatively map 4Kb chunks lazily and keep an internal map of 4Kb
+offsets to map. This allows more optimal handing of growing files.
 - [ ] Rewrite correctness test in benchmark_locking to use mapped_file handle.
 
 
@@ -79,7 +91,20 @@ GetFinalPathNameByHandle(FILE_NAME_OPENED). VOLUME_NAME_DOS vs VOLUME_NAME_NT sh
 depend on the current afio::path setting.
 - [ ] directory_handle
 - [ ] symlink_handle
+- [ ] pipe_handle? If so, child_process can use that instead of doing its own
+thing. Would be nice purely for conformance checking that io_handle layers
+downwards are correct.
 - [ ] Missing functions on handle/file_handle from AFIO v1
+- [ ] Proper temporary file support
+  - [ ] Need discovery routine - may need directory_handle support first.
+  - [ ] Need to do something about file creation permissions as temp files
+probably need to be user access only
+
+boost::afio::algorithm::todo:
+
+- [ ] Correct directory hierarchy delete
+- [ ] Correct directory hierarchy copy
+- [ ] Correct directory hierarchy move
 
 ## Commits and tags in this git repository can be verified using:
 <pre>
