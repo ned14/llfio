@@ -18,23 +18,33 @@ in a call sequence be overridden with some errored return.
   - Integration test would be expected to fail during these permutations, but
   we probably have to still call the syscalls in case they have side effects
 
+  
+  
+  
 Todo:
 - [ ] algorithm::atomic_append needs improvements:
   - Trap if append exceeds 2^63 and do something useful with that
   - Fix the known inefficiencies in the implementation:
+    - We should use byte range locks when concurrency*entities is low
     - We have an extra read() during locking between the scanning for our lock
     request and scanning for other lock requests
     - During scan when hashes mismatch we reload a suboptimal range
-   Loses SMB and NFS compatibility:
-    - We reload header when a memory mapped header would be much faster
+    - We should use memory maps until a SMB/NFS/QNX/OpenBSD lock_request comes
+    in whereafter we should degrade to normal i/o gracefully
 - [ ] In DEBUG builds, have io_handle always not fill buffers passed to remind
 people to use pointers returned!
+
 - [ ] Port AFIO v2 back to POSIX
+  - [ ] flag::delete_on_close should become flag::win_delete_on_last_close which only
+works on Windows
+  - [ ] Add flag::posix_unlink_on_first_close which only works on POSIX
   - [ ] delete on close on Linux could be implemented using a clone() and monitoring
 parent process for exit, then trying to take a write oplock and if success
 unlinking the file.
   - [ ] Maybe best actually to create a delete_on_close_file_handle to encapsulate
 all the hefty code for POSIX.
+
+
 
 - [ ] Outcome's error logging needs to record current thread id ideally.
 - [ ] Move caching into native_handle_type.
@@ -116,9 +126,32 @@ probably need to be user access only
 
 boost::afio::algorithm::todo:
 
+- [ ] Store in EA or a file called .spookyhashes or .spookyhash the 128 bit hash of
+a file and the time it was calculated. This can save lots of hashing work later.
 - [ ] Correct directory hierarchy delete
+  i.e.:
+  - Delete files first tips to trunk, retrying for some given timeout. If fail to
+  immediately delete, rename to base directory under a long random hex name, try
+  to delete again.
+  - Only after all files have been deleted, delete directories. If new files appear
+  during directory deletion, loop.
+  - Options:
+    - Rename base directory(ies) to something random to atomically prevent lookup.
+    - Delete all or nothing (i.e. rename all files into another tree checking
+    permissions etc, if successful only then delete)
 - [ ] Correct directory hierarchy copy
+  - Optional backup semantics (i.e. copy all ACLs, metadata etc)
+  - Intelligent retry for some given timeout before failing.
+  - Optional fixup of any symbolic links pointing into copied tree.
+  - Optional copy directory structure but hard or symbolic linking files.
+    - Symbolic links optionally are always absolute paths instead of relative.
+  - Optional deference all hard links and/or symbolic links into real files.
 - [ ] Correct directory hierarchy move
+- [ ] Make directory tree C by cloning tree B to tree B, and then updating tree C
+with changes from tree A. The idea is for an incremental backup of changes over
+time but saving storage where possible.
+- [ ] Replace all duplicate files in a tree with hardlinks.
+- [ ] Figure out all hard linked file entries for some inode.
 
 ## Commits and tags in this git repository can be verified using:
 <pre>
