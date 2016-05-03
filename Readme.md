@@ -22,6 +22,7 @@ in a call sequence be overridden with some errored return.
   
   
 Todo:
+- [ ] Add -Wdocumentation to clang builds and fix broken docs :)
 - [ ] algorithm::atomic_append needs improvements:
   - Trap if append exceeds 2^63 and do something useful with that
   - Fix the known inefficiencies in the implementation:
@@ -147,11 +148,14 @@ a file and the time it was calculated. This can save lots of hashing work later.
     - Symbolic links optionally are always absolute paths instead of relative.
   - Optional deference all hard links and/or symbolic links into real files.
 - [ ] Correct directory hierarchy move
+- [ ] Correct directory hierarchy update (i.e. changes only)
 - [ ] Make directory tree C by cloning tree B to tree B, and then updating tree C
 with changes from tree A. The idea is for an incremental backup of changes over
 time but saving storage where possible.
 - [ ] Replace all duplicate files in a tree with hardlinks.
 - [ ] Figure out all hard linked file entries for some inode.
+- [ ] Generate list of all hard linked files in a tree (i.e. refcount>1) and which
+are the same inode.
 
 ## Commits and tags in this git repository can be verified using:
 <pre>
