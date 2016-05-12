@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="tests">
+      <UniqueIdentifier>{dd3fde1b-4224-4530-93ee-34e10790db19}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="tests\file_handle_create_close">
+      <UniqueIdentifier>{dde25103-8a3d-47bc-9ccb-1253c9a1bd21}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="tests\file_handle_create_close\kernel.cpp">
+      <Filter>tests\file_handle_create_close</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="integration_test_kernel.hpp">
+      <Filter>tests</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

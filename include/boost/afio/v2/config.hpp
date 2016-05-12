@@ -388,9 +388,11 @@ BOOST_AFIO_V2_NAMESPACE_END
 #if BOOST_AFIO_LOGGING_LEVEL >= 2
 #define BOOST_AFIO_LOG_ERROR(inst, message) BOOST_AFIO_V2_NAMESPACE::log().emplace_back(ringbuffer_log::level::error, (message), (unsigned) (uintptr_t)(inst), ringbuffer_log::this_thread_id(), (BOOST_AFIO_LOG_BACKTRACE_LEVELS & (1 << 2)) ? nullptr : __func__, __LINE__)
 // Intercept when Outcome creates an error_code_extended and log it to our log too
+#ifndef BOOST_OUTCOME_ERROR_CODE_EXTENDED_CREATION_HOOK
 #define BOOST_OUTCOME_ERROR_CODE_EXTENDED_CREATION_HOOK                                                                                                                                                                                                                                                                        \
   if(*this)                                                                                                                                                                                                                                                                                                                    \
   BOOST_AFIO_V2_NAMESPACE::record_error_into_afio_log(ringbuffer_log::level::error, this->message().c_str(), this->value(), (unsigned) this->_unique_id, (BOOST_AFIO_LOG_BACKTRACE_LEVELS & (1 << 2)) ? nullptr : __func__, __LINE__)
+#endif
 #else
 #define BOOST_AFIO_LOG_ERROR(inst, message)
 #endif

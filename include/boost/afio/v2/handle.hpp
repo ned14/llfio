@@ -50,6 +50,8 @@ BOOST_AFIO_V2_NAMESPACE_BEGIN
 */
 class BOOST_AFIO_DECL handle
 {
+  friend inline std::ostream &operator<<(std::ostream &s, const handle &v);
+
 public:
   //! The path type used by this handle
   using path_type = fixme_path;
@@ -227,6 +229,10 @@ public:
   //! The native handle used by this handle
   native_handle_type native_handle() const noexcept { return _v; }
 };
+inline std::ostream &operator<<(std::ostream &s, const handle &v)
+{
+  return s << "afio::handle(" << v._v._init << ", " << v.path() << ")";
+}
 
 /*! \class io_handle
 \brief A handle to something capable of scatter-gather i/o.
