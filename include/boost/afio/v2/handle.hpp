@@ -94,8 +94,10 @@ public:
   //! Bitwise flags which can be specified
   BOOST_AFIO_BITFIELD_BEGIN(flag)
   {
-    none = 0,                  //!< No flags
-    delete_on_close = 1 << 0,  //!< Delete the file on last handle close
+    none = 0,                              //!< No flags
+    win_delete_on_last_close = 1 << 0,     //!< (Windows only) Delete the file on last handle close
+    posix_unlink_on_first_close = 1 << 1,  //!< (POSIX only) Unlink the file on first handle close
+
     /*! Some kernel caching modes have unhelpfully inconsistent behaviours
     in getting your data onto storage, so by default unless this flag is
     specified AFIO adds extra fsyncs to the following operations for the
@@ -113,7 +115,7 @@ public:
     * caching::reads_and_metadata
     * caching::safety_fsyncs
     */
-    disable_safety_fsyncs = 1 << 1,
+    disable_safety_fsyncs = 1 << 2,
 
     overlapped = 1 << 28,         //!< On Windows, create any new handles with OVERLAPPED semantics
     byte_lock_insanity = 1 << 29  //!< Using insane POSIX byte range locks
@@ -322,7 +324,7 @@ public:
   the data may be \em completely different to what was submitted (e.g. it may point into a
   memory map).
   \param reqs A scatter-gather and offset request.
-  \param deadline An optional deadline by which the i/o must complete, else it is cancelled.
+  \param d An optional deadline by which the i/o must complete, else it is cancelled.
   Note function may return significantly after this deadline if the i/o takes long to cancel.
   \errors Any of the values POSIX read() can return, ETIMEDOUT, ECANCELED. ENOTSUP may be
   returned if deadline i/o is not possible with this particular handle configuration (e.g.
@@ -346,7 +348,7 @@ public:
   \return The buffers written, which may not be the buffers input. The size of each scatter-gather
   buffer is updated with the number of bytes of that buffer transferred.
   \param reqs A scatter-gather and offset request.
-  \param deadline An optional deadline by which the i/o must complete, else it is cancelled.
+  \param d An optional deadline by which the i/o must complete, else it is cancelled.
   Note function may return significantly after this deadline if the i/o takes long to cancel.
   \errors Any of the values POSIX write() can return, ETIMEDOUT, ECANCELED. ENOTSUP may be
   returned if deadline i/o is not possible with this particular handle configuration (e.g.
@@ -460,7 +462,7 @@ public:
   efficient alternative algorithm where available on your platform (specifically, on BSD and OS X use
   flock() for non-insane semantics).
   \param exclusive Whether the lock is to be exclusive.
-  \param deadline An optional deadline by which the lock must complete, else it is cancelled.
+  \param d An optional deadline by which the lock must complete, else it is cancelled.
   \errors Any of the values POSIX fcntl() can return, ETIMEDOUT. ENOTSUP may be
   returned if deadline i/o is not possible with this particular handle configuration (e.g.
   non-overlapped HANDLE on Windows).

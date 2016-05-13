@@ -294,8 +294,7 @@
       <StrictAliasing>true</StrictAliasing>
       <ExceptionHandling>Enabled</ExceptionHandling>
       <CppLanguageStandard>c++1y</CppLanguageStandard>
-      <AdditionalOptions>
-      </AdditionalOptions>
+      <AdditionalOptions>-Wdocumentation</AdditionalOptions>
       <MSCompilerVersion>1900</MSCompilerVersion>
       <MSCompatibility>false</MSCompatibility>
       <UndefinePreprocessorDefinitions>__STDC__</UndefinePreprocessorDefinitions>

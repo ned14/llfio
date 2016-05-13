@@ -22,7 +22,6 @@ in a call sequence be overridden with some errored return.
   
   
 Todo:
-- [ ] Add -Wdocumentation to clang builds and fix broken docs :)
 - [ ] algorithm::atomic_append needs improvements:
   - Trap if append exceeds 2^63 and do something useful with that
   - Fix the known inefficiencies in the implementation:
@@ -36,9 +35,6 @@ Todo:
 people to use pointers returned!
 
 - [ ] Port AFIO v2 back to POSIX
-  - [ ] flag::delete_on_close should become flag::win_delete_on_last_close which only
-works on Windows
-  - [ ] Add flag::posix_unlink_on_first_close which only works on POSIX
   - [ ] delete on close on Linux could be implemented using a clone() and monitoring
 parent process for exit, then trying to take a write oplock and if success
 unlinking the file.
