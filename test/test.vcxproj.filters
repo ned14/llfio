@@ -9,13 +9,13 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="tests\file_handle_create_close\kernel.cpp">
-      <Filter>tests\file_handle_create_close</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="integration_test_kernel.hpp">
       <Filter>tests</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="tests\file_handle_create_close\kernel_creation.cpp">
+      <Filter>tests\file_handle_create_close</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

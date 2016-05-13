@@ -5,7 +5,9 @@ File Created: Apr 2016
 
 #include "../../integration_test_kernel.hpp"
 
-template <class FileHandleType> void file_handle_create_close_creation()
+// TODO FIXME: Make the below lambda based and rid ourselves of some of the macros
+
+template <class FileHandleType> inline void file_handle_create_close_creation()
 {
   using namespace BOOST_AFIO_V2_NAMESPACE;
   using BOOST_AFIO_V2_NAMESPACE::result;
@@ -17,7 +19,7 @@ template <class FileHandleType> void file_handle_create_close_creation()
   *    existing1: single one byte length file
   */
   // clang-format off
-  BOOST_OUTCOME_INTEGRATION_TEST_ST_KERNEL_PARAMETER_TO_FILESYSTEM(result<void>, c, ({
+  BOOST_OUTCOME_INTEGRATION_TEST_MT_KERNEL_PARAMETER_TO_FILESYSTEM(result<void>, c, ({
     { file_handle::creation::open_existing,     "non-existing", make_errored_result<void>(ENOENT), "non-existing" },
     { file_handle::creation::open_existing,     "existing0",            make_result<void>(),       "existing0" },
     { file_handle::creation::open_existing,     "existing1",            make_result<void>(),       "existing1" },
@@ -39,5 +41,5 @@ template <class FileHandleType> void file_handle_create_close_creation()
                                                                    })
 }
 
-BOOST_OUTCOME_INTEGRATION_TEST_KERNEL(afio, integration / file_handle_create_close_creation, "Tests that afio::file_handle's creation parameter works as expected", file_handle_create_close_creation<BOOST_AFIO_V2_NAMESPACE::file_handle>())
-BOOST_OUTCOME_INTEGRATION_TEST_KERNEL(afio, integration / async_file_handle_create_close_creation, "Tests that afio::async_file_handle's creation parameter works as expected", file_handle_create_close_creation<BOOST_AFIO_V2_NAMESPACE::async_file_handle>())
+BOOST_OUTCOME_INTEGRATION_TEST_KERNEL(afio, integration / file_handle_create_close / creation1, "Tests that afio::file_handle's creation parameter works as expected", file_handle_create_close_creation<BOOST_AFIO_V2_NAMESPACE::file_handle>())
+BOOST_OUTCOME_INTEGRATION_TEST_KERNEL(afio, integration / file_handle_create_close / creation2, "Tests that afio::async_file_handle's creation parameter works as expected", file_handle_create_close_creation<BOOST_AFIO_V2_NAMESPACE::async_file_handle>())

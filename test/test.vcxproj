@@ -40,10 +40,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="tests\file_handle_create_close\kernel.cpp" />
+    <ClInclude Include="integration_test_kernel.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="integration_test_kernel.hpp" />
+    <ClCompile Include="tests\file_handle_create_close\kernel_creation.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{800F84E0-5DEA-4D82-A6C5-830695DA4D1F}</ProjectGuid>
