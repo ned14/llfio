@@ -70,6 +70,7 @@ throws, have it detect __cpp_exceptions and skip those implementations.
 - [ ] C bindings for all AFIO v2 APIs. Write libclang parser which autogenerates
 SWIG interface files from the .hpp files.
 - [ ] Add mapped_file_handle
+  - Use two level page system, so page/bigpage
   - Need some way of explicitly converting a file_handle into a mapped_file_handle
 and vice versa.
   - Could speculatively map 4Kb chunks lazily and keep an internal map of 4Kb
@@ -148,7 +149,7 @@ a file and the time it was calculated. This can save lots of hashing work later.
 - [ ] Make directory tree C by cloning tree B to tree B, and then updating tree C
 with changes from tree A. The idea is for an incremental backup of changes over
 time but saving storage where possible.
-- [ ] Replace all duplicate files in a tree with hardlinks.
+- [ ] Replace all content (including EA) duplicate files in a tree with hardlinks.
 - [ ] Figure out all hard linked file entries for some inode.
 - [ ] Generate list of all hard linked files in a tree (i.e. refcount>1) and which
 are the same inode.
