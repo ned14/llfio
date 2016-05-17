@@ -19,7 +19,7 @@ template <class FileHandleType> inline void file_handle_create_close_creation()
   *    existing1: single one byte length file
   */
   // clang-format off
-  BOOST_OUTCOME_INTEGRATION_TEST_MT_KERNEL_PARAMETER_TO_FILESYSTEM(result<void>, c, ({
+  BOOST_OUTCOME_INTEGRATION_TEST_MT_KERNEL_PARAMETER_TO_FILESYSTEM((result<void>), c, "file_handle_create_close", ({
     { file_handle::creation::open_existing,     "non-existing", make_errored_result<void>(ENOENT), "non-existing" },
     { file_handle::creation::open_existing,     "existing0",            make_result<void>(),       "existing0" },
     { file_handle::creation::open_existing,     "existing1",            make_result<void>(),       "existing1" },

@@ -632,7 +632,20 @@ namespace detail
 }  // namespace detail
 
 
-// Temporary in lieu of afio::path
+// Temporary in lieu of full fat afio::path
+/* \todo Full fat afio::path needs to be able to variant a win32 path
+and a nt kernel path.
+\todo A variant of an open handle as base and a relative path fragment
+from there is also needed, though I have no idea how to manage lifetime
+for such a thing.
+\todo It would make a great deal of sense if afio::path were
+a linked list of filesystem::path fragments as things like directory
+hierarchy walks do a lot of leaf node splitting which for a 32k path
+means a ton load of memory copying. Something like LLVM's list of
+string fragments would be far faster - look for an existing implementation
+before writing our own! One of those path fragments could variant onto
+an open handle to solve the earlier issue.
+*/
 using fixme_path = stl1z::filesystem::path;
 
 //! Constexpr typesafe bitwise flags support

@@ -10,11 +10,17 @@ File Created: Apr 2016
 #include "../include/boost/afio/outcome/include/boost/outcome/bindlib/include/boost/test/unit_test.hpp"
 
 #include <filesystem>
+#include <unordered_map>
+
 // TODO: Outcome's config.hpp should bind this
 BOOST_OUTCOME_V1_NAMESPACE_BEGIN
 namespace stl1z
 {
   namespace filesystem = std::experimental::filesystem;
+  struct path_hasher
+  {
+    size_t operator()(const filesystem::path &p) const { return hash_value(p.native()); }
+  };
 }
 BOOST_OUTCOME_V1_NAMESPACE_END
 
@@ -92,37 +98,45 @@ namespace integration_test
     }
 
   private:
-    void _remove_workspace()
+    void _remove_workspace() noexcept
     {
-      if(!stl1z::filesystem::exists(_current))
-        return;
-      auto begin = stl11::chrono::steady_clock::now();
       stl11::error_code ec;
+      auto begin = stl11::chrono::steady_clock::now();
       do
       {
-        if(!stl1z::filesystem::exists(_current))
+        bool exists = stl1z::filesystem::exists(_current, ec);
+        if(!ec && !exists)
           return;
         stl1z::filesystem::remove_all(_current, ec);
       } while(stl11::chrono::duration_cast<stl11::chrono::seconds>(stl11::chrono::steady_clock::now() - begin).count() < 5);
-      std::cerr << "FATAL: Couldn't delete " << _current << " after five seconds of trying." << std::endl;
+      std::cerr << "FATAL: Couldn't delete " << _current << " due to " << ec.message() << " after five seconds of trying." << std::endl;
       std::terminate();
     }
-    void _setup_workspace()
+    void _setup_workspace() noexcept
     {
-      if(!stl1z::filesystem::exists(_before))
+      stl11::error_code ec;
+      // Is the input workspace no workspace?
+      bool exists = stl1z::filesystem::exists(_before, ec);
+      if(ec)
+        goto fatalexit;
+      if(!exists)
       {
-        stl1z::filesystem::create_directory(_current);
+        stl1z::filesystem::create_directory(_current, ec);
+        if(ec)
+          goto fatalexit;
         return;
       }
-      auto begin = stl11::chrono::steady_clock::now();
-      stl11::error_code ec;
-      do
       {
-        stl1z::filesystem::copy(_before, _current, stl1z::filesystem::copy_options::recursive, ec);
-        if(!ec)
-          return;
-      } while(stl11::chrono::duration_cast<stl11::chrono::seconds>(stl11::chrono::steady_clock::now() - begin).count() < 5);
-      std::cerr << "FATAL: Couldn't copy " << _before << " to " << _current << " after five seconds of trying." << std::endl;
+        auto begin = stl11::chrono::steady_clock::now();
+        do
+        {
+          stl1z::filesystem::copy(_before, _current, stl1z::filesystem::copy_options::recursive, ec);
+          if(!ec)
+            return;
+        } while(stl11::chrono::duration_cast<stl11::chrono::seconds>(stl11::chrono::steady_clock::now() - begin).count() < 5);
+      }
+    fatalexit:
+      std::cerr << "FATAL: Couldn't copy " << _before << " to " << _current << " due to " << ec.message() << " after five seconds of trying." << std::endl;
       std::terminate();
     }
     // We use a depth first strategy. f(directory_entry) can return something to early exit.
@@ -132,7 +146,7 @@ namespace integration_test
       {
         if(stl1z::filesystem::is_directory(it->status()))
         {
-          auto ret = _walk(it->path(), std::forward<U>(f));
+          auto ret(_walk(it->path(), std::forward<U>(f)));
           if(ret)
             return ret;
         }
@@ -141,30 +155,52 @@ namespace integration_test
       {
         if(!stl1z::filesystem::is_directory(it->status()))
         {
-          auto ret = f(*it);
+          auto ret(f(*it));
           if(ret)
             return ret;
         }
       }
-      return std::declval<decltype(f(std::declval<stl1z::filesystem::directory_entry>()))>();
+      // Return default constructed edition of the type returned by the callable
+      return decltype(f(std::declval<stl1z::filesystem::directory_entry>()))();
     }
     // We only compare location, names and sizes. Other metadata like timestamps or perms not compared.
-    option<stl1z::filesystem::path> _compare_workspace()
+    // Returns empty result if identical, else path of first differing item
+    result<stl1z::filesystem::path> _compare_workspace() noexcept
     {
-      // TODO FIXME: Need list of everything in _after first
+      // Make list of everything in _after
+      std::unordered_map<stl1z::filesystem::path, stl1z::filesystem::directory_entry, stl1z::path_hasher> _after_items;
+      _walk(_after, [&](stl1z::filesystem::directory_entry dirent) -> int {
+        _after_items[dirent.path()] = std::move(dirent);
+        return 0;
+      });
+
       // We need to remove each item as we check, if anything remains we fail
-      return _walk(_current, [this](stl1z::filesystem::directory_entry dirent) -> option<stl1z::filesystem::path> {
+      result<stl1z::filesystem::path> ret = _walk(_current, [&](stl1z::filesystem::directory_entry dirent) -> result<stl1z::filesystem::path> {
         stl1z::filesystem::path leafpath(dirent.path().native().substr(_current.native().size()));
         stl1z::filesystem::path afterpath(_after / leafpath);
         if(stl1z::filesystem::is_symlink(dirent.symlink_status()) != stl1z::filesystem::is_symlink(stl1z::filesystem::symlink_status(afterpath)))
-          return leafpath;
-        auto beforestatus = dirent.status(), afterstatus = stl1z::filesystem::status(afterpath);
-        if(stl1z::filesystem::is_directory(beforestatus) != stl1z::filesystem::is_directory(afterstatus))
-          return leafpath;
-        if(stl1z::filesystem::is_regular_file(beforestatus) != stl1z::filesystem::is_regular_file(afterstatus))
-          return leafpath;
-        return option<stl1z::filesystem::path>();
+          goto differs;
+        {
+          auto beforestatus = dirent.status(), afterstatus = _after_items[afterpath].status();
+          if(stl1z::filesystem::is_directory(beforestatus) != stl1z::filesystem::is_directory(afterstatus))
+            goto differs;
+          if(stl1z::filesystem::is_regular_file(beforestatus) != stl1z::filesystem::is_regular_file(afterstatus))
+            goto differs;
+        }
+        // This item is identical
+        _after_items.erase(afterpath);
+        return make_empty_result<stl1z::filesystem::path>();
+      differs:
+        return leafpath;
       });
+      // If anything different, return that
+      if(ret)
+        return ret;
+      // If anything in after not in current, return that
+      if(!_after_items.empty())
+        return _after_items.begin()->first;
+      // Otherwise both current and after are identical
+      return make_empty_result<stl1z::filesystem::path>();
     }
 
   public:
@@ -179,9 +215,16 @@ namespace integration_test
     }
     ~filesystem_workspace()
     {
-      option<stl1z::filesystem::path> workspaces_not_identical = _compare_workspace();
+      result<stl1z::filesystem::path> workspaces_not_identical = _compare_workspace();
       BOOST_CHECK(!workspaces_not_identical);
-      BOOST_WARN_MESSAGE(!workspaces_not_identical, "Item " << workspaces_not_identical.get() << " is not identical");
+      if(workspaces_not_identical.has_error())
+      {
+        BOOST_WARN_MESSAGE(!workspaces_not_identical, "Workspace comparison failed due to " << workspaces_not_identical.get_error().message());
+      }
+      else
+      {
+        BOOST_WARN_MESSAGE(!workspaces_not_identical, "Item " << workspaces_not_identical.get() << " is not identical");
+      }
       _remove_workspace();
     }
   };
@@ -190,10 +233,10 @@ BOOST_OUTCOME_V1_NAMESPACE_END
 
 #define BOOST_OUTCOME_INTEGRATION_TEST_REMOVE_BRACKETS(...) __VA_ARGS__
 
-// outcomes has format { parvalue, dirbefore, outcome<dirafter> }
-#define BOOST_OUTCOME_INTEGRATION_TEST_ST_KERNEL_PARAMETER_TO_FILESYSTEM(__outcometype, __param, __outcomes_initialiser, ...)                                                                                                                                                                                                  \
+// outcomes has format { parvalue, dirbefore, outcome, dirafter }
+#define BOOST_OUTCOME_INTEGRATION_TEST_ST_KERNEL_PARAMETER_TO_FILESYSTEM(__outcometype, __param, __testdir, __outcomes_initialiser, ...)                                                                                                                                                                                       \
   \
-static const BOOST_OUTCOME_V1_NAMESPACE::integration_test::parameters_type<decltype(__param), __outcometype>                                                                                                                                                                                                                   \
+static const BOOST_OUTCOME_V1_NAMESPACE::integration_test::parameters_type<decltype(__param), BOOST_OUTCOME_INTEGRATION_TEST_REMOVE_BRACKETS __outcometype>                                                                                                                                                                    \
   __outcomes = BOOST_OUTCOME_INTEGRATION_TEST_REMOVE_BRACKETS __outcomes_initialiser;                                                                                                                                                                                                                                          \
   \
 for(const auto &__outcome                                                                                                                                                                                                                                                                                                      \
@@ -201,11 +244,13 @@ for(const auto &__outcome                                                       
   \
 {                                                                                                                                                                                                                                                                                                                         \
     \
+BOOST_OUTCOME_V1_NAMESPACE::integration_test::filesystem_workspace __workspace((__testdir), __outcome.before, __outcome.after);                                                                                                                                                                                                \
+    \
 (__param) = __outcome.parameter_value;                                                                                                                                                                                                                                                                                         \
     __VA_ARGS__                                                                                                                                                                                                                                                                                                                \
   }
 
-#define BOOST_OUTCOME_INTEGRATION_TEST_MT_KERNEL_PARAMETER_TO_FILESYSTEM(param, outcomes_initialiser, ...) BOOST_OUTCOME_INTEGRATION_TEST_ST_KERNEL_PARAMETER_TO_FILESYSTEM(param, outcomes_initialiser, __VA_ARGS__)
+#define BOOST_OUTCOME_INTEGRATION_TEST_MT_KERNEL_PARAMETER_TO_FILESYSTEM(__outcometype, __param, __testdir, __outcomes_initialiser, ...) BOOST_OUTCOME_INTEGRATION_TEST_ST_KERNEL_PARAMETER_TO_FILESYSTEM(__outcometype, __param, __testdir, __outcomes_initialiser, __VA_ARGS__)
 
 BOOST_OUTCOME_V1_NAMESPACE_BEGIN namespace integration_test
 {
