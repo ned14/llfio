@@ -21,15 +21,15 @@ template <class FileHandleType> inline void file_handle_create_close_creation()
   // clang-format off
   BOOST_OUTCOME_INTEGRATION_TEST_MT_KERNEL_PARAMETER_TO_FILESYSTEM((result<void>), c, "file_handle_create_close", ({
     { file_handle::creation::open_existing,     "non-existing", make_errored_result<void>(ENOENT), "non-existing" },
-    { file_handle::creation::open_existing,     "existing0",            make_result<void>(),       "existing0" },
-    { file_handle::creation::open_existing,     "existing1",            make_result<void>(),       "existing1" },
-    { file_handle::creation::only_if_not_exist, "non-existing",         make_result<void>(),       "existing0" },
+    { file_handle::creation::open_existing,     "existing0",      make_ready_result<void>(),       "existing0" },
+    { file_handle::creation::open_existing,     "existing1",      make_ready_result<void>(),       "existing1" },
+    { file_handle::creation::only_if_not_exist, "non-existing",   make_ready_result<void>(),       "existing0" },
     { file_handle::creation::only_if_not_exist, "existing0",    make_errored_result<void>(EEXIST), "existing0" },
-    { file_handle::creation::if_needed,         "non-existing",         make_result<void>(),       "existing0" },
-    { file_handle::creation::if_needed,         "existing1",            make_result<void>(),       "existing1" },
+    { file_handle::creation::if_needed,         "non-existing",   make_ready_result<void>(),       "existing0" },
+    { file_handle::creation::if_needed,         "existing1",      make_ready_result<void>(),       "existing1" },
     { file_handle::creation::truncate,          "non-existing", make_errored_result<void>(ENOENT), "non-existing" },
-    { file_handle::creation::truncate,          "existing0",            make_result<void>(),       "existing0" },
-    { file_handle::creation::truncate,          "existing1",            make_result<void>(),       "existing0" }
+    { file_handle::creation::truncate,          "existing0",      make_ready_result<void>(),       "existing0" },
+    { file_handle::creation::truncate,          "existing1",      make_ready_result<void>(),       "existing0" }
   }),
                                                                    // clang-format on
                                                                    {

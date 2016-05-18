@@ -24,6 +24,79 @@ namespace stl1z
 }
 BOOST_OUTCOME_V1_NAMESPACE_END
 
+BOOST_OUTCOME_V1_NAMESPACE_BEGIN
+namespace console_colours
+{
+#ifdef _WIN32
+  namespace detail
+  {
+    inline void set(WORD v) { SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), v | FOREGROUND_INTENSITY); }
+  }
+  inline std::ostream &red(std::ostream &s)
+  {
+    s.flush();
+    detail::set(FOREGROUND_RED);
+    return s;
+  }
+  inline std::ostream &green(std::ostream &s)
+  {
+    s.flush();
+    detail::set(FOREGROUND_GREEN);
+    return s;
+  }
+  inline std::ostream &blue(std::ostream &s)
+  {
+    s.flush();
+    detail::set(FOREGROUND_BLUE);
+    return s;
+  }
+  inline std::ostream &yellow(std::ostream &s)
+  {
+    s.flush();
+    detail::set(FOREGROUND_RED | FOREGROUND_GREEN);
+    return s;
+  }
+  inline std::ostream &magenta(std::ostream &s)
+  {
+    s.flush();
+    detail::set(FOREGROUND_RED | FOREGROUND_BLUE);
+    return s;
+  }
+  inline std::ostream &cyan(std::ostream &s)
+  {
+    s.flush();
+    detail::set(FOREGROUND_GREEN | FOREGROUND_BLUE);
+    return s;
+  }
+  inline std::ostream &white(std::ostream &s)
+  {
+    s.flush();
+    detail::set(FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
+    return s;
+  }
+#else
+  constexpr const char red[] = {0x1b, '[', '3', '0', ';', '4', '1', 'm', 0};
+  constexpr const char green[] = {0x1b, '[', '3', '0', ';', '4', '2', 'm', 0};
+  constexpr const char blue[] = {0x1b, '[', '3', '0', ';', '4', '4', 'm', 0};
+  constexpr const char yellow[] = {0x1b, '[', '3', '0', ';', '4', '3', 'm', 0};
+  constexpr const char magenta[] = {0x1b, '[', '3', '0', ';', '4', '5', 'm', 0};
+  constexpr const char cyan[] = {0x1b, '[', '3', '0', ';', '4', '6', 'm', 0};
+  constexpr const char white[] = {0x1b, '[', '3', '0', ';', '4', '7', 'm', 0};
+#endif
+}
+namespace integration_test
+{
+  inline void print_result(bool v)
+  {
+    using namespace console_colours;
+    if(v)
+      std::cout << green << "OK" << white << std::endl;
+    else
+      std::cout << red << "FAILED" << white << std::endl;
+  }
+}
+BOOST_OUTCOME_V1_NAMESPACE_END
+
 
 #define BOOST_OUTCOME_INTEGRATION_TEST_KERNEL(suite, name, desc, ...)                                                                                                                                                                                                                                                          \
   \
@@ -91,7 +164,7 @@ namespace integration_test
         {
           return temp / "test" / "tests" / test_name;
         }
-        afiodir = stl1z::filesystem::absolute(afiodir / "..");
+        afiodir = stl1z::filesystem::canonical(afiodir / "..");
       } while(afiodir.native().size() > 3);
       std::cerr << "FATAL: Couldn't figure out where the test workspace templates live for test " << test_name << ". You need a boost.afio or afio directory somewhere in or above the directory you run the tests from." << std::endl;
       std::terminate();
@@ -165,7 +238,7 @@ namespace integration_test
     }
     // We only compare location, names and sizes. Other metadata like timestamps or perms not compared.
     // Returns empty result if identical, else path of first differing item
-    result<stl1z::filesystem::path> _compare_workspace() noexcept
+    result<stl1z::filesystem::path> _compare_workspace() const noexcept
     {
       // Make list of everything in _after
       std::unordered_map<stl1z::filesystem::path, stl1z::filesystem::directory_entry, stl1z::path_hasher> _after_items;
@@ -176,7 +249,7 @@ namespace integration_test
 
       // We need to remove each item as we check, if anything remains we fail
       result<stl1z::filesystem::path> ret = _walk(_current, [&](stl1z::filesystem::directory_entry dirent) -> result<stl1z::filesystem::path> {
-        stl1z::filesystem::path leafpath(dirent.path().native().substr(_current.native().size()));
+        stl1z::filesystem::path leafpath(dirent.path().native().substr(_current.native().size() + 1));
         stl1z::filesystem::path afterpath(_after / leafpath);
         if(stl1z::filesystem::is_symlink(dirent.symlink_status()) != stl1z::filesystem::is_symlink(stl1z::filesystem::symlink_status(afterpath)))
           goto differs;
@@ -204,27 +277,33 @@ namespace integration_test
     }
 
   public:
-    filesystem_workspace(const char *test_name, const stl1z::filesystem::path &before, const stl1z::filesystem::path &after)
+    template <class ParamType> filesystem_workspace(const char *test_name, const ParamType &param, size_t no, size_t total)
     {
       auto template_path = workspace_template_path(test_name);
-      _before = template_path / before;
-      _after = template_path / after;
+      _before = template_path / param.before;
+      _after = template_path / param.after;
       _current = starting_path() / "workspace";
       _remove_workspace();
       _setup_workspace();
+      stl1z::filesystem::current_path(_current);
+      using namespace console_colours;
+      std::cout << std::endl
+                << yellow << (no + 1) << "/" << total << ":" << white << " Running filesystem integration test kernel " << magenta << test_name << white << " to see if input parameter " << cyan << param.parameter_value << white << " causes input workspace " << red << param.before << white
+                << " to become output workspace " << green << param.after << white << std::endl
+                << "                   Test kernel execution: " << std::flush;
     }
+
     ~filesystem_workspace()
     {
+      std::cout << "   Test file system workspace comparison: " << std::flush;
       result<stl1z::filesystem::path> workspaces_not_identical = _compare_workspace();
+      print_result(!workspaces_not_identical);
       BOOST_CHECK(!workspaces_not_identical);
       if(workspaces_not_identical.has_error())
-      {
-        BOOST_WARN_MESSAGE(!workspaces_not_identical, "Workspace comparison failed due to " << workspaces_not_identical.get_error().message());
-      }
-      else
-      {
-        BOOST_WARN_MESSAGE(!workspaces_not_identical, "Item " << workspaces_not_identical.get() << " is not identical");
-      }
+        std::cout << "NOTE: Filesystem workspace comparison failed due to " << workspaces_not_identical.get_error().message() << std::endl;
+      if(workspaces_not_identical.has_value())
+        std::cout << "NOTE: Filesystem workspace comparison failed because item " << workspaces_not_identical.get() << " is not identical" << std::endl;
+      stl1z::filesystem::current_path(starting_path());
       _remove_workspace();
     }
   };
@@ -239,46 +318,80 @@ BOOST_OUTCOME_V1_NAMESPACE_END
 static const BOOST_OUTCOME_V1_NAMESPACE::integration_test::parameters_type<decltype(__param), BOOST_OUTCOME_INTEGRATION_TEST_REMOVE_BRACKETS __outcometype>                                                                                                                                                                    \
   __outcomes = BOOST_OUTCOME_INTEGRATION_TEST_REMOVE_BRACKETS __outcomes_initialiser;                                                                                                                                                                                                                                          \
   \
+size_t __no = 0;                                                                                                                                                                                                                                                                                                               \
+  \
 for(const auto &__outcome                                                                                                                                                                                                                                                                                                      \
     : __outcomes)                                                                                                                                                                                                                                                                                                              \
   \
 {                                                                                                                                                                                                                                                                                                                         \
     \
-BOOST_OUTCOME_V1_NAMESPACE::integration_test::filesystem_workspace __workspace((__testdir), __outcome.before, __outcome.after);                                                                                                                                                                                                \
+BOOST_OUTCOME_V1_NAMESPACE::integration_test::filesystem_workspace __workspace((__testdir), __outcome, __no++, __outcomes.size());                                                                                                                                                                                             \
     \
 (__param) = __outcome.parameter_value;                                                                                                                                                                                                                                                                                         \
-    __VA_ARGS__                                                                                                                                                                                                                                                                                                                \
-  }
+    \
+__VA_ARGS__                                                                                                                                                                                                                                                                                                             \
+  \
+}
 
 #define BOOST_OUTCOME_INTEGRATION_TEST_MT_KERNEL_PARAMETER_TO_FILESYSTEM(__outcometype, __param, __testdir, __outcomes_initialiser, ...) BOOST_OUTCOME_INTEGRATION_TEST_ST_KERNEL_PARAMETER_TO_FILESYSTEM(__outcometype, __param, __testdir, __outcomes_initialiser, __VA_ARGS__)
 
 BOOST_OUTCOME_V1_NAMESPACE_BEGIN namespace integration_test
 {
-  template <class T> void check_result(const outcome<T> &value, const outcome<T> &shouldbe) { BOOST_CHECK(value == shouldbe); };
-  template <class T> void check_result(const result<T> &value, const result<T> &shouldbe) { BOOST_CHECK(value == shouldbe); };
-  template <class T> void check_result(const option<T> &value, const option<T> &shouldbe) { BOOST_CHECK(value == shouldbe); };
+  template <class T> void check_result(const outcome<T> &kernel_outcome, const outcome<T> &shouldbe)
+  {
+    print_result(kernel_outcome == shouldbe);
+    BOOST_CHECK(kernel_outcome == shouldbe);
+  };
+  template <class T> void check_result(const result<T> &kernel_outcome, const result<T> &shouldbe)
+  {
+    print_result(kernel_outcome == shouldbe);
+    BOOST_CHECK(kernel_outcome == shouldbe);
+  };
+  template <class T> void check_result(const option<T> &kernel_outcome, const option<T> &shouldbe)
+  {
+    print_result(kernel_outcome == shouldbe);
+    BOOST_CHECK(kernel_outcome == shouldbe);
+  };
 
-  // If should be has type void, we only care value has a value
-  template <class T> void check_result(const outcome<T> &value, const outcome<void> &shouldbe)
+  // If should be has type void, we only care kernel_outcome has a value
+  template <class T> void check_result(const outcome<T> &kernel_outcome, const outcome<void> &shouldbe)
   {
-    if(value.has_value() && shouldbe.has_value())
-      BOOST_CHECK(value.has_value() == shouldbe.has_value());
+    if(kernel_outcome.has_value() && shouldbe.has_value())
+    {
+      print_result(kernel_outcome.has_value() == shouldbe.has_value());
+      BOOST_CHECK(kernel_outcome.has_value() == shouldbe.has_value());
+    }
     else
-      BOOST_CHECK(value == shouldbe);
+    {
+      print_result(kernel_outcome == shouldbe);
+      BOOST_CHECK(kernel_outcome == shouldbe);
+    }
   };
-  template <class T> void check_result(const result<T> &value, const result<void> &shouldbe)
+  template <class T> void check_result(const result<T> &kernel_outcome, const result<void> &shouldbe)
   {
-    if(value.has_value() && shouldbe.has_value())
-      BOOST_CHECK(value.has_value() == shouldbe.has_value());
+    if(kernel_outcome.has_value() && shouldbe.has_value())
+    {
+      print_result(kernel_outcome.has_value() == shouldbe.has_value());
+      BOOST_CHECK(kernel_outcome.has_value() == shouldbe.has_value());
+    }
     else
-      BOOST_CHECK(value == shouldbe);
+    {
+      print_result(kernel_outcome == shouldbe);
+      BOOST_CHECK(kernel_outcome == shouldbe);
+    }
   };
-  template <class T> void check_result(const option<T> &value, const option<void> &shouldbe)
+  template <class T> void check_result(const option<T> &kernel_outcome, const option<void> &shouldbe)
   {
-    if(value.has_value() && shouldbe.has_value())
-      BOOST_CHECK(value.has_value() == shouldbe.has_value());
+    if(kernel_outcome.has_value() && shouldbe.has_value())
+    {
+      print_result(kernel_outcome.has_value() == shouldbe.has_value());
+      BOOST_CHECK(kernel_outcome.has_value() == shouldbe.has_value());
+    }
     else
-      BOOST_CHECK(value == shouldbe);
+    {
+      print_result(kernel_outcome == shouldbe);
+      BOOST_CHECK(kernel_outcome == shouldbe);
+    }
   };
 }
 BOOST_OUTCOME_V1_NAMESPACE_END

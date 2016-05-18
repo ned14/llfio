@@ -70,6 +70,7 @@ public:
     read = 6,        //!< Ability to read (READ_CONTROL|FILE_READ_DATA|FILE_READ_ATTRIBUTES|FILE_READ_EA|SYNCHRONISE or O_RDONLY)
     write = 7,       //!< Ability to read and write (READ_CONTROL|FILE_READ_DATA|FILE_READ_ATTRIBUTES|FILE_READ_EA|FILE_WRITE_DATA|FILE_WRITE_ATTRIBUTES|FILE_WRITE_EA|FILE_APPEND_DATA|SYNCHRONISE or O_RDWR)
     append = 9       //!< All mainstream OSs and CIFS guarantee this is atomic with respect to all other appenders (FILE_APPEND_DATA|SYNCHRONISE or O_APPEND)
+                     // NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!
   };
   //! On opening, do we also create a new file or truncate an existing one?
   enum class creation : unsigned char
@@ -78,6 +79,7 @@ public:
     only_if_not_exist,
     if_needed,
     truncate  //!< Atomically truncate on open, leaving creation date unmodified.
+              // NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!
   };
   //! What i/o on the handle will complete immediately due to kernel caching
   enum class caching : unsigned char  // bit 0 set means safety fsyncs enabled
@@ -90,6 +92,7 @@ public:
     all = 4,                 //!< Cache reads and writes of data and metadata so they complete immediately, sending writes to storage at some point when the kernel decides (this is the default file system caching on a system).
     safety_fsyncs = 7,       //!< Cache reads and writes of data and metadata so they complete immediately, but issue safety fsyncs at certain points. See documentation for <tt>flag_disable_safety_fsyncs</tt>.
     temporary = 6            //!< Cache reads and writes of data and metadata so they complete immediately, only sending any updates to storage on last handle close in the system or if memory becomes tight as this file is expected to be temporary (Windows only).
+                             // NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!
   };
   //! Bitwise flags which can be specified
   BOOST_AFIO_BITFIELD_BEGIN(flag)
@@ -116,6 +119,8 @@ public:
     * caching::safety_fsyncs
     */
     disable_safety_fsyncs = 1 << 2,
+
+    // NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!
 
     overlapped = 1 << 28,         //!< On Windows, create any new handles with OVERLAPPED semantics
     byte_lock_insanity = 1 << 29  //!< Using insane POSIX byte range locks
@@ -234,6 +239,44 @@ public:
 inline std::ostream &operator<<(std::ostream &s, const handle &v)
 {
   return s << "afio::handle(" << v._v._init << ", " << v.path() << ")";
+}
+inline std::ostream &operator<<(std::ostream &s, const handle::mode &v)
+{
+  static constexpr const char *values[] = {"unchanged", nullptr, "none", nullptr, "attr_read", "attr_write", "read", "write", nullptr, "append"};
+  if(static_cast<size_t>(v) >= sizeof(values) / sizeof(values[0]) || !values[static_cast<size_t>(v)])
+    return s << "afio::handle::mode::<unknown>";
+  return s << "afio::handle::mode::" << values[static_cast<size_t>(v)];
+}
+inline std::ostream &operator<<(std::ostream &s, const handle::creation &v)
+{
+  static constexpr const char *values[] = {"open_existing", "only_if_not_exist", "if_needed", "truncate"};
+  if(static_cast<size_t>(v) >= sizeof(values) / sizeof(values[0]) || !values[static_cast<size_t>(v)])
+    return s << "afio::handle::creation::<unknown>";
+  return s << "afio::handle::creation::" << values[static_cast<size_t>(v)];
+}
+inline std::ostream &operator<<(std::ostream &s, const handle::caching &v)
+{
+  static constexpr const char *values[] = {"unchanged", "none", "only_metadata", "reads", "all", "reads_and_metadata", "temporary", "safety_fsyncs"};
+  if(static_cast<size_t>(v) >= sizeof(values) / sizeof(values[0]) || !values[static_cast<size_t>(v)])
+    return s << "afio::handle::caching::<unknown>";
+  return s << "afio::handle::caching::" << values[static_cast<size_t>(v)];
+}
+inline std::ostream &operator<<(std::ostream &s, const handle::flag &v)
+{
+  std::string temp;
+  if(v && handle::flag::win_delete_on_last_close)
+    temp.append("win_delete_on_last_close|");
+  if(v && handle::flag::posix_unlink_on_first_close)
+    temp.append("posix_unlink_on_first_close|");
+  if(v && handle::flag::disable_safety_fsyncs)
+    temp.append("disable_safety_fsyncs|");
+  if(v && handle::flag::overlapped)
+    temp.append("overlapped|");
+  if(v && handle::flag::byte_lock_insanity)
+    temp.append("byte_lock_insanity|");
+  if(!temp.empty())
+    temp.resize(temp.size() - 1);
+  return s << "afio::handle::flag::(" << temp << ")";
 }
 
 /*! \class io_handle
