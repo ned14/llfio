@@ -30,7 +30,17 @@ namespace console_colours
 #ifdef _WIN32
   namespace detail
   {
-    inline void set(WORD v) { SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), v | FOREGROUND_INTENSITY); }
+    inline bool &am_in_bold()
+    {
+      static bool v;
+      return v;
+    }
+    inline void set(WORD v)
+    {
+      if(am_in_bold())
+        v |= FOREGROUND_INTENSITY;
+      SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), v);
+    }
   }
   inline std::ostream &red(std::ostream &s)
   {
@@ -74,25 +84,37 @@ namespace console_colours
     detail::set(FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
     return s;
   }
+  inline std::ostream &bold(std::ostream &s)
+  {
+    detail::am_in_bold() = true;
+    return s;
+  }
+  inline std::ostream &normal(std::ostream &s)
+  {
+    detail::am_in_bold() = false;
+    return white(s);
+  }
 #else
-  constexpr const char red[] = {0x1b, '[', '3', '0', ';', '4', '1', 'm', 0};
-  constexpr const char green[] = {0x1b, '[', '3', '0', ';', '4', '2', 'm', 0};
-  constexpr const char blue[] = {0x1b, '[', '3', '0', ';', '4', '4', 'm', 0};
-  constexpr const char yellow[] = {0x1b, '[', '3', '0', ';', '4', '3', 'm', 0};
-  constexpr const char magenta[] = {0x1b, '[', '3', '0', ';', '4', '5', 'm', 0};
-  constexpr const char cyan[] = {0x1b, '[', '3', '0', ';', '4', '6', 'm', 0};
-  constexpr const char white[] = {0x1b, '[', '3', '0', ';', '4', '7', 'm', 0};
+  constexpr const char red[] = {0x1b, '[', '3', '1', 'm', 0};
+  constexpr const char green[] = {0x1b, '[', '3', '2', 'm', 0};
+  constexpr const char blue[] = {0x1b, '[', '3', '4', 'm', 0};
+  constexpr const char yellow[] = {0x1b, '[', '3', '3', 'm', 0};
+  constexpr const char magenta[] = {0x1b, '[', '3', '5', 'm', 0};
+  constexpr const char cyan[] = {0x1b, '[', '3', '6', 'm', 0};
+  constexpr const char white[] = {0x1b, '[', '3', '7', 'm', 0};
+  constexpr const char bold[] = {0x1b, '[', '1', 'm', 0};
+  constexpr const char normal[] = {0x1b, '[', '0', 'm', 0};
 #endif
 }
 namespace integration_test
 {
-  inline void print_result(bool v)
+  template <class T> inline void print_result(bool v, const T &result)
   {
     using namespace console_colours;
     if(v)
-      std::cout << green << "OK" << white << std::endl;
+      std::cout << bold << green << result << normal << std::endl;
     else
-      std::cout << red << "FAILED" << white << std::endl;
+      std::cout << bold << red << "FAILED" << normal << std::endl;
   }
 }
 BOOST_OUTCOME_V1_NAMESPACE_END
@@ -102,7 +124,18 @@ BOOST_OUTCOME_V1_NAMESPACE_END
   \
 BOOST_AUTO_TEST_CASE(name, desc)                                                                                                                                                                                                                                                                                               \
   {                                                                                                                                                                                                                                                                                                                            \
+    \
+static constexpr const char __integration_test_kernel_suite[] = #suite;                                                                                                                                                                                                                                                        \
+    \
+static constexpr const char __integration_test_kernel_name[] = #name;                                                                                                                                                                                                                                                          \
+    \
+static constexpr const char __integration_test_kernel_description[] = desc;                                                                                                                                                                                                                                                    \
     using namespace BOOST_OUTCOME_V1_NAMESPACE;                                                                                                                                                                                                                                                                                \
+    \
+std::cout                                                                                                                                                                                                                                                                                                                      \
+    << "\n\n"                                                                                                                                                                                                                                                                                                                  \
+    << console_colours::bold << console_colours::blue << __integration_test_kernel_suite << " / " << __integration_test_kernel_name << ":\n"                                                                                                                                                                                   \
+    << console_colours::bold << console_colours::white << desc << console_colours::normal << std::endl;                                                                                                                                                                                                                        \
     \
 __VA_ARGS__;                                                                                                                                                                                                                                                                                                                   \
   }
@@ -288,16 +321,18 @@ namespace integration_test
       stl1z::filesystem::current_path(_current);
       using namespace console_colours;
       std::cout << std::endl
-                << yellow << (no + 1) << "/" << total << ":" << white << " Running filesystem integration test kernel " << magenta << test_name << white << " to see if input parameter " << cyan << param.parameter_value << white << " causes input workspace " << red << param.before << white
-                << " to become output workspace " << green << param.after << white << std::endl
-                << "                   Test kernel execution: " << std::flush;
+                << yellow << (no + 1) << "/" << total << ":" << normal << " Running filesystem integration test kernel "       //
+                << magenta << test_name << normal << " to see if input parameter " << cyan << param.parameter_value << normal  //
+                << " causes input workspace " << bold << white << param.before << normal << " to become output workspace "     //
+                << bold << white << param.after << normal << std::endl
+                << "         Test kernel execution: " << std::flush;
     }
 
     ~filesystem_workspace()
     {
-      std::cout << "   Test file system workspace comparison: " << std::flush;
+      std::cout << "   Test file system comparison: " << std::flush;
       result<stl1z::filesystem::path> workspaces_not_identical = _compare_workspace();
-      print_result(!workspaces_not_identical);
+      print_result(!workspaces_not_identical, "MATCHES");
       BOOST_CHECK(!workspaces_not_identical);
       if(workspaces_not_identical.has_error())
         std::cout << "NOTE: Filesystem workspace comparison failed due to " << workspaces_not_identical.get_error().message() << std::endl;
@@ -339,17 +374,17 @@ BOOST_OUTCOME_V1_NAMESPACE_BEGIN namespace integration_test
 {
   template <class T> void check_result(const outcome<T> &kernel_outcome, const outcome<T> &shouldbe)
   {
-    print_result(kernel_outcome == shouldbe);
+    print_result(kernel_outcome == shouldbe, kernel_outcome);
     BOOST_CHECK(kernel_outcome == shouldbe);
   };
   template <class T> void check_result(const result<T> &kernel_outcome, const result<T> &shouldbe)
   {
-    print_result(kernel_outcome == shouldbe);
+    print_result(kernel_outcome == shouldbe, kernel_outcome);
     BOOST_CHECK(kernel_outcome == shouldbe);
   };
   template <class T> void check_result(const option<T> &kernel_outcome, const option<T> &shouldbe)
   {
-    print_result(kernel_outcome == shouldbe);
+    print_result(kernel_outcome == shouldbe, kernel_outcome);
     BOOST_CHECK(kernel_outcome == shouldbe);
   };
 
@@ -358,12 +393,12 @@ BOOST_OUTCOME_V1_NAMESPACE_BEGIN namespace integration_test
   {
     if(kernel_outcome.has_value() && shouldbe.has_value())
     {
-      print_result(kernel_outcome.has_value() == shouldbe.has_value());
+      print_result(kernel_outcome.has_value() == shouldbe.has_value(), kernel_outcome);
       BOOST_CHECK(kernel_outcome.has_value() == shouldbe.has_value());
     }
     else
     {
-      print_result(kernel_outcome == shouldbe);
+      print_result(kernel_outcome == shouldbe, kernel_outcome);
       BOOST_CHECK(kernel_outcome == shouldbe);
     }
   };
@@ -371,12 +406,12 @@ BOOST_OUTCOME_V1_NAMESPACE_BEGIN namespace integration_test
   {
     if(kernel_outcome.has_value() && shouldbe.has_value())
     {
-      print_result(kernel_outcome.has_value() == shouldbe.has_value());
+      print_result(kernel_outcome.has_value() == shouldbe.has_value(), kernel_outcome);
       BOOST_CHECK(kernel_outcome.has_value() == shouldbe.has_value());
     }
     else
     {
-      print_result(kernel_outcome == shouldbe);
+      print_result(kernel_outcome == shouldbe, kernel_outcome);
       BOOST_CHECK(kernel_outcome == shouldbe);
     }
   };
@@ -384,12 +419,12 @@ BOOST_OUTCOME_V1_NAMESPACE_BEGIN namespace integration_test
   {
     if(kernel_outcome.has_value() && shouldbe.has_value())
     {
-      print_result(kernel_outcome.has_value() == shouldbe.has_value());
+      print_result(kernel_outcome.has_value() == shouldbe.has_value(), kernel_outcome);
       BOOST_CHECK(kernel_outcome.has_value() == shouldbe.has_value());
     }
     else
     {
-      print_result(kernel_outcome == shouldbe);
+      print_result(kernel_outcome == shouldbe, kernel_outcome);
       BOOST_CHECK(kernel_outcome == shouldbe);
     }
   };

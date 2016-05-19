@@ -41,5 +41,5 @@ template <class FileHandleType> inline void file_handle_create_close_creation()
                                                                    })
 }
 
-BOOST_OUTCOME_INTEGRATION_TEST_KERNEL(afio, integration / file_handle_create_close / creation1, "Tests that afio::file_handle's creation parameter works as expected", file_handle_create_close_creation<BOOST_AFIO_V2_NAMESPACE::file_handle>())
-BOOST_OUTCOME_INTEGRATION_TEST_KERNEL(afio, integration / file_handle_create_close / creation2, "Tests that afio::async_file_handle's creation parameter works as expected", file_handle_create_close_creation<BOOST_AFIO_V2_NAMESPACE::async_file_handle>())
+BOOST_OUTCOME_INTEGRATION_TEST_KERNEL(afio, integration / file_handle_create_close / file_handle, "Tests that afio::file_handle's creation parameter works as expected", file_handle_create_close_creation<BOOST_AFIO_V2_NAMESPACE::file_handle>())
+BOOST_OUTCOME_INTEGRATION_TEST_KERNEL(afio, integration / file_handle_create_close / async_file_handle, "Tests that afio::async_file_handle's creation parameter works as expected", file_handle_create_close_creation<BOOST_AFIO_V2_NAMESPACE::async_file_handle>())
