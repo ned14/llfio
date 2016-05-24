@@ -12,9 +12,15 @@
     <ClInclude Include="integration_test_kernel.hpp">
       <Filter>tests</Filter>
     </ClInclude>
+    <ClInclude Include="tests\file_handle_create_close\kernel_async_file_handle.hpp">
+      <Filter>tests\file_handle_create_close</Filter>
+    </ClInclude>
+    <ClInclude Include="tests\file_handle_create_close\kernel_file_handle.hpp">
+      <Filter>tests\file_handle_create_close</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="tests\file_handle_create_close\kernel_creation.cpp">
+    <ClCompile Include="tests\file_handle_create_close\test.cpp">
       <Filter>tests\file_handle_create_close</Filter>
     </ClCompile>
   </ItemGroup>
