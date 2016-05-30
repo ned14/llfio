@@ -34,6 +34,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include "handle.hpp"
 
+#include <cassert>
 #include <deque>
 
 #undef _threadid  // windows macro splosh sigh

@@ -2,6 +2,10 @@ This is the beginnings of the post-peer-review AFIO
 v2 rewrite. You can view its documentation at https://ned14.github.io/boost.afio/
 
 
+- [ ] Poke C++ Modules support into BindLib and turn it on on MSVC once cmake
+build tooling is up (should be very straightforward assuming C++ Modules hasn't
+changed much since I designed BindLib)
+
 Notes on experimental automatic unit test framework:
 - kernel.cpp needs to be separate from runner.cpp
   - kernel.cpp gets compiled using asan, lsan, msan and ubsan using AFIO as

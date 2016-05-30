@@ -30,6 +30,8 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include "../../../utils.hpp"
+
+#include "../../../../boost-lite/include/spinlock.hpp"
 #include "import.hpp"
 
 BOOST_AFIO_V2_NAMESPACE_BEGIN
@@ -47,7 +49,7 @@ namespace utils
 #endif
   std::vector<size_t> page_sizes(bool only_actually_available) noexcept
   {
-    static spinlock<bool> lock;
+    static boost_lite::configurable_spinlock::spinlock<bool> lock;
     static std::vector<size_t> pagesizes, pagesizes_available;
     stl11::lock_guard<decltype(lock)> g(lock);
     if(pagesizes.empty())

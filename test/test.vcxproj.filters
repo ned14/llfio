@@ -9,18 +9,16 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="integration_test_kernel.hpp">
-      <Filter>tests</Filter>
-    </ClInclude>
-    <ClInclude Include="tests\file_handle_create_close\kernel_async_file_handle.hpp">
+    <ClInclude Include="tests\file_handle_create_close\kernel_async_file_handle.cpp.hpp">
       <Filter>tests\file_handle_create_close</Filter>
     </ClInclude>
-    <ClInclude Include="tests\file_handle_create_close\kernel_file_handle.hpp">
+    <ClInclude Include="tests\file_handle_create_close\kernel_file_handle.cpp.hpp">
       <Filter>tests\file_handle_create_close</Filter>
     </ClInclude>
+    <ClInclude Include="test_kernel_decl.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="tests\file_handle_create_close\test.cpp">
+    <ClCompile Include="tests\file_handle_create_close\runner.cpp">
       <Filter>tests\file_handle_create_close</Filter>
     </ClCompile>
   </ItemGroup>

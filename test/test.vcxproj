@@ -40,12 +40,12 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="integration_test_kernel.hpp" />
-    <ClInclude Include="tests\file_handle_create_close\kernel_async_file_handle.hpp" />
-    <ClInclude Include="tests\file_handle_create_close\kernel_file_handle.hpp" />
+    <ClInclude Include="tests\file_handle_create_close\kernel_async_file_handle.cpp.hpp" />
+    <ClInclude Include="tests\file_handle_create_close\kernel_file_handle.cpp.hpp" />
+    <ClInclude Include="test_kernel_decl.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="tests\file_handle_create_close\test.cpp" />
+    <ClCompile Include="tests\file_handle_create_close\runner.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{800F84E0-5DEA-4D82-A6C5-830695DA4D1F}</ProjectGuid>

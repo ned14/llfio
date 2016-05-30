@@ -3,11 +3,9 @@
 File Created: Apr 2016
 */
 
-#include "../../integration_test_kernel.hpp"
-#include "kernel_async_file_handle.hpp"
-#include "kernel_file_handle.hpp"
-
-// TODO FIXME: Make the below lambda based and rid ourselves of some of the macros
+#include "../../kerneltest/include/boost/kerneltest/v1/test_kernel.hpp"
+#include "kernel_async_file_handle.cpp.hpp"
+#include "kernel_file_handle.cpp.hpp"
 
 template <class U> inline void file_handle_create_close_creation(U &&f)
 {
@@ -43,5 +41,5 @@ template <class U> inline void file_handle_create_close_creation(U &&f)
   (std::forward<U>(f));
 }
 
-BOOST_OUTCOME_INTEGRATION_TEST(afio, integration / file_handle_create_close / file_handle, "Tests that afio::file_handle's creation parameter works as expected", file_handle_create_close_creation(file_handle_create_close::test_kernel_file_handle))
-BOOST_OUTCOME_INTEGRATION_TEST(afio, integration / file_handle_create_close / async_file_handle, "Tests that afio::async_file_handle's creation parameter works as expected", file_handle_create_close_creation(file_handle_create_close::test_kernel_async_file_handle))
+BOOST_KERNELTEST_TEST_KERNEL(integration, afio, file_handle_create_close, file_handle, "Tests that afio::file_handle's creation parameter works as expected", file_handle_create_close_creation(file_handle_create_close::test_kernel_file_handle))
+BOOST_KERNELTEST_TEST_KERNEL(integration, afio, file_handle_create_close, async_file_handle, "Tests that afio::async_file_handle's creation parameter works as expected", file_handle_create_close_creation(file_handle_create_close::test_kernel_async_file_handle))
