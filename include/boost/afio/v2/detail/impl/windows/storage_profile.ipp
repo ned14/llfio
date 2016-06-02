@@ -140,7 +140,7 @@ namespace storage_profile
           }
 #if defined(__i386__) || defined(_M_IX86) || defined(__x86_64__) || defined(_M_X64)
 // We can do a much better CPU name on x86/x64
-#if defined(__clang__) && !defined(_MSC_VER)
+#if defined(__clang__)
           auto __cpuid = [](int *cpuInfo, int func) { __asm__ __volatile__("cpuid\n\t" : "=a"(cpuInfo[0]), "=b"(cpuInfo[1]), "=c"(cpuInfo[2]), "=d"(cpuInfo[3]) : "0"(func)); };
 #endif
           sp.cpu_name.value.clear();
