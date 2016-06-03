@@ -173,9 +173,9 @@ DEALINGS IN THE SOFTWARE.
 #define BOOST_AFIO_V2_FILESYSTEM_IMPL std
 #endif
 #if BOOST_AFIO_LATEST_VERSION == 2
-#define BOOST_AFIO_V2 (boost), (afio), (BOOST_BINDLIB_NAMESPACE_VERSION(v2, BOOST_AFIO_V2_STL11_IMPL, BOOST_AFIO_V2_FILESYSTEM_IMPL), inline)
+#define BOOST_AFIO_V2 (boost), (afio), (BOOSTLITE_NAMESPACE_VERSION(v2, BOOST_AFIO_V2_STL11_IMPL, BOOST_AFIO_V2_FILESYSTEM_IMPL), inline)
 #else
-#define BOOST_AFIO_V2 (boost), (afio), (BOOST_BINDLIB_NAMESPACE_VERSION(v2, BOOST_AFIO_V2_STL11_IMPL, BOOST_AFIO_V2_FILESYSTEM_IMPL))
+#define BOOST_AFIO_V2 (boost), (afio), (BOOSTLITE_NAMESPACE_VERSION(v2, BOOST_AFIO_V2_STL11_IMPL, BOOST_AFIO_V2_FILESYSTEM_IMPL))
 #endif
 #if DOXYGEN_SHOULD_SKIP_THIS
 //! The Boost namespace
@@ -207,9 +207,9 @@ namespace boost
   }                                                                                                                                                                                                                                                                                                                            \
   }
 #else
-#define BOOST_AFIO_V2_NAMESPACE BOOST_BINDLIB_NAMESPACE(BOOST_AFIO_V2)
-#define BOOST_AFIO_V2_NAMESPACE_BEGIN BOOST_BINDLIB_NAMESPACE_BEGIN(BOOST_AFIO_V2)
-#define BOOST_AFIO_V2_NAMESPACE_END BOOST_BINDLIB_NAMESPACE_END(BOOST_AFIO_V2)
+#define BOOST_AFIO_V2_NAMESPACE BOOSTLITE_NAMESPACE(BOOST_AFIO_V2)
+#define BOOST_AFIO_V2_NAMESPACE_BEGIN BOOSTLITE_NAMESPACE_BEGIN(BOOST_AFIO_V2)
+#define BOOST_AFIO_V2_NAMESPACE_END BOOSTLITE_NAMESPACE_END(BOOST_AFIO_V2)
 #endif
 
 // From automated matrix generator
@@ -244,16 +244,8 @@ namespace boost
 #ifdef BOOST_AFIO_NEED_DEFINE
 #undef BOOST_AFIO_AFIO_H
 
-#define BOOST_STL11_ATOMIC_MAP_NAMESPACE_BEGIN BOOST_BINDLIB_NAMESPACE_BEGIN(BOOST_AFIO_V2, (stl11))
-#define BOOST_STL11_ATOMIC_MAP_NAMESPACE_END BOOST_BINDLIB_NAMESPACE_END(BOOST_AFIO_V2, (stl11))
 #define BOOST_STL11_ATOMIC_MAP_NO_ATOMIC_CHAR32_T  // missing VS14
 #define BOOST_STL11_ATOMIC_MAP_NO_ATOMIC_CHAR16_T  // missing VS14
-#define BOOST_STL11_CHRONO_MAP_NAMESPACE_BEGIN BOOST_BINDLIB_NAMESPACE_BEGIN(BOOST_AFIO_V2, (stl11), (chrono))
-#define BOOST_STL11_CHRONO_MAP_NAMESPACE_END BOOST_BINDLIB_NAMESPACE_END(BOOST_AFIO_V2, (stl11), (chrono))
-//#define BOOST_STL11_CONDITION_VARIABLE_MAP_NAMESPACE_BEGIN BOOST_BINDLIB_NAMESPACE_BEGIN(BOOST_AFIO_V2, (stl11))
-//#define BOOST_STL11_CONDITION_VARIABLE_MAP_NAMESPACE_END BOOST_BINDLIB_NAMESPACE_END(BOOST_AFIO_V2, (stl11))
-#define BOOST_STL1z_FILESYSTEM_MAP_NAMESPACE_BEGIN BOOST_BINDLIB_NAMESPACE_BEGIN(BOOST_AFIO_V2, (stl1z), (filesystem))
-#define BOOST_STL1z_FILESYSTEM_MAP_NAMESPACE_END BOOST_BINDLIB_NAMESPACE_END(BOOST_AFIO_V2, (stl1z), (filesystem))
 // Match Dinkumware's TR2 implementation
 #define BOOST_STL1z_FILESYSTEM_MAP_NO_SYMLINK_OPTION
 #define BOOST_STL1z_FILESYSTEM_MAP_NO_COPY_OPTION
@@ -278,25 +270,59 @@ namespace boost
 #define BOOST_STL1z_FILESYSTEM_MAP_NO_COPY_DIRECTORY
 #define BOOST_STL1z_FILESYSTEM_MAP_NO_NATIVE
 #define BOOST_STL1z_FILESYSTEM_MAP_NO_UNIQUE_PATH
-//#define BOOST_STL11_FUTURE_MAP_NAMESPACE_BEGIN BOOST_BINDLIB_NAMESPACE_BEGIN(BOOST_AFIO_V2, (stl11))
-//#define BOOST_STL11_FUTURE_MAP_NAMESPACE_END BOOST_BINDLIB_NAMESPACE_END(BOOST_AFIO_V2, (stl11))
-//#define BOOST_STL11_FUTURE_MAP_NO_FUTURE
-#define BOOST_STL11_MUTEX_MAP_NAMESPACE_BEGIN BOOST_BINDLIB_NAMESPACE_BEGIN(BOOST_AFIO_V2, (stl11))
-#define BOOST_STL11_MUTEX_MAP_NAMESPACE_END BOOST_BINDLIB_NAMESPACE_END(BOOST_AFIO_V2, (stl11))
-#define BOOST_STL11_RATIO_MAP_NAMESPACE_BEGIN BOOST_BINDLIB_NAMESPACE_BEGIN(BOOST_AFIO_V2, (stl11))
-#define BOOST_STL11_RATIO_MAP_NAMESPACE_END BOOST_BINDLIB_NAMESPACE_END(BOOST_AFIO_V2, (stl11))
-#define BOOST_STL11_THREAD_MAP_NAMESPACE_BEGIN BOOST_BINDLIB_NAMESPACE_BEGIN(BOOST_AFIO_V2, (stl11))
-#define BOOST_STL11_THREAD_MAP_NAMESPACE_END BOOST_BINDLIB_NAMESPACE_END(BOOST_AFIO_V2, (stl11))
-// clang-format off
-#include BOOST_BINDLIB_INCLUDE_STL11(../boost-lite, BOOST_AFIO_V2_STL11_IMPL, atomic)
-#include BOOST_BINDLIB_INCLUDE_STL11(../boost-lite, BOOST_AFIO_V2_STL11_IMPL, chrono)
-//#include BOOST_BINDLIB_INCLUDE_STL11(../boost-lite, BOOST_AFIO_V2_STL11_IMPL, condition_variable)
-#include BOOST_BINDLIB_INCLUDE_STL1z(../boost-lite, BOOST_AFIO_V2_FILESYSTEM_IMPL, filesystem)
-//#include BOOST_BINDLIB_INCLUDE_STL11(../boost-lite, BOOST_AFIO_V2_STL11_IMPL, future)
-#include BOOST_BINDLIB_INCLUDE_STL11(../boost-lite, BOOST_AFIO_V2_STL11_IMPL, mutex)
-#include BOOST_BINDLIB_INCLUDE_STL11(../boost-lite, BOOST_AFIO_V2_STL11_IMPL, ratio)
-#include BOOST_BINDLIB_INCLUDE_STL11(../boost-lite, BOOST_AFIO_V2_STL11_IMPL, thread)
-// clang-format on
+
+#include "../boost-lite/include/bind/stl11/std/atomic"
+BOOST_AFIO_V2_NAMESPACE_BEGIN
+namespace stl11
+{
+  using namespace boost_lite::bind::std::atomic;
+}
+BOOST_AFIO_V2_NAMESPACE_END
+#if BOOST_OUTCOME_USE_BOOST_THREAD
+#include "../boost-lite/include/bind/stl11/boost/chrono"
+#include "../boost-lite/include/bind/stl11/boost/mutex"
+#include "../boost-lite/include/bind/stl11/boost/ratio"
+#include "../boost-lite/include/bind/stl11/boost/thread"
+BOOST_AFIO_V2_NAMESPACE_BEGIN
+namespace stl11
+{
+  namespace chrono = boost_lite::bind::boost::chrono;
+  using namespace boost_lite::bind::boost::mutex;
+  using namespace boost_lite::bind::boost::ratio;
+  using namespace boost_lite::bind::boost::thread;
+}
+#else
+#include "../boost-lite/include/bind/stl11/std/chrono"
+#include "../boost-lite/include/bind/stl11/std/mutex"
+#include "../boost-lite/include/bind/stl11/std/ratio"
+#include "../boost-lite/include/bind/stl11/std/thread"
+BOOST_AFIO_V2_NAMESPACE_BEGIN
+namespace stl11
+{
+  namespace chrono = boost_lite::bind::std::chrono;
+  using namespace boost_lite::bind::std::mutex;
+  using namespace boost_lite::bind::std::ratio;
+  using namespace boost_lite::bind::std::thread;
+}
+BOOST_AFIO_V2_NAMESPACE_END
+#endif
+#if BOOST_AFIO_USE_BOOST_FILESYSTEM
+#include "../boost-lite/include/bind/stl1z/boost/filesystem"
+BOOST_AFIO_V2_NAMESPACE_BEGIN
+namespace stl1z
+{
+  namespace filesystem = boost_lite::bind::boost::filesystem;
+}
+BOOST_AFIO_V2_NAMESPACE_END
+#else
+#include "../boost-lite/include/bind/stl1z/std/filesystem"
+BOOST_AFIO_V2_NAMESPACE_BEGIN
+namespace stl1z
+{
+  namespace filesystem = boost_lite::bind::std::filesystem;
+}
+BOOST_AFIO_V2_NAMESPACE_END
+#endif
 
 
 // Bring in the Boost macro emulations

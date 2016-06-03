@@ -35,6 +35,8 @@ DEALINGS IN THE SOFTWARE.
 #include "../../file_handle.hpp"
 #include "base.hpp"
 
+#include <cassert>
+
 BOOST_AFIO_V2_NAMESPACE_BEGIN
 
 namespace algorithm
