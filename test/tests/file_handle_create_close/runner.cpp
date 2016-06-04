@@ -20,11 +20,12 @@ template <class U> inline void file_handle_create_close_creation(U &&f)
   *    existing1: single one byte length file
   */
   // clang-format off
-  mt_permute_parameters<              // This is a multithreaded parameter permutation test
-    result<void>,                     // The output outcome/result/option type. Type void means we don't care about the return type.
-    parameters<                       // The types of one or more input parameters to permute/fuzz.
+  auto results = mt_permute_parameters<  // This is a multithreaded parameter permutation test
+    result<void>,                        // The output outcome/result/option type. Type void means we don't care about the return type.
+    parameters<                          // The types of one or more input parameters to permute/fuzz the kernel with.
       typename file_handle::creation
     >,
+    // Any additional per-permute parameters not used to invoke the kernel
     hooks::filesystem_setup_parameters,
     hooks::filesystem_comparison_inexact_parameters
   >(
@@ -47,6 +48,10 @@ template <class U> inline void file_handle_create_close_creation(U &&f)
   )
   // clang-format on
   (std::forward<U>(f));
+  // Check each of the results. We don't do this inside the kernel as it messes with fuzzing/sanitising.
+  // We don't do this inside the parameter permuter either in case the fuzzer/sanitiser uses that.
+  for(const auto &i : results)
+    BOOST_KERNELTEST_CHECK_RESULT(i);
 }
 
 BOOST_KERNELTEST_TEST_KERNEL(integration, afio, file_handle_create_close, file_handle, "Tests that afio::file_handle's creation parameter works as expected", file_handle_create_close_creation(file_handle_create_close::test_kernel_file_handle))
