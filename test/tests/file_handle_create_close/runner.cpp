@@ -22,9 +22,9 @@ template <class U> inline void file_handle_create_close_creation(U &&f)
     *    existing1: single one byte length file
   */
   // clang-format off
-  static const auto permuter = mt_permute_parameters<  // This is a multithreaded parameter permutation test
-    result<void>,                                      // The output outcome/result/option type. Type void means we don't care about the return type.
-    parameters<                                        // The types of one or more input parameters to permute/fuzz the kernel with.
+  static const auto permuter(mt_permute_parameters<  // This is a multithreaded parameter permutation test
+    result<void>,                                    // The output outcome/result/option type. Type void means we don't care about the return type.
+    parameters<                                      // The types of one or more input parameters to permute/fuzz the kernel with.
       typename file_handle::creation
     >,
     // Any additional per-permute parameters not used to invoke the kernel
@@ -47,7 +47,7 @@ template <class U> inline void file_handle_create_close_creation(U &&f)
     // destroyed after each permutation. The callspec is (parameter_permuter<...> *parent, outcome<T> &testret, size_t, pars)
     hooks::filesystem_setup("file_handle_create_close"),               // Configure this filesystem workspace before the test
     hooks::filesystem_comparison_inexact("file_handle_create_close")   // Do an inexact comparison of the filesystem workspace after the test
-  );
+  ));
   // clang-format on
 
   // Have the permuter permute callable f with all the permutations, returning outcomes
