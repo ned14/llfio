@@ -29,7 +29,7 @@ template <class U> inline void file_handle_create_close_creation(U &&f)
     >,
     // Any additional per-permute parameters not used to invoke the kernel
     hooks::filesystem_setup_parameters,
-    hooks::filesystem_comparison_inexact_parameters
+    hooks::filesystem_comparison_structure_parameters
   >(
     { // Initialiser list of output value expected for the input parameters, plus any hook parameters
       { make_errored_result<void>(ENOENT), { file_handle::creation::open_existing     }, { "non-existing" }, { "non-existing" }},
@@ -46,7 +46,7 @@ template <class U> inline void file_handle_create_close_creation(U &&f)
     // Any parameters from now on are called before each permutation and the object returned is
     // destroyed after each permutation. The callspec is (parameter_permuter<...> *parent, outcome<T> &testret, size_t, pars)
     hooks::filesystem_setup("file_handle_create_close"),               // Configure this filesystem workspace before the test
-    hooks::filesystem_comparison_inexact("file_handle_create_close")   // Do an inexact comparison of the filesystem workspace after the test
+    hooks::filesystem_comparison_structure("file_handle_create_close") // Do a structural comparison of the filesystem workspace after the test
   ));
   // clang-format on
 
