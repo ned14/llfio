@@ -11,6 +11,8 @@ namespace file_handle_create_close
   {
     boost::afio::io_service service;
     auto h = boost::afio::async_file_handle::async_file(service, "testfile.txt", boost::afio::async_file_handle::mode::write, c);
+    if(h)
+      h.get().close();
     return h;
   }
 }
