@@ -52,11 +52,13 @@ template <class U> inline void file_handle_create_close_creation(U &&f)
 
   // Have the permuter permute callable f with all the permutations, returning outcomes
   auto results = permuter(std::forward<U>(f));
+  static_assert(permuter.permutation_results_type_is_constant_sized, "Results type returned should be a std::array due to the constant sized input");
+  static_assert(results.size() > 0, "Results type returned should be a std::array due to the constant sized input");
   std::vector<std::function<void()>> checks;
 
   // Check each of the results. We don't do this inside the kernel as it messes with fuzzing/sanitising.
   // We don't do this inside the parameter permuter either in case the fuzzer/sanitiser uses that.
-  permuter.check(results, pretty_print_failure(permuter.parameter_sequence(), [&](const auto &result, const auto &shouldbe) { checks.push_back([&] { BOOST_CHECK(result == shouldbe); }); }));
+  permuter.check(results, pretty_print_failure(permuter.parameter_sequence(), [&](const auto &result, const auto &shouldbe) { checks.push_back([&] { BOOST_CHECK(result == shouldbe); }); }), pretty_print_success(permuter.parameter_sequence()));
 
   for(auto &i : checks)
     i();
