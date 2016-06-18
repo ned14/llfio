@@ -1,0 +1,37 @@
+# version format
+version: 2.00.{build}-{branch}
+ 
+# branches to build
+branches:
+  # blacklist
+  except:
+    - gh-pages
+skip_tags: true
+ 
+# Operating system (build VM template)
+os: Visual Studio 2015
+init:
+  - git config --global core.longpaths true
+
+clone_folder: c:\boost.afio
+platform: x64 
+configuration: Release
+
+before_build:
+  - git submodule update --init --recursive
+  - cd build
+  - call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x64
+build_script:
+  - msbuild afio_v2.sln /t:test /p:Configuration="Release" /p:Platform="x64"
+after_build:
+
+before_test:
+  - cd x64\Release
+test_script:
+  - test.exe --reporter junit --out results.xml
+after_test:
+
+on_success:
+on_failure:
+on_finish:
+  - ps: (new-object net.webclient).UploadFile("https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\results.xml))

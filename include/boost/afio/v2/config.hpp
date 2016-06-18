@@ -653,7 +653,7 @@ public:
   //! Permit explicit casting to the underlying type
   explicit constexpr operator underlying_type() const noexcept { return _value; }
   //! Test for non-zeroness
-  constexpr operator bool() const noexcept { return !!_value; }
+  explicit constexpr operator bool() const noexcept { return !!_value; }
   //! Test for zeroness
   constexpr bool operator!() const noexcept { return !_value; }
 

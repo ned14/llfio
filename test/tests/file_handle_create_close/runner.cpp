@@ -60,7 +60,7 @@ template <class U> inline void file_handle_create_close_creation(U &&f)
   // this inside the kernel or permuter as it messes with fuzzing/sanitising.
   //
   // Note that we accumulate failures into the checks vector for later processing
-  bool all_passed = permuter.check(results, pretty_print_failure(permuter.parameter_sequence(), [&](const auto &result, const auto &shouldbe) { checks.push_back([&] { BOOST_CHECK(result == shouldbe); }); }), pretty_print_success(permuter.parameter_sequence()));
+  bool all_passed = permuter.check(results, pretty_print_failure(permuter, [&checks](const auto &result, const auto &shouldbe) { checks.push_back([&] { BOOST_CHECK(result == shouldbe); }); }), pretty_print_success(permuter));
   BOOST_CHECK(all_passed);
 
   // The pretty printing gets messed up by the unit test output, so defer telling it
