@@ -28,10 +28,13 @@ after_build:
 before_test:
   - cd x64\Release
 test_script:
+  - dir
+  - test.exe
   - test.exe --reporter junit --out results.xml
 after_test:
+  - dir
 
 on_success:
 on_failure:
 on_finish:
-  - ps: (new-object net.webclient).UploadFile("https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\results.xml))
+#  - ps: (new-object net.webclient).UploadFile("https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\results.xml))
