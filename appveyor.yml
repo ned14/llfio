@@ -25,7 +25,7 @@ build_script:
   - msbuild afio_v2.sln /t:test /p:Configuration="Release" /p:Platform="x64"
 after_build:
   - cd ..
-  - 7z a afio_v2_binaries_win64.zip "include\*" build\x64\Release\afio_v2.dll
+  - 7z a afio_v2_binaries_win64.zip doc include Readme.md release_notes.md build\x64\Release\afio_v2.dll
 
 before_test:
   - cd build\x64\Release
