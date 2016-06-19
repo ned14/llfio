@@ -1,7 +1,7 @@
 This is the beginnings of the post-peer-review AFIO
 v2 rewrite. You can view its documentation at https://ned14.github.io/boost.afio/
 
-master branch test status Linux: <b>platform support currently lagging</b> Windows: [![Build status](https://ci.appveyor.com/api/projects/status/ox59o2r276xbmef7/branch/master?svg=true)](https://ci.appveyor.com/project/ned14/boost-afio/branch/master) Coverage: <b>Boost.KernelTest support for coveralls.io still todo</b>
+<b>master branch test status</b> Linux: platform support currently lagging Windows: [![Build status](https://ci.appveyor.com/api/projects/status/ox59o2r276xbmef7/branch/master?svg=true)](https://ci.appveyor.com/project/ned14/boost-afio/branch/master) Coverage: Boost.KernelTest support for coveralls.io still todo
 
 
 - [ ] Poke C++ Modules support into BindLib and turn it on on MSVC once cmake
