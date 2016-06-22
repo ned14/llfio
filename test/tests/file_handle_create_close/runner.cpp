@@ -25,23 +25,25 @@ template <class U> inline void file_handle_create_close_creation(U &&f)
   static const auto permuter(mt_permute_parameters<  // This is a multithreaded parameter permutation test
     result<void>,                                    // The output outcome/result/option type. Type void means we don't care about the return type.
     parameters<                                      // The types of one or more input parameters to permute/fuzz the kernel with.
-      typename file_handle::creation
+      typename file_handle::mode,
+      typename file_handle::creation,
+      typename file_handle::flag
     >,
     // Any additional per-permute parameters not used to invoke the kernel
     precondition::filesystem_setup_parameters,
     postcondition::filesystem_comparison_structure_parameters
   >(
     { // Initialiser list of output value expected for the input parameters, plus any precondition/postcondition parameters
-      { make_errored_result<void>(ENOENT), { file_handle::creation::open_existing     }, { "non-existing" }, { "non-existing" }},
-      {   make_ready_result<void>(),       { file_handle::creation::open_existing     }, { "existing0"    }, { "existing0"    }},
-      {   make_ready_result<void>(),       { file_handle::creation::open_existing     }, { "existing1"    }, { "existing1"    }},
-      {   make_ready_result<void>(),       { file_handle::creation::only_if_not_exist }, { "non-existing" }, { "existing0"    }},
-      { make_errored_result<void>(EEXIST), { file_handle::creation::only_if_not_exist }, { "existing0"    }, { "existing0"    }},
-      {   make_ready_result<void>(),       { file_handle::creation::if_needed         }, { "non-existing" }, { "existing0"    }},
-      {   make_ready_result<void>(),       { file_handle::creation::if_needed         }, { "existing1"    }, { "existing1"    }},
-      { make_errored_result<void>(ENOENT), { file_handle::creation::truncate          }, { "non-existing" }, { "non-existing" }},
-      {   make_ready_result<void>(),       { file_handle::creation::truncate          }, { "existing0"    }, { "existing0"    }},
-      {   make_ready_result<void>(),       { file_handle::creation::truncate          }, { "existing1"    }, { "existing0"    }}
+      { make_errored_result<void>(ENOENT), { file_handle::mode::write, file_handle::creation::open_existing    , file_handle::flag::none }, { "non-existing" }, { "non-existing" }},
+      {   make_ready_result<void>(),       { file_handle::mode::write, file_handle::creation::open_existing    , file_handle::flag::none }, { "existing0"    }, { "existing0"    }},
+      {   make_ready_result<void>(),       { file_handle::mode::write, file_handle::creation::open_existing    , file_handle::flag::none }, { "existing1"    }, { "existing1"    }},
+      {   make_ready_result<void>(),       { file_handle::mode::write, file_handle::creation::only_if_not_exist, file_handle::flag::none }, { "non-existing" }, { "existing0"    }},
+      { make_errored_result<void>(EEXIST), { file_handle::mode::write, file_handle::creation::only_if_not_exist, file_handle::flag::none }, { "existing0"    }, { "existing0"    }},
+      {   make_ready_result<void>(),       { file_handle::mode::write, file_handle::creation::if_needed        , file_handle::flag::none }, { "non-existing" }, { "existing0"    }},
+      {   make_ready_result<void>(),       { file_handle::mode::write, file_handle::creation::if_needed        , file_handle::flag::none }, { "existing1"    }, { "existing1"    }},
+      { make_errored_result<void>(ENOENT), { file_handle::mode::write, file_handle::creation::truncate         , file_handle::flag::none }, { "non-existing" }, { "non-existing" }},
+      {   make_ready_result<void>(),       { file_handle::mode::write, file_handle::creation::truncate         , file_handle::flag::none }, { "existing0"    }, { "existing0"    }},
+      {   make_ready_result<void>(),       { file_handle::mode::write, file_handle::creation::truncate         , file_handle::flag::none }, { "existing1"    }, { "existing0"    }}
     },
     // Any parameters from now on are called before each permutation and the object returned is
     // destroyed after each permutation. The callspec is (parameter_permuter<...> *parent, outcome<T> &testret, size_t, pars)
