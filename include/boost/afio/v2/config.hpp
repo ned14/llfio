@@ -675,6 +675,8 @@ public:
     _value &= o;
     return *this;
   }
+  //! Trap incorrect use of logical AND
+  template <class T> bool operator&&(T) noexcept = delete;
   //! Performs a bitwise OR
   constexpr bitfield operator|(bitfield o) const noexcept { return bitfield(_value | o._value); }
   //! Performs a bitwise OR
