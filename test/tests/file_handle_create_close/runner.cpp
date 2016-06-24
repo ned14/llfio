@@ -56,7 +56,7 @@ template <class U> inline void file_handle_create_close_creation(U &&f)
 
   // Check each of the results. We don't do this inside the kernel as it messes with fuzzing/sanitising.
   // We don't do this inside the parameter permuter either in case the fuzzer/sanitiser uses that.
-  permuter.check(results, pretty_print_failure(permuter.parameter_sequence(), [&](const auto &result, const auto &shouldbe) { checks.push_back([&] { BOOST_CHECK(result == shouldbe); }); }));
+  permuter.check(results, pretty_print_failure(permuter, [&](const auto &result, const auto &shouldbe) { checks.push_back([&] { BOOST_CHECK(result == shouldbe); }); }));
 
   for(auto &i : checks)
     i();
