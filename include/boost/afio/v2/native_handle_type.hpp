@@ -108,29 +108,29 @@ struct native_handle_type
   constexpr bool operator!() const noexcept { return _init == -1 || static_cast<unsigned>(behaviour) == 0; }
 
   //! True if the handle is readable
-  constexpr bool is_readable() const noexcept { return behaviour & disposition::readable; }
+  constexpr bool is_readable() const noexcept { return (behaviour & disposition::readable) ? true : false; }
   //! True if the handle is writable
-  constexpr bool is_writable() const noexcept { return behaviour & disposition::writable; }
+  constexpr bool is_writable() const noexcept { return (behaviour & disposition::writable) ? true : false; }
   //! True if the handle is append only
-  constexpr bool is_append_only() const noexcept { return behaviour & disposition::append_only; }
+  constexpr bool is_append_only() const noexcept { return (behaviour & disposition::append_only) ? true : false; }
 
   //! True if overlapped
-  constexpr bool is_overlapped() const noexcept { return behaviour & disposition::overlapped; }
+  constexpr bool is_overlapped() const noexcept { return (behaviour & disposition::overlapped) ? true : false; }
   //! True if seekable
-  constexpr bool is_seekable() const noexcept { return behaviour & disposition::seekable; }
+  constexpr bool is_seekable() const noexcept { return (behaviour & disposition::seekable) ? true : false; }
   //! True if requires aligned i/o
-  constexpr bool requires_aligned_io() const noexcept { return behaviour & disposition::aligned_io; }
+  constexpr bool requires_aligned_io() const noexcept { return (behaviour & disposition::aligned_io) ? true : false; }
 
   //! True if a regular file or device
-  constexpr bool is_regular() const noexcept { return behaviour & disposition::file; }
+  constexpr bool is_regular() const noexcept { return (behaviour & disposition::file) ? true : false; }
   //! True if a directory
-  constexpr bool is_directory() const noexcept { return behaviour & disposition::directory; }
+  constexpr bool is_directory() const noexcept { return (behaviour & disposition::directory) ? true : false; }
   //! True if a symlink
-  constexpr bool is_symlink() const noexcept { return behaviour & disposition::symlink; }
+  constexpr bool is_symlink() const noexcept { return (behaviour & disposition::symlink) ? true : false; }
   //! True if a multiplexer like BSD kqueues, Linux epoll or Windows IOCP
-  constexpr bool is_multiplexer() const noexcept { return behaviour & disposition::multiplexer; }
+  constexpr bool is_multiplexer() const noexcept { return (behaviour & disposition::multiplexer) ? true : false; }
   //! True if a process
-  constexpr bool is_process() const noexcept { return behaviour & disposition::process; }
+  constexpr bool is_process() const noexcept { return (behaviour & disposition::process) ? true : false; }
 };
 
 BOOST_AFIO_V2_NAMESPACE_END

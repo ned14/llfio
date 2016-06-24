@@ -25,39 +25,65 @@ template <class U> inline void file_handle_create_close_creation(U &&f)
   static const auto permuter(mt_permute_parameters<  // This is a multithreaded parameter permutation test
     result<void>,                                    // The output outcome/result/option type. Type void means we don't care about the return type.
     parameters<                                      // The types of one or more input parameters to permute/fuzz the kernel with.
-      typename file_handle::creation
+      typename file_handle::mode,
+      typename file_handle::creation,
+      typename file_handle::flag
     >,
     // Any additional per-permute parameters not used to invoke the kernel
-    hooks::filesystem_setup_parameters,
-    hooks::filesystem_comparison_structure_parameters
+    precondition::filesystem_setup_parameters,
+    postcondition::filesystem_comparison_structure_parameters
   >(
-    { // Initialiser list of output value expected for the input parameters, plus any hook parameters
-      { make_errored_result<void>(ENOENT), { file_handle::creation::open_existing     }, { "non-existing" }, { "non-existing" }},
-      {   make_ready_result<void>(),       { file_handle::creation::open_existing     }, { "existing0"    }, { "existing0"    }},
-      {   make_ready_result<void>(),       { file_handle::creation::open_existing     }, { "existing1"    }, { "existing1"    }},
-      {   make_ready_result<void>(),       { file_handle::creation::only_if_not_exist }, { "non-existing" }, { "existing0"    }},
-      { make_errored_result<void>(EEXIST), { file_handle::creation::only_if_not_exist }, { "existing0"    }, { "existing0"    }},
-      {   make_ready_result<void>(),       { file_handle::creation::if_needed         }, { "non-existing" }, { "existing0"    }},
-      {   make_ready_result<void>(),       { file_handle::creation::if_needed         }, { "existing1"    }, { "existing1"    }},
-      { make_errored_result<void>(ENOENT), { file_handle::creation::truncate          }, { "non-existing" }, { "non-existing" }},
-      {   make_ready_result<void>(),       { file_handle::creation::truncate          }, { "existing0"    }, { "existing0"    }},
-      {   make_ready_result<void>(),       { file_handle::creation::truncate          }, { "existing1"    }, { "existing0"    }}
+    { // Initialiser list of output value expected for the input parameters, plus any precondition/postcondition parameters
+
+      // Does the mode parameter have the expected side effects?
+      { make_errored_result<void>(ENOENT), { file_handle::mode::none,       file_handle::creation::if_needed, file_handle::flag::none }, { "non-existing" }, { "non-existing" }},
+      {   make_ready_result<void>(),       { file_handle::mode::none,       file_handle::creation::if_needed, file_handle::flag::none }, { "existing1"    }, { "existing1"    }},
+      { make_errored_result<void>(ENOENT), { file_handle::mode::attr_read,  file_handle::creation::if_needed, file_handle::flag::none }, { "non-existing" }, { "non-existing" }},
+      {   make_ready_result<void>(),       { file_handle::mode::attr_read,  file_handle::creation::if_needed, file_handle::flag::none }, { "existing1"    }, { "existing1"    }},
+      { make_errored_result<void>(ENOENT), { file_handle::mode::attr_write, file_handle::creation::if_needed, file_handle::flag::none }, { "non-existing" }, { "non-existing" }},
+      {   make_ready_result<void>(),       { file_handle::mode::attr_write, file_handle::creation::if_needed, file_handle::flag::none }, { "existing1"    }, { "existing1"    }},
+      {   make_ready_result<void>(),       { file_handle::mode::write,      file_handle::creation::if_needed, file_handle::flag::none }, { "non-existing" }, { "existing0"    }},
+      {   make_ready_result<void>(),       { file_handle::mode::write,      file_handle::creation::if_needed, file_handle::flag::none }, { "existing1"    }, { "existing1"    }},
+      {   make_ready_result<void>(),       { file_handle::mode::append,     file_handle::creation::if_needed, file_handle::flag::none }, { "non-existing" }, { "existing0"    }},
+      {   make_ready_result<void>(),       { file_handle::mode::append,     file_handle::creation::if_needed, file_handle::flag::none }, { "existing1"    }, { "existing1"    }},
+
+      // Does the creation parameter have the expected side effects?
+      { make_errored_result<void>(ENOENT), { file_handle::mode::write, file_handle::creation::open_existing    , file_handle::flag::none }, { "non-existing" }, { "non-existing" }},
+      {   make_ready_result<void>(),       { file_handle::mode::write, file_handle::creation::open_existing    , file_handle::flag::none }, { "existing0"    }, { "existing0"    }},
+      {   make_ready_result<void>(),       { file_handle::mode::write, file_handle::creation::open_existing    , file_handle::flag::none }, { "existing1"    }, { "existing1"    }},
+      {   make_ready_result<void>(),       { file_handle::mode::write, file_handle::creation::only_if_not_exist, file_handle::flag::none }, { "non-existing" }, { "existing0"    }},
+      { make_errored_result<void>(EEXIST), { file_handle::mode::write, file_handle::creation::only_if_not_exist, file_handle::flag::none }, { "existing0"    }, { "existing0"    }},
+      {   make_ready_result<void>(),       { file_handle::mode::write, file_handle::creation::if_needed        , file_handle::flag::none }, { "non-existing" }, { "existing0"    }},
+      {   make_ready_result<void>(),       { file_handle::mode::write, file_handle::creation::if_needed        , file_handle::flag::none }, { "existing1"    }, { "existing1"    }},
+      { make_errored_result<void>(ENOENT), { file_handle::mode::write, file_handle::creation::truncate         , file_handle::flag::none }, { "non-existing" }, { "non-existing" }},
+      {   make_ready_result<void>(),       { file_handle::mode::write, file_handle::creation::truncate         , file_handle::flag::none }, { "existing0"    }, { "existing0"    }},
+      {   make_ready_result<void>(),       { file_handle::mode::write, file_handle::creation::truncate         , file_handle::flag::none }, { "existing1"    }, { "existing0"    }},
+
+      // Does the flag parameter have the expected side effects?
+      { make_ready_result<void>(), { file_handle::mode::write, file_handle::creation::open_existing, file_handle::flag::win_delete_on_last_close|file_handle::flag::posix_unlink_on_first_close }, { "existing1" }, { "non-existing" }}
     },
     // Any parameters from now on are called before each permutation and the object returned is
     // destroyed after each permutation. The callspec is (parameter_permuter<...> *parent, outcome<T> &testret, size_t, pars)
-    hooks::filesystem_setup("file_handle_create_close"),               // Configure this filesystem workspace before the test
-    hooks::filesystem_comparison_structure("file_handle_create_close") // Do a structural comparison of the filesystem workspace after the test
+    precondition::filesystem_setup(),                 // Configure this filesystem workspace before the test
+    postcondition::filesystem_comparison_structure()  // Do a structural comparison of the filesystem workspace after the test
   ));
   // clang-format on
 
   // Have the permuter permute callable f with all the permutations, returning outcomes
   auto results = permuter(std::forward<U>(f));
+  static_assert(permuter.permutation_results_type_is_constant_sized, "Results type returned should be a std::array due to the constant sized input");
+  static_assert(results.size() > 0, "Results type returned should be a std::array due to the constant sized input");
   std::vector<std::function<void()>> checks;
 
-  // Check each of the results. We don't do this inside the kernel as it messes with fuzzing/sanitising.
-  // We don't do this inside the parameter permuter either in case the fuzzer/sanitiser uses that.
-  permuter.check(results, pretty_print_failure(permuter, [&](const auto &result, const auto &shouldbe) { checks.push_back([&] { BOOST_CHECK(result == shouldbe); }); }));
+  // Check each of the results, calling the failure/pass callables supplied. We don't do
+  // this inside the kernel or permuter as it messes with fuzzing/sanitising.
+  //
+  // Note that we accumulate failures into the checks vector for later processing
+  bool all_passed = permuter.check(results, pretty_print_failure(permuter, [&checks](const auto &result, const auto &shouldbe) { checks.push_back([&] { BOOST_CHECK(result == shouldbe); }); }), pretty_print_success(permuter));
+  BOOST_CHECK(all_passed);
 
+  // The pretty printing gets messed up by the unit test output, so defer telling it
+  // about failures until now
   for(auto &i : checks)
     i();
 }

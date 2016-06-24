@@ -264,15 +264,15 @@ inline std::ostream &operator<<(std::ostream &s, const handle::caching &v)
 inline std::ostream &operator<<(std::ostream &s, const handle::flag &v)
 {
   std::string temp;
-  if(v && handle::flag::win_delete_on_last_close)
+  if(!!(v & handle::flag::win_delete_on_last_close))
     temp.append("win_delete_on_last_close|");
-  if(v && handle::flag::posix_unlink_on_first_close)
+  if(!!(v & handle::flag::posix_unlink_on_first_close))
     temp.append("posix_unlink_on_first_close|");
-  if(v && handle::flag::disable_safety_fsyncs)
+  if(!!(v & handle::flag::disable_safety_fsyncs))
     temp.append("disable_safety_fsyncs|");
-  if(v && handle::flag::overlapped)
+  if(!!(v & handle::flag::overlapped))
     temp.append("overlapped|");
-  if(v && handle::flag::byte_lock_insanity)
+  if(!!(v & handle::flag::byte_lock_insanity))
     temp.append("byte_lock_insanity|");
   if(!temp.empty())
     temp.resize(temp.size() - 1);

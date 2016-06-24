@@ -113,6 +113,9 @@ DEALINGS IN THE SOFTWARE.
 #ifndef __cpp_attributes
 #error Boost.AFIO needs attributes support in the compiler
 #endif
+#ifndef __cpp_variable_templates
+#error Boost.AFIO needs variable template support in the compiler
+#endif
 #if(defined(__GNUC__) && !defined(__clang__))
 #define BOOST_AFIO_GCC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
 #if BOOST_AFIO_GCC_VERSION < 40900
@@ -653,7 +656,7 @@ public:
   //! Permit explicit casting to the underlying type
   explicit constexpr operator underlying_type() const noexcept { return _value; }
   //! Test for non-zeroness
-  constexpr operator bool() const noexcept { return !!_value; }
+  explicit constexpr operator bool() const noexcept { return !!_value; }
   //! Test for zeroness
   constexpr bool operator!() const noexcept { return !_value; }
 
@@ -675,6 +678,8 @@ public:
     _value &= o;
     return *this;
   }
+  //! Trap incorrect use of logical AND
+  template <class T> bool operator&&(T) noexcept = delete;
   //! Performs a bitwise OR
   constexpr bitfield operator|(bitfield o) const noexcept { return bitfield(_value | o._value); }
   //! Performs a bitwise OR

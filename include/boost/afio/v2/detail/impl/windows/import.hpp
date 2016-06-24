@@ -968,7 +968,7 @@ static inline result<DWORD> attributes_from_handle_caching_and_flags(native_hand
     attribs |= FILE_ATTRIBUTE_TEMPORARY;
     break;
   }
-  if(flags && handle::flag::win_delete_on_last_close)
+  if(flags & handle::flag::win_delete_on_last_close)
     attribs |= FILE_FLAG_DELETE_ON_CLOSE;
   return attribs;
 }
