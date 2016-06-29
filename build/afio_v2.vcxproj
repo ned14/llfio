@@ -129,6 +129,9 @@
   <ItemGroup>
     <ClCompile Include="..\src\afio.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="..\include\boost\afio\outcome\doc\boost.outcome.natvis" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{4FCBD8AB-30CB-41C9-91C9-E74B9DEB1495}</ProjectGuid>
     <Keyword>MakeFileProj</Keyword>

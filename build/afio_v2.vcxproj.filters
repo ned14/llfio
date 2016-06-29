@@ -134,4 +134,7 @@
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="..\include\boost\afio\outcome\doc\boost.outcome.natvis" />
+  </ItemGroup>
 </Project>
