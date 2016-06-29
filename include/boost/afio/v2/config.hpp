@@ -113,6 +113,9 @@ DEALINGS IN THE SOFTWARE.
 #ifndef __cpp_attributes
 #error Boost.AFIO needs attributes support in the compiler
 #endif
+#ifndef __cpp_variable_templates
+#error Boost.AFIO needs variable template support in the compiler
+#endif
 #if(defined(__GNUC__) && !defined(__clang__))
 #define BOOST_AFIO_GCC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
 #if BOOST_AFIO_GCC_VERSION < 40900
