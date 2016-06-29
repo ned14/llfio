@@ -591,8 +591,9 @@ namespace utils
     return ret;
   }
 
-  uint128 fast_hash::hash(const char *message, size_t length, uint128 ret) noexcept
+  uint128 fast_hash::hash(const char *message, size_t length, const uint128 &_ret) noexcept
   {
+    uint128 ret(_ret);
     using namespace fash_hash_detail;
     if(length < sc_bufSize)
     {

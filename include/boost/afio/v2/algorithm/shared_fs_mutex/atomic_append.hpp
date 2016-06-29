@@ -319,7 +319,7 @@ namespace algorithm
             start_offset = _header.first_known_good;
           assert(record_offset >= start_offset);
           assert(record_offset - start_offset <= sizeof(_buffer));
-          BOOST_OUTCOME_FILTER_ERROR(batchread, _h.read(start_offset, _buffer, record_offset - start_offset + sizeof(atomic_append_detail::lock_request)));
+          BOOST_OUTCOME_FILTER_ERROR(batchread, _h.read(start_offset, _buffer, (size_t)(record_offset - start_offset) + sizeof(atomic_append_detail::lock_request)));
           assert(batchread.second == record_offset - start_offset + sizeof(atomic_append_detail::lock_request));
           const atomic_append_detail::lock_request *record = (atomic_append_detail::lock_request *) (batchread.first + batchread.second - sizeof(atomic_append_detail::lock_request));
           const atomic_append_detail::lock_request *firstrecord = (atomic_append_detail::lock_request *) batchread.first;

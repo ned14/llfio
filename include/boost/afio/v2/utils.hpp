@@ -673,7 +673,7 @@ This lets one pack one byte of input into two bytes of output.
 
   public:
     //! Initialise the hash with an optional seed
-    BOOST_CXX14_CONSTEXPR fast_hash(uint128 seed = uint128(nullptr)) noexcept
+    BOOST_CXX14_CONSTEXPR fast_hash(const uint128 &seed = uint128(nullptr)) noexcept
     {
       m_length = 0;
       m_remainder = 0;
@@ -688,7 +688,7 @@ This lets one pack one byte of input into two bytes of output.
     uint128 finalise() noexcept;
 
     //! Single shot hash of a sequence of bytes
-    static uint128 hash(const char *data, size_t bytes, uint128 seed = uint128(nullptr)) noexcept;
+    static uint128 hash(const char *data, size_t bytes, const uint128 &seed = uint128(nullptr)) noexcept;
 
     //! Single shot hash of a span
     template <typename T> static uint128 hash(const span<T> &str) noexcept { return hash((char *) str.data(), str.size() * sizeof(T)); }
