@@ -275,8 +275,14 @@ inline std::ostream &operator<<(std::ostream &s, const handle::flag &v)
   if(!!(v & handle::flag::byte_lock_insanity))
     temp.append("byte_lock_insanity|");
   if(!temp.empty())
+  {
     temp.resize(temp.size() - 1);
-  return s << "afio::handle::flag::(" << temp << ")";
+    if(std::count(temp.cbegin(), temp.cend(), '|') > 0)
+      temp = "(" + temp + ")";
+  }
+  else
+    temp = "none";
+  return s << "afio::handle::flag::" << temp;
 }
 
 /*! \class io_handle
