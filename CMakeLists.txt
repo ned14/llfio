@@ -1,0 +1,6 @@
+CMAKE_MINIMUM_REQUIRED(VERSION 3.0 FATAL_ERROR)
+PROJECT(afio VERSION 2.0.0 LANGUAGES CXX)
+SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/include/boost/afio/boost-lite/cmake")
+INCLUDE(RequireOutOfSourceBuild)
+INCLUDE(MakeBoostLiteLibrary)
+INCLUDE(MakeBoostLiteHeaderOnlyLibrary)
