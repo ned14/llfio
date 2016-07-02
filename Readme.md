@@ -4,8 +4,18 @@ v2 rewrite. You can view its documentation at https://ned14.github.io/boost.afio
 <b>master branch test status</b> Linux: platform support currently lagging Windows: [![Build status](https://ci.appveyor.com/api/projects/status/ox59o2r276xbmef7/branch/master?svg=true)](https://ci.appveyor.com/project/ned14/boost-afio/branch/master) Coverage: Boost.KernelTest support for coveralls.io still todo
 
 CMake todos:
+- target_compile_features(afio
+  PUBLIC cxx_auto_type
+  PRIVATE cxx_variadic_templates
+)
+- Visual Studio project files need to maintain directory structure
+  - See https://cmake.org/pipermail/cmake/2013-November/056336.html
 - Precompiled headers generation
 - C++ Modules support
+- Each dependent library also needs to use this cmake infrastructure and then
+be brought in as a header only dependency using
+target_link_library(afio, INTERFACE boost::outcome)
+  - Remove dragging in dependent libraries in the glob
 - Each test runner needs to be compiled into many build variants using the header
 only library
   - Also generate a DLL for each test kernel
