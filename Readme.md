@@ -4,6 +4,7 @@ v2 rewrite. You can view its documentation at https://ned14.github.io/boost.afio
 <b>master branch test status</b> Linux: platform support currently lagging Windows: [![Build status](https://ci.appveyor.com/api/projects/status/ox59o2r276xbmef7/branch/master?svg=true)](https://ci.appveyor.com/project/ned14/boost-afio/branch/master) Coverage: Boost.KernelTest support for coveralls.io still todo
 
 CMake todos:
+- project needs to parse version.hpp
 - target_compile_features(afio
   PUBLIC cxx_auto_type
   PRIVATE cxx_variadic_templates
