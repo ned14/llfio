@@ -1,10 +1,22 @@
 cmake_minimum_required(VERSION 3.0 FATAL_ERROR)
+# Bring in the Boost lite cmake tooling
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/include/boost/afio/boost-lite/cmake")
-include(RequireOutOfSourceBuild)
+include(BoostLiteRequireOutOfSourceBuild)
+include(BoostLiteHppUtils)  # for ParseProjectVersionFromHpp and UpdateRevisionHppFromGit
 
-include(ParseProjectVersionFromHpp)
+# Parse the version we tell cmake directly from the version header file
 ParseProjectVersionFromHpp("${CMAKE_CURRENT_SOURCE_DIR}/include/boost/afio/version.hpp" VERSIONSTRING)
+# Sets the usual PROJECT_NAME etc
 project(afio VERSION ${VERSIONSTRING} LANGUAGES CXX)
+# Also set a *cmake* namespace for this project
 set(PROJECT_NAMESPACE boost::)
-include(MakeBoostLiteLibrary)
-include(MakeBoostLiteHeaderOnlyLibrary)
+
+# Update this header file with the current git SHA and last timestamp
+UpdateRevisionHppFromGit("${CMAKE_CURRENT_SOURCE_DIR}/include/boost/afio/revision.hpp")
+# Make the standard static and shared libraries, and if supported by this compiler, C++ modules
+# for both static and shared libraries as well. For the non-C++ module variants, makes the
+# interface headers into precompiled headers. Only builds all of them if this is the topmost
+# CMakeLists, else built only if something upstream is dependent on one of them.
+include(BoostLiteMakeLibrary)
+# Make an interface only library so dependent CMakeLists can bring in this header-only library
+include(BoostLiteMakeHeaderOnlyLibrary)

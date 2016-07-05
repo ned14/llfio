@@ -12,8 +12,6 @@ CMake todos:
   PUBLIC cxx_auto_type
   PRIVATE cxx_variadic_templates
 )
-- Visual Studio project files need to maintain directory structure
-  - See https://cmake.org/pipermail/cmake/2013-November/056336.html
 - Precompiled headers generation
 - C++ Modules support
 - Each dependent library also needs to use this cmake infrastructure and then
