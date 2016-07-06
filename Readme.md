@@ -4,14 +4,6 @@ v2 rewrite. You can view its documentation at https://ned14.github.io/boost.afio
 <b>master branch test status</b> Linux: platform support currently lagging Windows: [![Build status](https://ci.appveyor.com/api/projects/status/ox59o2r276xbmef7/branch/master?svg=true)](https://ci.appveyor.com/project/ned14/boost-afio/branch/master) Coverage: Boost.KernelTest support for coveralls.io still todo
 
 CMake todos:
-- revision.hpp needs to be updated from .git/HEAD (ref: refs/heads/master)
-  - .git/HEAD/refs/heads/master contains the SHA
-  - timestamp of that file is the timestamp
-  - if a submodule, read the .git file and append /HEAD
-- target_compile_features(afio
-  PUBLIC cxx_auto_type
-  PRIVATE cxx_variadic_templates
-)
 - Precompiled headers generation
 - C++ Modules support
 - Each dependent library also needs to use this cmake infrastructure and then
