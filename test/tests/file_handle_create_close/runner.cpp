@@ -3,7 +3,6 @@
 File Created: Apr 2016
 */
 
-#include "boost/afio/afio.hpp"
 #include "../../kerneltest/include/boost/kerneltest/v1/hooks/filesystem_workspace.hpp"
 #include "../../kerneltest/include/boost/kerneltest/v1/permute_parameters.hpp"
 #include "../../kerneltest/include/boost/kerneltest/v1/test_kernel.hpp"
