@@ -156,9 +156,14 @@ DEALINGS IN THE SOFTWARE.
 #define BOOST_AFIO_USE_BOOST_THREAD 0
 #endif
 #endif
-// Default to the C++ 11 STL if on MSVC (Dinkumware ships a copy), else Boost
+// Default to the C++ 11 STL if on VS2015 or has <experimental/filesystem>
 #ifndef BOOST_AFIO_USE_BOOST_FILESYSTEM
-#if _MSC_VER >= 1900  // >= VS 14
+#ifdef __has_include
+#if __has_include(<experimental/filesystem>)
+#define BOOST_AFIO_USE_BOOST_FILESYSTEM 0
+#endif
+#endif
+#if !defined(BOOST_AFIO_USE_BOOST_FILESYSTEM) && _MSC_VER >= 1900  /* >= VS2015 */
 #define BOOST_AFIO_USE_BOOST_FILESYSTEM 0
 #endif
 #endif
@@ -737,6 +742,7 @@ namespace win
 BOOST_AFIO_V2_NAMESPACE_END
 
 
+#if 0
 ///////////////////////////////////////////////////////////////////////////////
 //  Auto library naming
 #if !defined(BOOST_AFIO_SOURCE) && !defined(BOOST_ALL_NO_LIB) && !defined(BOOST_AFIO_NO_LIB) && !AFIO_STANDALONE && !BOOST_AFIO_HEADERS_ONLY
@@ -751,6 +757,7 @@ BOOST_AFIO_V2_NAMESPACE_END
 #include <boost/config/auto_link.hpp>
 
 #endif  // auto-linking disabled
+#endif
 
 //#define BOOST_THREAD_VERSION 4
 //#define BOOST_THREAD_PROVIDES_VARIADIC_THREAD

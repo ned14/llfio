@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.0 FATAL_ERROR)
 # Bring in the Boost lite cmake tooling
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/include/boost/afio/boost-lite/cmake")
 include(BoostLiteRequireOutOfSourceBuild)
-include(BoostLiteHppUtils)  # for ParseProjectVersionFromHpp and UpdateRevisionHppFromGit
+include(BoostLiteUtils)  # for ParseProjectVersionFromHpp and UpdateRevisionHppFromGit
 
 # Parse the version we tell cmake directly from the version header file
 ParseProjectVersionFromHpp("${CMAKE_CURRENT_SOURCE_DIR}/include/boost/afio/version.hpp" VERSIONSTRING)
@@ -25,19 +25,25 @@ include(BoostLiteMakeHeaderOnlyLibrary)
 include(BoostLiteApplyDefaultDefinitions)
 # Set the C++ features this library requires
 all_compile_features(PUBLIC
-    # cxx_exceptions                        ## Annoyingly not supported by cmake 3.4
-    cxx_alias_templates
-    cxx_variadic_templates
-    cxx_noexcept
-    cxx_constexpr
-    cxx_thread_local
-    #cxx_init_captures                      ## Not supported yet by cmake 3.4
-    cxx_attributes
-    cxx_variable_templates
-  )
+  # cxx_exceptions                        ## Annoyingly not supported by cmake 3.4
+  cxx_alias_templates
+  cxx_variadic_templates
+  cxx_noexcept
+  cxx_constexpr
+  cxx_thread_local
+  #cxx_init_captures                      ## Not supported yet by cmake 3.4
+  cxx_attributes
+  cxx_variable_templates
+)
+# Set any macros this library requires
+if(WIN32)
+  all_compile_definitions(PRIVATE _WIN32_WINNT=0x600)  ## Target WinVista
+endif()
 
 # Anyone using the static or dynamic libraries is not using the header only variant
 foreach(lib afio_sl afio_dl)
   target_compile_definitions(${lib} INTERFACE BOOST_AFIO_HEADERS_ONLY=0) 
 endforeach()
 
+# For all possible configurations of this library, add each test
+include(BoostLiteMakeStandardTests)
