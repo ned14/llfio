@@ -67,7 +67,7 @@ struct BOOST_AFIO_DECL statfs_t
   uint64_t f_files;                /*!< total file nodes in filesystem     (POSIX) */
   uint64_t f_ffree;                /*!< free nodes avail to non-superuser  (POSIX) */
   uint32_t f_namemax;              /*!< maximum filename length            (Windows, POSIX) */
-#ifndef WIN32
+#ifndef _WIN32
   int16_t f_owner; /*!< user that mounted the filesystem   (BSD, OS X) */
 #endif
   uint64_t f_fsid[2];        /*!< filesystem id                      (Windows, POSIX) */
@@ -101,7 +101,7 @@ BOOST_AFIO_V2_NAMESPACE_END
 
 #if BOOST_AFIO_HEADERS_ONLY == 1 && !defined(DOXYGEN_SHOULD_SKIP_THIS)
 #define BOOST_AFIO_INCLUDED_BY_HEADER 1
-#ifdef WIN32
+#ifdef _WIN32
 #include "detail/impl/windows/statfs.ipp"
 #else
 #include "detail/impl/posix/statfs.ipp"

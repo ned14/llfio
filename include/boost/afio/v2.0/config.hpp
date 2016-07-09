@@ -62,11 +62,7 @@ DEALINGS IN THE SOFTWARE.
 #endif
 
 
-#if defined(_WIN32) && !defined(WIN32)
-#define WIN32 _WIN32
-#endif
-
-#if defined(WIN32)
+#if defined(_WIN32)
 #if !defined(_WIN32_WINNT)
 #define _WIN32_WINNT 0x0600
 #elif _WIN32_WINNT < 0x0600

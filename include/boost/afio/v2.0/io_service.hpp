@@ -49,7 +49,7 @@ Run as root 'kldload aio' or add 'aio_load=YES' in loader.conf.
 //!\def BOOST_AFIO_HAVE_REALTIME_SIGNALS Undefined to autodetect. 0 to use non-realtime signals. Note performance in this use case is abysmal.
 
 // Need to decide which kind of POSIX AIO to use
-#ifndef WIN32
+#ifndef _WIN32
 // Right now the only thing we support is POSIX AIO
 #if !defined(BOOST_AFIO_USE_POSIX_AIO)
 #define BOOST_AFIO_USE_POSIX_AIO 1
@@ -122,7 +122,7 @@ public:
   template <class T> using io_result = io_handle::io_result<T>;
 
 private:
-#ifdef WIN32
+#ifdef _WIN32
   win::handle _threadh;
   win::dword _threadid;
 #else
@@ -242,7 +242,7 @@ BOOST_AFIO_V2_NAMESPACE_END
 
 #if BOOST_AFIO_HEADERS_ONLY == 1 && !defined(DOXYGEN_SHOULD_SKIP_THIS)
 #define BOOST_AFIO_INCLUDED_BY_HEADER 1
-#ifdef WIN32
+#ifdef _WIN32
 #include "detail/impl/windows/io_service.ipp"
 #else
 #include "detail/impl/posix/io_service.ipp"

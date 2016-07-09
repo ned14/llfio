@@ -35,7 +35,7 @@ DEALINGS IN THE SOFTWARE.
 #include "../../../handle.hpp"
 #include <memory>  // for unique_ptr
 
-#ifndef WIN32
+#ifndef _WIN32
 #error You should not include windows/import.hpp on not Windows platforms
 #endif
 
@@ -669,16 +669,16 @@ template <class T> inline outcome<T> make_errored_outcome_nt(NTSTATUS e, const c
 #if 0
 static inline void fill_stat_t(stat_t &stat, BOOST_AFIO_POSIX_STAT_STRUCT s, metadata_flags wanted)
 {
-#ifndef WIN32
+#ifndef _WIN32
   if (!!(wanted&metadata_flags::dev)) { stat.st_dev = s.st_dev; }
 #endif
   if (!!(wanted&metadata_flags::ino)) { stat.st_ino = s.st_ino; }
   if (!!(wanted&metadata_flags::type)) { stat.st_type = to_st_type(s.st_mode); }
-#ifndef WIN32
+#ifndef _WIN32
   if (!!(wanted&metadata_flags::perms)) { stat.st_mode = s.st_perms; }
 #endif
   if (!!(wanted&metadata_flags::nlink)) { stat.st_nlink = s.st_nlink; }
-#ifndef WIN32
+#ifndef _WIN32
   if (!!(wanted&metadata_flags::uid)) { stat.st_uid = s.st_uid; }
   if (!!(wanted&metadata_flags::gid)) { stat.st_gid = s.st_gid; }
   if (!!(wanted&metadata_flags::rdev)) { stat.st_rdev = s.st_rdev; }

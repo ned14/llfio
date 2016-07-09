@@ -146,7 +146,7 @@ BOOST_AFIO_V2_NAMESPACE_END
 
 #if BOOST_AFIO_HEADERS_ONLY == 1 && !defined(DOXYGEN_SHOULD_SKIP_THIS)
 #define BOOST_AFIO_INCLUDED_BY_HEADER 1
-#ifdef WIN32
+#ifdef _WIN32
 #include "detail/impl/windows/file_handle.ipp"
 #else
 #include "detail/impl/posix/file_handle.ipp"

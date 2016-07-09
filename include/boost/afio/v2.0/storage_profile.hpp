@@ -165,7 +165,7 @@ namespace storage_profile
     BOOST_AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> cpu(storage_profile &sp, file_handle &h) noexcept;
     // System memory quantity, in use, max and min bandwidth
     BOOST_AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> mem(storage_profile &sp, file_handle &h) noexcept;
-#ifdef WIN32
+#ifdef _WIN32
     namespace windows
     {
 #else
@@ -181,7 +181,7 @@ namespace storage_profile
     BOOST_AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> device(storage_profile &sp, file_handle &h) noexcept;
     // FS name, config, size, in use
     BOOST_AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> fs(storage_profile &sp, file_handle &h) noexcept;
-#ifdef WIN32
+#ifdef _WIN32
     namespace windows
     {
 #else
