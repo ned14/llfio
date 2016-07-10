@@ -34,7 +34,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include "config.hpp"
 
-BOOST_AFIO_V2_NAMESPACE_BEGIN
+BOOST_AFIO_V2_NAMESPACE_EXPORT_BEGIN
 
 //! Utility routines often useful when using AFIO
 namespace utils

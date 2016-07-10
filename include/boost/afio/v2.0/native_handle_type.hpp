@@ -34,7 +34,7 @@ DEALINGS IN THE SOFTWARE.
 #ifndef BOOST_AFIO_NATIVE_HANDLE_TYPE_H
 #define BOOST_AFIO_NATIVE_HANDLE_TYPE_H
 
-BOOST_AFIO_V2_NAMESPACE_BEGIN
+BOOST_AFIO_V2_NAMESPACE_EXPORT_BEGIN
 
 /*! \struct native_handle_type
 \brief A native handle type used for wrapping file descriptors, process ids or HANDLEs.

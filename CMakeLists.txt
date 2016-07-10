@@ -39,11 +39,20 @@ all_compile_features(PUBLIC
 if(WIN32)
   all_compile_definitions(PRIVATE _WIN32_WINNT=0x600)  ## Target WinVista
 endif()
-
 # Anyone using the static or dynamic libraries is not using the header only variant
 foreach(lib afio_sl afio_dl)
   target_compile_definitions(${lib} INTERFACE BOOST_AFIO_HEADERS_ONLY=0) 
+  target_compile_definitions(${lib} PRIVATE BOOST_AFIO_SOURCE=1) 
 endforeach()
+# Test C++ Modules (ICEs in VS2015 Update 3)
+if(MSVC AND 0)
+  target_compile_definitions(afio_dl PUBLIC -D__cpp_modules=1)
+  target_compile_options(afio_dl PUBLIC /experimental:module)
+  target_sources(afio_dl PRIVATE include/boost/afio/afio.ixx)
+  set_source_files_properties(include/boost/afio/afio.ixx PROPERTIES
+      LANGUAGE CXX
+  )
+endif()
 
 # For all possible configurations of this library, add each test
 include(BoostLiteMakeStandardTests)

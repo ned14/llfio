@@ -206,13 +206,26 @@ namespace boost
     {                                                                                                                                                                                                                                                                                                                          \
       inline namespace v2                                                                                                                                                                                                                                                                                                      \
       {
+#define BOOST_AFIO_V2_NAMESPACE_EXPORT_BEGIN                                                                                                                                                                                                                                                                                          \
+  namespace boost                                                                                                                                                                                                                                                                                                              \
+  {                                                                                                                                                                                                                                                                                                                            \
+    namespace afio                                                                                                                                                                                                                                                                                                             \
+    {                                                                                                                                                                                                                                                                                                                          \
+      inline namespace v2                                                                                                                                                                                                                                                                                                      \
+      {
 #define BOOST_AFIO_V2_NAMESPACE_END                                                                                                                                                                                                                                                                                            \
   }                                                                                                                                                                                                                                                                                                                            \
   }                                                                                                                                                                                                                                                                                                                            \
   }
+#elif defined(GENERATING_CXX_MODULE_INTERFACE)
+#define BOOST_AFIO_V2_NAMESPACE BOOSTLITE_NAMESPACE(BOOST_AFIO_V2)
+#define BOOST_AFIO_V2_NAMESPACE_BEGIN BOOSTLITE_NAMESPACE_BEGIN(BOOST_AFIO_V2)
+#define BOOST_AFIO_V2_NAMESPACE_EXPORT_BEGIN BOOSTLITE_NAMESPACE_EXPORT_BEGIN(BOOST_AFIO_V2)
+#define BOOST_AFIO_V2_NAMESPACE_END BOOSTLITE_NAMESPACE_END(BOOST_AFIO_V2)
 #else
 #define BOOST_AFIO_V2_NAMESPACE BOOSTLITE_NAMESPACE(BOOST_AFIO_V2)
 #define BOOST_AFIO_V2_NAMESPACE_BEGIN BOOSTLITE_NAMESPACE_BEGIN(BOOST_AFIO_V2)
+#define BOOST_AFIO_V2_NAMESPACE_EXPORT_BEGIN BOOSTLITE_NAMESPACE_BEGIN(BOOST_AFIO_V2)
 #define BOOST_AFIO_V2_NAMESPACE_END BOOSTLITE_NAMESPACE_END(BOOST_AFIO_V2)
 #endif
 

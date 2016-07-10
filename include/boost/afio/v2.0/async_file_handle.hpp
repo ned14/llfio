@@ -35,7 +35,7 @@ DEALINGS IN THE SOFTWARE.
 #ifndef BOOST_AFIO_ASYNC_FILE_HANDLE_H
 #define BOOST_AFIO_ASYNC_FILE_HANDLE_H
 
-BOOST_AFIO_V2_NAMESPACE_BEGIN
+BOOST_AFIO_V2_NAMESPACE_EXPORT_BEGIN
 
 //! A handle to an open something
 class BOOST_AFIO_DECL async_file_handle : public file_handle

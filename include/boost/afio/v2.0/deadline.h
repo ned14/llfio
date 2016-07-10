@@ -38,7 +38,7 @@ DEALINGS IN THE SOFTWARE.
 #ifdef __cplusplus
 #include "config.hpp"
 #include <stdexcept>
-BOOST_AFIO_V2_NAMESPACE_BEGIN
+BOOST_AFIO_V2_NAMESPACE_EXPORT_BEGIN
 #define BOOST_AFIO_DEADLINE_NAME deadline
 #else
 #define BOOST_AFIO_DEADLINE_NAME boost_afio_deadline

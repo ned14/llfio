@@ -39,7 +39,7 @@ DEALINGS IN THE SOFTWARE.
 #pragma warning(disable : 4251)  // dll interface
 #endif
 
-BOOST_AFIO_V2_NAMESPACE_BEGIN
+BOOST_AFIO_V2_NAMESPACE_EXPORT_BEGIN
 
 class handle;
 
