@@ -3,24 +3,30 @@ v2 rewrite. You can view its documentation at https://ned14.github.io/boost.afio
 
 <b>master branch test status</b> Linux: platform support currently lagging Windows: [![Build status](https://ci.appveyor.com/api/projects/status/ox59o2r276xbmef7/branch/master?svg=true)](https://ci.appveyor.com/project/ned14/boost-afio/branch/master) Coverage: Boost.KernelTest support for coveralls.io still todo
 
+<b>CMake dashboard</b>: http://my.cdash.org/index.php?project=Boost.AFIO
+
 CMake todos:
-- Precompiled headers generation
-- C++ Modules support
 - Each dependent library also needs to use this cmake infrastructure and then
 be brought in as a header only dependency using
 target_link_library(afio, INTERFACE boost::outcome)
+  - Include sublibraries needs to use boost/lib/lib.hpp NOT directly
   - Remove dragging in dependent libraries in the glob
-- Each test runner needs to be compiled into many build variants using the header
-only library
-  - Also generate a DLL for each test kernel
+- Use junction points/hard link clones to replace dependencies with a
+flat list
 - ctest support
 - cdash support
-- Install support
+- Install and staging support
+- Jenkins & Appveyor
+- Remove old project files
 
+Later:
+- Each test runner needs to be compiled into many sanitising build variants
+using the header only library
+  - Also generate a DLL for each test kernel
+- Instead of git submodule recursive, unpack into a flat hierarchy and use
+boost/lib/lib.hpp
+- Single include generation
 
-- [ ] Poke C++ Modules support into BindLib and turn it on on MSVC once cmake
-build tooling is up (should be very straightforward assuming C++ Modules hasn't
-changed much since I designed BindLib)
 
 Notes on experimental automatic unit test framework:
 - kernel.cpp needs to be separate from runner.cpp
@@ -50,6 +56,7 @@ a percentage of total edges executed which needs to be reported to cdash somehow
     has a community edition letting you draw graphs on a web page.
 - FUTURE write a custom DLL/SO loader which returns error codes from
 system calls to exercise even more branch points.
+- FUTURE automatic possible error returns calculator for the documentation
 
 
 
@@ -92,6 +99,19 @@ unlinking the file.
 all the hefty code for POSIX.
 
 
+- [ ] Add mapped_file_handle
+  - Use one-two-three level page system, so 4Kb/2Mb/?. Files under 2Mb need just
+one indirection.
+  - Page tables need to also live in a potentially mapped file
+  - Need some way of explicitly converting a file_handle into a mapped_file_handle
+and vice versa.
+  - Could speculatively map 4Kb chunks lazily and keep an internal map of 4Kb
+offsets to map. This allows more optimal handing of growing files.
+  - WOULD BE NICE: Copy on Write support which collates a list of dirtied 4Kb
+pages and could write those out as a delta.
+    - LATER: Use guard pages to toggle dirty flag per initial COW
+- [ ] Rewrite correctness test in benchmark_locking to use mapped_file handle.
+
 
 - [ ] Outcome's error logging needs to record current thread id ideally.
 - [ ] Move caching into native_handle_type.
@@ -119,13 +139,6 @@ throws, have it detect __cpp_exceptions and skip those implementations.
 
 - [ ] C bindings for all AFIO v2 APIs. Write libclang parser which autogenerates
 SWIG interface files from the .hpp files.
-- [ ] Add mapped_file_handle
-  - Use two level page system, so page/bigpage
-  - Need some way of explicitly converting a file_handle into a mapped_file_handle
-and vice versa.
-  - Could speculatively map 4Kb chunks lazily and keep an internal map of 4Kb
-offsets to map. This allows more optimal handing of growing files.
-- [ ] Rewrite correctness test in benchmark_locking to use mapped_file handle.
 
 
 - [ ] Add native BSD kqueues to POSIX AIO backend as is vastly more efficient.

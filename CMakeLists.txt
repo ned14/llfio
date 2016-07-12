@@ -10,6 +10,7 @@ ParseProjectVersionFromHpp("${CMAKE_CURRENT_SOURCE_DIR}/include/boost/afio/versi
 project(afio VERSION ${VERSIONSTRING} LANGUAGES CXX)
 # Also set a *cmake* namespace for this project
 set(PROJECT_NAMESPACE boost::)
+include(CTest)
 
 # Update this header file with the current git SHA and last timestamp
 UpdateRevisionHppFromGit("${CMAKE_CURRENT_SOURCE_DIR}/include/boost/afio/revision.hpp")
