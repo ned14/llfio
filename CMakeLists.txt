@@ -1,15 +1,25 @@
 cmake_minimum_required(VERSION 3.0 FATAL_ERROR)
-# Bring in the Boost lite cmake tooling
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/include/boost/afio/boost-lite/cmake")
+# If necessary bring in the Boost lite cmake tooling
+list(FIND CMAKE_MODULE_PATH "boost-lite" boost_lite_idx)
+if(${boost_lite_idx} EQUAL -1)
+  if(EXISTS "${CMAKE_SOURCE_DIR}/../boost-lite/cmake")
+    set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/../boost-lite/cmake")
+  elseif(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/include/boost/afio/boost-lite/cmake")
+    set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/include/boost/afio/boost-lite/cmake")
+  else()
+    message(FATAL_ERROR "FATAL: A copy of boost-lite cannot be found. Try running 'git submodule update --init --recursive'")
+  endif()
+endif()
 include(BoostLiteRequireOutOfSourceBuild)
-include(BoostLiteUtils)  # for ParseProjectVersionFromHpp and UpdateRevisionHppFromGit
+include(BoostLiteUtils)
+find_boostish_library(boost--outcome 1.0 REQUIRED)
 
 # Parse the version we tell cmake directly from the version header file
 ParseProjectVersionFromHpp("${CMAKE_CURRENT_SOURCE_DIR}/include/boost/afio/version.hpp" VERSIONSTRING)
 # Sets the usual PROJECT_NAME etc
 project(afio VERSION ${VERSIONSTRING} LANGUAGES CXX)
 # Also set a *cmake* namespace for this project
-set(PROJECT_NAMESPACE boost::)
+set(PROJECT_NAMESPACE boost--)
 include(CTest)
 
 # Update this header file with the current git SHA and last timestamp
@@ -34,8 +44,12 @@ all_compile_features(PUBLIC
   cxx_thread_local
   #cxx_init_captures                      ## Not supported yet by cmake 3.4
   cxx_attributes
-  cxx_variable_templates
 )
+if(NOT MSVC OR CMAKE_VERSION VERSION_GREATER 3.59)
+  all_compile_features(PUBLIC
+    cxx_variable_templates
+  )
+endif()
 # Set any macros this library requires
 if(WIN32)
   all_compile_definitions(PRIVATE _WIN32_WINNT=0x600)  ## Target WinVista
