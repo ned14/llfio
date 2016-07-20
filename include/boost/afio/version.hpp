@@ -12,6 +12,9 @@
 #define BOOST_AFIO_VERSION_PATCH    0  // Patch version for cmake and DLL version stamping
 #define BOOST_AFIO_VERSION_REVISION 0  // Revision version for cmake and DLL version stamping
 
+// Defined between stable releases of AFIO
+#define BOOST_AFIO_UNSTABLE_VERSION
+
 #define BOOST_AFIO_VERSION_GLUE2(a, b, c) a ## b ## c
 #define BOOST_AFIO_VERSION_GLUE(a, b, c)  BOOST_AFIO_VERSION_GLUE2(a, b, c)
 // The namespace boost::afio::v ## BOOST_AFIO_NAMESPACE_VERSION

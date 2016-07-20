@@ -11,7 +11,7 @@ Created: May 2016
 #define BOOST_AFIO_TEST_KERNEL_DECL inline
 #else
 // We are standalone
-#include "boost/afio/afio.hpp"
+#include "../afio/include/boost/afio/afio.hpp"
 #define BOOST_AFIO_TEST_KERNEL_DECL extern BOOST_SYMBOL_EXPORT
 #endif
 

@@ -12,7 +12,6 @@ if(${boost_lite_idx} EQUAL -1)
 endif()
 include(BoostLiteRequireOutOfSourceBuild)
 include(BoostLiteUtils)
-find_boostish_library(boost--outcome 1.0 REQUIRED)
 
 # Parse the version we tell cmake directly from the version header file
 ParseProjectVersionFromHpp("${CMAKE_CURRENT_SOURCE_DIR}/include/boost/afio/version.hpp" VERSIONSTRING)
@@ -20,7 +19,11 @@ ParseProjectVersionFromHpp("${CMAKE_CURRENT_SOURCE_DIR}/include/boost/afio/versi
 project(afio VERSION ${VERSIONSTRING} LANGUAGES CXX)
 # Also set a *cmake* namespace for this project
 set(PROJECT_NAMESPACE boost--)
+# Bring in CTest support
 include(CTest)
+# Find my library dependencies
+find_boostish_library(boost-lite 1.0 REQUIRED)
+find_boostish_library(boost--outcome 1.0 REQUIRED)
 
 # Update this header file with the current git SHA and last timestamp
 UpdateRevisionHppFromGit("${CMAKE_CURRENT_SOURCE_DIR}/include/boost/afio/revision.hpp")
@@ -50,6 +53,8 @@ if(NOT MSVC OR CMAKE_VERSION VERSION_GREATER 3.59)
     cxx_variable_templates
   )
 endif()
+# Set the library dependencies this library has
+target_link_libraries(outcome_hl INTERFACE boost-lite_hl outcome_hl)
 # Set any macros this library requires
 if(WIN32)
   all_compile_definitions(PRIVATE _WIN32_WINNT=0x600)  ## Target WinVista
