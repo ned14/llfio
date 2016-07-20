@@ -18,20 +18,23 @@ platform: x64
 configuration: Release
 
 before_build:
+  - git checkout master
   - git submodule update --init --recursive
-  - cd build
-  - call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x64
+  - mkdir build
 build_script:
-  - msbuild afio_v2.sln /t:test /p:Configuration="Release" /p:Platform="x64"
+  - cd build
+  - cmake ..
+  - cmake --build . --config Release
 after_build:
   - cd ..
-  - 7z a afio_v2_binaries_win64.zip doc include Readme.md release_notes.md build\x64\Release\afio_v2.dll
+  - 7z a afio_v2_binaries_win64.zip doc include Readme.md release_notes.md build\bin\Release\afio_dl-2.0-Windows-Win32-Release.dll lib\Release\afio_sl-2.0-Windows-Win32-Release.lib
 
 before_test:
-  - cd build\x64\Release
+  - cd build
 test_script:
-  - test.exe --reporter junit --out results.xml
+  - ctest -D Experimental -C Release
 after_test:
+  - copy bin\Release\*.xml results.xml
 
 on_success:
 on_failure:
