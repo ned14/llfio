@@ -6,16 +6,7 @@ v2 rewrite. You can view its documentation at https://ned14.github.io/boost.afio
 <b>CMake dashboard</b>: http://my.cdash.org/index.php?project=Boost.AFIO
 
 CMake todos:
-- Each dependent library also needs to use this cmake infrastructure and then
-be brought in as a header only dependency using
-target_link_library(afio, INTERFACE boost::outcome)
-  - Include sublibraries needs to use boost/lib/lib.hpp NOT directly
-  - Remove dragging in dependent libraries in the glob
-- Use junction points/hard link clones to replace dependencies with a
-flat list
-- ctest support
-- cdash support
-- Install and staging support
+
 - Jenkins & Appveyor
 - Remove old project files
 
@@ -23,8 +14,6 @@ Later:
 - Each test runner needs to be compiled into many sanitising build variants
 using the header only library
   - Also generate a DLL for each test kernel
-- Instead of git submodule recursive, unpack into a flat hierarchy and use
-boost/lib/lib.hpp
 - Single include generation
 
 
