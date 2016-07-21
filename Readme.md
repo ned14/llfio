@@ -6,9 +6,7 @@ v2 rewrite. You can view its documentation at https://ned14.github.io/boost.afio
 <b>CMake dashboard</b>: http://my.cdash.org/index.php?project=Boost.AFIO
 
 CMake todos:
-
-- Jenkins & Appveyor
-- Remove old project files
+- _sl and _dl need to encode their suffixes into the library outputs
 
 Later:
 - Each test runner needs to be compiled into many sanitising build variants
