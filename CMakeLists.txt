@@ -25,8 +25,6 @@ include(CTest)
 find_boostish_library(boost-lite 1.0 REQUIRED)
 find_boostish_library(boost--outcome 1.0 REQUIRED)
 
-# Update this header file with the current git SHA and last timestamp
-UpdateRevisionHppFromGit("${CMAKE_CURRENT_SOURCE_DIR}/include/boost/afio/revision.hpp")
 # Make the standard static and shared libraries, and if supported by this compiler, C++ modules
 # for both static and shared libraries as well. For the non-C++ module variants, makes the
 # interface headers into precompiled headers. Only builds all of them if this is the topmost
@@ -34,6 +32,10 @@ UpdateRevisionHppFromGit("${CMAKE_CURRENT_SOURCE_DIR}/include/boost/afio/revisio
 include(BoostLiteMakeLibrary)
 # Make an interface only library so dependent CMakeLists can bring in this header-only library
 include(BoostLiteMakeHeaderOnlyLibrary)
+if(NOT PROJECT_IS_DEPENDENCY)
+  # Update this header file with the current git SHA and last timestamp
+  UpdateRevisionHppFromGit("${CMAKE_CURRENT_SOURCE_DIR}/include/boost/afio/revision.hpp")
+endif()
 
 # Set the standard definitions for these libraries and bring in the all_* helper functions
 include(BoostLiteApplyDefaultDefinitions)
