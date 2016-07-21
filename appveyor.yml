@@ -27,8 +27,6 @@ build_script:
   - cmake --build . --config Release
 after_build:
   - cd ..
-  - dir build\bin\Release
-  - dir build\lib\Release
   - 7z a afio_v2_binaries_win64.zip doc include Readme.md release_notes.md build\bin\Release\afio_dl-2.0-Windows-Win32-Release.dll build\lib\Release\afio_sl-2.0-Windows-Win32-Release.lib
 
 before_test:
@@ -37,6 +35,7 @@ test_script:
   - ctest -D Experimental -C Release
 after_test:
   - copy bin\Release\*.xml results.xml
+  - type results.xml
 
 on_success:
 on_failure:
