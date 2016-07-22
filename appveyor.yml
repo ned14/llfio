@@ -34,7 +34,7 @@ before_test:
 test_script:
   - ctest -D Experimental -C Release
 after_test:
-  - python ..\include\boost\afio\boost-lite\scripts\merge_junit_results.py results_all.xml bin\Release\*.xml
+  - C:\Python27\python ..\include\boost\afio\boost-lite\scripts\merge_junit_results.py results_all.xml bin\Release\*.xml
   - type results.xml
 
 on_success:
