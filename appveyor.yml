@@ -34,7 +34,7 @@ before_test:
 test_script:
   - ctest -D Experimental -C Release
 after_test:
-  - copy bin\Release\*.xml results.xml
+  - copy bin\Release\*.xml results_all.xml
   - type results.xml
 
 on_success:

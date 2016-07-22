@@ -6,7 +6,9 @@ v2 rewrite. You can view its documentation at https://ned14.github.io/boost.afio
 <b>CMake dashboard</b>: http://my.cdash.org/index.php?project=Boost.AFIO
 
 CMake todos:
-- _sl and _dl need to encode their suffixes into the library outputs
+- Static library edition appears to not be encoding extended error code detail?
+- Precompiled header's custom target causes a PCH rebuild every build run, which
+sucks and should be fixed.
 
 Later:
 - Each test runner needs to be compiled into many sanitising build variants
