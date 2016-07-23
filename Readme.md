@@ -7,8 +7,12 @@ v2 rewrite. You can view its documentation at https://ned14.github.io/boost.afio
 
 CMake todos:
 - Static library edition appears to not be encoding extended error code detail?
-- Precompiled header's custom target causes a PCH rebuild every build run, which
-sucks and should be fixed.
+  - Add a unit test!
+- CDash needs to display all the unit test results ideally
+  - ctest should combine the XML from the tests into a single XML
+  - ctest also needs to figure out if these binaries are using CATCH
+- Make updating revision.hpp a non-default target and have the pre-commit git
+hook call it
 
 Later:
 - Each test runner needs to be compiled into many sanitising build variants
