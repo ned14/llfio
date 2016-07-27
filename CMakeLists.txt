@@ -76,3 +76,13 @@ endif()
 
 # For all possible configurations of this library, add each test
 include(BoostLiteMakeStandardTests)
+# For each test target, set compile options
+if(MSVC)
+  foreach(test_target ${afio_TEST_TARGETS})
+    target_compile_options(${test_target} PRIVATE /wd4503)  ## decorated name length exceeded
+  endforeach()
+endif()
+
+# Make available this library for install and export
+include(BoostLiteMakeInstall)
+include(BoostLiteMakeExport)

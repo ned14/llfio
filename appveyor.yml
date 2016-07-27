@@ -20,27 +20,20 @@ configuration: Release
 before_build:
   - git checkout master
   - git submodule update --init --recursive
-  - mkdir build
 build_script:
-  - cd build
-  - cmake ..
-  - cmake --build . --config Release
+  - ctest -S .ci.cmake -V
 after_build:
   - cd ..
-  - 7z a afio_v2_binaries_win64.zip doc include Readme.md release_notes.md build\bin\Release\afio_dl-2.0-Windows-Win32-Release.dll build\lib\Release\afio_sl-2.0-Windows-Win32-Release.lib
+  - 7z a afio_v2_binaries_win64.zip doc include Readme.md release_notes.md build\bin\Release\afio_dl-2.0-Windows-x64-Release.dll build\lib\Release\afio_dl-2.0-Windows-x64-Release.lib build\lib\Release\afio_sl-2.0-Windows-x64-Release.lib
 
 before_test:
-  - cd build
 test_script:
-  - ctest -D Experimental -C Release
 after_test:
-  - ..\include\boost\afio\boost-lite\scripts\merge_junit_results.py results.xml bin\Release\*.xml
-  - type results.xml
 
 on_success:
 on_failure:
 on_finish:
-  - ps: (new-object net.webclient).UploadFile("https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\results.xml))
+  - ps: (new-object net.webclient).UploadFile("https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path build\merged_junit_results.xml))
 
 artifacts:
   - path: afio_v2_binaries_win64.zip

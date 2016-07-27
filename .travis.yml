@@ -1,0 +1,61 @@
+language: cpp
+sudo: false
+os:
+ - linux
+branches:
+  only:
+    - master
+notifications:
+  email:
+    recipients:
+      - nialldouglas14@gmail.com
+
+addons:
+  apt:
+    sources:
+    - ubuntu-toolchain-r-test
+    - george-edison55-precise-backports
+#    - llvm-toolchain-precise-3.8  ## not currently working due to bad source signing key
+    packages:
+    - g++-6
+    - python3
+    - cmake
+    - cmake-data
+
+env:
+ - __="cmake tests" NAME=TravisLinuxWorker
+ 
+cache:
+  apt: true
+  directories:
+    - llvm-3.8.0
+    
+before_install:
+ -
+    LLVM_VERSION=3.8.0;
+    if [ "${TRAVIS_OS_NAME}" = "linux" ]; then
+      if [ -z "$(ls -A llvm-$LLVM_VERSION)" ]; then
+        wget -O llvm-$LLVM_VERSION.tar.xz http://llvm.org/releases/$LLVM_VERSION/clang+llvm-$LLVM_VERSION-x86_64-linux-gnu-ubuntu-14.04.tar.xz;
+        mkdir llvm-$LLVM_VERSION;
+        xzcat llvm-$LLVM_VERSION.tar.xz | tar -xvf - --strip 1 -C llvm-$LLVM_VERSION;
+        cd llvm-$LLVM_VERSION/bin;
+        ln -s clang-3.8 clang++-3.8;
+        cd ../..;
+      fi;
+      llvm-$LLVM_VERSION/bin/llvm-config --version;
+      export LLVM_CONFIG="llvm-$LLVM_VERSION/bin/llvm-config";
+      export PATH="$PWD/llvm-$LLVM_VERSION/bin:$PATH";
+    fi
+ - git checkout master
+ - git submodule update --init --recursive
+
+script:
+ -
+   if [ "$__" = "cmake tests" ]; then
+     CXX=g++-6 ctest -S .ci.cmake -V;
+   fi
+ 
+after_success:
+# - bash -x ./update_coveralls.sh `pwd`
+
+after_failure:

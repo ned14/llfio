@@ -8,17 +8,13 @@ v2 rewrite. You can view its documentation at https://ned14.github.io/boost.afio
 CMake todos:
 - Static library edition appears to not be encoding extended error code detail?
   - Add a unit test!
-- CDash needs to display all the unit test results ideally
-  - ctest should combine the XML from the tests into a single XML
-  - ctest also needs to figure out if these binaries are using CATCH
-- Make updating revision.hpp a non-default target and have the pre-commit git
-hook call it
 
 Later:
 - Each test runner needs to be compiled into many sanitising build variants
 using the header only library
   - Also generate a DLL for each test kernel
 - Single include generation
+- Make updating revision.hpp updated by the pre-commit git hook
 
 
 Notes on experimental automatic unit test framework:
