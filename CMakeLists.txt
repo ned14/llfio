@@ -19,6 +19,8 @@ ParseProjectVersionFromHpp("${CMAKE_CURRENT_SOURCE_DIR}/include/boost/afio/versi
 project(afio VERSION ${VERSIONSTRING} LANGUAGES CXX)
 # Also set a *cmake* namespace for this project
 set(PROJECT_NAMESPACE boost--)
+# This file should be updated with the last git SHA next commit
+UpdateRevisionHppFromGit("${CMAKE_CURRENT_SOURCE_DIR}/include/boost/afio/revision.hpp")
 # Bring in CTest support
 include(CTest)
 # Find my library dependencies
@@ -32,10 +34,6 @@ find_boostish_library(boost--outcome 1.0 REQUIRED)
 include(BoostLiteMakeLibrary)
 # Make an interface only library so dependent CMakeLists can bring in this header-only library
 include(BoostLiteMakeHeaderOnlyLibrary)
-if(NOT PROJECT_IS_DEPENDENCY)
-  # Update this header file with the current git SHA and last timestamp
-  UpdateRevisionHppFromGit("${CMAKE_CURRENT_SOURCE_DIR}/include/boost/afio/revision.hpp")
-endif()
 
 # Set the standard definitions for these libraries and bring in the all_* helper functions
 include(BoostLiteApplyDefaultDefinitions)
@@ -78,3 +76,13 @@ endif()
 
 # For all possible configurations of this library, add each test
 include(BoostLiteMakeStandardTests)
+# For each test target, set compile options
+if(MSVC)
+  foreach(test_target ${afio_TEST_TARGETS})
+    target_compile_options(${test_target} PRIVATE /wd4503)  ## decorated name length exceeded
+  endforeach()
+endif()
+
+# Make available this library for install and export
+include(BoostLiteMakeInstall)
+include(BoostLiteMakeExport)
