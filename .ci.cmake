@@ -26,25 +26,29 @@ ctest_build()
 ctest_test()
 merge_junit_results_into_ctest_xml()
 if(WIN32)
-  execute_process(COMMAND "${CMAKE_COMMAND}" -E tar cfJ afio_v2_binaries_win64.tar.xz
-    doc
-    include
-    Readme.md
-    release_notes.md
-    build/lib/Release/afio_sl-2.0-Windows-x64-Release.lib
-    build/lib/Release/afio_dl-2.0-Windows-x64-Release.lib
-    build/bin/Release/afio_dl-2.0-Windows-x64-Release.dll
-  )
-  ctest_upload(FILES afio_v2_binaries_win64.tar.xz)
+  if(EXISTS build/bin/Release/afio_dl-2.0-Windows-x64-Release.dll)
+    execute_process(COMMAND "${CMAKE_COMMAND}" -E tar cfJ afio_v2_binaries_win64.tar.xz
+      doc
+      include
+      Readme.md
+      release_notes.md
+      build/lib/Release/afio_sl-2.0-Windows-x64-Release.lib
+      build/lib/Release/afio_dl-2.0-Windows-x64-Release.lib
+      build/bin/Release/afio_dl-2.0-Windows-x64-Release.dll
+    )
+    ctest_upload(FILES afio_v2_binaries_win64.tar.xz)
+  endif()
 else()
-  execute_process(COMMAND "${CMAKE_COMMAND}" -E tar cfJ afio_v2_binaries_linux64.tar.xz
-    doc
-    include
-    Readme.md
-    release_notes.md
-    build/lib/Release/afio_sl-2.0-Linux-x86_64-Release.a
-    build/bin/Release/afio_dl-2.0-Linux-x86_64-Release.so
-  )
-  ctest_upload(FILES afio_v2_binaries_linux64.tar.xz)
+  if(EXISTS build/bin/Release/afio_dl-2.0-Linux-x86_64-Release.so)
+    execute_process(COMMAND "${CMAKE_COMMAND}" -E tar cfJ afio_v2_binaries_linux64.tar.xz
+      doc
+      include
+      Readme.md
+      release_notes.md
+      build/lib/Release/afio_sl-2.0-Linux-x86_64-Release.a
+      build/bin/Release/afio_dl-2.0-Linux-x86_64-Release.so
+    )
+    ctest_upload(FILES afio_v2_binaries_linux64.tar.xz)
+  endif()
 endif()
-#ctest_submit()
+ctest_submit()

@@ -23,7 +23,6 @@ before_build:
 build_script:
   - ctest -S .ci.cmake -V
 after_build:
-  - cd ..
   - 7z a afio_v2_binaries_win64.zip doc include Readme.md release_notes.md build\bin\Release\afio_dl-2.0-Windows-x64-Release.dll build\lib\Release\afio_dl-2.0-Windows-x64-Release.lib build\lib\Release\afio_sl-2.0-Windows-x64-Release.lib
 
 before_test:
