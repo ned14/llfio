@@ -38,7 +38,7 @@ if(WIN32)
       RESULT_VARIABLE retval
     )
     message(STATUS "Tarring up binaries returned with status ${retval}")
-    execute_process(COMMAND dir /N)
+    execute_process(COMMAND dir . /N)
     ctest_upload(FILES afio_v2_binaries_win64.tar.gz)
   endif()
 else()
