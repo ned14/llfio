@@ -6,6 +6,9 @@ v2 rewrite. You can view its documentation at https://ned14.github.io/boost.afio
 <b>CMake dashboard</b>: http://my.cdash.org/index.php?project=Boost.AFIO
 
 CMake todos:
+- Add doxygen generation support
+- For non-embedded config, cmake should stamp git submodule SHAs so I can
+dispense with the upd method of submodule stamping
 - Static library edition appears to not be encoding extended error code detail?
   - Add a unit test!
 

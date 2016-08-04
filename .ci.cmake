@@ -17,7 +17,7 @@ endif()
 include(BoostLiteUtils)
 
 
-configure_ctest_script_for_cdash("afio" "build")
+CONFIGURE_CTEST_SCRIPT_FOR_CDASH("afio" "build")
 ctest_empty_binary_directory(${CTEST_BINARY_DIRECTORY})
 
 ctest_start("Experimental")
@@ -27,7 +27,8 @@ ctest_test()
 merge_junit_results_into_ctest_xml()
 if(WIN32)
   if(EXISTS build/bin/Release/afio_dl-2.0-Windows-x64-Release.dll)
-    execute_process(COMMAND "${CMAKE_COMMAND}" -E tar cfz afio_v2_binaries_win64.tar.gz
+    checked_execute_process("Tarring up binaries"
+      COMMAND "${CMAKE_COMMAND}" -E tar cfz afio_v2_binaries_win64.tar.gz
       doc
       include
       Readme.md
@@ -35,24 +36,21 @@ if(WIN32)
       build/lib/Release/afio_sl-2.0-Windows-x64-Release.lib
       build/lib/Release/afio_dl-2.0-Windows-x64-Release.lib
       build/bin/Release/afio_dl-2.0-Windows-x64-Release.dll
-      RESULT_VARIABLE retval
     )
-    message(STATUS "Tarring up binaries returned with status ${retval}")
     execute_process(COMMAND cmd /c dir)
     ctest_upload(FILES afio_v2_binaries_win64.tar.gz)
   endif()
 else()
   if(EXISTS build/bin/Release/afio_dl-2.0-Linux-x86_64-Release.so)
-    execute_process(COMMAND "${CMAKE_COMMAND}" -E tar cfz afio_v2_binaries_linux64.tgz
+    checked_execute_process("Tarring up binaries"
+    COMMAND "${CMAKE_COMMAND}" -E tar cfz afio_v2_binaries_linux64.tgz
       doc
       include
       Readme.md
       release_notes.md
       build/lib/Release/afio_sl-2.0-Linux-x86_64-Release.a
       build/bin/Release/afio_dl-2.0-Linux-x86_64-Release.so
-      RESULT_VARIABLE retval
     )
-    message(STATUS "Tarring up binaries returned with status ${retval}")
     ctest_upload(FILES afio_v2_binaries_linux64.tgz)
   endif()
 endif()
