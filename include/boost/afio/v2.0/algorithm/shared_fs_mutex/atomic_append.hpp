@@ -37,6 +37,8 @@ DEALINGS IN THE SOFTWARE.
 
 #include <cassert>
 
+//! \file atomic_append.hpp Provides algorithm::shared_fs_mutex::atomic_append
+
 BOOST_AFIO_V2_NAMESPACE_BEGIN
 
 namespace algorithm

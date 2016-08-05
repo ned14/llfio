@@ -38,6 +38,8 @@ DEALINGS IN THE SOFTWARE.
 #include <utility>  // for pair<>
 #include <vector>
 
+//! \file handle.hpp Provides handle
+
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4251)  // dll interface

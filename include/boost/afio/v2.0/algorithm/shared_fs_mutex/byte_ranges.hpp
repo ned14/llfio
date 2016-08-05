@@ -35,6 +35,8 @@ DEALINGS IN THE SOFTWARE.
 #include "../../file_handle.hpp"
 #include "base.hpp"
 
+//! \file byte_ranges.hpp Provides algorithm::shared_fs_mutex::byte_ranges
+
 BOOST_AFIO_V2_NAMESPACE_BEGIN
 
 namespace algorithm

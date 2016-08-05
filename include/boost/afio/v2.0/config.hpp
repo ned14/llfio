@@ -29,34 +29,37 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
-//! \def BOOST_AFIO_HEADERS_ONLY Whether AFIO is a headers only library. Defaults to 1 unless BOOST_ALL_DYN_LINK is defined.
+//! \file config.hpp Configures a compiler environment for AFIO header and source code
+#define BOOST_AFIO_CONFIGURED
+
 #if !defined(BOOST_AFIO_HEADERS_ONLY) && !defined(BOOST_ALL_DYN_LINK)
+//! Whether AFIO is a headers only library. Defaults to 1 unless BOOST_ALL_DYN_LINK is defined.
 #define BOOST_AFIO_HEADERS_ONLY 1
 #endif
 
-//! \def BOOST_AFIO_LOGGING_LEVEL How much detail to log. 0=disabled, 1=fatal, 2=error, 3=warn, 4=info, 5=debug, 6=all.
-//! Defaults to error if NDEBUG defined, else info level.
 #if !defined(BOOST_AFIO_LOGGING_LEVEL)
 #ifdef NDEBUG
 #define BOOST_AFIO_LOGGING_LEVEL 2  // error
 #else
+//! \brief How much detail to log. 0=disabled, 1=fatal, 2=error, 3=warn, 4=info, 5=debug, 6=all.
+//! Defaults to error if NDEBUG defined, else info level.
 #define BOOST_AFIO_LOGGING_LEVEL 4  // info
 #endif
 #endif
 
-//! \def BOOST_AFIO_LOG_BACKTRACE_LEVELS Bit mask of which log levels should be stack backtraced
+#if !defined(BOOST_AFIO_LOG_BACKTRACE_LEVELS)
+//! \brief Bit mask of which log levels should be stack backtraced
 //! which will slow those logs thirty fold or so. Defaults to (1<<1)|(1<<2)|(1<<3) i.e. stack backtrace
 //! on fatal, error and warn logs.
-#if !defined(BOOST_AFIO_LOG_BACKTRACE_LEVELS)
 #define BOOST_AFIO_LOG_BACKTRACE_LEVELS ((1 << 1) | (1 << 2) | (1 << 3))
 #endif
 
-//! \def BOOST_AFIO_LOGGING_MEMORY How much memory to use for the log.
-//! Defaults to 4Kb if NDEBUG defined, else 1Mb.
 #if !defined(BOOST_AFIO_LOGGING_MEMORY)
 #ifdef NDEBUG
 #define BOOST_AFIO_LOGGING_MEMORY 4096
 #else
+//! \brief How much memory to use for the log.
+//! Defaults to 4Kb if NDEBUG defined, else 1Mb.
 #define BOOST_AFIO_LOGGING_MEMORY (1024 * 1024)
 #endif
 #endif
@@ -197,6 +200,14 @@ namespace boost
     {
       //! Collection of file system based algorithms
       namespace algorithm
+      {
+      }
+      //! YAML databaseable empirical testing of a storage's behaviour
+      namespace storage_profile
+      {
+      }
+      //! Utility routines often useful when using AFIO
+      namespace utils
       {
       }
     }

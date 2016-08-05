@@ -32,6 +32,8 @@ DEALINGS IN THE SOFTWARE.
 #include "file_handle.hpp"
 #include "io_service.hpp"
 
+//! \file async_file_handle.hpp Provides async_file_handle
+
 #ifndef BOOST_AFIO_ASYNC_FILE_HANDLE_H
 #define BOOST_AFIO_ASYNC_FILE_HANDLE_H
 

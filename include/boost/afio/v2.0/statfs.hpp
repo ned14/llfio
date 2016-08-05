@@ -32,7 +32,12 @@ DEALINGS IN THE SOFTWARE.
 #ifndef BOOST_AFIO_STATFS_H
 #define BOOST_AFIO_STATFS_H
 
+#ifndef BOOST_AFIO_CONFIGURED
+#error You must include the master afio.hpp, not individual header files directly
+#endif
 #include "config.hpp"
+
+//! \file statfs.hpp Provides statfs
 
 #ifdef _MSC_VER
 #pragma warning(push)

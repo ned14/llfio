@@ -35,6 +35,8 @@ DEALINGS IN THE SOFTWARE.
 #include "../../handle.hpp"
 #include "../../utils.hpp"
 
+//! \file base.hpp Provides algorithm::shared_fs_mutex::shared_fs_mutex
+
 BOOST_AFIO_V2_NAMESPACE_BEGIN
 
 namespace algorithm

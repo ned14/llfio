@@ -32,11 +32,15 @@ DEALINGS IN THE SOFTWARE.
 #ifndef BOOST_AFIO_UTILS_H
 #define BOOST_AFIO_UTILS_H
 
+#ifndef BOOST_AFIO_CONFIGURED
+#error You must include the master afio.hpp, not individual header files directly
+#endif
 #include "config.hpp"
+
+//! \file utils.hpp Provides namespace utils
 
 BOOST_AFIO_V2_NAMESPACE_EXPORT_BEGIN
 
-//! Utility routines often useful when using AFIO
 namespace utils
 {
   /*! \brief Returns the page sizes of this architecture which is useful for calculating direct i/o multiples.

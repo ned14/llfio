@@ -39,19 +39,17 @@ DEALINGS IN THE SOFTWARE.
 
 #undef _threadid  // windows macro splosh sigh
 
-//!\def BOOST_AFIO_COMPILE_KQUEUES Undefined to autodetect, 1 to compile in BSD kqueue support, 0 to leave it out
-/*!\def BOOST_AFIO_USE_POSIX_AIO Undefined to autodetect, 1 to use POSIX AIO, 0 to not use
-
-\warning On FreeBSD the AIO kernel module needs to be loaded for POSIX AIO to work.
-Run as root 'kldload aio' or add 'aio_load=YES' in loader.conf.
-*/
-//!\def BOOST_AFIO_IO_POST_SIGNAL Undefined to autoset to first free SIGRTMIN if realtime signals available, else SIGUSR1. Only used if BOOST_AFIO_USE_KQUEUES=0.
-//!\def BOOST_AFIO_HAVE_REALTIME_SIGNALS Undefined to autodetect. 0 to use non-realtime signals. Note performance in this use case is abysmal.
+//! \file io_service.hpp Provides io_service
 
 // Need to decide which kind of POSIX AIO to use
 #ifndef _WIN32
 // Right now the only thing we support is POSIX AIO
 #if !defined(BOOST_AFIO_USE_POSIX_AIO)
+/*! \brief Undefined to autodetect, 1 to use POSIX AIO, 0 to not use
+
+\warning On FreeBSD the AIO kernel module needs to be loaded for POSIX AIO to work.
+Run as root 'kldload aio' or add 'aio_load=YES' in loader.conf.
+*/
 #define BOOST_AFIO_USE_POSIX_AIO 1
 #endif
 // BSD kqueues not implemented yet
@@ -66,6 +64,10 @@ Run as root 'kldload aio' or add 'aio_load=YES' in loader.conf.
 #define BOOST_AFIO_USE_POSIX_AIO 1
 #endif
 #endif
+#if DOXYGEN_SHOULD_SKIP_THIS
+//! Undefined to autodetect, 1 to compile in BSD kqueue support, 0 to leave it out
+#define BOOST_AFIO_COMPILE_KQUEUES <see docs>
+#endif
 
 #if BOOST_AFIO_USE_POSIX_AIO
 // We'll be using POSIX AIO and signal based interruption for post()
@@ -78,8 +80,10 @@ Run as root 'kldload aio' or add 'aio_load=YES' in loader.conf.
 #define BOOST_AFIO_HAVE_REALTIME_SIGNALS 1
 #else
 #ifndef BOOST_AFIO_IO_POST_SIGNAL
+//! Undefined to autoset to first free SIGRTMIN if realtime signals available, else SIGUSR1. Only used if BOOST_AFIO_USE_KQUEUES=0.
 #define BOOST_AFIO_IO_POST_SIGNAL (SIGUSR1)
 #endif
+//! Undefined to autodetect. 0 to use non-realtime signals. Note performance in this use case is abysmal.
 #define BOOST_AFIO_HAVE_REALTIME_SIGNALS 0
 #endif
 struct aiocb;

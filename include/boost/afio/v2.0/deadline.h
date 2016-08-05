@@ -35,7 +35,12 @@ DEALINGS IN THE SOFTWARE.
 #include <stdbool.h>
 #include <time.h>
 
+//! \file deadline.h Provides struct deadline
+
 #ifdef __cplusplus
+#ifndef BOOST_AFIO_CONFIGURED
+#error You must include the master afio.hpp, not individual header files directly
+#endif
 #include "config.hpp"
 #include <stdexcept>
 BOOST_AFIO_V2_NAMESPACE_EXPORT_BEGIN

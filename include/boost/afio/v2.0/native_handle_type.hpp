@@ -29,7 +29,12 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
+#ifndef BOOST_AFIO_CONFIGURED
+#error You must include the master afio.hpp, not individual header files directly
+#endif
 #include "config.hpp"
+
+//! \file native_handle_type.hpp Provides native_handle_type
 
 #ifndef BOOST_AFIO_NATIVE_HANDLE_TYPE_H
 #define BOOST_AFIO_NATIVE_HANDLE_TYPE_H

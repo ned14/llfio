@@ -34,6 +34,8 @@ DEALINGS IN THE SOFTWARE.
 
 #include "handle.hpp"
 
+//! \file file_handle.hpp Provides file_handle
+
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4251)  // dll interface

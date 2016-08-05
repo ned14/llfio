@@ -34,6 +34,8 @@ DEALINGS IN THE SOFTWARE.
 
 #include <regex>
 
+//! \file storage_profile.hpp Provides storage_profile
+
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4251)  // dll interface
