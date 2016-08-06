@@ -116,6 +116,9 @@ DEALINGS IN THE SOFTWARE.
 #ifndef __cpp_variable_templates
 #error Boost.AFIO needs variable template support in the compiler
 #endif
+#ifndef __cpp_generic_lambdas
+#error Boost.AFIO needs generic lambda support in the compiler
+#endif
 #if(defined(__GNUC__) && !defined(__clang__))
 #define BOOST_AFIO_GCC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
 #if BOOST_AFIO_GCC_VERSION < 40900
@@ -123,9 +126,6 @@ DEALINGS IN THE SOFTWARE.
 #endif
 #endif
 
-#if defined(BOOST_AFIO_LATEST_VERSION) && BOOST_AFIO_LATEST_VERSION < 2
-#error You need to include the latest version of Boost.AFIO before any earlier versions within the same translation unit
-#endif
 
 #include "../boost-lite/include/import.h"
 #undef BOOST_AFIO_V2_STL11_IMPL

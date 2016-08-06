@@ -23,7 +23,7 @@
 #define BOOST_AFIO_NAMESPACE_VERSION   BOOST_AFIO_VERSION_GLUE(BOOST_AFIO_VERSION_MAJOR, _, BOOST_AFIO_VERSION_MINOR)
 
 #if defined(__cpp_modules) || defined(DOXYGEN_SHOULD_SKIP_THIS)
-#if defined(_MSC_VER) && !defined(__clang)
+#if defined(_MSC_VER) && !defined(__clang__)
 //! \brief The AFIO C++ module name
 #define BOOST_AFIO_MODULE_NAME BOOST_AFIO_VERSION_GLUE(afio_v, BOOST_AFIO_NAMESPACE_VERSION,)
 #else

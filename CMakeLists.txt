@@ -22,8 +22,8 @@ project(afio VERSION ${VERSIONSTRING} LANGUAGES CXX)
 set(PROJECT_NAMESPACE boost--)
 # This file should be updated with the last git SHA next commit
 UpdateRevisionHppFromGit("${CMAKE_CURRENT_SOURCE_DIR}/include/boost/afio/revision.hpp")
-# Bring in CTest support
-include(CTest)
+# Setup this cmake environment for this project
+include(BoostLiteSetupProject)
 # Find my library dependencies
 find_boostish_library(boost-lite 1.0 REQUIRED)
 find_boostish_library(boost--outcome 1.0 REQUIRED)
@@ -42,14 +42,15 @@ include(BoostLiteMakeDoxygen)
 include(BoostLiteApplyDefaultDefinitions)
 # Set the C++ features this library requires
 all_compile_features(PUBLIC
-  # cxx_exceptions                        ## Annoyingly not supported by cmake 3.4
+  # cxx_exceptions                        ## Annoyingly not supported by cmake 3.6
   cxx_alias_templates
   cxx_variadic_templates
   cxx_noexcept
   cxx_constexpr
   cxx_thread_local
-  #cxx_init_captures                      ## Not supported yet by cmake 3.4
+  #cxx_init_captures                      ## Not supported yet by cmake 3.6
   cxx_attributes
+  cxx_generic_lambdas
 )
 if(NOT MSVC OR CMAKE_VERSION VERSION_GREATER 3.59)
   all_compile_features(PUBLIC

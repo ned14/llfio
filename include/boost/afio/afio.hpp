@@ -1,7 +1,7 @@
 //! \file afio/afio.hpp The master *latest version* AFIO include file. All AFIO consuming libraries should include this header only.
 #include "version.hpp"
 
-#if defined(_MSC_VER) && !defined(__clang)
+#if defined(_MSC_VER) && !defined(__clang__)
 #define BOOST_AFIO_HEADERS_PATH2 BOOST_AFIO_VERSION_GLUE(v, BOOST_AFIO_HEADERS_VERSION, /afio.hpp)
 #else
 #define BOOST_AFIO_HEADERS_PATH2 BOOST_AFIO_VERSION_GLUE(v, BOOST_AFIO_HEADERS_VERSION,)/afio.hpp
