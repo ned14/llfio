@@ -66,7 +66,7 @@ Run as root 'kldload aio' or add 'aio_load=YES' in loader.conf.
 #endif
 #if DOXYGEN_SHOULD_SKIP_THIS
 //! Undefined to autodetect, 1 to compile in BSD kqueue support, 0 to leave it out
-#define BOOST_AFIO_COMPILE_KQUEUES <see docs>
+#define BOOST_AFIO_COMPILE_KQUEUES 0
 #endif
 
 #if BOOST_AFIO_USE_POSIX_AIO

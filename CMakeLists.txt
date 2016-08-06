@@ -12,6 +12,7 @@ if(${boost_lite_idx} EQUAL -1)
 endif()
 include(BoostLiteRequireOutOfSourceBuild)
 include(BoostLiteUtils)
+include(BoostLitePolicies)
 
 # Parse the version we tell cmake directly from the version header file
 ParseProjectVersionFromHpp("${CMAKE_CURRENT_SOURCE_DIR}/include/boost/afio/version.hpp" VERSIONSTRING)

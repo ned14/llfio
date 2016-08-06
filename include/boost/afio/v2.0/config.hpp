@@ -30,10 +30,11 @@ DEALINGS IN THE SOFTWARE.
 */
 
 //! \file config.hpp Configures a compiler environment for AFIO header and source code
+//! \defgroup config Configuration macros
 #define BOOST_AFIO_CONFIGURED
 
 #if !defined(BOOST_AFIO_HEADERS_ONLY) && !defined(BOOST_ALL_DYN_LINK)
-//! Whether AFIO is a headers only library. Defaults to 1 unless BOOST_ALL_DYN_LINK is defined.
+//! \brief Whether AFIO is a headers only library. Defaults to 1 unless BOOST_ALL_DYN_LINK is defined. \ingroup config
 #define BOOST_AFIO_HEADERS_ONLY 1
 #endif
 
@@ -42,7 +43,7 @@ DEALINGS IN THE SOFTWARE.
 #define BOOST_AFIO_LOGGING_LEVEL 2  // error
 #else
 //! \brief How much detail to log. 0=disabled, 1=fatal, 2=error, 3=warn, 4=info, 5=debug, 6=all.
-//! Defaults to error if NDEBUG defined, else info level.
+//! Defaults to error if NDEBUG defined, else info level. \ingroup config
 #define BOOST_AFIO_LOGGING_LEVEL 4  // info
 #endif
 #endif
@@ -50,7 +51,7 @@ DEALINGS IN THE SOFTWARE.
 #if !defined(BOOST_AFIO_LOG_BACKTRACE_LEVELS)
 //! \brief Bit mask of which log levels should be stack backtraced
 //! which will slow those logs thirty fold or so. Defaults to (1<<1)|(1<<2)|(1<<3) i.e. stack backtrace
-//! on fatal, error and warn logs.
+//! on fatal, error and warn logs. \ingroup config
 #define BOOST_AFIO_LOG_BACKTRACE_LEVELS ((1 << 1) | (1 << 2) | (1 << 3))
 #endif
 
@@ -59,7 +60,7 @@ DEALINGS IN THE SOFTWARE.
 #define BOOST_AFIO_LOGGING_MEMORY 4096
 #else
 //! \brief How much memory to use for the log.
-//! Defaults to 4Kb if NDEBUG defined, else 1Mb.
+//! Defaults to 4Kb if NDEBUG defined, else 1Mb. \ingroup config
 #define BOOST_AFIO_LOGGING_MEMORY (1024 * 1024)
 #endif
 #endif
@@ -125,9 +126,6 @@ DEALINGS IN THE SOFTWARE.
 #if defined(BOOST_AFIO_LATEST_VERSION) && BOOST_AFIO_LATEST_VERSION < 2
 #error You need to include the latest version of Boost.AFIO before any earlier versions within the same translation unit
 #endif
-#ifndef BOOST_AFIO_LATEST_VERSION
-#define BOOST_AFIO_LATEST_VERSION 2
-#endif
 
 #include "../boost-lite/include/import.h"
 #undef BOOST_AFIO_V2_STL11_IMPL
@@ -155,15 +153,17 @@ DEALINGS IN THE SOFTWARE.
 #error You must configure Boost.Outcome and Boost.AFIO to both use Boost.Thread together or both not at all.
 #endif
 #define BOOST_OUTCOME_USE_BOOST_THREAD 0
+//! \brief The C++ 11 STL to use (std|boost). Defaults to std. \ingroup config
 #define BOOST_AFIO_V2_STL11_IMPL std
 #ifndef BOOST_AFIO_USE_BOOST_THREAD
+//! \brief Whether to use Boost.Thread instead of the C++ 11 STL `std::thread`. Defaults to the C++ 11 STL thread. \ingroup config
 #define BOOST_AFIO_USE_BOOST_THREAD 0
 #endif
 #endif
 // Default to the C++ 11 STL if on VS2015 or has <experimental/filesystem>
 #ifndef BOOST_AFIO_USE_BOOST_FILESYSTEM
 #ifdef __has_include
-#if __has_include(<experimental/filesystem>)
+#if __has_include(<filesystem>) || __has_include(<experimental/filesystem>)
 #define BOOST_AFIO_USE_BOOST_FILESYSTEM 0
 #endif
 #endif
@@ -172,6 +172,8 @@ DEALINGS IN THE SOFTWARE.
 #endif
 #endif
 #ifndef BOOST_AFIO_USE_BOOST_FILESYSTEM
+//! \brief Whether to use Boost.Filesystem instead of the C++ 17 TS `std::filesystem`.
+//! Defaults to the C++ 17 TS filesystem if that is available, else Boost. \ingroup config
 #define BOOST_AFIO_USE_BOOST_FILESYSTEM 1
 #endif
 #if BOOST_AFIO_USE_BOOST_FILESYSTEM
@@ -182,12 +184,17 @@ DEALINGS IN THE SOFTWARE.
 #endif
 #ifdef BOOST_AFIO_UNSTABLE_VERSION
 #include "../revision.hpp"
-#define BOOST_AFIO_V2 (boost), (afio), (BOOSTLITE_BIND_NAMESPACE_VERSION(v2, BOOST_AFIO_V2_STL11_IMPL, BOOST_AFIO_V2_FILESYSTEM_IMPL, BOOST_AFIO_PREVIOUS_COMMIT_UNIQUE), inline)
+#define BOOST_AFIO_V2 (boost), (afio), (BOOSTLITE_BIND_NAMESPACE_VERSION(v, BOOST_AFIO_NAMESPACE_VERSION, BOOST_AFIO_V2_STL11_IMPL, BOOST_AFIO_V2_FILESYSTEM_IMPL, BOOST_AFIO_PREVIOUS_COMMIT_UNIQUE), inline)
 #elif BOOST_AFIO_LATEST_VERSION == 2
-#define BOOST_AFIO_V2 (boost), (afio), (BOOSTLITE_BIND_NAMESPACE_VERSION(v2, BOOST_AFIO_V2_STL11_IMPL, BOOST_AFIO_V2_FILESYSTEM_IMPL), inline)
+#define BOOST_AFIO_V2 (boost), (afio), (BOOSTLITE_BIND_NAMESPACE_VERSION(v, BOOST_AFIO_NAMESPACE_VERSION, BOOST_AFIO_V2_STL11_IMPL, BOOST_AFIO_V2_FILESYSTEM_IMPL), inline)
 #else
-#define BOOST_AFIO_V2 (boost), (afio), (BOOSTLITE_BIND_NAMESPACE_VERSION(v2, BOOST_AFIO_V2_STL11_IMPL, BOOST_AFIO_V2_FILESYSTEM_IMPL))
+#define BOOST_AFIO_V2 (boost), (afio), (BOOSTLITE_BIND_NAMESPACE_VERSION(v, BOOST_AFIO_NAMESPACE_VERSION, BOOST_AFIO_V2_STL11_IMPL, BOOST_AFIO_V2_FILESYSTEM_IMPL))
 #endif
+/*! \def BOOST_AFIO_V2
+\ingroup config
+\brief The namespace configuration of this Boost.AFIO v2. Consists of a sequence
+of bracketed tokens later fused by the preprocessor into namespace and C++ module names.
+*/
 #if DOXYGEN_SHOULD_SKIP_THIS
 //! The Boost namespace
 namespace boost
@@ -196,7 +203,7 @@ namespace boost
   namespace afio
   {
     //! Inline namespace for this version of AFIO
-    inline namespace v2
+    inline namespace v2_xxx
     {
       //! Collection of file system based algorithms
       namespace algorithm
@@ -213,21 +220,35 @@ namespace boost
     }
   }
 }
-#define BOOST_AFIO_V2_NAMESPACE boost::afio::v2
+/*! \brief The namespace of this Boost.AFIO v2 which will be some unknown inline
+namespace starting with `v2_` inside the `boost::afio` namespace.
+\ingroup config
+*/
+#define BOOST_AFIO_V2_NAMESPACE boost::afio::v2_xxx
+/*! \brief Expands into the appropriate namespace markup to enter the AFIO v2 namespace.
+\ingroup config
+*/
 #define BOOST_AFIO_V2_NAMESPACE_BEGIN                                                                                                                                                                                                                                                                                          \
   namespace boost                                                                                                                                                                                                                                                                                                              \
   {                                                                                                                                                                                                                                                                                                                            \
     namespace afio                                                                                                                                                                                                                                                                                                             \
     {                                                                                                                                                                                                                                                                                                                          \
-      inline namespace v2                                                                                                                                                                                                                                                                                                      \
+      inline namespace v2_xxx                                                                                                                                                                                                                                                                                                  \
       {
+/*! \brief Expands into the appropriate namespace markup to enter the C++ module
+exported AFIO v2 namespace.
+\ingroup config
+*/
 #define BOOST_AFIO_V2_NAMESPACE_EXPORT_BEGIN                                                                                                                                                                                                                                                                                          \
-  namespace boost                                                                                                                                                                                                                                                                                                              \
+  export namespace boost                                                                                                                                                                                                                                                                                                              \
   {                                                                                                                                                                                                                                                                                                                            \
     namespace afio                                                                                                                                                                                                                                                                                                             \
     {                                                                                                                                                                                                                                                                                                                          \
-      inline namespace v2                                                                                                                                                                                                                                                                                                      \
+      inline namespace v2_xxx                                                                                                                                                                                                                                                                                                      \
       {
+/*! \brief Expands into the appropriate namespace markup to exit the AFIO v2 namespace.
+\ingroup config
+*/
 #define BOOST_AFIO_V2_NAMESPACE_END                                                                                                                                                                                                                                                                                            \
   }                                                                                                                                                                                                                                                                                                                            \
   }                                                                                                                                                                                                                                                                                                                            \
@@ -792,8 +813,20 @@ BOOST_AFIO_V2_NAMESPACE_END
 //#define BOOST_THREAD_DONT_PROVIDE_FUTURE
 //#define BOOST_THREAD_PROVIDES_SIGNATURE_PACKAGED_TASK
 #if BOOST_AFIO_HEADERS_ONLY == 1 && !defined(BOOST_AFIO_SOURCE)
+/*! \brief Expands into the appropriate markup to declare an `extern`
+function exported from the AFIO DLL if not building headers only.
+\ingroup config
+*/
 #define BOOST_AFIO_HEADERS_ONLY_FUNC_SPEC inline
+/*! \brief Expands into the appropriate markup to declare a class member
+function exported from the AFIO DLL if not building headers only.
+\ingroup config
+*/
 #define BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC inline
+/*! \brief Expands into the appropriate markup to declare a virtual class member
+function exported from the AFIO DLL if not building headers only.
+\ingroup config
+*/
 #define BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC inline virtual
 #else
 #define BOOST_AFIO_HEADERS_ONLY_FUNC_SPEC extern BOOST_AFIO_DECL
@@ -807,11 +840,18 @@ BOOST_AFIO_V2_NAMESPACE_END
 #endif
 #endif
 #ifndef BOOST_AFIO_DISABLE_THREAD_SANITIZE
+/*! \brief Expands into the appropriate markup to declare a function as to
+not be thread sanitised by the ThreadSanitiser.
+\ingroup config
+*/
 #define BOOST_AFIO_DISABLE_THREAD_SANITIZE
 #endif
 
 #ifndef BOOST_AFIO_THREAD_LOCAL
 #ifdef __cpp_thread_local
+/*! \brief Expands into the appropriate markup to declare a storage as thread local.
+\ingroup config
+*/
 #define BOOST_AFIO_THREAD_LOCAL thread_local
 #elif defined(_MSC_VER)
 #define BOOST_AFIO_THREAD_LOCAL __declspec(thread)

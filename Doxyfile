@@ -228,7 +228,10 @@ TAB_SIZE               = 2
 # "Side Effects:". You can put \n's in the value part of an alias to insert
 # newlines.
 
-ALIASES                = "errors=@par Errors returnable\n" "mallocs=@par Memory Allocations\n"
+ALIASES                = "errors=@par Errors returnable\n" "mallocs=@par Memory Allocations\n" \
+			"raceguarantees{1}=@par Race Guarantees\n\1" \
+			"complexity{1}=@par Complexity\n\1" \
+      "exceptionmodel{1}=@par Errors returnable\n\1"
 
 # This tag can be used to specify a number of word-keyword mappings (TCL only).
 # A mapping has the form "name=value". For example adding "class=itcl::class"
@@ -721,7 +724,7 @@ WARNINGS               = YES
 # will automatically be disabled.
 # The default value is: YES.
 
-WARN_IF_UNDOCUMENTED   = YES
+WARN_IF_UNDOCUMENTED   = NO
 
 # If the WARN_IF_DOC_ERROR tag is set to YES, doxygen will generate warnings for
 # potential errors in the documentation, such as not documenting some parameters
@@ -737,7 +740,7 @@ WARN_IF_DOC_ERROR      = YES
 # parameter documentation, but not about the absence of documentation.
 # The default value is: NO.
 
-WARN_NO_PARAMDOC       = NO
+WARN_NO_PARAMDOC       = YES
 
 # The WARN_FORMAT tag determines the format of the warning messages that doxygen
 # can produce. The string should contain the $file, $line, and $text tags, which
@@ -753,7 +756,7 @@ WARN_FORMAT            = "$file:$line: $text"
 # messages should be written. If left blank the output is written to standard
 # error (stderr).
 
-WARN_LOGFILE           =
+WARN_LOGFILE           = doxygen_warnings.log
 
 #---------------------------------------------------------------------------
 # Configuration options related to the input files
