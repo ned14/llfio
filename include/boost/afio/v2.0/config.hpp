@@ -30,7 +30,9 @@ DEALINGS IN THE SOFTWARE.
 */
 
 //! \file config.hpp Configures a compiler environment for AFIO header and source code
+
 //! \defgroup config Configuration macros
+
 #define BOOST_AFIO_CONFIGURED
 
 #if !defined(BOOST_AFIO_HEADERS_ONLY) && !defined(BOOST_ALL_DYN_LINK)
@@ -467,6 +469,14 @@ using namespace BOOST_OUTCOME_V1_NAMESPACE;
 using BOOST_OUTCOME_V1_NAMESPACE::outcome;
 using BOOST_OUTCOME_V1_NAMESPACE::make_errored_result;
 using BOOST_OUTCOME_V1_NAMESPACE::make_errored_outcome;
+#if DOXYGEN_SHOULD_SKIP_THIS
+/*! \brief Please see https://ned14.github.io/boost.outcome/classboost_1_1outcome_1_1v1__xxx_1_1basic__monad.html
+*/
+template<class T> using result = boost::outcome::result<T>;
+/*! \brief Please see https://ned14.github.io/boost.outcome/classboost_1_1outcome_1_1v1__xxx_1_1basic__monad.html
+*/
+template<class T> using outcome = boost::outcome::outcome<T>;
+#endif
 BOOST_AFIO_V2_NAMESPACE_END
 
 

@@ -21,9 +21,11 @@ addons:
     - python3
     - cmake
     - cmake-data
+    - doxygen
 
 env:
  - __="cmake tests" NAME=TravisLinuxWorker
+ - __="Documentation" NAME=TravisDocumentation
  
 cache:
   apt: true
@@ -52,7 +54,25 @@ before_install:
 script:
  -
    if [ "$__" = "cmake tests" ]; then
+     TARNAME=boost.afio-v2.0-source-`date +%Y%m%d%H%M`.tar.xz;
+     tar cfJ ../$TARNAME . --exclude llvm* --exclude .git;
      CXX=g++-6 ctest -S .ci.cmake -V;
+     # && curl --data-binary @../$TARNAME https://dedi4.nedprod.com/static/files/upload/$TARNAME;
+   fi
+ -
+   if [ "$__" = "Documentation" ]; then
+     git config --global push.default simple;
+     git config --global user.name "Jenkins nedprod CI";
+     git config --global user.email "foo@nowhere";
+     cd doc/html;
+     git checkout gh-pages;
+     cd ../..;
+     CXX=g++-6 ctest -S .docs.cmake -V;
+     cd doc/html;
+     git add . || true;
+     git commit -a -m "Travis CI updates documentation" || true;
+     git push -f https://jenkins-nedprod:$JENKINS_NEDPROD_PASSWORD@github.com/ned14/boost.afio gh-pages;
+     cd ../..;
    fi
  
 after_success:

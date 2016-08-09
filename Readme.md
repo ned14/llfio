@@ -1,9 +1,7 @@
 This is the beginnings of the post-peer-review AFIO
 v2 rewrite. You can view its documentation at https://ned14.github.io/boost.afio/
 
-<b>master branch test status</b> Linux: [![Build Status](https://travis-ci.org/ned14/boost.afio.svg?branch=master)](https://travis-ci.org/ned14/boost.afio) Windows: [![Build status](https://ci.appveyor.com/api/projects/status/ox59o2r276xbmef7/branch/master?svg=true)](https://ci.appveyor.com/project/ned14/boost-afio/branch/master) Coverage: Boost.KernelTest support for coveralls.io still todo
-
-<b>CMake dashboard</b>: http://my.cdash.org/index.php?project=Boost.AFIO
+<b>master branch test status</b> Linux: [![Build Status](https://travis-ci.org/ned14/boost.afio.svg?branch=master)](https://travis-ci.org/ned14/boost.afio) Windows: [![Build status](https://ci.appveyor.com/api/projects/status/ox59o2r276xbmef7/branch/master?svg=true)](https://ci.appveyor.com/project/ned14/boost-afio/branch/master) Coverage: Boost.KernelTest support for coveralls.io still todo <b>CMake dashboard</b>: http://my.cdash.org/index.php?project=Boost.AFIO
 
 CMake todos:
 - Add doxygen generation support
@@ -11,7 +9,9 @@ CMake todos:
     successful new docs to github (resetting the gh-pages SHA)
     - cmake --build . --target afio_docs
   - Get travis to push latest doxygen docs to github for me
-  - Merge all these improvements from AFIO back into Outcome
+- Push artifacts to:
+  - curl --data-binary @test.txt https://dedi4.nedprod.com/static/files/upload
+- Any dependency .natvis need to be compiled in!
 - For non-embedded config, cmake should stamp git submodule SHAs so I can
 dispense with the upd method of submodule stamping
 - Static library edition appears to not be encoding extended error code detail?
