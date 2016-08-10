@@ -649,11 +649,13 @@ namespace windows_nt_kernel
 // disable to prevent accidental usage
 template <class T> inline result<T> make_errored_result(NTSTATUS e, const char *extended = nullptr)
 {
+  (void)e;
   (void) extended;
   static_assert(!std::is_same<T, T>::value, "Use make_errored_result_nt<T>(NTSTATUS).");
 }
 template <class T> inline outcome<T> make_errored_outcome(NTSTATUS e, const char *extended = nullptr)
 {
+  (void)e;
   (void) extended;
   static_assert(!std::is_same<T, T>::value, "Use make_errored_outcome_nt<T>(NTSTATUS).");
 }
@@ -787,7 +789,8 @@ if(d)                                                                           
   \
 stl11::chrono::system_clock::time_point end_utc;                                                                                                                                                                                                                                                                               \
   \
-alignas(8) LARGE_INTEGER _timeout = {{0}};                                                                                                                                                                                                                                                                                     \
+alignas(8) LARGE_INTEGER _timeout;                                                                                                                                                                                                                                                                                     \
+memset(&_timeout, 0, sizeof(_timeout)); \
   \
 LARGE_INTEGER *timeout = nullptr;                                                                                                                                                                                                                                                                                              \
   \
@@ -1077,7 +1080,9 @@ static inline HANDLE CreateFileW_(_In_ LPCTSTR lpFileName, _In_ DWORD dwDesiredA
     ObjectAttributes.Attributes |= OBJ_CASE_INSENSITIVE;
 
   HANDLE ret = INVALID_HANDLE_VALUE;
-  IO_STATUS_BLOCK isb = {{-1}};
+  IO_STATUS_BLOCK isb;
+  memset(&isb, 0, sizeof(isb));
+  isb.Status = -1;
   dwFlagsAndAttributes &= ~0xfff80000;
   NTSTATUS ntstat = NtCreateFile(&ret, dwDesiredAccess, &ObjectAttributes, &isb, NULL, dwFlagsAndAttributes, dwShareMode, dwCreationDisposition, flags, NULL, 0);
   if(STATUS_SUCCESS == ntstat)
