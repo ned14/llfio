@@ -1,0 +1,19 @@
+var searchData=
+[
+  ['f_5fbavail',['f_bavail',['../structboost_1_1afio_1_1v2__xxx_1_1statfs__t.html#adc835963e7f0b9db93a28df9b3a245c5',1,'boost::afio::v2_xxx::statfs_t']]],
+  ['f_5fbfree',['f_bfree',['../structboost_1_1afio_1_1v2__xxx_1_1statfs__t.html#a5791bfc04bfaaab455940d7880bfcf4c',1,'boost::afio::v2_xxx::statfs_t']]],
+  ['f_5fblocks',['f_blocks',['../structboost_1_1afio_1_1v2__xxx_1_1statfs__t.html#a75d44efa48a7521214e0f9d0d0ab686e',1,'boost::afio::v2_xxx::statfs_t']]],
+  ['f_5fbsize',['f_bsize',['../structboost_1_1afio_1_1v2__xxx_1_1statfs__t.html#aeb688cb3e01b2a067500ad12abe99b16',1,'boost::afio::v2_xxx::statfs_t']]],
+  ['f_5fffree',['f_ffree',['../structboost_1_1afio_1_1v2__xxx_1_1statfs__t.html#ab0b2e6d67eedf3d0255f42350fd9fadd',1,'boost::afio::v2_xxx::statfs_t']]],
+  ['f_5ffiles',['f_files',['../structboost_1_1afio_1_1v2__xxx_1_1statfs__t.html#af1da822f6b937ad1ce1a15ca49d95181',1,'boost::afio::v2_xxx::statfs_t']]],
+  ['f_5fflags',['f_flags',['../structboost_1_1afio_1_1v2__xxx_1_1statfs__t.html#a5c811943e05c503d08cce1042ab47691',1,'boost::afio::v2_xxx::statfs_t']]],
+  ['f_5ffsid',['f_fsid',['../structboost_1_1afio_1_1v2__xxx_1_1statfs__t.html#ad8bdb0ee4f534879ab4b65a0e02830a0',1,'boost::afio::v2_xxx::statfs_t']]],
+  ['f_5ffstypename',['f_fstypename',['../structboost_1_1afio_1_1v2__xxx_1_1statfs__t.html#ad7b8d2caf5a4605c49d5638e64d68059',1,'boost::afio::v2_xxx::statfs_t']]],
+  ['f_5fiosize',['f_iosize',['../structboost_1_1afio_1_1v2__xxx_1_1statfs__t.html#a1da91a5b020de25d78d2b2dd101bc8d4',1,'boost::afio::v2_xxx::statfs_t']]],
+  ['f_5fmntfromname',['f_mntfromname',['../structboost_1_1afio_1_1v2__xxx_1_1statfs__t.html#a70456cfc824f2647b366d21ffd7e8ee8',1,'boost::afio::v2_xxx::statfs_t']]],
+  ['f_5fmntonname',['f_mntonname',['../structboost_1_1afio_1_1v2__xxx_1_1statfs__t.html#af3bd8aad00a4be8ef37067e843a4a300',1,'boost::afio::v2_xxx::statfs_t']]],
+  ['f_5fnamemax',['f_namemax',['../structboost_1_1afio_1_1v2__xxx_1_1statfs__t.html#a6326305bb4751576c5d20da473228ae5',1,'boost::afio::v2_xxx::statfs_t']]],
+  ['f_5fowner',['f_owner',['../structboost_1_1afio_1_1v2__xxx_1_1statfs__t.html#a2a017e057e8858d1f956cd8bba2b48f7',1,'boost::afio::v2_xxx::statfs_t']]],
+  ['fd',['fd',['../structboost_1_1afio_1_1v2__xxx_1_1native__handle__type.html#ab2ceb093076cf42f4468f5373d50662b',1,'boost::afio::v2_xxx::native_handle_type']]],
+  ['filecompression',['filecompression',['../structboost_1_1afio_1_1v2__xxx_1_1statfs__t_1_1f__flags__t.html#ae0d6b4b2140389446b90c9355b4c2086',1,'boost::afio::v2_xxx::statfs_t::f_flags_t']]]
+];
