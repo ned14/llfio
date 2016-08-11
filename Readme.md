@@ -4,10 +4,6 @@ v2 rewrite. You can view its documentation at https://ned14.github.io/boost.afio
 <b>master branch test status</b> Linux: [![Build Status](https://travis-ci.org/ned14/boost.afio.svg?branch=master)](https://travis-ci.org/ned14/boost.afio) Windows: [![Build status](https://ci.appveyor.com/api/projects/status/ox59o2r276xbmef7/branch/master?svg=true)](https://ci.appveyor.com/project/ned14/boost-afio/branch/master) Coverage: Boost.KernelTest support for coveralls.io still todo <b>CMake dashboard</b>: http://my.cdash.org/index.php?project=Boost.AFIO
 
 CMake todos:
-- For non-embedded config, cmake should stamp git submodule SHAs so I can
-dispense with the upd method of submodule stamping
-  - ALSO delete embedded copies when sibling copies found, otherwise it gets
-confusing
 - Any dependency .natvis need to be compiled in!
 - Rename all ParseProjectVersionFromHpp etc to parse_project_version_from_hpp etc
 - Static library edition appears to not be encoding extended error code detail?
