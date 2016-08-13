@@ -26,7 +26,7 @@ before_build:
 build_script:
   - ctest -S .ci.cmake -V
 after_build:
-  - for /f %a in ('powershell -Command "Get-Date -format yyyyMMddHHmm"') do set datetime=%a
+  - for /f %%a in ('powershell -Command "Get-Date -format yyyyMMddHHmm"') do set datetime=%%a
   - set "TARNAME=boost.afio-v2.0-binaries-win64-%datetime%.zip"
   - 7z a %TARNAME% doc include Readme.md release_notes.md build\bin\Release\afio_dl-2.0-Windows-x64-Release.dll build\lib\Release\afio_dl-2.0-Windows-x64-Release.lib build\lib\Release\afio_sl-2.0-Windows-x64-Release.lib
 
