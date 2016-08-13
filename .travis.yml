@@ -56,7 +56,8 @@ script:
    if [ "$__" = "cmake tests" ]; then
      TARNAME=boost.afio-v2.0-source-`date +%Y%m%d%H%M`.tar.xz;
      tar cfJ ../$TARNAME . --exclude llvm* --exclude .git;
-     CXX=g++-6 ctest -S .ci.cmake -V && curl -u jenkins-nedprod:$JENKINS_NEDPROD_PASSWORD --data-binary @../$TARNAME https://dedi4.nedprod.com/static/files/upload/$TARNAME;
+     CXX=g++-6 ctest -S .ci.cmake -V;
+     curl -u jenkins-nedprod:$JENKINS_NEDPROD_PASSWORD --data-binary @../$TARNAME https://dedi4.nedprod.com/static/files/upload/$TARNAME;
    fi
  -
    if [ "$__" = "Documentation" ]; then
