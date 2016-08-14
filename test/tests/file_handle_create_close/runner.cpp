@@ -3,9 +3,7 @@
 File Created: Apr 2016
 */
 
-#include "../../kerneltest/include/boost/kerneltest/v1/hooks/filesystem_workspace.hpp"
-#include "../../kerneltest/include/boost/kerneltest/v1/permute_parameters.hpp"
-#include "../../kerneltest/include/boost/kerneltest/v1/test_kernel.hpp"
+#include "../kerneltest/include/boost/kerneltest.hpp"
 #include "kernel_async_file_handle.cpp.hpp"
 #include "kernel_file_handle.cpp.hpp"
 

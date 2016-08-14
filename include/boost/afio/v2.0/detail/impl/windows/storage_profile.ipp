@@ -58,7 +58,9 @@ namespace storage_profile
       {
         try
         {
-          RTL_OSVERSIONINFOW ovi = {sizeof(RTL_OSVERSIONINFOW)};
+          RTL_OSVERSIONINFOW ovi;
+          memset(&ovi, 0, sizeof(ovi));
+          ovi.dwOSVersionInfoSize = sizeof(RTL_OSVERSIONINFOW);
           // GetVersionEx() is no longer useful since Win8.1
           using RtlGetVersion_t = LONG (*)(PRTL_OSVERSIONINFOW);
           static RtlGetVersion_t RtlGetVersion;
@@ -98,7 +100,8 @@ namespace storage_profile
       {
         try
         {
-          SYSTEM_INFO si = {{sizeof(SYSTEM_INFO)}};
+          SYSTEM_INFO si;
+          memset(&si, 0, sizeof(si));
           GetNativeSystemInfo(&si);
           switch(si.wProcessorArchitecture)
           {
@@ -188,7 +191,9 @@ namespace storage_profile
     {
       outcome<void> _mem(storage_profile &sp, file_handle &) noexcept
       {
-        MEMORYSTATUSEX ms = {sizeof(MEMORYSTATUSEX)};
+        MEMORYSTATUSEX ms;
+        memset(&ms, 0, sizeof(ms));
+        ms.dwLength = sizeof(MEMORYSTATUSEX);
         GlobalMemoryStatusEx(&ms);
         sp.mem_quantity.value = (unsigned long long) ms.ullTotalPhys;
         sp.mem_in_use.value = (float) (ms.ullTotalPhys - ms.ullAvailPhys) / ms.ullTotalPhys;
@@ -208,9 +213,14 @@ namespace storage_profile
           alignas(8) fixme_path::value_type buffer[32769];
           // Firstly open a handle to the volume
           BOOST_OUTCOME_FILTER_ERROR(volumeh, file_handle::file(mntfromname, handle::mode::none, handle::creation::open_existing, handle::caching::only_metadata));
-          STORAGE_PROPERTY_QUERY spq = {StorageAdapterProperty, PropertyStandardQuery};
+          STORAGE_PROPERTY_QUERY spq;
+          memset(&spq, 0, sizeof(spq));
+          spq.PropertyId = StorageAdapterProperty;
+          spq.QueryType = PropertyStandardQuery;
           STORAGE_ADAPTER_DESCRIPTOR *sad = (STORAGE_ADAPTER_DESCRIPTOR *) buffer;
-          OVERLAPPED ol = {(ULONG_PTR) -1};
+          OVERLAPPED ol;
+          memset(&ol, 0, sizeof(ol));
+          ol.Internal = (ULONG_PTR) -1;
           if(!DeviceIoControl(volumeh.native_handle().h, IOCTL_STORAGE_QUERY_PROPERTY, &spq, sizeof(spq), sad, sizeof(buffer), nullptr, &ol))
           {
             if(ERROR_IO_PENDING == GetLastError())
@@ -305,7 +315,9 @@ namespace storage_profile
             *e++ = '0' + (vde->Extents[0].DiskNumber % 10);
             *e = 0;
             BOOST_OUTCOME_FILTER_ERROR(diskh, file_handle::file(physicaldrivename, handle::mode::none, handle::creation::open_existing, handle::caching::only_metadata));
-            spq = {StorageDeviceProperty, PropertyStandardQuery};
+            memset(&spq, 0, sizeof(spq));
+            spq.PropertyId = StorageDeviceProperty;
+            spq.QueryType = PropertyStandardQuery;
             STORAGE_DEVICE_DESCRIPTOR *sdd = (STORAGE_DEVICE_DESCRIPTOR *) buffer;
             ol.Internal = (ULONG_PTR) -1;
             if(!DeviceIoControl(diskh.native_handle().h, IOCTL_STORAGE_QUERY_PROPERTY, &spq, sizeof(spq), sdd, sizeof(buffer), nullptr, &ol))

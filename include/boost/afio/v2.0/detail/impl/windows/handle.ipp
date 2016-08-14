@@ -202,7 +202,8 @@ result<io_handle::extent_guard> io_handle::lock(io_handle::extent_type offset, i
   if(d && !d.nsecs)
     flags |= LOCKFILE_FAIL_IMMEDIATELY;
   BOOST_AFIO_WIN_DEADLINE_TO_SLEEP_INIT(d);
-  OVERLAPPED ol = {0};
+  OVERLAPPED ol;
+  memset(&ol, 0, sizeof(ol));
   ol.Internal = (ULONG_PTR) -1;
   ol.OffsetHigh = (offset >> 32) & 0xffffffff;
   ol.Offset = offset & 0xffffffff;
@@ -233,7 +234,8 @@ result<io_handle::extent_guard> io_handle::lock(io_handle::extent_type offset, i
 void io_handle::unlock(io_handle::extent_type offset, io_handle::extent_type bytes) noexcept
 {
   BOOST_AFIO_LOG_FUNCTION_CALL(_v.h);
-  OVERLAPPED ol = {0};
+  OVERLAPPED ol;
+  memset(&ol, 0, sizeof(ol));
   ol.Internal = (ULONG_PTR) -1;
   ol.OffsetHigh = (offset >> 32) & 0xffffffff;
   ol.Offset = offset & 0xffffffff;
@@ -244,6 +246,7 @@ void io_handle::unlock(io_handle::extent_type offset, io_handle::extent_type byt
     if(ERROR_IO_PENDING != GetLastError())
     {
       auto ret = make_errored_result<void>(GetLastError());
+      (void) ret;
       BOOST_AFIO_LOG_FATAL(_v.h, "io_handle::unlock() failed");
       std::terminate();
     }
@@ -257,6 +260,7 @@ void io_handle::unlock(io_handle::extent_type offset, io_handle::extent_type byt
       // It seems the NT kernel is guilty of casting bugs sometimes
       ol.Internal = ol.Internal & 0xffffffff;
       auto ret = make_errored_result_nt<void>((NTSTATUS) ol.Internal);
+      (void) ret;
       BOOST_AFIO_LOG_FATAL(_v.h, "io_handle::unlock() failed");
       std::terminate();
     }

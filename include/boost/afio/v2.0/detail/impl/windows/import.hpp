@@ -57,10 +57,15 @@ BOOST_AFIO_V2_NAMESPACE_BEGIN
 namespace windows_nt_kernel
 {
 // Weirdly these appear to be undefined sometimes?
-#define STATUS_SUCCESS ((DWORD) 0x00000000L)
-#define STATUS_ALERTED ((DWORD) 0x00000101L)
-#define STATUS_DELETE_PENDING ((DWORD) 0xC0000056)
-
+#ifndef STATUS_SUCCESS
+#define STATUS_SUCCESS ((LONG) 0x00000000L)
+#endif
+#ifndef STATUS_ALERTED
+#define STATUS_ALERTED ((LONG) 0x00000101L)
+#endif
+#ifndef STATUS_DELETE_PENDING
+#define STATUS_DELETE_PENDING ((LONG) 0xC0000056)
+#endif
 
   // From http://undocumented.ntinternals.net/UserMode/Undocumented%20Functions/NT%20Objects/File/FILE_INFORMATION_CLASS.html
   typedef enum _FILE_INFORMATION_CLASS {
@@ -649,13 +654,13 @@ namespace windows_nt_kernel
 // disable to prevent accidental usage
 template <class T> inline result<T> make_errored_result(NTSTATUS e, const char *extended = nullptr)
 {
-  (void)e;
+  (void) e;
   (void) extended;
   static_assert(!std::is_same<T, T>::value, "Use make_errored_result_nt<T>(NTSTATUS).");
 }
 template <class T> inline outcome<T> make_errored_outcome(NTSTATUS e, const char *extended = nullptr)
 {
-  (void)e;
+  (void) e;
   (void) extended;
   static_assert(!std::is_same<T, T>::value, "Use make_errored_outcome_nt<T>(NTSTATUS).");
 }
@@ -789,8 +794,9 @@ if(d)                                                                           
   \
 stl11::chrono::system_clock::time_point end_utc;                                                                                                                                                                                                                                                                               \
   \
-alignas(8) LARGE_INTEGER _timeout;                                                                                                                                                                                                                                                                                     \
-memset(&_timeout, 0, sizeof(_timeout)); \
+alignas(8) LARGE_INTEGER _timeout;                                                                                                                                                                                                                                                                                             \
+  \
+memset(&_timeout, 0, sizeof(_timeout));                                                                                                                                                                                                                                                                                        \
   \
 LARGE_INTEGER *timeout = nullptr;                                                                                                                                                                                                                                                                                              \
   \

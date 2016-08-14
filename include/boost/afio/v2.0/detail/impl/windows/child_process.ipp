@@ -72,7 +72,9 @@ namespace detail
     child_process ret(std::move(__path), use_parent_errh, std::move(__args), std::move(__env));
     native_handle_type childreadh, childwriteh, childerrh;
 
-    STARTUPINFO si = {sizeof(STARTUPINFO)};
+    STARTUPINFO si;
+    memset(&si, 0, sizeof(si));
+    si.cb = sizeof(STARTUPINFO);
     si.dwFlags = STARTF_USESTDHANDLES;
     if(!CreatePipe(&childreadh.h, &ret._readh.h, nullptr, 0))
       return make_errored_result<child_process>(GetLastError());

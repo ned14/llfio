@@ -25,8 +25,9 @@ UpdateRevisionHppFromGit("${CMAKE_CURRENT_SOURCE_DIR}/include/boost/afio/revisio
 # Setup this cmake environment for this project
 include(BoostLiteSetupProject)
 # Find my library dependencies
-find_boostish_library(boost-lite 1.0 REQUIRED)
-find_boostish_library(boost--outcome 1.0 REQUIRED)
+find_boostish_library(boost-lite "include/boost/afio" 1.0 REQUIRED)
+find_boostish_library(outcome    "include/boost/afio" 1.0 REQUIRED)
+find_boostish_library(kerneltest "test"               1.0 REQUIRED)
 
 # Make the standard static and shared libraries, and if supported by this compiler, C++ modules
 # for both static and shared libraries as well. For the non-C++ module variants, makes the

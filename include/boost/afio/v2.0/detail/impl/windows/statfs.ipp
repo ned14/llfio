@@ -41,7 +41,9 @@ BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(handle &h, st
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
   alignas(8) fixme_path::value_type buffer[32769];
-  IO_STATUS_BLOCK isb = {{-1}};
+  IO_STATUS_BLOCK isb;
+  memset(&isb, 0, sizeof(isb));
+  isb.Status = -1;
   NTSTATUS ntstat;
   size_t ret = 0;
   if((wanted & want::flags) || (wanted & want::namemax) || (wanted & want::fstypename))

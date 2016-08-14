@@ -103,6 +103,7 @@ result<async_file_handle::io_state_ptr<CompletionRoutine, BuffersType>> async_fi
         while(this->items_to_go)
         {
           auto res = this->parent->service()->run();
+          (void) res;
 #ifndef NDEBUG
           if(res.has_error())
           {
@@ -175,13 +176,13 @@ result<async_file_handle::io_state_ptr<CompletionRoutine, BuffersType>> async_fi
 
 template <class CompletionRoutine> result<async_file_handle::io_state_ptr<CompletionRoutine, async_file_handle::buffers_type>> async_file_handle::async_read(async_file_handle::io_request<async_file_handle::buffers_type> reqs, CompletionRoutine &&completion) noexcept
 {
-  BOOST_AFIO_LOG_FUNCTION_CALL;
+  BOOST_AFIO_LOG_FUNCTION_CALL(_v.h);
   return _begin_io(operation_t::read, std::move(reqs), [completion = std::forward<CompletionRoutine>(completion)](auto *state) { completion(state->parent, state->result); }, ReadFileEx);
 }
 
 template <class CompletionRoutine> result<async_file_handle::io_state_ptr<CompletionRoutine, async_file_handle::const_buffers_type>> async_file_handle::async_write(async_file_handle::io_request<async_file_handle::const_buffers_type> reqs, CompletionRoutine &&completion) noexcept
 {
-  BOOST_AFIO_LOG_FUNCTION_CALL;
+  BOOST_AFIO_LOG_FUNCTION_CALL(_v.h);
   return _begin_io(operation_t::write, std::move(reqs), [completion = std::forward<CompletionRoutine>(completion)](auto *state) { completion(state->parent, state->result); }, WriteFileEx);
 }
 

@@ -76,11 +76,17 @@ void io_service::post(detail::function_ptr<void(io_service *)> &&f)
     _posts.push_back(std::move(pi));
     data = (void *) &_posts.back();
   }
-  PAPCFUNC apcf = [](ULONG_PTR data) {
-    post_info *pi = (post_info *) data;
-    pi->f(pi->service);
-    pi->service->_post_done(pi);
+  // lambdas can't be __stdcall on winclang, so ...
+  struct lambda
+  {
+    static void __stdcall _(ULONG_PTR data)
+    {
+      post_info *pi = (post_info *) data;
+      pi->f(pi->service);
+      pi->service->_post_done(pi);
+    }
   };
+  PAPCFUNC apcf = lambda::_;
   if(QueueUserAPC(apcf, _threadh, (ULONG_PTR) data))
     _work_enqueued();
   else

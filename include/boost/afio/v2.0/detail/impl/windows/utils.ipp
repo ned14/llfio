@@ -31,7 +31,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include "../../../utils.hpp"
 
-#include "../../../../boost-lite/include/spinlock.hpp"
+#include "../boost-lite/include/spinlock.hpp"
 #include "import.hpp"
 
 BOOST_AFIO_V2_NAMESPACE_BEGIN
@@ -55,7 +55,8 @@ namespace utils
     if(pagesizes.empty())
     {
       typedef size_t(WINAPI * GetLargePageMinimum_t)(void);
-      SYSTEM_INFO si = {{0}};
+      SYSTEM_INFO si;
+      memset(&si, 0, sizeof(si));
       GetSystemInfo(&si);
       pagesizes.push_back(si.dwPageSize);
       pagesizes_available.push_back(si.dwPageSize);
@@ -70,7 +71,9 @@ namespace utils
         if(OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES, &token))
         {
           auto untoken = detail::Undoer([&token] { CloseHandle(token); });
-          TOKEN_PRIVILEGES privs = {1};
+          TOKEN_PRIVILEGES privs;
+          memset(&privs, 0, sizeof(privs));
+          privs.PrivilegeCount = 1;
           if(LookupPrivilegeValue(NULL, SE_LOCK_MEMORY_NAME, &privs.Privileges[0].Luid))
           {
             privs.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;

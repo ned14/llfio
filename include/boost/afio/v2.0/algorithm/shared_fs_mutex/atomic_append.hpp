@@ -470,7 +470,7 @@ namespace algorithm
           // Hole punch if >= 1Mb of zeros exists
           if(_header.first_known_good - _header.first_after_hole_punch >= 1024 * 1024)
           {
-            off_t holepunchend = _header.first_known_good & ~(1024 * 1024 - 1);
+            handle::extent_type holepunchend = _header.first_known_good & ~(1024 * 1024 - 1);
 #ifdef _DEBUG
             fprintf(stderr, "hole_punch(%llx, %llx)\n", _header.first_after_hole_punch, holepunchend - _header.first_after_hole_punch);
 #endif
