@@ -35,7 +35,7 @@ test_script:
 after_test:
 
 on_success:
-  - curl -u jenkins-nedprod:%JENKINS_NEDPROD_PASSWORD% --data-binary @%TARNAME% https://dedi4.nedprod.com/static/files/upload/%TARNAME%
+  - curl -u jenkins-nedprod:%JENKINS_NEDPROD_PASSWORD% --data-binary "@%TARNAME%" "https://dedi4.nedprod.com/static/files/upload/%TARNAME%"
 on_failure:
 on_finish:
   - ps: (new-object net.webclient).UploadFile("https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path build\merged_junit_results.xml))
