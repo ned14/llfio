@@ -59,7 +59,7 @@ if(NOT MSVC OR CMAKE_VERSION VERSION_GREATER 3.59)
   )
 endif()
 # Set the library dependencies this library has
-target_link_libraries(outcome_hl INTERFACE boost-lite_hl outcome_hl)
+all_link_libraries(PUBLIC boost-lite_hl outcome_hl)
 # Set any macros this library requires
 if(WIN32)
   all_compile_definitions(PRIVATE _WIN32_WINNT=0x600)  ## Target WinVista

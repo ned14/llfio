@@ -7,7 +7,6 @@ Tarballs of source and prebuilt binaries with all unit tests passing: https://de
 
 
 CMake todos:
-- Any dependency .natvis need to be compiled in!
 - Rename all ParseProjectVersionFromHpp etc to parse_project_version_from_hpp etc
 - Static library edition appears to not be encoding extended error code detail?
   - Add a unit test!
