@@ -18,7 +18,7 @@ platform: x64
 configuration: Release
 environment:
   JENKINS_NEDPROD_PASSWORD:
-    secure: vI+U4YDxi99hN90v6LMvmg==
+    secure: u6OVf3jbCA7VXY6L+KztW2Isw4pcWLSDfkqJfv+IsikJrgjQS08Yb6Wdp6CY4vk8
 
 before_build:
   - git checkout master
