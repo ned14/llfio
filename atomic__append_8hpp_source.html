@@ -531,7 +531,7 @@ $(document).ready(function(){initNavTree('atomic__append_8hpp_source.html','');}
 <div class="line"><a name="l00470"></a><span class="lineno">  470</span>&#160;          <span class="comment">// Hole punch if &gt;= 1Mb of zeros exists</span></div>
 <div class="line"><a name="l00471"></a><span class="lineno">  471</span>&#160;          <span class="keywordflow">if</span>(_header.first_known_good - _header.first_after_hole_punch &gt;= 1024 * 1024)</div>
 <div class="line"><a name="l00472"></a><span class="lineno">  472</span>&#160;          {</div>
-<div class="line"><a name="l00473"></a><span class="lineno">  473</span>&#160;            off_t holepunchend = _header.first_known_good &amp; ~(1024 * 1024 - 1);</div>
+<div class="line"><a name="l00473"></a><span class="lineno">  473</span>&#160;            <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html#a617ab627aa596b325d7bfef5210a43f3" title="The file extent type used by this handle.">handle::extent_type</a> holepunchend = _header.first_known_good &amp; ~(1024 * 1024 - 1);</div>
 <div class="line"><a name="l00474"></a><span class="lineno">  474</span>&#160;<span class="preprocessor">#ifdef _DEBUG</span></div>
 <div class="line"><a name="l00475"></a><span class="lineno">  475</span>&#160;<span class="preprocessor"></span>            fprintf(stderr, <span class="stringliteral">&quot;hole_punch(%llx, %llx)\n&quot;</span>, _header.first_after_hole_punch, holepunchend - _header.first_after_hole_punch);</div>
 <div class="line"><a name="l00476"></a><span class="lineno">  476</span>&#160;<span class="preprocessor">#endif</span></div>
