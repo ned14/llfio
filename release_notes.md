@@ -39,6 +39,7 @@ on `result<T>` especially, almost every AFIO v2 API returns one of those.
 | ✔ |   | Dependency on ASIO/Networking TS removed completely.
 | ✔ |   | Three choices of algorithm implementing a shared filing system mutex.
 | ✔ |   | Uses CMake, CTest, CDash and CPack with automatic usage of C++ Modules or precompiled headers where available.
+| ✔ |   | Far more comprehensive memory map and virtual memory facilities.
 | P |   | New multithreaded kernel based testing infrastructure based on LLVM which can permute/fuzz/<b>edge</b> coverage/mock each test kernel with choices of asan/lsan/msan/ubsan/none sanitisation. This new test infrastructure should make possible eventual <b>formal proof</b> that AFIO's implementation is mathematically correct.
 
 
@@ -62,6 +63,6 @@ on `result<T>` especially, almost every AFIO v2 API returns one of those.
 | ✔ | ✔ | P | Byte range shared/exclusive locking.
 | ✔ | ✔ | P | `shared_fs_mutex` shared/exclusive entities locking based on byte ranges
 | ✔ | ✔ | P | `shared_fs_mutex` shared/exclusive entities locking based on atomic append
-|   | P | P | Memory mapped files (`mapped_file_handle`)
+|   | ✔ | P | Memory mapped files and virtual memory management (`section_handle` and `map_handle`)
 | ✔ | P | P | `shared_fs_mutex` shared/exclusive entities locking based on memory maps
 
