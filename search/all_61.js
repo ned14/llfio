@@ -2,6 +2,7 @@ var searchData=
 [
   ['acls',['acls',['../structboost_1_1afio_1_1v2__xxx_1_1statfs__t_1_1f__flags__t.html#aa80e4c1e910473a95dccca362a349075',1,'boost::afio::v2_xxx::statfs_t::f_flags_t']]],
   ['add',['add',['../classboost_1_1afio_1_1v2__xxx_1_1utils_1_1fast__hash.html#ad477eb19d0b566d62ff3554ce469a8a5',1,'boost::afio::v2_xxx::utils::fast_hash']]],
+  ['address',['address',['../classboost_1_1afio_1_1v2__xxx_1_1map__handle.html#a31c50127e7255b7dc99eab306a225298',1,'boost::afio::v2_xxx::map_handle']]],
   ['afio_2ehpp',['afio.hpp',['../v2_80_2afio_8hpp.html',1,'']]],
   ['afio_2ehpp',['afio.hpp',['../afio_8hpp.html',1,'']]],
   ['afio_5fnamespace_5fstring',['afio_namespace_string',['../namespaceboost_1_1afio_1_1v2__xxx.html#aa156cb08cea41226cfb4e3820b2704c5',1,'boost::afio::v2_xxx']]],
@@ -19,8 +20,8 @@ var searchData=
   ['async_5ffile_5fhandle_2ehpp',['async_file_handle.hpp',['../async__file__handle_8hpp.html',1,'']]],
   ['async_5fread',['async_read',['../classboost_1_1afio_1_1v2__xxx_1_1async__file__handle.html#afaf6132b6618d93866ad00598e1b7707',1,'boost::afio::v2_xxx::async_file_handle']]],
   ['async_5fwrite',['async_write',['../classboost_1_1afio_1_1v2__xxx_1_1async__file__handle.html#a79672341d97d3f934d6c90637bbeb40c',1,'boost::afio::v2_xxx::async_file_handle']]],
-  ['atomic_5fappend',['atomic_append',['../classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1atomic__append.html',1,'boost::afio::v2_xxx::algorithm::shared_fs_mutex']]],
   ['atomic_5fappend',['atomic_append',['../classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1atomic__append.html#abfb079133767800c93165b78629f4435',1,'boost::afio::v2_xxx::algorithm::shared_fs_mutex::atomic_append']]],
+  ['atomic_5fappend',['atomic_append',['../classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1atomic__append.html',1,'boost::afio::v2_xxx::algorithm::shared_fs_mutex']]],
   ['atomic_5fappend_2ehpp',['atomic_append.hpp',['../atomic__append_8hpp.html',1,'']]],
   ['attr_5fread',['attr_read',['../classboost_1_1afio_1_1v2__xxx_1_1handle.html#acd7f0c039e94c7ad40937fe32a2cabadaa4daf6d1e8da35af49c33bbe9ee91d79',1,'boost::afio::v2_xxx::handle']]],
   ['attr_5fwrite',['attr_write',['../classboost_1_1afio_1_1v2__xxx_1_1handle.html#acd7f0c039e94c7ad40937fe32a2cabada9f56aff64cb748e078ab221474132d19',1,'boost::afio::v2_xxx::handle']]]

@@ -18,7 +18,7 @@ var NAVTREE =
       [ "Class Hierarchy", "hierarchy.html", "hierarchy" ],
       [ "Class Members", "functions.html", [
         [ "All", "functions.html", "functions_dup" ],
-        [ "Functions", "functions_func.html", null ],
+        [ "Functions", "functions_func.html", "functions_func" ],
         [ "Variables", "functions_vars.html", null ],
         [ "Typedefs", "functions_type.html", null ],
         [ "Enumerations", "functions_enum.html", null ],
@@ -38,9 +38,10 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "afio_8hpp.html",
-"classboost_1_1afio_1_1v2__xxx_1_1handle.html#a81c7de194feaa88684ca9851d0d527caad5197d93c063a2b1e22d1630a39b7aef",
-"config_8hpp.html#gab5974d84a78dbcf8b072fca370f1291d",
-"structboost_1_1afio_1_1v2__xxx_1_1statfs__t.html#af1da822f6b937ad1ce1a15ca49d95181"
+"classboost_1_1afio_1_1v2__xxx_1_1handle.html#a81c7de194feaa88684ca9851d0d527ca",
+"classboost_1_1afio_1_1v2__xxx_1_1section__handle.html#acd7f0c039e94c7ad40937fe32a2cabada8d7b3d6b83c0a517eac07e1aac94b773",
+"lock__files_8hpp.html",
+"structboost_1_1afio_1_1v2__xxx_1_1storage__profile_1_1storage__profile.html#a19b3d6259b76cc4279e08f1fd1ab57a3"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

@@ -128,8 +128,10 @@ Inheritance diagram for boost::afio::v2_xxx::handle:</div>
  <div class="center">
   <img src="classboost_1_1afio_1_1v2__xxx_1_1handle.png" usemap="#boost::afio::v2_xxx::handle_map" alt=""/>
   <map id="boost::afio::v2_xxx::handle_map" name="boost::afio::v2_xxx::handle_map">
-<area href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html" title="A handle to something capable of scatter-gather i/o." alt="boost::afio::v2_xxx::io_handle" shape="rect" coords="0,56,223,80"/>
+<area href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html" title="A handle to something capable of scatter-gather i/o." alt="boost::afio::v2_xxx::io_handle" shape="rect" coords="116,56,339,80"/>
+<area href="classboost_1_1afio_1_1v2__xxx_1_1section__handle.html" title="A handle to a source of mapped memory." alt="boost::afio::v2_xxx::section_handle" shape="rect" coords="349,56,572,80"/>
 <area href="classboost_1_1afio_1_1v2__xxx_1_1file__handle.html" title="A handle to a regular file or device, kept data layout compatible with async_file_handle." alt="boost::afio::v2_xxx::file_handle" shape="rect" coords="0,112,223,136"/>
+<area href="classboost_1_1afio_1_1v2__xxx_1_1map__handle.html" title="A handle to a memory mapped region of memory." alt="boost::afio::v2_xxx::map_handle" shape="rect" coords="233,112,456,136"/>
 <area href="classboost_1_1afio_1_1v2__xxx_1_1async__file__handle.html" title="A handle to an open something." alt="boost::afio::v2_xxx::async_file_handle" shape="rect" coords="0,168,223,192"/>
 </map>
  </div></div>
@@ -233,6 +235,10 @@ virtual <a class="el" href="namespaceboost_1_1afio_1_1v2__xxx.html#ac8d06ecaa966
 virtual <a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1native__handle__type.html">native_handle_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html#a59c9bc1338196095a028b2870dcfb61d">release</a> () noexcept</td></tr>
 <tr class="memdesc:a59c9bc1338196095a028b2870dcfb61d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Release the native handle type managed by this handle. <br/></td></tr>
 <tr class="separator:a59c9bc1338196095a028b2870dcfb61d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a72da822cb2e7c406aaa40be0f44b16fa"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a72da822cb2e7c406aaa40be0f44b16fa"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html#a72da822cb2e7c406aaa40be0f44b16fa">is_valid</a> () const noexcept</td></tr>
+<tr class="memdesc:a72da822cb2e7c406aaa40be0f44b16fa"><td class="mdescLeft">&#160;</td><td class="mdescRight">True if the handle is valid (and usually open) <br/></td></tr>
+<tr class="separator:a72da822cb2e7c406aaa40be0f44b16fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af2d9387a79e320e2902880fee38b392a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af2d9387a79e320e2902880fee38b392a"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html#af2d9387a79e320e2902880fee38b392a">is_readable</a> () const noexcept</td></tr>
 <tr class="memdesc:af2d9387a79e320e2902880fee38b392a"><td class="mdescLeft">&#160;</td><td class="mdescRight">True if the handle is readable. <br/></td></tr>
@@ -279,6 +285,10 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html#a3460c3419d165c7d9e8aaee8db3c7f2c">is_process</a> () const noexcept</td></tr>
 <tr class="memdesc:a3460c3419d165c7d9e8aaee8db3c7f2c"><td class="mdescLeft">&#160;</td><td class="mdescRight">True if a process. <br/></td></tr>
 <tr class="separator:a3460c3419d165c7d9e8aaee8db3c7f2c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a75bedfc2b14073a20ac359edc29f9cc9"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a75bedfc2b14073a20ac359edc29f9cc9"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html#a75bedfc2b14073a20ac359edc29f9cc9">is_section</a> () const noexcept</td></tr>
+<tr class="memdesc:a75bedfc2b14073a20ac359edc29f9cc9"><td class="mdescLeft">&#160;</td><td class="mdescRight">True if a memory section. <br/></td></tr>
+<tr class="separator:a75bedfc2b14073a20ac359edc29f9cc9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad4ee22cfec00551e1f71ff23962280be"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad4ee22cfec00551e1f71ff23962280be"></a>
 <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html#a81c7de194feaa88684ca9851d0d527ca">caching</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html#ad4ee22cfec00551e1f71ff23962280be">kernel_caching</a> () const noexcept</td></tr>
 <tr class="memdesc:ad4ee22cfec00551e1f71ff23962280be"><td class="mdescLeft">&#160;</td><td class="mdescRight">Kernel cache strategy used by this handle. <br/></td></tr>

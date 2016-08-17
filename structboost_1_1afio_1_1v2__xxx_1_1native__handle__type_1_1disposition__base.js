@@ -12,6 +12,7 @@ var structboost_1_1afio_1_1v2__xxx_1_1native__handle__type_1_1disposition__base 
       [ "directory", "structboost_1_1afio_1_1v2__xxx_1_1native__handle__type_1_1disposition__base.html#a3f5231b1a86b8c661b39312f0f4a02f5aa2651bf8f667351f7d898cc35b9d016a", null ],
       [ "symlink", "structboost_1_1afio_1_1v2__xxx_1_1native__handle__type_1_1disposition__base.html#a3f5231b1a86b8c661b39312f0f4a02f5a58f3f96fa1cafd3605b488394e000d89", null ],
       [ "multiplexer", "structboost_1_1afio_1_1v2__xxx_1_1native__handle__type_1_1disposition__base.html#a3f5231b1a86b8c661b39312f0f4a02f5a1f40773df790828587987eb23baaa72d", null ],
-      [ "process", "structboost_1_1afio_1_1v2__xxx_1_1native__handle__type_1_1disposition__base.html#a3f5231b1a86b8c661b39312f0f4a02f5a9f62853225de4ea8ae224d6912fb0ca1", null ]
+      [ "process", "structboost_1_1afio_1_1v2__xxx_1_1native__handle__type_1_1disposition__base.html#a3f5231b1a86b8c661b39312f0f4a02f5a9f62853225de4ea8ae224d6912fb0ca1", null ],
+      [ "section", "structboost_1_1afio_1_1v2__xxx_1_1native__handle__type_1_1disposition__base.html#a3f5231b1a86b8c661b39312f0f4a02f5a8e7be1ef9aea64d916d9fe938cfeb7fa", null ]
     ] ]
 ];

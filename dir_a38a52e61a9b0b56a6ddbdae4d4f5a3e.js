@@ -12,7 +12,7 @@ var dir_a38a52e61a9b0b56a6ddbdae4d4f5a3e =
     ] ],
     [ "handle.hpp", "handle_8hpp.html", "handle_8hpp" ],
     [ "io_service.hpp", "io__service_8hpp.html", "io__service_8hpp" ],
-    [ "lockable_handle.hpp", "lockable__handle_8hpp_source.html", null ],
+    [ "map_handle.hpp", "map__handle_8hpp.html", "map__handle_8hpp" ],
     [ "native_handle_type.hpp", "native__handle__type_8hpp.html", [
       [ "native_handle_type", "structboost_1_1afio_1_1v2__xxx_1_1native__handle__type.html", "structboost_1_1afio_1_1v2__xxx_1_1native__handle__type" ],
       [ "disposition_base", "structboost_1_1afio_1_1v2__xxx_1_1native__handle__type_1_1disposition__base.html", "structboost_1_1afio_1_1v2__xxx_1_1native__handle__type_1_1disposition__base" ]

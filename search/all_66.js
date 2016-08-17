@@ -29,6 +29,7 @@ var searchData=
   ['finalise',['finalise',['../classboost_1_1afio_1_1v2__xxx_1_1utils_1_1fast__hash.html#ad8ee83af7299e1d637573dbe980d0682',1,'boost::afio::v2_xxx::utils::fast_hash']]],
   ['find_5fbad_5fbit',['find_bad_bit',['../classboost_1_1afio_1_1v2__xxx_1_1utils_1_1secded__ecc.html#a096555892089139936db034997de8a86',1,'boost::afio::v2_xxx::utils::secded_ecc']]],
   ['flag_5fbase',['flag_base',['../structboost_1_1afio_1_1v2__xxx_1_1handle_1_1flag__base.html',1,'boost::afio::v2_xxx::handle']]],
+  ['flag_5fbase',['flag_base',['../structboost_1_1afio_1_1v2__xxx_1_1section__handle_1_1flag__base.html',1,'boost::afio::v2_xxx::section_handle']]],
   ['flags',['flags',['../classboost_1_1afio_1_1v2__xxx_1_1handle.html#add27fa17cd6356b49a26a8b6dafb6a6d',1,'boost::afio::v2_xxx::handle']]],
   ['from_5fhex_5fstring',['from_hex_string',['../namespaceboost_1_1afio_1_1v2__xxx_1_1utils.html#a4757e475a9bdd0df572f7bf1babc5aae',1,'boost::afio::v2_xxx::utils']]],
   ['fs_5fmutex_5fappend',['fs_mutex_append',['../classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1atomic__append.html#a4ad149b7199d2fb919b73ef17a1d61b8',1,'boost::afio::v2_xxx::algorithm::shared_fs_mutex::atomic_append']]],

@@ -121,24 +121,24 @@ $(document).ready(function(){initNavTree('v2_80_2afio_8hpp_source.html','');});
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#undef BOOST_AFIO_NAMESPACE_VERSION</span></div>
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#undef BOOST_AFIO_MODULE_NAME</span></div>
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="preprocessor">#define BOOST_AFIO_VERSION_GLUE2(a, b, c) a ## b ## c</span></div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define BOOST_AFIO_VERSION_GLUE(a, b, c)  BOOST_AFIO_VERSION_GLUE2(a, b, c)</span></div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="preprocessor">#define BOOST_AFIO_VERSION_GLUE2(a, b, c) a##b##c</span></div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define BOOST_AFIO_VERSION_GLUE(a, b, c) BOOST_AFIO_VERSION_GLUE2(a, b, c)</span></div>
 <div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor"></span></div>
 <div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="comment">// Hard coded as this is a specific version</span></div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="preprocessor">#define BOOST_AFIO_VERSION_MAJOR    2</span></div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define BOOST_AFIO_VERSION_MINOR    0</span></div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define BOOST_AFIO_VERSION_PATCH    0</span></div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="preprocessor">#define BOOST_AFIO_VERSION_MAJOR 2</span></div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define BOOST_AFIO_VERSION_MINOR 0</span></div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define BOOST_AFIO_VERSION_PATCH 0</span></div>
 <div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define BOOST_AFIO_VERSION_REVISION 0</span></div>
 <div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l00023"></a><span class="lineno"><a class="code" href="v2_80_2afio_8hpp.html#af40cb131effa2c3e80b9d9251724d7aa">   23</a></span>&#160;<span class="preprocessor">#define BOOST_AFIO_NAMESPACE_VERSION   BOOST_AFIO_VERSION_GLUE(BOOST_AFIO_VERSION_MAJOR, _, BOOST_AFIO_VERSION_MINOR)</span></div>
+<div class="line"><a name="l00023"></a><span class="lineno"><a class="code" href="v2_80_2afio_8hpp.html#af40cb131effa2c3e80b9d9251724d7aa">   23</a></span>&#160;<span class="preprocessor">#define BOOST_AFIO_NAMESPACE_VERSION BOOST_AFIO_VERSION_GLUE(BOOST_AFIO_VERSION_MAJOR, _, BOOST_AFIO_VERSION_MINOR)</span></div>
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="preprocessor"></span></div>
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="preprocessor">#if defined(__cpp_modules) || defined(DOXYGEN_SHOULD_SKIP_THIS)</span></div>
 <div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#if defined(_MSC_VER) &amp;&amp; !defined(__clang__)</span></div>
 <div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="preprocessor">#define BOOST_AFIO_MODULE_NAME BOOST_AFIO_VERSION_GLUE(afio_v, BOOST_AFIO_NAMESPACE_VERSION,)</span></div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="preprocessor">#define BOOST_AFIO_MODULE_NAME BOOST_AFIO_VERSION_GLUE(afio_v, BOOST_AFIO_NAMESPACE_VERSION, )</span></div>
 <div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#else</span></div>
 <div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l00031"></a><span class="lineno"><a class="code" href="v2_80_2afio_8hpp.html#a0325740c6c0f8525814596fd7ff9627c">   31</a></span>&#160;<span class="preprocessor">#define BOOST_AFIO_MODULE_NAME BOOST_AFIO_VERSION_GLUE(afio_v, BOOST_AFIO_NAMESPACE_VERSION,)</span></div>
+<div class="line"><a name="l00031"></a><span class="lineno"><a class="code" href="v2_80_2afio_8hpp.html#a0325740c6c0f8525814596fd7ff9627c">   31</a></span>&#160;<span class="preprocessor">#define BOOST_AFIO_MODULE_NAME BOOST_AFIO_VERSION_GLUE(afio_v, BOOST_AFIO_NAMESPACE_VERSION, )</span></div>
 <div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#endif</span></div>
 <div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#endif</span></div>
 <div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<span class="preprocessor"></span></div>
@@ -168,15 +168,16 @@ $(document).ready(function(){initNavTree('v2_80_2afio_8hpp_source.html','');});
 <div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="config_8hpp.html" title="Configures a compiler environment for AFIO header and source code.">config.hpp</a>&quot;</span></div>
 <div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;</div>
 <div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="async__file__handle_8hpp.html" title="Provides async_file_handle.">async_file_handle.hpp</a>&quot;</span></div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="statfs_8hpp.html" title="Provides statfs.">statfs.hpp</a>&quot;</span></div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="storage__profile_8hpp.html" title="Provides storage_profile.">storage_profile.hpp</a>&quot;</span></div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="atomic__append_8hpp.html" title="Provides algorithm::shared_fs_mutex::atomic_append.">algorithm/shared_fs_mutex/atomic_append.hpp</a>&quot;</span></div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="byte__ranges_8hpp.html" title="Provides algorithm::shared_fs_mutex::byte_ranges.">algorithm/shared_fs_mutex/byte_ranges.hpp</a>&quot;</span></div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;<span class="preprocessor">#include &quot;detail/child_process.hpp&quot;</span></div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="map__handle_8hpp.html" title="Provides map_handle">map_handle.hpp</a>&quot;</span></div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="statfs_8hpp.html" title="Provides statfs.">statfs.hpp</a>&quot;</span></div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="storage__profile_8hpp.html" title="Provides storage_profile.">storage_profile.hpp</a>&quot;</span></div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="atomic__append_8hpp.html" title="Provides algorithm::shared_fs_mutex::atomic_append.">algorithm/shared_fs_mutex/atomic_append.hpp</a>&quot;</span></div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="byte__ranges_8hpp.html" title="Provides algorithm::shared_fs_mutex::byte_ranges.">algorithm/shared_fs_mutex/byte_ranges.hpp</a>&quot;</span></div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;<span class="preprocessor">#include &quot;detail/child_process.hpp&quot;</span></div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;<span class="preprocessor">#endif</span></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

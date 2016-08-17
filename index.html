@@ -162,6 +162,8 @@ async_file_handle - adds asynchronous scatter-gather i/o</li>
 <tr>
 <td>✔ </td><td></td><td>Uses CMake, CTest, CDash and CPack with automatic usage of C++ Modules or precompiled headers where available. </td></tr>
 <tr>
+<td>✔ </td><td></td><td>Far more comprehensive memory map and virtual memory facilities. </td></tr>
+<tr>
 <td>P </td><td></td><td>New multithreaded kernel based testing infrastructure based on LLVM which can permute/fuzz/<b>edge</b> coverage/mock each test kernel with choices of asan/lsan/msan/ubsan/none sanitisation. This new test infrastructure should make possible eventual <b>formal proof</b> that AFIO's implementation is mathematically correct. </td></tr>
 </table>
 <h2>Features implemented:</h2>
@@ -201,7 +203,7 @@ async_file_handle - adds asynchronous scatter-gather i/o</li>
 <tr>
 <td>✔ </td><td>✔ </td><td>P </td><td><code>shared_fs_mutex</code> shared/exclusive entities locking based on atomic append </td></tr>
 <tr>
-<td></td><td>P </td><td>P </td><td>Memory mapped files (<code>mapped_file_handle</code>) </td></tr>
+<td></td><td>✔ </td><td>P </td><td>Memory mapped files and virtual memory management (<code>section_handle</code> and <code>map_handle</code>) </td></tr>
 <tr>
 <td>✔ </td><td>P </td><td>P </td><td><code>shared_fs_mutex</code> shared/exclusive entities locking based on memory maps </td></tr>
 </table>

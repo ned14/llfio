@@ -135,7 +135,9 @@ Public Types</h2></td></tr>
 &#160;&#160;<a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1native__handle__type_1_1disposition__base.html#a3f5231b1a86b8c661b39312f0f4a02f5aa2651bf8f667351f7d898cc35b9d016a">directory</a> = 1 &lt;&lt; 9, 
 <a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1native__handle__type_1_1disposition__base.html#a3f5231b1a86b8c661b39312f0f4a02f5a58f3f96fa1cafd3605b488394e000d89">symlink</a> = 1 &lt;&lt; 10, 
 <a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1native__handle__type_1_1disposition__base.html#a3f5231b1a86b8c661b39312f0f4a02f5a1f40773df790828587987eb23baaa72d">multiplexer</a> = 1 &lt;&lt; 11, 
-<b>process</b> = 1 &lt;&lt; 12
+<a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1native__handle__type_1_1disposition__base.html#a3f5231b1a86b8c661b39312f0f4a02f5a9f62853225de4ea8ae224d6912fb0ca1">process</a> = 1 &lt;&lt; 12, 
+<br/>
+&#160;&#160;<a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1native__handle__type_1_1disposition__base.html#a3f5231b1a86b8c661b39312f0f4a02f5a8e7be1ef9aea64d916d9fe938cfeb7fa">section</a> = 1 &lt;&lt; 13
 <br/>
  }</td></tr>
 <tr class="separator:a3f5231b1a86b8c661b39312f0f4a02f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -186,6 +188,12 @@ Public Types</h2></td></tr>
 <tr><td class="fieldname"><em><a class="anchor" id="a3f5231b1a86b8c661b39312f0f4a02f5a1f40773df790828587987eb23baaa72d"></a>multiplexer</em>&nbsp;</td><td class="fielddoc">
 <p>Is a kqueue/epoll/iocp. </p>
 </td></tr>
+<tr><td class="fieldname"><em><a class="anchor" id="a3f5231b1a86b8c661b39312f0f4a02f5a9f62853225de4ea8ae224d6912fb0ca1"></a>process</em>&nbsp;</td><td class="fielddoc">
+<p>Is a child process. </p>
+</td></tr>
+<tr><td class="fieldname"><em><a class="anchor" id="a3f5231b1a86b8c661b39312f0f4a02f5a8e7be1ef9aea64d916d9fe938cfeb7fa"></a>section</em>&nbsp;</td><td class="fielddoc">
+<p>Is a memory section. </p>
+</td></tr>
 </table>
 <div class="fragment"><div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;  {</div>
 <div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    <a class="code" href="structboost_1_1afio_1_1v2__xxx_1_1native__handle__type_1_1disposition__base.html#a3f5231b1a86b8c661b39312f0f4a02f5a41d8512b16b5db4e04e0de37f5e25f85" title="Invalid handle.">invalid</a> = 0,  </div>
@@ -202,8 +210,9 @@ Public Types</h2></td></tr>
 <div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    <a class="code" href="structboost_1_1afio_1_1v2__xxx_1_1native__handle__type_1_1disposition__base.html#a3f5231b1a86b8c661b39312f0f4a02f5aa2651bf8f667351f7d898cc35b9d016a" title="Is a directory.">directory</a> = 1 &lt;&lt; 9,     </div>
 <div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    <a class="code" href="structboost_1_1afio_1_1v2__xxx_1_1native__handle__type_1_1disposition__base.html#a3f5231b1a86b8c661b39312f0f4a02f5a58f3f96fa1cafd3605b488394e000d89" title="Is a symlink.">symlink</a> = 1 &lt;&lt; 10,      </div>
 <div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    <a class="code" href="structboost_1_1afio_1_1v2__xxx_1_1native__handle__type_1_1disposition__base.html#a3f5231b1a86b8c661b39312f0f4a02f5a1f40773df790828587987eb23baaa72d" title="Is a kqueue/epoll/iocp.">multiplexer</a> = 1 &lt;&lt; 11,  </div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    process = 1 &lt;&lt; 12       </div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;  }</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    <a class="code" href="structboost_1_1afio_1_1v2__xxx_1_1native__handle__type_1_1disposition__base.html#a3f5231b1a86b8c661b39312f0f4a02f5a9f62853225de4ea8ae224d6912fb0ca1" title="Is a child process.">process</a> = 1 &lt;&lt; 12,      </div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    <a class="code" href="structboost_1_1afio_1_1v2__xxx_1_1native__handle__type_1_1disposition__base.html#a3f5231b1a86b8c661b39312f0f4a02f5a8e7be1ef9aea64d916d9fe938cfeb7fa" title="Is a memory section.">section</a> = 1 &lt;&lt; 13       </div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>

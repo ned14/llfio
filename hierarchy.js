@@ -11,6 +11,7 @@ var hierarchy =
     [ "boost::afio::v2_xxx::statfs_t::f_flags_t", "structboost_1_1afio_1_1v2__xxx_1_1statfs__t_1_1f__flags__t.html", null ],
     [ "boost::afio::v2_xxx::utils::fast_hash", "classboost_1_1afio_1_1v2__xxx_1_1utils_1_1fast__hash.html", null ],
     [ "boost::afio::v2_xxx::handle::flag_base", "structboost_1_1afio_1_1v2__xxx_1_1handle_1_1flag__base.html", null ],
+    [ "boost::afio::v2_xxx::section_handle::flag_base", "structboost_1_1afio_1_1v2__xxx_1_1section__handle_1_1flag__base.html", null ],
     [ "flag_base", null, [
       [ "boost::afio::v2_xxx::bitfield< flag_base >", "structboost_1_1afio_1_1v2__xxx_1_1bitfield.html", null ]
     ] ],
@@ -18,8 +19,10 @@ var hierarchy =
       [ "boost::afio::v2_xxx::io_handle", "classboost_1_1afio_1_1v2__xxx_1_1io__handle.html", [
         [ "boost::afio::v2_xxx::file_handle", "classboost_1_1afio_1_1v2__xxx_1_1file__handle.html", [
           [ "boost::afio::v2_xxx::async_file_handle", "classboost_1_1afio_1_1v2__xxx_1_1async__file__handle.html", null ]
-        ] ]
-      ] ]
+        ] ],
+        [ "boost::afio::v2_xxx::map_handle", "classboost_1_1afio_1_1v2__xxx_1_1map__handle.html", null ]
+      ] ],
+      [ "boost::afio::v2_xxx::section_handle", "classboost_1_1afio_1_1v2__xxx_1_1section__handle.html", null ]
     ] ],
     [ "boost::afio::v2_xxx::io_handle::io_request< T >", "structboost_1_1afio_1_1v2__xxx_1_1io__handle_1_1io__request.html", null ],
     [ "boost::afio::v2_xxx::io_service", "classboost_1_1afio_1_1v2__xxx_1_1io__service.html", null ],
