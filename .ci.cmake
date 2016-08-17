@@ -37,8 +37,7 @@ if(WIN32)
       build/lib/Release/afio_dl-2.0-Windows-x64-Release.lib
       build/bin/Release/afio_dl-2.0-Windows-x64-Release.dll
     )
-    execute_process(COMMAND cmd /c dir)
-    ctest_upload(FILES afio_v2_binaries_win64.tar.gz)
+    get_filename_component(toupload afio_v2_binaries_win64.tar.gz ABSOLUTE)
   endif()
 else()
   if(EXISTS build/bin/Release/afio_dl-2.0-Linux-x86_64-Release.so)
@@ -51,9 +50,10 @@ else()
       build/lib/Release/afio_sl-2.0-Linux-x86_64-Release.a
       build/bin/Release/afio_dl-2.0-Linux-x86_64-Release.so
     )
-    ctest_upload(FILES afio_v2_binaries_linux64.tgz)
+    get_filename_component(toupload afio_v2_binaries_linux64.tgz ABSOLUTE)
   endif()
 endif()
+ctest_upload(FILES "${toupload}")
 ctest_submit()
 if(NOT retval EQUAL 0)
   message(FATAL_ERROR "FATAL: Running tests exited with ${retval}")
