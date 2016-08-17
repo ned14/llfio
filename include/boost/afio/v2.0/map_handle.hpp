@@ -56,7 +56,7 @@ public:
   using size_type = handle::size_type;
 
   //! The behaviour of the memory section
-  BOOST_AFIO_BITFIELD_BEGIN(mode){
+  BOOST_AFIO_BITFIELD_BEGIN(flag){
   none = 0,          //!< No flags
   read = 1 << 0,     //!< Memory views can be read
   write = 1 << 1,    //!< Memory views can be written
@@ -69,35 +69,35 @@ public:
 
   // NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!
   };
-  BOOST_AFIO_BITFIELD_END(mode)
+  BOOST_AFIO_BITFIELD_END(flag)
 
 protected:
   io_handle *_backing;
   extent_type _length;
-  mode _mode;
+  flag _flag;
 
 public:
   //! Default constructor
   section_handle()
       : _backing(nullptr)
       , _length(0)
-      , _mode(mode::none)
+      , _flag(flag::none)
   {
   }
   //! Construct a section handle using the given native handle type for the section and the given i/o handle for the backing storage
-  explicit section_handle(native_handle_type sectionh, io_handle *backing, extent_type maximum_size, mode __mode)
+  explicit section_handle(native_handle_type sectionh, io_handle *backing, extent_type maximum_size, flag __flag)
       : handle(sectionh)
       , _backing(backing)
       , _length(maximum_size)
-      , _mode(__mode)
+      , _flag(__flag)
   {
   }
   //! Implicit move construction of section_handle permitted
-  section_handle(section_handle &&o) noexcept : handle(std::move(o)), _backing(o._backing), _length(o._length), _mode(o._mode)
+  section_handle(section_handle &&o) noexcept : handle(std::move(o)), _backing(o._backing), _length(o._length), _flag(o._flag)
   {
     o._backing = nullptr;
     o._length = 0;
-    o._mode = mode::none;
+    o._flag = flag::none;
   }
   //! Move assignment of section_handle permitted
   section_handle &operator=(section_handle &&o) noexcept
@@ -117,18 +117,18 @@ public:
   /*! \brief Create a memory section.
   \param backing The handle to use as backing storage. An invalid handle means to use the system page file as the backing storage.
   \param maximum_size The maximum size this section can ever be. Zero means to use backing.length().
-  \param _mode How to create the section.
+  \param _flag How to create the section.
 
   \errors Any of the values POSIX dup() or NtCreateSection() can return.
   */
   //[[bindlib::make_free]]
-  static BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<section_handle> section(file_handle &backing, extent_type maximum_size = 0, mode _mode = mode::read | mode::write) noexcept;
+  static BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<section_handle> section(file_handle &backing, extent_type maximum_size = 0, flag _flag = flag::read | flag::write) noexcept;
   //! \overload
   //[[bindlib::make_free]]
-  static inline result<section_handle> section(extent_type maximum_size, file_handle &backing, mode _mode = mode::read | mode::write) noexcept { return section(backing, maximum_size, _mode); }
+  static inline result<section_handle> section(extent_type maximum_size, file_handle &backing, flag _flag = flag::read | flag::write) noexcept { return section(backing, maximum_size, _flag); }
 
-  //! Returns the memory section's mode
-  mode section_mode() const noexcept { return _mode; }
+  //! Returns the memory section's flags
+  flag section_flags() const noexcept { return _flag; }
   //! Returns the borrowed native handle backing this section, if any
   native_handle_type backing_native_handle() const noexcept { return _backing ? _backing->native_handle() : native_handle_type(); }
   //! Return the current maximum permitted extent of the memory section.
@@ -141,6 +141,33 @@ public:
   //[[bindlib::make_free]]
   result<extent_type> truncate(extent_type newsize) noexcept;
 };
+inline std::ostream &operator<<(std::ostream &s, const section_handle::flag &v)
+{
+  std::string temp;
+  if(!!(v & section_handle::flag::read))
+    temp.append("read|");
+  if(!!(v & section_handle::flag::write))
+    temp.append("write|");
+  if(!!(v & section_handle::flag::cow))
+    temp.append("cow|");
+  if(!!(v & section_handle::flag::execute))
+    temp.append("execute|");
+  if(!!(v & section_handle::flag::nocommit))
+    temp.append("nocommit|");
+  if(!!(v & section_handle::flag::prefault))
+    temp.append("prefault|");
+  if(!!(v & section_handle::flag::executable))
+    temp.append("executable|");
+  if(!temp.empty())
+  {
+    temp.resize(temp.size() - 1);
+    if(std::count(temp.cbegin(), temp.cend(), '|') > 0)
+      temp = "(" + temp + ")";
+  }
+  else
+    temp = "none";
+  return s << "afio::section_handle::flag::" << temp;
+}
 
 /*! \class map_handle
 \brief A handle to a memory mapped region of memory.
@@ -155,7 +182,7 @@ public:
   using path_type = io_handle::path_type;
   using extent_type = io_handle::extent_type;
   using size_type = io_handle::size_type;
-  using mode = io_handle::mode;
+  using flag = io_handle::flag;
   using creation = io_handle::creation;
   using caching = io_handle::caching;
   using flag = io_handle::flag;
@@ -221,12 +248,12 @@ public:
   \param section A memory section handle specifying the backing storage to use.
   \param bytes How many bytes to map (0 = the size of the memory section). Typically needs to be a multiple of the page size (see utils::page_sizes()).
   \param offset The offset into the backing storage to map from. Typically needs to be at least a multiple of the page size (see utils::page_sizes()), on Windows it needs to be a multiple of the kernel memory allocation granularity (typically 64Kb).
-  \param _mode The permissions with which to map the view which are constrained by the permissions of the memory section. `mode::none` can be useful for reserving virtual address space without committing system resources, use commit() to later change availability of memory.
+  \param _flag The permissions with which to map the view which are constrained by the permissions of the memory section. `flag::none` can be useful for reserving virtual address space without committing system resources, use commit() to later change availability of memory.
 
   \errors Any of the values POSIX mmap() or NtMapViewOfSection() can return.
   */
   //[[bindlib::make_free]]
-  static BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<map_handle> map(section_handle &section, size_type bytes = 0, extent_type offset = 0, section_handle::mode _mode = section_handle::mode::read | section_handle::mode::write) noexcept;
+  static BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<map_handle> map(section_handle &section, size_type bytes = 0, extent_type offset = 0, section_handle::flag _flag = section_handle::flag::read | section_handle::flag::write) noexcept;
 
   //! The memory section this handle is using
   section_handle *section() const noexcept { return _section; }
@@ -238,10 +265,10 @@ public:
   size_type length() const noexcept { return _length; }
 
   //! Ask the system to commit the system resources to make the memory represented by the buffer available with the given permissions. addr and length should be page aligned (see utils::page_sizes()), if not the returned buffer is the region actually committed.
-  result<buffer_type> commit(buffer_type region, section_handle::mode _mode = section_handle::mode::read | section_handle::mode::write) noexcept;
+  result<buffer_type> commit(buffer_type region, section_handle::flag _flag = section_handle::flag::read | section_handle::flag::write) noexcept;
 
   //! Ask the system to make the memory represented by the buffer unavailable and to decommit the system resources representing them. addr and length should be page aligned (see utils::page_sizes()), if not the returned buffer is the region actually decommitted.
-  result<buffer_type> decommit(buffer_type region) noexcept { return commit(region, section_handle::mode::none); }
+  result<buffer_type> decommit(buffer_type region) noexcept { return commit(region, section_handle::flag::none); }
 
   /*! Zero the memory represented by the buffer. On Linux, Windows and FreeBSD any full 4Kb pages will be deallocated from the system entirely, including the extents for them in any backing storage. On newer Linux kernels the kernel can additionally swap whole 4Kb pages for freshly zeroed ones making this a very
   efficient way of zeroing large ranges of memory.

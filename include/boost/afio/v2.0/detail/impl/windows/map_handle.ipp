@@ -35,49 +35,49 @@ DEALINGS IN THE SOFTWARE.
 
 BOOST_AFIO_V2_NAMESPACE_BEGIN
 
-result<section_handle> section_handle::section(file_handle &backing, extent_type maximum_size, mode _mode) noexcept
+result<section_handle> section_handle::section(file_handle &backing, extent_type maximum_size, flag _flag) noexcept
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
-  BOOST_AFIO_LOG_FUNCTION_CALL(_v.h);
+  BOOST_AFIO_LOG_FUNCTION_CALL(0);
   if(!maximum_size && backing.is_valid())
   {
     BOOST_OUTCOME_FILTER_ERROR(length, backing.length());
     maximum_size = length;
   }
   maximum_size = utils::round_up_to_page_size(maximum_size);
-  result<section_handle> ret(section_handle(native_handle_type(), backing.is_valid() ? &backing : nullptr, maximum_size, _mode));
+  result<section_handle> ret(section_handle(native_handle_type(), backing.is_valid() ? &backing : nullptr, maximum_size, _flag));
   native_handle_type &nativeh = ret.get()._v;
   ACCESS_MASK access = SECTION_QUERY;
   ULONG prot = 0, attribs = 0;
   if(backing.is_valid())
     access |= SECTION_EXTEND_SIZE;
-  if(_mode & mode::read)
+  if(_flag & flag::read)
   {
     access |= SECTION_MAP_READ;
     prot = PAGE_READONLY;
     nativeh.behaviour |= native_handle_type::disposition::readable;
   }
-  if(_mode & mode::write)
+  if(_flag & flag::write)
   {
     access |= SECTION_MAP_WRITE;
     prot = PAGE_READWRITE;
     nativeh.behaviour |= native_handle_type::disposition::writable;
   }
-  if(_mode & mode::execute)
+  if(_flag & flag::execute)
   {
     access |= SECTION_MAP_EXECUTE;
     prot = PAGE_EXECUTE;
   }
-  if(_mode & mode::cow)
+  if(_flag & flag::cow)
     prot = PAGE_WRITECOPY;
-  if(_mode & mode::nocommit)
+  if(_flag & flag::nocommit)
     attribs = SEC_RESERVE;
   else
     attribs = SEC_COMMIT;
-  if(_mode & mode::executable)
+  if(_flag & flag::executable)
     attribs = SEC_IMAGE;
-  if(_mode & mode::prefault)
+  if(_flag & flag::prefault)
   {
     // Handled during view mapping below
   }
@@ -149,7 +149,7 @@ native_handle_type map_handle::release() noexcept
 }
 
 
-result<map_handle> map_handle::map(section_handle &section, size_type bytes, extent_type offset, section_handle::mode _mode) noexcept
+result<map_handle> map_handle::map(section_handle &section, size_type bytes, extent_type offset, section_handle::flag _flag) noexcept
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
@@ -157,33 +157,33 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
   bytes = utils::round_up_to_page_size(bytes);
   result<map_handle> ret(map_handle(io_handle(), &section));
   native_handle_type &nativeh = ret.get()._v;
-  ULONG allocation = (section.section_mode() & section_handle::mode::nocommit) ? MEM_RESERVE : 0, prot = 0;
+  ULONG allocation = (section.section_flags() & section_handle::flag::nocommit) ? MEM_RESERVE : 0, prot = 0;
   PVOID addr = 0;
   size_t commitsize = bytes;
   LARGE_INTEGER _offset;
   _offset.QuadPart = offset;
   SIZE_T _bytes = bytes;
-  if(_mode == section_handle::mode::none)
+  if(_flag == section_handle::flag::none)
   {
     allocation = MEM_RESERVE;
     commitsize = 0;
   }
-  else if(_mode & section_handle::mode::cow)
+  else if(_flag & section_handle::flag::cow)
   {
     prot = PAGE_WRITECOPY;
     nativeh.behaviour |= native_handle_type::disposition::seekable | native_handle_type::disposition::readable | native_handle_type::disposition::writable;
   }
-  else if(_mode & section_handle::mode::write)
+  else if(_flag & section_handle::flag::write)
   {
     prot = PAGE_READWRITE;
     nativeh.behaviour |= native_handle_type::disposition::seekable | native_handle_type::disposition::readable | native_handle_type::disposition::writable;
   }
-  else if(_mode & section_handle::mode::read)
+  else if(_flag & section_handle::flag::read)
   {
     prot = PAGE_READONLY;
     nativeh.behaviour |= native_handle_type::disposition::seekable | native_handle_type::disposition::readable;
   }
-  if(_mode & section_handle::mode::execute)
+  if(_flag & section_handle::flag::execute)
     prot = PAGE_EXECUTE;
   NTSTATUS ntstat = NtMapViewOfSection(section.native_handle().h, GetCurrentProcess(), &addr, 0, commitsize, &_offset, &_bytes, ViewUnmap, allocation, prot);
   if(STATUS_SUCCESS != ntstat)
@@ -194,7 +194,7 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
   ret.get()._v = section.backing_native_handle();
 
   // Windows has no way of getting the kernel to prefault maps on creation, so ...
-  if(section.section_mode() & section_handle::mode::prefault)
+  if(section.section_flags() & section_handle::flag::prefault)
   {
     // Start an asynchronous prefetch
     buffer_type b((char *) addr, _bytes);
@@ -208,33 +208,33 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
   return ret;
 }
 
-result<map_handle::buffer_type> map_handle::commit(buffer_type region, section_handle::mode _mode) noexcept
+result<map_handle::buffer_type> map_handle::commit(buffer_type region, section_handle::flag _flag) noexcept
 {
   BOOST_AFIO_LOG_FUNCTION_CALL(_v.h);
   DWORD prot = 0;
-  if(_mode == section_handle::mode::none)
+  if(_flag == section_handle::flag::none)
   {
     BOOST_OUTCOME_FILTER_ERROR(_region, dontneed(region));
     if(!VirtualProtect(_region.first, _region.second, PAGE_NOACCESS, NULL))
       return make_errored_result<buffer_type>(GetLastError());
     return _region;
   }
-  if(_mode & section_handle::mode::cow)
+  if(_flag & section_handle::flag::cow)
   {
     prot = PAGE_WRITECOPY;
     _v.behaviour |= native_handle_type::disposition::seekable | native_handle_type::disposition::readable | native_handle_type::disposition::writable;
   }
-  else if(_mode & section_handle::mode::write)
+  else if(_flag & section_handle::flag::write)
   {
     prot = PAGE_READWRITE;
     _v.behaviour |= native_handle_type::disposition::seekable | native_handle_type::disposition::readable | native_handle_type::disposition::writable;
   }
-  else if(_mode & section_handle::mode::read)
+  else if(_flag & section_handle::flag::read)
   {
     prot = PAGE_READONLY;
     _v.behaviour |= native_handle_type::disposition::seekable | native_handle_type::disposition::readable;
   }
-  if(_mode & section_handle::mode::execute)
+  if(_flag & section_handle::flag::execute)
     prot = PAGE_EXECUTE;
   region = utils::round_to_page_size(region);
   if(!VirtualAlloc(region.first, region.second, MEM_COMMIT, prot))

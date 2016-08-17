@@ -76,21 +76,8 @@ template <class U> inline void file_handle_create_close_creation(U &&f)
 
   // Have the permuter permute callable f with all the permutations, returning outcomes
   auto results = permuter(std::forward<U>(f));
-  static_assert(permuter.permutation_results_type_is_constant_sized, "Results type returned should be a std::array due to the constant sized input");
-  static_assert(results.size() > 0, "Results type returned should be a std::array due to the constant sized input");
-  std::vector<std::function<void()>> checks;
-
-  // Check each of the results, calling the failure/pass callables supplied. We don't do
-  // this inside the kernel or permuter as it messes with fuzzing/sanitising.
-  //
-  // Note that we accumulate failures into the checks vector for later processing
-  bool all_passed = permuter.check(results, pretty_print_failure(permuter, [&checks](const auto &result, const auto &shouldbe) { checks.push_back([&] { BOOST_CHECK(result == shouldbe); }); }), pretty_print_success(permuter));
-  BOOST_CHECK(all_passed);
-
-  // The pretty printing gets messed up by the unit test output, so defer telling it
-  // about failures until now
-  for(auto &i : checks)
-    i();
+  // Check these permutation results, pretty printing the outcomes and also informing Boost.Test via BOOST_CHECK().
+  check_results_with_boost_test(permuter, results);
 }
 
 BOOST_KERNELTEST_TEST_KERNEL(integration, afio, file_handle_create_close, file_handle, "Tests that afio::file_handle's creation parameter works as expected", file_handle_create_close_creation(file_handle_create_close::test_kernel_file_handle))
