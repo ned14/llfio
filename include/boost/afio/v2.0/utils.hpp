@@ -43,6 +43,41 @@ BOOST_AFIO_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace utils
 {
+  /*! \brief Returns the smallest page size of this architecture which is useful for calculating direct i/o multiples.
+
+  \return The page size of this architecture.
+  \ingroup utils
+  \complexity{Whatever the system API takes (one would hope constant time).}
+  */
+  BOOST_AFIO_HEADERS_ONLY_FUNC_SPEC size_t page_size() noexcept;
+
+  /*! \brief Round a value to its next lowest page size multiple
+  */
+  template <class T> inline T round_down_to_page_size(T i) noexcept
+  {
+    const size_t pagesize = page_size();
+    i = i & ~(pagesize - 1);
+    return i;
+  }
+  /*! \brief Round a value to its next highest page size multiple
+  */
+  template <class T> inline T round_up_to_page_size(T i) noexcept
+  {
+    const size_t pagesize = page_size();
+    i = (i + pagesize - 1) & ~(pagesize - 1);
+    return i;
+  }
+  /*! \brief Round a pair of a pointer and a size_t to their nearest page size multiples. The pointer will be rounded
+  down, the size_t upwards.
+  */
+  template <class T> inline std::pair<T *, size_t> round_to_page_size(std::pair<T *, size_t> i) noexcept
+  {
+    const size_t pagesize = page_size();
+    i.first = (T *) (((uintptr_t) i.first) & ~(pagesize - 1));
+    i.second = (i.second + pagesize - 1) & ~(pagesize - 1);
+    return i;
+  }
+
   /*! \brief Returns the page sizes of this architecture which is useful for calculating direct i/o multiples.
 
   \param only_actually_available Only return page sizes actually available to the user running this process
@@ -51,7 +86,7 @@ namespace utils
   \complexity{Whatever the system API takes (one would hope constant time).}
   \exceptionmodel{Any error from the operating system or std::bad_alloc.}
   */
-  BOOST_AFIO_HEADERS_ONLY_FUNC_SPEC std::vector<size_t> page_sizes(bool only_actually_available = true) noexcept;
+  BOOST_AFIO_HEADERS_ONLY_FUNC_SPEC std::vector<size_t> page_sizes(bool only_actually_available = true);
 
   /*! \brief Returns a reasonable default size for page_allocator, typically the closest page size from
   page_sizes() to 1Mb.

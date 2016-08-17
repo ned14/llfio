@@ -177,6 +177,9 @@ public:
     return ret;
   }
 
+  //! True if the handle is valid (and usually open)
+  bool is_valid() const noexcept { return _v.is_valid(); }
+
   //! True if the handle is readable
   bool is_readable() const noexcept { return _v.is_readable(); }
   //! True if the handle is writable
@@ -212,6 +215,8 @@ public:
   bool is_multiplexer() const noexcept { return _v.is_multiplexer(); }
   //! True if a process
   bool is_process() const noexcept { return _v.is_process(); }
+  //! True if a memory section
+  bool is_section() const noexcept { return _v.is_section(); }
 
   //! Kernel cache strategy used by this handle
   caching kernel_caching() const noexcept { return _caching; }

@@ -37,7 +37,14 @@ BOOST_AFIO_V2_NAMESPACE_BEGIN
 
 namespace utils
 {
-  std::vector<size_t> page_sizes(bool only_actually_available) noexcept
+  size_t page_size() noexcept
+  {
+    static size_t ret;
+    if(!ret)
+      ret = getpagesize();
+    return ret;
+  }
+  std::vector<size_t> page_sizes(bool only_actually_available)
   {
     static spinlock<bool> lock;
     static std::vector<size_t> pagesizes, pagesizes_available;

@@ -64,7 +64,8 @@ struct native_handle_type
     directory = 1 << 9,     //!< Is a directory
     symlink = 1 << 10,      //!< Is a symlink
     multiplexer = 1 << 11,  //!< Is a kqueue/epoll/iocp
-    process = 1 << 12       //! Is a child process
+    process = 1 << 12,      //!< Is a child process
+    section = 1 << 13       //!< Is a memory section
   }
   BOOST_AFIO_BITFIELD_END(disposition)
   disposition behaviour;  //! The behaviour of the handle
@@ -108,9 +109,12 @@ struct native_handle_type
   }
 
   //! True if valid
-  explicit constexpr operator bool() const noexcept { return _init != -1 && static_cast<unsigned>(behaviour) != 0; }
+  explicit constexpr operator bool() const noexcept { return is_valid(); }
   //! True if invalid
-  constexpr bool operator!() const noexcept { return _init == -1 || static_cast<unsigned>(behaviour) == 0; }
+  constexpr bool operator!() const noexcept { return !is_valid(); }
+
+  //! True if the handle is valid
+  constexpr bool is_valid() const noexcept { return _init != -1 && static_cast<unsigned>(behaviour) != 0; }
 
   //! True if the handle is readable
   constexpr bool is_readable() const noexcept { return (behaviour & disposition::readable) ? true : false; }
@@ -136,6 +140,8 @@ struct native_handle_type
   constexpr bool is_multiplexer() const noexcept { return (behaviour & disposition::multiplexer) ? true : false; }
   //! True if a process
   constexpr bool is_process() const noexcept { return (behaviour & disposition::process) ? true : false; }
+  //! True if a memory section
+  constexpr bool is_section() const noexcept { return (behaviour & disposition::section) ? true : false; }
 };
 
 BOOST_AFIO_V2_NAMESPACE_END

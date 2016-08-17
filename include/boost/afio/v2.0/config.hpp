@@ -165,11 +165,11 @@ DEALINGS IN THE SOFTWARE.
 // Default to the C++ 11 STL if on VS2015 or has <experimental/filesystem>
 #ifndef BOOST_AFIO_USE_BOOST_FILESYSTEM
 #ifdef __has_include
-#if __has_include(<filesystem>) || __has_include(<experimental/filesystem>)
+#if __has_include(<filesystem>) || __has_include(<experimental / filesystem>)
 #define BOOST_AFIO_USE_BOOST_FILESYSTEM 0
 #endif
 #endif
-#if !defined(BOOST_AFIO_USE_BOOST_FILESYSTEM) && _MSC_VER >= 1900  /* >= VS2015 */
+#if !defined(BOOST_AFIO_USE_BOOST_FILESYSTEM) && _MSC_VER >= 1900 /* >= VS2015 */
 #define BOOST_AFIO_USE_BOOST_FILESYSTEM 0
 #endif
 #endif
@@ -241,12 +241,12 @@ namespace starting with `v2_` inside the `boost::afio` namespace.
 exported AFIO v2 namespace.
 \ingroup config
 */
-#define BOOST_AFIO_V2_NAMESPACE_EXPORT_BEGIN                                                                                                                                                                                                                                                                                          \
-  export namespace boost                                                                                                                                                                                                                                                                                                              \
+#define BOOST_AFIO_V2_NAMESPACE_EXPORT_BEGIN                                                                                                                                                                                                                                                                                   \
+  export namespace boost                                                                                                                                                                                                                                                                                                       \
   {                                                                                                                                                                                                                                                                                                                            \
     namespace afio                                                                                                                                                                                                                                                                                                             \
     {                                                                                                                                                                                                                                                                                                                          \
-      inline namespace v2_xxx                                                                                                                                                                                                                                                                                                      \
+      inline namespace v2_xxx                                                                                                                                                                                                                                                                                                  \
       {
 /*! \brief Expands into the appropriate namespace markup to exit the AFIO v2 namespace.
 \ingroup config
@@ -472,10 +472,10 @@ using BOOST_OUTCOME_V1_NAMESPACE::make_errored_outcome;
 #if DOXYGEN_SHOULD_SKIP_THIS
 /*! \brief Please see https://ned14.github.io/boost.outcome/classboost_1_1outcome_1_1v1__xxx_1_1basic__monad.html
 */
-template<class T> using result = boost::outcome::result<T>;
+template <class T> using result = boost::outcome::result<T>;
 /*! \brief Please see https://ned14.github.io/boost.outcome/classboost_1_1outcome_1_1v1__xxx_1_1basic__monad.html
 */
-template<class T> using outcome = boost::outcome::outcome<T>;
+template <class T> using outcome = boost::outcome::outcome<T>;
 #endif
 BOOST_AFIO_V2_NAMESPACE_END
 
@@ -719,6 +719,15 @@ public:
   explicit constexpr operator bool() const noexcept { return !!_value; }
   //! Test for zeroness
   constexpr bool operator!() const noexcept { return !_value; }
+
+  //! Test for equality
+  constexpr bool operator==(bitfield o) const noexcept { return _value == o._value; }
+  //! Test for equality
+  constexpr bool operator==(enum_type o) const noexcept { return _value == o; }
+  //! Test for inequality
+  constexpr bool operator!=(bitfield o) const noexcept { return _value != o._value; }
+  //! Test for inequality
+  constexpr bool operator!=(enum_type o) const noexcept { return _value != o; }
 
   //! Performs a bitwise NOT
   constexpr bitfield operator~() const noexcept { return bitfield(~_value); }

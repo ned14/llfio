@@ -197,6 +197,14 @@ namespace windows_nt_kernel
     DWORD64 Address;
   } IMAGEHLP_LINE64, *PIMAGEHLP_LINE64;
 
+  typedef enum _SECTION_INHERIT { ViewShare = 1, ViewUnmap = 2 } SECTION_INHERIT, *PSECTION_INHERIT;
+
+  typedef struct _WIN32_MEMORY_RANGE_ENTRY
+  {
+    PVOID VirtualAddress;
+    SIZE_T NumberOfBytes;
+  } WIN32_MEMORY_RANGE_ENTRY, *PWIN32_MEMORY_RANGE_ENTRY;
+
   // From https://msdn.microsoft.com/en-us/library/bb432383%28v=vs.85%29.aspx
   typedef NTSTATUS(NTAPI *NtQueryObject_t)(_In_opt_ HANDLE Handle, _In_ OBJECT_INFORMATION_CLASS ObjectInformationClass, _Out_opt_ PVOID ObjectInformation, _In_ ULONG ObjectInformationLength, _Out_opt_ PULONG ReturnLength);
 
@@ -247,6 +255,15 @@ namespace windows_nt_kernel
   // From https://msdn.microsoft.com/en-us/library/windows/hardware/ff567118(v=vs.85).aspx
   typedef NTSTATUS(NTAPI *NtUnlockFile_t)(_In_ HANDLE FileHandle, _Out_ PIO_STATUS_BLOCK IoStatusBlock, _In_ PLARGE_INTEGER ByteOffset, _In_ PLARGE_INTEGER Length, _In_ ULONG Key);
 
+  typedef NTSTATUS(NTAPI *NtCreateSection_t)(_Out_ PHANDLE SectionHandle, _In_ ACCESS_MASK DesiredAccess, _In_opt_ POBJECT_ATTRIBUTES ObjectAttributes, _In_opt_ PLARGE_INTEGER MaximumSize, _In_ ULONG SectionPageProtection, _In_ ULONG AllocationAttributes, _In_opt_ HANDLE FileHandle);
+
+  typedef NTSTATUS(NTAPI *NtExtendSection_t)(_In_ HANDLE SectionHandle, _In_opt_ PLARGE_INTEGER MaximumSize);
+
+  typedef NTSTATUS(NTAPI *NtMapViewOfSection_t)(_In_ HANDLE SectionHandle, _In_ HANDLE ProcessHandle, _Inout_ PVOID *BaseAddress, _In_ ULONG_PTR ZeroBits, _In_ SIZE_T CommitSize, _Inout_opt_ PLARGE_INTEGER SectionOffset, _Inout_ PSIZE_T ViewSize, _In_ SECTION_INHERIT InheritDisposition, _In_ ULONG AllocationType,
+                                                _In_ ULONG Win32Protect);
+
+  typedef NTSTATUS(NTAPI *NtUnmapViewOfSection_t)(_In_ HANDLE ProcessHandle, _In_opt_ PVOID BaseAddress);
+
   typedef BOOLEAN(NTAPI *RtlGenRandom_t)(_Out_ PVOID RandomBuffer, _In_ ULONG RandomBufferLength);
 
   typedef BOOL(WINAPI *OpenProcessToken_t)(_In_ HANDLE ProcessHandle, _In_ DWORD DesiredAccess, _Out_ PHANDLE TokenHandle);
@@ -255,6 +272,8 @@ namespace windows_nt_kernel
 
   typedef BOOL(WINAPI *AdjustTokenPrivileges_t)(_In_ HANDLE TokenHandle, _In_ BOOL DisableAllPrivileges, _In_opt_ PTOKEN_PRIVILEGES NewState, _In_ DWORD BufferLength, _Out_opt_ PTOKEN_PRIVILEGES PreviousState, _Out_opt_ PDWORD ReturnLength);
 
+  typedef BOOL(WINAPI *PrefetchVirtualMemory_t)(_In_ HANDLE hProcess, _In_ ULONG_PTR NumberOfEntries, _In_ PWIN32_MEMORY_RANGE_ENTRY VirtualAddresses, _In_ ULONG Flags);
+
   typedef USHORT(WINAPI *RtlCaptureStackBackTrace_t)(_In_ ULONG FramesToSkip, _In_ ULONG FramesToCapture, _Out_ PVOID *BackTrace, _Out_opt_ PULONG BackTraceHash);
 
   typedef BOOL(WINAPI *SymInitialize_t)(_In_ HANDLE hProcess, _In_opt_ PCTSTR UserSearchPath, _In_ BOOL fInvadeProcess);
@@ -262,6 +281,7 @@ namespace windows_nt_kernel
   typedef BOOL(WINAPI *SymGetLineFromAddr64_t)(_In_ HANDLE hProcess, _In_ DWORD64 dwAddr, _Out_ PDWORD pdwDisplacement, _Out_ PIMAGEHLP_LINE64 Line);
 
   typedef BOOLEAN(WINAPI *RtlDosPathNameToNtPathName_U_t)(__in PCWSTR DosFileName, __out PUNICODE_STRING NtFileName, __out_opt PWSTR *FilePart, __out_opt PVOID RelativeName);
+
 
   typedef struct _FILE_BASIC_INFORMATION
   {
@@ -462,10 +482,15 @@ namespace windows_nt_kernel
   static NtDelayExecution_t NtDelayExecution;
   static NtLockFile_t NtLockFile;
   static NtUnlockFile_t NtUnlockFile;
+  static NtCreateSection_t NtCreateSection;
+  static NtExtendSection_t NtExtendSection;
+  static NtMapViewOfSection_t NtMapViewOfSection;
+  static NtUnmapViewOfSection_t NtUnmapViewOfSection;
   static RtlGenRandom_t RtlGenRandom;
   static OpenProcessToken_t OpenProcessToken;
   static LookupPrivilegeValue_t LookupPrivilegeValue;
   static AdjustTokenPrivileges_t AdjustTokenPrivileges;
+  static PrefetchVirtualMemory_t PrefetchVirtualMemory_;
   static SymInitialize_t SymInitialize;
   static SymGetLineFromAddr64_t SymGetLineFromAddr64;
   static RtlCaptureStackBackTrace_t RtlCaptureStackBackTrace;
@@ -483,6 +508,7 @@ namespace windows_nt_kernel
     static stl11::mutex lock;
     stl11::lock_guard<decltype(lock)> g(lock);
     static HMODULE ntdllh = GetModuleHandleA("NTDLL.DLL");
+    static HMODULE kernel32 = GetModuleHandleA("KERNEL32.DLL");
     if(!NtQueryObject)
       if(!(NtQueryObject = (NtQueryObject_t) GetProcAddress(ntdllh, "NtQueryObject")))
         abort();
@@ -528,6 +554,18 @@ namespace windows_nt_kernel
     if(!NtUnlockFile)
       if(!(NtUnlockFile = (NtUnlockFile_t) GetProcAddress(ntdllh, "NtUnlockFile")))
         abort();
+    if(!NtCreateSection)
+      if(!(NtCreateSection = (NtCreateSection_t) GetProcAddress(ntdllh, "NtCreateSection")))
+        abort();
+    if(!NtExtendSection)
+      if(!(NtExtendSection = (NtExtendSection_t) GetProcAddress(ntdllh, "NtExtendSection")))
+        abort();
+    if(!NtMapViewOfSection)
+      if(!(NtMapViewOfSection = (NtMapViewOfSection_t) GetProcAddress(ntdllh, "NtMapViewOfSection")))
+        abort();
+    if(!NtUnmapViewOfSection)
+      if(!(NtUnmapViewOfSection = (NtUnmapViewOfSection_t) GetProcAddress(ntdllh, "NtUnmapViewOfSection")))
+        abort();
     HMODULE advapi32 = LoadLibraryA("ADVAPI32.DLL");
     if(!RtlGenRandom)
       if(!(RtlGenRandom = (RtlGenRandom_t) GetProcAddress(advapi32, "SystemFunction036")))
@@ -540,6 +578,9 @@ namespace windows_nt_kernel
         abort();
     if(!AdjustTokenPrivileges)
       if(!(AdjustTokenPrivileges = (AdjustTokenPrivileges_t) GetProcAddress(advapi32, "AdjustTokenPrivileges")))
+        abort();
+    if(!PrefetchVirtualMemory_)
+      if(!(PrefetchVirtualMemory_ = (PrefetchVirtualMemory_t) GetProcAddress(kernel32, "PrefetchVirtualMemory ")))
         abort();
 #ifdef BOOST_AFIO_OP_STACKBACKTRACEDEPTH
     if(dbghelp)

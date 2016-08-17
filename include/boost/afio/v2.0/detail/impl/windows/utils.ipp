@@ -43,11 +43,23 @@ namespace utils
   {
     using namespace BOOST_AFIO_V2_NAMESPACE::detail;
   }
+  size_t page_size() noexcept
+  {
+    static size_t ret;
+    if(!ret)
+    {
+      SYSTEM_INFO si;
+      memset(&si, 0, sizeof(si));
+      GetSystemInfo(&si);
+      ret = si.dwPageSize;
+    }
+    return ret;
+  }
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 6387)  // MSVC sanitiser warns that GetModuleHandleA() might fail (hah!)
 #endif
-  std::vector<size_t> page_sizes(bool only_actually_available) noexcept
+  std::vector<size_t> page_sizes(bool only_actually_available)
   {
     static boost_lite::configurable_spinlock::spinlock<bool> lock;
     static std::vector<size_t> pagesizes, pagesizes_available;
