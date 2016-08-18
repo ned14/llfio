@@ -579,9 +579,9 @@ namespace windows_nt_kernel
     if(!AdjustTokenPrivileges)
       if(!(AdjustTokenPrivileges = (AdjustTokenPrivileges_t) GetProcAddress(advapi32, "AdjustTokenPrivileges")))
         abort();
+    // Only provided on Windows 8 and above
     if(!PrefetchVirtualMemory_)
-      if(!(PrefetchVirtualMemory_ = (PrefetchVirtualMemory_t) GetProcAddress(kernel32, "PrefetchVirtualMemory ")))
-        abort();
+      PrefetchVirtualMemory_ = (PrefetchVirtualMemory_t) GetProcAddress(kernel32, "PrefetchVirtualMemory");
 #ifdef BOOST_AFIO_OP_STACKBACKTRACEDEPTH
     if(dbghelp)
     {

@@ -46,6 +46,9 @@ result<section_handle> section_handle::section(file_handle &backing, extent_type
     maximum_size = length;
   }
   maximum_size = utils::round_up_to_page_size(maximum_size);
+  // On Windows, no protection means reserve don't commit
+  if(!_flag)
+    _flag = flag::nocommit;
   result<section_handle> ret(section_handle(native_handle_type(), backing.is_valid() ? &backing : nullptr, maximum_size, _flag));
   native_handle_type &nativeh = ret.get()._v;
   ACCESS_MASK access = SECTION_QUERY;
@@ -55,24 +58,34 @@ result<section_handle> section_handle::section(file_handle &backing, extent_type
   if(_flag & flag::read)
   {
     access |= SECTION_MAP_READ;
-    prot = PAGE_READONLY;
     nativeh.behaviour |= native_handle_type::disposition::readable;
   }
   if(_flag & flag::write)
   {
     access |= SECTION_MAP_WRITE;
-    prot = PAGE_READWRITE;
     nativeh.behaviour |= native_handle_type::disposition::writable;
   }
   if(_flag & flag::execute)
   {
     access |= SECTION_MAP_EXECUTE;
-    prot = PAGE_EXECUTE;
   }
-  if(_flag & flag::cow)
+  if(!!(_flag & flag::cow) && !!(_flag & flag::execute))
+    prot = PAGE_EXECUTE_WRITECOPY;
+  else if(_flag & flag::execute)
+    prot = PAGE_EXECUTE;
+  else if(_flag & flag::cow)
     prot = PAGE_WRITECOPY;
+  else if(_flag & flag::write)
+    prot = PAGE_READWRITE;
+  else if(_flag & flag::read)
+    prot = PAGE_READONLY;
+  else
+    prot = PAGE_NOACCESS;
   if(_flag & flag::nocommit)
+  {
     attribs = SEC_RESERVE;
+    prot = PAGE_READONLY;  // Windows doesn't permit PAGE_NOACCESS for reservations
+  }
   else
     attribs = SEC_COMMIT;
   if(_flag & flag::executable)
@@ -86,9 +99,11 @@ result<section_handle> section_handle::section(file_handle &backing, extent_type
   // InitializeObjectAttributes(&ObjectAttributes, &NULL, 0, NULL, NULL);
   LARGE_INTEGER _maximum_size;
   _maximum_size.QuadPart = maximum_size;
-  NTSTATUS ntstat = NtCreateSection(&nativeh.h, access, NULL, &_maximum_size, prot, attribs, backing.is_valid() ? backing.native_handle().h : NULL);
+  HANDLE h;
+  NTSTATUS ntstat = NtCreateSection(&h, access, NULL, &_maximum_size, prot, attribs, backing.is_valid() ? backing.native_handle().h : NULL);
   if(STATUS_SUCCESS != ntstat)
     return make_errored_result_nt<section_handle>(ntstat);
+  nativeh.h = h;
   return ret;
 }
 
@@ -116,6 +131,7 @@ map_handle::~map_handle()
     if(ret.has_error())
     {
       BOOST_AFIO_LOG_FATAL(_v.h, "map_handle::~map_handle() close failed");
+      abort();
     }
   }
 }
@@ -214,7 +230,7 @@ result<map_handle::buffer_type> map_handle::commit(buffer_type region, section_h
   DWORD prot = 0;
   if(_flag == section_handle::flag::none)
   {
-    BOOST_OUTCOME_FILTER_ERROR(_region, dontneed(region));
+    BOOST_OUTCOME_FILTER_ERROR(_region, do_not_store(region));
     if(!VirtualProtect(_region.first, _region.second, PAGE_NOACCESS, NULL))
       return make_errored_result<buffer_type>(GetLastError());
     return _region;
@@ -264,7 +280,7 @@ result<span<map_handle::buffer_type>> map_handle::prefetch(span<buffer_type> reg
   return regions;
 }
 
-result<map_handle::buffer_type> map_handle::dontneed(buffer_type region) noexcept
+result<map_handle::buffer_type> map_handle::do_not_store(buffer_type region) noexcept
 {
   region = utils::round_to_page_size(region);
   if(!VirtualAlloc(region.first, region.second, MEM_RESET, 0))

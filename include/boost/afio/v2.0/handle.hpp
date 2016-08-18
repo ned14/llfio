@@ -362,8 +362,11 @@ public:
 public:
   //! Default constructor
   constexpr io_handle() = default;
-  //! Same constructors as handle
-  using handle::handle;
+  //! Construct a handle from a supplied native handle
+  BOOST_CXX14_CONSTEXPR io_handle(native_handle_type h, caching caching = caching::none, flag flags = flag::none)
+      : handle(h, caching, flags)
+  {
+  }
   //! Explicit conversion from handle permitted
   explicit io_handle(handle &&o) noexcept : handle(std::move(o)) {}
   using handle::really_copy;

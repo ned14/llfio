@@ -86,7 +86,7 @@ public:
   }
   //! Construct a section handle using the given native handle type for the section and the given i/o handle for the backing storage
   explicit section_handle(native_handle_type sectionh, io_handle *backing, extent_type maximum_size, flag __flag)
-      : handle(sectionh)
+      : handle(sectionh, handle::caching::all)
       , _backing(backing)
       , _length(maximum_size)
       , _flag(__flag)
@@ -175,6 +175,9 @@ inline std::ostream &operator<<(std::ostream &s, const section_handle::flag &v)
 \note The native handle returned by this map handle is always that of the backing storage, but closing this handle
 does not close that of the backing storage, nor does releasing this handle release that of the backing storage.
 Locking byte ranges of this handle is therefore equal to locking byte ranges in the original backing storage.
+
+\todo MADV_NOSYNC on FreeBSD needs to applied when the file is temporary
+\todo MADV_FREE on FreeBSD seems to do what MADV_DONTNEED does on Linux, investigate.
 */
 class BOOST_AFIO_DECL map_handle : public io_handle
 {
@@ -280,7 +283,7 @@ public:
 
   //! Ask the system to unset the dirty flag for the memory represented by the buffer. This will prevent any changes not yet sent to the backing storage from being sent in the future, also if the system kicks out this page and reloads it you may see some edition of the underlying storage instead of what was here. addr
   //! and length should be page aligned (see utils::page_sizes()), if not the returned buffer is the region actually undirtied.
-  static result<buffer_type> dontneed(buffer_type region) noexcept;
+  static result<buffer_type> do_not_store(buffer_type region) noexcept;
 
   /*! \brief Read data from the mapped view.
 

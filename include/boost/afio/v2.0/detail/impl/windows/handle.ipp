@@ -53,6 +53,7 @@ handle::~handle()
     if(ret.has_error())
     {
       BOOST_AFIO_LOG_FATAL(_v.h, "handle::~handle() close failed");
+      abort();
     }
   }
 }

@@ -12,25 +12,58 @@ template <class U> inline void section_handle_create_close_(U &&f)
   using namespace BOOST_AFIO_V2_NAMESPACE;
 
   // Create a temporary file and put some text into it
-  auto temph = file_handle::file("tempfile", file_handle::mode::write, file_handle::creation::if_needed).get();
-  temph.write(0, "niall is not here", 17).get();
+  file_handle temph;
   auto boundf = [&](auto... pars) { return f(temph, pars...); };
 
   // clang-format off
-  static const auto permuter(mt_permute_parameters<
+  static const auto permuter(st_permute_parameters<
     result<void>,                               
     parameters<                              
       typename section_handle::extent_type,
       typename section_handle::flag
     >,
-    precondition::filesystem_setup_parameters
+    precondition::filesystem_setup_parameters,
+    postcondition::custom_parameters<bool>
   >(
     {
-      // Does the mode parameter have the expected side effects?
-      {   make_ready_result<void>(), { 1, section_handle::flag::read }, { "_" } },
-    },
-    precondition::filesystem_setup()
-    ));
+      { make_ready_result<void>(),{ 1, section_handle::flag::none },{ "_" },{ false } },
+      { make_ready_result<void>(),{ 1, section_handle::flag::read },{ "_" },{ false } },
+      { make_ready_result<void>(),{ 1, section_handle::flag::write },{ "_" },{ false } },
+      { make_ready_result<void>(),{ 1, section_handle::flag::cow },{ "_" },{ false } },
+      { make_ready_result<void>(),{ 1, section_handle::flag::execute },{ "_" },{ false } },
+      { make_ready_result<void>(),{ 1, section_handle::flag::write|section_handle::flag::nocommit },{ "_" },{ false } },
+      { make_ready_result<void>(),{ 1, section_handle::flag::write|section_handle::flag::prefault },{ "_" },{ false } },
+      //{ make_ready_result<void>(),{ 1, section_handle::flag::write|section_handle::flag::executable },{ "_" },{ false } },
+
+      { make_ready_result<void>(),{ 1, section_handle::flag::none },{ "_" },{ true } },
+      { make_ready_result<void>(),{ 1, section_handle::flag::read },{ "_" },{ true } },
+      { make_ready_result<void>(),{ 1, section_handle::flag::write },{ "_" },{ true } },
+      { make_ready_result<void>(),{ 1, section_handle::flag::cow },{ "_" },{ true } },
+      { make_ready_result<void>(),{ 1, section_handle::flag::execute },{ "_" },{ true } },
+      { make_ready_result<void>(),{ 1, section_handle::flag::write | section_handle::flag::nocommit },{ "_" },{ true } },
+      { make_ready_result<void>(),{ 1, section_handle::flag::write | section_handle::flag::prefault },{ "_" },{ true } },
+      //{ make_ready_result<void>(),{ 1, section_handle::flag::write|section_handle::flag::executable },{ "_" },{ true } },
+  },
+    precondition::filesystem_setup(),
+    postcondition::custom(
+      [&](auto *, auto &testreturn, size_t, int use_file_backing) {
+        if (use_file_backing)
+        {
+          temph = file_handle::file("tempfile", file_handle::mode::write, file_handle::creation::if_needed).get();
+          temph.write(0, "niall is not here", 17).get();
+        }
+        else
+          temph = file_handle();
+        return &testreturn;
+      },
+      [&](auto *testreturn) {
+        // Need to close the section and any backing file as otherwise filesystem_setup won't be able to clear up the working dir
+        if (*testreturn)
+          testreturn->get().close();
+        temph.close();
+      },
+    "check section")
+  ));
   // clang-format on
 
   auto results = permuter(boundf);
