@@ -355,8 +355,8 @@ static <a class="el" href="namespaceboost_1_1afio_1_1v2__xxx.html#ac8d06ecaa9660
 &lt; <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a811166f987d82fcd3c85c6aa0b9b4f34">buffer_type</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1map__handle.html#a7b7036b13db0a4e7ac90193afd22cca9">prefetch</a> (span&lt; <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a811166f987d82fcd3c85c6aa0b9b4f34">buffer_type</a> &gt; regions) noexcept</td></tr>
 <tr class="memdesc:a7b7036b13db0a4e7ac90193afd22cca9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Ask the system to begin to asynchronously prefetch the span of memory regions given, returning the regions actually prefetched. Note that on Windows 7 or earlier the system call to implement this was not available, and so you will see an empty span returned. <br/></td></tr>
 <tr class="separator:a7b7036b13db0a4e7ac90193afd22cca9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6e0505327903b809261502c1c40112d3"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="namespaceboost_1_1afio_1_1v2__xxx.html#ac8d06ecaa9660e7251c1251d88c1305c">result</a>&lt; <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a811166f987d82fcd3c85c6aa0b9b4f34">buffer_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1map__handle.html#a6e0505327903b809261502c1c40112d3">dontneed</a> (<a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a811166f987d82fcd3c85c6aa0b9b4f34">buffer_type</a> region) noexcept</td></tr>
-<tr class="separator:a6e0505327903b809261502c1c40112d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acf2dbad9fb261c665e9f082beb7050d5"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="namespaceboost_1_1afio_1_1v2__xxx.html#ac8d06ecaa9660e7251c1251d88c1305c">result</a>&lt; <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a811166f987d82fcd3c85c6aa0b9b4f34">buffer_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1map__handle.html#acf2dbad9fb261c665e9f082beb7050d5">do_not_store</a> (<a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a811166f987d82fcd3c85c6aa0b9b4f34">buffer_type</a> region) noexcept</td></tr>
+<tr class="separator:acf2dbad9fb261c665e9f082beb7050d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
@@ -381,9 +381,12 @@ char *&#160;</td><td class="memItemRight" valign="bottom"><b>_addr</b></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>A handle to a memory mapped region of memory. </p>
-<dl class="section note"><dt>Note</dt><dd>The native handle returned by this map handle is always that of the backing storage, but closing this handle does not close that of the backing storage, nor does releasing this handle release that of the backing storage. Locking byte ranges of this handle is therefore equal to locking byte ranges in the original backing storage. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>The native handle returned by this map handle is always that of the backing storage, but closing this handle does not close that of the backing storage, nor does releasing this handle release that of the backing storage. Locking byte ranges of this handle is therefore equal to locking byte ranges in the original backing storage.</dd></dl>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000002">Todo:</a></b></dt><dd><p class="startdd">MADV_NOSYNC on FreeBSD needs to applied when the file is temporary </p>
+<p class="enddd">MADV_FREE on FreeBSD seems to do what MADV_DONTNEED does on Linux, investigate. </p>
+</dd></dl>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="a6e0505327903b809261502c1c40112d3"></a>
+<a class="anchor" id="acf2dbad9fb261c665e9f082beb7050d5"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -391,7 +394,7 @@ char *&#160;</td><td class="memItemRight" valign="bottom"><b>_addr</b></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static <a class="el" href="namespaceboost_1_1afio_1_1v2__xxx.html#ac8d06ecaa9660e7251c1251d88c1305c">result</a>&lt;<a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a811166f987d82fcd3c85c6aa0b9b4f34">buffer_type</a>&gt; boost::afio::v2_xxx::map_handle::dontneed </td>
+          <td class="memname">static <a class="el" href="namespaceboost_1_1afio_1_1v2__xxx.html#ac8d06ecaa9660e7251c1251d88c1305c">result</a>&lt;<a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a811166f987d82fcd3c85c6aa0b9b4f34">buffer_type</a>&gt; boost::afio::v2_xxx::map_handle::do_not_store </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a811166f987d82fcd3c85c6aa0b9b4f34">buffer_type</a>&#160;</td>
           <td class="paramname"><em>region</em></td><td>)</td>
@@ -501,12 +504,12 @@ char *&#160;</td><td class="memItemRight" valign="bottom"><b>_addr</b></td></tr>
 </table>
 </div><div class="memdoc">
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><a name="l00533"></a><span class="lineno">  533</span>&#160;  {</div>
-<div class="line"><a name="l00534"></a><span class="lineno">  534</span>&#160;    <span class="keywordtype">size_t</span> bytes = 0;</div>
-<div class="line"><a name="l00535"></a><span class="lineno">  535</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;i : reqs.buffers)</div>
-<div class="line"><a name="l00536"></a><span class="lineno">  536</span>&#160;      bytes += i.second;</div>
-<div class="line"><a name="l00537"></a><span class="lineno">  537</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#aebd9c90a901e6364c94d466425db6e0f" title="Tries to lock the range of bytes specified for shared or exclusive access. Be aware this passes throu...">lock</a>(reqs.offset, bytes, <span class="keyword">false</span>, std::move(d));</div>
-<div class="line"><a name="l00538"></a><span class="lineno">  538</span>&#160;  }</div>
+<div class="fragment"><div class="line"><a name="l00536"></a><span class="lineno">  536</span>&#160;  {</div>
+<div class="line"><a name="l00537"></a><span class="lineno">  537</span>&#160;    <span class="keywordtype">size_t</span> bytes = 0;</div>
+<div class="line"><a name="l00538"></a><span class="lineno">  538</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;i : reqs.buffers)</div>
+<div class="line"><a name="l00539"></a><span class="lineno">  539</span>&#160;      bytes += i.second;</div>
+<div class="line"><a name="l00540"></a><span class="lineno">  540</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#aebd9c90a901e6364c94d466425db6e0f" title="Tries to lock the range of bytes specified for shared or exclusive access. Be aware this passes throu...">lock</a>(reqs.offset, bytes, <span class="keyword">false</span>, std::move(d));</div>
+<div class="line"><a name="l00541"></a><span class="lineno">  541</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -542,12 +545,12 @@ char *&#160;</td><td class="memItemRight" valign="bottom"><b>_addr</b></td></tr>
 </table>
 </div><div class="memdoc">
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><a name="l00541"></a><span class="lineno">  541</span>&#160;  {</div>
-<div class="line"><a name="l00542"></a><span class="lineno">  542</span>&#160;    <span class="keywordtype">size_t</span> bytes = 0;</div>
-<div class="line"><a name="l00543"></a><span class="lineno">  543</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;i : reqs.buffers)</div>
-<div class="line"><a name="l00544"></a><span class="lineno">  544</span>&#160;      bytes += i.second;</div>
-<div class="line"><a name="l00545"></a><span class="lineno">  545</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#aebd9c90a901e6364c94d466425db6e0f" title="Tries to lock the range of bytes specified for shared or exclusive access. Be aware this passes throu...">lock</a>(reqs.offset, bytes, <span class="keyword">true</span>, std::move(d));</div>
-<div class="line"><a name="l00546"></a><span class="lineno">  546</span>&#160;  }</div>
+<div class="fragment"><div class="line"><a name="l00544"></a><span class="lineno">  544</span>&#160;  {</div>
+<div class="line"><a name="l00545"></a><span class="lineno">  545</span>&#160;    <span class="keywordtype">size_t</span> bytes = 0;</div>
+<div class="line"><a name="l00546"></a><span class="lineno">  546</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;i : reqs.buffers)</div>
+<div class="line"><a name="l00547"></a><span class="lineno">  547</span>&#160;      bytes += i.second;</div>
+<div class="line"><a name="l00548"></a><span class="lineno">  548</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#aebd9c90a901e6364c94d466425db6e0f" title="Tries to lock the range of bytes specified for shared or exclusive access. Be aware this passes throu...">lock</a>(reqs.offset, bytes, <span class="keyword">true</span>, std::move(d));</div>
+<div class="line"><a name="l00549"></a><span class="lineno">  549</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -745,12 +748,12 @@ char *&#160;</td><td class="memItemRight" valign="bottom"><b>_addr</b></td></tr>
 </table>
 </div><div class="memdoc">
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;  {</div>
-<div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;    <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a811166f987d82fcd3c85c6aa0b9b4f34" title="The scatter buffer type used by this handle.">buffer_type</a> _reqs[1] = {{data, bytes}};</div>
-<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;    io_request&lt;buffers_type&gt; reqs(<a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a9085d19b744d1330eafa51fffc49e104" title="The scatter buffers type used by this handle.">buffers_type</a>(_reqs), offset);</div>
-<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;    BOOST_OUTCOME_FILTER_ERROR(v, <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#ab371d8427aeb4bd0ca5f8a39a98ea5a2" title="Read data from the open handle.">read</a>(reqs, d));</div>
-<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;    <span class="keywordflow">return</span> *v.data();</div>
-<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;  }</div>
+<div class="fragment"><div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;  {</div>
+<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;    <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a811166f987d82fcd3c85c6aa0b9b4f34" title="The scatter buffer type used by this handle.">buffer_type</a> _reqs[1] = {{data, bytes}};</div>
+<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;    io_request&lt;buffers_type&gt; reqs(<a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a9085d19b744d1330eafa51fffc49e104" title="The scatter buffers type used by this handle.">buffers_type</a>(_reqs), offset);</div>
+<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;    BOOST_OUTCOME_FILTER_ERROR(v, <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#ab371d8427aeb4bd0ca5f8a39a98ea5a2" title="Read data from the open handle.">read</a>(reqs, d));</div>
+<div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;    <span class="keywordflow">return</span> *v.data();</div>
+<div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -848,7 +851,7 @@ char *&#160;</td><td class="memItemRight" valign="bottom"><b>_addr</b></td></tr>
 </table>
 </div><div class="memdoc">
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><a name="l00530"></a><span class="lineno">  530</span>&#160;{ <span class="keywordflow">return</span> <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#aebd9c90a901e6364c94d466425db6e0f" title="Tries to lock the range of bytes specified for shared or exclusive access. Be aware this passes throu...">lock</a>(offset, bytes, exclusive, deadline(stl11::chrono::seconds(0))); }</div>
+<div class="fragment"><div class="line"><a name="l00533"></a><span class="lineno">  533</span>&#160;{ <span class="keywordflow">return</span> <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#aebd9c90a901e6364c94d466425db6e0f" title="Tries to lock the range of bytes specified for shared or exclusive access. Be aware this passes throu...">lock</a>(offset, bytes, exclusive, deadline(stl11::chrono::seconds(0))); }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1034,12 +1037,12 @@ char *&#160;</td><td class="memItemRight" valign="bottom"><b>_addr</b></td></tr>
 </table>
 </div><div class="memdoc">
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;  {</div>
-<div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;    <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#acbb752522c90f5e4596b8a4f07e2fa80" title="The gather buffer type used by this handle.">const_buffer_type</a> _reqs[1] = {{data, bytes}};</div>
-<div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;    io_request&lt;const_buffers_type&gt; reqs(<a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a692ba33b1e443510a791ff43f37d73cd" title="The gather buffers type used by this handle.">const_buffers_type</a>(_reqs), offset);</div>
-<div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;    BOOST_OUTCOME_FILTER_ERROR(v, <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a8890b6a6046fb562f9f0ab943b79dfb4" title="Write data to the open handle.">write</a>(reqs, d));</div>
-<div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;    <span class="keywordflow">return</span> *v.data();</div>
-<div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160;  }</div>
+<div class="fragment"><div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;  {</div>
+<div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;    <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#acbb752522c90f5e4596b8a4f07e2fa80" title="The gather buffer type used by this handle.">const_buffer_type</a> _reqs[1] = {{data, bytes}};</div>
+<div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160;    io_request&lt;const_buffers_type&gt; reqs(<a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a692ba33b1e443510a791ff43f37d73cd" title="The gather buffers type used by this handle.">const_buffers_type</a>(_reqs), offset);</div>
+<div class="line"><a name="l00425"></a><span class="lineno">  425</span>&#160;    BOOST_OUTCOME_FILTER_ERROR(v, <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a8890b6a6046fb562f9f0ab943b79dfb4" title="Write data to the open handle.">write</a>(reqs, d));</div>
+<div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160;    <span class="keywordflow">return</span> *v.data();</div>
+<div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>

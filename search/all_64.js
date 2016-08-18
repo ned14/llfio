@@ -10,5 +10,5 @@ var searchData=
   ['disable_5fkqueues',['disable_kqueues',['../classboost_1_1afio_1_1v2__xxx_1_1io__service.html#acae616853e07141e31bdf221a51b2fc0',1,'boost::afio::v2_xxx::io_service']]],
   ['disable_5fsafety_5ffsyncs',['disable_safety_fsyncs',['../structboost_1_1afio_1_1v2__xxx_1_1handle_1_1flag__base.html#a341bd60b4fd9aa6a6737f40e52d22458afa62fca7e0c53a86dfd47b93a2f8974f',1,'boost::afio::v2_xxx::handle::flag_base']]],
   ['disposition_5fbase',['disposition_base',['../structboost_1_1afio_1_1v2__xxx_1_1native__handle__type_1_1disposition__base.html',1,'boost::afio::v2_xxx::native_handle_type']]],
-  ['dontneed',['dontneed',['../classboost_1_1afio_1_1v2__xxx_1_1map__handle.html#a6e0505327903b809261502c1c40112d3',1,'boost::afio::v2_xxx::map_handle']]]
+  ['do_5fnot_5fstore',['do_not_store',['../classboost_1_1afio_1_1v2__xxx_1_1map__handle.html#acf2dbad9fb261c665e9f082beb7050d5',1,'boost::afio::v2_xxx::map_handle']]]
 ];

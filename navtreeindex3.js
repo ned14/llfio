@@ -1,5 +1,6 @@
 var NAVTREEINDEX3 =
 {
+"io__service_8hpp_source.html":[4,0,0,0,0,0,7],
 "lock__files_8hpp.html":[4,0,0,0,0,0,0,0,3],
 "lock__files_8hpp_source.html":[4,0,0,0,0,0,0,0,3],
 "map__handle_8hpp.html":[4,0,0,0,0,0,8],
@@ -248,6 +249,5 @@ var NAVTREEINDEX3 =
 "structboost_1_1afio_1_1v2__xxx_1_1storage__profile_1_1storage__profile.html#a03efff9ee431c43b9288e2869bace13a":[3,0,0,0,0,1,3,27],
 "structboost_1_1afio_1_1v2__xxx_1_1storage__profile_1_1storage__profile.html#a08e117ddec1c0b1cb2a601dc4e34a323":[3,0,0,0,0,1,3,15],
 "structboost_1_1afio_1_1v2__xxx_1_1storage__profile_1_1storage__profile.html#a0a870aa7cede1bd98ac357bb368b1086":[3,0,0,0,0,1,3,37],
-"structboost_1_1afio_1_1v2__xxx_1_1storage__profile_1_1storage__profile.html#a10d6cab54ce1b2bc1e7236d39b9dc361":[3,0,0,0,0,1,3,6],
-"structboost_1_1afio_1_1v2__xxx_1_1storage__profile_1_1storage__profile.html#a16582ee69c4ecd8ca6030f8fad3de639":[3,0,0,0,0,1,3,20]
+"structboost_1_1afio_1_1v2__xxx_1_1storage__profile_1_1storage__profile.html#a10d6cab54ce1b2bc1e7236d39b9dc361":[3,0,0,0,0,1,3,6]
 };
