@@ -46,28 +46,19 @@ result<section_handle> section_handle::section(file_handle &backing, extent_type
     maximum_size = length;
   }
   maximum_size = utils::round_up_to_page_size(maximum_size);
-  // On Windows, no protection means reserve don't commit
-  if(!_flag)
-    _flag = flag::nocommit;
   result<section_handle> ret(section_handle(native_handle_type(), backing.is_valid() ? &backing : nullptr, maximum_size, _flag));
   native_handle_type &nativeh = ret.get()._v;
-  ACCESS_MASK access = SECTION_QUERY;
   ULONG prot = 0, attribs = 0;
-  if(backing.is_valid())
-    access |= SECTION_EXTEND_SIZE;
+  // On Windows, no protection means reserve don't commit. We also ask for all permissions on the basis
+  // that he'll change permissions later
+  if(!_flag)
+    _flag = flag::nocommit;
   if(_flag & flag::read)
-  {
-    access |= SECTION_MAP_READ;
     nativeh.behaviour |= native_handle_type::disposition::readable;
-  }
   if(_flag & flag::write)
-  {
-    access |= SECTION_MAP_WRITE;
     nativeh.behaviour |= native_handle_type::disposition::writable;
-  }
   if(_flag & flag::execute)
   {
-    access |= SECTION_MAP_EXECUTE;
   }
   if(!!(_flag & flag::cow) && !!(_flag & flag::execute))
     prot = PAGE_EXECUTE_WRITECOPY;
@@ -84,7 +75,7 @@ result<section_handle> section_handle::section(file_handle &backing, extent_type
   if(_flag & flag::nocommit)
   {
     attribs = SEC_RESERVE;
-    prot = PAGE_READONLY;  // Windows doesn't permit PAGE_NOACCESS for reservations
+    prot = PAGE_READWRITE;  // Windows doesn't permit PAGE_NOACCESS for reservations
   }
   else
     attribs = SEC_COMMIT;
@@ -100,7 +91,7 @@ result<section_handle> section_handle::section(file_handle &backing, extent_type
   LARGE_INTEGER _maximum_size;
   _maximum_size.QuadPart = maximum_size;
   HANDLE h;
-  NTSTATUS ntstat = NtCreateSection(&h, access, NULL, &_maximum_size, prot, attribs, backing.is_valid() ? backing.native_handle().h : NULL);
+  NTSTATUS ntstat = NtCreateSection(&h, SECTION_ALL_ACCESS, NULL, &_maximum_size, prot, attribs, backing.is_valid() ? backing.native_handle().h : NULL);
   if(STATUS_SUCCESS != ntstat)
     return make_errored_result_nt<section_handle>(ntstat);
   nativeh.h = h;
@@ -199,7 +190,9 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
     prot = PAGE_READONLY;
     nativeh.behaviour |= native_handle_type::disposition::seekable | native_handle_type::disposition::readable;
   }
-  if(_flag & section_handle::flag::execute)
+  if(!!(_flag & section_handle::flag::cow) && !!(_flag & section_handle::flag::execute))
+    prot = PAGE_EXECUTE_WRITECOPY;
+  else if(_flag & section_handle::flag::execute)
     prot = PAGE_EXECUTE;
   NTSTATUS ntstat = NtMapViewOfSection(section.native_handle().h, GetCurrentProcess(), &addr, 0, commitsize, &_offset, &_bytes, ViewUnmap, allocation, prot);
   if(STATUS_SUCCESS != ntstat)
@@ -312,15 +305,16 @@ map_handle::io_result<map_handle::buffers_type> map_handle::read(io_request<buff
 map_handle::io_result<map_handle::const_buffers_type> map_handle::write(io_request<const_buffers_type> reqs, deadline) noexcept
 {
   BOOST_AFIO_LOG_FUNCTION_CALL(_v.h);
-  const char *addr = _addr + reqs.offset;
+  char *addr = _addr + reqs.offset;
   size_type togo = (size_type)(_length - reqs.offset);
   for(const_buffer_type &req : reqs.buffers)
   {
     if(togo)
     {
-      req.first = addr;
       if(req.second < togo)
         req.second = togo;
+      memcpy(addr, req.first, req.second);
+      req.first = addr;
       addr += req.second;
       togo -= req.second;
     }
