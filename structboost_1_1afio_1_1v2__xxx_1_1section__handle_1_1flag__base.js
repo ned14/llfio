@@ -8,6 +8,7 @@ var structboost_1_1afio_1_1v2__xxx_1_1section__handle_1_1flag__base =
       [ "execute", "structboost_1_1afio_1_1v2__xxx_1_1section__handle_1_1flag__base.html#aadb6d09d6768eb7ef629f3c10aa24b21ab14c76ef314929dfcb3bf1a2ca04e546", null ],
       [ "nocommit", "structboost_1_1afio_1_1v2__xxx_1_1section__handle_1_1flag__base.html#aadb6d09d6768eb7ef629f3c10aa24b21af370cf4af051d7f4f8983a5a15dd8073", null ],
       [ "prefault", "structboost_1_1afio_1_1v2__xxx_1_1section__handle_1_1flag__base.html#aadb6d09d6768eb7ef629f3c10aa24b21a1c2fc1d3eb7aca3d9e451ef1f03e064d", null ],
-      [ "executable", "structboost_1_1afio_1_1v2__xxx_1_1section__handle_1_1flag__base.html#aadb6d09d6768eb7ef629f3c10aa24b21ac32f8cabf653ea869cc4103438042ca8", null ]
+      [ "executable", "structboost_1_1afio_1_1v2__xxx_1_1section__handle_1_1flag__base.html#aadb6d09d6768eb7ef629f3c10aa24b21ac32f8cabf653ea869cc4103438042ca8", null ],
+      [ "readwrite", "structboost_1_1afio_1_1v2__xxx_1_1section__handle_1_1flag__base.html#aadb6d09d6768eb7ef629f3c10aa24b21a3679fcd46b6d429adf70faadca695fd6", null ]
     ] ]
 ];

@@ -933,8 +933,7 @@ char *&#160;</td><td class="memItemRight" valign="bottom"><b>_addr</b></td></tr>
 </div><div class="memdoc">
 
 <p>Write data to the mapped view. </p>
-<dl class="section note"><dt>Note</dt><dd>Because this implementation never copies memory, you can pass in buffers with a null address.</dd></dl>
-<dl class="section return"><dt>Returns</dt><dd>The buffers written, which will never be the buffers input because they will point into the mapped view. The size of each scatter-gather buffer is updated with the number of bytes of that buffer transferred. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The buffers written, which will never be the buffers input because they will point at where the data was copied into the mapped view. The size of each scatter-gather buffer is updated with the number of bytes of that buffer transferred. </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">reqs</td><td>A scatter-gather and offset request. </td></tr>
