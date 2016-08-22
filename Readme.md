@@ -6,10 +6,21 @@ v2 rewrite. You can view its documentation at https://ned14.github.io/boost.afio
 Tarballs of source and prebuilt binaries with all unit tests passing: https://dedi4.nedprod.com/static/files/
 
 
-CMake todos:
+CppCon 2016 todos:
+- Fix remaining failures in map_handle.
+- Test open_hash_index on valgrind, I ran out of time during the weekend.
+  - Ideally raise that test on per-commit CI via ctest support for valgrind.
+- Create algorithm::shared_fs_mutex::memory_map<> which places an open_hash_index<>
+inside a map_handle region.
+  - If non_local_count > 0, use byte range locks on everything :)
+  - Use read lock at very end to determine when non local users have gone away
 - Rename all ParseProjectVersionFromHpp etc to parse_project_version_from_hpp etc
-- Static library edition appears to not be encoding extended error code detail?
-  - Add a unit test!
+- DLL library edition appears to not be encoding extended error code detail because
+it's not sharing a single ringbuffer_log. Hard to fix given Outcome could be being
+used by multiple libraries as a header only library, need to figure out some global
+fix e.g. named shared memory.
+
+
 
 Later:
 - Each test runner needs to be compiled into many sanitising build variants

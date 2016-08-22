@@ -29,6 +29,10 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
+//#include <iostream>
+//#define BOOST_AFIO_LOG_TO_OSTREAM std::cout
+//#define BOOST_AFIO_LOGGING_LEVEL 99
+
 //! \file config.hpp Configures a compiler environment for AFIO header and source code
 
 //! \defgroup config Configuration macros
@@ -186,11 +190,11 @@ DEALINGS IN THE SOFTWARE.
 #endif
 #ifdef BOOST_AFIO_UNSTABLE_VERSION
 #include "../revision.hpp"
-#define BOOST_AFIO_V2 (boost), (afio), (BOOSTLITE_BIND_NAMESPACE_VERSION(v, BOOST_AFIO_NAMESPACE_VERSION, BOOST_AFIO_V2_STL11_IMPL, BOOST_AFIO_V2_FILESYSTEM_IMPL, BOOST_AFIO_PREVIOUS_COMMIT_UNIQUE), inline)
+#define BOOST_AFIO_V2 (boost), (afio), (BOOSTLITE_BIND_NAMESPACE_VERSION(, BOOST_AFIO_NAMESPACE_VERSION, BOOST_AFIO_V2_STL11_IMPL, BOOST_AFIO_V2_FILESYSTEM_IMPL, BOOST_AFIO_PREVIOUS_COMMIT_UNIQUE), inline)
 #elif BOOST_AFIO_LATEST_VERSION == 2
-#define BOOST_AFIO_V2 (boost), (afio), (BOOSTLITE_BIND_NAMESPACE_VERSION(v, BOOST_AFIO_NAMESPACE_VERSION, BOOST_AFIO_V2_STL11_IMPL, BOOST_AFIO_V2_FILESYSTEM_IMPL), inline)
+#define BOOST_AFIO_V2 (boost), (afio), (BOOSTLITE_BIND_NAMESPACE_VERSION(, BOOST_AFIO_NAMESPACE_VERSION, BOOST_AFIO_V2_STL11_IMPL, BOOST_AFIO_V2_FILESYSTEM_IMPL), inline)
 #else
-#define BOOST_AFIO_V2 (boost), (afio), (BOOSTLITE_BIND_NAMESPACE_VERSION(v, BOOST_AFIO_NAMESPACE_VERSION, BOOST_AFIO_V2_STL11_IMPL, BOOST_AFIO_V2_FILESYSTEM_IMPL))
+#define BOOST_AFIO_V2 (boost), (afio), (BOOSTLITE_BIND_NAMESPACE_VERSION(, BOOST_AFIO_NAMESPACE_VERSION, BOOST_AFIO_V2_STL11_IMPL, BOOST_AFIO_V2_FILESYSTEM_IMPL))
 #endif
 /*! \def BOOST_AFIO_V2
 \ingroup config
@@ -417,6 +421,9 @@ BOOST_AFIO_V2_NAMESPACE_BEGIN
 inline BOOST_AFIO_DECL boost_lite::ringbuffer_log::simple_ringbuffer_log<BOOST_AFIO_LOGGING_MEMORY> &log() noexcept
 {
   static boost_lite::ringbuffer_log::simple_ringbuffer_log<BOOST_AFIO_LOGGING_MEMORY> _log(static_cast<boost_lite::ringbuffer_log::level>(BOOST_AFIO_LOGGING_LEVEL));
+#ifdef BOOST_AFIO_LOG_TO_OSTREAM
+  _log.immediate(&BOOST_AFIO_LOG_TO_OSTREAM);
+#endif
   return _log;
 }
 inline void record_error_into_afio_log(boost_lite::ringbuffer_log::level _level, const char *_message, unsigned _code1, unsigned _code2, const char *_function, unsigned lineno)
