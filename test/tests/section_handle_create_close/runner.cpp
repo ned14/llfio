@@ -39,7 +39,7 @@ template <class U> inline void section_handle_create_close_(U &&f)
       { make_ready_result<void>(),{ 1, section_handle::flag::read },{ "_" },{ true } },
       { make_ready_result<void>(),{ 1, section_handle::flag::write },{ "_" },{ true } },
       { make_ready_result<void>(),{ 1, section_handle::flag::cow },{ "_" },{ true } },
-      { make_ready_result<void>(),{ 1, section_handle::flag::execute },{ "_" },{ true } },
+      //{ make_ready_result<void>(),{ 1, section_handle::flag::execute },{ "_" },{ true } },
       { make_ready_result<void>(),{ 1, section_handle::flag::write | section_handle::flag::nocommit },{ "_" },{ true } },
       { make_ready_result<void>(),{ 1, section_handle::flag::write | section_handle::flag::prefault },{ "_" },{ true } },
       //{ make_ready_result<void>(),{ 1, section_handle::flag::write|section_handle::flag::executable },{ "_" },{ true } },
@@ -70,4 +70,4 @@ template <class U> inline void section_handle_create_close_(U &&f)
   check_results_with_boost_test(permuter, results);
 }
 
-BOOST_KERNELTEST_TEST_KERNEL(integration, afio, section_handle_create_close, section_handle, "Tests that afio::section_handle's creation parameters work as expected", section_handle_create_close_(section_handle_create_close::test_kernel_section_handle))
+BOOST_KERNELTEST_TEST_KERNEL(unit, afio, section_handle_create_close, section_handle, "Tests that afio::section_handle's creation parameters work as expected", section_handle_create_close_(section_handle_create_close::test_kernel_section_handle))

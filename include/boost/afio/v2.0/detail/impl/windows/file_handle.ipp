@@ -36,7 +36,6 @@ BOOST_AFIO_V2_NAMESPACE_BEGIN
 
 result<file_handle> file_handle::file(file_handle::path_type _path, file_handle::mode _mode, file_handle::creation _creation, file_handle::caching _caching, file_handle::flag flags) noexcept
 {
-  BOOST_AFIO_LOG_FUNCTION_CALL(0);
   result<file_handle> ret(file_handle(std::move(_path), native_handle_type(), _caching, flags));
   native_handle_type &nativeh = ret.get()._v;
   BOOST_OUTCOME_FILTER_ERROR(access, access_mask_from_handle_mode(nativeh, _mode));
@@ -58,7 +57,12 @@ result<file_handle> file_handle::file(file_handle::path_type _path, file_handle:
   BOOST_OUTCOME_FILTER_ERROR(attribs, attributes_from_handle_caching_and_flags(nativeh, _caching, flags));
   nativeh.behaviour |= native_handle_type::disposition::file;
   if(INVALID_HANDLE_VALUE == (nativeh.h = CreateFileW_(ret.value()._path.c_str(), access, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL, creation, attribs, NULL)))
-    return make_errored_result<file_handle>(GetLastError());
+  {
+    DWORD errcode = GetLastError();
+    BOOST_AFIO_LOG_FUNCTION_CALL(0);
+    return make_errored_result<file_handle>(errcode);
+  }
+  BOOST_AFIO_LOG_FUNCTION_CALL(nativeh.h);
   if(_creation == creation::truncate && ret.value().are_safety_fsyncs_issued())
     FlushFileBuffers(nativeh.h);
   return ret;
