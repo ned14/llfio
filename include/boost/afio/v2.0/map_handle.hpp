@@ -298,6 +298,7 @@ public:
   */
   //[[bindlib::make_free]]
   BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<buffers_type> read(io_request<buffers_type> reqs, deadline d = deadline()) noexcept;
+  using io_handle::read;
 
   /*! \brief Write data to the mapped view.
 
@@ -310,6 +311,7 @@ public:
   */
   //[[bindlib::make_free]]
   BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> write(io_request<const_buffers_type> reqs, deadline d = deadline()) noexcept;
+  using io_handle::write;
 };
 
 

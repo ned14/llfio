@@ -39,7 +39,6 @@ result<section_handle> section_handle::section(file_handle &backing, extent_type
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
-  BOOST_AFIO_LOG_FUNCTION_CALL(0);
   if(!maximum_size && backing.is_valid())
   {
     BOOST_OUTCOME_FILTER_ERROR(length, backing.length());
@@ -49,10 +48,6 @@ result<section_handle> section_handle::section(file_handle &backing, extent_type
   result<section_handle> ret(section_handle(native_handle_type(), backing.is_valid() ? &backing : nullptr, maximum_size, _flag));
   native_handle_type &nativeh = ret.get()._v;
   ULONG prot = 0, attribs = 0;
-  // On Windows, no protection means reserve don't commit. We also ask for all permissions on the basis
-  // that he'll change permissions later
-  if(!_flag)
-    _flag = flag::nocommit;
   if(_flag & flag::read)
     nativeh.behaviour |= native_handle_type::disposition::readable;
   if(_flag & flag::write)
@@ -72,7 +67,8 @@ result<section_handle> section_handle::section(file_handle &backing, extent_type
     prot = PAGE_READONLY;
   else
     prot = PAGE_NOACCESS;
-  if(_flag & flag::nocommit)
+  // On Windows, asking for inaccessible memory from the swap file is treated as address reservation
+  if(!backing.is_valid() && !_flag)
   {
     attribs = SEC_RESERVE;
     prot = PAGE_READWRITE;  // Windows doesn't permit PAGE_NOACCESS for reservations
@@ -93,8 +89,12 @@ result<section_handle> section_handle::section(file_handle &backing, extent_type
   HANDLE h;
   NTSTATUS ntstat = NtCreateSection(&h, SECTION_ALL_ACCESS, NULL, &_maximum_size, prot, attribs, backing.is_valid() ? backing.native_handle().h : NULL);
   if(STATUS_SUCCESS != ntstat)
+  {
+    BOOST_AFIO_LOG_FUNCTION_CALL(0);
     return make_errored_result_nt<section_handle>(ntstat);
+  }
   nativeh.h = h;
+  BOOST_AFIO_LOG_FUNCTION_CALL(nativeh.h);
   return ret;
 }
 
@@ -160,20 +160,22 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
-  BOOST_AFIO_LOG_FUNCTION_CALL(0);
   bytes = utils::round_up_to_page_size(bytes);
   result<map_handle> ret(map_handle(io_handle(), &section));
   native_handle_type &nativeh = ret.get()._v;
-  ULONG allocation = (section.section_flags() & section_handle::flag::nocommit) ? MEM_RESERVE : 0, prot = 0;
+  ULONG allocation = 0, prot = 0;
   PVOID addr = 0;
   size_t commitsize = bytes;
   LARGE_INTEGER _offset;
   _offset.QuadPart = offset;
   SIZE_T _bytes = bytes;
-  if(_flag == section_handle::flag::none)
+  if((section.section_flags() & section_handle::flag::nocommit) || (_flag == section_handle::flag::none))
   {
-    allocation = MEM_RESERVE;
+    // Perhaps this is only valid from kernel mode? Either way, any attempt to use MEM_RESERVE caused an invalid parameter error.
+    // Weirdly, setting commitsize to 0 seems to do a reserve as we wanted
+    // allocation = MEM_RESERVE;
     commitsize = 0;
+    prot = PAGE_NOACCESS;
   }
   else if(_flag & section_handle::flag::cow)
   {
@@ -196,23 +198,30 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
     prot = PAGE_EXECUTE;
   NTSTATUS ntstat = NtMapViewOfSection(section.native_handle().h, GetCurrentProcess(), &addr, 0, commitsize, &_offset, &_bytes, ViewUnmap, allocation, prot);
   if(STATUS_SUCCESS != ntstat)
+  {
+    BOOST_AFIO_LOG_FUNCTION_CALL(0);
     return make_errored_result_nt<map_handle>(ntstat);
+  }
   ret.get()._addr = (char *) addr;
   ret.get()._length = _bytes;
   // Make my handle borrow the native handle of my backing storage
-  ret.get()._v = section.backing_native_handle();
+  ret.get()._v.h = section.backing_native_handle().h;
+  BOOST_AFIO_LOG_FUNCTION_CALL(ret.get()._v.h);
 
   // Windows has no way of getting the kernel to prefault maps on creation, so ...
   if(section.section_flags() & section_handle::flag::prefault)
   {
     // Start an asynchronous prefetch
     buffer_type b((char *) addr, _bytes);
-    prefetch(span<buffer_type>(&b, 1));
-    size_t pagesize = utils::page_size();
-    // And follow it up with poking every page in the map
-    volatile char *a = (volatile char *) addr;
-    for(size_t n = 0; n < _bytes; n += pagesize)
-      a[n];
+    (void) prefetch(span<buffer_type>(&b, 1));
+    // If this kernel doesn't support that API, manually poke every page in the new map
+    if(!PrefetchVirtualMemory_)
+    {
+      size_t pagesize = utils::page_size();
+      volatile char *a = (volatile char *) addr;
+      for(size_t n = 0; n < _bytes; n += pagesize)
+        a[n];
+    }
   }
   return ret;
 }
@@ -291,7 +300,7 @@ map_handle::io_result<map_handle::buffers_type> map_handle::read(io_request<buff
     if(togo)
     {
       req.first = addr;
-      if(req.second < togo)
+      if(req.second > togo)
         req.second = togo;
       addr += req.second;
       togo -= req.second;
@@ -311,7 +320,7 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::write(io_reque
   {
     if(togo)
     {
-      if(req.second < togo)
+      if(req.second > togo)
         req.second = togo;
       memcpy(addr, req.first, req.second);
       req.first = addr;

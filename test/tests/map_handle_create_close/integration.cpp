@@ -5,4 +5,6 @@ File Created: Aug 2016
 
 #include "../kerneltest/include/boost/kerneltest.hpp"
 
-BOOST_KERNELTEST_TEST_KERNEL(integration, afio, map_handle_nocommit_and_commit, map_handle, "Tests that afio::map_handle's nocommit and commit work as expected", [] {})
+BOOST_KERNELTEST_TEST_KERNEL(integration, afio, map_handle_nocommit_and_commit, map_handle, "Tests that afio::map_handle's nocommit and commit work as expected", [] {
+  //! \todo TODO test map_handle::commit, decommit, zero, prefetch, do_not_store
+})
