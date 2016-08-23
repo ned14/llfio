@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
 # If necessary bring in the Boost lite cmake tooling
 list(FIND CMAKE_MODULE_PATH "boost-lite" boost_lite_idx)
 if(${boost_lite_idx} EQUAL -1)
