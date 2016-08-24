@@ -17,7 +17,7 @@ include(BoostLitePolicies)
 # Parse the version we tell cmake directly from the version header file
 ParseProjectVersionFromHpp("${CMAKE_CURRENT_SOURCE_DIR}/include/boost/afio/version.hpp" VERSIONSTRING)
 # Sets the usual PROJECT_NAME etc
-project(afio VERSION ${VERSIONSTRING} LANGUAGES CXX)
+project(afio VERSION ${VERSIONSTRING} LANGUAGES C CXX)
 # Also set a *cmake* namespace for this project
 set(PROJECT_NAMESPACE boost--)
 # This file should be updated with the last git SHA next commit
