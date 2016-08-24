@@ -106,7 +106,8 @@ $(document).ready(function(){initNavTree('file__handle_8hpp.html','');});
 <div class="header">
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
-<a href="#namespaces">Namespaces</a>  </div>
+<a href="#namespaces">Namespaces</a> &#124;
+<a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">file_handle.hpp File Reference</div>  </div>
 </div><!--header-->
@@ -115,6 +116,7 @@ $(document).ready(function(){initNavTree('file__handle_8hpp.html','');});
 <p>Provides file_handle.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &quot;<a class="el" href="handle_8hpp_source.html">handle.hpp</a>&quot;</code><br/>
+<code>#include &quot;<a class="el" href="utils_8hpp_source.html">utils.hpp</a>&quot;</code><br/>
 </div>
 <p><a href="file__handle_8hpp_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
@@ -135,6 +137,12 @@ Namespaces</h2></td></tr>
 <tr class="memitem:namespaceboost_1_1afio_1_1v2__xxx"><td class="memItemLeft" align="right" valign="top">namespace &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceboost_1_1afio_1_1v2__xxx.html">boost::afio::v2_xxx</a></td></tr>
 <tr class="memdesc:namespaceboost_1_1afio_1_1v2__xxx"><td class="mdescLeft">&#160;</td><td class="mdescRight">Inline namespace for this version of AFIO. <br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:ad7da7a1d3240d7574fc7c6ee5831b7ee"><td class="memItemLeft" align="right" valign="top">const fixme_path &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceboost_1_1afio_1_1v2__xxx.html#ad7da7a1d3240d7574fc7c6ee5831b7ee">boost::afio::v2_xxx::fixme_temporary_files_directory</a> () noexcept</td></tr>
+<tr class="memdesc:ad7da7a1d3240d7574fc7c6ee5831b7ee"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a path to a directory reported by the operating system to be suitable for storing temporary files. As operating systems are known to sometimes lie about the validity of this path, each of the available temporary file path options reported by the OS are probed by trying to create a file in each until success is found. If none of the available options are writable, some valid path containing the string "no_temporary_directories_accessible" will be returned which should cause all operations using that path to fail with a usefully user visible error message.  <a href="#ad7da7a1d3240d7574fc7c6ee5831b7ee">More...</a><br/></td></tr>
+<tr class="separator:ad7da7a1d3240d7574fc7c6ee5831b7ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Provides file_handle. </p>

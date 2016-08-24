@@ -208,6 +208,9 @@ span&lt; char &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceboost_1_1afio_1_1v2__xxx.html#aaa526a2f0758c697b243b93ce14bc461">strip_pretty_function</a> (char *out, size_t bytes, const char *in)</td></tr>
 <tr class="memdesc:aaa526a2f0758c697b243b93ce14bc461"><td class="mdescLeft">&#160;</td><td class="mdescRight">Strips a <b>PRETTY_FUNCTION</b> of all instances of <a class="el" href="namespaceboost_1_1afio.html" title="The AFIO namespace.">boost::afio</a>:: and boost::outcome:: <br/></td></tr>
 <tr class="separator:aaa526a2f0758c697b243b93ce14bc461"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad7da7a1d3240d7574fc7c6ee5831b7ee"><td class="memItemLeft" align="right" valign="top">const fixme_path &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceboost_1_1afio_1_1v2__xxx.html#ad7da7a1d3240d7574fc7c6ee5831b7ee">fixme_temporary_files_directory</a> () noexcept</td></tr>
+<tr class="memdesc:ad7da7a1d3240d7574fc7c6ee5831b7ee"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a path to a directory reported by the operating system to be suitable for storing temporary files. As operating systems are known to sometimes lie about the validity of this path, each of the available temporary file path options reported by the OS are probed by trying to create a file in each until success is found. If none of the available options are writable, some valid path containing the string "no_temporary_directories_accessible" will be returned which should cause all operations using that path to fail with a usefully user visible error message.  <a href="#ad7da7a1d3240d7574fc7c6ee5831b7ee">More...</a><br/></td></tr>
+<tr class="separator:ad7da7a1d3240d7574fc7c6ee5831b7ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a79c5b6d82d8ad47e694e69228446ace5"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a79c5b6d82d8ad47e694e69228446ace5"></a>
 std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator&lt;&lt;</b> (std::ostream &amp;s, const <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html">handle</a> &amp;v)</td></tr>
 <tr class="separator:a79c5b6d82d8ad47e694e69228446ace5"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -226,7 +229,34 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operato
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Inline namespace for this version of AFIO. </p>
-</div></div><!-- contents -->
+</div><h2 class="groupheader">Function Documentation</h2>
+<a class="anchor" id="ad7da7a1d3240d7574fc7c6ee5831b7ee"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const fixme_path&amp; boost::afio::v2_xxx::fixme_temporary_files_directory </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns a path to a directory reported by the operating system to be suitable for storing temporary files. As operating systems are known to sometimes lie about the validity of this path, each of the available temporary file path options reported by the OS are probed by trying to create a file in each until success is found. If none of the available options are writable, some valid path containing the string "no_temporary_directories_accessible" will be returned which should cause all operations using that path to fail with a usefully user visible error message. </p>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000002">Todo:</a></b></dt><dd>This function needs to become a static member function of <code>afio::path</code> once that is written, hence the 'fixme' in its title. </dd></dl>
+
+</div>
+</div>
+</div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->

@@ -1,6 +1,7 @@
 var searchData=
 [
   ['random_5fentity',['random_entity',['../classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex.html#a493872c8b5dbfa83fdf82242b928e112',1,'boost::afio::v2_xxx::algorithm::shared_fs_mutex::shared_fs_mutex']]],
+  ['random_5ffile',['random_file',['../classboost_1_1afio_1_1v2__xxx_1_1file__handle.html#a603b0827a9ae139b8f5806b1297fa5f0',1,'boost::afio::v2_xxx::file_handle']]],
   ['random_5ffill',['random_fill',['../namespaceboost_1_1afio_1_1v2__xxx_1_1utils.html#ac7b89428cdd460548bd9a645a6565df4',1,'boost::afio::v2_xxx::utils']]],
   ['random_5fstring',['random_string',['../namespaceboost_1_1afio_1_1v2__xxx_1_1utils.html#a051e8deb72941b3460811a1cf5f29915',1,'boost::afio::v2_xxx::utils']]],
   ['rdonly',['rdonly',['../structboost_1_1afio_1_1v2__xxx_1_1statfs__t_1_1f__flags__t.html#a888a1dcf7397f05e735c80f2e33bcf89',1,'boost::afio::v2_xxx::statfs_t::f_flags_t']]],

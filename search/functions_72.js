@@ -1,6 +1,7 @@
 var searchData=
 [
   ['random_5fentity',['random_entity',['../classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex.html#a493872c8b5dbfa83fdf82242b928e112',1,'boost::afio::v2_xxx::algorithm::shared_fs_mutex::shared_fs_mutex']]],
+  ['random_5ffile',['random_file',['../classboost_1_1afio_1_1v2__xxx_1_1file__handle.html#a603b0827a9ae139b8f5806b1297fa5f0',1,'boost::afio::v2_xxx::file_handle']]],
   ['random_5ffill',['random_fill',['../namespaceboost_1_1afio_1_1v2__xxx_1_1utils.html#ac7b89428cdd460548bd9a645a6565df4',1,'boost::afio::v2_xxx::utils']]],
   ['random_5fstring',['random_string',['../namespaceboost_1_1afio_1_1v2__xxx_1_1utils.html#a051e8deb72941b3460811a1cf5f29915',1,'boost::afio::v2_xxx::utils']]],
   ['read',['read',['../classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#ab371d8427aeb4bd0ca5f8a39a98ea5a2',1,'boost::afio::v2_xxx::io_handle::read(io_request&lt; buffers_type &gt; reqs, deadline d=deadline()) noexcept'],['../classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a4480a48b8e54cde62fd2cee4ceed3725',1,'boost::afio::v2_xxx::io_handle::read(extent_type offset, char *data, size_type bytes, deadline d=deadline()) noexcept'],['../classboost_1_1afio_1_1v2__xxx_1_1map__handle.html#a5b832e5045ae54db8561133763837a47',1,'boost::afio::v2_xxx::map_handle::read()'],['../structboost_1_1afio_1_1v2__xxx_1_1storage__profile_1_1storage__profile.html#afc56522cf4f6d90bd825f7f50bff7432',1,'boost::afio::v2_xxx::storage_profile::storage_profile::read()']]],

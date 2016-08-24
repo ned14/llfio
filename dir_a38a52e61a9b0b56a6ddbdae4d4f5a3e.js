@@ -7,9 +7,7 @@ var dir_a38a52e61a9b0b56a6ddbdae4d4f5a3e =
     ] ],
     [ "config.hpp", "config_8hpp.html", "config_8hpp" ],
     [ "deadline.h", "deadline_8h.html", "deadline_8h" ],
-    [ "file_handle.hpp", "file__handle_8hpp.html", [
-      [ "file_handle", "classboost_1_1afio_1_1v2__xxx_1_1file__handle.html", "classboost_1_1afio_1_1v2__xxx_1_1file__handle" ]
-    ] ],
+    [ "file_handle.hpp", "file__handle_8hpp.html", "file__handle_8hpp" ],
     [ "handle.hpp", "handle_8hpp.html", "handle_8hpp" ],
     [ "io_service.hpp", "io__service_8hpp.html", "io__service_8hpp" ],
     [ "map_handle.hpp", "map__handle_8hpp.html", "map__handle_8hpp" ],

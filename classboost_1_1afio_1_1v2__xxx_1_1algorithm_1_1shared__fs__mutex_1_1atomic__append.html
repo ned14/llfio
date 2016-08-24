@@ -219,11 +219,11 @@ Protected Member Functions</h2></td></tr>
 <li>Much slower than <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1byte__ranges.html" title="Many entity shared/exclusive file system based lock.">byte_ranges</a> for few waiters or small number of entities.</li>
 <li>Sudden process exit with locks held will deadlock all other users.</li>
 <li>Maximum of twelve entities may be locked concurrently.</li>
-<li>Wasteful of disk space if used on a non-extents based filing system (e.g. FAT32, ext3). It is best used in <code>/tmp</code> if possible. If you really must use a non-extents based filing system, destroy and recreate the object instance periodically to force resetting the lock file's length to zero.</li>
+<li>Wasteful of disk space if used on a non-extents based filing system (e.g. FAT32, ext3). It is best used in <code>/tmp</code> if possible (<code><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1file__handle.html#aa1effcf350c823b713f7767e7530c545">file_handle::temp_file()</a></code>). If you really must use a non-extents based filing system, destroy and recreate the object instance periodically to force resetting the lock file's length to zero.</li>
 <li>Similarly older operating systems (e.g. Linux &lt; 3.0) do not implement extent hole punching and therefore will also see excessive disk space consumption. Note at the time of writing OS X doesn't implement hole punching at all.</li>
 <li>If your OS doesn't have sane byte range locks (OS X, BSD, older Linuxes) and multiple objects in your process use the same lock file, misoperation will occur. Use <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1lock__files.html" title="Many entity exclusive compatibility file system based lock.">lock_files</a> instead.</li>
 </ul>
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000003">Todo:</a></b></dt><dd><p class="startdd">Implement hole punching once I port that code from AFIO v1. </p>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000004">Todo:</a></b></dt><dd><p class="startdd">Implement hole punching once I port that code from AFIO v1. </p>
 <p>Decide on some resolution mechanism for sudden process exit. </p>
 <p class="enddd">There is a 1 out of 2^64-2 chance of unique id collision. It would be nice if we actually formally checked that our chosen unique id is actually unique. </p>
 </dd></dl>
@@ -265,7 +265,7 @@ Protected Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000004">Todo:</a></b></dt><dd>Read from header.last_known_good immediately if possible in order to avoid a duplicate read later </dd></dl>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000005">Todo:</a></b></dt><dd>Read from header.last_known_good immediately if possible in order to avoid a duplicate read later </dd></dl>
 
 <p>Implements <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex.html">boost::afio::v2_xxx::algorithm::shared_fs_mutex::shared_fs_mutex</a>.</p>
 <div class="fragment"><div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;      {</div>
