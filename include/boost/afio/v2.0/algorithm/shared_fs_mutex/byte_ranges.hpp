@@ -55,13 +55,15 @@ namespace algorithm
     - Linear complexity to number of concurrent users.
     - Exponential complexity to number of entities being concurrently locked, though some OSs
     provide linear complexity so long as total concurrent waiting processes is CPU core count or less.
+    - Does a reasonable job of trying to sleep the thread if any of the entities are locked.
     - Sudden process exit with lock held is recovered from.
     - Sudden power loss during use is recovered from.
     - Safe for multithreaded usage of the same instance.
 
     Caveats:
-    - When entities being locked is more than one, no ability to sleep until a lock becomes
-    free, so CPUs are spun at 100%.
+    - When entities being locked is more than one, the algorithm places the contending lock at the
+    front of the list during the randomisation after lock failure so we can sleep the thread until
+    it becomes free. However, under heavy churn the thread will generally spin, consuming 100% CPU.
     - Byte range locks need to work properly on your system. Misconfiguring NFS or Samba
     to cause byte range locks to not work right will produce bad outcomes.
     - If your OS doesn't have sane byte range locks (OS X, BSD, older Linuxes) and multiple

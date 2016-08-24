@@ -33,6 +33,7 @@ DEALINGS IN THE SOFTWARE.
 #define BOOST_AFIO_FILE_HANDLE_H
 
 #include "handle.hpp"
+#include "utils.hpp"
 
 //! \file file_handle.hpp Provides file_handle
 
@@ -42,6 +43,20 @@ DEALINGS IN THE SOFTWARE.
 #endif
 
 BOOST_AFIO_V2_NAMESPACE_EXPORT_BEGIN
+
+/*! \brief Returns a path to a directory reported by the operating system to be
+suitable for storing temporary files. As operating systems are known to sometimes
+lie about the validity of this path, each of the available temporary file path
+options reported by the OS are probed by trying to create a file in each until
+success is found. If none of the available options are writable, some valid path
+containing the string "no_temporary_directories_accessible" will be returned
+which should cause all operations using that path to fail with a usefully user
+visible error message.
+
+\todo This function needs to become a static member function of `afio::path` once
+that is written, hence the 'fixme' in its title.
+*/
+BOOST_AFIO_HEADERS_ONLY_FUNC_SPEC const fixme_path &fixme_temporary_files_directory() noexcept;
 
 class io_service;
 
@@ -117,6 +132,58 @@ public:
   */
   //[[bindlib::make_free]]
   static BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<file_handle> file(path_type _path, mode _mode = mode::read, creation _creation = creation::open_existing, caching _caching = caching::all, flag flags = flag::none) noexcept;
+  /*! Create a file handle creating a randomly named file on a path.
+  The file is opened exclusively with `creation::only_if_not_exist` so it
+  will never collide with nor overwrite any existing file. Note also
+  that caching defaults to temporary which hints to the OS to only
+  flush changes to physical storage as lately as possible.
+
+  \errors Any of the values POSIX open() or CreateFile() can return.
+  */
+  //[[bindlib::make_free]]
+  static inline result<file_handle> random_file(path_type dirpath, mode _mode = mode::write, caching _caching = caching::temporary, flag flags = flag::none) noexcept
+  {
+    try
+    {
+      result<file_handle> ret;
+      do
+      {
+        auto randomname = utils::random_string(32);
+        ret = file(dirpath / randomname, _mode, creation::only_if_not_exist, _caching, flags);
+        if(!ret && ret.get_error().value() != EEXIST)
+          return ret;
+      } while(!ret);
+      return ret;
+    }
+    BOOST_OUTCOME_CATCH_EXCEPTION_TO_RESULT(file_handle)
+  }
+  /*! Create a file handle creating the named file on some path which
+  the OS declares to be suitable for temporary files. Most OSs are
+  very lazy about flushing changes made to these temporary files.
+  Note the default flags are to have the newly created file deleted
+  on first handle close (POSIX) or last handle close (Windows).
+  Note also that an empty name is equivalent to calling
+  `random_file(fixme_temporary_files_directory())` and the creation
+  parameter is ignored.
+
+  \errors Any of the values POSIX open() or CreateFile() can return.
+  */
+  //[[bindlib::make_free]]
+  static inline result<file_handle> temp_file(path_type name = path_type(), mode _mode = mode::write, creation _creation = creation::open_existing, caching _caching = caching::temporary, flag flags = flag::win_delete_on_last_close | flag::posix_unlink_on_first_close) noexcept
+  {
+    return name.empty() ? random_file(fixme_temporary_files_directory(), _mode, _caching, flags) : file(fixme_temporary_files_directory() / name, _mode, _creation, _caching, flags);
+  }
+  /*! Create a file handle creating a temporary anonymous inode in
+  the filesystem referred to by \em dirpath. The inode created has
+  no name nor accessible path on the filing system and ceases to
+  exist as soon as the handle is closed, making it ideal for use as
+  a temporary file where other processes do not need to have access
+  to its contents.
+
+  \errors Any of the values POSIX open() or CreateFile() can return.
+  */
+  //[[bindlib::make_free]]
+  static BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<file_handle> temp_inode(path_type dirpath, mode _mode = mode::write, creation _creation = creation::only_if_not_exist) noexcept;
 
   /*! Clone this handle (copy constructor is disabled to avoid accidental copying)
 

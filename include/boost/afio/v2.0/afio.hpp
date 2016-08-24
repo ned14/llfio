@@ -64,6 +64,8 @@ import BOOST_AFIO_MODULE_NAME;
 
 #include "algorithm/shared_fs_mutex/atomic_append.hpp"
 #include "algorithm/shared_fs_mutex/byte_ranges.hpp"
+#include "algorithm/shared_fs_mutex/lock_files.hpp"
+#include "algorithm/shared_fs_mutex/memory_map.hpp"
 
 #include "detail/child_process.hpp"
 

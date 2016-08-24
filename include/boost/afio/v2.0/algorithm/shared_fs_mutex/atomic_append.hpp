@@ -94,7 +94,7 @@ namespace algorithm
     - Sudden process exit with locks held will deadlock all other users.
     - Maximum of twelve entities may be locked concurrently.
     - Wasteful of disk space if used on a non-extents based filing system (e.g. FAT32, ext3).
-    It is best used in `/tmp` if possible. If you really must use a non-extents based filing
+    It is best used in `/tmp` if possible (`file_handle::temp_file()`). If you really must use a non-extents based filing
     system, destroy and recreate the object instance periodically to force resetting the lock
     file's length to zero.
     - Similarly older operating systems (e.g. Linux < 3.0) do not implement extent hole punching
