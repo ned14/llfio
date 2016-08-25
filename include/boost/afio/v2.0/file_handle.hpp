@@ -53,6 +53,8 @@ containing the string "no_temporary_directories_accessible" will be returned
 which should cause all operations using that path to fail with a usefully user
 visible error message.
 
+\mallocs Allocates storage for each path probed.
+
 \todo This function needs to become a static member function of `afio::path` once
 that is written, hence the 'fixme' in its title.
 */
@@ -166,6 +168,10 @@ public:
   `random_file(fixme_temporary_files_directory())` and the creation
   parameter is ignored.
 
+  \note If the temporary file you are creating is not going to have its
+  path sent to another process for usage, this is the WRONG function
+  to use. Use `temp_inode()` instead, it is far more secure.
+
   \errors Any of the values POSIX open() or CreateFile() can return.
   */
   //[[bindlib::make_free]]
@@ -176,14 +182,15 @@ public:
   /*! Create a file handle creating a temporary anonymous inode in
   the filesystem referred to by \em dirpath. The inode created has
   no name nor accessible path on the filing system and ceases to
-  exist as soon as the handle is closed, making it ideal for use as
+  exist as soon as the last handle is closed, making it ideal for use as
   a temporary file where other processes do not need to have access
-  to its contents.
+  to its contents via some path on the filing system (a classic use case
+  is for backing shared memory maps).
 
   \errors Any of the values POSIX open() or CreateFile() can return.
   */
   //[[bindlib::make_free]]
-  static BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<file_handle> temp_inode(path_type dirpath, mode _mode = mode::write, creation _creation = creation::only_if_not_exist) noexcept;
+  static BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<file_handle> temp_inode(path_type dirpath = fixme_temporary_files_directory(), mode _mode = mode::write) noexcept;
 
   /*! Clone this handle (copy constructor is disabled to avoid accidental copying)
 

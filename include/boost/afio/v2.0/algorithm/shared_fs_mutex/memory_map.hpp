@@ -48,10 +48,13 @@ namespace algorithm
   {
     /*! \class memory_map
     \brief Many entity memory mapped shared/exclusive file system based lock
+    \tparam Hasher A STL compatible hash algorithm to use (defaults to `fnv1a_hash`)
+    \tparam HashIndexSize The size in bytes of the hash index to use (defaults to 4Kb)
+    \tparam SpinlockType The type of spinlock to use (defaults to a `SharedMutex` concept spinlock)
 
     This is the highest performing filing system mutex in AFIO, but it comes with a long list of potential
     gotchas. It works by creating a random temporary file somewhere on the system and placing its path
-    in a file in the lock file location. The random temporary file is mapped into memory by all processes
+    in a file at the lock file location. The random temporary file is mapped into memory by all processes
     using the lock where an open addressed hash table is kept. Each entity is hashed into somewhere in the
     hash table and its individual spin lock is used to implement the exclusion. As with `byte_ranges`, each
     entity is locked individually in sequence but if a particular lock fails, all are unlocked and the
@@ -61,9 +64,10 @@ namespace algorithm
 
     Performance ought to be excellent so long as no lock user attempts to use the lock from across a
     networked filing system. As soon as a locking entity fails to find the temporary file given in the
-    lock file location, it will *permanently* degrade the memory mapped lock into a `byte_ranges` lock.
-    This means that a single once off networked filing system user will permanently reduce performance
-    to that of `byte_ranges`.
+    lock file location, it will *permanently* degrade the memory mapped lock into the "fallback" lock
+    specified in the constructor (if you do not specify one, `EBUSY` will be forever returned from then
+    on when trying to lock). It is up to the end user to decide when it might be time to destroy and
+    reconstruct `memory_map` in order to restore full performance.
 
     - Compatible with networked file systems, though with a substantial performance degrade as described above.
     - Linear complexity to number of concurrent users up until hash table starts to get full or hashed
@@ -91,25 +95,29 @@ namespace algorithm
     - If your OS doesn't have sane byte range locks (OS X, BSD, older Linuxes) and multiple
     objects in your process use the same lock file, misoperation will occur.
     */
-    class memory_map : public shared_fs_mutex
+    template <template <class> class Hasher = boost_lite::algorithm::hash::fnv1a_hash, size_t HashIndexSize = 4096, class SpinlockType = boost_lite::configurable_spinlock::shared_spinlock<>> class memory_map : public shared_fs_mutex
     {
     public:
       //! The type of an entity id
       using entity_type = shared_fs_mutex::entity_type;
       //! The type of a sequence of entities
       using entities_type = shared_fs_mutex::entities_type;
+      //! The type of the hasher being used
+      using hasher_type = Hasher<entity_type::value_type>;
+      //! The type of the spinlock being used
+      using spinlock_type = SpinlockType;
 
     private:
-      using _spinlock_type = boost_lite::configurable_spinlock::shared_spinlock<>;
-      static constexpr size_t HashIndexSize = 4096;
-      using Hasher = boost_lite::algorithm::hash::fnv1a_hash<entity_type::value_type>;
-      static constexpr size_t _container_entries = HashIndexSize / sizeof(_spinlock_type);
-      using _hash_index_type = std::array<_spinlock_type, _container_entries>;
+      static constexpr size_t _container_entries = HashIndexSize / sizeof(spinlock_type);
+      using _hash_index_type = std::array<spinlock_type, _container_entries>;
+      static constexpr file_handle::extent_type _lockinuseoffset = (file_handle::extent_type) -1;
+      static constexpr file_handle::extent_type _mapinuseoffset = (file_handle::extent_type) -2;
 
       file_handle _h, _temph;
       file_handle::extent_guard _hlockinuse;  // shared lock of last byte of _h marking if lock is in use
       file_handle::extent_guard _hmapinuse;   // shared lock of second last byte of _h marking if mmap is in use
       map_handle _hmap, _temphmap;
+      shared_fs_mutex *_fallbacklock;
 
       _hash_index_type &_index() const
       {
@@ -117,21 +125,29 @@ namespace algorithm
         return *ret;
       }
 
-      memory_map(file_handle &&h, file_handle &&temph, file_handle::extent_guard &&hlockinuse, file_handle::extent_guard &&hmapinuse, map_handle &&hmap, map_handle &&temphmap)
+      memory_map(file_handle &&h, file_handle &&temph, file_handle::extent_guard &&hlockinuse, file_handle::extent_guard &&hmapinuse, map_handle &&hmap, map_handle &&temphmap, shared_fs_mutex *fallbacklock)
           : _h(std::move(h))
           , _temph(std::move(temph))
           , _hlockinuse(std::move(hlockinuse))
           , _hmapinuse(std::move(hmapinuse))
           , _hmap(std::move(hmap))
           , _temphmap(std::move(temphmap))
+          , _fallbacklock(fallbacklock)
       {
       }
       memory_map(const memory_map &) = delete;
       memory_map &operator=(const memory_map &) = delete;
 
     public:
+      //! Returns the fallback lock
+      shared_fs_mutex *fallback() const noexcept { return _fallbacklock; }
+      //! Sets the fallback lock
+      void fallback(shared_fs_mutex *fbl) noexcept { _fallbacklock = fbl; }
+      //! True if this lock has degraded due to a network user trying to use it
+      bool is_degraded() const noexcept { return _hmap.address()[1] == 0; }
+
       //! Move constructor
-      memory_map(memory_map &&o) noexcept : _h(std::move(o._h)), _temph(std::move(o._temph)), _hlockinuse(std::move(o._hlockinuse)), _hmapinuse(std::move(o._hmapinuse)), _hmap(std::move(o._hmap)), _temphmap(std::move(o._temphmap)) {}
+      memory_map(memory_map &&o) noexcept : _h(std::move(o._h)), _temph(std::move(o._temph)), _hlockinuse(std::move(o._hlockinuse)), _hmapinuse(std::move(o._hmapinuse)), _hmap(std::move(o._hmap)), _temphmap(std::move(o._temphmap)), _fallbacklock(std::move(o._fallbacklock)) {}
       //! Move assign
       memory_map &operator=(memory_map &&o) noexcept
       {
@@ -141,10 +157,10 @@ namespace algorithm
       }
       ~memory_map()
       {
-        // Release my shared locks and try locking entire file exclusively
+        // Release my shared locks and try locking inuse exclusively
         _hmapinuse.unlock();
         _hlockinuse.unlock();
-        auto lockresult = _h.try_lock(0, (handle::extent_type) -1, true);
+        auto lockresult = _h.try_lock(_lockinuseoffset, 1, true);
         if(lockresult)
         {
           // This means I am the last user, so zop the file contents as temp file is about to go away
@@ -163,24 +179,29 @@ namespace algorithm
         }
       }
 
-      //! Initialises a shared filing system mutex using the file at \em lockfile
+      /*! Initialises a shared filing system mutex using the file at \em lockfile and an optional fallback lock.
+      \errors Awaiting the clang result<> AST parser which auto generates all the error codes which could occur,
+      but a particularly important one is `EBUSY` which will be returned if the memory map lock is already in
+      a degraded state (i.e. just use the fallback lock directly).
+      */
       //[[bindlib::make_free]]
-      static result<memory_map> fs_mutex_map(file_handle::path_type lockfile) noexcept
+      static result<memory_map> fs_mutex_map(file_handle::path_type lockfile, shared_fs_mutex *fallbacklock = nullptr) noexcept
       {
         BOOST_AFIO_LOG_FUNCTION_CALL(0);
         try
         {
           BOOST_OUTCOME_FILTER_ERROR(ret, file_handle::file(std::move(lockfile), file_handle::mode::write, file_handle::creation::if_needed, file_handle::caching::temporary, file_handle::flag::win_delete_on_last_close));
           file_handle temph;
-          // Am I the first person to this file? Lock the entire file exclusively
-          auto lockinuse = ret.try_lock(0, (handle::extent_type) -1, true);
+          // Am I the first person to this file? Lock the inuse exclusively
+          auto lockinuse = ret.try_lock(_lockinuseoffset, 1, true);
+          //! \todo fs_mutex_map needs to check if file still exists after lock is granted, awaiting path fetching.
           file_handle::extent_guard mapinuse;
           if(lockinuse.has_error())
           {
             if(lockinuse.get_error().value() != ETIMEDOUT)
               return lockinuse.get_error();
             // Somebody else is also using this file, so try to read the hash index file I ought to use
-            lockinuse = ret.lock((handle::extent_type) -1, 1, false);  // last byte shared access
+            lockinuse = ret.lock(_lockinuseoffset, 1, false);  // last byte shared access
             char buffer[65536];
             memset(buffer, 0, sizeof(buffer));
             {
@@ -198,22 +219,21 @@ namespace algorithm
             if(!_temph)
             {
               // Zop the path so any new entrants into this lock will go to the fallback lock
-              char buffer[4096];
-              memset(buffer, 0, sizeof(buffer));
-              (void) ret.write(0, buffer, sizeof(buffer));
+              memset(buffer, 0, 4096);
+              (void) ret.write(0, buffer, 4096);
             use_fall_back_lock:
               // I am guaranteed that all mmap users have locked the second last byte
               // and will unlock it once everyone has stopped using the mmap, so make
               // absolutely sure the mmap is not in use by anyone by taking an exclusive
               // lock on the second final byte
-              BOOST_OUTCOME_FILTER_ERROR(mapinuse2, ret.lock((handle::extent_type) -2, 1, true));
-              // TODO, awaiting a template parameter to specify the backup lock
-              abort();
+              BOOST_OUTCOME_FILTER_ERROR(mapinuse2, ret.lock(_mapinuseoffset, 1, true));
+              // Release the exclusive lock and tell caller to just use the fallback lock directly
+              return make_errored_result<memory_map>(EBUSY);
             }
             else
             {
               // Mark the map as being in use by me too
-              BOOST_OUTCOME_FILTER_ERROR(mapinuse2, ret.lock((handle::extent_type) -2, 1, false));
+              BOOST_OUTCOME_FILTER_ERROR(mapinuse2, ret.lock(_mapinuseoffset, 1, false));
               mapinuse = std::move(mapinuse2);
               temph = std::move(_temph.get());
             }
@@ -232,17 +252,18 @@ namespace algorithm
               (void) _;
             }
             // Convert exclusive whole file lock into lock in use
-            BOOST_OUTCOME_FILTER_ERROR(lockinuse2, ret.lock((handle::extent_type) -1, 1, false));
-            BOOST_OUTCOME_FILTER_ERROR(mapinuse2, ret.lock((handle::extent_type) -2, 1, false));
+            BOOST_OUTCOME_FILTER_ERROR(lockinuse2, ret.lock(_lockinuseoffset, 1, false));
+            BOOST_OUTCOME_FILTER_ERROR(mapinuse2, ret.lock(_mapinuseoffset, 1, false));
             mapinuse = std::move(mapinuse2);
             lockinuse = std::move(lockinuse2);
           }
-          // Map the files into memory, being very careful that ret is only ever mapped read only
+          // Map the files into memory, being very careful that the lock file is only ever mapped read only
+          // as some OSs can get confused if you use non-mmaped writes on a region mapped for writing.
           BOOST_OUTCOME_FILTER_ERROR(hsection, section_handle::section(ret, 0, section_handle::flag::read));
           BOOST_OUTCOME_FILTER_ERROR(temphsection, section_handle::section(temph, HashIndexSize));
           BOOST_OUTCOME_FILTER_ERROR(hmap, map_handle::map(hsection, 0, 0, section_handle::flag::read));
           BOOST_OUTCOME_FILTER_ERROR(temphmap, map_handle::map(temphsection, HashIndexSize));
-          return memory_map(std::move(ret), std::move(temph), std::move(lockinuse.get()), std::move(mapinuse), std::move(hmap), std::move(temphmap));
+          return memory_map(std::move(ret), std::move(temph), std::move(lockinuse.get()), std::move(mapinuse), std::move(hmap), std::move(temphmap), fallbacklock);
         }
         BOOST_OUTCOME_CATCH_EXCEPTION_TO_RESULT(memory_map)
       }
@@ -262,7 +283,7 @@ namespace algorithm
         _entity_idx *ep = entity_to_idx;
         for(size_t n = 0; n < entities.size(); n++)
         {
-          ep->value = Hasher()(entities[n].value) % _container_entries;
+          ep->value = hasher_type()(entities[n].value) % _container_entries;
           ep->exclusive = entities[n].exclusive;
           bool skip = false;
           for(size_t m = 0; m < n; m++)
@@ -282,10 +303,12 @@ namespace algorithm
       virtual result<void> _lock(entities_guard &out, deadline d, bool spin_not_sleep) noexcept override final
       {
         BOOST_AFIO_LOG_FUNCTION_CALL(this);
-        if(_hmap.address()[1] != 0)
+        if(is_degraded())
         {
-          // TODO: Fall back onto backup locking system
-          abort();
+          _hmapinuse.unlock();
+          if(_fallbacklock)
+            return _fallbacklock->_lock(out, d, spin_not_sleep);
+          return make_errored_result<void>(EBUSY);
         }
         stl11::chrono::steady_clock::time_point began_steady;
         stl11::chrono::system_clock::time_point end_utc;
@@ -355,15 +378,23 @@ namespace algorithm
       }
 
     public:
-      virtual void unlock(entities_type entities, unsigned long long) noexcept override final
+      virtual void unlock(entities_type entities, unsigned long long hint) noexcept override final
       {
         BOOST_AFIO_LOG_FUNCTION_CALL(this);
+        if(!_hmapinuse())
+        {
+          if(_fallbacklock)
+            _fallbacklock->unlock(entities, hint);
+          return;
+        }
         span<_entity_idx> entity_to_idx(_hash_entities((_entity_idx *) alloca(sizeof(_entity_idx) * entities.size()), entities));
         _hash_index_type &index = _index();
         for(const auto &i : entity_to_idx)
         {
           i.exclusive ? index[i.value].unlock() : index[i.value].unlock_shared();
         }
+        if(is_degraded())
+          _hmapinuse.unlock();
       }
     };
 

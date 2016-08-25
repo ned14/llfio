@@ -596,6 +596,8 @@ using std::system_error;
 
 // Too darn useful
 using std::to_string;
+// Used to send the last 190 chars instead of the first 190 chars to extended_error_code
+using boost_lite::ringbuffer_log::last190;
 namespace detail
 {
   template <class F> using function_ptr = boost::outcome::detail::function_ptr<F>;

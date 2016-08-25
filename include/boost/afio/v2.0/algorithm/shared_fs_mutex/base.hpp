@@ -177,10 +177,8 @@ namespace algorithm
         }
       };
 
-    protected:
       virtual result<void> _lock(entities_guard &out, deadline d, bool spin_not_sleep) noexcept = 0;
 
-    public:
       //! Lock all of a sequence of entities for exclusive or shared access
       result<entities_guard> lock(entities_type entities, deadline d = deadline(), bool spin_not_sleep = false) noexcept
       {

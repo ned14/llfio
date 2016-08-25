@@ -229,11 +229,14 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
 result<map_handle::buffer_type> map_handle::commit(buffer_type region, section_handle::flag _flag) noexcept
 {
   BOOST_AFIO_LOG_FUNCTION_CALL(_v.h);
+  if(!region.first)
+    return make_errored_result<map_handle::buffer_type>(EINVAL);
   DWORD prot = 0;
   if(_flag == section_handle::flag::none)
   {
     BOOST_OUTCOME_FILTER_ERROR(_region, do_not_store(region));
-    if(!VirtualProtect(_region.first, _region.second, PAGE_NOACCESS, NULL))
+    DWORD _ = 0;
+    if(!VirtualProtect(_region.first, _region.second, PAGE_NOACCESS, &_))
       return make_errored_result<buffer_type>(GetLastError());
     return _region;
   }
@@ -263,6 +266,8 @@ result<map_handle::buffer_type> map_handle::commit(buffer_type region, section_h
 result<void> map_handle::zero(buffer_type region) noexcept
 {
   BOOST_AFIO_LOG_FUNCTION_CALL(_v.h);
+  if(!region.first)
+    return make_errored_result<void>(EINVAL);
   //! \todo Once you implement file_handle::zero(), please implement map_handle::zero()
   // buffer_type page_region { (char *) utils::round_up_to_page_size((uintptr_t) region.first), utils::round_down_to_page_size(region.second); };
   memset(region.first, 0, region.second);
@@ -285,6 +290,8 @@ result<span<map_handle::buffer_type>> map_handle::prefetch(span<buffer_type> reg
 result<map_handle::buffer_type> map_handle::do_not_store(buffer_type region) noexcept
 {
   region = utils::round_to_page_size(region);
+  if(!region.first)
+    return make_errored_result<map_handle::buffer_type>(EINVAL);
   if(!VirtualAlloc(region.first, region.second, MEM_RESET, 0))
     return make_errored_result<buffer_type>(GetLastError());
   return region;

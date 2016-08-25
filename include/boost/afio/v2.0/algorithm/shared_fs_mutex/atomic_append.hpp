@@ -185,6 +185,7 @@ namespace algorithm
         atomic_append_detail::header header;
         // Lock the entire header for exclusive access
         auto lockresult = ret.try_lock(0, sizeof(header), true);
+        //! \todo fs_mutex_append needs to check if file still exists after lock is granted, awaiting path fetching.
         if(lockresult.has_error())
         {
           if(lockresult.get_error().value() != ETIMEDOUT)

@@ -161,7 +161,7 @@ result<file_handle> file_handle::file(io_service &service, file_handle::path_typ
   }
   const char *path_ = ret.value()._path.c_str();
   if(-1 == (nativeh.fd = ::open(path_, attribs, 0x1b0 /*660*/)))
-    return make_errored_result<file_handle>(errno);
+    return make_errored_result<file_handle>(errno, last190(ret.value()._path));
   if(_creation == creation::truncate && ret.value().are_safety_fsyncs_issued())
     fsync(nativeh.fd);
   return ret;

@@ -34,6 +34,85 @@ DEALINGS IN THE SOFTWARE.
 
 BOOST_AFIO_V2_NAMESPACE_BEGIN
 
+// allocate at process start to ensure later failure to allocate won't cause failure
+static fixme_path temporary_files_directory_("C:\\no_temporary_directories_accessible");
+const fixme_path &fixme_temporary_files_directory() noexcept
+{
+  static struct temporary_files_directory_done_
+  {
+    temporary_files_directory_done_()
+    {
+      try
+      {
+        fixme_path::string_type buffer;
+        auto testpath = [&]() {
+          size_t len = buffer.size();
+          if(buffer[len - 1] == '\\')
+            buffer.resize(--len);
+          buffer.append(L"\\afio_tempfile_probe_file.tmp");
+          HANDLE h = CreateFile(buffer.c_str(), GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_TEMPORARY | FILE_FLAG_DELETE_ON_CLOSE, nullptr);
+          if(INVALID_HANDLE_VALUE != h)
+          {
+            CloseHandle(h);
+            buffer.resize(len);
+            temporary_files_directory_ = std::move(buffer);
+            return true;
+          }
+          return false;
+        };
+        {
+          error_code ec;
+          // Try filesystem::temp_directory_path() before all else
+          buffer = stl1z::filesystem::temp_directory_path(ec);
+          if(!ec && testpath())
+            return;
+        }
+        // GetTempPath() returns one of (in order): %TMP%, %TEMP%, %USERPROFILE%, GetWindowsDirectory()\Temp
+        static const wchar_t *variables[] = {L"TMP", L"TEMP", L"USERPROFILE"};
+        for(size_t n = 0; n < sizeof(variables) / sizeof(variables[0]); n++)
+        {
+          buffer.resize(32768);
+          DWORD len = GetEnvironmentVariable(variables[n], (LPWSTR) buffer.data(), buffer.size());
+          if(len && len < buffer.size())
+          {
+            buffer.resize(len);
+            if(variables[n][0] == 'U')
+            {
+              buffer.append(L"\\AppData\\Local\\Temp");
+              if(testpath())
+                return;
+              buffer.resize(len);
+              buffer.append(L"\\Local Settings\\Temp");
+              if(testpath())
+                return;
+              buffer.resize(len);
+            }
+            if(testpath())
+              return;
+          }
+        }
+        // Finally if everything earlier failed e.g. if our environment block is zeroed,
+        // fall back to Win3.1 era "the Windows directory" which definitely won't be
+        // C:\Windows nowadays
+        buffer.resize(32768);
+        DWORD len = GetWindowsDirectory((LPWSTR) buffer.data(), buffer.size());
+        if(len && len < buffer.size())
+        {
+          buffer.resize(len);
+          buffer.append(L"\\Temp");
+          if(testpath())
+            return;
+        }
+      }
+      catch(...)
+      {
+      }
+    }
+  } init;
+  return temporary_files_directory_;
+}
+
+
 result<file_handle> file_handle::file(file_handle::path_type _path, file_handle::mode _mode, file_handle::creation _creation, file_handle::caching _caching, file_handle::flag flags) noexcept
 {
   result<file_handle> ret(file_handle(std::move(_path), native_handle_type(), _caching, flags));
@@ -60,13 +139,44 @@ result<file_handle> file_handle::file(file_handle::path_type _path, file_handle:
   {
     DWORD errcode = GetLastError();
     BOOST_AFIO_LOG_FUNCTION_CALL(0);
-    return make_errored_result<file_handle>(errcode);
+    return make_errored_result<file_handle>(errcode, last190(ret.value()._path.u8string()));
   }
   BOOST_AFIO_LOG_FUNCTION_CALL(nativeh.h);
   if(_creation == creation::truncate && ret.value().are_safety_fsyncs_issued())
     FlushFileBuffers(nativeh.h);
   return ret;
 }
+
+result<file_handle> file_handle::temp_inode(path_type dirpath, mode _mode) noexcept
+{
+  caching _caching = caching::temporary;
+  flag flags = flag::win_delete_on_last_close;
+  result<file_handle> ret(file_handle(path_type(), native_handle_type(), _caching, flags));
+  native_handle_type &nativeh = ret.get()._v;
+  BOOST_OUTCOME_FILTER_ERROR(access, access_mask_from_handle_mode(nativeh, _mode));
+  BOOST_OUTCOME_FILTER_ERROR(attribs, attributes_from_handle_caching_and_flags(nativeh, _caching, flags));
+  nativeh.behaviour |= native_handle_type::disposition::file;
+  DWORD creation = CREATE_NEW;
+  for(;;)
+  {
+    try
+    {
+      ret.value()._path = dirpath / utils::random_string(32);
+    }
+    BOOST_OUTCOME_CATCH_EXCEPTION_TO_RESULT(file_handle)
+    if(INVALID_HANDLE_VALUE == (nativeh.h = CreateFileW_(ret.value()._path.c_str(), access, /* no read nor write access for others */ FILE_SHARE_DELETE, NULL, creation, attribs, NULL)))
+    {
+      DWORD errcode = GetLastError();
+      if(ERROR_FILE_EXISTS == errcode)
+        continue;
+      BOOST_AFIO_LOG_FUNCTION_CALL(0);
+      return make_errored_result<file_handle>(errcode, last190(ret.value()._path.u8string()));
+    }
+    BOOST_AFIO_LOG_FUNCTION_CALL(nativeh.h);
+    return ret;
+  }
+}
+
 
 result<file_handle> file_handle::clone() const noexcept
 {
