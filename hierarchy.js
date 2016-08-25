@@ -1,6 +1,6 @@
 var hierarchy =
 [
-    [ "boost::afio::v2_xxx::algorithm::shared_fs_mutex::memory_map::_entity_idx", "structboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map_1_1__entity__idx.html", null ],
+    [ "boost::afio::v2_xxx::algorithm::shared_fs_mutex::memory_map< Hasher, HashIndexSize, SpinlockType >::_entity_idx", "structboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map_1_1__entity__idx.html", null ],
     [ "boost::afio::v2_xxx::deadline", "structboost_1_1afio_1_1v2__xxx_1_1deadline.html", null ],
     [ "boost::afio::v2_xxx::native_handle_type::disposition_base", "structboost_1_1afio_1_1v2__xxx_1_1native__handle__type_1_1disposition__base.html", null ],
     [ "disposition_base", null, [
@@ -51,7 +51,7 @@ var hierarchy =
       [ "boost::afio::v2_xxx::algorithm::shared_fs_mutex::atomic_append", "classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1atomic__append.html", null ],
       [ "boost::afio::v2_xxx::algorithm::shared_fs_mutex::byte_ranges", "classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1byte__ranges.html", null ],
       [ "boost::afio::v2_xxx::algorithm::shared_fs_mutex::lock_files", "classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1lock__files.html", null ],
-      [ "boost::afio::v2_xxx::algorithm::shared_fs_mutex::memory_map", "classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html", null ]
+      [ "boost::afio::v2_xxx::algorithm::shared_fs_mutex::memory_map< Hasher, HashIndexSize, SpinlockType >", "classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html", null ]
     ] ],
     [ "boost::afio::v2_xxx::statfs_t", "structboost_1_1afio_1_1v2__xxx_1_1statfs__t.html", null ],
     [ "boost::afio::v2_xxx::storage_profile::storage_profile", "structboost_1_1afio_1_1v2__xxx_1_1storage__profile_1_1storage__profile.html", null ],

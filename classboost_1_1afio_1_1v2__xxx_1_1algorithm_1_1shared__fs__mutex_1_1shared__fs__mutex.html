@@ -110,7 +110,6 @@ $(document).ready(function(){initNavTree('classboost_1_1afio_1_1v2__xxx_1_1algor
 <a href="#nested-classes">Classes</a> &#124;
 <a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#pro-methods">Protected Member Functions</a> &#124;
 <a href="classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">boost::afio::v2_xxx::algorithm::shared_fs_mutex::shared_fs_mutex Class Reference<span class="mlabels"><span class="mlabel">abstract</span></span></div>  </div>
@@ -127,10 +126,10 @@ Inheritance diagram for boost::afio::v2_xxx::algorithm::shared_fs_mutex::shared_
  <div class="center">
   <img src="classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex.png" usemap="#boost::afio::v2_xxx::algorithm::shared_fs_mutex::shared_fs_mutex_map" alt=""/>
   <map id="boost::afio::v2_xxx::algorithm::shared_fs_mutex::shared_fs_mutex_map" name="boost::afio::v2_xxx::algorithm::shared_fs_mutex::shared_fs_mutex_map">
-<area href="classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1atomic__append.html" title="Scalable many entity shared/exclusive file system based lock." alt="boost::afio::v2_xxx::algorithm::shared_fs_mutex::atomic_append" shape="rect" coords="0,56,373,80"/>
-<area href="classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1byte__ranges.html" title="Many entity shared/exclusive file system based lock." alt="boost::afio::v2_xxx::algorithm::shared_fs_mutex::byte_ranges" shape="rect" coords="383,56,756,80"/>
-<area href="classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1lock__files.html" title="Many entity exclusive compatibility file system based lock." alt="boost::afio::v2_xxx::algorithm::shared_fs_mutex::lock_files" shape="rect" coords="766,56,1139,80"/>
-<area href="classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html" title="Many entity memory mapped shared/exclusive file system based lock." alt="boost::afio::v2_xxx::algorithm::shared_fs_mutex::memory_map" shape="rect" coords="1149,56,1522,80"/>
+<area href="classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1atomic__append.html" title="Scalable many entity shared/exclusive file system based lock." alt="boost::afio::v2_xxx::algorithm::shared_fs_mutex::atomic_append" shape="rect" coords="0,56,594,80"/>
+<area href="classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1byte__ranges.html" title="Many entity shared/exclusive file system based lock." alt="boost::afio::v2_xxx::algorithm::shared_fs_mutex::byte_ranges" shape="rect" coords="604,56,1198,80"/>
+<area href="classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1lock__files.html" title="Many entity exclusive compatibility file system based lock." alt="boost::afio::v2_xxx::algorithm::shared_fs_mutex::lock_files" shape="rect" coords="1208,56,1802,80"/>
+<area href="classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html" title="Many entity memory mapped shared/exclusive file system based lock." alt="boost::afio::v2_xxx::algorithm::shared_fs_mutex::memory_map&lt; Hasher, HashIndexSize, SpinlockType &gt;" shape="rect" coords="1812,56,2406,80"/>
 </map>
  </div></div>
 <table class="memberdecls">
@@ -169,6 +168,9 @@ template&lt;typename T &gt; </td></tr>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex.html#a50848058867ee3533b812378aff20b03">fill_random_entities</a> (span&lt; <a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex_1_1entity__type.html">entity_type</a> &gt; seq, bool exclusive=true) noexcept</td></tr>
 <tr class="memdesc:a50848058867ee3533b812378aff20b03"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fills a sequence of entity ids with cryptographic randomness. Much faster than calling <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex.html#a493872c8b5dbfa83fdf82242b928e112" title="Generates a cryptographically random entity id.">random_entity()</a> individually. <br/></td></tr>
 <tr class="separator:a50848058867ee3533b812378aff20b03"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0aa6687944f4489fd680c4f8cf8ce50e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0aa6687944f4489fd680c4f8cf8ce50e"></a>
+virtual <a class="el" href="namespaceboost_1_1afio_1_1v2__xxx.html#ac8d06ecaa9660e7251c1251d88c1305c">result</a>&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>_lock</b> (<a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex_1_1entities__guard.html">entities_guard</a> &amp;out, <a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1deadline.html">deadline</a> d, bool spin_not_sleep) noexcept=0</td></tr>
+<tr class="separator:a0aa6687944f4489fd680c4f8cf8ce50e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a19fafd3b1f9a098c9e60212e7ba97e32"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a19fafd3b1f9a098c9e60212e7ba97e32"></a>
 <a class="el" href="namespaceboost_1_1afio_1_1v2__xxx.html#ac8d06ecaa9660e7251c1251d88c1305c">result</a>&lt; <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex_1_1entities__guard.html">entities_guard</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex.html#a19fafd3b1f9a098c9e60212e7ba97e32">lock</a> (<a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex.html#a02af43575220c42252610c818e109b72">entities_type</a> entities, <a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1deadline.html">deadline</a>(), bool spin_not_sleep=false) noexcept</td></tr>
 <tr class="memdesc:a19fafd3b1f9a098c9e60212e7ba97e32"><td class="mdescLeft">&#160;</td><td class="mdescRight">Lock all of a sequence of entities for exclusive or shared access. <br/></td></tr>
@@ -189,12 +191,6 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex.html#ab598ba46a5b99ba81bc41be40d79b8e5">unlock</a> (<a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex.html#a02af43575220c42252610c818e109b72">entities_type</a> entities, unsigned long long hint=0) noexcept=0</td></tr>
 <tr class="memdesc:ab598ba46a5b99ba81bc41be40d79b8e5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Unlock a previously locked sequence of entities. <br/></td></tr>
 <tr class="separator:ab598ba46a5b99ba81bc41be40d79b8e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
-Protected Member Functions</h2></td></tr>
-<tr class="memitem:a0aa6687944f4489fd680c4f8cf8ce50e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0aa6687944f4489fd680c4f8cf8ce50e"></a>
-virtual <a class="el" href="namespaceboost_1_1afio_1_1v2__xxx.html#ac8d06ecaa9660e7251c1251d88c1305c">result</a>&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>_lock</b> (<a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex_1_1entities__guard.html">entities_guard</a> &amp;out, <a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1deadline.html">deadline</a> d, bool spin_not_sleep) noexcept=0</td></tr>
-<tr class="separator:a0aa6687944f4489fd680c4f8cf8ce50e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Abstract base class for an object which protects shared filing system resources. </p>

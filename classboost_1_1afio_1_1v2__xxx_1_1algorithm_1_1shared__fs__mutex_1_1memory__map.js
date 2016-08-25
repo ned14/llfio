@@ -1,20 +1,25 @@
 var classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map =
 [
     [ "_entity_idx", "structboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map_1_1__entity__idx.html", "structboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map_1_1__entity__idx" ],
-    [ "entities_type", "classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#a9cc8c9f8c25a6ec30464839ebdf845af", null ],
-    [ "entity_type", "classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#ab248a548b71660335d14f88270741b1c", null ],
-    [ "memory_map", "classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#a8803169706293901b29fbae2eaad1ee6", null ],
-    [ "~memory_map", "classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#acbbdc594d360ed48c621a4aca786e8bf", null ],
-    [ "_lock", "classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#a8689cb5c9090d4701fac23be0bb2aebe", null ],
+    [ "entities_type", "classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#ae9f3e252a8c155f9b835745c1e5df30a", null ],
+    [ "entity_type", "classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#a071f43d9e4dca8c5f0c8d7ab551e4d8d", null ],
+    [ "hasher_type", "classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#a68ab075ffa6ac8e7c616de146e784f83", null ],
+    [ "spinlock_type", "classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#ac010a9ebbf8c2176ae3871b28cdf50d5", null ],
+    [ "memory_map", "classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#a016539453fa3746be02d15830654e79b", null ],
+    [ "~memory_map", "classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#ace3d81e01943d9e9ed60b3966c224f1e", null ],
+    [ "_lock", "classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#a57c556cc305199e11a4d5fcd0c1b922e", null ],
     [ "entity_from_buffer", "classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#a6d121be3d16ec5fcd15d61e59f8b66bd", null ],
     [ "entity_from_string", "classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#adc91b1e075ed52fc277c59213cf7b357", null ],
+    [ "fallback", "classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#a5908f9f45b5b365a7d82997285c2acb5", null ],
+    [ "fallback", "classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#a435b244e76c966c4827f27c3d64ac79c", null ],
     [ "fill_random_entities", "classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#a50848058867ee3533b812378aff20b03", null ],
-    [ "handle", "classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#acf3ab16b4bfebf3b6988146e4fbeb138", null ],
+    [ "handle", "classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#a507508205fafa66ebc84dbaf4452c1f5", null ],
+    [ "is_degraded", "classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#a5971ff6c2a54bdcacfd071a7ba640e3a", null ],
     [ "lock", "classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#a19fafd3b1f9a098c9e60212e7ba97e32", null ],
     [ "lock", "classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#ade23c2f167c550c66fa5522ad3e27b7e", null ],
-    [ "operator=", "classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#a0245abc2bf944b196efeb4f8bdb1dd24", null ],
+    [ "operator=", "classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#afd33e6e74443893130dd8517e2fd000e", null ],
     [ "random_entity", "classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#a493872c8b5dbfa83fdf82242b928e112", null ],
     [ "try_lock", "classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#a851d41aee26d0d58cc7e6371724dfd80", null ],
     [ "try_lock", "classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#ad8f772f5f052920879526dbb66a90823", null ],
-    [ "unlock", "classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#a80efd5836f20ac304bdcf0033c95de8b", null ]
+    [ "unlock", "classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#a3b690325543b3e850274f4b92a34d797", null ]
 ];

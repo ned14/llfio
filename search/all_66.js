@@ -15,6 +15,7 @@ var searchData=
   ['f_5fmntonname',['f_mntonname',['../structboost_1_1afio_1_1v2__xxx_1_1statfs__t.html#af3bd8aad00a4be8ef37067e843a4a300',1,'boost::afio::v2_xxx::statfs_t']]],
   ['f_5fnamemax',['f_namemax',['../structboost_1_1afio_1_1v2__xxx_1_1statfs__t.html#a6326305bb4751576c5d20da473228ae5',1,'boost::afio::v2_xxx::statfs_t']]],
   ['f_5fowner',['f_owner',['../structboost_1_1afio_1_1v2__xxx_1_1statfs__t.html#a2a017e057e8858d1f956cd8bba2b48f7',1,'boost::afio::v2_xxx::statfs_t']]],
+  ['fallback',['fallback',['../classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#a5908f9f45b5b365a7d82997285c2acb5',1,'boost::afio::v2_xxx::algorithm::shared_fs_mutex::memory_map::fallback() const noexcept'],['../classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#a435b244e76c966c4827f27c3d64ac79c',1,'boost::afio::v2_xxx::algorithm::shared_fs_mutex::memory_map::fallback(shared_fs_mutex *fbl) noexcept']]],
   ['fast_5fhash',['fast_hash',['../classboost_1_1afio_1_1v2__xxx_1_1utils_1_1fast__hash.html',1,'boost::afio::v2_xxx::utils']]],
   ['fast_5fhash',['fast_hash',['../classboost_1_1afio_1_1v2__xxx_1_1utils_1_1fast__hash.html#ae11abedb86b5c2b99dc468a8a1f9660f',1,'boost::afio::v2_xxx::utils::fast_hash']]],
   ['fd',['fd',['../structboost_1_1afio_1_1v2__xxx_1_1native__handle__type.html#ab2ceb093076cf42f4468f5373d50662b',1,'boost::afio::v2_xxx::native_handle_type']]],
@@ -36,5 +37,5 @@ var searchData=
   ['fs_5fmutex_5fappend',['fs_mutex_append',['../classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1atomic__append.html#a4ad149b7199d2fb919b73ef17a1d61b8',1,'boost::afio::v2_xxx::algorithm::shared_fs_mutex::atomic_append']]],
   ['fs_5fmutex_5fbyte_5franges',['fs_mutex_byte_ranges',['../classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1byte__ranges.html#ad5ec22e222542607ce161d666506fb2b',1,'boost::afio::v2_xxx::algorithm::shared_fs_mutex::byte_ranges']]],
   ['fs_5fmutex_5flock_5ffiles',['fs_mutex_lock_files',['../classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1lock__files.html#a7ea9ac1e0ce49d90245e0e3c55b51168',1,'boost::afio::v2_xxx::algorithm::shared_fs_mutex::lock_files']]],
-  ['fs_5fmutex_5fmap',['fs_mutex_map',['../classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#a9a91ca12fd4b0bede7c30c5adf1946b2',1,'boost::afio::v2_xxx::algorithm::shared_fs_mutex::memory_map']]]
+  ['fs_5fmutex_5fmap',['fs_mutex_map',['../classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#af05e02f0e3cfa63e002bd87fa795b719',1,'boost::afio::v2_xxx::algorithm::shared_fs_mutex::memory_map']]]
 ];

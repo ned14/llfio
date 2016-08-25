@@ -6,7 +6,7 @@ var searchData=
   ['map_5fhandle_2ehpp',['map_handle.hpp',['../map__handle_8hpp.html',1,'']]],
   ['map_5fto_5fstorage_5ftype',['map_to_storage_type',['../namespaceboost_1_1afio_1_1v2__xxx_1_1storage__profile.html#a2ea36c51799cf6a8216c9d24a775d607',1,'boost::afio::v2_xxx::storage_profile']]],
   ['max_5fsize',['max_size',['../structboost_1_1afio_1_1v2__xxx_1_1storage__profile_1_1storage__profile.html#a7cfd0a293329c63b919c74c63ca7cb6e',1,'boost::afio::v2_xxx::storage_profile::storage_profile']]],
-  ['memory_5fmap',['memory_map',['../classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#a8803169706293901b29fbae2eaad1ee6',1,'boost::afio::v2_xxx::algorithm::shared_fs_mutex::memory_map']]],
+  ['memory_5fmap',['memory_map',['../classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#a016539453fa3746be02d15830654e79b',1,'boost::afio::v2_xxx::algorithm::shared_fs_mutex::memory_map']]],
   ['memory_5fmap',['memory_map',['../classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html',1,'boost::afio::v2_xxx::algorithm::shared_fs_mutex']]],
   ['memory_5fmap_2ehpp',['memory_map.hpp',['../memory__map_8hpp.html',1,'']]],
   ['mode',['mode',['../classboost_1_1afio_1_1v2__xxx_1_1handle.html#acd7f0c039e94c7ad40937fe32a2cabad',1,'boost::afio::v2_xxx::handle']]],

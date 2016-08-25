@@ -1,5 +1,10 @@
 var NAVTREEINDEX4 =
 {
+"structboost_1_1afio_1_1v2__xxx_1_1storage__profile_1_1item.html#a642e481b85a5fc293799731e2312522d":[3,0,0,0,0,1,1,9],
+"structboost_1_1afio_1_1v2__xxx_1_1storage__profile_1_1item.html#a6c85d3008ac29a3e42d5f0354b12eb29":[3,0,0,0,0,1,1,4],
+"structboost_1_1afio_1_1v2__xxx_1_1storage__profile_1_1item.html#a836d1718337dae26b9df900f345f86b2":[3,0,0,0,0,1,1,10],
+"structboost_1_1afio_1_1v2__xxx_1_1storage__profile_1_1item.html#ad0e92cf4f4ffbbfc0cc70f02ab8caf17":[3,0,0,0,0,1,1,1],
+"structboost_1_1afio_1_1v2__xxx_1_1storage__profile_1_1item__base.html":[3,0,0,0,0,1,0],
 "structboost_1_1afio_1_1v2__xxx_1_1storage__profile_1_1item__base.html#a4768051e2c28b127b07a4f7914d94de5":[3,0,0,0,0,1,0,1],
 "structboost_1_1afio_1_1v2__xxx_1_1storage__profile_1_1item__base.html#a55d90af1165e015d30489f253396b6c7":[3,0,0,0,0,1,0,2],
 "structboost_1_1afio_1_1v2__xxx_1_1storage__profile_1_1item__base.html#a5694fece1d182ad76eedd0be4aa59f76":[3,0,0,0,0,1,0,3],

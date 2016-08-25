@@ -252,6 +252,7 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operato
 </div><div class="memdoc">
 
 <p>Returns a path to a directory reported by the operating system to be suitable for storing temporary files. As operating systems are known to sometimes lie about the validity of this path, each of the available temporary file path options reported by the OS are probed by trying to create a file in each until success is found. If none of the available options are writable, some valid path containing the string "no_temporary_directories_accessible" will be returned which should cause all operations using that path to fail with a usefully user visible error message. </p>
+<dl class="section user"><dt>Memory Allocations</dt><dd>Allocates storage for each path probed.</dd></dl>
 <dl class="todo"><dt><b><a class="el" href="todo.html#_todo000002">Todo:</a></b></dt><dd>This function needs to become a static member function of <code>afio::path</code> once that is written, hence the 'fixme' in its title. </dd></dl>
 
 </div>
