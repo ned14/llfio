@@ -425,7 +425,7 @@ $(document).ready(function(){initNavTree('memory__map_8hpp_source.html','');});
 <div class="line"><a name="l00381"></a><span class="lineno"><a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#a3b690325543b3e850274f4b92a34d797">  381</a></span>&#160;      <span class="keyword">virtual</span> <span class="keywordtype">void</span> unlock(<a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex.html#a02af43575220c42252610c818e109b72" title="The type of a sequence of entities.">entities_type</a> entities, <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> <span class="keywordtype">long</span> hint) noexcept <span class="keyword">override</span> <span class="keyword">final</span></div>
 <div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;      {</div>
 <div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;        BOOST_AFIO_LOG_FUNCTION_CALL(<span class="keyword">this</span>);</div>
-<div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;        <span class="keywordflow">if</span>(!_hmapinuse())</div>
+<div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;        <span class="keywordflow">if</span>(!_hmapinuse)</div>
 <div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;        {</div>
 <div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;          <span class="keywordflow">if</span>(_fallbacklock)</div>
 <div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;            _fallbacklock-&gt;unlock(entities, hint);</div>
