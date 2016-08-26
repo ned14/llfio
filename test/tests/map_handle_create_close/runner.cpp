@@ -116,8 +116,8 @@ template <class U> inline void map_handle_create_close_(U &&f)
                 }
               }
             }
-            // If we did not commit, the OS should not auto expand storage to 4Kb
-            if (use_file_backing && (flags & section_handle::flag::nocommit))
+            // The OS should not auto expand storage to 4Kb
+            if (use_file_backing)
             {
               BOOST_KERNELTEST_CHECK(testreturn, temph.length().get() == 19);
             }

@@ -39,12 +39,18 @@ result<section_handle> section_handle::section(file_handle &backing, extent_type
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
-  if(!maximum_size && backing.is_valid())
+  if(!maximum_size)
   {
-    BOOST_OUTCOME_FILTER_ERROR(length, backing.length());
-    maximum_size = length;
+    if(backing.is_valid())
+    {
+      BOOST_OUTCOME_FILTER_ERROR(length, backing.length());
+      maximum_size = length;
+    }
+    else
+      return make_errored_result<section_handle>(EINVAL);
   }
-  maximum_size = utils::round_up_to_page_size(maximum_size);
+  // Do NOT round up to page size here, it causes STATUS_SECTION_TOO_BIG
+  // maximum_size = utils::round_up_to_page_size(maximum_size);
   result<section_handle> ret(section_handle(native_handle_type(), backing.is_valid() ? &backing : nullptr, maximum_size, _flag));
   native_handle_type &nativeh = ret.get()._v;
   ULONG prot = 0, attribs = 0;
@@ -63,18 +69,26 @@ result<section_handle> section_handle::section(file_handle &backing, extent_type
     prot = PAGE_WRITECOPY;
   else if(_flag & flag::write)
     prot = PAGE_READWRITE;
-  else if(_flag & flag::read)
-    prot = PAGE_READONLY;
   else
-    prot = PAGE_NOACCESS;
-  // On Windows, asking for inaccessible memory from the swap file is treated as address reservation
-  if(!backing.is_valid() && !_flag)
+    prot = PAGE_READONLY;  // PAGE_NOACCESS is refused, so this is the next best
+  attribs = SEC_COMMIT;
+  if(!backing.is_valid())
   {
-    attribs = SEC_RESERVE;
-    prot = PAGE_READWRITE;  // Windows doesn't permit PAGE_NOACCESS for reservations
+    // On Windows, asking for inaccessible memory from the swap file almost certainly
+    // means the user is intending to change permissions later, so reserve read/write
+    // memory of the size requested
+    if(!_flag)
+    {
+      attribs = SEC_RESERVE;
+      prot = PAGE_READWRITE;
+    }
   }
-  else
-    attribs = SEC_COMMIT;
+  else if(PAGE_READONLY == prot)
+  {
+    // In the case where there is a backing file, asking for read perms or no perms
+    // means "don't auto-expand the file to the nearest 4Kb multiple"
+    attribs = SEC_RESERVE;
+  }
   if(_flag & flag::executable)
     attribs = SEC_IMAGE;
   if(_flag & flag::prefault)
@@ -160,7 +174,8 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
-  bytes = utils::round_up_to_page_size(bytes);
+  // Do NOT round up bytes to the nearest page size, it causes an attempt to extend the file
+  // bytes = utils::round_up_to_page_size(bytes);
   result<map_handle> ret(map_handle(io_handle(), &section));
   native_handle_type &nativeh = ret.get()._v;
   ULONG allocation = 0, prot = 0;
@@ -169,7 +184,7 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
   LARGE_INTEGER _offset;
   _offset.QuadPart = offset;
   SIZE_T _bytes = bytes;
-  if((section.section_flags() & section_handle::flag::nocommit) || (_flag == section_handle::flag::none))
+  if((_flag & section_handle::flag::nocommit) || (_flag == section_handle::flag::none))
   {
     // Perhaps this is only valid from kernel mode? Either way, any attempt to use MEM_RESERVE caused an invalid parameter error.
     // Weirdly, setting commitsize to 0 seems to do a reserve as we wanted
@@ -209,7 +224,7 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
   BOOST_AFIO_LOG_FUNCTION_CALL(ret.get()._v.h);
 
   // Windows has no way of getting the kernel to prefault maps on creation, so ...
-  if(section.section_flags() & section_handle::flag::prefault)
+  if(_flag & section_handle::flag::prefault)
   {
     // Start an asynchronous prefetch
     buffer_type b((char *) addr, _bytes);
