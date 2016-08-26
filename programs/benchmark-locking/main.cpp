@@ -172,6 +172,15 @@ int main(int argc, char *argv[])
         return 1;
       }
     }
+#if 0
+    std::cout << "Attach your debugger now and press Return" << std::endl;
+    getchar();
+#endif
+#if 0
+    auto begin = std::chrono::steady_clock::now();
+    while(std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() - begin).count() < 2)
+      ;
+#endif
     std::cout << "Benchmarking for " << BENCHMARK_DURATION << " seconds ..." << std::endl;
     // Issue go command to all children
     for(auto &child : children)
@@ -310,13 +319,13 @@ int main(int argc, char *argv[])
     }
     case lock_algorithm::memory_map:
     {
-      auto v = afio::algorithm::shared_fs_mutex::memory_map<>::fs_mutex_map("lockfile");
+      auto v = afio::algorithm::shared_fs_mutex::memory_map<boost_lite::algorithm::hash::passthru_hash>::fs_mutex_map("lockfile");
       if(v.has_error())
       {
         std::cerr << "ERROR: Creation of lock algorithm returns " << v.get_error().message() << std::endl;
         return;
       }
-      algorithm = std::make_unique<afio::algorithm::shared_fs_mutex::memory_map<>>(std::move(v.get()));
+      algorithm = std::make_unique<afio::algorithm::shared_fs_mutex::memory_map<boost_lite::algorithm::hash::passthru_hash>>(std::move(v.get()));
       break;
     }
     case lock_algorithm::unknown:

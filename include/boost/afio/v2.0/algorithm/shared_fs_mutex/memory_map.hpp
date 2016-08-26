@@ -110,8 +110,8 @@ namespace algorithm
     private:
       static constexpr size_t _container_entries = HashIndexSize / sizeof(spinlock_type);
       using _hash_index_type = std::array<spinlock_type, _container_entries>;
-      static constexpr file_handle::extent_type _lockinuseoffset = (file_handle::extent_type) -1;
-      static constexpr file_handle::extent_type _mapinuseoffset = (file_handle::extent_type) -2;
+      static constexpr file_handle::extent_type _lockinuseoffset = (file_handle::extent_type) 1024 * 1024;
+      static constexpr file_handle::extent_type _mapinuseoffset = (file_handle::extent_type) 1024 * 1024 + 1;
 
       file_handle _h, _temph;
       file_handle::extent_guard _hlockinuse;  // shared lock of last byte of _h marking if lock is in use
@@ -134,6 +134,8 @@ namespace algorithm
           , _temphmap(std::move(temphmap))
           , _fallbacklock(fallbacklock)
       {
+        _hlockinuse.set_handle(&_h);
+        _hmapinuse.set_handle(&_h);
       }
       memory_map(const memory_map &) = delete;
       memory_map &operator=(const memory_map &) = delete;
@@ -144,10 +146,14 @@ namespace algorithm
       //! Sets the fallback lock
       void fallback(shared_fs_mutex *fbl) noexcept { _fallbacklock = fbl; }
       //! True if this lock has degraded due to a network user trying to use it
-      bool is_degraded() const noexcept { return _hmap.address()[1] == 0; }
+      bool is_degraded() const noexcept { return _hmap.address()[0] == 0; }
 
       //! Move constructor
-      memory_map(memory_map &&o) noexcept : _h(std::move(o._h)), _temph(std::move(o._temph)), _hlockinuse(std::move(o._hlockinuse)), _hmapinuse(std::move(o._hmapinuse)), _hmap(std::move(o._hmap)), _temphmap(std::move(o._temphmap)), _fallbacklock(std::move(o._fallbacklock)) {}
+      memory_map(memory_map &&o) noexcept : _h(std::move(o._h)), _temph(std::move(o._temph)), _hlockinuse(std::move(o._hlockinuse)), _hmapinuse(std::move(o._hmapinuse)), _hmap(std::move(o._hmap)), _temphmap(std::move(o._temphmap)), _fallbacklock(std::move(o._fallbacklock))
+      {
+        _hlockinuse.set_handle(&_h);
+        _hmapinuse.set_handle(&_h);
+      }
       //! Move assign
       memory_map &operator=(memory_map &&o) noexcept
       {
@@ -211,7 +217,7 @@ namespace algorithm
             fixme_path::value_type *temphpath = (fixme_path::value_type *) buffer;
             result<file_handle> _temph;
             // If path is zeroed, fall back onto backup lock
-            if(!buffer[1])
+            if(!buffer[0])
               goto use_fall_back_lock;
             else
               _temph = file_handle::file(temphpath, file_handle::mode::write, file_handle::creation::open_existing, file_handle::caching::temporary, file_handle::flag::win_delete_on_last_close);
