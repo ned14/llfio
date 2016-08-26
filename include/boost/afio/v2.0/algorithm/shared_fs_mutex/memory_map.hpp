@@ -381,7 +381,7 @@ namespace algorithm
       virtual void unlock(entities_type entities, unsigned long long hint) noexcept override final
       {
         BOOST_AFIO_LOG_FUNCTION_CALL(this);
-        if(!_hmapinuse())
+        if(!_hmapinuse)
         {
           if(_fallbacklock)
             _fallbacklock->unlock(entities, hint);

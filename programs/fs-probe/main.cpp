@@ -31,14 +31,12 @@ DEALINGS IN THE SOFTWARE.
 
 #define _CRT_SECURE_NO_WARNINGS 1
 
-#include "boost/afio/v2/async_file_handle.hpp"
-#include "boost/afio/v2/storage_profile.hpp"
+#include "../../include/boost/afio/afio.hpp"
 
 #include <fstream>
 #include <iomanip>
 #include <iostream>
 
-using namespace BOOST_AFIO_V2_NAMESPACE;
 #ifdef __linux__
 #define file_handle BOOST_AFIO_V2_NAMESPACE::file_handle
 #endif
@@ -46,7 +44,7 @@ using namespace BOOST_AFIO_V2_NAMESPACE;
 constexpr unsigned permute_flags_max = 4;
 static const std::regex sp_preamble{"(system|storage).*"};
 
-static storage_profile::storage_profile profile[permute_flags_max];
+static BOOST_AFIO_V2_NAMESPACE::storage_profile::storage_profile profile[permute_flags_max];
 
 #define RETCHECK(expr)                                                                                                                                                                                                                                                                                                         \
   {                                                                                                                                                                                                                                                                                                                            \
@@ -60,6 +58,8 @@ static storage_profile::storage_profile profile[permute_flags_max];
 
 int main(int argc, char *argv[])
 {
+  using namespace BOOST_AFIO_V2_NAMESPACE;
+  namespace stl11 = BOOST_AFIO_V2_NAMESPACE::stl11;
   std::regex torun(".*");
   bool regexvalid = false;
   unsigned torunflags = permute_flags_max - 1;

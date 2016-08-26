@@ -7,13 +7,8 @@ Tarballs of source and prebuilt binaries with all unit tests passing: https://de
 
 
 CppCon 2016 todos:
-- Fix remaining failures in map_handle.
-- Test open_hash_index on valgrind, I ran out of time during the weekend.
-  - Ideally raise that test on per-commit CI via ctest support for valgrind.
-- Create algorithm::shared_fs_mutex::memory_map<> which places an open_hash_index<>
-inside a map_handle region.
-  - If non_local_count > 0, use byte range locks on everything :)
-  - Use read lock at very end to determine when non local users have gone away
+- Fix remaining test failures.
+- Raise the sanitisers on per-commit CI via ctest.
 - Rename all ParseProjectVersionFromHpp etc to parse_project_version_from_hpp etc
 - DLL library edition appears to not be encoding extended error code detail because
 it's not sharing a single ringbuffer_log. Hard to fix given Outcome could be being

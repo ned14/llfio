@@ -72,7 +72,7 @@ const fixme_path &fixme_temporary_files_directory() noexcept
         for(size_t n = 0; n < sizeof(variables) / sizeof(variables[0]); n++)
         {
           buffer.resize(32768);
-          DWORD len = GetEnvironmentVariable(variables[n], (LPWSTR) buffer.data(), buffer.size());
+          DWORD len = GetEnvironmentVariable(variables[n], (LPWSTR) buffer.data(), (DWORD) buffer.size());
           if(len && len < buffer.size())
           {
             buffer.resize(len);
@@ -95,7 +95,7 @@ const fixme_path &fixme_temporary_files_directory() noexcept
         // fall back to Win3.1 era "the Windows directory" which definitely won't be
         // C:\Windows nowadays
         buffer.resize(32768);
-        DWORD len = GetWindowsDirectory((LPWSTR) buffer.data(), buffer.size());
+        DWORD len = GetWindowsDirectory((LPWSTR) buffer.data(), (UINT) buffer.size());
         if(len && len < buffer.size())
         {
           buffer.resize(len);

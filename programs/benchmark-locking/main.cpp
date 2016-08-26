@@ -37,10 +37,8 @@ DEALINGS IN THE SOFTWARE.
 
 #define _CRT_SECURE_NO_WARNINGS 1
 
-#include "boost/afio/v2/algorithm/shared_fs_mutex/atomic_append.hpp"
-#include "boost/afio/v2/algorithm/shared_fs_mutex/byte_ranges.hpp"
-#include "boost/afio/v2/algorithm/shared_fs_mutex/lock_files.hpp"
-#include "boost/afio/v2/detail/child_process.hpp"
+#include "../../include/boost/afio/afio.hpp"
+#include "../../include/boost/afio/v2.0/detail/child_process.hpp"
 
 #include <fstream>
 #include <iostream>
@@ -103,7 +101,7 @@ int main(int argc, char *argv[])
 {
   if(argc < 4)
   {
-    std::cerr << "Usage: " << argv[0] << " [!]<atomic_append|byte_ranges|lock_files> <entities> <no of waiters>" << std::endl;
+    std::cerr << "Usage: " << argv[0] << " [!]<atomic_append|byte_ranges|lock_files|memory_map> <entities> <no of waiters>" << std::endl;
     return 1;
   }
   initialise_shared_memory();
@@ -115,7 +113,7 @@ int main(int argc, char *argv[])
     size_t waiters = atoi(argv[3]);
     if(!waiters || !atoi(argv[2]))
     {
-      std::cerr << "Usage: " << argv[0] << " [!]<atomic_append|byte_ranges|lock_files> <entities> <no of waiters>" << std::endl;
+      std::cerr << "Usage: " << argv[0] << " [!]<atomic_append|byte_ranges|lock_files|memory_map> <entities> <no of waiters>" << std::endl;
       return 1;
     }
 
@@ -225,7 +223,8 @@ int main(int argc, char *argv[])
     unknown,
     atomic_append,
     byte_ranges,
-    lock_files
+    lock_files,
+    memory_map
   } test = lock_algorithm::unknown;
   bool contended = true;
   if(!strcmp(argv[2], "atomic_append"))
@@ -234,6 +233,8 @@ int main(int argc, char *argv[])
     test = lock_algorithm::byte_ranges;
   else if(!strcmp(argv[2], "lock_files"))
     test = lock_algorithm::lock_files;
+  else if(!strcmp(argv[2], "memory_map"))
+    test = lock_algorithm::memory_map;
   else if(!strcmp(argv[2], "!atomic_append"))
   {
     test = lock_algorithm::atomic_append;
@@ -247,6 +248,11 @@ int main(int argc, char *argv[])
   else if(!strcmp(argv[2], "!lock_files"))
   {
     test = lock_algorithm::lock_files;
+    contended = false;
+  }
+  else if(!strcmp(argv[2], "!memory_map"))
+  {
+    test = lock_algorithm::memory_map;
     contended = false;
   }
   if(test == lock_algorithm::unknown)
@@ -300,6 +306,17 @@ int main(int argc, char *argv[])
         return;
       }
       algorithm = std::make_unique<afio::algorithm::shared_fs_mutex::lock_files>(std::move(v.get()));
+      break;
+    }
+    case lock_algorithm::memory_map:
+    {
+      auto v = afio::algorithm::shared_fs_mutex::memory_map<>::fs_mutex_map("lockfile");
+      if(v.has_error())
+      {
+        std::cerr << "ERROR: Creation of lock algorithm returns " << v.get_error().message() << std::endl;
+        return;
+      }
+      algorithm = std::make_unique<afio::algorithm::shared_fs_mutex::memory_map<>>(std::move(v.get()));
       break;
     }
     case lock_algorithm::unknown:
