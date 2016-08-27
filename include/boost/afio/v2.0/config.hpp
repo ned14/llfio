@@ -401,6 +401,15 @@ BOOST_AFIO_V2_NAMESPACE_END
 #endif  // building a shared library
 
 
+// Bring in bitfields
+#include "../boost-lite/include/bitfield.hpp"
+// Bring in scoped undo
+#include "../boost-lite/include/scoped_undo.hpp"
+BOOST_AFIO_V2_NAMESPACE_BEGIN
+using BOOSTLITE_NAMESPACE::scoped_undo::undoer;
+BOOST_AFIO_V2_NAMESPACE_END
+
+
 #if !BOOST_AFIO_HAVE_CXX17_SPAN_IMPLEMENTATION
 #include "../gsl-lite/include/gsl.h"
 BOOST_AFIO_V2_NAMESPACE_BEGIN
@@ -604,88 +613,6 @@ namespace detail
   using boost::outcome::detail::make_function_ptr;
   using boost::outcome::detail::emplace_function_ptr;
 }
-namespace detail
-{
-
-  namespace Impl
-  {
-    template <typename T, bool iscomparable> struct is_nullptr
-    {
-      bool operator()(T c) const noexcept { return !c; }
-    };
-    template <typename T> struct is_nullptr<T, false>
-    {
-      bool operator()(T) const noexcept { return false; }
-    };
-  }
-//! Compile-time safe detector of if \em v is nullptr (can cope with non-pointer convertibles)
-#if defined(__GNUC__) && (BOOST_GCC < 41000 || defined(__MINGW32__))
-  template <typename T> bool is_nullptr(T v) noexcept { return Impl::is_nullptr<T, std::is_constructible<bool, T>::value>()(std::forward<T>(v)); }
-#else
-  template <typename T> bool is_nullptr(T v) noexcept { return Impl::is_nullptr<T, std::is_trivially_constructible<bool, T>::value>()(std::forward<T>(v)); }
-#endif
-
-
-  template <typename callable> class UndoerImpl
-  {
-    bool _dismissed;
-    callable undoer;
-    UndoerImpl() = delete;
-    UndoerImpl(const UndoerImpl &) = delete;
-    UndoerImpl &operator=(const UndoerImpl &) = delete;
-    explicit UndoerImpl(callable &&c)
-        : _dismissed(false)
-        , undoer(std::move(c))
-    {
-    }
-    void int_trigger()
-    {
-      if(!_dismissed && !is_nullptr(undoer))
-      {
-        undoer();
-        _dismissed = true;
-      }
-    }
-
-  public:
-    UndoerImpl(UndoerImpl &&o) noexcept : _dismissed(o._dismissed), undoer(std::move(o.undoer)) { o._dismissed = true; }
-    UndoerImpl &operator=(UndoerImpl &&o) noexcept
-    {
-      int_trigger();
-      _dismissed = o._dismissed;
-      undoer = std::move(o.undoer);
-      o._dismissed = true;
-      return *this;
-    }
-    template <typename _callable> friend UndoerImpl<_callable> Undoer(_callable c);
-    ~UndoerImpl() { int_trigger(); }
-    //! Returns if the Undoer is dismissed
-    bool dismissed() const { return _dismissed; }
-    //! Dismisses the Undoer
-    void dismiss(bool d = true) { _dismissed = d; }
-    //! Undismisses the Undoer
-    void undismiss(bool d = true) { _dismissed = !d; }
-  };  // UndoerImpl
-
-
-  /*! \brief Alexandrescu style rollbacks, a la C++ 11.
-
-  Example of usage:
-  \code
-  auto resetpos=Undoer([&s]() { s.seekg(0, std::ios::beg); });
-  ...
-  resetpos.dismiss();
-  \endcode
-  */
-  template <typename callable> inline UndoerImpl<callable> Undoer(callable c)
-  {
-    // static_assert(!std::is_function<callable>::value && !std::is_member_function_pointer<callable>::value && !std::is_member_object_pointer<callable>::value && !has_call_operator<callable>::value, "Undoer applied to a type not providing a call operator");
-    auto foo = UndoerImpl<callable>(std::move(c));
-    return foo;
-  }  // Undoer
-
-}  // namespace detail
-
 
 // Temporary in lieu of full fat afio::path
 /* \todo Full fat afio::path needs to be able to variant a win32 path
@@ -702,112 +629,6 @@ before writing our own! One of those path fragments could variant onto
 an open handle to solve the earlier issue.
 */
 using fixme_path = stl1z::filesystem::path;
-
-//! Constexpr typesafe bitwise flags support
-template <class Enum> struct bitfield : public Enum
-{
-  //! The C style enum type which represents flags in this bitfield
-  using enum_type = typename Enum::enum_type;
-  //! The type which the C style enum implicitly converts to
-  using underlying_type = std::underlying_type_t<enum_type>;
-
-private:
-  underlying_type _value;
-
-public:
-  //! Default construct to all bits zero
-  constexpr bitfield() noexcept : _value(0) {}
-  //! Implicit construction from the C style enum
-  constexpr bitfield(enum_type v) noexcept : _value(v) {}
-  //! Implicit construction from the underlying type of the C enum
-  constexpr bitfield(underlying_type v) noexcept : _value(v) {}
-
-  //! Permit explicit casting to the underlying type
-  explicit constexpr operator underlying_type() const noexcept { return _value; }
-  //! Test for non-zeroness
-  explicit constexpr operator bool() const noexcept { return !!_value; }
-  //! Test for zeroness
-  constexpr bool operator!() const noexcept { return !_value; }
-
-  //! Test for equality
-  constexpr bool operator==(bitfield o) const noexcept { return _value == o._value; }
-  //! Test for equality
-  constexpr bool operator==(enum_type o) const noexcept { return _value == o; }
-  //! Test for inequality
-  constexpr bool operator!=(bitfield o) const noexcept { return _value != o._value; }
-  //! Test for inequality
-  constexpr bool operator!=(enum_type o) const noexcept { return _value != o; }
-
-  //! Performs a bitwise NOT
-  constexpr bitfield operator~() const noexcept { return bitfield(~_value); }
-  //! Performs a bitwise AND
-  constexpr bitfield operator&(bitfield o) const noexcept { return bitfield(_value & o._value); }
-  //! Performs a bitwise AND
-  constexpr bitfield operator&(enum_type o) const noexcept { return bitfield(_value & o); }
-  //! Performs a bitwise AND
-  BOOST_CXX14_CONSTEXPR bitfield &operator&=(bitfield o) noexcept
-  {
-    _value &= o._value;
-    return *this;
-  }
-  //! Performs a bitwise AND
-  BOOST_CXX14_CONSTEXPR bitfield &operator&=(enum_type o) noexcept
-  {
-    _value &= o;
-    return *this;
-  }
-  //! Trap incorrect use of logical AND
-  template <class T> bool operator&&(T) noexcept = delete;
-  //! Performs a bitwise OR
-  constexpr bitfield operator|(bitfield o) const noexcept { return bitfield(_value | o._value); }
-  //! Performs a bitwise OR
-  constexpr bitfield operator|(enum_type o) const noexcept { return bitfield(_value | o); }
-  //! Performs a bitwise OR
-  BOOST_CXX14_CONSTEXPR bitfield &operator|=(bitfield o) noexcept
-  {
-    _value |= o._value;
-    return *this;
-  }
-  //! Performs a bitwise OR
-  BOOST_CXX14_CONSTEXPR bitfield &operator|=(enum_type o) noexcept
-  {
-    _value |= o;
-    return *this;
-  }
-  //! Performs a bitwise XOR
-  constexpr bitfield operator^(bitfield o) const noexcept { return bitfield(_value ^ o._value); }
-  //! Performs a bitwise XOR
-  constexpr bitfield operator^(enum_type o) const noexcept { return bitfield(_value ^ o); }
-  //! Performs a bitwise XOR
-  BOOST_CXX14_CONSTEXPR bitfield &operator^=(bitfield o) noexcept
-  {
-    _value ^= o._value;
-    return *this;
-  }
-  //! Performs a bitwise XOR
-  BOOST_CXX14_CONSTEXPR bitfield &operator^=(enum_type o) noexcept
-  {
-    _value ^= o;
-    return *this;
-  }
-};
-
-//! Begins a typesafe bitfield
-#define BOOST_AFIO_BITFIELD_BEGIN(type)                                                                                                                                                                                                                                                                                        \
-  \
-struct type##_base                                                                                                                                                                                                                                                                                                             \
-  \
-{                                                                                                                                                                                                                                                                                                                         \
-  enum enum_type : unsigned
-
-//! Ends a typesafe bitfield
-#define BOOST_AFIO_BITFIELD_END(type)                                                                                                                                                                                                                                                                                          \
-  \
-;                                                                                                                                                                                                                                                                                                                         \
-  }                                                                                                                                                                                                                                                                                                                            \
-  ;                                                                                                                                                                                                                                                                                                                            \
-  \
-using type = bitfield<type##_base>;
 
 // Native handle support
 namespace win

@@ -127,7 +127,7 @@ template <class BuffersType, class Syscall> inline io_handle::io_result<BuffersT
   span<OVERLAPPED> ols(_ols.data(), reqs.buffers.size());
   auto ol_it = ols.begin();
   DWORD transferred = 0;
-  auto cancel_io = detail::Undoer([&] {
+  auto cancel_io = undoer([&] {
     if(nativeh.is_overlapped())
     {
       for(auto &ol : ols)

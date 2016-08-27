@@ -140,7 +140,7 @@ namespace algorithm
         {
           size_t was_contended = (size_t) -1;
           {
-            auto undo = detail::Undoer([&] {
+            auto undo = undoer([&] {
               // 0 to (n-1) need to be closed
               if(n > 0)
               {

@@ -97,7 +97,7 @@ public:
                              // NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!
   };
   //! Bitwise flags which can be specified
-  BOOST_AFIO_BITFIELD_BEGIN(flag)
+  BOOSTLITE_BITFIELD_BEGIN(flag)
   {
     none = 0,                              //!< No flags
     win_delete_on_last_close = 1 << 0,     //!< (Windows only) Delete the file on last handle close
@@ -127,7 +127,7 @@ public:
     overlapped = 1 << 28,         //!< On Windows, create any new handles with OVERLAPPED semantics
     byte_lock_insanity = 1 << 29  //!< Using insane POSIX byte range locks
   }
-  BOOST_AFIO_BITFIELD_END(flag)
+  BOOSTLITE_BITFIELD_END(flag)
 protected:
   caching _caching;
   flag _flags;

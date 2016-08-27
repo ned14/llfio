@@ -48,7 +48,7 @@ Unmanaged, wrap in a handle object to manage.
 struct native_handle_type
 {
   //! The type of handle.
-  BOOST_AFIO_BITFIELD_BEGIN(disposition)
+  BOOSTLITE_BITFIELD_BEGIN(disposition)
   {
     invalid = 0,  //!< Invalid handle
 
@@ -67,7 +67,7 @@ struct native_handle_type
     process = 1 << 12,      //!< Is a child process
     section = 1 << 13       //!< Is a memory section
   }
-  BOOST_AFIO_BITFIELD_END(disposition)
+  BOOSTLITE_BITFIELD_END(disposition)
   disposition behaviour;  //! The behaviour of the handle
   union {
     intptr_t _init;

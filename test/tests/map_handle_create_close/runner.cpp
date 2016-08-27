@@ -67,7 +67,7 @@ template <class U> inline void map_handle_create_close_(U &&f)
         if (testreturn)
           maph = std::move(testreturn.get());
         // Need to close the map and any backing file as otherwise filesystem_setup won't be able to clear up the working dir on Windows
-        auto onexit = BOOST_AFIO_V2_NAMESPACE::detail::Undoer([&]{
+        auto onexit = BOOST_AFIO_V2_NAMESPACE::undoer([&]{
           maph.close();
           temph.close();
         });

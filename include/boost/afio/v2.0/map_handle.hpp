@@ -56,20 +56,20 @@ public:
   using size_type = handle::size_type;
 
   //! The behaviour of the memory section
-  BOOST_AFIO_BITFIELD_BEGIN(flag){none = 0,          //!< No flags
-                                  read = 1 << 0,     //!< Memory views can be read
-                                  write = 1 << 1,    //!< Memory views can be written
-                                  cow = 1 << 2,      //!< Memory views can be copy on written
-                                  execute = 1 << 3,  //!< Memory views can execute code
+  BOOSTLITE_BITFIELD_BEGIN(flag){none = 0,          //!< No flags
+                                 read = 1 << 0,     //!< Memory views can be read
+                                 write = 1 << 1,    //!< Memory views can be written
+                                 cow = 1 << 2,      //!< Memory views can be copy on written
+                                 execute = 1 << 3,  //!< Memory views can execute code
 
-                                  nocommit = 1 << 8,     //!< Don't allocate space for this memory in the system immediately
-                                  prefault = 1 << 9,     //!< Prefault, as if by reading every page, any views of memory upon creation.
-                                  executable = 1 << 10,  //!< The backing storage is in fact an executable program binary.
+                                 nocommit = 1 << 8,     //!< Don't allocate space for this memory in the system immediately
+                                 prefault = 1 << 9,     //!< Prefault, as if by reading every page, any views of memory upon creation.
+                                 executable = 1 << 10,  //!< The backing storage is in fact an executable program binary.
 
-                                  // NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!
+                                 // NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!
 
-                                  readwrite = (read | write)};
-  BOOST_AFIO_BITFIELD_END(flag)
+                                 readwrite = (read | write)};
+  BOOSTLITE_BITFIELD_END(flag)
 
 protected:
   io_handle *_backing;

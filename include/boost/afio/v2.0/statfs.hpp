@@ -81,8 +81,8 @@ struct BOOST_AFIO_DECL statfs_t
   fixme_path f_mntonname;    /*!< directory on which mounted         (Windows, POSIX) */
 
   //! Used to indicate what metadata should be filled in
-  BOOST_AFIO_BITFIELD_BEGIN(want) { flags = 1 << 0, bsize = 1 << 1, iosize = 1 << 2, blocks = 1 << 3, bfree = 1 << 4, bavail = 1 << 5, files = 1 << 6, ffree = 1 << 7, namemax = 1 << 8, owner = 1 << 9, fsid = 1 << 10, fstypename = 1 << 11, mntfromname = 1 << 12, mntonname = 1 << 13, all = (unsigned) -1 }
-  BOOST_AFIO_BITFIELD_END(want)
+  BOOSTLITE_BITFIELD_BEGIN(want) { flags = 1 << 0, bsize = 1 << 1, iosize = 1 << 2, blocks = 1 << 3, bfree = 1 << 4, bavail = 1 << 5, files = 1 << 6, ffree = 1 << 7, namemax = 1 << 8, owner = 1 << 9, fsid = 1 << 10, fstypename = 1 << 11, mntfromname = 1 << 12, mntonname = 1 << 13, all = (unsigned) -1 }
+  BOOSTLITE_BITFIELD_END(want)
   //! Constructs a default initialised instance (all bits set)
   statfs_t()
   {

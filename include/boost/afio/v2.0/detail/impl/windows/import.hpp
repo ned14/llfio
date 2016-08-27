@@ -1110,7 +1110,7 @@ static inline HANDLE CreateFileW_(_In_ LPCTSTR lpFileName, _In_ DWORD dwDesiredA
     SetLastError(ERROR_FILE_NOT_FOUND);
     return INVALID_HANDLE_VALUE;
   }
-  auto unntpath = detail::Undoer([&NtPath] {
+  auto unntpath = undoer([&NtPath] {
     if(!HeapFree(GetProcessHeap(), 0, NtPath.Buffer))
       abort();
   });

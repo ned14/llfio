@@ -328,13 +328,13 @@ namespace algorithm
         span<_entity_idx> entity_to_idx(_hash_entities((_entity_idx *) alloca(sizeof(_entity_idx) * out.entities.size()), out.entities));
         _hash_index_type &index = _index();
         // Fire this if an error occurs
-        auto disableunlock = detail::Undoer([&] { out.release(); });
+        auto disableunlock = undoer([&] { out.release(); });
         size_t n;
         for(;;)
         {
           size_t was_contended = (size_t) -1;
           {
-            auto undo = detail::Undoer([&] {
+            auto undo = undoer([&] {
               // 0 to (n-1) need to be closed
               if(n > 0)
               {

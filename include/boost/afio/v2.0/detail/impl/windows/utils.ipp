@@ -82,7 +82,7 @@ namespace utils
         HANDLE token;
         if(OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES, &token))
         {
-          auto untoken = detail::Undoer([&token] { CloseHandle(token); });
+          auto untoken = undoer([&token] { CloseHandle(token); });
           TOKEN_PRIVILEGES privs;
           memset(&privs, 0, sizeof(privs));
           privs.PrivilegeCount = 1;

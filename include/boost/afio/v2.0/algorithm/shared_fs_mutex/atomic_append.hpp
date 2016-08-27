@@ -235,7 +235,7 @@ namespace algorithm
             end_utc = (d).to_time_point();
         }
         // Fire this if an error occurs
-        auto disableunlock = detail::Undoer([&] { out.release(); });
+        auto disableunlock = undoer([&] { out.release(); });
 
         // Write my lock request immediately
         memset(&lock_request, 0, sizeof(lock_request));
@@ -250,7 +250,7 @@ namespace algorithm
         BOOST_OUTCOME_FILTER_ERROR(my_lock_request_offset, _h.length());
         {
           _h.set_append_only(true);
-          auto undo = detail::Undoer([this] { _h.set_append_only(false); });
+          auto undo = undoer([this] { _h.set_append_only(false); });
           file_handle::extent_guard append_guard;
           if(_nfs_compatibility)
           {

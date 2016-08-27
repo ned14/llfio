@@ -202,7 +202,7 @@ namespace storage_profile
           if(sp.mem_quantity.value / 4 < chunksize)
             chunksize = (size_t)(sp.mem_quantity.value / 4);
           char *buffer = utils::page_allocator<char>().allocate(chunksize);
-          auto unbuffer = BOOST_AFIO_V2_NAMESPACE::detail::Undoer([buffer, chunksize] { utils::page_allocator<char>().deallocate(buffer, chunksize); });
+          auto unbuffer = BOOST_AFIO_V2_NAMESPACE::undoer([buffer, chunksize] { utils::page_allocator<char>().deallocate(buffer, chunksize); });
           // Make sure all memory is really allocated first
           memset(buffer, 1, chunksize);
 

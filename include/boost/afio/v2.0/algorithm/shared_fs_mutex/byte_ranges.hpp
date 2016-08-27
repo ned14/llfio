@@ -122,13 +122,13 @@ namespace algorithm
             end_utc = (d).to_time_point();
         }
         // Fire this if an error occurs
-        auto disableunlock = detail::Undoer([&] { out.release(); });
+        auto disableunlock = undoer([&] { out.release(); });
         size_t n;
         for(;;)
         {
           size_t was_contended = (size_t) -1;
           {
-            auto undo = detail::Undoer([&] {
+            auto undo = undoer([&] {
               // 0 to (n-1) need to be closed
               if(n > 0)
               {

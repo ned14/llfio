@@ -38,7 +38,7 @@ DEALINGS IN THE SOFTWARE.
 #define _CRT_SECURE_NO_WARNINGS 1
 
 #include "../../include/boost/afio/afio.hpp"
-#include "../../include/boost/afio/v2.0/detail/child_process.hpp"
+#include "../kerneltest/include/boost/kerneltest/v1.0/child_process.hpp"
 
 #include <fstream>
 #include <iostream>
@@ -51,6 +51,7 @@ DEALINGS IN THE SOFTWARE.
 #endif
 
 namespace afio = BOOST_AFIO_V2_NAMESPACE;
+namespace child_process = BOOST_KERNELTEST_V1_NAMESPACE::child_process;
 
 #ifdef _WIN32
 // TODO FIXME Replace with mapped_file_handle once implemented as that is portable unlike this
@@ -117,8 +118,8 @@ int main(int argc, char *argv[])
       return 1;
     }
 
-    std::vector<afio::detail::child_process> children;
-    auto mypath = afio::detail::current_process_path();
+    std::vector<child_process::child_process> children;
+    auto mypath = child_process::current_process_path();
 #ifdef UNICODE
     std::vector<afio::stl1z::filesystem::path::string_type> args = {L"spawned", L"", L"", L"", L"00"};
     args[1].resize(strlen(argv[1]));
@@ -133,7 +134,7 @@ int main(int argc, char *argv[])
 #else
     std::vector<afio::stl1z::filesystem::path::string_type> args = {"spawned", argv[1], argv[2], argv[3], "00"};
 #endif
-    auto env = afio::detail::current_process_env();
+    auto env = child_process::current_process_env();
     std::cout << "Launching " << waiters << " copies of myself as a child process ..." << std::endl;
     for(size_t n = 0; n < waiters; n++)
     {
@@ -147,7 +148,7 @@ int main(int argc, char *argv[])
         args[4][0] = (char) ('0' + n);
         args[4][1] = 0;
       }
-      auto child = afio::detail::child_process::launch(mypath, args, env, true);
+      auto child = child_process::child_process::launch(mypath, args, env, true);
       if(child.has_error())
       {
         std::cerr << "FATAL: Child " << n << " could not be launched due to " << child.get_error().message() << std::endl;
