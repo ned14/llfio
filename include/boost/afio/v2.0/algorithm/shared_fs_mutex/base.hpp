@@ -144,7 +144,12 @@ namespace algorithm
         }
         entities_guard(const entities_guard &) = delete;
         entities_guard &operator=(const entities_guard &) = delete;
-        entities_guard(entities_guard &&o) noexcept : _entity(std::move(o._entity)), parent(o.parent), entities(std::move(o.entities)), hint(o.hint) { o.release(); }
+        entities_guard(entities_guard &&o) noexcept : _entity(std::move(o._entity)), parent(o.parent), entities(std::move(o.entities)), hint(o.hint)
+        {
+          if(entities.data() == &o._entity)
+            entities = entities_type(&_entity, 1);
+          o.release();
+        }
         entities_guard &operator=(entities_guard &&o) noexcept
         {
           this->~entities_guard();
@@ -190,16 +195,13 @@ namespace algorithm
       result<entities_guard> lock(entity_type entity, deadline d = deadline(), bool spin_not_sleep = false) noexcept
       {
         entities_guard ret(this, entity);
-        return lock(ret.entities, std::move(d), spin_not_sleep);
+        BOOST_OUTCOME_PROPAGATE_ERROR(_lock(ret, std::move(d), spin_not_sleep));
+        return std::move(ret);
       }
       //! Try to lock all of a sequence of entities for exclusive or shared access
       result<entities_guard> try_lock(entities_type entities) noexcept { return lock(std::move(entities), deadline(std::chrono::seconds(0))); }
       //! Try to lock a single entity for exclusive or shared access
-      result<entities_guard> try_lock(entity_type entity) noexcept
-      {
-        entities_guard ret(this, entity);
-        return try_lock(ret.entities);
-      }
+      result<entities_guard> try_lock(entity_type entity) noexcept { return lock(std::move(entity), deadline(std::chrono::seconds(0))); }
       //! Unlock a previously locked sequence of entities
       virtual void unlock(entities_type entities, unsigned long long hint = 0) noexcept = 0;
     };
