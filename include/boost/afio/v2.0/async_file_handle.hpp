@@ -39,7 +39,9 @@ DEALINGS IN THE SOFTWARE.
 
 BOOST_AFIO_V2_NAMESPACE_EXPORT_BEGIN
 
-//! A handle to an open something
+/*! An asynchronous handle to an open something
+\todo async_file_handle needs to gain its own random_file(), temp_file() and temp_inode() implementations
+*/
 class BOOST_AFIO_DECL async_file_handle : public file_handle
 {
 public:

@@ -358,7 +358,7 @@ namespace windows_nt_kernel
 
   typedef struct _FILE_DISPOSITION_INFORMATION
   {
-    BOOLEAN DeleteFile;
+    BOOLEAN _DeleteFile;
   } FILE_DISPOSITION_INFORMATION, *PFILE_DISPOSITION_INFORMATION;
 
   typedef struct _FILE_ALL_INFORMATION
@@ -900,6 +900,15 @@ if(d)                                                                           
 }
 #endif
 
+// Initialise an IO_STATUS_BLOCK for later wait operations
+static inline windows_nt_kernel::IO_STATUS_BLOCK make_iostatus() noexcept
+{
+  windows_nt_kernel::IO_STATUS_BLOCK isb;
+  memset(&isb, 0, sizeof(isb));
+  isb.Status = -1;
+  return isb;
+}
+
 // Wait for an overlapped handle to complete a specific operation
 static inline NTSTATUS ntwait(HANDLE h, windows_nt_kernel::IO_STATUS_BLOCK &isb, const deadline &d) noexcept
 {
@@ -1018,7 +1027,7 @@ static inline result<DWORD> attributes_from_handle_caching_and_flags(native_hand
     attribs |= FILE_ATTRIBUTE_TEMPORARY;
     break;
   }
-  if(flags & handle::flag::win_delete_on_last_close)
+  if(flags & handle::flag::unlink_on_close)
     attribs |= FILE_FLAG_DELETE_ON_CLOSE;
   return attribs;
 }
@@ -1127,9 +1136,7 @@ static inline HANDLE CreateFileW_(_In_ LPCTSTR lpFileName, _In_ DWORD dwDesiredA
     ObjectAttributes.Attributes |= OBJ_CASE_INSENSITIVE;
 
   HANDLE ret = INVALID_HANDLE_VALUE;
-  IO_STATUS_BLOCK isb;
-  memset(&isb, 0, sizeof(isb));
-  isb.Status = -1;
+  IO_STATUS_BLOCK isb = make_iostatus();
   dwFlagsAndAttributes &= ~0xfff80000;
   NTSTATUS ntstat = NtCreateFile(&ret, dwDesiredAccess, &ObjectAttributes, &isb, NULL, dwFlagsAndAttributes, dwShareMode, dwCreationDisposition, flags, NULL, 0);
   if(STATUS_SUCCESS == ntstat)

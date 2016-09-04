@@ -683,32 +683,4 @@ function exported from the AFIO DLL if not building headers only.
 #define BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC virtual
 #endif
 
-#if defined(__has_feature)
-#if __has_feature(thread_sanitizer)
-#define BOOST_AFIO_DISABLE_THREAD_SANITIZE __attribute__((no_sanitize_thread))
-#endif
-#endif
-#ifndef BOOST_AFIO_DISABLE_THREAD_SANITIZE
-/*! \brief Expands into the appropriate markup to declare a function as to
-not be thread sanitised by the ThreadSanitiser.
-\ingroup config
-*/
-#define BOOST_AFIO_DISABLE_THREAD_SANITIZE
-#endif
-
-#ifndef BOOST_AFIO_THREAD_LOCAL
-#ifdef __cpp_thread_local
-/*! \brief Expands into the appropriate markup to declare a storage as thread local.
-\ingroup config
-*/
-#define BOOST_AFIO_THREAD_LOCAL thread_local
-#elif defined(_MSC_VER)
-#define BOOST_AFIO_THREAD_LOCAL __declspec(thread)
-#elif defined(__GNUC__)
-#define BOOST_AFIO_THREAD_LOCAL __thread
-#else
-#error Unknown compiler, cannot set BOOST_AFIO_THREAD_LOCAL
-#endif
-#endif
-
 #endif  // BOOST_AFIO_NEED_DEFINE

@@ -99,9 +99,17 @@ public:
   //! Bitwise flags which can be specified
   BOOSTLITE_BITFIELD_BEGIN(flag)
   {
-    none = 0,                              //!< No flags
-    win_delete_on_last_close = 1 << 0,     //!< (Windows only) Delete the file on last handle close
-    posix_unlink_on_first_close = 1 << 1,  //!< (POSIX only) Unlink the file on first handle close
+    none = 0,  //!< No flags
+    /*! Unlinks the file on handle close. On POSIX, this simply unlinks whatever is pointed
+    to by `path()` upon the call of `close()` if and only if the inode matches. On Windows,
+    this opens the file handle with the `FILE_FLAG_DELETE_ON_CLOSE` modifier which substantially
+    affects caching policy and causes the \b first handle close to make the file unavailable for
+    anyone else to open with an `EAGAIN` error return. Because this is confusing, unless the
+    `win_disable_unlink_emulation` flag is also specified, this POSIX behaviour is
+    somewhat emulated by AFIO on Windows by renaming the file to a random name on `close()`
+    causing it to appear to have been unlinked immediately.
+    */
+    unlink_on_close = 1 << 0,
 
     /*! Some kernel caching modes have unhelpfully inconsistent behaviours
     in getting your data onto storage, so by default unless this flag is
@@ -121,6 +129,17 @@ public:
     * caching::safety_fsyncs
     */
     disable_safety_fsyncs = 1 << 2,
+    /*! `file_handle::unlink()` could accidentally delete the wrong file if someone has
+    renamed the open file handle since the time it was opened. To prevent this occuring,
+    where the OS doesn't provide race free unlink-by-open-handle we compare the inode of
+    the path we are about to unlink with that of the open handle before unlinking.
+    \warning This does not prevent races where in between the time of checking the inode
+    and executing the unlink a third party changes the item about to be unlinked. Only
+    operating systems with a true race-free unlink syscall are race free.
+    */
+    disable_safety_unlinks = 1 << 3,
+
+    win_disable_unlink_emulation = 1 << 24,  //!< See the documentation for `unlink_on_close`
 
     // NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!
 
@@ -271,12 +290,12 @@ inline std::ostream &operator<<(std::ostream &s, const handle::caching &v)
 inline std::ostream &operator<<(std::ostream &s, const handle::flag &v)
 {
   std::string temp;
-  if(!!(v & handle::flag::win_delete_on_last_close))
-    temp.append("win_delete_on_last_close|");
-  if(!!(v & handle::flag::posix_unlink_on_first_close))
-    temp.append("posix_unlink_on_first_close|");
+  if(!!(v & handle::flag::unlink_on_close))
+    temp.append("unlink_on_close|");
   if(!!(v & handle::flag::disable_safety_fsyncs))
     temp.append("disable_safety_fsyncs|");
+  if(!!(v & handle::flag::win_disable_unlink_emulation))
+    temp.append("win_disable_unlink_emulation|");
   if(!!(v & handle::flag::overlapped))
     temp.append("overlapped|");
   if(!!(v & handle::flag::byte_lock_insanity))

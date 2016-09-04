@@ -65,7 +65,7 @@ template <class U> inline void file_handle_create_close_creation(U &&f)
       {   make_ready_result<void>(),       { file_handle::mode::write, file_handle::creation::truncate         , file_handle::flag::none }, { "existing1"    }, { "existing0"    }},
 
       // Does the flag parameter have the expected side effects?
-      { make_ready_result<void>(), { file_handle::mode::write, file_handle::creation::open_existing, file_handle::flag::win_delete_on_last_close|file_handle::flag::posix_unlink_on_first_close }, { "existing1" }, { "non-existing" }}
+      { make_ready_result<void>(), { file_handle::mode::write, file_handle::creation::open_existing, file_handle::flag::unlink_on_close }, { "existing1" }, { "non-existing" }}
     },
     // Any parameters from now on are called before each permutation and the object returned is
     // destroyed after each permutation. The callspec is (parameter_permuter<...> *parent, outcome<T> &testret, size_t, pars)

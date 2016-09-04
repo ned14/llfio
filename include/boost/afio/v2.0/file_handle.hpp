@@ -65,6 +65,7 @@ class io_service;
 /*! \class file_handle
 \brief A handle to a regular file or device, kept data layout compatible with
 async_file_handle.
+\todo file_handle needs to be split into a pathed_handle for the file and directory common parts
 */
 class BOOST_AFIO_DECL file_handle : public io_handle
 {
@@ -151,6 +152,7 @@ public:
       do
       {
         auto randomname = utils::random_string(32);
+        randomname.append(".random");
         ret = file(dirpath / randomname, _mode, creation::only_if_not_exist, _caching, flags);
         if(!ret && ret.get_error().value() != EEXIST)
           return ret;
@@ -175,7 +177,7 @@ public:
   \errors Any of the values POSIX open() or CreateFile() can return.
   */
   //[[bindlib::make_free]]
-  static inline result<file_handle> temp_file(path_type name = path_type(), mode _mode = mode::write, creation _creation = creation::open_existing, caching _caching = caching::temporary, flag flags = flag::win_delete_on_last_close | flag::posix_unlink_on_first_close) noexcept
+  static inline result<file_handle> temp_file(path_type name = path_type(), mode _mode = mode::write, creation _creation = creation::open_existing, caching _caching = caching::temporary, flag flags = flag::unlink_on_close) noexcept
   {
     return name.empty() ? random_file(fixme_temporary_files_directory(), _mode, _caching, flags) : file(fixme_temporary_files_directory() / name, _mode, _creation, _caching, flags);
   }
@@ -192,30 +194,95 @@ public:
   //[[bindlib::make_free]]
   static BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<file_handle> temp_inode(path_type dirpath = fixme_temporary_files_directory(), mode _mode = mode::write) noexcept;
 
+  BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC path_type path() const noexcept override { return _path; }
+  BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> close() noexcept override
+  {
+    BOOST_AFIO_LOG_FUNCTION_CALL(_v.h);
+    if(_flags & flag::unlink_on_close)
+      return unlink();
+    return make_ready_result<void>();
+  }
+
   /*! Clone this handle (copy constructor is disabled to avoid accidental copying)
 
   \errors Any of the values POSIX dup() or DuplicateHandle() can return.
   */
   BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<file_handle> clone() const noexcept;
 
-  BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC path_type path() const noexcept override { return _path; }
-  //! The i/o service this handle is attached to
+#if 0
+  /*! Returns the current path of the open handle as said by the operating system. Note
+  that you are NOT guaranteed that any path refreshed bears any resemblance to the original,
+  many operating systems will return some different path which still reaches the same inode
+  via some other route.
+
+  Detection of unlinked files varies from platform to platform. Handling of inodes with
+  multiple paths (hardlinks) also varies from platform to platform. AFIO v2 returns
+  an empty path where it finds that the path returned by the OS does not have an inode
+  matching the current open file.
+
+  \subsection OS specific behaviours
+  On Windows, refreshing the path ALWAYS converts the cached path into a native NT kernel
+  path, destroying permanently any Win32 original path. It is non-trivial to map NT kernel
+  paths onto some Win32 equivalent. On FreeBSD, only the current path for directories can
+  be retrieved, fetching it for files currently does not work due to lack of kernel
+  support. On OS X, this is particularly flaky due to the OS X kernel, be careful.
+  */
+  result<path_type> current_path() const noexcept;
+
+  /*! Returns the cached path that this file handle was opened with.
+
+  If \em refresh is true, attempts to retrieve the current path of the open handle using
+  `current_path()`, if successful updating the cached copy with the newly retrieved path.
+  You should read the documentation for `current_path()` for list of the many caveats.
+  */
+  BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC path_type path(bool refresh = false) noexcept;
+#endif
+
+  /*! Atomically relinks the current path of this open handle to the new path specified,
+  \b atomically and silently replacing any item at the new path specified. This operation
+  is both atomic and silent matching POSIX behaviour even on Microsoft Windows where
+  no Win32 API can match POSIX semantics.
+
+  \return The full new path of the relinked filesystem entry.
+  \param newpath The optionally partial new path to relink to. The current path is used as a base
+  for any relative paths specified.
+  */
+  BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<path_type> relink(path_type newpath) noexcept;
+
+  /*! Unlinks the current path of this open handle, causing its entry to immediately disappear from the filing system.
+  On Windows unless `flag::win_disable_unlink_emulation` is set, this behaviour is
+  simulated by renaming the file to something random and setting its delete-on-last-close flag.
+  After the next handle to that file closes, it will become permanently unopenable by anyone
+  else until the last handle is closed, whereupon the entry will be deleted by the operating system.
+
+  \warning Some operating systems provide a race free syscall for unlinking an open handle (Windows).
+  On all other operating systems this call is \b racy and can result in the wrong file entry being
+  deleted. Note that unless `flag::disable_safety_unlinks` is set, this implementation checks
+  before unlinking that the item about to be unlinked has the same inode as the open file handle.
+  This should prevent most unmalicious accidental loss of data.
+  */
+  BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> unlink() noexcept;
+
+  //! The i/o service this handle is attached to, if any
   io_service *service() const noexcept { return _service; }
 
   /*! Return the current maximum permitted extent of the file.
 
   \errors Any of the values POSIX fstat() or GetFileInformationByHandleEx() can return.
   */
-  result<extent_type> length() const noexcept;
+  //[[bindlib::make_free]]
+  BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_type> length() const noexcept;
 
   /*! Resize the current maximum permitted extent of the file to the given extent, avoiding any
   new allocation of physical storage where supported. Note that on extents based filing systems
   this will succeed even if there is insufficient free space on the storage medium.
 
+  \return The bytes actually truncated to.
+  \param newsize The bytes to truncate the file to.
   \errors Any of the values POSIX ftruncate() or SetFileInformationByHandle() can return.
   */
   //[[bindlib::make_free]]
-  result<extent_type> truncate(extent_type newsize) noexcept;
+  BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_type> truncate(extent_type newsize) noexcept;
 };
 
 BOOST_AFIO_V2_NAMESPACE_END

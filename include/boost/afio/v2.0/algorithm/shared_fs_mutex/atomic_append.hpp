@@ -181,7 +181,7 @@ namespace algorithm
       static result<atomic_append> fs_mutex_append(file_handle::path_type lockfile, bool nfs_compatibility = false, bool skip_hashing = false) noexcept
       {
         BOOST_AFIO_LOG_FUNCTION_CALL(0);
-        BOOST_OUTCOME_FILTER_ERROR(ret, file_handle::file(std::move(lockfile), file_handle::mode::write, file_handle::creation::if_needed, file_handle::caching::temporary, file_handle::flag::win_delete_on_last_close));
+        BOOST_OUTCOME_FILTER_ERROR(ret, file_handle::file(std::move(lockfile), file_handle::mode::write, file_handle::creation::if_needed, file_handle::caching::temporary));
         atomic_append_detail::header header;
         // Lock the entire header for exclusive access
         auto lockresult = ret.try_lock(0, sizeof(header), true);

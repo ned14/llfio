@@ -343,7 +343,7 @@ int main(int argc, char *argv[])
       }
       else
       {
-        entities[n].value = (this_child << 16) + n;  // guaranteed unique
+        entities[n].value = (this_child << 4) + n;  // guaranteed unique
         entities[n].exclusive = true;
       }
     }

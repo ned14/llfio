@@ -115,6 +115,8 @@ const fixme_path &fixme_temporary_files_directory() noexcept
 
 result<file_handle> file_handle::file(file_handle::path_type _path, file_handle::mode _mode, file_handle::creation _creation, file_handle::caching _caching, file_handle::flag flags) noexcept
 {
+  windows_nt_kernel::init();
+  using namespace windows_nt_kernel;
   result<file_handle> ret(file_handle(std::move(_path), native_handle_type(), _caching, flags));
   native_handle_type &nativeh = ret.get()._v;
   BOOST_OUTCOME_FILTER_ERROR(access, access_mask_from_handle_mode(nativeh, _mode));
@@ -138,10 +140,22 @@ result<file_handle> file_handle::file(file_handle::path_type _path, file_handle:
   if(INVALID_HANDLE_VALUE == (nativeh.h = CreateFileW_(ret.value()._path.c_str(), access, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL, creation, attribs, NULL)))
   {
     DWORD errcode = GetLastError();
+    // assert(false);
     BOOST_AFIO_LOG_FUNCTION_CALL(0);
     return make_errored_result<file_handle>(errcode, last190(ret.value()._path.u8string()));
   }
   BOOST_AFIO_LOG_FUNCTION_CALL(nativeh.h);
+  if(flags & flag::unlink_on_close)
+  {
+    // Hide this item
+    IO_STATUS_BLOCK isb = make_iostatus();
+    FILE_BASIC_INFORMATION fbi;
+    memset(&fbi, 0, sizeof(fbi));
+    fbi.FileAttributes = FILE_ATTRIBUTE_HIDDEN;
+    NtSetInformationFile(nativeh.h, &isb, &fbi, sizeof(fbi), FileBasicInformation);
+    if(flags & flag::overlapped)
+      ntwait(nativeh.h, isb, deadline());
+  }
   if(_creation == creation::truncate && ret.value().are_safety_fsyncs_issued())
     FlushFileBuffers(nativeh.h);
   return ret;
@@ -149,8 +163,11 @@ result<file_handle> file_handle::file(file_handle::path_type _path, file_handle:
 
 result<file_handle> file_handle::temp_inode(path_type dirpath, mode _mode) noexcept
 {
+  windows_nt_kernel::init();
+  using namespace windows_nt_kernel;
   caching _caching = caching::temporary;
-  flag flags = flag::win_delete_on_last_close;
+  // No need to rename to random on unlink or check inode before unlink
+  flag flags = flag::unlink_on_close | flag::disable_safety_unlinks | flag::win_disable_unlink_emulation;
   result<file_handle> ret(file_handle(path_type(), native_handle_type(), _caching, flags));
   native_handle_type &nativeh = ret.get()._v;
   BOOST_OUTCOME_FILTER_ERROR(access, access_mask_from_handle_mode(nativeh, _mode));
@@ -161,7 +178,7 @@ result<file_handle> file_handle::temp_inode(path_type dirpath, mode _mode) noexc
   {
     try
     {
-      ret.value()._path = dirpath / utils::random_string(32);
+      ret.value()._path = dirpath / (utils::random_string(32) + ".tmp");
     }
     BOOST_OUTCOME_CATCH_EXCEPTION_TO_RESULT(file_handle)
     if(INVALID_HANDLE_VALUE == (nativeh.h = CreateFileW_(ret.value()._path.c_str(), access, /* no read nor write access for others */ FILE_SHARE_DELETE, NULL, creation, attribs, NULL)))
@@ -173,6 +190,12 @@ result<file_handle> file_handle::temp_inode(path_type dirpath, mode _mode) noexc
       return make_errored_result<file_handle>(errcode, last190(ret.value()._path.u8string()));
     }
     BOOST_AFIO_LOG_FUNCTION_CALL(nativeh.h);
+    // Hide this item
+    IO_STATUS_BLOCK isb = make_iostatus();
+    FILE_BASIC_INFORMATION fbi;
+    memset(&fbi, 0, sizeof(fbi));
+    fbi.FileAttributes = FILE_ATTRIBUTE_HIDDEN;
+    NtSetInformationFile(nativeh.h, &isb, &fbi, sizeof(fbi), FileBasicInformation);
     return ret;
   }
 }
@@ -186,6 +209,78 @@ result<file_handle> file_handle::clone() const noexcept
   if(!DuplicateHandle(GetCurrentProcess(), _v.h, GetCurrentProcess(), &ret.value()._v.h, 0, false, DUPLICATE_SAME_ACCESS))
     return make_errored_result<file_handle>(GetLastError());
   return ret;
+}
+
+result<file_handle::path_type> file_handle::relink(path_type newpath) noexcept
+{
+  windows_nt_kernel::init();
+  using namespace windows_nt_kernel;
+  BOOST_AFIO_LOG_FUNCTION_CALL(_v.h);
+  if(newpath.is_relative())
+    newpath = _path.parent_path() / newpath;
+
+  // FIXME: As soon as we implement fat paths, eliminate this mallocing NT path conversion nonsense
+  UNICODE_STRING NtPath;
+  if(!RtlDosPathNameToNtPathName_U(newpath.c_str(), &NtPath, NULL, NULL))
+    return make_errored_result<path_type>(ENOENT);
+  auto unntpath = undoer([&NtPath] {
+    if(!HeapFree(GetProcessHeap(), 0, NtPath.Buffer))
+      abort();
+  });
+
+  IO_STATUS_BLOCK isb = make_iostatus();
+  alignas(8) fixme_path::value_type buffer[32769];
+  FILE_RENAME_INFORMATION *fni = (FILE_RENAME_INFORMATION *) buffer;
+  fni->ReplaceIfExists = true;
+  // fni->RootDirectory = newdirh ? newdirh->native_handle() : nullptr;
+  fni->RootDirectory = nullptr;
+  fni->FileNameLength = NtPath.Length;
+  memcpy(fni->FileName, NtPath.Buffer, fni->FileNameLength);
+  NtSetInformationFile(_v.h, &isb, fni, sizeof(FILE_RENAME_INFORMATION) + fni->FileNameLength, FileRenameInformation);
+  if(_flags & flag::overlapped)
+    ntwait(_v.h, isb, deadline());
+  if(STATUS_SUCCESS != isb.Status)
+    return make_errored_result_nt<path_type>(isb.Status);
+  _path = std::move(newpath);
+  return _path;
+}
+
+result<void> file_handle::unlink() noexcept
+{
+  windows_nt_kernel::init();
+  using namespace windows_nt_kernel;
+  BOOST_AFIO_LOG_FUNCTION_CALL(_v.h);
+  if(!(_flags & flag::win_disable_unlink_emulation))
+  {
+    // Rename it to something random to emulate immediate unlinking
+    auto randomname = utils::random_string(32);
+    randomname.append(".deleted");
+    BOOST_OUTCOME_PROPAGATE_ERROR(relink(std::move(randomname)));
+  }
+  if(!(_flags & flag::unlink_on_close))
+  {
+    // Hide the item in Explorer and the command line
+    {
+      IO_STATUS_BLOCK isb = make_iostatus();
+      FILE_BASIC_INFORMATION fbi;
+      memset(&fbi, 0, sizeof(fbi));
+      fbi.FileAttributes = FILE_ATTRIBUTE_HIDDEN;
+      NtSetInformationFile(_v.h, &isb, &fbi, sizeof(fbi), FileBasicInformation);
+      if(_flags & flag::overlapped)
+        ntwait(_v.h, isb, deadline());
+    }
+    // Mark the item as delete on close
+    IO_STATUS_BLOCK isb = make_iostatus();
+    FILE_DISPOSITION_INFORMATION fdi;
+    memset(&fdi, 0, sizeof(fdi));
+    fdi._DeleteFile = true;
+    NtSetInformationFile(_v.h, &isb, &fdi, sizeof(fdi), FileDispositionInformation);
+    if(_flags & flag::overlapped)
+      ntwait(_v.h, isb, deadline());
+    if(STATUS_SUCCESS != isb.Status)
+      return make_errored_result_nt<void>(isb.Status);
+  }
+  return make_ready_result<void>();
 }
 
 result<file_handle::extent_type> file_handle::length() const noexcept
