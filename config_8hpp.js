@@ -1,11 +1,7 @@
 var config_8hpp =
 [
-    [ "bitfield", "structboost_1_1afio_1_1v2__xxx_1_1bitfield.html", "structboost_1_1afio_1_1v2__xxx_1_1bitfield" ],
-    [ "BOOST_AFIO_BITFIELD_BEGIN", "config_8hpp.html#a5e1130e7590e8566b58f523ef80b84c7", null ],
-    [ "BOOST_AFIO_BITFIELD_END", "config_8hpp.html#a0d3447cc66fc7217e796cd768490e081", null ],
     [ "BOOST_AFIO_CONFIGURED", "config_8hpp.html#a169d522a125e1c5fc933b54445ffc52f", null ],
     [ "BOOST_AFIO_DECL", "config_8hpp.html#af63c7b3e623e800e9eb3b0b077610d3b", null ],
-    [ "BOOST_AFIO_DISABLE_THREAD_SANITIZE", "config_8hpp.html#ga89ad581713d8d96b312530977320eb3a", null ],
     [ "BOOST_AFIO_HEADERS_ONLY", "config_8hpp.html#ga7d6cb43e029a76765081fb3a2f47187d", null ],
     [ "BOOST_AFIO_HEADERS_ONLY_FUNC_SPEC", "config_8hpp.html#gad8f3e2fb1aa278110cc8d7952abab5b6", null ],
     [ "BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC", "config_8hpp.html#ga5a75b0e1ac1a86e60b2666ed2f64d36f", null ],
@@ -78,10 +74,8 @@ var config_8hpp =
     [ "result", "config_8hpp.html#ac8d06ecaa9660e7251c1251d88c1305c", null ],
     [ "span", "config_8hpp.html#aa349d02323b4cc79a662fafc27ff55da", null ],
     [ "afio_namespace_string", "config_8hpp.html#aa156cb08cea41226cfb4e3820b2704c5", null ],
-    [ "is_nullptr", "config_8hpp.html#aa270e89fb4611305f6570fc19e430178", null ],
     [ "log", "config_8hpp.html#aea9da79cbed9aaa47b3f2f665df4be9d", null ],
     [ "outcome_namespace_string", "config_8hpp.html#a67492a1daf137ad9f55ff50714b87231", null ],
     [ "record_error_into_afio_log", "config_8hpp.html#aef86ee00adff3d4c5f3e56a6940d5292", null ],
-    [ "strip_pretty_function", "config_8hpp.html#aaa526a2f0758c697b243b93ce14bc461", null ],
-    [ "Undoer", "config_8hpp.html#a2fec5bee9348481ccb328c8f99ef3929", null ]
+    [ "strip_pretty_function", "config_8hpp.html#aaa526a2f0758c697b243b93ce14bc461", null ]
 ];

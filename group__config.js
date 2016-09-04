@@ -1,6 +1,5 @@
 var group__config =
 [
-    [ "BOOST_AFIO_DISABLE_THREAD_SANITIZE", "group__config.html#ga89ad581713d8d96b312530977320eb3a", null ],
     [ "BOOST_AFIO_HEADERS_ONLY", "group__config.html#ga7d6cb43e029a76765081fb3a2f47187d", null ],
     [ "BOOST_AFIO_HEADERS_ONLY_FUNC_SPEC", "group__config.html#gad8f3e2fb1aa278110cc8d7952abab5b6", null ],
     [ "BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC", "group__config.html#ga5a75b0e1ac1a86e60b2666ed2f64d36f", null ],

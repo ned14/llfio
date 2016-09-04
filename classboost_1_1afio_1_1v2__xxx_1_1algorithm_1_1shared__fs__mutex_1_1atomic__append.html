@@ -219,11 +219,11 @@ Protected Member Functions</h2></td></tr>
 <li>Much slower than <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1byte__ranges.html" title="Many entity shared/exclusive file system based lock.">byte_ranges</a> for few waiters or small number of entities.</li>
 <li>Sudden process exit with locks held will deadlock all other users.</li>
 <li>Maximum of twelve entities may be locked concurrently.</li>
-<li>Wasteful of disk space if used on a non-extents based filing system (e.g. FAT32, ext3). It is best used in <code>/tmp</code> if possible (<code><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1file__handle.html#aa1effcf350c823b713f7767e7530c545">file_handle::temp_file()</a></code>). If you really must use a non-extents based filing system, destroy and recreate the object instance periodically to force resetting the lock file's length to zero.</li>
+<li>Wasteful of disk space if used on a non-extents based filing system (e.g. FAT32, ext3). It is best used in <code>/tmp</code> if possible (<code><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1file__handle.html#ab5072ab928d59d3b1902d37d4a56c0e6">file_handle::temp_file()</a></code>). If you really must use a non-extents based filing system, destroy and recreate the object instance periodically to force resetting the lock file's length to zero.</li>
 <li>Similarly older operating systems (e.g. Linux &lt; 3.0) do not implement extent hole punching and therefore will also see excessive disk space consumption. Note at the time of writing OS X doesn't implement hole punching at all.</li>
 <li>If your OS doesn't have sane byte range locks (OS X, BSD, older Linuxes) and multiple objects in your process use the same lock file, misoperation will occur. Use <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1lock__files.html" title="Many entity exclusive compatibility file system based lock.">lock_files</a> instead.</li>
 </ul>
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000004">Todo:</a></b></dt><dd><p class="startdd">Implement hole punching once I port that code from AFIO v1. </p>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000006">Todo:</a></b></dt><dd><p class="startdd">Implement hole punching once I port that code from AFIO v1. </p>
 <p>Decide on some resolution mechanism for sudden process exit. </p>
 <p class="enddd">There is a 1 out of 2^64-2 chance of unique id collision. It would be nice if we actually formally checked that our chosen unique id is actually unique. </p>
 </dd></dl>
@@ -265,7 +265,7 @@ Protected Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000006">Todo:</a></b></dt><dd>Read from header.last_known_good immediately if possible in order to avoid a duplicate read later </dd></dl>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000008">Todo:</a></b></dt><dd>Read from header.last_known_good immediately if possible in order to avoid a duplicate read later </dd></dl>
 
 <p>Implements <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex.html">boost::afio::v2_xxx::algorithm::shared_fs_mutex::shared_fs_mutex</a>.</p>
 <div class="fragment"><div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;      {</div>
@@ -284,7 +284,7 @@ Protected Member Functions</h2></td></tr>
 <div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;            end_utc = (d).to_time_point();</div>
 <div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;        }</div>
 <div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;        <span class="comment">// Fire this if an error occurs</span></div>
-<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;        <span class="keyword">auto</span> disableunlock = detail::Undoer([&amp;] { out.release(); });</div>
+<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;        <span class="keyword">auto</span> disableunlock = undoer([&amp;] { out.release(); });</div>
 <div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;</div>
 <div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;        <span class="comment">// Write my lock request immediately</span></div>
 <div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;        memset(&amp;lock_request, 0, <span class="keyword">sizeof</span>(lock_request));</div>
@@ -296,10 +296,10 @@ Protected Member Functions</h2></td></tr>
 <div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;        <span class="keywordflow">if</span>(!_skip_hashing)</div>
 <div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;          lock_request.hash = <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1utils_1_1fast__hash.html#a5563217f87a97056bd5bc662a8c4c78e" title="Single shot hash of a sequence of bytes.">utils::fast_hash::hash</a>(((<span class="keywordtype">char</span> *) &amp;lock_request) + 16, <span class="keyword">sizeof</span>(lock_request) - 16);</div>
 <div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;        <span class="comment">// My lock request will be the file&#39;s current length or higher</span></div>
-<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;        BOOST_OUTCOME_FILTER_ERROR(my_lock_request_offset, _h.<a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1file__handle.html#a69b648ebe962dccca6526d7007a9c766">length</a>());</div>
+<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;        BOOST_OUTCOME_FILTER_ERROR(my_lock_request_offset, _h.<a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1file__handle.html#a6e4524b6bd5de76631bcc7ab68bab7bd">length</a>());</div>
 <div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;        {</div>
 <div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;          _h.<a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html#adf964e787e0666fc5b7d94c2715ee6f5">set_append_only</a>(<span class="keyword">true</span>);</div>
-<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;          <span class="keyword">auto</span> undo = detail::Undoer([<span class="keyword">this</span>] { _h.<a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html#adf964e787e0666fc5b7d94c2715ee6f5">set_append_only</a>(<span class="keyword">false</span>); });</div>
+<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;          <span class="keyword">auto</span> undo = undoer([<span class="keyword">this</span>] { _h.<a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html#adf964e787e0666fc5b7d94c2715ee6f5">set_append_only</a>(<span class="keyword">false</span>); });</div>
 <div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;          file_handle::extent_guard append_guard;</div>
 <div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;          <span class="keywordflow">if</span>(_nfs_compatibility)</div>
 <div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;          {</div>
@@ -501,10 +501,10 @@ Protected Member Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000005">Todo:</a></b></dt><dd>fs_mutex_append needs to check if file still exists after lock is granted, awaiting path fetching. </dd></dl>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000007">Todo:</a></b></dt><dd>fs_mutex_append needs to check if file still exists after lock is granted, awaiting path fetching. </dd></dl>
 <div class="fragment"><div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;      {</div>
 <div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;        BOOST_AFIO_LOG_FUNCTION_CALL(0);</div>
-<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;        BOOST_OUTCOME_FILTER_ERROR(ret, <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1file__handle.html#af912595f8964b78186236a2cec1150a4">file_handle::file</a>(std::move(lockfile), file_handle::mode::write, file_handle::creation::if_needed, file_handle::caching::temporary, file_handle::flag::win_delete_on_last_close));</div>
+<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;        BOOST_OUTCOME_FILTER_ERROR(ret, <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1file__handle.html#af912595f8964b78186236a2cec1150a4">file_handle::file</a>(std::move(lockfile), file_handle::mode::write, file_handle::creation::if_needed, file_handle::caching::temporary));</div>
 <div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;        atomic_append_detail::header header;</div>
 <div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;        <span class="comment">// Lock the entire header for exclusive access</span></div>
 <div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;        <span class="keyword">auto</span> lockresult = ret.try_lock(0, <span class="keyword">sizeof</span>(header), <span class="keyword">true</span>);</div>

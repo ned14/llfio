@@ -307,7 +307,7 @@ template&lt;template&lt; class &gt; class Hasher = boost_lite::algorithm::hash::
 </div><div class="memdoc">
 <p>Initialises a shared filing system mutex using the file at <em>lockfile</em> and an optional fallback lock. </p>
 <dl class="section user"><dt>Errors returnable</dt><dd>Awaiting the clang result&lt;&gt; AST parser which auto generates all the error codes which could occur, but a particularly important one is <code>EBUSY</code> which will be returned if the memory map lock is already in a degraded state (i.e. just use the fallback lock directly). </dd></dl>
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000007">Todo:</a></b></dt><dd>fs_mutex_map needs to check if file still exists after lock is granted, awaiting path fetching. </dd></dl>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000009">Todo:</a></b></dt><dd>fs_mutex_map needs to check if file still exists after lock is granted, awaiting path fetching. </dd></dl>
 <div class="fragment"><div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;      {</div>
 <div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;        BOOST_AFIO_LOG_FUNCTION_CALL(0);</div>
 <div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;        <span class="keywordflow">try</span></div>
@@ -363,7 +363,7 @@ template&lt;template&lt; class &gt; class Hasher = boost_lite::algorithm::hash::
 <div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;          {</div>
 <div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;            <span class="comment">// I am the first person to be using this (stale?) file, so create a new hash index file and write its path</span></div>
 <div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;            ret.truncate(0);</div>
-<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;            BOOST_OUTCOME_FILTER_ERROR(_temph, <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1file__handle.html#aa1effcf350c823b713f7767e7530c545">file_handle::temp_file</a>());</div>
+<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;            BOOST_OUTCOME_FILTER_ERROR(_temph, <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1file__handle.html#ab5072ab928d59d3b1902d37d4a56c0e6">file_handle::temp_file</a>());</div>
 <div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;            temph = std::move(_temph);</div>
 <div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;            <span class="keyword">auto</span> temppath(temph.path());</div>
 <div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;            temph.truncate(HashIndexSize);</div>

@@ -4,7 +4,6 @@ var namespaceboost_1_1afio_1_1v2__xxx =
     [ "storage_profile", "namespaceboost_1_1afio_1_1v2__xxx_1_1storage__profile.html", "namespaceboost_1_1afio_1_1v2__xxx_1_1storage__profile" ],
     [ "utils", "namespaceboost_1_1afio_1_1v2__xxx_1_1utils.html", "namespaceboost_1_1afio_1_1v2__xxx_1_1utils" ],
     [ "async_file_handle", "classboost_1_1afio_1_1v2__xxx_1_1async__file__handle.html", "classboost_1_1afio_1_1v2__xxx_1_1async__file__handle" ],
-    [ "bitfield", "structboost_1_1afio_1_1v2__xxx_1_1bitfield.html", "structboost_1_1afio_1_1v2__xxx_1_1bitfield" ],
     [ "deadline", "structboost_1_1afio_1_1v2__xxx_1_1deadline.html", "structboost_1_1afio_1_1v2__xxx_1_1deadline" ],
     [ "file_handle", "classboost_1_1afio_1_1v2__xxx_1_1file__handle.html", "classboost_1_1afio_1_1v2__xxx_1_1file__handle" ],
     [ "handle", "classboost_1_1afio_1_1v2__xxx_1_1handle.html", "classboost_1_1afio_1_1v2__xxx_1_1handle" ],

@@ -107,8 +107,6 @@ $(document).ready(function(){initNavTree('structboost_1_1afio_1_1v2__xxx_1_1nati
 
 <div class="header">
   <div class="summary">
-<a href="#nested-classes">Classes</a> &#124;
-<a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-attribs">Public Attributes</a> &#124;
 <a href="structboost_1_1afio_1_1v2__xxx_1_1native__handle__type-members.html">List of all members</a>  </div>
@@ -122,30 +120,21 @@ $(document).ready(function(){initNavTree('structboost_1_1afio_1_1v2__xxx_1_1nati
 
 <p><code>#include &lt;<a class="el" href="native__handle__type_8hpp_source.html">native_handle_type.hpp</a>&gt;</code></p>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
-Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1native__handle__type_1_1disposition__base.html">disposition_base</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">The type of handle.  <a href="structboost_1_1afio_1_1v2__xxx_1_1native__handle__type_1_1disposition__base.html#details">More...</a><br/></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
-Public Types</h2></td></tr>
-<tr class="memitem:a4bfe9b61095ea078d84de79847aaea61"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4bfe9b61095ea078d84de79847aaea61"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><b>disposition</b> = <a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1bitfield.html">bitfield</a>&lt; <a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1native__handle__type_1_1disposition__base.html">disposition_base</a> &gt;</td></tr>
-<tr class="separator:a4bfe9b61095ea078d84de79847aaea61"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
+<tr class="memitem:ade22f15e9a977a54937cb49f11457cce"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1native__handle__type.html#ade22f15e9a977a54937cb49f11457cce">BOOSTLITE_BITFIELD_BEGIN</a> (disposition)</td></tr>
+<tr class="memdesc:ade22f15e9a977a54937cb49f11457cce"><td class="mdescLeft">&#160;</td><td class="mdescRight">The type of handle.  <a href="#ade22f15e9a977a54937cb49f11457cce">More...</a><br/></td></tr>
+<tr class="separator:ade22f15e9a977a54937cb49f11457cce"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5ade736d1102ea5fa5a00ae96ec14dd9"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5ade736d1102ea5fa5a00ae96ec14dd9"></a>
 constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1native__handle__type.html#a5ade736d1102ea5fa5a00ae96ec14dd9">native_handle_type</a> () noexcept</td></tr>
 <tr class="memdesc:a5ade736d1102ea5fa5a00ae96ec14dd9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs a default instance. <br/></td></tr>
 <tr class="separator:a5ade736d1102ea5fa5a00ae96ec14dd9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad6eb1cef3178d6be0e5cee4e35e76e82"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad6eb1cef3178d6be0e5cee4e35e76e82"></a>
-constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1native__handle__type.html#ad6eb1cef3178d6be0e5cee4e35e76e82">native_handle_type</a> (<a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1bitfield.html">disposition</a> _behaviour, int _fd) noexcept</td></tr>
+constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1native__handle__type.html#ad6eb1cef3178d6be0e5cee4e35e76e82">native_handle_type</a> (disposition _behaviour, int _fd) noexcept</td></tr>
 <tr class="memdesc:ad6eb1cef3178d6be0e5cee4e35e76e82"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct from a POSIX file descriptor. <br/></td></tr>
 <tr class="separator:ad6eb1cef3178d6be0e5cee4e35e76e82"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a92330d915383d4eaf6a6eb6badc51286"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a92330d915383d4eaf6a6eb6badc51286"></a>
-constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1native__handle__type.html#a92330d915383d4eaf6a6eb6badc51286">native_handle_type</a> (<a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1bitfield.html">disposition</a> _behaviour, win::handle _h) noexcept</td></tr>
+constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1native__handle__type.html#a92330d915383d4eaf6a6eb6badc51286">native_handle_type</a> (disposition _behaviour, win::handle _h) noexcept</td></tr>
 <tr class="memdesc:a92330d915383d4eaf6a6eb6badc51286"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct from a Windows HANDLE. <br/></td></tr>
 <tr class="separator:a92330d915383d4eaf6a6eb6badc51286"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad347773ed7bc2201be56f99ee75e783e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad347773ed7bc2201be56f99ee75e783e"></a>
@@ -232,7 +221,7 @@ constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" 
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
 <tr class="memitem:a779010f714590d9955e7970c92622ef4"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a779010f714590d9955e7970c92622ef4"></a>
-<a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1bitfield.html">disposition</a>&#160;</td><td class="memItemRight" valign="bottom"><b>behaviour</b></td></tr>
+disposition&#160;</td><td class="memItemRight" valign="bottom"><b>behaviour</b></td></tr>
 <tr class="separator:a779010f714590d9955e7970c92622ef4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aef66d062681919ac6007b758130c0646"><td class="memItemLeft" ><a class="anchor" id="aef66d062681919ac6007b758130c0646"></a>
 union {</td></tr>
@@ -252,7 +241,65 @@ union {</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>A native handle type used for wrapping file descriptors, process ids or HANDLEs. Unmanaged, wrap in a handle object to manage. </p>
-</div><hr/>The documentation for this struct was generated from the following file:<ul>
+</div><h2 class="groupheader">Member Function Documentation</h2>
+<a class="anchor" id="ade22f15e9a977a54937cb49f11457cce"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">boost::afio::v2_xxx::native_handle_type::BOOSTLITE_BITFIELD_BEGIN </td>
+          <td>(</td>
+          <td class="paramtype">disposition&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>The type of handle. </p>
+<p>&lt; Invalid handle</p>
+<p>&lt; Is readable</p>
+<p>&lt; Is writable</p>
+<p>&lt; Is append only</p>
+<p>&lt; Requires additional synchronisation</p>
+<p>&lt; Is seekable</p>
+<p>&lt; Requires sector aligned i/o (typically 512 or 4096)</p>
+<p>&lt; Is a regular file</p>
+<p>&lt; Is a directory</p>
+<p>&lt; Is a symlink</p>
+<p>&lt; Is a kqueue/epoll/iocp</p>
+<p>&lt; Is a child process</p>
+<p>&lt; Is a memory section </p>
+<div class="fragment"><div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;  {</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    invalid = 0,  </div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    readable = 1 &lt;&lt; 0,     </div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    writable = 1 &lt;&lt; 1,     </div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    append_only = 1 &lt;&lt; 2,  </div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    overlapped = 1 &lt;&lt; 4,  </div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    seekable = 1 &lt;&lt; 5,    </div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    aligned_io = 1 &lt;&lt; 6,  </div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    file = 1 &lt;&lt; 8,          </div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    directory = 1 &lt;&lt; 9,     </div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    symlink = 1 &lt;&lt; 10,      </div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    multiplexer = 1 &lt;&lt; 11,  </div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    process = 1 &lt;&lt; 12,      </div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    section = 1 &lt;&lt; 13       </div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;  }</div>
+</div><!-- fragment -->
+</div>
+</div>
+<hr/>The documentation for this struct was generated from the following file:<ul>
 <li>include/boost/afio/v2.0/<a class="el" href="native__handle__type_8hpp_source.html">native_handle_type.hpp</a></li>
 </ul>
 </div><!-- contents -->

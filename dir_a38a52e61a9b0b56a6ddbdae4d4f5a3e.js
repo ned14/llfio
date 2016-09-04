@@ -12,13 +12,11 @@ var dir_a38a52e61a9b0b56a6ddbdae4d4f5a3e =
     [ "io_service.hpp", "io__service_8hpp.html", "io__service_8hpp" ],
     [ "map_handle.hpp", "map__handle_8hpp.html", "map__handle_8hpp" ],
     [ "native_handle_type.hpp", "native__handle__type_8hpp.html", [
-      [ "native_handle_type", "structboost_1_1afio_1_1v2__xxx_1_1native__handle__type.html", "structboost_1_1afio_1_1v2__xxx_1_1native__handle__type" ],
-      [ "disposition_base", "structboost_1_1afio_1_1v2__xxx_1_1native__handle__type_1_1disposition__base.html", "structboost_1_1afio_1_1v2__xxx_1_1native__handle__type_1_1disposition__base" ]
+      [ "native_handle_type", "structboost_1_1afio_1_1v2__xxx_1_1native__handle__type.html", "structboost_1_1afio_1_1v2__xxx_1_1native__handle__type" ]
     ] ],
     [ "statfs.hpp", "statfs_8hpp.html", [
       [ "statfs_t", "structboost_1_1afio_1_1v2__xxx_1_1statfs__t.html", "structboost_1_1afio_1_1v2__xxx_1_1statfs__t" ],
-      [ "f_flags_t", "structboost_1_1afio_1_1v2__xxx_1_1statfs__t_1_1f__flags__t.html", "structboost_1_1afio_1_1v2__xxx_1_1statfs__t_1_1f__flags__t" ],
-      [ "want_base", "structboost_1_1afio_1_1v2__xxx_1_1statfs__t_1_1want__base.html", "structboost_1_1afio_1_1v2__xxx_1_1statfs__t_1_1want__base" ]
+      [ "f_flags_t", "structboost_1_1afio_1_1v2__xxx_1_1statfs__t_1_1f__flags__t.html", "structboost_1_1afio_1_1v2__xxx_1_1statfs__t_1_1f__flags__t" ]
     ] ],
     [ "storage_profile.hpp", "storage__profile_8hpp.html", "storage__profile_8hpp" ],
     [ "utils.hpp", "utils_8hpp.html", "utils_8hpp" ]

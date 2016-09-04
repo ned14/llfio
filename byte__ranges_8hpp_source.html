@@ -178,7 +178,7 @@ $(document).ready(function(){initNavTree('byte__ranges_8hpp_source.html','');});
 <div class="line"><a name="l00101"></a><span class="lineno"><a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1byte__ranges.html#ad5ec22e222542607ce161d666506fb2b">  101</a></span>&#160;      <span class="keyword">static</span> <a class="code" href="namespaceboost_1_1afio_1_1v2__xxx.html#ac8d06ecaa9660e7251c1251d88c1305c" title="Please see https://ned14.github.io/boost.outcome/classboost_1_1outcome_1_1v1__xxx_1_1basic__monad.html.">result&lt;byte_ranges&gt;</a> fs_mutex_byte_ranges(file_handle::path_type lockfile) noexcept</div>
 <div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;      {</div>
 <div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;        BOOST_AFIO_LOG_FUNCTION_CALL(0);</div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;        BOOST_OUTCOME_FILTER_ERROR(ret, file_handle::file(std::move(lockfile), file_handle::mode::write, file_handle::creation::if_needed, file_handle::caching::temporary, file_handle::flag::win_delete_on_last_close));</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;        BOOST_OUTCOME_FILTER_ERROR(ret, file_handle::file(std::move(lockfile), file_handle::mode::write, file_handle::creation::if_needed, file_handle::caching::temporary));</div>
 <div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1byte__ranges.html" title="Many entity shared/exclusive file system based lock.">byte_ranges</a>(std::move(ret));</div>
 <div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;      }</div>
 <div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;</div>
@@ -198,13 +198,13 @@ $(document).ready(function(){initNavTree('byte__ranges_8hpp_source.html','');});
 <div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;            end_utc = (d).to_time_point();</div>
 <div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;        }</div>
 <div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;        <span class="comment">// Fire this if an error occurs</span></div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;        <span class="keyword">auto</span> disableunlock = detail::Undoer([&amp;] { out.release(); });</div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;        <span class="keyword">auto</span> disableunlock = undoer([&amp;] { out.release(); });</div>
 <div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;        <span class="keywordtype">size_t</span> n;</div>
 <div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;        <span class="keywordflow">for</span>(;;)</div>
 <div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;        {</div>
 <div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;          <span class="keywordtype">size_t</span> was_contended = (size_t) -1;</div>
 <div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;          {</div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;            <span class="keyword">auto</span> undo = detail::Undoer([&amp;] {</div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;            <span class="keyword">auto</span> undo = undoer([&amp;] {</div>
 <div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;              <span class="comment">// 0 to (n-1) need to be closed</span></div>
 <div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;              <span class="keywordflow">if</span>(n &gt; 0)</div>
 <div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;              {</div>

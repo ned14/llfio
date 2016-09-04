@@ -1,7 +1,5 @@
 var searchData=
 [
-  ['boost_5fafio_5fbitfield_5fbegin',['BOOST_AFIO_BITFIELD_BEGIN',['../config_8hpp.html#a5e1130e7590e8566b58f523ef80b84c7',1,'config.hpp']]],
-  ['boost_5fafio_5fbitfield_5fend',['BOOST_AFIO_BITFIELD_END',['../config_8hpp.html#a0d3447cc66fc7217e796cd768490e081',1,'config.hpp']]],
   ['boost_5fafio_5fcompile_5fkqueues',['BOOST_AFIO_COMPILE_KQUEUES',['../io__service_8hpp.html#ab9c867c05f1692955f174763005b0267',1,'io_service.hpp']]],
   ['boost_5fafio_5fhave_5frealtime_5fsignals',['BOOST_AFIO_HAVE_REALTIME_SIGNALS',['../io__service_8hpp.html#a1b6876c3aadf9312dd9a8e3243b947fb',1,'io_service.hpp']]],
   ['boost_5fafio_5fheaders_5fpath',['BOOST_AFIO_HEADERS_PATH',['../afio_8hpp.html#a473fa3392c54bdef2ab8e4f1b8140446',1,'afio.hpp']]],

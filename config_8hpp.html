@@ -105,7 +105,6 @@ $(document).ready(function(){initNavTree('config_8hpp.html','');});
 
 <div class="header">
   <div class="summary">
-<a href="#nested-classes">Classes</a> &#124;
 <a href="#namespaces">Namespaces</a> &#124;
 <a href="#define-members">Macros</a> &#124;
 <a href="#typedef-members">Typedefs</a> &#124;
@@ -126,6 +125,8 @@ $(document).ready(function(){initNavTree('config_8hpp.html','');});
 <code>#include &quot;../boost-lite/include/bind/stl11/std/thread&quot;</code><br/>
 <code>#include &quot;../boost-lite/include/bind/stl1z/boost/filesystem&quot;</code><br/>
 <code>#include &quot;../boost-lite/include/boost/config.hpp&quot;</code><br/>
+<code>#include &quot;../boost-lite/include/bitfield.hpp&quot;</code><br/>
+<code>#include &quot;../boost-lite/include/scoped_undo.hpp&quot;</code><br/>
 <code>#include &quot;../gsl-lite/include/gsl.h&quot;</code><br/>
 <code>#include &quot;../boost-lite/include/ringbuffer_log.hpp&quot;</code><br/>
 <code>#include &quot;../boost-lite/include/utils/thread.hpp&quot;</code><br/>
@@ -135,12 +136,6 @@ $(document).ready(function(){initNavTree('config_8hpp.html','');});
 </div>
 <p><a href="config_8hpp_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
-Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1bitfield.html">boost::afio::v2_xxx::bitfield&lt; Enum &gt;</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constexpr typesafe bitwise flags support.  <a href="structboost_1_1afio_1_1v2__xxx_1_1bitfield.html#details">More...</a><br/></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="namespaces"></a>
 Namespaces</h2></td></tr>
 <tr class="memitem:namespaceboost"><td class="memItemLeft" align="right" valign="top">namespace &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceboost.html">boost</a></td></tr>
@@ -358,12 +353,6 @@ Macros</h2></td></tr>
 <tr class="memitem:ab5fbd315e03ffbe890b94a0d8285c8b5"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab5fbd315e03ffbe890b94a0d8285c8b5"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><b>BOOST_AFIO_LOG_ALL</b>(inst, message)</td></tr>
 <tr class="separator:ab5fbd315e03ffbe890b94a0d8285c8b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5e1130e7590e8566b58f523ef80b84c7"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="config_8hpp.html#a5e1130e7590e8566b58f523ef80b84c7">BOOST_AFIO_BITFIELD_BEGIN</a>(type)</td></tr>
-<tr class="memdesc:a5e1130e7590e8566b58f523ef80b84c7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Begins a typesafe bitfield.  <a href="#a5e1130e7590e8566b58f523ef80b84c7">More...</a><br/></td></tr>
-<tr class="separator:a5e1130e7590e8566b58f523ef80b84c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0d3447cc66fc7217e796cd768490e081"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="config_8hpp.html#a0d3447cc66fc7217e796cd768490e081">BOOST_AFIO_BITFIELD_END</a>(type)</td></tr>
-<tr class="memdesc:a0d3447cc66fc7217e796cd768490e081"><td class="mdescLeft">&#160;</td><td class="mdescRight">Ends a typesafe bitfield.  <a href="#a0d3447cc66fc7217e796cd768490e081">More...</a><br/></td></tr>
-<tr class="separator:a0d3447cc66fc7217e796cd768490e081"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gad8f3e2fb1aa278110cc8d7952abab5b6"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="gad8f3e2fb1aa278110cc8d7952abab5b6"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__config.html#gad8f3e2fb1aa278110cc8d7952abab5b6">BOOST_AFIO_HEADERS_ONLY_FUNC_SPEC</a>&#160;&#160;&#160;inline</td></tr>
 <tr class="memdesc:gad8f3e2fb1aa278110cc8d7952abab5b6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Expands into the appropriate markup to declare an <code>extern</code> function exported from the AFIO DLL if not building headers only. <br/></td></tr>
@@ -376,10 +365,6 @@ Macros</h2></td></tr>
 #define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__config.html#gab4f63024aa1238f1d6a067b3d7fb23c7">BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC</a>&#160;&#160;&#160;inline virtual</td></tr>
 <tr class="memdesc:gab4f63024aa1238f1d6a067b3d7fb23c7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Expands into the appropriate markup to declare a virtual class member function exported from the AFIO DLL if not building headers only. <br/></td></tr>
 <tr class="separator:gab4f63024aa1238f1d6a067b3d7fb23c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga89ad581713d8d96b312530977320eb3a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga89ad581713d8d96b312530977320eb3a"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__config.html#ga89ad581713d8d96b312530977320eb3a">BOOST_AFIO_DISABLE_THREAD_SANITIZE</a></td></tr>
-<tr class="memdesc:ga89ad581713d8d96b312530977320eb3a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Expands into the appropriate markup to declare a function as to not be thread sanitised by the ThreadSanitiser. <br/></td></tr>
-<tr class="separator:ga89ad581713d8d96b312530977320eb3a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
@@ -434,66 +419,10 @@ span&lt; char &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceboost_1_1afio_1_1v2__xxx.html#aaa526a2f0758c697b243b93ce14bc461">boost::afio::v2_xxx::strip_pretty_function</a> (char *out, size_t bytes, const char *in)</td></tr>
 <tr class="memdesc:aaa526a2f0758c697b243b93ce14bc461"><td class="mdescLeft">&#160;</td><td class="mdescRight">Strips a <b>PRETTY_FUNCTION</b> of all instances of <a class="el" href="namespaceboost_1_1afio.html" title="The AFIO namespace.">boost::afio</a>:: and boost::outcome:: <br/></td></tr>
 <tr class="separator:aaa526a2f0758c697b243b93ce14bc461"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa270e89fb4611305f6570fc19e430178"><td class="memTemplParams" colspan="2"><a class="anchor" id="aa270e89fb4611305f6570fc19e430178"></a>
-template&lt;typename T &gt; </td></tr>
-<tr class="memitem:aa270e89fb4611305f6570fc19e430178"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>boost::afio::v2_xxx::detail::is_nullptr</b> (T v) noexcept</td></tr>
-<tr class="memdesc:aa270e89fb4611305f6570fc19e430178"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compile-time safe detector of if <em>v</em> is nullptr (can cope with non-pointer convertibles) <br/></td></tr>
-<tr class="separator:aa270e89fb4611305f6570fc19e430178"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2fec5bee9348481ccb328c8f99ef3929"><td class="memTemplParams" colspan="2">template&lt;typename callable &gt; </td></tr>
-<tr class="memitem:a2fec5bee9348481ccb328c8f99ef3929"><td class="memTemplItemLeft" align="right" valign="top">UndoerImpl&lt; callable &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>boost::afio::v2_xxx::detail::Undoer</b> (callable c)</td></tr>
-<tr class="memdesc:a2fec5bee9348481ccb328c8f99ef3929"><td class="mdescLeft">&#160;</td><td class="mdescRight">Alexandrescu style rollbacks, a la C++ 11.  <a href="#a2fec5bee9348481ccb328c8f99ef3929">More...</a><br/></td></tr>
-<tr class="separator:a2fec5bee9348481ccb328c8f99ef3929"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Configures a compiler environment for AFIO header and source code. </p>
 </div><h2 class="groupheader">Macro Definition Documentation</h2>
-<a class="anchor" id="a5e1130e7590e8566b58f523ef80b84c7"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define BOOST_AFIO_BITFIELD_BEGIN</td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">type</td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">\</div>
-<div class="line">struct type##_base                                                                                                                                                                                                                                                                                                             \</div>
-<div class="line">  \</div>
-<div class="line">{                                                                                                                                                                                                                                                                                                                         \</div>
-<div class="line">  enum enum_type : <span class="keywordtype">unsigned</span></div>
-</div><!-- fragment -->
-<p>Begins a typesafe bitfield. </p>
-
-</div>
-</div>
-<a class="anchor" id="a0d3447cc66fc7217e796cd768490e081"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define BOOST_AFIO_BITFIELD_END</td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">type</td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">\</div>
-<div class="line">;                                                                                                                                                                                                                                                                                                                         \</div>
-<div class="line">  }                                                                                                                                                                                                                                                                                                                            \</div>
-<div class="line">  ;                                                                                                                                                                                                                                                                                                                            \</div>
-<div class="line">  \</div>
-<div class="line">using type = bitfield&lt;type##_base&gt;;</div>
-</div><!-- fragment -->
-<p>Ends a typesafe bitfield. </p>
-
-</div>
-</div>
 <a class="anchor" id="acd70d05e20d178c2a58170dd6690c57b"></a>
 <div class="memitem">
 <div class="memproto">
