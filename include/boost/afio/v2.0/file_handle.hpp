@@ -165,7 +165,7 @@ public:
   the OS declares to be suitable for temporary files. Most OSs are
   very lazy about flushing changes made to these temporary files.
   Note the default flags are to have the newly created file deleted
-  on first handle close (POSIX) or last handle close (Windows).
+  on first handle close.
   Note also that an empty name is equivalent to calling
   `random_file(fixme_temporary_files_directory())` and the creation
   parameter is ignored.
@@ -177,7 +177,7 @@ public:
   \errors Any of the values POSIX open() or CreateFile() can return.
   */
   //[[bindlib::make_free]]
-  static inline result<file_handle> temp_file(path_type name = path_type(), mode _mode = mode::write, creation _creation = creation::open_existing, caching _caching = caching::temporary, flag flags = flag::unlink_on_close) noexcept
+  static inline result<file_handle> temp_file(path_type name = path_type(), mode _mode = mode::write, creation _creation = creation::if_needed, caching _caching = caching::temporary, flag flags = flag::unlink_on_close) noexcept
   {
     return name.empty() ? random_file(fixme_temporary_files_directory(), _mode, _caching, flags) : file(fixme_temporary_files_directory() / name, _mode, _creation, _caching, flags);
   }

@@ -178,10 +178,8 @@ namespace algorithm
           // OSs don't reflect zeros into memory maps upon truncation for quite a
           // long time
           _h.truncate(0);
-#ifndef _WIN32
-          // On POSIX we also need to delete the temp file
+          // Unlink the temp file
           _temph.unlink();
-#endif
         }
       }
 
@@ -196,7 +194,7 @@ namespace algorithm
         BOOST_AFIO_LOG_FUNCTION_CALL(0);
         try
         {
-          BOOST_OUTCOME_FILTER_ERROR(ret, file_handle::file(std::move(lockfile), file_handle::mode::write, file_handle::creation::if_needed, file_handle::caching::temporary, file_handle::flag::win_delete_on_last_close));
+          BOOST_OUTCOME_FILTER_ERROR(ret, file_handle::file(std::move(lockfile), file_handle::mode::write, file_handle::creation::if_needed, file_handle::caching::temporary));
           file_handle temph;
           // Am I the first person to this file? Lock the inuse exclusively
           auto lockinuse = ret.try_lock(_lockinuseoffset, 1, true);
@@ -220,7 +218,7 @@ namespace algorithm
             if(!buffer[0])
               goto use_fall_back_lock;
             else
-              _temph = file_handle::file(temphpath, file_handle::mode::write, file_handle::creation::open_existing, file_handle::caching::temporary, file_handle::flag::win_delete_on_last_close);
+              _temph = file_handle::file(temphpath, file_handle::mode::write, file_handle::creation::open_existing, file_handle::caching::temporary);
             // If temp file doesn't exist, I am on a different machine
             if(!_temph)
             {
@@ -248,7 +246,7 @@ namespace algorithm
           {
             // I am the first person to be using this (stale?) file, so create a new hash index file and write its path
             ret.truncate(0);
-            BOOST_OUTCOME_FILTER_ERROR(_temph, file_handle::temp_file());
+            BOOST_OUTCOME_FILTER_ERROR(_temph, file_handle::random_file(fixme_temporary_files_directory()));
             temph = std::move(_temph);
             auto temppath(temph.path());
             temph.truncate(HashIndexSize);
