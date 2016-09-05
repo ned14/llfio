@@ -190,12 +190,15 @@ result<file_handle> file_handle::temp_inode(path_type dirpath, mode _mode) noexc
       return make_errored_result<file_handle>(errcode, last190(ret.value()._path.u8string()));
     }
     BOOST_AFIO_LOG_FUNCTION_CALL(nativeh.h);
-    // Hide this item
-    IO_STATUS_BLOCK isb = make_iostatus();
-    FILE_BASIC_INFORMATION fbi;
-    memset(&fbi, 0, sizeof(fbi));
-    fbi.FileAttributes = FILE_ATTRIBUTE_HIDDEN;
-    NtSetInformationFile(nativeh.h, &isb, &fbi, sizeof(fbi), FileBasicInformation);
+    if(nativeh.h)
+    {
+      // Hide this item
+      IO_STATUS_BLOCK isb = make_iostatus();
+      FILE_BASIC_INFORMATION fbi;
+      memset(&fbi, 0, sizeof(fbi));
+      fbi.FileAttributes = FILE_ATTRIBUTE_HIDDEN;
+      NtSetInformationFile(nativeh.h, &isb, &fbi, sizeof(fbi), FileBasicInformation);
+    }
     return ret;
   }
 }

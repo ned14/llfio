@@ -287,7 +287,7 @@ static auto TestSharedFSMutexCorrectnessChildWorker = BOOST_KERNELTEST_V1_NAMESP
       if(oldval != 0)
         return "Child " + std::to_string(childidx) + " holding exclusive lock yet " + std::to_string(oldval) + " users hold the shared lock!";
       oldval = shmem->current_exclusive.exchange(-1);
-      if(oldval != childidx)
+      if(oldval != (long) childidx)
         return "Child " + std::to_string(childidx) + " released exclusive lock to find child " + std::to_string(oldval) + " had stolen my lock!";
     }
     else if(shmem->testtype == shared_memory::test_type::shared || shmem->testtype == shared_memory::test_type::both)
