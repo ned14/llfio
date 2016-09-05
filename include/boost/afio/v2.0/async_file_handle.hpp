@@ -40,7 +40,6 @@ DEALINGS IN THE SOFTWARE.
 BOOST_AFIO_V2_NAMESPACE_EXPORT_BEGIN
 
 /*! An asynchronous handle to an open something
-\todo async_file_handle needs to gain its own random_file(), temp_file() and temp_inode() implementations
 */
 class BOOST_AFIO_DECL async_file_handle : public file_handle
 {
@@ -109,7 +108,80 @@ public:
   \errors Any of the values POSIX open() or CreateFile() can return.
   */
   //[[bindlib::make_free]]
-  static BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<async_file_handle> async_file(io_service &service, path_type _path, mode _mode = mode::read, creation _creation = creation::open_existing, caching _caching = caching::all, flag flags = flag::none) noexcept;
+  static BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<async_file_handle> async_file(io_service &service, path_type _path, mode _mode = mode::read, creation _creation = creation::open_existing, caching _caching = caching::all, flag flags = flag::none) noexcept
+  {
+    // Open it overlapped, otherwise no difference.
+    BOOST_OUTCOME_FILTER_ERROR(v, file_handle::file(std::move(_path), std::move(_mode), std::move(_creation), std::move(_caching), flags | flag::overlapped));
+    async_file_handle ret(std::move(v));
+    ret._service = &service;
+    return std::move(ret);
+  }
+
+  /*! Create an async file handle creating a randomly named file on a path.
+  The file is opened exclusively with `creation::only_if_not_exist` so it
+  will never collide with nor overwrite any existing file. Note also
+  that caching defaults to temporary which hints to the OS to only
+  flush changes to physical storage as lately as possible.
+
+  \errors Any of the values POSIX open() or CreateFile() can return.
+  */
+  //[[bindlib::make_free]]
+  static inline result<async_file_handle> async_random_file(io_service &service, path_type dirpath, mode _mode = mode::write, caching _caching = caching::temporary, flag flags = flag::none) noexcept
+  {
+    try
+    {
+      result<async_file_handle> ret;
+      do
+      {
+        auto randomname = utils::random_string(32);
+        randomname.append(".random");
+        ret = async_file(service, dirpath / randomname, _mode, creation::only_if_not_exist, _caching, flags);
+        if(!ret && ret.get_error().value() != EEXIST)
+          return ret;
+      } while(!ret);
+      return ret;
+    }
+    BOOST_OUTCOME_CATCH_EXCEPTION_TO_RESULT(async_file_handle)
+  }
+  /*! Create an async file handle creating the named file on some path which
+  the OS declares to be suitable for temporary files. Most OSs are
+  very lazy about flushing changes made to these temporary files.
+  Note the default flags are to have the newly created file deleted
+  on first handle close.
+  Note also that an empty name is equivalent to calling
+  `async_random_file(fixme_temporary_files_directory())` and the creation
+  parameter is ignored.
+
+  \note If the temporary file you are creating is not going to have its
+  path sent to another process for usage, this is the WRONG function
+  to use. Use `temp_inode()` instead, it is far more secure.
+
+  \errors Any of the values POSIX open() or CreateFile() can return.
+  */
+  //[[bindlib::make_free]]
+  static inline result<async_file_handle> async_temp_file(io_service &service, path_type name = path_type(), mode _mode = mode::write, creation _creation = creation::if_needed, caching _caching = caching::temporary, flag flags = flag::unlink_on_close) noexcept
+  {
+    return name.empty() ? async_random_file(service, fixme_temporary_files_directory(), _mode, _caching, flags) : async_file(service, fixme_temporary_files_directory() / name, _mode, _creation, _caching, flags);
+  }
+  /*! \em Securely create an async file handle creating a temporary anonymous inode in
+  the filesystem referred to by \em dirpath. The inode created has
+  no name nor accessible path on the filing system and ceases to
+  exist as soon as the last handle is closed, making it ideal for use as
+  a temporary file where other processes do not need to have access
+  to its contents via some path on the filing system (a classic use case
+  is for backing shared memory maps).
+
+  \errors Any of the values POSIX open() or CreateFile() can return.
+  */
+  //[[bindlib::make_free]]
+  static BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<async_file_handle> async_temp_inode(io_service &service, path_type dirpath = fixme_temporary_files_directory(), mode _mode = mode::write, flag flags = flag::none) noexcept
+  {
+    // Open it overlapped, otherwise no difference.
+    BOOST_OUTCOME_FILTER_ERROR(v, file_handle::temp_inode(std::move(dirpath), std::move(_mode), flags | flag::overlapped));
+    async_file_handle ret(std::move(v));
+    ret._service = &service;
+    return std::move(ret);
+  }
 
   /*! Clone this handle to a different io_service (copy constructor is disabled to avoid accidental copying)
 

@@ -42,16 +42,6 @@ result<async_file_handle> async_file_handle::clone(io_service &service) const no
   return std::move(ret);
 }
 
-result<async_file_handle> async_file_handle::async_file(io_service &service, async_file_handle::path_type _path, async_file_handle::mode _mode, async_file_handle::creation _creation, async_file_handle::caching _caching, async_file_handle::flag flags) noexcept
-{
-  // Open it overlapped, otherwise no difference.
-  BOOST_OUTCOME_FILTER_ERROR(v, file_handle::file(std::move(_path), std::move(_mode), std::move(_creation), std::move(_caching), flags | flag::overlapped));
-  async_file_handle ret(std::move(v));
-  ret._service = &service;
-  return std::move(ret);
-}
-
-
 template <class CompletionRoutine, class BuffersType, class IORoutine>
 result<async_file_handle::io_state_ptr<CompletionRoutine, BuffersType>> async_file_handle::_begin_io(async_file_handle::operation_t operation, async_file_handle::io_request<BuffersType> reqs, CompletionRoutine &&completion, IORoutine &&ioroutine) noexcept
 {

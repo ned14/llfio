@@ -161,13 +161,13 @@ result<file_handle> file_handle::file(file_handle::path_type _path, file_handle:
   return ret;
 }
 
-result<file_handle> file_handle::temp_inode(path_type dirpath, mode _mode) noexcept
+result<file_handle> file_handle::temp_inode(path_type dirpath, mode _mode, flag flags) noexcept
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
   caching _caching = caching::temporary;
   // No need to rename to random on unlink or check inode before unlink
-  flag flags = flag::unlink_on_close | flag::disable_safety_unlinks | flag::win_disable_unlink_emulation;
+  flags |= flag::unlink_on_close | flag::disable_safety_unlinks | flag::win_disable_unlink_emulation;
   result<file_handle> ret(file_handle(path_type(), native_handle_type(), _caching, flags));
   native_handle_type &nativeh = ret.get()._v;
   BOOST_OUTCOME_FILTER_ERROR(access, access_mask_from_handle_mode(nativeh, _mode));
@@ -260,6 +260,7 @@ result<void> file_handle::unlink() noexcept
     randomname.append(".deleted");
     BOOST_OUTCOME_PROPAGATE_ERROR(relink(std::move(randomname)));
   }
+  // No point marking it for deletion if it's already been so
   if(!(_flags & flag::unlink_on_close))
   {
     // Hide the item in Explorer and the command line

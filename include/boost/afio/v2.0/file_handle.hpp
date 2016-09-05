@@ -181,7 +181,7 @@ public:
   {
     return name.empty() ? random_file(fixme_temporary_files_directory(), _mode, _caching, flags) : file(fixme_temporary_files_directory() / name, _mode, _creation, _caching, flags);
   }
-  /*! Create a file handle creating a temporary anonymous inode in
+  /*! \em Securely create a file handle creating a temporary anonymous inode in
   the filesystem referred to by \em dirpath. The inode created has
   no name nor accessible path on the filing system and ceases to
   exist as soon as the last handle is closed, making it ideal for use as
@@ -192,15 +192,17 @@ public:
   \errors Any of the values POSIX open() or CreateFile() can return.
   */
   //[[bindlib::make_free]]
-  static BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<file_handle> temp_inode(path_type dirpath = fixme_temporary_files_directory(), mode _mode = mode::write) noexcept;
+  static BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<file_handle> temp_inode(path_type dirpath = fixme_temporary_files_directory(), mode _mode = mode::write, flag flags = flag::none) noexcept;
 
   BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC path_type path() const noexcept override { return _path; }
   BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> close() noexcept override
   {
     BOOST_AFIO_LOG_FUNCTION_CALL(_v.h);
     if(_flags & flag::unlink_on_close)
-      return unlink();
-    return make_ready_result<void>();
+    {
+      BOOST_OUTCOME_PROPAGATE_ERROR(unlink());
+    }
+    return io_handle::close();
   }
 
   /*! Clone this handle (copy constructor is disabled to avoid accidental copying)
