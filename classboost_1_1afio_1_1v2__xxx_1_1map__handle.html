@@ -385,7 +385,7 @@ flag&#160;</td><td class="memItemRight" valign="bottom"><b>_flags</b></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>A handle to a memory mapped region of memory. </p>
 <dl class="section note"><dt>Note</dt><dd>The native handle returned by this map handle is always that of the backing storage, but closing this handle does not close that of the backing storage, nor does releasing this handle release that of the backing storage. Locking byte ranges of this handle is therefore equal to locking byte ranges in the original backing storage.</dd></dl>
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000005">Todo:</a></b></dt><dd><p class="startdd">MADV_NOSYNC on FreeBSD needs to applied when the file is temporary </p>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000004">Todo:</a></b></dt><dd><p class="startdd">MADV_NOSYNC on FreeBSD needs to applied when the file is temporary </p>
 <p class="enddd">MADV_FREE on FreeBSD seems to do what MADV_DONTNEED does on Linux, investigate. </p>
 </dd></dl>
 </div><h2 class="groupheader">Member Function Documentation</h2>
