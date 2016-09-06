@@ -712,13 +712,7 @@ This lets one pack one byte of input into two bytes of output.
 
   public:
     //! Initialise the hash with an optional seed
-    BOOST_CXX14_CONSTEXPR fast_hash(const uint128 &seed = uint128(nullptr)) noexcept
-    {
-      m_length = 0;
-      m_remainder = 0;
-      m_state[0] = seed.as_longlongs[0];
-      m_state[1] = seed.as_longlongs[1];
-    }
+    constexpr fast_hash(const uint128 &seed = uint128(nullptr)) noexcept : m_data{0}, m_state{seed.as_longlongs[0], seed.as_longlongs[1]}, m_length(0), m_remainder(0) {}
 
     //! Hash input
     void add(const char *data, size_t bytes) noexcept;

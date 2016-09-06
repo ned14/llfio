@@ -66,28 +66,47 @@ namespace algorithm
       {
         //! The type backing the value
         using value_type = handle::extent_type;
-        //! The value of the entity type which can range between 0 and (2^63)-1
-        value_type value : 63;
-        //! True if entity should be locked for exclusive access
-        value_type exclusive : 1;
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4201)  // nameless union used
+#endif
+        union {
+          value_type _init;
+          struct
+          {
+            //! The value of the entity type which can range between 0 and (2^63)-1
+            value_type value : 63;
+            //! True if entity should be locked for exclusive access
+            value_type exclusive : 1;
+          };
+        };
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
         //! Default constructor
-        constexpr entity_type()
-            : value(0)
-            , exclusive(0)
-        {
-        }
+        constexpr entity_type() noexcept : _init(0) {}
         //! Constructor
-        constexpr entity_type(value_type _value, bool _exclusive)
-            : value(_value)
-            , exclusive(_exclusive)
+        BOOST_CXX14_CONSTEXPR entity_type(value_type _value, bool _exclusive) noexcept : _init(0)
         {
+          value = _value;
+          exclusive = _exclusive;
         }
       };
+      static_assert(std::is_literal_type<entity_type>::value, "entity_type is not a literal type");
+      static_assert(sizeof(entity_type) == sizeof(entity_type::value_type), "entity_type is bit equal to its underlying type");
       //! The type of a sequence of entities
       using entities_type = span<entity_type>;
 
     protected:
-      BOOST_CXX14_CONSTEXPR shared_fs_mutex() {}
+#ifdef __cpp_relaxed_constexpr
+      static constexpr bool _entity_type_endian_check()
+      {
+        entity_type v(0, true);
+        return v._init != 1;
+      }
+      static_assert(_entity_type_endian_check(), "entity_type.exclusive is setting the bottom bit, endian problems?");
+#endif
+      constexpr shared_fs_mutex() {}
 
     public:
       virtual ~shared_fs_mutex() {}

@@ -463,7 +463,7 @@ static void TestMemoryMapFallback()
   auto shared_mem_file_map = afio::map_handle::map(shared_mem_file_section).get();
   shared_memory *shmem = (shared_memory *) shared_mem_file_map.address();
   auto begin = afio::stl11::chrono::steady_clock::now();
-  while(afio::stl11::chrono::duration_cast<afio::stl11::chrono::seconds>(afio::stl11::chrono::steady_clock::now() - begin).count() < 5)
+  while(afio::stl11::chrono::duration_cast<afio::stl11::chrono::seconds>(afio::stl11::chrono::steady_clock::now() - begin).count() < 20)
   {
     shmem->current_shared = -(long) afio::stl11::thread::hardware_concurrency();
     shmem->current_exclusive = -(long) afio::stl11::thread::hardware_concurrency() - 1;
@@ -473,7 +473,16 @@ static void TestMemoryMapFallback()
     auto child_workers = kerneltest::launch_child_workers("TestSharedFSMutexCorrectness", afio::stl11::thread::hardware_concurrency());
     child_workers.wait_until_ready();
     child_workers.go();
-    afio::stl11::this_thread::sleep_for(afio::stl11::chrono::milliseconds(50));
+    // Wait until children get to lock
+    {
+      auto lk = afio::algorithm::shared_fs_mutex::memory_map<>::fs_mutex_map("lockfile").get();
+      bool done;
+      do
+      {
+        auto _ = lk.try_lock(afio::algorithm::shared_fs_mutex::shared_fs_mutex::entity_type(0, false));
+        done = _.has_error();
+      } while(!done);
+    }
     // Zomp the lock file pretending to be a networked user
     {
       auto lf = afio::file_handle::file("lockfile", afio::file_handle::mode::write, afio::file_handle::creation::open_existing, afio::file_handle::caching::reads).get();
