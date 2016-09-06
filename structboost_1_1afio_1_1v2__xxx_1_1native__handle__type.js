@@ -4,7 +4,7 @@ var structboost_1_1afio_1_1v2__xxx_1_1native__handle__type =
     [ "native_handle_type", "structboost_1_1afio_1_1v2__xxx_1_1native__handle__type.html#ad6eb1cef3178d6be0e5cee4e35e76e82", null ],
     [ "native_handle_type", "structboost_1_1afio_1_1v2__xxx_1_1native__handle__type.html#a92330d915383d4eaf6a6eb6badc51286", null ],
     [ "native_handle_type", "structboost_1_1afio_1_1v2__xxx_1_1native__handle__type.html#ad347773ed7bc2201be56f99ee75e783e", null ],
-    [ "native_handle_type", "structboost_1_1afio_1_1v2__xxx_1_1native__handle__type.html#a1768c44bb2f7046b992123bb948632ee", null ],
+    [ "native_handle_type", "structboost_1_1afio_1_1v2__xxx_1_1native__handle__type.html#a327bc778ebbab6a497f0718492ba7bd8", null ],
     [ "BOOSTLITE_BITFIELD_BEGIN", "structboost_1_1afio_1_1v2__xxx_1_1native__handle__type.html#ade22f15e9a977a54937cb49f11457cce", null ],
     [ "is_append_only", "structboost_1_1afio_1_1v2__xxx_1_1native__handle__type.html#a9cc61ca802354747be3f08eabba2969e", null ],
     [ "is_directory", "structboost_1_1afio_1_1v2__xxx_1_1native__handle__type.html#aac1bb1d0c281c22ed021d3b7839ebd4b", null ],

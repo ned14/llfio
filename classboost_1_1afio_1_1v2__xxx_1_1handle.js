@@ -30,7 +30,7 @@ var classboost_1_1afio_1_1v2__xxx_1_1handle =
       [ "append", "classboost_1_1afio_1_1v2__xxx_1_1handle.html#acd7f0c039e94c7ad40937fe32a2cabada9516dfb15f51c7ee19a4d46b8c0dbe1d", null ]
     ] ],
     [ "handle", "classboost_1_1afio_1_1v2__xxx_1_1handle.html#aa845780704a8508c658c2b878f574ba7", null ],
-    [ "handle", "classboost_1_1afio_1_1v2__xxx_1_1handle.html#afeb3459e9b79236dbd664a816cd94079", null ],
+    [ "handle", "classboost_1_1afio_1_1v2__xxx_1_1handle.html#a4e9723c353eee4bcd629a7c9a01472f2", null ],
     [ "~handle", "classboost_1_1afio_1_1v2__xxx_1_1handle.html#a28bfd52c52de4aa17ceb208e54bcc4e6", null ],
     [ "handle", "classboost_1_1afio_1_1v2__xxx_1_1handle.html#a0dbf908498e5cbf54ee0fff752c0c490", null ],
     [ "handle", "classboost_1_1afio_1_1v2__xxx_1_1handle.html#a2c20412387db2551d9b26824412d4986", null ],

@@ -3,7 +3,7 @@ var classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__f
     [ "entities_guard", "classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex_1_1entities__guard.html", "classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex_1_1entities__guard" ],
     [ "entity_type", "structboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex_1_1entity__type.html", "structboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex_1_1entity__type" ],
     [ "entities_type", "classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex.html#a02af43575220c42252610c818e109b72", null ],
-    [ "shared_fs_mutex", "classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex.html#a54cd409bac55cff82dd376502daa02a3", null ],
+    [ "shared_fs_mutex", "classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex.html#a8d89db4b83d29a956c5f3eab4a58b238", null ],
     [ "~shared_fs_mutex", "classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex.html#a5efc272ec747cca5839cfb5a18ae4162", null ],
     [ "_lock", "classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex.html#a0aa6687944f4489fd680c4f8cf8ce50e", null ],
     [ "entity_from_buffer", "classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex.html#a6d121be3d16ec5fcd15d61e59f8b66bd", null ],

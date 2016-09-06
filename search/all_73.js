@@ -2,7 +2,7 @@ var searchData=
 [
   ['safety_5ffsyncs',['safety_fsyncs',['../classboost_1_1afio_1_1v2__xxx_1_1handle.html#a81c7de194feaa88684ca9851d0d527caadfa4d35596e04e042a53c64b25c22db3',1,'boost::afio::v2_xxx::handle']]],
   ['secded_5fecc',['secded_ecc',['../classboost_1_1afio_1_1v2__xxx_1_1utils_1_1secded__ecc.html',1,'boost::afio::v2_xxx::utils']]],
-  ['secded_5fecc',['secded_ecc',['../classboost_1_1afio_1_1v2__xxx_1_1utils_1_1secded__ecc.html#a6eed9d865c6f89d4c878b00602060ba5',1,'boost::afio::v2_xxx::utils::secded_ecc']]],
+  ['secded_5fecc',['secded_ecc',['../classboost_1_1afio_1_1v2__xxx_1_1utils_1_1secded__ecc.html#a2f04936acce7e13256b3b608cd10d060',1,'boost::afio::v2_xxx::utils::secded_ecc']]],
   ['section',['section',['../classboost_1_1afio_1_1v2__xxx_1_1section__handle.html#a09eab0e7e479b3c3a07a57567ae3e354',1,'boost::afio::v2_xxx::section_handle::section(file_handle &amp;backing, extent_type maximum_size=0, flag _flag=flag::read|flag::write) noexcept'],['../classboost_1_1afio_1_1v2__xxx_1_1section__handle.html#a2ce0e07e5e48578bae21dcaafbaf033a',1,'boost::afio::v2_xxx::section_handle::section(extent_type maximum_size, file_handle &amp;backing, flag _flag=flag::read|flag::write) noexcept'],['../classboost_1_1afio_1_1v2__xxx_1_1map__handle.html#a89f5587e480916c3d27428ea39a6c768',1,'boost::afio::v2_xxx::map_handle::section()']]],
   ['section_5fflags',['section_flags',['../classboost_1_1afio_1_1v2__xxx_1_1section__handle.html#a049964a4397f858e9b1be60c60113b13',1,'boost::afio::v2_xxx::section_handle']]],
   ['section_5fhandle',['section_handle',['../classboost_1_1afio_1_1v2__xxx_1_1section__handle.html',1,'boost::afio::v2_xxx']]],
