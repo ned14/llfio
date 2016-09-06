@@ -77,15 +77,20 @@ namespace algorithm
     - In the lightly contended case, an order of magnitude faster than any other `shared_fs_mutex` algorithm.
 
     Caveats:
+    - A transition between mapped and fallback locks will block forever until all current mapped memory users
+    have realised the transition has happened. This can take a very significant amount of time if a lock user
+    does not regularly lock its locks.
+    \todo It should be possible to auto early out from a memory_map transition by scanning the memory map for any
+    locked items, and if none then to proceed.
     - No ability to sleep until a lock becomes free, so CPUs are spun at 100%.
     - Sudden process exit with locks held will deadlock all other users.
     - Exponential complexity to number of entities being concurrently locked.
-    - Hyperbolic i.e. pathological complexity to contention. Most SMP and especially
+    - Exponential complexity to concurrency if entities hash to the same cache line. Most SMP and especially
     NUMA systems have a finite bandwidth for atomic compare and swap operations, and every attempt to
     lock or unlock an entity under this implementation is several of those operations. Under heavy contention,
     whole system performance very noticeably nose dives from excessive atomic operations, things like audio and the
     mouse pointer will stutter.
-    - Sometimes different entities hash to the same offset and collide with one another, causing poor performance.
+    - Sometimes different entities hash to the same offset and collide with one another, causing very poor performance.
     - Byte range locks need to work properly on your system. Misconfiguring NFS or Samba
     to cause byte range locks to not work right will produce bad outcomes.
     - Memory mapped files need to be cache unified with normal i/o in your OS kernel. Known OSs which
@@ -118,6 +123,7 @@ namespace algorithm
       file_handle::extent_guard _hmapinuse;   // shared lock of second last byte of _h marking if mmap is in use
       map_handle _hmap, _temphmap;
       shared_fs_mutex *_fallbacklock;
+      bool _have_degraded;
 
       _hash_index_type &_index() const
       {
@@ -133,6 +139,7 @@ namespace algorithm
           , _hmap(std::move(hmap))
           , _temphmap(std::move(temphmap))
           , _fallbacklock(fallbacklock)
+          , _have_degraded(false)
       {
         _hlockinuse.set_handle(&_h);
         _hmapinuse.set_handle(&_h);
@@ -149,7 +156,7 @@ namespace algorithm
       bool is_degraded() const noexcept { return _hmap.address()[0] == 0; }
 
       //! Move constructor
-      memory_map(memory_map &&o) noexcept : _h(std::move(o._h)), _temph(std::move(o._temph)), _hlockinuse(std::move(o._hlockinuse)), _hmapinuse(std::move(o._hmapinuse)), _hmap(std::move(o._hmap)), _temphmap(std::move(o._temphmap)), _fallbacklock(std::move(o._fallbacklock))
+      memory_map(memory_map &&o) noexcept : _h(std::move(o._h)), _temph(std::move(o._temph)), _hlockinuse(std::move(o._hlockinuse)), _hmapinuse(std::move(o._hmapinuse)), _hmap(std::move(o._hmap)), _temphmap(std::move(o._temphmap)), _fallbacklock(std::move(o._fallbacklock)), _have_degraded(std::move(o._have_degraded))
       {
         _hlockinuse.set_handle(&_h);
         _hmapinuse.set_handle(&_h);
@@ -176,7 +183,7 @@ namespace algorithm
           // You might wonder why I am now truncating to zero? It's to ensure any
           // memory maps definitely get written with zeros before truncation, some
           // OSs don't reflect zeros into memory maps upon truncation for quite a
-          // long time
+          // long time (or ever)
           _h.truncate(0);
           // Unlink the temp file
           _temph.unlink();
@@ -194,11 +201,11 @@ namespace algorithm
         BOOST_AFIO_LOG_FUNCTION_CALL(0);
         try
         {
-          BOOST_OUTCOME_FILTER_ERROR(ret, file_handle::file(std::move(lockfile), file_handle::mode::write, file_handle::creation::if_needed, file_handle::caching::temporary));
+          BOOST_OUTCOME_FILTER_ERROR(ret, file_handle::file(std::move(lockfile), file_handle::mode::write, file_handle::creation::if_needed, file_handle::caching::reads));
           file_handle temph;
           // Am I the first person to this file? Lock the inuse exclusively
           auto lockinuse = ret.try_lock(_lockinuseoffset, 1, true);
-          //! \todo fs_mutex_map needs to check if file still exists after lock is granted, awaiting path fetching.
+          //! \todo fs_mutex_map needs to check if this inode is that at the path after lock is granted, awaiting stat_t port.
           file_handle::extent_guard mapinuse;
           if(lockinuse.has_error())
           {
@@ -309,7 +316,17 @@ namespace algorithm
         BOOST_AFIO_LOG_FUNCTION_CALL(this);
         if(is_degraded())
         {
-          _hmapinuse.unlock();
+          if(!_have_degraded)
+          {
+            // We have just become degraded, so release our shared lock of the map
+            // being in use and lock it exclusively, this will gate us on all other
+            // current users of the map so we don't unblock until all current users
+            // reach this same point. If that lock times out, we will reenter here
+            // next time until we succeed
+            _hmapinuse.unlock();
+            BOOST_OUTCOME_FILTER_ERROR(mapinuse2, _h.lock(_mapinuseoffset, 1, true, d));
+            _have_degraded = true;
+          }
           if(_fallbacklock)
             return _fallbacklock->_lock(out, d, spin_not_sleep);
           return make_errored_result<void>(EBUSY);
@@ -385,7 +402,7 @@ namespace algorithm
       virtual void unlock(entities_type entities, unsigned long long hint) noexcept override final
       {
         BOOST_AFIO_LOG_FUNCTION_CALL(this);
-        if(!_hmapinuse)
+        if(_have_degraded)
         {
           if(_fallbacklock)
             _fallbacklock->unlock(entities, hint);

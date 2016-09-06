@@ -246,6 +246,26 @@ struct shared_memory
   BOOST_AFIO_V2_NAMESPACE::stl11::atomic<long> current_shared;
 };
 
+static inline void check_child_worker(const BOOST_KERNELTEST_V1_NAMESPACE::child_workers::result &i)
+{
+  if(i.cerr.size())
+  {
+    BOOST_CHECK(i.cerr.empty());
+    std::cout << "Child worker failed with '" << i.cerr << "'" << std::endl;
+  }
+  else if(i.retcode != 0)
+  {
+    BOOST_CHECK(i.retcode == 0);
+    std::cout << "Child worker process failed with return code " << i.retcode << std::endl;
+  }
+  else
+  {
+    BOOST_CHECK(i.retcode == 0);
+    BOOST_CHECK((i.results[0] == 'o' && i.results[1] == 'k'));
+    std::cout << "Child reports " << i.results << std::endl;
+  }
+};
+
 static auto TestSharedFSMutexCorrectnessChildWorker = BOOST_KERNELTEST_V1_NAMESPACE::register_child_worker("TestSharedFSMutexCorrectness", [](BOOST_KERNELTEST_V1_NAMESPACE::waitable_done &waitable, size_t childidx, const char *) -> std::string {
   namespace afio = BOOST_AFIO_V2_NAMESPACE;
   auto shared_mem_file = afio::file_handle::file("shared_memory", afio::file_handle::mode::write, afio::file_handle::creation::open_existing, afio::file_handle::caching::temporary).get();
@@ -255,7 +275,7 @@ static auto TestSharedFSMutexCorrectnessChildWorker = BOOST_KERNELTEST_V1_NAMESP
   ++shmem->current_exclusive;
   while(-1 != shmem->current_exclusive)
     afio::stl11::this_thread::yield();
-  std::unique_ptr<afio::algorithm::shared_fs_mutex::shared_fs_mutex> lock;
+  std::unique_ptr<afio::algorithm::shared_fs_mutex::shared_fs_mutex> lock, fblock;
   switch(shmem->mutex_kind)
   {
   case shared_memory::mutex_kind_type::atomic_append:
@@ -268,7 +288,8 @@ static auto TestSharedFSMutexCorrectnessChildWorker = BOOST_KERNELTEST_V1_NAMESP
     lock = std::make_unique<afio::algorithm::shared_fs_mutex::lock_files>(afio::algorithm::shared_fs_mutex::lock_files::fs_mutex_lock_files(".").get());
     break;
   case shared_memory::mutex_kind_type::memory_map:
-    lock = std::make_unique<afio::algorithm::shared_fs_mutex::memory_map<>>(afio::algorithm::shared_fs_mutex::memory_map<>::fs_mutex_map("lockfile").get());
+    fblock = std::make_unique<afio::algorithm::shared_fs_mutex::byte_ranges>(afio::algorithm::shared_fs_mutex::byte_ranges::fs_mutex_byte_ranges("fallbacklockfile").get());
+    lock = std::make_unique<afio::algorithm::shared_fs_mutex::memory_map<>>(afio::algorithm::shared_fs_mutex::memory_map<>::fs_mutex_map("lockfile", fblock.get()).get());
     break;
   }
   ++shmem->current_shared;
@@ -340,24 +361,7 @@ void TestSharedFSMutexCorrectness(shared_memory::mutex_kind_type mutex_kind, sha
   child_workers.stop();
   child_workers.join();
   for(auto &i : child_workers.results)
-  {
-    if(i.cerr.size())
-    {
-      BOOST_CHECK(i.cerr.empty());
-      std::cout << "Child worker failed with '" << i.cerr << "'" << std::endl;
-    }
-    else if(i.retcode != 0)
-    {
-      BOOST_CHECK(i.retcode == 0);
-      std::cout << "Child worker process failed with return code " << i.retcode << std::endl;
-    }
-    else
-    {
-      BOOST_CHECK(i.retcode == 0);
-      BOOST_CHECK((i.results[0] == 'o' && i.results[1] == 'k'));
-      std::cout << "Child reports " << i.results << std::endl;
-    }
-  }
+    check_child_worker(i);
 }
 
 BOOST_KERNELTEST_TEST_KERNEL(integration, afio, shared_fs_mutex_memory_map, exclusives, "Tests that afio::algorithm::shared_fs_mutex::memory_map implementation implements exclusive locking", [] { TestSharedFSMutexCorrectness(shared_memory::memory_map, shared_memory::exclusive); }())
@@ -381,7 +385,7 @@ Test 3: We have a constant ongoing stream of child processes constructing the lo
 and destructing the lock. This should find interesting races in the more complex lock constructors and destructors
 
 */
-void TestSharedFSMutexConstructDestruct(shared_memory::mutex_kind_type mutex_kind)
+static void TestSharedFSMutexConstructDestruct(shared_memory::mutex_kind_type mutex_kind)
 {
   namespace kerneltest = BOOST_KERNELTEST_V1_NAMESPACE;
   namespace afio = BOOST_AFIO_V2_NAMESPACE;
@@ -398,25 +402,6 @@ void TestSharedFSMutexConstructDestruct(shared_memory::mutex_kind_type mutex_kin
   auto child_workers1 = kerneltest::launch_child_workers("TestSharedFSMutexCorrectness", 2);
   child_workers1.wait_until_ready();
   child_workers1.go();
-
-  auto check_child_worker = [](const kerneltest::child_workers::result &i) {
-    if(i.cerr.size())
-    {
-      BOOST_CHECK(i.cerr.empty());
-      std::cout << "Child worker failed with '" << i.cerr << "'" << std::endl;
-    }
-    else if(i.retcode != 0)
-    {
-      BOOST_CHECK(i.retcode == 0);
-      std::cout << "Child worker process failed with return code " << i.retcode << std::endl;
-    }
-    else
-    {
-      BOOST_CHECK(i.retcode == 0);
-      BOOST_CHECK((i.results[0] == 'o' && i.results[1] == 'k'));
-      std::cout << "Child reports " << i.results << std::endl;
-    }
-  };
 
   // Now repeatedly launch hardware concurrency child workers who constantly open the lock, lock once, unlock and close the lock
   auto begin = afio::stl11::chrono::steady_clock::now();
@@ -465,6 +450,64 @@ BOOST_KERNELTEST_TEST_KERNEL(integration, afio, shared_fs_mutex_memory_map, cons
 /*
 
 Test 4: Does memory_map safely fall back onto its backup lock if a networked drive user turns up?
+
+*/
+
+static void TestMemoryMapFallback()
+{
+  // Launch hardware concurrency users of the map
+  namespace kerneltest = BOOST_KERNELTEST_V1_NAMESPACE;
+  namespace afio = BOOST_AFIO_V2_NAMESPACE;
+  auto shared_mem_file = afio::file_handle::file("shared_memory", afio::file_handle::mode::write, afio::file_handle::creation::if_needed, afio::file_handle::caching::temporary, afio::file_handle::flag::unlink_on_close).get();
+  auto shared_mem_file_section = afio::section_handle::section(sizeof(shared_memory), shared_mem_file, afio::section_handle::flag::readwrite).get();
+  auto shared_mem_file_map = afio::map_handle::map(shared_mem_file_section).get();
+  shared_memory *shmem = (shared_memory *) shared_mem_file_map.address();
+  auto begin = afio::stl11::chrono::steady_clock::now();
+  while(afio::stl11::chrono::duration_cast<afio::stl11::chrono::seconds>(afio::stl11::chrono::steady_clock::now() - begin).count() < 5)
+  {
+    shmem->current_shared = -(long) afio::stl11::thread::hardware_concurrency();
+    shmem->current_exclusive = -(long) afio::stl11::thread::hardware_concurrency() - 1;
+    shmem->mutex_kind = shared_memory::mutex_kind_type::memory_map;
+    shmem->testtype = shared_memory::test_type::both;
+
+    auto child_workers = kerneltest::launch_child_workers("TestSharedFSMutexCorrectness", afio::stl11::thread::hardware_concurrency());
+    child_workers.wait_until_ready();
+    child_workers.go();
+    afio::stl11::this_thread::sleep_for(afio::stl11::chrono::milliseconds(50));
+    // Zomp the lock file pretending to be a networked user
+    {
+      auto lf = afio::file_handle::file("lockfile", afio::file_handle::mode::write, afio::file_handle::creation::open_existing, afio::file_handle::caching::reads).get();
+      char buffer[4096];
+      memset(buffer, 0, sizeof(buffer));
+      lf.write(0, buffer, sizeof(buffer));
+    }
+    // Open the lock, should always return EBUSY but only AFTER all mapped users have fallen back
+    auto fblk = afio::algorithm::shared_fs_mutex::byte_ranges::fs_mutex_byte_ranges("fallbacklockfile").get();
+    auto lk = afio::algorithm::shared_fs_mutex::memory_map<>::fs_mutex_map("lockfile", &fblk);
+    BOOST_CHECK(lk.has_error());
+    if(lk.has_error())
+      BOOST_CHECK(lk.get_error().value() == EBUSY);
+    {
+      auto fblkh = fblk.lock(afio::algorithm::shared_fs_mutex::shared_fs_mutex::entity_type(0, false)).get();
+      long oldval = ++shmem->current_shared;
+      oldval = shmem->current_exclusive;
+      if(oldval != -1)
+      {
+        std::cerr << "Fallback lock granted shared lock when child " + std::to_string(oldval) + " already has exclusive lock!" << std::endl;
+        BOOST_CHECK(oldval == -1);
+      }
+      --shmem->current_shared;
+    }
+    child_workers.stop();
+    child_workers.join();
+    for(auto &i : child_workers.results)
+      check_child_worker(i);
+  }
+}
+BOOST_KERNELTEST_TEST_KERNEL(integration, afio, shared_fs_mutex_memory_map, fallback, "Tests that afio::algorithm::shared_fs_mutex::memory_map falls back onto its backup lock when a networked user arrives", TestMemoryMapFallback())
+
+/*
+
 
 
 
