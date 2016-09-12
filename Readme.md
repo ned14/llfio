@@ -7,13 +7,13 @@ Tarballs of source and prebuilt binaries with all unit tests passing: https://de
 
 
 CppCon 2016 todos:
-- Fix remaining test failures.
+- All time based kernel tests need to use soak test based API.
 - Raise the sanitisers on per-commit CI via ctest.
 - Rename all ParseProjectVersionFromHpp etc to parse_project_version_from_hpp etc
 - DLL library edition appears to not be encoding extended error code detail because
 it's not sharing a single ringbuffer_log. Hard to fix given Outcome could be being
 used by multiple libraries as a header only library, need to figure out some global
-fix e.g. named shared memory.
+fix e.g. named shared memory. Make log disc stored while we are at it.
 
 
 

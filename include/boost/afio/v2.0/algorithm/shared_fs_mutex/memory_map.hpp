@@ -77,7 +77,7 @@ namespace algorithm
     - In the lightly contended case, an order of magnitude faster than any other `shared_fs_mutex` algorithm.
 
     Caveats:
-    - A transition between mapped and fallback locks will block forever until all current mapped memory users
+    - A transition between mapped and fallback locks will not complete until all current mapped memory users
     have realised the transition has happened. This can take a very significant amount of time if a lock user
     does not regularly lock its locks.
     \todo It should be possible to auto early out from a memory_map transition by scanning the memory map for any
@@ -263,8 +263,8 @@ namespace algorithm
               (void) _;
             }
             // Convert exclusive whole file lock into lock in use
-            BOOST_OUTCOME_FILTER_ERROR(lockinuse2, ret.lock(_lockinuseoffset, 1, false));
             BOOST_OUTCOME_FILTER_ERROR(mapinuse2, ret.lock(_mapinuseoffset, 1, false));
+            BOOST_OUTCOME_FILTER_ERROR(lockinuse2, ret.lock(_lockinuseoffset, 1, false));
             mapinuse = std::move(mapinuse2);
             lockinuse = std::move(lockinuse2);
           }
@@ -289,9 +289,10 @@ namespace algorithm
         unsigned exclusive : 1;
       };
       // Create a cache of entities to their indices, eliding collisions where necessary
-      static span<_entity_idx> _hash_entities(_entity_idx *entity_to_idx, entities_type &entities)
+      static span<_entity_idx> _hash_entities(_entity_idx alignas(16) * entity_to_idx, entities_type &entities)
       {
         _entity_idx *ep = entity_to_idx;
+        //! \todo memory_map::_hash_entities needs to hash x16, x8 and x4 at a time to encourage auto vectorisation
         for(size_t n = 0; n < entities.size(); n++)
         {
           ep->value = hasher_type()(entities[n].value) % _container_entries;
@@ -340,6 +341,7 @@ namespace algorithm
           else
             end_utc = (d).to_time_point();
         }
+        // alloca() always returns 16 byte aligned addresses
         span<_entity_idx> entity_to_idx(_hash_entities((_entity_idx *) alloca(sizeof(_entity_idx) * out.entities.size()), out.entities));
         _hash_index_type &index = _index();
         // Fire this if an error occurs
@@ -402,6 +404,7 @@ namespace algorithm
       virtual void unlock(entities_type entities, unsigned long long hint) noexcept override final
       {
         BOOST_AFIO_LOG_FUNCTION_CALL(this);
+        //! \todo memory_map::unlock() degrade is racy when single instance being used by multiple threads
         if(_have_degraded)
         {
           if(_fallbacklock)
