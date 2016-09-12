@@ -303,8 +303,8 @@ $(document).ready(function(){initNavTree('memory__map_8hpp_source.html','');});
 <div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;              (void) _;</div>
 <div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;            }</div>
 <div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;            <span class="comment">// Convert exclusive whole file lock into lock in use</span></div>
-<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;            BOOST_OUTCOME_FILTER_ERROR(lockinuse2, ret.lock(_lockinuseoffset, 1, <span class="keyword">false</span>));</div>
-<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;            BOOST_OUTCOME_FILTER_ERROR(mapinuse2, ret.lock(_mapinuseoffset, 1, <span class="keyword">false</span>));</div>
+<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;            BOOST_OUTCOME_FILTER_ERROR(mapinuse2, ret.lock(_mapinuseoffset, 1, <span class="keyword">false</span>));</div>
+<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;            BOOST_OUTCOME_FILTER_ERROR(lockinuse2, ret.lock(_lockinuseoffset, 1, <span class="keyword">false</span>));</div>
 <div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;            mapinuse = std::move(mapinuse2);</div>
 <div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;            lockinuse = std::move(lockinuse2);</div>
 <div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;          }</div>
@@ -328,143 +328,144 @@ $(document).ready(function(){initNavTree('memory__map_8hpp_source.html','');});
 <div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;        <span class="keywordtype">unsigned</span> exclusive : 1;</div>
 <div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;      };</div>
 <div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;      <span class="comment">// Create a cache of entities to their indices, eliding collisions where necessary</span></div>
-<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;      <span class="keyword">static</span> span&lt;_entity_idx&gt; _hash_entities(<a class="code" href="structboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map_1_1__entity__idx.html">_entity_idx</a> *entity_to_idx, <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex.html#a02af43575220c42252610c818e109b72" title="The type of a sequence of entities.">entities_type</a> &amp;entities)</div>
+<div class="line"><a name="l00292"></a><span class="lineno"><a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#ae2d575461edb9d27c701a8e60671069f">  292</a></span>&#160;      <span class="keyword">static</span> span&lt;_entity_idx&gt; _hash_entities(<a class="code" href="structboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map_1_1__entity__idx.html">_entity_idx</a> <a class="code" href="namespaceboost_1_1afio_1_1v2__xxx_1_1utils.html#ab0e1d51b7a453455c0d834239b66e40f">alignas</a>(16) * entity_to_idx, <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex.html#a02af43575220c42252610c818e109b72" title="The type of a sequence of entities.">entities_type</a> &amp;entities)</div>
 <div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;      {</div>
 <div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;        <a class="code" href="structboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map_1_1__entity__idx.html">_entity_idx</a> *ep = entity_to_idx;</div>
-<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;        <span class="keywordflow">for</span>(<span class="keywordtype">size_t</span> n = 0; n &lt; entities.size(); n++)</div>
-<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;        {</div>
-<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;          ep-&gt;value = <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#a68ab075ffa6ac8e7c616de146e784f83" title="The type of the hasher being used.">hasher_type</a>()(entities[n].value) % _container_entries;</div>
-<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;          ep-&gt;exclusive = entities[n].exclusive;</div>
-<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;          <span class="keywordtype">bool</span> skip = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;          <span class="keywordflow">for</span>(<span class="keywordtype">size_t</span> m = 0; m &lt; n; m++)</div>
-<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;          {</div>
-<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;            <span class="keywordflow">if</span>(entity_to_idx[m].value == ep-&gt;value)</div>
-<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;            {</div>
-<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;              <span class="keywordflow">if</span>(ep-&gt;exclusive &amp;&amp; !entity_to_idx[m].exclusive)</div>
-<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;                entity_to_idx[m].exclusive = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;              skip = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;            }</div>
-<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;          }</div>
-<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;          <span class="keywordflow">if</span>(!skip)</div>
-<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;            ++ep;</div>
-<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;        }</div>
-<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;        <span class="keywordflow">return</span> span&lt;_entity_idx&gt;(entity_to_idx, ep - entity_to_idx);</div>
-<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;      }</div>
-<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;      <span class="keyword">virtual</span> result&lt;void&gt; _lock(entities_guard &amp;out, deadline d, <span class="keywordtype">bool</span> spin_not_sleep) noexcept <span class="keyword">override</span> <span class="keyword">final</span></div>
-<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;      {</div>
-<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;        BOOST_AFIO_LOG_FUNCTION_CALL(<span class="keyword">this</span>);</div>
-<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;        <span class="keywordflow">if</span>(is_degraded())</div>
-<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;        {</div>
-<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;          <span class="keywordflow">if</span>(!_have_degraded)</div>
-<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;          {</div>
-<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;            <span class="comment">// We have just become degraded, so release our shared lock of the map</span></div>
-<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;            <span class="comment">// being in use and lock it exclusively, this will gate us on all other</span></div>
-<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;            <span class="comment">// current users of the map so we don&#39;t unblock until all current users</span></div>
-<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;            <span class="comment">// reach this same point. If that lock times out, we will reenter here</span></div>
-<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;            <span class="comment">// next time until we succeed</span></div>
-<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;            _hmapinuse.unlock();</div>
-<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;            BOOST_OUTCOME_FILTER_ERROR(mapinuse2, _h.lock(_mapinuseoffset, 1, <span class="keyword">true</span>, d));</div>
-<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;            _have_degraded = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;          }</div>
-<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;          <span class="keywordflow">if</span>(_fallbacklock)</div>
-<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;            <span class="keywordflow">return</span> _fallbacklock-&gt;_lock(out, d, spin_not_sleep);</div>
-<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;          <span class="keywordflow">return</span> make_errored_result&lt;void&gt;(EBUSY);</div>
-<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;        }</div>
-<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;        stl11::chrono::steady_clock::time_point began_steady;</div>
-<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;        stl11::chrono::system_clock::time_point end_utc;</div>
-<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;        <span class="keywordflow">if</span>(d)</div>
-<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;        {</div>
-<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;          <span class="keywordflow">if</span>((d).steady)</div>
-<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;            began_steady = stl11::chrono::steady_clock::now();</div>
-<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;          <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;            end_utc = (d).to_time_point();</div>
-<div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;        }</div>
-<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;        span&lt;_entity_idx&gt; entity_to_idx(_hash_entities((_entity_idx *) alloca(<span class="keyword">sizeof</span>(_entity_idx) * out.entities.size()), out.entities));</div>
-<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;        _hash_index_type &amp;index = _index();</div>
-<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;        <span class="comment">// Fire this if an error occurs</span></div>
-<div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;        <span class="keyword">auto</span> disableunlock = undoer([&amp;] { out.release(); });</div>
-<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;        <span class="keywordtype">size_t</span> n;</div>
-<div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;        <span class="keywordflow">for</span>(;;)</div>
-<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;        {</div>
-<div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;          <span class="keywordtype">size_t</span> was_contended = (size_t) -1;</div>
-<div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;          {</div>
-<div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160;            <span class="keyword">auto</span> undo = undoer([&amp;] {</div>
-<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;              <span class="comment">// 0 to (n-1) need to be closed</span></div>
-<div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160;              <span class="keywordflow">if</span>(n &gt; 0)</div>
-<div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160;              {</div>
-<div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;                --n;</div>
-<div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;                <span class="comment">// Now 0 to n needs to be closed</span></div>
-<div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;                <span class="keywordflow">for</span>(; n &gt; 0; n--)</div>
-<div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160;                  entity_to_idx[n].exclusive ? index[entity_to_idx[n].value].unlock() : index[entity_to_idx[n].value].unlock_shared();</div>
-<div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;                entity_to_idx[0].exclusive ? index[entity_to_idx[0].value].unlock() : index[entity_to_idx[0].value].unlock_shared();</div>
-<div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160;              }</div>
-<div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;            });</div>
-<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;            <span class="keywordflow">for</span>(n = 0; n &lt; entity_to_idx.size(); n++)</div>
-<div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160;            {</div>
-<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;              <span class="keywordflow">if</span>(!(entity_to_idx[n].exclusive ? index[entity_to_idx[n].value].try_lock() : index[entity_to_idx[n].value].try_lock_shared()))</div>
-<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;              {</div>
-<div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;                was_contended = n;</div>
-<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;                <span class="keywordflow">goto</span> failed;</div>
-<div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;              }</div>
-<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;            }</div>
-<div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;            <span class="comment">// Everything is locked, exit</span></div>
-<div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;            undo.dismiss();</div>
-<div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;            disableunlock.dismiss();</div>
-<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;            <span class="keywordflow">return</span> make_result&lt;void&gt;();</div>
-<div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;          }</div>
-<div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;        failed:</div>
-<div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;          <span class="keywordflow">if</span>(d)</div>
-<div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;          {</div>
-<div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;            <span class="keywordflow">if</span>((d).steady)</div>
-<div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;            {</div>
-<div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;              <span class="keywordflow">if</span>(stl11::chrono::steady_clock::now() &gt;= (began_steady + stl11::chrono::nanoseconds((d).nsecs)))</div>
-<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;                <span class="keywordflow">return</span> make_errored_result&lt;void&gt;(ETIMEDOUT);</div>
-<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;            }</div>
-<div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;            <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;            {</div>
-<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;              <span class="keywordflow">if</span>(stl11::chrono::system_clock::now() &gt;= end_utc)</div>
-<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;                <span class="keywordflow">return</span> make_errored_result&lt;void&gt;(ETIMEDOUT);</div>
-<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;            }</div>
-<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;          }</div>
-<div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;          <span class="comment">// Move was_contended to front and randomise rest of out.entities</span></div>
-<div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;          std::swap(entity_to_idx[was_contended], entity_to_idx[0]);</div>
-<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;          <span class="keyword">auto</span> front = entity_to_idx.begin();</div>
-<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;          ++front;</div>
-<div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;          std::random_shuffle(front, entity_to_idx.end());</div>
-<div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;          <span class="keywordflow">if</span>(!spin_not_sleep)</div>
-<div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;            std::this_thread::yield();</div>
-<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;        }</div>
-<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;        <span class="comment">// return make_result&lt;void&gt;();</span></div>
-<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;      }</div>
-<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;</div>
-<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;    <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00402"></a><span class="lineno"><a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#a3b690325543b3e850274f4b92a34d797">  402</a></span>&#160;      <span class="keyword">virtual</span> <span class="keywordtype">void</span> unlock(<a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex.html#a02af43575220c42252610c818e109b72" title="The type of a sequence of entities.">entities_type</a> entities, <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> <span class="keywordtype">long</span> hint) noexcept <span class="keyword">override</span> <span class="keyword">final</span></div>
-<div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;      {</div>
-<div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;        BOOST_AFIO_LOG_FUNCTION_CALL(<span class="keyword">this</span>);</div>
-<div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;        <span class="keywordflow">if</span>(_have_degraded)</div>
-<div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;        {</div>
-<div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;          <span class="keywordflow">if</span>(_fallbacklock)</div>
-<div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;            _fallbacklock-&gt;unlock(entities, hint);</div>
-<div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;          <span class="keywordflow">return</span>;</div>
-<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;        }</div>
-<div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160;        span&lt;_entity_idx&gt; entity_to_idx(_hash_entities((<a class="code" href="structboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map_1_1__entity__idx.html">_entity_idx</a> *) alloca(<span class="keyword">sizeof</span>(<a class="code" href="structboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map_1_1__entity__idx.html">_entity_idx</a>) * entities.size()), entities));</div>
-<div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;        _hash_index_type &amp;index = _index();</div>
-<div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160;        <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;i : entity_to_idx)</div>
-<div class="line"><a name="l00414"></a><span class="lineno">  414</span>&#160;        {</div>
-<div class="line"><a name="l00415"></a><span class="lineno">  415</span>&#160;          i.exclusive ? index[i.value].unlock() : index[i.value].unlock_shared();</div>
-<div class="line"><a name="l00416"></a><span class="lineno">  416</span>&#160;        }</div>
-<div class="line"><a name="l00417"></a><span class="lineno">  417</span>&#160;        <span class="keywordflow">if</span>(is_degraded())</div>
-<div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160;          _hmapinuse.unlock();</div>
-<div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;      }</div>
-<div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;    };</div>
-<div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;</div>
-<div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;  }  <span class="comment">// namespace</span></div>
-<div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;}  <span class="comment">// namespace</span></div>
+<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;        <span class="keywordflow">for</span>(<span class="keywordtype">size_t</span> n = 0; n &lt; entities.size(); n++)</div>
+<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;        {</div>
+<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;          ep-&gt;value = <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#a68ab075ffa6ac8e7c616de146e784f83" title="The type of the hasher being used.">hasher_type</a>()(entities[n].value) % _container_entries;</div>
+<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;          ep-&gt;exclusive = entities[n].exclusive;</div>
+<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;          <span class="keywordtype">bool</span> skip = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;          <span class="keywordflow">for</span>(<span class="keywordtype">size_t</span> m = 0; m &lt; n; m++)</div>
+<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;          {</div>
+<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;            <span class="keywordflow">if</span>(entity_to_idx[m].value == ep-&gt;value)</div>
+<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;            {</div>
+<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;              <span class="keywordflow">if</span>(ep-&gt;exclusive &amp;&amp; !entity_to_idx[m].exclusive)</div>
+<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;                entity_to_idx[m].exclusive = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;              skip = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;            }</div>
+<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;          }</div>
+<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;          <span class="keywordflow">if</span>(!skip)</div>
+<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;            ++ep;</div>
+<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;        }</div>
+<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;        <span class="keywordflow">return</span> span&lt;_entity_idx&gt;(entity_to_idx, ep - entity_to_idx);</div>
+<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;      }</div>
+<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;      <span class="keyword">virtual</span> <a class="code" href="namespaceboost_1_1afio_1_1v2__xxx.html#ac8d06ecaa9660e7251c1251d88c1305c" title="Please see https://ned14.github.io/boost.outcome/classboost_1_1outcome_1_1v1__xxx_1_1basic__monad.html.">result&lt;void&gt;</a> _lock(entities_guard &amp;out, <a class="code" href="structboost_1_1afio_1_1v2__xxx_1_1deadline.html" title="A time deadline in either relative-to-now or absolute (system clock) terms.">deadline</a> d, <span class="keywordtype">bool</span> spin_not_sleep) noexcept <span class="keyword">override</span> <span class="keyword">final</span></div>
+<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;      {</div>
+<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;        BOOST_AFIO_LOG_FUNCTION_CALL(<span class="keyword">this</span>);</div>
+<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;        <span class="keywordflow">if</span>(is_degraded())</div>
+<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;        {</div>
+<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;          <span class="keywordflow">if</span>(!_have_degraded)</div>
+<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;          {</div>
+<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;            <span class="comment">// We have just become degraded, so release our shared lock of the map</span></div>
+<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;            <span class="comment">// being in use and lock it exclusively, this will gate us on all other</span></div>
+<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;            <span class="comment">// current users of the map so we don&#39;t unblock until all current users</span></div>
+<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;            <span class="comment">// reach this same point. If that lock times out, we will reenter here</span></div>
+<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;            <span class="comment">// next time until we succeed</span></div>
+<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;            _hmapinuse.unlock();</div>
+<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;            BOOST_OUTCOME_FILTER_ERROR(mapinuse2, _h.lock(_mapinuseoffset, 1, <span class="keyword">true</span>, d));</div>
+<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;            _have_degraded = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;          }</div>
+<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;          <span class="keywordflow">if</span>(_fallbacklock)</div>
+<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;            <span class="keywordflow">return</span> _fallbacklock-&gt;_lock(out, d, spin_not_sleep);</div>
+<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;          <span class="keywordflow">return</span> make_errored_result&lt;void&gt;(EBUSY);</div>
+<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;        }</div>
+<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;        stl11::chrono::steady_clock::time_point began_steady;</div>
+<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;        stl11::chrono::system_clock::time_point end_utc;</div>
+<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;        <span class="keywordflow">if</span>(d)</div>
+<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;        {</div>
+<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;          <span class="keywordflow">if</span>((d).steady)</div>
+<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;            began_steady = stl11::chrono::steady_clock::now();</div>
+<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;          <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;            end_utc = (d).to_time_point();</div>
+<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;        }</div>
+<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;        <span class="comment">// alloca() always returns 16 byte aligned addresses</span></div>
+<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;        span&lt;_entity_idx&gt; entity_to_idx(_hash_entities((_entity_idx *) alloca(<span class="keyword">sizeof</span>(_entity_idx) * out.entities.size()), out.entities));</div>
+<div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;        _hash_index_type &amp;index = _index();</div>
+<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;        <span class="comment">// Fire this if an error occurs</span></div>
+<div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;        <span class="keyword">auto</span> disableunlock = undoer([&amp;] { out.release(); });</div>
+<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;        <span class="keywordtype">size_t</span> n;</div>
+<div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;        <span class="keywordflow">for</span>(;;)</div>
+<div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;        {</div>
+<div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160;          <span class="keywordtype">size_t</span> was_contended = (size_t) -1;</div>
+<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;          {</div>
+<div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160;            <span class="keyword">auto</span> undo = undoer([&amp;] {</div>
+<div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160;              <span class="comment">// 0 to (n-1) need to be closed</span></div>
+<div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;              <span class="keywordflow">if</span>(n &gt; 0)</div>
+<div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;              {</div>
+<div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;                --n;</div>
+<div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160;                <span class="comment">// Now 0 to n needs to be closed</span></div>
+<div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;                <span class="keywordflow">for</span>(; n &gt; 0; n--)</div>
+<div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160;                  entity_to_idx[n].exclusive ? index[entity_to_idx[n].value].unlock() : index[entity_to_idx[n].value].unlock_shared();</div>
+<div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;                entity_to_idx[0].exclusive ? index[entity_to_idx[0].value].unlock() : index[entity_to_idx[0].value].unlock_shared();</div>
+<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;              }</div>
+<div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160;            });</div>
+<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;            <span class="keywordflow">for</span>(n = 0; n &lt; entity_to_idx.size(); n++)</div>
+<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;            {</div>
+<div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;              <span class="keywordflow">if</span>(!(entity_to_idx[n].exclusive ? index[entity_to_idx[n].value].try_lock() : index[entity_to_idx[n].value].try_lock_shared()))</div>
+<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;              {</div>
+<div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;                was_contended = n;</div>
+<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;                <span class="keywordflow">goto</span> failed;</div>
+<div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;              }</div>
+<div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;            }</div>
+<div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;            <span class="comment">// Everything is locked, exit</span></div>
+<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;            undo.dismiss();</div>
+<div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;            disableunlock.dismiss();</div>
+<div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;            <span class="keywordflow">return</span> make_result&lt;void&gt;();</div>
+<div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;          }</div>
+<div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;        failed:</div>
+<div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;          <span class="keywordflow">if</span>(d)</div>
+<div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;          {</div>
+<div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;            <span class="keywordflow">if</span>((d).steady)</div>
+<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;            {</div>
+<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;              <span class="keywordflow">if</span>(stl11::chrono::steady_clock::now() &gt;= (began_steady + stl11::chrono::nanoseconds((d).nsecs)))</div>
+<div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;                <span class="keywordflow">return</span> make_errored_result&lt;void&gt;(ETIMEDOUT);</div>
+<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;            }</div>
+<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;            <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;            {</div>
+<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;              <span class="keywordflow">if</span>(stl11::chrono::system_clock::now() &gt;= end_utc)</div>
+<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;                <span class="keywordflow">return</span> make_errored_result&lt;void&gt;(ETIMEDOUT);</div>
+<div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;            }</div>
+<div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;          }</div>
+<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;          <span class="comment">// Move was_contended to front and randomise rest of out.entities</span></div>
+<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;          std::swap(entity_to_idx[was_contended], entity_to_idx[0]);</div>
+<div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;          <span class="keyword">auto</span> front = entity_to_idx.begin();</div>
+<div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;          ++front;</div>
+<div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;          std::random_shuffle(front, entity_to_idx.end());</div>
+<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;          <span class="keywordflow">if</span>(!spin_not_sleep)</div>
+<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;            std::this_thread::yield();</div>
+<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;        }</div>
+<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;        <span class="comment">// return make_result&lt;void&gt;();</span></div>
+<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;      }</div>
+<div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;</div>
+<div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;    <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00404"></a><span class="lineno"><a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#a3b690325543b3e850274f4b92a34d797">  404</a></span>&#160;      <span class="keyword">virtual</span> <span class="keywordtype">void</span> unlock(<a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex.html#a02af43575220c42252610c818e109b72" title="The type of a sequence of entities.">entities_type</a> entities, <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> <span class="keywordtype">long</span> hint) noexcept <span class="keyword">override</span> <span class="keyword">final</span></div>
+<div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;      {</div>
+<div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;        BOOST_AFIO_LOG_FUNCTION_CALL(<span class="keyword">this</span>);</div>
+<div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;        <span class="keywordflow">if</span>(_have_degraded)</div>
+<div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;        {</div>
+<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;          <span class="keywordflow">if</span>(_fallbacklock)</div>
+<div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160;            _fallbacklock-&gt;unlock(entities, hint);</div>
+<div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;          <span class="keywordflow">return</span>;</div>
+<div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160;        }</div>
+<div class="line"><a name="l00414"></a><span class="lineno">  414</span>&#160;        span&lt;_entity_idx&gt; entity_to_idx(_hash_entities((<a class="code" href="structboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map_1_1__entity__idx.html">_entity_idx</a> *) alloca(<span class="keyword">sizeof</span>(<a class="code" href="structboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map_1_1__entity__idx.html">_entity_idx</a>) * entities.size()), entities));</div>
+<div class="line"><a name="l00415"></a><span class="lineno">  415</span>&#160;        _hash_index_type &amp;index = _index();</div>
+<div class="line"><a name="l00416"></a><span class="lineno">  416</span>&#160;        <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;i : entity_to_idx)</div>
+<div class="line"><a name="l00417"></a><span class="lineno">  417</span>&#160;        {</div>
+<div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160;          i.exclusive ? index[i.value].unlock() : index[i.value].unlock_shared();</div>
+<div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;        }</div>
+<div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;        <span class="keywordflow">if</span>(is_degraded())</div>
+<div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;          _hmapinuse.unlock();</div>
+<div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;      }</div>
+<div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;    };</div>
 <div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160;</div>
-<div class="line"><a name="l00425"></a><span class="lineno">  425</span>&#160;<a class="code" href="group__config.html#ga39f521144fef02193249bb7e3b0698fe" title="Expands into the appropriate namespace markup to exit the AFIO v2 namespace.">BOOST_AFIO_V2_NAMESPACE_END</a></div>
-<div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160;</div>
+<div class="line"><a name="l00425"></a><span class="lineno">  425</span>&#160;  }  <span class="comment">// namespace</span></div>
+<div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160;}  <span class="comment">// namespace</span></div>
 <div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160;</div>
-<div class="line"><a name="l00428"></a><span class="lineno">  428</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00428"></a><span class="lineno">  428</span>&#160;<a class="code" href="group__config.html#ga39f521144fef02193249bb7e3b0698fe" title="Expands into the appropriate namespace markup to exit the AFIO v2 namespace.">BOOST_AFIO_V2_NAMESPACE_END</a></div>
+<div class="line"><a name="l00429"></a><span class="lineno">  429</span>&#160;</div>
+<div class="line"><a name="l00430"></a><span class="lineno">  430</span>&#160;</div>
+<div class="line"><a name="l00431"></a><span class="lineno">  431</span>&#160;<span class="preprocessor">#endif</span></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
