@@ -115,23 +115,11 @@ $(document).ready(function(){initNavTree('todo.html','');});
 <dt><a class="anchor" id="_todo000006"></a>Member <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1atomic__append.html#a4ad149b7199d2fb919b73ef17a1d61b8">boost::afio::v2_xxx::algorithm::shared_fs_mutex::atomic_append::fs_mutex_append</a>  (file_handle::path_type lockfile, bool nfs_compatibility=false, bool skip_hashing=false) noexcept</dt>
 <dd>fs_mutex_append needs to check if file still exists after lock is granted, awaiting path fetching.  </dd>
 <dt><a class="anchor" id="_todo000008"></a>Class <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html">boost::afio::v2_xxx::algorithm::shared_fs_mutex::memory_map&lt; Hasher, HashIndexSize, SpinlockType &gt;</a>  </dt>
-<dd>It should be possible to auto early out from a memory_map transition by scanning the memory map for any locked items, and if none then to proceed.<ul>
-<li>No ability to sleep until a lock becomes free, so CPUs are spun at 100%.</li>
-<li>Sudden process exit with locks held will deadlock all other users.</li>
-<li>Exponential complexity to number of entities being concurrently locked.</li>
-<li>Exponential complexity to concurrency if entities hash to the same cache line. Most SMP and especially NUMA systems have a finite bandwidth for atomic compare and swap operations, and every attempt to lock or unlock an entity under this implementation is several of those operations. Under heavy contention, whole system performance very noticeably nose dives from excessive atomic operations, things like audio and the mouse pointer will stutter.</li>
-<li>Sometimes different entities hash to the same offset and collide with one another, causing very poor performance.</li>
-<li>Byte range locks need to work properly on your system. Misconfiguring NFS or Samba to cause byte range locks to not work right will produce bad outcomes.</li>
-<li>Memory mapped files need to be cache unified with normal i/o in your OS kernel. Known OSs which don't use a unified cache for memory mapped and normal i/o are QNX, OpenBSD. Furthermore, doing normal i/o and memory mapped i/o to the same file needs to not corrupt the file. In the past, there have been editions of the Linux kernel and the OS X kernel which did this.</li>
-<li>If your OS doesn't have sane byte range locks (OS X, BSD, older Linuxes) and multiple objects in your process use the same lock file, misoperation will occur.  </li>
-</ul>
+<dd><p class="startdd">It should be possible to auto early out from a memory_map transition by scanning the memory map for any locked items, and if none then to proceed. </p>
+<p>fs_mutex_map needs to check if this inode is that at the path after lock is granted, awaiting stat_t port. </p>
+<p>memory_map::_hash_entities needs to hash x16, x8 and x4 at a time to encourage auto vectorisation </p>
+<p class="enddd">memory_map::unlock() degrade is racy when single instance being used by multiple threads  </p>
 </dd>
-<dt><a class="anchor" id="_todo000010"></a>Member <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#ae2d575461edb9d27c701a8e60671069f">boost::afio::v2_xxx::algorithm::shared_fs_mutex::memory_map&lt; Hasher, HashIndexSize, SpinlockType &gt;::_hash_entities</a>  (_entity_idx alignas(16)*entity_to_idx, entities_type &amp;entities)</dt>
-<dd>memory_map::_hash_entities needs to hash x16, x8 and x4 at a time to encourage auto vectorisation  </dd>
-<dt><a class="anchor" id="_todo000009"></a>Member <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#af05e02f0e3cfa63e002bd87fa795b719">boost::afio::v2_xxx::algorithm::shared_fs_mutex::memory_map&lt; Hasher, HashIndexSize, SpinlockType &gt;::fs_mutex_map</a>  (file_handle::path_type lockfile, shared_fs_mutex *fallbacklock=nullptr) noexcept</dt>
-<dd>fs_mutex_map needs to check if this inode is that at the path after lock is granted, awaiting stat_t port.  </dd>
-<dt><a class="anchor" id="_todo000011"></a>Member <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#a3b690325543b3e850274f4b92a34d797">boost::afio::v2_xxx::algorithm::shared_fs_mutex::memory_map&lt; Hasher, HashIndexSize, SpinlockType &gt;::unlock</a>  (entities_type entities, unsigned long long hint) noexceptoverridefinal</dt>
-<dd>memory_map::unlock() degrade is racy when single instance being used by multiple threads  </dd>
 <dt><a class="anchor" id="_todo000003"></a>Class <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1file__handle.html">boost::afio::v2_xxx::file_handle</a>  </dt>
 <dd>file_handle needs to be split into a pathed_handle for the file and directory common parts  </dd>
 <dt><a class="anchor" id="_todo000002"></a>Member <a class="el" href="namespaceboost_1_1afio_1_1v2__xxx.html#ad7da7a1d3240d7574fc7c6ee5831b7ee">boost::afio::v2_xxx::fixme_temporary_files_directory</a>  () noexcept</dt>
