@@ -80,8 +80,6 @@ namespace algorithm
     - A transition between mapped and fallback locks will not complete until all current mapped memory users
     have realised the transition has happened. This can take a very significant amount of time if a lock user
     does not regularly lock its locks.
-    \todo It should be possible to auto early out from a memory_map transition by scanning the memory map for any
-    locked items, and if none then to proceed.
     - No ability to sleep until a lock becomes free, so CPUs are spun at 100%.
     - Sudden process exit with locks held will deadlock all other users.
     - Exponential complexity to number of entities being concurrently locked.
@@ -99,6 +97,12 @@ namespace algorithm
     there have been editions of the Linux kernel and the OS X kernel which did this.
     - If your OS doesn't have sane byte range locks (OS X, BSD, older Linuxes) and multiple
     objects in your process use the same lock file, misoperation will occur.
+
+    \todo It should be possible to auto early out from a memory_map transition by scanning the memory map for any
+    locked items, and if none then to proceed.
+    \todo fs_mutex_map needs to check if this inode is that at the path after lock is granted, awaiting stat_t port.
+    \todo memory_map::_hash_entities needs to hash x16, x8 and x4 at a time to encourage auto vectorisation
+    \todo memory_map::unlock() degrade is racy when single instance being used by multiple threads
     */
     template <template <class> class Hasher = boost_lite::algorithm::hash::fnv1a_hash, size_t HashIndexSize = 4096, class SpinlockType = boost_lite::configurable_spinlock::shared_spinlock<>> class memory_map : public shared_fs_mutex
     {
@@ -205,7 +209,6 @@ namespace algorithm
           file_handle temph;
           // Am I the first person to this file? Lock the inuse exclusively
           auto lockinuse = ret.try_lock(_lockinuseoffset, 1, true);
-          //! \todo fs_mutex_map needs to check if this inode is that at the path after lock is granted, awaiting stat_t port.
           file_handle::extent_guard mapinuse;
           if(lockinuse.has_error())
           {
@@ -292,7 +295,6 @@ namespace algorithm
       static span<_entity_idx> _hash_entities(_entity_idx alignas(16) * entity_to_idx, entities_type &entities)
       {
         _entity_idx *ep = entity_to_idx;
-        //! \todo memory_map::_hash_entities needs to hash x16, x8 and x4 at a time to encourage auto vectorisation
         for(size_t n = 0; n < entities.size(); n++)
         {
           ep->value = hasher_type()(entities[n].value) % _container_entries;
@@ -404,7 +406,6 @@ namespace algorithm
       virtual void unlock(entities_type entities, unsigned long long hint) noexcept override final
       {
         BOOST_AFIO_LOG_FUNCTION_CALL(this);
-        //! \todo memory_map::unlock() degrade is racy when single instance being used by multiple threads
         if(_have_degraded)
         {
           if(_fallbacklock)
