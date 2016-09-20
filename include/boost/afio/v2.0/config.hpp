@@ -169,7 +169,9 @@ DEALINGS IN THE SOFTWARE.
 // Default to the C++ 11 STL if on VS2015 or has <experimental/filesystem>
 #ifndef BOOST_AFIO_USE_BOOST_FILESYSTEM
 #ifdef __has_include
-#if __has_include(<filesystem>) || __has_include(<experimental / filesystem>)
+// clang-format off
+#if __has_include(<filesystem>) || __has_include(<experimental/filesystem>)
+// clang-format on
 #define BOOST_AFIO_USE_BOOST_FILESYSTEM 0
 #endif
 #endif
@@ -259,11 +261,11 @@ exported AFIO v2 namespace.
   }                                                                                                                                                                                                                                                                                                                            \
   }                                                                                                                                                                                                                                                                                                                            \
   }
-#elif defined(GENERATING_CXX_MODULE_INTERFACE)
+#elif defined(GENERATING_AFIO_MODULE_INTERFACE)
 #define BOOST_AFIO_V2_NAMESPACE BOOSTLITE_BIND_NAMESPACE(BOOST_AFIO_V2)
 #define BOOST_AFIO_V2_NAMESPACE_BEGIN BOOSTLITE_BIND_NAMESPACE_BEGIN(BOOST_AFIO_V2)
 #define BOOST_AFIO_V2_NAMESPACE_EXPORT_BEGIN BOOSTLITE_BIND_NAMESPACE_EXPORT_BEGIN(BOOST_AFIO_V2)
-#define BOOST_AFIO_V2_NAMESPACE_END BOOSTLITE_NAMESPACE_BIND_END(BOOST_AFIO_V2)
+#define BOOST_AFIO_V2_NAMESPACE_END BOOSTLITE_BIND_NAMESPACE_END(BOOST_AFIO_V2)
 #else
 #define BOOST_AFIO_V2_NAMESPACE BOOSTLITE_BIND_NAMESPACE(BOOST_AFIO_V2)
 #define BOOST_AFIO_V2_NAMESPACE_BEGIN BOOSTLITE_BIND_NAMESPACE_BEGIN(BOOST_AFIO_V2)

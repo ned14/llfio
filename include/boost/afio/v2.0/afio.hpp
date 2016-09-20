@@ -35,7 +35,7 @@
 // If C++ Modules are on and we are not compiling the library,
 // we are either generating the interface or importing
 #if defined(__cpp_modules)
-#if defined(GENERATING_CXX_MODULE_INTERFACE)
+#if defined(GENERATING_AFIO_MODULE_INTERFACE)
 // We are generating this module's interface
 #define BOOSTLITE_HEADERS_ONLY 0
 #define BOOST_AFIO_HEADERS_ONLY 0
