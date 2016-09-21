@@ -40,8 +40,8 @@ var NAVTREEINDEX =
 "afio_8hpp.html",
 "classboost_1_1afio_1_1v2__xxx_1_1file__handle.html#ae600069dc662d837c36f42802791c7f4",
 "classboost_1_1afio_1_1v2__xxx_1_1section__handle.html#a7a2b1215d07fc84508b2d4577c775cfa",
-"group__config.html#gab4f63024aa1238f1d6a067b3d7fb23c7",
-"structboost_1_1afio_1_1v2__xxx_1_1storage__profile_1_1storage__profile.html#a0a870aa7cede1bd98ac357bb368b1086"
+"io__service_8hpp.html#abe3ed2afdf4ef53e3e2d85853f127a95",
+"structboost_1_1afio_1_1v2__xxx_1_1storage__profile_1_1storage__profile.html#a83d2219a5baa4feedcdf5b043e3500cd"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

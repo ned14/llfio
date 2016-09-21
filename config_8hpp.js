@@ -72,7 +72,6 @@ var config_8hpp =
     [ "handle", "config_8hpp.html#a7e1ecae2713ef6c04334cb615b4f7f73", null ],
     [ "outcome", "config_8hpp.html#acdfe1e45abb03d934ed49eeadc3252e3", null ],
     [ "result", "config_8hpp.html#ac8d06ecaa9660e7251c1251d88c1305c", null ],
-    [ "span", "config_8hpp.html#aa349d02323b4cc79a662fafc27ff55da", null ],
     [ "afio_namespace_string", "config_8hpp.html#aa156cb08cea41226cfb4e3820b2704c5", null ],
     [ "log", "config_8hpp.html#aea9da79cbed9aaa47b3f2f665df4be9d", null ],
     [ "outcome_namespace_string", "config_8hpp.html#a67492a1daf137ad9f55ff50714b87231", null ],

@@ -117,16 +117,10 @@ $(document).ready(function(){initNavTree('namespaceboost_1_1afio_1_1v2__xxx_1_1u
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1utils_1_1secded__ecc.html">secded_ecc</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculates the single error correcting double error detecting (SECDED) Hamming Error Correcting Code for a <em>blocksize</em> block of bytes. For example, a secdec_ecc&lt;8&gt; would be the very common 72,64 Hamming code used in ECC RAM, or secdec_ecc&lt;4096&gt; would be for a 32784,32768 Hamming code.  <a href="classboost_1_1afio_1_1v2__xxx_1_1utils_1_1secded__ecc.html#details">More...</a><br/></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1utils_1_1page__allocator.html">page_allocator</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">An STL allocator which allocates large TLB page memory.If the operating system is configured to allow it, this type of memory is particularly efficient for doing large scale file i/o. This is because the kernel must normally convert the scatter gather buffers you pass into extended scatter gather buffers as the memory you see as contiguous may not, and probably isn't, actually be contiguous in physical memory. Regions returned by this allocator <em>may</em> be allocated contiguously in physical memory and therefore the kernel can pass through your scatter gather buffers unmodified.  <a href="classboost_1_1afio_1_1v2__xxx_1_1utils_1_1page__allocator.html#details">More...</a><br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1utils_1_1page__allocator_3_01void_01_4.html">page_allocator&lt; void &gt;</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1utils_1_1fast__hash.html">fast_hash</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fast very collision resistant <a class="el" href="unionuint128.html" title="An unsigned 128 bit value.">uint128</a> hash. Currently SpookyHash @ 0.3 cycles/byte.  <a href="classboost_1_1afio_1_1v2__xxx_1_1utils_1_1fast__hash.html#details">More...</a><br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
@@ -158,86 +152,17 @@ template&lt;class T &gt; </td></tr>
 <tr class="memitem:ac7b89428cdd460548bd9a645a6565df4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceboost_1_1afio_1_1v2__xxx_1_1utils.html#ac7b89428cdd460548bd9a645a6565df4">random_fill</a> (char *buffer, size_t bytes)</td></tr>
 <tr class="memdesc:ac7b89428cdd460548bd9a645a6565df4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fills the buffer supplied with cryptographically strong randomness. Uses the OS kernel API.  <a href="#ac7b89428cdd460548bd9a645a6565df4">More...</a><br/></td></tr>
 <tr class="separator:ac7b89428cdd460548bd9a645a6565df4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaa31dc5969be9b20e5f992c77f2998ec"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceboost_1_1afio_1_1v2__xxx_1_1utils.html#aaa31dc5969be9b20e5f992c77f2998ec">to_hex_string</a> (char *out, size_t outlen, const char *_in, size_t inlen)</td></tr>
-<tr class="memdesc:aaa31dc5969be9b20e5f992c77f2998ec"><td class="mdescLeft">&#160;</td><td class="mdescRight">Converts a number to a hex string. Out buffer can be same as in buffer.  <a href="#aaa31dc5969be9b20e5f992c77f2998ec">More...</a><br/></td></tr>
-<tr class="separator:aaa31dc5969be9b20e5f992c77f2998ec"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a46906d763fbc209f3ede923e3cdb1d00"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceboost_1_1afio_1_1v2__xxx_1_1utils.html#a46906d763fbc209f3ede923e3cdb1d00">to_hex_string</a> (span&lt; char &gt; out, const span&lt; char &gt; in)</td></tr>
-<tr class="separator:a46906d763fbc209f3ede923e3cdb1d00"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a775c89fe351b10ff3e4a088acb7d1865"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceboost_1_1afio_1_1v2__xxx_1_1utils.html#a775c89fe351b10ff3e4a088acb7d1865">to_hex_string</a> (span&lt; char &gt; in)</td></tr>
-<tr class="separator:a775c89fe351b10ff3e4a088acb7d1865"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4757e475a9bdd0df572f7bf1babc5aae"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceboost_1_1afio_1_1v2__xxx_1_1utils.html#a4757e475a9bdd0df572f7bf1babc5aae">from_hex_string</a> (char *out, size_t outlen, const char *in, size_t inlen)</td></tr>
-<tr class="memdesc:a4757e475a9bdd0df572f7bf1babc5aae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Converts a hex string to a number. Out buffer can be same as in buffer.  <a href="#a4757e475a9bdd0df572f7bf1babc5aae">More...</a><br/></td></tr>
-<tr class="separator:a4757e475a9bdd0df572f7bf1babc5aae"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a051e8deb72941b3460811a1cf5f29915"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceboost_1_1afio_1_1v2__xxx_1_1utils.html#a051e8deb72941b3460811a1cf5f29915">random_string</a> (size_t randomlen)</td></tr>
-<tr class="memdesc:a051e8deb72941b3460811a1cf5f29915"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a cryptographically random string capable of being used as a filename. Essentially <a class="el" href="namespaceboost_1_1afio_1_1v2__xxx_1_1utils.html#ac7b89428cdd460548bd9a645a6565df4" title="Fills the buffer supplied with cryptographically strong randomness. Uses the OS kernel API...">random_fill()</a> + <a class="el" href="namespaceboost_1_1afio_1_1v2__xxx_1_1utils.html#aaa31dc5969be9b20e5f992c77f2998ec" title="Converts a number to a hex string. Out buffer can be same as in buffer.">to_hex_string()</a>.  <a href="#a051e8deb72941b3460811a1cf5f29915">More...</a><br/></td></tr>
+<tr class="memdesc:a051e8deb72941b3460811a1cf5f29915"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a cryptographically random string capable of being used as a filename. Essentially <a class="el" href="namespaceboost_1_1afio_1_1v2__xxx_1_1utils.html#ac7b89428cdd460548bd9a645a6565df4" title="Fills the buffer supplied with cryptographically strong randomness. Uses the OS kernel API...">random_fill()</a> + to_hex_string().  <a href="#a051e8deb72941b3460811a1cf5f29915">More...</a><br/></td></tr>
 <tr class="separator:a051e8deb72941b3460811a1cf5f29915"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2c5271d7226a6ba7a59c8c3c476c5442"><td class="memTemplParams" colspan="2"><a class="anchor" id="a2c5271d7226a6ba7a59c8c3c476c5442"></a>
 template&lt;class T , class U &gt; </td></tr>
 <tr class="memitem:a2c5271d7226a6ba7a59c8c3c476c5442"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>operator==</b> (const <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1utils_1_1page__allocator.html">page_allocator</a>&lt; T &gt; &amp;, const <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1utils_1_1page__allocator.html">page_allocator</a>&lt; U &gt; &amp;) noexcept</td></tr>
 <tr class="separator:a2c5271d7226a6ba7a59c8c3c476c5442"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab0e1d51b7a453455c0d834239b66e40f"><td class="memItemLeft" align="right" valign="top">union&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceboost_1_1afio_1_1v2__xxx_1_1utils.html#ab0e1d51b7a453455c0d834239b66e40f">alignas</a> (16) <a class="el" href="unionuint128.html">uint128</a></td></tr>
-<tr class="separator:ab0e1d51b7a453455c0d834239b66e40f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Utility routines often useful when using AFIO. </p>
 </div><h2 class="groupheader">Function Documentation</h2>
-<a class="anchor" id="ab0e1d51b7a453455c0d834239b66e40f"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">union boost::afio::v2_xxx::utils::alignas </td>
-          <td>(</td>
-          <td class="paramtype">16&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">write</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Default constructor, no bits set</p>
-<p>All bits zero constructor </p>
-<div class="fragment"><div class="line"><a name="l00645"></a><span class="lineno">  645</span>&#160;                            {</div>
-<div class="line"><a name="l00646"></a><span class="lineno">  646</span>&#160;    <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> as_bytes[16];</div>
-<div class="line"><a name="l00647"></a><span class="lineno">  647</span>&#160;    <span class="keywordtype">unsigned</span> <span class="keywordtype">short</span> as_shorts[8];</div>
-<div class="line"><a name="l00648"></a><span class="lineno">  648</span>&#160;    <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> as_ints[4];</div>
-<div class="line"><a name="l00649"></a><span class="lineno">  649</span>&#160;    <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> <span class="keywordtype">long</span> as_longlongs[2];</div>
-<div class="line"><a name="l00650"></a><span class="lineno">  650</span>&#160;<span class="preprocessor">#if defined(__i386__) || defined(_M_IX86) || defined(__x86_64__) || defined(_M_X64)</span></div>
-<div class="line"><a name="l00651"></a><span class="lineno">  651</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#if defined(__x86_64__) || defined(_M_X64) || defined(__SSE2__) || (defined(_M_IX86_FP) &amp;&amp; _M_IX86_FP &gt;= 2)</span></div>
-<div class="line"><a name="l00652"></a><span class="lineno">  652</span>&#160;<span class="preprocessor"></span>    <span class="comment">// Strongly hint to the compiler what to do here</span></div>
-<div class="line"><a name="l00653"></a><span class="lineno">  653</span>&#160;    __m128i as_m128i;</div>
-<div class="line"><a name="l00654"></a><span class="lineno">  654</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00655"></a><span class="lineno">  655</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00656"></a><span class="lineno">  656</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l00657"></a><span class="lineno">  657</span>&#160;    <a class="code" href="namespaceboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex.html#aadc75b962fac6b2c028d7c7fce7cd1ac" title="Unsigned 128 bit integer.">uint128</a>() noexcept {}</div>
-<div class="line"><a name="l00659"></a><span class="lineno">  659</span>&#160;    constexpr <a class="code" href="namespaceboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex.html#aadc75b962fac6b2c028d7c7fce7cd1ac" title="Unsigned 128 bit integer.">uint128</a>(std::nullptr_t) noexcept : as_longlongs{0, 0} {}</div>
-<div class="line"><a name="l00660"></a><span class="lineno">  660</span>&#160;  <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00661"></a><span class="lineno">  661</span>&#160;    <span class="keyword">static</span> <span class="keyword">const</span> <a class="code" href="unionuint128.html" title="An unsigned 128 bit value.">uint128</a> &amp;_allbitszero()</div>
-<div class="line"><a name="l00662"></a><span class="lineno">  662</span>&#160;    {</div>
-<div class="line"><a name="l00663"></a><span class="lineno">  663</span>&#160;      <span class="keyword">static</span> <a class="code" href="unionuint128.html" title="An unsigned 128 bit value.">uint128</a> v(<span class="keyword">nullptr</span>);</div>
-<div class="line"><a name="l00664"></a><span class="lineno">  664</span>&#160;      <span class="keywordflow">return</span> v;</div>
-<div class="line"><a name="l00665"></a><span class="lineno">  665</span>&#160;    }</div>
-<div class="line"><a name="l00666"></a><span class="lineno">  666</span>&#160;</div>
-<div class="line"><a name="l00667"></a><span class="lineno">  667</span>&#160;  <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00668"></a><span class="lineno">  668</span>&#160;    <span class="keyword">explicit</span> <span class="keyword">operator</span> bool() const noexcept { <span class="keywordflow">return</span> (*<span class="keyword">this</span>) != _allbitszero(); }</div>
-<div class="line"><a name="l00669"></a><span class="lineno">  669</span>&#160;    <span class="keywordtype">bool</span> operator!() const noexcept { <span class="keywordflow">return</span> (*<span class="keyword">this</span>) == _allbitszero(); }</div>
-<div class="line"><a name="l00670"></a><span class="lineno">  670</span>&#160;    <span class="keywordtype">bool</span> operator==(<span class="keyword">const</span> <a class="code" href="unionuint128.html" title="An unsigned 128 bit value.">uint128</a> &amp;o) <span class="keyword">const</span> noexcept { <span class="keywordflow">return</span> as_longlongs[1] == o.as_longlongs[1] &amp;&amp; as_longlongs[0] == o.as_longlongs[0]; }</div>
-<div class="line"><a name="l00671"></a><span class="lineno">  671</span>&#160;    <span class="keywordtype">bool</span> operator!=(<span class="keyword">const</span> <a class="code" href="unionuint128.html" title="An unsigned 128 bit value.">uint128</a> &amp;o) <span class="keyword">const</span> noexcept { <span class="keywordflow">return</span> as_longlongs[1] != o.as_longlongs[1] || as_longlongs[0] != o.as_longlongs[0]; }</div>
-<div class="line"><a name="l00672"></a><span class="lineno">  672</span>&#160;    <span class="keywordtype">bool</span> operator&lt;(<span class="keyword">const</span> <a class="code" href="unionuint128.html" title="An unsigned 128 bit value.">uint128</a> &amp;o) <span class="keyword">const</span> noexcept { <span class="keywordflow">return</span> as_longlongs[0] &lt; o.as_longlongs[0] || (as_longlongs[0] == o.as_longlongs[0] &amp;&amp; as_longlongs[1] &lt; o.as_longlongs[1]); }</div>
-<div class="line"><a name="l00673"></a><span class="lineno">  673</span>&#160;    <span class="keywordtype">bool</span> operator&lt;=(<span class="keyword">const</span> <a class="code" href="unionuint128.html" title="An unsigned 128 bit value.">uint128</a> &amp;o) <span class="keyword">const</span> noexcept { <span class="keywordflow">return</span> as_longlongs[0] &lt; o.as_longlongs[0] || (as_longlongs[0] == o.as_longlongs[0] &amp;&amp; as_longlongs[1] &lt;= o.as_longlongs[1]); }</div>
-<div class="line"><a name="l00674"></a><span class="lineno">  674</span>&#160;    <span class="keywordtype">bool</span> operator&gt;(<span class="keyword">const</span> <a class="code" href="unionuint128.html" title="An unsigned 128 bit value.">uint128</a> &amp;o) <span class="keyword">const</span> noexcept { <span class="keywordflow">return</span> as_longlongs[0] &gt; o.as_longlongs[0] || (as_longlongs[0] == o.as_longlongs[0] &amp;&amp; as_longlongs[1] &gt; o.as_longlongs[1]); }</div>
-<div class="line"><a name="l00675"></a><span class="lineno">  675</span>&#160;    <span class="keywordtype">bool</span> operator&gt;=(<span class="keyword">const</span> <a class="code" href="unionuint128.html" title="An unsigned 128 bit value.">uint128</a> &amp;o) <span class="keyword">const</span> noexcept { <span class="keywordflow">return</span> as_longlongs[0] &gt; o.as_longlongs[0] || (as_longlongs[0] == o.as_longlongs[0] &amp;&amp; as_longlongs[1] &gt;= o.as_longlongs[1]); }</div>
-<div class="line"><a name="l00676"></a><span class="lineno">  676</span>&#160;  };</div>
-</div><!-- fragment -->
-</div>
-</div>
 <a class="anchor" id="a372dccddba2f36695a095dbe98474f1a"></a>
 <div class="memitem">
 <div class="memproto">
@@ -263,129 +188,22 @@ template&lt;class T , class U &gt; </td></tr>
 <dl class="section return"><dt>Returns</dt><dd>A value of a TLB large page size close to 1Mb.</dd></dl>
 <dl class="section user"><dt>Complexity</dt><dd>Whatever the system API takes (one would hope constant time). </dd></dl>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any error from the operating system or std::bad_alloc. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;  {</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">size_t</span> size;</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;    <span class="keywordflow">if</span>(!size)</div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;    {</div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;      std::vector&lt;size_t&gt; sizes(<a class="code" href="namespaceboost_1_1afio_1_1v2__xxx_1_1utils.html#ae63332cddaecd2a30b839856c7d5fe0e" title="Returns the page sizes of this architecture which is useful for calculating direct i/o multiples...">page_sizes</a>(<span class="keyword">true</span>));</div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;      <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;i : sizes)</div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;        <span class="keywordflow">if</span>(i &gt;= 1024 * 1024)</div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;        {</div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;          size = i;</div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;          <span class="keywordflow">break</span>;</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;        }</div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;      <span class="keywordflow">if</span>(!size)</div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;        size = 1024 * 1024;</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;    }</div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;    <span class="keywordflow">return</span> size;</div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;  }</div>
-</div><!-- fragment -->
-</div>
-</div>
-<a class="anchor" id="a4757e475a9bdd0df572f7bf1babc5aae"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">size_t boost::afio::v2_xxx::utils::from_hex_string </td>
-          <td>(</td>
-          <td class="paramtype">char *&#160;</td>
-          <td class="paramname"><em>out</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>outlen</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const char *&#160;</td>
-          <td class="paramname"><em>in</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>inlen</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Converts a hex string to a number. Out buffer can be same as in buffer. </p>
-<p>Note that this routine is about 43% slower than <a class="el" href="namespaceboost_1_1afio_1_1v2__xxx_1_1utils.html#aaa31dc5969be9b20e5f992c77f2998ec" title="Converts a number to a hex string. Out buffer can be same as in buffer.">to_hex_string()</a>, half of which is due to input validation.</p>
-<dl class="section user"><dt>Complexity</dt><dd>O(N) where N is the length of the string. </dd></dl>
-<dl class="section user"><dt>Errors returnable</dt><dd>Throws exception if output buffer is too small for input or input size is not multiple of two. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;  {</div>
-<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;    <span class="keywordflow">if</span>(inlen % 2)</div>
-<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;      <span class="keywordflow">throw</span> std::invalid_argument(<span class="stringliteral">&quot;Input buffer not multiple of two.&quot;</span>);</div>
-<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;    <span class="keywordflow">if</span>(outlen &lt; inlen / 2)</div>
-<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;      <span class="keywordflow">throw</span> std::invalid_argument(<span class="stringliteral">&quot;Output buffer too small.&quot;</span>);</div>
-<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;    <span class="keywordtype">bool</span> is_invalid = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;    <span class="keyword">auto</span> fromhex = [&amp;is_invalid](<span class="keywordtype">char</span> c) -&gt; <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> {</div>
-<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;<span class="preprocessor">#if 1</span></div>
-<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;<span class="preprocessor"></span>      <span class="comment">// ASCII starting from 48 is 0123456789:;&lt;=&gt;?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~</span></div>
-<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;      <span class="comment">//                           48               65                              97</span></div>
-<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;      <span class="keyword">static</span> constexpr <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> table[] = {0,   1,   2,   3,   4,   5,   6,   7,   8,   9,                                                                                    <span class="comment">// +10 = 58</span></div>
-<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;                                                255, 255, 255, 255, 255, 255, 255,                                                                                                 <span class="comment">// +7  = 65</span></div>
-<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;                                                10,  11,  12,  13,  14,  15,                                                                                                       <span class="comment">// +6  = 71</span></div>
-<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;                                                255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,  <span class="comment">// +26 = 97</span></div>
-<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;                                                10,  11,  12,  13,  14,  15};</div>
-<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;      <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> r = 255;</div>
-<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;      <span class="keywordflow">if</span>(c &gt;= 48 &amp;&amp; c &lt;= 102)</div>
-<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;        r = table[c - 48];</div>
-<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;      <span class="keywordflow">if</span>(r == 255)</div>
-<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;        is_invalid = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;      <span class="keywordflow">return</span> r;</div>
-<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;<span class="preprocessor">#else</span></div>
-<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;<span class="preprocessor"></span>      <span class="keywordflow">if</span>(c &gt;= <span class="charliteral">&#39;0&#39;</span> &amp;&amp; c &lt;= <span class="charliteral">&#39;9&#39;</span>)</div>
-<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;        <span class="keywordflow">return</span> c - <span class="charliteral">&#39;0&#39;</span>;</div>
-<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;      <span class="keywordflow">if</span>(c &gt;= <span class="charliteral">&#39;a&#39;</span> &amp;&amp; c &lt;= <span class="charliteral">&#39;f&#39;</span>)</div>
-<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;        <span class="keywordflow">return</span> c - <span class="charliteral">&#39;a&#39;</span> + 10;</div>
-<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;      <span class="keywordflow">if</span>(c &gt;= <span class="charliteral">&#39;A&#39;</span> &amp;&amp; c &lt;= <span class="charliteral">&#39;F&#39;</span>)</div>
-<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;        <span class="keywordflow">return</span> c - <span class="charliteral">&#39;A&#39;</span> + 10;</div>
-<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;      BOOST_AFIO_THROW(std::invalid_argument(<span class="stringliteral">&quot;Input is not hexadecimal.&quot;</span>));</div>
-<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;<span class="preprocessor"></span>    };</div>
-<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">size_t</span> n = 0; n &lt; inlen / 2; n += 4)</div>
-<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;    {</div>
-<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;      <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> c[8];</div>
-<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;      c[0] = fromhex(in[n * 2]);</div>
-<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;      c[1] = fromhex(in[n * 2 + 1]);</div>
-<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;      c[2] = fromhex(in[n * 2 + 2]);</div>
-<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;      c[3] = fromhex(in[n * 2 + 3]);</div>
-<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;      out[n] = (c[1] &lt;&lt; 4) | c[0];</div>
-<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;      c[4] = fromhex(in[n * 2 + 4]);</div>
-<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;      c[5] = fromhex(in[n * 2 + 5]);</div>
-<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;      out[n + 1] = (c[3] &lt;&lt; 4) | c[2];</div>
-<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;      c[6] = fromhex(in[n * 2 + 6]);</div>
-<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;      c[7] = fromhex(in[n * 2 + 7]);</div>
-<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;      out[n + 2] = (c[5] &lt;&lt; 4) | c[4];</div>
-<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;      out[n + 3] = (c[7] &lt;&lt; 4) | c[6];</div>
-<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;    }</div>
-<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">size_t</span> n = inlen / 2 - (inlen / 2) % 4; n &lt; inlen / 2; n++)</div>
-<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;    {</div>
-<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;      <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> c1 = fromhex(in[n * 2]), c2 = fromhex(in[n * 2 + 1]);</div>
-<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;      out[n] = (c2 &lt;&lt; 4) | c1;</div>
-<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;    }</div>
-<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;    <span class="keywordflow">if</span>(is_invalid)</div>
-<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;      <span class="keywordflow">throw</span> std::invalid_argument(<span class="stringliteral">&quot;Input is not hexadecimal.&quot;</span>);</div>
-<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;    <span class="keywordflow">return</span> inlen / 2;</div>
-<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;  }</div>
+<div class="fragment"><div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;  {</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">size_t</span> size;</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;    <span class="keywordflow">if</span>(!size)</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;    {</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;      std::vector&lt;size_t&gt; sizes(<a class="code" href="namespaceboost_1_1afio_1_1v2__xxx_1_1utils.html#ae63332cddaecd2a30b839856c7d5fe0e" title="Returns the page sizes of this architecture which is useful for calculating direct i/o multiples...">page_sizes</a>(<span class="keyword">true</span>));</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;      <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;i : sizes)</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;        <span class="keywordflow">if</span>(i &gt;= 1024 * 1024)</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;        {</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;          size = i;</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;          <span class="keywordflow">break</span>;</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;        }</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;      <span class="keywordflow">if</span>(!size)</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;        size = 1024 * 1024;</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;    }</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;    <span class="keywordflow">return</span> size;</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -518,7 +336,7 @@ template&lt;class T , class U &gt; </td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Returns a cryptographically random string capable of being used as a filename. Essentially <a class="el" href="namespaceboost_1_1afio_1_1v2__xxx_1_1utils.html#ac7b89428cdd460548bd9a645a6565df4" title="Fills the buffer supplied with cryptographically strong randomness. Uses the OS kernel API...">random_fill()</a> + <a class="el" href="namespaceboost_1_1afio_1_1v2__xxx_1_1utils.html#aaa31dc5969be9b20e5f992c77f2998ec" title="Converts a number to a hex string. Out buffer can be same as in buffer.">to_hex_string()</a>. </p>
+<p>Returns a cryptographically random string capable of being used as a filename. Essentially <a class="el" href="namespaceboost_1_1afio_1_1v2__xxx_1_1utils.html#ac7b89428cdd460548bd9a645a6565df4" title="Fills the buffer supplied with cryptographically strong randomness. Uses the OS kernel API...">random_fill()</a> + to_hex_string(). </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">randomlen</td><td>The number of bytes of randomness to use for the string. </td></tr>
@@ -528,151 +346,13 @@ template&lt;class T , class U &gt; </td></tr>
 <dl class="section return"><dt>Returns</dt><dd>A string representing the randomness at a 2x ratio, so if 32 bytes were requested, this string would be 64 bytes long.</dd></dl>
 <dl class="section user"><dt>Complexity</dt><dd>Whatever the system API takes. </dd></dl>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any error from the operating system. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;  {</div>
-<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;    <span class="keywordtype">size_t</span> outlen = randomlen * 2;</div>
-<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;    std::string ret(outlen, 0);</div>
-<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;    <a class="code" href="namespaceboost_1_1afio_1_1v2__xxx_1_1utils.html#ac7b89428cdd460548bd9a645a6565df4" title="Fills the buffer supplied with cryptographically strong randomness. Uses the OS kernel API...">random_fill</a>(const_cast&lt;char *&gt;(ret.data()), randomlen);</div>
-<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;    <a class="code" href="namespaceboost_1_1afio_1_1v2__xxx_1_1utils.html#aaa31dc5969be9b20e5f992c77f2998ec" title="Converts a number to a hex string. Out buffer can be same as in buffer.">to_hex_string</a>(const_cast&lt;char *&gt;(ret.data()), outlen, ret.data(), randomlen);</div>
-<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;    <span class="keywordflow">return</span> ret;</div>
-<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;  }</div>
-</div><!-- fragment -->
-</div>
-</div>
-<a class="anchor" id="aaa31dc5969be9b20e5f992c77f2998ec"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">size_t boost::afio::v2_xxx::utils::to_hex_string </td>
-          <td>(</td>
-          <td class="paramtype">char *&#160;</td>
-          <td class="paramname"><em>out</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>outlen</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const char *&#160;</td>
-          <td class="paramname"><em>_in</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>inlen</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Converts a number to a hex string. Out buffer can be same as in buffer. </p>
-<p>Note that the character range used is a 16 item table of:</p>
-<p>0123456789abcdef</p>
-<p>This lets one pack one byte of input into two bytes of output.</p>
-<dl class="section user"><dt>Complexity</dt><dd>O(N) where N is the length of the number. </dd></dl>
-<dl class="section user"><dt>Errors returnable</dt><dd>Throws exception if output buffer is too small for input. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;  {</div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;    <span class="keywordtype">unsigned</span> <span class="keyword">const</span> <span class="keywordtype">char</span> *in = (<span class="keywordtype">unsigned</span> <span class="keyword">const</span> <span class="keywordtype">char</span> *) _in;</div>
-<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;    <span class="keyword">static</span> constexpr <span class="keywordtype">char</span> table[] = <span class="stringliteral">&quot;0123456789abcdef&quot;</span>;</div>
-<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;    <span class="keywordflow">if</span>(outlen &lt; inlen * 2)</div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;      <span class="keywordflow">throw</span> std::invalid_argument(<span class="stringliteral">&quot;Output buffer too small.&quot;</span>);</div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">size_t</span> n = inlen - 2; n &lt;= inlen - 2; n -= 2)</div>
-<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;    {</div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;      out[n * 2 + 3] = table[(in[n + 1] &gt;&gt; 4) &amp; 0xf];</div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;      out[n * 2 + 2] = table[in[n + 1] &amp; 0xf];</div>
-<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;      out[n * 2 + 1] = table[(in[n] &gt;&gt; 4) &amp; 0xf];</div>
-<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;      out[n * 2 + 0] = table[in[n] &amp; 0xf];</div>
-<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;    }</div>
-<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;    <span class="keywordflow">if</span>(inlen &amp; 1)</div>
-<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;    {</div>
-<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;      out[1] = table[(in[0] &gt;&gt; 4) &amp; 0xf];</div>
-<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;      out[0] = table[in[0] &amp; 0xf];</div>
-<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;    }</div>
-<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;    <span class="keywordflow">return</span> inlen * 2;</div>
-<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;  }</div>
-</div><!-- fragment -->
-</div>
-</div>
-<a class="anchor" id="a46906d763fbc209f3ede923e3cdb1d00"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">size_t boost::afio::v2_xxx::utils::to_hex_string </td>
-          <td>(</td>
-          <td class="paramtype">span&lt; char &gt;&#160;</td>
-          <td class="paramname"><em>out</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const span&lt; char &gt;&#160;</td>
-          <td class="paramname"><em>in</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;{ <span class="keywordflow">return</span> <a class="code" href="namespaceboost_1_1afio_1_1v2__xxx_1_1utils.html#aaa31dc5969be9b20e5f992c77f2998ec" title="Converts a number to a hex string. Out buffer can be same as in buffer.">to_hex_string</a>(out.data(), out.size(), in.data(), in.size()); }</div>
-</div><!-- fragment -->
-</div>
-</div>
-<a class="anchor" id="a775c89fe351b10ff3e4a088acb7d1865"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::string boost::afio::v2_xxx::utils::to_hex_string </td>
-          <td>(</td>
-          <td class="paramtype">span&lt; char &gt;&#160;</td>
-          <td class="paramname"><em>in</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;  {</div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;    std::string out(in.size() * 2, <span class="charliteral">&#39; &#39;</span>);</div>
-<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;    <a class="code" href="namespaceboost_1_1afio_1_1v2__xxx_1_1utils.html#aaa31dc5969be9b20e5f992c77f2998ec" title="Converts a number to a hex string. Out buffer can be same as in buffer.">to_hex_string</a>(const_cast&lt;char *&gt;(out.data()), out.size(), in.data(), in.size());</div>
-<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;    <span class="keywordflow">return</span> out;</div>
-<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;  }</div>
+<div class="fragment"><div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;  {</div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;    <span class="keywordtype">size_t</span> outlen = randomlen * 2;</div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;    std::string ret(outlen, 0);</div>
+<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;    <a class="code" href="namespaceboost_1_1afio_1_1v2__xxx_1_1utils.html#ac7b89428cdd460548bd9a645a6565df4" title="Fills the buffer supplied with cryptographically strong randomness. Uses the OS kernel API...">random_fill</a>(const_cast&lt;char *&gt;(ret.data()), randomlen);</div>
+<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;    boost_lite::algorithm::string::to_hex_string(const_cast&lt;char *&gt;(ret.data()), outlen, ret.data(), randomlen);</div>
+<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;    <span class="keywordflow">return</span> ret;</div>
+<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>

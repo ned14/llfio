@@ -204,7 +204,7 @@ $(document).ready(function(){initNavTree('lock__files_8hpp_source.html','');});
 <div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;        <span class="keywordflow">for</span>(n = 0; n &lt; out.entities.size(); n++)</div>
 <div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;        {</div>
 <div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;          <span class="keyword">auto</span> v = out.entities[n].value;</div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;          entity_paths[n] = _path / <a class="code" href="namespaceboost_1_1afio_1_1v2__xxx_1_1utils.html#aaa31dc5969be9b20e5f992c77f2998ec" title="Converts a number to a hex string. Out buffer can be same as in buffer.">utils::to_hex_string</a>(span&lt;char&gt;((<span class="keywordtype">char</span> *) &amp;v, 8));</div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;          entity_paths[n] = _path / boost_lite::algorithm::string::to_hex_string(span&lt;char&gt;((<span class="keywordtype">char</span> *) &amp;v, 8));</div>
 <div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;        }</div>
 <div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;        _hs.resize(out.entities.size());</div>
 <div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;        <span class="keywordflow">do</span></div>

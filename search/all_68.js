@@ -5,7 +5,5 @@ var searchData=
   ['handle',['handle',['../classboost_1_1afio_1_1v2__xxx_1_1handle.html',1,'boost::afio::v2_xxx']]],
   ['handle_2ehpp',['handle.hpp',['../handle_8hpp.html',1,'']]],
   ['handle_5ftype',['handle_type',['../structboost_1_1afio_1_1v2__xxx_1_1storage__profile_1_1item__base.html#ac50981eecd188191dc343943031998d4',1,'boost::afio::v2_xxx::storage_profile::item_base::handle_type()'],['../structboost_1_1afio_1_1v2__xxx_1_1storage__profile_1_1storage__profile.html#a902cdf343a238d8bc4773968ae6f294a',1,'boost::afio::v2_xxx::storage_profile::storage_profile::handle_type()']]],
-  ['hash',['hash',['../classboost_1_1afio_1_1v2__xxx_1_1utils_1_1fast__hash.html#a5563217f87a97056bd5bc662a8c4c78e',1,'boost::afio::v2_xxx::utils::fast_hash::hash(const char *data, size_t bytes, const uint128 &amp;seed=uint128(nullptr)) noexcept'],['../classboost_1_1afio_1_1v2__xxx_1_1utils_1_1fast__hash.html#add85551b9f29910b17f7b33b7c8d3626',1,'boost::afio::v2_xxx::utils::fast_hash::hash(const span&lt; T &gt; &amp;str) noexcept']]],
-  ['hasher_5ftype',['hasher_type',['../classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#a68ab075ffa6ac8e7c616de146e784f83',1,'boost::afio::v2_xxx::algorithm::shared_fs_mutex::memory_map']]],
-  ['healed',['healed',['../classboost_1_1afio_1_1v2__xxx_1_1utils_1_1secded__ecc.html#ad4a2e426ac1c9a6a956f79a0220633cdaebcaccb9a72746b782900523470672b4',1,'boost::afio::v2_xxx::utils::secded_ecc']]]
+  ['hasher_5ftype',['hasher_type',['../classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#a68ab075ffa6ac8e7c616de146e784f83',1,'boost::afio::v2_xxx::algorithm::shared_fs_mutex::memory_map']]]
 ];

@@ -107,7 +107,6 @@ $(document).ready(function(){initNavTree('utils_8hpp.html','');});
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
 <a href="#namespaces">Namespaces</a> &#124;
-<a href="#define-members">Macros</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">utils.hpp File Reference</div>  </div>
@@ -117,14 +116,12 @@ $(document).ready(function(){initNavTree('utils_8hpp.html','');});
 <p>Provides namespace utils.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &quot;<a class="el" href="config_8hpp_source.html">config.hpp</a>&quot;</code><br/>
+<code>#include &quot;../boost-lite/include/algorithm/string.hpp&quot;</code><br/>
 </div>
 <p><a href="utils_8hpp_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1utils_1_1secded__ecc.html">boost::afio::v2_xxx::utils::secded_ecc&lt; blocksize &gt;</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculates the single error correcting double error detecting (SECDED) Hamming Error Correcting Code for a <em>blocksize</em> block of bytes. For example, a secdec_ecc&lt;8&gt; would be the very common 72,64 Hamming code used in ECC RAM, or secdec_ecc&lt;4096&gt; would be for a 32784,32768 Hamming code.  <a href="classboost_1_1afio_1_1v2__xxx_1_1utils_1_1secded__ecc.html#details">More...</a><br/></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1utils_1_1page__allocator.html">boost::afio::v2_xxx::utils::page_allocator&lt; T &gt;</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">An STL allocator which allocates large TLB page memory.If the operating system is configured to allow it, this type of memory is particularly efficient for doing large scale file i/o. This is because the kernel must normally convert the scatter gather buffers you pass into extended scatter gather buffers as the memory you see as contiguous may not, and probably isn't, actually be contiguous in physical memory. Regions returned by this allocator <em>may</em> be allocated contiguously in physical memory and therefore the kernel can pass through your scatter gather buffers unmodified.  <a href="classboost_1_1afio_1_1v2__xxx_1_1utils_1_1page__allocator.html#details">More...</a><br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -133,9 +130,6 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1utils_1_1page__allocator_3_01void_01_4.html">boost::afio::v2_xxx::utils::page_allocator&lt; void &gt;</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1utils_1_1page__allocator_3_01void_01_4_1_1rebind.html">boost::afio::v2_xxx::utils::page_allocator&lt; void &gt;::rebind&lt; U &gt;</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1utils_1_1fast__hash.html">boost::afio::v2_xxx::utils::fast_hash</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fast very collision resistant <a class="el" href="unionuint128.html" title="An unsigned 128 bit value.">uint128</a> hash. Currently SpookyHash @ 0.3 cycles/byte.  <a href="classboost_1_1afio_1_1v2__xxx_1_1utils_1_1fast__hash.html#details">More...</a><br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="namespaces"></a>
@@ -152,14 +146,6 @@ Namespaces</h2></td></tr>
 <tr class="memitem:namespaceboost_1_1afio_1_1v2__xxx_1_1utils"><td class="memItemLeft" align="right" valign="top">namespace &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceboost_1_1afio_1_1v2__xxx_1_1utils.html">boost::afio::v2_xxx::utils</a></td></tr>
 <tr class="memdesc:namespaceboost_1_1afio_1_1v2__xxx_1_1utils"><td class="mdescLeft">&#160;</td><td class="mdescRight">Utility routines often useful when using AFIO. <br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
-Macros</h2></td></tr>
-<tr class="memitem:a130389fe4d2bf643955597dfb34fe962"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a130389fe4d2bf643955597dfb34fe962"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>BOOST_AFIO_SECDEC_INTRINSICS</b>&#160;&#160;&#160;0</td></tr>
-<tr class="separator:a130389fe4d2bf643955597dfb34fe962"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4eff8ea7c1ee25af59b33fa679c9793e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><b>BOOST_AFIO_ROUND</b>(n)</td></tr>
-<tr class="separator:a4eff8ea7c1ee25af59b33fa679c9793e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
@@ -190,18 +176,8 @@ template&lt;class T &gt; </td></tr>
 <tr class="memitem:ac7b89428cdd460548bd9a645a6565df4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceboost_1_1afio_1_1v2__xxx_1_1utils.html#ac7b89428cdd460548bd9a645a6565df4">boost::afio::v2_xxx::utils::random_fill</a> (char *buffer, size_t bytes)</td></tr>
 <tr class="memdesc:ac7b89428cdd460548bd9a645a6565df4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fills the buffer supplied with cryptographically strong randomness. Uses the OS kernel API.  <a href="#ac7b89428cdd460548bd9a645a6565df4">More...</a><br/></td></tr>
 <tr class="separator:ac7b89428cdd460548bd9a645a6565df4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaa31dc5969be9b20e5f992c77f2998ec"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceboost_1_1afio_1_1v2__xxx_1_1utils.html#aaa31dc5969be9b20e5f992c77f2998ec">boost::afio::v2_xxx::utils::to_hex_string</a> (char *out, size_t outlen, const char *_in, size_t inlen)</td></tr>
-<tr class="memdesc:aaa31dc5969be9b20e5f992c77f2998ec"><td class="mdescLeft">&#160;</td><td class="mdescRight">Converts a number to a hex string. Out buffer can be same as in buffer.  <a href="#aaa31dc5969be9b20e5f992c77f2998ec">More...</a><br/></td></tr>
-<tr class="separator:aaa31dc5969be9b20e5f992c77f2998ec"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a46906d763fbc209f3ede923e3cdb1d00"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceboost_1_1afio_1_1v2__xxx_1_1utils.html#a46906d763fbc209f3ede923e3cdb1d00">boost::afio::v2_xxx::utils::to_hex_string</a> (span&lt; char &gt; out, const span&lt; char &gt; in)</td></tr>
-<tr class="separator:a46906d763fbc209f3ede923e3cdb1d00"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a775c89fe351b10ff3e4a088acb7d1865"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceboost_1_1afio_1_1v2__xxx_1_1utils.html#a775c89fe351b10ff3e4a088acb7d1865">boost::afio::v2_xxx::utils::to_hex_string</a> (span&lt; char &gt; in)</td></tr>
-<tr class="separator:a775c89fe351b10ff3e4a088acb7d1865"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4757e475a9bdd0df572f7bf1babc5aae"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceboost_1_1afio_1_1v2__xxx_1_1utils.html#a4757e475a9bdd0df572f7bf1babc5aae">boost::afio::v2_xxx::utils::from_hex_string</a> (char *out, size_t outlen, const char *in, size_t inlen)</td></tr>
-<tr class="memdesc:a4757e475a9bdd0df572f7bf1babc5aae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Converts a hex string to a number. Out buffer can be same as in buffer.  <a href="#a4757e475a9bdd0df572f7bf1babc5aae">More...</a><br/></td></tr>
-<tr class="separator:a4757e475a9bdd0df572f7bf1babc5aae"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a051e8deb72941b3460811a1cf5f29915"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceboost_1_1afio_1_1v2__xxx_1_1utils.html#a051e8deb72941b3460811a1cf5f29915">boost::afio::v2_xxx::utils::random_string</a> (size_t randomlen)</td></tr>
-<tr class="memdesc:a051e8deb72941b3460811a1cf5f29915"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a cryptographically random string capable of being used as a filename. Essentially <a class="el" href="namespaceboost_1_1afio_1_1v2__xxx_1_1utils.html#ac7b89428cdd460548bd9a645a6565df4" title="Fills the buffer supplied with cryptographically strong randomness. Uses the OS kernel API...">random_fill()</a> + <a class="el" href="namespaceboost_1_1afio_1_1v2__xxx_1_1utils.html#aaa31dc5969be9b20e5f992c77f2998ec" title="Converts a number to a hex string. Out buffer can be same as in buffer.">to_hex_string()</a>.  <a href="#a051e8deb72941b3460811a1cf5f29915">More...</a><br/></td></tr>
+<tr class="memdesc:a051e8deb72941b3460811a1cf5f29915"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a cryptographically random string capable of being used as a filename. Essentially <a class="el" href="namespaceboost_1_1afio_1_1v2__xxx_1_1utils.html#ac7b89428cdd460548bd9a645a6565df4" title="Fills the buffer supplied with cryptographically strong randomness. Uses the OS kernel API...">random_fill()</a> + to_hex_string().  <a href="#a051e8deb72941b3460811a1cf5f29915">More...</a><br/></td></tr>
 <tr class="separator:a051e8deb72941b3460811a1cf5f29915"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a871ffc5e829c4006846d2e951e4d2780"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a871ffc5e829c4006846d2e951e4d2780"></a>
 large_page_allocation&#160;</td><td class="memItemRight" valign="bottom"><b>boost::afio::v2_xxx::utils::detail::calculate_large_page_allocation</b> (size_t bytes)</td></tr>
@@ -216,53 +192,10 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>boost::afio::v2_xxx::
 template&lt;class T , class U &gt; </td></tr>
 <tr class="memitem:a2c5271d7226a6ba7a59c8c3c476c5442"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>boost::afio::v2_xxx::utils::operator==</b> (const page_allocator&lt; T &gt; &amp;, const page_allocator&lt; U &gt; &amp;) noexcept</td></tr>
 <tr class="separator:a2c5271d7226a6ba7a59c8c3c476c5442"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab0e1d51b7a453455c0d834239b66e40f"><td class="memItemLeft" align="right" valign="top">union&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceboost_1_1afio_1_1v2__xxx_1_1utils.html#ab0e1d51b7a453455c0d834239b66e40f">boost::afio::v2_xxx::utils::alignas</a> (16) <a class="el" href="unionuint128.html">uint128</a></td></tr>
-<tr class="separator:ab0e1d51b7a453455c0d834239b66e40f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Provides namespace utils. </p>
-</div><h2 class="groupheader">Macro Definition Documentation</h2>
-<a class="anchor" id="a4eff8ea7c1ee25af59b33fa679c9793e"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define BOOST_AFIO_ROUND</td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">n</td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">prefetch[0] = ecc_table[(i + 0) * 8 + n];                                                                                                                                                                                                                                                                                    \</div>
-<div class="line">  prefetch[1] = ecc_table[(i + 1) * 8 + n];                                                                                                                                                                                                                                                                                    \</div>
-<div class="line">  prefetch[2] = ecc_table[(i + 2) * 8 + n];                                                                                                                                                                                                                                                                                    \</div>
-<div class="line">  prefetch[3] = ecc_table[(i + 3) * 8 + n];                                                                                                                                                                                                                                                                                    \</div>
-<div class="line">  prefetch[4] = ecc_table[(i + 4) * 8 + n];                                                                                                                                                                                                                                                                                    \</div>
-<div class="line">  prefetch[5] = ecc_table[(i + 5) * 8 + n];                                                                                                                                                                                                                                                                                    \</div>
-<div class="line">  prefetch[6] = ecc_table[(i + 6) * 8 + n];                                                                                                                                                                                                                                                                                    \</div>
-<div class="line">  prefetch[7] = ecc_table[(i + 7) * 8 + n];                                                                                                                                                                                                                                                                                    \</div>
-<div class="line">  if(c[0] &amp; ((unit_type) 1 &lt;&lt; n))                                                                                                                                                                                                                                                                                              \</div>
-<div class="line">    ecc ^= prefetch[0];                                                                                                                                                                                                                                                                                                        \</div>
-<div class="line">  if(c[1] &amp; ((unit_type) 1 &lt;&lt; n))                                                                                                                                                                                                                                                                                              \</div>
-<div class="line">    ecc ^= prefetch[1];                                                                                                                                                                                                                                                                                                        \</div>
-<div class="line">  if(c[2] &amp; ((unit_type) 1 &lt;&lt; n))                                                                                                                                                                                                                                                                                              \</div>
-<div class="line">    ecc ^= prefetch[2];                                                                                                                                                                                                                                                                                                        \</div>
-<div class="line">  if(c[3] &amp; ((unit_type) 1 &lt;&lt; n))                                                                                                                                                                                                                                                                                              \</div>
-<div class="line">    ecc ^= prefetch[3];                                                                                                                                                                                                                                                                                                        \</div>
-<div class="line">  if(c[4] &amp; ((unit_type) 1 &lt;&lt; n))                                                                                                                                                                                                                                                                                              \</div>
-<div class="line">    ecc ^= prefetch[4];                                                                                                                                                                                                                                                                                                        \</div>
-<div class="line">  if(c[5] &amp; ((unit_type) 1 &lt;&lt; n))                                                                                                                                                                                                                                                                                              \</div>
-<div class="line">    ecc ^= prefetch[5];                                                                                                                                                                                                                                                                                                        \</div>
-<div class="line">  if(c[6] &amp; ((unit_type) 1 &lt;&lt; n))                                                                                                                                                                                                                                                                                              \</div>
-<div class="line">    ecc ^= prefetch[6];                                                                                                                                                                                                                                                                                                        \</div>
-<div class="line">  if(c[7] &amp; ((unit_type) 1 &lt;&lt; n))                                                                                                                                                                                                                                                                                              \</div>
-<div class="line">    ecc ^= prefetch[7];</div>
-</div><!-- fragment -->
-</div>
-</div>
-</div><!-- contents -->
+</div></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->

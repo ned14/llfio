@@ -111,7 +111,6 @@ $(document).ready(function(){initNavTree('classboost_1_1afio_1_1v2__xxx_1_1algor
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="#pro-methods">Protected Member Functions</a> &#124;
-<a href="#pro-static-methods">Static Protected Member Functions</a> &#124;
 <a href="classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1atomic__append-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">boost::afio::v2_xxx::algorithm::shared_fs_mutex::atomic_append Class Reference</div>  </div>
@@ -204,12 +203,6 @@ Static Public Member Functions</h2></td></tr>
 Protected Member Functions</h2></td></tr>
 <tr class="memitem:a4c16831d072f5e2ec9a33532b6764616"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespaceboost_1_1afio_1_1v2__xxx.html#ac8d06ecaa9660e7251c1251d88c1305c">result</a>&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1atomic__append.html#a4c16831d072f5e2ec9a33532b6764616">_lock</a> (<a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex_1_1entities__guard.html">entities_guard</a> &amp;out, <a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1deadline.html">deadline</a> d, bool spin_not_sleep) noexceptoverridefinal</td></tr>
 <tr class="separator:a4c16831d072f5e2ec9a33532b6764616"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-static-methods"></a>
-Static Protected Member Functions</h2></td></tr>
-<tr class="memitem:a791219f822fa8e707e2c5676bd3f22c2"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a791219f822fa8e707e2c5676bd3f22c2"></a>
-static constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><b>_entity_type_endian_check</b> ()</td></tr>
-<tr class="separator:a791219f822fa8e707e2c5676bd3f22c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Scalable many entity shared/exclusive file system based lock. </p>
@@ -301,7 +294,7 @@ static constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><b>_ent
 <div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;        lock_request.items = out.entities.size();</div>
 <div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;        memcpy(lock_request.entities, out.entities.data(), <span class="keyword">sizeof</span>(lock_request.entities[0]) * out.entities.size());</div>
 <div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;        <span class="keywordflow">if</span>(!_skip_hashing)</div>
-<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;          lock_request.hash = <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1utils_1_1fast__hash.html#a5563217f87a97056bd5bc662a8c4c78e" title="Single shot hash of a sequence of bytes.">utils::fast_hash::hash</a>(((<span class="keywordtype">char</span> *) &amp;lock_request) + 16, <span class="keyword">sizeof</span>(lock_request) - 16);</div>
+<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;          lock_request.hash = boost_lite::algorithm::hash::fast_hash::hash(((<span class="keywordtype">char</span> *) &amp;lock_request) + 16, <span class="keyword">sizeof</span>(lock_request) - 16);</div>
 <div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;        <span class="comment">// My lock request will be the file&#39;s current length or higher</span></div>
 <div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;        BOOST_OUTCOME_FILTER_ERROR(my_lock_request_offset, _h.<a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1file__handle.html#a6e4524b6bd5de76631bcc7ab68bab7bd">length</a>());</div>
 <div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;        {</div>
@@ -321,7 +314,7 @@ static constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><b>_ent
 <div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;        }</div>
 <div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;</div>
 <div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;        <span class="comment">// Find the record I just wrote</span></div>
-<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;        <a class="code" href="namespaceboost_1_1afio_1_1v2__xxx_1_1utils.html#ab0e1d51b7a453455c0d834239b66e40f">alignas</a>(64) char _buffer[4096 + 2048];  <span class="comment">// 6Kb cache line aligned buffer</span></div>
+<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;        alignas(64) char _buffer[4096 + 2048];  <span class="comment">// 6Kb cache line aligned buffer</span></div>
 <div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;        <span class="comment">// Read onwards from length as reported before I wrote my lock request</span></div>
 <div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;        <span class="comment">// until I find my lock request. This loop should never actually iterate</span></div>
 <div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;        <span class="comment">// except under extreme load conditions.</span></div>
@@ -390,7 +383,7 @@ static constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><b>_ent
 <div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;            <span class="comment">// If record hash doesn&#39;t match contents it&#39;s a torn read, reload</span></div>
 <div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;            <span class="keywordflow">if</span>(!_skip_hashing)</div>
 <div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;            {</div>
-<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;              <span class="keywordflow">if</span>(record-&gt;hash != <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1utils_1_1fast__hash.html#a5563217f87a97056bd5bc662a8c4c78e" title="Single shot hash of a sequence of bytes.">utils::fast_hash::hash</a>(((<span class="keywordtype">char</span> *) record) + 16, <span class="keyword">sizeof</span>(atomic_append_detail::lock_request) - 16))</div>
+<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;              <span class="keywordflow">if</span>(record-&gt;hash != boost_lite::algorithm::hash::fast_hash::hash(((<span class="keywordtype">char</span> *) record) + 16, <span class="keyword">sizeof</span>(atomic_append_detail::lock_request) - 16))</div>
 <div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;                <span class="keywordflow">goto</span> reload;</div>
 <div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;            }</div>
 <div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;</div>
@@ -530,7 +523,7 @@ static constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><b>_ent
 <div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;          header.first_known_good = <span class="keyword">sizeof</span>(header);</div>
 <div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;          header.first_after_hole_punch = <span class="keyword">sizeof</span>(header);</div>
 <div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;          <span class="keywordflow">if</span>(!skip_hashing)</div>
-<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;            header.hash = <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1utils_1_1fast__hash.html#a5563217f87a97056bd5bc662a8c4c78e" title="Single shot hash of a sequence of bytes.">utils::fast_hash::hash</a>(((<span class="keywordtype">char</span> *) &amp;header) + 16, <span class="keyword">sizeof</span>(header) - 16);</div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;            header.hash = boost_lite::algorithm::hash::fast_hash::hash(((<span class="keywordtype">char</span> *) &amp;header) + 16, <span class="keyword">sizeof</span>(header) - 16);</div>
 <div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;          BOOST_OUTCOME_FILTER_ERROR(_, ret.write(0, (<span class="keywordtype">char</span> *) &amp;header, <span class="keyword">sizeof</span>(header)));</div>
 <div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;          (void) _;</div>
 <div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;        }</div>
