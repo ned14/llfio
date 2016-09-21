@@ -138,6 +138,9 @@ Inheritance diagram for boost::afio::v2_xxx::handle:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1handle_1_1flag__base.html">flag_base</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Bitwise flags which can be specified.  <a href="structboost_1_1afio_1_1v2__xxx_1_1handle_1_1flag__base.html#details">More...</a><br/></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1handle_1_1really__copy.html">really_copy</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tag type to enable copy constructor.  <a href="structboost_1_1afio_1_1v2__xxx_1_1handle_1_1really__copy.html#details">More...</a><br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -190,12 +193,12 @@ using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cla
 using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html#aee8d98d7f979e312f5e18dfcebfc6870">size_type</a> = size_t</td></tr>
 <tr class="memdesc:aee8d98d7f979e312f5e18dfcebfc6870"><td class="mdescLeft">&#160;</td><td class="mdescRight">The memory extent type used by this handle. <br/></td></tr>
 <tr class="separator:aee8d98d7f979e312f5e18dfcebfc6870"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a170bde6eae5c0779be3ef5dc822af2c8"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a170bde6eae5c0779be3ef5dc822af2c8"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>flag</b> = boost_lite::_415bbcd2::bitfield::bitfield&lt; <a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1handle_1_1flag__base.html">flag_base</a> &gt;</td></tr>
+<tr class="separator:a170bde6eae5c0779be3ef5dc822af2c8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a2fcb63ac3ba4b4e227f2ded9ea5a690d"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html#a2fcb63ac3ba4b4e227f2ded9ea5a690d">BOOSTLITE_BITFIELD_BEGIN</a> (flag)</td></tr>
-<tr class="memdesc:a2fcb63ac3ba4b4e227f2ded9ea5a690d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Bitwise flags which can be specified.  <a href="#a2fcb63ac3ba4b4e227f2ded9ea5a690d">More...</a><br/></td></tr>
-<tr class="separator:a2fcb63ac3ba4b4e227f2ded9ea5a690d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa845780704a8508c658c2b878f574ba7"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa845780704a8508c658c2b878f574ba7"></a>
 constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html#aa845780704a8508c658c2b878f574ba7">handle</a> ()</td></tr>
 <tr class="memdesc:aa845780704a8508c658c2b878f574ba7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor. <br/></td></tr>
@@ -456,57 +459,6 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operato
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="a2fcb63ac3ba4b4e227f2ded9ea5a690d"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">boost::afio::v2_xxx::handle::BOOSTLITE_BITFIELD_BEGIN </td>
-          <td>(</td>
-          <td class="paramtype">flag&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Bitwise flags which can be specified. </p>
-<p>&lt; No flags</p>
-<p>Unlinks the file on handle close. On POSIX, this simply unlinks whatever is pointed to by <code><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html#a461355ae526806b338fd2eaadc564a43" title="The path this handle refers to, if any.">path()</a></code> upon the call of <code><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html#a651ff10099e7522df784507aca8b8f0f" title="Immediately close the native handle type managed by this handle.">close()</a></code> if and only if the inode matches. On Windows, this opens the file handle with the <code>FILE_FLAG_DELETE_ON_CLOSE</code> modifier which substantially affects caching policy and causes the <b>first</b> handle close to make the file unavailable for anyone else to open with an <code>EAGAIN</code> error return. Because this is confusing, unless the <code>win_disable_unlink_emulation</code> flag is also specified, this POSIX behaviour is somewhat emulated by AFIO on Windows by renaming the file to a random name on <code><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html#a651ff10099e7522df784507aca8b8f0f" title="Immediately close the native handle type managed by this handle.">close()</a></code> causing it to appear to have been unlinked immediately.</p>
-<p>Some kernel caching modes have unhelpfully inconsistent behaviours in getting your data onto storage, so by default unless this flag is specified AFIO adds extra fsyncs to the following operations for the caching modes specified below: truncation of file length either explicitly or during file open. closing of the handle either explicitly or in the destructor.</p>
-<p>Additionally on Linux only to prevent loss of file metadata: On the parent directory whenever a file might have been created. On the parent directory on file close.</p>
-<p>This only occurs for these kernel caching modes: caching::none caching::reads caching::reads_and_metadata caching::safety_fsyncs</p>
-<p><code><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1file__handle.html#ab8427163f63809bb60a7c70a7cc58031">file_handle::unlink()</a></code> could accidentally delete the wrong file if someone has renamed the open file handle since the time it was opened. To prevent this occuring, where the OS doesn't provide race free unlink-by-open-handle we compare the inode of the path we are about to unlink with that of the open handle before unlinking. </p>
-<dl class="section warning"><dt>Warning</dt><dd>This does not prevent races where in between the time of checking the inode and executing the unlink a third party changes the item about to be unlinked. Only operating systems with a true race-free unlink syscall are race free.</dd></dl>
-<p>&lt; See the documentation for <code>unlink_on_close</code></p>
-<p>&lt; On Windows, create any new handles with OVERLAPPED semantics</p>
-<p>&lt; Using insane POSIX byte range locks </p>
-<div class="fragment"><div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;  {</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;    <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html#acd7f0c039e94c7ad40937fe32a2cabada334c4a4c42fdb79d7ebc3e73b517e6f8" title="No ability to read or write anything, but can synchronise (SYNCHRONIZE or 0)">none</a> = 0,  </div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;</div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;    unlink_on_close = 1 &lt;&lt; 0,</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;</div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;    disable_safety_fsyncs = 1 &lt;&lt; 2,</div>
-<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;    disable_safety_unlinks = 1 &lt;&lt; 3,</div>
-<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;</div>
-<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;    win_disable_unlink_emulation = 1 &lt;&lt; 24,  </div>
-<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;</div>
-<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;    <span class="comment">// NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!</span></div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;</div>
-<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;    overlapped = 1 &lt;&lt; 28,         </div>
-<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;    byte_lock_insanity = 1 &lt;&lt; 29  </div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;  }</div>
-</div><!-- fragment -->
-</div>
-</div>
 <a class="anchor" id="adf964e787e0666fc5b7d94c2715ee6f5"></a>
 <div class="memitem">
 <div class="memproto">

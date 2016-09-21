@@ -1,9 +1,10 @@
 var structboost_1_1afio_1_1v2__xxx_1_1statfs__t =
 [
     [ "f_flags_t", "structboost_1_1afio_1_1v2__xxx_1_1statfs__t_1_1f__flags__t.html", "structboost_1_1afio_1_1v2__xxx_1_1statfs__t_1_1f__flags__t" ],
+    [ "want_base", "structboost_1_1afio_1_1v2__xxx_1_1statfs__t_1_1want__base.html", "structboost_1_1afio_1_1v2__xxx_1_1statfs__t_1_1want__base" ],
+    [ "want", "structboost_1_1afio_1_1v2__xxx_1_1statfs__t.html#a3a9e8f6d1597b39e3c6c12f90a772cf8", null ],
     [ "statfs_t", "structboost_1_1afio_1_1v2__xxx_1_1statfs__t.html#a95cd6253c6046b469f2f0a8917e75fc9", null ],
     [ "statfs_t", "structboost_1_1afio_1_1v2__xxx_1_1statfs__t.html#ababa5fcbf4999803f718a7b1b86d0b2c", null ],
-    [ "BOOSTLITE_BITFIELD_BEGIN", "structboost_1_1afio_1_1v2__xxx_1_1statfs__t.html#a3b556911b5de4e00f2cf8fef79e13adf", null ],
     [ "fill", "structboost_1_1afio_1_1v2__xxx_1_1statfs__t.html#a119a2c00ccb0e17461f16c6e5f418ec7", null ],
     [ "f_bavail", "structboost_1_1afio_1_1v2__xxx_1_1statfs__t.html#adc835963e7f0b9db93a28df9b3a245c5", null ],
     [ "f_bfree", "structboost_1_1afio_1_1v2__xxx_1_1statfs__t.html#a5791bfc04bfaaab455940d7880bfcf4c", null ],

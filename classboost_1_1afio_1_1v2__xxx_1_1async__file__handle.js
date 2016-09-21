@@ -26,7 +26,6 @@ var classboost_1_1afio_1_1v2__xxx_1_1async__file__handle =
     [ "are_writes_durable", "classboost_1_1afio_1_1v2__xxx_1_1async__file__handle.html#ae446e9a32283991f58f8f27dbed083d1", null ],
     [ "async_read", "classboost_1_1afio_1_1v2__xxx_1_1async__file__handle.html#afaf6132b6618d93866ad00598e1b7707", null ],
     [ "async_write", "classboost_1_1afio_1_1v2__xxx_1_1async__file__handle.html#a79672341d97d3f934d6c90637bbeb40c", null ],
-    [ "BOOSTLITE_BITFIELD_BEGIN", "classboost_1_1afio_1_1v2__xxx_1_1async__file__handle.html#a2fcb63ac3ba4b4e227f2ded9ea5a690d", null ],
     [ "clone", "classboost_1_1afio_1_1v2__xxx_1_1async__file__handle.html#a146af690967dbe866f3ecf1ebd5358b0", null ],
     [ "clone", "classboost_1_1afio_1_1v2__xxx_1_1async__file__handle.html#a396487cb0116b194fbb477a7ccbd26cb", null ],
     [ "close", "classboost_1_1afio_1_1v2__xxx_1_1async__file__handle.html#ab317ddd32e1ba126c647b6a89541ad67", null ],

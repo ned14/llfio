@@ -152,24 +152,24 @@ $(document).ready(function(){initNavTree('native__handle__type_8hpp_source.html'
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;</div>
 <div class="line"><a name="l00048"></a><span class="lineno"><a class="code" href="structboost_1_1afio_1_1v2__xxx_1_1native__handle__type.html">   48</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structboost_1_1afio_1_1v2__xxx_1_1native__handle__type.html" title="A native handle type used for wrapping file descriptors, process ids or HANDLEs. Unmanaged, wrap in a handle object to manage.">native_handle_type</a></div>
 <div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;{</div>
-<div class="line"><a name="l00051"></a><span class="lineno"><a class="code" href="structboost_1_1afio_1_1v2__xxx_1_1native__handle__type.html#ade22f15e9a977a54937cb49f11457cce">   51</a></span>&#160;  BOOSTLITE_BITFIELD_BEGIN(disposition)</div>
+<div class="line"><a name="l00051"></a><span class="lineno"><a class="code" href="structboost_1_1afio_1_1v2__xxx_1_1native__handle__type_1_1disposition__base.html#a3f5231b1a86b8c661b39312f0f4a02f5">   51</a></span>&#160;  BOOSTLITE_BITFIELD_BEGIN(disposition)</div>
 <div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;  {</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    invalid = 0,  </div>
+<div class="line"><a name="l00053"></a><span class="lineno"><a class="code" href="structboost_1_1afio_1_1v2__xxx_1_1native__handle__type_1_1disposition__base.html#a3f5231b1a86b8c661b39312f0f4a02f5a41d8512b16b5db4e04e0de37f5e25f85">   53</a></span>&#160;    invalid = 0,  </div>
 <div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    readable = 1 &lt;&lt; 0,     </div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    writable = 1 &lt;&lt; 1,     </div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    append_only = 1 &lt;&lt; 2,  </div>
+<div class="line"><a name="l00055"></a><span class="lineno"><a class="code" href="structboost_1_1afio_1_1v2__xxx_1_1native__handle__type_1_1disposition__base.html#a3f5231b1a86b8c661b39312f0f4a02f5a3dc019819243ad24fc283879f26e6c5d">   55</a></span>&#160;    readable = 1 &lt;&lt; 0,     </div>
+<div class="line"><a name="l00056"></a><span class="lineno"><a class="code" href="structboost_1_1afio_1_1v2__xxx_1_1native__handle__type_1_1disposition__base.html#a3f5231b1a86b8c661b39312f0f4a02f5a7f3c9880393fc86b9a5c004a597ed4fe">   56</a></span>&#160;    writable = 1 &lt;&lt; 1,     </div>
+<div class="line"><a name="l00057"></a><span class="lineno"><a class="code" href="structboost_1_1afio_1_1v2__xxx_1_1native__handle__type_1_1disposition__base.html#a3f5231b1a86b8c661b39312f0f4a02f5a4829b95ec7c706cbdde7248e896f248a">   57</a></span>&#160;    append_only = 1 &lt;&lt; 2,  </div>
 <div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    overlapped = 1 &lt;&lt; 4,  </div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    seekable = 1 &lt;&lt; 5,    </div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    aligned_io = 1 &lt;&lt; 6,  </div>
+<div class="line"><a name="l00059"></a><span class="lineno"><a class="code" href="structboost_1_1afio_1_1v2__xxx_1_1native__handle__type_1_1disposition__base.html#a3f5231b1a86b8c661b39312f0f4a02f5add35e73bad6f0e52bb7307f352513915">   59</a></span>&#160;    overlapped = 1 &lt;&lt; 4,  </div>
+<div class="line"><a name="l00060"></a><span class="lineno"><a class="code" href="structboost_1_1afio_1_1v2__xxx_1_1native__handle__type_1_1disposition__base.html#a3f5231b1a86b8c661b39312f0f4a02f5a9d5f9c3bd2a7577d36d953701116c651">   60</a></span>&#160;    seekable = 1 &lt;&lt; 5,    </div>
+<div class="line"><a name="l00061"></a><span class="lineno"><a class="code" href="structboost_1_1afio_1_1v2__xxx_1_1native__handle__type_1_1disposition__base.html#a3f5231b1a86b8c661b39312f0f4a02f5a34621b385c000f7bcf69a36d0c11b337">   61</a></span>&#160;    aligned_io = 1 &lt;&lt; 6,  </div>
 <div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    file = 1 &lt;&lt; 8,          </div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    directory = 1 &lt;&lt; 9,     </div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    symlink = 1 &lt;&lt; 10,      </div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    multiplexer = 1 &lt;&lt; 11,  </div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    process = 1 &lt;&lt; 12,      </div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    section = 1 &lt;&lt; 13       </div>
+<div class="line"><a name="l00063"></a><span class="lineno"><a class="code" href="structboost_1_1afio_1_1v2__xxx_1_1native__handle__type_1_1disposition__base.html#a3f5231b1a86b8c661b39312f0f4a02f5a0e22c8d87219acc3a42d6bb19e17fe8e">   63</a></span>&#160;    file = 1 &lt;&lt; 8,          </div>
+<div class="line"><a name="l00064"></a><span class="lineno"><a class="code" href="structboost_1_1afio_1_1v2__xxx_1_1native__handle__type_1_1disposition__base.html#a3f5231b1a86b8c661b39312f0f4a02f5aa2651bf8f667351f7d898cc35b9d016a">   64</a></span>&#160;    directory = 1 &lt;&lt; 9,     </div>
+<div class="line"><a name="l00065"></a><span class="lineno"><a class="code" href="structboost_1_1afio_1_1v2__xxx_1_1native__handle__type_1_1disposition__base.html#a3f5231b1a86b8c661b39312f0f4a02f5a58f3f96fa1cafd3605b488394e000d89">   65</a></span>&#160;    symlink = 1 &lt;&lt; 10,      </div>
+<div class="line"><a name="l00066"></a><span class="lineno"><a class="code" href="structboost_1_1afio_1_1v2__xxx_1_1native__handle__type_1_1disposition__base.html#a3f5231b1a86b8c661b39312f0f4a02f5a1f40773df790828587987eb23baaa72d">   66</a></span>&#160;    multiplexer = 1 &lt;&lt; 11,  </div>
+<div class="line"><a name="l00067"></a><span class="lineno"><a class="code" href="structboost_1_1afio_1_1v2__xxx_1_1native__handle__type_1_1disposition__base.html#a3f5231b1a86b8c661b39312f0f4a02f5a9f62853225de4ea8ae224d6912fb0ca1">   67</a></span>&#160;    process = 1 &lt;&lt; 12,      </div>
+<div class="line"><a name="l00068"></a><span class="lineno"><a class="code" href="structboost_1_1afio_1_1v2__xxx_1_1native__handle__type_1_1disposition__base.html#a3f5231b1a86b8c661b39312f0f4a02f5a8e7be1ef9aea64d916d9fe938cfeb7fa">   68</a></span>&#160;    section = 1 &lt;&lt; 13       </div>
 <div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;  }</div>
 <div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;  BOOSTLITE_BITFIELD_END(disposition)</div>
 <div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;  disposition behaviour;  </div>

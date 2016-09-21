@@ -2,11 +2,14 @@ var hierarchy =
 [
     [ "boost::afio::v2_xxx::algorithm::shared_fs_mutex::memory_map< Hasher, HashIndexSize, SpinlockType >::_entity_idx", "structboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map_1_1__entity__idx.html", null ],
     [ "boost::afio::v2_xxx::deadline", "structboost_1_1afio_1_1v2__xxx_1_1deadline.html", null ],
+    [ "boost::afio::v2_xxx::native_handle_type::disposition_base", "structboost_1_1afio_1_1v2__xxx_1_1native__handle__type_1_1disposition__base.html", null ],
     [ "boost::afio::v2_xxx::algorithm::shared_fs_mutex::shared_fs_mutex::entities_guard", "classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex_1_1entities__guard.html", null ],
     [ "boost::afio::v2_xxx::algorithm::shared_fs_mutex::shared_fs_mutex::entity_type", "structboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex_1_1entity__type.html", null ],
     [ "boost::afio::v2_xxx::io_handle::extent_guard", "classboost_1_1afio_1_1v2__xxx_1_1io__handle_1_1extent__guard.html", null ],
     [ "boost::afio::v2_xxx::statfs_t::f_flags_t", "structboost_1_1afio_1_1v2__xxx_1_1statfs__t_1_1f__flags__t.html", null ],
     [ "boost::afio::v2_xxx::utils::fast_hash", "classboost_1_1afio_1_1v2__xxx_1_1utils_1_1fast__hash.html", null ],
+    [ "boost::afio::v2_xxx::handle::flag_base", "structboost_1_1afio_1_1v2__xxx_1_1handle_1_1flag__base.html", null ],
+    [ "boost::afio::v2_xxx::section_handle::flag_base", "structboost_1_1afio_1_1v2__xxx_1_1section__handle_1_1flag__base.html", null ],
     [ "boost::afio::v2_xxx::handle", "classboost_1_1afio_1_1v2__xxx_1_1handle.html", [
       [ "boost::afio::v2_xxx::io_handle", "classboost_1_1afio_1_1v2__xxx_1_1io__handle.html", [
         [ "boost::afio::v2_xxx::file_handle", "classboost_1_1afio_1_1v2__xxx_1_1file__handle.html", [
@@ -46,5 +49,6 @@ var hierarchy =
     ] ],
     [ "boost::afio::v2_xxx::statfs_t", "structboost_1_1afio_1_1v2__xxx_1_1statfs__t.html", null ],
     [ "boost::afio::v2_xxx::storage_profile::storage_profile", "structboost_1_1afio_1_1v2__xxx_1_1storage__profile_1_1storage__profile.html", null ],
-    [ "uint128", "unionuint128.html", null ]
+    [ "uint128", "unionuint128.html", null ],
+    [ "boost::afio::v2_xxx::statfs_t::want_base", "structboost_1_1afio_1_1v2__xxx_1_1statfs__t_1_1want__base.html", null ]
 ];

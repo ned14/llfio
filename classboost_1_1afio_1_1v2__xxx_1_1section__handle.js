@@ -1,6 +1,8 @@
 var classboost_1_1afio_1_1v2__xxx_1_1section__handle =
 [
+    [ "flag_base", "structboost_1_1afio_1_1v2__xxx_1_1section__handle_1_1flag__base.html", "structboost_1_1afio_1_1v2__xxx_1_1section__handle_1_1flag__base" ],
     [ "extent_type", "classboost_1_1afio_1_1v2__xxx_1_1section__handle.html#add93e9bb6b358daefd88696598b5d372", null ],
+    [ "flag", "classboost_1_1afio_1_1v2__xxx_1_1section__handle.html#a9501b01defc274665493e3f7f7ec2f5f", null ],
     [ "path_type", "classboost_1_1afio_1_1v2__xxx_1_1section__handle.html#aa28b35a32f1292b6126a82bba20a2c90", null ],
     [ "size_type", "classboost_1_1afio_1_1v2__xxx_1_1section__handle.html#a7a2b1215d07fc84508b2d4577c775cfa", null ],
     [ "caching", "classboost_1_1afio_1_1v2__xxx_1_1section__handle.html#a81c7de194feaa88684ca9851d0d527ca", [
@@ -35,7 +37,6 @@ var classboost_1_1afio_1_1v2__xxx_1_1section__handle =
     [ "are_safety_fsyncs_issued", "classboost_1_1afio_1_1v2__xxx_1_1section__handle.html#a3e08545dd29f09a40ff8439ac774ae1e", null ],
     [ "are_writes_durable", "classboost_1_1afio_1_1v2__xxx_1_1section__handle.html#ae446e9a32283991f58f8f27dbed083d1", null ],
     [ "backing_native_handle", "classboost_1_1afio_1_1v2__xxx_1_1section__handle.html#a78fc51ac881ae0fc42327de1f9604ee7", null ],
-    [ "BOOSTLITE_BITFIELD_BEGIN", "classboost_1_1afio_1_1v2__xxx_1_1section__handle.html#abcaa8807c39cae2261ed9de520661678", null ],
     [ "close", "classboost_1_1afio_1_1v2__xxx_1_1section__handle.html#a651ff10099e7522df784507aca8b8f0f", null ],
     [ "flags", "classboost_1_1afio_1_1v2__xxx_1_1section__handle.html#add27fa17cd6356b49a26a8b6dafb6a6d", null ],
     [ "is_append_only", "classboost_1_1afio_1_1v2__xxx_1_1section__handle.html#abef3375ff35a72bd780cbee0b600b26d", null ],
