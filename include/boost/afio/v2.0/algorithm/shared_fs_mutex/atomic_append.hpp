@@ -148,7 +148,7 @@ namespace algorithm
           else
             stl11::this_thread::yield();
           // No timeout as this should very rarely block for any significant length of time
-        } while(_header.hash != utils::fast_hash::hash(((char *) &_header) + 16, sizeof(_header) - 16));
+        } while(_header.hash != boost_lite::algorithm::hash::fast_hash::hash(((char *) &_header) + 16, sizeof(_header) - 16));
         return make_result<void>();
       }
 
@@ -201,7 +201,7 @@ namespace algorithm
           header.first_known_good = sizeof(header);
           header.first_after_hole_punch = sizeof(header);
           if(!skip_hashing)
-            header.hash = utils::fast_hash::hash(((char *) &header) + 16, sizeof(header) - 16);
+            header.hash = boost_lite::algorithm::hash::fast_hash::hash(((char *) &header) + 16, sizeof(header) - 16);
           BOOST_OUTCOME_FILTER_ERROR(_, ret.write(0, (char *) &header, sizeof(header)));
           (void) _;
         }
@@ -245,7 +245,7 @@ namespace algorithm
         lock_request.items = out.entities.size();
         memcpy(lock_request.entities, out.entities.data(), sizeof(lock_request.entities[0]) * out.entities.size());
         if(!_skip_hashing)
-          lock_request.hash = utils::fast_hash::hash(((char *) &lock_request) + 16, sizeof(lock_request) - 16);
+          lock_request.hash = boost_lite::algorithm::hash::fast_hash::hash(((char *) &lock_request) + 16, sizeof(lock_request) - 16);
         // My lock request will be the file's current length or higher
         BOOST_OUTCOME_FILTER_ERROR(my_lock_request_offset, _h.length());
         {
@@ -336,7 +336,7 @@ namespace algorithm
             // If record hash doesn't match contents it's a torn read, reload
             if(!_skip_hashing)
             {
-              if(record->hash != utils::fast_hash::hash(((char *) record) + 16, sizeof(atomic_append_detail::lock_request) - 16))
+              if(record->hash != boost_lite::algorithm::hash::fast_hash::hash(((char *) record) + 16, sizeof(atomic_append_detail::lock_request) - 16))
                 goto reload;
             }
 
@@ -479,7 +479,7 @@ namespace algorithm
           }
           ++_header.generation;
           if(!_skip_hashing)
-            _header.hash = utils::fast_hash::hash(((char *) &_header) + 16, sizeof(_header) - 16);
+            _header.hash = boost_lite::algorithm::hash::fast_hash::hash(((char *) &_header) + 16, sizeof(_header) - 16);
           // Rewrite the first part of the header only
           (void) _h.write(0, (char *) &_header, 48);
         }

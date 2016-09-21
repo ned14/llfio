@@ -292,7 +292,7 @@ namespace algorithm
         unsigned exclusive : 1;
       };
       // Create a cache of entities to their indices, eliding collisions where necessary
-      static span<_entity_idx> _hash_entities(_entity_idx alignas(16) * entity_to_idx, entities_type &entities)
+      static span<_entity_idx> _hash_entities(_entity_idx *entity_to_idx, entities_type &entities)
       {
         _entity_idx *ep = entity_to_idx;
         for(size_t n = 0; n < entities.size(); n++)

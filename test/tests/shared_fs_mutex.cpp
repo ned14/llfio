@@ -8,6 +8,11 @@ File Created: Aug 2016
 #include "../../include/boost/afio/afio.hpp"
 #include "../kerneltest/include/boost/kerneltest.hpp"
 
+BOOST_KERNELTEST_TEST_KERNEL(unit, afio, shared_fs_mutex, entity_endian, "Tests that afio::algorithm::shared_fs_mutex::entity_type has the right endian", [] {
+  BOOST_AFIO_V2_NAMESPACE::algorithm::shared_fs_mutex::shared_fs_mutex::entity_type v(0, true);
+  BOOST_REQUIRE(v._init != 1UL);
+}())
+
 #include <codecvt>
 #include <unordered_map>
 

@@ -412,13 +412,11 @@ using BOOSTLITE_NAMESPACE::scoped_undo::undoer;
 BOOST_AFIO_V2_NAMESPACE_END
 
 
-#if !BOOST_AFIO_HAVE_CXX17_SPAN_IMPLEMENTATION
-#include "../gsl-lite/include/gsl.h"
+// Bring in a span implementation
+#include "../boost-lite/include/span.hpp"
 BOOST_AFIO_V2_NAMESPACE_BEGIN
-template <class T> using span = gsl::span<T>;
-using gsl::as_span;
+using namespace boost_lite::span;
 BOOST_AFIO_V2_NAMESPACE_END
-#endif
 
 
 #if BOOST_AFIO_LOGGING_LEVEL

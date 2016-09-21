@@ -33,7 +33,8 @@ DEALINGS IN THE SOFTWARE.
 #define BOOST_AFIO_SHARED_FS_MUTEX_BASE_HPP
 
 #include "../../handle.hpp"
-#include "../../utils.hpp"
+
+#include "../boost-lite/include/algorithm/hash.hpp"
 
 //! \file base.hpp Provides algorithm::shared_fs_mutex::shared_fs_mutex
 
@@ -47,7 +48,7 @@ namespace algorithm
     //! Unsigned 64 bit integer
     using uint64 = unsigned long long;
     //! Unsigned 128 bit integer
-    using uint128 = utils::uint128;
+    using uint128 = boost_lite::integers128::uint128;
 
     /*! \class shared_fs_mutex
     \brief Abstract base class for an object which protects shared filing system resources
@@ -98,14 +99,6 @@ namespace algorithm
       using entities_type = span<entity_type>;
 
     protected:
-#ifdef __cpp_relaxed_constexpr
-      static constexpr bool _entity_type_endian_check()
-      {
-        entity_type v(0, true);
-        return v._init != 1;
-      }
-      static_assert(_entity_type_endian_check(), "entity_type.exclusive is setting the bottom bit, endian problems?");
-#endif
       constexpr shared_fs_mutex() {}
 
     public:
@@ -114,13 +107,13 @@ namespace algorithm
       //! Generates an entity id from a sequence of bytes
       entity_type entity_from_buffer(const char *buffer, size_t bytes, bool exclusive = true) noexcept
       {
-        uint128 hash = utils::fast_hash::hash(buffer, bytes);
+        uint128 hash = boost_lite::algorithm::hash::fast_hash::hash(buffer, bytes);
         return entity_type(hash.as_longlongs[0] ^ hash.as_longlongs[1], exclusive);
       }
       //! Generates an entity id from a string
       template <typename T> entity_type entity_from_string(const std::basic_string<T> &str, bool exclusive = true) noexcept
       {
-        uint128 hash = utils::fast_hash::hash(str);
+        uint128 hash = boost_lite::algorithm::hash::fast_hash::hash(str);
         return entity_type(hash.as_longlongs[0] ^ hash.as_longlongs[1], exclusive);
       }
       //! Generates a cryptographically random entity id.

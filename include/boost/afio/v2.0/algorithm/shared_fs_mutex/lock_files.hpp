@@ -133,7 +133,7 @@ namespace algorithm
         for(n = 0; n < out.entities.size(); n++)
         {
           auto v = out.entities[n].value;
-          entity_paths[n] = _path / utils::to_hex_string(span<char>((char *) &v, 8));
+          entity_paths[n] = _path / boost_lite::algorithm::string::to_hex_string(span<char>((char *) &v, 8));
         }
         _hs.resize(out.entities.size());
         do
