@@ -75,10 +75,10 @@ namespace algorithm
           value_type _init;
           struct
           {
-            //! True if entity should be locked for exclusive access
-            value_type exclusive : 1;
             //! The value of the entity type which can range between 0 and (2^63)-1
             value_type value : 63;
+            //! True if entity should be locked for exclusive access
+            value_type exclusive : 1;
           };
         };
 #ifdef _MSC_VER
