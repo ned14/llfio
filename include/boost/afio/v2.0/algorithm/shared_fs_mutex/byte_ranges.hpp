@@ -35,6 +35,8 @@ DEALINGS IN THE SOFTWARE.
 #include "../../file_handle.hpp"
 #include "base.hpp"
 
+#include "../boost-lite/include/algorithm/small_prng.hpp"
+
 //! \file byte_ranges.hpp Provides algorithm::shared_fs_mutex::byte_ranges
 
 BOOST_AFIO_V2_NAMESPACE_BEGIN
@@ -189,15 +191,11 @@ namespace algorithm
                 return make_errored_result<void>(ETIMEDOUT);
             }
           }
-#if 1
           // Move was_contended to front and randomise rest of out.entities
           std::swap(out.entities[was_contended], out.entities[0]);
           auto front = out.entities.begin();
           ++front;
-          std::random_shuffle(front, out.entities.end());
-#else
-          std::random_shuffle(out.entities.begin(), out.entities.end());
-#endif
+          boost_lite::algorithm::small_prng::random_shuffle(front, out.entities.end());
           if(!spin_not_sleep)
             std::this_thread::yield();
         }

@@ -36,6 +36,7 @@ DEALINGS IN THE SOFTWARE.
 #include "base.hpp"
 
 #include "../boost-lite/include/algorithm/hash.hpp"
+#include "../boost-lite/include/algorithm/small_prng.hpp"
 #include "../boost-lite/include/spinlock.hpp"
 
 //! \file memory_map.hpp Provides algorithm::shared_fs_mutex::memory_map
@@ -395,7 +396,7 @@ namespace algorithm
           std::swap(entity_to_idx[was_contended], entity_to_idx[0]);
           auto front = entity_to_idx.begin();
           ++front;
-          std::random_shuffle(front, entity_to_idx.end());
+          boost_lite::algorithm::small_prng::random_shuffle(front, entity_to_idx.end());
           if(!spin_not_sleep)
             std::this_thread::yield();
         }
