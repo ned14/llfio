@@ -1,5 +1,8 @@
-20150924 CppCon Racing the File System Workshop
+20150924 CppCon Racing the File System Workshop (good for the background on file systems)
 https://www.youtube.com/watch?v=uhRWMGBjlO8
 
-20160421 ACCU Distributed Mutual Exclusion using Proposed Boost.AFIO
+20160421 ACCU Distributed Mutual Exclusion using Proposed Boost.AFIO (a bit of AFIO history and how and why it is designed, boost::afio::algorithm::shared_fs_mutex::atomic_append)
 https://www.youtube.com/watch?v=elegewDwm64
+
+20160922 CppCon Better mutual exclusion on the filesystem using Boost.AFIO (pretty good overview of AFIO written to date, boost::afio::algorithm::shared_fs_mutex::memory_map)
+https://www.youtube.com/watch?v=9l28ax3Zq0w
