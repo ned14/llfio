@@ -6,7 +6,7 @@ v2 rewrite. You can view its documentation at https://ned14.github.io/boost.afio
 Tarballs of source and prebuilt binaries with all unit tests passing: https://dedi4.nedprod.com/static/files/
 
 
-=== Todos in order of priority:
+### Immediate todos in order of priority:
 - [ ] Get Outcome to work perfectly with exceptions and RTTI disabled, this makes
 Outcome useful in the games/audio world.
   - [ ] Add unit tests proving it for all platforms.
@@ -49,7 +49,7 @@ fuzzed, coverage calculated, bloat calculated, ABI dumped etc
 - [ ] Add missing functions on handle/file_handle from AFIO v1
 
 
-=== clang AST parser based todos:
+### clang AST parser based todos which await me getting back into the clang AST parser:
 - [ ] Implement [[bindlib::make_free]] which injects member functions into the enclosing
 namespace.
 - [ ] C bindings for all AFIO v2 APIs. Write libclang parser which autogenerates
@@ -83,7 +83,7 @@ missing gaps.
 
 
 
-=== Known bugs and problems:
+### Known bugs and problems:
 - [ ] algorithm::atomic_append needs improvements:
   - Trap if append exceeds 2^63 and do something useful with that
   - Fix the known inefficiencies in the implementation:
