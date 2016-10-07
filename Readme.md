@@ -7,9 +7,9 @@ Tarballs of source and prebuilt binaries with all unit tests passing: https://de
 
 
 ### Immediate todos in order of priority:
-- [ ] Get Outcome to work perfectly with exceptions and RTTI disabled, this makes
+- [x] Get Outcome to work perfectly with exceptions and RTTI disabled, this makes
 Outcome useful in the games/audio world.
-  - [ ] Add unit tests proving it for all platforms.
+  - [x] Add unit tests proving it for all platforms.
   - [ ] Move AFIO to being tested with exceptions and RTTI disabled. Where AFIO 
 throws, have it detect __cpp_exceptions and skip those implementations.
   - [ ] Add macro helpers to Outcome for returning outcomes out of things
@@ -33,7 +33,6 @@ with a very simple engine based on atomic renames and send it to Boost for peer 
 - [ ] All time based kernel tests need to use soak test based API and auto adjust to
 valgrind.
 - [ ] Raise the sanitisers on per-commit CI via ctest.
-  - ubsan needs to be fused with the others i.e. asan + ubsan
 - [ ] Rename all ParseProjectVersionFromHpp etc to parse_project_version_from_hpp etc
 - [ ] In DEBUG builds, have io_handle always not fill buffers passed to remind
 people to use pointers returned!
