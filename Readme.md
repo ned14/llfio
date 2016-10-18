@@ -7,9 +7,11 @@ Tarballs of source and prebuilt binaries with all unit tests passing: https://de
 
 
 ### Immediate todos in order of priority:
+- [ ] Audit Outcome and AFIO for all uses of `std::error_code::value()` and replace where
+appropriate with `std::errc::whatever`.
 - [x] Get Outcome to work perfectly with exceptions and RTTI disabled, this makes
 Outcome useful in the games/audio world.
-  - [x] Add unit tests proving it for all platforms.
+  - [ ] Add a new Boost.Test emulation, one which is noexcept capable
   - [ ] Move AFIO to being tested with exceptions and RTTI disabled. Where AFIO 
 throws, have it detect __cpp_exceptions and skip those implementations.
   - [ ] Add macro helpers to Outcome for returning outcomes out of things
