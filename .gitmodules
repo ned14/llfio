@@ -4,21 +4,25 @@
 	branch = gh-pages
 	fetchRecurseSubmodules = true
 	ignore = none
+	shallow = true
 [submodule "include/boost/afio/boost-lite"]
 	path = include/boost/afio/boost-lite
 	url = https://github.com/ned14/boost-lite.git
 	branch = master
 	fetchRecurseSubmodules = true
 	ignore = untracked
+	shallow = true
 [submodule "include/boost/afio/outcome"]
 	path = include/boost/afio/outcome
 	url = https://github.com/ned14/boost.outcome.git
 	branch = master
 	fetchRecurseSubmodules = true
 	ignore = untracked
+	shallow = true
 [submodule "test/kerneltest"]
 	path = test/kerneltest
 	url = https://github.com/ned14/boost.kerneltest.git
 	branch = master
 	fetchRecurseSubmodules = true
 	ignore = untracked
+	shallow = true
