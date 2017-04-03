@@ -16,9 +16,10 @@ endif()
 include(BoostLiteUtils)
 
 
-CONFIGURE_CTEST_SCRIPT_FOR_CDASH("afio" "build")
+CONFIGURE_CTEST_SCRIPT_FOR_CDASH("afio" "cmake_ci")
 ctest_empty_binary_directory(${CTEST_BINARY_DIRECTORY})
 include(FindGit)
+set(CTEST_GIT_COMMAND "${GIT_EXECUTABLE}")
 #checked_execute_process("git reset"
 #  COMMAND "${GIT_EXECUTABLE}" checkout gh-pages
 #  COMMAND "${GIT_EXECUTABLE}" reset --hard cc293d14a48bf1ee3fb78743c3ad5cf61d63f3ff
@@ -26,6 +27,11 @@ include(FindGit)
 #)
 
 ctest_start("Documentation")
+ctest_update()
+checked_execute_process("git reset"
+  COMMAND "${GIT_EXECUTABLE}" checkout gh-pages
+  WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/doc/html"
+)
 ctest_configure()
 ctest_build(TARGET afio_docs)
 #checked_execute_process("git commit"

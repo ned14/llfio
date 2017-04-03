@@ -104,14 +104,8 @@ DEALINGS IN THE SOFTWARE.
 #ifndef __cpp_variadic_templates
 #error Boost.AFIO needs variadic template support in the compiler
 #endif
-#ifndef __cpp_noexcept
-#error Boost.AFIO needs noexcept support in the compiler
-#endif
 #ifndef __cpp_constexpr
 #error Boost.AFIO needs constexpr (C++ 11) support in the compiler
-#endif
-#ifndef __cpp_thread_local
-#error Boost.AFIO needs thread_local support in the compiler
 #endif
 #ifndef __cpp_init_captures
 #error Boost.AFIO needs lambda init captures support in the compiler (C++ 14)
@@ -386,17 +380,17 @@ BOOST_AFIO_V2_NAMESPACE_END
 #endif
 
 
-// Bring in the Boost macro emulations
-#include "../boost-lite/include/boost/config.hpp"
+// Bring in the Boost-lite macros
+#include "../boost-lite/include/config.hpp"
 
 // Configure BOOST_AFIO_DECL
 #if(defined(BOOST_AFIO_DYN_LINK) || defined(BOOST_ALL_DYN_LINK)) && !defined(BOOST_AFIO_STATIC_LINK)
 
 #if defined(BOOST_AFIO_SOURCE)
-#define BOOST_AFIO_DECL BOOST_SYMBOL_EXPORT
+#define BOOST_AFIO_DECL BOOSTLITE_SYMBOL_EXPORT
 #define BOOST_AFIO_BUILD_DLL
 #else
-#define BOOST_AFIO_DECL BOOST_SYMBOL_IMPORT
+#define BOOST_AFIO_DECL BOOSTLIE_SYMBOL_IMPORT
 #endif
 #else
 #define BOOST_AFIO_DECL

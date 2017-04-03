@@ -3,7 +3,7 @@
 
 #if defined(_MSC_VER) && !defined(__clang__)
 #define BOOST_AFIO_HEADERS_PATH2 BOOST_AFIO_VERSION_GLUE(v, BOOST_AFIO_HEADERS_VERSION, /afio.hpp)
-#else
+#elif !__PCPP_ALWAYS_FALSE__
 #define BOOST_AFIO_HEADERS_PATH2 BOOST_AFIO_VERSION_GLUE(v, BOOST_AFIO_HEADERS_VERSION,)/afio.hpp
 #endif
 

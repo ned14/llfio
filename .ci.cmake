@@ -17,10 +17,13 @@ endif()
 include(BoostLiteUtils)
 
 
-CONFIGURE_CTEST_SCRIPT_FOR_CDASH("afio" "build")
+CONFIGURE_CTEST_SCRIPT_FOR_CDASH("afio" "cmake_ci")
 ctest_empty_binary_directory(${CTEST_BINARY_DIRECTORY})
+include(FindGit)
+set(CTEST_GIT_COMMAND "${GIT_EXECUTABLE}")
 
 ctest_start("Experimental")
+ctest_update()
 ctest_configure()
 ctest_build(TARGET _dl)
 ctest_build(TARGET _sl)
