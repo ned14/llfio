@@ -120,7 +120,7 @@ $(document).ready(function(){initNavTree('classboost_1_1afio_1_1v2__xxx_1_1map__
 <p>A handle to a memory mapped region of memory.  
  <a href="classboost_1_1afio_1_1v2__xxx_1_1map__handle.html#details">More...</a></p>
 
-<p><code>#include &lt;<a class="el" href="map__handle_8hpp_source.html">map_handle.hpp</a>&gt;</code></p>
+<p><code>#include &quot;map_handle.hpp&quot;</code></p>
 <div class="dynheader">
 Inheritance diagram for boost::afio::v2_xxx::map_handle:</div>
 <div class="dyncontent">
@@ -191,11 +191,11 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ad7e261e816a1c394d556bfb62b618a02"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a856c6f55f486070b67e210065000454c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a856c6f55f486070b67e210065000454c"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1map__handle.html#a856c6f55f486070b67e210065000454c">map_handle</a> (<a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1map__handle.html">map_handle</a> &amp;&amp;o) noexcept</td></tr>
-<tr class="memdesc:a856c6f55f486070b67e210065000454c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Implicit move construction of <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1map__handle.html" title="A handle to a memory mapped region of memory.">map_handle</a> permitted. <br/></td></tr>
+<tr class="memdesc:a856c6f55f486070b67e210065000454c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Implicit move construction of map_handle permitted. <br/></td></tr>
 <tr class="separator:a856c6f55f486070b67e210065000454c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae07b3e5449e9116d733ef449b6ac0713"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae07b3e5449e9116d733ef449b6ac0713"></a>
 <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1map__handle.html">map_handle</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1map__handle.html#ae07b3e5449e9116d733ef449b6ac0713">operator=</a> (<a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1map__handle.html">map_handle</a> &amp;&amp;o) noexcept</td></tr>
-<tr class="memdesc:ae07b3e5449e9116d733ef449b6ac0713"><td class="mdescLeft">&#160;</td><td class="mdescRight">Move assignment of <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1map__handle.html" title="A handle to a memory mapped region of memory.">map_handle</a> permitted. <br/></td></tr>
+<tr class="memdesc:ae07b3e5449e9116d733ef449b6ac0713"><td class="mdescLeft">&#160;</td><td class="mdescRight">Move assignment of map_handle permitted. <br/></td></tr>
 <tr class="separator:ae07b3e5449e9116d733ef449b6ac0713"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a740ebf7b850bfa5e5484e5e54341ff1f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a740ebf7b850bfa5e5484e5e54341ff1f"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1map__handle.html#a740ebf7b850bfa5e5484e5e54341ff1f">swap</a> (<a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1map__handle.html">map_handle</a> &amp;o) noexcept</td></tr>
@@ -223,38 +223,38 @@ char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cl
 <tr class="separator:a5982ab4fc54347e01fed95ad44d948c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aefeb5e82a3073b18f50b3047c89752ce"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aefeb5e82a3073b18f50b3047c89752ce"></a>
 <a class="el" href="namespaceboost_1_1afio_1_1v2__xxx.html#ac8d06ecaa9660e7251c1251d88c1305c">result</a>&lt; <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a811166f987d82fcd3c85c6aa0b9b4f34">buffer_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1map__handle.html#aefeb5e82a3073b18f50b3047c89752ce">commit</a> (<a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a811166f987d82fcd3c85c6aa0b9b4f34">buffer_type</a> region, section_handle::flag _flag=section_handle::flag::read|section_handle::flag::write) noexcept</td></tr>
-<tr class="memdesc:aefeb5e82a3073b18f50b3047c89752ce"><td class="mdescLeft">&#160;</td><td class="mdescRight">Ask the system to commit the system resources to make the memory represented by the buffer available with the given permissions. addr and length should be page aligned (see <a class="el" href="namespaceboost_1_1afio_1_1v2__xxx_1_1utils.html#ae63332cddaecd2a30b839856c7d5fe0e" title="Returns the page sizes of this architecture which is useful for calculating direct i/o multiples...">utils::page_sizes()</a>), if not the returned buffer is the region actually committed. <br/></td></tr>
+<tr class="memdesc:aefeb5e82a3073b18f50b3047c89752ce"><td class="mdescLeft">&#160;</td><td class="mdescRight">Ask the system to commit the system resources to make the memory represented by the buffer available with the given permissions. addr and length should be page aligned (see utils::page_sizes()), if not the returned buffer is the region actually committed. <br/></td></tr>
 <tr class="separator:aefeb5e82a3073b18f50b3047c89752ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3cb9350601a177da333304ef5930cbab"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3cb9350601a177da333304ef5930cbab"></a>
 <a class="el" href="namespaceboost_1_1afio_1_1v2__xxx.html#ac8d06ecaa9660e7251c1251d88c1305c">result</a>&lt; <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a811166f987d82fcd3c85c6aa0b9b4f34">buffer_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1map__handle.html#a3cb9350601a177da333304ef5930cbab">decommit</a> (<a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a811166f987d82fcd3c85c6aa0b9b4f34">buffer_type</a> region) noexcept</td></tr>
-<tr class="memdesc:a3cb9350601a177da333304ef5930cbab"><td class="mdescLeft">&#160;</td><td class="mdescRight">Ask the system to make the memory represented by the buffer unavailable and to decommit the system resources representing them. addr and length should be page aligned (see <a class="el" href="namespaceboost_1_1afio_1_1v2__xxx_1_1utils.html#ae63332cddaecd2a30b839856c7d5fe0e" title="Returns the page sizes of this architecture which is useful for calculating direct i/o multiples...">utils::page_sizes()</a>), if not the returned buffer is the region actually decommitted. <br/></td></tr>
+<tr class="memdesc:a3cb9350601a177da333304ef5930cbab"><td class="mdescLeft">&#160;</td><td class="mdescRight">Ask the system to make the memory represented by the buffer unavailable and to decommit the system resources representing them. addr and length should be page aligned (see utils::page_sizes()), if not the returned buffer is the region actually decommitted. <br/></td></tr>
 <tr class="separator:a3cb9350601a177da333304ef5930cbab"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a03ca3f1cf96bae5be137227e64c1e78b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceboost_1_1afio_1_1v2__xxx.html#ac8d06ecaa9660e7251c1251d88c1305c">result</a>&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1map__handle.html#a03ca3f1cf96bae5be137227e64c1e78b">zero</a> (<a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a811166f987d82fcd3c85c6aa0b9b4f34">buffer_type</a> region) noexcept</td></tr>
 <tr class="separator:a03ca3f1cf96bae5be137227e64c1e78b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5b832e5045ae54db8561133763837a47"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle_1_1io__result.html">io_result</a>&lt; <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a9085d19b744d1330eafa51fffc49e104">buffers_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1map__handle.html#a5b832e5045ae54db8561133763837a47">read</a> (<a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1io__handle_1_1io__request.html">io_request</a>&lt; <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a9085d19b744d1330eafa51fffc49e104">buffers_type</a> &gt; reqs, <a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
+<tr class="memitem:a5b832e5045ae54db8561133763837a47"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle_1_1io__result.html">io_result</a>&lt; <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a9085d19b744d1330eafa51fffc49e104">buffers_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1map__handle.html#a5b832e5045ae54db8561133763837a47">read</a> (<a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1io__handle_1_1io__request.html">io_request</a>&lt; <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a9085d19b744d1330eafa51fffc49e104">buffers_type</a> &gt; reqs, <a class="el" href="structdeadline.html">deadline</a> d=<a class="el" href="structdeadline.html">deadline</a>()) noexcept</td></tr>
 <tr class="memdesc:a5b832e5045ae54db8561133763837a47"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read data from the mapped view.  <a href="#a5b832e5045ae54db8561133763837a47">More...</a><br/></td></tr>
 <tr class="separator:a5b832e5045ae54db8561133763837a47"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad6157050182facd9bb5c545b8fe487e6"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle_1_1io__result.html">io_result</a><br class="typebreak"/>
-&lt; <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a692ba33b1e443510a791ff43f37d73cd">const_buffers_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1map__handle.html#ad6157050182facd9bb5c545b8fe487e6">write</a> (<a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1io__handle_1_1io__request.html">io_request</a>&lt; <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a692ba33b1e443510a791ff43f37d73cd">const_buffers_type</a> &gt; reqs, <a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
+&lt; <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a692ba33b1e443510a791ff43f37d73cd">const_buffers_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1map__handle.html#ad6157050182facd9bb5c545b8fe487e6">write</a> (<a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1io__handle_1_1io__request.html">io_request</a>&lt; <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a692ba33b1e443510a791ff43f37d73cd">const_buffers_type</a> &gt; reqs, <a class="el" href="structdeadline.html">deadline</a> d=<a class="el" href="structdeadline.html">deadline</a>()) noexcept</td></tr>
 <tr class="memdesc:ad6157050182facd9bb5c545b8fe487e6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write data to the mapped view.  <a href="#ad6157050182facd9bb5c545b8fe487e6">More...</a><br/></td></tr>
 <tr class="separator:ad6157050182facd9bb5c545b8fe487e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab371d8427aeb4bd0ca5f8a39a98ea5a2"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle_1_1io__result.html">io_result</a>&lt; <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a9085d19b744d1330eafa51fffc49e104">buffers_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#ab371d8427aeb4bd0ca5f8a39a98ea5a2">read</a> (<a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1io__handle_1_1io__request.html">io_request</a>&lt; <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a9085d19b744d1330eafa51fffc49e104">buffers_type</a> &gt; reqs, <a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
+<tr class="memitem:ab371d8427aeb4bd0ca5f8a39a98ea5a2"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle_1_1io__result.html">io_result</a>&lt; <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a9085d19b744d1330eafa51fffc49e104">buffers_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#ab371d8427aeb4bd0ca5f8a39a98ea5a2">read</a> (<a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1io__handle_1_1io__request.html">io_request</a>&lt; <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a9085d19b744d1330eafa51fffc49e104">buffers_type</a> &gt; reqs, <a class="el" href="structdeadline.html">deadline</a> d=<a class="el" href="structdeadline.html">deadline</a>()) noexcept</td></tr>
 <tr class="memdesc:ab371d8427aeb4bd0ca5f8a39a98ea5a2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read data from the open handle.  <a href="#ab371d8427aeb4bd0ca5f8a39a98ea5a2">More...</a><br/></td></tr>
 <tr class="separator:ab371d8427aeb4bd0ca5f8a39a98ea5a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4480a48b8e54cde62fd2cee4ceed3725"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle_1_1io__result.html">io_result</a>&lt; <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a811166f987d82fcd3c85c6aa0b9b4f34">buffer_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a4480a48b8e54cde62fd2cee4ceed3725">read</a> (<a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html#a617ab627aa596b325d7bfef5210a43f3">extent_type</a> offset, char *data, <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html#aee8d98d7f979e312f5e18dfcebfc6870">size_type</a> bytes, <a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
+<tr class="memitem:a4480a48b8e54cde62fd2cee4ceed3725"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle_1_1io__result.html">io_result</a>&lt; <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a811166f987d82fcd3c85c6aa0b9b4f34">buffer_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a4480a48b8e54cde62fd2cee4ceed3725">read</a> (<a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html#a617ab627aa596b325d7bfef5210a43f3">extent_type</a> offset, char *data, <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html#aee8d98d7f979e312f5e18dfcebfc6870">size_type</a> bytes, <a class="el" href="structdeadline.html">deadline</a> d=<a class="el" href="structdeadline.html">deadline</a>()) noexcept</td></tr>
 <tr class="separator:a4480a48b8e54cde62fd2cee4ceed3725"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8890b6a6046fb562f9f0ab943b79dfb4"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle_1_1io__result.html">io_result</a><br class="typebreak"/>
-&lt; <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a692ba33b1e443510a791ff43f37d73cd">const_buffers_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a8890b6a6046fb562f9f0ab943b79dfb4">write</a> (<a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1io__handle_1_1io__request.html">io_request</a>&lt; <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a692ba33b1e443510a791ff43f37d73cd">const_buffers_type</a> &gt; reqs, <a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
+&lt; <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a692ba33b1e443510a791ff43f37d73cd">const_buffers_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a8890b6a6046fb562f9f0ab943b79dfb4">write</a> (<a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1io__handle_1_1io__request.html">io_request</a>&lt; <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a692ba33b1e443510a791ff43f37d73cd">const_buffers_type</a> &gt; reqs, <a class="el" href="structdeadline.html">deadline</a> d=<a class="el" href="structdeadline.html">deadline</a>()) noexcept</td></tr>
 <tr class="memdesc:a8890b6a6046fb562f9f0ab943b79dfb4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write data to the open handle.  <a href="#a8890b6a6046fb562f9f0ab943b79dfb4">More...</a><br/></td></tr>
 <tr class="separator:a8890b6a6046fb562f9f0ab943b79dfb4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac1fb657631c5212401259bb35ebf16db"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle_1_1io__result.html">io_result</a>&lt; <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#acbb752522c90f5e4596b8a4f07e2fa80">const_buffer_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#ac1fb657631c5212401259bb35ebf16db">write</a> (<a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html#a617ab627aa596b325d7bfef5210a43f3">extent_type</a> offset, const char *data, <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html#aee8d98d7f979e312f5e18dfcebfc6870">size_type</a> bytes, <a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
+<tr class="memitem:ac1fb657631c5212401259bb35ebf16db"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle_1_1io__result.html">io_result</a>&lt; <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#acbb752522c90f5e4596b8a4f07e2fa80">const_buffer_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#ac1fb657631c5212401259bb35ebf16db">write</a> (<a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html#a617ab627aa596b325d7bfef5210a43f3">extent_type</a> offset, const char *data, <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html#aee8d98d7f979e312f5e18dfcebfc6870">size_type</a> bytes, <a class="el" href="structdeadline.html">deadline</a> d=<a class="el" href="structdeadline.html">deadline</a>()) noexcept</td></tr>
 <tr class="separator:ac1fb657631c5212401259bb35ebf16db"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aebd9c90a901e6364c94d466425db6e0f"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespaceboost_1_1afio_1_1v2__xxx.html#ac8d06ecaa9660e7251c1251d88c1305c">result</a>&lt; <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle_1_1extent__guard.html">extent_guard</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#aebd9c90a901e6364c94d466425db6e0f">lock</a> (<a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html#a617ab627aa596b325d7bfef5210a43f3">extent_type</a> offset, <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html#a617ab627aa596b325d7bfef5210a43f3">extent_type</a> bytes, bool exclusive=true, <a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
+<tr class="memitem:aebd9c90a901e6364c94d466425db6e0f"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespaceboost_1_1afio_1_1v2__xxx.html#ac8d06ecaa9660e7251c1251d88c1305c">result</a>&lt; <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle_1_1extent__guard.html">extent_guard</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#aebd9c90a901e6364c94d466425db6e0f">lock</a> (<a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html#a617ab627aa596b325d7bfef5210a43f3">extent_type</a> offset, <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html#a617ab627aa596b325d7bfef5210a43f3">extent_type</a> bytes, bool exclusive=true, <a class="el" href="structdeadline.html">deadline</a> d=<a class="el" href="structdeadline.html">deadline</a>()) noexcept</td></tr>
 <tr class="memdesc:aebd9c90a901e6364c94d466425db6e0f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tries to lock the range of bytes specified for shared or exclusive access. Be aware this passes through the same semantics as the underlying OS call, including any POSIX insanity present on your platform.  <a href="#aebd9c90a901e6364c94d466425db6e0f">More...</a><br/></td></tr>
 <tr class="separator:aebd9c90a901e6364c94d466425db6e0f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac73d1383516e0e139e3863b57731e4de"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceboost_1_1afio_1_1v2__xxx.html#ac8d06ecaa9660e7251c1251d88c1305c">result</a>&lt; <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle_1_1extent__guard.html">extent_guard</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#ac73d1383516e0e139e3863b57731e4de">lock</a> (<a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1io__handle_1_1io__request.html">io_request</a>&lt; <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a9085d19b744d1330eafa51fffc49e104">buffers_type</a> &gt; reqs, <a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
+<tr class="memitem:ac73d1383516e0e139e3863b57731e4de"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceboost_1_1afio_1_1v2__xxx.html#ac8d06ecaa9660e7251c1251d88c1305c">result</a>&lt; <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle_1_1extent__guard.html">extent_guard</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#ac73d1383516e0e139e3863b57731e4de">lock</a> (<a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1io__handle_1_1io__request.html">io_request</a>&lt; <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a9085d19b744d1330eafa51fffc49e104">buffers_type</a> &gt; reqs, <a class="el" href="structdeadline.html">deadline</a> d=<a class="el" href="structdeadline.html">deadline</a>()) noexcept</td></tr>
 <tr class="separator:ac73d1383516e0e139e3863b57731e4de"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6de014bf9d16737f3b14b61d6eea413d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceboost_1_1afio_1_1v2__xxx.html#ac8d06ecaa9660e7251c1251d88c1305c">result</a>&lt; <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle_1_1extent__guard.html">extent_guard</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a6de014bf9d16737f3b14b61d6eea413d">lock</a> (<a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1io__handle_1_1io__request.html">io_request</a>&lt; <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a692ba33b1e443510a791ff43f37d73cd">const_buffers_type</a> &gt; reqs, <a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
+<tr class="memitem:a6de014bf9d16737f3b14b61d6eea413d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceboost_1_1afio_1_1v2__xxx.html#ac8d06ecaa9660e7251c1251d88c1305c">result</a>&lt; <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle_1_1extent__guard.html">extent_guard</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a6de014bf9d16737f3b14b61d6eea413d">lock</a> (<a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1io__handle_1_1io__request.html">io_request</a>&lt; <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a692ba33b1e443510a791ff43f37d73cd">const_buffers_type</a> &gt; reqs, <a class="el" href="structdeadline.html">deadline</a> d=<a class="el" href="structdeadline.html">deadline</a>()) noexcept</td></tr>
 <tr class="separator:a6de014bf9d16737f3b14b61d6eea413d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aab870fe5fa041af29e2d85a5c292077f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceboost_1_1afio_1_1v2__xxx.html#ac8d06ecaa9660e7251c1251d88c1305c">result</a>&lt; <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle_1_1extent__guard.html">extent_guard</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#aab870fe5fa041af29e2d85a5c292077f">try_lock</a> (<a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html#a617ab627aa596b325d7bfef5210a43f3">extent_type</a> offset, <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html#a617ab627aa596b325d7bfef5210a43f3">extent_type</a> bytes, bool exclusive=true) noexcept</td></tr>
 <tr class="separator:aab870fe5fa041af29e2d85a5c292077f"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -407,7 +407,7 @@ flag&#160;</td><td class="memItemRight" valign="bottom"><b>_flags</b></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Ask the system to unset the dirty flag for the memory represented by the buffer. This will prevent any changes not yet sent to the backing storage from being sent in the future, also if the system kicks out this page and reloads it you may see some edition of the underlying storage instead of what was here. addr and length should be page aligned (see <a class="el" href="namespaceboost_1_1afio_1_1v2__xxx_1_1utils.html#ae63332cddaecd2a30b839856c7d5fe0e" title="Returns the page sizes of this architecture which is useful for calculating direct i/o multiples...">utils::page_sizes()</a>), if not the returned buffer is the region actually undirtied. </p>
+<p>Ask the system to unset the dirty flag for the memory represented by the buffer. This will prevent any changes not yet sent to the backing storage from being sent in the future, also if the system kicks out this page and reloads it you may see some edition of the underlying storage instead of what was here. addr and length should be page aligned (see utils::page_sizes()), if not the returned buffer is the region actually undirtied. </p>
 
 </div>
 </div>
@@ -439,8 +439,8 @@ flag&#160;</td><td class="memItemRight" valign="bottom"><b>_flags</b></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1deadline.html">deadline</a>&#160;</td>
-          <td class="paramname"><em>d</em> = <code><a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1deadline.html">deadline</a>()</code>&#160;</td>
+          <td class="paramtype"><a class="el" href="structdeadline.html">deadline</a>&#160;</td>
+          <td class="paramname"><em>d</em> = <code><a class="el" href="structdeadline.html">deadline</a>()</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -456,8 +456,8 @@ flag&#160;</td><td class="memItemRight" valign="bottom"><b>_flags</b></td></tr>
 </div><div class="memdoc">
 
 <p>Tries to lock the range of bytes specified for shared or exclusive access. Be aware this passes through the same semantics as the underlying OS call, including any POSIX insanity present on your platform. </p>
-<dl class="section warning"><dt>Warning</dt><dd>On older Linuxes and POSIX, this uses <code>fcntl()</code> with the well known insane POSIX semantics that closing ANY handle to this file releases all bytes range locks on it. If your OS isn't new enough to support the non-insane lock API, <code>flag::byte_lock_insanity</code> will be set in <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html#add27fa17cd6356b49a26a8b6dafb6a6d" title="The flags this handle was opened with.">flags()</a> after the first call to this function.</dd></dl>
-<dl class="section return"><dt>Returns</dt><dd>An extent guard, the destruction of which will call <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a0d043e29e065db9618f6df2e43cc1d42" title="Unlocks a byte range previously locked.">unlock()</a>. </dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>On older Linuxes and POSIX, this uses <code>fcntl()</code> with the well known insane POSIX semantics that closing ANY handle to this file releases all bytes range locks on it. If your OS isn't new enough to support the non-insane lock API, <code>flag::byte_lock_insanity</code> will be set in flags() after the first call to this function.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>An extent guard, the destruction of which will call unlock(). </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">offset</td><td>The offset to lock. Note that on POSIX the top bit is always cleared before use as POSIX uses signed transport for offsets. If you want an advisory rather than mandatory lock on Windows, one technique is to force top bit set so the region you lock is not the one you will i/o - obviously this reduces maximum file size to (2^63)-1. </td></tr>
@@ -468,7 +468,7 @@ flag&#160;</td><td class="memItemRight" valign="bottom"><b>_flags</b></td></tr>
   </dd>
 </dl>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX fcntl() can return, ETIMEDOUT. ENOTSUP may be returned if deadline i/o is not possible with this particular handle configuration (e.g. non-overlapped HANDLE on Windows). </dd></dl>
-<dl class="section user"><dt>Memory Allocations</dt><dd>The default synchronous implementation in <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1file__handle.html" title="A handle to a regular file or device, kept data layout compatible with async_file_handle.">file_handle</a> performs no memory allocation. The asynchronous implementation in <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1async__file__handle.html">async_file_handle</a> performs one calloc and one free. </dd></dl>
+<dl class="section user"><dt>Memory Allocations</dt><dd>The default synchronous implementation in file_handle performs no memory allocation. The asynchronous implementation in async_file_handle performs one calloc and one free. </dd></dl>
 
 </div>
 </div>
@@ -488,8 +488,8 @@ flag&#160;</td><td class="memItemRight" valign="bottom"><b>_flags</b></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1deadline.html">deadline</a>&#160;</td>
-          <td class="paramname"><em>d</em> = <code><a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1deadline.html">deadline</a>()</code>&#160;</td>
+          <td class="paramtype"><a class="el" href="structdeadline.html">deadline</a>&#160;</td>
+          <td class="paramname"><em>d</em> = <code><a class="el" href="structdeadline.html">deadline</a>()</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -529,8 +529,8 @@ flag&#160;</td><td class="memItemRight" valign="bottom"><b>_flags</b></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1deadline.html">deadline</a>&#160;</td>
-          <td class="paramname"><em>d</em> = <code><a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1deadline.html">deadline</a>()</code>&#160;</td>
+          <td class="paramtype"><a class="el" href="structdeadline.html">deadline</a>&#160;</td>
+          <td class="paramname"><em>d</em> = <code><a class="el" href="structdeadline.html">deadline</a>()</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -601,9 +601,9 @@ flag&#160;</td><td class="memItemRight" valign="bottom"><b>_flags</b></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">section</td><td>A memory section handle specifying the backing storage to use. </td></tr>
-    <tr><td class="paramname">bytes</td><td>How many bytes to map (0 = the size of the memory section). Typically needs to be a multiple of the page size (see <a class="el" href="namespaceboost_1_1afio_1_1v2__xxx_1_1utils.html#ae63332cddaecd2a30b839856c7d5fe0e" title="Returns the page sizes of this architecture which is useful for calculating direct i/o multiples...">utils::page_sizes()</a>). </td></tr>
-    <tr><td class="paramname">offset</td><td>The offset into the backing storage to map from. Typically needs to be at least a multiple of the page size (see <a class="el" href="namespaceboost_1_1afio_1_1v2__xxx_1_1utils.html#ae63332cddaecd2a30b839856c7d5fe0e" title="Returns the page sizes of this architecture which is useful for calculating direct i/o multiples...">utils::page_sizes()</a>), on Windows it needs to be a multiple of the kernel memory allocation granularity (typically 64Kb). </td></tr>
-    <tr><td class="paramname">_flag</td><td>The permissions with which to map the view which are constrained by the permissions of the memory section. <code>flag::none</code> can be useful for reserving virtual address space without committing system resources, use <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1map__handle.html#aefeb5e82a3073b18f50b3047c89752ce" title="Ask the system to commit the system resources to make the memory represented by the buffer available ...">commit()</a> to later change availability of memory.</td></tr>
+    <tr><td class="paramname">bytes</td><td>How many bytes to map (0 = the size of the memory section). Typically needs to be a multiple of the page size (see utils::page_sizes()). </td></tr>
+    <tr><td class="paramname">offset</td><td>The offset into the backing storage to map from. Typically needs to be at least a multiple of the page size (see utils::page_sizes()), on Windows it needs to be a multiple of the kernel memory allocation granularity (typically 64Kb). </td></tr>
+    <tr><td class="paramname">_flag</td><td>The permissions with which to map the view which are constrained by the permissions of the memory section. <code>flag::none</code> can be useful for reserving virtual address space without committing system resources, use commit() to later change availability of memory.</td></tr>
   </table>
   </dd>
 </dl>
@@ -627,8 +627,8 @@ flag&#160;</td><td class="memItemRight" valign="bottom"><b>_flags</b></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1deadline.html">deadline</a>&#160;</td>
-          <td class="paramname"><em>d</em> = <code><a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1deadline.html">deadline</a>()</code>&#160;</td>
+          <td class="paramtype"><a class="el" href="structdeadline.html">deadline</a>&#160;</td>
+          <td class="paramname"><em>d</em> = <code><a class="el" href="structdeadline.html">deadline</a>()</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -674,8 +674,8 @@ flag&#160;</td><td class="memItemRight" valign="bottom"><b>_flags</b></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1deadline.html">deadline</a>&#160;</td>
-          <td class="paramname"><em>d</em> = <code><a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1deadline.html">deadline</a>()</code>&#160;</td>
+          <td class="paramtype"><a class="el" href="structdeadline.html">deadline</a>&#160;</td>
+          <td class="paramname"><em>d</em> = <code><a class="el" href="structdeadline.html">deadline</a>()</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -699,8 +699,8 @@ flag&#160;</td><td class="memItemRight" valign="bottom"><b>_flags</b></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#ab371d8427aeb4bd0ca5f8a39a98ea5a2" title="Read data from the open handle.">read()</a> can return, ETIMEDOUT, ECANCELED. ENOTSUP may be returned if deadline i/o is not possible with this particular handle configuration (e.g. reading from regular files on POSIX or reading from a non-overlapped HANDLE on Windows). </dd></dl>
-<dl class="section user"><dt>Memory Allocations</dt><dd>The default synchronous implementation in <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1file__handle.html" title="A handle to a regular file or device, kept data layout compatible with async_file_handle.">file_handle</a> performs no memory allocation. The asynchronous implementation in <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1async__file__handle.html">async_file_handle</a> performs one calloc and one free. </dd></dl>
+<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX read() can return, ETIMEDOUT, ECANCELED. ENOTSUP may be returned if deadline i/o is not possible with this particular handle configuration (e.g. reading from regular files on POSIX or reading from a non-overlapped HANDLE on Windows). </dd></dl>
+<dl class="section user"><dt>Memory Allocations</dt><dd>The default synchronous implementation in file_handle performs no memory allocation. The asynchronous implementation in async_file_handle performs one calloc and one free. </dd></dl>
 
 </div>
 </div>
@@ -732,8 +732,8 @@ flag&#160;</td><td class="memItemRight" valign="bottom"><b>_flags</b></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1deadline.html">deadline</a>&#160;</td>
-          <td class="paramname"><em>d</em> = <code><a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1deadline.html">deadline</a>()</code>&#160;</td>
+          <td class="paramtype"><a class="el" href="structdeadline.html">deadline</a>&#160;</td>
+          <td class="paramname"><em>d</em> = <code><a class="el" href="structdeadline.html">deadline</a>()</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -751,7 +751,7 @@ flag&#160;</td><td class="memItemRight" valign="bottom"><b>_flags</b></td></tr>
 <div class="fragment"><div class="line"><a name="l00417"></a><span class="lineno">  417</span>&#160;  {</div>
 <div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160;    <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a811166f987d82fcd3c85c6aa0b9b4f34" title="The scatter buffer type used by this handle.">buffer_type</a> _reqs[1] = {{data, bytes}};</div>
 <div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;    io_request&lt;buffers_type&gt; reqs(<a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a9085d19b744d1330eafa51fffc49e104" title="The scatter buffers type used by this handle.">buffers_type</a>(_reqs), offset);</div>
-<div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;    BOOST_OUTCOME_FILTER_ERROR(v, <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#ab371d8427aeb4bd0ca5f8a39a98ea5a2" title="Read data from the open handle.">read</a>(reqs, d));</div>
+<div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;    BOOST_OUTCOME_TRY(v, <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#ab371d8427aeb4bd0ca5f8a39a98ea5a2" title="Read data from the open handle.">read</a>(reqs, d));</div>
 <div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;    <span class="keywordflow">return</span> *v.data();</div>
 <div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;  }</div>
 </div><!-- fragment -->
@@ -851,7 +851,7 @@ flag&#160;</td><td class="memItemRight" valign="bottom"><b>_flags</b></td></tr>
 </table>
 </div><div class="memdoc">
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><a name="l00552"></a><span class="lineno">  552</span>&#160;{ <span class="keywordflow">return</span> <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#aebd9c90a901e6364c94d466425db6e0f" title="Tries to lock the range of bytes specified for shared or exclusive access. Be aware this passes throu...">lock</a>(offset, bytes, exclusive, deadline(stl11::chrono::seconds(0))); }</div>
+<div class="fragment"><div class="line"><a name="l00552"></a><span class="lineno">  552</span>&#160;{ <span class="keywordflow">return</span> <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#aebd9c90a901e6364c94d466425db6e0f" title="Tries to lock the range of bytes specified for shared or exclusive access. Be aware this passes throu...">lock</a>(offset, bytes, exclusive, <a class="code" href="structdeadline.html" title="A time deadline in either relative-to-now or absolute (system clock) terms.">deadline</a>(stl11::chrono::seconds(0))); }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -916,8 +916,8 @@ flag&#160;</td><td class="memItemRight" valign="bottom"><b>_flags</b></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1deadline.html">deadline</a>&#160;</td>
-          <td class="paramname"><em>d</em> = <code><a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1deadline.html">deadline</a>()</code>&#160;</td>
+          <td class="paramtype"><a class="el" href="structdeadline.html">deadline</a>&#160;</td>
+          <td class="paramname"><em>d</em> = <code><a class="el" href="structdeadline.html">deadline</a>()</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -962,8 +962,8 @@ flag&#160;</td><td class="memItemRight" valign="bottom"><b>_flags</b></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1deadline.html">deadline</a>&#160;</td>
-          <td class="paramname"><em>d</em> = <code><a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1deadline.html">deadline</a>()</code>&#160;</td>
+          <td class="paramtype"><a class="el" href="structdeadline.html">deadline</a>&#160;</td>
+          <td class="paramname"><em>d</em> = <code><a class="el" href="structdeadline.html">deadline</a>()</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -987,8 +987,8 @@ flag&#160;</td><td class="memItemRight" valign="bottom"><b>_flags</b></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a8890b6a6046fb562f9f0ab943b79dfb4" title="Write data to the open handle.">write()</a> can return, ETIMEDOUT, ECANCELED. ENOTSUP may be returned if deadline i/o is not possible with this particular handle configuration (e.g. writing to regular files on POSIX or writing to a non-overlapped HANDLE on Windows). </dd></dl>
-<dl class="section user"><dt>Memory Allocations</dt><dd>The default synchronous implementation in <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1file__handle.html" title="A handle to a regular file or device, kept data layout compatible with async_file_handle.">file_handle</a> performs no memory allocation. The asynchronous implementation in <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1async__file__handle.html">async_file_handle</a> performs one calloc and one free. </dd></dl>
+<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX write() can return, ETIMEDOUT, ECANCELED. ENOTSUP may be returned if deadline i/o is not possible with this particular handle configuration (e.g. writing to regular files on POSIX or writing to a non-overlapped HANDLE on Windows). </dd></dl>
+<dl class="section user"><dt>Memory Allocations</dt><dd>The default synchronous implementation in file_handle performs no memory allocation. The asynchronous implementation in async_file_handle performs one calloc and one free. </dd></dl>
 
 </div>
 </div>
@@ -1020,8 +1020,8 @@ flag&#160;</td><td class="memItemRight" valign="bottom"><b>_flags</b></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1deadline.html">deadline</a>&#160;</td>
-          <td class="paramname"><em>d</em> = <code><a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1deadline.html">deadline</a>()</code>&#160;</td>
+          <td class="paramtype"><a class="el" href="structdeadline.html">deadline</a>&#160;</td>
+          <td class="paramname"><em>d</em> = <code><a class="el" href="structdeadline.html">deadline</a>()</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -1039,7 +1039,7 @@ flag&#160;</td><td class="memItemRight" valign="bottom"><b>_flags</b></td></tr>
 <div class="fragment"><div class="line"><a name="l00441"></a><span class="lineno">  441</span>&#160;  {</div>
 <div class="line"><a name="l00442"></a><span class="lineno">  442</span>&#160;    <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#acbb752522c90f5e4596b8a4f07e2fa80" title="The gather buffer type used by this handle.">const_buffer_type</a> _reqs[1] = {{data, bytes}};</div>
 <div class="line"><a name="l00443"></a><span class="lineno">  443</span>&#160;    io_request&lt;const_buffers_type&gt; reqs(<a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a692ba33b1e443510a791ff43f37d73cd" title="The gather buffers type used by this handle.">const_buffers_type</a>(_reqs), offset);</div>
-<div class="line"><a name="l00444"></a><span class="lineno">  444</span>&#160;    BOOST_OUTCOME_FILTER_ERROR(v, <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a8890b6a6046fb562f9f0ab943b79dfb4" title="Write data to the open handle.">write</a>(reqs, d));</div>
+<div class="line"><a name="l00444"></a><span class="lineno">  444</span>&#160;    BOOST_OUTCOME_TRY(v, <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a8890b6a6046fb562f9f0ab943b79dfb4" title="Write data to the open handle.">write</a>(reqs, d));</div>
 <div class="line"><a name="l00445"></a><span class="lineno">  445</span>&#160;    <span class="keywordflow">return</span> *v.data();</div>
 <div class="line"><a name="l00446"></a><span class="lineno">  446</span>&#160;  }</div>
 </div><!-- fragment -->
@@ -1071,7 +1071,7 @@ flag&#160;</td><td class="memItemRight" valign="bottom"><b>_flags</b></td></tr>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>include/boost/afio/v2.0/<a class="el" href="map__handle_8hpp_source.html">map_handle.hpp</a></li>
+<li>include/boost/afio/v2.0/<a class="el" href="map__handle_8hpp.html">map_handle.hpp</a></li>
 </ul>
 </div><!-- contents -->
 </div><!-- doc-content -->

@@ -121,7 +121,7 @@ $(document).ready(function(){initNavTree('classboost_1_1afio_1_1v2__xxx_1_1io__s
 <p>An asynchronous i/o multiplexer service.  
  <a href="classboost_1_1afio_1_1v2__xxx_1_1io__service.html#details">More...</a></p>
 
-<p><code>#include &lt;<a class="el" href="io__service_8hpp_source.html">io_service.hpp</a>&gt;</code></p>
+<p><code>#include &quot;io_service.hpp&quot;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
 Public Types</h2></td></tr>
@@ -190,7 +190,7 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__service.html#acae616853e07141e31bdf221a51b2fc0">disable_kqueues</a> ()</td></tr>
 <tr class="memdesc:acae616853e07141e31bdf221a51b2fc0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Force disable any use of BSD kqueues. <br/></td></tr>
 <tr class="separator:acae616853e07141e31bdf221a51b2fc0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae401b78f109f594d6f1c5fc2281ff8f3"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespaceboost_1_1afio_1_1v2__xxx.html#ac8d06ecaa9660e7251c1251d88c1305c">result</a>&lt; bool &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__service.html#ae401b78f109f594d6f1c5fc2281ff8f3">run_until</a> (<a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1deadline.html">deadline</a> d) noexcept</td></tr>
+<tr class="memitem:ae401b78f109f594d6f1c5fc2281ff8f3"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespaceboost_1_1afio_1_1v2__xxx.html#ac8d06ecaa9660e7251c1251d88c1305c">result</a>&lt; bool &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__service.html#ae401b78f109f594d6f1c5fc2281ff8f3">run_until</a> (<a class="el" href="structdeadline.html">deadline</a> d) noexcept</td></tr>
 <tr class="separator:ae401b78f109f594d6f1c5fc2281ff8f3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0e4c31e7bc69ea4fbd12474d4a03775c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceboost_1_1afio_1_1v2__xxx.html#ac8d06ecaa9660e7251c1251d88c1305c">result</a>&lt; bool &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__service.html#a0e4c31e7bc69ea4fbd12474d4a03775c">run</a> () noexcept</td></tr>
 <tr class="separator:a0e4c31e7bc69ea4fbd12474d4a03775c"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -234,7 +234,7 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>async_file_handle</b
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Creates an i/o service for the calling thread, installing a global signal handler via <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__service.html#a327e40bd228cc34be4b29073b676a7cb">set_interruption_signal()</a> if not yet installed if on POSIX and BSD kqueues not in use. </p>
+<p>Creates an i/o service for the calling thread, installing a global signal handler via set_interruption_signal() if not yet installed if on POSIX and BSD kqueues not in use. </p>
 
 </div>
 </div>
@@ -259,7 +259,7 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>async_file_handle</b
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Returns the signal used for interrupting <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__service.html#ae401b78f109f594d6f1c5fc2281ff8f3">run_until()</a>. Only used on POSIX when BSD kqueues are not used. Defaults to BOOST_AFIO_IO_POST_SIGNAL on platforms which use it.</p>
+<p>Returns the signal used for interrupting run_until(). Only used on POSIX when BSD kqueues are not used. Defaults to BOOST_AFIO_IO_POST_SIGNAL on platforms which use it.</p>
 <dl class="section note"><dt>Note</dt><dd>Only present if BOOST_AFIO_IO_POST_SIGNAL is defined. </dd></dl>
 
 </div>
@@ -313,7 +313,7 @@ template&lt;class U &gt; </div>
 </table>
 </div><div class="memdoc">
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;{ <span class="keywordflow">return</span> <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__service.html#ae401b78f109f594d6f1c5fc2281ff8f3">run_until</a>(deadline()); }</div>
+<div class="fragment"><div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;{ <span class="keywordflow">return</span> <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__service.html#ae401b78f109f594d6f1c5fc2281ff8f3">run_until</a>(<a class="code" href="structdeadline.html" title="A time deadline in either relative-to-now or absolute (system clock) terms.">deadline</a>()); }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -327,7 +327,7 @@ template&lt;class U &gt; </div>
         <tr>
           <td class="memname">virtual <a class="el" href="namespaceboost_1_1afio_1_1v2__xxx.html#ac8d06ecaa9660e7251c1251d88c1305c">result</a>&lt;bool&gt; boost::afio::v2_xxx::io_service::run_until </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1deadline.html">deadline</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="structdeadline.html">deadline</a>&#160;</td>
           <td class="paramname"><em>d</em></td><td>)</td>
           <td></td>
         </tr>
@@ -363,13 +363,13 @@ template&lt;class U &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Sets the signal used for interrupting <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__service.html#ae401b78f109f594d6f1c5fc2281ff8f3">run_until()</a>, returning the former signal setting. Only used on POSIX when BSD kqueues are not used. Special values are 0 for deinstall global signal handler, and -1 for install to first unused signal between SIGRTMIN and SIGRTMAX. Changing this while any <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__service.html" title="An asynchronous i/o multiplexer service.">io_service</a> instances exist is a bad idea.</p>
+<p>Sets the signal used for interrupting run_until(), returning the former signal setting. Only used on POSIX when BSD kqueues are not used. Special values are 0 for deinstall global signal handler, and -1 for install to first unused signal between SIGRTMIN and SIGRTMAX. Changing this while any io_service instances exist is a bad idea.</p>
 <dl class="section note"><dt>Note</dt><dd>Only present if BOOST_AFIO_IO_POST_SIGNAL is defined. </dd></dl>
 
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>include/boost/afio/v2.0/<a class="el" href="io__service_8hpp_source.html">io_service.hpp</a></li>
+<li>include/boost/afio/v2.0/<a class="el" href="io__service_8hpp.html">io_service.hpp</a></li>
 </ul>
 </div><!-- contents -->
 </div><!-- doc-content -->

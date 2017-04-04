@@ -115,11 +115,9 @@ $(document).ready(function(){initNavTree('utils_8hpp.html','');});
 
 <p>Provides namespace utils.  
 <a href="#details">More...</a></p>
-<div class="textblock"><code>#include &quot;<a class="el" href="config_8hpp_source.html">config.hpp</a>&quot;</code><br/>
+<div class="textblock"><code>#include &quot;<a class="el" href="config_8hpp.html">config.hpp</a>&quot;</code><br/>
 <code>#include &quot;../boost-lite/include/algorithm/string.hpp&quot;</code><br/>
-</div>
-<p><a href="utils_8hpp_source.html">Go to the source code of this file.</a></p>
-<table class="memberdecls">
+</div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1utils_1_1page__allocator.html">boost::afio::v2_xxx::utils::page_allocator&lt; T &gt;</a></td></tr>
@@ -171,13 +169,13 @@ template&lt;class T &gt; </td></tr>
 <tr class="memdesc:ae63332cddaecd2a30b839856c7d5fe0e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the page sizes of this architecture which is useful for calculating direct i/o multiples.  <a href="#ae63332cddaecd2a30b839856c7d5fe0e">More...</a><br/></td></tr>
 <tr class="separator:ae63332cddaecd2a30b839856c7d5fe0e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a372dccddba2f36695a095dbe98474f1a"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceboost_1_1afio_1_1v2__xxx_1_1utils.html#a372dccddba2f36695a095dbe98474f1a">boost::afio::v2_xxx::utils::file_buffer_default_size</a> () noexcept</td></tr>
-<tr class="memdesc:a372dccddba2f36695a095dbe98474f1a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a reasonable default size for <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1utils_1_1page__allocator.html" title="An STL allocator which allocates large TLB page memory.If the operating system is configured to allow...">page_allocator</a>, typically the closest page size from <a class="el" href="namespaceboost_1_1afio_1_1v2__xxx_1_1utils.html#ae63332cddaecd2a30b839856c7d5fe0e" title="Returns the page sizes of this architecture which is useful for calculating direct i/o multiples...">page_sizes()</a> to 1Mb.  <a href="#a372dccddba2f36695a095dbe98474f1a">More...</a><br/></td></tr>
+<tr class="memdesc:a372dccddba2f36695a095dbe98474f1a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a reasonable default size for page_allocator, typically the closest page size from page_sizes() to 1Mb.  <a href="#a372dccddba2f36695a095dbe98474f1a">More...</a><br/></td></tr>
 <tr class="separator:a372dccddba2f36695a095dbe98474f1a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac7b89428cdd460548bd9a645a6565df4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceboost_1_1afio_1_1v2__xxx_1_1utils.html#ac7b89428cdd460548bd9a645a6565df4">boost::afio::v2_xxx::utils::random_fill</a> (char *buffer, size_t bytes)</td></tr>
 <tr class="memdesc:ac7b89428cdd460548bd9a645a6565df4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fills the buffer supplied with cryptographically strong randomness. Uses the OS kernel API.  <a href="#ac7b89428cdd460548bd9a645a6565df4">More...</a><br/></td></tr>
 <tr class="separator:ac7b89428cdd460548bd9a645a6565df4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a051e8deb72941b3460811a1cf5f29915"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceboost_1_1afio_1_1v2__xxx_1_1utils.html#a051e8deb72941b3460811a1cf5f29915">boost::afio::v2_xxx::utils::random_string</a> (size_t randomlen)</td></tr>
-<tr class="memdesc:a051e8deb72941b3460811a1cf5f29915"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a cryptographically random string capable of being used as a filename. Essentially <a class="el" href="namespaceboost_1_1afio_1_1v2__xxx_1_1utils.html#ac7b89428cdd460548bd9a645a6565df4" title="Fills the buffer supplied with cryptographically strong randomness. Uses the OS kernel API...">random_fill()</a> + to_hex_string().  <a href="#a051e8deb72941b3460811a1cf5f29915">More...</a><br/></td></tr>
+<tr class="memdesc:a051e8deb72941b3460811a1cf5f29915"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a cryptographically random string capable of being used as a filename. Essentially random_fill() + to_hex_string().  <a href="#a051e8deb72941b3460811a1cf5f29915">More...</a><br/></td></tr>
 <tr class="separator:a051e8deb72941b3460811a1cf5f29915"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a871ffc5e829c4006846d2e951e4d2780"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a871ffc5e829c4006846d2e951e4d2780"></a>
 large_page_allocation&#160;</td><td class="memItemRight" valign="bottom"><b>boost::afio::v2_xxx::utils::detail::calculate_large_page_allocation</b> (size_t bytes)</td></tr>

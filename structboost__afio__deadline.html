@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.3.1"/>
-<title>Boost.AFIO: include/boost/afio/afio.hpp Source File</title>
+<title>Boost.AFIO: boost_afio_deadline Struct Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -48,8 +48,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
       <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
-      <li><a href="annotated.html"><span>Classes</span></a></li>
-      <li class="current"><a href="files.html"><span>Files</span></a></li>
+      <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
+      <li><a href="files.html"><span>Files</span></a></li>
       <li>
         <div id="MSearchBox" class="MSearchBoxInactive">
         <span class="left">
@@ -70,8 +70,10 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   </div>
   <div id="navrow2" class="tabs2">
     <ul class="tablist">
-      <li><a href="files.html"><span>File&#160;List</span></a></li>
-      <li><a href="globals.html"><span>File&#160;Members</span></a></li>
+      <li><a href="annotated.html"><span>Class&#160;List</span></a></li>
+      <li><a href="classes.html"><span>Class&#160;Index</span></a></li>
+      <li><a href="hierarchy.html"><span>Class&#160;Hierarchy</span></a></li>
+      <li><a href="functions.html"><span>Class&#160;Members</span></a></li>
     </ul>
   </div>
 </div><!-- top -->
@@ -86,7 +88,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   </div>
 </div>
 <script type="text/javascript">
-$(document).ready(function(){initNavTree('afio_8hpp_source.html','');});
+$(document).ready(function(){initNavTree('structboost__afio__deadline.html','');});
 </script>
 <div id="doc-content">
 <!-- window showing the filter options -->
@@ -104,34 +106,40 @@ $(document).ready(function(){initNavTree('afio_8hpp_source.html','');});
 </div>
 
 <div class="header">
+  <div class="summary">
+<a href="#pub-attribs">Public Attributes</a> &#124;
+<a href="structboost__afio__deadline-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">afio.hpp</div>  </div>
+<div class="title">boost_afio_deadline Struct Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<a href="afio_8hpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;</div>
-<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="version_8hpp.html" title="Controls the version of AFIO for cmake, shared library and C++ namespace mangling.">version.hpp</a>&quot;</span></div>
-<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;</div>
-<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#if defined(_MSC_VER) &amp;&amp; !defined(__clang__)</span></div>
-<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define BOOST_AFIO_HEADERS_PATH2 BOOST_AFIO_VERSION_GLUE(v, BOOST_AFIO_HEADERS_VERSION, /afio.hpp)</span></div>
-<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#else</span></div>
-<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define BOOST_AFIO_HEADERS_PATH2 BOOST_AFIO_VERSION_GLUE(v, BOOST_AFIO_HEADERS_VERSION,)/afio.hpp</span></div>
-<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="preprocessor">#define BOOST_AFIO_HEADERS_PATH4(a) #a</span></div>
-<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define BOOST_AFIO_HEADERS_PATH3(a) BOOST_AFIO_HEADERS_PATH4(a)</span></div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l00013"></a><span class="lineno"><a class="code" href="afio_8hpp.html#a473fa3392c54bdef2ab8e4f1b8140446">   13</a></span>&#160;<span class="preprocessor">#define BOOST_AFIO_HEADERS_PATH BOOST_AFIO_HEADERS_PATH3(BOOST_AFIO_HEADERS_PATH2)</span></div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#include BOOST_AFIO_HEADERS_PATH</span></div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#undef BOOST_AFIO_HEADERS_PATH</span></div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#undef BOOST_AFIO_HEADERS_PATH2</span></div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#undef BOOST_AFIO_HEADERS_PATH3</span></div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#undef BOOST_AFIO_HEADERS_PATH4</span></div>
-</div><!-- fragment --></div><!-- contents -->
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
+Public Attributes</h2></td></tr>
+<tr class="memitem:a6ae7a549b4b836797531e5f9e097d12e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6ae7a549b4b836797531e5f9e097d12e"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structboost__afio__deadline.html#a6ae7a549b4b836797531e5f9e097d12e">steady</a></td></tr>
+<tr class="memdesc:a6ae7a549b4b836797531e5f9e097d12e"><td class="mdescLeft">&#160;</td><td class="mdescRight">True if deadline does not change with system clock changes. <br/></td></tr>
+<tr class="separator:a6ae7a549b4b836797531e5f9e097d12e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a820c895ecf9b4c24a8152a77e6840053"><td class="memItemLeft" ><a class="anchor" id="a820c895ecf9b4c24a8152a77e6840053"></a>
+union {</td></tr>
+<tr class="memitem:abd1bcfd518eaca7ad15dd863bcf9f5a6"><td class="memItemLeft" >&#160;&#160;&#160;struct timespec&#160;&#160;&#160;<a class="el" href="structboost__afio__deadline.html#a014b8dde909e5a8674952f8b7f01b796">utc</a></td></tr>
+<tr class="memdesc:abd1bcfd518eaca7ad15dd863bcf9f5a6"><td class="mdescLeft">&#160;</td><td class="mdescRight">System time from timespec_get(&amp;ts, TIME_UTC) <br/></td></tr>
+<tr class="separator:abd1bcfd518eaca7ad15dd863bcf9f5a6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aef214d8595211161a57f14951f9f2d31"><td class="memItemLeft" >&#160;&#160;&#160;unsigned long long&#160;&#160;&#160;<a class="el" href="structboost__afio__deadline.html#a4e661a7cd71b9995e85cbbc0e0741ab1">nsecs</a></td></tr>
+<tr class="memdesc:aef214d8595211161a57f14951f9f2d31"><td class="mdescLeft">&#160;</td><td class="mdescRight">Nanosecond ticks from start of operation. <br/></td></tr>
+<tr class="separator:aef214d8595211161a57f14951f9f2d31"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a820c895ecf9b4c24a8152a77e6840053"><td class="memItemLeft" valign="top">};&#160;</td><td class="memItemRight" valign="bottom"></td></tr>
+<tr class="separator:a820c895ecf9b4c24a8152a77e6840053"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<hr/>The documentation for this struct was generated from the following file:<ul>
+<li>include/boost/afio/v2.0/<a class="el" href="deadline_8h.html">deadline.h</a></li>
+</ul>
+</div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="dir_d44c64559bbebec7f509842c48db8b23.html">include</a></li><li class="navelem"><a class="el" href="dir_1878a3f4746a95c6aad317458cc7ef80.html">boost</a></li><li class="navelem"><a class="el" href="dir_ab196a265b6af1574b3a29b000b1d247.html">afio</a></li><li class="navelem"><a class="el" href="afio_8hpp.html">afio.hpp</a></li>
+    <li class="navelem"><a class="el" href="structboost__afio__deadline.html">boost_afio_deadline</a></li>
     <li class="footer">Generated by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.3.1 </li>

@@ -18,7 +18,7 @@ var searchData=
   ['statfs_2ehpp',['statfs.hpp',['../statfs_8hpp.html',1,'']]],
   ['statfs_5ft',['statfs_t',['../structboost_1_1afio_1_1v2__xxx_1_1statfs__t.html#a95cd6253c6046b469f2f0a8917e75fc9',1,'boost::afio::v2_xxx::statfs_t::statfs_t()'],['../structboost_1_1afio_1_1v2__xxx_1_1statfs__t.html#ababa5fcbf4999803f718a7b1b86d0b2c',1,'boost::afio::v2_xxx::statfs_t::statfs_t(handle &amp;h, want wanted=want::all)']]],
   ['statfs_5ft',['statfs_t',['../structboost_1_1afio_1_1v2__xxx_1_1statfs__t.html',1,'boost::afio::v2_xxx']]],
-  ['steady',['steady',['../structboost_1_1afio_1_1v2__xxx_1_1deadline.html#af3df7933d7f4707c55af6e839d83defe',1,'boost::afio::v2_xxx::deadline']]],
+  ['steady',['steady',['../structboost__afio__deadline.html#a6ae7a549b4b836797531e5f9e097d12e',1,'boost_afio_deadline']]],
   ['storage_5fprofile',['storage_profile',['../structboost_1_1afio_1_1v2__xxx_1_1storage__profile_1_1storage__profile.html',1,'boost::afio::v2_xxx::storage_profile']]],
   ['storage_5fprofile_2ehpp',['storage_profile.hpp',['../storage__profile_8hpp.html',1,'']]],
   ['storage_5ftypes',['storage_types',['../namespaceboost_1_1afio_1_1v2__xxx_1_1storage__profile.html#a43d0087c67bc947f806b0132c43f05f4',1,'boost::afio::v2_xxx::storage_profile']]],

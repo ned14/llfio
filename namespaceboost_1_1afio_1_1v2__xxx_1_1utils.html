@@ -147,13 +147,13 @@ template&lt;class T &gt; </td></tr>
 <tr class="memdesc:ae63332cddaecd2a30b839856c7d5fe0e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the page sizes of this architecture which is useful for calculating direct i/o multiples.  <a href="#ae63332cddaecd2a30b839856c7d5fe0e">More...</a><br/></td></tr>
 <tr class="separator:ae63332cddaecd2a30b839856c7d5fe0e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a372dccddba2f36695a095dbe98474f1a"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceboost_1_1afio_1_1v2__xxx_1_1utils.html#a372dccddba2f36695a095dbe98474f1a">file_buffer_default_size</a> () noexcept</td></tr>
-<tr class="memdesc:a372dccddba2f36695a095dbe98474f1a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a reasonable default size for <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1utils_1_1page__allocator.html" title="An STL allocator which allocates large TLB page memory.If the operating system is configured to allow...">page_allocator</a>, typically the closest page size from <a class="el" href="namespaceboost_1_1afio_1_1v2__xxx_1_1utils.html#ae63332cddaecd2a30b839856c7d5fe0e" title="Returns the page sizes of this architecture which is useful for calculating direct i/o multiples...">page_sizes()</a> to 1Mb.  <a href="#a372dccddba2f36695a095dbe98474f1a">More...</a><br/></td></tr>
+<tr class="memdesc:a372dccddba2f36695a095dbe98474f1a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a reasonable default size for page_allocator, typically the closest page size from page_sizes() to 1Mb.  <a href="#a372dccddba2f36695a095dbe98474f1a">More...</a><br/></td></tr>
 <tr class="separator:a372dccddba2f36695a095dbe98474f1a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac7b89428cdd460548bd9a645a6565df4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceboost_1_1afio_1_1v2__xxx_1_1utils.html#ac7b89428cdd460548bd9a645a6565df4">random_fill</a> (char *buffer, size_t bytes)</td></tr>
 <tr class="memdesc:ac7b89428cdd460548bd9a645a6565df4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fills the buffer supplied with cryptographically strong randomness. Uses the OS kernel API.  <a href="#ac7b89428cdd460548bd9a645a6565df4">More...</a><br/></td></tr>
 <tr class="separator:ac7b89428cdd460548bd9a645a6565df4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a051e8deb72941b3460811a1cf5f29915"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceboost_1_1afio_1_1v2__xxx_1_1utils.html#a051e8deb72941b3460811a1cf5f29915">random_string</a> (size_t randomlen)</td></tr>
-<tr class="memdesc:a051e8deb72941b3460811a1cf5f29915"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a cryptographically random string capable of being used as a filename. Essentially <a class="el" href="namespaceboost_1_1afio_1_1v2__xxx_1_1utils.html#ac7b89428cdd460548bd9a645a6565df4" title="Fills the buffer supplied with cryptographically strong randomness. Uses the OS kernel API...">random_fill()</a> + to_hex_string().  <a href="#a051e8deb72941b3460811a1cf5f29915">More...</a><br/></td></tr>
+<tr class="memdesc:a051e8deb72941b3460811a1cf5f29915"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a cryptographically random string capable of being used as a filename. Essentially random_fill() + to_hex_string().  <a href="#a051e8deb72941b3460811a1cf5f29915">More...</a><br/></td></tr>
 <tr class="separator:a051e8deb72941b3460811a1cf5f29915"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2c5271d7226a6ba7a59c8c3c476c5442"><td class="memTemplParams" colspan="2"><a class="anchor" id="a2c5271d7226a6ba7a59c8c3c476c5442"></a>
 template&lt;class T , class U &gt; </td></tr>
@@ -184,7 +184,7 @@ template&lt;class T , class U &gt; </td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Returns a reasonable default size for <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1utils_1_1page__allocator.html" title="An STL allocator which allocates large TLB page memory.If the operating system is configured to allow...">page_allocator</a>, typically the closest page size from <a class="el" href="namespaceboost_1_1afio_1_1v2__xxx_1_1utils.html#ae63332cddaecd2a30b839856c7d5fe0e" title="Returns the page sizes of this architecture which is useful for calculating direct i/o multiples...">page_sizes()</a> to 1Mb. </p>
+<p>Returns a reasonable default size for page_allocator, typically the closest page size from page_sizes() to 1Mb. </p>
 <dl class="section return"><dt>Returns</dt><dd>A value of a TLB large page size close to 1Mb.</dd></dl>
 <dl class="section user"><dt>Complexity</dt><dd>Whatever the system API takes (one would hope constant time). </dd></dl>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any error from the operating system or std::bad_alloc. </dd></dl>
@@ -336,7 +336,7 @@ template&lt;class T , class U &gt; </td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Returns a cryptographically random string capable of being used as a filename. Essentially <a class="el" href="namespaceboost_1_1afio_1_1v2__xxx_1_1utils.html#ac7b89428cdd460548bd9a645a6565df4" title="Fills the buffer supplied with cryptographically strong randomness. Uses the OS kernel API...">random_fill()</a> + to_hex_string(). </p>
+<p>Returns a cryptographically random string capable of being used as a filename. Essentially random_fill() + to_hex_string(). </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">randomlen</td><td>The number of bytes of randomness to use for the string. </td></tr>

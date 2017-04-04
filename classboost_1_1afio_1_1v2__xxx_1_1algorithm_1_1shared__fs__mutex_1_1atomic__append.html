@@ -120,7 +120,7 @@ $(document).ready(function(){initNavTree('classboost_1_1afio_1_1v2__xxx_1_1algor
 <p>Scalable many entity shared/exclusive file system based lock.  
  <a href="classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1atomic__append.html#details">More...</a></p>
 
-<p><code>#include &lt;<a class="el" href="atomic__append_8hpp_source.html">atomic_append.hpp</a>&gt;</code></p>
+<p><code>#include &quot;atomic_append.hpp&quot;</code></p>
 <div class="dynheader">
 Inheritance diagram for boost::afio::v2_xxx::algorithm::shared_fs_mutex::atomic_append:</div>
 <div class="dyncontent">
@@ -175,14 +175,14 @@ template&lt;typename T &gt; </td></tr>
 <tr class="separator:a493872c8b5dbfa83fdf82242b928e112"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a50848058867ee3533b812378aff20b03"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a50848058867ee3533b812378aff20b03"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex.html#a50848058867ee3533b812378aff20b03">fill_random_entities</a> (span&lt; <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1atomic__append.html#a0077428ce79aeba4e529024de8fb2664">entity_type</a> &gt; seq, bool exclusive=true) noexcept</td></tr>
-<tr class="memdesc:a50848058867ee3533b812378aff20b03"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fills a sequence of entity ids with cryptographic randomness. Much faster than calling <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex.html#a493872c8b5dbfa83fdf82242b928e112" title="Generates a cryptographically random entity id.">random_entity()</a> individually. <br/></td></tr>
+<tr class="memdesc:a50848058867ee3533b812378aff20b03"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fills a sequence of entity ids with cryptographic randomness. Much faster than calling random_entity() individually. <br/></td></tr>
 <tr class="separator:a50848058867ee3533b812378aff20b03"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a19fafd3b1f9a098c9e60212e7ba97e32"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a19fafd3b1f9a098c9e60212e7ba97e32"></a>
-<a class="el" href="namespaceboost_1_1afio_1_1v2__xxx.html#ac8d06ecaa9660e7251c1251d88c1305c">result</a>&lt; <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex_1_1entities__guard.html">entities_guard</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex.html#a19fafd3b1f9a098c9e60212e7ba97e32">lock</a> (<a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1atomic__append.html#a7f7a092579354a2189a1b541d1993557">entities_type</a> entities, <a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1deadline.html">deadline</a>(), bool spin_not_sleep=false) noexcept</td></tr>
+<a class="el" href="namespaceboost_1_1afio_1_1v2__xxx.html#ac8d06ecaa9660e7251c1251d88c1305c">result</a>&lt; <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex_1_1entities__guard.html">entities_guard</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex.html#a19fafd3b1f9a098c9e60212e7ba97e32">lock</a> (<a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1atomic__append.html#a7f7a092579354a2189a1b541d1993557">entities_type</a> entities, <a class="el" href="structdeadline.html">deadline</a> d=<a class="el" href="structdeadline.html">deadline</a>(), bool spin_not_sleep=false) noexcept</td></tr>
 <tr class="memdesc:a19fafd3b1f9a098c9e60212e7ba97e32"><td class="mdescLeft">&#160;</td><td class="mdescRight">Lock all of a sequence of entities for exclusive or shared access. <br/></td></tr>
 <tr class="separator:a19fafd3b1f9a098c9e60212e7ba97e32"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ade23c2f167c550c66fa5522ad3e27b7e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ade23c2f167c550c66fa5522ad3e27b7e"></a>
-<a class="el" href="namespaceboost_1_1afio_1_1v2__xxx.html#ac8d06ecaa9660e7251c1251d88c1305c">result</a>&lt; <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex_1_1entities__guard.html">entities_guard</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex.html#ade23c2f167c550c66fa5522ad3e27b7e">lock</a> (<a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1atomic__append.html#a0077428ce79aeba4e529024de8fb2664">entity_type</a> entity, <a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1deadline.html">deadline</a>(), bool spin_not_sleep=false) noexcept</td></tr>
+<a class="el" href="namespaceboost_1_1afio_1_1v2__xxx.html#ac8d06ecaa9660e7251c1251d88c1305c">result</a>&lt; <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex_1_1entities__guard.html">entities_guard</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex.html#ade23c2f167c550c66fa5522ad3e27b7e">lock</a> (<a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1atomic__append.html#a0077428ce79aeba4e529024de8fb2664">entity_type</a> entity, <a class="el" href="structdeadline.html">deadline</a> d=<a class="el" href="structdeadline.html">deadline</a>(), bool spin_not_sleep=false) noexcept</td></tr>
 <tr class="memdesc:ade23c2f167c550c66fa5522ad3e27b7e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Lock a single entity for exclusive or shared access. <br/></td></tr>
 <tr class="separator:ade23c2f167c550c66fa5522ad3e27b7e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a851d41aee26d0d58cc7e6371724dfd80"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a851d41aee26d0d58cc7e6371724dfd80"></a>
@@ -201,7 +201,7 @@ Static Public Member Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
-<tr class="memitem:a4c16831d072f5e2ec9a33532b6764616"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespaceboost_1_1afio_1_1v2__xxx.html#ac8d06ecaa9660e7251c1251d88c1305c">result</a>&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1atomic__append.html#a4c16831d072f5e2ec9a33532b6764616">_lock</a> (<a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex_1_1entities__guard.html">entities_guard</a> &amp;out, <a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1deadline.html">deadline</a> d, bool spin_not_sleep) noexceptoverridefinal</td></tr>
+<tr class="memitem:a4c16831d072f5e2ec9a33532b6764616"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespaceboost_1_1afio_1_1v2__xxx.html#ac8d06ecaa9660e7251c1251d88c1305c">result</a>&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1atomic__append.html#a4c16831d072f5e2ec9a33532b6764616">_lock</a> (<a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex_1_1entities__guard.html">entities_guard</a> &amp;out, <a class="el" href="structdeadline.html">deadline</a> d, bool spin_not_sleep) noexceptoverridefinal</td></tr>
 <tr class="separator:a4c16831d072f5e2ec9a33532b6764616"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -216,12 +216,12 @@ Protected Member Functions</h2></td></tr>
 </ul>
 <p>Caveats:</p>
 <ul>
-<li>Much slower than <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1byte__ranges.html" title="Many entity shared/exclusive file system based lock.">byte_ranges</a> for few waiters or small number of entities.</li>
+<li>Much slower than byte_ranges for few waiters or small number of entities.</li>
 <li>Sudden process exit with locks held will deadlock all other users.</li>
 <li>Maximum of twelve entities may be locked concurrently.</li>
-<li>Wasteful of disk space if used on a non-extents based filing system (e.g. FAT32, ext3). It is best used in <code>/tmp</code> if possible (<code><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1file__handle.html#ae614d4ecdef1dd817056f9ada1e5111f">file_handle::temp_file()</a></code>). If you really must use a non-extents based filing system, destroy and recreate the object instance periodically to force resetting the lock file's length to zero.</li>
+<li>Wasteful of disk space if used on a non-extents based filing system (e.g. FAT32, ext3). It is best used in <code>/tmp</code> if possible (<code>file_handle::temp_file()</code>). If you really must use a non-extents based filing system, destroy and recreate the object instance periodically to force resetting the lock file's length to zero.</li>
 <li>Similarly older operating systems (e.g. Linux &lt; 3.0) do not implement extent hole punching and therefore will also see excessive disk space consumption. Note at the time of writing OS X doesn't implement hole punching at all.</li>
-<li>If your OS doesn't have sane byte range locks (OS X, BSD, older Linuxes) and multiple objects in your process use the same lock file, misoperation will occur. Use <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1lock__files.html" title="Many entity exclusive compatibility file system based lock.">lock_files</a> instead.</li>
+<li>If your OS doesn't have sane byte range locks (OS X, BSD, older Linuxes) and multiple objects in your process use the same lock file, misoperation will occur. Use lock_files instead.</li>
 </ul>
 <dl class="todo"><dt><b><a class="el" href="todo.html#_todo000005">Todo:</a></b></dt><dd><p class="startdd">Implement hole punching once I port that code from AFIO v1. </p>
 <p>Decide on some resolution mechanism for sudden process exit. </p>
@@ -244,7 +244,7 @@ Protected Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1deadline.html">deadline</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="structdeadline.html">deadline</a>&#160;</td>
           <td class="paramname"><em>d</em>, </td>
         </tr>
         <tr>
@@ -296,7 +296,7 @@ Protected Member Functions</h2></td></tr>
 <div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;        <span class="keywordflow">if</span>(!_skip_hashing)</div>
 <div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;          lock_request.hash = boost_lite::algorithm::hash::fast_hash::hash(((<span class="keywordtype">char</span> *) &amp;lock_request) + 16, <span class="keyword">sizeof</span>(lock_request) - 16);</div>
 <div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;        <span class="comment">// My lock request will be the file&#39;s current length or higher</span></div>
-<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;        BOOST_OUTCOME_FILTER_ERROR(my_lock_request_offset, _h.<a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1file__handle.html#a6e4524b6bd5de76631bcc7ab68bab7bd">length</a>());</div>
+<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;        BOOST_OUTCOME_TRY(my_lock_request_offset, _h.<a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1file__handle.html#a6e4524b6bd5de76631bcc7ab68bab7bd">length</a>());</div>
 <div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;        {</div>
 <div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;          _h.<a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html#adf964e787e0666fc5b7d94c2715ee6f5">set_append_only</a>(<span class="keyword">true</span>);</div>
 <div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;          <span class="keyword">auto</span> undo = undoer([<span class="keyword">this</span>] { _h.<a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html#adf964e787e0666fc5b7d94c2715ee6f5">set_append_only</a>(<span class="keyword">false</span>); });</div>
@@ -306,10 +306,10 @@ Protected Member Functions</h2></td></tr>
 <div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;            file_handle::extent_type lastbyte = (file_handle::extent_type) -1;</div>
 <div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;            <span class="comment">// Lock up to the beginning of the shadow lock space</span></div>
 <div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;            lastbyte &amp;= ~(1ULL &lt;&lt; 63);</div>
-<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;            BOOST_OUTCOME_FILTER_ERROR(append_guard_, _h.<a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#aebd9c90a901e6364c94d466425db6e0f" title="Tries to lock the range of bytes specified for shared or exclusive access. Be aware this passes throu...">lock</a>(my_lock_request_offset, lastbyte, <span class="keyword">true</span>));</div>
+<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;            BOOST_OUTCOME_TRY(append_guard_, _h.<a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#aebd9c90a901e6364c94d466425db6e0f" title="Tries to lock the range of bytes specified for shared or exclusive access. Be aware this passes throu...">lock</a>(my_lock_request_offset, lastbyte, <span class="keyword">true</span>));</div>
 <div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;            append_guard = std::move(append_guard_);</div>
 <div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;          }</div>
-<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;          BOOST_OUTCOME_FILTER_ERROR(_, _h.<a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a8890b6a6046fb562f9f0ab943b79dfb4" title="Write data to the open handle.">write</a>(0, (<span class="keywordtype">char</span> *) &amp;lock_request, <span class="keyword">sizeof</span>(lock_request)));</div>
+<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;          BOOST_OUTCOME_TRY(_, _h.<a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a8890b6a6046fb562f9f0ab943b79dfb4" title="Write data to the open handle.">write</a>(0, (<span class="keywordtype">char</span> *) &amp;lock_request, <span class="keyword">sizeof</span>(lock_request)));</div>
 <div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;          (void) _;</div>
 <div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;        }</div>
 <div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;</div>
@@ -317,7 +317,9 @@ Protected Member Functions</h2></td></tr>
 <div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;        alignas(64) char _buffer[4096 + 2048];  <span class="comment">// 6Kb cache line aligned buffer</span></div>
 <div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;        <span class="comment">// Read onwards from length as reported before I wrote my lock request</span></div>
 <div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;        <span class="comment">// until I find my lock request. This loop should never actually iterate</span></div>
-<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;        <span class="comment">// except under extreme load conditions.</span></div>
+<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;        <span class="comment">// except under extreme load conditions.</span><span class="comment"></span></div>
+<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;<span class="comment">        //! \todo Read from header.last_known_good immediately if possible in order</span></div>
+<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;<span class="comment">        //! to avoid a duplicate read later</span></div>
 <div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;<span class="comment"></span>        for(;;)</div>
 <div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;        {</div>
 <div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;          file_handle::io_result&lt;file_handle::buffer_type&gt; readoutcome = _h.<a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#ab371d8427aeb4bd0ca5f8a39a98ea5a2" title="Read data from the open handle.">read</a>(my_lock_request_offset, _buffer, <span class="keyword">sizeof</span>(_buffer));</div>
@@ -345,7 +347,7 @@ Protected Member Functions</h2></td></tr>
 <div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;          <span class="keyword">auto</span> lock_offset = my_lock_request_offset;</div>
 <div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;          <span class="comment">// Set the top bit to use the shadow lock space on Windows</span></div>
 <div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;          lock_offset |= (1ULL &lt;&lt; 63);</div>
-<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;          BOOST_OUTCOME_FILTER_ERROR(my_request_guard_, _h.<a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#aebd9c90a901e6364c94d466425db6e0f" title="Tries to lock the range of bytes specified for shared or exclusive access. Be aware this passes throu...">lock</a>(lock_offset, <span class="keyword">sizeof</span>(lock_request), <span class="keyword">true</span>));</div>
+<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;          BOOST_OUTCOME_TRY(my_request_guard_, _h.<a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#aebd9c90a901e6364c94d466425db6e0f" title="Tries to lock the range of bytes specified for shared or exclusive access. Be aware this passes throu...">lock</a>(lock_offset, <span class="keyword">sizeof</span>(lock_request), <span class="keyword">true</span>));</div>
 <div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;          my_request_guard = std::move(my_request_guard_);</div>
 <div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;        }</div>
 <div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;</div>
@@ -369,7 +371,7 @@ Protected Member Functions</h2></td></tr>
 <div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;            start_offset = _header.first_known_good;</div>
 <div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;          assert(record_offset &gt;= start_offset);</div>
 <div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;          assert(record_offset - start_offset &lt;= <span class="keyword">sizeof</span>(_buffer));</div>
-<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;          BOOST_OUTCOME_FILTER_ERROR(batchread, _h.<a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#ab371d8427aeb4bd0ca5f8a39a98ea5a2" title="Read data from the open handle.">read</a>(start_offset, _buffer, (<span class="keywordtype">size_t</span>)(record_offset - start_offset) + <span class="keyword">sizeof</span>(atomic_append_detail::lock_request)));</div>
+<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;          BOOST_OUTCOME_TRY(batchread, _h.<a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#ab371d8427aeb4bd0ca5f8a39a98ea5a2" title="Read data from the open handle.">read</a>(start_offset, _buffer, (<span class="keywordtype">size_t</span>)(record_offset - start_offset) + <span class="keyword">sizeof</span>(atomic_append_detail::lock_request)));</div>
 <div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;          assert(batchread.second == record_offset - start_offset + <span class="keyword">sizeof</span>(atomic_append_detail::lock_request));</div>
 <div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;          <span class="keyword">const</span> atomic_append_detail::lock_request *record = (atomic_append_detail::lock_request *) (batchread.first + batchread.second - <span class="keyword">sizeof</span>(atomic_append_detail::lock_request));</div>
 <div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;          <span class="keyword">const</span> atomic_append_detail::lock_request *firstrecord = (atomic_append_detail::lock_request *) batchread.first;</div>
@@ -415,7 +417,7 @@ Protected Member Functions</h2></td></tr>
 <div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;          stl11::this_thread::yield();</div>
 <div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;          <span class="keywordflow">if</span>(!spin_not_sleep)</div>
 <div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;          {</div>
-<div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;            deadline nd;</div>
+<div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;            <a class="code" href="structdeadline.html" title="A time deadline in either relative-to-now or absolute (system clock) terms.">deadline</a> nd;</div>
 <div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;            <span class="keywordflow">if</span>(d)</div>
 <div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;            {</div>
 <div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;              <span class="keywordflow">if</span>((d).steady)</div>
@@ -432,7 +434,7 @@ Protected Member Functions</h2></td></tr>
 <div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;            <span class="keyword">auto</span> lock_offset = record_offset;</div>
 <div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;            <span class="comment">// Set the top bit to use the shadow lock space on Windows</span></div>
 <div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;            lock_offset |= (1ULL &lt;&lt; 63);</div>
-<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;            BOOST_OUTCOME_FILTER_ERROR(record_guard_, _h.<a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#aebd9c90a901e6364c94d466425db6e0f" title="Tries to lock the range of bytes specified for shared or exclusive access. Be aware this passes throu...">lock</a>(lock_offset, <span class="keyword">sizeof</span>(record), <span class="keyword">false</span>, nd));</div>
+<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;            BOOST_OUTCOME_TRY(record_guard_, _h.<a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#aebd9c90a901e6364c94d466425db6e0f" title="Tries to lock the range of bytes specified for shared or exclusive access. Be aware this passes throu...">lock</a>(lock_offset, <span class="keyword">sizeof</span>(record), <span class="keyword">false</span>, nd));</div>
 <div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;          }</div>
 <div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;          <span class="comment">// Make sure we haven&#39;t timed out during this wait</span></div>
 <div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;          <span class="keywordflow">if</span>(d)</div>
@@ -492,7 +494,7 @@ Protected Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 <p>Initialises a shared filing system mutex using the file at <em>lockfile</em> </p>
-<dl class="section return"><dt>Returns</dt><dd>An implementation of <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex.html" title="Abstract base class for an object which protects shared filing system resources.">shared_fs_mutex</a> using the <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1atomic__append.html" title="Scalable many entity shared/exclusive file system based lock.">atomic_append</a> algorithm. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>An implementation of shared_fs_mutex using the atomic_append algorithm. </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">lockfile</td><td>The path to the file to use for IPC. </td></tr>
@@ -504,11 +506,12 @@ Protected Member Functions</h2></td></tr>
 <dl class="todo"><dt><b><a class="el" href="todo.html#_todo000006">Todo:</a></b></dt><dd>fs_mutex_append needs to check if file still exists after lock is granted, awaiting path fetching. </dd></dl>
 <div class="fragment"><div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;      {</div>
 <div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;        BOOST_AFIO_LOG_FUNCTION_CALL(0);</div>
-<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;        BOOST_OUTCOME_FILTER_ERROR(ret, <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1file__handle.html#af912595f8964b78186236a2cec1150a4">file_handle::file</a>(std::move(lockfile), file_handle::mode::write, file_handle::creation::if_needed, file_handle::caching::temporary));</div>
+<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;        BOOST_OUTCOME_TRY(ret, <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1file__handle.html#af912595f8964b78186236a2cec1150a4">file_handle::file</a>(std::move(lockfile), file_handle::mode::write, file_handle::creation::if_needed, file_handle::caching::temporary));</div>
 <div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;        atomic_append_detail::header header;</div>
 <div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;        <span class="comment">// Lock the entire header for exclusive access</span></div>
-<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;        <span class="keyword">auto</span> lockresult = ret.try_lock(0, <span class="keyword">sizeof</span>(header), <span class="keyword">true</span>);</div>
-<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;        <span class="keywordflow">if</span>(lockresult.has_error())</div>
+<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;        <span class="keyword">auto</span> lockresult = ret.try_lock(0, <span class="keyword">sizeof</span>(header), <span class="keyword">true</span>);<span class="comment"></span></div>
+<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;<span class="comment">        //! \todo fs_mutex_append needs to check if file still exists after lock is granted, awaiting path fetching.</span></div>
+<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;<span class="comment"></span>        <span class="keywordflow">if</span>(lockresult.has_error())</div>
 <div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;        {</div>
 <div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;          <span class="keywordflow">if</span>(lockresult.get_error().value() != ETIMEDOUT)</div>
 <div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;            <span class="keywordflow">return</span> lockresult.get_error();</div>
@@ -524,11 +527,11 @@ Protected Member Functions</h2></td></tr>
 <div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;          header.first_after_hole_punch = <span class="keyword">sizeof</span>(header);</div>
 <div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;          <span class="keywordflow">if</span>(!skip_hashing)</div>
 <div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;            header.hash = boost_lite::algorithm::hash::fast_hash::hash(((<span class="keywordtype">char</span> *) &amp;header) + 16, <span class="keyword">sizeof</span>(header) - 16);</div>
-<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;          BOOST_OUTCOME_FILTER_ERROR(_, ret.write(0, (<span class="keywordtype">char</span> *) &amp;header, <span class="keyword">sizeof</span>(header)));</div>
+<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;          BOOST_OUTCOME_TRY(_, ret.write(0, (<span class="keywordtype">char</span> *) &amp;header, <span class="keyword">sizeof</span>(header)));</div>
 <div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;          (void) _;</div>
 <div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;        }</div>
 <div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;        <span class="comment">// Open a shared lock on last byte in header to prevent other users zomping the file</span></div>
-<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;        BOOST_OUTCOME_FILTER_ERROR(guard, ret.lock(<span class="keyword">sizeof</span>(header) - 1, 1, <span class="keyword">false</span>));</div>
+<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;        BOOST_OUTCOME_TRY(guard, ret.lock(<span class="keyword">sizeof</span>(header) - 1, 1, <span class="keyword">false</span>));</div>
 <div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;        <span class="comment">// Unlock any exclusive lock I gained earlier now</span></div>
 <div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;        <span class="keywordflow">if</span>(lockresult)</div>
 <div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;          lockresult.get().unlock();</div>
@@ -539,7 +542,7 @@ Protected Member Functions</h2></td></tr>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>include/boost/afio/v2.0/algorithm/shared_fs_mutex/<a class="el" href="atomic__append_8hpp_source.html">atomic_append.hpp</a></li>
+<li>include/boost/afio/v2.0/algorithm/shared_fs_mutex/<a class="el" href="atomic__append_8hpp.html">atomic_append.hpp</a></li>
 </ul>
 </div><!-- contents -->
 </div><!-- doc-content -->
