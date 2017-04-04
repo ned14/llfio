@@ -359,7 +359,7 @@ file_handle::io_result<file_handle::buffers_type> file_handle::read(file_handle:
 {
   io_result<buffers_type> ret;
   auto _io_state(_begin_io(operation_t::read, std::move(reqs), [&ret](auto *state) { ret = std::move(state->result); }, nullptr));
-  BOOST_OUTCOME_FILTER_ERROR(io_state, _io_state);
+  BOOST_OUTCOME_TRY(io_state, _io_state);
 
   // While i/o is not done pump i/o completion
   while(!ret.is_ready())
@@ -383,7 +383,7 @@ file_handle::io_result<file_handle::const_buffers_type> file_handle::write(file_
 {
   io_result<const_buffers_type> ret;
   auto _io_state(_begin_io(operation_t::write, std::move(reqs), [&ret](auto *state) { ret = std::move(state->result); }, nullptr));
-  BOOST_OUTCOME_FILTER_ERROR(io_state, _io_state);
+  BOOST_OUTCOME_TRY(io_state, _io_state);
 
   // While i/o is not done pump i/o completion
   while(!ret.is_ready())

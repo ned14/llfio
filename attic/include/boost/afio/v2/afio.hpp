@@ -6017,7 +6017,7 @@ namespace utils
     }
   public:
     //! Constructs an instance, configuring the necessary lookup tables
-    BOOST_CXX14_CONSTEXPR secded_ecc()
+    BOOSTLITE_CONSTEXPR secded_ecc()
     {
       for(size_t n=0; n<sizeof(result_type)*bits_per_byte; n++)
         ecc_twospowers[n]=((result_type)1<<n);

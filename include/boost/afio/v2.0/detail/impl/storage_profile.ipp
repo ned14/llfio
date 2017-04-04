@@ -194,9 +194,9 @@ namespace storage_profile
         {
           size_t chunksize = 256 * 1024 * 1024;
 #ifdef WIN32
-          BOOST_OUTCOME_PROPAGATE_ERROR(windows::_mem(sp, h));
+          BOOST_OUTCOME_TRYV(windows::_mem(sp, h));
 #else
-          BOOST_OUTCOME_PROPAGATE_ERROR(posix::_mem(sp, h));
+          BOOST_OUTCOME_TRYV(posix::_mem(sp, h));
 #endif
 
           if(sp.mem_quantity.value / 4 < chunksize)
@@ -239,7 +239,7 @@ namespace storage_profile
         mem_max_bandwidth = sp.mem_max_bandwidth.value;
         mem_min_bandwidth = sp.mem_min_bandwidth.value;
       }
-      return make_ready_outcome<void>();
+      return make_valued_outcome<void>();
     }
   }
   namespace storage
@@ -250,19 +250,19 @@ namespace storage_profile
       try
       {
         statfs_t fsinfo;
-        BOOST_OUTCOME_PROPAGATE_ERROR(fsinfo.fill(h, statfs_t::want::iosize | statfs_t::want::mntfromname | statfs_t::want::fstypename));
+        BOOST_OUTCOME_TRYV(fsinfo.fill(h, statfs_t::want::iosize | statfs_t::want::mntfromname | statfs_t::want::fstypename));
         sp.device_min_io_size.value = (unsigned) fsinfo.f_iosize;
 #ifdef WIN32
-        BOOST_OUTCOME_PROPAGATE_ERROR(windows::_device(sp, h, fsinfo.f_mntfromname, fsinfo.f_fstypename));
+        BOOST_OUTCOME_TRYV(windows::_device(sp, h, fsinfo.f_mntfromname, fsinfo.f_fstypename));
 #else
-        BOOST_OUTCOME_PROPAGATE_ERROR(posix::_device(sp, h, fsinfo.f_mntfromname, fsinfo.f_fstypename));
+        BOOST_OUTCOME_TRYV(posix::_device(sp, h, fsinfo.f_mntfromname, fsinfo.f_fstypename));
 #endif
       }
       catch(...)
       {
         return std::current_exception();
       }
-      return make_ready_outcome<void>();
+      return make_valued_outcome<void>();
     }
     // FS name, config, size, in use
     outcome<void> fs(storage_profile &sp, file_handle &h) noexcept
@@ -270,7 +270,7 @@ namespace storage_profile
       try
       {
         statfs_t fsinfo;
-        BOOST_OUTCOME_PROPAGATE_ERROR(fsinfo.fill(h));
+        BOOST_OUTCOME_TRYV(fsinfo.fill(h));
         sp.fs_name.value = fsinfo.f_fstypename;
         sp.fs_config.value = "todo";
         sp.fs_size.value = fsinfo.f_blocks * fsinfo.f_bsize;
@@ -280,7 +280,7 @@ namespace storage_profile
       {
         return std::current_exception();
       }
-      return make_ready_outcome<void>();
+      return make_valued_outcome<void>();
     }
   }
 
@@ -474,7 +474,7 @@ namespace storage_profile
               reader.join();
             sp.max_aligned_atomic_rewrite.value = max_aligned_atomic_rewrite;
             if(failed)
-              return make_ready_outcome<void>();
+              return make_valued_outcome<void>();
           }
         }
       }
@@ -482,7 +482,7 @@ namespace storage_profile
       {
         return std::current_exception();
       }
-      return make_ready_outcome<void>();
+      return make_valued_outcome<void>();
     }
 
     outcome<void> atomic_rewrite_offset_boundary(storage_profile &sp, file_handle &srch) noexcept
@@ -582,7 +582,7 @@ namespace storage_profile
                 reader.join();
               sp.atomic_rewrite_offset_boundary.value = atomic_rewrite_offset_boundary;
               if(failed)
-                return make_ready_outcome<void>();
+                return make_valued_outcome<void>();
             }
           }
         }
@@ -591,7 +591,7 @@ namespace storage_profile
       {
         return std::current_exception();
       }
-      return make_ready_outcome<void>();
+      return make_valued_outcome<void>();
     }
   }
 #ifdef _MSC_VER

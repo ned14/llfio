@@ -43,7 +43,7 @@ result<section_handle> section_handle::section(file_handle &backing, extent_type
   {
     if(backing.is_valid())
     {
-      BOOST_OUTCOME_FILTER_ERROR(length, backing.length());
+      BOOST_OUTCOME_TRY(length, backing.length());
       maximum_size = length;
     }
     else
@@ -156,7 +156,7 @@ result<void> map_handle::close() noexcept
   _v = native_handle_type();
   _addr = nullptr;
   _length = 0;
-  return make_ready_result<void>();
+  return make_valued_result<void>();
 }
 
 native_handle_type map_handle::release() noexcept
@@ -249,7 +249,7 @@ result<map_handle::buffer_type> map_handle::commit(buffer_type region, section_h
   DWORD prot = 0;
   if(_flag == section_handle::flag::none)
   {
-    BOOST_OUTCOME_FILTER_ERROR(_region, do_not_store(region));
+    BOOST_OUTCOME_TRY(_region, do_not_store(region));
     DWORD _ = 0;
     if(!VirtualProtect(_region.first, _region.second, PAGE_NOACCESS, &_))
       return make_errored_result<buffer_type>(GetLastError());
@@ -286,7 +286,7 @@ result<void> map_handle::zero(buffer_type region) noexcept
   //! \todo Once you implement file_handle::zero(), please implement map_handle::zero()
   // buffer_type page_region { (char *) utils::round_up_to_page_size((uintptr_t) region.first), utils::round_down_to_page_size(region.second); };
   memset(region.first, 0, region.second);
-  return make_ready_result<void>();
+  return make_valued_result<void>();
 }
 
 result<span<map_handle::buffer_type>> map_handle::prefetch(span<buffer_type> regions) noexcept

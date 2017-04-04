@@ -111,7 +111,7 @@ public:
   static BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<async_file_handle> async_file(io_service &service, path_type _path, mode _mode = mode::read, creation _creation = creation::open_existing, caching _caching = caching::all, flag flags = flag::none) noexcept
   {
     // Open it overlapped, otherwise no difference.
-    BOOST_OUTCOME_FILTER_ERROR(v, file_handle::file(std::move(_path), std::move(_mode), std::move(_creation), std::move(_caching), flags | flag::overlapped));
+    BOOST_OUTCOME_TRY(v, file_handle::file(std::move(_path), std::move(_mode), std::move(_creation), std::move(_caching), flags | flag::overlapped));
     async_file_handle ret(std::move(v));
     ret._service = &service;
     return std::move(ret);
@@ -141,7 +141,7 @@ public:
       } while(!ret);
       return ret;
     }
-    BOOST_OUTCOME_CATCH_EXCEPTION_TO_RESULT(async_file_handle)
+    BOOST_OUTCOME_CATCH_ALL_EXCEPTION_TO_RESULT
   }
   /*! Create an async file handle creating the named file on some path which
   the OS declares to be suitable for temporary files. Most OSs are
@@ -177,7 +177,7 @@ public:
   static BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<async_file_handle> async_temp_inode(io_service &service, path_type dirpath = fixme_temporary_files_directory(), mode _mode = mode::write, flag flags = flag::none) noexcept
   {
     // Open it overlapped, otherwise no difference.
-    BOOST_OUTCOME_FILTER_ERROR(v, file_handle::temp_inode(std::move(dirpath), std::move(_mode), flags | flag::overlapped));
+    BOOST_OUTCOME_TRY(v, file_handle::temp_inode(std::move(dirpath), std::move(_mode), flags | flag::overlapped));
     async_file_handle ret(std::move(v));
     ret._service = &service;
     return std::move(ret);

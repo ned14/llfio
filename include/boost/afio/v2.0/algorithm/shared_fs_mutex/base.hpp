@@ -87,7 +87,7 @@ namespace algorithm
         //! Default constructor
         constexpr entity_type() noexcept : _init(0) {}
         //! Constructor
-        BOOST_CXX14_CONSTEXPR entity_type(value_type _value, bool _exclusive) noexcept : _init(0)
+        BOOSTLITE_CONSTEXPR entity_type(value_type _value, bool _exclusive) noexcept : _init(0)
         {
           value = _value;
           exclusive = _exclusive;
@@ -200,14 +200,14 @@ namespace algorithm
       result<entities_guard> lock(entities_type entities, deadline d = deadline(), bool spin_not_sleep = false) noexcept
       {
         entities_guard ret(this, std::move(entities));
-        BOOST_OUTCOME_PROPAGATE_ERROR(_lock(ret, std::move(d), spin_not_sleep));
+        BOOST_OUTCOME_TRYV(_lock(ret, std::move(d), spin_not_sleep));
         return std::move(ret);
       }
       //! Lock a single entity for exclusive or shared access
       result<entities_guard> lock(entity_type entity, deadline d = deadline(), bool spin_not_sleep = false) noexcept
       {
         entities_guard ret(this, entity);
-        BOOST_OUTCOME_PROPAGATE_ERROR(_lock(ret, std::move(d), spin_not_sleep));
+        BOOST_OUTCOME_TRYV(_lock(ret, std::move(d), spin_not_sleep));
         return std::move(ret);
       }
       //! Try to lock all of a sequence of entities for exclusive or shared access

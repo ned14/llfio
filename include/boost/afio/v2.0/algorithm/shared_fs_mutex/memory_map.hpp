@@ -206,7 +206,7 @@ namespace algorithm
         BOOST_AFIO_LOG_FUNCTION_CALL(0);
         try
         {
-          BOOST_OUTCOME_FILTER_ERROR(ret, file_handle::file(std::move(lockfile), file_handle::mode::write, file_handle::creation::if_needed, file_handle::caching::reads));
+          BOOST_OUTCOME_TRY(ret, file_handle::file(std::move(lockfile), file_handle::mode::write, file_handle::creation::if_needed, file_handle::caching::reads));
           file_handle temph;
           // Am I the first person to this file? Lock the inuse exclusively
           auto lockinuse = ret.try_lock(_lockinuseoffset, 1, true);
@@ -220,7 +220,7 @@ namespace algorithm
             char buffer[65536];
             memset(buffer, 0, sizeof(buffer));
             {
-              BOOST_OUTCOME_FILTER_ERROR(_, ret.read(0, buffer, 65535));
+              BOOST_OUTCOME_TRY(_, ret.read(0, buffer, 65535));
               (void) _;
             }
             fixme_path::value_type *temphpath = (fixme_path::value_type *) buffer;
@@ -241,14 +241,14 @@ namespace algorithm
               // and will unlock it once everyone has stopped using the mmap, so make
               // absolutely sure the mmap is not in use by anyone by taking an exclusive
               // lock on the second final byte
-              BOOST_OUTCOME_FILTER_ERROR(mapinuse2, ret.lock(_mapinuseoffset, 1, true));
+              BOOST_OUTCOME_TRY(mapinuse2, ret.lock(_mapinuseoffset, 1, true));
               // Release the exclusive lock and tell caller to just use the fallback lock directly
               return make_errored_result<memory_map>(EBUSY);
             }
             else
             {
               // Mark the map as being in use by me too
-              BOOST_OUTCOME_FILTER_ERROR(mapinuse2, ret.lock(_mapinuseoffset, 1, false));
+              BOOST_OUTCOME_TRY(mapinuse2, ret.lock(_mapinuseoffset, 1, false));
               mapinuse = std::move(mapinuse2);
               temph = std::move(_temph.get());
             }
@@ -257,27 +257,27 @@ namespace algorithm
           {
             // I am the first person to be using this (stale?) file, so create a new hash index file and write its path
             ret.truncate(0);
-            BOOST_OUTCOME_FILTER_ERROR(_temph, file_handle::random_file(fixme_temporary_files_directory()));
+            BOOST_OUTCOME_TRY(_temph, file_handle::random_file(fixme_temporary_files_directory()));
             temph = std::move(_temph);
             auto temppath(temph.path());
             temph.truncate(HashIndexSize);
             // Write the path of my new hash index file and convert my lock to a shared one
             {
-              BOOST_OUTCOME_FILTER_ERROR(_, ret.write(0, (const char *) temppath.c_str(), temppath.native().size() * sizeof(*temppath.c_str())));
+              BOOST_OUTCOME_TRY(_, ret.write(0, (const char *) temppath.c_str(), temppath.native().size() * sizeof(*temppath.c_str())));
               (void) _;
             }
             // Convert exclusive whole file lock into lock in use
-            BOOST_OUTCOME_FILTER_ERROR(mapinuse2, ret.lock(_mapinuseoffset, 1, false));
-            BOOST_OUTCOME_FILTER_ERROR(lockinuse2, ret.lock(_lockinuseoffset, 1, false));
+            BOOST_OUTCOME_TRY(mapinuse2, ret.lock(_mapinuseoffset, 1, false));
+            BOOST_OUTCOME_TRY(lockinuse2, ret.lock(_lockinuseoffset, 1, false));
             mapinuse = std::move(mapinuse2);
             lockinuse = std::move(lockinuse2);
           }
           // Map the files into memory, being very careful that the lock file is only ever mapped read only
           // as some OSs can get confused if you use non-mmaped writes on a region mapped for writing.
-          BOOST_OUTCOME_FILTER_ERROR(hsection, section_handle::section(ret, 0, section_handle::flag::read));
-          BOOST_OUTCOME_FILTER_ERROR(temphsection, section_handle::section(temph, HashIndexSize));
-          BOOST_OUTCOME_FILTER_ERROR(hmap, map_handle::map(hsection, 0, 0, section_handle::flag::read));
-          BOOST_OUTCOME_FILTER_ERROR(temphmap, map_handle::map(temphsection, HashIndexSize));
+          BOOST_OUTCOME_TRY(hsection, section_handle::section(ret, 0, section_handle::flag::read));
+          BOOST_OUTCOME_TRY(temphsection, section_handle::section(temph, HashIndexSize));
+          BOOST_OUTCOME_TRY(hmap, map_handle::map(hsection, 0, 0, section_handle::flag::read));
+          BOOST_OUTCOME_TRY(temphmap, map_handle::map(temphsection, HashIndexSize));
           return memory_map(std::move(ret), std::move(temph), std::move(lockinuse.get()), std::move(mapinuse), std::move(hmap), std::move(temphmap), fallbacklock);
         }
         BOOST_OUTCOME_CATCH_EXCEPTION_TO_RESULT(memory_map)
@@ -328,7 +328,7 @@ namespace algorithm
             // reach this same point. If that lock times out, we will reenter here
             // next time until we succeed
             _hmapinuse.unlock();
-            BOOST_OUTCOME_FILTER_ERROR(mapinuse2, _h.lock(_mapinuseoffset, 1, true, d));
+            BOOST_OUTCOME_TRY(mapinuse2, _h.lock(_mapinuseoffset, 1, true, d));
             _have_degraded = true;
           }
           if(_fallbacklock)

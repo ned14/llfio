@@ -138,7 +138,7 @@ namespace algorithm
         bool first = true;
         do
         {
-          BOOST_OUTCOME_FILTER_ERROR(_, _h.read(0, (char *) &_header, 48));
+          BOOST_OUTCOME_TRY(_, _h.read(0, (char *) &_header, 48));
           if(_.first != (char *) &_header)
             memcpy(&_header, _.first, _.second);
           if(_skip_hashing)
@@ -181,7 +181,7 @@ namespace algorithm
       static result<atomic_append> fs_mutex_append(file_handle::path_type lockfile, bool nfs_compatibility = false, bool skip_hashing = false) noexcept
       {
         BOOST_AFIO_LOG_FUNCTION_CALL(0);
-        BOOST_OUTCOME_FILTER_ERROR(ret, file_handle::file(std::move(lockfile), file_handle::mode::write, file_handle::creation::if_needed, file_handle::caching::temporary));
+        BOOST_OUTCOME_TRY(ret, file_handle::file(std::move(lockfile), file_handle::mode::write, file_handle::creation::if_needed, file_handle::caching::temporary));
         atomic_append_detail::header header;
         // Lock the entire header for exclusive access
         auto lockresult = ret.try_lock(0, sizeof(header), true);
@@ -202,11 +202,11 @@ namespace algorithm
           header.first_after_hole_punch = sizeof(header);
           if(!skip_hashing)
             header.hash = boost_lite::algorithm::hash::fast_hash::hash(((char *) &header) + 16, sizeof(header) - 16);
-          BOOST_OUTCOME_FILTER_ERROR(_, ret.write(0, (char *) &header, sizeof(header)));
+          BOOST_OUTCOME_TRY(_, ret.write(0, (char *) &header, sizeof(header)));
           (void) _;
         }
         // Open a shared lock on last byte in header to prevent other users zomping the file
-        BOOST_OUTCOME_FILTER_ERROR(guard, ret.lock(sizeof(header) - 1, 1, false));
+        BOOST_OUTCOME_TRY(guard, ret.lock(sizeof(header) - 1, 1, false));
         // Unlock any exclusive lock I gained earlier now
         if(lockresult)
           lockresult.get().unlock();
@@ -247,7 +247,7 @@ namespace algorithm
         if(!_skip_hashing)
           lock_request.hash = boost_lite::algorithm::hash::fast_hash::hash(((char *) &lock_request) + 16, sizeof(lock_request) - 16);
         // My lock request will be the file's current length or higher
-        BOOST_OUTCOME_FILTER_ERROR(my_lock_request_offset, _h.length());
+        BOOST_OUTCOME_TRY(my_lock_request_offset, _h.length());
         {
           _h.set_append_only(true);
           auto undo = undoer([this] { _h.set_append_only(false); });
@@ -257,10 +257,10 @@ namespace algorithm
             file_handle::extent_type lastbyte = (file_handle::extent_type) -1;
             // Lock up to the beginning of the shadow lock space
             lastbyte &= ~(1ULL << 63);
-            BOOST_OUTCOME_FILTER_ERROR(append_guard_, _h.lock(my_lock_request_offset, lastbyte, true));
+            BOOST_OUTCOME_TRY(append_guard_, _h.lock(my_lock_request_offset, lastbyte, true));
             append_guard = std::move(append_guard_);
           }
-          BOOST_OUTCOME_FILTER_ERROR(_, _h.write(0, (char *) &lock_request, sizeof(lock_request)));
+          BOOST_OUTCOME_TRY(_, _h.write(0, (char *) &lock_request, sizeof(lock_request)));
           (void) _;
         }
 
@@ -298,7 +298,7 @@ namespace algorithm
           auto lock_offset = my_lock_request_offset;
           // Set the top bit to use the shadow lock space on Windows
           lock_offset |= (1ULL << 63);
-          BOOST_OUTCOME_FILTER_ERROR(my_request_guard_, _h.lock(lock_offset, sizeof(lock_request), true));
+          BOOST_OUTCOME_TRY(my_request_guard_, _h.lock(lock_offset, sizeof(lock_request), true));
           my_request_guard = std::move(my_request_guard_);
         }
 
@@ -322,7 +322,7 @@ namespace algorithm
             start_offset = _header.first_known_good;
           assert(record_offset >= start_offset);
           assert(record_offset - start_offset <= sizeof(_buffer));
-          BOOST_OUTCOME_FILTER_ERROR(batchread, _h.read(start_offset, _buffer, (size_t)(record_offset - start_offset) + sizeof(atomic_append_detail::lock_request)));
+          BOOST_OUTCOME_TRY(batchread, _h.read(start_offset, _buffer, (size_t)(record_offset - start_offset) + sizeof(atomic_append_detail::lock_request)));
           assert(batchread.second == record_offset - start_offset + sizeof(atomic_append_detail::lock_request));
           const atomic_append_detail::lock_request *record = (atomic_append_detail::lock_request *) (batchread.first + batchread.second - sizeof(atomic_append_detail::lock_request));
           const atomic_append_detail::lock_request *firstrecord = (atomic_append_detail::lock_request *) batchread.first;
@@ -385,7 +385,7 @@ namespace algorithm
             auto lock_offset = record_offset;
             // Set the top bit to use the shadow lock space on Windows
             lock_offset |= (1ULL << 63);
-            BOOST_OUTCOME_FILTER_ERROR(record_guard_, _h.lock(lock_offset, sizeof(record), false, nd));
+            BOOST_OUTCOME_TRY(record_guard_, _h.lock(lock_offset, sizeof(record), false, nd));
           }
           // Make sure we haven't timed out during this wait
           if(d)

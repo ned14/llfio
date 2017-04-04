@@ -115,7 +115,7 @@ namespace storage_profile
     outcome<void> operator()(storage_profile &sp, handle_type &h) const
     {
       if(value != default_value<T>())
-        return make_ready_outcome<void>();
+        return make_valued_outcome<void>();
       return impl(sp, h);
     }
   };

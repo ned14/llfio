@@ -72,7 +72,7 @@ namespace storage_profile
           return std::current_exception();
         }
       }
-      return make_ready_outcome<void>();
+      return make_valued_outcome<void>();
     }
 
     // CPU name, architecture, physical cores
@@ -188,7 +188,7 @@ namespace storage_profile
           return std::current_exception();
         }
       }
-      return make_ready_outcome<void>();
+      return make_valued_outcome<void>();
     }
     namespace posix
     {
@@ -213,7 +213,7 @@ namespace storage_profile
 #error Do not know how to get free physical RAM on this platform
 #endif
 #endif        
-        return make_ready_outcome<void>();
+        return make_valued_outcome<void>();
       }
     }
   }
@@ -266,7 +266,7 @@ namespace storage_profile
 #endif            
             return make_errored_outcome<void>(ENOSYS);
           }
-          BOOST_OUTCOME_FILTER_ERROR(deviceh, file_handle::file(*h.service(), mntfromname, handle::mode::none, handle::creation::open_existing, handle::caching::only_metadata));
+          BOOST_OUTCOME_TRY(deviceh, file_handle::file(*h.service(), mntfromname, handle::mode::none, handle::creation::open_existing, handle::caching::only_metadata));
 
           // TODO See https://github.com/baruch/diskscan/blob/master/arch/arch-linux.c
           //          sp.controller_type.value = "SCSI";
@@ -291,7 +291,7 @@ namespace storage_profile
         {
           return std::current_exception();
         }
-        return make_ready_outcome<void>();
+        return make_valued_outcome<void>();
       }
     }
   }

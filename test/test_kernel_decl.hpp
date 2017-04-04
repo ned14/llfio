@@ -12,7 +12,7 @@ Created: May 2016
 #else
 // We are standalone
 #include "../include/boost/afio/afio.hpp"
-#define BOOST_AFIO_TEST_KERNEL_DECL extern BOOST_SYMBOL_EXPORT
+#define BOOST_AFIO_TEST_KERNEL_DECL extern BOOSTLITE_SYMBOL_EXPORT
 #endif
 
 #endif  // namespace

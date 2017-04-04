@@ -36,7 +36,7 @@ BOOST_AFIO_V2_NAMESPACE_BEGIN
 
 result<async_file_handle> async_file_handle::clone(io_service &service) const noexcept
 {
-  BOOST_OUTCOME_FILTER_ERROR(v, clone());
+  BOOST_OUTCOME_TRY(v, clone());
   async_file_handle ret(std::move(v));
   ret._service = &service;
   return std::move(ret);
@@ -181,7 +181,7 @@ async_file_handle::io_result<async_file_handle::buffers_type> async_file_handle:
   BOOST_AFIO_LOG_FUNCTION_CALL(_v.h);
   io_result<buffers_type> ret;
   auto _io_state(_begin_io(operation_t::read, std::move(reqs), [&ret](auto *state) { ret = std::move(state->result); }, ReadFileEx));
-  BOOST_OUTCOME_FILTER_ERROR(io_state, _io_state);
+  BOOST_OUTCOME_TRY(io_state, _io_state);
 
   // While i/o is not done pump i/o completion
   while(!ret.is_ready())
@@ -206,7 +206,7 @@ async_file_handle::io_result<async_file_handle::const_buffers_type> async_file_h
   BOOST_AFIO_LOG_FUNCTION_CALL(_v.h);
   io_result<const_buffers_type> ret;
   auto _io_state(_begin_io(operation_t::write, std::move(reqs), [&ret](auto *state) { ret = std::move(state->result); }, WriteFileEx));
-  BOOST_OUTCOME_FILTER_ERROR(io_state, _io_state);
+  BOOST_OUTCOME_TRY(io_state, _io_state);
 
   // While i/o is not done pump i/o completion
   while(!ret.is_ready())

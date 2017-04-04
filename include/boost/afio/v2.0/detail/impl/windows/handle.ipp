@@ -103,8 +103,8 @@ result<void> handle::set_kernel_caching(caching caching) noexcept
     _mode = mode::write;
   else if(is_readable())
     _mode = mode::read;
-  BOOST_OUTCOME_FILTER_ERROR(access, access_mask_from_handle_mode(nativeh, _mode));
-  BOOST_OUTCOME_FILTER_ERROR(attribs, attributes_from_handle_caching_and_flags(nativeh, caching, _flags));
+  BOOST_OUTCOME_TRY(access, access_mask_from_handle_mode(nativeh, _mode));
+  BOOST_OUTCOME_TRY(attribs, attributes_from_handle_caching_and_flags(nativeh, caching, _flags));
   nativeh.behaviour |= native_handle_type::disposition::file;
   if(INVALID_HANDLE_VALUE == (nativeh.h = ReOpenFile(_v.h, access, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, attribs)))
     return make_errored_result<void>(GetLastError());

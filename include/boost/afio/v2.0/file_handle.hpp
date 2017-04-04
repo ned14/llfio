@@ -159,7 +159,7 @@ public:
       } while(!ret);
       return ret;
     }
-    BOOST_OUTCOME_CATCH_EXCEPTION_TO_RESULT(file_handle)
+    BOOST_OUTCOME_CATCH_ALL_EXCEPTION_TO_RESULT
   }
   /*! Create a file handle creating the named file on some path which
   the OS declares to be suitable for temporary files. Most OSs are
@@ -200,7 +200,7 @@ public:
     BOOST_AFIO_LOG_FUNCTION_CALL(_v.h);
     if(_flags & flag::unlink_on_close)
     {
-      BOOST_OUTCOME_PROPAGATE_ERROR(unlink());
+      BOOST_OUTCOME_TRYV(unlink());
     }
     return io_handle::close();
   }

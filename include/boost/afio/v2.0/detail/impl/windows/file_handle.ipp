@@ -119,7 +119,7 @@ result<file_handle> file_handle::file(file_handle::path_type _path, file_handle:
   using namespace windows_nt_kernel;
   result<file_handle> ret(file_handle(std::move(_path), native_handle_type(), _caching, flags));
   native_handle_type &nativeh = ret.get()._v;
-  BOOST_OUTCOME_FILTER_ERROR(access, access_mask_from_handle_mode(nativeh, _mode));
+  BOOST_OUTCOME_TRY(access, access_mask_from_handle_mode(nativeh, _mode));
   DWORD creation = OPEN_EXISTING;
   switch(_creation)
   {
@@ -135,7 +135,7 @@ result<file_handle> file_handle::file(file_handle::path_type _path, file_handle:
     creation = TRUNCATE_EXISTING;
     break;
   }
-  BOOST_OUTCOME_FILTER_ERROR(attribs, attributes_from_handle_caching_and_flags(nativeh, _caching, flags));
+  BOOST_OUTCOME_TRY(attribs, attributes_from_handle_caching_and_flags(nativeh, _caching, flags));
   nativeh.behaviour |= native_handle_type::disposition::file;
   if(INVALID_HANDLE_VALUE == (nativeh.h = CreateFileW_(ret.value()._path.c_str(), access, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL, creation, attribs, NULL)))
   {
@@ -170,8 +170,8 @@ result<file_handle> file_handle::temp_inode(path_type dirpath, mode _mode, flag 
   flags |= flag::unlink_on_close | flag::disable_safety_unlinks | flag::win_disable_unlink_emulation;
   result<file_handle> ret(file_handle(path_type(), native_handle_type(), _caching, flags));
   native_handle_type &nativeh = ret.get()._v;
-  BOOST_OUTCOME_FILTER_ERROR(access, access_mask_from_handle_mode(nativeh, _mode));
-  BOOST_OUTCOME_FILTER_ERROR(attribs, attributes_from_handle_caching_and_flags(nativeh, _caching, flags));
+  BOOST_OUTCOME_TRY(access, access_mask_from_handle_mode(nativeh, _mode));
+  BOOST_OUTCOME_TRY(attribs, attributes_from_handle_caching_and_flags(nativeh, _caching, flags));
   nativeh.behaviour |= native_handle_type::disposition::file;
   DWORD creation = CREATE_NEW;
   for(;;)
@@ -180,7 +180,7 @@ result<file_handle> file_handle::temp_inode(path_type dirpath, mode _mode, flag 
     {
       ret.value()._path = dirpath / (utils::random_string(32) + ".tmp");
     }
-    BOOST_OUTCOME_CATCH_EXCEPTION_TO_RESULT(file_handle)
+    BOOST_OUTCOME_CATCH_ALL_EXCEPTION_TO_RESULT
     if(INVALID_HANDLE_VALUE == (nativeh.h = CreateFileW_(ret.value()._path.c_str(), access, /* no read nor write access for others */ FILE_SHARE_DELETE, NULL, creation, attribs, NULL)))
     {
       DWORD errcode = GetLastError();
@@ -258,7 +258,7 @@ result<void> file_handle::unlink() noexcept
     // Rename it to something random to emulate immediate unlinking
     auto randomname = utils::random_string(32);
     randomname.append(".deleted");
-    BOOST_OUTCOME_PROPAGATE_ERROR(relink(std::move(randomname)));
+    BOOST_OUTCOME_TRY(_, relink(std::move(randomname)));
   }
   // No point marking it for deletion if it's already been so
   if(!(_flags & flag::unlink_on_close))
@@ -284,7 +284,7 @@ result<void> file_handle::unlink() noexcept
     if(STATUS_SUCCESS != isb.Status)
       return make_errored_result_nt<void>(isb.Status);
   }
-  return make_ready_result<void>();
+  return make_valued_result<void>();
 }
 
 result<file_handle::extent_type> file_handle::length() const noexcept

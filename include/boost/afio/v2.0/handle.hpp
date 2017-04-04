@@ -160,7 +160,7 @@ public:
   {
   }
   //! Construct a handle from a supplied native handle
-  BOOST_CXX14_CONSTEXPR handle(native_handle_type h, caching caching = caching::none, flag flags = flag::none)
+  BOOSTLITE_CONSTEXPR handle(native_handle_type h, caching caching = caching::none, flag flags = flag::none)
       : _caching(caching)
       , _flags(flags)
       , _v(std::move(h))
@@ -382,7 +382,7 @@ public:
   //! Default constructor
   constexpr io_handle() = default;
   //! Construct a handle from a supplied native handle
-  BOOST_CXX14_CONSTEXPR io_handle(native_handle_type h, caching caching = caching::none, flag flags = flag::none)
+  BOOSTLITE_CONSTEXPR io_handle(native_handle_type h, caching caching = caching::none, flag flags = flag::none)
       : handle(h, caching, flags)
   {
   }
@@ -417,7 +417,7 @@ public:
   {
     buffer_type _reqs[1] = {{data, bytes}};
     io_request<buffers_type> reqs(buffers_type(_reqs), offset);
-    BOOST_OUTCOME_FILTER_ERROR(v, read(reqs, d));
+    BOOST_OUTCOME_TRY(v, read(reqs, d));
     return *v.data();
   }
 
@@ -441,7 +441,7 @@ public:
   {
     const_buffer_type _reqs[1] = {{data, bytes}};
     io_request<const_buffers_type> reqs(const_buffers_type(_reqs), offset);
-    BOOST_OUTCOME_FILTER_ERROR(v, write(reqs, d));
+    BOOST_OUTCOME_TRY(v, write(reqs, d));
     return *v.data();
   }
 

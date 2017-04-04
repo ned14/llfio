@@ -103,7 +103,7 @@ namespace algorithm
       static result<byte_ranges> fs_mutex_byte_ranges(file_handle::path_type lockfile) noexcept
       {
         BOOST_AFIO_LOG_FUNCTION_CALL(0);
-        BOOST_OUTCOME_FILTER_ERROR(ret, file_handle::file(std::move(lockfile), file_handle::mode::write, file_handle::creation::if_needed, file_handle::caching::temporary));
+        BOOST_OUTCOME_TRY(ret, file_handle::file(std::move(lockfile), file_handle::mode::write, file_handle::creation::if_needed, file_handle::caching::temporary));
         return byte_ranges(std::move(ret));
       }
 
