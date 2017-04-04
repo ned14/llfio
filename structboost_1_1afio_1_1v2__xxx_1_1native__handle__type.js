@@ -1,7 +1,7 @@
 var structboost_1_1afio_1_1v2__xxx_1_1native__handle__type =
 [
     [ "disposition_base", "structboost_1_1afio_1_1v2__xxx_1_1native__handle__type_1_1disposition__base.html", "structboost_1_1afio_1_1v2__xxx_1_1native__handle__type_1_1disposition__base" ],
-    [ "disposition", "structboost_1_1afio_1_1v2__xxx_1_1native__handle__type.html#a145d696847d9f7810981668143981d03", null ],
+    [ "disposition", "structboost_1_1afio_1_1v2__xxx_1_1native__handle__type.html#af944a07e4ba47045eac6803a24d080e1", null ],
     [ "native_handle_type", "structboost_1_1afio_1_1v2__xxx_1_1native__handle__type.html#a5ade736d1102ea5fa5a00ae96ec14dd9", null ],
     [ "native_handle_type", "structboost_1_1afio_1_1v2__xxx_1_1native__handle__type.html#ad6eb1cef3178d6be0e5cee4e35e76e82", null ],
     [ "native_handle_type", "structboost_1_1afio_1_1v2__xxx_1_1native__handle__type.html#a92330d915383d4eaf6a6eb6badc51286", null ],
