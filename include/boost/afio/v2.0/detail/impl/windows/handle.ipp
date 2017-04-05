@@ -114,6 +114,9 @@ result<void> handle::set_kernel_caching(caching caching) noexcept
   return make_result<void>();
 }
 
+
+/************************************* io_handle ****************************************/
+
 template <class BuffersType, class Syscall> inline io_handle::io_result<BuffersType> do_read_write(const native_handle_type &nativeh, Syscall &&syscall, io_handle::io_request<BuffersType> reqs, deadline d) noexcept
 {
   if(d && !nativeh.is_overlapped())
@@ -208,8 +211,8 @@ result<io_handle::extent_guard> io_handle::lock(io_handle::extent_type offset, i
   ol.Internal = (ULONG_PTR) -1;
   ol.OffsetHigh = (offset >> 32) & 0xffffffff;
   ol.Offset = offset & 0xffffffff;
-  DWORD bytes_high = (DWORD)((bytes >> 32) & 0xffffffff);
-  DWORD bytes_low = (DWORD)(bytes & 0xffffffff);
+  DWORD bytes_high = !bytes ? MAXDWORD : (DWORD)((bytes >> 32) & 0xffffffff);
+  DWORD bytes_low = !bytes ? MAXDWORD : (DWORD)(bytes & 0xffffffff);
   if(!LockFileEx(_v.h, flags, 0, bytes_low, bytes_high, &ol))
   {
     if(ERROR_LOCK_VIOLATION == GetLastError() && d && !d.nsecs)
