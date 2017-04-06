@@ -280,7 +280,7 @@ namespace algorithm
           BOOST_OUTCOME_TRY(temphmap, map_handle::map(temphsection, HashIndexSize));
           return memory_map(std::move(ret), std::move(temph), std::move(lockinuse.get()), std::move(mapinuse), std::move(hmap), std::move(temphmap), fallbacklock);
         }
-        BOOST_OUTCOME_CATCH_EXCEPTION_TO_RESULT(memory_map)
+        BOOST_OUTCOME_CATCH_ALL_EXCEPTION_TO_RESULT
       }
 
       //! Return the handle to file being used for this lock

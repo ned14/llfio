@@ -3,7 +3,7 @@
 File Created: Aug 2016
 */
 
-#define BOOST_CATCH_CUSTOM_MAIN_DEFINED
+#define BOOSTLITE_BOOST_UNIT_TEST_CUSTOM_MAIN_DEFINED
 
 #include "../../include/boost/afio/afio.hpp"
 #include "../kerneltest/include/boost/kerneltest.hpp"
@@ -608,6 +608,6 @@ int main(int argc, char *argv[])
   }
   BOOST_AFIO_V2_NAMESPACE::stl1z::filesystem::create_directory("shared_fs_mutex_testdir");
   BOOST_AFIO_V2_NAMESPACE::stl1z::filesystem::current_path("shared_fs_mutex_testdir");
-  int result = Catch::Session().run(argc, argv);
+  int result = BOOSTLITE_BOOST_UNIT_TEST_RUN_TESTS(argc, argv);
   return result;
 }
