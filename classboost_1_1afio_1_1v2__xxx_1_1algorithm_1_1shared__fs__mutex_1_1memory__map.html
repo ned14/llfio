@@ -391,7 +391,7 @@ template&lt;template&lt; class &gt; class Hasher = boost_lite::algorithm::hash::
 <div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;          BOOST_OUTCOME_TRY(temphmap, <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1map__handle.html#a6f0fc242efb1e28078aa13812335df3b">map_handle::map</a>(temphsection, HashIndexSize));</div>
 <div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;          <span class="keywordflow">return</span> memory_map(std::move(ret), std::move(temph), std::move(lockinuse.get()), std::move(mapinuse), std::move(hmap), std::move(temphmap), fallbacklock);</div>
 <div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;        }</div>
-<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;        BOOST_OUTCOME_CATCH_EXCEPTION_TO_RESULT(memory_map)</div>
+<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;        BOOST_OUTCOME_CATCH_ALL_EXCEPTION_TO_RESULT</div>
 <div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;      }</div>
 </div><!-- fragment -->
 </div>
