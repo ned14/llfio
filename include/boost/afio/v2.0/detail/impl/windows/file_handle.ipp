@@ -62,7 +62,7 @@ const fixme_path &fixme_temporary_files_directory() noexcept
         };
         {
           error_code ec;
-          // Try filesystem::temp_directory_path() before all else
+          // Try filesystem::temp_directory_path() before all else. This probably just calls GetTempPath().
           buffer = stl1z::filesystem::temp_directory_path(ec);
           if(!ec && testpath())
             return;

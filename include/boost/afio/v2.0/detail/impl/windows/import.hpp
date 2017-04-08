@@ -976,7 +976,7 @@ static inline result<ACCESS_MASK> access_mask_from_handle_mode(native_handle_typ
   switch(_mode)
   {
   case handle::mode::unchanged:
-    return make_errored_result<ACCESS_MASK>(EINVAL);
+    return make_errored_result<ACCESS_MASK>(stl11::errc::invalid_argument);
   case handle::mode::none:
     break;
   case handle::mode::attr_read:
@@ -1012,7 +1012,7 @@ static inline result<DWORD> attributes_from_handle_caching_and_flags(native_hand
   switch(_caching)
   {
   case handle::caching::unchanged:
-    return make_errored_result<DWORD>(EINVAL);
+    return make_errored_result<DWORD>(stl11::errc::invalid_argument);
   case handle::caching::none:
     attribs |= FILE_FLAG_NO_BUFFERING | FILE_FLAG_WRITE_THROUGH;
     nativeh.behaviour |= native_handle_type::disposition::aligned_io;

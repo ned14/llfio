@@ -128,7 +128,7 @@ namespace utils
     }
     if(-1 == randomfd || ::read(randomfd, buffer, bytes) < bytes)
     {
-      BOOST_AFIO_LOG_FATAL("afio: Kernel crypto function failed");
+      BOOST_AFIO_LOG_FATAL(0, "afio: Kernel crypto function failed");
       std::terminate();
     }
   }
@@ -167,7 +167,7 @@ namespace utils
     {
       if(munmap(p, bytes) < 0)
       {
-        BOOST_AFIO_LOG_FATAL("afio: Freeing large pages failed");
+        BOOST_AFIO_LOG_FATAL(p, "afio: Freeing large pages failed");
         std::terminate();
       }
     }
