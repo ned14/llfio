@@ -175,7 +175,7 @@ namespace algorithm
             // Everything is locked, exit
             undo.dismiss();
             disableunlock.dismiss();
-            return make_result<void>();
+            return make_valued_result<void>();
           }
         failed:
           if(d)

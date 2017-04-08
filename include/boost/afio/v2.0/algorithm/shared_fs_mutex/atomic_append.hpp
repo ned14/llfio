@@ -260,8 +260,7 @@ namespace algorithm
             BOOST_OUTCOME_TRY(append_guard_, _h.lock(my_lock_request_offset, lastbyte, true));
             append_guard = std::move(append_guard_);
           }
-          BOOST_OUTCOME_TRY(_, _h.write(0, (char *) &lock_request, sizeof(lock_request)));
-          (void) _;
+          BOOST_OUTCOME_TRYV(_h.write(0, (char *) &lock_request, sizeof(lock_request)));
         }
 
         // Find the record I just wrote
@@ -402,7 +401,7 @@ namespace algorithm
             }
           }
         } while(record_offset >= _header.first_known_good);
-        return make_result<void>();
+        return make_valued_result<void>();
       }
 
     public:

@@ -195,7 +195,7 @@ namespace algorithm
               std::this_thread::yield();
           }
         } while(n < out.entities.size());
-        return make_result<void>();
+        return make_valued_result<void>();
       }
 
     public:

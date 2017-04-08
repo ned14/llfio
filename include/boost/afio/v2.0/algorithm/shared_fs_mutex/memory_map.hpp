@@ -262,10 +262,7 @@ namespace algorithm
             auto temppath(temph.path());
             temph.truncate(HashIndexSize);
             // Write the path of my new hash index file and convert my lock to a shared one
-            {
-              BOOST_OUTCOME_TRY(_, ret.write(0, (const char *) temppath.c_str(), temppath.native().size() * sizeof(*temppath.c_str())));
-              (void) _;
-            }
+            BOOST_OUTCOME_TRYV(ret.write(0, (const char *) temppath.c_str(), temppath.native().size() * sizeof(*temppath.c_str())));
             // Convert exclusive whole file lock into lock in use
             BOOST_OUTCOME_TRY(mapinuse2, ret.lock(_mapinuseoffset, 1, false));
             BOOST_OUTCOME_TRY(lockinuse2, ret.lock(_lockinuseoffset, 1, false));
@@ -376,7 +373,7 @@ namespace algorithm
             // Everything is locked, exit
             undo.dismiss();
             disableunlock.dismiss();
-            return make_result<void>();
+            return make_valued_result<void>();
           }
         failed:
           if(d)
