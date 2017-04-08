@@ -272,7 +272,7 @@ Protected Member Functions</h2></td></tr>
 <div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;        BOOST_AFIO_LOG_FUNCTION_CALL(<span class="keyword">this</span>);</div>
 <div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;        atomic_append_detail::lock_request lock_request;</div>
 <div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;        <span class="keywordflow">if</span>(out.entities.size() &gt; <span class="keyword">sizeof</span>(lock_request.entities) / <span class="keyword">sizeof</span>(lock_request.entities[0]))</div>
-<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;          <span class="keywordflow">return</span> make_errored_result&lt;void&gt;(E2BIG);</div>
+<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;          <span class="keywordflow">return</span> make_errored_result&lt;void&gt;(stl11::errc::argument_list_too_long);</div>
 <div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;</div>
 <div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;        stl11::chrono::steady_clock::time_point began_steady;</div>
 <div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;        stl11::chrono::system_clock::time_point end_utc;</div>
@@ -442,12 +442,12 @@ Protected Member Functions</h2></td></tr>
 <div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;            <span class="keywordflow">if</span>((d).steady)</div>
 <div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;            {</div>
 <div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;              <span class="keywordflow">if</span>(stl11::chrono::steady_clock::now() &gt;= (began_steady + stl11::chrono::nanoseconds((d).nsecs)))</div>
-<div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;                <span class="keywordflow">return</span> make_errored_result&lt;void&gt;(ETIMEDOUT);</div>
+<div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;                <span class="keywordflow">return</span> make_errored_result&lt;void&gt;(stl11::errc::timed_out);</div>
 <div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;            }</div>
 <div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;            <span class="keywordflow">else</span></div>
 <div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;            {</div>
 <div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;              <span class="keywordflow">if</span>(stl11::chrono::system_clock::now() &gt;= end_utc)</div>
-<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;                <span class="keywordflow">return</span> make_errored_result&lt;void&gt;(ETIMEDOUT);</div>
+<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;                <span class="keywordflow">return</span> make_errored_result&lt;void&gt;(stl11::errc::timed_out);</div>
 <div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;            }</div>
 <div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;          }</div>
 <div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;        } <span class="keywordflow">while</span>(record_offset &gt;= _header.first_known_good);</div>

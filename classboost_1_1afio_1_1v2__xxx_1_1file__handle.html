@@ -530,7 +530,7 @@ flag&#160;</td><td class="memItemRight" valign="bottom"><b>_flags</b></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX fcntl() can return, ETIMEDOUT. ENOTSUP may be returned if deadline i/o is not possible with this particular handle configuration (e.g. non-overlapped HANDLE on Windows). </dd></dl>
+<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX fcntl() can return, <code>errc::timed_out</code>, <code>errc::not_supported</code> may be returned if deadline i/o is not possible with this particular handle configuration (e.g. non-overlapped HANDLE on Windows). </dd></dl>
 <dl class="section user"><dt>Memory Allocations</dt><dd>The default synchronous implementation in file_handle performs no memory allocation. The asynchronous implementation in async_file_handle performs one calloc and one free. </dd></dl>
 
 </div>
@@ -722,7 +722,7 @@ flag&#160;</td><td class="memItemRight" valign="bottom"><b>_flags</b></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX read() can return, ETIMEDOUT, ECANCELED. ENOTSUP may be returned if deadline i/o is not possible with this particular handle configuration (e.g. reading from regular files on POSIX or reading from a non-overlapped HANDLE on Windows). </dd></dl>
+<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX read() can return, <code>errc::timed_out</code>, <code>errc::operation_canceled</code>. <code>errc::not_supported</code> may be returned if deadline i/o is not possible with this particular handle configuration (e.g. reading from regular files on POSIX or reading from a non-overlapped HANDLE on Windows). </dd></dl>
 <dl class="section user"><dt>Memory Allocations</dt><dd>The default synchronous implementation in file_handle performs no memory allocation. The asynchronous implementation in async_file_handle performs one calloc and one free. </dd></dl>
 
 </div>
@@ -802,6 +802,7 @@ flag&#160;</td><td class="memItemRight" valign="bottom"><b>_flags</b></td></tr>
 </table>
 </div><div class="memdoc">
 <p>Atomically relinks the current path of this open handle to the new path specified, <b>atomically</b> and silently replacing any item at the new path specified. This operation is both atomic and silent matching POSIX behaviour even on Microsoft Windows where no Win32 API can match POSIX semantics.</p>
+<dl class="section warning"><dt>Warning</dt><dd>Some operating systems provide a race free syscall for renaming an open handle (Windows). On all other operating systems this call is <b>racy</b> and can result in the wrong file entry being deleted. Note that unless <code>flag::disable_safety_unlinks</code> is set, this implementation checks before relinking that the item about to be relinked has the same inode as the open file handle. This should prevent most unmalicious accidental loss of data.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>The full new path of the relinked filesystem entry. </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -1154,7 +1155,7 @@ flag&#160;</td><td class="memItemRight" valign="bottom"><b>_flags</b></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX write() can return, ETIMEDOUT, ECANCELED. ENOTSUP may be returned if deadline i/o is not possible with this particular handle configuration (e.g. writing to regular files on POSIX or writing to a non-overlapped HANDLE on Windows). </dd></dl>
+<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX write() can return, <code>errc::timed_out</code>, <code>errc::operation_canceled</code>. <code>errc::not_supported</code> may be returned if deadline i/o is not possible with this particular handle configuration (e.g. writing to regular files on POSIX or writing to a non-overlapped HANDLE on Windows). </dd></dl>
 <dl class="section user"><dt>Memory Allocations</dt><dd>The default synchronous implementation in file_handle performs no memory allocation. The asynchronous implementation in async_file_handle performs one calloc and one free. </dd></dl>
 
 </div>

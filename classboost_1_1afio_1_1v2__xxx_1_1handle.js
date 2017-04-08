@@ -3,7 +3,7 @@ var classboost_1_1afio_1_1v2__xxx_1_1handle =
     [ "flag_base", "structboost_1_1afio_1_1v2__xxx_1_1handle_1_1flag__base.html", "structboost_1_1afio_1_1v2__xxx_1_1handle_1_1flag__base" ],
     [ "really_copy", "structboost_1_1afio_1_1v2__xxx_1_1handle_1_1really__copy.html", null ],
     [ "extent_type", "classboost_1_1afio_1_1v2__xxx_1_1handle.html#a617ab627aa596b325d7bfef5210a43f3", null ],
-    [ "flag", "classboost_1_1afio_1_1v2__xxx_1_1handle.html#af953896a1771bf08759f02b391a1d622", null ],
+    [ "flag", "classboost_1_1afio_1_1v2__xxx_1_1handle.html#a23d5ba410331a46aa470ec2f9c18a215", null ],
     [ "path_type", "classboost_1_1afio_1_1v2__xxx_1_1handle.html#aa28b35a32f1292b6126a82bba20a2c90", null ],
     [ "size_type", "classboost_1_1afio_1_1v2__xxx_1_1handle.html#aee8d98d7f979e312f5e18dfcebfc6870", null ],
     [ "caching", "classboost_1_1afio_1_1v2__xxx_1_1handle.html#a81c7de194feaa88684ca9851d0d527ca", [

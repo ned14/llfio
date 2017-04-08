@@ -338,7 +338,7 @@ template&lt;class U &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Runs the i/o service for the thread owning this i/o service. Returns true if more work remains and we just handled an i/o or post; false if there is no more work; ETIMEDOUT if the deadline passed; EOPNOTSUPP if you try to call it from a non-owning thread; EINVAL if deadline is invalid. </p>
+<p>Runs the i/o service for the thread owning this i/o service. Returns true if more work remains and we just handled an i/o or post; false if there is no more work; <code>errc::timed_out</code> if the deadline passed; <code>errc::operation_not_supported</code> if you try to call it from a non-owning thread; <code>errc::invalid_argument</code> if deadline is invalid. </p>
 
 </div>
 </div>
