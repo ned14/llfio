@@ -30,29 +30,29 @@ ctest_build(TARGET _sl)
 ctest_test(RETURN_VALUE retval EXCLUDE afio_hl)
 merge_junit_results_into_ctest_xml()
 if(WIN32)
-  if(EXISTS build/bin/Release/afio_dl-2.0-Windows-x64-Release.dll)
+  if(EXISTS cmake_ci/bin/Release/afio_dl-2.0-Windows-x64-Release.dll)
     checked_execute_process("Tarring up binaries"
       COMMAND "${CMAKE_COMMAND}" -E tar cfz afio_v2_binaries_win64.tar.gz
       doc
       include
       Readme.md
       release_notes.md
-      build/lib/Release/afio_sl-2.0-Windows-x64-Release.lib
-      build/lib/Release/afio_dl-2.0-Windows-x64-Release.lib
-      build/bin/Release/afio_dl-2.0-Windows-x64-Release.dll
+      cmake_ci/lib/Release/afio_sl-2.0-Windows-x64-Release.lib
+      cmake_ci/lib/Release/afio_dl-2.0-Windows-x64-Release.lib
+      cmake_ci/bin/Release/afio_dl-2.0-Windows-x64-Release.dll
     )
     get_filename_component(toupload afio_v2_binaries_win64.tar.gz ABSOLUTE)
   endif()
 else()
-  if(EXISTS build/bin/Release/afio_dl-2.0-Linux-x86_64-Release.so)
+  if(EXISTS cmake_ci/bin/Release/afio_dl-2.0-Linux-x86_64-Release.so)
     checked_execute_process("Tarring up binaries"
     COMMAND "${CMAKE_COMMAND}" -E tar cfz afio_v2_binaries_linux64.tgz
       doc
       include
       Readme.md
       release_notes.md
-      build/lib/Release/afio_sl-2.0-Linux-x86_64-Release.a
-      build/bin/Release/afio_dl-2.0-Linux-x86_64-Release.so
+      cmake_ci/lib/Release/afio_sl-2.0-Linux-x86_64-Release.a
+      cmake_ci/bin/Release/afio_dl-2.0-Linux-x86_64-Release.so
     )
     get_filename_component(toupload afio_v2_binaries_linux64.tgz ABSOLUTE)
   endif()
