@@ -34,6 +34,9 @@ DEALINGS IN THE SOFTWARE.
 #include "import.hpp"
 
 #include <winioctl.h>
+#if defined(__i386__) || defined(_M_IX86) || defined(__x86_64__) || defined(_M_X64)
+#include <intrin.h>  // for __cpuid
+#endif
 
 BOOST_AFIO_V2_NAMESPACE_BEGIN
 
