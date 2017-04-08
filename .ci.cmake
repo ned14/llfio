@@ -17,7 +17,7 @@ endif()
 include(BoostLiteUtils)
 
 
-CONFIGURE_CTEST_SCRIPT_FOR_CDASH("afio" "cmake_ci")
+CONFIGURE_CTEST_SCRIPT_FOR_CDASH("afio" "prebuilt")
 ctest_empty_binary_directory(${CTEST_BINARY_DIRECTORY})
 include(FindGit)
 set(CTEST_GIT_COMMAND "${GIT_EXECUTABLE}")
@@ -30,29 +30,29 @@ ctest_build(TARGET _sl)
 ctest_test(RETURN_VALUE retval EXCLUDE afio_hl)
 merge_junit_results_into_ctest_xml()
 if(WIN32)
-  if(EXISTS cmake_ci/bin/Release/afio_dl-2.0-Windows-x64-Release.dll)
+  if(EXISTS prebuilt/bin/Release/afio_dl-2.0-Windows-x64-Release.dll)
     checked_execute_process("Tarring up binaries"
       COMMAND "${CMAKE_COMMAND}" -E tar cfz afio_v2_binaries_win64.tar.gz
       doc
       include
       Readme.md
       release_notes.md
-      cmake_ci/lib/Release/afio_sl-2.0-Windows-x64-Release.lib
-      cmake_ci/lib/Release/afio_dl-2.0-Windows-x64-Release.lib
-      cmake_ci/bin/Release/afio_dl-2.0-Windows-x64-Release.dll
+      prebuilt/lib/Release/afio_sl-2.0-Windows-x64-Release.lib
+      prebuilt/lib/Release/afio_dl-2.0-Windows-x64-Release.lib
+      prebuilt/bin/Release/afio_dl-2.0-Windows-x64-Release.dll
     )
     get_filename_component(toupload afio_v2_binaries_win64.tar.gz ABSOLUTE)
   endif()
 else()
-  if(EXISTS cmake_ci/bin/Release/afio_dl-2.0-Linux-x86_64-Release.so)
+  if(EXISTS prebuilt/bin/Release/afio_dl-2.0-Linux-x86_64-Release.so)
     checked_execute_process("Tarring up binaries"
     COMMAND "${CMAKE_COMMAND}" -E tar cfz afio_v2_binaries_linux64.tgz
       doc
       include
       Readme.md
       release_notes.md
-      cmake_ci/lib/Release/afio_sl-2.0-Linux-x86_64-Release.a
-      cmake_ci/bin/Release/afio_dl-2.0-Linux-x86_64-Release.so
+      prebuilt/lib/Release/afio_sl-2.0-Linux-x86_64-Release.a
+      prebuilt/bin/Release/afio_dl-2.0-Linux-x86_64-Release.so
     )
     get_filename_component(toupload afio_v2_binaries_linux64.tgz ABSOLUTE)
   endif()
