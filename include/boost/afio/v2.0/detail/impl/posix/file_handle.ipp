@@ -298,7 +298,7 @@ result<handle> handle::clone(io_service &service, handle::mode mode, handle::cac
   {
     // Race free fetch the handle's path and reopen it with the new permissions
     // TODO FIXME
-    return make_errored_result<handle>(ENOSYS);
+    return make_errored_result<handle>(stl11::errc::function_not_supported);
   }
   else
   {
@@ -319,7 +319,7 @@ result<handle> handle::clone(io_service &service, handle::mode mode, handle::cac
       case handle::mode::attr_read:
       case handle::mode::attr_write:
       case handle::mode::read:
-        return make_errored_result<handle>(EINVAL);
+        return make_errored_result<handle>(stl11::errc::invalid_argument);
       case handle::mode::write:
         attribs &= ~O_APPEND;
         ret.value()._v.behaviour |= native_handle_type::disposition::seekable | native_handle_type::disposition::readable | native_handle_type::disposition::writable;
@@ -335,7 +335,7 @@ result<handle> handle::clone(io_service &service, handle::mode mode, handle::cac
     if(caching != handle::caching::unchanged && caching != _caching)
     {
       // TODO: Allow fiddling with O_DIRECT
-      return make_errored_result<handle>(EINVAL);
+      return make_errored_result<handle>(stl11::errc::invalid_argument);
     }
   }
   return ret;
@@ -455,11 +455,11 @@ template <class CompletionRoutine, class BuffersType, class IORoutine> result<fi
   using return_type = io_state_ptr<CompletionRoutine, BuffersType>;
 #if BOOST_AFIO_USE_POSIX_AIO && defined(AIO_LISTIO_MAX)
   if(items > AIO_LISTIO_MAX)
-    return make_errored_result<return_type>(EINVAL);
+    return make_errored_result<return_type>(stl11::errc::invalid_argument);
 #endif
   void *mem = ::calloc(1, statelen);
   if(!mem)
-    return make_errored_result<return_type>(ENOMEM);
+    return make_errored_result<return_type>(stl11::errc::not_enough_memory);
   return_type _state((_io_state_type<CompletionRoutine, BuffersType> *) mem);
   new((state = (state_type *) mem)) state_type(this, operation, std::forward<CompletionRoutine>(completion), items);
   // Noexcept move the buffers from req into result

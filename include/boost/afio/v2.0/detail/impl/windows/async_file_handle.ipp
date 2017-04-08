@@ -115,11 +115,11 @@ result<async_file_handle::io_state_ptr<CompletionRoutine, BuffersType>> async_fi
   using return_type = io_state_ptr<CompletionRoutine, BuffersType>;
   // On Windows i/o must be scheduled on the same thread pumping completion
   if(GetCurrentThreadId() != service()->_threadid)
-    return make_errored_result<return_type>(EOPNOTSUPP);
+    return make_errored_result<return_type>(stl11::errc::operation_not_supported);
 
   void *mem = ::calloc(1, statelen);
   if(!mem)
-    return make_errored_result<return_type>(ENOMEM);
+    return make_errored_result<return_type>(stl11::errc::not_enough_memory);
   return_type _state((_io_state_type<CompletionRoutine, BuffersType> *) mem);
   new((state = (state_type *) mem)) state_type(this, operation, std::forward<CompletionRoutine>(completion), items);
 

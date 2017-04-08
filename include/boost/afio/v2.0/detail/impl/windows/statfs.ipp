@@ -155,7 +155,7 @@ BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(handle &h, st
         len -= pathlen;
         // buffer should look like \Device\HarddiskVolumeX
         if(memcmp(buffer, L"\\Device\\HarddiskVolume", 44))
-          return make_errored_result<size_t>(EILSEQ);
+          return make_errored_result<size_t>(stl11::errc::illegal_byte_sequence);
         // TODO FIXME This should output the kind of path the input handle uses
         // For now though, output a win32 compatible path
         f_mntfromname.reserve(len + 3);

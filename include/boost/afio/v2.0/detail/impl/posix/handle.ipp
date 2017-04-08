@@ -168,9 +168,9 @@ io_handle::io_result<io_handle::buffers_type> io_handle::read(io_handle::io_requ
 {
   BOOST_AFIO_LOG_FUNCTION_CALL(_v.fd);
   if(d)
-    return make_errored_result<>(ENOTSUP);
+    return make_errored_result<>(stl11::errc::not_supported);
   if(reqs.buffers.size() > IOV_MAX)
-    return make_errored_result<>(E2BIG);
+    return make_errored_result<>(stl11::errc::argument_list_too_long);
   struct iovec *iov = (struct iovec *) alloca(reqs.size() * sizeof(struct iovec));
   for(size_t n = 0; n < reqs.buffers.size(); n++)
   {
@@ -197,9 +197,9 @@ io_handle::io_result<io_handle::const_buffers_type> io_handle::write(io_handle::
 {
   BOOST_AFIO_LOG_FUNCTION_CALL(_v.fd);
   if(d)
-    return make_errored_result<>(ENOTSUP);
+    return make_errored_result<>(stl11::errc::not_supported);
   if(reqs.buffers.size() > IOV_MAX)
-    return make_errored_result<>(E2BIG);
+    return make_errored_result<>(stl11::errc::argument_list_too_long);
   struct iovec *iov = (struct iovec *) alloca(reqs.size() * sizeof(struct iovec));
   for(size_t n = 0; n < reqs.buffers.size(); n++)
   {
@@ -226,7 +226,7 @@ result<io_handle::extent_guard> io_handle::lock(io_handle::extent_type offset, i
 {
   BOOST_AFIO_LOG_FUNCTION_CALL(_v.fd);
   if(d && d.nsecs > 0)
-    return make_errored_result<io_handle::extent_guard>(ENOTSUP);
+    return make_errored_result<io_handle::extent_guard>(stl11::errc::not_supported);
   bool failed = false;
 #if !defined(__linux__) && !defined(F_OFD_SETLK)
   if(0 == bytes)
@@ -277,7 +277,7 @@ result<io_handle::extent_guard> io_handle::lock(io_handle::extent_type offset, i
   if(failed)
   {
     if(d && !d.nsecs && (EACCES == errno || EAGAIN == errno || EWOULDBLOCK == errno))
-      return make_errored_result<void>(ETIMEDOUT);
+      return make_errored_result<void>(stl11::errc::timed_out);
     else
       return make_errored_result<void>(errno);
   }

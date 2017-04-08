@@ -104,7 +104,7 @@ public:
     to by `path()` upon the call of `close()` if and only if the inode matches. On Windows,
     this opens the file handle with the `FILE_FLAG_DELETE_ON_CLOSE` modifier which substantially
     affects caching policy and causes the \b first handle close to make the file unavailable for
-    anyone else to open with an `EAGAIN` error return. Because this is confusing, unless the
+    anyone else to open with an `errc::resource_unavailable_try_again` error return. Because this is confusing, unless the
     `win_disable_unlink_emulation` flag is also specified, this POSIX behaviour is
     somewhat emulated by AFIO on Windows by renaming the file to a random name on `close()`
     causing it to appear to have been unlinked immediately.
@@ -404,7 +404,7 @@ public:
   \param reqs A scatter-gather and offset request.
   \param d An optional deadline by which the i/o must complete, else it is cancelled.
   Note function may return significantly after this deadline if the i/o takes long to cancel.
-  \errors Any of the values POSIX read() can return, ETIMEDOUT, ECANCELED. ENOTSUP may be
+  \errors Any of the values POSIX read() can return, `errc::timed_out`, `errc::operation_canceled`. `errc::not_supported` may be
   returned if deadline i/o is not possible with this particular handle configuration (e.g.
   reading from regular files on POSIX or reading from a non-overlapped HANDLE on Windows).
   \mallocs The default synchronous implementation in file_handle performs no memory allocation.
@@ -428,7 +428,7 @@ public:
   \param reqs A scatter-gather and offset request.
   \param d An optional deadline by which the i/o must complete, else it is cancelled.
   Note function may return significantly after this deadline if the i/o takes long to cancel.
-  \errors Any of the values POSIX write() can return, ETIMEDOUT, ECANCELED. ENOTSUP may be
+  \errors Any of the values POSIX write() can return, `errc::timed_out`, `errc::operation_canceled`. `errc::not_supported` may be
   returned if deadline i/o is not possible with this particular handle configuration (e.g.
   writing to regular files on POSIX or writing to a non-overlapped HANDLE on Windows).
   \mallocs The default synchronous implementation in file_handle performs no memory allocation.
@@ -541,7 +541,7 @@ public:
   flock() for non-insane semantics).
   \param exclusive Whether the lock is to be exclusive.
   \param d An optional deadline by which the lock must complete, else it is cancelled.
-  \errors Any of the values POSIX fcntl() can return, ETIMEDOUT. ENOTSUP may be
+  \errors Any of the values POSIX fcntl() can return, `errc::timed_out`, `errc::not_supported` may be
   returned if deadline i/o is not possible with this particular handle configuration (e.g.
   non-overlapped HANDLE on Windows).
   \mallocs The default synchronous implementation in file_handle performs no memory allocation.

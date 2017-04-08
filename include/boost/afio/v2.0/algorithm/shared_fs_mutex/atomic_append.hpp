@@ -223,7 +223,7 @@ namespace algorithm
         BOOST_AFIO_LOG_FUNCTION_CALL(this);
         atomic_append_detail::lock_request lock_request;
         if(out.entities.size() > sizeof(lock_request.entities) / sizeof(lock_request.entities[0]))
-          return make_errored_result<void>(E2BIG);
+          return make_errored_result<void>(stl11::errc::argument_list_too_long);
 
         stl11::chrono::steady_clock::time_point began_steady;
         stl11::chrono::system_clock::time_point end_utc;
@@ -393,12 +393,12 @@ namespace algorithm
             if((d).steady)
             {
               if(stl11::chrono::steady_clock::now() >= (began_steady + stl11::chrono::nanoseconds((d).nsecs)))
-                return make_errored_result<void>(ETIMEDOUT);
+                return make_errored_result<void>(stl11::errc::timed_out);
             }
             else
             {
               if(stl11::chrono::system_clock::now() >= end_utc)
-                return make_errored_result<void>(ETIMEDOUT);
+                return make_errored_result<void>(stl11::errc::timed_out);
             }
           }
         } while(record_offset >= _header.first_known_good);

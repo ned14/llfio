@@ -225,7 +225,7 @@ result<file_handle::path_type> file_handle::relink(path_type newpath) noexcept
   // FIXME: As soon as we implement fat paths, eliminate this mallocing NT path conversion nonsense
   UNICODE_STRING NtPath;
   if(!RtlDosPathNameToNtPathName_U(newpath.c_str(), &NtPath, NULL, NULL))
-    return make_errored_result<path_type>(ENOENT);
+    return make_errored_result<path_type>(stl11::errc::no_such_file_or_directory);
   auto unntpath = undoer([&NtPath] {
     if(!HeapFree(GetProcessHeap(), 0, NtPath.Buffer))
       abort();

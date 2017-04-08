@@ -177,12 +177,12 @@ namespace algorithm
               if((d).steady)
               {
                 if(stl11::chrono::steady_clock::now() >= (began_steady + stl11::chrono::nanoseconds((d).nsecs)))
-                  return make_errored_result<void>(ETIMEDOUT);
+                  return make_errored_result<void>(stl11::errc::timed_out);
               }
               else
               {
                 if(stl11::chrono::system_clock::now() >= end_utc)
-                  return make_errored_result<void>(ETIMEDOUT);
+                  return make_errored_result<void>(stl11::errc::timed_out);
               }
             }
             // Move was_contended to front and randomise rest of out.entities

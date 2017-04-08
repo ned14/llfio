@@ -243,7 +243,7 @@ namespace algorithm
               // lock on the second final byte
               BOOST_OUTCOME_TRY(mapinuse2, ret.lock(_mapinuseoffset, 1, true));
               // Release the exclusive lock and tell caller to just use the fallback lock directly
-              return make_errored_result<memory_map>(EBUSY);
+              return make_errored_result<memory_map>(stl11::errc::device_or_resource_busy);
             }
             else
             {
@@ -333,7 +333,7 @@ namespace algorithm
           }
           if(_fallbacklock)
             return _fallbacklock->_lock(out, d, spin_not_sleep);
-          return make_errored_result<void>(EBUSY);
+          return make_errored_result<void>(stl11::errc::device_or_resource_busy);
         }
         stl11::chrono::steady_clock::time_point began_steady;
         stl11::chrono::system_clock::time_point end_utc;
@@ -384,12 +384,12 @@ namespace algorithm
             if((d).steady)
             {
               if(stl11::chrono::steady_clock::now() >= (began_steady + stl11::chrono::nanoseconds((d).nsecs)))
-                return make_errored_result<void>(ETIMEDOUT);
+                return make_errored_result<void>(stl11::errc::timed_out);
             }
             else
             {
               if(stl11::chrono::system_clock::now() >= end_utc)
-                return make_errored_result<void>(ETIMEDOUT);
+                return make_errored_result<void>(stl11::errc::timed_out);
             }
           }
           // Move was_contended to front and randomise rest of out.entities

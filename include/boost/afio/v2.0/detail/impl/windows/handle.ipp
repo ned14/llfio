@@ -120,9 +120,9 @@ result<void> handle::set_kernel_caching(caching caching) noexcept
 template <class BuffersType, class Syscall> inline io_handle::io_result<BuffersType> do_read_write(const native_handle_type &nativeh, Syscall &&syscall, io_handle::io_request<BuffersType> reqs, deadline d) noexcept
 {
   if(d && !nativeh.is_overlapped())
-    return make_errored_result<BuffersType>(ENOTSUP);
+    return make_errored_result<BuffersType>(stl11::errc::not_supported);
   if(reqs.buffers.size() > 64)
-    return make_errored_result<BuffersType>(E2BIG);
+    return make_errored_result<BuffersType>(stl11::errc::argument_list_too_long);
 
   BOOST_AFIO_WIN_DEADLINE_TO_SLEEP_INIT(d);
   std::array<OVERLAPPED, 64> _ols;
@@ -201,7 +201,7 @@ result<io_handle::extent_guard> io_handle::lock(io_handle::extent_type offset, i
 {
   BOOST_AFIO_LOG_FUNCTION_CALL(_v.h);
   if(d && d.nsecs > 0 && !_v.is_overlapped())
-    return make_errored_result<io_handle::extent_guard>(ENOTSUP);
+    return make_errored_result<io_handle::extent_guard>(stl11::errc::not_supported);
   DWORD flags = exclusive ? LOCKFILE_EXCLUSIVE_LOCK : 0;
   if(d && !d.nsecs)
     flags |= LOCKFILE_FAIL_IMMEDIATELY;
@@ -216,7 +216,7 @@ result<io_handle::extent_guard> io_handle::lock(io_handle::extent_type offset, i
   if(!LockFileEx(_v.h, flags, 0, bytes_low, bytes_high, &ol))
   {
     if(ERROR_LOCK_VIOLATION == GetLastError() && d && !d.nsecs)
-      return make_errored_result<io_handle::extent_guard>(ETIMEDOUT);
+      return make_errored_result<io_handle::extent_guard>(stl11::errc::timed_out);
     if(ERROR_IO_PENDING != GetLastError())
       return make_errored_result<io_handle::extent_guard>(GetLastError());
   }

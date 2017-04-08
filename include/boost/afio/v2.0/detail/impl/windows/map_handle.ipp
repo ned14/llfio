@@ -47,7 +47,7 @@ result<section_handle> section_handle::section(file_handle &backing, extent_type
       maximum_size = length;
     }
     else
-      return make_errored_result<section_handle>(EINVAL);
+      return make_errored_result<section_handle>(stl11::errc::invalid_argument);
   }
   // Do NOT round up to page size here, it causes STATUS_SECTION_TOO_BIG
   // maximum_size = utils::round_up_to_page_size(maximum_size);
@@ -245,7 +245,7 @@ result<map_handle::buffer_type> map_handle::commit(buffer_type region, section_h
 {
   BOOST_AFIO_LOG_FUNCTION_CALL(_v.h);
   if(!region.first)
-    return make_errored_result<map_handle::buffer_type>(EINVAL);
+    return make_errored_result<map_handle::buffer_type>(stl11::errc::invalid_argument);
   DWORD prot = 0;
   if(_flag == section_handle::flag::none)
   {
@@ -282,7 +282,7 @@ result<void> map_handle::zero(buffer_type region) noexcept
 {
   BOOST_AFIO_LOG_FUNCTION_CALL(_v.h);
   if(!region.first)
-    return make_errored_result<void>(EINVAL);
+    return make_errored_result<void>(stl11::errc::invalid_argument);
   //! \todo Once you implement file_handle::zero(), please implement map_handle::zero()
   // buffer_type page_region { (char *) utils::round_up_to_page_size((uintptr_t) region.first), utils::round_down_to_page_size(region.second); };
   memset(region.first, 0, region.second);
@@ -306,7 +306,7 @@ result<map_handle::buffer_type> map_handle::do_not_store(buffer_type region) noe
 {
   region = utils::round_to_page_size(region);
   if(!region.first)
-    return make_errored_result<map_handle::buffer_type>(EINVAL);
+    return make_errored_result<map_handle::buffer_type>(stl11::errc::invalid_argument);
   if(!VirtualAlloc(region.first, region.second, MEM_RESET, 0))
     return make_errored_result<buffer_type>(GetLastError());
   return region;

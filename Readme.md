@@ -7,14 +7,14 @@ Tarballs of source and prebuilt binaries with all unit tests passing: https://de
 
 
 ### Immediate todos in order of priority:
-- [ ] Audit Outcome and AFIO for all uses of `std::error_code::value()` and replace where
+- [x] Audit Outcome and AFIO for all uses of `std::error_code::value()` and replace where
 appropriate with `std::errc::whatever`.
 - [x] Get Outcome to work perfectly with exceptions and RTTI disabled, this makes
 Outcome useful in the games/audio world.
-  - [ ] Add a new Boost.Test emulation, one which is noexcept capable
+  - [x] Add a new Boost.Test emulation, one which is noexcept capable
   - [ ] Move AFIO to being tested with exceptions and RTTI disabled. Where AFIO 
 throws, have it detect __cpp_exceptions and skip those implementations.
-  - [ ] Add macro helpers to Outcome for returning outcomes out of things
+  - [x] Add macro helpers to Outcome for returning outcomes out of things
 which cannot return values like constructors, and convert said exceptions/TLS
 back into outcomes.
    - Make use of std::system_error(errno, system_category, "custom error message");
@@ -46,7 +46,7 @@ fix e.g. named shared memory. Make log disc stored while we are at it.
 fuzzed, coverage calculated, bloat calculated, ABI dumped etc
   - Easy coverage is the usual gcov route => coveralls.io or gcovr http://gcovr.com/guide.html
 - [ ] Single include generation
-- [ ] Make updating revision.hpp updated by the pre-commit git hook
+- [x] Make updating revision.hpp updated by the pre-commit git hook
 - [ ] Add missing functions on handle/file_handle from AFIO v1
 
 

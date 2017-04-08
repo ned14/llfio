@@ -255,16 +255,16 @@ namespace storage_profile
                   if(s[0]=='s' && s[1]=='c' && s[2]=='d') continue;
                   // Is there more than one physical disk device?
                   if(!mntfromname.empty())
-                    return make_errored_outcome<void>(ENOSYS);
+                    return make_errored_outcome<void>(stl11::errc::function_not_supported);
                   mntfromname="/dev/"+std::string(s, e-s);
                 }
               }
               else
-                return make_errored_outcome<void>(ENOSYS);
+                return make_errored_outcome<void>(stl11::errc::function_not_supported);
             }
             else
 #endif            
-            return make_errored_outcome<void>(ENOSYS);
+            return make_errored_outcome<void>(stl11::errc::function_not_supported);
           }
           BOOST_OUTCOME_TRY(deviceh, file_handle::file(*h.service(), mntfromname, handle::mode::none, handle::creation::open_existing, handle::caching::only_metadata));
 

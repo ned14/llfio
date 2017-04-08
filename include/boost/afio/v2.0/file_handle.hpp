@@ -245,6 +245,12 @@ public:
   is both atomic and silent matching POSIX behaviour even on Microsoft Windows where
   no Win32 API can match POSIX semantics.
 
+  \warning Some operating systems provide a race free syscall for renaming an open handle (Windows).
+  On all other operating systems this call is \b racy and can result in the wrong file entry being
+  deleted. Note that unless `flag::disable_safety_unlinks` is set, this implementation checks
+  before relinking that the item about to be relinked has the same inode as the open file handle.
+  This should prevent most unmalicious accidental loss of data.
+
   \return The full new path of the relinked filesystem entry.
   \param newpath The optionally partial new path to relink to. The current path is used as a base
   for any relative paths specified.

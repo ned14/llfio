@@ -191,7 +191,7 @@ result<bool> io_service::run_until(deadline d) noexcept
   if (!_work_queued)
     return false;
   if (pthread_self() != _threadh)
-    return make_errored_result<bool>(EOPNOTSUPP);
+    return make_errored_result<bool>(stl11::errc::operation_not_supported);
   stl11::chrono::steady_clock::time_point began_steady;
   stl11::chrono::system_clock::time_point end_utc;
   if (d)
@@ -300,12 +300,12 @@ result<bool> io_service::run_until(deadline d) noexcept
       if (d.steady)
       {
         if(stl11::chrono::steady_clock::now()>=(began_steady + stl11::chrono::nanoseconds(d.nsecs)))
-          return make_errored_result<bool>(ETIMEDOUT);
+          return make_errored_result<bool>(stl11::errc::timed_out);
       }
       else
       {
         if(stl11::chrono::system_clock::now()>=end_utc)
-          return make_errored_result<bool>(ETIMEDOUT);
+          return make_errored_result<bool>(stl11::errc::timed_out);
       }
     }
   } while(!done);

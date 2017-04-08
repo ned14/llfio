@@ -224,8 +224,8 @@ public:
 #endif
 
   /*! Runs the i/o service for the thread owning this i/o service. Returns true if more
-  work remains and we just handled an i/o or post; false if there is no more work; ETIMEDOUT if
-  the deadline passed; EOPNOTSUPP if you try to call it from a non-owning thread; EINVAL
+  work remains and we just handled an i/o or post; false if there is no more work; `errc::timed_out` if
+  the deadline passed; `errc::operation_not_supported` if you try to call it from a non-owning thread; `errc::invalid_argument`
   if deadline is invalid.
   */
   BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<bool> run_until(deadline d) noexcept;

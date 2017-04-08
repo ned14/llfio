@@ -479,6 +479,10 @@ using namespace BOOST_OUTCOME_V1_NAMESPACE;
 using BOOST_OUTCOME_V1_NAMESPACE::outcome;
 using BOOST_OUTCOME_V1_NAMESPACE::make_errored_result;
 using BOOST_OUTCOME_V1_NAMESPACE::make_errored_outcome;
+namespace stl11
+{
+  using BOOST_OUTCOME_V1_NAMESPACE::stl11::errc;
+}
 #if DOXYGEN_SHOULD_SKIP_THIS
 /*! \brief Please see https://ned14.github.io/boost.outcome/classboost_1_1outcome_1_1v1__xxx_1_1basic__monad.html
 */
