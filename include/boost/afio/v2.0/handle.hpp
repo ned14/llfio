@@ -170,23 +170,31 @@ public:
   {
   }
   BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC ~handle();
-  //! Move the handle. Explicit because this will lose information in any derived source.
-  explicit handle(handle &&o) noexcept : _caching(o._caching), _flags(o._flags), _v(std::move(o._v))
+  //! No copy construction (use clone())
+  handle(const handle &) = delete;
+  //! No copy assignment
+  handle &operator=(const handle &o) = delete;
+  //! Move the handle.
+  handle(handle &&o) noexcept : _caching(o._caching), _flags(o._flags), _v(std::move(o._v))
   {
     o._caching = caching::none;
     o._flags = flag::none;
     o._v = native_handle_type();
   }
-  //! Tag type to enable copy constructor
-  struct really_copy
+  //! Move assignment of handle
+  handle &operator=(handle &&o) noexcept
   {
-  };
-  //! Copy the handle. Tag enabled because copying handles is expensive (fd duplication).
-  explicit handle(const handle &o, really_copy);
-  //! No move assignment
-  handle &operator=(handle &&o) = delete;
-  //! No copy assignment
-  handle &operator=(const handle &o) = delete;
+    this->~handle();
+    new(this) handle(std::move(o));
+    return *this;
+  }
+  //! Swap with another instance
+  void swap(handle &o) noexcept
+  {
+    handle temp(std::move(*this));
+    *this = std::move(o);
+    o = std::move(temp);
+  }
 
   //! A unique identifier for this handle in this process (native handle). Subclasses like `file_handle` make this a unique identifier across the entire system.
   BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC unique_id_type unique_id() const noexcept { unique_id_type ret(nullptr); ret.as_longlongs[0] = _v._init; return ret; }
@@ -194,6 +202,11 @@ public:
   BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC path_type path() const noexcept { return path_type(); }
   //! Immediately close the native handle type managed by this handle
   BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> close() noexcept;
+  /*! Clone this handle (copy constructor is disabled to avoid accidental copying)
+
+  \errors Any of the values POSIX dup() or DuplicateHandle() can return.
+  */
+  result<handle> clone() const noexcept;
   //! Release the native handle type managed by this handle
   BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC native_handle_type release() noexcept
   {
@@ -393,12 +406,10 @@ public:
   }
   //! Explicit conversion from handle permitted
   explicit io_handle(handle &&o) noexcept : handle(std::move(o)) {}
-  using handle::really_copy;
-  //! Copy the handle. Tag enabled because copying handles is expensive (fd duplication).
-  explicit io_handle(const io_handle &o, really_copy _)
-      : handle(o, _)
-  {
-  }
+  //! Move construction permitted
+  io_handle(io_handle &&) = default;
+  //! Move assignment permitted
+  io_handle &operator=(io_handle &&) = default;
 
   /*! \brief Read data from the open handle.
 

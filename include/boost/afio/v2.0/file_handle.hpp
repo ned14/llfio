@@ -98,7 +98,7 @@ protected:
 
 public:
   //! Default constructor
-  file_handle()
+  constexpr file_handle()
       : io_handle()
       , _devid(0)
       , _inode(0)
@@ -109,7 +109,7 @@ public:
   file_handle(native_handle_type h, dev_t devid, ino_t inode, path_type path, caching caching = caching::none, flag flags = flag::none)
       : io_handle(std::move(h), std::move(caching), std::move(flags))
       , _devid(devid)
-      , _inod(inode)
+      , _inode(inode)
       , _path(std::move(path))
       , _service(nullptr)
   {
@@ -118,16 +118,6 @@ public:
   file_handle(file_handle &&o) noexcept : io_handle(std::move(o)), _devid(o._devid), _inode(o._inode), _path(std::move(o._path)), _service(o._service) { o._devid = 0; o._inode = 0; o._service = nullptr; }
   //! Explicit conversion from handle and io_handle permitted
   explicit file_handle(handle &&o, path_type path, dev_t devid, ino_t inode) noexcept : io_handle(std::move(o)), _devid(devid), _inode(inode), _path(std::move(path)), _service(nullptr) {}
-  using io_handle::really_copy;
-  //! Copy the handle. Tag enabled because copying handles is expensive (fd duplication).
-  explicit file_handle(const file_handle &o, really_copy _)
-      : io_handle(o, _)
-      , _devid(o._devid)
-      , _inode(o._inode)
-      , _path(o._path)
-      , _service(o._service)
-  {
-  }
   //! Move assignment of file_handle permitted
   file_handle &operator=(file_handle &&o) noexcept
   {

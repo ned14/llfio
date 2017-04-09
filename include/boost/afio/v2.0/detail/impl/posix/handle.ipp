@@ -39,17 +39,6 @@ DEALINGS IN THE SOFTWARE.
 
 BOOST_AFIO_V2_NAMESPACE_BEGIN
 
-handle::handle(const handle &o, handle::really_copy)
-{
-  BOOST_AFIO_LOG_FUNCTION_CALL(_v.fd);
-  _caching = o._caching;
-  _flags = o._flags;
-  _v.behaviour = o._v.behaviour;
-  _v.fd = ::dup(o._v.fd);
-  if(-1 == _v.fd)
-    throw std::system_error(errno, std::system_category());
-}
-
 handle::~handle()
 {
   if(_v)
@@ -79,6 +68,17 @@ result<void> handle::close() noexcept
     _v = native_handle_type();
   }
   return make_result<void>();
+}
+
+result<handle> handle::clone() const noexcept
+{
+  BOOST_AFIO_LOG_FUNCTION_CALL(_v.fd);
+  result<handle> ret(handle(native_handle_type(), _caching, _flags));
+  ret.value()._v.behaviour = _v.behaviour;
+  ret.value()._v.fd = ::dup(_v.fd);
+  if (-1 == ret.value()._v.fd)
+    return make_errored_result<handle>(errno, last190(path()));
+  return ret;
 }
 
 result<void> handle::set_append_only(bool enable) noexcept

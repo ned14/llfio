@@ -264,6 +264,7 @@ result<file_handle> file_handle::clone() const noexcept
 {
   BOOST_AFIO_LOG_FUNCTION_CALL(_v.fd);
   result<file_handle> ret(file_handle(native_handle_type(), _path, _devid, _inode, _caching, _flags));
+  ret.value()._service = _service;
   ret.value()._v.behaviour = _v.behaviour;
   ret.value()._v.fd = ::dup(_v.fd);
   if(-1 == ret.value()._v.fd)

@@ -126,7 +126,7 @@ result<file_handle> file_handle::file(file_handle::path_type _path, file_handle:
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
-  result<file_handle> ret(file_handle(std::move(_path), native_handle_type(), _caching, flags));
+  result<file_handle> ret(file_handle(native_handle_type(), 0, 0, std::move(_path), _caching, flags));
   native_handle_type &nativeh = ret.get()._v;
   BOOST_OUTCOME_TRY(access, access_mask_from_handle_mode(nativeh, _mode));
   DWORD creation = OPEN_EXISTING;
@@ -154,9 +154,9 @@ result<file_handle> file_handle::file(file_handle::path_type _path, file_handle:
     return make_errored_result<file_handle>(errcode, last190(ret.value()._path.u8string()));
   }
   BOOST_AFIO_LOG_FUNCTION_CALL(nativeh.h);
-  if(!(flags & disable_safety_unlinks))
+  if(!(flags & flag::disable_safety_unlinks))
   {
-    BOOST_OUTCOME_TRYV(_fetch_inode());
+    BOOST_OUTCOME_TRYV(ret.value()._fetch_inode());
   }
   if(flags & flag::unlink_on_close)
   {
@@ -181,7 +181,7 @@ result<file_handle> file_handle::temp_inode(path_type dirpath, mode _mode, flag 
   caching _caching = caching::temporary;
   // No need to rename to random on unlink or check inode before unlink
   flags |= flag::unlink_on_close | flag::disable_safety_unlinks | flag::win_disable_unlink_emulation;
-  result<file_handle> ret(file_handle(path_type(), native_handle_type(), _caching, flags));
+  result<file_handle> ret(file_handle(native_handle_type(), 0, 0, path_type(), _caching, flags));
   native_handle_type &nativeh = ret.get()._v;
   BOOST_OUTCOME_TRY(access, access_mask_from_handle_mode(nativeh, _mode));
   BOOST_OUTCOME_TRY(attribs, attributes_from_handle_caching_and_flags(nativeh, _caching, flags));
@@ -203,7 +203,7 @@ result<file_handle> file_handle::temp_inode(path_type dirpath, mode _mode, flag 
       return make_errored_result<file_handle>(errcode, last190(ret.value()._path.u8string()));
     }
     BOOST_AFIO_LOG_FUNCTION_CALL(nativeh.h);
-    BOOST_OUTCOME_TRYV(_fetch_inode());  // It can be useful to know the inode of temporary inodes
+    BOOST_OUTCOME_TRYV(ret.value()._fetch_inode());  // It can be useful to know the inode of temporary inodes
     if(nativeh.h)
     {
       // Hide this item
@@ -221,7 +221,8 @@ result<file_handle> file_handle::temp_inode(path_type dirpath, mode _mode, flag 
 result<file_handle> file_handle::clone() const noexcept
 {
   BOOST_AFIO_LOG_FUNCTION_CALL(_v.h);
-  result<file_handle> ret(file_handle(native_handle_type(), _path, _devid, _inode, _caching, _flags));
+  result<file_handle> ret(file_handle(native_handle_type(), _devid, _inode, _path, _caching, _flags));
+  ret.value()._service = _service;
   ret.value()._v.behaviour = _v.behaviour;
   if(!DuplicateHandle(GetCurrentProcess(), _v.h, GetCurrentProcess(), &ret.value()._v.h, 0, false, DUPLICATE_SAME_ACCESS))
     return make_errored_result<file_handle>(GetLastError(), last190(ret.value()._path.u8string()));

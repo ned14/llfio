@@ -44,6 +44,8 @@ BOOST_AFIO_V2_NAMESPACE_EXPORT_BEGIN
 class BOOST_AFIO_DECL async_file_handle : public file_handle
 {
 public:
+  using dev_t = file_handle::dev_t;
+  using ino_t = file_handle::ino_t;
   using path_type = io_handle::path_type;
   using extent_type = io_handle::extent_type;
   using size_type = io_handle::size_type;
@@ -59,34 +61,24 @@ public:
   template <class T> using io_result = io_handle::io_result<T>;
 
 protected:
-  io_service *_service;
+  // Do NOT declare variables here, put them into file_handle to preserve up-conversion
 
 public:
   //! Default constructor
-  async_file_handle()
-      : file_handle()
-      , _service(nullptr)
-  {
-  }
+  constexpr async_file_handle() = default;
 
   //! Construct a handle from a supplied native handle
-  async_file_handle(io_service *service, path_type path, native_handle_type h, caching caching = caching::none, flag flags = flag::none)
-      : file_handle(std::move(path), std::move(h), std::move(caching), std::move(flags))
-      , _service(service)
+  async_file_handle(io_service *service, native_handle_type h, dev_t devid, ino_t inode, path_type path, caching caching = caching::none, flag flags = flag::none)
+      : file_handle(std::move(h), devid, inode, std::move(path), std::move(caching), std::move(flags))
   {
+    this->_service = service;
   }
   //! Implicit move construction of async_file_handle permitted
-  async_file_handle(async_file_handle &&o) noexcept : file_handle(std::move(o)), _service(o._service) { o._service = nullptr; }
+  async_file_handle(async_file_handle &&o) noexcept = default;
   //! Explicit conversion from file_handle permitted
   explicit async_file_handle(file_handle &&o) noexcept : file_handle(std::move(o)) {}
   //! Explicit conversion from handle and io_handle permitted
-  explicit async_file_handle(handle &&o, io_service *service, path_type path) noexcept : file_handle(std::move(o), std::move(path)), _service(service) {}
-  using file_handle::really_copy;
-  //! Copy the handle. Tag enabled because copying handles is expensive (fd duplication).
-  explicit async_file_handle(const async_file_handle &o, really_copy _)
-      : file_handle(o, _)
-  {
-  }
+  explicit async_file_handle(handle &&o, io_service *service, path_type path, dev_t devid, ino_t inode) noexcept : file_handle(std::move(o), std::move(path), devid, inode) { this->_service = service; }
   //! Move assignment of async_file_handle permitted
   async_file_handle &operator=(async_file_handle &&o) noexcept
   {

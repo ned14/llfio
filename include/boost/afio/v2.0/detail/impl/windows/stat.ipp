@@ -33,6 +33,8 @@ DEALINGS IN THE SOFTWARE.
 #include "../../../stat.hpp"
 #include "import.hpp"
 
+#include <winioctl.h>  // for DeviceIoControl codes
+
 BOOST_AFIO_V2_NAMESPACE_BEGIN
 
 BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> stat_t::fill(handle &h, stat_t::want wanted) noexcept
@@ -47,9 +49,9 @@ BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> stat_t::fill(handle &h, stat
 
   FILE_ALL_INFORMATION &fai=*(FILE_ALL_INFORMATION *)buffer;
   FILE_FS_SECTOR_SIZE_INFORMATION ffssi={0};
-  bool needInternal=(wanted&want::ino);
-  bool needBasic=((wanted&want::type) || (wanted&want::atim) || (wanted&want::mtim) || (wanted&want::ctim) || (wanted&want::birthtim) || (wanted&want::sparse) || (wanted&want::compressed) || (wanted&want::reparse_point));
-  bool needStandard=((wanted&want::nlink) || (wanted&want::size) || (wanted&want::allocated) || (wanted&want::blocks));
+  bool needInternal=!!(wanted&want::ino);
+  bool needBasic=(!!(wanted&want::type) || !!(wanted&want::atim) || !!(wanted&want::mtim) || !!(wanted&want::ctim) || !!(wanted&want::birthtim) || !!(wanted&want::sparse) || !!(wanted&want::compressed) || !!(wanted&want::reparse_point));
+  bool needStandard=(!!(wanted&want::nlink) || !!(wanted&want::size) || !!(wanted&want::allocated) || !!(wanted&want::blocks));
   // It's not widely known that the NT kernel supplies a stat() equivalent i.e. get me everything in a single syscall
   // However fetching FileAlignmentInformation which comes with FILE_ALL_INFORMATION is slow as it touches the device driver,
   // so only use if we need more than one item
@@ -59,7 +61,7 @@ BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> stat_t::fill(handle &h, stat
     if(STATUS_PENDING == ntstat)
       ntstat = ntwait(h.native_handle().h, isb, deadline());
     if(ntstat)
-      return make_errored_result_nt<size_t>(ntstat, last190(h.path()));
+      return make_errored_result_nt<size_t>(ntstat, last190(h.path().u8string()));
   }
   else
   {
@@ -69,7 +71,7 @@ BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> stat_t::fill(handle &h, stat
       if(STATUS_PENDING == ntstat)
         ntstat = ntwait(h.native_handle().h, isb, deadline());
       if(ntstat)
-        return make_errored_result_nt<size_t>(ntstat, last190(h.path()));
+        return make_errored_result_nt<size_t>(ntstat, last190(h.path().u8string()));
     }
     if(needBasic)
     {
@@ -78,7 +80,7 @@ BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> stat_t::fill(handle &h, stat
       if(STATUS_PENDING == ntstat)
         ntstat = ntwait(h.native_handle().h, isb, deadline());
       if(ntstat)
-        return make_errored_result_nt<size_t>(ntstat, last190(h.path()));
+        return make_errored_result_nt<size_t>(ntstat, last190(h.path().u8string()));
     }
     if(needStandard)
     {
@@ -87,7 +89,7 @@ BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> stat_t::fill(handle &h, stat
       if(STATUS_PENDING == ntstat)
         ntstat = ntwait(h.native_handle().h, isb, deadline());
       if(ntstat)
-        return make_errored_result_nt<size_t>(ntstat, last190(h.path()));
+        return make_errored_result_nt<size_t>(ntstat, last190(h.path().u8string()));
     }
   }
   if((wanted&want::blocks) || (wanted&want::blksize))
@@ -97,7 +99,7 @@ BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> stat_t::fill(handle &h, stat
     if(STATUS_PENDING == ntstat)
       ntstat = ntwait(h.native_handle().h, isb, deadline());
     if(ntstat)
-      return make_errored_result_nt<size_t>(ntstat, last190(h.path()));
+      return make_errored_result_nt<size_t>(ntstat, last190(h.path().u8string()));
   }
 
   // FIXME: Implement st_dev for Windows somehow
@@ -109,12 +111,12 @@ BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> stat_t::fill(handle &h, stat
     // We need to get its reparse tag to see if it's a symlink
     if(fai.BasicInformation.FileAttributes&FILE_ATTRIBUTE_REPARSE_POINT && !ReparsePointTag)
     {
-      align_as(8) char buffer[sizeof(REPARSE_DATA_BUFFER)+32769];
+      alignas(8) char buffer_[sizeof(REPARSE_DATA_BUFFER)+32769];
       DWORD written=0;
-      REPARSE_DATA_BUFFER *rpd=(REPARSE_DATA_BUFFER *) buffer;
+      REPARSE_DATA_BUFFER *rpd=(REPARSE_DATA_BUFFER *) buffer_;
       memset(rpd, 0, sizeof(*rpd));
-      if(!DeviceIoControl(h.native_handle().h, FSCTL_GET_REPARSE_POINT, NULL, 0, rpd, sizeof(buffer), &written, NULL))
-        return make_errored_result<size_t>(GetLastError(), last190(h.path()));
+      if(!DeviceIoControl(h.native_handle().h, FSCTL_GET_REPARSE_POINT, NULL, 0, rpd, sizeof(buffer_), &written, NULL))
+        return make_errored_result<size_t>(GetLastError(), last190(h.path().u8string()));
       ReparsePointTag=rpd->ReparseTag;
     }
     st_type=windows_nt_kernel::to_st_type(fai.BasicInformation.FileAttributes, ReparsePointTag); ++ret;
