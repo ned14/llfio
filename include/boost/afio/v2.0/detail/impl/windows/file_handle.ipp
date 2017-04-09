@@ -224,7 +224,7 @@ result<file_handle> file_handle::clone() const noexcept
   result<file_handle> ret(file_handle(native_handle_type(), _path, _devid, _inode, _caching, _flags));
   ret.value()._v.behaviour = _v.behaviour;
   if(!DuplicateHandle(GetCurrentProcess(), _v.h, GetCurrentProcess(), &ret.value()._v.h, 0, false, DUPLICATE_SAME_ACCESS))
-    return make_errored_result<file_handle>(GetLastError());
+    return make_errored_result<file_handle>(GetLastError(), last190(ret.value()._path.u8string()));
   return ret;
 }
 
@@ -239,7 +239,7 @@ result<file_handle::path_type> file_handle::relink(path_type newpath) noexcept
   // FIXME: As soon as we implement fat paths, eliminate this mallocing NT path conversion nonsense
   UNICODE_STRING NtPath;
   if(!RtlDosPathNameToNtPathName_U(newpath.c_str(), &NtPath, NULL, NULL))
-    return make_errored_result<path_type>(stl11::errc::no_such_file_or_directory);
+    return make_errored_result<path_type>(stl11::errc::illegal_byte_sequence);
   auto unntpath = undoer([&NtPath] {
     if(!HeapFree(GetProcessHeap(), 0, NtPath.Buffer))
       abort();
@@ -257,7 +257,7 @@ result<file_handle::path_type> file_handle::relink(path_type newpath) noexcept
   if(_flags & flag::overlapped)
     ntwait(_v.h, isb, deadline());
   if(STATUS_SUCCESS != isb.Status)
-    return make_errored_result_nt<path_type>(isb.Status);
+    return make_errored_result_nt<path_type>(isb.Status, last190(_path.u8string()));
   _path = std::move(newpath);
   return _path;
 }
@@ -296,8 +296,9 @@ result<void> file_handle::unlink() noexcept
     if(_flags & flag::overlapped)
       ntwait(_v.h, isb, deadline());
     if(STATUS_SUCCESS != isb.Status)
-      return make_errored_result_nt<void>(isb.Status);
+      return make_errored_result_nt<void>(isb.Status, last190(_path.u8string()));
   }
+  _path.clear();
   return make_valued_result<void>();
 }
 
@@ -306,7 +307,7 @@ result<file_handle::extent_type> file_handle::length() const noexcept
   BOOST_AFIO_LOG_FUNCTION_CALL(_v.h);
   FILE_STANDARD_INFO fsi;
   if(!GetFileInformationByHandleEx(_v.h, FileStandardInfo, &fsi, sizeof(fsi)))
-    return make_errored_result<extent_type>(GetLastError());
+    return make_errored_result<extent_type>(GetLastError(), last190(_path.u8string()));
   return fsi.EndOfFile.QuadPart;
 }
 
@@ -316,7 +317,7 @@ result<file_handle::extent_type> file_handle::truncate(file_handle::extent_type 
   FILE_END_OF_FILE_INFO feofi;
   feofi.EndOfFile.QuadPart = newsize;
   if(!SetFileInformationByHandle(_v.h, FileEndOfFileInfo, &feofi, sizeof(feofi)))
-    return make_errored_result<extent_type>(GetLastError());
+    return make_errored_result<extent_type>(GetLastError(), last190(_path.u8string()));
   if(are_safety_fsyncs_issued())
   {
     FlushFileBuffers(_v.h);

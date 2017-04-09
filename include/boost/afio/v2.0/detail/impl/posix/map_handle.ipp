@@ -1,7 +1,7 @@
 /* map_handle.hpp
 A handle to a source of mapped memory
-(C) 2016 Niall Douglas http://www.nedprod.com/
-File Created: August 2016
+(C) 2017 Niall Douglas http://www.nedprod.com/
+File Created: Apr 2017
 
 
 Boost Software License - Version 1.0 - August 17th, 2003
@@ -31,14 +31,13 @@ DEALINGS IN THE SOFTWARE.
 
 #include "../../../map_handle.hpp"
 #include "../../../utils.hpp"
-#include "import.hpp"
+
+#include <sys/mman.h>
 
 BOOST_AFIO_V2_NAMESPACE_BEGIN
 
 result<section_handle> section_handle::section(file_handle &backing, extent_type maximum_size, flag _flag) noexcept
 {
-  windows_nt_kernel::init();
-  using namespace windows_nt_kernel;
   if(!maximum_size)
   {
     if(backing.is_valid())
@@ -49,80 +48,18 @@ result<section_handle> section_handle::section(file_handle &backing, extent_type
     else
       return make_errored_result<section_handle>(stl11::errc::invalid_argument);
   }
-  // Do NOT round up to page size here, it causes STATUS_SECTION_TOO_BIG
   if(!backing.is_valid())
     maximum_size = utils::round_up_to_page_size(maximum_size);
   result<section_handle> ret(section_handle(native_handle_type(), backing.is_valid() ? &backing : nullptr, maximum_size, _flag));
-  native_handle_type &nativeh = ret.get()._v;
-  ULONG prot = 0, attribs = 0;
-  if(_flag & flag::read)
-    nativeh.behaviour |= native_handle_type::disposition::readable;
-  if(_flag & flag::write)
-    nativeh.behaviour |= native_handle_type::disposition::writable;
-  if(_flag & flag::execute)
-  {
-  }
-  if(!!(_flag & flag::cow) && !!(_flag & flag::execute))
-    prot = PAGE_EXECUTE_WRITECOPY;
-  else if(_flag & flag::execute)
-    prot = PAGE_EXECUTE;
-  else if(_flag & flag::cow)
-    prot = PAGE_WRITECOPY;
-  else if(_flag & flag::write)
-    prot = PAGE_READWRITE;
-  else
-    prot = PAGE_READONLY;  // PAGE_NOACCESS is refused, so this is the next best
-  attribs = SEC_COMMIT;
-  if(!backing.is_valid())
-  {
-    // On Windows, asking for inaccessible memory from the swap file almost certainly
-    // means the user is intending to change permissions later, so reserve read/write
-    // memory of the size requested
-    if(!_flag)
-    {
-      attribs = SEC_RESERVE;
-      prot = PAGE_READWRITE;
-    }
-  }
-  else if(PAGE_READONLY == prot)
-  {
-    // In the case where there is a backing file, asking for read perms or no perms
-    // means "don't auto-expand the file to the nearest 4Kb multiple"
-    attribs = SEC_RESERVE;
-  }
-  if(_flag & flag::executable)
-    attribs = SEC_IMAGE;
-  if(_flag & flag::prefault)
-  {
-    // Handled during view mapping below
-  }
-  nativeh.behaviour |= native_handle_type::disposition::section;
-  // OBJECT_ATTRIBUTES ObjectAttributes;
-  // InitializeObjectAttributes(&ObjectAttributes, &NULL, 0, NULL, NULL);
-  LARGE_INTEGER _maximum_size;
-  _maximum_size.QuadPart = maximum_size;
-  HANDLE h;
-  NTSTATUS ntstat = NtCreateSection(&h, SECTION_ALL_ACCESS, NULL, &_maximum_size, prot, attribs, backing.is_valid() ? backing.native_handle().h : NULL);
-  if(STATUS_SUCCESS != ntstat)
-  {
-    BOOST_AFIO_LOG_FUNCTION_CALL(0);
-    return make_errored_result_nt<section_handle>(ntstat);
-  }
-  nativeh.h = h;
+  // There are no section handles on POSIX, so do nothing
   BOOST_AFIO_LOG_FUNCTION_CALL(nativeh.h);
   return ret;
 }
 
 result<section_handle::extent_type> section_handle::truncate(extent_type newsize) noexcept
 {
-  windows_nt_kernel::init();
-  using namespace windows_nt_kernel;
   newsize = utils::round_up_to_page_size(newsize);
-  LARGE_INTEGER _maximum_size;
-  _maximum_size.QuadPart = newsize;
-  NTSTATUS ntstat = NtExtendSection(_v.h, &_maximum_size);
-  if(STATUS_SUCCESS != ntstat)
-    return make_errored_result_nt<extent_type>(ntstat);
+  // There are no section handles on POSIX, so do nothing
   _length = newsize;
   return make_result<extent_type>(newsize);
 }
@@ -136,7 +73,7 @@ map_handle::~map_handle()
     auto ret = map_handle::close();
     if(ret.has_error())
     {
-      BOOST_AFIO_LOG_FATAL(_v.h, "map_handle::~map_handle() close failed");
+      BOOST_AFIO_LOG_FATAL(_v.fd, "map_handle::~map_handle() close failed");
       abort();
     }
   }
@@ -144,14 +81,11 @@ map_handle::~map_handle()
 
 result<void> map_handle::close() noexcept
 {
-  windows_nt_kernel::init();
-  using namespace windows_nt_kernel;
   BOOST_AFIO_LOG_FUNCTION_CALL(_addr);
   if(_addr)
   {
-    NTSTATUS ntstat = NtUnmapViewOfSection(GetCurrentProcess(), _addr);
-    if(STATUS_SUCCESS != ntstat)
-      return make_errored_result_nt<void>(ntstat);
+    if(-1 == ::munmap(_addr, _length))
+      return make_errored_result<void>(errno);
   }
   // We don't want ~handle() to close our borrowed handle
   _v = native_handle_type();
@@ -173,74 +107,86 @@ native_handle_type map_handle::release() noexcept
 
 result<map_handle> map_handle::map(section_handle &section, size_type bytes, extent_type offset, section_handle::flag _flag) noexcept
 {
-  windows_nt_kernel::init();
-  using namespace windows_nt_kernel;
-  // Do NOT round up bytes to the nearest page size, it causes an attempt to extend the file
-  // bytes = utils::round_up_to_page_size(bytes);
+  if(!section.backing)
+  {
+    // Do NOT round up bytes to the nearest page size, it causes an attempt to extend the file
+    bytes = utils::round_up_to_page_size(bytes);
+  }
   result<map_handle> ret(map_handle(io_handle(), &section));
   native_handle_type &nativeh = ret.get()._v;
-  ULONG allocation = 0, prot = 0;
-  PVOID addr = 0;
-  size_t commitsize = bytes;
-  LARGE_INTEGER _offset;
-  _offset.QuadPart = offset;
-  SIZE_T _bytes = bytes;
-  if((_flag & section_handle::flag::nocommit) || (_flag == section_handle::flag::none))
+  int prot = 0, int flags = backing ? MAP_SHARED : MAP_ANONYMOUS;
+  void *addr = nullptr;
+  if(_flag == section_handle::flag::none)
   {
-    // Perhaps this is only valid from kernel mode? Either way, any attempt to use MEM_RESERVE caused an invalid parameter error.
-    // Weirdly, setting commitsize to 0 seems to do a reserve as we wanted
-    // allocation = MEM_RESERVE;
-    commitsize = 0;
-    prot = PAGE_NOACCESS;
+    prot |= PROT_NONE;
   }
   else if(_flag & section_handle::flag::cow)
   {
-    prot = PAGE_WRITECOPY;
+    prot |= PROT_READ|PROT_WRITE;
+    flags &= ~MAP_SHARED;
+    flags |= MAP_PRIVATE;
     nativeh.behaviour |= native_handle_type::disposition::seekable | native_handle_type::disposition::readable | native_handle_type::disposition::writable;
   }
   else if(_flag & section_handle::flag::write)
   {
-    prot = PAGE_READWRITE;
+    prot |= PROT_READ|PROT_WRITE;
     nativeh.behaviour |= native_handle_type::disposition::seekable | native_handle_type::disposition::readable | native_handle_type::disposition::writable;
   }
   else if(_flag & section_handle::flag::read)
   {
-    prot = PAGE_READONLY;
+    prot |= PROT_READ;
     nativeh.behaviour |= native_handle_type::disposition::seekable | native_handle_type::disposition::readable;
   }
-  if(!!(_flag & section_handle::flag::cow) && !!(_flag & section_handle::flag::execute))
-    prot = PAGE_EXECUTE_WRITECOPY;
-  else if(_flag & section_handle::flag::execute)
-    prot = PAGE_EXECUTE;
-  NTSTATUS ntstat = NtMapViewOfSection(section.native_handle().h, GetCurrentProcess(), &addr, 0, commitsize, &_offset, &_bytes, ViewUnmap, allocation, prot);
-  if(STATUS_SUCCESS != ntstat)
-  {
-    BOOST_AFIO_LOG_FUNCTION_CALL(0);
-    return make_errored_result_nt<map_handle>(ntstat);
-  }
+  if(_flag & section_handle::flag::execute)
+    prot |= PROT_EXEC;
+#ifdef MAP_NORESERVE
+  if(_flag & section_handle::flag::nocommit)
+    flags |= MAP_NORESERVE;
+#endif
+#ifdef MAP_POPULATE
+  if(_flag & section_handle::flag::prefault)
+    flags |= MAP_POPULATE;
+#endif
+#ifdef MAP_PREFAULT_READ
+  if(_flag & section_handle::flag::prefault)
+    flags |= MAP_PREFAULT_READ;
+#endif
+#ifdef MAP_NOSYNC
+  if(section.backing && (section.backing->kernel_caching() == handle::caching::temporary))
+    flags |= MAP_NOSYNC;
+#endif
+  addr = ::mmap(nullptr, bytes, prot, flags, section.native_handle().fd, offset);
+  if(!addr)
+    return make_errored_result<map_handle>(errno);
   ret.get()._addr = (char *) addr;
   ret.get()._length = _bytes;
   // Make my handle borrow the native handle of my backing storage
   ret.get()._v.h = section.backing_native_handle().h;
   BOOST_AFIO_LOG_FUNCTION_CALL(ret.get()._v.h);
-
-  // Windows has no way of getting the kernel to prefault maps on creation, so ...
-  if(_flag & section_handle::flag::prefault)
-  {
-    // Start an asynchronous prefetch
-    buffer_type b((char *) addr, _bytes);
-    (void) prefetch(span<buffer_type>(&b, 1));
-    // If this kernel doesn't support that API, manually poke every page in the new map
-    if(!PrefetchVirtualMemory_)
-    {
-      size_t pagesize = utils::page_size();
-      volatile char *a = (volatile char *) addr;
-      for(size_t n = 0; n < _bytes; n += pagesize)
-        a[n];
-    }
-  }
   return ret;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 result<map_handle::buffer_type> map_handle::commit(buffer_type region, section_handle::flag _flag) noexcept
 {

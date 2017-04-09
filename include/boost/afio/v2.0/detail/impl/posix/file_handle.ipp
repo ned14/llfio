@@ -33,9 +33,6 @@ DEALINGS IN THE SOFTWARE.
 
 #include <fcntl.h>
 #include <unistd.h>
-#if BOOST_AFIO_USE_POSIX_AIO
-#include <aio.h>
-#endif
 
 BOOST_AFIO_V2_NAMESPACE_BEGIN
 
@@ -252,12 +249,12 @@ result<file_handle> file_handle::temp_inode(path_type dirpath, mode _mode, flag 
       if(EEXIST == errcode)
         continue;
       BOOST_AFIO_LOG_FUNCTION_CALL(0);
-      return make_errored_result<file_handle>(errcode, path_));
+      return make_errored_result<file_handle>(errcode);
     }
     BOOST_AFIO_LOG_FUNCTION_CALL(nativeh.fd);
     // Immediately unlink after creation
     if(-1 == ::unlink(path_))
-      return make_errored_result<file_handle>(errno, path_);
+      return make_errored_result<file_handle>(errno);
     BOOST_OUTCOME_TRYV(_fetch_inode());  // It can be useful to know the inode of temporary inodes
     return ret;
   }
@@ -270,7 +267,7 @@ result<file_handle> file_handle::clone() const noexcept
   ret.value()._v.behaviour = _v.behaviour;
   ret.value()._v.fd = ::dup(_v.fd);
   if(-1 == ret.value()._v.fd)
-    return make_errored_result<file_handle>(errno);
+    return make_errored_result<file_handle>(errno, last190(_path));
   return ret;
 }
 
@@ -297,320 +294,41 @@ result<file_handle::path_type> file_handle::relink(path_type newpath) noexcept
       BOOST_OUTCOME_TRYV(verify_inode(*this));
     }
     if(-1 == ::rename(_path.c_str(), newpath.c_str()))
-      return make_errored_result<path_type>(errno);
+      return make_errored_result<path_type>(errno, last190(_path));
   }
   _path = std::move(newpath);
   return _path;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-result<handle> handle::clone(io_service &service, handle::mode mode, handle::caching caching) const noexcept
+result<void> file_handle::unlink() noexcept
 {
-  result<handle> ret(handle(&service, _path, native_handle_type(), _caching, _flags));
-  ret.value()._v.behaviour = _v.behaviour;
-  // If current handle is read-only and clone request is to add write powers, we can't use dup()
-  if(mode != handle::mode::unchanged && !_v.is_writable() && (mode == handle::mode::write || mode == handle::mode::append))
+  BOOST_AFIO_LOG_FUNCTION_CALL(_v.fd);
+  // FIXME: As soon as we implement fat paths, make this race free
+  if(!(flags & disable_safety_unlinks))
   {
-    // Race free fetch the handle's path and reopen it with the new permissions
-    // TODO FIXME
-    return make_errored_result<handle>(stl11::errc::function_not_supported);
+    BOOST_OUTCOME_TRYV(verify_inode(*this));
   }
-  else
-  {
-    if(-1 == (ret.value()._v.fd = ::dup(_v.fd)))
-      return make_errored_result<handle>(errno);
-    // Only care if cloning and changing append only flag
-    if(mode != handle::mode::unchanged && (mode == handle::mode::write || mode == handle::mode::append))
-    {
-      ret.value()._v.behaviour = _v.behaviour & ~(native_handle_type::disposition::seekable | native_handle_type::disposition::readable | native_handle_type::disposition::writable | native_handle_type::disposition::append_only);
-      int attribs = 0;
-      if(-1 == (attribs = fcntl(ret.value()._v.fd, F_GETFL)))
-        return make_errored_result<handle>(errno);
-      switch(mode)
-      {
-      case handle::mode::unchanged:
-        break;
-      case handle::mode::none:
-      case handle::mode::attr_read:
-      case handle::mode::attr_write:
-      case handle::mode::read:
-        return make_errored_result<handle>(stl11::errc::invalid_argument);
-      case handle::mode::write:
-        attribs &= ~O_APPEND;
-        ret.value()._v.behaviour |= native_handle_type::disposition::seekable | native_handle_type::disposition::readable | native_handle_type::disposition::writable;
-        break;
-      case handle::mode::append:
-        attribs |= O_APPEND;
-        ret.value()._v.behaviour |= native_handle_type::disposition::append_only | native_handle_type::disposition::writable;
-        break;
-      }
-      if(-1 == fcntl(ret.value()._v.fd, F_SETFL, attribs))
-        return make_errored_result<handle>(errno);
-    }
-    if(caching != handle::caching::unchanged && caching != _caching)
-    {
-      // TODO: Allow fiddling with O_DIRECT
-      return make_errored_result<handle>(stl11::errc::invalid_argument);
-    }
-  }
-  return ret;
+  if(-1 == ::rename(_path.c_str(), newpath.c_str()))
+    return make_errored_result<path_type>(errno, last190(_path));
+  _path.clear();
+  return make_valued_result<void>();
 }
 
-handle::~handle()
+result<file_handle::extent_type> file_handle::length() const noexcept
 {
-  if(_v)
-  {
-    if(are_safety_fsyncs_issued())
-    {
-      fsync(_v.fd);
-    }
-    ::close(_v.fd);
-    _v = native_handle_type();
-  }
-}
-
-template <class CompletionRoutine, class BuffersType, class IORoutine> result<file_handle::io_state_ptr<CompletionRoutine, BuffersType>> file_handle::_begin_io(file_handle::operation_t operation, file_handle::io_request<BuffersType> reqs, CompletionRoutine &&completion, IORoutine &&ioroutine) noexcept
-{
-  // Need to keep a set of aiocbs matching the scatter-gather buffers
-  struct state_type : public _io_state_type<CompletionRoutine, BuffersType>
-  {
-#if BOOST_AFIO_USE_POSIX_AIO
-    struct aiocb aiocbs[1];
-#else
-#error todo
-#endif
-    state_type(handle *_parent, operation_t _operation, CompletionRoutine &&f, size_t _items)
-        : _io_state_type<CompletionRoutine, BuffersType>(_parent, _operation, std::forward<CompletionRoutine>(f), _items)
-    {
-    }
-    virtual void operator()(long errcode, long bytes_transferred, void *internal_state) noexcept override final
-    {
-#if BOOST_AFIO_USE_POSIX_AIO
-      struct aiocb **_paiocb = (struct aiocb **) internal_state;
-      struct aiocb *aiocb = *_paiocb;
-      assert(aiocb >= aiocbs && aiocb < aiocbs + this->items);
-      *_paiocb = nullptr;
-#else
-#error todo
-#endif
-      if(this->result)
-      {
-        if(errcode)
-          this->result = make_errored_result<BuffersType>((int) errcode);
-        else
-        {
-// Figure out which i/o I am and update the buffer in question
-#if BOOST_AFIO_USE_POSIX_AIO
-          size_t idx = aiocb - aiocbs;
-#else
-#error todo
-#endif
-          if(idx >= this->items)
-          {
-            BOOST_AFIO_LOG_FATAL("file_handle::io_state::operator() called with invalid index");
-            std::terminate();
-          }
-          this->result.value()[idx].second = bytes_transferred;
-        }
-      }
-      this->parent->service()->_work_done();
-      // Are we done?
-      if(!--this->items_to_go)
-        this->completion(this);
-    }
-    virtual ~state_type() override final
-    {
-      // Do we need to cancel pending i/o?
-      if(this->items_to_go)
-      {
-        for(size_t n = 0; n < this->items; n++)
-        {
-#if BOOST_AFIO_USE_POSIX_AIO
-          int ret = aio_cancel(this->parent->native_handle().fd, aiocbs + n);
-#if 0
-          if(ret<0 || ret==AIO_NOTCANCELED)
-          {
-            std::cout << "Failed to cancel " << (aiocbs+n) << std::endl;
-          }
-          else if(ret==AIO_CANCELED)
-          {
-            std::cout << "Cancelled " << (aiocbs+n) << std::endl;
-          }
-          else if(ret==AIO_ALLDONE)
-          {
-            std::cout << "Already done " << (aiocbs+n) << std::endl;
-          }
-#endif
-#else
-#error todo
-#endif
-        }
-        // Pump the i/o service until all pending i/o is completed
-        while(this->items_to_go)
-        {
-          auto res = this->parent->service()->run();
-#ifndef NDEBUG
-          if(res.has_error())
-          {
-            BOOST_AFIO_LOG_FATAL("file_handle: io_service failed");
-            std::terminate();
-          }
-          if(!res.get())
-          {
-            BOOST_AFIO_LOG_FATAL("file_handle: io_service returns no work when i/o has not completed");
-            std::terminate();
-          }
-#endif
-        }
-      }
-    }
-  } * state;
-  extent_type offset = reqs.offset;
-  size_t statelen = sizeof(state_type) + (reqs.buffers.size() - 1) * sizeof(struct aiocb), items(reqs.buffers.size());
-  using return_type = io_state_ptr<CompletionRoutine, BuffersType>;
-#if BOOST_AFIO_USE_POSIX_AIO && defined(AIO_LISTIO_MAX)
-  if(items > AIO_LISTIO_MAX)
-    return make_errored_result<return_type>(stl11::errc::invalid_argument);
-#endif
-  void *mem = ::calloc(1, statelen);
-  if(!mem)
-    return make_errored_result<return_type>(stl11::errc::not_enough_memory);
-  return_type _state((_io_state_type<CompletionRoutine, BuffersType> *) mem);
-  new((state = (state_type *) mem)) state_type(this, operation, std::forward<CompletionRoutine>(completion), items);
-  // Noexcept move the buffers from req into result
-  BuffersType &out = state->result.value();
-  out = std::move(reqs.buffers);
-  for(size_t n = 0; n < items; n++)
-  {
-#if BOOST_AFIO_USE_POSIX_AIO
-    struct aiocb *aiocb = state->aiocbs + n;
-    aiocb->aio_fildes = _v.fd;
-    aiocb->aio_offset = offset;
-    aiocb->aio_buf = (void *) out[n].first;
-    aiocb->aio_nbytes = out[n].second;
-    aiocb->aio_sigevent.sigev_notify = SIGEV_NONE;
-    aiocb->aio_sigevent.sigev_value.sival_ptr = (void *) state;
-    aiocb->aio_lio_opcode = (operation == operation_t::write) ? LIO_WRITE : LIO_READ;
-#else
-#error todo
-#endif
-    offset += out[n].second;
-    ++state->items_to_go;
-  }
-  int ret = 0;
-#if BOOST_AFIO_USE_POSIX_AIO
-  if(service()->using_kqueues())
-  {
-#if BOOST_AFIO_COMPILE_KQUEUES
-    // Only issue one kqueue event when entire scatter-gather has completed
-    struct _sigev = {0};
-#error todo
-#endif
-  }
-  else
-  {
-    // Add these i/o's to the quick aio_suspend list
-    service()->_aiocbsv.resize(service()->_aiocbsv.size() + items);
-    struct aiocb **thislist = service()->_aiocbsv.data() + service()->_aiocbsv.size() - items;
-    for(size_t n = 0; n < items; n++)
-    {
-      struct aiocb *aiocb = state->aiocbs + n;
-      thislist[n] = aiocb;
-    }
-    ret = lio_listio(LIO_NOWAIT, thislist, items, nullptr);
-  }
-#else
-#error todo
-#endif
-  if(ret < 0)
-  {
-    service()->_aiocbsv.resize(service()->_aiocbsv.size() - items);
-    state->items_to_go = 0;
-    state->result = make_errored_result<BuffersType>(errno);
-    state->completion(state);
-    return make_result<return_type>(std::move(_state));
-  }
-  service()->_work_enqueued(items);
-  return make_result<return_type>(std::move(_state));
-}
-
-template <class CompletionRoutine> result<file_handle::io_state_ptr<CompletionRoutine, file_handle::buffers_type>> file_handle::async_read(file_handle::io_request<file_handle::buffers_type> reqs, CompletionRoutine &&completion) noexcept
-{
-  return _begin_io(operation_t::read, std::move(reqs), [completion = std::forward<CompletionRoutine>(completion)](auto *state) { completion(state->parent, state->result); }, nullptr);
-}
-
-template <class CompletionRoutine> result<file_handle::io_state_ptr<CompletionRoutine, file_handle::const_buffers_type>> file_handle::async_write(file_handle::io_request<file_handle::const_buffers_type> reqs, CompletionRoutine &&completion) noexcept
-{
-  return _begin_io(operation_t::write, std::move(reqs), [completion = std::forward<CompletionRoutine>(completion)](auto *state) { completion(state->parent, state->result); }, nullptr);
-}
-
-file_handle::io_result<file_handle::buffers_type> file_handle::read(file_handle::io_request<file_handle::buffers_type> reqs, deadline d) noexcept
-{
-  io_result<buffers_type> ret;
-  auto _io_state(_begin_io(operation_t::read, std::move(reqs), [&ret](auto *state) { ret = std::move(state->result); }, nullptr));
-  BOOST_OUTCOME_FILTER_ERROR(io_state, _io_state);
-
-  // While i/o is not done pump i/o completion
-  while(!ret.is_ready())
-  {
-    auto t(_service->run_until(d));
-    // If i/o service pump failed or timed out, cancel outstanding i/o and return
-    if(!t)
-      return make_errored_result<buffers_type>(t.get_error());
-#ifndef NDEBUG
-    if(!ret.is_ready() && t && !t.get())
-    {
-      BOOST_AFIO_LOG_FATAL("file_handle: io_service returns no work when i/o has not completed");
-      std::terminate();
-    }
-#endif
-  }
-  return ret;
-}
-
-file_handle::io_result<file_handle::const_buffers_type> file_handle::write(file_handle::io_request<file_handle::const_buffers_type> reqs, deadline d) noexcept
-{
-  io_result<const_buffers_type> ret;
-  auto _io_state(_begin_io(operation_t::write, std::move(reqs), [&ret](auto *state) { ret = std::move(state->result); }, nullptr));
-  BOOST_OUTCOME_FILTER_ERROR(io_state, _io_state);
-
-  // While i/o is not done pump i/o completion
-  while(!ret.is_ready())
-  {
-    auto t(_service->run_until(d));
-    // If i/o service pump failed or timed out, cancel outstanding i/o and return
-    if(!t)
-      return make_errored_result<const_buffers_type>(t.get_error());
-#ifndef NDEBUG
-    if(!ret.is_ready() && t && !t.get())
-    {
-      BOOST_AFIO_LOG_FATAL("file_handle: io_service returns no work when i/o has not completed");
-      std::terminate();
-    }
-#endif
-  }
-  return ret;
+  BOOST_AFIO_LOG_FUNCTION_CALL(_v.fd);
+  struct stat_t s;
+  memset(&s, 0, sizeof(s));
+  if(-1 == ::fstat(_v.fd, &s))
+    return make_errored_result<file_handle::extent_type>(errno, last190(_path));
+  return s.st_size;
 }
 
 result<file_handle::extent_type> file_handle::truncate(file_handle::extent_type newsize) noexcept
 {
+  BOOST_AFIO_LOG_FUNCTION_CALL(_v.fd);
   if(ftruncate(_v.fd, newsize) < 0)
-    return make_errored_result<extent_type>(errno);
+    return make_errored_result<extent_type>(errno, last190(_path));
   if(are_safety_fsyncs_issued())
   {
     fsync(_v.fd);
