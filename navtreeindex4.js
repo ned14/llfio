@@ -1,5 +1,13 @@
 var NAVTREEINDEX4 =
 {
+"structboost_1_1afio_1_1v2__xxx_1_1statfs__t_1_1want__base.html#a35f5b2de8e92fce4b815ebce176d1993ad6b9087a338a1b8897775e17c518a538":[3,0,0,0,0,12,1,0,0],
+"structboost_1_1afio_1_1v2__xxx_1_1statfs__t_1_1want__base.html#a35f5b2de8e92fce4b815ebce176d1993ae340e202da13891a528e604882afc5e5":[3,0,0,0,0,12,1,0,6],
+"structboost_1_1afio_1_1v2__xxx_1_1statfs__t_1_1want__base.html#a35f5b2de8e92fce4b815ebce176d1993ae93a7678cc41ae98b974437c1eb108c9":[3,0,0,0,0,12,1,0,1],
+"structboost_1_1afio_1_1v2__xxx_1_1statfs__t_1_1want__base.html#a35f5b2de8e92fce4b815ebce176d1993af662d37fdacd0144c4ac9f5f69b1de7a":[3,0,0,0,0,12,1,0,11],
+"structboost_1_1afio_1_1v2__xxx_1_1storage__profile_1_1item.html":[3,0,0,0,0,1,1],
+"structboost_1_1afio_1_1v2__xxx_1_1storage__profile_1_1item.html#a24d0cb04b8399b63939399ca20c71d5b":[3,0,0,0,0,1,1,0],
+"structboost_1_1afio_1_1v2__xxx_1_1storage__profile_1_1item.html#a2c30c7fff1b6ee0a680775aca4904f42":[3,0,0,0,0,1,1,2],
+"structboost_1_1afio_1_1v2__xxx_1_1storage__profile_1_1item.html#a347eb1ce54dddfe5f1654e6aa58470a2":[3,0,0,0,0,1,1,3],
 "structboost_1_1afio_1_1v2__xxx_1_1storage__profile_1_1item.html#a55d90af1165e015d30489f253396b6c7":[3,0,0,0,0,1,1,6],
 "structboost_1_1afio_1_1v2__xxx_1_1storage__profile_1_1item.html#a5694fece1d182ad76eedd0be4aa59f76":[3,0,0,0,0,1,1,8],
 "structboost_1_1afio_1_1v2__xxx_1_1storage__profile_1_1item.html#a58f0cc61ffd81d49c0fa7786a3ef420b":[3,0,0,0,0,1,1,5],
@@ -105,8 +113,8 @@ var NAVTREEINDEX4 =
 "version_8hpp.html#a57ccd4188902593e71fa3a397236fec5":[4,0,0,0,0,2,5],
 "version_8hpp.html#a7c3b7ac71103a427e96797dd72a344ac":[4,0,0,0,0,2,0],
 "version_8hpp.html#a9c4fb3ff02ff3a503da1976425995e3b":[4,0,0,0,0,2,4],
-"version_8hpp.html#af40cb131effa2c3e80b9d9251724d7aa":[4,0,0,0,0,2,1],
 "version_8hpp.html#af40cb131effa2c3e80b9d9251724d7aa":[4,0,0,0,0,2,2],
+"version_8hpp.html#af40cb131effa2c3e80b9d9251724d7aa":[4,0,0,0,0,2,1],
 "version_8hpp.html#ga57b799d93636bd46b7cc54899f6d24dd":[4,0,0,0,0,2,8],
 "version_8hpp.html#ga6630f7026f9cd8ef19c13f58c719323a":[4,0,0,0,0,2,6],
 "version_8hpp.html#ga6f2f297d6873b445e0df91bde6854cdd":[4,0,0,0,0,2,9],

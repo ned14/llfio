@@ -33,7 +33,6 @@ var hierarchy =
     [ "boost::afio::v2_xxx::native_handle_type", "structboost_1_1afio_1_1v2__xxx_1_1native__handle__type.html", null ],
     [ "boost::afio::v2_xxx::utils::page_allocator< T >", "classboost_1_1afio_1_1v2__xxx_1_1utils_1_1page__allocator.html", null ],
     [ "boost::afio::v2_xxx::utils::page_allocator< void >", "classboost_1_1afio_1_1v2__xxx_1_1utils_1_1page__allocator_3_01void_01_4.html", null ],
-    [ "boost::afio::v2_xxx::handle::really_copy", "structboost_1_1afio_1_1v2__xxx_1_1handle_1_1really__copy.html", null ],
     [ "boost::afio::v2_xxx::utils::page_allocator< T >::rebind< U >", "structboost_1_1afio_1_1v2__xxx_1_1utils_1_1page__allocator_1_1rebind.html", null ],
     [ "boost::afio::v2_xxx::utils::page_allocator< void >::rebind< U >", "structboost_1_1afio_1_1v2__xxx_1_1utils_1_1page__allocator_3_01void_01_4_1_1rebind.html", null ],
     [ "result", null, [
@@ -49,6 +48,6 @@ var hierarchy =
     [ "boost::afio::v2_xxx::stat_t", "structboost_1_1afio_1_1v2__xxx_1_1stat__t.html", null ],
     [ "boost::afio::v2_xxx::statfs_t", "structboost_1_1afio_1_1v2__xxx_1_1statfs__t.html", null ],
     [ "boost::afio::v2_xxx::storage_profile::storage_profile", "structboost_1_1afio_1_1v2__xxx_1_1storage__profile_1_1storage__profile.html", null ],
-    [ "boost::afio::v2_xxx::statfs_t::want_base", "structboost_1_1afio_1_1v2__xxx_1_1statfs__t_1_1want__base.html", null ],
-    [ "boost::afio::v2_xxx::stat_t::want_base", "structboost_1_1afio_1_1v2__xxx_1_1stat__t_1_1want__base.html", null ]
+    [ "boost::afio::v2_xxx::stat_t::want_base", "structboost_1_1afio_1_1v2__xxx_1_1stat__t_1_1want__base.html", null ],
+    [ "boost::afio::v2_xxx::statfs_t::want_base", "structboost_1_1afio_1_1v2__xxx_1_1statfs__t_1_1want__base.html", null ]
 ];

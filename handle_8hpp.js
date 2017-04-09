@@ -2,7 +2,6 @@ var handle_8hpp =
 [
     [ "handle", "classboost_1_1afio_1_1v2__xxx_1_1handle.html", "classboost_1_1afio_1_1v2__xxx_1_1handle" ],
     [ "flag_base", "structboost_1_1afio_1_1v2__xxx_1_1handle_1_1flag__base.html", "structboost_1_1afio_1_1v2__xxx_1_1handle_1_1flag__base" ],
-    [ "really_copy", "structboost_1_1afio_1_1v2__xxx_1_1handle_1_1really__copy.html", null ],
     [ "io_handle", "classboost_1_1afio_1_1v2__xxx_1_1io__handle.html", "classboost_1_1afio_1_1v2__xxx_1_1io__handle" ],
     [ "io_request", "structboost_1_1afio_1_1v2__xxx_1_1io__handle_1_1io__request.html", "structboost_1_1afio_1_1v2__xxx_1_1io__handle_1_1io__request" ],
     [ "io_result", "classboost_1_1afio_1_1v2__xxx_1_1io__handle_1_1io__result.html", "classboost_1_1afio_1_1v2__xxx_1_1io__handle_1_1io__result" ],

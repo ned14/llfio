@@ -141,9 +141,6 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1handle_1_1flag__base.html">flag_base</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Bitwise flags which can be specified.  <a href="structboost_1_1afio_1_1v2__xxx_1_1handle_1_1flag__base.html#details">More...</a><br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1handle_1_1really__copy.html">really_copy</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tag type to enable copy constructor.  <a href="structboost_1_1afio_1_1v2__xxx_1_1handle_1_1really__copy.html#details">More...</a><br/></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
 Public Types</h2></td></tr>
@@ -197,9 +194,9 @@ using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cla
 using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html#ace66ef9d4b55ad11d02af26814069d94">unique_id_type</a> = boost_lite::integers128::uint128</td></tr>
 <tr class="memdesc:ace66ef9d4b55ad11d02af26814069d94"><td class="mdescLeft">&#160;</td><td class="mdescRight">The unique identifier type used by this handle. <br/></td></tr>
 <tr class="separator:ace66ef9d4b55ad11d02af26814069d94"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af953896a1771bf08759f02b391a1d622"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af953896a1771bf08759f02b391a1d622"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><b>flag</b> = boost_lite::_5e7563f4::bitfield::bitfield&lt; <a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1handle_1_1flag__base.html">flag_base</a> &gt;</td></tr>
-<tr class="separator:af953896a1771bf08759f02b391a1d622"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a23d5ba410331a46aa470ec2f9c18a215"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a23d5ba410331a46aa470ec2f9c18a215"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>flag</b> = boost_lite::_xxx::bitfield::bitfield&lt; <a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1handle_1_1flag__base.html">flag_base</a> &gt;</td></tr>
+<tr class="separator:a23d5ba410331a46aa470ec2f9c18a215"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
@@ -211,22 +208,26 @@ constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href=
 constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html#a4e9723c353eee4bcd629a7c9a01472f2">handle</a> (<a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1native__handle__type.html">native_handle_type</a> h, <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html#a81c7de194feaa88684ca9851d0d527ca">caching</a> <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html#a81c7de194feaa88684ca9851d0d527ca">caching</a>=caching::none, flag <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html#add27fa17cd6356b49a26a8b6dafb6a6d">flags</a>=flag::none)</td></tr>
 <tr class="memdesc:a4e9723c353eee4bcd629a7c9a01472f2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a handle from a supplied native handle. <br/></td></tr>
 <tr class="separator:a4e9723c353eee4bcd629a7c9a01472f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0dbf908498e5cbf54ee0fff752c0c490"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0dbf908498e5cbf54ee0fff752c0c490"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html#a0dbf908498e5cbf54ee0fff752c0c490">handle</a> (<a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html">handle</a> &amp;&amp;o) noexcept</td></tr>
-<tr class="memdesc:a0dbf908498e5cbf54ee0fff752c0c490"><td class="mdescLeft">&#160;</td><td class="mdescRight">Move the handle. Explicit because this will lose information in any derived source. <br/></td></tr>
-<tr class="separator:a0dbf908498e5cbf54ee0fff752c0c490"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2c20412387db2551d9b26824412d4986"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2c20412387db2551d9b26824412d4986"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html#a2c20412387db2551d9b26824412d4986">handle</a> (const <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html">handle</a> &amp;o, <a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1handle_1_1really__copy.html">really_copy</a>)</td></tr>
-<tr class="memdesc:a2c20412387db2551d9b26824412d4986"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy the handle. Tag enabled because copying handles is expensive (fd duplication). <br/></td></tr>
-<tr class="separator:a2c20412387db2551d9b26824412d4986"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aae278681887f4cb68b0b57c5ef6c8d4e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aae278681887f4cb68b0b57c5ef6c8d4e"></a>
-<a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html">handle</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html#aae278681887f4cb68b0b57c5ef6c8d4e">operator=</a> (<a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html">handle</a> &amp;&amp;o)=delete</td></tr>
-<tr class="memdesc:aae278681887f4cb68b0b57c5ef6c8d4e"><td class="mdescLeft">&#160;</td><td class="mdescRight">No move assignment. <br/></td></tr>
-<tr class="separator:aae278681887f4cb68b0b57c5ef6c8d4e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a73ec71bef5c89cbaa517ce0997d649f2"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a73ec71bef5c89cbaa517ce0997d649f2"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html#a73ec71bef5c89cbaa517ce0997d649f2">handle</a> (const <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html">handle</a> &amp;)=delete</td></tr>
+<tr class="memdesc:a73ec71bef5c89cbaa517ce0997d649f2"><td class="mdescLeft">&#160;</td><td class="mdescRight">No copy construction (use clone()) <br/></td></tr>
+<tr class="separator:a73ec71bef5c89cbaa517ce0997d649f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acda0caaacf4404bffc57508930ba52be"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="acda0caaacf4404bffc57508930ba52be"></a>
 <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html">handle</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html#acda0caaacf4404bffc57508930ba52be">operator=</a> (const <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html">handle</a> &amp;o)=delete</td></tr>
 <tr class="memdesc:acda0caaacf4404bffc57508930ba52be"><td class="mdescLeft">&#160;</td><td class="mdescRight">No copy assignment. <br/></td></tr>
 <tr class="separator:acda0caaacf4404bffc57508930ba52be"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0dbf908498e5cbf54ee0fff752c0c490"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0dbf908498e5cbf54ee0fff752c0c490"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html#a0dbf908498e5cbf54ee0fff752c0c490">handle</a> (<a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html">handle</a> &amp;&amp;o) noexcept</td></tr>
+<tr class="memdesc:a0dbf908498e5cbf54ee0fff752c0c490"><td class="mdescLeft">&#160;</td><td class="mdescRight">Move the handle. <br/></td></tr>
+<tr class="separator:a0dbf908498e5cbf54ee0fff752c0c490"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2f953c305bc7e621dc4df4b73b4d20d0"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2f953c305bc7e621dc4df4b73b4d20d0"></a>
+<a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html">handle</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html#a2f953c305bc7e621dc4df4b73b4d20d0">operator=</a> (<a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html">handle</a> &amp;&amp;o) noexcept</td></tr>
+<tr class="memdesc:a2f953c305bc7e621dc4df4b73b4d20d0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Move assignment of handle. <br/></td></tr>
+<tr class="separator:a2f953c305bc7e621dc4df4b73b4d20d0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adc26314bd23b9080ac3c4c2dd6bc5937"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="adc26314bd23b9080ac3c4c2dd6bc5937"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html#adc26314bd23b9080ac3c4c2dd6bc5937">swap</a> (<a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html">handle</a> &amp;o) noexcept</td></tr>
+<tr class="memdesc:adc26314bd23b9080ac3c4c2dd6bc5937"><td class="mdescLeft">&#160;</td><td class="mdescRight">Swap with another instance. <br/></td></tr>
+<tr class="separator:adc26314bd23b9080ac3c4c2dd6bc5937"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acb372c2075980a97874557859a62f5f7"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="acb372c2075980a97874557859a62f5f7"></a>
 virtual <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html#ace66ef9d4b55ad11d02af26814069d94">unique_id_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html#acb372c2075980a97874557859a62f5f7">unique_id</a> () const noexcept</td></tr>
 <tr class="memdesc:acb372c2075980a97874557859a62f5f7"><td class="mdescLeft">&#160;</td><td class="mdescRight">A unique identifier for this handle in this process (native handle). Subclasses like <code>file_handle</code> make this a unique identifier across the entire system. <br/></td></tr>
@@ -239,6 +240,8 @@ virtual <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html#aa28b35
 virtual <a class="el" href="namespaceboost_1_1afio_1_1v2__xxx.html#ac8d06ecaa9660e7251c1251d88c1305c">result</a>&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html#a651ff10099e7522df784507aca8b8f0f">close</a> () noexcept</td></tr>
 <tr class="memdesc:a651ff10099e7522df784507aca8b8f0f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Immediately close the native handle type managed by this handle. <br/></td></tr>
 <tr class="separator:a651ff10099e7522df784507aca8b8f0f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a95d26fe35f85d81382d903224660084d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceboost_1_1afio_1_1v2__xxx.html#ac8d06ecaa9660e7251c1251d88c1305c">result</a>&lt; <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html">handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html#a95d26fe35f85d81382d903224660084d">clone</a> () const noexcept</td></tr>
+<tr class="separator:a95d26fe35f85d81382d903224660084d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a59c9bc1338196095a028b2870dcfb61d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a59c9bc1338196095a028b2870dcfb61d"></a>
 virtual <a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1native__handle__type.html">native_handle_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html#a59c9bc1338196095a028b2870dcfb61d">release</a> () noexcept</td></tr>
 <tr class="memdesc:a59c9bc1338196095a028b2870dcfb61d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Release the native handle type managed by this handle. <br/></td></tr>
@@ -467,6 +470,31 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operato
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
+<a class="anchor" id="a95d26fe35f85d81382d903224660084d"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespaceboost_1_1afio_1_1v2__xxx.html#ac8d06ecaa9660e7251c1251d88c1305c">result</a>&lt;<a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html">handle</a>&gt; boost::afio::v2_xxx::handle::clone </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Clone this handle (copy constructor is disabled to avoid accidental copying)</p>
+<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX dup() or DuplicateHandle() can return. </dd></dl>
+
+</div>
+</div>
 <a class="anchor" id="adf964e787e0666fc5b7d94c2715ee6f5"></a>
 <div class="memitem">
 <div class="memproto">
