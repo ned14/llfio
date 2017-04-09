@@ -34,8 +34,8 @@ var hierarchy =
     [ "boost::afio::v2_xxx::utils::page_allocator< T >", "classboost_1_1afio_1_1v2__xxx_1_1utils_1_1page__allocator.html", null ],
     [ "boost::afio::v2_xxx::utils::page_allocator< void >", "classboost_1_1afio_1_1v2__xxx_1_1utils_1_1page__allocator_3_01void_01_4.html", null ],
     [ "boost::afio::v2_xxx::handle::really_copy", "structboost_1_1afio_1_1v2__xxx_1_1handle_1_1really__copy.html", null ],
-    [ "boost::afio::v2_xxx::utils::page_allocator< void >::rebind< U >", "structboost_1_1afio_1_1v2__xxx_1_1utils_1_1page__allocator_3_01void_01_4_1_1rebind.html", null ],
     [ "boost::afio::v2_xxx::utils::page_allocator< T >::rebind< U >", "structboost_1_1afio_1_1v2__xxx_1_1utils_1_1page__allocator_1_1rebind.html", null ],
+    [ "boost::afio::v2_xxx::utils::page_allocator< void >::rebind< U >", "structboost_1_1afio_1_1v2__xxx_1_1utils_1_1page__allocator_3_01void_01_4_1_1rebind.html", null ],
     [ "result", null, [
       [ "boost::afio::v2_xxx::io_handle::io_result< T >", "classboost_1_1afio_1_1v2__xxx_1_1io__handle_1_1io__result.html", null ],
       [ "boost::afio::v2_xxx::io_handle::io_result< BuffersType >", "classboost_1_1afio_1_1v2__xxx_1_1io__handle_1_1io__result.html", null ]
@@ -46,7 +46,9 @@ var hierarchy =
       [ "boost::afio::v2_xxx::algorithm::shared_fs_mutex::lock_files", "classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1lock__files.html", null ],
       [ "boost::afio::v2_xxx::algorithm::shared_fs_mutex::memory_map< Hasher, HashIndexSize, SpinlockType >", "classboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html", null ]
     ] ],
+    [ "boost::afio::v2_xxx::stat_t", "structboost_1_1afio_1_1v2__xxx_1_1stat__t.html", null ],
     [ "boost::afio::v2_xxx::statfs_t", "structboost_1_1afio_1_1v2__xxx_1_1statfs__t.html", null ],
     [ "boost::afio::v2_xxx::storage_profile::storage_profile", "structboost_1_1afio_1_1v2__xxx_1_1storage__profile_1_1storage__profile.html", null ],
-    [ "boost::afio::v2_xxx::statfs_t::want_base", "structboost_1_1afio_1_1v2__xxx_1_1statfs__t_1_1want__base.html", null ]
+    [ "boost::afio::v2_xxx::statfs_t::want_base", "structboost_1_1afio_1_1v2__xxx_1_1statfs__t_1_1want__base.html", null ],
+    [ "boost::afio::v2_xxx::stat_t::want_base", "structboost_1_1afio_1_1v2__xxx_1_1stat__t_1_1want__base.html", null ]
 ];

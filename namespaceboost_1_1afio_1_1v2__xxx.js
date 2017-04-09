@@ -11,5 +11,6 @@ var namespaceboost_1_1afio_1_1v2__xxx =
     [ "section_handle", "classboost_1_1afio_1_1v2__xxx_1_1section__handle.html", "classboost_1_1afio_1_1v2__xxx_1_1section__handle" ],
     [ "map_handle", "classboost_1_1afio_1_1v2__xxx_1_1map__handle.html", "classboost_1_1afio_1_1v2__xxx_1_1map__handle" ],
     [ "native_handle_type", "structboost_1_1afio_1_1v2__xxx_1_1native__handle__type.html", "structboost_1_1afio_1_1v2__xxx_1_1native__handle__type" ],
+    [ "stat_t", "structboost_1_1afio_1_1v2__xxx_1_1stat__t.html", "structboost_1_1afio_1_1v2__xxx_1_1stat__t" ],
     [ "statfs_t", "structboost_1_1afio_1_1v2__xxx_1_1statfs__t.html", "structboost_1_1afio_1_1v2__xxx_1_1statfs__t" ]
 ];

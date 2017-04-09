@@ -2,9 +2,10 @@ var classboost_1_1afio_1_1v2__xxx_1_1section__handle =
 [
     [ "flag_base", "structboost_1_1afio_1_1v2__xxx_1_1section__handle_1_1flag__base.html", "structboost_1_1afio_1_1v2__xxx_1_1section__handle_1_1flag__base" ],
     [ "extent_type", "classboost_1_1afio_1_1v2__xxx_1_1section__handle.html#add93e9bb6b358daefd88696598b5d372", null ],
-    [ "flag", "classboost_1_1afio_1_1v2__xxx_1_1section__handle.html#a026bffb803b3118d74bf97f79140c2d7", null ],
+    [ "flag", "classboost_1_1afio_1_1v2__xxx_1_1section__handle.html#a704df70571f2f54d17e174fcb74963cc", null ],
     [ "path_type", "classboost_1_1afio_1_1v2__xxx_1_1section__handle.html#aa28b35a32f1292b6126a82bba20a2c90", null ],
     [ "size_type", "classboost_1_1afio_1_1v2__xxx_1_1section__handle.html#a7a2b1215d07fc84508b2d4577c775cfa", null ],
+    [ "unique_id_type", "classboost_1_1afio_1_1v2__xxx_1_1section__handle.html#ace66ef9d4b55ad11d02af26814069d94", null ],
     [ "caching", "classboost_1_1afio_1_1v2__xxx_1_1section__handle.html#a81c7de194feaa88684ca9851d0d527ca", [
       [ "unchanged", "classboost_1_1afio_1_1v2__xxx_1_1section__handle.html#a81c7de194feaa88684ca9851d0d527caa8d7b3d6b83c0a517eac07e1aac94b773", null ],
       [ "none", "classboost_1_1afio_1_1v2__xxx_1_1section__handle.html#a81c7de194feaa88684ca9851d0d527caa334c4a4c42fdb79d7ebc3e73b517e6f8", null ],
@@ -63,6 +64,7 @@ var classboost_1_1afio_1_1v2__xxx_1_1section__handle =
     [ "set_kernel_caching", "classboost_1_1afio_1_1v2__xxx_1_1section__handle.html#aa8de6675205db68de70bf9075a6c649f", null ],
     [ "swap", "classboost_1_1afio_1_1v2__xxx_1_1section__handle.html#ae0e0965229c5c6486352867c4284bffe", null ],
     [ "truncate", "classboost_1_1afio_1_1v2__xxx_1_1section__handle.html#a5a4ed3e38634ee4378133c7ccbb882d6", null ],
+    [ "unique_id", "classboost_1_1afio_1_1v2__xxx_1_1section__handle.html#acb372c2075980a97874557859a62f5f7", null ],
     [ "_backing", "classboost_1_1afio_1_1v2__xxx_1_1section__handle.html#a121212f4f90b641353eb6a1c55ce6c82", null ],
     [ "_caching", "classboost_1_1afio_1_1v2__xxx_1_1section__handle.html#ae19418f14d1dd86e75214eda7644d42f", null ],
     [ "_flag", "classboost_1_1afio_1_1v2__xxx_1_1section__handle.html#abe273f17a7504e8247846f3b300df9d1", null ],
