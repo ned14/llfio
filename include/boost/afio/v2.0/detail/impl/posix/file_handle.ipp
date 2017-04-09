@@ -174,6 +174,24 @@ inline result<int> attribs_from_handle_mode_caching_and_flags(native_handle_type
   }
 }
 
+result<void> file_handle::_fetch_inode() noexcept
+{
+  stat_t s;
+  BOOST_OUTCOME_TRYV(s.fill(*this, stat_t::want::dev|stat_t::want::ino));
+  _devid = s.st_dev;
+  _inode = s.st_ino;
+  return make_valued_result<void>();
+}
+
+inline result<void> check_inode(const file_handle &h) noexcept
+{
+  stat_t s;
+  BOOST_OUTCOME_TRYV(s.fill(h, stat_t::want::dev|stat_t::want::ino));
+  if(s.st_dev != h.st_dev() || s.st_ino != h.st_ino())
+    return make_errored_result<void>(stl11::errc::no_such_file_or_directory);
+  return make_valued_result<void>();
+}
+
 result<file_handle> file_handle::file(file_handle::path_type _path, file_handle::mode _mode, file_handle::creation _creation, file_handle::caching _caching, file_handle::flag flags) noexcept
 {
   result<file_handle> ret(file_handle(std::move(_path), native_handle_type(), _caching, flags));
@@ -185,6 +203,10 @@ result<file_handle> file_handle::file(file_handle::path_type _path, file_handle:
   if(-1 == nativeh.fd)
     return make_errored_result<file_handle>(errno, last190(ret.value()._path));
   BOOST_AFIO_LOG_FUNCTION_CALL(nativeh.fd);
+  if(!(flags & disable_safety_unlinks))
+  {
+    BOOST_OUTCOME_TRYV(_fetch_inode());
+  }
   if(_creation == creation::truncate && ret.value().are_safety_fsyncs_issued())
     fsync(nativeh.fd);
   return ret;
@@ -207,7 +229,10 @@ result<file_handle> file_handle::temp_inode(path_type dirpath, mode _mode, flag 
   const char *path_ = ret.value()._path.c_str();
   nativeh.fd = ::open(path_, attribs, 0600);
   if(-1 != nativeh.fd)
+  {
+    BOOST_OUTCOME_TRYV(_fetch_inode());  // It can be useful to know the inode of temporary inodes
     return ret;
+  }
   // If it failed, assume this kernel or FS doesn't support O_TMPFILE
   attribs&=~O_TMPFILE;
   attribs|=O_EXCL;
@@ -233,6 +258,7 @@ result<file_handle> file_handle::temp_inode(path_type dirpath, mode _mode, flag 
     // Immediately unlink after creation
     if(-1 == ::unlink(path_))
       return make_errored_result<file_handle>(errno, path_);
+    BOOST_OUTCOME_TRYV(_fetch_inode());  // It can be useful to know the inode of temporary inodes
     return ret;
   }
 }
@@ -240,7 +266,7 @@ result<file_handle> file_handle::temp_inode(path_type dirpath, mode _mode, flag 
 result<file_handle> file_handle::clone() const noexcept
 {
   BOOST_AFIO_LOG_FUNCTION_CALL(_v.fd);
-  result<file_handle> ret(file_handle(_path, native_handle_type(), _caching, _flags));
+  result<file_handle> ret(file_handle(native_handle_type(), _path, _devid, _inode, _caching, _flags));
   ret.value()._v.behaviour = _v.behaviour;
   ret.value()._v.fd = ::dup(_v.fd);
   if(-1 == ret.value()._v.fd)
@@ -255,7 +281,7 @@ result<file_handle::path_type> file_handle::relink(path_type newpath) noexcept
     newpath = _path.parent_path() / newpath;
 #ifdef O_TMPFILE
   // If the handle was created with O_TMPFILE, we need a different approach
-  if(_path.empty() && _caching&caching::temporary)
+  if(_path.empty() && (_caching & caching::temporary))
   {
     char path[PATH_MAX];
     snprintf(path, PATH_MAX, "/proc/self/fd/%d", _v.fd);
@@ -266,6 +292,10 @@ result<file_handle::path_type> file_handle::relink(path_type newpath) noexcept
 #endif
   {
     // FIXME: As soon as we implement fat paths, make this race free
+    if(!(flags & disable_safety_unlinks))
+    {
+      BOOST_OUTCOME_TRYV(verify_inode(*this));
+    }
     if(-1 == ::rename(_path.c_str(), newpath.c_str()))
       return make_errored_result<path_type>(errno);
   }

@@ -70,9 +70,12 @@ async_file_handle.
 class BOOST_AFIO_DECL file_handle : public io_handle
 {
 public:
+  using dev_t = uint64_t;
+  using ino_t = uint64_t;
   using path_type = io_handle::path_type;
   using extent_type = io_handle::extent_type;
   using size_type = io_handle::size_type;
+  using unique_id_type = io_handle::unique_id_type;
   using mode = io_handle::mode;
   using creation = io_handle::creation;
   using caching = io_handle::caching;
@@ -85,31 +88,42 @@ public:
   template <class T> using io_result = io_handle::io_result<T>;
 
 protected:
+  dev_t _devid;
+  ino_t _inode;
   path_type _path;
   io_service *_service;
+
+  //! Fill in _devid and _inode from the handle via fstat()
+  result<void> _fetch_inode() noexcept;
 
 public:
   //! Default constructor
   file_handle()
       : io_handle()
+      , _devid(0)
+      , _inode(0)
       , _service(nullptr)
   {
   }
   //! Construct a handle from a supplied native handle
-  file_handle(path_type path, native_handle_type h, caching caching = caching::none, flag flags = flag::none)
+  file_handle(native_handle_type h, dev_t devid, ino_t inode, path_type path, caching caching = caching::none, flag flags = flag::none)
       : io_handle(std::move(h), std::move(caching), std::move(flags))
+      , _devid(devid)
+      , _inod(inode)
       , _path(std::move(path))
       , _service(nullptr)
   {
   }
   //! Implicit move construction of file_handle permitted
-  file_handle(file_handle &&o) noexcept : io_handle(std::move(o)), _path(std::move(o._path)), _service(o._service) { o._service = nullptr; }
+  file_handle(file_handle &&o) noexcept : io_handle(std::move(o)), _devid(o._devid), _inode(o._inode), _path(std::move(o._path)), _service(o._service) { o._devid = 0; o._inode = 0; o._service = nullptr; }
   //! Explicit conversion from handle and io_handle permitted
-  explicit file_handle(handle &&o, path_type path) noexcept : io_handle(std::move(o)), _path(std::move(path)), _service(nullptr) {}
+  explicit file_handle(handle &&o, path_type path, dev_t devid, ino_t inode) noexcept : io_handle(std::move(o)), _devid(devid), _inode(inode), _path(std::move(path)), _service(nullptr) {}
   using io_handle::really_copy;
   //! Copy the handle. Tag enabled because copying handles is expensive (fd duplication).
   explicit file_handle(const file_handle &o, really_copy _)
       : io_handle(o, _)
+      , _devid(o._devid)
+      , _inode(o._inode)
       , _path(o._path)
       , _service(o._service)
   {
@@ -194,6 +208,11 @@ public:
   //[[bindlib::make_free]]
   static BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<file_handle> temp_inode(path_type dirpath = fixme_temporary_files_directory(), mode _mode = mode::write, flag flags = flag::none) noexcept;
 
+  //! Unless `flag::disable_safety_unlinks` is set, the device id of the file when opened
+  dev_t st_dev() const noexcept { return _devid; }
+  //! Unless `flag::disable_safety_unlinks` is set, the inode of the file when opened. When combined with st_dev(), forms a unique identifer on this system
+  ino_t st_ino() const noexcept { return _inode; }
+  BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC unique_id_type unique_id() const noexcept override { unique_id_type ret(nullptr); ret.as_longlongs[0] = _devid; ret.as_longlongs[1] = _inode; return ret; }
   BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC path_type path() const noexcept override { return _path; }
   BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> close() noexcept override
   {

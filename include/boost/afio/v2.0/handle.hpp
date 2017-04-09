@@ -35,8 +35,9 @@ DEALINGS IN THE SOFTWARE.
 #include "deadline.h"
 #include "native_handle_type.hpp"
 
+#include "../boost-lite/include/uint128.hpp"
+
 #include <utility>  // for pair<>
-#include <vector>
 
 //! \file handle.hpp Provides handle
 
@@ -61,6 +62,8 @@ public:
   using extent_type = unsigned long long;
   //! The memory extent type used by this handle
   using size_type = size_t;
+  //! The unique identifier type used by this handle
+  using unique_id_type = boost_lite::integers128::uint128;
 
   //! The behaviour of the handle: does it read, read and write, or atomic append?
   enum class mode : unsigned char  // bit 0 set means writable
@@ -185,6 +188,8 @@ public:
   //! No copy assignment
   handle &operator=(const handle &o) = delete;
 
+  //! A unique identifier for this handle in this process (native handle). Subclasses like `file_handle` make this a unique identifier across the entire system.
+  BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC unique_id_type unique_id() const noexcept { unique_id_type ret(nullptr); ret.as_longlongs[0] = _v._init; return ret; }
   //! The path this handle refers to, if any
   BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC path_type path() const noexcept { return path_type(); }
   //! Immediately close the native handle type managed by this handle

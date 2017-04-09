@@ -30,6 +30,7 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include "../../../file_handle.hpp"
+#include "../../../stat.hpp"
 #include "import.hpp"
 
 BOOST_AFIO_V2_NAMESPACE_BEGIN
@@ -112,6 +113,14 @@ const fixme_path &fixme_temporary_files_directory() noexcept
   return temporary_files_directory_;
 }
 
+result<void> file_handle::_fetch_inode() noexcept
+{
+  stat_t s;
+  BOOST_OUTCOME_TRYV(s.fill(*this, stat_t::want::dev|stat_t::want::ino));
+  _devid = s.st_dev;
+  _inode = s.st_ino;
+  return make_valued_result<void>();
+}
 
 result<file_handle> file_handle::file(file_handle::path_type _path, file_handle::mode _mode, file_handle::creation _creation, file_handle::caching _caching, file_handle::flag flags) noexcept
 {
@@ -145,6 +154,10 @@ result<file_handle> file_handle::file(file_handle::path_type _path, file_handle:
     return make_errored_result<file_handle>(errcode, last190(ret.value()._path.u8string()));
   }
   BOOST_AFIO_LOG_FUNCTION_CALL(nativeh.h);
+  if(!(flags & disable_safety_unlinks))
+  {
+    BOOST_OUTCOME_TRYV(_fetch_inode());
+  }
   if(flags & flag::unlink_on_close)
   {
     // Hide this item
@@ -190,6 +203,7 @@ result<file_handle> file_handle::temp_inode(path_type dirpath, mode _mode, flag 
       return make_errored_result<file_handle>(errcode, last190(ret.value()._path.u8string()));
     }
     BOOST_AFIO_LOG_FUNCTION_CALL(nativeh.h);
+    BOOST_OUTCOME_TRYV(_fetch_inode());  // It can be useful to know the inode of temporary inodes
     if(nativeh.h)
     {
       // Hide this item
@@ -207,7 +221,7 @@ result<file_handle> file_handle::temp_inode(path_type dirpath, mode _mode, flag 
 result<file_handle> file_handle::clone() const noexcept
 {
   BOOST_AFIO_LOG_FUNCTION_CALL(_v.h);
-  result<file_handle> ret(file_handle(_path, native_handle_type(), _caching, _flags));
+  result<file_handle> ret(file_handle(native_handle_type(), _path, _devid, _inode, _caching, _flags));
   ret.value()._v.behaviour = _v.behaviour;
   if(!DuplicateHandle(GetCurrentProcess(), _v.h, GetCurrentProcess(), &ret.value()._v.h, 0, false, DUPLICATE_SAME_ACCESS))
     return make_errored_result<file_handle>(GetLastError());
