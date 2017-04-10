@@ -213,7 +213,7 @@ public:
 
   \note Only present if BOOST_AFIO_IO_POST_SIGNAL is defined.
   */
-  static BOOST_AFIO_HEADERS_ONLY_FUNC_SPEC int set_interruption_signal(int sig = BOOST_AFIO_IO_POST_SIGNAL);
+  static BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC int set_interruption_signal(int sig = BOOST_AFIO_IO_POST_SIGNAL);
 #endif
 
 #if BOOST_AFIO_USE_POSIX_AIO

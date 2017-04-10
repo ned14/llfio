@@ -49,7 +49,7 @@ result<section_handle> section_handle::section(file_handle &backing, extent_type
     else
       return make_errored_result<section_handle>(stl11::errc::invalid_argument);
   }
-  // Do NOT round up to page size here, it causes STATUS_SECTION_TOO_BIG
+  // Do NOT round up to page size here if backed by a file, it causes STATUS_SECTION_TOO_BIG
   if(!backing.is_valid())
     maximum_size = utils::round_up_to_page_size(maximum_size);
   result<section_handle> ret(section_handle(native_handle_type(), backing.is_valid() ? &backing : nullptr, maximum_size, _flag));
@@ -175,8 +175,11 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
-  // Do NOT round up bytes to the nearest page size, it causes an attempt to extend the file
-  // bytes = utils::round_up_to_page_size(bytes);
+  if(!section.backing())
+  {
+    // Do NOT round up bytes to the nearest page size for backed maps, it causes an attempt to extend the file
+    bytes = utils::round_up_to_page_size(bytes);
+  }
   result<map_handle> ret(map_handle(io_handle(), &section));
   native_handle_type &nativeh = ret.get()._v;
   ULONG allocation = 0, prot = 0;
@@ -219,6 +222,7 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
     return make_errored_result_nt<map_handle>(ntstat);
   }
   ret.get()._addr = (char *) addr;
+  ret.get()._offset = offset;
   ret.get()._length = _bytes;
   // Make my handle borrow the native handle of my backing storage
   ret.get()._v.h = section.backing_native_handle().h;
@@ -250,7 +254,6 @@ result<map_handle::buffer_type> map_handle::commit(buffer_type region, section_h
   DWORD prot = 0;
   if(_flag == section_handle::flag::none)
   {
-    BOOST_OUTCOME_TRY(_region, do_not_store(region));
     DWORD _ = 0;
     if(!VirtualProtect(_region.first, _region.second, PAGE_NOACCESS, &_))
       return make_errored_result<buffer_type>(GetLastError());
@@ -279,6 +282,17 @@ result<map_handle::buffer_type> map_handle::commit(buffer_type region, section_h
   return region;
 }
 
+result<map_handle::buffer_type> map_handle::decommit(buffer_type region) noexcept
+{
+  BOOST_AFIO_LOG_FUNCTION_CALL(_v.h);
+  if(!region.first)
+    return make_errored_result<map_handle::buffer_type>(stl11::errc::invalid_argument);
+  region = utils::round_to_page_size(region);
+  if(!VirtualFree(_region.first, _region.second, MEM_DECOMMIT))
+    return make_errored_result<buffer_type>(GetLastError());
+  return _region;
+}
+
 result<void> map_handle::zero(buffer_type region) noexcept
 {
   BOOST_AFIO_LOG_FUNCTION_CALL(_v.h);
@@ -305,6 +319,7 @@ result<span<map_handle::buffer_type>> map_handle::prefetch(span<buffer_type> reg
 
 result<map_handle::buffer_type> map_handle::do_not_store(buffer_type region) noexcept
 {
+  BOOST_AFIO_LOG_FUNCTION_CALL(0);
   region = utils::round_to_page_size(region);
   if(!region.first)
     return make_errored_result<map_handle::buffer_type>(stl11::errc::invalid_argument);

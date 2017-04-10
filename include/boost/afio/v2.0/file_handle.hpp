@@ -98,7 +98,7 @@ protected:
 
 public:
   //! Default constructor
-  constexpr file_handle()
+  file_handle()
       : io_handle()
       , _devid(0)
       , _inode(0)

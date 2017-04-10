@@ -31,6 +31,8 @@ DEALINGS IN THE SOFTWARE.
 
 #include "../../../utils.hpp"
 
+#include "../boost-lite/include/spinlock.hpp"
+
 #include <sys/mman.h>
 
 BOOST_AFIO_V2_NAMESPACE_BEGIN
@@ -46,7 +48,7 @@ namespace utils
   }
   std::vector<size_t> page_sizes(bool only_actually_available)
   {
-    static spinlock<bool> lock;
+    static boost_lite::configurable_spinlock::spinlock<bool> lock;
     static std::vector<size_t> pagesizes, pagesizes_available;
     stl11::lock_guard<decltype(lock)> g(lock);
     if(pagesizes.empty())
@@ -119,14 +121,14 @@ namespace utils
 
   void random_fill(char *buffer, size_t bytes)
   {
-    static spinlock<bool> lock;
+    static boost_lite::configurable_spinlock::spinlock<bool> lock;
     static int randomfd = -1;
     if(-1 == randomfd)
     {
       stl11::lock_guard<decltype(lock)> g(lock);
       randomfd = ::open("/dev/urandom", O_RDONLY);
     }
-    if(-1 == randomfd || ::read(randomfd, buffer, bytes) < bytes)
+    if(-1 == randomfd || ::read(randomfd, buffer, bytes) < (ssize_t) bytes)
     {
       BOOST_AFIO_LOG_FATAL(0, "afio: Kernel crypto function failed");
       std::terminate();
@@ -159,7 +161,7 @@ namespace utils
       }
 #ifndef NDEBUG
       else if(ret.page_size_used > 65536)
-        std::cout << "afio: Large page allocation successful" << std::endl;
+        printf("afio: Large page allocation successful\n");
 #endif
       return ret;
     }

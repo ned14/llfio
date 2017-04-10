@@ -31,17 +31,73 @@ DEALINGS IN THE SOFTWARE.
 
 #include "../../../handle.hpp"
 #include "../../../stat.hpp"
-#include "import.hpp"
+
+#include <sys/stat.h>
 
 BOOST_AFIO_V2_NAMESPACE_BEGIN
 
-BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> stat_t::fill(handle &h, stat_t::want wanted) noexcept
+static inline stl1z::filesystem::file_type to_st_type(uint16_t mode)
+{
+    switch(mode & S_IFMT)
+    {
+#ifdef BOOST_AFIO_USE_LEGACY_FILESYSTEM_SEMANTICS
+    case S_IFBLK:
+        return stl1z::filesystem::file_type::block_file;
+    case S_IFCHR:
+        return stl1z::filesystem::file_type::character_file;
+    case S_IFDIR:
+        return stl1z::filesystem::file_type::directory_file;
+    case S_IFIFO:
+        return stl1z::filesystem::file_type::fifo_file;
+    case S_IFLNK:
+        return stl1z::filesystem::file_type::symlink_file;
+    case S_IFREG:
+        return stl1z::filesystem::file_type::regular_file;
+    case S_IFSOCK:
+        return stl1z::filesystem::file_type::socket_file;
+    default:
+        return stl1z::filesystem::file_type::type_unknown;
+#else
+    case S_IFBLK:
+        return stl1z::filesystem::file_type::block;
+    case S_IFCHR:
+        return stl1z::filesystem::file_type::character;
+    case S_IFDIR:
+        return stl1z::filesystem::file_type::directory;
+    case S_IFIFO:
+        return stl1z::filesystem::file_type::fifo;
+    case S_IFLNK:
+        return stl1z::filesystem::file_type::symlink;
+    case S_IFREG:
+        return stl1z::filesystem::file_type::regular;
+    case S_IFSOCK:
+        return stl1z::filesystem::file_type::socket;
+    default:
+        return stl1z::filesystem::file_type::unknown;
+#endif
+    }
+}
+
+static inline stl11::chrono::system_clock::time_point to_timepoint(struct timespec ts)
+{
+  // Need to have this self-adapt to the STL being used
+  static constexpr unsigned long long STL_TICKS_PER_SEC=(unsigned long long) stl11::chrono::system_clock::period::den/stl11::chrono::system_clock::period::num;
+  static constexpr unsigned long long multiplier=STL_TICKS_PER_SEC>=1000000000ULL ? STL_TICKS_PER_SEC/1000000000ULL : 1;
+  static constexpr unsigned long long divider=STL_TICKS_PER_SEC>=1000000000ULL ? 1 : 1000000000ULL/STL_TICKS_PER_SEC;
+  // For speed we make the big assumption that the STL's system_clock is based on the time_t epoch 1st Jan 1970.
+  stl11::chrono::system_clock::duration duration(ts.tv_sec*STL_TICKS_PER_SEC+ts.tv_nsec*multiplier/divider);
+  return stl11::chrono::system_clock::time_point(duration);
+}
+
+BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> stat_t::fill(const handle &h, stat_t::want wanted) noexcept
 {
   BOOST_AFIO_LOG_FUNCTION_CALL(h.native_handle().fd);
-  struct stat_t s;
+  struct stat s;
   memset(&s, 0, sizeof(s));
+  size_t ret = 0;
+
   if(-1 == ::fstat(h.native_handle().fd, &s))
-    return make_errored_result<size_t>(errno, last190(h.path()));
+    return make_errored_result<size_t>(errno, last190(h.path().native()));
   if(wanted&want::dev) { st_dev=s.st_dev; ++ret; }
   if(wanted&want::ino) { st_ino=s.st_ino; ++ret; }
   if(wanted&want::type) { st_type=to_st_type(s.st_mode); ++ret; }

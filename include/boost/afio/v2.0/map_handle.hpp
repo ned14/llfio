@@ -129,7 +129,9 @@ public:
 
   //! Returns the memory section's flags
   flag section_flags() const noexcept { return _flag; }
-  //! Returns the borrowed native handle backing this section, if any
+  //! Returns the borrowed handle backing this section, if any
+  io_handle *backing() const noexcept { return _backing; }
+  //! Returns the borrowed native handle backing this section
   native_handle_type backing_native_handle() const noexcept { return _backing ? _backing->native_handle() : native_handle_type(); }
   //! Return the current maximum permitted extent of the memory section.
   extent_type length() const noexcept { return _length; }
@@ -185,7 +187,7 @@ public:
   using path_type = io_handle::path_type;
   using extent_type = io_handle::extent_type;
   using size_type = io_handle::size_type;
-  using flag = io_handle::flag;
+  using mode = io_handle::mode;
   using creation = io_handle::creation;
   using caching = io_handle::caching;
   using flag = io_handle::flag;
@@ -199,6 +201,7 @@ public:
 protected:
   section_handle *_section;
   char *_addr;
+  extent_type _offset;
   size_type _length;
 
 public:
@@ -207,6 +210,7 @@ public:
       : io_handle()
       , _section(nullptr)
       , _addr(nullptr)
+      , _offset(0)
       , _length(0)
   {
   }
@@ -215,15 +219,17 @@ public:
       : io_handle(std::move(h))
       , _section(section)
       , _addr(nullptr)
+      , _offset(0)
       , _length(0)
   {
   }
   ~map_handle();
   //! Implicit move construction of map_handle permitted
-  map_handle(map_handle &&o) noexcept : io_handle(std::move(o)), _section(o._section), _addr(o._addr), _length(o._length)
+  map_handle(map_handle &&o) noexcept : io_handle(std::move(o)), _section(o._section), _addr(o._addr), _offset(o._offset), _length(o._length)
   {
     o._section = nullptr;
     o._addr = nullptr;
+    o._offset = 0;
     o._length = 0;
   }
   //! Move assignment of map_handle permitted
@@ -264,6 +270,9 @@ public:
   //! The address in memory where this mapped view resides
   char *address() const noexcept { return _addr; }
 
+  //! The offset of the memory map.
+  extent_type offset() const noexcept { return _offset; }
+
   //! The size of the memory map.
   size_type length() const noexcept { return _length; }
 
@@ -271,7 +280,7 @@ public:
   result<buffer_type> commit(buffer_type region, section_handle::flag _flag = section_handle::flag::read | section_handle::flag::write) noexcept;
 
   //! Ask the system to make the memory represented by the buffer unavailable and to decommit the system resources representing them. addr and length should be page aligned (see utils::page_sizes()), if not the returned buffer is the region actually decommitted.
-  result<buffer_type> decommit(buffer_type region) noexcept { return commit(region, section_handle::flag::none); }
+  result<buffer_type> decommit(buffer_type region) noexcept;
 
   /*! Zero the memory represented by the buffer. On Linux, Windows and FreeBSD any full 4Kb pages will be deallocated from the system entirely, including the extents for them in any backing storage. On newer Linux kernels the kernel can additionally swap whole 4Kb pages for freshly zeroed ones making this a very
   efficient way of zeroing large ranges of memory.

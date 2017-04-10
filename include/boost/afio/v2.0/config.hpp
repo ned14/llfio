@@ -517,7 +517,7 @@ inline span<char> afio_namespace_string()
     return span<char>(buffer, length);
   const char *src = BOOST_AFIO_LOG_STRINGIFY(BOOST_AFIO_V2_NAMESPACE);
   char *bufferp = buffer;
-  for(; *src && bufferp - buffer < sizeof(buffer); src++)
+  for(; *src && (bufferp - buffer) < (ptrdiff_t) sizeof(buffer); src++)
   {
     if(*src != ' ')
       *bufferp++ = *src;
@@ -535,7 +535,7 @@ inline span<char> outcome_namespace_string()
     return span<char>(buffer, length);
   const char *src = BOOST_AFIO_LOG_STRINGIFY(BOOST_OUTCOME_V1_NAMESPACE);
   char *bufferp = buffer;
-  for(; *src && bufferp - buffer < sizeof(buffer); src++)
+  for(; *src && (bufferp - buffer) < (ptrdiff_t) sizeof(buffer); src++)
   {
     if(*src != ' ')
       *bufferp++ = *src;

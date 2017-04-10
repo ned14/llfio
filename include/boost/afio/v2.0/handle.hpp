@@ -37,6 +37,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include "../boost-lite/include/uint128.hpp"
 
+#include <algorithm>  // for std::count
 #include <utility>  // for pair<>
 
 //! \file handle.hpp Provides handle

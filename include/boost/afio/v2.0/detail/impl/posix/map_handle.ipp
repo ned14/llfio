@@ -52,7 +52,7 @@ result<section_handle> section_handle::section(file_handle &backing, extent_type
     maximum_size = utils::round_up_to_page_size(maximum_size);
   result<section_handle> ret(section_handle(native_handle_type(), backing.is_valid() ? &backing : nullptr, maximum_size, _flag));
   // There are no section handles on POSIX, so do nothing
-  BOOST_AFIO_LOG_FUNCTION_CALL(nativeh.h);
+  BOOST_AFIO_LOG_FUNCTION_CALL(ret.value()._v.fd);
   return ret;
 }
 
@@ -104,17 +104,10 @@ native_handle_type map_handle::release() noexcept
   return native_handle_type();
 }
 
-
-result<map_handle> map_handle::map(section_handle &section, size_type bytes, extent_type offset, section_handle::flag _flag) noexcept
+inline result<void *> do_mmap(native_handle_type &nativeh, void *ataddr, section_handle &section, map_handle::size_type bytes, map_handle::extent_type offset, section_handle::flag _flag) noexcept
 {
-  if(!section.backing)
-  {
-    // Do NOT round up bytes to the nearest page size, it causes an attempt to extend the file
-    bytes = utils::round_up_to_page_size(bytes);
-  }
-  result<map_handle> ret(map_handle(io_handle(), &section));
-  native_handle_type &nativeh = ret.get()._v;
-  int prot = 0, int flags = backing ? MAP_SHARED : MAP_ANONYMOUS;
+  bool have_backing = section.backing();
+  int prot = 0, flags = have_backing ? MAP_SHARED : MAP_ANONYMOUS;
   void *addr = nullptr;
   if(_flag == section_handle::flag::none)
   {
@@ -152,116 +145,118 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
     flags |= MAP_PREFAULT_READ;
 #endif
 #ifdef MAP_NOSYNC
-  if(section.backing && (section.backing->kernel_caching() == handle::caching::temporary))
+  if(have_backing && (section.backing()->kernel_caching() == handle::caching::temporary))
     flags |= MAP_NOSYNC;
 #endif
-  addr = ::mmap(nullptr, bytes, prot, flags, section.native_handle().fd, offset);
+  addr = ::mmap(ataddr, bytes, prot, flags, have_backing ? section.backing_native_handle().fd : -1, offset);
   if(!addr)
-    return make_errored_result<map_handle>(errno);
+    return make_errored_result<void *>(errno);
+  return addr;
+}
+
+result<map_handle> map_handle::map(section_handle &section, size_type bytes, extent_type offset, section_handle::flag _flag) noexcept
+{
+  if(!section.backing())
+  {
+    // Do NOT round up bytes to the nearest page size for backed maps, it causes an attempt to extend the file
+    bytes = utils::round_up_to_page_size(bytes);
+  }
+  result<map_handle> ret(map_handle(io_handle(), &section));
+  native_handle_type &nativeh = ret.get()._v;
+  BOOST_OUTCOME_TRY(addr, do_mmap(nativeh, nullptr, section, bytes, offset, _flag));
   ret.get()._addr = (char *) addr;
-  ret.get()._length = _bytes;
+  ret.get()._offset = offset;
+  ret.get()._length = bytes;
   // Make my handle borrow the native handle of my backing storage
-  ret.get()._v.h = section.backing_native_handle().h;
-  BOOST_AFIO_LOG_FUNCTION_CALL(ret.get()._v.h);
+  ret.get()._v.fd = section.backing_native_handle().fd;
+  BOOST_AFIO_LOG_FUNCTION_CALL(ret.get()._v.fd);
   return ret;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 result<map_handle::buffer_type> map_handle::commit(buffer_type region, section_handle::flag _flag) noexcept
+{
+  BOOST_AFIO_LOG_FUNCTION_CALL(_v.fd);
+  if(!region.first)
+    return make_errored_result<map_handle::buffer_type>(stl11::errc::invalid_argument);
+  // Set permissions on the pages
+  region = utils::round_to_page_size(region);
+  extent_type offset = _offset + (region.first - _addr);
+  size_type bytes = region.second;
+  BOOST_OUTCOME_TRYV(do_mmap(_v, region.first, section, bytes, offset, _flag));
+  // Tell the kernel we will be using these pages soon
+  if(-1 == ::madvise(region.first, region.second, MADV_WILLNEED))
+    return make_errored_result<map_handle::buffer_type>(errno);
+  return region;
+}
+
+result<map_handle::buffer_type> map_handle::decommit(buffer_type region) noexcept
 {
   BOOST_AFIO_LOG_FUNCTION_CALL(_v.h);
   if(!region.first)
     return make_errored_result<map_handle::buffer_type>(stl11::errc::invalid_argument);
-  DWORD prot = 0;
-  if(_flag == section_handle::flag::none)
-  {
-    BOOST_OUTCOME_TRY(_region, do_not_store(region));
-    DWORD _ = 0;
-    if(!VirtualProtect(_region.first, _region.second, PAGE_NOACCESS, &_))
-      return make_errored_result<buffer_type>(GetLastError());
-    return _region;
-  }
-  if(_flag & section_handle::flag::cow)
-  {
-    prot = PAGE_WRITECOPY;
-    _v.behaviour |= native_handle_type::disposition::seekable | native_handle_type::disposition::readable | native_handle_type::disposition::writable;
-  }
-  else if(_flag & section_handle::flag::write)
-  {
-    prot = PAGE_READWRITE;
-    _v.behaviour |= native_handle_type::disposition::seekable | native_handle_type::disposition::readable | native_handle_type::disposition::writable;
-  }
-  else if(_flag & section_handle::flag::read)
-  {
-    prot = PAGE_READONLY;
-    _v.behaviour |= native_handle_type::disposition::seekable | native_handle_type::disposition::readable;
-  }
-  if(_flag & section_handle::flag::execute)
-    prot = PAGE_EXECUTE;
   region = utils::round_to_page_size(region);
-  if(!VirtualAlloc(region.first, region.second, MEM_COMMIT, prot))
-    return make_errored_result<buffer_type>(GetLastError());
+  // Tell the kernel to kick these pages into storage
+  if(-1 == ::madvise(region.first, region.second, MADV_DONTNEED))
+    return make_errored_result<map_handle::buffer_type>(errno);
+  // Set permissions on the pages to no access
+  extent_type offset = _offset + (region.first - _addr);
+  size_type bytes = region.second;
+  BOOST_OUTCOME_TRYV(do_mmap(_v, region.first, section, bytes, offset, section_handle::flag::none));
   return region;
 }
 
 result<void> map_handle::zero(buffer_type region) noexcept
 {
-  BOOST_AFIO_LOG_FUNCTION_CALL(_v.h);
+  BOOST_AFIO_LOG_FUNCTION_CALL(_v.fd);
   if(!region.first)
     return make_errored_result<void>(stl11::errc::invalid_argument);
+#ifdef MADV_REMOVE
+  buffer_type page_region { (char *) utils::round_up_to_page_size((uintptr_t) region.first), utils::round_down_to_page_size(region.second) };
+  // Zero contents and punch a hole in any backing storage
+  if(page_region.second && -1 != ::madvise(page_region.first, page_region.second, MADV_REMOVE))
+  {
+    memset(region.first, 0, page_region.first - region.first);
+    memset(page_region.first + page_region.second, 0, (region.first + region.second) - (page_region.first + page_region.second));
+    return make_valued_result<void>();
+  }
+#endif
   //! \todo Once you implement file_handle::zero(), please implement map_handle::zero()
-  // buffer_type page_region { (char *) utils::round_up_to_page_size((uintptr_t) region.first), utils::round_down_to_page_size(region.second); };
   memset(region.first, 0, region.second);
   return make_valued_result<void>();
 }
 
 result<span<map_handle::buffer_type>> map_handle::prefetch(span<buffer_type> regions) noexcept
 {
-  windows_nt_kernel::init();
-  using namespace windows_nt_kernel;
   BOOST_AFIO_LOG_FUNCTION_CALL(0);
-  if(!PrefetchVirtualMemory_)
-    return span<map_handle::buffer_type>();
-  PWIN32_MEMORY_RANGE_ENTRY wmre = (PWIN32_MEMORY_RANGE_ENTRY) regions.data();
-  if(!PrefetchVirtualMemory_(GetCurrentProcess(), regions.size(), wmre, 0))
-    return make_errored_result<span<map_handle::buffer_type>>(GetLastError());
+  for(const auto &region : regions)
+  {
+    if(-1 == ::madvise(region.first, region.second, MADV_WILLNEED))
+      return make_errored_result<span<map_handle::buffer_type>>(errno);
+  }
   return regions;
 }
 
 result<map_handle::buffer_type> map_handle::do_not_store(buffer_type region) noexcept
 {
+  BOOST_AFIO_LOG_FUNCTION_CALL(0);
   region = utils::round_to_page_size(region);
   if(!region.first)
     return make_errored_result<map_handle::buffer_type>(stl11::errc::invalid_argument);
-  if(!VirtualAlloc(region.first, region.second, MEM_RESET, 0))
-    return make_errored_result<buffer_type>(GetLastError());
+#ifdef MADV_FREE
+  // Tell the kernel to throw away the contents of these pages
+  if(-1 == ::madvise(_region.first, _region.second, MADV_FREE))
+    return make_errored_result<map_handle::buffer_type>(errno);
+  else
+    return region;
+#endif
+  // No support on this platform
+  region.second = 0;
   return region;
 }
 
 map_handle::io_result<map_handle::buffers_type> map_handle::read(io_request<buffers_type> reqs, deadline) noexcept
 {
-  BOOST_AFIO_LOG_FUNCTION_CALL(_v.h);
+  BOOST_AFIO_LOG_FUNCTION_CALL(_v.fd);
   char *addr = _addr + reqs.offset;
   size_type togo = (size_type)(_length - reqs.offset);
   for(buffer_type &req : reqs.buffers)
@@ -282,7 +277,7 @@ map_handle::io_result<map_handle::buffers_type> map_handle::read(io_request<buff
 
 map_handle::io_result<map_handle::const_buffers_type> map_handle::write(io_request<const_buffers_type> reqs, deadline) noexcept
 {
-  BOOST_AFIO_LOG_FUNCTION_CALL(_v.h);
+  BOOST_AFIO_LOG_FUNCTION_CALL(_v.fd);
   char *addr = _addr + reqs.offset;
   size_type togo = (size_type)(_length - reqs.offset);
   for(const_buffer_type &req : reqs.buffers)

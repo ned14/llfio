@@ -49,7 +49,7 @@ namespace storage_profile
   namespace system
   {
     // OS name, version
-    outcome<void> os(storage_profile &sp, file_handle &h) noexcept
+    outcome<void> os(storage_profile &sp, file_handle &) noexcept
     {
       static std::string os_name, os_ver;
       if (!os_name.empty())
@@ -61,7 +61,8 @@ namespace storage_profile
       {
         try
         {
-          struct utsname name = {0};
+          struct utsname name;
+          memset(&name, 0, sizeof(name));
           if(uname(&name)<0)
             return make_errored_outcome<void>(errno);
           sp.os_name.value = os_name = name.sysname;
@@ -76,7 +77,7 @@ namespace storage_profile
     }
 
     // CPU name, architecture, physical cores
-    outcome<void> cpu(storage_profile &sp, file_handle &h) noexcept
+    outcome<void> cpu(storage_profile &sp, file_handle &) noexcept
     {
       static std::string cpu_name, cpu_architecture;
       static unsigned cpu_physical_cores;
@@ -90,7 +91,8 @@ namespace storage_profile
       {
         try
         {
-          struct utsname name = {0};
+          struct utsname name;
+          memset(&name, 0, sizeof(name));
           if(uname(&name)<0)
             return make_errored_outcome<void>(errno);
           sp.cpu_name.value = sp.cpu_architecture.value = name.machine;
@@ -192,7 +194,7 @@ namespace storage_profile
     }
     namespace posix
     {
-      outcome<void> _mem(storage_profile &sp, file_handle &h) noexcept
+      outcome<void> _mem(storage_profile &sp, file_handle &) noexcept
       {
 #if defined(_SC_PHYS_PAGES)
         size_t physpages=sysconf (_SC_PHYS_PAGES), pagesize=sysconf (_SC_PAGESIZE);
@@ -222,7 +224,7 @@ namespace storage_profile
     namespace posix
     {
       // Controller type, max transfer, max buffers. Device name, size
-      outcome<void> _device(storage_profile &sp, file_handle &h, std::string mntfromname, std::string fstypename) noexcept
+      outcome<void> _device(storage_profile &sp, file_handle &, std::string mntfromname, std::string /*fstypename*/) noexcept
       {
         try
         {
@@ -266,7 +268,7 @@ namespace storage_profile
 #endif            
             return make_errored_outcome<void>(stl11::errc::function_not_supported);
           }
-          BOOST_OUTCOME_TRY(deviceh, file_handle::file(*h.service(), mntfromname, handle::mode::none, handle::creation::open_existing, handle::caching::only_metadata));
+          BOOST_OUTCOME_TRY(deviceh, file_handle::file(mntfromname, handle::mode::none, handle::creation::open_existing, handle::caching::only_metadata));
 
           // TODO See https://github.com/baruch/diskscan/blob/master/arch/arch-linux.c
           //          sp.controller_type.value = "SCSI";

@@ -31,6 +31,8 @@ DEALINGS IN THE SOFTWARE.
 
 #include "../../../handle.hpp"
 
+#include "../../../stat.hpp"
+
 #include <fcntl.h>
 #include <unistd.h>
 
@@ -104,71 +106,72 @@ const fixme_path &fixme_temporary_files_directory() noexcept
   return temporary_files_directory_;
 }
 
-inline result<int> attribs_from_handle_mode_caching_and_flags(native_handle_type &nativeh, file_handle::mode _mode, file_handle::creation _creation, file_handle::caching _caching, file_handle::flag flags) noexcept
+inline result<int> attribs_from_handle_mode_caching_and_flags(native_handle_type &nativeh, file_handle::mode _mode, file_handle::creation _creation, file_handle::caching _caching, file_handle::flag) noexcept
 {
   int attribs = 0;
   switch(_mode)
   {
-  case mode::unchanged:
-    return make_errored_result<file_handle>(stl11::errc::invalid_argument);
-  case mode::none:
+  case file_handle::mode::unchanged:
+    return make_errored_result<int>(stl11::errc::invalid_argument);
+  case file_handle::mode::none:
     break;
-  case mode::attr_read:
-  case mode::read:
+  case file_handle::mode::attr_read:
+  case file_handle::mode::read:
     attribs = O_RDONLY;
     nativeh.behaviour |= native_handle_type::disposition::seekable | native_handle_type::disposition::readable;
     break;
-  case mode::attr_write:
-  case mode::write:
+  case file_handle::mode::attr_write:
+  case file_handle::mode::write:
     attribs = O_RDWR;
     nativeh.behaviour |= native_handle_type::disposition::seekable | native_handle_type::disposition::readable | native_handle_type::disposition::writable;
     break;
-  case mode::append:
+  case file_handle::mode::append:
     attribs = O_APPEND;
     nativeh.behaviour |= native_handle_type::disposition::writable | native_handle_type::disposition::append_only;
     break;
   }
   switch(_creation)
   {
-  case creation::open_existing:
+  case file_handle::creation::open_existing:
     break;
-  case creation::only_if_not_exist:
+  case file_handle::creation::only_if_not_exist:
     attribs |= O_CREAT | O_EXCL;
     break;
-  case creation::if_needed:
+  case file_handle::creation::if_needed:
     attribs |= O_CREAT;
     break;
-  case creation::truncate:
+  case file_handle::creation::truncate:
     attribs |= O_TRUNC;
     break;
   }
   switch(_caching)
   {
-  case caching::unchanged:
-    return make_errored_result<file_handle>(stl11::errc::invalid_argument);
-  case caching::none:
+  case file_handle::caching::unchanged:
+    return make_errored_result<int>(stl11::errc::invalid_argument);
+  case file_handle::caching::none:
     attribs |= O_SYNC | O_DIRECT;
     nativeh.behaviour |= native_handle_type::disposition::aligned_io;
     break;
-  case caching::only_metadata:
+  case file_handle::caching::only_metadata:
     attribs |= O_DIRECT;
     nativeh.behaviour |= native_handle_type::disposition::aligned_io;
     break;
-  case caching::reads:
+  case file_handle::caching::reads:
     attribs |= O_SYNC;
     break;
-  case caching::reads_and_metadata:
+  case file_handle::caching::reads_and_metadata:
 #ifdef O_DSYNC
     attribs |= O_DSYNC;
 #else
     attribs |= O_SYNC;
 #endif
     break;
-  case caching::all:
-  case caching::safety_fsyncs:
-  case caching::temporary:
+  case file_handle::caching::all:
+  case file_handle::caching::safety_fsyncs:
+  case file_handle::caching::temporary:
     break;
   }
+  return attribs;
 }
 
 result<void> file_handle::_fetch_inode() noexcept
@@ -191,18 +194,18 @@ inline result<void> check_inode(const file_handle &h) noexcept
 
 result<file_handle> file_handle::file(file_handle::path_type _path, file_handle::mode _mode, file_handle::creation _creation, file_handle::caching _caching, file_handle::flag flags) noexcept
 {
-  result<file_handle> ret(file_handle(std::move(_path), native_handle_type(), _caching, flags));
+  result<file_handle> ret(file_handle(native_handle_type(), 0, 0, std::move(_path), _caching, flags));
   native_handle_type &nativeh = ret.get()._v;
   BOOST_OUTCOME_TRY(attribs, attribs_from_handle_mode_caching_and_flags(nativeh, _mode, _creation, _caching, flags));
   nativeh.behaviour |= native_handle_type::disposition::file;
   const char *path_ = ret.value()._path.c_str();
   nativeh.fd = ::open(path_, attribs, 0x1b0 /*660*/);
   if(-1 == nativeh.fd)
-    return make_errored_result<file_handle>(errno, last190(ret.value()._path));
+    return make_errored_result<file_handle>(errno, last190(ret.value()._path.native()));
   BOOST_AFIO_LOG_FUNCTION_CALL(nativeh.fd);
-  if(!(flags & disable_safety_unlinks))
+  if(!(flags & flag::disable_safety_unlinks))
   {
-    BOOST_OUTCOME_TRYV(_fetch_inode());
+    BOOST_OUTCOME_TRYV(ret.value()._fetch_inode());
   }
   if(_creation == creation::truncate && ret.value().are_safety_fsyncs_issued())
     fsync(nativeh.fd);
@@ -214,7 +217,7 @@ result<file_handle> file_handle::temp_inode(path_type dirpath, mode _mode, flag 
   caching _caching = caching::temporary;
   // No need to rename to random on unlink or check inode before unlink
   flags |= flag::unlink_on_close | flag::disable_safety_unlinks;
-  result<file_handle> ret(file_handle(path_type(), native_handle_type(), _caching, flags));
+  result<file_handle> ret(file_handle(native_handle_type(), 0, 0, path_type(), _caching, flags));
   native_handle_type &nativeh = ret.get()._v;
   // Open file exclusively to prevent collision
   BOOST_OUTCOME_TRY(attribs, attribs_from_handle_mode_caching_and_flags(nativeh, _mode, creation::only_if_not_exist, _caching, flags));
@@ -227,7 +230,7 @@ result<file_handle> file_handle::temp_inode(path_type dirpath, mode _mode, flag 
   nativeh.fd = ::open(path_, attribs, 0600);
   if(-1 != nativeh.fd)
   {
-    BOOST_OUTCOME_TRYV(_fetch_inode());  // It can be useful to know the inode of temporary inodes
+    BOOST_OUTCOME_TRYV(ret.value()._fetch_inode());  // It can be useful to know the inode of temporary inodes
     return ret;
   }
   // If it failed, assume this kernel or FS doesn't support O_TMPFILE
@@ -255,7 +258,7 @@ result<file_handle> file_handle::temp_inode(path_type dirpath, mode _mode, flag 
     // Immediately unlink after creation
     if(-1 == ::unlink(path_))
       return make_errored_result<file_handle>(errno);
-    BOOST_OUTCOME_TRYV(_fetch_inode());  // It can be useful to know the inode of temporary inodes
+    BOOST_OUTCOME_TRYV(ret.value()._fetch_inode());  // It can be useful to know the inode of temporary inodes
     return ret;
   }
 }
@@ -263,12 +266,12 @@ result<file_handle> file_handle::temp_inode(path_type dirpath, mode _mode, flag 
 result<file_handle> file_handle::clone() const noexcept
 {
   BOOST_AFIO_LOG_FUNCTION_CALL(_v.fd);
-  result<file_handle> ret(file_handle(native_handle_type(), _path, _devid, _inode, _caching, _flags));
+  result<file_handle> ret(file_handle(native_handle_type(), _devid, _inode, _path, _caching, _flags));
   ret.value()._service = _service;
   ret.value()._v.behaviour = _v.behaviour;
   ret.value()._v.fd = ::dup(_v.fd);
   if(-1 == ret.value()._v.fd)
-    return make_errored_result<file_handle>(errno, last190(_path));
+    return make_errored_result<file_handle>(errno, last190(_path.native()));
   return ret;
 }
 
@@ -279,7 +282,7 @@ result<file_handle::path_type> file_handle::relink(path_type newpath) noexcept
     newpath = _path.parent_path() / newpath;
 #ifdef O_TMPFILE
   // If the handle was created with O_TMPFILE, we need a different approach
-  if(_path.empty() && (_caching & caching::temporary))
+  if(_path.empty() && (_caching == file_handle::caching::temporary))
   {
     char path[PATH_MAX];
     snprintf(path, PATH_MAX, "/proc/self/fd/%d", _v.fd);
@@ -290,12 +293,12 @@ result<file_handle::path_type> file_handle::relink(path_type newpath) noexcept
 #endif
   {
     // FIXME: As soon as we implement fat paths, make this race free
-    if(!(flags & disable_safety_unlinks))
+    if(!(_flags & flag::disable_safety_unlinks))
     {
-      BOOST_OUTCOME_TRYV(verify_inode(*this));
+      BOOST_OUTCOME_TRYV(check_inode(*this));
     }
     if(-1 == ::rename(_path.c_str(), newpath.c_str()))
-      return make_errored_result<path_type>(errno, last190(_path));
+      return make_errored_result<path_type>(errno, last190(_path.native()));
   }
   _path = std::move(newpath);
   return _path;
@@ -305,12 +308,12 @@ result<void> file_handle::unlink() noexcept
 {
   BOOST_AFIO_LOG_FUNCTION_CALL(_v.fd);
   // FIXME: As soon as we implement fat paths, make this race free
-  if(!(flags & disable_safety_unlinks))
+  if(!(_flags & flag::disable_safety_unlinks))
   {
-    BOOST_OUTCOME_TRYV(verify_inode(*this));
+    BOOST_OUTCOME_TRYV(check_inode(*this));
   }
-  if(-1 == ::rename(_path.c_str(), newpath.c_str()))
-    return make_errored_result<path_type>(errno, last190(_path));
+  if(-1 == ::unlink(_path.c_str()))
+    return make_errored_result<void>(errno, last190(_path.native()));
   _path.clear();
   return make_valued_result<void>();
 }
@@ -318,10 +321,10 @@ result<void> file_handle::unlink() noexcept
 result<file_handle::extent_type> file_handle::length() const noexcept
 {
   BOOST_AFIO_LOG_FUNCTION_CALL(_v.fd);
-  struct stat_t s;
+  struct stat s;
   memset(&s, 0, sizeof(s));
   if(-1 == ::fstat(_v.fd, &s))
-    return make_errored_result<file_handle::extent_type>(errno, last190(_path));
+    return make_errored_result<file_handle::extent_type>(errno, last190(_path.native()));
   return s.st_size;
 }
 
@@ -329,7 +332,7 @@ result<file_handle::extent_type> file_handle::truncate(file_handle::extent_type 
 {
   BOOST_AFIO_LOG_FUNCTION_CALL(_v.fd);
   if(ftruncate(_v.fd, newsize) < 0)
-    return make_errored_result<extent_type>(errno, last190(_path));
+    return make_errored_result<extent_type>(errno, last190(_path.native()));
   if(are_safety_fsyncs_issued())
   {
     fsync(_v.fd);

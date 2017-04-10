@@ -40,61 +40,62 @@ DEALINGS IN THE SOFTWARE.
 
 BOOST_AFIO_V2_NAMESPACE_BEGIN
 
-BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(handle &h, statfs_t::want wanted) noexcept
+BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, statfs_t::want wanted) noexcept
 {
   size_t ret = 0;
 #ifdef __linux__
-  struct statfs64 s = {0};
+  struct statfs64 s;
+  memset(&s, 0, sizeof(s));
   if(-1 == fstatfs64(h.native_handle().fd, &s))
     return make_errored_result<size_t>(errno);
-  if(!!(wanted && want::bsize))
+  if(!!(wanted & want::bsize))
   {
     f_bsize = s.f_bsize;
     ++ret;
   }
-  if(!!(wanted && want::iosize))
+  if(!!(wanted & want::iosize))
   {
     f_iosize = s.f_frsize;
     ++ret;
   }
-  if(!!(wanted && want::blocks))
+  if(!!(wanted & want::blocks))
   {
     f_blocks = s.f_blocks;
     ++ret;
   }
-  if(!!(wanted && want::bfree))
+  if(!!(wanted & want::bfree))
   {
     f_bfree = s.f_bfree;
     ++ret;
   }
-  if(!!(wanted && want::bavail))
+  if(!!(wanted & want::bavail))
   {
     f_bavail = s.f_bavail;
     ++ret;
   }
-  if(!!(wanted && want::files))
+  if(!!(wanted & want::files))
   {
     f_files = s.f_files;
     ++ret;
   }
-  if(!!(wanted && want::ffree))
+  if(!!(wanted & want::ffree))
   {
     f_ffree = s.f_ffree;
     ++ret;
   }
-  if(!!(wanted && want::namemax))
+  if(!!(wanted & want::namemax))
   {
     f_namemax = s.f_namelen;
     ++ret;
   }
   //            if(!!(wanted&&want::owner))       { f_owner      =s.f_owner;  ++ret; }
-  if(!!(wanted && want::fsid))
+  if(!!(wanted & want::fsid))
   {
     f_fsid[0] = (unsigned) s.f_fsid.__val[0];
     f_fsid[1] = (unsigned) s.f_fsid.__val[1];
     ++ret;
   }
-  if(!!(wanted && want::flags) || !!(wanted && want::fstypename) || !!(wanted && want::mntfromname) || !!(wanted && want::mntonname))
+  if(!!(wanted & want::flags) || !!(wanted & want::fstypename) || !!(wanted & want::mntfromname) || !!(wanted & want::mntonname))
   {
     struct mountentry
     {
@@ -118,7 +119,8 @@ BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(handle &h, st
       char buffer[32768];
       while(getmntent_r(mtab, &m, buffer, sizeof(buffer)))
       {
-        struct statfs64 temp = {0};
+        struct statfs64 temp;
+        memset(&temp, 0, sizeof(temp));
         if(0 == statfs64(m.mnt_dir, &temp) && temp.f_type == s.f_type && !memcmp(&temp.f_fsid, &s.f_fsid, sizeof(s.f_fsid)))
           mountentries.push_back(std::make_pair(mountentry(m.mnt_fsname, m.mnt_dir, m.mnt_type, m.mnt_opts), temp));
       }
@@ -146,7 +148,7 @@ BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(handle &h, st
       mountentries.push_back(std::move(temp));
     }
 #endif
-    if(!!(wanted && want::flags))
+    if(!!(wanted & want::flags))
     {
       f_flags.rdonly = !!(s.f_flags & MS_RDONLY);
       f_flags.noexec = !!(s.f_flags & MS_NOEXEC);
@@ -158,17 +160,17 @@ BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(handle &h, st
       f_flags.extents = (mountentries.front().first.mnt_type == "btrfs" || mountentries.front().first.mnt_type == "ext4" || mountentries.front().first.mnt_type == "xfs" || mountentries.front().first.mnt_type == "tmpfs");
       ++ret;
     }
-    if(!!(wanted && want::fstypename))
+    if(!!(wanted & want::fstypename))
     {
       f_fstypename = mountentries.front().first.mnt_type;
       ++ret;
     }
-    if(!!(wanted && want::mntfromname))
+    if(!!(wanted & want::mntfromname))
     {
       f_mntfromname = mountentries.front().first.mnt_fsname;
       ++ret;
     }
-    if(!!(wanted && want::mntonname))
+    if(!!(wanted & want::mntonname))
     {
       f_mntonname = mountentries.front().first.mnt_dir;
       ++ret;
@@ -178,7 +180,7 @@ BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(handle &h, st
   struct statfs s;
   if(-1 == fstatfs(h.native_handle().fd, &s))
     return make_errored_result<size_t>(errno);
-  if(!!(wanted && want::flags))
+  if(!!(wanted & want::flags))
   {
     f_flags.rdonly = !!(s.f_flags & MNT_RDONLY);
     f_flags.noexec = !!(s.f_flags & MNT_NOEXEC);
@@ -192,76 +194,76 @@ BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(handle &h, st
     f_flags.extents = !strcmp(s.f_fstypename, "ufs") || !strcmp(s.f_fstypename, "zfs");
     ++ret;
   }
-  if(!!(wanted && want::bsize))
+  if(!!(wanted & want::bsize))
   {
     f_bsize = s.f_bsize;
     ++ret;
   }
-  if(!!(wanted && want::iosize))
+  if(!!(wanted & want::iosize))
   {
     f_iosize = s.f_iosize;
     ++ret;
   }
-  if(!!(wanted && want::blocks))
+  if(!!(wanted & want::blocks))
   {
     f_blocks = s.f_blocks;
     ++ret;
   }
-  if(!!(wanted && want::bfree))
+  if(!!(wanted & want::bfree))
   {
     f_bfree = s.f_bfree;
     ++ret;
   }
-  if(!!(wanted && want::bavail))
+  if(!!(wanted & want::bavail))
   {
     f_bavail = s.f_bavail;
     ++ret;
   }
-  if(!!(wanted && want::files))
+  if(!!(wanted & want::files))
   {
     f_files = s.f_files;
     ++ret;
   }
-  if(!!(wanted && want::ffree))
+  if(!!(wanted & want::ffree))
   {
     f_ffree = s.f_ffree;
     ++ret;
   }
 #ifdef __APPLE__
-  if(!!(wanted && want::namemax))
+  if(!!(wanted & want::namemax))
   {
     f_namemax = 255;
     ++ret;
   }
 #else
-  if(!!(wanted && want::namemax))
+  if(!!(wanted & want::namemax))
   {
     f_namemax = s.f_namemax;
     ++ret;
   }
 #endif
-  if(!!(wanted && want::owner))
+  if(!!(wanted & want::owner))
   {
     f_owner = s.f_owner;
     ++ret;
   }
-  if(!!(wanted && want::fsid))
+  if(!!(wanted & want::fsid))
   {
     f_fsid[0] = (unsigned) s.f_fsid.val[0];
     f_fsid[1] = (unsigned) s.f_fsid.val[1];
     ++ret;
   }
-  if(!!(wanted && want::fstypename))
+  if(!!(wanted & want::fstypename))
   {
     f_fstypename = s.f_fstypename;
     ++ret;
   }
-  if(!!(wanted && want::mntfromname))
+  if(!!(wanted & want::mntfromname))
   {
     f_mntfromname = s.f_mntfromname;
     ++ret;
   }
-  if(!!(wanted && want::mntonname))
+  if(!!(wanted & want::mntonname))
   {
     f_mntonname = s.f_mntonname;
     ++ret;

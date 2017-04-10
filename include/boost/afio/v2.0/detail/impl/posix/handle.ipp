@@ -32,6 +32,8 @@ DEALINGS IN THE SOFTWARE.
 #include "../../../handle.hpp"
 
 #include <fcntl.h>
+#include <limits.h>  // for IOV_MAX
+#include <sys/uio.h>  // for preadv etc
 #include <unistd.h>
 #if BOOST_AFIO_USE_POSIX_AIO
 #include <aio.h>
@@ -77,7 +79,7 @@ result<handle> handle::clone() const noexcept
   ret.value()._v.behaviour = _v.behaviour;
   ret.value()._v.fd = ::dup(_v.fd);
   if (-1 == ret.value()._v.fd)
-    return make_errored_result<handle>(errno, last190(path()));
+    return make_errored_result<handle>(errno, last190(path().native()));
   return ret;
 }
 
@@ -86,13 +88,13 @@ result<void> handle::set_append_only(bool enable) noexcept
   BOOST_AFIO_LOG_FUNCTION_CALL(_v.fd);
   int attribs = fcntl(_v.fd, F_GETFL);
   if(-1 == attribs)
-    return make_errored_result<void>(errno);
+    return make_errored_result<void>(errno, last190(path().native()));
   if(enable)
   {
     // Set append_only
     attribs |= O_APPEND;
     if(-1 == fcntl(_v.fd, F_SETFL, attribs))
-      return make_errored_result<void>(errno);
+      return make_errored_result<void>(errno, last190(path().native()));
     _v.behaviour |= native_handle_type::disposition::append_only;
   }
   else
@@ -100,7 +102,7 @@ result<void> handle::set_append_only(bool enable) noexcept
     // Remove append_only
     attribs &= ~O_APPEND;
     if(-1 == fcntl(_v.fd, F_SETFL, attribs))
-      return make_errored_result<void>(errno);
+      return make_errored_result<void>(errno, last190(path().native()));
     _v.behaviour &= ~native_handle_type::disposition::append_only;
   }
   return make_result<void>();
@@ -119,41 +121,41 @@ result<void> handle::set_kernel_caching(caching caching) noexcept
   );
   switch(_caching)
   {
-  case caching::unchanged:
+  case handle::caching::unchanged:
     break;
-  case caching::none:
+  case handle::caching::none:
     attribs |= O_SYNC | O_DIRECT;
     if(-1 == fcntl(_v.fd, F_SETFL, attribs))
-      return make_errored_result<void>(errno);
+      return make_errored_result<void>(errno, last190(path().native()));
     _v.behaviour |= native_handle_type::disposition::aligned_io;
     break;
-  case caching::only_metadata:
+  case handle::caching::only_metadata:
     attribs |= O_DIRECT;
     if(-1 == fcntl(_v.fd, F_SETFL, attribs))
-      return make_errored_result<void>(errno);
+      return make_errored_result<void>(errno, last190(path().native()));
     _v.behaviour |= native_handle_type::disposition::aligned_io;
     break;
-  case caching::reads:
+  case handle::caching::reads:
     attribs |= O_SYNC;
     if(-1 == fcntl(_v.fd, F_SETFL, attribs))
-      return make_errored_result<void>(errno);
+      return make_errored_result<void>(errno, last190(path().native()));
     _v.behaviour &= ~native_handle_type::disposition::aligned_io;
     break;
-  case caching::reads_and_metadata:
+  case handle::caching::reads_and_metadata:
 #ifdef O_DSYNC
     attribs |= O_DSYNC;
 #else
     attribs |= O_SYNC;
 #endif
     if(-1 == fcntl(_v.fd, F_SETFL, attribs))
-      return make_errored_result<void>(errno);
+      return make_errored_result<void>(errno, last190(path().native()));
     _v.behaviour &= ~native_handle_type::disposition::aligned_io;
     break;
-  case caching::all:
-  case caching::safety_fsyncs:
-  case caching::temporary:
+  case handle::caching::all:
+  case handle::caching::safety_fsyncs:
+  case handle::caching::temporary:
     if(-1 == fcntl(_v.fd, F_SETFL, attribs))
-      return make_errored_result<void>(errno);
+      return make_errored_result<void>(errno, last190(path().native()));
     _v.behaviour &= ~native_handle_type::disposition::aligned_io;
     break;
   }
@@ -171,16 +173,18 @@ io_handle::io_result<io_handle::buffers_type> io_handle::read(io_handle::io_requ
     return make_errored_result<>(stl11::errc::not_supported);
   if(reqs.buffers.size() > IOV_MAX)
     return make_errored_result<>(stl11::errc::argument_list_too_long);
-  struct iovec *iov = (struct iovec *) alloca(reqs.size() * sizeof(struct iovec));
+  struct iovec *iov = (struct iovec *) alloca(reqs.buffers.size() * sizeof(struct iovec));
   for(size_t n = 0; n < reqs.buffers.size(); n++)
   {
     iov[n].iov_base = reqs.buffers[n].first;
     iov[n].iov_len = reqs.buffers[n].second;
   }
-  ssize_t bytesread = ::preadv(_v.fd, iov, reqs.size(), reqs.offset);
+  ssize_t bytesread = ::preadv(_v.fd, iov, reqs.buffers.size(), reqs.offset);
+  if(bytesread < 0)
+    return make_errored_result<io_handle::buffers_type>(errno, last190(path().native()));
   for(size_t n = 0; n < reqs.buffers.size(); n++)
   {
-    if(reqs.buffers[n].second >= bytesread)
+    if(reqs.buffers[n].second >= (size_t) bytesread)
       bytesread -= reqs.buffers[n].second;
     else if(bytesread > 0)
     {
@@ -200,16 +204,18 @@ io_handle::io_result<io_handle::const_buffers_type> io_handle::write(io_handle::
     return make_errored_result<>(stl11::errc::not_supported);
   if(reqs.buffers.size() > IOV_MAX)
     return make_errored_result<>(stl11::errc::argument_list_too_long);
-  struct iovec *iov = (struct iovec *) alloca(reqs.size() * sizeof(struct iovec));
+  struct iovec *iov = (struct iovec *) alloca(reqs.buffers.size() * sizeof(struct iovec));
   for(size_t n = 0; n < reqs.buffers.size(); n++)
   {
-    iov[n].iov_base = reqs.buffers[n].first;
+    iov[n].iov_base = const_cast<char *>(reqs.buffers[n].first);
     iov[n].iov_len = reqs.buffers[n].second;
   }
-  ssize_t byteswritten = ::pwritev(_v.fd, iov, reqs.size(), reqs.offset);
+  ssize_t byteswritten = ::pwritev(_v.fd, iov, reqs.buffers.size(), reqs.offset);
+  if(byteswritten < 0)
+    return make_errored_result<io_handle::const_buffers_type>(errno, last190(path().native()));
   for(size_t n = 0; n < reqs.buffers.size(); n++)
   {
-    if(reqs.buffers[n].second >= byteswritten)
+    if(reqs.buffers[n].second >= (size_t) byteswritten)
       byteswritten -= reqs.buffers[n].second;
     else if(byteswritten > 0)
     {
@@ -241,25 +247,25 @@ result<io_handle::extent_guard> io_handle::lock(io_handle::extent_type offset, i
   {
     struct flock fl;
     memset(&fl, 0, sizeof(fl));
-    fl.l_type = exclusive ? F_WRLOCK : F_RDLCK;
+    fl.l_type = exclusive ? F_WRLCK : F_RDLCK;
     constexpr extent_type extent_topbit = (extent_type) 1<<(8*sizeof(extent_type)-1);
     if(offset & extent_topbit)
     {
-      BOOST_AFIO_LOG_WARNING(_v.fd, "io_handle::lock() called with offset with top bit set, masking out");
+      BOOST_AFIO_LOG_WARN(_v.fd, "io_handle::lock() called with offset with top bit set, masking out");
     }
     if(bytes & extent_topbit)
     {
-      BOOST_AFIO_LOG_WARNING(_v.fd, "io_handle::lock() called with bytes with top bit set, masking out");
+      BOOST_AFIO_LOG_WARN(_v.fd, "io_handle::lock() called with bytes with top bit set, masking out");
     }
     fl.l_whence = SEEK_SET;
     fl.l_start = offset & ~extent_topbit;
     fl.l_len = bytes & ~extent_topbit;
 #ifdef F_OFD_SETLK
-    if(-1 == fcntl(_v.fd, (d && !d.nsec) ? F_OFD_SETLK : F_OFD_SETLKW, &fl))
+    if(-1 == fcntl(_v.fd, (d && !d.nsecs) ? F_OFD_SETLK : F_OFD_SETLKW, &fl))
     {
       if(EINVAL == errno)  // OFD locks not supported on this kernel
       {
-        if(-1 == fcntl(_v.fd, (d && !d.nsec) ? F_SETLK : F_SETLKW, &fl))
+        if(-1 == fcntl(_v.fd, (d && !d.nsecs) ? F_SETLK : F_SETLKW, &fl))
           failed = true;
         else
           _flags |= flag::byte_lock_insanity;
@@ -268,7 +274,7 @@ result<io_handle::extent_guard> io_handle::lock(io_handle::extent_type offset, i
         failed = true;
     }
 #else
-    if(-1 == fcntl(_v.fd, (d && !d.nsec) ? F_SETLK : F_SETLKW, &fl))
+    if(-1 == fcntl(_v.fd, (d && !d.nsecs) ? F_SETLK : F_SETLKW, &fl))
       failed = true;
     else
       _flags |= flag::byte_lock_insanity;
@@ -279,7 +285,7 @@ result<io_handle::extent_guard> io_handle::lock(io_handle::extent_type offset, i
     if(d && !d.nsecs && (EACCES == errno || EAGAIN == errno || EWOULDBLOCK == errno))
       return make_errored_result<void>(stl11::errc::timed_out);
     else
-      return make_errored_result<void>(errno);
+      return make_errored_result<void>(errno, last190(path().native()));
   }
   return extent_guard(this, offset, bytes, exclusive);
 }

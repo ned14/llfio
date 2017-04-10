@@ -48,7 +48,7 @@ result<async_file_handle> async_file_handle::clone(io_service &service) const no
 }
 
 template <class CompletionRoutine, class BuffersType, class IORoutine>
-result<async_file_handle::io_state_ptr<CompletionRoutine, BuffersType>> async_file_handle::_begin_io(async_file_handle::operation_t operation, async_file_handle::io_request<BuffersType> reqs, CompletionRoutine &&completion, IORoutine &&ioroutine) noexcept
+result<async_file_handle::io_state_ptr<CompletionRoutine, BuffersType>> async_file_handle::_begin_io(async_file_handle::operation_t operation, async_file_handle::io_request<BuffersType> reqs, CompletionRoutine &&completion, IORoutine &&/*ioroutine*/) noexcept
 {
   // Need to keep a set of aiocbs matching the scatter-gather buffers
   struct state_type : public _io_state_type<CompletionRoutine, BuffersType>
@@ -58,7 +58,7 @@ result<async_file_handle::io_state_ptr<CompletionRoutine, BuffersType>> async_fi
 #else
 #error todo
 #endif
-    state_type(handle *_parent, operation_t _operation, CompletionRoutine &&f, size_t _items)
+    state_type(async_file_handle *_parent, operation_t _operation, CompletionRoutine &&f, size_t _items)
         : _io_state_type<CompletionRoutine, BuffersType>(_parent, _operation, std::forward<CompletionRoutine>(f), _items)
     {
     }
@@ -106,6 +106,7 @@ result<async_file_handle::io_state_ptr<CompletionRoutine, BuffersType>> async_fi
         {
 #if BOOST_AFIO_USE_POSIX_AIO
           int ret = aio_cancel(this->parent->native_handle().fd, aiocbs + n);
+          (void) ret;
 #if 0
           if(ret<0 || ret==AIO_NOTCANCELED)
           {
@@ -227,7 +228,7 @@ async_file_handle::io_result<async_file_handle::buffers_type> async_file_handle:
 {
   io_result<buffers_type> ret;
   auto _io_state(_begin_io(operation_t::read, std::move(reqs), [&ret](auto *state) { ret = std::move(state->result); }, nullptr));
-  BOOST_OUTCOME_FILTER_ERROR(io_state, _io_state);
+  BOOST_OUTCOME_TRY(io_state, _io_state);
 
   // While i/o is not done pump i/o completion
   while(!ret.is_ready())
@@ -251,7 +252,7 @@ async_file_handle::io_result<async_file_handle::const_buffers_type> async_file_h
 {
   io_result<const_buffers_type> ret;
   auto _io_state(_begin_io(operation_t::write, std::move(reqs), [&ret](auto *state) { ret = std::move(state->result); }, nullptr));
-  BOOST_OUTCOME_FILTER_ERROR(io_state, _io_state);
+  BOOST_OUTCOME_TRY(io_state, _io_state);
 
   // While i/o is not done pump i/o completion
   while(!ret.is_ready())

@@ -43,6 +43,7 @@ BOOST_AFIO_V2_NAMESPACE_EXPORT_BEGIN
 */
 class BOOST_AFIO_DECL async_file_handle : public file_handle
 {
+  friend class io_service;
 public:
   using dev_t = file_handle::dev_t;
   using ino_t = file_handle::ino_t;
@@ -65,7 +66,7 @@ protected:
 
 public:
   //! Default constructor
-  constexpr async_file_handle() = default;
+  async_file_handle() = default;
 
   //! Construct a handle from a supplied native handle
   async_file_handle(io_service *service, native_handle_type h, dev_t devid, ino_t inode, path_type path, caching caching = caching::none, flag flags = flag::none)

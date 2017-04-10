@@ -149,7 +149,7 @@ struct stat_t
       st_size(0), st_allocated(0), st_blocks(0), st_blksize(0), st_flags(0), st_gen(0), st_sparse(0), st_compressed(0), st_reparse_point(0) { }
 #ifdef __cpp_exceptions
   //! Constructs a filled instance, throwing as an exception any error which might occur
-  stat_t(handle &h, want wanted = want::all)
+  stat_t(const handle &h, want wanted = want::all)
       : stat_t()
   {
     auto v(fill(h, wanted));
@@ -158,7 +158,7 @@ struct stat_t
   }
 #endif
   //! Fills in the structure with metadata, returning number of items filled in
-  BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> fill(handle &h, want wanted = want::all) noexcept;
+  BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> fill(const handle &h, want wanted = want::all) noexcept;
 };
 
 BOOST_AFIO_V2_NAMESPACE_END

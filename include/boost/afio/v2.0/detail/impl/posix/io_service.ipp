@@ -29,7 +29,7 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
-#include "../../../handle.hpp"
+#include "../../../async_file_handle.hpp"
 
 #include <pthread.h>
 #if BOOST_AFIO_USE_POSIX_AIO
@@ -73,7 +73,8 @@ int io_service::set_interruption_signal(int signo)
     {
       for(signo=SIGRTMIN; signo<SIGRTMAX; signo++)
       {
-        struct sigaction sigact = { 0 };
+        struct sigaction sigact;
+        memset(&sigact, 0, sizeof(sigact));
         if(sigaction(signo, nullptr, &sigact)>=0)
         {
           if(sigact.sa_handler==SIG_DFL)
@@ -83,7 +84,8 @@ int io_service::set_interruption_signal(int signo)
     }
 #endif
     // Install process wide signal handler for signal
-    struct sigaction sigact = { 0 };
+    struct sigaction sigact;
+    memset(&sigact, 0, sizeof(sigact));
     sigact.sa_sigaction=&interrupt_signal_handler;
     sigact.sa_flags=SA_SIGINFO;
     sigemptyset(&sigact.sa_mask);
@@ -144,7 +146,9 @@ io_service::~io_service()
 {
   if (_work_queued)
   {
-    std::cerr << "WARNING: ~io_service() sees work still queued, blocking until no work queued" << std::endl;
+#ifndef NDEBUG
+    fprintf(stderr, "WARNING: ~io_service() sees work still queued, blocking until no work queued\n");
+#endif
     while (_work_queued)
       std::this_thread::yield();
   }
@@ -201,7 +205,8 @@ result<bool> io_service::run_until(deadline d) noexcept
     else
       end_utc = d.to_time_point();
   }
-  struct timespec *ts=nullptr, _ts={0};
+  struct timespec *ts=nullptr, _ts;
+  memset(&_ts, 0, sizeof(_ts));
   bool done=false;
   do
   {
@@ -283,7 +288,7 @@ result<bool> io_service::run_until(deadline d) noexcept
           int errcode=ioret<0 ? errno : 0;
 //          std::cout << "aiocb " << aiocb << " sees return " << ioret << " errno " << errcode << std::endl;
           // The aiocb aio_sigevent.sigev_value.sival_ptr field will point to a file_handle::_io_state_type
-          auto io_state=(file_handle::_erased_io_state_type *) aiocb->aio_sigevent.sigev_value.sival_ptr;
+          auto io_state=(async_file_handle::_erased_io_state_type *) aiocb->aio_sigevent.sigev_value.sival_ptr;
           assert(io_state);
           (*io_state)(errcode, ioret, &aiocb);
         }

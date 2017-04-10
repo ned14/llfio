@@ -35,7 +35,7 @@ DEALINGS IN THE SOFTWARE.
 
 BOOST_AFIO_V2_NAMESPACE_BEGIN
 
-BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(handle &h, statfs_t::want wanted) noexcept
+BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, statfs_t::want wanted) noexcept
 {
   BOOST_AFIO_LOG_FUNCTION_CALL(h.native_handle().h);
   windows_nt_kernel::init();
