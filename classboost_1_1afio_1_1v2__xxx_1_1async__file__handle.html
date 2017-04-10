@@ -113,6 +113,7 @@ $(document).ready(function(){initNavTree('classboost_1_1afio_1_1v2__xxx_1_1async
 <a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="#pro-methods">Protected Member Functions</a> &#124;
 <a href="#pro-attribs">Protected Attributes</a> &#124;
+<a href="#friends">Friends</a> &#124;
 <a href="classboost_1_1afio_1_1v2__xxx_1_1async__file__handle-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">boost::afio::v2_xxx::async_file_handle Class Reference</div>  </div>
@@ -192,10 +193,10 @@ using&#160;</td><td class="memItemRight" valign="bottom"><b>unique_id_type</b> =
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a4a78ff42af242a11e917d92523e6e28a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4a78ff42af242a11e917d92523e6e28a"></a>
-constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1async__file__handle.html#a4a78ff42af242a11e917d92523e6e28a">async_file_handle</a> ()=default</td></tr>
-<tr class="memdesc:a4a78ff42af242a11e917d92523e6e28a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor. <br/></td></tr>
-<tr class="separator:a4a78ff42af242a11e917d92523e6e28a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a45e3460664113cfbc0898f084057e54c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a45e3460664113cfbc0898f084057e54c"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1async__file__handle.html#a45e3460664113cfbc0898f084057e54c">async_file_handle</a> ()=default</td></tr>
+<tr class="memdesc:a45e3460664113cfbc0898f084057e54c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor. <br/></td></tr>
+<tr class="separator:a45e3460664113cfbc0898f084057e54c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5299c08edd2ab9c55d7a6d3698ee6be9"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5299c08edd2ab9c55d7a6d3698ee6be9"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1async__file__handle.html#a5299c08edd2ab9c55d7a6d3698ee6be9">async_file_handle</a> (<a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__service.html">io_service</a> *<a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1file__handle.html#a8f008c58eacfba8efdb2f4ec88322fb9">service</a>, <a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1native__handle__type.html">native_handle_type</a> h, dev_t devid, ino_t inode, path_type <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1file__handle.html#a8581a32e1ed27a84046bc5cd9a248392">path</a>, <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html#a81c7de194feaa88684ca9851d0d527ca">caching</a> <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html#a81c7de194feaa88684ca9851d0d527ca">caching</a>=caching::none, flag <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html#add27fa17cd6356b49a26a8b6dafb6a6d">flags</a>=flag::none)</td></tr>
 <tr class="memdesc:a5299c08edd2ab9c55d7a6d3698ee6be9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a handle from a supplied native handle. <br/></td></tr>
@@ -440,6 +441,12 @@ flag&#160;</td><td class="memItemRight" valign="bottom"><b>_flags</b></td></tr>
 <tr class="memitem:a8d3193d192d5de93d3ea781b93ea398b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8d3193d192d5de93d3ea781b93ea398b"></a>
 <a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1native__handle__type.html">native_handle_type</a>&#160;</td><td class="memItemRight" valign="bottom"><b>_v</b></td></tr>
 <tr class="separator:a8d3193d192d5de93d3ea781b93ea398b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
+Friends</h2></td></tr>
+<tr class="memitem:ae9f4f5f9cc386f5188a9977145edbe6c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae9f4f5f9cc386f5188a9977145edbe6c"></a>
+class&#160;</td><td class="memItemRight" valign="bottom"><b>io_service</b></td></tr>
+<tr class="separator:ae9f4f5f9cc386f5188a9977145edbe6c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>An asynchronous handle to an open something </p>
@@ -530,13 +537,13 @@ template&lt;class CompletionRoutine , class BuffersType &gt; </div>
 </div><div class="memdoc">
 <p>Create an async file handle opening access to a file on path using the given io_service.</p>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX open() or CreateFile() can return. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;  {</div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;    <span class="comment">// Open it overlapped, otherwise no difference.</span></div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;    BOOST_OUTCOME_TRY(v, <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1file__handle.html#af912595f8964b78186236a2cec1150a4">file_handle::file</a>(std::move(_path), std::move(_mode), std::move(_creation), std::move(_caching), <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html#add27fa17cd6356b49a26a8b6dafb6a6d" title="The flags this handle was opened with.">flags</a> | flag::overlapped));</div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;    <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1async__file__handle.html#a4a78ff42af242a11e917d92523e6e28a" title="Default constructor.">async_file_handle</a> ret(std::move(v));</div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;    ret._service = &amp;<a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1file__handle.html#a8f008c58eacfba8efdb2f4ec88322fb9" title="The i/o service this handle is attached to, if any.">service</a>;</div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;    <span class="keywordflow">return</span> std::move(ret);</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;  }</div>
+<div class="fragment"><div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;  {</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;    <span class="comment">// Open it overlapped, otherwise no difference.</span></div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;    BOOST_OUTCOME_TRY(v, <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1file__handle.html#af912595f8964b78186236a2cec1150a4">file_handle::file</a>(std::move(_path), std::move(_mode), std::move(_creation), std::move(_caching), <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html#add27fa17cd6356b49a26a8b6dafb6a6d" title="The flags this handle was opened with.">flags</a> | flag::overlapped));</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;    <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1async__file__handle.html#a45e3460664113cfbc0898f084057e54c" title="Default constructor.">async_file_handle</a> ret(std::move(v));</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;    ret._service = &amp;<a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1file__handle.html#a8f008c58eacfba8efdb2f4ec88322fb9" title="The i/o service this handle is attached to, if any.">service</a>;</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;    <span class="keywordflow">return</span> std::move(ret);</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -591,22 +598,22 @@ template&lt;class CompletionRoutine , class BuffersType &gt; </div>
 </div><div class="memdoc">
 <p>Create an async file handle creating a randomly named file on a path. The file is opened exclusively with <code>creation::only_if_not_exist</code> so it will never collide with nor overwrite any existing file. Note also that caching defaults to temporary which hints to the OS to only flush changes to physical storage as lately as possible.</p>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX open() or CreateFile() can return. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;  {</div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;    <span class="keywordflow">try</span></div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;    {</div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;      result&lt;async_file_handle&gt; ret;</div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;      <span class="keywordflow">do</span></div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;      {</div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;        <span class="keyword">auto</span> randomname = <a class="code" href="namespaceboost_1_1afio_1_1v2__xxx_1_1utils.html#a051e8deb72941b3460811a1cf5f29915" title="Returns a cryptographically random string capable of being used as a filename. Essentially random_fil...">utils::random_string</a>(32);</div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;        randomname.append(<span class="stringliteral">&quot;.random&quot;</span>);</div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;        ret = <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1async__file__handle.html#a12b3005187cfe96eb2af7b19fffbb284">async_file</a>(<a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1file__handle.html#a8f008c58eacfba8efdb2f4ec88322fb9" title="The i/o service this handle is attached to, if any.">service</a>, dirpath / randomname, _mode, creation::only_if_not_exist, _caching, <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html#add27fa17cd6356b49a26a8b6dafb6a6d" title="The flags this handle was opened with.">flags</a>);</div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;        <span class="keywordflow">if</span>(!ret &amp;&amp; ret.get_error().value() != EEXIST)</div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;          <span class="keywordflow">return</span> ret;</div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;      } <span class="keywordflow">while</span>(!ret);</div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;      <span class="keywordflow">return</span> ret;</div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;    }</div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;    BOOST_OUTCOME_CATCH_ALL_EXCEPTION_TO_RESULT</div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;  }</div>
+<div class="fragment"><div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;  {</div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;    <span class="keywordflow">try</span></div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;    {</div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;      result&lt;async_file_handle&gt; ret;</div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;      <span class="keywordflow">do</span></div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;      {</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;        <span class="keyword">auto</span> randomname = <a class="code" href="namespaceboost_1_1afio_1_1v2__xxx_1_1utils.html#a051e8deb72941b3460811a1cf5f29915" title="Returns a cryptographically random string capable of being used as a filename. Essentially random_fil...">utils::random_string</a>(32);</div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;        randomname.append(<span class="stringliteral">&quot;.random&quot;</span>);</div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;        ret = <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1async__file__handle.html#a12b3005187cfe96eb2af7b19fffbb284">async_file</a>(<a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1file__handle.html#a8f008c58eacfba8efdb2f4ec88322fb9" title="The i/o service this handle is attached to, if any.">service</a>, dirpath / randomname, _mode, creation::only_if_not_exist, _caching, <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html#add27fa17cd6356b49a26a8b6dafb6a6d" title="The flags this handle was opened with.">flags</a>);</div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;        <span class="keywordflow">if</span>(!ret &amp;&amp; ret.get_error().value() != EEXIST)</div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;          <span class="keywordflow">return</span> ret;</div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;      } <span class="keywordflow">while</span>(!ret);</div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;      <span class="keywordflow">return</span> ret;</div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;    }</div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;    BOOST_OUTCOME_CATCH_ALL_EXCEPTION_TO_RESULT</div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -716,9 +723,9 @@ template&lt;class CompletionRoutine &gt; </div>
 <p>Create an async file handle creating the named file on some path which the OS declares to be suitable for temporary files. Most OSs are very lazy about flushing changes made to these temporary files. Note the default flags are to have the newly created file deleted on first handle close. Note also that an empty name is equivalent to calling <code>async_random_file(fixme_temporary_files_directory())</code> and the creation parameter is ignored.</p>
 <dl class="section note"><dt>Note</dt><dd>If the temporary file you are creating is not going to have its path sent to another process for usage, this is the WRONG function to use. Use <code>temp_inode()</code> instead, it is far more secure.</dd></dl>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX open() or CreateFile() can return. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;  {</div>
-<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;    <span class="keywordflow">return</span> name.empty() ? <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1async__file__handle.html#a46d1de34eb162674eec85decaef44799">async_random_file</a>(<a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1file__handle.html#a8f008c58eacfba8efdb2f4ec88322fb9" title="The i/o service this handle is attached to, if any.">service</a>, <a class="code" href="namespaceboost_1_1afio_1_1v2__xxx.html#ad7da7a1d3240d7574fc7c6ee5831b7ee" title="Returns a path to a directory reported by the operating system to be suitable for storing temporary f...">fixme_temporary_files_directory</a>(), _mode, _caching, <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html#add27fa17cd6356b49a26a8b6dafb6a6d" title="The flags this handle was opened with.">flags</a>) : <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1async__file__handle.html#a12b3005187cfe96eb2af7b19fffbb284">async_file</a>(<a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1file__handle.html#a8f008c58eacfba8efdb2f4ec88322fb9" title="The i/o service this handle is attached to, if any.">service</a>, <a class="code" href="namespaceboost_1_1afio_1_1v2__xxx.html#ad7da7a1d3240d7574fc7c6ee5831b7ee" title="Returns a path to a directory reported by the operating system to be suitable for storing temporary f...">fixme_temporary_files_directory</a>() / name, _mode, _creation, _caching, <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html#add27fa17cd6356b49a26a8b6dafb6a6d" title="The flags this handle was opened with.">flags</a>);</div>
-<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;  }</div>
+<div class="fragment"><div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;  {</div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;    <span class="keywordflow">return</span> name.empty() ? <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1async__file__handle.html#a46d1de34eb162674eec85decaef44799">async_random_file</a>(<a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1file__handle.html#a8f008c58eacfba8efdb2f4ec88322fb9" title="The i/o service this handle is attached to, if any.">service</a>, <a class="code" href="namespaceboost_1_1afio_1_1v2__xxx.html#ad7da7a1d3240d7574fc7c6ee5831b7ee" title="Returns a path to a directory reported by the operating system to be suitable for storing temporary f...">fixme_temporary_files_directory</a>(), _mode, _caching, <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html#add27fa17cd6356b49a26a8b6dafb6a6d" title="The flags this handle was opened with.">flags</a>) : <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1async__file__handle.html#a12b3005187cfe96eb2af7b19fffbb284">async_file</a>(<a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1file__handle.html#a8f008c58eacfba8efdb2f4ec88322fb9" title="The i/o service this handle is attached to, if any.">service</a>, <a class="code" href="namespaceboost_1_1afio_1_1v2__xxx.html#ad7da7a1d3240d7574fc7c6ee5831b7ee" title="Returns a path to a directory reported by the operating system to be suitable for storing temporary f...">fixme_temporary_files_directory</a>() / name, _mode, _creation, _caching, <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html#add27fa17cd6356b49a26a8b6dafb6a6d" title="The flags this handle was opened with.">flags</a>);</div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -767,13 +774,13 @@ template&lt;class CompletionRoutine &gt; </div>
 </div><div class="memdoc">
 <p><em>Securely</em> create an async file handle creating a temporary anonymous inode in the filesystem referred to by <em>dirpath</em>. The inode created has no name nor accessible path on the filing system and ceases to exist as soon as the last handle is closed, making it ideal for use as a temporary file where other processes do not need to have access to its contents via some path on the filing system (a classic use case is for backing shared memory maps).</p>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX open() or CreateFile() can return. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;  {</div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;    <span class="comment">// Open it overlapped, otherwise no difference.</span></div>
-<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;    BOOST_OUTCOME_TRY(v, <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1file__handle.html#a841ba6c013b21dba15bceb472c3cbecf">file_handle::temp_inode</a>(std::move(dirpath), std::move(_mode), <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html#add27fa17cd6356b49a26a8b6dafb6a6d" title="The flags this handle was opened with.">flags</a> | flag::overlapped));</div>
-<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;    <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1async__file__handle.html#a4a78ff42af242a11e917d92523e6e28a" title="Default constructor.">async_file_handle</a> ret(std::move(v));</div>
-<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;    ret._service = &amp;<a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1file__handle.html#a8f008c58eacfba8efdb2f4ec88322fb9" title="The i/o service this handle is attached to, if any.">service</a>;</div>
-<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;    <span class="keywordflow">return</span> std::move(ret);</div>
-<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;  }</div>
+<div class="fragment"><div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;  {</div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;    <span class="comment">// Open it overlapped, otherwise no difference.</span></div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;    BOOST_OUTCOME_TRY(v, <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1file__handle.html#a841ba6c013b21dba15bceb472c3cbecf">file_handle::temp_inode</a>(std::move(dirpath), std::move(_mode), <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html#add27fa17cd6356b49a26a8b6dafb6a6d" title="The flags this handle was opened with.">flags</a> | flag::overlapped));</div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;    <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1async__file__handle.html#a45e3460664113cfbc0898f084057e54c" title="Default constructor.">async_file_handle</a> ret(std::move(v));</div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;    ret._service = &amp;<a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1file__handle.html#a8f008c58eacfba8efdb2f4ec88322fb9" title="The i/o service this handle is attached to, if any.">service</a>;</div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;    <span class="keywordflow">return</span> std::move(ret);</div>
+<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1048,12 +1055,12 @@ template&lt;class CompletionRoutine &gt; </div>
 </table>
 </div><div class="memdoc">
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><a name="l00571"></a><span class="lineno">  571</span>&#160;  {</div>
-<div class="line"><a name="l00572"></a><span class="lineno">  572</span>&#160;    <span class="keywordtype">size_t</span> bytes = 0;</div>
-<div class="line"><a name="l00573"></a><span class="lineno">  573</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;i : reqs.buffers)</div>
-<div class="line"><a name="l00574"></a><span class="lineno">  574</span>&#160;      bytes += i.second;</div>
-<div class="line"><a name="l00575"></a><span class="lineno">  575</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#aebd9c90a901e6364c94d466425db6e0f" title="Tries to lock the range of bytes specified for shared or exclusive access. Be aware this passes throu...">lock</a>(reqs.offset, bytes, <span class="keyword">false</span>, std::move(d));</div>
-<div class="line"><a name="l00576"></a><span class="lineno">  576</span>&#160;  }</div>
+<div class="fragment"><div class="line"><a name="l00572"></a><span class="lineno">  572</span>&#160;  {</div>
+<div class="line"><a name="l00573"></a><span class="lineno">  573</span>&#160;    <span class="keywordtype">size_t</span> bytes = 0;</div>
+<div class="line"><a name="l00574"></a><span class="lineno">  574</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;i : reqs.buffers)</div>
+<div class="line"><a name="l00575"></a><span class="lineno">  575</span>&#160;      bytes += i.second;</div>
+<div class="line"><a name="l00576"></a><span class="lineno">  576</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#aebd9c90a901e6364c94d466425db6e0f" title="Tries to lock the range of bytes specified for shared or exclusive access. Be aware this passes throu...">lock</a>(reqs.offset, bytes, <span class="keyword">false</span>, std::move(d));</div>
+<div class="line"><a name="l00577"></a><span class="lineno">  577</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1089,12 +1096,12 @@ template&lt;class CompletionRoutine &gt; </div>
 </table>
 </div><div class="memdoc">
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><a name="l00579"></a><span class="lineno">  579</span>&#160;  {</div>
-<div class="line"><a name="l00580"></a><span class="lineno">  580</span>&#160;    <span class="keywordtype">size_t</span> bytes = 0;</div>
-<div class="line"><a name="l00581"></a><span class="lineno">  581</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;i : reqs.buffers)</div>
-<div class="line"><a name="l00582"></a><span class="lineno">  582</span>&#160;      bytes += i.second;</div>
-<div class="line"><a name="l00583"></a><span class="lineno">  583</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#aebd9c90a901e6364c94d466425db6e0f" title="Tries to lock the range of bytes specified for shared or exclusive access. Be aware this passes throu...">lock</a>(reqs.offset, bytes, <span class="keyword">true</span>, std::move(d));</div>
-<div class="line"><a name="l00584"></a><span class="lineno">  584</span>&#160;  }</div>
+<div class="fragment"><div class="line"><a name="l00580"></a><span class="lineno">  580</span>&#160;  {</div>
+<div class="line"><a name="l00581"></a><span class="lineno">  581</span>&#160;    <span class="keywordtype">size_t</span> bytes = 0;</div>
+<div class="line"><a name="l00582"></a><span class="lineno">  582</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;i : reqs.buffers)</div>
+<div class="line"><a name="l00583"></a><span class="lineno">  583</span>&#160;      bytes += i.second;</div>
+<div class="line"><a name="l00584"></a><span class="lineno">  584</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#aebd9c90a901e6364c94d466425db6e0f" title="Tries to lock the range of bytes specified for shared or exclusive access. Be aware this passes throu...">lock</a>(reqs.offset, bytes, <span class="keyword">true</span>, std::move(d));</div>
+<div class="line"><a name="l00585"></a><span class="lineno">  585</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1252,12 +1259,12 @@ template&lt;class CompletionRoutine &gt; </div>
 </table>
 </div><div class="memdoc">
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><a name="l00433"></a><span class="lineno">  433</span>&#160;  {</div>
-<div class="line"><a name="l00434"></a><span class="lineno">  434</span>&#160;    <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a811166f987d82fcd3c85c6aa0b9b4f34" title="The scatter buffer type used by this handle.">buffer_type</a> _reqs[1] = {{data, bytes}};</div>
-<div class="line"><a name="l00435"></a><span class="lineno">  435</span>&#160;    io_request&lt;buffers_type&gt; reqs(<a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a9085d19b744d1330eafa51fffc49e104" title="The scatter buffers type used by this handle.">buffers_type</a>(_reqs), offset);</div>
-<div class="line"><a name="l00436"></a><span class="lineno">  436</span>&#160;    BOOST_OUTCOME_TRY(v, <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#ab371d8427aeb4bd0ca5f8a39a98ea5a2" title="Read data from the open handle.">read</a>(reqs, d));</div>
-<div class="line"><a name="l00437"></a><span class="lineno">  437</span>&#160;    <span class="keywordflow">return</span> *v.data();</div>
-<div class="line"><a name="l00438"></a><span class="lineno">  438</span>&#160;  }</div>
+<div class="fragment"><div class="line"><a name="l00434"></a><span class="lineno">  434</span>&#160;  {</div>
+<div class="line"><a name="l00435"></a><span class="lineno">  435</span>&#160;    <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a811166f987d82fcd3c85c6aa0b9b4f34" title="The scatter buffer type used by this handle.">buffer_type</a> _reqs[1] = {{data, bytes}};</div>
+<div class="line"><a name="l00436"></a><span class="lineno">  436</span>&#160;    io_request&lt;buffers_type&gt; reqs(<a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a9085d19b744d1330eafa51fffc49e104" title="The scatter buffers type used by this handle.">buffers_type</a>(_reqs), offset);</div>
+<div class="line"><a name="l00437"></a><span class="lineno">  437</span>&#160;    BOOST_OUTCOME_TRY(v, <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#ab371d8427aeb4bd0ca5f8a39a98ea5a2" title="Read data from the open handle.">read</a>(reqs, d));</div>
+<div class="line"><a name="l00438"></a><span class="lineno">  438</span>&#160;    <span class="keywordflow">return</span> *v.data();</div>
+<div class="line"><a name="l00439"></a><span class="lineno">  439</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1521,7 +1528,7 @@ template&lt;class CompletionRoutine &gt; </div>
 </table>
 </div><div class="memdoc">
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><a name="l00568"></a><span class="lineno">  568</span>&#160;{ <span class="keywordflow">return</span> <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#aebd9c90a901e6364c94d466425db6e0f" title="Tries to lock the range of bytes specified for shared or exclusive access. Be aware this passes throu...">lock</a>(offset, bytes, exclusive, <a class="code" href="structdeadline.html" title="A time deadline in either relative-to-now or absolute (system clock) terms.">deadline</a>(stl11::chrono::seconds(0))); }</div>
+<div class="fragment"><div class="line"><a name="l00569"></a><span class="lineno">  569</span>&#160;{ <span class="keywordflow">return</span> <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#aebd9c90a901e6364c94d466425db6e0f" title="Tries to lock the range of bytes specified for shared or exclusive access. Be aware this passes throu...">lock</a>(offset, bytes, exclusive, <a class="code" href="structdeadline.html" title="A time deadline in either relative-to-now or absolute (system clock) terms.">deadline</a>(stl11::chrono::seconds(0))); }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1685,12 +1692,12 @@ template&lt;class CompletionRoutine &gt; </div>
 </table>
 </div><div class="memdoc">
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><a name="l00457"></a><span class="lineno">  457</span>&#160;  {</div>
-<div class="line"><a name="l00458"></a><span class="lineno">  458</span>&#160;    <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#acbb752522c90f5e4596b8a4f07e2fa80" title="The gather buffer type used by this handle.">const_buffer_type</a> _reqs[1] = {{data, bytes}};</div>
-<div class="line"><a name="l00459"></a><span class="lineno">  459</span>&#160;    io_request&lt;const_buffers_type&gt; reqs(<a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a692ba33b1e443510a791ff43f37d73cd" title="The gather buffers type used by this handle.">const_buffers_type</a>(_reqs), offset);</div>
-<div class="line"><a name="l00460"></a><span class="lineno">  460</span>&#160;    BOOST_OUTCOME_TRY(v, <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a8890b6a6046fb562f9f0ab943b79dfb4" title="Write data to the open handle.">write</a>(reqs, d));</div>
-<div class="line"><a name="l00461"></a><span class="lineno">  461</span>&#160;    <span class="keywordflow">return</span> *v.data();</div>
-<div class="line"><a name="l00462"></a><span class="lineno">  462</span>&#160;  }</div>
+<div class="fragment"><div class="line"><a name="l00458"></a><span class="lineno">  458</span>&#160;  {</div>
+<div class="line"><a name="l00459"></a><span class="lineno">  459</span>&#160;    <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#acbb752522c90f5e4596b8a4f07e2fa80" title="The gather buffer type used by this handle.">const_buffer_type</a> _reqs[1] = {{data, bytes}};</div>
+<div class="line"><a name="l00460"></a><span class="lineno">  460</span>&#160;    io_request&lt;const_buffers_type&gt; reqs(<a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a692ba33b1e443510a791ff43f37d73cd" title="The gather buffers type used by this handle.">const_buffers_type</a>(_reqs), offset);</div>
+<div class="line"><a name="l00461"></a><span class="lineno">  461</span>&#160;    BOOST_OUTCOME_TRY(v, <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a8890b6a6046fb562f9f0ab943b79dfb4" title="Write data to the open handle.">write</a>(reqs, d));</div>
+<div class="line"><a name="l00462"></a><span class="lineno">  462</span>&#160;    <span class="keywordflow">return</span> *v.data();</div>
+<div class="line"><a name="l00463"></a><span class="lineno">  463</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>

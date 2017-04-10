@@ -2,6 +2,7 @@ var searchData=
 [
   ['afio',['afio',['../namespaceboost_1_1afio.html',1,'boost']]],
   ['algorithm',['algorithm',['../namespaceboost_1_1afio_1_1v2__xxx_1_1algorithm.html',1,'boost::afio::v2_xxx']]],
+  ['backing',['backing',['../classboost_1_1afio_1_1v2__xxx_1_1section__handle.html#a60302d5e901f36404d61244e2f0ef90d',1,'boost::afio::v2_xxx::section_handle']]],
   ['backing_5fnative_5fhandle',['backing_native_handle',['../classboost_1_1afio_1_1v2__xxx_1_1section__handle.html#a78fc51ac881ae0fc42327de1f9604ee7',1,'boost::afio::v2_xxx::section_handle']]],
   ['base_2ehpp',['base.hpp',['../base_8hpp.html',1,'']]],
   ['begin',['begin',['../structboost_1_1afio_1_1v2__xxx_1_1storage__profile_1_1storage__profile.html#aff13684e4ab8c811e63808b66901209c',1,'boost::afio::v2_xxx::storage_profile::storage_profile::begin() noexcept'],['../structboost_1_1afio_1_1v2__xxx_1_1storage__profile_1_1storage__profile.html#a41eaa3d97abd88484db04b0fed1d7cd3',1,'boost::afio::v2_xxx::storage_profile::storage_profile::begin() const noexcept']]],

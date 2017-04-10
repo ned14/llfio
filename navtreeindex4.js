@@ -1,5 +1,8 @@
 var NAVTREEINDEX4 =
 {
+"structboost_1_1afio_1_1v2__xxx_1_1statfs__t_1_1want__base.html#a35f5b2de8e92fce4b815ebce176d1993ac61254662a3c0555c9dbacabd508064c":[3,0,0,0,0,12,1,0,2],
+"structboost_1_1afio_1_1v2__xxx_1_1statfs__t_1_1want__base.html#a35f5b2de8e92fce4b815ebce176d1993ac6d92e8c4789ddbdc2590720a9ddd15f":[3,0,0,0,0,12,1,0,5],
+"structboost_1_1afio_1_1v2__xxx_1_1statfs__t_1_1want__base.html#a35f5b2de8e92fce4b815ebce176d1993ad246ebd8a531a96202bb88ff697536f9":[3,0,0,0,0,12,1,0,7],
 "structboost_1_1afio_1_1v2__xxx_1_1statfs__t_1_1want__base.html#a35f5b2de8e92fce4b815ebce176d1993ad6b9087a338a1b8897775e17c518a538":[3,0,0,0,0,12,1,0,0],
 "structboost_1_1afio_1_1v2__xxx_1_1statfs__t_1_1want__base.html#a35f5b2de8e92fce4b815ebce176d1993ae340e202da13891a528e604882afc5e5":[3,0,0,0,0,12,1,0,6],
 "structboost_1_1afio_1_1v2__xxx_1_1statfs__t_1_1want__base.html#a35f5b2de8e92fce4b815ebce176d1993ae93a7678cc41ae98b974437c1eb108c9":[3,0,0,0,0,12,1,0,1],

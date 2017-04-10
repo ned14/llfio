@@ -37,6 +37,7 @@ var classboost_1_1afio_1_1v2__xxx_1_1section__handle =
     [ "are_reads_from_cache", "classboost_1_1afio_1_1v2__xxx_1_1section__handle.html#a70998344e2234961c5ad64491d042ff8", null ],
     [ "are_safety_fsyncs_issued", "classboost_1_1afio_1_1v2__xxx_1_1section__handle.html#a3e08545dd29f09a40ff8439ac774ae1e", null ],
     [ "are_writes_durable", "classboost_1_1afio_1_1v2__xxx_1_1section__handle.html#ae446e9a32283991f58f8f27dbed083d1", null ],
+    [ "backing", "classboost_1_1afio_1_1v2__xxx_1_1section__handle.html#a60302d5e901f36404d61244e2f0ef90d", null ],
     [ "backing_native_handle", "classboost_1_1afio_1_1v2__xxx_1_1section__handle.html#a78fc51ac881ae0fc42327de1f9604ee7", null ],
     [ "clone", "classboost_1_1afio_1_1v2__xxx_1_1section__handle.html#a95d26fe35f85d81382d903224660084d", null ],
     [ "close", "classboost_1_1afio_1_1v2__xxx_1_1section__handle.html#a651ff10099e7522df784507aca8b8f0f", null ],

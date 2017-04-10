@@ -8,10 +8,9 @@ var classboost_1_1afio_1_1v2__xxx_1_1map__handle =
     [ "creation", "classboost_1_1afio_1_1v2__xxx_1_1map__handle.html#aa638bb94fce9ca72cbbb78255ec5595b", null ],
     [ "extent_type", "classboost_1_1afio_1_1v2__xxx_1_1map__handle.html#a14282152f2d93ca24873a7a9ede58d7e", null ],
     [ "flag", "classboost_1_1afio_1_1v2__xxx_1_1map__handle.html#aba89dfd920d015199f25a07d53ccb991", null ],
-    [ "flag", "classboost_1_1afio_1_1v2__xxx_1_1map__handle.html#aba89dfd920d015199f25a07d53ccb991", null ],
     [ "io_request", "classboost_1_1afio_1_1v2__xxx_1_1map__handle.html#a32b72e90696ec29152c8fdd10c4689c9", null ],
     [ "io_result", "classboost_1_1afio_1_1v2__xxx_1_1map__handle.html#a7ad4f68e9a642f68369977cbe2d5195e", null ],
-    [ "mode", "classboost_1_1afio_1_1v2__xxx_1_1map__handle.html#a8d711d76185dedd14856b8653455b8f2", null ],
+    [ "mode", "classboost_1_1afio_1_1v2__xxx_1_1map__handle.html#a6eb625e6c6364e6669ebbf66c0b35ade", null ],
     [ "path_type", "classboost_1_1afio_1_1v2__xxx_1_1map__handle.html#a2c61575fe222c227d6d8db0d2c67c4ec", null ],
     [ "size_type", "classboost_1_1afio_1_1v2__xxx_1_1map__handle.html#a7437f115d61376fc1064fef51eb3abf8", null ],
     [ "unique_id_type", "classboost_1_1afio_1_1v2__xxx_1_1map__handle.html#ace66ef9d4b55ad11d02af26814069d94", null ],
@@ -46,6 +45,7 @@ var classboost_1_1afio_1_1v2__xxx_1_1map__handle =
     [ "lock", "classboost_1_1afio_1_1v2__xxx_1_1map__handle.html#ac73d1383516e0e139e3863b57731e4de", null ],
     [ "lock", "classboost_1_1afio_1_1v2__xxx_1_1map__handle.html#a6de014bf9d16737f3b14b61d6eea413d", null ],
     [ "native_handle", "classboost_1_1afio_1_1v2__xxx_1_1map__handle.html#ae600069dc662d837c36f42802791c7f4", null ],
+    [ "offset", "classboost_1_1afio_1_1v2__xxx_1_1map__handle.html#aa37d709995bc671b3ca267ee5b821732", null ],
     [ "operator=", "classboost_1_1afio_1_1v2__xxx_1_1map__handle.html#ae07b3e5449e9116d733ef449b6ac0713", null ],
     [ "path", "classboost_1_1afio_1_1v2__xxx_1_1map__handle.html#a461355ae526806b338fd2eaadc564a43", null ],
     [ "read", "classboost_1_1afio_1_1v2__xxx_1_1map__handle.html#a5b832e5045ae54db8561133763837a47", null ],
@@ -69,6 +69,7 @@ var classboost_1_1afio_1_1v2__xxx_1_1map__handle =
     [ "_caching", "classboost_1_1afio_1_1v2__xxx_1_1map__handle.html#ae19418f14d1dd86e75214eda7644d42f", null ],
     [ "_flags", "classboost_1_1afio_1_1v2__xxx_1_1map__handle.html#a5037b058e4f8ef02a776d870b10d379a", null ],
     [ "_length", "classboost_1_1afio_1_1v2__xxx_1_1map__handle.html#aa28496a0b1cb81f567bbaf09ed7b195e", null ],
+    [ "_offset", "classboost_1_1afio_1_1v2__xxx_1_1map__handle.html#a61355c5c8b3a05fe120cf742d19c4846", null ],
     [ "_section", "classboost_1_1afio_1_1v2__xxx_1_1map__handle.html#af38b22afde040c08f397af289d629041", null ],
     [ "_v", "classboost_1_1afio_1_1v2__xxx_1_1map__handle.html#a8d3193d192d5de93d3ea781b93ea398b", null ]
 ];
