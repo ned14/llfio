@@ -9,6 +9,6 @@ var searchData=
   ['pid',['pid',['../structboost_1_1afio_1_1v2__xxx_1_1native__handle__type.html#a429e9168e369d247180ce48da5c96322',1,'boost::afio::v2_xxx::native_handle_type']]],
   ['post',['post',['../classboost_1_1afio_1_1v2__xxx_1_1io__service.html#a92d15569661b80759e674a893dcd7166',1,'boost::afio::v2_xxx::io_service']]],
   ['prefault',['prefault',['../structboost_1_1afio_1_1v2__xxx_1_1section__handle_1_1flag__base.html#aadb6d09d6768eb7ef629f3c10aa24b21a1c2fc1d3eb7aca3d9e451ef1f03e064d',1,'boost::afio::v2_xxx::section_handle::flag_base']]],
-  ['prefetch',['prefetch',['../classboost_1_1afio_1_1v2__xxx_1_1map__handle.html#a7b7036b13db0a4e7ac90193afd22cca9',1,'boost::afio::v2_xxx::map_handle']]],
+  ['prefetch',['prefetch',['../classboost_1_1afio_1_1v2__xxx_1_1map__handle.html#a7b7036b13db0a4e7ac90193afd22cca9',1,'boost::afio::v2_xxx::map_handle::prefetch(span&lt; buffer_type &gt; regions) noexcept'],['../classboost_1_1afio_1_1v2__xxx_1_1map__handle.html#a0635f9dddc90cd38bc7cc13bef8e0661',1,'boost::afio::v2_xxx::map_handle::prefetch(buffer_type region) noexcept']]],
   ['process',['process',['../structboost_1_1afio_1_1v2__xxx_1_1native__handle__type_1_1disposition__base.html#a3f5231b1a86b8c661b39312f0f4a02f5a9f62853225de4ea8ae224d6912fb0ca1',1,'boost::afio::v2_xxx::native_handle_type::disposition_base']]]
 ];

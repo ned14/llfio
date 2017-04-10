@@ -370,6 +370,8 @@ static <a class="el" href="namespaceboost_1_1afio_1_1v2__xxx.html#ac8d06ecaa9660
 &lt; <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a811166f987d82fcd3c85c6aa0b9b4f34">buffer_type</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1map__handle.html#a7b7036b13db0a4e7ac90193afd22cca9">prefetch</a> (span&lt; <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a811166f987d82fcd3c85c6aa0b9b4f34">buffer_type</a> &gt; regions) noexcept</td></tr>
 <tr class="memdesc:a7b7036b13db0a4e7ac90193afd22cca9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Ask the system to begin to asynchronously prefetch the span of memory regions given, returning the regions actually prefetched. Note that on Windows 7 or earlier the system call to implement this was not available, and so you will see an empty span returned. <br/></td></tr>
 <tr class="separator:a7b7036b13db0a4e7ac90193afd22cca9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0635f9dddc90cd38bc7cc13bef8e0661"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="namespaceboost_1_1afio_1_1v2__xxx.html#ac8d06ecaa9660e7251c1251d88c1305c">result</a>&lt; <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a811166f987d82fcd3c85c6aa0b9b4f34">buffer_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1map__handle.html#a0635f9dddc90cd38bc7cc13bef8e0661">prefetch</a> (<a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a811166f987d82fcd3c85c6aa0b9b4f34">buffer_type</a> region) noexcept</td></tr>
+<tr class="separator:a0635f9dddc90cd38bc7cc13bef8e0661"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acf2dbad9fb261c665e9f082beb7050d5"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="namespaceboost_1_1afio_1_1v2__xxx.html#ac8d06ecaa9660e7251c1251d88c1305c">result</a>&lt; <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a811166f987d82fcd3c85c6aa0b9b4f34">buffer_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1map__handle.html#acf2dbad9fb261c665e9f082beb7050d5">do_not_store</a> (<a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a811166f987d82fcd3c85c6aa0b9b4f34">buffer_type</a> region) noexcept</td></tr>
 <tr class="separator:acf2dbad9fb261c665e9f082beb7050d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -399,10 +401,7 @@ flag&#160;</td><td class="memItemRight" valign="bottom"><b>_flags</b></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>A handle to a memory mapped region of memory. </p>
-<dl class="section note"><dt>Note</dt><dd>The native handle returned by this map handle is always that of the backing storage, but closing this handle does not close that of the backing storage, nor does releasing this handle release that of the backing storage. Locking byte ranges of this handle is therefore equal to locking byte ranges in the original backing storage.</dd></dl>
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000004">Todo:</a></b></dt><dd><p class="startdd">MADV_NOSYNC on FreeBSD needs to applied when the file is temporary </p>
-<p class="enddd">MADV_FREE on FreeBSD seems to do what MADV_DONTNEED does on Linux, investigate. </p>
-</dd></dl>
+<dl class="section note"><dt>Note</dt><dd>The native handle returned by this map handle is always that of the backing storage, but closing this handle does not close that of the backing storage, nor does releasing this handle release that of the backing storage. Locking byte ranges of this handle is therefore equal to locking byte ranges in the original backing storage. </dd></dl>
 </div><h2 class="groupheader">Member Function Documentation</h2>
 <a class="anchor" id="a95d26fe35f85d81382d903224660084d"></a>
 <div class="memitem">
@@ -450,7 +449,8 @@ flag&#160;</td><td class="memItemRight" valign="bottom"><b>_flags</b></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Ask the system to unset the dirty flag for the memory represented by the buffer. This will prevent any changes not yet sent to the backing storage from being sent in the future, also if the system kicks out this page and reloads it you may see some edition of the underlying storage instead of what was here. addr and length should be page aligned (see utils::page_sizes()), if not the returned buffer is the region actually undirtied. </p>
+<p>Ask the system to unset the dirty flag for the memory represented by the buffer. This will prevent any changes not yet sent to the backing storage from being sent in the future, also if the system kicks out this page and reloads it you may see some edition of the underlying storage instead of what was here. addr and length should be page aligned (see utils::page_sizes()), if not the returned buffer is the region actually undirtied.</p>
+<dl class="section warning"><dt>Warning</dt><dd>This function destroys the contents of unwritten pages in the region in a totally unpredictable fashion. Only use it if you don't care how much of the region reaches physical storage or not. Note that the region is not necessarily zeroed, and may be randomly zeroed. </dd></dl>
 
 </div>
 </div>
@@ -652,6 +652,32 @@ flag&#160;</td><td class="memItemRight" valign="bottom"><b>_flags</b></td></tr>
 </dl>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX mmap() or NtMapViewOfSection() can return. </dd></dl>
 
+</div>
+</div>
+<a class="anchor" id="a0635f9dddc90cd38bc7cc13bef8e0661"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="namespaceboost_1_1afio_1_1v2__xxx.html#ac8d06ecaa9660e7251c1251d88c1305c">result</a>&lt;<a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a811166f987d82fcd3c85c6aa0b9b4f34">buffer_type</a>&gt; boost::afio::v2_xxx::map_handle::prefetch </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a811166f987d82fcd3c85c6aa0b9b4f34">buffer_type</a>&#160;</td>
+          <td class="paramname"><em>region</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
+<div class="fragment"><div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;{ BOOST_OUTCOME_TRY(ret, <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1map__handle.html#a7b7036b13db0a4e7ac90193afd22cca9" title="Ask the system to begin to asynchronously prefetch the span of memory regions given, returning the regions actually prefetched. Note that on Windows 7 or earlier the system call to implement this was not available, and so you will see an empty span returned.">prefetch</a>(span&lt;buffer_type&gt;(&amp;region, 1))); <span class="keywordflow">return</span> *ret.data(); }</div>
+</div><!-- fragment -->
 </div>
 </div>
 <a class="anchor" id="a5b832e5045ae54db8561133763837a47"></a>
