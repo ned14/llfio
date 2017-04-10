@@ -255,9 +255,9 @@ result<map_handle::buffer_type> map_handle::commit(buffer_type region, section_h
   if(_flag == section_handle::flag::none)
   {
     DWORD _ = 0;
-    if(!VirtualProtect(_region.first, _region.second, PAGE_NOACCESS, &_))
+    if(!VirtualProtect(region.first, region.second, PAGE_NOACCESS, &_))
       return make_errored_result<buffer_type>(GetLastError());
-    return _region;
+    return region;
   }
   if(_flag & section_handle::flag::cow)
   {
@@ -288,9 +288,9 @@ result<map_handle::buffer_type> map_handle::decommit(buffer_type region) noexcep
   if(!region.first)
     return make_errored_result<map_handle::buffer_type>(stl11::errc::invalid_argument);
   region = utils::round_to_page_size(region);
-  if(!VirtualFree(_region.first, _region.second, MEM_DECOMMIT))
+  if(!VirtualFree(region.first, region.second, MEM_DECOMMIT))
     return make_errored_result<buffer_type>(GetLastError());
-  return _region;
+  return region;
 }
 
 result<void> map_handle::zero(buffer_type region) noexcept

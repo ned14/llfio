@@ -177,9 +177,6 @@ inline std::ostream &operator<<(std::ostream &s, const section_handle::flag &v)
 \note The native handle returned by this map handle is always that of the backing storage, but closing this handle
 does not close that of the backing storage, nor does releasing this handle release that of the backing storage.
 Locking byte ranges of this handle is therefore equal to locking byte ranges in the original backing storage.
-
-\todo MADV_NOSYNC on FreeBSD needs to applied when the file is temporary
-\todo MADV_FREE on FreeBSD seems to do what MADV_DONTNEED does on Linux, investigate.
 */
 class BOOST_AFIO_DECL map_handle : public io_handle
 {
@@ -289,9 +286,15 @@ public:
 
   //! Ask the system to begin to asynchronously prefetch the span of memory regions given, returning the regions actually prefetched. Note that on Windows 7 or earlier the system call to implement this was not available, and so you will see an empty span returned.
   static result<span<buffer_type>> prefetch(span<buffer_type> regions) noexcept;
+  //! \overload
+  static result<buffer_type> prefetch(buffer_type region) noexcept { BOOST_OUTCOME_TRY(ret, prefetch(span<buffer_type>(&region, 1))); return *ret.data(); }
 
-  //! Ask the system to unset the dirty flag for the memory represented by the buffer. This will prevent any changes not yet sent to the backing storage from being sent in the future, also if the system kicks out this page and reloads it you may see some edition of the underlying storage instead of what was here. addr
-  //! and length should be page aligned (see utils::page_sizes()), if not the returned buffer is the region actually undirtied.
+  /*! Ask the system to unset the dirty flag for the memory represented by the buffer. This will prevent any changes not yet sent to the backing storage from being sent in the future, also if the system kicks out this page and reloads it you may see some edition of the underlying storage instead of what was here. addr
+  and length should be page aligned (see utils::page_sizes()), if not the returned buffer is the region actually undirtied.
+
+  \warning This function destroys the contents of unwritten pages in the region in a totally unpredictable fashion. Only use it if you don't care how much of
+  the region reaches physical storage or not. Note that the region is not necessarily zeroed, and may be randomly zeroed.
+  */
   static result<buffer_type> do_not_store(buffer_type region) noexcept;
 
   /*! \brief Read data from the mapped view.
