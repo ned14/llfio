@@ -104,9 +104,9 @@ native_handle_type map_handle::release() noexcept
   return native_handle_type();
 }
 
-inline result<void *> do_mmap(native_handle_type &nativeh, void *ataddr, section_handle &section, map_handle::size_type bytes, map_handle::extent_type offset, section_handle::flag _flag) noexcept
+inline result<void *> do_mmap(native_handle_type &nativeh, void *ataddr, section_handle *section, map_handle::size_type bytes, map_handle::extent_type offset, section_handle::flag _flag) noexcept
 {
-  bool have_backing = section.backing();
+  bool have_backing = section->backing();
   int prot = 0, flags = have_backing ? MAP_SHARED : MAP_ANONYMOUS;
   void *addr = nullptr;
   if(_flag == section_handle::flag::none)
@@ -148,7 +148,7 @@ inline result<void *> do_mmap(native_handle_type &nativeh, void *ataddr, section
   if(have_backing && (section.backing()->kernel_caching() == handle::caching::temporary))
     flags |= MAP_NOSYNC;
 #endif
-  addr = ::mmap(ataddr, bytes, prot, flags, have_backing ? section.backing_native_handle().fd : -1, offset);
+  addr = ::mmap(ataddr, bytes, prot, flags, have_backing ? section->backing_native_handle().fd : -1, offset);
   if(!addr)
     return make_errored_result<void *>(errno);
   return addr;
@@ -163,7 +163,7 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
   }
   result<map_handle> ret(map_handle(io_handle(), &section));
   native_handle_type &nativeh = ret.get()._v;
-  BOOST_OUTCOME_TRY(addr, do_mmap(nativeh, nullptr, section, bytes, offset, _flag));
+  BOOST_OUTCOME_TRY(addr, do_mmap(nativeh, nullptr, &section, bytes, offset, _flag));
   ret.get()._addr = (char *) addr;
   ret.get()._offset = offset;
   ret.get()._length = bytes;
@@ -182,7 +182,7 @@ result<map_handle::buffer_type> map_handle::commit(buffer_type region, section_h
   region = utils::round_to_page_size(region);
   extent_type offset = _offset + (region.first - _addr);
   size_type bytes = region.second;
-  BOOST_OUTCOME_TRYV(do_mmap(_v, region.first, section, bytes, offset, _flag));
+  BOOST_OUTCOME_TRYV(do_mmap(_v, region.first, _section, bytes, offset, _flag));
   // Tell the kernel we will be using these pages soon
   if(-1 == ::madvise(region.first, region.second, MADV_WILLNEED))
     return make_errored_result<map_handle::buffer_type>(errno);
@@ -201,7 +201,7 @@ result<map_handle::buffer_type> map_handle::decommit(buffer_type region) noexcep
   // Set permissions on the pages to no access
   extent_type offset = _offset + (region.first - _addr);
   size_type bytes = region.second;
-  BOOST_OUTCOME_TRYV(do_mmap(_v, region.first, section, bytes, offset, section_handle::flag::none));
+  BOOST_OUTCOME_TRYV(do_mmap(_v, region.first, _section, bytes, offset, section_handle::flag::none));
   return region;
 }
 
