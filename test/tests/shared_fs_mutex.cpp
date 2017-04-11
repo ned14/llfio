@@ -500,7 +500,9 @@ static void TestMemoryMapFallback()
     auto lk = afio::algorithm::shared_fs_mutex::memory_map<>::fs_mutex_map("lockfile", &fblk);
     BOOST_CHECK(lk.has_error());
     if(lk.has_error())
+    {
       BOOST_CHECK(lk.get_error().value() == EBUSY);
+    }
     {
       auto fblkh = fblk.lock(afio::algorithm::shared_fs_mutex::shared_fs_mutex::entity_type(0, false)).get();
       long oldval = ++shmem->current_shared;
