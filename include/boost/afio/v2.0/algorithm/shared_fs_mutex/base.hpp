@@ -87,7 +87,10 @@ namespace algorithm
         //! Default constructor
         constexpr entity_type() noexcept : _init(0) {}
         //! Constructor
-        BOOSTLITE_CONSTEXPR entity_type(value_type _value, bool _exclusive) noexcept : _init(0)
+#if !defined(__GNUC__) || defined(__clang__) || __GNUC__ >= 7
+        BOOSTLITE_CONSTEXPR
+#endif
+        entity_type(value_type _value, bool _exclusive) noexcept : _init(0)
         {
           value = _value;
           exclusive = _exclusive;

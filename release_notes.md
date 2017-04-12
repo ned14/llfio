@@ -7,7 +7,7 @@ source code repository lives at https://github.com/ned14/boost.afio.
 yet. Nobody should use this code for anything serious.
 
 You need these compilers or better:
-- GCC 5.0
+- GCC 6.0
 - clang 3.7
 - VS2015 Update 2
 - clang 3.7 with Microsoft Codegen ("winclang")

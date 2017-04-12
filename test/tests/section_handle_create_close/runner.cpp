@@ -10,6 +10,7 @@ template <class U> inline void section_handle_create_close_(U &&f)
 {
   using namespace BOOST_KERNELTEST_V1_NAMESPACE;
   using namespace BOOST_AFIO_V2_NAMESPACE;
+  using BOOST_AFIO_V2_NAMESPACE::file_handle;
 
   // Create a temporary file and put some text into it
   file_handle temph;
