@@ -104,10 +104,10 @@ native_handle_type map_handle::release() noexcept
   return native_handle_type();
 }
 
-inline result<void *> do_mmap(native_handle_type &nativeh, void *ataddr, section_handle *section, map_handle::size_type bytes, map_handle::extent_type offset, section_handle::flag _flag) noexcept
+inline result<void *> do_mmap(native_handle_type &nativeh, void *ataddr, section_handle *section, map_handle::size_type &bytes, map_handle::extent_type offset, section_handle::flag _flag) noexcept
 {
   bool have_backing = section->backing();
-  int prot = 0, flags = have_backing ? MAP_SHARED : MAP_ANONYMOUS;
+  int prot = 0, flags = have_backing ? MAP_SHARED : MAP_PRIVATE|MAP_ANONYMOUS;
   void *addr = nullptr;
   if(_flag == section_handle::flag::none)
   {
@@ -148,25 +148,29 @@ inline result<void *> do_mmap(native_handle_type &nativeh, void *ataddr, section
   if(have_backing && (section.backing()->kernel_caching() == handle::caching::temporary))
     flags |= MAP_NOSYNC;
 #endif
+  //printf("mmap(%p, %u, %d, %d, %d, %u)\n", ataddr, (unsigned) bytes, prot, flags, have_backing ? section->backing_native_handle().fd : -1, (unsigned) offset);
   addr = ::mmap(ataddr, bytes, prot, flags, have_backing ? section->backing_native_handle().fd : -1, offset);
-  if(!addr)
+  if(MAP_FAILED == addr)
     return make_errored_result<void *>(errno);
   return addr;
 }
 
 result<map_handle> map_handle::map(section_handle &section, size_type bytes, extent_type offset, section_handle::flag _flag) noexcept
 {
+  if(!bytes)
+    bytes = section.length();
+  size_type _bytes = utils::round_up_to_page_size(bytes);
   if(!section.backing())
   {
     // Do NOT round up bytes to the nearest page size for backed maps, it causes an attempt to extend the file
-    bytes = utils::round_up_to_page_size(bytes);
+    bytes = _bytes;
   }
   result<map_handle> ret(map_handle(io_handle(), &section));
   native_handle_type &nativeh = ret.get()._v;
   BOOST_OUTCOME_TRY(addr, do_mmap(nativeh, nullptr, &section, bytes, offset, _flag));
   ret.get()._addr = (char *) addr;
   ret.get()._offset = offset;
-  ret.get()._length = bytes;
+  ret.get()._length = _bytes;
   // Make my handle borrow the native handle of my backing storage
   ret.get()._v.fd = section.backing_native_handle().fd;
   BOOST_AFIO_LOG_FUNCTION_CALL(ret.get()._v.fd);
@@ -258,7 +262,7 @@ map_handle::io_result<map_handle::buffers_type> map_handle::read(io_request<buff
 {
   BOOST_AFIO_LOG_FUNCTION_CALL(_v.fd);
   char *addr = _addr + reqs.offset;
-  size_type togo = (size_type)(_length - reqs.offset);
+  size_type togo = reqs.offset < _length ? (size_type)(_length - reqs.offset) : 0;
   for(buffer_type &req : reqs.buffers)
   {
     if(togo)
@@ -279,7 +283,7 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::write(io_reque
 {
   BOOST_AFIO_LOG_FUNCTION_CALL(_v.fd);
   char *addr = _addr + reqs.offset;
-  size_type togo = (size_type)(_length - reqs.offset);
+  size_type togo = reqs.offset < _length ? (size_type)(_length - reqs.offset) : 0;
   for(const_buffer_type &req : reqs.buffers)
   {
     if(togo)

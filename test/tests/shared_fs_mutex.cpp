@@ -342,6 +342,7 @@ void TestSharedFSMutexCorrectness(shared_memory::mutex_kind_type mutex_kind, sha
   namespace kerneltest = BOOST_KERNELTEST_V1_NAMESPACE;
   namespace afio = BOOST_AFIO_V2_NAMESPACE;
   auto shared_mem_file = afio::file_handle::file("shared_memory", afio::file_handle::mode::write, afio::file_handle::creation::if_needed, afio::file_handle::caching::temporary, afio::file_handle::flag::unlink_on_close).get();
+  shared_mem_file.truncate(sizeof(shared_memory));
   auto shared_mem_file_section = afio::section_handle::section(sizeof(shared_memory), shared_mem_file, afio::section_handle::flag::readwrite).get();
   auto shared_mem_file_map = afio::map_handle::map(shared_mem_file_section).get();
   shared_memory *shmem = (shared_memory *) shared_mem_file_map.address();

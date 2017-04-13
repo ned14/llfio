@@ -13,7 +13,6 @@ template <class U> inline void file_handle_create_close_creation(U &&f)
   using file_handle = BOOST_AFIO_V2_NAMESPACE::file_handle;
   using BOOST_OUTCOME_V1_NAMESPACE::stl11::errc;
   static const result<void> success = make_valued_result<void>();
-  static const result<void> permission_denied = make_errored_result(errc::permission_denied);
   static const result<void> no_such_file_or_directory = make_errored_result(errc::no_such_file_or_directory);
   static const result<void> file_exists = make_errored_result(errc::file_exists);
 
@@ -46,16 +45,9 @@ template <class U> inline void file_handle_create_close_creation(U &&f)
       {                   success, { file_handle::mode::write,      file_handle::creation::if_needed, file_handle::flag::none }, { "existing1"    }, { "existing1"    }},
       {                   success, { file_handle::mode::append,     file_handle::creation::if_needed, file_handle::flag::none }, { "non-existing" }, { "existing0"    }},
       {                   success, { file_handle::mode::append,     file_handle::creation::if_needed, file_handle::flag::none }, { "existing1"    }, { "existing1"    }},
-#ifdef _WIN32
-      // Interestingly Windows lets you create a new file which has no access at all. Go figure.
       {                   success, { file_handle::mode::none,       file_handle::creation::if_needed, file_handle::flag::none }, { "non-existing" }, { "existing0"    }},
       {                   success, { file_handle::mode::attr_read,  file_handle::creation::if_needed, file_handle::flag::none }, { "non-existing" }, { "existing0"    }},
       {                   success, { file_handle::mode::attr_write, file_handle::creation::if_needed, file_handle::flag::none }, { "non-existing" }, { "existing0"    }},
-#else
-      {         permission_denied, { file_handle::mode::none,       file_handle::creation::if_needed, file_handle::flag::none }, { "non-existing" }, { "non-existing" }},
-      {         permission_denied, { file_handle::mode::attr_read,  file_handle::creation::if_needed, file_handle::flag::none }, { "non-existing" }, { "non-existing" }},
-      {         permission_denied, { file_handle::mode::attr_write, file_handle::creation::if_needed, file_handle::flag::none }, { "non-existing" }, { "non-existing" }},
-#endif
 
       // Does the creation parameter have the expected side effects?
       { no_such_file_or_directory, { file_handle::mode::write, file_handle::creation::open_existing    , file_handle::flag::none }, { "non-existing" }, { "non-existing" }},

@@ -332,7 +332,7 @@ map_handle::io_result<map_handle::buffers_type> map_handle::read(io_request<buff
 {
   BOOST_AFIO_LOG_FUNCTION_CALL(_v.h);
   char *addr = _addr + reqs.offset;
-  size_type togo = (size_type)(_length - reqs.offset);
+  size_type togo = reqs.offset < _length ? (size_type)(_length - reqs.offset) : 0;
   for(buffer_type &req : reqs.buffers)
   {
     if(togo)
@@ -353,7 +353,7 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::write(io_reque
 {
   BOOST_AFIO_LOG_FUNCTION_CALL(_v.h);
   char *addr = _addr + reqs.offset;
-  size_type togo = (size_type)(_length - reqs.offset);
+  size_type togo = reqs.offset < _length ? (size_type)(_length - reqs.offset) : 0;
   for(const_buffer_type &req : reqs.buffers)
   {
     if(togo)

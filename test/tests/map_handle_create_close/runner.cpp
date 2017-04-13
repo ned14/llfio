@@ -98,7 +98,7 @@ template <class U> inline void map_handle_create_close_(U &&f)
               BOOST_KERNELTEST_CHECK(testreturn, b.second == 4091);
             }
             // If we are writable, write straight into the map
-            if (maph.is_writable())
+            if (maph.is_writable() && addr)
             {
               memcpy(addr, "NIALL was here", 14);
               // Make sure maph's write() works
