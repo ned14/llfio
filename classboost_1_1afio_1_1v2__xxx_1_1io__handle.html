@@ -113,7 +113,7 @@ $(document).ready(function(){initNavTree('classboost_1_1afio_1_1v2__xxx_1_1io__h
 <a href="#pro-attribs">Protected Attributes</a> &#124;
 <a href="classboost_1_1afio_1_1v2__xxx_1_1io__handle-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">boost::afio::v2_xxx::io_handle Class Reference</div>  </div>
+<div class="title">boost::afio::v2_xxx::io_handle Class Reference<span class="mlabels"><span class="mlabel">abstract</span></span></div>  </div>
 </div><!--header-->
 <div class="contents">
 
@@ -223,6 +223,10 @@ constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href=
 <tr class="separator:a8890b6a6046fb562f9f0ab943b79dfb4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac1fb657631c5212401259bb35ebf16db"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle_1_1io__result.html">io_result</a>&lt; <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#acbb752522c90f5e4596b8a4f07e2fa80">const_buffer_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#ac1fb657631c5212401259bb35ebf16db">write</a> (<a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html#a617ab627aa596b325d7bfef5210a43f3">extent_type</a> offset, const char *data, <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html#aee8d98d7f979e312f5e18dfcebfc6870">size_type</a> bytes, <a class="el" href="structdeadline.html">deadline</a> d=<a class="el" href="structdeadline.html">deadline</a>()) noexcept</td></tr>
 <tr class="separator:ac1fb657631c5212401259bb35ebf16db"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a01027dfc7b8d85f2ba3b5a56ef053191"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle_1_1io__result.html">io_result</a><br class="typebreak"/>
+&lt; <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a692ba33b1e443510a791ff43f37d73cd">const_buffers_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a01027dfc7b8d85f2ba3b5a56ef053191">sync</a> (<a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1io__handle_1_1io__request.html">io_request</a>&lt; <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a692ba33b1e443510a791ff43f37d73cd">const_buffers_type</a> &gt; reqs=<a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1io__handle_1_1io__request.html">io_request</a>&lt; <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a692ba33b1e443510a791ff43f37d73cd">const_buffers_type</a> &gt;(), bool wait_for_device=false, bool and_metadata=false, <a class="el" href="structdeadline.html">deadline</a> d=<a class="el" href="structdeadline.html">deadline</a>()) noexcept=0</td></tr>
+<tr class="memdesc:a01027dfc7b8d85f2ba3b5a56ef053191"><td class="mdescLeft">&#160;</td><td class="mdescRight">Issue a write reordering barrier for preceding writes such that they will all be issued to storage before any writes after the barrier.  <a href="#a01027dfc7b8d85f2ba3b5a56ef053191">More...</a><br/></td></tr>
+<tr class="separator:a01027dfc7b8d85f2ba3b5a56ef053191"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aebd9c90a901e6364c94d466425db6e0f"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespaceboost_1_1afio_1_1v2__xxx.html#ac8d06ecaa9660e7251c1251d88c1305c">result</a>&lt; <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle_1_1extent__guard.html">extent_guard</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#aebd9c90a901e6364c94d466425db6e0f">lock</a> (<a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html#a617ab627aa596b325d7bfef5210a43f3">extent_type</a> offset, <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html#a617ab627aa596b325d7bfef5210a43f3">extent_type</a> bytes, bool exclusive=true, <a class="el" href="structdeadline.html">deadline</a> d=<a class="el" href="structdeadline.html">deadline</a>()) noexcept</td></tr>
 <tr class="memdesc:aebd9c90a901e6364c94d466425db6e0f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tries to lock the range of bytes specified for shared or exclusive access. Be aware this passes through the same semantics as the underlying OS call, including any POSIX insanity present on your platform.  <a href="#aebd9c90a901e6364c94d466425db6e0f">More...</a><br/></td></tr>
 <tr class="separator:aebd9c90a901e6364c94d466425db6e0f"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -471,12 +475,12 @@ flag&#160;</td><td class="memItemRight" valign="bottom"><b>_flags</b></td></tr>
 </table>
 </div><div class="memdoc">
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><a name="l00572"></a><span class="lineno">  572</span>&#160;  {</div>
-<div class="line"><a name="l00573"></a><span class="lineno">  573</span>&#160;    <span class="keywordtype">size_t</span> bytes = 0;</div>
-<div class="line"><a name="l00574"></a><span class="lineno">  574</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;i : reqs.buffers)</div>
-<div class="line"><a name="l00575"></a><span class="lineno">  575</span>&#160;      bytes += i.second;</div>
-<div class="line"><a name="l00576"></a><span class="lineno">  576</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#aebd9c90a901e6364c94d466425db6e0f" title="Tries to lock the range of bytes specified for shared or exclusive access. Be aware this passes throu...">lock</a>(reqs.offset, bytes, <span class="keyword">false</span>, std::move(d));</div>
-<div class="line"><a name="l00577"></a><span class="lineno">  577</span>&#160;  }</div>
+<div class="fragment"><div class="line"><a name="l00599"></a><span class="lineno">  599</span>&#160;  {</div>
+<div class="line"><a name="l00600"></a><span class="lineno">  600</span>&#160;    <span class="keywordtype">size_t</span> bytes = 0;</div>
+<div class="line"><a name="l00601"></a><span class="lineno">  601</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;i : reqs.buffers)</div>
+<div class="line"><a name="l00602"></a><span class="lineno">  602</span>&#160;      bytes += i.second;</div>
+<div class="line"><a name="l00603"></a><span class="lineno">  603</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#aebd9c90a901e6364c94d466425db6e0f" title="Tries to lock the range of bytes specified for shared or exclusive access. Be aware this passes throu...">lock</a>(reqs.offset, bytes, <span class="keyword">false</span>, std::move(d));</div>
+<div class="line"><a name="l00604"></a><span class="lineno">  604</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -512,12 +516,12 @@ flag&#160;</td><td class="memItemRight" valign="bottom"><b>_flags</b></td></tr>
 </table>
 </div><div class="memdoc">
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><a name="l00580"></a><span class="lineno">  580</span>&#160;  {</div>
-<div class="line"><a name="l00581"></a><span class="lineno">  581</span>&#160;    <span class="keywordtype">size_t</span> bytes = 0;</div>
-<div class="line"><a name="l00582"></a><span class="lineno">  582</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;i : reqs.buffers)</div>
-<div class="line"><a name="l00583"></a><span class="lineno">  583</span>&#160;      bytes += i.second;</div>
-<div class="line"><a name="l00584"></a><span class="lineno">  584</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#aebd9c90a901e6364c94d466425db6e0f" title="Tries to lock the range of bytes specified for shared or exclusive access. Be aware this passes throu...">lock</a>(reqs.offset, bytes, <span class="keyword">true</span>, std::move(d));</div>
-<div class="line"><a name="l00585"></a><span class="lineno">  585</span>&#160;  }</div>
+<div class="fragment"><div class="line"><a name="l00607"></a><span class="lineno">  607</span>&#160;  {</div>
+<div class="line"><a name="l00608"></a><span class="lineno">  608</span>&#160;    <span class="keywordtype">size_t</span> bytes = 0;</div>
+<div class="line"><a name="l00609"></a><span class="lineno">  609</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;i : reqs.buffers)</div>
+<div class="line"><a name="l00610"></a><span class="lineno">  610</span>&#160;      bytes += i.second;</div>
+<div class="line"><a name="l00611"></a><span class="lineno">  611</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#aebd9c90a901e6364c94d466425db6e0f" title="Tries to lock the range of bytes specified for shared or exclusive access. Be aware this passes throu...">lock</a>(reqs.offset, bytes, <span class="keyword">true</span>, std::move(d));</div>
+<div class="line"><a name="l00612"></a><span class="lineno">  612</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -676,6 +680,69 @@ flag&#160;</td><td class="memItemRight" valign="bottom"><b>_flags</b></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="a01027dfc7b8d85f2ba3b5a56ef053191"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle_1_1io__result.html">io_result</a>&lt;<a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a692ba33b1e443510a791ff43f37d73cd">const_buffers_type</a>&gt; boost::afio::v2_xxx::io_handle::sync </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1io__handle_1_1io__request.html">io_request</a>&lt; <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a692ba33b1e443510a791ff43f37d73cd">const_buffers_type</a> &gt;&#160;</td>
+          <td class="paramname"><em>reqs</em> = <code><a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1io__handle_1_1io__request.html">io_request</a>&lt;&#160;<a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a692ba33b1e443510a791ff43f37d73cd">const_buffers_type</a>&#160;&gt;()</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>wait_for_device</em> = <code>false</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>and_metadata</em> = <code>false</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structdeadline.html">deadline</a>&#160;</td>
+          <td class="paramname"><em>d</em> = <code><a class="el" href="structdeadline.html">deadline</a>()</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">pure virtual</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Issue a write reordering barrier for preceding writes such that they will all be issued to storage before any writes after the barrier. </p>
+<dl class="section warning"><dt>Warning</dt><dd>This call really is for people with deep understanding of individual filing systems, and unless you <b>really</b> know what you are doing, do NOT use this call as it is false security. Instead open the handle with <code>caching::reads</code>, that will get you true durable write ordering, plus the filing system can use different algorithms to give much better performance.</dd>
+<dd>
+For portability, you can only assume that sync()'s are write ordered for a single handle instance. You cannot assume that sync() write orders across multiple handles to the same inode, or across processes.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The buffers synced, which may not be the buffers input. The size of each scatter-gather buffer is updated with the number of bytes of that buffer synced. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">reqs</td><td>A scatter-gather and offset request. May be ignored on some platforms. </td></tr>
+    <tr><td class="paramname">wait_for_device</td><td>True if you want the call to wait until data reaches storage and that storage has acknowledged the data is physically written. </td></tr>
+    <tr><td class="paramname">and_metadata</td><td>True if you want the call to sync the metadata for retrieving writes until now too. </td></tr>
+    <tr><td class="paramname">d</td><td>An optional deadline by which the i/o must complete, else it is cancelled. Note function may return significantly after this deadline if the i/o takes long to cancel. has confirmed that the data is written before returning. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX fdatasync() or Windows NtFlushBuffersFileEx() can return. </dd></dl>
+<dl class="section user"><dt>Memory Allocations</dt><dd>None. </dd></dl>
+
+</div>
+</div>
 <a class="anchor" id="aab870fe5fa041af29e2d85a5c292077f"></a>
 <div class="memitem">
 <div class="memproto">
@@ -714,7 +781,7 @@ flag&#160;</td><td class="memItemRight" valign="bottom"><b>_flags</b></td></tr>
 </table>
 </div><div class="memdoc">
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><a name="l00569"></a><span class="lineno">  569</span>&#160;{ <span class="keywordflow">return</span> <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#aebd9c90a901e6364c94d466425db6e0f" title="Tries to lock the range of bytes specified for shared or exclusive access. Be aware this passes throu...">lock</a>(offset, bytes, exclusive, <a class="code" href="structdeadline.html" title="A time deadline in either relative-to-now or absolute (system clock) terms.">deadline</a>(stl11::chrono::seconds(0))); }</div>
+<div class="fragment"><div class="line"><a name="l00596"></a><span class="lineno">  596</span>&#160;{ <span class="keywordflow">return</span> <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#aebd9c90a901e6364c94d466425db6e0f" title="Tries to lock the range of bytes specified for shared or exclusive access. Be aware this passes throu...">lock</a>(offset, bytes, exclusive, <a class="code" href="structdeadline.html" title="A time deadline in either relative-to-now or absolute (system clock) terms.">deadline</a>(stl11::chrono::seconds(0))); }</div>
 </div><!-- fragment -->
 </div>
 </div>

@@ -51,6 +51,7 @@ var classboost_1_1afio_1_1v2__xxx_1_1io__handle =
     [ "set_append_only", "classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#adf964e787e0666fc5b7d94c2715ee6f5", null ],
     [ "set_kernel_caching", "classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#aa8de6675205db68de70bf9075a6c649f", null ],
     [ "swap", "classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#adc26314bd23b9080ac3c4c2dd6bc5937", null ],
+    [ "sync", "classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a01027dfc7b8d85f2ba3b5a56ef053191", null ],
     [ "try_lock", "classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#aab870fe5fa041af29e2d85a5c292077f", null ],
     [ "unique_id", "classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#acb372c2075980a97874557859a62f5f7", null ],
     [ "unlock", "classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a0d043e29e065db9618f6df2e43cc1d42", null ],

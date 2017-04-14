@@ -1,5 +1,12 @@
 var NAVTREEINDEX4 =
 {
+"structboost_1_1afio_1_1v2__xxx_1_1statfs__t_1_1want__base.html#a35f5b2de8e92fce4b815ebce176d1993a24a07030722dfce8ba19052b8f23874d":[3,0,0,0,0,12,1,0,12],
+"structboost_1_1afio_1_1v2__xxx_1_1statfs__t_1_1want__base.html#a35f5b2de8e92fce4b815ebce176d1993a4024d8ce923f0157176daa6e9796c7eb":[3,0,0,0,0,12,1,0,14],
+"structboost_1_1afio_1_1v2__xxx_1_1statfs__t_1_1want__base.html#a35f5b2de8e92fce4b815ebce176d1993a8510c4b321fbf29fc614cdcc464858ab":[3,0,0,0,0,12,1,0,4],
+"structboost_1_1afio_1_1v2__xxx_1_1statfs__t_1_1want__base.html#a35f5b2de8e92fce4b815ebce176d1993a994d60166ce6320b78f2973ce6f85f7f":[3,0,0,0,0,12,1,0,13],
+"structboost_1_1afio_1_1v2__xxx_1_1statfs__t_1_1want__base.html#a35f5b2de8e92fce4b815ebce176d1993a9b712dad9f7cdcdc74e67074b8d9bea0":[3,0,0,0,0,12,1,0,8],
+"structboost_1_1afio_1_1v2__xxx_1_1statfs__t_1_1want__base.html#a35f5b2de8e92fce4b815ebce176d1993a9bb250141653e9b4996c2841b171bb78":[3,0,0,0,0,12,1,0,9],
+"structboost_1_1afio_1_1v2__xxx_1_1statfs__t_1_1want__base.html#a35f5b2de8e92fce4b815ebce176d1993aa9f1392974b11a8e54f70fbc36f11745":[3,0,0,0,0,12,1,0,3],
 "structboost_1_1afio_1_1v2__xxx_1_1statfs__t_1_1want__base.html#a35f5b2de8e92fce4b815ebce176d1993ac61254662a3c0555c9dbacabd508064c":[3,0,0,0,0,12,1,0,2],
 "structboost_1_1afio_1_1v2__xxx_1_1statfs__t_1_1want__base.html#a35f5b2de8e92fce4b815ebce176d1993ac6d92e8c4789ddbdc2590720a9ddd15f":[3,0,0,0,0,12,1,0,5],
 "structboost_1_1afio_1_1v2__xxx_1_1statfs__t_1_1want__base.html#a35f5b2de8e92fce4b815ebce176d1993ad246ebd8a531a96202bb88ff697536f9":[3,0,0,0,0,12,1,0,7],
@@ -116,8 +123,8 @@ var NAVTREEINDEX4 =
 "version_8hpp.html#a57ccd4188902593e71fa3a397236fec5":[4,0,0,0,0,2,5],
 "version_8hpp.html#a7c3b7ac71103a427e96797dd72a344ac":[4,0,0,0,0,2,0],
 "version_8hpp.html#a9c4fb3ff02ff3a503da1976425995e3b":[4,0,0,0,0,2,4],
-"version_8hpp.html#af40cb131effa2c3e80b9d9251724d7aa":[4,0,0,0,0,2,2],
 "version_8hpp.html#af40cb131effa2c3e80b9d9251724d7aa":[4,0,0,0,0,2,1],
+"version_8hpp.html#af40cb131effa2c3e80b9d9251724d7aa":[4,0,0,0,0,2,2],
 "version_8hpp.html#ga57b799d93636bd46b7cc54899f6d24dd":[4,0,0,0,0,2,8],
 "version_8hpp.html#ga6630f7026f9cd8ef19c13f58c719323a":[4,0,0,0,0,2,6],
 "version_8hpp.html#ga6f2f297d6873b445e0df91bde6854cdd":[4,0,0,0,0,2,9],
