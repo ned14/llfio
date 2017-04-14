@@ -104,10 +104,29 @@ native_handle_type map_handle::release() noexcept
   return native_handle_type();
 }
 
+map_handle::io_result<map_handle::const_buffers_type> map_handle::barrier(map_handle::io_request<map_handle::const_buffers_type> reqs, bool wait_for_device, bool and_metadata, deadline d) noexcept
+{
+  BOOST_AFIO_LOG_FUNCTION_CALL(_v.fd);
+  char *addr = _addr + reqs.offset;
+  extent_type bytes = 0;
+  for(const auto &req : reqs.buffers)
+    bytes += req.second;
+  int flags = (wait_for_device || and_metadata) ? MS_SYNC : MS_ASYNC;
+  if(-1 == ::msync(addr, bytes, flags))
+    return make_errored_result<>(errno);
+  if(_section->backing() && (wait_for_device || and_metadata))
+  {
+    reqs.offset += _offset;
+    return _section->backing()->barrier(std::move(reqs), wait_for_device, and_metadata, d);
+  }
+  return io_handle::io_result<const_buffers_type>(std::move(reqs.buffers));
+}
+
+
 inline result<void *> do_mmap(native_handle_type &nativeh, void *ataddr, section_handle *section, map_handle::size_type &bytes, map_handle::extent_type offset, section_handle::flag _flag) noexcept
 {
   bool have_backing = section->backing();
-  int prot = 0, flags = have_backing ? MAP_SHARED : MAP_PRIVATE|MAP_ANONYMOUS;
+  int prot = 0, flags = have_backing ? MAP_SHARED : MAP_PRIVATE | MAP_ANONYMOUS;
   void *addr = nullptr;
   if(_flag == section_handle::flag::none)
   {
@@ -115,14 +134,14 @@ inline result<void *> do_mmap(native_handle_type &nativeh, void *ataddr, section
   }
   else if(_flag & section_handle::flag::cow)
   {
-    prot |= PROT_READ|PROT_WRITE;
+    prot |= PROT_READ | PROT_WRITE;
     flags &= ~MAP_SHARED;
     flags |= MAP_PRIVATE;
     nativeh.behaviour |= native_handle_type::disposition::seekable | native_handle_type::disposition::readable | native_handle_type::disposition::writable;
   }
   else if(_flag & section_handle::flag::write)
   {
-    prot |= PROT_READ|PROT_WRITE;
+    prot |= PROT_READ | PROT_WRITE;
     nativeh.behaviour |= native_handle_type::disposition::seekable | native_handle_type::disposition::readable | native_handle_type::disposition::writable;
   }
   else if(_flag & section_handle::flag::read)
@@ -148,7 +167,7 @@ inline result<void *> do_mmap(native_handle_type &nativeh, void *ataddr, section
   if(have_backing && (section.backing()->kernel_caching() == handle::caching::temporary))
     flags |= MAP_NOSYNC;
 #endif
-  //printf("mmap(%p, %u, %d, %d, %d, %u)\n", ataddr, (unsigned) bytes, prot, flags, have_backing ? section->backing_native_handle().fd : -1, (unsigned) offset);
+  // printf("mmap(%p, %u, %d, %d, %d, %u)\n", ataddr, (unsigned) bytes, prot, flags, have_backing ? section->backing_native_handle().fd : -1, (unsigned) offset);
   addr = ::mmap(ataddr, bytes, prot, flags, have_backing ? section->backing_native_handle().fd : -1, offset);
   if(MAP_FAILED == addr)
     return make_errored_result<void *>(errno);
@@ -165,7 +184,7 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
     // Do NOT round up bytes to the nearest page size for backed maps, it causes an attempt to extend the file
     bytes = _bytes;
   }
-  result<map_handle> ret(map_handle(&section));
+  result<map_handle> ret(make_valued_result<map_handle>(map_handle(&section)));
   native_handle_type &nativeh = ret.get()._v;
   BOOST_OUTCOME_TRY(addr, do_mmap(nativeh, nullptr, &section, bytes, offset, _flag));
   ret.get()._addr = (char *) addr;
@@ -215,7 +234,7 @@ result<void> map_handle::zero(buffer_type region) noexcept
   if(!region.first)
     return make_errored_result<void>(stl11::errc::invalid_argument);
 #ifdef MADV_REMOVE
-  buffer_type page_region { (char *) utils::round_up_to_page_size((uintptr_t) region.first), utils::round_down_to_page_size(region.second) };
+  buffer_type page_region{(char *) utils::round_up_to_page_size((uintptr_t) region.first), utils::round_down_to_page_size(region.second)};
   // Zero contents and punch a hole in any backing storage
   if(page_region.second && -1 != ::madvise(page_region.first, page_region.second, MADV_REMOVE))
   {

@@ -54,7 +54,7 @@ const fixme_path &fixme_temporary_files_directory() noexcept
           if(buffer[len - 1] == '/')
             buffer.resize(--len);
           buffer.append("/afio_tempfile_probe_file.tmp");
-          int h = open(buffer.c_str(), O_WRONLY|O_CREAT, 0666);
+          int h = open(buffer.c_str(), O_WRONLY | O_CREAT, 0666);
           if(-1 != h)
           {
             unlink(buffer.c_str());
@@ -177,7 +177,7 @@ inline result<int> attribs_from_handle_mode_caching_and_flags(native_handle_type
 result<void> file_handle::_fetch_inode() noexcept
 {
   stat_t s;
-  BOOST_OUTCOME_TRYV(s.fill(*this, stat_t::want::dev|stat_t::want::ino));
+  BOOST_OUTCOME_TRYV(s.fill(*this, stat_t::want::dev | stat_t::want::ino));
   _devid = s.st_dev;
   _inode = s.st_ino;
   return make_valued_result<void>();
@@ -186,7 +186,7 @@ result<void> file_handle::_fetch_inode() noexcept
 inline result<void> check_inode(const file_handle &h) noexcept
 {
   stat_t s;
-  BOOST_OUTCOME_TRYV(s.fill(h, stat_t::want::dev|stat_t::want::ino));
+  BOOST_OUTCOME_TRYV(s.fill(h, stat_t::want::dev | stat_t::want::ino));
   if(s.st_dev != h.st_dev() || s.st_ino != h.st_ino())
     return make_errored_result<void>(stl11::errc::no_such_file_or_directory);
   return make_valued_result<void>();
@@ -224,8 +224,8 @@ result<file_handle> file_handle::temp_inode(path_type dirpath, mode _mode, flag 
   nativeh.behaviour |= native_handle_type::disposition::file;
 #ifdef O_TMPFILE
   // Linux has a special flag just for this use case
-  attribs|=O_TMPFILE;
-  attribs&=~O_EXCL;  // allow relinking later
+  attribs |= O_TMPFILE;
+  attribs &= ~O_EXCL;  // allow relinking later
   const char *path_ = ret.value()._path.c_str();
   nativeh.fd = ::open(path_, attribs, 0600);
   if(-1 != nativeh.fd)
@@ -234,8 +234,8 @@ result<file_handle> file_handle::temp_inode(path_type dirpath, mode _mode, flag 
     return ret;
   }
   // If it failed, assume this kernel or FS doesn't support O_TMPFILE
-  attribs&=~O_TMPFILE;
-  attribs|=O_EXCL;
+  attribs &= ~O_TMPFILE;
+  attribs |= O_EXCL;
 #endif
   for(;;)
   {
@@ -261,6 +261,49 @@ result<file_handle> file_handle::temp_inode(path_type dirpath, mode _mode, flag 
     BOOST_OUTCOME_TRYV(ret.value()._fetch_inode());  // It can be useful to know the inode of temporary inodes
     return ret;
   }
+}
+
+file_handle::io_result<file_handle::const_buffers_type> file_handle::barrier(file_handle::io_request<file_handle::const_buffers_type> reqs, bool wait_for_device, bool and_metadata, deadline d) noexcept
+{
+  BOOST_AFIO_LOG_FUNCTION_CALL(_v.fd);
+  if(d)
+    return make_errored_result<>(stl11::errc::not_supported);
+#ifdef __linux__
+  if(!wait_for_device && !and_metadata)
+  {
+    // Linux has a lovely dedicated syscall giving us exactly what we need here
+    extent_type offset = reqs.offset, bytes = 0;
+    for(const auto &req : reqs.buffers)  // empty buffers means bytes = 0 which means sync entire file
+      bytes += req.second;
+    unsigned flags = SYNC_FILE_RANGE_WAIT_BEFORE | SYNC_FILE_RANGE_WRITE;  // start writing all dirty pages in range now
+    if(-1 != ::sync_file_range(_v.fd, offset, bytes, flags))
+      return io_handle::io_result<const_buffers_type>(std::move(reqs.buffers));
+  }
+#endif
+#if !defined(__FreeBSD__) && !defined(__APPLE__)  // neither of these have fdatasync()
+  if(!and_metadata)
+  {
+    if(-1 == ::fdatasync(_v.fd))
+      return make_errored_result<>(errno);
+    return io_handle::io_result<const_buffers_type>(std::move(reqs.buffers));
+  }
+#endif
+#ifdef __APPLE__
+  if(!wait_for_device)
+  {
+    // OS X fsync doesn't wait for the device to flush its buffers
+    if(-1 == ::fsync(_v.fd))
+      return make_errored_result<>(errno);
+    return io_handle::io_result<const_buffers_type>(std::move(reqs.buffers));
+  }
+  // This is the fsync as on every other OS
+  if(-1 == ::fcntl(_v.fd, F_FULLFSYNC))
+    return make_errored_result<>(errno);
+#else
+  if(-1 == ::fsync(_v.fd))
+    return make_errored_result<>(errno);
+#endif
+  return io_handle::io_result<const_buffers_type>(std::move(reqs.buffers));
 }
 
 result<file_handle> file_handle::clone() const noexcept

@@ -266,14 +266,14 @@ namespace algorithm
           else
           {
             // I am the first person to be using this (stale?) file, so create a new hash index file and write its path
-            ret.truncate(0);
+            BOOST_OUTCOME_TRYV(ret.truncate(0));
             BOOST_OUTCOME_TRY(_temph, file_handle::random_file(fixme_temporary_files_directory()));
             temph = std::move(_temph);
             auto temppath(temph.path());
-            temph.truncate(HashIndexSize);
+            BOOST_OUTCOME_TRYV(temph.truncate(HashIndexSize));
 #ifdef __linux__
             // Linux appears to have a race where if you mmap for read straight after a fallocate, on read you get a SIGBUS
-            temph.sync();
+            BOOST_OUTCOME_TRYV(temph.barrier());
 #endif
             // Write the path of my new hash index file and convert my lock to a shared one
             BOOST_OUTCOME_TRYV(ret.write(0, (const char *) temppath.c_str(), temppath.native().size() * sizeof(*temppath.c_str())));

@@ -149,8 +149,10 @@ namespace algorithm
                 --n;
                 // Now 0 to n needs to be closed
                 for(; n > 0; n--)
-                  _hs[n].close();  // delete on close semantics deletes the file
-                _hs[0].close();
+                {
+                  (void) _hs[n].close();  // delete on close semantics deletes the file
+                }
+                (void) _hs[0].close();
               }
             });
             for(n = 0; n < out.entities.size(); n++)
@@ -204,7 +206,7 @@ namespace algorithm
         BOOST_AFIO_LOG_FUNCTION_CALL(this);
         for(auto &i : _hs)
         {
-          i.close();  // delete on close semantics deletes the file
+          (void) i.close();  // delete on close semantics deletes the file
         }
       }
     };

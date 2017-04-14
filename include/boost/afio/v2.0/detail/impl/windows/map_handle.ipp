@@ -170,6 +170,23 @@ native_handle_type map_handle::release() noexcept
   return native_handle_type();
 }
 
+map_handle::io_result<map_handle::const_buffers_type> map_handle::barrier(map_handle::io_request<map_handle::const_buffers_type> reqs, bool wait_for_device, bool and_metadata, deadline d) noexcept
+{
+  BOOST_AFIO_LOG_FUNCTION_CALL(_v.h);
+  char *addr = _addr + reqs.offset;
+  extent_type bytes = 0;
+  for(const auto &req : reqs.buffers)
+    bytes += req.second;
+  if(!FlushViewOfFile(addr, (SIZE_T) bytes))
+    return make_errored_result<>(GetLastError());
+  if(_section->backing() && (wait_for_device || and_metadata))
+  {
+    reqs.offset += _offset;
+    return _section->backing()->barrier(std::move(reqs), wait_for_device, and_metadata, d);
+  }
+  return io_handle::io_result<const_buffers_type>(std::move(reqs.buffers));
+}
+
 
 result<map_handle> map_handle::map(section_handle &section, size_type bytes, extent_type offset, section_handle::flag _flag) noexcept
 {
@@ -180,7 +197,7 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
     // Do NOT round up bytes to the nearest page size for backed maps, it causes an attempt to extend the file
     bytes = utils::round_up_to_page_size(bytes);
   }
-  result<map_handle> ret(map_handle(io_handle(), &section));
+  result<map_handle> ret(make_valued_result<map_handle>(map_handle(&section)));
   native_handle_type &nativeh = ret.get()._v;
   ULONG allocation = 0, prot = 0;
   PVOID addr = 0;

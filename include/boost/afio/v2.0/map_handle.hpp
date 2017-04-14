@@ -201,19 +201,19 @@ protected:
   extent_type _offset;
   size_type _length;
 
-public:
-  //! Default constructor
-  map_handle()
-      : io_handle()
-      , _section(nullptr)
+  explicit map_handle(section_handle *section)
+      : _section(section)
       , _addr(nullptr)
       , _offset(0)
       , _length(0)
   {
   }
-  //! Construct from these parameters
-  explicit map_handle(section_handle *section)
-      : _section(section)
+
+public:
+  //! Default constructor
+  map_handle()
+      : io_handle()
+      , _section(nullptr)
       , _addr(nullptr)
       , _offset(0)
       , _length(0)
@@ -244,10 +244,10 @@ public:
   }
 
   //! Unmap the mapped view.
-  BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> close() noexcept;
+  BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> close() noexcept override;
   //! Releases the mapped view, but does NOT release the native handle.
-  BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC native_handle_type release() noexcept;
-  BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> sync(io_request<const_buffers_type> reqs = io_request<const_buffers_type>(), bool wait_for_device = false, bool and_metadata = false, deadline d = deadline()) noexcept override;
+  BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC native_handle_type release() noexcept override;
+  BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> barrier(io_request<const_buffers_type> reqs = io_request<const_buffers_type>(), bool wait_for_device = false, bool and_metadata = false, deadline d = deadline()) noexcept override;
 
 
   /*! Create a memory mapped view of a backing storage.
@@ -287,7 +287,11 @@ public:
   //! Ask the system to begin to asynchronously prefetch the span of memory regions given, returning the regions actually prefetched. Note that on Windows 7 or earlier the system call to implement this was not available, and so you will see an empty span returned.
   static result<span<buffer_type>> prefetch(span<buffer_type> regions) noexcept;
   //! \overload
-  static result<buffer_type> prefetch(buffer_type region) noexcept { BOOST_OUTCOME_TRY(ret, prefetch(span<buffer_type>(&region, 1))); return *ret.data(); }
+  static result<buffer_type> prefetch(buffer_type region) noexcept
+  {
+    BOOST_OUTCOME_TRY(ret, prefetch(span<buffer_type>(&region, 1)));
+    return *ret.data();
+  }
 
   /*! Ask the system to unset the dirty flag for the memory represented by the buffer. This will prevent any changes not yet sent to the backing storage from being sent in the future, also if the system kicks out this page and reloads it you may see some edition of the underlying storage instead of what was here. addr
   and length should be page aligned (see utils::page_sizes()), if not the returned buffer is the region actually undirtied.
@@ -309,7 +313,7 @@ public:
   \mallocs None.
   */
   //[[bindlib::make_free]]
-  BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<buffers_type> read(io_request<buffers_type> reqs, deadline d = deadline()) noexcept;
+  BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<buffers_type> read(io_request<buffers_type> reqs, deadline d = deadline()) noexcept override;
   using io_handle::read;
 
   /*! \brief Write data to the mapped view.
@@ -322,7 +326,7 @@ public:
   \mallocs None.
   */
   //[[bindlib::make_free]]
-  BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> write(io_request<const_buffers_type> reqs, deadline d = deadline()) noexcept;
+  BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> write(io_request<const_buffers_type> reqs, deadline d = deadline()) noexcept override;
   using io_handle::write;
 };
 

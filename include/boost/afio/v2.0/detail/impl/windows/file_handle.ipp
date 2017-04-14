@@ -116,7 +116,7 @@ const fixme_path &fixme_temporary_files_directory() noexcept
 result<void> file_handle::_fetch_inode() noexcept
 {
   stat_t s;
-  BOOST_OUTCOME_TRYV(s.fill(*this, stat_t::want::dev|stat_t::want::ino));
+  BOOST_OUTCOME_TRYV(s.fill(*this, stat_t::want::dev | stat_t::want::ino));
   _devid = s.st_dev;
   _inode = s.st_ino;
   return make_valued_result<void>();
@@ -217,13 +217,14 @@ result<file_handle> file_handle::temp_inode(path_type dirpath, mode _mode, flag 
   }
 }
 
-file_handle::io_result<file_handle::const_buffers_type> file_handle::sync(file_handle::io_request<file_handle::const_buffers_type> reqs, bool wait_for_device, bool and_metadata, deadline d) noexcept
+file_handle::io_result<file_handle::const_buffers_type> file_handle::barrier(file_handle::io_request<file_handle::const_buffers_type> reqs, bool wait_for_device, bool and_metadata, deadline d) noexcept
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
   BOOST_AFIO_LOG_FUNCTION_CALL(_v.h);
   if(d && !_v.is_overlapped())
     return make_errored_result<>(stl11::errc::not_supported);
+  BOOST_AFIO_WIN_DEADLINE_TO_SLEEP_INIT(d);
   OVERLAPPED ol;
   memset(&ol, 0, sizeof(ol));
   IO_STATUS_BLOCK *isb = (IO_STATUS_BLOCK *) &ol;
@@ -236,23 +237,16 @@ file_handle::io_result<file_handle::const_buffers_type> file_handle::sync(file_h
   NtFlushBuffersFileEx(_v.h, flags, isb);
   if(_v.is_overlapped())
   {
-    if(STATUS_TIMEOUT == ntwait(_v.h, isb, d))
+    if(STATUS_TIMEOUT == ntwait(_v.h, ol, d))
     {
       CancelIoEx(_v.h, &ol);
       BOOST_AFIO_WIN_DEADLINE_TO_TIMEOUT(void, d);
     }
   }
-  if(STATUS_SUCCESS != isb.Status)
-    return make_errored_result_nt<void>(isb.Status, last190(_path.u8string()));
-  BOOST_OUTCOME_TRY(length, this->length());
-  for(size_t n = 0; n < reqs.buffers.size(); n++)
-  {
-    reqs.buffers[n].second = !n ? length : 0;
-  }
-  return io_handle::io_result<BuffersType>(std::move(reqs.buffers));
+  if(STATUS_SUCCESS != isb->Status)
+    return make_errored_result_nt<void>(isb->Status, last190(_path.u8string()));
+  return io_handle::io_result<const_buffers_type>(std::move(reqs.buffers));
 }
-
-
 
 
 result<file_handle> file_handle::clone() const noexcept

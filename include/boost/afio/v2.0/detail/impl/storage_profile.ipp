@@ -328,7 +328,7 @@ namespace storage_profile
           std::atomic<io_service::extent_type> atomic_rewrite_quantum(sp.atomic_rewrite_quantum.value);
           std::atomic<bool> failed(false);
           for(unsigned no = 0; no < concurrency; no++)
-            readers.push_back(std::thread([size, &srch, no, &done, &atomic_rewrite_quantum, &failed] {
+            readers.push_back(std::thread([size, &srch, &done, &atomic_rewrite_quantum, &failed] {
               auto _h(srch.clone());
               if(!_h)
                 throw std::runtime_error("concurrency::atomic_rewrite_quantum: Could not open work file due to " + _h.get_error().message());
@@ -424,7 +424,7 @@ namespace storage_profile
             std::atomic<io_service::extent_type> max_aligned_atomic_rewrite(sp.max_aligned_atomic_rewrite.value);
             std::atomic<bool> failed(false);
             for(unsigned no = 0; no < concurrency; no++)
-              readers.push_back(std::thread([size, offset, &srch, no, &done, &max_aligned_atomic_rewrite, &failed] {
+              readers.push_back(std::thread([size, offset, &srch, &done, &max_aligned_atomic_rewrite, &failed] {
                 auto _h(srch.clone());
                 if(!_h)
                   throw std::runtime_error("concurrency::atomic_rewrite_quantum: Could not open work file due to " + _h.get_error().message());
@@ -532,7 +532,7 @@ namespace storage_profile
               std::atomic<io_service::extent_type> atomic_rewrite_offset_boundary(sp.atomic_rewrite_offset_boundary.value);
               std::atomic<bool> failed(false);
               for(unsigned no = 0; no < concurrency; no++)
-                readers.push_back(std::thread([size, offset, &srch, no, &done, &atomic_rewrite_offset_boundary, &failed] {
+                readers.push_back(std::thread([size, offset, &srch, &done, &atomic_rewrite_offset_boundary, &failed] {
                   auto _h(srch.clone());
                   if(!_h)
                     throw std::runtime_error("concurrency::atomic_rewrite_offset_boundary: Could not open work file due to " + _h.get_error().message());

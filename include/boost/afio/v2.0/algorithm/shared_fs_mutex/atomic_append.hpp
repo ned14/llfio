@@ -195,15 +195,14 @@ namespace algorithm
         else
         {
           // I am the first person to be using this (stale?) file, so write a new header and truncate
-          ret.truncate(sizeof(header));
+          BOOST_OUTCOME_TRYV(ret.truncate(sizeof(header)));
           memset(&header, 0, sizeof(header));
           header.time_offset = stl11::chrono::system_clock::to_time_t(stl11::chrono::system_clock::now());
           header.first_known_good = sizeof(header);
           header.first_after_hole_punch = sizeof(header);
           if(!skip_hashing)
             header.hash = boost_lite::algorithm::hash::fast_hash::hash(((char *) &header) + 16, sizeof(header) - 16);
-          BOOST_OUTCOME_TRY(_, ret.write(0, (char *) &header, sizeof(header)));
-          (void) _;
+          BOOST_OUTCOME_TRYV(ret.write(0, (char *) &header, sizeof(header)));
         }
         // Open a shared lock on last byte in header to prevent other users zomping the file
         BOOST_OUTCOME_TRY(guard, ret.lock(sizeof(header) - 1, 1, false));
@@ -249,8 +248,8 @@ namespace algorithm
         // My lock request will be the file's current length or higher
         BOOST_OUTCOME_TRY(my_lock_request_offset, _h.length());
         {
-          _h.set_append_only(true);
-          auto undo = undoer([this] { _h.set_append_only(false); });
+          BOOST_OUTCOME_TRYV(_h.set_append_only(true));
+          auto undo = undoer([this] { (void) _h.set_append_only(false); });
           file_handle::extent_guard append_guard;
           if(_nfs_compatibility)
           {
@@ -308,7 +307,7 @@ namespace algorithm
         reload:
           // Refresh the header and load a snapshot of everything between record_offset
           // and first_known_good or -6Kb, whichever the sooner
-          _read_header();
+          BOOST_OUTCOME_TRYV(_read_header());
           // If there are no preceding records, we're done
           if(record_offset < _header.first_known_good)
             break;

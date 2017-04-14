@@ -115,7 +115,12 @@ public:
   {
   }
   //! Implicit move construction of file_handle permitted
-  file_handle(file_handle &&o) noexcept : io_handle(std::move(o)), _devid(o._devid), _inode(o._inode), _path(std::move(o._path)), _service(o._service) { o._devid = 0; o._inode = 0; o._service = nullptr; }
+  file_handle(file_handle &&o) noexcept : io_handle(std::move(o)), _devid(o._devid), _inode(o._inode), _path(std::move(o._path)), _service(o._service)
+  {
+    o._devid = 0;
+    o._inode = 0;
+    o._service = nullptr;
+  }
   //! Explicit conversion from handle and io_handle permitted
   explicit file_handle(handle &&o, path_type path, dev_t devid, ino_t inode) noexcept : io_handle(std::move(o)), _devid(devid), _inode(inode), _path(std::move(path)), _service(nullptr) {}
   //! Move assignment of file_handle permitted
@@ -202,7 +207,13 @@ public:
   dev_t st_dev() const noexcept { return _devid; }
   //! Unless `flag::disable_safety_unlinks` is set, the inode of the file when opened. When combined with st_dev(), forms a unique identifer on this system
   ino_t st_ino() const noexcept { return _inode; }
-  BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC unique_id_type unique_id() const noexcept override { unique_id_type ret(nullptr); ret.as_longlongs[0] = _devid; ret.as_longlongs[1] = _inode; return ret; }
+  BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC unique_id_type unique_id() const noexcept override
+  {
+    unique_id_type ret(nullptr);
+    ret.as_longlongs[0] = _devid;
+    ret.as_longlongs[1] = _inode;
+    return ret;
+  }
   BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC path_type path() const noexcept override { return _path; }
   BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> close() noexcept override
   {
@@ -213,7 +224,7 @@ public:
     }
     return io_handle::close();
   }
-  BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> sync(io_request<const_buffers_type> reqs = io_request<const_buffers_type>(), bool wait_for_device = false, bool and_metadata = false, deadline d = deadline()) noexcept override;
+  BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> barrier(io_request<const_buffers_type> reqs = io_request<const_buffers_type>(), bool wait_for_device = false, bool and_metadata = false, deadline d = deadline()) noexcept override;
 
   /*! Clone this handle (copy constructor is disabled to avoid accidental copying)
 

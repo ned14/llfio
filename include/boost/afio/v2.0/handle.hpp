@@ -38,7 +38,7 @@ DEALINGS IN THE SOFTWARE.
 #include "../boost-lite/include/uint128.hpp"
 
 #include <algorithm>  // for std::count
-#include <utility>  // for pair<>
+#include <utility>    // for pair<>
 
 //! \file handle.hpp Provides handle
 
@@ -198,7 +198,12 @@ public:
   }
 
   //! A unique identifier for this handle in this process (native handle). Subclasses like `file_handle` make this a unique identifier across the entire system.
-  BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC unique_id_type unique_id() const noexcept { unique_id_type ret(nullptr); ret.as_longlongs[0] = _v._init; return ret; }
+  BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC unique_id_type unique_id() const noexcept
+  {
+    unique_id_type ret(nullptr);
+    ret.as_longlongs[0] = _v._init;
+    return ret;
+  }
   //! The path this handle refers to, if any
   BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC path_type path() const noexcept { return path_type(); }
   //! Immediately close the native handle type managed by this handle
@@ -462,32 +467,38 @@ public:
     return *v.data();
   }
 
-  /*! \brief Issue a write reordering barrier for preceding writes such that they will all be issued
-  to storage before any writes after the barrier.
+  /*! \brief Issue a write reordering barrier such that writes preceding the barrier will reach storage
+  before writes after this barrier.
 
-  \warning This call really is for people with deep understanding of individual filing systems,
-  and unless you **really** know what you are doing, do NOT use this call as it is false security.
-  Instead open the handle with `caching::reads`, that will get you true durable write ordering, plus the
-  filing system can use different algorithms to give much better performance.
-  
-  \warning For portability, you can only assume that sync()'s are write ordered for a single handle
-  instance. You cannot assume that sync() write orders across multiple handles to the same inode, or
+  \warning **Assume that this call is a no-op**. It is not reliably implemented in many common use cases,
+  for example if your code is running inside a LXC container, or if the user has mounted the filing
+  system with non-default options. Instead open the handle with `caching::reads` which means that all
+  writes form a strict sequential order not completing until acknowledged by the storage device.
+  Filing system can and do use different algorithms to give much better performance with `caching::reads`,
+  some (e.g. ZFS) spectacularly better.
+
+  \warning Let me repeat again: consider this call to be a **hint** to poke the kernel with a stick to
+  go start to do some work sooner rather than later. It may be ignored entirely.
+
+  \warning For portability, you can only assume that barriers write order for a single handle
+  instance. You cannot assume that barriers write order across multiple handles to the same inode, or
   across processes.
 
-  \return The buffers synced, which may not be the buffers input. The size of each scatter-gather
-  buffer is updated with the number of bytes of that buffer synced.
-  \param reqs A scatter-gather and offset request. May be ignored on some platforms.
+  \return The buffers barriered, which may not be the buffers input. The size of each scatter-gather
+  buffer is updated with the number of bytes of that buffer barriered.
+  \param reqs A scatter-gather and offset request for what range to barrier. May be ignored on some platforms
+  which always write barrier the entire file. Supplying a default initialised reqs write barriers the entire file.
   \param wait_for_device True if you want the call to wait until data reaches storage and that storage
-  has acknowledged the data is physically written.
-  \param and_metadata True if you want the call to sync the metadata for retrieving writes until now too.
+  has acknowledged the data is physically written. Slow.
+  \param and_metadata True if you want the call to sync the metadata for retrieving the writes before the
+  barrier after a sudden power loss event. Slow.
   \param d An optional deadline by which the i/o must complete, else it is cancelled.
   Note function may return significantly after this deadline if the i/o takes long to cancel.
-  has confirmed that the data is written before returning.
   \errors Any of the values POSIX fdatasync() or Windows NtFlushBuffersFileEx() can return.
   \mallocs None.
   */
   //[[bindlib::make_free]]
-  BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> sync(io_request<const_buffers_type> reqs = io_request<const_buffers_type>(), bool wait_for_device = false, bool and_metadata = false, deadline d = deadline()) noexcept = 0;
+  BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> barrier(io_request<const_buffers_type> reqs = io_request<const_buffers_type>(), bool wait_for_device = false, bool and_metadata = false, deadline d = deadline()) noexcept = 0;
 
   /*! \class extent_guard
   \brief RAII holder a locked extent of bytes in a file.
