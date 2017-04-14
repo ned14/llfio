@@ -34,6 +34,12 @@ DEALINGS IN THE SOFTWARE.
 
 BOOST_AFIO_V2_NAMESPACE_BEGIN
 
+async_file_handle::io_result<async_file_handle::const_buffers_type> async_file_handle::barrier(async_file_handle::io_request<async_file_handle::const_buffers_type> reqs, bool wait_for_device, bool and_metadata, deadline d) noexcept
+{
+  // Pass through the file_handle's implementation, it understands overlapped handles
+  return file_handle::barrier(std::move(reqs), wait_for_device, and_metadata, std::move(d));
+}
+
 result<async_file_handle> async_file_handle::clone(io_service &service) const noexcept
 {
   BOOST_OUTCOME_TRY(v, clone());

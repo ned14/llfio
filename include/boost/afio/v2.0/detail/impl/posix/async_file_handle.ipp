@@ -39,6 +39,31 @@ DEALINGS IN THE SOFTWARE.
 
 BOOST_AFIO_V2_NAMESPACE_BEGIN
 
+async_file_handle::io_result<async_file_handle::const_buffers_type> async_file_handle::barrier(async_file_handle::io_request<async_file_handle::const_buffers_type> reqs, bool /*wait_for_device*/, bool and_metadata, deadline d) noexcept
+{
+  BOOST_AFIO_LOG_FUNCTION_CALL(_v.fd);
+  io_result<const_buffers_type> ret;
+  auto _io_state(_begin_io(and_metadata ? operation_t::fsync : operation_t::dsync, std::move(reqs), [&ret](auto *state) { ret = std::move(state->result); }, nullptr));
+  BOOST_OUTCOME_TRY(io_state, _io_state);
+
+  // While i/o is not done pump i/o completion
+  while(!ret.is_ready())
+  {
+    auto t(_service->run_until(d));
+    // If i/o service pump failed or timed out, cancel outstanding i/o and return
+    if(!t)
+      return make_errored_result<const_buffers_type>(t.get_error());
+#ifndef NDEBUG
+    if(!ret.is_ready() && t && !t.get())
+    {
+      BOOST_AFIO_LOG_FATAL(_v.fd, "async_file_handle: io_service returns no work when i/o has not completed");
+      std::terminate();
+    }
+#endif
+  }
+  return ret;
+}
+
 result<async_file_handle> async_file_handle::clone(io_service &service) const noexcept
 {
   BOOST_OUTCOME_TRY(v, clone());
@@ -48,7 +73,7 @@ result<async_file_handle> async_file_handle::clone(io_service &service) const no
 }
 
 template <class CompletionRoutine, class BuffersType, class IORoutine>
-result<async_file_handle::io_state_ptr<CompletionRoutine, BuffersType>> async_file_handle::_begin_io(async_file_handle::operation_t operation, async_file_handle::io_request<BuffersType> reqs, CompletionRoutine &&completion, IORoutine &&/*ioroutine*/) noexcept
+result<async_file_handle::io_state_ptr<CompletionRoutine, BuffersType>> async_file_handle::_begin_io(async_file_handle::operation_t operation, async_file_handle::io_request<BuffersType> reqs, CompletionRoutine &&completion, IORoutine && /*ioroutine*/) noexcept
 {
   // Need to keep a set of aiocbs matching the scatter-gather buffers
   struct state_type : public _io_state_type<CompletionRoutine, BuffersType>
@@ -171,7 +196,21 @@ result<async_file_handle::io_state_ptr<CompletionRoutine, BuffersType>> async_fi
     aiocb->aio_nbytes = out[n].second;
     aiocb->aio_sigevent.sigev_notify = SIGEV_NONE;
     aiocb->aio_sigevent.sigev_value.sival_ptr = (void *) state;
-    aiocb->aio_lio_opcode = (operation == operation_t::write) ? LIO_WRITE : LIO_READ;
+    switch(operation)
+    {
+    case operation_t::read:
+      aiocb->aio_lio_opcode = LIO_READ;
+      break;
+    case operation_t::write:
+      aiocb->aio_lio_opcode = LIO_WRITE;
+      break;
+    case operation_t::fsync:
+      aiocb->aio_lio_opcode = LIO_NOP;
+      break;
+    case operation_t::dsync:
+      aiocb->aio_lio_opcode = LIO_NOP;
+      break;
+    }
 #else
 #error todo
 #endif
@@ -198,7 +237,25 @@ result<async_file_handle::io_state_ptr<CompletionRoutine, BuffersType>> async_fi
       struct aiocb *aiocb = state->aiocbs + n;
       thislist[n] = aiocb;
     }
-    ret = lio_listio(LIO_NOWAIT, thislist, items, nullptr);
+    switch(operation)
+    {
+    case operation_t::read:
+    case operation_t::write:
+      ret = lio_listio(LIO_NOWAIT, thislist, items, nullptr);
+      break;
+    case operation_t::fsync:
+    case operation_t::dsync:
+      for(size_t n = 0; n < items; n++)
+      {
+        struct aiocb *aiocb = state->aiocbs + n;
+#if defined(__FreeBSD__) || defined(__APPLE__)  // neither of these have fdatasync()
+        ret = aio_fsync(O_SYNC, aiocb);
+#else
+        ret = aio_fsync(operation == operation_t::dsync ? O_DSYNC : O_SYNC, aiocb);
+#endif
+      }
+      break;
+    }
   }
 #else
 #error todo

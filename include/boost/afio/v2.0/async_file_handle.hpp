@@ -44,6 +44,7 @@ BOOST_AFIO_V2_NAMESPACE_EXPORT_BEGIN
 class BOOST_AFIO_DECL async_file_handle : public file_handle
 {
   friend class io_service;
+
 public:
   using dev_t = file_handle::dev_t;
   using ino_t = file_handle::ino_t;
@@ -176,6 +177,7 @@ public:
     return std::move(ret);
   }
 
+  BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> barrier(io_request<const_buffers_type> reqs = io_request<const_buffers_type>(), bool wait_for_device = false, bool and_metadata = false, deadline d = deadline()) noexcept override;
   /*! Clone this handle to a different io_service (copy constructor is disabled to avoid accidental copying)
 
   \errors Any of the values POSIX dup() or DuplicateHandle() can return.
@@ -192,7 +194,9 @@ protected:
   enum class operation_t
   {
     read,
-    write
+    write,
+    fsync,
+    dsync
   };
   // Holds state for an i/o in progress. Will be subclassed with platform specific state and how to implement completion.
   // Note this is allocated using malloc not new to avoid memory zeroing, and therefore it has a custom deleter.
