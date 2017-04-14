@@ -217,6 +217,43 @@ result<file_handle> file_handle::temp_inode(path_type dirpath, mode _mode, flag 
   }
 }
 
+file_handle::io_result<file_handle::const_buffers_type> file_handle::sync(file_handle::io_request<file_handle::const_buffers_type> reqs, bool wait_for_device, bool and_metadata, deadline d) noexcept
+{
+  windows_nt_kernel::init();
+  using namespace windows_nt_kernel;
+  BOOST_AFIO_LOG_FUNCTION_CALL(_v.h);
+  if(d && !_v.is_overlapped())
+    return make_errored_result<>(stl11::errc::not_supported);
+  OVERLAPPED ol;
+  memset(&ol, 0, sizeof(ol));
+  IO_STATUS_BLOCK *isb = (IO_STATUS_BLOCK *) &ol;
+  *isb = make_iostatus();
+  ULONG flags = 0;
+  if(!wait_for_device)
+    flags |= 2 /*FLUSH_FLAGS_NO_SYNC*/;
+  if(!and_metadata)
+    flags |= 1 /*FLUSH_FLAGS_FILE_DATA_ONLY*/;
+  NtFlushBuffersFileEx(_v.h, flags, isb);
+  if(_v.is_overlapped())
+  {
+    if(STATUS_TIMEOUT == ntwait(_v.h, isb, d))
+    {
+      CancelIoEx(_v.h, &ol);
+      BOOST_AFIO_WIN_DEADLINE_TO_TIMEOUT(void, d);
+    }
+  }
+  if(STATUS_SUCCESS != isb.Status)
+    return make_errored_result_nt<void>(isb.Status, last190(_path.u8string()));
+  BOOST_OUTCOME_TRY(length, this->length());
+  for(size_t n = 0; n < reqs.buffers.size(); n++)
+  {
+    reqs.buffers[n].second = !n ? length : 0;
+  }
+  return io_handle::io_result<BuffersType>(std::move(reqs.buffers));
+}
+
+
+
 
 result<file_handle> file_handle::clone() const noexcept
 {

@@ -462,6 +462,33 @@ public:
     return *v.data();
   }
 
+  /*! \brief Issue a write reordering barrier for preceding writes such that they will all be issued
+  to storage before any writes after the barrier.
+
+  \warning This call really is for people with deep understanding of individual filing systems,
+  and unless you **really** know what you are doing, do NOT use this call as it is false security.
+  Instead open the handle with `caching::reads`, that will get you true durable write ordering, plus the
+  filing system can use different algorithms to give much better performance.
+  
+  \warning For portability, you can only assume that sync()'s are write ordered for a single handle
+  instance. You cannot assume that sync() write orders across multiple handles to the same inode, or
+  across processes.
+
+  \return The buffers synced, which may not be the buffers input. The size of each scatter-gather
+  buffer is updated with the number of bytes of that buffer synced.
+  \param reqs A scatter-gather and offset request. May be ignored on some platforms.
+  \param wait_for_device True if you want the call to wait until data reaches storage and that storage
+  has acknowledged the data is physically written.
+  \param and_metadata True if you want the call to sync the metadata for retrieving writes until now too.
+  \param d An optional deadline by which the i/o must complete, else it is cancelled.
+  Note function may return significantly after this deadline if the i/o takes long to cancel.
+  has confirmed that the data is written before returning.
+  \errors Any of the values POSIX fdatasync() or Windows NtFlushBuffersFileEx() can return.
+  \mallocs None.
+  */
+  //[[bindlib::make_free]]
+  BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> sync(io_request<const_buffers_type> reqs, bool wait_for_device = false, bool and_metadata = false, deadline d = deadline()) noexcept = 0;
+
   /*! \class extent_guard
   \brief RAII holder a locked extent of bytes in a file.
   */
