@@ -367,14 +367,14 @@ template&lt;template&lt; class &gt; class Hasher = boost_lite::algorithm::hash::
 <div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;          <span class="keywordflow">else</span></div>
 <div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;          {</div>
 <div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;            <span class="comment">// I am the first person to be using this (stale?) file, so create a new hash index file and write its path</span></div>
-<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;            ret.truncate(0);</div>
+<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;            BOOST_OUTCOME_TRYV(ret.truncate(0));</div>
 <div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;            BOOST_OUTCOME_TRY(_temph, <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1file__handle.html#a603b0827a9ae139b8f5806b1297fa5f0">file_handle::random_file</a>(<a class="code" href="namespaceboost_1_1afio_1_1v2__xxx.html#ad7da7a1d3240d7574fc7c6ee5831b7ee" title="Returns a path to a directory reported by the operating system to be suitable for storing temporary f...">fixme_temporary_files_directory</a>()));</div>
 <div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;            temph = std::move(_temph);</div>
 <div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;            <span class="keyword">auto</span> temppath(temph.path());</div>
-<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;            temph.truncate(HashIndexSize);</div>
+<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;            BOOST_OUTCOME_TRYV(temph.truncate(HashIndexSize));</div>
 <div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;<span class="preprocessor">#ifdef __linux__</span></div>
 <div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;<span class="preprocessor"></span>            <span class="comment">// Linux appears to have a race where if you mmap for read straight after a fallocate, on read you get a SIGBUS</span></div>
-<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;            temph.sync();</div>
+<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;            BOOST_OUTCOME_TRYV(temph.barrier());</div>
 <div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;<span class="preprocessor"></span>            <span class="comment">// Write the path of my new hash index file and convert my lock to a shared one</span></div>
 <div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;            BOOST_OUTCOME_TRYV(ret.write(0, (<span class="keyword">const</span> <span class="keywordtype">char</span> *) temppath.c_str(), temppath.native().size() * <span class="keyword">sizeof</span>(*temppath.c_str())));</div>
