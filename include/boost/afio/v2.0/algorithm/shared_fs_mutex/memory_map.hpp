@@ -273,11 +273,7 @@ namespace algorithm
             temph.truncate(HashIndexSize);
 #ifdef __linux__
             // Linux appears to have a race where if you mmap for read straight after a fallocate, on read you get a SIGBUS
-            // Writing zeros to extend the file appears to solve the problem
-            char buffer[4096];
-            memset(buffer, 0, sizeof(buffer));
-            for(size_t n = 0; n < HashIndexSize; n += HashIndexSize)
-              (void) temph.write(n, buffer, 4096);
+            temph.sync();
 #endif
             // Write the path of my new hash index file and convert my lock to a shared one
             BOOST_OUTCOME_TRYV(ret.write(0, (const char *) temppath.c_str(), temppath.native().size() * sizeof(*temppath.c_str())));

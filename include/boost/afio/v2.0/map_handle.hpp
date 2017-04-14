@@ -212,9 +212,8 @@ public:
   {
   }
   //! Construct from these parameters
-  map_handle(io_handle h, section_handle *section)
-      : io_handle(std::move(h))
-      , _section(section)
+  explicit map_handle(section_handle *section)
+      : _section(section)
       , _addr(nullptr)
       , _offset(0)
       , _length(0)
@@ -248,6 +247,7 @@ public:
   BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> close() noexcept;
   //! Releases the mapped view, but does NOT release the native handle.
   BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC native_handle_type release() noexcept;
+  BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> sync(io_request<const_buffers_type> reqs = io_request<const_buffers_type>(), bool wait_for_device = false, bool and_metadata = false, deadline d = deadline()) noexcept override;
 
 
   /*! Create a memory mapped view of a backing storage.

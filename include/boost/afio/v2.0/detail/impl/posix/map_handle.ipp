@@ -165,7 +165,7 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
     // Do NOT round up bytes to the nearest page size for backed maps, it causes an attempt to extend the file
     bytes = _bytes;
   }
-  result<map_handle> ret(map_handle(io_handle(), &section));
+  result<map_handle> ret(map_handle(&section));
   native_handle_type &nativeh = ret.get()._v;
   BOOST_OUTCOME_TRY(addr, do_mmap(nativeh, nullptr, &section, bytes, offset, _flag));
   ret.get()._addr = (char *) addr;

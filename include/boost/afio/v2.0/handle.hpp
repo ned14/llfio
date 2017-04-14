@@ -487,7 +487,7 @@ public:
   \mallocs None.
   */
   //[[bindlib::make_free]]
-  BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> sync(io_request<const_buffers_type> reqs, bool wait_for_device = false, bool and_metadata = false, deadline d = deadline()) noexcept = 0;
+  BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> sync(io_request<const_buffers_type> reqs = io_request<const_buffers_type>(), bool wait_for_device = false, bool and_metadata = false, deadline d = deadline()) noexcept = 0;
 
   /*! \class extent_guard
   \brief RAII holder a locked extent of bytes in a file.

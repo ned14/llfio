@@ -213,6 +213,7 @@ public:
     }
     return io_handle::close();
   }
+  BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> sync(io_request<const_buffers_type> reqs = io_request<const_buffers_type>(), bool wait_for_device = false, bool and_metadata = false, deadline d = deadline()) noexcept override;
 
   /*! Clone this handle (copy constructor is disabled to avoid accidental copying)
 
