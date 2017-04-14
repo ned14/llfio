@@ -129,6 +129,7 @@ result<async_file_handle::io_state_ptr<CompletionRoutine, BuffersType>> async_fi
         while(this->items_to_go)
         {
           auto res = this->parent->service()->run();
+          (void) res;
 #ifndef NDEBUG
           if(res.has_error())
           {

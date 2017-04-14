@@ -175,23 +175,33 @@ namespace algorithm
       }
       ~memory_map()
       {
-        // Release my shared locks and try locking inuse exclusively
-        _hmapinuse.unlock();
-        _hlockinuse.unlock();
-        auto lockresult = _h.try_lock(_lockinuseoffset, 1, true);
-        if(lockresult)
+        if(_h.is_valid())
         {
-          // This means I am the last user, so zop the file contents as temp file is about to go away
-          char buffer[4096];
-          memset(buffer, 0, sizeof(buffer));
-          (void) _h.write(0, buffer, sizeof(buffer));
-          // You might wonder why I am now truncating to zero? It's to ensure any
-          // memory maps definitely get written with zeros before truncation, some
-          // OSs don't reflect zeros into memory maps upon truncation for quite a
-          // long time (or ever)
-          _h.truncate(0);
-          // Unlink the temp file
-          _temph.unlink();
+          // Release my shared locks and try locking inuse exclusively
+          _hmapinuse.unlock();
+          _hlockinuse.unlock();
+          auto lockresult = _h.try_lock(_lockinuseoffset, 1, true);
+#ifndef NDEBUG
+          if(!lockresult && lockresult.error() != stl11::errc::timed_out)
+          {
+            BOOST_AFIO_LOG_FATAL(0, "memory_map::~memory_map() try_lock failed");
+            abort();
+          }
+#endif
+          if(lockresult)
+          {
+            // This means I am the last user, so zop the file contents as temp file is about to go away
+            char buffer[4096];
+            memset(buffer, 0, sizeof(buffer));
+            (void) _h.write(0, buffer, sizeof(buffer));
+            // You might wonder why I am now truncating to zero? It's to ensure any
+            // memory maps definitely get written with zeros before truncation, some
+            // OSs don't reflect zeros into memory maps upon truncation for quite a
+            // long time (or ever)
+            _h.truncate(0);
+            // Unlink the temp file
+            _temph.unlink();
+          }
         }
       }
 
@@ -261,6 +271,14 @@ namespace algorithm
             temph = std::move(_temph);
             auto temppath(temph.path());
             temph.truncate(HashIndexSize);
+#ifdef __linux__
+            // Linux appears to have a race where if you mmap for read straight after a fallocate, on read you get a SIGBUS
+            // Writing zeros to extend the file appears to solve the problem
+            char buffer[4096];
+            memset(buffer, 0, sizeof(buffer));
+            for(size_t n = 0; n < HashIndexSize; n += HashIndexSize)
+              (void) temph.write(n, buffer, 4096);
+#endif
             // Write the path of my new hash index file and convert my lock to a shared one
             BOOST_OUTCOME_TRYV(ret.write(0, (const char *) temppath.c_str(), temppath.native().size() * sizeof(*temppath.c_str())));
             // Convert exclusive whole file lock into lock in use

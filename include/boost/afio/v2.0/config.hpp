@@ -30,8 +30,8 @@ DEALINGS IN THE SOFTWARE.
 */
 
 //#include <iostream>
-//#define BOOST_AFIO_LOG_TO_OSTREAM std::cout
-//#define BOOST_AFIO_LOGGING_LEVEL 99
+//#define BOOST_AFIO_LOG_TO_OSTREAM std::cerr
+//#define BOOST_AFIO_LOGGING_LEVEL 3
 
 //! \file config.hpp Configures a compiler environment for AFIO header and source code
 
