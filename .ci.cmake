@@ -33,7 +33,13 @@ if(WIN32)
   if(EXISTS prebuilt/bin/Release/afio_dl-2.0-Windows-x64-Release.dll)
     checked_execute_process("Tarring up binaries"
       COMMAND mkdir afio
-      COMMAND xcopy doc include Readme.md release_notes.md prebuilt\\lib\\Release\\afio_sl-2.0-Windows-x64-Release.lib prebuilt\\lib\\Release\\afio_dl-2.0-Windows-x64-Release.lib prebuilt\\bin\\Release\\afio_dl-2.0-Windows-x64-Release.dll afio\\ -s
+      COMMAND xcopy doc afio\\ -s
+      COMMAND xcopy include afio\\ -s
+      COMMAND xcopy Readme.md afio\\ -s
+      COMMAND xcopy release_notes.md afio\\ -s
+      COMMAND xcopy prebuilt\\lib\\Release\\afio_sl-2.0-Windows-x64-Release.lib afio\\ -s
+      COMMAND xcopy prebuilt\\lib\\Release\\afio_dl-2.0-Windows-x64-Release.lib afio\\ -s
+      COMMAND xcopy prebuilt\\bin\\Release\\afio_dl-2.0-Windows-x64-Release.dll afio\\ -s
       COMMAND "${CMAKE_COMMAND}" -E tar cfz afio_v2_binaries_win64.tar.gz afio
     )
     get_filename_component(toupload afio_v2_binaries_win64.tar.gz ABSOLUTE)
@@ -42,7 +48,12 @@ else()
   if(EXISTS prebuilt/lib/libafio_dl-2.0-Linux-x86_64-Release.so)
     checked_execute_process("Tarring up binaries"
       COMMAND mkdir afio
-      COMMAND cp -a doc include Readme.md release_notes.md prebuilt/lib/libafio_sl-2.0-Linux-x86_64-Release.a prebuilt/lib/libafio_dl-2.0-Linux-x86_64-Release.so afio/
+      COMMAND cp -a doc afio/
+      COMMAND cp -a include afio/
+      COMMAND cp -a Readme.md afio/
+      COMMAND cp -a release_notes.md afio/
+      COMMAND cp -a prebuilt/lib/libafio_sl-2.0-Linux-x86_64-Release.a afio/
+      COMMAND cp -a prebuilt/lib/libafio_dl-2.0-Linux-x86_64-Release.so afio/
       COMMAND "${CMAKE_COMMAND}" -E tar cfz afio_v2_binaries_linux64.tgz afio
     )
     get_filename_component(toupload afio_v2_binaries_linux64.tgz ABSOLUTE)
