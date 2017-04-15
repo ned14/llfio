@@ -551,9 +551,9 @@ inline void strip_pretty_function(char *out, size_t bytes, const char *in)
   const span<char> remove2 = outcome_namespace_string();
   for(--bytes; bytes && *in; --bytes)
   {
-    if(!memcmp(in, remove1.data(), remove1.size()))
+    if(!strncmp(in, remove1.data(), remove1.size()))
       in += remove1.size();
-    if(!memcmp(in, remove2.data(), remove2.size()))
+    if(!strncmp(in, remove2.data(), remove2.size()))
       in += remove2.size();
     *out++ = *in++;
   }

@@ -290,6 +290,8 @@ namespace algorithm
             // as some OSs can get confused if you use non-mmaped writes on a region mapped for writing.
             BOOST_OUTCOME_TRY(temphsection, section_handle::section(temph, HashIndexSize));
             BOOST_OUTCOME_TRY(temphmap, map_handle::map(temphsection, HashIndexSize));
+            // Force page allocation now
+            memset(temphmap.address(), 0, HashIndexSize);
             // Write the path of my new hash index file and convert my lock to a shared one
             BOOST_OUTCOME_TRYV(ret.write(0, (const char *) temppath.c_str(), temppath.native().size() * sizeof(*temppath.c_str())));
             BOOST_OUTCOME_TRY(hsection, section_handle::section(ret, 0, section_handle::flag::read));
