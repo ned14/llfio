@@ -32,7 +32,7 @@ DEALINGS IN THE SOFTWARE.
 #include "../../../handle.hpp"
 
 #include <fcntl.h>
-#include <limits.h>  // for IOV_MAX
+#include <limits.h>   // for IOV_MAX
 #include <sys/uio.h>  // for preadv etc
 #include <unistd.h>
 #if BOOST_AFIO_USE_POSIX_AIO
@@ -78,7 +78,7 @@ result<handle> handle::clone() const noexcept
   result<handle> ret(handle(native_handle_type(), _caching, _flags));
   ret.value()._v.behaviour = _v.behaviour;
   ret.value()._v.fd = ::dup(_v.fd);
-  if (-1 == ret.value()._v.fd)
+  if(-1 == ret.value()._v.fd)
     return make_errored_result<handle>(errno, last190(path().native()));
   return ret;
 }
@@ -114,11 +114,11 @@ result<void> handle::set_kernel_caching(caching caching) noexcept
   int attribs = fcntl(_v.fd, F_GETFL);
   if(-1 == attribs)
     return make_errored_result<void>(errno);
-  attribs&=~(O_SYNC|O_DIRECT
+  attribs &= ~(O_SYNC | O_DIRECT
 #ifdef O_DSYNC
-             |O_DSYNC
+               | O_DSYNC
 #endif
-  );
+               );
   switch(_caching)
   {
   case handle::caching::unchanged:
@@ -248,7 +248,7 @@ result<io_handle::extent_guard> io_handle::lock(io_handle::extent_type offset, i
     struct flock fl;
     memset(&fl, 0, sizeof(fl));
     fl.l_type = exclusive ? F_WRLCK : F_RDLCK;
-    constexpr extent_type extent_topbit = (extent_type) 1<<(8*sizeof(extent_type)-1);
+    constexpr extent_type extent_topbit = (extent_type) 1 << (8 * sizeof(extent_type) - 1);
     if(offset & extent_topbit)
     {
       BOOST_AFIO_LOG_WARN(_v.fd, "io_handle::lock() called with offset with top bit set, masking out");
@@ -259,8 +259,8 @@ result<io_handle::extent_guard> io_handle::lock(io_handle::extent_type offset, i
     }
     fl.l_whence = SEEK_SET;
     fl.l_start = offset & ~extent_topbit;
-    fl.l_len = bytes & ~extent_topbit;
-#ifdef F_OFD_SETLK
+    fl.l_len = bytes & ~extent_topbit;  // zero bytes means lock entire file
+#if 0                                   // def F_OFD_SETLK
     if(-1 == fcntl(_v.fd, (d && !d.nsecs) ? F_OFD_SETLK : F_OFD_SETLKW, &fl))
     {
       if(EINVAL == errno)  // OFD locks not supported on this kernel
@@ -306,11 +306,11 @@ void io_handle::unlock(io_handle::extent_type offset, io_handle::extent_type byt
     struct flock fl;
     memset(&fl, 0, sizeof(fl));
     fl.l_type = F_UNLCK;
-    constexpr extent_type extent_topbit = (extent_type) 1<<(8*sizeof(extent_type)-1);
+    constexpr extent_type extent_topbit = (extent_type) 1 << (8 * sizeof(extent_type) - 1);
     fl.l_whence = SEEK_SET;
     fl.l_start = offset & ~extent_topbit;
     fl.l_len = bytes & ~extent_topbit;
-#ifdef F_OFD_SETLK
+#if 0  // def F_OFD_SETLK
     if(-1 == fcntl(_v.fd, F_OFD_SETLK, &fl))
     {
       if(EINVAL == errno)  // OFD locks not supported on this kernel

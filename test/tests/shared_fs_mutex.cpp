@@ -384,10 +384,13 @@ void TestSharedFSMutexCorrectness(shared_memory::mutex_kind_type mutex_kind, sha
     check_child_worker(i);
 }
 
+BOOST_KERNELTEST_TEST_KERNEL(integration, afio, shared_fs_mutex_byte_ranges, exclusives, "Tests that afio::algorithm::shared_fs_mutex::byte_ranges implementation implements exclusive locking", [] { TestSharedFSMutexCorrectness(shared_memory::byte_ranges, shared_memory::exclusive); }())
+BOOST_KERNELTEST_TEST_KERNEL(integration, afio, shared_fs_mutex_byte_ranges, shared, "Tests that afio::algorithm::shared_fs_mutex::byte_ranges implementation implements shared locking", [] { TestSharedFSMutexCorrectness(shared_memory::byte_ranges, shared_memory::shared); }())
+BOOST_KERNELTEST_TEST_KERNEL(integration, afio, shared_fs_mutex_byte_ranges, both, "Tests that afio::algorithm::shared_fs_mutex::byte_ranges implementation implements a mixture of exclusive and shared locking", [] { TestSharedFSMutexCorrectness(shared_memory::byte_ranges, shared_memory::both); }())
+
 BOOST_KERNELTEST_TEST_KERNEL(integration, afio, shared_fs_mutex_memory_map, exclusives, "Tests that afio::algorithm::shared_fs_mutex::memory_map implementation implements exclusive locking", [] { TestSharedFSMutexCorrectness(shared_memory::memory_map, shared_memory::exclusive); }())
 BOOST_KERNELTEST_TEST_KERNEL(integration, afio, shared_fs_mutex_memory_map, shared, "Tests that afio::algorithm::shared_fs_mutex::memory_map implementation implements shared locking", [] { TestSharedFSMutexCorrectness(shared_memory::memory_map, shared_memory::shared); }())
 BOOST_KERNELTEST_TEST_KERNEL(integration, afio, shared_fs_mutex_memory_map, both, "Tests that afio::algorithm::shared_fs_mutex::memory_map implementation implements a mixture of exclusive and shared locking", [] { TestSharedFSMutexCorrectness(shared_memory::memory_map, shared_memory::both); }())
-
 
 /*
 
