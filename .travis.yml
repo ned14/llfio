@@ -27,35 +27,33 @@ env:
  - __="cmake tests" NAME=TravisLinuxWorker
  - __="Documentation" NAME=TravisDocumentation
  
-cache:
-  apt: true
-  directories:
-    - llvm-3.8.0
+#cache:
+#  apt: true
+#  directories:
+#    - llvm-3.8.0
     
 before_install:
- -
-    LLVM_VERSION=3.8.0;
-    if [ "${TRAVIS_OS_NAME}" = "linux" ]; then
-      if [ -z "$(ls -A llvm-$LLVM_VERSION)" ]; then
-        wget -O llvm-$LLVM_VERSION.tar.xz http://llvm.org/releases/$LLVM_VERSION/clang+llvm-$LLVM_VERSION-x86_64-linux-gnu-ubuntu-14.04.tar.xz;
-        mkdir llvm-$LLVM_VERSION;
-        xzcat llvm-$LLVM_VERSION.tar.xz | tar -xvf - --strip 1 -C llvm-$LLVM_VERSION;
-        cd llvm-$LLVM_VERSION/bin;
-        ln -s clang-3.8 clang++-3.8;
-        cd ../..;
-      fi;
-      llvm-$LLVM_VERSION/bin/llvm-config --version;
-      export LLVM_CONFIG="llvm-$LLVM_VERSION/bin/llvm-config";
-      export PATH="$PWD/llvm-$LLVM_VERSION/bin:$PATH";
-    fi
+# -
+#    LLVM_VERSION=3.8.0;
+#    if [ "${TRAVIS_OS_NAME}" = "linux" ]; then
+#      if [ -z "$(ls -A llvm-$LLVM_VERSION)" ]; then
+#        wget -O llvm-$LLVM_VERSION.tar.xz http://llvm.org/releases/$LLVM_VERSION/clang+llvm-$LLVM_VERSION-x86_64-linux-gnu-ubuntu-14.04.tar.xz;
+#        mkdir llvm-$LLVM_VERSION;
+#        xzcat llvm-$LLVM_VERSION.tar.xz | tar -xvf - --strip 1 -C llvm-$LLVM_VERSION;
+#        cd llvm-$LLVM_VERSION/bin;
+#        ln -s clang-3.8 clang++-3.8;
+#        cd ../..;
+#      fi;
+#      llvm-$LLVM_VERSION/bin/llvm-config --version;
+#      export LLVM_CONFIG="llvm-$LLVM_VERSION/bin/llvm-config";
+#      export PATH="$PWD/llvm-$LLVM_VERSION/bin:$PATH";
+#    fi
  - git checkout master
  - git submodule update --init --recursive
 
 script:
  -
    if [ "$__" = "cmake tests" ]; then
-     TARNAME=boost.afio-v2.0-source-`date +%Y%m%d%H%M`.tar.xz;
-     tar cfJ ../$TARNAME . --exclude llvm* --exclude .git;
      CXX=g++-6 ctest -S .ci.cmake -V;
    fi
  -
