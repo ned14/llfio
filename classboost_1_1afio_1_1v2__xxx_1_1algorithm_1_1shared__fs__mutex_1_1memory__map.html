@@ -391,20 +391,22 @@ template&lt;template&lt; class &gt; class Hasher = boost_lite::algorithm::hash::
 <div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;            <span class="comment">// as some OSs can get confused if you use non-mmaped writes on a region mapped for writing.</span></div>
 <div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;            BOOST_OUTCOME_TRY(temphsection, <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1section__handle.html#a09eab0e7e479b3c3a07a57567ae3e354" title="Create a memory section.">section_handle::section</a>(temph, HashIndexSize));</div>
 <div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;            BOOST_OUTCOME_TRY(temphmap, <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1map__handle.html#a6f0fc242efb1e28078aa13812335df3b">map_handle::map</a>(temphsection, HashIndexSize));</div>
-<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;            <span class="comment">// Write the path of my new hash index file and convert my lock to a shared one</span></div>
-<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;            BOOST_OUTCOME_TRYV(ret.write(0, (<span class="keyword">const</span> <span class="keywordtype">char</span> *) temppath.c_str(), temppath.native().size() * <span class="keyword">sizeof</span>(*temppath.c_str())));</div>
-<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;            BOOST_OUTCOME_TRY(hsection, <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1section__handle.html#a09eab0e7e479b3c3a07a57567ae3e354" title="Create a memory section.">section_handle::section</a>(ret, 0, section_handle::flag::read));</div>
-<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;            BOOST_OUTCOME_TRY(hmap, <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1map__handle.html#a6f0fc242efb1e28078aa13812335df3b">map_handle::map</a>(hsection, 0, 0, section_handle::flag::read));</div>
-<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;            <span class="comment">// Convert exclusive whole file lock into lock in use</span></div>
-<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;            BOOST_OUTCOME_TRY(mapinuse2, ret.lock(_mapinuseoffset, 1, <span class="keyword">false</span>));</div>
-<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;            BOOST_OUTCOME_TRY(lockinuse2, ret.lock(_lockinuseoffset, 1, <span class="keyword">false</span>));</div>
-<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;            mapinuse = std::move(mapinuse2);</div>
-<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;            lockinuse = std::move(lockinuse2);</div>
-<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;            <span class="keywordflow">return</span> memory_map(std::move(ret), std::move(temph), std::move(lockinuse.get()), std::move(mapinuse), std::move(hmap), std::move(temphmap), fallbacklock);</div>
-<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;          }</div>
-<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;        }</div>
-<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;        BOOST_OUTCOME_CATCH_ALL_EXCEPTION_TO_RESULT</div>
-<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;      }</div>
+<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;            <span class="comment">// Force page allocation now</span></div>
+<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;            memset(temphmap.address(), 0, HashIndexSize);</div>
+<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;            <span class="comment">// Write the path of my new hash index file and convert my lock to a shared one</span></div>
+<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;            BOOST_OUTCOME_TRYV(ret.write(0, (<span class="keyword">const</span> <span class="keywordtype">char</span> *) temppath.c_str(), temppath.native().size() * <span class="keyword">sizeof</span>(*temppath.c_str())));</div>
+<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;            BOOST_OUTCOME_TRY(hsection, <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1section__handle.html#a09eab0e7e479b3c3a07a57567ae3e354" title="Create a memory section.">section_handle::section</a>(ret, 0, section_handle::flag::read));</div>
+<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;            BOOST_OUTCOME_TRY(hmap, <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1map__handle.html#a6f0fc242efb1e28078aa13812335df3b">map_handle::map</a>(hsection, 0, 0, section_handle::flag::read));</div>
+<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;            <span class="comment">// Convert exclusive whole file lock into lock in use</span></div>
+<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;            BOOST_OUTCOME_TRY(mapinuse2, ret.lock(_mapinuseoffset, 1, <span class="keyword">false</span>));</div>
+<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;            BOOST_OUTCOME_TRY(lockinuse2, ret.lock(_lockinuseoffset, 1, <span class="keyword">false</span>));</div>
+<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;            mapinuse = std::move(mapinuse2);</div>
+<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;            lockinuse = std::move(lockinuse2);</div>
+<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;            <span class="keywordflow">return</span> memory_map(std::move(ret), std::move(temph), std::move(lockinuse.get()), std::move(mapinuse), std::move(hmap), std::move(temphmap), fallbacklock);</div>
+<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;          }</div>
+<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;        }</div>
+<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;        BOOST_OUTCOME_CATCH_ALL_EXCEPTION_TO_RESULT</div>
+<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;      }</div>
 </div><!-- fragment -->
 </div>
 </div>
