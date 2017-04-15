@@ -32,14 +32,15 @@ merge_junit_results_into_ctest_xml()
 if(WIN32)
   if(EXISTS prebuilt/bin/Release/afio_dl-2.0-Windows-x64-Release.dll)
     checked_execute_process("Tarring up binaries"
-      COMMAND mkdir afio
-      COMMAND xcopy doc afio\\ -s
-      COMMAND xcopy include afio\\ -s
-      COMMAND xcopy Readme.md afio\\ -s
-      COMMAND xcopy release_notes.md afio\\ -s
-      COMMAND xcopy prebuilt\\lib\\Release\\afio_sl-2.0-Windows-x64-Release.lib afio\\ -s
-      COMMAND xcopy prebuilt\\lib\\Release\\afio_dl-2.0-Windows-x64-Release.lib afio\\ -s
-      COMMAND xcopy prebuilt\\bin\\Release\\afio_dl-2.0-Windows-x64-Release.dll afio\\ -s
+      COMMAND mkdir afio\\prebuilt\\bin\\Release
+      COMMAND mkdir afio\\prebuilt\\lib\\Release
+      COMMAND xcopy doc afio\\ /s
+      COMMAND xcopy include afio\\ /s
+      COMMAND copy Readme.md afio\\ /s
+      COMMAND copy release_notes.md afio\\ /s
+      COMMAND copy prebuilt\\lib\\Release\\afio_sl-2.0-Windows-x64-Release.lib afio\\ /s
+      COMMAND copy prebuilt\\lib\\Release\\afio_dl-2.0-Windows-x64-Release.lib afio\\ /s
+      COMMAND copy prebuilt\\bin\\Release\\afio_dl-2.0-Windows-x64-Release.dll afio\\ /s
       COMMAND "${CMAKE_COMMAND}" -E tar cfz afio_v2_binaries_win64.tar.gz afio
     )
     get_filename_component(toupload afio_v2_binaries_win64.tar.gz ABSOLUTE)

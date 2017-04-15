@@ -70,7 +70,7 @@ result<handle> handle::clone() const noexcept
   BOOST_AFIO_LOG_FUNCTION_CALL(_v.h);
   result<handle> ret(handle(native_handle_type(), _caching, _flags));
   ret.value()._v.behaviour = _v.behaviour;
-  if (!DuplicateHandle(GetCurrentProcess(), _v.h, GetCurrentProcess(), &ret.value()._v.h, 0, false, DUPLICATE_SAME_ACCESS))
+  if(!DuplicateHandle(GetCurrentProcess(), _v.h, GetCurrentProcess(), &ret.value()._v.h, 0, false, DUPLICATE_SAME_ACCESS))
     return make_errored_result<handle>(GetLastError(), last190(ret.value().path().u8string()));
   return ret;
 }
@@ -243,8 +243,8 @@ void io_handle::unlock(io_handle::extent_type offset, io_handle::extent_type byt
   ol.Internal = (ULONG_PTR) -1;
   ol.OffsetHigh = (offset >> 32) & 0xffffffff;
   ol.Offset = offset & 0xffffffff;
-  DWORD bytes_high = (DWORD)((bytes >> 32) & 0xffffffff);
-  DWORD bytes_low = (DWORD)(bytes & 0xffffffff);
+  DWORD bytes_high = !bytes ? MAXDWORD : (DWORD)((bytes >> 32) & 0xffffffff);
+  DWORD bytes_low = !bytes ? MAXDWORD : (DWORD)(bytes & 0xffffffff);
   if(!UnlockFileEx(_v.h, 0, bytes_low, bytes_high, &ol))
   {
     if(ERROR_IO_PENDING != GetLastError())
