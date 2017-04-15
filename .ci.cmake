@@ -32,7 +32,8 @@ merge_junit_results_into_ctest_xml()
 if(WIN32)
   if(EXISTS prebuilt/bin/Release/afio_dl-2.0-Windows-x64-Release.dll)
     checked_execute_process("Tarring up binaries"
-      COMMAND "${CMAKE_COMMAND}" -E tar cfz afio_v2_binaries_win64.tar.gz
+      COMMAND mkdir afio
+      COMMAND "${CMAKE_COMMAND}" -E copy
       doc
       include
       Readme.md
@@ -40,19 +41,24 @@ if(WIN32)
       prebuilt/lib/Release/afio_sl-2.0-Windows-x64-Release.lib
       prebuilt/lib/Release/afio_dl-2.0-Windows-x64-Release.lib
       prebuilt/bin/Release/afio_dl-2.0-Windows-x64-Release.dll
+      afio/
+      COMMAND "${CMAKE_COMMAND}" -E tar cfz afio_v2_binaries_win64.tar.gz afio
     )
     get_filename_component(toupload afio_v2_binaries_win64.tar.gz ABSOLUTE)
   endif()
 else()
   if(EXISTS prebuilt/lib/libafio_dl-2.0-Linux-x86_64-Release.so)
     checked_execute_process("Tarring up binaries"
-    COMMAND "${CMAKE_COMMAND}" -E tar cfz afio_v2_binaries_linux64.tgz
+      COMMAND mkdir afio
+      COMMAND "${CMAKE_COMMAND}" -E copy
       doc
       include
       Readme.md
       release_notes.md
       prebuilt/lib/libafio_sl-2.0-Linux-x86_64-Release.a
       prebuilt/lib/libafio_dl-2.0-Linux-x86_64-Release.so
+      afio/
+      COMMAND "${CMAKE_COMMAND}" -E tar cfz afio_v2_binaries_linux64.tgz afio
     )
     get_filename_component(toupload afio_v2_binaries_linux64.tgz ABSOLUTE)
   endif()
