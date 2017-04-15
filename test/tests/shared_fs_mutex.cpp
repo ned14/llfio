@@ -137,7 +137,16 @@ struct child_workers
       ss2 = decltype(ss2)();
       ss2 << ss1.str() << n << ss3.str();
       std::vector<stl1z::filesystem::path::string_type> args{ss2.str()};
-      workers.push_back(child_process::child_process::launch(child_process::current_process_path(), std::move(args), child_process::current_process_env(), true).get());
+      auto newchild = child_process::child_process::launch(child_process::current_process_path(), std::move(args), child_process::current_process_env(), true);
+#if 0
+      if(!newchild)
+      {
+        fprintf(stderr, "Failed to launch new child process due to %s. Press Return to fatal exit.\n", newchild.error().message().c_str());
+        getchar();
+        abort();
+      }
+#endif
+      workers.push_back(std::move(newchild).get());
       results[n].retcode = 0;
     }
   }
@@ -201,7 +210,12 @@ struct child_workers
         if(results[n].results.back() == '\r')
           results[n].results.resize(results[n].results.size() - 1);
       }
-      results[n].retcode = child.wait().get();
+#ifdef NDEBUG 
+      stl11::chrono::steady_clock::time_point deadline = stl11::chrono::steady_clock::now() + stl11::chrono::seconds(5);
+#else
+      stl11::chrono::steady_clock::time_point deadline;
+#endif
+      results[n].retcode = child.wait_until(deadline).get();
     }
   }
 };

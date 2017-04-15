@@ -262,6 +262,13 @@ namespace algorithm
               mapinuse = std::move(mapinuse2);
               temph = std::move(_temph.get());
             }
+            // Map the files into memory, being very careful that the lock file is only ever mapped read only
+            // as some OSs can get confused if you use non-mmaped writes on a region mapped for writing.
+            BOOST_OUTCOME_TRY(hsection, section_handle::section(ret, 0, section_handle::flag::read));
+            BOOST_OUTCOME_TRY(temphsection, section_handle::section(temph, HashIndexSize));
+            BOOST_OUTCOME_TRY(hmap, map_handle::map(hsection, 0, 0, section_handle::flag::read));
+            BOOST_OUTCOME_TRY(temphmap, map_handle::map(temphsection, HashIndexSize));
+            return memory_map(std::move(ret), std::move(temph), std::move(lockinuse.get()), std::move(mapinuse), std::move(hmap), std::move(temphmap), fallbacklock);
           }
           else
           {
@@ -271,25 +278,29 @@ namespace algorithm
             temph = std::move(_temph);
             auto temppath(temph.path());
             BOOST_OUTCOME_TRYV(temph.truncate(HashIndexSize));
-#ifdef __linux__
-            // Linux appears to have a race where if you mmap for read straight after a fallocate, on read you get a SIGBUS
-            BOOST_OUTCOME_TRYV(temph.barrier());
-#endif
+            /* Linux appears to have a race where:
+                 1. This process creates a new file and fallocate's its maximum extent.
+                 2. Another process opens this file and mmaps it.
+                 3. The other process tries to read from the mmap, and gets a SIGBUS for its efforts.
+                 
+               I tried writing zeros using write after the fallocate, but it appears not to help, so
+               for Linux compatibility we will have to mmap before publishing the path of the hash index.
+            */
+            // Map the files into memory, being very careful that the lock file is only ever mapped read only
+            // as some OSs can get confused if you use non-mmaped writes on a region mapped for writing.
+            BOOST_OUTCOME_TRY(temphsection, section_handle::section(temph, HashIndexSize));
+            BOOST_OUTCOME_TRY(temphmap, map_handle::map(temphsection, HashIndexSize));
             // Write the path of my new hash index file and convert my lock to a shared one
             BOOST_OUTCOME_TRYV(ret.write(0, (const char *) temppath.c_str(), temppath.native().size() * sizeof(*temppath.c_str())));
+            BOOST_OUTCOME_TRY(hsection, section_handle::section(ret, 0, section_handle::flag::read));
+            BOOST_OUTCOME_TRY(hmap, map_handle::map(hsection, 0, 0, section_handle::flag::read));
             // Convert exclusive whole file lock into lock in use
             BOOST_OUTCOME_TRY(mapinuse2, ret.lock(_mapinuseoffset, 1, false));
             BOOST_OUTCOME_TRY(lockinuse2, ret.lock(_lockinuseoffset, 1, false));
             mapinuse = std::move(mapinuse2);
             lockinuse = std::move(lockinuse2);
+            return memory_map(std::move(ret), std::move(temph), std::move(lockinuse.get()), std::move(mapinuse), std::move(hmap), std::move(temphmap), fallbacklock);
           }
-          // Map the files into memory, being very careful that the lock file is only ever mapped read only
-          // as some OSs can get confused if you use non-mmaped writes on a region mapped for writing.
-          BOOST_OUTCOME_TRY(hsection, section_handle::section(ret, 0, section_handle::flag::read));
-          BOOST_OUTCOME_TRY(temphsection, section_handle::section(temph, HashIndexSize));
-          BOOST_OUTCOME_TRY(hmap, map_handle::map(hsection, 0, 0, section_handle::flag::read));
-          BOOST_OUTCOME_TRY(temphmap, map_handle::map(temphsection, HashIndexSize));
-          return memory_map(std::move(ret), std::move(temph), std::move(lockinuse.get()), std::move(mapinuse), std::move(hmap), std::move(temphmap), fallbacklock);
         }
         BOOST_OUTCOME_CATCH_ALL_EXCEPTION_TO_RESULT
       }
