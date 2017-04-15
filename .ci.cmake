@@ -44,20 +44,22 @@ if(WIN32)
     get_filename_component(toupload afio_v2_binaries_win64.tar.gz ABSOLUTE)
   endif()
 else()
-  if(EXISTS prebuilt/bin/Release/afio_dl-2.0-Linux-x86_64-Release.so)
+  if(EXISTS prebuilt/lib/libafio_dl-2.0-Linux-x86_64-Release.so)
     checked_execute_process("Tarring up binaries"
     COMMAND "${CMAKE_COMMAND}" -E tar cfz afio_v2_binaries_linux64.tgz
       doc
       include
       Readme.md
       release_notes.md
-      prebuilt/lib/Release/afio_sl-2.0-Linux-x86_64-Release.a
-      prebuilt/bin/Release/afio_dl-2.0-Linux-x86_64-Release.so
+      prebuilt/lib/libafio_sl-2.0-Linux-x86_64-Release.a
+      prebuilt/lib/libafio_dl-2.0-Linux-x86_64-Release.so
     )
     get_filename_component(toupload afio_v2_binaries_linux64.tgz ABSOLUTE)
   endif()
 endif()
-ctest_upload(FILES "${toupload}")
+if(EXISTS "${toupload}")
+  ctest_upload(FILES "${toupload}")
+endif()
 ctest_submit()
 if(NOT retval EQUAL 0)
   message(FATAL_ERROR "FATAL: Running tests exited with ${retval}")
