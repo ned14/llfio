@@ -73,6 +73,9 @@ DEALINGS IN THE SOFTWARE.
 
 
 #if defined(_WIN32)
+#if !defined(_UNICODE)
+#error Boost AFIO cannot target the ANSI Windows API. Please define _UNICODE to target the Unicode Windows API.
+#endif
 #if !defined(_WIN32_WINNT)
 #define _WIN32_WINNT 0x0600
 #elif _WIN32_WINNT < 0x0600
@@ -621,7 +624,7 @@ namespace detail
       U c;
       template <class... Args2>
       constexpr function_ptr_storage_impl(Args2 &&... args)
-        : c(std::forward<Args2>(args)...)
+          : c(std::forward<Args2>(args)...)
       {
       }
       virtual R operator()(Args &&... args) override final { return c(std::move(args)...); }
@@ -633,13 +636,13 @@ namespace detail
     template <class U, class V> friend inline function_ptr<U> make_function_ptr(V &&f);
     template <class U>
     explicit function_ptr(std::nullptr_t, U &&f)
-      : ptr(new function_ptr_storage_impl<typename std::decay<U>::type>(std::forward<U>(f)))
+        : ptr(new function_ptr_storage_impl<typename std::decay<U>::type>(std::forward<U>(f)))
     {
     }
     template <class R_, class U, class... Args2> friend inline function_ptr<R_> emplace_function_ptr(Args2 &&... args);
     template <class U, class... Args2>
     explicit function_ptr(emplace_t<U>, Args2 &&... args)
-      : ptr(new function_ptr_storage_impl<U>(std::forward<Args2>(args)...))
+        : ptr(new function_ptr_storage_impl<U>(std::forward<Args2>(args)...))
     {
     }
 
