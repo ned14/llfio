@@ -88,7 +88,7 @@ struct native_handle_type
   BOOSTLITE_CONSTEXPR native_handle_type(native_handle_type &&o) noexcept : behaviour(std::move(o.behaviour)), _init(std::move(o._init))
   {
     o.behaviour = disposition();
-    o._init = 0;
+    o._init = -1;
   }
   //! Copy assign
   native_handle_type &operator=(const native_handle_type &) = default;
@@ -98,7 +98,7 @@ struct native_handle_type
     behaviour = std::move(o.behaviour);
     _init = std::move(o._init);
     o.behaviour = disposition();
-    o._init = 0;
+    o._init = -1;
     return *this;
   }
   //! Swaps with another instance
