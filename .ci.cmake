@@ -34,8 +34,8 @@ if(WIN32)
     checked_execute_process("Tarring up binaries"
       COMMAND mkdir afio\\prebuilt\\bin\\Release
       COMMAND mkdir afio\\prebuilt\\lib\\Release
-      COMMAND xcopy doc afio\\ /s
-      COMMAND xcopy include afio\\ /s
+      COMMAND xcopy doc afio\\doc\\ /s
+      COMMAND xcopy include afio\\include\\ /s
       COMMAND copy Readme.md afio\\
       COMMAND copy release_notes.md afio\\
       COMMAND copy prebuilt\\lib\\Release\\afio_sl-2.0-Windows-x64-Release.lib afio\\prebuilt\\lib\\Release\\
