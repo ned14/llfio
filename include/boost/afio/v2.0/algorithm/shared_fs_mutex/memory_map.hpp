@@ -35,9 +35,9 @@ DEALINGS IN THE SOFTWARE.
 #include "../../map_handle.hpp"
 #include "base.hpp"
 
-#include "../boost-lite/include/algorithm/hash.hpp"
-#include "../boost-lite/include/algorithm/small_prng.hpp"
-#include "../boost-lite/include/spinlock.hpp"
+#include "../../hash.hpp"
+#include "../../small_prng.hpp"
+#include "../../spinlock.hpp"
 
 //! \file memory_map.hpp Provides algorithm::shared_fs_mutex::memory_map
 
