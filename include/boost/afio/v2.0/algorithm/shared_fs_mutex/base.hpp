@@ -34,7 +34,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include "../../handle.hpp"
 
-#include "../boost-lite/include/algorithm/hash.hpp"
+#include "../../hash.hpp"
 
 //! \file base.hpp Provides algorithm::shared_fs_mutex::shared_fs_mutex
 

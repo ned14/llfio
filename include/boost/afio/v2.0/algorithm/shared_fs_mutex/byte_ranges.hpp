@@ -35,7 +35,7 @@ DEALINGS IN THE SOFTWARE.
 #include "../../file_handle.hpp"
 #include "base.hpp"
 
-#include "../boost-lite/include/algorithm/small_prng.hpp"
+#include "../../small_prng.hpp"
 
 //! \file byte_ranges.hpp Provides algorithm::shared_fs_mutex::byte_ranges
 

@@ -31,7 +31,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include "../../../utils.hpp"
 
-#include "../boost-lite/include/spinlock.hpp"
+#include "../../../spinlock.hpp"
 #include "import.hpp"
 
 BOOST_AFIO_V2_NAMESPACE_BEGIN
