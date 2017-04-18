@@ -36,11 +36,11 @@ if(WIN32)
       COMMAND mkdir afio\\prebuilt\\lib\\Release
       COMMAND xcopy doc afio\\ /s
       COMMAND xcopy include afio\\ /s
-      COMMAND copy Readme.md afio\\ /s
-      COMMAND copy release_notes.md afio\\ /s
-      COMMAND copy prebuilt\\lib\\Release\\afio_sl-2.0-Windows-x64-Release.lib afio\\prebuilt\\lib\\Release\\ /s
-      COMMAND copy prebuilt\\lib\\Release\\afio_dl-2.0-Windows-x64-Release.lib afio\\prebuilt\\lib\\Release\\ /s
-      COMMAND copy prebuilt\\bin\\Release\\afio_dl-2.0-Windows-x64-Release.dll afio\\prebuilt\\bin\\Release\\ /s
+      COMMAND copy Readme.md afio\\
+      COMMAND copy release_notes.md afio\\
+      COMMAND copy prebuilt\\lib\\Release\\afio_sl-2.0-Windows-x64-Release.lib afio\\prebuilt\\lib\\Release\\
+      COMMAND copy prebuilt\\lib\\Release\\afio_dl-2.0-Windows-x64-Release.lib afio\\prebuilt\\lib\\Release\\
+      COMMAND copy prebuilt\\bin\\Release\\afio_dl-2.0-Windows-x64-Release.dll afio\\prebuilt\\bin\\Release\\
       COMMAND "${CMAKE_COMMAND}" -E tar cfz afio_v2_binaries_win64.tar.gz afio
     )
     get_filename_component(toupload afio_v2_binaries_win64.tar.gz ABSOLUTE)
