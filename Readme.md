@@ -18,7 +18,7 @@ throws, have it detect __cpp_exceptions and skip those implementations.
 which cannot return values like constructors, and convert said exceptions/TLS
 back into outcomes.
    - Make use of std::system_error(errno, system_category, "custom error message");
-- [ ] Port AFIO v2 back to POSIX
+- [x] Port AFIO v2 back to POSIX
 - [ ] Move handle caching into native_handle_type? Overlapped flag is especially needed.
 - [ ] Need to split out the path functions from io_handle into a pathed_handle
   - [ ] directory_handle extends pathed_handle
