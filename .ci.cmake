@@ -38,9 +38,9 @@ if(WIN32)
       COMMAND xcopy include afio\\ /s
       COMMAND copy Readme.md afio\\ /s
       COMMAND copy release_notes.md afio\\ /s
-      COMMAND copy prebuilt\\lib\\Release\\afio_sl-2.0-Windows-x64-Release.lib afio\\ /s
-      COMMAND copy prebuilt\\lib\\Release\\afio_dl-2.0-Windows-x64-Release.lib afio\\ /s
-      COMMAND copy prebuilt\\bin\\Release\\afio_dl-2.0-Windows-x64-Release.dll afio\\ /s
+      COMMAND copy prebuilt\\lib\\Release\\afio_sl-2.0-Windows-x64-Release.lib afio\\prebuilt\\lib\\Release\\ /s
+      COMMAND copy prebuilt\\lib\\Release\\afio_dl-2.0-Windows-x64-Release.lib afio\\prebuilt\\lib\\Release\\ /s
+      COMMAND copy prebuilt\\bin\\Release\\afio_dl-2.0-Windows-x64-Release.dll afio\\prebuilt\\bin\\Release\\ /s
       COMMAND "${CMAKE_COMMAND}" -E tar cfz afio_v2_binaries_win64.tar.gz afio
     )
     get_filename_component(toupload afio_v2_binaries_win64.tar.gz ABSOLUTE)
@@ -53,8 +53,8 @@ else()
       COMMAND cp -a include afio/
       COMMAND cp -a Readme.md afio/
       COMMAND cp -a release_notes.md afio/
-      COMMAND cp -a prebuilt/lib/libafio_sl-2.0-Linux-x86_64-Release.a afio/
-      COMMAND cp -a prebuilt/lib/libafio_dl-2.0-Linux-x86_64-Release.so afio/
+      COMMAND cp -a --parents prebuilt/lib/libafio_sl-2.0-Linux-x86_64-Release.a afio/
+      COMMAND cp -a --parents prebuilt/lib/libafio_dl-2.0-Linux-x86_64-Release.so afio/
       COMMAND "${CMAKE_COMMAND}" -E tar cfz afio_v2_binaries_linux64.tgz afio
     )
     get_filename_component(toupload afio_v2_binaries_linux64.tgz ABSOLUTE)
