@@ -383,7 +383,7 @@ template&lt;template&lt; class &gt; class Hasher = boost_lite::algorithm::hash::
 <div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;<span class="comment">                 1. This process creates a new file and fallocate&#39;s its maximum extent.</span></div>
 <div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;<span class="comment">                 2. Another process opens this file and mmaps it.</span></div>
 <div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;<span class="comment">                 3. The other process tries to read from the mmap, and gets a SIGBUS for its efforts.</span></div>
-<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;<span class="comment">                 </span></div>
+<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;<span class="comment"></span></div>
 <div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;<span class="comment">               I tried writing zeros using write after the fallocate, but it appears not to help, so</span></div>
 <div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;<span class="comment">               for Linux compatibility we will have to mmap before publishing the path of the hash index.</span></div>
 <div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;<span class="comment">            */</span></div>

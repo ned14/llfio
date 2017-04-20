@@ -1,5 +1,6 @@
 var NAVTREEINDEX4 =
 {
+"structboost_1_1afio_1_1v2__xxx_1_1statfs__t_1_1want__base.html#a35f5b2de8e92fce4b815ebce176d1993a197df5c8f76183bb218685527ec9cafc":[3,0,0,0,0,12,1,0,10],
 "structboost_1_1afio_1_1v2__xxx_1_1statfs__t_1_1want__base.html#a35f5b2de8e92fce4b815ebce176d1993a24a07030722dfce8ba19052b8f23874d":[3,0,0,0,0,12,1,0,12],
 "structboost_1_1afio_1_1v2__xxx_1_1statfs__t_1_1want__base.html#a35f5b2de8e92fce4b815ebce176d1993a4024d8ce923f0157176daa6e9796c7eb":[3,0,0,0,0,12,1,0,14],
 "structboost_1_1afio_1_1v2__xxx_1_1statfs__t_1_1want__base.html#a35f5b2de8e92fce4b815ebce176d1993a8510c4b321fbf29fc614cdcc464858ab":[3,0,0,0,0,12,1,0,4],

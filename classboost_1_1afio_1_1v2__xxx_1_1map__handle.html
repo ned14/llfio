@@ -235,8 +235,10 @@ char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cl
 <a class="el" href="namespaceboost_1_1afio_1_1v2__xxx.html#ac8d06ecaa9660e7251c1251d88c1305c">result</a>&lt; <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a811166f987d82fcd3c85c6aa0b9b4f34">buffer_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1map__handle.html#a3cb9350601a177da333304ef5930cbab">decommit</a> (<a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a811166f987d82fcd3c85c6aa0b9b4f34">buffer_type</a> region) noexcept</td></tr>
 <tr class="memdesc:a3cb9350601a177da333304ef5930cbab"><td class="mdescLeft">&#160;</td><td class="mdescRight">Ask the system to make the memory represented by the buffer unavailable and to decommit the system resources representing them. addr and length should be page aligned (see utils::page_sizes()), if not the returned buffer is the region actually decommitted. <br/></td></tr>
 <tr class="separator:a3cb9350601a177da333304ef5930cbab"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a03ca3f1cf96bae5be137227e64c1e78b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceboost_1_1afio_1_1v2__xxx.html#ac8d06ecaa9660e7251c1251d88c1305c">result</a>&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1map__handle.html#a03ca3f1cf96bae5be137227e64c1e78b">zero</a> (<a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a811166f987d82fcd3c85c6aa0b9b4f34">buffer_type</a> region) noexcept</td></tr>
-<tr class="separator:a03ca3f1cf96bae5be137227e64c1e78b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac802ae36a54193633c49244bf776ca27"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceboost_1_1afio_1_1v2__xxx.html#ac8d06ecaa9660e7251c1251d88c1305c">result</a>&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1map__handle.html#ac802ae36a54193633c49244bf776ca27">zero_memory</a> (<a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a811166f987d82fcd3c85c6aa0b9b4f34">buffer_type</a> region) noexcept</td></tr>
+<tr class="separator:ac802ae36a54193633c49244bf776ca27"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a51ef598da1ee46c8bc908fd06f15188a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceboost_1_1afio_1_1v2__xxx.html#ac8d06ecaa9660e7251c1251d88c1305c">result</a>&lt; <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a811166f987d82fcd3c85c6aa0b9b4f34">buffer_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1map__handle.html#a51ef598da1ee46c8bc908fd06f15188a">do_not_store</a> (<a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a811166f987d82fcd3c85c6aa0b9b4f34">buffer_type</a> region) noexcept</td></tr>
+<tr class="separator:a51ef598da1ee46c8bc908fd06f15188a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a25780704d766521da460d33b72cec76e"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle_1_1io__result.html">io_result</a>&lt; <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a9085d19b744d1330eafa51fffc49e104">buffers_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1map__handle.html#a25780704d766521da460d33b72cec76e">read</a> (<a class="el" href="structboost_1_1afio_1_1v2__xxx_1_1io__handle_1_1io__request.html">io_request</a>&lt; <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a9085d19b744d1330eafa51fffc49e104">buffers_type</a> &gt; reqs, <a class="el" href="structdeadline.html">deadline</a> d=<a class="el" href="structdeadline.html">deadline</a>()) noexceptoverride</td></tr>
 <tr class="memdesc:a25780704d766521da460d33b72cec76e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read data from the mapped view.  <a href="#a25780704d766521da460d33b72cec76e">More...</a><br/></td></tr>
 <tr class="separator:a25780704d766521da460d33b72cec76e"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -377,8 +379,6 @@ static <a class="el" href="namespaceboost_1_1afio_1_1v2__xxx.html#ac8d06ecaa9660
 <tr class="separator:a7b7036b13db0a4e7ac90193afd22cca9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0635f9dddc90cd38bc7cc13bef8e0661"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="namespaceboost_1_1afio_1_1v2__xxx.html#ac8d06ecaa9660e7251c1251d88c1305c">result</a>&lt; <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a811166f987d82fcd3c85c6aa0b9b4f34">buffer_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1map__handle.html#a0635f9dddc90cd38bc7cc13bef8e0661">prefetch</a> (<a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a811166f987d82fcd3c85c6aa0b9b4f34">buffer_type</a> region) noexcept</td></tr>
 <tr class="separator:a0635f9dddc90cd38bc7cc13bef8e0661"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acf2dbad9fb261c665e9f082beb7050d5"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="namespaceboost_1_1afio_1_1v2__xxx.html#ac8d06ecaa9660e7251c1251d88c1305c">result</a>&lt; <a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a811166f987d82fcd3c85c6aa0b9b4f34">buffer_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1map__handle.html#acf2dbad9fb261c665e9f082beb7050d5">do_not_store</a> (<a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a811166f987d82fcd3c85c6aa0b9b4f34">buffer_type</a> region) noexcept</td></tr>
-<tr class="separator:acf2dbad9fb261c665e9f082beb7050d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
@@ -504,7 +504,7 @@ For portability, you can only assume that barriers write order for a single hand
 
 </div>
 </div>
-<a class="anchor" id="acf2dbad9fb261c665e9f082beb7050d5"></a>
+<a class="anchor" id="a51ef598da1ee46c8bc908fd06f15188a"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -512,7 +512,7 @@ For portability, you can only assume that barriers write order for a single hand
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static <a class="el" href="namespaceboost_1_1afio_1_1v2__xxx.html#ac8d06ecaa9660e7251c1251d88c1305c">result</a>&lt;<a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a811166f987d82fcd3c85c6aa0b9b4f34">buffer_type</a>&gt; boost::afio::v2_xxx::map_handle::do_not_store </td>
+          <td class="memname"><a class="el" href="namespaceboost_1_1afio_1_1v2__xxx.html#ac8d06ecaa9660e7251c1251d88c1305c">result</a>&lt;<a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a811166f987d82fcd3c85c6aa0b9b4f34">buffer_type</a>&gt; boost::afio::v2_xxx::map_handle::do_not_store </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a811166f987d82fcd3c85c6aa0b9b4f34">buffer_type</a>&#160;</td>
           <td class="paramname"><em>region</em></td><td>)</td>
@@ -521,12 +521,13 @@ For portability, you can only assume that barriers write order for a single hand
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">noexcept</span></span>  </td>
+<span class="mlabels"><span class="mlabel">noexcept</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 <p>Ask the system to unset the dirty flag for the memory represented by the buffer. This will prevent any changes not yet sent to the backing storage from being sent in the future, also if the system kicks out this page and reloads it you may see some edition of the underlying storage instead of what was here. addr and length should be page aligned (see utils::page_sizes()), if not the returned buffer is the region actually undirtied.</p>
-<dl class="section warning"><dt>Warning</dt><dd>This function destroys the contents of unwritten pages in the region in a totally unpredictable fashion. Only use it if you don't care how much of the region reaches physical storage or not. Note that the region is not necessarily zeroed, and may be randomly zeroed. </dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>This function destroys the contents of unwritten pages in the region in a totally unpredictable fashion. Only use it if you don't care how much of the region reaches physical storage or not. Note that the region is not necessarily zeroed, and may be randomly zeroed.</dd></dl>
+<dl class="section note"><dt>Note</dt><dd>Microsoft Windows does not support unsetting the dirty flag on file backed maps, so on Windows this call does nothing. </dd></dl>
 
 </div>
 </div>
@@ -752,10 +753,10 @@ For portability, you can only assume that barriers write order for a single hand
 </table>
 </div><div class="memdoc">
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;  {</div>
-<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;    BOOST_OUTCOME_TRY(ret, <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1map__handle.html#a7b7036b13db0a4e7ac90193afd22cca9" title="Ask the system to begin to asynchronously prefetch the span of memory regions given, returning the regions actually prefetched. Note that on Windows 7 or earlier the system call to implement this was not available, and so you will see an empty span returned.">prefetch</a>(span&lt;buffer_type&gt;(&amp;region, 1)));</div>
-<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;    <span class="keywordflow">return</span> *ret.data();</div>
-<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;  }</div>
+<div class="fragment"><div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;  {</div>
+<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;    BOOST_OUTCOME_TRY(ret, <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1map__handle.html#a7b7036b13db0a4e7ac90193afd22cca9" title="Ask the system to begin to asynchronously prefetch the span of memory regions given, returning the regions actually prefetched. Note that on Windows 7 or earlier the system call to implement this was not available, and so you will see an empty span returned.">prefetch</a>(span&lt;buffer_type&gt;(&amp;region, 1)));</div>
+<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;    <span class="keywordflow">return</span> *ret.data();</div>
+<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1193,7 +1194,7 @@ For portability, you can only assume that barriers write order for a single hand
 </div><!-- fragment -->
 </div>
 </div>
-<a class="anchor" id="a03ca3f1cf96bae5be137227e64c1e78b"></a>
+<a class="anchor" id="ac802ae36a54193633c49244bf776ca27"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -1201,7 +1202,7 @@ For portability, you can only assume that barriers write order for a single hand
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="namespaceboost_1_1afio_1_1v2__xxx.html#ac8d06ecaa9660e7251c1251d88c1305c">result</a>&lt;void&gt; boost::afio::v2_xxx::map_handle::zero </td>
+          <td class="memname"><a class="el" href="namespaceboost_1_1afio_1_1v2__xxx.html#ac8d06ecaa9660e7251c1251d88c1305c">result</a>&lt;void&gt; boost::afio::v2_xxx::map_handle::zero_memory </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a811166f987d82fcd3c85c6aa0b9b4f34">buffer_type</a>&#160;</td>
           <td class="paramname"><em>region</em></td><td>)</td>
@@ -1214,7 +1215,9 @@ For portability, you can only assume that barriers write order for a single hand
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Zero the memory represented by the buffer. On Linux, Windows and FreeBSD any full 4Kb pages will be deallocated from the system entirely, including the extents for them in any backing storage. On newer Linux kernels the kernel can additionally swap whole 4Kb pages for freshly zeroed ones making this a very efficient way of zeroing large ranges of memory. </p>
+<p>Zero the memory represented by the buffer. Differs from zero() because it acts on mapped memory, but may call zero() internally.</p>
+<p>On Linux, Windows and FreeBSD any full 4Kb pages will be deallocated from the system entirely, including the extents for them in any backing storage. On newer Linux kernels the kernel can additionally swap whole 4Kb pages for freshly zeroed ones making this a very efficient way of zeroing large ranges of memory. </p>
+<dl class="section user"><dt>Errors returnable</dt><dd>Any of the errors returnable by madvise() or DiscardVirtualMemory or the zero() function. </dd></dl>
 
 </div>
 </div>

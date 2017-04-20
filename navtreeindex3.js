@@ -1,5 +1,6 @@
 var NAVTREEINDEX3 =
 {
+"functions_func_0x7a.html":[3,3,1,20],
 "functions_type.html":[3,3,3],
 "functions_vars.html":[3,3,2],
 "globals.html":[4,1,0],
@@ -55,8 +56,8 @@ var NAVTREEINDEX3 =
 "namespaceboost_1_1afio_1_1v2__xxx_1_1algorithm_1_1shared__fs__mutex.html":[3,0,0,0,0,0,0],
 "namespaceboost_1_1afio_1_1v2__xxx_1_1storage__profile.html":[3,0,0,0,0,1],
 "namespaceboost_1_1afio_1_1v2__xxx_1_1storage__profile.html":[2,0,0,0,0,1],
-"namespaceboost_1_1afio_1_1v2__xxx_1_1utils.html":[2,0,0,0,0,2],
 "namespaceboost_1_1afio_1_1v2__xxx_1_1utils.html":[3,0,0,0,0,2],
+"namespaceboost_1_1afio_1_1v2__xxx_1_1utils.html":[2,0,0,0,0,2],
 "namespacemembers.html":[2,1,0],
 "namespacemembers_enum.html":[2,1,3],
 "namespacemembers_func.html":[2,1,1],
@@ -248,6 +249,5 @@ var NAVTREEINDEX3 =
 "structboost_1_1afio_1_1v2__xxx_1_1statfs__t_1_1f__flags__t.html#ad91e7e59b79d12cb1050126b4089b798":[3,0,0,0,0,12,0,7],
 "structboost_1_1afio_1_1v2__xxx_1_1statfs__t_1_1f__flags__t.html#ae0d6b4b2140389446b90c9355b4c2086":[3,0,0,0,0,12,0,3],
 "structboost_1_1afio_1_1v2__xxx_1_1statfs__t_1_1want__base.html":[3,0,0,0,0,12,1],
-"structboost_1_1afio_1_1v2__xxx_1_1statfs__t_1_1want__base.html#a35f5b2de8e92fce4b815ebce176d1993":[3,0,0,0,0,12,1,0],
-"structboost_1_1afio_1_1v2__xxx_1_1statfs__t_1_1want__base.html#a35f5b2de8e92fce4b815ebce176d1993a197df5c8f76183bb218685527ec9cafc":[3,0,0,0,0,12,1,0,10]
+"structboost_1_1afio_1_1v2__xxx_1_1statfs__t_1_1want__base.html#a35f5b2de8e92fce4b815ebce176d1993":[3,0,0,0,0,12,1,0]
 };
