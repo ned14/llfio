@@ -142,14 +142,14 @@ namespace algorithm
           if(_.first != (char *) &_header)
             memcpy(&_header, _.first, _.second);
           if(_skip_hashing)
-            return make_result<void>();
+            return make_valued_result<void>();
           if(first)
             first = false;
           else
             stl11::this_thread::yield();
           // No timeout as this should very rarely block for any significant length of time
         } while(_header.hash != boost_lite::algorithm::hash::fast_hash::hash(((char *) &_header) + 16, sizeof(_header) - 16));
-        return make_result<void>();
+        return make_valued_result<void>();
       }
 
     public:

@@ -312,6 +312,38 @@ public:
   */
   //[[bindlib::make_free]]
   BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_type> truncate(extent_type newsize) noexcept;
+
+#if 0
+  /*! \brief Efficiently zero, and possibly deallocate, data on storage.
+
+  On most major operating systems and with recent filing systems which are "extents based", one can
+  deallocate the physical storage of a file, causing the space deallocated to appear all bits zero.
+  This call attempts to deallocate whole pages (usually 4Kb) entirely, and memset's any excess to all
+  bits zero. This call works on most Linux filing systems with a recent kernel, Microsoft Windows
+  with NTFS, and FreeBSD with ZFS. On other systems it simply calls memset().
+
+  \return The buffers zeroed, which may not be the buffers input. The size of each scatter-gather
+  buffer is updated with the number of bytes of that buffer zeroed.
+  \param reqs A scatter-gather and offset request.
+  \param d An optional deadline by which the i/o must complete, else it is cancelled.
+  Note function may return significantly after this deadline if the i/o takes long to cancel.
+  \errors Any of the values POSIX write() can return, `errc::timed_out`, `errc::operation_canceled`. `errc::not_supported` may be
+  returned if deadline i/o is not possible with this particular handle configuration (e.g.
+  writing to regular files on POSIX or writing to a non-overlapped HANDLE on Windows).
+  \mallocs The default synchronous implementation in file_handle performs no memory allocation.
+  The asynchronous implementation in async_file_handle performs one calloc and one free.
+  */
+  //[[bindlib::make_free]]
+  BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> zero(io_request<const_buffers_type> reqs, deadline d = deadline()) noexcept;
+  //! \overload
+  io_result<const_buffer_type> zero(extent_type offset, const char *data, size_type bytes, deadline d = deadline()) noexcept
+  {
+    const_buffer_type _reqs[1] = { { data, bytes } };
+    io_request<const_buffers_type> reqs(const_buffers_type(_reqs), offset);
+    BOOST_OUTCOME_TRY(v, zero(reqs, d));
+    return *v.data();
+  }
+#endif
 };
 
 BOOST_AFIO_V2_NAMESPACE_END

@@ -281,6 +281,8 @@ namespace windows_nt_kernel
 
   typedef BOOL(WINAPI *PrefetchVirtualMemory_t)(_In_ HANDLE hProcess, _In_ ULONG_PTR NumberOfEntries, _In_ PWIN32_MEMORY_RANGE_ENTRY VirtualAddresses, _In_ ULONG Flags);
 
+  typedef BOOL(WINAPI *DiscardVirtualMemory_t)(_In_ PVOID VirtualAddress, _In_ SIZE_T Size);
+
   typedef USHORT(WINAPI *RtlCaptureStackBackTrace_t)(_In_ ULONG FramesToSkip, _In_ ULONG FramesToCapture, _Out_ PVOID *BackTrace, _Out_opt_ PULONG BackTraceHash);
 
   typedef BOOL(WINAPI *SymInitialize_t)(_In_ HANDLE hProcess, _In_opt_ PCTSTR UserSearchPath, _In_ BOOL fInvadeProcess);
@@ -499,6 +501,7 @@ namespace windows_nt_kernel
   static LookupPrivilegeValue_t LookupPrivilegeValue;
   static AdjustTokenPrivileges_t AdjustTokenPrivileges;
   static PrefetchVirtualMemory_t PrefetchVirtualMemory_;
+  static DiscardVirtualMemory_t DiscardVirtualMemory_;
   static SymInitialize_t SymInitialize;
   static SymGetLineFromAddr64_t SymGetLineFromAddr64;
   static RtlCaptureStackBackTrace_t RtlCaptureStackBackTrace;
@@ -593,6 +596,8 @@ namespace windows_nt_kernel
     // Only provided on Windows 8 and above
     if(!PrefetchVirtualMemory_)
       PrefetchVirtualMemory_ = (PrefetchVirtualMemory_t) GetProcAddress(kernel32, "PrefetchVirtualMemory");
+    if(!DiscardVirtualMemory_)
+      DiscardVirtualMemory_ = (DiscardVirtualMemory_t) GetProcAddress(kernel32, "DiscardVirtualMemory");
 #ifdef BOOST_AFIO_OP_STACKBACKTRACEDEPTH
     if(dbghelp)
     {
@@ -825,12 +830,12 @@ if(d)                                                                           
     if((d).steady)                                                                                                                                                                                                                                                                                                             \
     {                                                                                                                                                                                                                                                                                                                          \
       if(stl11::chrono::steady_clock::now() >= (began_steady + stl11::chrono::nanoseconds((d).nsecs)))                                                                                                                                                                                                                         \
-        return make_errored_result<type>(stl11::errc::timed_out);                                                                                                                                                                                                                                                                           \
+        return make_errored_result<type>(stl11::errc::timed_out);                                                                                                                                                                                                                                                              \
     }                                                                                                                                                                                                                                                                                                                          \
     else                                                                                                                                                                                                                                                                                                                       \
     {                                                                                                                                                                                                                                                                                                                          \
       if(stl11::chrono::system_clock::now() >= end_utc)                                                                                                                                                                                                                                                                        \
-        return make_errored_result<type>(stl11::errc::timed_out);                                                                                                                                                                                                                                                                           \
+        return make_errored_result<type>(stl11::errc::timed_out);                                                                                                                                                                                                                                                              \
     }                                                                                                                                                                                                                                                                                                                          \
   \
 }
@@ -900,12 +905,12 @@ if(d)                                                                           
     if((d).steady)                                                                                                                                                                                                                                                                                                             \
     {                                                                                                                                                                                                                                                                                                                          \
       if(stl11::chrono::steady_clock::now() >= (began_steady + stl11::chrono::nanoseconds((d).nsecs)))                                                                                                                                                                                                                         \
-        return make_errored_result<type>(stl11::errc::timed_out);                                                                                                                                                                                                                                                                           \
+        return make_errored_result<type>(stl11::errc::timed_out);                                                                                                                                                                                                                                                              \
     }                                                                                                                                                                                                                                                                                                                          \
     else                                                                                                                                                                                                                                                                                                                       \
     {                                                                                                                                                                                                                                                                                                                          \
       if(stl11::chrono::system_clock::now() >= end_utc)                                                                                                                                                                                                                                                                        \
-        return make_errored_result<type>(stl11::errc::timed_out);                                                                                                                                                                                                                                                                           \
+        return make_errored_result<type>(stl11::errc::timed_out);                                                                                                                                                                                                                                                              \
     }                                                                                                                                                                                                                                                                                                                          \
   \
 }

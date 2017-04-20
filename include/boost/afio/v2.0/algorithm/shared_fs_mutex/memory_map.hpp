@@ -282,7 +282,7 @@ namespace algorithm
                  1. This process creates a new file and fallocate's its maximum extent.
                  2. Another process opens this file and mmaps it.
                  3. The other process tries to read from the mmap, and gets a SIGBUS for its efforts.
-                 
+
                I tried writing zeros using write after the fallocate, but it appears not to help, so
                for Linux compatibility we will have to mmap before publishing the path of the hash index.
             */
@@ -424,7 +424,7 @@ namespace algorithm
           if(!spin_not_sleep)
             std::this_thread::yield();
         }
-        // return make_result<void>();
+        // return make_valued_result<void>();
       }
 
     public:

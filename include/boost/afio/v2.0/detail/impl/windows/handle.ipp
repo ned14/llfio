@@ -62,7 +62,7 @@ result<void> handle::close() noexcept
       return make_errored_result<void>(GetLastError());
     _v = native_handle_type();
   }
-  return make_result<void>();
+  return make_valued_result<void>();
 }
 
 result<handle> handle::clone() const noexcept
@@ -89,7 +89,7 @@ result<void> handle::set_append_only(bool enable) noexcept
     // Remove append_only
     _v.behaviour &= ~native_handle_type::disposition::append_only;
   }
-  return make_result<void>();
+  return make_valued_result<void>();
 }
 
 result<void> handle::set_kernel_caching(caching caching) noexcept
@@ -111,7 +111,7 @@ result<void> handle::set_kernel_caching(caching caching) noexcept
   _v.swap(nativeh);
   if(!CloseHandle(nativeh.h))
     return make_errored_result<void>(GetLastError());
-  return make_result<void>();
+  return make_valued_result<void>();
 }
 
 

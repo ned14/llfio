@@ -310,7 +310,7 @@ result<map_handle::buffer_type> map_handle::decommit(buffer_type region) noexcep
   return region;
 }
 
-result<void> map_handle::zero(buffer_type region) noexcept
+result<void> map_handle::zero_memory(buffer_type region) noexcept
 {
   BOOST_AFIO_LOG_FUNCTION_CALL(_v.h);
   if(!region.first)
@@ -336,12 +336,29 @@ result<span<map_handle::buffer_type>> map_handle::prefetch(span<buffer_type> reg
 
 result<map_handle::buffer_type> map_handle::do_not_store(buffer_type region) noexcept
 {
+  windows_nt_kernel::init();
+  using namespace windows_nt_kernel;
   BOOST_AFIO_LOG_FUNCTION_CALL(0);
   region = utils::round_to_page_size(region);
   if(!region.first)
     return make_errored_result<map_handle::buffer_type>(stl11::errc::invalid_argument);
-  if(!VirtualAlloc(region.first, region.second, MEM_RESET, 0))
-    return make_errored_result<buffer_type>(GetLastError());
+  // Windows does not support throwing away dirty pages on file backed maps
+  if(!_section->backing())
+  {
+    // Win8's DiscardVirtualMemory is much faster if it's available
+    if(DiscardVirtualMemory_)
+    {
+      if(!DiscardVirtualMemory_(region.first, region.second))
+        return make_errored_result<buffer_type>(GetLastError());
+      return region;
+    }
+    // Else MEM_RESET will do
+    if(!VirtualAlloc(region.first, region.second, MEM_RESET, 0))
+      return make_errored_result<buffer_type>(GetLastError());
+    return region;
+  }
+  // We did nothing
+  region.second = 0;
   return region;
 }
 

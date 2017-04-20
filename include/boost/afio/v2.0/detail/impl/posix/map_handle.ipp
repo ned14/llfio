@@ -228,7 +228,7 @@ result<map_handle::buffer_type> map_handle::decommit(buffer_type region) noexcep
   return region;
 }
 
-result<void> map_handle::zero(buffer_type region) noexcept
+result<void> map_handle::zero_memory(buffer_type region) noexcept
 {
   BOOST_AFIO_LOG_FUNCTION_CALL(_v.fd);
   if(!region.first)

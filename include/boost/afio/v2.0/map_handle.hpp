@@ -126,6 +126,13 @@ public:
   //! \overload
   //[[bindlib::make_free]]
   static inline result<section_handle> section(extent_type maximum_size, file_handle &backing, flag _flag = flag::read | flag::write) noexcept { return section(backing, maximum_size, _flag); }
+  //! \overload
+  //[[bindlib::make_free]]
+  static inline result<section_handle> section(extent_type maximum_size) noexcept
+  {
+    file_handle backing;
+    return section(backing, maximum_size, flag::read | flag::write);
+  }
 
   //! Returns the memory section's flags
   flag section_flags() const noexcept { return _flag; }
@@ -279,10 +286,24 @@ public:
   //! Ask the system to make the memory represented by the buffer unavailable and to decommit the system resources representing them. addr and length should be page aligned (see utils::page_sizes()), if not the returned buffer is the region actually decommitted.
   result<buffer_type> decommit(buffer_type region) noexcept;
 
-  /*! Zero the memory represented by the buffer. On Linux, Windows and FreeBSD any full 4Kb pages will be deallocated from the system entirely, including the extents for them in any backing storage. On newer Linux kernels the kernel can additionally swap whole 4Kb pages for freshly zeroed ones making this a very
-  efficient way of zeroing large ranges of memory.
+  /*! Zero the memory represented by the buffer. Differs from zero() because it acts on mapped memory, but may call zero() internally.
+
+  On Linux, Windows and FreeBSD any full 4Kb pages will be deallocated from the
+  system entirely, including the extents for them in any backing storage. On newer Linux kernels the kernel can additionally swap whole 4Kb pages for
+  freshly zeroed ones making this a very efficient way of zeroing large ranges of memory.
+  \errors Any of the errors returnable by madvise() or DiscardVirtualMemory or the zero() function.
   */
-  result<void> zero(buffer_type region) noexcept;
+  result<void> zero_memory(buffer_type region) noexcept;
+
+  /*! Ask the system to unset the dirty flag for the memory represented by the buffer. This will prevent any changes not yet sent to the backing storage from being sent in the future, also if the system kicks out this page and reloads it you may see some edition of the underlying storage instead of what was here. addr
+  and length should be page aligned (see utils::page_sizes()), if not the returned buffer is the region actually undirtied.
+
+  \warning This function destroys the contents of unwritten pages in the region in a totally unpredictable fashion. Only use it if you don't care how much of
+  the region reaches physical storage or not. Note that the region is not necessarily zeroed, and may be randomly zeroed.
+
+  \note Microsoft Windows does not support unsetting the dirty flag on file backed maps, so on Windows this call does nothing.
+  */
+  result<buffer_type> do_not_store(buffer_type region) noexcept;
 
   //! Ask the system to begin to asynchronously prefetch the span of memory regions given, returning the regions actually prefetched. Note that on Windows 7 or earlier the system call to implement this was not available, and so you will see an empty span returned.
   static result<span<buffer_type>> prefetch(span<buffer_type> regions) noexcept;
@@ -292,14 +313,6 @@ public:
     BOOST_OUTCOME_TRY(ret, prefetch(span<buffer_type>(&region, 1)));
     return *ret.data();
   }
-
-  /*! Ask the system to unset the dirty flag for the memory represented by the buffer. This will prevent any changes not yet sent to the backing storage from being sent in the future, also if the system kicks out this page and reloads it you may see some edition of the underlying storage instead of what was here. addr
-  and length should be page aligned (see utils::page_sizes()), if not the returned buffer is the region actually undirtied.
-
-  \warning This function destroys the contents of unwritten pages in the region in a totally unpredictable fashion. Only use it if you don't care how much of
-  the region reaches physical storage or not. Note that the region is not necessarily zeroed, and may be randomly zeroed.
-  */
-  static result<buffer_type> do_not_store(buffer_type region) noexcept;
 
   /*! \brief Read data from the mapped view.
 

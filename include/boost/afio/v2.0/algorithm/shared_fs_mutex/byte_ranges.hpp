@@ -199,7 +199,7 @@ namespace algorithm
           if(!spin_not_sleep)
             std::this_thread::yield();
         }
-        // return make_result<void>();
+        // return make_valued_result<void>();
       }
 
     public:
