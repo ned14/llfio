@@ -94,7 +94,7 @@ protected:
   io_service *_service;
 
   //! Fill in _devid and _inode from the handle via fstat()
-  result<void> _fetch_inode() noexcept;
+  BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> _fetch_inode() noexcept;
 
 public:
   //! Default constructor

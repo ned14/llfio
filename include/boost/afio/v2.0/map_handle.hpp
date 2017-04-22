@@ -148,7 +148,7 @@ public:
   \errors Any of the values NtExtendSection() can return. On POSIX this is a no op.
   */
   //[[bindlib::make_free]]
-  result<extent_type> truncate(extent_type newsize) noexcept;
+  BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<extent_type> truncate(extent_type newsize) noexcept;
 };
 inline std::ostream &operator<<(std::ostream &s, const section_handle::flag &v)
 {
@@ -226,7 +226,7 @@ public:
       , _length(0)
   {
   }
-  ~map_handle();
+  BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC ~map_handle();
   //! Implicit move construction of map_handle permitted
   map_handle(map_handle &&o) noexcept : io_handle(std::move(o)), _section(o._section), _addr(o._addr), _offset(o._offset), _length(o._length)
   {
@@ -295,10 +295,10 @@ public:
   size_type length() const noexcept { return _length; }
 
   //! Ask the system to commit the system resources to make the memory represented by the buffer available with the given permissions. addr and length should be page aligned (see utils::page_sizes()), if not the returned buffer is the region actually committed.
-  result<buffer_type> commit(buffer_type region, section_handle::flag _flag = section_handle::flag::read | section_handle::flag::write) noexcept;
+  BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<buffer_type> commit(buffer_type region, section_handle::flag _flag = section_handle::flag::read | section_handle::flag::write) noexcept;
 
   //! Ask the system to make the memory represented by the buffer unavailable and to decommit the system resources representing them. addr and length should be page aligned (see utils::page_sizes()), if not the returned buffer is the region actually decommitted.
-  result<buffer_type> decommit(buffer_type region) noexcept;
+  BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<buffer_type> decommit(buffer_type region) noexcept;
 
   /*! Zero the memory represented by the buffer. Differs from zero() because it acts on mapped memory, but may call zero() internally.
 
@@ -307,7 +307,7 @@ public:
   freshly zeroed ones making this a very efficient way of zeroing large ranges of memory.
   \errors Any of the errors returnable by madvise() or DiscardVirtualMemory or the zero() function.
   */
-  result<void> zero_memory(buffer_type region) noexcept;
+  BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> zero_memory(buffer_type region) noexcept;
 
   /*! Ask the system to unset the dirty flag for the memory represented by the buffer. This will prevent any changes not yet sent to the backing storage from being sent in the future, also if the system kicks out this page and reloads it you may see some edition of the underlying storage instead of what was here. addr
   and length should be page aligned (see utils::page_sizes()), if not the returned buffer is the region actually undirtied.
@@ -317,10 +317,10 @@ public:
 
   \note Microsoft Windows does not support unsetting the dirty flag on file backed maps, so on Windows this call does nothing.
   */
-  result<buffer_type> do_not_store(buffer_type region) noexcept;
+  BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<buffer_type> do_not_store(buffer_type region) noexcept;
 
   //! Ask the system to begin to asynchronously prefetch the span of memory regions given, returning the regions actually prefetched. Note that on Windows 7 or earlier the system call to implement this was not available, and so you will see an empty span returned.
-  static result<span<buffer_type>> prefetch(span<buffer_type> regions) noexcept;
+  static BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<span<buffer_type>> prefetch(span<buffer_type> regions) noexcept;
   //! \overload
   static result<buffer_type> prefetch(buffer_type region) noexcept
   {

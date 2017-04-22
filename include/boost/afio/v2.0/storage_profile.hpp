@@ -243,9 +243,9 @@ namespace storage_profile
     const_iterator end() const noexcept { return begin() + max_size(); }
 
     //! Read the matching items in the storage profile from in as YAML
-    void read(std::istream &in, std::regex which = std::regex(".*"));
+    BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC void read(std::istream &in, std::regex which = std::regex(".*"));
     //! Write the matching items from storage profile as YAML to out with the given indentation
-    void write(std::ostream &out, std::regex which = std::regex(".*"), size_t _indent = 0, bool invert_which = false) const;
+    BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC void write(std::ostream &out, std::regex which = std::regex(".*"), size_t _indent = 0, bool invert_which = false) const;
 
     // System characteristics
     item<std::string> os_name = {"system:os:name", &system::os};                     // e.g. Microsoft Windows NT
