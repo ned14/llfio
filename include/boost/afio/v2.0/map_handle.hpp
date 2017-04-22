@@ -257,9 +257,23 @@ public:
   BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> barrier(io_request<const_buffers_type> reqs = io_request<const_buffers_type>(), bool wait_for_device = false, bool and_metadata = false, deadline d = deadline()) noexcept override;
 
 
+  /*! Create new memory and map it into view.
+  \param bytes How many bytes to create and map. Typically will be rounded to a multiple of the page size (see utils::page_sizes()).
+  \param _flag The permissions with which to map the view which are constrained by the permissions of the memory section. `flag::none` can be useful for reserving virtual address space without committing system resources, use commit() to later change availability of memory.
+
+  \note On Microsoft Windows this constructor uses the faster VirtualAlloc() which creates less versatile page backed memory. If you want anonymous memory
+  allocated from a paging file backed section instead, create a page file backed section and then a mapped view from that using
+  the other constructor. This makes available all those very useful VM tricks Windows can do with section mapped memory which
+  VirtualAlloc() memory cannot do.
+
+  \errors Any of the values POSIX mmap() or NtMapViewOfSection() can return.
+  */
+  //[[bindlib::make_free]]
+  static BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<map_handle> map(size_type bytes, section_handle::flag _flag = section_handle::flag::read | section_handle::flag::write) noexcept;
+
   /*! Create a memory mapped view of a backing storage.
   \param section A memory section handle specifying the backing storage to use.
-  \param bytes How many bytes to map (0 = the size of the memory section). Typically needs to be a multiple of the page size (see utils::page_sizes()).
+  \param bytes How many bytes to map (0 = the size of the memory section). Typically will be rounded to a multiple of the page size (see utils::page_sizes()).
   \param offset The offset into the backing storage to map from. Typically needs to be at least a multiple of the page size (see utils::page_sizes()), on Windows it needs to be a multiple of the kernel memory allocation granularity (typically 64Kb).
   \param _flag The permissions with which to map the view which are constrained by the permissions of the memory section. `flag::none` can be useful for reserving virtual address space without committing system resources, use commit() to later change availability of memory.
 

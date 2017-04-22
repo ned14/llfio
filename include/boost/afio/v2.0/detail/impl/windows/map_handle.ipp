@@ -149,9 +149,17 @@ result<void> map_handle::close() noexcept
   BOOST_AFIO_LOG_FUNCTION_CALL(_addr);
   if(_addr)
   {
-    NTSTATUS ntstat = NtUnmapViewOfSection(GetCurrentProcess(), _addr);
-    if(STATUS_SUCCESS != ntstat)
-      return make_errored_result_nt<void>(ntstat);
+    if(_section)
+    {
+      NTSTATUS ntstat = NtUnmapViewOfSection(GetCurrentProcess(), _addr);
+      if(STATUS_SUCCESS != ntstat)
+        return make_errored_result_nt<void>(ntstat);
+    }
+    else
+    {
+      if(!VirtualFree(_addr, 0, MEM_RELEASE))
+        return make_errored_result<void>(GetLastError());
+    }
   }
   // We don't want ~handle() to close our borrowed handle
   _v = native_handle_type();
@@ -179,7 +187,7 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::barrier(map_ha
     bytes += req.second;
   if(!FlushViewOfFile(addr, (SIZE_T) bytes))
     return make_errored_result<>(GetLastError());
-  if(_section->backing() && (wait_for_device || and_metadata))
+  if(_section && _section->backing() && (wait_for_device || and_metadata))
   {
     reqs.offset += _offset;
     return _section->backing()->barrier(std::move(reqs), wait_for_device, and_metadata, d);
@@ -187,6 +195,63 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::barrier(map_ha
   return io_handle::io_result<const_buffers_type>(std::move(reqs.buffers));
 }
 
+
+result<map_handle> map_handle::map(size_type bytes, section_handle::flag _flag) noexcept
+{
+  bytes = utils::round_up_to_page_size(bytes);
+  result<map_handle> ret(make_valued_result<map_handle>(map_handle(nullptr)));
+  native_handle_type &nativeh = ret.get()._v;
+  DWORD allocation = MEM_RESERVE | MEM_COMMIT, prot = 0;
+  PVOID addr = 0;
+  if((_flag & section_handle::flag::nocommit) || (_flag == section_handle::flag::none))
+  {
+    allocation = MEM_RESERVE;
+    prot = PAGE_NOACCESS;
+  }
+  else if(_flag & section_handle::flag::cow)
+  {
+    prot = PAGE_WRITECOPY;
+    nativeh.behaviour |= native_handle_type::disposition::seekable | native_handle_type::disposition::readable | native_handle_type::disposition::writable;
+  }
+  else if(_flag & section_handle::flag::write)
+  {
+    prot = PAGE_READWRITE;
+    nativeh.behaviour |= native_handle_type::disposition::seekable | native_handle_type::disposition::readable | native_handle_type::disposition::writable;
+  }
+  else if(_flag & section_handle::flag::read)
+  {
+    prot = PAGE_READONLY;
+    nativeh.behaviour |= native_handle_type::disposition::seekable | native_handle_type::disposition::readable;
+  }
+  if(!!(_flag & section_handle::flag::cow) && !!(_flag & section_handle::flag::execute))
+    prot = PAGE_EXECUTE_WRITECOPY;
+  else if(_flag & section_handle::flag::execute)
+    prot = PAGE_EXECUTE;
+  addr = VirtualAlloc(nullptr, bytes, allocation, prot);
+  if(!addr)
+    return make_errored_result<>(GetLastError());
+  ret.get()._addr = (char *) addr;
+  ret.get()._length = bytes;
+  BOOST_AFIO_LOG_FUNCTION_CALL(ret.get()._v.h);
+
+  // Windows has no way of getting the kernel to prefault maps on creation, so ...
+  if(_flag & section_handle::flag::prefault)
+  {
+    using namespace windows_nt_kernel;
+    // Start an asynchronous prefetch
+    buffer_type b((char *) addr, bytes);
+    (void) prefetch(span<buffer_type>(&b, 1));
+    // If this kernel doesn't support that API, manually poke every page in the new map
+    if(!PrefetchVirtualMemory_)
+    {
+      size_t pagesize = utils::page_size();
+      volatile char *a = (volatile char *) addr;
+      for(size_t n = 0; n < bytes; n += pagesize)
+        a[n];
+    }
+  }
+  return ret;
+}
 
 result<map_handle> map_handle::map(section_handle &section, size_type bytes, extent_type offset, section_handle::flag _flag) noexcept
 {
@@ -343,7 +408,7 @@ result<map_handle::buffer_type> map_handle::do_not_store(buffer_type region) noe
   if(!region.first)
     return make_errored_result<map_handle::buffer_type>(stl11::errc::invalid_argument);
   // Windows does not support throwing away dirty pages on file backed maps
-  if(!_section->backing())
+  if(!_section || !_section->backing())
   {
     // Win8's DiscardVirtualMemory is much faster if it's available
     if(DiscardVirtualMemory_)
