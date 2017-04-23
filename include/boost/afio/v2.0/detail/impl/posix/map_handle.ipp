@@ -125,7 +125,7 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::barrier(map_ha
 
 static inline result<void *> do_mmap(native_handle_type &nativeh, void *ataddr, section_handle *section, map_handle::size_type &bytes, map_handle::extent_type offset, section_handle::flag _flag) noexcept
 {
-  bool have_backing = section ? section->backing() : false;
+  bool have_backing = section ? (section->backing() != nullptr) : false;
   int prot = 0, flags = have_backing ? MAP_SHARED : MAP_PRIVATE | MAP_ANONYMOUS;
   void *addr = nullptr;
   if(_flag == section_handle::flag::none)
@@ -178,10 +178,10 @@ result<map_handle> map_handle::map(size_type bytes, section_handle::flag _flag) 
 {
   if(!bytes)
     return make_errored_result<>(stl11::errc::argument_out_of_domain);
-  size_type bytes = utils::round_up_to_page_size(bytes);
+  bytes = utils::round_up_to_page_size(bytes);
   result<map_handle> ret(make_valued_result<map_handle>(map_handle(nullptr)));
   native_handle_type &nativeh = ret.get()._v;
-  BOOST_OUTCOME_TRY(addr, do_mmap(nativeh, nullptr, nullptr, bytes, offset, _flag));
+  BOOST_OUTCOME_TRY(addr, do_mmap(nativeh, nullptr, nullptr, bytes, 0, _flag));
   ret.get()._addr = (char *) addr;
   ret.get()._length = bytes;
   BOOST_AFIO_LOG_FUNCTION_CALL(ret.get()._v.fd);

@@ -220,7 +220,13 @@ public:
     BOOST_AFIO_LOG_FUNCTION_CALL(_v.h);
     if(_flags & flag::unlink_on_close)
     {
-      BOOST_OUTCOME_TRYV(unlink());
+      auto ret = unlink();
+      if(!ret)
+      {
+        // File may have already been deleted, if so ignore
+        if(ret.error() != stl11::errc::no_such_file_or_directory)
+          return make_errored_result<void>(ret.error());
+      }
     }
     return io_handle::close();
   }

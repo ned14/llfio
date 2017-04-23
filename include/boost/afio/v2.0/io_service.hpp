@@ -195,8 +195,8 @@ public:
 private:
   int _blocked_interrupt_signal;
   std::atomic<bool> _need_signal;  // false = signal not needed, true = signal needed
-  void _block_interruption() noexcept;
-  void _unblock_interruption() noexcept;
+  BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC void _block_interruption() noexcept;
+  BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC void _unblock_interruption() noexcept;
 
 public:
   /*! Returns the signal used for interrupting run_until(). Only used on POSIX when
@@ -204,7 +204,7 @@ public:
 
   \note Only present if BOOST_AFIO_IO_POST_SIGNAL is defined.
   */
-  static int interruption_signal() noexcept;
+  static BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC int interruption_signal() noexcept;
   /*! Sets the signal used for interrupting run_until(), returning the former signal
   setting. Only used on POSIX when BSD kqueues are not used. Special values are
   0 for deinstall global signal handler, and -1 for install to first unused signal
