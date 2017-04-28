@@ -21,7 +21,7 @@ ParseProjectVersionFromHpp("${CMAKE_CURRENT_SOURCE_DIR}/include/boost/afio/versi
 # Sets the usual PROJECT_NAME etc
 project(afio VERSION ${VERSIONSTRING} LANGUAGES C CXX)
 # Also set a *cmake* namespace for this project
-set(PROJECT_NAMESPACE boost--)
+set(PROJECT_NAMESPACE boost::)
 # Setup this cmake environment for this project
 include(BoostLiteSetupProject)
 if(NOT PROJECT_IS_DEPENDENCY)
@@ -62,7 +62,7 @@ if(NOT MSVC OR CMAKE_VERSION VERSION_GREATER 3.59)
   )
 endif()
 # Set the library dependencies this library has
-all_link_libraries(PUBLIC boost-lite_hl outcome_hl kerneltest_hl)
+all_link_libraries(PUBLIC boost-lite::hl boost::outcome::hl boost::kerneltest::hl)
 # Set the system dependencies this library has
 if(CMAKE_SYSTEM_NAME MATCHES "Linux")
   all_link_libraries(PUBLIC stdc++fs rt)

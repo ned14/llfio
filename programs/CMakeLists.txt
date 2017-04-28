@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
 
-if(NOT DEFINED afio_hl)
+if(NOT TARGET boost::afio::hl)
   add_subdirectory(.. afio EXCLUDE_FROM_ALL)
 endif()
 
@@ -16,5 +16,5 @@ function(make_program program)
   )
 endfunction()
 
-make_program(benchmark-locking afio_hl)
-make_program(fs-probe afio_hl)
+make_program(benchmark-locking boost::afio::hl)
+make_program(fs-probe boost::afio::hl)
