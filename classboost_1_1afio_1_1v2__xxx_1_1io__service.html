@@ -288,7 +288,7 @@ template&lt;class U &gt; </div>
 </table>
 </div><div class="memdoc">
 <p>Schedule the callable to be invoked by the thread owning this object at its next available opportunity. Unlike any other function in this API layer, this function is thread safe. </p>
-<div class="fragment"><div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;{ _post(detail::make_function_ptr&lt;<span class="keywordtype">void</span>(<a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__service.html#a4522573bfdefe82786302800eb6316e6">io_service</a> *)&gt;(std::forward&lt;U&gt;(f))); }</div>
+<div class="fragment"><div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;{ _post(detail::make_function_ptr&lt;<span class="keywordtype">void</span>(<a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__service.html#a4522573bfdefe82786302800eb6316e6">io_service</a> *)&gt;(std::forward&lt;U&gt;(f))); }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -313,7 +313,7 @@ template&lt;class U &gt; </div>
 </table>
 </div><div class="memdoc">
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;{ <span class="keywordflow">return</span> <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__service.html#ae401b78f109f594d6f1c5fc2281ff8f3">run_until</a>(<a class="code" href="structdeadline.html" title="A time deadline in either relative-to-now or absolute (system clock) terms.">deadline</a>()); }</div>
+<div class="fragment"><div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;{ <span class="keywordflow">return</span> <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__service.html#ae401b78f109f594d6f1c5fc2281ff8f3">run_until</a>(<a class="code" href="structdeadline.html" title="A time deadline in either relative-to-now or absolute (system clock) terms.">deadline</a>()); }</div>
 </div><!-- fragment -->
 </div>
 </div>

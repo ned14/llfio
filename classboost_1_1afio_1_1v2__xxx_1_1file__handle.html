@@ -675,12 +675,12 @@ For portability, you can only assume that barriers write order for a single hand
 </table>
 </div><div class="memdoc">
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><a name="l00610"></a><span class="lineno">  610</span>&#160;  {</div>
-<div class="line"><a name="l00611"></a><span class="lineno">  611</span>&#160;    <span class="keywordtype">size_t</span> bytes = 0;</div>
-<div class="line"><a name="l00612"></a><span class="lineno">  612</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;i : reqs.buffers)</div>
-<div class="line"><a name="l00613"></a><span class="lineno">  613</span>&#160;      bytes += i.second;</div>
-<div class="line"><a name="l00614"></a><span class="lineno">  614</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#aebd9c90a901e6364c94d466425db6e0f" title="Tries to lock the range of bytes specified for shared or exclusive access. Be aware this passes throu...">lock</a>(reqs.offset, bytes, <span class="keyword">false</span>, std::move(d));</div>
-<div class="line"><a name="l00615"></a><span class="lineno">  615</span>&#160;  }</div>
+<div class="fragment"><div class="line"><a name="l00603"></a><span class="lineno">  603</span>&#160;  {</div>
+<div class="line"><a name="l00604"></a><span class="lineno">  604</span>&#160;    <span class="keywordtype">size_t</span> bytes = 0;</div>
+<div class="line"><a name="l00605"></a><span class="lineno">  605</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;i : reqs.buffers)</div>
+<div class="line"><a name="l00606"></a><span class="lineno">  606</span>&#160;      bytes += i.second;</div>
+<div class="line"><a name="l00607"></a><span class="lineno">  607</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#aebd9c90a901e6364c94d466425db6e0f" title="Tries to lock the range of bytes specified for shared or exclusive access. Be aware this passes throu...">lock</a>(reqs.offset, bytes, <span class="keyword">false</span>, std::move(d));</div>
+<div class="line"><a name="l00608"></a><span class="lineno">  608</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -716,12 +716,12 @@ For portability, you can only assume that barriers write order for a single hand
 </table>
 </div><div class="memdoc">
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><a name="l00618"></a><span class="lineno">  618</span>&#160;  {</div>
-<div class="line"><a name="l00619"></a><span class="lineno">  619</span>&#160;    <span class="keywordtype">size_t</span> bytes = 0;</div>
-<div class="line"><a name="l00620"></a><span class="lineno">  620</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;i : reqs.buffers)</div>
-<div class="line"><a name="l00621"></a><span class="lineno">  621</span>&#160;      bytes += i.second;</div>
-<div class="line"><a name="l00622"></a><span class="lineno">  622</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#aebd9c90a901e6364c94d466425db6e0f" title="Tries to lock the range of bytes specified for shared or exclusive access. Be aware this passes throu...">lock</a>(reqs.offset, bytes, <span class="keyword">true</span>, std::move(d));</div>
-<div class="line"><a name="l00623"></a><span class="lineno">  623</span>&#160;  }</div>
+<div class="fragment"><div class="line"><a name="l00611"></a><span class="lineno">  611</span>&#160;  {</div>
+<div class="line"><a name="l00612"></a><span class="lineno">  612</span>&#160;    <span class="keywordtype">size_t</span> bytes = 0;</div>
+<div class="line"><a name="l00613"></a><span class="lineno">  613</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;i : reqs.buffers)</div>
+<div class="line"><a name="l00614"></a><span class="lineno">  614</span>&#160;      bytes += i.second;</div>
+<div class="line"><a name="l00615"></a><span class="lineno">  615</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#aebd9c90a901e6364c94d466425db6e0f" title="Tries to lock the range of bytes specified for shared or exclusive access. Be aware this passes throu...">lock</a>(reqs.offset, bytes, <span class="keyword">true</span>, std::move(d));</div>
+<div class="line"><a name="l00616"></a><span class="lineno">  616</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -770,22 +770,22 @@ For portability, you can only assume that barriers write order for a single hand
 </div><div class="memdoc">
 <p>Create a file handle creating a randomly named file on a path. The file is opened exclusively with <code>creation::only_if_not_exist</code> so it will never collide with nor overwrite any existing file. Note also that caching defaults to temporary which hints to the OS to only flush changes to physical storage as lately as possible.</p>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX open() or CreateFile() can return. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;  {</div>
-<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;    <span class="keywordflow">try</span></div>
-<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;    {</div>
-<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;      result&lt;file_handle&gt; ret;</div>
-<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;      <span class="keywordflow">do</span></div>
-<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;      {</div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;        <span class="keyword">auto</span> randomname = <a class="code" href="namespaceboost_1_1afio_1_1v2__xxx_1_1utils.html#a051e8deb72941b3460811a1cf5f29915" title="Returns a cryptographically random string capable of being used as a filename. Essentially random_fil...">utils::random_string</a>(32);</div>
-<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;        randomname.append(<span class="stringliteral">&quot;.random&quot;</span>);</div>
-<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;        ret = <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1file__handle.html#af912595f8964b78186236a2cec1150a4">file</a>(dirpath / randomname, _mode, creation::only_if_not_exist, _caching, <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html#add27fa17cd6356b49a26a8b6dafb6a6d" title="The flags this handle was opened with.">flags</a>);</div>
-<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;        <span class="keywordflow">if</span>(!ret &amp;&amp; ret.get_error().value() != EEXIST)</div>
-<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;          <span class="keywordflow">return</span> ret;</div>
-<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;      } <span class="keywordflow">while</span>(!ret);</div>
-<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;      <span class="keywordflow">return</span> ret;</div>
-<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;    }</div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;    BOOST_OUTCOME_CATCH_ALL_EXCEPTION_TO_RESULT</div>
-<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;  }</div>
+<div class="fragment"><div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;  {</div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;    <span class="keywordflow">try</span></div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;    {</div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;      result&lt;file_handle&gt; ret;</div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;      <span class="keywordflow">do</span></div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;      {</div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;        <span class="keyword">auto</span> randomname = <a class="code" href="namespaceboost_1_1afio_1_1v2__xxx_1_1utils.html#a051e8deb72941b3460811a1cf5f29915" title="Returns a cryptographically random string capable of being used as a filename. Essentially random_fil...">utils::random_string</a>(32);</div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;        randomname.append(<span class="stringliteral">&quot;.random&quot;</span>);</div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;        ret = <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1file__handle.html#af912595f8964b78186236a2cec1150a4">file</a>(dirpath / randomname, _mode, creation::only_if_not_exist, _caching, <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html#add27fa17cd6356b49a26a8b6dafb6a6d" title="The flags this handle was opened with.">flags</a>);</div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;        <span class="keywordflow">if</span>(!ret &amp;&amp; ret.get_error().value() != EEXIST)</div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;          <span class="keywordflow">return</span> ret;</div>
+<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;      } <span class="keywordflow">while</span>(!ret);</div>
+<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;      <span class="keywordflow">return</span> ret;</div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;    }</div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;    BOOST_OUTCOME_CATCH_ALL_EXCEPTION_TO_RESULT</div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -879,12 +879,12 @@ For portability, you can only assume that barriers write order for a single hand
 </table>
 </div><div class="memdoc">
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><a name="l00439"></a><span class="lineno">  439</span>&#160;  {</div>
-<div class="line"><a name="l00440"></a><span class="lineno">  440</span>&#160;    <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a811166f987d82fcd3c85c6aa0b9b4f34" title="The scatter buffer type used by this handle.">buffer_type</a> _reqs[1] = {{data, bytes}};</div>
-<div class="line"><a name="l00441"></a><span class="lineno">  441</span>&#160;    io_request&lt;buffers_type&gt; reqs(<a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a9085d19b744d1330eafa51fffc49e104" title="The scatter buffers type used by this handle.">buffers_type</a>(_reqs), offset);</div>
-<div class="line"><a name="l00442"></a><span class="lineno">  442</span>&#160;    BOOST_OUTCOME_TRY(v, <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#ab371d8427aeb4bd0ca5f8a39a98ea5a2" title="Read data from the open handle.">read</a>(reqs, d));</div>
-<div class="line"><a name="l00443"></a><span class="lineno">  443</span>&#160;    <span class="keywordflow">return</span> *v.data();</div>
-<div class="line"><a name="l00444"></a><span class="lineno">  444</span>&#160;  }</div>
+<div class="fragment"><div class="line"><a name="l00432"></a><span class="lineno">  432</span>&#160;  {</div>
+<div class="line"><a name="l00433"></a><span class="lineno">  433</span>&#160;    <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a811166f987d82fcd3c85c6aa0b9b4f34" title="The scatter buffer type used by this handle.">buffer_type</a> _reqs[1] = {{data, bytes}};</div>
+<div class="line"><a name="l00434"></a><span class="lineno">  434</span>&#160;    io_request&lt;buffers_type&gt; reqs(<a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a9085d19b744d1330eafa51fffc49e104" title="The scatter buffers type used by this handle.">buffers_type</a>(_reqs), offset);</div>
+<div class="line"><a name="l00435"></a><span class="lineno">  435</span>&#160;    BOOST_OUTCOME_TRY(v, <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#ab371d8427aeb4bd0ca5f8a39a98ea5a2" title="Read data from the open handle.">read</a>(reqs, d));</div>
+<div class="line"><a name="l00436"></a><span class="lineno">  436</span>&#160;    <span class="keywordflow">return</span> *v.data();</div>
+<div class="line"><a name="l00437"></a><span class="lineno">  437</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1029,9 +1029,9 @@ For portability, you can only assume that barriers write order for a single hand
 <p>Create a file handle creating the named file on some path which the OS declares to be suitable for temporary files. Most OSs are very lazy about flushing changes made to these temporary files. Note the default flags are to have the newly created file deleted on first handle close. Note also that an empty name is equivalent to calling <code>random_file(fixme_temporary_files_directory())</code> and the creation parameter is ignored.</p>
 <dl class="section note"><dt>Note</dt><dd>If the temporary file you are creating is not going to have its path sent to another process for usage, this is the WRONG function to use. Use <code>temp_inode()</code> instead, it is far more secure.</dd></dl>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX open() or CreateFile() can return. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;  {</div>
-<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;    <span class="keywordflow">return</span> name.empty() ? <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1file__handle.html#a603b0827a9ae139b8f5806b1297fa5f0">random_file</a>(<a class="code" href="namespaceboost_1_1afio_1_1v2__xxx.html#ad7da7a1d3240d7574fc7c6ee5831b7ee" title="Returns a path to a directory reported by the operating system to be suitable for storing temporary f...">fixme_temporary_files_directory</a>(), _mode, _caching, <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html#add27fa17cd6356b49a26a8b6dafb6a6d" title="The flags this handle was opened with.">flags</a>) : <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1file__handle.html#af912595f8964b78186236a2cec1150a4">file</a>(<a class="code" href="namespaceboost_1_1afio_1_1v2__xxx.html#ad7da7a1d3240d7574fc7c6ee5831b7ee" title="Returns a path to a directory reported by the operating system to be suitable for storing temporary f...">fixme_temporary_files_directory</a>() / name, _mode, _creation, _caching, <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html#add27fa17cd6356b49a26a8b6dafb6a6d" title="The flags this handle was opened with.">flags</a>);</div>
-<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;  }</div>
+<div class="fragment"><div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;  {</div>
+<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;    <span class="keywordflow">return</span> name.empty() ? <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1file__handle.html#a603b0827a9ae139b8f5806b1297fa5f0">random_file</a>(<a class="code" href="namespaceboost_1_1afio_1_1v2__xxx.html#ad7da7a1d3240d7574fc7c6ee5831b7ee" title="Returns a path to a directory reported by the operating system to be suitable for storing temporary f...">fixme_temporary_files_directory</a>(), _mode, _caching, <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html#add27fa17cd6356b49a26a8b6dafb6a6d" title="The flags this handle was opened with.">flags</a>) : <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1file__handle.html#af912595f8964b78186236a2cec1150a4">file</a>(<a class="code" href="namespaceboost_1_1afio_1_1v2__xxx.html#ad7da7a1d3240d7574fc7c6ee5831b7ee" title="Returns a path to a directory reported by the operating system to be suitable for storing temporary f...">fixme_temporary_files_directory</a>() / name, _mode, _creation, _caching, <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1handle.html#add27fa17cd6356b49a26a8b6dafb6a6d" title="The flags this handle was opened with.">flags</a>);</div>
+<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1148,7 +1148,7 @@ For portability, you can only assume that barriers write order for a single hand
 </table>
 </div><div class="memdoc">
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><a name="l00607"></a><span class="lineno">  607</span>&#160;{ <span class="keywordflow">return</span> <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#aebd9c90a901e6364c94d466425db6e0f" title="Tries to lock the range of bytes specified for shared or exclusive access. Be aware this passes throu...">lock</a>(offset, bytes, exclusive, <a class="code" href="structdeadline.html" title="A time deadline in either relative-to-now or absolute (system clock) terms.">deadline</a>(stl11::chrono::seconds(0))); }</div>
+<div class="fragment"><div class="line"><a name="l00600"></a><span class="lineno">  600</span>&#160;{ <span class="keywordflow">return</span> <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#aebd9c90a901e6364c94d466425db6e0f" title="Tries to lock the range of bytes specified for shared or exclusive access. Be aware this passes throu...">lock</a>(offset, bytes, exclusive, <a class="code" href="structdeadline.html" title="A time deadline in either relative-to-now or absolute (system clock) terms.">deadline</a>(stl11::chrono::seconds(0))); }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1312,12 +1312,12 @@ For portability, you can only assume that barriers write order for a single hand
 </table>
 </div><div class="memdoc">
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><a name="l00463"></a><span class="lineno">  463</span>&#160;  {</div>
-<div class="line"><a name="l00464"></a><span class="lineno">  464</span>&#160;    <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#acbb752522c90f5e4596b8a4f07e2fa80" title="The gather buffer type used by this handle.">const_buffer_type</a> _reqs[1] = {{data, bytes}};</div>
-<div class="line"><a name="l00465"></a><span class="lineno">  465</span>&#160;    io_request&lt;const_buffers_type&gt; reqs(<a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a692ba33b1e443510a791ff43f37d73cd" title="The gather buffers type used by this handle.">const_buffers_type</a>(_reqs), offset);</div>
-<div class="line"><a name="l00466"></a><span class="lineno">  466</span>&#160;    BOOST_OUTCOME_TRY(v, <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a8890b6a6046fb562f9f0ab943b79dfb4" title="Write data to the open handle.">write</a>(reqs, d));</div>
-<div class="line"><a name="l00467"></a><span class="lineno">  467</span>&#160;    <span class="keywordflow">return</span> *v.data();</div>
-<div class="line"><a name="l00468"></a><span class="lineno">  468</span>&#160;  }</div>
+<div class="fragment"><div class="line"><a name="l00456"></a><span class="lineno">  456</span>&#160;  {</div>
+<div class="line"><a name="l00457"></a><span class="lineno">  457</span>&#160;    <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#acbb752522c90f5e4596b8a4f07e2fa80" title="The gather buffer type used by this handle.">const_buffer_type</a> _reqs[1] = {{data, bytes}};</div>
+<div class="line"><a name="l00458"></a><span class="lineno">  458</span>&#160;    io_request&lt;const_buffers_type&gt; reqs(<a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a692ba33b1e443510a791ff43f37d73cd" title="The gather buffers type used by this handle.">const_buffers_type</a>(_reqs), offset);</div>
+<div class="line"><a name="l00459"></a><span class="lineno">  459</span>&#160;    BOOST_OUTCOME_TRY(v, <a class="code" href="classboost_1_1afio_1_1v2__xxx_1_1io__handle.html#a8890b6a6046fb562f9f0ab943b79dfb4" title="Write data to the open handle.">write</a>(reqs, d));</div>
+<div class="line"><a name="l00460"></a><span class="lineno">  460</span>&#160;    <span class="keywordflow">return</span> *v.data();</div>
+<div class="line"><a name="l00461"></a><span class="lineno">  461</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
