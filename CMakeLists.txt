@@ -1,50 +1,38 @@
 cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
-# If necessary bring in the Boost lite cmake tooling
-list(FIND CMAKE_MODULE_PATH "boost-lite" boost_lite_idx)
-if(${boost_lite_idx} EQUAL -1)
-  if(EXISTS "${CMAKE_SOURCE_DIR}/../.use_boostish_siblings")
-    set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/../boost-lite/cmake")
-  elseif(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../.use_boostish_siblings")
-    set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/../boost-lite/cmake")
-  elseif(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/include/boost/afio/boost-lite/cmake")
-    set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/include/boost/afio/boost-lite/cmake")
-  else()
-    message(FATAL_ERROR "FATAL: A copy of boost-lite cannot be found. Try running 'git submodule update --init --recursive'")
-  endif()
-endif()
-include(BoostLiteRequireOutOfSourceBuild)
-include(BoostLiteUtils)
-include(BoostLitePolicies)
+include(cmake/QuickCppLibBootstrap.cmake)
+include(QuickCppLibRequireOutOfSourceBuild)
+include(QuickCppLibUtils)
+include(QuickCppLibPolicies)
 
 # Parse the version we tell cmake directly from the version header file
-ParseProjectVersionFromHpp("${CMAKE_CURRENT_SOURCE_DIR}/include/boost/afio/version.hpp" VERSIONSTRING)
+ParseProjectVersionFromHpp("${CMAKE_CURRENT_SOURCE_DIR}/include/afio/version.hpp" VERSIONSTRING)
 # Sets the usual PROJECT_NAME etc
 project(afio VERSION ${VERSIONSTRING} LANGUAGES C CXX)
 # Also set a *cmake* namespace for this project
-set(PROJECT_NAMESPACE boost::)
+set(PROJECT_NAMESPACE)
 # Setup this cmake environment for this project
-include(BoostLiteSetupProject)
+include(QuickCppLibSetupProject)
 if(NOT PROJECT_IS_DEPENDENCY)
   # This file should be updated with the last git SHA next commit
-  UpdateRevisionHppFromGit("${CMAKE_CURRENT_SOURCE_DIR}/include/boost/afio/revision.hpp")
+  UpdateRevisionHppFromGit("${CMAKE_CURRENT_SOURCE_DIR}/include/afio/revision.hpp")
 endif()
 # Find my library dependencies
-find_boostish_library(boost-lite "include/boost/afio" 1.0 REQUIRED)
-find_boostish_library(outcome    "include/boost/afio" 1.0 REQUIRED)
-find_boostish_library(kerneltest "test"               1.0 REQUIRED)
+find_quickcpplib_library(quickcpplib 1.0 REQUIRED)
+find_quickcpplib_library(outcome 2.0 REQUIRED)
+find_quickcpplib_library(kerneltest 1.0 REQUIRED)
 
 # Make the standard static and shared libraries, and if supported by this compiler, C++ modules
 # for both static and shared libraries as well. For the non-C++ module variants, makes the
 # interface headers into precompiled headers. Only builds all of them if this is the topmost
 # CMakeLists, else built only if something upstream is dependent on one of them.
-include(BoostLiteMakeLibrary)
+include(QuickCppLibMakeLibrary)
 # Make an interface only library so dependent CMakeLists can bring in this header-only library
-include(BoostLiteMakeHeaderOnlyLibrary)
+include(QuickCppLibMakeHeaderOnlyLibrary)
 
 # Create a custom doxygen generation target
-include(BoostLiteMakeDoxygen)
+include(QuickCppLibMakeDoxygen)
 # Set the standard definitions for these libraries and bring in the all_* helper functions
-include(BoostLiteApplyDefaultDefinitions)
+include(QuickCppLibApplyDefaultDefinitions)
 # Set the C++ features this library requires
 all_compile_features(PUBLIC
   # cxx_exceptions                        ## Annoyingly not supported by cmake 3.6
@@ -62,7 +50,7 @@ if(NOT MSVC OR CMAKE_VERSION VERSION_GREATER 3.59)
   )
 endif()
 # Set the library dependencies this library has
-all_link_libraries(PUBLIC boost-lite::hl boost::outcome::hl boost::kerneltest::hl)
+all_link_libraries(PUBLIC quickcpplib::hl outcome::hl kerneltest::hl)
 # Set the system dependencies this library has
 if(CMAKE_SYSTEM_NAME MATCHES "Linux")
   all_link_libraries(PUBLIC stdc++fs rt)
@@ -73,12 +61,12 @@ if(WIN32)
 endif()
 # Anyone using the static or dynamic libraries is not using the header only variant
 foreach(lib afio_sl afio_dl)
-  target_compile_definitions(${lib} INTERFACE BOOST_AFIO_HEADERS_ONLY=0) 
-  target_compile_definitions(${lib} PRIVATE BOOST_AFIO_SOURCE=1) 
+  target_compile_definitions(${lib} INTERFACE AFIO_HEADERS_ONLY=0) 
+  target_compile_definitions(${lib} PRIVATE AFIO_SOURCE=1) 
 endforeach()
 
 # For all possible configurations of this library, add each test
-include(BoostLiteMakeStandardTests)
+include(QuickCppLibMakeStandardTests)
 # For each test target, set compile options
 if(MSVC)
   foreach(test_target ${afio_TEST_TARGETS})
@@ -86,6 +74,9 @@ if(MSVC)
   endforeach()
 endif()
 
+# Cache this library's auto scanned sources for later reuse
+include(QuickCppLibCacheLibrarySources)
+
 # Make available this library for install and export
-include(BoostLiteMakeInstall)
-include(BoostLiteMakeExport)
+include(QuickCppLibMakeInstall)
+include(QuickCppLibMakeExport)
