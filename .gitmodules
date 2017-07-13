@@ -5,14 +5,7 @@
 	fetchRecurseSubmodules = true
 	ignore = none
 #	shallow = true
-[submodule "include/boost/afio/boost-lite"]
-	path = include/afio/boost-lite
-	url = https://github.com/ned14/boost-lite.git
-	branch = master
-	fetchRecurseSubmodules = true
-	ignore = untracked
-#	shallow = true
-[submodule "include/boost/afio/outcome"]
+[submodule "include/afio/outcome"]
 	path = include/afio/outcome
 	url = https://github.com/ned14/boost.outcome.git
 	branch = master
@@ -22,6 +15,13 @@
 [submodule "test/kerneltest"]
 	path = test/kerneltest
 	url = https://github.com/ned14/boost.kerneltest.git
+	branch = master
+	fetchRecurseSubmodules = true
+	ignore = untracked
+#	shallow = true
+[submodule "include/afio/quickcpplib"]
+	path = include/afio/quickcpplib
+	url = https://github.com/ned14/quickcpplib
 	branch = master
 	fetchRecurseSubmodules = true
 	ignore = untracked
