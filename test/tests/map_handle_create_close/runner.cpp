@@ -22,14 +22,14 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#include "../kerneltest/include/boost/kerneltest.hpp"
+#include "../kerneltest/include/kerneltest.hpp"
 #include "kernel_map_handle.cpp.hpp"
 
 template <class U> inline void map_handle_create_close_(U &&f)
 {
-  using namespace BOOST_KERNELTEST_V1_NAMESPACE;
-  using namespace BOOST_AFIO_V2_NAMESPACE;
-  using BOOST_AFIO_V2_NAMESPACE::file_handle;
+  using namespace KERNELTEST_V1_NAMESPACE;
+  using namespace AFIO_V2_NAMESPACE;
+  using AFIO_V2_NAMESPACE::file_handle;
 
   // Create a temporary file and put some text into it
   file_handle temph;
@@ -87,7 +87,7 @@ template <class U> inline void map_handle_create_close_(U &&f)
         if (testreturn)
           maph = std::move(testreturn.get());
         // Need to close the map and any backing file as otherwise filesystem_setup won't be able to clear up the working dir on Windows
-        auto onexit = BOOST_AFIO_V2_NAMESPACE::undoer([&]{
+        auto onexit = AFIO_V2_NAMESPACE::undoer([&]{
           maph.close();
           temph.close();
         });
@@ -152,4 +152,4 @@ template <class U> inline void map_handle_create_close_(U &&f)
   check_results_with_boost_test(permuter, results);
 }
 
-BOOST_KERNELTEST_TEST_KERNEL(unit, afio, map_handle_create_close, map_handle, "Tests that afio::map_handle's creation parameters work as expected", map_handle_create_close_(map_handle_create_close::test_kernel_map_handle))
+KERNELTEST_TEST_KERNEL(unit, afio, map_handle_create_close, map_handle, "Tests that afio::map_handle's creation parameters work as expected", map_handle_create_close_(map_handle_create_close::test_kernel_map_handle))

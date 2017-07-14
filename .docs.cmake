@@ -1,14 +1,14 @@
 # CTest script for a CI to submit to CDash a documentation generation run
 cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
 # Bring in the Boost lite cmake tooling
-list(FIND CMAKE_MODULE_PATH "boost-lite" boost_lite_idx)
-if(${boost_lite_idx} EQUAL -1)
+list(FIND CMAKE_MODULE_PATH "boost-lite" quickcpplib_idx)
+if(${quickcpplib_idx} EQUAL -1)
   if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../boost-lite/cmake")
     set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/../boost-lite/cmake")
-    set(CTEST_BOOSTLITE_SCRIPTS "${CMAKE_CURRENT_SOURCE_DIR}/../boost-lite/scripts")
+    set(CTEST_QUICKCPPLIB_SCRIPTS "${CMAKE_CURRENT_SOURCE_DIR}/../boost-lite/scripts")
   elseif(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/include/boost/afio/boost-lite/cmake")
     set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/include/boost/afio/boost-lite/cmake")
-    set(CTEST_BOOSTLITE_SCRIPTS "${CMAKE_CURRENT_SOURCE_DIR}/include/boost/afio/boost-lite/scripts")
+    set(CTEST_QUICKCPPLIB_SCRIPTS "${CMAKE_CURRENT_SOURCE_DIR}/include/boost/afio/boost-lite/scripts")
   else()
     message(FATAL_ERROR "FATAL: A copy of boost-lite cannot be found. Try running 'git submodule update --init --recursive'")
   endif()

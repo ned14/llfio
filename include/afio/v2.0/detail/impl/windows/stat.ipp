@@ -28,11 +28,11 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <winioctl.h>  // for DeviceIoControl codes
 
-BOOST_AFIO_V2_NAMESPACE_BEGIN
+AFIO_V2_NAMESPACE_BEGIN
 
-BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> stat_t::fill(const handle &h, stat_t::want wanted) noexcept
+AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> stat_t::fill(const handle &h, stat_t::want wanted) noexcept
 {
-  BOOST_AFIO_LOG_FUNCTION_CALL(h.native_handle().h);
+  AFIO_LOG_FUNCTION_CALL(h.native_handle().h);
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
   alignas(8) fixme_path::value_type buffer[32769];
@@ -129,4 +129,4 @@ BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> stat_t::fill(const handle &h
   return ret;
 }
 
-BOOST_AFIO_V2_NAMESPACE_END
+AFIO_V2_NAMESPACE_END

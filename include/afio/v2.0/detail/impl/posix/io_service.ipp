@@ -25,17 +25,17 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../../../async_file_handle.hpp"
 
 #include <pthread.h>
-#if BOOST_AFIO_USE_POSIX_AIO
+#if AFIO_USE_POSIX_AIO
 # include <aio.h>
 # include <sys/mman.h>
-# if BOOST_AFIO_COMPILE_KQUEUES
+# if AFIO_COMPILE_KQUEUES
 #  include <sys/types.h>
 #  include <sys/event.h>
 #  include <sys/time.h>
 # endif
 #endif
 
-BOOST_AFIO_V2_NAMESPACE_BEGIN
+AFIO_V2_NAMESPACE_BEGIN
 
 static int interrupt_signal;
 static struct sigaction interrupt_signal_handler_old_action;
@@ -61,7 +61,7 @@ int io_service::set_interruption_signal(int signo)
   }
   if(signo)
   {
-#if BOOST_AFIO_HAVE_REALTIME_SIGNALS
+#if AFIO_HAVE_REALTIME_SIGNALS
     if(-1==signo)
     {
       for(signo=SIGRTMIN; signo<SIGRTMAX; signo++)
@@ -121,10 +121,10 @@ void io_service::_unblock_interruption() noexcept
 io_service::io_service() : _work_queued(0)
 {
   _threadh = pthread_self();
-#if BOOST_AFIO_USE_POSIX_AIO
+#if AFIO_USE_POSIX_AIO
   _use_kqueues=true;
   _blocked_interrupt_signal=0;
-# if BOOST_AFIO_COMPILE_KQUEUES
+# if AFIO_COMPILE_KQUEUES
   _kqueueh=0;
 #  error todo
 # else
@@ -145,8 +145,8 @@ io_service::~io_service()
     while (_work_queued)
       std::this_thread::yield();
   }
-#if BOOST_AFIO_USE_POSIX_AIO
-# if BOOST_AFIO_COMPILE_KQUEUES
+#if AFIO_USE_POSIX_AIO
+# if AFIO_COMPILE_KQUEUES
   if(_kqueueh)
     ::close(_kqueueh);
 # endif
@@ -158,7 +158,7 @@ io_service::~io_service()
 #endif
 }
 
-#if BOOST_AFIO_USE_POSIX_AIO
+#if AFIO_USE_POSIX_AIO
 void io_service::disable_kqueues()
 {
   if(_use_kqueues)
@@ -188,13 +188,13 @@ result<bool> io_service::run_until(deadline d) noexcept
   if (!_work_queued)
     return false;
   if (pthread_self() != _threadh)
-    return make_errored_result<bool>(stl11::errc::operation_not_supported);
-  stl11::chrono::steady_clock::time_point began_steady;
-  stl11::chrono::system_clock::time_point end_utc;
+    return make_errored_result<bool>(std::errc::operation_not_supported);
+  std::chrono::steady_clock::time_point began_steady;
+  std::chrono::system_clock::time_point end_utc;
   if (d)
   {
     if (d.steady)
-      began_steady = stl11::chrono::steady_clock::now();
+      began_steady = std::chrono::steady_clock::now();
     else
       end_utc = d.to_time_point();
   }
@@ -205,11 +205,11 @@ result<bool> io_service::run_until(deadline d) noexcept
   {
     if (d)
     {
-      stl11::chrono::nanoseconds ns;
+      std::chrono::nanoseconds ns;
       if (d.steady)
-        ns = stl11::chrono::duration_cast<stl11::chrono::nanoseconds>((began_steady + stl11::chrono::nanoseconds(d.nsecs)) - stl11::chrono::steady_clock::now());
+        ns = std::chrono::duration_cast<std::chrono::nanoseconds>((began_steady + std::chrono::nanoseconds(d.nsecs)) - std::chrono::steady_clock::now());
       else
-        ns = stl11::chrono::duration_cast<stl11::chrono::nanoseconds>(end_utc - stl11::chrono::system_clock::now());
+        ns = std::chrono::duration_cast<std::chrono::nanoseconds>(end_utc - std::chrono::system_clock::now());
       ts=&_ts;      
       if (ns.count() <= 0)
       {
@@ -240,11 +240,11 @@ result<bool> io_service::run_until(deadline d) noexcept
         return _work_queued != 0;
       }
     }
-#if BOOST_AFIO_USE_POSIX_AIO
+#if AFIO_USE_POSIX_AIO
     int errcode=0;
     if(_use_kqueues)
     {
-#if BOOST_AFIO_COMPILE_KQUEUES
+#if AFIO_COMPILE_KQUEUES
 # error todo
 #endif
     }
@@ -297,13 +297,13 @@ result<bool> io_service::run_until(deadline d) noexcept
     {
       if (d.steady)
       {
-        if(stl11::chrono::steady_clock::now()>=(began_steady + stl11::chrono::nanoseconds(d.nsecs)))
-          return make_errored_result<bool>(stl11::errc::timed_out);
+        if(std::chrono::steady_clock::now()>=(began_steady + std::chrono::nanoseconds(d.nsecs)))
+          return make_errored_result<bool>(std::errc::timed_out);
       }
       else
       {
-        if(stl11::chrono::system_clock::now()>=end_utc)
-          return make_errored_result<bool>(stl11::errc::timed_out);
+        if(std::chrono::system_clock::now()>=end_utc)
+          return make_errored_result<bool>(std::errc::timed_out);
       }
     }
   } while(!done);
@@ -318,10 +318,10 @@ void io_service::post(detail::function_ptr<void(io_service *)> &&f)
     _posts.push_back(std::move(pi));
   }
   _work_enqueued();
-#if BOOST_AFIO_USE_POSIX_AIO
+#if AFIO_USE_POSIX_AIO
   if(_use_kqueues)
   {
-#if BOOST_AFIO_COMPILE_KQUEUES
+#if AFIO_COMPILE_KQUEUES
 # error todo
 #endif
   }
@@ -331,7 +331,7 @@ void io_service::post(detail::function_ptr<void(io_service *)> &&f)
     // of the aio_suspend(), we need to pump this until run_until() notices
     while(_need_signal)
     {
-//#  if BOOST_AFIO_HAVE_REALTIME_SIGNALS
+//#  if AFIO_HAVE_REALTIME_SIGNALS
 //    sigval val = { 0 };
 //    pthread_sigqueue(_threadh, interrupt_signal, val);
 //#else
@@ -344,4 +344,4 @@ void io_service::post(detail::function_ptr<void(io_service *)> &&f)
 #endif
 }
 
-BOOST_AFIO_V2_NAMESPACE_END
+AFIO_V2_NAMESPACE_END

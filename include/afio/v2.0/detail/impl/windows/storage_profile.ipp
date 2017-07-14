@@ -31,7 +31,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <intrin.h>  // for __cpuid
 #endif
 
-BOOST_AFIO_V2_NAMESPACE_BEGIN
+AFIO_V2_NAMESPACE_BEGIN
 
 namespace storage_profile
 {
@@ -76,7 +76,7 @@ namespace storage_profile
           return std::current_exception();
         }
       }
-      return make_valued_outcome<void>();
+      return success();
     }
 #ifdef _MSC_VER
 #pragma warning(pop)
@@ -181,7 +181,7 @@ namespace storage_profile
           return std::current_exception();
         }
       }
-      return make_valued_outcome<void>();
+      return success();
     }
     namespace windows
     {
@@ -193,7 +193,7 @@ namespace storage_profile
         GlobalMemoryStatusEx(&ms);
         sp.mem_quantity.value = (unsigned long long) ms.ullTotalPhys;
         sp.mem_in_use.value = (float) (ms.ullTotalPhys - ms.ullAvailPhys) / ms.ullTotalPhys;
-        return make_valued_outcome<void>();
+        return success();
       }
     }
   }
@@ -208,7 +208,7 @@ namespace storage_profile
         {
           alignas(8) fixme_path::value_type buffer[32769];
           // Firstly open a handle to the volume
-          BOOST_OUTCOME_TRY(volumeh, file_handle::file(mntfromname, handle::mode::none, handle::creation::open_existing, handle::caching::only_metadata));
+          OUTCOME_TRY(volumeh, file_handle::file(mntfromname, handle::mode::none, handle::creation::open_existing, handle::caching::only_metadata));
           STORAGE_PROPERTY_QUERY spq;
           memset(&spq, 0, sizeof(spq));
           spq.PropertyId = StorageAdapterProperty;
@@ -310,7 +310,7 @@ namespace storage_profile
               *e++ = '0' + ((vde->Extents[0].DiskNumber / 10) % 10);
             *e++ = '0' + (vde->Extents[0].DiskNumber % 10);
             *e = 0;
-            BOOST_OUTCOME_TRY(diskh, file_handle::file(physicaldrivename, handle::mode::none, handle::creation::open_existing, handle::caching::only_metadata));
+            OUTCOME_TRY(diskh, file_handle::file(physicaldrivename, handle::mode::none, handle::creation::open_existing, handle::caching::only_metadata));
             memset(&spq, 0, sizeof(spq));
             spq.PropertyId = StorageDeviceProperty;
             spq.QueryType = PropertyStandardQuery;
@@ -373,10 +373,10 @@ namespace storage_profile
         {
           return std::current_exception();
         }
-        return make_valued_outcome<void>();
+        return success();
       }
     }
   }
 }
 
-BOOST_AFIO_V2_NAMESPACE_END
+AFIO_V2_NAMESPACE_END

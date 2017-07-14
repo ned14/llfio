@@ -1,2 +1,2 @@
 #pragma once
-#include "../boost-lite/include/algorithm/small_prng.hpp"
+#include "../quickcpplib/include/algorithm/small_prng.hpp"

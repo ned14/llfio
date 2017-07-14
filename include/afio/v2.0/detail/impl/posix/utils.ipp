@@ -28,7 +28,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <sys/mman.h>
 
-BOOST_AFIO_V2_NAMESPACE_BEGIN
+AFIO_V2_NAMESPACE_BEGIN
 
 namespace utils
 {
@@ -41,9 +41,9 @@ namespace utils
   }
   std::vector<size_t> page_sizes(bool only_actually_available)
   {
-    static boost_lite::configurable_spinlock::spinlock<bool> lock;
+    static QUICKCPPLIB_NAMESPACE::configurable_spinlock::spinlock<bool> lock;
     static std::vector<size_t> pagesizes, pagesizes_available;
-    stl11::lock_guard<decltype(lock)> g(lock);
+    std::lock_guard<decltype(lock)> g(lock);
     if(pagesizes.empty())
     {
 #if defined(__FreeBSD__)
@@ -114,16 +114,16 @@ namespace utils
 
   void random_fill(char *buffer, size_t bytes)
   {
-    static boost_lite::configurable_spinlock::spinlock<bool> lock;
+    static QUICKCPPLIB_NAMESPACE::configurable_spinlock::spinlock<bool> lock;
     static int randomfd = -1;
     if(-1 == randomfd)
     {
-      stl11::lock_guard<decltype(lock)> g(lock);
+      std::lock_guard<decltype(lock)> g(lock);
       randomfd = ::open("/dev/urandom", O_RDONLY);
     }
     if(-1 == randomfd || ::read(randomfd, buffer, bytes) < (ssize_t) bytes)
     {
-      BOOST_AFIO_LOG_FATAL(0, "afio: Kernel crypto function failed");
+      AFIO_LOG_FATAL(0, "afio: Kernel crypto function failed");
       std::terminate();
     }
   }
@@ -162,11 +162,11 @@ namespace utils
     {
       if(munmap(p, bytes) < 0)
       {
-        BOOST_AFIO_LOG_FATAL(p, "afio: Freeing large pages failed");
+        AFIO_LOG_FATAL(p, "afio: Freeing large pages failed");
         std::terminate();
       }
     }
   }
 }
 
-BOOST_AFIO_V2_NAMESPACE_END
+AFIO_V2_NAMESPACE_END

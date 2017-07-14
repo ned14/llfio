@@ -22,8 +22,8 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#ifndef BOOST_AFIO_STORAGE_PROFILE_H
-#define BOOST_AFIO_STORAGE_PROFILE_H
+#ifndef AFIO_STORAGE_PROFILE_H
+#define AFIO_STORAGE_PROFILE_H
 
 #include "io_service.hpp"
 
@@ -36,7 +36,7 @@ Distributed under the Boost Software License, Version 1.0.
 #pragma warning(disable : 4251)  // dll interface
 #endif
 
-BOOST_AFIO_V2_NAMESPACE_EXPORT_BEGIN
+AFIO_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace storage_profile
 {
@@ -110,7 +110,7 @@ namespace storage_profile
     outcome<void> operator()(storage_profile &sp, handle_type &h) const
     {
       if(value != default_value<T>())
-        return make_valued_outcome<void>();
+        return success();
       return impl(sp, h);
     }
   };
@@ -157,11 +157,11 @@ namespace storage_profile
   namespace system
   {
     // OS name, version
-    BOOST_AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> os(storage_profile &sp, file_handle &h) noexcept;
+    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> os(storage_profile &sp, file_handle &h) noexcept;
     // CPU name, architecture, physical cores
-    BOOST_AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> cpu(storage_profile &sp, file_handle &h) noexcept;
+    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> cpu(storage_profile &sp, file_handle &h) noexcept;
     // System memory quantity, in use, max and min bandwidth
-    BOOST_AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> mem(storage_profile &sp, file_handle &h) noexcept;
+    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> mem(storage_profile &sp, file_handle &h) noexcept;
 #ifdef _WIN32
     namespace windows
     {
@@ -169,15 +169,15 @@ namespace storage_profile
     namespace posix
     {
 #endif
-      BOOST_AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> _mem(storage_profile &sp, file_handle &h) noexcept;
+      AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> _mem(storage_profile &sp, file_handle &h) noexcept;
     }
   }
   namespace storage
   {
     // Device name, size, min i/o size
-    BOOST_AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> device(storage_profile &sp, file_handle &h) noexcept;
+    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> device(storage_profile &sp, file_handle &h) noexcept;
     // FS name, config, size, in use
-    BOOST_AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> fs(storage_profile &sp, file_handle &h) noexcept;
+    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> fs(storage_profile &sp, file_handle &h) noexcept;
 #ifdef _WIN32
     namespace windows
     {
@@ -185,17 +185,17 @@ namespace storage_profile
     namespace posix
     {
 #endif
-      BOOST_AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> _device(storage_profile &sp, file_handle &h, std::string mntfromname, std::string fstypename) noexcept;
+      AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> _device(storage_profile &sp, file_handle &h, std::string mntfromname, std::string fstypename) noexcept;
     }
   }
   namespace concurrency
   {
-    BOOST_AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> atomic_rewrite_quantum(storage_profile &sp, file_handle &h) noexcept;
-    BOOST_AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> atomic_rewrite_offset_boundary(storage_profile &sp, file_handle &h) noexcept;
+    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> atomic_rewrite_quantum(storage_profile &sp, file_handle &h) noexcept;
+    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> atomic_rewrite_offset_boundary(storage_profile &sp, file_handle &h) noexcept;
   }
 
   //! A (possibly incomplet) profile of storage
-  struct BOOST_AFIO_DECL storage_profile
+  struct AFIO_DECL storage_profile
   {
     //! The size type
     using size_type = size_t;
@@ -238,9 +238,9 @@ namespace storage_profile
     const_iterator end() const noexcept { return begin() + max_size(); }
 
     //! Read the matching items in the storage profile from in as YAML
-    BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC void read(std::istream &in, std::regex which = std::regex(".*"));
+    AFIO_HEADERS_ONLY_MEMFUNC_SPEC void read(std::istream &in, std::regex which = std::regex(".*"));
     //! Write the matching items from storage profile as YAML to out with the given indentation
-    BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC void write(std::ostream &out, std::regex which = std::regex(".*"), size_t _indent = 0, bool invert_which = false) const;
+    AFIO_HEADERS_ONLY_MEMFUNC_SPEC void write(std::ostream &out, std::regex which = std::regex(".*"), size_t _indent = 0, bool invert_which = false) const;
 
     // System characteristics
     item<std::string> os_name = {"system:os:name", &system::os};                     // e.g. Microsoft Windows NT
@@ -285,12 +285,12 @@ namespace storage_profile
   };
 }
 
-BOOST_AFIO_V2_NAMESPACE_END
+AFIO_V2_NAMESPACE_END
 
-#if BOOST_AFIO_HEADERS_ONLY == 1 && !defined(DOXYGEN_SHOULD_SKIP_THIS)
-#define BOOST_AFIO_INCLUDED_BY_HEADER 1
+#if AFIO_HEADERS_ONLY == 1 && !defined(DOXYGEN_SHOULD_SKIP_THIS)
+#define AFIO_INCLUDED_BY_HEADER 1
 #include "detail/impl/storage_profile.ipp"
-#undef BOOST_AFIO_INCLUDED_BY_HEADER
+#undef AFIO_INCLUDED_BY_HEADER
 #endif
 
 #ifdef _MSC_VER

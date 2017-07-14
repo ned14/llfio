@@ -28,11 +28,11 @@ Distributed under the Boost Software License, Version 1.0.
 #include <limits.h>   // for IOV_MAX
 #include <sys/uio.h>  // for preadv etc
 #include <unistd.h>
-#if BOOST_AFIO_USE_POSIX_AIO
+#if AFIO_USE_POSIX_AIO
 #include <aio.h>
 #endif
 
-BOOST_AFIO_V2_NAMESPACE_BEGIN
+AFIO_V2_NAMESPACE_BEGIN
 
 handle::~handle()
 {
@@ -42,7 +42,7 @@ handle::~handle()
     auto ret = handle::close();
     if(ret.has_error())
     {
-      BOOST_AFIO_LOG_FATAL(_v.fd, "handle::~handle() close failed");
+      AFIO_LOG_FATAL(_v.fd, "handle::~handle() close failed");
       abort();
     }
   }
@@ -50,7 +50,7 @@ handle::~handle()
 
 result<void> handle::close() noexcept
 {
-  BOOST_AFIO_LOG_FUNCTION_CALL(_v.fd);
+  AFIO_LOG_FUNCTION_CALL(_v.fd);
   if(_v)
   {
     if(are_safety_fsyncs_issued())
@@ -67,7 +67,7 @@ result<void> handle::close() noexcept
 
 result<handle> handle::clone() const noexcept
 {
-  BOOST_AFIO_LOG_FUNCTION_CALL(_v.fd);
+  AFIO_LOG_FUNCTION_CALL(_v.fd);
   result<handle> ret(handle(native_handle_type(), _caching, _flags));
   ret.value()._v.behaviour = _v.behaviour;
   ret.value()._v.fd = ::dup(_v.fd);
@@ -78,7 +78,7 @@ result<handle> handle::clone() const noexcept
 
 result<void> handle::set_append_only(bool enable) noexcept
 {
-  BOOST_AFIO_LOG_FUNCTION_CALL(_v.fd);
+  AFIO_LOG_FUNCTION_CALL(_v.fd);
   int attribs = fcntl(_v.fd, F_GETFL);
   if(-1 == attribs)
     return make_errored_result<void>(errno, last190(path().native()));
@@ -103,7 +103,7 @@ result<void> handle::set_append_only(bool enable) noexcept
 
 result<void> handle::set_kernel_caching(caching caching) noexcept
 {
-  BOOST_AFIO_LOG_FUNCTION_CALL(_v.fd);
+  AFIO_LOG_FUNCTION_CALL(_v.fd);
   int attribs = fcntl(_v.fd, F_GETFL);
   if(-1 == attribs)
     return make_errored_result<void>(errno);
@@ -161,11 +161,11 @@ result<void> handle::set_kernel_caching(caching caching) noexcept
 
 io_handle::io_result<io_handle::buffers_type> io_handle::read(io_handle::io_request<io_handle::buffers_type> reqs, deadline d) noexcept
 {
-  BOOST_AFIO_LOG_FUNCTION_CALL(_v.fd);
+  AFIO_LOG_FUNCTION_CALL(_v.fd);
   if(d)
-    return make_errored_result<>(stl11::errc::not_supported);
+    return make_errored_result<>(std::errc::not_supported);
   if(reqs.buffers.size() > IOV_MAX)
-    return make_errored_result<>(stl11::errc::argument_list_too_long);
+    return make_errored_result<>(std::errc::argument_list_too_long);
   struct iovec *iov = (struct iovec *) alloca(reqs.buffers.size() * sizeof(struct iovec));
   for(size_t n = 0; n < reqs.buffers.size(); n++)
   {
@@ -192,11 +192,11 @@ io_handle::io_result<io_handle::buffers_type> io_handle::read(io_handle::io_requ
 
 io_handle::io_result<io_handle::const_buffers_type> io_handle::write(io_handle::io_request<io_handle::const_buffers_type> reqs, deadline d) noexcept
 {
-  BOOST_AFIO_LOG_FUNCTION_CALL(_v.fd);
+  AFIO_LOG_FUNCTION_CALL(_v.fd);
   if(d)
-    return make_errored_result<>(stl11::errc::not_supported);
+    return make_errored_result<>(std::errc::not_supported);
   if(reqs.buffers.size() > IOV_MAX)
-    return make_errored_result<>(stl11::errc::argument_list_too_long);
+    return make_errored_result<>(std::errc::argument_list_too_long);
   struct iovec *iov = (struct iovec *) alloca(reqs.buffers.size() * sizeof(struct iovec));
   for(size_t n = 0; n < reqs.buffers.size(); n++)
   {
@@ -223,9 +223,9 @@ io_handle::io_result<io_handle::const_buffers_type> io_handle::write(io_handle::
 
 result<io_handle::extent_guard> io_handle::lock(io_handle::extent_type offset, io_handle::extent_type bytes, bool exclusive, deadline d) noexcept
 {
-  BOOST_AFIO_LOG_FUNCTION_CALL(_v.fd);
+  AFIO_LOG_FUNCTION_CALL(_v.fd);
   if(d && d.nsecs > 0)
-    return make_errored_result<io_handle::extent_guard>(stl11::errc::not_supported);
+    return make_errored_result<io_handle::extent_guard>(std::errc::not_supported);
   bool failed = false;
 #if !defined(__linux__) && !defined(F_OFD_SETLK)
   if(0 == bytes)
@@ -244,11 +244,11 @@ result<io_handle::extent_guard> io_handle::lock(io_handle::extent_type offset, i
     constexpr extent_type extent_topbit = (extent_type) 1 << (8 * sizeof(extent_type) - 1);
     if(offset & extent_topbit)
     {
-      BOOST_AFIO_LOG_WARN(_v.fd, "io_handle::lock() called with offset with top bit set, masking out");
+      AFIO_LOG_WARN(_v.fd, "io_handle::lock() called with offset with top bit set, masking out");
     }
     if(bytes & extent_topbit)
     {
-      BOOST_AFIO_LOG_WARN(_v.fd, "io_handle::lock() called with bytes with top bit set, masking out");
+      AFIO_LOG_WARN(_v.fd, "io_handle::lock() called with bytes with top bit set, masking out");
     }
     fl.l_whence = SEEK_SET;
     fl.l_start = offset & ~extent_topbit;
@@ -276,7 +276,7 @@ result<io_handle::extent_guard> io_handle::lock(io_handle::extent_type offset, i
   if(failed)
   {
     if(d && !d.nsecs && (EACCES == errno || EAGAIN == errno || EWOULDBLOCK == errno))
-      return make_errored_result<void>(stl11::errc::timed_out);
+      return make_errored_result<void>(std::errc::timed_out);
     else
       return make_errored_result<void>(errno, last190(path().native()));
   }
@@ -285,7 +285,7 @@ result<io_handle::extent_guard> io_handle::lock(io_handle::extent_type offset, i
 
 void io_handle::unlock(io_handle::extent_type offset, io_handle::extent_type bytes) noexcept
 {
-  BOOST_AFIO_LOG_FUNCTION_CALL(_v.fd);
+  AFIO_LOG_FUNCTION_CALL(_v.fd);
   bool failed = false;
 #if !defined(__linux__) && !defined(F_OFD_SETLK)
   if(0 == bytes)
@@ -323,10 +323,10 @@ void io_handle::unlock(io_handle::extent_type offset, io_handle::extent_type byt
   {
     auto ret = make_errored_result<void>(errno);
     (void) ret;
-    BOOST_AFIO_LOG_FATAL(_v.fd, "io_handle::unlock() failed");
+    AFIO_LOG_FATAL(_v.fd, "io_handle::unlock() failed");
     std::terminate();
   }
 }
 
 
-BOOST_AFIO_V2_NAMESPACE_END
+AFIO_V2_NAMESPACE_END

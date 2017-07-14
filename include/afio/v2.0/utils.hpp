@@ -22,19 +22,19 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#ifndef BOOST_AFIO_UTILS_H
-#define BOOST_AFIO_UTILS_H
+#ifndef AFIO_UTILS_H
+#define AFIO_UTILS_H
 
-#ifndef BOOST_AFIO_CONFIGURED
+#ifndef AFIO_CONFIG_HPP
 #error You must include the master afio.hpp, not individual header files directly
 #endif
 #include "config.hpp"
 
-#include "../boost-lite/include/algorithm/string.hpp"
+#include "../quickcpplib/include/algorithm/string.hpp"
 
 //! \file utils.hpp Provides namespace utils
 
-BOOST_AFIO_V2_NAMESPACE_EXPORT_BEGIN
+AFIO_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace utils
 {
@@ -44,7 +44,7 @@ namespace utils
   \ingroup utils
   \complexity{Whatever the system API takes (one would hope constant time).}
   */
-  BOOST_AFIO_HEADERS_ONLY_FUNC_SPEC size_t page_size() noexcept;
+  AFIO_HEADERS_ONLY_FUNC_SPEC size_t page_size() noexcept;
 
   /*! \brief Round a value to its next lowest page size multiple
   */
@@ -81,7 +81,7 @@ namespace utils
   \complexity{Whatever the system API takes (one would hope constant time).}
   \exceptionmodel{Any error from the operating system or std::bad_alloc.}
   */
-  BOOST_AFIO_HEADERS_ONLY_FUNC_SPEC std::vector<size_t> page_sizes(bool only_actually_available = true);
+  AFIO_HEADERS_ONLY_FUNC_SPEC std::vector<size_t> page_sizes(bool only_actually_available = true);
 
   /*! \brief Returns a reasonable default size for page_allocator, typically the closest page size from
   page_sizes() to 1Mb.
@@ -117,7 +117,7 @@ namespace utils
   \complexity{Whatever the system API takes.}
   \exceptionmodel{Any error from the operating system.}
   */
-  BOOST_AFIO_HEADERS_ONLY_FUNC_SPEC void random_fill(char *buffer, size_t bytes);
+  AFIO_HEADERS_ONLY_FUNC_SPEC void random_fill(char *buffer, size_t bytes);
 
   /*! \brief Returns a cryptographically random string capable of being used as a filename. Essentially random_fill() + to_hex_string().
 
@@ -132,7 +132,7 @@ namespace utils
     size_t outlen = randomlen * 2;
     std::string ret(outlen, 0);
     random_fill(const_cast<char *>(ret.data()), randomlen);
-    boost_lite::algorithm::string::to_hex_string(const_cast<char *>(ret.data()), outlen, ret.data(), randomlen);
+    QUICKCPPLIB_NAMESPACE::algorithm::string::to_hex_string(const_cast<char *>(ret.data()), outlen, ret.data(), randomlen);
     return ret;
   }
 
@@ -168,8 +168,8 @@ namespace utils
       ret.actual_size = (bytes + ret.page_size_used - 1) & ~(ret.page_size_used - 1);
       return ret;
     }
-    BOOST_AFIO_HEADERS_ONLY_FUNC_SPEC large_page_allocation allocate_large_pages(size_t bytes);
-    BOOST_AFIO_HEADERS_ONLY_FUNC_SPEC void deallocate_large_pages(void *p, size_t bytes);
+    AFIO_HEADERS_ONLY_FUNC_SPEC large_page_allocation allocate_large_pages(size_t bytes);
+    AFIO_HEADERS_ONLY_FUNC_SPEC void deallocate_large_pages(void *p, size_t bytes);
   }
   /*! \class page_allocator
   \brief An STL allocator which allocates large TLB page memory.
@@ -255,16 +255,16 @@ namespace utils
   template <class T, class U> inline bool operator==(const page_allocator<T> &, const page_allocator<U> &) noexcept { return true; }
 }
 
-BOOST_AFIO_V2_NAMESPACE_END
+AFIO_V2_NAMESPACE_END
 
-#if BOOST_AFIO_HEADERS_ONLY == 1 && !defined(DOXYGEN_SHOULD_SKIP_THIS)
-#define BOOST_AFIO_INCLUDED_BY_HEADER 1
+#if AFIO_HEADERS_ONLY == 1 && !defined(DOXYGEN_SHOULD_SKIP_THIS)
+#define AFIO_INCLUDED_BY_HEADER 1
 #ifdef _WIN32
 #include "detail/impl/windows/utils.ipp"
 #else
 #include "detail/impl/posix/utils.ipp"
 #endif
-#undef BOOST_AFIO_INCLUDED_BY_HEADER
+#undef AFIO_INCLUDED_BY_HEADER
 #endif
 
 

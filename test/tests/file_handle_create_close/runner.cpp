@@ -22,15 +22,15 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#include "../kerneltest/include/boost/kerneltest.hpp"
+#include "../kerneltest/include/kerneltest.hpp"
 #include "kernel_async_file_handle.cpp.hpp"
 #include "kernel_file_handle.cpp.hpp"
 
 template <class U> inline void file_handle_create_close_creation(U &&f)
 {
-  using namespace BOOST_KERNELTEST_V1_NAMESPACE;
-  using file_handle = BOOST_AFIO_V2_NAMESPACE::file_handle;
-  using BOOST_OUTCOME_V1_NAMESPACE::stl11::errc;
+  using namespace KERNELTEST_V1_NAMESPACE;
+  using file_handle = AFIO_V2_NAMESPACE::file_handle;
+  using OUTCOME_V2_NAMESPACE::std::errc;
   static const result<void> success = make_valued_result<void>();
   static const result<void> no_such_file_or_directory = make_errored_result(errc::no_such_file_or_directory);
   static const result<void> file_exists = make_errored_result(errc::file_exists);
@@ -96,5 +96,5 @@ template <class U> inline void file_handle_create_close_creation(U &&f)
   check_results_with_boost_test(permuter, results);
 }
 
-BOOST_KERNELTEST_TEST_KERNEL(unit, afio, file_handle_create_close, file_handle, "Tests that afio::file_handle's creation parameter works as expected", file_handle_create_close_creation(file_handle_create_close::test_kernel_file_handle))
-BOOST_KERNELTEST_TEST_KERNEL(unit, afio, file_handle_create_close, async_file_handle, "Tests that afio::async_file_handle's creation parameter works as expected", file_handle_create_close_creation(file_handle_create_close::test_kernel_async_file_handle))
+KERNELTEST_TEST_KERNEL(unit, afio, file_handle_create_close, file_handle, "Tests that afio::file_handle's creation parameter works as expected", file_handle_create_close_creation(file_handle_create_close::test_kernel_file_handle))
+KERNELTEST_TEST_KERNEL(unit, afio, file_handle_create_close, async_file_handle, "Tests that afio::async_file_handle's creation parameter works as expected", file_handle_create_close_creation(file_handle_create_close::test_kernel_async_file_handle))

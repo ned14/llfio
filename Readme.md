@@ -1,9 +1,9 @@
 This is the beginnings of the post-peer-review AFIO
 v2 rewrite. You can view its documentation at https://ned14.github.io/boost.afio/
 
-<b>master branch test status</b> Linux: [![Build Status](https://travis-ci.org/ned14/boost.afio.svg?branch=master)](https://travis-ci.org/ned14/boost.afio) Windows: [![Build status](https://ci.appveyor.com/api/projects/status/ox59o2r276xbmef7/branch/master?svg=true)](https://ci.appveyor.com/project/ned14/boost-afio/branch/master) Coverage: Boost.KernelTest support for coveralls.io still todo <b>CMake dashboard</b>: http://my.cdash.org/index.php?project=Boost.AFIO
+<b>master branch test status</b> Linux: [![Build Status](https://travis-ci.org/ned14/boost.afio.svg?branch=master)](https://travis-ci.org/ned14/boost.afio) Windows: [![Build status](https://ci.appveyor.com/api/projects/status/ox59o2r276xbmef7/branch/master?svg=true)](https://ci.appveyor.com/project/ned14/boost-afio/branch/master) Coverage: Boost.KernelTest support for coveralls.io still todo <b>CMake dashboard</b>: http://my.cdash.org/index.php?project=AFIO
 
-Tarballs of source and prebuilt binaries for Linux x64 and Windows x64: http://my.cdash.org/index.php?project=Boost.AFIO (click on the little package icon to the right of the Build Name, obviously choose one passing all tests)
+Tarballs of source and prebuilt binaries for Linux x64 and Windows x64: http://my.cdash.org/index.php?project=AFIO (click on the little package icon to the right of the Build Name, obviously choose one passing all tests)
 
 
 ### Immediate todos in order of priority:
@@ -121,7 +121,7 @@ is named FS + device e.g.
   - results/win64 direct=1 sync=0/NTFS + WDC WD30EFRX-68EUZN0
 
 
-### Algorithms library `boost::afio::algorithm` todo:
+### Algorithms library `AFIO_V2_NAMESPACE::algorithm` todo:
 - [ ] Add an intelligent on demand memory mapper:
   - Use one-two-three level page system, so 4Kb/2Mb/?. Files under 2Mb need just
 one indirection.

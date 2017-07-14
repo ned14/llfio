@@ -22,8 +22,8 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#ifndef BOOST_AFIO_FILE_HANDLE_H
-#define BOOST_AFIO_FILE_HANDLE_H
+#ifndef AFIO_FILE_HANDLE_H
+#define AFIO_FILE_HANDLE_H
 
 #include "handle.hpp"
 #include "utils.hpp"
@@ -35,7 +35,7 @@ Distributed under the Boost Software License, Version 1.0.
 #pragma warning(disable : 4251)  // dll interface
 #endif
 
-BOOST_AFIO_V2_NAMESPACE_EXPORT_BEGIN
+AFIO_V2_NAMESPACE_EXPORT_BEGIN
 
 /*! \brief Returns a path to a directory reported by the operating system to be
 suitable for storing temporary files. As operating systems are known to sometimes
@@ -51,7 +51,7 @@ visible error message.
 \todo This function needs to become a static member function of `afio::path` once
 that is written, hence the 'fixme' in its title.
 */
-BOOST_AFIO_HEADERS_ONLY_FUNC_SPEC const fixme_path &fixme_temporary_files_directory() noexcept;
+AFIO_HEADERS_ONLY_FUNC_SPEC const fixme_path &fixme_temporary_files_directory() noexcept;
 
 class io_service;
 
@@ -60,7 +60,7 @@ class io_service;
 async_file_handle.
 \todo file_handle needs to be split into a pathed_handle for the file and directory common parts
 */
-class BOOST_AFIO_DECL file_handle : public io_handle
+class AFIO_DECL file_handle : public io_handle
 {
 public:
   using dev_t = uint64_t;
@@ -87,7 +87,7 @@ protected:
   io_service *_service;
 
   //! Fill in _devid and _inode from the handle via fstat()
-  BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> _fetch_inode() noexcept;
+  AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> _fetch_inode() noexcept;
 
 public:
   //! Default constructor
@@ -136,7 +136,7 @@ public:
   \errors Any of the values POSIX open() or CreateFile() can return.
   */
   //[[bindlib::make_free]]
-  static BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<file_handle> file(path_type _path, mode _mode = mode::read, creation _creation = creation::open_existing, caching _caching = caching::all, flag flags = flag::none) noexcept;
+  static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<file_handle> file(path_type _path, mode _mode = mode::read, creation _creation = creation::open_existing, caching _caching = caching::all, flag flags = flag::none) noexcept;
   /*! Create a file handle creating a randomly named file on a path.
   The file is opened exclusively with `creation::only_if_not_exist` so it
   will never collide with nor overwrite any existing file. Note also
@@ -150,18 +150,19 @@ public:
   {
     try
     {
-      result<file_handle> ret;
-      do
+      for(;;)
       {
         auto randomname = utils::random_string(32);
         randomname.append(".random");
-        ret = file(dirpath / randomname, _mode, creation::only_if_not_exist, _caching, flags);
-        if(!ret && ret.get_error().value() != EEXIST)
+        result<file_handle> ret = file(dirpath / randomname, _mode, creation::only_if_not_exist, _caching, flags);
+        if(ret || (!ret && ret.error().value() != EEXIST))
           return ret;
-      } while(!ret);
-      return ret;
+      }
     }
-    BOOST_OUTCOME_CATCH_ALL_EXCEPTION_TO_RESULT
+    catch(...)
+    {
+      return error_from_exception();
+    }
   }
   /*! Create a file handle creating the named file on some path which
   the OS declares to be suitable for temporary files. Most OSs are
@@ -194,42 +195,42 @@ public:
   \errors Any of the values POSIX open() or CreateFile() can return.
   */
   //[[bindlib::make_free]]
-  static BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<file_handle> temp_inode(path_type dirpath = fixme_temporary_files_directory(), mode _mode = mode::write, flag flags = flag::none) noexcept;
+  static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<file_handle> temp_inode(path_type dirpath = fixme_temporary_files_directory(), mode _mode = mode::write, flag flags = flag::none) noexcept;
 
   //! Unless `flag::disable_safety_unlinks` is set, the device id of the file when opened
   dev_t st_dev() const noexcept { return _devid; }
   //! Unless `flag::disable_safety_unlinks` is set, the inode of the file when opened. When combined with st_dev(), forms a unique identifer on this system
   ino_t st_ino() const noexcept { return _inode; }
-  BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC unique_id_type unique_id() const noexcept override
+  AFIO_HEADERS_ONLY_VIRTUAL_SPEC unique_id_type unique_id() const noexcept override
   {
     unique_id_type ret(nullptr);
     ret.as_longlongs[0] = _devid;
     ret.as_longlongs[1] = _inode;
     return ret;
   }
-  BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC path_type path() const noexcept override { return _path; }
-  BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> close() noexcept override
+  AFIO_HEADERS_ONLY_VIRTUAL_SPEC path_type path() const noexcept override { return _path; }
+  AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> close() noexcept override
   {
-    BOOST_AFIO_LOG_FUNCTION_CALL(_v.h);
+    AFIO_LOG_FUNCTION_CALL(_v.h);
     if(_flags & flag::unlink_on_close)
     {
       auto ret = unlink();
       if(!ret)
       {
         // File may have already been deleted, if so ignore
-        if(ret.error() != stl11::errc::no_such_file_or_directory)
-          return make_errored_result<void>(ret.error());
+        if(ret.error() != std::errc::no_such_file_or_directory)
+          return ret.error();
       }
     }
     return io_handle::close();
   }
-  BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> barrier(io_request<const_buffers_type> reqs = io_request<const_buffers_type>(), bool wait_for_device = false, bool and_metadata = false, deadline d = deadline()) noexcept override;
+  AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> barrier(io_request<const_buffers_type> reqs = io_request<const_buffers_type>(), bool wait_for_device = false, bool and_metadata = false, deadline d = deadline()) noexcept override;
 
   /*! Clone this handle (copy constructor is disabled to avoid accidental copying)
 
   \errors Any of the values POSIX dup() or DuplicateHandle() can return.
   */
-  BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<file_handle> clone() const noexcept;
+  AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<file_handle> clone() const noexcept;
 
 #if 0
   /*! Returns the current path of the open handle as said by the operating system. Note
@@ -257,7 +258,7 @@ public:
   `current_path()`, if successful updating the cached copy with the newly retrieved path.
   You should read the documentation for `current_path()` for list of the many caveats.
   */
-  BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC path_type path(bool refresh = false) noexcept;
+  AFIO_HEADERS_ONLY_VIRTUAL_SPEC path_type path(bool refresh = false) noexcept;
 #endif
 
   /*! Atomically relinks the current path of this open handle to the new path specified,
@@ -275,7 +276,7 @@ public:
   \param newpath The optionally partial new path to relink to. The current path is used as a base
   for any relative paths specified.
   */
-  BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<path_type> relink(path_type newpath) noexcept;
+  AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<path_type> relink(path_type newpath) noexcept;
 
   /*! Unlinks the current path of this open handle, causing its entry to immediately disappear from the filing system.
   On Windows unless `flag::win_disable_unlink_emulation` is set, this behaviour is
@@ -289,7 +290,7 @@ public:
   before unlinking that the item about to be unlinked has the same inode as the open file handle.
   This should prevent most unmalicious accidental loss of data.
   */
-  BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> unlink() noexcept;
+  AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> unlink() noexcept;
 
   //! The i/o service this handle is attached to, if any
   io_service *service() const noexcept { return _service; }
@@ -299,7 +300,7 @@ public:
   \errors Any of the values POSIX fstat() or GetFileInformationByHandleEx() can return.
   */
   //[[bindlib::make_free]]
-  BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_type> length() const noexcept;
+  AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_type> length() const noexcept;
 
   /*! Resize the current maximum permitted extent of the file to the given extent, avoiding any
   new allocation of physical storage where supported. Note that on extents based filing systems
@@ -310,7 +311,7 @@ public:
   \errors Any of the values POSIX ftruncate() or SetFileInformationByHandle() can return.
   */
   //[[bindlib::make_free]]
-  BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_type> truncate(extent_type newsize) noexcept;
+  AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_type> truncate(extent_type newsize) noexcept;
 
 #if 0
   /*! \brief Efficiently zero, and possibly deallocate, data on storage.
@@ -333,28 +334,28 @@ public:
   The asynchronous implementation in async_file_handle performs one calloc and one free.
   */
   //[[bindlib::make_free]]
-  BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> zero(io_request<const_buffers_type> reqs, deadline d = deadline()) noexcept;
+  AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> zero(io_request<const_buffers_type> reqs, deadline d = deadline()) noexcept;
   //! \overload
   io_result<const_buffer_type> zero(extent_type offset, const char *data, size_type bytes, deadline d = deadline()) noexcept
   {
     const_buffer_type _reqs[1] = { { data, bytes } };
     io_request<const_buffers_type> reqs(const_buffers_type(_reqs), offset);
-    BOOST_OUTCOME_TRY(v, zero(reqs, d));
+    OUTCOME_TRY(v, zero(reqs, d));
     return *v.data();
   }
 #endif
 };
 
-BOOST_AFIO_V2_NAMESPACE_END
+AFIO_V2_NAMESPACE_END
 
-#if BOOST_AFIO_HEADERS_ONLY == 1 && !defined(DOXYGEN_SHOULD_SKIP_THIS)
-#define BOOST_AFIO_INCLUDED_BY_HEADER 1
+#if AFIO_HEADERS_ONLY == 1 && !defined(DOXYGEN_SHOULD_SKIP_THIS)
+#define AFIO_INCLUDED_BY_HEADER 1
 #ifdef _WIN32
 #include "detail/impl/windows/file_handle.ipp"
 #else
 #include "detail/impl/posix/file_handle.ipp"
 #endif
-#undef BOOST_AFIO_INCLUDED_BY_HEADER
+#undef AFIO_INCLUDED_BY_HEADER
 #endif
 
 #ifdef _MSC_VER

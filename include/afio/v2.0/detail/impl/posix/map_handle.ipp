@@ -27,7 +27,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <sys/mman.h>
 
-BOOST_AFIO_V2_NAMESPACE_BEGIN
+AFIO_V2_NAMESPACE_BEGIN
 
 result<section_handle> section_handle::section(file_handle &backing, extent_type maximum_size, flag _flag) noexcept
 {
@@ -35,17 +35,17 @@ result<section_handle> section_handle::section(file_handle &backing, extent_type
   {
     if(backing.is_valid())
     {
-      BOOST_OUTCOME_TRY(length, backing.length());
+      OUTCOME_TRY(length, backing.length());
       maximum_size = length;
     }
     else
-      return make_errored_result<section_handle>(stl11::errc::invalid_argument);
+      return make_errored_result<section_handle>(std::errc::invalid_argument);
   }
   if(!backing.is_valid())
     maximum_size = utils::round_up_to_page_size(maximum_size);
   result<section_handle> ret(section_handle(native_handle_type(), backing.is_valid() ? &backing : nullptr, maximum_size, _flag));
   // There are no section handles on POSIX, so do nothing
-  BOOST_AFIO_LOG_FUNCTION_CALL(ret.value()._v.fd);
+  AFIO_LOG_FUNCTION_CALL(ret.value()._v.fd);
   return ret;
 }
 
@@ -66,7 +66,7 @@ map_handle::~map_handle()
     auto ret = map_handle::close();
     if(ret.has_error())
     {
-      BOOST_AFIO_LOG_FATAL(_v.fd, "map_handle::~map_handle() close failed");
+      AFIO_LOG_FATAL(_v.fd, "map_handle::~map_handle() close failed");
       abort();
     }
   }
@@ -74,7 +74,7 @@ map_handle::~map_handle()
 
 result<void> map_handle::close() noexcept
 {
-  BOOST_AFIO_LOG_FUNCTION_CALL(_addr);
+  AFIO_LOG_FUNCTION_CALL(_addr);
   if(_addr)
   {
     if(-1 == ::munmap(_addr, _length))
@@ -89,7 +89,7 @@ result<void> map_handle::close() noexcept
 
 native_handle_type map_handle::release() noexcept
 {
-  BOOST_AFIO_LOG_FUNCTION_CALL(_v.h);
+  AFIO_LOG_FUNCTION_CALL(_v.h);
   // We don't want ~handle() to close our borrowed handle
   _v = native_handle_type();
   _addr = nullptr;
@@ -99,7 +99,7 @@ native_handle_type map_handle::release() noexcept
 
 map_handle::io_result<map_handle::const_buffers_type> map_handle::barrier(map_handle::io_request<map_handle::const_buffers_type> reqs, bool wait_for_device, bool and_metadata, deadline d) noexcept
 {
-  BOOST_AFIO_LOG_FUNCTION_CALL(_v.fd);
+  AFIO_LOG_FUNCTION_CALL(_v.fd);
   char *addr = _addr + reqs.offset;
   extent_type bytes = 0;
   for(const auto &req : reqs.buffers)
@@ -170,14 +170,14 @@ static inline result<void *> do_mmap(native_handle_type &nativeh, void *ataddr, 
 result<map_handle> map_handle::map(size_type bytes, section_handle::flag _flag) noexcept
 {
   if(!bytes)
-    return make_errored_result<>(stl11::errc::argument_out_of_domain);
+    return make_errored_result<>(std::errc::argument_out_of_domain);
   bytes = utils::round_up_to_page_size(bytes);
   result<map_handle> ret(make_valued_result<map_handle>(map_handle(nullptr)));
   native_handle_type &nativeh = ret.get()._v;
-  BOOST_OUTCOME_TRY(addr, do_mmap(nativeh, nullptr, nullptr, bytes, 0, _flag));
+  OUTCOME_TRY(addr, do_mmap(nativeh, nullptr, nullptr, bytes, 0, _flag));
   ret.get()._addr = (char *) addr;
   ret.get()._length = bytes;
-  BOOST_AFIO_LOG_FUNCTION_CALL(ret.get()._v.fd);
+  AFIO_LOG_FUNCTION_CALL(ret.get()._v.fd);
   return ret;
 }
 
@@ -186,7 +186,7 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
   if(!bytes)
   {
     if(!section.backing())
-      return make_errored_result<>(stl11::errc::argument_out_of_domain);
+      return make_errored_result<>(std::errc::argument_out_of_domain);
     bytes = section.length();
   }
   size_type _bytes = utils::round_up_to_page_size(bytes);
@@ -197,26 +197,26 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
   }
   result<map_handle> ret(make_valued_result<map_handle>(map_handle(&section)));
   native_handle_type &nativeh = ret.get()._v;
-  BOOST_OUTCOME_TRY(addr, do_mmap(nativeh, nullptr, &section, bytes, offset, _flag));
+  OUTCOME_TRY(addr, do_mmap(nativeh, nullptr, &section, bytes, offset, _flag));
   ret.get()._addr = (char *) addr;
   ret.get()._offset = offset;
   ret.get()._length = _bytes;
   // Make my handle borrow the native handle of my backing storage
   ret.get()._v.fd = section.backing_native_handle().fd;
-  BOOST_AFIO_LOG_FUNCTION_CALL(ret.get()._v.fd);
+  AFIO_LOG_FUNCTION_CALL(ret.get()._v.fd);
   return ret;
 }
 
 result<map_handle::buffer_type> map_handle::commit(buffer_type region, section_handle::flag _flag) noexcept
 {
-  BOOST_AFIO_LOG_FUNCTION_CALL(_v.fd);
+  AFIO_LOG_FUNCTION_CALL(_v.fd);
   if(!region.first)
-    return make_errored_result<map_handle::buffer_type>(stl11::errc::invalid_argument);
+    return make_errored_result<map_handle::buffer_type>(std::errc::invalid_argument);
   // Set permissions on the pages
   region = utils::round_to_page_size(region);
   extent_type offset = _offset + (region.first - _addr);
   size_type bytes = region.second;
-  BOOST_OUTCOME_TRYV(do_mmap(_v, region.first, _section, bytes, offset, _flag));
+  OUTCOME_TRYV(do_mmap(_v, region.first, _section, bytes, offset, _flag));
   // Tell the kernel we will be using these pages soon
   if(-1 == ::madvise(region.first, region.second, MADV_WILLNEED))
     return make_errored_result<map_handle::buffer_type>(errno);
@@ -225,9 +225,9 @@ result<map_handle::buffer_type> map_handle::commit(buffer_type region, section_h
 
 result<map_handle::buffer_type> map_handle::decommit(buffer_type region) noexcept
 {
-  BOOST_AFIO_LOG_FUNCTION_CALL(_v.h);
+  AFIO_LOG_FUNCTION_CALL(_v.h);
   if(!region.first)
-    return make_errored_result<map_handle::buffer_type>(stl11::errc::invalid_argument);
+    return make_errored_result<map_handle::buffer_type>(std::errc::invalid_argument);
   region = utils::round_to_page_size(region);
   // Tell the kernel to kick these pages into storage
   if(-1 == ::madvise(region.first, region.second, MADV_DONTNEED))
@@ -235,15 +235,15 @@ result<map_handle::buffer_type> map_handle::decommit(buffer_type region) noexcep
   // Set permissions on the pages to no access
   extent_type offset = _offset + (region.first - _addr);
   size_type bytes = region.second;
-  BOOST_OUTCOME_TRYV(do_mmap(_v, region.first, _section, bytes, offset, section_handle::flag::none));
+  OUTCOME_TRYV(do_mmap(_v, region.first, _section, bytes, offset, section_handle::flag::none));
   return region;
 }
 
 result<void> map_handle::zero_memory(buffer_type region) noexcept
 {
-  BOOST_AFIO_LOG_FUNCTION_CALL(_v.fd);
+  AFIO_LOG_FUNCTION_CALL(_v.fd);
   if(!region.first)
-    return make_errored_result<void>(stl11::errc::invalid_argument);
+    return make_errored_result<void>(std::errc::invalid_argument);
 #ifdef MADV_REMOVE
   buffer_type page_region{(char *) utils::round_up_to_page_size((uintptr_t) region.first), utils::round_down_to_page_size(region.second)};
   // Zero contents and punch a hole in any backing storage
@@ -261,7 +261,7 @@ result<void> map_handle::zero_memory(buffer_type region) noexcept
 
 result<span<map_handle::buffer_type>> map_handle::prefetch(span<buffer_type> regions) noexcept
 {
-  BOOST_AFIO_LOG_FUNCTION_CALL(0);
+  AFIO_LOG_FUNCTION_CALL(0);
   for(const auto &region : regions)
   {
     if(-1 == ::madvise(region.first, region.second, MADV_WILLNEED))
@@ -272,10 +272,10 @@ result<span<map_handle::buffer_type>> map_handle::prefetch(span<buffer_type> reg
 
 result<map_handle::buffer_type> map_handle::do_not_store(buffer_type region) noexcept
 {
-  BOOST_AFIO_LOG_FUNCTION_CALL(0);
+  AFIO_LOG_FUNCTION_CALL(0);
   region = utils::round_to_page_size(region);
   if(!region.first)
-    return make_errored_result<map_handle::buffer_type>(stl11::errc::invalid_argument);
+    return make_errored_result<map_handle::buffer_type>(std::errc::invalid_argument);
 #ifdef MADV_FREE
   // Tell the kernel to throw away the contents of these pages
   if(-1 == ::madvise(_region.first, _region.second, MADV_FREE))
@@ -290,7 +290,7 @@ result<map_handle::buffer_type> map_handle::do_not_store(buffer_type region) noe
 
 map_handle::io_result<map_handle::buffers_type> map_handle::read(io_request<buffers_type> reqs, deadline) noexcept
 {
-  BOOST_AFIO_LOG_FUNCTION_CALL(_v.fd);
+  AFIO_LOG_FUNCTION_CALL(_v.fd);
   char *addr = _addr + reqs.offset;
   size_type togo = reqs.offset < _length ? (size_type)(_length - reqs.offset) : 0;
   for(buffer_type &req : reqs.buffers)
@@ -311,7 +311,7 @@ map_handle::io_result<map_handle::buffers_type> map_handle::read(io_request<buff
 
 map_handle::io_result<map_handle::const_buffers_type> map_handle::write(io_request<const_buffers_type> reqs, deadline) noexcept
 {
-  BOOST_AFIO_LOG_FUNCTION_CALL(_v.fd);
+  AFIO_LOG_FUNCTION_CALL(_v.fd);
   char *addr = _addr + reqs.offset;
   size_type togo = reqs.offset < _length ? (size_type)(_length - reqs.offset) : 0;
   for(const_buffer_type &req : reqs.buffers)
@@ -331,4 +331,4 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::write(io_reque
   return reqs.buffers;
 }
 
-BOOST_AFIO_V2_NAMESPACE_END
+AFIO_V2_NAMESPACE_END

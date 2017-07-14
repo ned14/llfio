@@ -26,10 +26,10 @@ Distributed under the Boost Software License, Version 1.0.
 
 namespace map_handle_create_close
 {
-  BOOST_AFIO_TEST_KERNEL_DECL boost::outcome::result<boost::afio::map_handle> test_kernel_map_handle(boost::afio::file_handle &backing, boost::afio::map_handle::size_type bytes, boost::afio::section_handle::flag m)
+  AFIO_TEST_KERNEL_DECL AFIO_V2_NAMESPACE::result<AFIO_V2_NAMESPACE::map_handle> test_kernel_map_handle(AFIO_V2_NAMESPACE::file_handle &backing, AFIO_V2_NAMESPACE::map_handle::size_type bytes, AFIO_V2_NAMESPACE::section_handle::flag m)
   {
-    auto sectionh = boost::afio::section_handle::section(backing, bytes, boost::afio::section_handle::flag::readwrite);
-    auto h = boost::afio::map_handle::map(sectionh.get(), bytes, 0, m);
+    auto sectionh = AFIO_V2_NAMESPACE::section_handle::section(backing, bytes, AFIO_V2_NAMESPACE::section_handle::flag::readwrite);
+    auto h = AFIO_V2_NAMESPACE::map_handle::map(sectionh.value(), bytes, 0, m);
     return h;
   }
 }

@@ -27,14 +27,14 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../../../spinlock.hpp"
 #include "import.hpp"
 
-BOOST_AFIO_V2_NAMESPACE_BEGIN
+AFIO_V2_NAMESPACE_BEGIN
 
 namespace utils
 {
   // Stupid MSVC ...
   namespace detail
   {
-    using namespace BOOST_AFIO_V2_NAMESPACE::detail;
+    using namespace AFIO_V2_NAMESPACE::detail;
   }
   size_t page_size() noexcept
   {
@@ -54,9 +54,9 @@ namespace utils
 #endif
   std::vector<size_t> page_sizes(bool only_actually_available)
   {
-    static boost_lite::configurable_spinlock::spinlock<bool> lock;
+    static QUICKCPPLIB_NAMESPACE::configurable_spinlock::spinlock<bool> lock;
     static std::vector<size_t> pagesizes, pagesizes_available;
-    stl11::lock_guard<decltype(lock)> g(lock);
+    std::lock_guard<decltype(lock)> g(lock);
     if(pagesizes.empty())
     {
       typedef size_t(WINAPI * GetLargePageMinimum_t)(void);
@@ -100,7 +100,7 @@ namespace utils
     using namespace windows_nt_kernel;
     if(!RtlGenRandom(buffer, (ULONG) bytes))
     {
-      BOOST_AFIO_LOG_FATAL(0, "afio: Kernel crypto function failed");
+      AFIO_LOG_FATAL(0, "afio: Kernel crypto function failed");
       std::terminate();
     }
   }
@@ -130,11 +130,11 @@ namespace utils
       (void) bytes;
       if(!VirtualFree(p, 0, MEM_RELEASE))
       {
-        BOOST_AFIO_LOG_FATAL(p, "afio: Freeing large pages failed");
+        AFIO_LOG_FATAL(p, "afio: Freeing large pages failed");
         std::terminate();
       }
     }
   }
 }
 
-BOOST_AFIO_V2_NAMESPACE_END
+AFIO_V2_NAMESPACE_END

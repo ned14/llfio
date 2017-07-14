@@ -27,64 +27,64 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <sys/stat.h>
 
-BOOST_AFIO_V2_NAMESPACE_BEGIN
+AFIO_V2_NAMESPACE_BEGIN
 
-static inline stl1z::filesystem::file_type to_st_type(uint16_t mode)
+static inline filesystem::file_type to_st_type(uint16_t mode)
 {
     switch(mode & S_IFMT)
     {
-#ifdef BOOST_AFIO_USE_LEGACY_FILESYSTEM_SEMANTICS
+#ifdef AFIO_USE_LEGACY_FILESYSTEM_SEMANTICS
     case S_IFBLK:
-        return stl1z::filesystem::file_type::block_file;
+        return filesystem::file_type::block_file;
     case S_IFCHR:
-        return stl1z::filesystem::file_type::character_file;
+        return filesystem::file_type::character_file;
     case S_IFDIR:
-        return stl1z::filesystem::file_type::directory_file;
+        return filesystem::file_type::directory_file;
     case S_IFIFO:
-        return stl1z::filesystem::file_type::fifo_file;
+        return filesystem::file_type::fifo_file;
     case S_IFLNK:
-        return stl1z::filesystem::file_type::symlink_file;
+        return filesystem::file_type::symlink_file;
     case S_IFREG:
-        return stl1z::filesystem::file_type::regular_file;
+        return filesystem::file_type::regular_file;
     case S_IFSOCK:
-        return stl1z::filesystem::file_type::socket_file;
+        return filesystem::file_type::socket_file;
     default:
-        return stl1z::filesystem::file_type::type_unknown;
+        return filesystem::file_type::type_unknown;
 #else
     case S_IFBLK:
-        return stl1z::filesystem::file_type::block;
+        return filesystem::file_type::block;
     case S_IFCHR:
-        return stl1z::filesystem::file_type::character;
+        return filesystem::file_type::character;
     case S_IFDIR:
-        return stl1z::filesystem::file_type::directory;
+        return filesystem::file_type::directory;
     case S_IFIFO:
-        return stl1z::filesystem::file_type::fifo;
+        return filesystem::file_type::fifo;
     case S_IFLNK:
-        return stl1z::filesystem::file_type::symlink;
+        return filesystem::file_type::symlink;
     case S_IFREG:
-        return stl1z::filesystem::file_type::regular;
+        return filesystem::file_type::regular;
     case S_IFSOCK:
-        return stl1z::filesystem::file_type::socket;
+        return filesystem::file_type::socket;
     default:
-        return stl1z::filesystem::file_type::unknown;
+        return filesystem::file_type::unknown;
 #endif
     }
 }
 
-static inline stl11::chrono::system_clock::time_point to_timepoint(struct timespec ts)
+static inline std::chrono::system_clock::time_point to_timepoint(struct timespec ts)
 {
   // Need to have this self-adapt to the STL being used
-  static constexpr unsigned long long STL_TICKS_PER_SEC=(unsigned long long) stl11::chrono::system_clock::period::den/stl11::chrono::system_clock::period::num;
+  static constexpr unsigned long long STL_TICKS_PER_SEC=(unsigned long long) std::chrono::system_clock::period::den/std::chrono::system_clock::period::num;
   static constexpr unsigned long long multiplier=STL_TICKS_PER_SEC>=1000000000ULL ? STL_TICKS_PER_SEC/1000000000ULL : 1;
   static constexpr unsigned long long divider=STL_TICKS_PER_SEC>=1000000000ULL ? 1 : 1000000000ULL/STL_TICKS_PER_SEC;
   // For speed we make the big assumption that the STL's system_clock is based on the time_t epoch 1st Jan 1970.
-  stl11::chrono::system_clock::duration duration(ts.tv_sec*STL_TICKS_PER_SEC+ts.tv_nsec*multiplier/divider);
-  return stl11::chrono::system_clock::time_point(duration);
+  std::chrono::system_clock::duration duration(ts.tv_sec*STL_TICKS_PER_SEC+ts.tv_nsec*multiplier/divider);
+  return std::chrono::system_clock::time_point(duration);
 }
 
-BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> stat_t::fill(const handle &h, stat_t::want wanted) noexcept
+AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> stat_t::fill(const handle &h, stat_t::want wanted) noexcept
 {
-  BOOST_AFIO_LOG_FUNCTION_CALL(h.native_handle().fd);
+  AFIO_LOG_FUNCTION_CALL(h.native_handle().fd);
   struct stat s;
   memset(&s, 0, sizeof(s));
   size_t ret = 0;
@@ -133,4 +133,4 @@ BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> stat_t::fill(const handle &h
   return ret;
 }
 
-BOOST_AFIO_V2_NAMESPACE_END
+AFIO_V2_NAMESPACE_END

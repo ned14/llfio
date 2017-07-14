@@ -31,13 +31,13 @@ Distributed under the Boost Software License, Version 1.0.
 #include <iostream>
 
 #ifdef __linux__
-#define file_handle BOOST_AFIO_V2_NAMESPACE::file_handle
+#define file_handle AFIO_V2_NAMESPACE::file_handle
 #endif
 
 constexpr unsigned permute_flags_max = 4;
 static const std::regex sp_preamble{"(system|storage).*"};
 
-static BOOST_AFIO_V2_NAMESPACE::storage_profile::storage_profile profile[permute_flags_max];
+static AFIO_V2_NAMESPACE::storage_profile::storage_profile profile[permute_flags_max];
 
 #define RETCHECK(expr)                                                                                                                                                                                                                                                                                                         \
   {                                                                                                                                                                                                                                                                                                                            \
@@ -51,8 +51,8 @@ static BOOST_AFIO_V2_NAMESPACE::storage_profile::storage_profile profile[permute
 
 int main(int argc, char *argv[])
 {
-  using namespace BOOST_AFIO_V2_NAMESPACE;
-  namespace stl11 = BOOST_AFIO_V2_NAMESPACE::stl11;
+  using namespace AFIO_V2_NAMESPACE;
+  namespace stl11 = AFIO_V2_NAMESPACE::stl11;
   std::regex torun(".*");
   bool regexvalid = false;
   unsigned torunflags = permute_flags_max - 1;
@@ -93,7 +93,7 @@ int main(int argc, char *argv[])
   }
   // File closes, as it was opened with O_SYNC it forces extent allocation
   // Pause as Windows still takes a while
-  stl11::this_thread::sleep_for(stl11::chrono::seconds(3));
+  std::this_thread::sleep_for(std::chrono::seconds(3));
   std::ofstream results("fs_probe_results.yaml", std::ios::app);
   {
     auto put_time = [](const std::tm *tmb, const char *fmt) {

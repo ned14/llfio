@@ -22,8 +22,8 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#ifndef BOOST_AFIO_MAP_HANDLE_H
-#define BOOST_AFIO_MAP_HANDLE_H
+#ifndef AFIO_MAP_HANDLE_H
+#define AFIO_MAP_HANDLE_H
 
 #include "file_handle.hpp"
 
@@ -34,7 +34,7 @@ Distributed under the Boost Software License, Version 1.0.
 #pragma warning(disable : 4251)  // dll interface
 #endif
 
-BOOST_AFIO_V2_NAMESPACE_EXPORT_BEGIN
+AFIO_V2_NAMESPACE_EXPORT_BEGIN
 
 /*! \class section_handle
 \brief A handle to a source of mapped memory.
@@ -42,14 +42,14 @@ BOOST_AFIO_V2_NAMESPACE_EXPORT_BEGIN
 \note On Windows the native handle of this handle is that of the NT kernel section object. On POSIX it is
 a cloned file descriptor of the backing storage.
 */
-class BOOST_AFIO_DECL section_handle : public handle
+class AFIO_DECL section_handle : public handle
 {
 public:
   using extent_type = handle::extent_type;
   using size_type = handle::size_type;
 
   //! The behaviour of the memory section
-  BOOSTLITE_BITFIELD_BEGIN(flag){none = 0,          //!< No flags
+  QUICKCPPLIB_BITFIELD_BEGIN(flag){none = 0,          //!< No flags
                                  read = 1 << 0,     //!< Memory views can be read
                                  write = 1 << 1,    //!< Memory views can be written
                                  cow = 1 << 2,      //!< Memory views can be copy on written
@@ -62,7 +62,7 @@ public:
                                  // NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!
 
                                  readwrite = (read | write)};
-  BOOSTLITE_BITFIELD_END(flag)
+  QUICKCPPLIB_BITFIELD_END(flag)
 
 protected:
   io_handle *_backing;
@@ -115,7 +115,7 @@ public:
   \errors Any of the values POSIX dup() or NtCreateSection() can return.
   */
   //[[bindlib::make_free]]
-  static BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<section_handle> section(file_handle &backing, extent_type maximum_size = 0, flag _flag = flag::read | flag::write) noexcept;
+  static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<section_handle> section(file_handle &backing, extent_type maximum_size = 0, flag _flag = flag::read | flag::write) noexcept;
   //! \overload
   //[[bindlib::make_free]]
   static inline result<section_handle> section(extent_type maximum_size, file_handle &backing, flag _flag = flag::read | flag::write) noexcept { return section(backing, maximum_size, _flag); }
@@ -141,7 +141,7 @@ public:
   \errors Any of the values NtExtendSection() can return. On POSIX this is a no op.
   */
   //[[bindlib::make_free]]
-  BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<extent_type> truncate(extent_type newsize) noexcept;
+  AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<extent_type> truncate(extent_type newsize) noexcept;
 };
 inline std::ostream &operator<<(std::ostream &s, const section_handle::flag &v)
 {
@@ -178,7 +178,7 @@ inline std::ostream &operator<<(std::ostream &s, const section_handle::flag &v)
 does not close that of the backing storage, nor does releasing this handle release that of the backing storage.
 Locking byte ranges of this handle is therefore equal to locking byte ranges in the original backing storage.
 */
-class BOOST_AFIO_DECL map_handle : public io_handle
+class AFIO_DECL map_handle : public io_handle
 {
 public:
   using path_type = io_handle::path_type;
@@ -219,7 +219,7 @@ public:
       , _length(0)
   {
   }
-  BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC ~map_handle();
+  AFIO_HEADERS_ONLY_MEMFUNC_SPEC ~map_handle();
   //! Implicit move construction of map_handle permitted
   map_handle(map_handle &&o) noexcept : io_handle(std::move(o)), _section(o._section), _addr(o._addr), _offset(o._offset), _length(o._length)
   {
@@ -244,10 +244,10 @@ public:
   }
 
   //! Unmap the mapped view.
-  BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> close() noexcept override;
+  AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> close() noexcept override;
   //! Releases the mapped view, but does NOT release the native handle.
-  BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC native_handle_type release() noexcept override;
-  BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> barrier(io_request<const_buffers_type> reqs = io_request<const_buffers_type>(), bool wait_for_device = false, bool and_metadata = false, deadline d = deadline()) noexcept override;
+  AFIO_HEADERS_ONLY_VIRTUAL_SPEC native_handle_type release() noexcept override;
+  AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> barrier(io_request<const_buffers_type> reqs = io_request<const_buffers_type>(), bool wait_for_device = false, bool and_metadata = false, deadline d = deadline()) noexcept override;
 
 
   /*! Create new memory and map it into view.
@@ -262,7 +262,7 @@ public:
   \errors Any of the values POSIX mmap() or NtMapViewOfSection() can return.
   */
   //[[bindlib::make_free]]
-  static BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<map_handle> map(size_type bytes, section_handle::flag _flag = section_handle::flag::read | section_handle::flag::write) noexcept;
+  static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<map_handle> map(size_type bytes, section_handle::flag _flag = section_handle::flag::read | section_handle::flag::write) noexcept;
 
   /*! Create a memory mapped view of a backing storage.
   \param section A memory section handle specifying the backing storage to use.
@@ -273,7 +273,7 @@ public:
   \errors Any of the values POSIX mmap() or NtMapViewOfSection() can return.
   */
   //[[bindlib::make_free]]
-  static BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<map_handle> map(section_handle &section, size_type bytes = 0, extent_type offset = 0, section_handle::flag _flag = section_handle::flag::read | section_handle::flag::write) noexcept;
+  static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<map_handle> map(section_handle &section, size_type bytes = 0, extent_type offset = 0, section_handle::flag _flag = section_handle::flag::read | section_handle::flag::write) noexcept;
 
   //! The memory section this handle is using
   section_handle *section() const noexcept { return _section; }
@@ -288,10 +288,10 @@ public:
   size_type length() const noexcept { return _length; }
 
   //! Ask the system to commit the system resources to make the memory represented by the buffer available with the given permissions. addr and length should be page aligned (see utils::page_sizes()), if not the returned buffer is the region actually committed.
-  BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<buffer_type> commit(buffer_type region, section_handle::flag _flag = section_handle::flag::read | section_handle::flag::write) noexcept;
+  AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<buffer_type> commit(buffer_type region, section_handle::flag _flag = section_handle::flag::read | section_handle::flag::write) noexcept;
 
   //! Ask the system to make the memory represented by the buffer unavailable and to decommit the system resources representing them. addr and length should be page aligned (see utils::page_sizes()), if not the returned buffer is the region actually decommitted.
-  BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<buffer_type> decommit(buffer_type region) noexcept;
+  AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<buffer_type> decommit(buffer_type region) noexcept;
 
   /*! Zero the memory represented by the buffer. Differs from zero() because it acts on mapped memory, but may call zero() internally.
 
@@ -300,7 +300,7 @@ public:
   freshly zeroed ones making this a very efficient way of zeroing large ranges of memory.
   \errors Any of the errors returnable by madvise() or DiscardVirtualMemory or the zero() function.
   */
-  BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> zero_memory(buffer_type region) noexcept;
+  AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> zero_memory(buffer_type region) noexcept;
 
   /*! Ask the system to unset the dirty flag for the memory represented by the buffer. This will prevent any changes not yet sent to the backing storage from being sent in the future, also if the system kicks out this page and reloads it you may see some edition of the underlying storage instead of what was here. addr
   and length should be page aligned (see utils::page_sizes()), if not the returned buffer is the region actually undirtied.
@@ -310,14 +310,14 @@ public:
 
   \note Microsoft Windows does not support unsetting the dirty flag on file backed maps, so on Windows this call does nothing.
   */
-  BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<buffer_type> do_not_store(buffer_type region) noexcept;
+  AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<buffer_type> do_not_store(buffer_type region) noexcept;
 
   //! Ask the system to begin to asynchronously prefetch the span of memory regions given, returning the regions actually prefetched. Note that on Windows 7 or earlier the system call to implement this was not available, and so you will see an empty span returned.
-  static BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<span<buffer_type>> prefetch(span<buffer_type> regions) noexcept;
+  static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<span<buffer_type>> prefetch(span<buffer_type> regions) noexcept;
   //! \overload
   static result<buffer_type> prefetch(buffer_type region) noexcept
   {
-    BOOST_OUTCOME_TRY(ret, prefetch(span<buffer_type>(&region, 1)));
+    OUTCOME_TRY(ret, prefetch(span<buffer_type>(&region, 1)));
     return *ret.data();
   }
 
@@ -333,7 +333,7 @@ public:
   \mallocs None.
   */
   //[[bindlib::make_free]]
-  BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<buffers_type> read(io_request<buffers_type> reqs, deadline d = deadline()) noexcept override;
+  AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<buffers_type> read(io_request<buffers_type> reqs, deadline d = deadline()) noexcept override;
   using io_handle::read;
 
   /*! \brief Write data to the mapped view.
@@ -346,21 +346,21 @@ public:
   \mallocs None.
   */
   //[[bindlib::make_free]]
-  BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> write(io_request<const_buffers_type> reqs, deadline d = deadline()) noexcept override;
+  AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> write(io_request<const_buffers_type> reqs, deadline d = deadline()) noexcept override;
   using io_handle::write;
 };
 
 
-BOOST_AFIO_V2_NAMESPACE_END
+AFIO_V2_NAMESPACE_END
 
-#if BOOST_AFIO_HEADERS_ONLY == 1 && !defined(DOXYGEN_SHOULD_SKIP_THIS)
-#define BOOST_AFIO_INCLUDED_BY_HEADER 1
+#if AFIO_HEADERS_ONLY == 1 && !defined(DOXYGEN_SHOULD_SKIP_THIS)
+#define AFIO_INCLUDED_BY_HEADER 1
 #ifdef _WIN32
 #include "detail/impl/windows/map_handle.ipp"
 #else
 #include "detail/impl/posix/map_handle.ipp"
 #endif
-#undef BOOST_AFIO_INCLUDED_BY_HEADER
+#undef AFIO_INCLUDED_BY_HEADER
 #endif
 
 #ifdef _MSC_VER

@@ -26,12 +26,12 @@ Distributed under the Boost Software License, Version 1.0.
 
 namespace file_handle_create_close
 {
-  BOOST_AFIO_TEST_KERNEL_DECL boost::outcome::result<boost::afio::async_file_handle> test_kernel_async_file_handle(boost::afio::async_file_handle::mode m, boost::afio::async_file_handle::creation c, boost::afio::async_file_handle::flag f)
+  AFIO_TEST_KERNEL_DECL AFIO_V2_NAMESPACE::result<AFIO_V2_NAMESPACE::async_file_handle> test_kernel_async_file_handle(AFIO_V2_NAMESPACE::async_file_handle::mode m, AFIO_V2_NAMESPACE::async_file_handle::creation c, AFIO_V2_NAMESPACE::async_file_handle::flag f)
   {
-    boost::afio::io_service service;
-    auto h = boost::afio::async_file_handle::async_file(service, "testfile.txt", m, c, boost::afio::async_file_handle::caching::all, f);
+    AFIO_V2_NAMESPACE::io_service service;
+    auto h = AFIO_V2_NAMESPACE::async_file_handle::async_file(service, "testfile.txt", m, c, AFIO_V2_NAMESPACE::async_file_handle::caching::all, f);
     if(h)
-      h.get().close();
+      h.value().close();
     return h;
   }
 }

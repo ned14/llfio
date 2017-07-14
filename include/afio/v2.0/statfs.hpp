@@ -22,10 +22,10 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#ifndef BOOST_AFIO_STATFS_H
-#define BOOST_AFIO_STATFS_H
+#ifndef AFIO_STATFS_H
+#define AFIO_STATFS_H
 
-#ifndef BOOST_AFIO_CONFIGURED
+#ifndef AFIO_CONFIG_HPP
 #error You must include the master afio.hpp, not individual header files directly
 #endif
 #include "config.hpp"
@@ -37,14 +37,14 @@ Distributed under the Boost Software License, Version 1.0.
 #pragma warning(disable : 4251)  // dll interface
 #endif
 
-BOOST_AFIO_V2_NAMESPACE_EXPORT_BEGIN
+AFIO_V2_NAMESPACE_EXPORT_BEGIN
 
 class handle;
 
 /*! \struct statfs_t
 \brief Metadata about a filing system. Unsupported entries are all bits set.
 */
-struct BOOST_AFIO_DECL statfs_t
+struct AFIO_DECL statfs_t
 {
   struct f_flags_t
   {
@@ -74,8 +74,8 @@ struct BOOST_AFIO_DECL statfs_t
   fixme_path f_mntonname;    /*!< directory on which mounted         (Windows, POSIX) */
 
   //! Used to indicate what metadata should be filled in
-  BOOSTLITE_BITFIELD_BEGIN(want) { flags = 1 << 0, bsize = 1 << 1, iosize = 1 << 2, blocks = 1 << 3, bfree = 1 << 4, bavail = 1 << 5, files = 1 << 6, ffree = 1 << 7, namemax = 1 << 8, owner = 1 << 9, fsid = 1 << 10, fstypename = 1 << 11, mntfromname = 1 << 12, mntonname = 1 << 13, all = (unsigned) -1 }
-  BOOSTLITE_BITFIELD_END(want)
+  QUICKCPPLIB_BITFIELD_BEGIN(want) { flags = 1 << 0, bsize = 1 << 1, iosize = 1 << 2, blocks = 1 << 3, bfree = 1 << 4, bavail = 1 << 5, files = 1 << 6, ffree = 1 << 7, namemax = 1 << 8, owner = 1 << 9, fsid = 1 << 10, fstypename = 1 << 11, mntfromname = 1 << 12, mntonname = 1 << 13, all = (unsigned) -1 }
+  QUICKCPPLIB_BITFIELD_END(want)
   //! Constructs a default initialised instance (all bits set)
   statfs_t()
   {
@@ -90,23 +90,23 @@ struct BOOST_AFIO_DECL statfs_t
   {
     auto v(fill(h, wanted));
     if(v.has_error())
-      throw std::system_error(v.get_error());
+      throw std::system_error(v.error());
   }
 #endif
   //! Fills in the structure with metadata, returning number of items filled in
-  BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> fill(const handle &h, want wanted = want::all) noexcept;
+  AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> fill(const handle &h, want wanted = want::all) noexcept;
 };
 
-BOOST_AFIO_V2_NAMESPACE_END
+AFIO_V2_NAMESPACE_END
 
-#if BOOST_AFIO_HEADERS_ONLY == 1 && !defined(DOXYGEN_SHOULD_SKIP_THIS)
-#define BOOST_AFIO_INCLUDED_BY_HEADER 1
+#if AFIO_HEADERS_ONLY == 1 && !defined(DOXYGEN_SHOULD_SKIP_THIS)
+#define AFIO_INCLUDED_BY_HEADER 1
 #ifdef _WIN32
 #include "detail/impl/windows/statfs.ipp"
 #else
 #include "detail/impl/posix/statfs.ipp"
 #endif
-#undef BOOST_AFIO_INCLUDED_BY_HEADER
+#undef AFIO_INCLUDED_BY_HEADER
 #endif
 
 #ifdef _MSC_VER

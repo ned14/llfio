@@ -29,7 +29,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <fcntl.h>
 #include <unistd.h>
 
-BOOST_AFIO_V2_NAMESPACE_BEGIN
+AFIO_V2_NAMESPACE_BEGIN
 
 // allocate at process start to ensure later failure to allocate won't cause failure
 static fixme_path temporary_files_directory_("/tmp/no_temporary_directories_accessible");
@@ -105,7 +105,7 @@ inline result<int> attribs_from_handle_mode_caching_and_flags(native_handle_type
   switch(_mode)
   {
   case file_handle::mode::unchanged:
-    return make_errored_result<int>(stl11::errc::invalid_argument);
+    return make_errored_result<int>(std::errc::invalid_argument);
   case file_handle::mode::none:
     break;
   case file_handle::mode::attr_read:
@@ -140,7 +140,7 @@ inline result<int> attribs_from_handle_mode_caching_and_flags(native_handle_type
   switch(_caching)
   {
   case file_handle::caching::unchanged:
-    return make_errored_result<int>(stl11::errc::invalid_argument);
+    return make_errored_result<int>(std::errc::invalid_argument);
   case file_handle::caching::none:
     attribs |= O_SYNC | O_DIRECT;
     nativeh.behaviour |= native_handle_type::disposition::aligned_io;
@@ -170,7 +170,7 @@ inline result<int> attribs_from_handle_mode_caching_and_flags(native_handle_type
 result<void> file_handle::_fetch_inode() noexcept
 {
   stat_t s;
-  BOOST_OUTCOME_TRYV(s.fill(*this, stat_t::want::dev | stat_t::want::ino));
+  OUTCOME_TRYV(s.fill(*this, stat_t::want::dev | stat_t::want::ino));
   _devid = s.st_dev;
   _inode = s.st_ino;
   return make_valued_result<void>();
@@ -179,9 +179,9 @@ result<void> file_handle::_fetch_inode() noexcept
 inline result<void> check_inode(const file_handle &h) noexcept
 {
   stat_t s;
-  BOOST_OUTCOME_TRYV(s.fill(h, stat_t::want::dev | stat_t::want::ino));
+  OUTCOME_TRYV(s.fill(h, stat_t::want::dev | stat_t::want::ino));
   if(s.st_dev != h.st_dev() || s.st_ino != h.st_ino())
-    return make_errored_result<void>(stl11::errc::no_such_file_or_directory);
+    return make_errored_result<void>(std::errc::no_such_file_or_directory);
   return make_valued_result<void>();
 }
 
@@ -189,16 +189,16 @@ result<file_handle> file_handle::file(file_handle::path_type _path, file_handle:
 {
   result<file_handle> ret(file_handle(native_handle_type(), 0, 0, std::move(_path), _caching, flags));
   native_handle_type &nativeh = ret.get()._v;
-  BOOST_OUTCOME_TRY(attribs, attribs_from_handle_mode_caching_and_flags(nativeh, _mode, _creation, _caching, flags));
+  OUTCOME_TRY(attribs, attribs_from_handle_mode_caching_and_flags(nativeh, _mode, _creation, _caching, flags));
   nativeh.behaviour |= native_handle_type::disposition::file;
   const char *path_ = ret.value()._path.c_str();
   nativeh.fd = ::open(path_, attribs, 0x1b0 /*660*/);
   if(-1 == nativeh.fd)
     return make_errored_result<file_handle>(errno, last190(ret.value()._path.native()));
-  BOOST_AFIO_LOG_FUNCTION_CALL(nativeh.fd);
+  AFIO_LOG_FUNCTION_CALL(nativeh.fd);
   if(!(flags & flag::disable_safety_unlinks))
   {
-    BOOST_OUTCOME_TRYV(ret.value()._fetch_inode());
+    OUTCOME_TRYV(ret.value()._fetch_inode());
   }
   if(_creation == creation::truncate && ret.value().are_safety_fsyncs_issued())
     fsync(nativeh.fd);
@@ -213,7 +213,7 @@ result<file_handle> file_handle::temp_inode(path_type dirpath, mode _mode, flag 
   result<file_handle> ret(file_handle(native_handle_type(), 0, 0, path_type(), _caching, flags));
   native_handle_type &nativeh = ret.get()._v;
   // Open file exclusively to prevent collision
-  BOOST_OUTCOME_TRY(attribs, attribs_from_handle_mode_caching_and_flags(nativeh, _mode, creation::only_if_not_exist, _caching, flags));
+  OUTCOME_TRY(attribs, attribs_from_handle_mode_caching_and_flags(nativeh, _mode, creation::only_if_not_exist, _caching, flags));
   nativeh.behaviour |= native_handle_type::disposition::file;
 #ifdef O_TMPFILE
   // Linux has a special flag just for this use case
@@ -223,7 +223,7 @@ result<file_handle> file_handle::temp_inode(path_type dirpath, mode _mode, flag 
   nativeh.fd = ::open(path_, attribs, 0600);
   if(-1 != nativeh.fd)
   {
-    BOOST_OUTCOME_TRYV(ret.value()._fetch_inode());  // It can be useful to know the inode of temporary inodes
+    OUTCOME_TRYV(ret.value()._fetch_inode());  // It can be useful to know the inode of temporary inodes
     return ret;
   }
   // If it failed, assume this kernel or FS doesn't support O_TMPFILE
@@ -244,23 +244,23 @@ result<file_handle> file_handle::temp_inode(path_type dirpath, mode _mode, flag 
       int errcode = errno;
       if(EEXIST == errcode)
         continue;
-      BOOST_AFIO_LOG_FUNCTION_CALL(0);
+      AFIO_LOG_FUNCTION_CALL(0);
       return make_errored_result<file_handle>(errcode);
     }
-    BOOST_AFIO_LOG_FUNCTION_CALL(nativeh.fd);
+    AFIO_LOG_FUNCTION_CALL(nativeh.fd);
     // Immediately unlink after creation
     if(-1 == ::unlink(path_))
       return make_errored_result<file_handle>(errno);
-    BOOST_OUTCOME_TRYV(ret.value()._fetch_inode());  // It can be useful to know the inode of temporary inodes
+    OUTCOME_TRYV(ret.value()._fetch_inode());  // It can be useful to know the inode of temporary inodes
     return ret;
   }
 }
 
 file_handle::io_result<file_handle::const_buffers_type> file_handle::barrier(file_handle::io_request<file_handle::const_buffers_type> reqs, bool wait_for_device, bool and_metadata, deadline d) noexcept
 {
-  BOOST_AFIO_LOG_FUNCTION_CALL(_v.fd);
+  AFIO_LOG_FUNCTION_CALL(_v.fd);
   if(d)
-    return make_errored_result<>(stl11::errc::not_supported);
+    return make_errored_result<>(std::errc::not_supported);
 #ifdef __linux__
   if(!wait_for_device && !and_metadata)
   {
@@ -301,7 +301,7 @@ file_handle::io_result<file_handle::const_buffers_type> file_handle::barrier(fil
 
 result<file_handle> file_handle::clone() const noexcept
 {
-  BOOST_AFIO_LOG_FUNCTION_CALL(_v.fd);
+  AFIO_LOG_FUNCTION_CALL(_v.fd);
   result<file_handle> ret(file_handle(native_handle_type(), _devid, _inode, _path, _caching, _flags));
   ret.value()._service = _service;
   ret.value()._v.behaviour = _v.behaviour;
@@ -313,7 +313,7 @@ result<file_handle> file_handle::clone() const noexcept
 
 result<file_handle::path_type> file_handle::relink(path_type newpath) noexcept
 {
-  BOOST_AFIO_LOG_FUNCTION_CALL(_v.fd);
+  AFIO_LOG_FUNCTION_CALL(_v.fd);
   if(newpath.is_relative())
     newpath = _path.parent_path() / newpath;
 #ifdef O_TMPFILE
@@ -331,7 +331,7 @@ result<file_handle::path_type> file_handle::relink(path_type newpath) noexcept
     // FIXME: As soon as we implement fat paths, make this race free
     if(!(_flags & flag::disable_safety_unlinks))
     {
-      BOOST_OUTCOME_TRYV(check_inode(*this));
+      OUTCOME_TRYV(check_inode(*this));
     }
     if(-1 == ::rename(_path.c_str(), newpath.c_str()))
       return make_errored_result<path_type>(errno, last190(_path.native()));
@@ -342,11 +342,11 @@ result<file_handle::path_type> file_handle::relink(path_type newpath) noexcept
 
 result<void> file_handle::unlink() noexcept
 {
-  BOOST_AFIO_LOG_FUNCTION_CALL(_v.fd);
+  AFIO_LOG_FUNCTION_CALL(_v.fd);
   // FIXME: As soon as we implement fat paths, make this race free
   if(!(_flags & flag::disable_safety_unlinks))
   {
-    BOOST_OUTCOME_TRYV(check_inode(*this));
+    OUTCOME_TRYV(check_inode(*this));
   }
   if(-1 == ::unlink(_path.c_str()))
     return make_errored_result<void>(errno, last190(_path.native()));
@@ -356,7 +356,7 @@ result<void> file_handle::unlink() noexcept
 
 result<file_handle::extent_type> file_handle::length() const noexcept
 {
-  BOOST_AFIO_LOG_FUNCTION_CALL(_v.fd);
+  AFIO_LOG_FUNCTION_CALL(_v.fd);
   struct stat s;
   memset(&s, 0, sizeof(s));
   if(-1 == ::fstat(_v.fd, &s))
@@ -366,7 +366,7 @@ result<file_handle::extent_type> file_handle::length() const noexcept
 
 result<file_handle::extent_type> file_handle::truncate(file_handle::extent_type newsize) noexcept
 {
-  BOOST_AFIO_LOG_FUNCTION_CALL(_v.fd);
+  AFIO_LOG_FUNCTION_CALL(_v.fd);
   if(ftruncate(_v.fd, newsize) < 0)
     return make_errored_result<extent_type>(errno, last190(_path.native()));
   if(are_safety_fsyncs_issued())
@@ -376,4 +376,4 @@ result<file_handle::extent_type> file_handle::truncate(file_handle::extent_type 
   return newsize;
 }
 
-BOOST_AFIO_V2_NAMESPACE_END
+AFIO_V2_NAMESPACE_END

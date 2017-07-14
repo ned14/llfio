@@ -43,8 +43,8 @@ Distributed under the Boost Software License, Version 1.0.
 #include <conio.h>  // for kbhit()
 #endif
 
-namespace afio = BOOST_AFIO_V2_NAMESPACE;
-namespace child_process = BOOST_KERNELTEST_V1_NAMESPACE::child_process;
+namespace afio = AFIO_V2_NAMESPACE;
+namespace child_process = KERNELTEST_V1_NAMESPACE::child_process;
 
 #ifdef _WIN32
 // TODO FIXME Replace with mapped_file_handle once implemented as that is portable unlike this
@@ -114,7 +114,7 @@ int main(int argc, char *argv[])
     std::vector<child_process::child_process> children;
     auto mypath = child_process::current_process_path();
 #ifdef UNICODE
-    std::vector<afio::stl1z::filesystem::path::string_type> args = {L"spawned", L"", L"", L"", L"00"};
+    std::vector<afio::filesystem::path::string_type> args = {L"spawned", L"", L"", L"", L"00"};
     args[1].resize(strlen(argv[1]));
     for(size_t n = 0; n < args[1].size(); n++)
       args[1][n] = argv[1][n];
@@ -125,7 +125,7 @@ int main(int argc, char *argv[])
     for(size_t n = 0; n < args[3].size(); n++)
       args[3][n] = argv[3][n];
 #else
-    std::vector<afio::stl1z::filesystem::path::string_type> args = {"spawned", argv[1], argv[2], argv[3], "00"};
+    std::vector<afio::filesystem::path::string_type> args = {"spawned", argv[1], argv[2], argv[3], "00"};
 #endif
     auto env = child_process::current_process_env();
     std::cout << "Launching " << waiters << " copies of myself as a child process ..." << std::endl;
@@ -313,13 +313,13 @@ int main(int argc, char *argv[])
     }
     case lock_algorithm::memory_map:
     {
-      auto v = afio::algorithm::shared_fs_mutex::memory_map<boost_lite::algorithm::hash::passthru_hash>::fs_mutex_map("lockfile");
+      auto v = afio::algorithm::shared_fs_mutex::memory_map<QUICKCPPLIB_NAMESPACE::algorithm::hash::passthru_hash>::fs_mutex_map("lockfile");
       if(v.has_error())
       {
         std::cerr << "ERROR: Creation of lock algorithm returns " << v.get_error().message() << std::endl;
         return;
       }
-      algorithm = std::make_unique<afio::algorithm::shared_fs_mutex::memory_map<boost_lite::algorithm::hash::passthru_hash>>(std::move(v.get()));
+      algorithm = std::make_unique<afio::algorithm::shared_fs_mutex::memory_map<QUICKCPPLIB_NAMESPACE::algorithm::hash::passthru_hash>>(std::move(v.get()));
       break;
     }
     case lock_algorithm::unknown:

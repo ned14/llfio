@@ -22,8 +22,8 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#ifndef BOOST_AFIO_SHARED_FS_MUTEX_BASE_HPP
-#define BOOST_AFIO_SHARED_FS_MUTEX_BASE_HPP
+#ifndef AFIO_SHARED_FS_MUTEX_BASE_HPP
+#define AFIO_SHARED_FS_MUTEX_BASE_HPP
 
 #include "../../handle.hpp"
 
@@ -31,7 +31,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 //! \file base.hpp Provides algorithm::shared_fs_mutex::shared_fs_mutex
 
-BOOST_AFIO_V2_NAMESPACE_BEGIN
+AFIO_V2_NAMESPACE_BEGIN
 
 namespace algorithm
 {
@@ -41,7 +41,7 @@ namespace algorithm
     //! Unsigned 64 bit integer
     using uint64 = unsigned long long;
     //! Unsigned 128 bit integer
-    using uint128 = boost_lite::integers128::uint128;
+    using uint128 = QUICKCPPLIB_NAMESPACE::integers128::uint128;
 
     /*! \class shared_fs_mutex
     \brief Abstract base class for an object which protects shared filing system resources
@@ -81,7 +81,7 @@ namespace algorithm
         constexpr entity_type() noexcept : _init(0) {}
         //! Constructor
 #if !defined(__GNUC__) || defined(__clang__) || __GNUC__ >= 7
-        BOOSTLITE_CONSTEXPR
+        QUICKCPPLIB_CONSTEXPR
 #endif
         entity_type(value_type _value, bool _exclusive) noexcept : _init(0)
         {
@@ -103,13 +103,13 @@ namespace algorithm
       //! Generates an entity id from a sequence of bytes
       entity_type entity_from_buffer(const char *buffer, size_t bytes, bool exclusive = true) noexcept
       {
-        uint128 hash = boost_lite::algorithm::hash::fast_hash::hash(buffer, bytes);
+        uint128 hash = QUICKCPPLIB_NAMESPACE::algorithm::hash::fast_hash::hash(buffer, bytes);
         return entity_type(hash.as_longlongs[0] ^ hash.as_longlongs[1], exclusive);
       }
       //! Generates an entity id from a string
       template <typename T> entity_type entity_from_string(const std::basic_string<T> &str, bool exclusive = true) noexcept
       {
-        uint128 hash = boost_lite::algorithm::hash::fast_hash::hash(str);
+        uint128 hash = QUICKCPPLIB_NAMESPACE::algorithm::hash::fast_hash::hash(str);
         return entity_type(hash.as_longlongs[0] ^ hash.as_longlongs[1], exclusive);
       }
       //! Generates a cryptographically random entity id.
@@ -196,14 +196,14 @@ namespace algorithm
       result<entities_guard> lock(entities_type entities, deadline d = deadline(), bool spin_not_sleep = false) noexcept
       {
         entities_guard ret(this, std::move(entities));
-        BOOST_OUTCOME_TRYV(_lock(ret, std::move(d), spin_not_sleep));
+        OUTCOME_TRYV(_lock(ret, std::move(d), spin_not_sleep));
         return std::move(ret);
       }
       //! Lock a single entity for exclusive or shared access
       result<entities_guard> lock(entity_type entity, deadline d = deadline(), bool spin_not_sleep = false) noexcept
       {
         entities_guard ret(this, entity);
-        BOOST_OUTCOME_TRYV(_lock(ret, std::move(d), spin_not_sleep));
+        OUTCOME_TRYV(_lock(ret, std::move(d), spin_not_sleep));
         return std::move(ret);
       }
       //! Try to lock all of a sequence of entities for exclusive or shared access
@@ -217,7 +217,7 @@ namespace algorithm
   }  // namespace
 }  // namespace
 
-BOOST_AFIO_V2_NAMESPACE_END
+AFIO_V2_NAMESPACE_END
 
 
 #endif

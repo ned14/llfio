@@ -25,7 +25,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../../../handle.hpp"
 #include "import.hpp"
 
-BOOST_AFIO_V2_NAMESPACE_BEGIN
+AFIO_V2_NAMESPACE_BEGIN
 
 async_file_handle::io_result<async_file_handle::const_buffers_type> async_file_handle::barrier(async_file_handle::io_request<async_file_handle::const_buffers_type> reqs, bool wait_for_device, bool and_metadata, deadline d) noexcept
 {
@@ -35,7 +35,7 @@ async_file_handle::io_result<async_file_handle::const_buffers_type> async_file_h
 
 result<async_file_handle> async_file_handle::clone(io_service &service) const noexcept
 {
-  BOOST_OUTCOME_TRY(v, clone());
+  OUTCOME_TRY(v, clone());
   async_file_handle ret(std::move(v));
   ret._service = &service;
   return std::move(ret);
@@ -66,7 +66,7 @@ result<async_file_handle::io_state_ptr<CompletionRoutine, BuffersType>> async_fi
           size_t idx = ol - ols;
           if(idx >= this->items)
           {
-            BOOST_AFIO_LOG_FATAL(0, "async_file_handle::io_state::operator() called with invalid index");
+            AFIO_LOG_FATAL(0, "async_file_handle::io_state::operator() called with invalid index");
             std::terminate();
           }
           this->result.value()[idx].second = bytes_transferred;
@@ -96,12 +96,12 @@ result<async_file_handle::io_state_ptr<CompletionRoutine, BuffersType>> async_fi
 #ifndef NDEBUG
           if(res.has_error())
           {
-            BOOST_AFIO_LOG_FATAL(0, "async_file_handle: io_service failed");
+            AFIO_LOG_FATAL(0, "async_file_handle: io_service failed");
             std::terminate();
           }
           if(!res.get())
           {
-            BOOST_AFIO_LOG_FATAL(0, "async_file_handle: io_service returns no work when i/o has not completed");
+            AFIO_LOG_FATAL(0, "async_file_handle: io_service returns no work when i/o has not completed");
             std::terminate();
           }
 #endif
@@ -114,11 +114,11 @@ result<async_file_handle::io_state_ptr<CompletionRoutine, BuffersType>> async_fi
   using return_type = io_state_ptr<CompletionRoutine, BuffersType>;
   // On Windows i/o must be scheduled on the same thread pumping completion
   if(GetCurrentThreadId() != service()->_threadid)
-    return make_errored_result<return_type>(stl11::errc::operation_not_supported);
+    return make_errored_result<return_type>(std::errc::operation_not_supported);
 
   void *mem = ::calloc(1, statelen);
   if(!mem)
-    return make_errored_result<return_type>(stl11::errc::not_enough_memory);
+    return make_errored_result<return_type>(std::errc::not_enough_memory);
   return_type _state((_io_state_type<CompletionRoutine, BuffersType> *) mem);
   new((state = (state_type *) mem)) state_type(this, operation, std::forward<CompletionRoutine>(completion), items);
 
@@ -165,65 +165,65 @@ result<async_file_handle::io_state_ptr<CompletionRoutine, BuffersType>> async_fi
 
 template <class CompletionRoutine> result<async_file_handle::io_state_ptr<CompletionRoutine, async_file_handle::buffers_type>> async_file_handle::async_read(async_file_handle::io_request<async_file_handle::buffers_type> reqs, CompletionRoutine &&completion) noexcept
 {
-  BOOST_AFIO_LOG_FUNCTION_CALL(_v.h);
+  AFIO_LOG_FUNCTION_CALL(_v.h);
   return _begin_io(operation_t::read, std::move(reqs), [completion = std::forward<CompletionRoutine>(completion)](auto *state) { completion(state->parent, state->result); }, ReadFileEx);
 }
 
 template <class CompletionRoutine> result<async_file_handle::io_state_ptr<CompletionRoutine, async_file_handle::const_buffers_type>> async_file_handle::async_write(async_file_handle::io_request<async_file_handle::const_buffers_type> reqs, CompletionRoutine &&completion) noexcept
 {
-  BOOST_AFIO_LOG_FUNCTION_CALL(_v.h);
+  AFIO_LOG_FUNCTION_CALL(_v.h);
   return _begin_io(operation_t::write, std::move(reqs), [completion = std::forward<CompletionRoutine>(completion)](auto *state) { completion(state->parent, state->result); }, WriteFileEx);
 }
 
 async_file_handle::io_result<async_file_handle::buffers_type> async_file_handle::read(async_file_handle::io_request<async_file_handle::buffers_type> reqs, deadline d) noexcept
 {
-  BOOST_AFIO_LOG_FUNCTION_CALL(_v.h);
-  io_result<buffers_type> ret;
+  AFIO_LOG_FUNCTION_CALL(_v.h);
+  optional<io_result<buffers_type>> ret;
   auto _io_state(_begin_io(operation_t::read, std::move(reqs), [&ret](auto *state) { ret = std::move(state->result); }, ReadFileEx));
-  BOOST_OUTCOME_TRY(io_state, _io_state);
+  OUTCOME_TRY(io_state, _io_state);
 
   // While i/o is not done pump i/o completion
-  while(!ret.is_ready())
+  while(!ret)
   {
     auto t(_service->run_until(d));
     // If i/o service pump failed or timed out, cancel outstanding i/o and return
     if(!t)
-      return make_errored_result<buffers_type>(t.get_error());
+      return t.error();
 #ifndef NDEBUG
-    if(!ret.is_ready() && t && !t.get())
+    if(!ret && t && !t.value())
     {
-      BOOST_AFIO_LOG_FATAL(_v.h, "async_file_handle: io_service returns no work when i/o has not completed");
+      AFIO_LOG_FATAL(_v.h, "async_file_handle: io_service returns no work when i/o has not completed");
       std::terminate();
     }
 #endif
   }
-  return ret;
+  return *ret;
 }
 
 async_file_handle::io_result<async_file_handle::const_buffers_type> async_file_handle::write(async_file_handle::io_request<async_file_handle::const_buffers_type> reqs, deadline d) noexcept
 {
-  BOOST_AFIO_LOG_FUNCTION_CALL(_v.h);
-  io_result<const_buffers_type> ret;
+  AFIO_LOG_FUNCTION_CALL(_v.h);
+  optional<io_result<const_buffers_type>> ret;
   auto _io_state(_begin_io(operation_t::write, std::move(reqs), [&ret](auto *state) { ret = std::move(state->result); }, WriteFileEx));
-  BOOST_OUTCOME_TRY(io_state, _io_state);
+  OUTCOME_TRY(io_state, _io_state);
 
   // While i/o is not done pump i/o completion
-  while(!ret.is_ready())
+  while(!ret)
   {
     auto t(_service->run_until(d));
     // If i/o service pump failed or timed out, cancel outstanding i/o and return
     if(!t)
-      return make_errored_result<const_buffers_type>(t.get_error());
+      return t.error();
 #ifndef NDEBUG
-    if(!ret.is_ready() && t && !t.get())
+    if(!ret && t && !t.value())
     {
-      BOOST_AFIO_LOG_FATAL(_v.h, "async_file_handle: io_service returns no work when i/o has not completed");
+      AFIO_LOG_FATAL(_v.h, "async_file_handle: io_service returns no work when i/o has not completed");
       std::terminate();
     }
 #endif
   }
-  return ret;
+  return *ret;
 }
 
 
-BOOST_AFIO_V2_NAMESPACE_END
+AFIO_V2_NAMESPACE_END

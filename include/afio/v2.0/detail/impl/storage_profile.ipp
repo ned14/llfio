@@ -32,9 +32,9 @@ Distributed under the Boost Software License, Version 1.0.
 #include <iostream>
 #endif
 
-#define BOOST_AFIO_STORAGE_PROFILE_TIME_DIVIDER 10
+#define AFIO_STORAGE_PROFILE_TIME_DIVIDER 10
 
-BOOST_AFIO_V2_NAMESPACE_BEGIN
+AFIO_V2_NAMESPACE_BEGIN
 
 namespace storage_profile
 {
@@ -70,7 +70,7 @@ namespace storage_profile
   */
   void storage_profile::write(std::ostream &out, std::regex which, size_t _indent, bool invert_match) const
   {
-    BOOST_AFIO_LOG_FUNCTION_CALL(this);
+    AFIO_LOG_FUNCTION_CALL(this);
     std::vector<std::string> lastsection;
     auto print = [_indent, &out, &lastsection](auto &i) {
       size_t indent = _indent;
@@ -187,22 +187,22 @@ namespace storage_profile
         {
           size_t chunksize = 256 * 1024 * 1024;
 #ifdef WIN32
-          BOOST_OUTCOME_TRYV(windows::_mem(sp, h));
+          OUTCOME_TRYV(windows::_mem(sp, h));
 #else
-          BOOST_OUTCOME_TRYV(posix::_mem(sp, h));
+          OUTCOME_TRYV(posix::_mem(sp, h));
 #endif
 
           if(sp.mem_quantity.value / 4 < chunksize)
             chunksize = (size_t)(sp.mem_quantity.value / 4);
           char *buffer = utils::page_allocator<char>().allocate(chunksize);
-          auto unbuffer = BOOST_AFIO_V2_NAMESPACE::undoer([buffer, chunksize] { utils::page_allocator<char>().deallocate(buffer, chunksize); });
+          auto unbuffer = AFIO_V2_NAMESPACE::undoer([buffer, chunksize] { utils::page_allocator<char>().deallocate(buffer, chunksize); });
           // Make sure all memory is really allocated first
           memset(buffer, 1, chunksize);
 
           // Max bandwidth is sequential writes of min(25% of system memory or 256Mb)
-          auto begin = stl11::chrono::high_resolution_clock::now();
+          auto begin = std::chrono::high_resolution_clock::now();
           unsigned long long count;
-          for(count = 0; stl11::chrono::duration_cast<stl11::chrono::seconds>(stl11::chrono::high_resolution_clock::now() - begin).count() < (10 / BOOST_AFIO_STORAGE_PROFILE_TIME_DIVIDER); count++)
+          for(count = 0; std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock::now() - begin).count() < (10 / AFIO_STORAGE_PROFILE_TIME_DIVIDER); count++)
           {
             memset(buffer, count & 0xff, chunksize);
           }
@@ -211,8 +211,8 @@ namespace storage_profile
           // Min bandwidth is randomised 4Kb copies of the same
           detail::ranctx ctx;
           detail::raninit(&ctx, 78);
-          begin = stl11::chrono::high_resolution_clock::now();
-          for(count = 0; stl11::chrono::duration_cast<stl11::chrono::seconds>(stl11::chrono::high_resolution_clock::now() - begin).count() < (10 / BOOST_AFIO_STORAGE_PROFILE_TIME_DIVIDER); count++)
+          begin = std::chrono::high_resolution_clock::now();
+          for(count = 0; std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock::now() - begin).count() < (10 / AFIO_STORAGE_PROFILE_TIME_DIVIDER); count++)
           {
             for(size_t n = 0; n < chunksize; n += 4096)
             {
@@ -232,7 +232,7 @@ namespace storage_profile
         mem_max_bandwidth = sp.mem_max_bandwidth.value;
         mem_min_bandwidth = sp.mem_min_bandwidth.value;
       }
-      return make_valued_outcome<void>();
+      return success();
     }
   }
   namespace storage
@@ -243,19 +243,19 @@ namespace storage_profile
       try
       {
         statfs_t fsinfo;
-        BOOST_OUTCOME_TRYV(fsinfo.fill(h, statfs_t::want::iosize | statfs_t::want::mntfromname | statfs_t::want::fstypename));
+        OUTCOME_TRYV(fsinfo.fill(h, statfs_t::want::iosize | statfs_t::want::mntfromname | statfs_t::want::fstypename));
         sp.device_min_io_size.value = (unsigned) fsinfo.f_iosize;
 #ifdef WIN32
-        BOOST_OUTCOME_TRYV(windows::_device(sp, h, fsinfo.f_mntfromname, fsinfo.f_fstypename));
+        OUTCOME_TRYV(windows::_device(sp, h, fsinfo.f_mntfromname, fsinfo.f_fstypename));
 #else
-        BOOST_OUTCOME_TRYV(posix::_device(sp, h, fsinfo.f_mntfromname, fsinfo.f_fstypename));
+        OUTCOME_TRYV(posix::_device(sp, h, fsinfo.f_mntfromname, fsinfo.f_fstypename));
 #endif
       }
       catch(...)
       {
         return std::current_exception();
       }
-      return make_valued_outcome<void>();
+      return success();
     }
     // FS name, config, size, in use
     outcome<void> fs(storage_profile &sp, file_handle &h) noexcept
@@ -263,7 +263,7 @@ namespace storage_profile
       try
       {
         statfs_t fsinfo;
-        BOOST_OUTCOME_TRYV(fsinfo.fill(h));
+        OUTCOME_TRYV(fsinfo.fill(h));
         sp.fs_name.value = fsinfo.f_fstypename;
         sp.fs_config.value = "todo";
         sp.fs_size.value = fsinfo.f_blocks * fsinfo.f_bsize;
@@ -273,7 +273,7 @@ namespace storage_profile
       {
         return std::current_exception();
       }
-      return make_valued_outcome<void>();
+      return success();
     }
   }
 
@@ -299,8 +299,8 @@ namespace storage_profile
             writers.push_back(std::thread([size, &srch, no, &done] {
               auto _h(srch.clone());
               if(!_h)
-                throw std::runtime_error("concurrency::atomic_rewrite_quantum: Could not open work file due to " + _h.get_error().message());
-              file_handle h(std::move(_h.get()));
+                throw std::runtime_error("concurrency::atomic_rewrite_quantum: Could not open work file due to " + _h.error().message());
+              file_handle h(std::move(_h.value()));
               std::vector<char> buffer(size, no);
               file_handle::const_buffer_type _reqs[1] = {std::make_pair(buffer.data(), size)};
               file_handle::io_request<file_handle::const_buffers_type> reqs(_reqs, 0);
@@ -324,8 +324,8 @@ namespace storage_profile
             readers.push_back(std::thread([size, &srch, &done, &atomic_rewrite_quantum, &failed] {
               auto _h(srch.clone());
               if(!_h)
-                throw std::runtime_error("concurrency::atomic_rewrite_quantum: Could not open work file due to " + _h.get_error().message());
-              file_handle h(std::move(_h.get()));
+                throw std::runtime_error("concurrency::atomic_rewrite_quantum: Could not open work file due to " + _h.error().message());
+              file_handle h(std::move(_h.value()));
               std::vector<char> buffer(size, 0), tocmp(size, 0);
               file_handle::buffer_type _reqs[1] = {std::make_pair(buffer.data(), size)};
               file_handle::io_request<file_handle::buffers_type> reqs(_reqs, 0);
@@ -359,10 +359,10 @@ namespace storage_profile
 #ifndef NDEBUG
           std::cout << "direct=" << !srch.are_reads_from_cache() << " sync=" << srch.are_writes_durable() << " testing atomicity of rewrites of " << size << " bytes ..." << std::endl;
 #endif
-          auto begin = stl11::chrono::high_resolution_clock::now();
-          while(!failed && stl11::chrono::duration_cast<stl11::chrono::seconds>(stl11::chrono::high_resolution_clock::now() - begin).count() < (20 / BOOST_AFIO_STORAGE_PROFILE_TIME_DIVIDER))
+          auto begin = std::chrono::high_resolution_clock::now();
+          while(!failed && std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock::now() - begin).count() < (20 / AFIO_STORAGE_PROFILE_TIME_DIVIDER))
           {
-            stl11::this_thread::sleep_for(stl11::chrono::seconds(1));
+            std::this_thread::sleep_for(std::chrono::seconds(1));
           }
           done = true;
           for(auto &writer : writers)
@@ -395,8 +395,8 @@ namespace storage_profile
               writers.push_back(std::thread([size, offset, &srch, no, &done] {
                 auto _h(srch.clone());
                 if(!_h)
-                  throw std::runtime_error("concurrency::atomic_rewrite_quantum: Could not open work file due to " + _h.get_error().message());
-                file_handle h(std::move(_h.get()));
+                  throw std::runtime_error("concurrency::atomic_rewrite_quantum: Could not open work file due to " + _h.error().message());
+                file_handle h(std::move(_h.value()));
                 std::vector<char> buffer(size, no);
                 file_handle::const_buffer_type _reqs[1] = {std::make_pair(buffer.data(), size)};
                 file_handle::io_request<file_handle::const_buffers_type> reqs(_reqs, offset);
@@ -420,8 +420,8 @@ namespace storage_profile
               readers.push_back(std::thread([size, offset, &srch, &done, &max_aligned_atomic_rewrite, &failed] {
                 auto _h(srch.clone());
                 if(!_h)
-                  throw std::runtime_error("concurrency::atomic_rewrite_quantum: Could not open work file due to " + _h.get_error().message());
-                file_handle h(std::move(_h.get()));
+                  throw std::runtime_error("concurrency::atomic_rewrite_quantum: Could not open work file due to " + _h.error().message());
+                file_handle h(std::move(_h.value()));
                 std::vector<char> buffer(size, 0), tocmp(size, 0);
                 file_handle::buffer_type _reqs[1] = {std::make_pair(buffer.data(), size)};
                 file_handle::io_request<file_handle::buffers_type> reqs(_reqs, offset);
@@ -455,10 +455,10 @@ namespace storage_profile
 #ifndef NDEBUG
             std::cout << "direct=" << !srch.are_reads_from_cache() << " sync=" << srch.are_writes_durable() << " testing atomicity of rewrites of " << size << " bytes to offset " << offset << " ..." << std::endl;
 #endif
-            auto begin = stl11::chrono::high_resolution_clock::now();
-            while(!failed && stl11::chrono::duration_cast<stl11::chrono::seconds>(stl11::chrono::high_resolution_clock::now() - begin).count() < (20 / BOOST_AFIO_STORAGE_PROFILE_TIME_DIVIDER))
+            auto begin = std::chrono::high_resolution_clock::now();
+            while(!failed && std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock::now() - begin).count() < (20 / AFIO_STORAGE_PROFILE_TIME_DIVIDER))
             {
-              stl11::this_thread::sleep_for(stl11::chrono::seconds(1));
+              std::this_thread::sleep_for(std::chrono::seconds(1));
             }
             done = true;
             for(auto &writer : writers)
@@ -467,7 +467,7 @@ namespace storage_profile
               reader.join();
             sp.max_aligned_atomic_rewrite.value = max_aligned_atomic_rewrite;
             if(failed)
-              return make_valued_outcome<void>();
+              return success();
           }
         }
       }
@@ -475,7 +475,7 @@ namespace storage_profile
       {
         return std::current_exception();
       }
-      return make_valued_outcome<void>();
+      return success();
     }
 
     outcome<void> atomic_rewrite_offset_boundary(storage_profile &sp, file_handle &srch) noexcept
@@ -503,8 +503,8 @@ namespace storage_profile
                 writers.push_back(std::thread([size, offset, &srch, no, &done] {
                   auto _h(srch.clone());
                   if(!_h)
-                    throw std::runtime_error("concurrency::atomic_rewrite_offset_boundary: Could not open work file due to " + _h.get_error().message());
-                  file_handle h(std::move(_h.get()));
+                    throw std::runtime_error("concurrency::atomic_rewrite_offset_boundary: Could not open work file due to " + _h.error().message());
+                  file_handle h(std::move(_h.value()));
                   std::vector<char> buffer(size, no);
                   file_handle::const_buffer_type _reqs[1] = {std::make_pair(buffer.data(), size)};
                   file_handle::io_request<file_handle::const_buffers_type> reqs(_reqs, offset);
@@ -528,8 +528,8 @@ namespace storage_profile
                 readers.push_back(std::thread([size, offset, &srch, &done, &atomic_rewrite_offset_boundary, &failed] {
                   auto _h(srch.clone());
                   if(!_h)
-                    throw std::runtime_error("concurrency::atomic_rewrite_offset_boundary: Could not open work file due to " + _h.get_error().message());
-                  file_handle h(std::move(_h.get()));
+                    throw std::runtime_error("concurrency::atomic_rewrite_offset_boundary: Could not open work file due to " + _h.error().message());
+                  file_handle h(std::move(_h.value()));
                   std::vector<char> buffer(size, 0), tocmp(size, 0);
                   file_handle::buffer_type _reqs[1] = {std::make_pair(buffer.data(), size)};
                   file_handle::io_request<file_handle::buffers_type> reqs(_reqs, offset);
@@ -563,10 +563,10 @@ namespace storage_profile
 #ifndef NDEBUG
               std::cout << "direct=" << !srch.are_reads_from_cache() << " sync=" << srch.are_writes_durable() << " testing atomicity of rewrites of " << size << " bytes to offset " << offset << " ..." << std::endl;
 #endif
-              auto begin = stl11::chrono::high_resolution_clock::now();
-              while(!failed && stl11::chrono::duration_cast<stl11::chrono::seconds>(stl11::chrono::high_resolution_clock::now() - begin).count() < (20 / BOOST_AFIO_STORAGE_PROFILE_TIME_DIVIDER))
+              auto begin = std::chrono::high_resolution_clock::now();
+              while(!failed && std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock::now() - begin).count() < (20 / AFIO_STORAGE_PROFILE_TIME_DIVIDER))
               {
-                stl11::this_thread::sleep_for(stl11::chrono::seconds(1));
+                std::this_thread::sleep_for(std::chrono::seconds(1));
               }
               done = true;
               for(auto &writer : writers)
@@ -575,7 +575,7 @@ namespace storage_profile
                 reader.join();
               sp.atomic_rewrite_offset_boundary.value = atomic_rewrite_offset_boundary;
               if(failed)
-                return make_valued_outcome<void>();
+                return success();
             }
           }
         }
@@ -584,14 +584,14 @@ namespace storage_profile
       {
         return std::current_exception();
       }
-      return make_valued_outcome<void>();
+      return success();
     }
   }
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
 }
-BOOST_AFIO_V2_NAMESPACE_END
+AFIO_V2_NAMESPACE_END
 
 #ifdef WIN32
 #include "windows/storage_profile.ipp"

@@ -22,8 +22,8 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#ifndef BOOST_AFIO_SHARED_FS_MUTEX_ATOMIC_APPEND_HPP
-#define BOOST_AFIO_SHARED_FS_MUTEX_ATOMIC_APPEND_HPP
+#ifndef AFIO_SHARED_FS_MUTEX_ATOMIC_APPEND_HPP
+#define AFIO_SHARED_FS_MUTEX_ATOMIC_APPEND_HPP
 
 #include "../../file_handle.hpp"
 #include "base.hpp"
@@ -32,7 +32,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 //! \file atomic_append.hpp Provides algorithm::shared_fs_mutex::atomic_append
 
-BOOST_AFIO_V2_NAMESPACE_BEGIN
+AFIO_V2_NAMESPACE_BEGIN
 
 namespace algorithm
 {
@@ -131,18 +131,18 @@ namespace algorithm
         bool first = true;
         do
         {
-          BOOST_OUTCOME_TRY(_, _h.read(0, (char *) &_header, 48));
+          OUTCOME_TRY(_, _h.read(0, (char *) &_header, 48));
           if(_.first != (char *) &_header)
             memcpy(&_header, _.first, _.second);
           if(_skip_hashing)
-            return make_valued_result<void>();
+            return success();
           if(first)
             first = false;
           else
-            stl11::this_thread::yield();
+            std::this_thread::yield();
           // No timeout as this should very rarely block for any significant length of time
-        } while(_header.hash != boost_lite::algorithm::hash::fast_hash::hash(((char *) &_header) + 16, sizeof(_header) - 16));
-        return make_valued_result<void>();
+        } while(_header.hash != QUICKCPPLIB_NAMESPACE::algorithm::hash::fast_hash::hash(((char *) &_header) + 16, sizeof(_header) - 16));
+        return success();
       }
 
     public:
@@ -173,35 +173,35 @@ namespace algorithm
       //[[bindlib::make_free]]
       static result<atomic_append> fs_mutex_append(file_handle::path_type lockfile, bool nfs_compatibility = false, bool skip_hashing = false) noexcept
       {
-        BOOST_AFIO_LOG_FUNCTION_CALL(0);
-        BOOST_OUTCOME_TRY(ret, file_handle::file(std::move(lockfile), file_handle::mode::write, file_handle::creation::if_needed, file_handle::caching::temporary));
+        AFIO_LOG_FUNCTION_CALL(0);
+        OUTCOME_TRY(ret, file_handle::file(std::move(lockfile), file_handle::mode::write, file_handle::creation::if_needed, file_handle::caching::temporary));
         atomic_append_detail::header header;
         // Lock the entire header for exclusive access
         auto lockresult = ret.try_lock(0, sizeof(header), true);
         //! \todo fs_mutex_append needs to check if file still exists after lock is granted, awaiting path fetching.
         if(lockresult.has_error())
         {
-          if(lockresult.get_error().value() != ETIMEDOUT)
-            return lockresult.get_error();
+          if(lockresult.error().value() != ETIMEDOUT)
+            return lockresult.error();
           // Somebody else is also using this file
         }
         else
         {
           // I am the first person to be using this (stale?) file, so write a new header and truncate
-          BOOST_OUTCOME_TRYV(ret.truncate(sizeof(header)));
+          OUTCOME_TRYV(ret.truncate(sizeof(header)));
           memset(&header, 0, sizeof(header));
-          header.time_offset = stl11::chrono::system_clock::to_time_t(stl11::chrono::system_clock::now());
+          header.time_offset = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
           header.first_known_good = sizeof(header);
           header.first_after_hole_punch = sizeof(header);
           if(!skip_hashing)
-            header.hash = boost_lite::algorithm::hash::fast_hash::hash(((char *) &header) + 16, sizeof(header) - 16);
-          BOOST_OUTCOME_TRYV(ret.write(0, (char *) &header, sizeof(header)));
+            header.hash = QUICKCPPLIB_NAMESPACE::algorithm::hash::fast_hash::hash(((char *) &header) + 16, sizeof(header) - 16);
+          OUTCOME_TRYV(ret.write(0, (char *) &header, sizeof(header)));
         }
         // Open a shared lock on last byte in header to prevent other users zomping the file
-        BOOST_OUTCOME_TRY(guard, ret.lock(sizeof(header) - 1, 1, false));
+        OUTCOME_TRY(guard, ret.lock(sizeof(header) - 1, 1, false));
         // Unlock any exclusive lock I gained earlier now
         if(lockresult)
-          lockresult.get().unlock();
+          lockresult.value().unlock();
         // The constructor will read and cache the header
         return atomic_append(std::move(ret), std::move(guard), nfs_compatibility, skip_hashing);
       }
@@ -212,17 +212,17 @@ namespace algorithm
     protected:
       virtual result<void> _lock(entities_guard &out, deadline d, bool spin_not_sleep) noexcept override final
       {
-        BOOST_AFIO_LOG_FUNCTION_CALL(this);
+        AFIO_LOG_FUNCTION_CALL(this);
         atomic_append_detail::lock_request lock_request;
         if(out.entities.size() > sizeof(lock_request.entities) / sizeof(lock_request.entities[0]))
-          return make_errored_result<void>(stl11::errc::argument_list_too_long);
+          return std::errc::argument_list_too_long;
 
-        stl11::chrono::steady_clock::time_point began_steady;
-        stl11::chrono::system_clock::time_point end_utc;
+        std::chrono::steady_clock::time_point began_steady;
+        std::chrono::system_clock::time_point end_utc;
         if(d)
         {
           if((d).steady)
-            began_steady = stl11::chrono::steady_clock::now();
+            began_steady = std::chrono::steady_clock::now();
           else
             end_utc = (d).to_time_point();
         }
@@ -232,16 +232,16 @@ namespace algorithm
         // Write my lock request immediately
         memset(&lock_request, 0, sizeof(lock_request));
         lock_request.unique_id = _unique_id;
-        auto count = stl11::chrono::system_clock::now() - stl11::chrono::system_clock::from_time_t(_header.time_offset);
-        lock_request.us_count = stl11::chrono::duration_cast<stl11::chrono::microseconds>(count).count();
+        auto count = std::chrono::system_clock::now() - std::chrono::system_clock::from_time_t(_header.time_offset);
+        lock_request.us_count = std::chrono::duration_cast<std::chrono::microseconds>(count).count();
         lock_request.items = out.entities.size();
         memcpy(lock_request.entities, out.entities.data(), sizeof(lock_request.entities[0]) * out.entities.size());
         if(!_skip_hashing)
-          lock_request.hash = boost_lite::algorithm::hash::fast_hash::hash(((char *) &lock_request) + 16, sizeof(lock_request) - 16);
+          lock_request.hash = QUICKCPPLIB_NAMESPACE::algorithm::hash::fast_hash::hash(((char *) &lock_request) + 16, sizeof(lock_request) - 16);
         // My lock request will be the file's current length or higher
-        BOOST_OUTCOME_TRY(my_lock_request_offset, _h.length());
+        OUTCOME_TRY(my_lock_request_offset, _h.length());
         {
-          BOOST_OUTCOME_TRYV(_h.set_append_only(true));
+          OUTCOME_TRYV(_h.set_append_only(true));
           auto undo = undoer([this] { (void) _h.set_append_only(false); });
           file_handle::extent_guard append_guard;
           if(_nfs_compatibility)
@@ -249,10 +249,10 @@ namespace algorithm
             file_handle::extent_type lastbyte = (file_handle::extent_type) -1;
             // Lock up to the beginning of the shadow lock space
             lastbyte &= ~(1ULL << 63);
-            BOOST_OUTCOME_TRY(append_guard_, _h.lock(my_lock_request_offset, lastbyte, true));
+            OUTCOME_TRY(append_guard_, _h.lock(my_lock_request_offset, lastbyte, true));
             append_guard = std::move(append_guard_);
           }
-          BOOST_OUTCOME_TRYV(_h.write(0, (char *) &lock_request, sizeof(lock_request)));
+          OUTCOME_TRYV(_h.write(0, (char *) &lock_request, sizeof(lock_request)));
         }
 
         // Find the record I just wrote
@@ -268,11 +268,11 @@ namespace algorithm
           // Should never happen :)
           if(readoutcome.has_error())
           {
-            BOOST_AFIO_LOG_FATAL(this, "atomic_append::lock() saw an error when searching for just written data");
+            AFIO_LOG_FATAL(this, "atomic_append::lock() saw an error when searching for just written data");
             std::terminate();
           }
           const atomic_append_detail::lock_request *record, *lastrecord;
-          for(record = (const atomic_append_detail::lock_request *) readoutcome.get().first, lastrecord = (const atomic_append_detail::lock_request *) (readoutcome.get().first + readoutcome.get().second); record < lastrecord && record->hash != lock_request.hash; ++record)
+          for(record = (const atomic_append_detail::lock_request *) readoutcome.value().first, lastrecord = (const atomic_append_detail::lock_request *) (readoutcome.value().first + readoutcome.value().second); record < lastrecord && record->hash != lock_request.hash; ++record)
             my_lock_request_offset += sizeof(atomic_append_detail::lock_request);
           if(record->hash == lock_request.hash)
             break;
@@ -289,7 +289,7 @@ namespace algorithm
           auto lock_offset = my_lock_request_offset;
           // Set the top bit to use the shadow lock space on Windows
           lock_offset |= (1ULL << 63);
-          BOOST_OUTCOME_TRY(my_request_guard_, _h.lock(lock_offset, sizeof(lock_request), true));
+          OUTCOME_TRY(my_request_guard_, _h.lock(lock_offset, sizeof(lock_request), true));
           my_request_guard = std::move(my_request_guard_);
         }
 
@@ -300,7 +300,7 @@ namespace algorithm
         reload:
           // Refresh the header and load a snapshot of everything between record_offset
           // and first_known_good or -6Kb, whichever the sooner
-          BOOST_OUTCOME_TRYV(_read_header());
+          OUTCOME_TRYV(_read_header());
           // If there are no preceding records, we're done
           if(record_offset < _header.first_known_good)
             break;
@@ -313,7 +313,7 @@ namespace algorithm
             start_offset = _header.first_known_good;
           assert(record_offset >= start_offset);
           assert(record_offset - start_offset <= sizeof(_buffer));
-          BOOST_OUTCOME_TRY(batchread, _h.read(start_offset, _buffer, (size_t)(record_offset - start_offset) + sizeof(atomic_append_detail::lock_request)));
+          OUTCOME_TRY(batchread, _h.read(start_offset, _buffer, (size_t)(record_offset - start_offset) + sizeof(atomic_append_detail::lock_request)));
           assert(batchread.second == record_offset - start_offset + sizeof(atomic_append_detail::lock_request));
           const atomic_append_detail::lock_request *record = (atomic_append_detail::lock_request *) (batchread.first + batchread.second - sizeof(atomic_append_detail::lock_request));
           const atomic_append_detail::lock_request *firstrecord = (atomic_append_detail::lock_request *) batchread.first;
@@ -327,7 +327,7 @@ namespace algorithm
             // If record hash doesn't match contents it's a torn read, reload
             if(!_skip_hashing)
             {
-              if(record->hash != boost_lite::algorithm::hash::fast_hash::hash(((char *) record) + 16, sizeof(atomic_append_detail::lock_request) - 16))
+              if(record->hash != QUICKCPPLIB_NAMESPACE::algorithm::hash::fast_hash::hash(((char *) record) + 16, sizeof(atomic_append_detail::lock_request) - 16))
                 goto reload;
             }
 
@@ -356,7 +356,7 @@ namespace algorithm
           // request and when he takes an exclusive lock on it,
           // so if our shared lock succeeds we need to immediately
           // unlock and retry based on the data.
-          stl11::this_thread::yield();
+          std::this_thread::yield();
           if(!spin_not_sleep)
           {
             deadline nd;
@@ -364,7 +364,7 @@ namespace algorithm
             {
               if((d).steady)
               {
-                stl11::chrono::nanoseconds ns = stl11::chrono::duration_cast<stl11::chrono::nanoseconds>((began_steady + stl11::chrono::nanoseconds((d).nsecs)) - stl11::chrono::steady_clock::now());
+                std::chrono::nanoseconds ns = std::chrono::duration_cast<std::chrono::nanoseconds>((began_steady + std::chrono::nanoseconds((d).nsecs)) - std::chrono::steady_clock::now());
                 if(ns.count() < 0)
                   (nd).nsecs = 0;
                 else
@@ -376,34 +376,34 @@ namespace algorithm
             auto lock_offset = record_offset;
             // Set the top bit to use the shadow lock space on Windows
             lock_offset |= (1ULL << 63);
-            BOOST_OUTCOME_TRY(record_guard_, _h.lock(lock_offset, sizeof(record), false, nd));
+            OUTCOME_TRY(record_guard_, _h.lock(lock_offset, sizeof(record), false, nd));
           }
           // Make sure we haven't timed out during this wait
           if(d)
           {
             if((d).steady)
             {
-              if(stl11::chrono::steady_clock::now() >= (began_steady + stl11::chrono::nanoseconds((d).nsecs)))
-                return make_errored_result<void>(stl11::errc::timed_out);
+              if(std::chrono::steady_clock::now() >= (began_steady + std::chrono::nanoseconds((d).nsecs)))
+                return std::errc::timed_out;
             }
             else
             {
-              if(stl11::chrono::system_clock::now() >= end_utc)
-                return make_errored_result<void>(stl11::errc::timed_out);
+              if(std::chrono::system_clock::now() >= end_utc)
+                return std::errc::timed_out;
             }
           }
         } while(record_offset >= _header.first_known_good);
-        return make_valued_result<void>();
+        return success();
       }
 
     public:
       virtual void unlock(entities_type entities, unsigned long long hint) noexcept override final
       {
         (void) entities;
-        BOOST_AFIO_LOG_FUNCTION_CALL(this);
+        AFIO_LOG_FUNCTION_CALL(this);
         if(!hint)
         {
-          BOOST_AFIO_LOG_WARN(this, "atomic_append::unlock() currently requires a hint to work, assuming this is a failed lock.");
+          AFIO_LOG_WARN(this, "atomic_append::unlock() currently requires a hint to work, assuming this is a failed lock.");
           return;
         }
         file_handle::extent_type my_lock_request_offset = (file_handle::extent_type) hint;
@@ -413,13 +413,13 @@ namespace algorithm
           (void) _h.read(my_lock_request_offset, (char *) &record, sizeof(record));
           if(!record.unique_id)
           {
-            BOOST_AFIO_LOG_FATAL(this, "atomic_append::unlock() I have been previously unlocked!");
+            AFIO_LOG_FATAL(this, "atomic_append::unlock() I have been previously unlocked!");
             std::terminate();
           }
           _read_header();
           if(_header.first_known_good > my_lock_request_offset)
           {
-            BOOST_AFIO_LOG_FATAL(this, "atomic_append::unlock() header exceeds the lock I am unlocking!");
+            AFIO_LOG_FATAL(this, "atomic_append::unlock() header exceeds the lock I am unlocking!");
             std::terminate();
           }
 #endif
@@ -445,7 +445,7 @@ namespace algorithm
               // 6Kb we can read an EOF
               break;
             }
-            const auto &bytesread = bytesread_.get();
+            const auto &bytesread = bytesread_.value();
             // If read was partial, we are done after this round
             if(bytesread.second < sizeof(_buffer))
               done = true;
@@ -470,7 +470,7 @@ namespace algorithm
           }
           ++_header.generation;
           if(!_skip_hashing)
-            _header.hash = boost_lite::algorithm::hash::fast_hash::hash(((char *) &_header) + 16, sizeof(_header) - 16);
+            _header.hash = QUICKCPPLIB_NAMESPACE::algorithm::hash::fast_hash::hash(((char *) &_header) + 16, sizeof(_header) - 16);
           // Rewrite the first part of the header only
           (void) _h.write(0, (char *) &_header, 48);
         }
@@ -480,7 +480,7 @@ namespace algorithm
   }  // namespace
 }  // namespace
 
-BOOST_AFIO_V2_NAMESPACE_END
+AFIO_V2_NAMESPACE_END
 
 
 #endif

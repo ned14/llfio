@@ -28,7 +28,7 @@ print('''<p align="center">
 <a href="http://boostgsoc13.github.io/boost.afio/">Documentation can be found here</a>
 </p>
 <h3 align="center">
-Boost.AFIO Jenkins CI status:
+AFIO Jenkins CI status:
 </h3>
 <p align="center">Unit test code coverage is: <a href='https://coveralls.io/r/BoostGSoC13/boost.afio'><img src='https://coveralls.io/repos/BoostGSoC13/boost.afio/badge.png' alt='Coverage Status' /></a></p>
 <p align="center">Appveyor: <a href='https://ci.appveyor.com/project/ned14/boost-afio'><img src='https://ci.appveyor.com/api/projects/status/f89cv89kj8c2nmvb/branch/master'/></a></p>
@@ -39,22 +39,22 @@ Boost.AFIO Jenkins CI status:
 
 <!-- static analysis clang -->
 <tr align="center"><td rowspan="2">Static analysis</td><td>clang 3.7 tidy + static analyser + GCC 4.8</td><td></td><td></td><td>
-<div><a href='https://ci.nedprod.com/job/Boost.AFIO%20Static%20Analysis%20clang/'><img src='https://ci.nedprod.com/buildStatus/icon?job=Boost.AFIO%20Static%20Analysis%20clang' /></a></div></td><td></td>
+<div><a href='https://ci.nedprod.com/job/AFIO%20Static%20Analysis%20clang/'><img src='https://ci.nedprod.com/buildStatus/icon?job=AFIO%20Static%20Analysis%20clang' /></a></div></td><td></td>
 </tr>
 
 <!-- static analysis MSVC -->
 <tr align="center"><td>VS2013</td><td></td><td></td><td>
-<div><a href='https://ci.nedprod.com/job/Boost.AFIO%20Static%20Analysis%20MSVC/'><img src='https://ci.nedprod.com/buildStatus/icon?job=Boost.AFIO%20Static%20Analysis%20MSVC' /></a></div></td><td></td>
+<div><a href='https://ci.nedprod.com/job/AFIO%20Static%20Analysis%20MSVC/'><img src='https://ci.nedprod.com/buildStatus/icon?job=AFIO%20Static%20Analysis%20MSVC' /></a></div></td><td></td>
 </tr>
 
 <!-- sanitiser -->
 <tr align="center"><td>Thread Sanitiser</td><td>clang 3.4</td><td>libstdc++ 4.9</td><td>x64</td><td></td><td>
-<div><a href='https://ci.nedprod.com/job/Boost.AFIO%20Sanitise%20Linux%20clang%203.4/'><img src='https://ci.nedprod.com/buildStatus/icon?job=Boost.AFIO%20Sanitise%20Linux%20clang%203.4' /></a></div></td>
+<div><a href='https://ci.nedprod.com/job/AFIO%20Sanitise%20Linux%20clang%203.4/'><img src='https://ci.nedprod.com/buildStatus/icon?job=AFIO%20Sanitise%20Linux%20clang%203.4' /></a></div></td>
 </tr>
 
 <!-- valgrind -->
 <tr align="center"><td>Valgrind</td><td>GCC 4.8</td><td>libstdc++ 4.8</td><td>x64</td><td></td><td>
-<div><a href='https://ci.nedprod.com/job/Boost.AFIO%20Valgrind%20Linux%20GCC%204.8/'><img src='https://ci.nedprod.com/buildStatus/icon?job=Boost.AFIO%20Valgrind%20Linux%20GCC%204.8' /></a></div></td>
+<div><a href='https://ci.nedprod.com/job/AFIO%20Valgrind%20Linux%20GCC%204.8/'><img src='https://ci.nedprod.com/buildStatus/icon?job=AFIO%20Valgrind%20Linux%20GCC%204.8' /></a></div></td>
 </tr>
 
 <!-- sep -->
@@ -67,7 +67,7 @@ Boost.AFIO Jenkins CI status:
 </tr>
 ''')
 
-# <a href='https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++11,CXX=g++-4.8,LINKTYPE=static,label=android-ndk/'><img src='https://ci.nedprod.com/job/Boost.AFIO%20Build/CPPSTD=c++11,CXX=g++-4.8,LINKTYPE=static,label=android-ndk/badge/icon'></a>
+# <a href='https://ci.nedprod.com/job/AFIO%20Build/CPPSTD=c++11,CXX=g++-4.8,LINKTYPE=static,label=android-ndk/'><img src='https://ci.nedprod.com/job/AFIO%20Build/CPPSTD=c++11,CXX=g++-4.8,LINKTYPE=static,label=android-ndk/badge/icon'></a>
 
 for line, items in inputs:
   if line[0]==0:
@@ -82,12 +82,12 @@ for line, items in inputs:
   for cppstd in cppstds:
     for cxx in cxxs:
       for linktype in linktypes:
-        print('  <div><a href="https://ci.nedprod.com/job/Boost.AFIO%%20Build/CPPSTD=%s,CXX=%s,LINKTYPE=%s,label=%s/"><img src="https://ci.nedprod.com/job/Boost.AFIO%%20Build/CPPSTD=%s,CXX=%s,LINKTYPE=%s,label=%s/badge/icon" /></a></div>' % (cppstd, cxx, linktype, label, cppstd, cxx, linktype, label))
+        print('  <div><a href="https://ci.nedprod.com/job/AFIO%%20Build/CPPSTD=%s,CXX=%s,LINKTYPE=%s,label=%s/"><img src="https://ci.nedprod.com/job/AFIO%%20Build/CPPSTD=%s,CXX=%s,LINKTYPE=%s,label=%s/badge/icon" /></a></div>' % (cppstd, cxx, linktype, label, cppstd, cxx, linktype, label))
   print('</td><td>')
   for cppstd in cppstds:
     for cxx in cxxs:
       for linktype in linktypes:
-        print('  <div><a href="https://ci.nedprod.com/job/Boost.AFIO%%20Test/CPPSTD=%s,CXX=%s,LINKTYPE=%s,label=%s/"><img src="https://ci.nedprod.com/job/Boost.AFIO%%20Test/CPPSTD=%s,CXX=%s,LINKTYPE=%s,label=%s/badge/icon" /></a></div>' % (cppstd, cxx, linktype, label, cppstd, cxx, linktype, label))
+        print('  <div><a href="https://ci.nedprod.com/job/AFIO%%20Test/CPPSTD=%s,CXX=%s,LINKTYPE=%s,label=%s/"><img src="https://ci.nedprod.com/job/AFIO%%20Test/CPPSTD=%s,CXX=%s,LINKTYPE=%s,label=%s/badge/icon" /></a></div>' % (cppstd, cxx, linktype, label, cppstd, cxx, linktype, label))
   print('</td></tr>')
   
 print('''</table>

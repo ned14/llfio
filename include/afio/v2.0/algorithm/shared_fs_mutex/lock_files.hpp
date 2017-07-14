@@ -22,8 +22,8 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#ifndef BOOST_AFIO_SHARED_FS_MUTEX_LOCK_FILES_HPP
-#define BOOST_AFIO_SHARED_FS_MUTEX_LOCK_FILES_HPP
+#ifndef AFIO_SHARED_FS_MUTEX_LOCK_FILES_HPP
+#define AFIO_SHARED_FS_MUTEX_LOCK_FILES_HPP
 
 #include "../../file_handle.hpp"
 #include "base.hpp"
@@ -32,7 +32,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 //! \file lock_files.hpp Provides algorithm::shared_fs_mutex::lock_files
 
-BOOST_AFIO_V2_NAMESPACE_BEGIN
+AFIO_V2_NAMESPACE_BEGIN
 
 namespace algorithm
 {
@@ -102,7 +102,7 @@ namespace algorithm
       //[[bindlib::make_free]]
       static result<lock_files> fs_mutex_lock_files(file_handle::path_type lockdir) noexcept
       {
-        BOOST_AFIO_LOG_FUNCTION_CALL(0);
+        AFIO_LOG_FUNCTION_CALL(0);
         return lock_files(std::move(lockdir));
       }
 
@@ -112,13 +112,13 @@ namespace algorithm
     protected:
       virtual result<void> _lock(entities_guard &out, deadline d, bool spin_not_sleep) noexcept override final
       {
-        BOOST_AFIO_LOG_FUNCTION_CALL(this);
-        stl11::chrono::steady_clock::time_point began_steady;
-        stl11::chrono::system_clock::time_point end_utc;
+        AFIO_LOG_FUNCTION_CALL(this);
+        std::chrono::steady_clock::time_point began_steady;
+        std::chrono::system_clock::time_point end_utc;
         if(d)
         {
           if((d).steady)
-            began_steady = stl11::chrono::steady_clock::now();
+            began_steady = std::chrono::steady_clock::now();
           else
             end_utc = (d).to_time_point();
         }
@@ -128,7 +128,7 @@ namespace algorithm
         for(n = 0; n < out.entities.size(); n++)
         {
           auto v = out.entities[n].value;
-          entity_paths[n] = _path / boost_lite::algorithm::string::to_hex_string(span<char>((char *) &v, 8));
+          entity_paths[n] = _path / QUICKCPPLIB_NAMESPACE::algorithm::string::to_hex_string(span<char>((char *) &v, 8));
         }
         _hs.resize(out.entities.size());
         do
@@ -153,14 +153,14 @@ namespace algorithm
               auto ret = file_handle::file(entity_paths[n], file_handle::mode::write, file_handle::creation::only_if_not_exist, file_handle::caching::temporary, file_handle::flag::unlink_on_close);
               if(ret.has_error())
               {
-                const auto &ec = ret.get_error();
+                const auto &ec = ret.error();
                 if(ec.category() != std::generic_category() || (ec.value() != EAGAIN && ec.value() != EEXIST))
-                  return ret.get_error();
+                  return ret.error();
                 // Collided with another locker
                 was_contended = n;
                 break;
               }
-              _hs[n] = std::move(ret.get());
+              _hs[n] = std::move(ret.value());
             }
             if(n == out.entities.size())
               undo.dismiss();
@@ -171,32 +171,32 @@ namespace algorithm
             {
               if((d).steady)
               {
-                if(stl11::chrono::steady_clock::now() >= (began_steady + stl11::chrono::nanoseconds((d).nsecs)))
-                  return make_errored_result<void>(stl11::errc::timed_out);
+                if(std::chrono::steady_clock::now() >= (began_steady + std::chrono::nanoseconds((d).nsecs)))
+                  return std::errc::timed_out;
               }
               else
               {
-                if(stl11::chrono::system_clock::now() >= end_utc)
-                  return make_errored_result<void>(stl11::errc::timed_out);
+                if(std::chrono::system_clock::now() >= end_utc)
+                  return std::errc::timed_out;
               }
             }
             // Move was_contended to front and randomise rest of out.entities
             std::swap(out.entities[was_contended], out.entities[0]);
             auto front = out.entities.begin();
             ++front;
-            boost_lite::algorithm::small_prng::random_shuffle(front, out.entities.end());
+            QUICKCPPLIB_NAMESPACE::algorithm::small_prng::random_shuffle(front, out.entities.end());
             // Sleep for a very short time
             if(!spin_not_sleep)
               std::this_thread::yield();
           }
         } while(n < out.entities.size());
-        return make_valued_result<void>();
+        return success();
       }
 
     public:
       virtual void unlock(entities_type, unsigned long long) noexcept override final
       {
-        BOOST_AFIO_LOG_FUNCTION_CALL(this);
+        AFIO_LOG_FUNCTION_CALL(this);
         for(auto &i : _hs)
         {
           (void) i.close();  // delete on close semantics deletes the file
@@ -207,7 +207,7 @@ namespace algorithm
   }  // namespace
 }  // namespace
 
-BOOST_AFIO_V2_NAMESPACE_END
+AFIO_V2_NAMESPACE_END
 
 
 #endif

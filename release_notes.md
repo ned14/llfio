@@ -1,7 +1,7 @@
-﻿Herein lies the beginnings of the proposed Boost.AFIO v2 post-peer-review rewrite. Its github
+﻿Herein lies the beginnings of the proposed AFIO v2 post-peer-review rewrite. Its github
 source code repository lives at https://github.com/ned14/boost.afio.
 
-<b>master branch test status</b> Linux: [![Build Status](https://travis-ci.org/ned14/boost.afio.svg?branch=master)](https://travis-ci.org/ned14/boost.afio) Windows: [![Build status](https://ci.appveyor.com/api/projects/status/ox59o2r276xbmef7/branch/master?svg=true)](https://ci.appveyor.com/project/ned14/boost-afio/branch/master) Coverage: Boost.KernelTest support for coveralls.io still todo <b>CMake dashboard</b>: http://my.cdash.org/index.php?project=Boost.AFIO
+<b>master branch test status</b> Linux: [![Build Status](https://travis-ci.org/ned14/boost.afio.svg?branch=master)](https://travis-ci.org/ned14/boost.afio) Windows: [![Build status](https://ci.appveyor.com/api/projects/status/ox59o2r276xbmef7/branch/master?svg=true)](https://ci.appveyor.com/project/ned14/boost-afio/branch/master) Coverage: Boost.KernelTest support for coveralls.io still todo <b>CMake dashboard</b>: http://my.cdash.org/index.php?project=AFIO
 
 \note Note that this code is so early alpha that no substantial test code exists
 yet. Nobody should use this code for anything serious.

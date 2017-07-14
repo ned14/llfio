@@ -26,7 +26,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../../../utils.hpp"
 #include "import.hpp"
 
-BOOST_AFIO_V2_NAMESPACE_BEGIN
+AFIO_V2_NAMESPACE_BEGIN
 
 result<section_handle> section_handle::section(file_handle &backing, extent_type maximum_size, flag _flag) noexcept
 {
@@ -36,17 +36,17 @@ result<section_handle> section_handle::section(file_handle &backing, extent_type
   {
     if(backing.is_valid())
     {
-      BOOST_OUTCOME_TRY(length, backing.length());
+      OUTCOME_TRY(length, backing.length());
       maximum_size = length;
     }
     else
-      return make_errored_result<section_handle>(stl11::errc::invalid_argument);
+      return std::errc::invalid_argument;
   }
   // Do NOT round up to page size here if backed by a file, it causes STATUS_SECTION_TOO_BIG
   if(!backing.is_valid())
     maximum_size = utils::round_up_to_page_size(maximum_size);
   result<section_handle> ret(section_handle(native_handle_type(), backing.is_valid() ? &backing : nullptr, maximum_size, _flag));
-  native_handle_type &nativeh = ret.get()._v;
+  native_handle_type &nativeh = ret.value()._v;
   ULONG prot = 0, attribs = 0;
   if(_flag & flag::read)
     nativeh.behaviour |= native_handle_type::disposition::readable;
@@ -98,11 +98,11 @@ result<section_handle> section_handle::section(file_handle &backing, extent_type
   NTSTATUS ntstat = NtCreateSection(&h, SECTION_ALL_ACCESS, NULL, &_maximum_size, prot, attribs, backing.is_valid() ? backing.native_handle().h : NULL);
   if(STATUS_SUCCESS != ntstat)
   {
-    BOOST_AFIO_LOG_FUNCTION_CALL(0);
+    AFIO_LOG_FUNCTION_CALL(0);
     return make_errored_result_nt<section_handle>(ntstat);
   }
   nativeh.h = h;
-  BOOST_AFIO_LOG_FUNCTION_CALL(nativeh.h);
+  AFIO_LOG_FUNCTION_CALL(nativeh.h);
   return ret;
 }
 
@@ -117,7 +117,7 @@ result<section_handle::extent_type> section_handle::truncate(extent_type newsize
   if(STATUS_SUCCESS != ntstat)
     return make_errored_result_nt<extent_type>(ntstat);
   _length = newsize;
-  return make_result<extent_type>(newsize);
+  return newsize;
 }
 
 
@@ -129,7 +129,7 @@ map_handle::~map_handle()
     auto ret = map_handle::close();
     if(ret.has_error())
     {
-      BOOST_AFIO_LOG_FATAL(_v.h, "map_handle::~map_handle() close failed");
+      AFIO_LOG_FATAL(_v.h, "map_handle::~map_handle() close failed");
       abort();
     }
   }
@@ -139,7 +139,7 @@ result<void> map_handle::close() noexcept
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
-  BOOST_AFIO_LOG_FUNCTION_CALL(_addr);
+  AFIO_LOG_FUNCTION_CALL(_addr);
   if(_addr)
   {
     if(_section)
@@ -158,12 +158,12 @@ result<void> map_handle::close() noexcept
   _v = native_handle_type();
   _addr = nullptr;
   _length = 0;
-  return make_valued_result<void>();
+  return success();
 }
 
 native_handle_type map_handle::release() noexcept
 {
-  BOOST_AFIO_LOG_FUNCTION_CALL(_v.h);
+  AFIO_LOG_FUNCTION_CALL(_v.h);
   // We don't want ~handle() to close our borrowed handle
   _v = native_handle_type();
   _addr = nullptr;
@@ -173,13 +173,13 @@ native_handle_type map_handle::release() noexcept
 
 map_handle::io_result<map_handle::const_buffers_type> map_handle::barrier(map_handle::io_request<map_handle::const_buffers_type> reqs, bool wait_for_device, bool and_metadata, deadline d) noexcept
 {
-  BOOST_AFIO_LOG_FUNCTION_CALL(_v.h);
+  AFIO_LOG_FUNCTION_CALL(_v.h);
   char *addr = _addr + reqs.offset;
   extent_type bytes = 0;
   for(const auto &req : reqs.buffers)
     bytes += req.second;
   if(!FlushViewOfFile(addr, (SIZE_T) bytes))
-    return make_errored_result<>(GetLastError());
+    return {GetLastError(), std::system_category()};
   if(_section && _section->backing() && (wait_for_device || and_metadata))
   {
     reqs.offset += _offset;
@@ -192,8 +192,8 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::barrier(map_ha
 result<map_handle> map_handle::map(size_type bytes, section_handle::flag _flag) noexcept
 {
   bytes = utils::round_up_to_page_size(bytes);
-  result<map_handle> ret(make_valued_result<map_handle>(map_handle(nullptr)));
-  native_handle_type &nativeh = ret.get()._v;
+  result<map_handle> ret(map_handle(nullptr));
+  native_handle_type &nativeh = ret.value()._v;
   DWORD allocation = MEM_RESERVE | MEM_COMMIT, prot = 0;
   PVOID addr = 0;
   if((_flag & section_handle::flag::nocommit) || (_flag == section_handle::flag::none))
@@ -222,10 +222,10 @@ result<map_handle> map_handle::map(size_type bytes, section_handle::flag _flag) 
     prot = PAGE_EXECUTE;
   addr = VirtualAlloc(nullptr, bytes, allocation, prot);
   if(!addr)
-    return make_errored_result<>(GetLastError());
-  ret.get()._addr = (char *) addr;
-  ret.get()._length = bytes;
-  BOOST_AFIO_LOG_FUNCTION_CALL(ret.get()._v.h);
+    return {GetLastError(), std::system_category()};
+  ret.value()._addr = (char *) addr;
+  ret.value()._length = bytes;
+  AFIO_LOG_FUNCTION_CALL(ret.value()._v.h);
 
   // Windows has no way of getting the kernel to prefault maps on creation, so ...
   if(_flag & section_handle::flag::prefault)
@@ -255,8 +255,8 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
     // Do NOT round up bytes to the nearest page size for backed maps, it causes an attempt to extend the file
     bytes = utils::round_up_to_page_size(bytes);
   }
-  result<map_handle> ret(make_valued_result<map_handle>(map_handle(&section)));
-  native_handle_type &nativeh = ret.get()._v;
+  result<map_handle> ret{map_handle(&section)};
+  native_handle_type &nativeh = ret.value()._v;
   ULONG allocation = 0, prot = 0;
   PVOID addr = 0;
   size_t commitsize = bytes;
@@ -293,15 +293,15 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
   NTSTATUS ntstat = NtMapViewOfSection(section.native_handle().h, GetCurrentProcess(), &addr, 0, commitsize, &_offset, &_bytes, ViewUnmap, allocation, prot);
   if(STATUS_SUCCESS != ntstat)
   {
-    BOOST_AFIO_LOG_FUNCTION_CALL(0);
+    AFIO_LOG_FUNCTION_CALL(0);
     return make_errored_result_nt<map_handle>(ntstat);
   }
-  ret.get()._addr = (char *) addr;
-  ret.get()._offset = offset;
-  ret.get()._length = _bytes;
+  ret.value()._addr = (char *) addr;
+  ret.value()._offset = offset;
+  ret.value()._length = _bytes;
   // Make my handle borrow the native handle of my backing storage
-  ret.get()._v.h = section.backing_native_handle().h;
-  BOOST_AFIO_LOG_FUNCTION_CALL(ret.get()._v.h);
+  ret.value()._v.h = section.backing_native_handle().h;
+  AFIO_LOG_FUNCTION_CALL(ret.value()._v.h);
 
   // Windows has no way of getting the kernel to prefault maps on creation, so ...
   if(_flag & section_handle::flag::prefault)
@@ -323,9 +323,9 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
 
 result<map_handle::buffer_type> map_handle::commit(buffer_type region, section_handle::flag _flag) noexcept
 {
-  BOOST_AFIO_LOG_FUNCTION_CALL(_v.h);
+  AFIO_LOG_FUNCTION_CALL(_v.h);
   if(!region.first)
-    return make_errored_result<map_handle::buffer_type>(stl11::errc::invalid_argument);
+    return std::errc::invalid_argument;
   DWORD prot = 0;
   if(_flag == section_handle::flag::none)
   {
@@ -359,9 +359,9 @@ result<map_handle::buffer_type> map_handle::commit(buffer_type region, section_h
 
 result<map_handle::buffer_type> map_handle::decommit(buffer_type region) noexcept
 {
-  BOOST_AFIO_LOG_FUNCTION_CALL(_v.h);
+  AFIO_LOG_FUNCTION_CALL(_v.h);
   if(!region.first)
-    return make_errored_result<map_handle::buffer_type>(stl11::errc::invalid_argument);
+    return std::errc::invalid_argument;
   region = utils::round_to_page_size(region);
   if(!VirtualFree(region.first, region.second, MEM_DECOMMIT))
     return make_errored_result<buffer_type>(GetLastError());
@@ -370,20 +370,20 @@ result<map_handle::buffer_type> map_handle::decommit(buffer_type region) noexcep
 
 result<void> map_handle::zero_memory(buffer_type region) noexcept
 {
-  BOOST_AFIO_LOG_FUNCTION_CALL(_v.h);
+  AFIO_LOG_FUNCTION_CALL(_v.h);
   if(!region.first)
-    return make_errored_result<void>(stl11::errc::invalid_argument);
+    return std::errc::invalid_argument;
   //! \todo Once you implement file_handle::zero(), please implement map_handle::zero()
   // buffer_type page_region { (char *) utils::round_up_to_page_size((uintptr_t) region.first), utils::round_down_to_page_size(region.second); };
   memset(region.first, 0, region.second);
-  return make_valued_result<void>();
+  return success();
 }
 
 result<span<map_handle::buffer_type>> map_handle::prefetch(span<buffer_type> regions) noexcept
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
-  BOOST_AFIO_LOG_FUNCTION_CALL(0);
+  AFIO_LOG_FUNCTION_CALL(0);
   if(!PrefetchVirtualMemory_)
     return span<map_handle::buffer_type>();
   PWIN32_MEMORY_RANGE_ENTRY wmre = (PWIN32_MEMORY_RANGE_ENTRY) regions.data();
@@ -396,10 +396,10 @@ result<map_handle::buffer_type> map_handle::do_not_store(buffer_type region) noe
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
-  BOOST_AFIO_LOG_FUNCTION_CALL(0);
+  AFIO_LOG_FUNCTION_CALL(0);
   region = utils::round_to_page_size(region);
   if(!region.first)
-    return make_errored_result<map_handle::buffer_type>(stl11::errc::invalid_argument);
+    return std::errc::invalid_argument;
   // Windows does not support throwing away dirty pages on file backed maps
   if(!_section || !_section->backing())
   {
@@ -422,7 +422,7 @@ result<map_handle::buffer_type> map_handle::do_not_store(buffer_type region) noe
 
 map_handle::io_result<map_handle::buffers_type> map_handle::read(io_request<buffers_type> reqs, deadline) noexcept
 {
-  BOOST_AFIO_LOG_FUNCTION_CALL(_v.h);
+  AFIO_LOG_FUNCTION_CALL(_v.h);
   char *addr = _addr + reqs.offset;
   size_type togo = reqs.offset < _length ? (size_type)(_length - reqs.offset) : 0;
   for(buffer_type &req : reqs.buffers)
@@ -443,7 +443,7 @@ map_handle::io_result<map_handle::buffers_type> map_handle::read(io_request<buff
 
 map_handle::io_result<map_handle::const_buffers_type> map_handle::write(io_request<const_buffers_type> reqs, deadline) noexcept
 {
-  BOOST_AFIO_LOG_FUNCTION_CALL(_v.h);
+  AFIO_LOG_FUNCTION_CALL(_v.h);
   char *addr = _addr + reqs.offset;
   size_type togo = reqs.offset < _length ? (size_type)(_length - reqs.offset) : 0;
   for(const_buffer_type &req : reqs.buffers)
@@ -463,4 +463,4 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::write(io_reque
   return reqs.buffers;
 }
 
-BOOST_AFIO_V2_NAMESPACE_END
+AFIO_V2_NAMESPACE_END

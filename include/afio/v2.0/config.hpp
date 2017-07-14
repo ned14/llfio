@@ -1,4 +1,4 @@
-/* Configures Boost.AFIO
+/* Configures AFIO
 (C) 2015-2017 Niall Douglas <http://www.nedproductions.biz/> (24 commits)
 File Created: Dec 2015
 
@@ -22,45 +22,46 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
+#ifndef AFIO_CONFIG_HPP
+#define AFIO_CONFIG_HPP
+
 //#include <iostream>
-//#define BOOST_AFIO_LOG_TO_OSTREAM std::cerr
-//#define BOOST_AFIO_LOGGING_LEVEL 3
+//#define AFIO_LOG_TO_OSTREAM std::cerr
+//#define AFIO_LOGGING_LEVEL 3
 
 //! \file config.hpp Configures a compiler environment for AFIO header and source code
 
 //! \defgroup config Configuration macros
 
-#define BOOST_AFIO_CONFIGURED
-
-#if !defined(BOOST_AFIO_HEADERS_ONLY) && !defined(BOOST_ALL_DYN_LINK)
+#if !defined(AFIO_HEADERS_ONLY) && !defined(BOOST_ALL_DYN_LINK)
 //! \brief Whether AFIO is a headers only library. Defaults to 1 unless BOOST_ALL_DYN_LINK is defined. \ingroup config
-#define BOOST_AFIO_HEADERS_ONLY 1
+#define AFIO_HEADERS_ONLY 1
 #endif
 
-#if !defined(BOOST_AFIO_LOGGING_LEVEL)
+#if !defined(AFIO_LOGGING_LEVEL)
 #ifdef NDEBUG
-#define BOOST_AFIO_LOGGING_LEVEL 2  // error
+#define AFIO_LOGGING_LEVEL 2  // error
 #else
 //! \brief How much detail to log. 0=disabled, 1=fatal, 2=error, 3=warn, 4=info, 5=debug, 6=all.
 //! Defaults to error if NDEBUG defined, else info level. \ingroup config
-#define BOOST_AFIO_LOGGING_LEVEL 4  // info
+#define AFIO_LOGGING_LEVEL 4  // info
 #endif
 #endif
 
-#if !defined(BOOST_AFIO_LOG_BACKTRACE_LEVELS)
+#if !defined(AFIO_LOG_BACKTRACE_LEVELS)
 //! \brief Bit mask of which log levels should be stack backtraced
 //! which will slow those logs thirty fold or so. Defaults to (1<<1)|(1<<2)|(1<<3) i.e. stack backtrace
 //! on fatal, error and warn logs. \ingroup config
-#define BOOST_AFIO_LOG_BACKTRACE_LEVELS ((1 << 1) | (1 << 2) | (1 << 3))
+#define AFIO_LOG_BACKTRACE_LEVELS ((1 << 1) | (1 << 2) | (1 << 3))
 #endif
 
-#if !defined(BOOST_AFIO_LOGGING_MEMORY)
+#if !defined(AFIO_LOGGING_MEMORY)
 #ifdef NDEBUG
-#define BOOST_AFIO_LOGGING_MEMORY 4096
+#define AFIO_LOGGING_MEMORY 4096
 #else
 //! \brief How much memory to use for the log.
 //! Defaults to 4Kb if NDEBUG defined, else 1Mb. \ingroup config
-#define BOOST_AFIO_LOGGING_MEMORY (1024 * 1024)
+#define AFIO_LOGGING_MEMORY (1024 * 1024)
 #endif
 #endif
 
@@ -84,426 +85,252 @@ Distributed under the Boost Software License, Version 1.0.
 #include <_mingw.h>
 #endif
 
-// If I'm on winclang, I can't stop the deprecation warnings from MSVCRT unless I do this
-#if defined(_MSC_VER) && defined(__clang__)
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-#endif
-
-#include "../boost-lite/include/cpp_feature.h"
+#include "../quickcpplib/include/cpp_feature.h"
 
 #ifndef __cpp_exceptions
-#error Boost.AFIO needs C++ exceptions to be turned on
+#error AFIO needs C++ exceptions to be turned on
 #endif
 #ifndef __cpp_alias_templates
-#error Boost.AFIO needs template alias support in the compiler
+#error AFIO needs template alias support in the compiler
 #endif
 #ifndef __cpp_variadic_templates
-#error Boost.AFIO needs variadic template support in the compiler
+#error AFIO needs variadic template support in the compiler
 #endif
 #ifndef __cpp_constexpr
-#error Boost.AFIO needs constexpr (C++ 11) support in the compiler
+#error AFIO needs constexpr (C++ 11) support in the compiler
 #endif
 #ifndef __cpp_init_captures
-#error Boost.AFIO needs lambda init captures support in the compiler (C++ 14)
+#error AFIO needs lambda init captures support in the compiler (C++ 14)
 #endif
 #ifndef __cpp_attributes
-#error Boost.AFIO needs attributes support in the compiler
+#error AFIO needs attributes support in the compiler
 #endif
 #ifndef __cpp_variable_templates
-#error Boost.AFIO needs variable template support in the compiler
+#error AFIO needs variable template support in the compiler
 #endif
 #ifndef __cpp_generic_lambdas
-#error Boost.AFIO needs generic lambda support in the compiler
+#error AFIO needs generic lambda support in the compiler
 #endif
-#if(defined(__GNUC__) && !defined(__clang__))
-#define BOOST_AFIO_GCC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
-#if BOOST_AFIO_GCC_VERSION < 40900
-#error Boost.AFIO needs GCC 4.9 or later as the <regex> shipped in libstdc++ < 4.9 does not work
-#endif
-#endif
-
-
-#include "../boost-lite/include/import.h"
-#undef BOOST_AFIO_V2_STL11_IMPL
-#undef BOOST_AFIO_V2_FILESYSTEM_IMPL
-#undef BOOST_AFIO_V2
-#undef BOOST_AFIO_V2_NAMESPACE
-#undef BOOST_AFIO_V2_NAMESPACE_BEGIN
-#undef BOOST_AFIO_V2_NAMESPACE_END
-
-// Default to the C++ 11 STL for atomic, chrono, mutex and thread except on Mingw32
-#if(defined(BOOST_AFIO_USE_BOOST_THREAD) && BOOST_AFIO_USE_BOOST_THREAD) || (defined(__MINGW32__) && !defined(__MINGW64__) && !defined(__MINGW64_VERSION_MAJOR))
-#if defined(BOOST_OUTCOME_USE_BOOST_THREAD) && BOOST_OUTCOME_USE_BOOST_THREAD != 1
-#error You must configure Boost.Outcome and Boost.AFIO to both use Boost.Thread together or both not at all.
-#endif
-#define BOOST_OUTCOME_USE_BOOST_THREAD 1
-#define BOOST_AFIO_V2_STL11_IMPL boost
-#ifndef BOOST_THREAD_VERSION
-#define BOOST_THREAD_VERSION 3
-#endif
-#if BOOST_THREAD_VERSION < 3
-#error Boost.AFIO requires that Boost.Thread be configured to v3 or later
-#endif
-#else
-#if defined(BOOST_OUTCOME_USE_BOOST_THREAD) && BOOST_OUTCOME_USE_BOOST_THREAD != 0
-#error You must configure Boost.Outcome and Boost.AFIO to both use Boost.Thread together or both not at all.
-#endif
-#define BOOST_OUTCOME_USE_BOOST_THREAD 0
-//! \brief The C++ 11 STL to use (std|boost). Defaults to std. \ingroup config
-#define BOOST_AFIO_V2_STL11_IMPL std
-#ifndef BOOST_AFIO_USE_BOOST_THREAD
-//! \brief Whether to use Boost.Thread instead of the C++ 11 STL `std::thread`. Defaults to the C++ 11 STL thread. \ingroup config
-#define BOOST_AFIO_USE_BOOST_THREAD 0
-#endif
-#endif
-// Default to the C++ 11 STL if on VS2015 or has <experimental/filesystem>
-#ifndef BOOST_AFIO_USE_BOOST_FILESYSTEM
 #ifdef __has_include
 // clang-format off
-#if __has_include(<filesystem>) || __has_include(<experimental/filesystem>)
+#if !__has_include(<filesystem>) && !__has_include(<experimental/filesystem>)
 // clang-format on
-#define BOOST_AFIO_USE_BOOST_FILESYSTEM 0
+#error AFIO needs an implementation of the Filesystem TS in the standard library
 #endif
 #endif
-#if !defined(BOOST_AFIO_USE_BOOST_FILESYSTEM) && _MSC_VER >= 1900 /* >= VS2015 */
-#define BOOST_AFIO_USE_BOOST_FILESYSTEM 0
-#endif
-#endif
-#ifndef BOOST_AFIO_USE_BOOST_FILESYSTEM
-//! \brief Whether to use Boost.Filesystem instead of the C++ 17 TS `std::filesystem`.
-//! Defaults to the C++ 17 TS filesystem if that is available, else Boost. \ingroup config
-#define BOOST_AFIO_USE_BOOST_FILESYSTEM 1
-#endif
-#if BOOST_AFIO_USE_BOOST_FILESYSTEM
-#define BOOST_AFIO_V2_FILESYSTEM_IMPL boost
-#define BOOST_AFIO_USE_LEGACY_FILESYSTEM_SEMANTICS 1
-#else
-#define BOOST_AFIO_V2_FILESYSTEM_IMPL std
-#endif
-#ifdef BOOST_AFIO_UNSTABLE_VERSION
+
+
+#include "../quickcpplib/include/import.h"
+
+#ifdef AFIO_UNSTABLE_VERSION
 #include "../revision.hpp"
-#define BOOST_AFIO_V2 (boost), (afio), (BOOSTLITE_BIND_NAMESPACE_VERSION(, BOOST_AFIO_NAMESPACE_VERSION, BOOST_AFIO_V2_STL11_IMPL, BOOST_AFIO_V2_FILESYSTEM_IMPL, BOOST_AFIO_PREVIOUS_COMMIT_UNIQUE), inline)
-#elif BOOST_AFIO_LATEST_VERSION == 2
-#define BOOST_AFIO_V2 (boost), (afio), (BOOSTLITE_BIND_NAMESPACE_VERSION(, BOOST_AFIO_NAMESPACE_VERSION, BOOST_AFIO_V2_STL11_IMPL, BOOST_AFIO_V2_FILESYSTEM_IMPL), inline)
+#define AFIO_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(afio_v2, AFIO_PREVIOUS_COMMIT_UNIQUE))
 #else
-#define BOOST_AFIO_V2 (boost), (afio), (BOOSTLITE_BIND_NAMESPACE_VERSION(, BOOST_AFIO_NAMESPACE_VERSION, BOOST_AFIO_V2_STL11_IMPL, BOOST_AFIO_V2_FILESYSTEM_IMPL))
+#define AFIO_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(afio_v2))
 #endif
-/*! \def BOOST_AFIO_V2
+/*! \def AFIO_V2
 \ingroup config
-\brief The namespace configuration of this Boost.AFIO v2. Consists of a sequence
+\brief The namespace configuration of this AFIO v2. Consists of a sequence
 of bracketed tokens later fused by the preprocessor into namespace and C++ module names.
 */
 #if DOXYGEN_SHOULD_SKIP_THIS
-//! The Boost namespace
-namespace boost
+//! The AFIO namespace
+namespace afio_v2_xxx
 {
-  //! The AFIO namespace
-  namespace afio
+  //! Collection of file system based algorithms
+  namespace algorithm
   {
-    //! Inline namespace for this version of AFIO
-    inline namespace v2_xxx
-    {
-      //! Collection of file system based algorithms
-      namespace algorithm
-      {
-      }
-      //! YAML databaseable empirical testing of a storage's behaviour
-      namespace storage_profile
-      {
-      }
-      //! Utility routines often useful when using AFIO
-      namespace utils
-      {
-      }
-    }
+  }
+  //! YAML databaseable empirical testing of a storage's behaviour
+  namespace storage_profile
+  {
+  }
+  //! Utility routines often useful when using AFIO
+  namespace utils
+  {
   }
 }
-/*! \brief The namespace of this Boost.AFIO v2 which will be some unknown inline
+/*! \brief The namespace of this AFIO v2 which will be some unknown inline
 namespace starting with `v2_` inside the `boost::afio` namespace.
 \ingroup config
 */
-#define BOOST_AFIO_V2_NAMESPACE boost::afio::v2_xxx
+#define AFIO_V2_NAMESPACE afio_v2_xxx
 /*! \brief Expands into the appropriate namespace markup to enter the AFIO v2 namespace.
 \ingroup config
 */
-#define BOOST_AFIO_V2_NAMESPACE_BEGIN                                                                                                                                                                                                                                                                                          \
-  namespace boost                                                                                                                                                                                                                                                                                                              \
-  {                                                                                                                                                                                                                                                                                                                            \
-    namespace afio                                                                                                                                                                                                                                                                                                             \
-    {                                                                                                                                                                                                                                                                                                                          \
-      inline namespace v2_xxx                                                                                                                                                                                                                                                                                                  \
-      {
+#define AFIO_V2_NAMESPACE_BEGIN                                                                                                                                                                                                                                                                                                \
+  namespace afio_v2_xxx                                                                                                                                                                                                                                                                                                        \
+  {  \
 /*! \brief Expands into the appropriate namespace markup to enter the C++ module
 exported AFIO v2 namespace.
 \ingroup config
 */
-#define BOOST_AFIO_V2_NAMESPACE_EXPORT_BEGIN                                                                                                                                                                                                                                                                                   \
-  export namespace boost                                                                                                                                                                                                                                                                                                       \
-  {                                                                                                                                                                                                                                                                                                                            \
-    namespace afio                                                                                                                                                                                                                                                                                                             \
-    {                                                                                                                                                                                                                                                                                                                          \
-      inline namespace v2_xxx                                                                                                                                                                                                                                                                                                  \
-      {
+#define AFIO_V2_NAMESPACE_EXPORT_BEGIN                                                                                                                                                                                                                                                                                         \
+  export namespace afio_v2_xxx                                                                                                                                                                                                                                                                                                 \
+  {  \
 /*! \brief Expands into the appropriate namespace markup to exit the AFIO v2 namespace.
 \ingroup config
 */
-#define BOOST_AFIO_V2_NAMESPACE_END                                                                                                                                                                                                                                                                                            \
-  }                                                                                                                                                                                                                                                                                                                            \
-  }                                                                                                                                                                                                                                                                                                                            \
-  }
+#define AFIO_V2_NAMESPACE_END }
 #elif defined(GENERATING_AFIO_MODULE_INTERFACE)
-#define BOOST_AFIO_V2_NAMESPACE BOOSTLITE_BIND_NAMESPACE(BOOST_AFIO_V2)
-#define BOOST_AFIO_V2_NAMESPACE_BEGIN BOOSTLITE_BIND_NAMESPACE_BEGIN(BOOST_AFIO_V2)
-#define BOOST_AFIO_V2_NAMESPACE_EXPORT_BEGIN BOOSTLITE_BIND_NAMESPACE_EXPORT_BEGIN(BOOST_AFIO_V2)
-#define BOOST_AFIO_V2_NAMESPACE_END BOOSTLITE_BIND_NAMESPACE_END(BOOST_AFIO_V2)
+#define AFIO_V2_NAMESPACE QUICKCPPLIB_BIND_NAMESPACE(AFIO_V2)
+#define AFIO_V2_NAMESPACE_BEGIN QUICKCPPLIB_BIND_NAMESPACE_BEGIN(AFIO_V2)
+#define AFIO_V2_NAMESPACE_EXPORT_BEGIN QUICKCPPLIB_BIND_NAMESPACE_EXPORT_BEGIN(AFIO_V2)
+#define AFIO_V2_NAMESPACE_END QUICKCPPLIB_BIND_NAMESPACE_END(AFIO_V2)
 #else
-#define BOOST_AFIO_V2_NAMESPACE BOOSTLITE_BIND_NAMESPACE(BOOST_AFIO_V2)
-#define BOOST_AFIO_V2_NAMESPACE_BEGIN BOOSTLITE_BIND_NAMESPACE_BEGIN(BOOST_AFIO_V2)
-#define BOOST_AFIO_V2_NAMESPACE_EXPORT_BEGIN BOOSTLITE_BIND_NAMESPACE_BEGIN(BOOST_AFIO_V2)
-#define BOOST_AFIO_V2_NAMESPACE_END BOOSTLITE_BIND_NAMESPACE_END(BOOST_AFIO_V2)
+#define AFIO_V2_NAMESPACE QUICKCPPLIB_BIND_NAMESPACE(AFIO_V2)
+#define AFIO_V2_NAMESPACE_BEGIN QUICKCPPLIB_BIND_NAMESPACE_BEGIN(AFIO_V2)
+#define AFIO_V2_NAMESPACE_EXPORT_BEGIN QUICKCPPLIB_BIND_NAMESPACE_BEGIN(AFIO_V2)
+#define AFIO_V2_NAMESPACE_END QUICKCPPLIB_BIND_NAMESPACE_END(AFIO_V2)
 #endif
-
-// From automated matrix generator
-#undef BOOST_AFIO_NEED_DEFINE
-#undef BOOST_AFIO_NEED_DEFINE_DESCRIPTION
-#if !BOOST_AFIO_USE_BOOST_THREAD && !BOOST_AFIO_USE_BOOST_FILESYSTEM
-#ifndef BOOST_AFIO_NEED_DEFINE_00
-#define BOOST_AFIO_NEED_DEFINE_DESCRIPTION "BOOST_AFIO_USE_BOOST_THREAD=0 BOOST_AFIO_USE_BOOST_FILESYSTEM=0"
-#define BOOST_AFIO_NEED_DEFINE_00
-#define BOOST_AFIO_NEED_DEFINE 1
-#endif
-#elif BOOST_AFIO_USE_BOOST_THREAD && !BOOST_AFIO_USE_BOOST_FILESYSTEM
-#ifndef BOOST_AFIO_NEED_DEFINE_10
-#define BOOST_AFIO_NEED_DEFINE_DESCRIPTION "BOOST_AFIO_USE_BOOST_THREAD=1 BOOST_AFIO_USE_BOOST_FILESYSTEM=0"
-#define BOOST_AFIO_NEED_DEFINE_10
-#define BOOST_AFIO_NEED_DEFINE 1
-#endif
-#elif !BOOST_AFIO_USE_BOOST_THREAD && BOOST_AFIO_USE_BOOST_FILESYSTEM
-#ifndef BOOST_AFIO_NEED_DEFINE_01
-#define BOOST_AFIO_NEED_DEFINE_DESCRIPTION "BOOST_AFIO_USE_BOOST_THREAD=0 BOOST_AFIO_USE_BOOST_FILESYSTEM=1"
-#define BOOST_AFIO_NEED_DEFINE_01
-#define BOOST_AFIO_NEED_DEFINE 1
-#endif
-#elif BOOST_AFIO_USE_BOOST_THREAD && BOOST_AFIO_USE_BOOST_FILESYSTEM
-#ifndef BOOST_AFIO_NEED_DEFINE_11
-#define BOOST_AFIO_NEED_DEFINE_DESCRIPTION "BOOST_AFIO_USE_BOOST_THREAD=1 BOOST_AFIO_USE_BOOST_FILESYSTEM=1"
-#define BOOST_AFIO_NEED_DEFINE_11
-#define BOOST_AFIO_NEED_DEFINE 1
-#endif
-#endif
-
-#ifdef BOOST_AFIO_NEED_DEFINE
-#undef BOOST_AFIO_AFIO_H
-
-#define BOOST_STL11_ATOMIC_MAP_NO_ATOMIC_CHAR32_T  // missing VS14
-#define BOOST_STL11_ATOMIC_MAP_NO_ATOMIC_CHAR16_T  // missing VS14
-// Match Dinkumware's TR2 implementation
-#define BOOST_STL1z_FILESYSTEM_MAP_NO_SYMLINK_OPTION
-#define BOOST_STL1z_FILESYSTEM_MAP_NO_COPY_OPTION
-#define BOOST_STL1z_FILESYSTEM_MAP_NO_CHANGE_EXTENSION
-#define BOOST_STL1z_FILESYSTEM_MAP_NO_WRECURSIVE_DIRECTORY_ITERATOR
-#define BOOST_STL1z_FILESYSTEM_MAP_NO_EXTENSION
-#define BOOST_STL1z_FILESYSTEM_MAP_NO_TYPE_PRESENT
-#define BOOST_STL1z_FILESYSTEM_MAP_NO_PORTABLE_FILE_NAME
-#define BOOST_STL1z_FILESYSTEM_MAP_NO_PORTABLE_DIRECTORY_NAME
-#define BOOST_STL1z_FILESYSTEM_MAP_NO_PORTABLE_POSIX_NAME
-#define BOOST_STL1z_FILESYSTEM_MAP_NO_LEXICOGRAPHICAL_COMPARE
-#define BOOST_STL1z_FILESYSTEM_MAP_NO_WINDOWS_NAME
-#define BOOST_STL1z_FILESYSTEM_MAP_NO_PORTABLE_NAME
-#define BOOST_STL1z_FILESYSTEM_MAP_NO_BASENAME
-#define BOOST_STL1z_FILESYSTEM_MAP_NO_COMPLETE
-#define BOOST_STL1z_FILESYSTEM_MAP_NO_IS_REGULAR
-#define BOOST_STL1z_FILESYSTEM_MAP_NO_INITIAL_PATH
-#define BOOST_STL1z_FILESYSTEM_MAP_NO_PERMISSIONS_PRESENT
-#define BOOST_STL1z_FILESYSTEM_MAP_NO_CODECVT_ERROR_CATEGORY
-#define BOOST_STL1z_FILESYSTEM_MAP_NO_WPATH
-#define BOOST_STL1z_FILESYSTEM_MAP_NO_SYMBOLIC_LINK_EXISTS
-#define BOOST_STL1z_FILESYSTEM_MAP_NO_COPY_DIRECTORY
-#define BOOST_STL1z_FILESYSTEM_MAP_NO_NATIVE
-#define BOOST_STL1z_FILESYSTEM_MAP_NO_UNIQUE_PATH
-
-#include "../boost-lite/include/bind/stl11/std/atomic"
-BOOST_AFIO_V2_NAMESPACE_BEGIN
-namespace stl11
-{
-  using namespace boost_lite::bind::std::atomic;
-}
-BOOST_AFIO_V2_NAMESPACE_END
-#if BOOST_OUTCOME_USE_BOOST_THREAD
-#include "../boost-lite/include/bind/stl11/boost/chrono"
-#include "../boost-lite/include/bind/stl11/boost/mutex"
-#include "../boost-lite/include/bind/stl11/boost/ratio"
-#include "../boost-lite/include/bind/stl11/boost/thread"
-BOOST_AFIO_V2_NAMESPACE_BEGIN
-namespace stl11
-{
-  namespace chrono = boost_lite::bind::boost::chrono;
-  using namespace boost_lite::bind::boost::mutex;
-  using namespace boost_lite::bind::boost::ratio;
-  using namespace boost_lite::bind::boost::thread;
-}
-#else
-#include "../boost-lite/include/bind/stl11/std/chrono"
-#include "../boost-lite/include/bind/stl11/std/mutex"
-#include "../boost-lite/include/bind/stl11/std/ratio"
-#include "../boost-lite/include/bind/stl11/std/thread"
-BOOST_AFIO_V2_NAMESPACE_BEGIN
-namespace stl11
-{
-  namespace chrono = boost_lite::bind::std::chrono;
-  using namespace boost_lite::bind::std::mutex;
-  using namespace boost_lite::bind::std::ratio;
-  using namespace boost_lite::bind::std::thread;
-}
-BOOST_AFIO_V2_NAMESPACE_END
-#endif
-#if BOOST_AFIO_USE_BOOST_FILESYSTEM
-#include "../boost-lite/include/bind/stl1z/boost/filesystem"
-BOOST_AFIO_V2_NAMESPACE_BEGIN
-namespace stl1z
-{
-  namespace filesystem = boost_lite::bind::boost::filesystem;
-}
-BOOST_AFIO_V2_NAMESPACE_END
-#else
-#include "../boost-lite/include/bind/stl1z/std/filesystem"
-BOOST_AFIO_V2_NAMESPACE_BEGIN
-namespace stl1z
-{
-  namespace filesystem = boost_lite::bind::std::filesystem;
-}
-BOOST_AFIO_V2_NAMESPACE_END
-#endif
-
 
 // Bring in the Boost-lite macros
-#include "../boost-lite/include/config.hpp"
-
-// Configure BOOST_AFIO_DECL
-#if(defined(BOOST_AFIO_DYN_LINK) || defined(BOOST_ALL_DYN_LINK)) && !defined(BOOST_AFIO_STATIC_LINK)
-
-#if defined(BOOST_AFIO_SOURCE)
-#define BOOST_AFIO_DECL BOOSTLITE_SYMBOL_EXPORT
-#define BOOST_AFIO_BUILD_DLL
+#include "../quickcpplib/include/config.hpp"
+// Bring in filesystem
+#if defined(__has_include)
+// clang-format off
+#if __has_include(<filesystem>)
+#include <filesystem>
+AFIO_V2_NAMESPACE_BEGIN
+namespace filesystem = std::filesystem;
+AFIO_V2_NAMESPACE_END
+#elif __has_include(<experimental/filesystem>)
+#include <experimental/filesystem>
+AFIO_V2_NAMESPACE_BEGIN
+namespace filesystem = std::experimental::filesystem;
+AFIO_V2_NAMESPACE_END
+#endif
+// clang-format on
+#elif defined(_MSC_VER)
+#include <filesystem>
+AFIO_V2_NAMESPACE_BEGIN
+namespace filesystem = std::experimental::filesystem;
+AFIO_V2_NAMESPACE_END
 #else
-#define BOOST_AFIO_DECL BOOSTLIE_SYMBOL_IMPORT
+#error No <filesystem> implementation found
+#endif
+
+
+// Configure AFIO_DECL
+#if(defined(AFIO_DYN_LINK) || defined(BOOST_ALL_DYN_LINK)) && !defined(AFIO_STATIC_LINK)
+
+#if defined(AFIO_SOURCE)
+#define AFIO_DECL QUICKCPPLIB_SYMBOL_EXPORT
+#define AFIO_BUILD_DLL
+#else
+#define AFIO_DECL BOOSTLIE_SYMBOL_IMPORT
 #endif
 #else
-#define BOOST_AFIO_DECL
+#define AFIO_DECL
 #endif  // building a shared library
 
 
 // Bring in bitfields
-#include "../boost-lite/include/bitfield.hpp"
+#include "../quickcpplib/include/bitfield.hpp"
 // Bring in scoped undo
-#include "../boost-lite/include/scoped_undo.hpp"
-BOOST_AFIO_V2_NAMESPACE_BEGIN
-using BOOSTLITE_NAMESPACE::scoped_undo::undoer;
-BOOST_AFIO_V2_NAMESPACE_END
-
-
+#include "../quickcpplib/include/scoped_undo.hpp"
+AFIO_V2_NAMESPACE_BEGIN
+using QUICKCPPLIB_NAMESPACE::scoped_undo::undoer;
+AFIO_V2_NAMESPACE_END
 // Bring in a span implementation
-#include "../boost-lite/include/span.hpp"
-BOOST_AFIO_V2_NAMESPACE_BEGIN
-using namespace boost_lite::span;
-BOOST_AFIO_V2_NAMESPACE_END
+#include "../quickcpplib/include/span.hpp"
+AFIO_V2_NAMESPACE_BEGIN
+using namespace QUICKCPPLIB_NAMESPACE::span;
+AFIO_V2_NAMESPACE_END
+// Bring in an optional implementation
+#include "../quickcpplib/include/optional.hpp"
+AFIO_V2_NAMESPACE_BEGIN
+using namespace QUICKCPPLIB_NAMESPACE::optional;
+AFIO_V2_NAMESPACE_END
 
 
-#if BOOST_AFIO_LOGGING_LEVEL
-#include "../boost-lite/include/ringbuffer_log.hpp"
-#include "../boost-lite/include/utils/thread.hpp"
+#if AFIO_LOGGING_LEVEL
+#include "../quickcpplib/include/ringbuffer_log.hpp"
+#include "../quickcpplib/include/utils/thread.hpp"
 
 /*! \todo TODO FIXME Replace in-memory log with memory map file backed log.
 */
-BOOST_AFIO_V2_NAMESPACE_BEGIN
+AFIO_V2_NAMESPACE_BEGIN
 //! The log used by AFIO
-inline BOOST_AFIO_DECL boost_lite::ringbuffer_log::simple_ringbuffer_log<BOOST_AFIO_LOGGING_MEMORY> &log() noexcept
+inline AFIO_DECL QUICKCPPLIB_NAMESPACE::ringbuffer_log::simple_ringbuffer_log<AFIO_LOGGING_MEMORY> &log() noexcept
 {
-  static boost_lite::ringbuffer_log::simple_ringbuffer_log<BOOST_AFIO_LOGGING_MEMORY> _log(static_cast<boost_lite::ringbuffer_log::level>(BOOST_AFIO_LOGGING_LEVEL));
-#ifdef BOOST_AFIO_LOG_TO_OSTREAM
-  _log.immediate(&BOOST_AFIO_LOG_TO_OSTREAM);
+  static QUICKCPPLIB_NAMESPACE::ringbuffer_log::simple_ringbuffer_log<AFIO_LOGGING_MEMORY> _log(static_cast<QUICKCPPLIB_NAMESPACE::ringbuffer_log::level>(AFIO_LOGGING_LEVEL));
+#ifdef AFIO_LOG_TO_OSTREAM
+  _log.immediate(&AFIO_LOG_TO_OSTREAM);
 #endif
   return _log;
 }
-inline void record_error_into_afio_log(boost_lite::ringbuffer_log::level _level, const char *_message, unsigned _code1, unsigned _code2, const char *_function, unsigned lineno)
+inline void record_error_into_afio_log(QUICKCPPLIB_NAMESPACE::ringbuffer_log::level _level, const char *_message, unsigned _code1, unsigned _code2, const char *_function, unsigned lineno)
 {
   // Here is a VERY useful place to breakpoint!
   log().emplace_back(_level, _message, _code1, _code2, _function, lineno);
 }
-BOOST_AFIO_V2_NAMESPACE_END
+AFIO_V2_NAMESPACE_END
 #endif
 
-#ifndef BOOST_AFIO_LOG_FATAL_TO_CERR
+#ifndef AFIO_LOG_FATAL_TO_CERR
 #include <stdio.h>
-#define BOOST_AFIO_LOG_FATAL_TO_CERR(expr)                                                                                                                                                                                                                                                                                     \
+#define AFIO_LOG_FATAL_TO_CERR(expr)                                                                                                                                                                                                                                                                                           \
   fprintf(stderr, "%s\n", (expr));                                                                                                                                                                                                                                                                                             \
   fflush(stderr)
 #endif
 
-#if BOOST_AFIO_LOGGING_LEVEL >= 1
-#define BOOST_AFIO_LOG_FATAL(inst, message)                                                                                                                                                                                                                                                                                    \
+#if AFIO_LOGGING_LEVEL >= 1
+#define AFIO_LOG_FATAL(inst, message)                                                                                                                                                                                                                                                                                          \
   {                                                                                                                                                                                                                                                                                                                            \
-    BOOST_AFIO_V2_NAMESPACE::log().emplace_back(boost_lite::ringbuffer_log::level::fatal, (message), (unsigned) (uintptr_t)(inst), boost_lite::utils::thread::this_thread_id(), (BOOST_AFIO_LOG_BACKTRACE_LEVELS & (1 << 1)) ? nullptr : __func__, __LINE__);                                                                  \
-    BOOST_AFIO_LOG_FATAL_TO_CERR(message);                                                                                                                                                                                                                                                                                     \
+    AFIO_V2_NAMESPACE::log().emplace_back(QUICKCPPLIB_NAMESPACE::ringbuffer_log::level::fatal, (message), (unsigned) (uintptr_t)(inst), QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id(), (AFIO_LOG_BACKTRACE_LEVELS & (1 << 1)) ? nullptr : __func__, __LINE__);                                                        \
+    AFIO_LOG_FATAL_TO_CERR(message);                                                                                                                                                                                                                                                                                           \
   }
 #else
-#define BOOST_AFIO_LOG_FATAL(inst, message) BOOST_AFIO_LOG_FATAL_TO_CERR(message)
+#define AFIO_LOG_FATAL(inst, message) AFIO_LOG_FATAL_TO_CERR(message)
 #endif
-#if BOOST_AFIO_LOGGING_LEVEL >= 2
-#define BOOST_AFIO_LOG_ERROR(inst, message) BOOST_AFIO_V2_NAMESPACE::log().emplace_back(boost_lite::ringbuffer_log::level::error, (message), (unsigned) (uintptr_t)(inst), boost_lite::utils::thread::this_thread_id(), (BOOST_AFIO_LOG_BACKTRACE_LEVELS & (1 << 2)) ? nullptr : __func__, __LINE__)
+#if AFIO_LOGGING_LEVEL >= 2
+#define AFIO_LOG_ERROR(inst, message) AFIO_V2_NAMESPACE::log().emplace_back(QUICKCPPLIB_NAMESPACE::ringbuffer_log::level::error, (message), (unsigned) (uintptr_t)(inst), QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id(), (AFIO_LOG_BACKTRACE_LEVELS & (1 << 2)) ? nullptr : __func__, __LINE__)
 // Intercept when Outcome creates an error_code_extended and log it to our log too
 #ifndef BOOST_OUTCOME_ERROR_CODE_EXTENDED_CREATION_HOOK
 #define BOOST_OUTCOME_ERROR_CODE_EXTENDED_CREATION_HOOK                                                                                                                                                                                                                                                                        \
   if(*this)                                                                                                                                                                                                                                                                                                                    \
-  BOOST_AFIO_V2_NAMESPACE::record_error_into_afio_log(boost_lite::ringbuffer_log::level::error, this->message().c_str(), this->value(), (unsigned) this->_unique_id, (BOOST_AFIO_LOG_BACKTRACE_LEVELS & (1 << 2)) ? nullptr : __func__, __LINE__)
+  AFIO_V2_NAMESPACE::record_error_into_afio_log(QUICKCPPLIB_NAMESPACE::ringbuffer_log::level::error, this->message().c_str(), this->value(), (unsigned) this->_unique_id, (AFIO_LOG_BACKTRACE_LEVELS & (1 << 2)) ? nullptr : __func__, __LINE__)
 #endif
 #else
-#define BOOST_AFIO_LOG_ERROR(inst, message)
+#define AFIO_LOG_ERROR(inst, message)
 #endif
-#if BOOST_AFIO_LOGGING_LEVEL >= 3
-#define BOOST_AFIO_LOG_WARN(inst, message) BOOST_AFIO_V2_NAMESPACE::log().emplace_back(boost_lite::ringbuffer_log::level::warn, (message), (unsigned) (uintptr_t)(inst), boost_lite::utils::thread::this_thread_id(), (BOOST_AFIO_LOG_BACKTRACE_LEVELS & (1 << 3)) ? nullptr : __func__, __LINE__)
+#if AFIO_LOGGING_LEVEL >= 3
+#define AFIO_LOG_WARN(inst, message) AFIO_V2_NAMESPACE::log().emplace_back(QUICKCPPLIB_NAMESPACE::ringbuffer_log::level::warn, (message), (unsigned) (uintptr_t)(inst), QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id(), (AFIO_LOG_BACKTRACE_LEVELS & (1 << 3)) ? nullptr : __func__, __LINE__)
 #else
-#define BOOST_AFIO_LOG_WARN(inst, message)
+#define AFIO_LOG_WARN(inst, message)
 #endif
 
 // Need Outcome in play before I can define logging level 4
-#include "../outcome/include/boost/outcome.hpp"
-BOOST_AFIO_V2_NAMESPACE_BEGIN
+#include "../outcome/include/outcome.hpp"
+AFIO_V2_NAMESPACE_BEGIN
 // We are so heavily tied into Outcome we just import it wholesale into our namespace
-using namespace BOOST_OUTCOME_V1_NAMESPACE;
-// Force these to the same overloading precedence as if they were defined in the AFIO namespace
-using BOOST_OUTCOME_V1_NAMESPACE::outcome;
-using BOOST_OUTCOME_V1_NAMESPACE::make_errored_result;
-using BOOST_OUTCOME_V1_NAMESPACE::make_errored_outcome;
-namespace stl11
-{
-  using BOOST_OUTCOME_V1_NAMESPACE::stl11::errc;
-}
+using namespace OUTCOME_V2_NAMESPACE;
 #if DOXYGEN_SHOULD_SKIP_THIS
 /*! \brief Please see https://ned14.github.io/boost.outcome/classboost_1_1outcome_1_1v1__xxx_1_1basic__monad.html
 */
-template <class T> using result = boost::outcome::result<T>;
+template <class T> using result = OUTCOME_V2_NAMESPACE::result<T>;
 /*! \brief Please see https://ned14.github.io/boost.outcome/classboost_1_1outcome_1_1v1__xxx_1_1basic__monad.html
 */
-template <class T> using outcome = boost::outcome::outcome<T>;
+template <class T> using outcome = OUTCOME_V2_NAMESPACE::outcome<T>;
 #endif
-BOOST_AFIO_V2_NAMESPACE_END
+AFIO_V2_NAMESPACE_END
 
 
-#if BOOST_AFIO_LOGGING_LEVEL >= 4
-#define BOOST_AFIO_LOG_INFO(inst, message) BOOST_AFIO_V2_NAMESPACE::log().emplace_back(boost_lite::ringbuffer_log::level::info, (message), (unsigned) (uintptr_t)(inst), boost_lite::utils::thread::this_thread_id(), (BOOST_AFIO_LOG_BACKTRACE_LEVELS & (1 << 4)) ? nullptr : __func__, __LINE__)
+#if AFIO_LOGGING_LEVEL >= 4
+#define AFIO_LOG_INFO(inst, message) AFIO_V2_NAMESPACE::log().emplace_back(QUICKCPPLIB_NAMESPACE::ringbuffer_log::level::info, (message), (unsigned) (uintptr_t)(inst), QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id(), (AFIO_LOG_BACKTRACE_LEVELS & (1 << 4)) ? nullptr : __func__, __LINE__)
 
 // Need to expand out our namespace into a string
-#define BOOST_AFIO_LOG_STRINGIFY9(s) #s "::"
-#define BOOST_AFIO_LOG_STRINGIFY8(s) BOOST_AFIO_LOG_STRINGIFY9(s)
-#define BOOST_AFIO_LOG_STRINGIFY7(s) BOOST_AFIO_LOG_STRINGIFY8(s)
-#define BOOST_AFIO_LOG_STRINGIFY6(s) BOOST_AFIO_LOG_STRINGIFY7(s)
-#define BOOST_AFIO_LOG_STRINGIFY5(s) BOOST_AFIO_LOG_STRINGIFY6(s)
-#define BOOST_AFIO_LOG_STRINGIFY4(s) BOOST_AFIO_LOG_STRINGIFY5(s)
-#define BOOST_AFIO_LOG_STRINGIFY3(s) BOOST_AFIO_LOG_STRINGIFY4(s)
-#define BOOST_AFIO_LOG_STRINGIFY2(s) BOOST_AFIO_LOG_STRINGIFY3(s)
-#define BOOST_AFIO_LOG_STRINGIFY(s) BOOST_AFIO_LOG_STRINGIFY2(s)
-BOOST_AFIO_V2_NAMESPACE_BEGIN
+#define AFIO_LOG_STRINGIFY9(s) #s "::"
+#define AFIO_LOG_STRINGIFY8(s) AFIO_LOG_STRINGIFY9(s)
+#define AFIO_LOG_STRINGIFY7(s) AFIO_LOG_STRINGIFY8(s)
+#define AFIO_LOG_STRINGIFY6(s) AFIO_LOG_STRINGIFY7(s)
+#define AFIO_LOG_STRINGIFY5(s) AFIO_LOG_STRINGIFY6(s)
+#define AFIO_LOG_STRINGIFY4(s) AFIO_LOG_STRINGIFY5(s)
+#define AFIO_LOG_STRINGIFY3(s) AFIO_LOG_STRINGIFY4(s)
+#define AFIO_LOG_STRINGIFY2(s) AFIO_LOG_STRINGIFY3(s)
+#define AFIO_LOG_STRINGIFY(s) AFIO_LOG_STRINGIFY2(s)
+AFIO_V2_NAMESPACE_BEGIN
 //! Returns the AFIO namespace as a string
 inline span<char> afio_namespace_string()
 {
@@ -511,7 +338,7 @@ inline span<char> afio_namespace_string()
   static size_t length;
   if(length)
     return span<char>(buffer, length);
-  const char *src = BOOST_AFIO_LOG_STRINGIFY(BOOST_AFIO_V2_NAMESPACE);
+  const char *src = AFIO_LOG_STRINGIFY(AFIO_V2_NAMESPACE);
   char *bufferp = buffer;
   for(; *src && (bufferp - buffer) < (ptrdiff_t) sizeof(buffer); src++)
   {
@@ -529,7 +356,7 @@ inline span<char> outcome_namespace_string()
   static size_t length;
   if(length)
     return span<char>(buffer, length);
-  const char *src = BOOST_AFIO_LOG_STRINGIFY(BOOST_OUTCOME_V1_NAMESPACE);
+  const char *src = AFIO_LOG_STRINGIFY(OUTCOME_V2_NAMESPACE);
   char *bufferp = buffer;
   for(; *src && (bufferp - buffer) < (ptrdiff_t) sizeof(buffer); src++)
   {
@@ -540,7 +367,7 @@ inline span<char> outcome_namespace_string()
   length = bufferp - buffer;
   return span<char>(buffer, length);
 }
-//! Strips a __PRETTY_FUNCTION__ of all instances of boost::afio:: and boost::outcome::
+//! Strips a __PRETTY_FUNCTION__ of all instances of AFIO_V2_NAMESPACE:: and AFIO_V2_NAMESPACE::
 inline void strip_pretty_function(char *out, size_t bytes, const char *in)
 {
   const span<char> remove1 = afio_namespace_string();
@@ -555,40 +382,40 @@ inline void strip_pretty_function(char *out, size_t bytes, const char *in)
   }
   *out = 0;
 }
-BOOST_AFIO_V2_NAMESPACE_END
+AFIO_V2_NAMESPACE_END
 #ifdef _MSC_VER
-#define BOOST_AFIO_LOG_FUNCTION_CALL(inst)                                                                                                                                                                                                                                                                                     \
+#define AFIO_LOG_FUNCTION_CALL(inst)                                                                                                                                                                                                                                                                                           \
   {                                                                                                                                                                                                                                                                                                                            \
     char buffer[256];                                                                                                                                                                                                                                                                                                          \
-    BOOST_AFIO_V2_NAMESPACE::strip_pretty_function(buffer, sizeof(buffer), __FUNCSIG__);                                                                                                                                                                                                                                       \
-    BOOST_AFIO_LOG_INFO(inst, buffer);                                                                                                                                                                                                                                                                                         \
+    AFIO_V2_NAMESPACE::strip_pretty_function(buffer, sizeof(buffer), __FUNCSIG__);                                                                                                                                                                                                                                             \
+    AFIO_LOG_INFO(inst, buffer);                                                                                                                                                                                                                                                                                               \
   }
 #else
-#define BOOST_AFIO_LOG_FUNCTION_CALL(inst)                                                                                                                                                                                                                                                                                     \
+#define AFIO_LOG_FUNCTION_CALL(inst)                                                                                                                                                                                                                                                                                           \
   {                                                                                                                                                                                                                                                                                                                            \
     char buffer[256];                                                                                                                                                                                                                                                                                                          \
-    BOOST_AFIO_V2_NAMESPACE::strip_pretty_function(buffer, sizeof(buffer), __PRETTY_FUNCTION__);                                                                                                                                                                                                                               \
-    BOOST_AFIO_LOG_INFO(inst, buffer);                                                                                                                                                                                                                                                                                         \
+    AFIO_V2_NAMESPACE::strip_pretty_function(buffer, sizeof(buffer), __PRETTY_FUNCTION__);                                                                                                                                                                                                                                     \
+    AFIO_LOG_INFO(inst, buffer);                                                                                                                                                                                                                                                                                               \
   }
 #endif
 #else
-#define BOOST_AFIO_LOG_INFO(inst, message)
-#define BOOST_AFIO_LOG_FUNCTION_CALL(inst)
+#define AFIO_LOG_INFO(inst, message)
+#define AFIO_LOG_FUNCTION_CALL(inst)
 #endif
-#if BOOST_AFIO_LOGGING_LEVEL >= 5
-#define BOOST_AFIO_LOG_DEBUG(inst, message) BOOST_AFIO_V2_NAMESPACE::log().emplace_back(boost_lite::ringbuffer_log::level::debug, (message), (unsigned) (uintptr_t)(inst), boost_lite::utils::thread::this_thread_id(), (BOOST_AFIO_LOG_BACKTRACE_LEVELS & (1 << 5)) ? nullptr : __func__, __LINE__)
+#if AFIO_LOGGING_LEVEL >= 5
+#define AFIO_LOG_DEBUG(inst, message) AFIO_V2_NAMESPACE::log().emplace_back(QUICKCPPLIB_NAMESPACE::ringbuffer_log::level::debug, (message), (unsigned) (uintptr_t)(inst), QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id(), (AFIO_LOG_BACKTRACE_LEVELS & (1 << 5)) ? nullptr : __func__, __LINE__)
 #else
-#define BOOST_AFIO_LOG_DEBUG(inst, message)
+#define AFIO_LOG_DEBUG(inst, message)
 #endif
-#if BOOST_AFIO_LOGGING_LEVEL >= 6
-#define BOOST_AFIO_LOG_ALL(inst, message) BOOST_AFIO_V2_NAMESPACE::log().emplace_back(boost_lite::ringbuffer_log::level::all, (message), (unsigned) (uintptr_t)(inst), boost_lite::utils::thread::this_thread_id(), (BOOST_AFIO_LOG_BACKTRACE_LEVELS & (1 << 6)) ? nullptr : __func__, __LINE__)
+#if AFIO_LOGGING_LEVEL >= 6
+#define AFIO_LOG_ALL(inst, message) AFIO_V2_NAMESPACE::log().emplace_back(QUICKCPPLIB_NAMESPACE::ringbuffer_log::level::all, (message), (unsigned) (uintptr_t)(inst), QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id(), (AFIO_LOG_BACKTRACE_LEVELS & (1 << 6)) ? nullptr : __func__, __LINE__)
 #else
-#define BOOST_AFIO_LOG_ALL(inst, message)
+#define AFIO_LOG_ALL(inst, message)
 #endif
 
 #include <time.h>  // for struct timespec
 
-BOOST_AFIO_V2_NAMESPACE_BEGIN
+AFIO_V2_NAMESPACE_BEGIN
 
 // The C++ 11 runtime is much better at exception state than Boost so no choice here
 using std::make_exception_ptr;
@@ -600,7 +427,7 @@ using std::system_error;
 // Too darn useful
 using std::to_string;
 // Used to send the last 190 chars instead of the first 190 chars to extended_error_code
-using boost_lite::ringbuffer_log::last190;
+using QUICKCPPLIB_NAMESPACE::ringbuffer_log::last190;
 namespace detail
 {
   // A move only capable lightweight std::function, as std::function can't handle move only callables
@@ -642,7 +469,7 @@ namespace detail
   public:
     constexpr function_ptr() noexcept : ptr(nullptr) {}
     constexpr function_ptr(function_ptr_storage *p) noexcept : ptr(p) {}
-    BOOSTLITE_CONSTEXPR function_ptr(function_ptr &&o) noexcept : ptr(o.ptr) { o.ptr = nullptr; }
+    QUICKCPPLIB_CONSTEXPR function_ptr(function_ptr &&o) noexcept : ptr(o.ptr) { o.ptr = nullptr; }
     function_ptr &operator=(function_ptr &&o)
     {
       delete ptr;
@@ -654,14 +481,14 @@ namespace detail
     function_ptr &operator=(const function_ptr &) = delete;
     ~function_ptr() { delete ptr; }
     explicit constexpr operator bool() const noexcept { return !!ptr; }
-    BOOSTLITE_CONSTEXPR R operator()(Args... args) const { return (*ptr)(std::move(args)...); }
-    BOOSTLITE_CONSTEXPR function_ptr_storage *get() noexcept { return ptr; }
-    BOOSTLITE_CONSTEXPR void reset(function_ptr_storage *p = nullptr) noexcept
+    QUICKCPPLIB_CONSTEXPR R operator()(Args... args) const { return (*ptr)(std::move(args)...); }
+    QUICKCPPLIB_CONSTEXPR function_ptr_storage *get() noexcept { return ptr; }
+    QUICKCPPLIB_CONSTEXPR void reset(function_ptr_storage *p = nullptr) noexcept
     {
       delete ptr;
       ptr = p;
     }
-    BOOSTLITE_CONSTEXPR function_ptr_storage *release() noexcept
+    QUICKCPPLIB_CONSTEXPR function_ptr_storage *release() noexcept
     {
       auto p = ptr;
       ptr = nullptr;
@@ -686,7 +513,7 @@ string fragments would be far faster - look for an existing implementation
 before writing our own! One of those path fragments could variant onto
 an open handle to solve the earlier issue.
 */
-using fixme_path = stl1z::filesystem::path;
+using fixme_path = filesystem::path;
 
 // Native handle support
 namespace win
@@ -695,18 +522,18 @@ namespace win
   using dword = unsigned long;
 }
 
-BOOST_AFIO_V2_NAMESPACE_END
+AFIO_V2_NAMESPACE_END
 
 
 #if 0
 ///////////////////////////////////////////////////////////////////////////////
 //  Auto library naming
-#if !defined(BOOST_AFIO_SOURCE) && !defined(BOOST_ALL_NO_LIB) && !defined(BOOST_AFIO_NO_LIB) && !AFIO_STANDALONE && !BOOST_AFIO_HEADERS_ONLY
+#if !defined(AFIO_SOURCE) && !defined(BOOST_ALL_NO_LIB) && !defined(AFIO_NO_LIB) && !AFIO_STANDALONE && !AFIO_HEADERS_ONLY
 
 #define BOOST_LIB_NAME boost_afio
 
 // tell the auto-link code to select a dll when required:
-#if defined(BOOST_ALL_DYN_LINK) || defined(BOOST_AFIO_DYN_LINK)
+#if defined(BOOST_ALL_DYN_LINK) || defined(AFIO_DYN_LINK)
 #define BOOST_DYN_LINK
 #endif
 
@@ -719,26 +546,26 @@ BOOST_AFIO_V2_NAMESPACE_END
 //#define BOOST_THREAD_PROVIDES_VARIADIC_THREAD
 //#define BOOST_THREAD_DONT_PROVIDE_FUTURE
 //#define BOOST_THREAD_PROVIDES_SIGNATURE_PACKAGED_TASK
-#if BOOST_AFIO_HEADERS_ONLY == 1 && !defined(BOOST_AFIO_SOURCE)
+#if AFIO_HEADERS_ONLY == 1 && !defined(AFIO_SOURCE)
 /*! \brief Expands into the appropriate markup to declare an `extern`
 function exported from the AFIO DLL if not building headers only.
 \ingroup config
 */
-#define BOOST_AFIO_HEADERS_ONLY_FUNC_SPEC inline
+#define AFIO_HEADERS_ONLY_FUNC_SPEC inline
 /*! \brief Expands into the appropriate markup to declare a class member
 function exported from the AFIO DLL if not building headers only.
 \ingroup config
 */
-#define BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC inline
+#define AFIO_HEADERS_ONLY_MEMFUNC_SPEC inline
 /*! \brief Expands into the appropriate markup to declare a virtual class member
 function exported from the AFIO DLL if not building headers only.
 \ingroup config
 */
-#define BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC inline virtual
+#define AFIO_HEADERS_ONLY_VIRTUAL_SPEC inline virtual
 #else
-#define BOOST_AFIO_HEADERS_ONLY_FUNC_SPEC extern BOOST_AFIO_DECL
-#define BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC
-#define BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC virtual
+#define AFIO_HEADERS_ONLY_FUNC_SPEC extern AFIO_DECL
+#define AFIO_HEADERS_ONLY_MEMFUNC_SPEC
+#define AFIO_HEADERS_ONLY_VIRTUAL_SPEC virtual
 #endif
 
-#endif  // BOOST_AFIO_NEED_DEFINE
+#endif

@@ -22,8 +22,8 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#ifndef BOOST_AFIO_SHARED_FS_MUTEX_BYTE_RANGES_HPP
-#define BOOST_AFIO_SHARED_FS_MUTEX_BYTE_RANGES_HPP
+#ifndef AFIO_SHARED_FS_MUTEX_BYTE_RANGES_HPP
+#define AFIO_SHARED_FS_MUTEX_BYTE_RANGES_HPP
 
 #include "../../file_handle.hpp"
 #include "base.hpp"
@@ -32,7 +32,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 //! \file byte_ranges.hpp Provides algorithm::shared_fs_mutex::byte_ranges
 
-BOOST_AFIO_V2_NAMESPACE_BEGIN
+AFIO_V2_NAMESPACE_BEGIN
 
 namespace algorithm
 {
@@ -95,8 +95,8 @@ namespace algorithm
       //[[bindlib::make_free]]
       static result<byte_ranges> fs_mutex_byte_ranges(file_handle::path_type lockfile) noexcept
       {
-        BOOST_AFIO_LOG_FUNCTION_CALL(0);
-        BOOST_OUTCOME_TRY(ret, file_handle::file(std::move(lockfile), file_handle::mode::write, file_handle::creation::if_needed, file_handle::caching::temporary));
+        AFIO_LOG_FUNCTION_CALL(0);
+        OUTCOME_TRY(ret, file_handle::file(std::move(lockfile), file_handle::mode::write, file_handle::creation::if_needed, file_handle::caching::temporary));
         return byte_ranges(std::move(ret));
       }
 
@@ -106,13 +106,13 @@ namespace algorithm
     protected:
       virtual result<void> _lock(entities_guard &out, deadline d, bool spin_not_sleep) noexcept override final
       {
-        BOOST_AFIO_LOG_FUNCTION_CALL(this);
-        stl11::chrono::steady_clock::time_point began_steady;
-        stl11::chrono::system_clock::time_point end_utc;
+        AFIO_LOG_FUNCTION_CALL(this);
+        std::chrono::steady_clock::time_point began_steady;
+        std::chrono::system_clock::time_point end_utc;
         if(d)
         {
           if((d).steady)
-            began_steady = stl11::chrono::steady_clock::now();
+            began_steady = std::chrono::steady_clock::now();
           else
             end_utc = (d).to_time_point();
         }
@@ -139,7 +139,7 @@ namespace algorithm
               deadline nd;
               // Only for very first entity will we sleep until its lock becomes available
               if(n)
-                nd = deadline(stl11::chrono::seconds(0));
+                nd = deadline(std::chrono::seconds(0));
               else
               {
                 nd = deadline();
@@ -147,7 +147,7 @@ namespace algorithm
                 {
                   if((d).steady)
                   {
-                    stl11::chrono::nanoseconds ns = stl11::chrono::duration_cast<stl11::chrono::nanoseconds>((began_steady + stl11::chrono::nanoseconds((d).nsecs)) - stl11::chrono::steady_clock::now());
+                    std::chrono::nanoseconds ns = std::chrono::duration_cast<std::chrono::nanoseconds>((began_steady + std::chrono::nanoseconds((d).nsecs)) - std::chrono::steady_clock::now());
                     if(ns.count() < 0)
                       (nd).nsecs = 0;
                     else
@@ -163,32 +163,32 @@ namespace algorithm
                 was_contended = n;
                 goto failed;
               }
-              outcome.get().release();
+              outcome.value().release();
             }
             // Everything is locked, exit
             undo.dismiss();
             disableunlock.dismiss();
-            return make_valued_result<void>();
+            return success();
           }
         failed:
           if(d)
           {
             if((d).steady)
             {
-              if(stl11::chrono::steady_clock::now() >= (began_steady + stl11::chrono::nanoseconds((d).nsecs)))
-                return make_errored_result<void>(stl11::errc::timed_out);
+              if(std::chrono::steady_clock::now() >= (began_steady + std::chrono::nanoseconds((d).nsecs)))
+                return std::errc::timed_out;
             }
             else
             {
-              if(stl11::chrono::system_clock::now() >= end_utc)
-                return make_errored_result<void>(stl11::errc::timed_out);
+              if(std::chrono::system_clock::now() >= end_utc)
+                return std::errc::timed_out;
             }
           }
           // Move was_contended to front and randomise rest of out.entities
           std::swap(out.entities[was_contended], out.entities[0]);
           auto front = out.entities.begin();
           ++front;
-          boost_lite::algorithm::small_prng::random_shuffle(front, out.entities.end());
+          QUICKCPPLIB_NAMESPACE::algorithm::small_prng::random_shuffle(front, out.entities.end());
           if(!spin_not_sleep)
             std::this_thread::yield();
         }
@@ -198,7 +198,7 @@ namespace algorithm
     public:
       virtual void unlock(entities_type entities, unsigned long long) noexcept override final
       {
-        BOOST_AFIO_LOG_FUNCTION_CALL(this);
+        AFIO_LOG_FUNCTION_CALL(this);
         for(const auto &i : entities)
         {
           _h.unlock(i.value, 1);
@@ -209,7 +209,7 @@ namespace algorithm
   }  // namespace
 }  // namespace
 
-BOOST_AFIO_V2_NAMESPACE_END
+AFIO_V2_NAMESPACE_END
 
 
 #endif

@@ -22,8 +22,8 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#ifndef BOOST_AFIO_SHARED_FS_MUTEX_MEMORY_MAP_HPP
-#define BOOST_AFIO_SHARED_FS_MUTEX_MEMORY_MAP_HPP
+#ifndef AFIO_SHARED_FS_MUTEX_MEMORY_MAP_HPP
+#define AFIO_SHARED_FS_MUTEX_MEMORY_MAP_HPP
 
 #include "../../map_handle.hpp"
 #include "base.hpp"
@@ -34,7 +34,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 //! \file memory_map.hpp Provides algorithm::shared_fs_mutex::memory_map
 
-BOOST_AFIO_V2_NAMESPACE_BEGIN
+AFIO_V2_NAMESPACE_BEGIN
 
 namespace algorithm
 {
@@ -98,7 +98,7 @@ namespace algorithm
     \todo memory_map::_hash_entities needs to hash x16, x8 and x4 at a time to encourage auto vectorisation
     \todo memory_map::unlock() degrade is racy when single instance being used by multiple threads
     */
-    template <template <class> class Hasher = boost_lite::algorithm::hash::fnv1a_hash, size_t HashIndexSize = 4096, class SpinlockType = boost_lite::configurable_spinlock::shared_spinlock<>> class memory_map : public shared_fs_mutex
+    template <template <class> class Hasher = QUICKCPPLIB_NAMESPACE::algorithm::hash::fnv1a_hash, size_t HashIndexSize = 4096, class SpinlockType = QUICKCPPLIB_NAMESPACE::configurable_spinlock::shared_spinlock<>> class memory_map : public shared_fs_mutex
     {
     public:
       //! The type of an entity id
@@ -175,9 +175,9 @@ namespace algorithm
           _hlockinuse.unlock();
           auto lockresult = _h.try_lock(_lockinuseoffset, 1, true);
 #ifndef NDEBUG
-          if(!lockresult && lockresult.error() != stl11::errc::timed_out)
+          if(!lockresult && lockresult.error() != std::errc::timed_out)
           {
-            BOOST_AFIO_LOG_FATAL(0, "memory_map::~memory_map() try_lock failed");
+            AFIO_LOG_FATAL(0, "memory_map::~memory_map() try_lock failed");
             abort();
           }
 #endif
@@ -206,28 +206,28 @@ namespace algorithm
       //[[bindlib::make_free]]
       static result<memory_map> fs_mutex_map(file_handle::path_type lockfile, shared_fs_mutex *fallbacklock = nullptr) noexcept
       {
-        BOOST_AFIO_LOG_FUNCTION_CALL(0);
+        AFIO_LOG_FUNCTION_CALL(0);
         try
         {
-          BOOST_OUTCOME_TRY(ret, file_handle::file(std::move(lockfile), file_handle::mode::write, file_handle::creation::if_needed, file_handle::caching::reads));
+          OUTCOME_TRY(ret, file_handle::file(std::move(lockfile), file_handle::mode::write, file_handle::creation::if_needed, file_handle::caching::reads));
           file_handle temph;
           // Am I the first person to this file? Lock the inuse exclusively
           auto lockinuse = ret.try_lock(_lockinuseoffset, 1, true);
           file_handle::extent_guard mapinuse;
           if(lockinuse.has_error())
           {
-            if(lockinuse.get_error().value() != ETIMEDOUT)
-              return lockinuse.get_error();
+            if(lockinuse.error() != std::errc::timed_out)
+              return lockinuse.error();
             // Somebody else is also using this file, so try to read the hash index file I ought to use
             lockinuse = ret.lock(_lockinuseoffset, 1, false);  // last byte shared access
             char buffer[65536];
             memset(buffer, 0, sizeof(buffer));
             {
-              BOOST_OUTCOME_TRY(_, ret.read(0, buffer, 65535));
+              OUTCOME_TRY(_, ret.read(0, buffer, 65535));
               (void) _;
             }
             fixme_path::value_type *temphpath = (fixme_path::value_type *) buffer;
-            result<file_handle> _temph;
+            result<file_handle> _temph(in_place_type<file_handle>);
             // If path is zeroed, fall back onto backup lock
             if(!buffer[0])
               goto use_fall_back_lock;
@@ -244,33 +244,33 @@ namespace algorithm
               // and will unlock it once everyone has stopped using the mmap, so make
               // absolutely sure the mmap is not in use by anyone by taking an exclusive
               // lock on the second final byte
-              BOOST_OUTCOME_TRY(mapinuse2, ret.lock(_mapinuseoffset, 1, true));
+              OUTCOME_TRY(mapinuse2, ret.lock(_mapinuseoffset, 1, true));
               // Release the exclusive lock and tell caller to just use the fallback lock directly
-              return make_errored_result<memory_map>(stl11::errc::device_or_resource_busy);
+              return std::errc::device_or_resource_busy;
             }
             else
             {
               // Mark the map as being in use by me too
-              BOOST_OUTCOME_TRY(mapinuse2, ret.lock(_mapinuseoffset, 1, false));
+              OUTCOME_TRY(mapinuse2, ret.lock(_mapinuseoffset, 1, false));
               mapinuse = std::move(mapinuse2);
-              temph = std::move(_temph.get());
+              temph = std::move(_temph.value());
             }
             // Map the files into memory, being very careful that the lock file is only ever mapped read only
             // as some OSs can get confused if you use non-mmaped writes on a region mapped for writing.
-            BOOST_OUTCOME_TRY(hsection, section_handle::section(ret, 0, section_handle::flag::read));
-            BOOST_OUTCOME_TRY(temphsection, section_handle::section(temph, HashIndexSize));
-            BOOST_OUTCOME_TRY(hmap, map_handle::map(hsection, 0, 0, section_handle::flag::read));
-            BOOST_OUTCOME_TRY(temphmap, map_handle::map(temphsection, HashIndexSize));
-            return memory_map(std::move(ret), std::move(temph), std::move(lockinuse.get()), std::move(mapinuse), std::move(hmap), std::move(temphmap), fallbacklock);
+            OUTCOME_TRY(hsection, section_handle::section(ret, 0, section_handle::flag::read));
+            OUTCOME_TRY(temphsection, section_handle::section(temph, HashIndexSize));
+            OUTCOME_TRY(hmap, map_handle::map(hsection, 0, 0, section_handle::flag::read));
+            OUTCOME_TRY(temphmap, map_handle::map(temphsection, HashIndexSize));
+            return memory_map(std::move(ret), std::move(temph), std::move(lockinuse.value()), std::move(mapinuse), std::move(hmap), std::move(temphmap), fallbacklock);
           }
           else
           {
             // I am the first person to be using this (stale?) file, so create a new hash index file and write its path
-            BOOST_OUTCOME_TRYV(ret.truncate(0));
-            BOOST_OUTCOME_TRY(_temph, file_handle::random_file(fixme_temporary_files_directory()));
+            OUTCOME_TRYV(ret.truncate(0));
+            OUTCOME_TRY(_temph, file_handle::random_file(fixme_temporary_files_directory()));
             temph = std::move(_temph);
             auto temppath(temph.path());
-            BOOST_OUTCOME_TRYV(temph.truncate(HashIndexSize));
+            OUTCOME_TRYV(temph.truncate(HashIndexSize));
             /* Linux appears to have a race where:
                  1. This process creates a new file and fallocate's its maximum extent.
                  2. Another process opens this file and mmaps it.
@@ -281,23 +281,26 @@ namespace algorithm
             */
             // Map the files into memory, being very careful that the lock file is only ever mapped read only
             // as some OSs can get confused if you use non-mmaped writes on a region mapped for writing.
-            BOOST_OUTCOME_TRY(temphsection, section_handle::section(temph, HashIndexSize));
-            BOOST_OUTCOME_TRY(temphmap, map_handle::map(temphsection, HashIndexSize));
+            OUTCOME_TRY(temphsection, section_handle::section(temph, HashIndexSize));
+            OUTCOME_TRY(temphmap, map_handle::map(temphsection, HashIndexSize));
             // Force page allocation now
             memset(temphmap.address(), 0, HashIndexSize);
             // Write the path of my new hash index file and convert my lock to a shared one
-            BOOST_OUTCOME_TRYV(ret.write(0, (const char *) temppath.c_str(), temppath.native().size() * sizeof(*temppath.c_str())));
-            BOOST_OUTCOME_TRY(hsection, section_handle::section(ret, 0, section_handle::flag::read));
-            BOOST_OUTCOME_TRY(hmap, map_handle::map(hsection, 0, 0, section_handle::flag::read));
+            OUTCOME_TRYV(ret.write(0, (const char *) temppath.c_str(), temppath.native().size() * sizeof(*temppath.c_str())));
+            OUTCOME_TRY(hsection, section_handle::section(ret, 0, section_handle::flag::read));
+            OUTCOME_TRY(hmap, map_handle::map(hsection, 0, 0, section_handle::flag::read));
             // Convert exclusive whole file lock into lock in use
-            BOOST_OUTCOME_TRY(mapinuse2, ret.lock(_mapinuseoffset, 1, false));
-            BOOST_OUTCOME_TRY(lockinuse2, ret.lock(_lockinuseoffset, 1, false));
+            OUTCOME_TRY(mapinuse2, ret.lock(_mapinuseoffset, 1, false));
+            OUTCOME_TRY(lockinuse2, ret.lock(_lockinuseoffset, 1, false));
             mapinuse = std::move(mapinuse2);
             lockinuse = std::move(lockinuse2);
-            return memory_map(std::move(ret), std::move(temph), std::move(lockinuse.get()), std::move(mapinuse), std::move(hmap), std::move(temphmap), fallbacklock);
+            return memory_map(std::move(ret), std::move(temph), std::move(lockinuse.value()), std::move(mapinuse), std::move(hmap), std::move(temphmap), fallbacklock);
           }
         }
-        BOOST_OUTCOME_CATCH_ALL_EXCEPTION_TO_RESULT
+        catch(...)
+        {
+          return error_from_exception();
+        }
       }
 
       //! Return the handle to file being used for this lock
@@ -334,7 +337,7 @@ namespace algorithm
       }
       virtual result<void> _lock(entities_guard &out, deadline d, bool spin_not_sleep) noexcept override final
       {
-        BOOST_AFIO_LOG_FUNCTION_CALL(this);
+        AFIO_LOG_FUNCTION_CALL(this);
         if(is_degraded())
         {
           if(!_have_degraded)
@@ -345,19 +348,19 @@ namespace algorithm
             // reach this same point. If that lock times out, we will reenter here
             // next time until we succeed
             _hmapinuse.unlock();
-            BOOST_OUTCOME_TRY(mapinuse2, _h.lock(_mapinuseoffset, 1, true, d));
+            OUTCOME_TRY(mapinuse2, _h.lock(_mapinuseoffset, 1, true, d));
             _have_degraded = true;
           }
           if(_fallbacklock)
             return _fallbacklock->_lock(out, d, spin_not_sleep);
-          return make_errored_result<void>(stl11::errc::device_or_resource_busy);
+          return std::errc::device_or_resource_busy;
         }
-        stl11::chrono::steady_clock::time_point began_steady;
-        stl11::chrono::system_clock::time_point end_utc;
+        std::chrono::steady_clock::time_point began_steady;
+        std::chrono::system_clock::time_point end_utc;
         if(d)
         {
           if((d).steady)
-            began_steady = stl11::chrono::steady_clock::now();
+            began_steady = std::chrono::steady_clock::now();
           else
             end_utc = (d).to_time_point();
         }
@@ -393,27 +396,27 @@ namespace algorithm
             // Everything is locked, exit
             undo.dismiss();
             disableunlock.dismiss();
-            return make_valued_result<void>();
+            return success();
           }
         failed:
           if(d)
           {
             if((d).steady)
             {
-              if(stl11::chrono::steady_clock::now() >= (began_steady + stl11::chrono::nanoseconds((d).nsecs)))
-                return make_errored_result<void>(stl11::errc::timed_out);
+              if(std::chrono::steady_clock::now() >= (began_steady + std::chrono::nanoseconds((d).nsecs)))
+                return std::errc::timed_out;
             }
             else
             {
-              if(stl11::chrono::system_clock::now() >= end_utc)
-                return make_errored_result<void>(stl11::errc::timed_out);
+              if(std::chrono::system_clock::now() >= end_utc)
+                return std::errc::timed_out;
             }
           }
           // Move was_contended to front and randomise rest of out.entities
           std::swap(entity_to_idx[was_contended], entity_to_idx[0]);
           auto front = entity_to_idx.begin();
           ++front;
-          boost_lite::algorithm::small_prng::random_shuffle(front, entity_to_idx.end());
+          QUICKCPPLIB_NAMESPACE::algorithm::small_prng::random_shuffle(front, entity_to_idx.end());
           if(!spin_not_sleep)
             std::this_thread::yield();
         }
@@ -423,7 +426,7 @@ namespace algorithm
     public:
       virtual void unlock(entities_type entities, unsigned long long hint) noexcept override final
       {
-        BOOST_AFIO_LOG_FUNCTION_CALL(this);
+        AFIO_LOG_FUNCTION_CALL(this);
         if(_have_degraded)
         {
           if(_fallbacklock)
@@ -444,7 +447,7 @@ namespace algorithm
   }  // namespace
 }  // namespace
 
-BOOST_AFIO_V2_NAMESPACE_END
+AFIO_V2_NAMESPACE_END
 
 
 #endif

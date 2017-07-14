@@ -25,7 +25,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../../../handle.hpp"
 #include "import.hpp"
 
-BOOST_AFIO_V2_NAMESPACE_BEGIN
+AFIO_V2_NAMESPACE_BEGIN
 
 handle::~handle()
 {
@@ -35,7 +35,7 @@ handle::~handle()
     auto ret = handle::close();
     if(ret.has_error())
     {
-      BOOST_AFIO_LOG_FATAL(_v.h, "handle::~handle() close failed");
+      AFIO_LOG_FATAL(_v.h, "handle::~handle() close failed");
       abort();
     }
   }
@@ -43,7 +43,7 @@ handle::~handle()
 
 result<void> handle::close() noexcept
 {
-  BOOST_AFIO_LOG_FUNCTION_CALL(_v.h);
+  AFIO_LOG_FUNCTION_CALL(_v.h);
   if(_v)
   {
     if(are_safety_fsyncs_issued())
@@ -55,12 +55,12 @@ result<void> handle::close() noexcept
       return make_errored_result<void>(GetLastError());
     _v = native_handle_type();
   }
-  return make_valued_result<void>();
+  return success();
 }
 
 result<handle> handle::clone() const noexcept
 {
-  BOOST_AFIO_LOG_FUNCTION_CALL(_v.h);
+  AFIO_LOG_FUNCTION_CALL(_v.h);
   result<handle> ret(handle(native_handle_type(), _caching, _flags));
   ret.value()._v.behaviour = _v.behaviour;
   if(!DuplicateHandle(GetCurrentProcess(), _v.h, GetCurrentProcess(), &ret.value()._v.h, 0, false, DUPLICATE_SAME_ACCESS))
@@ -70,7 +70,7 @@ result<handle> handle::clone() const noexcept
 
 result<void> handle::set_append_only(bool enable) noexcept
 {
-  BOOST_AFIO_LOG_FUNCTION_CALL(_v.h);
+  AFIO_LOG_FUNCTION_CALL(_v.h);
   // This works only due to special handling in OVERLAPPED later
   if(enable)
   {
@@ -82,12 +82,12 @@ result<void> handle::set_append_only(bool enable) noexcept
     // Remove append_only
     _v.behaviour &= ~native_handle_type::disposition::append_only;
   }
-  return make_valued_result<void>();
+  return success();
 }
 
 result<void> handle::set_kernel_caching(caching caching) noexcept
 {
-  BOOST_AFIO_LOG_FUNCTION_CALL(_v.h);
+  AFIO_LOG_FUNCTION_CALL(_v.h);
   native_handle_type nativeh;
   handle::mode _mode = mode::none;
   if(is_append_only())
@@ -96,15 +96,15 @@ result<void> handle::set_kernel_caching(caching caching) noexcept
     _mode = mode::write;
   else if(is_readable())
     _mode = mode::read;
-  BOOST_OUTCOME_TRY(access, access_mask_from_handle_mode(nativeh, _mode));
-  BOOST_OUTCOME_TRY(attribs, attributes_from_handle_caching_and_flags(nativeh, caching, _flags));
+  OUTCOME_TRY(access, access_mask_from_handle_mode(nativeh, _mode));
+  OUTCOME_TRY(attribs, attributes_from_handle_caching_and_flags(nativeh, caching, _flags));
   nativeh.behaviour |= native_handle_type::disposition::file;
   if(INVALID_HANDLE_VALUE == (nativeh.h = ReOpenFile(_v.h, access, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, attribs)))
     return make_errored_result<void>(GetLastError());
   _v.swap(nativeh);
   if(!CloseHandle(nativeh.h))
     return make_errored_result<void>(GetLastError());
-  return make_valued_result<void>();
+  return success();
 }
 
 
@@ -113,11 +113,11 @@ result<void> handle::set_kernel_caching(caching caching) noexcept
 template <class BuffersType, class Syscall> inline io_handle::io_result<BuffersType> do_read_write(const native_handle_type &nativeh, Syscall &&syscall, io_handle::io_request<BuffersType> reqs, deadline d) noexcept
 {
   if(d && !nativeh.is_overlapped())
-    return make_errored_result<BuffersType>(stl11::errc::not_supported);
+    return make_errored_result<BuffersType>(std::errc::not_supported);
   if(reqs.buffers.size() > 64)
-    return make_errored_result<BuffersType>(stl11::errc::argument_list_too_long);
+    return make_errored_result<BuffersType>(std::errc::argument_list_too_long);
 
-  BOOST_AFIO_WIN_DEADLINE_TO_SLEEP_INIT(d);
+  AFIO_WIN_DEADLINE_TO_SLEEP_INIT(d);
   std::array<OVERLAPPED, 64> _ols;
   memset(_ols.data(), 0, reqs.buffers.size() * sizeof(OVERLAPPED));
   span<OVERLAPPED> ols(_ols.data(), reqs.buffers.size());
@@ -157,10 +157,10 @@ template <class BuffersType, class Syscall> inline io_handle::io_result<BuffersT
     for(auto &ol : ols)
     {
       deadline nd = d;
-      BOOST_AFIO_WIN_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
+      AFIO_WIN_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
       if(STATUS_TIMEOUT == ntwait(nativeh.h, ol, nd))
       {
-        BOOST_AFIO_WIN_DEADLINE_TO_TIMEOUT(BuffersType, d);
+        AFIO_WIN_DEADLINE_TO_TIMEOUT(d);
       }
     }
   }
@@ -180,25 +180,25 @@ template <class BuffersType, class Syscall> inline io_handle::io_result<BuffersT
 
 io_handle::io_result<io_handle::buffers_type> io_handle::read(io_handle::io_request<io_handle::buffers_type> reqs, deadline d) noexcept
 {
-  BOOST_AFIO_LOG_FUNCTION_CALL(_v.h);
+  AFIO_LOG_FUNCTION_CALL(_v.h);
   return do_read_write(_v, &ReadFile, std::move(reqs), std::move(d));
 }
 
 io_handle::io_result<io_handle::const_buffers_type> io_handle::write(io_handle::io_request<io_handle::const_buffers_type> reqs, deadline d) noexcept
 {
-  BOOST_AFIO_LOG_FUNCTION_CALL(_v.h);
+  AFIO_LOG_FUNCTION_CALL(_v.h);
   return do_read_write(_v, &WriteFile, std::move(reqs), std::move(d));
 }
 
 result<io_handle::extent_guard> io_handle::lock(io_handle::extent_type offset, io_handle::extent_type bytes, bool exclusive, deadline d) noexcept
 {
-  BOOST_AFIO_LOG_FUNCTION_CALL(_v.h);
+  AFIO_LOG_FUNCTION_CALL(_v.h);
   if(d && d.nsecs > 0 && !_v.is_overlapped())
-    return make_errored_result<io_handle::extent_guard>(stl11::errc::not_supported);
+    return std::errc::not_supported;
   DWORD flags = exclusive ? LOCKFILE_EXCLUSIVE_LOCK : 0;
   if(d && !d.nsecs)
     flags |= LOCKFILE_FAIL_IMMEDIATELY;
-  BOOST_AFIO_WIN_DEADLINE_TO_SLEEP_INIT(d);
+  AFIO_WIN_DEADLINE_TO_SLEEP_INIT(d);
   OVERLAPPED ol;
   memset(&ol, 0, sizeof(ol));
   ol.Internal = (ULONG_PTR) -1;
@@ -209,7 +209,7 @@ result<io_handle::extent_guard> io_handle::lock(io_handle::extent_type offset, i
   if(!LockFileEx(_v.h, flags, 0, bytes_low, bytes_high, &ol))
   {
     if(ERROR_LOCK_VIOLATION == GetLastError() && d && !d.nsecs)
-      return make_errored_result<io_handle::extent_guard>(stl11::errc::timed_out);
+      return std::errc::timed_out;
     if(ERROR_IO_PENDING != GetLastError())
       return make_errored_result<io_handle::extent_guard>(GetLastError());
   }
@@ -218,7 +218,7 @@ result<io_handle::extent_guard> io_handle::lock(io_handle::extent_type offset, i
   {
     if(STATUS_TIMEOUT == ntwait(_v.h, ol, d))
     {
-      BOOST_AFIO_WIN_DEADLINE_TO_TIMEOUT(io_handle::extent_guard, d);
+      AFIO_WIN_DEADLINE_TO_TIMEOUT(d);
     }
     // It seems the NT kernel is guilty of casting bugs sometimes
     ol.Internal = ol.Internal & 0xffffffff;
@@ -230,7 +230,7 @@ result<io_handle::extent_guard> io_handle::lock(io_handle::extent_type offset, i
 
 void io_handle::unlock(io_handle::extent_type offset, io_handle::extent_type bytes) noexcept
 {
-  BOOST_AFIO_LOG_FUNCTION_CALL(_v.h);
+  AFIO_LOG_FUNCTION_CALL(_v.h);
   OVERLAPPED ol;
   memset(&ol, 0, sizeof(ol));
   ol.Internal = (ULONG_PTR) -1;
@@ -244,7 +244,7 @@ void io_handle::unlock(io_handle::extent_type offset, io_handle::extent_type byt
     {
       auto ret = make_errored_result<void>(GetLastError());
       (void) ret;
-      BOOST_AFIO_LOG_FATAL(_v.h, "io_handle::unlock() failed");
+      AFIO_LOG_FATAL(_v.h, "io_handle::unlock() failed");
       std::terminate();
     }
   }
@@ -258,10 +258,10 @@ void io_handle::unlock(io_handle::extent_type offset, io_handle::extent_type byt
       ol.Internal = ol.Internal & 0xffffffff;
       auto ret = make_errored_result_nt<void>((NTSTATUS) ol.Internal);
       (void) ret;
-      BOOST_AFIO_LOG_FATAL(_v.h, "io_handle::unlock() failed");
+      AFIO_LOG_FATAL(_v.h, "io_handle::unlock() failed");
       std::terminate();
     }
   }
 }
 
-BOOST_AFIO_V2_NAMESPACE_END
+AFIO_V2_NAMESPACE_END

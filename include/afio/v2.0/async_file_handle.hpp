@@ -27,14 +27,14 @@ Distributed under the Boost Software License, Version 1.0.
 
 //! \file async_file_handle.hpp Provides async_file_handle
 
-#ifndef BOOST_AFIO_ASYNC_FILE_HANDLE_H
-#define BOOST_AFIO_ASYNC_FILE_HANDLE_H
+#ifndef AFIO_ASYNC_FILE_HANDLE_H
+#define AFIO_ASYNC_FILE_HANDLE_H
 
-BOOST_AFIO_V2_NAMESPACE_EXPORT_BEGIN
+AFIO_V2_NAMESPACE_EXPORT_BEGIN
 
 /*! An asynchronous handle to an open something
 */
-class BOOST_AFIO_DECL async_file_handle : public file_handle
+class AFIO_DECL async_file_handle : public file_handle
 {
   friend class io_service;
 
@@ -95,10 +95,10 @@ public:
   \errors Any of the values POSIX open() or CreateFile() can return.
   */
   //[[bindlib::make_free]]
-  static BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<async_file_handle> async_file(io_service &service, path_type _path, mode _mode = mode::read, creation _creation = creation::open_existing, caching _caching = caching::all, flag flags = flag::none) noexcept
+  static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<async_file_handle> async_file(io_service &service, path_type _path, mode _mode = mode::read, creation _creation = creation::open_existing, caching _caching = caching::all, flag flags = flag::none) noexcept
   {
     // Open it overlapped, otherwise no difference.
-    BOOST_OUTCOME_TRY(v, file_handle::file(std::move(_path), std::move(_mode), std::move(_creation), std::move(_caching), flags | flag::overlapped));
+    OUTCOME_TRY(v, file_handle::file(std::move(_path), std::move(_mode), std::move(_creation), std::move(_caching), flags | flag::overlapped));
     async_file_handle ret(std::move(v));
     ret._service = &service;
     return std::move(ret);
@@ -117,18 +117,19 @@ public:
   {
     try
     {
-      result<async_file_handle> ret;
-      do
+      for(;;)
       {
         auto randomname = utils::random_string(32);
         randomname.append(".random");
-        ret = async_file(service, dirpath / randomname, _mode, creation::only_if_not_exist, _caching, flags);
-        if(!ret && ret.get_error().value() != EEXIST)
+        result<async_file_handle> ret = async_file(service, dirpath / randomname, _mode, creation::only_if_not_exist, _caching, flags);
+        if(ret || (!ret && ret.error().value() != EEXIST))
           return ret;
-      } while(!ret);
-      return ret;
+      }
     }
-    BOOST_OUTCOME_CATCH_ALL_EXCEPTION_TO_RESULT
+    catch(...)
+    {
+      return error_from_exception();
+    }
   }
   /*! Create an async file handle creating the named file on some path which
   the OS declares to be suitable for temporary files. Most OSs are
@@ -161,21 +162,21 @@ public:
   \errors Any of the values POSIX open() or CreateFile() can return.
   */
   //[[bindlib::make_free]]
-  static BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<async_file_handle> async_temp_inode(io_service &service, path_type dirpath = fixme_temporary_files_directory(), mode _mode = mode::write, flag flags = flag::none) noexcept
+  static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<async_file_handle> async_temp_inode(io_service &service, path_type dirpath = fixme_temporary_files_directory(), mode _mode = mode::write, flag flags = flag::none) noexcept
   {
     // Open it overlapped, otherwise no difference.
-    BOOST_OUTCOME_TRY(v, file_handle::temp_inode(std::move(dirpath), std::move(_mode), flags | flag::overlapped));
+    OUTCOME_TRY(v, file_handle::temp_inode(std::move(dirpath), std::move(_mode), flags | flag::overlapped));
     async_file_handle ret(std::move(v));
     ret._service = &service;
     return std::move(ret);
   }
 
-  BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> barrier(io_request<const_buffers_type> reqs = io_request<const_buffers_type>(), bool wait_for_device = false, bool and_metadata = false, deadline d = deadline()) noexcept override;
+  AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> barrier(io_request<const_buffers_type> reqs = io_request<const_buffers_type>(), bool wait_for_device = false, bool and_metadata = false, deadline d = deadline()) noexcept override;
   /*! Clone this handle to a different io_service (copy constructor is disabled to avoid accidental copying)
 
   \errors Any of the values POSIX dup() or DuplicateHandle() can return.
   */
-  BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<async_file_handle> clone(io_service &service) const noexcept;
+  AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<async_file_handle> clone(io_service &service) const noexcept;
   using file_handle::clone;
 
 #if DOXYGEN_SHOULD_SKIP_THIS
@@ -218,13 +219,13 @@ protected:
       - internal_state: address of pointer to struct aiocb in io_service's _aiocbsv
     */
     virtual void operator()(long errcode, long bytes_transferred, void *internal_state) noexcept = 0;
-    BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC ~_erased_io_state_type()
+    AFIO_HEADERS_ONLY_VIRTUAL_SPEC ~_erased_io_state_type()
     {
       // i/o still pending is very bad, this should never happen
       assert(!items_to_go);
       if(items_to_go)
       {
-        BOOST_AFIO_LOG_FATAL(parent->native_handle().h, "FATAL: io_state destructed while i/o still in flight, the derived class should never allow this.");
+        AFIO_LOG_FATAL(parent->native_handle().h, "FATAL: io_state destructed while i/o still in flight, the derived class should never allow this.");
         abort();
       }
     }
@@ -295,20 +296,20 @@ public:
   //[[bindlib::make_free]]
   template <class CompletionRoutine> result<io_state_ptr<CompletionRoutine, const_buffers_type>> async_write(io_request<const_buffers_type> reqs, CompletionRoutine &&completion) noexcept;
 
-  BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<buffers_type> read(io_request<buffers_type> reqs, deadline d = deadline()) noexcept override;
-  BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> write(io_request<const_buffers_type> reqs, deadline d = deadline()) noexcept override;
+  AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<buffers_type> read(io_request<buffers_type> reqs, deadline d = deadline()) noexcept override;
+  AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> write(io_request<const_buffers_type> reqs, deadline d = deadline()) noexcept override;
 };
 
-BOOST_AFIO_V2_NAMESPACE_END
+AFIO_V2_NAMESPACE_END
 
-#if BOOST_AFIO_HEADERS_ONLY == 1 && !defined(DOXYGEN_SHOULD_SKIP_THIS)
-#define BOOST_AFIO_INCLUDED_BY_HEADER 1
+#if AFIO_HEADERS_ONLY == 1 && !defined(DOXYGEN_SHOULD_SKIP_THIS)
+#define AFIO_INCLUDED_BY_HEADER 1
 #ifdef _WIN32
 #include "detail/impl/windows/async_file_handle.ipp"
 #else
 #include "detail/impl/posix/async_file_handle.ipp"
 #endif
-#undef BOOST_AFIO_INCLUDED_BY_HEADER
+#undef AFIO_INCLUDED_BY_HEADER
 #endif
 
 #endif

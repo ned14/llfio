@@ -176,7 +176,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <PreprocessorDefinitions>_DEBUG;UNICODE=1;WIN32=1;_UNICODE=1;_WIN32=1;AFIO_STANDALONE=1;BOOST_AFIO_HEADERS_ONLY=0;AFIO_STANDALONE=1;BOOST_AFIO_DYN_LINK</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;UNICODE=1;WIN32=1;_UNICODE=1;_WIN32=1;AFIO_STANDALONE=1;AFIO_HEADERS_ONLY=0;AFIO_STANDALONE=1;AFIO_DYN_LINK</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>../include</AdditionalIncludeDirectories>
       <WarningLevel>Level4</WarningLevel>
       <DisableSpecificWarnings>
@@ -187,7 +187,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug LLVM|x64'">
     <ClCompile>
-      <PreprocessorDefinitions>_DEBUG;UNICODE=1;WIN32=1;_UNICODE=1;_WIN32=1;AFIO_STANDALONE=1;BOOST_AFIO_HEADERS_ONLY=0;AFIO_STANDALONE=1;BOOST_AFIO_DYN_LINK</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;UNICODE=1;WIN32=1;_UNICODE=1;_WIN32=1;AFIO_STANDALONE=1;AFIO_HEADERS_ONLY=0;AFIO_STANDALONE=1;AFIO_DYN_LINK</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>../include</AdditionalIncludeDirectories>
       <WarningLevel>Level4</WarningLevel>
       <DisableSpecificWarnings>
@@ -198,7 +198,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug clang|x64'">
     <ClCompile>
-      <PreprocessorDefinitions>_DEBUG;UNICODE=1;WIN32=1;_UNICODE=1;_WIN32=1;AFIO_STANDALONE=1;BOOST_AFIO_HEADERS_ONLY=0;AFIO_STANDALONE=1</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;UNICODE=1;WIN32=1;_UNICODE=1;_WIN32=1;AFIO_STANDALONE=1;AFIO_HEADERS_ONLY=0;AFIO_STANDALONE=1</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>../include</AdditionalIncludeDirectories>
       <WarningLevel>EnableAllWarnings</WarningLevel>
       <DisableSpecificWarnings>4503;4201;4100;4127;4189;4459</DisableSpecificWarnings>
@@ -218,7 +218,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <PreprocessorDefinitions>NDEBUG;UNICODE=1;WIN32=1;_UNICODE=1;_WIN32=1;AFIO_STANDALONE=1;BOOST_AFIO_HEADERS_ONLY=0;AFIO_STANDALONE=1;BOOST_AFIO_DYN_LINK</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;UNICODE=1;WIN32=1;_UNICODE=1;_WIN32=1;AFIO_STANDALONE=1;AFIO_HEADERS_ONLY=0;AFIO_STANDALONE=1;AFIO_DYN_LINK</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>../include</AdditionalIncludeDirectories>
       <WarningLevel>Level4</WarningLevel>
       <DisableSpecificWarnings>
@@ -232,7 +232,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug clang|Win32'">
     <ClCompile>
       <AdditionalIncludeDirectories>../include</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_DEBUG;UNICODE=1;WIN32=1;_UNICODE=1;_WIN32=1;AFIO_STANDALONE=1;BOOST_AFIO_HEADERS_ONLY=0;AFIO_STANDALONE=1;BOOST_AFIO_DYN_LINK</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;UNICODE=1;WIN32=1;_UNICODE=1;_WIN32=1;AFIO_STANDALONE=1;AFIO_HEADERS_ONLY=0;AFIO_STANDALONE=1;AFIO_DYN_LINK</PreprocessorDefinitions>
       <EnablePREfast>false</EnablePREfast>
       <AdditionalOptions>
       </AdditionalOptions>
@@ -242,7 +242,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <AdditionalIncludeDirectories>../include</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_DEBUG;UNICODE=1;WIN32=1;_UNICODE=1;_WIN32=1;AFIO_STANDALONE=1;BOOST_AFIO_HEADERS_ONLY=0;AFIO_STANDALONE=1;BOOST_AFIO_DYN_LINK</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;UNICODE=1;WIN32=1;_UNICODE=1;_WIN32=1;AFIO_STANDALONE=1;AFIO_HEADERS_ONLY=0;AFIO_STANDALONE=1;AFIO_DYN_LINK</PreprocessorDefinitions>
       <EnablePREfast>false</EnablePREfast>
       <AdditionalOptions> /FS</AdditionalOptions>
       <WarningLevel>Level4</WarningLevel>
@@ -251,7 +251,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug LLVM|Win32'">
     <ClCompile>
       <AdditionalIncludeDirectories>../include</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_DEBUG;UNICODE=1;WIN32=1;_UNICODE=1;_WIN32=1;AFIO_STANDALONE=1;BOOST_AFIO_HEADERS_ONLY=0;AFIO_STANDALONE=1;BOOST_AFIO_DYN_LINK</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;UNICODE=1;WIN32=1;_UNICODE=1;_WIN32=1;AFIO_STANDALONE=1;AFIO_HEADERS_ONLY=0;AFIO_STANDALONE=1;AFIO_DYN_LINK</PreprocessorDefinitions>
       <EnablePREfast>false</EnablePREfast>
       <AdditionalOptions> /FS</AdditionalOptions>
       <WarningLevel>Level4</WarningLevel>
@@ -260,7 +260,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <AdditionalIncludeDirectories>../include</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>NDEBUG;UNICODE=1;WIN32=1;_UNICODE=1;_WIN32=1;AFIO_STANDALONE=1;BOOST_AFIO_HEADERS_ONLY=0;AFIO_STANDALONE=1;BOOST_AFIO_DYN_LINK</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;UNICODE=1;WIN32=1;_UNICODE=1;_WIN32=1;AFIO_STANDALONE=1;AFIO_HEADERS_ONLY=0;AFIO_STANDALONE=1;AFIO_DYN_LINK</PreprocessorDefinitions>
       <EnablePREfast>false</EnablePREfast>
       <AdditionalOptions>/FS /analyze:stacksize 204800 /analyze-</AdditionalOptions>
       <WarningLevel>Level4</WarningLevel>

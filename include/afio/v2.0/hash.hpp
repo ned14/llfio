@@ -1,2 +1,2 @@
 #pragma once
-#include "../boost-lite/include/algorithm/hash.hpp"
+#include "../quickcpplib/include/algorithm/hash.hpp"

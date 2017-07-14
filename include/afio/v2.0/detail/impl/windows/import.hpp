@@ -22,11 +22,12 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#ifndef BOOST_AFIO_WINDOWS_H
-#define BOOST_AFIO_WINDOWS_H
+#ifndef AFIO_WINDOWS_H
+#define AFIO_WINDOWS_H
 
 #include "../../../handle.hpp"
 #include <memory>  // for unique_ptr
+#include <mutex>
 
 #ifndef _WIN32
 #error You should not include windows/import.hpp on not Windows platforms
@@ -50,7 +51,7 @@ Distributed under the Boost Software License, Version 1.0.
 #error todo
 #endif
 
-BOOST_AFIO_V2_NAMESPACE_BEGIN
+AFIO_V2_NAMESPACE_BEGIN
 
 namespace windows_nt_kernel
 {
@@ -509,8 +510,8 @@ namespace windows_nt_kernel
   {
     if(RtlDosPathNameToNtPathName_U)
       return;
-    static stl11::mutex lock;
-    stl11::lock_guard<decltype(lock)> g(lock);
+    static std::mutex lock;
+    std::lock_guard<decltype(lock)> g(lock);
     static HMODULE ntdllh = GetModuleHandleA("NTDLL.DLL");
     static HMODULE kernel32 = GetModuleHandleA("KERNEL32.DLL");
     if(!NtQueryObject)
@@ -591,7 +592,7 @@ namespace windows_nt_kernel
       PrefetchVirtualMemory_ = (PrefetchVirtualMemory_t) GetProcAddress(kernel32, "PrefetchVirtualMemory");
     if(!DiscardVirtualMemory_)
       DiscardVirtualMemory_ = (DiscardVirtualMemory_t) GetProcAddress(kernel32, "DiscardVirtualMemory");
-#ifdef BOOST_AFIO_OP_STACKBACKTRACEDEPTH
+#ifdef AFIO_OP_STACKBACKTRACEDEPTH
     if(dbghelp)
     {
       HMODULE dbghelp = LoadLibraryA("DBGHELP.DLL");
@@ -625,9 +626,9 @@ namespace windows_nt_kernel
     }
   }
 
-  static inline stl1z::filesystem::file_type to_st_type(ULONG FileAttributes, ULONG ReparsePointTag)
+  static inline filesystem::file_type to_st_type(ULONG FileAttributes, ULONG ReparsePointTag)
   {
-#ifdef BOOST_AFIO_USE_LEGACY_FILESYSTEM_SEMANTICS
+#ifdef AFIO_USE_LEGACY_FILESYSTEM_SEMANTICS
     if(FileAttributes & FILE_ATTRIBUTE_REPARSE_POINT && (ReparsePointTag == IO_REPARSE_TAG_MOUNT_POINT || ReparsePointTag == IO_REPARSE_TAG_SYMLINK))
       return filesystem::file_type::symlink_file;
     // return filesystem::file_type::reparse_file;
@@ -637,12 +638,12 @@ namespace windows_nt_kernel
       return filesystem::file_type::regular_file;
 #else
     if(FileAttributes & FILE_ATTRIBUTE_REPARSE_POINT && (ReparsePointTag == IO_REPARSE_TAG_MOUNT_POINT || ReparsePointTag == IO_REPARSE_TAG_SYMLINK))
-      return stl1z::filesystem::file_type::symlink;
-    // return stl1z::filesystem::file_type::reparse_file;
+      return filesystem::file_type::symlink;
+    // return filesystem::file_type::reparse_file;
     else if(FileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-      return stl1z::filesystem::file_type::directory;
+      return filesystem::file_type::directory;
     else
-      return stl1z::filesystem::file_type::regular;
+      return filesystem::file_type::regular;
 #endif
   }
 
@@ -650,27 +651,27 @@ namespace windows_nt_kernel
 #pragma warning(push)
 #pragma warning(disable : 6326)  // comparison of constants
 #endif
-  static inline stl11::chrono::system_clock::time_point to_timepoint(LARGE_INTEGER time)
+  static inline std::chrono::system_clock::time_point to_timepoint(LARGE_INTEGER time)
   {
     // For speed we make the big assumption that the STL's system_clock is based on the time_t epoch 1st Jan 1970.
     static constexpr unsigned long long FILETIME_OFFSET_TO_1970 = ((27111902ULL << 32U) + 3577643008ULL);
     // Need to have this self-adapt to the STL being used
-    static constexpr unsigned long long STL_TICKS_PER_SEC = (unsigned long long) stl11::chrono::system_clock::period::den / stl11::chrono::system_clock::period::num;
+    static constexpr unsigned long long STL_TICKS_PER_SEC = (unsigned long long) std::chrono::system_clock::period::den / std::chrono::system_clock::period::num;
     static constexpr unsigned long long multiplier = STL_TICKS_PER_SEC >= 10000000ULL ? STL_TICKS_PER_SEC / 10000000ULL : 1;
     static constexpr unsigned long long divider = STL_TICKS_PER_SEC >= 10000000ULL ? 1 : 10000000ULL / STL_TICKS_PER_SEC;
 
     unsigned long long ticks_since_1970 = (time.QuadPart - FILETIME_OFFSET_TO_1970);  // In 100ns increments
-    stl11::chrono::system_clock::duration duration(ticks_since_1970 * multiplier / divider);
-    return stl11::chrono::system_clock::time_point(duration);
+    std::chrono::system_clock::duration duration(ticks_since_1970 * multiplier / divider);
+    return std::chrono::system_clock::time_point(duration);
   }
-  static inline LARGE_INTEGER from_timepoint(stl11::chrono::system_clock::time_point time)
+  static inline LARGE_INTEGER from_timepoint(std::chrono::system_clock::time_point time)
   {
     // For speed we make the big assumption that the STL's system_clock is based on the time_t epoch 1st Jan 1970.
     static constexpr unsigned long long FILETIME_OFFSET_TO_1970 = ((27111902ULL << 32U) + 3577643008ULL);
-    static const stl11::chrono::system_clock::time_point time_point_1970 = stl11::chrono::system_clock::from_time_t(0);
+    static const std::chrono::system_clock::time_point time_point_1970 = std::chrono::system_clock::from_time_t(0);
 
     LARGE_INTEGER ret;
-    ret.QuadPart = FILETIME_OFFSET_TO_1970 + stl11::chrono::duration_cast<stl11::chrono::nanoseconds>(time - time_point_1970).count() / 100;
+    ret.QuadPart = FILETIME_OFFSET_TO_1970 + std::chrono::duration_cast<std::chrono::nanoseconds>(time - time_point_1970).count() / 100;
     return ret;
   }
 #ifdef _MSC_VER
@@ -724,7 +725,7 @@ template <class T> inline outcome<T> make_errored_outcome_nt(NTSTATUS e, const c
 }
 
 #if 0
-static inline void fill_stat_t(stat_t &stat, BOOST_AFIO_POSIX_STAT_STRUCT s, metadata_flags wanted)
+static inline void fill_stat_t(stat_t &stat, AFIO_POSIX_STAT_STRUCT s, metadata_flags wanted)
 {
 #ifndef _WIN32
   if (!!(wanted&metadata_flags::dev)) { stat.st_dev = s.st_dev; }
@@ -772,16 +773,16 @@ static inline HANDLE get_thread_local_waitable_timer()
 - sleep_interval: Set to the number of steady milliseconds until the sleep must end
 - sleep_object: Set to a primed deadline timer HANDLE which will signal when the system clock reaches the deadline
 */
-#define BOOST_AFIO_WIN_DEADLINE_TO_SLEEP_INIT(d)                                                                                                                                                                                                                                                                               \
-  stl11::chrono::steady_clock::time_point began_steady;                                                                                                                                                                                                                                                                        \
+#define AFIO_WIN_DEADLINE_TO_SLEEP_INIT(d)                                                                                                                                                                                                                                                                                     \
+  std::chrono::steady_clock::time_point began_steady;                                                                                                                                                                                                                                                                          \
   \
-stl11::chrono::system_clock::time_point end_utc;                                                                                                                                                                                                                                                                               \
+std::chrono::system_clock::time_point end_utc;                                                                                                                                                                                                                                                                                 \
   \
 if(d)                                                                                                                                                                                                                                                                                                                          \
   \
 {                                                                                                                                                                                                                                                                                                                         \
     if((d).steady)                                                                                                                                                                                                                                                                                                             \
-      began_steady = stl11::chrono::steady_clock::now();                                                                                                                                                                                                                                                                       \
+      began_steady = std::chrono::steady_clock::now();                                                                                                                                                                                                                                                                         \
     else                                                                                                                                                                                                                                                                                                                       \
       end_utc = (d).to_time_point();                                                                                                                                                                                                                                                                                           \
   \
@@ -791,15 +792,15 @@ DWORD sleep_interval = INFINITE;                                                
   \
 HANDLE sleep_object = nullptr;
 
-#define BOOST_AFIO_WIN_DEADLINE_TO_SLEEP_LOOP(d)                                                                                                                                                                                                                                                                               \
+#define AFIO_WIN_DEADLINE_TO_SLEEP_LOOP(d)                                                                                                                                                                                                                                                                                     \
   \
 if(d)                                                                                                                                                                                                                                                                                                                          \
   \
 {                                                                                                                                                                                                                                                                                                                         \
     if((d).steady)                                                                                                                                                                                                                                                                                                             \
     {                                                                                                                                                                                                                                                                                                                          \
-      stl11::chrono::milliseconds ms;                                                                                                                                                                                                                                                                                          \
-      ms = stl11::chrono::duration_cast<stl11::chrono::milliseconds>((began_steady + stl11::chrono::nanoseconds(d.nsecs)) - stl11::chrono::steady_clock::now());                                                                                                                                                               \
+      std::chrono::milliseconds ms;                                                                                                                                                                                                                                                                                            \
+      ms = std::chrono::duration_cast<std::chrono::milliseconds>((began_steady + std::chrono::nanoseconds(d.nsecs)) - std::chrono::steady_clock::now());                                                                                                                                                                       \
       if(ms.count() < 0)                                                                                                                                                                                                                                                                                                       \
         sleep_interval = 0;                                                                                                                                                                                                                                                                                                    \
       else                                                                                                                                                                                                                                                                                                                     \
@@ -815,20 +816,20 @@ if(d)                                                                           
   \
 }
 
-#define BOOST_AFIO_WIN_DEADLINE_TO_TIMEOUT(type, d)                                                                                                                                                                                                                                                                            \
+#define AFIO_WIN_DEADLINE_TO_TIMEOUT(type, d)                                                                                                                                                                                                                                                                                  \
   \
 if(d)                                                                                                                                                                                                                                                                                                                          \
   \
 {                                                                                                                                                                                                                                                                                                                         \
     if((d).steady)                                                                                                                                                                                                                                                                                                             \
     {                                                                                                                                                                                                                                                                                                                          \
-      if(stl11::chrono::steady_clock::now() >= (began_steady + stl11::chrono::nanoseconds((d).nsecs)))                                                                                                                                                                                                                         \
-        return make_errored_result<type>(stl11::errc::timed_out);                                                                                                                                                                                                                                                              \
+      if(std::chrono::steady_clock::now() >= (began_steady + std::chrono::nanoseconds((d).nsecs)))                                                                                                                                                                                                                             \
+        return make_errored_result<type>(std::errc::timed_out);                                                                                                                                                                                                                                                                \
     }                                                                                                                                                                                                                                                                                                                          \
     else                                                                                                                                                                                                                                                                                                                       \
     {                                                                                                                                                                                                                                                                                                                          \
-      if(stl11::chrono::system_clock::now() >= end_utc)                                                                                                                                                                                                                                                                        \
-        return make_errored_result<type>(stl11::errc::timed_out);                                                                                                                                                                                                                                                              \
+      if(std::chrono::system_clock::now() >= end_utc)                                                                                                                                                                                                                                                                          \
+        return make_errored_result<type>(std::errc::timed_out);                                                                                                                                                                                                                                                                \
     }                                                                                                                                                                                                                                                                                                                          \
   \
 }
@@ -839,10 +840,10 @@ if(d)                                                                           
 - sleep_interval: Set to the number of steady milliseconds until the sleep must end
 - sleep_object: Set to a primed deadline timer HANDLE which will signal when the system clock reaches the deadline
 */
-#define BOOST_AFIO_WIN_DEADLINE_TO_SLEEP_INIT(d)                                                                                                                                                                                                                                                                               \
-  stl11::chrono::steady_clock::time_point began_steady;                                                                                                                                                                                                                                                                        \
+#define AFIO_WIN_DEADLINE_TO_SLEEP_INIT(d)                                                                                                                                                                                                                                                                                     \
+  std::chrono::steady_clock::time_point began_steady;                                                                                                                                                                                                                                                                          \
   \
-stl11::chrono::system_clock::time_point end_utc;                                                                                                                                                                                                                                                                               \
+std::chrono::system_clock::time_point end_utc;                                                                                                                                                                                                                                                                                 \
   \
 alignas(8) LARGE_INTEGER _timeout;                                                                                                                                                                                                                                                                                             \
   \
@@ -854,7 +855,7 @@ if(d)                                                                           
   \
 {                                                                                                                                                                                                                                                                                                                         \
     if((d).steady)                                                                                                                                                                                                                                                                                                             \
-      began_steady = stl11::chrono::steady_clock::now();                                                                                                                                                                                                                                                                       \
+      began_steady = std::chrono::steady_clock::now();                                                                                                                                                                                                                                                                         \
     else                                                                                                                                                                                                                                                                                                                       \
     {                                                                                                                                                                                                                                                                                                                          \
       end_utc = (d).to_time_point();                                                                                                                                                                                                                                                                                           \
@@ -864,23 +865,23 @@ if(d)                                                                           
   \
 }
 
-#define BOOST_AFIO_WIN_DEADLINE_TO_SLEEP_LOOP(d)                                                                                                                                                                                                                                                                               \
+#define AFIO_WIN_DEADLINE_TO_SLEEP_LOOP(d)                                                                                                                                                                                                                                                                                     \
   if((d) && (d).steady)                                                                                                                                                                                                                                                                                                        \
   {                                                                                                                                                                                                                                                                                                                            \
-    stl11::chrono::nanoseconds ns;                                                                                                                                                                                                                                                                                             \
-    ns = stl11::chrono::duration_cast<stl11::chrono::nanoseconds>((began_steady + stl11::chrono::nanoseconds(d.nsecs)) - stl11::chrono::steady_clock::now());                                                                                                                                                                  \
+    std::chrono::nanoseconds ns;                                                                                                                                                                                                                                                                                               \
+    ns = std::chrono::duration_cast<std::chrono::nanoseconds>((began_steady + std::chrono::nanoseconds(d.nsecs)) - std::chrono::steady_clock::now());                                                                                                                                                                          \
     if(ns.count() < 0)                                                                                                                                                                                                                                                                                                         \
       _timeout.QuadPart = 0;                                                                                                                                                                                                                                                                                                   \
     else                                                                                                                                                                                                                                                                                                                       \
       _timeout.QuadPart = ns.count() / -100;                                                                                                                                                                                                                                                                                   \
   }
 
-#define BOOST_AFIO_WIN_DEADLINE_TO_PARTIAL_DEADLINE(nd, d)                                                                                                                                                                                                                                                                     \
+#define AFIO_WIN_DEADLINE_TO_PARTIAL_DEADLINE(nd, d)                                                                                                                                                                                                                                                                           \
   if(d)                                                                                                                                                                                                                                                                                                                        \
   {                                                                                                                                                                                                                                                                                                                            \
     if((d).steady)                                                                                                                                                                                                                                                                                                             \
     {                                                                                                                                                                                                                                                                                                                          \
-      stl11::chrono::nanoseconds ns = stl11::chrono::duration_cast<stl11::chrono::nanoseconds>((began_steady + stl11::chrono::nanoseconds((d).nsecs)) - stl11::chrono::steady_clock::now());                                                                                                                                   \
+      std::chrono::nanoseconds ns = std::chrono::duration_cast<std::chrono::nanoseconds>((began_steady + std::chrono::nanoseconds((d).nsecs)) - std::chrono::steady_clock::now());                                                                                                                                             \
       if(ns.count() < 0)                                                                                                                                                                                                                                                                                                       \
         (nd).nsecs = 0;                                                                                                                                                                                                                                                                                                        \
       else                                                                                                                                                                                                                                                                                                                     \
@@ -890,20 +891,20 @@ if(d)                                                                           
       (nd) = (d);                                                                                                                                                                                                                                                                                                              \
   }
 
-#define BOOST_AFIO_WIN_DEADLINE_TO_TIMEOUT(type, d)                                                                                                                                                                                                                                                                            \
+#define AFIO_WIN_DEADLINE_TO_TIMEOUT(d)                                                                                                                                                                                                                                                                                        \
   \
 if(d)                                                                                                                                                                                                                                                                                                                          \
   \
 {                                                                                                                                                                                                                                                                                                                         \
     if((d).steady)                                                                                                                                                                                                                                                                                                             \
     {                                                                                                                                                                                                                                                                                                                          \
-      if(stl11::chrono::steady_clock::now() >= (began_steady + stl11::chrono::nanoseconds((d).nsecs)))                                                                                                                                                                                                                         \
-        return make_errored_result<type>(stl11::errc::timed_out);                                                                                                                                                                                                                                                              \
+      if(std::chrono::steady_clock::now() >= (began_steady + std::chrono::nanoseconds((d).nsecs)))                                                                                                                                                                                                                             \
+        return std::errc::timed_out;                                                                                                                                                                                                                                                                                           \
     }                                                                                                                                                                                                                                                                                                                          \
     else                                                                                                                                                                                                                                                                                                                       \
     {                                                                                                                                                                                                                                                                                                                          \
-      if(stl11::chrono::system_clock::now() >= end_utc)                                                                                                                                                                                                                                                                        \
-        return make_errored_result<type>(stl11::errc::timed_out);                                                                                                                                                                                                                                                              \
+      if(std::chrono::system_clock::now() >= end_utc)                                                                                                                                                                                                                                                                          \
+        return std::errc::timed_out;                                                                                                                                                                                                                                                                                           \
     }                                                                                                                                                                                                                                                                                                                          \
   \
 }
@@ -923,10 +924,10 @@ static inline NTSTATUS ntwait(HANDLE h, windows_nt_kernel::IO_STATUS_BLOCK &isb,
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
-  BOOST_AFIO_WIN_DEADLINE_TO_SLEEP_INIT(d);
+  AFIO_WIN_DEADLINE_TO_SLEEP_INIT(d);
   do  // needs to be a do, not while in order to flip auto reset event objects etc.
   {
-    BOOST_AFIO_WIN_DEADLINE_TO_SLEEP_LOOP(d);
+    AFIO_WIN_DEADLINE_TO_SLEEP_LOOP(d);
     // Pump alerts and APCs
     NTSTATUS ntstat = NtWaitForSingleObject(h, true, timeout);
     if(STATUS_TIMEOUT == ntstat)
@@ -950,21 +951,21 @@ static inline bool ntsleep(const deadline &d, bool return_on_alert = false) noex
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
-  BOOST_AFIO_WIN_DEADLINE_TO_SLEEP_INIT(d);
+  AFIO_WIN_DEADLINE_TO_SLEEP_INIT(d);
   for(;;)
   {
-    BOOST_AFIO_WIN_DEADLINE_TO_SLEEP_LOOP(d);
+    AFIO_WIN_DEADLINE_TO_SLEEP_LOOP(d);
     // Pump alerts and APCs
     NTSTATUS ntstat = NtDelayExecution(true, timeout);
     (void) ntstat;
     if((d).steady)
     {
-      if(stl11::chrono::steady_clock::now() >= (began_steady + stl11::chrono::nanoseconds((d).nsecs)))
+      if(std::chrono::steady_clock::now() >= (began_steady + std::chrono::nanoseconds((d).nsecs)))
         return false;
     }
     else
     {
-      if(stl11::chrono::system_clock::now() >= end_utc)
+      if(std::chrono::system_clock::now() >= end_utc)
         return false;
     }
     if(return_on_alert)
@@ -980,7 +981,7 @@ static inline result<ACCESS_MASK> access_mask_from_handle_mode(native_handle_typ
   switch(_mode)
   {
   case handle::mode::unchanged:
-    return make_errored_result<ACCESS_MASK>(stl11::errc::invalid_argument);
+    return std::errc::invalid_argument;
   case handle::mode::none:
     break;
   case handle::mode::attr_read:
@@ -1016,7 +1017,7 @@ static inline result<DWORD> attributes_from_handle_caching_and_flags(native_hand
   switch(_caching)
   {
   case handle::caching::unchanged:
-    return make_errored_result<DWORD>(stl11::errc::invalid_argument);
+    return std::errc::invalid_argument;
   case handle::caching::none:
     attribs |= FILE_FLAG_NO_BUFFERING | FILE_FLAG_WRITE_THROUGH;
     nativeh.behaviour |= native_handle_type::disposition::aligned_io;
@@ -1159,6 +1160,6 @@ static inline HANDLE CreateFileW_(_In_ LPCTSTR lpFileName, _In_ DWORD dwDesiredA
   return INVALID_HANDLE_VALUE;
 }
 
-BOOST_AFIO_V2_NAMESPACE_END
+AFIO_V2_NAMESPACE_END
 
 #endif

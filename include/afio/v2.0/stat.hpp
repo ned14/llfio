@@ -22,10 +22,10 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#ifndef BOOST_AFIO_STAT_H
-#define BOOST_AFIO_STAT_H
+#ifndef AFIO_STAT_H
+#define AFIO_STAT_H
 
-#ifndef BOOST_AFIO_CONFIGURED
+#ifndef AFIO_CONFIG_HPP
 #error You must include the master afio.hpp, not individual header files directly
 #endif
 #include "config.hpp"
@@ -37,7 +37,7 @@ Distributed under the Boost Software License, Version 1.0.
 #pragma warning(disable : 4251)  // dll interface
 #endif
 
-BOOST_AFIO_V2_NAMESPACE_EXPORT_BEGIN
+AFIO_V2_NAMESPACE_EXPORT_BEGIN
 
 class handle;
 
@@ -64,82 +64,74 @@ with compression enabled (e.g. ZFS with ZLE compression which elides runs of zer
 */
 struct stat_t
 {
-  uint64_t        st_dev;                            /*!< inode of device containing file (POSIX only) */
-  uint64_t        st_ino;                            /*!< inode of file                   (Windows, POSIX) */
-  stl1z::filesystem::file_type st_type;              /*!< type of file                    (Windows, POSIX) */
+  uint64_t st_dev;               /*!< inode of device containing file (POSIX only) */
+  uint64_t st_ino;               /*!< inode of file                   (Windows, POSIX) */
+  filesystem::file_type st_type; /*!< type of file                    (Windows, POSIX) */
 #ifndef _WIN32
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-  uint16_t        st_perms;
+  uint16_t st_perms;
 #else
-  stil1z::filesystem::perms st_perms;               /*!< uint16_t bitfield perms of file (POSIX only) */
+  stil1z::filesystem::perms st_perms; /*!< uint16_t bitfield perms of file (POSIX only) */
 #endif
 #endif
-  int16_t         st_nlink;                         /*!< number of hard links            (Windows, POSIX) */
+  int16_t st_nlink; /*!< number of hard links            (Windows, POSIX) */
 #ifndef _WIN32
-  int16_t         st_uid;                           /*!< user ID of the file             (POSIX only) */
-  int16_t         st_gid;                           /*!< group ID of the file            (POSIX only) */
-  dev_t           st_rdev;                          /*!< id of file if special           (POSIX only) */
+  int16_t st_uid; /*!< user ID of the file             (POSIX only) */
+  int16_t st_gid; /*!< group ID of the file            (POSIX only) */
+  dev_t st_rdev;  /*!< id of file if special           (POSIX only) */
 #endif
-  stl11::chrono::system_clock::time_point st_atim;  /*!< time of last access             (Windows, POSIX) */
-  stl11::chrono::system_clock::time_point st_mtim;  /*!< time of last data modification  (Windows, POSIX) */
-  stl11::chrono::system_clock::time_point st_ctim;  /*!< time of last status change      (Windows, POSIX) */
-  handle::extent_type st_size;                      /*!< file size, in bytes             (Windows, POSIX) */
-  handle::extent_type st_allocated;                 /*!< bytes allocated for file        (Windows, POSIX) */
-  handle::extent_type st_blocks;                    /*!< number of blocks allocated      (Windows, POSIX) */
-  uint16_t        st_blksize;                       /*!< block size used by this device  (Windows, POSIX) */
-  uint32_t        st_flags;                         /*!< user defined flags for file     (FreeBSD, OS X, zero otherwise) */
-  uint32_t        st_gen;                           /*!< file generation number          (FreeBSD, OS X, zero otherwise)*/
-  stl11::chrono::system_clock::time_point st_birthtim; /*!< time of file creation           (Windows, FreeBSD, OS X, zero otherwise) */
+  std::chrono::system_clock::time_point st_atim;     /*!< time of last access             (Windows, POSIX) */
+  std::chrono::system_clock::time_point st_mtim;     /*!< time of last data modification  (Windows, POSIX) */
+  std::chrono::system_clock::time_point st_ctim;     /*!< time of last status change      (Windows, POSIX) */
+  handle::extent_type st_size;                       /*!< file size, in bytes             (Windows, POSIX) */
+  handle::extent_type st_allocated;                  /*!< bytes allocated for file        (Windows, POSIX) */
+  handle::extent_type st_blocks;                     /*!< number of blocks allocated      (Windows, POSIX) */
+  uint16_t st_blksize;                               /*!< block size used by this device  (Windows, POSIX) */
+  uint32_t st_flags;                                 /*!< user defined flags for file     (FreeBSD, OS X, zero otherwise) */
+  uint32_t st_gen;                                   /*!< file generation number          (FreeBSD, OS X, zero otherwise)*/
+  std::chrono::system_clock::time_point st_birthtim; /*!< time of file creation           (Windows, FreeBSD, OS X, zero otherwise) */
 
-  unsigned        st_sparse : 1;                   /*!< if this file is sparse, or this directory capable of sparse files (Windows, POSIX) */
-  unsigned        st_compressed : 1;               /*!< if this file is compressed, or this directory capable of compressed files (Windows) */
-  unsigned        st_reparse_point : 1;            /*!< if this file or directory is a reparse point (Windows) */
-    
+  unsigned st_sparse : 1;        /*!< if this file is sparse, or this directory capable of sparse files (Windows, POSIX) */
+  unsigned st_compressed : 1;    /*!< if this file is compressed, or this directory capable of compressed files (Windows) */
+  unsigned st_reparse_point : 1; /*!< if this file or directory is a reparse point (Windows) */
+
   //! Used to indicate what metadata should be filled in
-  BOOSTLITE_BITFIELD_BEGIN(want) {
-    dev=1<<0,
-    ino=1<<1,
-    type=1<<2,
-    perms=1<<3,
-    nlink=1<<4,
-    uid=1<<5,
-    gid=1<<6,
-    rdev=1<<7,
-    atim=1<<8,
-    mtim=1<<9,
-    ctim=1<<10,
-    size=1<<11,
-    allocated=1<<12,
-    blocks=1<<13,
-    blksize=1<<14,
-    flags=1<<15,
-    gen=1<<16,
-    birthtim=1<<17,
-    sparse=1<<24,
-    compressed=1<<25,
-    reparse_point=1<<26,
-    all = (unsigned) -1
+  QUICKCPPLIB_BITFIELD_BEGIN(want)
+  {
+    dev = 1 << 0, ino = 1 << 1, type = 1 << 2, perms = 1 << 3, nlink = 1 << 4, uid = 1 << 5, gid = 1 << 6, rdev = 1 << 7, atim = 1 << 8, mtim = 1 << 9, ctim = 1 << 10, size = 1 << 11, allocated = 1 << 12, blocks = 1 << 13, blksize = 1 << 14, flags = 1 << 15, gen = 1 << 16, birthtim = 1 << 17, sparse = 1 << 24,
+    compressed = 1 << 25, reparse_point = 1 << 26, all = (unsigned) -1
   }
-  BOOSTLITE_BITFIELD_END(want)
+  QUICKCPPLIB_BITFIELD_END(want)
   //! Constructs a UNINITIALIZED instance i.e. full of random garbage
-  stat_t() noexcept { }
+  stat_t() noexcept {}
   //! Constructs a zeroed instance
-  constexpr stat_t(std::nullptr_t) noexcept :
-      st_dev(0),
-      st_ino(0),
-#ifdef BOOST_AFIO_USE_LEGACY_FILESYSTEM_SEMANTICS
-      st_type(stl1z::filesystem::file_type::type_unknown),
+  constexpr stat_t(std::nullptr_t) noexcept : st_dev(0),
+                                              st_ino(0),
+#ifdef AFIO_USE_LEGACY_FILESYSTEM_SEMANTICS
+                                              st_type(filesystem::file_type::type_unknown),
 #else
-      st_type(stl1z::filesystem::file_type::unknown),
+                                              st_type(filesystem::file_type::unknown),
 #endif
 #ifndef _WIN32
-      st_perms(0),
+                                              st_perms(0),
 #endif
-      st_nlink(0),
+                                              st_nlink(0),
 #ifndef _WIN32
-      st_uid(0), st_gid(0), st_rdev(0),
+                                              st_uid(0),
+                                              st_gid(0),
+                                              st_rdev(0),
 #endif
-      st_size(0), st_allocated(0), st_blocks(0), st_blksize(0), st_flags(0), st_gen(0), st_sparse(0), st_compressed(0), st_reparse_point(0) { }
+                                              st_size(0),
+                                              st_allocated(0),
+                                              st_blocks(0),
+                                              st_blksize(0),
+                                              st_flags(0),
+                                              st_gen(0),
+                                              st_sparse(0),
+                                              st_compressed(0),
+                                              st_reparse_point(0)
+  {
+  }
 #ifdef __cpp_exceptions
   //! Constructs a filled instance, throwing as an exception any error which might occur
   stat_t(const handle &h, want wanted = want::all)
@@ -147,23 +139,23 @@ struct stat_t
   {
     auto v(fill(h, wanted));
     if(v.has_error())
-      throw std::system_error(v.get_error());
+      throw std::system_error(v.error());
   }
 #endif
   //! Fills in the structure with metadata, returning number of items filled in
-  BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> fill(const handle &h, want wanted = want::all) noexcept;
+  AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> fill(const handle &h, want wanted = want::all) noexcept;
 };
 
-BOOST_AFIO_V2_NAMESPACE_END
+AFIO_V2_NAMESPACE_END
 
-#if BOOST_AFIO_HEADERS_ONLY == 1 && !defined(DOXYGEN_SHOULD_SKIP_THIS)
-#define BOOST_AFIO_INCLUDED_BY_HEADER 1
+#if AFIO_HEADERS_ONLY == 1 && !defined(DOXYGEN_SHOULD_SKIP_THIS)
+#define AFIO_INCLUDED_BY_HEADER 1
 #ifdef _WIN32
 #include "detail/impl/windows/stat.ipp"
 #else
 #include "detail/impl/posix/stat.ipp"
 #endif
-#undef BOOST_AFIO_INCLUDED_BY_HEADER
+#undef AFIO_INCLUDED_BY_HEADER
 #endif
 
 #ifdef _MSC_VER

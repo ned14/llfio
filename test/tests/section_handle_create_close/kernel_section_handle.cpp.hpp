@@ -26,9 +26,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 namespace section_handle_create_close
 {
-  BOOST_AFIO_TEST_KERNEL_DECL boost::outcome::result<boost::afio::section_handle> test_kernel_section_handle(boost::afio::file_handle &backing, boost::afio::section_handle::extent_type maximum_size, boost::afio::section_handle::flag m)
+  AFIO_TEST_KERNEL_DECL AFIO_V2_NAMESPACE::result<AFIO_V2_NAMESPACE::section_handle> test_kernel_section_handle(AFIO_V2_NAMESPACE::file_handle &backing, AFIO_V2_NAMESPACE::section_handle::extent_type maximum_size, AFIO_V2_NAMESPACE::section_handle::flag m)
   {
-    auto h = boost::afio::section_handle::section(backing, maximum_size, m);
+    auto h = AFIO_V2_NAMESPACE::section_handle::section(backing, maximum_size, m);
     return h;
   }
 }

@@ -26,7 +26,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../../../stat.hpp"
 #include "import.hpp"
 
-BOOST_AFIO_V2_NAMESPACE_BEGIN
+AFIO_V2_NAMESPACE_BEGIN
 
 // allocate at process start to ensure later failure to allocate won't cause failure
 static fixme_path temporary_files_directory_("C:\\no_temporary_directories_accessible");
@@ -57,7 +57,7 @@ const fixme_path &fixme_temporary_files_directory() noexcept
         {
           error_code ec;
           // Try filesystem::temp_directory_path() before all else. This probably just calls GetTempPath().
-          buffer = stl1z::filesystem::temp_directory_path(ec);
+          buffer = filesystem::temp_directory_path(ec);
           if(!ec && testpath())
             return;
         }
@@ -109,10 +109,10 @@ const fixme_path &fixme_temporary_files_directory() noexcept
 result<void> file_handle::_fetch_inode() noexcept
 {
   stat_t s;
-  BOOST_OUTCOME_TRYV(s.fill(*this, stat_t::want::dev | stat_t::want::ino));
+  OUTCOME_TRYV(s.fill(*this, stat_t::want::dev | stat_t::want::ino));
   _devid = s.st_dev;
   _inode = s.st_ino;
-  return make_valued_result<void>();
+  return success();
 }
 
 result<file_handle> file_handle::file(file_handle::path_type _path, file_handle::mode _mode, file_handle::creation _creation, file_handle::caching _caching, file_handle::flag flags) noexcept
@@ -120,8 +120,8 @@ result<file_handle> file_handle::file(file_handle::path_type _path, file_handle:
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
   result<file_handle> ret(file_handle(native_handle_type(), 0, 0, std::move(_path), _caching, flags));
-  native_handle_type &nativeh = ret.get()._v;
-  BOOST_OUTCOME_TRY(access, access_mask_from_handle_mode(nativeh, _mode));
+  native_handle_type &nativeh = ret.value()._v;
+  OUTCOME_TRY(access, access_mask_from_handle_mode(nativeh, _mode));
   DWORD creation = OPEN_EXISTING;
   switch(_creation)
   {
@@ -137,19 +137,19 @@ result<file_handle> file_handle::file(file_handle::path_type _path, file_handle:
     creation = TRUNCATE_EXISTING;
     break;
   }
-  BOOST_OUTCOME_TRY(attribs, attributes_from_handle_caching_and_flags(nativeh, _caching, flags));
+  OUTCOME_TRY(attribs, attributes_from_handle_caching_and_flags(nativeh, _caching, flags));
   nativeh.behaviour |= native_handle_type::disposition::file;
   if(INVALID_HANDLE_VALUE == (nativeh.h = CreateFileW_(ret.value()._path.c_str(), access, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL, creation, attribs, NULL)))
   {
     DWORD errcode = GetLastError();
     // assert(false);
-    BOOST_AFIO_LOG_FUNCTION_CALL(0);
+    AFIO_LOG_FUNCTION_CALL(0);
     return make_errored_result<file_handle>(errcode, last190(ret.value()._path.u8string()));
   }
-  BOOST_AFIO_LOG_FUNCTION_CALL(nativeh.h);
+  AFIO_LOG_FUNCTION_CALL(nativeh.h);
   if(!(flags & flag::disable_safety_unlinks))
   {
-    BOOST_OUTCOME_TRYV(ret.value()._fetch_inode());
+    OUTCOME_TRYV(ret.value()._fetch_inode());
   }
   if(flags & flag::unlink_on_close)
   {
@@ -175,9 +175,9 @@ result<file_handle> file_handle::temp_inode(path_type dirpath, mode _mode, flag 
   // No need to rename to random on unlink or check inode before unlink
   flags |= flag::unlink_on_close | flag::disable_safety_unlinks | flag::win_disable_unlink_emulation;
   result<file_handle> ret(file_handle(native_handle_type(), 0, 0, path_type(), _caching, flags));
-  native_handle_type &nativeh = ret.get()._v;
-  BOOST_OUTCOME_TRY(access, access_mask_from_handle_mode(nativeh, _mode));
-  BOOST_OUTCOME_TRY(attribs, attributes_from_handle_caching_and_flags(nativeh, _caching, flags));
+  native_handle_type &nativeh = ret.value()._v;
+  OUTCOME_TRY(access, access_mask_from_handle_mode(nativeh, _mode));
+  OUTCOME_TRY(attribs, attributes_from_handle_caching_and_flags(nativeh, _caching, flags));
   nativeh.behaviour |= native_handle_type::disposition::file;
   DWORD creation = CREATE_NEW;
   for(;;)
@@ -186,17 +186,20 @@ result<file_handle> file_handle::temp_inode(path_type dirpath, mode _mode, flag 
     {
       ret.value()._path = dirpath / (utils::random_string(32) + ".tmp");
     }
-    BOOST_OUTCOME_CATCH_ALL_EXCEPTION_TO_RESULT
+    catch(...)
+    {
+      return error_from_exception();
+    }
     if(INVALID_HANDLE_VALUE == (nativeh.h = CreateFileW_(ret.value()._path.c_str(), access, /* no read nor write access for others */ FILE_SHARE_DELETE, NULL, creation, attribs, NULL)))
     {
       DWORD errcode = GetLastError();
       if(ERROR_FILE_EXISTS == errcode)
         continue;
-      BOOST_AFIO_LOG_FUNCTION_CALL(0);
+      AFIO_LOG_FUNCTION_CALL(0);
       return make_errored_result<file_handle>(errcode, last190(ret.value()._path.u8string()));
     }
-    BOOST_AFIO_LOG_FUNCTION_CALL(nativeh.h);
-    BOOST_OUTCOME_TRYV(ret.value()._fetch_inode());  // It can be useful to know the inode of temporary inodes
+    AFIO_LOG_FUNCTION_CALL(nativeh.h);
+    OUTCOME_TRYV(ret.value()._fetch_inode());  // It can be useful to know the inode of temporary inodes
     if(nativeh.h)
     {
       // Hide this item
@@ -214,10 +217,10 @@ file_handle::io_result<file_handle::const_buffers_type> file_handle::barrier(fil
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
-  BOOST_AFIO_LOG_FUNCTION_CALL(_v.h);
+  AFIO_LOG_FUNCTION_CALL(_v.h);
   if(d && !_v.is_overlapped())
-    return make_errored_result<>(stl11::errc::not_supported);
-  BOOST_AFIO_WIN_DEADLINE_TO_SLEEP_INIT(d);
+    return std::errc::not_supported;
+  AFIO_WIN_DEADLINE_TO_SLEEP_INIT(d);
   OVERLAPPED ol;
   memset(&ol, 0, sizeof(ol));
   IO_STATUS_BLOCK *isb = (IO_STATUS_BLOCK *) &ol;
@@ -233,7 +236,7 @@ file_handle::io_result<file_handle::const_buffers_type> file_handle::barrier(fil
     if(STATUS_TIMEOUT == ntwait(_v.h, ol, d))
     {
       CancelIoEx(_v.h, &ol);
-      BOOST_AFIO_WIN_DEADLINE_TO_TIMEOUT(void, d);
+      AFIO_WIN_DEADLINE_TO_TIMEOUT(d);
     }
   }
   if(STATUS_SUCCESS != isb->Status)
@@ -244,7 +247,7 @@ file_handle::io_result<file_handle::const_buffers_type> file_handle::barrier(fil
 
 result<file_handle> file_handle::clone() const noexcept
 {
-  BOOST_AFIO_LOG_FUNCTION_CALL(_v.h);
+  AFIO_LOG_FUNCTION_CALL(_v.h);
   result<file_handle> ret(file_handle(native_handle_type(), _devid, _inode, _path, _caching, _flags));
   ret.value()._service = _service;
   ret.value()._v.behaviour = _v.behaviour;
@@ -257,14 +260,14 @@ result<file_handle::path_type> file_handle::relink(path_type newpath) noexcept
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
-  BOOST_AFIO_LOG_FUNCTION_CALL(_v.h);
+  AFIO_LOG_FUNCTION_CALL(_v.h);
   if(newpath.is_relative())
     newpath = _path.parent_path() / newpath;
 
   // FIXME: As soon as we implement fat paths, eliminate this mallocing NT path conversion nonsense
   UNICODE_STRING NtPath;
   if(!RtlDosPathNameToNtPathName_U(newpath.c_str(), &NtPath, NULL, NULL))
-    return make_errored_result<path_type>(stl11::errc::illegal_byte_sequence);
+    return std::errc::illegal_byte_sequence;
   auto unntpath = undoer([&NtPath] {
     if(!HeapFree(GetProcessHeap(), 0, NtPath.Buffer))
       abort();
@@ -291,13 +294,13 @@ result<void> file_handle::unlink() noexcept
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
-  BOOST_AFIO_LOG_FUNCTION_CALL(_v.h);
+  AFIO_LOG_FUNCTION_CALL(_v.h);
   if(!(_flags & flag::win_disable_unlink_emulation))
   {
     // Rename it to something random to emulate immediate unlinking
     auto randomname = utils::random_string(32);
     randomname.append(".deleted");
-    BOOST_OUTCOME_TRY(_, relink(std::move(randomname)));
+    OUTCOME_TRY(_, relink(std::move(randomname)));
   }
   // No point marking it for deletion if it's already been so
   if(!(_flags & flag::unlink_on_close))
@@ -324,12 +327,12 @@ result<void> file_handle::unlink() noexcept
       return make_errored_result_nt<void>(isb.Status, last190(_path.u8string()));
   }
   _path.clear();
-  return make_valued_result<void>();
+  return success();
 }
 
 result<file_handle::extent_type> file_handle::length() const noexcept
 {
-  BOOST_AFIO_LOG_FUNCTION_CALL(_v.h);
+  AFIO_LOG_FUNCTION_CALL(_v.h);
   FILE_STANDARD_INFO fsi;
   if(!GetFileInformationByHandleEx(_v.h, FileStandardInfo, &fsi, sizeof(fsi)))
     return make_errored_result<extent_type>(GetLastError(), last190(_path.u8string()));
@@ -338,7 +341,7 @@ result<file_handle::extent_type> file_handle::length() const noexcept
 
 result<file_handle::extent_type> file_handle::truncate(file_handle::extent_type newsize) noexcept
 {
-  BOOST_AFIO_LOG_FUNCTION_CALL(_v.h);
+  AFIO_LOG_FUNCTION_CALL(_v.h);
   FILE_END_OF_FILE_INFO feofi;
   feofi.EndOfFile.QuadPart = newsize;
   if(!SetFileInformationByHandle(_v.h, FileEndOfFileInfo, &feofi, sizeof(feofi)))
@@ -350,4 +353,4 @@ result<file_handle::extent_type> file_handle::truncate(file_handle::extent_type 
   return newsize;
 }
 
-BOOST_AFIO_V2_NAMESPACE_END
+AFIO_V2_NAMESPACE_END

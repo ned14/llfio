@@ -22,13 +22,13 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#ifndef BOOST_AFIO_HANDLE_H
-#define BOOST_AFIO_HANDLE_H
+#ifndef AFIO_HANDLE_H
+#define AFIO_HANDLE_H
 
 #include "deadline.h"
 #include "native_handle_type.hpp"
 
-#include "../boost-lite/include/uint128.hpp"
+#include "../quickcpplib/include/uint128.hpp"
 
 #include <algorithm>  // for std::count
 #include <utility>    // for pair<>
@@ -40,12 +40,12 @@ Distributed under the Boost Software License, Version 1.0.
 #pragma warning(disable : 4251)  // dll interface
 #endif
 
-BOOST_AFIO_V2_NAMESPACE_EXPORT_BEGIN
+AFIO_V2_NAMESPACE_EXPORT_BEGIN
 
 /*! \class handle
 \brief A native_handle_type which is managed by the lifetime of this object instance.
 */
-class BOOST_AFIO_DECL handle
+class AFIO_DECL handle
 {
   friend inline std::ostream &operator<<(std::ostream &s, const handle &v);
 
@@ -57,7 +57,7 @@ public:
   //! The memory extent type used by this handle
   using size_type = size_t;
   //! The unique identifier type used by this handle
-  using unique_id_type = boost_lite::integers128::uint128;
+  using unique_id_type = QUICKCPPLIB_NAMESPACE::integers128::uint128;
 
   //! The behaviour of the handle: does it read, read and write, or atomic append?
   enum class mode : unsigned char  // bit 0 set means writable
@@ -94,7 +94,7 @@ public:
                              // NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!
   };
   //! Bitwise flags which can be specified
-  BOOSTLITE_BITFIELD_BEGIN(flag)
+  QUICKCPPLIB_BITFIELD_BEGIN(flag)
   {
     none = 0,  //!< No flags
     /*! Unlinks the file on handle close. On POSIX, this simply unlinks whatever is pointed
@@ -143,7 +143,7 @@ public:
     overlapped = 1 << 28,         //!< On Windows, create any new handles with OVERLAPPED semantics
     byte_lock_insanity = 1 << 29  //!< Using insane POSIX byte range locks
   }
-  BOOSTLITE_BITFIELD_END(flag)
+  QUICKCPPLIB_BITFIELD_END(flag)
 protected:
   caching _caching;
   flag _flags;
@@ -157,13 +157,13 @@ public:
   {
   }
   //! Construct a handle from a supplied native handle
-  BOOSTLITE_CONSTEXPR handle(native_handle_type h, caching caching = caching::none, flag flags = flag::none)
+  QUICKCPPLIB_CONSTEXPR handle(native_handle_type h, caching caching = caching::none, flag flags = flag::none)
       : _caching(caching)
       , _flags(flags)
       , _v(std::move(h))
   {
   }
-  BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC ~handle();
+  AFIO_HEADERS_ONLY_VIRTUAL_SPEC ~handle();
   //! No copy construction (use clone())
   handle(const handle &) = delete;
   //! No copy assignment
@@ -191,23 +191,23 @@ public:
   }
 
   //! A unique identifier for this handle in this process (native handle). Subclasses like `file_handle` make this a unique identifier across the entire system.
-  BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC unique_id_type unique_id() const noexcept
+  AFIO_HEADERS_ONLY_VIRTUAL_SPEC unique_id_type unique_id() const noexcept
   {
     unique_id_type ret(nullptr);
     ret.as_longlongs[0] = _v._init;
     return ret;
   }
   //! The path this handle refers to, if any
-  BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC path_type path() const noexcept { return path_type(); }
+  AFIO_HEADERS_ONLY_VIRTUAL_SPEC path_type path() const noexcept { return path_type(); }
   //! Immediately close the native handle type managed by this handle
-  BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> close() noexcept;
+  AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> close() noexcept;
   /*! Clone this handle (copy constructor is disabled to avoid accidental copying)
 
   \errors Any of the values POSIX dup() or DuplicateHandle() can return.
   */
-  BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<handle> clone() const noexcept;
+  AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<handle> clone() const noexcept;
   //! Release the native handle type managed by this handle
-  BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC native_handle_type release() noexcept
+  AFIO_HEADERS_ONLY_VIRTUAL_SPEC native_handle_type release() noexcept
   {
     native_handle_type ret(std::move(_v));
     return ret;
@@ -232,7 +232,7 @@ public:
   \errors Whatever POSIX fcntl() returns. On Windows nothing is changed on the handle.
   \mallocs No memory allocation.
   */
-  BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> set_append_only(bool enable) noexcept;
+  AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> set_append_only(bool enable) noexcept;
 
   //! True if overlapped
   bool is_overlapped() const noexcept { return _v.is_overlapped(); }
@@ -272,7 +272,7 @@ public:
   \errors Whatever POSIX fcntl() or ReOpenFile() returns.
   \mallocs No memory allocation.
   */
-  BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> set_kernel_caching(caching caching) noexcept;
+  AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> set_kernel_caching(caching caching) noexcept;
 
   //! The flags this handle was opened with
   flag flags() const noexcept { return _flags; }
@@ -331,7 +331,7 @@ inline std::ostream &operator<<(std::ostream &s, const handle::flag &v)
 /*! \class io_handle
 \brief A handle to something capable of scatter-gather i/o.
 */
-class BOOST_AFIO_DECL io_handle : public handle
+class AFIO_DECL io_handle : public handle
 {
 public:
   using path_type = handle::path_type;
@@ -399,7 +399,7 @@ public:
   //! Default constructor
   constexpr io_handle() = default;
   //! Construct a handle from a supplied native handle
-  BOOSTLITE_CONSTEXPR io_handle(native_handle_type h, caching caching = caching::none, flag flags = flag::none)
+  QUICKCPPLIB_CONSTEXPR io_handle(native_handle_type h, caching caching = caching::none, flag flags = flag::none)
       : handle(h, caching, flags)
   {
   }
@@ -426,13 +426,13 @@ public:
   The asynchronous implementation in async_file_handle performs one calloc and one free.
   */
   //[[bindlib::make_free]]
-  BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<buffers_type> read(io_request<buffers_type> reqs, deadline d = deadline()) noexcept;
+  AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<buffers_type> read(io_request<buffers_type> reqs, deadline d = deadline()) noexcept;
   //! \overload
   io_result<buffer_type> read(extent_type offset, char *data, size_type bytes, deadline d = deadline()) noexcept
   {
     buffer_type _reqs[1] = {{data, bytes}};
     io_request<buffers_type> reqs(buffers_type(_reqs), offset);
-    BOOST_OUTCOME_TRY(v, read(reqs, d));
+    OUTCOME_TRY(v, read(reqs, d));
     return *v.data();
   }
 
@@ -450,13 +450,13 @@ public:
   The asynchronous implementation in async_file_handle performs one calloc and one free.
   */
   //[[bindlib::make_free]]
-  BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> write(io_request<const_buffers_type> reqs, deadline d = deadline()) noexcept;
+  AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> write(io_request<const_buffers_type> reqs, deadline d = deadline()) noexcept;
   //! \overload
   io_result<const_buffer_type> write(extent_type offset, const char *data, size_type bytes, deadline d = deadline()) noexcept
   {
     const_buffer_type _reqs[1] = {{data, bytes}};
     io_request<const_buffers_type> reqs(const_buffers_type(_reqs), offset);
-    BOOST_OUTCOME_TRY(v, write(reqs, d));
+    OUTCOME_TRY(v, write(reqs, d));
     return *v.data();
   }
 
@@ -595,9 +595,9 @@ public:
   \mallocs The default synchronous implementation in file_handle performs no memory allocation.
   The asynchronous implementation in async_file_handle performs one calloc and one free.
   */
-  BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_guard> lock(extent_type offset, extent_type bytes, bool exclusive = true, deadline d = deadline()) noexcept;
+  AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_guard> lock(extent_type offset, extent_type bytes, bool exclusive = true, deadline d = deadline()) noexcept;
   //! \overload
-  result<extent_guard> try_lock(extent_type offset, extent_type bytes, bool exclusive = true) noexcept { return lock(offset, bytes, exclusive, deadline(stl11::chrono::seconds(0))); }
+  result<extent_guard> try_lock(extent_type offset, extent_type bytes, bool exclusive = true) noexcept { return lock(offset, bytes, exclusive, deadline(std::chrono::seconds(0))); }
   //! \overload Locks for shared access
   result<extent_guard> lock(io_request<buffers_type> reqs, deadline d = deadline()) noexcept
   {
@@ -622,20 +622,20 @@ public:
   \errors Any of the values POSIX fcntl() can return.
   \mallocs None.
   */
-  BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC void unlock(extent_type offset, extent_type bytes) noexcept;
+  AFIO_HEADERS_ONLY_VIRTUAL_SPEC void unlock(extent_type offset, extent_type bytes) noexcept;
 };
 
 
-BOOST_AFIO_V2_NAMESPACE_END
+AFIO_V2_NAMESPACE_END
 
-#if BOOST_AFIO_HEADERS_ONLY == 1 && !defined(DOXYGEN_SHOULD_SKIP_THIS)
-#define BOOST_AFIO_INCLUDED_BY_HEADER 1
+#if AFIO_HEADERS_ONLY == 1 && !defined(DOXYGEN_SHOULD_SKIP_THIS)
+#define AFIO_INCLUDED_BY_HEADER 1
 #ifdef _WIN32
 #include "detail/impl/windows/handle.ipp"
 #else
 #include "detail/impl/posix/handle.ipp"
 #endif
-#undef BOOST_AFIO_INCLUDED_BY_HEADER
+#undef AFIO_INCLUDED_BY_HEADER
 #endif
 
 #ifdef _MSC_VER

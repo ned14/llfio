@@ -35,7 +35,7 @@ Distributed under the Boost Software License, Version 1.0.
 # include <sys/disk.h>
 #endif
 
-BOOST_AFIO_V2_NAMESPACE_BEGIN
+AFIO_V2_NAMESPACE_BEGIN
 
 namespace storage_profile
 {
@@ -250,18 +250,18 @@ namespace storage_profile
                   if(s[0]=='s' && s[1]=='c' && s[2]=='d') continue;
                   // Is there more than one physical disk device?
                   if(!mntfromname.empty())
-                    return make_errored_outcome<void>(stl11::errc::function_not_supported);
+                    return make_errored_outcome<void>(std::errc::function_not_supported);
                   mntfromname="/dev/"+std::string(s, e-s);
                 }
               }
               else
-                return make_errored_outcome<void>(stl11::errc::function_not_supported);
+                return make_errored_outcome<void>(std::errc::function_not_supported);
             }
             else
 #endif            
-            return make_errored_outcome<void>(stl11::errc::function_not_supported);
+            return make_errored_outcome<void>(std::errc::function_not_supported);
           }
-          BOOST_OUTCOME_TRY(deviceh, file_handle::file(mntfromname, handle::mode::none, handle::creation::open_existing, handle::caching::only_metadata));
+          OUTCOME_TRY(deviceh, file_handle::file(mntfromname, handle::mode::none, handle::creation::open_existing, handle::caching::only_metadata));
 
           // TODO See https://github.com/baruch/diskscan/blob/master/arch/arch-linux.c
           //          sp.controller_type.value = "SCSI";
@@ -292,4 +292,4 @@ namespace storage_profile
   }
 }
 
-BOOST_AFIO_V2_NAMESPACE_END
+AFIO_V2_NAMESPACE_END

@@ -26,11 +26,11 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../../../statfs.hpp"
 #include "import.hpp"
 
-BOOST_AFIO_V2_NAMESPACE_BEGIN
+AFIO_V2_NAMESPACE_BEGIN
 
-BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, statfs_t::want wanted) noexcept
+AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, statfs_t::want wanted) noexcept
 {
-  BOOST_AFIO_LOG_FUNCTION_CALL(h.native_handle().h);
+  AFIO_LOG_FUNCTION_CALL(h.native_handle().h);
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
   alignas(8) fixme_path::value_type buffer[32769];
@@ -146,7 +146,7 @@ BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle 
         len -= pathlen;
         // buffer should look like \Device\HarddiskVolumeX
         if(memcmp(buffer, L"\\Device\\HarddiskVolume", 44))
-          return make_errored_result<size_t>(stl11::errc::illegal_byte_sequence);
+          return std::errc::illegal_byte_sequence;
         // TODO FIXME This should output the kind of path the input handle uses
         // For now though, output a win32 compatible path
         f_mntfromname.reserve(len + 3);
@@ -174,4 +174,4 @@ BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle 
   return ret;
 }
 
-BOOST_AFIO_V2_NAMESPACE_END
+AFIO_V2_NAMESPACE_END

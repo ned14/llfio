@@ -22,16 +22,16 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#ifndef BOOST_AFIO_TEST_KERNEL_DECL_HPP
-#define BOOST_AFIO_TEST_KERNEL_DECL_HPP
+#ifndef AFIO_TEST_KERNEL_DECL_HPP
+#define AFIO_TEST_KERNEL_DECL_HPP
 
 #ifdef BOOST_KERNELTEST_PLEASE_INLINE_TEST_KERNELS
 // We have been included as part of an inline test suite
-#define BOOST_AFIO_TEST_KERNEL_DECL inline
+#define AFIO_TEST_KERNEL_DECL inline
 #else
 // We are standalone
-#include "../include/boost/afio/afio.hpp"
-#define BOOST_AFIO_TEST_KERNEL_DECL extern BOOSTLITE_SYMBOL_EXPORT
+#include "../include/afio/afio.hpp"
+#define AFIO_TEST_KERNEL_DECL extern QUICKCPPLIB_SYMBOL_EXPORT
 #endif
 
 #endif  // namespace

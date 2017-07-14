@@ -31,9 +31,9 @@ Distributed under the Boost Software License, Version 1.0.
 #include <sys/statfs.h>
 #endif
 
-BOOST_AFIO_V2_NAMESPACE_BEGIN
+AFIO_V2_NAMESPACE_BEGIN
 
-BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, statfs_t::want wanted) noexcept
+AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, statfs_t::want wanted) noexcept
 {
   size_t ret = 0;
 #ifdef __linux__
@@ -118,9 +118,9 @@ BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle 
           mountentries.push_back(std::make_pair(mountentry(m.mnt_fsname, m.mnt_dir, m.mnt_type, m.mnt_opts), temp));
       }
     }
-#ifndef BOOST_AFIO_COMPILING_FOR_GCOV
+#ifndef AFIO_COMPILING_FOR_GCOV
     if(mountentries.empty())
-      return make_errored_result<size_t>(stl11::errc::no_such_file_or_directory);
+      return make_errored_result<size_t>(std::errc::no_such_file_or_directory);
     // Choose the mount entry with the most closely matching statfs. You can't choose
     // exclusively based on mount point because of bind mounts
     if(mountentries.size() > 1)
@@ -265,4 +265,4 @@ BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle 
   return ret;
 }
 
-BOOST_AFIO_V2_NAMESPACE_END
+AFIO_V2_NAMESPACE_END

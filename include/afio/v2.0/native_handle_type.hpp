@@ -22,17 +22,17 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#ifndef BOOST_AFIO_CONFIGURED
+#ifndef AFIO_CONFIG_HPP
 #error You must include the master afio.hpp, not individual header files directly
 #endif
 #include "config.hpp"
 
 //! \file native_handle_type.hpp Provides native_handle_type
 
-#ifndef BOOST_AFIO_NATIVE_HANDLE_TYPE_H
-#define BOOST_AFIO_NATIVE_HANDLE_TYPE_H
+#ifndef AFIO_NATIVE_HANDLE_TYPE_H
+#define AFIO_NATIVE_HANDLE_TYPE_H
 
-BOOST_AFIO_V2_NAMESPACE_EXPORT_BEGIN
+AFIO_V2_NAMESPACE_EXPORT_BEGIN
 
 /*! \struct native_handle_type
 \brief A native handle type used for wrapping file descriptors, process ids or HANDLEs.
@@ -41,7 +41,7 @@ Unmanaged, wrap in a handle object to manage.
 struct native_handle_type
 {
   //! The type of handle.
-  BOOSTLITE_BITFIELD_BEGIN(disposition)
+  QUICKCPPLIB_BITFIELD_BEGIN(disposition)
   {
     invalid = 0,  //!< Invalid handle
 
@@ -60,7 +60,7 @@ struct native_handle_type
     process = 1 << 12,      //!< Is a child process
     section = 1 << 13       //!< Is a memory section
   }
-  BOOSTLITE_BITFIELD_END(disposition)
+  QUICKCPPLIB_BITFIELD_END(disposition)
   disposition behaviour;  //! The behaviour of the handle
   union {
     intptr_t _init;
@@ -78,7 +78,7 @@ struct native_handle_type
   //! Copy construct
   constexpr native_handle_type(const native_handle_type &) = default;
   //! Move construct
-  BOOSTLITE_CONSTEXPR native_handle_type(native_handle_type &&o) noexcept : behaviour(std::move(o.behaviour)), _init(std::move(o._init))
+  QUICKCPPLIB_CONSTEXPR native_handle_type(native_handle_type &&o) noexcept : behaviour(std::move(o.behaviour)), _init(std::move(o._init))
   {
     o.behaviour = disposition();
     o._init = -1;
@@ -137,7 +137,7 @@ struct native_handle_type
   constexpr bool is_section() const noexcept { return (behaviour & disposition::section) ? true : false; }
 };
 
-BOOST_AFIO_V2_NAMESPACE_END
+AFIO_V2_NAMESPACE_END
 
 
 #endif

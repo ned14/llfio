@@ -26,18 +26,18 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <fcntl.h>
 #include <unistd.h>
-#if BOOST_AFIO_USE_POSIX_AIO
+#if AFIO_USE_POSIX_AIO
 #include <aio.h>
 #endif
 
-BOOST_AFIO_V2_NAMESPACE_BEGIN
+AFIO_V2_NAMESPACE_BEGIN
 
 async_file_handle::io_result<async_file_handle::const_buffers_type> async_file_handle::barrier(async_file_handle::io_request<async_file_handle::const_buffers_type> reqs, bool /*wait_for_device*/, bool and_metadata, deadline d) noexcept
 {
-  BOOST_AFIO_LOG_FUNCTION_CALL(_v.fd);
+  AFIO_LOG_FUNCTION_CALL(_v.fd);
   io_result<const_buffers_type> ret;
   auto _io_state(_begin_io(and_metadata ? operation_t::fsync : operation_t::dsync, std::move(reqs), [&ret](auto *state) { ret = std::move(state->result); }, nullptr));
-  BOOST_OUTCOME_TRY(io_state, _io_state);
+  OUTCOME_TRY(io_state, _io_state);
 
   // While i/o is not done pump i/o completion
   while(!ret.is_ready())
@@ -49,7 +49,7 @@ async_file_handle::io_result<async_file_handle::const_buffers_type> async_file_h
 #ifndef NDEBUG
     if(!ret.is_ready() && t && !t.get())
     {
-      BOOST_AFIO_LOG_FATAL(_v.fd, "async_file_handle: io_service returns no work when i/o has not completed");
+      AFIO_LOG_FATAL(_v.fd, "async_file_handle: io_service returns no work when i/o has not completed");
       std::terminate();
     }
 #endif
@@ -59,7 +59,7 @@ async_file_handle::io_result<async_file_handle::const_buffers_type> async_file_h
 
 result<async_file_handle> async_file_handle::clone(io_service &service) const noexcept
 {
-  BOOST_OUTCOME_TRY(v, clone());
+  OUTCOME_TRY(v, clone());
   async_file_handle ret(std::move(v));
   ret._service = &service;
   return std::move(ret);
@@ -71,7 +71,7 @@ result<async_file_handle::io_state_ptr<CompletionRoutine, BuffersType>> async_fi
   // Need to keep a set of aiocbs matching the scatter-gather buffers
   struct state_type : public _io_state_type<CompletionRoutine, BuffersType>
   {
-#if BOOST_AFIO_USE_POSIX_AIO
+#if AFIO_USE_POSIX_AIO
     struct aiocb aiocbs[1];
 #else
 #error todo
@@ -82,7 +82,7 @@ result<async_file_handle::io_state_ptr<CompletionRoutine, BuffersType>> async_fi
     }
     virtual void operator()(long errcode, long bytes_transferred, void *internal_state) noexcept override final
     {
-#if BOOST_AFIO_USE_POSIX_AIO
+#if AFIO_USE_POSIX_AIO
       struct aiocb **_paiocb = (struct aiocb **) internal_state;
       struct aiocb *aiocb = *_paiocb;
       assert(aiocb >= aiocbs && aiocb < aiocbs + this->items);
@@ -97,14 +97,14 @@ result<async_file_handle::io_state_ptr<CompletionRoutine, BuffersType>> async_fi
         else
         {
 // Figure out which i/o I am and update the buffer in question
-#if BOOST_AFIO_USE_POSIX_AIO
+#if AFIO_USE_POSIX_AIO
           size_t idx = aiocb - aiocbs;
 #else
 #error todo
 #endif
           if(idx >= this->items)
           {
-            BOOST_AFIO_LOG_FATAL(0, "file_handle::io_state::operator() called with invalid index");
+            AFIO_LOG_FATAL(0, "file_handle::io_state::operator() called with invalid index");
             std::terminate();
           }
           this->result.value()[idx].second = bytes_transferred;
@@ -122,7 +122,7 @@ result<async_file_handle::io_state_ptr<CompletionRoutine, BuffersType>> async_fi
       {
         for(size_t n = 0; n < this->items; n++)
         {
-#if BOOST_AFIO_USE_POSIX_AIO
+#if AFIO_USE_POSIX_AIO
           int ret = aio_cancel(this->parent->native_handle().fd, aiocbs + n);
           (void) ret;
 #if 0
@@ -151,12 +151,12 @@ result<async_file_handle::io_state_ptr<CompletionRoutine, BuffersType>> async_fi
 #ifndef NDEBUG
           if(res.has_error())
           {
-            BOOST_AFIO_LOG_FATAL(0, "file_handle: io_service failed");
+            AFIO_LOG_FATAL(0, "file_handle: io_service failed");
             std::terminate();
           }
           if(!res.get())
           {
-            BOOST_AFIO_LOG_FATAL(0, "file_handle: io_service returns no work when i/o has not completed");
+            AFIO_LOG_FATAL(0, "file_handle: io_service returns no work when i/o has not completed");
             std::terminate();
           }
 #endif
@@ -167,13 +167,13 @@ result<async_file_handle::io_state_ptr<CompletionRoutine, BuffersType>> async_fi
   extent_type offset = reqs.offset;
   size_t statelen = sizeof(state_type) + (reqs.buffers.size() - 1) * sizeof(struct aiocb), items(reqs.buffers.size());
   using return_type = io_state_ptr<CompletionRoutine, BuffersType>;
-#if BOOST_AFIO_USE_POSIX_AIO && defined(AIO_LISTIO_MAX)
+#if AFIO_USE_POSIX_AIO && defined(AIO_LISTIO_MAX)
   if(items > AIO_LISTIO_MAX)
-    return make_errored_result<return_type>(stl11::errc::invalid_argument);
+    return make_errored_result<return_type>(std::errc::invalid_argument);
 #endif
   void *mem = ::calloc(1, statelen);
   if(!mem)
-    return make_errored_result<return_type>(stl11::errc::not_enough_memory);
+    return make_errored_result<return_type>(std::errc::not_enough_memory);
   return_type _state((_io_state_type<CompletionRoutine, BuffersType> *) mem);
   new((state = (state_type *) mem)) state_type(this, operation, std::forward<CompletionRoutine>(completion), items);
   // Noexcept move the buffers from req into result
@@ -181,7 +181,7 @@ result<async_file_handle::io_state_ptr<CompletionRoutine, BuffersType>> async_fi
   out = std::move(reqs.buffers);
   for(size_t n = 0; n < items; n++)
   {
-#if BOOST_AFIO_USE_POSIX_AIO
+#if AFIO_USE_POSIX_AIO
     struct aiocb *aiocb = state->aiocbs + n;
     aiocb->aio_fildes = _v.fd;
     aiocb->aio_offset = offset;
@@ -211,10 +211,10 @@ result<async_file_handle::io_state_ptr<CompletionRoutine, BuffersType>> async_fi
     ++state->items_to_go;
   }
   int ret = 0;
-#if BOOST_AFIO_USE_POSIX_AIO
+#if AFIO_USE_POSIX_AIO
   if(service()->using_kqueues())
   {
-#if BOOST_AFIO_COMPILE_KQUEUES
+#if AFIO_COMPILE_KQUEUES
     // Only issue one kqueue event when entire scatter-gather has completed
     struct _sigev = {0};
 #error todo
@@ -279,7 +279,7 @@ async_file_handle::io_result<async_file_handle::buffers_type> async_file_handle:
 {
   io_result<buffers_type> ret;
   auto _io_state(_begin_io(operation_t::read, std::move(reqs), [&ret](auto *state) { ret = std::move(state->result); }, nullptr));
-  BOOST_OUTCOME_TRY(io_state, _io_state);
+  OUTCOME_TRY(io_state, _io_state);
 
   // While i/o is not done pump i/o completion
   while(!ret.is_ready())
@@ -291,7 +291,7 @@ async_file_handle::io_result<async_file_handle::buffers_type> async_file_handle:
 #ifndef NDEBUG
     if(!ret.is_ready() && t && !t.get())
     {
-      BOOST_AFIO_LOG_FATAL(_v.fd, "async_file_handle: io_service returns no work when i/o has not completed");
+      AFIO_LOG_FATAL(_v.fd, "async_file_handle: io_service returns no work when i/o has not completed");
       std::terminate();
     }
 #endif
@@ -303,7 +303,7 @@ async_file_handle::io_result<async_file_handle::const_buffers_type> async_file_h
 {
   io_result<const_buffers_type> ret;
   auto _io_state(_begin_io(operation_t::write, std::move(reqs), [&ret](auto *state) { ret = std::move(state->result); }, nullptr));
-  BOOST_OUTCOME_TRY(io_state, _io_state);
+  OUTCOME_TRY(io_state, _io_state);
 
   // While i/o is not done pump i/o completion
   while(!ret.is_ready())
@@ -315,7 +315,7 @@ async_file_handle::io_result<async_file_handle::const_buffers_type> async_file_h
 #ifndef NDEBUG
     if(!ret.is_ready() && t && !t.get())
     {
-      BOOST_AFIO_LOG_FATAL(_v.fd, "async_file_handle: io_service returns no work when i/o has not completed");
+      AFIO_LOG_FATAL(_v.fd, "async_file_handle: io_service returns no work when i/o has not completed");
       std::terminate();
     }
 #endif
@@ -323,4 +323,4 @@ async_file_handle::io_result<async_file_handle::const_buffers_type> async_file_h
   return ret;
 }
 
-BOOST_AFIO_V2_NAMESPACE_END
+AFIO_V2_NAMESPACE_END
