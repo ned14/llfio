@@ -1,7 +1,12 @@
 cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
 # If necessary bring in the quickcpplib cmake tooling
-list(FIND CMAKE_MODULE_PATH "quickcpplib/cmakelib" quickcpplib_idx)
-if(${quickcpplib_idx} EQUAL -1)
+set(quickcpplib_done OFF)
+foreach(item ${CMAKE_MODULE_PATH})
+  if(item MATCHES "quickcpplib/cmakelib")
+    set(quickcpplib_done ON)
+  endif()
+endforeach()
+if(NOT quickcpplib_done)
   # CMAKE_SOURCE_DIR is the very topmost parent cmake project
   # CMAKE_CURRENT_SOURCE_DIR is the current cmake subproject
   
