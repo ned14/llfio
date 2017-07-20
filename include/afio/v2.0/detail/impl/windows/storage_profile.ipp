@@ -63,7 +63,7 @@ namespace storage_profile
           if(!RtlGetVersion)
             RtlGetVersion = (RtlGetVersion_t) GetProcAddress(GetModuleHandle(L"NTDLL.DLL"), "RtlGetVersion");
           if(!RtlGetVersion)
-            return make_errored_outcome<void>(GetLastError());
+            return {GetLastError(), std::system_category()};
           RtlGetVersion(&ovi);
           sp.os_name.value = "Microsoft Windows ";
           sp.os_name.value.append(ovi.dwPlatformId == VER_PLATFORM_WIN32_NT ? "NT" : "Unknown");
@@ -122,11 +122,11 @@ namespace storage_profile
 
             GetLogicalProcessorInformation(NULL, &size);
             if(ERROR_INSUFFICIENT_BUFFER != GetLastError())
-              return make_errored_outcome<void>(GetLastError());
+              return {GetLastError(), std::system_category()};
 
             std::vector<SYSTEM_LOGICAL_PROCESSOR_INFORMATION> buffer(size);
             if(GetLogicalProcessorInformation(&buffer.front(), &size) == FALSE)
-              return make_errored_outcome<void>(GetLastError());
+              return {GetLastError(), std::system_category()};
 
             const size_t Elements = size / sizeof(SYSTEM_LOGICAL_PROCESSOR_INFORMATION);
 
@@ -223,10 +223,10 @@ namespace storage_profile
             {
               NTSTATUS ntstat = ntwait(volumeh.native_handle().h, ol, deadline());
               if(ntstat)
-                return make_errored_outcome_nt<void>(ntstat);
+                return {ntstat, ntkernel_category()};
             }
             if(ERROR_SUCCESS != GetLastError())
-              return make_errored_outcome<void>(GetLastError());
+              return {GetLastError(), std::system_category()};
           }
           switch(sad->BusType)
           {
@@ -291,10 +291,10 @@ namespace storage_profile
             {
               NTSTATUS ntstat = ntwait(volumeh.native_handle().h, ol, deadline());
               if(ntstat)
-                return make_errored_outcome_nt<void>(ntstat);
+                return {ntstat, ntkernel_category()};
             }
             if(ERROR_SUCCESS != GetLastError())
-              return make_errored_outcome<void>(GetLastError());
+              return {GetLastError(), std::system_category()};
           }
           DWORD disk_extents = vde->NumberOfDiskExtents;
           sp.device_name.value.clear();
@@ -322,10 +322,10 @@ namespace storage_profile
               {
                 NTSTATUS ntstat = ntwait(volumeh.native_handle().h, ol, deadline());
                 if(ntstat)
-                  return make_errored_outcome_nt<void>(ntstat);
+                  return {ntstat, ntkernel_category()};
               }
               if(ERROR_SUCCESS != GetLastError())
-                return make_errored_outcome<void>(GetLastError());
+                return {GetLastError(), std::system_category()};
             }
             if(sdd->VendorIdOffset > 0 && sdd->VendorIdOffset < sizeof(buffer))
             {
@@ -361,10 +361,10 @@ namespace storage_profile
               {
                 NTSTATUS ntstat = ntwait(volumeh.native_handle().h, ol, deadline());
                 if(ntstat)
-                  return make_errored_outcome_nt<void>(ntstat);
+                  return {ntstat, ntkernel_category()};
               }
               if(ERROR_SUCCESS != GetLastError())
-                return make_errored_outcome<void>(GetLastError());
+                return {GetLastError(), std::system_category()};
             }
             sp.device_size.value = dg->DiskSize.QuadPart;
           }

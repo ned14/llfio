@@ -26,3 +26,9 @@
 	fetchRecurseSubmodules = true
 	ignore = untracked
 #	shallow = true
+[submodule "include/afio/ntkernel-error-category"]
+	path = include/afio/ntkernel-error-category
+	url = https://github.com/ned14/ntkernel-error-category.git
+	branch = master
+	fetchRecurseSubmodules = true
+	ignore = untracked

@@ -31,7 +31,7 @@ namespace file_handle_create_close
     AFIO_V2_NAMESPACE::io_service service;
     auto h = AFIO_V2_NAMESPACE::async_file_handle::async_file(service, "testfile.txt", m, c, AFIO_V2_NAMESPACE::async_file_handle::caching::all, f);
     if(h)
-      h.value().close();
+      h.value().close().value();
     return h;
   }
 }

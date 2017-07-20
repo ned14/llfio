@@ -51,7 +51,16 @@ Distributed under the Boost Software License, Version 1.0.
 #error todo
 #endif
 
+// Bring in the custom NT kernel error code category
+#if AFIO_HEADERS_ONLY
+#define NTKERNEL_ERROR_CATEGORY_INLINE
+#define NTKERNEL_ERROR_CATEGORY_STATIC
+#endif
+#include "../../../../ntkernel-error-category/include/ntkernel_category.hpp"
+
 AFIO_V2_NAMESPACE_BEGIN
+
+using ntkernel_error_category::ntkernel_category;
 
 namespace windows_nt_kernel
 {
@@ -689,6 +698,7 @@ namespace windows_nt_kernel
     DWORD br;
     OVERLAPPED o;
 
+    SetLastError(0);
     o.Internal = ntstatus;
     o.InternalHigh = 0;
     o.Offset = 0;
@@ -701,28 +711,6 @@ namespace windows_nt_kernel
 #pragma warning(pop)
 #endif
 }  // namespace
-
-// disable to prevent accidental usage
-template <class T> inline result<T> make_errored_result(NTSTATUS e, const char *extended = nullptr)
-{
-  (void) e;
-  (void) extended;
-  static_assert(!std::is_same<T, T>::value, "Use make_errored_result_nt<T>(NTSTATUS).");
-}
-template <class T> inline outcome<T> make_errored_outcome(NTSTATUS e, const char *extended = nullptr)
-{
-  (void) e;
-  (void) extended;
-  static_assert(!std::is_same<T, T>::value, "Use make_errored_outcome_nt<T>(NTSTATUS).");
-}
-template <class T> inline result<T> make_errored_result_nt(NTSTATUS e, const char *extended = nullptr)
-{
-  return make_errored_result<T>(windows_nt_kernel::win32_error_from_nt_status(e), extended);
-}
-template <class T> inline outcome<T> make_errored_outcome_nt(NTSTATUS e, const char *extended = nullptr)
-{
-  return make_errored_outcome<T>(windows_nt_kernel::win32_error_from_nt_status(e), extended);
-}
 
 #if 0
 static inline void fill_stat_t(stat_t &stat, AFIO_POSIX_STAT_STRUCT s, metadata_flags wanted)

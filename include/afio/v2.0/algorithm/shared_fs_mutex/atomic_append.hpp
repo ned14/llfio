@@ -376,7 +376,7 @@ namespace algorithm
             auto lock_offset = record_offset;
             // Set the top bit to use the shadow lock space on Windows
             lock_offset |= (1ULL << 63);
-            OUTCOME_TRY(record_guard_, _h.lock(lock_offset, sizeof(record), false, nd));
+            OUTCOME_TRYV(_h.lock(lock_offset, sizeof(record), false, nd));
           }
           // Make sure we haven't timed out during this wait
           if(d)
@@ -416,7 +416,7 @@ namespace algorithm
             AFIO_LOG_FATAL(this, "atomic_append::unlock() I have been previously unlocked!");
             std::terminate();
           }
-          _read_header();
+          (void) _read_header();
           if(_header.first_known_good > my_lock_request_offset)
           {
             AFIO_LOG_FATAL(this, "atomic_append::unlock() header exceeds the lock I am unlocking!");

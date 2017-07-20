@@ -49,10 +49,10 @@ result<void> handle::close() noexcept
     if(are_safety_fsyncs_issued())
     {
       if(!FlushFileBuffers(_v.h))
-        return make_errored_result<void>(GetLastError());
+        return {GetLastError(), std::system_category()};
     }
     if(!CloseHandle(_v.h))
-      return make_errored_result<void>(GetLastError());
+      return {GetLastError(), std::system_category()};
     _v = native_handle_type();
   }
   return success();
@@ -100,10 +100,10 @@ result<void> handle::set_kernel_caching(caching caching) noexcept
   OUTCOME_TRY(attribs, attributes_from_handle_caching_and_flags(nativeh, caching, _flags));
   nativeh.behaviour |= native_handle_type::disposition::file;
   if(INVALID_HANDLE_VALUE == (nativeh.h = ReOpenFile(_v.h, access, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, attribs)))
-    return make_errored_result<void>(GetLastError());
+    return {GetLastError(), std::system_category()};
   _v.swap(nativeh);
   if(!CloseHandle(nativeh.h))
-    return make_errored_result<void>(GetLastError());
+    return {GetLastError(), std::system_category()};
   return success();
 }
 
@@ -148,7 +148,7 @@ template <class BuffersType, class Syscall> inline io_handle::io_result<BuffersT
       ol.Offset = reqs.offset & 0xffffffff;
     }
     if(!syscall(nativeh.h, req.first, (DWORD) req.second, &transferred, &ol) && ERROR_IO_PENDING != GetLastError())
-      return make_errored_result<BuffersType>(GetLastError());
+      return {GetLastError(), std::system_category()};
     reqs.offset += req.second;
   }
   // If handle is overlapped, wait for completion of each i/o.
@@ -211,7 +211,7 @@ result<io_handle::extent_guard> io_handle::lock(io_handle::extent_type offset, i
     if(ERROR_LOCK_VIOLATION == GetLastError() && d && !d.nsecs)
       return std::errc::timed_out;
     if(ERROR_IO_PENDING != GetLastError())
-      return make_errored_result<io_handle::extent_guard>(GetLastError());
+      return {GetLastError(), std::system_category()};
   }
   // If handle is overlapped, wait for completion of each i/o.
   if(_v.is_overlapped())
@@ -223,7 +223,7 @@ result<io_handle::extent_guard> io_handle::lock(io_handle::extent_type offset, i
     // It seems the NT kernel is guilty of casting bugs sometimes
     ol.Internal = ol.Internal & 0xffffffff;
     if(ol.Internal != 0)
-      return make_errored_result_nt<io_handle::extent_guard>((NTSTATUS) ol.Internal);
+      return {ol.Internal, ntkernel_category()};
   }
   return extent_guard(this, offset, bytes, exclusive);
 }
@@ -242,7 +242,7 @@ void io_handle::unlock(io_handle::extent_type offset, io_handle::extent_type byt
   {
     if(ERROR_IO_PENDING != GetLastError())
     {
-      auto ret = make_errored_result<void>(GetLastError());
+      auto ret = failure({GetLastError(), std::system_category()});
       (void) ret;
       AFIO_LOG_FATAL(_v.h, "io_handle::unlock() failed");
       std::terminate();

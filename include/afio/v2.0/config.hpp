@@ -189,7 +189,7 @@ exported AFIO v2 namespace.
 // Bring in filesystem
 #if defined(__has_include)
 // clang-format off
-#if __has_include(<filesystem>)
+#if __has_include(<filesystem>) && __cplusplus >= 202000
 #include <filesystem>
 AFIO_V2_NAMESPACE_BEGIN
 namespace filesystem = std::filesystem;

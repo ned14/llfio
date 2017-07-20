@@ -146,12 +146,12 @@ result<void> map_handle::close() noexcept
     {
       NTSTATUS ntstat = NtUnmapViewOfSection(GetCurrentProcess(), _addr);
       if(STATUS_SUCCESS != ntstat)
-        return make_errored_result_nt<void>(ntstat);
+        return {ntstat, ntkernel_category()};
     }
     else
     {
       if(!VirtualFree(_addr, 0, MEM_RELEASE))
-        return make_errored_result<void>(GetLastError());
+        return {GetLastError(), std::system_category()};
     }
   }
   // We don't want ~handle() to close our borrowed handle
@@ -331,7 +331,7 @@ result<map_handle::buffer_type> map_handle::commit(buffer_type region, section_h
   {
     DWORD _ = 0;
     if(!VirtualProtect(region.first, region.second, PAGE_NOACCESS, &_))
-      return make_errored_result<buffer_type>(GetLastError());
+      return {GetLastError(), std::system_category()};
     return region;
   }
   if(_flag & section_handle::flag::cow)
@@ -353,7 +353,7 @@ result<map_handle::buffer_type> map_handle::commit(buffer_type region, section_h
     prot = PAGE_EXECUTE;
   region = utils::round_to_page_size(region);
   if(!VirtualAlloc(region.first, region.second, MEM_COMMIT, prot))
-    return make_errored_result<buffer_type>(GetLastError());
+    return {GetLastError(), std::system_category()};
   return region;
 }
 
@@ -364,7 +364,7 @@ result<map_handle::buffer_type> map_handle::decommit(buffer_type region) noexcep
     return std::errc::invalid_argument;
   region = utils::round_to_page_size(region);
   if(!VirtualFree(region.first, region.second, MEM_DECOMMIT))
-    return make_errored_result<buffer_type>(GetLastError());
+    return {GetLastError(), std::system_category()};
   return region;
 }
 
@@ -388,7 +388,7 @@ result<span<map_handle::buffer_type>> map_handle::prefetch(span<buffer_type> reg
     return span<map_handle::buffer_type>();
   PWIN32_MEMORY_RANGE_ENTRY wmre = (PWIN32_MEMORY_RANGE_ENTRY) regions.data();
   if(!PrefetchVirtualMemory_(GetCurrentProcess(), regions.size(), wmre, 0))
-    return make_errored_result<span<map_handle::buffer_type>>(GetLastError());
+    return {GetLastError(), std::system_category()};
   return regions;
 }
 
@@ -407,12 +407,12 @@ result<map_handle::buffer_type> map_handle::do_not_store(buffer_type region) noe
     if(DiscardVirtualMemory_)
     {
       if(!DiscardVirtualMemory_(region.first, region.second))
-        return make_errored_result<buffer_type>(GetLastError());
+        return {GetLastError(), std::system_category()};
       return region;
     }
     // Else MEM_RESET will do
     if(!VirtualAlloc(region.first, region.second, MEM_RESET, 0))
-      return make_errored_result<buffer_type>(GetLastError());
+      return {GetLastError(), std::system_category()};
     return region;
   }
   // We did nothing

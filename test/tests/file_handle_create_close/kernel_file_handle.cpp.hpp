@@ -31,7 +31,7 @@ namespace file_handle_create_close
     //! \todo TODO Use tempfile() once I've implemented it, that works around this being unsafe under mt permutation
     auto h = AFIO_V2_NAMESPACE::file_handle::file("testfile.txt", m, c, AFIO_V2_NAMESPACE::file_handle::caching::all, f);
     if(h)
-      h.value().close();
+      h.value().close().value();
     return h;
   }
 }

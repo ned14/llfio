@@ -152,7 +152,7 @@ result<async_file_handle::io_state_ptr<CompletionRoutine, BuffersType>> async_fi
     if(!ioroutine(_v.h, out[n].first, (DWORD) out[n].second, ol, handle_completion::Do))
     {
       --state->items_to_go;
-      state->result = make_errored_result<BuffersType>(GetLastError());
+      state->result = {GetLastError(), std::system_category()};
       // Fire completion now if we didn't schedule anything
       if(!n)
         state->completion(state);
@@ -181,6 +181,7 @@ async_file_handle::io_result<async_file_handle::buffers_type> async_file_handle:
   optional<io_result<buffers_type>> ret;
   auto _io_state(_begin_io(operation_t::read, std::move(reqs), [&ret](auto *state) { ret = std::move(state->result); }, ReadFileEx));
   OUTCOME_TRY(io_state, _io_state);
+  (void) io_state;  // holds i/o open until it completes
 
   // While i/o is not done pump i/o completion
   while(!ret)
@@ -206,6 +207,7 @@ async_file_handle::io_result<async_file_handle::const_buffers_type> async_file_h
   optional<io_result<const_buffers_type>> ret;
   auto _io_state(_begin_io(operation_t::write, std::move(reqs), [&ret](auto *state) { ret = std::move(state->result); }, WriteFileEx));
   OUTCOME_TRY(io_state, _io_state);
+  (void) io_state;  // holds i/o open until it completes
 
   // While i/o is not done pump i/o completion
   while(!ret)

@@ -20,6 +20,9 @@ endif()
 find_quickcpplib_library(quickcpplib 1.0 REQUIRED)
 find_quickcpplib_library(outcome 2.0 REQUIRED)
 find_quickcpplib_library(kerneltest 1.0 REQUIRED)
+if(WIN32)
+  add_subdirectory("include/afio/ntkernel-error-category" EXCLUDE_FROM_ALL)
+endif()
 
 # Make the standard static and shared libraries, and if supported by this compiler, C++ modules
 # for both static and shared libraries as well. For the non-C++ module variants, makes the
@@ -58,6 +61,8 @@ endif()
 # Set any macros this library requires
 if(WIN32)
   all_compile_definitions(PRIVATE _WIN32_WINNT=0x600)  ## Target WinVista
+  target_link_libraries(afio_dl PUBLIC ntkernel-error-category::dl)
+  target_link_libraries(afio_sl PUBLIC ntkernel-error-category::sl)
 endif()
 # Anyone using the static or dynamic libraries is not using the header only variant
 foreach(lib afio_sl afio_dl)

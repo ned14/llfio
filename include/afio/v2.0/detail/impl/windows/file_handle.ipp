@@ -300,7 +300,7 @@ result<void> file_handle::unlink() noexcept
     // Rename it to something random to emulate immediate unlinking
     auto randomname = utils::random_string(32);
     randomname.append(".deleted");
-    OUTCOME_TRY(_, relink(std::move(randomname)));
+    OUTCOME_TRYV(relink(std::move(randomname)));
   }
   // No point marking it for deletion if it's already been so
   if(!(_flags & flag::unlink_on_close))
