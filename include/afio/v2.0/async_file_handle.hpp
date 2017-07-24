@@ -41,6 +41,7 @@ class AFIO_DECL async_file_handle : public file_handle
 public:
   using dev_t = file_handle::dev_t;
   using ino_t = file_handle::ino_t;
+  using path_view_type = file_handle::path_view_type;
   using path_type = io_handle::path_type;
   using extent_type = io_handle::extent_type;
   using size_type = io_handle::size_type;
@@ -63,8 +64,8 @@ public:
   async_file_handle() = default;
 
   //! Construct a handle from a supplied native handle
-  async_file_handle(io_service *service, native_handle_type h, dev_t devid, ino_t inode, path_type path, caching caching = caching::none, flag flags = flag::none)
-      : file_handle(std::move(h), devid, inode, std::move(path), std::move(caching), std::move(flags))
+  async_file_handle(io_service *service, native_handle_type h, dev_t devid, ino_t inode, caching caching = caching::none, flag flags = flag::none)
+      : file_handle(std::move(h), devid, inode, std::move(caching), std::move(flags))
   {
     this->_service = service;
   }
@@ -73,7 +74,7 @@ public:
   //! Explicit conversion from file_handle permitted
   explicit async_file_handle(file_handle &&o) noexcept : file_handle(std::move(o)) {}
   //! Explicit conversion from handle and io_handle permitted
-  explicit async_file_handle(handle &&o, io_service *service, path_type path, dev_t devid, ino_t inode) noexcept : file_handle(std::move(o), std::move(path), devid, inode) { this->_service = service; }
+  explicit async_file_handle(handle &&o, io_service *service, dev_t devid, ino_t inode) noexcept : file_handle(std::move(o), devid, inode) { this->_service = service; }
   //! Move assignment of async_file_handle permitted
   async_file_handle &operator=(async_file_handle &&o) noexcept
   {
@@ -95,10 +96,10 @@ public:
   \errors Any of the values POSIX open() or CreateFile() can return.
   */
   //[[bindlib::make_free]]
-  static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<async_file_handle> async_file(io_service &service, path_type _path, mode _mode = mode::read, creation _creation = creation::open_existing, caching _caching = caching::all, flag flags = flag::none) noexcept
+  static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<async_file_handle> async_file(io_service &service, const path_handle &base, path_view_type _path, mode _mode = mode::read, creation _creation = creation::open_existing, caching _caching = caching::all, flag flags = flag::none) noexcept
   {
     // Open it overlapped, otherwise no difference.
-    OUTCOME_TRY(v, file_handle::file(std::move(_path), std::move(_mode), std::move(_creation), std::move(_caching), flags | flag::overlapped));
+    OUTCOME_TRY(v, file_handle::file(std::move(base), std::move(_path), std::move(_mode), std::move(_creation), std::move(_caching), flags | flag::overlapped));
     async_file_handle ret(std::move(v));
     ret._service = &service;
     return std::move(ret);
@@ -113,7 +114,7 @@ public:
   \errors Any of the values POSIX open() or CreateFile() can return.
   */
   //[[bindlib::make_free]]
-  static inline result<async_file_handle> async_random_file(io_service &service, path_type dirpath, mode _mode = mode::write, caching _caching = caching::temporary, flag flags = flag::none) noexcept
+  static inline result<async_file_handle> async_random_file(io_service &service, const path_handle &dirpath, mode _mode = mode::write, caching _caching = caching::temporary, flag flags = flag::none) noexcept
   {
     try
     {
@@ -147,7 +148,7 @@ public:
   \errors Any of the values POSIX open() or CreateFile() can return.
   */
   //[[bindlib::make_free]]
-  static inline result<async_file_handle> async_temp_file(io_service &service, path_type name = path_type(), mode _mode = mode::write, creation _creation = creation::if_needed, caching _caching = caching::temporary, flag flags = flag::unlink_on_close) noexcept
+  static inline result<async_file_handle> async_temp_file(io_service &service, path_view_type name = path_view_type(), mode _mode = mode::write, creation _creation = creation::if_needed, caching _caching = caching::temporary, flag flags = flag::unlink_on_close) noexcept
   {
     return name.empty() ? async_random_file(service, fixme_temporary_files_directory(), _mode, _caching, flags) : async_file(service, fixme_temporary_files_directory() / name, _mode, _creation, _caching, flags);
   }
@@ -162,7 +163,7 @@ public:
   \errors Any of the values POSIX open() or CreateFile() can return.
   */
   //[[bindlib::make_free]]
-  static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<async_file_handle> async_temp_inode(io_service &service, path_type dirpath = fixme_temporary_files_directory(), mode _mode = mode::write, flag flags = flag::none) noexcept
+  static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<async_file_handle> async_temp_inode(io_service &service, path_view_type dirpath = temporary_files_directory(), mode _mode = mode::write, flag flags = flag::none) noexcept
   {
     // Open it overlapped, otherwise no difference.
     OUTCOME_TRY(v, file_handle::temp_inode(std::move(dirpath), std::move(_mode), flags | flag::overlapped));

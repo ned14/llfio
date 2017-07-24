@@ -184,6 +184,10 @@ exported AFIO v2 namespace.
 #define AFIO_V2_NAMESPACE_END QUICKCPPLIB_BIND_NAMESPACE_END(AFIO_V2)
 #endif
 
+AFIO_V2_NAMESPACE_BEGIN
+class handle;
+AFIO_V2_NAMESPACE_END
+
 // Bring in the Boost-lite macros
 #include "../quickcpplib/include/config.hpp"
 // Bring in filesystem
@@ -224,6 +228,25 @@ AFIO_V2_NAMESPACE_END
 #define AFIO_DECL
 #endif  // building a shared library
 
+// Configure AFIO_THREAD_LOCAL
+#ifndef AFIO_THREAD_LOCAL_IS_CXX11
+#ifdef __has_feature
+#if __has_feature(cxx_thread_local)
+#define AFIO_THREAD_LOCAL_IS_CXX11 1
+#endif
+#elif defined(_MSC_VER)
+#define AFIO_THREAD_LOCAL_IS_CXX11 1
+#endif
+#ifndef AFIO_THREAD_LOCAL_IS_CXX11
+#define AFIO_THREAD_LOCAL_IS_CXX11 0
+#define AFIO_THREAD_LOCAL QUICKCPPLIB_THREAD_LOCAL
+#endif
+#endif
+
+#define AFIO_GLUE2(x, y) x##y
+#define AFIO_GLUE(x, y) AFIO_GLUE2(x, y)
+#define AFIO_UNIQUE_NAME AFIO_GLUE(__t, __COUNTER__)
+
 
 // Bring in bitfields
 #include "../quickcpplib/include/bitfield.hpp"
@@ -242,6 +265,29 @@ AFIO_V2_NAMESPACE_END
 AFIO_V2_NAMESPACE_BEGIN
 using namespace QUICKCPPLIB_NAMESPACE::optional;
 AFIO_V2_NAMESPACE_END
+// Bring in a string_view implementation
+#include "../quickcpplib/include/string_view.hpp"
+AFIO_V2_NAMESPACE_BEGIN
+using namespace QUICKCPPLIB_NAMESPACE::string_view;
+AFIO_V2_NAMESPACE_END
+// Bring in a result implementation
+#include "../outcome/include/outcome.hpp"
+AFIO_V2_NAMESPACE_BEGIN
+// Specialise error_code into this namespace so we can hook result creation via ADL
+struct error_code : public std::error_code
+{
+  // literally passthrough
+  using std::error_code::error_code;
+  error_code() = default;
+  error_code(std::error_code ec)  // NOLINT
+  : std::error_code(ec)
+  {
+  }
+};
+template <class T> using result = OUTCOME_V2_NAMESPACE::result<T, error_code>;
+using OUTCOME_V2_NAMESPACE::success;
+using OUTCOME_V2_NAMESPACE::failure;
+AFIO_V2_NAMESPACE_END
 
 
 #if AFIO_LOGGING_LEVEL
@@ -251,6 +297,7 @@ AFIO_V2_NAMESPACE_END
 /*! \todo TODO FIXME Replace in-memory log with memory map file backed log.
 */
 AFIO_V2_NAMESPACE_BEGIN
+
 //! The log used by AFIO
 inline AFIO_DECL QUICKCPPLIB_NAMESPACE::ringbuffer_log::simple_ringbuffer_log<AFIO_LOGGING_MEMORY> &log() noexcept
 {
@@ -260,19 +307,115 @@ inline AFIO_DECL QUICKCPPLIB_NAMESPACE::ringbuffer_log::simple_ringbuffer_log<AF
 #endif
   return _log;
 }
-inline void record_error_into_afio_log(QUICKCPPLIB_NAMESPACE::ringbuffer_log::level _level, const char *_message, unsigned _code1, unsigned _code2, const char *_function, unsigned lineno)
+//! Enum for the log level
+using log_level = QUICKCPPLIB_NAMESPACE::ringbuffer_log::level;
+//! RAII class for temporarily adjusting the log level
+class log_level_guard
 {
-  // Here is a VERY useful place to breakpoint!
-  log().emplace_back(_level, _message, _code1, _code2, _function, lineno);
-}
-AFIO_V2_NAMESPACE_END
+  log_level _v;
+
+public:
+  log_level_guard(log_level n)
+      : _v(log().log_level())
+  {
+    log().log_level(n);
+  }
+  ~log_level_guard() { log().log_level(_v); }
+};
+
+/* Some notes on how error logging works:
+
+Throughout AFIO in almost all of its functions, we call `AFIO_LOG_FUNCTION_CALL(inst)` where `inst` is
+usually `this`. We test if inst points to a `handle`, and if so we replace the "current handle" in
+TLS storage with the new one, restoring it on stack unwind.
+
+When an errored result is created, Outcome provides ADL based hooks which let us intercept an errored
+result creation. We look up TLS storage for the current handle, and if one is set then we fetch its
+current path and store it into a round robin store in TLS, storing the index into the result. Later
+on, when we are reporting or otherwise dealing with the error, the path the error refers to can be
+printed.
+
+All this gets compiled out if AFIO_LOGGING_LEVEL < 2 (error) and is skipped if log().log_level() < 2 (error).
+In this situation, no paths are captured on error.
+*/
+#if AFIO_LOGGING_LEVEL >= 2
+namespace detail
+{
+  // Our thread local store
+  struct tls_errored_results_t
+  {
+    handle *current_handle{nullptr};  // The current handle for this thread
+    char paths[190][16];              // The log can only store 190 chars of message anyway
+    uint16_t pathidx{0};
+    char *next(uint16_t &idx)
+    {
+      idx = pathidx++;
+      return paths[idx % 16];  // NOLINT
+    }
+    const char *get(uint16_t idx) const
+    {
+      // If the idx is stale, return not found
+      if(idx - pathidx >= 16)
+      {
+        return nullptr;
+      }
+      return paths[idx % 16];  // NOLINT
+    }
+  };
+  inline tls_errored_results_t &tls_errored_results()
+  {
+#if AFIO_THREAD_LOCAL_IS_CXX11
+    static thread_local tls_errored_results_t v;
+    return v;
+#else
+    static AFIO_THREAD_LOCAL tls_errored_results_t *v;
+    if(!v)
+    {
+      v = new tls_errored_results_t;
+    }
+    return *v;
 #endif
+  }
+  template <bool enabled> struct tls_current_handle_holder
+  {
+    handle *old{nullptr};
+    bool enabled{false};
+    tls_current_handle_holder(const handle *h)
+    {
+      if(h != nullptr && log().log_level() >= log_level::error)
+      {
+        auto &tls = tls_errored_results();
+        old = tls.current_handle;
+        tls.current_handle = const_cast<handle *>(h);
+        enabled = true;
+      }
+    }
+    ~tls_current_handle_holder()
+    {
+      if(enabled)
+      {
+        auto &tls = tls_errored_results();
+        tls.current_handle = old;
+      }
+    }
+  };
+  template <> struct tls_current_handle_holder<false>
+  {
+    template <class T> tls_current_handle_holder(T &&) {}
+  };
+#define AFIO_LOG_INST_TO_TLS(inst) AFIO_V2_NAMESPACE::detail::tls_current_handle_holder<std::is_base_of<AFIO_V2_NAMESPACE::handle, std::decay_t<std::remove_pointer_t<decltype(inst)>>>::value> AFIO_UNIQUE_NAME(inst)
+}
+#else
+#define AFIO_LOG_INST_TO_TLS(inst)
+#endif
+AFIO_V2_NAMESPACE_END
 
 #ifndef AFIO_LOG_FATAL_TO_CERR
 #include <stdio.h>
 #define AFIO_LOG_FATAL_TO_CERR(expr)                                                                                                                                                                                                                                                                                           \
   fprintf(stderr, "%s\n", (expr));                                                                                                                                                                                                                                                                                             \
   fflush(stderr)
+#endif
 #endif
 
 #if AFIO_LOGGING_LEVEL >= 1
@@ -286,12 +429,6 @@ AFIO_V2_NAMESPACE_END
 #endif
 #if AFIO_LOGGING_LEVEL >= 2
 #define AFIO_LOG_ERROR(inst, message) AFIO_V2_NAMESPACE::log().emplace_back(QUICKCPPLIB_NAMESPACE::ringbuffer_log::level::error, (message), (unsigned) (uintptr_t)(inst), QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id(), (AFIO_LOG_BACKTRACE_LEVELS & (1 << 2)) ? nullptr : __func__, __LINE__)
-// Intercept when Outcome creates an error_code_extended and log it to our log too
-#ifndef BOOST_OUTCOME_ERROR_CODE_EXTENDED_CREATION_HOOK
-#define BOOST_OUTCOME_ERROR_CODE_EXTENDED_CREATION_HOOK                                                                                                                                                                                                                                                                        \
-  if(*this)                                                                                                                                                                                                                                                                                                                    \
-  AFIO_V2_NAMESPACE::record_error_into_afio_log(QUICKCPPLIB_NAMESPACE::ringbuffer_log::level::error, this->message().c_str(), this->value(), (unsigned) this->_unique_id, (AFIO_LOG_BACKTRACE_LEVELS & (1 << 2)) ? nullptr : __func__, __LINE__)
-#endif
 #else
 #define AFIO_LOG_ERROR(inst, message)
 #endif
@@ -300,23 +437,6 @@ AFIO_V2_NAMESPACE_END
 #else
 #define AFIO_LOG_WARN(inst, message)
 #endif
-
-// Need Outcome in play before I can define logging level 4
-#include "../outcome/include/outcome.hpp"
-AFIO_V2_NAMESPACE_BEGIN
-// We are so heavily tied into Outcome we just import it wholesale into our namespace
-using namespace OUTCOME_V2_NAMESPACE;
-#if DOXYGEN_SHOULD_SKIP_THIS
-/*! \brief Please see https://ned14.github.io/boost.outcome/classboost_1_1outcome_1_1v1__xxx_1_1basic__monad.html
-*/
-template <class T> using result = OUTCOME_V2_NAMESPACE::result<T>;
-/*! \brief Please see https://ned14.github.io/boost.outcome/classboost_1_1outcome_1_1v1__xxx_1_1basic__monad.html
-*/
-template <class T> using outcome = OUTCOME_V2_NAMESPACE::outcome<T>;
-#endif
-AFIO_V2_NAMESPACE_END
-
-
 #if AFIO_LOGGING_LEVEL >= 4
 #define AFIO_LOG_INFO(inst, message) AFIO_V2_NAMESPACE::log().emplace_back(QUICKCPPLIB_NAMESPACE::ringbuffer_log::level::info, (message), (unsigned) (uintptr_t)(inst), QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id(), (AFIO_LOG_BACKTRACE_LEVELS & (1 << 4)) ? nullptr : __func__, __LINE__)
 
@@ -331,76 +451,84 @@ AFIO_V2_NAMESPACE_END
 #define AFIO_LOG_STRINGIFY2(s) AFIO_LOG_STRINGIFY3(s)
 #define AFIO_LOG_STRINGIFY(s) AFIO_LOG_STRINGIFY2(s)
 AFIO_V2_NAMESPACE_BEGIN
-//! Returns the AFIO namespace as a string
-inline span<char> afio_namespace_string()
+namespace detail
 {
-  static char buffer[64];
-  static size_t length;
-  if(length)
+  // Returns the AFIO namespace as a string
+  inline span<char> afio_namespace_string()
+  {
+    static char buffer[64];
+    static size_t length;
+    if(length)
+      return span<char>(buffer, length);
+    const char *src = AFIO_LOG_STRINGIFY(AFIO_V2_NAMESPACE);
+    char *bufferp = buffer;
+    for(; *src && (bufferp - buffer) < (ptrdiff_t) sizeof(buffer); src++)
+    {
+      if(*src != ' ')
+        *bufferp++ = *src;
+    }
+    *bufferp = 0;
+    length = bufferp - buffer;
     return span<char>(buffer, length);
-  const char *src = AFIO_LOG_STRINGIFY(AFIO_V2_NAMESPACE);
-  char *bufferp = buffer;
-  for(; *src && (bufferp - buffer) < (ptrdiff_t) sizeof(buffer); src++)
-  {
-    if(*src != ' ')
-      *bufferp++ = *src;
   }
-  *bufferp = 0;
-  length = bufferp - buffer;
-  return span<char>(buffer, length);
-}
-//! Returns the Outcome namespace as a string
-inline span<char> outcome_namespace_string()
-{
-  static char buffer[64];
-  static size_t length;
-  if(length)
+  // Returns the Outcome namespace as a string
+  inline span<char> outcome_namespace_string()
+  {
+    static char buffer[64];
+    static size_t length;
+    if(length)
+      return span<char>(buffer, length);
+    const char *src = AFIO_LOG_STRINGIFY(OUTCOME_V2_NAMESPACE);
+    char *bufferp = buffer;
+    for(; *src && (bufferp - buffer) < (ptrdiff_t) sizeof(buffer); src++)
+    {
+      if(*src != ' ')
+        *bufferp++ = *src;
+    }
+    *bufferp = 0;
+    length = bufferp - buffer;
     return span<char>(buffer, length);
-  const char *src = AFIO_LOG_STRINGIFY(OUTCOME_V2_NAMESPACE);
-  char *bufferp = buffer;
-  for(; *src && (bufferp - buffer) < (ptrdiff_t) sizeof(buffer); src++)
-  {
-    if(*src != ' ')
-      *bufferp++ = *src;
   }
-  *bufferp = 0;
-  length = bufferp - buffer;
-  return span<char>(buffer, length);
-}
-//! Strips a __PRETTY_FUNCTION__ of all instances of AFIO_V2_NAMESPACE:: and AFIO_V2_NAMESPACE::
-inline void strip_pretty_function(char *out, size_t bytes, const char *in)
-{
-  const span<char> remove1 = afio_namespace_string();
-  const span<char> remove2 = outcome_namespace_string();
-  for(--bytes; bytes && *in; --bytes)
+  // Strips a __PRETTY_FUNCTION__ of all instances of AFIO_V2_NAMESPACE:: and AFIO_V2_NAMESPACE::
+  inline void strip_pretty_function(char *out, size_t bytes, const char *in)
   {
-    if(!strncmp(in, remove1.data(), remove1.size()))
-      in += remove1.size();
-    if(!strncmp(in, remove2.data(), remove2.size()))
-      in += remove2.size();
-    *out++ = *in++;
+    const span<char> remove1 = afio_namespace_string();
+    const span<char> remove2 = outcome_namespace_string();
+    for(--bytes; bytes && *in; --bytes)
+    {
+      if(!strncmp(in, remove1.data(), remove1.size()))
+        in += remove1.size();
+      if(!strncmp(in, remove2.data(), remove2.size()))
+        in += remove2.size();
+      *out++ = *in++;
+    }
+    *out = 0;
   }
-  *out = 0;
+  template <class T> void log_inst_to_info(T &&inst, const char *buffer) { AFIO_LOG_INFO(inst, buffer); }
 }
 AFIO_V2_NAMESPACE_END
 #ifdef _MSC_VER
 #define AFIO_LOG_FUNCTION_CALL(inst)                                                                                                                                                                                                                                                                                           \
+  if(log().log_level() >= log_level::info)                                                                                                                                                                                                                                                                                     \
   {                                                                                                                                                                                                                                                                                                                            \
     char buffer[256];                                                                                                                                                                                                                                                                                                          \
-    AFIO_V2_NAMESPACE::strip_pretty_function(buffer, sizeof(buffer), __FUNCSIG__);                                                                                                                                                                                                                                             \
-    AFIO_LOG_INFO(inst, buffer);                                                                                                                                                                                                                                                                                               \
-  }
+    AFIO_V2_NAMESPACE::detail::strip_pretty_function(buffer, sizeof(buffer), __FUNCSIG__);                                                                                                                                                                                                                                     \
+    AFIO_V2_NAMESPACE::detail::log_inst_to_info(inst, buffer);                                                                                                                                                                                                                                                                 \
+  }                                                                                                                                                                                                                                                                                                                            \
+  AFIO_LOG_INST_TO_TLS(inst)
 #else
 #define AFIO_LOG_FUNCTION_CALL(inst)                                                                                                                                                                                                                                                                                           \
+  if(log().log_level() >= log_level::info)                                                                                                                                                                                                                                                                                     \
   {                                                                                                                                                                                                                                                                                                                            \
     char buffer[256];                                                                                                                                                                                                                                                                                                          \
-    AFIO_V2_NAMESPACE::strip_pretty_function(buffer, sizeof(buffer), __PRETTY_FUNCTION__);                                                                                                                                                                                                                                     \
-    AFIO_LOG_INFO(inst, buffer);                                                                                                                                                                                                                                                                                               \
-  }
+    AFIO_V2_NAMESPACE::detail::strip_pretty_function(buffer, sizeof(buffer), __PRETTY_FUNCTION__);                                                                                                                                                                                                                             \
+    AFIO_V2_NAMESPACE::detail::log_inst_to_info(inst, buffer);                                                                                                                                                                                                                                                                 \
+  }                                                                                                                                                                                                                                                                                                                            \
+  AFIO_LOG_INST_TO_TLS(inst)
 #endif
 #else
 #define AFIO_LOG_INFO(inst, message)
-#define AFIO_LOG_FUNCTION_CALL(inst)
+#define AFIO_LOG_FUNCTION_CALL(inst) AFIO_LOG_INST_TO_TLS(inst)
 #endif
 #if AFIO_LOGGING_LEVEL >= 5
 #define AFIO_LOG_DEBUG(inst, message) AFIO_V2_NAMESPACE::log().emplace_back(QUICKCPPLIB_NAMESPACE::ringbuffer_log::level::debug, (message), (unsigned) (uintptr_t)(inst), QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id(), (AFIO_LOG_BACKTRACE_LEVELS & (1 << 5)) ? nullptr : __func__, __LINE__)
@@ -417,17 +545,6 @@ AFIO_V2_NAMESPACE_END
 
 AFIO_V2_NAMESPACE_BEGIN
 
-// The C++ 11 runtime is much better at exception state than Boost so no choice here
-using std::make_exception_ptr;
-using std::error_code;
-using std::generic_category;
-using std::system_category;
-using std::system_error;
-
-// Too darn useful
-using std::to_string;
-// Used to send the last 190 chars instead of the first 190 chars to extended_error_code
-using QUICKCPPLIB_NAMESPACE::ringbuffer_log::last190;
 namespace detail
 {
   // A move only capable lightweight std::function, as std::function can't handle move only callables
@@ -498,22 +615,6 @@ namespace detail
   template <class R, class U> inline function_ptr<R> make_function_ptr(U &&f) { return function_ptr<R>(nullptr, std::forward<U>(f)); }
   template <class R, class U, class... Args> inline function_ptr<R> emplace_function_ptr(Args &&... args) { return function_ptr<R>(typename function_ptr<R>::template emplace_t<U>(), std::forward<Args>(args)...); }
 }
-
-// Temporary in lieu of full fat afio::path
-/* \todo Full fat afio::path needs to be able to variant a win32 path
-and a nt kernel path.
-\todo A variant of an open handle as base and a relative path fragment
-from there is also needed, though I have no idea how to manage lifetime
-for such a thing.
-\todo It would make a great deal of sense if afio::path were
-a linked list of filesystem::path fragments as things like directory
-hierarchy walks do a lot of leaf node splitting which for a 32k path
-means a ton load of memory copying. Something like LLVM's list of
-string fragments would be far faster - look for an existing implementation
-before writing our own! One of those path fragments could variant onto
-an open handle to solve the earlier issue.
-*/
-using fixme_path = filesystem::path;
 
 // Native handle support
 namespace win

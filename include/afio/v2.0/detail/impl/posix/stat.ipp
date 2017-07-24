@@ -31,105 +31,209 @@ AFIO_V2_NAMESPACE_BEGIN
 
 static inline filesystem::file_type to_st_type(uint16_t mode)
 {
-    switch(mode & S_IFMT)
-    {
+  switch(mode & S_IFMT)
+  {
 #ifdef AFIO_USE_LEGACY_FILESYSTEM_SEMANTICS
-    case S_IFBLK:
-        return filesystem::file_type::block_file;
-    case S_IFCHR:
-        return filesystem::file_type::character_file;
-    case S_IFDIR:
-        return filesystem::file_type::directory_file;
-    case S_IFIFO:
-        return filesystem::file_type::fifo_file;
-    case S_IFLNK:
-        return filesystem::file_type::symlink_file;
-    case S_IFREG:
-        return filesystem::file_type::regular_file;
-    case S_IFSOCK:
-        return filesystem::file_type::socket_file;
-    default:
-        return filesystem::file_type::type_unknown;
+  case S_IFBLK:
+    return filesystem::file_type::block_file;
+  case S_IFCHR:
+    return filesystem::file_type::character_file;
+  case S_IFDIR:
+    return filesystem::file_type::directory_file;
+  case S_IFIFO:
+    return filesystem::file_type::fifo_file;
+  case S_IFLNK:
+    return filesystem::file_type::symlink_file;
+  case S_IFREG:
+    return filesystem::file_type::regular_file;
+  case S_IFSOCK:
+    return filesystem::file_type::socket_file;
+  default:
+    return filesystem::file_type::type_unknown;
 #else
-    case S_IFBLK:
-        return filesystem::file_type::block;
-    case S_IFCHR:
-        return filesystem::file_type::character;
-    case S_IFDIR:
-        return filesystem::file_type::directory;
-    case S_IFIFO:
-        return filesystem::file_type::fifo;
-    case S_IFLNK:
-        return filesystem::file_type::symlink;
-    case S_IFREG:
-        return filesystem::file_type::regular;
-    case S_IFSOCK:
-        return filesystem::file_type::socket;
-    default:
-        return filesystem::file_type::unknown;
+  case S_IFBLK:
+    return filesystem::file_type::block;
+  case S_IFCHR:
+    return filesystem::file_type::character;
+  case S_IFDIR:
+    return filesystem::file_type::directory;
+  case S_IFIFO:
+    return filesystem::file_type::fifo;
+  case S_IFLNK:
+    return filesystem::file_type::symlink;
+  case S_IFREG:
+    return filesystem::file_type::regular;
+  case S_IFSOCK:
+    return filesystem::file_type::socket;
+  default:
+    return filesystem::file_type::unknown;
 #endif
-    }
+  }
 }
 
 static inline std::chrono::system_clock::time_point to_timepoint(struct timespec ts)
 {
   // Need to have this self-adapt to the STL being used
-  static constexpr unsigned long long STL_TICKS_PER_SEC=(unsigned long long) std::chrono::system_clock::period::den/std::chrono::system_clock::period::num;
-  static constexpr unsigned long long multiplier=STL_TICKS_PER_SEC>=1000000000ULL ? STL_TICKS_PER_SEC/1000000000ULL : 1;
-  static constexpr unsigned long long divider=STL_TICKS_PER_SEC>=1000000000ULL ? 1 : 1000000000ULL/STL_TICKS_PER_SEC;
+  static constexpr unsigned long long STL_TICKS_PER_SEC = (unsigned long long) std::chrono::system_clock::period::den / std::chrono::system_clock::period::num;
+  static constexpr unsigned long long multiplier = STL_TICKS_PER_SEC >= 1000000000ULL ? STL_TICKS_PER_SEC / 1000000000ULL : 1;
+  static constexpr unsigned long long divider = STL_TICKS_PER_SEC >= 1000000000ULL ? 1 : 1000000000ULL / STL_TICKS_PER_SEC;
   // For speed we make the big assumption that the STL's system_clock is based on the time_t epoch 1st Jan 1970.
-  std::chrono::system_clock::duration duration(ts.tv_sec*STL_TICKS_PER_SEC+ts.tv_nsec*multiplier/divider);
+  std::chrono::system_clock::duration duration(ts.tv_sec * STL_TICKS_PER_SEC + ts.tv_nsec * multiplier / divider);
   return std::chrono::system_clock::time_point(duration);
 }
 
 AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> stat_t::fill(const handle &h, stat_t::want wanted) noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(h.native_handle().fd);
+  AFIO_LOG_FUNCTION_CALL(&h);
   struct stat s;
   memset(&s, 0, sizeof(s));
   size_t ret = 0;
 
   if(-1 == ::fstat(h.native_handle().fd, &s))
     return make_errored_result<size_t>(errno, last190(h.path().native()));
-  if(wanted&want::dev) { st_dev=s.st_dev; ++ret; }
-  if(wanted&want::ino) { st_ino=s.st_ino; ++ret; }
-  if(wanted&want::type) { st_type=to_st_type(s.st_mode); ++ret; }
-  if(wanted&want::perms) { st_perms=s.st_mode & 0xfff; ++ret; }
-  if(wanted&want::nlink) { st_nlink=s.st_nlink; ++ret; }
-  if(wanted&want::uid) { st_uid=s.st_uid; ++ret; }
-  if(wanted&want::gid) { st_gid=s.st_gid; ++ret; }
-  if(wanted&want::rdev) { st_rdev=s.st_rdev; ++ret; }
+  if(wanted & want::dev)
+  {
+    st_dev = s.st_dev;
+    ++ret;
+  }
+  if(wanted & want::ino)
+  {
+    st_ino = s.st_ino;
+    ++ret;
+  }
+  if(wanted & want::type)
+  {
+    st_type = to_st_type(s.st_mode);
+    ++ret;
+  }
+  if(wanted & want::perms)
+  {
+    st_perms = s.st_mode & 0xfff;
+    ++ret;
+  }
+  if(wanted & want::nlink)
+  {
+    st_nlink = s.st_nlink;
+    ++ret;
+  }
+  if(wanted & want::uid)
+  {
+    st_uid = s.st_uid;
+    ++ret;
+  }
+  if(wanted & want::gid)
+  {
+    st_gid = s.st_gid;
+    ++ret;
+  }
+  if(wanted & want::rdev)
+  {
+    st_rdev = s.st_rdev;
+    ++ret;
+  }
 #ifdef __ANDROID__
-  if(wanted&want::atim) { st_atim=to_timepoint(*((struct timespec *)&s.st_atime)); ++ret; }
-  if(wanted&want::mtim) { st_mtim=to_timepoint(*((struct timespec *)&s.st_mtime)); ++ret; }
-  if(wanted&want::ctim) { st_ctim=to_timepoint(*((struct timespec *)&s.st_ctime)); ++ret; }
+  if(wanted & want::atim)
+  {
+    st_atim = to_timepoint(*((struct timespec *) &s.st_atime));
+    ++ret;
+  }
+  if(wanted & want::mtim)
+  {
+    st_mtim = to_timepoint(*((struct timespec *) &s.st_mtime));
+    ++ret;
+  }
+  if(wanted & want::ctim)
+  {
+    st_ctim = to_timepoint(*((struct timespec *) &s.st_ctime));
+    ++ret;
+  }
 #elif defined(__APPLE__)
-  if(wanted&want::atim) { st_atim=to_timepoint(s.st_atimespec); ++ret; }
-  if(wanted&want::mtim) { st_mtim=to_timepoint(s.st_mtimespec); ++ret; }
-  if(wanted&want::ctim) { st_ctim=to_timepoint(s.st_ctimespec); ++ret; }
+  if(wanted & want::atim)
+  {
+    st_atim = to_timepoint(s.st_atimespec);
+    ++ret;
+  }
+  if(wanted & want::mtim)
+  {
+    st_mtim = to_timepoint(s.st_mtimespec);
+    ++ret;
+  }
+  if(wanted & want::ctim)
+  {
+    st_ctim = to_timepoint(s.st_ctimespec);
+    ++ret;
+  }
 #else  // Linux and BSD
-  if(wanted&want::atim) { st_atim=to_timepoint(s.st_atim); ++ret; }
-  if(wanted&want::mtim) { st_mtim=to_timepoint(s.st_mtim); ++ret; }
-  if(wanted&want::ctim) { st_ctim=to_timepoint(s.st_ctim); ++ret; }
+  if(wanted & want::atim)
+  {
+    st_atim = to_timepoint(s.st_atim);
+    ++ret;
+  }
+  if(wanted & want::mtim)
+  {
+    st_mtim = to_timepoint(s.st_mtim);
+    ++ret;
+  }
+  if(wanted & want::ctim)
+  {
+    st_ctim = to_timepoint(s.st_ctim);
+    ++ret;
+  }
 #endif
-  if(wanted&want::size) { st_size=s.st_size; ++ret; }
-  if(wanted&want::allocated) { st_allocated=(handle::extent_type) s.st_blocks*512; ++ret; }
-  if(wanted&want::blocks) { st_blocks=s.st_blocks; ++ret; }
-  if(wanted&want::blksize) { st_blksize=s.st_blksize; ++ret; }
+  if(wanted & want::size)
+  {
+    st_size = s.st_size;
+    ++ret;
+  }
+  if(wanted & want::allocated)
+  {
+    st_allocated = (handle::extent_type) s.st_blocks * 512;
+    ++ret;
+  }
+  if(wanted & want::blocks)
+  {
+    st_blocks = s.st_blocks;
+    ++ret;
+  }
+  if(wanted & want::blksize)
+  {
+    st_blksize = s.st_blksize;
+    ++ret;
+  }
 #ifdef HAVE_STAT_FLAGS
-  if(wanted&want::flags) { st_flags=s.st_flags; ++ret; }
+  if(wanted & want::flags)
+  {
+    st_flags = s.st_flags;
+    ++ret;
+  }
 #endif
 #ifdef HAVE_STAT_GEN
-  if(wanted&want::gen) { st_gen=s.st_gen; ++ret; }
+  if(wanted & want::gen)
+  {
+    st_gen = s.st_gen;
+    ++ret;
+  }
 #endif
 #ifdef HAVE_BIRTHTIMESPEC
 #if defined(__APPLE__)
-  if(wanted&want::birthtim) { st_birthtim=to_timepoint(s.st_birthtimespec); ++ret; }
+  if(wanted & want::birthtim)
+  {
+    st_birthtim = to_timepoint(s.st_birthtimespec);
+    ++ret;
+  }
 #else
-  if(wanted&want::birthtim) { st_birthtim=to_timepoint(s.st_birthtim); ++ret; }
+  if(wanted & want::birthtim)
+  {
+    st_birthtim = to_timepoint(s.st_birthtim);
+    ++ret;
+  }
 #endif
 #endif
-  if(wanted&want::sparse) { st_sparse=((handle::extent_type) s.st_blocks*512)<(handle::extent_type) s.st_size; ++ret; }
+  if(wanted & want::sparse)
+  {
+    st_sparse = ((handle::extent_type) s.st_blocks * 512) < (handle::extent_type) s.st_size;
+    ++ret;
+  }
   return ret;
 }
 

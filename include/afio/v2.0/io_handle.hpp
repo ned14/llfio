@@ -1,0 +1,353 @@
+/* A handle to something
+(C) 2015-2017 Niall Douglas <http://www.nedproductions.biz/> (20 commits)
+File Created: Dec 2015
+
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License in the accompanying file
+Licence.txt or at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+
+Distributed under the Boost Software License, Version 1.0.
+    (See accompanying file Licence.txt or copy at
+          http://www.boost.org/LICENSE_1_0.txt)
+*/
+
+#ifndef AFIO_IO_HANDLE_H
+#define AFIO_IO_HANDLE_H
+
+#include "handle.hpp"
+
+//! \file io_handle.hpp Provides i/o handle
+
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4251)  // dll interface
+#endif
+
+AFIO_V2_NAMESPACE_EXPORT_BEGIN
+
+/*! \class io_handle
+\brief A handle to something capable of scatter-gather i/o.
+*/
+class AFIO_DECL io_handle : public handle
+{
+public:
+  using path_type = handle::path_type;
+  using extent_type = handle::extent_type;
+  using size_type = handle::size_type;
+  using mode = handle::mode;
+  using creation = handle::creation;
+  using caching = handle::caching;
+  using flag = handle::flag;
+
+  //! The scatter buffer type used by this handle
+  using buffer_type = std::pair<char *, size_type>;
+  //! The gather buffer type used by this handle
+  using const_buffer_type = std::pair<const char *, size_type>;
+  //! The scatter buffers type used by this handle
+  using buffers_type = span<buffer_type>;
+  //! The gather buffers type used by this handle
+  using const_buffers_type = span<const_buffer_type>;
+  //! The i/o request type used by this handle
+  template <class T> struct io_request
+  {
+    T buffers;
+    extent_type offset;
+    constexpr io_request()
+        : buffers()
+        , offset(0)
+    {
+    }
+    constexpr io_request(T _buffers, extent_type _offset)
+        : buffers(std::move(_buffers))
+        , offset(_offset)
+    {
+    }
+  };
+  //! The i/o result type used by this handle
+  template <class T> class io_result : public result<T>
+  {
+    using Base = result<T>;
+    size_type _bytes_transferred;
+
+  public:
+    constexpr io_result() noexcept : _bytes_transferred((size_type) -1) {}
+    template <class... Args>
+    io_result(Args &&... args)
+        : result<T>(std::forward<Args>(args)...)
+        , _bytes_transferred((size_type) -1)
+    {
+    }
+    io_result &operator=(const io_result &) = default;
+    io_result &operator=(io_result &&) = default;
+    //! Returns bytes transferred
+    size_type bytes_transferred() noexcept
+    {
+      if(_bytes_transferred == (size_type) -1)
+      {
+        _bytes_transferred = 0;
+        for(auto &i : this->value())
+          _bytes_transferred += i.second;
+      }
+      return _bytes_transferred;
+    }
+  };
+
+public:
+  //! Default constructor
+  constexpr io_handle() = default;
+  //! Construct a handle from a supplied native handle
+  QUICKCPPLIB_CONSTEXPR io_handle(native_handle_type h, caching caching = caching::none, flag flags = flag::none)
+      : handle(h, caching, flags)
+  {
+  }
+  //! Explicit conversion from handle permitted
+  explicit io_handle(handle &&o) noexcept : handle(std::move(o)) {}
+  //! Move construction permitted
+  io_handle(io_handle &&) = default;
+  //! Move assignment permitted
+  io_handle &operator=(io_handle &&) = default;
+
+  /*! \brief Read data from the open handle.
+
+  \return The buffers read, which may not be the buffers input. The size of each scatter-gather
+  buffer is updated with the number of bytes of that buffer transferred, and the pointer to
+  the data may be \em completely different to what was submitted (e.g. it may point into a
+  memory map).
+  \param reqs A scatter-gather and offset request.
+  \param d An optional deadline by which the i/o must complete, else it is cancelled.
+  Note function may return significantly after this deadline if the i/o takes long to cancel.
+  \errors Any of the values POSIX read() can return, `errc::timed_out`, `errc::operation_canceled`. `errc::not_supported` may be
+  returned if deadline i/o is not possible with this particular handle configuration (e.g.
+  reading from regular files on POSIX or reading from a non-overlapped HANDLE on Windows).
+  \mallocs The default synchronous implementation in file_handle performs no memory allocation.
+  The asynchronous implementation in async_file_handle performs one calloc and one free.
+  */
+  //[[bindlib::make_free]]
+  AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<buffers_type> read(io_request<buffers_type> reqs, deadline d = deadline()) noexcept;
+  //! \overload
+  io_result<buffer_type> read(extent_type offset, char *data, size_type bytes, deadline d = deadline()) noexcept
+  {
+    buffer_type _reqs[1] = {{data, bytes}};
+    io_request<buffers_type> reqs(buffers_type(_reqs), offset);
+    OUTCOME_TRY(v, read(reqs, d));
+    return *v.data();
+  }
+
+  /*! \brief Write data to the open handle.
+
+  \return The buffers written, which may not be the buffers input. The size of each scatter-gather
+  buffer is updated with the number of bytes of that buffer transferred.
+  \param reqs A scatter-gather and offset request.
+  \param d An optional deadline by which the i/o must complete, else it is cancelled.
+  Note function may return significantly after this deadline if the i/o takes long to cancel.
+  \errors Any of the values POSIX write() can return, `errc::timed_out`, `errc::operation_canceled`. `errc::not_supported` may be
+  returned if deadline i/o is not possible with this particular handle configuration (e.g.
+  writing to regular files on POSIX or writing to a non-overlapped HANDLE on Windows).
+  \mallocs The default synchronous implementation in file_handle performs no memory allocation.
+  The asynchronous implementation in async_file_handle performs one calloc and one free.
+  */
+  //[[bindlib::make_free]]
+  AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> write(io_request<const_buffers_type> reqs, deadline d = deadline()) noexcept;
+  //! \overload
+  io_result<const_buffer_type> write(extent_type offset, const char *data, size_type bytes, deadline d = deadline()) noexcept
+  {
+    const_buffer_type _reqs[1] = {{data, bytes}};
+    io_request<const_buffers_type> reqs(const_buffers_type(_reqs), offset);
+    OUTCOME_TRY(v, write(reqs, d));
+    return *v.data();
+  }
+
+  /*! \brief Issue a write reordering barrier such that writes preceding the barrier will reach storage
+  before writes after this barrier.
+
+  \warning **Assume that this call is a no-op**. It is not reliably implemented in many common use cases,
+  for example if your code is running inside a LXC container, or if the user has mounted the filing
+  system with non-default options. Instead open the handle with `caching::reads` which means that all
+  writes form a strict sequential order not completing until acknowledged by the storage device.
+  Filing system can and do use different algorithms to give much better performance with `caching::reads`,
+  some (e.g. ZFS) spectacularly better.
+
+  \warning Let me repeat again: consider this call to be a **hint** to poke the kernel with a stick to
+  go start to do some work sooner rather than later. It may be ignored entirely.
+
+  \warning For portability, you can only assume that barriers write order for a single handle
+  instance. You cannot assume that barriers write order across multiple handles to the same inode, or
+  across processes.
+
+  \return The buffers barriered, which may not be the buffers input. The size of each scatter-gather
+  buffer is updated with the number of bytes of that buffer barriered.
+  \param reqs A scatter-gather and offset request for what range to barrier. May be ignored on some platforms
+  which always write barrier the entire file. Supplying a default initialised reqs write barriers the entire file.
+  \param wait_for_device True if you want the call to wait until data reaches storage and that storage
+  has acknowledged the data is physically written. Slow.
+  \param and_metadata True if you want the call to sync the metadata for retrieving the writes before the
+  barrier after a sudden power loss event. Slow.
+  \param d An optional deadline by which the i/o must complete, else it is cancelled.
+  Note function may return significantly after this deadline if the i/o takes long to cancel.
+  \errors Any of the values POSIX fdatasync() or Windows NtFlushBuffersFileEx() can return.
+  \mallocs None.
+  */
+  //[[bindlib::make_free]]
+  virtual io_result<const_buffers_type> barrier(io_request<const_buffers_type> reqs = io_request<const_buffers_type>(), bool wait_for_device = false, bool and_metadata = false, deadline d = deadline()) noexcept = 0;
+
+  /*! \class extent_guard
+  \brief RAII holder a locked extent of bytes in a file.
+  */
+  class extent_guard
+  {
+    friend class io_handle;
+    io_handle *_h;
+    extent_type _offset, _length;
+    bool _exclusive;
+    constexpr extent_guard(io_handle *h, extent_type offset, extent_type length, bool exclusive)
+        : _h(h)
+        , _offset(offset)
+        , _length(length)
+        , _exclusive(exclusive)
+    {
+    }
+    extent_guard(const extent_guard &) = delete;
+    extent_guard &operator=(const extent_guard &) = delete;
+
+  public:
+    //! Default constructor
+    constexpr extent_guard()
+        : _h(nullptr)
+        , _offset(0)
+        , _length(0)
+        , _exclusive(false)
+    {
+    }
+    //! Move constructor
+    extent_guard(extent_guard &&o) noexcept : _h(o._h), _offset(o._offset), _length(o._length), _exclusive(o._exclusive) { o.release(); }
+    //! Move assign
+    extent_guard &operator=(extent_guard &&o) noexcept
+    {
+      unlock();
+      _h = o._h;
+      _offset = o._offset;
+      _length = o._length;
+      _exclusive = o._exclusive;
+      o.release();
+      return *this;
+    }
+    ~extent_guard()
+    {
+      if(_h)
+        unlock();
+    }
+    //! True if extent guard is valid
+    explicit operator bool() const noexcept { return _h != nullptr; }
+    //! True if extent guard is invalid
+    bool operator!() const noexcept { return _h == nullptr; }
+
+    //! The io_handle to be unlocked
+    io_handle *handle() const noexcept { return _h; }
+    //! Sets the io_handle to be unlocked
+    void set_handle(io_handle *h) noexcept { _h = h; }
+    //! The extent to be unlocked
+    std::tuple<extent_type, extent_type, bool> extent() const noexcept { return std::make_tuple(_offset, _length, _exclusive); }
+
+    //! Unlocks the locked extent immediately
+    void unlock() noexcept
+    {
+      if(_h)
+      {
+        _h->unlock(_offset, _length);
+        release();
+      }
+    }
+
+    //! Detach this RAII unlocker from the locked state
+    void release() noexcept
+    {
+      _h = nullptr;
+      _offset = 0;
+      _length = 0;
+      _exclusive = false;
+    }
+  };
+
+  /*! \brief Tries to lock the range of bytes specified for shared or exclusive access. Be aware this passes through
+  the same semantics as the underlying OS call, including any POSIX insanity present on your platform.
+
+  \warning On older Linuxes and POSIX, this uses `fcntl()` with the well known insane POSIX
+  semantics that closing ANY handle to this file releases all bytes range locks on it. If your
+  OS isn't new enough to support the non-insane lock API, `flag::byte_lock_insanity` will be set
+  in flags() after the first call to this function.
+
+  \return An extent guard, the destruction of which will call unlock().
+  \param offset The offset to lock. Note that on POSIX the top bit is always cleared before use
+  as POSIX uses signed transport for offsets. If you want an advisory rather than mandatory lock
+  on Windows, one technique is to force top bit set so the region you lock is not the one you will
+  i/o - obviously this reduces maximum file size to (2^63)-1.
+  \param bytes The number of bytes to lock. Zero means lock the entire file using any more
+  efficient alternative algorithm where available on your platform (specifically, on BSD and OS X use
+  flock() for non-insane semantics).
+  \param exclusive Whether the lock is to be exclusive.
+  \param d An optional deadline by which the lock must complete, else it is cancelled.
+  \errors Any of the values POSIX fcntl() can return, `errc::timed_out`, `errc::not_supported` may be
+  returned if deadline i/o is not possible with this particular handle configuration (e.g.
+  non-overlapped HANDLE on Windows).
+  \mallocs The default synchronous implementation in file_handle performs no memory allocation.
+  The asynchronous implementation in async_file_handle performs one calloc and one free.
+  */
+  AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_guard> lock(extent_type offset, extent_type bytes, bool exclusive = true, deadline d = deadline()) noexcept;
+  //! \overload
+  result<extent_guard> try_lock(extent_type offset, extent_type bytes, bool exclusive = true) noexcept { return lock(offset, bytes, exclusive, deadline(std::chrono::seconds(0))); }
+  //! \overload Locks for shared access
+  result<extent_guard> lock(io_request<buffers_type> reqs, deadline d = deadline()) noexcept
+  {
+    size_t bytes = 0;
+    for(auto &i : reqs.buffers)
+      bytes += i.second;
+    return lock(reqs.offset, bytes, false, std::move(d));
+  }
+  //! \overload Locks for exclusive access
+  result<extent_guard> lock(io_request<const_buffers_type> reqs, deadline d = deadline()) noexcept
+  {
+    size_t bytes = 0;
+    for(auto &i : reqs.buffers)
+      bytes += i.second;
+    return lock(reqs.offset, bytes, true, std::move(d));
+  }
+
+  /*! \brief Unlocks a byte range previously locked.
+
+  \param offset The offset to unlock. This should be an offset previously locked.
+  \param bytes The number of bytes to unlock. This should be a byte extent previously locked.
+  \errors Any of the values POSIX fcntl() can return.
+  \mallocs None.
+  */
+  AFIO_HEADERS_ONLY_VIRTUAL_SPEC void unlock(extent_type offset, extent_type bytes) noexcept;
+};
+
+
+AFIO_V2_NAMESPACE_END
+
+#if AFIO_HEADERS_ONLY == 1 && !defined(DOXYGEN_SHOULD_SKIP_THIS)
+#define AFIO_INCLUDED_BY_HEADER 1
+#ifdef _WIN32
+#include "detail/impl/windows/io_handle.ipp"
+#else
+#include "detail/impl/posix/io_handle.ipp"
+#endif
+#undef AFIO_INCLUDED_BY_HEADER
+#endif
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
+
+#endif

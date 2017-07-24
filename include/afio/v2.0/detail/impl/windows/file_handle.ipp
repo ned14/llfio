@@ -139,14 +139,13 @@ result<file_handle> file_handle::file(file_handle::path_type _path, file_handle:
   }
   OUTCOME_TRY(attribs, attributes_from_handle_caching_and_flags(nativeh, _caching, flags));
   nativeh.behaviour |= native_handle_type::disposition::file;
+  AFIO_LOG_FUNCTION_CALL(&ret);
   if(INVALID_HANDLE_VALUE == (nativeh.h = CreateFileW_(ret.value()._path.c_str(), access, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL, creation, attribs, NULL)))
   {
     DWORD errcode = GetLastError();
     // assert(false);
-    AFIO_LOG_FUNCTION_CALL(0);
     return make_errored_result<file_handle>(errcode, last190(ret.value()._path.u8string()));
   }
-  AFIO_LOG_FUNCTION_CALL(nativeh.h);
   if(!(flags & flag::disable_safety_unlinks))
   {
     OUTCOME_TRYV(ret.value()._fetch_inode());
@@ -180,6 +179,7 @@ result<file_handle> file_handle::temp_inode(path_type dirpath, mode _mode, flag 
   OUTCOME_TRY(attribs, attributes_from_handle_caching_and_flags(nativeh, _caching, flags));
   nativeh.behaviour |= native_handle_type::disposition::file;
   DWORD creation = CREATE_NEW;
+  AFIO_LOG_FUNCTION_CALL(&ret);
   for(;;)
   {
     try
@@ -195,10 +195,8 @@ result<file_handle> file_handle::temp_inode(path_type dirpath, mode _mode, flag 
       DWORD errcode = GetLastError();
       if(ERROR_FILE_EXISTS == errcode)
         continue;
-      AFIO_LOG_FUNCTION_CALL(0);
       return make_errored_result<file_handle>(errcode, last190(ret.value()._path.u8string()));
     }
-    AFIO_LOG_FUNCTION_CALL(nativeh.h);
     OUTCOME_TRYV(ret.value()._fetch_inode());  // It can be useful to know the inode of temporary inodes
     if(nativeh.h)
     {
@@ -217,7 +215,7 @@ file_handle::io_result<file_handle::const_buffers_type> file_handle::barrier(fil
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
-  AFIO_LOG_FUNCTION_CALL(_v.h);
+  AFIO_LOG_FUNCTION_CALL(this);
   if(d && !_v.is_overlapped())
     return std::errc::not_supported;
   AFIO_WIN_DEADLINE_TO_SLEEP_INIT(d);
@@ -247,7 +245,7 @@ file_handle::io_result<file_handle::const_buffers_type> file_handle::barrier(fil
 
 result<file_handle> file_handle::clone() const noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(_v.h);
+  AFIO_LOG_FUNCTION_CALL(this);
   result<file_handle> ret(file_handle(native_handle_type(), _devid, _inode, _path, _caching, _flags));
   ret.value()._service = _service;
   ret.value()._v.behaviour = _v.behaviour;
@@ -260,7 +258,7 @@ result<file_handle::path_type> file_handle::relink(path_type newpath) noexcept
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
-  AFIO_LOG_FUNCTION_CALL(_v.h);
+  AFIO_LOG_FUNCTION_CALL(this);
   if(newpath.is_relative())
     newpath = _path.parent_path() / newpath;
 
@@ -294,7 +292,7 @@ result<void> file_handle::unlink() noexcept
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
-  AFIO_LOG_FUNCTION_CALL(_v.h);
+  AFIO_LOG_FUNCTION_CALL(this);
   if(!(_flags & flag::win_disable_unlink_emulation))
   {
     // Rename it to something random to emulate immediate unlinking
@@ -332,20 +330,20 @@ result<void> file_handle::unlink() noexcept
 
 result<file_handle::extent_type> file_handle::length() const noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(_v.h);
+  AFIO_LOG_FUNCTION_CALL(this);
   FILE_STANDARD_INFO fsi;
   if(!GetFileInformationByHandleEx(_v.h, FileStandardInfo, &fsi, sizeof(fsi)))
-    return make_errored_result<extent_type>(GetLastError(), last190(_path.u8string()));
+    return {GetLastError(), std::system_category()};
   return fsi.EndOfFile.QuadPart;
 }
 
 result<file_handle::extent_type> file_handle::truncate(file_handle::extent_type newsize) noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(_v.h);
+  AFIO_LOG_FUNCTION_CALL(this);
   FILE_END_OF_FILE_INFO feofi;
   feofi.EndOfFile.QuadPart = newsize;
   if(!SetFileInformationByHandle(_v.h, FileEndOfFileInfo, &feofi, sizeof(feofi)))
-    return make_errored_result<extent_type>(GetLastError(), last190(_path.u8string()));
+    return {GetLastError(), std::system_category()};
   if(are_safety_fsyncs_issued())
   {
     FlushFileBuffers(_v.h);

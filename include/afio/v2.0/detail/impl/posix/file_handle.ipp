@@ -185,7 +185,7 @@ inline result<void> check_inode(const file_handle &h) noexcept
   return make_valued_result<void>();
 }
 
-result<file_handle> file_handle::file(file_handle::path_type _path, file_handle::mode _mode, file_handle::creation _creation, file_handle::caching _caching, file_handle::flag flags) noexcept
+result<file_handle> file_handle::file(const path_handle &base, file_handle::path_view_type _path, file_handle::mode _mode, file_handle::creation _creation, file_handle::caching _caching, file_handle::flag flags) noexcept
 {
   result<file_handle> ret(file_handle(native_handle_type(), 0, 0, std::move(_path), _caching, flags));
   native_handle_type &nativeh = ret.get()._v;
@@ -195,7 +195,7 @@ result<file_handle> file_handle::file(file_handle::path_type _path, file_handle:
   nativeh.fd = ::open(path_, attribs, 0x1b0 /*660*/);
   if(-1 == nativeh.fd)
     return make_errored_result<file_handle>(errno, last190(ret.value()._path.native()));
-  AFIO_LOG_FUNCTION_CALL(nativeh.fd);
+  AFIO_LOG_FUNCTION_CALL(&ret);
   if(!(flags & flag::disable_safety_unlinks))
   {
     OUTCOME_TRYV(ret.value()._fetch_inode());
@@ -230,6 +230,7 @@ result<file_handle> file_handle::temp_inode(path_type dirpath, mode _mode, flag 
   attribs &= ~O_TMPFILE;
   attribs |= O_EXCL;
 #endif
+  AFIO_LOG_FUNCTION_CALL(&ret);
   for(;;)
   {
     try
@@ -244,10 +245,8 @@ result<file_handle> file_handle::temp_inode(path_type dirpath, mode _mode, flag 
       int errcode = errno;
       if(EEXIST == errcode)
         continue;
-      AFIO_LOG_FUNCTION_CALL(0);
       return make_errored_result<file_handle>(errcode);
     }
-    AFIO_LOG_FUNCTION_CALL(nativeh.fd);
     // Immediately unlink after creation
     if(-1 == ::unlink(path_))
       return make_errored_result<file_handle>(errno);
@@ -258,7 +257,7 @@ result<file_handle> file_handle::temp_inode(path_type dirpath, mode _mode, flag 
 
 file_handle::io_result<file_handle::const_buffers_type> file_handle::barrier(file_handle::io_request<file_handle::const_buffers_type> reqs, bool wait_for_device, bool and_metadata, deadline d) noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(_v.fd);
+  AFIO_LOG_FUNCTION_CALL(this);
   if(d)
     return make_errored_result<>(std::errc::not_supported);
 #ifdef __linux__
@@ -301,7 +300,7 @@ file_handle::io_result<file_handle::const_buffers_type> file_handle::barrier(fil
 
 result<file_handle> file_handle::clone() const noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(_v.fd);
+  AFIO_LOG_FUNCTION_CALL(this);
   result<file_handle> ret(file_handle(native_handle_type(), _devid, _inode, _path, _caching, _flags));
   ret.value()._service = _service;
   ret.value()._v.behaviour = _v.behaviour;
@@ -313,7 +312,7 @@ result<file_handle> file_handle::clone() const noexcept
 
 result<file_handle::path_type> file_handle::relink(path_type newpath) noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(_v.fd);
+  AFIO_LOG_FUNCTION_CALL(this);
   if(newpath.is_relative())
     newpath = _path.parent_path() / newpath;
 #ifdef O_TMPFILE
@@ -342,7 +341,7 @@ result<file_handle::path_type> file_handle::relink(path_type newpath) noexcept
 
 result<void> file_handle::unlink() noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(_v.fd);
+  AFIO_LOG_FUNCTION_CALL(this);
   // FIXME: As soon as we implement fat paths, make this race free
   if(!(_flags & flag::disable_safety_unlinks))
   {
@@ -356,7 +355,7 @@ result<void> file_handle::unlink() noexcept
 
 result<file_handle::extent_type> file_handle::length() const noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(_v.fd);
+  AFIO_LOG_FUNCTION_CALL(this);
   struct stat s;
   memset(&s, 0, sizeof(s));
   if(-1 == ::fstat(_v.fd, &s))
@@ -366,7 +365,7 @@ result<file_handle::extent_type> file_handle::length() const noexcept
 
 result<file_handle::extent_type> file_handle::truncate(file_handle::extent_type newsize) noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(_v.fd);
+  AFIO_LOG_FUNCTION_CALL(this);
   if(ftruncate(_v.fd, newsize) < 0)
     return make_errored_result<extent_type>(errno, last190(_path.native()));
   if(are_safety_fsyncs_issued())

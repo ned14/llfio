@@ -294,6 +294,7 @@ namespace windows_nt_kernel
 
   typedef BOOLEAN(WINAPI *RtlDosPathNameToNtPathName_U_t)(__in PCWSTR DosFileName, __out PUNICODE_STRING NtFileName, __out_opt PWSTR *FilePart, __out_opt PVOID RelativeName);
 
+  typedef NTSTATUS(WINAPI *RtlUTF8ToUnicodeN_t)(_Out_opt_ PWSTR UnicodeStringDestination, _In_ ULONG UnicodeStringMaxByteCount, _Out_ PULONG UnicodeStringActualByteCount, _In_ PCCH UTF8StringSource, _In_ ULONG UTF8StringByteCount);
 
   typedef struct _FILE_BASIC_INFORMATION
   {
@@ -509,6 +510,7 @@ namespace windows_nt_kernel
   static SymGetLineFromAddr64_t SymGetLineFromAddr64;
   static RtlCaptureStackBackTrace_t RtlCaptureStackBackTrace;
   static RtlDosPathNameToNtPathName_U_t RtlDosPathNameToNtPathName_U;
+  static RtlUTF8ToUnicodeN_t RtlUTF8ToUnicodeN;
 
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -517,7 +519,7 @@ namespace windows_nt_kernel
 #endif
   static inline void doinit()
   {
-    if(RtlDosPathNameToNtPathName_U)
+    if(RtlUTF8ToUnicodeN)
       return;
     static std::mutex lock;
     std::lock_guard<decltype(lock)> g(lock);
@@ -620,6 +622,10 @@ namespace windows_nt_kernel
     if(!RtlDosPathNameToNtPathName_U)
       if(!(RtlDosPathNameToNtPathName_U = (RtlDosPathNameToNtPathName_U_t) GetProcAddress(ntdllh, "RtlDosPathNameToNtPathName_U")))
         abort();
+    if(!RtlUTF8ToUnicodeN)
+      if(!(RtlUTF8ToUnicodeN = (RtlUTF8ToUnicodeN_t) GetProcAddress(ntdllh, "RtlUTF8ToUnicodeN")))
+        abort();
+
     // MAKE SURE you update the early exit check at the top to whatever the last of these is!
   }
 #ifdef _MSC_VER
@@ -962,10 +968,10 @@ static inline bool ntsleep(const deadline &d, bool return_on_alert = false) noex
 }
 
 
-// Utility routines for building an ACCESS_MASK from a handle::mode
-static inline result<ACCESS_MASK> access_mask_from_handle_mode(native_handle_type &nativeh, handle::mode _mode)
+// Utility routine for building an ACCESS_MASK from a handle::mode
+static inline result<ACCESS_MASK> access_mask_from_handle_mode(native_handle_type &nativeh, handle::mode _mode, handle::flag flags)
 {
-  ACCESS_MASK access = SYNCHRONIZE;
+  ACCESS_MASK access = 0;
   switch(_mode)
   {
   case handle::mode::unchanged:
@@ -973,27 +979,28 @@ static inline result<ACCESS_MASK> access_mask_from_handle_mode(native_handle_typ
   case handle::mode::none:
     break;
   case handle::mode::attr_read:
-    access |= FILE_READ_ATTRIBUTES;
+    access |= SYNCHRONIZE | FILE_READ_ATTRIBUTES;
     break;
   case handle::mode::attr_write:
-    access |= FILE_READ_ATTRIBUTES | FILE_WRITE_ATTRIBUTES;
+    access |= SYNCHRONIZE | FILE_READ_ATTRIBUTES | FILE_WRITE_ATTRIBUTES;
     break;
   case handle::mode::read:
-    access |= GENERIC_READ;
+    access |= SYNCHRONIZE | GENERIC_READ;
     nativeh.behaviour |= native_handle_type::disposition::seekable | native_handle_type::disposition::readable;
     break;
   case handle::mode::write:
-    access |= GENERIC_WRITE | GENERIC_READ;
+    access |= SYNCHRONIZE | GENERIC_WRITE | GENERIC_READ;
     nativeh.behaviour |= native_handle_type::disposition::seekable | native_handle_type::disposition::readable | native_handle_type::disposition::writable;
     break;
   case handle::mode::append:
-    access |= FILE_APPEND_DATA;
+    access |= SYNCHRONIZE | FILE_APPEND_DATA;
     nativeh.behaviour |= native_handle_type::disposition::writable | native_handle_type::disposition::append_only;
     break;
   }
+  if(flags & handle::flag::unlink_on_close)
+    access |= DELETE;
   return access;
 }
-
 static inline result<DWORD> attributes_from_handle_caching_and_flags(native_handle_type &nativeh, handle::caching _caching, handle::flag flags)
 {
   DWORD attribs = 0;
@@ -1028,6 +1035,44 @@ static inline result<DWORD> attributes_from_handle_caching_and_flags(native_hand
   if(flags & handle::flag::unlink_on_close)
     attribs |= FILE_FLAG_DELETE_ON_CLOSE;
   return attribs;
+}
+static inline result<DWORD> ntflags_from_handle_caching_and_flags(native_handle_type &nativeh, handle::caching _caching, handle::flag flags)
+{
+  DWORD ntflags = 0;
+  if(flags & handle::flag::overlapped)
+  {
+    nativeh.behaviour |= native_handle_type::disposition::overlapped;
+  }
+  else
+  {
+    ntflags |= 0x20 /*FILE_SYNCHRONOUS_IO_NONALERT*/;
+  }
+  switch(_caching)
+  {
+  case handle::caching::unchanged:
+    return std::errc::invalid_argument;
+  case handle::caching::none:
+    ntflags |= 0x00000008 /*FILE_NO_INTERMEDIATE_BUFFERING*/ | 0x00000002 /*FILE_WRITE_THROUGH*/;
+    nativeh.behaviour |= native_handle_type::disposition::aligned_io;
+    break;
+  case handle::caching::only_metadata:
+    ntflags |= 0x00000008 /*FILE_NO_INTERMEDIATE_BUFFERING*/;
+    nativeh.behaviour |= native_handle_type::disposition::aligned_io;
+    break;
+  case handle::caching::reads:
+  case handle::caching::reads_and_metadata:
+    ntflags |= 0x00000002 /*FILE_WRITE_THROUGH*/;
+    break;
+  case handle::caching::all:
+  case handle::caching::safety_fsyncs:
+    break;
+  case handle::caching::temporary:
+    // should be handled by attributes_from_handle_caching_and_flags
+    break;
+  }
+  if(flags & handle::flag::unlink_on_close)
+    ntflags |= 0x00001000 /*FILE_DELETE_ON_CLOSE*/;
+  return ntflags;
 }
 
 /* Our own custom CreateFileW() implementation.

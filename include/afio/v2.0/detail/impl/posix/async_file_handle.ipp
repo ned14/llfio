@@ -34,7 +34,7 @@ AFIO_V2_NAMESPACE_BEGIN
 
 async_file_handle::io_result<async_file_handle::const_buffers_type> async_file_handle::barrier(async_file_handle::io_request<async_file_handle::const_buffers_type> reqs, bool /*wait_for_device*/, bool and_metadata, deadline d) noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(_v.fd);
+  AFIO_LOG_FUNCTION_CALL(this);
   io_result<const_buffers_type> ret;
   auto _io_state(_begin_io(and_metadata ? operation_t::fsync : operation_t::dsync, std::move(reqs), [&ret](auto *state) { ret = std::move(state->result); }, nullptr));
   OUTCOME_TRY(io_state, _io_state);

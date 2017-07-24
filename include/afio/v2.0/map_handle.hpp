@@ -50,18 +50,18 @@ public:
 
   //! The behaviour of the memory section
   QUICKCPPLIB_BITFIELD_BEGIN(flag){none = 0,          //!< No flags
-                                 read = 1 << 0,     //!< Memory views can be read
-                                 write = 1 << 1,    //!< Memory views can be written
-                                 cow = 1 << 2,      //!< Memory views can be copy on written
-                                 execute = 1 << 3,  //!< Memory views can execute code
+                                   read = 1 << 0,     //!< Memory views can be read
+                                   write = 1 << 1,    //!< Memory views can be written
+                                   cow = 1 << 2,      //!< Memory views can be copy on written
+                                   execute = 1 << 3,  //!< Memory views can execute code
 
-                                 nocommit = 1 << 8,     //!< Don't allocate space for this memory in the system immediately
-                                 prefault = 1 << 9,     //!< Prefault, as if by reading every page, any views of memory upon creation.
-                                 executable = 1 << 10,  //!< The backing storage is in fact an executable program binary.
+                                   nocommit = 1 << 8,     //!< Don't allocate space for this memory in the system immediately
+                                   prefault = 1 << 9,     //!< Prefault, as if by reading every page, any views of memory upon creation.
+                                   executable = 1 << 10,  //!< The backing storage is in fact an executable program binary.
 
-                                 // NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!
+                                   // NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!
 
-                                 readwrite = (read | write)};
+                                   readwrite = (read | write)};
   QUICKCPPLIB_BITFIELD_END(flag)
 
 protected:
@@ -181,7 +181,6 @@ Locking byte ranges of this handle is therefore equal to locking byte ranges in 
 class AFIO_DECL map_handle : public io_handle
 {
 public:
-  using path_type = io_handle::path_type;
   using extent_type = io_handle::extent_type;
   using size_type = io_handle::size_type;
   using mode = io_handle::mode;

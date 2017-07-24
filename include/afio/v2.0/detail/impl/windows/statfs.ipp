@@ -30,7 +30,7 @@ AFIO_V2_NAMESPACE_BEGIN
 
 AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, statfs_t::want wanted) noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(h.native_handle().h);
+  AFIO_LOG_FUNCTION_CALL(&h);
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
   alignas(8) fixme_path::value_type buffer[32769];

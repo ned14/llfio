@@ -204,7 +204,7 @@ namespace algorithm
       a degraded state (i.e. just use the fallback lock directly).
       */
       //[[bindlib::make_free]]
-      static result<memory_map> fs_mutex_map(file_handle::path_type lockfile, shared_fs_mutex *fallbacklock = nullptr) noexcept
+      static result<memory_map> fs_mutex_map(path_view lockfile, shared_fs_mutex *fallbacklock = nullptr) noexcept
       {
         AFIO_LOG_FUNCTION_CALL(0);
         try

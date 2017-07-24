@@ -43,7 +43,7 @@ handle::~handle()
 
 result<void> handle::close() noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(_v.h);
+  AFIO_LOG_FUNCTION_CALL(this);
   if(_v)
   {
     if(are_safety_fsyncs_issued())
@@ -60,17 +60,17 @@ result<void> handle::close() noexcept
 
 result<handle> handle::clone() const noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(_v.h);
+  AFIO_LOG_FUNCTION_CALL(this);
   result<handle> ret(handle(native_handle_type(), _caching, _flags));
   ret.value()._v.behaviour = _v.behaviour;
   if(!DuplicateHandle(GetCurrentProcess(), _v.h, GetCurrentProcess(), &ret.value()._v.h, 0, false, DUPLICATE_SAME_ACCESS))
-    return make_errored_result<handle>(GetLastError(), last190(ret.value().path().u8string()));
+    return {GetLastError(), std::system_category()};
   return ret;
 }
 
 result<void> handle::set_append_only(bool enable) noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(_v.h);
+  AFIO_LOG_FUNCTION_CALL(this);
   // This works only due to special handling in OVERLAPPED later
   if(enable)
   {
@@ -87,7 +87,7 @@ result<void> handle::set_append_only(bool enable) noexcept
 
 result<void> handle::set_kernel_caching(caching caching) noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(_v.h);
+  AFIO_LOG_FUNCTION_CALL(this);
   native_handle_type nativeh;
   handle::mode _mode = mode::none;
   if(is_append_only())
@@ -96,7 +96,7 @@ result<void> handle::set_kernel_caching(caching caching) noexcept
     _mode = mode::write;
   else if(is_readable())
     _mode = mode::read;
-  OUTCOME_TRY(access, access_mask_from_handle_mode(nativeh, _mode));
+  OUTCOME_TRY(access, access_mask_from_handle_mode(nativeh, _mode, _flags));
   OUTCOME_TRY(attribs, attributes_from_handle_caching_and_flags(nativeh, caching, _flags));
   nativeh.behaviour |= native_handle_type::disposition::file;
   if(INVALID_HANDLE_VALUE == (nativeh.h = ReOpenFile(_v.h, access, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, attribs)))
@@ -105,163 +105,6 @@ result<void> handle::set_kernel_caching(caching caching) noexcept
   if(!CloseHandle(nativeh.h))
     return {GetLastError(), std::system_category()};
   return success();
-}
-
-
-/************************************* io_handle ****************************************/
-
-template <class BuffersType, class Syscall> inline io_handle::io_result<BuffersType> do_read_write(const native_handle_type &nativeh, Syscall &&syscall, io_handle::io_request<BuffersType> reqs, deadline d) noexcept
-{
-  if(d && !nativeh.is_overlapped())
-    return make_errored_result<BuffersType>(std::errc::not_supported);
-  if(reqs.buffers.size() > 64)
-    return make_errored_result<BuffersType>(std::errc::argument_list_too_long);
-
-  AFIO_WIN_DEADLINE_TO_SLEEP_INIT(d);
-  std::array<OVERLAPPED, 64> _ols;
-  memset(_ols.data(), 0, reqs.buffers.size() * sizeof(OVERLAPPED));
-  span<OVERLAPPED> ols(_ols.data(), reqs.buffers.size());
-  auto ol_it = ols.begin();
-  DWORD transferred = 0;
-  auto cancel_io = undoer([&] {
-    if(nativeh.is_overlapped())
-    {
-      for(auto &ol : ols)
-      {
-        CancelIoEx(nativeh.h, &ol);
-      }
-      for(auto &ol : ols)
-      {
-        ntwait(nativeh.h, ol, deadline());
-      }
-    }
-  });
-  for(auto &req : reqs.buffers)
-  {
-    OVERLAPPED &ol = *ol_it++;
-    ol.Internal = (ULONG_PTR) -1;
-    if(nativeh.is_append_only())
-      ol.OffsetHigh = ol.Offset = 0xffffffff;
-    else
-    {
-      ol.OffsetHigh = (reqs.offset >> 32) & 0xffffffff;
-      ol.Offset = reqs.offset & 0xffffffff;
-    }
-    if(!syscall(nativeh.h, req.first, (DWORD) req.second, &transferred, &ol) && ERROR_IO_PENDING != GetLastError())
-      return {GetLastError(), std::system_category()};
-    reqs.offset += req.second;
-  }
-  // If handle is overlapped, wait for completion of each i/o.
-  if(nativeh.is_overlapped())
-  {
-    for(auto &ol : ols)
-    {
-      deadline nd = d;
-      AFIO_WIN_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
-      if(STATUS_TIMEOUT == ntwait(nativeh.h, ol, nd))
-      {
-        AFIO_WIN_DEADLINE_TO_TIMEOUT(d);
-      }
-    }
-  }
-  cancel_io.dismiss();
-  for(size_t n = 0; n < reqs.buffers.size(); n++)
-  {
-    // It seems the NT kernel is guilty of casting bugs sometimes
-    ols[n].Internal = ols[n].Internal & 0xffffffff;
-    if(ols[n].Internal != 0)
-    {
-      return make_errored_result_nt<BuffersType>((NTSTATUS) ols[n].Internal);
-    }
-    reqs.buffers[n].second = ols[n].InternalHigh;
-  }
-  return io_handle::io_result<BuffersType>(std::move(reqs.buffers));
-}
-
-io_handle::io_result<io_handle::buffers_type> io_handle::read(io_handle::io_request<io_handle::buffers_type> reqs, deadline d) noexcept
-{
-  AFIO_LOG_FUNCTION_CALL(_v.h);
-  return do_read_write(_v, &ReadFile, std::move(reqs), std::move(d));
-}
-
-io_handle::io_result<io_handle::const_buffers_type> io_handle::write(io_handle::io_request<io_handle::const_buffers_type> reqs, deadline d) noexcept
-{
-  AFIO_LOG_FUNCTION_CALL(_v.h);
-  return do_read_write(_v, &WriteFile, std::move(reqs), std::move(d));
-}
-
-result<io_handle::extent_guard> io_handle::lock(io_handle::extent_type offset, io_handle::extent_type bytes, bool exclusive, deadline d) noexcept
-{
-  AFIO_LOG_FUNCTION_CALL(_v.h);
-  if(d && d.nsecs > 0 && !_v.is_overlapped())
-    return std::errc::not_supported;
-  DWORD flags = exclusive ? LOCKFILE_EXCLUSIVE_LOCK : 0;
-  if(d && !d.nsecs)
-    flags |= LOCKFILE_FAIL_IMMEDIATELY;
-  AFIO_WIN_DEADLINE_TO_SLEEP_INIT(d);
-  OVERLAPPED ol;
-  memset(&ol, 0, sizeof(ol));
-  ol.Internal = (ULONG_PTR) -1;
-  ol.OffsetHigh = (offset >> 32) & 0xffffffff;
-  ol.Offset = offset & 0xffffffff;
-  DWORD bytes_high = !bytes ? MAXDWORD : (DWORD)((bytes >> 32) & 0xffffffff);
-  DWORD bytes_low = !bytes ? MAXDWORD : (DWORD)(bytes & 0xffffffff);
-  if(!LockFileEx(_v.h, flags, 0, bytes_low, bytes_high, &ol))
-  {
-    if(ERROR_LOCK_VIOLATION == GetLastError() && d && !d.nsecs)
-      return std::errc::timed_out;
-    if(ERROR_IO_PENDING != GetLastError())
-      return {GetLastError(), std::system_category()};
-  }
-  // If handle is overlapped, wait for completion of each i/o.
-  if(_v.is_overlapped())
-  {
-    if(STATUS_TIMEOUT == ntwait(_v.h, ol, d))
-    {
-      AFIO_WIN_DEADLINE_TO_TIMEOUT(d);
-    }
-    // It seems the NT kernel is guilty of casting bugs sometimes
-    ol.Internal = ol.Internal & 0xffffffff;
-    if(ol.Internal != 0)
-      return {ol.Internal, ntkernel_category()};
-  }
-  return extent_guard(this, offset, bytes, exclusive);
-}
-
-void io_handle::unlock(io_handle::extent_type offset, io_handle::extent_type bytes) noexcept
-{
-  AFIO_LOG_FUNCTION_CALL(_v.h);
-  OVERLAPPED ol;
-  memset(&ol, 0, sizeof(ol));
-  ol.Internal = (ULONG_PTR) -1;
-  ol.OffsetHigh = (offset >> 32) & 0xffffffff;
-  ol.Offset = offset & 0xffffffff;
-  DWORD bytes_high = !bytes ? MAXDWORD : (DWORD)((bytes >> 32) & 0xffffffff);
-  DWORD bytes_low = !bytes ? MAXDWORD : (DWORD)(bytes & 0xffffffff);
-  if(!UnlockFileEx(_v.h, 0, bytes_low, bytes_high, &ol))
-  {
-    if(ERROR_IO_PENDING != GetLastError())
-    {
-      auto ret = failure({GetLastError(), std::system_category()});
-      (void) ret;
-      AFIO_LOG_FATAL(_v.h, "io_handle::unlock() failed");
-      std::terminate();
-    }
-  }
-  // If handle is overlapped, wait for completion of each i/o.
-  if(_v.is_overlapped())
-  {
-    ntwait(_v.h, ol, deadline());
-    if(ol.Internal != 0)
-    {
-      // It seems the NT kernel is guilty of casting bugs sometimes
-      ol.Internal = ol.Internal & 0xffffffff;
-      auto ret = make_errored_result_nt<void>((NTSTATUS) ol.Internal);
-      (void) ret;
-      AFIO_LOG_FATAL(_v.h, "io_handle::unlock() failed");
-      std::terminate();
-    }
-  }
 }
 
 AFIO_V2_NAMESPACE_END

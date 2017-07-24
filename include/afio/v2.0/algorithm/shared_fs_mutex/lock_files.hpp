@@ -100,7 +100,7 @@ namespace algorithm
 
       //! Initialises a shared filing system mutex using the directory at \em lockdir
       //[[bindlib::make_free]]
-      static result<lock_files> fs_mutex_lock_files(file_handle::path_type lockdir) noexcept
+      static result<lock_files> fs_mutex_lock_files(path_view lockdir) noexcept
       {
         AFIO_LOG_FUNCTION_CALL(0);
         return lock_files(std::move(lockdir));

@@ -171,7 +171,7 @@ namespace algorithm
       observed by readers. For these, hashing can be safely disabled.
       */
       //[[bindlib::make_free]]
-      static result<atomic_append> fs_mutex_append(file_handle::path_type lockfile, bool nfs_compatibility = false, bool skip_hashing = false) noexcept
+      static result<atomic_append> fs_mutex_append(path_view lockfile, bool nfs_compatibility = false, bool skip_hashing = false) noexcept
       {
         AFIO_LOG_FUNCTION_CALL(0);
         OUTCOME_TRY(ret, file_handle::file(std::move(lockfile), file_handle::mode::write, file_handle::creation::if_needed, file_handle::caching::temporary));

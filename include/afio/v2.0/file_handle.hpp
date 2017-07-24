@@ -25,7 +25,9 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef AFIO_FILE_HANDLE_H
 #define AFIO_FILE_HANDLE_H
 
-#include "handle.hpp"
+#include "io_handle.hpp"
+#include "path_handle.hpp"
+#include "path_view.hpp"
 #include "utils.hpp"
 
 //! \file file_handle.hpp Provides file_handle
@@ -47,11 +49,8 @@ which should cause all operations using that path to fail with a usefully user
 visible error message.
 
 \mallocs Allocates storage for each path probed.
-
-\todo This function needs to become a static member function of `afio::path` once
-that is written, hence the 'fixme' in its title.
 */
-AFIO_HEADERS_ONLY_FUNC_SPEC const fixme_path &fixme_temporary_files_directory() noexcept;
+AFIO_HEADERS_ONLY_FUNC_SPEC const filesystem::path &temporary_files_directory() noexcept;
 
 class io_service;
 
@@ -63,8 +62,6 @@ async_file_handle.
 class AFIO_DECL file_handle : public io_handle
 {
 public:
-  using dev_t = uint64_t;
-  using ino_t = uint64_t;
   using path_type = io_handle::path_type;
   using extent_type = io_handle::extent_type;
   using size_type = io_handle::size_type;
@@ -80,10 +77,18 @@ public:
   template <class T> using io_request = io_handle::io_request<T>;
   template <class T> using io_result = io_handle::io_result<T>;
 
+  using dev_t = uint64_t;
+  using ino_t = uint64_t;
+  //! The path view type used by this handle
+  using path_view_type = path_view;
+
 protected:
   dev_t _devid;
   ino_t _inode;
+#ifdef __FreeBSD__  // FreeBSD can't look up the current path of file, only a directory
+  path_handle _pathbase;
   path_type _path;
+#endif
   io_service *_service;
 
   //! Fill in _devid and _inode from the handle via fstat()
@@ -99,23 +104,29 @@ public:
   {
   }
   //! Construct a handle from a supplied native handle
-  file_handle(native_handle_type h, dev_t devid, ino_t inode, path_type path, caching caching = caching::none, flag flags = flag::none)
+  file_handle(native_handle_type h, dev_t devid, ino_t inode, caching caching = caching::none, flag flags = flag::none)
       : io_handle(std::move(h), std::move(caching), std::move(flags))
       , _devid(devid)
       , _inode(inode)
-      , _path(std::move(path))
       , _service(nullptr)
   {
   }
   //! Implicit move construction of file_handle permitted
-  file_handle(file_handle &&o) noexcept : io_handle(std::move(o)), _devid(o._devid), _inode(o._inode), _path(std::move(o._path)), _service(o._service)
+  file_handle(file_handle &&o) noexcept : io_handle(std::move(o)),
+                                          _devid(o._devid),
+                                          _inode(o._inode),
+#ifdef __FreeBSD__
+                                          _pathbase(std::move(o._pathbase)),
+                                          _path(std::move(o._path)),
+#endif
+                                          _service(o._service)
   {
     o._devid = 0;
     o._inode = 0;
     o._service = nullptr;
   }
   //! Explicit conversion from handle and io_handle permitted
-  explicit file_handle(handle &&o, path_type path, dev_t devid, ino_t inode) noexcept : io_handle(std::move(o)), _devid(devid), _inode(inode), _path(std::move(path)), _service(nullptr) {}
+  explicit file_handle(handle &&o, dev_t devid, ino_t inode) noexcept : io_handle(std::move(o)), _devid(devid), _inode(inode), _service(nullptr) {}
   //! Move assignment of file_handle permitted
   file_handle &operator=(file_handle &&o) noexcept
   {
@@ -136,7 +147,7 @@ public:
   \errors Any of the values POSIX open() or CreateFile() can return.
   */
   //[[bindlib::make_free]]
-  static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<file_handle> file(path_type _path, mode _mode = mode::read, creation _creation = creation::open_existing, caching _caching = caching::all, flag flags = flag::none) noexcept;
+  static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<file_handle> file(const path_handle &base, path_view_type _path, mode _mode = mode::read, creation _creation = creation::open_existing, caching _caching = caching::all, flag flags = flag::none) noexcept;
   /*! Create a file handle creating a randomly named file on a path.
   The file is opened exclusively with `creation::only_if_not_exist` so it
   will never collide with nor overwrite any existing file. Note also
@@ -146,7 +157,7 @@ public:
   \errors Any of the values POSIX open() or CreateFile() can return.
   */
   //[[bindlib::make_free]]
-  static inline result<file_handle> random_file(path_type dirpath, mode _mode = mode::write, caching _caching = caching::temporary, flag flags = flag::none) noexcept
+  static inline result<file_handle> random_file(const path_handle &dirpath, mode _mode = mode::write, caching _caching = caching::temporary, flag flags = flag::none) noexcept
   {
     try
     {
@@ -180,7 +191,7 @@ public:
   \errors Any of the values POSIX open() or CreateFile() can return.
   */
   //[[bindlib::make_free]]
-  static inline result<file_handle> temp_file(path_type name = path_type(), mode _mode = mode::write, creation _creation = creation::if_needed, caching _caching = caching::temporary, flag flags = flag::unlink_on_close) noexcept
+  static inline result<file_handle> temp_file(path_view_type name = path_view_type(), mode _mode = mode::write, creation _creation = creation::if_needed, caching _caching = caching::temporary, flag flags = flag::unlink_on_close) noexcept
   {
     return name.empty() ? random_file(fixme_temporary_files_directory(), _mode, _caching, flags) : file(fixme_temporary_files_directory() / name, _mode, _creation, _caching, flags);
   }
@@ -195,7 +206,7 @@ public:
   \errors Any of the values POSIX open() or CreateFile() can return.
   */
   //[[bindlib::make_free]]
-  static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<file_handle> temp_inode(path_type dirpath = fixme_temporary_files_directory(), mode _mode = mode::write, flag flags = flag::none) noexcept;
+  static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<file_handle> temp_inode(path_view_type dirpath = temporary_files_directory(), mode _mode = mode::write, flag flags = flag::none) noexcept;
 
   //! Unless `flag::disable_safety_unlinks` is set, the device id of the file when opened
   dev_t st_dev() const noexcept { return _devid; }
@@ -208,10 +219,9 @@ public:
     ret.as_longlongs[1] = _inode;
     return ret;
   }
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC path_type path() const noexcept override { return _path; }
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> close() noexcept override
   {
-    AFIO_LOG_FUNCTION_CALL(_v.h);
+    AFIO_LOG_FUNCTION_CALL(this);
     if(_flags & flag::unlink_on_close)
     {
       auto ret = unlink();
@@ -232,35 +242,6 @@ public:
   */
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<file_handle> clone() const noexcept;
 
-#if 0
-  /*! Returns the current path of the open handle as said by the operating system. Note
-  that you are NOT guaranteed that any path refreshed bears any resemblance to the original,
-  many operating systems will return some different path which still reaches the same inode
-  via some other route.
-
-  Detection of unlinked files varies from platform to platform. Handling of inodes with
-  multiple paths (hardlinks) also varies from platform to platform. AFIO v2 returns
-  an empty path where it finds that the path returned by the OS does not have an inode
-  matching the current open file.
-
-  \subsection OS specific behaviours
-  On Windows, refreshing the path ALWAYS converts the cached path into a native NT kernel
-  path, destroying permanently any Win32 original path. It is non-trivial to map NT kernel
-  paths onto some Win32 equivalent. On FreeBSD, only the current path for directories can
-  be retrieved, fetching it for files currently does not work due to lack of kernel
-  support. On OS X, this is particularly flaky due to the OS X kernel, be careful.
-  */
-  result<path_type> current_path() const noexcept;
-
-  /*! Returns the cached path that this file handle was opened with.
-
-  If \em refresh is true, attempts to retrieve the current path of the open handle using
-  `current_path()`, if successful updating the cached copy with the newly retrieved path.
-  You should read the documentation for `current_path()` for list of the many caveats.
-  */
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC path_type path(bool refresh = false) noexcept;
-#endif
-
   /*! Atomically relinks the current path of this open handle to the new path specified,
   \b atomically and silently replacing any item at the new path specified. This operation
   is both atomic and silent matching POSIX behaviour even on Microsoft Windows where
@@ -268,9 +249,10 @@ public:
 
   \warning Some operating systems provide a race free syscall for renaming an open handle (Windows).
   On all other operating systems this call is \b racy and can result in the wrong file entry being
-  deleted. Note that unless `flag::disable_safety_unlinks` is set, this implementation checks
-  before relinking that the item about to be relinked has the same inode as the open file handle.
-  This should prevent most unmalicious accidental loss of data.
+  deleted. Note that unless `flag::disable_safety_unlinks` is set, this implementation opens a
+  `path_handle` to the two containing directories first, then checks before relinking that the item
+  about to be relinked has the same inode as the open file handle. This should prevent most unmalicious
+  accidental loss of data.
 
   \return The full new path of the relinked filesystem entry.
   \param newpath The optionally partial new path to relink to. The current path is used as a base
@@ -286,9 +268,9 @@ public:
 
   \warning Some operating systems provide a race free syscall for unlinking an open handle (Windows).
   On all other operating systems this call is \b racy and can result in the wrong file entry being
-  deleted. Note that unless `flag::disable_safety_unlinks` is set, this implementation checks
-  before unlinking that the item about to be unlinked has the same inode as the open file handle.
-  This should prevent most unmalicious accidental loss of data.
+  deleted. Note that unless `flag::disable_safety_unlinks` is set, this implementation opens a
+  `path_handle` to the containing directory first, then checks that the item about to be unlinked
+  has the same inode as the open file handle. This should prevent most unmalicious accidental loss of data.
   */
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> unlink() noexcept;
 

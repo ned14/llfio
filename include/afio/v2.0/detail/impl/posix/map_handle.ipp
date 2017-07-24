@@ -45,7 +45,7 @@ result<section_handle> section_handle::section(file_handle &backing, extent_type
     maximum_size = utils::round_up_to_page_size(maximum_size);
   result<section_handle> ret(section_handle(native_handle_type(), backing.is_valid() ? &backing : nullptr, maximum_size, _flag));
   // There are no section handles on POSIX, so do nothing
-  AFIO_LOG_FUNCTION_CALL(ret.value()._v.fd);
+  AFIO_LOG_FUNCTION_CALL(&ret);
   return ret;
 }
 
@@ -74,7 +74,7 @@ map_handle::~map_handle()
 
 result<void> map_handle::close() noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(_addr);
+  AFIO_LOG_FUNCTION_CALL(this);
   if(_addr)
   {
     if(-1 == ::munmap(_addr, _length))
@@ -89,7 +89,7 @@ result<void> map_handle::close() noexcept
 
 native_handle_type map_handle::release() noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(_v.h);
+  AFIO_LOG_FUNCTION_CALL(this);
   // We don't want ~handle() to close our borrowed handle
   _v = native_handle_type();
   _addr = nullptr;
@@ -99,7 +99,7 @@ native_handle_type map_handle::release() noexcept
 
 map_handle::io_result<map_handle::const_buffers_type> map_handle::barrier(map_handle::io_request<map_handle::const_buffers_type> reqs, bool wait_for_device, bool and_metadata, deadline d) noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(_v.fd);
+  AFIO_LOG_FUNCTION_CALL(this);
   char *addr = _addr + reqs.offset;
   extent_type bytes = 0;
   for(const auto &req : reqs.buffers)
@@ -177,7 +177,7 @@ result<map_handle> map_handle::map(size_type bytes, section_handle::flag _flag) 
   OUTCOME_TRY(addr, do_mmap(nativeh, nullptr, nullptr, bytes, 0, _flag));
   ret.get()._addr = (char *) addr;
   ret.get()._length = bytes;
-  AFIO_LOG_FUNCTION_CALL(ret.get()._v.fd);
+  AFIO_LOG_FUNCTION_CALL(&ret);
   return ret;
 }
 
@@ -203,13 +203,13 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
   ret.get()._length = _bytes;
   // Make my handle borrow the native handle of my backing storage
   ret.get()._v.fd = section.backing_native_handle().fd;
-  AFIO_LOG_FUNCTION_CALL(ret.get()._v.fd);
+  AFIO_LOG_FUNCTION_CALL(&ret);
   return ret;
 }
 
 result<map_handle::buffer_type> map_handle::commit(buffer_type region, section_handle::flag _flag) noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(_v.fd);
+  AFIO_LOG_FUNCTION_CALL(this);
   if(!region.first)
     return make_errored_result<map_handle::buffer_type>(std::errc::invalid_argument);
   // Set permissions on the pages
@@ -225,7 +225,7 @@ result<map_handle::buffer_type> map_handle::commit(buffer_type region, section_h
 
 result<map_handle::buffer_type> map_handle::decommit(buffer_type region) noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(_v.h);
+  AFIO_LOG_FUNCTION_CALL(this);
   if(!region.first)
     return make_errored_result<map_handle::buffer_type>(std::errc::invalid_argument);
   region = utils::round_to_page_size(region);
@@ -241,7 +241,7 @@ result<map_handle::buffer_type> map_handle::decommit(buffer_type region) noexcep
 
 result<void> map_handle::zero_memory(buffer_type region) noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(_v.fd);
+  AFIO_LOG_FUNCTION_CALL(this);
   if(!region.first)
     return make_errored_result<void>(std::errc::invalid_argument);
 #ifdef MADV_REMOVE
@@ -290,7 +290,7 @@ result<map_handle::buffer_type> map_handle::do_not_store(buffer_type region) noe
 
 map_handle::io_result<map_handle::buffers_type> map_handle::read(io_request<buffers_type> reqs, deadline) noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(_v.fd);
+  AFIO_LOG_FUNCTION_CALL(this);
   char *addr = _addr + reqs.offset;
   size_type togo = reqs.offset < _length ? (size_type)(_length - reqs.offset) : 0;
   for(buffer_type &req : reqs.buffers)
@@ -311,7 +311,7 @@ map_handle::io_result<map_handle::buffers_type> map_handle::read(io_request<buff
 
 map_handle::io_result<map_handle::const_buffers_type> map_handle::write(io_request<const_buffers_type> reqs, deadline) noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(_v.fd);
+  AFIO_LOG_FUNCTION_CALL(this);
   char *addr = _addr + reqs.offset;
   size_type togo = reqs.offset < _length ? (size_type)(_length - reqs.offset) : 0;
   for(const_buffer_type &req : reqs.buffers)

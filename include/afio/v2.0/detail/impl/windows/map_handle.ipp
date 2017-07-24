@@ -94,15 +94,14 @@ result<section_handle> section_handle::section(file_handle &backing, extent_type
   // InitializeObjectAttributes(&ObjectAttributes, &NULL, 0, NULL, NULL);
   LARGE_INTEGER _maximum_size;
   _maximum_size.QuadPart = maximum_size;
+  AFIO_LOG_FUNCTION_CALL(&ret);
   HANDLE h;
   NTSTATUS ntstat = NtCreateSection(&h, SECTION_ALL_ACCESS, NULL, &_maximum_size, prot, attribs, backing.is_valid() ? backing.native_handle().h : NULL);
   if(STATUS_SUCCESS != ntstat)
   {
-    AFIO_LOG_FUNCTION_CALL(0);
     return make_errored_result_nt<section_handle>(ntstat);
   }
   nativeh.h = h;
-  AFIO_LOG_FUNCTION_CALL(nativeh.h);
   return ret;
 }
 
@@ -139,7 +138,7 @@ result<void> map_handle::close() noexcept
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
-  AFIO_LOG_FUNCTION_CALL(_addr);
+  AFIO_LOG_FUNCTION_CALL(this);
   if(_addr)
   {
     if(_section)
@@ -163,7 +162,7 @@ result<void> map_handle::close() noexcept
 
 native_handle_type map_handle::release() noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(_v.h);
+  AFIO_LOG_FUNCTION_CALL(this);
   // We don't want ~handle() to close our borrowed handle
   _v = native_handle_type();
   _addr = nullptr;
@@ -173,7 +172,7 @@ native_handle_type map_handle::release() noexcept
 
 map_handle::io_result<map_handle::const_buffers_type> map_handle::barrier(map_handle::io_request<map_handle::const_buffers_type> reqs, bool wait_for_device, bool and_metadata, deadline d) noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(_v.h);
+  AFIO_LOG_FUNCTION_CALL(this);
   char *addr = _addr + reqs.offset;
   extent_type bytes = 0;
   for(const auto &req : reqs.buffers)
@@ -220,12 +219,12 @@ result<map_handle> map_handle::map(size_type bytes, section_handle::flag _flag) 
     prot = PAGE_EXECUTE_WRITECOPY;
   else if(_flag & section_handle::flag::execute)
     prot = PAGE_EXECUTE;
+  AFIO_LOG_FUNCTION_CALL(&ret);
   addr = VirtualAlloc(nullptr, bytes, allocation, prot);
   if(!addr)
     return {GetLastError(), std::system_category()};
   ret.value()._addr = (char *) addr;
   ret.value()._length = bytes;
-  AFIO_LOG_FUNCTION_CALL(ret.value()._v.h);
 
   // Windows has no way of getting the kernel to prefault maps on creation, so ...
   if(_flag & section_handle::flag::prefault)
@@ -290,10 +289,10 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
     prot = PAGE_EXECUTE_WRITECOPY;
   else if(_flag & section_handle::flag::execute)
     prot = PAGE_EXECUTE;
+  AFIO_LOG_FUNCTION_CALL(&ret);
   NTSTATUS ntstat = NtMapViewOfSection(section.native_handle().h, GetCurrentProcess(), &addr, 0, commitsize, &_offset, &_bytes, ViewUnmap, allocation, prot);
   if(STATUS_SUCCESS != ntstat)
   {
-    AFIO_LOG_FUNCTION_CALL(0);
     return make_errored_result_nt<map_handle>(ntstat);
   }
   ret.value()._addr = (char *) addr;
@@ -301,7 +300,6 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
   ret.value()._length = _bytes;
   // Make my handle borrow the native handle of my backing storage
   ret.value()._v.h = section.backing_native_handle().h;
-  AFIO_LOG_FUNCTION_CALL(ret.value()._v.h);
 
   // Windows has no way of getting the kernel to prefault maps on creation, so ...
   if(_flag & section_handle::flag::prefault)
@@ -323,7 +321,7 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
 
 result<map_handle::buffer_type> map_handle::commit(buffer_type region, section_handle::flag _flag) noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(_v.h);
+  AFIO_LOG_FUNCTION_CALL(this);
   if(!region.first)
     return std::errc::invalid_argument;
   DWORD prot = 0;
@@ -359,7 +357,7 @@ result<map_handle::buffer_type> map_handle::commit(buffer_type region, section_h
 
 result<map_handle::buffer_type> map_handle::decommit(buffer_type region) noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(_v.h);
+  AFIO_LOG_FUNCTION_CALL(this);
   if(!region.first)
     return std::errc::invalid_argument;
   region = utils::round_to_page_size(region);
@@ -370,7 +368,7 @@ result<map_handle::buffer_type> map_handle::decommit(buffer_type region) noexcep
 
 result<void> map_handle::zero_memory(buffer_type region) noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(_v.h);
+  AFIO_LOG_FUNCTION_CALL(this);
   if(!region.first)
     return std::errc::invalid_argument;
   //! \todo Once you implement file_handle::zero(), please implement map_handle::zero()
@@ -422,7 +420,7 @@ result<map_handle::buffer_type> map_handle::do_not_store(buffer_type region) noe
 
 map_handle::io_result<map_handle::buffers_type> map_handle::read(io_request<buffers_type> reqs, deadline) noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(_v.h);
+  AFIO_LOG_FUNCTION_CALL(this);
   char *addr = _addr + reqs.offset;
   size_type togo = reqs.offset < _length ? (size_type)(_length - reqs.offset) : 0;
   for(buffer_type &req : reqs.buffers)
@@ -443,7 +441,7 @@ map_handle::io_result<map_handle::buffers_type> map_handle::read(io_request<buff
 
 map_handle::io_result<map_handle::const_buffers_type> map_handle::write(io_request<const_buffers_type> reqs, deadline) noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(_v.h);
+  AFIO_LOG_FUNCTION_CALL(this);
   char *addr = _addr + reqs.offset;
   size_type togo = reqs.offset < _length ? (size_type)(_length - reqs.offset) : 0;
   for(const_buffer_type &req : reqs.buffers)

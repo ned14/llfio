@@ -32,7 +32,7 @@ AFIO_V2_NAMESPACE_BEGIN
 
 AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> stat_t::fill(const handle &h, stat_t::want wanted) noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(h.native_handle().h);
+  AFIO_LOG_FUNCTION_CALL(&h);
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
   alignas(8) fixme_path::value_type buffer[32769];
@@ -117,7 +117,7 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> stat_t::fill(const handle &h, stat
       REPARSE_DATA_BUFFER *rpd = (REPARSE_DATA_BUFFER *) buffer_;
       memset(rpd, 0, sizeof(*rpd));
       if(!DeviceIoControl(h.native_handle().h, FSCTL_GET_REPARSE_POINT, NULL, 0, rpd, sizeof(buffer_), &written, NULL))
-        return make_errored_result<size_t>(GetLastError(), last190(h.path().u8string()));
+        return {GetLastError(), std::system_category()};
       ReparsePointTag = rpd->ReparseTag;
     }
     st_type = windows_nt_kernel::to_st_type(fai.BasicInformation.FileAttributes, ReparsePointTag);
