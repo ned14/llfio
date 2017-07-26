@@ -204,12 +204,12 @@ namespace algorithm
       a degraded state (i.e. just use the fallback lock directly).
       */
       //[[bindlib::make_free]]
-      static result<memory_map> fs_mutex_map(path_view lockfile, shared_fs_mutex *fallbacklock = nullptr) noexcept
+      static result<memory_map> fs_mutex_map(const path_handle &base, path_view lockfile, shared_fs_mutex *fallbacklock = nullptr) noexcept
       {
         AFIO_LOG_FUNCTION_CALL(0);
         try
         {
-          OUTCOME_TRY(ret, file_handle::file(std::move(lockfile), file_handle::mode::write, file_handle::creation::if_needed, file_handle::caching::reads));
+          OUTCOME_TRY(ret, file_handle::file(base, lockfile, file_handle::mode::write, file_handle::creation::if_needed, file_handle::caching::reads));
           file_handle temph;
           // Am I the first person to this file? Lock the inuse exclusively
           auto lockinuse = ret.try_lock(_lockinuseoffset, 1, true);
@@ -226,13 +226,13 @@ namespace algorithm
               OUTCOME_TRY(_, ret.read(0, buffer, 65535));
               (void) _;
             }
-            fixme_path::value_type *temphpath = (fixme_path::value_type *) buffer;
+            path_view temphpath((filesystem::path::value_type *) buffer);
             result<file_handle> _temph(in_place_type<file_handle>);
             // If path is zeroed, fall back onto backup lock
             if(!buffer[0])
               goto use_fall_back_lock;
             else
-              _temph = file_handle::file(temphpath, file_handle::mode::write, file_handle::creation::open_existing, file_handle::caching::temporary);
+              _temph = file_handle::file({}, temphpath, file_handle::mode::write, file_handle::creation::open_existing, file_handle::caching::temporary);
             // If temp file doesn't exist, I am on a different machine
             if(!_temph)
             {
@@ -267,9 +267,10 @@ namespace algorithm
           {
             // I am the first person to be using this (stale?) file, so create a new hash index file and write its path
             OUTCOME_TRYV(ret.truncate(0));
-            OUTCOME_TRY(_temph, file_handle::random_file(fixme_temporary_files_directory()));
+            OUTCOME_TRY(tempdirh, path_handle::path(temporary_files_directory()));
+            OUTCOME_TRY(_temph, file_handle::random_file(tempdirh));
             temph = std::move(_temph);
-            auto temppath(temph.path());
+            OUTCOME_TRY(temppath, temph.current_path());
             OUTCOME_TRYV(temph.truncate(HashIndexSize));
             /* Linux appears to have a race where:
                  1. This process creates a new file and fallocate's its maximum extent.
@@ -420,7 +421,7 @@ namespace algorithm
           if(!spin_not_sleep)
             std::this_thread::yield();
         }
-        // return make_valued_result<void>();
+        // return success();
       }
 
     public:

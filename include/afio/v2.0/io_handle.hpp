@@ -78,16 +78,13 @@ public:
   template <class T> class io_result : public result<T>
   {
     using Base = result<T>;
-    size_type _bytes_transferred;
+    size_type _bytes_transferred{(size_type) -1};
 
   public:
-    constexpr io_result() noexcept : _bytes_transferred((size_type) -1) {}
-    template <class... Args>
-    io_result(Args &&... args)
-        : result<T>(std::forward<Args>(args)...)
-        , _bytes_transferred((size_type) -1)
-    {
-    }
+    using Base::Base;
+    constexpr io_result() = default;
+    io_result(const io_result &) = default;
+    io_result(io_result &&) = default;
     io_result &operator=(const io_result &) = default;
     io_result &operator=(io_result &&) = default;
     //! Returns bytes transferred

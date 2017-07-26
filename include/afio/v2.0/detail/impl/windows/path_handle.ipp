@@ -69,10 +69,12 @@ result<path_handle> path_handle::path(const path_handle &base, path_handle::path
 
     LARGE_INTEGER AllocationSize;
     memset(&AllocationSize, 0, sizeof(AllocationSize));
-    std::error_code ec((int) NtCreateFile(&nativeh.h, access, &oa, &isb, &AllocationSize, attribs, fileshare, creatdisp, ntflags, NULL, 0), ntkernel_category());
-    if(ec && ec.value() < 0)
+    NTSTATUS ntstat = NtCreateFile(&nativeh.h, access, &oa, &isb, &AllocationSize, attribs, fileshare, creatdisp, ntflags, NULL, 0);
+    if(STATUS_PENDING == ntstat)
+      ntstat = ntwait(nativeh.h, isb, deadline());
+    if(ntstat < 0)
     {
-      return ec;
+      return {(int) ntstat, ntkernel_category()};
     }
   }
   else
@@ -84,7 +86,7 @@ result<path_handle> path_handle::path(const path_handle &base, path_handle::path
     {
       DWORD errcode = GetLastError();
       // assert(false);
-      return {errcode, std::system_category()};
+      return {(int) errcode, std::system_category()};
     }
   }
   return ret;

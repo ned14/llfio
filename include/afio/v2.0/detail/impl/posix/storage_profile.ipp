@@ -22,17 +22,17 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#include "../../../storage_profile.hpp"
 #include "../../../handle.hpp"
+#include "../../../storage_profile.hpp"
 
-#include <unistd.h>
-#include <sys/utsname.h>  // for uname()
 #include <sys/ioctl.h>
+#include <sys/utsname.h>  // for uname()
+#include <unistd.h>
 #if defined(__linux__)
-# include <linux/fs.h>
+#include <linux/fs.h>
 #else
-# include <sys/sysctl.h>
-# include <sys/disk.h>
+#include <sys/disk.h>
+#include <sys/sysctl.h>
 #endif
 
 AFIO_V2_NAMESPACE_BEGIN
@@ -45,7 +45,7 @@ namespace storage_profile
     outcome<void> os(storage_profile &sp, file_handle &) noexcept
     {
       static std::string os_name, os_ver;
-      if (!os_name.empty())
+      if(!os_name.empty())
       {
         sp.os_name.value = os_name;
         sp.os_ver.value = os_ver;
@@ -56,17 +56,17 @@ namespace storage_profile
         {
           struct utsname name;
           memset(&name, 0, sizeof(name));
-          if(uname(&name)<0)
-            return make_errored_outcome<void>(errno);
+          if(uname(&name) < 0)
+            return {errno, std::system_category()};
           sp.os_name.value = os_name = name.sysname;
           sp.os_ver.value = os_ver = name.release;
         }
-        catch (...)
+        catch(...)
         {
           return std::current_exception();
         }
       }
-      return make_valued_outcome<void>();
+      return success();
     }
 
     // CPU name, architecture, physical cores
@@ -74,7 +74,7 @@ namespace storage_profile
     {
       static std::string cpu_name, cpu_architecture;
       static unsigned cpu_physical_cores;
-      if (!cpu_name.empty())
+      if(!cpu_name.empty())
       {
         sp.cpu_name.value = cpu_name;
         sp.cpu_architecture.value = cpu_architecture;
@@ -86,50 +86,52 @@ namespace storage_profile
         {
           struct utsname name;
           memset(&name, 0, sizeof(name));
-          if(uname(&name)<0)
-            return make_errored_outcome<void>(errno);
+          if(uname(&name) < 0)
+            return {errno, std::system_category()};
           sp.cpu_name.value = sp.cpu_architecture.value = name.machine;
           sp.cpu_physical_cores.value = 0;
 #if defined(__linux__)
           {
-            int ih=::open("/proc/cpuinfo", O_RDONLY);
-            if(ih>=0)
+            int ih = ::open("/proc/cpuinfo", O_RDONLY);
+            if(ih >= 0)
             {
               char cpuinfo[8192];
-              cpuinfo[::read(ih, cpuinfo, sizeof(cpuinfo)-1)]=0;
+              cpuinfo[ ::read(ih, cpuinfo, sizeof(cpuinfo) - 1)] = 0;
               ::close(ih);
               /* If siblings > cpu cores hyperthread is enabled:
               siblings   : 8
               cpu cores  : 4
               */
-              const char *siblings=strstr(cpuinfo, "siblings");
-              const char *cpucores=strstr(cpuinfo, "cpu cores");
+              const char *siblings = strstr(cpuinfo, "siblings");
+              const char *cpucores = strstr(cpuinfo, "cpu cores");
               if(siblings && cpucores)
               {
-                for(siblings=strchr(siblings, ':'); ' '==*siblings; siblings++);
-                for(cpucores=strchr(cpucores, ':'); ' '==*cpucores; cpucores++);
-                int s=atoi(siblings), c=atoi(cpucores);
+                for(siblings = strchr(siblings, ':'); ' ' == *siblings; siblings++)
+                  ;
+                for(cpucores = strchr(cpucores, ':'); ' ' == *cpucores; cpucores++)
+                  ;
+                int s = atoi(siblings), c = atoi(cpucores);
                 if(s && c)
-                  sp.cpu_physical_cores.value = sysconf( _SC_NPROCESSORS_ONLN ) * c / s;
+                  sp.cpu_physical_cores.value = sysconf(_SC_NPROCESSORS_ONLN) * c / s;
               }
             }
           }
 #else
           // Currently only available on OS X
           {
-            int physicalCores=0;
-            size_t len=sizeof(physicalCores);
-            if(sysctlbyname("hw.physicalcpu", &physicalCores, &len, NULL, 0)>=0)
-              sp.cpu_physical_cores.value=physicalCores;
+            int physicalCores = 0;
+            size_t len = sizeof(physicalCores);
+            if(sysctlbyname("hw.physicalcpu", &physicalCores, &len, NULL, 0) >= 0)
+              sp.cpu_physical_cores.value = physicalCores;
           }
           if(!sp.cpu_physical_cores.value)
           {
             char topology[8192];
-            size_t len=sizeof(topology)-1;
-            if(sysctlbyname("kern.sched.topology_spec", topology, &len, NULL, 0)>=0)
+            size_t len = sizeof(topology) - 1;
+            if(sysctlbyname("kern.sched.topology_spec", topology, &len, NULL, 0) >= 0)
             {
-              topology[len]=0;
-              sp.cpu_physical_cores.value = sysconf( _SC_NPROCESSORS_ONLN );
+              topology[len] = 0;
+              sp.cpu_physical_cores.value = sysconf(_SC_NPROCESSORS_ONLN);
               if(strstr(topology, "HTT"))
                 sp.cpu_physical_cores.value /= 2;
             }
@@ -137,39 +139,36 @@ namespace storage_profile
 #endif
           // Doesn't account for any hyperthreading
           if(!sp.cpu_physical_cores.value)
-            sp.cpu_physical_cores.value = sysconf( _SC_NPROCESSORS_ONLN );
+            sp.cpu_physical_cores.value = sysconf(_SC_NPROCESSORS_ONLN);
 #if defined(__i386__) || defined(_M_IX86) || defined(__x86_64__) || defined(_M_X64)
           // We can do a much better CPU name on x86/x64
           sp.cpu_name.value.clear();
-          auto __cpuid=[](int *cpuInfo, int func)
-          {
-            __asm__ __volatile__ ("cpuid\n\t" : "=a" (cpuInfo[0]), "=b" (cpuInfo[1]), "=c" (cpuInfo[2]), "=d" (cpuInfo[3]) : "0" (func));
-          };
+          auto __cpuid = [](int *cpuInfo, int func) { __asm__ __volatile__("cpuid\n\t" : "=a"(cpuInfo[0]), "=b"(cpuInfo[1]), "=c"(cpuInfo[2]), "=d"(cpuInfo[3]) : "0"(func)); };
           {
             char buffer[62];
             memset(buffer, 32, 62);
             int nBuff[4];
             __cpuid(nBuff, 0);
-            memcpy(buffer+0, nBuff+1, 4);
-            *(int*)(buffer+4) = nBuff[3];
-            *(int*)(buffer+8) = nBuff[2];
+            memcpy(buffer + 0, nBuff + 1, 4);
+            *(int *) (buffer + 4) = nBuff[3];
+            *(int *) (buffer + 8) = nBuff[2];
 
             // Do we have a brand string?
             __cpuid(nBuff, 0x80000000);
-            if ((unsigned)nBuff[0] >= 0x80000004)
+            if((unsigned) nBuff[0] >= 0x80000004)
             {
-              __cpuid((int*)&buffer[14], 0x80000002);
-              __cpuid((int*)&buffer[30], 0x80000003);
-              __cpuid((int*)&buffer[46], 0x80000004);
+              __cpuid((int *) &buffer[14], 0x80000002);
+              __cpuid((int *) &buffer[30], 0x80000003);
+              __cpuid((int *) &buffer[46], 0x80000004);
             }
             else
               strcpy(&buffer[14], "unbranded");
 
             // Trim string
-            for (size_t n = 0; n < 62; n++)
+            for(size_t n = 0; n < 62; n++)
             {
-              if (!n || buffer[n] != 32 || buffer[n - 1] != 32)
-                if (buffer[n])
+              if(!n || buffer[n] != 32 || buffer[n - 1] != 32)
+                if(buffer[n])
                   sp.cpu_name.value.push_back(buffer[n]);
             }
           }
@@ -178,37 +177,37 @@ namespace storage_profile
           cpu_architecture = sp.cpu_architecture.value;
           cpu_physical_cores = sp.cpu_physical_cores.value;
         }
-        catch (...)
+        catch(...)
         {
           return std::current_exception();
         }
       }
-      return make_valued_outcome<void>();
+      return success();
     }
     namespace posix
     {
       outcome<void> _mem(storage_profile &sp, file_handle &) noexcept
       {
 #if defined(_SC_PHYS_PAGES)
-        size_t physpages=sysconf (_SC_PHYS_PAGES), pagesize=sysconf (_SC_PAGESIZE);
-        sp.mem_quantity.value = (unsigned long long)physpages * pagesize;
+        size_t physpages = sysconf(_SC_PHYS_PAGES), pagesize = sysconf(_SC_PAGESIZE);
+        sp.mem_quantity.value = (unsigned long long) physpages * pagesize;
 #if defined(_SC_AVPHYS_PAGES)
-        size_t freepages=sysconf (_SC_AVPHYS_PAGES);
-        sp.mem_in_use.value = (float)(physpages - freepages) / physpages;
+        size_t freepages = sysconf(_SC_AVPHYS_PAGES);
+        sp.mem_in_use.value = (float) (physpages - freepages) / physpages;
 #elif defined(HW_USERMEM)
-        unsigned long long freemem=0;
+        unsigned long long freemem = 0;
         size_t len = sizeof(freemem);
-        int mib[2] = { CTL_HW, HW_USERMEM };
-        if (sysctl (mib, 2, &freemem, &len, nullptr, 0) >= 0)
+        int mib[2] = {CTL_HW, HW_USERMEM};
+        if(sysctl(mib, 2, &freemem, &len, nullptr, 0) >= 0)
         {
-          size_t freepages=(size_t)(freemem/pagesize);
-          sp.mem_in_use.value = (float)(physpages - freepages) / physpages;          
+          size_t freepages = (size_t)(freemem / pagesize);
+          sp.mem_in_use.value = (float) (physpages - freepages) / physpages;
         }
 #else
 #error Do not know how to get free physical RAM on this platform
 #endif
-#endif        
-        return make_valued_outcome<void>();
+#endif
+        return success();
       }
     }
   }
@@ -225,49 +224,54 @@ namespace storage_profile
           if(!strncmp(mntfromname.data(), "/dev", 4))
           {
             if(std::isdigit(mntfromname.back()))
-              mntfromname.resize(mntfromname.size()-1);
+              mntfromname.resize(mntfromname.size() - 1);
           }
           else
           {
-            // If the mount point doesn't begin with /dev we can't use that here, so return ENOSYS
+// If the mount point doesn't begin with /dev we can't use that here, so return ENOSYS
 #ifdef __FreeBSD__
             // If on ZFS and there is exactly one physical disk in the system, use that
-            if(fstypename=="zfs")
+            if(fstypename == "zfs")
             {
               char buffer[4096];
-              size_t len=sizeof(buffer);
-              if(sysctlbyname("kern.disks",buffer, &len, NULL, 0)>=0)
+              size_t len = sizeof(buffer);
+              if(sysctlbyname("kern.disks", buffer, &len, NULL, 0) >= 0)
               {
                 mntfromname.clear();
                 // Might be a string like "ada0 cd0 ..."
-                const char *s, *e=buffer;
-                for(; e<buffer+len; e++)
+                const char *s, *e = buffer;
+                for(; e < buffer + len; e++)
                 {
-                  for(s=e; e<buffer+len && *e!=' '; e++);
-                  if(s[0]=='c' && s[1]=='d') continue;
-                  if(s[0]=='f' && s[1]=='d') continue;
-                  if(s[0]=='m' && s[1]=='c' && s[2]=='d') continue;
-                  if(s[0]=='s' && s[1]=='c' && s[2]=='d') continue;
+                  for(s = e; e < buffer + len && *e != ' '; e++)
+                    ;
+                  if(s[0] == 'c' && s[1] == 'd')
+                    continue;
+                  if(s[0] == 'f' && s[1] == 'd')
+                    continue;
+                  if(s[0] == 'm' && s[1] == 'c' && s[2] == 'd')
+                    continue;
+                  if(s[0] == 's' && s[1] == 'c' && s[2] == 'd')
+                    continue;
                   // Is there more than one physical disk device?
                   if(!mntfromname.empty())
-                    return make_errored_outcome<void>(std::errc::function_not_supported);
-                  mntfromname="/dev/"+std::string(s, e-s);
+                    return std::errc::function_not_supported;
+                  mntfromname = "/dev/" + std::string(s, e - s);
                 }
               }
               else
-                return make_errored_outcome<void>(std::errc::function_not_supported);
+                return std::errc::function_not_supported;
             }
             else
-#endif            
-            return make_errored_outcome<void>(std::errc::function_not_supported);
+#endif
+              return std::errc::function_not_supported;
           }
-          OUTCOME_TRY(deviceh, file_handle::file(mntfromname, handle::mode::none, handle::creation::open_existing, handle::caching::only_metadata));
+          OUTCOME_TRY(deviceh, file_handle::file({}, mntfromname, handle::mode::none, handle::creation::open_existing, handle::caching::only_metadata));
 
-          // TODO See https://github.com/baruch/diskscan/blob/master/arch/arch-linux.c
-          //          sp.controller_type.value = "SCSI";
-          //          sp.controller_max_transfer.value = sad->MaximumTransferLength;
-          //          sp.controller_max_buffers.value = sad->MaximumPhysicalPages;
-          //          sp.device_name.value.resize(sp.device_name.value.size() - 1);
+// TODO See https://github.com/baruch/diskscan/blob/master/arch/arch-linux.c
+//          sp.controller_type.value = "SCSI";
+//          sp.controller_max_transfer.value = sad->MaximumTransferLength;
+//          sp.controller_max_buffers.value = sad->MaximumPhysicalPages;
+//          sp.device_name.value.resize(sp.device_name.value.size() - 1);
 
 #ifdef DIOCGMEDIASIZE
           // BSDs
@@ -282,11 +286,11 @@ namespace storage_profile
           ioctl(deviceh.native_handle().fd, DKIOCGETBLOCKCOUNT, &sp.device_size.value);
 #endif
         }
-        catch (...)
+        catch(...)
         {
           return std::current_exception();
         }
-        return make_valued_outcome<void>();
+        return success();
       }
     }
   }

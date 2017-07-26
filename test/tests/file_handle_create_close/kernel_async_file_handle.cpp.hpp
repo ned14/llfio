@@ -29,7 +29,7 @@ namespace file_handle_create_close
   AFIO_TEST_KERNEL_DECL AFIO_V2_NAMESPACE::result<AFIO_V2_NAMESPACE::async_file_handle> test_kernel_async_file_handle(AFIO_V2_NAMESPACE::async_file_handle::mode m, AFIO_V2_NAMESPACE::async_file_handle::creation c, AFIO_V2_NAMESPACE::async_file_handle::flag f)
   {
     AFIO_V2_NAMESPACE::io_service service;
-    auto h = AFIO_V2_NAMESPACE::async_file_handle::async_file(service, "testfile.txt", m, c, AFIO_V2_NAMESPACE::async_file_handle::caching::all, f);
+    auto h = AFIO_V2_NAMESPACE::async_file_handle::async_file(service, {}, "testfile.txt", m, c, AFIO_V2_NAMESPACE::async_file_handle::caching::all, f);
     if(h)
       h.value().close().value();
     return h;

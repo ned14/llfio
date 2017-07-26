@@ -22,18 +22,16 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#include "../../../handle.hpp"
+#include "../../../file_handle.hpp"
 
 #include "../../../stat.hpp"
-
-#include <fcntl.h>
-#include <unistd.h>
+#include "import.hpp"
 
 AFIO_V2_NAMESPACE_BEGIN
 
 // allocate at process start to ensure later failure to allocate won't cause failure
-static fixme_path temporary_files_directory_("/tmp/no_temporary_directories_accessible");
-const fixme_path &fixme_temporary_files_directory() noexcept
+static filesystem::path temporary_files_directory_("/tmp/no_temporary_directories_accessible");
+AFIO_HEADERS_ONLY_FUNC_SPEC path_view temporary_files_directory() noexcept
 {
   static struct temporary_files_directory_done_
   {
@@ -41,7 +39,7 @@ const fixme_path &fixme_temporary_files_directory() noexcept
     {
       try
       {
-        fixme_path::string_type buffer;
+        filesystem::path::string_type buffer;
         auto testpath = [&]() {
           size_t len = buffer.size();
           if(buffer[len - 1] == '/')
@@ -99,103 +97,75 @@ const fixme_path &fixme_temporary_files_directory() noexcept
   return temporary_files_directory_;
 }
 
-inline result<int> attribs_from_handle_mode_caching_and_flags(native_handle_type &nativeh, file_handle::mode _mode, file_handle::creation _creation, file_handle::caching _caching, file_handle::flag) noexcept
-{
-  int attribs = 0;
-  switch(_mode)
-  {
-  case file_handle::mode::unchanged:
-    return make_errored_result<int>(std::errc::invalid_argument);
-  case file_handle::mode::none:
-    break;
-  case file_handle::mode::attr_read:
-  case file_handle::mode::read:
-    attribs = O_RDONLY;
-    nativeh.behaviour |= native_handle_type::disposition::seekable | native_handle_type::disposition::readable;
-    break;
-  case file_handle::mode::attr_write:
-  case file_handle::mode::write:
-    attribs = O_RDWR;
-    nativeh.behaviour |= native_handle_type::disposition::seekable | native_handle_type::disposition::readable | native_handle_type::disposition::writable;
-    break;
-  case file_handle::mode::append:
-    attribs = O_APPEND;
-    nativeh.behaviour |= native_handle_type::disposition::writable | native_handle_type::disposition::append_only;
-    break;
-  }
-  switch(_creation)
-  {
-  case file_handle::creation::open_existing:
-    break;
-  case file_handle::creation::only_if_not_exist:
-    attribs |= O_CREAT | O_EXCL;
-    break;
-  case file_handle::creation::if_needed:
-    attribs |= O_CREAT;
-    break;
-  case file_handle::creation::truncate:
-    attribs |= O_TRUNC;
-    break;
-  }
-  switch(_caching)
-  {
-  case file_handle::caching::unchanged:
-    return make_errored_result<int>(std::errc::invalid_argument);
-  case file_handle::caching::none:
-    attribs |= O_SYNC | O_DIRECT;
-    nativeh.behaviour |= native_handle_type::disposition::aligned_io;
-    break;
-  case file_handle::caching::only_metadata:
-    attribs |= O_DIRECT;
-    nativeh.behaviour |= native_handle_type::disposition::aligned_io;
-    break;
-  case file_handle::caching::reads:
-    attribs |= O_SYNC;
-    break;
-  case file_handle::caching::reads_and_metadata:
-#ifdef O_DSYNC
-    attribs |= O_DSYNC;
-#else
-    attribs |= O_SYNC;
-#endif
-    break;
-  case file_handle::caching::all:
-  case file_handle::caching::safety_fsyncs:
-  case file_handle::caching::temporary:
-    break;
-  }
-  return attribs;
-}
-
 result<void> file_handle::_fetch_inode() noexcept
 {
   stat_t s;
   OUTCOME_TRYV(s.fill(*this, stat_t::want::dev | stat_t::want::ino));
   _devid = s.st_dev;
   _inode = s.st_ino;
-  return make_valued_result<void>();
+  return success();
 }
 
-inline result<void> check_inode(const file_handle &h) noexcept
+inline result<path_handle> containing_directory(filesystem::path &filename, const file_handle &h) noexcept
 {
-  stat_t s;
-  OUTCOME_TRYV(s.fill(h, stat_t::want::dev | stat_t::want::ino));
-  if(s.st_dev != h.st_dev() || s.st_ino != h.st_ino())
-    return make_errored_result<void>(std::errc::no_such_file_or_directory);
-  return make_valued_result<void>();
+#ifdef AFIO_DISABLE_RACE_FREE_PATH_FUNCTIONS
+  return std::errc::function_not_supported;
+#endif
+  try
+  {
+    for(;;)
+    {
+      // Get current path for handle and open its containing dir
+      auto currentpath_ = h.current_path();
+      if(!currentpath_)
+        continue;
+      filesystem::path currentpath = std::move(currentpath_.value());
+      filename = currentpath.filename();
+      currentpath.remove_filename();
+      auto currentdirh_ = path_handle::path(currentpath);
+      if(!currentdirh_)
+        continue;
+      path_handle currentdirh = std::move(currentdirh_.value());
+      if(h.flags() & handle::flag::disable_safety_unlinks)
+        return success(std::move(currentdirh));
+      // Open the same file name, and compare dev and inode
+      auto nh_ = file_handle::file(currentdirh, filename);
+      if(!nh_)
+        continue;
+      file_handle nh = std::move(nh_.value());
+      // If the same, we know for a fact that this is the correct containing dir for now at least
+      if(nh.st_dev() == h.st_dev() && nh.st_ino() == h.st_ino())
+        return success(std::move(currentdirh));
+    }
+  }
+  catch(...)
+  {
+    return error_from_exception();
+  }
 }
 
-result<file_handle> file_handle::file(const path_handle &base, file_handle::path_view_type _path, file_handle::mode _mode, file_handle::creation _creation, file_handle::caching _caching, file_handle::flag flags) noexcept
+result<file_handle> file_handle::file(const path_handle &base, file_handle::path_view_type path, file_handle::mode _mode, file_handle::creation _creation, file_handle::caching _caching, file_handle::flag flags) noexcept
 {
-  result<file_handle> ret(file_handle(native_handle_type(), 0, 0, std::move(_path), _caching, flags));
-  native_handle_type &nativeh = ret.get()._v;
-  OUTCOME_TRY(attribs, attribs_from_handle_mode_caching_and_flags(nativeh, _mode, _creation, _caching, flags));
-  nativeh.behaviour |= native_handle_type::disposition::file;
-  const char *path_ = ret.value()._path.c_str();
-  nativeh.fd = ::open(path_, attribs, 0x1b0 /*660*/);
-  if(-1 == nativeh.fd)
-    return make_errored_result<file_handle>(errno, last190(ret.value()._path.native()));
+  result<file_handle> ret(file_handle(native_handle_type(), 0, 0, _caching, flags));
+  native_handle_type &nativeh = ret.value()._v;
   AFIO_LOG_FUNCTION_CALL(&ret);
+  nativeh.behaviour |= native_handle_type::disposition::file;
+  OUTCOME_TRY(attribs, attribs_from_handle_mode_caching_and_flags(nativeh, _mode, _creation, _caching, flags));
+  path_view::c_str zpath(path);
+  if(base.is_valid())
+  {
+#ifdef AFIO_DISABLE_RACE_FREE_PATH_FUNCTIONS
+    return std::errc::function_not_supported;
+#else
+    nativeh.fd = ::openat(base.native_handle().fd, zpath.buffer, attribs, 0x1b0 /*660*/);
+#endif
+  }
+  else
+  {
+    nativeh.fd = ::open(zpath.buffer, attribs, 0x1b0 /*660*/);
+  }
+  if(-1 == nativeh.fd)
+    return {errno, std::system_category()};
   if(!(flags & flag::disable_safety_unlinks))
   {
     OUTCOME_TRYV(ret.value()._fetch_inode());
@@ -205,22 +175,23 @@ result<file_handle> file_handle::file(const path_handle &base, file_handle::path
   return ret;
 }
 
-result<file_handle> file_handle::temp_inode(path_type dirpath, mode _mode, flag flags) noexcept
+result<file_handle> file_handle::temp_inode(path_view_type dirpath, mode _mode, flag flags) noexcept
 {
   caching _caching = caching::temporary;
   // No need to rename to random on unlink or check inode before unlink
   flags |= flag::unlink_on_close | flag::disable_safety_unlinks;
-  result<file_handle> ret(file_handle(native_handle_type(), 0, 0, path_type(), _caching, flags));
-  native_handle_type &nativeh = ret.get()._v;
+  result<file_handle> ret(file_handle(native_handle_type(), 0, 0, _caching, flags));
+  native_handle_type &nativeh = ret.value()._v;
+  AFIO_LOG_FUNCTION_CALL(&ret);
+  nativeh.behaviour |= native_handle_type::disposition::file;
   // Open file exclusively to prevent collision
   OUTCOME_TRY(attribs, attribs_from_handle_mode_caching_and_flags(nativeh, _mode, creation::only_if_not_exist, _caching, flags));
-  nativeh.behaviour |= native_handle_type::disposition::file;
+  path_view::c_str zpath(dirpath);
 #ifdef O_TMPFILE
   // Linux has a special flag just for this use case
   attribs |= O_TMPFILE;
   attribs &= ~O_EXCL;  // allow relinking later
-  const char *path_ = ret.value()._path.c_str();
-  nativeh.fd = ::open(path_, attribs, 0600);
+  nativeh.fd = ::open(zpath.buffer, attribs, 0600);
   if(-1 != nativeh.fd)
   {
     OUTCOME_TRYV(ret.value()._fetch_inode());  // It can be useful to know the inode of temporary inodes
@@ -230,26 +201,32 @@ result<file_handle> file_handle::temp_inode(path_type dirpath, mode _mode, flag 
   attribs &= ~O_TMPFILE;
   attribs |= O_EXCL;
 #endif
-  AFIO_LOG_FUNCTION_CALL(&ret);
+#ifdef AFIO_DISABLE_RACE_FREE_PATH_FUNCTIONS
+  return std::errc::function_not_supported;
+#endif
+  OUTCOME_TRY(dirh, path_handle::path(dirpath));
+  std::string random;
   for(;;)
   {
     try
     {
-      ret.value()._path = dirpath / (utils::random_string(32) + ".tmp");
+      random = utils::random_string(32) + ".tmp";
     }
-    BOOST_OUTCOME_CATCH_ALL_EXCEPTION_TO_RESULT
-    const char *path_ = ret.value()._path.c_str();
-    nativeh.fd = ::open(path_, attribs, 0600);  // user read/write perms only
+    catch(...)
+    {
+      return error_from_exception();
+    }
+    nativeh.fd = ::openat(dirh.native_handle().fd, random.c_str(), attribs, 0600);  // user read/write perms only
     if(-1 == nativeh.fd)
     {
       int errcode = errno;
       if(EEXIST == errcode)
         continue;
-      return make_errored_result<file_handle>(errcode);
+      return {errcode, std::system_category()};
     }
     // Immediately unlink after creation
-    if(-1 == ::unlink(path_))
-      return make_errored_result<file_handle>(errno);
+    if(-1 == ::unlinkat(dirh.native_handle().fd, random.c_str(), 0))
+      return {errno, std::system_category()};
     OUTCOME_TRYV(ret.value()._fetch_inode());  // It can be useful to know the inode of temporary inodes
     return ret;
   }
@@ -259,7 +236,7 @@ file_handle::io_result<file_handle::const_buffers_type> file_handle::barrier(fil
 {
   AFIO_LOG_FUNCTION_CALL(this);
   if(d)
-    return make_errored_result<>(std::errc::not_supported);
+    return std::errc::not_supported;
 #ifdef __linux__
   if(!wait_for_device && !and_metadata)
   {
@@ -276,7 +253,7 @@ file_handle::io_result<file_handle::const_buffers_type> file_handle::barrier(fil
   if(!and_metadata)
   {
     if(-1 == ::fdatasync(_v.fd))
-      return make_errored_result<>(errno);
+      return {errno, std::system_category()};
     return io_handle::io_result<const_buffers_type>(std::move(reqs.buffers));
   }
 #endif
@@ -285,15 +262,15 @@ file_handle::io_result<file_handle::const_buffers_type> file_handle::barrier(fil
   {
     // OS X fsync doesn't wait for the device to flush its buffers
     if(-1 == ::fsync(_v.fd))
-      return make_errored_result<>(errno);
+      return {errno, std::system_category()};
     return io_handle::io_result<const_buffers_type>(std::move(reqs.buffers));
   }
   // This is the fsync as on every other OS
   if(-1 == ::fcntl(_v.fd, F_FULLFSYNC))
-    return make_errored_result<>(errno);
+    return {errno, std::system_category()};
 #else
   if(-1 == ::fsync(_v.fd))
-    return make_errored_result<>(errno);
+    return {errno, std::system_category()};
 #endif
   return io_handle::io_result<const_buffers_type>(std::move(reqs.buffers));
 }
@@ -301,56 +278,46 @@ file_handle::io_result<file_handle::const_buffers_type> file_handle::barrier(fil
 result<file_handle> file_handle::clone() const noexcept
 {
   AFIO_LOG_FUNCTION_CALL(this);
-  result<file_handle> ret(file_handle(native_handle_type(), _devid, _inode, _path, _caching, _flags));
+  result<file_handle> ret(file_handle(native_handle_type(), _devid, _inode, _caching, _flags));
   ret.value()._service = _service;
   ret.value()._v.behaviour = _v.behaviour;
   ret.value()._v.fd = ::dup(_v.fd);
   if(-1 == ret.value()._v.fd)
-    return make_errored_result<file_handle>(errno, last190(_path.native()));
+    return {errno, std::system_category()};
   return ret;
 }
 
-result<file_handle::path_type> file_handle::relink(path_type newpath) noexcept
+result<void> file_handle::relink(const path_handle &base, path_view_type path) noexcept
 {
   AFIO_LOG_FUNCTION_CALL(this);
-  if(newpath.is_relative())
-    newpath = _path.parent_path() / newpath;
+  path_view::c_str zpath(path);
 #ifdef O_TMPFILE
   // If the handle was created with O_TMPFILE, we need a different approach
-  if(_path.empty() && (_caching == file_handle::caching::temporary))
+  if(path.empty() && (_caching == file_handle::caching::temporary))
   {
-    char path[PATH_MAX];
-    snprintf(path, PATH_MAX, "/proc/self/fd/%d", _v.fd);
-    if(-1 == ::linkat(AT_FDCWD, path, AT_FDCWD, newpath.c_str(), AT_SYMLINK_FOLLOW))
-      return make_errored_result<path_type>(errno);
+    char _path[PATH_MAX];
+    snprintf(_path, PATH_MAX, "/proc/self/fd/%d", _v.fd);
+    if(-1 == ::linkat(AT_FDCWD, _path, base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.buffer, AT_SYMLINK_FOLLOW))
+      return {errno, std::system_category()};
   }
-  else
 #endif
-  {
-    // FIXME: As soon as we implement fat paths, make this race free
-    if(!(_flags & flag::disable_safety_unlinks))
-    {
-      OUTCOME_TRYV(check_inode(*this));
-    }
-    if(-1 == ::rename(_path.c_str(), newpath.c_str()))
-      return make_errored_result<path_type>(errno, last190(_path.native()));
-  }
-  _path = std::move(newpath);
-  return _path;
+  // Open our containing directory
+  filesystem::path filename;
+  OUTCOME_TRY(dirh, containing_directory(filename, *this));
+  if(-1 == ::renameat(dirh.native_handle().fd, filename.c_str(), base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.buffer))
+    return {errno, std::system_category()};
+  return success();
 }
 
 result<void> file_handle::unlink() noexcept
 {
   AFIO_LOG_FUNCTION_CALL(this);
-  // FIXME: As soon as we implement fat paths, make this race free
-  if(!(_flags & flag::disable_safety_unlinks))
-  {
-    OUTCOME_TRYV(check_inode(*this));
-  }
-  if(-1 == ::unlink(_path.c_str()))
-    return make_errored_result<void>(errno, last190(_path.native()));
-  _path.clear();
-  return make_valued_result<void>();
+  // Open our containing directory
+  filesystem::path filename;
+  OUTCOME_TRY(dirh, containing_directory(filename, *this));
+  if(-1 == ::unlinkat(dirh.native_handle().fd, filename.c_str(), 0))
+    return {errno, std::system_category()};
+  return success();
 }
 
 result<file_handle::extent_type> file_handle::length() const noexcept
@@ -359,7 +326,7 @@ result<file_handle::extent_type> file_handle::length() const noexcept
   struct stat s;
   memset(&s, 0, sizeof(s));
   if(-1 == ::fstat(_v.fd, &s))
-    return make_errored_result<file_handle::extent_type>(errno, last190(_path.native()));
+    return {errno, std::system_category()};
   return s.st_size;
 }
 
@@ -367,7 +334,7 @@ result<file_handle::extent_type> file_handle::truncate(file_handle::extent_type 
 {
   AFIO_LOG_FUNCTION_CALL(this);
   if(ftruncate(_v.fd, newsize) < 0)
-    return make_errored_result<extent_type>(errno, last190(_path.native()));
+    return {errno, std::system_category()};
   if(are_safety_fsyncs_issued())
   {
     fsync(_v.fd);

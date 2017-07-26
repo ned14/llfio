@@ -33,6 +33,7 @@ Distributed under the Boost Software License, Version 1.0.
 AFIO_V2_NAMESPACE_EXPORT_BEGIN
 
 /*! An asynchronous handle to an open something
+\todo Direct use of `calloc()` ought to be replaced with a user supplied STL allocator instance.
 */
 class AFIO_DECL async_file_handle : public file_handle
 {
@@ -122,8 +123,8 @@ public:
       {
         auto randomname = utils::random_string(32);
         randomname.append(".random");
-        result<async_file_handle> ret = async_file(service, dirpath / randomname, _mode, creation::only_if_not_exist, _caching, flags);
-        if(ret || (!ret && ret.error().value() != EEXIST))
+        result<async_file_handle> ret = async_file(service, dirpath, randomname, _mode, creation::only_if_not_exist, _caching, flags);
+        if(ret || (!ret && ret.error() != std::errc::file_exists))
           return ret;
       }
     }
@@ -138,7 +139,7 @@ public:
   Note the default flags are to have the newly created file deleted
   on first handle close.
   Note also that an empty name is equivalent to calling
-  `async_random_file(fixme_temporary_files_directory())` and the creation
+  `async_random_file(temporary_files_directory())` and the creation
   parameter is ignored.
 
   \note If the temporary file you are creating is not going to have its
@@ -150,7 +151,8 @@ public:
   //[[bindlib::make_free]]
   static inline result<async_file_handle> async_temp_file(io_service &service, path_view_type name = path_view_type(), mode _mode = mode::write, creation _creation = creation::if_needed, caching _caching = caching::temporary, flag flags = flag::unlink_on_close) noexcept
   {
-    return name.empty() ? async_random_file(service, fixme_temporary_files_directory(), _mode, _caching, flags) : async_file(service, fixme_temporary_files_directory() / name, _mode, _creation, _caching, flags);
+    OUTCOME_TRY(tempdirh, path_handle::path(temporary_files_directory()));
+    return name.empty() ? async_random_file(service, tempdirh, _mode, _caching, flags) : async_file(service, tempdirh, name, _mode, _creation, _caching, flags);
   }
   /*! \em Securely create an async file handle creating a temporary anonymous inode in
   the filesystem referred to by \em dirpath. The inode created has
@@ -238,7 +240,7 @@ protected:
     CompletionRoutine completion;
     constexpr _io_state_type(async_file_handle *_parent, operation_t _operation, CompletionRoutine &&f, size_t _items)
         : _erased_io_state_type(_parent, _operation, _items)
-        , result(make_result(BuffersType()))
+        , result(BuffersType())
         , completion(std::forward<CompletionRoutine>(f))
     {
     }

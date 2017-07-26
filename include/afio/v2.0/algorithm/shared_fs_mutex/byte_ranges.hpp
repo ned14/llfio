@@ -93,10 +93,10 @@ namespace algorithm
 
       //! Initialises a shared filing system mutex using the file at \em lockfile
       //[[bindlib::make_free]]
-      static result<byte_ranges> fs_mutex_byte_ranges(path_view lockfile) noexcept
+      static result<byte_ranges> fs_mutex_byte_ranges(const path_handle &base, path_view lockfile) noexcept
       {
         AFIO_LOG_FUNCTION_CALL(0);
-        OUTCOME_TRY(ret, file_handle::file(std::move(lockfile), file_handle::mode::write, file_handle::creation::if_needed, file_handle::caching::temporary));
+        OUTCOME_TRY(ret, file_handle::file(base, lockfile, file_handle::mode::write, file_handle::creation::if_needed, file_handle::caching::temporary));
         return byte_ranges(std::move(ret));
       }
 
@@ -192,7 +192,7 @@ namespace algorithm
           if(!spin_not_sleep)
             std::this_thread::yield();
         }
-        // return make_valued_result<void>();
+        // return success();
       }
 
     public:

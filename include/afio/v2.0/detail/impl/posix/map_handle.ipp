@@ -39,7 +39,7 @@ result<section_handle> section_handle::section(file_handle &backing, extent_type
       maximum_size = length;
     }
     else
-      return make_errored_result<section_handle>(std::errc::invalid_argument);
+      return std::errc::invalid_argument;
   }
   if(!backing.is_valid())
     maximum_size = utils::round_up_to_page_size(maximum_size);
@@ -54,7 +54,7 @@ result<section_handle::extent_type> section_handle::truncate(extent_type newsize
   newsize = utils::round_up_to_page_size(newsize);
   // There are no section handles on POSIX, so do nothing
   _length = newsize;
-  return make_result<extent_type>(newsize);
+  return newsize;
 }
 
 
@@ -78,13 +78,13 @@ result<void> map_handle::close() noexcept
   if(_addr)
   {
     if(-1 == ::munmap(_addr, _length))
-      return make_errored_result<void>(errno);
+      return {errno, std::system_category()};
   }
   // We don't want ~handle() to close our borrowed handle
   _v = native_handle_type();
   _addr = nullptr;
   _length = 0;
-  return make_valued_result<void>();
+  return success();
 }
 
 native_handle_type map_handle::release() noexcept
@@ -106,7 +106,7 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::barrier(map_ha
     bytes += req.second;
   int flags = (wait_for_device || and_metadata) ? MS_SYNC : MS_ASYNC;
   if(-1 == ::msync(addr, bytes, flags))
-    return make_errored_result<>(errno);
+    return {errno, std::system_category()};
   if(_section->backing() && (wait_for_device || and_metadata))
   {
     reqs.offset += _offset;
@@ -163,20 +163,20 @@ static inline result<void *> do_mmap(native_handle_type &nativeh, void *ataddr, 
   // printf("mmap(%p, %u, %d, %d, %d, %u)\n", ataddr, (unsigned) bytes, prot, flags, have_backing ? section->backing_native_handle().fd : -1, (unsigned) offset);
   addr = ::mmap(ataddr, bytes, prot, flags, have_backing ? section->backing_native_handle().fd : -1, offset);
   if(MAP_FAILED == addr)
-    return make_errored_result<void *>(errno);
+    return {errno, std::system_category()};
   return addr;
 }
 
 result<map_handle> map_handle::map(size_type bytes, section_handle::flag _flag) noexcept
 {
   if(!bytes)
-    return make_errored_result<>(std::errc::argument_out_of_domain);
+    return std::errc::argument_out_of_domain;
   bytes = utils::round_up_to_page_size(bytes);
-  result<map_handle> ret(make_valued_result<map_handle>(map_handle(nullptr)));
-  native_handle_type &nativeh = ret.get()._v;
+  result<map_handle> ret(map_handle(nullptr));
+  native_handle_type &nativeh = ret.value()._v;
   OUTCOME_TRY(addr, do_mmap(nativeh, nullptr, nullptr, bytes, 0, _flag));
-  ret.get()._addr = (char *) addr;
-  ret.get()._length = bytes;
+  ret.value()._addr = (char *) addr;
+  ret.value()._length = bytes;
   AFIO_LOG_FUNCTION_CALL(&ret);
   return ret;
 }
@@ -186,7 +186,7 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
   if(!bytes)
   {
     if(!section.backing())
-      return make_errored_result<>(std::errc::argument_out_of_domain);
+      return std::errc::argument_out_of_domain;
     bytes = section.length();
   }
   size_type _bytes = utils::round_up_to_page_size(bytes);
@@ -195,14 +195,14 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
     // Do NOT round up bytes to the nearest page size for backed maps, it causes an attempt to extend the file
     bytes = _bytes;
   }
-  result<map_handle> ret(make_valued_result<map_handle>(map_handle(&section)));
-  native_handle_type &nativeh = ret.get()._v;
+  result<map_handle> ret{map_handle(&section)};
+  native_handle_type &nativeh = ret.value()._v;
   OUTCOME_TRY(addr, do_mmap(nativeh, nullptr, &section, bytes, offset, _flag));
-  ret.get()._addr = (char *) addr;
-  ret.get()._offset = offset;
-  ret.get()._length = _bytes;
+  ret.value()._addr = (char *) addr;
+  ret.value()._offset = offset;
+  ret.value()._length = _bytes;
   // Make my handle borrow the native handle of my backing storage
-  ret.get()._v.fd = section.backing_native_handle().fd;
+  ret.value()._v.fd = section.backing_native_handle().fd;
   AFIO_LOG_FUNCTION_CALL(&ret);
   return ret;
 }
@@ -211,7 +211,7 @@ result<map_handle::buffer_type> map_handle::commit(buffer_type region, section_h
 {
   AFIO_LOG_FUNCTION_CALL(this);
   if(!region.first)
-    return make_errored_result<map_handle::buffer_type>(std::errc::invalid_argument);
+    return std::errc::invalid_argument;
   // Set permissions on the pages
   region = utils::round_to_page_size(region);
   extent_type offset = _offset + (region.first - _addr);
@@ -219,7 +219,7 @@ result<map_handle::buffer_type> map_handle::commit(buffer_type region, section_h
   OUTCOME_TRYV(do_mmap(_v, region.first, _section, bytes, offset, _flag));
   // Tell the kernel we will be using these pages soon
   if(-1 == ::madvise(region.first, region.second, MADV_WILLNEED))
-    return make_errored_result<map_handle::buffer_type>(errno);
+    return {errno, std::system_category()};
   return region;
 }
 
@@ -227,11 +227,11 @@ result<map_handle::buffer_type> map_handle::decommit(buffer_type region) noexcep
 {
   AFIO_LOG_FUNCTION_CALL(this);
   if(!region.first)
-    return make_errored_result<map_handle::buffer_type>(std::errc::invalid_argument);
+    return std::errc::invalid_argument;
   region = utils::round_to_page_size(region);
   // Tell the kernel to kick these pages into storage
   if(-1 == ::madvise(region.first, region.second, MADV_DONTNEED))
-    return make_errored_result<map_handle::buffer_type>(errno);
+    return {errno, std::system_category()};
   // Set permissions on the pages to no access
   extent_type offset = _offset + (region.first - _addr);
   size_type bytes = region.second;
@@ -243,7 +243,7 @@ result<void> map_handle::zero_memory(buffer_type region) noexcept
 {
   AFIO_LOG_FUNCTION_CALL(this);
   if(!region.first)
-    return make_errored_result<void>(std::errc::invalid_argument);
+    return std::errc::invalid_argument;
 #ifdef MADV_REMOVE
   buffer_type page_region{(char *) utils::round_up_to_page_size((uintptr_t) region.first), utils::round_down_to_page_size(region.second)};
   // Zero contents and punch a hole in any backing storage
@@ -251,12 +251,12 @@ result<void> map_handle::zero_memory(buffer_type region) noexcept
   {
     memset(region.first, 0, page_region.first - region.first);
     memset(page_region.first + page_region.second, 0, (region.first + region.second) - (page_region.first + page_region.second));
-    return make_valued_result<void>();
+    return success();
   }
 #endif
   //! \todo Once you implement file_handle::zero(), please implement map_handle::zero()
   memset(region.first, 0, region.second);
-  return make_valued_result<void>();
+  return success();
 }
 
 result<span<map_handle::buffer_type>> map_handle::prefetch(span<buffer_type> regions) noexcept
@@ -265,7 +265,7 @@ result<span<map_handle::buffer_type>> map_handle::prefetch(span<buffer_type> reg
   for(const auto &region : regions)
   {
     if(-1 == ::madvise(region.first, region.second, MADV_WILLNEED))
-      return make_errored_result<span<map_handle::buffer_type>>(errno);
+      return {errno, std::system_category()};
   }
   return regions;
 }
@@ -275,11 +275,11 @@ result<map_handle::buffer_type> map_handle::do_not_store(buffer_type region) noe
   AFIO_LOG_FUNCTION_CALL(0);
   region = utils::round_to_page_size(region);
   if(!region.first)
-    return make_errored_result<map_handle::buffer_type>(std::errc::invalid_argument);
+    return std::errc::invalid_argument;
 #ifdef MADV_FREE
   // Tell the kernel to throw away the contents of these pages
   if(-1 == ::madvise(_region.first, _region.second, MADV_FREE))
-    return make_errored_result<map_handle::buffer_type>(errno);
+    return {errno, std::system_category()};
   else
     return region;
 #endif

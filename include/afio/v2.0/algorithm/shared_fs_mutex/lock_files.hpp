@@ -72,11 +72,11 @@ namespace algorithm
     */
     class lock_files : public shared_fs_mutex
     {
-      file_handle::path_type _path;
+      const path_handle &_path;
       std::vector<file_handle> _hs;
 
-      lock_files(file_handle::path_type &&o)
-          : _path(std::move(o))
+      lock_files(const path_handle &o)
+          : _path(o)
       {
       }
       lock_files(const lock_files &) = delete;
@@ -89,25 +89,25 @@ namespace algorithm
       using entities_type = shared_fs_mutex::entities_type;
 
       //! Move constructor
-      lock_files(lock_files &&o) noexcept : _path(std::move(o._path)), _hs(std::move(o._hs)) {}
+      lock_files(lock_files &&o) noexcept : _path(o._path), _hs(std::move(o._hs)) {}
       //! Move assign
       lock_files &operator=(lock_files &&o) noexcept
       {
-        _path = std::move(o._path);
-        _hs = std::move(o._hs);
+        this->~lock_files();
+        new(this) lock_files(std::move(o));
         return *this;
       }
 
-      //! Initialises a shared filing system mutex using the directory at \em lockdir
+      //! Initialises a shared filing system mutex using the directory at \em lockdir which MUST stay valid for the duration of this lock.
       //[[bindlib::make_free]]
-      static result<lock_files> fs_mutex_lock_files(path_view lockdir) noexcept
+      static result<lock_files> fs_mutex_lock_files(const path_handle &lockdir) noexcept
       {
         AFIO_LOG_FUNCTION_CALL(0);
-        return lock_files(std::move(lockdir));
+        return lock_files(lockdir);
       }
 
       //! Return the path to the directory being used for this lock
-      const file_handle::path_type &path() const noexcept { return _path; }
+      const path_handle &path() const noexcept { return _path; }
 
     protected:
       virtual result<void> _lock(entities_guard &out, deadline d, bool spin_not_sleep) noexcept override final
@@ -124,11 +124,11 @@ namespace algorithm
         }
         size_t n;
         // Create a set of paths to files to exclusively create
-        std::vector<fixme_path> entity_paths(out.entities.size());
+        std::vector<std::string> entity_paths(out.entities.size());
         for(n = 0; n < out.entities.size(); n++)
         {
           auto v = out.entities[n].value;
-          entity_paths[n] = _path / QUICKCPPLIB_NAMESPACE::algorithm::string::to_hex_string(span<char>((char *) &v, 8));
+          entity_paths[n] = QUICKCPPLIB_NAMESPACE::algorithm::string::to_hex_string(span<char>((char *) &v, 8));
         }
         _hs.resize(out.entities.size());
         do
@@ -150,7 +150,7 @@ namespace algorithm
             });
             for(n = 0; n < out.entities.size(); n++)
             {
-              auto ret = file_handle::file(entity_paths[n], file_handle::mode::write, file_handle::creation::only_if_not_exist, file_handle::caching::temporary, file_handle::flag::unlink_on_close);
+              auto ret = file_handle::file(_path, entity_paths[n], file_handle::mode::write, file_handle::creation::only_if_not_exist, file_handle::caching::temporary, file_handle::flag::unlink_on_close);
               if(ret.has_error())
               {
                 const auto &ec = ret.error();

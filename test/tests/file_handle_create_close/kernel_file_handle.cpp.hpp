@@ -29,7 +29,7 @@ namespace file_handle_create_close
   AFIO_TEST_KERNEL_DECL AFIO_V2_NAMESPACE::result<AFIO_V2_NAMESPACE::file_handle> test_kernel_file_handle(AFIO_V2_NAMESPACE::file_handle::mode m, AFIO_V2_NAMESPACE::file_handle::creation c, AFIO_V2_NAMESPACE::file_handle::flag f)
   {
     //! \todo TODO Use tempfile() once I've implemented it, that works around this being unsafe under mt permutation
-    auto h = AFIO_V2_NAMESPACE::file_handle::file("testfile.txt", m, c, AFIO_V2_NAMESPACE::file_handle::caching::all, f);
+    auto h = AFIO_V2_NAMESPACE::file_handle::file({}, "testfile.txt", m, c, AFIO_V2_NAMESPACE::file_handle::caching::all, f);
     if(h)
       h.value().close().value();
     return h;

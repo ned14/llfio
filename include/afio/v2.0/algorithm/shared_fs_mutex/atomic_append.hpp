@@ -171,10 +171,10 @@ namespace algorithm
       observed by readers. For these, hashing can be safely disabled.
       */
       //[[bindlib::make_free]]
-      static result<atomic_append> fs_mutex_append(path_view lockfile, bool nfs_compatibility = false, bool skip_hashing = false) noexcept
+      static result<atomic_append> fs_mutex_append(const path_handle &base, path_view lockfile, bool nfs_compatibility = false, bool skip_hashing = false) noexcept
       {
         AFIO_LOG_FUNCTION_CALL(0);
-        OUTCOME_TRY(ret, file_handle::file(std::move(lockfile), file_handle::mode::write, file_handle::creation::if_needed, file_handle::caching::temporary));
+        OUTCOME_TRY(ret, file_handle::file(base, lockfile, file_handle::mode::write, file_handle::creation::if_needed, file_handle::caching::temporary));
         atomic_append_detail::header header;
         // Lock the entire header for exclusive access
         auto lockresult = ret.try_lock(0, sizeof(header), true);

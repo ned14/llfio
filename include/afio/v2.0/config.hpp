@@ -65,18 +65,24 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #endif
 
+#if !defined(AFIO_DISABLE_RACE_FREE_PATH_FUNCTIONS)
+#ifdef __APPLE__
+#define AFIO_DISABLE_RACE_FREE_PATH_FUNCTIONS 1
+#endif
+#endif
+
 
 #if defined(_WIN32)
 #if !defined(_UNICODE)
-#error Boost AFIO cannot target the ANSI Windows API. Please define _UNICODE to target the Unicode Windows API.
+#error AFIO cannot target the ANSI Windows API. Please define _UNICODE to target the Unicode Windows API.
 #endif
 #if !defined(_WIN32_WINNT)
 #define _WIN32_WINNT 0x0600
 #elif _WIN32_WINNT < 0x0600
-#error _WIN32_WINNT must at least be set to Windows Vista for Boost AFIO to work
+#error _WIN32_WINNT must at least be set to Windows Vista for AFIO to work
 #endif
 #if defined(NTDDI_VERSION) && NTDDI_VERSION < 0x06000000
-#error NTDDI_VERSION must at least be set to Windows Vista for Boost AFIO to work
+#error NTDDI_VERSION must at least be set to Windows Vista for AFIO to work
 #endif
 #endif
 
@@ -186,6 +192,7 @@ exported AFIO v2 namespace.
 
 AFIO_V2_NAMESPACE_BEGIN
 class handle;
+class file_handle;
 AFIO_V2_NAMESPACE_END
 
 // Bring in the Boost-lite macros
@@ -285,8 +292,11 @@ struct error_code : public std::error_code
   }
 };
 template <class T> using result = OUTCOME_V2_NAMESPACE::result<T, error_code>;
+template <class T> using outcome = OUTCOME_V2_NAMESPACE::outcome<T, error_code>;
 using OUTCOME_V2_NAMESPACE::success;
 using OUTCOME_V2_NAMESPACE::failure;
+using OUTCOME_V2_NAMESPACE::error_from_exception;
+using OUTCOME_V2_NAMESPACE::in_place_type;
 AFIO_V2_NAMESPACE_END
 
 
@@ -376,7 +386,7 @@ namespace detail
     return *v;
 #endif
   }
-  template <bool enabled> struct tls_current_handle_holder
+  template <bool _enabled> struct tls_current_handle_holder
   {
     handle *old{nullptr};
     bool enabled{false};

@@ -54,6 +54,7 @@ namespace storage_profile
       {
         try
         {
+          using std::to_string;
           RTL_OSVERSIONINFOW ovi;
           memset(&ovi, 0, sizeof(ovi));
           ovi.dwOSVersionInfoSize = sizeof(RTL_OSVERSIONINFOW);
@@ -206,9 +207,9 @@ namespace storage_profile
       {
         try
         {
-          alignas(8) fixme_path::value_type buffer[32769];
+          alignas(8) wchar_t buffer[32769];
           // Firstly open a handle to the volume
-          OUTCOME_TRY(volumeh, file_handle::file(mntfromname, handle::mode::none, handle::creation::open_existing, handle::caching::only_metadata));
+          OUTCOME_TRY(volumeh, file_handle::file({}, mntfromname, handle::mode::none, handle::creation::open_existing, handle::caching::only_metadata));
           STORAGE_PROPERTY_QUERY spq;
           memset(&spq, 0, sizeof(spq));
           spq.PropertyId = StorageAdapterProperty;
@@ -301,7 +302,7 @@ namespace storage_profile
           if(disk_extents > 0)
           {
             // For now we only care about the first physical device
-            alignas(8) fixme_path::value_type physicaldrivename[32769] = L"\\\\.\\PhysicalDrive", *e;
+            alignas(8) wchar_t physicaldrivename[32769] = L"\\\\.\\PhysicalDrive", *e;
             for(e = physicaldrivename; *e; e++)
               ;
             if(vde->Extents[0].DiskNumber >= 100)
@@ -310,7 +311,7 @@ namespace storage_profile
               *e++ = '0' + ((vde->Extents[0].DiskNumber / 10) % 10);
             *e++ = '0' + (vde->Extents[0].DiskNumber % 10);
             *e = 0;
-            OUTCOME_TRY(diskh, file_handle::file(physicaldrivename, handle::mode::none, handle::creation::open_existing, handle::caching::only_metadata));
+            OUTCOME_TRY(diskh, file_handle::file({}, wstring_view(physicaldrivename, e - physicaldrivename), handle::mode::none, handle::creation::open_existing, handle::caching::only_metadata));
             memset(&spq, 0, sizeof(spq));
             spq.PropertyId = StorageDeviceProperty;
             spq.QueryType = PropertyStandardQuery;

@@ -59,7 +59,7 @@ result<async_file_handle::io_state_ptr<CompletionRoutine, BuffersType>> async_fi
       if(this->result)
       {
         if(errcode)
-          this->result = make_errored_result<BuffersType>((DWORD) errcode);
+          this->result = error_code{errcode, std::system_category()};
         else
         {
           // Figure out which i/o I am and update the buffer in question
@@ -99,7 +99,7 @@ result<async_file_handle::io_state_ptr<CompletionRoutine, BuffersType>> async_fi
             AFIO_LOG_FATAL(0, "async_file_handle: io_service failed");
             std::terminate();
           }
-          if(!res.get())
+          if(!res.value())
           {
             AFIO_LOG_FATAL(0, "async_file_handle: io_service returns no work when i/o has not completed");
             std::terminate();
@@ -114,11 +114,11 @@ result<async_file_handle::io_state_ptr<CompletionRoutine, BuffersType>> async_fi
   using return_type = io_state_ptr<CompletionRoutine, BuffersType>;
   // On Windows i/o must be scheduled on the same thread pumping completion
   if(GetCurrentThreadId() != service()->_threadid)
-    return make_errored_result<return_type>(std::errc::operation_not_supported);
+    return std::errc::operation_not_supported;
 
   void *mem = ::calloc(1, statelen);
   if(!mem)
-    return make_errored_result<return_type>(std::errc::not_enough_memory);
+    return std::errc::not_enough_memory;
   return_type _state((_io_state_type<CompletionRoutine, BuffersType> *) mem);
   new((state = (state_type *) mem)) state_type(this, operation, std::forward<CompletionRoutine>(completion), items);
 
@@ -156,11 +156,11 @@ result<async_file_handle::io_state_ptr<CompletionRoutine, BuffersType>> async_fi
       // Fire completion now if we didn't schedule anything
       if(!n)
         state->completion(state);
-      return make_result<return_type>(std::move(_state));
+      return _state;
     }
     service()->_work_enqueued();
   }
-  return make_result<return_type>(std::move(_state));
+  return _state;
 }
 
 template <class CompletionRoutine> result<async_file_handle::io_state_ptr<CompletionRoutine, async_file_handle::buffers_type>> async_file_handle::async_read(async_file_handle::io_request<async_file_handle::buffers_type> reqs, CompletionRoutine &&completion) noexcept

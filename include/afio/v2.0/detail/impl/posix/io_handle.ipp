@@ -38,9 +38,9 @@ io_handle::io_result<io_handle::buffers_type> io_handle::read(io_handle::io_requ
 {
   AFIO_LOG_FUNCTION_CALL(this);
   if(d)
-    return make_errored_result<>(std::errc::not_supported);
+    return std::errc::not_supported;
   if(reqs.buffers.size() > IOV_MAX)
-    return make_errored_result<>(std::errc::argument_list_too_long);
+    return std::errc::argument_list_too_long;
   struct iovec *iov = (struct iovec *) alloca(reqs.buffers.size() * sizeof(struct iovec));
   for(size_t n = 0; n < reqs.buffers.size(); n++)
   {
@@ -49,7 +49,7 @@ io_handle::io_result<io_handle::buffers_type> io_handle::read(io_handle::io_requ
   }
   ssize_t bytesread = ::preadv(_v.fd, iov, reqs.buffers.size(), reqs.offset);
   if(bytesread < 0)
-    return make_errored_result<io_handle::buffers_type>(errno, last190(path().native()));
+    return {errno, std::system_category()};
   for(size_t n = 0; n < reqs.buffers.size(); n++)
   {
     if(reqs.buffers[n].second >= (size_t) bytesread)
@@ -69,9 +69,9 @@ io_handle::io_result<io_handle::const_buffers_type> io_handle::write(io_handle::
 {
   AFIO_LOG_FUNCTION_CALL(this);
   if(d)
-    return make_errored_result<>(std::errc::not_supported);
+    return std::errc::not_supported;
   if(reqs.buffers.size() > IOV_MAX)
-    return make_errored_result<>(std::errc::argument_list_too_long);
+    return std::errc::argument_list_too_long;
   struct iovec *iov = (struct iovec *) alloca(reqs.buffers.size() * sizeof(struct iovec));
   for(size_t n = 0; n < reqs.buffers.size(); n++)
   {
@@ -80,7 +80,7 @@ io_handle::io_result<io_handle::const_buffers_type> io_handle::write(io_handle::
   }
   ssize_t byteswritten = ::pwritev(_v.fd, iov, reqs.buffers.size(), reqs.offset);
   if(byteswritten < 0)
-    return make_errored_result<io_handle::const_buffers_type>(errno, last190(path().native()));
+    return {errno, std::system_category()};
   for(size_t n = 0; n < reqs.buffers.size(); n++)
   {
     if(reqs.buffers[n].second >= (size_t) byteswritten)
@@ -100,7 +100,7 @@ result<io_handle::extent_guard> io_handle::lock(io_handle::extent_type offset, i
 {
   AFIO_LOG_FUNCTION_CALL(this);
   if(d && d.nsecs > 0)
-    return make_errored_result<io_handle::extent_guard>(std::errc::not_supported);
+    return std::errc::not_supported;
   bool failed = false;
 #if !defined(__linux__) && !defined(F_OFD_SETLK)
   if(0 == bytes)
@@ -151,9 +151,9 @@ result<io_handle::extent_guard> io_handle::lock(io_handle::extent_type offset, i
   if(failed)
   {
     if(d && !d.nsecs && (EACCES == errno || EAGAIN == errno || EWOULDBLOCK == errno))
-      return make_errored_result<void>(std::errc::timed_out);
+      return std::errc::timed_out;
     else
-      return make_errored_result<void>(errno, last190(path().native()));
+      return {errno, std::system_category()};
   }
   return extent_guard(this, offset, bytes, exclusive);
 }
@@ -196,7 +196,7 @@ void io_handle::unlock(io_handle::extent_type offset, io_handle::extent_type byt
   }
   if(failed)
   {
-    auto ret = make_errored_result<void>(errno);
+    error_code ret{errno, std::system_category()};
     (void) ret;
     AFIO_LOG_FATAL(_v.fd, "io_handle::unlock() failed");
     std::terminate();

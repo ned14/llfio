@@ -35,26 +35,27 @@ AFIO_V2_NAMESPACE_BEGIN
 async_file_handle::io_result<async_file_handle::const_buffers_type> async_file_handle::barrier(async_file_handle::io_request<async_file_handle::const_buffers_type> reqs, bool /*wait_for_device*/, bool and_metadata, deadline d) noexcept
 {
   AFIO_LOG_FUNCTION_CALL(this);
-  io_result<const_buffers_type> ret;
+  optional<io_result<const_buffers_type>> ret;
   auto _io_state(_begin_io(and_metadata ? operation_t::fsync : operation_t::dsync, std::move(reqs), [&ret](auto *state) { ret = std::move(state->result); }, nullptr));
   OUTCOME_TRY(io_state, _io_state);
+  (void) io_state;
 
   // While i/o is not done pump i/o completion
-  while(!ret.is_ready())
+  while(!ret)
   {
     auto t(_service->run_until(d));
     // If i/o service pump failed or timed out, cancel outstanding i/o and return
     if(!t)
-      return make_errored_result<const_buffers_type>(t.get_error());
+      return t.error();
 #ifndef NDEBUG
-    if(!ret.is_ready() && t && !t.get())
+    if(!ret && t && !t.value())
     {
       AFIO_LOG_FATAL(_v.fd, "async_file_handle: io_service returns no work when i/o has not completed");
       std::terminate();
     }
 #endif
   }
-  return ret;
+  return *ret;
 }
 
 result<async_file_handle> async_file_handle::clone(io_service &service) const noexcept
@@ -93,7 +94,7 @@ result<async_file_handle::io_state_ptr<CompletionRoutine, BuffersType>> async_fi
       if(this->result)
       {
         if(errcode)
-          this->result = make_errored_result<BuffersType>((int) errcode);
+          this->result = error_code((int) errcode, std::system_category());
         else
         {
 // Figure out which i/o I am and update the buffer in question
@@ -154,7 +155,7 @@ result<async_file_handle::io_state_ptr<CompletionRoutine, BuffersType>> async_fi
             AFIO_LOG_FATAL(0, "file_handle: io_service failed");
             std::terminate();
           }
-          if(!res.get())
+          if(!res.value())
           {
             AFIO_LOG_FATAL(0, "file_handle: io_service returns no work when i/o has not completed");
             std::terminate();
@@ -169,11 +170,11 @@ result<async_file_handle::io_state_ptr<CompletionRoutine, BuffersType>> async_fi
   using return_type = io_state_ptr<CompletionRoutine, BuffersType>;
 #if AFIO_USE_POSIX_AIO && defined(AIO_LISTIO_MAX)
   if(items > AIO_LISTIO_MAX)
-    return make_errored_result<return_type>(std::errc::invalid_argument);
+    return std::errc::invalid_argument;
 #endif
   void *mem = ::calloc(1, statelen);
   if(!mem)
-    return make_errored_result<return_type>(std::errc::not_enough_memory);
+    return std::errc::not_enough_memory;
   return_type _state((_io_state_type<CompletionRoutine, BuffersType> *) mem);
   new((state = (state_type *) mem)) state_type(this, operation, std::forward<CompletionRoutine>(completion), items);
   // Noexcept move the buffers from req into result
@@ -257,12 +258,12 @@ result<async_file_handle::io_state_ptr<CompletionRoutine, BuffersType>> async_fi
   {
     service()->_aiocbsv.resize(service()->_aiocbsv.size() - items);
     state->items_to_go = 0;
-    state->result = make_errored_result<BuffersType>(errno);
+    state->result = {errno, std::system_category()};
     state->completion(state);
-    return make_result<return_type>(std::move(_state));
+    return success(std::move(_state));
   }
   service()->_work_enqueued(items);
-  return make_result<return_type>(std::move(_state));
+  return success(std::move(_state));
 }
 
 template <class CompletionRoutine> result<async_file_handle::io_state_ptr<CompletionRoutine, async_file_handle::buffers_type>> async_file_handle::async_read(async_file_handle::io_request<async_file_handle::buffers_type> reqs, CompletionRoutine &&completion) noexcept
@@ -277,50 +278,52 @@ template <class CompletionRoutine> result<async_file_handle::io_state_ptr<Comple
 
 async_file_handle::io_result<async_file_handle::buffers_type> async_file_handle::read(async_file_handle::io_request<async_file_handle::buffers_type> reqs, deadline d) noexcept
 {
-  io_result<buffers_type> ret;
+  optional<io_result<buffers_type>> ret;
   auto _io_state(_begin_io(operation_t::read, std::move(reqs), [&ret](auto *state) { ret = std::move(state->result); }, nullptr));
   OUTCOME_TRY(io_state, _io_state);
+  (void) io_state;
 
   // While i/o is not done pump i/o completion
-  while(!ret.is_ready())
+  while(!ret)
   {
     auto t(_service->run_until(d));
     // If i/o service pump failed or timed out, cancel outstanding i/o and return
     if(!t)
-      return make_errored_result<buffers_type>(t.get_error());
+      return t.error();
 #ifndef NDEBUG
-    if(!ret.is_ready() && t && !t.get())
+    if(!ret && t && !t.value())
     {
       AFIO_LOG_FATAL(_v.fd, "async_file_handle: io_service returns no work when i/o has not completed");
       std::terminate();
     }
 #endif
   }
-  return ret;
+  return *ret;
 }
 
 async_file_handle::io_result<async_file_handle::const_buffers_type> async_file_handle::write(async_file_handle::io_request<async_file_handle::const_buffers_type> reqs, deadline d) noexcept
 {
-  io_result<const_buffers_type> ret;
+  optional<io_result<const_buffers_type>> ret;
   auto _io_state(_begin_io(operation_t::write, std::move(reqs), [&ret](auto *state) { ret = std::move(state->result); }, nullptr));
   OUTCOME_TRY(io_state, _io_state);
+  (void) io_state;
 
   // While i/o is not done pump i/o completion
-  while(!ret.is_ready())
+  while(!ret)
   {
     auto t(_service->run_until(d));
     // If i/o service pump failed or timed out, cancel outstanding i/o and return
     if(!t)
-      return make_errored_result<const_buffers_type>(t.get_error());
+      return t.error();
 #ifndef NDEBUG
-    if(!ret.is_ready() && t && !t.get())
+    if(!ret && t && !t.value())
     {
       AFIO_LOG_FATAL(_v.fd, "async_file_handle: io_service returns no work when i/o has not completed");
       std::terminate();
     }
 #endif
   }
-  return ret;
+  return *ret;
 }
 
 AFIO_V2_NAMESPACE_END

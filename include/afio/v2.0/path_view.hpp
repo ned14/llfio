@@ -172,11 +172,23 @@ private:
 public:
   //! Constructs an empty path view
   constexpr path_view() noexcept : _state{} {}
-  //! Constructs a path view from a path
+  //! Constructs a path view from a path. The input path MUST continue to exist for this view to be valid.
   path_view(const filesystem::path &v) noexcept : _state(v.native()) {}
+  //! Constructs a UTF-8 path view from a string. The input string MUST continue to exist for this view to be valid.
+  path_view(const std::string &v) noexcept : _state(v) {}
+  //! Constructs a UTF-8 path view from a const char array. The input string MUST continue to exist for this view to be valid.
+  template <size_t L> constexpr path_view(const char (&v)[L]) noexcept : _state(string_view(static_cast<const char *>(v), L)) {}
+  //! Constructs a UTF-8 path view from a `const char *`
+  constexpr explicit path_view(const char *v) noexcept : _state(string_view(v)) {}
   //! Constructs a UTF-8 path view from a string view
   constexpr path_view(string_view v) noexcept : _state(v) {}
 #ifdef _WIN32
+  //! Constructs a UTF-16 path view from a string. The input string MUST continue to exist for this view to be valid.
+  path_view(const std::wstring &v) noexcept : _state(v) {}
+  //! Constructs a UTF-8 path view from a const char array. The input string MUST continue to exist for this view to be valid.
+  template <size_t L> constexpr path_view(const wchar_t (&v)[L]) noexcept : _state(wstring_view(static_cast<const wchar_t *>(v), L)) {}
+  //! Constructs a UTF-16 path view from a `const wchar_t *`
+  constexpr explicit path_view(const wchar_t *v) noexcept : _state(wstring_view(v)) {}
   //! Constructs a UTF-16 path view from a wide string view
   constexpr path_view(wstring_view v) noexcept : _state(v) {}
 #endif

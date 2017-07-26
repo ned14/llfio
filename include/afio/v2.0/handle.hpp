@@ -356,10 +356,14 @@ template <class T, class R> inline void hook_result_construction(OUTCOME_V2_NAME
     if(currenth != nullptr)
     {
       nativeh = currenth->native_handle();
-      auto currentpath = currenth->current_path().u8string();
-      uint16_t tlsidx = 0;
-      strncpy(tls.next(tlsidx), QUICKCPPLIB_NAMESPACE::ringbuffer_log::last190(currentpath), 190);
-      OUTCOME_V2_NAMESPACE::hooks::set_spare_storage(res, tlsidx);
+      auto currentpath_ = currenth->current_path();
+      if(currentpath_)
+      {
+        auto currentpath = currentpath_.value().u8string();
+        uint16_t tlsidx = 0;
+        strncpy(tls.next(tlsidx), QUICKCPPLIB_NAMESPACE::ringbuffer_log::last190(currentpath), 190);
+        OUTCOME_V2_NAMESPACE::hooks::set_spare_storage(res, tlsidx);
+      }
     }
     log().emplace_back(log_level::error, res->assume_error().message().c_str(), nativeh._init, QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id());
   }

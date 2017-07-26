@@ -33,7 +33,7 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, st
   AFIO_LOG_FUNCTION_CALL(&h);
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
-  alignas(8) fixme_path::value_type buffer[32769];
+  alignas(8) wchar_t buffer[32769];
   IO_STATUS_BLOCK isb = make_iostatus();
   NTSTATUS ntstat;
   size_t ret = 0;
@@ -45,7 +45,7 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, st
     if(STATUS_PENDING == ntstat)
       ntstat = ntwait(h.native_handle().h, isb, deadline());
     if(ntstat)
-      return make_errored_result_nt<size_t>(ntstat);
+      return {(int) ntstat, ntkernel_category()};
     if(wanted & want::flags)
     {
       f_flags.rdonly = !!(ffai->FileSystemAttributes & FILE_READ_ONLY_VOLUME);
@@ -63,8 +63,8 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, st
     }
     if(wanted & want::fstypename)
     {
-      f_fstypename.resize(ffai->FileSystemNameLength / sizeof(fixme_path::value_type));
-      for(size_t n = 0; n < ffai->FileSystemNameLength / sizeof(fixme_path::value_type); n++)
+      f_fstypename.resize(ffai->FileSystemNameLength / sizeof(wchar_t));
+      for(size_t n = 0; n < ffai->FileSystemNameLength / sizeof(wchar_t); n++)
         f_fstypename[n] = (char) ffai->FileSystemName[n];
       ++ret;
     }
@@ -77,7 +77,7 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, st
     if(STATUS_PENDING == ntstat)
       ntstat = ntwait(h.native_handle().h, isb, deadline());
     if(ntstat)
-      return make_errored_result_nt<size_t>(ntstat);
+      return {(int) ntstat, ntkernel_category()};
     if(wanted & want::bsize)
     {
       f_bsize = fffsi->BytesPerSector * fffsi->SectorsPerAllocationUnit;
@@ -128,7 +128,7 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, st
   if((wanted & want::mntfromname) || (wanted & want::mntonname))
   {
     // Irrespective we need the path before figuring out the mounted device
-    alignas(8) fixme_path::value_type buffer2[32769];
+    alignas(8) wchar_t buffer2[32769];
     for(;;)
     {
       DWORD pathlen = GetFinalPathNameByHandle(h.native_handle().h, buffer2, sizeof(buffer2) / sizeof(*buffer2), FILE_NAME_OPENED | VOLUME_NAME_NONE);

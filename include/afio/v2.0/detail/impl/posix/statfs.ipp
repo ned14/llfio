@@ -40,7 +40,7 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, st
   struct statfs64 s;
   memset(&s, 0, sizeof(s));
   if(-1 == fstatfs64(h.native_handle().fd, &s))
-    return make_errored_result<size_t>(errno);
+    return {errno, std::system_category()};
   if(!!(wanted & want::bsize))
   {
     f_bsize = s.f_bsize;
@@ -106,7 +106,7 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, st
       // Need to parse mount options on Linux
       FILE *mtab = setmntent("/etc/mtab", "r");
       if(!mtab)
-        return make_errored_result<size_t>(errno);
+        return {errno, std::system_category()};
       auto unmtab = undoer([mtab] { endmntent(mtab); });
       struct mntent m;
       char buffer[32768];
@@ -120,7 +120,7 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, st
     }
 #ifndef AFIO_COMPILING_FOR_GCOV
     if(mountentries.empty())
-      return make_errored_result<size_t>(std::errc::no_such_file_or_directory);
+      return std::errc::no_such_file_or_directory;
     // Choose the mount entry with the most closely matching statfs. You can't choose
     // exclusively based on mount point because of bind mounts
     if(mountentries.size() > 1)
@@ -172,7 +172,7 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, st
 #else
   struct statfs s;
   if(-1 == fstatfs(h.native_handle().fd, &s))
-    return make_errored_result<size_t>(errno);
+    return {errno, std::system_category()};
   if(!!(wanted & want::flags))
   {
     f_flags.rdonly = !!(s.f_flags & MNT_RDONLY);

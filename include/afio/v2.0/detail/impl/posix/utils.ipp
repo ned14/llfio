@@ -26,6 +26,8 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include "../../../spinlock.hpp"
 
+#include <mutex>  // for lock_guard
+
 #include <sys/mman.h>
 
 AFIO_V2_NAMESPACE_BEGIN

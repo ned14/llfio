@@ -51,13 +51,13 @@ result<void> handle::close() noexcept
     if(are_safety_fsyncs_issued())
     {
       if(-1 == fsync(_v.fd))
-        return make_errored_result<void>(errno);
+        return {errno, std::system_category()};
     }
     if(-1 == ::close(_v.fd))
-      return make_errored_result<void>(errno);
+      return {errno, std::system_category()};
     _v = native_handle_type();
   }
-  return make_valued_result<void>();
+  return success();
 }
 
 result<handle> handle::clone() const noexcept
@@ -67,7 +67,7 @@ result<handle> handle::clone() const noexcept
   ret.value()._v.behaviour = _v.behaviour;
   ret.value()._v.fd = ::dup(_v.fd);
   if(-1 == ret.value()._v.fd)
-    return make_errored_result<handle>(errno, last190(path().native()));
+    return {errno, std::system_category()};
   return ret;
 }
 
@@ -76,13 +76,13 @@ result<void> handle::set_append_only(bool enable) noexcept
   AFIO_LOG_FUNCTION_CALL(this);
   int attribs = fcntl(_v.fd, F_GETFL);
   if(-1 == attribs)
-    return make_errored_result<void>(errno, last190(path().native()));
+    return {errno, std::system_category()};
   if(enable)
   {
     // Set append_only
     attribs |= O_APPEND;
     if(-1 == fcntl(_v.fd, F_SETFL, attribs))
-      return make_errored_result<void>(errno, last190(path().native()));
+      return {errno, std::system_category()};
     _v.behaviour |= native_handle_type::disposition::append_only;
   }
   else
@@ -90,10 +90,10 @@ result<void> handle::set_append_only(bool enable) noexcept
     // Remove append_only
     attribs &= ~O_APPEND;
     if(-1 == fcntl(_v.fd, F_SETFL, attribs))
-      return make_errored_result<void>(errno, last190(path().native()));
+      return {errno, std::system_category()};
     _v.behaviour &= ~native_handle_type::disposition::append_only;
   }
-  return make_valued_result<void>();
+  return success();
 }
 
 result<void> handle::set_kernel_caching(caching caching) noexcept
@@ -101,7 +101,7 @@ result<void> handle::set_kernel_caching(caching caching) noexcept
   AFIO_LOG_FUNCTION_CALL(this);
   int attribs = fcntl(_v.fd, F_GETFL);
   if(-1 == attribs)
-    return make_errored_result<void>(errno);
+    return {errno, std::system_category()};
   attribs &= ~(O_SYNC | O_DIRECT
 #ifdef O_DSYNC
                | O_DSYNC
@@ -114,19 +114,19 @@ result<void> handle::set_kernel_caching(caching caching) noexcept
   case handle::caching::none:
     attribs |= O_SYNC | O_DIRECT;
     if(-1 == fcntl(_v.fd, F_SETFL, attribs))
-      return make_errored_result<void>(errno, last190(path().native()));
+      return {errno, std::system_category()};
     _v.behaviour |= native_handle_type::disposition::aligned_io;
     break;
   case handle::caching::only_metadata:
     attribs |= O_DIRECT;
     if(-1 == fcntl(_v.fd, F_SETFL, attribs))
-      return make_errored_result<void>(errno, last190(path().native()));
+      return {errno, std::system_category()};
     _v.behaviour |= native_handle_type::disposition::aligned_io;
     break;
   case handle::caching::reads:
     attribs |= O_SYNC;
     if(-1 == fcntl(_v.fd, F_SETFL, attribs))
-      return make_errored_result<void>(errno, last190(path().native()));
+      return {errno, std::system_category()};
     _v.behaviour &= ~native_handle_type::disposition::aligned_io;
     break;
   case handle::caching::reads_and_metadata:
@@ -136,23 +136,19 @@ result<void> handle::set_kernel_caching(caching caching) noexcept
     attribs |= O_SYNC;
 #endif
     if(-1 == fcntl(_v.fd, F_SETFL, attribs))
-      return make_errored_result<void>(errno, last190(path().native()));
+      return {errno, std::system_category()};
     _v.behaviour &= ~native_handle_type::disposition::aligned_io;
     break;
   case handle::caching::all:
   case handle::caching::safety_fsyncs:
   case handle::caching::temporary:
     if(-1 == fcntl(_v.fd, F_SETFL, attribs))
-      return make_errored_result<void>(errno, last190(path().native()));
+      return {errno, std::system_category()};
     _v.behaviour &= ~native_handle_type::disposition::aligned_io;
     break;
   }
   _caching = caching;
-  return make_valued_result<void>();
-}
-
-pathed_handle::~pathed_handle()
-{
+  return success();
 }
 
 AFIO_V2_NAMESPACE_END

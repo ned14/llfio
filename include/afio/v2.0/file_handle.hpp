@@ -50,7 +50,7 @@ visible error message.
 
 \mallocs Allocates storage for each path probed.
 */
-AFIO_HEADERS_ONLY_FUNC_SPEC const filesystem::path &temporary_files_directory() noexcept;
+AFIO_HEADERS_ONLY_FUNC_SPEC path_view temporary_files_directory() noexcept;
 
 class io_service;
 
@@ -165,8 +165,8 @@ public:
       {
         auto randomname = utils::random_string(32);
         randomname.append(".random");
-        result<file_handle> ret = file(dirpath / randomname, _mode, creation::only_if_not_exist, _caching, flags);
-        if(ret || (!ret && ret.error().value() != EEXIST))
+        result<file_handle> ret = file(dirpath, randomname, _mode, creation::only_if_not_exist, _caching, flags);
+        if(ret || (!ret && ret.error() != std::errc::file_exists))
           return ret;
       }
     }
@@ -181,7 +181,7 @@ public:
   Note the default flags are to have the newly created file deleted
   on first handle close.
   Note also that an empty name is equivalent to calling
-  `random_file(fixme_temporary_files_directory())` and the creation
+  `random_file(temporary_files_directory())` and the creation
   parameter is ignored.
 
   \note If the temporary file you are creating is not going to have its
@@ -193,7 +193,8 @@ public:
   //[[bindlib::make_free]]
   static inline result<file_handle> temp_file(path_view_type name = path_view_type(), mode _mode = mode::write, creation _creation = creation::if_needed, caching _caching = caching::temporary, flag flags = flag::unlink_on_close) noexcept
   {
-    return name.empty() ? random_file(fixme_temporary_files_directory(), _mode, _caching, flags) : file(fixme_temporary_files_directory() / name, _mode, _creation, _caching, flags);
+    OUTCOME_TRY(tempdirh, path_handle::path(temporary_files_directory()));
+    return name.empty() ? random_file(tempdirh, _mode, _caching, flags) : file(tempdirh, name, _mode, _creation, _caching, flags);
   }
   /*! \em Securely create a file handle creating a temporary anonymous inode in
   the filesystem referred to by \em dirpath. The inode created has
@@ -254,11 +255,10 @@ public:
   about to be relinked has the same inode as the open file handle. This should prevent most unmalicious
   accidental loss of data.
 
-  \return The full new path of the relinked filesystem entry.
-  \param newpath The optionally partial new path to relink to. The current path is used as a base
-  for any relative paths specified.
+  \param base Base for any relative path.
+  \param newpath The relative or absolute new path to relink to.
   */
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<path_type> relink(path_type newpath) noexcept;
+  AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> relink(const path_handle &base, path_view_type newpath) noexcept;
 
   /*! Unlinks the current path of this open handle, causing its entry to immediately disappear from the filing system.
   On Windows unless `flag::win_disable_unlink_emulation` is set, this behaviour is

@@ -30,9 +30,9 @@ AFIO_V2_NAMESPACE_BEGIN
 template <class BuffersType, class Syscall> inline io_handle::io_result<BuffersType> do_read_write(const native_handle_type &nativeh, Syscall &&syscall, io_handle::io_request<BuffersType> reqs, deadline d) noexcept
 {
   if(d && !nativeh.is_overlapped())
-    return make_errored_result<BuffersType>(std::errc::not_supported);
+    return std::errc::not_supported;
   if(reqs.buffers.size() > 64)
-    return make_errored_result<BuffersType>(std::errc::argument_list_too_long);
+    return std::errc::argument_list_too_long;
 
   AFIO_WIN_DEADLINE_TO_SLEEP_INIT(d);
   std::array<OVERLAPPED, 64> _ols;
@@ -88,7 +88,7 @@ template <class BuffersType, class Syscall> inline io_handle::io_result<BuffersT
     ols[n].Internal = ols[n].Internal & 0xffffffff;
     if(ols[n].Internal != 0)
     {
-      return make_errored_result_nt<BuffersType>((NTSTATUS) ols[n].Internal);
+      return {(int) ols[n].Internal, ntkernel_category()};
     }
     reqs.buffers[n].second = ols[n].InternalHigh;
   }

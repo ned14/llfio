@@ -99,7 +99,7 @@ result<section_handle> section_handle::section(file_handle &backing, extent_type
   NTSTATUS ntstat = NtCreateSection(&h, SECTION_ALL_ACCESS, NULL, &_maximum_size, prot, attribs, backing.is_valid() ? backing.native_handle().h : NULL);
   if(STATUS_SUCCESS != ntstat)
   {
-    return make_errored_result_nt<section_handle>(ntstat);
+    return {(int) ntstat, ntkernel_category()};
   }
   nativeh.h = h;
   return ret;
@@ -114,7 +114,7 @@ result<section_handle::extent_type> section_handle::truncate(extent_type newsize
   _maximum_size.QuadPart = newsize;
   NTSTATUS ntstat = NtExtendSection(_v.h, &_maximum_size);
   if(STATUS_SUCCESS != ntstat)
-    return make_errored_result_nt<extent_type>(ntstat);
+    return {(int) ntstat, ntkernel_category()};
   _length = newsize;
   return newsize;
 }
@@ -293,7 +293,7 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
   NTSTATUS ntstat = NtMapViewOfSection(section.native_handle().h, GetCurrentProcess(), &addr, 0, commitsize, &_offset, &_bytes, ViewUnmap, allocation, prot);
   if(STATUS_SUCCESS != ntstat)
   {
-    return make_errored_result_nt<map_handle>(ntstat);
+    return {(int) ntstat, ntkernel_category()};
   }
   ret.value()._addr = (char *) addr;
   ret.value()._offset = offset;

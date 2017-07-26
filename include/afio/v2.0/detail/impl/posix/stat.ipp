@@ -90,7 +90,7 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> stat_t::fill(const handle &h, stat
   size_t ret = 0;
 
   if(-1 == ::fstat(h.native_handle().fd, &s))
-    return make_errored_result<size_t>(errno, last190(h.path().native()));
+    return { errno, std::system_category() };
   if(wanted & want::dev)
   {
     st_dev = s.st_dev;
