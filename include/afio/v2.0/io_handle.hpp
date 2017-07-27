@@ -80,6 +80,17 @@ public:
     using Base = result<T>;
     size_type _bytes_transferred{(size_type) -1};
 
+#ifndef NDEBUG
+    static_assert(std::is_trivial<T>::value, "");
+    static_assert(std::is_trivially_default_constructible<T>::value, "");
+    static_assert(std::is_trivially_copyable<T>::value, "");
+    static_assert(std::is_trivially_assignable<T, T>::value, "");
+    static_assert(std::is_trivially_destructible<T>::value, "");
+    static_assert(std::is_trivially_copy_constructible<T>::value, "");
+    static_assert(std::is_trivially_move_constructible<T>::value, "");
+    static_assert(std::is_trivially_copy_assignable<T>::value, "");
+    static_assert(std::is_trivially_move_assignable<T>::value, "");
+#endif
   public:
     using Base::Base;
     constexpr io_result() = default;

@@ -33,27 +33,15 @@ AFIO_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace detail
 {
-  namespace path_view
+#if !_HAS_CXX17 && __cplusplus < 201700
+  template <class T> constexpr size_t constexpr_strlen(const T *s) noexcept
   {
-    struct empty
-    {
-      template <class Char> constexpr bool operator()(const basic_string_view<Char> &v) const noexcept { return v.empty(); }
-    };
-    struct is_ntpath
-    {
-      template <class Char> constexpr bool operator()(const basic_string_view<Char> &v) const noexcept
-      {
-        if(v.size() < 4)
-          return false;
-        const auto *d = v.data();
-        if(d[0] == '\\' && d[1] == '\\' && d[2] == '.' && d[3] == '\\')
-          return true;
-        if(d[0] == '\\' && d[1] == '?' && d[2] == '?' && d[3] == '\\')
-          return true;
-        return false;
-      }
-    };
+    const T *e = s;
+    for(; *e; e++)
+      ;
+    return e - s;
   }
+#endif
 }
 
 /*! \class path_view
@@ -172,24 +160,34 @@ private:
 public:
   //! Constructs an empty path view
   constexpr path_view() noexcept : _state{} {}
-  //! Constructs a path view from a path. The input path MUST continue to exist for this view to be valid.
+  //! Implicitly constructs a path view from a path. The input path MUST continue to exist for this view to be valid.
   path_view(const filesystem::path &v) noexcept : _state(v.native()) {}
-  //! Constructs a UTF-8 path view from a string. The input string MUST continue to exist for this view to be valid.
+  //! Implicitly constructs a UTF-8 path view from a string. The input string MUST continue to exist for this view to be valid.
   path_view(const std::string &v) noexcept : _state(v) {}
-  //! Constructs a UTF-8 path view from a const char array. The input string MUST continue to exist for this view to be valid.
-  template <size_t L> constexpr path_view(const char (&v)[L]) noexcept : _state(string_view(static_cast<const char *>(v), L)) {}
-  //! Constructs a UTF-8 path view from a `const char *`
-  constexpr explicit path_view(const char *v) noexcept : _state(string_view(v)) {}
-  //! Constructs a UTF-8 path view from a string view
+  //! Implicitly constructs a UTF-8 path view from a `const char *`. The input string MUST continue to exist for this view to be valid.
+  constexpr path_view(const char *v) noexcept :
+#if !_HAS_CXX17 && __cplusplus < 201700
+  _state(string_view(v, detail::constexpr_strlen(v)))
+#else
+  _state(string_view(v))
+#endif
+  {
+  }
+  //! Implicitly constructs a UTF-8 path view from a string view.
   constexpr path_view(string_view v) noexcept : _state(v) {}
 #ifdef _WIN32
-  //! Constructs a UTF-16 path view from a string. The input string MUST continue to exist for this view to be valid.
+  //! Implicitly constructs a UTF-16 path view from a string. The input string MUST continue to exist for this view to be valid.
   path_view(const std::wstring &v) noexcept : _state(v) {}
-  //! Constructs a UTF-8 path view from a const char array. The input string MUST continue to exist for this view to be valid.
-  template <size_t L> constexpr path_view(const wchar_t (&v)[L]) noexcept : _state(wstring_view(static_cast<const wchar_t *>(v), L)) {}
-  //! Constructs a UTF-16 path view from a `const wchar_t *`
-  constexpr explicit path_view(const wchar_t *v) noexcept : _state(wstring_view(v)) {}
-  //! Constructs a UTF-16 path view from a wide string view
+  //! Implicitly constructs a UTF-16 path view from a `const wchar_t *`. The input string MUST continue to exist for this view to be valid.
+  constexpr path_view(const wchar_t *v) noexcept :
+#if !_HAS_CXX17 && __cplusplus < 201700
+  _state(wstring_view(v, detail::constexpr_strlen(v)))
+#else
+  _state(wstring_view(v))
+#endif
+  {
+  }
+  //! Implicitly constructs a UTF-16 path view from a wide string view.
   constexpr path_view(wstring_view v) noexcept : _state(v) {}
 #endif
   //! Default copy constructor
@@ -205,7 +203,10 @@ public:
   constexpr void swap(path_view &o) noexcept { _state.swap(o._state); }
 
   //! True if empty
-  constexpr bool empty() const noexcept { return _invoke(detail::path_view::empty()); }
+  constexpr bool empty() const noexcept
+  {
+    return _invoke([](const auto &v) { return v.empty(); });
+  }
   constexpr bool has_root_path() const noexcept;
   constexpr bool has_root_name() const noexcept;
   constexpr bool has_root_directory() const noexcept;
@@ -218,7 +219,19 @@ public:
   constexpr bool is_relative() const noexcept;
 #ifdef _WIN32
   // True if the path view is a NT kernel path starting with `\\.\`
-  constexpr bool is_ntpath() const noexcept { return _invoke(detail::path_view::is_ntpath()); }
+  constexpr bool is_ntpath() const noexcept
+  {
+    return _invoke([](const auto &v) {
+      if(v.size() < 4)
+        return false;
+      const auto *d = v.data();
+      if(d[0] == '\\' && d[1] == '\\' && d[2] == '.' && d[3] == '\\')
+        return true;
+      if(d[0] == '\\' && d[1] == '?' && d[2] == '?' && d[3] == '\\')
+        return true;
+      return false;
+    });
+  }
 #endif
 
   constexpr path_view remove_filename() const noexcept;
