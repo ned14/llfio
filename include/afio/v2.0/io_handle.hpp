@@ -51,13 +51,42 @@ public:
   using flag = handle::flag;
 
   //! The scatter buffer type used by this handle
-  using buffer_type = std::pair<char *, size_type>;
+  struct buffer_type
+  {
+    //! Pointer to memory to be filled by a read. Try to make this 64 byte, or ideally, `page_size()` aligned where possible.
+    char *data;
+    //! The number of bytes to fill into this address. Try to make this a 64 byte multiple, or ideally, a whole multiple of `page_size()`.
+    size_t len;
+  };
   //! The gather buffer type used by this handle
-  using const_buffer_type = std::pair<const char *, size_type>;
+  struct const_buffer_type
+  {
+    //! Pointer to memory to be written. Try to make this 64 byte, or ideally, `page_size()` aligned where possible.
+    const char *data;
+    //! The number of bytes to write from this address. Try to make this a 64 byte multiple, or ideally, a whole multiple of `page_size()`.
+    size_t len;
+  };
+#ifndef NDEBUG
+  static_assert(std::is_trivial<buffer_type>::value, "buffer_type is not a trivial type!");
+  static_assert(std::is_trivial<const_buffer_type>::value, "const_buffer_type is not a trivial type!");
+  static_assert(std::is_standard_layout<buffer_type>::value, "buffer_type is not a standard layout type!");
+  static_assert(std::is_standard_layout<const_buffer_type>::value, "const_buffer_type is not a standard layout type!");
+#endif
   //! The scatter buffers type used by this handle
   using buffers_type = span<buffer_type>;
   //! The gather buffers type used by this handle
   using const_buffers_type = span<const_buffer_type>;
+#ifndef NDEBUG
+  // Is trivial in all ways, except default constructibility
+  static_assert(std::is_trivially_copyable<buffers_type>::value, "buffers_type is not trivially copyable!");
+  static_assert(std::is_trivially_assignable<buffers_type, buffers_type>::value, "buffers_type is not trivially assignable!");
+  static_assert(std::is_trivially_destructible<buffers_type>::value, "buffers_type is not trivially destructible!");
+  static_assert(std::is_trivially_copy_constructible<buffers_type>::value, "buffers_type is not trivially copy constructible!");
+  static_assert(std::is_trivially_move_constructible<buffers_type>::value, "buffers_type is not trivially move constructible!");
+  static_assert(std::is_trivially_copy_assignable<buffers_type>::value, "buffers_type is not trivially copy assignable!");
+  static_assert(std::is_trivially_move_assignable<buffers_type>::value, "buffers_type is not trivially move assignable!");
+  static_assert(std::is_standard_layout<buffers_type>::value, "buffers_type is not a standard layout type!");
+#endif
   //! The i/o request type used by this handle
   template <class T> struct io_request
   {
@@ -74,23 +103,23 @@ public:
     {
     }
   };
+#ifndef NDEBUG
+  // Is trivial in all ways, except default constructibility
+  static_assert(std::is_trivially_copyable<io_request<buffers_type>>::value, "io_request<buffers_type> is not trivially copyable!");
+  static_assert(std::is_trivially_assignable<io_request<buffers_type>, io_request<buffers_type>>::value, "io_request<buffers_type> is not trivially assignable!");
+  static_assert(std::is_trivially_destructible<io_request<buffers_type>>::value, "io_request<buffers_type> is not trivially destructible!");
+  static_assert(std::is_trivially_copy_constructible<io_request<buffers_type>>::value, "io_request<buffers_type> is not trivially copy constructible!");
+  static_assert(std::is_trivially_move_constructible<io_request<buffers_type>>::value, "io_request<buffers_type> is not trivially move constructible!");
+  static_assert(std::is_trivially_copy_assignable<io_request<buffers_type>>::value, "io_request<buffers_type> is not trivially copy assignable!");
+  static_assert(std::is_trivially_move_assignable<io_request<buffers_type>>::value, "io_request<buffers_type> is not trivially move assignable!");
+  static_assert(std::is_standard_layout<io_request<buffers_type>>::value, "io_request<buffers_type> is not a standard layout type!");
+#endif
   //! The i/o result type used by this handle
   template <class T> class io_result : public result<T>
   {
     using Base = result<T>;
     size_type _bytes_transferred{(size_type) -1};
 
-#ifndef NDEBUG
-    static_assert(std::is_trivial<T>::value, "");
-    static_assert(std::is_trivially_default_constructible<T>::value, "");
-    static_assert(std::is_trivially_copyable<T>::value, "");
-    static_assert(std::is_trivially_assignable<T, T>::value, "");
-    static_assert(std::is_trivially_destructible<T>::value, "");
-    static_assert(std::is_trivially_copy_constructible<T>::value, "");
-    static_assert(std::is_trivially_move_constructible<T>::value, "");
-    static_assert(std::is_trivially_copy_assignable<T>::value, "");
-    static_assert(std::is_trivially_move_assignable<T>::value, "");
-#endif
   public:
     using Base::Base;
     constexpr io_result() = default;
@@ -110,6 +139,18 @@ public:
       return _bytes_transferred;
     }
   };
+#ifndef NDEBUG
+  // Is trivial in all ways, except default constructibility
+  static_assert(std::is_trivially_copyable<io_result<buffers_type>>::value, "io_result<buffers_type> is not trivially copyable!");
+  static_assert(std::is_trivially_assignable<io_result<buffers_type>, io_result<buffers_type>>::value, "io_result<buffers_type> is not trivially assignable!");
+  static_assert(std::is_trivially_destructible<io_result<buffers_type>>::value, "io_result<buffers_type> is not trivially destructible!");
+  static_assert(std::is_trivially_copy_constructible<io_result<buffers_type>>::value, "io_result<buffers_type> is not trivially copy constructible!");
+  static_assert(std::is_trivially_move_constructible<io_result<buffers_type>>::value, "io_result<buffers_type> is not trivially move constructible!");
+  static_assert(std::is_trivially_copy_assignable<io_result<buffers_type>>::value, "io_result<buffers_type> is not trivially copy assignable!");
+  static_assert(std::is_trivially_move_assignable<io_result<buffers_type>>::value, "io_result<buffers_type> is not trivially move assignable!");
+// Better to default constructors than to remove the static member init
+// static_assert(std::is_standard_layout<io_result<buffers_type>>::value, "io_result<buffers_type> is not a standard layout type!");
+#endif
 
 public:
   //! Default constructor
@@ -319,7 +360,11 @@ public:
   {
     size_t bytes = 0;
     for(auto &i : reqs.buffers)
-      bytes += i.second;
+    {
+      if(bytes + i.len < bytes)
+        return std::errc::value_too_large;
+      bytes += i.len;
+    }
     return lock(reqs.offset, bytes, false, std::move(d));
   }
   //! \overload Locks for exclusive access
@@ -327,7 +372,11 @@ public:
   {
     size_t bytes = 0;
     for(auto &i : reqs.buffers)
-      bytes += i.second;
+    {
+      if(bytes + i.len < bytes)
+        return std::errc::value_too_large;
+      bytes += i.len;
+    }
     return lock(reqs.offset, bytes, true, std::move(d));
   }
 

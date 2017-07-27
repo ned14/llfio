@@ -176,7 +176,11 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::barrier(map_ha
   char *addr = _addr + reqs.offset;
   extent_type bytes = 0;
   for(const auto &req : reqs.buffers)
-    bytes += req.second;
+  {
+    if(bytes + req.len < bytes)
+      return std::errc::value_too_large;
+    bytes += req.len;
+  }
   if(!FlushViewOfFile(addr, (SIZE_T) bytes))
     return {GetLastError(), std::system_category()};
   if(_section && _section->backing() && (wait_for_device || and_metadata))
@@ -231,7 +235,7 @@ result<map_handle> map_handle::map(size_type bytes, section_handle::flag _flag) 
   {
     using namespace windows_nt_kernel;
     // Start an asynchronous prefetch
-    buffer_type b((char *) addr, bytes);
+    buffer_type b{(char *) addr, bytes};
     (void) prefetch(span<buffer_type>(&b, 1));
     // If this kernel doesn't support that API, manually poke every page in the new map
     if(!PrefetchVirtualMemory_)
@@ -305,7 +309,7 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
   if(_flag & section_handle::flag::prefault)
   {
     // Start an asynchronous prefetch
-    buffer_type b((char *) addr, _bytes);
+    buffer_type b{(char *) addr, _bytes};
     (void) prefetch(span<buffer_type>(&b, 1));
     // If this kernel doesn't support that API, manually poke every page in the new map
     if(!PrefetchVirtualMemory_)
@@ -322,13 +326,13 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
 result<map_handle::buffer_type> map_handle::commit(buffer_type region, section_handle::flag _flag) noexcept
 {
   AFIO_LOG_FUNCTION_CALL(this);
-  if(!region.first)
+  if(!region.data)
     return std::errc::invalid_argument;
   DWORD prot = 0;
   if(_flag == section_handle::flag::none)
   {
     DWORD _ = 0;
-    if(!VirtualProtect(region.first, region.second, PAGE_NOACCESS, &_))
+    if(!VirtualProtect(region.data, region.len, PAGE_NOACCESS, &_))
       return {GetLastError(), std::system_category()};
     return region;
   }
@@ -350,7 +354,7 @@ result<map_handle::buffer_type> map_handle::commit(buffer_type region, section_h
   if(_flag & section_handle::flag::execute)
     prot = PAGE_EXECUTE;
   region = utils::round_to_page_size(region);
-  if(!VirtualAlloc(region.first, region.second, MEM_COMMIT, prot))
+  if(!VirtualAlloc(region.data, region.len, MEM_COMMIT, prot))
     return {GetLastError(), std::system_category()};
   return region;
 }
@@ -358,10 +362,10 @@ result<map_handle::buffer_type> map_handle::commit(buffer_type region, section_h
 result<map_handle::buffer_type> map_handle::decommit(buffer_type region) noexcept
 {
   AFIO_LOG_FUNCTION_CALL(this);
-  if(!region.first)
+  if(!region.data)
     return std::errc::invalid_argument;
   region = utils::round_to_page_size(region);
-  if(!VirtualFree(region.first, region.second, MEM_DECOMMIT))
+  if(!VirtualFree(region.data, region.len, MEM_DECOMMIT))
     return {GetLastError(), std::system_category()};
   return region;
 }
@@ -369,11 +373,11 @@ result<map_handle::buffer_type> map_handle::decommit(buffer_type region) noexcep
 result<void> map_handle::zero_memory(buffer_type region) noexcept
 {
   AFIO_LOG_FUNCTION_CALL(this);
-  if(!region.first)
+  if(!region.data)
     return std::errc::invalid_argument;
   //! \todo Once you implement file_handle::zero(), please implement map_handle::zero()
-  // buffer_type page_region { (char *) utils::round_up_to_page_size((uintptr_t) region.first), utils::round_down_to_page_size(region.second); };
-  memset(region.first, 0, region.second);
+  // buffer_type page_region { (char *) utils::round_up_to_page_size((uintptr_t) region.data), utils::round_down_to_page_size(region.len); };
+  memset(region.data, 0, region.len);
   return success();
 }
 
@@ -396,7 +400,7 @@ result<map_handle::buffer_type> map_handle::do_not_store(buffer_type region) noe
   using namespace windows_nt_kernel;
   AFIO_LOG_FUNCTION_CALL(0);
   region = utils::round_to_page_size(region);
-  if(!region.first)
+  if(!region.data)
     return std::errc::invalid_argument;
   // Windows does not support throwing away dirty pages on file backed maps
   if(!_section || !_section->backing())
@@ -404,17 +408,17 @@ result<map_handle::buffer_type> map_handle::do_not_store(buffer_type region) noe
     // Win8's DiscardVirtualMemory is much faster if it's available
     if(DiscardVirtualMemory_)
     {
-      if(!DiscardVirtualMemory_(region.first, region.second))
+      if(!DiscardVirtualMemory_(region.data, region.len))
         return {GetLastError(), std::system_category()};
       return region;
     }
     // Else MEM_RESET will do
-    if(!VirtualAlloc(region.first, region.second, MEM_RESET, 0))
+    if(!VirtualAlloc(region.data, region.len, MEM_RESET, 0))
       return {GetLastError(), std::system_category()};
     return region;
   }
   // We did nothing
-  region.second = 0;
+  region.len = 0;
   return region;
 }
 
@@ -427,14 +431,14 @@ map_handle::io_result<map_handle::buffers_type> map_handle::read(io_request<buff
   {
     if(togo)
     {
-      req.first = addr;
-      if(req.second > togo)
-        req.second = togo;
-      addr += req.second;
-      togo -= req.second;
+      req.data = addr;
+      if(req.len > togo)
+        req.len = togo;
+      addr += req.len;
+      togo -= req.len;
     }
     else
-      req.second = 0;
+      req.len = 0;
   }
   return reqs.buffers;
 }
@@ -448,15 +452,15 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::write(io_reque
   {
     if(togo)
     {
-      if(req.second > togo)
-        req.second = togo;
-      memcpy(addr, req.first, req.second);
-      req.first = addr;
-      addr += req.second;
-      togo -= req.second;
+      if(req.len > togo)
+        req.len = togo;
+      memcpy(addr, req.data, req.len);
+      req.data = addr;
+      addr += req.len;
+      togo -= req.len;
     }
     else
-      req.second = 0;
+      req.len = 0;
   }
   return reqs.buffers;
 }

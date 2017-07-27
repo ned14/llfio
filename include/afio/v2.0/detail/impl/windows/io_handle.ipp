@@ -64,9 +64,9 @@ template <class BuffersType, class Syscall> inline io_handle::io_result<BuffersT
       ol.OffsetHigh = (reqs.offset >> 32) & 0xffffffff;
       ol.Offset = reqs.offset & 0xffffffff;
     }
-    if(!syscall(nativeh.h, req.first, (DWORD) req.second, &transferred, &ol) && ERROR_IO_PENDING != GetLastError())
+    if(!syscall(nativeh.h, req.data, (DWORD) req.len, &transferred, &ol) && ERROR_IO_PENDING != GetLastError())
       return {GetLastError(), std::system_category()};
-    reqs.offset += req.second;
+    reqs.offset += req.len;
   }
   // If handle is overlapped, wait for completion of each i/o.
   if(nativeh.is_overlapped())
@@ -90,7 +90,7 @@ template <class BuffersType, class Syscall> inline io_handle::io_result<BuffersT
     {
       return {(int) ols[n].Internal, ntkernel_category()};
     }
-    reqs.buffers[n].second = ols[n].InternalHigh;
+    reqs.buffers[n].len = ols[n].InternalHigh;
   }
   return io_handle::io_result<BuffersType>(std::move(reqs.buffers));
 }

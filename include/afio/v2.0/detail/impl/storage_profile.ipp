@@ -302,7 +302,7 @@ namespace storage_profile
                 throw std::runtime_error("concurrency::atomic_rewrite_quantum: Could not open work file due to " + _h.error().message());
               file_handle h(std::move(_h.value()));
               std::vector<char> buffer(size, no);
-              file_handle::const_buffer_type _reqs[1] = {std::make_pair(buffer.data(), size)};
+              file_handle::const_buffer_type _reqs[1] = {{buffer.data(), size}};
               file_handle::io_request<file_handle::const_buffers_type> reqs(_reqs, 0);
               --done;
               while(done)
@@ -327,7 +327,7 @@ namespace storage_profile
                 throw std::runtime_error("concurrency::atomic_rewrite_quantum: Could not open work file due to " + _h.error().message());
               file_handle h(std::move(_h.value()));
               std::vector<char> buffer(size, 0), tocmp(size, 0);
-              file_handle::buffer_type _reqs[1] = {std::make_pair(buffer.data(), size)};
+              file_handle::buffer_type _reqs[1] = {{buffer.data(), size}};
               file_handle::io_request<file_handle::buffers_type> reqs(_reqs, 0);
               while(!done)
               {
@@ -398,7 +398,7 @@ namespace storage_profile
                   throw std::runtime_error("concurrency::atomic_rewrite_quantum: Could not open work file due to " + _h.error().message());
                 file_handle h(std::move(_h.value()));
                 std::vector<char> buffer(size, no);
-                file_handle::const_buffer_type _reqs[1] = {std::make_pair(buffer.data(), size)};
+                file_handle::const_buffer_type _reqs[1] = {{buffer.data(), size}};
                 file_handle::io_request<file_handle::const_buffers_type> reqs(_reqs, offset);
                 --done;
                 while(done)
@@ -423,7 +423,7 @@ namespace storage_profile
                   throw std::runtime_error("concurrency::atomic_rewrite_quantum: Could not open work file due to " + _h.error().message());
                 file_handle h(std::move(_h.value()));
                 std::vector<char> buffer(size, 0), tocmp(size, 0);
-                file_handle::buffer_type _reqs[1] = {std::make_pair(buffer.data(), size)};
+                file_handle::buffer_type _reqs[1] = {{buffer.data(), size}};
                 file_handle::io_request<file_handle::buffers_type> reqs(_reqs, offset);
                 while(!done)
                 {
@@ -506,7 +506,7 @@ namespace storage_profile
                     throw std::runtime_error("concurrency::atomic_rewrite_offset_boundary: Could not open work file due to " + _h.error().message());
                   file_handle h(std::move(_h.value()));
                   std::vector<char> buffer(size, no);
-                  file_handle::const_buffer_type _reqs[1] = {std::make_pair(buffer.data(), size)};
+                  file_handle::const_buffer_type _reqs[1] = {{buffer.data(), size}};
                   file_handle::io_request<file_handle::const_buffers_type> reqs(_reqs, offset);
                   --done;
                   while(done)
@@ -531,7 +531,7 @@ namespace storage_profile
                     throw std::runtime_error("concurrency::atomic_rewrite_offset_boundary: Could not open work file due to " + _h.error().message());
                   file_handle h(std::move(_h.value()));
                   std::vector<char> buffer(size, 0), tocmp(size, 0);
-                  file_handle::buffer_type _reqs[1] = {std::make_pair(buffer.data(), size)};
+                  file_handle::buffer_type _reqs[1] = {{buffer.data(), size}};
                   file_handle::io_request<file_handle::buffers_type> reqs(_reqs, offset);
                   while(!done)
                   {

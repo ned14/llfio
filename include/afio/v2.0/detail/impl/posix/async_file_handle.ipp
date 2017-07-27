@@ -108,7 +108,7 @@ result<async_file_handle::io_state_ptr<CompletionRoutine, BuffersType>> async_fi
             AFIO_LOG_FATAL(0, "file_handle::io_state::operator() called with invalid index");
             std::terminate();
           }
-          this->result.value()[idx].second = bytes_transferred;
+          this->result.value()[idx].len = bytes_transferred;
         }
       }
       this->parent->service()->_work_done();
@@ -186,8 +186,8 @@ result<async_file_handle::io_state_ptr<CompletionRoutine, BuffersType>> async_fi
     struct aiocb *aiocb = state->aiocbs + n;
     aiocb->aio_fildes = _v.fd;
     aiocb->aio_offset = offset;
-    aiocb->aio_buf = (void *) out[n].first;
-    aiocb->aio_nbytes = out[n].second;
+    aiocb->aio_buf = (void *) out[n].data;
+    aiocb->aio_nbytes = out[n].len;
     aiocb->aio_sigevent.sigev_notify = SIGEV_NONE;
     aiocb->aio_sigevent.sigev_value.sival_ptr = (void *) state;
     switch(operation)
@@ -208,7 +208,7 @@ result<async_file_handle::io_state_ptr<CompletionRoutine, BuffersType>> async_fi
 #else
 #error todo
 #endif
-    offset += out[n].second;
+    offset += out[n].len;
     ++state->items_to_go;
   }
   int ret = 0;

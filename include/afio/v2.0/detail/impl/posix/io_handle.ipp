@@ -41,26 +41,31 @@ io_handle::io_result<io_handle::buffers_type> io_handle::read(io_handle::io_requ
     return std::errc::not_supported;
   if(reqs.buffers.size() > IOV_MAX)
     return std::errc::argument_list_too_long;
+#if 0
   struct iovec *iov = (struct iovec *) alloca(reqs.buffers.size() * sizeof(struct iovec));
   for(size_t n = 0; n < reqs.buffers.size(); n++)
   {
-    iov[n].iov_base = reqs.buffers[n].first;
-    iov[n].iov_len = reqs.buffers[n].second;
+    iov[n].iov_base = reqs.buffers[n].data;
+    iov[n].iov_len = reqs.buffers[n].len;
   }
+#else
+  static_assert(sizeof(buffer_type) == sizeof(iovec), "buffer_type and struct iovec do not match");
+  struct iovec *iov = (struct iovec *) reqs.buffers.data();
+#endif
   ssize_t bytesread = ::preadv(_v.fd, iov, reqs.buffers.size(), reqs.offset);
   if(bytesread < 0)
     return {errno, std::system_category()};
   for(size_t n = 0; n < reqs.buffers.size(); n++)
   {
-    if(reqs.buffers[n].second >= (size_t) bytesread)
-      bytesread -= reqs.buffers[n].second;
+    if(reqs.buffers[n].len >= (size_t) bytesread)
+      bytesread -= reqs.buffers[n].len;
     else if(bytesread > 0)
     {
-      reqs.buffers[n].second = bytesread;
+      reqs.buffers[n].len = bytesread;
       bytesread = 0;
     }
     else
-      reqs.buffers[n].second = 0;
+      reqs.buffers[n].len = 0;
   }
   return io_handle::io_result<io_handle::buffers_type>(std::move(reqs.buffers));
 }
@@ -72,26 +77,31 @@ io_handle::io_result<io_handle::const_buffers_type> io_handle::write(io_handle::
     return std::errc::not_supported;
   if(reqs.buffers.size() > IOV_MAX)
     return std::errc::argument_list_too_long;
+#if 0
   struct iovec *iov = (struct iovec *) alloca(reqs.buffers.size() * sizeof(struct iovec));
   for(size_t n = 0; n < reqs.buffers.size(); n++)
   {
-    iov[n].iov_base = const_cast<char *>(reqs.buffers[n].first);
-    iov[n].iov_len = reqs.buffers[n].second;
+    iov[n].iov_base = const_cast<char *>(reqs.buffers[n].data);
+    iov[n].iov_len = reqs.buffers[n].len;
   }
+#else
+  static_assert(sizeof(buffer_type) == sizeof(iovec), "buffer_type and struct iovec do not match");
+  struct iovec *iov = (struct iovec *) reqs.buffers.data();
+#endif
   ssize_t byteswritten = ::pwritev(_v.fd, iov, reqs.buffers.size(), reqs.offset);
   if(byteswritten < 0)
     return {errno, std::system_category()};
   for(size_t n = 0; n < reqs.buffers.size(); n++)
   {
-    if(reqs.buffers[n].second >= (size_t) byteswritten)
-      byteswritten -= reqs.buffers[n].second;
+    if(reqs.buffers[n].len >= (size_t) byteswritten)
+      byteswritten -= reqs.buffers[n].len;
     else if(byteswritten > 0)
     {
-      reqs.buffers[n].second = byteswritten;
+      reqs.buffers[n].len = byteswritten;
       byteswritten = 0;
     }
     else
-      reqs.buffers[n].second = 0;
+      reqs.buffers[n].len = 0;
   }
   return io_handle::io_result<io_handle::const_buffers_type>(std::move(reqs.buffers));
 }

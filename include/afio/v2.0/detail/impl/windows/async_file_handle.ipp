@@ -69,7 +69,7 @@ result<async_file_handle::io_state_ptr<CompletionRoutine, BuffersType>> async_fi
             AFIO_LOG_FATAL(0, "async_file_handle::io_state::operator() called with invalid index");
             std::terminate();
           }
-          this->result.value()[idx].second = bytes_transferred;
+          this->result.value()[idx].len = bytes_transferred;
         }
       }
       this->parent->service()->_work_done();
@@ -147,9 +147,9 @@ result<async_file_handle::io_state_ptr<CompletionRoutine, BuffersType>> async_fi
     }
     // Use the unused hEvent member to pass through the state
     ol->hEvent = (HANDLE) state;
-    offset += out[n].second;
+    offset += out[n].len;
     ++state->items_to_go;
-    if(!ioroutine(_v.h, out[n].first, (DWORD) out[n].second, ol, handle_completion::Do))
+    if(!ioroutine(_v.h, out[n].data, (DWORD) out[n].len, ol, handle_completion::Do))
     {
       --state->items_to_go;
       state->result = {GetLastError(), std::system_category()};

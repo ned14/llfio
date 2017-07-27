@@ -103,7 +103,11 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::barrier(map_ha
   char *addr = _addr + reqs.offset;
   extent_type bytes = 0;
   for(const auto &req : reqs.buffers)
-    bytes += req.second;
+  {
+    if(bytes + req.len < bytes)
+      return std::errc::value_too_large;
+    bytes += req.len;
+  }
   int flags = (wait_for_device || and_metadata) ? MS_SYNC : MS_ASYNC;
   if(-1 == ::msync(addr, bytes, flags))
     return {errno, std::system_category()};
@@ -210,15 +214,15 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
 result<map_handle::buffer_type> map_handle::commit(buffer_type region, section_handle::flag _flag) noexcept
 {
   AFIO_LOG_FUNCTION_CALL(this);
-  if(!region.first)
+  if(!region.data)
     return std::errc::invalid_argument;
   // Set permissions on the pages
   region = utils::round_to_page_size(region);
-  extent_type offset = _offset + (region.first - _addr);
-  size_type bytes = region.second;
-  OUTCOME_TRYV(do_mmap(_v, region.first, _section, bytes, offset, _flag));
+  extent_type offset = _offset + (region.data - _addr);
+  size_type bytes = region.len;
+  OUTCOME_TRYV(do_mmap(_v, region.data, _section, bytes, offset, _flag));
   // Tell the kernel we will be using these pages soon
-  if(-1 == ::madvise(region.first, region.second, MADV_WILLNEED))
+  if(-1 == ::madvise(region.data, region.len, MADV_WILLNEED))
     return {errno, std::system_category()};
   return region;
 }
@@ -226,36 +230,36 @@ result<map_handle::buffer_type> map_handle::commit(buffer_type region, section_h
 result<map_handle::buffer_type> map_handle::decommit(buffer_type region) noexcept
 {
   AFIO_LOG_FUNCTION_CALL(this);
-  if(!region.first)
+  if(!region.data)
     return std::errc::invalid_argument;
   region = utils::round_to_page_size(region);
   // Tell the kernel to kick these pages into storage
-  if(-1 == ::madvise(region.first, region.second, MADV_DONTNEED))
+  if(-1 == ::madvise(region.data, region.len, MADV_DONTNEED))
     return {errno, std::system_category()};
   // Set permissions on the pages to no access
-  extent_type offset = _offset + (region.first - _addr);
-  size_type bytes = region.second;
-  OUTCOME_TRYV(do_mmap(_v, region.first, _section, bytes, offset, section_handle::flag::none));
+  extent_type offset = _offset + (region.data - _addr);
+  size_type bytes = region.len;
+  OUTCOME_TRYV(do_mmap(_v, region.data, _section, bytes, offset, section_handle::flag::none));
   return region;
 }
 
 result<void> map_handle::zero_memory(buffer_type region) noexcept
 {
   AFIO_LOG_FUNCTION_CALL(this);
-  if(!region.first)
+  if(!region.data)
     return std::errc::invalid_argument;
 #ifdef MADV_REMOVE
-  buffer_type page_region{(char *) utils::round_up_to_page_size((uintptr_t) region.first), utils::round_down_to_page_size(region.second)};
+  buffer_type page_region{(char *) utils::round_up_to_page_size((uintptr_t) region.data), utils::round_down_to_page_size(region.len)};
   // Zero contents and punch a hole in any backing storage
-  if(page_region.second && -1 != ::madvise(page_region.first, page_region.second, MADV_REMOVE))
+  if(page_region.len && -1 != ::madvise(page_region.data, page_region.len, MADV_REMOVE))
   {
-    memset(region.first, 0, page_region.first - region.first);
-    memset(page_region.first + page_region.second, 0, (region.first + region.second) - (page_region.first + page_region.second));
+    memset(region.data, 0, page_region.data - region.data);
+    memset(page_region.data + page_region.len, 0, (region.data + region.len) - (page_region.data + page_region.len));
     return success();
   }
 #endif
   //! \todo Once you implement file_handle::zero(), please implement map_handle::zero()
-  memset(region.first, 0, region.second);
+  memset(region.data, 0, region.len);
   return success();
 }
 
@@ -264,7 +268,7 @@ result<span<map_handle::buffer_type>> map_handle::prefetch(span<buffer_type> reg
   AFIO_LOG_FUNCTION_CALL(0);
   for(const auto &region : regions)
   {
-    if(-1 == ::madvise(region.first, region.second, MADV_WILLNEED))
+    if(-1 == ::madvise(region.data, region.len, MADV_WILLNEED))
       return {errno, std::system_category()};
   }
   return regions;
@@ -274,17 +278,17 @@ result<map_handle::buffer_type> map_handle::do_not_store(buffer_type region) noe
 {
   AFIO_LOG_FUNCTION_CALL(0);
   region = utils::round_to_page_size(region);
-  if(!region.first)
+  if(!region.data)
     return std::errc::invalid_argument;
 #ifdef MADV_FREE
   // Tell the kernel to throw away the contents of these pages
-  if(-1 == ::madvise(_region.first, _region.second, MADV_FREE))
+  if(-1 == ::madvise(_region.data, _region.len, MADV_FREE))
     return {errno, std::system_category()};
   else
     return region;
 #endif
   // No support on this platform
-  region.second = 0;
+  region.len = 0;
   return region;
 }
 
@@ -297,14 +301,14 @@ map_handle::io_result<map_handle::buffers_type> map_handle::read(io_request<buff
   {
     if(togo)
     {
-      req.first = addr;
-      if(req.second > togo)
-        req.second = togo;
-      addr += req.second;
-      togo -= req.second;
+      req.data = addr;
+      if(req.len > togo)
+        req.len = togo;
+      addr += req.len;
+      togo -= req.len;
     }
     else
-      req.second = 0;
+      req.len = 0;
   }
   return reqs.buffers;
 }
@@ -318,15 +322,15 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::write(io_reque
   {
     if(togo)
     {
-      if(req.second > togo)
-        req.second = togo;
-      memcpy(addr, req.first, req.second);
-      req.first = addr;
-      addr += req.second;
-      togo -= req.second;
+      if(req.len > togo)
+        req.len = togo;
+      memcpy(addr, req.data, req.len);
+      req.data = addr;
+      addr += req.len;
+      togo -= req.len;
     }
     else
-      req.second = 0;
+      req.len = 0;
   }
   return reqs.buffers;
 }

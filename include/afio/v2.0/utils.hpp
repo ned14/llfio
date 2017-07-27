@@ -65,11 +65,11 @@ namespace utils
   /*! \brief Round a pair of a pointer and a size_t to their nearest page size multiples. The pointer will be rounded
   down, the size_t upwards.
   */
-  template <class T> inline std::pair<T *, size_t> round_to_page_size(std::pair<T *, size_t> i) noexcept
+  template <class T> inline T round_to_page_size(T i) noexcept
   {
     const size_t pagesize = page_size();
-    i.first = (T *) (((uintptr_t) i.first) & ~(pagesize - 1));
-    i.second = (i.second + pagesize - 1) & ~(pagesize - 1);
+    i.data = (char *) (((uintptr_t) i.data) & ~(pagesize - 1));
+    i.len = (i.len + pagesize - 1) & ~(pagesize - 1);
     return i;
   }
 
