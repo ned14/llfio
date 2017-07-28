@@ -29,6 +29,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include "base.hpp"
 
 #include <cassert>
+#include <thread>  // for yield()
 
 //! \file atomic_append.hpp Provides algorithm::shared_fs_mutex::atomic_append
 

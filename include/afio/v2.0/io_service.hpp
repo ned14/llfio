@@ -29,6 +29,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <cassert>
 #include <deque>
+#include <mutex>
 
 #undef _threadid  // windows macro splosh sigh
 

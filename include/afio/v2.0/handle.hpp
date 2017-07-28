@@ -151,18 +151,9 @@ protected:
 
 public:
   //! Default constructor
-  constexpr handle()
-      : _caching(caching::none)
-      , _flags(flag::none)
-  {
-  }
+  constexpr handle() noexcept : _caching(caching::none), _flags(flag::none) {}
   //! Construct a handle from a supplied native handle
-  explicit QUICKCPPLIB_CONSTEXPR handle(native_handle_type h, caching caching = caching::none, flag flags = flag::none)
-      : _caching(caching)
-      , _flags(flags)
-      , _v(std::move(h))
-  {
-  }
+  explicit QUICKCPPLIB_CONSTEXPR handle(native_handle_type h, caching caching = caching::none, flag flags = flag::none) noexcept : _caching(caching), _flags(flags), _v(std::move(h)) {}
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC ~handle();
   //! No copy construction (use clone())
   handle(const handle &) = delete;

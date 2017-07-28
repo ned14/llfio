@@ -70,7 +70,7 @@ template <class U> inline void map_handle_create_close_(U &&f)
         if (use_file_backing)
         {
           // Create a temporary backing file
-          temph = file_handle::file("tempfile", file_handle::mode::write, file_handle::creation::if_needed).get();
+          temph = file_handle::file({}, "tempfile", file_handle::mode::write, file_handle::creation::if_needed).value();
           temph.write(0, "I am some file data", 19).get();
         }
         else
@@ -95,26 +95,26 @@ template <class U> inline void map_handle_create_close_(U &&f)
         {
           char *addr = maph.address();
           section_handle::flag flags = std::get<1>(std::get<1>(permuter[idx]));
-          BOOST_KERNELTEST_CHECK(testreturn, maph.length() > 0);
-          BOOST_KERNELTEST_CHECK(testreturn, addr != nullptr);
+          KERNELTEST_CHECK(testreturn, maph.length() > 0);
+          KERNELTEST_CHECK(testreturn, addr != nullptr);
           if (!(flags & section_handle::flag::nocommit))
           {
             char buffer[64];
             // Make sure the backing file is appearing in the map
             if (use_file_backing && maph.is_readable())
             {
-              BOOST_KERNELTEST_CHECK(testreturn, !memcmp(addr, "I am some file data", 19));
+              KERNELTEST_CHECK(testreturn, !memcmp(addr, "I am some file data", 19));
             }
             // Make sure maph's read() does what it is supposed to
             {
-              auto b = maph.read(0, nullptr, 20).get();
-              BOOST_KERNELTEST_CHECK(testreturn, b.first == addr);
-              BOOST_KERNELTEST_CHECK(testreturn, b.second == 20);
+              auto b = maph.read(0, nullptr, 20).value();
+              KERNELTEST_CHECK(testreturn, b.first == addr);
+              KERNELTEST_CHECK(testreturn, b.second == 20);
             }
             {
-              auto b = maph.read(5, nullptr, 5000).get();
-              BOOST_KERNELTEST_CHECK(testreturn, b.first == addr+5);
-              BOOST_KERNELTEST_CHECK(testreturn, b.second == 4091);
+              auto b = maph.read(5, nullptr, 5000).value();
+              KERNELTEST_CHECK(testreturn, b.first == addr+5);
+              KERNELTEST_CHECK(testreturn, b.second == 4091);
             }
             // If we are writable, write straight into the map
             if (maph.is_writable() && addr)
@@ -128,18 +128,18 @@ template <class U> inline void map_handle_create_close_(U &&f)
                 temph.read(0, buffer, 64);
                 if (flags & section_handle::flag::cow)
                 {
-                  BOOST_KERNELTEST_CHECK(testreturn, !memcmp(buffer, "I am some file data", 19));
+                  KERNELTEST_CHECK(testreturn, !memcmp(buffer, "I am some file data", 19));
                 }
                 else
                 {
-                  BOOST_KERNELTEST_CHECK(testreturn, !memcmp(buffer, "Niall was here data", 19));
+                  KERNELTEST_CHECK(testreturn, !memcmp(buffer, "Niall was here data", 19));
                 }
               }
             }
             // The OS should not auto expand storage to 4Kb
             if (use_file_backing)
             {
-              BOOST_KERNELTEST_CHECK(testreturn, temph.length().get() == 19);
+              KERNELTEST_CHECK(testreturn, temph.length().value() == 19);
             }
           }
         }

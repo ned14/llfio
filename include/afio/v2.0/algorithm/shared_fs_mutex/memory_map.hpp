@@ -191,9 +191,9 @@ namespace algorithm
             // memory maps definitely get written with zeros before truncation, some
             // OSs don't reflect zeros into memory maps upon truncation for quite a
             // long time (or ever)
-            _h.truncate(0);
+            (void) _h.truncate(0);
             // Unlink the temp file
-            _temph.unlink();
+            (void) _temph.unlink();
           }
         }
       }
@@ -244,7 +244,7 @@ namespace algorithm
               // and will unlock it once everyone has stopped using the mmap, so make
               // absolutely sure the mmap is not in use by anyone by taking an exclusive
               // lock on the second final byte
-              OUTCOME_TRY(mapinuse2, ret.lock(_mapinuseoffset, 1, true));
+              OUTCOME_TRYV(ret.lock(_mapinuseoffset, 1, true));
               // Release the exclusive lock and tell caller to just use the fallback lock directly
               return std::errc::device_or_resource_busy;
             }
@@ -349,7 +349,7 @@ namespace algorithm
             // reach this same point. If that lock times out, we will reenter here
             // next time until we succeed
             _hmapinuse.unlock();
-            OUTCOME_TRY(mapinuse2, _h.lock(_mapinuseoffset, 1, true, d));
+            OUTCOME_TRYV(_h.lock(_mapinuseoffset, 1, true, d));
             _have_degraded = true;
           }
           if(_fallbacklock)

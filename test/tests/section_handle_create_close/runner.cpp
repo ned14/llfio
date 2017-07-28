@@ -69,8 +69,8 @@ template <class U> inline void section_handle_create_close_(U &&f)
       [&](auto &, auto &testreturn, size_t, int use_file_backing) {
         if (use_file_backing)
         {
-          temph = file_handle::file("tempfile", file_handle::mode::write, file_handle::creation::if_needed).get();
-          temph.write(0, "niall is not here", 17).get();
+          temph = file_handle::file({}, "tempfile", file_handle::mode::write, file_handle::creation::if_needed).value();
+          temph.write(0, "niall is not here", 17).value();
         }
         else
           temph = file_handle();
@@ -79,7 +79,7 @@ template <class U> inline void section_handle_create_close_(U &&f)
       [&](auto *testreturn) {
         // Need to close the section and any backing file as otherwise filesystem_setup won't be able to clear up the working dir
         if (*testreturn)
-          testreturn->get().close();
+          testreturn->value().close();
         temph.close();
       },
     "check section")
