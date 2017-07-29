@@ -106,11 +106,20 @@ result<void> file_handle::_fetch_inode() noexcept
   return success();
 }
 
-inline result<path_handle> containing_directory(filesystem::path &filename, const file_handle &h) noexcept
+inline result<path_handle> containing_directory(filesystem::path &filename, const file_handle &h, deadline d) noexcept
 {
 #ifdef AFIO_DISABLE_RACE_FREE_PATH_FUNCTIONS
   return std::errc::function_not_supported;
 #endif
+  std::chrono::steady_clock::time_point began_steady;
+  std::chrono::system_clock::time_point end_utc;
+  if(d)
+  {
+    if(d.steady)
+      began_steady = std::chrono::steady_clock::now();
+    else
+      end_utc = d.to_time_point();
+  }
   try
   {
     for(;;)
@@ -136,6 +145,20 @@ inline result<path_handle> containing_directory(filesystem::path &filename, cons
       // If the same, we know for a fact that this is the correct containing dir for now at least
       if(nh.st_dev() == h.st_dev() && nh.st_ino() == h.st_ino())
         return success(std::move(currentdirh));
+      // Check timeout
+      if(d)
+      {
+        if(d.steady)
+        {
+          if(std::chrono::steady_clock::now() >= (began_steady + std::chrono::nanoseconds(d.nsecs)))
+            return std::errc::timed_out;
+        }
+        else
+        {
+          if(std::chrono::system_clock::now() >= end_utc)
+            return std::errc::timed_out;
+        }
+      }
     }
   }
   catch(...)
@@ -287,7 +310,7 @@ result<file_handle> file_handle::clone() const noexcept
   return ret;
 }
 
-result<void> file_handle::relink(const path_handle &base, path_view_type path) noexcept
+result<void> file_handle::relink(const path_handle &base, path_view_type path, deadline d) noexcept
 {
   AFIO_LOG_FUNCTION_CALL(this);
   path_view::c_str zpath(path);
@@ -303,18 +326,18 @@ result<void> file_handle::relink(const path_handle &base, path_view_type path) n
 #endif
   // Open our containing directory
   filesystem::path filename;
-  OUTCOME_TRY(dirh, containing_directory(filename, *this));
+  OUTCOME_TRY(dirh, containing_directory(filename, *this, d));
   if(-1 == ::renameat(dirh.native_handle().fd, filename.c_str(), base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.buffer))
     return {errno, std::system_category()};
   return success();
 }
 
-result<void> file_handle::unlink() noexcept
+result<void> file_handle::unlink(deadline d) noexcept
 {
   AFIO_LOG_FUNCTION_CALL(this);
   // Open our containing directory
   filesystem::path filename;
-  OUTCOME_TRY(dirh, containing_directory(filename, *this));
+  OUTCOME_TRY(dirh, containing_directory(filename, *this, d));
   if(-1 == ::unlinkat(dirh.native_handle().fd, filename.c_str(), 0))
     return {errno, std::system_category()};
   return success();

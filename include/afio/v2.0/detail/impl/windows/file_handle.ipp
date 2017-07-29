@@ -335,7 +335,7 @@ result<file_handle> file_handle::clone() const noexcept
   return ret;
 }
 
-result<void> file_handle::relink(const path_handle &base, path_view_type path) noexcept
+result<void> file_handle::relink(const path_handle &base, path_view_type path, deadline /*unused*/) noexcept
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
@@ -367,7 +367,7 @@ result<void> file_handle::relink(const path_handle &base, path_view_type path) n
   return success();
 }
 
-result<void> file_handle::unlink() noexcept
+result<void> file_handle::unlink(deadline /*unused*/) noexcept
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;

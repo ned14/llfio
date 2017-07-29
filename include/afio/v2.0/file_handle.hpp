@@ -257,8 +257,9 @@ public:
 
   \param base Base for any relative path.
   \param newpath The relative or absolute new path to relink to.
+  \param d The deadline by which the relink must succeed, else `std::errc::timed_out` will be returned.
   */
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> relink(const path_handle &base, path_view_type newpath) noexcept;
+  AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> relink(const path_handle &base, path_view_type newpath, deadline d = std::chrono::seconds(30)) noexcept;
 
   /*! Unlinks the current path of this open handle, causing its entry to immediately disappear from the filing system.
   On Windows unless `flag::win_disable_unlink_emulation` is set, this behaviour is
@@ -271,8 +272,10 @@ public:
   deleted. Note that unless `flag::disable_safety_unlinks` is set, this implementation opens a
   `path_handle` to the containing directory first, then checks that the item about to be unlinked
   has the same inode as the open file handle. This should prevent most unmalicious accidental loss of data.
+
+  \param d The deadline by which the unlink must succeed, else `std::errc::timed_out` will be returned.
   */
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> unlink() noexcept;
+  AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> unlink(deadline d = std::chrono::seconds(30)) noexcept;
 
   //! The i/o service this handle is attached to, if any
   io_service *service() const noexcept { return _service; }
