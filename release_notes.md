@@ -7,17 +7,9 @@ source code repository lives at https://github.com/ned14/boost.afio.
 yet. Nobody should use this code for anything serious.
 
 You need these compilers or better:
-- GCC 6.0
-- clang 3.7
-- VS2015 Update 2
-- clang 3.7 with Microsoft Codegen ("winclang")
-
-It has two mandatory dependencies:
-
-1. https://github.com/ned14/boost-lite, a minimal emulation of Boost for C++ 11.
-2. https://github.com/ned14/boost.outcome, a factory and family of policy driven lightweight monads with
-the specialisations of `outcome<T>`, `result<T>` and `option<T>`. AFIO v2 leans heavily
-on `result<T>` especially, almost every AFIO v2 API returns one of those.
+- GCC 7.0
+- clang 4.0
+- VS2017 Update 3
 
 
 ## Architecture and design:
