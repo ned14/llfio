@@ -1,47 +1,11 @@
 var NAVTREE =
 [
-  [ "Boost.AFIO", "index.html", [
-    [ "Todo List", "todo.html", null ],
-    [ "Modules", "modules.html", "modules" ],
-    [ "Namespaces", null, [
-      [ "Namespace List", "namespaces.html", "namespaces" ],
-      [ "Namespace Members", "namespacemembers.html", [
-        [ "All", "namespacemembers.html", null ],
-        [ "Functions", "namespacemembers_func.html", null ],
-        [ "Typedefs", "namespacemembers_type.html", null ],
-        [ "Enumerations", "namespacemembers_enum.html", null ]
-      ] ]
-    ] ],
-    [ "Classes", null, [
-      [ "Class List", "annotated.html", "annotated" ],
-      [ "Class Index", "classes.html", null ],
-      [ "Class Hierarchy", "hierarchy.html", "hierarchy" ],
-      [ "Class Members", "functions.html", [
-        [ "All", "functions.html", "functions_dup" ],
-        [ "Functions", "functions_func.html", "functions_func" ],
-        [ "Variables", "functions_vars.html", null ],
-        [ "Typedefs", "functions_type.html", null ],
-        [ "Enumerations", "functions_enum.html", null ],
-        [ "Enumerator", "functions_eval.html", null ]
-      ] ]
-    ] ],
-    [ "Files", null, [
-      [ "File List", "files.html", "files" ],
-      [ "File Members", "globals.html", [
-        [ "All", "globals.html", null ],
-        [ "Macros", "globals_defs.html", null ]
-      ] ]
-    ] ]
-  ] ]
+  [ "AFIO", "index.html", ]
 ];
 
 var NAVTREEINDEX =
 [
-"afio_8hpp.html",
-"classboost_1_1afio_1_1v2__xxx_1_1file__handle.html#ac1fb657631c5212401259bb35ebf16db",
-"classboost_1_1afio_1_1v2__xxx_1_1map__handle.html#ace66ef9d4b55ad11d02af26814069d94",
-"functions_func_0x7a.html",
-"structboost_1_1afio_1_1v2__xxx_1_1statfs__t_1_1want__base.html#a35f5b2de8e92fce4b815ebce176d1993a197df5c8f76183bb218685527ec9cafc"
+"index.html"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';
