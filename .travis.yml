@@ -1,4 +1,7 @@
 language: cpp
+compiler:
+ - g++-6
+ - clang-4.0
 sudo: false
 os:
  - linux
@@ -15,9 +18,10 @@ addons:
     sources:
     - ubuntu-toolchain-r-test
     - george-edison55-precise-backports
-#    - llvm-toolchain-precise-3.8  ## not currently working due to bad source signing key
+    - llvm-toolchain-trusty-4.0
     packages:
     - g++-6
+    - clang-4.0
     - python3
     - cmake
     - cmake-data
@@ -27,6 +31,18 @@ env:
  - __="cmake tests" NAME=TravisLinuxWorker
  - __="Documentation" NAME=TravisDocumentation
  
+matrix:
+  exclude:
+#  - os: osx
+#    compiler: g++-6
+  - os: linux
+    compiler: clang-4.0
+    env: __="Documentation" NAME=TravisDocumentation
+#  - os: osx
+#    env: __="Documentation" NAME=TravisDocumentation
+#  - os: osx
+#    env: __="cmake tests" NAME=TravisLinuxWorker
+
 #cache:
 #  apt: true
 #  directories:
@@ -54,7 +70,9 @@ before_install:
 script:
  -
    if [ "$__" = "cmake tests" ]; then
-     CXX=g++-6 ctest -S .ci.cmake -V;
+     if [ "$CXX" = "g++" ]; then export CXX=g++-6; export NAME=TravisLinuxWorkerGCC; fi;
+     if [ "$CXX" = "clang++" ]; then export CXX=clang++-4.0; export NAME=TravisLinuxWorkerClang; fi;
+     ctest -S .ci.cmake -V;
    fi
  -
    if [ "$__" = "Documentation" ]; then

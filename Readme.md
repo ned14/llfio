@@ -1,35 +1,20 @@
-This is the beginnings of the post-peer-review AFIO
-v2 rewrite. You can view its documentation at https://ned14.github.io/boost.afio/
+This is the post-peer-review AFIO v2 rewrite. You can view its documentation at https://ned14.github.io/afio/
 
-<b>master branch test status</b> Linux: [![Build Status](https://travis-ci.org/ned14/boost.afio.svg?branch=master)](https://travis-ci.org/ned14/boost.afio) Windows: [![Build status](https://ci.appveyor.com/api/projects/status/ox59o2r276xbmef7/branch/master?svg=true)](https://ci.appveyor.com/project/ned14/boost-afio/branch/master) Coverage: Boost.KernelTest support for coveralls.io still todo <b>CMake dashboard</b>: http://my.cdash.org/index.php?project=AFIO
+<b>master branch test status</b> Linux: [![Build Status](https://travis-ci.org/ned14/afio.svg?branch=master)](https://travis-ci.org/ned14/afio) Windows: [![Build status](https://ci.appveyor.com/api/projects/status/ox59o2r276xbmef7/branch/master?svg=true)](https://ci.appveyor.com/project/ned14/afio/branch/master) <b>CMake dashboard</b>: http://my.cdash.org/index.php?project=Boost.AFIO
 
-Tarballs of source and prebuilt binaries for Linux x64 and Windows x64: http://my.cdash.org/index.php?project=AFIO (click on the little package icon to the right of the Build Name, obviously choose one passing all tests)
+Tarballs of source and prebuilt binaries for Linux x64 and Windows x64: http://my.cdash.org/index.php?project=Boost.AFIO (click on the little package icon to the right of the Build Name, obviously choose one passing all tests)
 
 
 ### Immediate todos in order of priority:
-- [x] Audit Outcome and AFIO for all uses of `std::error_code::value()` and replace where
-appropriate with `std::errc::whatever`.
 - [x] Get Outcome to work perfectly with exceptions and RTTI disabled, this makes
 Outcome useful in the games/audio world.
-  - [x] Add a new Boost.Test emulation, one which is noexcept capable
   - [ ] Move AFIO to being tested with exceptions and RTTI disabled. Where AFIO 
 throws, have it detect __cpp_exceptions and skip those implementations.
-  - [x] Add macro helpers to Outcome for returning outcomes out of things
-which cannot return values like constructors, and convert said exceptions/TLS
-back into outcomes.
-   - Make use of std::system_error(errno, system_category, "custom error message");
-- [x] Port AFIO v2 back to POSIX
 - [ ] Move handle caching into native_handle_type? Overlapped flag is especially needed.
-- [ ] Need to split out the path functions from io_handle into a pathed_handle
-  - [ ] directory_handle extends pathed_handle
-  - [ ] symlink_handle extends pathed_handle
-- [ ] Fat `afio::path`
-  - [ ] Relative path fragment + a pathed_handle as the base
-  - [ ] POSIX, NT kernel and win32 path variants
-- [ ] `virtual handle::path_type pathed_handle::path(bool refresh=false)` should be added using
+- [ ] `handle::current_path()` should be added using
 `GetFinalPathNameByHandle(FILE_NAME_OPENED)`. `VOLUME_NAME_DOS` vs `VOLUME_NAME_NT` should
 depend on the current afio::path setting.
-- [ ] Once the fat path is implemented, implement the long planned ACID key-value BLOB store
+- [ ] Implement the long planned ACID key-value BLOB store
 with a very simple engine based on atomic renames and send it to Boost for peer review.
 
 - [ ] All time based kernel tests need to use soak test based API and auto adjust to
@@ -38,10 +23,6 @@ valgrind.
 - [ ] Rename all ParseProjectVersionFromHpp etc to parse_project_version_from_hpp etc
 - [ ] In DEBUG builds, have io_handle always not fill buffers passed to remind
 people to use pointers returned!
-- [ ] DLL library edition appears to not be encoding extended error code detail because
-it's not sharing a single ringbuffer_log. Hard to fix given Outcome could be being
-used by multiple libraries as a header only library, need to figure out some global
-fix e.g. named shared memory. Make log disc stored while we are at it.
 - KernelTest needs to be generating each test kernel as a standalone DLL so it can be
 fuzzed, coverage calculated, bloat calculated, ABI dumped etc
   - Easy coverage is the usual gcov route => coveralls.io or gcovr http://gcovr.com/guide.html

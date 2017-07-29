@@ -570,7 +570,7 @@ static void TestMemoryMapFallback()
     BOOST_CHECK(lk.has_error());
     if(lk.has_error())
     {
-      BOOST_CHECK(lk.error().value() == EBUSY);
+      BOOST_CHECK(lk.error() == std::errc::device_or_resource_busy);
     }
     {
       auto fblkh = fblk.lock(afio::algorithm::shared_fs_mutex::shared_fs_mutex::entity_type(0, false)).value();
