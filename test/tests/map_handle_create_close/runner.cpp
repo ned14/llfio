@@ -102,7 +102,7 @@ template <class U> inline void map_handle_create_close_(U &&f)
           section_handle::flag flags = std::get<1>(std::get<1>(permuter[idx]));
           KERNELTEST_CHECK(testreturn, maph.length() > 0);
           KERNELTEST_CHECK(testreturn, addr != nullptr);
-          if (!(flags & section_handle::flag::nocommit))
+          if (!(flags & section_handle::flag::nocommit) && addr != nullptr)
           {
             char buffer[64];
             // Make sure the backing file is appearing in the map

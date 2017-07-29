@@ -361,7 +361,12 @@ template <class T, class R> inline void hook_result_construction(OUTCOME_V2_NAME
 }
 namespace detail
 {
-  template <class T> void log_inst_to_info(const handle *inst, const char *buffer) { AFIO_LOG_INFO(inst->native_handle()._init, buffer); }
+  template <class T> void log_inst_to_info(const handle *inst, const char *buffer)
+  {
+    (void) inst;
+    (void) buffer;
+    AFIO_LOG_INFO(inst->native_handle()._init, buffer);
+  }
 }
 
 AFIO_V2_NAMESPACE_END
