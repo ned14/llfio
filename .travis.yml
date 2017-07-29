@@ -1,6 +1,7 @@
+dist: trusty
 language: cpp
 compiler:
- - g++-6
+ - g++-7
  - clang-4.0
 sudo: false
 os:
@@ -20,7 +21,7 @@ addons:
     - george-edison55-precise-backports
     - llvm-toolchain-trusty-4.0
     packages:
-    - g++-6
+    - g++-7
     - clang-4.0
     - python3
     - cmake
@@ -34,7 +35,7 @@ env:
 matrix:
   exclude:
 #  - os: osx
-#    compiler: g++-6
+#    compiler: g++-7
   - os: linux
     compiler: clang-4.0
     env: __="Documentation" NAME=TravisDocumentation
@@ -70,7 +71,7 @@ before_install:
 script:
  -
    if [ "$__" = "cmake tests" ]; then
-     if [ "$CXX" = "g++" ]; then export CXX=g++-6; export NAME=TravisLinuxWorkerGCC; fi;
+     if [ "$CXX" = "g++" ]; then export CXX=g++-7; export NAME=TravisLinuxWorkerGCC; fi;
      if [ "$CXX" = "clang++" ]; then export CXX=clang++-4.0; export NAME=TravisLinuxWorkerClang; fi;
      ctest -S .ci.cmake -V;
    fi
@@ -82,7 +83,7 @@ script:
      cd doc/html;
      git checkout gh-pages;
      cd ../..;
-     CXX=g++-6 ctest -S .docs.cmake -V;
+     CXX=g++-7 ctest -S .docs.cmake -V;
      cd doc/html;
      git add . || true;
      git commit -a -m "Travis CI updates documentation" || true;
