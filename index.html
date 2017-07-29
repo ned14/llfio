@@ -98,15 +98,15 @@ $(document).ready(function(){initNavTree('index.html','');});
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>Herein lies the beginnings of the proposed AFIO v2 post-peer-review rewrite. Its github source code repository lives at <a href="https://github.com/ned14/boost.afio">https://github.com/ned14/boost.afio</a>.</p>
-<p><b>master branch test status</b> Linux: <a href="https://travis-ci.org/ned14/boost.afio">![Build Status](https://travis-ci.org/ned14/boost.afio.svg?branch=master)</a> Windows: <a href="https://ci.appveyor.com/project/ned14/boost-afio/branch/master">![Build status](https://ci.appveyor.com/api/projects/status/ox59o2r276xbmef7/branch/master?svg=true)</a> Coverage: Boost.KernelTest support for coveralls.io still todo <b>CMake dashboard</b>: <a href="http://my.cdash.org/index.php?project=AFIO">http://my.cdash.org/index.php?project=AFIO</a></p>
-<dl class="section note"><dt>Note</dt><dd>Note that this code is so early alpha that no substantial test code exists yet. Nobody should use this code for anything serious.</dd></dl>
+<p><b>master branch test status</b> Linux: <a href="https://travis-ci.org/ned14/afio"></a> Windows: <em>disabled due to lack of VS2017.3 on CI</em> <b>CMake dashboard</b>: <a href="http://my.cdash.org/index.php?project=AFIO">http://my.cdash.org/index.php?project=AFIO</a></p>
+<dl class="section note"><dt>Note</dt><dd>Note that this code is of late alpha quality. Be careful when using it!</dd></dl>
 <p>You need these compilers or better:</p>
 <ul>
 <li>GCC 7.0</li>
 <li>clang 4.0</li>
 <li>VS2017 Update 3</li>
 </ul>
-<h2>Architecture and design:</h2>
+<h2>v2 architecture and design implemented:</h2>
 <table class="doxtable">
 <tr>
 <th>NEW in v2 </th><th>Boost peer review feedback </th><th></th></tr>
@@ -121,6 +121,8 @@ $(document).ready(function(){initNavTree('index.html','');});
 <li>
 handle - provides open, close, get path, clone, set/unset append only, change caching, characteristics</li>
 <li>
+path_handle - a race free anchor to a subset of the filesystem</li>
+<li>
 io_handle - adds synchronous scatter-gather i/o, byte range locking</li>
 <li>
 file_handle - adds open/create file, get and set maximum extent</li>
@@ -133,7 +135,7 @@ async_file_handle - adds asynchronous scatter-gather i/o</li>
 <tr>
 <td>✔ </td><td>✔ </td><td>All shared_ptr usage removed as all use of multiple threads removed. </td></tr>
 <tr>
-<td>✔ </td><td>✔ </td><td>Use of std::vector to transport scatter-gather sequences replaced with C++ 2x <code>span&lt;&gt;</code> borrowed views. </td></tr>
+<td>✔ </td><td>✔ </td><td>Use of std::vector to transport scatter-gather sequences replaced with C++ 20 <code>span&lt;&gt;</code> borrowed views. </td></tr>
 <tr>
 <td>✔ </td><td>✔ </td><td>Completion callbacks are now some arbitrary type <code>U&amp;&amp;</code> instead of a future continuation. Type erasure for its storage is bound into the one single memory allocation for everything needed to execute the op, and so therefore overhead is optimal. </td></tr>
 <tr>
@@ -147,15 +149,23 @@ async_file_handle - adds asynchronous scatter-gather i/o</li>
 <tr>
 <td>✔ </td><td></td><td>Dependency on ASIO/Networking TS removed completely. </td></tr>
 <tr>
-<td>✔ </td><td></td><td>Three choices of algorithm implementing a shared filing system mutex. </td></tr>
+<td>✔ </td><td></td><td>Four choices of algorithm implementing a shared filing system mutex. </td></tr>
 <tr>
 <td>✔ </td><td></td><td>Uses CMake, CTest, CDash and CPack with automatic usage of C++ Modules or precompiled headers where available. </td></tr>
 <tr>
 <td>✔ </td><td></td><td>Far more comprehensive memory map and virtual memory facilities. </td></tr>
 <tr>
-<td>P </td><td></td><td>New multithreaded kernel based testing infrastructure based on LLVM which can permute/fuzz/<b>edge</b> coverage/mock each test kernel with choices of asan/lsan/msan/ubsan/none sanitisation. This new test infrastructure should make possible (one day) <b>formal proof</b> that AFIO's implementation is mathematically correct. </td></tr>
+<td>✔ </td><td></td><td>Much more granular, micro level unit testing of individual functions. </td></tr>
+<tr>
+<td>✔ </td><td></td><td>Much more granular, micro level internal logging of every code path taken. </td></tr>
+<tr>
+<td>✔ </td><td></td><td>Path views used throughout, thus avoiding string copying and allocation in <code>std::filesystem::path</code>. </td></tr>
+<tr>
+<td>✔ </td><td></td><td>Paths are equally interpreted as UTF-8 on all platforms. </td></tr>
 </table>
-<h2>Features implemented:</h2>
+<p>Todo:</p>
+<p>| P | | clang AST assisted SWIG bindings for other languages. | P | | Statistical tracking of operation latencies.</p>
+<h2>Planned features implemented:</h2>
 <table class="doxtable">
 <tr>
 <th>NEW in v2 </th><th>Windows </th><th>POSIX </th><th></th></tr>
@@ -166,17 +176,21 @@ async_file_handle - adds asynchronous scatter-gather i/o</li>
 <tr>
 <td></td><td>✔ </td><td>✔ </td><td>Absolute path open. </td></tr>
 <tr>
-<td></td><td></td><td></td><td>Relative path open ("fat paths"). </td></tr>
+<td></td><td>✔ </td><td>✔ </td><td>Relative "anchored" path open enabling race free file system. </td></tr>
 <tr>
 <td>✔ </td><td>✔ </td><td></td><td>Win32 path support (260 path limit). </td></tr>
 <tr>
-<td></td><td></td><td></td><td>NT kernel path support (32,768 path limit). </td></tr>
+<td></td><td>✔ </td><td></td><td>NT kernel path support (32,768 path limit). </td></tr>
 <tr>
 <td>✔ </td><td>✔ </td><td>✔ </td><td>Synchronous universal scatter-gather i/o. </td></tr>
 <tr>
 <td>✔ (POSIX AIO support) </td><td>✔ </td><td>✔ </td><td>Asynchronous universal scatter-gather i/o. </td></tr>
 <tr>
-<td>✔ </td><td>✔ </td><td>✔ </td><td>i/o cancellation. </td></tr>
+<td></td><td></td><td></td><td>BSD and OS X kqueues optimised <code>io_service</code> </td></tr>
+<tr>
+<td>✔ </td><td></td><td></td><td>Linux KAIO support for native async <code>O_DIRECT</code> i/o </td></tr>
+<tr>
+<td>✔ </td><td>✔ </td><td>✔ </td><td>i/o deadlines and cancellation. </td></tr>
 <tr>
 <td></td><td>✔ </td><td>✔ </td><td>Retrieving and setting the current maximum extent (size) of an open file. </td></tr>
 <tr>
@@ -195,7 +209,11 @@ async_file_handle - adds asynchronous scatter-gather i/o</li>
 <td></td><td>✔ </td><td>✔ </td><td>Memory mapped files and virtual memory management (<code>section_handle</code> and <code>map_handle</code>) </td></tr>
 <tr>
 <td>✔ </td><td>✔ </td><td>✔ </td><td><code>shared_fs_mutex</code> shared/exclusive entities locking based on memory maps </td></tr>
+<tr>
+<td>✔ </td><td>✔ </td><td>✔ </td><td>Universal portable UTF-8 path views. </td></tr>
 </table>
+<p>Todo:</p>
+<p>| | | | "Hole punching" and hole enumeration ported over from AFIO v1. | | | | Directory handles and very fast directory enumeration ported over from AFIO v1. | ✔ | | | Extended attributes support. | | | | Reliable directory hierarchy deletion algorithm. | | | | Reliable directory hierarchy copy algorithm. | ✔ | | | Reliable directory hierarchy update (two and three way) algorithm. | ✔ | | | Algorithm to replace all duplicate content with hard links. | ✔ | | | Algorithm to figure out all paths for a hard linked inode. </p>
 </div></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
