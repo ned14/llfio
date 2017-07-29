@@ -139,7 +139,7 @@ Distributed under the Boost Software License, Version 1.0.
 \brief The namespace configuration of this AFIO v2. Consists of a sequence
 of bracketed tokens later fused by the preprocessor into namespace and C++ module names.
 */
-#if DOXYGEN_SHOULD_SKIP_THIS
+#if DOXYGEN_IS_IN_THE_HOUSE
 //! The AFIO namespace
 namespace afio_v2_xxx
 {
@@ -166,14 +166,14 @@ namespace starting with `v2_` inside the `boost::afio` namespace.
 */
 #define AFIO_V2_NAMESPACE_BEGIN                                                                                                                                                                                                                                                                                                \
   namespace afio_v2_xxx                                                                                                                                                                                                                                                                                                        \
-  {  \
+  {
 /*! \brief Expands into the appropriate namespace markup to enter the C++ module
 exported AFIO v2 namespace.
 \ingroup config
 */
 #define AFIO_V2_NAMESPACE_EXPORT_BEGIN                                                                                                                                                                                                                                                                                         \
   export namespace afio_v2_xxx                                                                                                                                                                                                                                                                                                 \
-  {  \
+  {
 /*! \brief Expands into the appropriate namespace markup to exit the AFIO v2 namespace.
 \ingroup config
 */
@@ -229,7 +229,7 @@ AFIO_V2_NAMESPACE_END
 #define AFIO_DECL QUICKCPPLIB_SYMBOL_EXPORT
 #define AFIO_BUILD_DLL
 #else
-#define AFIO_DECL BOOSTLIE_SYMBOL_IMPORT
+#define AFIO_DECL QUICKCPPLIB_SYMBOL_IMPORT
 #endif
 #else
 #define AFIO_DECL
@@ -281,6 +281,9 @@ AFIO_V2_NAMESPACE_END
 #include "../outcome/include/outcome.hpp"
 AFIO_V2_NAMESPACE_BEGIN
 // Specialise error_code into this namespace so we can hook result creation via ADL
+/*! \struct error_code
+\brief Trampoline to `std::error_code`, used to ADL hook `result<T, E>` creation in Outcome.
+*/
 struct error_code : public std::error_code
 {
   // literally passthrough

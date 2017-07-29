@@ -143,7 +143,8 @@ public:
     overlapped = 1 << 28,         //!< On Windows, create any new handles with OVERLAPPED semantics
     byte_lock_insanity = 1 << 29  //!< Using insane POSIX byte range locks
   }
-  QUICKCPPLIB_BITFIELD_END(flag)
+  QUICKCPPLIB_BITFIELD_END(flag);
+
 protected:
   caching _caching;
   flag _flags;

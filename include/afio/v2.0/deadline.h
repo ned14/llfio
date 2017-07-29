@@ -30,7 +30,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 //! \file deadline.h Provides struct deadline
 
-#ifdef __cplusplus
+#if defined(__cplusplus) || DOXYGEN_IS_IN_THE_HOUSE
 #ifndef AFIO_CONFIG_HPP
 #error You must include the master afio.hpp, not individual header files directly
 #endif
@@ -90,7 +90,7 @@ struct AFIO_DEADLINE_NAME
 };
 
 #undef AFIO_DEADLINE_NAME
-#ifdef __cplusplus
+#if defined(__cplusplus) || DOXYGEN_IS_IN_THE_HOUSE
 AFIO_V2_NAMESPACE_END
 #endif
 

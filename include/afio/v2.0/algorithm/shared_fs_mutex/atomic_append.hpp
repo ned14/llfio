@@ -165,6 +165,7 @@ namespace algorithm
       /*! Initialises a shared filing system mutex using the file at \em lockfile
 
       \return An implementation of shared_fs_mutex using the atomic_append algorithm.
+      \param base Optional base for the path to the file.
       \param lockfile The path to the file to use for IPC.
       \param nfs_compatibility Make this true if the lockfile could be accessed by NFS.
       \param skip_hashing Some filing systems (typically the copy on write ones e.g.

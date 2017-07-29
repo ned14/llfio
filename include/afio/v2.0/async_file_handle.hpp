@@ -32,7 +32,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 AFIO_V2_NAMESPACE_EXPORT_BEGIN
 
-/*! An asynchronous handle to an open something
+/*! \class async_file_handle
+\brief An asynchronous handle to an open something
+
 \todo Direct use of `calloc()` ought to be replaced with a user supplied STL allocator instance.
 */
 class AFIO_DECL async_file_handle : public file_handle

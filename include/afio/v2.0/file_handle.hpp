@@ -57,7 +57,6 @@ class io_service;
 /*! \class file_handle
 \brief A handle to a regular file or device, kept data layout compatible with
 async_file_handle.
-\todo file_handle needs to be split into a pathed_handle for the file and directory common parts
 */
 class AFIO_DECL file_handle : public io_handle
 {

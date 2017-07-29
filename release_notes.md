@@ -1,15 +1,24 @@
-﻿Herein lies the beginnings of the proposed AFIO v2 post-peer-review rewrite. Its github
+﻿<center><table border="0" cellpadding="4">
+<tr>
+<td align="center"> <a href="https://github.com/ned14/afio">AFIO</a><br><a href="https://github.com/ned14/afio">on GitHub</a> </td>
+<td align="center"> <a href="http://my.cdash.org/index.php?project=Boost.AFIO">CTest summary</a><br><a href="http://my.cdash.org/index.php?project=Boost.AFIO">dashboard</a> </td>
+<td align="center"> <a href="https://travis-ci.org/ned14/boost.outcome">Linux and MacOS CI:</a><img src="https://travis-ci.org/ned14/afio.svg?branch=master"/> </td>
+<td align="center"> <a href="https://ci.appveyor.com/project/ned14/afio/branch/master">Windows CI:</a><img src="https://ci.appveyor.com/api/projects/status/680b1pt9srnoprs3/branch/master?svg=true"/> </td>
+</tr>
+</table></center>
+
+Herein lies my proposed async file i/o and filesystem library for Boost and the C++ standard.
+It is a complete rewrite after a Boost peer review in August 2015. Its github
 source code repository lives at https://github.com/ned14/boost.afio.
 
-<b>master branch test status</b> Linux: <a href="https://travis-ci.org/ned14/afio"><img src="https://travis-ci.org/ned14/afio.svg?branch=master"></a> Windows: <em>disabled due to lack of VS2017.3 on CI</em> <b>CMake dashboard</b>: http://my.cdash.org/index.php?project=AFIO
-
-\note Note that this code is of late alpha quality. Be careful when using it!
+\note Note that this code is of late alpha quality. It's quite reliable, but be careful when using it!
 
 You need these compilers or better:
-- GCC 7.0
-- clang 4.0
-- VS2017 Update 3
+- GCC 7.0 (Linux)
+- clang 4.0 (Linux, Windows)
+- VS2017 Update 3 (Windows)
 
+Todo list for already implemented parts: https://ned14.github.io/afio/todo.html
 
 ## v2 architecture and design implemented:
 

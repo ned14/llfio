@@ -50,7 +50,7 @@ public:
   using caching = handle::caching;
   using flag = handle::flag;
 
-  //! The scatter buffer type used by this handle
+  //! The scatter buffer type used by this handle. Guaranteed to be `TrivialType` and `StandardLayoutType`.
   struct buffer_type
   {
     //! Pointer to memory to be filled by a read. Try to make this 64 byte, or ideally, `page_size()` aligned where possible.
@@ -58,7 +58,7 @@ public:
     //! The number of bytes to fill into this address. Try to make this a 64 byte multiple, or ideally, a whole multiple of `page_size()`.
     size_t len;
   };
-  //! The gather buffer type used by this handle
+  //! The gather buffer type used by this handle. Guaranteed to be `TrivialType` and `StandardLayoutType`.
   struct const_buffer_type
   {
     //! Pointer to memory to be written. Try to make this 64 byte, or ideally, `page_size()` aligned where possible.
@@ -72,9 +72,9 @@ public:
   static_assert(std::is_standard_layout<buffer_type>::value, "buffer_type is not a standard layout type!");
   static_assert(std::is_standard_layout<const_buffer_type>::value, "const_buffer_type is not a standard layout type!");
 #endif
-  //! The scatter buffers type used by this handle
+  //! The scatter buffers type used by this handle. Guaranteed to be `TrivialType` apart from construction, and `StandardLayoutType`.
   using buffers_type = span<buffer_type>;
-  //! The gather buffers type used by this handle
+  //! The gather buffers type used by this handle. Guaranteed to be `TrivialType` apart from construction, and `StandardLayoutType`.
   using const_buffers_type = span<const_buffer_type>;
 #ifndef NDEBUG
   // Is trivial in all ways, except default constructibility
@@ -87,7 +87,7 @@ public:
   static_assert(std::is_trivially_move_assignable<buffers_type>::value, "buffers_type is not trivially move assignable!");
   static_assert(std::is_standard_layout<buffers_type>::value, "buffers_type is not a standard layout type!");
 #endif
-  //! The i/o request type used by this handle
+  //! The i/o request type used by this handle. Guaranteed to be `TrivialType` apart from construction, and `StandardLayoutType`.
   template <class T> struct io_request
   {
     T buffers;
@@ -114,7 +114,7 @@ public:
   static_assert(std::is_trivially_move_assignable<io_request<buffers_type>>::value, "io_request<buffers_type> is not trivially move assignable!");
   static_assert(std::is_standard_layout<io_request<buffers_type>>::value, "io_request<buffers_type> is not a standard layout type!");
 #endif
-  //! The i/o result type used by this handle
+  //! The i/o result type used by this handle. Guaranteed to be `TrivialType` apart from construction, and `StandardLayoutType`.
   template <class T> class io_result : public result<T>
   {
     using Base = result<T>;
