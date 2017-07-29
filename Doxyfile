@@ -38,7 +38,7 @@ PROJECT_NAME           = "AFIO"
 # could be handy for archiving the generated documentation or if some version
 # control system is used.
 
-PROJECT_NUMBER         = "v2.00 early alpha"
+PROJECT_NUMBER         = "v2.00 late alpha"
 
 # Using the PROJECT_BRIEF tag one can provide an optional one line description
 # for a project that appears at the top of each page and should give viewer a
@@ -768,10 +768,10 @@ WARN_LOGFILE           = doxygen_warnings.log
 # spaces. See also FILE_PATTERNS and EXTENSION_MAPPING
 # Note: If this tag is empty the current directory is searched.
 
-INPUT                  = include/boost/afio \
-                         include/boost/afio/v2.0 \
-                         include/boost/afio/v2.0/algorithm \
-                         include/boost/afio/v2.0/algorithm/shared_fs_mutex \
+INPUT                  = include/afio \
+                         include/afio/v2.0 \
+                         include/afio/v2.0/algorithm \
+                         include/afio/v2.0/algorithm/shared_fs_mutex \
                          release_notes.md
 
 # This tag can be used to specify the character encoding of the source files

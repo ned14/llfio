@@ -38,8 +38,10 @@ You need these compilers or better:
 
 Todo:
 
-| P |   | clang AST assisted SWIG bindings for other languages.
-| P |   | Statistical tracking of operation latencies.
+| NEW in v2 | Boost peer review feedback |     |
+| --------- | -------------------------- | --- |
+| ✔ |   | clang AST assisted SWIG bindings for other languages.
+| ✔ |   | Statistical tracking of operation latencies so realtime IOPS can be measured.
 
 
 
@@ -71,6 +73,8 @@ Todo:
 
 Todo:
 
+| NEW in v2 | Windows | POSIX |     |
+| --------- | --------| ----- | --- |
 |   |   |   | "Hole punching" and hole enumeration ported over from AFIO v1.
 |   |   |   | Directory handles and very fast directory enumeration ported over from AFIO v1.
 | ✔ |   |   | Extended attributes support.
