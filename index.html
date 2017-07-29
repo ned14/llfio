@@ -30,7 +30,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">AFIO
-   &#160;<span id="projectnumber">v2.00 early alpha</span>
+   &#160;<span id="projectnumber">v2.00 late alpha</span>
    </div>
   </td>
  </tr>
@@ -45,6 +45,11 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li class="current"><a href="index.html"><span>Main&#160;Page</span></a></li>
+      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
+      <li><a href="modules.html"><span>Modules</span></a></li>
+      <li><a href="namespaces.html"><span>Namespaces</span></a></li>
+      <li><a href="annotated.html"><span>Classes</span></a></li>
+      <li><a href="files.html"><span>Files</span></a></li>
       <li>
         <div id="MSearchBox" class="MSearchBoxInactive">
         <span class="left">
@@ -83,7 +88,7 @@ $(document).ready(function(){initNavTree('index.html','');});
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-</div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -164,7 +169,14 @@ async_file_handle - adds asynchronous scatter-gather i/o</li>
 <td>✔ </td><td></td><td>Paths are equally interpreted as UTF-8 on all platforms. </td></tr>
 </table>
 <p>Todo:</p>
-<p>| P | | clang AST assisted SWIG bindings for other languages. | P | | Statistical tracking of operation latencies.</p>
+<table class="doxtable">
+<tr>
+<th>NEW in v2 </th><th>Boost peer review feedback </th><th></th></tr>
+<tr>
+<td>✔ </td><td></td><td>clang AST assisted SWIG bindings for other languages. </td></tr>
+<tr>
+<td>✔ </td><td></td><td>Statistical tracking of operation latencies so realtime IOPS can be measured. </td></tr>
+</table>
 <h2>Planned features implemented:</h2>
 <table class="doxtable">
 <tr>
@@ -213,7 +225,26 @@ async_file_handle - adds asynchronous scatter-gather i/o</li>
 <td>✔ </td><td>✔ </td><td>✔ </td><td>Universal portable UTF-8 path views. </td></tr>
 </table>
 <p>Todo:</p>
-<p>| | | | "Hole punching" and hole enumeration ported over from AFIO v1. | | | | Directory handles and very fast directory enumeration ported over from AFIO v1. | ✔ | | | Extended attributes support. | | | | Reliable directory hierarchy deletion algorithm. | | | | Reliable directory hierarchy copy algorithm. | ✔ | | | Reliable directory hierarchy update (two and three way) algorithm. | ✔ | | | Algorithm to replace all duplicate content with hard links. | ✔ | | | Algorithm to figure out all paths for a hard linked inode. </p>
+<table class="doxtable">
+<tr>
+<th>NEW in v2 </th><th>Windows </th><th>POSIX </th><th></th></tr>
+<tr>
+<td></td><td></td><td></td><td>"Hole punching" and hole enumeration ported over from AFIO v1. </td></tr>
+<tr>
+<td></td><td></td><td></td><td>Directory handles and very fast directory enumeration ported over from AFIO v1. </td></tr>
+<tr>
+<td>✔ </td><td></td><td></td><td>Extended attributes support. </td></tr>
+<tr>
+<td></td><td></td><td></td><td>Reliable directory hierarchy deletion algorithm. </td></tr>
+<tr>
+<td></td><td></td><td></td><td>Reliable directory hierarchy copy algorithm. </td></tr>
+<tr>
+<td>✔ </td><td></td><td></td><td>Reliable directory hierarchy update (two and three way) algorithm. </td></tr>
+<tr>
+<td>✔ </td><td></td><td></td><td>Algorithm to replace all duplicate content with hard links. </td></tr>
+<tr>
+<td>✔ </td><td></td><td></td><td>Algorithm to figure out all paths for a hard linked inode. </td></tr>
+</table>
 </div></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

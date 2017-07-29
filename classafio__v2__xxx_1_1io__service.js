@@ -1,0 +1,25 @@
+var classafio__v2__xxx_1_1io__service =
+[
+    [ "buffer_type", "classafio__v2__xxx_1_1io__service.html#a92977b609973629357b17d2589b1212a", null ],
+    [ "buffers_type", "classafio__v2__xxx_1_1io__service.html#a806f0493759968705d435a3e9f879ea9", null ],
+    [ "const_buffer_type", "classafio__v2__xxx_1_1io__service.html#a65f0c679c4f4d0eacf9ff7fb13035b27", null ],
+    [ "const_buffers_type", "classafio__v2__xxx_1_1io__service.html#a2f699e7aaf4993a80d029b1f52a2d60c", null ],
+    [ "extent_type", "classafio__v2__xxx_1_1io__service.html#afc9f0ed0d7e0bce83023f998e95f7873", null ],
+    [ "io_request", "classafio__v2__xxx_1_1io__service.html#af425566e4443162d2ac550b2ca750776", null ],
+    [ "io_result", "classafio__v2__xxx_1_1io__service.html#a220be1c4dc11a187fdf2b766baf09e99", null ],
+    [ "size_type", "classafio__v2__xxx_1_1io__service.html#a2efd36ca952a401e2b0bc44b7e52524e", null ],
+    [ "io_service", "classafio__v2__xxx_1_1io__service.html#a444d27f19c042b91f1751621135f65e9", null ],
+    [ "io_service", "classafio__v2__xxx_1_1io__service.html#a0d4b2214a82771a947b97387a5da0716", null ],
+    [ "~io_service", "classafio__v2__xxx_1_1io__service.html#a6d1f5edf1f40ae2764393a3c59b36969", null ],
+    [ "__post_done", "classafio__v2__xxx_1_1io__service.html#a8d62fb8c5a2b0954e6024c7fd83a0379", null ],
+    [ "_post_done", "classafio__v2__xxx_1_1io__service.html#a2eed345de929f681d7a5380d8ad167bb", null ],
+    [ "_work_done", "classafio__v2__xxx_1_1io__service.html#a444cb7d21db240378bdea7bcb41fb8da", null ],
+    [ "_work_enqueued", "classafio__v2__xxx_1_1io__service.html#a465d36981cbc25ae2529478a922eb03a", null ],
+    [ "disable_kqueues", "classafio__v2__xxx_1_1io__service.html#a83ed27472ae75a1a31d73b383aa78564", null ],
+    [ "operator=", "classafio__v2__xxx_1_1io__service.html#a1761cc16a1cc9362d4200df37a978d93", null ],
+    [ "post", "classafio__v2__xxx_1_1io__service.html#acaa55fe3a61484c646c479f256158c02", null ],
+    [ "run", "classafio__v2__xxx_1_1io__service.html#a73dbea24c52d4051ddd92e0ff3b3fb97", null ],
+    [ "run_until", "classafio__v2__xxx_1_1io__service.html#a72e68348a3f92ee2a91599960132f404", null ],
+    [ "using_kqueues", "classafio__v2__xxx_1_1io__service.html#a692d937b87fa783803c5342f993fede1", null ],
+    [ "async_file_handle", "classafio__v2__xxx_1_1io__service.html#ae39e3934b1eb85ac91f1993c8886d888", null ]
+];
