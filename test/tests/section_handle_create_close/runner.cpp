@@ -28,8 +28,8 @@ Distributed under the Boost Software License, Version 1.0.
 template <class U> inline void section_handle_create_close_(U &&f)
 {
   using namespace KERNELTEST_V1_NAMESPACE;
-  using namespace AFIO_V2_NAMESPACE;
   using AFIO_V2_NAMESPACE::file_handle;
+  using AFIO_V2_NAMESPACE::section_handle;
 
   // Create a temporary file and put some text into it
   file_handle temph;
@@ -73,14 +73,18 @@ template <class U> inline void section_handle_create_close_(U &&f)
           temph.write(0, "niall is not here", 17).value();
         }
         else
+        {
           temph = file_handle();
+        }
         return &testreturn;
       },
       [&](auto *testreturn) {
         // Need to close the section and any backing file as otherwise filesystem_setup won't be able to clear up the working dir
-        if (*testreturn)
-          testreturn->value().close();
-        temph.close();
+        if (**testreturn)
+        {
+          (void)(*testreturn)->value().close();
+        }
+        (void) temph.close();
       },
     "check section")
   ));

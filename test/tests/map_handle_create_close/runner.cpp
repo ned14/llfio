@@ -28,8 +28,9 @@ Distributed under the Boost Software License, Version 1.0.
 template <class U> inline void map_handle_create_close_(U &&f)
 {
   using namespace KERNELTEST_V1_NAMESPACE;
-  using namespace AFIO_V2_NAMESPACE;
   using AFIO_V2_NAMESPACE::file_handle;
+  using AFIO_V2_NAMESPACE::section_handle;
+  using AFIO_V2_NAMESPACE::map_handle;
 
   // Create a temporary file and put some text into it
   file_handle temph;
@@ -71,25 +72,29 @@ template <class U> inline void map_handle_create_close_(U &&f)
         {
           // Create a temporary backing file
           temph = file_handle::file({}, "tempfile", file_handle::mode::write, file_handle::creation::if_needed).value();
-          temph.write(0, "I am some file data", 19).get();
+          temph.write(0, "I am some file data", 19).value();
         }
         else
+        {
           // Use the page file
           temph = file_handle();
+        }
         return std::make_tuple(std::ref(permuter), std::ref(testreturn), idx, use_file_backing);
       },
       [&](auto tuplestate) {
         auto &permuter = std::get<0>(tuplestate);
-        auto &testreturn = std::get<1>(tuplestate);
+        auto &testreturn = *std::get<1>(tuplestate);
         size_t idx = std::get<2>(tuplestate);
         int use_file_backing = std::get<3>(tuplestate);
         map_handle maph;
         if (testreturn)
-          maph = std::move(testreturn.get());
+        {
+          maph = std::move(testreturn.value());
+        }
         // Need to close the map and any backing file as otherwise filesystem_setup won't be able to clear up the working dir on Windows
         auto onexit = AFIO_V2_NAMESPACE::undoer([&]{
-          maph.close();
-          temph.close();
+          (void) maph.close();
+          (void) temph.close();
         });
         if (testreturn)
         {
@@ -108,13 +113,13 @@ template <class U> inline void map_handle_create_close_(U &&f)
             // Make sure maph's read() does what it is supposed to
             {
               auto b = maph.read(0, nullptr, 20).value();
-              KERNELTEST_CHECK(testreturn, b.first == addr);
-              KERNELTEST_CHECK(testreturn, b.second == 20);
+              KERNELTEST_CHECK(testreturn, b.data == addr);
+              KERNELTEST_CHECK(testreturn, b.len == 20);
             }
             {
               auto b = maph.read(5, nullptr, 5000).value();
-              KERNELTEST_CHECK(testreturn, b.first == addr+5);
-              KERNELTEST_CHECK(testreturn, b.second == 4091);
+              KERNELTEST_CHECK(testreturn, b.data == addr+5); // NOLINT
+              KERNELTEST_CHECK(testreturn, b.len == 4091);
             }
             // If we are writable, write straight into the map
             if (maph.is_writable() && addr)
