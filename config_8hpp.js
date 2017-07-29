@@ -1,5 +1,6 @@
 var config_8hpp =
 [
+    [ "error_code", "structafio__v2__xxx_1_1error__code.html", "structafio__v2__xxx_1_1error__code" ],
     [ "log_level_guard", "classafio__v2__xxx_1_1log__level__guard.html", "classafio__v2__xxx_1_1log__level__guard" ],
     [ "AFIO_DECL", "config_8hpp.html#a10535ba14c672e51779ac3d70b2e09d8", null ],
     [ "AFIO_GLUE", "config_8hpp.html#a84d91a729e5c9f99860fe8548bfbbb08", null ],
@@ -35,8 +36,8 @@ var config_8hpp =
     [ "AFIO_V2", "config_8hpp.html#gaf3ff30cde278dda89ad679d698fb7168", null ],
     [ "AFIO_V2_NAMESPACE", "config_8hpp.html#gaa3ed9f085329a0b81feeac3397a83740", null ],
     [ "AFIO_V2_NAMESPACE_BEGIN", "config_8hpp.html#gad76892d94bb7a3a33aa956188171d048", null ],
-    [ "AFIO_V2_NAMESPACE_END", "config_8hpp.html#a44d280b35341b388f646bca61c056bcf", null ],
-    [ "AFIO_V2_NAMESPACE_EXPORT_BEGIN", "config_8hpp.html#af5f9b13a512047008c0caeb5fcd310e0", null ],
+    [ "AFIO_V2_NAMESPACE_END", "config_8hpp.html#ga44d280b35341b388f646bca61c056bcf", null ],
+    [ "AFIO_V2_NAMESPACE_EXPORT_BEGIN", "config_8hpp.html#gaf5f9b13a512047008c0caeb5fcd310e0", null ],
     [ "dword", "config_8hpp.html#af7f8a19da7028ffc370391b79513b58d", null ],
     [ "handle", "config_8hpp.html#a55941737a7ecd8f04f0bebeaa4ea5f03", null ],
     [ "log_level", "config_8hpp.html#aed225790bbca36d005efff21edbee937", null ],
@@ -44,7 +45,7 @@ var config_8hpp =
     [ "result", "config_8hpp.html#a536f4a9f568b26dc2586c34d3f5ccc9c", null ],
     [ "afio_namespace_string", "config_8hpp.html#a8d1ce7530e78fdb2e5d619b0b12c4634", null ],
     [ "emplace_function_ptr", "config_8hpp.html#af965839d0d8cc1c0b14d22ccdbf01c9a", null ],
-    [ "log", "config_8hpp.html#ga055d3fab8c2f8e818f6f10461cc1275c", null ],
+    [ "log", "config_8hpp.html#a08363b8572e6a8971a6d236d54fb8287", null ],
     [ "log_inst_to_info", "config_8hpp.html#aaa60a39a72c8c6c4a33829f0340048ed", null ],
     [ "make_function_ptr", "config_8hpp.html#ae11f63b07f766758e45df316122b3598", null ],
     [ "outcome_namespace_string", "config_8hpp.html#a114b5c134cd344b9fe5e89470d82f8c6", null ],

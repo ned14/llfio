@@ -134,7 +134,7 @@ $(document).ready(function(){initNavTree('config_8hpp.html','');});
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structafio__v2__xxx_1_1error__code.html">afio_v2_xxx::error_code</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Expands into the appropriate namespace markup to enter the C++ module exported AFIO v2 namespace.  <a href="structafio__v2__xxx_1_1error__code.html#details">More...</a><br/></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Trampoline to <code>std::error_code</code>, used to ADL hook <code>result&lt;T, E&gt;</code> creation in Outcome.  <a href="structafio__v2__xxx_1_1error__code.html#details">More...</a><br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1log__level__guard.html">afio_v2_xxx::log_level_guard</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">RAII class for temporarily adjusting the log level.  <a href="classafio__v2__xxx_1_1log__level__guard.html#details">More...</a><br/></td></tr>
@@ -153,9 +153,6 @@ Namespaces</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:namespaceafio__v2__xxx_1_1utils"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx_1_1utils.html">afio_v2_xxx::utils</a></td></tr>
 <tr class="memdesc:namespaceafio__v2__xxx_1_1utils"><td class="mdescLeft">&#160;</td><td class="mdescRight">Utility routines often useful when using AFIO. <br/></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:namespaceafio__v2__xxx_1_1detail"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx_1_1detail.html">afio_v2_xxx::detail</a></td></tr>
-<tr class="memdesc:namespaceafio__v2__xxx_1_1detail"><td class="mdescLeft">&#160;</td><td class="mdescRight">Expands into the appropriate namespace markup to enter the C++ module exported AFIO v2 namespace. <br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
@@ -187,11 +184,13 @@ Macros</h2></td></tr>
 <tr class="memitem:gad76892d94bb7a3a33aa956188171d048"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__config.html#gad76892d94bb7a3a33aa956188171d048">AFIO_V2_NAMESPACE_BEGIN</a></td></tr>
 <tr class="memdesc:gad76892d94bb7a3a33aa956188171d048"><td class="mdescLeft">&#160;</td><td class="mdescRight">Expands into the appropriate namespace markup to enter the AFIO v2 namespace.  <a href="group__config.html#gad76892d94bb7a3a33aa956188171d048">More...</a><br/></td></tr>
 <tr class="separator:gad76892d94bb7a3a33aa956188171d048"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af5f9b13a512047008c0caeb5fcd310e0"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><b>AFIO_V2_NAMESPACE_EXPORT_BEGIN</b></td></tr>
-<tr class="separator:af5f9b13a512047008c0caeb5fcd310e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a44d280b35341b388f646bca61c056bcf"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a44d280b35341b388f646bca61c056bcf"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>AFIO_V2_NAMESPACE_END</b>&#160;&#160;&#160;}</td></tr>
-<tr class="separator:a44d280b35341b388f646bca61c056bcf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaf5f9b13a512047008c0caeb5fcd310e0"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__config.html#gaf5f9b13a512047008c0caeb5fcd310e0">AFIO_V2_NAMESPACE_EXPORT_BEGIN</a></td></tr>
+<tr class="memdesc:gaf5f9b13a512047008c0caeb5fcd310e0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Expands into the appropriate namespace markup to enter the C++ module exported AFIO v2 namespace.  <a href="group__config.html#gaf5f9b13a512047008c0caeb5fcd310e0">More...</a><br/></td></tr>
+<tr class="separator:gaf5f9b13a512047008c0caeb5fcd310e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga44d280b35341b388f646bca61c056bcf"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga44d280b35341b388f646bca61c056bcf"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__config.html#ga44d280b35341b388f646bca61c056bcf">AFIO_V2_NAMESPACE_END</a>&#160;&#160;&#160;}</td></tr>
+<tr class="memdesc:ga44d280b35341b388f646bca61c056bcf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Expands into the appropriate namespace markup to exit the AFIO v2 namespace. <br/></td></tr>
+<tr class="separator:ga44d280b35341b388f646bca61c056bcf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a10535ba14c672e51779ac3d70b2e09d8"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a10535ba14c672e51779ac3d70b2e09d8"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><b>AFIO_DECL</b></td></tr>
 <tr class="separator:a10535ba14c672e51779ac3d70b2e09d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -297,11 +296,11 @@ using&#160;</td><td class="memItemRight" valign="bottom"><b>afio_v2_xxx::win::dw
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ga055d3fab8c2f8e818f6f10461cc1275c"><td class="memItemLeft" align="right" valign="top">AFIO_DECL <br class="typebreak"/>
+<tr class="memitem:a08363b8572e6a8971a6d236d54fb8287"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a08363b8572e6a8971a6d236d54fb8287"></a>
 QUICKCPPLIB_NAMESPACE::ringbuffer_log::simple_ringbuffer_log<br class="typebreak"/>
-&lt; <a class="el" href="group__config.html#ga7c2409ed4b38a384c422012a43423a16">AFIO_LOGGING_MEMORY</a> &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__config.html#ga055d3fab8c2f8e818f6f10461cc1275c">afio_v2_xxx::log</a> () noexcept</td></tr>
-<tr class="memdesc:ga055d3fab8c2f8e818f6f10461cc1275c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Expands into the appropriate namespace markup to enter the C++ module exported AFIO v2 namespace.  <a href="group__config.html#ga055d3fab8c2f8e818f6f10461cc1275c">More...</a><br/></td></tr>
-<tr class="separator:ga055d3fab8c2f8e818f6f10461cc1275c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+&lt; <a class="el" href="group__config.html#ga7c2409ed4b38a384c422012a43423a16">AFIO_LOGGING_MEMORY</a> &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx.html#a08363b8572e6a8971a6d236d54fb8287">afio_v2_xxx::log</a> () noexcept</td></tr>
+<tr class="memdesc:a08363b8572e6a8971a6d236d54fb8287"><td class="mdescLeft">&#160;</td><td class="mdescRight">The log used by AFIO. <br/></td></tr>
+<tr class="separator:a08363b8572e6a8971a6d236d54fb8287"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae2ddff37f35bbb27dbde71beff2e6f6d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae2ddff37f35bbb27dbde71beff2e6f6d"></a>
 tls_errored_results_t &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>afio_v2_xxx::detail::tls_errored_results</b> ()</td></tr>
 <tr class="separator:ae2ddff37f35bbb27dbde71beff2e6f6d"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -353,11 +352,11 @@ template&lt;class R , class U , class... Args&gt; </td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">{                                                                                                                                                                                                                                                                                                                            <a class="code" href="group__config.html#ga055d3fab8c2f8e818f6f10461cc1275c">\</a></div>
-<div class="line"><a class="code" href="group__config.html#ga055d3fab8c2f8e818f6f10461cc1275c">    AFIO_V2_NAMESPACE::log</a>().emplace_back(QUICKCPPLIB_NAMESPACE::ringbuffer_log::level::fatal, (message), (<span class="keywordtype">unsigned</span>) (uintptr_t)(inst), QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id(), (<a class="code" href="group__config.html#ga98c874cd585103f72c3c8338b491436b">AFIO_LOG_BACKTRACE_LEVELS</a> &amp; (1 &lt;&lt; 1)) ? <span class="keyword">nullptr</span> : __func__, __LINE__);                                                        \</div>
+<b>Value:</b><div class="fragment"><div class="line">{                                                                                                                                                                                                                                                                                                                            <a class="code" href="namespaceafio__v2__xxx.html#a08363b8572e6a8971a6d236d54fb8287">\</a></div>
+<div class="line"><a class="code" href="namespaceafio__v2__xxx.html#a08363b8572e6a8971a6d236d54fb8287">    AFIO_V2_NAMESPACE::log</a>().emplace_back(QUICKCPPLIB_NAMESPACE::ringbuffer_log::level::fatal, (message), (<span class="keywordtype">unsigned</span>) (uintptr_t)(inst), QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id(), (<a class="code" href="group__config.html#ga98c874cd585103f72c3c8338b491436b">AFIO_LOG_BACKTRACE_LEVELS</a> &amp; (1 &lt;&lt; 1)) ? <span class="keyword">nullptr</span> : __func__, __LINE__);                                                        \</div>
 <div class="line">    AFIO_LOG_FATAL_TO_CERR(message);                                                                                                                                                                                                                                                                                           \</div>
 <div class="line">  }</div>
-<div class="ttc" id="group__config_html_ga055d3fab8c2f8e818f6f10461cc1275c"><div class="ttname"><a href="group__config.html#ga055d3fab8c2f8e818f6f10461cc1275c">afio_v2_xxx::log</a></div><div class="ttdeci">AFIO_DECL QUICKCPPLIB_NAMESPACE::ringbuffer_log::simple_ringbuffer_log&lt; AFIO_LOGGING_MEMORY &gt; &amp; log() noexcept</div><div class="ttdoc">Expands into the appropriate namespace markup to enter the C++ module exported AFIO v2 namespace...</div><div class="ttdef"><b>Definition:</b> config.hpp:312</div></div>
+<div class="ttc" id="namespaceafio__v2__xxx_html_a08363b8572e6a8971a6d236d54fb8287"><div class="ttname"><a href="namespaceafio__v2__xxx.html#a08363b8572e6a8971a6d236d54fb8287">afio_v2_xxx::log</a></div><div class="ttdeci">QUICKCPPLIB_NAMESPACE::ringbuffer_log::simple_ringbuffer_log&lt; AFIO_LOGGING_MEMORY &gt; &amp; log() noexcept</div><div class="ttdoc">The log used by AFIO. </div><div class="ttdef"><b>Definition:</b> config.hpp:315</div></div>
 <div class="ttc" id="group__config_html_ga98c874cd585103f72c3c8338b491436b"><div class="ttname"><a href="group__config.html#ga98c874cd585103f72c3c8338b491436b">AFIO_LOG_BACKTRACE_LEVELS</a></div><div class="ttdeci">#define AFIO_LOG_BACKTRACE_LEVELS</div><div class="ttdoc">Bit mask of which log levels should be stack backtraced which will slow those logs thirty fold or so...</div><div class="ttdef"><b>Definition:</b> config.hpp:55</div></div>
 </div><!-- fragment -->
 </div>
@@ -393,32 +392,15 @@ template&lt;class R , class U , class... Args&gt; </td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line"><span class="keywordflow">if</span>(<a class="code" href="group__config.html#ga055d3fab8c2f8e818f6f10461cc1275c">log</a>().<a class="code" href="namespaceafio__v2__xxx.html#aed225790bbca36d005efff21edbee937">log_level</a>() &gt;= log_level::info)                                                                                                                                                                                                                                                                                     \</div>
+<b>Value:</b><div class="fragment"><div class="line"><span class="keywordflow">if</span>(<a class="code" href="namespaceafio__v2__xxx.html#a08363b8572e6a8971a6d236d54fb8287">log</a>().<a class="code" href="namespaceafio__v2__xxx.html#aed225790bbca36d005efff21edbee937">log_level</a>() &gt;= log_level::info)                                                                                                                                                                                                                                                                                     \</div>
 <div class="line">  {                                                                                                                                                                                                                                                                                                                            \</div>
 <div class="line">    char buffer[256];                                                                                                                                                                                                                                                                                                          \</div>
 <div class="line">    AFIO_V2_NAMESPACE::detail::strip_pretty_function(buffer, <span class="keyword">sizeof</span>(buffer), __PRETTY_FUNCTION__);                                                                                                                                                                                                                             \</div>
 <div class="line">    AFIO_V2_NAMESPACE::detail::log_inst_to_info(inst, buffer);                                                                                                                                                                                                                                                                 \</div>
 <div class="line">  }                                                                                                                                                                                                                                                                                                                            \</div>
 <div class="line">  AFIO_LOG_INST_TO_TLS(inst)</div>
-<div class="ttc" id="namespaceafio__v2__xxx_html_aed225790bbca36d005efff21edbee937"><div class="ttname"><a href="namespaceafio__v2__xxx.html#aed225790bbca36d005efff21edbee937">afio_v2_xxx::log_level</a></div><div class="ttdeci">QUICKCPPLIB_NAMESPACE::ringbuffer_log::level log_level</div><div class="ttdoc">Enum for the log level. </div><div class="ttdef"><b>Definition:</b> config.hpp:321</div></div>
-<div class="ttc" id="group__config_html_ga055d3fab8c2f8e818f6f10461cc1275c"><div class="ttname"><a href="group__config.html#ga055d3fab8c2f8e818f6f10461cc1275c">afio_v2_xxx::log</a></div><div class="ttdeci">AFIO_DECL QUICKCPPLIB_NAMESPACE::ringbuffer_log::simple_ringbuffer_log&lt; AFIO_LOGGING_MEMORY &gt; &amp; log() noexcept</div><div class="ttdoc">Expands into the appropriate namespace markup to enter the C++ module exported AFIO v2 namespace...</div><div class="ttdef"><b>Definition:</b> config.hpp:312</div></div>
-</div><!-- fragment -->
-</div>
-</div>
-<a class="anchor" id="af5f9b13a512047008c0caeb5fcd310e0"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define AFIO_V2_NAMESPACE_EXPORT_BEGIN</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">export <span class="keyword">namespace </span>afio_v2_xxx                                                                                                                                                                                                                                                                                                 \</div>
-<div class="line">  {  \<span class="comment"></span></div>
-<div class="line"><span class="comment">/*! \brief Expands into the appropriate namespace markup to exit the AFIO v2 namespace.</span></div>
-<div class="line"><span class="comment">\ingroup config</span></div>
-<div class="line"><span class="comment">*/</span></div>
+<div class="ttc" id="namespaceafio__v2__xxx_html_a08363b8572e6a8971a6d236d54fb8287"><div class="ttname"><a href="namespaceafio__v2__xxx.html#a08363b8572e6a8971a6d236d54fb8287">afio_v2_xxx::log</a></div><div class="ttdeci">QUICKCPPLIB_NAMESPACE::ringbuffer_log::simple_ringbuffer_log&lt; AFIO_LOGGING_MEMORY &gt; &amp; log() noexcept</div><div class="ttdoc">The log used by AFIO. </div><div class="ttdef"><b>Definition:</b> config.hpp:315</div></div>
+<div class="ttc" id="namespaceafio__v2__xxx_html_aed225790bbca36d005efff21edbee937"><div class="ttname"><a href="namespaceafio__v2__xxx.html#aed225790bbca36d005efff21edbee937">afio_v2_xxx::log_level</a></div><div class="ttdeci">QUICKCPPLIB_NAMESPACE::ringbuffer_log::level log_level</div><div class="ttdoc">Enum for the log level. </div><div class="ttdef"><b>Definition:</b> config.hpp:324</div></div>
 </div><!-- fragment -->
 </div>
 </div>

@@ -190,7 +190,7 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1io__service.html#a83ed27472ae75a1a31d73b383aa78564">disable_kqueues</a> ()</td></tr>
 <tr class="memdesc:a83ed27472ae75a1a31d73b383aa78564"><td class="mdescLeft">&#160;</td><td class="mdescRight">Force disable any use of BSD kqueues. <br/></td></tr>
 <tr class="separator:a83ed27472ae75a1a31d73b383aa78564"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a72e68348a3f92ee2a91599960132f404"><td class="memItemLeft" align="right" valign="top">virtual result&lt; bool &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1io__service.html#a72e68348a3f92ee2a91599960132f404">run_until</a> (<a class="el" href="structdeadline.html">deadline</a> d) noexcept</td></tr>
+<tr class="memitem:a72e68348a3f92ee2a91599960132f404"><td class="memItemLeft" align="right" valign="top">virtual result&lt; bool &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1io__service.html#a72e68348a3f92ee2a91599960132f404">run_until</a> (<a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a> d) noexcept</td></tr>
 <tr class="separator:a72e68348a3f92ee2a91599960132f404"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a73dbea24c52d4051ddd92e0ff3b3fb97"><td class="memItemLeft" align="right" valign="top">result&lt; bool &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1io__service.html#a73dbea24c52d4051ddd92e0ff3b3fb97">run</a> () noexcept</td></tr>
 <tr class="separator:a73dbea24c52d4051ddd92e0ff3b3fb97"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -314,8 +314,7 @@ template&lt;class U &gt; </div>
 </table>
 </div><div class="memdoc">
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;{ <span class="keywordflow">return</span> <a class="code" href="classafio__v2__xxx_1_1io__service.html#a72e68348a3f92ee2a91599960132f404">run_until</a>(<a class="code" href="structdeadline.html">deadline</a>()); }</div>
-<div class="ttc" id="structdeadline_html"><div class="ttname"><a href="structdeadline.html">deadline</a></div><div class="ttdoc">A time deadline in either relative-to-now or absolute (system clock) terms. </div></div>
+<div class="fragment"><div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;{ <span class="keywordflow">return</span> <a class="code" href="classafio__v2__xxx_1_1io__service.html#a72e68348a3f92ee2a91599960132f404">run_until</a>(deadline()); }</div>
 <div class="ttc" id="classafio__v2__xxx_1_1io__service_html_a72e68348a3f92ee2a91599960132f404"><div class="ttname"><a href="classafio__v2__xxx_1_1io__service.html#a72e68348a3f92ee2a91599960132f404">afio_v2_xxx::io_service::run_until</a></div><div class="ttdeci">virtual result&lt; bool &gt; run_until(deadline d) noexcept</div></div>
 </div><!-- fragment -->
 </div>
@@ -330,7 +329,7 @@ template&lt;class U &gt; </div>
         <tr>
           <td class="memname">virtual result&lt;bool&gt; afio_v2_xxx::io_service::run_until </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="structdeadline.html">deadline</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a>&#160;</td>
           <td class="paramname"><em>d</em></td><td>)</td>
           <td></td>
         </tr>

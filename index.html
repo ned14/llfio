@@ -102,15 +102,27 @@ $(document).ready(function(){initNavTree('index.html','');});
 <div class="title">AFIO Documentation</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>Herein lies the beginnings of the proposed AFIO v2 post-peer-review rewrite. Its github source code repository lives at <a href="https://github.com/ned14/boost.afio">https://github.com/ned14/boost.afio</a>.</p>
-<p><b>master branch test status</b> Linux: <a href="https://travis-ci.org/ned14/afio"></a> Windows: <em>disabled due to lack of VS2017.3 on CI</em> <b>CMake dashboard</b>: <a href="http://my.cdash.org/index.php?project=AFIO">http://my.cdash.org/index.php?project=AFIO</a></p>
-<dl class="section note"><dt>Note</dt><dd>Note that this code is of late alpha quality. Be careful when using it!</dd></dl>
+<div class="textblock"><center><table  border="0" cellpadding="4">
+<tr>
+<td align="center"><a href="https://github.com/ned14/afio">AFIO</a><br/>
+<a href="https://github.com/ned14/afio">on GitHub</a>  </td><td align="center"><a href="http://my.cdash.org/index.php?project=Boost.AFIO">CTest summary</a><br/>
+<a href="http://my.cdash.org/index.php?project=Boost.AFIO">dashboard</a>  </td><td align="center"><a href="https://travis-ci.org/ned14/boost.outcome">Linux and MacOS CI:</a><div class="image">
+<img src="https://travis-ci.org/ned14/afio.svg?branch=master" />
+</div>
+  </td><td align="center"><a href="https://ci.appveyor.com/project/ned14/afio/branch/master">Windows CI:</a><div class="image">
+<img src="https://ci.appveyor.com/api/projects/status/680b1pt9srnoprs3/branch/master?svg=true" />
+</div>
+   </td></tr>
+</table>
+</center><p>Herein lies my proposed async file i/o and filesystem library for Boost and the C++ standard. It is a complete rewrite after a Boost peer review in August 2015. Its github source code repository lives at <a href="https://github.com/ned14/boost.afio">https://github.com/ned14/boost.afio</a>.</p>
+<dl class="section note"><dt>Note</dt><dd>Note that this code is of late alpha quality. It's quite reliable, but be careful when using it!</dd></dl>
 <p>You need these compilers or better:</p>
 <ul>
-<li>GCC 7.0</li>
-<li>clang 4.0</li>
-<li>VS2017 Update 3</li>
+<li>GCC 7.0 (Linux)</li>
+<li>clang 4.0 (Linux, Windows)</li>
+<li>VS2017 Update 3 (Windows)</li>
 </ul>
+<p>Todo list for already implemented parts: <a href="https://ned14.github.io/afio/todo.html">https://ned14.github.io/afio/todo.html</a></p>
 <h2>v2 architecture and design implemented:</h2>
 <table class="doxtable">
 <tr>

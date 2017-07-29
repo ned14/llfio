@@ -114,11 +114,11 @@ $(document).ready(function(){initNavTree('classafio__v2__xxx_1_1section__handle.
 <a href="#pro-attribs">Protected Attributes</a> &#124;
 <a href="classafio__v2__xxx_1_1section__handle-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">afio_v2_xxx::section_handle Class Reference<div class="ingroups"><a class="el" href="group__config.html">Configuration macros</a></div></div>  </div>
+<div class="title">afio_v2_xxx::section_handle Class Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 
-<p>Expands into the appropriate namespace markup to exit the AFIO v2 namespace.  
+<p>A handle to a source of mapped memory.  
  <a href="classafio__v2__xxx_1_1section__handle.html#details">More...</a></p>
 
 <p><code>#include &quot;map_handle.hpp&quot;</code></p>
@@ -128,7 +128,7 @@ Inheritance diagram for afio_v2_xxx::section_handle:</div>
  <div class="center">
   <img src="classafio__v2__xxx_1_1section__handle.png" usemap="#afio_v2_xxx::section_handle_map" alt=""/>
   <map id="afio_v2_xxx::section_handle_map" name="afio_v2_xxx::section_handle_map">
-<area href="classafio__v2__xxx_1_1handle.html" title="Expands into the appropriate namespace markup to exit the AFIO v2 namespace. " alt="afio_v2_xxx::handle" shape="rect" coords="0,0,170,24"/>
+<area href="classafio__v2__xxx_1_1handle.html" title="A native_handle_type which is managed by the lifetime of this object instance. " alt="afio_v2_xxx::handle" shape="rect" coords="0,0,170,24"/>
 </map>
  </div></div>
 <table class="memberdecls">
@@ -365,8 +365,7 @@ flag&#160;</td><td class="memItemRight" valign="bottom"><b>_flags</b></td></tr>
 <tr class="separator:a771ef2bf39ad784eb6265dde077792ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Expands into the appropriate namespace markup to exit the AFIO v2 namespace. </p>
-<p>A handle to a source of mapped memory.</p>
+<div class="textblock"><p>A handle to a source of mapped memory. </p>
 <dl class="section note"><dt>Note</dt><dd>On Windows the native handle of this handle is that of the NT kernel section object. On POSIX it is a cloned file descriptor of the backing storage. </dd></dl>
 </div><h2 class="groupheader">Member Enumeration Documentation</h2>
 <a class="anchor" id="a6f7e37c73271968271c2342023f58c9e"></a>
@@ -563,7 +562,7 @@ flag&#160;</td><td class="memItemRight" valign="bottom"><b>_flags</b></td></tr>
 <p>Returns the current path of the open handle as said by the operating system. Note that you are NOT guaranteed that any path refreshed bears any resemblance to the original, many operating systems will return some different path which still reaches the same inode via some other route e.g. hardlinks, dereferenced symbolic links, etc.</p>
 <p>If AFIO was not able to determine the current path for this open handle e.g. the inode has been unlinked, it returns an empty path. Some operating systems e.g. FreeBSD also only can fetch the current path for directory inodes, not file inodes.</p>
 <dl class="section warning"><dt>Warning</dt><dd>This call is expensive, it always asks the kernel for the current path, and if <code>disable_safety_unlinks</code> is off (the default) it checks the path returned to ensure it does actually point at the correct inode. Be aware that despite these precautions, paths are unstable and <b>can change randomly at any moment</b>. Most code written to use absolute file systems paths is <b>racy</b>, so don't do it, use <code>path_handle</code> to fix a base location on the file system and work from that anchor instead! </dd></dl>
-<div class="fragment"><div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;{ <span class="keywordflow">return</span> <a class="code" href="classafio__v2__xxx_1_1handle.html#a6c4df2242ece6f63ba7ef4e6baafaca6">path_type</a>(); }</div>
+<div class="fragment"><div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;{ <span class="keywordflow">return</span> <a class="code" href="classafio__v2__xxx_1_1handle.html#a6c4df2242ece6f63ba7ef4e6baafaca6">path_type</a>(); }</div>
 <div class="ttc" id="classafio__v2__xxx_1_1handle_html_a6c4df2242ece6f63ba7ef4e6baafaca6"><div class="ttname"><a href="classafio__v2__xxx_1_1handle.html#a6c4df2242ece6f63ba7ef4e6baafaca6">afio_v2_xxx::handle::path_type</a></div><div class="ttdeci">filesystem::path path_type</div><div class="ttdoc">The path type used by this handle. </div><div class="ttdef"><b>Definition:</b> handle.hpp:54</div></div>
 </div><!-- fragment -->
 </div>

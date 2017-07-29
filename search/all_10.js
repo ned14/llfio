@@ -42,7 +42,7 @@ var searchData=
   ['statfs_2ehpp',['statfs.hpp',['../statfs_8hpp.html',1,'']]],
   ['statfs_5ft',['statfs_t',['../structafio__v2__xxx_1_1statfs__t.html',1,'afio_v2_xxx']]],
   ['statfs_5ft',['statfs_t',['../structafio__v2__xxx_1_1statfs__t.html#ab9d13f831de61aafbfcdcb8bac53e521',1,'afio_v2_xxx::statfs_t']]],
-  ['steady',['steady',['../structboost__afio__deadline.html#a6ae7a549b4b836797531e5f9e097d12e',1,'boost_afio_deadline']]],
+  ['steady',['steady',['../structafio__v2__xxx_1_1deadline.html#a37956f66fc9e6d091fb1f34c4ba90236',1,'afio_v2_xxx::deadline']]],
   ['storage_5fprofile',['storage_profile',['../structafio__v2__xxx_1_1storage__profile_1_1storage__profile.html',1,'afio_v2_xxx::storage_profile']]],
   ['storage_5fprofile_2ehpp',['storage_profile.hpp',['../storage__profile_8hpp.html',1,'']]],
   ['storage_5ftypes',['storage_types',['../namespaceafio__v2__xxx_1_1storage__profile.html#a28463e9febc38f42595612b02c04b031',1,'afio_v2_xxx::storage_profile']]],

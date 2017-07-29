@@ -1,5 +1,6 @@
 var handle_8hpp =
 [
+    [ "handle", "classafio__v2__xxx_1_1handle.html", "classafio__v2__xxx_1_1handle" ],
     [ "flag_base", "structafio__v2__xxx_1_1handle_1_1flag__base.html", "structafio__v2__xxx_1_1handle_1_1flag__base" ],
     [ "hook_result_construction", "handle_8hpp.html#a6e724f1ed8bc70cb89ea1ef13176a4aa", null ],
     [ "log_inst_to_info", "handle_8hpp.html#aa3356a7dbe3d081f112d6e8dd4344160", null ],

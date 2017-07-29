@@ -122,9 +122,6 @@ Namespaces</h2></td></tr>
 <tr class="memitem:namespaceafio__v2__xxx_1_1algorithm"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx_1_1algorithm.html">algorithm</a></td></tr>
 <tr class="memdesc:namespaceafio__v2__xxx_1_1algorithm"><td class="mdescLeft">&#160;</td><td class="mdescRight">Collection of file system based algorithms. <br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:namespaceafio__v2__xxx_1_1detail"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx_1_1detail.html">detail</a></td></tr>
-<tr class="memdesc:namespaceafio__v2__xxx_1_1detail"><td class="mdescLeft">&#160;</td><td class="mdescRight">Expands into the appropriate namespace markup to enter the C++ module exported AFIO v2 namespace. <br/></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:namespaceafio__v2__xxx_1_1storage__profile"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx_1_1storage__profile.html">storage_profile</a></td></tr>
 <tr class="memdesc:namespaceafio__v2__xxx_1_1storage__profile"><td class="mdescLeft">&#160;</td><td class="mdescRight">YAML databaseable empirical testing of a storage's behaviour. <br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -135,37 +132,40 @@ Namespaces</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1async__file__handle.html">async_file_handle</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Expands into the appropriate namespace markup to exit the AFIO v2 namespace.  <a href="classafio__v2__xxx_1_1async__file__handle.html#details">More...</a><br/></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">An asynchronous handle to an open something.  <a href="classafio__v2__xxx_1_1async__file__handle.html#details">More...</a><br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structafio__v2__xxx_1_1error__code.html">error_code</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Expands into the appropriate namespace markup to enter the C++ module exported AFIO v2 namespace.  <a href="structafio__v2__xxx_1_1error__code.html#details">More...</a><br/></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Trampoline to <code>std::error_code</code>, used to ADL hook <code>result&lt;T, E&gt;</code> creation in Outcome.  <a href="structafio__v2__xxx_1_1error__code.html#details">More...</a><br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1log__level__guard.html">log_level_guard</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">RAII class for temporarily adjusting the log level.  <a href="classafio__v2__xxx_1_1log__level__guard.html#details">More...</a><br/></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A time deadline in either relative-to-now or absolute (system clock) terms.  <a href="structafio__v2__xxx_1_1deadline.html#details">More...</a><br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1file__handle.html">file_handle</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A handle to a regular file or device, kept data layout compatible with async_file_handle.  <a href="classafio__v2__xxx_1_1file__handle.html#details">More...</a><br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1handle.html">handle</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Expands into the appropriate namespace markup to exit the AFIO v2 namespace.  <a href="classafio__v2__xxx_1_1handle.html#details">More...</a><br/></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A native_handle_type which is managed by the lifetime of this object instance.  <a href="classafio__v2__xxx_1_1handle.html#details">More...</a><br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1io__handle.html">io_handle</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Expands into the appropriate namespace markup to exit the AFIO v2 namespace.  <a href="classafio__v2__xxx_1_1io__handle.html#details">More...</a><br/></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A handle to something capable of scatter-gather i/o.  <a href="classafio__v2__xxx_1_1io__handle.html#details">More...</a><br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1io__service.html">io_service</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">An asynchronous i/o multiplexer service.  <a href="classafio__v2__xxx_1_1io__service.html#details">More...</a><br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1section__handle.html">section_handle</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Expands into the appropriate namespace markup to exit the AFIO v2 namespace.  <a href="classafio__v2__xxx_1_1section__handle.html#details">More...</a><br/></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A handle to a source of mapped memory.  <a href="classafio__v2__xxx_1_1section__handle.html#details">More...</a><br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1map__handle.html">map_handle</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A handle to a memory mapped region of memory.  <a href="classafio__v2__xxx_1_1map__handle.html#details">More...</a><br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structafio__v2__xxx_1_1native__handle__type.html">native_handle_type</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Expands into the appropriate namespace markup to exit the AFIO v2 namespace.  <a href="structafio__v2__xxx_1_1native__handle__type.html#details">More...</a><br/></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A native handle type used for wrapping file descriptors, process ids or HANDLEs. Unmanaged, wrap in a handle object to manage.  <a href="structafio__v2__xxx_1_1native__handle__type.html#details">More...</a><br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1path__handle.html">path_handle</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Expands into the appropriate namespace markup to exit the AFIO v2 namespace.  <a href="classafio__v2__xxx_1_1path__handle.html#details">More...</a><br/></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A handle to somewhere originally identified by a path on the filing system. Typically used as the lightest weight handle to some location on the filing system which may unpredictably relocate over time. This handle is thus an <em>anchor</em> to a subset island of the filing system, free of any race conditions introduced by third party changes to any part of the path leading to that island.  <a href="classafio__v2__xxx_1_1path__handle.html#details">More...</a><br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1path__view.html">path_view</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A borrowed view of a path. A lightweight trivial-type alternative to <code>std::filesystem::path</code>.  <a href="classafio__v2__xxx_1_1path__view.html#details">More...</a><br/></td></tr>
@@ -194,14 +194,14 @@ using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="nam
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ga055d3fab8c2f8e818f6f10461cc1275c"><td class="memItemLeft" align="right" valign="top">AFIO_DECL <br class="typebreak"/>
+<tr class="memitem:a08363b8572e6a8971a6d236d54fb8287"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a08363b8572e6a8971a6d236d54fb8287"></a>
 QUICKCPPLIB_NAMESPACE::ringbuffer_log::simple_ringbuffer_log<br class="typebreak"/>
-&lt; <a class="el" href="group__config.html#ga7c2409ed4b38a384c422012a43423a16">AFIO_LOGGING_MEMORY</a> &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__config.html#ga055d3fab8c2f8e818f6f10461cc1275c">log</a> () noexcept</td></tr>
-<tr class="memdesc:ga055d3fab8c2f8e818f6f10461cc1275c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Expands into the appropriate namespace markup to enter the C++ module exported AFIO v2 namespace.  <a href="group__config.html#ga055d3fab8c2f8e818f6f10461cc1275c">More...</a><br/></td></tr>
-<tr class="separator:ga055d3fab8c2f8e818f6f10461cc1275c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga4968bb2d647535f4b91427c66ff8b9e4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classafio__v2__xxx_1_1path__view.html">path_view</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__config.html#ga4968bb2d647535f4b91427c66ff8b9e4">temporary_files_directory</a> () noexcept</td></tr>
-<tr class="memdesc:ga4968bb2d647535f4b91427c66ff8b9e4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Expands into the appropriate namespace markup to exit the AFIO v2 namespace.  <a href="group__config.html#ga4968bb2d647535f4b91427c66ff8b9e4">More...</a><br/></td></tr>
-<tr class="separator:ga4968bb2d647535f4b91427c66ff8b9e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+&lt; <a class="el" href="group__config.html#ga7c2409ed4b38a384c422012a43423a16">AFIO_LOGGING_MEMORY</a> &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx.html#a08363b8572e6a8971a6d236d54fb8287">log</a> () noexcept</td></tr>
+<tr class="memdesc:a08363b8572e6a8971a6d236d54fb8287"><td class="mdescLeft">&#160;</td><td class="mdescRight">The log used by AFIO. <br/></td></tr>
+<tr class="separator:a08363b8572e6a8971a6d236d54fb8287"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4968bb2d647535f4b91427c66ff8b9e4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classafio__v2__xxx_1_1path__view.html">path_view</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx.html#a4968bb2d647535f4b91427c66ff8b9e4">temporary_files_directory</a> () noexcept</td></tr>
+<tr class="memdesc:a4968bb2d647535f4b91427c66ff8b9e4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a path to a directory reported by the operating system to be suitable for storing temporary files. As operating systems are known to sometimes lie about the validity of this path, each of the available temporary file path options reported by the OS are probed by trying to create a file in each until success is found. If none of the available options are writable, some valid path containing the string "no_temporary_directories_accessible" will be returned which should cause all operations using that path to fail with a usefully user visible error message.  <a href="#a4968bb2d647535f4b91427c66ff8b9e4">More...</a><br/></td></tr>
+<tr class="separator:a4968bb2d647535f4b91427c66ff8b9e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a23c535a7d67a0bbd0cf3254325b6efc7"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a23c535a7d67a0bbd0cf3254325b6efc7"></a>
 std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator&lt;&lt;</b> (std::ostream &amp;s, const <a class="el" href="classafio__v2__xxx_1_1handle.html">handle</a> &amp;v)</td></tr>
 <tr class="separator:a23c535a7d67a0bbd0cf3254325b6efc7"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -225,7 +225,34 @@ template&lt;class T , class R &gt; </td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>The AFIO namespace. </p>
 <dl class="todo"><dt><b><a class="el" href="todo.html#_todo000002">Todo:</a></b></dt><dd>TODO FIXME Replace in-memory log with memory map file backed log. </dd></dl>
-</div></div><!-- contents -->
+</div><h2 class="groupheader">Function Documentation</h2>
+<a class="anchor" id="a4968bb2d647535f4b91427c66ff8b9e4"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classafio__v2__xxx_1_1path__view.html">path_view</a> afio_v2_xxx::temporary_files_directory </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns a path to a directory reported by the operating system to be suitable for storing temporary files. As operating systems are known to sometimes lie about the validity of this path, each of the available temporary file path options reported by the OS are probed by trying to create a file in each until success is found. If none of the available options are writable, some valid path containing the string "no_temporary_directories_accessible" will be returned which should cause all operations using that path to fail with a usefully user visible error message. </p>
+<dl class="section user"><dt>Memory Allocations</dt><dd>Allocates storage for each path probed. </dd></dl>
+
+</div>
+</div>
+</div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->

@@ -6,7 +6,7 @@ var searchData=
   ['lock_5ffiles',['lock_files',['../classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1lock__files.html',1,'afio_v2_xxx::algorithm::shared_fs_mutex']]],
   ['lock_5ffiles',['lock_files',['../classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1lock__files.html#a21bdcd57cf9be0f1a3d6134dab68927f',1,'afio_v2_xxx::algorithm::shared_fs_mutex::lock_files']]],
   ['lock_5ffiles_2ehpp',['lock_files.hpp',['../lock__files_8hpp.html',1,'']]],
-  ['log',['log',['../group__config.html#ga055d3fab8c2f8e818f6f10461cc1275c',1,'afio_v2_xxx']]],
+  ['log',['log',['../namespaceafio__v2__xxx.html#a08363b8572e6a8971a6d236d54fb8287',1,'afio_v2_xxx']]],
   ['log_5flevel',['log_level',['../namespaceafio__v2__xxx.html#aed225790bbca36d005efff21edbee937',1,'afio_v2_xxx']]],
   ['log_5flevel_5fguard',['log_level_guard',['../classafio__v2__xxx_1_1log__level__guard.html',1,'afio_v2_xxx']]]
 ];

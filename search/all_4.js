@@ -1,7 +1,7 @@
 var searchData=
 [
   ['data',['data',['../structafio__v2__xxx_1_1io__handle_1_1buffer__type.html#af99fc701020c497671e8b865294b5ed2',1,'afio_v2_xxx::io_handle::buffer_type::data()'],['../structafio__v2__xxx_1_1io__handle_1_1const__buffer__type.html#adc7fb3275838792208c936669926cfe9',1,'afio_v2_xxx::io_handle::const_buffer_type::data()']]],
-  ['deadline',['deadline',['../structdeadline.html',1,'']]],
+  ['deadline',['deadline',['../structafio__v2__xxx_1_1deadline.html',1,'afio_v2_xxx']]],
   ['deadline_2eh',['deadline.h',['../deadline_8h.html',1,'']]],
   ['decommit',['decommit',['../classafio__v2__xxx_1_1map__handle.html#a5b69e8faa8a9e47dec1b1a123c722a3e',1,'afio_v2_xxx::map_handle']]],
   ['default_5fvalue',['default_value',['../namespaceafio__v2__xxx_1_1storage__profile.html#a2ad39b78e400cf1ab64579129522d4ac',1,'afio_v2_xxx::storage_profile']]],

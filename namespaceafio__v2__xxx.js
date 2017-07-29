@@ -1,12 +1,12 @@
 var namespaceafio__v2__xxx =
 [
     [ "algorithm", "namespaceafio__v2__xxx_1_1algorithm.html", "namespaceafio__v2__xxx_1_1algorithm" ],
-    [ "detail", "namespaceafio__v2__xxx_1_1detail.html", null ],
     [ "storage_profile", "namespaceafio__v2__xxx_1_1storage__profile.html", "namespaceafio__v2__xxx_1_1storage__profile" ],
     [ "utils", "namespaceafio__v2__xxx_1_1utils.html", "namespaceafio__v2__xxx_1_1utils" ],
     [ "async_file_handle", "classafio__v2__xxx_1_1async__file__handle.html", "classafio__v2__xxx_1_1async__file__handle" ],
     [ "error_code", "structafio__v2__xxx_1_1error__code.html", "structafio__v2__xxx_1_1error__code" ],
     [ "log_level_guard", "classafio__v2__xxx_1_1log__level__guard.html", "classafio__v2__xxx_1_1log__level__guard" ],
+    [ "deadline", "structafio__v2__xxx_1_1deadline.html", "structafio__v2__xxx_1_1deadline" ],
     [ "file_handle", "classafio__v2__xxx_1_1file__handle.html", "classafio__v2__xxx_1_1file__handle" ],
     [ "handle", "classafio__v2__xxx_1_1handle.html", "classafio__v2__xxx_1_1handle" ],
     [ "io_handle", "classafio__v2__xxx_1_1io__handle.html", "classafio__v2__xxx_1_1io__handle" ],

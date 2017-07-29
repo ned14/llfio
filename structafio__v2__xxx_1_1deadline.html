@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.6"/>
-<title>AFIO: Member List</title>
+<title>AFIO: afio_v2_xxx::deadline Struct Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -88,7 +88,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   </div>
 </div>
 <script type="text/javascript">
-$(document).ready(function(){initNavTree('structboost__afio__deadline.html','');});
+$(document).ready(function(){initNavTree('structafio__v2__xxx_1_1deadline.html','');});
 </script>
 <div id="doc-content">
 <!-- window showing the filter options -->
@@ -106,21 +106,49 @@ $(document).ready(function(){initNavTree('structboost__afio__deadline.html','');
 </div>
 
 <div class="header">
+  <div class="summary">
+<a href="#pub-attribs">Public Attributes</a> &#124;
+<a href="structafio__v2__xxx_1_1deadline-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">boost_afio_deadline Member List</div>  </div>
+<div class="title">afio_v2_xxx::deadline Struct Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 
-<p>This is the complete list of members for <a class="el" href="structboost__afio__deadline.html">boost_afio_deadline</a>, including all inherited members.</p>
-<table class="directory">
-  <tr class="even"><td class="entry"><a class="el" href="structboost__afio__deadline.html#a4e661a7cd71b9995e85cbbc0e0741ab1">nsecs</a></td><td class="entry"><a class="el" href="structboost__afio__deadline.html">boost_afio_deadline</a></td><td class="entry"></td></tr>
-  <tr><td class="entry"><a class="el" href="structboost__afio__deadline.html#a6ae7a549b4b836797531e5f9e097d12e">steady</a></td><td class="entry"><a class="el" href="structboost__afio__deadline.html">boost_afio_deadline</a></td><td class="entry"></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="structboost__afio__deadline.html#a014b8dde909e5a8674952f8b7f01b796">utc</a></td><td class="entry"><a class="el" href="structboost__afio__deadline.html">boost_afio_deadline</a></td><td class="entry"></td></tr>
-</table></div><!-- contents -->
+<p>A time deadline in either relative-to-now or absolute (system clock) terms.  
+ <a href="structafio__v2__xxx_1_1deadline.html#details">More...</a></p>
+
+<p><code>#include &quot;deadline.h&quot;</code></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
+Public Attributes</h2></td></tr>
+<tr class="memitem:a37956f66fc9e6d091fb1f34c4ba90236"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a37956f66fc9e6d091fb1f34c4ba90236"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structafio__v2__xxx_1_1deadline.html#a37956f66fc9e6d091fb1f34c4ba90236">steady</a></td></tr>
+<tr class="memdesc:a37956f66fc9e6d091fb1f34c4ba90236"><td class="mdescLeft">&#160;</td><td class="mdescRight">True if deadline does not change with system clock changes. <br/></td></tr>
+<tr class="separator:a37956f66fc9e6d091fb1f34c4ba90236"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5644c8ee9b6c25e75bd8a6b955081816"><td class="memItemLeft" ><a class="anchor" id="a5644c8ee9b6c25e75bd8a6b955081816"></a>
+union {</td></tr>
+<tr class="memitem:a085fb8822a8672b3debae5c80988f234"><td class="memItemLeft" ><a class="anchor" id="aeffdc3baecafe2d22f80abdefa68785e"></a>
+&#160;&#160;&#160;struct timespec&#160;&#160;&#160;<a class="el" href="structafio__v2__xxx_1_1deadline.html#aeffdc3baecafe2d22f80abdefa68785e">utc</a></td></tr>
+<tr class="memdesc:a085fb8822a8672b3debae5c80988f234"><td class="mdescLeft">&#160;</td><td class="mdescRight">System time from timespec_get(&amp;ts, TIME_UTC) <br/></td></tr>
+<tr class="separator:a085fb8822a8672b3debae5c80988f234"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab76f3775e596bb20d637e2b6663039a8"><td class="memItemLeft" ><a class="anchor" id="a6640fb195fb8b761a8b04ab8dd653106"></a>
+&#160;&#160;&#160;unsigned long long&#160;&#160;&#160;<a class="el" href="structafio__v2__xxx_1_1deadline.html#a6640fb195fb8b761a8b04ab8dd653106">nsecs</a></td></tr>
+<tr class="memdesc:ab76f3775e596bb20d637e2b6663039a8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Nanosecond ticks from start of operation. <br/></td></tr>
+<tr class="separator:ab76f3775e596bb20d637e2b6663039a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5644c8ee9b6c25e75bd8a6b955081816"><td class="memItemLeft" valign="top">};&#160;</td><td class="memItemRight" valign="bottom"></td></tr>
+<tr class="separator:a5644c8ee9b6c25e75bd8a6b955081816"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>A time deadline in either relative-to-now or absolute (system clock) terms. </p>
+</div><hr/>The documentation for this struct was generated from the following file:<ul>
+<li>include/afio/v2.0/<a class="el" href="deadline_8h.html">deadline.h</a></li>
+</ul>
+</div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
+    <li class="navelem"><a class="el" href="namespaceafio__v2__xxx.html">afio_v2_xxx</a></li><li class="navelem"><a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a></li>
     <li class="footer">Generated by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
