@@ -4,7 +4,7 @@ var classafio__v2__xxx_1_1io__handle =
     [ "const_buffer_type", "structafio__v2__xxx_1_1io__handle_1_1const__buffer__type.html", "structafio__v2__xxx_1_1io__handle_1_1const__buffer__type" ],
     [ "extent_guard", "classafio__v2__xxx_1_1io__handle_1_1extent__guard.html", "classafio__v2__xxx_1_1io__handle_1_1extent__guard" ],
     [ "io_request", "structafio__v2__xxx_1_1io__handle_1_1io__request.html", "structafio__v2__xxx_1_1io__handle_1_1io__request" ],
-    [ "io_result", "classafio__v2__xxx_1_1io__handle_1_1io__result.html", "classafio__v2__xxx_1_1io__handle_1_1io__result" ],
+    [ "io_result", "structafio__v2__xxx_1_1io__handle_1_1io__result.html", "structafio__v2__xxx_1_1io__handle_1_1io__result" ],
     [ "buffers_type", "classafio__v2__xxx_1_1io__handle.html#a70a3c5e6f62efc95db81f831f3b90a2c", null ],
     [ "caching", "classafio__v2__xxx_1_1io__handle.html#a2b34c5f4006c79320449590d953dea3f", null ],
     [ "const_buffers_type", "classafio__v2__xxx_1_1io__handle.html#a639b8760b1b98df95e4956f6cc56f6b5", null ],

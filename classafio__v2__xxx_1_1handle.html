@@ -541,9 +541,7 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operato
 <p>Returns the current path of the open handle as said by the operating system. Note that you are NOT guaranteed that any path refreshed bears any resemblance to the original, many operating systems will return some different path which still reaches the same inode via some other route e.g. hardlinks, dereferenced symbolic links, etc.</p>
 <p>If AFIO was not able to determine the current path for this open handle e.g. the inode has been unlinked, it returns an empty path. Some operating systems e.g. FreeBSD also only can fetch the current path for directory inodes, not file inodes.</p>
 <dl class="section warning"><dt>Warning</dt><dd>This call is expensive, it always asks the kernel for the current path, and if <code>disable_safety_unlinks</code> is off (the default) it checks the path returned to ensure it does actually point at the correct inode. Be aware that despite these precautions, paths are unstable and <b>can change randomly at any moment</b>. Most code written to use absolute file systems paths is <b>racy</b>, so don't do it, use <code>path_handle</code> to fix a base location on the file system and work from that anchor instead! </dd></dl>
-<div class="fragment"><div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;{ <span class="keywordflow">return</span> <a class="code" href="classafio__v2__xxx_1_1handle.html#a6c4df2242ece6f63ba7ef4e6baafaca6">path_type</a>(); }</div>
-<div class="ttc" id="classafio__v2__xxx_1_1handle_html_a6c4df2242ece6f63ba7ef4e6baafaca6"><div class="ttname"><a href="classafio__v2__xxx_1_1handle.html#a6c4df2242ece6f63ba7ef4e6baafaca6">afio_v2_xxx::handle::path_type</a></div><div class="ttdeci">filesystem::path path_type</div><div class="ttdoc">The path type used by this handle. </div><div class="ttdef"><b>Definition:</b> handle.hpp:54</div></div>
-</div><!-- fragment -->
+
 </div>
 </div>
 <a class="anchor" id="af1610ec7fb0a41f039e3e17e0dc467ab"></a>

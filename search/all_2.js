@@ -12,5 +12,5 @@ var searchData=
   ['byte_5franges',['byte_ranges',['../classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1byte__ranges.html',1,'afio_v2_xxx::algorithm::shared_fs_mutex']]],
   ['byte_5franges',['byte_ranges',['../classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1byte__ranges.html#a047dc0602663a9011edc17720c239fd2',1,'afio_v2_xxx::algorithm::shared_fs_mutex::byte_ranges']]],
   ['byte_5franges_2ehpp',['byte_ranges.hpp',['../byte__ranges_8hpp.html',1,'']]],
-  ['bytes_5ftransferred',['bytes_transferred',['../classafio__v2__xxx_1_1io__handle_1_1io__result.html#a26abbc9936d6412d2f073069f383d5e6',1,'afio_v2_xxx::io_handle::io_result']]]
+  ['bytes_5ftransferred',['bytes_transferred',['../structafio__v2__xxx_1_1io__handle_1_1io__result.html#a26abbc9936d6412d2f073069f383d5e6',1,'afio_v2_xxx::io_handle::io_result']]]
 ];

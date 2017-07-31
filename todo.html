@@ -105,16 +105,16 @@ $(document).ready(function(){initNavTree('todo.html','');});
 <div class="textblock"><dl class="reflist">
 <dt><a class="anchor" id="_todo000002"></a>Namespace <a class="el" href="namespaceafio__v2__xxx.html">afio_v2_xxx</a>  </dt>
 <dd>TODO FIXME Replace in-memory log with memory map file backed log.  </dd>
-<dt><a class="anchor" id="_todo000004"></a>Class <a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1atomic__append.html">afio_v2_xxx::algorithm::shared_fs_mutex::atomic_append</a>  </dt>
+<dt><a class="anchor" id="_todo000005"></a>Class <a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1atomic__append.html">afio_v2_xxx::algorithm::shared_fs_mutex::atomic_append</a>  </dt>
 <dd><p class="startdd">Implement hole punching once I port that code from AFIO v1. </p>
 <p>Decide on some resolution mechanism for sudden process exit. </p>
 <p class="enddd">There is a 1 out of 2^64-2 chance of unique id collision. It would be nice if we actually formally checked that our chosen unique id is actually unique.  </p>
 </dd>
-<dt><a class="anchor" id="_todo000006"></a>Member <a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1atomic__append.html#a314b006449b2516b1dbe3c4ac07067dc">afio_v2_xxx::algorithm::shared_fs_mutex::atomic_append::_lock</a>  (entities_guard &amp;out, deadline d, bool spin_not_sleep) noexceptoverridefinal</dt>
+<dt><a class="anchor" id="_todo000007"></a>Member <a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1atomic__append.html#a314b006449b2516b1dbe3c4ac07067dc">afio_v2_xxx::algorithm::shared_fs_mutex::atomic_append::_lock</a>  (entities_guard &amp;out, deadline d, bool spin_not_sleep) noexceptoverridefinal</dt>
 <dd>Read from header.last_known_good immediately if possible in order to avoid a duplicate read later  </dd>
-<dt><a class="anchor" id="_todo000005"></a>Member <a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1atomic__append.html#a37d6135d8677c0da876a432a7ac05b53">afio_v2_xxx::algorithm::shared_fs_mutex::atomic_append::fs_mutex_append</a>  (const path_handle &amp;base, path_view lockfile, bool nfs_compatibility=false, bool skip_hashing=false) noexcept</dt>
+<dt><a class="anchor" id="_todo000006"></a>Member <a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1atomic__append.html#a37d6135d8677c0da876a432a7ac05b53">afio_v2_xxx::algorithm::shared_fs_mutex::atomic_append::fs_mutex_append</a>  (const path_handle &amp;base, path_view lockfile, bool nfs_compatibility=false, bool skip_hashing=false) noexcept</dt>
 <dd>fs_mutex_append needs to check if file still exists after lock is granted, awaiting path fetching.  </dd>
-<dt><a class="anchor" id="_todo000007"></a>Class <a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html">afio_v2_xxx::algorithm::shared_fs_mutex::memory_map&lt; Hasher, HashIndexSize, SpinlockType &gt;</a>  </dt>
+<dt><a class="anchor" id="_todo000008"></a>Class <a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html">afio_v2_xxx::algorithm::shared_fs_mutex::memory_map&lt; Hasher, HashIndexSize, SpinlockType &gt;</a>  </dt>
 <dd><p class="startdd">It should be possible to auto early out from a memory_map transition by scanning the memory map for any locked items, and if none then to proceed. </p>
 <p>fs_mutex_map needs to check if this inode is that at the path after lock is granted, awaiting stat_t port. </p>
 <p>memory_map::_hash_entities needs to hash x16, x8 and x4 at a time to encourage auto vectorisation </p>
@@ -122,7 +122,9 @@ $(document).ready(function(){initNavTree('todo.html','');});
 </dd>
 <dt><a class="anchor" id="_todo000001"></a>Class <a class="el" href="classafio__v2__xxx_1_1async__file__handle.html">afio_v2_xxx::async_file_handle</a>  </dt>
 <dd>Direct use of <code>calloc()</code> ought to be replaced with a user supplied STL allocator instance.  </dd>
-<dt><a class="anchor" id="_todo000003"></a>Class <a class="el" href="classafio__v2__xxx_1_1path__view.html">afio_v2_xxx::path_view</a>  </dt>
+<dt><a class="anchor" id="_todo000003"></a>Member <a class="el" href="classafio__v2__xxx_1_1io__handle.html#a2da2f177b841701a840a8191a79dd1d4">afio_v2_xxx::io_handle::io_handle</a>  ()=default</dt>
+<dd>Why is io_result&lt;buffers_type&gt; not a standard layout type?  </dd>
+<dt><a class="anchor" id="_todo000004"></a>Class <a class="el" href="classafio__v2__xxx_1_1path__view.html">afio_v2_xxx::path_view</a>  </dt>
 <dd>Lots of member functions remain to be implemented.</dd>
 </dl>
 </div></div><!-- contents -->

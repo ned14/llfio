@@ -44,8 +44,8 @@ var hierarchy =
     [ "afio_v2_xxx::utils::page_allocator< void >::rebind< U >", "structafio__v2__xxx_1_1utils_1_1page__allocator_3_01void_01_4_1_1rebind.html", null ],
     [ "afio_v2_xxx::utils::page_allocator< T >::rebind< U >", "structafio__v2__xxx_1_1utils_1_1page__allocator_1_1rebind.html", null ],
     [ "result", null, [
-      [ "afio_v2_xxx::io_handle::io_result< T >", "classafio__v2__xxx_1_1io__handle_1_1io__result.html", null ],
-      [ "afio_v2_xxx::io_handle::io_result< BuffersType >", "classafio__v2__xxx_1_1io__handle_1_1io__result.html", null ]
+      [ "afio_v2_xxx::io_handle::io_result< T >", "structafio__v2__xxx_1_1io__handle_1_1io__result.html", null ],
+      [ "afio_v2_xxx::io_handle::io_result< BuffersType >", "structafio__v2__xxx_1_1io__handle_1_1io__result.html", null ]
     ] ],
     [ "afio_v2_xxx::algorithm::shared_fs_mutex::shared_fs_mutex", "classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex.html", [
       [ "afio_v2_xxx::algorithm::shared_fs_mutex::atomic_append", "classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1atomic__append.html", null ],

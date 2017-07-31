@@ -148,8 +148,8 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structafio__v2__xxx_1_1io__handle_1_1io__request.html">io_request</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">The i/o request type used by this handle. Guaranteed to be <code>TrivialType</code> apart from construction, and <code>StandardLayoutType</code>.  <a href="structafio__v2__xxx_1_1io__handle_1_1io__request.html#details">More...</a><br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1io__handle_1_1io__result.html">io_result</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">The i/o result type used by this handle. Guaranteed to be <code>TrivialType</code> apart from construction, and <code>StandardLayoutType</code>.  <a href="classafio__v2__xxx_1_1io__handle_1_1io__result.html#details">More...</a><br/></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structafio__v2__xxx_1_1io__handle_1_1io__result.html">io_result</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">The i/o result type used by this handle. Guaranteed to be <code>TrivialType</code> apart from construction..  <a href="structafio__v2__xxx_1_1io__handle_1_1io__result.html#details">More...</a><br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
@@ -190,9 +190,8 @@ using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cla
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a2da2f177b841701a840a8191a79dd1d4"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2da2f177b841701a840a8191a79dd1d4"></a>
-constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1io__handle.html#a2da2f177b841701a840a8191a79dd1d4">io_handle</a> ()=default</td></tr>
-<tr class="memdesc:a2da2f177b841701a840a8191a79dd1d4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor. <br/></td></tr>
+<tr class="memitem:a2da2f177b841701a840a8191a79dd1d4"><td class="memItemLeft" align="right" valign="top">constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1io__handle.html#a2da2f177b841701a840a8191a79dd1d4">io_handle</a> ()=default</td></tr>
+<tr class="memdesc:a2da2f177b841701a840a8191a79dd1d4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor.  <a href="#a2da2f177b841701a840a8191a79dd1d4">More...</a><br/></td></tr>
 <tr class="separator:a2da2f177b841701a840a8191a79dd1d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5e4f43f6ce4820bc483404c02fa52c5a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5e4f43f6ce4820bc483404c02fa52c5a"></a>
 constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1io__handle.html#a5e4f43f6ce4820bc483404c02fa52c5a">io_handle</a> (<a class="el" href="structafio__v2__xxx_1_1native__handle__type.html">native_handle_type</a> h, <a class="el" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9e">caching</a> <a class="el" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9e">caching</a>=<a class="el" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9ea334c4a4c42fdb79d7ebc3e73b517e6f8">caching::none</a>, flag <a class="el" href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">flags</a>=flag::none)</td></tr>
@@ -210,18 +209,18 @@ constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href=
 <a class="el" href="classafio__v2__xxx_1_1io__handle.html">io_handle</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1io__handle.html#aca75b76bf7cbb9add3fd9a36bcd6d42a">operator=</a> (<a class="el" href="classafio__v2__xxx_1_1io__handle.html">io_handle</a> &amp;&amp;)=default</td></tr>
 <tr class="memdesc:aca75b76bf7cbb9add3fd9a36bcd6d42a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Move assignment permitted. <br/></td></tr>
 <tr class="separator:aca75b76bf7cbb9add3fd9a36bcd6d42a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a71d7636f40607829cacc2c974c4a2a28"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classafio__v2__xxx_1_1io__handle_1_1io__result.html">io_result</a>&lt; <a class="el" href="classafio__v2__xxx_1_1io__handle.html#a70a3c5e6f62efc95db81f831f3b90a2c">buffers_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1io__handle.html#a71d7636f40607829cacc2c974c4a2a28">read</a> (<a class="el" href="structafio__v2__xxx_1_1io__handle_1_1io__request.html">io_request</a>&lt; <a class="el" href="classafio__v2__xxx_1_1io__handle.html#a70a3c5e6f62efc95db81f831f3b90a2c">buffers_type</a> &gt; reqs, <a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
+<tr class="memitem:a71d7636f40607829cacc2c974c4a2a28"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="structafio__v2__xxx_1_1io__handle_1_1io__result.html">io_result</a>&lt; <a class="el" href="classafio__v2__xxx_1_1io__handle.html#a70a3c5e6f62efc95db81f831f3b90a2c">buffers_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1io__handle.html#a71d7636f40607829cacc2c974c4a2a28">read</a> (<a class="el" href="structafio__v2__xxx_1_1io__handle_1_1io__request.html">io_request</a>&lt; <a class="el" href="classafio__v2__xxx_1_1io__handle.html#a70a3c5e6f62efc95db81f831f3b90a2c">buffers_type</a> &gt; reqs, <a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
 <tr class="memdesc:a71d7636f40607829cacc2c974c4a2a28"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read data from the open handle.  <a href="#a71d7636f40607829cacc2c974c4a2a28">More...</a><br/></td></tr>
 <tr class="separator:a71d7636f40607829cacc2c974c4a2a28"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8af6c6dc1502d40f6aaccc83e49d5342"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classafio__v2__xxx_1_1io__handle_1_1io__result.html">io_result</a>&lt; <a class="el" href="structafio__v2__xxx_1_1io__handle_1_1buffer__type.html">buffer_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1io__handle.html#a8af6c6dc1502d40f6aaccc83e49d5342">read</a> (<a class="el" href="classafio__v2__xxx_1_1handle.html#a818fff07c92eaab72532092d1c2a14f9">extent_type</a> offset, char *data, <a class="el" href="classafio__v2__xxx_1_1handle.html#a0adf7fa00e23ed561328f473986e9ccc">size_type</a> bytes, <a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
+<tr class="memitem:a8af6c6dc1502d40f6aaccc83e49d5342"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structafio__v2__xxx_1_1io__handle_1_1io__result.html">io_result</a>&lt; <a class="el" href="structafio__v2__xxx_1_1io__handle_1_1buffer__type.html">buffer_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1io__handle.html#a8af6c6dc1502d40f6aaccc83e49d5342">read</a> (<a class="el" href="classafio__v2__xxx_1_1handle.html#a818fff07c92eaab72532092d1c2a14f9">extent_type</a> offset, char *data, <a class="el" href="classafio__v2__xxx_1_1handle.html#a0adf7fa00e23ed561328f473986e9ccc">size_type</a> bytes, <a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
 <tr class="separator:a8af6c6dc1502d40f6aaccc83e49d5342"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aefac4710e5617264347f437b04732c01"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classafio__v2__xxx_1_1io__handle_1_1io__result.html">io_result</a><br class="typebreak"/>
+<tr class="memitem:aefac4710e5617264347f437b04732c01"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="structafio__v2__xxx_1_1io__handle_1_1io__result.html">io_result</a><br class="typebreak"/>
 &lt; <a class="el" href="classafio__v2__xxx_1_1io__handle.html#a639b8760b1b98df95e4956f6cc56f6b5">const_buffers_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1io__handle.html#aefac4710e5617264347f437b04732c01">write</a> (<a class="el" href="structafio__v2__xxx_1_1io__handle_1_1io__request.html">io_request</a>&lt; <a class="el" href="classafio__v2__xxx_1_1io__handle.html#a639b8760b1b98df95e4956f6cc56f6b5">const_buffers_type</a> &gt; reqs, <a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
 <tr class="memdesc:aefac4710e5617264347f437b04732c01"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write data to the open handle.  <a href="#aefac4710e5617264347f437b04732c01">More...</a><br/></td></tr>
 <tr class="separator:aefac4710e5617264347f437b04732c01"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab26a3c5a18cdcc67a506533dbe55e2b3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classafio__v2__xxx_1_1io__handle_1_1io__result.html">io_result</a>&lt; <a class="el" href="structafio__v2__xxx_1_1io__handle_1_1const__buffer__type.html">const_buffer_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1io__handle.html#ab26a3c5a18cdcc67a506533dbe55e2b3">write</a> (<a class="el" href="classafio__v2__xxx_1_1handle.html#a818fff07c92eaab72532092d1c2a14f9">extent_type</a> offset, const char *data, <a class="el" href="classafio__v2__xxx_1_1handle.html#a0adf7fa00e23ed561328f473986e9ccc">size_type</a> bytes, <a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
+<tr class="memitem:ab26a3c5a18cdcc67a506533dbe55e2b3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structafio__v2__xxx_1_1io__handle_1_1io__result.html">io_result</a>&lt; <a class="el" href="structafio__v2__xxx_1_1io__handle_1_1const__buffer__type.html">const_buffer_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1io__handle.html#ab26a3c5a18cdcc67a506533dbe55e2b3">write</a> (<a class="el" href="classafio__v2__xxx_1_1handle.html#a818fff07c92eaab72532092d1c2a14f9">extent_type</a> offset, const char *data, <a class="el" href="classafio__v2__xxx_1_1handle.html#a0adf7fa00e23ed561328f473986e9ccc">size_type</a> bytes, <a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
 <tr class="separator:ab26a3c5a18cdcc67a506533dbe55e2b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a243156928e89b8988a1412f211b3b603"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classafio__v2__xxx_1_1io__handle_1_1io__result.html">io_result</a><br class="typebreak"/>
+<tr class="memitem:a243156928e89b8988a1412f211b3b603"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="structafio__v2__xxx_1_1io__handle_1_1io__result.html">io_result</a><br class="typebreak"/>
 &lt; <a class="el" href="classafio__v2__xxx_1_1io__handle.html#a639b8760b1b98df95e4956f6cc56f6b5">const_buffers_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1io__handle.html#a243156928e89b8988a1412f211b3b603">barrier</a> (<a class="el" href="structafio__v2__xxx_1_1io__handle_1_1io__request.html">io_request</a>&lt; <a class="el" href="classafio__v2__xxx_1_1io__handle.html#a639b8760b1b98df95e4956f6cc56f6b5">const_buffers_type</a> &gt; reqs=<a class="el" href="structafio__v2__xxx_1_1io__handle_1_1io__request.html">io_request</a>&lt; <a class="el" href="classafio__v2__xxx_1_1io__handle.html#a639b8760b1b98df95e4956f6cc56f6b5">const_buffers_type</a> &gt;(), bool wait_for_device=false, bool and_metadata=false, <a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a>()) noexcept=0</td></tr>
 <tr class="memdesc:a243156928e89b8988a1412f211b3b603"><td class="mdescLeft">&#160;</td><td class="mdescRight">Issue a write reordering barrier such that writes preceding the barrier will reach storage before writes after this barrier.  <a href="#a243156928e89b8988a1412f211b3b603">More...</a><br/></td></tr>
 <tr class="separator:a243156928e89b8988a1412f211b3b603"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -352,7 +351,34 @@ flag&#160;</td><td class="memItemRight" valign="bottom"><b>_flags</b></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>A handle to something capable of scatter-gather i/o. </p>
-</div><h2 class="groupheader">Member Function Documentation</h2>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a class="anchor" id="a2da2f177b841701a840a8191a79dd1d4"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">constexpr afio_v2_xxx::io_handle::io_handle </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">default</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Default constructor. </p>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000003">Todo:</a></b></dt><dd>Why is io_result&lt;buffers_type&gt; not a standard layout type? </dd></dl>
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
 <a class="anchor" id="a243156928e89b8988a1412f211b3b603"></a>
 <div class="memitem">
 <div class="memproto">
@@ -361,7 +387,7 @@ flag&#160;</td><td class="memItemRight" valign="bottom"><b>_flags</b></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual <a class="el" href="classafio__v2__xxx_1_1io__handle_1_1io__result.html">io_result</a>&lt;<a class="el" href="classafio__v2__xxx_1_1io__handle.html#a639b8760b1b98df95e4956f6cc56f6b5">const_buffers_type</a>&gt; afio_v2_xxx::io_handle::barrier </td>
+          <td class="memname">virtual <a class="el" href="structafio__v2__xxx_1_1io__handle_1_1io__result.html">io_result</a>&lt;<a class="el" href="classafio__v2__xxx_1_1io__handle.html#a639b8760b1b98df95e4956f6cc56f6b5">const_buffers_type</a>&gt; afio_v2_xxx::io_handle::barrier </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="structafio__v2__xxx_1_1io__handle_1_1io__request.html">io_request</a>&lt; <a class="el" href="classafio__v2__xxx_1_1io__handle.html#a639b8760b1b98df95e4956f6cc56f6b5">const_buffers_type</a> &gt;&#160;</td>
           <td class="paramname"><em>reqs</em> = <code><a class="el" href="structafio__v2__xxx_1_1io__handle_1_1io__request.html">io_request</a>&lt;&#160;<a class="el" href="classafio__v2__xxx_1_1io__handle.html#a639b8760b1b98df95e4956f6cc56f6b5">const_buffers_type</a>&#160;&gt;()</code>, </td>
@@ -466,9 +492,7 @@ For portability, you can only assume that barriers write order for a single hand
 <p>Returns the current path of the open handle as said by the operating system. Note that you are NOT guaranteed that any path refreshed bears any resemblance to the original, many operating systems will return some different path which still reaches the same inode via some other route e.g. hardlinks, dereferenced symbolic links, etc.</p>
 <p>If AFIO was not able to determine the current path for this open handle e.g. the inode has been unlinked, it returns an empty path. Some operating systems e.g. FreeBSD also only can fetch the current path for directory inodes, not file inodes.</p>
 <dl class="section warning"><dt>Warning</dt><dd>This call is expensive, it always asks the kernel for the current path, and if <code>disable_safety_unlinks</code> is off (the default) it checks the path returned to ensure it does actually point at the correct inode. Be aware that despite these precautions, paths are unstable and <b>can change randomly at any moment</b>. Most code written to use absolute file systems paths is <b>racy</b>, so don't do it, use <code>path_handle</code> to fix a base location on the file system and work from that anchor instead! </dd></dl>
-<div class="fragment"><div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;{ <span class="keywordflow">return</span> <a class="code" href="classafio__v2__xxx_1_1handle.html#a6c4df2242ece6f63ba7ef4e6baafaca6">path_type</a>(); }</div>
-<div class="ttc" id="classafio__v2__xxx_1_1handle_html_a6c4df2242ece6f63ba7ef4e6baafaca6"><div class="ttname"><a href="classafio__v2__xxx_1_1handle.html#a6c4df2242ece6f63ba7ef4e6baafaca6">afio_v2_xxx::handle::path_type</a></div><div class="ttdeci">filesystem::path path_type</div><div class="ttdoc">The path type used by this handle. </div><div class="ttdef"><b>Definition:</b> handle.hpp:54</div></div>
-</div><!-- fragment -->
+
 </div>
 </div>
 <a class="anchor" id="a88689b15e6e8b6ce1f945737dee4369e"></a>
@@ -564,16 +588,16 @@ For portability, you can only assume that barriers write order for a single hand
 </table>
 </div><div class="memdoc">
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;  {</div>
-<div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160;    <span class="keywordtype">size_t</span> bytes = 0;</div>
-<div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;i : reqs.buffers)</div>
-<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;    {</div>
-<div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160;      <span class="keywordflow">if</span>(bytes + i.len &lt; bytes)</div>
-<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;        <span class="keywordflow">return</span> std::errc::value_too_large;</div>
-<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;      bytes += i.len;</div>
-<div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;    }</div>
-<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classafio__v2__xxx_1_1io__handle.html#a88689b15e6e8b6ce1f945737dee4369e">lock</a>(reqs.offset, bytes, <span class="keyword">false</span>, std::move(d));</div>
-<div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;  }</div>
+<div class="fragment"><div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;  {</div>
+<div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;    <span class="keywordtype">size_t</span> bytes = 0;</div>
+<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;i : reqs.buffers)</div>
+<div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;    {</div>
+<div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;      <span class="keywordflow">if</span>(bytes + i.len &lt; bytes)</div>
+<div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;        <span class="keywordflow">return</span> std::errc::value_too_large;</div>
+<div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;      bytes += i.len;</div>
+<div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;    }</div>
+<div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classafio__v2__xxx_1_1io__handle.html#a88689b15e6e8b6ce1f945737dee4369e">lock</a>(reqs.offset, bytes, <span class="keyword">false</span>, std::move(d));</div>
+<div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;  }</div>
 <div class="ttc" id="classafio__v2__xxx_1_1io__handle_html_a88689b15e6e8b6ce1f945737dee4369e"><div class="ttname"><a href="classafio__v2__xxx_1_1io__handle.html#a88689b15e6e8b6ce1f945737dee4369e">afio_v2_xxx::io_handle::lock</a></div><div class="ttdeci">virtual result&lt; extent_guard &gt; lock(extent_type offset, extent_type bytes, bool exclusive=true, deadline d=deadline()) noexcept</div><div class="ttdoc">Tries to lock the range of bytes specified for shared or exclusive access. Be aware this passes throu...</div></div>
 </div><!-- fragment -->
 </div>
@@ -610,16 +634,16 @@ For portability, you can only assume that barriers write order for a single hand
 </table>
 </div><div class="memdoc">
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;  {</div>
-<div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;    <span class="keywordtype">size_t</span> bytes = 0;</div>
-<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;i : reqs.buffers)</div>
-<div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;    {</div>
-<div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;      <span class="keywordflow">if</span>(bytes + i.len &lt; bytes)</div>
-<div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;        <span class="keywordflow">return</span> std::errc::value_too_large;</div>
-<div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;      bytes += i.len;</div>
-<div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;    }</div>
-<div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classafio__v2__xxx_1_1io__handle.html#a88689b15e6e8b6ce1f945737dee4369e">lock</a>(reqs.offset, bytes, <span class="keyword">true</span>, std::move(d));</div>
-<div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;  }</div>
+<div class="fragment"><div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;  {</div>
+<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;    <span class="keywordtype">size_t</span> bytes = 0;</div>
+<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;i : reqs.buffers)</div>
+<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;    {</div>
+<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;      <span class="keywordflow">if</span>(bytes + i.len &lt; bytes)</div>
+<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;        <span class="keywordflow">return</span> std::errc::value_too_large;</div>
+<div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;      bytes += i.len;</div>
+<div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;    }</div>
+<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classafio__v2__xxx_1_1io__handle.html#a88689b15e6e8b6ce1f945737dee4369e">lock</a>(reqs.offset, bytes, <span class="keyword">true</span>, std::move(d));</div>
+<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;  }</div>
 <div class="ttc" id="classafio__v2__xxx_1_1io__handle_html_a88689b15e6e8b6ce1f945737dee4369e"><div class="ttname"><a href="classafio__v2__xxx_1_1io__handle.html#a88689b15e6e8b6ce1f945737dee4369e">afio_v2_xxx::io_handle::lock</a></div><div class="ttdeci">virtual result&lt; extent_guard &gt; lock(extent_type offset, extent_type bytes, bool exclusive=true, deadline d=deadline()) noexcept</div><div class="ttdoc">Tries to lock the range of bytes specified for shared or exclusive access. Be aware this passes throu...</div></div>
 </div><!-- fragment -->
 </div>
@@ -632,7 +656,7 @@ For portability, you can only assume that barriers write order for a single hand
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual <a class="el" href="classafio__v2__xxx_1_1io__handle_1_1io__result.html">io_result</a>&lt;<a class="el" href="classafio__v2__xxx_1_1io__handle.html#a70a3c5e6f62efc95db81f831f3b90a2c">buffers_type</a>&gt; afio_v2_xxx::io_handle::read </td>
+          <td class="memname">virtual <a class="el" href="structafio__v2__xxx_1_1io__handle_1_1io__result.html">io_result</a>&lt;<a class="el" href="classafio__v2__xxx_1_1io__handle.html#a70a3c5e6f62efc95db81f831f3b90a2c">buffers_type</a>&gt; afio_v2_xxx::io_handle::read </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="structafio__v2__xxx_1_1io__handle_1_1io__request.html">io_request</a>&lt; <a class="el" href="classafio__v2__xxx_1_1io__handle.html#a70a3c5e6f62efc95db81f831f3b90a2c">buffers_type</a> &gt;&#160;</td>
           <td class="paramname"><em>reqs</em>, </td>
@@ -678,7 +702,7 @@ For portability, you can only assume that barriers write order for a single hand
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classafio__v2__xxx_1_1io__handle_1_1io__result.html">io_result</a>&lt;<a class="el" href="structafio__v2__xxx_1_1io__handle_1_1buffer__type.html">buffer_type</a>&gt; afio_v2_xxx::io_handle::read </td>
+          <td class="memname"><a class="el" href="structafio__v2__xxx_1_1io__handle_1_1io__result.html">io_result</a>&lt;<a class="el" href="structafio__v2__xxx_1_1io__handle_1_1buffer__type.html">buffer_type</a>&gt; afio_v2_xxx::io_handle::read </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="classafio__v2__xxx_1_1handle.html#a818fff07c92eaab72532092d1c2a14f9">extent_type</a>&#160;</td>
           <td class="paramname"><em>offset</em>, </td>
@@ -714,12 +738,12 @@ For portability, you can only assume that barriers write order for a single hand
 </table>
 </div><div class="memdoc">
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;  {</div>
-<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;    buffer_type _reqs[1] = {{data, bytes}};</div>
-<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;    io_request&lt;buffers_type&gt; reqs(<a class="code" href="classafio__v2__xxx_1_1io__handle.html#a70a3c5e6f62efc95db81f831f3b90a2c">buffers_type</a>(_reqs), offset);</div>
-<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;    OUTCOME_TRY(v, <a class="code" href="classafio__v2__xxx_1_1io__handle.html#a71d7636f40607829cacc2c974c4a2a28">read</a>(reqs, d));</div>
-<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;    <span class="keywordflow">return</span> *v.data();</div>
-<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;  }</div>
+<div class="fragment"><div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;  {</div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;    buffer_type _reqs[1] = {{data, bytes}};</div>
+<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;    io_request&lt;buffers_type&gt; reqs(<a class="code" href="classafio__v2__xxx_1_1io__handle.html#a70a3c5e6f62efc95db81f831f3b90a2c">buffers_type</a>(_reqs), offset);</div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;    OUTCOME_TRY(v, <a class="code" href="classafio__v2__xxx_1_1io__handle.html#a71d7636f40607829cacc2c974c4a2a28">read</a>(reqs, d));</div>
+<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;    <span class="keywordflow">return</span> *v.data();</div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;  }</div>
 <div class="ttc" id="classafio__v2__xxx_1_1io__handle_html_a70a3c5e6f62efc95db81f831f3b90a2c"><div class="ttname"><a href="classafio__v2__xxx_1_1io__handle.html#a70a3c5e6f62efc95db81f831f3b90a2c">afio_v2_xxx::io_handle::buffers_type</a></div><div class="ttdeci">span&lt; buffer_type &gt; buffers_type</div><div class="ttdoc">The scatter buffers type used by this handle. Guaranteed to be TrivialType apart from construction...</div><div class="ttdef"><b>Definition:</b> io_handle.hpp:76</div></div>
 <div class="ttc" id="classafio__v2__xxx_1_1io__handle_html_a71d7636f40607829cacc2c974c4a2a28"><div class="ttname"><a href="classafio__v2__xxx_1_1io__handle.html#a71d7636f40607829cacc2c974c4a2a28">afio_v2_xxx::io_handle::read</a></div><div class="ttdeci">virtual io_result&lt; buffers_type &gt; read(io_request&lt; buffers_type &gt; reqs, deadline d=deadline()) noexcept</div><div class="ttdoc">Read data from the open handle. </div></div>
 </div><!-- fragment -->
@@ -819,7 +843,7 @@ For portability, you can only assume that barriers write order for a single hand
 </table>
 </div><div class="memdoc">
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;{ <span class="keywordflow">return</span> <a class="code" href="classafio__v2__xxx_1_1io__handle.html#a88689b15e6e8b6ce1f945737dee4369e">lock</a>(offset, bytes, exclusive, deadline(std::chrono::seconds(0))); }</div>
+<div class="fragment"><div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;{ <span class="keywordflow">return</span> <a class="code" href="classafio__v2__xxx_1_1io__handle.html#a88689b15e6e8b6ce1f945737dee4369e">lock</a>(offset, bytes, exclusive, deadline(std::chrono::seconds(0))); }</div>
 <div class="ttc" id="classafio__v2__xxx_1_1io__handle_html_a88689b15e6e8b6ce1f945737dee4369e"><div class="ttname"><a href="classafio__v2__xxx_1_1io__handle.html#a88689b15e6e8b6ce1f945737dee4369e">afio_v2_xxx::io_handle::lock</a></div><div class="ttdeci">virtual result&lt; extent_guard &gt; lock(extent_type offset, extent_type bytes, bool exclusive=true, deadline d=deadline()) noexcept</div><div class="ttdoc">Tries to lock the range of bytes specified for shared or exclusive access. Be aware this passes throu...</div></div>
 </div><!-- fragment -->
 </div>
@@ -877,7 +901,7 @@ For portability, you can only assume that barriers write order for a single hand
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual <a class="el" href="classafio__v2__xxx_1_1io__handle_1_1io__result.html">io_result</a>&lt;<a class="el" href="classafio__v2__xxx_1_1io__handle.html#a639b8760b1b98df95e4956f6cc56f6b5">const_buffers_type</a>&gt; afio_v2_xxx::io_handle::write </td>
+          <td class="memname">virtual <a class="el" href="structafio__v2__xxx_1_1io__handle_1_1io__result.html">io_result</a>&lt;<a class="el" href="classafio__v2__xxx_1_1io__handle.html#a639b8760b1b98df95e4956f6cc56f6b5">const_buffers_type</a>&gt; afio_v2_xxx::io_handle::write </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="structafio__v2__xxx_1_1io__handle_1_1io__request.html">io_request</a>&lt; <a class="el" href="classafio__v2__xxx_1_1io__handle.html#a639b8760b1b98df95e4956f6cc56f6b5">const_buffers_type</a> &gt;&#160;</td>
           <td class="paramname"><em>reqs</em>, </td>
@@ -923,7 +947,7 @@ For portability, you can only assume that barriers write order for a single hand
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classafio__v2__xxx_1_1io__handle_1_1io__result.html">io_result</a>&lt;<a class="el" href="structafio__v2__xxx_1_1io__handle_1_1const__buffer__type.html">const_buffer_type</a>&gt; afio_v2_xxx::io_handle::write </td>
+          <td class="memname"><a class="el" href="structafio__v2__xxx_1_1io__handle_1_1io__result.html">io_result</a>&lt;<a class="el" href="structafio__v2__xxx_1_1io__handle_1_1const__buffer__type.html">const_buffer_type</a>&gt; afio_v2_xxx::io_handle::write </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="classafio__v2__xxx_1_1handle.html#a818fff07c92eaab72532092d1c2a14f9">extent_type</a>&#160;</td>
           <td class="paramname"><em>offset</em>, </td>
@@ -959,12 +983,12 @@ For portability, you can only assume that barriers write order for a single hand
 </table>
 </div><div class="memdoc">
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;  {</div>
-<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;    const_buffer_type _reqs[1] = {{data, bytes}};</div>
-<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;    io_request&lt;const_buffers_type&gt; reqs(<a class="code" href="classafio__v2__xxx_1_1io__handle.html#a639b8760b1b98df95e4956f6cc56f6b5">const_buffers_type</a>(_reqs), offset);</div>
-<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;    OUTCOME_TRY(v, <a class="code" href="classafio__v2__xxx_1_1io__handle.html#aefac4710e5617264347f437b04732c01">write</a>(reqs, d));</div>
-<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;    <span class="keywordflow">return</span> *v.data();</div>
-<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;  }</div>
+<div class="fragment"><div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;  {</div>
+<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;    const_buffer_type _reqs[1] = {{data, bytes}};</div>
+<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;    io_request&lt;const_buffers_type&gt; reqs(<a class="code" href="classafio__v2__xxx_1_1io__handle.html#a639b8760b1b98df95e4956f6cc56f6b5">const_buffers_type</a>(_reqs), offset);</div>
+<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;    OUTCOME_TRY(v, <a class="code" href="classafio__v2__xxx_1_1io__handle.html#aefac4710e5617264347f437b04732c01">write</a>(reqs, d));</div>
+<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;    <span class="keywordflow">return</span> *v.data();</div>
+<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;  }</div>
 <div class="ttc" id="classafio__v2__xxx_1_1io__handle_html_a639b8760b1b98df95e4956f6cc56f6b5"><div class="ttname"><a href="classafio__v2__xxx_1_1io__handle.html#a639b8760b1b98df95e4956f6cc56f6b5">afio_v2_xxx::io_handle::const_buffers_type</a></div><div class="ttdeci">span&lt; const_buffer_type &gt; const_buffers_type</div><div class="ttdoc">The gather buffers type used by this handle. Guaranteed to be TrivialType apart from construction...</div><div class="ttdef"><b>Definition:</b> io_handle.hpp:78</div></div>
 <div class="ttc" id="classafio__v2__xxx_1_1io__handle_html_aefac4710e5617264347f437b04732c01"><div class="ttname"><a href="classafio__v2__xxx_1_1io__handle.html#aefac4710e5617264347f437b04732c01">afio_v2_xxx::io_handle::write</a></div><div class="ttdeci">virtual io_result&lt; const_buffers_type &gt; write(io_request&lt; const_buffers_type &gt; reqs, deadline d=deadline()) noexcept</div><div class="ttdoc">Write data to the open handle. </div></div>
 </div><!-- fragment -->

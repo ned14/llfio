@@ -356,9 +356,7 @@ flag&#160;</td><td class="memItemRight" valign="bottom"><b>_flags</b></td></tr>
 <p>Returns the current path of the open handle as said by the operating system. Note that you are NOT guaranteed that any path refreshed bears any resemblance to the original, many operating systems will return some different path which still reaches the same inode via some other route e.g. hardlinks, dereferenced symbolic links, etc.</p>
 <p>If AFIO was not able to determine the current path for this open handle e.g. the inode has been unlinked, it returns an empty path. Some operating systems e.g. FreeBSD also only can fetch the current path for directory inodes, not file inodes.</p>
 <dl class="section warning"><dt>Warning</dt><dd>This call is expensive, it always asks the kernel for the current path, and if <code>disable_safety_unlinks</code> is off (the default) it checks the path returned to ensure it does actually point at the correct inode. Be aware that despite these precautions, paths are unstable and <b>can change randomly at any moment</b>. Most code written to use absolute file systems paths is <b>racy</b>, so don't do it, use <code>path_handle</code> to fix a base location on the file system and work from that anchor instead! </dd></dl>
-<div class="fragment"><div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;{ <span class="keywordflow">return</span> <a class="code" href="classafio__v2__xxx_1_1handle.html#a6c4df2242ece6f63ba7ef4e6baafaca6">path_type</a>(); }</div>
-<div class="ttc" id="classafio__v2__xxx_1_1handle_html_a6c4df2242ece6f63ba7ef4e6baafaca6"><div class="ttname"><a href="classafio__v2__xxx_1_1handle.html#a6c4df2242ece6f63ba7ef4e6baafaca6">afio_v2_xxx::handle::path_type</a></div><div class="ttdeci">filesystem::path path_type</div><div class="ttdoc">The path type used by this handle. </div><div class="ttdef"><b>Definition:</b> handle.hpp:54</div></div>
-</div><!-- fragment -->
+
 </div>
 </div>
 <a class="anchor" id="a5cbd1d67ffe72d6cce0d093f861a4af7"></a>
@@ -419,7 +417,7 @@ flag&#160;</td><td class="memItemRight" valign="bottom"><b>_flags</b></td></tr>
 </table>
 </div><div class="memdoc">
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;{ <span class="keywordflow">return</span> <a class="code" href="classafio__v2__xxx_1_1path__handle.html#a5cbd1d67ffe72d6cce0d093f861a4af7">path</a>(<a class="code" href="classafio__v2__xxx_1_1path__handle.html#a61039e1770420c4e72814a942a188220">path_handle</a>(), _path); }</div>
+<div class="fragment"><div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;{ <span class="keywordflow">return</span> <a class="code" href="classafio__v2__xxx_1_1path__handle.html#a5cbd1d67ffe72d6cce0d093f861a4af7">path</a>(<a class="code" href="classafio__v2__xxx_1_1path__handle.html#a61039e1770420c4e72814a942a188220">path_handle</a>(), _path); }</div>
 <div class="ttc" id="classafio__v2__xxx_1_1path__handle_html_a61039e1770420c4e72814a942a188220"><div class="ttname"><a href="classafio__v2__xxx_1_1path__handle.html#a61039e1770420c4e72814a942a188220">afio_v2_xxx::path_handle::path_handle</a></div><div class="ttdeci">path_handle()=default</div><div class="ttdoc">Default constructor. </div></div>
 <div class="ttc" id="classafio__v2__xxx_1_1path__handle_html_a5cbd1d67ffe72d6cce0d093f861a4af7"><div class="ttname"><a href="classafio__v2__xxx_1_1path__handle.html#a5cbd1d67ffe72d6cce0d093f861a4af7">afio_v2_xxx::path_handle::path</a></div><div class="ttdeci">static result&lt; path_handle &gt; path(const path_handle &amp;base, path_view_type _path) noexcept</div></div>
 </div><!-- fragment -->

@@ -159,13 +159,6 @@ var NAVTREEINDEX1 =
 "classafio__v2__xxx_1_1io__handle_1_1extent__guard.html#ab3186062f0496b7c65272c81bbab4e1c":[3,0,0,9,2,9],
 "classafio__v2__xxx_1_1io__handle_1_1extent__guard.html#ad39d0d65e7497b15e5565ca5c40309bb":[3,0,0,9,2,0],
 "classafio__v2__xxx_1_1io__handle_1_1extent__guard.html#aed3a270ce019773feab6f93818c443a8":[3,0,0,9,2,2],
-"classafio__v2__xxx_1_1io__handle_1_1io__result.html":[3,0,0,9,4],
-"classafio__v2__xxx_1_1io__handle_1_1io__result.html#a06f4e6691683b36ad2a4786dbf5ac0de":[3,0,0,9,4,5],
-"classafio__v2__xxx_1_1io__handle_1_1io__result.html#a09e1e4638149003b3b2fecb9e3fbef3d":[3,0,0,9,4,0],
-"classafio__v2__xxx_1_1io__handle_1_1io__result.html#a26abbc9936d6412d2f073069f383d5e6":[3,0,0,9,4,3],
-"classafio__v2__xxx_1_1io__handle_1_1io__result.html#a34237c8cb4f1f8484c1290f2be79454f":[3,0,0,9,4,1],
-"classafio__v2__xxx_1_1io__handle_1_1io__result.html#a65f487152b5e4604c8f560cdc06eab8d":[3,0,0,9,4,4],
-"classafio__v2__xxx_1_1io__handle_1_1io__result.html#abb963a51835d492eefcd16199d23049e":[3,0,0,9,4,2],
 "classafio__v2__xxx_1_1io__service.html":[3,0,0,10],
 "classafio__v2__xxx_1_1io__service.html#a0d4b2214a82771a947b97387a5da0716":[3,0,0,10,9],
 "classafio__v2__xxx_1_1io__service.html#a1761cc16a1cc9362d4200df37a978d93":[3,0,0,10,16],
@@ -249,5 +242,12 @@ var NAVTREEINDEX1 =
 "classafio__v2__xxx_1_1map__handle.html#ac049430769b0fa1d06c93160cef5a2f9":[3,0,0,12,49],
 "classafio__v2__xxx_1_1map__handle.html#ac35a85e8a6cca721640ddc6b5008e145":[3,0,0,12,67],
 "classafio__v2__xxx_1_1map__handle.html#ac46e0a296c31fcd0a996a79d78647fb6":[3,0,0,12,70],
-"classafio__v2__xxx_1_1map__handle.html#ac5b2859fabe04dbfc37020daed618257":[3,0,0,12,38]
+"classafio__v2__xxx_1_1map__handle.html#ac5b2859fabe04dbfc37020daed618257":[3,0,0,12,38],
+"classafio__v2__xxx_1_1map__handle.html#ad02958278a0d92e4ec4fb864ba1eb35b":[3,0,0,12,35],
+"classafio__v2__xxx_1_1map__handle.html#ad44dcd9c7ca9e7a094dd1bc7c8aa4897":[3,0,0,12,46],
+"classafio__v2__xxx_1_1map__handle.html#ad50026d4eca2ddd77b5f9877666857b8":[3,0,0,12,53],
+"classafio__v2__xxx_1_1map__handle.html#ad90f8264470763069256ae9eeda45e69":[3,0,0,12,58],
+"classafio__v2__xxx_1_1map__handle.html#adffdff916ccf13d88a02ddb6b6a421c8":[3,0,0,12,71],
+"classafio__v2__xxx_1_1map__handle.html#ae081e94bf7cce4ff3e011f58af44ec98":[3,0,0,12,16],
+"classafio__v2__xxx_1_1map__handle.html#ae33d4d0faa1377cd371bd6a0ae0769ae":[3,0,0,12,31]
 };

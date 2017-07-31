@@ -14,7 +14,7 @@ var dir_df838802a8d72797f186037846947269 =
       [ "buffer_type", "structafio__v2__xxx_1_1io__handle_1_1buffer__type.html", "structafio__v2__xxx_1_1io__handle_1_1buffer__type" ],
       [ "const_buffer_type", "structafio__v2__xxx_1_1io__handle_1_1const__buffer__type.html", "structafio__v2__xxx_1_1io__handle_1_1const__buffer__type" ],
       [ "io_request", "structafio__v2__xxx_1_1io__handle_1_1io__request.html", "structafio__v2__xxx_1_1io__handle_1_1io__request" ],
-      [ "io_result", "classafio__v2__xxx_1_1io__handle_1_1io__result.html", "classafio__v2__xxx_1_1io__handle_1_1io__result" ],
+      [ "io_result", "structafio__v2__xxx_1_1io__handle_1_1io__result.html", "structafio__v2__xxx_1_1io__handle_1_1io__result" ],
       [ "extent_guard", "classafio__v2__xxx_1_1io__handle_1_1extent__guard.html", "classafio__v2__xxx_1_1io__handle_1_1extent__guard" ]
     ] ],
     [ "io_service.hpp", "io__service_8hpp.html", "io__service_8hpp" ],
