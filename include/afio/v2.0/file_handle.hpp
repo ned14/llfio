@@ -249,14 +249,16 @@ public:
 
   \warning Some operating systems provide a race free syscall for renaming an open handle (Windows).
   On all other operating systems this call is \b racy and can result in the wrong file entry being
-  deleted. Note that unless `flag::disable_safety_unlinks` is set, this implementation opens a
-  `path_handle` to the two containing directories first, then checks before relinking that the item
-  about to be relinked has the same inode as the open file handle. This should prevent most unmalicious
-  accidental loss of data.
+  relinked. Note that unless `flag::disable_safety_unlinks` is set, this implementation opens a
+  `path_handle` to the source containing directory first, then checks before relinking that the item
+  about to be relinked has the same inode as the open file handle. It will retry this matching until
+  success until the deadline given. This should prevent most unmalicious accidental loss of data.
 
   \param base Base for any relative path.
   \param newpath The relative or absolute new path to relink to.
-  \param d The deadline by which the relink must succeed, else `std::errc::timed_out` will be returned.
+  \param d The deadline by which the matching of the containing directory to the open handle's inode
+  must succeed, else `std::errc::timed_out` will be returned. Not used on platforms with race free
+  syscalls for renaming open handles (Windows).
   */
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> relink(const path_handle &base, path_view_type newpath, deadline d = std::chrono::seconds(30)) noexcept;
 
@@ -264,15 +266,19 @@ public:
   On Windows unless `flag::win_disable_unlink_emulation` is set, this behaviour is
   simulated by renaming the file to something random and setting its delete-on-last-close flag.
   After the next handle to that file closes, it will become permanently unopenable by anyone
-  else until the last handle is closed, whereupon the entry will be deleted by the operating system.
+  else until the last handle is closed, whereupon the entry will be eventually removed by the
+  operating system.
 
   \warning Some operating systems provide a race free syscall for unlinking an open handle (Windows).
   On all other operating systems this call is \b racy and can result in the wrong file entry being
-  deleted. Note that unless `flag::disable_safety_unlinks` is set, this implementation opens a
+  unlinked. Note that unless `flag::disable_safety_unlinks` is set, this implementation opens a
   `path_handle` to the containing directory first, then checks that the item about to be unlinked
-  has the same inode as the open file handle. This should prevent most unmalicious accidental loss of data.
+  has the same inode as the open file handle. It will retry this matching until success until the
+  deadline given. This should prevent most unmalicious accidental loss of data.
 
-  \param d The deadline by which the unlink must succeed, else `std::errc::timed_out` will be returned.
+  \param d The deadline by which the matching of the containing directory to the open handle's inode
+  must succeed, else `std::errc::timed_out` will be returned. Not used on platforms with race free
+  syscalls for unlinking open handles (Windows).
   */
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> unlink(deadline d = std::chrono::seconds(30)) noexcept;
 

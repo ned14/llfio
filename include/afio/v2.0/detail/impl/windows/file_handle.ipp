@@ -140,7 +140,7 @@ result<file_handle> file_handle::file(const path_handle &base, file_handle::path
       creatdisp = 0x00000003 /*FILE_OPEN_IF*/;
       break;
     case creation::truncate:
-      creatdisp = 0x00000005 /*FILE_OVERWRITE_IF*/;
+      creatdisp = 0x00000004 /*FILE_OVERWRITE*/;
       break;
     }
 
@@ -156,8 +156,8 @@ result<file_handle> file_handle::file(const path_handle &base, file_handle::path
     if(zpath.length >= 4 && _path.Buffer[0] == '\\' && _path.Buffer[1] == '\\' && _path.Buffer[2] == '.' && _path.Buffer[3] == '\\')
     {
       _path.Buffer += 3;
-      _path.Length -= 3;
-      _path.MaximumLength -= 3;
+      _path.Length -= 3 * sizeof(wchar_t);
+      _path.MaximumLength -= 3 * sizeof(wchar_t);
     }
 
     OBJECT_ATTRIBUTES oa;
@@ -348,8 +348,8 @@ result<void> file_handle::relink(const path_handle &base, path_view_type path, d
   if(zpath.length >= 4 && _path.Buffer[0] == '\\' && _path.Buffer[1] == '\\' && _path.Buffer[2] == '.' && _path.Buffer[3] == '\\')
   {
     _path.Buffer += 3;
-    _path.Length -= 3;
-    _path.MaximumLength -= 3;
+    _path.Length -= 3 * sizeof(wchar_t);
+    _path.MaximumLength -= 3 * sizeof(wchar_t);
   }
 
   IO_STATUS_BLOCK isb = make_iostatus();

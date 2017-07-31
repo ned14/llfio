@@ -971,7 +971,7 @@ static inline bool ntsleep(const deadline &d, bool return_on_alert = false) noex
 // Utility routine for building an ACCESS_MASK from a handle::mode
 static inline result<ACCESS_MASK> access_mask_from_handle_mode(native_handle_type &nativeh, handle::mode _mode, handle::flag flags)
 {
-  ACCESS_MASK access = 0;
+  ACCESS_MASK access = SYNCHRONIZE;  // appears that this is the bare minimum for the call to succeed
   switch(_mode)
   {
   case handle::mode::unchanged:
@@ -979,21 +979,21 @@ static inline result<ACCESS_MASK> access_mask_from_handle_mode(native_handle_typ
   case handle::mode::none:
     break;
   case handle::mode::attr_read:
-    access |= SYNCHRONIZE | FILE_READ_ATTRIBUTES;
+    access |= FILE_READ_ATTRIBUTES;
     break;
   case handle::mode::attr_write:
-    access |= SYNCHRONIZE | FILE_READ_ATTRIBUTES | FILE_WRITE_ATTRIBUTES;
+    access |= FILE_READ_ATTRIBUTES | FILE_WRITE_ATTRIBUTES;
     break;
   case handle::mode::read:
-    access |= SYNCHRONIZE | GENERIC_READ;
+    access |= GENERIC_READ;
     nativeh.behaviour |= native_handle_type::disposition::seekable | native_handle_type::disposition::readable;
     break;
   case handle::mode::write:
-    access |= SYNCHRONIZE | GENERIC_WRITE | GENERIC_READ;
+    access |= GENERIC_WRITE | GENERIC_READ;
     nativeh.behaviour |= native_handle_type::disposition::seekable | native_handle_type::disposition::readable | native_handle_type::disposition::writable;
     break;
   case handle::mode::append:
-    access |= SYNCHRONIZE | FILE_APPEND_DATA;
+    access |= FILE_APPEND_DATA;
     nativeh.behaviour |= native_handle_type::disposition::writable | native_handle_type::disposition::append_only;
     break;
   }

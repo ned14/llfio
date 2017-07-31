@@ -41,6 +41,23 @@ handle::~handle()
   }
 }
 
+result<handle::path_type> handle::current_path() const noexcept
+{
+  AFIO_LOG_FUNCTION_CALL(this);
+  // Most efficient, least memory copying method is direct fill of a wstring which is moved into filesystem::path
+  filesystem::path::string_type buffer;
+  buffer.resize(32769);
+  wchar_t *_buffer = const_cast<wchar_t *>(buffer.data());
+  memcpy(_buffer, L"\\\\.", 6);
+  DWORD len = GetFinalPathNameByHandle(_v.h, _buffer + 3, buffer.size() - 4 * sizeof(wchar_t), VOLUME_NAME_NT);  // NOLINT
+  if(len == 0)
+  {
+    return {GetLastError(), std::system_category()};
+  }
+  buffer.resize(3 + len);
+  return path_type(std::move(buffer));
+}
+
 result<void> handle::close() noexcept
 {
   AFIO_LOG_FUNCTION_CALL(this);

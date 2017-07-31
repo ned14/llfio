@@ -94,5 +94,7 @@ template <class U> inline void file_handle_create_close_creation(U &&f)
   check_results_with_boost_test(permuter, results);
 }
 
-KERNELTEST_TEST_KERNEL(unit, afio, file_handle_create_close, file_handle, "Tests that afio::file_handle's creation parameter works as expected", file_handle_create_close_creation(file_handle_create_close::test_kernel_file_handle))
-KERNELTEST_TEST_KERNEL(unit, afio, file_handle_create_close, async_file_handle, "Tests that afio::async_file_handle's creation parameter works as expected", file_handle_create_close_creation(file_handle_create_close::test_kernel_async_file_handle))
+KERNELTEST_TEST_KERNEL(unit, afio, file_handle_create_close, file_handle, "Tests that afio::file_handle::file()'s parameters with absolute paths work as expected", file_handle_create_close_creation(file_handle_create_close::test_kernel_file_handle_absolute))
+KERNELTEST_TEST_KERNEL(unit, afio, file_handle_create_close, file_handle, "Tests that afio::file_handle::file()'s parameters with relative paths work as expected", file_handle_create_close_creation(file_handle_create_close::test_kernel_file_handle_relative))
+KERNELTEST_TEST_KERNEL(unit, afio, file_handle_create_close, async_file_handle, "Tests that afio::async_file_handle::async_file()'s parameters with absolute paths work as expected", file_handle_create_close_creation(file_handle_create_close::test_kernel_async_file_handle_absolute))
+KERNELTEST_TEST_KERNEL(unit, afio, file_handle_create_close, async_file_handle, "Tests that afio::async_file_handle::async_file()'s parameters with relative paths work as expected", file_handle_create_close_creation(file_handle_create_close::test_kernel_async_file_handle_relative))

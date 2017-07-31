@@ -206,7 +206,7 @@ public:
   do it, use `path_handle` to fix a base location on the file system and work from that anchor
   instead!
   */
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<path_type> current_path() const noexcept { return path_type(); }
+  AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<path_type> current_path() const noexcept;
   //! Immediately close the native handle type managed by this handle
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> close() noexcept;
   /*! Clone this handle (copy constructor is disabled to avoid accidental copying)

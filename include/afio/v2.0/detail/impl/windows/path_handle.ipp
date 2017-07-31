@@ -54,8 +54,8 @@ result<path_handle> path_handle::path(const path_handle &base, path_handle::path
     if(zpath.length >= 4 && _path.Buffer[0] == '\\' && _path.Buffer[1] == '\\' && _path.Buffer[2] == '.' && _path.Buffer[3] == '\\')
     {
       _path.Buffer += 3;
-      _path.Length -= 3;
-      _path.MaximumLength -= 3;
+      _path.Length -= 3 * sizeof(wchar_t);
+      _path.MaximumLength -= 3 * sizeof(wchar_t);
     }
 
     OBJECT_ATTRIBUTES oa;

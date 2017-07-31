@@ -26,12 +26,22 @@ Distributed under the Boost Software License, Version 1.0.
 
 namespace file_handle_create_close
 {
-  AFIO_TEST_KERNEL_DECL AFIO_V2_NAMESPACE::result<AFIO_V2_NAMESPACE::async_file_handle> test_kernel_async_file_handle(AFIO_V2_NAMESPACE::async_file_handle::mode m, AFIO_V2_NAMESPACE::async_file_handle::creation c, AFIO_V2_NAMESPACE::async_file_handle::flag f)
+  AFIO_TEST_KERNEL_DECL AFIO_V2_NAMESPACE::result<AFIO_V2_NAMESPACE::async_file_handle> test_kernel_async_file_handle_absolute(AFIO_V2_NAMESPACE::async_file_handle::mode m, AFIO_V2_NAMESPACE::async_file_handle::creation c, AFIO_V2_NAMESPACE::async_file_handle::flag f)
   {
     AFIO_V2_NAMESPACE::io_service service;
     auto h = AFIO_V2_NAMESPACE::async_file_handle::async_file(service, {}, "testfile.txt", m, c, AFIO_V2_NAMESPACE::async_file_handle::caching::all, f);
     if(h)
       h.value().close().value();
+    return h;
+  }
+  AFIO_TEST_KERNEL_DECL AFIO_V2_NAMESPACE::result<AFIO_V2_NAMESPACE::async_file_handle> test_kernel_async_file_handle_relative(AFIO_V2_NAMESPACE::async_file_handle::mode m, AFIO_V2_NAMESPACE::async_file_handle::creation c, AFIO_V2_NAMESPACE::async_file_handle::flag f)
+  {
+    AFIO_V2_NAMESPACE::io_service service;
+    OUTCOME_TRY(b, AFIO_V2_NAMESPACE::path_handle::path("."));
+    auto h = AFIO_V2_NAMESPACE::async_file_handle::async_file(service, b, "testfile.txt", m, c, AFIO_V2_NAMESPACE::async_file_handle::caching::all, f);
+    if(h)
+      h.value().close().value();
+    b.close().value();
     return h;
   }
 }
