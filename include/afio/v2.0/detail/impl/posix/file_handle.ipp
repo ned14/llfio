@@ -129,6 +129,9 @@ inline result<path_handle> containing_directory(filesystem::path &filename, cons
       if(!currentpath_)
         continue;
       filesystem::path currentpath = std::move(currentpath_.value());
+      // If current path is empty, it's been deleted
+      if(currentpath.empty())
+        return std::errc::no_such_file_or_directory;
       filename = currentpath.filename();
       currentpath.remove_filename();
       auto currentdirh_ = path_handle::path(currentpath);

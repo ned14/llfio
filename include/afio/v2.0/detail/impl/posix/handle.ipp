@@ -43,6 +43,84 @@ handle::~handle()
   }
 }
 
+result<handle::path_type> handle::current_path() const noexcept
+{
+  AFIO_LOG_FUNCTION_CALL(this);
+  try
+  {
+    // Most efficient, least memory copying method is direct fill of a string which is moved into filesystem::path
+    filesystem::path::string_type ret;
+#if defined(__linux__)
+    ret.resize(32769);
+    char *out = const_cast<char *>(ret.data());
+    // Linux keeps a symlink at /proc/self/fd/n
+    char in[64];
+    snprintf(in, sizeof(in), "/proc/self/fd/%d", _v.fd);
+    ssize_t len;
+    if((len = readlink(in, out, 32768)) == -1)
+      return {errno, std::system_category()};
+    ret.resize(len);
+    // Linux prepends or appends a " (deleted)" when a fd is nameless
+    // TODO: Should I stat the target to be really sure?
+    if(ret.size() >= 10 && (!ret.compare(0, 10, " (deleted)") || !ret.compare(ret.size() - 10, 10, " (deleted)")))
+      ret.clear();
+#elif defined(__APPLE__)
+    ret.resize(32769);
+    char *out = const_cast<char *>(ret.data());
+    // Yes, this API is instant memory corruption. Thank you Apple.
+    if(-1 == fcntl(_v.fd, F_GETPATH, out))
+      return {errno, std::system_category()};
+    ret.resize(strchr(out, 0) - out);  // no choice :(
+    // Apple returns the previous path when deleted, so lstat to be sure
+    struct stat ls;
+    bool exists = (-1 != ::lstat(out, &ls));
+    if(!exists)
+      ret.clear();
+#elif defined(__FreeBSD__)
+    // Unfortunately this call is broken on FreeBSD 10 where it is currently returning
+    // null paths most of the time for regular files. Directories work perfectly. I've
+    // logged a bug with test case at https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=197695.
+    size_t len;
+    int mib[4] = {CTL_KERN, KERN_PROC, KERN_PROC_FILEDESC, getpid()};
+    if(-1 == sysctl(mib, 4, NULL, &len, NULL, 0))
+      return {errno, std::system_category()};
+    std::vector<char> buffer(len * 2);
+    if(-1 == sysctl(mib, 4, buffer.data(), &len, NULL, 0))
+      return {errno, std::system_category()};
+#if 0  // ndef NDEBUG
+    for (char *p = buffer.data(); p<buffer.data() + len;)
+    {
+      struct kinfo_file *kif = (struct kinfo_file *) p;
+      std::cout << kif->kf_type << " " << kif->kf_fd << " " << kif->kf_path << std::endl;
+      p += kif->kf_structsize;
+    }
+#endif
+    for(char *p = buffer.data(); p < buffer.data() + len;)
+    {
+      struct kinfo_file *kif = (struct kinfo_file *) p;
+      if(kif->kf_fd == _v.fd)
+      {
+        ret = std::string(kif->kf_path);
+        // If the path entry is empty, this is probably a file, so error out
+        if(ret.empty())
+        {
+          return std::errc::function_not_supported;
+        }
+        break;
+      }
+      p += kif->kf_structsize;
+    }
+#else
+#error Unknown system
+#endif
+    return path_type(std::move(ret));
+  }
+  catch(...)
+  {
+    return error_from_exception();
+  }
+}
+
 result<void> handle::close() noexcept
 {
   AFIO_LOG_FUNCTION_CALL(this);
