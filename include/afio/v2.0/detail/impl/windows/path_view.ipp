@@ -38,7 +38,7 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC void path_view::c_str::_from_utf8(const path_view
     AFIO_LOG_FATAL(ec.value(), ec.message().c_str());
     abort();
   }
-  length = written / sizeof(wchar_t);
+  length = static_cast<uint16_t>(written / sizeof(wchar_t));
   _buffer[length] = 0;
   buffer = _buffer;
 }

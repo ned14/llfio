@@ -15,8 +15,8 @@ source code repository lives at https://github.com/ned14/boost.afio.
 
 You need these compilers or better:
 - GCC 7.0 (Linux)
-- clang 4.0 (Linux, Windows)
-- VS2017 Update 3 (Windows)
+- clang 4.0 (Linux)
+- clang 5.0 (Windows)
 
 Todo list for already implemented parts: https://ned14.github.io/afio/todo.html
 

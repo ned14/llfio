@@ -27,7 +27,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 AFIO_V2_NAMESPACE_BEGIN
 
-result<path_handle> path_handle::path(const path_handle &base, path_handle::path_view_type _path) noexcept
+result<path_handle> path_handle::path(const path_handle &base, path_handle::path_view_type path) noexcept
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
@@ -39,7 +39,7 @@ result<path_handle> path_handle::path(const path_handle &base, path_handle::path
   // Open directory with no access requested, this is much faster than asking for access
   OUTCOME_TRY(access, access_mask_from_handle_mode(nativeh, mode::none, flag::none));
   OUTCOME_TRY(attribs, attributes_from_handle_caching_and_flags(nativeh, caching::all, flag::none));
-  if(base.is_valid() || _path.is_ntpath())
+  if(base.is_valid() || path.is_ntpath())
   {
     DWORD creatdisp = 0x00000001 /*FILE_OPEN*/;
     attribs &= 0x00ffffff;  // the real attributes only, not the win32 flags
@@ -47,7 +47,7 @@ result<path_handle> path_handle::path(const path_handle &base, path_handle::path
     ntflags |= 0x01 /*FILE_DIRECTORY_FILE*/;  // required to open a directory
     IO_STATUS_BLOCK isb = make_iostatus();
 
-    path_view::c_str zpath(_path);
+    path_view::c_str zpath(path);
     UNICODE_STRING _path;
     _path.Buffer = const_cast<wchar_t *>(zpath.buffer);
     _path.MaximumLength = (_path.Length = (USHORT)(zpath.length * sizeof(wchar_t))) + sizeof(wchar_t);
@@ -81,7 +81,7 @@ result<path_handle> path_handle::path(const path_handle &base, path_handle::path
   {
     DWORD creation = OPEN_EXISTING;
     attribs |= FILE_FLAG_BACKUP_SEMANTICS;  // required to open a directory
-    path_view::c_str zpath(_path);
+    path_view::c_str zpath(path);
     if(INVALID_HANDLE_VALUE == (nativeh.h = CreateFileW_(zpath.buffer, access, fileshare, NULL, creation, attribs, NULL)))
     {
       DWORD errcode = GetLastError();

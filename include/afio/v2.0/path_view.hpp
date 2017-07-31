@@ -29,6 +29,11 @@ Distributed under the Boost Software License, Version 1.0.
 
 //! \file path_view.hpp Provides view of a path
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4251)  // dll interface
+#endif
+
 AFIO_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace detail
@@ -270,7 +275,12 @@ public:
 #ifdef _WIN32
       if(!view._state._utf16.empty())
       {
-        length = view._state._utf16.size();
+        if (view._state._utf16.size() > 32768)
+        {
+          AFIO_LOG_FATAL(&view, "Attempt to send a path exceeding 64Kb to kernel");
+          abort();
+        }
+        length = static_cast<uint16_t>(view._state._utf16.size());
         // Is the byte just after the view a zero? If so, use directly
         if(0 == view._state._utf16.data()[length])
         {
@@ -296,7 +306,12 @@ public:
 #else
       if(!view._state._utf8.empty())
       {
-        length = view._state._utf8.size();
+        if (view._state._utf8.size() > 32768)
+        {
+          AFIO_LOG_FATAL(&view, "Attempt to send a path exceeding 64Kb to kernel");
+          abort();
+        }
+        length = static_cast<uint16_t>(view._state._utf8.size());
         // Is the byte just after the view a zero? If so, use directly
         if(0 == view._state._utf8.data()[length])
         {

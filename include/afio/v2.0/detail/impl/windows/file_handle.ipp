@@ -270,13 +270,15 @@ result<file_handle> file_handle::temp_inode(file_handle::path_view_type dirpath,
       return error_from_exception();
     }
     _path.Buffer = const_cast<wchar_t *>(random.c_str());
-    IO_STATUS_BLOCK isb = make_iostatus();
-    NTSTATUS ntstat = NtCreateFile(&nativeh.h, access, &oa, &isb, &AllocationSize, attribs, fileshare, creatdisp, ntflags, NULL, 0);
-    if(STATUS_PENDING == ntstat)
-      ntstat = ntwait(nativeh.h, isb, deadline());
-    if(ntstat < 0 && ntstat != (NTSTATUS) 0xC0000035L /*STATUS_OBJECT_NAME_COLLISION*/)
     {
-      return {(int) ntstat, ntkernel_category()};
+      IO_STATUS_BLOCK isb = make_iostatus();
+      NTSTATUS ntstat = NtCreateFile(&nativeh.h, access, &oa, &isb, &AllocationSize, attribs, fileshare, creatdisp, ntflags, NULL, 0);
+      if (STATUS_PENDING == ntstat)
+        ntstat = ntwait(nativeh.h, isb, deadline());
+      if (ntstat < 0 && ntstat != (NTSTATUS)0xC0000035L /*STATUS_OBJECT_NAME_COLLISION*/)
+      {
+        return { (int)ntstat, ntkernel_category() };
+      }
     }
     OUTCOME_TRYV(ret.value()._fetch_inode());  // It can be useful to know the inode of temporary inodes
     if(nativeh.h)

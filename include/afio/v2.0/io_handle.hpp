@@ -114,15 +114,19 @@ public:
   static_assert(std::is_trivially_move_assignable<io_request<buffers_type>>::value, "io_request<buffers_type> is not trivially move assignable!");
   static_assert(std::is_standard_layout<io_request<buffers_type>>::value, "io_request<buffers_type> is not a standard layout type!");
 #endif
-  //! The i/o result type used by this handle. Guaranteed to be `TrivialType` apart from construction, and `StandardLayoutType`.
-  template <class T> class io_result : public result<T>
+  //! The i/o result type used by this handle. Guaranteed to be `TrivialType` apart from construction..
+  template <class T> struct io_result : public result<T>
   {
     using Base = result<T>;
-    size_type _bytes_transferred{(size_type) -1};
+    size_t _bytes_transferred{ -1 };
 
-  public:
+#if defined( _MSC_VER) && !defined(__clang__)  // workaround MSVC parsing bug
+    constexpr io_result() : Base() {}
+    template<class... Args> constexpr io_result(Args&&... args) : Base(std::forward<Args>(args)...) {}
+#else
     using Base::Base;
-    constexpr io_result() = default;
+    io_result() = default;
+#endif
     io_result(const io_result &) = default;
     io_result(io_result &&) = default;
     io_result &operator=(const io_result &) = default;
@@ -148,8 +152,9 @@ public:
   static_assert(std::is_trivially_move_constructible<io_result<buffers_type>>::value, "io_result<buffers_type> is not trivially move constructible!");
   static_assert(std::is_trivially_copy_assignable<io_result<buffers_type>>::value, "io_result<buffers_type> is not trivially copy assignable!");
   static_assert(std::is_trivially_move_assignable<io_result<buffers_type>>::value, "io_result<buffers_type> is not trivially move assignable!");
-// Better to default constructors than to remove the static member init
-// static_assert(std::is_standard_layout<io_result<buffers_type>>::value, "io_result<buffers_type> is not a standard layout type!");
+  //! \todo Why is io_result<buffers_type> not a standard layout type?
+  //static_assert(std::is_standard_layout<result<buffers_type>>::value, "result<buffers_type> is not a standard layout type!");
+  //static_assert(std::is_standard_layout<io_result<buffers_type>>::value, "io_result<buffers_type> is not a standard layout type!");
 #endif
 
 public:

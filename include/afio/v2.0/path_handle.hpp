@@ -30,6 +30,11 @@ Distributed under the Boost Software License, Version 1.0.
 
 //! \file path_handle.hpp Provides a handle to a filesystem location.
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4251)  // dll interface
+#endif
+
 AFIO_V2_NAMESPACE_EXPORT_BEGIN
 
 /*! \class path_handle
