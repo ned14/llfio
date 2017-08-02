@@ -413,6 +413,92 @@ public:
 };
 
 
+// BEGIN make_free_functions.py
+/*! \brief Read data from the open handle.
+
+\warning Depending on the implementation backend, **very** different buffers may be returned than you
+supplied. You should **always** use the buffers returned and assume that they point to different
+memory and that each buffer's size will have changed.
+
+\return The buffers read, which may not be the buffers input. The size of each scatter-gather
+buffer is updated with the number of bytes of that buffer transferred, and the pointer to
+the data may be \em completely different to what was submitted (e.g. it may point into a
+memory map).
+\param self The object whose member function to call.
+\param reqs A scatter-gather and offset request.
+\param d An optional deadline by which the i/o must complete, else it is cancelled.
+Note function may return significantly after this deadline if the i/o takes long to cancel.
+\errors Any of the values POSIX read() can return, `errc::timed_out`, `errc::operation_canceled`. `errc::not_supported` may be
+returned if deadline i/o is not possible with this particular handle configuration (e.g.
+reading from regular files on POSIX or reading from a non-overlapped HANDLE on Windows).
+\mallocs The default synchronous implementation in file_handle performs no memory allocation.
+The asynchronous implementation in async_file_handle performs one calloc and one free.
+*/
+inline io_handle::io_result<io_handle::buffers_type> read(io_handle &self, io_handle::io_request<io_handle::buffers_type> reqs, deadline d = deadline()) noexcept
+{
+  return self.read(std::forward<decltype(reqs)>(reqs), std::forward<decltype(d)>(d));
+}
+/*! \brief Write data to the open handle.
+
+\warning Depending on the implementation backend, not all of the buffers input may be written and
+the some buffers at the end of the returned buffers may return with zero bytes written.
+For example, with a zeroed deadline, some backends may only consume as many buffers as the system has available write slots
+for, thus for those backends this call is "non-blocking" in the sense that it will return immediately even if it
+could not schedule a single buffer write.
+
+\return The buffers written, which may not be the buffers input. The size of each scatter-gather
+buffer is updated with the number of bytes of that buffer transferred.
+\param self The object whose member function to call.
+\param reqs A scatter-gather and offset request.
+\param d An optional deadline by which the i/o must complete, else it is cancelled.
+Note function may return significantly after this deadline if the i/o takes long to cancel.
+\errors Any of the values POSIX write() can return, `errc::timed_out`, `errc::operation_canceled`. `errc::not_supported` may be
+returned if deadline i/o is not possible with this particular handle configuration (e.g.
+writing to regular files on POSIX or writing to a non-overlapped HANDLE on Windows).
+\mallocs The default synchronous implementation in file_handle performs no memory allocation.
+The asynchronous implementation in async_file_handle performs one calloc and one free.
+*/
+inline io_handle::io_result<io_handle::const_buffers_type> write(io_handle &self, io_handle::io_request<io_handle::const_buffers_type> reqs, deadline d = deadline()) noexcept
+{
+  return self.write(std::forward<decltype(reqs)>(reqs), std::forward<decltype(d)>(d));
+}
+/*! \brief Issue a write reordering barrier such that writes preceding the barrier will reach storage
+before writes after this barrier.
+
+\warning **Assume that this call is a no-op**. It is not reliably implemented in many common use cases,
+for example if your code is running inside a LXC container, or if the user has mounted the filing
+system with non-default options. Instead open the handle with `caching::reads` which means that all
+writes form a strict sequential order not completing until acknowledged by the storage device.
+Filing system can and do use different algorithms to give much better performance with `caching::reads`,
+some (e.g. ZFS) spectacularly better.
+
+\warning Let me repeat again: consider this call to be a **hint** to poke the kernel with a stick to
+go start to do some work sooner rather than later. It may be ignored entirely.
+
+\warning For portability, you can only assume that barriers write order for a single handle
+instance. You cannot assume that barriers write order across multiple handles to the same inode, or
+across processes.
+
+\return The buffers barriered, which may not be the buffers input. The size of each scatter-gather
+buffer is updated with the number of bytes of that buffer barriered.
+\param self The object whose member function to call.
+\param reqs A scatter-gather and offset request for what range to barrier. May be ignored on some platforms
+which always write barrier the entire file. Supplying a default initialised reqs write barriers the entire file.
+\param wait_for_device True if you want the call to wait until data reaches storage and that storage
+has acknowledged the data is physically written. Slow.
+\param and_metadata True if you want the call to sync the metadata for retrieving the writes before the
+barrier after a sudden power loss event. Slow.
+\param d An optional deadline by which the i/o must complete, else it is cancelled.
+Note function may return significantly after this deadline if the i/o takes long to cancel.
+\errors Any of the values POSIX fdatasync() or Windows NtFlushBuffersFileEx() can return.
+\mallocs None.
+*/
+inline io_handle::io_result<io_handle::const_buffers_type> barrier(io_handle &self, io_handle::io_request<io_handle::const_buffers_type> reqs = io_handle::io_request<io_handle::const_buffers_type>(), bool wait_for_device = false, bool and_metadata = false, deadline d = deadline()) noexcept
+{
+  return self.barrier(std::forward<decltype(reqs)>(reqs), std::forward<decltype(wait_for_device)>(wait_for_device), std::forward<decltype(and_metadata)>(and_metadata), std::forward<decltype(d)>(d));
+}
+// END make_free_functions.py
+
 AFIO_V2_NAMESPACE_END
 
 #if AFIO_HEADERS_ONLY == 1 && !defined(DOXYGEN_SHOULD_SKIP_THIS)

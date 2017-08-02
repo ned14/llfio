@@ -29,8 +29,6 @@ fuzzed, coverage calculated, bloat calculated, ABI dumped etc
 
 
 ### clang AST parser based todos which await me getting back into the clang AST parser:
-- [ ] Implement [[bindlib::make_free]] which injects member functions into the enclosing
-namespace.
 - [ ] C bindings for all AFIO v2 APIs. Write libclang parser which autogenerates
 SWIG interface files from the .hpp files using custom attributes to fill in the
 missing gaps.

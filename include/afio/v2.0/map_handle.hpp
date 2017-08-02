@@ -350,6 +350,95 @@ public:
 };
 
 
+// BEGIN make_free_functions.py
+/*! \brief Create a memory section.
+\param backing The handle to use as backing storage. An invalid handle means to use the system page file as the backing storage.
+\param maximum_size The maximum size this section can ever be. Zero means to use backing.length().
+\param _flag How to create the section.
+
+\errors Any of the values POSIX dup() or NtCreateSection() can return.
+*/
+inline result<section_handle> section(file_handle &backing, section_handle::extent_type maximum_size = 0, section_handle::flag _flag = section_handle::flag::read | section_handle::flag::write) noexcept
+{
+  return section_handle::section(std::forward<decltype(backing)>(backing), std::forward<decltype(maximum_size)>(maximum_size), std::forward<decltype(_flag)>(_flag));
+}
+//! \overload
+inline result<section_handle> section(section_handle::extent_type maximum_size, file_handle &backing, section_handle::flag _flag = section_handle::flag::read | section_handle::flag::write) noexcept
+{
+  return section_handle::section(std::forward<decltype(maximum_size)>(maximum_size), std::forward<decltype(backing)>(backing), std::forward<decltype(_flag)>(_flag));
+}
+//! \overload
+inline result<section_handle> section(section_handle::extent_type maximum_size) noexcept
+{
+  return section_handle::section(std::forward<decltype(maximum_size)>(maximum_size));
+}
+/*! Resize the current maximum permitted extent of the memory section to the given extent.
+
+\errors Any of the values NtExtendSection() can return. On POSIX this is a no op.
+*/
+inline result<section_handle::extent_type> truncate(section_handle &self, section_handle::extent_type newsize) noexcept
+{
+  return self.truncate(std::forward<decltype(newsize)>(newsize));
+}
+/*! Create new memory and map it into view.
+\param bytes How many bytes to create and map. Typically will be rounded to a multiple of the page size (see utils::page_sizes()).
+\param _flag The permissions with which to map the view which are constrained by the permissions of the memory section. `flag::none` can be useful for reserving virtual address space without committing system resources, use commit() to later change availability of memory.
+
+\note On Microsoft Windows this constructor uses the faster VirtualAlloc() which creates less versatile page backed memory. If you want anonymous memory
+allocated from a paging file backed section instead, create a page file backed section and then a mapped view from that using
+the other constructor. This makes available all those very useful VM tricks Windows can do with section mapped memory which
+VirtualAlloc() memory cannot do.
+
+\errors Any of the values POSIX mmap() or NtMapViewOfSection() can return.
+*/
+inline result<map_handle> map(map_handle::size_type bytes, section_handle::flag _flag = section_handle::flag::read | section_handle::flag::write) noexcept
+{
+  return map_handle::map(std::forward<decltype(bytes)>(bytes), std::forward<decltype(_flag)>(_flag));
+}
+/*! Create a memory mapped view of a backing storage.
+\param section A memory section handle specifying the backing storage to use.
+\param bytes How many bytes to map (0 = the size of the memory section). Typically will be rounded to a multiple of the page size (see utils::page_sizes()).
+\param offset The offset into the backing storage to map from. Typically needs to be at least a multiple of the page size (see utils::page_sizes()), on Windows it needs to be a multiple of the kernel memory allocation granularity (typically 64Kb).
+\param _flag The permissions with which to map the view which are constrained by the permissions of the memory section. `flag::none` can be useful for reserving virtual address space without committing system resources, use commit() to later change availability of memory.
+
+\errors Any of the values POSIX mmap() or NtMapViewOfSection() can return.
+*/
+inline result<map_handle> map(section_handle &section, map_handle::size_type bytes = 0, map_handle::extent_type offset = 0, section_handle::flag _flag = section_handle::flag::read | section_handle::flag::write) noexcept
+{
+  return map_handle::map(std::forward<decltype(section)>(section), std::forward<decltype(bytes)>(bytes), std::forward<decltype(offset)>(offset), std::forward<decltype(_flag)>(_flag));
+}
+/*! \brief Read data from the mapped view.
+
+\note Because this implementation never copies memory, you can pass in buffers with a null address.
+
+\return The buffers read, which will never be the buffers input because they will point into the mapped view.
+The size of each scatter-gather buffer is updated with the number of bytes of that buffer transferred.
+\param self The object whose member function to call.
+\param reqs A scatter-gather and offset request.
+\param d Ignored.
+\errors None, though the various signals and structured exception throws common to using memory maps may occur.
+\mallocs None.
+*/
+inline map_handle::io_result<map_handle::buffers_type> read(map_handle &self, map_handle::io_request<map_handle::buffers_type> reqs, deadline d = deadline()) noexcept
+{
+  return self.read(std::forward<decltype(reqs)>(reqs), std::forward<decltype(d)>(d));
+}
+/*! \brief Write data to the mapped view.
+
+\return The buffers written, which will never be the buffers input because they will point at where the data was copied into the mapped view.
+The size of each scatter-gather buffer is updated with the number of bytes of that buffer transferred.
+\param self The object whose member function to call.
+\param reqs A scatter-gather and offset request.
+\param d Ignored.
+\errors None, though the various signals and structured exception throws common to using memory maps may occur.
+\mallocs None.
+*/
+inline map_handle::io_result<map_handle::const_buffers_type> write(map_handle &self, map_handle::io_request<map_handle::const_buffers_type> reqs, deadline d = deadline()) noexcept
+{
+  return self.write(std::forward<decltype(reqs)>(reqs), std::forward<decltype(d)>(d));
+}
+// END make_free_functions.py
+
 AFIO_V2_NAMESPACE_END
 
 #if AFIO_HEADERS_ONLY == 1 && !defined(DOXYGEN_SHOULD_SKIP_THIS)

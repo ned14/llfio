@@ -86,6 +86,25 @@ public:
   static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<path_handle> path(path_view_type _path) noexcept { return path(path_handle(), _path); }
 };
 
+// BEGIN make_free_functions.py
+/*! Create a path handle opening access to some location on the filing system.
+Some operating systems provide a particularly lightweight method of doing this
+(Linux: `O_PATH`, Windows: no access perms) which is much faster than opening
+a directory. For other systems, we open a directory with read only permissions.
+
+\errors Any of the values POSIX open() or CreateFile() can return.
+*/
+inline result<path_handle> path(const path_handle &base, path_handle::path_view_type _path) noexcept
+{
+  return path_handle::path(std::forward<decltype(base)>(base), std::forward<decltype(_path)>(_path));
+}
+//! \overload
+inline result<path_handle> path(path_handle::path_view_type _path) noexcept
+{
+  return path_handle::path(std::forward<decltype(_path)>(_path));
+}
+// END make_free_functions.py
+
 AFIO_V2_NAMESPACE_END
 
 #if AFIO_HEADERS_ONLY == 1 && !defined(DOXYGEN_SHOULD_SKIP_THIS)
