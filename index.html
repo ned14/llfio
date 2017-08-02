@@ -123,7 +123,19 @@ $(document).ready(function(){initNavTree('index.html','');});
 <li>clang 5.0 (Windows)</li>
 </ul>
 <p>Todo list for already implemented parts: <a href="https://ned14.github.io/afio/todo.html">https://ned14.github.io/afio/todo.html</a></p>
-<h2>v2 architecture and design implemented:</h2>
+<p>To build and test (make, ninja etc):</p>
+<div class="fragment"><div class="line">mkdir build</div>
+<div class="line">cd build</div>
+<div class="line">cmake ..</div>
+<div class="line">cmake --build .</div>
+<div class="line">ctest -R afio_sl</div>
+</div><!-- fragment --><p>To build and test (Visual Studio, XCode etc):</p>
+<div class="fragment"><div class="line">mkdir build</div>
+<div class="line">cd build</div>
+<div class="line">cmake ..</div>
+<div class="line">cmake --build . --config Release</div>
+<div class="line">ctest -C Release -R afio_sl</div>
+</div><!-- fragment --><h2>v2 architecture and design implemented:</h2>
 <table class="doxtable">
 <tr>
 <th>NEW in v2 </th><th>Boost peer review feedback </th><th></th></tr>
@@ -179,6 +191,8 @@ async_file_handle - adds asynchronous scatter-gather i/o</li>
 <td>✔ </td><td></td><td>Path views used throughout, thus avoiding string copying and allocation in <code>std::filesystem::path</code>. </td></tr>
 <tr>
 <td>✔ </td><td></td><td>Paths are equally interpreted as UTF-8 on all platforms. </td></tr>
+<tr>
+<td>✔ </td><td></td><td>We never store nor retain a path, as they are inherently racy and are best avoided. </td></tr>
 </table>
 <p>Todo:</p>
 <table class="doxtable">
@@ -217,6 +231,8 @@ async_file_handle - adds asynchronous scatter-gather i/o</li>
 <td>✔ </td><td>✔ </td><td>✔ </td><td>i/o deadlines and cancellation. </td></tr>
 <tr>
 <td></td><td>✔ </td><td>✔ </td><td>Retrieving and setting the current maximum extent (size) of an open file. </td></tr>
+<tr>
+<td></td><td>✔ </td><td>✔ </td><td>Retrieving the current path of an open file irrespective of where it has been renamed to by third parties. </td></tr>
 <tr>
 <td></td><td>✔ </td><td>✔ </td><td>statfs_t ported over from AFIO v1. </td></tr>
 <tr>

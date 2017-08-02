@@ -1,5 +1,6 @@
 var NAVTREEINDEX3 =
 {
+"config_8hpp.html#gaf5f9b13a512047008c0caeb5fcd310e0":[4,0,0,0,0,3,38],
 "config_8hpp.html#gafa3b0c57823d6f9736497df6a1571a95":[4,0,0,0,0,3,5],
 "deadline_8h.html":[4,0,0,0,0,4],
 "deadline_8h.html#ad6773c216d9f3c219efe8e29a1398f95":[4,0,0,0,0,4,1],
@@ -104,12 +105,12 @@ var NAVTREEINDEX3 =
 "modules.html":[1],
 "namespaceafio__v2__xxx.html":[3,0,0],
 "namespaceafio__v2__xxx.html":[2,0,0],
-"namespaceafio__v2__xxx_1_1algorithm.html":[2,0,0,0],
 "namespaceafio__v2__xxx_1_1algorithm.html":[3,0,0,0],
+"namespaceafio__v2__xxx_1_1algorithm.html":[2,0,0,0],
 "namespaceafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex.html":[2,0,0,0,0],
 "namespaceafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex.html":[3,0,0,0,0],
-"namespaceafio__v2__xxx_1_1storage__profile.html":[3,0,0,1],
 "namespaceafio__v2__xxx_1_1storage__profile.html":[2,0,0,1],
+"namespaceafio__v2__xxx_1_1storage__profile.html":[3,0,0,1],
 "namespaceafio__v2__xxx_1_1utils.html":[3,0,0,2],
 "namespaceafio__v2__xxx_1_1utils.html":[2,0,0,2],
 "namespacemembers.html":[2,1,0],
@@ -248,6 +249,5 @@ var NAVTREEINDEX3 =
 "structafio__v2__xxx_1_1path__view_1_1c__str.html#aa94e3bdb40e67a3c0400e36850e78719":[3,0,0,15,0,1],
 "structafio__v2__xxx_1_1path__view_1_1c__str.html#abcac57340986fb1b02e5d05d3e521e1a":[3,0,0,15,0,2],
 "structafio__v2__xxx_1_1section__handle_1_1flag__base.html":[3,0,0,11,0],
-"structafio__v2__xxx_1_1section__handle_1_1flag__base.html#a5b790e66402ef3a07ce9464f3e1dc9d8":[3,0,0,11,0,0],
-"structafio__v2__xxx_1_1section__handle_1_1flag__base.html#a5b790e66402ef3a07ce9464f3e1dc9d8a26c56f64a5569c048ed853c28249726d":[3,0,0,11,0,0,0]
+"structafio__v2__xxx_1_1section__handle_1_1flag__base.html#a5b790e66402ef3a07ce9464f3e1dc9d8":[3,0,0,11,0,0]
 };

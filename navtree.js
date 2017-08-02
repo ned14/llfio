@@ -40,8 +40,8 @@ var NAVTREEINDEX =
 "afio_8hpp.html",
 "classafio__v2__xxx_1_1file__handle.html#ac46e0a296c31fcd0a996a79d78647fb6",
 "classafio__v2__xxx_1_1map__handle.html#aeabd245b6edcfb57779b29c6f2ea9737",
-"config_8hpp.html#gafa3b0c57823d6f9736497df6a1571a95",
-"structafio__v2__xxx_1_1section__handle_1_1flag__base.html#a5b790e66402ef3a07ce9464f3e1dc9d8a522b281f854fe92d7ea674d2d8cc4be2"
+"config_8hpp.html#gaf5f9b13a512047008c0caeb5fcd310e0",
+"structafio__v2__xxx_1_1section__handle_1_1flag__base.html#a5b790e66402ef3a07ce9464f3e1dc9d8a26c56f64a5569c048ed853c28249726d"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

@@ -450,7 +450,7 @@ flag&#160;</td><td class="memItemRight" valign="bottom"><b>_flags</b></td></tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">pure virtual</span><span class="mlabel">noexcept</span><span class="mlabel">inherited</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">pure virtual</span><span class="mlabel">noexcept</span><span class="mlabel">inherited</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -705,16 +705,16 @@ For portability, you can only assume that barriers write order for a single hand
 </table>
 </div><div class="memdoc">
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;  {</div>
-<div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;    <span class="keywordtype">size_t</span> bytes = 0;</div>
-<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;i : reqs.buffers)</div>
-<div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;    {</div>
-<div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;      <span class="keywordflow">if</span>(bytes + i.len &lt; bytes)</div>
-<div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;        <span class="keywordflow">return</span> std::errc::value_too_large;</div>
-<div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;      bytes += i.len;</div>
-<div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;    }</div>
-<div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classafio__v2__xxx_1_1io__handle.html#a88689b15e6e8b6ce1f945737dee4369e">lock</a>(reqs.offset, bytes, <span class="keyword">false</span>, std::move(d));</div>
-<div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;  }</div>
+<div class="fragment"><div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;  {</div>
+<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;    <span class="keywordtype">size_t</span> bytes = 0;</div>
+<div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;i : reqs.buffers)</div>
+<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;    {</div>
+<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;      <span class="keywordflow">if</span>(bytes + i.len &lt; bytes)</div>
+<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;        <span class="keywordflow">return</span> std::errc::value_too_large;</div>
+<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;      bytes += i.len;</div>
+<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;    }</div>
+<div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classafio__v2__xxx_1_1io__handle.html#a88689b15e6e8b6ce1f945737dee4369e">lock</a>(reqs.offset, bytes, <span class="keyword">false</span>, std::move(d));</div>
+<div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;  }</div>
 <div class="ttc" id="classafio__v2__xxx_1_1io__handle_html_a88689b15e6e8b6ce1f945737dee4369e"><div class="ttname"><a href="classafio__v2__xxx_1_1io__handle.html#a88689b15e6e8b6ce1f945737dee4369e">afio_v2_xxx::io_handle::lock</a></div><div class="ttdeci">virtual result&lt; extent_guard &gt; lock(extent_type offset, extent_type bytes, bool exclusive=true, deadline d=deadline()) noexcept</div><div class="ttdoc">Tries to lock the range of bytes specified for shared or exclusive access. Be aware this passes throu...</div></div>
 </div><!-- fragment -->
 </div>
@@ -751,16 +751,16 @@ For portability, you can only assume that barriers write order for a single hand
 </table>
 </div><div class="memdoc">
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;  {</div>
-<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;    <span class="keywordtype">size_t</span> bytes = 0;</div>
-<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;i : reqs.buffers)</div>
-<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;    {</div>
-<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;      <span class="keywordflow">if</span>(bytes + i.len &lt; bytes)</div>
-<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;        <span class="keywordflow">return</span> std::errc::value_too_large;</div>
-<div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;      bytes += i.len;</div>
-<div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;    }</div>
-<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classafio__v2__xxx_1_1io__handle.html#a88689b15e6e8b6ce1f945737dee4369e">lock</a>(reqs.offset, bytes, <span class="keyword">true</span>, std::move(d));</div>
-<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;  }</div>
+<div class="fragment"><div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;  {</div>
+<div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;    <span class="keywordtype">size_t</span> bytes = 0;</div>
+<div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;i : reqs.buffers)</div>
+<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;    {</div>
+<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;      <span class="keywordflow">if</span>(bytes + i.len &lt; bytes)</div>
+<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;        <span class="keywordflow">return</span> std::errc::value_too_large;</div>
+<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;      bytes += i.len;</div>
+<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;    }</div>
+<div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classafio__v2__xxx_1_1io__handle.html#a88689b15e6e8b6ce1f945737dee4369e">lock</a>(reqs.offset, bytes, <span class="keyword">true</span>, std::move(d));</div>
+<div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;  }</div>
 <div class="ttc" id="classafio__v2__xxx_1_1io__handle_html_a88689b15e6e8b6ce1f945737dee4369e"><div class="ttname"><a href="classafio__v2__xxx_1_1io__handle.html#a88689b15e6e8b6ce1f945737dee4369e">afio_v2_xxx::io_handle::lock</a></div><div class="ttdeci">virtual result&lt; extent_guard &gt; lock(extent_type offset, extent_type bytes, bool exclusive=true, deadline d=deadline()) noexcept</div><div class="ttdoc">Tries to lock the range of bytes specified for shared or exclusive access. Be aware this passes throu...</div></div>
 </div><!-- fragment -->
 </div>
@@ -866,6 +866,7 @@ For portability, you can only assume that barriers write order for a single hand
 </div><div class="memdoc">
 
 <p>Read data from the open handle. </p>
+<dl class="section warning"><dt>Warning</dt><dd>Depending on the implementation backend, <b>very</b> different buffers may be returned than you supplied. You should <b>always</b> use the buffers returned and assume that they point to different memory and that each buffer's size will have changed.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>The buffers read, which may not be the buffers input. The size of each scatter-gather buffer is updated with the number of bytes of that buffer transferred, and the pointer to the data may be <em>completely</em> different to what was submitted (e.g. it may point into a memory map). </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -923,12 +924,12 @@ For portability, you can only assume that barriers write order for a single hand
 </table>
 </div><div class="memdoc">
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;  {</div>
-<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;    buffer_type _reqs[1] = {{data, bytes}};</div>
-<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;    io_request&lt;buffers_type&gt; reqs(<a class="code" href="classafio__v2__xxx_1_1io__handle.html#a70a3c5e6f62efc95db81f831f3b90a2c">buffers_type</a>(_reqs), offset);</div>
-<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;    OUTCOME_TRY(v, <a class="code" href="classafio__v2__xxx_1_1io__handle.html#a71d7636f40607829cacc2c974c4a2a28">read</a>(reqs, d));</div>
-<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;    <span class="keywordflow">return</span> *v.data();</div>
-<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;  }</div>
+<div class="fragment"><div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;  {</div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;    buffer_type _reqs[1] = {{data, bytes}};</div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;    io_request&lt;buffers_type&gt; reqs(<a class="code" href="classafio__v2__xxx_1_1io__handle.html#a70a3c5e6f62efc95db81f831f3b90a2c">buffers_type</a>(_reqs), offset);</div>
+<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;    OUTCOME_TRY(v, <a class="code" href="classafio__v2__xxx_1_1io__handle.html#a71d7636f40607829cacc2c974c4a2a28">read</a>(reqs, d));</div>
+<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;    <span class="keywordflow">return</span> *v.data();</div>
+<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;  }</div>
 <div class="ttc" id="classafio__v2__xxx_1_1io__handle_html_a70a3c5e6f62efc95db81f831f3b90a2c"><div class="ttname"><a href="classafio__v2__xxx_1_1io__handle.html#a70a3c5e6f62efc95db81f831f3b90a2c">afio_v2_xxx::io_handle::buffers_type</a></div><div class="ttdeci">span&lt; buffer_type &gt; buffers_type</div><div class="ttdoc">The scatter buffers type used by this handle. Guaranteed to be TrivialType apart from construction...</div><div class="ttdef"><b>Definition:</b> io_handle.hpp:76</div></div>
 <div class="ttc" id="classafio__v2__xxx_1_1io__handle_html_a71d7636f40607829cacc2c974c4a2a28"><div class="ttname"><a href="classafio__v2__xxx_1_1io__handle.html#a71d7636f40607829cacc2c974c4a2a28">afio_v2_xxx::io_handle::read</a></div><div class="ttdeci">virtual io_result&lt; buffers_type &gt; read(io_request&lt; buffers_type &gt; reqs, deadline d=deadline()) noexcept</div><div class="ttdoc">Read data from the open handle. </div></div>
 </div><!-- fragment -->
@@ -1217,7 +1218,7 @@ For portability, you can only assume that barriers write order for a single hand
 </table>
 </div><div class="memdoc">
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;{ <span class="keywordflow">return</span> <a class="code" href="classafio__v2__xxx_1_1io__handle.html#a88689b15e6e8b6ce1f945737dee4369e">lock</a>(offset, bytes, exclusive, deadline(std::chrono::seconds(0))); }</div>
+<div class="fragment"><div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;{ <span class="keywordflow">return</span> <a class="code" href="classafio__v2__xxx_1_1io__handle.html#a88689b15e6e8b6ce1f945737dee4369e">lock</a>(offset, bytes, exclusive, deadline(std::chrono::seconds(0))); }</div>
 <div class="ttc" id="classafio__v2__xxx_1_1io__handle_html_a88689b15e6e8b6ce1f945737dee4369e"><div class="ttname"><a href="classafio__v2__xxx_1_1io__handle.html#a88689b15e6e8b6ce1f945737dee4369e">afio_v2_xxx::io_handle::lock</a></div><div class="ttdeci">virtual result&lt; extent_guard &gt; lock(extent_type offset, extent_type bytes, bool exclusive=true, deadline d=deadline()) noexcept</div><div class="ttdoc">Tries to lock the range of bytes specified for shared or exclusive access. Be aware this passes throu...</div></div>
 </div><!-- fragment -->
 </div>
@@ -1332,6 +1333,7 @@ For portability, you can only assume that barriers write order for a single hand
 </div><div class="memdoc">
 
 <p>Write data to the open handle. </p>
+<dl class="section warning"><dt>Warning</dt><dd>Depending on the implementation backend, not all of the buffers input may be written and the some buffers at the end of the returned buffers may return with zero bytes written. For example, with a zeroed deadline, some backends may only consume as many buffers as the system has available write slots for, thus for those backends this call is "non-blocking" in the sense that it will return immediately even if it could not schedule a single buffer write.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>The buffers written, which may not be the buffers input. The size of each scatter-gather buffer is updated with the number of bytes of that buffer transferred. </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -1389,12 +1391,12 @@ For portability, you can only assume that barriers write order for a single hand
 </table>
 </div><div class="memdoc">
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;  {</div>
-<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;    const_buffer_type _reqs[1] = {{data, bytes}};</div>
-<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;    io_request&lt;const_buffers_type&gt; reqs(<a class="code" href="classafio__v2__xxx_1_1io__handle.html#a639b8760b1b98df95e4956f6cc56f6b5">const_buffers_type</a>(_reqs), offset);</div>
-<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;    OUTCOME_TRY(v, <a class="code" href="classafio__v2__xxx_1_1io__handle.html#aefac4710e5617264347f437b04732c01">write</a>(reqs, d));</div>
-<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;    <span class="keywordflow">return</span> *v.data();</div>
-<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;  }</div>
+<div class="fragment"><div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;  {</div>
+<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;    const_buffer_type _reqs[1] = {{data, bytes}};</div>
+<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;    io_request&lt;const_buffers_type&gt; reqs(<a class="code" href="classafio__v2__xxx_1_1io__handle.html#a639b8760b1b98df95e4956f6cc56f6b5">const_buffers_type</a>(_reqs), offset);</div>
+<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;    OUTCOME_TRY(v, <a class="code" href="classafio__v2__xxx_1_1io__handle.html#aefac4710e5617264347f437b04732c01">write</a>(reqs, d));</div>
+<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;    <span class="keywordflow">return</span> *v.data();</div>
+<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;  }</div>
 <div class="ttc" id="classafio__v2__xxx_1_1io__handle_html_a639b8760b1b98df95e4956f6cc56f6b5"><div class="ttname"><a href="classafio__v2__xxx_1_1io__handle.html#a639b8760b1b98df95e4956f6cc56f6b5">afio_v2_xxx::io_handle::const_buffers_type</a></div><div class="ttdeci">span&lt; const_buffer_type &gt; const_buffers_type</div><div class="ttdoc">The gather buffers type used by this handle. Guaranteed to be TrivialType apart from construction...</div><div class="ttdef"><b>Definition:</b> io_handle.hpp:78</div></div>
 <div class="ttc" id="classafio__v2__xxx_1_1io__handle_html_aefac4710e5617264347f437b04732c01"><div class="ttname"><a href="classafio__v2__xxx_1_1io__handle.html#aefac4710e5617264347f437b04732c01">afio_v2_xxx::io_handle::write</a></div><div class="ttdeci">virtual io_result&lt; const_buffers_type &gt; write(io_request&lt; const_buffers_type &gt; reqs, deadline d=deadline()) noexcept</div><div class="ttdoc">Write data to the open handle. </div></div>
 </div><!-- fragment -->

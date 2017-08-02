@@ -30,6 +30,7 @@ var config_8hpp =
     [ "AFIO_LOG_WARN", "config_8hpp.html#ae3f3879c99ecb9e72ae39dba776bde05", null ],
     [ "AFIO_LOGGING_LEVEL", "config_8hpp.html#ga0d327438e5744ed72dc80dd3c85f87d6", null ],
     [ "AFIO_LOGGING_MEMORY", "config_8hpp.html#ga7c2409ed4b38a384c422012a43423a16", null ],
+    [ "AFIO_MAKE_FREE_FUNCTION", "config_8hpp.html#a54fbf115a2753bd20efdaac10df60c04", null ],
     [ "AFIO_THREAD_LOCAL", "config_8hpp.html#a21b2b83de81415cc20c331b2b8784574", null ],
     [ "AFIO_THREAD_LOCAL_IS_CXX11", "config_8hpp.html#a25c3aac8fb81959d7233ad3f0caa50ac", null ],
     [ "AFIO_UNIQUE_NAME", "config_8hpp.html#af228d29a3eb0cfe81ab08d4757cbb491", null ],
