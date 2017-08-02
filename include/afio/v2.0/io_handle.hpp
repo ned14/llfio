@@ -168,7 +168,7 @@ public:
   //! Default constructor
   constexpr io_handle() = default;
   //! Construct a handle from a supplied native handle
-  QUICKCPPLIB_CONSTEXPR io_handle(native_handle_type h, caching caching = caching::none, flag flags = flag::none)
+  constexpr io_handle(native_handle_type h, caching caching = caching::none, flag flags = flag::none)
       : handle(h, caching, flags)
   {
   }
@@ -180,6 +180,10 @@ public:
   io_handle &operator=(io_handle &&) = default;
 
   /*! \brief Read data from the open handle.
+
+  \warning Depending on the implementation backend, **very** different buffers may be returned than you
+  supplied. You should **always** use the buffers returned and assume that they point to different
+  memory and that each buffer's size will have changed.
 
   \return The buffers read, which may not be the buffers input. The size of each scatter-gather
   buffer is updated with the number of bytes of that buffer transferred, and the pointer to
@@ -194,7 +198,7 @@ public:
   \mallocs The default synchronous implementation in file_handle performs no memory allocation.
   The asynchronous implementation in async_file_handle performs one calloc and one free.
   */
-  //[[bindlib::make_free]]
+  AFIO_MAKE_FREE_FUNCTION
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<buffers_type> read(io_request<buffers_type> reqs, deadline d = deadline()) noexcept;
   //! \overload
   io_result<buffer_type> read(extent_type offset, char *data, size_type bytes, deadline d = deadline()) noexcept
@@ -207,6 +211,12 @@ public:
 
   /*! \brief Write data to the open handle.
 
+  \warning Depending on the implementation backend, not all of the buffers input may be written and
+  the some buffers at the end of the returned buffers may return with zero bytes written.
+  For example, with a zeroed deadline, some backends may only consume as many buffers as the system has available write slots
+  for, thus for those backends this call is "non-blocking" in the sense that it will return immediately even if it
+  could not schedule a single buffer write.
+
   \return The buffers written, which may not be the buffers input. The size of each scatter-gather
   buffer is updated with the number of bytes of that buffer transferred.
   \param reqs A scatter-gather and offset request.
@@ -218,7 +228,7 @@ public:
   \mallocs The default synchronous implementation in file_handle performs no memory allocation.
   The asynchronous implementation in async_file_handle performs one calloc and one free.
   */
-  //[[bindlib::make_free]]
+  AFIO_MAKE_FREE_FUNCTION
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> write(io_request<const_buffers_type> reqs, deadline d = deadline()) noexcept;
   //! \overload
   io_result<const_buffer_type> write(extent_type offset, const char *data, size_type bytes, deadline d = deadline()) noexcept
@@ -259,8 +269,8 @@ public:
   \errors Any of the values POSIX fdatasync() or Windows NtFlushBuffersFileEx() can return.
   \mallocs None.
   */
-  //[[bindlib::make_free]]
-  virtual io_result<const_buffers_type> barrier(io_request<const_buffers_type> reqs = io_request<const_buffers_type>(), bool wait_for_device = false, bool and_metadata = false, deadline d = deadline()) noexcept = 0;
+  AFIO_MAKE_FREE_FUNCTION
+  AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> barrier(io_request<const_buffers_type> reqs = io_request<const_buffers_type>(), bool wait_for_device = false, bool and_metadata = false, deadline d = deadline()) noexcept = 0;
 
   /*! \class extent_guard
   \brief RAII holder a locked extent of bytes in a file.

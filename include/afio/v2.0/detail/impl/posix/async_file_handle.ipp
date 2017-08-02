@@ -81,7 +81,7 @@ result<async_file_handle::io_state_ptr<CompletionRoutine, BuffersType>> async_fi
         : _io_state_type<CompletionRoutine, BuffersType>(_parent, _operation, std::forward<CompletionRoutine>(f), _items)
     {
     }
-    virtual void operator()(long errcode, long bytes_transferred, void *internal_state) noexcept override final
+    AFIO_HEADERS_ONLY_VIRTUAL_SPEC void operator()(long errcode, long bytes_transferred, void *internal_state) noexcept override final
     {
 #if AFIO_USE_POSIX_AIO
       struct aiocb **_paiocb = (struct aiocb **) internal_state;
@@ -116,7 +116,7 @@ result<async_file_handle::io_state_ptr<CompletionRoutine, BuffersType>> async_fi
       if(!--this->items_to_go)
         this->completion(this);
     }
-    virtual ~state_type() override final
+    AFIO_HEADERS_ONLY_VIRTUAL_SPEC ~state_type() override final
     {
       // Do we need to cancel pending i/o?
       if(this->items_to_go)

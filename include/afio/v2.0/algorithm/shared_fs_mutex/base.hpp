@@ -79,9 +79,9 @@ namespace algorithm
 #endif
         //! Default constructor
         constexpr entity_type() noexcept : _init(0) {}
-        //! Constructor
+//! Constructor
 #if !defined(__GNUC__) || defined(__clang__) || __GNUC__ >= 7
-        QUICKCPPLIB_CONSTEXPR
+        constexpr
 #endif
         entity_type(value_type _value, bool _exclusive) noexcept : _init(0)
         {
@@ -98,7 +98,7 @@ namespace algorithm
       constexpr shared_fs_mutex() {}
 
     public:
-      virtual ~shared_fs_mutex() {}
+      AFIO_HEADERS_ONLY_VIRTUAL_SPEC ~shared_fs_mutex() {}
 
       //! Generates an entity id from a sequence of bytes
       entity_type entity_from_buffer(const char *buffer, size_t bytes, bool exclusive = true) noexcept
@@ -190,7 +190,7 @@ namespace algorithm
         }
       };
 
-      virtual result<void> _lock(entities_guard &out, deadline d, bool spin_not_sleep) noexcept = 0;
+      AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> _lock(entities_guard &out, deadline d, bool spin_not_sleep) noexcept = 0;
 
       //! Lock all of a sequence of entities for exclusive or shared access
       result<entities_guard> lock(entities_type entities, deadline d = deadline(), bool spin_not_sleep = false) noexcept
@@ -211,7 +211,7 @@ namespace algorithm
       //! Try to lock a single entity for exclusive or shared access
       result<entities_guard> try_lock(entity_type entity) noexcept { return lock(std::move(entity), deadline(std::chrono::seconds(0))); }
       //! Unlock a previously locked sequence of entities
-      virtual void unlock(entities_type entities, unsigned long long hint = 0) noexcept = 0;
+      AFIO_HEADERS_ONLY_VIRTUAL_SPEC void unlock(entities_type entities, unsigned long long hint = 0) noexcept = 0;
     };
 
   }  // namespace

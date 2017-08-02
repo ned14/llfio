@@ -203,7 +203,7 @@ namespace algorithm
       but a particularly important one is `EBUSY` which will be returned if the memory map lock is already in
       a degraded state (i.e. just use the fallback lock directly).
       */
-      //[[bindlib::make_free]]
+      AFIO_MAKE_FREE_FUNCTION
       static result<memory_map> fs_mutex_map(const path_handle &base, path_view lockfile, shared_fs_mutex *fallbacklock = nullptr) noexcept
       {
         AFIO_LOG_FUNCTION_CALL(0);
@@ -336,7 +336,7 @@ namespace algorithm
         }
         return span<_entity_idx>(entity_to_idx, ep - entity_to_idx);
       }
-      virtual result<void> _lock(entities_guard &out, deadline d, bool spin_not_sleep) noexcept override final
+      AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> _lock(entities_guard &out, deadline d, bool spin_not_sleep) noexcept override final
       {
         AFIO_LOG_FUNCTION_CALL(this);
         if(is_degraded())
@@ -425,7 +425,7 @@ namespace algorithm
       }
 
     public:
-      virtual void unlock(entities_type entities, unsigned long long hint) noexcept override final
+      AFIO_HEADERS_ONLY_VIRTUAL_SPEC void unlock(entities_type entities, unsigned long long hint) noexcept override final
       {
         AFIO_LOG_FUNCTION_CALL(this);
         if(_have_degraded)

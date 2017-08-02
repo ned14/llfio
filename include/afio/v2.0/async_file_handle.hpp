@@ -98,7 +98,7 @@ public:
 
   \errors Any of the values POSIX open() or CreateFile() can return.
   */
-  //[[bindlib::make_free]]
+  AFIO_MAKE_FREE_FUNCTION
   static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<async_file_handle> async_file(io_service &service, const path_handle &base, path_view_type _path, mode _mode = mode::read, creation _creation = creation::open_existing, caching _caching = caching::all, flag flags = flag::none) noexcept
   {
     // Open it overlapped, otherwise no difference.
@@ -116,7 +116,7 @@ public:
 
   \errors Any of the values POSIX open() or CreateFile() can return.
   */
-  //[[bindlib::make_free]]
+  AFIO_MAKE_FREE_FUNCTION
   static inline result<async_file_handle> async_random_file(io_service &service, const path_handle &dirpath, mode _mode = mode::write, caching _caching = caching::temporary, flag flags = flag::none) noexcept
   {
     try
@@ -150,7 +150,7 @@ public:
 
   \errors Any of the values POSIX open() or CreateFile() can return.
   */
-  //[[bindlib::make_free]]
+  AFIO_MAKE_FREE_FUNCTION
   static inline result<async_file_handle> async_temp_file(io_service &service, path_view_type name = path_view_type(), mode _mode = mode::write, creation _creation = creation::if_needed, caching _caching = caching::temporary, flag flags = flag::unlink_on_close) noexcept
   {
     OUTCOME_TRY(tempdirh, path_handle::path(temporary_files_directory()));
@@ -166,7 +166,7 @@ public:
 
   \errors Any of the values POSIX open() or CreateFile() can return.
   */
-  //[[bindlib::make_free]]
+  AFIO_MAKE_FREE_FUNCTION
   static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<async_file_handle> async_temp_inode(io_service &service, path_view_type dirpath = temporary_files_directory(), mode _mode = mode::write, flag flags = flag::none) noexcept
   {
     // Open it overlapped, otherwise no difference.
@@ -285,7 +285,7 @@ public:
   \mallocs One calloc, one free. The allocation is unavoidable due to the need to store a type
   erased completion handler of unknown type.
   */
-  //[[bindlib::make_free]]
+  AFIO_MAKE_FREE_FUNCTION
   template <class CompletionRoutine> result<io_state_ptr<CompletionRoutine, buffers_type>> async_read(io_request<buffers_type> reqs, CompletionRoutine &&completion) noexcept;
 
   /*! \brief Schedule a write to occur asynchronously.
@@ -298,7 +298,7 @@ public:
   \mallocs One calloc, one free. The allocation is unavoidable due to the need to store a type
   erased completion handler of unknown type.
   */
-  //[[bindlib::make_free]]
+  AFIO_MAKE_FREE_FUNCTION
   template <class CompletionRoutine> result<io_state_ptr<CompletionRoutine, const_buffers_type>> async_write(io_request<const_buffers_type> reqs, CompletionRoutine &&completion) noexcept;
 
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<buffers_type> read(io_request<buffers_type> reqs, deadline d = deadline()) noexcept override;

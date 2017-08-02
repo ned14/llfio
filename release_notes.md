@@ -20,6 +20,26 @@ You need these compilers or better:
 
 Todo list for already implemented parts: https://ned14.github.io/afio/todo.html
 
+To build and test (make, ninja etc):
+
+~~~
+mkdir build
+cd build
+cmake ..
+cmake --build .
+ctest -R afio_sl
+~~~
+
+To build and test (Visual Studio, XCode etc):
+
+~~~
+mkdir build
+cd build
+cmake ..
+cmake --build . --config Release
+ctest -C Release -R afio_sl
+~~~
+
 ## v2 architecture and design implemented:
 
 | NEW in v2 | Boost peer review feedback |     |
@@ -44,6 +64,7 @@ Todo list for already implemented parts: https://ned14.github.io/afio/todo.html
 | ✔ |   | Much more granular, micro level internal logging of every code path taken.
 | ✔ |   | Path views used throughout, thus avoiding string copying and allocation in `std::filesystem::path`.
 | ✔ |   | Paths are equally interpreted as UTF-8 on all platforms.
+| ✔ |   | We never store nor retain a path, as they are inherently racy and are best avoided.
 
 Todo:
 
@@ -70,6 +91,7 @@ Todo:
 | ✔ |   |   | Linux KAIO support for native async `O_DIRECT` i/o
 | ✔ | ✔ | ✔ | i/o deadlines and cancellation.
 |   | ✔ | ✔ | Retrieving and setting the current maximum extent (size) of an open file.
+|   | ✔ | ✔ | Retrieving the current path of an open file irrespective of where it has been renamed to by third parties.
 |   | ✔ | ✔ | statfs_t ported over from AFIO v1.
 |   | ✔ | ✔ | utils namespace ported over from AFIO v1.
 | ✔ | ✔ | ✔ | `shared_fs_mutex` shared/exclusive entities locking based on lock files

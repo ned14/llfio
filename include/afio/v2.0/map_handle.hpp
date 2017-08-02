@@ -114,13 +114,13 @@ public:
 
   \errors Any of the values POSIX dup() or NtCreateSection() can return.
   */
-  //[[bindlib::make_free]]
+  AFIO_MAKE_FREE_FUNCTION
   static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<section_handle> section(file_handle &backing, extent_type maximum_size = 0, flag _flag = flag::read | flag::write) noexcept;
   //! \overload
-  //[[bindlib::make_free]]
+  AFIO_MAKE_FREE_FUNCTION
   static inline result<section_handle> section(extent_type maximum_size, file_handle &backing, flag _flag = flag::read | flag::write) noexcept { return section(backing, maximum_size, _flag); }
   //! \overload
-  //[[bindlib::make_free]]
+  AFIO_MAKE_FREE_FUNCTION
   static inline result<section_handle> section(extent_type maximum_size) noexcept
   {
     file_handle backing;
@@ -140,7 +140,7 @@ public:
 
   \errors Any of the values NtExtendSection() can return. On POSIX this is a no op.
   */
-  //[[bindlib::make_free]]
+  AFIO_MAKE_FREE_FUNCTION
   AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<extent_type> truncate(extent_type newsize) noexcept;
 };
 inline std::ostream &operator<<(std::ostream &s, const section_handle::flag &v)
@@ -260,7 +260,7 @@ public:
 
   \errors Any of the values POSIX mmap() or NtMapViewOfSection() can return.
   */
-  //[[bindlib::make_free]]
+  AFIO_MAKE_FREE_FUNCTION
   static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<map_handle> map(size_type bytes, section_handle::flag _flag = section_handle::flag::read | section_handle::flag::write) noexcept;
 
   /*! Create a memory mapped view of a backing storage.
@@ -271,7 +271,7 @@ public:
 
   \errors Any of the values POSIX mmap() or NtMapViewOfSection() can return.
   */
-  //[[bindlib::make_free]]
+  AFIO_MAKE_FREE_FUNCTION
   static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<map_handle> map(section_handle &section, size_type bytes = 0, extent_type offset = 0, section_handle::flag _flag = section_handle::flag::read | section_handle::flag::write) noexcept;
 
   //! The memory section this handle is using
@@ -331,7 +331,7 @@ public:
   \errors None, though the various signals and structured exception throws common to using memory maps may occur.
   \mallocs None.
   */
-  //[[bindlib::make_free]]
+  AFIO_MAKE_FREE_FUNCTION
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<buffers_type> read(io_request<buffers_type> reqs, deadline d = deadline()) noexcept override;
   using io_handle::read;
 
@@ -344,7 +344,7 @@ public:
   \errors None, though the various signals and structured exception throws common to using memory maps may occur.
   \mallocs None.
   */
-  //[[bindlib::make_free]]
+  AFIO_MAKE_FREE_FUNCTION
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> write(io_request<const_buffers_type> reqs, deadline d = deadline()) noexcept override;
   using io_handle::write;
 };

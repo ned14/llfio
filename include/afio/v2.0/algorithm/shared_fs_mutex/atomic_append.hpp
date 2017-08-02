@@ -172,7 +172,7 @@ namespace algorithm
       ZFS, btrfs) guarantee atomicity of updates and therefore torn writes are never
       observed by readers. For these, hashing can be safely disabled.
       */
-      //[[bindlib::make_free]]
+      AFIO_MAKE_FREE_FUNCTION
       static result<atomic_append> fs_mutex_append(const path_handle &base, path_view lockfile, bool nfs_compatibility = false, bool skip_hashing = false) noexcept
       {
         AFIO_LOG_FUNCTION_CALL(0);
@@ -212,7 +212,7 @@ namespace algorithm
       const file_handle &handle() const noexcept { return _h; }
 
     protected:
-      virtual result<void> _lock(entities_guard &out, deadline d, bool spin_not_sleep) noexcept override final
+      AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> _lock(entities_guard &out, deadline d, bool spin_not_sleep) noexcept override final
       {
         AFIO_LOG_FUNCTION_CALL(this);
         atomic_append_detail::lock_request lock_request;
@@ -399,7 +399,7 @@ namespace algorithm
       }
 
     public:
-      virtual void unlock(entities_type entities, unsigned long long hint) noexcept override final
+      AFIO_HEADERS_ONLY_VIRTUAL_SPEC void unlock(entities_type entities, unsigned long long hint) noexcept override final
       {
         (void) entities;
         AFIO_LOG_FUNCTION_CALL(this);

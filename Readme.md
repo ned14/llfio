@@ -11,9 +11,6 @@ Outcome useful in the games/audio world.
   - [ ] Move AFIO to being tested with exceptions and RTTI disabled. Where AFIO 
 throws, have it detect __cpp_exceptions and skip those implementations.
 - [ ] Move handle caching into native_handle_type? Overlapped flag is especially needed.
-- [ ] `handle::current_path()` should be added using
-`GetFinalPathNameByHandle(FILE_NAME_OPENED)`. `VOLUME_NAME_DOS` vs `VOLUME_NAME_NT` should
-depend on the current afio::path setting.
 - [ ] Implement the long planned ACID key-value BLOB store
 with a very simple engine based on atomic renames and send it to Boost for peer review.
 

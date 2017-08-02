@@ -79,10 +79,10 @@ public:
 
   \errors Any of the values POSIX open() or CreateFile() can return.
   */
-  //[[bindlib::make_free]]
+  AFIO_MAKE_FREE_FUNCTION
   static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<path_handle> path(const path_handle &base, path_view_type _path) noexcept;
   //! \overload
-  //[[bindlib::make_free]]
+  AFIO_MAKE_FREE_FUNCTION
   static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<path_handle> path(path_view_type _path) noexcept { return path(path_handle(), _path); }
 };
 

@@ -92,7 +92,7 @@ namespace algorithm
       }
 
       //! Initialises a shared filing system mutex using the file at \em lockfile
-      //[[bindlib::make_free]]
+      AFIO_MAKE_FREE_FUNCTION
       static result<byte_ranges> fs_mutex_byte_ranges(const path_handle &base, path_view lockfile) noexcept
       {
         AFIO_LOG_FUNCTION_CALL(0);
@@ -104,7 +104,7 @@ namespace algorithm
       const file_handle &handle() const noexcept { return _h; }
 
     protected:
-      virtual result<void> _lock(entities_guard &out, deadline d, bool spin_not_sleep) noexcept override final
+      AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> _lock(entities_guard &out, deadline d, bool spin_not_sleep) noexcept override final
       {
         AFIO_LOG_FUNCTION_CALL(this);
         std::chrono::steady_clock::time_point began_steady;
@@ -196,7 +196,7 @@ namespace algorithm
       }
 
     public:
-      virtual void unlock(entities_type entities, unsigned long long) noexcept override final
+      AFIO_HEADERS_ONLY_VIRTUAL_SPEC void unlock(entities_type entities, unsigned long long) noexcept override final
       {
         AFIO_LOG_FUNCTION_CALL(this);
         for(const auto &i : entities)

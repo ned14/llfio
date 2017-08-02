@@ -78,7 +78,7 @@ struct native_handle_type
   //! Copy construct
   constexpr native_handle_type(const native_handle_type &) = default;
   //! Move construct
-  QUICKCPPLIB_CONSTEXPR native_handle_type(native_handle_type &&o) noexcept : behaviour(std::move(o.behaviour)), _init(std::move(o._init))
+  constexpr native_handle_type(native_handle_type &&o) noexcept : behaviour(std::move(o.behaviour)), _init(std::move(o._init))
   {
     o.behaviour = disposition();
     o._init = -1;

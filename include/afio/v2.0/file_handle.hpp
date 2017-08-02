@@ -145,7 +145,7 @@ public:
 
   \errors Any of the values POSIX open() or CreateFile() can return.
   */
-  //[[bindlib::make_free]]
+  AFIO_MAKE_FREE_FUNCTION
   static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<file_handle> file(const path_handle &base, path_view_type _path, mode _mode = mode::read, creation _creation = creation::open_existing, caching _caching = caching::all, flag flags = flag::none) noexcept;
   /*! Create a file handle creating a randomly named file on a path.
   The file is opened exclusively with `creation::only_if_not_exist` so it
@@ -155,7 +155,7 @@ public:
 
   \errors Any of the values POSIX open() or CreateFile() can return.
   */
-  //[[bindlib::make_free]]
+  AFIO_MAKE_FREE_FUNCTION
   static inline result<file_handle> random_file(const path_handle &dirpath, mode _mode = mode::write, caching _caching = caching::temporary, flag flags = flag::none) noexcept
   {
     try
@@ -189,7 +189,7 @@ public:
 
   \errors Any of the values POSIX open() or CreateFile() can return.
   */
-  //[[bindlib::make_free]]
+  AFIO_MAKE_FREE_FUNCTION
   static inline result<file_handle> temp_file(path_view_type name = path_view_type(), mode _mode = mode::write, creation _creation = creation::if_needed, caching _caching = caching::temporary, flag flags = flag::unlink_on_close) noexcept
   {
     OUTCOME_TRY(tempdirh, path_handle::path(temporary_files_directory()));
@@ -205,7 +205,7 @@ public:
 
   \errors Any of the values POSIX open() or CreateFile() can return.
   */
-  //[[bindlib::make_free]]
+  AFIO_MAKE_FREE_FUNCTION
   static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<file_handle> temp_inode(path_view_type dirpath = temporary_files_directory(), mode _mode = mode::write, flag flags = flag::none) noexcept;
 
   //! Unless `flag::disable_safety_unlinks` is set, the device id of the file when opened
@@ -289,7 +289,7 @@ public:
 
   \errors Any of the values POSIX fstat() or GetFileInformationByHandleEx() can return.
   */
-  //[[bindlib::make_free]]
+  AFIO_MAKE_FREE_FUNCTION
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_type> length() const noexcept;
 
   /*! Resize the current maximum permitted extent of the file to the given extent, avoiding any
@@ -300,7 +300,7 @@ public:
   \param newsize The bytes to truncate the file to.
   \errors Any of the values POSIX ftruncate() or SetFileInformationByHandle() can return.
   */
-  //[[bindlib::make_free]]
+  AFIO_MAKE_FREE_FUNCTION
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_type> truncate(extent_type newsize) noexcept;
 
 #if 0
@@ -323,7 +323,7 @@ public:
   \mallocs The default synchronous implementation in file_handle performs no memory allocation.
   The asynchronous implementation in async_file_handle performs one calloc and one free.
   */
-  //[[bindlib::make_free]]
+  AFIO_MAKE_FREE_FUNCTION
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> zero(io_request<const_buffers_type> reqs, deadline d = deadline()) noexcept;
   //! \overload
   io_result<const_buffer_type> zero(extent_type offset, const char *data, size_type bytes, deadline d = deadline()) noexcept

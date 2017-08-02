@@ -102,8 +102,8 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef __cpp_variadic_templates
 #error AFIO needs variadic template support in the compiler
 #endif
-#ifndef __cpp_constexpr
-#error AFIO needs constexpr (C++ 11) support in the compiler
+#if __cpp_constexpr < 201304
+#error AFIO needs relaxed constexpr (C++ 14) support in the compiler
 #endif
 #ifndef __cpp_init_captures
 #error AFIO needs lambda init captures support in the compiler (C++ 14)
@@ -250,10 +250,19 @@ AFIO_V2_NAMESPACE_END
 #endif
 #endif
 
+// A unique identifier generating macro
 #define AFIO_GLUE2(x, y) x##y
 #define AFIO_GLUE(x, y) AFIO_GLUE2(x, y)
 #define AFIO_UNIQUE_NAME AFIO_GLUE(__t, __COUNTER__)
 
+// Used to tag functions which need to be made free by the AST tool
+#ifndef AFIO_MAKE_FREE_FUNCTION
+#if __cplusplus >= 201700
+#define AFIO_MAKE_FREE_FUNCTION [[afio::make_free_function]]
+#else
+#define AFIO_MAKE_FREE_FUNCTION
+#endif
+#endif
 
 // Bring in bitfields
 #include "../quickcpplib/include/bitfield.hpp"
@@ -599,7 +608,7 @@ namespace detail
   public:
     constexpr function_ptr() noexcept : ptr(nullptr) {}
     constexpr function_ptr(function_ptr_storage *p) noexcept : ptr(p) {}
-    QUICKCPPLIB_CONSTEXPR function_ptr(function_ptr &&o) noexcept : ptr(o.ptr) { o.ptr = nullptr; }
+    constexpr function_ptr(function_ptr &&o) noexcept : ptr(o.ptr) { o.ptr = nullptr; }
     function_ptr &operator=(function_ptr &&o)
     {
       delete ptr;
@@ -611,14 +620,14 @@ namespace detail
     function_ptr &operator=(const function_ptr &) = delete;
     ~function_ptr() { delete ptr; }
     explicit constexpr operator bool() const noexcept { return !!ptr; }
-    QUICKCPPLIB_CONSTEXPR R operator()(Args... args) const { return (*ptr)(std::move(args)...); }
-    QUICKCPPLIB_CONSTEXPR function_ptr_storage *get() noexcept { return ptr; }
-    QUICKCPPLIB_CONSTEXPR void reset(function_ptr_storage *p = nullptr) noexcept
+    constexpr R operator()(Args... args) const { return (*ptr)(std::move(args)...); }
+    constexpr function_ptr_storage *get() noexcept { return ptr; }
+    constexpr void reset(function_ptr_storage *p = nullptr) noexcept
     {
       delete ptr;
       ptr = p;
     }
-    QUICKCPPLIB_CONSTEXPR function_ptr_storage *release() noexcept
+    constexpr function_ptr_storage *release() noexcept
     {
       auto p = ptr;
       ptr = nullptr;
