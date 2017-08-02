@@ -106,7 +106,8 @@ $(document).ready(function(){initNavTree('async__file__handle_8hpp.html','');});
 <div class="header">
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
-<a href="#namespaces">Namespaces</a>  </div>
+<a href="#namespaces">Namespaces</a> &#124;
+<a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">async_file_handle.hpp File Reference</div>  </div>
 </div><!--header-->
@@ -128,6 +129,31 @@ Namespaces</h2></td></tr>
 <tr class="memitem:namespaceafio__v2__xxx"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx.html">afio_v2_xxx</a></td></tr>
 <tr class="memdesc:namespaceafio__v2__xxx"><td class="mdescLeft">&#160;</td><td class="mdescRight">The AFIO namespace. <br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:aaca67159c4f0fc906967b9fb7912116b"><td class="memItemLeft" align="right" valign="top">result&lt; async_file_handle &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx.html#aaca67159c4f0fc906967b9fb7912116b">afio_v2_xxx::async_file</a> (io_service &amp;service, const path_handle &amp;base, async_file_handle::path_view_type _path, async_file_handle::mode _mode=async_file_handle::mode::read, async_file_handle::creation _creation=async_file_handle::creation::open_existing, async_file_handle::caching _caching=async_file_handle::caching::all, async_file_handle::flag flags=async_file_handle::flag::none) noexcept</td></tr>
+<tr class="separator:aaca67159c4f0fc906967b9fb7912116b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7f695bc414e2abe02eeaf17b0070bf74"><td class="memItemLeft" align="right" valign="top">result&lt; async_file_handle &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx.html#a7f695bc414e2abe02eeaf17b0070bf74">afio_v2_xxx::async_random_file</a> (io_service &amp;service, const path_handle &amp;dirpath, async_file_handle::mode _mode=async_file_handle::mode::write, async_file_handle::caching _caching=async_file_handle::caching::temporary, async_file_handle::flag flags=async_file_handle::flag::none) noexcept</td></tr>
+<tr class="separator:a7f695bc414e2abe02eeaf17b0070bf74"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa3cdce920646dc31d5f8d36ae0fafc2b"><td class="memItemLeft" align="right" valign="top">result&lt; async_file_handle &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx.html#aa3cdce920646dc31d5f8d36ae0fafc2b">afio_v2_xxx::async_temp_file</a> (io_service &amp;service, async_file_handle::path_view_type name=async_file_handle::path_view_type(), async_file_handle::mode _mode=async_file_handle::mode::write, async_file_handle::creation _creation=async_file_handle::creation::if_needed, async_file_handle::caching _caching=async_file_handle::caching::temporary, async_file_handle::flag flags=async_file_handle::flag::unlink_on_close) noexcept</td></tr>
+<tr class="separator:aa3cdce920646dc31d5f8d36ae0fafc2b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7e32a73d5c84a0b5aefcefe9fb2f5297"><td class="memItemLeft" align="right" valign="top">result&lt; async_file_handle &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx.html#a7e32a73d5c84a0b5aefcefe9fb2f5297">afio_v2_xxx::async_temp_inode</a> (io_service &amp;service, async_file_handle::path_view_type dirpath=temporary_files_directory(), async_file_handle::mode _mode=async_file_handle::mode::write, async_file_handle::flag flags=async_file_handle::flag::none) noexcept</td></tr>
+<tr class="separator:a7e32a73d5c84a0b5aefcefe9fb2f5297"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9b76b093cea445bbf0215e59e0533c1a"><td class="memTemplParams" colspan="2">template&lt;class CompletionRoutine &gt; </td></tr>
+<tr class="memitem:a9b76b093cea445bbf0215e59e0533c1a"><td class="memTemplItemLeft" align="right" valign="top">result<br class="typebreak"/>
+&lt; async_file_handle::io_state_ptr<br class="typebreak"/>
+&lt; CompletionRoutine, <br class="typebreak"/>
+async_file_handle::buffers_type &gt; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx.html#a9b76b093cea445bbf0215e59e0533c1a">afio_v2_xxx::async_read</a> (async_file_handle &amp;self, async_file_handle::io_request&lt; async_file_handle::buffers_type &gt; reqs, CompletionRoutine &amp;&amp;completion) noexcept</td></tr>
+<tr class="memdesc:a9b76b093cea445bbf0215e59e0533c1a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Schedule a read to occur asynchronously.  <a href="#a9b76b093cea445bbf0215e59e0533c1a">More...</a><br/></td></tr>
+<tr class="separator:a9b76b093cea445bbf0215e59e0533c1a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae02e72d068c5dfd1c686a32e614ea6f8"><td class="memTemplParams" colspan="2">template&lt;class CompletionRoutine &gt; </td></tr>
+<tr class="memitem:ae02e72d068c5dfd1c686a32e614ea6f8"><td class="memTemplItemLeft" align="right" valign="top">result<br class="typebreak"/>
+&lt; async_file_handle::io_state_ptr<br class="typebreak"/>
+&lt; CompletionRoutine, <br class="typebreak"/>
+async_file_handle::const_buffers_type &gt; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx.html#ae02e72d068c5dfd1c686a32e614ea6f8">afio_v2_xxx::async_write</a> (async_file_handle &amp;self, async_file_handle::io_request&lt; async_file_handle::const_buffers_type &gt; reqs, CompletionRoutine &amp;&amp;completion) noexcept</td></tr>
+<tr class="memdesc:ae02e72d068c5dfd1c686a32e614ea6f8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Schedule a write to occur asynchronously.  <a href="#ae02e72d068c5dfd1c686a32e614ea6f8">More...</a><br/></td></tr>
+<tr class="separator:ae02e72d068c5dfd1c686a32e614ea6f8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Provides async_file_handle. </p>

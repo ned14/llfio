@@ -106,7 +106,8 @@ $(document).ready(function(){initNavTree('io__handle_8hpp.html','');});
 <div class="header">
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
-<a href="#namespaces">Namespaces</a>  </div>
+<a href="#namespaces">Namespaces</a> &#124;
+<a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">io_handle.hpp File Reference</div>  </div>
 </div><!--header-->
@@ -142,6 +143,21 @@ Namespaces</h2></td></tr>
 <tr class="memitem:namespaceafio__v2__xxx"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx.html">afio_v2_xxx</a></td></tr>
 <tr class="memdesc:namespaceafio__v2__xxx"><td class="mdescLeft">&#160;</td><td class="mdescRight">The AFIO namespace. <br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:a3cff8f3910dbf47663e5df1dc7e5ba47"><td class="memItemLeft" align="right" valign="top">io_handle::io_result<br class="typebreak"/>
+&lt; io_handle::buffers_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx.html#a3cff8f3910dbf47663e5df1dc7e5ba47">afio_v2_xxx::read</a> (io_handle &amp;self, io_handle::io_request&lt; io_handle::buffers_type &gt; reqs, deadline d=deadline()) noexcept</td></tr>
+<tr class="memdesc:a3cff8f3910dbf47663e5df1dc7e5ba47"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read data from the open handle.  <a href="#a3cff8f3910dbf47663e5df1dc7e5ba47">More...</a><br/></td></tr>
+<tr class="separator:a3cff8f3910dbf47663e5df1dc7e5ba47"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2d15768d28ea660ebe44901508ed3372"><td class="memItemLeft" align="right" valign="top">io_handle::io_result<br class="typebreak"/>
+&lt; io_handle::const_buffers_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx.html#a2d15768d28ea660ebe44901508ed3372">afio_v2_xxx::write</a> (io_handle &amp;self, io_handle::io_request&lt; io_handle::const_buffers_type &gt; reqs, deadline d=deadline()) noexcept</td></tr>
+<tr class="memdesc:a2d15768d28ea660ebe44901508ed3372"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write data to the open handle.  <a href="#a2d15768d28ea660ebe44901508ed3372">More...</a><br/></td></tr>
+<tr class="separator:a2d15768d28ea660ebe44901508ed3372"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abb60a5dc89b41b1db101dbed12cb065d"><td class="memItemLeft" align="right" valign="top">io_handle::io_result<br class="typebreak"/>
+&lt; io_handle::const_buffers_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx.html#abb60a5dc89b41b1db101dbed12cb065d">afio_v2_xxx::barrier</a> (io_handle &amp;self, io_handle::io_request&lt; io_handle::const_buffers_type &gt; reqs=io_handle::io_request&lt; io_handle::const_buffers_type &gt;(), bool wait_for_device=false, bool and_metadata=false, deadline d=deadline()) noexcept</td></tr>
+<tr class="memdesc:abb60a5dc89b41b1db101dbed12cb065d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Issue a write reordering barrier such that writes preceding the barrier will reach storage before writes after this barrier.  <a href="#abb60a5dc89b41b1db101dbed12cb065d">More...</a><br/></td></tr>
+<tr class="separator:abb60a5dc89b41b1db101dbed12cb065d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Provides i/o handle. </p>

@@ -140,6 +140,28 @@ Functions</h2></td></tr>
 <tr class="memitem:a2e9ad4a02efc6016631baecfbc1d1d4d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2e9ad4a02efc6016631baecfbc1d1d4d"></a>
 std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>afio_v2_xxx::operator&lt;&lt;</b> (std::ostream &amp;s, const handle::flag &amp;v)</td></tr>
 <tr class="separator:a2e9ad4a02efc6016631baecfbc1d1d4d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2dbe5b8cabded7080ede1254a0625350"><td class="memItemLeft" align="right" valign="top">result&lt; section_handle &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx.html#a2dbe5b8cabded7080ede1254a0625350">afio_v2_xxx::section</a> (file_handle &amp;backing, section_handle::extent_type maximum_size=0, section_handle::flag _flag=section_handle::flag::read|section_handle::flag::write) noexcept</td></tr>
+<tr class="memdesc:a2dbe5b8cabded7080ede1254a0625350"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a memory section.  <a href="#a2dbe5b8cabded7080ede1254a0625350">More...</a><br/></td></tr>
+<tr class="separator:a2dbe5b8cabded7080ede1254a0625350"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa8b81d5171058b1ef35ab5bbf5861427"><td class="memItemLeft" align="right" valign="top">result&lt; section_handle &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx.html#aa8b81d5171058b1ef35ab5bbf5861427">afio_v2_xxx::section</a> (section_handle::extent_type maximum_size, file_handle &amp;backing, section_handle::flag _flag=section_handle::flag::read|section_handle::flag::write) noexcept</td></tr>
+<tr class="separator:aa8b81d5171058b1ef35ab5bbf5861427"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac66cb0c9b287056b325469cc52e93f97"><td class="memItemLeft" align="right" valign="top">result&lt; section_handle &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx.html#ac66cb0c9b287056b325469cc52e93f97">afio_v2_xxx::section</a> (section_handle::extent_type maximum_size) noexcept</td></tr>
+<tr class="separator:ac66cb0c9b287056b325469cc52e93f97"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aab59d71477b67ee40dc46daadddd40bb"><td class="memItemLeft" align="right" valign="top">result<br class="typebreak"/>
+&lt; section_handle::extent_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx.html#aab59d71477b67ee40dc46daadddd40bb">afio_v2_xxx::truncate</a> (section_handle &amp;self, section_handle::extent_type newsize) noexcept</td></tr>
+<tr class="separator:aab59d71477b67ee40dc46daadddd40bb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a819f25432ad3c4ec19d065a9c0ea6159"><td class="memItemLeft" align="right" valign="top">result&lt; map_handle &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx.html#a819f25432ad3c4ec19d065a9c0ea6159">afio_v2_xxx::map</a> (map_handle::size_type bytes, section_handle::flag _flag=section_handle::flag::read|section_handle::flag::write) noexcept</td></tr>
+<tr class="separator:a819f25432ad3c4ec19d065a9c0ea6159"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac0c1354bd001aa35aadb77f9c774a14d"><td class="memItemLeft" align="right" valign="top">result&lt; map_handle &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx.html#ac0c1354bd001aa35aadb77f9c774a14d">afio_v2_xxx::map</a> (section_handle &amp;section, map_handle::size_type bytes=0, map_handle::extent_type offset=0, section_handle::flag _flag=section_handle::flag::read|section_handle::flag::write) noexcept</td></tr>
+<tr class="separator:ac0c1354bd001aa35aadb77f9c774a14d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac89289d85eff137c40d3d0084c410656"><td class="memItemLeft" align="right" valign="top">map_handle::io_result<br class="typebreak"/>
+&lt; map_handle::buffers_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx.html#ac89289d85eff137c40d3d0084c410656">afio_v2_xxx::read</a> (map_handle &amp;self, map_handle::io_request&lt; map_handle::buffers_type &gt; reqs, deadline d=deadline()) noexcept</td></tr>
+<tr class="memdesc:ac89289d85eff137c40d3d0084c410656"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read data from the mapped view.  <a href="#ac89289d85eff137c40d3d0084c410656">More...</a><br/></td></tr>
+<tr class="separator:ac89289d85eff137c40d3d0084c410656"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5bfae365a1845c1bde4739de38c3653f"><td class="memItemLeft" align="right" valign="top">map_handle::io_result<br class="typebreak"/>
+&lt; map_handle::const_buffers_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx.html#a5bfae365a1845c1bde4739de38c3653f">afio_v2_xxx::write</a> (map_handle &amp;self, map_handle::io_request&lt; map_handle::const_buffers_type &gt; reqs, deadline d=deadline()) noexcept</td></tr>
+<tr class="memdesc:a5bfae365a1845c1bde4739de38c3653f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write data to the mapped view.  <a href="#a5bfae365a1845c1bde4739de38c3653f">More...</a><br/></td></tr>
+<tr class="separator:a5bfae365a1845c1bde4739de38c3653f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Provides <code>map_handle</code> </p>
