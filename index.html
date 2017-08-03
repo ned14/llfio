@@ -224,10 +224,6 @@ async_file_handle - adds asynchronous scatter-gather i/o</li>
 <tr>
 <td>✔ (POSIX AIO support) </td><td>✔ </td><td>✔ </td><td>Asynchronous universal scatter-gather i/o. </td></tr>
 <tr>
-<td></td><td></td><td></td><td>BSD and OS X kqueues optimised <code>io_service</code> </td></tr>
-<tr>
-<td>✔ </td><td></td><td></td><td>Linux KAIO support for native async <code>O_DIRECT</code> i/o </td></tr>
-<tr>
 <td>✔ </td><td>✔ </td><td>✔ </td><td>i/o deadlines and cancellation. </td></tr>
 <tr>
 <td></td><td>✔ </td><td>✔ </td><td>Retrieving and setting the current maximum extent (size) of an open file. </td></tr>
@@ -262,6 +258,12 @@ async_file_handle - adds asynchronous scatter-gather i/o</li>
 <td></td><td></td><td></td><td>Directory handles and very fast directory enumeration ported over from AFIO v1. </td></tr>
 <tr>
 <td>✔ </td><td></td><td></td><td>Extended attributes support. </td></tr>
+<tr>
+<td>✔ </td><td></td><td></td><td>Coroutines TS integration for <code>async_file_handle</code>. Use example: <a href="https://gist.github.com/anonymous/a67ba4695c223a905ff108ed8b9a342f">https://gist.github.com/anonymous/a67ba4695c223a905ff108ed8b9a342f</a> </td></tr>
+<tr>
+<td></td><td></td><td></td><td>BSD and OS X kqueues optimised <code>io_service</code> </td></tr>
+<tr>
+<td>✔ </td><td></td><td></td><td>Linux KAIO support for native async <code>O_DIRECT</code> i/o </td></tr>
 <tr>
 <td></td><td></td><td></td><td>Reliable directory hierarchy deletion algorithm. </td></tr>
 <tr>
