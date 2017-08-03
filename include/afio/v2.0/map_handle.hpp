@@ -71,14 +71,14 @@ protected:
 
 public:
   //! Default constructor
-  section_handle()
+  constexpr section_handle()
       : _backing(nullptr)
       , _length(0)
       , _flag(flag::none)
   {
   }
   //! Construct a section handle using the given native handle type for the section and the given i/o handle for the backing storage
-  explicit section_handle(native_handle_type sectionh, io_handle *backing, extent_type maximum_size, flag __flag)
+  explicit constexpr section_handle(native_handle_type sectionh, io_handle *backing, extent_type maximum_size, flag __flag)
       : handle(sectionh, handle::caching::all)
       , _backing(backing)
       , _length(maximum_size)
@@ -86,7 +86,7 @@ public:
   {
   }
   //! Implicit move construction of section_handle permitted
-  section_handle(section_handle &&o) noexcept : handle(std::move(o)), _backing(o._backing), _length(o._length), _flag(o._flag)
+  constexpr section_handle(section_handle &&o) noexcept : handle(std::move(o)), _backing(o._backing), _length(o._length), _flag(o._flag)
   {
     o._backing = nullptr;
     o._length = 0;
@@ -210,7 +210,7 @@ protected:
 
 public:
   //! Default constructor
-  map_handle()
+  constexpr map_handle()
       : io_handle()
       , _section(nullptr)
       , _addr(nullptr)
@@ -220,7 +220,7 @@ public:
   }
   AFIO_HEADERS_ONLY_MEMFUNC_SPEC ~map_handle();
   //! Implicit move construction of map_handle permitted
-  map_handle(map_handle &&o) noexcept : io_handle(std::move(o)), _section(o._section), _addr(o._addr), _offset(o._offset), _length(o._length)
+  constexpr map_handle(map_handle &&o) noexcept : io_handle(std::move(o)), _section(o._section), _addr(o._addr), _offset(o._offset), _length(o._length)
   {
     o._section = nullptr;
     o._addr = nullptr;

@@ -161,7 +161,7 @@ public:
   //! No copy assignment
   handle &operator=(const handle &o) = delete;
   //! Move the handle.
-  handle(handle &&o) noexcept : _caching(o._caching), _flags(o._flags), _v(std::move(o._v))
+  constexpr handle(handle &&o) noexcept : _caching(o._caching), _flags(o._flags), _v(std::move(o._v))
   {
     o._caching = caching::none;
     o._flags = flag::none;

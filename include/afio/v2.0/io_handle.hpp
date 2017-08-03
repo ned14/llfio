@@ -173,7 +173,7 @@ public:
   {
   }
   //! Explicit conversion from handle permitted
-  explicit io_handle(handle &&o) noexcept : handle(std::move(o)) {}
+  explicit constexpr io_handle(handle &&o) noexcept : handle(std::move(o)) {}
   //! Move construction permitted
   io_handle(io_handle &&) = default;
   //! Move assignment permitted

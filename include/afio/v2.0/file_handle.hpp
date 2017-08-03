@@ -87,6 +87,7 @@ protected:
 #ifdef __FreeBSD__  // FreeBSD can't look up the current path of file, only a directory
   path_handle _pathbase;
   path_type _path;
+#error TODO: Finish FreeBSD support
 #endif
   io_service *_service;
 
@@ -95,7 +96,7 @@ protected:
 
 public:
   //! Default constructor
-  file_handle()
+  constexpr file_handle()
       : io_handle()
       , _devid(0)
       , _inode(0)
@@ -103,7 +104,7 @@ public:
   {
   }
   //! Construct a handle from a supplied native handle
-  file_handle(native_handle_type h, dev_t devid, ino_t inode, caching caching = caching::none, flag flags = flag::none)
+  constexpr file_handle(native_handle_type h, dev_t devid, ino_t inode, caching caching = caching::none, flag flags = flag::none)
       : io_handle(std::move(h), std::move(caching), std::move(flags))
       , _devid(devid)
       , _inode(inode)
@@ -111,21 +112,21 @@ public:
   {
   }
   //! Implicit move construction of file_handle permitted
-  file_handle(file_handle &&o) noexcept : io_handle(std::move(o)),
-                                          _devid(o._devid),
-                                          _inode(o._inode),
+  constexpr file_handle(file_handle &&o) noexcept : io_handle(std::move(o)),
+                                                    _devid(o._devid),
+                                                    _inode(o._inode),
 #ifdef __FreeBSD__
-                                          _pathbase(std::move(o._pathbase)),
-                                          _path(std::move(o._path)),
+                                                    _pathbase(std::move(o._pathbase)),
+                                                    _path(std::move(o._path)),
 #endif
-                                          _service(o._service)
+                                                    _service(o._service)
   {
     o._devid = 0;
     o._inode = 0;
     o._service = nullptr;
   }
   //! Explicit conversion from handle and io_handle permitted
-  explicit file_handle(handle &&o, dev_t devid, ino_t inode) noexcept : io_handle(std::move(o)), _devid(devid), _inode(inode), _service(nullptr) {}
+  explicit constexpr file_handle(handle &&o, dev_t devid, ino_t inode) noexcept : io_handle(std::move(o)), _devid(devid), _inode(inode), _service(nullptr) {}
   //! Move assignment of file_handle permitted
   file_handle &operator=(file_handle &&o) noexcept
   {
@@ -336,7 +337,8 @@ public:
 
 \errors Any of the values POSIX open() or CreateFile() can return.
 */
-inline result<file_handle> file(const path_handle &base, file_handle::path_view_type _path, file_handle::mode _mode = file_handle::mode::read, file_handle::creation _creation = file_handle::creation::open_existing, file_handle::caching _caching = file_handle::caching::all, file_handle::flag flags = file_handle::flag::none) noexcept
+inline result<file_handle> file(const path_handle &base, file_handle::path_view_type _path, file_handle::mode _mode = file_handle::mode::read, file_handle::creation _creation = file_handle::creation::open_existing, file_handle::caching _caching = file_handle::caching::all,
+                                file_handle::flag flags = file_handle::flag::none) noexcept
 {
   return file_handle::file(std::forward<decltype(base)>(base), std::forward<decltype(_path)>(_path), std::forward<decltype(_mode)>(_mode), std::forward<decltype(_creation)>(_creation), std::forward<decltype(_caching)>(_caching), std::forward<decltype(flags)>(flags));
 }
@@ -367,7 +369,8 @@ to use. Use `temp_inode()` instead, it is far more secure.
 
 \errors Any of the values POSIX open() or CreateFile() can return.
 */
-inline result<file_handle> temp_file(file_handle::path_view_type name = file_handle::path_view_type(), file_handle::mode _mode = file_handle::mode::write, file_handle::creation _creation = file_handle::creation::if_needed, file_handle::caching _caching = file_handle::caching::temporary, file_handle::flag flags = file_handle::flag::unlink_on_close) noexcept
+inline result<file_handle> temp_file(file_handle::path_view_type name = file_handle::path_view_type(), file_handle::mode _mode = file_handle::mode::write, file_handle::creation _creation = file_handle::creation::if_needed, file_handle::caching _caching = file_handle::caching::temporary,
+                                     file_handle::flag flags = file_handle::flag::unlink_on_close) noexcept
 {
   return file_handle::temp_file(std::forward<decltype(name)>(name), std::forward<decltype(_mode)>(_mode), std::forward<decltype(_creation)>(_creation), std::forward<decltype(_caching)>(_caching), std::forward<decltype(flags)>(flags));
 }

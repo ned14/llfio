@@ -87,8 +87,6 @@ Todo:
 |   | ✔ |   | NT kernel path support (32,768 path limit).
 | ✔ | ✔ | ✔ | Synchronous universal scatter-gather i/o.
 | ✔ (POSIX AIO support) | ✔ | ✔ | Asynchronous universal scatter-gather i/o.
-|   |   |   | BSD and OS X kqueues optimised `io_service`
-| ✔ |   |   | Linux KAIO support for native async `O_DIRECT` i/o
 | ✔ | ✔ | ✔ | i/o deadlines and cancellation.
 |   | ✔ | ✔ | Retrieving and setting the current maximum extent (size) of an open file.
 |   | ✔ | ✔ | Retrieving the current path of an open file irrespective of where it has been renamed to by third parties.
@@ -109,6 +107,9 @@ Todo:
 | --------- | --------| ----- | --- |
 |   |   |   | Directory handles and very fast directory enumeration ported over from AFIO v1.
 | ✔ |   |   | Extended attributes support.
+| ✔ |   |   | Coroutines TS integration for `async_file_handle`. Use example: https://gist.github.com/anonymous/a67ba4695c223a905ff108ed8b9a342f
+|   |   |   | BSD and OS X kqueues optimised `io_service`
+| ✔ |   |   | Linux KAIO support for native async `O_DIRECT` i/o
 |   |   |   | Reliable directory hierarchy deletion algorithm.
 |   |   |   | Reliable directory hierarchy copy algorithm.
 | ✔ |   |   | Reliable directory hierarchy update (two and three way) algorithm.

@@ -67,7 +67,7 @@ public:
   async_file_handle() = default;
 
   //! Construct a handle from a supplied native handle
-  async_file_handle(io_service *service, native_handle_type h, dev_t devid, ino_t inode, caching caching = caching::none, flag flags = flag::none)
+  constexpr async_file_handle(io_service *service, native_handle_type h, dev_t devid, ino_t inode, caching caching = caching::none, flag flags = flag::none)
       : file_handle(std::move(h), devid, inode, std::move(caching), std::move(flags))
   {
     this->_service = service;
@@ -75,9 +75,9 @@ public:
   //! Implicit move construction of async_file_handle permitted
   async_file_handle(async_file_handle &&o) noexcept = default;
   //! Explicit conversion from file_handle permitted
-  explicit async_file_handle(file_handle &&o) noexcept : file_handle(std::move(o)) {}
+  explicit constexpr async_file_handle(file_handle &&o) noexcept : file_handle(std::move(o)) {}
   //! Explicit conversion from handle and io_handle permitted
-  explicit async_file_handle(handle &&o, io_service *service, dev_t devid, ino_t inode) noexcept : file_handle(std::move(o), devid, inode) { this->_service = service; }
+  explicit constexpr async_file_handle(handle &&o, io_service *service, dev_t devid, ino_t inode) noexcept : file_handle(std::move(o), devid, inode) { this->_service = service; }
   //! Move assignment of async_file_handle permitted
   async_file_handle &operator=(async_file_handle &&o) noexcept
   {
@@ -311,9 +311,11 @@ using the given io_service.
 
 \errors Any of the values POSIX open() or CreateFile() can return.
 */
-inline result<async_file_handle> async_file(io_service &service, const path_handle &base, async_file_handle::path_view_type _path, async_file_handle::mode _mode = async_file_handle::mode::read, async_file_handle::creation _creation = async_file_handle::creation::open_existing, async_file_handle::caching _caching = async_file_handle::caching::all, async_file_handle::flag flags = async_file_handle::flag::none) noexcept
+inline result<async_file_handle> async_file(io_service &service, const path_handle &base, async_file_handle::path_view_type _path, async_file_handle::mode _mode = async_file_handle::mode::read, async_file_handle::creation _creation = async_file_handle::creation::open_existing,
+                                            async_file_handle::caching _caching = async_file_handle::caching::all, async_file_handle::flag flags = async_file_handle::flag::none) noexcept
 {
-  return async_file_handle::async_file(std::forward<decltype(service)>(service), std::forward<decltype(base)>(base), std::forward<decltype(_path)>(_path), std::forward<decltype(_mode)>(_mode), std::forward<decltype(_creation)>(_creation), std::forward<decltype(_caching)>(_caching), std::forward<decltype(flags)>(flags));
+  return async_file_handle::async_file(std::forward<decltype(service)>(service), std::forward<decltype(base)>(base), std::forward<decltype(_path)>(_path), std::forward<decltype(_mode)>(_mode), std::forward<decltype(_creation)>(_creation), std::forward<decltype(_caching)>(_caching),
+                                       std::forward<decltype(flags)>(flags));
 }
 /*! Create an async file handle creating a randomly named file on a path.
 The file is opened exclusively with `creation::only_if_not_exist` so it
@@ -342,7 +344,8 @@ to use. Use `temp_inode()` instead, it is far more secure.
 
 \errors Any of the values POSIX open() or CreateFile() can return.
 */
-inline result<async_file_handle> async_temp_file(io_service &service, async_file_handle::path_view_type name = async_file_handle::path_view_type(), async_file_handle::mode _mode = async_file_handle::mode::write, async_file_handle::creation _creation = async_file_handle::creation::if_needed, async_file_handle::caching _caching = async_file_handle::caching::temporary, async_file_handle::flag flags = async_file_handle::flag::unlink_on_close) noexcept
+inline result<async_file_handle> async_temp_file(io_service &service, async_file_handle::path_view_type name = async_file_handle::path_view_type(), async_file_handle::mode _mode = async_file_handle::mode::write, async_file_handle::creation _creation = async_file_handle::creation::if_needed,
+                                                 async_file_handle::caching _caching = async_file_handle::caching::temporary, async_file_handle::flag flags = async_file_handle::flag::unlink_on_close) noexcept
 {
   return async_file_handle::async_temp_file(std::forward<decltype(service)>(service), std::forward<decltype(name)>(name), std::forward<decltype(_mode)>(_mode), std::forward<decltype(_creation)>(_creation), std::forward<decltype(_caching)>(_caching), std::forward<decltype(flags)>(flags));
 }

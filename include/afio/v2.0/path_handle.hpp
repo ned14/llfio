@@ -66,7 +66,7 @@ public:
   {
   }
   //! Explicit conversion from handle permitted
-  explicit path_handle(handle &&o) noexcept : handle(std::move(o)) {}
+  explicit constexpr path_handle(handle &&o) noexcept : handle(std::move(o)) {}
   //! Move construction permitted
   path_handle(path_handle &&) = default;
   //! Move assignment permitted
