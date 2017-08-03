@@ -368,4 +368,118 @@ result<file_handle::extent_type> file_handle::truncate(file_handle::extent_type 
   return newsize;
 }
 
+result<std::vector<std::pair<file_handle::extent_type, file_handle::extent_type>>> file_handle::extents() const noexcept
+{
+  AFIO_LOG_FUNCTION_CALL(this);
+  try
+  {
+    std::vector<std::pair<file_handle::extent_type, file_handle::extent_type>> out;
+    out.reserve(64);
+    extent_type start = 0, end = 0;
+    for(;;)
+    {
+#ifdef __linux__
+      start = lseek64(_v.fd, end, SEEK_DATA);
+      if((extent_type) -1 == start)
+        break;
+      end = lseek64(_v.fd, start, SEEK_HOLE);
+      if((extent_type) -1 == end)
+        break;
+#elif defined(__APPLE__)
+      // Can't find any support for extent enumeration in OS X
+      errno = EINVAL;
+      break;
+#elif defined(__FreeBSD__)
+      start = lseek(_v.fd, end, SEEK_DATA);
+      if((extent_type) -1 == start)
+        break;
+      end = lseek(_v.fd, start, SEEK_HOLE);
+      if((extent_type) -1 == end)
+        break;
+#else
+#error Unknown system
+#endif
+      // Data region may have been concurrently deleted
+      if(end > start)
+        out.push_back(std::make_pair(std::move(start), end - start));
+    }
+    if(ENXIO != errno)
+    {
+      if(EINVAL == errno)
+      {
+        // If it failed with no output, probably this filing system doesn't support extents
+        if(out.empty())
+        {
+          OUTCOME_TRY(size, file_handle::length());
+          out.push_back(std::make_pair(0, size));
+          return out;
+        }
+      }
+      else
+        return {errno, std::system_category()};
+    }
+#if 0
+  // A problem with SEEK_DATA and SEEK_HOLE is that they are racy under concurrent extents changing
+  // Coalesce sequences of contiguous data e.g. 0, 64; 64, 64; 128, 64 ...
+  std::vector<std::pair<extent_type, extent_type>> outfixed; outfixed.reserve(out.size());
+  outfixed.push_back(out.front());
+  for (size_t n = 1; n<out.size(); n++)
+  {
+    if (outfixed.back().first + outfixed.back().second == out[n].first)
+      outfixed.back().second += out[n].second;
+    else
+      outfixed.push_back(out[n]);
+  }
+  return outfixed;
+#endif
+    return out;
+  }
+  catch(...)
+  {
+    return error_from_exception();
+  }
+}
+
+result<file_handle::extent_type> file_handle::zero(file_handle::extent_type offset, file_handle::extent_type bytes, deadline d) noexcept
+{
+  AFIO_LOG_FUNCTION_CALL(this);
+#if defined(__linux__)
+  if(-1 == fallocate(_v.fd, 0x02 /*FALLOC_FL_PUNCH_HOLE*/ | 0x01 /*FALLOC_FL_KEEP_SIZE*/, offset, bytes))
+  {
+    // The filing system may not support trim
+    if(EOPNOTSUPP != errno)
+      return {errno, std::system_category()};
+  }
+#endif
+  // Fall back onto a write of zeros
+  if(bytes < utils::page_size())
+  {
+    char *buffer = (char *) alloca(bytes);
+    memset(buffer, 0, bytes);
+    OUTCOME_TRY(written, write(offset, buffer, bytes, d));
+    return written.len;
+  }
+  try
+  {
+    extent_type ret = 0;
+    auto blocksize = utils::file_buffer_default_size();
+    char *buffer = utils::page_allocator<char>().allocate(blocksize);
+    auto unbufferh = undoer([buffer, blocksize] { utils::page_allocator<char>().deallocate(buffer, blocksize); });
+    (void) unbufferh;
+    while(bytes > 0)
+    {
+      auto towrite = (bytes < blocksize) ? bytes : blocksize;
+      OUTCOME_TRY(written, write(offset, buffer, towrite, d));
+      offset += written.len;
+      bytes -= written.len;
+      ret += written.len;
+    }
+    return ret;
+  }
+  catch(...)
+  {
+    return error_from_exception();
+  }
+}
+
 AFIO_V2_NAMESPACE_END

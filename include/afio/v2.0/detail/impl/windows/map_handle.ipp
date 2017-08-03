@@ -372,12 +372,22 @@ result<map_handle::buffer_type> map_handle::decommit(buffer_type region) noexcep
 
 result<void> map_handle::zero_memory(buffer_type region) noexcept
 {
+  windows_nt_kernel::init();
+  using namespace windows_nt_kernel;
   AFIO_LOG_FUNCTION_CALL(this);
   if(!region.data)
     return std::errc::invalid_argument;
-  //! \todo Once you implement file_handle::zero(), please implement map_handle::zero()
-  // buffer_type page_region { (char *) utils::round_up_to_page_size((uintptr_t) region.data), utils::round_down_to_page_size(region.len); };
+  // Alas, zero() will not work on mapped views on Windows :(, so memset to zero and call discard if available
   memset(region.data, 0, region.len);
+  if(DiscardVirtualMemory_ && region.len >= utils::page_size())
+  {
+    region = utils::round_to_page_size(region);
+    if(region.len > 0)
+    {
+      if(!DiscardVirtualMemory_(region.data, region.len))
+        return {GetLastError(), std::system_category()};
+    }
+  }
   return success();
 }
 

@@ -258,7 +258,7 @@ result<void> map_handle::zero_memory(buffer_type region) noexcept
     return success();
   }
 #endif
-  //! \todo Once you implement file_handle::zero(), please implement map_handle::zero()
+  //! Only Linux implements syscall zero(), and it's covered by MADV_REMOVE already
   memset(region.data, 0, region.len);
   return success();
 }

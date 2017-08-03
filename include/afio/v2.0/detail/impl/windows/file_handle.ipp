@@ -273,11 +273,11 @@ result<file_handle> file_handle::temp_inode(file_handle::path_view_type dirpath,
     {
       IO_STATUS_BLOCK isb = make_iostatus();
       NTSTATUS ntstat = NtCreateFile(&nativeh.h, access, &oa, &isb, &AllocationSize, attribs, fileshare, creatdisp, ntflags, NULL, 0);
-      if (STATUS_PENDING == ntstat)
+      if(STATUS_PENDING == ntstat)
         ntstat = ntwait(nativeh.h, isb, deadline());
-      if (ntstat < 0 && ntstat != (NTSTATUS)0xC0000035L /*STATUS_OBJECT_NAME_COLLISION*/)
+      if(ntstat < 0 && ntstat != (NTSTATUS) 0xC0000035L /*STATUS_OBJECT_NAME_COLLISION*/)
       {
-        return { (int)ntstat, ntkernel_category() };
+        return {(int) ntstat, ntkernel_category()};
       }
     }
     OUTCOME_TRYV(ret.value()._fetch_inode());  // It can be useful to know the inode of temporary inodes
@@ -432,6 +432,73 @@ result<file_handle::extent_type> file_handle::truncate(file_handle::extent_type 
     FlushFileBuffers(_v.h);
   }
   return newsize;
+}
+
+result<std::vector<std::pair<file_handle::extent_type, file_handle::extent_type>>> file_handle::extents() const noexcept
+{
+  windows_nt_kernel::init();
+  using namespace windows_nt_kernel;
+  AFIO_LOG_FUNCTION_CALL(this);
+  try
+  {
+    static_assert(sizeof(std::pair<file_handle::extent_type, file_handle::extent_type>) == sizeof(FILE_ALLOCATED_RANGE_BUFFER), "FILE_ALLOCATED_RANGE_BUFFER is not equivalent to pair<extent_type, extent_type>!");
+    std::vector<std::pair<file_handle::extent_type, file_handle::extent_type>> ret;
+#ifdef NDEBUG
+    ret.resize(64);
+#else
+    ret.resize(1);
+#endif
+    FILE_ALLOCATED_RANGE_BUFFER farb;
+    farb.FileOffset.QuadPart = 0;
+    farb.Length.QuadPart = ((extent_type) 1 << 63) - 1;  // Microsoft claims this is 1<<64-1024 for NTFS, but I get bad parameter error with anything higher than 1<<63-1.
+    DWORD bytesout = 0;
+    OVERLAPPED ol;
+    memset(&ol, 0, sizeof(ol));
+    ol.Internal = (ULONG_PTR) -1;
+    while(!DeviceIoControl(_v.h, FSCTL_QUERY_ALLOCATED_RANGES, &farb, sizeof(farb), ret.data(), (DWORD)(ret.size() * sizeof(FILE_ALLOCATED_RANGE_BUFFER)), &bytesout, &ol))
+    {
+      if(ERROR_INSUFFICIENT_BUFFER == GetLastError() || ERROR_MORE_DATA == GetLastError())
+      {
+        ret.resize(ret.size() * 2);
+        continue;
+      }
+      if(ERROR_SUCCESS != GetLastError())
+        return {GetLastError(), std::system_category()};
+    }
+    return ret;
+  }
+  catch(...)
+  {
+    return error_from_exception();
+  }
+}
+
+result<file_handle::extent_type> file_handle::zero(file_handle::extent_type offset, file_handle::extent_type bytes, deadline /*unused*/) noexcept
+{
+  windows_nt_kernel::init();
+  using namespace windows_nt_kernel;
+  AFIO_LOG_FUNCTION_CALL(this);
+  if(offset + bytes < offset)
+    return std::errc::value_too_large;
+  FILE_ZERO_DATA_INFORMATION fzdi;
+  fzdi.FileOffset.QuadPart = offset;
+  fzdi.BeyondFinalZero.QuadPart = offset + bytes;
+  DWORD bytesout = 0;
+  OVERLAPPED ol;
+  memset(&ol, 0, sizeof(ol));
+  ol.Internal = (ULONG_PTR) -1;
+  if(!DeviceIoControl(_v.h, FSCTL_SET_ZERO_DATA, &fzdi, sizeof(fzdi), nullptr, 0, &bytesout, &ol))
+  {
+    if(ERROR_IO_PENDING == GetLastError())
+    {
+      NTSTATUS ntstat = ntwait(_v.h, ol, deadline());
+      if(ntstat)
+        return {ntstat, ntkernel_category()};
+    }
+    if(ERROR_SUCCESS != GetLastError())
+      return {GetLastError(), std::system_category()};
+  }
+  return success();
 }
 
 AFIO_V2_NAMESPACE_END

@@ -101,12 +101,12 @@ Todo:
 |   | ✔ | ✔ | Memory mapped files and virtual memory management (`section_handle` and `map_handle`)
 | ✔ | ✔ | ✔ | `shared_fs_mutex` shared/exclusive entities locking based on memory maps
 | ✔ | ✔ | ✔ | Universal portable UTF-8 path views.
+|   | ✔ | ✔ | "Hole punching" and hole enumeration ported over from AFIO v1.
 
 Todo:
 
 | NEW in v2 | Windows | POSIX |     |
 | --------- | --------| ----- | --- |
-|   |   |   | "Hole punching" and hole enumeration ported over from AFIO v1.
 |   |   |   | Directory handles and very fast directory enumeration ported over from AFIO v1.
 | ✔ |   |   | Extended attributes support.
 |   |   |   | Reliable directory hierarchy deletion algorithm.
