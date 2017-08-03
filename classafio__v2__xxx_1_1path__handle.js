@@ -8,9 +8,8 @@ var classafio__v2__xxx_1_1path__handle =
     [ "path_type", "classafio__v2__xxx_1_1path__handle.html#aff461906ee411a03278d20824201becf", null ],
     [ "path_view_type", "classafio__v2__xxx_1_1path__handle.html#abe4d76fd0308667d7b5727c69cfe943f", null ],
     [ "size_type", "classafio__v2__xxx_1_1path__handle.html#a8373f12c4835eecf6a3dce32eb16cc9e", null ],
-    [ "unique_id_type", "classafio__v2__xxx_1_1path__handle.html#a04971d1f6ab4059556caafb3ad0e19a3", null ],
     [ "path_handle", "classafio__v2__xxx_1_1path__handle.html#a61039e1770420c4e72814a942a188220", null ],
-    [ "path_handle", "classafio__v2__xxx_1_1path__handle.html#a0520150407f62eb614a093f3201e7dd6", null ],
+    [ "path_handle", "classafio__v2__xxx_1_1path__handle.html#adfa0356d4ef899bad7a510f718cbed5f", null ],
     [ "path_handle", "classafio__v2__xxx_1_1path__handle.html#a99b23d7a01380400ee1f69cc840684c1", null ],
     [ "path_handle", "classafio__v2__xxx_1_1path__handle.html#a88881e89f538f09c1eaf9447a8182eea", null ],
     [ "are_reads_from_cache", "classafio__v2__xxx_1_1path__handle.html#a71137cb82edd9a1bcb24f64886b5826d", null ],
@@ -40,7 +39,6 @@ var classafio__v2__xxx_1_1path__handle =
     [ "set_append_only", "classafio__v2__xxx_1_1path__handle.html#af1610ec7fb0a41f039e3e17e0dc467ab", null ],
     [ "set_kernel_caching", "classafio__v2__xxx_1_1path__handle.html#ad90f8264470763069256ae9eeda45e69", null ],
     [ "swap", "classafio__v2__xxx_1_1path__handle.html#a657c12a309cf02bf2351bfcc7f41463b", null ],
-    [ "unique_id", "classafio__v2__xxx_1_1path__handle.html#a1d633fb0752e739e057503fbf5dc6e80", null ],
     [ "_caching", "classafio__v2__xxx_1_1path__handle.html#af024e3d92d9a01ac367734e9cdc517fb", null ],
     [ "_flags", "classafio__v2__xxx_1_1path__handle.html#ac46e0a296c31fcd0a996a79d78647fb6", null ],
     [ "_v", "classafio__v2__xxx_1_1path__handle.html#a771ef2bf39ad784eb6265dde077792ad", null ]

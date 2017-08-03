@@ -5,7 +5,6 @@ var classafio__v2__xxx_1_1handle =
     [ "flag", "classafio__v2__xxx_1_1handle.html#a70137cea6eedc190392200f7ffe2c70c", null ],
     [ "path_type", "classafio__v2__xxx_1_1handle.html#a6c4df2242ece6f63ba7ef4e6baafaca6", null ],
     [ "size_type", "classafio__v2__xxx_1_1handle.html#a0adf7fa00e23ed561328f473986e9ccc", null ],
-    [ "unique_id_type", "classafio__v2__xxx_1_1handle.html#a04971d1f6ab4059556caafb3ad0e19a3", null ],
     [ "caching", "classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9e", [
       [ "unchanged", "classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9ea8d7b3d6b83c0a517eac07e1aac94b773", null ],
       [ "none", "classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9ea334c4a4c42fdb79d7ebc3e73b517e6f8", null ],
@@ -64,7 +63,6 @@ var classafio__v2__xxx_1_1handle =
     [ "set_append_only", "classafio__v2__xxx_1_1handle.html#af1610ec7fb0a41f039e3e17e0dc467ab", null ],
     [ "set_kernel_caching", "classafio__v2__xxx_1_1handle.html#ad90f8264470763069256ae9eeda45e69", null ],
     [ "swap", "classafio__v2__xxx_1_1handle.html#a657c12a309cf02bf2351bfcc7f41463b", null ],
-    [ "unique_id", "classafio__v2__xxx_1_1handle.html#a1d633fb0752e739e057503fbf5dc6e80", null ],
     [ "operator<<", "classafio__v2__xxx_1_1handle.html#a5c7d33dcd1f366fa378607e1dd087744", null ],
     [ "_caching", "classafio__v2__xxx_1_1handle.html#af024e3d92d9a01ac367734e9cdc517fb", null ],
     [ "_flags", "classafio__v2__xxx_1_1handle.html#ac46e0a296c31fcd0a996a79d78647fb6", null ],

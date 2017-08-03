@@ -6,6 +6,7 @@ var dir_df838802a8d72797f186037846947269 =
     [ "config.hpp", "config_8hpp.html", "config_8hpp" ],
     [ "deadline.h", "deadline_8h.html", "deadline_8h" ],
     [ "file_handle.hpp", "file__handle_8hpp.html", "file__handle_8hpp" ],
+    [ "fs_handle.hpp", "fs__handle_8hpp.html", "fs__handle_8hpp" ],
     [ "handle.hpp", "handle_8hpp.html", "handle_8hpp" ],
     [ "io_handle.hpp", "io__handle_8hpp.html", "io__handle_8hpp" ],
     [ "io_service.hpp", "io__service_8hpp.html", "io__service_8hpp" ],

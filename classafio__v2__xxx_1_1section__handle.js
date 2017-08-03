@@ -5,7 +5,6 @@ var classafio__v2__xxx_1_1section__handle =
     [ "flag", "classafio__v2__xxx_1_1section__handle.html#a9d31e04371c3a752c581359c8eb965c7", null ],
     [ "path_type", "classafio__v2__xxx_1_1section__handle.html#a6c4df2242ece6f63ba7ef4e6baafaca6", null ],
     [ "size_type", "classafio__v2__xxx_1_1section__handle.html#aab05cce42ff482ab80ba122c7871c932", null ],
-    [ "unique_id_type", "classafio__v2__xxx_1_1section__handle.html#a04971d1f6ab4059556caafb3ad0e19a3", null ],
     [ "caching", "classafio__v2__xxx_1_1section__handle.html#a6f7e37c73271968271c2342023f58c9e", [
       [ "unchanged", "classafio__v2__xxx_1_1section__handle.html#a6f7e37c73271968271c2342023f58c9ea8d7b3d6b83c0a517eac07e1aac94b773", null ],
       [ "none", "classafio__v2__xxx_1_1section__handle.html#a6f7e37c73271968271c2342023f58c9ea334c4a4c42fdb79d7ebc3e73b517e6f8", null ],
@@ -67,7 +66,6 @@ var classafio__v2__xxx_1_1section__handle =
     [ "swap", "classafio__v2__xxx_1_1section__handle.html#a852a6b382a9e69f568977b2cd53e0496", null ],
     [ "swap", "classafio__v2__xxx_1_1section__handle.html#a657c12a309cf02bf2351bfcc7f41463b", null ],
     [ "truncate", "classafio__v2__xxx_1_1section__handle.html#ac855a808ee7367d35f2616aed62e9ed8", null ],
-    [ "unique_id", "classafio__v2__xxx_1_1section__handle.html#a1d633fb0752e739e057503fbf5dc6e80", null ],
     [ "_backing", "classafio__v2__xxx_1_1section__handle.html#afafd65b2a47414273650e5f2e4c48006", null ],
     [ "_caching", "classafio__v2__xxx_1_1section__handle.html#af024e3d92d9a01ac367734e9cdc517fb", null ],
     [ "_flag", "classafio__v2__xxx_1_1section__handle.html#afa234bf3475037d668f5f0a9e55ad036", null ],

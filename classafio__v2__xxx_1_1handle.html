@@ -191,10 +191,6 @@ using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cla
 using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1handle.html#a0adf7fa00e23ed561328f473986e9ccc">size_type</a> = size_t</td></tr>
 <tr class="memdesc:a0adf7fa00e23ed561328f473986e9ccc"><td class="mdescLeft">&#160;</td><td class="mdescRight">The memory extent type used by this handle. <br/></td></tr>
 <tr class="separator:a0adf7fa00e23ed561328f473986e9ccc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a04971d1f6ab4059556caafb3ad0e19a3"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a04971d1f6ab4059556caafb3ad0e19a3"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1handle.html#a04971d1f6ab4059556caafb3ad0e19a3">unique_id_type</a> = QUICKCPPLIB_NAMESPACE::integers128::uint128</td></tr>
-<tr class="memdesc:a04971d1f6ab4059556caafb3ad0e19a3"><td class="mdescLeft">&#160;</td><td class="mdescRight">The unique identifier type used by this handle. <br/></td></tr>
-<tr class="separator:a04971d1f6ab4059556caafb3ad0e19a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a70137cea6eedc190392200f7ffe2c70c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a70137cea6eedc190392200f7ffe2c70c"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><b>flag</b> = quickcpplib::_xxx::bitfield::bitfield&lt; <a class="el" href="structafio__v2__xxx_1_1handle_1_1flag__base.html">flag_base</a> &gt;</td></tr>
 <tr class="separator:a70137cea6eedc190392200f7ffe2c70c"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -229,10 +225,6 @@ constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href=
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1handle.html#a657c12a309cf02bf2351bfcc7f41463b">swap</a> (<a class="el" href="classafio__v2__xxx_1_1handle.html">handle</a> &amp;o) noexcept</td></tr>
 <tr class="memdesc:a657c12a309cf02bf2351bfcc7f41463b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Swap with another instance. <br/></td></tr>
 <tr class="separator:a657c12a309cf02bf2351bfcc7f41463b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1d633fb0752e739e057503fbf5dc6e80"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1d633fb0752e739e057503fbf5dc6e80"></a>
-virtual <a class="el" href="classafio__v2__xxx_1_1handle.html#a04971d1f6ab4059556caafb3ad0e19a3">unique_id_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1handle.html#a1d633fb0752e739e057503fbf5dc6e80">unique_id</a> () const noexcept</td></tr>
-<tr class="memdesc:a1d633fb0752e739e057503fbf5dc6e80"><td class="mdescLeft">&#160;</td><td class="mdescRight">A unique identifier for this handle in this process (native handle). Subclasses like <code>file_handle</code> make this a unique identifier across the entire system. <br/></td></tr>
-<tr class="separator:a1d633fb0752e739e057503fbf5dc6e80"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a616a67222676af5ec5b3aa94d7c02428"><td class="memItemLeft" align="right" valign="top">virtual result&lt; <a class="el" href="classafio__v2__xxx_1_1handle.html#a6c4df2242ece6f63ba7ef4e6baafaca6">path_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1handle.html#a616a67222676af5ec5b3aa94d7c02428">current_path</a> () const noexcept</td></tr>
 <tr class="separator:a616a67222676af5ec5b3aa94d7c02428"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af4c39abeaa83d990e3bd48fff7b94fb9"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af4c39abeaa83d990e3bd48fff7b94fb9"></a>
@@ -389,18 +381,18 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operato
 <p>Cache reads and writes of data and metadata so they complete immediately, only sending any updates to storage on last handle close in the system or if memory becomes tight as this file is expected to be temporary (Windows and FreeBSD only). </p>
 </td></tr>
 </table>
-<div class="fragment"><div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;                     : <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span>  <span class="comment">// bit 0 set means safety fsyncs enabled</span></div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;  {</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;    unchanged = 0,</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    none = 1,                <span class="comment">//!&lt; No caching whatsoever, all reads and writes come from storage (i.e. &lt;tt&gt;O_DIRECT|O_SYNC&lt;/tt&gt;). Align all i/o to 4Kb boundaries for this to work. &lt;tt&gt;flag_disable_safety_fsyncs&lt;/tt&gt; can be used here.</span></div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;<span class="comment"></span>    only_metadata = 2,       <span class="comment">//!&lt; Cache reads and writes of metadata but avoid caching data (&lt;tt&gt;O_DIRECT&lt;/tt&gt;), thus i/o here does not affect other cached data for other handles. Align all i/o to 4Kb boundaries for this to work.</span></div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;<span class="comment"></span>    reads = 3,               <span class="comment">//!&lt; Cache reads only. Writes of data and metadata do not complete until reaching storage (&lt;tt&gt;O_SYNC&lt;/tt&gt;). &lt;tt&gt;flag_disable_safety_fsyncs&lt;/tt&gt; can be used here.</span></div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;<span class="comment"></span>    reads_and_metadata = 5,  <span class="comment">//!&lt; Cache reads and writes of metadata, but writes of data do not complete until reaching storage (&lt;tt&gt;O_DSYNC&lt;/tt&gt;). &lt;tt&gt;flag_disable_safety_fsyncs&lt;/tt&gt; can be used here.</span></div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;<span class="comment"></span>    all = 4,                 <span class="comment">//!&lt; Cache reads and writes of data and metadata so they complete immediately, sending writes to storage at some point when the kernel decides (this is the default file system caching on a system).</span></div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;<span class="comment"></span>    safety_fsyncs = 7,       <span class="comment">//!&lt; Cache reads and writes of data and metadata so they complete immediately, but issue safety fsyncs at certain points. See documentation for &lt;tt&gt;flag_disable_safety_fsyncs&lt;/tt&gt;.</span></div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;<span class="comment"></span>    temporary = 6            <span class="comment">//!&lt; Cache reads and writes of data and metadata so they complete immediately, only sending any updates to storage on last handle close in the system or if memory becomes tight as this file is expected to be temporary (Windows and FreeBSD only).</span></div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;<span class="comment"></span>                             <span class="comment">// NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!</span></div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;  };</div>
+<div class="fragment"><div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;                     : <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span>  <span class="comment">// bit 0 set means safety fsyncs enabled</span></div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;  {</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    unchanged = 0,</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;    none = 1,                <span class="comment">//!&lt; No caching whatsoever, all reads and writes come from storage (i.e. &lt;tt&gt;O_DIRECT|O_SYNC&lt;/tt&gt;). Align all i/o to 4Kb boundaries for this to work. &lt;tt&gt;flag_disable_safety_fsyncs&lt;/tt&gt; can be used here.</span></div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;<span class="comment"></span>    only_metadata = 2,       <span class="comment">//!&lt; Cache reads and writes of metadata but avoid caching data (&lt;tt&gt;O_DIRECT&lt;/tt&gt;), thus i/o here does not affect other cached data for other handles. Align all i/o to 4Kb boundaries for this to work.</span></div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;<span class="comment"></span>    reads = 3,               <span class="comment">//!&lt; Cache reads only. Writes of data and metadata do not complete until reaching storage (&lt;tt&gt;O_SYNC&lt;/tt&gt;). &lt;tt&gt;flag_disable_safety_fsyncs&lt;/tt&gt; can be used here.</span></div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;<span class="comment"></span>    reads_and_metadata = 5,  <span class="comment">//!&lt; Cache reads and writes of metadata, but writes of data do not complete until reaching storage (&lt;tt&gt;O_DSYNC&lt;/tt&gt;). &lt;tt&gt;flag_disable_safety_fsyncs&lt;/tt&gt; can be used here.</span></div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;<span class="comment"></span>    all = 4,                 <span class="comment">//!&lt; Cache reads and writes of data and metadata so they complete immediately, sending writes to storage at some point when the kernel decides (this is the default file system caching on a system).</span></div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;<span class="comment"></span>    safety_fsyncs = 7,       <span class="comment">//!&lt; Cache reads and writes of data and metadata so they complete immediately, but issue safety fsyncs at certain points. See documentation for &lt;tt&gt;flag_disable_safety_fsyncs&lt;/tt&gt;.</span></div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;<span class="comment"></span>    temporary = 6            <span class="comment">//!&lt; Cache reads and writes of data and metadata so they complete immediately, only sending any updates to storage on last handle close in the system or if memory becomes tight as this file is expected to be temporary (Windows and FreeBSD only).</span></div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;<span class="comment"></span>                             <span class="comment">// NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!</span></div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;  };</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -428,15 +420,15 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operato
 <p>Atomically truncate on open, leaving creation date unmodified. </p>
 </td></tr>
 </table>
-<div class="fragment"><div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;                      : <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span></div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;  {</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;    open_existing = 0,</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    only_if_not_exist,</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    if_needed,</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    <a class="code" href="namespaceafio__v2__xxx.html#a84d22c966fcabe50de30ad8cf26c7241">truncate</a>  <span class="comment">//!&lt; Atomically truncate on open, leaving creation date unmodified.</span></div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;<span class="comment"></span>              <span class="comment">// NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!</span></div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;  };</div>
-<div class="ttc" id="namespaceafio__v2__xxx_html_a84d22c966fcabe50de30ad8cf26c7241"><div class="ttname"><a href="namespaceafio__v2__xxx.html#a84d22c966fcabe50de30ad8cf26c7241">afio_v2_xxx::truncate</a></div><div class="ttdeci">result&lt; file_handle::extent_type &gt; truncate(file_handle &amp;self, file_handle::extent_type newsize) noexcept</div><div class="ttdef"><b>Definition:</b> file_handle.hpp:408</div></div>
+<div class="fragment"><div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;                      : <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span></div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;  {</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;    open_existing = 0,</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;    only_if_not_exist,</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    if_needed,</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;    <a class="code" href="namespaceafio__v2__xxx.html#a84d22c966fcabe50de30ad8cf26c7241">truncate</a>  <span class="comment">//!&lt; Atomically truncate on open, leaving creation date unmodified.</span></div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;<span class="comment"></span>              <span class="comment">// NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!</span></div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;  };</div>
+<div class="ttc" id="namespaceafio__v2__xxx_html_a84d22c966fcabe50de30ad8cf26c7241"><div class="ttname"><a href="namespaceafio__v2__xxx.html#a84d22c966fcabe50de30ad8cf26c7241">afio_v2_xxx::truncate</a></div><div class="ttdeci">result&lt; file_handle::extent_type &gt; truncate(file_handle &amp;self, file_handle::extent_type newsize) noexcept</div><div class="ttdef"><b>Definition:</b> file_handle.hpp:328</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -479,17 +471,17 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operato
 <p>All mainstream OSs and CIFS guarantee this is atomic with respect to all other appenders (FILE_APPEND_DATA|SYNCHRONISE or O_APPEND) </p>
 </td></tr>
 </table>
-<div class="fragment"><div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;                  : <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span>  <span class="comment">// bit 0 set means writable</span></div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;  {</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    unchanged = 0,</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    none = 2,        <span class="comment">//!&lt; No ability to read or write anything, but can synchronise (SYNCHRONIZE or 0)</span></div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;<span class="comment"></span>    attr_read = 4,   <span class="comment">//!&lt; Ability to read attributes (FILE_READ_ATTRIBUTES|SYNCHRONIZE or O_RDONLY)</span></div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;<span class="comment"></span>    attr_write = 5,  <span class="comment">//!&lt; Ability to read and write attributes (FILE_READ_ATTRIBUTES|FILE_WRITE_ATTRIBUTES|SYNCHRONIZE or O_RDONLY)</span></div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;<span class="comment"></span>    <a class="code" href="namespaceafio__v2__xxx.html#a3cff8f3910dbf47663e5df1dc7e5ba47">read</a> = 6,        <span class="comment">//!&lt; Ability to read (READ_CONTROL|FILE_READ_DATA|FILE_READ_ATTRIBUTES|FILE_READ_EA|SYNCHRONISE or O_RDONLY)</span></div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;<span class="comment"></span>    <a class="code" href="namespaceafio__v2__xxx.html#a2d15768d28ea660ebe44901508ed3372">write</a> = 7,       <span class="comment">//!&lt; Ability to read and write (READ_CONTROL|FILE_READ_DATA|FILE_READ_ATTRIBUTES|FILE_READ_EA|FILE_WRITE_DATA|FILE_WRITE_ATTRIBUTES|FILE_WRITE_EA|FILE_APPEND_DATA|SYNCHRONISE or O_RDWR)</span></div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;<span class="comment"></span>    append = 9       <span class="comment">//!&lt; All mainstream OSs and CIFS guarantee this is atomic with respect to all other appenders (FILE_APPEND_DATA|SYNCHRONISE or O_APPEND)</span></div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;<span class="comment"></span>                     <span class="comment">// NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!</span></div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;  };</div>
+<div class="fragment"><div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;                  : <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span>  <span class="comment">// bit 0 set means writable</span></div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;  {</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    unchanged = 0,</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    none = 2,        <span class="comment">//!&lt; No ability to read or write anything, but can synchronise (SYNCHRONIZE or 0)</span></div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;<span class="comment"></span>    attr_read = 4,   <span class="comment">//!&lt; Ability to read attributes (FILE_READ_ATTRIBUTES|SYNCHRONIZE or O_RDONLY)</span></div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;<span class="comment"></span>    attr_write = 5,  <span class="comment">//!&lt; Ability to read and write attributes (FILE_READ_ATTRIBUTES|FILE_WRITE_ATTRIBUTES|SYNCHRONIZE or O_RDONLY)</span></div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;<span class="comment"></span>    <a class="code" href="namespaceafio__v2__xxx.html#a3cff8f3910dbf47663e5df1dc7e5ba47">read</a> = 6,        <span class="comment">//!&lt; Ability to read (READ_CONTROL|FILE_READ_DATA|FILE_READ_ATTRIBUTES|FILE_READ_EA|SYNCHRONISE or O_RDONLY)</span></div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;<span class="comment"></span>    <a class="code" href="namespaceafio__v2__xxx.html#a2d15768d28ea660ebe44901508ed3372">write</a> = 7,       <span class="comment">//!&lt; Ability to read and write (READ_CONTROL|FILE_READ_DATA|FILE_READ_ATTRIBUTES|FILE_READ_EA|FILE_WRITE_DATA|FILE_WRITE_ATTRIBUTES|FILE_WRITE_EA|FILE_APPEND_DATA|SYNCHRONISE or O_RDWR)</span></div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;<span class="comment"></span>    append = 9       <span class="comment">//!&lt; All mainstream OSs and CIFS guarantee this is atomic with respect to all other appenders (FILE_APPEND_DATA|SYNCHRONISE or O_APPEND)</span></div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;<span class="comment"></span>                     <span class="comment">// NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!</span></div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;  };</div>
 <div class="ttc" id="namespaceafio__v2__xxx_html_a3cff8f3910dbf47663e5df1dc7e5ba47"><div class="ttname"><a href="namespaceafio__v2__xxx.html#a3cff8f3910dbf47663e5df1dc7e5ba47">afio_v2_xxx::read</a></div><div class="ttdeci">io_handle::io_result&lt; io_handle::buffers_type &gt; read(io_handle &amp;self, io_handle::io_request&lt; io_handle::buffers_type &gt; reqs, deadline d=deadline()) noexcept</div><div class="ttdoc">Read data from the open handle. </div><div class="ttdef"><b>Definition:</b> io_handle.hpp:437</div></div>
 <div class="ttc" id="namespaceafio__v2__xxx_html_a2d15768d28ea660ebe44901508ed3372"><div class="ttname"><a href="namespaceafio__v2__xxx.html#a2d15768d28ea660ebe44901508ed3372">afio_v2_xxx::write</a></div><div class="ttdeci">io_handle::io_result&lt; io_handle::const_buffers_type &gt; write(io_handle &amp;self, io_handle::io_request&lt; io_handle::const_buffers_type &gt; reqs, deadline d=deadline()) noexcept</div><div class="ttdoc">Write data to the open handle. </div><div class="ttdef"><b>Definition:</b> io_handle.hpp:461</div></div>
 </div><!-- fragment -->

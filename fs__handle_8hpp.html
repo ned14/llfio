@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.6"/>
-<title>AFIO: include/afio/v2.0/handle.hpp File Reference</title>
+<title>AFIO: include/afio/v2.0/fs_handle.hpp File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -86,7 +86,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   </div>
 </div>
 <script type="text/javascript">
-$(document).ready(function(){initNavTree('handle_8hpp.html','');});
+$(document).ready(function(){initNavTree('fs__handle_8hpp.html','');});
 </script>
 <div id="doc-content">
 <!-- window showing the filter options -->
@@ -109,23 +109,20 @@ $(document).ready(function(){initNavTree('handle_8hpp.html','');});
 <a href="#namespaces">Namespaces</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
-<div class="title">handle.hpp File Reference</div>  </div>
+<div class="title">fs_handle.hpp File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 
-<p>Provides handle.  
+<p>Provides fs_handle.  
 <a href="#details">More...</a></p>
-<div class="textblock"><code>#include &quot;<a class="el" href="deadline_8h.html">deadline.h</a>&quot;</code><br/>
-<code>#include &quot;<a class="el" href="native__handle__type_8hpp.html">native_handle_type.hpp</a>&quot;</code><br/>
-<code>#include &lt;algorithm&gt;</code><br/>
+<div class="textblock"><code>#include &quot;<a class="el" href="path__handle_8hpp.html">path_handle.hpp</a>&quot;</code><br/>
+<code>#include &quot;<a class="el" href="path__view_8hpp.html">path_view.hpp</a>&quot;</code><br/>
+<code>#include &quot;../quickcpplib/include/uint128.hpp&quot;</code><br/>
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1handle.html">afio_v2_xxx::handle</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A native_handle_type which is managed by the lifetime of this object instance.  <a href="classafio__v2__xxx_1_1handle.html#details">More...</a><br/></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structafio__v2__xxx_1_1handle_1_1flag__base.html">afio_v2_xxx::handle::flag_base</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Bitwise flags which can be specified.  <a href="structafio__v2__xxx_1_1handle_1_1flag__base.html#details">More...</a><br/></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1fs__handle.html">afio_v2_xxx::fs_handle</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A handle to something with a device and inode number.  <a href="classafio__v2__xxx_1_1fs__handle.html#details">More...</a><br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="namespaces"></a>
@@ -136,38 +133,19 @@ Namespaces</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a23c535a7d67a0bbd0cf3254325b6efc7"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a23c535a7d67a0bbd0cf3254325b6efc7"></a>
-std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>afio_v2_xxx::operator&lt;&lt;</b> (std::ostream &amp;s, const handle &amp;v)</td></tr>
-<tr class="separator:a23c535a7d67a0bbd0cf3254325b6efc7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6bee597c46adc4f62e9d589c22382d88"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6bee597c46adc4f62e9d589c22382d88"></a>
-std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>afio_v2_xxx::operator&lt;&lt;</b> (std::ostream &amp;s, const handle::mode &amp;v)</td></tr>
-<tr class="separator:a6bee597c46adc4f62e9d589c22382d88"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3a4327cf9a53ded4a8dad10058e5a5fd"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3a4327cf9a53ded4a8dad10058e5a5fd"></a>
-std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>afio_v2_xxx::operator&lt;&lt;</b> (std::ostream &amp;s, const handle::creation &amp;v)</td></tr>
-<tr class="separator:a3a4327cf9a53ded4a8dad10058e5a5fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afc2bdd1199ddbfc7d8347d8322eba897"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afc2bdd1199ddbfc7d8347d8322eba897"></a>
-std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>afio_v2_xxx::operator&lt;&lt;</b> (std::ostream &amp;s, const handle::caching &amp;v)</td></tr>
-<tr class="separator:afc2bdd1199ddbfc7d8347d8322eba897"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2e9ad4a02efc6016631baecfbc1d1d4d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2e9ad4a02efc6016631baecfbc1d1d4d"></a>
-std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>afio_v2_xxx::operator&lt;&lt;</b> (std::ostream &amp;s, const handle::flag &amp;v)</td></tr>
-<tr class="separator:a2e9ad4a02efc6016631baecfbc1d1d4d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6e724f1ed8bc70cb89ea1ef13176a4aa"><td class="memTemplParams" colspan="2"><a class="anchor" id="a6e724f1ed8bc70cb89ea1ef13176a4aa"></a>
-template&lt;class T , class R &gt; </td></tr>
-<tr class="memitem:a6e724f1ed8bc70cb89ea1ef13176a4aa"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>afio_v2_xxx::hook_result_construction</b> (OUTCOME_V2_NAMESPACE::in_place_type_t&lt; T &gt;, result&lt; R &gt; *res) noexcept</td></tr>
-<tr class="separator:a6e724f1ed8bc70cb89ea1ef13176a4aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa3356a7dbe3d081f112d6e8dd4344160"><td class="memTemplParams" colspan="2"><a class="anchor" id="aa3356a7dbe3d081f112d6e8dd4344160"></a>
-template&lt;class T &gt; </td></tr>
-<tr class="memitem:aa3356a7dbe3d081f112d6e8dd4344160"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>afio_v2_xxx::detail::log_inst_to_info</b> (const handle *inst, const char *buffer)</td></tr>
-<tr class="separator:aa3356a7dbe3d081f112d6e8dd4344160"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afdb467668a7e313274721b39495f76f3"><td class="memItemLeft" align="right" valign="top">result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx.html#afdb467668a7e313274721b39495f76f3">afio_v2_xxx::relink</a> (fs_handle &amp;self, const path_handle &amp;base, fs_handle::path_view_type newpath, deadline d=std::chrono::seconds(30)) noexcept</td></tr>
+<tr class="separator:afdb467668a7e313274721b39495f76f3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abefe1503efb01ea89200b829bcd87713"><td class="memItemLeft" align="right" valign="top">result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx.html#abefe1503efb01ea89200b829bcd87713">afio_v2_xxx::unlink</a> (fs_handle &amp;self, deadline d=std::chrono::seconds(30)) noexcept</td></tr>
+<tr class="separator:abefe1503efb01ea89200b829bcd87713"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Provides handle. </p>
+<div class="textblock"><p>Provides fs_handle. </p>
 </div></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="dir_d44c64559bbebec7f509842c48db8b23.html">include</a></li><li class="navelem"><a class="el" href="dir_4443eecac141a9c11b93921c40e6e530.html">afio</a></li><li class="navelem"><a class="el" href="dir_df838802a8d72797f186037846947269.html">v2.0</a></li><li class="navelem"><a class="el" href="handle_8hpp.html">handle.hpp</a></li>
+    <li class="navelem"><a class="el" href="dir_d44c64559bbebec7f509842c48db8b23.html">include</a></li><li class="navelem"><a class="el" href="dir_4443eecac141a9c11b93921c40e6e530.html">afio</a></li><li class="navelem"><a class="el" href="dir_df838802a8d72797f186037846947269.html">v2.0</a></li><li class="navelem"><a class="el" href="fs__handle_8hpp.html">fs_handle.hpp</a></li>
     <li class="footer">Generated by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
