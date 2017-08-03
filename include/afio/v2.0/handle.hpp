@@ -28,10 +28,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include "deadline.h"
 #include "native_handle_type.hpp"
 
-#include "../quickcpplib/include/uint128.hpp"
-
 #include <algorithm>  // for std::count
-#include <utility>    // for pair<>
 
 //! \file handle.hpp Provides handle
 
@@ -56,8 +53,6 @@ public:
   using extent_type = unsigned long long;
   //! The memory extent type used by this handle
   using size_type = size_t;
-  //! The unique identifier type used by this handle
-  using unique_id_type = QUICKCPPLIB_NAMESPACE::integers128::uint128;
 
   //! The behaviour of the handle: does it read, read and write, or atomic append?
   enum class mode : unsigned char  // bit 0 set means writable
@@ -182,13 +177,6 @@ public:
     o = std::move(temp);
   }
 
-  //! A unique identifier for this handle in this process (native handle). Subclasses like `file_handle` make this a unique identifier across the entire system.
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC unique_id_type unique_id() const noexcept
-  {
-    unique_id_type ret(nullptr);
-    ret.as_longlongs[0] = _v._init;
-    return ret;
-  }
   /*! Returns the current path of the open handle as said by the operating system. Note
   that you are NOT guaranteed that any path refreshed bears any resemblance to the original,
   many operating systems will return some different path which still reaches the same inode

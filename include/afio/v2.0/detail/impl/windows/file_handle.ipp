@@ -23,7 +23,6 @@ Distributed under the Boost Software License, Version 1.0.
 */
 
 #include "../../../file_handle.hpp"
-#include "../../../stat.hpp"
 #include "import.hpp"
 
 AFIO_V2_NAMESPACE_BEGIN
@@ -104,15 +103,6 @@ AFIO_HEADERS_ONLY_FUNC_SPEC path_view temporary_files_directory() noexcept
     }
   } init;
   return temporary_files_directory_;
-}
-
-result<void> file_handle::_fetch_inode() noexcept
-{
-  stat_t s;
-  OUTCOME_TRYV(s.fill(*this, stat_t::want::dev | stat_t::want::ino));
-  _devid = s.st_dev;
-  _inode = s.st_ino;
-  return success();
 }
 
 result<file_handle> file_handle::file(const path_handle &base, file_handle::path_view_type path, file_handle::mode _mode, file_handle::creation _creation, file_handle::caching _caching, file_handle::flag flags) noexcept
@@ -335,80 +325,6 @@ result<file_handle> file_handle::clone() const noexcept
   if(!DuplicateHandle(GetCurrentProcess(), _v.h, GetCurrentProcess(), &ret.value()._v.h, 0, false, DUPLICATE_SAME_ACCESS))
     return {GetLastError(), std::system_category()};
   return ret;
-}
-
-result<void> file_handle::relink(const path_handle &base, path_view_type path, deadline /*unused*/) noexcept
-{
-  windows_nt_kernel::init();
-  using namespace windows_nt_kernel;
-  AFIO_LOG_FUNCTION_CALL(this);
-
-  path_view::c_str zpath(path);
-  UNICODE_STRING _path;
-  _path.Buffer = const_cast<wchar_t *>(zpath.buffer);
-  _path.MaximumLength = (_path.Length = (USHORT)(zpath.length * sizeof(wchar_t))) + sizeof(wchar_t);
-  if(zpath.length >= 4 && _path.Buffer[0] == '\\' && _path.Buffer[1] == '\\' && _path.Buffer[2] == '.' && _path.Buffer[3] == '\\')
-  {
-    _path.Buffer += 3;
-    _path.Length -= 3 * sizeof(wchar_t);
-    _path.MaximumLength -= 3 * sizeof(wchar_t);
-  }
-
-  IO_STATUS_BLOCK isb = make_iostatus();
-  alignas(8) char buffer[sizeof(FILE_RENAME_INFORMATION) + 65536];
-  FILE_RENAME_INFORMATION *fni = (FILE_RENAME_INFORMATION *) buffer;
-  fni->ReplaceIfExists = true;
-  fni->RootDirectory = base.is_valid() ? base.native_handle().h : nullptr;
-  fni->FileNameLength = _path.Length;
-  memcpy(fni->FileName, _path.Buffer, fni->FileNameLength);
-  NtSetInformationFile(_v.h, &isb, fni, sizeof(FILE_RENAME_INFORMATION) + fni->FileNameLength, FileRenameInformation);
-  if(_flags & flag::overlapped)
-    ntwait(_v.h, isb, deadline());
-  if(STATUS_SUCCESS != isb.Status)
-    return {(int) isb.Status, ntkernel_category()};
-  return success();
-}
-
-result<void> file_handle::unlink(deadline /*unused*/) noexcept
-{
-  windows_nt_kernel::init();
-  using namespace windows_nt_kernel;
-  AFIO_LOG_FUNCTION_CALL(this);
-  if(!(_flags & flag::win_disable_unlink_emulation))
-  {
-    // Rename it to something random to emulate immediate unlinking
-    auto randomname = utils::random_string(32);
-    randomname.append(".deleted");
-    OUTCOME_TRY(cpath, current_path());
-    cpath.remove_filename();
-    OUTCOME_TRY(dirh, path_handle::path(cpath));
-    OUTCOME_TRYV(relink(dirh, randomname));
-  }
-  // No point marking it for deletion if it's already been so
-  if(!(_flags & flag::unlink_on_close))
-  {
-    // Hide the item in Explorer and the command line
-    {
-      IO_STATUS_BLOCK isb = make_iostatus();
-      FILE_BASIC_INFORMATION fbi;
-      memset(&fbi, 0, sizeof(fbi));
-      fbi.FileAttributes = FILE_ATTRIBUTE_HIDDEN;
-      NtSetInformationFile(_v.h, &isb, &fbi, sizeof(fbi), FileBasicInformation);
-      if(_flags & flag::overlapped)
-        ntwait(_v.h, isb, deadline());
-    }
-    // Mark the item as delete on close
-    IO_STATUS_BLOCK isb = make_iostatus();
-    FILE_DISPOSITION_INFORMATION fdi;
-    memset(&fdi, 0, sizeof(fdi));
-    fdi._DeleteFile = true;
-    NtSetInformationFile(_v.h, &isb, &fdi, sizeof(fdi), FileDispositionInformation);
-    if(_flags & flag::overlapped)
-      ntwait(_v.h, isb, deadline());
-    if(STATUS_SUCCESS != isb.Status)
-      return {(int) isb.Status, ntkernel_category()};
-  }
-  return success();
 }
 
 result<file_handle::extent_type> file_handle::length() const noexcept

@@ -25,9 +25,8 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef AFIO_FILE_HANDLE_H
 #define AFIO_FILE_HANDLE_H
 
+#include "fs_handle.hpp"
 #include "io_handle.hpp"
-#include "path_handle.hpp"
-#include "path_view.hpp"
 #include "utils.hpp"
 
 //! \file file_handle.hpp Provides file_handle
@@ -58,13 +57,13 @@ class io_service;
 \brief A handle to a regular file or device, kept data layout compatible with
 async_file_handle.
 */
-class AFIO_DECL file_handle : public io_handle
+class AFIO_DECL file_handle : public io_handle, public fs_handle
 {
+  AFIO_HEADERS_ONLY_VIRTUAL_SPEC const handle &_get_handle() const noexcept override final { return *this; }
 public:
   using path_type = io_handle::path_type;
   using extent_type = io_handle::extent_type;
   using size_type = io_handle::size_type;
-  using unique_id_type = io_handle::unique_id_type;
   using mode = io_handle::mode;
   using creation = io_handle::creation;
   using caching = io_handle::caching;
@@ -75,65 +74,34 @@ public:
   using const_buffers_type = io_handle::const_buffers_type;
   template <class T> using io_request = io_handle::io_request<T>;
   template <class T> using io_result = io_handle::io_result<T>;
-
-  using dev_t = uint64_t;
-  using ino_t = uint64_t;
-  //! The path view type used by this handle
-  using path_view_type = path_view;
+  using dev_t = fs_handle::dev_t;
+  using ino_t = fs_handle::ino_t;
+  using path_view_type = fs_handle::path_view_type;
 
 protected:
-  dev_t _devid;
-  ino_t _inode;
-#ifdef __FreeBSD__  // FreeBSD can't look up the current path of file, only a directory
-  path_handle _pathbase;
-  path_type _path;
-#error TODO: Finish FreeBSD support
-#endif
   io_service *_service;
-
-  //! Fill in _devid and _inode from the handle via fstat()
-  AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> _fetch_inode() noexcept;
 
 public:
   //! Default constructor
   constexpr file_handle()
       : io_handle()
-      , _devid(0)
-      , _inode(0)
+      , fs_handle()
       , _service(nullptr)
   {
   }
   //! Construct a handle from a supplied native handle
   constexpr file_handle(native_handle_type h, dev_t devid, ino_t inode, caching caching = caching::none, flag flags = flag::none)
       : io_handle(std::move(h), std::move(caching), std::move(flags))
-      , _devid(devid)
-      , _inode(inode)
+      , fs_handle(devid, inode)
       , _service(nullptr)
   {
   }
   //! Implicit move construction of file_handle permitted
-  constexpr file_handle(file_handle &&o) noexcept : io_handle(std::move(o)),
-                                                    _devid(o._devid),
-                                                    _inode(o._inode),
-#ifdef __FreeBSD__
-                                                    _pathbase(std::move(o._pathbase)),
-                                                    _path(std::move(o._path)),
-#endif
-                                                    _service(o._service)
-  {
-    o._devid = 0;
-    o._inode = 0;
-    o._service = nullptr;
-  }
+  constexpr file_handle(file_handle &&o) noexcept : io_handle(std::move(o)), fs_handle(std::move(o)), _service(o._service) { o._service = nullptr; }
   //! Explicit conversion from handle and io_handle permitted
-  explicit constexpr file_handle(handle &&o, dev_t devid, ino_t inode) noexcept : io_handle(std::move(o)), _devid(devid), _inode(inode), _service(nullptr) {}
+  explicit constexpr file_handle(handle &&o, dev_t devid, ino_t inode) noexcept : io_handle(std::move(o)), fs_handle(devid, inode), _service(nullptr) {}
   //! Move assignment of file_handle permitted
-  file_handle &operator=(file_handle &&o) noexcept
-  {
-    this->~file_handle();
-    new(this) file_handle(std::move(o));
-    return *this;
-  }
+  file_handle &operator=(file_handle &&o) noexcept = default;
   //! Swap with another instance
   void swap(file_handle &o) noexcept
   {
@@ -209,17 +177,6 @@ public:
   AFIO_MAKE_FREE_FUNCTION
   static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<file_handle> temp_inode(path_view_type dirpath = temporary_files_directory(), mode _mode = mode::write, flag flags = flag::none) noexcept;
 
-  //! Unless `flag::disable_safety_unlinks` is set, the device id of the file when opened
-  dev_t st_dev() const noexcept { return _devid; }
-  //! Unless `flag::disable_safety_unlinks` is set, the inode of the file when opened. When combined with st_dev(), forms a unique identifer on this system
-  ino_t st_ino() const noexcept { return _inode; }
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC unique_id_type unique_id() const noexcept override
-  {
-    unique_id_type ret(nullptr);
-    ret.as_longlongs[0] = _devid;
-    ret.as_longlongs[1] = _inode;
-    return ret;
-  }
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> close() noexcept override
   {
     AFIO_LOG_FUNCTION_CALL(this);
@@ -242,46 +199,6 @@ public:
   \errors Any of the values POSIX dup() or DuplicateHandle() can return.
   */
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<file_handle> clone() const noexcept;
-
-  /*! Atomically relinks the current path of this open handle to the new path specified,
-  \b atomically and silently replacing any item at the new path specified. This operation
-  is both atomic and silent matching POSIX behaviour even on Microsoft Windows where
-  no Win32 API can match POSIX semantics.
-
-  \warning Some operating systems provide a race free syscall for renaming an open handle (Windows).
-  On all other operating systems this call is \b racy and can result in the wrong file entry being
-  relinked. Note that unless `flag::disable_safety_unlinks` is set, this implementation opens a
-  `path_handle` to the source containing directory first, then checks before relinking that the item
-  about to be relinked has the same inode as the open file handle. It will retry this matching until
-  success until the deadline given. This should prevent most unmalicious accidental loss of data.
-
-  \param base Base for any relative path.
-  \param newpath The relative or absolute new path to relink to.
-  \param d The deadline by which the matching of the containing directory to the open handle's inode
-  must succeed, else `std::errc::timed_out` will be returned. Not used on platforms with race free
-  syscalls for renaming open handles (Windows).
-  */
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> relink(const path_handle &base, path_view_type newpath, deadline d = std::chrono::seconds(30)) noexcept;
-
-  /*! Unlinks the current path of this open handle, causing its entry to immediately disappear from the filing system.
-  On Windows unless `flag::win_disable_unlink_emulation` is set, this behaviour is
-  simulated by renaming the file to something random and setting its delete-on-last-close flag.
-  After the next handle to that file closes, it will become permanently unopenable by anyone
-  else until the last handle is closed, whereupon the entry will be eventually removed by the
-  operating system.
-
-  \warning Some operating systems provide a race free syscall for unlinking an open handle (Windows).
-  On all other operating systems this call is \b racy and can result in the wrong file entry being
-  unlinked. Note that unless `flag::disable_safety_unlinks` is set, this implementation opens a
-  `path_handle` to the containing directory first, then checks that the item about to be unlinked
-  has the same inode as the open file handle. It will retry this matching until success until the
-  deadline given. This should prevent most unmalicious accidental loss of data.
-
-  \param d The deadline by which the matching of the containing directory to the open handle's inode
-  must succeed, else `std::errc::timed_out` will be returned. Not used on platforms with race free
-  syscalls for unlinking open handles (Windows).
-  */
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> unlink(deadline d = std::chrono::seconds(30)) noexcept;
 
   //! The i/o service this handle is attached to, if any
   io_service *service() const noexcept { return _service; }

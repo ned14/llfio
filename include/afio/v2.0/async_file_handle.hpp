@@ -311,11 +311,9 @@ using the given io_service.
 
 \errors Any of the values POSIX open() or CreateFile() can return.
 */
-inline result<async_file_handle> async_file(io_service &service, const path_handle &base, async_file_handle::path_view_type _path, async_file_handle::mode _mode = async_file_handle::mode::read, async_file_handle::creation _creation = async_file_handle::creation::open_existing,
-                                            async_file_handle::caching _caching = async_file_handle::caching::all, async_file_handle::flag flags = async_file_handle::flag::none) noexcept
+inline result<async_file_handle> async_file(io_service &service, const path_handle &base, async_file_handle::path_view_type _path, async_file_handle::mode _mode = async_file_handle::mode::read, async_file_handle::creation _creation = async_file_handle::creation::open_existing, async_file_handle::caching _caching = async_file_handle::caching::all, async_file_handle::flag flags = async_file_handle::flag::none) noexcept
 {
-  return async_file_handle::async_file(std::forward<decltype(service)>(service), std::forward<decltype(base)>(base), std::forward<decltype(_path)>(_path), std::forward<decltype(_mode)>(_mode), std::forward<decltype(_creation)>(_creation), std::forward<decltype(_caching)>(_caching),
-                                       std::forward<decltype(flags)>(flags));
+  return async_file_handle::async_file(std::forward<decltype(service)>(service), std::forward<decltype(base)>(base), std::forward<decltype(_path)>(_path), std::forward<decltype(_mode)>(_mode), std::forward<decltype(_creation)>(_creation), std::forward<decltype(_caching)>(_caching), std::forward<decltype(flags)>(flags));
 }
 /*! Create an async file handle creating a randomly named file on a path.
 The file is opened exclusively with `creation::only_if_not_exist` so it
@@ -344,8 +342,7 @@ to use. Use `temp_inode()` instead, it is far more secure.
 
 \errors Any of the values POSIX open() or CreateFile() can return.
 */
-inline result<async_file_handle> async_temp_file(io_service &service, async_file_handle::path_view_type name = async_file_handle::path_view_type(), async_file_handle::mode _mode = async_file_handle::mode::write, async_file_handle::creation _creation = async_file_handle::creation::if_needed,
-                                                 async_file_handle::caching _caching = async_file_handle::caching::temporary, async_file_handle::flag flags = async_file_handle::flag::unlink_on_close) noexcept
+inline result<async_file_handle> async_temp_file(io_service &service, async_file_handle::path_view_type name = async_file_handle::path_view_type(), async_file_handle::mode _mode = async_file_handle::mode::write, async_file_handle::creation _creation = async_file_handle::creation::if_needed, async_file_handle::caching _caching = async_file_handle::caching::temporary, async_file_handle::flag flags = async_file_handle::flag::unlink_on_close) noexcept
 {
   return async_file_handle::async_temp_file(std::forward<decltype(service)>(service), std::forward<decltype(name)>(name), std::forward<decltype(_mode)>(_mode), std::forward<decltype(_creation)>(_creation), std::forward<decltype(_caching)>(_caching), std::forward<decltype(flags)>(flags));
 }

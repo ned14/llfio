@@ -1,0 +1,237 @@
+/* A filing system handle
+(C) 2017 Niall Douglas <http://www.nedproductions.biz/> (20 commits)
+File Created: Aug 2017
+
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License in the accompanying file
+Licence.txt or at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+
+Distributed under the Boost Software License, Version 1.0.
+    (See accompanying file Licence.txt or copy at
+          http://www.boost.org/LICENSE_1_0.txt)
+*/
+
+#ifndef AFIO_FS_HANDLE_H
+#define AFIO_FS_HANDLE_H
+
+#include "path_handle.hpp"
+#include "path_view.hpp"
+
+#include "../quickcpplib/include/uint128.hpp"
+
+//! \file fs_handle.hpp Provides fs_handle
+
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4251)  // dll interface
+#endif
+
+AFIO_V2_NAMESPACE_EXPORT_BEGIN
+
+/*! \class fs_handle
+\brief A handle to something with a device and inode number.
+*/
+class AFIO_DECL fs_handle
+{
+public:
+  using dev_t = uint64_t;
+  using ino_t = uint64_t;
+  //! The path view type used by this handle
+  using path_view_type = path_view;
+  //! The unique identifier type used by this handle
+  using unique_id_type = QUICKCPPLIB_NAMESPACE::integers128::uint128;
+
+protected:
+  dev_t _devid;
+  ino_t _inode;
+#ifdef __FreeBSD__  // FreeBSD can't look up the current path of file, only a directory
+  path_handle _pathbase;
+  path_type _path;
+#error TODO: Finish FreeBSD support
+#endif
+
+  //! Fill in _devid and _inode from the handle via fstat()
+  AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> _fetch_inode() noexcept;
+
+  AFIO_HEADERS_ONLY_VIRTUAL_SPEC const handle &_get_handle() const noexcept = 0;
+
+protected:
+  //! Default constructor
+  constexpr fs_handle()
+      : _devid(0)
+      , _inode(0)
+  {
+  }
+  //! Construct a handle
+  constexpr fs_handle(dev_t devid, ino_t inode)
+      : _devid(devid)
+      , _inode(inode)
+  {
+  }
+#ifdef __FreeBSD__
+  AFIO_HEADERS_ONLY_VIRTUAL_SPEC ~fs_handle() {}
+#endif
+  //! No copy construction (use clone())
+  fs_handle(const fs_handle &) = delete;
+  //! No copy assignment
+  fs_handle &operator=(const fs_handle &o) = delete;
+  //! Implicit move construction of fs_handle permitted
+  constexpr fs_handle(fs_handle &&o) noexcept : _devid(o._devid),
+                                                _inode(o._inode)
+#ifdef __FreeBSD__
+                                                ,
+                                                _pathbase(std::move(o._pathbase)),
+                                                _path(std::move(o._path))
+#endif
+  {
+    o._devid = 0;
+    o._inode = 0;
+  }
+  //! Move assignment of fs_handle permitted
+  fs_handle &operator=(fs_handle &&o) noexcept
+  {
+    _devid = o._devid;
+    _inode = o._inode;
+#ifdef __FreeBSD__
+    _pathbase = std::move(o._pathbase);
+    _path = std::move(o._path);
+#endif
+    o._devid = 0;
+    o._inode = 0;
+    return *this;
+  }
+
+public:
+  //! Unless `flag::disable_safety_unlinks` is set, the device id of the file when opened
+  dev_t st_dev() const noexcept { return _devid; }
+  //! Unless `flag::disable_safety_unlinks` is set, the inode of the file when opened. When combined with st_dev(), forms a unique identifer on this system
+  ino_t st_ino() const noexcept { return _inode; }
+  //! A unique identifier for this handle in this process (native handle). Subclasses like `file_handle` make this a unique identifier across the entire system.
+  unique_id_type unique_id() const noexcept
+  {
+    unique_id_type ret(nullptr);
+    ret.as_longlongs[0] = _devid;
+    ret.as_longlongs[1] = _inode;
+    return ret;
+  }
+
+  /*! Atomically relinks the current path of this open handle to the new path specified,
+  \b atomically and silently replacing any item at the new path specified. This operation
+  is both atomic and silent matching POSIX behaviour even on Microsoft Windows where
+  no Win32 API can match POSIX semantics.
+
+  \warning Some operating systems provide a race free syscall for renaming an open handle (Windows).
+  On all other operating systems this call is \b racy and can result in the wrong file entry being
+  relinked. Note that unless `flag::disable_safety_unlinks` is set, this implementation opens a
+  `path_handle` to the source containing directory first, then checks before relinking that the item
+  about to be relinked has the same inode as the open file handle. It will retry this matching until
+  success until the deadline given. This should prevent most unmalicious accidental loss of data.
+
+  \param base Base for any relative path.
+  \param newpath The relative or absolute new path to relink to.
+  \param d The deadline by which the matching of the containing directory to the open handle's inode
+  must succeed, else `std::errc::timed_out` will be returned. Not used on platforms with race free
+  syscalls for renaming open handles (Windows).
+  */
+  AFIO_MAKE_FREE_FUNCTION
+  result<void> relink(const path_handle &base, path_view_type newpath, deadline d = std::chrono::seconds(30)) noexcept;
+
+  /*! Unlinks the current path of this open handle, causing its entry to immediately disappear from the filing system.
+  On Windows unless `flag::win_disable_unlink_emulation` is set, this behaviour is
+  simulated by renaming the file to something random and setting its delete-on-last-close flag.
+  After the next handle to that file closes, it will become permanently unopenable by anyone
+  else until the last handle is closed, whereupon the entry will be eventually removed by the
+  operating system.
+
+  \warning Some operating systems provide a race free syscall for unlinking an open handle (Windows).
+  On all other operating systems this call is \b racy and can result in the wrong file entry being
+  unlinked. Note that unless `flag::disable_safety_unlinks` is set, this implementation opens a
+  `path_handle` to the containing directory first, then checks that the item about to be unlinked
+  has the same inode as the open file handle. It will retry this matching until success until the
+  deadline given. This should prevent most unmalicious accidental loss of data.
+
+  \param d The deadline by which the matching of the containing directory to the open handle's inode
+  must succeed, else `std::errc::timed_out` will be returned. Not used on platforms with race free
+  syscalls for unlinking open handles (Windows).
+  */
+  AFIO_MAKE_FREE_FUNCTION
+  result<void> unlink(deadline d = std::chrono::seconds(30)) noexcept;
+};
+
+// BEGIN make_free_functions.py
+/*! Atomically relinks the current path of this open handle to the new path specified,
+\b atomically and silently replacing any item at the new path specified. This operation
+is both atomic and silent matching POSIX behaviour even on Microsoft Windows where
+no Win32 API can match POSIX semantics.
+
+\warning Some operating systems provide a race free syscall for renaming an open handle (Windows).
+On all other operating systems this call is \b racy and can result in the wrong file entry being
+relinked. Note that unless `flag::disable_safety_unlinks` is set, this implementation opens a
+`path_handle` to the source containing directory first, then checks before relinking that the item
+about to be relinked has the same inode as the open file handle. It will retry this matching until
+success until the deadline given. This should prevent most unmalicious accidental loss of data.
+
+\param self The object whose member function to call.
+\param base Base for any relative path.
+\param newpath The relative or absolute new path to relink to.
+\param d The deadline by which the matching of the containing directory to the open handle's inode
+must succeed, else `std::errc::timed_out` will be returned. Not used on platforms with race free
+syscalls for renaming open handles (Windows).
+*/
+inline result<void> relink(fs_handle &self, const path_handle &base, fs_handle::path_view_type newpath, deadline d = std::chrono::seconds(30)) noexcept
+{
+  return self.relink(std::forward<decltype(base)>(base), std::forward<decltype(newpath)>(newpath), std::forward<decltype(d)>(d));
+}
+/*! Unlinks the current path of this open handle, causing its entry to immediately disappear from the filing system.
+On Windows unless `flag::win_disable_unlink_emulation` is set, this behaviour is
+simulated by renaming the file to something random and setting its delete-on-last-close flag.
+After the next handle to that file closes, it will become permanently unopenable by anyone
+else until the last handle is closed, whereupon the entry will be eventually removed by the
+operating system.
+
+\warning Some operating systems provide a race free syscall for unlinking an open handle (Windows).
+On all other operating systems this call is \b racy and can result in the wrong file entry being
+unlinked. Note that unless `flag::disable_safety_unlinks` is set, this implementation opens a
+`path_handle` to the containing directory first, then checks that the item about to be unlinked
+has the same inode as the open file handle. It will retry this matching until success until the
+deadline given. This should prevent most unmalicious accidental loss of data.
+
+\param self The object whose member function to call.
+\param d The deadline by which the matching of the containing directory to the open handle's inode
+must succeed, else `std::errc::timed_out` will be returned. Not used on platforms with race free
+syscalls for unlinking open handles (Windows).
+*/
+inline result<void> unlink(fs_handle &self, deadline d = std::chrono::seconds(30)) noexcept
+{
+  return self.unlink(std::forward<decltype(d)>(d));
+}
+// END make_free_functions.py
+
+AFIO_V2_NAMESPACE_END
+
+#if AFIO_HEADERS_ONLY == 1 && !defined(DOXYGEN_SHOULD_SKIP_THIS)
+#define AFIO_INCLUDED_BY_HEADER 1
+#ifdef _WIN32
+#include "detail/impl/windows/fs_handle.ipp"
+#else
+#include "detail/impl/posix/fs_handle.ipp"
+#endif
+#undef AFIO_INCLUDED_BY_HEADER
+#endif
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
+
+#endif

@@ -24,7 +24,6 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include "../../../file_handle.hpp"
 
-#include "../../../stat.hpp"
 #include "import.hpp"
 
 AFIO_V2_NAMESPACE_BEGIN
@@ -45,11 +44,11 @@ AFIO_HEADERS_ONLY_FUNC_SPEC path_view temporary_files_directory() noexcept
           if(buffer[len - 1] == '/')
             buffer.resize(--len);
           buffer.append("/afio_tempfile_probe_file.tmp");
-          int h = open(buffer.c_str(), O_WRONLY | O_CREAT, 0666);
+          int h = ::open(buffer.c_str(), O_WRONLY | O_CREAT, 0666);
           if(-1 != h)
           {
-            unlink(buffer.c_str());
-            close(h);
+            ::unlink(buffer.c_str());
+            ::close(h);
             buffer.resize(len);
             temporary_files_directory_ = std::move(buffer);
             return true;
@@ -95,79 +94,6 @@ AFIO_HEADERS_ONLY_FUNC_SPEC path_view temporary_files_directory() noexcept
     }
   } init;
   return temporary_files_directory_;
-}
-
-result<void> file_handle::_fetch_inode() noexcept
-{
-  stat_t s;
-  OUTCOME_TRYV(s.fill(*this, stat_t::want::dev | stat_t::want::ino));
-  _devid = s.st_dev;
-  _inode = s.st_ino;
-  return success();
-}
-
-inline result<path_handle> containing_directory(filesystem::path &filename, const file_handle &h, deadline d) noexcept
-{
-#ifdef AFIO_DISABLE_RACE_FREE_PATH_FUNCTIONS
-  return std::errc::function_not_supported;
-#endif
-  std::chrono::steady_clock::time_point began_steady;
-  std::chrono::system_clock::time_point end_utc;
-  if(d)
-  {
-    if(d.steady)
-      began_steady = std::chrono::steady_clock::now();
-    else
-      end_utc = d.to_time_point();
-  }
-  try
-  {
-    for(;;)
-    {
-      // Get current path for handle and open its containing dir
-      auto currentpath_ = h.current_path();
-      if(!currentpath_)
-        continue;
-      filesystem::path currentpath = std::move(currentpath_.value());
-      // If current path is empty, it's been deleted
-      if(currentpath.empty())
-        return std::errc::no_such_file_or_directory;
-      filename = currentpath.filename();
-      currentpath.remove_filename();
-      auto currentdirh_ = path_handle::path(currentpath);
-      if(!currentdirh_)
-        continue;
-      path_handle currentdirh = std::move(currentdirh_.value());
-      if(h.flags() & handle::flag::disable_safety_unlinks)
-        return success(std::move(currentdirh));
-      // Open the same file name, and compare dev and inode
-      auto nh_ = file_handle::file(currentdirh, filename);
-      if(!nh_)
-        continue;
-      file_handle nh = std::move(nh_.value());
-      // If the same, we know for a fact that this is the correct containing dir for now at least
-      if(nh.st_dev() == h.st_dev() && nh.st_ino() == h.st_ino())
-        return success(std::move(currentdirh));
-      // Check timeout
-      if(d)
-      {
-        if(d.steady)
-        {
-          if(std::chrono::steady_clock::now() >= (began_steady + std::chrono::nanoseconds(d.nsecs)))
-            return std::errc::timed_out;
-        }
-        else
-        {
-          if(std::chrono::system_clock::now() >= end_utc)
-            return std::errc::timed_out;
-        }
-      }
-    }
-  }
-  catch(...)
-  {
-    return error_from_exception();
-  }
 }
 
 result<file_handle> file_handle::file(const path_handle &base, file_handle::path_view_type path, file_handle::mode _mode, file_handle::creation _creation, file_handle::caching _caching, file_handle::flag flags) noexcept
@@ -311,39 +237,6 @@ result<file_handle> file_handle::clone() const noexcept
   if(-1 == ret.value()._v.fd)
     return {errno, std::system_category()};
   return ret;
-}
-
-result<void> file_handle::relink(const path_handle &base, path_view_type path, deadline d) noexcept
-{
-  AFIO_LOG_FUNCTION_CALL(this);
-  path_view::c_str zpath(path);
-#ifdef O_TMPFILE
-  // If the handle was created with O_TMPFILE, we need a different approach
-  if(path.empty() && (_caching == file_handle::caching::temporary))
-  {
-    char _path[PATH_MAX];
-    snprintf(_path, PATH_MAX, "/proc/self/fd/%d", _v.fd);
-    if(-1 == ::linkat(AT_FDCWD, _path, base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.buffer, AT_SYMLINK_FOLLOW))
-      return {errno, std::system_category()};
-  }
-#endif
-  // Open our containing directory
-  filesystem::path filename;
-  OUTCOME_TRY(dirh, containing_directory(filename, *this, d));
-  if(-1 == ::renameat(dirh.native_handle().fd, filename.c_str(), base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.buffer))
-    return {errno, std::system_category()};
-  return success();
-}
-
-result<void> file_handle::unlink(deadline d) noexcept
-{
-  AFIO_LOG_FUNCTION_CALL(this);
-  // Open our containing directory
-  filesystem::path filename;
-  OUTCOME_TRY(dirh, containing_directory(filename, *this, d));
-  if(-1 == ::unlinkat(dirh.native_handle().fd, filename.c_str(), 0))
-    return {errno, std::system_category()};
-  return success();
 }
 
 result<file_handle::extent_type> file_handle::length() const noexcept
