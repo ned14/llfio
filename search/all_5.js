@@ -18,5 +18,5 @@ var searchData=
   ['extent_5fguard',['extent_guard',['../classafio__v2__xxx_1_1io__handle_1_1extent__guard.html#ad39d0d65e7497b15e5565ca5c40309bb',1,'afio_v2_xxx::io_handle::extent_guard::extent_guard()'],['../classafio__v2__xxx_1_1io__handle_1_1extent__guard.html#a654755e3c10998191fe5a923df02c4e3',1,'afio_v2_xxx::io_handle::extent_guard::extent_guard(extent_guard &amp;&amp;o) noexcept']]],
   ['extent_5fguard',['extent_guard',['../classafio__v2__xxx_1_1io__handle_1_1extent__guard.html',1,'afio_v2_xxx::io_handle']]],
   ['extent_5ftype',['extent_type',['../classafio__v2__xxx_1_1handle.html#a818fff07c92eaab72532092d1c2a14f9',1,'afio_v2_xxx::handle::extent_type()'],['../classafio__v2__xxx_1_1io__service.html#afc9f0ed0d7e0bce83023f998e95f7873',1,'afio_v2_xxx::io_service::extent_type()']]],
-  ['extents',['extents',['../structafio__v2__xxx_1_1statfs__t_1_1f__flags__t.html#aad31bddf29d0736339709e78ca93062a',1,'afio_v2_xxx::statfs_t::f_flags_t']]]
+  ['extents',['extents',['../structafio__v2__xxx_1_1statfs__t_1_1f__flags__t.html#aad31bddf29d0736339709e78ca93062a',1,'afio_v2_xxx::statfs_t::f_flags_t::extents()'],['../classafio__v2__xxx_1_1file__handle.html#a03d1774e3ad8678fb4aac4ced57beeef',1,'afio_v2_xxx::file_handle::extents()'],['../namespaceafio__v2__xxx.html#ac3c009153d916556b991d4a79c664fe9',1,'afio_v2_xxx::extents()']]]
 ];

@@ -1,5 +1,11 @@
 var NAVTREEINDEX4 =
 {
+"structafio__v2__xxx_1_1native__handle__type.html#acf366a8411ecec492e1722c199675256":[3,0,0,13,12],
+"structafio__v2__xxx_1_1native__handle__type.html#acfe87ca8331f3b57e2b976c4e09ef4d5":[3,0,0,13,24],
+"structafio__v2__xxx_1_1native__handle__type.html#ad63a7f07556e8e5ae5c04bc515538f7f":[3,0,0,13,13],
+"structafio__v2__xxx_1_1native__handle__type.html#aeaa17492e640c2bb07e72eabbf92b101":[3,0,0,13,25],
+"structafio__v2__xxx_1_1native__handle__type.html#aef53fb6c5b942c7806108c39e402506e":[3,0,0,13,19],
+"structafio__v2__xxx_1_1native__handle__type.html#afbacfb60e744076535baf62eff599f90":[3,0,0,13,4],
 "structafio__v2__xxx_1_1native__handle__type_1_1disposition__base.html":[3,0,0,13,0],
 "structafio__v2__xxx_1_1native__handle__type_1_1disposition__base.html#a89e0e728fc7a7e4a008e57d572702de6":[3,0,0,13,0,0],
 "structafio__v2__xxx_1_1native__handle__type_1_1disposition__base.html#a89e0e728fc7a7e4a008e57d572702de6a14430730f1382b8aadfe6bdfb8ab4ed4":[3,0,0,13,0,0,9],

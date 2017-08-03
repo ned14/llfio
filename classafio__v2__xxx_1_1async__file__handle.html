@@ -294,6 +294,15 @@ virtual result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom">
 <tr class="separator:a2083c37ffc746ec28f9e4d6b094d3ba5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a45873fd0b1ab27f936f046ed14124afd"><td class="memItemLeft" align="right" valign="top">virtual result&lt; extent_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1file__handle.html#a45873fd0b1ab27f936f046ed14124afd">truncate</a> (extent_type newsize) noexcept</td></tr>
 <tr class="separator:a45873fd0b1ab27f936f046ed14124afd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a03d1774e3ad8678fb4aac4ced57beeef"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a03d1774e3ad8678fb4aac4ced57beeef"></a>
+virtual result&lt; std::vector<br class="typebreak"/>
+&lt; std::pair&lt; extent_type, <br class="typebreak"/>
+extent_type &gt; &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1file__handle.html#a03d1774e3ad8678fb4aac4ced57beeef">extents</a> () const noexcept</td></tr>
+<tr class="memdesc:a03d1774e3ad8678fb4aac4ced57beeef"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a list of currently valid extents for this open file. WARNING: racy! <br/></td></tr>
+<tr class="separator:a03d1774e3ad8678fb4aac4ced57beeef"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a649aa39b0d4b60a05d4aab4be569dcb6"><td class="memItemLeft" align="right" valign="top">virtual result&lt; extent_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1file__handle.html#a649aa39b0d4b60a05d4aab4be569dcb6">zero</a> (extent_type offset, extent_type bytes, <a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
+<tr class="memdesc:a649aa39b0d4b60a05d4aab4be569dcb6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Efficiently zero, and possibly deallocate, data on storage.  <a href="#a649aa39b0d4b60a05d4aab4be569dcb6">More...</a><br/></td></tr>
+<tr class="separator:a649aa39b0d4b60a05d4aab4be569dcb6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a71d7636f40607829cacc2c974c4a2a28"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="structafio__v2__xxx_1_1io__handle_1_1io__result.html">io_result</a>&lt; buffers_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1io__handle.html#a71d7636f40607829cacc2c974c4a2a28">read</a> (<a class="el" href="structafio__v2__xxx_1_1io__handle_1_1io__request.html">io_request</a>&lt; buffers_type &gt; reqs, <a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
 <tr class="memdesc:a71d7636f40607829cacc2c974c4a2a28"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read data from the open handle.  <a href="#a71d7636f40607829cacc2c974c4a2a28">More...</a><br/></td></tr>
 <tr class="separator:a71d7636f40607829cacc2c974c4a2a28"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -1883,6 +1892,60 @@ For portability, you can only assume that barriers write order for a single hand
 <div class="ttc" id="classafio__v2__xxx_1_1io__handle_html_a639b8760b1b98df95e4956f6cc56f6b5"><div class="ttname"><a href="classafio__v2__xxx_1_1io__handle.html#a639b8760b1b98df95e4956f6cc56f6b5">afio_v2_xxx::io_handle::const_buffers_type</a></div><div class="ttdeci">span&lt; const_buffer_type &gt; const_buffers_type</div><div class="ttdoc">The gather buffers type used by this handle. Guaranteed to be TrivialType apart from construction...</div><div class="ttdef"><b>Definition:</b> io_handle.hpp:78</div></div>
 <div class="ttc" id="classafio__v2__xxx_1_1io__handle_html_aefac4710e5617264347f437b04732c01"><div class="ttname"><a href="classafio__v2__xxx_1_1io__handle.html#aefac4710e5617264347f437b04732c01">afio_v2_xxx::io_handle::write</a></div><div class="ttdeci">virtual io_result&lt; const_buffers_type &gt; write(io_request&lt; const_buffers_type &gt; reqs, deadline d=deadline()) noexcept</div><div class="ttdoc">Write data to the open handle. </div></div>
 </div><!-- fragment -->
+</div>
+</div>
+<a class="anchor" id="a649aa39b0d4b60a05d4aab4be569dcb6"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual result&lt;extent_type&gt; afio_v2_xxx::file_handle::zero </td>
+          <td>(</td>
+          <td class="paramtype">extent_type&#160;</td>
+          <td class="paramname"><em>offset</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">extent_type&#160;</td>
+          <td class="paramname"><em>bytes</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a>&#160;</td>
+          <td class="paramname"><em>d</em> = <code><a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a>()</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span><span class="mlabel">noexcept</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Efficiently zero, and possibly deallocate, data on storage. </p>
+<p>On most major operating systems and with recent filing systems which are "extents based", one can deallocate the physical storage of a file, causing the space deallocated to appear all bits zero. This call attempts to deallocate whole pages (usually 4Kb) entirely, and memset's any excess to all bits zero. This call works on most Linux filing systems with a recent kernel, Microsoft Windows with NTFS, and FreeBSD with ZFS. On other systems it simply writes zeros.</p>
+<dl class="section return"><dt>Returns</dt><dd>The bytes zeroed. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">offset</td><td>The offset to start zeroing from. </td></tr>
+    <tr><td class="paramname">bytes</td><td>The number of bytes to zero. </td></tr>
+    <tr><td class="paramname">d</td><td>An optional deadline by which the i/o must complete, else it is cancelled. Note function may return significantly after this deadline if the i/o takes long to cancel. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX write() can return, <code>errc::timed_out</code>, <code>errc::operation_canceled</code>. <code>errc::not_supported</code> may be returned if deadline i/o is not possible with this particular handle configuration (e.g. writing to regular files on POSIX or writing to a non-overlapped HANDLE on Windows). </dd></dl>
+<dl class="section user"><dt>Memory Allocations</dt><dd>The default synchronous implementation in file_handle performs no memory allocation. The asynchronous implementation in async_file_handle may perform one calloc and one free. </dd></dl>
+
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>

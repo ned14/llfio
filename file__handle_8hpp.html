@@ -149,6 +149,15 @@ Functions</h2></td></tr>
 <tr class="separator:afe66c5875c48c8bd172901a1159ccbdc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a84d22c966fcabe50de30ad8cf26c7241"><td class="memItemLeft" align="right" valign="top">result&lt; file_handle::extent_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx.html#a84d22c966fcabe50de30ad8cf26c7241">afio_v2_xxx::truncate</a> (file_handle &amp;self, file_handle::extent_type newsize) noexcept</td></tr>
 <tr class="separator:a84d22c966fcabe50de30ad8cf26c7241"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac3c009153d916556b991d4a79c664fe9"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac3c009153d916556b991d4a79c664fe9"></a>
+result&lt; std::vector&lt; std::pair<br class="typebreak"/>
+&lt; file_handle::extent_type, <br class="typebreak"/>
+file_handle::extent_type &gt; &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx.html#ac3c009153d916556b991d4a79c664fe9">afio_v2_xxx::extents</a> (const file_handle &amp;self) noexcept</td></tr>
+<tr class="memdesc:ac3c009153d916556b991d4a79c664fe9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a list of currently valid extents for this open file. WARNING: racy! <br/></td></tr>
+<tr class="separator:ac3c009153d916556b991d4a79c664fe9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae412aa7c9e37601d1814e75d09795185"><td class="memItemLeft" align="right" valign="top">result&lt; file_handle::extent_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx.html#ae412aa7c9e37601d1814e75d09795185">afio_v2_xxx::zero</a> (file_handle &amp;self, file_handle::extent_type offset, file_handle::extent_type bytes, deadline d=deadline()) noexcept</td></tr>
+<tr class="memdesc:ae412aa7c9e37601d1814e75d09795185"><td class="mdescLeft">&#160;</td><td class="mdescRight">Efficiently zero, and possibly deallocate, data on storage.  <a href="#ae412aa7c9e37601d1814e75d09795185">More...</a><br/></td></tr>
+<tr class="separator:ae412aa7c9e37601d1814e75d09795185"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Provides file_handle. </p>
