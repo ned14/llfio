@@ -336,8 +336,7 @@ public:
 
 \errors Any of the values POSIX open() or CreateFile() can return.
 */
-inline result<file_handle> file(const path_handle &base, file_handle::path_view_type _path, file_handle::mode _mode = file_handle::mode::read, file_handle::creation _creation = file_handle::creation::open_existing, file_handle::caching _caching = file_handle::caching::all,
-                                file_handle::flag flags = file_handle::flag::none) noexcept
+inline result<file_handle> file(const path_handle &base, file_handle::path_view_type _path, file_handle::mode _mode = file_handle::mode::read, file_handle::creation _creation = file_handle::creation::open_existing, file_handle::caching _caching = file_handle::caching::all, file_handle::flag flags = file_handle::flag::none) noexcept
 {
   return file_handle::file(std::forward<decltype(base)>(base), std::forward<decltype(_path)>(_path), std::forward<decltype(_mode)>(_mode), std::forward<decltype(_creation)>(_creation), std::forward<decltype(_caching)>(_caching), std::forward<decltype(flags)>(flags));
 }
@@ -368,8 +367,7 @@ to use. Use `temp_inode()` instead, it is far more secure.
 
 \errors Any of the values POSIX open() or CreateFile() can return.
 */
-inline result<file_handle> temp_file(file_handle::path_view_type name = file_handle::path_view_type(), file_handle::mode _mode = file_handle::mode::write, file_handle::creation _creation = file_handle::creation::if_needed, file_handle::caching _caching = file_handle::caching::temporary,
-                                     file_handle::flag flags = file_handle::flag::unlink_on_close) noexcept
+inline result<file_handle> temp_file(file_handle::path_view_type name = file_handle::path_view_type(), file_handle::mode _mode = file_handle::mode::write, file_handle::creation _creation = file_handle::creation::if_needed, file_handle::caching _caching = file_handle::caching::temporary, file_handle::flag flags = file_handle::flag::unlink_on_close) noexcept
 {
   return file_handle::temp_file(std::forward<decltype(name)>(name), std::forward<decltype(_mode)>(_mode), std::forward<decltype(_creation)>(_creation), std::forward<decltype(_caching)>(_caching), std::forward<decltype(flags)>(flags));
 }
@@ -407,6 +405,36 @@ this will succeed even if there is insufficient free space on the storage medium
 inline result<file_handle::extent_type> truncate(file_handle &self, file_handle::extent_type newsize) noexcept
 {
   return self.truncate(std::forward<decltype(newsize)>(newsize));
+}
+/*! \brief Returns a list of currently valid extents for this open file. WARNING: racy!
+*/
+inline result<std::vector<std::pair<file_handle::extent_type, file_handle::extent_type>>> extents(const file_handle &self) noexcept
+{
+  return self.extents();
+}
+/*! \brief Efficiently zero, and possibly deallocate, data on storage.
+
+On most major operating systems and with recent filing systems which are "extents based", one can
+deallocate the physical storage of a file, causing the space deallocated to appear all bits zero.
+This call attempts to deallocate whole pages (usually 4Kb) entirely, and memset's any excess to all
+bits zero. This call works on most Linux filing systems with a recent kernel, Microsoft Windows
+with NTFS, and FreeBSD with ZFS. On other systems it simply writes zeros.
+
+\return The bytes zeroed.
+\param self The object whose member function to call.
+\param offset The offset to start zeroing from.
+\param bytes The number of bytes to zero.
+\param d An optional deadline by which the i/o must complete, else it is cancelled.
+Note function may return significantly after this deadline if the i/o takes long to cancel.
+\errors Any of the values POSIX write() can return, `errc::timed_out`, `errc::operation_canceled`. `errc::not_supported` may be
+returned if deadline i/o is not possible with this particular handle configuration (e.g.
+writing to regular files on POSIX or writing to a non-overlapped HANDLE on Windows).
+\mallocs The default synchronous implementation in file_handle performs no memory allocation.
+The asynchronous implementation in async_file_handle may perform one calloc and one free.
+*/
+inline result<file_handle::extent_type> zero(file_handle &self, file_handle::extent_type offset, file_handle::extent_type bytes, deadline d = deadline()) noexcept
+{
+  return self.zero(std::forward<decltype(offset)>(offset), std::forward<decltype(bytes)>(bytes), std::forward<decltype(d)>(d));
 }
 // END make_free_functions.py
 

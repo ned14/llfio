@@ -65,6 +65,7 @@ for header in glob.glob("../include/afio/*/*.hpp"):
             def replace(function, item):
                 function = function.replace(' '+item+' ', ' '+classname+'::'+item+' ')
                 function = function.replace('('+item+' ', '('+classname+'::'+item+' ')
+                function = function.replace('<'+item+',', '<'+classname+'::'+item+',')
                 function = function.replace('<'+item+'>', '<'+classname+'::'+item+'>')
                 function = function.replace(' '+item+'>', ' '+classname+'::'+item+'>')
                 return function
