@@ -15,7 +15,7 @@ ctest_update()
 ctest_configure()
 ctest_build(TARGET _dl)
 ctest_build(TARGET _sl)
-ctest_test(RETURN_VALUE retval EXCLUDE "afio_hl")
+ctest_test(RETURN_VALUE retval EXCLUDE "afio_hl|shared_fs_mutex")
 if(WIN32)
   if(EXISTS prebuilt/bin/Release/afio_dl-2.0-Windows-x64-Release.dll)
     checked_execute_process("Tarring up binaries"

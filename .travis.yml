@@ -73,7 +73,7 @@ script:
    if [ "$__" = "cmake tests" ]; then
      if [ "$CXX" = "g++" ]; then export CXX=g++-7; export NAME=TravisLinuxWorkerGCC; fi;
      if [ "$CXX" = "clang++" ]; then export CXX=clang++-4.0; export NAME=TravisLinuxWorkerClang; fi;
-     ctest -S .ci.cmake -V --timeout 300 -E shared_fs_mutex;
+     ctest -S .ci.cmake -V --timeout 300;
    fi
  -
    if [ "$__" = "Documentation" ]; then
