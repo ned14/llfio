@@ -64,7 +64,7 @@ protected:
   //! Fill in _devid and _inode from the handle via fstat()
   AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> _fetch_inode() noexcept;
 
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC const handle &_get_handle() const noexcept = 0;
+  virtual const handle &_get_handle() const noexcept = 0;
 
 protected:
   //! Default constructor

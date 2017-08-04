@@ -86,6 +86,7 @@ public:
     return *this;
   }
   //! Swap with another instance
+  AFIO_MAKE_FREE_FUNCTION
   void swap(async_file_handle &o) noexcept
   {
     async_file_handle temp(std::move(*this));
@@ -176,6 +177,7 @@ public:
     return std::move(ret);
   }
 
+  AFIO_MAKE_FREE_FUNCTION
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> barrier(io_request<const_buffers_type> reqs = io_request<const_buffers_type>(), bool wait_for_device = false, bool and_metadata = false, deadline d = deadline()) noexcept override;
   /*! Clone this handle to a different io_service (copy constructor is disabled to avoid accidental copying)
 
@@ -306,6 +308,11 @@ public:
 };
 
 // BEGIN make_free_functions.py
+//! Swap with another instance
+inline void swap(async_file_handle &self, async_file_handle &o) noexcept
+{
+  return self.swap(std::forward<decltype(o)>(o));
+}
 /*! Create an async file handle opening access to a file on path
 using the given io_service.
 
@@ -359,6 +366,10 @@ is for backing shared memory maps).
 inline result<async_file_handle> async_temp_inode(io_service &service, async_file_handle::path_view_type dirpath = temporary_files_directory(), async_file_handle::mode _mode = async_file_handle::mode::write, async_file_handle::flag flags = async_file_handle::flag::none) noexcept
 {
   return async_file_handle::async_temp_inode(std::forward<decltype(service)>(service), std::forward<decltype(dirpath)>(dirpath), std::forward<decltype(_mode)>(_mode), std::forward<decltype(flags)>(flags));
+}
+inline async_file_handle::io_result<async_file_handle::const_buffers_type> barrier(async_file_handle &self, async_file_handle::io_request<async_file_handle::const_buffers_type> reqs = async_file_handle::io_request<async_file_handle::const_buffers_type>(), bool wait_for_device = false, bool and_metadata = false, deadline d = deadline()) noexcept
+{
+  return self.barrier(std::forward<decltype(reqs)>(reqs), std::forward<decltype(wait_for_device)>(wait_for_device), std::forward<decltype(and_metadata)>(and_metadata), std::forward<decltype(d)>(d));
 }
 /*! \brief Schedule a read to occur asynchronously.
 

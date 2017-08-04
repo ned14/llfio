@@ -190,7 +190,7 @@ namespace algorithm
         }
       };
 
-      AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> _lock(entities_guard &out, deadline d, bool spin_not_sleep) noexcept = 0;
+      virtual result<void> _lock(entities_guard &out, deadline d, bool spin_not_sleep) noexcept = 0;
 
       //! Lock all of a sequence of entities for exclusive or shared access
       result<entities_guard> lock(entities_type entities, deadline d = deadline(), bool spin_not_sleep = false) noexcept
@@ -211,7 +211,7 @@ namespace algorithm
       //! Try to lock a single entity for exclusive or shared access
       result<entities_guard> try_lock(entity_type entity) noexcept { return lock(std::move(entity), deadline(std::chrono::seconds(0))); }
       //! Unlock a previously locked sequence of entities
-      AFIO_HEADERS_ONLY_VIRTUAL_SPEC void unlock(entities_type entities, unsigned long long hint = 0) noexcept = 0;
+      virtual void unlock(entities_type entities, unsigned long long hint = 0) noexcept = 0;
     };
 
   }  // namespace

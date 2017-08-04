@@ -270,7 +270,7 @@ public:
   \mallocs None.
   */
   AFIO_MAKE_FREE_FUNCTION
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> barrier(io_request<const_buffers_type> reqs = io_request<const_buffers_type>(), bool wait_for_device = false, bool and_metadata = false, deadline d = deadline()) noexcept = 0;
+  virtual io_result<const_buffers_type> barrier(io_request<const_buffers_type> reqs = io_request<const_buffers_type>(), bool wait_for_device = false, bool and_metadata = false, deadline d = deadline()) noexcept = 0;
 
   /*! \class extent_guard
   \brief RAII holder a locked extent of bytes in a file.

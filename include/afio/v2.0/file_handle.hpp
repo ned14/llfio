@@ -108,6 +108,7 @@ public:
     return *this;
   }
   //! Swap with another instance
+  AFIO_MAKE_FREE_FUNCTION
   void swap(file_handle &o) noexcept
   {
     file_handle temp(std::move(*this));
@@ -197,6 +198,7 @@ public:
     }
     return io_handle::close();
   }
+
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> barrier(io_request<const_buffers_type> reqs = io_request<const_buffers_type>(), bool wait_for_device = false, bool and_metadata = false, deadline d = deadline()) noexcept override;
 
   /*! Clone this handle (copy constructor is disabled to avoid accidental copying)
@@ -255,6 +257,11 @@ public:
 };
 
 // BEGIN make_free_functions.py
+//! Swap with another instance
+inline void swap(file_handle &self, file_handle &o) noexcept
+{
+  return self.swap(std::forward<decltype(o)>(o));
+}
 /*! Create a file handle opening access to a file on path
 
 \errors Any of the values POSIX open() or CreateFile() can return.

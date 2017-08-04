@@ -170,6 +170,7 @@ public:
     return *this;
   }
   //! Swap with another instance
+  AFIO_MAKE_FREE_FUNCTION
   void swap(handle &o) noexcept
   {
     handle temp(std::move(*this));
@@ -196,6 +197,7 @@ public:
   */
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<path_type> current_path() const noexcept;
   //! Immediately close the native handle type managed by this handle
+  AFIO_MAKE_FREE_FUNCTION
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> close() noexcept;
   /*! Clone this handle (copy constructor is disabled to avoid accidental copying)
 
@@ -359,6 +361,19 @@ namespace detail
     AFIO_LOG_INFO(inst->native_handle()._init, buffer);
   }
 }
+
+// BEGIN make_free_functions.py
+//! Swap with another instance
+inline void swap(handle &self, handle &o) noexcept
+{
+  return self.swap(std::forward<decltype(o)>(o));
+}
+//! Immediately close the native handle type managed by this handle
+inline result<void> close(handle &self) noexcept
+{
+  return self.close();
+}
+// END make_free_functions.py
 
 AFIO_V2_NAMESPACE_END
 

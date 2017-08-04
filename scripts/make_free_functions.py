@@ -25,12 +25,14 @@ for header in glob.glob("../include/afio/*/*.hpp"):
                    raise Exception()
                if '{' in lines[lineidx+n+1] or ';' in lines[lineidx+n]:
                    break
-            for n in range(1, 100):
-               if '//!' in lines[lineidx-n] or '/*!' in lines[lineidx-n]:
-                   docs = ''.join(lines[lineidx-n:lineidx])
-                   # Remove any indent
-                   docs = docs.replace('\n  ', '\n')[2:]
-                   break
+            docs = ''
+            if '*/' in lines[lineidx-1] or '//!' in lines[lineidx-1]:
+                for n in range(1, 100):
+                   if '//!' in lines[lineidx-n] or '/*!' in lines[lineidx-n]:
+                       docs = ''.join(lines[lineidx-n:lineidx])
+                       # Remove any indent
+                       docs = docs.replace('\n  ', '\n')[2:]
+                       break
             functions_to_be_freed.append((current_class, function, docs))
         elif '// BEGIN make_free_functions.py' in lines[lineidx]:
             functions_to_be_freed_begin = lineidx

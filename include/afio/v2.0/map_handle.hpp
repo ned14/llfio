@@ -100,6 +100,7 @@ public:
     return *this;
   }
   //! Swap with another instance
+  AFIO_MAKE_FREE_FUNCTION
   void swap(section_handle &o) noexcept
   {
     section_handle temp(std::move(*this));
@@ -134,6 +135,7 @@ public:
   //! Returns the borrowed native handle backing this section
   native_handle_type backing_native_handle() const noexcept { return _backing ? _backing->native_handle() : native_handle_type(); }
   //! Return the current maximum permitted extent of the memory section.
+  AFIO_MAKE_FREE_FUNCTION
   extent_type length() const noexcept { return _length; }
 
   /*! Resize the current maximum permitted extent of the memory section to the given extent.
@@ -235,6 +237,7 @@ public:
     return *this;
   }
   //! Swap with another instance
+  AFIO_MAKE_FREE_FUNCTION
   void swap(map_handle &o) noexcept
   {
     map_handle temp(std::move(*this));
@@ -243,9 +246,11 @@ public:
   }
 
   //! Unmap the mapped view.
+  AFIO_MAKE_FREE_FUNCTION
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> close() noexcept override;
   //! Releases the mapped view, but does NOT release the native handle.
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC native_handle_type release() noexcept override;
+  AFIO_MAKE_FREE_FUNCTION
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> barrier(io_request<const_buffers_type> reqs = io_request<const_buffers_type>(), bool wait_for_device = false, bool and_metadata = false, deadline d = deadline()) noexcept override;
 
 
@@ -284,6 +289,7 @@ public:
   extent_type offset() const noexcept { return _offset; }
 
   //! The size of the memory map.
+  AFIO_MAKE_FREE_FUNCTION
   size_type length() const noexcept { return _length; }
 
   //! Ask the system to commit the system resources to make the memory represented by the buffer available with the given permissions. addr and length should be page aligned (see utils::page_sizes()), if not the returned buffer is the region actually committed.
@@ -351,6 +357,11 @@ public:
 
 
 // BEGIN make_free_functions.py
+//! Swap with another instance
+inline void swap(section_handle &self, section_handle &o) noexcept
+{
+  return self.swap(std::forward<decltype(o)>(o));
+}
 /*! \brief Create a memory section.
 \param backing The handle to use as backing storage. An invalid handle means to use the system page file as the backing storage.
 \param maximum_size The maximum size this section can ever be. Zero means to use backing.length().
@@ -372,6 +383,11 @@ inline result<section_handle> section(section_handle::extent_type maximum_size) 
 {
   return section_handle::section(std::forward<decltype(maximum_size)>(maximum_size));
 }
+//! Return the current maximum permitted extent of the memory section.
+inline section_handle::extent_type length(const section_handle &self) noexcept
+{
+  return self.length();
+}
 /*! Resize the current maximum permitted extent of the memory section to the given extent.
 
 \errors Any of the values NtExtendSection() can return. On POSIX this is a no op.
@@ -379,6 +395,20 @@ inline result<section_handle> section(section_handle::extent_type maximum_size) 
 inline result<section_handle::extent_type> truncate(section_handle &self, section_handle::extent_type newsize) noexcept
 {
   return self.truncate(std::forward<decltype(newsize)>(newsize));
+}
+//! Swap with another instance
+inline void swap(map_handle &self, map_handle &o) noexcept
+{
+  return self.swap(std::forward<decltype(o)>(o));
+}
+//! Unmap the mapped view.
+inline result<void> close(map_handle &self) noexcept
+{
+  return self.close();
+}
+inline map_handle::io_result<map_handle::const_buffers_type> barrier(map_handle &self, map_handle::io_request<map_handle::const_buffers_type> reqs = map_handle::io_request<map_handle::const_buffers_type>(), bool wait_for_device = false, bool and_metadata = false, deadline d = deadline()) noexcept
+{
+  return self.barrier(std::forward<decltype(reqs)>(reqs), std::forward<decltype(wait_for_device)>(wait_for_device), std::forward<decltype(and_metadata)>(and_metadata), std::forward<decltype(d)>(d));
 }
 /*! Create new memory and map it into view.
 \param bytes How many bytes to create and map. Typically will be rounded to a multiple of the page size (see utils::page_sizes()).
@@ -406,6 +436,11 @@ inline result<map_handle> map(map_handle::size_type bytes, section_handle::flag 
 inline result<map_handle> map(section_handle &section, map_handle::size_type bytes = 0, map_handle::extent_type offset = 0, section_handle::flag _flag = section_handle::flag::read | section_handle::flag::write) noexcept
 {
   return map_handle::map(std::forward<decltype(section)>(section), std::forward<decltype(bytes)>(bytes), std::forward<decltype(offset)>(offset), std::forward<decltype(_flag)>(_flag));
+}
+//! The size of the memory map.
+inline map_handle::size_type length(const map_handle &self) noexcept
+{
+  return self.length();
 }
 /*! \brief Read data from the mapped view.
 
