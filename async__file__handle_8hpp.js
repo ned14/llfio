@@ -6,5 +6,7 @@ var async__file__handle_8hpp =
     [ "async_read", "async__file__handle_8hpp.html#a9b76b093cea445bbf0215e59e0533c1a", null ],
     [ "async_temp_file", "async__file__handle_8hpp.html#aa3cdce920646dc31d5f8d36ae0fafc2b", null ],
     [ "async_temp_inode", "async__file__handle_8hpp.html#a7e32a73d5c84a0b5aefcefe9fb2f5297", null ],
-    [ "async_write", "async__file__handle_8hpp.html#ae02e72d068c5dfd1c686a32e614ea6f8", null ]
+    [ "async_write", "async__file__handle_8hpp.html#ae02e72d068c5dfd1c686a32e614ea6f8", null ],
+    [ "barrier", "async__file__handle_8hpp.html#a0ff925d5c5434bcec35b2167d87d5c55", null ],
+    [ "swap", "async__file__handle_8hpp.html#ae927cd0656591e7763a96703da0ebebb", null ]
 ];
