@@ -99,7 +99,7 @@ struct stat_t
   QUICKCPPLIB_BITFIELD_BEGIN(want)
   {
     dev = 1 << 0, ino = 1 << 1, type = 1 << 2, perms = 1 << 3, nlink = 1 << 4, uid = 1 << 5, gid = 1 << 6, rdev = 1 << 7, atim = 1 << 8, mtim = 1 << 9, ctim = 1 << 10, size = 1 << 11, allocated = 1 << 12, blocks = 1 << 13, blksize = 1 << 14, flags = 1 << 15, gen = 1 << 16, birthtim = 1 << 17, sparse = 1 << 24,
-    compressed = 1 << 25, reparse_point = 1 << 26, all = (unsigned) -1
+    compressed = 1 << 25, reparse_point = 1 << 26, all = (unsigned) -1, none = 0
   }
   QUICKCPPLIB_BITFIELD_END(want)
   //! Constructs a UNINITIALIZED instance i.e. full of random garbage

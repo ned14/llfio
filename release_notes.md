@@ -7,9 +7,27 @@
 </tr>
 </table></center>
 
-Herein lies my proposed async file i/o and filesystem library for Boost and the C++ standard.
+Herein lies my proposed zero whole machine memory copy async file i/o and filesystem
+library for Boost and the C++ standard.
 It is a complete rewrite after a Boost peer review in August 2015. Its github
 source code repository lives at https://github.com/ned14/boost.afio.
+
+Why you might need AFIO: Average 4Kb transfer latencies for the physical hardware:
+- Average read spinning rust hard drive latency @ QD1: **7000us**
+- Average read SATA flash drive latency @ QD1: **800us**
+- Average `memcpy(4Kb)` latency: **500us** (main memory) to **90us** (L2 cache)
+- Average read NVMe flash drive latency @ QD1: **300us**
+- Average RTT UDP packet latency over a LAN: **60us**
+- Average read XPoint drive latency @ QD1: **10us**
+- Average RTT PCIe latency: **0.5us**
+
+Why you might need AFIO: Max bandwidth for the physical hardware:
+- DDR4 2133: **30Gb/sec** (main memory)
+- x4 PCIe 4.0: **7.5Gb/sec** (arrives end of 2017, the 2018 NVMe drives will use PCIe 4.0)
+- x4 PCIe 3.0: **3.75Gb/sec**
+- 2017 XPoint drive (x4 PCIe 3.0): **2.5Gb/sec**
+- 2017 NVMe flash drive (x4 PCIe 3.0): **2Gb/sec**
+- 10Gbit LAN: **1.2Gb/sec**
 
 \note Note that this code is of late alpha quality. It's quite reliable, but be careful when using it!
 
