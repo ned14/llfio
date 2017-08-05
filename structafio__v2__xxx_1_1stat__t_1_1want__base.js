@@ -22,6 +22,7 @@ var structafio__v2__xxx_1_1stat__t_1_1want__base =
       [ "sparse", "structafio__v2__xxx_1_1stat__t_1_1want__base.html#a5c889dae7c6113ee9da35a669447145eab734799919fb2491189d1474f4f4ccb5", null ],
       [ "compressed", "structafio__v2__xxx_1_1stat__t_1_1want__base.html#a5c889dae7c6113ee9da35a669447145ea776bf5a041dd501728da299abe1f45e4", null ],
       [ "reparse_point", "structafio__v2__xxx_1_1stat__t_1_1want__base.html#a5c889dae7c6113ee9da35a669447145ea33278cd01927ae36ae63be87e32d873c", null ],
-      [ "all", "structafio__v2__xxx_1_1stat__t_1_1want__base.html#a5c889dae7c6113ee9da35a669447145eaaec521a4866705e2172d9900cd88f870", null ]
+      [ "all", "structafio__v2__xxx_1_1stat__t_1_1want__base.html#a5c889dae7c6113ee9da35a669447145eaaec521a4866705e2172d9900cd88f870", null ],
+      [ "none", "structafio__v2__xxx_1_1stat__t_1_1want__base.html#a5c889dae7c6113ee9da35a669447145ead3010a2a1a4b87d445c0d0755031c5eb", null ]
     ] ]
 ];
