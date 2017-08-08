@@ -117,9 +117,9 @@ $(document).ready(function(){initNavTree('index.html','');});
 </center><p>Herein lies my proposed zero whole machine memory copy async file i/o and filesystem library for Boost and the C++ standard. It is a complete rewrite after a Boost peer review in August 2015. Its github source code repository lives at <a href="https://github.com/ned14/boost.afio">https://github.com/ned14/boost.afio</a>.</p>
 <table  border="0" cellpadding="4">
 <tr>
-<th colspan="2">Why you might need AFIO  </th></tr>
+<th colspan="4">&lt;u&gt;Why you might need AFIO&lt;/u&gt;  </th></tr>
 <tr>
-<td>Average 4Kb transfer latencies for the physical hardware:<ul>
+<td valign="top">Average 4Kb transfer latencies for the physical hardware:<ul>
 <li>Average read spinning rust hard drive latency @ QD1: <b>7000us</b></li>
 <li>Average read SATA flash drive latency @ QD1: <b>800us</b></li>
 <li>Average <code>memcpy(4Kb)</code> latency: <b>500us</b> (main memory) to <b>90us</b> (L2 cache)</li>
@@ -128,7 +128,7 @@ $(document).ready(function(){initNavTree('index.html','');});
 <li>Average read XPoint drive latency @ QD1: <b>10us</b></li>
 <li>Average RTT PCIe latency: <b>0.5us</b>  </li>
 </ul>
-</td><td>Max bandwidth for the physical hardware:<ul>
+</td><td valign="top">Max bandwidth for the physical hardware:<ul>
 <li>DDR4 2133: <b>30Gb/sec</b> (main memory)</li>
 <li>x4 PCIe 4.0: <b>7.5Gb/sec</b> (arrives end of 2017, the 2018 NVMe drives will use PCIe 4.0)</li>
 <li>x4 PCIe 3.0: <b>3.75Gb/sec</b></li>
@@ -136,10 +136,21 @@ $(document).ready(function(){initNavTree('index.html','');});
 <li>2017 NVMe flash drive (x4 PCIe 3.0): <b>2Gb/sec</b></li>
 <li>10Gbit LAN: <b>1.2Gb/sec</b>  </li>
 </ul>
-</td><td>Average 4Kb transfer latencies for the software with <code>O_DIRECT</code>:<ul>
+</td><td valign="top">Average 4Kb transfer latencies for the software with STL iostreams:<ul>
 <li>Average read spinning rust hard drive latency @ QD1: <b>TODO</b></li>
 <li>Average read SATA flash drive latency @ QD1: <b>TODO</b></li>
-<li>Average read NVMe flash drive latency @ QD1: <b>TODO</b>   </li>
+<li>Average read NVMe flash drive latency @ QD1: <b>TODO</b></li>
+<li>Average read spinning rust hard drive latency @ QD8: <b>TODO</b></li>
+<li>Average read SATA flash drive latency @ QD8: <b>TODO</b></li>
+<li>Average read NVMe flash drive latency @ QD8: <b>TODO</b>  </li>
+</ul>
+</td><td valign="top">Average 4Kb transfer latencies for the software with AFIO:<ul>
+<li>Average read spinning rust hard drive latency @ QD1: <b>TODO</b></li>
+<li>Average read SATA flash drive latency @ QD1: <b>TODO</b></li>
+<li>Average read NVMe flash drive latency @ QD1: <b>TODO</b></li>
+<li>Average read spinning rust hard drive latency @ QD8: <b>TODO</b></li>
+<li>Average read SATA flash drive latency @ QD8: <b>TODO</b></li>
+<li>Average read NVMe flash drive latency @ QD8: <b>TODO</b>   </li>
 </ul>
 </td></tr>
 </table>
