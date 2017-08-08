@@ -14,10 +14,10 @@ source code repository lives at https://github.com/ned14/boost.afio.
 
 <table border="0" cellpadding="4">
 <tr>
-<th colspan="2">Why you might need AFIO</th>
+<th colspan="4"><u>Why you might need AFIO</u></th>
 </tr>
 <tr>
-<td>
+<td valign="top">
 Average 4Kb transfer latencies for the physical hardware:
 - Average read spinning rust hard drive latency @ QD1: **7000us**
 - Average read SATA flash drive latency @ QD1: **800us**
@@ -27,7 +27,7 @@ Average 4Kb transfer latencies for the physical hardware:
 - Average read XPoint drive latency @ QD1: **10us**
 - Average RTT PCIe latency: **0.5us**
 </td>
-<td>
+<td valign="top">
 Max bandwidth for the physical hardware:
 - DDR4 2133: **30Gb/sec** (main memory)
 - x4 PCIe 4.0: **7.5Gb/sec** (arrives end of 2017, the 2018 NVMe drives will use PCIe 4.0)
@@ -36,11 +36,23 @@ Max bandwidth for the physical hardware:
 - 2017 NVMe flash drive (x4 PCIe 3.0): **2Gb/sec**
 - 10Gbit LAN: **1.2Gb/sec**
 </td>
-<td>
-Average 4Kb transfer latencies for the software with `O_DIRECT`:
+<td valign="top">
+Average 4Kb transfer latencies for the software with STL iostreams:
 - Average read spinning rust hard drive latency @ QD1: **TODO**
 - Average read SATA flash drive latency @ QD1: **TODO**
 - Average read NVMe flash drive latency @ QD1: **TODO**
+- Average read spinning rust hard drive latency @ QD8: **TODO**
+- Average read SATA flash drive latency @ QD8: **TODO**
+- Average read NVMe flash drive latency @ QD8: **TODO**
+</td>
+<td valign="top">
+Average 4Kb transfer latencies for the software with AFIO:
+- Average read spinning rust hard drive latency @ QD1: **TODO**
+- Average read SATA flash drive latency @ QD1: **TODO**
+- Average read NVMe flash drive latency @ QD1: **TODO**
+- Average read spinning rust hard drive latency @ QD8: **TODO**
+- Average read SATA flash drive latency @ QD8: **TODO**
+- Average read NVMe flash drive latency @ QD8: **TODO**
 </td>
 </tr>
 </table>
