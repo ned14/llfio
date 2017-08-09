@@ -175,11 +175,9 @@ constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href=
 <tr class="separator:ad52109de64819f13ee8e89c9122bc9d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abe45825030f5e5c93c9e9aae2ec1267a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="abe45825030f5e5c93c9e9aae2ec1267a"></a>
 constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1path__view.html#abe45825030f5e5c93c9e9aae2ec1267a">path_view</a> (const char *v) noexcept</td></tr>
-<tr class="memdesc:abe45825030f5e5c93c9e9aae2ec1267a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Implicitly constructs a UTF-8 path view from a <code>const char *</code>. The input string MUST continue to exist for this view to be valid. <br/></td></tr>
+<tr class="memdesc:abe45825030f5e5c93c9e9aae2ec1267a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Implicitly constructs a UTF-8 path view from a zero terminated <code>const char *</code>. The input string MUST continue to exist for this view to be valid. <br/></td></tr>
 <tr class="separator:abe45825030f5e5c93c9e9aae2ec1267a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0fbb34b2d74d72ae18209d5b3d6fd42d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0fbb34b2d74d72ae18209d5b3d6fd42d"></a>
-constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1path__view.html#a0fbb34b2d74d72ae18209d5b3d6fd42d">path_view</a> (string_view v) noexcept</td></tr>
-<tr class="memdesc:a0fbb34b2d74d72ae18209d5b3d6fd42d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Implicitly constructs a UTF-8 path view from a string view. <br/></td></tr>
+<tr class="memitem:a0fbb34b2d74d72ae18209d5b3d6fd42d"><td class="memItemLeft" align="right" valign="top">constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1path__view.html#a0fbb34b2d74d72ae18209d5b3d6fd42d">path_view</a> (string_view v) noexcept</td></tr>
 <tr class="separator:a0fbb34b2d74d72ae18209d5b3d6fd42d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a203b7d7a696fa1098b05346c095e3094"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a203b7d7a696fa1098b05346c095e3094"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1path__view.html#a203b7d7a696fa1098b05346c095e3094">path_view</a> (const <a class="el" href="classafio__v2__xxx_1_1path__view.html">path_view</a> &amp;)=default</td></tr>
@@ -306,26 +304,61 @@ struct&#160;</td><td class="memItemRight" valign="bottom"><b>c_str</b></td></tr>
 <h1>Windows specific notes:</h1>
 <p>Be aware that on Microsoft Windows, the native path storage <code>std::filesystem::path::value_type</code> is a <code>wchar_t</code> referring to UTF-16. However much of AFIO path usage is a <code>path_handle</code> to somewhere on the filing system plus a relative <code>const char *</code> UTF-8 path fragment as the use of absolute paths is discouraged. Rather than complicate the ABI to handle templated path character types, on Microsoft Windows only we do the following:</p>
 <ul>
-<li>If view input is <code>wchar_t</code>, the original source is passed through unmodified to the syscall without any memory allocation nor copying.</li>
+<li>If view input is <code>wchar_t</code>, the original source is passed through unmodified to the syscall without any memory allocation, copying nor slash conversion.</li>
 <li>If view input is <code>char</code>:<ol type="1">
 <li>The original source <b>is assumed to be in UTF-8</b>, not ASCII like most <code>char</code> paths on Microsoft Windows.</li>
 <li>Use with any kernel function converts to a temporary UTF-16 internal buffer. We use the fast NT kernel UTF8 to UTF16 routine, not the slow Win32 routine.</li>
+<li>Any forward slashes are converted to backwards slashes.</li>
 </ol>
 </li>
 </ul>
-<p>Be also aware that AFIO calls the NT kernel API directly rather than the Win32 API for:</p>
+<p>AFIO calls the NT kernel API directly rather than the Win32 API for:</p>
 <ul>
 <li>For any paths relative to a <code>path_handle</code> (the Win32 API does not provide a race free file system API).</li>
-<li>For any paths beginning with <code>\\.\</code> (NT kernel namespace) or <code>\??\</code> (NT kernel symlink namespace). Note this is NOT <code>\\?\</code> which is used to tell a Win32 API to not perform DOS to NT path conversion.</li>
+<li>For any paths beginning with <code>\!!\</code>, we pass the path + 3 characters directly through. This prefix is a pure AFIO extension, and will not be recognised by other code.</li>
+<li>For any paths beginning with <code>\??\</code>, we pass the path + 0 characters directly through. Note the NT kernel keeps a symlink at <code>\??\</code> which refers to the DosDevices namespace for the current login, so as an incorrect relation which you should <b>not</b> rely on, the Win32 path <code>C:\foo</code> probably will appear at <code>\??\C:\foo</code>.</li>
+</ul>
+<p>These prefixes are still passed to the Win32 API:</p>
+<ul>
+<li><code>\\?\</code> which is used to tell a Win32 API that the remaining path is longer than a DOS path.</li>
+<li><code>\\.\</code> which since Windows 7 is treated exactly like <code>\\?\</code>.</li>
 </ul>
 <p>If the NT kernel API is used directly then:</p>
 <ul>
 <li>Paths are matched case sensitively as raw bytes via <code>memcmp()</code>, not case insensitively (requires slow locale conversion).</li>
 <li>The path limit is 32,767 characters.</li>
 </ul>
-<p>For performance, you are very strongly recommended to use the NT kernel API wherever possible. Where paths are involved, it is often three to five times faster due to the multiple memory allocations and string translations that the Win32 functions perform before calling the NT kernel routine.</p>
-<p>If however you are taking input from some external piece of code, then for maximum compatibility we still use the Win32 API. </p>
-</div><hr/>The documentation for this class was generated from the following file:<ul>
+<p>If you really care about performance, you are very strongly recommended to use the NT kernel API wherever possible. Where paths are involved, it is often three to five times faster due to the multiple memory allocations and string translations that the Win32 functions perform before calling the NT kernel routine.</p>
+<p>If however you are taking input from some external piece of code, then for maximum compatibility you should still use the Win32 API. </p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a class="anchor" id="a0fbb34b2d74d72ae18209d5b3d6fd42d"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">constexpr afio_v2_xxx::path_view::path_view </td>
+          <td>(</td>
+          <td class="paramtype">string_view&#160;</td>
+          <td class="paramname"><em>v</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Implicitly constructs a UTF-8 path view from a string view. </p>
+<dl class="section warning"><dt>Warning</dt><dd>The byte after the end of the view must be legal to read. </dd></dl>
+<div class="fragment"><div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;: _state(v) {}</div>
+</div><!-- fragment -->
+</div>
+</div>
+<hr/>The documentation for this class was generated from the following file:<ul>
 <li>include/afio/v2.0/<a class="el" href="path__view_8hpp.html">path_view.hpp</a></li>
 </ul>
 </div><!-- contents -->
