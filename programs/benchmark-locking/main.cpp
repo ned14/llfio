@@ -30,8 +30,8 @@ Distributed under the Boost Software License, Version 1.0.
 
 #define _CRT_SECURE_NO_WARNINGS 1
 
-#include "../../include/boost/afio/afio.hpp"
-#include "../kerneltest/include/boost/kerneltest/v1.0/child_process.hpp"
+#include "../../include/afio/afio.hpp"
+#include "../kerneltest/include/kerneltest/v1.0/child_process.hpp"
 
 #include <fstream>
 #include <iostream>
@@ -144,10 +144,10 @@ int main(int argc, char *argv[])
       auto child = child_process::child_process::launch(mypath, args, env, true);
       if(child.has_error())
       {
-        std::cerr << "FATAL: Child " << n << " could not be launched due to " << child.get_error().message() << std::endl;
+        std::cerr << "FATAL: Child " << n << " could not be launched due to " << child.error().message() << std::endl;
         return 1;
       }
-      children.push_back(std::move(child.get()));
+      children.push_back(std::move(child.value()));
     }
     // Wait for all children to tell me they are ready
     char buffer[1024];
@@ -276,50 +276,51 @@ int main(int argc, char *argv[])
   std::atomic<int> done(-1);
   std::thread worker([test, contended, total_locks, this_child, &done, &count] {
     std::unique_ptr<afio::algorithm::shared_fs_mutex::shared_fs_mutex> algorithm;
+    auto base = afio::path_handle::path(".").value();
     switch(test)
     {
     case lock_algorithm::atomic_append:
     {
-      auto v = afio::algorithm::shared_fs_mutex::atomic_append::fs_mutex_append("lockfile");
+      auto v = afio::algorithm::shared_fs_mutex::atomic_append::fs_mutex_append({}, "lockfile");
       if(v.has_error())
       {
-        std::cerr << "ERROR: Creation of lock algorithm returns " << v.get_error().message() << std::endl;
+        std::cerr << "ERROR: Creation of lock algorithm returns " << v.error().message() << std::endl;
         return;
       }
-      algorithm = std::make_unique<afio::algorithm::shared_fs_mutex::atomic_append>(std::move(v.get()));
+      algorithm = std::make_unique<afio::algorithm::shared_fs_mutex::atomic_append>(std::move(v.value()));
       break;
     }
     case lock_algorithm::byte_ranges:
     {
-      auto v = afio::algorithm::shared_fs_mutex::byte_ranges::fs_mutex_byte_ranges("lockfile");
+      auto v = afio::algorithm::shared_fs_mutex::byte_ranges::fs_mutex_byte_ranges({}, "lockfile");
       if(v.has_error())
       {
-        std::cerr << "ERROR: Creation of lock algorithm returns " << v.get_error().message() << std::endl;
+        std::cerr << "ERROR: Creation of lock algorithm returns " << v.error().message() << std::endl;
         return;
       }
-      algorithm = std::make_unique<afio::algorithm::shared_fs_mutex::byte_ranges>(std::move(v.get()));
+      algorithm = std::make_unique<afio::algorithm::shared_fs_mutex::byte_ranges>(std::move(v.value()));
       break;
     }
     case lock_algorithm::lock_files:
     {
-      auto v = afio::algorithm::shared_fs_mutex::lock_files::fs_mutex_lock_files(".");
+      auto v = afio::algorithm::shared_fs_mutex::lock_files::fs_mutex_lock_files(base);
       if(v.has_error())
       {
-        std::cerr << "ERROR: Creation of lock algorithm returns " << v.get_error().message() << std::endl;
+        std::cerr << "ERROR: Creation of lock algorithm returns " << v.error().message() << std::endl;
         return;
       }
-      algorithm = std::make_unique<afio::algorithm::shared_fs_mutex::lock_files>(std::move(v.get()));
+      algorithm = std::make_unique<afio::algorithm::shared_fs_mutex::lock_files>(std::move(v.value()));
       break;
     }
     case lock_algorithm::memory_map:
     {
-      auto v = afio::algorithm::shared_fs_mutex::memory_map<QUICKCPPLIB_NAMESPACE::algorithm::hash::passthru_hash>::fs_mutex_map("lockfile");
+      auto v = afio::algorithm::shared_fs_mutex::memory_map<QUICKCPPLIB_NAMESPACE::algorithm::hash::passthru_hash>::fs_mutex_map({}, "lockfile");
       if(v.has_error())
       {
-        std::cerr << "ERROR: Creation of lock algorithm returns " << v.get_error().message() << std::endl;
+        std::cerr << "ERROR: Creation of lock algorithm returns " << v.error().message() << std::endl;
         return;
       }
-      algorithm = std::make_unique<afio::algorithm::shared_fs_mutex::memory_map<QUICKCPPLIB_NAMESPACE::algorithm::hash::passthru_hash>>(std::move(v.get()));
+      algorithm = std::make_unique<afio::algorithm::shared_fs_mutex::memory_map<QUICKCPPLIB_NAMESPACE::algorithm::hash::passthru_hash>>(std::move(v.value()));
       break;
     }
     case lock_algorithm::unknown:
@@ -344,16 +345,16 @@ int main(int argc, char *argv[])
       std::this_thread::yield();
     while(!done)
     {
-      auto result = algorithm->lock(afio::as_span(entities), afio::deadline(), false);
+      auto result = algorithm->lock(entities, afio::deadline(), false);
       if(result.has_error())
       {
-        std::cerr << "ERROR: Algorithm lock returns " << result.get_error().message() << std::endl;
+        std::cerr << "ERROR: Algorithm lock returns " << result.error().message() << std::endl;
         return;
       }
       if(contended)
         child_locks(this_child);
       ++count;
-      auto guard = std::move(result.get());
+      auto guard = std::move(result.value());
       if(contended)
         child_unlocks(this_child);
       guard.unlock();

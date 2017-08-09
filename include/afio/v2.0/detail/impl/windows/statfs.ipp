@@ -147,11 +147,9 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, st
         // buffer should look like \Device\HarddiskVolumeX
         if(memcmp(buffer, L"\\Device\\HarddiskVolume", 44))
           return std::errc::illegal_byte_sequence;
-        // TODO FIXME This should output the kind of path the input handle uses
-        // For now though, output a win32 compatible path
         f_mntfromname.reserve(len + 3);
-        f_mntfromname.assign("\\\\.");  // win32 escape prefix for NT kernel path \Device
-        for(size_t n = 7; n < len; n++)
+        f_mntfromname.assign("\\!!");  // escape prefix for NT kernel path
+        for(size_t n = 0; n < len; n++)
           f_mntfromname.push_back((char) buffer[n]);
         ++ret;
         wanted &= ~want::mntfromname;

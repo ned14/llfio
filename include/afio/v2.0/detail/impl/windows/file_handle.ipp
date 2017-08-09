@@ -139,11 +139,11 @@ result<file_handle> file_handle::file(const path_handle &base, file_handle::path
     ntflags |= 0x040 /*FILE_NON_DIRECTORY_FILE*/;  // do not open a directory
     IO_STATUS_BLOCK isb = make_iostatus();
 
-    path_view::c_str zpath(path);
+    path_view::c_str zpath(path, true);
     UNICODE_STRING _path;
     _path.Buffer = const_cast<wchar_t *>(zpath.buffer);
     _path.MaximumLength = (_path.Length = (USHORT)(zpath.length * sizeof(wchar_t))) + sizeof(wchar_t);
-    if(zpath.length >= 4 && _path.Buffer[0] == '\\' && _path.Buffer[1] == '\\' && _path.Buffer[2] == '.' && _path.Buffer[3] == '\\')
+    if(zpath.length >= 4 && _path.Buffer[0] == '\\' && _path.Buffer[1] == '!' && _path.Buffer[2] == '!' && _path.Buffer[3] == '\\')
     {
       _path.Buffer += 3;
       _path.Length -= 3 * sizeof(wchar_t);
@@ -186,7 +186,7 @@ result<file_handle> file_handle::file(const path_handle &base, file_handle::path
       creation = TRUNCATE_EXISTING;
       break;
     }
-    path_view::c_str zpath(path);
+    path_view::c_str zpath(path, false);
     if(INVALID_HANDLE_VALUE == (nativeh.h = CreateFileW_(zpath.buffer, access, fileshare, NULL, creation, attribs, NULL)))
     {
       DWORD errcode = GetLastError();
@@ -196,7 +196,11 @@ result<file_handle> file_handle::file(const path_handle &base, file_handle::path
   }
   if(!(flags & flag::disable_safety_unlinks))
   {
-    OUTCOME_TRYV(ret.value()._fetch_inode());
+    if(!ret.value()._fetch_inode())
+    {
+      // If fetching inode failed e.g. were opening device, disable safety unlinks
+      ret.value()._flags &= ~flag::disable_safety_unlinks;
+    }
   }
   if(flags & flag::unlink_on_close)
   {

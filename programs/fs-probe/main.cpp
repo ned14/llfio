@@ -24,7 +24,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #define _CRT_SECURE_NO_WARNINGS 1
 
-#include "../../include/boost/afio/afio.hpp"
+#include "../../include/afio/afio.hpp"
 
 #include <fstream>
 #include <iomanip>
@@ -44,7 +44,7 @@ static AFIO_V2_NAMESPACE::storage_profile::storage_profile profile[permute_flags
     auto ret = (expr);                                                                                                                                                                                                                                                                                                         \
     if(ret.has_error())                                                                                                                                                                                                                                                                                                        \
     {                                                                                                                                                                                                                                                                                                                          \
-      std::cerr << "WARNING: Operation " #expr " failed due to '" << ret.get_error().message() << "'" << std::endl;                                                                                                                                                                                                            \
+      std::cerr << "WARNING: Operation " #expr " failed due to '" << ret.error().message() << "'" << std::endl;                                                                                                                                                                                                                \
       abort();                                                                                                                                                                                                                                                                                                                 \
     }                                                                                                                                                                                                                                                                                                                          \
   }
@@ -52,7 +52,6 @@ static AFIO_V2_NAMESPACE::storage_profile::storage_profile profile[permute_flags
 int main(int argc, char *argv[])
 {
   using namespace AFIO_V2_NAMESPACE;
-  namespace stl11 = AFIO_V2_NAMESPACE::stl11;
   std::regex torun(".*");
   bool regexvalid = false;
   unsigned torunflags = permute_flags_max - 1;
@@ -78,16 +77,16 @@ int main(int argc, char *argv[])
   // Force extent allocation before test begins
   {
     // Create file with O_SYNC
-    auto _testfile(file_handle::file("test", handle::mode::write, handle::creation::if_needed, handle::caching::reads));
+    auto _testfile(file_handle::file({}, "test", handle::mode::write, handle::creation::if_needed, handle::caching::reads));
     if(!_testfile)
     {
-      std::cerr << "WARNING: Failed to create test file due to '" << _testfile.get_error().message() << "', failing" << std::endl;
+      std::cerr << "WARNING: Failed to create test file due to '" << _testfile.error().message() << "', failing" << std::endl;
       return 1;
     }
-    file_handle testfile(std::move(_testfile.get()));
+    file_handle testfile(std::move(_testfile.value()));
     std::vector<char> buffer(1024 * 1024);
     RETCHECK(testfile.truncate(buffer.size()));
-    file_handle::const_buffer_type _reqs[1] = {std::make_pair(buffer.data(), buffer.size())};
+    file_handle::const_buffer_type _reqs[1] = {{buffer.data(), buffer.size()}};
     file_handle::io_request<file_handle::const_buffers_type> reqs(_reqs, 0);
     RETCHECK(testfile.write(reqs));
   }
@@ -123,13 +122,13 @@ int main(int argc, char *argv[])
         break;
       }
       std::cout << "\ndirect=" << !!(flags & 1) << " sync=" << !!(flags & 2) << ":\n";
-      auto _testfile(file_handle::file("test", handle::mode::write, handle::creation::open_existing, strategy));
+      auto _testfile(file_handle::file({}, "test", handle::mode::write, handle::creation::open_existing, strategy));
       if(!_testfile)
       {
-        std::cerr << "WARNING: Failed to create test file due to '" << _testfile.get_error().message() << "', skipping" << std::endl;
+        std::cerr << "WARNING: Failed to create test file due to '" << _testfile.error().message() << "', skipping" << std::endl;
         continue;
       }
-      file_handle testfile(std::move(_testfile.get()));
+      file_handle testfile(std::move(_testfile.value()));
       for(auto &test : profile[flags])
       {
         if(std::regex_match(test.name, torun))
@@ -141,7 +140,7 @@ int main(int argc, char *argv[])
             test.invoke([](auto &i) { std::cout << "   " << i.name << " = " << i.value << std::endl; });
           }
           else
-            std::cerr << "   ERROR running test '" << test.name << "': " << result.get_error().message() << std::endl;
+            std::cerr << "   ERROR running test '" << test.name << "': " << result.error().message() << std::endl;
         }
       }
       // Write out results for this combination of flags

@@ -40,6 +40,15 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC void path_view::c_str::_from_utf8(const path_view
   }
   length = static_cast<uint16_t>(written / sizeof(wchar_t));
   _buffer[length] = 0;
+  wchar_t *p = _buffer;
+  do
+  {
+    p = wcschr(p, '/');
+    if(p)
+    {
+      *p = '\\';
+    }
+  } while(p);
   buffer = _buffer;
 }
 

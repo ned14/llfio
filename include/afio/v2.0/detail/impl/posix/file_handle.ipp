@@ -120,7 +120,11 @@ result<file_handle> file_handle::file(const path_handle &base, file_handle::path
     return {errno, std::system_category()};
   if(!(flags & flag::disable_safety_unlinks))
   {
-    OUTCOME_TRYV(ret.value()._fetch_inode());
+    if(!ret.value()._fetch_inode())
+    {
+      // If fetching inode failed e.g. were opening device, disable safety unlinks
+      ret.value()._flags &= ~flag::disable_safety_unlinks;
+    }
   }
   if(_creation == creation::truncate && ret.value().are_safety_fsyncs_issued())
     fsync(nativeh.fd);

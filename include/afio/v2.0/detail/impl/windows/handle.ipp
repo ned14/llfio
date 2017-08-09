@@ -50,7 +50,7 @@ result<handle::path_type> handle::current_path() const noexcept
     filesystem::path::string_type buffer;
     buffer.resize(32769);
     wchar_t *_buffer = const_cast<wchar_t *>(buffer.data());
-    memcpy(_buffer, L"\\\\.", 6);
+    memcpy(_buffer, L"\\!!", 6);
     DWORD len = GetFinalPathNameByHandle(_v.h, _buffer + 3, buffer.size() - 4 * sizeof(wchar_t), VOLUME_NAME_NT);  // NOLINT
     if(len == 0)
     {

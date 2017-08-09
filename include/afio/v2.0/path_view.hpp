@@ -69,17 +69,27 @@ plus a relative `const char *` UTF-8 path fragment as the use of absolute paths 
 complicate the ABI to handle templated path character types, on Microsoft Windows only we do the following:
 
 - If view input is `wchar_t`, the original source is passed through unmodified to the syscall without any
-memory allocation nor copying.
+memory allocation, copying nor slash conversion.
 - If view input is `char`:
   1. The original source **is assumed to be in UTF-8**, not ASCII like most `char` paths on Microsoft Windows.
   2. Use with any kernel function converts to a temporary UTF-16 internal buffer. We use the fast NT kernel
 UTF8 to UTF16 routine, not the slow Win32 routine.
+  3. Any forward slashes are converted to backwards slashes.
 
-Be also aware that AFIO calls the NT kernel API directly rather than the Win32 API for:
+AFIO calls the NT kernel API directly rather than the Win32 API for:
 
 - For any paths relative to a `path_handle` (the Win32 API does not provide a race free file system API).
-- For any paths beginning with `\\.\` (NT kernel namespace) or `\??\` (NT kernel symlink namespace). Note
-this is NOT `\\?\` which is used to tell a Win32 API to not perform DOS to NT path conversion.
+- For any paths beginning with `\!!\`, we pass the path + 3 characters directly through. This prefix
+is a pure AFIO extension, and will not be recognised by other code.
+- For any paths beginning with `\??\`, we pass the path + 0 characters directly through. Note the NT kernel
+keeps a symlink at `\??\` which refers to the DosDevices namespace for the current login, so as an
+incorrect relation which you should **not** rely on, the Win32 path `C:\foo` probably will appear
+at `\??\C:\foo`.
+
+These prefixes are still passed to the Win32 API:
+
+- `\\?\` which is used to tell a Win32 API that the remaining path is longer than a DOS path.
+- `\\.\` which since Windows 7 is treated exactly like `\\?\`.
 
 If the NT kernel API is used directly then:
 
@@ -87,12 +97,12 @@ If the NT kernel API is used directly then:
 locale conversion).
 - The path limit is 32,767 characters.
 
-For performance, you are very strongly recommended to use the NT kernel API wherever possible. Where paths
+If you really care about performance, you are very strongly recommended to use the NT kernel API wherever possible. Where paths
 are involved, it is often three to five times faster due to the multiple memory allocations and string
 translations that the Win32 functions perform before calling the NT kernel routine.
 
-If however you are taking input from some external piece of code, then for maximum compatibility we still use
-the Win32 API.
+If however you are taking input from some external piece of code, then for maximum compatibility you
+should still use the Win32 API.
 */
 class AFIO_DECL path_view
 {
@@ -169,7 +179,7 @@ public:
   path_view(const filesystem::path &v) noexcept : _state(v.native()) {}
   //! Implicitly constructs a UTF-8 path view from a string. The input string MUST continue to exist for this view to be valid.
   path_view(const std::string &v) noexcept : _state(v) {}
-  //! Implicitly constructs a UTF-8 path view from a `const char *`. The input string MUST continue to exist for this view to be valid.
+  //! Implicitly constructs a UTF-8 path view from a zero terminated `const char *`. The input string MUST continue to exist for this view to be valid.
   constexpr path_view(const char *v) noexcept :
 #if !_HAS_CXX17 && __cplusplus < 201700
   _state(string_view(v, detail::constexpr_strlen(v)))
@@ -178,12 +188,14 @@ public:
 #endif
   {
   }
-  //! Implicitly constructs a UTF-8 path view from a string view.
+  /*! Implicitly constructs a UTF-8 path view from a string view.
+  \warning The byte after the end of the view must be legal to read.
+  */
   constexpr path_view(string_view v) noexcept : _state(v) {}
 #ifdef _WIN32
   //! Implicitly constructs a UTF-16 path view from a string. The input string MUST continue to exist for this view to be valid.
   path_view(const std::wstring &v) noexcept : _state(v) {}
-  //! Implicitly constructs a UTF-16 path view from a `const wchar_t *`. The input string MUST continue to exist for this view to be valid.
+  //! Implicitly constructs a UTF-16 path view from a zero terminated `const wchar_t *`. The input string MUST continue to exist for this view to be valid.
   constexpr path_view(const wchar_t *v) noexcept :
 #if !_HAS_CXX17 && __cplusplus < 201700
   _state(wstring_view(v, detail::constexpr_strlen(v)))
@@ -192,7 +204,9 @@ public:
 #endif
   {
   }
-  //! Implicitly constructs a UTF-16 path view from a wide string view.
+  /*! Implicitly constructs a UTF-16 path view from a wide string view.
+  \warning The character after the end of the view must be legal to read.
+  */
   constexpr path_view(wstring_view v) noexcept : _state(v) {}
 #endif
   //! Default copy constructor
@@ -223,14 +237,14 @@ public:
   constexpr bool is_absolute() const noexcept;
   constexpr bool is_relative() const noexcept;
 #ifdef _WIN32
-  // True if the path view is a NT kernel path starting with `\\.\`
+  // True if the path view is a NT kernel path starting with `\!!\` or `\??\`
   constexpr bool is_ntpath() const noexcept
   {
     return _invoke([](const auto &v) {
       if(v.size() < 4)
         return false;
       const auto *d = v.data();
-      if(d[0] == '\\' && d[1] == '\\' && d[2] == '.' && d[3] == '\\')
+      if(d[0] == '\\' && d[1] == '!' && d[2] == '!' && d[3] == '\\')
         return true;
       if(d[0] == '\\' && d[1] == '?' && d[2] == '?' && d[3] == '\\')
         return true;
@@ -270,18 +284,24 @@ public:
     uint16_t length{0};
     const filesystem::path::value_type *buffer{nullptr};
 
-    c_str(const path_view &view) noexcept
-    {
 #ifdef _WIN32
+    c_str(const path_view &view, bool ntkernelapi) noexcept
+    {
       if(!view._state._utf16.empty())
       {
-        if (view._state._utf16.size() > 32768)
+        if(view._state._utf16.size() > 32768)
         {
           AFIO_LOG_FATAL(&view, "Attempt to send a path exceeding 64Kb to kernel");
           abort();
         }
-        length = static_cast<uint16_t>(view._state._utf16.size());
+        // Is this going straight to a NT kernel API? If so, use directly
+        if(ntkernelapi)
+        {
+          buffer = view._state._utf16.data();
+          return;
+        }
         // Is the byte just after the view a zero? If so, use directly
+        length = static_cast<uint16_t>(view._state._utf16.size());
         if(0 == view._state._utf16.data()[length])
         {
           buffer = view._state._utf16.data();
@@ -304,9 +324,11 @@ public:
         return;
       }
 #else
+    c_str(const path_view &view) noexcept
+    {
       if(!view._state._utf8.empty())
       {
-        if (view._state._utf8.size() > 32768)
+        if(view._state._utf8.size() > 32768)
         {
           AFIO_LOG_FATAL(&view, "Attempt to send a path exceeding 64Kb to kernel");
           abort();

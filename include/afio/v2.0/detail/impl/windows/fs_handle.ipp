@@ -46,17 +46,35 @@ result<void> fs_handle::relink(const path_handle &base, path_view_type path, dea
   AFIO_LOG_FUNCTION_CALL(this);
   auto &h = _get_handle();
 
-  path_view::c_str zpath(path);
+  // If the target is a win32 path, we need to convert to NT path and call ourselves
+  if(!base.is_valid() && !path.is_ntpath())
+  {
+    path_view::c_str zpath(path, false);
+    UNICODE_STRING NtPath;
+    if(!RtlDosPathNameToNtPathName_U(zpath.buffer, &NtPath, NULL, NULL))
+    {
+      return {ERROR_FILE_NOT_FOUND, std::system_category()};
+    }
+    auto unntpath = undoer([&NtPath] {
+      if(!HeapFree(GetProcessHeap(), 0, NtPath.Buffer))
+      {
+        abort();
+      }
+    });
+    // RtlDosPathNameToNtPathName_U outputs \??\path, so path.is_ntpath() will be false.
+    return relink(base, wstring_view(NtPath.Buffer, NtPath.Length / sizeof(wchar_t)));
+  }
+
+  path_view::c_str zpath(path, true);
   UNICODE_STRING _path;
   _path.Buffer = const_cast<wchar_t *>(zpath.buffer);
   _path.MaximumLength = (_path.Length = (USHORT)(zpath.length * sizeof(wchar_t))) + sizeof(wchar_t);
-  if(zpath.length >= 4 && _path.Buffer[0] == '\\' && _path.Buffer[1] == '\\' && _path.Buffer[2] == '.' && _path.Buffer[3] == '\\')
+  if(zpath.length >= 4 && _path.Buffer[0] == '\\' && _path.Buffer[1] == '!' && _path.Buffer[2] == '!' && _path.Buffer[3] == '\\')
   {
     _path.Buffer += 3;
     _path.Length -= 3 * sizeof(wchar_t);
     _path.MaximumLength -= 3 * sizeof(wchar_t);
   }
-
   IO_STATUS_BLOCK isb = make_iostatus();
   alignas(8) char buffer[sizeof(FILE_RENAME_INFORMATION) + 65536];
   FILE_RENAME_INFORMATION *fni = (FILE_RENAME_INFORMATION *) buffer;
