@@ -8,61 +8,59 @@
 </table></center>
 
 Herein lies my proposed zero whole machine memory copy async file i/o and filesystem
-library for Boost and the C++ standard.
+library for Boost and the C++ standard, intended for storage devices with sub-10 microsecond
+4Kb read latencies.
+
 It is a complete rewrite after a Boost peer review in August 2015. Its github
 source code repository lives at https://github.com/ned14/boost.afio.
 
 <table border="0" cellpadding="4">
 <tr>
-<th colspan="4"><u>Why you might need AFIO</u></th>
+<th colspan="5">Why you might need AFIO<hr></th>
 </tr>
 <tr>
 <td valign="top">
-Average 4Kb transfer latencies for the physical hardware:
-- Average read spinning rust hard drive latency @ QD1: **7000us**
-- Average read SATA flash drive latency @ QD1: **800us**
-- Average `memcpy(4Kb)` latency: **500us** (main memory) to **90us** (L2 cache)
-- Average read NVMe flash drive latency @ QD1: **300us**
-- Average RTT UDP packet latency over a LAN: **60us**
-- Average read XPoint drive latency @ QD1: **10us**
-- Average RTT PCIe latency: **0.5us**
+4Kb transfer latencies for the physical hardware:
+- Read spinning rust hard drive latency @ QD1: **7000us**
+- Read SATA flash drive latency @ QD1: **800us**
+- `memcpy(4Kb)` latency: **500us** (main memory) to **90us** (L2 cache)
+- Read NVMe flash drive latency @ QD1: **300us**
+- RTT UDP packet latency over a LAN: **60us**
+- Read XPoint drive latency @ QD1: **10us**
+- RTT PCIe latency: **0.5us**
 </td>
+<td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
 <td valign="top">
-Max bandwidth for the physical hardware:
-- DDR4 2133: **30Gb/sec** (main memory)
-- x4 PCIe 4.0: **7.5Gb/sec** (arrives end of 2017, the 2018 NVMe drives will use PCIe 4.0)
-- x4 PCIe 3.0: **3.75Gb/sec**
-- 2017 XPoint drive (x4 PCIe 3.0): **2.5Gb/sec**
-- 2017 NVMe flash drive (x4 PCIe 3.0): **2Gb/sec**
-- 10Gbit LAN: **1.2Gb/sec**
+QD1 4Kb transfer latencies for the software with STL iostreams:
+- Average read spinning rust hard drive latency: **TODO**
+- 99.999% read spinning rust hard drive latency: **TODO**
+- Average read SATA flash drive latency: **TODO**
+- 99.999% read SATA flash drive latency: **TODO**
+- Average read NVMe flash drive latency: **TODO**
+- 99.999% read NVMe flash drive latency: **TODO**
 </td>
+<td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
 <td valign="top">
-Average 4Kb transfer latencies for the software with STL iostreams:
-- Average read spinning rust hard drive latency @ QD1: **TODO**
-- Average read SATA flash drive latency @ QD1: **TODO**
-- Average read NVMe flash drive latency @ QD1: **TODO**
-- Average read spinning rust hard drive latency @ QD8: **TODO**
-- Average read SATA flash drive latency @ QD8: **TODO**
-- Average read NVMe flash drive latency @ QD8: **TODO**
-</td>
-<td valign="top">
-Average 4Kb transfer latencies for the software with AFIO:
-- Average read spinning rust hard drive latency @ QD1: **TODO**
-- Average read SATA flash drive latency @ QD1: **TODO**
-- Average read NVMe flash drive latency @ QD1: **TODO**
-- Average read spinning rust hard drive latency @ QD8: **TODO**
-- Average read SATA flash drive latency @ QD8: **TODO**
-- Average read NVMe flash drive latency @ QD8: **TODO**
+QD1 4Kb transfer latencies for the software with AFIO:
+- Average read spinning rust hard drive latency: **TODO**
+- 99.999% read spinning rust hard drive latency: **TODO**
+- Average read SATA flash drive latency: **TODO**
+- 99.999% read SATA flash drive latency: **TODO**
+- Average read NVMe flash drive latency: **TODO**
+- 99.999% read NVMe flash drive latency: **TODO**
 </td>
 </tr>
 </table>
 
 \note Note that this code is of late alpha quality. It's quite reliable, but be careful when using it!
 
-You need these compilers or better:
+You need these compilers and OS or better:
 - GCC 7.0 (Linux)
 - clang 4.0 (Linux)
 - clang 5.0 (Windows)
+
+Other compilers and OSs may work, but are not tested regularly. You will need a Filesystem TS
+implementation in your STL and C++ 14.
 
 Todo list for already implemented parts: https://ned14.github.io/afio/todo.html
 
