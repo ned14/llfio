@@ -14,40 +14,38 @@ library for Boost and the C++ standard, intended for storage devices with sub-10
 It is a complete rewrite after a Boost peer review in August 2015. Its github
 source code repository lives at https://github.com/ned14/boost.afio.
 
-<table border="0" cellpadding="4">
+<table width="100%" border="0" cellpadding="4">
 <tr>
-<th colspan="5">Why you might need AFIO<hr></th>
+<th colspan="3">Why you might need AFIO<hr></th>
 </tr>
 <tr>
 <td valign="top">
-4Kb transfer latencies for the physical hardware:
-- Read spinning rust hard drive latency @ QD1: **7000us**
-- Read SATA flash drive latency @ QD1: **800us**
+Manufacturer claimed 4Kb transfer latencies for the physical hardware:
+- Spinning rust hard drive latency @ QD1: **7000us**
+- SATA flash drive latency @ QD1: **800us**
 - `memcpy(4Kb)` latency: **500us** (main memory) to **90us** (L2 cache)
-- Read NVMe flash drive latency @ QD1: **300us**
+- NVMe flash drive latency @ QD1: **300us**
 - RTT UDP packet latency over a LAN: **60us**
-- Read XPoint drive latency @ QD1: **10us**
+- XPoint drive latency @ QD1: **10us**
 - RTT PCIe latency: **0.5us**
 </td>
-<td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
 <td valign="top">
-QD1 4Kb transfer latencies for the software with STL iostreams:
-- Average read spinning rust hard drive latency: **TODO**
-- 99.999% read spinning rust hard drive latency: **TODO**
-- Average read SATA flash drive latency: **TODO**
-- 99.999% read SATA flash drive latency: **TODO**
-- Average read NVMe flash drive latency: **TODO**
-- 99.999% read NVMe flash drive latency: **TODO**
+100% read QD1 4Kb transfer latencies for the software with AFIO:
+- Average spinning rust hard drive latency: **TODO**
+- 99.999% spinning rust hard drive latency: **TODO**
+- Average SATA flash drive latency: **TODO**
+- 99.999% SATA flash drive latency: **TODO**
+- Average NVMe flash drive latency: **98.9us** (10,111 IOPS)
+- 99.999% NVMe flash drive latency: **3,146us** (317 IOPS)
 </td>
-<td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
 <td valign="top">
-QD1 4Kb transfer latencies for the software with AFIO:
-- Average read spinning rust hard drive latency: **TODO**
-- 99.999% read spinning rust hard drive latency: **TODO**
-- Average read SATA flash drive latency: **TODO**
-- 99.999% read SATA flash drive latency: **TODO**
-- Average read NVMe flash drive latency: **TODO**
-- 99.999% read NVMe flash drive latency: **TODO**
+75% read 25% write QD4 4Kb transfer latencies for the software with AFIO:
+- Average spinning rust hard drive latency: **TODO**
+- 99.999% spinning rust hard drive latency: **TODO**
+- Average SATA flash drive latency: **TODO**
+- 99.999% SATA flash drive latency: **TODO**
+- Average NVMe flash drive latency: **344.5us** (11,611 IOPS)
+- 99.999% NVMe flash drive latency: **52,164us** (77 IOPS)
 </td>
 </tr>
 </table>

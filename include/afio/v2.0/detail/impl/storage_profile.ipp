@@ -27,8 +27,11 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../../storage_profile.hpp"
 #include "../../utils.hpp"
 
+#include "../quickcpplib/include/algorithm/small_prng.hpp"
+
 #include <vector>
 #ifndef NDEBUG
+#include <fstream>
 #include <iostream>
 #endif
 
@@ -134,41 +137,6 @@ namespace storage_profile
 
   namespace system
   {
-    namespace detail
-    {
-      // From http://burtleburtle.net/bob/rand/smallprng.html
-      typedef unsigned int u4;
-      typedef struct ranctx
-      {
-        u4 a;
-        u4 b;
-        u4 c;
-        u4 d;
-      } ranctx;
-
-#define rot(x, k) (((x) << (k)) | ((x) >> (32 - (k))))
-      static u4 ranval(ranctx *x)
-      {
-        u4 e = x->a - rot(x->b, 27);
-        x->a = x->b ^ rot(x->c, 17);
-        x->b = x->c + x->d;
-        x->c = x->d + e;
-        x->d = e + x->a;
-        return x->d;
-      }
-#undef rot
-
-      static void raninit(ranctx *x, u4 seed)
-      {
-        u4 i;
-        x->a = 0xf1ea5eed, x->b = x->c = x->d = seed;
-        for(i = 0; i < 20; ++i)
-        {
-          (void) ranval(x);
-        }
-      }
-    }
-
     // System memory quantity, in use, max and min bandwidth
     outcome<void> mem(storage_profile &sp, file_handle &h) noexcept
     {
@@ -209,14 +177,13 @@ namespace storage_profile
           sp.mem_max_bandwidth.value = (unsigned long long) ((double) count * chunksize / 10);
 
           // Min bandwidth is randomised 4Kb copies of the same
-          detail::ranctx ctx;
-          detail::raninit(&ctx, 78);
+          QUICKCPPLIB_NAMESPACE::algorithm::small_prng::small_prng ctx(78);
           begin = std::chrono::high_resolution_clock::now();
           for(count = 0; std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock::now() - begin).count() < (10 / AFIO_STORAGE_PROFILE_TIME_DIVIDER); count++)
           {
             for(size_t n = 0; n < chunksize; n += 4096)
             {
-              auto offset = detail::ranval(&ctx) * 4096;
+              auto offset = ctx() * 4096;
               offset = offset % chunksize;
               memset(buffer + offset, count & 0xff, 4096);
             }
@@ -232,6 +199,34 @@ namespace storage_profile
         mem_max_bandwidth = sp.mem_max_bandwidth.value;
         mem_min_bandwidth = sp.mem_min_bandwidth.value;
       }
+      return success();
+    }
+
+    // High resolution clock granularity
+    unsigned _clock_granularity()
+    {
+      static unsigned granularity;
+      if(!granularity)
+      {
+        unsigned count = (unsigned) -1;
+        for(size_t n = 0; n < 20; n++)
+        {
+          std::chrono::high_resolution_clock::time_point begin = std::chrono::high_resolution_clock::now(), end;
+          do
+          {
+            end = std::chrono::high_resolution_clock::now();
+          } while(begin == end);
+          auto diff = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count();
+          if(diff < count)
+            count = (unsigned) diff;
+        }
+        granularity = count;
+      }
+      return granularity;
+    }
+    outcome<void> clock_granularity(storage_profile &sp, file_handle & /*unused*/) noexcept
+    {
+      sp.clock_granularity.value = _clock_granularity();
       return success();
     }
   }
@@ -285,6 +280,8 @@ namespace storage_profile
   {
     outcome<void> atomic_rewrite_quantum(storage_profile &sp, file_handle &srch) noexcept
     {
+      if(sp.atomic_rewrite_quantum.value != (io_service::extent_type) -1)
+        return success();
       try
       {
         using off_t = io_service::extent_type;
@@ -480,6 +477,8 @@ namespace storage_profile
 
     outcome<void> atomic_rewrite_offset_boundary(storage_profile &sp, file_handle &srch) noexcept
     {
+      if(sp.atomic_rewrite_offset_boundary.value != (io_service::extent_type) -1)
+        return success();
       try
       {
         using off_t = io_service::extent_type;
@@ -590,6 +589,212 @@ namespace storage_profile
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
+  namespace latency
+  {
+    struct stats
+    {
+      unsigned min{0}, mean{0}, max{0}, _95{0}, _99{0}, _99999{0};
+    };
+    inline outcome<stats> _latency_test(file_handle &srch, size_t noreaders, size_t nowriters)
+    {
+      static constexpr size_t memory_to_use = 1024 * 1024 * 1024;  // 4Gb
+      static const unsigned clock_granularity = system::_clock_granularity();
+      try
+      {
+        std::vector<std::vector<unsigned>> results(noreaders + nowriters);
+        std::vector<std::thread> writers, readers;
+        std::atomic<size_t> done(noreaders + nowriters);
+        for(auto &i : results)
+        {
+          i.reserve(memory_to_use / results.size());
+          memset(i.data(), 0, i.size() * sizeof(unsigned));
+        }
+        for(size_t no = 0; no < nowriters; no++)
+          writers.push_back(std::thread([&srch, no, &done, &results] {
+            auto _h(srch.clone());
+            if(!_h)
+              throw std::runtime_error("latency_test: Could not open work file due to " + _h.error().message());
+            file_handle h(std::move(_h.value()));
+            alignas(4096) char buffer[4096];
+            memset(buffer, no, 4096);
+            file_handle::const_buffer_type _reqs[1] = {{buffer, 4096}};
+            file_handle::io_request<file_handle::const_buffers_type> reqs(_reqs, 0);
+            QUICKCPPLIB_NAMESPACE::algorithm::small_prng::small_prng rand(no);
+            auto maxsize = srch.length().value() - 4095;
+            --done;
+            while(done)
+              std::this_thread::yield();
+            while(!done)
+            {
+              reqs.offset = (rand() * 4096) % maxsize;
+              auto begin = std::chrono::high_resolution_clock::now();
+              (void) h.write(reqs);
+              auto end = std::chrono::high_resolution_clock::now();
+              auto ns = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count();
+              if(ns > UINT_MAX)
+                ns = UINT_MAX;
+              if(ns == 0)
+                ns = clock_granularity;
+              results[no].push_back((unsigned) ns);
+              if(results[no].size() == results[no].capacity())
+                return;
+            }
+          }));
+        for(size_t no = nowriters; no < nowriters + noreaders; no++)
+          readers.push_back(std::thread([&srch, no, &done, &results] {
+            auto _h(srch.clone());
+            if(!_h)
+              throw std::runtime_error("latency_test: Could not open work file due to " + _h.error().message());
+            file_handle h(std::move(_h.value()));
+            alignas(4096) char buffer[4096];
+            file_handle::buffer_type _reqs[1] = {{buffer, 4096}};
+            file_handle::io_request<file_handle::buffers_type> reqs(_reqs, 0);
+            QUICKCPPLIB_NAMESPACE::algorithm::small_prng::small_prng rand(no);
+            auto maxsize = srch.length().value() - 4095;
+            --done;
+            while(done)
+              std::this_thread::yield();
+            while(!done)
+            {
+              reqs.offset = (rand() * 4096) % maxsize;
+              auto begin = std::chrono::high_resolution_clock::now();
+              (void) h.read(reqs);
+              auto end = std::chrono::high_resolution_clock::now();
+              auto ns = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count();
+              if(ns > UINT_MAX)
+                ns = UINT_MAX;
+              if(ns == 0)
+                ns = clock_granularity;
+              results[no].push_back((unsigned) ns);
+              if(results[no].size() == results[no].capacity())
+                return;
+            }
+          }));
+        // Wait till the readers and writers launch
+        while(done)
+          std::this_thread::yield();
+        auto begin = std::chrono::high_resolution_clock::now();
+        while(std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock::now() - begin).count() < (10))
+        {
+          std::this_thread::sleep_for(std::chrono::seconds(1));
+        }
+        done = true;
+        for(auto &writer : writers)
+          writer.join();
+        for(auto &reader : readers)
+          reader.join();
+
+#if 0  // ndef NDEBUG
+        {
+          std::ofstream out("latencies.csv");
+          for(const auto &r : results)
+          {
+            for(const auto &i : r)
+            {
+              out << i << "\n";
+            }
+          }
+        }
+#endif
+        std::vector<unsigned> totalresults;
+        unsigned long long sum = 0;
+        stats s;
+        s.min = (unsigned) -1;
+        for(auto &r : results)
+        {
+          for(const auto &i : r)
+          {
+            if(i < s.min)
+              s.min = i;
+            if(i > s.max)
+              s.max = i;
+            sum += i;
+            totalresults.push_back(i);
+          }
+          r.clear();
+          r.shrink_to_fit();
+        }
+        s.mean = (unsigned) ((double) sum / totalresults.size());
+        // Latency distributions are definitely not normally distributed, but here we have the
+        // advantage of tons of sample points. So simply sort into order, and pluck out the values
+        // at 99.999%, 99% and 95%. It'll be accurate enough.
+        std::sort(totalresults.begin(), totalresults.end());
+        s._95 = totalresults[(size_t)(0.95 * totalresults.size())];
+        s._99 = totalresults[(size_t)(0.99 * totalresults.size())];
+        s._99999 = totalresults[(size_t)(0.99999 * totalresults.size())];
+        return s;
+      }
+      catch(...)
+      {
+        return std::current_exception();
+      }
+    }
+    outcome<void> read_qd1(storage_profile &sp, file_handle &srch) noexcept
+    {
+      if(sp.read_qd1_mean.value != (unsigned int) -1)
+        return success();
+      OUTCOME_TRY(s, _latency_test(srch, 1, 0));
+      sp.read_qd1_min.value = s.min;
+      sp.read_qd1_mean.value = s.mean;
+      sp.read_qd1_max.value = s.max;
+      sp.read_qd1_95.value = s._95;
+      sp.read_qd1_99.value = s._99;
+      sp.read_qd1_99999.value = s._99999;
+      return success();
+    }
+    outcome<void> write_qd1(storage_profile &sp, file_handle &srch) noexcept
+    {
+      if(sp.write_qd1_mean.value != (unsigned int) -1)
+        return success();
+      OUTCOME_TRY(s, _latency_test(srch, 0, 1));
+      sp.write_qd1_min.value = s.min;
+      sp.write_qd1_mean.value = s.mean;
+      sp.write_qd1_max.value = s.max;
+      sp.write_qd1_95.value = s._95;
+      sp.write_qd1_99.value = s._99;
+      sp.write_qd1_99999.value = s._99999;
+      return success();
+    }
+    outcome<void> read_qd16(storage_profile &sp, file_handle &srch) noexcept
+    {
+      if(sp.read_qd16_mean.value != (unsigned int) -1)
+        return success();
+      OUTCOME_TRY(s, _latency_test(srch, 16, 0));
+      sp.read_qd16_min.value = s.min;
+      sp.read_qd16_mean.value = s.mean;
+      sp.read_qd16_max.value = s.max;
+      sp.read_qd16_95.value = s._95;
+      sp.read_qd16_99.value = s._99;
+      sp.read_qd16_99999.value = s._99999;
+      return success();
+    }
+    outcome<void> write_qd16(storage_profile &sp, file_handle &srch) noexcept
+    {
+      if(sp.write_qd16_mean.value != (unsigned int) -1)
+        return success();
+      OUTCOME_TRY(s, _latency_test(srch, 0, 16));
+      sp.write_qd16_min.value = s.min;
+      sp.write_qd16_mean.value = s.mean;
+      sp.write_qd16_max.value = s.max;
+      sp.write_qd16_95.value = s._95;
+      sp.write_qd16_99.value = s._99;
+      sp.write_qd16_99999.value = s._99999;
+      return success();
+    }
+    outcome<void> readwrite_qd4(storage_profile &sp, file_handle &srch) noexcept
+    {
+      if(sp.readwrite_qd4_mean.value != (unsigned int) -1)
+        return success();
+      OUTCOME_TRY(s, _latency_test(srch, 3, 1));
+      sp.readwrite_qd4_min.value = s.min;
+      sp.readwrite_qd4_mean.value = s.mean;
+      sp.readwrite_qd4_max.value = s.max;
+      sp.readwrite_qd4_95.value = s._95;
+      sp.readwrite_qd4_99.value = s._99;
+      sp.readwrite_qd4_99999.value = s._99999;
+      return success();
+    }
+  }
 }
 AFIO_V2_NAMESPACE_END
 

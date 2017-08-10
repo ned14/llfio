@@ -84,7 +84,7 @@ int main(int argc, char *argv[])
       return 1;
     }
     file_handle testfile(std::move(_testfile.value()));
-    std::vector<char> buffer(1024 * 1024);
+    std::vector<char> buffer(1024 * 1024 * 1024);
     RETCHECK(testfile.truncate(buffer.size()));
     file_handle::const_buffer_type _reqs[1] = {{buffer.data(), buffer.size()}};
     file_handle::io_request<file_handle::const_buffers_type> reqs(_reqs, 0);
@@ -154,6 +154,20 @@ int main(int argc, char *argv[])
       results.flush();
     }
   }
-
+  // Delete the test file
+  {
+    auto _testfile(file_handle::file({}, "test", handle::mode::write));
+    if(!_testfile)
+    {
+      std::cerr << "WARNING: Failed to open test file due to '" << _testfile.error().message() << std::endl;
+      return 1;
+    }
+    auto out = _testfile.value().unlink();
+    if(!out)
+    {
+      std::cerr << "WARNING: Failed to unlink test file due to '" << out.error().message() << std::endl;
+      return 1;
+    }
+  }
   return 0;
 }

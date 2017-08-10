@@ -64,6 +64,7 @@ namespace storage_profile
   template <> constexpr storage_types map_to_storage_type<io_service::extent_type>() { return storage_types::extent_type; }
   template <> constexpr io_service::extent_type default_value<io_service::extent_type>() { return (io_service::extent_type) -1; }
   template <> constexpr storage_types map_to_storage_type<unsigned int>() { return storage_types::unsigned_int; }
+  template <> constexpr unsigned int default_value<unsigned int>() { return (unsigned int) -1; }
   //  template<> constexpr storage_types map_to_storage_type<unsigned long long>() { return storage_types::unsigned_long_long; }
   template <> constexpr storage_types map_to_storage_type<float>() { return storage_types::float_; }
   template <> constexpr storage_types map_to_storage_type<std::string>() { return storage_types::string; }
@@ -171,6 +172,8 @@ namespace storage_profile
 #endif
       AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> _mem(storage_profile &sp, file_handle &h) noexcept;
     }
+    // High resolution clock granularity
+    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> clock_granularity(storage_profile &sp, file_handle &h) noexcept;
   }
   namespace storage
   {
@@ -192,6 +195,14 @@ namespace storage_profile
   {
     AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> atomic_rewrite_quantum(storage_profile &sp, file_handle &h) noexcept;
     AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> atomic_rewrite_offset_boundary(storage_profile &sp, file_handle &h) noexcept;
+  }
+  namespace latency
+  {
+    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> read_qd1(storage_profile &sp, file_handle &h) noexcept;
+    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> write_qd1(storage_profile &sp, file_handle &h) noexcept;
+    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> read_qd16(storage_profile &sp, file_handle &h) noexcept;
+    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> write_qd16(storage_profile &sp, file_handle &h) noexcept;
+    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> readwrite_qd4(storage_profile &sp, file_handle &h) noexcept;
   }
 
   //! A (possibly incomplet) profile of storage
@@ -252,6 +263,7 @@ namespace storage_profile
     item<unsigned long long> mem_min_bandwidth = {"system:mem:min_bandwidth", system::mem, "Main memory bandwidth when 4Kb pages are accessed randomly"};
     item<unsigned long long> mem_quantity = {"system:mem:quantity", &system::mem};
     item<float> mem_in_use = {"system:mem:in_use", &system::mem};  // not including caches etc.
+    item<unsigned> clock_granularity = {"system:timer:ns_per_tick", &system::clock_granularity};
 
     // Controller characteristics
     item<std::string> controller_type = {"storage:controller:kind", &storage::device};  // e.g. SATA
@@ -282,6 +294,40 @@ namespace storage_profile
                                                                                                                                                                "an i/o straddles a 4096 file offset multiple and DMA suddenly goes into many 64 byte cache lines :(, so if "
                                                                                                                                                                "this value is less than max_aligned_atomic_rewrite and some multiple of the CPU cache line size then this is "
                                                                                                                                                                "what has happened."};
+    item<unsigned> read_qd1_min = {"latency:read:qd1:min", latency::read_qd1, "The nanoseconds to read 4Kb at a queue depth of 1 (min)"};
+    item<unsigned> read_qd1_mean = {"latency:read:qd1:mean", latency::read_qd1, "The nanoseconds to read 4Kb at a queue depth of 1 (arithmetic mean)"};
+    item<unsigned> read_qd1_max = {"latency:read:qd1:max", latency::read_qd1, "The nanoseconds to read 4Kb at a queue depth of 1 (max)"};
+    item<unsigned> read_qd1_95 = {"latency:read:qd1:95%", latency::read_qd1, "The nanoseconds to read 4Kb at a queue depth of 1 (95% of the time)"};
+    item<unsigned> read_qd1_99 = {"latency:read:qd1:99%", latency::read_qd1, "The nanoseconds to read 4Kb at a queue depth of 1 (99% of the time)"};
+    item<unsigned> read_qd1_99999 = {"latency:read:qd1:99.999%", latency::read_qd1, "The nanoseconds to read 4Kb at a queue depth of 1 (99.999% of the time)"};
+
+    item<unsigned> read_qd16_min = {"latency:read:qd16:min", latency::read_qd16, "The nanoseconds to read 4Kb at a queue depth of 16 (min)"};
+    item<unsigned> read_qd16_mean = {"latency:read:qd16:mean", latency::read_qd16, "The nanoseconds to read 4Kb at a queue depth of 16 (arithmetic mean)"};
+    item<unsigned> read_qd16_max = {"latency:read:qd16:max", latency::read_qd16, "The nanoseconds to read 4Kb at a queue depth of 16 (max)"};
+    item<unsigned> read_qd16_95 = {"latency:read:qd16:95%", latency::read_qd16, "The nanoseconds to read 4Kb at a queue depth of 16 (95% of the time)"};
+    item<unsigned> read_qd16_99 = {"latency:read:qd16:99%", latency::read_qd16, "The nanoseconds to read 4Kb at a queue depth of 16 (99% of the time)"};
+    item<unsigned> read_qd16_99999 = {"latency:read:qd16:99.999%", latency::read_qd16, "The nanoseconds to read 4Kb at a queue depth of 16 (99.999% of the time)"};
+
+    item<unsigned> write_qd1_min = {"latency:write:qd1:min", latency::write_qd1, "The nanoseconds to write 4Kb at a queue depth of 1 (min)"};
+    item<unsigned> write_qd1_mean = {"latency:write:qd1:mean", latency::write_qd1, "The nanoseconds to write 4Kb at a queue depth of 1 (arithmetic mean)"};
+    item<unsigned> write_qd1_max = {"latency:write:qd1:max", latency::write_qd1, "The nanoseconds to write 4Kb at a queue depth of 1 (max)"};
+    item<unsigned> write_qd1_95 = {"latency:write:qd1:95%", latency::write_qd1, "The nanoseconds to write 4Kb at a queue depth of 1 (95% of the time)"};
+    item<unsigned> write_qd1_99 = {"latency:write:qd1:99%", latency::write_qd1, "The nanoseconds to write 4Kb at a queue depth of 1 (99% of the time)"};
+    item<unsigned> write_qd1_99999 = {"latency:write:qd1:99.999%", latency::write_qd1, "The nanoseconds to write 4Kb at a queue depth of 1 (99.999% of the time)"};
+
+    item<unsigned> write_qd16_min = {"latency:write:qd16:min", latency::write_qd16, "The nanoseconds to write 4Kb at a queue depth of 16 (min)"};
+    item<unsigned> write_qd16_mean = {"latency:write:qd16:mean", latency::write_qd16, "The nanoseconds to write 4Kb at a queue depth of 16 (arithmetic mean)"};
+    item<unsigned> write_qd16_max = {"latency:write:qd16:max", latency::write_qd16, "The nanoseconds to write 4Kb at a queue depth of 16 (max)"};
+    item<unsigned> write_qd16_95 = {"latency:write:qd16:95%", latency::write_qd16, "The nanoseconds to write 4Kb at a queue depth of 16 (95% of the time)"};
+    item<unsigned> write_qd16_99 = {"latency:write:qd16:99%", latency::write_qd16, "The nanoseconds to write 4Kb at a queue depth of 16 (99% of the time)"};
+    item<unsigned> write_qd16_99999 = {"latency:write:qd16:99.999%", latency::write_qd16, "The nanoseconds to write 4Kb at a queue depth of 16 (99.999% of the time)"};
+
+    item<unsigned> readwrite_qd4_min = {"latency:readwrite:qd4:min", latency::readwrite_qd4, "The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4 (min)"};
+    item<unsigned> readwrite_qd4_mean = {"latency:readwrite:qd4:mean", latency::readwrite_qd4, "The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4 (arithmetic mean)"};
+    item<unsigned> readwrite_qd4_max = {"latency:readwrite:qd4:max", latency::readwrite_qd4, "The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4 (max)"};
+    item<unsigned> readwrite_qd4_95 = {"latency:readwrite:qd4:95%", latency::readwrite_qd4, "The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4 (95% of the time)"};
+    item<unsigned> readwrite_qd4_99 = {"latency:readwrite:qd4:99%", latency::readwrite_qd4, "The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4 (99% of the time)"};
+    item<unsigned> readwrite_qd4_99999 = {"latency:readwrite:qd4:99.999%", latency::readwrite_qd4, "The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4 (99.999% of the time)"};
   };
 }
 
