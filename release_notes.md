@@ -143,17 +143,23 @@ Todo:
 | ✔ | ✔ | ✔ | Universal portable UTF-8 path views.
 |   | ✔ | ✔ | "Hole punching" and hole enumeration ported over from AFIO v1.
 
-Todo:
+Todo to reach feature parity with AFIO v1:
 
 | NEW in v2 | Windows | POSIX |     |
 | --------- | --------| ----- | --- |
 |   |   |   | Directory handles and very fast directory enumeration ported over from AFIO v1.
+|   |   |   | Hard links and symlinks.
+|   |   |   | BSD and OS X kqueues optimised `io_service`
+
+Todo thereafter:
+
+| NEW in v2 | Windows | POSIX |     |
+| --------- | --------| ----- | --- |
 | ✔ |   |   | Extended attributes support.
 | ✔ |   |   | Coroutines TS integration for `async_file_handle`. Use example: https://gist.github.com/anonymous/a67ba4695c223a905ff108ed8b9a342f
-|   |   |   | BSD and OS X kqueues optimised `io_service`
 | ✔ |   |   | Linux KAIO support for native async `O_DIRECT` i/o
-|   |   |   | Reliable directory hierarchy deletion algorithm.
-|   |   |   | Reliable directory hierarchy copy algorithm.
+| ✔ |   |   | Reliable directory hierarchy deletion algorithm.
+| ✔ |   |   | Reliable directory hierarchy copy algorithm.
 | ✔ |   |   | Reliable directory hierarchy update (two and three way) algorithm.
 | ✔ |   |   | Algorithm to replace all duplicate content with hard links.
 | ✔ |   |   | Algorithm to figure out all paths for a hard linked inode.

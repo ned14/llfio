@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
   using namespace AFIO_V2_NAMESPACE;
   std::regex torun(".*");
   bool regexvalid = false;
-  unsigned torunflags = permute_flags_max - 1;
+  unsigned torunflags = (1 << permute_flags_max) - 1;
   if(argc > 1)
   {
     try
@@ -104,9 +104,9 @@ int main(int argc, char *argv[])
     results << "---\ntimestamp: " << put_time(std::gmtime(&t), "%F %T %z") << "\n";
   }
   bool first = true;
-  for(unsigned flags = 0; flags <= torunflags; flags++)
+  for(unsigned flags = 0; flags < permute_flags_max; flags++)
   {
-    if(!flags || !!(flags & torunflags))
+    if((1 << flags) & torunflags)
     {
       handle::caching strategy = handle::caching::all;
       switch(flags)

@@ -117,7 +117,7 @@ public:
   dev_t st_dev() const noexcept { return _devid; }
   //! Unless `flag::disable_safety_unlinks` is set, the inode of the file when opened. When combined with st_dev(), forms a unique identifer on this system
   ino_t st_ino() const noexcept { return _inode; }
-  //! A unique identifier for this handle in this process (native handle). Subclasses like `file_handle` make this a unique identifier across the entire system.
+  //! A unique identifier for this handle across the entire system. Can be used in hash tables etc.
   unique_id_type unique_id() const noexcept
   {
     unique_id_type ret(nullptr);
@@ -125,6 +125,16 @@ public:
     ret.as_longlongs[1] = _inode;
     return ret;
   }
+
+  /*! Obtain a handle to the path **currently** containing this handle's file entry.
+
+  \warning This call is \b racy and can result in the wrong path handle being returned. Note that
+  unless `flag::disable_safety_unlinks` is set, this implementation opens a
+  `path_handle` to the source containing directory, then checks if the file entry within has the
+  same inode as the open file handle. It will retry this matching until
+  success until the deadline given.
+  */
+  result<path_handle> parent_path_handle(deadline d = std::chrono::seconds(30)) const noexcept;
 
   /*! Atomically relinks the current path of this open handle to the new path specified,
   \b atomically and silently replacing any item at the new path specified. This operation

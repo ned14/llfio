@@ -982,21 +982,22 @@ static inline result<ACCESS_MASK> access_mask_from_handle_mode(native_handle_typ
     access |= FILE_READ_ATTRIBUTES;
     break;
   case handle::mode::attr_write:
-    access |= FILE_READ_ATTRIBUTES | FILE_WRITE_ATTRIBUTES;
+    access |= DELETE | FILE_READ_ATTRIBUTES | FILE_WRITE_ATTRIBUTES;
     break;
   case handle::mode::read:
     access |= GENERIC_READ;
     nativeh.behaviour |= native_handle_type::disposition::seekable | native_handle_type::disposition::readable;
     break;
   case handle::mode::write:
-    access |= GENERIC_WRITE | GENERIC_READ;
+    access |= DELETE | GENERIC_WRITE | GENERIC_READ;
     nativeh.behaviour |= native_handle_type::disposition::seekable | native_handle_type::disposition::readable | native_handle_type::disposition::writable;
     break;
   case handle::mode::append:
-    access |= FILE_APPEND_DATA;
+    access |= DELETE | FILE_APPEND_DATA;
     nativeh.behaviour |= native_handle_type::disposition::writable | native_handle_type::disposition::append_only;
     break;
   }
+  // Should we allow unlink on close if opening read only? I guess if Windows allows it, so should we.
   if(flags & handle::flag::unlink_on_close)
     access |= DELETE;
   return access;

@@ -38,9 +38,72 @@ result<void> fs_handle::_fetch_inode() noexcept
   return success();
 }
 
-result<void> fs_handle::relink(const path_handle &base, path_view_type path, deadline /*unused*/) noexcept
+result<path_handle> fs_handle::parent_path_handle(deadline d) const noexcept
 {
-  using flag = handle::flag;
+  windows_nt_kernel::init();
+  using namespace windows_nt_kernel;
+  AFIO_LOG_FUNCTION_CALL(this);
+  auto &h = _get_handle();
+  AFIO_WIN_DEADLINE_TO_SLEEP_INIT(d);
+  try
+  {
+    for(;;)
+    {
+      // Get current path for handle and open its containing dir
+      auto currentpath_ = h.current_path();
+      if(!currentpath_)
+        continue;
+      filesystem::path currentpath = std::move(currentpath_.value());
+      // If current path is empty, it's been deleted
+      if(currentpath.empty())
+        return std::errc::no_such_file_or_directory;
+      auto filename = currentpath.filename();
+      currentpath.remove_filename();
+      auto currentdirh_ = path_handle::path(currentpath);
+      if(!currentdirh_)
+        continue;
+      path_handle currentdirh = std::move(currentdirh_.value());
+      if(h.flags() & handle::flag::disable_safety_unlinks)
+        return success(std::move(currentdirh));
+
+      DWORD fileshare = FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE;
+      IO_STATUS_BLOCK isb = make_iostatus();
+      UNICODE_STRING _path;
+      _path.Buffer = (wchar_t *) filename.c_str();
+      _path.Length = filename.native().size() * sizeof(wchar_t);
+      _path.MaximumLength = _path.Length + sizeof(wchar_t);
+      OBJECT_ATTRIBUTES oa;
+      memset(&oa, 0, sizeof(oa));
+      oa.Length = sizeof(OBJECT_ATTRIBUTES);
+      oa.ObjectName = &_path;
+      oa.RootDirectory = currentdirh.native_handle().h;
+      LARGE_INTEGER AllocationSize;
+      memset(&AllocationSize, 0, sizeof(AllocationSize));
+      HANDLE nh = nullptr;
+      NTSTATUS ntstat = NtCreateFile(&nh, SYNCHRONIZE, &oa, &isb, &AllocationSize, 0, fileshare, 0x00000001 /*FILE_OPEN*/, 0x20 /*FILE_SYNCHRONOUS_IO_NONALERT*/, NULL, 0);
+      if(STATUS_SUCCESS != ntstat)
+        continue;
+      auto unnh = undoer([nh] { CloseHandle(nh); });
+      (void) unnh;
+      isb.Status = -1;
+      FILE_INTERNAL_INFORMATION fii;
+      ntstat = NtQueryInformationFile(nh, &isb, &fii, sizeof(fii), FileInternalInformation);
+      if(STATUS_SUCCESS != ntstat)
+        continue;
+      // If the same, we know for a fact that this is the correct containing dir for now at least
+      if((ino_t) fii.IndexNumber.QuadPart == _inode)
+        return success(std::move(currentdirh));
+      AFIO_WIN_DEADLINE_TO_TIMEOUT(d);
+    }
+  }
+  catch(...)
+  {
+    return error_from_exception();
+  }
+}
+
+result<void> fs_handle::relink(const path_handle &base, path_view_type path, deadline d) noexcept
+{
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
   AFIO_LOG_FUNCTION_CALL(this);
@@ -82,15 +145,17 @@ result<void> fs_handle::relink(const path_handle &base, path_view_type path, dea
   fni->RootDirectory = base.is_valid() ? base.native_handle().h : nullptr;
   fni->FileNameLength = _path.Length;
   memcpy(fni->FileName, _path.Buffer, fni->FileNameLength);
-  NtSetInformationFile(h.native_handle().h, &isb, fni, sizeof(FILE_RENAME_INFORMATION) + fni->FileNameLength, FileRenameInformation);
-  if(h.flags() & flag::overlapped)
-    ntwait(h.native_handle().h, isb, deadline());
-  if(STATUS_SUCCESS != isb.Status)
-    return {(int) isb.Status, ntkernel_category()};
+  NTSTATUS ntstat = NtSetInformationFile(h.native_handle().h, &isb, fni, sizeof(FILE_RENAME_INFORMATION) + fni->FileNameLength, FileRenameInformation);
+  if(STATUS_PENDING == ntstat)
+    ntstat = ntwait(h.native_handle().h, isb, d);
+  if(ntstat < 0)
+  {
+    return {(int) ntstat, ntkernel_category()};
+  }
   return success();
 }
 
-result<void> fs_handle::unlink(deadline /*unused*/) noexcept
+result<void> fs_handle::unlink(deadline d) noexcept
 {
   using flag = handle::flag;
   windows_nt_kernel::init();
@@ -102,9 +167,7 @@ result<void> fs_handle::unlink(deadline /*unused*/) noexcept
     // Rename it to something random to emulate immediate unlinking
     auto randomname = utils::random_string(32);
     randomname.append(".deleted");
-    OUTCOME_TRY(cpath, h.current_path());
-    cpath.remove_filename();
-    OUTCOME_TRY(dirh, path_handle::path(cpath));
+    OUTCOME_TRY(dirh, parent_path_handle(d));
     OUTCOME_TRYV(relink(dirh, randomname));
   }
   // No point marking it for deletion if it's already been so
@@ -125,11 +188,13 @@ result<void> fs_handle::unlink(deadline /*unused*/) noexcept
     FILE_DISPOSITION_INFORMATION fdi;
     memset(&fdi, 0, sizeof(fdi));
     fdi._DeleteFile = true;
-    NtSetInformationFile(h.native_handle().h, &isb, &fdi, sizeof(fdi), FileDispositionInformation);
-    if(h.flags() & flag::overlapped)
-      ntwait(h.native_handle().h, isb, deadline());
-    if(STATUS_SUCCESS != isb.Status)
-      return {(int) isb.Status, ntkernel_category()};
+    NTSTATUS ntstat = NtSetInformationFile(h.native_handle().h, &isb, &fdi, sizeof(fdi), FileDispositionInformation);
+    if(STATUS_PENDING == ntstat)
+      ntstat = ntwait(h.native_handle().h, isb, d);
+    if(ntstat < 0)
+    {
+      return {(int) ntstat, ntkernel_category()};
+    }
   }
   return success();
 }

@@ -264,6 +264,7 @@ namespace storage_profile
     item<unsigned long long> mem_quantity = {"system:mem:quantity", &system::mem};
     item<float> mem_in_use = {"system:mem:in_use", &system::mem};  // not including caches etc.
     item<unsigned> clock_granularity = {"system:timer:ns_per_tick", &system::clock_granularity};
+    item<unsigned> clock_overhead = {"system:timer:ns_overhead", &system::clock_granularity};
 
     // Controller characteristics
     item<std::string> controller_type = {"storage:controller:kind", &storage::device};  // e.g. SATA

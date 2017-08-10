@@ -294,6 +294,7 @@ public:
           AFIO_LOG_FATAL(&view, "Attempt to send a path exceeding 64Kb to kernel");
           abort();
         }
+        length = static_cast<uint16_t>(view._state._utf16.size());
         // Is this going straight to a NT kernel API? If so, use directly
         if(ntkernelapi)
         {
@@ -301,7 +302,6 @@ public:
           return;
         }
         // Is the byte just after the view a zero? If so, use directly
-        length = static_cast<uint16_t>(view._state._utf16.size());
         if(0 == view._state._utf16.data()[length])
         {
           buffer = view._state._utf16.data();

@@ -203,10 +203,15 @@ namespace storage_profile
     }
 
     // High resolution clock granularity
-    unsigned _clock_granularity()
+    struct clock_info_t
     {
-      static unsigned granularity;
-      if(!granularity)
+      unsigned granularity;  // in nanoseconds
+      unsigned overhead;     // in nanoseconds
+    };
+    inline clock_info_t _clock_granularity_and_overhead()
+    {
+      static clock_info_t info;
+      if(!info.granularity)
       {
         unsigned count = (unsigned) -1;
         for(size_t n = 0; n < 20; n++)
@@ -220,13 +225,22 @@ namespace storage_profile
           if(diff < count)
             count = (unsigned) diff;
         }
-        granularity = count;
+        info.granularity = count;
+        std::chrono::high_resolution_clock::time_point begin = std::chrono::high_resolution_clock::now();
+        for(size_t n = 0; n < 1000000; n++)
+        {
+          (void) std::chrono::high_resolution_clock::now();
+        }
+        std::chrono::high_resolution_clock::time_point end = std::chrono::high_resolution_clock::now();
+        info.overhead = (unsigned) ((double) std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count() / 1000000);
       }
-      return granularity;
+      return info;
     }
     outcome<void> clock_granularity(storage_profile &sp, file_handle & /*unused*/) noexcept
     {
-      sp.clock_granularity.value = _clock_granularity();
+      auto info = _clock_granularity_and_overhead();
+      sp.clock_granularity.value = info.granularity;
+      sp.clock_overhead.value = info.overhead;
       return success();
     }
   }
@@ -597,8 +611,9 @@ namespace storage_profile
     };
     inline outcome<stats> _latency_test(file_handle &srch, size_t noreaders, size_t nowriters)
     {
-      static constexpr size_t memory_to_use = 1024 * 1024 * 1024;  // 4Gb
-      static const unsigned clock_granularity = system::_clock_granularity();
+      static constexpr size_t memory_to_use = 256 * 1024 * 1024;  // 1Gb
+      static const unsigned clock_overhead = system::_clock_granularity_and_overhead().overhead;
+      static const unsigned clock_granularity = system::_clock_granularity_and_overhead().granularity;
       try
       {
         std::vector<std::vector<unsigned>> results(noreaders + nowriters);
@@ -606,8 +621,9 @@ namespace storage_profile
         std::atomic<size_t> done(noreaders + nowriters);
         for(auto &i : results)
         {
-          i.reserve(memory_to_use / results.size());
-          memset(i.data(), 0, i.size() * sizeof(unsigned));
+          i.resize(memory_to_use / results.size());
+          memset(i.data(), 0, i.size() * sizeof(unsigned));  // prefault
+          i.resize(0);
         }
         for(size_t no = 0; no < nowriters; no++)
           writers.push_back(std::thread([&srch, no, &done, &results] {
@@ -626,15 +642,18 @@ namespace storage_profile
               std::this_thread::yield();
             while(!done)
             {
-              reqs.offset = (rand() * 4096) % maxsize;
               auto begin = std::chrono::high_resolution_clock::now();
-              (void) h.write(reqs);
+              // for(size_t n = 0; n < 16; n++)
+              {
+                reqs.offset = (rand() * 4096) % maxsize;
+                (void) h.write(reqs);
+              }
               auto end = std::chrono::high_resolution_clock::now();
-              auto ns = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count();
+              auto ns = (std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count() - clock_overhead);  // / 16;
               if(ns > UINT_MAX)
                 ns = UINT_MAX;
               if(ns == 0)
-                ns = clock_granularity;
+                ns = clock_granularity / 2;
               results[no].push_back((unsigned) ns);
               if(results[no].size() == results[no].capacity())
                 return;
@@ -656,15 +675,18 @@ namespace storage_profile
               std::this_thread::yield();
             while(!done)
             {
-              reqs.offset = (rand() * 4096) % maxsize;
               auto begin = std::chrono::high_resolution_clock::now();
-              (void) h.read(reqs);
+              // for(size_t n = 0; n < 16; n++)
+              {
+                reqs.offset = (rand() * 4096) % maxsize;
+                (void) h.read(reqs);
+              }
               auto end = std::chrono::high_resolution_clock::now();
-              auto ns = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count();
+              auto ns = (std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count() - clock_overhead);  // / 16;
               if(ns > UINT_MAX)
                 ns = UINT_MAX;
               if(ns == 0)
-                ns = clock_granularity;
+                ns = clock_granularity / 2;
               results[no].push_back((unsigned) ns);
               if(results[no].size() == results[no].capacity())
                 return;
@@ -700,9 +722,9 @@ namespace storage_profile
         unsigned long long sum = 0;
         stats s;
         s.min = (unsigned) -1;
-        for(auto &r : results)
+        for(size_t n = 0; n < results.size(); n++)
         {
-          for(const auto &i : r)
+          for(const auto &i : results[n])
           {
             if(i < s.min)
               s.min = i;
@@ -711,9 +733,10 @@ namespace storage_profile
             sum += i;
             totalresults.push_back(i);
           }
-          r.clear();
-          r.shrink_to_fit();
+          results[n].clear();
+          results[n].shrink_to_fit();
         }
+        std::cout << "Total results = " << totalresults.size() << std::endl;
         s.mean = (unsigned) ((double) sum / totalresults.size());
         // Latency distributions are definitely not normally distributed, but here we have the
         // advantage of tons of sample points. So simply sort into order, and pluck out the values

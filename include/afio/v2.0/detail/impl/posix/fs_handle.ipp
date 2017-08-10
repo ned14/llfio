@@ -108,6 +108,14 @@ inline result<path_handle> containing_directory(filesystem::path &filename, cons
   }
 }
 
+result<path_handle> fs_handle::parent_path_handle(deadline d) const noexcept
+{
+  AFIO_LOG_FUNCTION_CALL(this);
+  auto &h = _get_handle();
+  filesystem::path filename;
+  return containing_directory(filename, h, *this, d);
+}
+
 result<void> fs_handle::relink(const path_handle &base, path_view_type path, deadline d) noexcept
 {
   AFIO_LOG_FUNCTION_CALL(this);
