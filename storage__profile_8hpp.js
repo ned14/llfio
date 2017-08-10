@@ -16,9 +16,11 @@ var storage__profile_8hpp =
     [ "_mem", "storage__profile_8hpp.html#a1a45f916a2d712222c364d0d0b583045", null ],
     [ "atomic_rewrite_offset_boundary", "storage__profile_8hpp.html#a31088169183da9bd9bc7592916df84b2", null ],
     [ "atomic_rewrite_quantum", "storage__profile_8hpp.html#abbe00db81f621ba1e9cf451eb0d36e4c", null ],
+    [ "clock_granularity", "storage__profile_8hpp.html#a2449178d0fe412669afac5985df800c3", null ],
     [ "cpu", "storage__profile_8hpp.html#ad975a2d09846e107e752d0a39cb64b4f", null ],
     [ "default_value", "storage__profile_8hpp.html#a2ad39b78e400cf1ab64579129522d4ac", null ],
     [ "default_value< io_service::extent_type >", "storage__profile_8hpp.html#aa6a87dd5a7caa0287274894eca115a2a", null ],
+    [ "default_value< unsigned int >", "storage__profile_8hpp.html#acf57088eb7760c91813215167e1db291", null ],
     [ "device", "storage__profile_8hpp.html#a3940c6f61882afc7d51b3cc43887a5c3", null ],
     [ "fs", "storage__profile_8hpp.html#a330bf3de689771aacc88cfb5c92f70b8", null ],
     [ "map_to_storage_type", "storage__profile_8hpp.html#a0e2c44a94f432bdb2bd1c92eb78d1143", null ],
@@ -27,5 +29,10 @@ var storage__profile_8hpp =
     [ "map_to_storage_type< std::string >", "storage__profile_8hpp.html#a1a14b4c4fc30c82b91df918ecdac6828", null ],
     [ "map_to_storage_type< unsigned int >", "storage__profile_8hpp.html#ad382d00ad8f64a3bc7046f70dacb1ab2", null ],
     [ "mem", "storage__profile_8hpp.html#a289319881e1dd3f5b73b69bfeb9d110c", null ],
-    [ "os", "storage__profile_8hpp.html#aaa8f045d95743f0148a0092f388dba7f", null ]
+    [ "os", "storage__profile_8hpp.html#aaa8f045d95743f0148a0092f388dba7f", null ],
+    [ "read_qd1", "storage__profile_8hpp.html#a12b552095491d25fdfbad807b34fe59c", null ],
+    [ "read_qd16", "storage__profile_8hpp.html#a99446f05e5840249c6c3832a8660f1a0", null ],
+    [ "readwrite_qd4", "storage__profile_8hpp.html#a3d429992b1afa99100d51d2896dc6006", null ],
+    [ "write_qd1", "storage__profile_8hpp.html#aa9427ec9c14608cda4b12cdd5801f846", null ],
+    [ "write_qd16", "storage__profile_8hpp.html#aa8c24dd8f1f836b23299120d349d112b", null ]
 ];
