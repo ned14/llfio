@@ -8,8 +8,8 @@
 </table></center>
 
 Herein lies my proposed zero whole machine memory copy async file i/o and filesystem
-library for Boost and the C++ standard, intended for storage devices with sub-10 microsecond
-4Kb read latencies.
+library for Boost and the C++ standard, intended for storage devices with ~1 microsecond
+4Kb transfer latencies.
 
 It is a complete rewrite after a Boost peer review in August 2015. Its github
 source code repository lives at https://github.com/ned14/boost.afio.
@@ -23,10 +23,10 @@ source code repository lives at https://github.com/ned14/boost.afio.
 Manufacturer claimed 4Kb transfer latencies for the physical hardware:
 - Spinning rust hard drive latency @ QD1: **7000us**
 - SATA flash drive latency @ QD1: **800us**
-- `memcpy(4Kb)` latency: **500us** (main memory) to **90us** (L2 cache)
 - NVMe flash drive latency @ QD1: **300us**
 - RTT UDP packet latency over a LAN: **60us**
 - XPoint drive latency @ QD1: **10us**
+- `memcpy(4Kb)` latency: **5us** (main memory) to **1.3us** (L3 cache)
 - RTT PCIe latency: **0.5us**
 </td>
 <td valign="top">
@@ -37,6 +37,8 @@ Manufacturer claimed 4Kb transfer latencies for the physical hardware:
 - 99.999% SATA flash drive latency: **TODO**
 - Average NVMe flash drive latency: **98.9us** (10,111 IOPS)
 - 99.999% NVMe flash drive latency: **3,146us** (317 IOPS)
+
+Lowest sustained 4Kb read latency benchmarked to date by author (NVMe): **992ns** (1M IOPS, 3.8Gb/sec)
 </td>
 <td valign="top">
 75% read 25% write QD4 4Kb transfer latencies for the software with AFIO:
@@ -46,6 +48,8 @@ Manufacturer claimed 4Kb transfer latencies for the physical hardware:
 - 99.999% SATA flash drive latency: **TODO**
 - Average NVMe flash drive latency: **26.9us** (37,105 IOPS)
 - 99.999% NVMe flash drive latency: **21,597us** (46 IOPS)
+
+Lowest sustained 4Kb write latency benchmarked to date by author (NVMe): **992ns** (1M IOPS, 3.8Gb/sec)
 </td>
 </tr>
 </table>
@@ -163,3 +167,12 @@ Todo thereafter:
 | ✔ |   |   | Reliable directory hierarchy update (two and three way) algorithm.
 | ✔ |   |   | Algorithm to replace all duplicate content with hard links.
 | ✔ |   |   | Algorithm to figure out all paths for a hard linked inode.
+
+
+Max bandwidth for the physical hardware:
+- DDR4 2133: **30Gb/sec** (main memory)
+- x4 PCIe 4.0: **7.5Gb/sec** (arrives end of 2017, the 2018 NVMe drives will use PCIe 4.0)
+- x4 PCIe 3.0: **3.75Gb/sec** (985Mb/sec per PCIe lane)
+- 2017 XPoint drive (x4 PCIe 3.0): **2.5Gb/sec**
+- 2017 NVMe flash drive (x4 PCIe 3.0): **2Gb/sec**
+- 10Gbit LAN: **1.2Gb/sec**
