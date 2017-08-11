@@ -114,7 +114,7 @@ $(document).ready(function(){initNavTree('index.html','');});
 </div>
    </td></tr>
 </table>
-</center><p>Herein lies my proposed zero whole machine memory copy async file i/o and filesystem library for Boost and the C++ standard, intended for storage devices with sub-10 microsecond 4Kb read latencies.</p>
+</center><p>Herein lies my proposed zero whole machine memory copy async file i/o and filesystem library for Boost and the C++ standard, intended for storage devices with ~1 microsecond 4Kb transfer latencies.</p>
 <p>It is a complete rewrite after a Boost peer review in August 2015. Its github source code repository lives at <a href="https://github.com/ned14/boost.afio">https://github.com/ned14/boost.afio</a>.</p>
 <table  width="100%" border="0" cellpadding="4">
 <tr>
@@ -124,28 +124,32 @@ $(document).ready(function(){initNavTree('index.html','');});
 <td valign="top">Manufacturer claimed 4Kb transfer latencies for the physical hardware:<ul>
 <li>Spinning rust hard drive latency @ QD1: <b>7000us</b></li>
 <li>SATA flash drive latency @ QD1: <b>800us</b></li>
-<li><code>memcpy(4Kb)</code> latency: <b>500us</b> (main memory) to <b>90us</b> (L2 cache)</li>
 <li>NVMe flash drive latency @ QD1: <b>300us</b></li>
 <li>RTT UDP packet latency over a LAN: <b>60us</b></li>
 <li>XPoint drive latency @ QD1: <b>10us</b></li>
+<li><code>memcpy(4Kb)</code> latency: <b>5us</b> (main memory) to <b>1.3us</b> (L3 cache)</li>
 <li>RTT PCIe latency: <b>0.5us</b>  </li>
 </ul>
-</td><td valign="top">100% read QD1 4Kb transfer latencies for the software with AFIO:<ul>
+</td><td valign="top"><p class="starttd">100% read QD1 4Kb transfer latencies for the software with AFIO:</p>
+<ul>
 <li>Average spinning rust hard drive latency: <b>TODO</b></li>
 <li>99.999% spinning rust hard drive latency: <b>TODO</b></li>
 <li>Average SATA flash drive latency: <b>TODO</b></li>
 <li>99.999% SATA flash drive latency: <b>TODO</b></li>
 <li>Average NVMe flash drive latency: <b>98.9us</b> (10,111 IOPS)</li>
-<li>99.999% NVMe flash drive latency: <b>3,146us</b> (317 IOPS)  </li>
+<li>99.999% NVMe flash drive latency: <b>3,146us</b> (317 IOPS)</li>
 </ul>
-</td><td valign="top">75% read 25% write QD4 4Kb transfer latencies for the software with AFIO:<ul>
+<p class="endtd">Lowest sustained 4Kb read latency benchmarked to date by author (NVMe): <b>992ns</b> (1M IOPS, 3.8Gb/sec)  </p>
+</td><td valign="top"><p class="starttd">75% read 25% write QD4 4Kb transfer latencies for the software with AFIO:</p>
+<ul>
 <li>Average spinning rust hard drive latency: <b>TODO</b></li>
 <li>99.999% spinning rust hard drive latency: <b>TODO</b></li>
 <li>Average SATA flash drive latency: <b>TODO</b></li>
 <li>99.999% SATA flash drive latency: <b>TODO</b></li>
 <li>Average NVMe flash drive latency: <b>26.9us</b> (37,105 IOPS)</li>
-<li>99.999% NVMe flash drive latency: <b>21,597us</b> (46 IOPS)   </li>
+<li>99.999% NVMe flash drive latency: <b>21,597us</b> (46 IOPS)</li>
 </ul>
+<p class="endtd">Lowest sustained 4Kb write latency benchmarked to date by author (NVMe): <b>992ns</b> (1M IOPS, 3.8Gb/sec)   </p>
 </td></tr>
 </table>
 <dl class="section note"><dt>Note</dt><dd>Note that this code is of late alpha quality. It's quite reliable, but be careful when using it!</dd></dl>
@@ -316,6 +320,15 @@ async_file_handle - adds asynchronous scatter-gather i/o</li>
 <tr>
 <td>✔ </td><td></td><td></td><td>Algorithm to figure out all paths for a hard linked inode. </td></tr>
 </table>
+<p>Max bandwidth for the physical hardware:</p>
+<ul>
+<li>DDR4 2133: <b>30Gb/sec</b> (main memory)</li>
+<li>x4 PCIe 4.0: <b>7.5Gb/sec</b> (arrives end of 2017, the 2018 NVMe drives will use PCIe 4.0)</li>
+<li>x4 PCIe 3.0: <b>3.75Gb/sec</b> (985Mb/sec per PCIe lane)</li>
+<li>2017 XPoint drive (x4 PCIe 3.0): <b>2.5Gb/sec</b></li>
+<li>2017 NVMe flash drive (x4 PCIe 3.0): <b>2Gb/sec</b></li>
+<li>10Gbit LAN: <b>1.2Gb/sec</b> </li>
+</ul>
 </div></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
