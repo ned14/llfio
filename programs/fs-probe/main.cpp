@@ -75,13 +75,13 @@ int main(int argc, char *argv[])
   }
 
   // Force extent allocation before test begins
-  {
+  auto make_testfile = [](std::string name) {
     // Create file with O_SYNC
-    auto _testfile(file_handle::file({}, "test", handle::mode::write, handle::creation::if_needed, handle::caching::reads));
+    auto _testfile(file_handle::file({}, name, handle::mode::write, handle::creation::if_needed, handle::caching::reads));
     if(!_testfile)
     {
       std::cerr << "WARNING: Failed to create test file due to '" << _testfile.error().message() << "', failing" << std::endl;
-      return 1;
+      abort();
     }
     file_handle testfile(std::move(_testfile.value()));
     std::vector<char> buffer(1024 * 1024 * 1024);
@@ -89,10 +89,15 @@ int main(int argc, char *argv[])
     file_handle::const_buffer_type _reqs[1] = {{buffer.data(), buffer.size()}};
     file_handle::io_request<file_handle::const_buffers_type> reqs(_reqs, 0);
     RETCHECK(testfile.write(reqs));
-  }
+  };
+  std::cout << "Writing 17Gb of temporary test files, this will take a while ..." << std::endl;
+  make_testfile("test");
+  for(size_t n = 0; n < 16; n++)
+    make_testfile(std::to_string(n));
   // File closes, as it was opened with O_SYNC it forces extent allocation
   // Pause as Windows still takes a while
-  std::this_thread::sleep_for(std::chrono::seconds(3));
+  std::cout << "Waiting for hard drive to quieten after temp files written ..." << std::endl;
+  std::this_thread::sleep_for(std::chrono::seconds(10));
   std::ofstream results("fs_probe_results.yaml", std::ios::app);
   {
     auto put_time = [](const std::tm *tmb, const char *fmt) {
@@ -155,19 +160,22 @@ int main(int argc, char *argv[])
     }
   }
   // Delete the test file
-  {
-    auto _testfile(file_handle::file({}, "test", handle::mode::write));
+  auto delete_testfile = [](std::string name) {
+    auto _testfile(file_handle::file({}, name, handle::mode::write));
     if(!_testfile)
     {
       std::cerr << "WARNING: Failed to open test file due to '" << _testfile.error().message() << std::endl;
-      return 1;
+      abort();
     }
     auto out = _testfile.value().unlink();
     if(!out)
     {
       std::cerr << "WARNING: Failed to unlink test file due to '" << out.error().message() << std::endl;
-      return 1;
+      abort();
     }
-  }
+  };
+  delete_testfile("test");
+  for(size_t n = 0; n < 16; n++)
+    delete_testfile(std::to_string(n));
   return 0;
 }

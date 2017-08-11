@@ -295,40 +295,45 @@ namespace storage_profile
                                                                                                                                                                "an i/o straddles a 4096 file offset multiple and DMA suddenly goes into many 64 byte cache lines :(, so if "
                                                                                                                                                                "this value is less than max_aligned_atomic_rewrite and some multiple of the CPU cache line size then this is "
                                                                                                                                                                "what has happened."};
-    item<unsigned> read_qd1_min = {"latency:read:qd1:min", latency::read_qd1, "The nanoseconds to read 4Kb at a queue depth of 1 (min)"};
-    item<unsigned> read_qd1_mean = {"latency:read:qd1:mean", latency::read_qd1, "The nanoseconds to read 4Kb at a queue depth of 1 (arithmetic mean)"};
-    item<unsigned> read_qd1_max = {"latency:read:qd1:max", latency::read_qd1, "The nanoseconds to read 4Kb at a queue depth of 1 (max)"};
-    item<unsigned> read_qd1_95 = {"latency:read:qd1:95%", latency::read_qd1, "The nanoseconds to read 4Kb at a queue depth of 1 (95% of the time)"};
-    item<unsigned> read_qd1_99 = {"latency:read:qd1:99%", latency::read_qd1, "The nanoseconds to read 4Kb at a queue depth of 1 (99% of the time)"};
-    item<unsigned> read_qd1_99999 = {"latency:read:qd1:99.999%", latency::read_qd1, "The nanoseconds to read 4Kb at a queue depth of 1 (99.999% of the time)"};
+    item<unsigned long long> read_qd1_min = {"latency:read:qd1:min", latency::read_qd1, "The nanoseconds to read 4Kb at a queue depth of 1 (min)"};
+    item<unsigned long long> read_qd1_mean = {"latency:read:qd1:mean", latency::read_qd1, "The nanoseconds to read 4Kb at a queue depth of 1 (arithmetic mean)"};
+    item<unsigned long long> read_qd1_max = {"latency:read:qd1:max", latency::read_qd1, "The nanoseconds to read 4Kb at a queue depth of 1 (max)"};
+    item<unsigned long long> read_qd1_50 = {"latency:read:qd1:50%", latency::read_qd1, "The nanoseconds to read 4Kb at a queue depth of 1 (50% of the time)"};
+    item<unsigned long long> read_qd1_95 = {"latency:read:qd1:95%", latency::read_qd1, "The nanoseconds to read 4Kb at a queue depth of 1 (95% of the time)"};
+    item<unsigned long long> read_qd1_99 = {"latency:read:qd1:99%", latency::read_qd1, "The nanoseconds to read 4Kb at a queue depth of 1 (99% of the time)"};
+    item<unsigned long long> read_qd1_99999 = {"latency:read:qd1:99.999%", latency::read_qd1, "The nanoseconds to read 4Kb at a queue depth of 1 (99.999% of the time)"};
 
-    item<unsigned> read_qd16_min = {"latency:read:qd16:min", latency::read_qd16, "The nanoseconds to read 4Kb at a queue depth of 16 (min)"};
-    item<unsigned> read_qd16_mean = {"latency:read:qd16:mean", latency::read_qd16, "The nanoseconds to read 4Kb at a queue depth of 16 (arithmetic mean)"};
-    item<unsigned> read_qd16_max = {"latency:read:qd16:max", latency::read_qd16, "The nanoseconds to read 4Kb at a queue depth of 16 (max)"};
-    item<unsigned> read_qd16_95 = {"latency:read:qd16:95%", latency::read_qd16, "The nanoseconds to read 4Kb at a queue depth of 16 (95% of the time)"};
-    item<unsigned> read_qd16_99 = {"latency:read:qd16:99%", latency::read_qd16, "The nanoseconds to read 4Kb at a queue depth of 16 (99% of the time)"};
-    item<unsigned> read_qd16_99999 = {"latency:read:qd16:99.999%", latency::read_qd16, "The nanoseconds to read 4Kb at a queue depth of 16 (99.999% of the time)"};
+    item<unsigned long long> read_qd16_min = {"latency:read:qd16:min", latency::read_qd16, "The nanoseconds to read 4Kb at a queue depth of 16 (min)"};
+    item<unsigned long long> read_qd16_mean = {"latency:read:qd16:mean", latency::read_qd16, "The nanoseconds to read 4Kb at a queue depth of 16 (arithmetic mean)"};
+    item<unsigned long long> read_qd16_max = {"latency:read:qd16:max", latency::read_qd16, "The nanoseconds to read 4Kb at a queue depth of 16 (max)"};
+    item<unsigned long long> read_qd16_50 = {"latency:read:qd16:50%", latency::read_qd16, "The nanoseconds to read 4Kb at a queue depth of 16 (50% of the time)"};
+    item<unsigned long long> read_qd16_95 = {"latency:read:qd16:95%", latency::read_qd16, "The nanoseconds to read 4Kb at a queue depth of 16 (95% of the time)"};
+    item<unsigned long long> read_qd16_99 = {"latency:read:qd16:99%", latency::read_qd16, "The nanoseconds to read 4Kb at a queue depth of 16 (99% of the time)"};
+    item<unsigned long long> read_qd16_99999 = {"latency:read:qd16:99.999%", latency::read_qd16, "The nanoseconds to read 4Kb at a queue depth of 16 (99.999% of the time)"};
 
-    item<unsigned> write_qd1_min = {"latency:write:qd1:min", latency::write_qd1, "The nanoseconds to write 4Kb at a queue depth of 1 (min)"};
-    item<unsigned> write_qd1_mean = {"latency:write:qd1:mean", latency::write_qd1, "The nanoseconds to write 4Kb at a queue depth of 1 (arithmetic mean)"};
-    item<unsigned> write_qd1_max = {"latency:write:qd1:max", latency::write_qd1, "The nanoseconds to write 4Kb at a queue depth of 1 (max)"};
-    item<unsigned> write_qd1_95 = {"latency:write:qd1:95%", latency::write_qd1, "The nanoseconds to write 4Kb at a queue depth of 1 (95% of the time)"};
-    item<unsigned> write_qd1_99 = {"latency:write:qd1:99%", latency::write_qd1, "The nanoseconds to write 4Kb at a queue depth of 1 (99% of the time)"};
-    item<unsigned> write_qd1_99999 = {"latency:write:qd1:99.999%", latency::write_qd1, "The nanoseconds to write 4Kb at a queue depth of 1 (99.999% of the time)"};
+    item<unsigned long long> write_qd1_min = {"latency:write:qd1:min", latency::write_qd1, "The nanoseconds to write 4Kb at a queue depth of 1 (min)"};
+    item<unsigned long long> write_qd1_mean = {"latency:write:qd1:mean", latency::write_qd1, "The nanoseconds to write 4Kb at a queue depth of 1 (arithmetic mean)"};
+    item<unsigned long long> write_qd1_max = {"latency:write:qd1:max", latency::write_qd1, "The nanoseconds to write 4Kb at a queue depth of 1 (max)"};
+    item<unsigned long long> write_qd1_50 = {"latency:write:qd1:50%", latency::write_qd1, "The nanoseconds to write 4Kb at a queue depth of 1 (50% of the time)"};
+    item<unsigned long long> write_qd1_95 = {"latency:write:qd1:95%", latency::write_qd1, "The nanoseconds to write 4Kb at a queue depth of 1 (95% of the time)"};
+    item<unsigned long long> write_qd1_99 = {"latency:write:qd1:99%", latency::write_qd1, "The nanoseconds to write 4Kb at a queue depth of 1 (99% of the time)"};
+    item<unsigned long long> write_qd1_99999 = {"latency:write:qd1:99.999%", latency::write_qd1, "The nanoseconds to write 4Kb at a queue depth of 1 (99.999% of the time)"};
 
-    item<unsigned> write_qd16_min = {"latency:write:qd16:min", latency::write_qd16, "The nanoseconds to write 4Kb at a queue depth of 16 (min)"};
-    item<unsigned> write_qd16_mean = {"latency:write:qd16:mean", latency::write_qd16, "The nanoseconds to write 4Kb at a queue depth of 16 (arithmetic mean)"};
-    item<unsigned> write_qd16_max = {"latency:write:qd16:max", latency::write_qd16, "The nanoseconds to write 4Kb at a queue depth of 16 (max)"};
-    item<unsigned> write_qd16_95 = {"latency:write:qd16:95%", latency::write_qd16, "The nanoseconds to write 4Kb at a queue depth of 16 (95% of the time)"};
-    item<unsigned> write_qd16_99 = {"latency:write:qd16:99%", latency::write_qd16, "The nanoseconds to write 4Kb at a queue depth of 16 (99% of the time)"};
-    item<unsigned> write_qd16_99999 = {"latency:write:qd16:99.999%", latency::write_qd16, "The nanoseconds to write 4Kb at a queue depth of 16 (99.999% of the time)"};
+    item<unsigned long long> write_qd16_min = {"latency:write:qd16:min", latency::write_qd16, "The nanoseconds to write 4Kb at a queue depth of 16 (min)"};
+    item<unsigned long long> write_qd16_mean = {"latency:write:qd16:mean", latency::write_qd16, "The nanoseconds to write 4Kb at a queue depth of 16 (arithmetic mean)"};
+    item<unsigned long long> write_qd16_max = {"latency:write:qd16:max", latency::write_qd16, "The nanoseconds to write 4Kb at a queue depth of 16 (max)"};
+    item<unsigned long long> write_qd16_50 = {"latency:write:qd16:50%", latency::write_qd16, "The nanoseconds to write 4Kb at a queue depth of 16 (50% of the time)"};
+    item<unsigned long long> write_qd16_95 = {"latency:write:qd16:95%", latency::write_qd16, "The nanoseconds to write 4Kb at a queue depth of 16 (95% of the time)"};
+    item<unsigned long long> write_qd16_99 = {"latency:write:qd16:99%", latency::write_qd16, "The nanoseconds to write 4Kb at a queue depth of 16 (99% of the time)"};
+    item<unsigned long long> write_qd16_99999 = {"latency:write:qd16:99.999%", latency::write_qd16, "The nanoseconds to write 4Kb at a queue depth of 16 (99.999% of the time)"};
 
-    item<unsigned> readwrite_qd4_min = {"latency:readwrite:qd4:min", latency::readwrite_qd4, "The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4 (min)"};
-    item<unsigned> readwrite_qd4_mean = {"latency:readwrite:qd4:mean", latency::readwrite_qd4, "The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4 (arithmetic mean)"};
-    item<unsigned> readwrite_qd4_max = {"latency:readwrite:qd4:max", latency::readwrite_qd4, "The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4 (max)"};
-    item<unsigned> readwrite_qd4_95 = {"latency:readwrite:qd4:95%", latency::readwrite_qd4, "The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4 (95% of the time)"};
-    item<unsigned> readwrite_qd4_99 = {"latency:readwrite:qd4:99%", latency::readwrite_qd4, "The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4 (99% of the time)"};
-    item<unsigned> readwrite_qd4_99999 = {"latency:readwrite:qd4:99.999%", latency::readwrite_qd4, "The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4 (99.999% of the time)"};
+    item<unsigned long long> readwrite_qd4_min = {"latency:readwrite:qd4:min", latency::readwrite_qd4, "The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4 (min)"};
+    item<unsigned long long> readwrite_qd4_mean = {"latency:readwrite:qd4:mean", latency::readwrite_qd4, "The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4 (arithmetic mean)"};
+    item<unsigned long long> readwrite_qd4_max = {"latency:readwrite:qd4:max", latency::readwrite_qd4, "The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4 (max)"};
+    item<unsigned long long> readwrite_qd4_50 = {"latency:readwrite:qd4:50%", latency::readwrite_qd4, "The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4 (50% of the time)"};
+    item<unsigned long long> readwrite_qd4_95 = {"latency:readwrite:qd4:95%", latency::readwrite_qd4, "The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4 (95% of the time)"};
+    item<unsigned long long> readwrite_qd4_99 = {"latency:readwrite:qd4:99%", latency::readwrite_qd4, "The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4 (99% of the time)"};
+    item<unsigned long long> readwrite_qd4_99999 = {"latency:readwrite:qd4:99.999%", latency::readwrite_qd4, "The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4 (99.999% of the time)"};
   };
 }
 

@@ -44,8 +44,8 @@ Manufacturer claimed 4Kb transfer latencies for the physical hardware:
 - 99.999% spinning rust hard drive latency: **TODO**
 - Average SATA flash drive latency: **TODO**
 - 99.999% SATA flash drive latency: **TODO**
-- Average NVMe flash drive latency: **344.5us** (11,611 IOPS)
-- 99.999% NVMe flash drive latency: **52,164us** (77 IOPS)
+- Average NVMe flash drive latency: **26.9us** (37,105 IOPS)
+- 99.999% NVMe flash drive latency: **21,597us** (46 IOPS)
 </td>
 </tr>
 </table>

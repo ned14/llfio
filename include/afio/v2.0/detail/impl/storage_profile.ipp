@@ -607,36 +607,53 @@ namespace storage_profile
   {
     struct stats
     {
-      unsigned min{0}, mean{0}, max{0}, _95{0}, _99{0}, _99999{0};
+      unsigned long long min{0}, mean{0}, max{0}, _50{0}, _95{0}, _99{0}, _99999{0};
     };
-    inline outcome<stats> _latency_test(file_handle &srch, size_t noreaders, size_t nowriters)
+    inline outcome<stats> _latency_test(file_handle &srch, size_t noreaders, size_t nowriters, bool ownfiles)
     {
-      static constexpr size_t memory_to_use = 256 * 1024 * 1024;  // 1Gb
-      static const unsigned clock_overhead = system::_clock_granularity_and_overhead().overhead;
+      static constexpr size_t memory_to_use = 128 * 1024 * 1024;  // 1Gb
+      // static const unsigned clock_overhead = system::_clock_granularity_and_overhead().overhead;
       static const unsigned clock_granularity = system::_clock_granularity_and_overhead().granularity;
       try
       {
-        std::vector<std::vector<unsigned>> results(noreaders + nowriters);
+        std::vector<file_handle> _workfiles;
+        _workfiles.reserve(noreaders + nowriters);
+        std::vector<file_handle *> workfiles(noreaders + nowriters, &srch);
+        path_handle base = srch.parent_path_handle().value();
+        if(ownfiles)
+        {
+          std::vector<char> buffer(1024 * 1024 * 1024);
+          for(size_t n = 0; n < noreaders + nowriters; n++)
+          {
+            auto fh = file_handle::file(base, std::to_string(n), file_handle::mode::write, file_handle::creation::open_existing, srch.kernel_caching(), srch.flags());
+            if(!fh)
+            {
+              fh = file_handle::file(base, std::to_string(n), file_handle::mode::write, file_handle::creation::if_needed, srch.kernel_caching(), srch.flags() | file_handle::flag::unlink_on_close);
+              fh.value().write(0, buffer.data(), buffer.size()).value();
+            }
+            _workfiles.push_back(std::move(fh.value()));
+            workfiles[n] = &_workfiles.back();
+          }
+        }
+
+        std::vector<std::vector<unsigned long long>> results(noreaders + nowriters);
         std::vector<std::thread> writers, readers;
         std::atomic<size_t> done(noreaders + nowriters);
         for(auto &i : results)
         {
           i.resize(memory_to_use / results.size());
-          memset(i.data(), 0, i.size() * sizeof(unsigned));  // prefault
+          memset(i.data(), 0, i.size() * sizeof(unsigned long long));  // prefault
           i.resize(0);
         }
         for(size_t no = 0; no < nowriters; no++)
-          writers.push_back(std::thread([&srch, no, &done, &results] {
-            auto _h(srch.clone());
-            if(!_h)
-              throw std::runtime_error("latency_test: Could not open work file due to " + _h.error().message());
-            file_handle h(std::move(_h.value()));
+          writers.push_back(std::thread([no, &done, &workfiles, &results] {
+            file_handle &h = *workfiles[no];
             alignas(4096) char buffer[4096];
             memset(buffer, no, 4096);
             file_handle::const_buffer_type _reqs[1] = {{buffer, 4096}};
             file_handle::io_request<file_handle::const_buffers_type> reqs(_reqs, 0);
             QUICKCPPLIB_NAMESPACE::algorithm::small_prng::small_prng rand(no);
-            auto maxsize = srch.length().value() - 4095;
+            auto maxsize = h.length().value() - 4095;
             --done;
             while(done)
               std::this_thread::yield();
@@ -649,27 +666,22 @@ namespace storage_profile
                 (void) h.write(reqs);
               }
               auto end = std::chrono::high_resolution_clock::now();
-              auto ns = (std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count() - clock_overhead);  // / 16;
-              if(ns > UINT_MAX)
-                ns = UINT_MAX;
+              auto ns = (std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count());  // / 16;
               if(ns == 0)
                 ns = clock_granularity / 2;
-              results[no].push_back((unsigned) ns);
+              results[no].push_back(ns);
               if(results[no].size() == results[no].capacity())
                 return;
             }
           }));
         for(size_t no = nowriters; no < nowriters + noreaders; no++)
-          readers.push_back(std::thread([&srch, no, &done, &results] {
-            auto _h(srch.clone());
-            if(!_h)
-              throw std::runtime_error("latency_test: Could not open work file due to " + _h.error().message());
-            file_handle h(std::move(_h.value()));
+          readers.push_back(std::thread([no, &done, &workfiles, &results] {
+            file_handle &h = *workfiles[no];
             alignas(4096) char buffer[4096];
             file_handle::buffer_type _reqs[1] = {{buffer, 4096}};
             file_handle::io_request<file_handle::buffers_type> reqs(_reqs, 0);
             QUICKCPPLIB_NAMESPACE::algorithm::small_prng::small_prng rand(no);
-            auto maxsize = srch.length().value() - 4095;
+            auto maxsize = h.length().value() - 4095;
             --done;
             while(done)
               std::this_thread::yield();
@@ -682,12 +694,10 @@ namespace storage_profile
                 (void) h.read(reqs);
               }
               auto end = std::chrono::high_resolution_clock::now();
-              auto ns = (std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count() - clock_overhead);  // / 16;
-              if(ns > UINT_MAX)
-                ns = UINT_MAX;
+              auto ns = (std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count());  // / 16;
               if(ns == 0)
                 ns = clock_granularity / 2;
-              results[no].push_back((unsigned) ns);
+              results[no].push_back(ns);
               if(results[no].size() == results[no].capacity())
                 return;
             }
@@ -718,10 +728,10 @@ namespace storage_profile
           }
         }
 #endif
-        std::vector<unsigned> totalresults;
+        std::vector<unsigned long long> totalresults;
         unsigned long long sum = 0;
         stats s;
-        s.min = (unsigned) -1;
+        s.min = (unsigned long long) -1;
         for(size_t n = 0; n < results.size(); n++)
         {
           for(const auto &i : results[n])
@@ -737,11 +747,12 @@ namespace storage_profile
           results[n].shrink_to_fit();
         }
         std::cout << "Total results = " << totalresults.size() << std::endl;
-        s.mean = (unsigned) ((double) sum / totalresults.size());
+        s.mean = (unsigned long long) ((double) sum / totalresults.size());
         // Latency distributions are definitely not normally distributed, but here we have the
         // advantage of tons of sample points. So simply sort into order, and pluck out the values
         // at 99.999%, 99% and 95%. It'll be accurate enough.
         std::sort(totalresults.begin(), totalresults.end());
+        s._50 = totalresults[(size_t)(0.5 * totalresults.size())];
         s._95 = totalresults[(size_t)(0.95 * totalresults.size())];
         s._99 = totalresults[(size_t)(0.99 * totalresults.size())];
         s._99999 = totalresults[(size_t)(0.99999 * totalresults.size())];
@@ -754,12 +765,13 @@ namespace storage_profile
     }
     outcome<void> read_qd1(storage_profile &sp, file_handle &srch) noexcept
     {
-      if(sp.read_qd1_mean.value != (unsigned int) -1)
+      if(sp.read_qd1_mean.value != (unsigned long long) -1)
         return success();
-      OUTCOME_TRY(s, _latency_test(srch, 1, 0));
+      OUTCOME_TRY(s, _latency_test(srch, 1, 0, false));
       sp.read_qd1_min.value = s.min;
       sp.read_qd1_mean.value = s.mean;
       sp.read_qd1_max.value = s.max;
+      sp.read_qd1_50.value = s._50;
       sp.read_qd1_95.value = s._95;
       sp.read_qd1_99.value = s._99;
       sp.read_qd1_99999.value = s._99999;
@@ -767,12 +779,13 @@ namespace storage_profile
     }
     outcome<void> write_qd1(storage_profile &sp, file_handle &srch) noexcept
     {
-      if(sp.write_qd1_mean.value != (unsigned int) -1)
+      if(sp.write_qd1_mean.value != (unsigned long long) -1)
         return success();
-      OUTCOME_TRY(s, _latency_test(srch, 0, 1));
+      OUTCOME_TRY(s, _latency_test(srch, 0, 1, false));
       sp.write_qd1_min.value = s.min;
       sp.write_qd1_mean.value = s.mean;
       sp.write_qd1_max.value = s.max;
+      sp.write_qd1_50.value = s._50;
       sp.write_qd1_95.value = s._95;
       sp.write_qd1_99.value = s._99;
       sp.write_qd1_99999.value = s._99999;
@@ -780,12 +793,13 @@ namespace storage_profile
     }
     outcome<void> read_qd16(storage_profile &sp, file_handle &srch) noexcept
     {
-      if(sp.read_qd16_mean.value != (unsigned int) -1)
+      if(sp.read_qd16_mean.value != (unsigned long long) -1)
         return success();
-      OUTCOME_TRY(s, _latency_test(srch, 16, 0));
+      OUTCOME_TRY(s, _latency_test(srch, 16, 0, true));
       sp.read_qd16_min.value = s.min;
       sp.read_qd16_mean.value = s.mean;
       sp.read_qd16_max.value = s.max;
+      sp.read_qd16_50.value = s._50;
       sp.read_qd16_95.value = s._95;
       sp.read_qd16_99.value = s._99;
       sp.read_qd16_99999.value = s._99999;
@@ -793,12 +807,13 @@ namespace storage_profile
     }
     outcome<void> write_qd16(storage_profile &sp, file_handle &srch) noexcept
     {
-      if(sp.write_qd16_mean.value != (unsigned int) -1)
+      if(sp.write_qd16_mean.value != (unsigned long long) -1)
         return success();
-      OUTCOME_TRY(s, _latency_test(srch, 0, 16));
+      OUTCOME_TRY(s, _latency_test(srch, 0, 16, true));
       sp.write_qd16_min.value = s.min;
       sp.write_qd16_mean.value = s.mean;
       sp.write_qd16_max.value = s.max;
+      sp.write_qd16_50.value = s._50;
       sp.write_qd16_95.value = s._95;
       sp.write_qd16_99.value = s._99;
       sp.write_qd16_99999.value = s._99999;
@@ -806,12 +821,13 @@ namespace storage_profile
     }
     outcome<void> readwrite_qd4(storage_profile &sp, file_handle &srch) noexcept
     {
-      if(sp.readwrite_qd4_mean.value != (unsigned int) -1)
+      if(sp.readwrite_qd4_mean.value != (unsigned long long) -1)
         return success();
-      OUTCOME_TRY(s, _latency_test(srch, 3, 1));
+      OUTCOME_TRY(s, _latency_test(srch, 3, 1, true));
       sp.readwrite_qd4_min.value = s.min;
       sp.readwrite_qd4_mean.value = s.mean;
       sp.readwrite_qd4_max.value = s.max;
+      sp.readwrite_qd4_50.value = s._50;
       sp.readwrite_qd4_95.value = s._95;
       sp.readwrite_qd4_99.value = s._99;
       sp.readwrite_qd4_99999.value = s._99999;
