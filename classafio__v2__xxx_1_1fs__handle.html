@@ -161,8 +161,10 @@ ino_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cla
 <tr class="separator:a1f7779618e9b0e27bd1619025dcbb617"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5a5244ab1a15053aefe93f2c253db5b3"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5a5244ab1a15053aefe93f2c253db5b3"></a>
 <a class="el" href="classafio__v2__xxx_1_1fs__handle.html#a0344f48ef10fa2b94199d5566aedd879">unique_id_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1fs__handle.html#a5a5244ab1a15053aefe93f2c253db5b3">unique_id</a> () const noexcept</td></tr>
-<tr class="memdesc:a5a5244ab1a15053aefe93f2c253db5b3"><td class="mdescLeft">&#160;</td><td class="mdescRight">A unique identifier for this handle in this process (native handle). Subclasses like <code>file_handle</code> make this a unique identifier across the entire system. <br/></td></tr>
+<tr class="memdesc:a5a5244ab1a15053aefe93f2c253db5b3"><td class="mdescLeft">&#160;</td><td class="mdescRight">A unique identifier for this handle across the entire system. Can be used in hash tables etc. <br/></td></tr>
 <tr class="separator:a5a5244ab1a15053aefe93f2c253db5b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a15232dc853f7ca4769eebbfd1fb91cbe"><td class="memItemLeft" align="right" valign="top">result&lt; <a class="el" href="classafio__v2__xxx_1_1path__handle.html">path_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1fs__handle.html#a15232dc853f7ca4769eebbfd1fb91cbe">parent_path_handle</a> (<a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a> d=std::chrono::seconds(30)) const noexcept</td></tr>
+<tr class="separator:a15232dc853f7ca4769eebbfd1fb91cbe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa867637783001773f4c50e25d5e628c3"><td class="memItemLeft" align="right" valign="top">result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1fs__handle.html#aa867637783001773f4c50e25d5e628c3">relink</a> (const <a class="el" href="classafio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;base, <a class="el" href="classafio__v2__xxx_1_1fs__handle.html#ac25247b15af82faf1db557b3e45e13d7">path_view_type</a> newpath, <a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a> d=std::chrono::seconds(30)) noexcept</td></tr>
 <tr class="separator:aa867637783001773f4c50e25d5e628c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a11d5f02b84c8fee8d81a5cbda0ef5765"><td class="memItemLeft" align="right" valign="top">result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1fs__handle.html#a11d5f02b84c8fee8d81a5cbda0ef5765">unlink</a> (<a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a> d=std::chrono::seconds(30)) noexcept</td></tr>
@@ -214,6 +216,32 @@ ino_t&#160;</td><td class="memItemRight" valign="bottom"><b>_inode</b></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>A handle to something with a device and inode number. </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
+<a class="anchor" id="a15232dc853f7ca4769eebbfd1fb91cbe"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">result&lt;<a class="el" href="classafio__v2__xxx_1_1path__handle.html">path_handle</a>&gt; afio_v2_xxx::fs_handle::parent_path_handle </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a>&#160;</td>
+          <td class="paramname"><em>d</em> = <code>std::chrono::seconds(30)</code></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Obtain a handle to the path <b>currently</b> containing this handle's file entry.</p>
+<dl class="section warning"><dt>Warning</dt><dd>This call is <b>racy</b> and can result in the wrong path handle being returned. Note that unless <code>flag::disable_safety_unlinks</code> is set, this implementation opens a <code>path_handle</code> to the source containing directory, then checks if the file entry within has the same inode as the open file handle. It will retry this matching until success until the deadline given. </dd></dl>
+
+</div>
+</div>
 <a class="anchor" id="aa867637783001773f4c50e25d5e628c3"></a>
 <div class="memitem">
 <div class="memproto">

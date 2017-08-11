@@ -143,8 +143,8 @@ $(document).ready(function(){initNavTree('index.html','');});
 <li>99.999% spinning rust hard drive latency: <b>TODO</b></li>
 <li>Average SATA flash drive latency: <b>TODO</b></li>
 <li>99.999% SATA flash drive latency: <b>TODO</b></li>
-<li>Average NVMe flash drive latency: <b>344.5us</b> (11,611 IOPS)</li>
-<li>99.999% NVMe flash drive latency: <b>52,164us</b> (77 IOPS)   </li>
+<li>Average NVMe flash drive latency: <b>26.9us</b> (37,105 IOPS)</li>
+<li>99.999% NVMe flash drive latency: <b>21,597us</b> (46 IOPS)   </li>
 </ul>
 </td></tr>
 </table>
@@ -284,24 +284,31 @@ async_file_handle - adds asynchronous scatter-gather i/o</li>
 <tr>
 <td></td><td>✔ </td><td>✔ </td><td>"Hole punching" and hole enumeration ported over from AFIO v1. </td></tr>
 </table>
-<p>Todo:</p>
+<p>Todo to reach feature parity with AFIO v1:</p>
 <table class="doxtable">
 <tr>
 <th>NEW in v2 </th><th>Windows </th><th>POSIX </th><th></th></tr>
 <tr>
 <td></td><td></td><td></td><td>Directory handles and very fast directory enumeration ported over from AFIO v1. </td></tr>
 <tr>
+<td></td><td></td><td></td><td>Hard links and symlinks. </td></tr>
+<tr>
+<td></td><td></td><td></td><td>BSD and OS X kqueues optimised <code>io_service</code> </td></tr>
+</table>
+<p>Todo thereafter:</p>
+<table class="doxtable">
+<tr>
+<th>NEW in v2 </th><th>Windows </th><th>POSIX </th><th></th></tr>
+<tr>
 <td>✔ </td><td></td><td></td><td>Extended attributes support. </td></tr>
 <tr>
 <td>✔ </td><td></td><td></td><td>Coroutines TS integration for <code>async_file_handle</code>. Use example: <a href="https://gist.github.com/anonymous/a67ba4695c223a905ff108ed8b9a342f">https://gist.github.com/anonymous/a67ba4695c223a905ff108ed8b9a342f</a> </td></tr>
 <tr>
-<td></td><td></td><td></td><td>BSD and OS X kqueues optimised <code>io_service</code> </td></tr>
-<tr>
 <td>✔ </td><td></td><td></td><td>Linux KAIO support for native async <code>O_DIRECT</code> i/o </td></tr>
 <tr>
-<td></td><td></td><td></td><td>Reliable directory hierarchy deletion algorithm. </td></tr>
+<td>✔ </td><td></td><td></td><td>Reliable directory hierarchy deletion algorithm. </td></tr>
 <tr>
-<td></td><td></td><td></td><td>Reliable directory hierarchy copy algorithm. </td></tr>
+<td>✔ </td><td></td><td></td><td>Reliable directory hierarchy copy algorithm. </td></tr>
 <tr>
 <td>✔ </td><td></td><td></td><td>Reliable directory hierarchy update (two and three way) algorithm. </td></tr>
 <tr>

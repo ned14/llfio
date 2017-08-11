@@ -12,6 +12,7 @@ var classafio__v2__xxx_1_1fs__handle =
     [ "_get_handle", "classafio__v2__xxx_1_1fs__handle.html#af1c6b569d96ce4bd7e13ae451641e628", null ],
     [ "operator=", "classafio__v2__xxx_1_1fs__handle.html#a334ed7c11091e8f3f83686b8aeaa1c5b", null ],
     [ "operator=", "classafio__v2__xxx_1_1fs__handle.html#a57612714e944a93f6e26ec66b91ffd6e", null ],
+    [ "parent_path_handle", "classafio__v2__xxx_1_1fs__handle.html#a15232dc853f7ca4769eebbfd1fb91cbe", null ],
     [ "relink", "classafio__v2__xxx_1_1fs__handle.html#aa867637783001773f4c50e25d5e628c3", null ],
     [ "st_dev", "classafio__v2__xxx_1_1fs__handle.html#abf1012040064a3d429adfae8e6f443f0", null ],
     [ "st_ino", "classafio__v2__xxx_1_1fs__handle.html#a1f7779618e9b0e27bd1619025dcbb617", null ],
