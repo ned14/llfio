@@ -40,7 +40,7 @@ result<void> fs_handle::_fetch_inode() noexcept
   return success();
 }
 
-inline result<path_handle> containing_directory(filesystem::path &filename, const handle &h, const fs_handle &fsh, deadline d) noexcept
+inline result<path_handle> containing_directory(optional<std::reference_wrapper<filesystem::path>> out_filename, const handle &h, const fs_handle &fsh, deadline d) noexcept
 {
 #ifdef AFIO_DISABLE_RACE_FREE_PATH_FUNCTIONS
   return std::errc::function_not_supported;
@@ -62,12 +62,16 @@ inline result<path_handle> containing_directory(filesystem::path &filename, cons
       auto currentpath_ = h.current_path();
       if(!currentpath_)
         continue;
-      filesystem::path currentpath = std::move(currentpath_.value());
+      filesystem::path _currentpath = std::move(currentpath_.value());
       // If current path is empty, it's been deleted
-      if(currentpath.empty())
+      if(_currentpath.empty())
         return std::errc::no_such_file_or_directory;
-      filename = currentpath.filename();
+      // Split the path into root and leafname
+      path_view currentpath(_currentpath);
+      path_view filename = currentpath.filename();
       currentpath.remove_filename();
+      // Zero terminate the root path so it doesn't get copied later
+      const_cast<filesystem::path::string_type &>(_currentpath.native())[currentpath.native_size()] = 0;
       auto currentdirh_ = path_handle::path(currentpath);
       if(!currentdirh_)
         continue;
@@ -75,7 +79,8 @@ inline result<path_handle> containing_directory(filesystem::path &filename, cons
       if(h.flags() & handle::flag::disable_safety_unlinks)
         return success(std::move(currentdirh));
       // Open the same file name, and compare dev and inode
-      int fd = ::openat(currentdirh.native_handle().fd, filename.c_str(), 0);
+      path_view::c_str zpath(filename);
+      int fd = ::openat(currentdirh.native_handle().fd, filename.buffer, 0);
       if(fd == -1)
         continue;
       auto unfd = undoer([fd] { ::close(fd); });
@@ -85,7 +90,11 @@ inline result<path_handle> containing_directory(filesystem::path &filename, cons
         continue;
       // If the same, we know for a fact that this is the correct containing dir for now at least
       if(s.st_dev == fsh.st_dev() && s.st_ino == fsh.st_ino())
+      {
+        if(out_filename)
+          out_filename->get() = filename.path();
         return success(std::move(currentdirh));
+      }
       // Check timeout
       if(d)
       {
@@ -112,8 +121,7 @@ result<path_handle> fs_handle::parent_path_handle(deadline d) const noexcept
 {
   AFIO_LOG_FUNCTION_CALL(this);
   auto &h = _get_handle();
-  filesystem::path filename;
-  return containing_directory(filename, h, *this, d);
+  return containing_directory({}, h, *this, d);
 }
 
 result<void> fs_handle::relink(const path_handle &base, path_view_type path, deadline d) noexcept

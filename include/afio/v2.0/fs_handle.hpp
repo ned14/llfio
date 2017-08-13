@@ -133,6 +133,8 @@ public:
   `path_handle` to the source containing directory, then checks if the file entry within has the
   same inode as the open file handle. It will retry this matching until
   success until the deadline given.
+
+  \mallocs Calls `current_path()` and thus is both expensive and calls malloc many times.
   */
   result<path_handle> parent_path_handle(deadline d = std::chrono::seconds(30)) const noexcept;
 
@@ -151,8 +153,9 @@ public:
   \param base Base for any relative path.
   \param newpath The relative or absolute new path to relink to.
   \param d The deadline by which the matching of the containing directory to the open handle's inode
-  must succeed, else `std::errc::timed_out` will be returned. Not used on platforms with race free
-  syscalls for renaming open handles (Windows).
+  must succeed, else `std::errc::timed_out` will be returned.
+  \mallocs Except on platforms with race free syscalls for renaming open handles (Windows), calls
+  `current_path()` and thus is both expensive and calls malloc many times.
   */
   AFIO_MAKE_FREE_FUNCTION
   result<void> relink(const path_handle &base, path_view_type newpath, deadline d = std::chrono::seconds(30)) noexcept;
@@ -172,8 +175,10 @@ public:
   deadline given. This should prevent most unmalicious accidental loss of data.
 
   \param d The deadline by which the matching of the containing directory to the open handle's inode
-  must succeed, else `std::errc::timed_out` will be returned. Not used on platforms with race free
-  syscalls for unlinking open handles (Windows).
+  must succeed, else `std::errc::timed_out` will be returned.
+  \mallocs Except on platforms with race free syscalls for unlinking open handles (Windows), calls
+  `current_path()` and thus is both expensive and calls malloc many times. On Windows, also calls
+  `current_path()` if `flag::disable_safety_unlinks` is not set.
   */
   AFIO_MAKE_FREE_FUNCTION
   result<void> unlink(deadline d = std::chrono::seconds(30)) noexcept;

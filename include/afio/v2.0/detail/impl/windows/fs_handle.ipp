@@ -53,12 +53,16 @@ result<path_handle> fs_handle::parent_path_handle(deadline d) const noexcept
       auto currentpath_ = h.current_path();
       if(!currentpath_)
         continue;
-      filesystem::path currentpath = std::move(currentpath_.value());
+      filesystem::path _currentpath = std::move(currentpath_.value());
       // If current path is empty, it's been deleted
-      if(currentpath.empty())
+      if(_currentpath.empty())
         return std::errc::no_such_file_or_directory;
-      auto filename = currentpath.filename();
+      // Split the path into root and leafname
+      path_view currentpath(_currentpath);
+      path_view filename = currentpath.filename();
       currentpath.remove_filename();
+      // Zero terminate the root path so it doesn't get copied later
+      const_cast<filesystem::path::string_type &>(_currentpath.native())[currentpath.native_size()] = 0;
       auto currentdirh_ = path_handle::path(currentpath);
       if(!currentdirh_)
         continue;
@@ -68,10 +72,10 @@ result<path_handle> fs_handle::parent_path_handle(deadline d) const noexcept
 
       DWORD fileshare = FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE;
       IO_STATUS_BLOCK isb = make_iostatus();
+      path_view::c_str zpath(filename, true);
       UNICODE_STRING _path;
-      _path.Buffer = (wchar_t *) filename.c_str();
-      _path.Length = filename.native().size() * sizeof(wchar_t);
-      _path.MaximumLength = _path.Length + sizeof(wchar_t);
+      _path.Buffer = const_cast<wchar_t *>(zpath.buffer);
+      _path.MaximumLength = (_path.Length = (USHORT)(zpath.length * sizeof(wchar_t))) + sizeof(wchar_t);
       OBJECT_ATTRIBUTES oa;
       memset(&oa, 0, sizeof(oa));
       oa.Length = sizeof(OBJECT_ATTRIBUTES);
@@ -179,9 +183,10 @@ result<void> fs_handle::unlink(deadline d) noexcept
       FILE_BASIC_INFORMATION fbi;
       memset(&fbi, 0, sizeof(fbi));
       fbi.FileAttributes = FILE_ATTRIBUTE_HIDDEN;
-      NtSetInformationFile(h.native_handle().h, &isb, &fbi, sizeof(fbi), FileBasicInformation);
-      if(h.flags() & flag::overlapped)
-        ntwait(h.native_handle().h, isb, deadline());
+      NTSTATUS ntstat = NtSetInformationFile(h.native_handle().h, &isb, &fbi, sizeof(fbi), FileBasicInformation);
+      if(STATUS_PENDING == ntstat)
+        ntstat = ntwait(h.native_handle().h, isb, d);
+      (void) ntstat;
     }
     // Mark the item as delete on close
     IO_STATUS_BLOCK isb = make_iostatus();

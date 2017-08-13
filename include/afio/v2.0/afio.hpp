@@ -58,6 +58,7 @@ import AFIO_MODULE_NAME;
 #include "config.hpp"
 
 #include "async_file_handle.hpp"
+#include "directory_handle.hpp"
 #include "map_handle.hpp"
 #include "statfs.hpp"
 #include "storage_profile.hpp"

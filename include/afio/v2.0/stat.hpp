@@ -107,11 +107,7 @@ struct stat_t
   //! Constructs a zeroed instance
   constexpr stat_t(std::nullptr_t) noexcept : st_dev(0),
                                               st_ino(0),
-#ifdef AFIO_USE_LEGACY_FILESYSTEM_SEMANTICS
-                                              st_type(filesystem::file_type::type_unknown),
-#else
                                               st_type(filesystem::file_type::unknown),
-#endif
 #ifndef _WIN32
                                               st_perms(0),
 #endif

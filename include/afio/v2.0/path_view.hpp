@@ -127,6 +127,7 @@ public:
   using difference_type = std::ptrdiff_t;
 
 private:
+  static constexpr auto _npos = string_view::npos;
 #ifdef _WIN32
   struct state
   {
@@ -154,7 +155,24 @@ private:
       _utf16.swap(o._utf16);
     }
   } _state;
+  template <class U> constexpr auto _invoke(U &&f) noexcept { return !_state._utf16.empty() ? f(_state._utf16) : f(_state._utf8); }
   template <class U> constexpr auto _invoke(U &&f) const noexcept { return !_state._utf16.empty() ? f(_state._utf16) : f(_state._utf8); }
+  constexpr auto _find_last_sep() const noexcept
+  {
+    // wchar paths must use backslashes
+    if(!_state._utf16.empty())
+      return _state._utf16.rfind(filesystem::path::preferred_separator);
+    // char paths can use either
+    auto idx1 = _state._utf8.rfind('\\');
+    auto idx2 = _state._utf8.rfind('/');
+    if(_npos == idx1 && _npos == idx2)
+      return _npos;
+    if(_npos == idx1)
+      return idx2;
+    if(_npos == idx2)
+      return idx1;
+    return (idx1 < idx2) ? idx1 : idx2;
+  }
 #else
   struct state
   {
@@ -170,7 +188,9 @@ private:
     }
     constexpr void swap(state &o) noexcept { _utf8.swap(o._utf8); }
   } _state;
+  template <class U> constexpr auto _invoke(U &&f) noexcept { return f(_state._utf8); }
   template <class U> constexpr auto _invoke(U &&f) const noexcept { return f(_state._utf8); }
+  constexpr auto _find_last_sep() const noexcept { return _state._utf8.rfind(filesystem::path::preferred_separator); }
 #endif
 public:
   //! Constructs an empty path view
@@ -188,6 +208,8 @@ public:
 #endif
   {
   }
+  //! Constructs a UTF-8 path view from a lengthed `const char *`. The input string MUST continue to exist for this view to be valid.
+  constexpr path_view(const char *v, size_t len) noexcept : _state(string_view(v, len)) {}
   /*! Implicitly constructs a UTF-8 path view from a string view.
   \warning The byte after the end of the view must be legal to read.
   */
@@ -204,6 +226,8 @@ public:
 #endif
   {
   }
+  //! Constructs a UTF-16 path view from a lengthed `const wchar_t *`. The input string MUST continue to exist for this view to be valid.
+  constexpr path_view(const wchar_t *v, size_t len) noexcept : _state(wstring_view(v, len)) {}
   /*! Implicitly constructs a UTF-16 path view from a wide string view.
   \warning The character after the end of the view must be legal to read.
   */
@@ -251,24 +275,69 @@ public:
       return false;
     });
   }
+  // True if the path view matches the format of an AFIO deleted file
+  constexpr bool is_afio_deleted() const noexcept
+  {
+    return filename()._invoke([](const auto &v) {
+      if(v.size() == 64 + 8)
+      {
+        // Could be one of our "deleted" files, is he all hex + ".deleted"?
+        for(size_t n = 0; n < 64; n++)
+        {
+          auto c = v[n];
+          if(!((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f')))
+            return false;
+        }
+        return v[64] == '.' && v[65] == 'd' && v[66] == 'e' && v[67] == 'l' && v[68] == 'e' && v[69] == 't' && v[70] == 'e' && v[71] == 'd';
+      }
+      return false;
+    });
+  }
 #endif
 
-  constexpr path_view remove_filename() const noexcept;
+  //! Adjusts the end of this view to match the final separator.
+  constexpr void remove_filename() noexcept
+  {
+    auto sep_idx = _find_last_sep();
+    _invoke([sep_idx](auto &v) {
+      if(_npos == sep_idx)
+        v.clear();
+      else
+        v.remove_suffix(v.size() - sep_idx - 1);
+    });
+  }
+  //! Returns the size of the view in characters.
+  constexpr size_t native_size() const noexcept
+  {
+    return _invoke([](const auto &v) { return v.size(); });
+  }
   constexpr path_view root_name() const noexcept;
   constexpr path_view root_directory() const noexcept;
   constexpr path_view root_path() const noexcept;
   constexpr path_view relative_path() const noexcept;
   constexpr path_view parent_path() const noexcept;
-  constexpr path_view filename() const noexcept;
+  //! Returns a view of the filename part of this view.
+  constexpr path_view filename() const noexcept
+  {
+    auto sep_idx = _find_last_sep();
+    if(_npos == sep_idx)
+      return *this;
+    return _invoke([sep_idx](const auto &v) { return path_view(v.data() + sep_idx + 1, v.size() - sep_idx - 1); });
+  }
   constexpr path_view stem() const noexcept;
   constexpr path_view extension() const noexcept;
 
-  template <class CharT, class Traits = std::char_traits<CharT>, class Alloc = std::allocator<CharT>> std::basic_string<CharT, Traits, Alloc> string(const Alloc &a = Alloc()) const;
-  std::string string() const;
-  std::wstring wstring() const;
-  std::string u8string() const;
-  std::u16string u16string() const;
-  std::u32string u32string() const;
+  //! Return the path view as a path.
+  filesystem::path path() const
+  {
+#ifdef _WIN32
+    if(!_state._utf16.empty())
+      return filesystem::path(_state._utf16.to_string());
+#endif
+    if(!_state._utf8.empty())
+      return filesystem::path(_state._utf8.to_string());
+    return {};
+  }
 
   constexpr int compare(const path_view &p) const noexcept;
   constexpr int compare(string_view str) const noexcept;

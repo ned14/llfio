@@ -146,12 +146,12 @@ Todo:
 | ✔ | ✔ | ✔ | `shared_fs_mutex` shared/exclusive entities locking based on memory maps
 | ✔ | ✔ | ✔ | Universal portable UTF-8 path views.
 |   | ✔ | ✔ | "Hole punching" and hole enumeration ported over from AFIO v1.
+|   | ✔ | ✔ | Directory handles and very fast directory enumeration ported over from AFIO v1.
 
 Todo to reach feature parity with AFIO v1:
 
 | NEW in v2 | Windows | POSIX |     |
 | --------- | --------| ----- | --- |
-|   |   |   | Directory handles and very fast directory enumeration ported over from AFIO v1.
 |   |   |   | Hard links and symlinks.
 |   |   |   | BSD and OS X kqueues optimised `io_service`
 
