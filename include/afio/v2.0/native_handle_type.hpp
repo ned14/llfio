@@ -84,9 +84,9 @@ struct native_handle_type
     o._init = -1;
   }
   //! Copy assign
-  native_handle_type &operator=(const native_handle_type &) = default;
+  constexpr native_handle_type &operator=(const native_handle_type &) = default;
   //! Move assign
-  native_handle_type &operator=(native_handle_type &&o) noexcept
+  constexpr native_handle_type &operator=(native_handle_type &&o) noexcept
   {
     behaviour = std::move(o.behaviour);
     _init = std::move(o._init);

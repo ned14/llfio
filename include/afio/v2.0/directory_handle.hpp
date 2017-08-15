@@ -47,12 +47,6 @@ struct directory_entry
   path_view leafname;
   //! The metadata retrieved for the directory entry
   stat_t stat;
-//! The default list of metadata retrieved by `enumerate()` on this platform
-#ifdef _WIN32
-  static constexpr stat_t::want default_stat_contents = stat_t::want::ino | stat_t::want::type | stat_t::want::atim | stat_t::want::mtim | stat_t::want::ctim | stat_t::want::size | stat_t::want::allocated | stat_t::want::birthtim | stat_t::want::sparse | stat_t::want::compressed | stat_t::want::reparse_point;
-#else
-  static constexpr stat_t::want default_stat_contents = stat_t::want::ino | stat_t::want::type;
-#endif
 };
 #ifndef NDEBUG
 // Is trivial in all ways, except default constructibility
@@ -210,10 +204,19 @@ public:
   */
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<directory_handle> clone() const noexcept;
 
+  //! Completion information for `enumerate()`
+  struct enumerate_info
+  {
+    //! The list of stat metadata retrieved by `enumerate()` this call per `buffer_type`.
+    stat_t::want metadata;
+    //! Whether the directory was entirely read or not.
+    bool done;
+  };
   /*! Fill the buffers type with as many directory entries as will fit.
 
-  \return True if the entire directory was read into `tofill`, false otherwise.
-  `tofill`'s extent is adjusted to match the number of items read on exit.
+  \return Returns whether the entire directory was read into `tofill`, false otherwise,
+  and what metadata was filled in. `tofill`'s extent is adjusted to match the number of
+  items read on exit.
   \param tofill The buffers to fill.
   \param glob An optional shell glob by which to filter the items filled. Done kernel side on Windows, user side on POSIX.
   \param filtering Whether to filter out fake-deleted files on Windows or not.
@@ -225,10 +228,67 @@ public:
   If unset, at least one memory allocation, possibly more is performed.
   */
   AFIO_MAKE_FREE_FUNCTION
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<bool> enumerate(buffers_type &tofill, path_view_type glob = path_view_type(), filter filtering = filter::fastdeleted, span<char> kernelbuffer = span<char>()) const noexcept;
+  AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<enumerate_info> enumerate(buffers_type &tofill, path_view_type glob = path_view_type(), filter filtering = filter::fastdeleted, span<char> kernelbuffer = span<char>()) const noexcept;
 };
 
 // BEGIN make_free_functions.py
+//! Swap with another instance
+inline void swap(directory_handle &self, directory_handle &o) noexcept
+{
+  return self.swap(std::forward<decltype(o)>(o));
+}
+/*! Create a handle opening access to a directory on path.
+
+\errors Any of the values POSIX open() or CreateFile() can return.
+*/
+inline result<directory_handle> directory(const path_handle &base, directory_handle::path_view_type _path, directory_handle::mode _mode = directory_handle::mode::read, directory_handle::creation _creation = directory_handle::creation::open_existing, directory_handle::caching _caching = directory_handle::caching::all,
+                                          directory_handle::flag flags = directory_handle::flag::none) noexcept
+{
+  return directory_handle::directory(std::forward<decltype(base)>(base), std::forward<decltype(_path)>(_path), std::forward<decltype(_mode)>(_mode), std::forward<decltype(_creation)>(_creation), std::forward<decltype(_caching)>(_caching), std::forward<decltype(flags)>(flags));
+}
+/*! Create a directory handle creating a randomly named file on a path.
+The file is opened exclusively with `creation::only_if_not_exist` so it
+will never collide with nor overwrite any existing entry.
+
+\errors Any of the values POSIX open() or CreateFile() can return.
+*/
+inline result<directory_handle> random_directory(const path_handle &dirpath, directory_handle::mode _mode = directory_handle::mode::write, directory_handle::caching _caching = directory_handle::caching::temporary, directory_handle::flag flags = directory_handle::flag::none) noexcept
+{
+  return directory_handle::random_directory(std::forward<decltype(dirpath)>(dirpath), std::forward<decltype(_mode)>(_mode), std::forward<decltype(_caching)>(_caching), std::forward<decltype(flags)>(flags));
+}
+/*! Create a directory handle creating the named directory on some path which
+the OS declares to be suitable for temporary files.
+Note also that an empty name is equivalent to calling
+`random_file(temporary_files_directory())` and the creation
+parameter is ignored.
+
+\errors Any of the values POSIX open() or CreateFile() can return.
+*/
+inline result<directory_handle> temp_directory(directory_handle::path_view_type name = directory_handle::path_view_type(), directory_handle::mode _mode = directory_handle::mode::write, directory_handle::creation _creation = directory_handle::creation::if_needed,
+                                               directory_handle::caching _caching = directory_handle::caching::all, directory_handle::flag flags = directory_handle::flag::none) noexcept
+{
+  return directory_handle::temp_directory(std::forward<decltype(name)>(name), std::forward<decltype(_mode)>(_mode), std::forward<decltype(_creation)>(_creation), std::forward<decltype(_caching)>(_caching), std::forward<decltype(flags)>(flags));
+}
+/*! Fill the buffers type with as many directory entries as will fit.
+
+\return True if the entire directory was read into `tofill`, false otherwise.
+`tofill`'s extent is adjusted to match the number of items read on exit.
+\param self The object whose member function to call.
+\param tofill The buffers to fill.
+\param glob An optional shell glob by which to filter the items filled. Done kernel side on Windows, user side on POSIX.
+\param filtering Whether to filter out fake-deleted files on Windows or not.
+\param kernelbuffer A buffer to use for the kernel to fill. If left defaulted, a kernel buffer
+is allocated internally and stored into `tofill` which needs to not be destructed until one
+is no longer using any items within (leafnames are views onto the original kernel data).
+\errors todo
+\mallocs If the `kernelbuffer` parameter is set on entry, no memory allocations.
+If unset, at least one memory allocation, possibly more is performed.
+*/
+inline result<directory_handle::enumerate_info> enumerate(const directory_handle &self, directory_handle::buffers_type &tofill, directory_handle::path_view_type glob = directory_handle::path_view_type(), directory_handle::filter filtering = directory_handle::filter::fastdeleted,
+                                                          span<char> kernelbuffer = span<char>()) noexcept
+{
+  return self.enumerate(std::forward<decltype(tofill)>(tofill), std::forward<decltype(glob)>(glob), std::forward<decltype(filtering)>(filtering), std::forward<decltype(kernelbuffer)>(kernelbuffer));
+}
 // END make_free_functions.py
 
 AFIO_V2_NAMESPACE_END

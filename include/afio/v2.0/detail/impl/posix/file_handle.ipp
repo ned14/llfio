@@ -150,6 +150,7 @@ result<file_handle> file_handle::temp_inode(path_view_type dirpath, mode _mode, 
   nativeh.fd = ::open(zpath.buffer, attribs, 0600);
   if(-1 != nativeh.fd)
   {
+    ret.value()._flags |= flag::anonymous_inode;
     OUTCOME_TRYV(ret.value()._fetch_inode());  // It can be useful to know the inode of temporary inodes
     return ret;
   }

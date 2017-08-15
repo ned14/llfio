@@ -39,11 +39,14 @@ Distributed under the Boost Software License, Version 1.0.
 
 AFIO_V2_NAMESPACE_EXPORT_BEGIN
 
+class fs_handle;
+
 /*! \class handle
 \brief A native_handle_type which is managed by the lifetime of this object instance.
 */
 class AFIO_DECL handle
 {
+  friend class fs_handle;
   friend inline std::ostream &operator<<(std::ostream &s, const handle &v);
 
 public:
@@ -135,8 +138,9 @@ public:
 
     // NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!
 
-    overlapped = 1 << 28,         //!< On Windows, create any new handles with OVERLAPPED semantics
-    byte_lock_insanity = 1 << 29  //!< Using insane POSIX byte range locks
+    overlapped = 1 << 28,          //!< On Windows, create any new handles with OVERLAPPED semantics
+    byte_lock_insanity = 1 << 29,  //!< Using insane POSIX byte range locks
+    anonymous_inode = 1 << 30      //!< This is an inode created with no representation on the filing system
   }
   QUICKCPPLIB_BITFIELD_END(flag);
 

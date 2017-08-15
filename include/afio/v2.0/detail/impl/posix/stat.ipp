@@ -33,24 +33,6 @@ static inline filesystem::file_type to_st_type(uint16_t mode)
 {
   switch(mode & S_IFMT)
   {
-#ifdef AFIO_USE_LEGACY_FILESYSTEM_SEMANTICS
-  case S_IFBLK:
-    return filesystem::file_type::block_file;
-  case S_IFCHR:
-    return filesystem::file_type::character_file;
-  case S_IFDIR:
-    return filesystem::file_type::directory_file;
-  case S_IFIFO:
-    return filesystem::file_type::fifo_file;
-  case S_IFLNK:
-    return filesystem::file_type::symlink_file;
-  case S_IFREG:
-    return filesystem::file_type::regular_file;
-  case S_IFSOCK:
-    return filesystem::file_type::socket_file;
-  default:
-    return filesystem::file_type::type_unknown;
-#else
   case S_IFBLK:
     return filesystem::file_type::block;
   case S_IFCHR:
@@ -67,7 +49,6 @@ static inline filesystem::file_type to_st_type(uint16_t mode)
     return filesystem::file_type::socket;
   default:
     return filesystem::file_type::unknown;
-#endif
   }
 }
 
@@ -90,7 +71,7 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> stat_t::fill(const handle &h, stat
   size_t ret = 0;
 
   if(-1 == ::fstat(h.native_handle().fd, &s))
-    return { errno, std::system_category() };
+    return {errno, std::system_category()};
   if(wanted & want::dev)
   {
     st_dev = s.st_dev;

@@ -13,10 +13,13 @@ throws, have it detect __cpp_exceptions and skip those implementations.
 - [ ] Move handle caching into native_handle_type? Overlapped flag is especially needed.
 - [ ] Implement the long planned ACID key-value BLOB store
 with a very simple engine based on atomic renames and send it to Boost for peer review.
+  - You may need compression, https://github.com/johnezang/pithy looks easily convertible
+into header-only C++ and has a snappy-like performance to compression ratio. Make sure
+you merge the bug fixes from the forks first.
 
 - [ ] All time based kernel tests need to use soak test based API and auto adjust to
 valgrind.
-- [ ] Raise the sanitisers on per-commit CI via ctest.
+- [x] Raise the sanitisers on per-commit CI via ctest.
 - [ ] Rename all ParseProjectVersionFromHpp etc to parse_project_version_from_hpp etc
 - [ ] In DEBUG builds, have io_handle always not fill buffers passed to remind
 people to use pointers returned!
@@ -87,8 +90,8 @@ handles on some storage i.e. storage needs to be kept in a global map.
   - [ ] Should have decile bucketing e.g. percentage in bottom 10%, percentage
   in next 10% etc. Plus mean and stddev.
   - [ ] Should either be resettable or subtractable i.e. points can be diffed.
-  - [ ] Add IOPS QD=1..N storage profile test
-  - [ ] Add throughput storage profile test
+  - [x] Add IOPS QD=1..N storage profile test
+  - [x] Add throughput storage profile test
 - [ ] Output into YAML comparable hashes for OS + device + FS + flags
 so we can merge partial results for some combo into the results database.
 - [ ] Write YAML parsing tool which merges fs_probe_results.yaml into
@@ -99,13 +102,16 @@ is named FS + device e.g.
 
 ### Algorithms library `AFIO_V2_NAMESPACE::algorithm` todo:
 - [ ] Add an intelligent on demand memory mapper:
-  - Use one-two-three level page system, so 4Kb/2Mb/?. Files under 2Mb need just
+  - Use one-two-three level page system, so 4Kb/2Mb/1Gb. Files under 2Mb need just
 one indirection.
   - Page tables need to also live in a potentially mapped file
   - Could speculatively map 4Kb chunks lazily and keep an internal map of 4Kb
 offsets to map. This allows more optimal handing of growing files.
   - WOULD BE NICE: Copy on Write support which collates a list of dirtied 4Kb
 pages and could write those out as a delta.
+    - Perhaps Snappy compression could be useful? It is continuable from a base
+if you dump out the dictionary i.e. 1Mb data compressed, then add 4Kb delta, you can
+compress the additional 4Kb very quickly using the dictionary from the 1Mb.
     - LATER: Use guard pages to toggle dirty flag per initial COW
 - [ ] Store in EA or a file called .spookyhashes or .spookyhash the 128 bit hash of
 a file and the time it was calculated. This can save lots of hashing work later.
@@ -136,6 +142,40 @@ time but saving storage where possible.
 - [ ] Figure out all hard linked file entries for some inode.
 - [ ] Generate list of all hard linked files in a tree (i.e. refcount>1) and which
 are the same inode.
+
+
+### Eventual transactional key-blob store:
+- What's the least possible complex implementation based on files and directories?
+  - `store/index` is 48 bit counter + open hash map of 128 bit key to blob
+  identifier (64 bits) which can be:
+  
+    1. `store/small/01-3f` for blobs < 65520 bytes. Each blob is padded to 64 byte
+    multiple and tail record with 6 byte (48 bit) counter + 2 byte size aligned
+    at end + optional hash. There are 15 of these used to maximise write concurrency.
+    Blob identifier is top 6 bits smallfile id, cannot be 0.
+    Remaining 58 bits is the offset into the smallfile (shifted left 6 bits, all records in smallfiles are at 64 byte multiples).
+    
+    2. `store/large/*` for blobs >= 65520.
+      - `store/large/hexkey/48bithexcounter` stores each blob
+      - Last 64 bytes contains magic, size, optional hash.
+    Blob identifier is top 6 bits zero. Next 10 bits is 4 bits mantissa shifted left
+    6 bits of shift (0-63) for approx size. Remaining 48 bits is counter.
+    
+  - `store/config` keeps:
+    - transactions enabled or not.
+    - write concurrency (i.e. number of small files)
+    - mmap enable or not (i.e. can be used over network drive)
+    - content hash used e.g. SpookyHash
+    - compression used e.g. pithy
+    - dirty flag i.e. do fsck on next first open
+      - `O_SYNC` was on or not last open (affects severity of any fsck).
+    - shared lock kept on config so we know last user exit/first user enter
+- How do I detect transaction conflicts?
+  - Could lock the bottom 64 bits of key hashes being updated during write?
+  False abort between colliding keys possible though.
+  - Could lock the 48 bit counter for the revision of each blob we are basing
+  this transaction on? No false abort, but instead updates of keys
+  related in last transaction can remove concurrency.
 
 
 ## Commits and tags in this git repository can be verified using:

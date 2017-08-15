@@ -149,11 +149,14 @@ result<directory_handle> directory_handle::clone() const noexcept
   return ret;
 }
 
-result<bool> directory_handle::enumerate(buffers_type &tofill, path_view_type glob, filter filtering, span<char> kernelbuffer) const noexcept
+result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_type &tofill, path_view_type glob, filter filtering, span<char> kernelbuffer) const noexcept
 {
+  static constexpr stat_t::want default_stat_contents = stat_t::want::ino | stat_t::want::type | stat_t::want::atim | stat_t::want::mtim | stat_t::want::ctim | stat_t::want::size | stat_t::want::allocated | stat_t::want::birthtim | stat_t::want::sparse | stat_t::want::compressed | stat_t::want::reparse_point;
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
   AFIO_LOG_FUNCTION_CALL(this);
+  if(tofill.empty())
+    return enumerate_info{stat_t::want::none, false};
   UNICODE_STRING _glob;
   memset(&_glob, 0, sizeof(_glob));
   path_view_type::c_str zglob(glob, true);
@@ -199,7 +202,9 @@ result<bool> directory_handle::enumerate(buffers_type &tofill, path_view_type gl
       tofill._kernel_buffer_size = toallocate;
     }
     else
+    {
       done = true;
+    }
   } while(!done);
   size_t n = 0;
   for(FILE_ID_FULL_DIR_INFORMATION *ffdi = buffer;; ffdi = (FILE_ID_FULL_DIR_INFORMATION *) ((size_t) ffdi + ffdi->NextEntryOffset))
@@ -208,7 +213,7 @@ result<bool> directory_handle::enumerate(buffers_type &tofill, path_view_type gl
     {
       // Fill is complete
       tofill._resize(n);
-      return true;
+      return enumerate_info{default_stat_contents, true};
     }
     size_t length = ffdi->FileNameLength / sizeof(wchar_t);
     if(length <= 2 && '.' == ffdi->FileName[0])
@@ -236,7 +241,7 @@ result<bool> directory_handle::enumerate(buffers_type &tofill, path_view_type gl
     if(n >= tofill.size())
     {
       // Fill is incomplete
-      return false;
+      return enumerate_info{default_stat_contents, false};
     }
   }
 }

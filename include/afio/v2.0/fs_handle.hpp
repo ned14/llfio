@@ -138,8 +138,8 @@ public:
   */
   result<path_handle> parent_path_handle(deadline d = std::chrono::seconds(30)) const noexcept;
 
-  /*! Atomically relinks the current path of this open handle to the new path specified,
-  \b atomically and silently replacing any item at the new path specified. This operation
+  /*! Relinks the current path of this open handle to the new path specified. If `atomic_replace` is
+  true, the relink \b atomically and silently replaces any item at the new path specified. This operation
   is both atomic and silent matching POSIX behaviour even on Microsoft Windows where
   no Win32 API can match POSIX semantics.
 
@@ -152,13 +152,17 @@ public:
 
   \param base Base for any relative path.
   \param newpath The relative or absolute new path to relink to.
+  \param atomic_replace Atomically replace the destination if a file entry already is present there.
+  Choosing false for this will fail if a file entry is already present at the destination, and may
+  not be an atomic operation on some platforms (i.e. both the old and new names may be linked to the
+  same inode for a very short period of time). Windows and recent Linuxes are always atomic.
   \param d The deadline by which the matching of the containing directory to the open handle's inode
   must succeed, else `std::errc::timed_out` will be returned.
   \mallocs Except on platforms with race free syscalls for renaming open handles (Windows), calls
   `current_path()` and thus is both expensive and calls malloc many times.
   */
   AFIO_MAKE_FREE_FUNCTION
-  result<void> relink(const path_handle &base, path_view_type newpath, deadline d = std::chrono::seconds(30)) noexcept;
+  result<void> relink(const path_handle &base, path_view_type newpath, bool atomic_replace = true, deadline d = std::chrono::seconds(30)) noexcept;
 
   /*! Unlinks the current path of this open handle, causing its entry to immediately disappear from the filing system.
   On Windows unless `flag::win_disable_unlink_emulation` is set, this behaviour is
@@ -185,8 +189,8 @@ public:
 };
 
 // BEGIN make_free_functions.py
-/*! Atomically relinks the current path of this open handle to the new path specified,
-\b atomically and silently replacing any item at the new path specified. This operation
+/*! Relinks the current path of this open handle to the new path specified. If `atomic_replace` is
+true, the relink \b atomically and silently replaces any item at the new path specified. This operation
 is both atomic and silent matching POSIX behaviour even on Microsoft Windows where
 no Win32 API can match POSIX semantics.
 
@@ -200,13 +204,18 @@ success until the deadline given. This should prevent most unmalicious accidenta
 \param self The object whose member function to call.
 \param base Base for any relative path.
 \param newpath The relative or absolute new path to relink to.
+\param atomic_replace Atomically replace the destination if a file entry already is present there.
+Choosing false for this will fail if a file entry is already present at the destination, and may
+not be an atomic operation on some platforms (i.e. both the old and new names may be linked to the
+same inode for a very short period of time). Windows and recent Linuxes are always atomic.
 \param d The deadline by which the matching of the containing directory to the open handle's inode
-must succeed, else `std::errc::timed_out` will be returned. Not used on platforms with race free
-syscalls for renaming open handles (Windows).
+must succeed, else `std::errc::timed_out` will be returned.
+\mallocs Except on platforms with race free syscalls for renaming open handles (Windows), calls
+`current_path()` and thus is both expensive and calls malloc many times.
 */
-inline result<void> relink(fs_handle &self, const path_handle &base, fs_handle::path_view_type newpath, deadline d = std::chrono::seconds(30)) noexcept
+inline result<void> relink(fs_handle &self, const path_handle &base, fs_handle::path_view_type newpath, bool atomic_replace = true, deadline d = std::chrono::seconds(30)) noexcept
 {
-  return self.relink(std::forward<decltype(base)>(base), std::forward<decltype(newpath)>(newpath), std::forward<decltype(d)>(d));
+  return self.relink(std::forward<decltype(base)>(base), std::forward<decltype(newpath)>(newpath), std::forward<decltype(atomic_replace)>(atomic_replace), std::forward<decltype(d)>(d));
 }
 /*! Unlinks the current path of this open handle, causing its entry to immediately disappear from the filing system.
 On Windows unless `flag::win_disable_unlink_emulation` is set, this behaviour is
@@ -224,8 +233,10 @@ deadline given. This should prevent most unmalicious accidental loss of data.
 
 \param self The object whose member function to call.
 \param d The deadline by which the matching of the containing directory to the open handle's inode
-must succeed, else `std::errc::timed_out` will be returned. Not used on platforms with race free
-syscalls for unlinking open handles (Windows).
+must succeed, else `std::errc::timed_out` will be returned.
+\mallocs Except on platforms with race free syscalls for unlinking open handles (Windows), calls
+`current_path()` and thus is both expensive and calls malloc many times. On Windows, also calls
+`current_path()` if `flag::disable_safety_unlinks` is not set.
 */
 inline result<void> unlink(fs_handle &self, deadline d = std::chrono::seconds(30)) noexcept
 {

@@ -106,7 +106,7 @@ result<path_handle> fs_handle::parent_path_handle(deadline d) const noexcept
   }
 }
 
-result<void> fs_handle::relink(const path_handle &base, path_view_type path, deadline d) noexcept
+result<void> fs_handle::relink(const path_handle &base, path_view_type path, bool atomic_replace, deadline d) noexcept
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
@@ -145,7 +145,7 @@ result<void> fs_handle::relink(const path_handle &base, path_view_type path, dea
   IO_STATUS_BLOCK isb = make_iostatus();
   alignas(8) char buffer[sizeof(FILE_RENAME_INFORMATION) + 65536];
   FILE_RENAME_INFORMATION *fni = (FILE_RENAME_INFORMATION *) buffer;
-  fni->ReplaceIfExists = true;
+  fni->ReplaceIfExists = atomic_replace;
   fni->RootDirectory = base.is_valid() ? base.native_handle().h : nullptr;
   fni->FileNameLength = _path.Length;
   memcpy(fni->FileName, _path.Buffer, fni->FileNameLength);

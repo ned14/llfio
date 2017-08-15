@@ -161,17 +161,9 @@ private:
   {
     // wchar paths must use backslashes
     if(!_state._utf16.empty())
-      return _state._utf16.rfind(filesystem::path::preferred_separator);
+      return _state._utf16.rfind('\\');
     // char paths can use either
-    auto idx1 = _state._utf8.rfind('\\');
-    auto idx2 = _state._utf8.rfind('/');
-    if(_npos == idx1 && _npos == idx2)
-      return _npos;
-    if(_npos == idx1)
-      return idx2;
-    if(_npos == idx2)
-      return idx1;
-    return (idx1 < idx2) ? idx1 : idx2;
+    return _state._utf8.find_last_of("/\\");
   }
 #else
   struct state
@@ -260,6 +252,19 @@ public:
   constexpr bool has_extension() const noexcept;
   constexpr bool is_absolute() const noexcept;
   constexpr bool is_relative() const noexcept;
+  // True if the path view contains any of the characters `*`, `?`, (POSIX only: `[` or `]`).
+  constexpr bool contains_glob() const noexcept
+  {
+#ifdef _WIN32
+    if(!_state._utf16.empty())
+      return wstring_view::npos != _state._utf16.find_first_of(L"*?");
+    if(!_state._utf8.empty())
+      return wstring_view::npos != _state._utf8.find_first_of("*?");
+    return false;
+#else
+    return string_view::npos != _state._utf8.find_first_of("*?[]");
+#endif
+  }
 #ifdef _WIN32
   // True if the path view is a NT kernel path starting with `\!!\` or `\??\`
   constexpr bool is_ntpath() const noexcept

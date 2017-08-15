@@ -80,7 +80,7 @@ inline result<path_handle> containing_directory(optional<std::reference_wrapper<
         return success(std::move(currentdirh));
       // Open the same file name, and compare dev and inode
       path_view::c_str zpath(filename);
-      int fd = ::openat(currentdirh.native_handle().fd, filename.buffer, 0);
+      int fd = ::openat(currentdirh.native_handle().fd, zpath.buffer, 0);
       if(fd == -1)
         continue;
       auto unfd = undoer([fd] { ::close(fd); });
@@ -124,24 +124,41 @@ result<path_handle> fs_handle::parent_path_handle(deadline d) const noexcept
   return containing_directory({}, h, *this, d);
 }
 
-result<void> fs_handle::relink(const path_handle &base, path_view_type path, deadline d) noexcept
+result<void> fs_handle::relink(const path_handle &base, path_view_type path, bool atomic_replace, deadline d) noexcept
 {
   AFIO_LOG_FUNCTION_CALL(this);
-  auto &h = _get_handle();
+  auto &h = const_cast<handle &>(_get_handle());
   path_view::c_str zpath(path);
 #ifdef O_TMPFILE
   // If the handle was created with O_TMPFILE, we need a different approach
-  if(path.empty() && (h.kernel_caching() == handle::caching::temporary))
+  if(h.flags() & handle::flag::anonymous_inode)
   {
+    if(atomic_replace)
+      return std::errc::function_not_supported;
     char _path[PATH_MAX];
     snprintf(_path, PATH_MAX, "/proc/self/fd/%d", h.native_handle().fd);
     if(-1 == ::linkat(AT_FDCWD, _path, base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.buffer, AT_SYMLINK_FOLLOW))
       return {errno, std::system_category()};
+    h._flags &= ~handle::flag::anonymous_inode;
+    return success();
   }
 #endif
   // Open our containing directory
   filesystem::path filename;
-  OUTCOME_TRY(dirh, containing_directory(filename, h, *this, d));
+  OUTCOME_TRY(dirh, containing_directory(std::ref(filename), h, *this, d));
+  if(!atomic_replace)
+  {
+// Some systems provide an extension for atomic non-replacing renames
+#ifdef RENAME_NOREPLACE
+    if(-1 != ::renameat2(dirh.native_handle().fd, filename.c_str(), base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.buffer, RENAME_NOREPLACE))
+      return success();
+    if(EEXIST == errno)
+      return {errno, std::system_category()};
+#endif
+    // Otherwise we need to use linkat followed by renameat (non-atomic)
+    if(-1 == ::linkat(dirh.native_handle().fd, filename.c_str(), base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.buffer, 0))
+      return {errno, std::system_category()};
+  }
   if(-1 == ::renameat(dirh.native_handle().fd, filename.c_str(), base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.buffer))
     return {errno, std::system_category()};
   return success();
@@ -153,7 +170,7 @@ result<void> fs_handle::unlink(deadline d) noexcept
   auto &h = _get_handle();
   // Open our containing directory
   filesystem::path filename;
-  OUTCOME_TRY(dirh, containing_directory(filename, h, *this, d));
+  OUTCOME_TRY(dirh, containing_directory(std::ref(filename), h, *this, d));
   if(-1 == ::unlinkat(dirh.native_handle().fd, filename.c_str(), 0))
     return {errno, std::system_category()};
   return success();

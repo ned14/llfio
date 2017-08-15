@@ -65,12 +65,6 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #endif
 
-#if !defined(AFIO_DISABLE_RACE_FREE_PATH_FUNCTIONS)
-#ifdef __APPLE__
-#define AFIO_DISABLE_RACE_FREE_PATH_FUNCTIONS 1
-#endif
-#endif
-
 
 #if defined(_WIN32)
 #if !defined(_UNICODE)
@@ -102,7 +96,7 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef __cpp_variadic_templates
 #error AFIO needs variadic template support in the compiler
 #endif
-#if __cpp_constexpr < 201304
+#if __cpp_constexpr < 201304L && !defined(_MSC_VER)
 #error AFIO needs relaxed constexpr (C++ 14) support in the compiler
 #endif
 #ifndef __cpp_init_captures
