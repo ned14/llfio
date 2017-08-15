@@ -32,6 +32,7 @@ var searchData=
   ['algorithm',['algorithm',['../namespaceafio__v2__xxx_1_1algorithm.html',1,'afio_v2_xxx']]],
   ['aligned_5fio',['aligned_io',['../structafio__v2__xxx_1_1native__handle__type_1_1disposition__base.html#a89e0e728fc7a7e4a008e57d572702de6a73ab50983f5265ae0d234d89ffda2420',1,'afio_v2_xxx::native_handle_type::disposition_base']]],
   ['all',['all',['../classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9eaa181a603769c1f98ad927e7367c7aa51',1,'afio_v2_xxx::handle']]],
+  ['anonymous_5finode',['anonymous_inode',['../structafio__v2__xxx_1_1handle_1_1flag__base.html#a51aaa32c78950cedbc1b7a61e1738d3ea802bd6921ae57e138c9c7eb8e06c2409',1,'afio_v2_xxx::handle::flag_base']]],
   ['append',['append',['../classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18a9516dfb15f51c7ee19a4d46b8c0dbe1d',1,'afio_v2_xxx::handle']]],
   ['append_5fonly',['append_only',['../structafio__v2__xxx_1_1native__handle__type_1_1disposition__base.html#a89e0e728fc7a7e4a008e57d572702de6a27f909b0e7d4a4e817ccc65a42f937ba',1,'afio_v2_xxx::native_handle_type::disposition_base']]],
   ['are_5freads_5ffrom_5fcache',['are_reads_from_cache',['../classafio__v2__xxx_1_1handle.html#a71137cb82edd9a1bcb24f64886b5826d',1,'afio_v2_xxx::handle']]],

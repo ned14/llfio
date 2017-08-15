@@ -63,6 +63,7 @@ var classafio__v2__xxx_1_1handle =
     [ "set_append_only", "classafio__v2__xxx_1_1handle.html#af1610ec7fb0a41f039e3e17e0dc467ab", null ],
     [ "set_kernel_caching", "classafio__v2__xxx_1_1handle.html#ad90f8264470763069256ae9eeda45e69", null ],
     [ "swap", "classafio__v2__xxx_1_1handle.html#a657c12a309cf02bf2351bfcc7f41463b", null ],
+    [ "fs_handle", "classafio__v2__xxx_1_1handle.html#a026944e947f6830e5bc5fd31aae205be", null ],
     [ "operator<<", "classafio__v2__xxx_1_1handle.html#a5c7d33dcd1f366fa378607e1dd087744", null ],
     [ "_caching", "classafio__v2__xxx_1_1handle.html#af024e3d92d9a01ac367734e9cdc517fb", null ],
     [ "_flags", "classafio__v2__xxx_1_1handle.html#ac46e0a296c31fcd0a996a79d78647fb6", null ],

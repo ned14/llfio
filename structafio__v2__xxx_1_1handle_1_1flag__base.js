@@ -7,6 +7,7 @@ var structafio__v2__xxx_1_1handle_1_1flag__base =
       [ "disable_safety_unlinks", "structafio__v2__xxx_1_1handle_1_1flag__base.html#a51aaa32c78950cedbc1b7a61e1738d3ea09f03ed90a3b187555210e8a8d09f4a0", null ],
       [ "win_disable_unlink_emulation", "structafio__v2__xxx_1_1handle_1_1flag__base.html#a51aaa32c78950cedbc1b7a61e1738d3ea476a57854e60d134c425521a18099df1", null ],
       [ "overlapped", "structafio__v2__xxx_1_1handle_1_1flag__base.html#a51aaa32c78950cedbc1b7a61e1738d3ea99093d0cc4dd36e5f36f336b33a826ab", null ],
-      [ "byte_lock_insanity", "structafio__v2__xxx_1_1handle_1_1flag__base.html#a51aaa32c78950cedbc1b7a61e1738d3eae1fcc9d8ed4b5c23601bea4dda367316", null ]
+      [ "byte_lock_insanity", "structafio__v2__xxx_1_1handle_1_1flag__base.html#a51aaa32c78950cedbc1b7a61e1738d3eae1fcc9d8ed4b5c23601bea4dda367316", null ],
+      [ "anonymous_inode", "structafio__v2__xxx_1_1handle_1_1flag__base.html#a51aaa32c78950cedbc1b7a61e1738d3ea802bd6921ae57e138c9c7eb8e06c2409", null ]
     ] ]
 ];

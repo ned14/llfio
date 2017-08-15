@@ -5,9 +5,11 @@ var hierarchy =
     [ "afio_v2_xxx::path_view::c_str", "structafio__v2__xxx_1_1path__view_1_1c__str.html", null ],
     [ "afio_v2_xxx::io_handle::const_buffer_type", "structafio__v2__xxx_1_1io__handle_1_1const__buffer__type.html", null ],
     [ "afio_v2_xxx::deadline", "structafio__v2__xxx_1_1deadline.html", null ],
+    [ "afio_v2_xxx::directory_entry", "structafio__v2__xxx_1_1directory__entry.html", null ],
     [ "afio_v2_xxx::native_handle_type::disposition_base", "structafio__v2__xxx_1_1native__handle__type_1_1disposition__base.html", null ],
     [ "afio_v2_xxx::algorithm::shared_fs_mutex::shared_fs_mutex::entities_guard", "classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex_1_1entities__guard.html", null ],
     [ "afio_v2_xxx::algorithm::shared_fs_mutex::shared_fs_mutex::entity_type", "structafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex_1_1entity__type.html", null ],
+    [ "afio_v2_xxx::directory_handle::enumerate_info", "structafio__v2__xxx_1_1directory__handle_1_1enumerate__info.html", null ],
     [ "std::error_code", null, [
       [ "afio_v2_xxx::error_code", "structafio__v2__xxx_1_1error__code.html", null ]
     ] ],
@@ -16,6 +18,7 @@ var hierarchy =
     [ "afio_v2_xxx::handle::flag_base", "structafio__v2__xxx_1_1handle_1_1flag__base.html", null ],
     [ "afio_v2_xxx::section_handle::flag_base", "structafio__v2__xxx_1_1section__handle_1_1flag__base.html", null ],
     [ "afio_v2_xxx::fs_handle", "classafio__v2__xxx_1_1fs__handle.html", [
+      [ "afio_v2_xxx::directory_handle", "classafio__v2__xxx_1_1directory__handle.html", null ],
       [ "afio_v2_xxx::file_handle", "classafio__v2__xxx_1_1file__handle.html", [
         [ "afio_v2_xxx::async_file_handle", "classafio__v2__xxx_1_1async__file__handle.html", null ]
       ] ]
@@ -25,7 +28,9 @@ var hierarchy =
         [ "afio_v2_xxx::file_handle", "classafio__v2__xxx_1_1file__handle.html", null ],
         [ "afio_v2_xxx::map_handle", "classafio__v2__xxx_1_1map__handle.html", null ]
       ] ],
-      [ "afio_v2_xxx::path_handle", "classafio__v2__xxx_1_1path__handle.html", null ],
+      [ "afio_v2_xxx::path_handle", "classafio__v2__xxx_1_1path__handle.html", [
+        [ "afio_v2_xxx::directory_handle", "classafio__v2__xxx_1_1directory__handle.html", null ]
+      ] ],
       [ "afio_v2_xxx::section_handle", "classafio__v2__xxx_1_1section__handle.html", null ]
     ] ],
     [ "afio_v2_xxx::io_handle::io_request< T >", "structafio__v2__xxx_1_1io__handle_1_1io__request.html", null ],
@@ -55,6 +60,9 @@ var hierarchy =
       [ "afio_v2_xxx::algorithm::shared_fs_mutex::byte_ranges", "classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1byte__ranges.html", null ],
       [ "afio_v2_xxx::algorithm::shared_fs_mutex::lock_files", "classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1lock__files.html", null ],
       [ "afio_v2_xxx::algorithm::shared_fs_mutex::memory_map< Hasher, HashIndexSize, SpinlockType >", "classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html", null ]
+    ] ],
+    [ "span", null, [
+      [ "afio_v2_xxx::directory_handle::buffers_type", "structafio__v2__xxx_1_1directory__handle_1_1buffers__type.html", null ]
     ] ],
     [ "afio_v2_xxx::stat_t", "structafio__v2__xxx_1_1stat__t.html", null ],
     [ "afio_v2_xxx::statfs_t", "structafio__v2__xxx_1_1statfs__t.html", null ],

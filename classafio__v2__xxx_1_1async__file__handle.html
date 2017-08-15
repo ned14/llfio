@@ -412,8 +412,8 @@ ino_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cla
 <tr class="separator:a5a5244ab1a15053aefe93f2c253db5b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a15232dc853f7ca4769eebbfd1fb91cbe"><td class="memItemLeft" align="right" valign="top">result&lt; <a class="el" href="classafio__v2__xxx_1_1path__handle.html">path_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1fs__handle.html#a15232dc853f7ca4769eebbfd1fb91cbe">parent_path_handle</a> (<a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a> d=std::chrono::seconds(30)) const noexcept</td></tr>
 <tr class="separator:a15232dc853f7ca4769eebbfd1fb91cbe"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa867637783001773f4c50e25d5e628c3"><td class="memItemLeft" align="right" valign="top">result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1fs__handle.html#aa867637783001773f4c50e25d5e628c3">relink</a> (const <a class="el" href="classafio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;base, <a class="el" href="classafio__v2__xxx_1_1path__view.html">path_view_type</a> newpath, <a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a> d=std::chrono::seconds(30)) noexcept</td></tr>
-<tr class="separator:aa867637783001773f4c50e25d5e628c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a06da220c6d1cf3ee4c981ae15012560e"><td class="memItemLeft" align="right" valign="top">result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1fs__handle.html#a06da220c6d1cf3ee4c981ae15012560e">relink</a> (const <a class="el" href="classafio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;base, <a class="el" href="classafio__v2__xxx_1_1path__view.html">path_view_type</a> newpath, bool atomic_replace=true, <a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a> d=std::chrono::seconds(30)) noexcept</td></tr>
+<tr class="separator:a06da220c6d1cf3ee4c981ae15012560e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a11d5f02b84c8fee8d81a5cbda0ef5765"><td class="memItemLeft" align="right" valign="top">result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1fs__handle.html#a11d5f02b84c8fee8d81a5cbda0ef5765">unlink</a> (<a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a> d=std::chrono::seconds(30)) noexcept</td></tr>
 <tr class="separator:a11d5f02b84c8fee8d81a5cbda0ef5765"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -573,7 +573,7 @@ template&lt;class CompletionRoutine , class BuffersType &gt; </div>
 <div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;    ret._service = &amp;<a class="code" href="classafio__v2__xxx_1_1file__handle.html#a672324d44ea84ccfb71594c1036628ac">service</a>;</div>
 <div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;    <span class="keywordflow">return</span> std::move(ret);</div>
 <div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;  }</div>
-<div class="ttc" id="classafio__v2__xxx_1_1handle_html_ab3d876f5996605158fd6a0582adadad6"><div class="ttname"><a href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">afio_v2_xxx::handle::flags</a></div><div class="ttdeci">flag flags() const noexcept</div><div class="ttdoc">The flags this handle was opened with. </div><div class="ttdef"><b>Definition:</b> handle.hpp:276</div></div>
+<div class="ttc" id="classafio__v2__xxx_1_1handle_html_ab3d876f5996605158fd6a0582adadad6"><div class="ttname"><a href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">afio_v2_xxx::handle::flags</a></div><div class="ttdeci">flag flags() const noexcept</div><div class="ttdoc">The flags this handle was opened with. </div><div class="ttdef"><b>Definition:</b> handle.hpp:282</div></div>
 <div class="ttc" id="classafio__v2__xxx_1_1file__handle_html_a6f4e7c6e9768c0e853105b1d63bd9dfb"><div class="ttname"><a href="classafio__v2__xxx_1_1file__handle.html#a6f4e7c6e9768c0e853105b1d63bd9dfb">afio_v2_xxx::file_handle::file</a></div><div class="ttdeci">static result&lt; file_handle &gt; file(const path_handle &amp;base, path_view_type _path, mode _mode=mode::read, creation _creation=creation::open_existing, caching _caching=caching::all, flag flags=flag::none) noexcept</div></div>
 <div class="ttc" id="classafio__v2__xxx_1_1file__handle_html_a672324d44ea84ccfb71594c1036628ac"><div class="ttname"><a href="classafio__v2__xxx_1_1file__handle.html#a672324d44ea84ccfb71594c1036628ac">afio_v2_xxx::file_handle::service</a></div><div class="ttdeci">io_service * service() const noexcept</div><div class="ttdoc">The i/o service this handle is attached to, if any. </div><div class="ttdef"><b>Definition:</b> file_handle.hpp:211</div></div>
 <div class="ttc" id="classafio__v2__xxx_1_1async__file__handle_html_a1b8753468fe5561b92da18d1cb4a6c68"><div class="ttname"><a href="classafio__v2__xxx_1_1async__file__handle.html#a1b8753468fe5561b92da18d1cb4a6c68">afio_v2_xxx::async_file_handle::async_file_handle</a></div><div class="ttdeci">async_file_handle()=default</div><div class="ttdoc">Default constructor. </div></div>
@@ -649,7 +649,7 @@ template&lt;class CompletionRoutine , class BuffersType &gt; </div>
 <div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;    }</div>
 <div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;  }</div>
 <div class="ttc" id="namespaceafio__v2__xxx_1_1utils_html_a767b8434456319066194534a4c4edbf5"><div class="ttname"><a href="namespaceafio__v2__xxx_1_1utils.html#a767b8434456319066194534a4c4edbf5">afio_v2_xxx::utils::random_string</a></div><div class="ttdeci">std::string random_string(size_t randomlen)</div><div class="ttdoc">Returns a cryptographically random string capable of being used as a filename. Essentially random_fil...</div><div class="ttdef"><b>Definition:</b> utils.hpp:130</div></div>
-<div class="ttc" id="classafio__v2__xxx_1_1handle_html_ab3d876f5996605158fd6a0582adadad6"><div class="ttname"><a href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">afio_v2_xxx::handle::flags</a></div><div class="ttdeci">flag flags() const noexcept</div><div class="ttdoc">The flags this handle was opened with. </div><div class="ttdef"><b>Definition:</b> handle.hpp:276</div></div>
+<div class="ttc" id="classafio__v2__xxx_1_1handle_html_ab3d876f5996605158fd6a0582adadad6"><div class="ttname"><a href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">afio_v2_xxx::handle::flags</a></div><div class="ttdeci">flag flags() const noexcept</div><div class="ttdoc">The flags this handle was opened with. </div><div class="ttdef"><b>Definition:</b> handle.hpp:282</div></div>
 <div class="ttc" id="classafio__v2__xxx_1_1file__handle_html_a672324d44ea84ccfb71594c1036628ac"><div class="ttname"><a href="classafio__v2__xxx_1_1file__handle.html#a672324d44ea84ccfb71594c1036628ac">afio_v2_xxx::file_handle::service</a></div><div class="ttdeci">io_service * service() const noexcept</div><div class="ttdoc">The i/o service this handle is attached to, if any. </div><div class="ttdef"><b>Definition:</b> file_handle.hpp:211</div></div>
 <div class="ttc" id="classafio__v2__xxx_1_1async__file__handle_html_a5e6891894762e648e78726cabc23c0b9"><div class="ttname"><a href="classafio__v2__xxx_1_1async__file__handle.html#a5e6891894762e648e78726cabc23c0b9">afio_v2_xxx::async_file_handle::async_file</a></div><div class="ttdeci">static result&lt; async_file_handle &gt; async_file(io_service &amp;service, const path_handle &amp;base, path_view_type _path, mode _mode=mode::read, creation _creation=creation::open_existing, caching _caching=caching::all, flag flags=flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> async_file_handle.hpp:103</div></div>
 </div><!-- fragment -->
@@ -767,7 +767,7 @@ template&lt;class CompletionRoutine &gt; </div>
 <div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;  }</div>
 <div class="ttc" id="namespaceafio__v2__xxx_html_a4968bb2d647535f4b91427c66ff8b9e4"><div class="ttname"><a href="namespaceafio__v2__xxx.html#a4968bb2d647535f4b91427c66ff8b9e4">afio_v2_xxx::temporary_files_directory</a></div><div class="ttdeci">path_view temporary_files_directory() noexcept</div><div class="ttdoc">Returns a path to a directory reported by the operating system to be suitable for storing temporary f...</div></div>
 <div class="ttc" id="classafio__v2__xxx_1_1path__handle_html_a5cbd1d67ffe72d6cce0d093f861a4af7"><div class="ttname"><a href="classafio__v2__xxx_1_1path__handle.html#a5cbd1d67ffe72d6cce0d093f861a4af7">afio_v2_xxx::path_handle::path</a></div><div class="ttdeci">static result&lt; path_handle &gt; path(const path_handle &amp;base, path_view_type _path) noexcept</div></div>
-<div class="ttc" id="classafio__v2__xxx_1_1handle_html_ab3d876f5996605158fd6a0582adadad6"><div class="ttname"><a href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">afio_v2_xxx::handle::flags</a></div><div class="ttdeci">flag flags() const noexcept</div><div class="ttdoc">The flags this handle was opened with. </div><div class="ttdef"><b>Definition:</b> handle.hpp:276</div></div>
+<div class="ttc" id="classafio__v2__xxx_1_1handle_html_ab3d876f5996605158fd6a0582adadad6"><div class="ttname"><a href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">afio_v2_xxx::handle::flags</a></div><div class="ttdeci">flag flags() const noexcept</div><div class="ttdoc">The flags this handle was opened with. </div><div class="ttdef"><b>Definition:</b> handle.hpp:282</div></div>
 <div class="ttc" id="classafio__v2__xxx_1_1file__handle_html_a672324d44ea84ccfb71594c1036628ac"><div class="ttname"><a href="classafio__v2__xxx_1_1file__handle.html#a672324d44ea84ccfb71594c1036628ac">afio_v2_xxx::file_handle::service</a></div><div class="ttdeci">io_service * service() const noexcept</div><div class="ttdoc">The i/o service this handle is attached to, if any. </div><div class="ttdef"><b>Definition:</b> file_handle.hpp:211</div></div>
 <div class="ttc" id="classafio__v2__xxx_1_1async__file__handle_html_a5e6891894762e648e78726cabc23c0b9"><div class="ttname"><a href="classafio__v2__xxx_1_1async__file__handle.html#a5e6891894762e648e78726cabc23c0b9">afio_v2_xxx::async_file_handle::async_file</a></div><div class="ttdeci">static result&lt; async_file_handle &gt; async_file(io_service &amp;service, const path_handle &amp;base, path_view_type _path, mode _mode=mode::read, creation _creation=creation::open_existing, caching _caching=caching::all, flag flags=flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> async_file_handle.hpp:103</div></div>
 <div class="ttc" id="classafio__v2__xxx_1_1async__file__handle_html_a2eb236d3277dac32fabbae2c39821a51"><div class="ttname"><a href="classafio__v2__xxx_1_1async__file__handle.html#a2eb236d3277dac32fabbae2c39821a51">afio_v2_xxx::async_file_handle::async_random_file</a></div><div class="ttdeci">static result&lt; async_file_handle &gt; async_random_file(io_service &amp;service, const path_handle &amp;dirpath, mode _mode=mode::write, caching _caching=caching::temporary, flag flags=flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> async_file_handle.hpp:121</div></div>
@@ -827,7 +827,7 @@ template&lt;class CompletionRoutine &gt; </div>
 <div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;    <span class="keywordflow">return</span> std::move(ret);</div>
 <div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;  }</div>
 <div class="ttc" id="classafio__v2__xxx_1_1file__handle_html_a2910fdfa511d1295e36e2eb015b989ac"><div class="ttname"><a href="classafio__v2__xxx_1_1file__handle.html#a2910fdfa511d1295e36e2eb015b989ac">afio_v2_xxx::file_handle::temp_inode</a></div><div class="ttdeci">static result&lt; file_handle &gt; temp_inode(path_view_type dirpath=temporary_files_directory(), mode _mode=mode::write, flag flags=flag::none) noexcept</div></div>
-<div class="ttc" id="classafio__v2__xxx_1_1handle_html_ab3d876f5996605158fd6a0582adadad6"><div class="ttname"><a href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">afio_v2_xxx::handle::flags</a></div><div class="ttdeci">flag flags() const noexcept</div><div class="ttdoc">The flags this handle was opened with. </div><div class="ttdef"><b>Definition:</b> handle.hpp:276</div></div>
+<div class="ttc" id="classafio__v2__xxx_1_1handle_html_ab3d876f5996605158fd6a0582adadad6"><div class="ttname"><a href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">afio_v2_xxx::handle::flags</a></div><div class="ttdeci">flag flags() const noexcept</div><div class="ttdoc">The flags this handle was opened with. </div><div class="ttdef"><b>Definition:</b> handle.hpp:282</div></div>
 <div class="ttc" id="classafio__v2__xxx_1_1file__handle_html_a672324d44ea84ccfb71594c1036628ac"><div class="ttname"><a href="classafio__v2__xxx_1_1file__handle.html#a672324d44ea84ccfb71594c1036628ac">afio_v2_xxx::file_handle::service</a></div><div class="ttdeci">io_service * service() const noexcept</div><div class="ttdoc">The i/o service this handle is attached to, if any. </div><div class="ttdef"><b>Definition:</b> file_handle.hpp:211</div></div>
 <div class="ttc" id="classafio__v2__xxx_1_1async__file__handle_html_a1b8753468fe5561b92da18d1cb4a6c68"><div class="ttname"><a href="classafio__v2__xxx_1_1async__file__handle.html#a1b8753468fe5561b92da18d1cb4a6c68">afio_v2_xxx::async_file_handle::async_file_handle</a></div><div class="ttdeci">async_file_handle()=default</div><div class="ttdoc">Default constructor. </div></div>
 </div><!-- fragment -->
@@ -1019,7 +1019,8 @@ For portability, you can only assume that barriers write order for a single hand
 </div><div class="memdoc">
 <p>Returns the current path of the open handle as said by the operating system. Note that you are NOT guaranteed that any path refreshed bears any resemblance to the original, many operating systems will return some different path which still reaches the same inode via some other route e.g. hardlinks, dereferenced symbolic links, etc.</p>
 <p>If AFIO was not able to determine the current path for this open handle e.g. the inode has been unlinked, it returns an empty path. Some operating systems e.g. FreeBSD also only can fetch the current path for directory inodes, not file inodes.</p>
-<dl class="section warning"><dt>Warning</dt><dd>This call is expensive, it always asks the kernel for the current path, and if <code>disable_safety_unlinks</code> is off (the default) it checks the path returned to ensure it does actually point at the correct inode. Be aware that despite these precautions, paths are unstable and <b>can change randomly at any moment</b>. Most code written to use absolute file systems paths is <b>racy</b>, so don't do it, use <code>path_handle</code> to fix a base location on the file system and work from that anchor instead! </dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>This call is expensive, it always asks the kernel for the current path, and if <code>disable_safety_unlinks</code> is off (the default) it checks the path returned to ensure it does actually point at the correct inode. Be aware that despite these precautions, paths are unstable and <b>can change randomly at any moment</b>. Most code written to use absolute file systems paths is <b>racy</b>, so don't do it, use <code>path_handle</code> to fix a base location on the file system and work from that anchor instead!</dd></dl>
+<dl class="section user"><dt>Memory Allocations</dt><dd>At least one malloc for the <code>path_type</code>, likely several more. </dd></dl>
 
 </div>
 </div>
@@ -1283,7 +1284,8 @@ For portability, you can only assume that barriers write order for a single hand
 </table>
 </div><div class="memdoc">
 <p>Obtain a handle to the path <b>currently</b> containing this handle's file entry.</p>
-<dl class="section warning"><dt>Warning</dt><dd>This call is <b>racy</b> and can result in the wrong path handle being returned. Note that unless <code>flag::disable_safety_unlinks</code> is set, this implementation opens a <code>path_handle</code> to the source containing directory, then checks if the file entry within has the same inode as the open file handle. It will retry this matching until success until the deadline given. </dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>This call is <b>racy</b> and can result in the wrong path handle being returned. Note that unless <code>flag::disable_safety_unlinks</code> is set, this implementation opens a <code>path_handle</code> to the source containing directory, then checks if the file entry within has the same inode as the open file handle. It will retry this matching until success until the deadline given.</dd></dl>
+<dl class="section user"><dt>Memory Allocations</dt><dd>Calls <code>current_path()</code> and thus is both expensive and calls malloc many times. </dd></dl>
 
 </div>
 </div>
@@ -1350,7 +1352,7 @@ For portability, you can only assume that barriers write order for a single hand
 <div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;    }</div>
 <div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;  }</div>
 <div class="ttc" id="namespaceafio__v2__xxx_1_1utils_html_a767b8434456319066194534a4c4edbf5"><div class="ttname"><a href="namespaceafio__v2__xxx_1_1utils.html#a767b8434456319066194534a4c4edbf5">afio_v2_xxx::utils::random_string</a></div><div class="ttdeci">std::string random_string(size_t randomlen)</div><div class="ttdoc">Returns a cryptographically random string capable of being used as a filename. Essentially random_fil...</div><div class="ttdef"><b>Definition:</b> utils.hpp:130</div></div>
-<div class="ttc" id="classafio__v2__xxx_1_1handle_html_ab3d876f5996605158fd6a0582adadad6"><div class="ttname"><a href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">afio_v2_xxx::handle::flags</a></div><div class="ttdeci">flag flags() const noexcept</div><div class="ttdoc">The flags this handle was opened with. </div><div class="ttdef"><b>Definition:</b> handle.hpp:276</div></div>
+<div class="ttc" id="classafio__v2__xxx_1_1handle_html_ab3d876f5996605158fd6a0582adadad6"><div class="ttname"><a href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">afio_v2_xxx::handle::flags</a></div><div class="ttdeci">flag flags() const noexcept</div><div class="ttdoc">The flags this handle was opened with. </div><div class="ttdef"><b>Definition:</b> handle.hpp:282</div></div>
 <div class="ttc" id="classafio__v2__xxx_1_1file__handle_html_a6f4e7c6e9768c0e853105b1d63bd9dfb"><div class="ttname"><a href="classafio__v2__xxx_1_1file__handle.html#a6f4e7c6e9768c0e853105b1d63bd9dfb">afio_v2_xxx::file_handle::file</a></div><div class="ttdeci">static result&lt; file_handle &gt; file(const path_handle &amp;base, path_view_type _path, mode _mode=mode::read, creation _creation=creation::open_existing, caching _caching=caching::all, flag flags=flag::none) noexcept</div></div>
 </div><!-- fragment -->
 </div>
@@ -1457,7 +1459,7 @@ For portability, you can only assume that barriers write order for a single hand
 </div><!-- fragment -->
 </div>
 </div>
-<a class="anchor" id="aa867637783001773f4c50e25d5e628c3"></a>
+<a class="anchor" id="a06da220c6d1cf3ee4c981ae15012560e"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -1479,6 +1481,12 @@ For portability, you can only assume that barriers write order for a single hand
         <tr>
           <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>atomic_replace</em> = <code>true</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
           <td class="paramtype"><a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a>&#160;</td>
           <td class="paramname"><em>d</em> = <code>std::chrono::seconds(30)</code>&#160;</td>
         </tr>
@@ -1494,16 +1502,18 @@ For portability, you can only assume that barriers write order for a single hand
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Atomically relinks the current path of this open handle to the new path specified, <b>atomically</b> and silently replacing any item at the new path specified. This operation is both atomic and silent matching POSIX behaviour even on Microsoft Windows where no Win32 API can match POSIX semantics.</p>
+<p>Relinks the current path of this open handle to the new path specified. If <code>atomic_replace</code> is true, the relink <b>atomically</b> and silently replaces any item at the new path specified. This operation is both atomic and silent matching POSIX behaviour even on Microsoft Windows where no Win32 API can match POSIX semantics.</p>
 <dl class="section warning"><dt>Warning</dt><dd>Some operating systems provide a race free syscall for renaming an open handle (Windows). On all other operating systems this call is <b>racy</b> and can result in the wrong file entry being relinked. Note that unless <code>flag::disable_safety_unlinks</code> is set, this implementation opens a <code>path_handle</code> to the source containing directory first, then checks before relinking that the item about to be relinked has the same inode as the open file handle. It will retry this matching until success until the deadline given. This should prevent most unmalicious accidental loss of data.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">base</td><td>Base for any relative path. </td></tr>
     <tr><td class="paramname">newpath</td><td>The relative or absolute new path to relink to. </td></tr>
-    <tr><td class="paramname">d</td><td>The deadline by which the matching of the containing directory to the open handle's inode must succeed, else <code>std::errc::timed_out</code> will be returned. Not used on platforms with race free syscalls for renaming open handles (Windows). </td></tr>
+    <tr><td class="paramname">atomic_replace</td><td>Atomically replace the destination if a file entry already is present there. Choosing false for this will fail if a file entry is already present at the destination, and may not be an atomic operation on some platforms (i.e. both the old and new names may be linked to the same inode for a very short period of time). Windows and recent Linuxes are always atomic. </td></tr>
+    <tr><td class="paramname">d</td><td>The deadline by which the matching of the containing directory to the open handle's inode must succeed, else <code>std::errc::timed_out</code> will be returned. </td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section user"><dt>Memory Allocations</dt><dd>Except on platforms with race free syscalls for renaming open handles (Windows), calls <code>current_path()</code> and thus is both expensive and calls malloc many times. </dd></dl>
 
 </div>
 </div>
@@ -1622,7 +1632,7 @@ For portability, you can only assume that barriers write order for a single hand
 <div class="ttc" id="namespaceafio__v2__xxx_html_a4968bb2d647535f4b91427c66ff8b9e4"><div class="ttname"><a href="namespaceafio__v2__xxx.html#a4968bb2d647535f4b91427c66ff8b9e4">afio_v2_xxx::temporary_files_directory</a></div><div class="ttdeci">path_view temporary_files_directory() noexcept</div><div class="ttdoc">Returns a path to a directory reported by the operating system to be suitable for storing temporary f...</div></div>
 <div class="ttc" id="classafio__v2__xxx_1_1path__handle_html_a5cbd1d67ffe72d6cce0d093f861a4af7"><div class="ttname"><a href="classafio__v2__xxx_1_1path__handle.html#a5cbd1d67ffe72d6cce0d093f861a4af7">afio_v2_xxx::path_handle::path</a></div><div class="ttdeci">static result&lt; path_handle &gt; path(const path_handle &amp;base, path_view_type _path) noexcept</div></div>
 <div class="ttc" id="classafio__v2__xxx_1_1file__handle_html_a7fdd164a8af6542c5fb80c514283c585"><div class="ttname"><a href="classafio__v2__xxx_1_1file__handle.html#a7fdd164a8af6542c5fb80c514283c585">afio_v2_xxx::file_handle::random_file</a></div><div class="ttdeci">static result&lt; file_handle &gt; random_file(const path_handle &amp;dirpath, mode _mode=mode::write, caching _caching=caching::temporary, flag flags=flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> file_handle.hpp:134</div></div>
-<div class="ttc" id="classafio__v2__xxx_1_1handle_html_ab3d876f5996605158fd6a0582adadad6"><div class="ttname"><a href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">afio_v2_xxx::handle::flags</a></div><div class="ttdeci">flag flags() const noexcept</div><div class="ttdoc">The flags this handle was opened with. </div><div class="ttdef"><b>Definition:</b> handle.hpp:276</div></div>
+<div class="ttc" id="classafio__v2__xxx_1_1handle_html_ab3d876f5996605158fd6a0582adadad6"><div class="ttname"><a href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">afio_v2_xxx::handle::flags</a></div><div class="ttdeci">flag flags() const noexcept</div><div class="ttdoc">The flags this handle was opened with. </div><div class="ttdef"><b>Definition:</b> handle.hpp:282</div></div>
 <div class="ttc" id="classafio__v2__xxx_1_1file__handle_html_a6f4e7c6e9768c0e853105b1d63bd9dfb"><div class="ttname"><a href="classafio__v2__xxx_1_1file__handle.html#a6f4e7c6e9768c0e853105b1d63bd9dfb">afio_v2_xxx::file_handle::file</a></div><div class="ttdeci">static result&lt; file_handle &gt; file(const path_handle &amp;base, path_view_type _path, mode _mode=mode::read, creation _creation=creation::open_existing, caching _caching=caching::all, flag flags=flag::none) noexcept</div></div>
 </div><!-- fragment -->
 </div>
@@ -1770,10 +1780,11 @@ For portability, you can only assume that barriers write order for a single hand
 <dl class="section warning"><dt>Warning</dt><dd>Some operating systems provide a race free syscall for unlinking an open handle (Windows). On all other operating systems this call is <b>racy</b> and can result in the wrong file entry being unlinked. Note that unless <code>flag::disable_safety_unlinks</code> is set, this implementation opens a <code>path_handle</code> to the containing directory first, then checks that the item about to be unlinked has the same inode as the open file handle. It will retry this matching until success until the deadline given. This should prevent most unmalicious accidental loss of data.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">d</td><td>The deadline by which the matching of the containing directory to the open handle's inode must succeed, else <code>std::errc::timed_out</code> will be returned. Not used on platforms with race free syscalls for unlinking open handles (Windows). </td></tr>
+    <tr><td class="paramname">d</td><td>The deadline by which the matching of the containing directory to the open handle's inode must succeed, else <code>std::errc::timed_out</code> will be returned. </td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section user"><dt>Memory Allocations</dt><dd>Except on platforms with race free syscalls for unlinking open handles (Windows), calls <code>current_path()</code> and thus is both expensive and calls malloc many times. On Windows, also calls <code>current_path()</code> if <code>flag::disable_safety_unlinks</code> is not set. </dd></dl>
 
 </div>
 </div>

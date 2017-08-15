@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['random_5fdirectory',['random_directory',['../classafio__v2__xxx_1_1directory__handle.html#a28fdac2d7adadbdddd036efd802ad726',1,'afio_v2_xxx::directory_handle::random_directory()'],['../namespaceafio__v2__xxx.html#a26a149bed05acb7e27596e84f16cd0bd',1,'afio_v2_xxx::random_directory()']]],
   ['random_5fentity',['random_entity',['../classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex.html#a17f374fc7863784f478498eac95dcc70',1,'afio_v2_xxx::algorithm::shared_fs_mutex::shared_fs_mutex']]],
   ['random_5ffile',['random_file',['../classafio__v2__xxx_1_1file__handle.html#a7fdd164a8af6542c5fb80c514283c585',1,'afio_v2_xxx::file_handle::random_file()'],['../namespaceafio__v2__xxx.html#aac0b7d76c4298e86cef49c832c93edec',1,'afio_v2_xxx::random_file()']]],
   ['random_5ffill',['random_fill',['../namespaceafio__v2__xxx_1_1utils.html#ad164c516eb2043c4f4f05277b2745f82',1,'afio_v2_xxx::utils']]],
@@ -13,7 +14,8 @@ var searchData=
   ['rebind',['rebind',['../structafio__v2__xxx_1_1utils_1_1page__allocator_1_1rebind.html',1,'afio_v2_xxx::utils::page_allocator']]],
   ['reference',['reference',['../classafio__v2__xxx_1_1path__view.html#a399229662f3c1fef9e4560e3e2bc5a08',1,'afio_v2_xxx::path_view::reference()'],['../structafio__v2__xxx_1_1storage__profile_1_1storage__profile.html#af15713231fb00958e4fc70f3d28b9ad7',1,'afio_v2_xxx::storage_profile::storage_profile::reference()']]],
   ['release',['release',['../classafio__v2__xxx_1_1handle.html#a73d5f2070bce0c3d7fa536d3cbed7b52',1,'afio_v2_xxx::handle::release()'],['../classafio__v2__xxx_1_1io__handle_1_1extent__guard.html#a3a575d17f757d18ca077d004790bb91b',1,'afio_v2_xxx::io_handle::extent_guard::release()'],['../classafio__v2__xxx_1_1map__handle.html#afb8db753542d228ed96ce3fb4cb26b97',1,'afio_v2_xxx::map_handle::release()'],['../classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex_1_1entities__guard.html#a085f31f636e01187e6d65dac1512869f',1,'afio_v2_xxx::algorithm::shared_fs_mutex::shared_fs_mutex::entities_guard::release()']]],
-  ['relink',['relink',['../classafio__v2__xxx_1_1fs__handle.html#aa867637783001773f4c50e25d5e628c3',1,'afio_v2_xxx::fs_handle::relink()'],['../namespaceafio__v2__xxx.html#afdb467668a7e313274721b39495f76f3',1,'afio_v2_xxx::relink()']]],
+  ['relink',['relink',['../classafio__v2__xxx_1_1fs__handle.html#a06da220c6d1cf3ee4c981ae15012560e',1,'afio_v2_xxx::fs_handle::relink()'],['../namespaceafio__v2__xxx.html#a8d7c50561e9103968467c928f2e38f16',1,'afio_v2_xxx::relink()']]],
+  ['remove_5ffilename',['remove_filename',['../classafio__v2__xxx_1_1path__view.html#a628788bf5c788d109b28aa7afdc46a8f',1,'afio_v2_xxx::path_view']]],
   ['requires_5faligned_5fio',['requires_aligned_io',['../classafio__v2__xxx_1_1handle.html#affb10caeeca67b804695b7378be29e23',1,'afio_v2_xxx::handle::requires_aligned_io()'],['../structafio__v2__xxx_1_1native__handle__type.html#a0aa00d6598a6f23989961957907d2e38',1,'afio_v2_xxx::native_handle_type::requires_aligned_io()']]],
   ['round_5fdown_5fto_5fpage_5fsize',['round_down_to_page_size',['../namespaceafio__v2__xxx_1_1utils.html#a7e0604f2e7f98b94ddb09989184968f5',1,'afio_v2_xxx::utils']]],
   ['round_5fto_5fpage_5fsize',['round_to_page_size',['../namespaceafio__v2__xxx_1_1utils.html#a6a99cc31f1816073bd899bb82d018e55',1,'afio_v2_xxx::utils']]],

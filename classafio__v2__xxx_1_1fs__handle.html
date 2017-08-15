@@ -127,8 +127,9 @@ Inheritance diagram for afio_v2_xxx::fs_handle:</div>
  <div class="center">
   <img src="classafio__v2__xxx_1_1fs__handle.png" usemap="#afio_v2_xxx::fs_handle_map" alt=""/>
   <map id="afio_v2_xxx::fs_handle_map" name="afio_v2_xxx::fs_handle_map">
-<area href="classafio__v2__xxx_1_1file__handle.html" title="A handle to a regular file or device, kept data layout compatible with async_file_handle. " alt="afio_v2_xxx::file_handle" shape="rect" coords="0,56,188,80"/>
-<area href="classafio__v2__xxx_1_1async__file__handle.html" title="An asynchronous handle to an open something. " alt="afio_v2_xxx::async_file_handle" shape="rect" coords="0,112,188,136"/>
+<area href="classafio__v2__xxx_1_1directory__handle.html" title="A handle to a directory which can be enumerated. " alt="afio_v2_xxx::directory_handle" shape="rect" coords="0,56,188,80"/>
+<area href="classafio__v2__xxx_1_1file__handle.html" title="A handle to a regular file or device, kept data layout compatible with async_file_handle. " alt="afio_v2_xxx::file_handle" shape="rect" coords="198,56,386,80"/>
+<area href="classafio__v2__xxx_1_1async__file__handle.html" title="An asynchronous handle to an open something. " alt="afio_v2_xxx::async_file_handle" shape="rect" coords="198,112,386,136"/>
 </map>
  </div></div>
 <table class="memberdecls">
@@ -165,8 +166,8 @@ ino_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cla
 <tr class="separator:a5a5244ab1a15053aefe93f2c253db5b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a15232dc853f7ca4769eebbfd1fb91cbe"><td class="memItemLeft" align="right" valign="top">result&lt; <a class="el" href="classafio__v2__xxx_1_1path__handle.html">path_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1fs__handle.html#a15232dc853f7ca4769eebbfd1fb91cbe">parent_path_handle</a> (<a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a> d=std::chrono::seconds(30)) const noexcept</td></tr>
 <tr class="separator:a15232dc853f7ca4769eebbfd1fb91cbe"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa867637783001773f4c50e25d5e628c3"><td class="memItemLeft" align="right" valign="top">result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1fs__handle.html#aa867637783001773f4c50e25d5e628c3">relink</a> (const <a class="el" href="classafio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;base, <a class="el" href="classafio__v2__xxx_1_1fs__handle.html#ac25247b15af82faf1db557b3e45e13d7">path_view_type</a> newpath, <a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a> d=std::chrono::seconds(30)) noexcept</td></tr>
-<tr class="separator:aa867637783001773f4c50e25d5e628c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a06da220c6d1cf3ee4c981ae15012560e"><td class="memItemLeft" align="right" valign="top">result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1fs__handle.html#a06da220c6d1cf3ee4c981ae15012560e">relink</a> (const <a class="el" href="classafio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;base, <a class="el" href="classafio__v2__xxx_1_1fs__handle.html#ac25247b15af82faf1db557b3e45e13d7">path_view_type</a> newpath, bool atomic_replace=true, <a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a> d=std::chrono::seconds(30)) noexcept</td></tr>
+<tr class="separator:a06da220c6d1cf3ee4c981ae15012560e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a11d5f02b84c8fee8d81a5cbda0ef5765"><td class="memItemLeft" align="right" valign="top">result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1fs__handle.html#a11d5f02b84c8fee8d81a5cbda0ef5765">unlink</a> (<a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a> d=std::chrono::seconds(30)) noexcept</td></tr>
 <tr class="separator:a11d5f02b84c8fee8d81a5cbda0ef5765"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -238,11 +239,12 @@ ino_t&#160;</td><td class="memItemRight" valign="bottom"><b>_inode</b></td></tr>
 </table>
 </div><div class="memdoc">
 <p>Obtain a handle to the path <b>currently</b> containing this handle's file entry.</p>
-<dl class="section warning"><dt>Warning</dt><dd>This call is <b>racy</b> and can result in the wrong path handle being returned. Note that unless <code>flag::disable_safety_unlinks</code> is set, this implementation opens a <code>path_handle</code> to the source containing directory, then checks if the file entry within has the same inode as the open file handle. It will retry this matching until success until the deadline given. </dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>This call is <b>racy</b> and can result in the wrong path handle being returned. Note that unless <code>flag::disable_safety_unlinks</code> is set, this implementation opens a <code>path_handle</code> to the source containing directory, then checks if the file entry within has the same inode as the open file handle. It will retry this matching until success until the deadline given.</dd></dl>
+<dl class="section user"><dt>Memory Allocations</dt><dd>Calls <code>current_path()</code> and thus is both expensive and calls malloc many times. </dd></dl>
 
 </div>
 </div>
-<a class="anchor" id="aa867637783001773f4c50e25d5e628c3"></a>
+<a class="anchor" id="a06da220c6d1cf3ee4c981ae15012560e"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -264,6 +266,12 @@ ino_t&#160;</td><td class="memItemRight" valign="bottom"><b>_inode</b></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>atomic_replace</em> = <code>true</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
           <td class="paramtype"><a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a>&#160;</td>
           <td class="paramname"><em>d</em> = <code>std::chrono::seconds(30)</code>&#160;</td>
         </tr>
@@ -279,16 +287,18 @@ ino_t&#160;</td><td class="memItemRight" valign="bottom"><b>_inode</b></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Atomically relinks the current path of this open handle to the new path specified, <b>atomically</b> and silently replacing any item at the new path specified. This operation is both atomic and silent matching POSIX behaviour even on Microsoft Windows where no Win32 API can match POSIX semantics.</p>
+<p>Relinks the current path of this open handle to the new path specified. If <code>atomic_replace</code> is true, the relink <b>atomically</b> and silently replaces any item at the new path specified. This operation is both atomic and silent matching POSIX behaviour even on Microsoft Windows where no Win32 API can match POSIX semantics.</p>
 <dl class="section warning"><dt>Warning</dt><dd>Some operating systems provide a race free syscall for renaming an open handle (Windows). On all other operating systems this call is <b>racy</b> and can result in the wrong file entry being relinked. Note that unless <code>flag::disable_safety_unlinks</code> is set, this implementation opens a <code>path_handle</code> to the source containing directory first, then checks before relinking that the item about to be relinked has the same inode as the open file handle. It will retry this matching until success until the deadline given. This should prevent most unmalicious accidental loss of data.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">base</td><td>Base for any relative path. </td></tr>
     <tr><td class="paramname">newpath</td><td>The relative or absolute new path to relink to. </td></tr>
-    <tr><td class="paramname">d</td><td>The deadline by which the matching of the containing directory to the open handle's inode must succeed, else <code>std::errc::timed_out</code> will be returned. Not used on platforms with race free syscalls for renaming open handles (Windows). </td></tr>
+    <tr><td class="paramname">atomic_replace</td><td>Atomically replace the destination if a file entry already is present there. Choosing false for this will fail if a file entry is already present at the destination, and may not be an atomic operation on some platforms (i.e. both the old and new names may be linked to the same inode for a very short period of time). Windows and recent Linuxes are always atomic. </td></tr>
+    <tr><td class="paramname">d</td><td>The deadline by which the matching of the containing directory to the open handle's inode must succeed, else <code>std::errc::timed_out</code> will be returned. </td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section user"><dt>Memory Allocations</dt><dd>Except on platforms with race free syscalls for renaming open handles (Windows), calls <code>current_path()</code> and thus is both expensive and calls malloc many times. </dd></dl>
 
 </div>
 </div>
@@ -317,10 +327,11 @@ ino_t&#160;</td><td class="memItemRight" valign="bottom"><b>_inode</b></td></tr>
 <dl class="section warning"><dt>Warning</dt><dd>Some operating systems provide a race free syscall for unlinking an open handle (Windows). On all other operating systems this call is <b>racy</b> and can result in the wrong file entry being unlinked. Note that unless <code>flag::disable_safety_unlinks</code> is set, this implementation opens a <code>path_handle</code> to the containing directory first, then checks that the item about to be unlinked has the same inode as the open file handle. It will retry this matching until success until the deadline given. This should prevent most unmalicious accidental loss of data.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">d</td><td>The deadline by which the matching of the containing directory to the open handle's inode must succeed, else <code>std::errc::timed_out</code> will be returned. Not used on platforms with race free syscalls for unlinking open handles (Windows). </td></tr>
+    <tr><td class="paramname">d</td><td>The deadline by which the matching of the containing directory to the open handle's inode must succeed, else <code>std::errc::timed_out</code> will be returned. </td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section user"><dt>Memory Allocations</dt><dd>Except on platforms with race free syscalls for unlinking open handles (Windows), calls <code>current_path()</code> and thus is both expensive and calls malloc many times. On Windows, also calls <code>current_path()</code> if <code>flag::disable_safety_unlinks</code> is not set. </dd></dl>
 
 </div>
 </div>

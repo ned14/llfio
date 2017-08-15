@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['mode',['mode',['../classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18',1,'afio_v2_xxx::handle']]]
+  ['filter',['filter',['../classafio__v2__xxx_1_1directory__handle.html#a47ed88b4de271daa08862b273c2f609e',1,'afio_v2_xxx::directory_handle']]]
 ];

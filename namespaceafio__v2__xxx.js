@@ -7,6 +7,8 @@ var namespaceafio__v2__xxx =
     [ "error_code", "structafio__v2__xxx_1_1error__code.html", "structafio__v2__xxx_1_1error__code" ],
     [ "log_level_guard", "classafio__v2__xxx_1_1log__level__guard.html", "classafio__v2__xxx_1_1log__level__guard" ],
     [ "deadline", "structafio__v2__xxx_1_1deadline.html", "structafio__v2__xxx_1_1deadline" ],
+    [ "directory_entry", "structafio__v2__xxx_1_1directory__entry.html", "structafio__v2__xxx_1_1directory__entry" ],
+    [ "directory_handle", "classafio__v2__xxx_1_1directory__handle.html", "classafio__v2__xxx_1_1directory__handle" ],
     [ "file_handle", "classafio__v2__xxx_1_1file__handle.html", "classafio__v2__xxx_1_1file__handle" ],
     [ "fs_handle", "classafio__v2__xxx_1_1fs__handle.html", "classafio__v2__xxx_1_1fs__handle" ],
     [ "handle", "classafio__v2__xxx_1_1handle.html", "classafio__v2__xxx_1_1handle" ],
