@@ -31,7 +31,7 @@ Distributed under the Boost Software License, Version 1.0.
 #define _CRT_SECURE_NO_WARNINGS 1
 
 #include "../../include/afio/afio.hpp"
-#include "../kerneltest/include/kerneltest/v1.0/child_process.hpp"
+#include "kerneltest/include/kerneltest/v1.0/child_process.hpp"
 
 #include <fstream>
 #include <iostream>

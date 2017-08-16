@@ -22,7 +22,7 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#include "../kerneltest/include/kerneltest.hpp"
+#include "kerneltest/include/kerneltest.hpp"
 #include "kernel_directory_handle.cpp.hpp"
 
 template <class U> inline void directory_handle_create_close_creation(U &&f)

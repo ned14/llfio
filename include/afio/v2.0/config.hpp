@@ -85,7 +85,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <_mingw.h>
 #endif
 
-#include "../quickcpplib/include/cpp_feature.h"
+#include "quickcpplib/include/cpp_feature.h"
 
 #ifndef __cpp_exceptions
 #error AFIO needs C++ exceptions to be turned on
@@ -120,7 +120,7 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 
 
-#include "../quickcpplib/include/import.h"
+#include "quickcpplib/include/import.h"
 
 #ifdef AFIO_UNSTABLE_VERSION
 #include "../revision.hpp"
@@ -190,7 +190,7 @@ class file_handle;
 AFIO_V2_NAMESPACE_END
 
 // Bring in the Boost-lite macros
-#include "../quickcpplib/include/config.hpp"
+#include "quickcpplib/include/config.hpp"
 // Bring in filesystem
 #if defined(__has_include)
 // clang-format off
@@ -259,29 +259,29 @@ AFIO_V2_NAMESPACE_END
 #endif
 
 // Bring in bitfields
-#include "../quickcpplib/include/bitfield.hpp"
+#include "quickcpplib/include/bitfield.hpp"
 // Bring in scoped undo
-#include "../quickcpplib/include/scoped_undo.hpp"
+#include "quickcpplib/include/scoped_undo.hpp"
 AFIO_V2_NAMESPACE_BEGIN
 using QUICKCPPLIB_NAMESPACE::scoped_undo::undoer;
 AFIO_V2_NAMESPACE_END
 // Bring in a span implementation
-#include "../quickcpplib/include/span.hpp"
+#include "quickcpplib/include/span.hpp"
 AFIO_V2_NAMESPACE_BEGIN
 using namespace QUICKCPPLIB_NAMESPACE::span;
 AFIO_V2_NAMESPACE_END
 // Bring in an optional implementation
-#include "../quickcpplib/include/optional.hpp"
+#include "quickcpplib/include/optional.hpp"
 AFIO_V2_NAMESPACE_BEGIN
 using namespace QUICKCPPLIB_NAMESPACE::optional;
 AFIO_V2_NAMESPACE_END
 // Bring in a string_view implementation
-#include "../quickcpplib/include/string_view.hpp"
+#include "quickcpplib/include/string_view.hpp"
 AFIO_V2_NAMESPACE_BEGIN
 using namespace QUICKCPPLIB_NAMESPACE::string_view;
 AFIO_V2_NAMESPACE_END
 // Bring in a result implementation
-#include "../outcome/include/outcome.hpp"
+#include "outcome/include/outcome.hpp"
 AFIO_V2_NAMESPACE_BEGIN
 // Specialise error_code into this namespace so we can hook result creation via ADL
 /*! \struct error_code
@@ -307,8 +307,8 @@ AFIO_V2_NAMESPACE_END
 
 
 #if AFIO_LOGGING_LEVEL
-#include "../quickcpplib/include/ringbuffer_log.hpp"
-#include "../quickcpplib/include/utils/thread.hpp"
+#include "quickcpplib/include/ringbuffer_log.hpp"
+#include "quickcpplib/include/utils/thread.hpp"
 
 /*! \todo TODO FIXME Replace in-memory log with memory map file backed log.
 */

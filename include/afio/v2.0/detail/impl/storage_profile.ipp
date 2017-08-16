@@ -27,7 +27,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../../storage_profile.hpp"
 #include "../../utils.hpp"
 
-#include "../quickcpplib/include/algorithm/small_prng.hpp"
+#include "../../quickcpplib/include/algorithm/small_prng.hpp"
 
 #include <vector>
 #ifndef NDEBUG

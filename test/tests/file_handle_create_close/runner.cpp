@@ -22,7 +22,7 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#include "../kerneltest/include/kerneltest.hpp"
+#include "kerneltest/include/kerneltest.hpp"
 #include "kernel_async_file_handle.cpp.hpp"
 #include "kernel_file_handle.cpp.hpp"
 

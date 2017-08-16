@@ -23,7 +23,7 @@ Distributed under the Boost Software License, Version 1.0.
 */
 
 #include "../../include/afio/afio.hpp"
-#include "../kerneltest/include/kerneltest.hpp"
+#include "kerneltest/include/kerneltest.hpp"
 
 static inline void TestFileHandleLockUnlock()
 {

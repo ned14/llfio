@@ -28,7 +28,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include "path_handle.hpp"
 #include "path_view.hpp"
 
-#include "../quickcpplib/include/uint128.hpp"
+#include "quickcpplib/include/uint128.hpp"
 
 //! \file fs_handle.hpp Provides fs_handle
 
