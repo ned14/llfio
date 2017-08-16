@@ -38,7 +38,7 @@ Manufacturer claimed 4Kb transfer latencies for the physical hardware:
 - Average NVMe flash drive latency: **98.9us** (10,111 IOPS)
 - 99.999% NVMe flash drive latency: **3,146us** (317 IOPS)
 
-Lowest sustained 4Kb read latency benchmarked to date by author (NVMe): **992ns** (1M IOPS, 3.8Gb/sec, x4 PCIe 3.0 interface maxed out)
+Lowest sustained 4Kb read latency benchmarked to date by author (NVMe): **0.992us** (1M IOPS, 3.8Gb/sec, x4 PCIe 3.0 interface maxed out)
 </td>
 <td valign="top" width="33%">
 75% read 25% write QD4 4Kb transfer latencies for the software with AFIO:
@@ -49,7 +49,7 @@ Lowest sustained 4Kb read latency benchmarked to date by author (NVMe): **992ns*
 - Average NVMe flash drive latency: **26.9us** (37,105 IOPS)
 - 99.999% NVMe flash drive latency: **21,597us** (46 IOPS)
 
-Lowest sustained 4Kb write latency benchmarked to date by author (NVMe): **992ns** (1M IOPS, 3.8Gb/sec, x4 PCIe 3.0 interface maxed out)
+Lowest sustained 4Kb write latency benchmarked to date by author (NVMe): **0.992us** (1M IOPS, 3.8Gb/sec, x4 PCIe 3.0 interface maxed out)
 </td>
 </tr>
 </table>
