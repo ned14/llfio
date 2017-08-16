@@ -248,6 +248,6 @@ var NAVTREEINDEX0 =
 "classafio__v2__xxx_1_1directory__handle.html#a9e2c2f026219cdb7e956a58ea0537f75":[3,0,0,8,4],
 "classafio__v2__xxx_1_1directory__handle.html#aa53d88105df8c6be01be649829a65b14":[3,0,0,8,29],
 "classafio__v2__xxx_1_1directory__handle.html#aac62f621c42be6eeb8d9a5700da367f9":[3,0,0,8,36],
-"classafio__v2__xxx_1_1directory__handle.html#ab2d684d8ecb017d10c0f096f93573a40":[3,0,0,8,26],
-"classafio__v2__xxx_1_1directory__handle.html#ab3d876f5996605158fd6a0582adadad6":[3,0,0,8,27]
+"classafio__v2__xxx_1_1directory__handle.html#ab3d876f5996605158fd6a0582adadad6":[3,0,0,8,27],
+"classafio__v2__xxx_1_1directory__handle.html#ab43eb3c35e9544ea148d1ac14ed35b4b":[3,0,0,8,5]
 };

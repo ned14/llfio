@@ -221,8 +221,8 @@ virtual result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom">
 <tr class="separator:a8f27bd9d54e28aac2042886e06eccd5b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a52e014939626d1afcb0c8756732e1817"><td class="memItemLeft" align="right" valign="top">virtual result&lt; <a class="el" href="classafio__v2__xxx_1_1directory__handle.html">directory_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1directory__handle.html#a52e014939626d1afcb0c8756732e1817">clone</a> () const noexcept</td></tr>
 <tr class="separator:a52e014939626d1afcb0c8756732e1817"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab2d684d8ecb017d10c0f096f93573a40"><td class="memItemLeft" align="right" valign="top">virtual result&lt; <a class="el" href="structafio__v2__xxx_1_1directory__handle_1_1enumerate__info.html">enumerate_info</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1directory__handle.html#ab2d684d8ecb017d10c0f096f93573a40">enumerate</a> (<a class="el" href="structafio__v2__xxx_1_1directory__handle_1_1buffers__type.html">buffers_type</a> &amp;tofill, <a class="el" href="classafio__v2__xxx_1_1path__view.html">path_view_type</a> glob=<a class="el" href="classafio__v2__xxx_1_1path__view.html">path_view_type</a>(), <a class="el" href="classafio__v2__xxx_1_1directory__handle.html#a47ed88b4de271daa08862b273c2f609e">filter</a> filtering=<a class="el" href="classafio__v2__xxx_1_1directory__handle.html#a47ed88b4de271daa08862b273c2f609ea14847befc159c1492671b53718fc46f8">filter::fastdeleted</a>, span&lt; char &gt; kernelbuffer=span&lt; char &gt;()) const noexcept</td></tr>
-<tr class="separator:ab2d684d8ecb017d10c0f096f93573a40"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac4b90958be1b1b620a6768de52407935"><td class="memItemLeft" align="right" valign="top">virtual result&lt; <a class="el" href="structafio__v2__xxx_1_1directory__handle_1_1enumerate__info.html">enumerate_info</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1directory__handle.html#ac4b90958be1b1b620a6768de52407935">enumerate</a> (<a class="el" href="structafio__v2__xxx_1_1directory__handle_1_1buffers__type.html">buffers_type</a> &amp;&amp;tofill, <a class="el" href="classafio__v2__xxx_1_1path__view.html">path_view_type</a> glob=<a class="el" href="classafio__v2__xxx_1_1path__view.html">path_view_type</a>(), <a class="el" href="classafio__v2__xxx_1_1directory__handle.html#a47ed88b4de271daa08862b273c2f609e">filter</a> filtering=<a class="el" href="classafio__v2__xxx_1_1directory__handle.html#a47ed88b4de271daa08862b273c2f609ea14847befc159c1492671b53718fc46f8">filter::fastdeleted</a>, span&lt; char &gt; kernelbuffer=span&lt; char &gt;()) const noexcept</td></tr>
+<tr class="separator:ac4b90958be1b1b620a6768de52407935"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a657c12a309cf02bf2351bfcc7f41463b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a657c12a309cf02bf2351bfcc7f41463b"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1handle.html#a657c12a309cf02bf2351bfcc7f41463b">swap</a> (<a class="el" href="classafio__v2__xxx_1_1handle.html">handle</a> &amp;o) noexcept</td></tr>
 <tr class="memdesc:a657c12a309cf02bf2351bfcc7f41463b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Swap with another instance. <br/></td></tr>
@@ -520,7 +520,7 @@ ino_t&#160;</td><td class="memItemRight" valign="bottom"><b>_inode</b></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="ab2d684d8ecb017d10c0f096f93573a40"></a>
+<a class="anchor" id="ac4b90958be1b1b620a6768de52407935"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -530,7 +530,7 @@ ino_t&#160;</td><td class="memItemRight" valign="bottom"><b>_inode</b></td></tr>
         <tr>
           <td class="memname">virtual result&lt;<a class="el" href="structafio__v2__xxx_1_1directory__handle_1_1enumerate__info.html">enumerate_info</a>&gt; afio_v2_xxx::directory_handle::enumerate </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="structafio__v2__xxx_1_1directory__handle_1_1buffers__type.html">buffers_type</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="structafio__v2__xxx_1_1directory__handle_1_1buffers__type.html">buffers_type</a> &amp;&amp;&#160;</td>
           <td class="paramname"><em>tofill</em>, </td>
         </tr>
         <tr>
@@ -564,10 +564,10 @@ ino_t&#160;</td><td class="memItemRight" valign="bottom"><b>_inode</b></td></tr>
 </table>
 </div><div class="memdoc">
 <p>Fill the buffers type with as many directory entries as will fit.</p>
-<dl class="section return"><dt>Returns</dt><dd>Returns whether the entire directory was read into <code>tofill</code>, false otherwise, and what metadata was filled in. <code>tofill</code>'s extent is adjusted to match the number of items read on exit. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>Returns the buffers filled, what metadata was filled in and whether the entire directory was read into <code>tofill</code>. </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">tofill</td><td>The buffers to fill. </td></tr>
+    <tr><td class="paramname">tofill</td><td>The buffers to fill, returned to you on exit. </td></tr>
     <tr><td class="paramname">glob</td><td>An optional shell glob by which to filter the items filled. Done kernel side on Windows, user side on POSIX. </td></tr>
     <tr><td class="paramname">filtering</td><td>Whether to filter out fake-deleted files on Windows or not. </td></tr>
     <tr><td class="paramname">kernelbuffer</td><td>A buffer to use for the kernel to fill. If left defaulted, a kernel buffer is allocated internally and stored into <code>tofill</code> which needs to not be destructed until one is no longer using any items within (leafnames are views onto the original kernel data). </td></tr>

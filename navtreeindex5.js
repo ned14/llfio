@@ -1,5 +1,12 @@
 var NAVTREEINDEX5 =
 {
+"structafio__v2__xxx_1_1statfs__t_1_1want__base.html#a328ecf03e9e9d49f6a7e5ba513b4bcedaf376e6b0d61316509a37ec70b66ff060":[3,0,0,20,1,0,14],
+"structafio__v2__xxx_1_1statfs__t_1_1want__base.html#a328ecf03e9e9d49f6a7e5ba513b4bcedafecd7ffad2bb412c9794142dff71b4f7":[3,0,0,20,1,0,3],
+"structafio__v2__xxx_1_1storage__profile_1_1item.html":[3,0,0,1,1],
+"structafio__v2__xxx_1_1storage__profile_1_1item.html#a1c59e24cdf6e608b87539c5639a8ded6":[3,0,0,1,1,9],
+"structafio__v2__xxx_1_1storage__profile_1_1item.html#a3914ff417e4a91fd0cc1da8ccb3e81d0":[3,0,0,1,1,6],
+"structafio__v2__xxx_1_1storage__profile_1_1item.html#a404ca538cb1956e0d97b3413338441a7":[3,0,0,1,1,1],
+"structafio__v2__xxx_1_1storage__profile_1_1item.html#a5f7494ef59c8a25210953863888da1ec":[3,0,0,1,1,3],
 "structafio__v2__xxx_1_1storage__profile_1_1item.html#a827ac3b1521e3b7404f71cc195e5e776":[3,0,0,1,1,5],
 "structafio__v2__xxx_1_1storage__profile_1_1item.html#a83ad0d417e2f96422bba8d7137746370":[3,0,0,1,1,0],
 "structafio__v2__xxx_1_1storage__profile_1_1item.html#a840669ecfec7eac1137c038da665337b":[3,0,0,1,1,8],

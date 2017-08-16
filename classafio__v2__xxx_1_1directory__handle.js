@@ -29,7 +29,7 @@ var classafio__v2__xxx_1_1directory__handle =
     [ "clone", "classafio__v2__xxx_1_1directory__handle.html#a52e014939626d1afcb0c8756732e1817", null ],
     [ "close", "classafio__v2__xxx_1_1directory__handle.html#a8f27bd9d54e28aac2042886e06eccd5b", null ],
     [ "current_path", "classafio__v2__xxx_1_1directory__handle.html#a616a67222676af5ec5b3aa94d7c02428", null ],
-    [ "enumerate", "classafio__v2__xxx_1_1directory__handle.html#ab2d684d8ecb017d10c0f096f93573a40", null ],
+    [ "enumerate", "classafio__v2__xxx_1_1directory__handle.html#ac4b90958be1b1b620a6768de52407935", null ],
     [ "flags", "classafio__v2__xxx_1_1directory__handle.html#ab3d876f5996605158fd6a0582adadad6", null ],
     [ "is_append_only", "classafio__v2__xxx_1_1directory__handle.html#ae33d4d0faa1377cd371bd6a0ae0769ae", null ],
     [ "is_directory", "classafio__v2__xxx_1_1directory__handle.html#aa53d88105df8c6be01be649829a65b14", null ],

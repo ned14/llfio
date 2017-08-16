@@ -1,5 +1,11 @@
 var NAVTREEINDEX4 =
 {
+"path__view_8hpp.html#ad11faca48d5a02c9552774fd6726972c":[4,0,0,0,0,14,7],
+"path__view_8hpp.html#adaa9535b9824cc3ce0c02d202238c127":[4,0,0,0,0,14,5],
+"path__view_8hpp.html#adc590ba43ef62ce8521bf9112a1efdca":[4,0,0,0,0,14,4],
+"path__view_8hpp.html#ae68747d832af82d92e0015e94bb6e81a":[4,0,0,0,0,14,2],
+"stat_8hpp.html":[4,0,0,0,0,15],
+"statfs_8hpp.html":[4,0,0,0,0,16],
 "storage__profile_8hpp.html":[4,0,0,0,0,17],
 "storage__profile_8hpp.html#a0e2c44a94f432bdb2bd1c92eb78d1143":[4,0,0,0,0,17,16],
 "storage__profile_8hpp.html#a12b552095491d25fdfbad807b34fe59c":[4,0,0,0,0,17,23],
@@ -52,7 +58,8 @@ var NAVTREEINDEX4 =
 "structafio__v2__xxx_1_1directory__handle_1_1buffers__type.html#ab98213f3667f45cc5429e9d6ed6073fb":[3,0,0,8,0,0],
 "structafio__v2__xxx_1_1directory__handle_1_1enumerate__info.html":[3,0,0,8,1],
 "structafio__v2__xxx_1_1directory__handle_1_1enumerate__info.html#a516cfbc33c3f1aaaa52f5d3eb043db41":[3,0,0,8,1,0],
-"structafio__v2__xxx_1_1directory__handle_1_1enumerate__info.html#af9748b3597c3d041f87761ec8e2212a4":[3,0,0,8,1,1],
+"structafio__v2__xxx_1_1directory__handle_1_1enumerate__info.html#af9748b3597c3d041f87761ec8e2212a4":[3,0,0,8,1,2],
+"structafio__v2__xxx_1_1directory__handle_1_1enumerate__info.html#afa4e68d6bf132fe56e4b41dbec9a0209":[3,0,0,8,1,1],
 "structafio__v2__xxx_1_1error__code.html":[3,0,0,4],
 "structafio__v2__xxx_1_1error__code.html#a0269ce49eeb7fa7c6dfe86d3793ebf8f":[3,0,0,4,1],
 "structafio__v2__xxx_1_1error__code.html#a0e554dac809ab25dbe428ac7e6f4aa06":[3,0,0,4,0],
@@ -242,12 +249,5 @@ var NAVTREEINDEX4 =
 "structafio__v2__xxx_1_1statfs__t_1_1want__base.html#a328ecf03e9e9d49f6a7e5ba513b4bcedab03bde4c9bd49a008a08d27030eaa992":[3,0,0,20,1,0,13],
 "structafio__v2__xxx_1_1statfs__t_1_1want__base.html#a328ecf03e9e9d49f6a7e5ba513b4bcedab489ff82158e035ff1f73a91a978987f":[3,0,0,20,1,0,11],
 "structafio__v2__xxx_1_1statfs__t_1_1want__base.html#a328ecf03e9e9d49f6a7e5ba513b4bcedacfbeed8e100ea7e7b2e6ee5c18047a3a":[3,0,0,20,1,0,12],
-"structafio__v2__xxx_1_1statfs__t_1_1want__base.html#a328ecf03e9e9d49f6a7e5ba513b4bcedaee8b566b96ead2727d5790db395cf818":[3,0,0,20,1,0,6],
-"structafio__v2__xxx_1_1statfs__t_1_1want__base.html#a328ecf03e9e9d49f6a7e5ba513b4bcedaf376e6b0d61316509a37ec70b66ff060":[3,0,0,20,1,0,14],
-"structafio__v2__xxx_1_1statfs__t_1_1want__base.html#a328ecf03e9e9d49f6a7e5ba513b4bcedafecd7ffad2bb412c9794142dff71b4f7":[3,0,0,20,1,0,3],
-"structafio__v2__xxx_1_1storage__profile_1_1item.html":[3,0,0,1,1],
-"structafio__v2__xxx_1_1storage__profile_1_1item.html#a1c59e24cdf6e608b87539c5639a8ded6":[3,0,0,1,1,9],
-"structafio__v2__xxx_1_1storage__profile_1_1item.html#a3914ff417e4a91fd0cc1da8ccb3e81d0":[3,0,0,1,1,6],
-"structafio__v2__xxx_1_1storage__profile_1_1item.html#a404ca538cb1956e0d97b3413338441a7":[3,0,0,1,1,1],
-"structafio__v2__xxx_1_1storage__profile_1_1item.html#a5f7494ef59c8a25210953863888da1ec":[3,0,0,1,1,3]
+"structafio__v2__xxx_1_1statfs__t_1_1want__base.html#a328ecf03e9e9d49f6a7e5ba513b4bcedaee8b566b96ead2727d5790db395cf818":[3,0,0,20,1,0,6]
 };

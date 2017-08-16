@@ -121,7 +121,7 @@ $(document).ready(function(){initNavTree('index.html','');});
 <th colspan="3">Why you might need AFIO<hr/>
   </th></tr>
 <tr>
-<td valign="top">Manufacturer claimed 4Kb transfer latencies for the physical hardware:<ul>
+<td valign="top" width="33%">Manufacturer claimed 4Kb transfer latencies for the physical hardware:<ul>
 <li>Spinning rust hard drive latency @ QD1: <b>7000us</b></li>
 <li>SATA flash drive latency @ QD1: <b>800us</b></li>
 <li>NVMe flash drive latency @ QD1: <b>300us</b></li>
@@ -130,7 +130,7 @@ $(document).ready(function(){initNavTree('index.html','');});
 <li><code>memcpy(4Kb)</code> latency: <b>5us</b> (main memory) to <b>1.3us</b> (L3 cache)</li>
 <li>RTT PCIe latency: <b>0.5us</b>  </li>
 </ul>
-</td><td valign="top"><p class="starttd">100% read QD1 4Kb transfer latencies for the software with AFIO:</p>
+</td><td valign="top" width="33%"><p class="starttd">100% read QD1 4Kb transfer latencies for the software with AFIO:</p>
 <ul>
 <li>Average spinning rust hard drive latency: <b>TODO</b></li>
 <li>99.999% spinning rust hard drive latency: <b>TODO</b></li>
@@ -139,8 +139,8 @@ $(document).ready(function(){initNavTree('index.html','');});
 <li>Average NVMe flash drive latency: <b>98.9us</b> (10,111 IOPS)</li>
 <li>99.999% NVMe flash drive latency: <b>3,146us</b> (317 IOPS)</li>
 </ul>
-<p class="endtd">Lowest sustained 4Kb read latency benchmarked to date by author (NVMe): <b>992ns</b> (1M IOPS, 3.8Gb/sec)  </p>
-</td><td valign="top"><p class="starttd">75% read 25% write QD4 4Kb transfer latencies for the software with AFIO:</p>
+<p class="endtd">Lowest sustained 4Kb read latency benchmarked to date by author (NVMe): <b>992ns</b> (1M IOPS, 3.8Gb/sec, x4 PCIe 3.0 interface maxed out)  </p>
+</td><td valign="top" width="33%"><p class="starttd">75% read 25% write QD4 4Kb transfer latencies for the software with AFIO:</p>
 <ul>
 <li>Average spinning rust hard drive latency: <b>TODO</b></li>
 <li>99.999% spinning rust hard drive latency: <b>TODO</b></li>
@@ -149,7 +149,7 @@ $(document).ready(function(){initNavTree('index.html','');});
 <li>Average NVMe flash drive latency: <b>26.9us</b> (37,105 IOPS)</li>
 <li>99.999% NVMe flash drive latency: <b>21,597us</b> (46 IOPS)</li>
 </ul>
-<p class="endtd">Lowest sustained 4Kb write latency benchmarked to date by author (NVMe): <b>992ns</b> (1M IOPS, 3.8Gb/sec)   </p>
+<p class="endtd">Lowest sustained 4Kb write latency benchmarked to date by author (NVMe): <b>992ns</b> (1M IOPS, 3.8Gb/sec, x4 PCIe 3.0 interface maxed out)   </p>
 </td></tr>
 </table>
 <dl class="section note"><dt>Note</dt><dd>Note that this code is of late alpha quality. It's quite reliable, but be careful when using it!</dd></dl>

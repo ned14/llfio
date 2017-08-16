@@ -15,5 +15,6 @@ var searchData=
   ['f_5fnamemax',['f_namemax',['../structafio__v2__xxx_1_1statfs__t.html#a155161c0d118bc43ea6058622ba8f5a9',1,'afio_v2_xxx::statfs_t']]],
   ['f_5fowner',['f_owner',['../structafio__v2__xxx_1_1statfs__t.html#a1b1aef93998f288c7cd84e17a22c9394',1,'afio_v2_xxx::statfs_t']]],
   ['fd',['fd',['../structafio__v2__xxx_1_1native__handle__type.html#a5f67e70703bf6f4ccbf9b9e68795adde',1,'afio_v2_xxx::native_handle_type']]],
-  ['filecompression',['filecompression',['../structafio__v2__xxx_1_1statfs__t_1_1f__flags__t.html#a2dcc8c52ed1147d36a480af7e43a263e',1,'afio_v2_xxx::statfs_t::f_flags_t']]]
+  ['filecompression',['filecompression',['../structafio__v2__xxx_1_1statfs__t_1_1f__flags__t.html#a2dcc8c52ed1147d36a480af7e43a263e',1,'afio_v2_xxx::statfs_t::f_flags_t']]],
+  ['filled',['filled',['../structafio__v2__xxx_1_1directory__handle_1_1enumerate__info.html#afa4e68d6bf132fe56e4b41dbec9a0209',1,'afio_v2_xxx::directory_handle::enumerate_info']]]
 ];
