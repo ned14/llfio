@@ -28,9 +28,9 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../../map_handle.hpp"
 #include "base.hpp"
 
-#include "../../hash.hpp"
-#include "../../small_prng.hpp"
-#include "../../spinlock.hpp"
+#include "../../quickcpplib/include/algorithm/hash.hpp"
+#include "../../quickcpplib/include/algorithm/small_prng.hpp"
+#include "../../quickcpplib/include/spinlock.hpp"
 
 //! \file memory_map.hpp Provides algorithm::shared_fs_mutex::memory_map
 

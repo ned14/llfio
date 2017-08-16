@@ -28,7 +28,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../../file_handle.hpp"
 #include "base.hpp"
 
-#include "../../small_prng.hpp"
+#include "../../quickcpplib/include/algorithm/small_prng.hpp"
 
 //! \file lock_files.hpp Provides algorithm::shared_fs_mutex::lock_files
 

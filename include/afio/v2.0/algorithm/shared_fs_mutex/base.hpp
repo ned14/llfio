@@ -27,7 +27,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include "../../handle.hpp"
 
-#include "../../hash.hpp"
+#include "../../quickcpplib/include/algorithm/hash.hpp"
 
 //! \file base.hpp Provides algorithm::shared_fs_mutex::shared_fs_mutex
 
