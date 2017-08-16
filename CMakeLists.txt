@@ -70,18 +70,16 @@ foreach(lib afio_sl afio_dl)
   target_compile_definitions(${lib} PRIVATE AFIO_SOURCE=1) 
 endforeach()
 
-if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test" AND NOT PROJECT_IS_DEPENDENCY)
-  # For all possible configurations of this library, add each test
-  include(QuickCppLibMakeStandardTests)
-  # For each test target, link to kerneltest
+# For all possible configurations of this library, add each test
+include(QuickCppLibMakeStandardTests)
+# For each test target, link to kerneltest
+foreach(test_target ${afio_TEST_TARGETS})
+  target_link_libraries(${test_target} PRIVATE kerneltest::hl)
+endforeach()
+if(MSVC)
   foreach(test_target ${afio_TEST_TARGETS})
-    target_link_libraries(${test_target} PRIVATE kerneltest::hl)
+    target_compile_options(${test_target} PRIVATE /wd4503)  ## decorated name length exceeded
   endforeach()
-  if(MSVC)
-    foreach(test_target ${afio_TEST_TARGETS})
-      target_compile_options(${test_target} PRIVATE /wd4503)  ## decorated name length exceeded
-    endforeach()
-  endif()
 endif()
 
 # Cache this library's auto scanned sources for later reuse
