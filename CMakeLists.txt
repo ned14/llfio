@@ -53,7 +53,7 @@ if(NOT MSVC OR CMAKE_VERSION VERSION_GREATER 3.59)
   )
 endif()
 # Set the library dependencies this library has
-all_link_libraries(PUBLIC quickcpplib::hl outcome::hl kerneltest::hl)
+all_link_libraries(PUBLIC quickcpplib::hl outcome::hl)
 # Set the system dependencies this library has
 if(CMAKE_SYSTEM_NAME MATCHES "Linux")
   all_link_libraries(PUBLIC stdc++fs rt)
@@ -70,13 +70,18 @@ foreach(lib afio_sl afio_dl)
   target_compile_definitions(${lib} PRIVATE AFIO_SOURCE=1) 
 endforeach()
 
-# For all possible configurations of this library, add each test
-include(QuickCppLibMakeStandardTests)
-# For each test target, set compile options
-if(MSVC)
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test" AND NOT PROJECT_IS_DEPENDENCY)
+  # For all possible configurations of this library, add each test
+  include(QuickCppLibMakeStandardTests)
+  # For each test target, link to kerneltest
   foreach(test_target ${afio_TEST_TARGETS})
-    target_compile_options(${test_target} PRIVATE /wd4503)  ## decorated name length exceeded
+    target_link_libraries(${test_target} PRIVATE kerneltest::hl)
   endforeach()
+  if(MSVC)
+    foreach(test_target ${afio_TEST_TARGETS})
+      target_compile_options(${test_target} PRIVATE /wd4503)  ## decorated name length exceeded
+    endforeach()
+  endif()
 endif()
 
 # Cache this library's auto scanned sources for later reuse

@@ -251,7 +251,7 @@ AFIO_V2_NAMESPACE_END
 
 // Used to tag functions which need to be made free by the AST tool
 #ifndef AFIO_MAKE_FREE_FUNCTION
-#if __cplusplus >= 201700
+#if 0  //__cplusplus >= 201700  // makes annoying warnings
 #define AFIO_MAKE_FREE_FUNCTION [[afio::make_free_function]]
 #else
 #define AFIO_MAKE_FREE_FUNCTION

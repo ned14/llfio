@@ -259,8 +259,8 @@ namespace storage_profile
     item<std::string> cpu_name = {"system:cpu:name", &system::cpu};                  // e.g. Intel Haswell
     item<std::string> cpu_architecture = {"system:cpu:architecture", &system::cpu};  // e.g. x64
     item<unsigned> cpu_physical_cores = {"system:cpu:physical_cores", &system::cpu};
-    item<unsigned long long> mem_max_bandwidth = {"system:mem:max_bandwidth", system::mem, "Main memory bandwidth when accessed sequentially"};
-    item<unsigned long long> mem_min_bandwidth = {"system:mem:min_bandwidth", system::mem, "Main memory bandwidth when 4Kb pages are accessed randomly"};
+    item<unsigned long long> mem_max_bandwidth = {"system:mem:max_bandwidth", system::mem, "Main memory bandwidth when accessed sequentially (1 CPU core)"};
+    item<unsigned long long> mem_min_bandwidth = {"system:mem:min_bandwidth", system::mem, "Main memory bandwidth when 4Kb pages are accessed randomly (1 CPU core)"};
     item<unsigned long long> mem_quantity = {"system:mem:quantity", &system::mem};
     item<float> mem_in_use = {"system:mem:in_use", &system::mem};  // not including caches etc.
     item<unsigned> clock_granularity = {"system:timer:ns_per_tick", &system::clock_granularity};

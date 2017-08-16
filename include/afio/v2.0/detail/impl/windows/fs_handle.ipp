@@ -95,6 +95,7 @@ result<path_handle> fs_handle::parent_path_handle(deadline d) const noexcept
       if(STATUS_SUCCESS != ntstat)
         continue;
       // If the same, we know for a fact that this is the correct containing dir for now at least
+      // FIXME: We are not comparing device number, that's faked as the volume number in stat_t
       if((ino_t) fii.IndexNumber.QuadPart == _inode)
         return success(std::move(currentdirh));
       AFIO_WIN_DEADLINE_TO_TIMEOUT(d);

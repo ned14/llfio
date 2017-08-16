@@ -1087,7 +1087,7 @@ with a non-broken version.
 This edition does pretty much the same as the Win32 edition, minus support for file
 templates and lpFileName being anything but a file path.
 */
-static inline HANDLE CreateFileW_(_In_ LPCTSTR lpFileName, _In_ DWORD dwDesiredAccess, _In_ DWORD dwShareMode, _In_opt_ LPSECURITY_ATTRIBUTES lpSecurityAttributes, _In_ DWORD dwCreationDisposition, _In_ DWORD dwFlagsAndAttributes, _In_opt_ HANDLE hTemplateFile)
+static inline HANDLE CreateFileW_(_In_ LPCTSTR lpFileName, _In_ DWORD dwDesiredAccess, _In_ DWORD dwShareMode, _In_opt_ LPSECURITY_ATTRIBUTES lpSecurityAttributes, _In_ DWORD dwCreationDisposition, _In_ DWORD dwFlagsAndAttributes, _In_opt_ HANDLE hTemplateFile, bool forcedir = false)
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
@@ -1149,6 +1149,8 @@ static inline HANDLE CreateFileW_(_In_ LPCTSTR lpFileName, _In_ DWORD dwDesiredA
       if(dwDesiredAccess & GENERIC_WRITE)
         flags |= FILE_OPEN_REMOTE_INSTANCE;
     }
+    if(forcedir)
+      flags |= FILE_DIRECTORY_FILE;
   }
   else
     flags |= FILE_NON_DIRECTORY_FILE;

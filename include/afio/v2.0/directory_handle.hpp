@@ -207,6 +207,8 @@ public:
   //! Completion information for `enumerate()`
   struct enumerate_info
   {
+    //! The buffers filled.
+    buffers_type filled;
     //! The list of stat metadata retrieved by `enumerate()` this call per `buffer_type`.
     stat_t::want metadata;
     //! Whether the directory was entirely read or not.
@@ -214,10 +216,9 @@ public:
   };
   /*! Fill the buffers type with as many directory entries as will fit.
 
-  \return Returns whether the entire directory was read into `tofill`, false otherwise,
-  and what metadata was filled in. `tofill`'s extent is adjusted to match the number of
-  items read on exit.
-  \param tofill The buffers to fill.
+  \return Returns the buffers filled, what metadata was filled in and whether the entire directory
+  was read into `tofill`.
+  \param tofill The buffers to fill, returned to you on exit.
   \param glob An optional shell glob by which to filter the items filled. Done kernel side on Windows, user side on POSIX.
   \param filtering Whether to filter out fake-deleted files on Windows or not.
   \param kernelbuffer A buffer to use for the kernel to fill. If left defaulted, a kernel buffer
@@ -228,7 +229,7 @@ public:
   If unset, at least one memory allocation, possibly more is performed.
   */
   AFIO_MAKE_FREE_FUNCTION
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<enumerate_info> enumerate(buffers_type &tofill, path_view_type glob = path_view_type(), filter filtering = filter::fastdeleted, span<char> kernelbuffer = span<char>()) const noexcept;
+  AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<enumerate_info> enumerate(buffers_type &&tofill, path_view_type glob = path_view_type(), filter filtering = filter::fastdeleted, span<char> kernelbuffer = span<char>()) const noexcept;
 };
 
 // BEGIN make_free_functions.py
@@ -271,10 +272,10 @@ inline result<directory_handle> temp_directory(directory_handle::path_view_type 
 }
 /*! Fill the buffers type with as many directory entries as will fit.
 
-\return True if the entire directory was read into `tofill`, false otherwise.
-`tofill`'s extent is adjusted to match the number of items read on exit.
+\return Returns the buffers filled, what metadata was filled in and whether the entire directory
+was read into `tofill`.
 \param self The object whose member function to call.
-\param tofill The buffers to fill.
+\param tofill The buffers to fill, returned to you on exit.
 \param glob An optional shell glob by which to filter the items filled. Done kernel side on Windows, user side on POSIX.
 \param filtering Whether to filter out fake-deleted files on Windows or not.
 \param kernelbuffer A buffer to use for the kernel to fill. If left defaulted, a kernel buffer
@@ -284,7 +285,7 @@ is no longer using any items within (leafnames are views onto the original kerne
 \mallocs If the `kernelbuffer` parameter is set on entry, no memory allocations.
 If unset, at least one memory allocation, possibly more is performed.
 */
-inline result<directory_handle::enumerate_info> enumerate(const directory_handle &self, directory_handle::buffers_type &tofill, directory_handle::path_view_type glob = directory_handle::path_view_type(), directory_handle::filter filtering = directory_handle::filter::fastdeleted,
+inline result<directory_handle::enumerate_info> enumerate(const directory_handle &self, directory_handle::buffers_type &&tofill, directory_handle::path_view_type glob = directory_handle::path_view_type(), directory_handle::filter filtering = directory_handle::filter::fastdeleted,
                                                           span<char> kernelbuffer = span<char>()) noexcept
 {
   return self.enumerate(std::forward<decltype(tofill)>(tofill), std::forward<decltype(glob)>(glob), std::forward<decltype(filtering)>(filtering), std::forward<decltype(kernelbuffer)>(kernelbuffer));

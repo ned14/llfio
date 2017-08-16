@@ -41,12 +41,20 @@ AFIO_V2_NAMESPACE_BEGIN
 
 result<directory_handle> directory_handle::directory(const path_handle &base, path_view_type path, mode _mode, creation _creation, caching _caching, flag flags) noexcept
 {
+  // We don't implement unlink on close
+  flags &= ~flag::unlink_on_close;
   result<directory_handle> ret(directory_handle(native_handle_type(), 0, 0, _caching, flags));
   native_handle_type &nativeh = ret.value()._v;
   AFIO_LOG_FUNCTION_CALL(&ret);
-  if(_creation == creation::truncate)
-    return std::errc::operation_not_supported;
   nativeh.behaviour |= native_handle_type::disposition::directory;
+  // POSIX does not permit directory opens with O_RDWR like Windows, so silently convert to read
+  if(_mode == mode::attr_write)
+    _mode = mode::attr_read;
+  else if(_mode == mode::write)
+    _mode = mode::read;
+  // Also trying to truncate a directory returns EISDIR
+  if(_creation == creation::truncate)
+    return std::errc::is_a_directory;
   OUTCOME_TRY(attribs, attribs_from_handle_mode_caching_and_flags(nativeh, _mode, _creation, _caching, flags));
 #ifdef O_DIRECTORY
   attribs |= O_DIRECTORY;
@@ -117,11 +125,11 @@ result<directory_handle> directory_handle::clone() const noexcept
   return ret;
 }
 
-result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_type &tofill, path_view_type glob, filter /*unused*/, span<char> kernelbuffer) const noexcept
+result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_type &&tofill, path_view_type glob, filter /*unused*/, span<char> kernelbuffer) const noexcept
 {
   AFIO_LOG_FUNCTION_CALL(this);
   if(tofill.empty())
-    return enumerate_info{stat_t::want::none, false};
+    return enumerate_info{std::move(tofill), stat_t::want::none, false};
   // Is glob a single entry match? If so, this is really a stat call
   path_view_type::c_str zglob(glob);
   if(!glob.empty() && !glob.contains_glob())
@@ -181,7 +189,7 @@ result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_typ
                                                           | stat_t::want::birthtim
 #endif
                                                           | stat_t::want::sparse;
-    return enumerate_info{default_stat_contents, true};
+    return enumerate_info{std::move(tofill), default_stat_contents, true};
   }
 #ifdef __linux__
   // Unlike FreeBSD, Linux doesn't define a getdents() function, so we'll do that here.
@@ -242,23 +250,27 @@ result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_typ
     }
     else
     {
+      if(bytes == -1)
+      {
+        return {errno, std::system_category()};
+      }
       done = true;
     }
   } while(!done);
   if(bytes == 0)
   {
     tofill._resize(0);
-    return enumerate_info{default_stat_contents, true};
+    return enumerate_info{std::move(tofill), default_stat_contents, true};
   }
   AFIO_VALGRIND_MAKE_MEM_DEFINED_IF_ADDRESSABLE(buffer, bytes);
   size_t n = 0;
-  for(dirent *dent = buffer;; dent = (dirent *) ((size_t) dent + dent->d_reclen))
+  for(dirent *dent = buffer;; dent = (dirent *) ((uintptr_t) dent + dent->d_reclen))
   {
     if((bytes -= dent->d_reclen) <= 0)
     {
       // Fill is complete
       tofill._resize(n);
-      return enumerate_info{default_stat_contents, true};
+      return enumerate_info{std::move(tofill), default_stat_contents, true};
     }
     if(!dent->d_ino)
     {
@@ -313,7 +325,7 @@ result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_typ
     if(n >= tofill.size())
     {
       // Fill is incomplete
-      return enumerate_info{default_stat_contents, false};
+      return enumerate_info{std::move(tofill), default_stat_contents, false};
     }
   }
 }

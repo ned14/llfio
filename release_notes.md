@@ -19,7 +19,7 @@ source code repository lives at https://github.com/ned14/boost.afio.
 <th colspan="3">Why you might need AFIO<hr></th>
 </tr>
 <tr>
-<td valign="top">
+<td valign="top" width="33%">
 Manufacturer claimed 4Kb transfer latencies for the physical hardware:
 - Spinning rust hard drive latency @ QD1: **7000us**
 - SATA flash drive latency @ QD1: **800us**
@@ -29,7 +29,7 @@ Manufacturer claimed 4Kb transfer latencies for the physical hardware:
 - `memcpy(4Kb)` latency: **5us** (main memory) to **1.3us** (L3 cache)
 - RTT PCIe latency: **0.5us**
 </td>
-<td valign="top">
+<td valign="top" width="33%">
 100% read QD1 4Kb transfer latencies for the software with AFIO:
 - Average spinning rust hard drive latency: **TODO**
 - 99.999% spinning rust hard drive latency: **TODO**
@@ -38,9 +38,9 @@ Manufacturer claimed 4Kb transfer latencies for the physical hardware:
 - Average NVMe flash drive latency: **98.9us** (10,111 IOPS)
 - 99.999% NVMe flash drive latency: **3,146us** (317 IOPS)
 
-Lowest sustained 4Kb read latency benchmarked to date by author (NVMe): **992ns** (1M IOPS, 3.8Gb/sec)
+Lowest sustained 4Kb read latency benchmarked to date by author (NVMe): **992ns** (1M IOPS, 3.8Gb/sec, x4 PCIe 3.0 interface maxed out)
 </td>
-<td valign="top">
+<td valign="top" width="33%">
 75% read 25% write QD4 4Kb transfer latencies for the software with AFIO:
 - Average spinning rust hard drive latency: **TODO**
 - 99.999% spinning rust hard drive latency: **TODO**
@@ -49,7 +49,7 @@ Lowest sustained 4Kb read latency benchmarked to date by author (NVMe): **992ns*
 - Average NVMe flash drive latency: **26.9us** (37,105 IOPS)
 - 99.999% NVMe flash drive latency: **21,597us** (46 IOPS)
 
-Lowest sustained 4Kb write latency benchmarked to date by author (NVMe): **992ns** (1M IOPS, 3.8Gb/sec)
+Lowest sustained 4Kb write latency benchmarked to date by author (NVMe): **992ns** (1M IOPS, 3.8Gb/sec, x4 PCIe 3.0 interface maxed out)
 </td>
 </tr>
 </table>

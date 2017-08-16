@@ -31,11 +31,16 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
+  // We don't implement unlink on close
+  flags &= ~flag::unlink_on_close;
   result<directory_handle> ret(directory_handle(native_handle_type(), 0, 0, _caching, flags));
   native_handle_type &nativeh = ret.value()._v;
   AFIO_LOG_FUNCTION_CALL(&ret);
   nativeh.behaviour |= native_handle_type::disposition::directory;
   DWORD fileshare = FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE;
+  // Trying to truncate a directory returns EISDIR rather than some internal Win32 error code uncomparable to std::errc
+  if(_creation == creation::truncate)
+    return std::errc::is_a_directory;
   OUTCOME_TRY(access, access_mask_from_handle_mode(nativeh, _mode, flags));
   OUTCOME_TRY(attribs, attributes_from_handle_caching_and_flags(nativeh, _caching, flags));
   if(base.is_valid() || path.is_ntpath())
@@ -110,7 +115,7 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
     }
     attribs |= FILE_FLAG_BACKUP_SEMANTICS;  // required to open a directory
     path_view::c_str zpath(path, false);
-    if(INVALID_HANDLE_VALUE == (nativeh.h = CreateFileW_(zpath.buffer, access, fileshare, NULL, creation, attribs, NULL)))
+    if(INVALID_HANDLE_VALUE == (nativeh.h = CreateFileW_(zpath.buffer, access, fileshare, NULL, creation, attribs, NULL, true)))
     {
       DWORD errcode = GetLastError();
       // assert(false);
@@ -149,14 +154,14 @@ result<directory_handle> directory_handle::clone() const noexcept
   return ret;
 }
 
-result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_type &tofill, path_view_type glob, filter filtering, span<char> kernelbuffer) const noexcept
+result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_type &&tofill, path_view_type glob, filter filtering, span<char> kernelbuffer) const noexcept
 {
   static constexpr stat_t::want default_stat_contents = stat_t::want::ino | stat_t::want::type | stat_t::want::atim | stat_t::want::mtim | stat_t::want::ctim | stat_t::want::size | stat_t::want::allocated | stat_t::want::birthtim | stat_t::want::sparse | stat_t::want::compressed | stat_t::want::reparse_point;
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
   AFIO_LOG_FUNCTION_CALL(this);
   if(tofill.empty())
-    return enumerate_info{stat_t::want::none, false};
+    return enumerate_info{std::move(tofill), stat_t::want::none, false};
   UNICODE_STRING _glob;
   memset(&_glob, 0, sizeof(_glob));
   path_view_type::c_str zglob(glob, true);
@@ -203,23 +208,32 @@ result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_typ
     }
     else
     {
+      if(ntstat < 0)
+      {
+        return {(int) ntstat, ntkernel_category()};
+      }
       done = true;
     }
   } while(!done);
   size_t n = 0;
-  for(FILE_ID_FULL_DIR_INFORMATION *ffdi = buffer;; ffdi = (FILE_ID_FULL_DIR_INFORMATION *) ((size_t) ffdi + ffdi->NextEntryOffset))
+  for(FILE_ID_FULL_DIR_INFORMATION *ffdi = buffer;; ffdi = (FILE_ID_FULL_DIR_INFORMATION *) ((uintptr_t) ffdi + ffdi->NextEntryOffset))
   {
     if(!ffdi->NextEntryOffset)
     {
       // Fill is complete
       tofill._resize(n);
-      return enumerate_info{default_stat_contents, true};
+      return enumerate_info{std::move(tofill), default_stat_contents, true};
     }
     size_t length = ffdi->FileNameLength / sizeof(wchar_t);
     if(length <= 2 && '.' == ffdi->FileName[0])
     {
       if(1 == length || '.' == ffdi->FileName[1])
         continue;
+    }
+    // Try to zero terminate leafnames where possible for later efficiency
+    if((uintptr_t)(ffdi->FileName + length) + sizeof(wchar_t) <= (uintptr_t) ffdi + ffdi->NextEntryOffset)
+    {
+      ffdi->FileName[length] = 0;
     }
     directory_entry &item = tofill[n];
     item.leafname = path_view(wstring_view(ffdi->FileName, length));
@@ -241,7 +255,7 @@ result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_typ
     if(n >= tofill.size())
     {
       // Fill is incomplete
-      return enumerate_info{default_stat_contents, false};
+      return enumerate_info{std::move(tofill), default_stat_contents, false};
     }
   }
 }

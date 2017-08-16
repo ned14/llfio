@@ -306,9 +306,9 @@ public:
     auto sep_idx = _find_last_sep();
     _invoke([sep_idx](auto &v) {
       if(_npos == sep_idx)
-        v.clear();
+        v = {};
       else
-        v.remove_suffix(v.size() - sep_idx - 1);
+        v.remove_suffix(v.size() - sep_idx);
     });
   }
   //! Returns the size of the view in characters.
@@ -337,16 +337,49 @@ public:
   {
 #ifdef _WIN32
     if(!_state._utf16.empty())
-      return filesystem::path(_state._utf16.to_string());
+      return filesystem::path(std::wstring(_state._utf16.data(), _state._utf16.size()));
 #endif
     if(!_state._utf8.empty())
-      return filesystem::path(_state._utf8.to_string());
+      return filesystem::path(std::string(_state._utf8.data(), _state._utf8.size()));
     return {};
   }
 
-  constexpr int compare(const path_view &p) const noexcept;
-  constexpr int compare(string_view str) const noexcept;
-  constexpr int compare(const value_type *s) const noexcept;
+  /*! Compares the two string views via the view's `compare()` which in turn calls `traits::compare()`.
+  Be aware that on Windows a conversion from UTF-8 to UTF-16 is performed if needed.
+  */
+  constexpr int compare(const path_view &p) const noexcept
+  {
+    return _invoke([&p](const auto &v) { return -p.compare(v); });
+  }
+  //! \overload
+  constexpr int compare(const char *s) const noexcept { return compare(string_view(s)); }
+//! \overload
+#ifndef _WIN32
+  constexpr
+#endif
+  int compare(string_view str) const noexcept
+  {
+#ifdef _WIN32
+    if(!_state._utf16.empty())
+    {
+      c_str z(path_view(str), false);
+      return _state._utf16.compare(wstring_view(z.buffer, z.length));
+    }
+#endif
+    return _state._utf8.compare(str);
+  }
+#ifdef _WIN32
+  int compare(const wchar_t *s) const noexcept { return compare(wstring_view(s)); }
+  int compare(wstring_view str) const noexcept
+  {
+    if(!_state._utf16.empty())
+    {
+      return _state._utf16.compare(str);
+    }
+    c_str z(path_view(*this), false);
+    return -str.compare(wstring_view(z.buffer, z.length));
+  }
+#endif
 
   // iterator begin() const;
   // iterator end() const;
@@ -443,6 +476,34 @@ public:
   };
   friend struct c_str;
 };
+inline constexpr bool operator==(path_view x, path_view y) noexcept
+{
+  if(x.native_size() != y.native_size())
+    return false;
+  return x.compare(y) == 0;
+}
+inline constexpr bool operator!=(path_view x, path_view y) noexcept
+{
+  if(x.native_size() != y.native_size())
+    return true;
+  return x.compare(y) != 0;
+}
+inline constexpr bool operator<(path_view x, path_view y) noexcept
+{
+  return x.compare(y) < 0;
+}
+inline constexpr bool operator>(path_view x, path_view y) noexcept
+{
+  return x.compare(y) > 0;
+}
+inline constexpr bool operator<=(path_view x, path_view y) noexcept
+{
+  return x.compare(y) <= 0;
+}
+inline constexpr bool operator>=(path_view x, path_view y) noexcept
+{
+  return x.compare(y) >= 0;
+}
 
 AFIO_V2_NAMESPACE_END
 

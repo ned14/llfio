@@ -38,6 +38,7 @@ set(afio_HEADERS
   "include/afio/ntkernel-error-category/include/detail/ntkernel-table.ipp"
   "include/afio/ntkernel-error-category/include/detail/ntkernel_category_impl.ipp"
   "include/afio/v2.0/detail/impl/posix/async_file_handle.ipp"
+  "include/afio/v2.0/detail/impl/posix/directory_handle.ipp"
   "include/afio/v2.0/detail/impl/posix/file_handle.ipp"
   "include/afio/v2.0/detail/impl/posix/fs_handle.ipp"
   "include/afio/v2.0/detail/impl/posix/handle.ipp"

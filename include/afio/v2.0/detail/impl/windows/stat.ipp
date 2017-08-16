@@ -96,10 +96,19 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> stat_t::fill(const handle &h, stat
       return {(int) ntstat, ntkernel_category()};
   }
 
-  // FIXME: Implement st_dev for Windows somehow
   if(wanted & want::dev)
   {
-    st_dev = 0;
+    // This is a bit hacky, but we just need a unique device number
+    alignas(8) wchar_t buffer[32769];
+    DWORD len = GetFinalPathNameByHandle(h.native_handle().h, buffer, sizeof(buffer) / sizeof(*buffer), VOLUME_NAME_NT);
+    if(!len || len >= sizeof(buffer) / sizeof(*buffer))
+      return {GetLastError(), std::system_category()};
+    buffer[len] = 0;
+    if(memcmp(buffer, L"\\Device\\HarddiskVolume", 44))
+      return std::errc::illegal_byte_sequence;
+    // buffer should look like \Device\HarddiskVolumeX, so our number is from +22 onwards
+    st_dev = _wtoi(buffer + 22);
+    ++ret;
   }
   if(wanted & want::ino)
   {
