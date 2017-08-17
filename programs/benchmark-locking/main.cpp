@@ -41,20 +41,38 @@ Distributed under the Boost Software License, Version 1.0.
 #undef _CRT_NONSTDC_DEPRECATE
 #define _CRT_NONSTDC_DEPRECATE(a)
 #include <conio.h>  // for kbhit()
+#else
+#include <sys/ioctl.h>
+#include <termios.h>
+
+bool kbhit()
+{
+  termios term;
+  tcgetattr(0, &term);
+
+  termios term2 = term;
+  term2.c_lflag &= ~ICANON;
+  tcsetattr(0, TCSANOW, &term2);
+
+  int byteswaiting;
+  ioctl(0, FIONREAD, &byteswaiting);
+
+  tcsetattr(0, TCSANOW, &term);
+
+  return byteswaiting > 0;
+}
 #endif
 
 namespace afio = AFIO_V2_NAMESPACE;
 namespace child_process = KERNELTEST_V1_NAMESPACE::child_process;
 
-#ifdef _WIN32
-// TODO FIXME Replace with mapped_file_handle once implemented as that is portable unlike this
 static volatile size_t *shared_memory;
 static void initialise_shared_memory()
 {
-  HANDLE cfm = CreateFileMapping(INVALID_HANDLE_VALUE, nullptr, PAGE_READWRITE, 0, 8, L"benchmark_locking");
-  if(!cfm)
-    abort();
-  shared_memory = (size_t *) MapViewOfFile(cfm, FILE_MAP_WRITE, 0, 0, 0);
+  auto fh = afio::file_handle::file({}, "shared_memory", afio::file_handle::mode::write, afio::file_handle::creation::if_needed, afio::file_handle::caching::temporary).value();
+  auto sh = afio::section_handle::section(8, fh, afio::section_handle::flag::write).value();
+  auto mp = afio::map_handle::map(sh).value();
+  shared_memory = (size_t *)mp.address();
   if(!shared_memory)
     abort();
   *shared_memory = (size_t) -1;
@@ -79,17 +97,6 @@ static void child_unlocks(size_t id)
   }
   *shared_memory = (size_t) -1;
 }
-#else
-static void initialise_shared_memory()
-{
-}
-static void child_locks(size_t id)
-{
-}
-static void child_unlocks(size_t id)
-{
-}
-#endif
 
 int main(int argc, char *argv[])
 {

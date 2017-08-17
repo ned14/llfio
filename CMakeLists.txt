@@ -53,7 +53,7 @@ if(NOT MSVC OR CMAKE_VERSION VERSION_GREATER 3.59)
   )
 endif()
 # Set the library dependencies this library has
-all_link_libraries(PUBLIC quickcpplib::hl outcome::hl)
+all_link_libraries(PUBLIC quickcpplib::hl outcome::hl Threads::Threads)
 # Set the system dependencies this library has
 if(CMAKE_SYSTEM_NAME MATCHES "Linux")
   all_link_libraries(PUBLIC stdc++fs rt)
