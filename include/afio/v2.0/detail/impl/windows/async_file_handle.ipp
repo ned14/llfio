@@ -142,6 +142,12 @@ result<async_file_handle::io_state_ptr<CompletionRoutine, BuffersType>> async_fi
       ol->OffsetHigh = ol->Offset = 0xffffffff;
     else
     {
+#ifndef NDEBUG
+      if(_v.requires_aligned_io())
+      {
+        assert((offset & 511) == 0);
+      }
+#endif
       ol->Offset = offset & 0xffffffff;
       ol->OffsetHigh = (offset >> 32) & 0xffffffff;
     }
@@ -149,6 +155,13 @@ result<async_file_handle::io_state_ptr<CompletionRoutine, BuffersType>> async_fi
     ol->hEvent = (HANDLE) state;
     offset += out[n].len;
     ++state->items_to_go;
+#ifndef NDEBUG
+    if(_v.requires_aligned_io())
+    {
+      assert(((uintptr_t) out[n].data & 511) == 0);
+      assert((out[n].len & 511) == 0);
+    }
+#endif
     if(!ioroutine(_v.h, out[n].data, (DWORD) out[n].len, ol, handle_completion::Do))
     {
       --state->items_to_go;

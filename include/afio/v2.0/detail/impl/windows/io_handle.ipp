@@ -61,9 +61,22 @@ template <class BuffersType, class Syscall> inline io_handle::io_result<BuffersT
       ol.OffsetHigh = ol.Offset = 0xffffffff;
     else
     {
+#ifndef NDEBUG
+      if(nativeh.requires_aligned_io())
+      {
+        assert((reqs.offset & 511) == 0);
+      }
+#endif
       ol.OffsetHigh = (reqs.offset >> 32) & 0xffffffff;
       ol.Offset = reqs.offset & 0xffffffff;
     }
+#ifndef NDEBUG
+    if(nativeh.requires_aligned_io())
+    {
+      assert(((uintptr_t) req.data & 511) == 0);
+      assert((req.len & 511) == 0);
+    }
+#endif
     if(!syscall(nativeh.h, req.data, (DWORD) req.len, &transferred, &ol) && ERROR_IO_PENDING != GetLastError())
       return {GetLastError(), std::system_category()};
     reqs.offset += req.len;

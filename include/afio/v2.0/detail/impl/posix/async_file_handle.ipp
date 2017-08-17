@@ -183,6 +183,14 @@ result<async_file_handle::io_state_ptr<CompletionRoutine, BuffersType>> async_fi
   for(size_t n = 0; n < items; n++)
   {
 #if AFIO_USE_POSIX_AIO
+#ifndef NDEBUG
+    if(_v.requires_aligned_io())
+    {
+      assert((offset & 511) == 0);
+      assert(((uintptr_t) out[n].data & 511) == 0);
+      assert((out[n].len & 511) == 0);
+    }
+#endif
     struct aiocb *aiocb = state->aiocbs + n;
     aiocb->aio_fildes = _v.fd;
     aiocb->aio_offset = offset;

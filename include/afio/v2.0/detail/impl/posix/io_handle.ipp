@@ -52,6 +52,17 @@ io_handle::io_result<io_handle::buffers_type> io_handle::read(io_handle::io_requ
   static_assert(sizeof(buffer_type) == sizeof(iovec), "buffer_type and struct iovec do not match");
   struct iovec *iov = (struct iovec *) reqs.buffers.data();
 #endif
+#ifndef NDEBUG
+  if(_v.requires_aligned_io())
+  {
+    assert((reqs.offset & 511) == 0);
+    for(size_t n = 0; n < reqs.buffers.size(); n++)
+    {
+      assert(((uintptr_t) iov[n].iov_base & 511) == 0);
+      assert((iov[n].iov_len & 511) == 0);
+    }
+  }
+#endif
   ssize_t bytesread = ::preadv(_v.fd, iov, reqs.buffers.size(), reqs.offset);
   if(bytesread < 0)
     return {errno, std::system_category()};
@@ -87,6 +98,17 @@ io_handle::io_result<io_handle::const_buffers_type> io_handle::write(io_handle::
 #else
   static_assert(sizeof(buffer_type) == sizeof(iovec), "buffer_type and struct iovec do not match");
   struct iovec *iov = (struct iovec *) reqs.buffers.data();
+#endif
+#ifndef NDEBUG
+  if(_v.requires_aligned_io())
+  {
+    assert((reqs.offset & 511) == 0);
+    for(size_t n = 0; n < reqs.buffers.size(); n++)
+    {
+      assert(((uintptr_t) iov[n].iov_base & 511) == 0);
+      assert((iov[n].iov_len & 511) == 0);
+    }
+  }
 #endif
   ssize_t byteswritten = ::pwritev(_v.fd, iov, reqs.buffers.size(), reqs.offset);
   if(byteswritten < 0)

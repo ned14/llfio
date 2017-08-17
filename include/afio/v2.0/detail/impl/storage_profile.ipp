@@ -721,7 +721,7 @@ namespace storage_profile
             file_handle::const_buffer_type _reqs[1] = {{buffer, 4096}};
             file_handle::io_request<file_handle::const_buffers_type> reqs(_reqs, 0);
             QUICKCPPLIB_NAMESPACE::algorithm::small_prng::small_prng rand(no);
-            auto maxsize = h.length().value() - 4095;
+            auto maxsize = h.length().value();
             --done;
             while(done)
               std::this_thread::yield();
@@ -730,7 +730,7 @@ namespace storage_profile
               auto begin = std::chrono::high_resolution_clock::now();
               // for(size_t n = 0; n < 16; n++)
               {
-                reqs.offset = (rand() * 4096) % maxsize;
+                reqs.offset = (rand() % maxsize) & ~4095ULL;
                 h.write(reqs).value();
               }
               auto end = std::chrono::high_resolution_clock::now();
@@ -752,7 +752,7 @@ namespace storage_profile
             file_handle::buffer_type _reqs[1] = {{buffer, 4096}};
             file_handle::io_request<file_handle::buffers_type> reqs(_reqs, 0);
             QUICKCPPLIB_NAMESPACE::algorithm::small_prng::small_prng rand(no);
-            auto maxsize = h.length().value() - 4095;
+            auto maxsize = h.length().value();
             --done;
             while(done)
               std::this_thread::yield();
@@ -761,7 +761,7 @@ namespace storage_profile
               auto begin = std::chrono::high_resolution_clock::now();
               // for(size_t n = 0; n < 16; n++)
               {
-                reqs.offset = (rand() * 4096) % maxsize;
+                reqs.offset = (rand() % maxsize) & ~4095ULL;
                 h.read(reqs).value();
               }
               auto end = std::chrono::high_resolution_clock::now();
