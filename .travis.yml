@@ -31,6 +31,7 @@ addons:
 env:
  - __="cmake tests" NAME=TravisLinuxWorker
  - __="Documentation" NAME=TravisDocumentation
+ - __="Programs"
  
 matrix:
   exclude:
@@ -89,6 +90,16 @@ script:
      git commit -a -m "Travis CI updates documentation" || true;
      git push -f https://jenkins-nedprod:$JENKINS_NEDPROD_PASSWORD@github.com/ned14/boost.afio gh-pages;
      cd ../..;
+   fi
+ -
+   if [ "$__" = "Programs" ]; then
+     if [ "$CXX" = "g++" ]; then export CXX=g++-7; export NAME=TravisLinuxWorkerGCC; fi;
+     if [ "$CXX" = "clang++" ]; then export CXX=clang++-4.0; export NAME=TravisLinuxWorkerClang; fi;
+     cd programs;
+     mkdir build;
+     cd build;
+     cmake ..;
+     cmake --build .;
    fi
  
 after_success:

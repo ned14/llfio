@@ -14,7 +14,15 @@ endif()
 
 function(make_program program)
   add_executable(${program} "${program}/main.cpp")
-  target_include_directories(${program} PRIVATE ..)
+  # Hack for sibling config
+  if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../../.quickcpplib_use_siblings")
+    target_include_directories(${program} PRIVATE "../..")
+    target_include_directories(${program} PRIVATE "../../.quickcpplib_use_siblings")
+    target_include_directories(${program} PRIVATE "../../.quickcpplib_use_siblings/a")
+    target_include_directories(${program} PRIVATE "../../.quickcpplib_use_siblings/a/a")
+  else()
+    target_include_directories(${program} PRIVATE "test")
+  endif()
   if(WIN32)
     target_compile_definitions(${program} PRIVATE _UNICODE UNICODE)
     # cmake's support for LLVM clang is shocking :(
