@@ -90,11 +90,11 @@ int main(int argc, char *argv[])
     file_handle::io_request<file_handle::const_buffers_type> reqs(_reqs, 0);
     RETCHECK(testfile.write(reqs));
   };
-  if (std::regex_match("latency:read:qd16", torun) || std::regex_match("latency:write:qd16", torun) || std::regex_match("latency:readwrite:qd4", torun))
+  if(std::regex_match("latency:read:qd16", torun) || std::regex_match("latency:write:qd16", torun) || std::regex_match("latency:readwrite:qd4", torun))
   {
     std::cout << "Writing 17Gb of temporary test files, this will take a while ..." << std::endl;
     make_testfile("test");
-    for (size_t n = 0; n < 16; n++)
+    for(size_t n = 0; n < 16; n++)
       make_testfile(std::to_string(n));
   }
   else
@@ -153,7 +153,7 @@ int main(int argc, char *argv[])
             test.invoke([](auto &i) { std::cout << "   " << i.name << " = " << i.value << std::endl; });
           }
           else
-            std::cerr << "   ERROR running test '" << test.name << "': " << result.error().message() << std::endl;
+            std::cerr << "   ERROR running test '" << test.name << "': " << print(result) << std::endl;
         }
       }
       // Write out results for this combination of flags
