@@ -385,13 +385,19 @@ namespace storage_profile
           done = true;
           for(auto &writer : writers)
           {
-            writer.second.get();
             writer.first.join();
           }
           for(auto &reader : readers)
           {
-            reader.second.get();
             reader.first.join();
+          }
+          for(auto &writer : writers)
+          {
+            writer.second.get();
+          }
+          for(auto &reader : readers)
+          {
+            reader.second.get();
           }
           sp.atomic_rewrite_quantum.value = atomic_rewrite_quantum;
           if(!failed)
@@ -493,13 +499,19 @@ namespace storage_profile
             done = true;
             for(auto &writer : writers)
             {
-              writer.second.get();
               writer.first.join();
             }
             for(auto &reader : readers)
             {
-              reader.second.get();
               reader.first.join();
+            }
+            for(auto &writer : writers)
+            {
+              writer.second.get();
+            }
+            for(auto &reader : readers)
+            {
+              reader.second.get();
             }
             sp.max_aligned_atomic_rewrite.value = max_aligned_atomic_rewrite;
             if(failed)
@@ -615,13 +627,19 @@ namespace storage_profile
               done = true;
               for(auto &writer : writers)
               {
-                writer.second.get();
                 writer.first.join();
               }
               for(auto &reader : readers)
               {
-                reader.second.get();
                 reader.first.join();
+              }
+              for(auto &writer : writers)
+              {
+                writer.second.get();
+              }
+              for(auto &reader : readers)
+              {
+                reader.second.get();
               }
               sp.atomic_rewrite_offset_boundary.value = atomic_rewrite_offset_boundary;
               if(failed)
@@ -756,13 +774,19 @@ namespace storage_profile
         done = true;
         for(auto &writer : writers)
         {
-          writer.second.get();
           writer.first.join();
         }
         for(auto &reader : readers)
         {
-          reader.second.get();
           reader.first.join();
+        }
+        for(auto &writer : writers)
+        {
+          writer.second.get();
+        }
+        for(auto &reader : readers)
+        {
+          reader.second.get();
         }
 
 #if 0  // ndef NDEBUG
