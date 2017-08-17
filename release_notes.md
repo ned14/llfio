@@ -35,10 +35,10 @@ Manufacturer claimed 4Kb transfer latencies for the physical hardware:
 - 99.999% spinning rust hard drive latency: **TODO**
 - Average SATA flash drive latency: **TODO**
 - 99.999% SATA flash drive latency: **TODO**
-- Average NVMe flash drive latency: **351us** (2,849 IOPS)
+- Average NVMe flash drive latency: **362us** (2,762 IOPS)
 - 99.999% NVMe flash drive latency: **35,378us** (28 IOPS)
 
-Lowest sustained 4Kb read latency benchmarked to date by author (page cache): **2us** (500,000 IOPS, approx 1.9Gb/sec)
+Lowest sustained 4Kb read latency benchmarked to date by author (page cache): **7us** (142k IOPS @ QD1, approx 558Mb/sec)
 </td>
 <td valign="top" width="33%">
 75% read 25% write QD4 4Kb transfer latencies for the software with AFIO:
@@ -46,10 +46,10 @@ Lowest sustained 4Kb read latency benchmarked to date by author (page cache): **
 - 99.999% spinning rust hard drive latency: **TODO**
 - Average SATA flash drive latency: **TODO**
 - 99.999% SATA flash drive latency: **TODO**
-- Average NVMe flash drive latency: **221us** (4,525 IOPS)
+- Average NVMe flash drive latency: **232us** (4,310 IOPS)
 - 99.999% NVMe flash drive latency: **11,952us** (83 IOPS)
 
-Lowest sustained 4Kb write latency benchmarked to date by author (page cache): **2us** (500,000 IOPS, approx 1.9Gb/sec)
+Lowest sustained 4Kb write latency benchmarked to date by author (page cache): **7us** (142k IOPS @ QD1, approx 558Mb/sec)
 </td>
 </tr>
 </table>
