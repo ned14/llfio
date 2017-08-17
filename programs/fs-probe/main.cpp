@@ -183,7 +183,10 @@ int main(int argc, char *argv[])
     }
   };
   delete_testfile("test");
-  for(size_t n = 0; n < 16; n++)
-    delete_testfile(std::to_string(n));
+  if(std::regex_match("latency:read:qd16", torun) || std::regex_match("latency:write:qd16", torun) || std::regex_match("latency:readwrite:qd4", torun))
+  {
+    for(size_t n = 0; n < 16; n++)
+      delete_testfile(std::to_string(n));
+  }
   return 0;
 }

@@ -302,7 +302,15 @@ namespace storage_profile
         using off_t = io_service::extent_type;
         sp.max_aligned_atomic_rewrite.value = 1;
         sp.atomic_rewrite_quantum.value = (off_t) -1;
-        for(size_t size = srch.requires_aligned_io() ? 512 : 64; size <= 1 * 1024 * 1024 && size < sp.atomic_rewrite_quantum.value; size = size * 2)
+        size_t size = srch.requires_aligned_io() ?
+#ifdef _WIN32
+                      4096
+#else
+                      512
+#endif
+                      :
+                      64;
+        for(; size <= 1 * 1024 * 1024 && size < sp.atomic_rewrite_quantum.value; size = size * 2)
         {
           // Create two concurrent writer threads and as many reader threads as additional CPU cores
           std::vector<std::pair<std::thread, std::future<void>>> writers, readers;
@@ -314,7 +322,7 @@ namespace storage_profile
               if(!_h)
                 throw std::runtime_error("concurrency::atomic_rewrite_quantum: Could not open work file due to " + _h.error().message());
               file_handle h(std::move(_h.value()));
-              std::vector<char> buffer(size, no);
+              std::vector<char, utils::page_allocator<char>> buffer(size, no);
               file_handle::const_buffer_type _reqs[1] = {{buffer.data(), size}};
               file_handle::io_request<file_handle::const_buffers_type> reqs(_reqs, 0);
               --done;
@@ -342,7 +350,7 @@ namespace storage_profile
               if(!_h)
                 throw std::runtime_error("concurrency::atomic_rewrite_quantum: Could not open work file due to " + _h.error().message());
               file_handle h(std::move(_h.value()));
-              std::vector<char> buffer(size, 0), tocmp(size, 0);
+              std::vector<char, utils::page_allocator<char>> buffer(size, 0), tocmp(size, 0);
               file_handle::buffer_type _reqs[1] = {{buffer.data(), size}};
               file_handle::io_request<file_handle::buffers_type> reqs(_reqs, 0);
               while(!done)
@@ -428,7 +436,7 @@ namespace storage_profile
                 if(!_h)
                   throw std::runtime_error("concurrency::atomic_rewrite_quantum: Could not open work file due to " + _h.error().message());
                 file_handle h(std::move(_h.value()));
-                std::vector<char> buffer(size, no);
+                std::vector<char, utils::page_allocator<char>> buffer(size, no);
                 file_handle::const_buffer_type _reqs[1] = {{buffer.data(), size}};
                 file_handle::io_request<file_handle::const_buffers_type> reqs(_reqs, offset);
                 --done;
@@ -456,7 +464,7 @@ namespace storage_profile
                 if(!_h)
                   throw std::runtime_error("concurrency::atomic_rewrite_quantum: Could not open work file due to " + _h.error().message());
                 file_handle h(std::move(_h.value()));
-                std::vector<char> buffer(size, 0), tocmp(size, 0);
+                std::vector<char, utils::page_allocator<char>> buffer(size, 0), tocmp(size, 0);
                 file_handle::buffer_type _reqs[1] = {{buffer.data(), size}};
                 file_handle::io_request<file_handle::buffers_type> reqs(_reqs, offset);
                 while(!done)
@@ -530,6 +538,10 @@ namespace storage_profile
     {
       if(sp.atomic_rewrite_offset_boundary.value != (io_service::extent_type) -1)
         return success();
+#ifdef _WIN32  // The 4Kb min i/o makes this test take too long
+      if(srch.requires_aligned_io())
+        return success();
+#endif
       try
       {
         using off_t = io_service::extent_type;
@@ -556,7 +568,7 @@ namespace storage_profile
                   if(!_h)
                     throw std::runtime_error("concurrency::atomic_rewrite_offset_boundary: Could not open work file due to " + _h.error().message());
                   file_handle h(std::move(_h.value()));
-                  std::vector<char> buffer(size, no);
+                  std::vector<char, utils::page_allocator<char>> buffer(size, no);
                   file_handle::const_buffer_type _reqs[1] = {{buffer.data(), size}};
                   file_handle::io_request<file_handle::const_buffers_type> reqs(_reqs, offset);
                   --done;
@@ -584,7 +596,7 @@ namespace storage_profile
                   if(!_h)
                     throw std::runtime_error("concurrency::atomic_rewrite_offset_boundary: Could not open work file due to " + _h.error().message());
                   file_handle h(std::move(_h.value()));
-                  std::vector<char> buffer(size, 0), tocmp(size, 0);
+                  std::vector<char, utils::page_allocator<char>> buffer(size, 0), tocmp(size, 0);
                   file_handle::buffer_type _reqs[1] = {{buffer.data(), size}};
                   file_handle::io_request<file_handle::buffers_type> reqs(_reqs, offset);
                   while(!done)
@@ -677,7 +689,7 @@ namespace storage_profile
         path_handle base = srch.parent_path_handle().value();
         if(ownfiles)
         {
-          std::vector<char> buffer(1024 * 1024 * 1024);
+          std::vector<char, utils::page_allocator<char>> buffer(1024 * 1024 * 1024);
           for(size_t n = 0; n < noreaders + nowriters; n++)
           {
             auto fh = file_handle::file(base, std::to_string(n), file_handle::mode::write, file_handle::creation::open_existing, srch.kernel_caching(), srch.flags());
