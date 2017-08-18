@@ -130,24 +130,16 @@ $(document).ready(function(){initNavTree('index.html','');});
 <li><code>memcpy(4Kb)</code> latency: <b>5us</b> (main memory) to <b>1.3us</b> (L3 cache)</li>
 <li>RTT PCIe latency: <b>0.5us</b>  </li>
 </ul>
-</td><td valign="top" width="33%"><p class="starttd">100% read QD1 4Kb transfer latencies for the software with AFIO:</p>
+</td><td valign="top" width="33%"><p class="starttd">100% read QD1 4Kb direct transfer latencies for the software with AFIO:</p>
 <ul>
-<li>Average spinning rust hard drive latency: <b>TODO</b></li>
-<li>99.999% spinning rust hard drive latency: <b>TODO</b></li>
-<li>Average SATA flash drive latency: <b>TODO</b></li>
-<li>99.999% SATA flash drive latency: <b>TODO</b></li>
-<li>Average NVMe flash drive latency: <b>362us</b> (2,762 IOPS)</li>
-<li>99.999% NVMe flash drive latency: <b>35,378us</b> (28 IOPS)</li>
+<li>&lt; 99% spinning rust hard drive latency: <b>TODO</b></li>
+<li>&lt; 99% SATA flash drive latency: Windows <b>290us</b> Linux <b>158us</b></li>
 </ul>
 <p class="endtd">Lowest sustained 4Kb read latency benchmarked to date by author (page cache): <b>7us</b> (142k IOPS @ QD1, approx 558Mb/sec)  </p>
-</td><td valign="top" width="33%"><p class="starttd">75% read 25% write QD4 4Kb transfer latencies for the software with AFIO:</p>
+</td><td valign="top" width="33%"><p class="starttd">75% read 25% write QD4 4Kb direct transfer latencies for the software with AFIO:</p>
 <ul>
-<li>Average spinning rust hard drive latency: <b>TODO</b></li>
-<li>99.999% spinning rust hard drive latency: <b>TODO</b></li>
-<li>Average SATA flash drive latency: <b>TODO</b></li>
-<li>99.999% SATA flash drive latency: <b>TODO</b></li>
-<li>Average NVMe flash drive latency: <b>232us</b> (4,310 IOPS)</li>
-<li>99.999% NVMe flash drive latency: <b>11,952us</b> (83 IOPS)</li>
+<li>&lt; 99% spinning rust hard drive latency: <b>TODO</b></li>
+<li>&lt; 99% SATA flash drive latency: Windows <b>1,812us</b> Linux <b>1,416us</b></li>
 </ul>
 <p class="endtd">Lowest sustained 4Kb write latency benchmarked to date by author (page cache): <b>7us</b> (142k IOPS @ QD1, approx 558Mb/sec)   </p>
 </td></tr>
