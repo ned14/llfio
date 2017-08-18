@@ -240,6 +240,12 @@ QUICKCPPLIB_NAMESPACE::ringbuffer_log::simple_ringbuffer_log<br class="typebreak
 <tr class="memitem:a4968bb2d647535f4b91427c66ff8b9e4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classafio__v2__xxx_1_1path__view.html">path_view</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx.html#a4968bb2d647535f4b91427c66ff8b9e4">temporary_files_directory</a> () noexcept</td></tr>
 <tr class="memdesc:a4968bb2d647535f4b91427c66ff8b9e4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a path to a directory reported by the operating system to be suitable for storing temporary files. As operating systems are known to sometimes lie about the validity of this path, each of the available temporary file path options reported by the OS are probed by trying to create a file in each until success is found. If none of the available options are writable, some valid path containing the string "no_temporary_directories_accessible" will be returned which should cause all operations using that path to fail with a usefully user visible error message.  <a href="#a4968bb2d647535f4b91427c66ff8b9e4">More...</a><br/></td></tr>
 <tr class="separator:a4968bb2d647535f4b91427c66ff8b9e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2cbad389de45a9893ef02eeec86dcd21"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2cbad389de45a9893ef02eeec86dcd21"></a>
+std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator&lt;&lt;</b> (std::ostream &amp;s, const <a class="el" href="classafio__v2__xxx_1_1directory__handle.html#a47ed88b4de271daa08862b273c2f609e">directory_handle::filter</a> &amp;v)</td></tr>
+<tr class="separator:a2cbad389de45a9893ef02eeec86dcd21"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adc0cc191e052bf33253287e0d1baeb4c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="adc0cc191e052bf33253287e0d1baeb4c"></a>
+std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator&lt;&lt;</b> (std::ostream &amp;s, const <a class="el" href="structafio__v2__xxx_1_1directory__handle_1_1enumerate__info.html">directory_handle::enumerate_info</a> &amp;)</td></tr>
+<tr class="separator:adc0cc191e052bf33253287e0d1baeb4c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3ece430e8478fc6909cd7ec2fc0082b3"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3ece430e8478fc6909cd7ec2fc0082b3"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx.html#a3ece430e8478fc6909cd7ec2fc0082b3">swap</a> (<a class="el" href="classafio__v2__xxx_1_1directory__handle.html">directory_handle</a> &amp;self, <a class="el" href="classafio__v2__xxx_1_1directory__handle.html">directory_handle</a> &amp;o) noexcept</td></tr>
 <tr class="memdesc:a3ece430e8478fc6909cd7ec2fc0082b3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Swap with another instance. <br/></td></tr>
@@ -389,6 +395,9 @@ constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><b>operator&lt
 <tr class="memitem:a9ee3e4f703705a13a9465b6ec39203be"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9ee3e4f703705a13a9465b6ec39203be"></a>
 constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><b>operator&gt;=</b> (<a class="el" href="classafio__v2__xxx_1_1path__view.html">path_view</a> x, <a class="el" href="classafio__v2__xxx_1_1path__view.html">path_view</a> y) noexcept</td></tr>
 <tr class="separator:a9ee3e4f703705a13a9465b6ec39203be"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a10b83cf245b2a1779d2016cb3cd69bdb"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a10b83cf245b2a1779d2016cb3cd69bdb"></a>
+std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator&lt;&lt;</b> (std::ostream &amp;s, const <a class="el" href="classafio__v2__xxx_1_1path__view.html">path_view</a> &amp;v)</td></tr>
+<tr class="separator:a10b83cf245b2a1779d2016cb3cd69bdb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>The AFIO namespace. </p>
@@ -887,10 +896,10 @@ For portability, you can only assume that barriers write order for a single hand
 </div><div class="memdoc">
 <p>Create a handle opening access to a directory on path.</p>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX open() or CreateFile() can return. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;{</div>
-<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespaceafio__v2__xxx.html#affce2389376e27ffa0565890034d209f">directory_handle::directory</a>(std::forward&lt;decltype(base)&gt;(base), std::forward&lt;decltype(_path)&gt;(_path), std::forward&lt;decltype(_mode)&gt;(_mode), std::forward&lt;decltype(_creation)&gt;(_creation), std::forward&lt;decltype(_caching)&gt;(_caching), std::forward&lt;decltype(flags)&gt;(flags));</div>
-<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;}</div>
-<div class="ttc" id="namespaceafio__v2__xxx_html_affce2389376e27ffa0565890034d209f"><div class="ttname"><a href="namespaceafio__v2__xxx.html#affce2389376e27ffa0565890034d209f">afio_v2_xxx::directory</a></div><div class="ttdeci">result&lt; directory_handle &gt; directory(const path_handle &amp;base, directory_handle::path_view_type _path, directory_handle::mode _mode=directory_handle::mode::read, directory_handle::creation _creation=directory_handle::creation::open_existing, directory_handle::caching _caching=directory_handle::caching::all, directory_handle::flag flags=directory_handle::flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> directory_handle.hpp:245</div></div>
+<div class="fragment"><div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;{</div>
+<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespaceafio__v2__xxx.html#affce2389376e27ffa0565890034d209f">directory_handle::directory</a>(std::forward&lt;decltype(base)&gt;(base), std::forward&lt;decltype(_path)&gt;(_path), std::forward&lt;decltype(_mode)&gt;(_mode), std::forward&lt;decltype(_creation)&gt;(_creation), std::forward&lt;decltype(_caching)&gt;(_caching), std::forward&lt;decltype(flags)&gt;(flags));</div>
+<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;}</div>
+<div class="ttc" id="namespaceafio__v2__xxx_html_affce2389376e27ffa0565890034d209f"><div class="ttname"><a href="namespaceafio__v2__xxx.html#affce2389376e27ffa0565890034d209f">afio_v2_xxx::directory</a></div><div class="ttdeci">result&lt; directory_handle &gt; directory(const path_handle &amp;base, directory_handle::path_view_type _path, directory_handle::mode _mode=directory_handle::mode::read, directory_handle::creation _creation=directory_handle::creation::open_existing, directory_handle::caching _caching=directory_handle::caching::all, directory_handle::flag flags=directory_handle::flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> directory_handle.hpp:266</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -957,9 +966,9 @@ For portability, you can only assume that barriers write order for a single hand
 </dl>
 <dl class="section user"><dt>Errors returnable</dt><dd>todo </dd></dl>
 <dl class="section user"><dt>Memory Allocations</dt><dd>If the <code>kernelbuffer</code> parameter is set on entry, no memory allocations. If unset, at least one memory allocation, possibly more is performed. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;{</div>
-<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.enumerate(std::forward&lt;decltype(tofill)&gt;(tofill), std::forward&lt;decltype(glob)&gt;(glob), std::forward&lt;decltype(filtering)&gt;(filtering), std::forward&lt;decltype(kernelbuffer)&gt;(kernelbuffer));</div>
-<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;}</div>
+<div class="fragment"><div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;{</div>
+<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.enumerate(std::forward&lt;decltype(tofill)&gt;(tofill), std::forward&lt;decltype(glob)&gt;(glob), std::forward&lt;decltype(filtering)&gt;(filtering), std::forward&lt;decltype(kernelbuffer)&gt;(kernelbuffer));</div>
+<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1280,10 +1289,10 @@ For portability, you can only assume that barriers write order for a single hand
 </div><div class="memdoc">
 <p>Create a directory handle creating a randomly named file on a path. The file is opened exclusively with <code>creation::only_if_not_exist</code> so it will never collide with nor overwrite any existing entry.</p>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX open() or CreateFile() can return. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;{</div>
-<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespaceafio__v2__xxx.html#a26a149bed05acb7e27596e84f16cd0bd">directory_handle::random_directory</a>(std::forward&lt;decltype(dirpath)&gt;(dirpath), std::forward&lt;decltype(_mode)&gt;(_mode), std::forward&lt;decltype(_caching)&gt;(_caching), std::forward&lt;decltype(flags)&gt;(flags));</div>
-<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;}</div>
-<div class="ttc" id="namespaceafio__v2__xxx_html_a26a149bed05acb7e27596e84f16cd0bd"><div class="ttname"><a href="namespaceafio__v2__xxx.html#a26a149bed05acb7e27596e84f16cd0bd">afio_v2_xxx::random_directory</a></div><div class="ttdeci">result&lt; directory_handle &gt; random_directory(const path_handle &amp;dirpath, directory_handle::mode _mode=directory_handle::mode::write, directory_handle::caching _caching=directory_handle::caching::temporary, directory_handle::flag flags=directory_handle::flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> directory_handle.hpp:256</div></div>
+<div class="fragment"><div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;{</div>
+<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespaceafio__v2__xxx.html#a26a149bed05acb7e27596e84f16cd0bd">directory_handle::random_directory</a>(std::forward&lt;decltype(dirpath)&gt;(dirpath), std::forward&lt;decltype(_mode)&gt;(_mode), std::forward&lt;decltype(_caching)&gt;(_caching), std::forward&lt;decltype(flags)&gt;(flags));</div>
+<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;}</div>
+<div class="ttc" id="namespaceafio__v2__xxx_html_a26a149bed05acb7e27596e84f16cd0bd"><div class="ttname"><a href="namespaceafio__v2__xxx.html#a26a149bed05acb7e27596e84f16cd0bd">afio_v2_xxx::random_directory</a></div><div class="ttdeci">result&lt; directory_handle &gt; random_directory(const path_handle &amp;dirpath, directory_handle::mode _mode=directory_handle::mode::write, directory_handle::caching _caching=directory_handle::caching::temporary, directory_handle::flag flags=directory_handle::flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> directory_handle.hpp:277</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1701,10 +1710,10 @@ For portability, you can only assume that barriers write order for a single hand
 </div><div class="memdoc">
 <p>Create a directory handle creating the named directory on some path which the OS declares to be suitable for temporary files. Note also that an empty name is equivalent to calling <code>random_file(temporary_files_directory())</code> and the creation parameter is ignored.</p>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX open() or CreateFile() can return. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;{</div>
-<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespaceafio__v2__xxx.html#ac095df054e29fb086f9e7b96274c3c67">directory_handle::temp_directory</a>(std::forward&lt;decltype(name)&gt;(name), std::forward&lt;decltype(_mode)&gt;(_mode), std::forward&lt;decltype(_creation)&gt;(_creation), std::forward&lt;decltype(_caching)&gt;(_caching), std::forward&lt;decltype(flags)&gt;(flags));</div>
-<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;}</div>
-<div class="ttc" id="namespaceafio__v2__xxx_html_ac095df054e29fb086f9e7b96274c3c67"><div class="ttname"><a href="namespaceafio__v2__xxx.html#ac095df054e29fb086f9e7b96274c3c67">afio_v2_xxx::temp_directory</a></div><div class="ttdeci">result&lt; directory_handle &gt; temp_directory(directory_handle::path_view_type name=directory_handle::path_view_type(), directory_handle::mode _mode=directory_handle::mode::write, directory_handle::creation _creation=directory_handle::creation::if_needed, directory_handle::caching _caching=directory_handle::caching::all, directory_handle::flag flags=directory_handle::flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> directory_handle.hpp:268</div></div>
+<div class="fragment"><div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;{</div>
+<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespaceafio__v2__xxx.html#ac095df054e29fb086f9e7b96274c3c67">directory_handle::temp_directory</a>(std::forward&lt;decltype(name)&gt;(name), std::forward&lt;decltype(_mode)&gt;(_mode), std::forward&lt;decltype(_creation)&gt;(_creation), std::forward&lt;decltype(_caching)&gt;(_caching), std::forward&lt;decltype(flags)&gt;(flags));</div>
+<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;}</div>
+<div class="ttc" id="namespaceafio__v2__xxx_html_ac095df054e29fb086f9e7b96274c3c67"><div class="ttname"><a href="namespaceafio__v2__xxx.html#ac095df054e29fb086f9e7b96274c3c67">afio_v2_xxx::temp_directory</a></div><div class="ttdeci">result&lt; directory_handle &gt; temp_directory(directory_handle::path_view_type name=directory_handle::path_view_type(), directory_handle::mode _mode=directory_handle::mode::write, directory_handle::creation _creation=directory_handle::creation::if_needed, directory_handle::caching _caching=directory_handle::caching::all, directory_handle::flag flags=directory_handle::flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> directory_handle.hpp:289</div></div>
 </div><!-- fragment -->
 </div>
 </div>
