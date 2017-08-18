@@ -266,62 +266,62 @@ result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_typ
   size_t n = 0;
   for(dirent *dent = buffer;; dent = (dirent *) ((uintptr_t) dent + dent->d_reclen))
   {
-    if((bytes -= dent->d_reclen) <= 0)
+    if (dent->d_ino)
+    {
+      size_t length = strchr(dent->d_name, 0) - dent->d_name;
+      if (length <= 2 && '.' == dent->d_name[0])
+      {
+        if (1 == length || '.' == dent->d_name[1])
+        {
+          goto cont;
+        }
+      }
+      if (!glob.empty() && fnmatch(zglob.buffer, dent->d_name, 0)!=0)
+      {
+        goto cont;
+      }
+      directory_entry &item = tofill[n];
+      item.leafname = path_view(dent->d_name, length);
+      item.stat = stat_t(nullptr);
+      item.stat.st_ino = dent->d_ino;
+      char d_type = dent->d_type;
+      switch (d_type)
+      {
+      case DT_BLK:
+        item.stat.st_type = filesystem::file_type::block;
+        break;
+      case DT_CHR:
+        item.stat.st_type = filesystem::file_type::character;
+        break;
+      case DT_DIR:
+        item.stat.st_type = filesystem::file_type::directory;
+        break;
+      case DT_FIFO:
+        item.stat.st_type = filesystem::file_type::fifo;
+        break;
+      case DT_LNK:
+        item.stat.st_type = filesystem::file_type::symlink;
+        break;
+      case DT_REG:
+        item.stat.st_type = filesystem::file_type::regular;
+        break;
+      case DT_SOCK:
+        item.stat.st_type = filesystem::file_type::socket;
+        break;
+      default:
+        // Don't say we return type
+        default_stat_contents = default_stat_contents & ~stat_t::want::type;
+        break;
+      }
+      n++;
+    }
+    cont:
+    if ((bytes -= dent->d_reclen) <= 0)
     {
       // Fill is complete
       tofill._resize(n);
-      return enumerate_info{std::move(tofill), default_stat_contents, true};
+      return enumerate_info{ std::move(tofill), default_stat_contents, true };
     }
-    if(!dent->d_ino)
-    {
-      continue;
-    }
-    size_t length = strchr(dent->d_name, 0) - dent->d_name;
-    if(length <= 2 && '.' == dent->d_name[0])
-    {
-      if(1 == length || '.' == dent->d_name[1])
-      {
-        continue;
-      }
-    }
-    if(!glob.empty() && fnmatch(zglob.buffer, dent->d_name, 0))
-    {
-      continue;
-    }
-    directory_entry &item = tofill[n];
-    item.leafname = path_view(dent->d_name, length);
-    item.stat = stat_t(nullptr);
-    item.stat.st_ino = dent->d_ino;
-    char d_type = dent->d_type;
-    switch(d_type)
-    {
-    case DT_BLK:
-      item.stat.st_type = filesystem::file_type::block;
-      break;
-    case DT_CHR:
-      item.stat.st_type = filesystem::file_type::character;
-      break;
-    case DT_DIR:
-      item.stat.st_type = filesystem::file_type::directory;
-      break;
-    case DT_FIFO:
-      item.stat.st_type = filesystem::file_type::fifo;
-      break;
-    case DT_LNK:
-      item.stat.st_type = filesystem::file_type::symlink;
-      break;
-    case DT_REG:
-      item.stat.st_type = filesystem::file_type::regular;
-      break;
-    case DT_SOCK:
-      item.stat.st_type = filesystem::file_type::socket;
-      break;
-    default:
-      // Don't say we return type
-      default_stat_contents = default_stat_contents & ~stat_t::want::type;
-      break;
-    }
-    n++;
     if(n >= tofill.size())
     {
       // Fill is incomplete

@@ -504,6 +504,10 @@ inline constexpr bool operator>=(path_view x, path_view y) noexcept
 {
   return x.compare(y) >= 0;
 }
+inline std::ostream &operator<<(std::ostream &s, const path_view &v)
+{
+  return s << v.path();
+}
 
 AFIO_V2_NAMESPACE_END
 

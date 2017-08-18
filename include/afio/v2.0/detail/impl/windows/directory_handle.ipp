@@ -168,7 +168,7 @@ result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_typ
   if(!glob.empty())
   {
     _glob.Buffer = const_cast<wchar_t *>(zglob.buffer);
-    _glob.Length = zglob.length;
+    _glob.Length = zglob.length * sizeof(wchar_t);
     _glob.MaximumLength = _glob.Length + sizeof(wchar_t);
   }
   if(!tofill._kernel_buffer && kernelbuffer.empty())
@@ -218,12 +218,6 @@ result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_typ
   size_t n = 0;
   for(FILE_ID_FULL_DIR_INFORMATION *ffdi = buffer;; ffdi = (FILE_ID_FULL_DIR_INFORMATION *) ((uintptr_t) ffdi + ffdi->NextEntryOffset))
   {
-    if(!ffdi->NextEntryOffset)
-    {
-      // Fill is complete
-      tofill._resize(n);
-      return enumerate_info{std::move(tofill), default_stat_contents, true};
-    }
     size_t length = ffdi->FileNameLength / sizeof(wchar_t);
     if(length <= 2 && '.' == ffdi->FileName[0])
     {
@@ -252,6 +246,12 @@ result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_typ
     item.stat.st_compressed = !!(ffdi->FileAttributes & FILE_ATTRIBUTE_COMPRESSED);
     item.stat.st_reparse_point = !!(ffdi->FileAttributes & FILE_ATTRIBUTE_REPARSE_POINT);
     n++;
+    if (!ffdi->NextEntryOffset)
+    {
+      // Fill is complete
+      tofill._resize(n);
+      return enumerate_info{ std::move(tofill), default_stat_contents, true };
+    }
     if(n >= tofill.size())
     {
       // Fill is incomplete

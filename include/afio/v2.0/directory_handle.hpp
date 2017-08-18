@@ -89,7 +89,17 @@ public:
   struct buffers_type : public span<buffer_type>
   {
     using span<buffer_type>::span;
-
+    buffers_type(span<buffer_type> v) : span<buffer_type>(std::move(v)) {}
+    buffers_type(buffers_type &&o) noexcept : span<buffer_type>(std::move(o)), _kernel_buffer(std::move(o._kernel_buffer)), _kernel_buffer_size(o._kernel_buffer_size) {
+      static_cast<span<buffer_type> &>(o) = {};
+      o._kernel_buffer_size = 0;
+    }
+    buffers_type &operator=(buffers_type &&o) noexcept
+    {
+      this->~buffers_type();
+      new(this) buffers_type(std::move(o));
+      return *this;
+    }
   private:
     friend class directory_handle;
     std::unique_ptr<char[]> _kernel_buffer;
@@ -231,6 +241,17 @@ public:
   AFIO_MAKE_FREE_FUNCTION
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<enumerate_info> enumerate(buffers_type &&tofill, path_view_type glob = path_view_type(), filter filtering = filter::fastdeleted, span<char> kernelbuffer = span<char>()) const noexcept;
 };
+inline std::ostream &operator<<(std::ostream &s, const directory_handle::filter &v)
+{
+  static constexpr const char *values[] = { "none", "fastdeleted" };
+  if (static_cast<size_t>(v) >= sizeof(values) / sizeof(values[0]) || !values[static_cast<size_t>(v)])
+    return s << "afio::directory_handle::filter::<unknown>";
+  return s << "afio::directory_handle::filter::" << values[static_cast<size_t>(v)];
+}
+inline std::ostream &operator<<(std::ostream &s, const directory_handle::enumerate_info &)
+{
+  return s <<  "afio::directory_handle::enumerate_info";
+}
 
 // BEGIN make_free_functions.py
 //! Swap with another instance
