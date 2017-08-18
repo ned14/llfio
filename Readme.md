@@ -146,37 +146,52 @@ are the same inode.
 
 ### Eventual transactional key-blob store:
 - What's the least possible complex implementation based on files and directories?
-  - `store/index` is 48 bit counter + open hash map of 128 bit key to blob
-  identifier (64 bits) which can be:
+  - `store/index` is 48 bit counter + r/w mutex + open hash map of 128 bit key to blob
+  identifier (64 bits). Blob identifier is top 6 bits file id:
+    - 0 means large file, values 1-15 are reserved for future use (large file deltas).
+    - Values 16-63 are the smallfile. 
   
-    1. `store/small/01-3f` for blobs < 65520 bytes. Each blob is padded to 64 byte
-    multiple and tail record with 6 byte (48 bit) counter + 2 byte size aligned
-    at end + optional hash. There are 15 of these used to maximise write concurrency.
-    Blob identifier is top 6 bits smallfile id, cannot be 0.
-    Remaining 58 bits is the offset into the smallfile (shifted left 6 bits, all records in smallfiles are at 64 byte multiples).
-    
-    2. `store/large/*` for blobs >= 65520.
+    1. `store/small/01-3f` for blobs <= 65512 bytes (8 bytes tail, 16 bytes key).
+    Each blob is padded to 64 byte
+    multiple and tail record with 16 bytes of key, 6 byte (48 bit) counter + 2 byte size aligned
+    at end + optional 16 byte hash. There are 48 of these used to maximise write concurrency
+    (use the thread id to select a smallfile on open, use exclusive lock probing to
+    figure out a small file not in use, hold shared lock on chosen small file until exit).
+
+    Remaining 58 bits of blob identifier is the offset into the smallfile of the end of
+    the tail record (shifted left 6 bits, all records in smallfiles are at 64 byte multiples).
+  
+    2. `store/large/*` for blobs > 65512 under the assumption that one day we'll
+    implement 4Kb dirty delta page with compression support.
       - `store/large/hexkey/48bithexcounter` stores each blob
       - Last 64 bytes contains magic, size, optional hash.
+      
     Blob identifier is top 6 bits zero. Next 10 bits is 4 bits mantissa shifted left
     6 bits of shift (0-63) for approx size. Remaining 48 bits is counter.
     
   - `store/config` keeps:
     - transactions enabled or not.
-    - write concurrency (i.e. number of small files)
     - mmap enable or not (i.e. can be used over network drive)
     - content hash used e.g. SpookyHash
     - compression used e.g. pithy
     - dirty flag i.e. do fsck on next first open
       - `O_SYNC` was on or not last open (affects severity of any fsck).
     - shared lock kept on config so we know last user exit/first user enter
-- How do I detect transaction conflicts?
-  - Could lock the bottom 64 bits of key hashes being updated during write?
-  False abort between colliding keys possible though.
-  - Could lock the 48 bit counter for the revision of each blob we are basing
-  this transaction on? No false abort, but instead updates of keys
-  related in last transaction can remove concurrency.
-
+- Start a transaction = atomic increment current 48 bit counter
+  - Write the changes making up this transaction under this counter
+  - When ready, lock the open hash map's r/w mutex for exclusive access.
+  - Check that all the keys we are modifying have not been changed since the
+  transaction began.
+  - If all good, update all the keys with their new values and unlock the r/w mutex
+  QUESTION: Can forcing all map users to lock the mutex each access be avoided?
+  e.g. atomic swapping in a pointer to an updated table? One could COW the 4Kb pages
+  being changed in the current table, then update the map, then swap pointers
+  and leave the old table hang around for a while.
+- Garbage collecting in this design is easy enough, write all current small values
+into a single file, then update the map in a single shot, then hole punch all the
+other small files.
+- Live resizing the open hash map I think is impossible however unless we use that
+atomic swapping design.
 
 ## Commits and tags in this git repository can be verified using:
 <pre>
