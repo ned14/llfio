@@ -1413,5 +1413,449 @@ direct=0 sync=1:
                 # The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4 (99.999%
                 # of the time)
                 99.999%: 21646924
+---
+timestamp: 2017-08-17 22:30:47 -0000
+system:
+    os:
+        name: Microsoft Windows NT
+        ver: 10.0.14393
+    cpu:
+        name: GenuineIntel Intel(R) Core(TM) i7-3770K CPU @ 3.50GHz
+        architecture: x64
+        physical_cores: 4
+    mem:
+        # Main memory bandwidth when accessed sequentially (1 CPU core)
+        max_bandwidth: 2013265920
+        # Main memory bandwidth when 4Kb pages are accessed randomly (1 CPU core)
+        min_bandwidth: 1530082099
+        quantity: 17127100416
+        in_use: 0.334203
+    timer:
+        ns_per_tick: 292
+        ns_overhead: 11
+storage:
+    controller:
+        kind: SATA
+        # The maximum number of bytes the disk controller can transfer at once
+        max_transfer: 131072
+        # The maximum number of scatter-gather buffers the disk controller can handle
+        max_buffers: 33
+    device:
+        name: Samsung SSD 850 EVO 1TB,EMT02B6Q
+        min_io_size: 512
+        size: 1000204886016
+    fs:
+        name: NTFS
+        config: todo
+        size: 744143671296
+        in_use: 0.897091
+direct=0 sync=0:
+    concurrency:
+        # The i/o modify quantum guaranteed to be atomically visible to readers
+        # irrespective of rewrite quantity
+        atomic_rewrite_quantum: 1048576
+
+        # The maximum single aligned i/o modify quantity atomically visible to readers
+        # (can be [potentially unreliably] much larger than atomic_rewrite_quantum). A
+        # very common value on modern hardware with direct i/o thanks to PCIe DMA is
+        # 4096, don't trust values higher than this because of potentially discontiguous
+        # memory page mapping.
+        max_aligned_atomic_rewrite: 1048576
+
+    latency:
+        read:
+            qd1:
+                # The nanoseconds to read 4Kb at a queue depth of 1 (min)
+                min: 4389
+                # The nanoseconds to read 4Kb at a queue depth of 1 (arithmetic mean)
+                mean: 169711
+                # The nanoseconds to read 4Kb at a queue depth of 1 (max)
+                max: 15261012
+                # The nanoseconds to read 4Kb at a queue depth of 1 (50% of the time)
+                50%: 181393
+                # The nanoseconds to read 4Kb at a queue depth of 1 (95% of the time)
+                95%: 244296
+                # The nanoseconds to read 4Kb at a queue depth of 1 (99% of the time)
+                99%: 272382
+                # The nanoseconds to read 4Kb at a queue depth of 1 (99.999% of the time)
+                99.999%: 15261012
+            qd16:
+                # The nanoseconds to read 4Kb at a queue depth of 16 (min)
+                min: 1462
+                # The nanoseconds to read 4Kb at a queue depth of 16 (arithmetic mean)
+                mean: 30243
+                # The nanoseconds to read 4Kb at a queue depth of 16 (max)
+                max: 15624968
+                # The nanoseconds to read 4Kb at a queue depth of 16 (50% of the time)
+                50%: 6436
+                # The nanoseconds to read 4Kb at a queue depth of 16 (95% of the time)
+                95%: 168812
+                # The nanoseconds to read 4Kb at a queue depth of 16 (99% of the time)
+                99%: 213283
+                # The nanoseconds to read 4Kb at a queue depth of 16 (99.999% of the time)
+                99.999%: 7960817
+        write:
+            qd1:
+                # The nanoseconds to write 4Kb at a queue depth of 1 (min)
+                min: 1463
+                # The nanoseconds to write 4Kb at a queue depth of 1 (arithmetic mean)
+                mean: 4147
+                # The nanoseconds to write 4Kb at a queue depth of 1 (max)
+                max: 125220
+                # The nanoseconds to write 4Kb at a queue depth of 1 (50% of the time)
+                50%: 3219
+                # The nanoseconds to write 4Kb at a queue depth of 1 (95% of the time)
+                95%: 8777
+                # The nanoseconds to write 4Kb at a queue depth of 1 (99% of the time)
+                99%: 13166
+                # The nanoseconds to write 4Kb at a queue depth of 1 (99.999% of the time)
+                99.999%: 61147
+            qd16:
+                # The nanoseconds to write 4Kb at a queue depth of 16 (min)
+                min: 2633
+                # The nanoseconds to write 4Kb at a queue depth of 16 (arithmetic mean)
+                mean: 303395
+                # The nanoseconds to write 4Kb at a queue depth of 16 (max)
+                max: 63539957
+                # The nanoseconds to write 4Kb at a queue depth of 16 (50% of the time)
+                50%: 10240
+                # The nanoseconds to write 4Kb at a queue depth of 16 (95% of the time)
+                95%: 1710362
+                # The nanoseconds to write 4Kb at a queue depth of 16 (99% of the time)
+                99%: 6185212
+                # The nanoseconds to write 4Kb at a queue depth of 16 (99.999% of the time)
+                99.999%: 47317269
+        readwrite:
+            qd4:
+                # The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4 (min)
+                min: 1170
+                # The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4
+                # (arithmetic mean)
+                mean: 18188
+
+                # The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4 (max)
+                max: 85511928
+                # The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4 (50% of
+                # the time)
+                50%: 3511
+
+                # The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4 (95% of
+                # the time)
+                95%: 12580
+
+                # The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4 (99% of
+                # the time)
+                99%: 179638
+
+                # The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4 (99.999%
+                # of the time)
+                99.999%: 38268386
+
+direct=1 sync=0:
+    concurrency:
+        # The i/o modify quantum guaranteed to be atomically visible to readers
+        # irrespective of rewrite quantity
+        atomic_rewrite_quantum: 1048576
+
+        # The maximum single aligned i/o modify quantity atomically visible to readers
+        # (can be [potentially unreliably] much larger than atomic_rewrite_quantum). A
+        # very common value on modern hardware with direct i/o thanks to PCIe DMA is
+        # 4096, don't trust values higher than this because of potentially discontiguous
+        # memory page mapping.
+        max_aligned_atomic_rewrite: 1048576
+
+    latency:
+        read:
+            qd1:
+                # The nanoseconds to read 4Kb at a queue depth of 1 (min)
+                min: 102984
+                # The nanoseconds to read 4Kb at a queue depth of 1 (arithmetic mean)
+                mean: 201632
+                # The nanoseconds to read 4Kb at a queue depth of 1 (max)
+                max: 28880416
+                # The nanoseconds to read 4Kb at a queue depth of 1 (50% of the time)
+                50%: 191047
+                # The nanoseconds to read 4Kb at a queue depth of 1 (95% of the time)
+                95%: 237274
+                # The nanoseconds to read 4Kb at a queue depth of 1 (99% of the time)
+                99%: 290815
+                # The nanoseconds to read 4Kb at a queue depth of 1 (99.999% of the time)
+                99.999%: 28880416
+            qd16:
+                # The nanoseconds to read 4Kb at a queue depth of 16 (min)
+                min: 113810
+                # The nanoseconds to read 4Kb at a queue depth of 16 (arithmetic mean)
+                mean: 205007
+                # The nanoseconds to read 4Kb at a queue depth of 16 (max)
+                max: 4558526
+                # The nanoseconds to read 4Kb at a queue depth of 16 (50% of the time)
+                50%: 200117
+                # The nanoseconds to read 4Kb at a queue depth of 16 (95% of the time)
+                95%: 269456
+                # The nanoseconds to read 4Kb at a queue depth of 16 (99% of the time)
+                99%: 313342
+                # The nanoseconds to read 4Kb at a queue depth of 16 (99.999% of the time)
+                99.999%: 4519322
+        write:
+            qd1:
+                # The nanoseconds to write 4Kb at a queue depth of 1 (min)
+                min: 41545
+                # The nanoseconds to write 4Kb at a queue depth of 1 (arithmetic mean)
+                mean: 72859
+                # The nanoseconds to write 4Kb at a queue depth of 1 (max)
+                max: 15147494
+                # The nanoseconds to write 4Kb at a queue depth of 1 (50% of the time)
+                50%: 74897
+                # The nanoseconds to write 4Kb at a queue depth of 1 (95% of the time)
+                95%: 88941
+                # The nanoseconds to write 4Kb at a queue depth of 1 (99% of the time)
+                99%: 104448
+                # The nanoseconds to write 4Kb at a queue depth of 1 (99.999% of the time)
+                99.999%: 10942100
+            qd16:
+                # The nanoseconds to write 4Kb at a queue depth of 16 (min)
+                min: 54125
+                # The nanoseconds to write 4Kb at a queue depth of 16 (arithmetic mean)
+                mean: 271950
+                # The nanoseconds to write 4Kb at a queue depth of 16 (max)
+                max: 37345915
+                # The nanoseconds to write 4Kb at a queue depth of 16 (50% of the time)
+                50%: 179637
+                # The nanoseconds to write 4Kb at a queue depth of 16 (95% of the time)
+                95%: 576069
+                # The nanoseconds to write 4Kb at a queue depth of 16 (99% of the time)
+                99%: 1455240
+                # The nanoseconds to write 4Kb at a queue depth of 16 (99.999% of the time)
+                99.999%: 37288864
+        readwrite:
+            qd4:
+                # The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4 (min)
+                min: 40667
+                # The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4
+                # (arithmetic mean)
+                mean: 169301
+
+                # The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4 (max)
+                max: 25668587
+                # The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4 (50% of
+                # the time)
+                50%: 148625
+
+                # The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4 (95% of
+                # the time)
+                95%: 238737
+
+                # The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4 (99% of
+                # the time)
+                99%: 1812176
+
+                # The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4 (99.999%
+                # of the time)
+                99.999%: 25647522
+
+direct=0 sync=1:
+    concurrency:
+        # The i/o modify quantum guaranteed to be atomically visible to readers
+        # irrespective of rewrite quantity
+        atomic_rewrite_quantum: 1048576
+
+        # The maximum single aligned i/o modify quantity atomically visible to readers
+        # (can be [potentially unreliably] much larger than atomic_rewrite_quantum). A
+        # very common value on modern hardware with direct i/o thanks to PCIe DMA is
+        # 4096, don't trust values higher than this because of potentially discontiguous
+        # memory page mapping.
+        max_aligned_atomic_rewrite: 1048576
+
+    latency:
+        read:
+            qd1:
+                # The nanoseconds to read 4Kb at a queue depth of 1 (min)
+                min: 2633
+                # The nanoseconds to read 4Kb at a queue depth of 1 (arithmetic mean)
+                mean: 169377
+                # The nanoseconds to read 4Kb at a queue depth of 1 (max)
+                max: 4425406
+                # The nanoseconds to read 4Kb at a queue depth of 1 (50% of the time)
+                50%: 181101
+                # The nanoseconds to read 4Kb at a queue depth of 1 (95% of the time)
+                95%: 247806
+                # The nanoseconds to read 4Kb at a queue depth of 1 (99% of the time)
+                99%: 280867
+                # The nanoseconds to read 4Kb at a queue depth of 1 (99.999% of the time)
+                99.999%: 4425406
+            qd16:
+                # The nanoseconds to read 4Kb at a queue depth of 16 (min)
+                min: 2048
+                # The nanoseconds to read 4Kb at a queue depth of 16 (arithmetic mean)
+                mean: 196982
+                # The nanoseconds to read 4Kb at a queue depth of 16 (max)
+                max: 4482750
+                # The nanoseconds to read 4Kb at a queue depth of 16 (50% of the time)
+                50%: 204506
+                # The nanoseconds to read 4Kb at a queue depth of 16 (95% of the time)
+                95%: 284085
+                # The nanoseconds to read 4Kb at a queue depth of 16 (99% of the time)
+                99%: 332651
+                # The nanoseconds to read 4Kb at a queue depth of 16 (99.999% of the time)
+                99.999%: 4412241
+        write:
+            qd1:
+                # The nanoseconds to write 4Kb at a queue depth of 1 (min)
+                min: 56173
+                # The nanoseconds to write 4Kb at a queue depth of 1 (arithmetic mean)
+                mean: 92226
+                # The nanoseconds to write 4Kb at a queue depth of 1 (max)
+                max: 5687552
+                # The nanoseconds to write 4Kb at a queue depth of 1 (50% of the time)
+                50%: 90111
+                # The nanoseconds to write 4Kb at a queue depth of 1 (95% of the time)
+                95%: 123757
+                # The nanoseconds to write 4Kb at a queue depth of 1 (99% of the time)
+                99%: 161206
+                # The nanoseconds to write 4Kb at a queue depth of 1 (99.999% of the time)
+                99.999%: 3026632
+            qd16:
+                # The nanoseconds to write 4Kb at a queue depth of 16 (min)
+                min: 76361
+                # The nanoseconds to write 4Kb at a queue depth of 16 (arithmetic mean)
+                mean: 177529
+                # The nanoseconds to write 4Kb at a queue depth of 16 (max)
+                max: 25100710
+                # The nanoseconds to write 4Kb at a queue depth of 16 (50% of the time)
+                50%: 170861
+                # The nanoseconds to write 4Kb at a queue depth of 16 (95% of the time)
+                95%: 232008
+                # The nanoseconds to write 4Kb at a queue depth of 16 (99% of the time)
+                99%: 275893
+                # The nanoseconds to write 4Kb at a queue depth of 16 (99.999% of the time)
+                99.999%: 25015279
+        readwrite:
+            qd4:
+                # The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4 (min)
+                min: 1462
+                # The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4
+                # (arithmetic mean)
+                mean: 83716
+
+                # The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4 (max)
+                max: 24962032
+                # The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4 (50% of
+                # the time)
+                50%: 61440
+
+                # The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4 (95% of
+                # the time)
+                95%: 174079
+
+                # The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4 (99% of
+                # the time)
+                99%: 808662
+
+                # The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4 (99.999%
+                # of the time)
+                99.999%: 22559744
+
+direct=1 sync=1:
+    concurrency:
+        # The i/o modify quantum guaranteed to be atomically visible to readers
+        # irrespective of rewrite quantity
+        atomic_rewrite_quantum: 1048576
+
+        # The maximum single aligned i/o modify quantity atomically visible to readers
+        # (can be [potentially unreliably] much larger than atomic_rewrite_quantum). A
+        # very common value on modern hardware with direct i/o thanks to PCIe DMA is
+        # 4096, don't trust values higher than this because of potentially discontiguous
+        # memory page mapping.
+        max_aligned_atomic_rewrite: 1048576
+
+    latency:
+        read:
+            qd1:
+                # The nanoseconds to read 4Kb at a queue depth of 1 (min)
+                min: 102985
+                # The nanoseconds to read 4Kb at a queue depth of 1 (arithmetic mean)
+                mean: 170202
+                # The nanoseconds to read 4Kb at a queue depth of 1 (max)
+                max: 23478997
+                # The nanoseconds to read 4Kb at a queue depth of 1 (50% of the time)
+                50%: 168521
+                # The nanoseconds to read 4Kb at a queue depth of 1 (95% of the time)
+                95%: 205091
+                # The nanoseconds to read 4Kb at a queue depth of 1 (99% of the time)
+                99%: 247222
+                # The nanoseconds to read 4Kb at a queue depth of 1 (99.999% of the time)
+                99.999%: 23478997
+            qd16:
+                # The nanoseconds to read 4Kb at a queue depth of 16 (min)
+                min: 52370
+                # The nanoseconds to read 4Kb at a queue depth of 16 (arithmetic mean)
+                mean: 207102
+                # The nanoseconds to read 4Kb at a queue depth of 16 (max)
+                max: 23940965
+                # The nanoseconds to read 4Kb at a queue depth of 16 (50% of the time)
+                50%: 200117
+                # The nanoseconds to read 4Kb at a queue depth of 16 (95% of the time)
+                95%: 272383
+                # The nanoseconds to read 4Kb at a queue depth of 16 (99% of the time)
+                99%: 319486
+                # The nanoseconds to read 4Kb at a queue depth of 16 (99.999% of the time)
+                99.999%: 23732069
+        write:
+            qd1:
+                # The nanoseconds to write 4Kb at a queue depth of 1 (min)
+                min: 47103
+                # The nanoseconds to write 4Kb at a queue depth of 1 (arithmetic mean)
+                mean: 99637
+                # The nanoseconds to write 4Kb at a queue depth of 1 (max)
+                max: 19831240
+                # The nanoseconds to write 4Kb at a queue depth of 1 (50% of the time)
+                50%: 94793
+                # The nanoseconds to write 4Kb at a queue depth of 1 (95% of the time)
+                95%: 143652
+                # The nanoseconds to write 4Kb at a queue depth of 1 (99% of the time)
+                99%: 174957
+                # The nanoseconds to write 4Kb at a queue depth of 1 (99.999% of the time)
+                99.999%: 19417547
+            qd16:
+                # The nanoseconds to write 4Kb at a queue depth of 16 (min)
+                min: 53540
+                # The nanoseconds to write 4Kb at a queue depth of 16 (arithmetic mean)
+                mean: 190653
+                # The nanoseconds to write 4Kb at a queue depth of 16 (max)
+                max: 33141983
+                # The nanoseconds to write 4Kb at a queue depth of 16 (50% of the time)
+                50%: 175835
+                # The nanoseconds to write 4Kb at a queue depth of 16 (95% of the time)
+                95%: 208017
+                # The nanoseconds to write 4Kb at a queue depth of 16 (99% of the time)
+                99%: 477473
+                # The nanoseconds to write 4Kb at a queue depth of 16 (99.999% of the time)
+                99.999%: 32823375
+        readwrite:
+            qd4:
+                # The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4 (min)
+                min: 35986
+                # The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4
+                # (arithmetic mean)
+                mean: 154828
+
+                # The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4 (max)
+                max: 22164482
+                # The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4 (50% of
+                # the time)
+                50%: 131656
+
+                # The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4 (95% of
+                # the time)
+                95%: 221183
+
+                # The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4 (99% of
+                # the time)
+                99%: 1662965
+
+                # The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4 (99.999%
+                # of the time)
+                99.999%: 22112405
+
 
 
