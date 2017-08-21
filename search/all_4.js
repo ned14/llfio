@@ -17,5 +17,6 @@ var searchData=
   ['disable_5fsafety_5funlinks',['disable_safety_unlinks',['../structafio__v2__xxx_1_1handle_1_1flag__base.html#a51aaa32c78950cedbc1b7a61e1738d3ea09f03ed90a3b187555210e8a8d09f4a0',1,'afio_v2_xxx::handle::flag_base']]],
   ['disposition_5fbase',['disposition_base',['../structafio__v2__xxx_1_1native__handle__type_1_1disposition__base.html',1,'afio_v2_xxx::native_handle_type']]],
   ['do_5fnot_5fstore',['do_not_store',['../classafio__v2__xxx_1_1map__handle.html#aa25715985351f79e034bb1ef37f74824',1,'afio_v2_xxx::map_handle']]],
-  ['done',['done',['../structafio__v2__xxx_1_1directory__handle_1_1enumerate__info.html#a516cfbc33c3f1aaaa52f5d3eb043db41',1,'afio_v2_xxx::directory_handle::enumerate_info']]]
+  ['done',['done',['../structafio__v2__xxx_1_1directory__handle_1_1enumerate__info.html#a516cfbc33c3f1aaaa52f5d3eb043db41',1,'afio_v2_xxx::directory_handle::enumerate_info']]],
+  ['drop_5ffilesystem_5fcache',['drop_filesystem_cache',['../namespaceafio__v2__xxx_1_1utils.html#a34fff580f0b7e7bea5509e5294f5d71e',1,'afio_v2_xxx::utils']]]
 ];

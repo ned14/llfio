@@ -30,6 +30,7 @@ var structafio__v2__xxx_1_1storage__profile_1_1storage__profile =
     [ "device_min_io_size", "structafio__v2__xxx_1_1storage__profile_1_1storage__profile.html#a3256118d54926ec32c600e46fbc58ca4", null ],
     [ "device_name", "structafio__v2__xxx_1_1storage__profile_1_1storage__profile.html#acfbf6fb17dec57afe04dea1607db4403", null ],
     [ "device_size", "structafio__v2__xxx_1_1storage__profile_1_1storage__profile.html#a29ae5cba03c0600ee4ef83a2103f616e", null ],
+    [ "drop_filesystem_cache_support", "structafio__v2__xxx_1_1storage__profile_1_1storage__profile.html#ae068031814fedd33517ad82bc6534860", null ],
     [ "fs_config", "structafio__v2__xxx_1_1storage__profile_1_1storage__profile.html#afb571846fcfea49afceeb0d7e83142c5", null ],
     [ "fs_in_use", "structafio__v2__xxx_1_1storage__profile_1_1storage__profile.html#a8e9d7854b50b35384e9364254df97f08", null ],
     [ "fs_name", "structafio__v2__xxx_1_1storage__profile_1_1storage__profile.html#a5b1f170aeccbd787f8251e2b1eaecd32", null ],

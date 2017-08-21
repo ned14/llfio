@@ -833,9 +833,9 @@ For portability, you can only assume that barriers write order for a single hand
 </dl>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX fdatasync() or Windows NtFlushBuffersFileEx() can return. </dd></dl>
 <dl class="section user"><dt>Memory Allocations</dt><dd>None. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00497"></a><span class="lineno">  497</span>&#160;{</div>
-<div class="line"><a name="l00498"></a><span class="lineno">  498</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.barrier(std::forward&lt;decltype(reqs)&gt;(reqs), std::forward&lt;decltype(wait_for_device)&gt;(wait_for_device), std::forward&lt;decltype(and_metadata)&gt;(and_metadata), std::forward&lt;decltype(d)&gt;(d));</div>
-<div class="line"><a name="l00499"></a><span class="lineno">  499</span>&#160;}</div>
+<div class="fragment"><div class="line"><a name="l00499"></a><span class="lineno">  499</span>&#160;{</div>
+<div class="line"><a name="l00500"></a><span class="lineno">  500</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.barrier(std::forward&lt;decltype(reqs)&gt;(reqs), std::forward&lt;decltype(wait_for_device)&gt;(wait_for_device), std::forward&lt;decltype(and_metadata)&gt;(and_metadata), std::forward&lt;decltype(d)&gt;(d));</div>
+<div class="line"><a name="l00501"></a><span class="lineno">  501</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1399,9 +1399,9 @@ For portability, you can only assume that barriers write order for a single hand
 </dl>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX read() can return, <code>errc::timed_out</code>, <code>errc::operation_canceled</code>. <code>errc::not_supported</code> may be returned if deadline i/o is not possible with this particular handle configuration (e.g. reading from regular files on POSIX or reading from a non-overlapped HANDLE on Windows). </dd></dl>
 <dl class="section user"><dt>Memory Allocations</dt><dd>The default synchronous implementation in file_handle performs no memory allocation. The asynchronous implementation in async_file_handle performs one calloc and one free. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00438"></a><span class="lineno">  438</span>&#160;{</div>
-<div class="line"><a name="l00439"></a><span class="lineno">  439</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.read(std::forward&lt;decltype(reqs)&gt;(reqs), std::forward&lt;decltype(d)&gt;(d));</div>
-<div class="line"><a name="l00440"></a><span class="lineno">  440</span>&#160;}</div>
+<div class="fragment"><div class="line"><a name="l00440"></a><span class="lineno">  440</span>&#160;{</div>
+<div class="line"><a name="l00441"></a><span class="lineno">  441</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.read(std::forward&lt;decltype(reqs)&gt;(reqs), std::forward&lt;decltype(d)&gt;(d));</div>
+<div class="line"><a name="l00442"></a><span class="lineno">  442</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2032,9 +2032,9 @@ For portability, you can only assume that barriers write order for a single hand
 </dl>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX write() can return, <code>errc::timed_out</code>, <code>errc::operation_canceled</code>. <code>errc::not_supported</code> may be returned if deadline i/o is not possible with this particular handle configuration (e.g. writing to regular files on POSIX or writing to a non-overlapped HANDLE on Windows). </dd></dl>
 <dl class="section user"><dt>Memory Allocations</dt><dd>The default synchronous implementation in file_handle performs no memory allocation. The asynchronous implementation in async_file_handle performs one calloc and one free. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00462"></a><span class="lineno">  462</span>&#160;{</div>
-<div class="line"><a name="l00463"></a><span class="lineno">  463</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.write(std::forward&lt;decltype(reqs)&gt;(reqs), std::forward&lt;decltype(d)&gt;(d));</div>
-<div class="line"><a name="l00464"></a><span class="lineno">  464</span>&#160;}</div>
+<div class="fragment"><div class="line"><a name="l00464"></a><span class="lineno">  464</span>&#160;{</div>
+<div class="line"><a name="l00465"></a><span class="lineno">  465</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.write(std::forward&lt;decltype(reqs)&gt;(reqs), std::forward&lt;decltype(d)&gt;(d));</div>
+<div class="line"><a name="l00466"></a><span class="lineno">  466</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>

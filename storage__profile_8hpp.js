@@ -22,6 +22,7 @@ var storage__profile_8hpp =
     [ "default_value< io_service::extent_type >", "storage__profile_8hpp.html#aa6a87dd5a7caa0287274894eca115a2a", null ],
     [ "default_value< unsigned int >", "storage__profile_8hpp.html#acf57088eb7760c91813215167e1db291", null ],
     [ "device", "storage__profile_8hpp.html#a3940c6f61882afc7d51b3cc43887a5c3", null ],
+    [ "drop_filesystem_cache_support", "storage__profile_8hpp.html#ad2c199ea2862a9d6a357c7aa49e3bfca", null ],
     [ "fs", "storage__profile_8hpp.html#a330bf3de689771aacc88cfb5c92f70b8", null ],
     [ "map_to_storage_type", "storage__profile_8hpp.html#a0e2c44a94f432bdb2bd1c92eb78d1143", null ],
     [ "map_to_storage_type< float >", "storage__profile_8hpp.html#a1b6e0ac7297da255fc05b8acb03ff329", null ],

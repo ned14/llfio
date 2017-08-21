@@ -146,15 +146,18 @@ template&lt;class T &gt; </td></tr>
 <tr class="memitem:aadc7dd505730e2701313be55519c9958"><td class="memItemLeft" align="right" valign="top">std::vector&lt; size_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx_1_1utils.html#aadc7dd505730e2701313be55519c9958">page_sizes</a> (bool only_actually_available=true)</td></tr>
 <tr class="memdesc:aadc7dd505730e2701313be55519c9958"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the page sizes of this architecture which is useful for calculating direct i/o multiples.  <a href="#aadc7dd505730e2701313be55519c9958">More...</a><br/></td></tr>
 <tr class="separator:aadc7dd505730e2701313be55519c9958"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0ec29e5ed6db344a0c3465df4a33d2ea"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx_1_1utils.html#a0ec29e5ed6db344a0c3465df4a33d2ea">file_buffer_default_size</a> () noexcept</td></tr>
-<tr class="memdesc:a0ec29e5ed6db344a0c3465df4a33d2ea"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a reasonable default size for page_allocator, typically the closest page size from page_sizes() to 1Mb.  <a href="#a0ec29e5ed6db344a0c3465df4a33d2ea">More...</a><br/></td></tr>
-<tr class="separator:a0ec29e5ed6db344a0c3465df4a33d2ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad164c516eb2043c4f4f05277b2745f82"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx_1_1utils.html#ad164c516eb2043c4f4f05277b2745f82">random_fill</a> (char *buffer, size_t bytes)</td></tr>
-<tr class="memdesc:ad164c516eb2043c4f4f05277b2745f82"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fills the buffer supplied with cryptographically strong randomness. Uses the OS kernel API.  <a href="#ad164c516eb2043c4f4f05277b2745f82">More...</a><br/></td></tr>
-<tr class="separator:ad164c516eb2043c4f4f05277b2745f82"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ace050f445d1d1fdd4b2a6f99d9be7f85"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx_1_1utils.html#ace050f445d1d1fdd4b2a6f99d9be7f85">file_buffer_default_size</a> ()</td></tr>
+<tr class="memdesc:ace050f445d1d1fdd4b2a6f99d9be7f85"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a reasonable default size for page_allocator, typically the closest page size from page_sizes() to 1Mb.  <a href="#ace050f445d1d1fdd4b2a6f99d9be7f85">More...</a><br/></td></tr>
+<tr class="separator:ace050f445d1d1fdd4b2a6f99d9be7f85"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aed184bfbef52745f68812e68b317527f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx_1_1utils.html#aed184bfbef52745f68812e68b317527f">random_fill</a> (char *buffer, size_t bytes) noexcept</td></tr>
+<tr class="memdesc:aed184bfbef52745f68812e68b317527f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fills the buffer supplied with cryptographically strong randomness. Uses the OS kernel API.  <a href="#aed184bfbef52745f68812e68b317527f">More...</a><br/></td></tr>
+<tr class="separator:aed184bfbef52745f68812e68b317527f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a767b8434456319066194534a4c4edbf5"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx_1_1utils.html#a767b8434456319066194534a4c4edbf5">random_string</a> (size_t randomlen)</td></tr>
 <tr class="memdesc:a767b8434456319066194534a4c4edbf5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a cryptographically random string capable of being used as a filename. Essentially random_fill() + to_hex_string().  <a href="#a767b8434456319066194534a4c4edbf5">More...</a><br/></td></tr>
 <tr class="separator:a767b8434456319066194534a4c4edbf5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a34fff580f0b7e7bea5509e5294f5d71e"><td class="memItemLeft" align="right" valign="top">result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx_1_1utils.html#a34fff580f0b7e7bea5509e5294f5d71e">drop_filesystem_cache</a> () noexcept</td></tr>
+<tr class="memdesc:a34fff580f0b7e7bea5509e5294f5d71e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tries to flush all modified data to the physical device, and then drop the OS filesystem cache, thus making all future reads come from the physical device. Currently only implemented for Microsoft Windows and Linux.  <a href="#a34fff580f0b7e7bea5509e5294f5d71e">More...</a><br/></td></tr>
+<tr class="separator:a34fff580f0b7e7bea5509e5294f5d71e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2d0c1e951ea0b9f45b3e6d331f194e68"><td class="memTemplParams" colspan="2"><a class="anchor" id="a2d0c1e951ea0b9f45b3e6d331f194e68"></a>
 template&lt;class T , class U &gt; </td></tr>
 <tr class="memitem:a2d0c1e951ea0b9f45b3e6d331f194e68"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>operator==</b> (const <a class="el" href="classafio__v2__xxx_1_1utils_1_1page__allocator.html">page_allocator</a>&lt; T &gt; &amp;, const <a class="el" href="classafio__v2__xxx_1_1utils_1_1page__allocator.html">page_allocator</a>&lt; U &gt; &amp;) noexcept</td></tr>
@@ -163,7 +166,33 @@ template&lt;class T , class U &gt; </td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Utility routines often useful when using AFIO. </p>
 </div><h2 class="groupheader">Function Documentation</h2>
-<a class="anchor" id="a0ec29e5ed6db344a0c3465df4a33d2ea"></a>
+<a class="anchor" id="a34fff580f0b7e7bea5509e5294f5d71e"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">result&lt;void&gt; afio_v2_xxx::utils::drop_filesystem_cache </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Tries to flush all modified data to the physical device, and then drop the OS filesystem cache, thus making all future reads come from the physical device. Currently only implemented for Microsoft Windows and Linux. </p>
+<p>Note that the OS specific magic called by this routine generally requires elevated privileges for the calling process. For obvious reasons, calling this will have a severe negative impact on performance, but it's very useful for benchmarking cold cache vs warm cache performance. </p>
+
+</div>
+</div>
+<a class="anchor" id="ace050f445d1d1fdd4b2a6f99d9be7f85"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -179,7 +208,7 @@ template&lt;class T , class U &gt; </td></tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -270,7 +299,7 @@ template&lt;class T , class U &gt; </td></tr>
 
 </div>
 </div>
-<a class="anchor" id="ad164c516eb2043c4f4f05277b2745f82"></a>
+<a class="anchor" id="aed184bfbef52745f68812e68b317527f"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -297,7 +326,7 @@ template&lt;class T , class U &gt; </td></tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -350,11 +379,11 @@ template&lt;class T , class U &gt; </td></tr>
 <div class="fragment"><div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;  {</div>
 <div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;    <span class="keywordtype">size_t</span> outlen = randomlen * 2;</div>
 <div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;    std::string ret(outlen, 0);</div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;    <a class="code" href="namespaceafio__v2__xxx_1_1utils.html#ad164c516eb2043c4f4f05277b2745f82">random_fill</a>(const_cast&lt;char *&gt;(ret.data()), randomlen);</div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;    <a class="code" href="namespaceafio__v2__xxx_1_1utils.html#aed184bfbef52745f68812e68b317527f">random_fill</a>(const_cast&lt;char *&gt;(ret.data()), randomlen);</div>
 <div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;    QUICKCPPLIB_NAMESPACE::algorithm::string::to_hex_string(const_cast&lt;char *&gt;(ret.data()), outlen, ret.data(), randomlen);</div>
 <div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;    <span class="keywordflow">return</span> ret;</div>
 <div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;  }</div>
-<div class="ttc" id="namespaceafio__v2__xxx_1_1utils_html_ad164c516eb2043c4f4f05277b2745f82"><div class="ttname"><a href="namespaceafio__v2__xxx_1_1utils.html#ad164c516eb2043c4f4f05277b2745f82">afio_v2_xxx::utils::random_fill</a></div><div class="ttdeci">void random_fill(char *buffer, size_t bytes)</div><div class="ttdoc">Fills the buffer supplied with cryptographically strong randomness. Uses the OS kernel API...</div></div>
+<div class="ttc" id="namespaceafio__v2__xxx_1_1utils_html_aed184bfbef52745f68812e68b317527f"><div class="ttname"><a href="namespaceafio__v2__xxx_1_1utils.html#aed184bfbef52745f68812e68b317527f">afio_v2_xxx::utils::random_fill</a></div><div class="ttdeci">void random_fill(char *buffer, size_t bytes) noexcept</div><div class="ttdoc">Fills the buffer supplied with cryptographically strong randomness. Uses the OS kernel API...</div></div>
 </div><!-- fragment -->
 </div>
 </div>
