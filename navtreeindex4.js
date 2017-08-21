@@ -1,5 +1,6 @@
 var NAVTREEINDEX4 =
 {
+"namespaceafio__v2__xxx_1_1utils.html":[2,0,0,2],
 "namespacemembers.html":[2,1,0],
 "namespacemembers_enum.html":[2,1,3],
 "namespacemembers_func.html":[2,1,1],
@@ -248,6 +249,5 @@ var NAVTREEINDEX4 =
 "structafio__v2__xxx_1_1statfs__t.html#aff9b6558a9deb9dcb2fb981881a14ba2":[3,0,0,20,5],
 "structafio__v2__xxx_1_1statfs__t_1_1f__flags__t.html":[3,0,0,20,0],
 "structafio__v2__xxx_1_1statfs__t_1_1f__flags__t.html#a14559edf894cb85d3afcdce3af0f0d3f":[3,0,0,20,0,5],
-"structafio__v2__xxx_1_1statfs__t_1_1f__flags__t.html#a2dcc8c52ed1147d36a480af7e43a263e":[3,0,0,20,0,3],
-"structafio__v2__xxx_1_1statfs__t_1_1f__flags__t.html#a66db065b8f21b1895e1f021465cfe9e3":[3,0,0,20,0,4]
+"structafio__v2__xxx_1_1statfs__t_1_1f__flags__t.html#a2dcc8c52ed1147d36a480af7e43a263e":[3,0,0,20,0,3]
 };

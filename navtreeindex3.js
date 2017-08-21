@@ -1,5 +1,6 @@
 var NAVTREEINDEX3 =
 {
+"classafio__v2__xxx_1_1section__handle.html#aac62f621c42be6eeb8d9a5700da367f9":[3,0,0,14,28],
 "classafio__v2__xxx_1_1section__handle.html#aafde2623c9a54e14792eee729321f5a3":[3,0,0,14,48],
 "classafio__v2__xxx_1_1section__handle.html#ab3d876f5996605158fd6a0582adadad6":[3,0,0,14,19],
 "classafio__v2__xxx_1_1section__handle.html#ab790af4654f5455d8c5e1f1d397543ca":[3,0,0,14,22],
@@ -248,6 +249,5 @@ var NAVTREEINDEX3 =
 "namespaceafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex.html":[3,0,0,0,0],
 "namespaceafio__v2__xxx_1_1storage__profile.html":[3,0,0,1],
 "namespaceafio__v2__xxx_1_1storage__profile.html":[2,0,0,1],
-"namespaceafio__v2__xxx_1_1utils.html":[3,0,0,2],
-"namespaceafio__v2__xxx_1_1utils.html":[2,0,0,2]
+"namespaceafio__v2__xxx_1_1utils.html":[3,0,0,2]
 };

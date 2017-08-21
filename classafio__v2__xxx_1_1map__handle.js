@@ -68,6 +68,7 @@ var classafio__v2__xxx_1_1map__handle =
     [ "zero_memory", "classafio__v2__xxx_1_1map__handle.html#ac35a85e8a6cca721640ddc6b5008e145", null ],
     [ "_addr", "classafio__v2__xxx_1_1map__handle.html#af85f9116968f2a2900640846009f48ea", null ],
     [ "_caching", "classafio__v2__xxx_1_1map__handle.html#af024e3d92d9a01ac367734e9cdc517fb", null ],
+    [ "_flag", "classafio__v2__xxx_1_1map__handle.html#abdcdfc9d1ed9193bff10f3a03257b677", null ],
     [ "_flags", "classafio__v2__xxx_1_1map__handle.html#ac46e0a296c31fcd0a996a79d78647fb6", null ],
     [ "_length", "classafio__v2__xxx_1_1map__handle.html#adffdff916ccf13d88a02ddb6b6a421c8", null ],
     [ "_offset", "classafio__v2__xxx_1_1map__handle.html#a5b7bae1f24ec1ae96822fb865bfd0ea5", null ],
