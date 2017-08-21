@@ -143,6 +143,10 @@ result<void> map_handle::close() noexcept
   {
     if(_section)
     {
+      if(_section->section_flags() & section_handle::flag::barrier_on_close)
+      {
+        OUTCOME_TRYV(barrier({}, true, false));
+      }
       NTSTATUS ntstat = NtUnmapViewOfSection(GetCurrentProcess(), _addr);
       if(STATUS_SUCCESS != ntstat)
         return {ntstat, ntkernel_category()};
@@ -181,6 +185,7 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::barrier(map_ha
       return std::errc::value_too_large;
     bytes += req.len;
   }
+  // bytes = 0 means flush entire mapping
   if(!FlushViewOfFile(addr, (SIZE_T) bytes))
     return {GetLastError(), std::system_category()};
   if(_section && _section->backing() && (wait_for_device || and_metadata))

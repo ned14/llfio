@@ -243,6 +243,21 @@ AFIO_V2_NAMESPACE_END
 #define AFIO_THREAD_LOCAL QUICKCPPLIB_THREAD_LOCAL
 #endif
 #endif
+#ifndef AFIO_TEMPLATE
+#define AFIO_TEMPLATE(...) QUICKCPPLIB_TEMPLATE(__VA_ARGS__)
+#endif
+#ifndef AFIO_TREQUIRES
+#define AFIO_TREQUIRES(...) QUICKCPPLIB_TREQUIRES(__VA_ARGS__)
+#endif
+#ifndef AFIO_TEXPR
+#define AFIO_TEXPR(...) QUICKCPPLIB_TEXPR(__VA_ARGS__)
+#endif
+#ifndef AFIO_TPRED
+#define AFIO_TPRED(...) QUICKCPPLIB_TPRED(__VA_ARGS__)
+#endif
+#ifndef AFIO_REQUIRES
+#define AFIO_REQUIRES(...) QUICKCPPLIB_REQUIRES(__VA_ARGS__)
+#endif
 
 // A unique identifier generating macro
 #define AFIO_GLUE2(x, y) x##y

@@ -59,6 +59,8 @@ public:
                                    prefault = 1 << 9,     //!< Prefault, as if by reading every page, any views of memory upon creation.
                                    executable = 1 << 10,  //!< The backing storage is in fact an executable program binary.
 
+                                   barrier_on_close = 1 << 16,  //!< Maps of this section, if writable, issue a `barrier()` when destructed blocking until data (not metadata) reaches physical storage.
+
                                    // NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!
 
                                    readwrite = (read | write)};
@@ -263,10 +265,10 @@ public:
   the other constructor. This makes available all those very useful VM tricks Windows can do with section mapped memory which
   VirtualAlloc() memory cannot do.
 
-  \errors Any of the values POSIX mmap() or NtMapViewOfSection() can return.
+  \errors Any of the values POSIX mmap() or VirtualAlloc() can return.
   */
   AFIO_MAKE_FREE_FUNCTION
-  static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<map_handle> map(size_type bytes, section_handle::flag _flag = section_handle::flag::read | section_handle::flag::write) noexcept;
+  static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<map_handle> map(size_type bytes, section_handle::flag _flag = section_handle::flag::readwrite) noexcept;
 
   /*! Create a memory mapped view of a backing storage.
   \param section A memory section handle specifying the backing storage to use.
@@ -277,7 +279,7 @@ public:
   \errors Any of the values POSIX mmap() or NtMapViewOfSection() can return.
   */
   AFIO_MAKE_FREE_FUNCTION
-  static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<map_handle> map(section_handle &section, size_type bytes = 0, extent_type offset = 0, section_handle::flag _flag = section_handle::flag::read | section_handle::flag::write) noexcept;
+  static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<map_handle> map(section_handle &section, size_type bytes = 0, extent_type offset = 0, section_handle::flag _flag = section_handle::flag::readwrite) noexcept;
 
   //! The memory section this handle is using
   section_handle *section() const noexcept { return _section; }
@@ -293,7 +295,7 @@ public:
   size_type length() const noexcept { return _length; }
 
   //! Ask the system to commit the system resources to make the memory represented by the buffer available with the given permissions. addr and length should be page aligned (see utils::page_sizes()), if not the returned buffer is the region actually committed.
-  AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<buffer_type> commit(buffer_type region, section_handle::flag _flag = section_handle::flag::read | section_handle::flag::write) noexcept;
+  AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<buffer_type> commit(buffer_type region, section_handle::flag _flag = section_handle::flag::readwrite) noexcept;
 
   //! Ask the system to make the memory represented by the buffer unavailable and to decommit the system resources representing them. addr and length should be page aligned (see utils::page_sizes()), if not the returned buffer is the region actually decommitted.
   AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<buffer_type> decommit(buffer_type region) noexcept;

@@ -7,6 +7,8 @@ set(afio_HEADERS
   "include/afio/ntkernel-error-category/include/ntkernel_category.hpp"
   "include/afio/revision.hpp"
   "include/afio/v2.0/afio.hpp"
+  "include/afio/v2.0/algorithm/mapped_view.hpp"
+  "include/afio/v2.0/algorithm/section_allocator.hpp"
   "include/afio/v2.0/algorithm/shared_fs_mutex/atomic_append.hpp"
   "include/afio/v2.0/algorithm/shared_fs_mutex/base.hpp"
   "include/afio/v2.0/algorithm/shared_fs_mutex/byte_ranges.hpp"

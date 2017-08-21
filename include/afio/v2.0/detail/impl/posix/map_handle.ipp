@@ -77,6 +77,10 @@ result<void> map_handle::close() noexcept
   AFIO_LOG_FUNCTION_CALL(this);
   if(_addr)
   {
+    if(_section->section_flags() & section_handle::flag::barrier_on_close)
+    {
+      OUTCOME_TRYV(barrier({}, true, false));
+    }
     if(-1 == ::munmap(_addr, _length))
       return {errno, std::system_category()};
   }
@@ -107,6 +111,10 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::barrier(map_ha
     if(bytes + req.len < bytes)
       return std::errc::value_too_large;
     bytes += req.len;
+  }
+  if(reqs.buffers.empty())
+  {
+    bytes = _length;
   }
   int flags = (wait_for_device || and_metadata) ? MS_SYNC : MS_ASYNC;
   if(-1 == ::msync(addr, bytes, flags))
