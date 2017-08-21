@@ -210,7 +210,7 @@ protected:
       , _addr(nullptr)
       , _offset(0)
       , _length(0)
-      , _flag(section->section_flags())
+      , _flag(section ? section->section_flags() : section_handle::flag::none)
   {
   }
 
