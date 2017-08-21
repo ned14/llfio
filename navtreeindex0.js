@@ -20,6 +20,12 @@ var NAVTREEINDEX0 =
 "base_8hpp.html#a48547949428f2da935a05cad87f2a7ff":[4,0,0,0,0,0,0,1,3],
 "base_8hpp.html#af6e3781d4c08b2d3f74b32255f49479f":[4,0,0,0,0,0,0,1,4],
 "byte__ranges_8hpp.html":[4,0,0,0,0,0,0,2],
+"classafio__v2__xxx_1_1algorithm_1_1mapped__view.html":[3,0,0,0,1],
+"classafio__v2__xxx_1_1algorithm_1_1mapped__view.html#a0e413ca44e22e974598aa700f8fda08a":[3,0,0,0,1,0],
+"classafio__v2__xxx_1_1algorithm_1_1mapped__view.html#a347ec4809316c22d4b59b82f2b9b7023":[3,0,0,0,1,2],
+"classafio__v2__xxx_1_1algorithm_1_1mapped__view.html#a7812759f458831ea053fed38ec46dc30":[3,0,0,0,1,1],
+"classafio__v2__xxx_1_1algorithm_1_1mapped__view.html#a9b4829efc1c9b87957203e8313172064":[3,0,0,0,1,4],
+"classafio__v2__xxx_1_1algorithm_1_1mapped__view.html#af8a986d93d5967962763900af3f99824":[3,0,0,0,1,3],
 "classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1atomic__append.html":[3,0,0,0,0,0],
 "classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1atomic__append.html#a0987b9c6c93a65acb2715e589d45c273":[3,0,0,0,0,0,12],
 "classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1atomic__append.html#a0b8ee014f4d70b6e972eef6eed3a9cc5":[3,0,0,0,0,0,1],
@@ -243,11 +249,5 @@ var NAVTREEINDEX0 =
 "classafio__v2__xxx_1_1directory__handle.html#a771ef2bf39ad784eb6265dde077792ad":[3,0,0,8,59],
 "classafio__v2__xxx_1_1directory__handle.html#a875440f1b368472f1840c70c266f3a48":[3,0,0,8,41],
 "classafio__v2__xxx_1_1directory__handle.html#a8f27bd9d54e28aac2042886e06eccd5b":[3,0,0,8,24],
-"classafio__v2__xxx_1_1directory__handle.html#a90baeed9cd42aea9737e031426a32944":[3,0,0,8,11],
-"classafio__v2__xxx_1_1directory__handle.html#a97ffbbf53f51549549efef0b49e125dc":[3,0,0,8,22],
-"classafio__v2__xxx_1_1directory__handle.html#a9e2c2f026219cdb7e956a58ea0537f75":[3,0,0,8,4],
-"classafio__v2__xxx_1_1directory__handle.html#aa53d88105df8c6be01be649829a65b14":[3,0,0,8,29],
-"classafio__v2__xxx_1_1directory__handle.html#aac62f621c42be6eeb8d9a5700da367f9":[3,0,0,8,36],
-"classafio__v2__xxx_1_1directory__handle.html#ab3d876f5996605158fd6a0582adadad6":[3,0,0,8,27],
-"classafio__v2__xxx_1_1directory__handle.html#ab43eb3c35e9544ea148d1ac14ed35b4b":[3,0,0,8,5]
+"classafio__v2__xxx_1_1directory__handle.html#a90baeed9cd42aea9737e031426a32944":[3,0,0,8,11]
 };

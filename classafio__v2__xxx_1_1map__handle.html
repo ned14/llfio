@@ -223,10 +223,10 @@ char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cl
 <a class="el" href="classafio__v2__xxx_1_1handle.html#a0adf7fa00e23ed561328f473986e9ccc">size_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1map__handle.html#aba6ebe9afaccfaf59a92c5b85c72e7d2">length</a> () const noexcept</td></tr>
 <tr class="memdesc:aba6ebe9afaccfaf59a92c5b85c72e7d2"><td class="mdescLeft">&#160;</td><td class="mdescRight">The size of the memory map. <br/></td></tr>
 <tr class="separator:aba6ebe9afaccfaf59a92c5b85c72e7d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9e2e22376e63670584421cd055c1b6ff"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9e2e22376e63670584421cd055c1b6ff"></a>
-result&lt; <a class="el" href="structafio__v2__xxx_1_1io__handle_1_1buffer__type.html">buffer_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1map__handle.html#a9e2e22376e63670584421cd055c1b6ff">commit</a> (<a class="el" href="structafio__v2__xxx_1_1io__handle_1_1buffer__type.html">buffer_type</a> region, section_handle::flag _flag=section_handle::flag::read|section_handle::flag::write) noexcept</td></tr>
-<tr class="memdesc:a9e2e22376e63670584421cd055c1b6ff"><td class="mdescLeft">&#160;</td><td class="mdescRight">Ask the system to commit the system resources to make the memory represented by the buffer available with the given permissions. addr and length should be page aligned (see utils::page_sizes()), if not the returned buffer is the region actually committed. <br/></td></tr>
-<tr class="separator:a9e2e22376e63670584421cd055c1b6ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0e1645859018bbc0b977bc8ed7687fc5"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0e1645859018bbc0b977bc8ed7687fc5"></a>
+result&lt; <a class="el" href="structafio__v2__xxx_1_1io__handle_1_1buffer__type.html">buffer_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1map__handle.html#a0e1645859018bbc0b977bc8ed7687fc5">commit</a> (<a class="el" href="structafio__v2__xxx_1_1io__handle_1_1buffer__type.html">buffer_type</a> region, section_handle::flag _flag=section_handle::flag::readwrite) noexcept</td></tr>
+<tr class="memdesc:a0e1645859018bbc0b977bc8ed7687fc5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Ask the system to commit the system resources to make the memory represented by the buffer available with the given permissions. addr and length should be page aligned (see utils::page_sizes()), if not the returned buffer is the region actually committed. <br/></td></tr>
+<tr class="separator:a0e1645859018bbc0b977bc8ed7687fc5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5b69e8faa8a9e47dec1b1a123c722a3e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5b69e8faa8a9e47dec1b1a123c722a3e"></a>
 result&lt; <a class="el" href="structafio__v2__xxx_1_1io__handle_1_1buffer__type.html">buffer_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1map__handle.html#a5b69e8faa8a9e47dec1b1a123c722a3e">decommit</a> (<a class="el" href="structafio__v2__xxx_1_1io__handle_1_1buffer__type.html">buffer_type</a> region) noexcept</td></tr>
 <tr class="memdesc:a5b69e8faa8a9e47dec1b1a123c722a3e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Ask the system to make the memory represented by the buffer unavailable and to decommit the system resources representing them. addr and length should be page aligned (see utils::page_sizes()), if not the returned buffer is the region actually decommitted. <br/></td></tr>
@@ -360,10 +360,10 @@ flag&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:af5f18eca79c68d7db2923c2817d1c6fb"><td class="memItemLeft" align="right" valign="top">static result&lt; <a class="el" href="classafio__v2__xxx_1_1map__handle.html">map_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1map__handle.html#af5f18eca79c68d7db2923c2817d1c6fb">map</a> (<a class="el" href="classafio__v2__xxx_1_1handle.html#a0adf7fa00e23ed561328f473986e9ccc">size_type</a> bytes, section_handle::flag _flag=section_handle::flag::read|section_handle::flag::write) noexcept</td></tr>
-<tr class="separator:af5f18eca79c68d7db2923c2817d1c6fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a820a00dbe33ffa034e1c4fe15aa89193"><td class="memItemLeft" align="right" valign="top">static result&lt; <a class="el" href="classafio__v2__xxx_1_1map__handle.html">map_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1map__handle.html#a820a00dbe33ffa034e1c4fe15aa89193">map</a> (<a class="el" href="classafio__v2__xxx_1_1section__handle.html">section_handle</a> &amp;<a class="el" href="classafio__v2__xxx_1_1map__handle.html#ab8a43a5388161f629fef5ee7256dbbc8">section</a>, <a class="el" href="classafio__v2__xxx_1_1handle.html#a0adf7fa00e23ed561328f473986e9ccc">size_type</a> bytes=0, <a class="el" href="classafio__v2__xxx_1_1handle.html#a818fff07c92eaab72532092d1c2a14f9">extent_type</a> <a class="el" href="classafio__v2__xxx_1_1map__handle.html#ac049430769b0fa1d06c93160cef5a2f9">offset</a>=0, section_handle::flag _flag=section_handle::flag::read|section_handle::flag::write) noexcept</td></tr>
-<tr class="separator:a820a00dbe33ffa034e1c4fe15aa89193"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9c43d182b257682d320f12f6e6be30b3"><td class="memItemLeft" align="right" valign="top">static result&lt; <a class="el" href="classafio__v2__xxx_1_1map__handle.html">map_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1map__handle.html#a9c43d182b257682d320f12f6e6be30b3">map</a> (<a class="el" href="classafio__v2__xxx_1_1handle.html#a0adf7fa00e23ed561328f473986e9ccc">size_type</a> bytes, section_handle::flag _flag=section_handle::flag::readwrite) noexcept</td></tr>
+<tr class="separator:a9c43d182b257682d320f12f6e6be30b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aab2f2816821bcde22353855873a34c48"><td class="memItemLeft" align="right" valign="top">static result&lt; <a class="el" href="classafio__v2__xxx_1_1map__handle.html">map_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1map__handle.html#aab2f2816821bcde22353855873a34c48">map</a> (<a class="el" href="classafio__v2__xxx_1_1section__handle.html">section_handle</a> &amp;<a class="el" href="classafio__v2__xxx_1_1map__handle.html#ab8a43a5388161f629fef5ee7256dbbc8">section</a>, <a class="el" href="classafio__v2__xxx_1_1handle.html#a0adf7fa00e23ed561328f473986e9ccc">size_type</a> bytes=0, <a class="el" href="classafio__v2__xxx_1_1handle.html#a818fff07c92eaab72532092d1c2a14f9">extent_type</a> <a class="el" href="classafio__v2__xxx_1_1map__handle.html#ac049430769b0fa1d06c93160cef5a2f9">offset</a>=0, section_handle::flag _flag=section_handle::flag::readwrite) noexcept</td></tr>
+<tr class="separator:aab2f2816821bcde22353855873a34c48"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae16cb0af9b96f90f87f42318f7d35e65"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae16cb0af9b96f90f87f42318f7d35e65"></a>
 static result&lt; span<br class="typebreak"/>
 &lt; <a class="el" href="structafio__v2__xxx_1_1io__handle_1_1buffer__type.html">buffer_type</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1map__handle.html#ae16cb0af9b96f90f87f42318f7d35e65">prefetch</a> (span&lt; <a class="el" href="structafio__v2__xxx_1_1io__handle_1_1buffer__type.html">buffer_type</a> &gt; regions) noexcept</td></tr>
@@ -703,7 +703,7 @@ For portability, you can only assume that barriers write order for a single hand
 </div><!-- fragment -->
 </div>
 </div>
-<a class="anchor" id="af5f18eca79c68d7db2923c2817d1c6fb"></a>
+<a class="anchor" id="a9c43d182b257682d320f12f6e6be30b3"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -720,7 +720,7 @@ For portability, you can only assume that barriers write order for a single hand
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">section_handle::flag&#160;</td>
-          <td class="paramname"><em>_flag</em> = <code>section_handle::flag::read|section_handle::flag::write</code>&#160;</td>
+          <td class="paramname"><em>_flag</em> = <code>section_handle::flag::readwrite</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -743,11 +743,11 @@ For portability, you can only assume that barriers write order for a single hand
   </dd>
 </dl>
 <dl class="section note"><dt>Note</dt><dd>On Microsoft Windows this constructor uses the faster VirtualAlloc() which creates less versatile page backed memory. If you want anonymous memory allocated from a paging file backed section instead, create a page file backed section and then a mapped view from that using the other constructor. This makes available all those very useful VM tricks Windows can do with section mapped memory which VirtualAlloc() memory cannot do.</dd></dl>
-<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX mmap() or NtMapViewOfSection() can return. </dd></dl>
+<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX mmap() or VirtualAlloc() can return. </dd></dl>
 
 </div>
 </div>
-<a class="anchor" id="a820a00dbe33ffa034e1c4fe15aa89193"></a>
+<a class="anchor" id="aab2f2816821bcde22353855873a34c48"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -776,7 +776,7 @@ For portability, you can only assume that barriers write order for a single hand
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">section_handle::flag&#160;</td>
-          <td class="paramname"><em>_flag</em> = <code>section_handle::flag::read|section_handle::flag::write</code>&#160;</td>
+          <td class="paramname"><em>_flag</em> = <code>section_handle::flag::readwrite</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -826,10 +826,10 @@ For portability, you can only assume that barriers write order for a single hand
 </table>
 </div><div class="memdoc">
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;  {</div>
-<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;    OUTCOME_TRY(ret, <a class="code" href="classafio__v2__xxx_1_1map__handle.html#ae16cb0af9b96f90f87f42318f7d35e65">prefetch</a>(span&lt;buffer_type&gt;(&amp;region, 1)));</div>
-<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;    <span class="keywordflow">return</span> *ret.data();</div>
-<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;  }</div>
+<div class="fragment"><div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;  {</div>
+<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;    OUTCOME_TRY(ret, <a class="code" href="classafio__v2__xxx_1_1map__handle.html#ae16cb0af9b96f90f87f42318f7d35e65">prefetch</a>(span&lt;buffer_type&gt;(&amp;region, 1)));</div>
+<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;    <span class="keywordflow">return</span> *ret.data();</div>
+<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;  }</div>
 <div class="ttc" id="classafio__v2__xxx_1_1map__handle_html_ae16cb0af9b96f90f87f42318f7d35e65"><div class="ttname"><a href="classafio__v2__xxx_1_1map__handle.html#ae16cb0af9b96f90f87f42318f7d35e65">afio_v2_xxx::map_handle::prefetch</a></div><div class="ttdeci">static result&lt; span&lt; buffer_type &gt; &gt; prefetch(span&lt; buffer_type &gt; regions) noexcept</div><div class="ttdoc">Ask the system to begin to asynchronously prefetch the span of memory regions given, returning the regions actually prefetched. Note that on Windows 7 or earlier the system call to implement this was not available, and so you will see an empty span returned. </div></div>
 </div><!-- fragment -->
 </div>

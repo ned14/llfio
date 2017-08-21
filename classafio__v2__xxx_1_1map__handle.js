@@ -25,7 +25,7 @@ var classafio__v2__xxx_1_1map__handle =
     [ "barrier", "classafio__v2__xxx_1_1map__handle.html#a243156928e89b8988a1412f211b3b603", null ],
     [ "clone", "classafio__v2__xxx_1_1map__handle.html#a54790e954f57372b87b095451cc79c38", null ],
     [ "close", "classafio__v2__xxx_1_1map__handle.html#a1de468f5375b9da6fc14dd3cd76fa998", null ],
-    [ "commit", "classafio__v2__xxx_1_1map__handle.html#a9e2e22376e63670584421cd055c1b6ff", null ],
+    [ "commit", "classafio__v2__xxx_1_1map__handle.html#a0e1645859018bbc0b977bc8ed7687fc5", null ],
     [ "current_path", "classafio__v2__xxx_1_1map__handle.html#a616a67222676af5ec5b3aa94d7c02428", null ],
     [ "decommit", "classafio__v2__xxx_1_1map__handle.html#a5b69e8faa8a9e47dec1b1a123c722a3e", null ],
     [ "do_not_store", "classafio__v2__xxx_1_1map__handle.html#aa25715985351f79e034bb1ef37f74824", null ],

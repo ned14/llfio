@@ -1,5 +1,11 @@
 var NAVTREEINDEX1 =
 {
+"classafio__v2__xxx_1_1directory__handle.html#a97ffbbf53f51549549efef0b49e125dc":[3,0,0,8,22],
+"classafio__v2__xxx_1_1directory__handle.html#a9e2c2f026219cdb7e956a58ea0537f75":[3,0,0,8,4],
+"classafio__v2__xxx_1_1directory__handle.html#aa53d88105df8c6be01be649829a65b14":[3,0,0,8,29],
+"classafio__v2__xxx_1_1directory__handle.html#aac62f621c42be6eeb8d9a5700da367f9":[3,0,0,8,36],
+"classafio__v2__xxx_1_1directory__handle.html#ab3d876f5996605158fd6a0582adadad6":[3,0,0,8,27],
+"classafio__v2__xxx_1_1directory__handle.html#ab43eb3c35e9544ea148d1ac14ed35b4b":[3,0,0,8,5],
 "classafio__v2__xxx_1_1directory__handle.html#ab790af4654f5455d8c5e1f1d397543ca":[3,0,0,8,30],
 "classafio__v2__xxx_1_1directory__handle.html#ab8def17e3aca3866e7d3dbd899f23fe4":[3,0,0,8,2],
 "classafio__v2__xxx_1_1directory__handle.html#aba38e07ad5f70bce164f22b5f2e1d880":[3,0,0,8,12],
@@ -243,11 +249,5 @@ var NAVTREEINDEX1 =
 "classafio__v2__xxx_1_1io__handle_1_1extent__guard.html#a055302071c01e5ac1626cda4d179e313":[3,0,0,12,2,4],
 "classafio__v2__xxx_1_1io__handle_1_1extent__guard.html#a15ded83348af6cd802e49b261b7734ea":[3,0,0,12,2,3],
 "classafio__v2__xxx_1_1io__handle_1_1extent__guard.html#a2455cde5b7244855bc3d22a7cd625166":[3,0,0,12,2,6],
-"classafio__v2__xxx_1_1io__handle_1_1extent__guard.html#a3a575d17f757d18ca077d004790bb91b":[3,0,0,12,2,8],
-"classafio__v2__xxx_1_1io__handle_1_1extent__guard.html#a3e8e08d70c44c016fcd527457d9c761e":[3,0,0,12,2,5],
-"classafio__v2__xxx_1_1io__handle_1_1extent__guard.html#a654755e3c10998191fe5a923df02c4e3":[3,0,0,12,2,1],
-"classafio__v2__xxx_1_1io__handle_1_1extent__guard.html#a7b1174cb914471d635484e4f0937dac9":[3,0,0,12,2,7],
-"classafio__v2__xxx_1_1io__handle_1_1extent__guard.html#a8774c7f192061ccff6659f645d1e51fd":[3,0,0,12,2,10],
-"classafio__v2__xxx_1_1io__handle_1_1extent__guard.html#a954c5d5a2b4f91a7af3caf7f36dbbdbe":[3,0,0,12,2,11],
-"classafio__v2__xxx_1_1io__handle_1_1extent__guard.html#ab3186062f0496b7c65272c81bbab4e1c":[3,0,0,12,2,9]
+"classafio__v2__xxx_1_1io__handle_1_1extent__guard.html#a3a575d17f757d18ca077d004790bb91b":[3,0,0,12,2,8]
 };
