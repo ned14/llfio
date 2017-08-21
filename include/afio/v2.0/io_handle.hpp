@@ -352,6 +352,8 @@ public:
 
   /*! \brief Tries to lock the range of bytes specified for shared or exclusive access. Be aware this passes through
   the same semantics as the underlying OS call, including any POSIX insanity present on your platform.
+  You almost cetainly should use your choice of an `algorithm::shared_fs_mutex::*` instead of this
+  as those are more portable and performant.
 
   \warning On older Linuxes and POSIX, this uses `fcntl()` with the well known insane POSIX
   semantics that closing ANY handle to this file releases all bytes range locks on it. If your

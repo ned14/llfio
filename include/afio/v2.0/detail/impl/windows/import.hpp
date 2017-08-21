@@ -274,6 +274,8 @@ namespace windows_nt_kernel
 
   typedef NTSTATUS(NTAPI *NtFlushBuffersFileEx_t)(_In_ HANDLE FileHandle, _In_ ULONG Flags, _Out_ PIO_STATUS_BLOCK IoStatusBlock);
 
+  typedef NTSTATUS(WINAPI *NtSetSystemInformation_t)(_In_ INT SystemInformationClass, _In_ PVOID SystemInformation, _In_ ULONG SystemInformationLength);
+
   typedef BOOLEAN(NTAPI *RtlGenRandom_t)(_Out_ PVOID RandomBuffer, _In_ ULONG RandomBufferLength);
 
   typedef BOOL(WINAPI *OpenProcessToken_t)(_In_ HANDLE ProcessHandle, _In_ DWORD DesiredAccess, _Out_ PHANDLE TokenHandle);
@@ -500,6 +502,7 @@ namespace windows_nt_kernel
   static NtMapViewOfSection_t NtMapViewOfSection;
   static NtUnmapViewOfSection_t NtUnmapViewOfSection;
   static NtFlushBuffersFileEx_t NtFlushBuffersFileEx;
+  static NtSetSystemInformation_t NtSetSystemInformation;
   static RtlGenRandom_t RtlGenRandom;
   static OpenProcessToken_t OpenProcessToken;
   static LookupPrivilegeValue_t LookupPrivilegeValue;
@@ -584,6 +587,9 @@ namespace windows_nt_kernel
         abort();
     if(!NtFlushBuffersFileEx)
       if(!(NtFlushBuffersFileEx = (NtFlushBuffersFileEx_t) GetProcAddress(ntdllh, "NtFlushBuffersFileEx")))
+        abort();
+    if(!NtSetSystemInformation)
+      if(!(NtSetSystemInformation = (NtSetSystemInformation_t) GetProcAddress(ntdllh, "NtSetSystemInformation")))
         abort();
     HMODULE advapi32 = LoadLibraryA("ADVAPI32.DLL");
     if(!RtlGenRandom)

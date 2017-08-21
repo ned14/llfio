@@ -103,6 +103,19 @@ int main(int argc, char *argv[])
     make_testfile("test");
   }
   // File closes, as it was opened with O_SYNC it forces extent allocation
+  // Drop filesystem caches
+  {
+    std::cout << "Attempting to flush all modified data in system and drop all filesystem caches ..." << std::endl;
+    result<void> o = utils::drop_filesystem_cache();
+    if(o)
+    {
+      std::cout << "   Success!" << std::endl;
+    }
+    else
+    {
+      std::cout << "   WARNING: Failed due to " << o.error().message() << std::endl;
+    }
+  }
   // Pause as Windows still takes a while
   std::cout << "Waiting for hard drive to quieten after temp files written ..." << std::endl;
   std::this_thread::sleep_for(std::chrono::seconds(10));

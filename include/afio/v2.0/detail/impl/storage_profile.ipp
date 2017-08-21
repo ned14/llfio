@@ -244,6 +244,12 @@ namespace storage_profile
       sp.clock_overhead.value = info.overhead;
       return success();
     }
+    outcome<void> drop_filesystem_cache_support(storage_profile &sp, file_handle & /*unused*/) noexcept
+    {
+      static bool v = !!utils::drop_filesystem_cache();
+      sp.drop_filesystem_cache_support.value = v;
+      return success();
+    }
   }
   namespace storage
   {
@@ -702,6 +708,7 @@ namespace storage_profile
             workfiles[n] = &_workfiles.back();
           }
         }
+        (void) utils::drop_filesystem_cache();
 
         std::vector<std::vector<unsigned long long>> results(noreaders + nowriters);
         std::vector<std::pair<std::thread, std::future<void>>> writers, readers;

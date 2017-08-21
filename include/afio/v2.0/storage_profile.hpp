@@ -174,6 +174,7 @@ namespace storage_profile
     }
     // High resolution clock granularity
     AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> clock_granularity(storage_profile &sp, file_handle &h) noexcept;
+    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> drop_filesystem_cache_support(storage_profile &sp, file_handle & /*unused*/) noexcept;
   }
   namespace storage
   {
@@ -265,6 +266,7 @@ namespace storage_profile
     item<float> mem_in_use = {"system:mem:in_use", &system::mem};  // not including caches etc.
     item<unsigned> clock_granularity = {"system:timer:ns_per_tick", &system::clock_granularity};
     item<unsigned> clock_overhead = {"system:timer:ns_overhead", &system::clock_granularity};
+    item<unsigned> drop_filesystem_cache_support = {"system:drop_filesystem_cache_support", &system::drop_filesystem_cache_support};
 
     // Controller characteristics
     item<std::string> controller_type = {"storage:controller:kind", &storage::device};  // e.g. SATA

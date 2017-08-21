@@ -114,7 +114,7 @@ namespace utils
 #pragma warning(pop)
 #endif
 
-  void random_fill(char *buffer, size_t bytes)
+  void random_fill(char *buffer, size_t bytes) noexcept
   {
     static QUICKCPPLIB_NAMESPACE::configurable_spinlock::spinlock<bool> lock;
     static int randomfd = -1;
@@ -128,6 +128,26 @@ namespace utils
       AFIO_LOG_FATAL(0, "afio: Kernel crypto function failed");
       std::terminate();
     }
+  }
+
+  result<void> drop_filesystem_cache() noexcept
+  {
+#ifdef __linux__
+    ::sync();
+    int h = ::open("/proc/sys/vm/drop_caches", O_WRONLY);
+    if(h == -1)
+    {
+      return {errno, std::system_category()};
+    }
+    auto unh = undoer([&h] { ::close(h); });
+    char v = '3';  // drop everything
+    if(-1 == ::write(h, &v, 1))
+    {
+      return {errno, std::system_category()};
+    }
+    return success();
+#endif
+    return std::errc::not_supported;
   }
 
   namespace detail

@@ -94,7 +94,7 @@ namespace utils
 #pragma warning(pop)
 #endif
 
-  void random_fill(char *buffer, size_t bytes)
+  void random_fill(char *buffer, size_t bytes) noexcept
   {
     windows_nt_kernel::init();
     using namespace windows_nt_kernel;
@@ -103,6 +103,71 @@ namespace utils
       AFIO_LOG_FATAL(0, "afio: Kernel crypto function failed");
       std::terminate();
     }
+  }
+
+  result<void> drop_filesystem_cache() noexcept
+  {
+    windows_nt_kernel::init();
+    using namespace windows_nt_kernel;
+    HANDLE processToken;
+    if(OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &processToken) == FALSE)
+    {
+      return {GetLastError(), std::system_category()};
+    }
+    auto unprocessToken = undoer([&processToken] { CloseHandle(processToken); });
+    {
+      LUID luid;
+      if(!LookupPrivilegeValue(NULL, L"SeIncreaseQuotaPrivilege", &luid))
+      {
+        return {GetLastError(), std::system_category()};
+      }
+      TOKEN_PRIVILEGES tp;
+      tp.PrivilegeCount = 1;
+      tp.Privileges[0].Luid = luid;
+      tp.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
+      if(!AdjustTokenPrivileges(processToken, FALSE, &tp, sizeof(TOKEN_PRIVILEGES), (PTOKEN_PRIVILEGES) NULL, (PDWORD) NULL))
+      {
+        return {GetLastError(), std::system_category()};
+      }
+      if(GetLastError() == ERROR_NOT_ALL_ASSIGNED)
+      {
+        return {GetLastError(), std::system_category()};
+      }
+    }
+    {
+      LUID luid;
+      if(!LookupPrivilegeValue(NULL, L"SeProfileSingleProcessPrivilege", &luid))
+      {
+        return {GetLastError(), std::system_category()};
+      }
+      TOKEN_PRIVILEGES tp;
+      tp.PrivilegeCount = 1;
+      tp.Privileges[0].Luid = luid;
+      tp.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
+      if(!AdjustTokenPrivileges(processToken, FALSE, &tp, sizeof(TOKEN_PRIVILEGES), (PTOKEN_PRIVILEGES) NULL, (PDWORD) NULL))
+      {
+        return {GetLastError(), std::system_category()};
+      }
+      if(GetLastError() == ERROR_NOT_ALL_ASSIGNED)
+      {
+        return {GetLastError(), std::system_category()};
+      }
+    }
+    typedef enum _SYSTEM_MEMORY_LIST_COMMAND { MemoryCaptureAccessedBits, MemoryCaptureAndResetAccessedBits, MemoryEmptyWorkingSets, MemoryFlushModifiedList, MemoryPurgeStandbyList, MemoryPurgeLowPriorityStandbyList, MemoryCommandMax } SYSTEM_MEMORY_LIST_COMMAND;
+
+    // Write all modified pages to storage
+    SYSTEM_MEMORY_LIST_COMMAND command = MemoryPurgeStandbyList;
+    NTSTATUS ntstat = NtSetSystemInformation(80 /*SystemMemoryListInformation*/, &command, sizeof(SYSTEM_MEMORY_LIST_COMMAND));
+    if(ntstat != STATUS_SUCCESS)
+    {
+      return {(int) ntstat, ntkernel_category()};
+    }
+    // Drop filesystem cache
+    if(!SetSystemFileCacheSize(-1, -1, 0))
+    {
+      return {GetLastError(), std::system_category()};
+    }
+    return success();
   }
 
   namespace detail

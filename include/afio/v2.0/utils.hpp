@@ -91,7 +91,7 @@ namespace utils
   \complexity{Whatever the system API takes (one would hope constant time).}
   \exceptionmodel{Any error from the operating system or std::bad_alloc.}
   */
-  inline size_t file_buffer_default_size() noexcept
+  inline size_t file_buffer_default_size()
   {
     static size_t size;
     if(!size)
@@ -117,7 +117,7 @@ namespace utils
   \complexity{Whatever the system API takes.}
   \exceptionmodel{Any error from the operating system.}
   */
-  AFIO_HEADERS_ONLY_FUNC_SPEC void random_fill(char *buffer, size_t bytes);
+  AFIO_HEADERS_ONLY_FUNC_SPEC void random_fill(char *buffer, size_t bytes) noexcept;
 
   /*! \brief Returns a cryptographically random string capable of being used as a filename. Essentially random_fill() + to_hex_string().
 
@@ -135,6 +135,15 @@ namespace utils
     QUICKCPPLIB_NAMESPACE::algorithm::string::to_hex_string(const_cast<char *>(ret.data()), outlen, ret.data(), randomlen);
     return ret;
   }
+
+  /*! \brief Tries to flush all modified data to the physical device, and then drop the OS filesystem cache,
+  thus making all future reads come from the physical device. Currently only implemented for Microsoft Windows and Linux.
+
+  Note that the OS specific magic called by this routine generally requires elevated privileges for the calling process.
+  For obvious reasons, calling this will have a severe negative impact on performance, but it's very useful for
+  benchmarking cold cache vs warm cache performance.
+  */
+  AFIO_HEADERS_ONLY_FUNC_SPEC result<void> drop_filesystem_cache() noexcept;
 
   namespace detail
   {
