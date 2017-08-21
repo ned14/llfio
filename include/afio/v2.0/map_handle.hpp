@@ -203,12 +203,14 @@ protected:
   char *_addr;
   extent_type _offset;
   size_type _length;
+  section_handle::flag _flag;
 
   explicit map_handle(section_handle *section)
       : _section(section)
       , _addr(nullptr)
       , _offset(0)
       , _length(0)
+      , _flag(section->section_flags())
   {
   }
 
@@ -220,16 +222,18 @@ public:
       , _addr(nullptr)
       , _offset(0)
       , _length(0)
+      , _flag(section_handle::flag::none)
   {
   }
   AFIO_HEADERS_ONLY_MEMFUNC_SPEC ~map_handle();
   //! Implicit move construction of map_handle permitted
-  constexpr map_handle(map_handle &&o) noexcept : io_handle(std::move(o)), _section(o._section), _addr(o._addr), _offset(o._offset), _length(o._length)
+  constexpr map_handle(map_handle &&o) noexcept : io_handle(std::move(o)), _section(o._section), _addr(o._addr), _offset(o._offset), _length(o._length), _flag(o._flag)
   {
     o._section = nullptr;
     o._addr = nullptr;
     o._offset = 0;
     o._length = 0;
+    o._flag = section_handle::flag::none;
   }
   //! Move assignment of map_handle permitted
   map_handle &operator=(map_handle &&o) noexcept
