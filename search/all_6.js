@@ -32,6 +32,7 @@ var searchData=
   ['flag_5fbase',['flag_base',['../structafio__v2__xxx_1_1section__handle_1_1flag__base.html',1,'afio_v2_xxx::section_handle']]],
   ['flag_5fbase',['flag_base',['../structafio__v2__xxx_1_1handle_1_1flag__base.html',1,'afio_v2_xxx::handle']]],
   ['flags',['flags',['../classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6',1,'afio_v2_xxx::handle']]],
+  ['flush_5fmodified_5fdata',['flush_modified_data',['../namespaceafio__v2__xxx_1_1utils.html#a17a232f68f865706495f9f6e3a85e5d5',1,'afio_v2_xxx::utils']]],
   ['fs_5fhandle',['fs_handle',['../classafio__v2__xxx_1_1fs__handle.html',1,'afio_v2_xxx']]],
   ['fs_5fhandle',['fs_handle',['../classafio__v2__xxx_1_1fs__handle.html#a73339904321a53bf0ef493ecf2927d44',1,'afio_v2_xxx::fs_handle::fs_handle()'],['../classafio__v2__xxx_1_1fs__handle.html#a45eb2220cdefa846fdb103d12a5ce485',1,'afio_v2_xxx::fs_handle::fs_handle(dev_t devid, ino_t inode)'],['../classafio__v2__xxx_1_1fs__handle.html#a274f5d82e11f92ed62e05919076508b8',1,'afio_v2_xxx::fs_handle::fs_handle(const fs_handle &amp;)=delete'],['../classafio__v2__xxx_1_1fs__handle.html#a10d68d2506b9d587e7cad8485fef9637',1,'afio_v2_xxx::fs_handle::fs_handle(fs_handle &amp;&amp;o) noexcept']]],
   ['fs_5fhandle_2ehpp',['fs_handle.hpp',['../fs__handle_8hpp.html',1,'']]],

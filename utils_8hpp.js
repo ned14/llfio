@@ -9,6 +9,7 @@ var utils_8hpp =
     [ "deallocate_large_pages", "utils_8hpp.html#a23dd1191399dd20f3e23c3ff4b3a0c2e", null ],
     [ "drop_filesystem_cache", "utils_8hpp.html#a34fff580f0b7e7bea5509e5294f5d71e", null ],
     [ "file_buffer_default_size", "utils_8hpp.html#ace050f445d1d1fdd4b2a6f99d9be7f85", null ],
+    [ "flush_modified_data", "utils_8hpp.html#a17a232f68f865706495f9f6e3a85e5d5", null ],
     [ "operator==", "utils_8hpp.html#a2d0c1e951ea0b9f45b3e6d331f194e68", null ],
     [ "page_size", "utils_8hpp.html#a337c41ad9b9dcbc6dbd81f2e706b469d", null ],
     [ "page_sizes", "utils_8hpp.html#aadc7dd505730e2701313be55519c9958", null ],

@@ -42,7 +42,7 @@ var NAVTREEINDEX =
 "classafio__v2__xxx_1_1io__handle_1_1extent__guard.html#a3e8e08d70c44c016fcd527457d9c761e",
 "classafio__v2__xxx_1_1section__handle.html#aac62f621c42be6eeb8d9a5700da367f9",
 "namespaceafio__v2__xxx_1_1utils.html",
-"structafio__v2__xxx_1_1statfs__t_1_1f__flags__t.html#a2dcc8c52ed1147d36a480af7e43a263e"
+"structafio__v2__xxx_1_1statfs__t.html#a2d3e50dff522b66e6ae5b9215baa5a23"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';
