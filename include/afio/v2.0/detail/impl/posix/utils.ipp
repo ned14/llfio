@@ -130,10 +130,16 @@ namespace utils
     }
   }
 
+  result<void> flush_modified_data() noexcept
+  {
+    ::sync();
+    return success();
+  }
+
   result<void> drop_filesystem_cache() noexcept
   {
+    (void) flush_modified_data();
 #ifdef __linux__
-    ::sync();
     int h = ::open("/proc/sys/vm/drop_caches", O_WRONLY);
     if(h == -1)
     {

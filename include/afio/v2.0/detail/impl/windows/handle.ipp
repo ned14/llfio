@@ -70,7 +70,7 @@ result<void> handle::close() noexcept
   AFIO_LOG_FUNCTION_CALL(this);
   if(_v)
   {
-    if(are_safety_fsyncs_issued())
+    if(are_safety_fsyncs_issued() && is_writable())
     {
       if(!FlushFileBuffers(_v.h))
         return {GetLastError(), std::system_category()};

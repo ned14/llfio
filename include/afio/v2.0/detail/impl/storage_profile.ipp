@@ -22,6 +22,7 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
+#include "../../directory_handle.hpp"
 #include "../../file_handle.hpp"
 #include "../../statfs.hpp"
 #include "../../storage_profile.hpp"
@@ -925,6 +926,187 @@ namespace storage_profile
       sp.readwrite_qd4_99999.value = s._99999;
       return success();
     }
+  }
+  namespace response_time
+  {
+    struct stats
+    {
+      unsigned long long create{0}, enumerate{0}, open_read{0}, open_write{0}, destroy{0};
+    };
+    inline outcome<stats> _traversal_N(file_handle &srch, size_t no, size_t bytes, bool cold_cache, bool race_free, bool reduced) noexcept
+    {
+      stats s;
+      try
+      {
+        directory_handle dirh(directory_handle::directory(srch.parent_path_handle().value(), "testdir", directory_handle::mode::write, directory_handle::creation::if_needed).value());
+        auto flags = srch.flags();
+        std::string filename;
+        filename.reserve(16);
+        std::chrono::high_resolution_clock::time_point begin, end;
+        alignas(4096) char buffer[4096];
+        memset(buffer, 78, sizeof(buffer));
+        if(!race_free)
+        {
+          flags |= handle::flag::disable_safety_unlinks | handle::flag::win_disable_unlink_emulation;
+        }
+        if(srch.requires_aligned_io())
+        {
+          bytes = utils::round_down_to_page_size(bytes);
+        }
+
+        if(cold_cache)
+        {
+          OUTCOME_TRYV(utils::drop_filesystem_cache());
+        }
+        begin = std::chrono::high_resolution_clock::now();
+        for(size_t n = 0; n < no; n++)
+        {
+          filename = std::to_string(n);
+          file_handle fileh(file_handle::file(dirh, filename, file_handle::mode::write, file_handle::creation::if_needed, srch.kernel_caching(), flags).value());
+          if(bytes > 0)
+          {
+            fileh.write(0, buffer, bytes).value();
+          }
+        }
+        if(srch.kernel_caching() == file_handle::caching::reads || srch.kernel_caching() == file_handle::caching::none)
+        {
+          (void) utils::flush_modified_data();
+        }
+        end = std::chrono::high_resolution_clock::now();
+        s.create = (unsigned long long) ((double) std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count() / no);
+        if(cold_cache)
+        {
+          (void) utils::drop_filesystem_cache();
+        }
+
+        std::vector<directory_entry> entries(no);
+        begin = std::chrono::high_resolution_clock::now();
+        directory_handle::enumerate_info ei(dirh.enumerate(entries).value());
+        assert(ei.done == true);
+        assert(ei.filled.size() == no);
+        end = std::chrono::high_resolution_clock::now();
+        s.enumerate = (unsigned long long) ((double) std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count() / no);
+        if(cold_cache)
+        {
+          (void) utils::drop_filesystem_cache();
+        }
+
+        if(!reduced)
+        {
+          begin = std::chrono::high_resolution_clock::now();
+          for(size_t n = 0; n < no; n++)
+          {
+            filename = std::to_string(n);
+            file_handle fileh(file_handle::file(dirh, filename, file_handle::mode::read, file_handle::creation::open_existing, srch.kernel_caching(), flags).value());
+          }
+          // For atime updating
+          if(srch.kernel_caching() == file_handle::caching::reads || srch.kernel_caching() == file_handle::caching::none)
+          {
+            (void) utils::flush_modified_data();
+          }
+          end = std::chrono::high_resolution_clock::now();
+          s.open_read = (unsigned long long) ((double) std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count() / no);
+          if(cold_cache)
+          {
+            (void) utils::drop_filesystem_cache();
+          }
+
+          begin = std::chrono::high_resolution_clock::now();
+          for(size_t n = 0; n < no; n++)
+          {
+            filename = std::to_string(n);
+            file_handle fileh(file_handle::file(dirh, filename, file_handle::mode::write, file_handle::creation::open_existing, srch.kernel_caching(), flags).value());
+          }
+          // For atime updating
+          if(srch.kernel_caching() == file_handle::caching::reads || srch.kernel_caching() == file_handle::caching::none)
+          {
+            (void) utils::flush_modified_data();
+          }
+          end = std::chrono::high_resolution_clock::now();
+          s.open_write = (unsigned long long) ((double) std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count() / no);
+          if(cold_cache)
+          {
+            (void) utils::drop_filesystem_cache();
+          }
+        }
+
+        begin = std::chrono::high_resolution_clock::now();
+        for(size_t n = 0; n < no; n++)
+        {
+          filename = std::to_string(n);
+          file_handle fileh(file_handle::file(dirh, filename, file_handle::mode::write, file_handle::creation::open_existing, srch.kernel_caching(), flags).value());
+          fileh.unlink().value();
+        }
+        if(srch.kernel_caching() == file_handle::caching::reads || srch.kernel_caching() == file_handle::caching::none)
+        {
+          (void) utils::flush_modified_data();
+        }
+        end = std::chrono::high_resolution_clock::now();
+        s.destroy = (unsigned long long) ((double) std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count() / no);
+
+        dirh.unlink().value();
+        return s;
+      }
+      catch(...)
+      {
+        return std::current_exception();
+      }
+    }
+    outcome<void> traversal_warm_racefree_0b(storage_profile &sp, file_handle &srch) noexcept
+    {
+      if(sp.create_file_warm_racefree_0b.value != (unsigned long long) -1)
+        return success();
+      size_t items = srch.are_writes_durable() ? 256 : 16384;
+      OUTCOME_TRY(s, _traversal_N(srch, items, 0, false, true, false));
+      sp.create_file_warm_racefree_0b.value = s.create;
+      sp.enumerate_file_warm_racefree_0b.value = s.enumerate;
+      sp.open_file_read_warm_racefree_0b.value = s.open_read;
+      sp.open_file_write_warm_racefree_0b.value = s.open_write;
+      sp.delete_file_warm_racefree_0b.value = s.destroy;
+      return success();
+    }
+    outcome<void> traversal_warm_nonracefree_0b(storage_profile &sp, file_handle &srch) noexcept
+    {
+      if(sp.create_file_warm_nonracefree_0b.value != (unsigned long long) -1)
+        return success();
+      size_t items = srch.are_writes_durable() ? 256 : 16384;
+      OUTCOME_TRY(s, _traversal_N(srch, items, 0, false, false, false));
+      sp.create_file_warm_nonracefree_0b.value = s.create;
+      sp.enumerate_file_warm_nonracefree_0b.value = s.enumerate;
+      sp.open_file_read_warm_nonracefree_0b.value = s.open_read;
+      sp.open_file_write_warm_nonracefree_0b.value = s.open_write;
+      sp.delete_file_warm_nonracefree_0b.value = s.destroy;
+      return success();
+    }
+    outcome<void> traversal_cold_racefree_0b(storage_profile &sp, file_handle &srch) noexcept
+    {
+      if(sp.create_file_cold_racefree_0b.value != (unsigned long long) -1)
+        return success();
+      size_t items = srch.are_writes_durable() ? 256 : 16384;
+      OUTCOME_TRY(s, _traversal_N(srch, items, 0, true, true, false));
+      sp.create_file_cold_racefree_0b.value = s.create;
+      sp.enumerate_file_cold_racefree_0b.value = s.enumerate;
+      sp.open_file_read_cold_racefree_0b.value = s.open_read;
+      sp.open_file_write_cold_racefree_0b.value = s.open_write;
+      sp.delete_file_cold_racefree_0b.value = s.destroy;
+      return success();
+    }
+    /*
+    outcome<void> traversal_warm_nonracefree_1M(storage_profile &sp, file_handle &srch) noexcept
+    {
+      if(sp.create_1M_files.value != (unsigned) -1)
+        return success();
+      if(srch.kernel_caching() != file_handle::caching::all)
+      {
+        return std::errc::invalid_argument;
+      }
+      OUTCOME_TRY(s, _traversal_N(srch, 1000000, 0, false, false, true));
+      sp.create_1M_files.value = s.create;
+      sp.enumerate_1M_files.value = s.enumerate;
+      sp.delete_1M_files.value = s.destroy;
+      return success();
+    }
+    */
   }
 }
 AFIO_V2_NAMESPACE_END

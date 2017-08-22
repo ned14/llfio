@@ -173,7 +173,15 @@ result<void> fs_handle::unlink(deadline d) noexcept
     auto randomname = utils::random_string(32);
     randomname.append(".deleted");
     OUTCOME_TRY(dirh, parent_path_handle(d));
-    OUTCOME_TRYV(relink(dirh, randomname));
+    result<void> out = relink(dirh, randomname);
+    if(!out)
+    {
+      // If something else is using it, we may not be able to rename
+      if(out.error().value() != (int) 0xC0000043 /*STATUS_SHARING_VIOLATION*/)
+      {
+        return out.error();
+      }
+    }
   }
   // No point marking it for deletion if it's already been so
   if(!(h.flags() & flag::unlink_on_close))

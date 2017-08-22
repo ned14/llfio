@@ -205,6 +205,22 @@ namespace storage_profile
     AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> write_qd16(storage_profile &sp, file_handle &h) noexcept;
     AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> readwrite_qd4(storage_profile &sp, file_handle &h) noexcept;
   }
+  namespace response_time
+  {
+    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> traversal_warm_racefree_0b(storage_profile &sp, file_handle &h) noexcept;
+    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> traversal_warm_racefree_1b(storage_profile &sp, file_handle &h) noexcept;
+    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> traversal_warm_racefree_4k(storage_profile &sp, file_handle &h) noexcept;
+    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> traversal_warm_nonracefree_0b(storage_profile &sp, file_handle &h) noexcept;
+    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> traversal_warm_nonracefree_1b(storage_profile &sp, file_handle &h) noexcept;
+    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> traversal_warm_nonracefree_4k(storage_profile &sp, file_handle &h) noexcept;
+    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> traversal_warm_nonracefree_1M(storage_profile &sp, file_handle &h) noexcept;
+    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> traversal_cold_racefree_0b(storage_profile &sp, file_handle &h) noexcept;
+    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> traversal_cold_racefree_1b(storage_profile &sp, file_handle &h) noexcept;
+    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> traversal_cold_racefree_4k(storage_profile &sp, file_handle &h) noexcept;
+    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> traversal_cold_nonracefree_0b(storage_profile &sp, file_handle &h) noexcept;
+    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> traversal_cold_nonracefree_1b(storage_profile &sp, file_handle &h) noexcept;
+    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> traversal_cold_nonracefree_4k(storage_profile &sp, file_handle &h) noexcept;
+  }
 
   //! A (possibly incomplet) profile of storage
   struct AFIO_DECL storage_profile
@@ -336,6 +352,30 @@ namespace storage_profile
     item<unsigned long long> readwrite_qd4_95 = {"latency:readwrite:qd4:95%", latency::readwrite_qd4, "The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4 (95% of the time)"};
     item<unsigned long long> readwrite_qd4_99 = {"latency:readwrite:qd4:99%", latency::readwrite_qd4, "The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4 (99% of the time)"};
     item<unsigned long long> readwrite_qd4_99999 = {"latency:readwrite:qd4:99.999%", latency::readwrite_qd4, "The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4 (99.999% of the time)"};
+
+    item<unsigned long long> create_file_warm_racefree_0b = {"response_time:race_free:warm_cache:create_file:0b", response_time::traversal_warm_racefree_0b, "The average nanoseconds to create a 0 byte file (warm cache, race free)"};
+    item<unsigned long long> enumerate_file_warm_racefree_0b = {"response_time:race_free:warm_cache:enumerate_file:0b", response_time::traversal_warm_racefree_0b, "The average nanoseconds to enumerate a 0 byte file (warm cache, race free)"};
+    item<unsigned long long> open_file_read_warm_racefree_0b = {"response_time:race_free:warm_cache:open_file_read:0b", response_time::traversal_warm_racefree_0b, "The average nanoseconds to open a 0 byte file for reading (warm cache, race free)"};
+    item<unsigned long long> open_file_write_warm_racefree_0b = {"response_time:race_free:warm_cache:open_file_write:0b", response_time::traversal_warm_racefree_0b, "The average nanoseconds to open a 0 byte file for writing (warm cache, race free)"};
+    item<unsigned long long> delete_file_warm_racefree_0b = {"response_time:race_free:warm_cache:delete_file:0b", response_time::traversal_warm_racefree_0b, "The average nanoseconds to delete a 0 byte file (warm cache, race free)"};
+
+    item<unsigned long long> create_file_warm_nonracefree_0b = {"response_time:non_race_free:warm_cache:create_file:0b", response_time::traversal_warm_nonracefree_0b, "The average nanoseconds to create a 0 byte file (warm cache, non race free)"};
+    item<unsigned long long> enumerate_file_warm_nonracefree_0b = {"response_time:non_race_free:warm_cache:enumerate_file:0b", response_time::traversal_warm_nonracefree_0b, "The average nanoseconds to enumerate a 0 byte file (warm cache, non race free)"};
+    item<unsigned long long> open_file_read_warm_nonracefree_0b = {"response_time:non_race_free:warm_cache:open_file_read:0b", response_time::traversal_warm_nonracefree_0b, "The average nanoseconds to open a 0 byte file for reading (warm cache, non race free)"};
+    item<unsigned long long> open_file_write_warm_nonracefree_0b = {"response_time:non_race_free:warm_cache:open_file_write:0b", response_time::traversal_warm_nonracefree_0b, "The average nanoseconds to open a 0 byte file for writing (warm cache, non race free)"};
+    item<unsigned long long> delete_file_warm_nonracefree_0b = {"response_time:non_race_free:warm_cache:delete_file:0b", response_time::traversal_warm_nonracefree_0b, "The average nanoseconds to delete a 0 byte file (warm cache, non race free)"};
+
+    item<unsigned long long> create_file_cold_racefree_0b = {"response_time:race_free:cold_cache:create_file:0b", response_time::traversal_cold_racefree_0b, "The average nanoseconds to create a 0 byte file (cold cache, race free)"};
+    item<unsigned long long> enumerate_file_cold_racefree_0b = {"response_time:race_free:cold_cache:enumerate_file:0b", response_time::traversal_cold_racefree_0b, "The average nanoseconds to enumerate a 0 byte file (cold cache, race free)"};
+    item<unsigned long long> open_file_read_cold_racefree_0b = {"response_time:race_free:cold_cache:open_file_read:0b", response_time::traversal_cold_racefree_0b, "The average nanoseconds to open a 0 byte file for reading (cold cache, race free)"};
+    item<unsigned long long> open_file_write_cold_racefree_0b = {"response_time:race_free:cold_cache:open_file_write:0b", response_time::traversal_cold_racefree_0b, "The average nanoseconds to open a 0 byte file for writing (cold cache, race free)"};
+    item<unsigned long long> delete_file_cold_racefree_0b = {"response_time:race_free:cold_cache:delete_file:0b", response_time::traversal_cold_racefree_0b, "The average nanoseconds to delete a 0 byte file (cold cache, race free)"};
+
+    /*
+    item<unsigned> create_1M_files = {"response_time:create_1M_files_single_dir", response_time::traversal_warm_nonracefree_1M, "The milliseconds to create 1M empty files in a single directory"};
+    item<unsigned> enumerate_1M_files = {"response_time:enumerate_1M_files_single_dir", response_time::traversal_warm_nonracefree_1M, "The milliseconds to enumerate 1M empty files in a single directory"};
+    item<unsigned> delete_1M_files = {"response_time:delete_1M_files_single_dir", response_time::traversal_warm_nonracefree_1M, "The milliseconds to delete 1M files in a single directory"};
+    */
   };
 }
 

@@ -167,6 +167,8 @@ public:
   /*! Unlinks the current path of this open handle, causing its entry to immediately disappear from the filing system.
   On Windows unless `flag::win_disable_unlink_emulation` is set, this behaviour is
   simulated by renaming the file to something random and setting its delete-on-last-close flag.
+  Note that Windows may prevent the renaming of a file in use by another process, if so it will
+  NOT be renamed.
   After the next handle to that file closes, it will become permanently unopenable by anyone
   else until the last handle is closed, whereupon the entry will be eventually removed by the
   operating system.

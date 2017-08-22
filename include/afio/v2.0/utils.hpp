@@ -136,6 +136,10 @@ namespace utils
     return ret;
   }
 
+  /*! \brief Tries to flush all modified data to the physical device.
+  */
+  AFIO_HEADERS_ONLY_FUNC_SPEC result<void> flush_modified_data() noexcept;
+
   /*! \brief Tries to flush all modified data to the physical device, and then drop the OS filesystem cache,
   thus making all future reads come from the physical device. Currently only implemented for Microsoft Windows and Linux.
 

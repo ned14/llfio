@@ -246,11 +246,11 @@ result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_typ
     item.stat.st_compressed = !!(ffdi->FileAttributes & FILE_ATTRIBUTE_COMPRESSED);
     item.stat.st_reparse_point = !!(ffdi->FileAttributes & FILE_ATTRIBUTE_REPARSE_POINT);
     n++;
-    if (!ffdi->NextEntryOffset)
+    if(!ffdi->NextEntryOffset)
     {
       // Fill is complete
       tofill._resize(n);
-      return enumerate_info{ std::move(tofill), default_stat_contents, true };
+      return enumerate_info{std::move(tofill), default_stat_contents, true};
     }
     if(n >= tofill.size())
     {

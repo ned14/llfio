@@ -105,53 +105,39 @@ namespace utils
     }
   }
 
-  result<void> drop_filesystem_cache() noexcept
+  result<void> flush_modified_data() noexcept
   {
     windows_nt_kernel::init();
     using namespace windows_nt_kernel;
-    HANDLE processToken;
-    if(OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &processToken) == FALSE)
+    static bool prived;
+    if(!prived)
     {
-      return {GetLastError(), std::system_category()};
-    }
-    auto unprocessToken = undoer([&processToken] { CloseHandle(processToken); });
-    {
-      LUID luid;
-      if(!LookupPrivilegeValue(NULL, L"SeIncreaseQuotaPrivilege", &luid))
+      HANDLE processToken;
+      if(OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &processToken) == FALSE)
       {
         return {GetLastError(), std::system_category()};
       }
-      TOKEN_PRIVILEGES tp;
-      tp.PrivilegeCount = 1;
-      tp.Privileges[0].Luid = luid;
-      tp.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
-      if(!AdjustTokenPrivileges(processToken, FALSE, &tp, sizeof(TOKEN_PRIVILEGES), (PTOKEN_PRIVILEGES) NULL, (PDWORD) NULL))
+      auto unprocessToken = undoer([&processToken] { CloseHandle(processToken); });
       {
-        return {GetLastError(), std::system_category()};
+        LUID luid;
+        if(!LookupPrivilegeValue(NULL, L"SeProfileSingleProcessPrivilege", &luid))
+        {
+          return {GetLastError(), std::system_category()};
+        }
+        TOKEN_PRIVILEGES tp;
+        tp.PrivilegeCount = 1;
+        tp.Privileges[0].Luid = luid;
+        tp.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
+        if(!AdjustTokenPrivileges(processToken, FALSE, &tp, sizeof(TOKEN_PRIVILEGES), (PTOKEN_PRIVILEGES) NULL, (PDWORD) NULL))
+        {
+          return {GetLastError(), std::system_category()};
+        }
+        if(GetLastError() == ERROR_NOT_ALL_ASSIGNED)
+        {
+          return {GetLastError(), std::system_category()};
+        }
       }
-      if(GetLastError() == ERROR_NOT_ALL_ASSIGNED)
-      {
-        return {GetLastError(), std::system_category()};
-      }
-    }
-    {
-      LUID luid;
-      if(!LookupPrivilegeValue(NULL, L"SeProfileSingleProcessPrivilege", &luid))
-      {
-        return {GetLastError(), std::system_category()};
-      }
-      TOKEN_PRIVILEGES tp;
-      tp.PrivilegeCount = 1;
-      tp.Privileges[0].Luid = luid;
-      tp.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
-      if(!AdjustTokenPrivileges(processToken, FALSE, &tp, sizeof(TOKEN_PRIVILEGES), (PTOKEN_PRIVILEGES) NULL, (PDWORD) NULL))
-      {
-        return {GetLastError(), std::system_category()};
-      }
-      if(GetLastError() == ERROR_NOT_ALL_ASSIGNED)
-      {
-        return {GetLastError(), std::system_category()};
-      }
+      prived = true;
     }
     typedef enum _SYSTEM_MEMORY_LIST_COMMAND { MemoryCaptureAccessedBits, MemoryCaptureAndResetAccessedBits, MemoryEmptyWorkingSets, MemoryFlushModifiedList, MemoryPurgeStandbyList, MemoryPurgeLowPriorityStandbyList, MemoryCommandMax } SYSTEM_MEMORY_LIST_COMMAND;
 
@@ -162,6 +148,45 @@ namespace utils
     {
       return {(int) ntstat, ntkernel_category()};
     }
+    return success();
+  }
+
+  result<void> drop_filesystem_cache() noexcept
+  {
+    windows_nt_kernel::init();
+    using namespace windows_nt_kernel;
+    static bool prived;
+    if(!prived)
+    {
+      HANDLE processToken;
+      if(OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &processToken) == FALSE)
+      {
+        return {GetLastError(), std::system_category()};
+      }
+      auto unprocessToken = undoer([&processToken] { CloseHandle(processToken); });
+      {
+        LUID luid;
+        if(!LookupPrivilegeValue(NULL, L"SeIncreaseQuotaPrivilege", &luid))
+        {
+          return {GetLastError(), std::system_category()};
+        }
+        TOKEN_PRIVILEGES tp;
+        tp.PrivilegeCount = 1;
+        tp.Privileges[0].Luid = luid;
+        tp.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
+        if(!AdjustTokenPrivileges(processToken, FALSE, &tp, sizeof(TOKEN_PRIVILEGES), (PTOKEN_PRIVILEGES) NULL, (PDWORD) NULL))
+        {
+          return {GetLastError(), std::system_category()};
+        }
+        if(GetLastError() == ERROR_NOT_ALL_ASSIGNED)
+        {
+          return {GetLastError(), std::system_category()};
+        }
+      }
+      prived = true;
+    }
+    // Flush modified data so dropping the cache drops everything
+    OUTCOME_TRYV(flush_modified_data());
     // Drop filesystem cache
     if(!SetSystemFileCacheSize(-1, -1, 0))
     {

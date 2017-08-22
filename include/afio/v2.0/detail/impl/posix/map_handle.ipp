@@ -77,7 +77,7 @@ result<void> map_handle::close() noexcept
   AFIO_LOG_FUNCTION_CALL(this);
   if(_addr)
   {
-    if(_flag & section_handle::flag::barrier_on_close)
+    if(is_writable() && (_flag & section_handle::flag::barrier_on_close))
     {
       OUTCOME_TRYV(barrier({}, true, false));
     }
