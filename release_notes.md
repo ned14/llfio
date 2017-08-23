@@ -25,20 +25,20 @@ Manufacturer claimed 4Kb transfer latencies for the physical hardware:
 - SATA flash drive latency @ QD1: **800us**
 - NVMe flash drive latency @ QD1: **300us**
 - RTT UDP packet latency over a LAN: **60us**
-- XPoint drive latency @ QD1: **10us**
+- NVMe Optane drive latency @ QD1: **10us**
 - `memcpy(4Kb)` latency: **5us** (main memory) to **1.3us** (L3 cache)
 - RTT PCIe latency: **0.5us**
 </td>
 <td valign="top" width="33%">
 100% read QD1 4Kb direct transfer latencies for the software with AFIO:
-- &lt; 99% spinning rust hard drive latency: **TODO**
+- &lt; 99% spinning rust hard drive latency: **230,005us**
 - &lt; 99% SATA flash drive latency: Windows **290us** Linux **158us**
 
 Lowest sustained 4Kb read latency benchmarked to date by author (page cache): **7us** (142k IOPS @ QD1, approx 558Mb/sec)
 </td>
 <td valign="top" width="33%">
 75% read 25% write QD4 4Kb direct transfer latencies for the software with AFIO:
-- &lt; 99% spinning rust hard drive latency: **TODO**
+- &lt; 99% spinning rust hard drive latency: **48,185us**
 - &lt; 99% SATA flash drive latency: Windows **1,812us** Linux **1,416us**
 
 Lowest sustained 4Kb write latency benchmarked to date by author (page cache): **7us** (142k IOPS @ QD1, approx 558Mb/sec)
