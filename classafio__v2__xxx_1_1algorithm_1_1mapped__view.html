@@ -193,7 +193,7 @@ template&lt;class T &gt; </div>
 <p>Create a view of new memory.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">bytes</td><td>The number of items to map. </td></tr>
+    <tr><td class="paramname">length</td><td>The number of items to map. </td></tr>
     <tr><td class="paramname">_flag</td><td>The flags to pass to <code>map_handle::map()</code>. </td></tr>
   </table>
   </dd>
@@ -259,7 +259,7 @@ template&lt;class T &gt; </div>
   <table class="params">
     <tr><td class="paramname">sh</td><td>The section handle to use as the data source for creating the map. </td></tr>
     <tr><td class="paramname">length</td><td>The number of items to map, use -1 to mean the length of the section handle divided by <code>sizeof(T)</code>. </td></tr>
-    <tr><td class="paramname">offset</td><td>The byte offset into the section handle, this does not need to be a multiple of the page size. </td></tr>
+    <tr><td class="paramname">byteoffset</td><td>The byte offset into the section handle, this does not need to be a multiple of the page size. </td></tr>
     <tr><td class="paramname">_flag</td><td>The flags to pass to <code>map_handle::map()</code>. </td></tr>
   </table>
   </dd>
