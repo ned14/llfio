@@ -351,8 +351,14 @@ public:
   {
     return _invoke([&p](const auto &v) { return -p.compare(v); });
   }
-  //! \overload
-  constexpr int compare(const char *s) const noexcept { return compare(string_view(s)); }
+//! \overload
+#ifndef _WIN32
+  constexpr
+#endif
+  int compare(const char *s) const noexcept
+  {
+    return compare(string_view(s));
+  }
 //! \overload
 #ifndef _WIN32
   constexpr

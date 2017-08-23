@@ -725,10 +725,10 @@ namespace storage_profile
           std::packaged_task<void()> task([no, &done, &workfiles, &results] {
             file_handle &h = *workfiles[no];
             alignas(4096) char buffer[4096];
-            memset(buffer, no, 4096);
+            memset(buffer, (int) no, 4096);
             file_handle::const_buffer_type _reqs[1] = {{buffer, 4096}};
             file_handle::io_request<file_handle::const_buffers_type> reqs(_reqs, 0);
-            QUICKCPPLIB_NAMESPACE::algorithm::small_prng::small_prng rand(no);
+            QUICKCPPLIB_NAMESPACE::algorithm::small_prng::small_prng rand((uint32_t) no);
             auto maxsize = h.length().value();
             --done;
             while(done)
@@ -759,7 +759,7 @@ namespace storage_profile
             alignas(4096) char buffer[4096];
             file_handle::buffer_type _reqs[1] = {{buffer, 4096}};
             file_handle::io_request<file_handle::buffers_type> reqs(_reqs, 0);
-            QUICKCPPLIB_NAMESPACE::algorithm::small_prng::small_prng rand(no);
+            QUICKCPPLIB_NAMESPACE::algorithm::small_prng::small_prng rand((uint32_t) no);
             auto maxsize = h.length().value();
             --done;
             while(done)
