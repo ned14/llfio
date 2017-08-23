@@ -27,6 +27,11 @@ Distributed under the Boost Software License, Version 1.0.
 #include <fcntl.h>
 #include <unistd.h>
 
+#ifdef __FreeBSD__
+#include <sys/sysctl.h>  // for sysctl()
+#include <sys/user.h>    // for struct kinfo_file
+#endif
+
 AFIO_V2_NAMESPACE_BEGIN
 
 handle::~handle()

@@ -58,6 +58,9 @@ all_link_libraries(PUBLIC quickcpplib::hl outcome::hl Threads::Threads)
 if(CMAKE_SYSTEM_NAME MATCHES "Linux")
   all_link_libraries(PUBLIC stdc++fs rt)
 endif()
+if(CMAKE_SYSTEM_NAME MATCHES "FreeBSD" OR APPLE)
+  all_link_libraries(PUBLIC c++experimental)
+endif()
 # Set any macros this library requires
 if(WIN32)
   all_compile_definitions(PRIVATE _WIN32_WINNT=0x600)  ## Target WinVista

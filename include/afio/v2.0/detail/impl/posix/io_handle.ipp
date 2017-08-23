@@ -138,7 +138,7 @@ result<io_handle::extent_guard> io_handle::lock(io_handle::extent_type offset, i
   if(0 == bytes)
   {
     // Non-Linux has a sane locking system in flock() if you are willing to lock the entire file
-    int operation = ((d && !d.nsec) ? LOCK_NB : 0) | (exclusive ? LOCK_EX : LOCK_SH);
+    int operation = ((d && !d.nsecs) ? LOCK_NB : 0) | (exclusive ? LOCK_EX : LOCK_SH);
     if(-1 == flock(_v.fd, operation))
       failed = true;
   }

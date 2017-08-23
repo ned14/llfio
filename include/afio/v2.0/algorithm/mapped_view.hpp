@@ -69,7 +69,7 @@ namespace algorithm
     constexpr mapped_view() = default;
     /*! Create a view of new memory.
 
-    \param bytes The number of items to map.
+    \param length The number of items to map.
     \param _flag The flags to pass to `map_handle::map()`.
     */
     mapped_view(size_type length, section_handle::flag _flag = section_handle::flag::readwrite)
@@ -82,7 +82,7 @@ namespace algorithm
 
     \param sh The section handle to use as the data source for creating the map.
     \param length The number of items to map, use -1 to mean the length of the section handle divided by `sizeof(T)`.
-    \param offset The byte offset into the section handle, this does not need to be a multiple of the page size.
+    \param byteoffset The byte offset into the section handle, this does not need to be a multiple of the page size.
     \param _flag The flags to pass to `map_handle::map()`.
     */
     mapped_view(section_handle &sh, size_type length = (size_type) -1, extent_type byteoffset = 0, section_handle::flag _flag = section_handle::flag::readwrite)

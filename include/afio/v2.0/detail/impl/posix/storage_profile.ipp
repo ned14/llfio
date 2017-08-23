@@ -216,8 +216,9 @@ namespace storage_profile
     namespace posix
     {
       // Controller type, max transfer, max buffers. Device name, size
-      outcome<void> _device(storage_profile &sp, file_handle &, std::string mntfromname, std::string /*fstypename*/) noexcept
+      outcome<void> _device(storage_profile &sp, file_handle &, std::string mntfromname, std::string fstypename) noexcept
       {
+	(void) fstypename;
         try
         {
           // Firstly open a handle to the device

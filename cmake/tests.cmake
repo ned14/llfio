@@ -11,8 +11,9 @@ set(afio_TESTS
   "test/tests/directory_handle_enumerate/runner.cpp"
   "test/tests/file_handle_create_close/runner.cpp"
   "test/tests/file_handle_lock_unlock.cpp"
-  "test/tests/map_handle_create_close/runner.cpp"
+  "test/tests/current_path.cpp"
   "test/tests/mapped_view.cpp"
+  "test/tests/map_handle_create_close/runner.cpp"
   "test/tests/section_handle_create_close/runner.cpp"
   "test/tests/shared_fs_mutex.cpp"
 )

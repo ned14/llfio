@@ -169,7 +169,7 @@ static inline result<void *> do_mmap(native_handle_type &nativeh, void *ataddr, 
     flags |= MAP_PREFAULT_READ;
 #endif
 #ifdef MAP_NOSYNC
-  if(have_backing && (section.backing()->kernel_caching() == handle::caching::temporary))
+  if(have_backing && (section->backing()->kernel_caching() == handle::caching::temporary))
     flags |= MAP_NOSYNC;
 #endif
   // printf("mmap(%p, %u, %d, %d, %d, %u)\n", ataddr, (unsigned) bytes, prot, flags, have_backing ? section->backing_native_handle().fd : -1, (unsigned) offset);
@@ -290,7 +290,7 @@ result<map_handle::buffer_type> map_handle::do_not_store(buffer_type region) noe
     return std::errc::invalid_argument;
 #ifdef MADV_FREE
   // Tell the kernel to throw away the contents of these pages
-  if(-1 == ::madvise(_region.data, _region.len, MADV_FREE))
+  if(-1 == ::madvise(region.data, region.len, MADV_FREE))
     return {errno, std::system_category()};
   else
     return region;

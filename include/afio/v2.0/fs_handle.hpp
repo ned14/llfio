@@ -55,11 +55,6 @@ public:
 protected:
   dev_t _devid;
   ino_t _inode;
-#ifdef __FreeBSD__  // FreeBSD can't look up the current path of file, only a directory
-  path_handle _pathbase;
-  path_type _path;
-#error TODO: Finish FreeBSD support
-#endif
 
   //! Fill in _devid and _inode from the handle via fstat()
   AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> _fetch_inode() noexcept;
@@ -79,9 +74,6 @@ protected:
       , _inode(inode)
   {
   }
-#ifdef __FreeBSD__
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC ~fs_handle() {}
-#endif
   //! No copy construction (use clone())
   fs_handle(const fs_handle &) = delete;
   //! No copy assignment
@@ -89,11 +81,6 @@ protected:
   //! Implicit move construction of fs_handle permitted
   constexpr fs_handle(fs_handle &&o) noexcept : _devid(o._devid),
                                                 _inode(o._inode)
-#ifdef __FreeBSD__
-                                                ,
-                                                _pathbase(std::move(o._pathbase)),
-                                                _path(std::move(o._path))
-#endif
   {
     o._devid = 0;
     o._inode = 0;
@@ -103,10 +90,6 @@ protected:
   {
     _devid = o._devid;
     _inode = o._inode;
-#ifdef __FreeBSD__
-    _pathbase = std::move(o._pathbase);
-    _path = std::move(o._path);
-#endif
     o._devid = 0;
     o._inode = 0;
     return *this;

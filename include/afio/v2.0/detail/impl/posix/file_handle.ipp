@@ -191,6 +191,8 @@ result<file_handle> file_handle::temp_inode(path_view_type dirpath, mode _mode, 
 
 file_handle::io_result<file_handle::const_buffers_type> file_handle::barrier(file_handle::io_request<file_handle::const_buffers_type> reqs, bool wait_for_device, bool and_metadata, deadline d) noexcept
 {
+  (void) wait_for_device;
+  (void) and_metadata;
   AFIO_LOG_FUNCTION_CALL(this);
   if(d)
     return std::errc::not_supported;
