@@ -115,9 +115,9 @@ public:
   static_assert(std::is_standard_layout<io_request<buffers_type>>::value, "io_request<buffers_type> is not a standard layout type!");
 #endif
   //! The i/o result type used by this handle. Guaranteed to be `TrivialType` apart from construction..
-  template <class T> struct io_result : public result<T>
+  template <class T> struct io_result : public AFIO_V2_NAMESPACE::result<T>
   {
-    using Base = result<T>;
+    using Base = AFIO_V2_NAMESPACE::result<T>;
     size_type _bytes_transferred{static_cast<size_type>(-1)};
 
 #if defined(_MSC_VER) && !defined(__clang__)  // workaround MSVC parsing bug

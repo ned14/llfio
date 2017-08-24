@@ -53,16 +53,17 @@ result<path_handle> fs_handle::parent_path_handle(deadline d) const noexcept
       auto currentpath_ = h.current_path();
       if(!currentpath_)
         continue;
-      filesystem::path _currentpath = std::move(currentpath_.value());
+      filesystem::path currentpath = std::move(currentpath_.value());
       // If current path is empty, it's been deleted
-      if(_currentpath.empty())
+      if(currentpath.empty())
         return std::errc::no_such_file_or_directory;
       // Split the path into root and leafname
-      path_view currentpath(_currentpath);
-      path_view filename = currentpath.filename();
+      filesystem::path filename = currentpath.filename();
       currentpath.remove_filename();
-      // Zero terminate the root path so it doesn't get copied later
-      const_cast<filesystem::path::string_type &>(_currentpath.native())[currentpath.native_size()] = 0;
+      /* We have to be super careful here because \Device\HarddiskVolume4 != \Device\HarddiskVolume4\!
+      The former opens the device, the latter the root directory of the device.
+      */
+      const_cast<filesystem::path::string_type &>(currentpath.native()).push_back('\\');
       auto currentdirh_ = path_handle::path(currentpath);
       if(!currentdirh_)
         continue;

@@ -245,6 +245,74 @@ namespace storage_profile
       sp.clock_overhead.value = info.overhead;
       return success();
     }
+    inline unsigned _sleep_wake_overhead()
+    {
+      static unsigned v;
+      if(!v)
+      {
+        unsigned count = (unsigned) -1, period = 1000;  // 1us
+        for(size_t n = 0; n < 20; n++)
+        {
+          std::chrono::high_resolution_clock::time_point begin, end;
+          unsigned diff;
+          do
+          {
+            begin = std::chrono::high_resolution_clock::now();
+            std::this_thread::sleep_for(std::chrono::nanoseconds(period));
+            end = std::chrono::high_resolution_clock::now();
+            period *= 2;  // 2^20 = ~1ms
+            diff = (unsigned) std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count();
+          } while(diff == 0);
+          if(diff < count)
+          {
+            count = (unsigned) diff;
+          }
+        }
+        v = count;
+      }
+      return v;
+    }
+    outcome<void> sleep_wake_overhead(storage_profile &sp, file_handle & /*unused*/) noexcept
+    {
+      sp.sleep_wake_overhead.value = _sleep_wake_overhead();
+      return success();
+    }
+    inline unsigned _yield_overhead()
+    {
+      static unsigned v;
+      if(!v)
+      {
+        unsigned count = (unsigned) -1;
+        for(size_t n = 0; n < 20; n++)
+        {
+          std::chrono::high_resolution_clock::time_point begin, end;
+          begin = std::chrono::high_resolution_clock::now();
+          std::this_thread::yield();
+          std::this_thread::yield();
+          std::this_thread::yield();
+          std::this_thread::yield();
+          std::this_thread::yield();
+          std::this_thread::yield();
+          std::this_thread::yield();
+          std::this_thread::yield();
+          std::this_thread::yield();
+          std::this_thread::yield();
+          end = std::chrono::high_resolution_clock::now();
+          unsigned diff = (unsigned) std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count();
+          if(diff < count)
+          {
+            count = (unsigned) diff / 10;
+          }
+        }
+        v = count;
+      }
+      return v;
+    }
+    outcome<void> yield_overhead(storage_profile &sp, file_handle & /*unused*/) noexcept
+    {
+      sp.yield_overhead.value = _yield_overhead();
+      return success();
+    }
     outcome<void> drop_filesystem_cache_support(storage_profile &sp, file_handle & /*unused*/) noexcept
     {
       static bool v = !!utils::drop_filesystem_cache();

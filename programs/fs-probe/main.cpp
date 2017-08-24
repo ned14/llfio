@@ -155,6 +155,8 @@ int main(int argc, char *argv[])
         continue;
       }
       file_handle testfile(std::move(_testfile.value()));
+      for(auto begin = std::chrono::steady_clock::now(); std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() - begin).count() < 3;)
+        ;
       for(auto &test : profile[flags])
       {
         if(std::regex_match(test.name, torun))
