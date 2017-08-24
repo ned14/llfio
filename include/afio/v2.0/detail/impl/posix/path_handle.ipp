@@ -34,7 +34,7 @@ result<path_handle> path_handle::path(const path_handle &base, path_handle::path
   native_handle_type &nativeh = ret.value()._v;
   AFIO_LOG_FUNCTION_CALL(&ret);
   nativeh.behaviour |= native_handle_type::disposition::directory;
-  int attribs = O_RDONLY;
+  int attribs = O_CLOEXEC | O_RDONLY;
 #ifdef O_DIRECTORY
   attribs |= O_DIRECTORY;
 #endif

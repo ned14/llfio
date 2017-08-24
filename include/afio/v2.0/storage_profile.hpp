@@ -320,7 +320,6 @@ namespace storage_profile
                                                                                                                                                                "this value is less than max_aligned_atomic_rewrite and some multiple of the CPU cache line size then this is "
                                                                                                                                                                "what has happened."};
     item<unsigned> read_nothing = {"latency:read:nothing", latency::read_nothing, "The nanoseconds to read zero bytes"};
-    item<unsigned> write_nothing = {"latency:write:nothing", latency::write_nothing, "The nanoseconds to write zero bytes"};
 
     item<unsigned long long> read_qd1_min = {"latency:read:qd1:min", latency::read_qd1, "The nanoseconds to read 4Kb at a queue depth of 1 (min)"};
     item<unsigned long long> read_qd1_mean = {"latency:read:qd1:mean", latency::read_qd1, "The nanoseconds to read 4Kb at a queue depth of 1 (arithmetic mean)"};
@@ -337,6 +336,8 @@ namespace storage_profile
     item<unsigned long long> read_qd16_95 = {"latency:read:qd16:95%", latency::read_qd16, "The nanoseconds to read 4Kb at a queue depth of 16 (95% of the time)"};
     item<unsigned long long> read_qd16_99 = {"latency:read:qd16:99%", latency::read_qd16, "The nanoseconds to read 4Kb at a queue depth of 16 (99% of the time)"};
     item<unsigned long long> read_qd16_99999 = {"latency:read:qd16:99.999%", latency::read_qd16, "The nanoseconds to read 4Kb at a queue depth of 16 (99.999% of the time)"};
+
+    item<unsigned> write_nothing = {"latency:write:nothing", latency::write_nothing, "The nanoseconds to write zero bytes"};
 
     item<unsigned long long> write_qd1_min = {"latency:write:qd1:min", latency::write_qd1, "The nanoseconds to write 4Kb at a queue depth of 1 (min)"};
     item<unsigned long long> write_qd1_mean = {"latency:write:qd1:mean", latency::write_qd1, "The nanoseconds to write 4Kb at a queue depth of 1 (arithmetic mean)"};

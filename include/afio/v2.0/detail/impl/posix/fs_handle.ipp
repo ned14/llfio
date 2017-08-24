@@ -80,7 +80,7 @@ inline result<path_handle> containing_directory(optional<std::reference_wrapper<
         return success(std::move(currentdirh));
       // Open the same file name, and compare dev and inode
       path_view::c_str zpath(filename);
-      int fd = ::openat(currentdirh.native_handle().fd, zpath.buffer, 0);
+      int fd = ::openat(currentdirh.native_handle().fd, zpath.buffer, O_CLOEXEC);
       if(fd == -1)
         continue;
       auto unfd = undoer([fd] { ::close(fd); });
