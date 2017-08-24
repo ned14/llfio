@@ -201,6 +201,8 @@ namespace storage_profile
   }
   namespace latency
   {
+    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> read_nothing(storage_profile &sp, file_handle &h) noexcept;
+    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> write_nothing(storage_profile &sp, file_handle &h) noexcept;
     AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> read_qd1(storage_profile &sp, file_handle &h) noexcept;
     AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> write_qd1(storage_profile &sp, file_handle &h) noexcept;
     AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> read_qd16(storage_profile &sp, file_handle &h) noexcept;
@@ -317,6 +319,9 @@ namespace storage_profile
                                                                                                                                                                "an i/o straddles a 4096 file offset multiple and DMA suddenly goes into many 64 byte cache lines :(, so if "
                                                                                                                                                                "this value is less than max_aligned_atomic_rewrite and some multiple of the CPU cache line size then this is "
                                                                                                                                                                "what has happened."};
+    item<unsigned> read_nothing = {"latency:read:nothing", latency::read_nothing, "The nanoseconds to read zero bytes"};
+    item<unsigned> write_nothing = {"latency:write:nothing", latency::write_nothing, "The nanoseconds to write zero bytes"};
+
     item<unsigned long long> read_qd1_min = {"latency:read:qd1:min", latency::read_qd1, "The nanoseconds to read 4Kb at a queue depth of 1 (min)"};
     item<unsigned long long> read_qd1_mean = {"latency:read:qd1:mean", latency::read_qd1, "The nanoseconds to read 4Kb at a queue depth of 1 (arithmetic mean)"};
     item<unsigned long long> read_qd1_max = {"latency:read:qd1:max", latency::read_qd1, "The nanoseconds to read 4Kb at a queue depth of 1 (max)"};

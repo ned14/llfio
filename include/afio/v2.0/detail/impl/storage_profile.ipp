@@ -803,14 +803,11 @@ namespace storage_profile
               std::this_thread::yield();
             while(!done)
             {
+              reqs.offset = (rand() % maxsize) & ~4095ULL;
               auto begin = std::chrono::high_resolution_clock::now();
-              // for(size_t n = 0; n < 16; n++)
-              {
-                reqs.offset = (rand() % maxsize) & ~4095ULL;
-                h.write(reqs).value();
-              }
+              h.write(reqs).value();
               auto end = std::chrono::high_resolution_clock::now();
-              auto ns = (std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count());  // / 16;
+              auto ns = (std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count());
               if(ns == 0)
                 ns = clock_granularity / 2;
               results[no].push_back(ns);
@@ -834,12 +831,9 @@ namespace storage_profile
               std::this_thread::yield();
             while(!done)
             {
+              reqs.offset = (rand() % maxsize) & ~4095ULL;
               auto begin = std::chrono::high_resolution_clock::now();
-              // for(size_t n = 0; n < 16; n++)
-              {
-                reqs.offset = (rand() % maxsize) & ~4095ULL;
-                h.read(reqs).value();
-              }
+              h.read(reqs).value();
               auto end = std::chrono::high_resolution_clock::now();
               auto ns = (std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count());  // / 16;
               if(ns == 0)
@@ -992,6 +986,42 @@ namespace storage_profile
       sp.readwrite_qd4_95.value = s._95;
       sp.readwrite_qd4_99.value = s._99;
       sp.readwrite_qd4_99999.value = s._99999;
+      return success();
+    }
+    outcome<void> read_nothing(storage_profile &sp, file_handle &srch) noexcept
+    {
+      if(sp.read_nothing.value != (unsigned) -1)
+        return success();
+      volatile size_t errors = 0;
+      auto begin = std::chrono::high_resolution_clock::now();
+      for(size_t n = 0; n < 1000000; n++)
+      {
+        if(!srch.read(0, nullptr, 0))
+        {
+          ++errors;
+        }
+      }
+      auto end = std::chrono::high_resolution_clock::now();
+      auto diff = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count();
+      sp.read_nothing.value = (unsigned) (diff / 1000000);
+      return success();
+    }
+    outcome<void> write_nothing(storage_profile &sp, file_handle &srch) noexcept
+    {
+      if(sp.write_nothing.value != (unsigned) -1)
+        return success();
+      volatile size_t errors = 0;
+      auto begin = std::chrono::high_resolution_clock::now();
+      for(size_t n = 0; n < 1000000; n++)
+      {
+        if(!srch.write(0, nullptr, 0))
+        {
+          ++errors;
+        }
+      }
+      auto end = std::chrono::high_resolution_clock::now();
+      auto diff = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count();
+      sp.write_nothing.value = (unsigned) (diff / 1000000);
       return success();
     }
   }
