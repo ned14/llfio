@@ -34,6 +34,7 @@ var storage__profile_8hpp =
     [ "read_qd1", "storage__profile_8hpp.html#a12b552095491d25fdfbad807b34fe59c", null ],
     [ "read_qd16", "storage__profile_8hpp.html#a99446f05e5840249c6c3832a8660f1a0", null ],
     [ "readwrite_qd4", "storage__profile_8hpp.html#a3d429992b1afa99100d51d2896dc6006", null ],
+    [ "sleep_wake_overhead", "storage__profile_8hpp.html#a96c0407764d3b36eed64df00d99c7204", null ],
     [ "traversal_cold_nonracefree_0b", "storage__profile_8hpp.html#a583ca35364b0ff2ea2106b4a9b7a20a7", null ],
     [ "traversal_cold_nonracefree_1b", "storage__profile_8hpp.html#a68bbc81cb793c8185f4110a35cbf69f3", null ],
     [ "traversal_cold_nonracefree_4k", "storage__profile_8hpp.html#a089976a2a7fa38021a48929697f99e7e", null ],
@@ -48,5 +49,6 @@ var storage__profile_8hpp =
     [ "traversal_warm_racefree_1b", "storage__profile_8hpp.html#a7dba519175fd25c9580440d9d8525af8", null ],
     [ "traversal_warm_racefree_4k", "storage__profile_8hpp.html#a52a150c446ab466ed5cfb1b1519b1ca6", null ],
     [ "write_qd1", "storage__profile_8hpp.html#aa9427ec9c14608cda4b12cdd5801f846", null ],
-    [ "write_qd16", "storage__profile_8hpp.html#aa8c24dd8f1f836b23299120d349d112b", null ]
+    [ "write_qd16", "storage__profile_8hpp.html#aa8c24dd8f1f836b23299120d349d112b", null ],
+    [ "yield_overhead", "storage__profile_8hpp.html#ae7af307b516c7bb3781064da741c628d", null ]
 ];

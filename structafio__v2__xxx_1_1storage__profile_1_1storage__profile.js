@@ -78,6 +78,7 @@ var structafio__v2__xxx_1_1storage__profile_1_1storage__profile =
     [ "readwrite_qd4_max", "structafio__v2__xxx_1_1storage__profile_1_1storage__profile.html#ab5d7450fe38a4c74bb7cff912707482e", null ],
     [ "readwrite_qd4_mean", "structafio__v2__xxx_1_1storage__profile_1_1storage__profile.html#a60b600fac1a3c92295cd8989e474e21c", null ],
     [ "readwrite_qd4_min", "structafio__v2__xxx_1_1storage__profile_1_1storage__profile.html#a34fad4871984933b53511199e6955d47", null ],
+    [ "sleep_wake_overhead", "structafio__v2__xxx_1_1storage__profile_1_1storage__profile.html#ae5f3183b23921dc601e91bc635142615", null ],
     [ "write_qd16_50", "structafio__v2__xxx_1_1storage__profile_1_1storage__profile.html#a0c4e04fa15e7ce67c1797ea105df0add", null ],
     [ "write_qd16_95", "structafio__v2__xxx_1_1storage__profile_1_1storage__profile.html#a15d5805d60bee769452fd3a60dd8a6b5", null ],
     [ "write_qd16_99", "structafio__v2__xxx_1_1storage__profile_1_1storage__profile.html#af1aa81681eaef4f8045d5134bd9b69cb", null ],
@@ -91,5 +92,6 @@ var structafio__v2__xxx_1_1storage__profile_1_1storage__profile =
     [ "write_qd1_99999", "structafio__v2__xxx_1_1storage__profile_1_1storage__profile.html#a182b36239110e815d74cd0a8dae94a10", null ],
     [ "write_qd1_max", "structafio__v2__xxx_1_1storage__profile_1_1storage__profile.html#a12423032d1a0b4c42dae32c474a4272f", null ],
     [ "write_qd1_mean", "structafio__v2__xxx_1_1storage__profile_1_1storage__profile.html#a36a1b1a2af65b82347260cf8858f5c39", null ],
-    [ "write_qd1_min", "structafio__v2__xxx_1_1storage__profile_1_1storage__profile.html#adbaa933d37a4656257158c0a2d9cb576", null ]
+    [ "write_qd1_min", "structafio__v2__xxx_1_1storage__profile_1_1storage__profile.html#adbaa933d37a4656257158c0a2d9cb576", null ],
+    [ "yield_overhead", "structafio__v2__xxx_1_1storage__profile_1_1storage__profile.html#a6598166efe4f1ceb6304a202d9f8ee68", null ]
 ];
