@@ -276,6 +276,15 @@ namespace storage_profile
           case BusTypeFileBackedVirtual:
             sp.controller_type.value = "File Backed Virtual";
             break;
+          case BusTypeSpaces:
+            sp.controller_type.value = "Storage Spaces";
+            break;
+          case BusTypeNvme:
+            sp.controller_type.value = "NVMe";
+            break;
+          case BusTypeSCM:
+            sp.controller_type.value = "Storage Class Memory";
+            break;
           default:
             sp.controller_type.value = "unknown";
             break;
