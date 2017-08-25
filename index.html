@@ -145,13 +145,13 @@ $(document).ready(function(){initNavTree('index.html','');});
 </td></tr>
 </table>
 <dl class="section note"><dt>Note</dt><dd>Note that this code is of late alpha quality. It's quite reliable, but be careful when using it!</dd></dl>
-<p>You need these compilers and OS or better:</p>
+<p>These compilers and OS are regularly tested:</p>
 <ul>
-<li>GCC 7.0 (Linux)</li>
-<li>clang 4.0 (Linux)</li>
-<li>clang 5.0 (Windows)</li>
+<li>GCC 7.0 (Linux 4,x x64)</li>
+<li>clang 4.0 (Linux 4.x x64)</li>
+<li>clang 5.0 (Windows 10 x64)</li>
 </ul>
-<p>Other compilers and OSs may work, but are not tested regularly. You will need a Filesystem TS implementation in your STL and C++ 14.</p>
+<p>Other compilers, architectures and OSs may work, but are not tested regularly. You will need a Filesystem TS implementation in your STL and C++ 14. See <a href="https://github.com/ned14/afio/blob/master/programs/fs-probe/fs_probe_results.yaml">https://github.com/ned14/afio/blob/master/programs/fs-probe/fs_probe_results.yaml</a> for a database of latencies for various previously tested OS, filing systems and storage devices.</p>
 <p>Todo list for already implemented parts: <a href="https://ned14.github.io/afio/todo.html">https://ned14.github.io/afio/todo.html</a></p>
 <p>To build and test (make, ninja etc):</p>
 <div class="fragment"><div class="line">mkdir build</div>
