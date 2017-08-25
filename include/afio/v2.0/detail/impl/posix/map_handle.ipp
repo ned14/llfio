@@ -81,6 +81,7 @@ result<void> map_handle::close() noexcept
     {
       OUTCOME_TRYV(barrier({}, true, false));
     }
+    //printf("%d munmap %p-%p\n", getpid(), _addr, _addr+_length);
     if(-1 == ::munmap(_addr, _length))
       return {errno, std::system_category()};
   }
@@ -174,6 +175,7 @@ static inline result<void *> do_mmap(native_handle_type &nativeh, void *ataddr, 
 #endif
   // printf("mmap(%p, %u, %d, %d, %d, %u)\n", ataddr, (unsigned) bytes, prot, flags, have_backing ? section->backing_native_handle().fd : -1, (unsigned) offset);
   addr = ::mmap(ataddr, bytes, prot, flags, have_backing ? section->backing_native_handle().fd : -1, offset);
+  //printf("%d mmap %p-%p\n", getpid(), addr, (char *) addr+bytes);
   if(MAP_FAILED == addr)
     return {errno, std::system_category()};
   return addr;

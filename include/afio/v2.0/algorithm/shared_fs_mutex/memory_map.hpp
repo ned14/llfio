@@ -113,8 +113,9 @@ namespace algorithm
     private:
       static constexpr size_t _container_entries = HashIndexSize / sizeof(spinlock_type);
       using _hash_index_type = std::array<spinlock_type, _container_entries>;
-      static constexpr file_handle::extent_type _lockinuseoffset = (file_handle::extent_type) 1024 * 1024;
-      static constexpr file_handle::extent_type _mapinuseoffset = (file_handle::extent_type) 1024 * 1024 + 1;
+      static constexpr file_handle::extent_type _initialisingoffset = (file_handle::extent_type) 1024 * 1024;
+      static constexpr file_handle::extent_type _lockinuseoffset = (file_handle::extent_type) 1024 * 1024 + 1;
+      static constexpr file_handle::extent_type _mapinuseoffset = (file_handle::extent_type) 1024 * 1024 + 2;
 
       file_handle _h, _temph;
       file_handle::extent_guard _hlockinuse;  // shared lock of last byte of _h marking if lock is in use
@@ -173,7 +174,7 @@ namespace algorithm
           // Release my shared locks and try locking inuse exclusively
           _hmapinuse.unlock();
           _hlockinuse.unlock();
-          auto lockresult = _h.try_lock(_lockinuseoffset, 1, true);
+          auto lockresult = _h.try_lock(_initialisingoffset, 3, true);
 #ifndef NDEBUG
           if(!lockresult && lockresult.error() != std::errc::timed_out)
           {
@@ -184,15 +185,23 @@ namespace algorithm
           if(lockresult)
           {
             // This means I am the last user, so zop the file contents as temp file is about to go away
-            char buffer[4096];
+            char buffer[4];
             memset(buffer, 0, sizeof(buffer));
-            (void) _h.write(0, buffer, sizeof(buffer));
-            // You might wonder why I am now truncating to zero? It's to ensure any
-            // memory maps definitely get written with zeros before truncation, some
-            // OSs don't reflect zeros into memory maps upon truncation for quite a
-            // long time (or ever)
-            (void) _h.truncate(0);
-            // Unlink the temp file
+            if(!_h.write(0, buffer, sizeof(buffer)))
+            {
+              AFIO_LOG_FATAL(0, "memory_map::~memory_map() write failed");
+              abort();
+            }
+            // The reason we write 4 zeros and then truncate is because some POSIX implementations
+            // don't clear maps when you truncate.
+            // We truncate to 4, not 0, lest an implementation considers a zero truncation to
+            // equal unmapping.
+            if(!_h.truncate(4))
+            {
+              AFIO_LOG_FATAL(0, "memory_map::~memory_map() truncate failed");
+              abort();
+            }
+            // Unlink the temp file (which may already be deleted)
             (void) _temph.unlink();
           }
         }
@@ -211,35 +220,39 @@ namespace algorithm
         {
           OUTCOME_TRY(ret, file_handle::file(base, lockfile, file_handle::mode::write, file_handle::creation::if_needed, file_handle::caching::reads));
           file_handle temph;
-          // Am I the first person to this file? Lock the inuse exclusively
-          auto lockinuse = ret.try_lock(_lockinuseoffset, 1, true);
+          // Am I the first person to this file? Lock everything exclusively
+          auto lockinuse = ret.try_lock(_initialisingoffset, 3, true);
           file_handle::extent_guard mapinuse;
           if(lockinuse.has_error())
           {
             if(lockinuse.error() != std::errc::timed_out)
               return lockinuse.error();
             // Somebody else is also using this file, so try to read the hash index file I ought to use
-            lockinuse = ret.lock(_lockinuseoffset, 1, false);  // last byte shared access
+            lockinuse = ret.lock(_lockinuseoffset, 1, false);  // inuse shared access
             char buffer[65536];
             memset(buffer, 0, sizeof(buffer));
-            {
-              OUTCOME_TRY(_, ret.read(0, buffer, 65535));
-              (void) _;
-            }
+            OUTCOME_TRYV(ret.read(0, buffer, 65535));
             path_view temphpath((filesystem::path::value_type *) buffer);
             result<file_handle> _temph(in_place_type<file_handle>);
             // If path is zeroed, fall back onto backup lock
             if(!buffer[0])
-              goto use_fall_back_lock;
+            {
+              // I am guaranteed that all mmap users have locked the second last byte
+              // and will unlock it once everyone has stopped using the mmap, so make
+              // absolutely sure the mmap is not in use by anyone by taking an exclusive
+              // lock on the second final byte
+              OUTCOME_TRYV(ret.lock(_mapinuseoffset, 1, true));
+              // Release the exclusive lock and tell caller to just use the fallback lock directly
+              return std::errc::device_or_resource_busy;
+            }
             else
               _temph = file_handle::file({}, temphpath, file_handle::mode::write, file_handle::creation::open_existing, file_handle::caching::temporary);
             // If temp file doesn't exist, I am on a different machine
             if(!_temph)
             {
               // Zop the path so any new entrants into this lock will go to the fallback lock
-              memset(buffer, 0, 4096);
-              (void) ret.write(0, buffer, 4096);
-            use_fall_back_lock:
+              memset(buffer, 0, 4);
+              OUTCOME_TRYV(ret.write(0, buffer, 4));
               // I am guaranteed that all mmap users have locked the second last byte
               // and will unlock it once everyone has stopped using the mmap, so make
               // absolutely sure the mmap is not in use by anyone by taking an exclusive
@@ -255,46 +268,47 @@ namespace algorithm
               mapinuse = std::move(mapinuse2);
               temph = std::move(_temph.value());
             }
-            // Map the files into memory, being very careful that the lock file is only ever mapped read only
-            // as some OSs can get confused if you use non-mmaped writes on a region mapped for writing.
-            OUTCOME_TRY(hsection, section_handle::section(ret, 0, section_handle::flag::read));
+            // Map the hash index file into memory for read/write access
             OUTCOME_TRY(temphsection, section_handle::section(temph, HashIndexSize));
-            OUTCOME_TRY(hmap, map_handle::map(hsection, 0, 0, section_handle::flag::read));
             OUTCOME_TRY(temphmap, map_handle::map(temphsection, HashIndexSize));
+            // Map the path file into memory with its maximum possible size, read only
+            OUTCOME_TRY(hsection, section_handle::section(ret, 65536, section_handle::flag::read));
+            OUTCOME_TRY(hmap, map_handle::map(hsection, 0, 0, section_handle::flag::read));
             return memory_map(std::move(ret), std::move(temph), std::move(lockinuse.value()), std::move(mapinuse), std::move(hmap), std::move(temphmap), fallbacklock);
           }
           else
           {
-            // I am the first person to be using this (stale?) file, so create a new hash index file and write its path
-            OUTCOME_TRYV(ret.truncate(0));
+            // I am the first person to be using this (stale?) file, so create a new hash index file in /tmp
             OUTCOME_TRY(tempdirh, path_handle::path(temporary_files_directory()));
             OUTCOME_TRY(_temph, file_handle::random_file(tempdirh));
             temph = std::move(_temph);
-            OUTCOME_TRY(temppath, temph.current_path());
+            // Truncate it out to the hash index size, and map it into memory for read/write access
             OUTCOME_TRYV(temph.truncate(HashIndexSize));
-            /* Linux appears to have a race where:
-                 1. This process creates a new file and fallocate's its maximum extent.
-                 2. Another process opens this file and mmaps it.
-                 3. The other process tries to read from the mmap, and gets a SIGBUS for its efforts.
-
-               I tried writing zeros using write after the fallocate, but it appears not to help, so
-               for Linux compatibility we will have to mmap before publishing the path of the hash index.
-            */
-            // Map the files into memory, being very careful that the lock file is only ever mapped read only
-            // as some OSs can get confused if you use non-mmaped writes on a region mapped for writing.
             OUTCOME_TRY(temphsection, section_handle::section(temph, HashIndexSize));
             OUTCOME_TRY(temphmap, map_handle::map(temphsection, HashIndexSize));
-            // Force page allocation now
-            memset(temphmap.address(), 0, HashIndexSize);
-            // Write the path of my new hash index file and convert my lock to a shared one
-            OUTCOME_TRYV(ret.write(0, (const char *) temppath.c_str(), temppath.native().size() * sizeof(*temppath.c_str())));
-            OUTCOME_TRY(hsection, section_handle::section(ret, 0, section_handle::flag::read));
+            // Write the path of my new hash index file, padding zeros to the nearest page size
+            // multiple to work around a race condition in the Linux kernel
+            OUTCOME_TRY(temppath, temph.current_path());
+            char buffer[4096];
+            memset(buffer, 0, sizeof(buffer));
+            size_t bytes = temppath.native().size() * sizeof(*temppath.c_str());
+            file_handle::const_buffer_type buffers[]={
+              {(const char *) temppath.c_str(), bytes},
+              {(const char *) buffer, 4096-(bytes % 4096)}
+            };
+            OUTCOME_TRYV(ret.truncate(65536));
+            OUTCOME_TRYV(ret.write({buffers, 0}));
+            // Map for read the maximum possible path file size, again to avoid race problems
+            OUTCOME_TRY(hsection, section_handle::section(ret, 65536, section_handle::flag::read));
             OUTCOME_TRY(hmap, map_handle::map(hsection, 0, 0, section_handle::flag::read));
-            // Convert exclusive whole file lock into lock in use
+            /* Take shared locks on mapinuse and inuse. Even if this implementation doesn't implement
+            atomic downgrade of exclusive range to shared range, we're fully prepared for other users
+            now. The _initialisingoffset remains exclusive to prevent double entry into this init routine.
+            */
             OUTCOME_TRY(mapinuse2, ret.lock(_mapinuseoffset, 1, false));
             OUTCOME_TRY(lockinuse2, ret.lock(_lockinuseoffset, 1, false));
             mapinuse = std::move(mapinuse2);
-            lockinuse = std::move(lockinuse2);
+            lockinuse = std::move(lockinuse2); // releases exclusive lock on all three offsets
             return memory_map(std::move(ret), std::move(temph), std::move(lockinuse.value()), std::move(mapinuse), std::move(hmap), std::move(temphmap), fallbacklock);
           }
         }

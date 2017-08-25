@@ -186,13 +186,13 @@ struct child_workers
       auto &i = workers[n].cout();
       if(!i.getline(buffer, sizeof(buffer)))
       {
-        results[n].cerr = "ERROR: Child seems to have vanished!";
+        results[n].cerr = "ERROR: Child seems to have vanished! (wait_until_ready)";
         results[n].retcode = 99;
         continue;
       }
       if(0 != strncmp(buffer, "READY", 5))
       {
-        results[n].cerr = "ERROR: Child wrote unexpected output '" + std::string(buffer) + "'";
+        results[n].cerr = "ERROR: Child wrote unexpected output '" + std::string(buffer) + "' (wait_until_ready)";
         results[n].retcode = 98;
         continue;
       }
@@ -228,20 +228,21 @@ struct child_workers
       {
         if(!child.cout().getline(buffer, sizeof(buffer)))
         {
-          results[n].cerr = "ERROR: Child seems to have vanished!";
+          results[n].cerr = child.is_running() ? "ERROR: Child pipe is unreadable! (join)" : "ERROR: Child seems to have vanished! (join)";
           results[n].retcode = 99;
-          continue;
         }
-        if(0 != strncmp(buffer, "RESULTS ", 8))
+        else if(0 != strncmp(buffer, "RESULTS ", 8))
         {
-          results[n].cerr = "ERROR: Child wrote unexpected output '" + std::string(buffer) + "'";
+          results[n].cerr = "ERROR: Child wrote unexpected output '" + std::string(buffer) + "' (join)";
           results[n].retcode = 98;
-          continue;
         }
-        results[n].results = buffer + 8;  // NOLINT
-        if(results[n].results.back() == '\r')
+        else
         {
-          results[n].results.resize(results[n].results.size() - 1);
+          results[n].results = buffer + 8;  // NOLINT
+          if(results[n].results.back() == '\r')
+          {
+            results[n].results.resize(results[n].results.size() - 1);
+          }
         }
       }
 #ifdef NDEBUG
@@ -249,7 +250,11 @@ struct child_workers
 #else
       std::chrono::steady_clock::time_point deadline;
 #endif
-      results[n].retcode = child.wait_until(deadline).value();
+      int ret = child.wait_until(deadline).value();
+      if(ret!=0)
+      {
+        results[n].retcode = ret;
+      }
     }
   }
 };
@@ -304,7 +309,7 @@ static inline void check_child_worker(const KERNELTEST_V1_NAMESPACE::child_worke
   if(!i.cerr.empty())
   {
     BOOST_CHECK(i.cerr.empty());
-    std::cout << "Child worker failed with '" << i.cerr << "'" << std::endl;
+    std::cout << "Child worker failed with '" << i.cerr << "' (return code was " << i.retcode << ")" << std::endl;
   }
   else if(i.retcode != 0)
   {
@@ -461,6 +466,7 @@ static void TestSharedFSMutexConstructDestruct(shared_memory::mutex_kind_type mu
 {
   namespace afio = AFIO_V2_NAMESPACE;
   auto shared_mem_file = afio::file_handle::file({}, "shared_memory", afio::file_handle::mode::write, afio::file_handle::creation::if_needed, afio::file_handle::caching::temporary, afio::file_handle::flag::unlink_on_close).value();
+  shared_mem_file.truncate(sizeof(shared_memory)).value();
   auto shared_mem_file_section = afio::section_handle::section(sizeof(shared_memory), shared_mem_file, afio::section_handle::flag::readwrite).value();
   auto shared_mem_file_map = afio::map_handle::map(shared_mem_file_section).value();
   auto *shmem = reinterpret_cast<shared_memory *>(shared_mem_file_map.address());  // NOLINT
@@ -533,6 +539,7 @@ static void TestMemoryMapFallback()
   // Launch hardware concurrency users of the map
   namespace afio = AFIO_V2_NAMESPACE;
   auto shared_mem_file = afio::file_handle::file({}, "shared_memory", afio::file_handle::mode::write, afio::file_handle::creation::if_needed, afio::file_handle::caching::temporary, afio::file_handle::flag::unlink_on_close).value();
+  shared_mem_file.truncate(sizeof(shared_memory)).value();
   auto shared_mem_file_section = afio::section_handle::section(sizeof(shared_memory), shared_mem_file, afio::section_handle::flag::readwrite).value();
   auto shared_mem_file_map = afio::map_handle::map(shared_mem_file_section).value();
   auto *shmem = reinterpret_cast<shared_memory *>(shared_mem_file_map.address());  // NOLINT
@@ -548,40 +555,47 @@ static void TestMemoryMapFallback()
     child_workers.wait_until_ready();
     child_workers.go();
     // Wait until children get to lock
+    auto olk = afio::algorithm::shared_fs_mutex::memory_map<>::fs_mutex_map({}, "lockfile").value();
+    bool done, failed_to_find_children=false;
+    auto begin = std::chrono::steady_clock::now();
+    do
     {
-      auto lk = afio::algorithm::shared_fs_mutex::memory_map<>::fs_mutex_map({}, "lockfile").value();
-      bool done;
-      do
+      if(std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now()-begin).count()>5)
       {
-        auto _ = lk.try_lock(afio::algorithm::shared_fs_mutex::shared_fs_mutex::entity_type(0, false));
-        done = _.has_error();
-      } while(!done);
-    }
-    // Zomp the lock file pretending to be a networked user
-    {
-      auto lf = afio::file_handle::file({}, "lockfile", afio::file_handle::mode::write, afio::file_handle::creation::open_existing, afio::file_handle::caching::reads).value();
-      char buffer[4096];
-      memset(buffer, 0, sizeof(buffer));
-      lf.write(0, buffer, sizeof(buffer));
-    }
-    // Open the lock, should always return EBUSY but only AFTER all mapped users have fallen back
-    auto fblk = afio::algorithm::shared_fs_mutex::byte_ranges::fs_mutex_byte_ranges({}, "fallbacklockfile").value();
-    auto lk = afio::algorithm::shared_fs_mutex::memory_map<>::fs_mutex_map({}, "lockfile", &fblk);
-    BOOST_CHECK(lk.has_error());
-    if(lk.has_error())
-    {
-      BOOST_CHECK(lk.error() == std::errc::device_or_resource_busy);
-    }
-    {
-      auto fblkh = fblk.lock(afio::algorithm::shared_fs_mutex::shared_fs_mutex::entity_type(0, false)).value();
-      ++shmem->current_shared;
-      long oldval = shmem->current_exclusive;
-      if(oldval != -1)
-      {
-        std::cerr << "Fallback lock granted shared lock when child " + std::to_string(oldval) + " already has exclusive lock!" << std::endl;
-        BOOST_CHECK(oldval == -1);
+        failed_to_find_children=true;
+        break;
       }
-      --shmem->current_shared;
+      auto _ = olk.try_lock(afio::algorithm::shared_fs_mutex::shared_fs_mutex::entity_type(0, false));
+      done = _.has_error();
+    } while(!done);
+    if(!failed_to_find_children)
+    {
+      // Zomp the lock file pretending to be a networked user
+      {
+        auto lf = afio::file_handle::file({}, "lockfile", afio::file_handle::mode::write, afio::file_handle::creation::open_existing, afio::file_handle::caching::reads).value();
+        char buffer[4];
+        memset(buffer, 0, sizeof(buffer));
+        lf.write(0, buffer, sizeof(buffer)).value();
+      }
+      // Open the lock, should always return EBUSY but only AFTER all mapped users have fallen back
+      auto fblk = afio::algorithm::shared_fs_mutex::byte_ranges::fs_mutex_byte_ranges({}, "fallbacklockfile").value();
+      auto lk = afio::algorithm::shared_fs_mutex::memory_map<>::fs_mutex_map({}, "lockfile", &fblk);
+      BOOST_CHECK(lk.has_error());
+      if(lk.has_error())
+      {
+        BOOST_CHECK(lk.error() == std::errc::device_or_resource_busy);
+      }
+      {
+        auto fblkh = fblk.lock(afio::algorithm::shared_fs_mutex::shared_fs_mutex::entity_type(0, false)).value();
+        ++shmem->current_shared;
+        long oldval = shmem->current_exclusive;
+        if(oldval != -1)
+        {
+          std::cerr << "Fallback lock granted shared lock when child " + std::to_string(oldval) + " already has exclusive lock!" << std::endl;
+          BOOST_CHECK(oldval == -1);
+        }
+        --shmem->current_shared;
+      }
     }
     child_workers.stop();
     child_workers.join();

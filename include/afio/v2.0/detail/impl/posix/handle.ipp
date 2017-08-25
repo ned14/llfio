@@ -106,11 +106,6 @@ result<handle::path_type> handle::current_path() const noexcept
       if(kif->kf_fd == _v.fd)
       {
         ret = std::string(kif->kf_path);
-        // If the path entry is empty, this is probably a file, so error out
-        if(ret.empty())
-        {
-          return std::errc::function_not_supported;
-        }
         break;
       }
       p += kif->kf_structsize;
