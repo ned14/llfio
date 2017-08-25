@@ -48,13 +48,14 @@ Lowest sustained 4Kb write latency benchmarked to date by author (page cache): *
 
 \note Note that this code is of late alpha quality. It's quite reliable, but be careful when using it!
 
-You need these compilers and OS or better:
-- GCC 7.0 (Linux)
-- clang 4.0 (Linux)
-- clang 5.0 (Windows)
+These compilers and OS are regularly tested:
+- GCC 7.0 (Linux 4,x x64)
+- clang 4.0 (Linux 4.x x64)
+- clang 5.0 (Windows 10 x64)
 
-Other compilers and OSs may work, but are not tested regularly. You will need a Filesystem TS
-implementation in your STL and C++ 14.
+Other compilers, architectures and OSs may work, but are not tested regularly. You will need a Filesystem TS
+implementation in your STL and C++ 14. See https://github.com/ned14/afio/blob/master/programs/fs-probe/fs_probe_results.yaml
+for a database of latencies for various previously tested OS, filing systems and storage devices.
 
 Todo list for already implemented parts: https://ned14.github.io/afio/todo.html
 
