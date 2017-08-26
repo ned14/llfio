@@ -172,7 +172,12 @@ result<void> fs_handle::unlink(deadline d) noexcept
   filesystem::path filename;
   OUTCOME_TRY(dirh, containing_directory(std::ref(filename), h, *this, d));
   if(-1 == ::unlinkat(dirh.native_handle().fd, filename.c_str(), 0))
-    return {errno, std::system_category()};
+  {
+    if(EISDIR != errno)
+      return {errno, std::system_category()};
+    if(-1 == ::unlinkat(dirh.native_handle().fd, filename.c_str(), AT_REMOVEDIR))
+      return {errno, std::system_category()};
+  }
   return success();
 }
 
