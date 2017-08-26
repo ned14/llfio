@@ -1,16 +1,5 @@
 var NAVTREEINDEX5 =
 {
-"structafio__v2__xxx_1_1statfs__t.html#a14d16535e5bdcce2400b1ce593f57f38":[3,0,0,20,12],
-"structafio__v2__xxx_1_1statfs__t.html#a155161c0d118bc43ea6058622ba8f5a9":[3,0,0,20,17],
-"structafio__v2__xxx_1_1statfs__t.html#a1b1aef93998f288c7cd84e17a22c9394":[3,0,0,20,18],
-"structafio__v2__xxx_1_1statfs__t.html#a28ef6258e04ad3d288ea886221384fd8":[3,0,0,20,8],
-"structafio__v2__xxx_1_1statfs__t.html#a2d3e50dff522b66e6ae5b9215baa5a23":[3,0,0,20,9],
-"structafio__v2__xxx_1_1statfs__t.html#a36f352f08b86b7743b0cd5ebc14b17ee":[3,0,0,20,11],
-"structafio__v2__xxx_1_1statfs__t.html#a3821437e74837a99014ff1bbad4dbf9f":[3,0,0,20,10],
-"structafio__v2__xxx_1_1statfs__t.html#a3b10af0dcae5b2f7c8d5d33a635fa31c":[3,0,0,20,4],
-"structafio__v2__xxx_1_1statfs__t.html#a4f26a565e1fc7a356285631df91bdd71":[3,0,0,20,16],
-"structafio__v2__xxx_1_1statfs__t.html#a5154cbc0933baea5906b1133f577da9f":[3,0,0,20,15],
-"structafio__v2__xxx_1_1statfs__t.html#a836b825613ae069efbbd676c505cef96":[3,0,0,20,2],
 "structafio__v2__xxx_1_1statfs__t.html#a8ba4ab8892187dff6ab92b3f0ca25c64":[3,0,0,20,14],
 "structafio__v2__xxx_1_1statfs__t.html#ab9d13f831de61aafbfcdcb8bac53e521":[3,0,0,20,3],
 "structafio__v2__xxx_1_1statfs__t.html#afd7deb0987a569515b00c412fe2c8f6d":[3,0,0,20,7],

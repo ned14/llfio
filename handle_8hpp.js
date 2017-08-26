@@ -4,6 +4,7 @@ var handle_8hpp =
     [ "flag_base", "structafio__v2__xxx_1_1handle_1_1flag__base.html", "structafio__v2__xxx_1_1handle_1_1flag__base" ],
     [ "close", "handle_8hpp.html#a6d5183938634e1519ddb8486aa07a31e", null ],
     [ "hook_result_construction", "handle_8hpp.html#a6e724f1ed8bc70cb89ea1ef13176a4aa", null ],
+    [ "hook_result_in_place_construction", "handle_8hpp.html#a6346bec3589df60770ce11fbb0bb04b6", null ],
     [ "log_inst_to_info", "handle_8hpp.html#aa3356a7dbe3d081f112d6e8dd4344160", null ],
     [ "operator<<", "handle_8hpp.html#a23c535a7d67a0bbd0cf3254325b6efc7", null ],
     [ "operator<<", "handle_8hpp.html#a6bee597c46adc4f62e9d589c22382d88", null ],

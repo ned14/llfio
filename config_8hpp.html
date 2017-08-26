@@ -162,9 +162,13 @@ Macros</h2></td></tr>
 <tr class="memdesc:gafa3b0c57823d6f9736497df6a1571a95"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether AFIO is a headers only library. Defaults to 1 unless BOOST_ALL_DYN_LINK is defined. <br/></td></tr>
 <tr class="separator:gafa3b0c57823d6f9736497df6a1571a95"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga0d327438e5744ed72dc80dd3c85f87d6"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga0d327438e5744ed72dc80dd3c85f87d6"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__config.html#ga0d327438e5744ed72dc80dd3c85f87d6">AFIO_LOGGING_LEVEL</a>&#160;&#160;&#160;4</td></tr>
-<tr class="memdesc:ga0d327438e5744ed72dc80dd3c85f87d6"><td class="mdescLeft">&#160;</td><td class="mdescRight">How much detail to log. 0=disabled, 1=fatal, 2=error, 3=warn, 4=info, 5=debug, 6=all. Defaults to error if NDEBUG defined, else info level. <br/></td></tr>
+#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__config.html#ga0d327438e5744ed72dc80dd3c85f87d6">AFIO_LOGGING_LEVEL</a>&#160;&#160;&#160;2</td></tr>
+<tr class="memdesc:ga0d327438e5744ed72dc80dd3c85f87d6"><td class="mdescLeft">&#160;</td><td class="mdescRight">How much detail to log. 0=disabled, 1=fatal, 2=error, 3=warn, 4=info, 5=debug, 6=all. Defaults to error level. <br/></td></tr>
 <tr class="separator:ga0d327438e5744ed72dc80dd3c85f87d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a71378cc7ca5c69d2ebccc3c4f106b07d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a71378cc7ca5c69d2ebccc3c4f106b07d"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="config_8hpp.html#a71378cc7ca5c69d2ebccc3c4f106b07d">AFIO_LOG_TO_OSTREAM</a>&#160;&#160;&#160;std::cerr</td></tr>
+<tr class="memdesc:a71378cc7ca5c69d2ebccc3c4f106b07d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Any <code>ostream</code> to also log to. If <code>NDEBUG</code> is not defined, <code>std::cerr</code> is the default. <br/></td></tr>
+<tr class="separator:a71378cc7ca5c69d2ebccc3c4f106b07d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga98c874cd585103f72c3c8338b491436b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga98c874cd585103f72c3c8338b491436b"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__config.html#ga98c874cd585103f72c3c8338b491436b">AFIO_LOG_BACKTRACE_LEVELS</a>&#160;&#160;&#160;((1 &lt;&lt; 1) | (1 &lt;&lt; 2) | (1 &lt;&lt; 3))</td></tr>
 <tr class="memdesc:ga98c874cd585103f72c3c8338b491436b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Bit mask of which log levels should be stack backtraced which will slow those logs thirty fold or so. Defaults to (1&lt;&lt;1)|(1&lt;&lt;2)|(1&lt;&lt;3) i.e. stack backtrace on fatal, error and warn logs. <br/></td></tr>
@@ -238,39 +242,13 @@ Macros</h2></td></tr>
 #define&#160;</td><td class="memItemRight" valign="bottom"><b>AFIO_LOG_ERROR</b>(inst, message)&#160;&#160;&#160;AFIO_V2_NAMESPACE::log().emplace_back(QUICKCPPLIB_NAMESPACE::ringbuffer_log::level::error, (message), (unsigned) (uintptr_t)(inst), QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id(), (<a class="el" href="group__config.html#ga98c874cd585103f72c3c8338b491436b">AFIO_LOG_BACKTRACE_LEVELS</a> &amp; (1 &lt;&lt; 2)) ? nullptr : __func__, __LINE__)</td></tr>
 <tr class="separator:acddef6e4881c962632b3539d7d52835c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae3f3879c99ecb9e72ae39dba776bde05"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae3f3879c99ecb9e72ae39dba776bde05"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>AFIO_LOG_WARN</b>(inst, message)&#160;&#160;&#160;AFIO_V2_NAMESPACE::log().emplace_back(QUICKCPPLIB_NAMESPACE::ringbuffer_log::level::warn, (message), (unsigned) (uintptr_t)(inst), QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id(), (<a class="el" href="group__config.html#ga98c874cd585103f72c3c8338b491436b">AFIO_LOG_BACKTRACE_LEVELS</a> &amp; (1 &lt;&lt; 3)) ? nullptr : __func__, __LINE__)</td></tr>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>AFIO_LOG_WARN</b>(inst, message)</td></tr>
 <tr class="separator:ae3f3879c99ecb9e72ae39dba776bde05"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a79bcfd1ccc55f071e7101f411fdf4f37"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a79bcfd1ccc55f071e7101f411fdf4f37"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>AFIO_LOG_INFO</b>(inst, message)&#160;&#160;&#160;AFIO_V2_NAMESPACE::log().emplace_back(QUICKCPPLIB_NAMESPACE::ringbuffer_log::level::info, (message), (unsigned) (uintptr_t)(inst), QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id(), (<a class="el" href="group__config.html#ga98c874cd585103f72c3c8338b491436b">AFIO_LOG_BACKTRACE_LEVELS</a> &amp; (1 &lt;&lt; 4)) ? nullptr : __func__, __LINE__)</td></tr>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>AFIO_LOG_INFO</b>(inst, message)</td></tr>
 <tr class="separator:a79bcfd1ccc55f071e7101f411fdf4f37"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9480fa4eb9a2cf8eac814a27047c2e20"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9480fa4eb9a2cf8eac814a27047c2e20"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>AFIO_LOG_STRINGIFY9</b>(s)&#160;&#160;&#160;#s &quot;::&quot;</td></tr>
-<tr class="separator:a9480fa4eb9a2cf8eac814a27047c2e20"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a226022391b2af8be34800b237d7c3528"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a226022391b2af8be34800b237d7c3528"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>AFIO_LOG_STRINGIFY8</b>(s)&#160;&#160;&#160;AFIO_LOG_STRINGIFY9(s)</td></tr>
-<tr class="separator:a226022391b2af8be34800b237d7c3528"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0f778d6b8f4f5138d236f9aa01357097"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0f778d6b8f4f5138d236f9aa01357097"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>AFIO_LOG_STRINGIFY7</b>(s)&#160;&#160;&#160;AFIO_LOG_STRINGIFY8(s)</td></tr>
-<tr class="separator:a0f778d6b8f4f5138d236f9aa01357097"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac5f5c1f71f06c26a7de3970ea5784669"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac5f5c1f71f06c26a7de3970ea5784669"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>AFIO_LOG_STRINGIFY6</b>(s)&#160;&#160;&#160;AFIO_LOG_STRINGIFY7(s)</td></tr>
-<tr class="separator:ac5f5c1f71f06c26a7de3970ea5784669"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2fd1f1f2adc5dec808e56434c5c9d51a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2fd1f1f2adc5dec808e56434c5c9d51a"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>AFIO_LOG_STRINGIFY5</b>(s)&#160;&#160;&#160;AFIO_LOG_STRINGIFY6(s)</td></tr>
-<tr class="separator:a2fd1f1f2adc5dec808e56434c5c9d51a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acf64aecc5b4eb886d4a63106a4606144"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="acf64aecc5b4eb886d4a63106a4606144"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>AFIO_LOG_STRINGIFY4</b>(s)&#160;&#160;&#160;AFIO_LOG_STRINGIFY5(s)</td></tr>
-<tr class="separator:acf64aecc5b4eb886d4a63106a4606144"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af3c8abf8bdcb764077f99dc7180288fe"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af3c8abf8bdcb764077f99dc7180288fe"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>AFIO_LOG_STRINGIFY3</b>(s)&#160;&#160;&#160;AFIO_LOG_STRINGIFY4(s)</td></tr>
-<tr class="separator:af3c8abf8bdcb764077f99dc7180288fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3651e762d1374bd4931742c14e7645bb"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3651e762d1374bd4931742c14e7645bb"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>AFIO_LOG_STRINGIFY2</b>(s)&#160;&#160;&#160;AFIO_LOG_STRINGIFY3(s)</td></tr>
-<tr class="separator:a3651e762d1374bd4931742c14e7645bb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad316120580340b27c35dc3a0c2e3ecdc"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad316120580340b27c35dc3a0c2e3ecdc"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>AFIO_LOG_STRINGIFY</b>(s)&#160;&#160;&#160;AFIO_LOG_STRINGIFY2(s)</td></tr>
-<tr class="separator:ad316120580340b27c35dc3a0c2e3ecdc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aedb0d0f8ee1a6decb31e0e7d1fbcab0e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><b>AFIO_LOG_FUNCTION_CALL</b>(inst)</td></tr>
+<tr class="memitem:aedb0d0f8ee1a6decb31e0e7d1fbcab0e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aedb0d0f8ee1a6decb31e0e7d1fbcab0e"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>AFIO_LOG_FUNCTION_CALL</b>(inst)&#160;&#160;&#160;AFIO_LOG_INST_TO_TLS(inst)</td></tr>
 <tr class="separator:aedb0d0f8ee1a6decb31e0e7d1fbcab0e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab9a24d77ed59e1188baba7ba84caf072"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab9a24d77ed59e1188baba7ba84caf072"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><b>AFIO_LOG_DEBUG</b>(inst, message)</td></tr>
@@ -322,19 +300,6 @@ QUICKCPPLIB_NAMESPACE::ringbuffer_log::simple_ringbuffer_log<br class="typebreak
 <tr class="memitem:ae2ddff37f35bbb27dbde71beff2e6f6d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae2ddff37f35bbb27dbde71beff2e6f6d"></a>
 tls_errored_results_t &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>afio_v2_xxx::detail::tls_errored_results</b> ()</td></tr>
 <tr class="separator:ae2ddff37f35bbb27dbde71beff2e6f6d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8d1ce7530e78fdb2e5d619b0b12c4634"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8d1ce7530e78fdb2e5d619b0b12c4634"></a>
-span&lt; char &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>afio_v2_xxx::detail::afio_namespace_string</b> ()</td></tr>
-<tr class="separator:a8d1ce7530e78fdb2e5d619b0b12c4634"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a114b5c134cd344b9fe5e89470d82f8c6"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a114b5c134cd344b9fe5e89470d82f8c6"></a>
-span&lt; char &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>afio_v2_xxx::detail::outcome_namespace_string</b> ()</td></tr>
-<tr class="separator:a114b5c134cd344b9fe5e89470d82f8c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3647d7a59a4e063c982a4a24d2124365"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3647d7a59a4e063c982a4a24d2124365"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>afio_v2_xxx::detail::strip_pretty_function</b> (char *out, size_t bytes, const char *in)</td></tr>
-<tr class="separator:a3647d7a59a4e063c982a4a24d2124365"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaa60a39a72c8c6c4a33829f0340048ed"><td class="memTemplParams" colspan="2"><a class="anchor" id="aaa60a39a72c8c6c4a33829f0340048ed"></a>
-template&lt;class T &gt; </td></tr>
-<tr class="memitem:aaa60a39a72c8c6c4a33829f0340048ed"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>afio_v2_xxx::detail::log_inst_to_info</b> (T &amp;&amp;inst, const char *buffer)</td></tr>
-<tr class="separator:aaa60a39a72c8c6c4a33829f0340048ed"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae11f63b07f766758e45df316122b3598"><td class="memTemplParams" colspan="2"><a class="anchor" id="ae11f63b07f766758e45df316122b3598"></a>
 template&lt;class R , class U &gt; </td></tr>
 <tr class="memitem:ae11f63b07f766758e45df316122b3598"><td class="memTemplItemLeft" align="right" valign="top">function_ptr&lt; R &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>afio_v2_xxx::detail::make_function_ptr</b> (U &amp;&amp;f)</td></tr>
@@ -374,8 +339,8 @@ template&lt;class R , class U , class... Args&gt; </td></tr>
 <div class="line"><a class="code" href="namespaceafio__v2__xxx.html#a08363b8572e6a8971a6d236d54fb8287">    AFIO_V2_NAMESPACE::log</a>().emplace_back(QUICKCPPLIB_NAMESPACE::ringbuffer_log::level::fatal, (message), (<span class="keywordtype">unsigned</span>) (uintptr_t)(inst), QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id(), (<a class="code" href="group__config.html#ga98c874cd585103f72c3c8338b491436b">AFIO_LOG_BACKTRACE_LEVELS</a> &amp; (1 &lt;&lt; 1)) ? <span class="keyword">nullptr</span> : __func__, __LINE__);                                                        \</div>
 <div class="line">    AFIO_LOG_FATAL_TO_CERR(message);                                                                                                                                                                                                                                                                                           \</div>
 <div class="line">  }</div>
-<div class="ttc" id="namespaceafio__v2__xxx_html_a08363b8572e6a8971a6d236d54fb8287"><div class="ttname"><a href="namespaceafio__v2__xxx.html#a08363b8572e6a8971a6d236d54fb8287">afio_v2_xxx::log</a></div><div class="ttdeci">QUICKCPPLIB_NAMESPACE::ringbuffer_log::simple_ringbuffer_log&lt; AFIO_LOGGING_MEMORY &gt; &amp; log() noexcept</div><div class="ttdoc">The log used by AFIO. </div><div class="ttdef"><b>Definition:</b> config.hpp:326</div></div>
-<div class="ttc" id="group__config_html_ga98c874cd585103f72c3c8338b491436b"><div class="ttname"><a href="group__config.html#ga98c874cd585103f72c3c8338b491436b">AFIO_LOG_BACKTRACE_LEVELS</a></div><div class="ttdeci">#define AFIO_LOG_BACKTRACE_LEVELS</div><div class="ttdoc">Bit mask of which log levels should be stack backtraced which will slow those logs thirty fold or so...</div><div class="ttdef"><b>Definition:</b> config.hpp:55</div></div>
+<div class="ttc" id="namespaceafio__v2__xxx_html_a08363b8572e6a8971a6d236d54fb8287"><div class="ttname"><a href="namespaceafio__v2__xxx.html#a08363b8572e6a8971a6d236d54fb8287">afio_v2_xxx::log</a></div><div class="ttdeci">QUICKCPPLIB_NAMESPACE::ringbuffer_log::simple_ringbuffer_log&lt; AFIO_LOGGING_MEMORY &gt; &amp; log() noexcept</div><div class="ttdoc">The log used by AFIO. </div><div class="ttdef"><b>Definition:</b> config.hpp:329</div></div>
+<div class="ttc" id="group__config_html_ga98c874cd585103f72c3c8338b491436b"><div class="ttname"><a href="group__config.html#ga98c874cd585103f72c3c8338b491436b">AFIO_LOG_BACKTRACE_LEVELS</a></div><div class="ttdeci">#define AFIO_LOG_BACKTRACE_LEVELS</div><div class="ttdoc">Bit mask of which log levels should be stack backtraced which will slow those logs thirty fold or so...</div><div class="ttdef"><b>Definition:</b> config.hpp:58</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -394,31 +359,6 @@ template&lt;class R , class U , class... Args&gt; </td></tr>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">fprintf(stderr, <span class="stringliteral">&quot;%s\n&quot;</span>, (expr));                                                                                                                                                                                                                                                                                             \</div>
 <div class="line">  fflush(stderr)</div>
-</div><!-- fragment -->
-</div>
-</div>
-<a class="anchor" id="aedb0d0f8ee1a6decb31e0e7d1fbcab0e"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define AFIO_LOG_FUNCTION_CALL</td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">inst</td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line"><span class="keywordflow">if</span>(<a class="code" href="namespaceafio__v2__xxx.html#a08363b8572e6a8971a6d236d54fb8287">log</a>().<a class="code" href="namespaceafio__v2__xxx.html#aed225790bbca36d005efff21edbee937">log_level</a>() &gt;= log_level::info)                                                                                                                                                                                                                                                                                     \</div>
-<div class="line">  {                                                                                                                                                                                                                                                                                                                            \</div>
-<div class="line">    char buffer[256];                                                                                                                                                                                                                                                                                                          \</div>
-<div class="line">    AFIO_V2_NAMESPACE::detail::strip_pretty_function(buffer, <span class="keyword">sizeof</span>(buffer), __PRETTY_FUNCTION__);                                                                                                                                                                                                                             \</div>
-<div class="line">    AFIO_V2_NAMESPACE::detail::log_inst_to_info(inst, buffer);                                                                                                                                                                                                                                                                 \</div>
-<div class="line">  }                                                                                                                                                                                                                                                                                                                            \</div>
-<div class="line">  AFIO_LOG_INST_TO_TLS(inst)</div>
-<div class="ttc" id="namespaceafio__v2__xxx_html_a08363b8572e6a8971a6d236d54fb8287"><div class="ttname"><a href="namespaceafio__v2__xxx.html#a08363b8572e6a8971a6d236d54fb8287">afio_v2_xxx::log</a></div><div class="ttdeci">QUICKCPPLIB_NAMESPACE::ringbuffer_log::simple_ringbuffer_log&lt; AFIO_LOGGING_MEMORY &gt; &amp; log() noexcept</div><div class="ttdoc">The log used by AFIO. </div><div class="ttdef"><b>Definition:</b> config.hpp:326</div></div>
-<div class="ttc" id="namespaceafio__v2__xxx_html_aed225790bbca36d005efff21edbee937"><div class="ttname"><a href="namespaceafio__v2__xxx.html#aed225790bbca36d005efff21edbee937">afio_v2_xxx::log_level</a></div><div class="ttdeci">QUICKCPPLIB_NAMESPACE::ringbuffer_log::level log_level</div><div class="ttdoc">Enum for the log level. </div><div class="ttdef"><b>Definition:</b> config.hpp:335</div></div>
 </div><!-- fragment -->
 </div>
 </div>
