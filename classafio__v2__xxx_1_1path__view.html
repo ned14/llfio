@@ -294,7 +294,7 @@ struct&#160;</td><td class="memItemRight" valign="bottom"><b>c_str</b></td></tr>
 <div class="textblock"><p>A borrowed view of a path. A lightweight trivial-type alternative to <code>std::filesystem::path</code>. </p>
 <p>AFIO is sufficiently fast that <code>std::filesystem::path</code> as a wrapper of an underlying <code>std::basic_string&lt;&gt;</code> can be problematically expensive for some filing system operations due to the potential memory allocation. AFIO therefore works exclusively with borrowed views of other path storage.</p>
 <p>Some of the API for <code>std::filesystem::path</code> is replicated here, however any APIs which modify the path other than taking subsets are obviously not possible with borrowed views.</p>
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000004">Todo:</a></b></dt><dd>Lots of member functions remain to be implemented.</dd></dl>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000005">Todo:</a></b></dt><dd>Lots of member functions remain to be implemented.</dd></dl>
 <h1>Windows specific notes:</h1>
 <p>Be aware that on Microsoft Windows, the native path storage <code>std::filesystem::path::value_type</code> is a <code>wchar_t</code> referring to UTF-16. However much of AFIO path usage is a <code>path_handle</code> to somewhere on the filing system plus a relative <code>const char *</code> UTF-8 path fragment as the use of absolute paths is discouraged. Rather than complicate the ABI to handle templated path character types, on Microsoft Windows only we do the following:</p>
 <ul>

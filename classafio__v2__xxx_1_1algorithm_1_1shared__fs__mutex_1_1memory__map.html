@@ -272,7 +272,7 @@ class afio_v2_xxx::algorithm::shared_fs_mutex::memory_map&lt; Hasher, HashIndexS
 <li>Memory mapped files need to be cache unified with normal i/o in your OS kernel. Known OSs which don't use a unified cache for memory mapped and normal i/o are QNX, OpenBSD. Furthermore, doing normal i/o and memory mapped i/o to the same file needs to not corrupt the file. In the past, there have been editions of the Linux kernel and the OS X kernel which did this.</li>
 <li>If your OS doesn't have sane byte range locks (OS X, BSD, older Linuxes) and multiple objects in your process use the same lock file, misoperation will occur.</li>
 </ul>
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000009">Todo:</a></b></dt><dd><p class="startdd">It should be possible to auto early out from a memory_map transition by scanning the memory map for any locked items, and if none then to proceed. </p>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000010">Todo:</a></b></dt><dd><p class="startdd">It should be possible to auto early out from a memory_map transition by scanning the memory map for any locked items, and if none then to proceed. </p>
 <p>fs_mutex_map needs to check if this inode is that at the path after lock is granted, awaiting stat_t port. </p>
 <p>memory_map::_hash_entities needs to hash x16, x8 and x4 at a time to encourage auto vectorisation </p>
 <p class="enddd">memory_map::unlock() degrade is racy when single instance being used by multiple threads </p>
