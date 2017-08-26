@@ -337,6 +337,8 @@ inline std::ostream &operator<<(std::ostream &s, const handle::flag &v)
 // Intercept when Outcome creates an errored result and log it to our log
 template <class T, class R> inline void hook_result_construction(OUTCOME_V2_NAMESPACE::in_place_type_t<T>, result<R> *res) noexcept
 {
+  // Sanity check that we never construct a null error code
+  assert(!res->has_error() || res->error().value() != 0);
   if(res->has_error() && log().log_level() >= log_level::error)
   {
     // Here is a VERY useful place to breakpoint!
@@ -357,6 +359,10 @@ template <class T, class R> inline void hook_result_construction(OUTCOME_V2_NAME
     }
     log().emplace_back(log_level::error, res->assume_error().message().c_str(), nativeh._init, QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id());
   }
+}
+template <class T, class R> inline void hook_result_in_place_construction(OUTCOME_V2_NAMESPACE::in_place_type_t<T> _, result<R> *res) noexcept
+{
+  hook_result_construction(_, res);
 }
 namespace detail
 {

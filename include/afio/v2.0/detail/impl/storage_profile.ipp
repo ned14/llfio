@@ -505,7 +505,8 @@ namespace storage_profile
           for(off_t offset = sp.max_aligned_atomic_rewrite.value; offset < sp.max_aligned_atomic_rewrite.value * 4; offset += sp.max_aligned_atomic_rewrite.value)
           {
             // Create two concurrent writer threads and as many reader threads as additional CPU cores
-            std::vector<std::pair<std::thread, std::future<void>>> writers, readers;
+            // The excessive unique_ptr works around a bug in libc++'s thread implementation
+            std::vector<std::pair<std::unique_ptr<std::thread>, std::future<void>>> writers, readers;
             std::atomic<size_t> done(2);
             for(char no = '1'; no <= '2'; no++)
             {
@@ -525,7 +526,8 @@ namespace storage_profile
                   h.write(reqs).value();
                 }
               });
-              writers.push_back(std::make_pair(std::thread(std::move(task)), task.get_future()));
+              auto f(task.get_future());
+              writers.emplace_back(std::make_unique<std::thread>(std::move(task)), std::move(f));
             }
             // Wait till the writers launch
             while(done)
@@ -571,7 +573,8 @@ namespace storage_profile
                   }
                 }
               });
-              readers.push_back(std::make_pair(std::thread(std::move(task)), task.get_future()));
+              auto f(task.get_future());
+              readers.emplace_back(std::make_unique<std::thread>(std::move(task)), std::move(f));
             }
 
 #ifndef NDEBUG
@@ -585,11 +588,11 @@ namespace storage_profile
             done = true;
             for(auto &writer : writers)
             {
-              writer.first.join();
+              writer.first->join();
             }
             for(auto &reader : readers)
             {
-              reader.first.join();
+              reader.first->join();
             }
             for(auto &writer : writers)
             {
@@ -637,7 +640,8 @@ namespace storage_profile
             for(off_t offset = 512; offset < size; offset += 512)
             {
               // Create two concurrent writer threads and as many reader threads as additional CPU cores
-              std::vector<std::pair<std::thread, std::future<void>>> writers, readers;
+              // The excessive unique_ptr works around a bug in libc++'s thread implementation
+              std::vector<std::pair<std::unique_ptr<std::thread>, std::future<void>>> writers, readers;
               std::atomic<size_t> done(2);
               for(char no = '1'; no <= '2'; no++)
               {
@@ -657,7 +661,8 @@ namespace storage_profile
                     h.write(reqs).value();
                   }
                 });
-                writers.push_back(std::make_pair(std::thread(std::move(task)), task.get_future()));
+                auto f(task.get_future());
+                writers.emplace_back(std::make_unique<std::thread>(std::move(task)), std::move(f));
               }
               // Wait till the writers launch
               while(done)
@@ -703,7 +708,8 @@ namespace storage_profile
                     }
                   }
                 });
-                readers.push_back(std::make_pair(std::thread(std::move(task)), task.get_future()));
+                auto f(task.get_future());
+                readers.emplace_back(std::make_unique<std::thread>(std::move(task)), std::move(f));
               }
 
 #ifndef NDEBUG
@@ -717,11 +723,11 @@ namespace storage_profile
               done = true;
               for(auto &writer : writers)
               {
-                writer.first.join();
+                writer.first->join();
               }
               for(auto &reader : readers)
               {
-                reader.first.join();
+                reader.first->join();
               }
               for(auto &writer : writers)
               {
@@ -783,7 +789,8 @@ namespace storage_profile
         (void) utils::drop_filesystem_cache();
 
         std::vector<std::vector<unsigned long long>> results(noreaders + nowriters);
-        std::vector<std::pair<std::thread, std::future<void>>> writers, readers;
+        // The excessive unique_ptr works around a bug in libc++'s thread implementation
+        std::vector<std::pair<std::unique_ptr<std::thread>, std::future<void>>> writers, readers;
         std::atomic<size_t> done(noreaders + nowriters);
         for(auto &i : results)
         {
@@ -818,7 +825,8 @@ namespace storage_profile
                 return;
             }
           });
-          writers.push_back(std::make_pair(std::thread(std::move(task)), task.get_future()));
+          auto f(task.get_future());
+          writers.emplace_back(std::make_unique<std::thread>(std::move(task)), std::move(f));
         }
         for(size_t no = nowriters; no < nowriters + noreaders; no++)
         {
@@ -846,7 +854,8 @@ namespace storage_profile
                 return;
             }
           });
-          readers.push_back(std::make_pair(std::thread(std::move(task)), task.get_future()));
+          auto f(task.get_future());
+          readers.emplace_back(std::make_unique<std::thread>(std::move(task)), std::move(f));
         }
         // Wait till the readers and writers launch
         while(done)
@@ -859,11 +868,11 @@ namespace storage_profile
         done = true;
         for(auto &writer : writers)
         {
-          writer.first.join();
+          writer.first->join();
         }
         for(auto &reader : readers)
         {
-          reader.first.join();
+          reader.first->join();
         }
         for(auto &writer : writers)
         {

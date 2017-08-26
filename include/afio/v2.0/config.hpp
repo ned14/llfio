@@ -39,12 +39,15 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 
 #if !defined(AFIO_LOGGING_LEVEL)
-#ifdef NDEBUG
-#define AFIO_LOGGING_LEVEL 2  // error
-#else
 //! \brief How much detail to log. 0=disabled, 1=fatal, 2=error, 3=warn, 4=info, 5=debug, 6=all.
-//! Defaults to error if NDEBUG defined, else info level. \ingroup config
-#define AFIO_LOGGING_LEVEL 4  // info
+//! Defaults to error level. \ingroup config
+#define AFIO_LOGGING_LEVEL 2  // error
+#endif
+
+#ifndef AFIO_LOG_TO_OSTREAM
+#ifndef NDEBUG
+//! \brief Any `ostream` to also log to. If `NDEBUG` is not defined, `std::cerr` is the default.
+#define AFIO_LOG_TO_OSTREAM std::cerr
 #endif
 #endif
 
