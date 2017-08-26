@@ -45,7 +45,7 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 
 #ifndef AFIO_LOG_TO_OSTREAM
-#ifndef NDEBUG
+#if !defined(NDEBUG) && !defined(AFIO_DISABLE_LOG_TO_OSTREAM)
 //! \brief Any `ostream` to also log to. If `NDEBUG` is not defined, `std::cerr` is the default.
 #define AFIO_LOG_TO_OSTREAM std::cerr
 #endif

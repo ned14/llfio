@@ -347,6 +347,7 @@ template <class T, class R> inline void hook_result_construction(OUTCOME_V2_NAME
     native_handle_type nativeh;
     if(currenth != nullptr)
     {
+      //! \todo hook_result_construction() recurses into itself forever if current_path() fails
       nativeh = currenth->native_handle();
       auto currentpath_ = currenth->current_path();
       if(currentpath_)
