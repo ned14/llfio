@@ -77,7 +77,11 @@ inline result<path_handle> containing_directory(optional<std::reference_wrapper<
         continue;
       path_handle currentdirh = std::move(currentdirh_.value());
       if(h.flags() & handle::flag::disable_safety_unlinks)
+      {
+        if(out_filename)
+          out_filename->get() = filename.path();
         return success(std::move(currentdirh));
+      }
       // Open the same file name, and compare dev and inode
       path_view::c_str zpath(filename);
       int fd = ::openat(currentdirh.native_handle().fd, zpath.buffer, O_CLOEXEC);
