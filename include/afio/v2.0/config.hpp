@@ -372,6 +372,7 @@ namespace detail
   struct tls_errored_results_t
   {
     handle *current_handle{nullptr};  // The current handle for this thread
+    bool reentered{false};            // Whether hook_result_construction is reentering itself
     char paths[190][16];              // The log can only store 190 chars of message anyway
     uint16_t pathidx{0};
     char *next(uint16_t &idx)

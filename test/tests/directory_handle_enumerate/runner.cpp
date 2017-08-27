@@ -22,8 +22,8 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#include "kerneltest/include/kerneltest.hpp"
 #include "kernel_directory_handle_enumerate.cpp.hpp"
+#include "kerneltest/include/kerneltest.hpp"
 
 template <class U> inline void directory_handle_enumerate_(U &&f)
 {
@@ -94,13 +94,21 @@ template <class U> inline void directory_handle_enumerate_(U &&f)
           for (directory_entry &i : info.filled)
           {
             if (i.leafname == "012345678901234567890123456789012345678901234567890123456789012z.deleted")
+            {
               havedeleted1 = true;
+            }
             if (i.leafname == "0123456789012345678901234567890123456789012345678901234567890123.deleted")
+            {
               havedeleted2 = true;
+            }
             if (i.leafname == "foo.txt")
+            {
               havefoo = true;
+            }
             if (i.leafname == "dir")
+            {
               havedir = true;
+            }
           }
           KERNELTEST_CHECK(testreturn, havedeleted1 == true);
           KERNELTEST_CHECK(testreturn, havedeleted2 == true);

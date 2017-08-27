@@ -347,7 +347,11 @@ template <class T, class R> inline void hook_result_construction(OUTCOME_V2_NAME
     native_handle_type nativeh;
     if(currenth != nullptr)
     {
-      //! \todo hook_result_construction() recurses into itself forever if current_path() fails
+      if(tls.reentered)
+      {
+        return;
+      }
+      tls.reentered = true;
       nativeh = currenth->native_handle();
       auto currentpath_ = currenth->current_path();
       if(currentpath_)
@@ -357,6 +361,7 @@ template <class T, class R> inline void hook_result_construction(OUTCOME_V2_NAME
         strncpy(tls.next(tlsidx), QUICKCPPLIB_NAMESPACE::ringbuffer_log::last190(currentpath), 190);
         OUTCOME_V2_NAMESPACE::hooks::set_spare_storage(res, tlsidx);
       }
+      tls.reentered = false;
     }
     log().emplace_back(log_level::error, res->assume_error().message().c_str(), nativeh._init, QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id());
   }
