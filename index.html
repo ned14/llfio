@@ -122,29 +122,31 @@ $(document).ready(function(){initNavTree('index.html','');});
   </th></tr>
 <tr>
 <td valign="top" width="33%">Manufacturer claimed 4Kb transfer latencies for the physical hardware:<ul>
-<li>Spinning rust hard drive latency @ QD1: <b>7000us</b></li>
+<li>Spinning rust hard drive latency @ QD1: <b>9000us</b></li>
 <li>SATA flash drive latency @ QD1: <b>800us</b></li>
 <li>NVMe flash drive latency @ QD1: <b>300us</b></li>
 <li>RTT UDP packet latency over a LAN: <b>60us</b></li>
-<li>NVMe Optane drive latency @ QD1: <b>10us</b></li>
+<li>NVMe Optane drive latency @ QD1: <b>60us</b></li>
 <li><code>memcpy(4Kb)</code> latency: <b>5us</b> (main memory) to <b>1.3us</b> (L3 cache)</li>
 <li>RTT PCIe latency: <b>0.5us</b>  </li>
 </ul>
 </td><td valign="top" width="33%"><p class="starttd">100% read QD1 4Kb direct transfer latencies for the software with AFIO:</p>
 <ul>
-<li>&lt; 99% spinning rust hard drive latency: <b>230,005us</b></li>
+<li>&lt; 99% spinning rust hard drive latency: Windows <b>187,231us</b> FreeBSD <b>9,836us</b> Linux <b>26,468us</b></li>
 <li>&lt; 99% SATA flash drive latency: Windows <b>290us</b> Linux <b>158us</b></li>
+<li>&lt; 99% NVMe drive latency: Windows <b>150us</b> FreeBSD <b>70us</b> Linux <b>30us</b></li>
 </ul>
-<p class="endtd">Lowest sustained 4Kb read latency benchmarked to date by author (page cache): <b>7us</b> (142k IOPS @ QD1, approx 558Mb/sec)  </p>
+<p class="endtd">Lowest achievable 4Kb read latency benchmarked to date by author: <b>0.19us</b> (5.3M IOPS @ QD1, approx 20Gb/sec)  </p>
 </td><td valign="top" width="33%"><p class="starttd">75% read 25% write QD4 4Kb direct transfer latencies for the software with AFIO:</p>
 <ul>
-<li>&lt; 99% spinning rust hard drive latency: <b>48,185us</b></li>
+<li>&lt; 99% spinning rust hard drive latency: Windows <b>48,185us</b> FreeBSD <b>61,834us</b> Linux <b>104,507us</b></li>
 <li>&lt; 99% SATA flash drive latency: Windows <b>1,812us</b> Linux <b>1,416us</b></li>
+<li>&lt; 99% NVMe drive latency: Windows <b>95us</b> FreeBSD <b>143us</b> Linux <b>40us</b></li>
 </ul>
-<p class="endtd">Lowest sustained 4Kb write latency benchmarked to date by author (page cache): <b>7us</b> (142k IOPS @ QD1, approx 558Mb/sec)   </p>
+<p class="endtd">Lowest achievable 4Kb write latency benchmarked to date by author: <b>0.18us</b> (5.6M IOPS @ QD1, approx 21Gb/sec)   </p>
 </td></tr>
 </table>
-<dl class="section note"><dt>Note</dt><dd>Note that this code is of late alpha quality. It's quite reliable, but be careful when using it!</dd></dl>
+<dl class="section note"><dt>Note</dt><dd>Note that this code is of late alpha quality. It's quite reliable on Windows and Linux, but be careful when using it!</dd></dl>
 <p>These compilers and OS are regularly tested:</p>
 <ul>
 <li>GCC 7.0 (Linux 4,x x64)</li>
@@ -288,6 +290,8 @@ async_file_handle - adds asynchronous scatter-gather i/o</li>
 <th>NEW in v2 </th><th>Windows </th><th>POSIX </th><th></th></tr>
 <tr>
 <td></td><td></td><td></td><td>Hard links and symlinks. </td></tr>
+<tr>
+<td></td><td></td><td></td><td>Set random or sequential i/o (prefetch). </td></tr>
 <tr>
 <td></td><td></td><td></td><td>BSD and OS X kqueues optimised <code>io_service</code> </td></tr>
 </table>
