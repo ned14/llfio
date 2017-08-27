@@ -47,7 +47,7 @@ static inline void TestPathView()
   afio::path_view::c_str g(e);
   BOOST_CHECK(g.buffer != p);
   afio::path_view::c_str h(f);
-  BOOST_CHECK(g.buffer == p + 70);  // NOLINT
+  BOOST_CHECK(h.buffer == p + 70);  // NOLINT
 #endif
 
 #ifdef _WIN32
