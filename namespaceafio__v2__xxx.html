@@ -303,8 +303,9 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operato
 <tr class="memitem:a2e9ad4a02efc6016631baecfbc1d1d4d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2e9ad4a02efc6016631baecfbc1d1d4d"></a>
 std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator&lt;&lt;</b> (std::ostream &amp;s, const handle::flag &amp;v)</td></tr>
 <tr class="separator:a2e9ad4a02efc6016631baecfbc1d1d4d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6e724f1ed8bc70cb89ea1ef13176a4aa"><td class="memTemplParams" colspan="2">template&lt;class T , class R &gt; </td></tr>
-<tr class="memitem:a6e724f1ed8bc70cb89ea1ef13176a4aa"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx.html#a6e724f1ed8bc70cb89ea1ef13176a4aa">hook_result_construction</a> (OUTCOME_V2_NAMESPACE::in_place_type_t&lt; T &gt;, result&lt; R &gt; *res) noexcept</td></tr>
+<tr class="memitem:a6e724f1ed8bc70cb89ea1ef13176a4aa"><td class="memTemplParams" colspan="2"><a class="anchor" id="a6e724f1ed8bc70cb89ea1ef13176a4aa"></a>
+template&lt;class T , class R &gt; </td></tr>
+<tr class="memitem:a6e724f1ed8bc70cb89ea1ef13176a4aa"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>hook_result_construction</b> (OUTCOME_V2_NAMESPACE::in_place_type_t&lt; T &gt;, result&lt; R &gt; *res) noexcept</td></tr>
 <tr class="separator:a6e724f1ed8bc70cb89ea1ef13176a4aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6346bec3589df60770ce11fbb0bb04b6"><td class="memTemplParams" colspan="2"><a class="anchor" id="a6346bec3589df60770ce11fbb0bb04b6"></a>
 template&lt;class T , class R &gt; </td></tr>
@@ -1036,69 +1037,6 @@ For portability, you can only assume that barriers write order for a single hand
 <div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespaceafio__v2__xxx.html#a84b5a9fc93107c673160b41fff151938">file_handle::file</a>(std::forward&lt;decltype(base)&gt;(base), std::forward&lt;decltype(_path)&gt;(_path), std::forward&lt;decltype(_mode)&gt;(_mode), std::forward&lt;decltype(_creation)&gt;(_creation), std::forward&lt;decltype(_caching)&gt;(_caching), std::forward&lt;decltype(flags)&gt;(flags));</div>
 <div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;}</div>
 <div class="ttc" id="namespaceafio__v2__xxx_html_a84b5a9fc93107c673160b41fff151938"><div class="ttname"><a href="namespaceafio__v2__xxx.html#a84b5a9fc93107c673160b41fff151938">afio_v2_xxx::file</a></div><div class="ttdeci">result&lt; file_handle &gt; file(const path_handle &amp;base, file_handle::path_view_type _path, file_handle::mode _mode=file_handle::mode::read, file_handle::creation _creation=file_handle::creation::open_existing, file_handle::caching _caching=file_handle::caching::all, file_handle::flag flags=file_handle::flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> file_handle.hpp:269</div></div>
-</div><!-- fragment -->
-</div>
-</div>
-<a class="anchor" id="a6e724f1ed8bc70cb89ea1ef13176a4aa"></a>
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;class T , class R &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void afio_v2_xxx::hook_result_construction </td>
-          <td>(</td>
-          <td class="paramtype">OUTCOME_V2_NAMESPACE::in_place_type_t&lt; T &gt;&#160;</td>
-          <td class="paramname">, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">result&lt; R &gt; *&#160;</td>
-          <td class="paramname"><em>res</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000003">Todo:</a></b></dt><dd>hook_result_construction() recurses into itself forever if current_path() fails </dd></dl>
-<div class="fragment"><div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;{</div>
-<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;  <span class="comment">// Sanity check that we never construct a null error code</span></div>
-<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;  assert(!res-&gt;has_error() || res-&gt;error().value() != 0);</div>
-<div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;  <span class="keywordflow">if</span>(res-&gt;has_error() &amp;&amp; <a class="code" href="namespaceafio__v2__xxx.html#a08363b8572e6a8971a6d236d54fb8287">log</a>().log_level() &gt;= log_level::error)</div>
-<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;  {</div>
-<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;    <span class="comment">// Here is a VERY useful place to breakpoint!</span></div>
-<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;    <span class="keyword">auto</span> &amp;tls = detail::tls_errored_results();</div>
-<div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;    handle *currenth = tls.current_handle;</div>
-<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;    native_handle_type nativeh;</div>
-<div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;    <span class="keywordflow">if</span>(currenth != <span class="keyword">nullptr</span>)</div>
-<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;    {<span class="comment"></span></div>
-<div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;<span class="comment">      //! \todo hook_result_construction() recurses into itself forever if current_path() fails</span></div>
-<div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;<span class="comment"></span>      nativeh = currenth-&gt;native_handle();</div>
-<div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160;      <span class="keyword">auto</span> currentpath_ = currenth-&gt;current_path();</div>
-<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;      <span class="keywordflow">if</span>(currentpath_)</div>
-<div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160;      {</div>
-<div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160;        <span class="keyword">auto</span> currentpath = currentpath_.value().u8string();</div>
-<div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;        uint16_t tlsidx = 0;</div>
-<div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;        strncpy(tls.next(tlsidx), QUICKCPPLIB_NAMESPACE::ringbuffer_log::last190(currentpath), 190);</div>
-<div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;        OUTCOME_V2_NAMESPACE::hooks::set_spare_storage(res, tlsidx);</div>
-<div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160;      }</div>
-<div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;    }</div>
-<div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160;    <a class="code" href="namespaceafio__v2__xxx.html#a08363b8572e6a8971a6d236d54fb8287">log</a>().emplace_back(log_level::error, res-&gt;assume_error().message().c_str(), nativeh._init, QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id());</div>
-<div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;  }</div>
-<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;}</div>
-<div class="ttc" id="namespaceafio__v2__xxx_html_a08363b8572e6a8971a6d236d54fb8287"><div class="ttname"><a href="namespaceafio__v2__xxx.html#a08363b8572e6a8971a6d236d54fb8287">afio_v2_xxx::log</a></div><div class="ttdeci">QUICKCPPLIB_NAMESPACE::ringbuffer_log::simple_ringbuffer_log&lt; AFIO_LOGGING_MEMORY &gt; &amp; log() noexcept</div><div class="ttdoc">The log used by AFIO. </div><div class="ttdef"><b>Definition:</b> config.hpp:329</div></div>
 </div><!-- fragment -->
 </div>
 </div>
