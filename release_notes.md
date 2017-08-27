@@ -21,32 +21,34 @@ source code repository lives at https://github.com/ned14/boost.afio.
 <tr>
 <td valign="top" width="33%">
 Manufacturer claimed 4Kb transfer latencies for the physical hardware:
-- Spinning rust hard drive latency @ QD1: **7000us**
+- Spinning rust hard drive latency @ QD1: **9000us**
 - SATA flash drive latency @ QD1: **800us**
 - NVMe flash drive latency @ QD1: **300us**
 - RTT UDP packet latency over a LAN: **60us**
-- NVMe Optane drive latency @ QD1: **10us**
+- NVMe Optane drive latency @ QD1: **60us**
 - `memcpy(4Kb)` latency: **5us** (main memory) to **1.3us** (L3 cache)
 - RTT PCIe latency: **0.5us**
 </td>
 <td valign="top" width="33%">
 100% read QD1 4Kb direct transfer latencies for the software with AFIO:
-- &lt; 99% spinning rust hard drive latency: **230,005us**
+- &lt; 99% spinning rust hard drive latency: Windows **187,231us** FreeBSD **9,836us** Linux **26,468us**
 - &lt; 99% SATA flash drive latency: Windows **290us** Linux **158us**
+- &lt; 99% NVMe drive latency: Windows **150us** FreeBSD **70us** Linux **30us**
 
-Lowest sustained 4Kb read latency benchmarked to date by author (page cache): **7us** (142k IOPS @ QD1, approx 558Mb/sec)
+Lowest achievable 4Kb read latency benchmarked to date by author: **0.19us** (5.3M IOPS @ QD1, approx 20Gb/sec)
 </td>
 <td valign="top" width="33%">
 75% read 25% write QD4 4Kb direct transfer latencies for the software with AFIO:
-- &lt; 99% spinning rust hard drive latency: **48,185us**
+- &lt; 99% spinning rust hard drive latency: Windows **48,185us** FreeBSD **61,834us** Linux **104,507us**
 - &lt; 99% SATA flash drive latency: Windows **1,812us** Linux **1,416us**
+- &lt; 99% NVMe drive latency: Windows **95us** FreeBSD **143us** Linux **40us**
 
-Lowest sustained 4Kb write latency benchmarked to date by author (page cache): **7us** (142k IOPS @ QD1, approx 558Mb/sec)
+Lowest achievable 4Kb write latency benchmarked to date by author: **0.18us** (5.6M IOPS @ QD1, approx 21Gb/sec)
 </td>
 </tr>
 </table>
 
-\note Note that this code is of late alpha quality. It's quite reliable, but be careful when using it!
+\note Note that this code is of late alpha quality. It's quite reliable on Windows and Linux, but be careful when using it!
 
 These compilers and OS are regularly tested:
 - GCC 7.0 (Linux 4,x x64)
@@ -146,6 +148,7 @@ Todo to reach feature parity with AFIO v1:
 | NEW in v2 | Windows | POSIX |     |
 | --------- | --------| ----- | --- |
 |   |   |   | Hard links and symlinks.
+|   |   |   | Set random or sequential i/o (prefetch).
 |   |   |   | BSD and OS X kqueues optimised `io_service`
 
 Todo thereafter:
