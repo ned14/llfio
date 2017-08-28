@@ -136,14 +136,14 @@ $(document).ready(function(){initNavTree('index.html','');});
 <li>&lt; 99% SATA flash drive latency: Windows <b>290us</b> Linux <b>158us</b></li>
 <li>&lt; 99% NVMe drive latency: Windows <b>150us</b> FreeBSD <b>70us</b> Linux <b>30us</b></li>
 </ul>
-<p class="endtd">Lowest achievable 4Kb read latency benchmarked to date by author: <b>0.19us</b> (5.3M IOPS @ QD1, approx 20Gb/sec)  </p>
+<p class="endtd">Empirical AFIO read latency benchmarked by author: <b>0.19us</b> (5.3M IOPS @ QD1, approx 20Gb/sec)  </p>
 </td><td valign="top" width="33%"><p class="starttd">75% read 25% write QD4 4Kb direct transfer latencies for the software with AFIO:</p>
 <ul>
 <li>&lt; 99% spinning rust hard drive latency: Windows <b>48,185us</b> FreeBSD <b>61,834us</b> Linux <b>104,507us</b></li>
 <li>&lt; 99% SATA flash drive latency: Windows <b>1,812us</b> Linux <b>1,416us</b></li>
 <li>&lt; 99% NVMe drive latency: Windows <b>95us</b> FreeBSD <b>143us</b> Linux <b>40us</b></li>
 </ul>
-<p class="endtd">Lowest achievable 4Kb write latency benchmarked to date by author: <b>0.18us</b> (5.6M IOPS @ QD1, approx 21Gb/sec)   </p>
+<p class="endtd">Empirical AFIO write latency benchmarked by author: <b>0.18us</b> (5.6M IOPS @ QD1, approx 21Gb/sec)   </p>
 </td></tr>
 </table>
 <dl class="section note"><dt>Note</dt><dd>Note that this code is of late alpha quality. It's quite reliable on Windows and Linux, but be careful when using it!</dd></dl>
@@ -283,6 +283,8 @@ async_file_handle - adds asynchronous scatter-gather i/o</li>
 <td></td><td>✔ </td><td>✔ </td><td>"Hole punching" and hole enumeration ported over from AFIO v1. </td></tr>
 <tr>
 <td></td><td>✔ </td><td>✔ </td><td>Directory handles and very fast directory enumeration ported over from AFIO v1. </td></tr>
+<tr>
+<td>✔ </td><td>✔ </td><td>✔ </td><td><code>shared_fs_mutex</code> shared/exclusive entities locking based on safe byte ranges </td></tr>
 </table>
 <p>Todo to reach feature parity with AFIO v1:</p>
 <table class="doxtable">
