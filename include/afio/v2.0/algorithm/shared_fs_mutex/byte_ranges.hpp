@@ -46,6 +46,8 @@ namespace algorithm
     and tries locking them again until success. Needless to say this algorithm puts a lot of strain on
     your byte range locking implementation, some NFS implementations have been known to fail to cope.
 
+    \note Most users will want to use `safe_byte_ranges` instead of this class directly.
+
     - Compatible with networked file systems, though be cautious with older NFS.
     - Linear complexity to number of concurrent users.
     - Exponential complexity to number of entities being concurrently locked, though some OSs
@@ -64,6 +66,9 @@ namespace algorithm
     - If your OS doesn't have sane byte range locks (OS X, BSD, older Linuxes) and multiple
     objects in your process use the same lock file, misoperation will occur. Use lock_files
     or share a single instance of this class per lock file in this case.
+    - If you are on POSIX and the same process relocks an entity a second time, it will release everything
+    on the first unlock. On Windows, the first unlock releases the exclusive lock and the second
+    unlock will release the shared lock.
     */
     class byte_ranges : public shared_fs_mutex
     {

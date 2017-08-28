@@ -183,7 +183,7 @@ namespace algorithm
         //! \todo fs_mutex_append needs to check if file still exists after lock is granted, awaiting path fetching.
         if(lockresult.has_error())
         {
-          if(lockresult.error().value() != ETIMEDOUT)
+          if(lockresult.error() != std::errc::timed_out)
             return lockresult.error();
           // Somebody else is also using this file
         }

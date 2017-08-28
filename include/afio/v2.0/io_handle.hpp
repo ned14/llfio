@@ -250,7 +250,7 @@ public:
   some (e.g. ZFS) spectacularly better.
 
   \warning Let me repeat again: consider this call to be a **hint** to poke the kernel with a stick to
-  go start to do some work sooner rather than later. It may be ignored entirely.
+  go start to do some work sooner rather than later. **It may be ignored entirely**.
 
   \warning For portability, you can only assume that barriers write order for a single handle
   instance. You cannot assume that barriers write order across multiple handles to the same inode, or
@@ -351,14 +351,22 @@ public:
   };
 
   /*! \brief Tries to lock the range of bytes specified for shared or exclusive access. Be aware this passes through
-  the same semantics as the underlying OS call, including any POSIX insanity present on your platform.
+  the same semantics as the underlying OS call, including any POSIX insanity present on your platform:
+
+  - Any fd closed on an inode must release all byte range locks on that inode for all
+  other fds. If your OS isn't new enough to support the non-insane lock API, `flag::byte_lock_insanity` will be set
+  in flags() after the first call to this function.
+  - Threads replace each other's locks, indeed locks replace each other's locks.
+
   You almost cetainly should use your choice of an `algorithm::shared_fs_mutex::*` instead of this
   as those are more portable and performant.
 
-  \warning On older Linuxes and POSIX, this uses `fcntl()` with the well known insane POSIX
-  semantics that closing ANY handle to this file releases all bytes range locks on it. If your
-  OS isn't new enough to support the non-insane lock API, `flag::byte_lock_insanity` will be set
-  in flags() after the first call to this function.
+  \warning This is a low-level API which you should not use directly in portable code. Another issue is that
+  atomic lock upgrade/downgrade, if your platform implements that (you should assume it does not in
+  portable code), means that on POSIX you need to *release* the old `extent_guard` after creating a new one over the
+  same byte range, otherwise the old `extent_guard`'s destructor will simply unlock the range entirely. On
+  Windows however upgrade/downgrade locks overlay, so on that platform you must *not* release the old
+  `extent_guard`. Look into `algorithm::shared_fs_mutex::safe_byte_ranges` for a portable solution.
 
   \return An extent guard, the destruction of which will call unlock().
   \param offset The offset to lock. Note that on POSIX the top bit is always cleared before use

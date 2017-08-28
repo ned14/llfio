@@ -56,14 +56,10 @@ namespace algorithm
     implementation is entirely implemented in userspace using shared memory without any kernel syscalls,
     performance is probably as fast as any many-arbitrary-entity shared locking system could be.
 
-    Performance ought to be excellent so long as no lock user attempts to use the lock from across a
-    networked filing system. As soon as a locking entity fails to find the temporary file given in the
-    lock file location, it will *permanently* degrade the memory mapped lock into the "fallback" lock
-    specified in the constructor (if you do not specify one, `EBUSY` will be forever returned from then
-    on when trying to lock). It is up to the end user to decide when it might be time to destroy and
-    reconstruct `memory_map` in order to restore full performance.
+    As it uses shared memory, this implementation of `shared_fs_mutex` cannot work over a networked
+    drive. If you attempt to open this lock on a network drive and the first user of the lock is not
+    on this local machine, `std::errc::no_lock_available` will be returned from the constructor.
 
-    - Compatible with networked file systems, though with a substantial performance degrade as described above.
     - Linear complexity to number of concurrent users up until hash table starts to get full or hashed
     entries collide.
     - Sudden power loss during use is recovered from.
@@ -71,9 +67,6 @@ namespace algorithm
     - In the lightly contended case, an order of magnitude faster than any other `shared_fs_mutex` algorithm.
 
     Caveats:
-    - A transition between mapped and fallback locks will not complete until all current mapped memory users
-    have realised the transition has happened. This can take a very significant amount of time if a lock user
-    does not regularly lock its locks.
     - No ability to sleep until a lock becomes free, so CPUs are spun at 100%.
     - Sudden process exit with locks held will deadlock all other users.
     - Exponential complexity to number of entities being concurrently locked.
@@ -83,8 +76,6 @@ namespace algorithm
     whole system performance very noticeably nose dives from excessive atomic operations, things like audio and the
     mouse pointer will stutter.
     - Sometimes different entities hash to the same offset and collide with one another, causing very poor performance.
-    - Byte range locks need to work properly on your system. Misconfiguring NFS or Samba
-    to cause byte range locks to not work right will produce bad outcomes.
     - Memory mapped files need to be cache unified with normal i/o in your OS kernel. Known OSs which
     don't use a unified cache for memory mapped and normal i/o are QNX, OpenBSD. Furthermore, doing
     normal i/o and memory mapped i/o to the same file needs to not corrupt the file. In the past,
@@ -92,11 +83,7 @@ namespace algorithm
     - If your OS doesn't have sane byte range locks (OS X, BSD, older Linuxes) and multiple
     objects in your process use the same lock file, misoperation will occur.
 
-    \todo It should be possible to auto early out from a memory_map transition by scanning the memory map for any
-    locked items, and if none then to proceed.
-    \todo fs_mutex_map needs to check if this inode is that at the path after lock is granted, awaiting stat_t port.
     \todo memory_map::_hash_entities needs to hash x16, x8 and x4 at a time to encourage auto vectorisation
-    \todo memory_map::unlock() degrade is racy when single instance being used by multiple threads
     */
     template <template <class> class Hasher = QUICKCPPLIB_NAMESPACE::algorithm::hash::fnv1a_hash, size_t HashIndexSize = 4096, class SpinlockType = QUICKCPPLIB_NAMESPACE::configurable_spinlock::shared_spinlock<>> class memory_map : public shared_fs_mutex
     {
@@ -115,14 +102,10 @@ namespace algorithm
       using _hash_index_type = std::array<spinlock_type, _container_entries>;
       static constexpr file_handle::extent_type _initialisingoffset = (file_handle::extent_type) 1024 * 1024;
       static constexpr file_handle::extent_type _lockinuseoffset = (file_handle::extent_type) 1024 * 1024 + 1;
-      static constexpr file_handle::extent_type _mapinuseoffset = (file_handle::extent_type) 1024 * 1024 + 2;
 
       file_handle _h, _temph;
       file_handle::extent_guard _hlockinuse;  // shared lock of last byte of _h marking if lock is in use
-      file_handle::extent_guard _hmapinuse;   // shared lock of second last byte of _h marking if mmap is in use
       map_handle _hmap, _temphmap;
-      shared_fs_mutex *_fallbacklock;
-      bool _have_degraded;
 
       _hash_index_type &_index() const
       {
@@ -130,36 +113,21 @@ namespace algorithm
         return *ret;
       }
 
-      memory_map(file_handle &&h, file_handle &&temph, file_handle::extent_guard &&hlockinuse, file_handle::extent_guard &&hmapinuse, map_handle &&hmap, map_handle &&temphmap, shared_fs_mutex *fallbacklock)
+      memory_map(file_handle &&h, file_handle &&temph, file_handle::extent_guard &&hlockinuse, map_handle &&hmap, map_handle &&temphmap)
           : _h(std::move(h))
           , _temph(std::move(temph))
           , _hlockinuse(std::move(hlockinuse))
-          , _hmapinuse(std::move(hmapinuse))
           , _hmap(std::move(hmap))
           , _temphmap(std::move(temphmap))
-          , _fallbacklock(fallbacklock)
-          , _have_degraded(false)
       {
         _hlockinuse.set_handle(&_h);
-        _hmapinuse.set_handle(&_h);
       }
       memory_map(const memory_map &) = delete;
       memory_map &operator=(const memory_map &) = delete;
 
     public:
-      //! Returns the fallback lock
-      shared_fs_mutex *fallback() const noexcept { return _fallbacklock; }
-      //! Sets the fallback lock
-      void fallback(shared_fs_mutex *fbl) noexcept { _fallbacklock = fbl; }
-      //! True if this lock has degraded due to a network user trying to use it
-      bool is_degraded() const noexcept { return _hmap.address()[0] == 0; }
-
       //! Move constructor
-      memory_map(memory_map &&o) noexcept : _h(std::move(o._h)), _temph(std::move(o._temph)), _hlockinuse(std::move(o._hlockinuse)), _hmapinuse(std::move(o._hmapinuse)), _hmap(std::move(o._hmap)), _temphmap(std::move(o._temphmap)), _fallbacklock(std::move(o._fallbacklock)), _have_degraded(std::move(o._have_degraded))
-      {
-        _hlockinuse.set_handle(&_h);
-        _hmapinuse.set_handle(&_h);
-      }
+      memory_map(memory_map &&o) noexcept : _h(std::move(o._h)), _temph(std::move(o._temph)), _hlockinuse(std::move(o._hlockinuse)), _hmap(std::move(o._hmap)), _temphmap(std::move(o._temphmap)) { _hlockinuse.set_handle(&_h); }
       //! Move assign
       memory_map &operator=(memory_map &&o) noexcept
       {
@@ -171,10 +139,12 @@ namespace algorithm
       {
         if(_h.is_valid())
         {
+          // Release the maps
+          _hmap = {};
+          _temphmap = {};
           // Release my shared locks and try locking inuse exclusively
-          _hmapinuse.unlock();
           _hlockinuse.unlock();
-          auto lockresult = _h.try_lock(_initialisingoffset, 3, true);
+          auto lockresult = _h.try_lock(_initialisingoffset, 2, true);
 #ifndef NDEBUG
           if(!lockresult && lockresult.error() != std::errc::timed_out)
           {
@@ -185,35 +155,36 @@ namespace algorithm
           if(lockresult)
           {
             // This means I am the last user, so zop the file contents as temp file is about to go away
-            char buffer[4];
-            memset(buffer, 0, sizeof(buffer));
-            if(!_h.write(0, buffer, sizeof(buffer)))
-            {
-              AFIO_LOG_FATAL(0, "memory_map::~memory_map() write failed");
-              abort();
-            }
-            // The reason we write 4 zeros and then truncate is because some POSIX implementations
-            // don't clear maps when you truncate.
-            // We truncate to 4, not 0, lest an implementation considers a zero truncation to
-            // equal unmapping.
-            if(!_h.truncate(4))
+            auto o2 = _h.truncate(0);
+            if(!o2)
             {
               AFIO_LOG_FATAL(0, "memory_map::~memory_map() truncate failed");
+              std::cerr << "~memory_map() truncate failed due to " << o2.error().message() << std::endl;
               abort();
             }
-            // Unlink the temp file (which may already be deleted)
-            (void) _temph.unlink();
+            // Unlink the temp file. We don't trap any failure to unlink on FreeBSD it can forget current path.
+            auto o3 = _temph.unlink();
+            if(!o3)
+            {
+#ifdef __FreeBSD__
+              std::cerr << "~memory_map() unlink failed due to " << o3.error().message() << std::endl;
+#else
+              AFIO_LOG_FATAL(0, "memory_map::~memory_map() unlink failed");
+              std::cerr << "~memory_map() unlink failed due to " << o3.error().message() << std::endl;
+              abort();
+#endif
+            }
           }
         }
       }
 
-      /*! Initialises a shared filing system mutex using the file at \em lockfile and an optional fallback lock.
+      /*! Initialises a shared filing system mutex using the file at \em lockfile.
       \errors Awaiting the clang result<> AST parser which auto generates all the error codes which could occur,
-      but a particularly important one is `EBUSY` which will be returned if the memory map lock is already in
-      a degraded state (i.e. just use the fallback lock directly).
+      but a particularly important one is `std::errc::no_lock_available` which will be returned if the lock
+      is in use by another computer on a network.
       */
       AFIO_MAKE_FREE_FUNCTION
-      static result<memory_map> fs_mutex_map(const path_handle &base, path_view lockfile, shared_fs_mutex *fallbacklock = nullptr) noexcept
+      static result<memory_map> fs_mutex_map(const path_handle &base, path_view lockfile) noexcept
       {
         AFIO_LOG_FUNCTION_CALL(0);
         try
@@ -221,60 +192,35 @@ namespace algorithm
           OUTCOME_TRY(ret, file_handle::file(base, lockfile, file_handle::mode::write, file_handle::creation::if_needed, file_handle::caching::reads));
           file_handle temph;
           // Am I the first person to this file? Lock everything exclusively
-          auto lockinuse = ret.try_lock(_initialisingoffset, 3, true);
-          file_handle::extent_guard mapinuse;
+          auto lockinuse = ret.try_lock(_initialisingoffset, 2, true);
           if(lockinuse.has_error())
           {
             if(lockinuse.error() != std::errc::timed_out)
               return lockinuse.error();
             // Somebody else is also using this file, so try to read the hash index file I ought to use
-            lockinuse = ret.lock(_lockinuseoffset, 1, false);  // inuse shared access
+            lockinuse = ret.lock(_lockinuseoffset, 1, false);  // inuse shared access, blocking
+            if(!lockinuse)
+              return lockinuse.error();
             char buffer[65536];
             memset(buffer, 0, sizeof(buffer));
             OUTCOME_TRYV(ret.read(0, buffer, 65535));
             path_view temphpath((filesystem::path::value_type *) buffer);
             result<file_handle> _temph(in_place_type<file_handle>);
-            // If path is zeroed, fall back onto backup lock
-            if(!buffer[0])
-            {
-              // I am guaranteed that all mmap users have locked the second last byte
-              // and will unlock it once everyone has stopped using the mmap, so make
-              // absolutely sure the mmap is not in use by anyone by taking an exclusive
-              // lock on the second final byte
-              OUTCOME_TRYV(ret.lock(_mapinuseoffset, 1, true));
-              // Release the exclusive lock and tell caller to just use the fallback lock directly
-              return std::errc::device_or_resource_busy;
-            }
-            else
-              _temph = file_handle::file({}, temphpath, file_handle::mode::write, file_handle::creation::open_existing, file_handle::caching::temporary);
+            _temph = file_handle::file({}, temphpath, file_handle::mode::write, file_handle::creation::open_existing, file_handle::caching::temporary);
             // If temp file doesn't exist, I am on a different machine
             if(!_temph)
             {
-              // Zop the path so any new entrants into this lock will go to the fallback lock
-              memset(buffer, 0, 4);
-              OUTCOME_TRYV(ret.write(0, buffer, 4));
-              // I am guaranteed that all mmap users have locked the second last byte
-              // and will unlock it once everyone has stopped using the mmap, so make
-              // absolutely sure the mmap is not in use by anyone by taking an exclusive
-              // lock on the second final byte
-              OUTCOME_TRYV(ret.lock(_mapinuseoffset, 1, true));
-              // Release the exclusive lock and tell caller to just use the fallback lock directly
-              return std::errc::device_or_resource_busy;
+              // Release the exclusive lock and tell caller that this lock is not available
+              return std::errc::no_lock_available;
             }
-            else
-            {
-              // Mark the map as being in use by me too
-              OUTCOME_TRY(mapinuse2, ret.lock(_mapinuseoffset, 1, false));
-              mapinuse = std::move(mapinuse2);
-              temph = std::move(_temph.value());
-            }
+            temph = std::move(_temph.value());
             // Map the hash index file into memory for read/write access
             OUTCOME_TRY(temphsection, section_handle::section(temph, HashIndexSize));
             OUTCOME_TRY(temphmap, map_handle::map(temphsection, HashIndexSize));
             // Map the path file into memory with its maximum possible size, read only
             OUTCOME_TRY(hsection, section_handle::section(ret, 65536, section_handle::flag::read));
             OUTCOME_TRY(hmap, map_handle::map(hsection, 0, 0, section_handle::flag::read));
-            return memory_map(std::move(ret), std::move(temph), std::move(lockinuse.value()), std::move(mapinuse), std::move(hmap), std::move(temphmap), fallbacklock);
+            return memory_map(std::move(ret), std::move(temph), std::move(lockinuse.value()), std::move(hmap), std::move(temphmap));
           }
           else
           {
@@ -292,24 +238,19 @@ namespace algorithm
             char buffer[4096];
             memset(buffer, 0, sizeof(buffer));
             size_t bytes = temppath.native().size() * sizeof(*temppath.c_str());
-            file_handle::const_buffer_type buffers[]={
-              {(const char *) temppath.c_str(), bytes},
-              {(const char *) buffer, 4096-(bytes % 4096)}
-            };
+            file_handle::const_buffer_type buffers[] = {{(const char *) temppath.c_str(), bytes}, {(const char *) buffer, 4096 - (bytes % 4096)}};
             OUTCOME_TRYV(ret.truncate(65536));
             OUTCOME_TRYV(ret.write({buffers, 0}));
             // Map for read the maximum possible path file size, again to avoid race problems
             OUTCOME_TRY(hsection, section_handle::section(ret, 65536, section_handle::flag::read));
             OUTCOME_TRY(hmap, map_handle::map(hsection, 0, 0, section_handle::flag::read));
-            /* Take shared locks on mapinuse and inuse. Even if this implementation doesn't implement
+            /* Take shared locks on inuse. Even if this implementation doesn't implement
             atomic downgrade of exclusive range to shared range, we're fully prepared for other users
             now. The _initialisingoffset remains exclusive to prevent double entry into this init routine.
             */
-            OUTCOME_TRY(mapinuse2, ret.lock(_mapinuseoffset, 1, false));
             OUTCOME_TRY(lockinuse2, ret.lock(_lockinuseoffset, 1, false));
-            mapinuse = std::move(mapinuse2);
-            lockinuse = std::move(lockinuse2); // releases exclusive lock on all three offsets
-            return memory_map(std::move(ret), std::move(temph), std::move(lockinuse.value()), std::move(mapinuse), std::move(hmap), std::move(temphmap), fallbacklock);
+            lockinuse = std::move(lockinuse2);  // releases exclusive lock on all three offsets
+            return memory_map(std::move(ret), std::move(temph), std::move(lockinuse.value()), std::move(hmap), std::move(temphmap));
           }
         }
         catch(...)
@@ -353,23 +294,6 @@ namespace algorithm
       AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> _lock(entities_guard &out, deadline d, bool spin_not_sleep) noexcept override final
       {
         AFIO_LOG_FUNCTION_CALL(this);
-        if(is_degraded())
-        {
-          if(!_have_degraded)
-          {
-            // We have just become degraded, so release our shared lock of the map
-            // being in use and lock it exclusively, this will gate us on all other
-            // current users of the map so we don't unblock until all current users
-            // reach this same point. If that lock times out, we will reenter here
-            // next time until we succeed
-            _hmapinuse.unlock();
-            OUTCOME_TRYV(_h.lock(_mapinuseoffset, 1, true, d));
-            _have_degraded = true;
-          }
-          if(_fallbacklock)
-            return _fallbacklock->_lock(out, d, spin_not_sleep);
-          return std::errc::device_or_resource_busy;
-        }
         std::chrono::steady_clock::time_point began_steady;
         std::chrono::system_clock::time_point end_utc;
         if(d)
@@ -439,23 +363,15 @@ namespace algorithm
       }
 
     public:
-      AFIO_HEADERS_ONLY_VIRTUAL_SPEC void unlock(entities_type entities, unsigned long long hint) noexcept override final
+      AFIO_HEADERS_ONLY_VIRTUAL_SPEC void unlock(entities_type entities, unsigned long long /*unused*/) noexcept override final
       {
         AFIO_LOG_FUNCTION_CALL(this);
-        if(_have_degraded)
-        {
-          if(_fallbacklock)
-            _fallbacklock->unlock(entities, hint);
-          return;
-        }
         span<_entity_idx> entity_to_idx(_hash_entities((_entity_idx *) alloca(sizeof(_entity_idx) * entities.size()), entities));
         _hash_index_type &index = _index();
         for(const auto &i : entity_to_idx)
         {
           i.exclusive ? index[i.value].unlock() : index[i.value].unlock_shared();
         }
-        if(is_degraded())
-          _hmapinuse.unlock();
       }
     };
 
