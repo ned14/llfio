@@ -6,11 +6,7 @@ Tarballs of source and prebuilt binaries for Linux x64 and Windows x64: http://m
 
 
 ### Immediate todos in order of priority:
-- [x] Get Outcome to work perfectly with exceptions and RTTI disabled, this makes
-Outcome useful in the games/audio world.
-  - [ ] Move AFIO to being tested with exceptions and RTTI disabled. Where AFIO 
-throws, have it detect __cpp_exceptions and skip those implementations.
-- [ ] Move handle caching into native_handle_type? Overlapped flag is especially needed.
+- [ ] `atomic_append` isn't actually being tested in shared_fs_mutex
 - [ ] Implement the long planned ACID key-value BLOB store
 with a very simple engine based on atomic renames and send it to Boost for peer review.
   - You may need compression, https://github.com/johnezang/pithy looks easily convertible
@@ -19,16 +15,12 @@ you merge the bug fixes from the forks first.
 
 - [ ] All time based kernel tests need to use soak test based API and auto adjust to
 valgrind.
-- [x] Raise the sanitisers on per-commit CI via ctest.
-- [ ] Rename all ParseProjectVersionFromHpp etc to parse_project_version_from_hpp etc
 - [ ] In DEBUG builds, have io_handle always not fill buffers passed to remind
 people to use pointers returned!
 - KernelTest needs to be generating each test kernel as a standalone DLL so it can be
 fuzzed, coverage calculated, bloat calculated, ABI dumped etc
   - Easy coverage is the usual gcov route => coveralls.io or gcovr http://gcovr.com/guide.html
 - [ ] Single include generation
-- [x] Make updating revision.hpp updated by the pre-commit git hook
-- [ ] Add missing functions on handle/file_handle from AFIO v1
 
 
 ### clang AST parser based todos which await me getting back into the clang AST parser:
@@ -90,14 +82,11 @@ handles on some storage i.e. storage needs to be kept in a global map.
   - [ ] Should have decile bucketing e.g. percentage in bottom 10%, percentage
   in next 10% etc. Plus mean and stddev.
   - [ ] Should either be resettable or subtractable i.e. points can be diffed.
-  - [x] Add IOPS QD=1..N storage profile test
-  - [x] Add throughput storage profile test
 - [ ] Output into YAML comparable hashes for OS + device + FS + flags
 so we can merge partial results for some combo into the results database.
 - [ ] Write YAML parsing tool which merges fs_probe_results.yaml into
 the results directory where flags and OS get its own directory and each YAML file
 is named FS + device e.g.
-  - results/win64 direct=1 sync=0/NTFS + WDC WD30EFRX-68EUZN0
 
 
 ### Algorithms library `AFIO_V2_NAMESPACE::algorithm` todo:

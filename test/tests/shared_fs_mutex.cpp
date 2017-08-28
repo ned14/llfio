@@ -305,6 +305,12 @@ struct shared_memory
   std::atomic<long> current_shared;
 };
 
+static inline void _check_child_worker(const std::string &i)
+{
+  BOOST_CHECK((i[0] == 'o' && i[1] == 'k'));
+  std::cout << "Child reports " << i << std::endl;
+}
+
 static inline void check_child_worker(const KERNELTEST_V1_NAMESPACE::child_workers::result &i)
 {
   if(!i.cerr.empty())
@@ -320,17 +326,13 @@ static inline void check_child_worker(const KERNELTEST_V1_NAMESPACE::child_worke
   else
   {
     BOOST_CHECK(i.retcode == 0);
-    BOOST_CHECK((i.results[0] == 'o' && i.results[1] == 'k'));
-    std::cout << "Child reports " << i.results << std::endl;
+    _check_child_worker(i.results);
   }
-};
+}
 
-static auto TestSharedFSMutexCorrectnessChildWorker = KERNELTEST_V1_NAMESPACE::register_child_worker("TestSharedFSMutexCorrectness", [](KERNELTEST_V1_NAMESPACE::waitable_done &waitable, size_t childidx, const char * /*unused*/) -> std::string {  // NOLINT
+static std::string _TestSharedFSMutexCorrectnessChildWorker(KERNELTEST_V1_NAMESPACE::waitable_done &waitable, size_t childidx, shared_memory *shmem)
+{
   namespace afio = AFIO_V2_NAMESPACE;
-  auto shared_mem_file = afio::file_handle::file({}, "shared_memory", afio::file_handle::mode::write, afio::file_handle::creation::open_existing, afio::file_handle::caching::temporary).value();
-  auto shared_mem_file_section = afio::section_handle::section(sizeof(shared_memory), shared_mem_file, afio::section_handle::flag::readwrite).value();
-  auto shared_mem_file_map = afio::map_handle::map(shared_mem_file_section).value();
-  auto *shmem = reinterpret_cast<shared_memory *>(shared_mem_file_map.address());  // NOLINT
   ++shmem->current_exclusive;
   while(-1 != shmem->current_exclusive)
   {
@@ -399,6 +401,14 @@ static auto TestSharedFSMutexCorrectnessChildWorker = KERNELTEST_V1_NAMESPACE::r
     }
   } while(0 == waitable.done);
   return "ok, max concurrent readers was " + std::to_string(maxreaders);
+}
+static auto TestSharedFSMutexCorrectnessChildWorker = KERNELTEST_V1_NAMESPACE::register_child_worker("TestSharedFSMutexCorrectness", [](KERNELTEST_V1_NAMESPACE::waitable_done &waitable, size_t childidx, const char * /*unused*/) -> std::string {  // NOLINT
+  namespace afio = AFIO_V2_NAMESPACE;
+  auto shared_mem_file = afio::file_handle::file({}, "shared_memory", afio::file_handle::mode::write, afio::file_handle::creation::open_existing, afio::file_handle::caching::temporary).value();
+  auto shared_mem_file_section = afio::section_handle::section(sizeof(shared_memory), shared_mem_file, afio::section_handle::flag::readwrite).value();
+  auto shared_mem_file_map = afio::map_handle::map(shared_mem_file_section).value();
+  auto *shmem = reinterpret_cast<shared_memory *>(shared_mem_file_map.address());  // NOLINT
+  return _TestSharedFSMutexCorrectnessChildWorker(waitable, childidx, shmem);
 });
 
 
@@ -407,7 +417,7 @@ Test 1: X child processes use the lock for exclusive and shared usage. Verify we
 else. Verify shared allows other shared.
 */
 
-void TestSharedFSMutexCorrectness(shared_memory::mutex_kind_type mutex_kind, shared_memory::test_type testtype)
+void TestSharedFSMutexCorrectness(shared_memory::mutex_kind_type mutex_kind, shared_memory::test_type testtype, bool threads_not_processes)
 {
   namespace afio = AFIO_V2_NAMESPACE;
   auto shared_mem_file = afio::file_handle::file({}, "shared_memory", afio::file_handle::mode::write, afio::file_handle::creation::if_needed, afio::file_handle::caching::temporary, afio::file_handle::flag::unlink_on_close).value();
@@ -420,34 +430,65 @@ void TestSharedFSMutexCorrectness(shared_memory::mutex_kind_type mutex_kind, sha
   shmem->mutex_kind = mutex_kind;
   shmem->testtype = testtype;
 
-  auto child_workers = KERNELTEST_V1_NAMESPACE::launch_child_workers("TestSharedFSMutexCorrectness", std::thread::hardware_concurrency());
-  child_workers.wait_until_ready();
+  if(threads_not_processes)
+  {
+    KERNELTEST_V1_NAMESPACE::waitable_done waitable(0);
+    std::vector<std::pair<std::future<std::string>, std::thread>> thread_workers;
+    thread_workers.reserve(std::thread::hardware_concurrency());
+    for(size_t n = 0; n < std::thread::hardware_concurrency(); n++)
+    {
+      std::packaged_task<std::string(KERNELTEST_V1_NAMESPACE::waitable_done &, size_t, shared_memory *)> task(_TestSharedFSMutexCorrectnessChildWorker);
+      thread_workers.push_back({task.get_future(), std::thread(std::move(task), std::ref(waitable), n, shmem)});
+    }
+    std::this_thread::sleep_for(std::chrono::seconds(5));
+    waitable.set_done(1);
+    for(auto &i : thread_workers)
+    {
+      i.second.join();
+      _check_child_worker(i.first.get());
+    }
+  }
+  else
+  {
+    auto child_workers = KERNELTEST_V1_NAMESPACE::launch_child_workers("TestSharedFSMutexCorrectness", std::thread::hardware_concurrency());
+    child_workers.wait_until_ready();
 // I now have hardware_concurrency child worker processes ready to go, so execute the child worker
 #if 0
-  std::cout << "Please attach debuggers and press Enter" << std::endl;
-  getchar();
+    std::cout << "Please attach debuggers and press Enter" << std::endl;
+    getchar();
 #endif
-  child_workers.go();
-  // They will all open the shared memory and gate on current_exclusive until all reach the exact same point
-  // They will then all create the lock concurrently and gate on current_shared until all reach the exact same point
-  // They then will iterate locking and unlocking the same entity using the shared memory to verify it never happens
-  // that more than one ever holds an exclusive lock, or any shared lock occurs when an exclusive lock is held
-  std::this_thread::sleep_for(std::chrono::seconds(5));
-  child_workers.stop();
-  child_workers.join();
-  for(auto &i : child_workers.results)
-  {
-    check_child_worker(i);
+    child_workers.go();
+    // They will all open the shared memory and gate on current_exclusive until all reach the exact same point
+    // They will then all create the lock concurrently and gate on current_shared until all reach the exact same point
+    // They then will iterate locking and unlocking the same entity using the shared memory to verify it never happens
+    // that more than one ever holds an exclusive lock, or any shared lock occurs when an exclusive lock is held
+    std::this_thread::sleep_for(std::chrono::seconds(5));
+    child_workers.stop();
+    child_workers.join();
+    for(auto &i : child_workers.results)
+    {
+      check_child_worker(i);
+    }
   }
 }
 
-KERNELTEST_TEST_KERNEL(integration, afio, shared_fs_mutex_byte_ranges, exclusives, "Tests that afio::algorithm::shared_fs_mutex::byte_ranges implementation implements exclusive locking", [] { TestSharedFSMutexCorrectness(shared_memory::byte_ranges, shared_memory::exclusive); }())
-KERNELTEST_TEST_KERNEL(integration, afio, shared_fs_mutex_byte_ranges, shared, "Tests that afio::algorithm::shared_fs_mutex::byte_ranges implementation implements shared locking", [] { TestSharedFSMutexCorrectness(shared_memory::byte_ranges, shared_memory::shared); }())
-KERNELTEST_TEST_KERNEL(integration, afio, shared_fs_mutex_byte_ranges, both, "Tests that afio::algorithm::shared_fs_mutex::byte_ranges implementation implements a mixture of exclusive and shared locking", [] { TestSharedFSMutexCorrectness(shared_memory::byte_ranges, shared_memory::both); }())
+KERNELTEST_TEST_KERNEL(integration, afio, shared_fs_mutex_byte_ranges, exclusives, "Tests that afio::algorithm::shared_fs_mutex::byte_ranges implementation implements exclusive locking", [] { TestSharedFSMutexCorrectness(shared_memory::byte_ranges, shared_memory::exclusive, false); }())
+KERNELTEST_TEST_KERNEL(integration, afio, shared_fs_mutex_byte_ranges, shared, "Tests that afio::algorithm::shared_fs_mutex::byte_ranges implementation implements shared locking", [] { TestSharedFSMutexCorrectness(shared_memory::byte_ranges, shared_memory::shared, false); }())
+KERNELTEST_TEST_KERNEL(integration, afio, shared_fs_mutex_byte_ranges, both, "Tests that afio::algorithm::shared_fs_mutex::byte_ranges implementation implements a mixture of exclusive and shared locking", [] { TestSharedFSMutexCorrectness(shared_memory::byte_ranges, shared_memory::both, false); }())
 
-KERNELTEST_TEST_KERNEL(integration, afio, shared_fs_mutex_memory_map, exclusives, "Tests that afio::algorithm::shared_fs_mutex::memory_map implementation implements exclusive locking", [] { TestSharedFSMutexCorrectness(shared_memory::memory_map, shared_memory::exclusive); }())
-KERNELTEST_TEST_KERNEL(integration, afio, shared_fs_mutex_memory_map, shared, "Tests that afio::algorithm::shared_fs_mutex::memory_map implementation implements shared locking", [] { TestSharedFSMutexCorrectness(shared_memory::memory_map, shared_memory::shared); }())
-KERNELTEST_TEST_KERNEL(integration, afio, shared_fs_mutex_memory_map, both, "Tests that afio::algorithm::shared_fs_mutex::memory_map implementation implements a mixture of exclusive and shared locking", [] { TestSharedFSMutexCorrectness(shared_memory::memory_map, shared_memory::both); }())
+KERNELTEST_TEST_KERNEL(integration, afio, shared_fs_mutex_memory_map, exclusives, "Tests that afio::algorithm::shared_fs_mutex::memory_map implementation implements exclusive locking", [] { TestSharedFSMutexCorrectness(shared_memory::memory_map, shared_memory::exclusive, false); }())
+KERNELTEST_TEST_KERNEL(integration, afio, shared_fs_mutex_memory_map, shared, "Tests that afio::algorithm::shared_fs_mutex::memory_map implementation implements shared locking", [] { TestSharedFSMutexCorrectness(shared_memory::memory_map, shared_memory::shared, false); }())
+KERNELTEST_TEST_KERNEL(integration, afio, shared_fs_mutex_memory_map, both, "Tests that afio::algorithm::shared_fs_mutex::memory_map implementation implements a mixture of exclusive and shared locking", [] { TestSharedFSMutexCorrectness(shared_memory::memory_map, shared_memory::both, false); }())
+
+KERNELTEST_TEST_KERNEL(integration, afio, shared_fs_mutex_safe_byte_ranges_process, exclusives, "Tests that afio::algorithm::shared_fs_mutex::safe_byte_ranges implementation implements exclusive locking with processes", [] { TestSharedFSMutexCorrectness(shared_memory::memory_map, shared_memory::exclusive, false); }())
+KERNELTEST_TEST_KERNEL(integration, afio, shared_fs_mutex_safe_byte_ranges_process, shared, "Tests that afio::algorithm::shared_fs_mutex::safe_byte_ranges implementation implements shared locking with processes", [] { TestSharedFSMutexCorrectness(shared_memory::memory_map, shared_memory::shared, false); }())
+KERNELTEST_TEST_KERNEL(integration, afio, shared_fs_mutex_safe_byte_ranges_process, both, "Tests that afio::algorithm::shared_fs_mutex::safe_byte_ranges implementation implements a mixture of exclusive and shared locking with processes",
+                       [] { TestSharedFSMutexCorrectness(shared_memory::memory_map, shared_memory::both, false); }())
+
+KERNELTEST_TEST_KERNEL(integration, afio, shared_fs_mutex_safe_byte_ranges_thread, exclusives, "Tests that afio::algorithm::shared_fs_mutex::safe_byte_ranges implementation implements exclusive locking with threads", [] { TestSharedFSMutexCorrectness(shared_memory::memory_map, shared_memory::exclusive, true); }())
+KERNELTEST_TEST_KERNEL(integration, afio, shared_fs_mutex_safe_byte_ranges_thread, shared, "Tests that afio::algorithm::shared_fs_mutex::safe_byte_ranges implementation implements shared locking with threads", [] { TestSharedFSMutexCorrectness(shared_memory::memory_map, shared_memory::shared, true); }())
+KERNELTEST_TEST_KERNEL(integration, afio, shared_fs_mutex_safe_byte_ranges_thread, both, "Tests that afio::algorithm::shared_fs_mutex::safe_byte_ranges implementation implements a mixture of exclusive and shared locking with threads",
+                       [] { TestSharedFSMutexCorrectness(shared_memory::memory_map, shared_memory::both, true); }())
 
 /*
 
