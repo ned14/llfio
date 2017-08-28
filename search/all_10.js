@@ -1,5 +1,8 @@
 var searchData=
 [
+  ['safe_5fbyte_5franges',['safe_byte_ranges',['../classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1safe__byte__ranges.html',1,'afio_v2_xxx::algorithm::shared_fs_mutex']]],
+  ['safe_5fbyte_5franges',['safe_byte_ranges',['../classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1safe__byte__ranges.html#a113cf8648fc11c4b9cafa0f3fbb34b5d',1,'afio_v2_xxx::algorithm::shared_fs_mutex::safe_byte_ranges']]],
+  ['safe_5fbyte_5franges_2ehpp',['safe_byte_ranges.hpp',['../safe__byte__ranges_8hpp.html',1,'']]],
   ['safety_5ffsyncs',['safety_fsyncs',['../classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9eadfa4d35596e04e042a53c64b25c22db3',1,'afio_v2_xxx::handle']]],
   ['section',['section',['../structafio__v2__xxx_1_1native__handle__type_1_1disposition__base.html#a89e0e728fc7a7e4a008e57d572702de6a536596b2c7b335a91a3ded6088ea1d06',1,'afio_v2_xxx::native_handle_type::disposition_base::section()'],['../classafio__v2__xxx_1_1section__handle.html#a34cf4f9a6ec20c2a456d6b6313f0e595',1,'afio_v2_xxx::section_handle::section(file_handle &amp;backing, extent_type maximum_size=0, flag _flag=flag::read|flag::write) noexcept'],['../classafio__v2__xxx_1_1section__handle.html#a0a1ce2d9e66a0abab3c7fdfdb5514980',1,'afio_v2_xxx::section_handle::section(extent_type maximum_size, file_handle &amp;backing, flag _flag=flag::read|flag::write) noexcept'],['../classafio__v2__xxx_1_1section__handle.html#a75e06de0b8bc9c0f04e7671c75a64708',1,'afio_v2_xxx::section_handle::section(extent_type maximum_size) noexcept'],['../classafio__v2__xxx_1_1map__handle.html#ab8a43a5388161f629fef5ee7256dbbc8',1,'afio_v2_xxx::map_handle::section()'],['../namespaceafio__v2__xxx.html#a2dbe5b8cabded7080ede1254a0625350',1,'afio_v2_xxx::section(file_handle &amp;backing, section_handle::extent_type maximum_size=0, section_handle::flag _flag=section_handle::flag::read|section_handle::flag::write) noexcept'],['../namespaceafio__v2__xxx.html#aa8b81d5171058b1ef35ab5bbf5861427',1,'afio_v2_xxx::section(section_handle::extent_type maximum_size, file_handle &amp;backing, section_handle::flag _flag=section_handle::flag::read|section_handle::flag::write) noexcept'],['../namespaceafio__v2__xxx.html#ac66cb0c9b287056b325469cc52e93f97',1,'afio_v2_xxx::section(section_handle::extent_type maximum_size) noexcept']]],
   ['section_5fallocator_2ehpp',['section_allocator.hpp',['../section__allocator_8hpp.html',1,'']]],
@@ -39,8 +42,8 @@ var searchData=
   ['st_5fuid',['st_uid',['../structafio__v2__xxx_1_1stat__t.html#a76b46ca289cd0bb1ed94c5eb8273e52d',1,'afio_v2_xxx::stat_t']]],
   ['stat',['stat',['../structafio__v2__xxx_1_1directory__entry.html#abb735d664f64ed69a62fef4f62237a29',1,'afio_v2_xxx::directory_entry']]],
   ['stat_2ehpp',['stat.hpp',['../stat_8hpp.html',1,'']]],
-  ['stat_5ft',['stat_t',['../structafio__v2__xxx_1_1stat__t.html',1,'afio_v2_xxx']]],
   ['stat_5ft',['stat_t',['../structafio__v2__xxx_1_1stat__t.html#a1612293fb6cfe7ea9d3aac852a6e0628',1,'afio_v2_xxx::stat_t::stat_t() noexcept'],['../structafio__v2__xxx_1_1stat__t.html#a0a07fcfc00ab2593a47400549eba8509',1,'afio_v2_xxx::stat_t::stat_t(std::nullptr_t) noexcept']]],
+  ['stat_5ft',['stat_t',['../structafio__v2__xxx_1_1stat__t.html',1,'afio_v2_xxx']]],
   ['statfs_2ehpp',['statfs.hpp',['../statfs_8hpp.html',1,'']]],
   ['statfs_5ft',['statfs_t',['../structafio__v2__xxx_1_1statfs__t.html#ab9d13f831de61aafbfcdcb8bac53e521',1,'afio_v2_xxx::statfs_t']]],
   ['statfs_5ft',['statfs_t',['../structafio__v2__xxx_1_1statfs__t.html',1,'afio_v2_xxx']]],

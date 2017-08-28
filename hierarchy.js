@@ -59,7 +59,8 @@ var hierarchy =
       [ "afio_v2_xxx::algorithm::shared_fs_mutex::atomic_append", "classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1atomic__append.html", null ],
       [ "afio_v2_xxx::algorithm::shared_fs_mutex::byte_ranges", "classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1byte__ranges.html", null ],
       [ "afio_v2_xxx::algorithm::shared_fs_mutex::lock_files", "classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1lock__files.html", null ],
-      [ "afio_v2_xxx::algorithm::shared_fs_mutex::memory_map< Hasher, HashIndexSize, SpinlockType >", "classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html", null ]
+      [ "afio_v2_xxx::algorithm::shared_fs_mutex::memory_map< Hasher, HashIndexSize, SpinlockType >", "classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html", null ],
+      [ "afio_v2_xxx::algorithm::shared_fs_mutex::safe_byte_ranges", "classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1safe__byte__ranges.html", null ]
     ] ],
     [ "span", null, [
       [ "afio_v2_xxx::algorithm::mapped_view< T >", "classafio__v2__xxx_1_1algorithm_1_1mapped__view.html", null ],

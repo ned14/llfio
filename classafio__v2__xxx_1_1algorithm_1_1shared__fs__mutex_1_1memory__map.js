@@ -10,16 +10,13 @@ var classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map =
     [ "_lock", "classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#aa9686424aec6d97205000cd6f0c952ca", null ],
     [ "entity_from_buffer", "classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#a96b28acf46a3d4ebe93b6031d90f79ac", null ],
     [ "entity_from_string", "classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#a3cd51b21b55c1ed21fcea0edaefdae85", null ],
-    [ "fallback", "classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#a89e52feca9dfdc21f0934ffe178ec496", null ],
-    [ "fallback", "classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#a869e5a388b53cc46a026ae534d2dc16f", null ],
     [ "fill_random_entities", "classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#a1d2d3fb211c48b0322333c55e1d019a5", null ],
     [ "handle", "classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#aacf62428585d7179c4490934f02c8d24", null ],
-    [ "is_degraded", "classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#a4b939f02167fe69a9b10fae2554826a6", null ],
     [ "lock", "classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#a2e82ae0ca11932f5287b0ca2f4834da6", null ],
     [ "lock", "classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#ac1dbb5f7b7887690b47b1d24940a054d", null ],
     [ "operator=", "classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#a45a6e65f4a2fe737c10a23b357fc1349", null ],
     [ "random_entity", "classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#a17f374fc7863784f478498eac95dcc70", null ],
     [ "try_lock", "classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#a0987b9c6c93a65acb2715e589d45c273", null ],
     [ "try_lock", "classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#aebdc3d01ccb30b297950130c7ebac57b", null ],
-    [ "unlock", "classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#adc0f8bf3c61cb2dd0bc74c4db7d316f7", null ]
+    [ "unlock", "classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#a5392e91c0fc7844fb8922145e2fa790e", null ]
 ];

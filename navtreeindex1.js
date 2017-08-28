@@ -1,5 +1,17 @@
 var NAVTREEINDEX1 =
 {
+"classafio__v2__xxx_1_1directory__handle.html#a5a5244ab1a15053aefe93f2c253db5b3":[3,0,0,8,53],
+"classafio__v2__xxx_1_1directory__handle.html#a5be9a526bc5c1be758b0cfc36a262f6e":[3,0,0,8,39],
+"classafio__v2__xxx_1_1directory__handle.html#a616a67222676af5ec5b3aa94d7c02428":[3,0,0,8,25],
+"classafio__v2__xxx_1_1directory__handle.html#a657c12a309cf02bf2351bfcc7f41463b":[3,0,0,8,52],
+"classafio__v2__xxx_1_1directory__handle.html#a6e0f5a3fa97abd46531c791e032c76f4":[3,0,0,8,9],
+"classafio__v2__xxx_1_1directory__handle.html#a71137cb82edd9a1bcb24f64886b5826d":[3,0,0,8,20],
+"classafio__v2__xxx_1_1directory__handle.html#a73d5f2070bce0c3d7fa536d3cbed7b52":[3,0,0,8,44],
+"classafio__v2__xxx_1_1directory__handle.html#a7661e46005a377ca3f6e23064710dd9f":[3,0,0,8,17],
+"classafio__v2__xxx_1_1directory__handle.html#a771ef2bf39ad784eb6265dde077792ad":[3,0,0,8,59],
+"classafio__v2__xxx_1_1directory__handle.html#a875440f1b368472f1840c70c266f3a48":[3,0,0,8,41],
+"classafio__v2__xxx_1_1directory__handle.html#a8f27bd9d54e28aac2042886e06eccd5b":[3,0,0,8,24],
+"classafio__v2__xxx_1_1directory__handle.html#a90baeed9cd42aea9737e031426a32944":[3,0,0,8,11],
 "classafio__v2__xxx_1_1directory__handle.html#a97ffbbf53f51549549efef0b49e125dc":[3,0,0,8,22],
 "classafio__v2__xxx_1_1directory__handle.html#a9e2c2f026219cdb7e956a58ea0537f75":[3,0,0,8,4],
 "classafio__v2__xxx_1_1directory__handle.html#aa53d88105df8c6be01be649829a65b14":[3,0,0,8,29],
@@ -237,17 +249,5 @@ var NAVTREEINDEX1 =
 "classafio__v2__xxx_1_1io__handle.html#ad44dcd9c7ca9e7a094dd1bc7c8aa4897":[3,0,0,12,40],
 "classafio__v2__xxx_1_1io__handle.html#ad90f8264470763069256ae9eeda45e69":[3,0,0,12,49],
 "classafio__v2__xxx_1_1io__handle.html#ae33d4d0faa1377cd371bd6a0ae0769ae":[3,0,0,12,26],
-"classafio__v2__xxx_1_1io__handle.html#aeabd245b6edcfb57779b29c6f2ea9737":[3,0,0,12,41],
-"classafio__v2__xxx_1_1io__handle.html#aefac4710e5617264347f437b04732c01":[3,0,0,12,53],
-"classafio__v2__xxx_1_1io__handle.html#af024e3d92d9a01ac367734e9cdc517fb":[3,0,0,12,55],
-"classafio__v2__xxx_1_1io__handle.html#af1610ec7fb0a41f039e3e17e0dc467ab":[3,0,0,12,48],
-"classafio__v2__xxx_1_1io__handle.html#af42904dd49b5517a303e7cb256eae939":[3,0,0,12,29],
-"classafio__v2__xxx_1_1io__handle.html#af4c39abeaa83d990e3bd48fff7b94fb9":[3,0,0,12,23],
-"classafio__v2__xxx_1_1io__handle.html#afd29e28513145de4dec9a6d96f3b1ea8":[3,0,0,12,9],
-"classafio__v2__xxx_1_1io__handle.html#affb10caeeca67b804695b7378be29e23":[3,0,0,12,47],
-"classafio__v2__xxx_1_1io__handle_1_1extent__guard.html":[3,0,0,12,2],
-"classafio__v2__xxx_1_1io__handle_1_1extent__guard.html#a055302071c01e5ac1626cda4d179e313":[3,0,0,12,2,4],
-"classafio__v2__xxx_1_1io__handle_1_1extent__guard.html#a15ded83348af6cd802e49b261b7734ea":[3,0,0,12,2,3],
-"classafio__v2__xxx_1_1io__handle_1_1extent__guard.html#a2455cde5b7244855bc3d22a7cd625166":[3,0,0,12,2,6],
-"classafio__v2__xxx_1_1io__handle_1_1extent__guard.html#a3a575d17f757d18ca077d004790bb91b":[3,0,0,12,2,8]
+"classafio__v2__xxx_1_1io__handle.html#aeabd245b6edcfb57779b29c6f2ea9737":[3,0,0,12,41]
 };

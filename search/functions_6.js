@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['fallback',['fallback',['../classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#a89e52feca9dfdc21f0934ffe178ec496',1,'afio_v2_xxx::algorithm::shared_fs_mutex::memory_map::fallback() const noexcept'],['../classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#a869e5a388b53cc46a026ae534d2dc16f',1,'afio_v2_xxx::algorithm::shared_fs_mutex::memory_map::fallback(shared_fs_mutex *fbl) noexcept']]],
   ['file',['file',['../classafio__v2__xxx_1_1file__handle.html#a6f4e7c6e9768c0e853105b1d63bd9dfb',1,'afio_v2_xxx::file_handle::file()'],['../namespaceafio__v2__xxx.html#a84b5a9fc93107c673160b41fff151938',1,'afio_v2_xxx::file()']]],
   ['file_5fbuffer_5fdefault_5fsize',['file_buffer_default_size',['../namespaceafio__v2__xxx_1_1utils.html#ace050f445d1d1fdd4b2a6f99d9be7f85',1,'afio_v2_xxx::utils']]],
   ['file_5fhandle',['file_handle',['../classafio__v2__xxx_1_1file__handle.html#a962eb1411083ca9b2250fe40a9259354',1,'afio_v2_xxx::file_handle::file_handle()'],['../classafio__v2__xxx_1_1file__handle.html#ab1f64547bfc4ee74e6019729aaf25703',1,'afio_v2_xxx::file_handle::file_handle(native_handle_type h, dev_t devid, ino_t inode, caching caching=caching::none, flag flags=flag::none)'],['../classafio__v2__xxx_1_1file__handle.html#a42313f9ac61c825800d07a33a92679ba',1,'afio_v2_xxx::file_handle::file_handle(file_handle &amp;&amp;o) noexcept'],['../classafio__v2__xxx_1_1file__handle.html#a7aed1b9a1601502a692d27d8f3997b64',1,'afio_v2_xxx::file_handle::file_handle(handle &amp;&amp;o, dev_t devid, ino_t inode) noexcept']]],
@@ -13,5 +12,6 @@ var searchData=
   ['fs_5fmutex_5fappend',['fs_mutex_append',['../classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1atomic__append.html#a37d6135d8677c0da876a432a7ac05b53',1,'afio_v2_xxx::algorithm::shared_fs_mutex::atomic_append']]],
   ['fs_5fmutex_5fbyte_5franges',['fs_mutex_byte_ranges',['../classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1byte__ranges.html#a66be7a3974074253106a1059028860eb',1,'afio_v2_xxx::algorithm::shared_fs_mutex::byte_ranges']]],
   ['fs_5fmutex_5flock_5ffiles',['fs_mutex_lock_files',['../classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1lock__files.html#aeb6dbd556768096305341b98c1aa8ec4',1,'afio_v2_xxx::algorithm::shared_fs_mutex::lock_files']]],
-  ['fs_5fmutex_5fmap',['fs_mutex_map',['../classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#a5706f64aff5256b56b54f9f8b2a99d3b',1,'afio_v2_xxx::algorithm::shared_fs_mutex::memory_map']]]
+  ['fs_5fmutex_5fmap',['fs_mutex_map',['../classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#aef52aad16b92e13b1483b6e909fc0db2',1,'afio_v2_xxx::algorithm::shared_fs_mutex::memory_map']]],
+  ['fs_5fmutex_5fsafe_5fbyte_5franges',['fs_mutex_safe_byte_ranges',['../classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1safe__byte__ranges.html#a1665c2fe34b741c5d5185f980f06d04a',1,'afio_v2_xxx::algorithm::shared_fs_mutex::safe_byte_ranges']]]
 ];

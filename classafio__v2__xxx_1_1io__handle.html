@@ -221,7 +221,7 @@ constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href=
 <tr class="memdesc:a243156928e89b8988a1412f211b3b603"><td class="mdescLeft">&#160;</td><td class="mdescRight">Issue a write reordering barrier such that writes preceding the barrier will reach storage before writes after this barrier.  <a href="#a243156928e89b8988a1412f211b3b603">More...</a><br/></td></tr>
 <tr class="separator:a243156928e89b8988a1412f211b3b603"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a88689b15e6e8b6ce1f945737dee4369e"><td class="memItemLeft" align="right" valign="top">virtual result&lt; <a class="el" href="classafio__v2__xxx_1_1io__handle_1_1extent__guard.html">extent_guard</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1io__handle.html#a88689b15e6e8b6ce1f945737dee4369e">lock</a> (<a class="el" href="classafio__v2__xxx_1_1handle.html#a818fff07c92eaab72532092d1c2a14f9">extent_type</a> offset, <a class="el" href="classafio__v2__xxx_1_1handle.html#a818fff07c92eaab72532092d1c2a14f9">extent_type</a> bytes, bool exclusive=true, <a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
-<tr class="memdesc:a88689b15e6e8b6ce1f945737dee4369e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tries to lock the range of bytes specified for shared or exclusive access. Be aware this passes through the same semantics as the underlying OS call, including any POSIX insanity present on your platform. You almost cetainly should use your choice of an <code>algorithm::shared_fs_mutex::*</code> instead of this as those are more portable and performant.  <a href="#a88689b15e6e8b6ce1f945737dee4369e">More...</a><br/></td></tr>
+<tr class="memdesc:a88689b15e6e8b6ce1f945737dee4369e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tries to lock the range of bytes specified for shared or exclusive access. Be aware this passes through the same semantics as the underlying OS call, including any POSIX insanity present on your platform:  <a href="#a88689b15e6e8b6ce1f945737dee4369e">More...</a><br/></td></tr>
 <tr class="separator:a88689b15e6e8b6ce1f945737dee4369e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0a1c4773b9fa7bbd04fee0756075d319"><td class="memItemLeft" align="right" valign="top">result&lt; <a class="el" href="classafio__v2__xxx_1_1io__handle_1_1extent__guard.html">extent_guard</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1io__handle.html#a0a1c4773b9fa7bbd04fee0756075d319">try_lock</a> (<a class="el" href="classafio__v2__xxx_1_1handle.html#a818fff07c92eaab72532092d1c2a14f9">extent_type</a> offset, <a class="el" href="classafio__v2__xxx_1_1handle.html#a818fff07c92eaab72532092d1c2a14f9">extent_type</a> bytes, bool exclusive=true) noexcept</td></tr>
 <tr class="separator:a0a1c4773b9fa7bbd04fee0756075d319"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -418,7 +418,7 @@ flag&#160;</td><td class="memItemRight" valign="bottom"><b>_flags</b></td></tr>
 <p>Issue a write reordering barrier such that writes preceding the barrier will reach storage before writes after this barrier. </p>
 <dl class="section warning"><dt>Warning</dt><dd><b>Assume that this call is a no-op</b>. It is not reliably implemented in many common use cases, for example if your code is running inside a LXC container, or if the user has mounted the filing system with non-default options. Instead open the handle with <code>caching::reads</code> which means that all writes form a strict sequential order not completing until acknowledged by the storage device. Filing system can and do use different algorithms to give much better performance with <code>caching::reads</code>, some (e.g. ZFS) spectacularly better.</dd>
 <dd>
-Let me repeat again: consider this call to be a <b>hint</b> to poke the kernel with a stick to go start to do some work sooner rather than later. It may be ignored entirely.</dd>
+Let me repeat again: consider this call to be a <b>hint</b> to poke the kernel with a stick to go start to do some work sooner rather than later. <b>It may be ignored entirely</b>.</dd>
 <dd>
 For portability, you can only assume that barriers write order for a single handle instance. You cannot assume that barriers write order across multiple handles to the same inode, or across processes.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>The buffers barriered, which may not be the buffers input. The size of each scatter-gather buffer is updated with the number of bytes of that buffer barriered. </dd></dl>
@@ -532,8 +532,13 @@ For portability, you can only assume that barriers write order for a single hand
 </table>
 </div><div class="memdoc">
 
-<p>Tries to lock the range of bytes specified for shared or exclusive access. Be aware this passes through the same semantics as the underlying OS call, including any POSIX insanity present on your platform. You almost cetainly should use your choice of an <code>algorithm::shared_fs_mutex::*</code> instead of this as those are more portable and performant. </p>
-<dl class="section warning"><dt>Warning</dt><dd>On older Linuxes and POSIX, this uses <code>fcntl()</code> with the well known insane POSIX semantics that closing ANY handle to this file releases all bytes range locks on it. If your OS isn't new enough to support the non-insane lock API, <code>flag::byte_lock_insanity</code> will be set in flags() after the first call to this function.</dd></dl>
+<p>Tries to lock the range of bytes specified for shared or exclusive access. Be aware this passes through the same semantics as the underlying OS call, including any POSIX insanity present on your platform: </p>
+<ul>
+<li>Any fd closed on an inode must release all byte range locks on that inode for all other fds. If your OS isn't new enough to support the non-insane lock API, <code>flag::byte_lock_insanity</code> will be set in flags() after the first call to this function.</li>
+<li>Threads replace each other's locks, indeed locks replace each other's locks.</li>
+</ul>
+<p>You almost cetainly should use your choice of an <code>algorithm::shared_fs_mutex::*</code> instead of this as those are more portable and performant.</p>
+<dl class="section warning"><dt>Warning</dt><dd>This is a low-level API which you should not use directly in portable code. Another issue is that atomic lock upgrade/downgrade, if your platform implements that (you should assume it does not in portable code), means that on POSIX you need to <em>release</em> the old <code>extent_guard</code> after creating a new one over the same byte range, otherwise the old <code>extent_guard</code>'s destructor will simply unlock the range entirely. On Windows however upgrade/downgrade locks overlay, so on that platform you must <em>not</em> release the old <code>extent_guard</code>. Look into <code>algorithm::shared_fs_mutex::safe_byte_ranges</code> for a portable solution.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>An extent guard, the destruction of which will call unlock(). </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -581,16 +586,16 @@ For portability, you can only assume that barriers write order for a single hand
 </table>
 </div><div class="memdoc">
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;  {</div>
-<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;    <span class="keywordtype">size_t</span> bytes = 0;</div>
-<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;i : reqs.buffers)</div>
-<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;    {</div>
-<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;      <span class="keywordflow">if</span>(bytes + i.len &lt; bytes)</div>
-<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;        <span class="keywordflow">return</span> std::errc::value_too_large;</div>
-<div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;      bytes += i.len;</div>
-<div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;    }</div>
-<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classafio__v2__xxx_1_1io__handle.html#a88689b15e6e8b6ce1f945737dee4369e">lock</a>(reqs.offset, bytes, <span class="keyword">false</span>, std::move(d));</div>
-<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;  }</div>
+<div class="fragment"><div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;  {</div>
+<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;    <span class="keywordtype">size_t</span> bytes = 0;</div>
+<div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;i : reqs.buffers)</div>
+<div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;    {</div>
+<div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;      <span class="keywordflow">if</span>(bytes + i.len &lt; bytes)</div>
+<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;        <span class="keywordflow">return</span> std::errc::value_too_large;</div>
+<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;      bytes += i.len;</div>
+<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;    }</div>
+<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classafio__v2__xxx_1_1io__handle.html#a88689b15e6e8b6ce1f945737dee4369e">lock</a>(reqs.offset, bytes, <span class="keyword">false</span>, std::move(d));</div>
+<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;  }</div>
 <div class="ttc" id="classafio__v2__xxx_1_1io__handle_html_a88689b15e6e8b6ce1f945737dee4369e"><div class="ttname"><a href="classafio__v2__xxx_1_1io__handle.html#a88689b15e6e8b6ce1f945737dee4369e">afio_v2_xxx::io_handle::lock</a></div><div class="ttdeci">virtual result&lt; extent_guard &gt; lock(extent_type offset, extent_type bytes, bool exclusive=true, deadline d=deadline()) noexcept</div><div class="ttdoc">Tries to lock the range of bytes specified for shared or exclusive access. Be aware this passes throu...</div></div>
 </div><!-- fragment -->
 </div>
@@ -627,16 +632,16 @@ For portability, you can only assume that barriers write order for a single hand
 </table>
 </div><div class="memdoc">
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;  {</div>
-<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;    <span class="keywordtype">size_t</span> bytes = 0;</div>
-<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;i : reqs.buffers)</div>
-<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;    {</div>
-<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;      <span class="keywordflow">if</span>(bytes + i.len &lt; bytes)</div>
-<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;        <span class="keywordflow">return</span> std::errc::value_too_large;</div>
-<div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;      bytes += i.len;</div>
-<div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;    }</div>
-<div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classafio__v2__xxx_1_1io__handle.html#a88689b15e6e8b6ce1f945737dee4369e">lock</a>(reqs.offset, bytes, <span class="keyword">true</span>, std::move(d));</div>
-<div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;  }</div>
+<div class="fragment"><div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;  {</div>
+<div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;    <span class="keywordtype">size_t</span> bytes = 0;</div>
+<div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;i : reqs.buffers)</div>
+<div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;    {</div>
+<div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;      <span class="keywordflow">if</span>(bytes + i.len &lt; bytes)</div>
+<div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;        <span class="keywordflow">return</span> std::errc::value_too_large;</div>
+<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;      bytes += i.len;</div>
+<div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160;    }</div>
+<div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classafio__v2__xxx_1_1io__handle.html#a88689b15e6e8b6ce1f945737dee4369e">lock</a>(reqs.offset, bytes, <span class="keyword">true</span>, std::move(d));</div>
+<div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160;  }</div>
 <div class="ttc" id="classafio__v2__xxx_1_1io__handle_html_a88689b15e6e8b6ce1f945737dee4369e"><div class="ttname"><a href="classafio__v2__xxx_1_1io__handle.html#a88689b15e6e8b6ce1f945737dee4369e">afio_v2_xxx::io_handle::lock</a></div><div class="ttdeci">virtual result&lt; extent_guard &gt; lock(extent_type offset, extent_type bytes, bool exclusive=true, deadline d=deadline()) noexcept</div><div class="ttdoc">Tries to lock the range of bytes specified for shared or exclusive access. Be aware this passes throu...</div></div>
 </div><!-- fragment -->
 </div>
@@ -837,7 +842,7 @@ For portability, you can only assume that barriers write order for a single hand
 </table>
 </div><div class="memdoc">
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;{ <span class="keywordflow">return</span> <a class="code" href="classafio__v2__xxx_1_1io__handle.html#a88689b15e6e8b6ce1f945737dee4369e">lock</a>(offset, bytes, exclusive, deadline(std::chrono::seconds(0))); }</div>
+<div class="fragment"><div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;{ <span class="keywordflow">return</span> <a class="code" href="classafio__v2__xxx_1_1io__handle.html#a88689b15e6e8b6ce1f945737dee4369e">lock</a>(offset, bytes, exclusive, deadline(std::chrono::seconds(0))); }</div>
 <div class="ttc" id="classafio__v2__xxx_1_1io__handle_html_a88689b15e6e8b6ce1f945737dee4369e"><div class="ttname"><a href="classafio__v2__xxx_1_1io__handle.html#a88689b15e6e8b6ce1f945737dee4369e">afio_v2_xxx::io_handle::lock</a></div><div class="ttdeci">virtual result&lt; extent_guard &gt; lock(extent_type offset, extent_type bytes, bool exclusive=true, deadline d=deadline()) noexcept</div><div class="ttdoc">Tries to lock the range of bytes specified for shared or exclusive access. Be aware this passes throu...</div></div>
 </div><!-- fragment -->
 </div>

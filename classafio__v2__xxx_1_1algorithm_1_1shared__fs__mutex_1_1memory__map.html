@@ -159,18 +159,6 @@ using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cla
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a89e52feca9dfdc21f0934ffe178ec496"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a89e52feca9dfdc21f0934ffe178ec496"></a>
-<a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex.html">shared_fs_mutex</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#a89e52feca9dfdc21f0934ffe178ec496">fallback</a> () const noexcept</td></tr>
-<tr class="memdesc:a89e52feca9dfdc21f0934ffe178ec496"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the fallback lock. <br/></td></tr>
-<tr class="separator:a89e52feca9dfdc21f0934ffe178ec496"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a869e5a388b53cc46a026ae534d2dc16f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a869e5a388b53cc46a026ae534d2dc16f"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#a869e5a388b53cc46a026ae534d2dc16f">fallback</a> (<a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex.html">shared_fs_mutex</a> *fbl) noexcept</td></tr>
-<tr class="memdesc:a869e5a388b53cc46a026ae534d2dc16f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the fallback lock. <br/></td></tr>
-<tr class="separator:a869e5a388b53cc46a026ae534d2dc16f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4b939f02167fe69a9b10fae2554826a6"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4b939f02167fe69a9b10fae2554826a6"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#a4b939f02167fe69a9b10fae2554826a6">is_degraded</a> () const noexcept</td></tr>
-<tr class="memdesc:a4b939f02167fe69a9b10fae2554826a6"><td class="mdescLeft">&#160;</td><td class="mdescRight">True if this lock has degraded due to a network user trying to use it. <br/></td></tr>
-<tr class="separator:a4b939f02167fe69a9b10fae2554826a6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af066bb4d3f9f7020b60733ff0bcc99df"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af066bb4d3f9f7020b60733ff0bcc99df"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#af066bb4d3f9f7020b60733ff0bcc99df">memory_map</a> (<a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html">memory_map</a> &amp;&amp;o) noexcept</td></tr>
 <tr class="memdesc:af066bb4d3f9f7020b60733ff0bcc99df"><td class="mdescLeft">&#160;</td><td class="mdescRight">Move constructor. <br/></td></tr>
@@ -183,10 +171,10 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 const <a class="el" href="classafio__v2__xxx_1_1file__handle.html">file_handle</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#aacf62428585d7179c4490934f02c8d24">handle</a> () const noexcept</td></tr>
 <tr class="memdesc:aacf62428585d7179c4490934f02c8d24"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the handle to file being used for this lock. <br/></td></tr>
 <tr class="separator:aacf62428585d7179c4490934f02c8d24"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adc0f8bf3c61cb2dd0bc74c4db7d316f7"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="adc0f8bf3c61cb2dd0bc74c4db7d316f7"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#adc0f8bf3c61cb2dd0bc74c4db7d316f7">unlock</a> (<a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex.html#ab9b3f3598d373786919eafc643d78633">entities_type</a> entities, unsigned long long hint) noexceptoverridefinal</td></tr>
-<tr class="memdesc:adc0f8bf3c61cb2dd0bc74c4db7d316f7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Unlock a previously locked sequence of entities. <br/></td></tr>
-<tr class="separator:adc0f8bf3c61cb2dd0bc74c4db7d316f7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5392e91c0fc7844fb8922145e2fa790e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5392e91c0fc7844fb8922145e2fa790e"></a>
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#a5392e91c0fc7844fb8922145e2fa790e">unlock</a> (<a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex.html#ab9b3f3598d373786919eafc643d78633">entities_type</a> entities, unsigned long long) noexceptoverridefinal</td></tr>
+<tr class="memdesc:a5392e91c0fc7844fb8922145e2fa790e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Unlock a previously locked sequence of entities. <br/></td></tr>
+<tr class="separator:a5392e91c0fc7844fb8922145e2fa790e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a96b28acf46a3d4ebe93b6031d90f79ac"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a96b28acf46a3d4ebe93b6031d90f79ac"></a>
 <a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#a33d3ab28b81a5b1eedcc8eb217f78eab">entity_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex.html#a96b28acf46a3d4ebe93b6031d90f79ac">entity_from_buffer</a> (const char *buffer, size_t bytes, bool exclusive=true) noexcept</td></tr>
 <tr class="memdesc:a96b28acf46a3d4ebe93b6031d90f79ac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generates an entity id from a sequence of bytes. <br/></td></tr>
@@ -223,8 +211,8 @@ result&lt; <a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mu
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:a5706f64aff5256b56b54f9f8b2a99d3b"><td class="memItemLeft" align="right" valign="top">static result&lt; <a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html">memory_map</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#a5706f64aff5256b56b54f9f8b2a99d3b">fs_mutex_map</a> (const <a class="el" href="classafio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;base, <a class="el" href="classafio__v2__xxx_1_1path__view.html">path_view</a> lockfile, <a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex.html">shared_fs_mutex</a> *fallbacklock=nullptr) noexcept</td></tr>
-<tr class="separator:a5706f64aff5256b56b54f9f8b2a99d3b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aef52aad16b92e13b1483b6e909fc0db2"><td class="memItemLeft" align="right" valign="top">static result&lt; <a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html">memory_map</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#aef52aad16b92e13b1483b6e909fc0db2">fs_mutex_map</a> (const <a class="el" href="classafio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;base, <a class="el" href="classafio__v2__xxx_1_1path__view.html">path_view</a> lockfile) noexcept</td></tr>
+<tr class="separator:aef52aad16b92e13b1483b6e909fc0db2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
@@ -252,9 +240,8 @@ class afio_v2_xxx::algorithm::shared_fs_mutex::memory_map&lt; Hasher, HashIndexS
   </dd>
 </dl>
 <p>This is the highest performing filing system mutex in AFIO, but it comes with a long list of potential gotchas. It works by creating a random temporary file somewhere on the system and placing its path in a file at the lock file location. The random temporary file is mapped into memory by all processes using the lock where an open addressed hash table is kept. Each entity is hashed into somewhere in the hash table and its individual spin lock is used to implement the exclusion. As with <code>byte_ranges</code>, each entity is locked individually in sequence but if a particular lock fails, all are unlocked and the list is randomised before trying again. Because this locking implementation is entirely implemented in userspace using shared memory without any kernel syscalls, performance is probably as fast as any many-arbitrary-entity shared locking system could be.</p>
-<p>Performance ought to be excellent so long as no lock user attempts to use the lock from across a networked filing system. As soon as a locking entity fails to find the temporary file given in the lock file location, it will <em>permanently</em> degrade the memory mapped lock into the "fallback" lock specified in the constructor (if you do not specify one, <code>EBUSY</code> will be forever returned from then on when trying to lock). It is up to the end user to decide when it might be time to destroy and reconstruct <code>memory_map</code> in order to restore full performance.</p>
+<p>As it uses shared memory, this implementation of <code>shared_fs_mutex</code> cannot work over a networked drive. If you attempt to open this lock on a network drive and the first user of the lock is not on this local machine, <code>std::errc::no_lock_available</code> will be returned from the constructor.</p>
 <ul>
-<li>Compatible with networked file systems, though with a substantial performance degrade as described above.</li>
 <li>Linear complexity to number of concurrent users up until hash table starts to get full or hashed entries collide.</li>
 <li>Sudden power loss during use is recovered from.</li>
 <li>Safe for multithreaded usage of the same instance.</li>
@@ -262,23 +249,17 @@ class afio_v2_xxx::algorithm::shared_fs_mutex::memory_map&lt; Hasher, HashIndexS
 </ul>
 <p>Caveats:</p>
 <ul>
-<li>A transition between mapped and fallback locks will not complete until all current mapped memory users have realised the transition has happened. This can take a very significant amount of time if a lock user does not regularly lock its locks.</li>
 <li>No ability to sleep until a lock becomes free, so CPUs are spun at 100%.</li>
 <li>Sudden process exit with locks held will deadlock all other users.</li>
 <li>Exponential complexity to number of entities being concurrently locked.</li>
 <li>Exponential complexity to concurrency if entities hash to the same cache line. Most SMP and especially NUMA systems have a finite bandwidth for atomic compare and swap operations, and every attempt to lock or unlock an entity under this implementation is several of those operations. Under heavy contention, whole system performance very noticeably nose dives from excessive atomic operations, things like audio and the mouse pointer will stutter.</li>
 <li>Sometimes different entities hash to the same offset and collide with one another, causing very poor performance.</li>
-<li>Byte range locks need to work properly on your system. Misconfiguring NFS or Samba to cause byte range locks to not work right will produce bad outcomes.</li>
 <li>Memory mapped files need to be cache unified with normal i/o in your OS kernel. Known OSs which don't use a unified cache for memory mapped and normal i/o are QNX, OpenBSD. Furthermore, doing normal i/o and memory mapped i/o to the same file needs to not corrupt the file. In the past, there have been editions of the Linux kernel and the OS X kernel which did this.</li>
 <li>If your OS doesn't have sane byte range locks (OS X, BSD, older Linuxes) and multiple objects in your process use the same lock file, misoperation will occur.</li>
 </ul>
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000009">Todo:</a></b></dt><dd><p class="startdd">It should be possible to auto early out from a memory_map transition by scanning the memory map for any locked items, and if none then to proceed. </p>
-<p>fs_mutex_map needs to check if this inode is that at the path after lock is granted, awaiting stat_t port. </p>
-<p>memory_map::_hash_entities needs to hash x16, x8 and x4 at a time to encourage auto vectorisation </p>
-<p class="enddd">memory_map::unlock() degrade is racy when single instance being used by multiple threads </p>
-</dd></dl>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000009">Todo:</a></b></dt><dd>memory_map::_hash_entities needs to hash x16, x8 and x4 at a time to encourage auto vectorisation </dd></dl>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="a5706f64aff5256b56b54f9f8b2a99d3b"></a>
+<a class="anchor" id="aef52aad16b92e13b1483b6e909fc0db2"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
@@ -297,13 +278,7 @@ template&lt;template&lt; class &gt; class Hasher = QUICKCPPLIB_NAMESPACE::algori
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype"><a class="el" href="classafio__v2__xxx_1_1path__view.html">path_view</a>&#160;</td>
-          <td class="paramname"><em>lockfile</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex.html">shared_fs_mutex</a> *&#160;</td>
-          <td class="paramname"><em>fallbacklock</em> = <code>nullptr</code>&#160;</td>
+          <td class="paramname"><em>lockfile</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -317,113 +292,83 @@ template&lt;template&lt; class &gt; class Hasher = QUICKCPPLIB_NAMESPACE::algori
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Initialises a shared filing system mutex using the file at <em>lockfile</em> and an optional fallback lock. </p>
-<dl class="section user"><dt>Errors returnable</dt><dd>Awaiting the clang result&lt;&gt; AST parser which auto generates all the error codes which could occur, but a particularly important one is <code>EBUSY</code> which will be returned if the memory map lock is already in a degraded state (i.e. just use the fallback lock directly). </dd></dl>
-<div class="fragment"><div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;      {</div>
-<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;        AFIO_LOG_FUNCTION_CALL(0);</div>
-<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;        <span class="keywordflow">try</span></div>
-<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;        {</div>
-<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;          OUTCOME_TRY(ret, <a class="code" href="classafio__v2__xxx_1_1file__handle.html#a6f4e7c6e9768c0e853105b1d63bd9dfb">file_handle::file</a>(base, lockfile, <a class="code" href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18aefb2a684e4afb7d55e6147fbe5a332ee">file_handle::mode::write</a>, file_handle::creation::if_needed, <a class="code" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9ea0fb9cf5f04f61bb6f1151da57ceb1ca1">file_handle::caching::reads</a>));</div>
-<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;          file_handle temph;</div>
-<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;          <span class="comment">// Am I the first person to this file? Lock everything exclusively</span></div>
-<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;          <span class="keyword">auto</span> lockinuse = ret.try_lock(_initialisingoffset, 3, <span class="keyword">true</span>);</div>
-<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;          file_handle::extent_guard mapinuse;</div>
-<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;          <span class="keywordflow">if</span>(lockinuse.has_error())</div>
-<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;          {</div>
-<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;            <span class="keywordflow">if</span>(lockinuse.error() != std::errc::timed_out)</div>
-<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;              <span class="keywordflow">return</span> lockinuse.error();</div>
-<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;            <span class="comment">// Somebody else is also using this file, so try to read the hash index file I ought to use</span></div>
-<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;            lockinuse = ret.lock(_lockinuseoffset, 1, <span class="keyword">false</span>);  <span class="comment">// inuse shared access</span></div>
-<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;            <span class="keywordtype">char</span> buffer[65536];</div>
-<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;            memset(buffer, 0, <span class="keyword">sizeof</span>(buffer));</div>
-<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;            OUTCOME_TRYV(ret.read(0, buffer, 65535));</div>
-<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;            path_view temphpath((filesystem::path::value_type *) buffer);</div>
-<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;            result&lt;file_handle&gt; _temph(in_place_type&lt;file_handle&gt;);</div>
-<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;            <span class="comment">// If path is zeroed, fall back onto backup lock</span></div>
-<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;            <span class="keywordflow">if</span>(!buffer[0])</div>
-<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;            {</div>
-<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;              <span class="comment">// I am guaranteed that all mmap users have locked the second last byte</span></div>
-<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;              <span class="comment">// and will unlock it once everyone has stopped using the mmap, so make</span></div>
-<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;              <span class="comment">// absolutely sure the mmap is not in use by anyone by taking an exclusive</span></div>
-<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;              <span class="comment">// lock on the second final byte</span></div>
-<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;              OUTCOME_TRYV(ret.lock(_mapinuseoffset, 1, <span class="keyword">true</span>));</div>
-<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;              <span class="comment">// Release the exclusive lock and tell caller to just use the fallback lock directly</span></div>
-<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;              <span class="keywordflow">return</span> std::errc::device_or_resource_busy;</div>
-<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;            }</div>
-<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;            <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;              _temph = <a class="code" href="classafio__v2__xxx_1_1file__handle.html#a6f4e7c6e9768c0e853105b1d63bd9dfb">file_handle::file</a>({}, temphpath, <a class="code" href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18aefb2a684e4afb7d55e6147fbe5a332ee">file_handle::mode::write</a>, file_handle::creation::open_existing, <a class="code" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9ead5197d93c063a2b1e22d1630a39b7aef">file_handle::caching::temporary</a>);</div>
-<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;            <span class="comment">// If temp file doesn&#39;t exist, I am on a different machine</span></div>
-<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;            <span class="keywordflow">if</span>(!_temph)</div>
-<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;            {</div>
-<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;              <span class="comment">// Zop the path so any new entrants into this lock will go to the fallback lock</span></div>
-<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;              memset(buffer, 0, 4);</div>
-<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;              OUTCOME_TRYV(ret.write(0, buffer, 4));</div>
-<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;              <span class="comment">// I am guaranteed that all mmap users have locked the second last byte</span></div>
-<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;              <span class="comment">// and will unlock it once everyone has stopped using the mmap, so make</span></div>
-<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;              <span class="comment">// absolutely sure the mmap is not in use by anyone by taking an exclusive</span></div>
-<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;              <span class="comment">// lock on the second final byte</span></div>
-<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;              OUTCOME_TRYV(ret.lock(_mapinuseoffset, 1, <span class="keyword">true</span>));</div>
-<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;              <span class="comment">// Release the exclusive lock and tell caller to just use the fallback lock directly</span></div>
-<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;              <span class="keywordflow">return</span> std::errc::device_or_resource_busy;</div>
-<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;            }</div>
-<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;            <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;            {</div>
-<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;              <span class="comment">// Mark the map as being in use by me too</span></div>
-<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;              OUTCOME_TRY(mapinuse2, ret.lock(_mapinuseoffset, 1, <span class="keyword">false</span>));</div>
-<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;              mapinuse = std::move(mapinuse2);</div>
-<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;              temph = std::move(_temph.value());</div>
-<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;            }</div>
-<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;            <span class="comment">// Map the hash index file into memory for read/write access</span></div>
-<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;            OUTCOME_TRY(temphsection, <a class="code" href="classafio__v2__xxx_1_1section__handle.html#a34cf4f9a6ec20c2a456d6b6313f0e595">section_handle::section</a>(temph, HashIndexSize));</div>
-<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;            OUTCOME_TRY(temphmap, <a class="code" href="classafio__v2__xxx_1_1map__handle.html#a9c43d182b257682d320f12f6e6be30b3">map_handle::map</a>(temphsection, HashIndexSize));</div>
-<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;            <span class="comment">// Map the path file into memory with its maximum possible size, read only</span></div>
-<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;            OUTCOME_TRY(hsection, <a class="code" href="classafio__v2__xxx_1_1section__handle.html#a34cf4f9a6ec20c2a456d6b6313f0e595">section_handle::section</a>(ret, 65536, <a class="code" href="namespaceafio__v2__xxx.html#a3cff8f3910dbf47663e5df1dc7e5ba47">section_handle::flag::read</a>));</div>
-<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;            OUTCOME_TRY(hmap, <a class="code" href="classafio__v2__xxx_1_1map__handle.html#a9c43d182b257682d320f12f6e6be30b3">map_handle::map</a>(hsection, 0, 0, <a class="code" href="namespaceafio__v2__xxx.html#a3cff8f3910dbf47663e5df1dc7e5ba47">section_handle::flag::read</a>));</div>
-<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;            <span class="keywordflow">return</span> memory_map(std::move(ret), std::move(temph), std::move(lockinuse.value()), std::move(mapinuse), std::move(hmap), std::move(temphmap), fallbacklock);</div>
-<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;          }</div>
-<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;          <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;          {</div>
-<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;            <span class="comment">// I am the first person to be using this (stale?) file, so create a new hash index file in /tmp</span></div>
-<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;            OUTCOME_TRY(tempdirh, <a class="code" href="classafio__v2__xxx_1_1path__handle.html#a5cbd1d67ffe72d6cce0d093f861a4af7">path_handle::path</a>(<a class="code" href="namespaceafio__v2__xxx.html#a4968bb2d647535f4b91427c66ff8b9e4">temporary_files_directory</a>()));</div>
-<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;            OUTCOME_TRY(_temph, <a class="code" href="classafio__v2__xxx_1_1file__handle.html#a7fdd164a8af6542c5fb80c514283c585">file_handle::random_file</a>(tempdirh));</div>
-<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;            temph = std::move(_temph);</div>
-<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;            <span class="comment">// Truncate it out to the hash index size, and map it into memory for read/write access</span></div>
-<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;            OUTCOME_TRYV(temph.truncate(HashIndexSize));</div>
-<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;            OUTCOME_TRY(temphsection, <a class="code" href="classafio__v2__xxx_1_1section__handle.html#a34cf4f9a6ec20c2a456d6b6313f0e595">section_handle::section</a>(temph, HashIndexSize));</div>
-<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;            OUTCOME_TRY(temphmap, <a class="code" href="classafio__v2__xxx_1_1map__handle.html#a9c43d182b257682d320f12f6e6be30b3">map_handle::map</a>(temphsection, HashIndexSize));</div>
-<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;            <span class="comment">// Write the path of my new hash index file, padding zeros to the nearest page size</span></div>
-<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;            <span class="comment">// multiple to work around a race condition in the Linux kernel</span></div>
-<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;            OUTCOME_TRY(temppath, temph.current_path());</div>
-<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;            <span class="keywordtype">char</span> buffer[4096];</div>
-<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;            memset(buffer, 0, <span class="keyword">sizeof</span>(buffer));</div>
-<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;            <span class="keywordtype">size_t</span> bytes = temppath.native().size() * <span class="keyword">sizeof</span>(*temppath.c_str());</div>
-<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;            file_handle::const_buffer_type buffers[]={</div>
-<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;              {(<span class="keyword">const</span> <span class="keywordtype">char</span> *) temppath.c_str(), bytes},</div>
-<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;              {(<span class="keyword">const</span> <span class="keywordtype">char</span> *) buffer, 4096-(bytes % 4096)}</div>
-<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;            };</div>
-<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;            OUTCOME_TRYV(ret.truncate(65536));</div>
-<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;            OUTCOME_TRYV(ret.write({buffers, 0}));</div>
-<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;            <span class="comment">// Map for read the maximum possible path file size, again to avoid race problems</span></div>
-<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;            OUTCOME_TRY(hsection, <a class="code" href="classafio__v2__xxx_1_1section__handle.html#a34cf4f9a6ec20c2a456d6b6313f0e595">section_handle::section</a>(ret, 65536, <a class="code" href="namespaceafio__v2__xxx.html#a3cff8f3910dbf47663e5df1dc7e5ba47">section_handle::flag::read</a>));</div>
-<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;            OUTCOME_TRY(hmap, <a class="code" href="classafio__v2__xxx_1_1map__handle.html#a9c43d182b257682d320f12f6e6be30b3">map_handle::map</a>(hsection, 0, 0, <a class="code" href="namespaceafio__v2__xxx.html#a3cff8f3910dbf47663e5df1dc7e5ba47">section_handle::flag::read</a>));</div>
-<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;            <span class="comment">/* Take shared locks on mapinuse and inuse. Even if this implementation doesn&#39;t implement</span></div>
-<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;<span class="comment">            atomic downgrade of exclusive range to shared range, we&#39;re fully prepared for other users</span></div>
-<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;<span class="comment">            now. The _initialisingoffset remains exclusive to prevent double entry into this init routine.</span></div>
-<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;<span class="comment">            */</span></div>
-<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;            OUTCOME_TRY(mapinuse2, ret.lock(_mapinuseoffset, 1, <span class="keyword">false</span>));</div>
-<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;            OUTCOME_TRY(lockinuse2, ret.lock(_lockinuseoffset, 1, <span class="keyword">false</span>));</div>
-<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;            mapinuse = std::move(mapinuse2);</div>
-<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;            lockinuse = std::move(lockinuse2); <span class="comment">// releases exclusive lock on all three offsets</span></div>
-<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;            <span class="keywordflow">return</span> memory_map(std::move(ret), std::move(temph), std::move(lockinuse.value()), std::move(mapinuse), std::move(hmap), std::move(temphmap), fallbacklock);</div>
-<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;          }</div>
-<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;        }</div>
-<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;        <span class="keywordflow">catch</span>(...)</div>
-<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;        {</div>
-<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;          <span class="keywordflow">return</span> error_from_exception();</div>
-<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;        }</div>
-<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;      }</div>
+<p>Initialises a shared filing system mutex using the file at <em>lockfile</em>. </p>
+<dl class="section user"><dt>Errors returnable</dt><dd>Awaiting the clang result&lt;&gt; AST parser which auto generates all the error codes which could occur, but a particularly important one is <code>std::errc::no_lock_available</code> which will be returned if the lock is in use by another computer on a network. </dd></dl>
+<div class="fragment"><div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;      {</div>
+<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;        AFIO_LOG_FUNCTION_CALL(0);</div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;        <span class="keywordflow">try</span></div>
+<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;        {</div>
+<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;          OUTCOME_TRY(ret, <a class="code" href="classafio__v2__xxx_1_1file__handle.html#a6f4e7c6e9768c0e853105b1d63bd9dfb">file_handle::file</a>(base, lockfile, <a class="code" href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18aefb2a684e4afb7d55e6147fbe5a332ee">file_handle::mode::write</a>, file_handle::creation::if_needed, <a class="code" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9ea0fb9cf5f04f61bb6f1151da57ceb1ca1">file_handle::caching::reads</a>));</div>
+<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;          file_handle temph;</div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;          <span class="comment">// Am I the first person to this file? Lock everything exclusively</span></div>
+<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;          <span class="keyword">auto</span> lockinuse = ret.try_lock(_initialisingoffset, 2, <span class="keyword">true</span>);</div>
+<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;          <span class="keywordflow">if</span>(lockinuse.has_error())</div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;          {</div>
+<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;            <span class="keywordflow">if</span>(lockinuse.error() != std::errc::timed_out)</div>
+<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;              <span class="keywordflow">return</span> lockinuse.error();</div>
+<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;            <span class="comment">// Somebody else is also using this file, so try to read the hash index file I ought to use</span></div>
+<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;            lockinuse = ret.lock(_lockinuseoffset, 1, <span class="keyword">false</span>);  <span class="comment">// inuse shared access, blocking</span></div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;            <span class="keywordflow">if</span>(!lockinuse)</div>
+<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;              <span class="keywordflow">return</span> lockinuse.error();</div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;            <span class="keywordtype">char</span> buffer[65536];</div>
+<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;            memset(buffer, 0, <span class="keyword">sizeof</span>(buffer));</div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;            OUTCOME_TRYV(ret.read(0, buffer, 65535));</div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;            path_view temphpath((filesystem::path::value_type *) buffer);</div>
+<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;            result&lt;file_handle&gt; _temph(in_place_type&lt;file_handle&gt;);</div>
+<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;            _temph = <a class="code" href="classafio__v2__xxx_1_1file__handle.html#a6f4e7c6e9768c0e853105b1d63bd9dfb">file_handle::file</a>({}, temphpath, <a class="code" href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18aefb2a684e4afb7d55e6147fbe5a332ee">file_handle::mode::write</a>, file_handle::creation::open_existing, <a class="code" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9ead5197d93c063a2b1e22d1630a39b7aef">file_handle::caching::temporary</a>);</div>
+<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;            <span class="comment">// If temp file doesn&#39;t exist, I am on a different machine</span></div>
+<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;            <span class="keywordflow">if</span>(!_temph)</div>
+<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;            {</div>
+<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;              <span class="comment">// Release the exclusive lock and tell caller that this lock is not available</span></div>
+<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;              <span class="keywordflow">return</span> std::errc::no_lock_available;</div>
+<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;            }</div>
+<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;            temph = std::move(_temph.value());</div>
+<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;            <span class="comment">// Map the hash index file into memory for read/write access</span></div>
+<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;            OUTCOME_TRY(temphsection, <a class="code" href="classafio__v2__xxx_1_1section__handle.html#a34cf4f9a6ec20c2a456d6b6313f0e595">section_handle::section</a>(temph, HashIndexSize));</div>
+<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;            OUTCOME_TRY(temphmap, <a class="code" href="classafio__v2__xxx_1_1map__handle.html#a9c43d182b257682d320f12f6e6be30b3">map_handle::map</a>(temphsection, HashIndexSize));</div>
+<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;            <span class="comment">// Map the path file into memory with its maximum possible size, read only</span></div>
+<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;            OUTCOME_TRY(hsection, <a class="code" href="classafio__v2__xxx_1_1section__handle.html#a34cf4f9a6ec20c2a456d6b6313f0e595">section_handle::section</a>(ret, 65536, <a class="code" href="namespaceafio__v2__xxx.html#a3cff8f3910dbf47663e5df1dc7e5ba47">section_handle::flag::read</a>));</div>
+<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;            OUTCOME_TRY(hmap, <a class="code" href="classafio__v2__xxx_1_1map__handle.html#a9c43d182b257682d320f12f6e6be30b3">map_handle::map</a>(hsection, 0, 0, <a class="code" href="namespaceafio__v2__xxx.html#a3cff8f3910dbf47663e5df1dc7e5ba47">section_handle::flag::read</a>));</div>
+<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;            <span class="keywordflow">return</span> memory_map(std::move(ret), std::move(temph), std::move(lockinuse.value()), std::move(hmap), std::move(temphmap));</div>
+<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;          }</div>
+<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;          <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;          {</div>
+<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;            <span class="comment">// I am the first person to be using this (stale?) file, so create a new hash index file in /tmp</span></div>
+<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;            OUTCOME_TRY(tempdirh, <a class="code" href="classafio__v2__xxx_1_1path__handle.html#a5cbd1d67ffe72d6cce0d093f861a4af7">path_handle::path</a>(<a class="code" href="namespaceafio__v2__xxx.html#a4968bb2d647535f4b91427c66ff8b9e4">temporary_files_directory</a>()));</div>
+<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;            OUTCOME_TRY(_temph, <a class="code" href="classafio__v2__xxx_1_1file__handle.html#a7fdd164a8af6542c5fb80c514283c585">file_handle::random_file</a>(tempdirh));</div>
+<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;            temph = std::move(_temph);</div>
+<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;            <span class="comment">// Truncate it out to the hash index size, and map it into memory for read/write access</span></div>
+<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;            OUTCOME_TRYV(temph.truncate(HashIndexSize));</div>
+<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;            OUTCOME_TRY(temphsection, <a class="code" href="classafio__v2__xxx_1_1section__handle.html#a34cf4f9a6ec20c2a456d6b6313f0e595">section_handle::section</a>(temph, HashIndexSize));</div>
+<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;            OUTCOME_TRY(temphmap, <a class="code" href="classafio__v2__xxx_1_1map__handle.html#a9c43d182b257682d320f12f6e6be30b3">map_handle::map</a>(temphsection, HashIndexSize));</div>
+<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;            <span class="comment">// Write the path of my new hash index file, padding zeros to the nearest page size</span></div>
+<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;            <span class="comment">// multiple to work around a race condition in the Linux kernel</span></div>
+<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;            OUTCOME_TRY(temppath, temph.current_path());</div>
+<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;            <span class="keywordtype">char</span> buffer[4096];</div>
+<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;            memset(buffer, 0, <span class="keyword">sizeof</span>(buffer));</div>
+<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;            <span class="keywordtype">size_t</span> bytes = temppath.native().size() * <span class="keyword">sizeof</span>(*temppath.c_str());</div>
+<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;            file_handle::const_buffer_type buffers[] = {{(<span class="keyword">const</span> <span class="keywordtype">char</span> *) temppath.c_str(), bytes}, {(<span class="keyword">const</span> <span class="keywordtype">char</span> *) buffer, 4096 - (bytes % 4096)}};</div>
+<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;            OUTCOME_TRYV(ret.truncate(65536));</div>
+<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;            OUTCOME_TRYV(ret.write({buffers, 0}));</div>
+<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;            <span class="comment">// Map for read the maximum possible path file size, again to avoid race problems</span></div>
+<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;            OUTCOME_TRY(hsection, <a class="code" href="classafio__v2__xxx_1_1section__handle.html#a34cf4f9a6ec20c2a456d6b6313f0e595">section_handle::section</a>(ret, 65536, <a class="code" href="namespaceafio__v2__xxx.html#a3cff8f3910dbf47663e5df1dc7e5ba47">section_handle::flag::read</a>));</div>
+<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;            OUTCOME_TRY(hmap, <a class="code" href="classafio__v2__xxx_1_1map__handle.html#a9c43d182b257682d320f12f6e6be30b3">map_handle::map</a>(hsection, 0, 0, <a class="code" href="namespaceafio__v2__xxx.html#a3cff8f3910dbf47663e5df1dc7e5ba47">section_handle::flag::read</a>));</div>
+<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;            <span class="comment">/* Take shared locks on inuse. Even if this implementation doesn&#39;t implement</span></div>
+<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;<span class="comment">            atomic downgrade of exclusive range to shared range, we&#39;re fully prepared for other users</span></div>
+<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;<span class="comment">            now. The _initialisingoffset remains exclusive to prevent double entry into this init routine.</span></div>
+<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;<span class="comment">            */</span></div>
+<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;            OUTCOME_TRY(lockinuse2, ret.lock(_lockinuseoffset, 1, <span class="keyword">false</span>));</div>
+<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;            lockinuse = std::move(lockinuse2);  <span class="comment">// releases exclusive lock on all three offsets</span></div>
+<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;            <span class="keywordflow">return</span> memory_map(std::move(ret), std::move(temph), std::move(lockinuse.value()), std::move(hmap), std::move(temphmap));</div>
+<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;          }</div>
+<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;        }</div>
+<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;        <span class="keywordflow">catch</span>(...)</div>
+<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;        {</div>
+<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;          <span class="keywordflow">return</span> error_from_exception();</div>
+<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;        }</div>
+<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;      }</div>
 <div class="ttc" id="classafio__v2__xxx_1_1handle_html_a6f7e37c73271968271c2342023f58c9ea0fb9cf5f04f61bb6f1151da57ceb1ca1"><div class="ttname"><a href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9ea0fb9cf5f04f61bb6f1151da57ceb1ca1">afio_v2_xxx::handle::caching::reads</a></div><div class="ttdoc">Cache reads only. Writes of data and metadata do not complete until reaching storage (O_SYNC)...</div></div>
-<div class="ttc" id="namespaceafio__v2__xxx_html_a3cff8f3910dbf47663e5df1dc7e5ba47"><div class="ttname"><a href="namespaceafio__v2__xxx.html#a3cff8f3910dbf47663e5df1dc7e5ba47">afio_v2_xxx::read</a></div><div class="ttdeci">io_handle::io_result&lt; io_handle::buffers_type &gt; read(io_handle &amp;self, io_handle::io_request&lt; io_handle::buffers_type &gt; reqs, deadline d=deadline()) noexcept</div><div class="ttdoc">Read data from the open handle. </div><div class="ttdef"><b>Definition:</b> io_handle.hpp:439</div></div>
+<div class="ttc" id="namespaceafio__v2__xxx_html_a3cff8f3910dbf47663e5df1dc7e5ba47"><div class="ttname"><a href="namespaceafio__v2__xxx.html#a3cff8f3910dbf47663e5df1dc7e5ba47">afio_v2_xxx::read</a></div><div class="ttdeci">io_handle::io_result&lt; io_handle::buffers_type &gt; read(io_handle &amp;self, io_handle::io_request&lt; io_handle::buffers_type &gt; reqs, deadline d=deadline()) noexcept</div><div class="ttdoc">Read data from the open handle. </div><div class="ttdef"><b>Definition:</b> io_handle.hpp:447</div></div>
 <div class="ttc" id="namespaceafio__v2__xxx_html_a4968bb2d647535f4b91427c66ff8b9e4"><div class="ttname"><a href="namespaceafio__v2__xxx.html#a4968bb2d647535f4b91427c66ff8b9e4">afio_v2_xxx::temporary_files_directory</a></div><div class="ttdeci">path_view temporary_files_directory() noexcept</div><div class="ttdoc">Returns a path to a directory reported by the operating system to be suitable for storing temporary f...</div></div>
 <div class="ttc" id="classafio__v2__xxx_1_1map__handle_html_a9c43d182b257682d320f12f6e6be30b3"><div class="ttname"><a href="classafio__v2__xxx_1_1map__handle.html#a9c43d182b257682d320f12f6e6be30b3">afio_v2_xxx::map_handle::map</a></div><div class="ttdeci">static result&lt; map_handle &gt; map(size_type bytes, section_handle::flag _flag=section_handle::flag::readwrite) noexcept</div></div>
 <div class="ttc" id="classafio__v2__xxx_1_1handle_html_a0489b6c1e25cd2bad2ba1ec86e1aaf18aefb2a684e4afb7d55e6147fbe5a332ee"><div class="ttname"><a href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18aefb2a684e4afb7d55e6147fbe5a332ee">afio_v2_xxx::handle::mode::write</a></div><div class="ttdoc">Ability to read and write (READ_CONTROL|FILE_READ_DATA|FILE_READ_ATTRIBUTES|FILE_READ_EA|FILE_WRITE_D...</div></div>

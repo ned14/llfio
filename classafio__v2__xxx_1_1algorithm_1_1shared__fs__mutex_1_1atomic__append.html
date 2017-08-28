@@ -524,7 +524,7 @@ Protected Member Functions</h2></td></tr>
 <div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;<span class="comment">        //! \todo fs_mutex_append needs to check if file still exists after lock is granted, awaiting path fetching.</span></div>
 <div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;<span class="comment"></span>        <span class="keywordflow">if</span>(lockresult.has_error())</div>
 <div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;        {</div>
-<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;          <span class="keywordflow">if</span>(lockresult.error().value() != ETIMEDOUT)</div>
+<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;          <span class="keywordflow">if</span>(lockresult.error() != std::errc::timed_out)</div>
 <div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;            <span class="keywordflow">return</span> lockresult.error();</div>
 <div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;          <span class="comment">// Somebody else is also using this file</span></div>
 <div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;        }</div>

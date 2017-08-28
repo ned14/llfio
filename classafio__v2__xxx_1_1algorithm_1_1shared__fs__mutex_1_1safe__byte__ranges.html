@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.6"/>
-<title>AFIO: afio_v2_xxx::algorithm::shared_fs_mutex::byte_ranges Class Reference</title>
+<title>AFIO: afio_v2_xxx::algorithm::shared_fs_mutex::safe_byte_ranges Class Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -88,7 +88,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   </div>
 </div>
 <script type="text/javascript">
-$(document).ready(function(){initNavTree('classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1byte__ranges.html','');});
+$(document).ready(function(){initNavTree('classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1safe__byte__ranges.html','');});
 </script>
 <div id="doc-content">
 <!-- window showing the filter options -->
@@ -111,70 +111,66 @@ $(document).ready(function(){initNavTree('classafio__v2__xxx_1_1algorithm_1_1sha
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="#pro-methods">Protected Member Functions</a> &#124;
-<a href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1byte__ranges-members.html">List of all members</a>  </div>
+<a href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1safe__byte__ranges-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">afio_v2_xxx::algorithm::shared_fs_mutex::byte_ranges Class Reference</div>  </div>
+<div class="title">afio_v2_xxx::algorithm::shared_fs_mutex::safe_byte_ranges Class Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 
-<p>Many entity shared/exclusive file system based lock.  
- <a href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1byte__ranges.html#details">More...</a></p>
+<p>Safe many entity shared/exclusive file system based lock.  
+ <a href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1safe__byte__ranges.html#details">More...</a></p>
 
-<p><code>#include &quot;byte_ranges.hpp&quot;</code></p>
+<p><code>#include &quot;safe_byte_ranges.hpp&quot;</code></p>
 <div class="dynheader">
-Inheritance diagram for afio_v2_xxx::algorithm::shared_fs_mutex::byte_ranges:</div>
+Inheritance diagram for afio_v2_xxx::algorithm::shared_fs_mutex::safe_byte_ranges:</div>
 <div class="dyncontent">
  <div class="center">
-  <img src="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1byte__ranges.png" usemap="#afio_v2_xxx::algorithm::shared_fs_mutex::byte_ranges_map" alt=""/>
-  <map id="afio_v2_xxx::algorithm::shared_fs_mutex::byte_ranges_map" name="afio_v2_xxx::algorithm::shared_fs_mutex::byte_ranges_map">
-<area href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex.html" title="Abstract base class for an object which protects shared filing system resources. " alt="afio_v2_xxx::algorithm::shared_fs_mutex::shared_fs_mutex" shape="rect" coords="0,0,338,24"/>
+  <img src="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1safe__byte__ranges.png" usemap="#afio_v2_xxx::algorithm::shared_fs_mutex::safe_byte_ranges_map" alt=""/>
+  <map id="afio_v2_xxx::algorithm::shared_fs_mutex::safe_byte_ranges_map" name="afio_v2_xxx::algorithm::shared_fs_mutex::safe_byte_ranges_map">
+<area href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex.html" title="Abstract base class for an object which protects shared filing system resources. " alt="afio_v2_xxx::algorithm::shared_fs_mutex::shared_fs_mutex" shape="rect" coords="0,0,344,24"/>
 </map>
  </div></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
 Public Types</h2></td></tr>
-<tr class="memitem:a29c486c2b6b93b7bebf2c34211fa284e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a29c486c2b6b93b7bebf2c34211fa284e"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1byte__ranges.html#a29c486c2b6b93b7bebf2c34211fa284e">entity_type</a> = <a class="el" href="structafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex_1_1entity__type.html">shared_fs_mutex::entity_type</a></td></tr>
-<tr class="memdesc:a29c486c2b6b93b7bebf2c34211fa284e"><td class="mdescLeft">&#160;</td><td class="mdescRight">The type of an entity id. <br/></td></tr>
-<tr class="separator:a29c486c2b6b93b7bebf2c34211fa284e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a89a844be9af16f025224af20515cb156"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a89a844be9af16f025224af20515cb156"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1byte__ranges.html#a89a844be9af16f025224af20515cb156">entities_type</a> = <a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex.html#ab9b3f3598d373786919eafc643d78633">shared_fs_mutex::entities_type</a></td></tr>
-<tr class="memdesc:a89a844be9af16f025224af20515cb156"><td class="mdescLeft">&#160;</td><td class="mdescRight">The type of a sequence of entities. <br/></td></tr>
-<tr class="separator:a89a844be9af16f025224af20515cb156"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2c691f6623a7bd90b846e49863702f00"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2c691f6623a7bd90b846e49863702f00"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1safe__byte__ranges.html#a2c691f6623a7bd90b846e49863702f00">entity_type</a> = <a class="el" href="structafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex_1_1entity__type.html">shared_fs_mutex::entity_type</a></td></tr>
+<tr class="memdesc:a2c691f6623a7bd90b846e49863702f00"><td class="mdescLeft">&#160;</td><td class="mdescRight">The type of an entity id. <br/></td></tr>
+<tr class="separator:a2c691f6623a7bd90b846e49863702f00"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac066e96222b8063715b54856390e301a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac066e96222b8063715b54856390e301a"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1safe__byte__ranges.html#ac066e96222b8063715b54856390e301a">entities_type</a> = <a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex.html#ab9b3f3598d373786919eafc643d78633">shared_fs_mutex::entities_type</a></td></tr>
+<tr class="memdesc:ac066e96222b8063715b54856390e301a"><td class="mdescLeft">&#160;</td><td class="mdescRight">The type of a sequence of entities. <br/></td></tr>
+<tr class="separator:ac066e96222b8063715b54856390e301a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a047dc0602663a9011edc17720c239fd2"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a047dc0602663a9011edc17720c239fd2"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1byte__ranges.html#a047dc0602663a9011edc17720c239fd2">byte_ranges</a> (<a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1byte__ranges.html">byte_ranges</a> &amp;&amp;o) noexcept</td></tr>
-<tr class="memdesc:a047dc0602663a9011edc17720c239fd2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Move constructor. <br/></td></tr>
-<tr class="separator:a047dc0602663a9011edc17720c239fd2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8597fe3b882b8cabcc3833ed529e18a3"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8597fe3b882b8cabcc3833ed529e18a3"></a>
-<a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1byte__ranges.html">byte_ranges</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1byte__ranges.html#a8597fe3b882b8cabcc3833ed529e18a3">operator=</a> (<a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1byte__ranges.html">byte_ranges</a> &amp;&amp;o) noexcept</td></tr>
-<tr class="memdesc:a8597fe3b882b8cabcc3833ed529e18a3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Move assign. <br/></td></tr>
-<tr class="separator:a8597fe3b882b8cabcc3833ed529e18a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae0c765a4db09854a28d7be414cb3d018"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae0c765a4db09854a28d7be414cb3d018"></a>
-const <a class="el" href="classafio__v2__xxx_1_1file__handle.html">file_handle</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1byte__ranges.html#ae0c765a4db09854a28d7be414cb3d018">handle</a> () const noexcept</td></tr>
-<tr class="memdesc:ae0c765a4db09854a28d7be414cb3d018"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the handle to file being used for this lock. <br/></td></tr>
-<tr class="separator:ae0c765a4db09854a28d7be414cb3d018"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9013e211fa361a86916455f888d9a41b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9013e211fa361a86916455f888d9a41b"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1byte__ranges.html#a9013e211fa361a86916455f888d9a41b">unlock</a> (<a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex.html#ab9b3f3598d373786919eafc643d78633">entities_type</a> entities, unsigned long long) noexceptoverridefinal</td></tr>
-<tr class="memdesc:a9013e211fa361a86916455f888d9a41b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Unlock a previously locked sequence of entities. <br/></td></tr>
-<tr class="separator:a9013e211fa361a86916455f888d9a41b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a113cf8648fc11c4b9cafa0f3fbb34b5d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a113cf8648fc11c4b9cafa0f3fbb34b5d"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1safe__byte__ranges.html#a113cf8648fc11c4b9cafa0f3fbb34b5d">safe_byte_ranges</a> (<a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1safe__byte__ranges.html">safe_byte_ranges</a> &amp;&amp;o) noexcept</td></tr>
+<tr class="memdesc:a113cf8648fc11c4b9cafa0f3fbb34b5d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Move constructor. <br/></td></tr>
+<tr class="separator:a113cf8648fc11c4b9cafa0f3fbb34b5d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1e2fbb8bff40e21dd8c7d9e2a724b8ec"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1e2fbb8bff40e21dd8c7d9e2a724b8ec"></a>
+<a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1safe__byte__ranges.html">safe_byte_ranges</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1safe__byte__ranges.html#a1e2fbb8bff40e21dd8c7d9e2a724b8ec">operator=</a> (<a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1safe__byte__ranges.html">safe_byte_ranges</a> &amp;&amp;o) noexcept</td></tr>
+<tr class="memdesc:a1e2fbb8bff40e21dd8c7d9e2a724b8ec"><td class="mdescLeft">&#160;</td><td class="mdescRight">Move assign. <br/></td></tr>
+<tr class="separator:a1e2fbb8bff40e21dd8c7d9e2a724b8ec"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a34b3a7b369d880b769f59547d0516dc9"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a34b3a7b369d880b769f59547d0516dc9"></a>
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1safe__byte__ranges.html#a34b3a7b369d880b769f59547d0516dc9">unlock</a> (<a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex.html#ab9b3f3598d373786919eafc643d78633">entities_type</a> entities, unsigned long long hint) noexceptoverridefinal</td></tr>
+<tr class="memdesc:a34b3a7b369d880b769f59547d0516dc9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Unlock a previously locked sequence of entities. <br/></td></tr>
+<tr class="separator:a34b3a7b369d880b769f59547d0516dc9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a96b28acf46a3d4ebe93b6031d90f79ac"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a96b28acf46a3d4ebe93b6031d90f79ac"></a>
-<a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1byte__ranges.html#a29c486c2b6b93b7bebf2c34211fa284e">entity_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex.html#a96b28acf46a3d4ebe93b6031d90f79ac">entity_from_buffer</a> (const char *buffer, size_t bytes, bool exclusive=true) noexcept</td></tr>
+<a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1safe__byte__ranges.html#a2c691f6623a7bd90b846e49863702f00">entity_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex.html#a96b28acf46a3d4ebe93b6031d90f79ac">entity_from_buffer</a> (const char *buffer, size_t bytes, bool exclusive=true) noexcept</td></tr>
 <tr class="memdesc:a96b28acf46a3d4ebe93b6031d90f79ac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generates an entity id from a sequence of bytes. <br/></td></tr>
 <tr class="separator:a96b28acf46a3d4ebe93b6031d90f79ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3cd51b21b55c1ed21fcea0edaefdae85"><td class="memTemplParams" colspan="2"><a class="anchor" id="a3cd51b21b55c1ed21fcea0edaefdae85"></a>
 template&lt;typename T &gt; </td></tr>
-<tr class="memitem:a3cd51b21b55c1ed21fcea0edaefdae85"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1byte__ranges.html#a29c486c2b6b93b7bebf2c34211fa284e">entity_type</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex.html#a3cd51b21b55c1ed21fcea0edaefdae85">entity_from_string</a> (const std::basic_string&lt; T &gt; &amp;str, bool exclusive=true) noexcept</td></tr>
+<tr class="memitem:a3cd51b21b55c1ed21fcea0edaefdae85"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1safe__byte__ranges.html#a2c691f6623a7bd90b846e49863702f00">entity_type</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex.html#a3cd51b21b55c1ed21fcea0edaefdae85">entity_from_string</a> (const std::basic_string&lt; T &gt; &amp;str, bool exclusive=true) noexcept</td></tr>
 <tr class="memdesc:a3cd51b21b55c1ed21fcea0edaefdae85"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generates an entity id from a string. <br/></td></tr>
 <tr class="separator:a3cd51b21b55c1ed21fcea0edaefdae85"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a17f374fc7863784f478498eac95dcc70"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a17f374fc7863784f478498eac95dcc70"></a>
-<a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1byte__ranges.html#a29c486c2b6b93b7bebf2c34211fa284e">entity_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex.html#a17f374fc7863784f478498eac95dcc70">random_entity</a> (bool exclusive=true) noexcept</td></tr>
+<a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1safe__byte__ranges.html#a2c691f6623a7bd90b846e49863702f00">entity_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex.html#a17f374fc7863784f478498eac95dcc70">random_entity</a> (bool exclusive=true) noexcept</td></tr>
 <tr class="memdesc:a17f374fc7863784f478498eac95dcc70"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generates a cryptographically random entity id. <br/></td></tr>
 <tr class="separator:a17f374fc7863784f478498eac95dcc70"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1d2d3fb211c48b0322333c55e1d019a5"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1d2d3fb211c48b0322333c55e1d019a5"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex.html#a1d2d3fb211c48b0322333c55e1d019a5">fill_random_entities</a> (span&lt; <a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1byte__ranges.html#a29c486c2b6b93b7bebf2c34211fa284e">entity_type</a> &gt; seq, bool exclusive=true) noexcept</td></tr>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex.html#a1d2d3fb211c48b0322333c55e1d019a5">fill_random_entities</a> (span&lt; <a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1safe__byte__ranges.html#a2c691f6623a7bd90b846e49863702f00">entity_type</a> &gt; seq, bool exclusive=true) noexcept</td></tr>
 <tr class="memdesc:a1d2d3fb211c48b0322333c55e1d019a5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fills a sequence of entity ids with cryptographic randomness. Much faster than calling random_entity() individually. <br/></td></tr>
 <tr class="separator:a1d2d3fb211c48b0322333c55e1d019a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2e82ae0ca11932f5287b0ca2f4834da6"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2e82ae0ca11932f5287b0ca2f4834da6"></a>
@@ -182,7 +178,7 @@ result&lt; <a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mu
 <tr class="memdesc:a2e82ae0ca11932f5287b0ca2f4834da6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Lock all of a sequence of entities for exclusive or shared access. <br/></td></tr>
 <tr class="separator:a2e82ae0ca11932f5287b0ca2f4834da6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac1dbb5f7b7887690b47b1d24940a054d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac1dbb5f7b7887690b47b1d24940a054d"></a>
-result&lt; <a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex_1_1entities__guard.html">entities_guard</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex.html#ac1dbb5f7b7887690b47b1d24940a054d">lock</a> (<a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1byte__ranges.html#a29c486c2b6b93b7bebf2c34211fa284e">entity_type</a> entity, <a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a>(), bool spin_not_sleep=false) noexcept</td></tr>
+result&lt; <a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex_1_1entities__guard.html">entities_guard</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex.html#ac1dbb5f7b7887690b47b1d24940a054d">lock</a> (<a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1safe__byte__ranges.html#a2c691f6623a7bd90b846e49863702f00">entity_type</a> entity, <a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a>(), bool spin_not_sleep=false) noexcept</td></tr>
 <tr class="memdesc:ac1dbb5f7b7887690b47b1d24940a054d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Lock a single entity for exclusive or shared access. <br/></td></tr>
 <tr class="separator:ac1dbb5f7b7887690b47b1d24940a054d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0987b9c6c93a65acb2715e589d45c273"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0987b9c6c93a65acb2715e589d45c273"></a>
@@ -190,52 +186,64 @@ result&lt; <a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mu
 <tr class="memdesc:a0987b9c6c93a65acb2715e589d45c273"><td class="mdescLeft">&#160;</td><td class="mdescRight">Try to lock all of a sequence of entities for exclusive or shared access. <br/></td></tr>
 <tr class="separator:a0987b9c6c93a65acb2715e589d45c273"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aebdc3d01ccb30b297950130c7ebac57b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aebdc3d01ccb30b297950130c7ebac57b"></a>
-result&lt; <a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex_1_1entities__guard.html">entities_guard</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex.html#aebdc3d01ccb30b297950130c7ebac57b">try_lock</a> (<a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1byte__ranges.html#a29c486c2b6b93b7bebf2c34211fa284e">entity_type</a> entity) noexcept</td></tr>
+result&lt; <a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex_1_1entities__guard.html">entities_guard</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex.html#aebdc3d01ccb30b297950130c7ebac57b">try_lock</a> (<a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1safe__byte__ranges.html#a2c691f6623a7bd90b846e49863702f00">entity_type</a> entity) noexcept</td></tr>
 <tr class="memdesc:aebdc3d01ccb30b297950130c7ebac57b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Try to lock a single entity for exclusive or shared access. <br/></td></tr>
 <tr class="separator:aebdc3d01ccb30b297950130c7ebac57b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:a66be7a3974074253106a1059028860eb"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a66be7a3974074253106a1059028860eb"></a>
-static result&lt; <a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1byte__ranges.html">byte_ranges</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1byte__ranges.html#a66be7a3974074253106a1059028860eb">fs_mutex_byte_ranges</a> (const <a class="el" href="classafio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;base, <a class="el" href="classafio__v2__xxx_1_1path__view.html">path_view</a> lockfile) noexcept</td></tr>
-<tr class="memdesc:a66be7a3974074253106a1059028860eb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialises a shared filing system mutex using the file at <em>lockfile</em>. <br/></td></tr>
-<tr class="separator:a66be7a3974074253106a1059028860eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1665c2fe34b741c5d5185f980f06d04a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1665c2fe34b741c5d5185f980f06d04a"></a>
+static result&lt; <a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1safe__byte__ranges.html">safe_byte_ranges</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1safe__byte__ranges.html#a1665c2fe34b741c5d5185f980f06d04a">fs_mutex_safe_byte_ranges</a> (const <a class="el" href="classafio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;base, <a class="el" href="classafio__v2__xxx_1_1path__view.html">path_view</a> lockfile) noexcept</td></tr>
+<tr class="memdesc:a1665c2fe34b741c5d5185f980f06d04a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialises a shared filing system mutex using the file at <em>lockfile</em>. <br/></td></tr>
+<tr class="separator:a1665c2fe34b741c5d5185f980f06d04a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
-<tr class="memitem:a9886607c18a59394ca12fcb1dae98f54"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9886607c18a59394ca12fcb1dae98f54"></a>
+<tr class="memitem:a41d966d8921c516b8d45682e1ce9036e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a41d966d8921c516b8d45682e1ce9036e"></a>
 virtual result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>_lock</b> (<a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex_1_1entities__guard.html">entities_guard</a> &amp;out, <a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a> d, bool spin_not_sleep) noexceptoverridefinal</td></tr>
-<tr class="separator:a9886607c18a59394ca12fcb1dae98f54"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="separator:a41d966d8921c516b8d45682e1ce9036e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Many entity shared/exclusive file system based lock. </p>
-<p>This is a simple many entity shared mutex. It works by locking in the same file the byte at the offset of the entity id. If it fails to lock a byte, it backs out all preceding locks, randomises the order and tries locking them again until success. Needless to say this algorithm puts a lot of strain on your byte range locking implementation, some NFS implementations have been known to fail to cope.</p>
-<dl class="section note"><dt>Note</dt><dd>Most users will want to use <code>safe_byte_ranges</code> instead of this class directly.</dd></dl>
+<div class="textblock"><p>Safe many entity shared/exclusive file system based lock. </p>
+<dl class="section see"><dt>See Also</dt><dd>byte_ranges</dd></dl>
+<p>POSIX requires that byte range locks have insane semantics, namely that:</p>
+<ul>
+<li>Any fd closed on an inode must release all byte range locks on that inode for all other fds.</li>
+<li>Threads replace each other's locks.</li>
+</ul>
+<p>This makes the use of byte range locks in modern code highly problematic.</p>
+<p>This implementation of <code>shared_fs_mutex</code> exclusively uses byte range locks on an inode for exclusion with other processes, but on POSIX only also layers on top:</p>
+<ul>
+<li>Keeps a process-wide store of reference counted fd's per lock in the process, thus preventing byte range locks ever being dropped unexpectedly.</li>
+<li>A process-local thread aware layer, allowing byte range locks to be held by a thread and excluding other threads as well as processes.</li>
+<li>A thread may add an additional exclusive or shared lock on top of its existing exclusive or shared lock, but unlocks always unlock the exclusive lock first. This choice of behaviour is to match Microsoft Windows' behaviour to aid writing portable code.</li>
+</ul>
+<p>On Microsoft Windows <code>safe_byte_ranges</code> is typedefed to <code>byte_ranges</code>, as the Windows byte range locking API already works as described above.</p>
+<p>Benefits:</p>
 <ul>
 <li>Compatible with networked file systems, though be cautious with older NFS.</li>
 <li>Linear complexity to number of concurrent users.</li>
-<li>Exponential complexity to number of entities being concurrently locked, though some OSs provide linear complexity so long as total concurrent waiting processes is CPU core count or less.</li>
+<li>Exponential complexity to number of entities being concurrently locked.</li>
 <li>Does a reasonable job of trying to sleep the thread if any of the entities are locked.</li>
 <li>Sudden process exit with lock held is recovered from.</li>
 <li>Sudden power loss during use is recovered from.</li>
-<li>Safe for multithreaded usage of the same instance.</li>
+<li>Safe for multithreaded usage.</li>
 </ul>
 <p>Caveats:</p>
 <ul>
 <li>When entities being locked is more than one, the algorithm places the contending lock at the front of the list during the randomisation after lock failure so we can sleep the thread until it becomes free. However, under heavy churn the thread will generally spin, consuming 100% CPU.</li>
 <li>Byte range locks need to work properly on your system. Misconfiguring NFS or Samba to cause byte range locks to not work right will produce bad outcomes.</li>
-<li>If your OS doesn't have sane byte range locks (OS X, BSD, older Linuxes) and multiple objects in your process use the same lock file, misoperation will occur. Use lock_files or share a single instance of this class per lock file in this case.</li>
-<li>If you are on POSIX and the same process relocks an entity a second time, it will release everything on the first unlock. On Windows, the first unlock releases the exclusive lock and the second unlock will release the shared lock. </li>
+<li>Unavoidably these locks will be a good bit slower than <code>byte_ranges</code>. </li>
 </ul>
 </div><hr/>The documentation for this class was generated from the following file:<ul>
-<li>include/afio/v2.0/algorithm/shared_fs_mutex/<a class="el" href="byte__ranges_8hpp.html">byte_ranges.hpp</a></li>
+<li>include/afio/v2.0/algorithm/shared_fs_mutex/<a class="el" href="safe__byte__ranges_8hpp.html">safe_byte_ranges.hpp</a></li>
 </ul>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="namespaceafio__v2__xxx.html">afio_v2_xxx</a></li><li class="navelem"><a class="el" href="namespaceafio__v2__xxx_1_1algorithm.html">algorithm</a></li><li class="navelem"><a class="el" href="namespaceafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex.html">shared_fs_mutex</a></li><li class="navelem"><a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1byte__ranges.html">byte_ranges</a></li>
+    <li class="navelem"><a class="el" href="namespaceafio__v2__xxx.html">afio_v2_xxx</a></li><li class="navelem"><a class="el" href="namespaceafio__v2__xxx_1_1algorithm.html">algorithm</a></li><li class="navelem"><a class="el" href="namespaceafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex.html">shared_fs_mutex</a></li><li class="navelem"><a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1safe__byte__ranges.html">safe_byte_ranges</a></li>
     <li class="footer">Generated by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>

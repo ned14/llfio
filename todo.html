@@ -115,11 +115,7 @@ $(document).ready(function(){initNavTree('todo.html','');});
 <dt><a class="anchor" id="_todo000007"></a>Member <a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1atomic__append.html#a37d6135d8677c0da876a432a7ac05b53">afio_v2_xxx::algorithm::shared_fs_mutex::atomic_append::fs_mutex_append</a>  (const path_handle &amp;base, path_view lockfile, bool nfs_compatibility=false, bool skip_hashing=false) noexcept</dt>
 <dd>fs_mutex_append needs to check if file still exists after lock is granted, awaiting path fetching.  </dd>
 <dt><a class="anchor" id="_todo000009"></a>Class <a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html">afio_v2_xxx::algorithm::shared_fs_mutex::memory_map&lt; Hasher, HashIndexSize, SpinlockType &gt;</a>  </dt>
-<dd><p class="startdd">It should be possible to auto early out from a memory_map transition by scanning the memory map for any locked items, and if none then to proceed. </p>
-<p>fs_mutex_map needs to check if this inode is that at the path after lock is granted, awaiting stat_t port. </p>
-<p>memory_map::_hash_entities needs to hash x16, x8 and x4 at a time to encourage auto vectorisation </p>
-<p class="enddd">memory_map::unlock() degrade is racy when single instance being used by multiple threads  </p>
-</dd>
+<dd>memory_map::_hash_entities needs to hash x16, x8 and x4 at a time to encourage auto vectorisation  </dd>
 <dt><a class="anchor" id="_todo000001"></a>Class <a class="el" href="classafio__v2__xxx_1_1async__file__handle.html">afio_v2_xxx::async_file_handle</a>  </dt>
 <dd>Direct use of <code>calloc()</code> ought to be replaced with a user supplied STL allocator instance.  </dd>
 <dt><a class="anchor" id="_todo000003"></a>Member <a class="el" href="classafio__v2__xxx_1_1io__handle.html#a2da2f177b841701a840a8191a79dd1d4">afio_v2_xxx::io_handle::io_handle</a>  ()=default</dt>
