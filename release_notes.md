@@ -35,7 +35,7 @@ Manufacturer claimed 4Kb transfer latencies for the physical hardware:
 - &lt; 99% SATA flash drive latency: Windows **290us** Linux **158us**
 - &lt; 99% NVMe drive latency: Windows **150us** FreeBSD **70us** Linux **30us**
 
-Lowest achievable 4Kb read latency benchmarked to date by author: **0.19us** (5.3M IOPS @ QD1, approx 20Gb/sec)
+Empirical AFIO read latency benchmarked by author: **0.19us** (5.3M IOPS @ QD1, approx 20Gb/sec)
 </td>
 <td valign="top" width="33%">
 75% read 25% write QD4 4Kb direct transfer latencies for the software with AFIO:
@@ -43,7 +43,7 @@ Lowest achievable 4Kb read latency benchmarked to date by author: **0.19us** (5.
 - &lt; 99% SATA flash drive latency: Windows **1,812us** Linux **1,416us**
 - &lt; 99% NVMe drive latency: Windows **95us** FreeBSD **143us** Linux **40us**
 
-Lowest achievable 4Kb write latency benchmarked to date by author: **0.18us** (5.6M IOPS @ QD1, approx 21Gb/sec)
+Empirical AFIO write latency benchmarked by author: **0.18us** (5.6M IOPS @ QD1, approx 21Gb/sec)
 </td>
 </tr>
 </table>
@@ -142,6 +142,7 @@ Todo:
 | ✔ | ✔ | ✔ | Universal portable UTF-8 path views.
 |   | ✔ | ✔ | "Hole punching" and hole enumeration ported over from AFIO v1.
 |   | ✔ | ✔ | Directory handles and very fast directory enumeration ported over from AFIO v1.
+| ✔ | ✔ | ✔ | `shared_fs_mutex` shared/exclusive entities locking based on safe byte ranges
 
 Todo to reach feature parity with AFIO v1:
 

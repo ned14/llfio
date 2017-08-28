@@ -117,13 +117,14 @@ namespace utils
   void random_fill(char *buffer, size_t bytes) noexcept
   {
     static QUICKCPPLIB_NAMESPACE::configurable_spinlock::spinlock<bool> lock;
-    static int randomfd = -1;
-    if(-1 == randomfd)
+    static std::atomic<int> randomfd(-1);
+    int fd = randomfd;
+    if(-1 == fd)
     {
       std::lock_guard<decltype(lock)> g(lock);
-      randomfd = ::open("/dev/urandom", O_RDONLY);
+      randomfd = fd = ::open("/dev/urandom", O_RDONLY);
     }
-    if(-1 == randomfd || ::read(randomfd, buffer, bytes) < (ssize_t) bytes)
+    if(-1 == fd || ::read(fd, buffer, bytes) < (ssize_t) bytes)
     {
       AFIO_LOG_FATAL(0, "afio: Kernel crypto function failed");
       std::terminate();

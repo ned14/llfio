@@ -86,6 +86,8 @@ namespace algorithm
         void _unlock(unsigned mythreadid, entity_type entity)
         {
           auto it = _thread_locks.find(entity.value);
+          assert(it != _thread_locks.end());
+          assert(it->second.writer_tid == mythreadid || it->second.writer_tid == 0);
           if(it->second.writer_tid == mythreadid)
           {
             if(!it->second.reader_tids.empty())
@@ -101,14 +103,17 @@ namespace algorithm
               return;
             }
           }
-          // Remove me from reader tids
-          auto reader_tid_it = std::find(it->second.reader_tids.begin(), it->second.reader_tids.end(), mythreadid);
-          assert(reader_tid_it != it->second.reader_tids.end());
-          if(reader_tid_it != it->second.reader_tids.end())
+          else
           {
-            // We don't care about the order, so fastest is to swap this tid with final tid and resize down
-            std::swap(*reader_tid_it, it->second.reader_tids.back());
-            it->second.reader_tids.pop_back();
+            // Remove me from reader tids
+            auto reader_tid_it = std::find(it->second.reader_tids.begin(), it->second.reader_tids.end(), mythreadid);
+            assert(reader_tid_it != it->second.reader_tids.end());
+            if(reader_tid_it != it->second.reader_tids.end())
+            {
+              // We don't care about the order, so fastest is to swap this tid with final tid and resize down
+              std::swap(*reader_tid_it, it->second.reader_tids.back());
+              it->second.reader_tids.pop_back();
+            }
           }
           if(it->second.reader_tids.empty())
           {
