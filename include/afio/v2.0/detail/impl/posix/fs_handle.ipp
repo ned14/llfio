@@ -33,7 +33,7 @@ AFIO_V2_NAMESPACE_BEGIN
 
 result<void> fs_handle::_fetch_inode() noexcept
 {
-  stat_t s;
+  stat_t s(nullptr);
   OUTCOME_TRYV(s.fill(_get_handle(), stat_t::want::dev | stat_t::want::ino));
   _devid = s.st_dev;
   _inode = s.st_ino;
