@@ -35,7 +35,7 @@ Manufacturer claimed 4Kb transfer latencies for the physical hardware:
 - &lt; 99% SATA flash drive latency: Windows **290us** Linux **158us**
 - &lt; 99% NVMe drive latency: Windows **150us** FreeBSD **70us** Linux **30us**
 
-Empirical AFIO read latency benchmarked by author: **0.19us** (5.3M IOPS @ QD1, approx 20Gb/sec)
+Worst case AFIO read overhead benchmarked by author: **0.19us** (5.3M IOPS @ QD1, approx 20Gb/sec)
 </td>
 <td valign="top" width="33%">
 75% read 25% write QD4 4Kb direct transfer latencies for the software with AFIO:
@@ -43,7 +43,7 @@ Empirical AFIO read latency benchmarked by author: **0.19us** (5.3M IOPS @ QD1, 
 - &lt; 99% SATA flash drive latency: Windows **1,812us** Linux **1,416us**
 - &lt; 99% NVMe drive latency: Windows **95us** FreeBSD **143us** Linux **40us**
 
-Empirical AFIO write latency benchmarked by author: **0.18us** (5.6M IOPS @ QD1, approx 21Gb/sec)
+Worst case AFIO write overhead benchmarked by author: **0.18us** (5.6M IOPS @ QD1, approx 21Gb/sec)
 </td>
 </tr>
 </table>

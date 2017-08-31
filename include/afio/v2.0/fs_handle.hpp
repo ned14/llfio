@@ -79,8 +79,7 @@ protected:
   //! No copy assignment
   fs_handle &operator=(const fs_handle &o) = delete;
   //! Implicit move construction of fs_handle permitted
-  constexpr fs_handle(fs_handle &&o) noexcept : _devid(o._devid),
-                                                _inode(o._inode)
+  constexpr fs_handle(fs_handle &&o) noexcept : _devid(o._devid), _inode(o._inode)
   {
     o._devid = 0;
     o._inode = 0;
@@ -103,7 +102,7 @@ public:
   //! A unique identifier for this handle across the entire system. Can be used in hash tables etc.
   unique_id_type unique_id() const noexcept
   {
-    unique_id_type ret(nullptr);
+    unique_id_type ret;
     ret.as_longlongs[0] = _devid;
     ret.as_longlongs[1] = _inode;
     return ret;

@@ -833,6 +833,7 @@ namespace storage_profile
           std::packaged_task<void()> task([no, &done, &workfiles, &results] {
             file_handle &h = *workfiles[no];
             alignas(4096) char buffer[4096];
+            memset(buffer, (int) no, 4096);
             file_handle::buffer_type _reqs[1] = {{buffer, 4096}};
             file_handle::io_request<file_handle::buffers_type> reqs(_reqs, 0);
             QUICKCPPLIB_NAMESPACE::algorithm::small_prng::small_prng rand((uint32_t) no);
