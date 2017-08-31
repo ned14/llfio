@@ -24,8 +24,29 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include "include/key_value_store.hpp"
 
-int main(int argc, char *argv[])
+int main()
 {
-  key_value_store::basic_key_value_store store("teststore", 1000000);
+  try
+  {
+    key_value_store::basic_key_value_store store("teststore", 10);
+    auto kvi = store.find(78);
+    if(kvi)
+    {
+      std::cout << "Key 78 has value " << kvi.value << " and it was last updated at " << kvi.transaction_counter << std::endl;
+    }
+    else
+    {
+      std::cout << "Key 78 was not found!" << std::endl;
+    }
+    key_value_store::transaction tr(store);
+    tr.fetch(78);
+    tr.update(78, "niall");
+    tr.commit();
+  }
+  catch(const std::exception &e)
+  {
+    std::cerr << "EXCEPTION: " << e.what() << std::endl;
+    return 1;
+  }
   return 0;
 }

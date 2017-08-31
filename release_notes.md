@@ -33,7 +33,7 @@ Manufacturer claimed 4Kb transfer latencies for the physical hardware:
 100% read QD1 4Kb direct transfer latencies for the software with AFIO:
 - &lt; 99% spinning rust hard drive latency: Windows **187,231us** FreeBSD **9,836us** Linux **26,468us**
 - &lt; 99% SATA flash drive latency: Windows **290us** Linux **158us**
-- &lt; 99% NVMe drive latency: Windows **150us** FreeBSD **70us** Linux **30us**
+- &lt; 99% NVMe drive latency: Windows **37us** FreeBSD **70us** Linux **30us**
 
 Worst case AFIO read overhead benchmarked by author: **0.19us** (5.3M IOPS @ QD1, approx 20Gb/sec)
 </td>
@@ -41,7 +41,7 @@ Worst case AFIO read overhead benchmarked by author: **0.19us** (5.3M IOPS @ QD1
 75% read 25% write QD4 4Kb direct transfer latencies for the software with AFIO:
 - &lt; 99% spinning rust hard drive latency: Windows **48,185us** FreeBSD **61,834us** Linux **104,507us**
 - &lt; 99% SATA flash drive latency: Windows **1,812us** Linux **1,416us**
-- &lt; 99% NVMe drive latency: Windows **95us** FreeBSD **143us** Linux **40us**
+- &lt; 99% NVMe drive latency: Windows **50us** FreeBSD **143us** Linux **40us**
 
 Worst case AFIO write overhead benchmarked by author: **0.18us** (5.6M IOPS @ QD1, approx 21Gb/sec)
 </td>

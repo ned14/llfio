@@ -985,10 +985,10 @@ static inline result<ACCESS_MASK> access_mask_from_handle_mode(native_handle_typ
   case handle::mode::none:
     break;
   case handle::mode::attr_read:
-    access |= FILE_READ_ATTRIBUTES;
+    access |= FILE_READ_ATTRIBUTES | STANDARD_RIGHTS_READ;
     break;
   case handle::mode::attr_write:
-    access |= DELETE | FILE_READ_ATTRIBUTES | FILE_WRITE_ATTRIBUTES;
+    access |= DELETE | FILE_READ_ATTRIBUTES | STANDARD_RIGHTS_READ | FILE_WRITE_ATTRIBUTES | STANDARD_RIGHTS_WRITE;
     break;
   case handle::mode::read:
     access |= GENERIC_READ;
@@ -999,7 +999,7 @@ static inline result<ACCESS_MASK> access_mask_from_handle_mode(native_handle_typ
     nativeh.behaviour |= native_handle_type::disposition::seekable | native_handle_type::disposition::readable | native_handle_type::disposition::writable;
     break;
   case handle::mode::append:
-    access |= DELETE | FILE_APPEND_DATA;
+    access |= DELETE | GENERIC_READ | FILE_WRITE_ATTRIBUTES | STANDARD_RIGHTS_WRITE | FILE_APPEND_DATA;
     nativeh.behaviour |= native_handle_type::disposition::writable | native_handle_type::disposition::append_only;
     break;
   }

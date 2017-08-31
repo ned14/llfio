@@ -39,6 +39,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 #define AFIO_STORAGE_PROFILE_TIME_DIVIDER 10
 
+// Work around buggy Windows scheduler
+//#define AFIO_STORAGE_PROFILE_PIN_THREADS
+
 AFIO_V2_NAMESPACE_BEGIN
 
 namespace storage_profile
@@ -801,6 +804,9 @@ namespace storage_profile
         for(size_t no = 0; no < nowriters; no++)
         {
           std::packaged_task<void()> task([no, &done, &workfiles, &results] {
+#ifdef AFIO_STORAGE_PROFILE_PIN_THREADS
+            SetThreadAffinityMask(GetCurrentThread(), 1ULL << (no * 2));
+#endif
             file_handle &h = *workfiles[no];
             alignas(4096) char buffer[4096];
             memset(buffer, (int) no, 4096);
@@ -831,6 +837,9 @@ namespace storage_profile
         for(size_t no = nowriters; no < nowriters + noreaders; no++)
         {
           std::packaged_task<void()> task([no, &done, &workfiles, &results] {
+#ifdef AFIO_STORAGE_PROFILE_PIN_THREADS
+            SetThreadAffinityMask(GetCurrentThread(), 1ULL << (no * 2));
+#endif
             file_handle &h = *workfiles[no];
             alignas(4096) char buffer[4096];
             memset(buffer, (int) no, 4096);
@@ -1047,6 +1056,9 @@ namespace storage_profile
     inline outcome<stats> _traversal_N(file_handle &srch, size_t no, size_t bytes, bool cold_cache, bool race_free, bool reduced) noexcept
     {
       stats s;
+#ifdef AFIO_STORAGE_PROFILE_PIN_THREADS
+      SetThreadAffinityMask(GetCurrentThread(), 1ULL << (no * 2));
+#endif
       try
       {
         directory_handle dirh(directory_handle::directory(srch.parent_path_handle().value(), "testdir", directory_handle::mode::write, directory_handle::creation::if_needed).value());

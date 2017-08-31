@@ -59,7 +59,7 @@ namespace key_value_store
   {
   public:
     maximum_writers_reached()
-        : std::runtime_error("64 writers have now opened the store, either open read-only or reduce the number of writers")
+        : std::runtime_error("48 writers have now opened the store, either open read-only or reduce the number of writers")
     {
     }
   };
@@ -120,10 +120,10 @@ namespace key_value_store
 
     struct index
     {
-      uint64_t magic;                             // versionmagic, currently "AFIOKV01" for valid, "DEADKV01" for requires repair
-      std::atomic<uint64_t> transaction_counter;  // top 16 bits are number of keys changed this transaction, bottom 48 bits are monotonic counter
-      std::atomic<bool> write_interrupted;        // Set just before an update, cleared after
-      std::atomic<bool> all_writes_synced;        // Set if all writers since the first which has opened this store did so with `O_SYNC` on (i.e. safe during fsck to check small file tails only)
+      uint64_t magic;                              // versionmagic, currently "AFIOKV01" for valid, "DEADKV01" for requires repair
+      std::atomic<uint64_t> transaction_counter;   // top 16 bits are number of keys changed this transaction, bottom 48 bits are monotonic counter
+      std::atomic<unsigned> writes_occurring[48];  // Incremented just before an update, decremented after, per writer
+      std::atomic<bool> all_writes_synced;         // Set if all writers since the first which has opened this store did so with `O_SYNC` on (i.e. safe during fsck to check small file tails only)
     };
 
     struct value_tail
@@ -144,8 +144,8 @@ namespace key_value_store
   {
     friend class transaction;
     afio::file_handle _indexfile;
-    afio::file_handle::extent_guard _indexfileguard, _smallfileguard;
     afio::file_handle _mysmallfile;  // append only
+    afio::file_handle::extent_guard _indexfileguard, _smallfileguard;
     size_t _mysmallfileidx{(size_t) -1};
     struct
     {
@@ -155,8 +155,8 @@ namespace key_value_store
     index::index *_indexheader{nullptr};
 
     static constexpr afio::file_handle::extent_type _indexinuseoffset = (afio::file_handle::extent_type) -1;
-    static constexpr const char *goodmagic = "AFIOKV01";
-    static constexpr const char *badmagic = "DEADKV01";
+    static constexpr uint64_t goodmagic = 0x3130564b4f494641;  // "AFIOKV01"
+    static constexpr uint64_t badmagic = 0x3130564b44414544;   // "DEADKV01"
 
     static size_t _pad_length(size_t length)
     {
@@ -169,7 +169,8 @@ namespace key_value_store
       {
         // Open the small files, choosing the first unclaimed small file as "mine"
         std::string name;
-        for(size_t n = 0; n < 64; n++)
+        _smallfiles.read.reserve(48);
+        for(size_t n = 0; n < 48; n++)
         {
           name = std::to_string(n);
           auto fh = afio::file_handle::file(dir, name, afio::file_handle::mode::read);
@@ -183,11 +184,21 @@ namespace key_value_store
               if(smallfileclaimed)
               {
                 _mysmallfile = afio::file_handle::file(dir, name, afio::file_handle::mode::append, afio::file_handle::creation::open_existing, caching).value();
-                _smallfileguard = std::move(smallfileclaimed).value();
-                _mysmallfileidx = n;
+                smallfileclaimed.value().unlock();
+                smallfileclaimed = _mysmallfile.try_lock(_indexinuseoffset, 1, true);
+                if(smallfileclaimed)
+                {
+                  _smallfileguard = std::move(smallfileclaimed).value();
+                  _mysmallfileidx = n;
+                }
+                else
+                {
+                  _mysmallfile.close().value();
+                }
               }
             }
             _smallfiles.read.push_back(std::move(fh).value());
+            continue;
           }
           else if(mode == afio::file_handle::mode::write && !_mysmallfile.is_valid())
           {
@@ -197,11 +208,9 @@ namespace key_value_store
             {
               goto retry;
             }
+            continue;
           }
-          else
-          {
-            break;
-          }
+          break;
         }
         if(mode == afio::file_handle::mode::write && !_mysmallfile.is_valid())
         {
@@ -214,11 +223,21 @@ namespace key_value_store
         len /= sizeof(index::open_hash_index::value_type);
         size_t offset = sizeof(index::index);
         _index.emplace(sh, len, offset);
-        _indexheader = reinterpret_cast<index::index *>(_index->container().data() - offset);
+        _indexheader = reinterpret_cast<index::index *>((char *) _index->container().data() - offset);
+        if(_indexheader->writes_occurring[_mysmallfileidx] != 0)
+        {
+          _indexheader->magic = badmagic;
+          throw corrupted_store();
+        }
       }
     }
 
   public:
+    basic_key_value_store(const basic_key_value_store &) = delete;
+    basic_key_value_store(basic_key_value_store &&) = delete;
+    basic_key_value_store &operator=(const basic_key_value_store &) = delete;
+    basic_key_value_store &operator=(basic_key_value_store &&) = delete;
+
     basic_key_value_store(const afio::path_handle &dir, size_t hashtableentries, afio::file_handle::mode mode = afio::file_handle::mode::write, afio::file_handle::caching caching = afio::file_handle::caching::temporary)
         : _indexfile(afio::file_handle::file(dir, "index", mode, (mode == afio::file_handle::mode::write) ? afio::file_handle::creation::if_needed : afio::file_handle::creation::open_existing, caching).value())
     {
@@ -234,7 +253,7 @@ namespace key_value_store
             afio::file_handle::extent_type size = sizeof(index::index) + (hashtableentries) * sizeof(index::open_hash_index::value_type);
             size = afio::utils::round_up_to_page_size(size);
             _indexfile.truncate(size).value();
-            _indexfile.write(0, goodmagic, 8).value();
+            _indexfile.write(0, (const char *) &goodmagic, 8).value();
           }
           else
           {
@@ -246,10 +265,10 @@ namespace key_value_store
             */
             //_openfiles(dir, writable);
           }
-          // Reset write_interrupted and all_writes_synced
+          // Reset writes_occurring and all_writes_synced
           index::index i;
           _indexfile.read(0, (char *) &i, sizeof(i)).value();
-          i.write_interrupted = false;
+          memset(i.writes_occurring, 0, sizeof(i.writes_occurring));
           i.all_writes_synced = _indexfile.are_writes_durable();
           _indexfile.write(0, (char *) &i, sizeof(i)).value();
         }
@@ -259,9 +278,9 @@ namespace key_value_store
       {
         char buffer[8];
         _indexfile.read(0, buffer, 8).value();
-        if(!strncmp(buffer, badmagic, 8))
+        if(!memcmp(buffer, &badmagic, 8))
           throw corrupted_store();
-        if(strncmp(buffer, goodmagic, 8))
+        if(memcmp(buffer, &goodmagic, 8))
           throw unknown_store();
       }
       // Open our smallfiles and map our index for shared usage
@@ -276,7 +295,7 @@ namespace key_value_store
     }
     //! \overload
     basic_key_value_store(const afio::path_view &dir, size_t hashtableentries, afio::file_handle::mode mode = afio::file_handle::mode::write, afio::file_handle::caching caching = afio::file_handle::caching::temporary)
-        : basic_key_value_store(afio::path_handle::path(dir).value(), hashtableentries, mode, caching)
+        : basic_key_value_store(afio::directory_handle::directory({}, dir, afio::directory_handle::mode::write, afio::directory_handle::creation::if_needed).value(), hashtableentries, mode, caching)
     {
     }
     //! Opens the store for read only access
@@ -313,8 +332,13 @@ namespace key_value_store
       //! When this value was last modified
       uint64_t transaction_counter;
 
-      keyvalue_info(keyvalue_info &&) = default;
-      keyvalue_info &operator=(keyvalue_info &&) = default;
+      keyvalue_info(keyvalue_info &&o) noexcept : key(std::move(o.key)), value(std::move(o.value)), transaction_counter(std::move(o.transaction_counter)), _value_buffer(std::move(o._value_buffer)), _value_view(std::move(o._value_view)) { o._value_buffer = nullptr; }
+      keyvalue_info &operator=(keyvalue_info &&o) noexcept
+      {
+        this->~keyvalue_info();
+        new(this) keyvalue_info(std::move(o));
+        return *this;
+      }
       ~keyvalue_info()
       {
         if(_value_buffer != nullptr)
@@ -323,9 +347,17 @@ namespace key_value_store
         }
       }
 
+      //! True if this info contains a valid value
+      explicit operator bool() const noexcept { return transaction_counter != (uint64_t) -1; }
+
     private:
       keyvalue_info()
           : key(0)
+          , transaction_counter((uint64_t) -1)
+      {
+      }
+      keyvalue_info(key_type _key)
+          : key(_key)
           , transaction_counter((uint64_t) -1)
       {
       }
@@ -342,17 +374,19 @@ namespace key_value_store
     //! Retrieve the latest value for a key
     keyvalue_info find(key_type key, size_t revision = 0)
     {
+      if(_indexheader->magic != goodmagic)
+        throw corrupted_store();
       auto it = _index->find_shared(key);
       if(it == _index->end())
       {
-        return {};
+        return keyvalue_info(key);
       }
       else
       {
         // TODO Depending on length, make a mapped_view instead
         const auto &item = it->second.history[revision];
         size_t length = item.length, smallfilelength = _pad_length(length);
-        char *buffer = (char *) malloc(length);
+        char *buffer = (char *) malloc(smallfilelength);
         if(!buffer)
         {
           throw std::bad_alloc();
@@ -401,8 +435,8 @@ namespace key_value_store
 
   public:
     //! Start a new transaction
-    explicit transaction(basic_key_value_store *parent)
-        : _parent(parent)
+    explicit transaction(basic_key_value_store &parent)
+        : _parent(&parent)
     {
     }
     transaction(const transaction &) = delete;
@@ -443,6 +477,9 @@ namespace key_value_store
     //! Commit the transaction, throwing `transaction_aborted` if a key's value was updated since it was fetched for this transaction.
     void commit()
     {
+      if(_parent->_indexheader->magic != _parent->goodmagic)
+        throw corrupted_store();
+
       // Firstly sort the list of keys we are to update into order. This ensures that all
       // writers always lock the keys in the same order, thus preventing deadlock.
       std::sort(_items.begin(), _items.end(), [](const _item &a, const _item &b) { return a.kvi.key < b.kvi.key; });
@@ -495,6 +532,7 @@ namespace key_value_store
         if(item.towrite.has_value())
         {
           vt->key = item.kvi.key;
+          vt->transaction_counter = this_transaction_counter;
           vt->length = item.towrite->size();
           // TODO: Hash contents
           size_t totalwrite = _parent->_pad_length(vt->length);
@@ -504,7 +542,7 @@ namespace key_value_store
           _parent->_mysmallfile.write({reqs, 0}).value();
           index::value_history::item history_item;
           history_item.transaction_counter = this_transaction_counter;
-          history_item.value_offset = value_offset / 64;
+          history_item.value_offset = (value_offset + totalwrite) / 64;
           history_item.value_identifier = _parent->_mysmallfileidx;
           history_item.length = vt->length;
           toupdate.emplace_back(vt->key, item.kvi.transaction_counter, history_item, index::open_hash_index::iterator{});
@@ -528,12 +566,27 @@ namespace key_value_store
       }
 
       // Update all the values we are updating this transaction
+      if(_parent->_indexheader->magic != _parent->goodmagic)
+        throw corrupted_store();
+      _parent->_indexheader->writes_occurring[_parent->_mysmallfileidx].fetch_add(1);
       for(auto &item : toupdate)
       {
-        auto &indexitem = std::get<3>(item)->second;
-        memmove(indexitem.history + 1, indexitem.history, sizeof(indexitem.history) / sizeof(indexitem.history[0]) - 1);
-        indexitem.history[0] = std::get<2>(item);
+        auto &it = std::get<3>(item);
+        if(it == _parent->_index->end())
+        {
+          index::value_history vh;
+          memset(&vh, 0, sizeof(vh));
+          vh.history[0] = std::get<2>(item);
+          _parent->_index->insert({std::get<0>(item), std::move(vh)});
+        }
+        else
+        {
+          auto &indexitem = it->second;
+          memmove(indexitem.history + 1, indexitem.history, sizeof(indexitem.history) / sizeof(indexitem.history[0]) - 1);
+          indexitem.history[0] = std::get<2>(item);
+        }
       }
+      _parent->_indexheader->writes_occurring[_parent->_mysmallfileidx].fetch_sub(1);
     }
   };
 }
