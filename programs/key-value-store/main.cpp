@@ -93,7 +93,7 @@ int main()
     std::cout << "\nGenerating 1M key-value pairs ..." << std::endl;
     for(size_t n = 0; n < 1000000; n++)
     {
-      std::string randomvalue = AFIO_V2_NAMESPACE::utils::random_string(1024);
+      std::string randomvalue = AFIO_V2_NAMESPACE::utils::random_string(1024 / 2);
       values.push_back({100 + n, randomvalue});
     }
     std::cout << "Inserting 1M key-value pairs ..." << std::endl;

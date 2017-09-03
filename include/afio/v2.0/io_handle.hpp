@@ -179,6 +179,22 @@ public:
   //! Move assignment permitted
   io_handle &operator=(io_handle &&) = default;
 
+  /*! \brief The *maximum* number of buffers which a single read or write syscall can process at a time
+  for this specific open handle. On POSIX, this is known as `IOV_MAX`.
+
+  Note that the actual number of buffers accepted for a read or a write may be significantly
+  lower than this system-defined limit, depending on available resources. The `read()` or `write()`
+  call will return the buffers accepted.
+
+  Note also that some OSs will error out if you supply more than this limit to `read()` or `write()`,
+  but other OSs do not. Some OSs guarantee that each i/o syscall has effects atomically visible or not
+  to other i/o, other OSs do not.
+
+  Microsoft Windows does not implement scatter-gather file i/o syscalls except for unbuffered i/o.
+  Thus this function will always return `1` in that situation.
+  */
+  AFIO_HEADERS_ONLY_VIRTUAL_SPEC size_t max_buffers() const noexcept;
+
   /*! \brief Read data from the open handle.
 
   \warning Depending on the implementation backend, **very** different buffers may be returned than you

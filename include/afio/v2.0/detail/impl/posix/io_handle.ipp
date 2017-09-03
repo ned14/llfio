@@ -34,6 +34,25 @@ Distributed under the Boost Software License, Version 1.0.
 
 AFIO_V2_NAMESPACE_BEGIN
 
+size_t io_handle::max_buffers() const noexcept
+{
+  static size_t v;
+  if(!v)
+  {
+    long r = sysconf(_SC_IOV_MAX);
+    if(r == -1)
+    {
+#ifdef IOV_MAX
+      r = IOV_MAX;
+#else
+      r = 1;
+#endif
+    }
+    v = r;
+  }
+  return v;
+}
+
 io_handle::io_result<io_handle::buffers_type> io_handle::read(io_handle::io_request<io_handle::buffers_type> reqs, deadline d) noexcept
 {
   AFIO_LOG_FUNCTION_CALL(this);

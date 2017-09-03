@@ -27,6 +27,11 @@ Distributed under the Boost Software License, Version 1.0.
 
 AFIO_V2_NAMESPACE_BEGIN
 
+size_t io_handle::max_buffers() const noexcept
+{
+  return 1;  // async_file_handle may override this virtual function
+}
+
 template <class BuffersType, class Syscall> inline io_handle::io_result<BuffersType> do_read_write(const native_handle_type &nativeh, Syscall &&syscall, io_handle::io_request<BuffersType> reqs, deadline d) noexcept
 {
   if(d && !nativeh.is_overlapped())

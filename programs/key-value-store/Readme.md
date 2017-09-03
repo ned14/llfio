@@ -10,7 +10,7 @@ anything serious.
 - [ ] Add sparse file creation on Windows to AFIO and see how the
 benchmarks fare.
 - [x] Add key-value deletion.
-- [ ] Atomic append should issue gather buffers of `IOV_MAX`
+- [x] Atomic append should issue gather buffers of `IOV_MAX`
 - [ ] Optionally use mmaps to extend smallfile instead of atomic appends.
 Likely highly racy on Linux due to kernel bugs :)
 - [ ] Online free space consolidation (copy early still in use records
@@ -23,14 +23,14 @@ index update.
 - 1Kb values Windows with NTFS, no integrity, no durability:
   ```
   Inserting 1M key-value pairs ...
-  Inserted at 125596 items per sec
+  Inserted at 168435 items per sec
   Retrieving 1M key-value pairs ...
-  Fetched at 524934 items per sec
+  Fetched at 612745 items per sec
   ```
 - 64 byte values Windows with NTFS, no integrity, no durability:
   ```
   Inserting 1M key-value pairs ...
-  Inserted at 247402 items per sec
+  Inserted at 259201 items per sec
   Retrieving 1M key-value pairs ...
   Fetched at 700770 items per sec
   ```

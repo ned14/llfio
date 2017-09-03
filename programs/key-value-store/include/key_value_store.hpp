@@ -168,8 +168,8 @@ namespace key_value_store
     index::index *_indexheader{nullptr};
 
     static constexpr afio::file_handle::extent_type _indexinuseoffset = (afio::file_handle::extent_type) -1;
-    static constexpr uint64_t goodmagic = 0x3130564b4f494641;  // "AFIOKV01"
-    static constexpr uint64_t badmagic = 0x3130564b44414544;   // "DEADKV01"
+    static constexpr uint64_t _goodmagic = 0x3130564b4f494641;  // "AFIOKV01"
+    static constexpr uint64_t _badmagic = 0x3130564b44414544;   // "DEADKV01"
 
     static size_t _pad_length(size_t length)
     {
@@ -239,7 +239,7 @@ namespace key_value_store
         _indexheader = reinterpret_cast<index::index *>((char *) _index->container().data() - offset);
         if(_indexheader->writes_occurring[_mysmallfileidx] != 0)
         {
-          _indexheader->magic = badmagic;
+          _indexheader->magic = _badmagic;
           throw corrupted_store();
         }
       }
@@ -266,6 +266,7 @@ namespace key_value_store
             afio::file_handle::extent_type size = sizeof(index::index) + (hashtableentries) * sizeof(index::open_hash_index::value_type);
             size = afio::utils::round_up_to_page_size(size);
             _indexfile.truncate(size).value();
+            auto goodmagic = _goodmagic;
             _indexfile.write(0, (const char *) &goodmagic, 8).value();
           }
           else
@@ -295,6 +296,8 @@ namespace key_value_store
       {
         char buffer[8];
         _indexfile.read(0, buffer, 8).value();
+        auto goodmagic = _goodmagic;
+        auto badmagic = _badmagic;
         if(!memcmp(buffer, &badmagic, 8))
           throw corrupted_store();
         if(memcmp(buffer, &goodmagic, 8))
@@ -406,7 +409,7 @@ namespace key_value_store
     //! Retrieve the latest value for a key. May throw `corrupted_store`
     keyvalue_info find(key_type key, size_t revision = 0)
     {
-      if(_indexheader->magic != goodmagic)
+      if(_indexheader->magic != _goodmagic)
         throw corrupted_store();
       if(revision >= 4)
         throw std::invalid_argument("valid revision is 0-3");
@@ -446,23 +449,23 @@ namespace key_value_store
           uint128 thishash = QUICKCPPLIB_NAMESPACE::algorithm::hash::fast_hash::hash(buffer, _indexheader->contents_hashed ? smallfilelength : length);
           if(tocheck != thishash)
           {
-            _indexheader->magic = badmagic;
+            _indexheader->magic = _badmagic;
             throw corrupted_store();
           }
         }
         if(vt->key != key)
         {
-          _indexheader->magic = badmagic;
+          _indexheader->magic = _badmagic;
           throw corrupted_store();
         }
         if(vt->length != length)
         {
-          _indexheader->magic = badmagic;
+          _indexheader->magic = _badmagic;
           throw corrupted_store();
         }
         if(vt->transaction_counter != item.transaction_counter)
         {
-          _indexheader->magic = badmagic;
+          _indexheader->magic = _badmagic;
           throw corrupted_store();
         }
         return keyvalue_info(key, span<char>(buffer, length), item.transaction_counter);
@@ -588,7 +591,7 @@ namespace key_value_store
     //! Commit the transaction, throwing `transaction_aborted` if a key's value was updated since it was fetched for this transaction.
     void commit()
     {
-      if(_parent->_indexheader->magic != _parent->goodmagic)
+      if(_parent->_indexheader->magic != _parent->_goodmagic)
         throw corrupted_store();
 
       // Firstly remove any items fetched but not used as a base for an update, and sort the remaining
@@ -646,51 +649,58 @@ namespace key_value_store
         toupdate.emplace_back(item.kvi.key, item.kvi.transaction_counter, insertion, update, removal);
       }
       // Atomically increment the transaction counter to set this latest transaction
-      uint64_t old_transaction_counter;
-      union {
-        struct
-        {
-          uint64_t values_updated : 16;
-          uint64_t counter : 48;
-        };
-        uint64_t this_transaction_counter;
-      };
-      do
+      uint64_t this_transaction_counter = 0;
       {
-        this_transaction_counter = old_transaction_counter = _parent->_indexheader->transaction_counter.load(std::memory_order_acquire);
-        // Increment bottom 48 bits, letting it wrap if necessary
-        counter++;
-        values_updated = _items.size();
-      } while(!_parent->_indexheader->transaction_counter.compare_exchange_weak(old_transaction_counter, this_transaction_counter, std::memory_order_release, std::memory_order_relaxed));
+        uint64_t old_transaction_counter;
+        union {
+          struct
+          {
+            uint64_t values_updated : 16;
+            uint64_t counter : 48;
+          };
+          uint64_t this_transaction_counter;
+        } _;
+        do
+        {
+          _.this_transaction_counter = old_transaction_counter = _parent->_indexheader->transaction_counter.load(std::memory_order_acquire);
+          // Increment bottom 48 bits, letting it wrap if necessary
+          _.counter++;
+          _.values_updated = _items.size();
+        } while(!_parent->_indexheader->transaction_counter.compare_exchange_weak(old_transaction_counter, _.this_transaction_counter, std::memory_order_release, std::memory_order_relaxed));
+        this_transaction_counter = _.this_transaction_counter;
+      }
 
       // Gather append write all my items to my smallfile
-      char buffer[128];
-      memset(buffer, 0, sizeof(buffer));
-      index::value_tail *vt = reinterpret_cast<index::value_tail *>(buffer + sizeof(buffer) - sizeof(index::value_tail));
-      afio::file_handle::extent_type value_offset = _parent->_mysmallfile.length().value();
-      for(size_t n = 0; n < _items.size(); n++)
       {
-        toupdate_type &thisupdate = toupdate[n];
-        if(thisupdate.insertion || thisupdate.update || thisupdate.removal)
+        afio::file_handle::extent_type value_offset = _parent->_mysmallfile.length().value();
+        assert((value_offset % 64) == 0);
+        // POSIX guarantees that at least 16 gather buffers can be written in a single shot
+        std::vector<afio::file_handle::const_buffer_type> reqs;
+        reqs.reserve(16);
+        // With tails, that's eight items per syscall
+        char tailbuffers[8][128];
+        memset(tailbuffers, 0, sizeof(tailbuffers));
+        for(size_t n = 0; n < _items.size(); n++)
         {
+          char *tailbuffer = tailbuffers[n % 8];
+          index::value_tail *vt = reinterpret_cast<index::value_tail *>(tailbuffer + 128 - sizeof(index::value_tail));
+          toupdate_type &thisupdate = toupdate[n];
           const transaction::_item &item = _items[n];
           vt->key = thisupdate.key;
           vt->transaction_counter = this_transaction_counter;
           size_t totalwrite = 0;
           if(thisupdate.removal)
           {
-            vt->length = (uint64_t) -1;
+            vt->length = (uint64_t) -1;  // this key is being deleted
             totalwrite = 64;
-            size_t tailbytes = 64;
-            afio::file_handle::const_buffer_type reqs[] = {{buffer + sizeof(buffer) - tailbytes, tailbytes}};
+            reqs.push_back({tailbuffer + 64, 64});
             if(_parent->_indexheader->contents_hashed)
             {
               QUICKCPPLIB_NAMESPACE::algorithm::hash::fast_hash hasher;
               memset(&vt->hash, 0, sizeof(vt->hash));
-              hasher.add(reqs[0].data, reqs[0].len);
+              hasher.add(reqs.back().data, reqs.back().len);
               vt->hash = hasher.finalise();
             }
-            _parent->_mysmallfile.write({reqs, 0}).value();
             memset(&thisupdate.history_item, 0, sizeof(thisupdate.history_item));
           }
           else
@@ -698,17 +708,20 @@ namespace key_value_store
             vt->length = item.towrite->size();
             totalwrite = _parent->_pad_length(item.towrite->size());
             size_t tailbytes = totalwrite - item.towrite->size();
-            assert(tailbytes < sizeof(buffer));
-            afio::file_handle::const_buffer_type reqs[] = {{item.towrite->data(), item.towrite->size()}, {buffer + sizeof(buffer) - tailbytes, tailbytes}};
+            assert(tailbytes < 128);
+            reqs.push_back({item.towrite->data(), item.towrite->size()});
+            reqs.push_back({tailbuffer + 128 - tailbytes, tailbytes});
             if(_parent->_indexheader->contents_hashed)
             {
               QUICKCPPLIB_NAMESPACE::algorithm::hash::fast_hash hasher;
               memset(&vt->hash, 0, sizeof(vt->hash));
-              hasher.add(reqs[0].data, reqs[0].len);
-              hasher.add(reqs[1].data, reqs[1].len);
+              auto rit = reqs.end();
+              rit -= 2;
+              hasher.add(rit->data, rit->len);
+              ++rit;
+              hasher.add(rit->data, rit->len);
               vt->hash = hasher.finalise();
             }
-            _parent->_mysmallfile.write({reqs, 0}).value();
             index::value_history::item &history_item = thisupdate.history_item;
             history_item.transaction_counter = this_transaction_counter;
             history_item.value_offset = (value_offset + totalwrite) / 64;
@@ -716,13 +729,22 @@ namespace key_value_store
             history_item.length = vt->length;
           }
           value_offset += totalwrite;
+          if((n % 8) == 7)
+          {
+            _parent->_mysmallfile.write({reqs, 0}).value();
+            reqs.clear();
+          }
+        }
+        if(!reqs.empty())
+        {
+          _parent->_mysmallfile.write({reqs, 0}).value();
         }
       }
 
       // Release all the shared locks on the existing items we are about to update
       shared_locks.clear();
       // Bail out if store has become corrupted
-      if(_parent->_indexheader->magic != _parent->goodmagic)
+      if(_parent->_indexheader->magic != _parent->_goodmagic)
         throw corrupted_store();
       // Remove any newly inserted keys if we abort
       auto removeinserted = undoer([this, &toupdate] {
@@ -766,7 +788,7 @@ namespace key_value_store
         item.it = std::move(it);
       }
 
-      if(_parent->_indexheader->magic != _parent->goodmagic)
+      if(_parent->_indexheader->magic != _parent->_goodmagic)
         throw corrupted_store();
       // Finally actually perform the update as quickly as possible to reduce the
       // possibility of a partially issued update which is expensive to repair.
