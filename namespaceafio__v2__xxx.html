@@ -837,9 +837,9 @@ For portability, you can only assume that barriers write order for a single hand
 </dl>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX fdatasync() or Windows NtFlushBuffersFileEx() can return. </dd></dl>
 <dl class="section user"><dt>Memory Allocations</dt><dd>None. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00507"></a><span class="lineno">  507</span>&#160;{</div>
-<div class="line"><a name="l00508"></a><span class="lineno">  508</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.barrier(std::forward&lt;decltype(reqs)&gt;(reqs), std::forward&lt;decltype(wait_for_device)&gt;(wait_for_device), std::forward&lt;decltype(and_metadata)&gt;(and_metadata), std::forward&lt;decltype(d)&gt;(d));</div>
-<div class="line"><a name="l00509"></a><span class="lineno">  509</span>&#160;}</div>
+<div class="fragment"><div class="line"><a name="l00523"></a><span class="lineno">  523</span>&#160;{</div>
+<div class="line"><a name="l00524"></a><span class="lineno">  524</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.barrier(std::forward&lt;decltype(reqs)&gt;(reqs), std::forward&lt;decltype(wait_for_device)&gt;(wait_for_device), std::forward&lt;decltype(and_metadata)&gt;(and_metadata), std::forward&lt;decltype(d)&gt;(d));</div>
+<div class="line"><a name="l00525"></a><span class="lineno">  525</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1403,9 +1403,9 @@ For portability, you can only assume that barriers write order for a single hand
 </dl>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX read() can return, <code>errc::timed_out</code>, <code>errc::operation_canceled</code>. <code>errc::not_supported</code> may be returned if deadline i/o is not possible with this particular handle configuration (e.g. reading from regular files on POSIX or reading from a non-overlapped HANDLE on Windows). </dd></dl>
 <dl class="section user"><dt>Memory Allocations</dt><dd>The default synchronous implementation in file_handle performs no memory allocation. The asynchronous implementation in async_file_handle performs one calloc and one free. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00448"></a><span class="lineno">  448</span>&#160;{</div>
-<div class="line"><a name="l00449"></a><span class="lineno">  449</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.read(std::forward&lt;decltype(reqs)&gt;(reqs), std::forward&lt;decltype(d)&gt;(d));</div>
-<div class="line"><a name="l00450"></a><span class="lineno">  450</span>&#160;}</div>
+<div class="fragment"><div class="line"><a name="l00464"></a><span class="lineno">  464</span>&#160;{</div>
+<div class="line"><a name="l00465"></a><span class="lineno">  465</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.read(std::forward&lt;decltype(reqs)&gt;(reqs), std::forward&lt;decltype(d)&gt;(d));</div>
+<div class="line"><a name="l00466"></a><span class="lineno">  466</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1985,63 +1985,6 @@ For portability, you can only assume that barriers write order for a single hand
 </div><!-- fragment -->
 </div>
 </div>
-<a class="anchor" id="a2d15768d28ea660ebe44901508ed3372"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="structafio__v2__xxx_1_1io__handle_1_1io__result.html">io_handle::io_result</a>&lt;<a class="el" href="classafio__v2__xxx_1_1io__handle.html#a639b8760b1b98df95e4956f6cc56f6b5">io_handle::const_buffers_type</a>&gt; afio_v2_xxx::write </td>
-          <td>(</td>
-          <td class="paramtype">io_handle &amp;&#160;</td>
-          <td class="paramname"><em>self</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">io_handle::io_request&lt; io_handle::const_buffers_type &gt;&#160;</td>
-          <td class="paramname"><em>reqs</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">deadline&#160;</td>
-          <td class="paramname"><em>d</em> = <code>deadline()</code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Write data to the open handle. </p>
-<dl class="section warning"><dt>Warning</dt><dd>Depending on the implementation backend, not all of the buffers input may be written and the some buffers at the end of the returned buffers may return with zero bytes written. For example, with a zeroed deadline, some backends may only consume as many buffers as the system has available write slots for, thus for those backends this call is "non-blocking" in the sense that it will return immediately even if it could not schedule a single buffer write.</dd></dl>
-<dl class="section return"><dt>Returns</dt><dd>The buffers written, which may not be the buffers input. The size of each scatter-gather buffer is updated with the number of bytes of that buffer transferred. </dd></dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">self</td><td>The object whose member function to call. </td></tr>
-    <tr><td class="paramname">reqs</td><td>A scatter-gather and offset request. </td></tr>
-    <tr><td class="paramname">d</td><td>An optional deadline by which the i/o must complete, else it is cancelled. Note function may return significantly after this deadline if the i/o takes long to cancel. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX write() can return, <code>errc::timed_out</code>, <code>errc::operation_canceled</code>. <code>errc::not_supported</code> may be returned if deadline i/o is not possible with this particular handle configuration (e.g. writing to regular files on POSIX or writing to a non-overlapped HANDLE on Windows). </dd></dl>
-<dl class="section user"><dt>Memory Allocations</dt><dd>The default synchronous implementation in file_handle performs no memory allocation. The asynchronous implementation in async_file_handle performs one calloc and one free. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00472"></a><span class="lineno">  472</span>&#160;{</div>
-<div class="line"><a name="l00473"></a><span class="lineno">  473</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.write(std::forward&lt;decltype(reqs)&gt;(reqs), std::forward&lt;decltype(d)&gt;(d));</div>
-<div class="line"><a name="l00474"></a><span class="lineno">  474</span>&#160;}</div>
-</div><!-- fragment -->
-</div>
-</div>
 <a class="anchor" id="a5bfae365a1845c1bde4739de38c3653f"></a>
 <div class="memitem">
 <div class="memproto">
@@ -2095,6 +2038,63 @@ For portability, you can only assume that barriers write order for a single hand
 <div class="fragment"><div class="line"><a name="l00478"></a><span class="lineno">  478</span>&#160;{</div>
 <div class="line"><a name="l00479"></a><span class="lineno">  479</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.write(std::forward&lt;decltype(reqs)&gt;(reqs), std::forward&lt;decltype(d)&gt;(d));</div>
 <div class="line"><a name="l00480"></a><span class="lineno">  480</span>&#160;}</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a class="anchor" id="a2d15768d28ea660ebe44901508ed3372"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structafio__v2__xxx_1_1io__handle_1_1io__result.html">io_handle::io_result</a>&lt;<a class="el" href="classafio__v2__xxx_1_1io__handle.html#a639b8760b1b98df95e4956f6cc56f6b5">io_handle::const_buffers_type</a>&gt; afio_v2_xxx::write </td>
+          <td>(</td>
+          <td class="paramtype">io_handle &amp;&#160;</td>
+          <td class="paramname"><em>self</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">io_handle::io_request&lt; io_handle::const_buffers_type &gt;&#160;</td>
+          <td class="paramname"><em>reqs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">deadline&#160;</td>
+          <td class="paramname"><em>d</em> = <code>deadline()</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Write data to the open handle. </p>
+<dl class="section warning"><dt>Warning</dt><dd>Depending on the implementation backend, not all of the buffers input may be written and the some buffers at the end of the returned buffers may return with zero bytes written. For example, with a zeroed deadline, some backends may only consume as many buffers as the system has available write slots for, thus for those backends this call is "non-blocking" in the sense that it will return immediately even if it could not schedule a single buffer write.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The buffers written, which may not be the buffers input. The size of each scatter-gather buffer is updated with the number of bytes of that buffer transferred. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">self</td><td>The object whose member function to call. </td></tr>
+    <tr><td class="paramname">reqs</td><td>A scatter-gather and offset request. </td></tr>
+    <tr><td class="paramname">d</td><td>An optional deadline by which the i/o must complete, else it is cancelled. Note function may return significantly after this deadline if the i/o takes long to cancel. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX write() can return, <code>errc::timed_out</code>, <code>errc::operation_canceled</code>. <code>errc::not_supported</code> may be returned if deadline i/o is not possible with this particular handle configuration (e.g. writing to regular files on POSIX or writing to a non-overlapped HANDLE on Windows). </dd></dl>
+<dl class="section user"><dt>Memory Allocations</dt><dd>The default synchronous implementation in file_handle performs no memory allocation. The asynchronous implementation in async_file_handle performs one calloc and one free. </dd></dl>
+<div class="fragment"><div class="line"><a name="l00488"></a><span class="lineno">  488</span>&#160;{</div>
+<div class="line"><a name="l00489"></a><span class="lineno">  489</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.write(std::forward&lt;decltype(reqs)&gt;(reqs), std::forward&lt;decltype(d)&gt;(d));</div>
+<div class="line"><a name="l00490"></a><span class="lineno">  490</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
