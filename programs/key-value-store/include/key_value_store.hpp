@@ -181,6 +181,14 @@ namespace key_value_store
     }
     void _openfiles(const afio::path_handle &dir, afio::file_handle::mode mode, afio::file_handle::caching caching)
     {
+      const afio::file_handle::mode smallfilemode = 
+#ifdef _WIN32
+          afio::file_handle::mode::read
+#else
+          // Linux won't allow taking an exclusive lock on a read only file
+          afio::file_handle::mode::write
+#endif
+      ;
       if(_smallfiles.read.empty())
       {
         // Open the small files, choosing the first unclaimed small file as "mine"
@@ -189,10 +197,11 @@ namespace key_value_store
         for(size_t n = 0; n < 48; n++)
         {
           name = std::to_string(n);
-          auto fh = afio::file_handle::file(dir, name, afio::file_handle::mode::read);
+          auto fh = afio::file_handle::file(dir, name, smallfilemode);
           if(fh)
           {
-          retry:
+        retry:
+            bool claimed=false;
             if(mode == afio::file_handle::mode::write && !_mysmallfile.is_valid())
             {
               // Try to claim this small file
@@ -200,26 +209,23 @@ namespace key_value_store
               if(smallfileclaimed)
               {
                 _mysmallfile = afio::file_handle::file(dir, name, afio::file_handle::mode::append, afio::file_handle::creation::open_existing, caching).value();
-                smallfileclaimed.value().unlock();
-                smallfileclaimed = _mysmallfile.try_lock(_indexinuseoffset, 1, true);
-                if(smallfileclaimed)
-                {
-                  _smallfileguard = std::move(smallfileclaimed).value();
-                  _mysmallfileidx = n;
-                }
-                else
-                {
-                  _mysmallfile.close().value();
-                }
+                _smallfileguard = std::move(smallfileclaimed).value();
+                _mysmallfileidx = n;
+                _smallfiles.read.push_back(std::move(fh).value());
+                _smallfileguard.set_handle(&_smallfiles.read.back());
+                claimed=true;
               }
             }
-            _smallfiles.read.push_back(std::move(fh).value());
+            if(!claimed)
+            {
+              _smallfiles.read.push_back(std::move(fh).value());
+            }
             continue;
           }
           else if(mode == afio::file_handle::mode::write && !_mysmallfile.is_valid())
           {
             // Going to need a new smallfile
-            fh = afio::file_handle::file(dir, name, afio::file_handle::mode::read, afio::file_handle::creation::only_if_not_exist, caching);
+            fh = afio::file_handle::file(dir, name, smallfilemode, afio::file_handle::creation::only_if_not_exist, caching);
             if(fh)
             {
               goto retry;

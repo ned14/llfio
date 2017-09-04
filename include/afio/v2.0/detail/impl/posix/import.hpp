@@ -56,7 +56,7 @@ inline result<int> attribs_from_handle_mode_caching_and_flags(native_handle_type
     nativeh.behaviour |= native_handle_type::disposition::seekable | native_handle_type::disposition::readable | native_handle_type::disposition::writable;
     break;
   case handle::mode::append:
-    attribs = O_APPEND;
+    attribs = O_WRONLY | O_APPEND;
     nativeh.behaviour |= native_handle_type::disposition::writable | native_handle_type::disposition::append_only;
     break;
   }
