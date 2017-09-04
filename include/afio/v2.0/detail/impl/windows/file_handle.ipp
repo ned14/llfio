@@ -116,6 +116,7 @@ result<file_handle> file_handle::file(const path_handle &base, file_handle::path
   DWORD fileshare = FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE;
   OUTCOME_TRY(access, access_mask_from_handle_mode(nativeh, _mode, flags));
   OUTCOME_TRY(attribs, attributes_from_handle_caching_and_flags(nativeh, _caching, flags));
+  bool need_to_set_sparse = false;
   if(base.is_valid() || path.is_ntpath())
   {
     DWORD creatdisp = 0x00000001 /*FILE_OPEN*/;
@@ -168,6 +169,21 @@ result<file_handle> file_handle::file(const path_handle &base, file_handle::path
     {
       return {(int) ntstat, ntkernel_category()};
     }
+    switch(_creation)
+    {
+    case creation::open_existing:
+      need_to_set_sparse = false;
+      break;
+    case creation::only_if_not_exist:
+      need_to_set_sparse = true;
+      break;
+    case creation::if_needed:
+      need_to_set_sparse = (isb.Information == 2 /*FILE_CREATED*/);
+      break;
+    case creation::truncate:
+      need_to_set_sparse = true;
+      break;
+    }
   }
   else
   {
@@ -193,6 +209,21 @@ result<file_handle> file_handle::file(const path_handle &base, file_handle::path
       // assert(false);
       return {(int) errcode, std::system_category()};
     }
+    switch(_creation)
+    {
+    case creation::open_existing:
+      need_to_set_sparse = false;
+      break;
+    case creation::only_if_not_exist:
+      need_to_set_sparse = true;
+      break;
+    case creation::if_needed:
+      need_to_set_sparse = (GetLastError() == ERROR_ALREADY_EXISTS);
+      break;
+    case creation::truncate:
+      need_to_set_sparse = true;
+      break;
+    }
   }
   if(!(flags & flag::disable_safety_unlinks))
   {
@@ -200,6 +231,20 @@ result<file_handle> file_handle::file(const path_handle &base, file_handle::path
     {
       // If fetching inode failed e.g. were opening device, disable safety unlinks
       ret.value()._flags &= ~flag::disable_safety_unlinks;
+    }
+  }
+  if(need_to_set_sparse && !(flags & flag::win_disable_sparse_file_creation))
+  {
+    DWORD bytesout = 0;
+    FILE_SET_SPARSE_BUFFER fssb = {true};
+    if(!DeviceIoControl(nativeh.h, FSCTL_SET_SPARSE, &fssb, sizeof(fssb), nullptr, 0, &bytesout, nullptr))
+    {
+#if AFIO_LOGGING_LEVEL >= 3
+      DWORD errcode = GetLastError();
+      AFIO_LOG_WARN(&ret, "Failed to set file to sparse");
+      result<void> r{errcode, std::system_category()};
+      (void) r;  // throw away
+#endif
     }
   }
   if(flags & flag::unlink_on_close)

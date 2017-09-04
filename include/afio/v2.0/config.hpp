@@ -41,7 +41,7 @@ Distributed under the Boost Software License, Version 1.0.
 #if !defined(AFIO_LOGGING_LEVEL)
 //! \brief How much detail to log. 0=disabled, 1=fatal, 2=error, 3=warn, 4=info, 5=debug, 6=all.
 //! Defaults to error level. \ingroup config
-#define AFIO_LOGGING_LEVEL 2  // error
+#define AFIO_LOGGING_LEVEL 3  // warn
 #endif
 
 #ifndef AFIO_LOG_TO_OSTREAM

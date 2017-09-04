@@ -135,6 +135,22 @@ public:
     disable_safety_unlinks = 1 << 3,
 
     win_disable_unlink_emulation = 1 << 24,  //!< See the documentation for `unlink_on_close`
+    /*! Microsoft Windows NTFS, having been created in the late 1980s, did not originally
+    implement extents-based storage and thus could only represent sparse files via
+    efficient compression of intermediate zeros. With NTFS v3.0 (Microsoft Windows 2000),
+    a proper extents-based on-storage representation was added, thus allowing only 64Kb
+    extent chunks written to be stored irrespective of whatever the maximum file extent
+    was set to.
+
+    For various historical reasons, extents-based storage is disabled by default in newly
+    created files on NTFS, unlike in almost every other major filing system. You have to
+    explicitly "opt in" to extents-based storage.
+
+    As extents-based storage is nearly cost free on NTFS, AFIO by default opts in to
+    extents-based storage for any empty file it creates. If you don't want this, you
+    can specify this flag to prevent that happening.
+    */
+    win_disable_sparse_file_creation = 1 << 25,
 
     // NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!
 

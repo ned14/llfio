@@ -169,6 +169,8 @@ namespace key_value_store
     } _smallfiles;
     optional<index::open_hash_index> _index;
     index::index *_indexheader{nullptr};
+    std::mutex _commitlock;
+    bool _use_mmaps_for_commit{false};
 
     static constexpr afio::file_handle::extent_type _indexinuseoffset = (afio::file_handle::extent_type) -1;
     static constexpr uint64_t _goodmagic = 0x3130564b4f494641;  // "AFIOKV01"
@@ -181,12 +183,12 @@ namespace key_value_store
     }
     void _openfiles(const afio::path_handle &dir, afio::file_handle::mode mode, afio::file_handle::caching caching)
     {
-      const afio::file_handle::mode smallfilemode = 
+      const afio::file_handle::mode smallfilemode =
 #ifdef _WIN32
-          afio::file_handle::mode::read
+      afio::file_handle::mode::read
 #else
-          // Linux won't allow taking an exclusive lock on a read only file
-          mode
+      // Linux won't allow taking an exclusive lock on a read only file
+      mode
 #endif
       ;
       if(_smallfiles.read.empty())
@@ -200,8 +202,8 @@ namespace key_value_store
           auto fh = afio::file_handle::file(dir, name, smallfilemode);
           if(fh)
           {
-        retry:
-            bool claimed=false;
+          retry:
+            bool claimed = false;
             if(mode == afio::file_handle::mode::write && !_mysmallfile.is_valid())
             {
               // Try to claim this small file
@@ -213,7 +215,7 @@ namespace key_value_store
                 _mysmallfileidx = n;
                 _smallfiles.read.push_back(std::move(fh).value());
                 _smallfileguard.set_handle(&_smallfiles.read.back());
-                claimed=true;
+                claimed = true;
               }
             }
             if(!claimed)
@@ -351,6 +353,25 @@ namespace key_value_store
         }
       }
     }
+
+    /*! \brief Sets whether to use mmaps for writing small objects during commit.
+
+    Normally, this implementation atomic-appends small objects to the smallfile via gather write.
+    This is simple, safe, and with reasonable performance most of the time.
+
+    However in certain circumstances e.g. with synchronous i/o enabled, atomic-append forces lots of
+    read-modify-write cycles on the storage device. This can become unusably slow if the values you
+    write are small, or your OS doesn't implement gather writes for file i/o (e.g. Windows). For
+    these circumstances, one can instead use a memory map of the end of the smallfile to append
+    the small objects. This can cause the kernel to not flush the map to storage until the map is
+    destroyed, but it also avoids the read-modify-write cycle with synchronous i/o.
+
+    Be aware that memory mapping off the end of a file being modified has historically been
+    full of quirks, race conditions and bugs in major OS kernels. Everything from data loss,
+    data corruption, denial of service and root privilege exploits have been found from the
+    unexpected interactions between memory maps and a moving end of file.
+    */
+    void use_mmaps_for_commit(bool v) noexcept { _use_mmaps_for_commit = v; }
 
     //! Retrieve when keys were last updated by setting the second to the latest transaction counter.
     //! Note that counter will be `(uint64_t)-1` for any unknown keys. Never throws exceptions.
@@ -633,6 +654,8 @@ namespace key_value_store
       };
       std::vector<toupdate_type> toupdate;
       toupdate.reserve(_items.size());
+      // Serialise multiple threads issuing commit using the same store
+      std::lock_guard<decltype(_parent->_commitlock)> commitlockguard(_parent->_commitlock);
 
       // Take out shared locks on all the items in my commit with existing values, early checking if we will abort
       std::vector<index::open_hash_index::const_iterator> shared_locks;

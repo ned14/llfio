@@ -23,14 +23,14 @@ index update.
 - 1Kb values Windows with NTFS, no integrity, no durability:
   ```
   Inserting 1M key-value pairs ...
-  Inserted at 168435 items per sec
+  Inserted at 157183 items per sec
   Retrieving 1M key-value pairs ...
   Fetched at 612745 items per sec
   ```
 - 1Kb values Windows with NTFS, integrity, no durability:
   ```
   Inserting 1M key-value pairs ...
-  Inserted at 151194 items per sec
+  Inserted at 145053 items per sec
   Retrieving 1M key-value pairs ...
   Fetched at 542005 items per sec
   ```
