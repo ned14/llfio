@@ -31,7 +31,10 @@ int main()
 #endif
   try
   {
-    AFIO_V2_NAMESPACE::filesystem::remove_all("teststore");
+    {
+      std::error_code ec;
+      AFIO_V2_NAMESPACE::filesystem::remove_all("teststore", ec);
+    }
     key_value_store::basic_key_value_store store("teststore", 2000000);
     {
       key_value_store::transaction tr(store);

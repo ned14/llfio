@@ -34,6 +34,7 @@ KERNELTEST_TEST_KERNEL(unit, afio, shared_fs_mutex, entity_endian, "Tests that a
 
 #include <codecvt>
 #include <condition_variable>
+#include <future>
 #include <unordered_map>
 
 KERNELTEST_V1_NAMESPACE_BEGIN
