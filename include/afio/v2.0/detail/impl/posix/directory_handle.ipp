@@ -50,7 +50,7 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
   // POSIX does not permit directory opens with O_RDWR like Windows, so silently convert to read
   if(_mode == mode::attr_write)
     _mode = mode::attr_read;
-  else if(_mode == mode::write)
+  else if(_mode == mode::write || _mode == mode::append)
     _mode = mode::read;
   // Also trying to truncate a directory returns EISDIR
   if(_creation == creation::truncate)
