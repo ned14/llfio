@@ -7,12 +7,17 @@ a store, and to test AFIO's design. Nobody should use this store for
 anything serious.
 
 ## Todo:
-- [ ] Add sparse file creation on Windows to AFIO and see how the
+- [x] Add sparse file creation on Windows to AFIO and see how the
 benchmarks fare.
 - [x] Add key-value deletion.
 - [x] Atomic append should issue gather buffers of `IOV_MAX`
-- [ ] Optionally use mmaps to extend smallfile instead of atomic appends.
+- [x] Optionally use mmaps to extend smallfile instead of atomic appends.
 Likely highly racy on Linux due to kernel bugs :)
+- [ ] Use mmaps for all smallfiles
+  - Windows x64 provides 128Tb of address space
+  - Linux x64 provides 128Tb of address space
+  - On adoption of smallfile, would need to parse backwards from end to
+  find last used record.
 - [ ] Online free space consolidation (copy early still in use records
 into new small file, update index to use new small file)
   - [ ] Per 1Mb free space consolidated, punch hole

@@ -57,6 +57,13 @@ void benchmark(key_value_store::basic_key_value_store &store, const char *desc)
     auto diff = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
     std::cout << "  Inserted at " << (1000000000ULL / diff) << " items per sec" << std::endl;
   }
+#if 0
+  {
+    auto begin = std::chrono::high_resolution_clock::now();
+    while(std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock::now() - begin).count() < 5)
+      ;
+  }
+#endif
   std::cout << "  Retrieving 1M key-value pairs ..." << std::endl;
   {
     auto begin = std::chrono::high_resolution_clock::now();
@@ -158,7 +165,7 @@ int main()
     }
     {
       key_value_store::basic_key_value_store store("teststore", 2000000);
-      benchmark(store, "no integrity, no durability");
+      benchmark(store, "no integrity, no durability, commit appends");
     }
     {
       std::error_code ec;
@@ -166,18 +173,35 @@ int main()
     }
     {
       key_value_store::basic_key_value_store store("teststore", 2000000, true);
-      benchmark(store, "integrity, no durability");
+      benchmark(store, "integrity, no durability, commit appends");
     }
-#if 0
+    {
+      std::error_code ec;
+      AFIO_V2_NAMESPACE::filesystem::remove_all("teststore", ec);
+    }
+    {
+      key_value_store::basic_key_value_store store("teststore", 2000000);
+      store.use_mmaps_for_commit(true);
+      benchmark(store, "no integrity, no durability, commit mmaps");
+    }
+    {
+      std::error_code ec;
+      AFIO_V2_NAMESPACE::filesystem::remove_all("teststore", ec);
+    }
+    {
+      key_value_store::basic_key_value_store store("teststore", 2000000, true);
+      store.use_mmaps_for_commit(true);
+      benchmark(store, "integrity, no durability, commit mmaps");
+    }
     {
       std::error_code ec;
       AFIO_V2_NAMESPACE::filesystem::remove_all("teststore", ec);
     }
     {
       key_value_store::basic_key_value_store store("teststore", 2000000, true, AFIO_V2_NAMESPACE::file_handle::mode::write, AFIO_V2_NAMESPACE::file_handle::caching::reads);
-      benchmark(store, "integrity, durability");
+      store.use_mmaps_for_commit(true);
+      benchmark(store, "integrity, durability, commit mmaps");
     }
-#endif
   }
   catch(const std::exception &e)
   {
