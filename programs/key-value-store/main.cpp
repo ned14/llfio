@@ -24,6 +24,53 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include "include/key_value_store.hpp"
 
+void benchmark(key_value_store::basic_key_value_store &store, const char *desc)
+{
+  std::cout << "\n" << desc << ":" << std::endl;
+  // Write 1M values and see how long it takes
+  static std::vector<std::pair<uint64_t, std::string>> values;
+  if(values.empty())
+  {
+    std::cout << "  Generating 1M key-value pairs ..." << std::endl;
+    for(size_t n = 0; n < 1000000; n++)
+    {
+      std::string randomvalue = AFIO_V2_NAMESPACE::utils::random_string(1024 / 2);
+      values.push_back({100 + n, randomvalue});
+    }
+  }
+  std::cout << "  Inserting 1M key-value pairs ..." << std::endl;
+  {
+    auto begin = std::chrono::high_resolution_clock::now();
+    for(size_t n = 0; n < values.size(); n += 1024)
+    {
+      key_value_store::transaction tr(store);
+      for(size_t m = 0; m < 1024; m++)
+      {
+        if(n + m >= values.size())
+          break;
+        auto &i = values[n + m];
+        tr.update_unsafe(i.first, i.second);
+      }
+      tr.commit();
+    }
+    auto end = std::chrono::high_resolution_clock::now();
+    auto diff = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
+    std::cout << "  Inserted at " << (1000000000ULL / diff) << " items per sec" << std::endl;
+  }
+  std::cout << "  Retrieving 1M key-value pairs ..." << std::endl;
+  {
+    auto begin = std::chrono::high_resolution_clock::now();
+    for(auto &i : values)
+    {
+      if(!store.find(i.first))
+        abort();
+    }
+    auto end = std::chrono::high_resolution_clock::now();
+    auto diff = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
+    std::cout << "  Fetched at " << (1000000000ULL / diff) << " items per sec" << std::endl;
+  }
+}
+
 int main()
 {
 #ifdef _WIN32
@@ -35,27 +82,66 @@ int main()
       std::error_code ec;
       AFIO_V2_NAMESPACE::filesystem::remove_all("teststore", ec);
     }
-    key_value_store::basic_key_value_store store("teststore", 2000000);
     {
-      key_value_store::transaction tr(store);
-      tr.fetch(78);
-      tr.update(78, "niall");
-      tr.commit();
-      auto kvi = store.find(78);
-      if(kvi)
+      key_value_store::basic_key_value_store store("teststore", 10);
       {
-        std::cout << "Key 78 has value " << kvi.value << " and it was last updated at " << kvi.transaction_counter << std::endl;
+        key_value_store::transaction tr(store);
+        tr.fetch(78);
+        tr.update(78, "niall");
+        tr.commit();
+        auto kvi = store.find(78);
+        if(kvi)
+        {
+          std::cout << "Key 78 has value " << kvi.value << " and it was last updated at " << kvi.transaction_counter << std::endl;
+        }
+        else
+        {
+          std::cerr << "FAILURE: Key 78 was not found!" << std::endl;
+        }
       }
-      else
       {
-        std::cerr << "FAILURE: Key 78 was not found!" << std::endl;
+        key_value_store::transaction tr(store);
+        tr.fetch(79);
+        tr.update(79, "douglas");
+        tr.commit();
+        auto kvi = store.find(79);
+        if(kvi)
+        {
+          std::cout << "Key 79 has value " << kvi.value << " and it was last updated at " << kvi.transaction_counter << std::endl;
+        }
+        else
+        {
+          std::cerr << "FAILURE: Key 79 was not found!" << std::endl;
+        }
+      }
+      {
+        key_value_store::transaction tr(store);
+        tr.fetch(78);
+        tr.remove(78);
+        tr.commit();
+        auto kvi = store.find(78, 0);
+        if(kvi)
+        {
+          std::cerr << "FAILURE: Revision 0 of Key 78 has value " << kvi.value << " and it was last updated at " << kvi.transaction_counter << std::endl;
+        }
+        else
+        {
+          std::cout << "Revision 0 of key 78 was not found!" << std::endl;
+        }
+        kvi = store.find(78, 1);
+        if(kvi)
+        {
+          std::cout << "Revision 1 of Key 78 has value " << kvi.value << " and it was last updated at " << kvi.transaction_counter << std::endl;
+        }
+        else
+        {
+          std::cerr << "FAILURE: Revision 1Key 78 was not found!" << std::endl;
+        }
       }
     }
+    // test read only
     {
-      key_value_store::transaction tr(store);
-      tr.fetch(79);
-      tr.update(79, "douglas");
-      tr.commit();
+      key_value_store::basic_key_value_store store("teststore");
       auto kvi = store.find(79);
       if(kvi)
       {
@@ -67,69 +153,31 @@ int main()
       }
     }
     {
-      key_value_store::transaction tr(store);
-      tr.fetch(78);
-      tr.remove(78);
-      tr.commit();
-      auto kvi = store.find(78, 0);
-      if(kvi)
-      {
-        std::cerr << "FAILURE: Revision 0 of Key 78 has value " << kvi.value << " and it was last updated at " << kvi.transaction_counter << std::endl;
-      }
-      else
-      {
-        std::cout << "Revision 0 of key 78 was not found!" << std::endl;
-      }
-      kvi = store.find(78, 1);
-      if(kvi)
-      {
-        std::cout << "Revision 1 of Key 78 has value " << kvi.value << " and it was last updated at " << kvi.transaction_counter << std::endl;
-      }
-      else
-      {
-        std::cerr << "FAILURE: Revision 1Key 78 was not found!" << std::endl;
-      }
+      std::error_code ec;
+      AFIO_V2_NAMESPACE::filesystem::remove_all("teststore", ec);
     }
-
-    // Write 1M values and see how long it takes
-    std::vector<std::pair<uint64_t, std::string>> values;
-    std::cout << "\nGenerating 1M key-value pairs ..." << std::endl;
-    for(size_t n = 0; n < 1000000; n++)
     {
-      std::string randomvalue = AFIO_V2_NAMESPACE::utils::random_string(1024 / 2);
-      values.push_back({100 + n, randomvalue});
+      key_value_store::basic_key_value_store store("teststore", 2000000);
+      benchmark(store, "no integrity, no durability");
     }
-    std::cout << "Inserting 1M key-value pairs ..." << std::endl;
     {
-      auto begin = std::chrono::high_resolution_clock::now();
-      for(size_t n = 0; n < values.size(); n += 1024)
-      {
-        key_value_store::transaction tr(store);
-        for(size_t m = 0; m < 1024; m++)
-        {
-          if(n + m >= values.size())
-            break;
-          auto &i = values[n + m];
-          tr.update_unsafe(i.first, i.second);
-        }
-        tr.commit();
-      }
-      auto end = std::chrono::high_resolution_clock::now();
-      auto diff = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
-      std::cout << "Inserted at " << (1000000000ULL / diff) << " items per sec" << std::endl;
+      std::error_code ec;
+      AFIO_V2_NAMESPACE::filesystem::remove_all("teststore", ec);
     }
-    std::cout << "Retrieving 1M key-value pairs ..." << std::endl;
     {
-      auto begin = std::chrono::high_resolution_clock::now();
-      for(auto &i : values)
-      {
-        if(!store.find(i.first))
-          abort();
-      }
-      auto end = std::chrono::high_resolution_clock::now();
-      auto diff = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
-      std::cout << "Fetched at " << (1000000000ULL / diff) << " items per sec" << std::endl;
+      key_value_store::basic_key_value_store store("teststore", 2000000, true);
+      benchmark(store, "integrity, no durability");
     }
+#if 0
+    {
+      std::error_code ec;
+      AFIO_V2_NAMESPACE::filesystem::remove_all("teststore", ec);
+    }
+    {
+      key_value_store::basic_key_value_store store("teststore", 2000000, true, AFIO_V2_NAMESPACE::file_handle::mode::write, AFIO_V2_NAMESPACE::file_handle::caching::reads);
+      benchmark(store, "integrity, durability");
+    }
+#endif
   }
   catch(const std::exception &e)
   {

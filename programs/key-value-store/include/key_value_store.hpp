@@ -186,7 +186,7 @@ namespace key_value_store
           afio::file_handle::mode::read
 #else
           // Linux won't allow taking an exclusive lock on a read only file
-          afio::file_handle::mode::write
+          mode
 #endif
       ;
       if(_smallfiles.read.empty())
@@ -239,12 +239,13 @@ namespace key_value_store
           throw maximum_writers_reached();
         }
         // Set up the index, either r/w or read only with copy on write
-        afio::section_handle sh = afio::section_handle::section(_indexfile, 0, (mode == afio::file_handle::mode::write) ? afio::section_handle::flag::readwrite : (afio::section_handle::flag::read | afio::section_handle::flag::cow)).value();
+        afio::section_handle::flag mapflags = (mode == afio::file_handle::mode::write) ? afio::section_handle::flag::readwrite : (afio::section_handle::flag::read | afio::section_handle::flag::cow);
+        afio::section_handle sh = afio::section_handle::section(_indexfile, 0, mapflags).value();
         afio::file_handle::extent_type len = sh.length();
         len -= sizeof(index::index);
         len /= sizeof(index::open_hash_index::value_type);
         size_t offset = sizeof(index::index);
-        _index.emplace(sh, len, offset);
+        _index.emplace(sh, len, offset, mapflags);
         _indexheader = reinterpret_cast<index::index *>((char *) _index->container().data() - offset);
         if(_indexheader->writes_occurring[_mysmallfileidx] != 0)
         {
@@ -260,7 +261,7 @@ namespace key_value_store
     basic_key_value_store &operator=(const basic_key_value_store &) = delete;
     basic_key_value_store &operator=(basic_key_value_store &&) = delete;
 
-    basic_key_value_store(const afio::path_handle &dir, size_t hashtableentries, afio::file_handle::mode mode = afio::file_handle::mode::write, afio::file_handle::caching caching = afio::file_handle::caching::temporary)
+    basic_key_value_store(const afio::path_handle &dir, size_t hashtableentries, bool enable_integrity = false, afio::file_handle::mode mode = afio::file_handle::mode::write, afio::file_handle::caching caching = afio::file_handle::caching::temporary)
         : _indexfile(afio::file_handle::file(dir, "index", mode, (mode == afio::file_handle::mode::write) ? afio::file_handle::creation::if_needed : afio::file_handle::creation::open_existing, caching).value())
     {
       if(mode == afio::file_handle::mode::write)
@@ -275,8 +276,12 @@ namespace key_value_store
             afio::file_handle::extent_type size = sizeof(index::index) + (hashtableentries) * sizeof(index::open_hash_index::value_type);
             size = afio::utils::round_up_to_page_size(size);
             _indexfile.truncate(size).value();
-            auto goodmagic = _goodmagic;
-            _indexfile.write(0, (const char *) &goodmagic, 8).value();
+            index::index i;
+            memset(&i, 0, sizeof(i));
+            i.magic = _goodmagic;
+            i.all_writes_synced = _indexfile.are_writes_durable();
+            i.contents_hashed = enable_integrity;
+            _indexfile.write(0, (char *) &i, sizeof(i)).value();
           }
           else
           {
@@ -290,14 +295,14 @@ namespace key_value_store
             if(_indexheader->contents_hashed)
             {
             }
+            // Now we've finished the checks, reset writes_occurring and all_writes_synced
+            index::index i;
+            _indexfile.read(0, (char *) &i, sizeof(i)).value();
+            memset(i.writes_occurring, 0, sizeof(i.writes_occurring));
+            i.all_writes_synced = _indexfile.are_writes_durable();
+            memset(&i.hash, 0, sizeof(i.hash));
+            _indexfile.write(0, (char *) &i, sizeof(i)).value();
           }
-          // Reset writes_occurring and all_writes_synced
-          index::index i;
-          _indexfile.read(0, (char *) &i, sizeof(i)).value();
-          memset(i.writes_occurring, 0, sizeof(i.writes_occurring));
-          i.all_writes_synced = _indexfile.are_writes_durable();
-          memset(&i.hash, 0, sizeof(i.hash));
-          _indexfile.write(0, (char *) &i, sizeof(i)).value();
         }
       }
       // Take a shared lock, blocking if someone is still setting things up
@@ -320,13 +325,13 @@ namespace key_value_store
       }
     }
     //! \overload
-    basic_key_value_store(const afio::path_view &dir, size_t hashtableentries, afio::file_handle::mode mode = afio::file_handle::mode::write, afio::file_handle::caching caching = afio::file_handle::caching::temporary)
-        : basic_key_value_store(afio::directory_handle::directory({}, dir, afio::directory_handle::mode::write, afio::directory_handle::creation::if_needed).value(), hashtableentries, mode, caching)
+    basic_key_value_store(const afio::path_view &dir, size_t hashtableentries, bool enable_integrity = false, afio::file_handle::mode mode = afio::file_handle::mode::write, afio::file_handle::caching caching = afio::file_handle::caching::temporary)
+        : basic_key_value_store(afio::directory_handle::directory({}, dir, afio::directory_handle::mode::write, afio::directory_handle::creation::if_needed).value(), hashtableentries, enable_integrity, mode, caching)
     {
     }
     //! Opens the store for read only access
     basic_key_value_store(const afio::path_view &dir)
-        : basic_key_value_store(afio::path_handle::path(dir).value(), 0, afio::file_handle::mode::read)
+        : basic_key_value_store(afio::path_handle::path(dir).value(), 0, false, afio::file_handle::mode::read)
     {
     }
     ~basic_key_value_store()
