@@ -126,6 +126,12 @@ result<file_handle> file_handle::file(const path_handle &base, file_handle::path
       ret.value()._flags &= ~flag::disable_safety_unlinks;
     }
   }
+  if((flags & flag::disable_prefetching) || (flags & flag::maximum_prefetching))
+  {
+    int advice = (flags & flag::disable_prefetching) ? POSIX_FADV_RANDOM : (POSIX_FADV_SEQUENTIAL | POSIX_FADV_WILLNEED);
+    if(-1 == ::posix_fadvise(nativeh.fd, 0, 0, advice))
+      return {errno, std::system_category()};
+  }
   if(_creation == creation::truncate && ret.value().are_safety_fsyncs_issued())
     fsync(nativeh.fd);
   return ret;

@@ -39,6 +39,14 @@ index update.
   Retrieving 1M key-value pairs ...
   Fetched at 542005 items per sec
   ```
+- 1Kb values Windows with NTFS, integrity, durability:
+  ```
+  Inserting 1M key-value pairs ...
+  Inserted at 32379 items per sec
+  Retrieving 1M key-value pairs ...
+  Fetched at 549752 items per sec
+  ```
+
 - 1Kb values Linux with ext4, no integrity, no durability:
   ```
   Inserting 1M key-value pairs ...

@@ -24,6 +24,68 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include "include/key_value_store.hpp"
 
+namespace stackoverflow
+{
+  namespace filesystem = AFIO_V2_NAMESPACE::filesystem;
+  using string_view = AFIO_V2_NAMESPACE::string_view;
+  template <class T> using optional = AFIO_V2_NAMESPACE::optional<T>;
+
+  // Try to read first line from file at path, returning no string if file does not exist,
+  // throwing exception for any other error
+  optional<std::string> read_first_line(filesystem::path path)
+  {
+    using namespace AFIO_V2_NAMESPACE;
+    using AFIO_V2_NAMESPACE::file_handle;
+    // The result<T> is from WG21 P0762, it looks quite like an `expected<T, std::error_code>` object
+    // See Outcome v2 at https://ned14.github.io/outcome/ and https://lists.boost.org/boost-announce/2017/06/0510.php
+
+    // Open for reading the file at path using a null handle as the base
+    result<file_handle> _fh = file({}, path);
+    // If fh represents failure ...
+    if(!_fh)
+    {
+      // Fetch the error code
+      std::error_code ec = _fh.error();
+      // Did we fail due to file not found?
+      // It is *very* important to note that ec contains the *original* error code which could
+      // be POSIX, or Win32 or NT kernel error code domains. However we can always compare,
+      // via 100% C++ 11 STL, any error code to a generic error *condition* for equivalence
+      // So this comparison will work as expected irrespective of original error code.
+      if(ec == std::errc::no_such_file_or_directory)
+      {
+        // Return empty optional
+        return {};
+      }
+      std::cerr << "Opening file " << path << " failed with " << ec.message() << std::endl;
+    }
+    // If errored, result<T>.value() throws an error code failure as if `throw std::system_error(fh.error());`
+    // Otherwise unpack the value containing the valid file_handle
+    file_handle fh(std::move(_fh.value()));
+    // Configure the scatter buffers for the read, ideally aligned to a page boundary for DMA
+    alignas(4096) char buffer[4096];
+    // There is actually a faster to type shortcut for this, but I thought best to spell it out
+    file_handle::buffer_type reqs[] = {{buffer, sizeof(buffer)}};
+    // Do a blocking read from offset 0 possibly filling the scatter buffers passed in
+    file_handle::io_result<file_handle::buffers_type> _buffers_read = read(fh, {reqs, 0});
+    if(!_buffers_read)
+    {
+      std::error_code ec = _fh.error();
+      std::cerr << "Reading the file " << path << " failed with " << ec.message() << std::endl;
+    }
+    // Same as before, either throw any error or unpack the value returned
+    file_handle::buffers_type buffers_read(_buffers_read.value());
+    // Note that buffers returned by AFIO read() may be completely different to buffers submitted
+    // This lets us skip unnecessary memory copying
+
+    // Make a string view of the first buffer returned
+    string_view v(buffers_read[0].data, buffers_read[0].len);
+    // Sub view that view with the first line
+    string_view line(v.substr(0, v.find_first_of('\n')));
+    // Return a string copying the first line from the file, or all 4096 bytes read if no newline found.
+    return std::string(line);
+  }
+}
+
 void benchmark(key_value_store::basic_key_value_store &store, const char *desc)
 {
   std::cout << "\n" << desc << ":" << std::endl;

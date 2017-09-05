@@ -1041,6 +1041,10 @@ static inline result<DWORD> attributes_from_handle_caching_and_flags(native_hand
   }
   if(flags & handle::flag::unlink_on_close)
     attribs |= FILE_FLAG_DELETE_ON_CLOSE;
+  if(flags & handle::flag::disable_prefetching)
+    attribs |= FILE_FLAG_RANDOM_ACCESS;
+  if(flags & handle::flag::maximum_prefetching)
+    attribs |= FILE_FLAG_SEQUENTIAL_SCAN;
   return attribs;
 }
 static inline result<DWORD> ntflags_from_handle_caching_and_flags(native_handle_type &nativeh, handle::caching _caching, handle::flag flags)
@@ -1079,6 +1083,10 @@ static inline result<DWORD> ntflags_from_handle_caching_and_flags(native_handle_
   }
   if(flags & handle::flag::unlink_on_close)
     ntflags |= 0x00001000 /*FILE_DELETE_ON_CLOSE*/;
+  if(flags & handle::flag::disable_prefetching)
+    ntflags |= 0x00000800 /*FILE_RANDOM_ACCESS*/;
+  if(flags & handle::flag::maximum_prefetching)
+    ntflags |= 0x00000004 /*FILE_SEQUENTIAL_ONLY*/;
   return ntflags;
 }
 

@@ -164,6 +164,8 @@ inline std::ostream &operator<<(std::ostream &s, const section_handle::flag &v)
     temp.append("prefault|");
   if(!!(v & section_handle::flag::executable))
     temp.append("executable|");
+  if(!!(v & section_handle::flag::barrier_on_close))
+    temp.append("barrier_on_close|");
   if(!temp.empty())
   {
     temp.resize(temp.size() - 1);

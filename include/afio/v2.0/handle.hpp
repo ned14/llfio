@@ -133,6 +133,14 @@ public:
     operating systems with a true race-free unlink syscall are race free.
     */
     disable_safety_unlinks = 1 << 3,
+    /*! Ask the OS to disable prefetching of data. This can improve random
+    i/o performance.
+    */
+    disable_prefetching = 1 << 4,
+    /*! Ask the OS to maximise prefetching of data, possibly prefetching the entire file
+    into kernel cache. This can improve sequential i/o performance.
+    */
+    maximum_prefetching = 1 << 5,
 
     win_disable_unlink_emulation = 1 << 24,  //!< See the documentation for `unlink_on_close`
     /*! Microsoft Windows NTFS, having been created in the late 1980s, did not originally
@@ -333,12 +341,20 @@ inline std::ostream &operator<<(std::ostream &s, const handle::flag &v)
     temp.append("unlink_on_close|");
   if(!!(v & handle::flag::disable_safety_fsyncs))
     temp.append("disable_safety_fsyncs|");
+  if(!!(v & handle::flag::disable_prefetching))
+    temp.append("disable_prefetching|");
+  if(!!(v & handle::flag::maximum_prefetching))
+    temp.append("maximum_prefetching|");
   if(!!(v & handle::flag::win_disable_unlink_emulation))
     temp.append("win_disable_unlink_emulation|");
+  if(!!(v & handle::flag::win_disable_sparse_file_creation))
+    temp.append("win_disable_sparse_file_creation|");
   if(!!(v & handle::flag::overlapped))
     temp.append("overlapped|");
   if(!!(v & handle::flag::byte_lock_insanity))
     temp.append("byte_lock_insanity|");
+  if(!!(v & handle::flag::anonymous_inode))
+    temp.append("anonymous_inode|");
   if(!temp.empty())
   {
     temp.resize(temp.size() - 1);

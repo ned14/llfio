@@ -199,7 +199,7 @@ namespace key_value_store
         for(size_t n = 0; n < 48; n++)
         {
           name = std::to_string(n);
-          auto fh = afio::file_handle::file(dir, name, smallfilemode);
+          auto fh = afio::file_handle::file(dir, name, smallfilemode, afio::file_handle::creation::open_existing, afio::file_handle::caching::all, afio::file_handle::flag::disable_prefetching);
           if(fh)
           {
           retry:
@@ -265,7 +265,7 @@ namespace key_value_store
     basic_key_value_store &operator=(basic_key_value_store &&) = delete;
 
     basic_key_value_store(const afio::path_handle &dir, size_t hashtableentries, bool enable_integrity = false, afio::file_handle::mode mode = afio::file_handle::mode::write, afio::file_handle::caching caching = afio::file_handle::caching::all)
-        : _indexfile(afio::file_handle::file(dir, "index", mode, (mode == afio::file_handle::mode::write) ? afio::file_handle::creation::if_needed : afio::file_handle::creation::open_existing, caching).value())
+        : _indexfile(afio::file_handle::file(dir, "index", mode, (mode == afio::file_handle::mode::write) ? afio::file_handle::creation::if_needed : afio::file_handle::creation::open_existing, caching, afio::file_handle::flag::disable_prefetching).value())
     {
       if(mode == afio::file_handle::mode::write)
       {
