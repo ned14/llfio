@@ -13,6 +13,7 @@ var searchData=
   ['directory_5fhandle',['directory_handle',['../classafio__v2__xxx_1_1directory__handle.html',1,'afio_v2_xxx']]],
   ['directory_5fhandle_2ehpp',['directory_handle.hpp',['../directory__handle_8hpp.html',1,'']]],
   ['disable_5fkqueues',['disable_kqueues',['../classafio__v2__xxx_1_1io__service.html#a83ed27472ae75a1a31d73b383aa78564',1,'afio_v2_xxx::io_service']]],
+  ['disable_5fprefetching',['disable_prefetching',['../structafio__v2__xxx_1_1handle_1_1flag__base.html#a51aaa32c78950cedbc1b7a61e1738d3eaebfe097a938adbdf4adcbf5f559259f5',1,'afio_v2_xxx::handle::flag_base']]],
   ['disable_5fsafety_5ffsyncs',['disable_safety_fsyncs',['../structafio__v2__xxx_1_1handle_1_1flag__base.html#a51aaa32c78950cedbc1b7a61e1738d3ea9a3ba39dc74f2998838df3fc58400ce4',1,'afio_v2_xxx::handle::flag_base']]],
   ['disable_5fsafety_5funlinks',['disable_safety_unlinks',['../structafio__v2__xxx_1_1handle_1_1flag__base.html#a51aaa32c78950cedbc1b7a61e1738d3ea09f03ed90a3b187555210e8a8d09f4a0',1,'afio_v2_xxx::handle::flag_base']]],
   ['disposition_5fbase',['disposition_base',['../structafio__v2__xxx_1_1native__handle__type_1_1disposition__base.html',1,'afio_v2_xxx::native_handle_type']]],

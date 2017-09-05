@@ -1110,10 +1110,10 @@ For portability, you can only assume that barriers write order for a single hand
 </dl>
 <dl class="section note"><dt>Note</dt><dd>On Microsoft Windows this constructor uses the faster VirtualAlloc() which creates less versatile page backed memory. If you want anonymous memory allocated from a paging file backed section instead, create a page file backed section and then a mapped view from that using the other constructor. This makes available all those very useful VM tricks Windows can do with section mapped memory which VirtualAlloc() memory cannot do.</dd></dl>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX mmap() or NtMapViewOfSection() can return. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00431"></a><span class="lineno">  431</span>&#160;{</div>
-<div class="line"><a name="l00432"></a><span class="lineno">  432</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespaceafio__v2__xxx.html#ac0c1354bd001aa35aadb77f9c774a14d">map_handle::map</a>(std::forward&lt;decltype(bytes)&gt;(bytes), std::forward&lt;decltype(_flag)&gt;(_flag));</div>
-<div class="line"><a name="l00433"></a><span class="lineno">  433</span>&#160;}</div>
-<div class="ttc" id="namespaceafio__v2__xxx_html_ac0c1354bd001aa35aadb77f9c774a14d"><div class="ttname"><a href="namespaceafio__v2__xxx.html#ac0c1354bd001aa35aadb77f9c774a14d">afio_v2_xxx::map</a></div><div class="ttdeci">result&lt; map_handle &gt; map(section_handle &amp;section, map_handle::size_type bytes=0, map_handle::extent_type offset=0, section_handle::flag _flag=section_handle::flag::read|section_handle::flag::write) noexcept</div><div class="ttdef"><b>Definition:</b> map_handle.hpp:442</div></div>
+<div class="fragment"><div class="line"><a name="l00433"></a><span class="lineno">  433</span>&#160;{</div>
+<div class="line"><a name="l00434"></a><span class="lineno">  434</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespaceafio__v2__xxx.html#ac0c1354bd001aa35aadb77f9c774a14d">map_handle::map</a>(std::forward&lt;decltype(bytes)&gt;(bytes), std::forward&lt;decltype(_flag)&gt;(_flag));</div>
+<div class="line"><a name="l00435"></a><span class="lineno">  435</span>&#160;}</div>
+<div class="ttc" id="namespaceafio__v2__xxx_html_ac0c1354bd001aa35aadb77f9c774a14d"><div class="ttname"><a href="namespaceafio__v2__xxx.html#ac0c1354bd001aa35aadb77f9c774a14d">afio_v2_xxx::map</a></div><div class="ttdeci">result&lt; map_handle &gt; map(section_handle &amp;section, map_handle::size_type bytes=0, map_handle::extent_type offset=0, section_handle::flag _flag=section_handle::flag::read|section_handle::flag::write) noexcept</div><div class="ttdef"><b>Definition:</b> map_handle.hpp:444</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1171,11 +1171,11 @@ For portability, you can only assume that barriers write order for a single hand
   </dd>
 </dl>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX mmap() or NtMapViewOfSection() can return. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00443"></a><span class="lineno">  443</span>&#160;{</div>
-<div class="line"><a name="l00444"></a><span class="lineno">  444</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespaceafio__v2__xxx.html#ac0c1354bd001aa35aadb77f9c774a14d">map_handle::map</a>(std::forward&lt;decltype(<a class="code" href="namespaceafio__v2__xxx.html#ac66cb0c9b287056b325469cc52e93f97">section</a>)&gt;(<a class="code" href="namespaceafio__v2__xxx.html#ac66cb0c9b287056b325469cc52e93f97">section</a>), std::forward&lt;decltype(bytes)&gt;(bytes), std::forward&lt;decltype(offset)&gt;(offset), std::forward&lt;decltype(_flag)&gt;(_flag));</div>
-<div class="line"><a name="l00445"></a><span class="lineno">  445</span>&#160;}</div>
-<div class="ttc" id="namespaceafio__v2__xxx_html_ac66cb0c9b287056b325469cc52e93f97"><div class="ttname"><a href="namespaceafio__v2__xxx.html#ac66cb0c9b287056b325469cc52e93f97">afio_v2_xxx::section</a></div><div class="ttdeci">result&lt; section_handle &gt; section(section_handle::extent_type maximum_size) noexcept</div><div class="ttdef"><b>Definition:</b> map_handle.hpp:388</div></div>
-<div class="ttc" id="namespaceafio__v2__xxx_html_ac0c1354bd001aa35aadb77f9c774a14d"><div class="ttname"><a href="namespaceafio__v2__xxx.html#ac0c1354bd001aa35aadb77f9c774a14d">afio_v2_xxx::map</a></div><div class="ttdeci">result&lt; map_handle &gt; map(section_handle &amp;section, map_handle::size_type bytes=0, map_handle::extent_type offset=0, section_handle::flag _flag=section_handle::flag::read|section_handle::flag::write) noexcept</div><div class="ttdef"><b>Definition:</b> map_handle.hpp:442</div></div>
+<div class="fragment"><div class="line"><a name="l00445"></a><span class="lineno">  445</span>&#160;{</div>
+<div class="line"><a name="l00446"></a><span class="lineno">  446</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespaceafio__v2__xxx.html#ac0c1354bd001aa35aadb77f9c774a14d">map_handle::map</a>(std::forward&lt;decltype(<a class="code" href="namespaceafio__v2__xxx.html#ac66cb0c9b287056b325469cc52e93f97">section</a>)&gt;(<a class="code" href="namespaceafio__v2__xxx.html#ac66cb0c9b287056b325469cc52e93f97">section</a>), std::forward&lt;decltype(bytes)&gt;(bytes), std::forward&lt;decltype(offset)&gt;(offset), std::forward&lt;decltype(_flag)&gt;(_flag));</div>
+<div class="line"><a name="l00447"></a><span class="lineno">  447</span>&#160;}</div>
+<div class="ttc" id="namespaceafio__v2__xxx_html_ac66cb0c9b287056b325469cc52e93f97"><div class="ttname"><a href="namespaceafio__v2__xxx.html#ac66cb0c9b287056b325469cc52e93f97">afio_v2_xxx::section</a></div><div class="ttdeci">result&lt; section_handle &gt; section(section_handle::extent_type maximum_size) noexcept</div><div class="ttdef"><b>Definition:</b> map_handle.hpp:390</div></div>
+<div class="ttc" id="namespaceafio__v2__xxx_html_ac0c1354bd001aa35aadb77f9c774a14d"><div class="ttname"><a href="namespaceafio__v2__xxx.html#ac0c1354bd001aa35aadb77f9c774a14d">afio_v2_xxx::map</a></div><div class="ttdeci">result&lt; map_handle &gt; map(section_handle &amp;section, map_handle::size_type bytes=0, map_handle::extent_type offset=0, section_handle::flag _flag=section_handle::flag::read|section_handle::flag::write) noexcept</div><div class="ttdef"><b>Definition:</b> map_handle.hpp:444</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1460,9 +1460,9 @@ For portability, you can only assume that barriers write order for a single hand
 </dl>
 <dl class="section user"><dt>Errors returnable</dt><dd>None, though the various signals and structured exception throws common to using memory maps may occur. </dd></dl>
 <dl class="section user"><dt>Memory Allocations</dt><dd>None. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00464"></a><span class="lineno">  464</span>&#160;{</div>
-<div class="line"><a name="l00465"></a><span class="lineno">  465</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.read(std::forward&lt;decltype(reqs)&gt;(reqs), std::forward&lt;decltype(d)&gt;(d));</div>
-<div class="line"><a name="l00466"></a><span class="lineno">  466</span>&#160;}</div>
+<div class="fragment"><div class="line"><a name="l00466"></a><span class="lineno">  466</span>&#160;{</div>
+<div class="line"><a name="l00467"></a><span class="lineno">  467</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.read(std::forward&lt;decltype(reqs)&gt;(reqs), std::forward&lt;decltype(d)&gt;(d));</div>
+<div class="line"><a name="l00468"></a><span class="lineno">  468</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1582,10 +1582,10 @@ For portability, you can only assume that barriers write order for a single hand
   </dd>
 </dl>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX dup() or NtCreateSection() can return. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;{</div>
-<div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespaceafio__v2__xxx.html#ac66cb0c9b287056b325469cc52e93f97">section_handle::section</a>(std::forward&lt;decltype(backing)&gt;(backing), std::forward&lt;decltype(maximum_size)&gt;(maximum_size), std::forward&lt;decltype(_flag)&gt;(_flag));</div>
-<div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;}</div>
-<div class="ttc" id="namespaceafio__v2__xxx_html_ac66cb0c9b287056b325469cc52e93f97"><div class="ttname"><a href="namespaceafio__v2__xxx.html#ac66cb0c9b287056b325469cc52e93f97">afio_v2_xxx::section</a></div><div class="ttdeci">result&lt; section_handle &gt; section(section_handle::extent_type maximum_size) noexcept</div><div class="ttdef"><b>Definition:</b> map_handle.hpp:388</div></div>
+<div class="fragment"><div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;{</div>
+<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespaceafio__v2__xxx.html#ac66cb0c9b287056b325469cc52e93f97">section_handle::section</a>(std::forward&lt;decltype(backing)&gt;(backing), std::forward&lt;decltype(maximum_size)&gt;(maximum_size), std::forward&lt;decltype(_flag)&gt;(_flag));</div>
+<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;}</div>
+<div class="ttc" id="namespaceafio__v2__xxx_html_ac66cb0c9b287056b325469cc52e93f97"><div class="ttname"><a href="namespaceafio__v2__xxx.html#ac66cb0c9b287056b325469cc52e93f97">afio_v2_xxx::section</a></div><div class="ttdeci">result&lt; section_handle &gt; section(section_handle::extent_type maximum_size) noexcept</div><div class="ttdef"><b>Definition:</b> map_handle.hpp:390</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1627,10 +1627,10 @@ For portability, you can only assume that barriers write order for a single hand
 </table>
 </div><div class="memdoc">
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;{</div>
-<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespaceafio__v2__xxx.html#ac66cb0c9b287056b325469cc52e93f97">section_handle::section</a>(std::forward&lt;decltype(maximum_size)&gt;(maximum_size), std::forward&lt;decltype(backing)&gt;(backing), std::forward&lt;decltype(_flag)&gt;(_flag));</div>
-<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;}</div>
-<div class="ttc" id="namespaceafio__v2__xxx_html_ac66cb0c9b287056b325469cc52e93f97"><div class="ttname"><a href="namespaceafio__v2__xxx.html#ac66cb0c9b287056b325469cc52e93f97">afio_v2_xxx::section</a></div><div class="ttdeci">result&lt; section_handle &gt; section(section_handle::extent_type maximum_size) noexcept</div><div class="ttdef"><b>Definition:</b> map_handle.hpp:388</div></div>
+<div class="fragment"><div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;{</div>
+<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespaceafio__v2__xxx.html#ac66cb0c9b287056b325469cc52e93f97">section_handle::section</a>(std::forward&lt;decltype(maximum_size)&gt;(maximum_size), std::forward&lt;decltype(backing)&gt;(backing), std::forward&lt;decltype(_flag)&gt;(_flag));</div>
+<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;}</div>
+<div class="ttc" id="namespaceafio__v2__xxx_html_ac66cb0c9b287056b325469cc52e93f97"><div class="ttname"><a href="namespaceafio__v2__xxx.html#ac66cb0c9b287056b325469cc52e93f97">afio_v2_xxx::section</a></div><div class="ttdeci">result&lt; section_handle &gt; section(section_handle::extent_type maximum_size) noexcept</div><div class="ttdef"><b>Definition:</b> map_handle.hpp:390</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1656,10 +1656,10 @@ For portability, you can only assume that barriers write order for a single hand
 </table>
 </div><div class="memdoc">
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;{</div>
-<div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespaceafio__v2__xxx.html#ac66cb0c9b287056b325469cc52e93f97">section_handle::section</a>(std::forward&lt;decltype(maximum_size)&gt;(maximum_size));</div>
-<div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;}</div>
-<div class="ttc" id="namespaceafio__v2__xxx_html_ac66cb0c9b287056b325469cc52e93f97"><div class="ttname"><a href="namespaceafio__v2__xxx.html#ac66cb0c9b287056b325469cc52e93f97">afio_v2_xxx::section</a></div><div class="ttdeci">result&lt; section_handle &gt; section(section_handle::extent_type maximum_size) noexcept</div><div class="ttdef"><b>Definition:</b> map_handle.hpp:388</div></div>
+<div class="fragment"><div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;{</div>
+<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespaceafio__v2__xxx.html#ac66cb0c9b287056b325469cc52e93f97">section_handle::section</a>(std::forward&lt;decltype(maximum_size)&gt;(maximum_size));</div>
+<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;}</div>
+<div class="ttc" id="namespaceafio__v2__xxx_html_ac66cb0c9b287056b325469cc52e93f97"><div class="ttname"><a href="namespaceafio__v2__xxx.html#ac66cb0c9b287056b325469cc52e93f97">afio_v2_xxx::section</a></div><div class="ttdeci">result&lt; section_handle &gt; section(section_handle::extent_type maximum_size) noexcept</div><div class="ttdef"><b>Definition:</b> map_handle.hpp:390</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1932,9 +1932,9 @@ For portability, you can only assume that barriers write order for a single hand
 </div><div class="memdoc">
 <p>Resize the current maximum permitted extent of the memory section to the given extent.</p>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values NtExtendSection() can return. On POSIX this is a no op. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;{</div>
-<div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.truncate(std::forward&lt;decltype(newsize)&gt;(newsize));</div>
-<div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;}</div>
+<div class="fragment"><div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;{</div>
+<div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.truncate(std::forward&lt;decltype(newsize)&gt;(newsize));</div>
+<div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2035,9 +2035,9 @@ For portability, you can only assume that barriers write order for a single hand
 </dl>
 <dl class="section user"><dt>Errors returnable</dt><dd>None, though the various signals and structured exception throws common to using memory maps may occur. </dd></dl>
 <dl class="section user"><dt>Memory Allocations</dt><dd>None. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00478"></a><span class="lineno">  478</span>&#160;{</div>
-<div class="line"><a name="l00479"></a><span class="lineno">  479</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.write(std::forward&lt;decltype(reqs)&gt;(reqs), std::forward&lt;decltype(d)&gt;(d));</div>
-<div class="line"><a name="l00480"></a><span class="lineno">  480</span>&#160;}</div>
+<div class="fragment"><div class="line"><a name="l00480"></a><span class="lineno">  480</span>&#160;{</div>
+<div class="line"><a name="l00481"></a><span class="lineno">  481</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.write(std::forward&lt;decltype(reqs)&gt;(reqs), std::forward&lt;decltype(d)&gt;(d));</div>
+<div class="line"><a name="l00482"></a><span class="lineno">  482</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
