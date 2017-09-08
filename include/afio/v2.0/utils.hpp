@@ -51,7 +51,7 @@ namespace utils
   template <class T> inline T round_down_to_page_size(T i) noexcept
   {
     const size_t pagesize = page_size();
-    i = i & ~(pagesize - 1);
+    i = (T)((uintptr_t) i & ~(pagesize - 1));
     return i;
   }
   /*! \brief Round a value to its next highest page size multiple
@@ -59,7 +59,7 @@ namespace utils
   template <class T> inline T round_up_to_page_size(T i) noexcept
   {
     const size_t pagesize = page_size();
-    i = (i + pagesize - 1) & ~(pagesize - 1);
+    i = (T)(((uintptr_t) i + pagesize - 1) & ~(pagesize - 1));
     return i;
   }
   /*! \brief Round a pair of a pointer and a size_t to their nearest page size multiples. The pointer will be rounded

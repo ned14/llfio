@@ -25,7 +25,7 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef AFIO_MAPPED_VIEW_HPP
 #define AFIO_MAPPED_VIEW_HPP
 
-#include "../map_handle.hpp"
+#include "../mapped_file_handle.hpp"
 #include "../utils.hpp"
 
 //! \file mapped_view.hpp Provides typed view of mapped section.
@@ -93,6 +93,16 @@ namespace algorithm
                                                       utils::round_down_to_page_size(byteoffset),
 #endif
                                                       byteoffset, sh, (length == (size_type) -1) ? 0 : length * sizeof(T), _flag))
+    {
+    }
+    /*! Construct a mapped view of the given mapped file handle.
+
+    \param mfh The mapped file handle to use as the data source for creating the map.
+    \param length The number of items to map, use -1 to mean the length of the section handle divided by `sizeof(T)`.
+    \param byteoffset The byte offset into the mapped file handle, this does not need to be a multiple of the page size.
+    */
+    mapped_view(mapped_file_handle &sh, size_type length = (size_type) -1, extent_type byteoffset = 0)
+        : span<T>(sh.address() + byteoffset, (length == (size_type) -1) ? (sh.length().value() / sizeof(T)) : length)
     {
     }
   };

@@ -81,7 +81,6 @@ result<section_handle> section_handle::section(file_handle &backing, extent_type
   {
     // In the case where there is a backing file, asking for read perms or no perms
     // means "don't auto-expand the file to the nearest 4Kb multiple"
-    attribs = SEC_RESERVE;
   }
   if(_flag & flag::executable)
     attribs = SEC_IMAGE;
@@ -109,7 +108,18 @@ result<section_handle::extent_type> section_handle::truncate(extent_type newsize
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
-  newsize = utils::round_up_to_page_size(newsize);
+  if(!newsize)
+  {
+    if(_backing)
+    {
+      OUTCOME_TRY(length, _backing->length());
+      newsize = length;
+    }
+    else
+      return std::errc::invalid_argument;
+  }
+  if(!_backing)
+    newsize = utils::round_up_to_page_size(newsize);
   LARGE_INTEGER _maximum_size;
   _maximum_size.QuadPart = newsize;
   NTSTATUS ntstat = NtExtendSection(_v.h, &_maximum_size);
@@ -265,7 +275,7 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
   }
   result<map_handle> ret{map_handle(&section)};
   native_handle_type &nativeh = ret.value()._v;
-  ULONG allocation = 0, prot = 0;
+  ULONG allocation = 0, prot = PAGE_NOACCESS;
   PVOID addr = 0;
   size_t commitsize = bytes;
   LARGE_INTEGER _offset;
@@ -273,13 +283,10 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
   SIZE_T _bytes = bytes;
   if((_flag & section_handle::flag::nocommit) || (_flag == section_handle::flag::none))
   {
-    // Perhaps this is only valid from kernel mode? Either way, any attempt to use MEM_RESERVE caused an invalid parameter error.
-    // Weirdly, setting commitsize to 0 seems to do a reserve as we wanted
-    // allocation = MEM_RESERVE;
+    allocation = MEM_RESERVE;
     commitsize = 0;
-    prot = PAGE_NOACCESS;
   }
-  else if(_flag & section_handle::flag::cow)
+  if(_flag & section_handle::flag::cow)
   {
     prot = PAGE_WRITECOPY;
     nativeh.behaviour |= native_handle_type::disposition::seekable | native_handle_type::disposition::readable | native_handle_type::disposition::writable;

@@ -9,7 +9,12 @@
 
 Herein lies my proposed zero whole machine memory copy async file i/o and filesystem
 library for Boost and the C++ standard, intended for storage devices with ~1 microsecond
-4Kb transfer latencies.
+4Kb transfer latencies and those supporting Storage Class Memory (SCM)/Direct Access
+Storage (DAX). Its i/o overhead, including syscall overhead, has been benchmarked to
+100 nanoseconds on Linux which corresponds to a theoretical maximum of 10M IOPS @ QD1,
+approx 40Gb/sec per thread. It has particularly strong support for writing portable
+filesystem algorithms which work well with directly mapped non-volatile storage such
+as Intel Optane.
 
 It is a complete rewrite after a Boost peer review in August 2015. Its github
 source code repository lives at https://github.com/ned14/boost.afio.
@@ -34,21 +39,32 @@ Manufacturer claimed 4Kb transfer latencies for the physical hardware:
 - &lt; 99% spinning rust hard drive latency: Windows **187,231us** FreeBSD **9,836us** Linux **26,468us**
 - &lt; 99% SATA flash drive latency: Windows **290us** Linux **158us**
 - &lt; 99% NVMe drive latency: Windows **37us** FreeBSD **70us** Linux **30us**
-
-Worst case AFIO read overhead benchmarked by author: **0.19us** (5.3M IOPS @ QD1, approx 20Gb/sec)
 </td>
 <td valign="top" width="33%">
 75% read 25% write QD4 4Kb direct transfer latencies for the software with AFIO:
 - &lt; 99% spinning rust hard drive latency: Windows **48,185us** FreeBSD **61,834us** Linux **104,507us**
 - &lt; 99% SATA flash drive latency: Windows **1,812us** Linux **1,416us**
 - &lt; 99% NVMe drive latency: Windows **50us** FreeBSD **143us** Linux **40us**
-
-Worst case AFIO write overhead benchmarked by author: **0.18us** (5.6M IOPS @ QD1, approx 21Gb/sec)
 </td>
 </tr>
 </table>
 
 \note Note that this code is of late alpha quality. It's quite reliable on Windows and Linux, but be careful when using it!
+
+Example of use:
+\code
+namespace afio = AFIO_V2_NAMESPACE;
+// Make me a 1 trillion element sparsely allocated integer array!
+afio::mapped_file_handle mfh = afio::mapped_temp_inode().value();
+// On an extents based filing system, doesn't actually allocate any physical storage
+// but does map approximately 4Tb of all bits zero data into memory
+mfh.truncate(1000000000000ULL*sizeof(int));
+// Create a typed view of the one trillion integers
+afio::algorithm::mapped_view<int> one_trillion_int_array(mfh);
+// Write and read as you see fit, if you exceed physical RAM it'll be paged to disk
+one_trillion_int_array[0] = 5;
+one_trillion_int_array[999999999999ULL] = 6;
+\endcode
 
 These compilers and OS are regularly tested:
 - GCC 7.0 (Linux 4,x x64)
@@ -88,7 +104,7 @@ ctest -C Release -R afio_sl
 | ✔ | ✔ | Universal native handle/fd abstraction instead of `void *`.
 | ✔ | ✔ | Perfectly/Ideally low memory (de)allocation per op (usually none).
 | ✔ | ✔ | noexcept API throughout returning error_code for failure instead of throwing exceptions.
-| ✔ | ✔ | AFIO v1 handle type split into hierarchy of types:<ol><li>handle - provides open, close, get path, clone, set/unset append only, change caching, characteristics<li>path_handle - a race free anchor to a subset of the filesystem<li>io_handle - adds synchronous scatter-gather i/o, byte range locking<li>file_handle - adds open/create file, get and set maximum extent<li>async_file_handle - adds asynchronous scatter-gather i/o</ol>
+| ✔ | ✔ | AFIO v1 handle type split into hierarchy of types:<ol><li>handle - provides open, close, get path, clone, set/unset append only, change caching, characteristics<li>fs_handle - handles with an inode number<li>path_handle - a race free anchor to a subset of the filesystem<li>directory_handle - enumerates the filesystem<li>io_handle - adds synchronous scatter-gather i/o, byte range locking<li>file_handle - adds open/create file, get and set maximum extent<li>async_file_handle - adds asynchronous scatter-gather i/o<li>mapped_file_handle - adds low latency memory mapped scatter-gather i/o</ol>
 | ✔ | ✔ | Cancelable i/o (made possible thanks to dropping XP support).
 | ✔ | ✔ | All shared_ptr usage removed as all use of multiple threads removed.
 | ✔ | ✔ | Use of std::vector to transport scatter-gather sequences replaced with C++ 20 `span<>` borrowed views.
@@ -137,19 +153,19 @@ Todo:
 | ✔ | ✔ | ✔ | Byte range shared/exclusive locking.
 | ✔ | ✔ | ✔ | `shared_fs_mutex` shared/exclusive entities locking based on byte ranges
 | ✔ | ✔ | ✔ | `shared_fs_mutex` shared/exclusive entities locking based on atomic append
-|   | ✔ | ✔ | Memory mapped files and virtual memory management (`section_handle` and `map_handle`)
+|   | ✔ | ✔ | Memory mapped files and virtual memory management (`section_handle`, `map_handle` and `mapped_file_handle`)
 | ✔ | ✔ | ✔ | `shared_fs_mutex` shared/exclusive entities locking based on memory maps
 | ✔ | ✔ | ✔ | Universal portable UTF-8 path views.
 |   | ✔ | ✔ | "Hole punching" and hole enumeration ported over from AFIO v1.
 |   | ✔ | ✔ | Directory handles and very fast directory enumeration ported over from AFIO v1.
 | ✔ | ✔ | ✔ | `shared_fs_mutex` shared/exclusive entities locking based on safe byte ranges
+|   | ✔ | ✔ | Set random or sequential i/o (prefetch).
 
 Todo to reach feature parity with AFIO v1:
 
 | NEW in v2 | Windows | POSIX |     |
 | --------- | --------| ----- | --- |
 |   |   |   | Hard links and symlinks.
-|   |   |   | Set random or sequential i/o (prefetch).
 |   |   |   | BSD and OS X kqueues optimised `io_service`
 
 Todo thereafter:
@@ -158,7 +174,7 @@ Todo thereafter:
 | --------- | --------| ----- | --- |
 | ✔ |   |   | Extended attributes support.
 | ✔ |   |   | Coroutines TS integration for `async_file_handle`. Use example: https://gist.github.com/anonymous/a67ba4695c223a905ff108ed8b9a342f
-| ✔ |   |   | Linux KAIO support for native async `O_DIRECT` i/o
+| ✔ |   |   | Linux KAIO support for native non-blocking `O_DIRECT` i/o
 | ✔ |   |   | Reliable directory hierarchy deletion algorithm.
 | ✔ |   |   | Reliable directory hierarchy copy algorithm.
 | ✔ |   |   | Reliable directory hierarchy update (two and three way) algorithm.

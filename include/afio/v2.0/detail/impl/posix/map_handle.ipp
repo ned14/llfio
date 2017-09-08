@@ -31,15 +31,27 @@ AFIO_V2_NAMESPACE_BEGIN
 
 result<section_handle> section_handle::section(file_handle &backing, extent_type maximum_size, flag _flag) noexcept
 {
+  extent_type length = 0;
+  if(backing.is_valid())
+  {
+    OUTCOME_TRY(_length, backing.length());
+    length = _length;
+    if(maximum_size > length)
+    {
+      // For compatibility with Windows, disallow sections larger than the file
+      return std::errc::value_too_large;
+    }
+  }
   if(!maximum_size)
   {
     if(backing.is_valid())
     {
-      OUTCOME_TRY(length, backing.length());
       maximum_size = length;
     }
     else
+    {
       return std::errc::invalid_argument;
+    }
   }
   if(!backing.is_valid())
     maximum_size = utils::round_up_to_page_size(maximum_size);
@@ -51,7 +63,21 @@ result<section_handle> section_handle::section(file_handle &backing, extent_type
 
 result<section_handle::extent_type> section_handle::truncate(extent_type newsize) noexcept
 {
-  newsize = utils::round_up_to_page_size(newsize);
+  extent_type length = 0;
+  if(_backing)
+  {
+    OUTCOME_TRY(_length, _backing->length());
+    length = _length;
+    if(newsize > length)
+    {
+      // For compatibility with Windows, disallow sections larger than the file
+      return std::errc::value_too_large;
+    }
+  }
+  else
+  {
+    newsize = utils::round_up_to_page_size(newsize);
+  }
   // There are no section handles on POSIX, so do nothing
   _length = newsize;
   return newsize;
@@ -132,7 +158,7 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::barrier(map_ha
 static inline result<void *> do_mmap(native_handle_type &nativeh, void *ataddr, section_handle *section, map_handle::size_type &bytes, map_handle::extent_type offset, section_handle::flag _flag) noexcept
 {
   bool have_backing = section ? (section->backing() != nullptr) : false;
-  int prot = 0, flags = have_backing ? MAP_SHARED : MAP_PRIVATE | MAP_ANONYMOUS;
+  int prot = 0, flags = have_backing ? MAP_SHARED : (MAP_PRIVATE | MAP_ANONYMOUS);
   void *addr = nullptr;
   if(_flag == section_handle::flag::none)
   {

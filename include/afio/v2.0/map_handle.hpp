@@ -67,7 +67,7 @@ public:
   QUICKCPPLIB_BITFIELD_END(flag);
 
 protected:
-  io_handle *_backing;
+  file_handle *_backing;
   extent_type _length;
   flag _flag;
 
@@ -80,7 +80,7 @@ public:
   {
   }
   //! Construct a section handle using the given native handle type for the section and the given i/o handle for the backing storage
-  explicit constexpr section_handle(native_handle_type sectionh, io_handle *backing, extent_type maximum_size, flag __flag)
+  explicit constexpr section_handle(native_handle_type sectionh, file_handle *backing, extent_type maximum_size, flag __flag)
       : handle(sectionh, handle::caching::all)
       , _backing(backing)
       , _length(maximum_size)
@@ -112,7 +112,8 @@ public:
 
   /*! \brief Create a memory section.
   \param backing The handle to use as backing storage. An invalid handle means to use the system page file as the backing storage.
-  \param maximum_size The maximum size this section can ever be. Zero means to use backing.length().
+  \param maximum_size The maximum size this section can ever be. Zero means to use `backing.length()`. This cannot exceed the size
+  of any backing file used.
   \param _flag How to create the section.
 
   \errors Any of the values POSIX dup() or NtCreateSection() can return.
@@ -141,11 +142,13 @@ public:
   extent_type length() const noexcept { return _length; }
 
   /*! Resize the current maximum permitted extent of the memory section to the given extent.
+  \param newsize The new size of the memory section. Specify zero to use `backing.length()`.
+  This cannot exceed the size of any backing file used.
 
   \errors Any of the values NtExtendSection() can return. On POSIX this is a no op.
   */
   AFIO_MAKE_FREE_FUNCTION
-  AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<extent_type> truncate(extent_type newsize) noexcept;
+  AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<extent_type> truncate(extent_type newsize = 0) noexcept;
 };
 inline std::ostream &operator<<(std::ostream &s, const section_handle::flag &v)
 {
@@ -183,6 +186,8 @@ inline std::ostream &operator<<(std::ostream &s, const section_handle::flag &v)
 \note The native handle returned by this map handle is always that of the backing storage, but closing this handle
 does not close that of the backing storage, nor does releasing this handle release that of the backing storage.
 Locking byte ranges of this handle is therefore equal to locking byte ranges in the original backing storage.
+
+\sa `mapped_file_handle`, `algorithm::mapped_view`
 */
 class AFIO_DECL map_handle : public io_handle
 {
@@ -227,7 +232,7 @@ public:
       , _flag(section_handle::flag::none)
   {
   }
-  AFIO_HEADERS_ONLY_MEMFUNC_SPEC ~map_handle();
+  AFIO_HEADERS_ONLY_VIRTUAL_SPEC ~map_handle();
   //! Implicit move construction of map_handle permitted
   constexpr map_handle(map_handle &&o) noexcept : io_handle(std::move(o)), _section(o._section), _addr(o._addr), _offset(o._offset), _length(o._length), _flag(o._flag)
   {
@@ -466,7 +471,7 @@ inline map_handle::io_result<map_handle::buffers_type> read(map_handle &self, ma
 {
   return self.read(std::forward<decltype(reqs)>(reqs), std::forward<decltype(d)>(d));
 }
-/*! \brief Write data to the mapped view.
+/*! \brief Write data to the mapped view. Note this will never extend past the current length of the mapped file.
 
 \return The buffers written, which will never be the buffers input because they will point at where the data was copied into the mapped view.
 The size of each scatter-gather buffer is updated with the number of bytes of that buffer transferred.
