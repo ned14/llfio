@@ -16,6 +16,7 @@ var namespaceafio__v2__xxx =
     [ "io_service", "classafio__v2__xxx_1_1io__service.html", "classafio__v2__xxx_1_1io__service" ],
     [ "section_handle", "classafio__v2__xxx_1_1section__handle.html", "classafio__v2__xxx_1_1section__handle" ],
     [ "map_handle", "classafio__v2__xxx_1_1map__handle.html", "classafio__v2__xxx_1_1map__handle" ],
+    [ "mapped_file_handle", "classafio__v2__xxx_1_1mapped__file__handle.html", "classafio__v2__xxx_1_1mapped__file__handle" ],
     [ "native_handle_type", "structafio__v2__xxx_1_1native__handle__type.html", "structafio__v2__xxx_1_1native__handle__type" ],
     [ "path_handle", "classafio__v2__xxx_1_1path__handle.html", "classafio__v2__xxx_1_1path__handle" ],
     [ "path_view", "classafio__v2__xxx_1_1path__view.html", "classafio__v2__xxx_1_1path__view" ],

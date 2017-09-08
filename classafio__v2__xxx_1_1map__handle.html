@@ -410,7 +410,8 @@ flag&#160;</td><td class="memItemRight" valign="bottom"><b>_flags</b></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>A handle to a memory mapped region of memory. </p>
-<dl class="section note"><dt>Note</dt><dd>The native handle returned by this map handle is always that of the backing storage, but closing this handle does not close that of the backing storage, nor does releasing this handle release that of the backing storage. Locking byte ranges of this handle is therefore equal to locking byte ranges in the original backing storage. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>The native handle returned by this map handle is always that of the backing storage, but closing this handle does not close that of the backing storage, nor does releasing this handle release that of the backing storage. Locking byte ranges of this handle is therefore equal to locking byte ranges in the original backing storage.</dd></dl>
+<dl class="section see"><dt>See Also</dt><dd><code>mapped_file_handle</code>, <code>algorithm::mapped_view</code> </dd></dl>
 </div><h2 class="groupheader">Member Function Documentation</h2>
 <a class="anchor" id="a243156928e89b8988a1412f211b3b603"></a>
 <div class="memitem">
@@ -865,10 +866,10 @@ For portability, you can only assume that barriers write order for a single hand
 </table>
 </div><div class="memdoc">
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;  {</div>
-<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;    OUTCOME_TRY(ret, <a class="code" href="classafio__v2__xxx_1_1map__handle.html#ae16cb0af9b96f90f87f42318f7d35e65">prefetch</a>(span&lt;buffer_type&gt;(&amp;region, 1)));</div>
-<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;    <span class="keywordflow">return</span> *ret.data();</div>
-<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;  }</div>
+<div class="fragment"><div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;  {</div>
+<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;    OUTCOME_TRY(ret, <a class="code" href="classafio__v2__xxx_1_1map__handle.html#ae16cb0af9b96f90f87f42318f7d35e65">prefetch</a>(span&lt;buffer_type&gt;(&amp;region, 1)));</div>
+<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;    <span class="keywordflow">return</span> *ret.data();</div>
+<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;  }</div>
 <div class="ttc" id="classafio__v2__xxx_1_1map__handle_html_ae16cb0af9b96f90f87f42318f7d35e65"><div class="ttname"><a href="classafio__v2__xxx_1_1map__handle.html#ae16cb0af9b96f90f87f42318f7d35e65">afio_v2_xxx::map_handle::prefetch</a></div><div class="ttdeci">static result&lt; span&lt; buffer_type &gt; &gt; prefetch(span&lt; buffer_type &gt; regions) noexcept</div><div class="ttdoc">Ask the system to begin to asynchronously prefetch the span of memory regions given, returning the regions actually prefetched. Note that on Windows 7 or earlier the system call to implement this was not available, and so you will see an empty span returned. </div></div>
 </div><!-- fragment -->
 </div>

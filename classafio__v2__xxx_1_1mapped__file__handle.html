@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.6"/>
-<title>AFIO: afio_v2_xxx::async_file_handle Class Reference</title>
+<title>AFIO: afio_v2_xxx::mapped_file_handle Class Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -88,7 +88,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   </div>
 </div>
 <script type="text/javascript">
-$(document).ready(function(){initNavTree('classafio__v2__xxx_1_1async__file__handle.html','');});
+$(document).ready(function(){initNavTree('classafio__v2__xxx_1_1mapped__file__handle.html','');});
 </script>
 <div id="doc-content">
 <!-- window showing the filter options -->
@@ -107,93 +107,86 @@ $(document).ready(function(){initNavTree('classafio__v2__xxx_1_1async__file__han
 
 <div class="header">
   <div class="summary">
-<a href="#nested-classes">Classes</a> &#124;
 <a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="#pro-methods">Protected Member Functions</a> &#124;
 <a href="#pro-attribs">Protected Attributes</a> &#124;
-<a href="#friends">Friends</a> &#124;
-<a href="classafio__v2__xxx_1_1async__file__handle-members.html">List of all members</a>  </div>
+<a href="classafio__v2__xxx_1_1mapped__file__handle-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">afio_v2_xxx::async_file_handle Class Reference<span class="mlabels"><span class="mlabel">abstract</span></span></div>  </div>
+<div class="title">afio_v2_xxx::mapped_file_handle Class Reference<span class="mlabels"><span class="mlabel">abstract</span></span></div>  </div>
 </div><!--header-->
 <div class="contents">
 
-<p>An asynchronous handle to an open something.  
- <a href="classafio__v2__xxx_1_1async__file__handle.html#details">More...</a></p>
+<p>A memory mapped regular file or device.  
+ <a href="classafio__v2__xxx_1_1mapped__file__handle.html#details">More...</a></p>
 
-<p><code>#include &quot;async_file_handle.hpp&quot;</code></p>
+<p><code>#include &quot;mapped_file_handle.hpp&quot;</code></p>
 <div class="dynheader">
-Inheritance diagram for afio_v2_xxx::async_file_handle:</div>
+Inheritance diagram for afio_v2_xxx::mapped_file_handle:</div>
 <div class="dyncontent">
  <div class="center">
-  <img src="classafio__v2__xxx_1_1async__file__handle.png" usemap="#afio_v2_xxx::async_file_handle_map" alt=""/>
-  <map id="afio_v2_xxx::async_file_handle_map" name="afio_v2_xxx::async_file_handle_map">
-<area href="classafio__v2__xxx_1_1file__handle.html" title="A handle to a regular file or device, kept data layout compatible with async_file_handle. " alt="afio_v2_xxx::file_handle" shape="rect" coords="99,112,287,136"/>
-<area href="classafio__v2__xxx_1_1io__handle.html" title="A handle to something capable of scatter-gather i/o. " alt="afio_v2_xxx::io_handle" shape="rect" coords="0,56,188,80"/>
-<area href="classafio__v2__xxx_1_1fs__handle.html" title="A handle to something with a device and inode number. " alt="afio_v2_xxx::fs_handle" shape="rect" coords="198,56,386,80"/>
-<area href="classafio__v2__xxx_1_1handle.html" title="A native_handle_type which is managed by the lifetime of this object instance. " alt="afio_v2_xxx::handle" shape="rect" coords="0,0,188,24"/>
+  <img src="classafio__v2__xxx_1_1mapped__file__handle.png" usemap="#afio_v2_xxx::mapped_file_handle_map" alt=""/>
+  <map id="afio_v2_xxx::mapped_file_handle_map" name="afio_v2_xxx::mapped_file_handle_map">
+<area href="classafio__v2__xxx_1_1file__handle.html" title="A handle to a regular file or device, kept data layout compatible with async_file_handle. " alt="afio_v2_xxx::file_handle" shape="rect" coords="104,112,302,136"/>
+<area href="classafio__v2__xxx_1_1io__handle.html" title="A handle to something capable of scatter-gather i/o. " alt="afio_v2_xxx::io_handle" shape="rect" coords="0,56,198,80"/>
+<area href="classafio__v2__xxx_1_1fs__handle.html" title="A handle to something with a device and inode number. " alt="afio_v2_xxx::fs_handle" shape="rect" coords="208,56,406,80"/>
+<area href="classafio__v2__xxx_1_1handle.html" title="A native_handle_type which is managed by the lifetime of this object instance. " alt="afio_v2_xxx::handle" shape="rect" coords="0,0,198,24"/>
 </map>
  </div></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
 Public Types</h2></td></tr>
-<tr class="memitem:ae881dbcdc2b71009f2a61895a0a45a3e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae881dbcdc2b71009f2a61895a0a45a3e"></a>
+<tr class="memitem:a4356735ad4ed5508a11d8425ecebb71d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4356735ad4ed5508a11d8425ecebb71d"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><b>dev_t</b> = file_handle::dev_t</td></tr>
-<tr class="separator:ae881dbcdc2b71009f2a61895a0a45a3e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afe12988dc9a05cb7bdd4435b45e50591"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afe12988dc9a05cb7bdd4435b45e50591"></a>
+<tr class="separator:a4356735ad4ed5508a11d8425ecebb71d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3eab6961fcb3281565509deacffc39e4"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3eab6961fcb3281565509deacffc39e4"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><b>ino_t</b> = file_handle::ino_t</td></tr>
-<tr class="separator:afe12988dc9a05cb7bdd4435b45e50591"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abc812234dbdd26eaeb19312357fdb64f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="abc812234dbdd26eaeb19312357fdb64f"></a>
+<tr class="separator:a3eab6961fcb3281565509deacffc39e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af7b06e2a262328b7b55e7327a763a406"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af7b06e2a262328b7b55e7327a763a406"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><b>path_view_type</b> = <a class="el" href="classafio__v2__xxx_1_1path__view.html">file_handle::path_view_type</a></td></tr>
-<tr class="separator:abc812234dbdd26eaeb19312357fdb64f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0dacafa3abaa61b3b26ffa305fc09970"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0dacafa3abaa61b3b26ffa305fc09970"></a>
+<tr class="separator:af7b06e2a262328b7b55e7327a763a406"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab808f7ff9de4f37e046afa4cb90478b7"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab808f7ff9de4f37e046afa4cb90478b7"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><b>path_type</b> = io_handle::path_type</td></tr>
-<tr class="separator:a0dacafa3abaa61b3b26ffa305fc09970"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2e4a0216d0cf67f26136f17fc0100a16"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2e4a0216d0cf67f26136f17fc0100a16"></a>
+<tr class="separator:ab808f7ff9de4f37e046afa4cb90478b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a05326220bdb9099e980e931cb6fb122f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a05326220bdb9099e980e931cb6fb122f"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><b>extent_type</b> = io_handle::extent_type</td></tr>
-<tr class="separator:a2e4a0216d0cf67f26136f17fc0100a16"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1e9d59b7d6b6d4f0762db5aa013f373b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1e9d59b7d6b6d4f0762db5aa013f373b"></a>
+<tr class="separator:a05326220bdb9099e980e931cb6fb122f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abf39a6938fe3e58730921f69e197ce2e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="abf39a6938fe3e58730921f69e197ce2e"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><b>size_type</b> = io_handle::size_type</td></tr>
-<tr class="separator:a1e9d59b7d6b6d4f0762db5aa013f373b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4252c4047fb520bcedfcd90040c17b37"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4252c4047fb520bcedfcd90040c17b37"></a>
+<tr class="separator:abf39a6938fe3e58730921f69e197ce2e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a65309b707922e501d5895916c64e1a4e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a65309b707922e501d5895916c64e1a4e"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><b>mode</b> = <a class="el" href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18">io_handle::mode</a></td></tr>
-<tr class="separator:a4252c4047fb520bcedfcd90040c17b37"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a013a4709cdc8733c54132a6a0726fb41"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a013a4709cdc8733c54132a6a0726fb41"></a>
+<tr class="separator:a65309b707922e501d5895916c64e1a4e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1d291996a3f9712d93db5f0753478636"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1d291996a3f9712d93db5f0753478636"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><b>creation</b> = <a class="el" href="classafio__v2__xxx_1_1handle.html#a45ff5c1c5662623d99156870dfeee0a7">io_handle::creation</a></td></tr>
-<tr class="separator:a013a4709cdc8733c54132a6a0726fb41"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab48a3007097cfa403e68101954ddd477"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab48a3007097cfa403e68101954ddd477"></a>
+<tr class="separator:a1d291996a3f9712d93db5f0753478636"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a16df7a1dad404aadca8ee1166c558bf4"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a16df7a1dad404aadca8ee1166c558bf4"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><b>caching</b> = <a class="el" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9e">io_handle::caching</a></td></tr>
-<tr class="separator:ab48a3007097cfa403e68101954ddd477"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af275f6aff0e84c73877b3f3511d4f903"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af275f6aff0e84c73877b3f3511d4f903"></a>
+<tr class="separator:a16df7a1dad404aadca8ee1166c558bf4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad4989ff4925e90b34a1cdea824bf0bac"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad4989ff4925e90b34a1cdea824bf0bac"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><b>flag</b> = io_handle::flag</td></tr>
-<tr class="separator:af275f6aff0e84c73877b3f3511d4f903"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abcdd973d43bca7a80b75603c97b8a03a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="abcdd973d43bca7a80b75603c97b8a03a"></a>
+<tr class="separator:ad4989ff4925e90b34a1cdea824bf0bac"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a27f05141cca51cefd88b51ce2adc5a01"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a27f05141cca51cefd88b51ce2adc5a01"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><b>buffer_type</b> = <a class="el" href="structafio__v2__xxx_1_1io__handle_1_1buffer__type.html">io_handle::buffer_type</a></td></tr>
-<tr class="separator:abcdd973d43bca7a80b75603c97b8a03a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8b4e8c3d96a045d68b7490482a6fcf34"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8b4e8c3d96a045d68b7490482a6fcf34"></a>
+<tr class="separator:a27f05141cca51cefd88b51ce2adc5a01"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:addc3baa29bc2b309043dcc314c984cfe"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="addc3baa29bc2b309043dcc314c984cfe"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><b>const_buffer_type</b> = <a class="el" href="structafio__v2__xxx_1_1io__handle_1_1const__buffer__type.html">io_handle::const_buffer_type</a></td></tr>
-<tr class="separator:a8b4e8c3d96a045d68b7490482a6fcf34"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0ce3592c95434ac52711e86e9a22ed6d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0ce3592c95434ac52711e86e9a22ed6d"></a>
+<tr class="separator:addc3baa29bc2b309043dcc314c984cfe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6ae97ef40cdd0932e0e35cae5b5c8eb4"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6ae97ef40cdd0932e0e35cae5b5c8eb4"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><b>buffers_type</b> = <a class="el" href="classafio__v2__xxx_1_1io__handle.html#a70a3c5e6f62efc95db81f831f3b90a2c">io_handle::buffers_type</a></td></tr>
-<tr class="separator:a0ce3592c95434ac52711e86e9a22ed6d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac0191d9ace58e8f7c4fb1ddd6e75e57e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac0191d9ace58e8f7c4fb1ddd6e75e57e"></a>
+<tr class="separator:a6ae97ef40cdd0932e0e35cae5b5c8eb4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acb3cf485007ae052ad4d7fa489cb6024"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="acb3cf485007ae052ad4d7fa489cb6024"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><b>const_buffers_type</b> = <a class="el" href="classafio__v2__xxx_1_1io__handle.html#a639b8760b1b98df95e4956f6cc56f6b5">io_handle::const_buffers_type</a></td></tr>
-<tr class="separator:ac0191d9ace58e8f7c4fb1ddd6e75e57e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aea56c3f195f2d1376e2603a9d9a9df59"><td class="memTemplParams" colspan="2"><a class="anchor" id="aea56c3f195f2d1376e2603a9d9a9df59"></a>
+<tr class="separator:acb3cf485007ae052ad4d7fa489cb6024"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a04c1470699131d36ef3f43982690ef9e"><td class="memTemplParams" colspan="2"><a class="anchor" id="a04c1470699131d36ef3f43982690ef9e"></a>
 template&lt;class T &gt; </td></tr>
-<tr class="memitem:aea56c3f195f2d1376e2603a9d9a9df59"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><b>io_request</b> = <a class="el" href="structafio__v2__xxx_1_1io__handle_1_1io__request.html">io_handle::io_request</a>&lt; T &gt;</td></tr>
-<tr class="separator:aea56c3f195f2d1376e2603a9d9a9df59"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af056e7f0890da5d370afc08d6e5a56c8"><td class="memTemplParams" colspan="2"><a class="anchor" id="af056e7f0890da5d370afc08d6e5a56c8"></a>
+<tr class="memitem:a04c1470699131d36ef3f43982690ef9e"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><b>io_request</b> = <a class="el" href="structafio__v2__xxx_1_1io__handle_1_1io__request.html">io_handle::io_request</a>&lt; T &gt;</td></tr>
+<tr class="separator:a04c1470699131d36ef3f43982690ef9e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a76d2631eef67d71930e9d1c690c31a8d"><td class="memTemplParams" colspan="2"><a class="anchor" id="a76d2631eef67d71930e9d1c690c31a8d"></a>
 template&lt;class T &gt; </td></tr>
-<tr class="memitem:af056e7f0890da5d370afc08d6e5a56c8"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><b>io_result</b> = <a class="el" href="structafio__v2__xxx_1_1io__handle_1_1io__result.html">io_handle::io_result</a>&lt; T &gt;</td></tr>
-<tr class="separator:af056e7f0890da5d370afc08d6e5a56c8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a78ad3cca36cdd444a459b5f63d413c19"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1async__file__handle.html#a78ad3cca36cdd444a459b5f63d413c19">erased_io_state_ptr</a> = std::unique_ptr&lt; _erased_io_state_type, _io_state_deleter &gt;</td></tr>
-<tr class="separator:a78ad3cca36cdd444a459b5f63d413c19"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a06eb57f7a0f9f0f975de47395808ee28"><td class="memTemplParams" colspan="2">template&lt;class CompletionRoutine , class BuffersType &gt; </td></tr>
-<tr class="memitem:a06eb57f7a0f9f0f975de47395808ee28"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1async__file__handle.html#a06eb57f7a0f9f0f975de47395808ee28">io_state_ptr</a> = std::unique_ptr&lt; _io_state_type&lt; CompletionRoutine, BuffersType &gt;, _io_state_deleter &gt;</td></tr>
-<tr class="separator:a06eb57f7a0f9f0f975de47395808ee28"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a76d2631eef67d71930e9d1c690c31a8d"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><b>io_result</b> = <a class="el" href="structafio__v2__xxx_1_1io__handle_1_1io__result.html">io_handle::io_result</a>&lt; T &gt;</td></tr>
+<tr class="separator:a76d2631eef67d71930e9d1c690c31a8d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0344f48ef10fa2b94199d5566aedd879"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0344f48ef10fa2b94199d5566aedd879"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1fs__handle.html#a0344f48ef10fa2b94199d5566aedd879">unique_id_type</a> = QUICKCPPLIB_NAMESPACE::integers128::uint128</td></tr>
 <tr class="memdesc:a0344f48ef10fa2b94199d5566aedd879"><td class="mdescLeft">&#160;</td><td class="mdescRight">The unique identifier type used by this handle. <br/></td></tr>
@@ -201,59 +194,88 @@ using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cla
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a1b8753468fe5561b92da18d1cb4a6c68"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1b8753468fe5561b92da18d1cb4a6c68"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1async__file__handle.html#a1b8753468fe5561b92da18d1cb4a6c68">async_file_handle</a> ()=default</td></tr>
-<tr class="memdesc:a1b8753468fe5561b92da18d1cb4a6c68"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor. <br/></td></tr>
-<tr class="separator:a1b8753468fe5561b92da18d1cb4a6c68"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a59973a4ee6681fa999bfcc7a6ee2b8eb"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a59973a4ee6681fa999bfcc7a6ee2b8eb"></a>
-constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1async__file__handle.html#a59973a4ee6681fa999bfcc7a6ee2b8eb">async_file_handle</a> (<a class="el" href="classafio__v2__xxx_1_1io__service.html">io_service</a> *<a class="el" href="classafio__v2__xxx_1_1file__handle.html#a672324d44ea84ccfb71594c1036628ac">service</a>, <a class="el" href="structafio__v2__xxx_1_1native__handle__type.html">native_handle_type</a> h, dev_t devid, ino_t inode, <a class="el" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9e">caching</a> <a class="el" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9e">caching</a>=<a class="el" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9ea334c4a4c42fdb79d7ebc3e73b517e6f8">caching::none</a>, flag <a class="el" href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">flags</a>=flag::none)</td></tr>
-<tr class="memdesc:a59973a4ee6681fa999bfcc7a6ee2b8eb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a handle from a supplied native handle. <br/></td></tr>
-<tr class="separator:a59973a4ee6681fa999bfcc7a6ee2b8eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7226567016e1729200791fd0423b605e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7226567016e1729200791fd0423b605e"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1async__file__handle.html#a7226567016e1729200791fd0423b605e">async_file_handle</a> (<a class="el" href="classafio__v2__xxx_1_1async__file__handle.html">async_file_handle</a> &amp;&amp;o) noexcept=default</td></tr>
-<tr class="memdesc:a7226567016e1729200791fd0423b605e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Implicit move construction of async_file_handle permitted. <br/></td></tr>
-<tr class="separator:a7226567016e1729200791fd0423b605e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acd47b60681f19ee2d2906d27ee703611"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="acd47b60681f19ee2d2906d27ee703611"></a>
-constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1async__file__handle.html#acd47b60681f19ee2d2906d27ee703611">async_file_handle</a> (<a class="el" href="classafio__v2__xxx_1_1file__handle.html">file_handle</a> &amp;&amp;o) noexcept</td></tr>
-<tr class="memdesc:acd47b60681f19ee2d2906d27ee703611"><td class="mdescLeft">&#160;</td><td class="mdescRight">Explicit conversion from file_handle permitted. <br/></td></tr>
-<tr class="separator:acd47b60681f19ee2d2906d27ee703611"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6e6df4068e197e12169be113f18d0799"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6e6df4068e197e12169be113f18d0799"></a>
-constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1async__file__handle.html#a6e6df4068e197e12169be113f18d0799">async_file_handle</a> (<a class="el" href="classafio__v2__xxx_1_1handle.html">handle</a> &amp;&amp;o, <a class="el" href="classafio__v2__xxx_1_1io__service.html">io_service</a> *<a class="el" href="classafio__v2__xxx_1_1file__handle.html#a672324d44ea84ccfb71594c1036628ac">service</a>, dev_t devid, ino_t inode) noexcept</td></tr>
-<tr class="memdesc:a6e6df4068e197e12169be113f18d0799"><td class="mdescLeft">&#160;</td><td class="mdescRight">Explicit conversion from handle and io_handle permitted. <br/></td></tr>
-<tr class="separator:a6e6df4068e197e12169be113f18d0799"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8bac7dde456d65b956f324d981461dd2"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8bac7dde456d65b956f324d981461dd2"></a>
-<a class="el" href="classafio__v2__xxx_1_1async__file__handle.html">async_file_handle</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1async__file__handle.html#a8bac7dde456d65b956f324d981461dd2">operator=</a> (<a class="el" href="classafio__v2__xxx_1_1async__file__handle.html">async_file_handle</a> &amp;&amp;o) noexcept</td></tr>
-<tr class="memdesc:a8bac7dde456d65b956f324d981461dd2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Move assignment of async_file_handle permitted. <br/></td></tr>
-<tr class="separator:a8bac7dde456d65b956f324d981461dd2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1f4b597a58fd4713d04ec81ab70ab801"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1f4b597a58fd4713d04ec81ab70ab801"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1async__file__handle.html#a1f4b597a58fd4713d04ec81ab70ab801">swap</a> (<a class="el" href="classafio__v2__xxx_1_1async__file__handle.html">async_file_handle</a> &amp;o) noexcept</td></tr>
-<tr class="memdesc:a1f4b597a58fd4713d04ec81ab70ab801"><td class="mdescLeft">&#160;</td><td class="mdescRight">Swap with another instance. <br/></td></tr>
-<tr class="separator:a1f4b597a58fd4713d04ec81ab70ab801"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaf6595663e03f339d7eb305278703426"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aaf6595663e03f339d7eb305278703426"></a>
+<tr class="memitem:a5f3f5dd54b5c2cc9810621c05a6171f6"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5f3f5dd54b5c2cc9810621c05a6171f6"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1mapped__file__handle.html#a5f3f5dd54b5c2cc9810621c05a6171f6">mapped_file_handle</a> ()=default</td></tr>
+<tr class="memdesc:a5f3f5dd54b5c2cc9810621c05a6171f6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor. <br/></td></tr>
+<tr class="separator:a5f3f5dd54b5c2cc9810621c05a6171f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acfb095539345cd3ab37a6bbf379ac434"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="acfb095539345cd3ab37a6bbf379ac434"></a>
+constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1mapped__file__handle.html#acfb095539345cd3ab37a6bbf379ac434">mapped_file_handle</a> (<a class="el" href="structafio__v2__xxx_1_1native__handle__type.html">native_handle_type</a> h, dev_t devid, ino_t inode, <a class="el" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9e">caching</a> <a class="el" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9e">caching</a>=<a class="el" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9ea334c4a4c42fdb79d7ebc3e73b517e6f8">caching::none</a>, flag <a class="el" href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">flags</a>=flag::none)</td></tr>
+<tr class="memdesc:acfb095539345cd3ab37a6bbf379ac434"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a handle from a supplied native handle. <br/></td></tr>
+<tr class="separator:acfb095539345cd3ab37a6bbf379ac434"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a01972772c9b438cc489325d34350257c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a01972772c9b438cc489325d34350257c"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1mapped__file__handle.html#a01972772c9b438cc489325d34350257c">mapped_file_handle</a> (<a class="el" href="classafio__v2__xxx_1_1mapped__file__handle.html">mapped_file_handle</a> &amp;&amp;o) noexcept=default</td></tr>
+<tr class="memdesc:a01972772c9b438cc489325d34350257c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Implicit move construction of mapped_file_handle permitted. <br/></td></tr>
+<tr class="separator:a01972772c9b438cc489325d34350257c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afd7469b8fa7aa8e0a3dd84cb42697621"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afd7469b8fa7aa8e0a3dd84cb42697621"></a>
+constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1mapped__file__handle.html#afd7469b8fa7aa8e0a3dd84cb42697621">mapped_file_handle</a> (<a class="el" href="classafio__v2__xxx_1_1file__handle.html">file_handle</a> &amp;&amp;o) noexcept</td></tr>
+<tr class="memdesc:afd7469b8fa7aa8e0a3dd84cb42697621"><td class="mdescLeft">&#160;</td><td class="mdescRight">Explicit conversion from file_handle permitted. <br/></td></tr>
+<tr class="separator:afd7469b8fa7aa8e0a3dd84cb42697621"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad8714dac7f0b13ceca5f21ba25e1fa10"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad8714dac7f0b13ceca5f21ba25e1fa10"></a>
+<a class="el" href="classafio__v2__xxx_1_1mapped__file__handle.html">mapped_file_handle</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1mapped__file__handle.html#ad8714dac7f0b13ceca5f21ba25e1fa10">operator=</a> (<a class="el" href="classafio__v2__xxx_1_1mapped__file__handle.html">mapped_file_handle</a> &amp;&amp;o) noexcept</td></tr>
+<tr class="memdesc:ad8714dac7f0b13ceca5f21ba25e1fa10"><td class="mdescLeft">&#160;</td><td class="mdescRight">Move assignment of mapped_file_handle permitted. <br/></td></tr>
+<tr class="separator:ad8714dac7f0b13ceca5f21ba25e1fa10"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afad1771041a8f2b9c6e848c0fc13df57"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afad1771041a8f2b9c6e848c0fc13df57"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1mapped__file__handle.html#afad1771041a8f2b9c6e848c0fc13df57">swap</a> (<a class="el" href="classafio__v2__xxx_1_1mapped__file__handle.html">mapped_file_handle</a> &amp;o) noexcept</td></tr>
+<tr class="memdesc:afad1771041a8f2b9c6e848c0fc13df57"><td class="mdescLeft">&#160;</td><td class="mdescRight">Swap with another instance. <br/></td></tr>
+<tr class="separator:afad1771041a8f2b9c6e848c0fc13df57"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af33b97dcd0a501da97baa39f44e418da"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af33b97dcd0a501da97baa39f44e418da"></a>
+const <a class="el" href="classafio__v2__xxx_1_1section__handle.html">section_handle</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1mapped__file__handle.html#af33b97dcd0a501da97baa39f44e418da">section</a> () const noexcept</td></tr>
+<tr class="memdesc:af33b97dcd0a501da97baa39f44e418da"><td class="mdescLeft">&#160;</td><td class="mdescRight">The memory section this handle is using. <br/></td></tr>
+<tr class="separator:af33b97dcd0a501da97baa39f44e418da"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a04e89968a4391fcdc2b8cd9203337c32"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a04e89968a4391fcdc2b8cd9203337c32"></a>
+<a class="el" href="classafio__v2__xxx_1_1section__handle.html">section_handle</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1mapped__file__handle.html#a04e89968a4391fcdc2b8cd9203337c32">section</a> () noexcept</td></tr>
+<tr class="memdesc:a04e89968a4391fcdc2b8cd9203337c32"><td class="mdescLeft">&#160;</td><td class="mdescRight">The memory section this handle is using. <br/></td></tr>
+<tr class="separator:a04e89968a4391fcdc2b8cd9203337c32"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa7fe74ccbf2fc255897bacaa6c41d319"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa7fe74ccbf2fc255897bacaa6c41d319"></a>
+const <a class="el" href="classafio__v2__xxx_1_1map__handle.html">map_handle</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1mapped__file__handle.html#aa7fe74ccbf2fc255897bacaa6c41d319">map</a> () const noexcept</td></tr>
+<tr class="memdesc:aa7fe74ccbf2fc255897bacaa6c41d319"><td class="mdescLeft">&#160;</td><td class="mdescRight">The map this handle is using. <br/></td></tr>
+<tr class="separator:aa7fe74ccbf2fc255897bacaa6c41d319"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a767caa74d636805d0986adc59b70060c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a767caa74d636805d0986adc59b70060c"></a>
+<a class="el" href="classafio__v2__xxx_1_1map__handle.html">map_handle</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1mapped__file__handle.html#a767caa74d636805d0986adc59b70060c">map</a> () noexcept</td></tr>
+<tr class="memdesc:a767caa74d636805d0986adc59b70060c"><td class="mdescLeft">&#160;</td><td class="mdescRight">The map this handle is using. <br/></td></tr>
+<tr class="separator:a767caa74d636805d0986adc59b70060c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adca505e51ea006ffa59e3673ea0a9853"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="adca505e51ea006ffa59e3673ea0a9853"></a>
+char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1mapped__file__handle.html#adca505e51ea006ffa59e3673ea0a9853">address</a> () const noexcept</td></tr>
+<tr class="memdesc:adca505e51ea006ffa59e3673ea0a9853"><td class="mdescLeft">&#160;</td><td class="mdescRight">The address in memory where this mapped file resides. <br/></td></tr>
+<tr class="separator:adca505e51ea006ffa59e3673ea0a9853"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1dc81182455d0cceb0eb8db1a19df464"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1dc81182455d0cceb0eb8db1a19df464"></a>
+result&lt; extent_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1mapped__file__handle.html#a1dc81182455d0cceb0eb8db1a19df464">underlying_file_length</a> () const noexcept</td></tr>
+<tr class="memdesc:a1dc81182455d0cceb0eb8db1a19df464"><td class="mdescLeft">&#160;</td><td class="mdescRight">The length of the underlying file. <br/></td></tr>
+<tr class="separator:a1dc81182455d0cceb0eb8db1a19df464"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a78e774267e805fcb88e384d5ba09960f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a78e774267e805fcb88e384d5ba09960f"></a>
+virtual result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1mapped__file__handle.html#a78e774267e805fcb88e384d5ba09960f">close</a> () noexceptoverride</td></tr>
+<tr class="memdesc:a78e774267e805fcb88e384d5ba09960f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Immediately close the native handle type managed by this handle. <br/></td></tr>
+<tr class="separator:a78e774267e805fcb88e384d5ba09960f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a778785515ac0c8a6b4d8aa4e852e4552"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a778785515ac0c8a6b4d8aa4e852e4552"></a>
+virtual <a class="el" href="structafio__v2__xxx_1_1native__handle__type.html">native_handle_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1mapped__file__handle.html#a778785515ac0c8a6b4d8aa4e852e4552">release</a> () noexceptoverride</td></tr>
+<tr class="memdesc:a778785515ac0c8a6b4d8aa4e852e4552"><td class="mdescLeft">&#160;</td><td class="mdescRight">Release the native handle type managed by this handle. <br/></td></tr>
+<tr class="separator:a778785515ac0c8a6b4d8aa4e852e4552"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a22df02b12a8b5f27e21da509aadb31d4"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a22df02b12a8b5f27e21da509aadb31d4"></a>
 virtual <a class="el" href="structafio__v2__xxx_1_1io__handle_1_1io__result.html">io_result</a><br class="typebreak"/>
 &lt; const_buffers_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>barrier</b> (<a class="el" href="structafio__v2__xxx_1_1io__handle_1_1io__request.html">io_request</a>&lt; const_buffers_type &gt; reqs=<a class="el" href="structafio__v2__xxx_1_1io__handle_1_1io__request.html">io_request</a>&lt; const_buffers_type &gt;(), bool wait_for_device=false, bool and_metadata=false, <a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a>()) noexceptoverride</td></tr>
-<tr class="separator:aaf6595663e03f339d7eb305278703426"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5bf8b6c6bca19b98c999e9ba762e8ceb"><td class="memItemLeft" align="right" valign="top">virtual result&lt; <a class="el" href="classafio__v2__xxx_1_1async__file__handle.html">async_file_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1async__file__handle.html#a5bf8b6c6bca19b98c999e9ba762e8ceb">clone</a> (<a class="el" href="classafio__v2__xxx_1_1io__service.html">io_service</a> &amp;<a class="el" href="classafio__v2__xxx_1_1file__handle.html#a672324d44ea84ccfb71594c1036628ac">service</a>) const noexcept</td></tr>
-<tr class="separator:a5bf8b6c6bca19b98c999e9ba762e8ceb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a763966d2304e8eead72dcfd2bc775f35"><td class="memTemplParams" colspan="2">template&lt;class CompletionRoutine &gt; </td></tr>
-<tr class="memitem:a763966d2304e8eead72dcfd2bc775f35"><td class="memTemplItemLeft" align="right" valign="top">result&lt; <a class="el" href="classafio__v2__xxx_1_1async__file__handle.html#a06eb57f7a0f9f0f975de47395808ee28">io_state_ptr</a><br class="typebreak"/>
-&lt; CompletionRoutine, <br class="typebreak"/>
-buffers_type &gt; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1async__file__handle.html#a763966d2304e8eead72dcfd2bc775f35">async_read</a> (<a class="el" href="structafio__v2__xxx_1_1io__handle_1_1io__request.html">io_request</a>&lt; buffers_type &gt; reqs, CompletionRoutine &amp;&amp;completion) noexcept</td></tr>
-<tr class="memdesc:a763966d2304e8eead72dcfd2bc775f35"><td class="mdescLeft">&#160;</td><td class="mdescRight">Schedule a read to occur asynchronously.  <a href="#a763966d2304e8eead72dcfd2bc775f35">More...</a><br/></td></tr>
-<tr class="separator:a763966d2304e8eead72dcfd2bc775f35"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab493207a0372c9f4122bcbf39860a81e"><td class="memTemplParams" colspan="2">template&lt;class CompletionRoutine &gt; </td></tr>
-<tr class="memitem:ab493207a0372c9f4122bcbf39860a81e"><td class="memTemplItemLeft" align="right" valign="top">result&lt; <a class="el" href="classafio__v2__xxx_1_1async__file__handle.html#a06eb57f7a0f9f0f975de47395808ee28">io_state_ptr</a><br class="typebreak"/>
-&lt; CompletionRoutine, <br class="typebreak"/>
-const_buffers_type &gt; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1async__file__handle.html#ab493207a0372c9f4122bcbf39860a81e">async_write</a> (<a class="el" href="structafio__v2__xxx_1_1io__handle_1_1io__request.html">io_request</a>&lt; const_buffers_type &gt; reqs, CompletionRoutine &amp;&amp;completion) noexcept</td></tr>
-<tr class="memdesc:ab493207a0372c9f4122bcbf39860a81e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Schedule a write to occur asynchronously.  <a href="#ab493207a0372c9f4122bcbf39860a81e">More...</a><br/></td></tr>
-<tr class="separator:ab493207a0372c9f4122bcbf39860a81e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acf4d3e1458451b5f9228e294beae101f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="acf4d3e1458451b5f9228e294beae101f"></a>
-virtual <a class="el" href="structafio__v2__xxx_1_1io__handle_1_1io__result.html">io_result</a>&lt; buffers_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>read</b> (<a class="el" href="structafio__v2__xxx_1_1io__handle_1_1io__request.html">io_request</a>&lt; buffers_type &gt; reqs, <a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a>()) noexceptoverride</td></tr>
-<tr class="separator:acf4d3e1458451b5f9228e294beae101f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4489767a88acf8cdb963ecfaf4751268"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4489767a88acf8cdb963ecfaf4751268"></a>
-virtual <a class="el" href="structafio__v2__xxx_1_1io__handle_1_1io__result.html">io_result</a><br class="typebreak"/>
-&lt; const_buffers_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>write</b> (<a class="el" href="structafio__v2__xxx_1_1io__handle_1_1io__request.html">io_request</a>&lt; const_buffers_type &gt; reqs, <a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a>()) noexceptoverride</td></tr>
-<tr class="separator:a4489767a88acf8cdb963ecfaf4751268"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="separator:a22df02b12a8b5f27e21da509aadb31d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab37c9af33f662fa5e4cbfc1dff155607"><td class="memItemLeft" align="right" valign="top">virtual result&lt; <a class="el" href="classafio__v2__xxx_1_1file__handle.html">file_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1mapped__file__handle.html#ab37c9af33f662fa5e4cbfc1dff155607">clone</a> () const noexceptoverride</td></tr>
+<tr class="separator:ab37c9af33f662fa5e4cbfc1dff155607"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad9f3e51710bff40a4237f08feb9c4a63"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad9f3e51710bff40a4237f08feb9c4a63"></a>
+virtual result&lt; extent_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1mapped__file__handle.html#ad9f3e51710bff40a4237f08feb9c4a63">length</a> () const noexceptoverride</td></tr>
+<tr class="memdesc:ad9f3e51710bff40a4237f08feb9c4a63"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the current maximum permitted extent of the file. <br/></td></tr>
+<tr class="separator:ad9f3e51710bff40a4237f08feb9c4a63"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a47cd01f73559631556a0fd8817f01d48"><td class="memItemLeft" align="right" valign="top">virtual result&lt; extent_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1mapped__file__handle.html#a47cd01f73559631556a0fd8817f01d48">truncate</a> (extent_type newsize) noexceptoverride</td></tr>
+<tr class="memdesc:a47cd01f73559631556a0fd8817f01d48"><td class="mdescLeft">&#160;</td><td class="mdescRight">Resize the current maximum permitted extent of the mapped file to the given extent, avoiding any new allocation of physical storage where supported.  <a href="#a47cd01f73559631556a0fd8817f01d48">More...</a><br/></td></tr>
+<tr class="separator:a47cd01f73559631556a0fd8817f01d48"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aea61aa0d30653b72a8e877e3b507552a"><td class="memItemLeft" align="right" valign="top">result&lt; extent_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1mapped__file__handle.html#aea61aa0d30653b72a8e877e3b507552a">truncate</a> () noexcept</td></tr>
+<tr class="memdesc:aea61aa0d30653b72a8e877e3b507552a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Resize the mapping to match that of the underlying file, returning the size of the underlying file.  <a href="#aea61aa0d30653b72a8e877e3b507552a">More...</a><br/></td></tr>
+<tr class="separator:aea61aa0d30653b72a8e877e3b507552a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a58a53c65313fcf097bb57cd077adc17d"><td class="memItemLeft" align="right" valign="top">virtual result&lt; extent_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1mapped__file__handle.html#a58a53c65313fcf097bb57cd077adc17d">zero</a> (extent_type offset, extent_type bytes, <a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a>=<a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a>()) noexceptoverride</td></tr>
+<tr class="memdesc:a58a53c65313fcf097bb57cd077adc17d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Efficiently zero, and possibly deallocate, data on storage.  <a href="#a58a53c65313fcf097bb57cd077adc17d">More...</a><br/></td></tr>
+<tr class="separator:a58a53c65313fcf097bb57cd077adc17d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9700eb2bd35b78fcd8131a07090690dc"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="structafio__v2__xxx_1_1io__handle_1_1io__result.html">io_result</a>&lt; buffers_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1mapped__file__handle.html#a9700eb2bd35b78fcd8131a07090690dc">read</a> (<a class="el" href="structafio__v2__xxx_1_1io__handle_1_1io__request.html">io_request</a>&lt; buffers_type &gt; reqs, <a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a>()) noexceptoverride</td></tr>
+<tr class="memdesc:a9700eb2bd35b78fcd8131a07090690dc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read data from the mapped file.  <a href="#a9700eb2bd35b78fcd8131a07090690dc">More...</a><br/></td></tr>
+<tr class="separator:a9700eb2bd35b78fcd8131a07090690dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab5445524727b27b8df50347320bc8d6e"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="structafio__v2__xxx_1_1io__handle_1_1io__result.html">io_result</a><br class="typebreak"/>
+&lt; const_buffers_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1mapped__file__handle.html#ab5445524727b27b8df50347320bc8d6e">write</a> (<a class="el" href="structafio__v2__xxx_1_1io__handle_1_1io__request.html">io_request</a>&lt; const_buffers_type &gt; reqs, <a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a>()) noexceptoverride</td></tr>
+<tr class="memdesc:ab5445524727b27b8df50347320bc8d6e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write data to the mapped file. Note this will never extend past the current length of the mapped file.  <a href="#ab5445524727b27b8df50347320bc8d6e">More...</a><br/></td></tr>
+<tr class="separator:ab5445524727b27b8df50347320bc8d6e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae56f6754d6ad0a037ebb134d83f45dfc"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae56f6754d6ad0a037ebb134d83f45dfc"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1file__handle.html#ae56f6754d6ad0a037ebb134d83f45dfc">swap</a> (<a class="el" href="classafio__v2__xxx_1_1file__handle.html">file_handle</a> &amp;o) noexcept</td></tr>
 <tr class="memdesc:ae56f6754d6ad0a037ebb134d83f45dfc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Swap with another instance. <br/></td></tr>
@@ -262,33 +284,20 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1handle.html#a657c12a309cf02bf2351bfcc7f41463b">swap</a> (<a class="el" href="classafio__v2__xxx_1_1handle.html">handle</a> &amp;o) noexcept</td></tr>
 <tr class="memdesc:a657c12a309cf02bf2351bfcc7f41463b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Swap with another instance. <br/></td></tr>
 <tr class="separator:a657c12a309cf02bf2351bfcc7f41463b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a08ec5c13136c04ae424833173734abdb"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a08ec5c13136c04ae424833173734abdb"></a>
-virtual result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1file__handle.html#a08ec5c13136c04ae424833173734abdb">close</a> () noexceptoverride</td></tr>
-<tr class="memdesc:a08ec5c13136c04ae424833173734abdb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Immediately close the native handle type managed by this handle. <br/></td></tr>
-<tr class="separator:a08ec5c13136c04ae424833173734abdb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a243156928e89b8988a1412f211b3b603"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="structafio__v2__xxx_1_1io__handle_1_1io__result.html">io_result</a><br class="typebreak"/>
 &lt; const_buffers_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1io__handle.html#a243156928e89b8988a1412f211b3b603">barrier</a> (<a class="el" href="structafio__v2__xxx_1_1io__handle_1_1io__request.html">io_request</a>&lt; const_buffers_type &gt; reqs=<a class="el" href="structafio__v2__xxx_1_1io__handle_1_1io__request.html">io_request</a>&lt; const_buffers_type &gt;(), bool wait_for_device=false, bool and_metadata=false, <a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a>()) noexcept=0</td></tr>
 <tr class="memdesc:a243156928e89b8988a1412f211b3b603"><td class="mdescLeft">&#160;</td><td class="mdescRight">Issue a write reordering barrier such that writes preceding the barrier will reach storage before writes after this barrier.  <a href="#a243156928e89b8988a1412f211b3b603">More...</a><br/></td></tr>
 <tr class="separator:a243156928e89b8988a1412f211b3b603"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac544e656873ccf3b6665064f46cfaf2b"><td class="memItemLeft" align="right" valign="top">virtual result&lt; <a class="el" href="classafio__v2__xxx_1_1file__handle.html">file_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1file__handle.html#ac544e656873ccf3b6665064f46cfaf2b">clone</a> () const noexcept</td></tr>
-<tr class="separator:ac544e656873ccf3b6665064f46cfaf2b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a672324d44ea84ccfb71594c1036628ac"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a672324d44ea84ccfb71594c1036628ac"></a>
 <a class="el" href="classafio__v2__xxx_1_1io__service.html">io_service</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1file__handle.html#a672324d44ea84ccfb71594c1036628ac">service</a> () const noexcept</td></tr>
 <tr class="memdesc:a672324d44ea84ccfb71594c1036628ac"><td class="mdescLeft">&#160;</td><td class="mdescRight">The i/o service this handle is attached to, if any. <br/></td></tr>
 <tr class="separator:a672324d44ea84ccfb71594c1036628ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2083c37ffc746ec28f9e4d6b094d3ba5"><td class="memItemLeft" align="right" valign="top">virtual result&lt; extent_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1file__handle.html#a2083c37ffc746ec28f9e4d6b094d3ba5">length</a> () const noexcept</td></tr>
-<tr class="separator:a2083c37ffc746ec28f9e4d6b094d3ba5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a45873fd0b1ab27f936f046ed14124afd"><td class="memItemLeft" align="right" valign="top">virtual result&lt; extent_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1file__handle.html#a45873fd0b1ab27f936f046ed14124afd">truncate</a> (extent_type newsize) noexcept</td></tr>
-<tr class="separator:a45873fd0b1ab27f936f046ed14124afd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a03d1774e3ad8678fb4aac4ced57beeef"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a03d1774e3ad8678fb4aac4ced57beeef"></a>
 virtual result&lt; std::vector<br class="typebreak"/>
 &lt; std::pair&lt; extent_type, <br class="typebreak"/>
 extent_type &gt; &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1file__handle.html#a03d1774e3ad8678fb4aac4ced57beeef">extents</a> () const noexcept</td></tr>
 <tr class="memdesc:a03d1774e3ad8678fb4aac4ced57beeef"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a list of currently valid extents for this open file. WARNING: racy! <br/></td></tr>
 <tr class="separator:a03d1774e3ad8678fb4aac4ced57beeef"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a649aa39b0d4b60a05d4aab4be569dcb6"><td class="memItemLeft" align="right" valign="top">virtual result&lt; extent_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1file__handle.html#a649aa39b0d4b60a05d4aab4be569dcb6">zero</a> (extent_type offset, extent_type bytes, <a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
-<tr class="memdesc:a649aa39b0d4b60a05d4aab4be569dcb6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Efficiently zero, and possibly deallocate, data on storage.  <a href="#a649aa39b0d4b60a05d4aab4be569dcb6">More...</a><br/></td></tr>
-<tr class="separator:a649aa39b0d4b60a05d4aab4be569dcb6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4d9cbbb7aae98704c6ad97de080c4210"><td class="memItemLeft" align="right" valign="top">virtual size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1io__handle.html#a4d9cbbb7aae98704c6ad97de080c4210">max_buffers</a> () const noexcept</td></tr>
 <tr class="memdesc:a4d9cbbb7aae98704c6ad97de080c4210"><td class="mdescLeft">&#160;</td><td class="mdescRight">The <em>maximum</em> number of buffers which a single read or write syscall can process at a time for this specific open handle. On POSIX, this is known as <code>IOV_MAX</code>.  <a href="#a4d9cbbb7aae98704c6ad97de080c4210">More...</a><br/></td></tr>
 <tr class="separator:a4d9cbbb7aae98704c6ad97de080c4210"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -317,10 +326,6 @@ extent_type &gt; &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a
 <tr class="separator:a96b9da71ee7791fbaaa2470c936ec763"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a616a67222676af5ec5b3aa94d7c02428"><td class="memItemLeft" align="right" valign="top">virtual result&lt; path_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1handle.html#a616a67222676af5ec5b3aa94d7c02428">current_path</a> () const noexcept</td></tr>
 <tr class="separator:a616a67222676af5ec5b3aa94d7c02428"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a73d5f2070bce0c3d7fa536d3cbed7b52"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a73d5f2070bce0c3d7fa536d3cbed7b52"></a>
-virtual <a class="el" href="structafio__v2__xxx_1_1native__handle__type.html">native_handle_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1handle.html#a73d5f2070bce0c3d7fa536d3cbed7b52">release</a> () noexcept</td></tr>
-<tr class="memdesc:a73d5f2070bce0c3d7fa536d3cbed7b52"><td class="mdescLeft">&#160;</td><td class="mdescRight">Release the native handle type managed by this handle. <br/></td></tr>
-<tr class="separator:a73d5f2070bce0c3d7fa536d3cbed7b52"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4194a05dd9694d2c47d5a45f925db1d7"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4194a05dd9694d2c47d5a45f925db1d7"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1handle.html#a4194a05dd9694d2c47d5a45f925db1d7">is_valid</a> () const noexcept</td></tr>
 <tr class="memdesc:a4194a05dd9694d2c47d5a45f925db1d7"><td class="mdescLeft">&#160;</td><td class="mdescRight">True if the handle is valid (and usually open) <br/></td></tr>
@@ -422,14 +427,16 @@ ino_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cla
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:a5e6891894762e648e78726cabc23c0b9"><td class="memItemLeft" align="right" valign="top">static result&lt; <a class="el" href="classafio__v2__xxx_1_1async__file__handle.html">async_file_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1async__file__handle.html#a5e6891894762e648e78726cabc23c0b9">async_file</a> (<a class="el" href="classafio__v2__xxx_1_1io__service.html">io_service</a> &amp;<a class="el" href="classafio__v2__xxx_1_1file__handle.html#a672324d44ea84ccfb71594c1036628ac">service</a>, const <a class="el" href="classafio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;base, <a class="el" href="classafio__v2__xxx_1_1path__view.html">path_view_type</a> _path, <a class="el" href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18">mode</a> _mode=<a class="el" href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18aecae13117d6f0584c25a9da6c8f8415e">mode::read</a>, <a class="el" href="classafio__v2__xxx_1_1handle.html#a45ff5c1c5662623d99156870dfeee0a7">creation</a> _creation=creation::open_existing, <a class="el" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9e">caching</a> _caching=<a class="el" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9eaa181a603769c1f98ad927e7367c7aa51">caching::all</a>, flag <a class="el" href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">flags</a>=flag::none) noexcept</td></tr>
-<tr class="separator:a5e6891894762e648e78726cabc23c0b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2eb236d3277dac32fabbae2c39821a51"><td class="memItemLeft" align="right" valign="top">static result&lt; <a class="el" href="classafio__v2__xxx_1_1async__file__handle.html">async_file_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1async__file__handle.html#a2eb236d3277dac32fabbae2c39821a51">async_random_file</a> (<a class="el" href="classafio__v2__xxx_1_1io__service.html">io_service</a> &amp;<a class="el" href="classafio__v2__xxx_1_1file__handle.html#a672324d44ea84ccfb71594c1036628ac">service</a>, const <a class="el" href="classafio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;dirpath, <a class="el" href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18">mode</a> _mode=<a class="el" href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18aefb2a684e4afb7d55e6147fbe5a332ee">mode::write</a>, <a class="el" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9e">caching</a> _caching=<a class="el" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9ead5197d93c063a2b1e22d1630a39b7aef">caching::temporary</a>, flag <a class="el" href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">flags</a>=flag::none) noexcept</td></tr>
-<tr class="separator:a2eb236d3277dac32fabbae2c39821a51"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a458c97161d6612d55c716f7d2372a465"><td class="memItemLeft" align="right" valign="top">static result&lt; <a class="el" href="classafio__v2__xxx_1_1async__file__handle.html">async_file_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1async__file__handle.html#a458c97161d6612d55c716f7d2372a465">async_temp_file</a> (<a class="el" href="classafio__v2__xxx_1_1io__service.html">io_service</a> &amp;<a class="el" href="classafio__v2__xxx_1_1file__handle.html#a672324d44ea84ccfb71594c1036628ac">service</a>, <a class="el" href="classafio__v2__xxx_1_1path__view.html">path_view_type</a> name=<a class="el" href="classafio__v2__xxx_1_1path__view.html">path_view_type</a>(), <a class="el" href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18">mode</a> _mode=<a class="el" href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18aefb2a684e4afb7d55e6147fbe5a332ee">mode::write</a>, <a class="el" href="classafio__v2__xxx_1_1handle.html#a45ff5c1c5662623d99156870dfeee0a7">creation</a> _creation=creation::if_needed, <a class="el" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9e">caching</a> _caching=<a class="el" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9ead5197d93c063a2b1e22d1630a39b7aef">caching::temporary</a>, flag <a class="el" href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">flags</a>=flag::unlink_on_close) noexcept</td></tr>
-<tr class="separator:a458c97161d6612d55c716f7d2372a465"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af4cc1f1ddda8a421167c335265d10eb0"><td class="memItemLeft" align="right" valign="top">static result&lt; <a class="el" href="classafio__v2__xxx_1_1async__file__handle.html">async_file_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1async__file__handle.html#af4cc1f1ddda8a421167c335265d10eb0">async_temp_inode</a> (<a class="el" href="classafio__v2__xxx_1_1io__service.html">io_service</a> &amp;<a class="el" href="classafio__v2__xxx_1_1file__handle.html#a672324d44ea84ccfb71594c1036628ac">service</a>, <a class="el" href="classafio__v2__xxx_1_1path__view.html">path_view_type</a> dirpath=<a class="el" href="namespaceafio__v2__xxx.html#a4968bb2d647535f4b91427c66ff8b9e4">temporary_files_directory</a>(), <a class="el" href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18">mode</a> _mode=<a class="el" href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18aefb2a684e4afb7d55e6147fbe5a332ee">mode::write</a>, flag <a class="el" href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">flags</a>=flag::none) noexcept</td></tr>
-<tr class="separator:af4cc1f1ddda8a421167c335265d10eb0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aedf10997693cf088cf9d67720c4defe1"><td class="memItemLeft" align="right" valign="top">static result&lt; <a class="el" href="classafio__v2__xxx_1_1mapped__file__handle.html">mapped_file_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1mapped__file__handle.html#aedf10997693cf088cf9d67720c4defe1">mapped_file</a> (size_type reservation, const <a class="el" href="classafio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;base, <a class="el" href="classafio__v2__xxx_1_1path__view.html">path_view_type</a> _path, <a class="el" href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18">mode</a> _mode=<a class="el" href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18aecae13117d6f0584c25a9da6c8f8415e">mode::read</a>, <a class="el" href="classafio__v2__xxx_1_1handle.html#a45ff5c1c5662623d99156870dfeee0a7">creation</a> _creation=creation::open_existing, <a class="el" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9e">caching</a> _caching=<a class="el" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9eaa181a603769c1f98ad927e7367c7aa51">caching::all</a>, flag <a class="el" href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">flags</a>=flag::none) noexcept</td></tr>
+<tr class="separator:aedf10997693cf088cf9d67720c4defe1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1bb7ab6d64156732e0e6c26c47fbbf77"><td class="memItemLeft" align="right" valign="top">static result&lt; <a class="el" href="classafio__v2__xxx_1_1mapped__file__handle.html">mapped_file_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1mapped__file__handle.html#a1bb7ab6d64156732e0e6c26c47fbbf77">mapped_file</a> (const <a class="el" href="classafio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;base, <a class="el" href="classafio__v2__xxx_1_1path__view.html">path_view_type</a> _path, <a class="el" href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18">mode</a> _mode=<a class="el" href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18aecae13117d6f0584c25a9da6c8f8415e">mode::read</a>, <a class="el" href="classafio__v2__xxx_1_1handle.html#a45ff5c1c5662623d99156870dfeee0a7">creation</a> _creation=creation::open_existing, <a class="el" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9e">caching</a> _caching=<a class="el" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9eaa181a603769c1f98ad927e7367c7aa51">caching::all</a>, flag <a class="el" href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">flags</a>=flag::none) noexcept</td></tr>
+<tr class="separator:a1bb7ab6d64156732e0e6c26c47fbbf77"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a00875e717f4b2725bb58ecbb5310fc6f"><td class="memItemLeft" align="right" valign="top">static result&lt; <a class="el" href="classafio__v2__xxx_1_1mapped__file__handle.html">mapped_file_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1mapped__file__handle.html#a00875e717f4b2725bb58ecbb5310fc6f">mapped_random_file</a> (size_type reservation, const <a class="el" href="classafio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;dirpath, <a class="el" href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18">mode</a> _mode=<a class="el" href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18aefb2a684e4afb7d55e6147fbe5a332ee">mode::write</a>, <a class="el" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9e">caching</a> _caching=<a class="el" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9ead5197d93c063a2b1e22d1630a39b7aef">caching::temporary</a>, flag <a class="el" href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">flags</a>=flag::none) noexcept</td></tr>
+<tr class="separator:a00875e717f4b2725bb58ecbb5310fc6f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae19c88791bd2e0bca0d22ec576687a83"><td class="memItemLeft" align="right" valign="top">static result&lt; <a class="el" href="classafio__v2__xxx_1_1mapped__file__handle.html">mapped_file_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1mapped__file__handle.html#ae19c88791bd2e0bca0d22ec576687a83">mapped_temp_file</a> (size_type reservation, <a class="el" href="classafio__v2__xxx_1_1path__view.html">path_view_type</a> name=<a class="el" href="classafio__v2__xxx_1_1path__view.html">path_view_type</a>(), <a class="el" href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18">mode</a> _mode=<a class="el" href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18aefb2a684e4afb7d55e6147fbe5a332ee">mode::write</a>, <a class="el" href="classafio__v2__xxx_1_1handle.html#a45ff5c1c5662623d99156870dfeee0a7">creation</a> _creation=creation::if_needed, <a class="el" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9e">caching</a> _caching=<a class="el" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9ead5197d93c063a2b1e22d1630a39b7aef">caching::temporary</a>, flag <a class="el" href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">flags</a>=flag::unlink_on_close) noexcept</td></tr>
+<tr class="separator:ae19c88791bd2e0bca0d22ec576687a83"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a35439e5c32b702717402b9035dd25199"><td class="memItemLeft" align="right" valign="top">static result&lt; <a class="el" href="classafio__v2__xxx_1_1mapped__file__handle.html">mapped_file_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1mapped__file__handle.html#a35439e5c32b702717402b9035dd25199">mapped_temp_inode</a> (<a class="el" href="classafio__v2__xxx_1_1path__view.html">path_view_type</a> dirpath=<a class="el" href="namespaceafio__v2__xxx.html#a4968bb2d647535f4b91427c66ff8b9e4">temporary_files_directory</a>(), <a class="el" href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18">mode</a> _mode=<a class="el" href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18aefb2a684e4afb7d55e6147fbe5a332ee">mode::write</a>, flag <a class="el" href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">flags</a>=flag::none) noexcept</td></tr>
+<tr class="separator:a35439e5c32b702717402b9035dd25199"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6f4e7c6e9768c0e853105b1d63bd9dfb"><td class="memItemLeft" align="right" valign="top">static result&lt; <a class="el" href="classafio__v2__xxx_1_1file__handle.html">file_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1file__handle.html#a6f4e7c6e9768c0e853105b1d63bd9dfb">file</a> (const <a class="el" href="classafio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;base, <a class="el" href="classafio__v2__xxx_1_1path__view.html">path_view_type</a> _path, <a class="el" href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18">mode</a> _mode=<a class="el" href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18aecae13117d6f0584c25a9da6c8f8415e">mode::read</a>, <a class="el" href="classafio__v2__xxx_1_1handle.html#a45ff5c1c5662623d99156870dfeee0a7">creation</a> _creation=creation::open_existing, <a class="el" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9e">caching</a> _caching=<a class="el" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9eaa181a603769c1f98ad927e7367c7aa51">caching::all</a>, flag <a class="el" href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">flags</a>=flag::none) noexcept</td></tr>
 <tr class="separator:a6f4e7c6e9768c0e853105b1d63bd9dfb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7fdd164a8af6542c5fb80c514283c585"><td class="memItemLeft" align="right" valign="top">static result&lt; <a class="el" href="classafio__v2__xxx_1_1file__handle.html">file_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1file__handle.html#a7fdd164a8af6542c5fb80c514283c585">random_file</a> (const <a class="el" href="classafio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;dirpath, <a class="el" href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18">mode</a> _mode=<a class="el" href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18aefb2a684e4afb7d55e6147fbe5a332ee">mode::write</a>, <a class="el" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9e">caching</a> _caching=<a class="el" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9ead5197d93c063a2b1e22d1630a39b7aef">caching::temporary</a>, flag <a class="el" href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">flags</a>=flag::none) noexcept</td></tr>
@@ -448,6 +455,12 @@ result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
+<tr class="memitem:a7e45c857d47961469496795f1c5c242b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7e45c857d47961469496795f1c5c242b"></a>
+<a class="el" href="classafio__v2__xxx_1_1section__handle.html">section_handle</a>&#160;</td><td class="memItemRight" valign="bottom"><b>_sh</b></td></tr>
+<tr class="separator:a7e45c857d47961469496795f1c5c242b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae84ef76c65209bd3ed593cd64e3d7c2a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae84ef76c65209bd3ed593cd64e3d7c2a"></a>
+<a class="el" href="classafio__v2__xxx_1_1map__handle.html">map_handle</a>&#160;</td><td class="memItemRight" valign="bottom"><b>_mh</b></td></tr>
+<tr class="separator:ae84ef76c65209bd3ed593cd64e3d7c2a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a959c04239b557c6d3c3c0e996563abb8"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a959c04239b557c6d3c3c0e996563abb8"></a>
 <a class="el" href="classafio__v2__xxx_1_1io__service.html">io_service</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>_service</b></td></tr>
 <tr class="separator:a959c04239b557c6d3c3c0e996563abb8"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -466,436 +479,17 @@ dev_t&#160;</td><td class="memItemRight" valign="bottom"><b>_devid</b></td></tr>
 <tr class="memitem:a3620b3c68611c77dd3cd98d77c073bd2"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3620b3c68611c77dd3cd98d77c073bd2"></a>
 ino_t&#160;</td><td class="memItemRight" valign="bottom"><b>_inode</b></td></tr>
 <tr class="separator:a3620b3c68611c77dd3cd98d77c073bd2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
-Friends</h2></td></tr>
-<tr class="memitem:ae9f4f5f9cc386f5188a9977145edbe6c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae9f4f5f9cc386f5188a9977145edbe6c"></a>
-class&#160;</td><td class="memItemRight" valign="bottom"><b>io_service</b></td></tr>
-<tr class="separator:ae9f4f5f9cc386f5188a9977145edbe6c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>An asynchronous handle to an open something. </p>
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000001">Todo:</a></b></dt><dd>Direct use of <code>calloc()</code> ought to be replaced with a user supplied STL allocator instance. </dd></dl>
-</div><h2 class="groupheader">Member Typedef Documentation</h2>
-<a class="anchor" id="a78ad3cca36cdd444a459b5f63d413c19"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">using <a class="el" href="classafio__v2__xxx_1_1async__file__handle.html#a78ad3cca36cdd444a459b5f63d413c19">afio_v2_xxx::async_file_handle::erased_io_state_ptr</a> =  std::unique_ptr&lt;_erased_io_state_type, _io_state_deleter&gt;</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Smart pointer to state of an i/o in progress. Destroying this before an i/o has completed is <b>blocking</b> because the i/o must be cancelled before the destructor can safely exit. </p>
-
-</div>
-</div>
-<a class="anchor" id="a06eb57f7a0f9f0f975de47395808ee28"></a>
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;class CompletionRoutine , class BuffersType &gt; </div>
-      <table class="memname">
-        <tr>
-          <td class="memname">using <a class="el" href="classafio__v2__xxx_1_1async__file__handle.html#a06eb57f7a0f9f0f975de47395808ee28">afio_v2_xxx::async_file_handle::io_state_ptr</a> =  std::unique_ptr&lt;_io_state_type&lt;CompletionRoutine, BuffersType&gt;, _io_state_deleter&gt;</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Smart pointer to state of an i/o in progress. Destroying this before an i/o has completed is <b>blocking</b> because the i/o must be cancelled before the destructor can safely exit. </p>
-
-</div>
-</div>
-<h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="a5e6891894762e648e78726cabc23c0b9"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static result&lt;<a class="el" href="classafio__v2__xxx_1_1async__file__handle.html">async_file_handle</a>&gt; afio_v2_xxx::async_file_handle::async_file </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classafio__v2__xxx_1_1io__service.html">io_service</a> &amp;&#160;</td>
-          <td class="paramname"><em>service</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="classafio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;&#160;</td>
-          <td class="paramname"><em>base</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="classafio__v2__xxx_1_1path__view.html">path_view_type</a>&#160;</td>
-          <td class="paramname"><em>_path</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18">mode</a>&#160;</td>
-          <td class="paramname"><em>_mode</em> = <code><a class="el" href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18aecae13117d6f0584c25a9da6c8f8415e">mode::read</a></code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="classafio__v2__xxx_1_1handle.html#a45ff5c1c5662623d99156870dfeee0a7">creation</a>&#160;</td>
-          <td class="paramname"><em>_creation</em> = <code>creation::open_existing</code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9e">caching</a>&#160;</td>
-          <td class="paramname"><em>_caching</em> = <code><a class="el" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9eaa181a603769c1f98ad927e7367c7aa51">caching::all</a></code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">flag&#160;</td>
-          <td class="paramname"><em>flags</em> = <code>flag::none</code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span><span class="mlabel">noexcept</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Create an async file handle opening access to a file on path using the given io_service. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">service</td><td>The <code>io_service</code> to use. </td></tr>
-    <tr><td class="paramname">base</td><td>Handle to a base location on the filing system. Pass <code>{}</code> to indicate that path will be absolute. </td></tr>
-    <tr><td class="paramname">_path</td><td>The path relative to base to open. </td></tr>
-    <tr><td class="paramname">_mode</td><td>How to open the file. </td></tr>
-    <tr><td class="paramname">_creation</td><td>How to create the file. </td></tr>
-    <tr><td class="paramname">_caching</td><td>How to ask the kernel to cache the file. </td></tr>
-    <tr><td class="paramname">flags</td><td>Any additional custom behaviours.</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX open() or CreateFile() can return. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;  {</div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;    <span class="comment">// Open it overlapped, otherwise no difference.</span></div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;    OUTCOME_TRY(v, <a class="code" href="classafio__v2__xxx_1_1file__handle.html#a6f4e7c6e9768c0e853105b1d63bd9dfb">file_handle::file</a>(std::move(base), std::move(_path), std::move(_mode), std::move(_creation), std::move(_caching), <a class="code" href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">flags</a> | flag::overlapped));</div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;    <a class="code" href="classafio__v2__xxx_1_1async__file__handle.html#a1b8753468fe5561b92da18d1cb4a6c68">async_file_handle</a> ret(std::move(v));</div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;    ret._service = &amp;<a class="code" href="classafio__v2__xxx_1_1file__handle.html#a672324d44ea84ccfb71594c1036628ac">service</a>;</div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;    <span class="keywordflow">return</span> std::move(ret);</div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;  }</div>
-<div class="ttc" id="classafio__v2__xxx_1_1handle_html_ab3d876f5996605158fd6a0582adadad6"><div class="ttname"><a href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">afio_v2_xxx::handle::flags</a></div><div class="ttdeci">flag flags() const noexcept</div><div class="ttdoc">The flags this handle was opened with. </div><div class="ttdef"><b>Definition:</b> handle.hpp:306</div></div>
-<div class="ttc" id="classafio__v2__xxx_1_1file__handle_html_a6f4e7c6e9768c0e853105b1d63bd9dfb"><div class="ttname"><a href="classafio__v2__xxx_1_1file__handle.html#a6f4e7c6e9768c0e853105b1d63bd9dfb">afio_v2_xxx::file_handle::file</a></div><div class="ttdeci">static result&lt; file_handle &gt; file(const path_handle &amp;base, path_view_type _path, mode _mode=mode::read, creation _creation=creation::open_existing, caching _caching=caching::all, flag flags=flag::none) noexcept</div></div>
-<div class="ttc" id="classafio__v2__xxx_1_1file__handle_html_a672324d44ea84ccfb71594c1036628ac"><div class="ttname"><a href="classafio__v2__xxx_1_1file__handle.html#a672324d44ea84ccfb71594c1036628ac">afio_v2_xxx::file_handle::service</a></div><div class="ttdeci">io_service * service() const noexcept</div><div class="ttdoc">The i/o service this handle is attached to, if any. </div><div class="ttdef"><b>Definition:</b> file_handle.hpp:217</div></div>
-<div class="ttc" id="classafio__v2__xxx_1_1async__file__handle_html_a1b8753468fe5561b92da18d1cb4a6c68"><div class="ttname"><a href="classafio__v2__xxx_1_1async__file__handle.html#a1b8753468fe5561b92da18d1cb4a6c68">afio_v2_xxx::async_file_handle::async_file_handle</a></div><div class="ttdeci">async_file_handle()=default</div><div class="ttdoc">Default constructor. </div></div>
-</div><!-- fragment -->
-</div>
-</div>
-<a class="anchor" id="a2eb236d3277dac32fabbae2c39821a51"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static result&lt;<a class="el" href="classafio__v2__xxx_1_1async__file__handle.html">async_file_handle</a>&gt; afio_v2_xxx::async_file_handle::async_random_file </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classafio__v2__xxx_1_1io__service.html">io_service</a> &amp;&#160;</td>
-          <td class="paramname"><em>service</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="classafio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;&#160;</td>
-          <td class="paramname"><em>dirpath</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18">mode</a>&#160;</td>
-          <td class="paramname"><em>_mode</em> = <code><a class="el" href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18aefb2a684e4afb7d55e6147fbe5a332ee">mode::write</a></code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9e">caching</a>&#160;</td>
-          <td class="paramname"><em>_caching</em> = <code><a class="el" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9ead5197d93c063a2b1e22d1630a39b7aef">caching::temporary</a></code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">flag&#160;</td>
-          <td class="paramname"><em>flags</em> = <code>flag::none</code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span><span class="mlabel">noexcept</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Create an async file handle creating a randomly named file on a path. The file is opened exclusively with <code>creation::only_if_not_exist</code> so it will never collide with nor overwrite any existing file. Note also that caching defaults to temporary which hints to the OS to only flush changes to physical storage as lately as possible.</p>
-<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX open() or CreateFile() can return. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;  {</div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;    <span class="keywordflow">try</span></div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;    {</div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;      <span class="keywordflow">for</span>(;;)</div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;      {</div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;        <span class="keyword">auto</span> randomname = <a class="code" href="namespaceafio__v2__xxx_1_1utils.html#a767b8434456319066194534a4c4edbf5">utils::random_string</a>(32);</div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;        randomname.append(<span class="stringliteral">&quot;.random&quot;</span>);</div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;        result&lt;async_file_handle&gt; ret = <a class="code" href="classafio__v2__xxx_1_1async__file__handle.html#a5e6891894762e648e78726cabc23c0b9">async_file</a>(<a class="code" href="classafio__v2__xxx_1_1file__handle.html#a672324d44ea84ccfb71594c1036628ac">service</a>, dirpath, randomname, _mode, creation::only_if_not_exist, _caching, <a class="code" href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">flags</a>);</div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;        <span class="keywordflow">if</span>(ret || (!ret &amp;&amp; ret.error() != std::errc::file_exists))</div>
-<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;          <span class="keywordflow">return</span> ret;</div>
-<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;      }</div>
-<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;    }</div>
-<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;    <span class="keywordflow">catch</span>(...)</div>
-<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;    {</div>
-<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;      <span class="keywordflow">return</span> error_from_exception();</div>
-<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;    }</div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;  }</div>
-<div class="ttc" id="namespaceafio__v2__xxx_1_1utils_html_a767b8434456319066194534a4c4edbf5"><div class="ttname"><a href="namespaceafio__v2__xxx_1_1utils.html#a767b8434456319066194534a4c4edbf5">afio_v2_xxx::utils::random_string</a></div><div class="ttdeci">std::string random_string(size_t randomlen)</div><div class="ttdoc">Returns a cryptographically random string capable of being used as a filename. Essentially random_fil...</div><div class="ttdef"><b>Definition:</b> utils.hpp:130</div></div>
-<div class="ttc" id="classafio__v2__xxx_1_1handle_html_ab3d876f5996605158fd6a0582adadad6"><div class="ttname"><a href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">afio_v2_xxx::handle::flags</a></div><div class="ttdeci">flag flags() const noexcept</div><div class="ttdoc">The flags this handle was opened with. </div><div class="ttdef"><b>Definition:</b> handle.hpp:306</div></div>
-<div class="ttc" id="classafio__v2__xxx_1_1file__handle_html_a672324d44ea84ccfb71594c1036628ac"><div class="ttname"><a href="classafio__v2__xxx_1_1file__handle.html#a672324d44ea84ccfb71594c1036628ac">afio_v2_xxx::file_handle::service</a></div><div class="ttdeci">io_service * service() const noexcept</div><div class="ttdoc">The i/o service this handle is attached to, if any. </div><div class="ttdef"><b>Definition:</b> file_handle.hpp:217</div></div>
-<div class="ttc" id="classafio__v2__xxx_1_1async__file__handle_html_a5e6891894762e648e78726cabc23c0b9"><div class="ttname"><a href="classafio__v2__xxx_1_1async__file__handle.html#a5e6891894762e648e78726cabc23c0b9">afio_v2_xxx::async_file_handle::async_file</a></div><div class="ttdeci">static result&lt; async_file_handle &gt; async_file(io_service &amp;service, const path_handle &amp;base, path_view_type _path, mode _mode=mode::read, creation _creation=creation::open_existing, caching _caching=caching::all, flag flags=flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> async_file_handle.hpp:110</div></div>
-</div><!-- fragment -->
-</div>
-</div>
-<a class="anchor" id="a763966d2304e8eead72dcfd2bc775f35"></a>
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;class CompletionRoutine &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">result&lt;<a class="el" href="classafio__v2__xxx_1_1async__file__handle.html#a06eb57f7a0f9f0f975de47395808ee28">io_state_ptr</a>&lt;CompletionRoutine, buffers_type&gt; &gt; afio_v2_xxx::async_file_handle::async_read </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="structafio__v2__xxx_1_1io__handle_1_1io__request.html">io_request</a>&lt; buffers_type &gt;&#160;</td>
-          <td class="paramname"><em>reqs</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">CompletionRoutine &amp;&amp;&#160;</td>
-          <td class="paramname"><em>completion</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">noexcept</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Schedule a read to occur asynchronously. </p>
-<dl class="section return"><dt>Returns</dt><dd>Either an io_state_ptr to the i/o in progress, or an error code. </dd></dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">reqs</td><td>A scatter-gather and offset request. </td></tr>
-    <tr><td class="paramname">completion</td><td>A callable to call upon i/o completion. Spec is void(async_file_handle *, io_result&lt;buffers_type&gt; &amp;). Note that buffers returned may not be buffers input, see documentation for read(). </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section user"><dt>Errors returnable</dt><dd>As for read(), plus ENOMEM. </dd></dl>
-<dl class="section user"><dt>Memory Allocations</dt><dd>One calloc, one free. The allocation is unavoidable due to the need to store a type erased completion handler of unknown type. </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="a458c97161d6612d55c716f7d2372a465"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static result&lt;<a class="el" href="classafio__v2__xxx_1_1async__file__handle.html">async_file_handle</a>&gt; afio_v2_xxx::async_file_handle::async_temp_file </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classafio__v2__xxx_1_1io__service.html">io_service</a> &amp;&#160;</td>
-          <td class="paramname"><em>service</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="classafio__v2__xxx_1_1path__view.html">path_view_type</a>&#160;</td>
-          <td class="paramname"><em>name</em> = <code><a class="el" href="classafio__v2__xxx_1_1path__view.html">path_view_type</a>()</code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18">mode</a>&#160;</td>
-          <td class="paramname"><em>_mode</em> = <code><a class="el" href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18aefb2a684e4afb7d55e6147fbe5a332ee">mode::write</a></code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="classafio__v2__xxx_1_1handle.html#a45ff5c1c5662623d99156870dfeee0a7">creation</a>&#160;</td>
-          <td class="paramname"><em>_creation</em> = <code>creation::if_needed</code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9e">caching</a>&#160;</td>
-          <td class="paramname"><em>_caching</em> = <code><a class="el" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9ead5197d93c063a2b1e22d1630a39b7aef">caching::temporary</a></code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">flag&#160;</td>
-          <td class="paramname"><em>flags</em> = <code>flag::unlink_on_close</code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span><span class="mlabel">noexcept</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Create an async file handle creating the named file on some path which the OS declares to be suitable for temporary files. Most OSs are very lazy about flushing changes made to these temporary files. Note the default flags are to have the newly created file deleted on first handle close. Note also that an empty name is equivalent to calling <code>async_random_file(temporary_files_directory())</code> and the creation parameter is ignored.</p>
-<dl class="section note"><dt>Note</dt><dd>If the temporary file you are creating is not going to have its path sent to another process for usage, this is the WRONG function to use. Use <code>temp_inode()</code> instead, it is far more secure.</dd></dl>
-<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX open() or CreateFile() can return. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;  {</div>
-<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;    OUTCOME_TRY(tempdirh, <a class="code" href="classafio__v2__xxx_1_1path__handle.html#a5cbd1d67ffe72d6cce0d093f861a4af7">path_handle::path</a>(<a class="code" href="namespaceafio__v2__xxx.html#a4968bb2d647535f4b91427c66ff8b9e4">temporary_files_directory</a>()));</div>
-<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;    <span class="keywordflow">return</span> name.empty() ? <a class="code" href="classafio__v2__xxx_1_1async__file__handle.html#a2eb236d3277dac32fabbae2c39821a51">async_random_file</a>(<a class="code" href="classafio__v2__xxx_1_1file__handle.html#a672324d44ea84ccfb71594c1036628ac">service</a>, tempdirh, _mode, _caching, <a class="code" href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">flags</a>) : <a class="code" href="classafio__v2__xxx_1_1async__file__handle.html#a5e6891894762e648e78726cabc23c0b9">async_file</a>(<a class="code" href="classafio__v2__xxx_1_1file__handle.html#a672324d44ea84ccfb71594c1036628ac">service</a>, tempdirh, name, _mode, _creation, _caching, <a class="code" href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">flags</a>);</div>
-<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;  }</div>
-<div class="ttc" id="namespaceafio__v2__xxx_html_a4968bb2d647535f4b91427c66ff8b9e4"><div class="ttname"><a href="namespaceafio__v2__xxx.html#a4968bb2d647535f4b91427c66ff8b9e4">afio_v2_xxx::temporary_files_directory</a></div><div class="ttdeci">path_view temporary_files_directory() noexcept</div><div class="ttdoc">Returns a path to a directory reported by the operating system to be suitable for storing temporary f...</div></div>
-<div class="ttc" id="classafio__v2__xxx_1_1path__handle_html_a5cbd1d67ffe72d6cce0d093f861a4af7"><div class="ttname"><a href="classafio__v2__xxx_1_1path__handle.html#a5cbd1d67ffe72d6cce0d093f861a4af7">afio_v2_xxx::path_handle::path</a></div><div class="ttdeci">static result&lt; path_handle &gt; path(const path_handle &amp;base, path_view_type _path) noexcept</div></div>
-<div class="ttc" id="classafio__v2__xxx_1_1handle_html_ab3d876f5996605158fd6a0582adadad6"><div class="ttname"><a href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">afio_v2_xxx::handle::flags</a></div><div class="ttdeci">flag flags() const noexcept</div><div class="ttdoc">The flags this handle was opened with. </div><div class="ttdef"><b>Definition:</b> handle.hpp:306</div></div>
-<div class="ttc" id="classafio__v2__xxx_1_1file__handle_html_a672324d44ea84ccfb71594c1036628ac"><div class="ttname"><a href="classafio__v2__xxx_1_1file__handle.html#a672324d44ea84ccfb71594c1036628ac">afio_v2_xxx::file_handle::service</a></div><div class="ttdeci">io_service * service() const noexcept</div><div class="ttdoc">The i/o service this handle is attached to, if any. </div><div class="ttdef"><b>Definition:</b> file_handle.hpp:217</div></div>
-<div class="ttc" id="classafio__v2__xxx_1_1async__file__handle_html_a5e6891894762e648e78726cabc23c0b9"><div class="ttname"><a href="classafio__v2__xxx_1_1async__file__handle.html#a5e6891894762e648e78726cabc23c0b9">afio_v2_xxx::async_file_handle::async_file</a></div><div class="ttdeci">static result&lt; async_file_handle &gt; async_file(io_service &amp;service, const path_handle &amp;base, path_view_type _path, mode _mode=mode::read, creation _creation=creation::open_existing, caching _caching=caching::all, flag flags=flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> async_file_handle.hpp:110</div></div>
-<div class="ttc" id="classafio__v2__xxx_1_1async__file__handle_html_a2eb236d3277dac32fabbae2c39821a51"><div class="ttname"><a href="classafio__v2__xxx_1_1async__file__handle.html#a2eb236d3277dac32fabbae2c39821a51">afio_v2_xxx::async_file_handle::async_random_file</a></div><div class="ttdeci">static result&lt; async_file_handle &gt; async_random_file(io_service &amp;service, const path_handle &amp;dirpath, mode _mode=mode::write, caching _caching=caching::temporary, flag flags=flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> async_file_handle.hpp:128</div></div>
-</div><!-- fragment -->
-</div>
-</div>
-<a class="anchor" id="af4cc1f1ddda8a421167c335265d10eb0"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static result&lt;<a class="el" href="classafio__v2__xxx_1_1async__file__handle.html">async_file_handle</a>&gt; afio_v2_xxx::async_file_handle::async_temp_inode </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classafio__v2__xxx_1_1io__service.html">io_service</a> &amp;&#160;</td>
-          <td class="paramname"><em>service</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="classafio__v2__xxx_1_1path__view.html">path_view_type</a>&#160;</td>
-          <td class="paramname"><em>dirpath</em> = <code><a class="el" href="namespaceafio__v2__xxx.html#a4968bb2d647535f4b91427c66ff8b9e4">temporary_files_directory</a>()</code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18">mode</a>&#160;</td>
-          <td class="paramname"><em>_mode</em> = <code><a class="el" href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18aefb2a684e4afb7d55e6147fbe5a332ee">mode::write</a></code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">flag&#160;</td>
-          <td class="paramname"><em>flags</em> = <code>flag::none</code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span><span class="mlabel">noexcept</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p><em>Securely</em> create an async file handle creating a temporary anonymous inode in the filesystem referred to by <em>dirpath</em>. The inode created has no name nor accessible path on the filing system and ceases to exist as soon as the last handle is closed, making it ideal for use as a temporary file where other processes do not need to have access to its contents via some path on the filing system (a classic use case is for backing shared memory maps).</p>
-<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX open() or CreateFile() can return. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;  {</div>
-<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;    <span class="comment">// Open it overlapped, otherwise no difference.</span></div>
-<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;    OUTCOME_TRY(v, <a class="code" href="classafio__v2__xxx_1_1file__handle.html#a2910fdfa511d1295e36e2eb015b989ac">file_handle::temp_inode</a>(std::move(dirpath), std::move(_mode), <a class="code" href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">flags</a> | flag::overlapped));</div>
-<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;    <a class="code" href="classafio__v2__xxx_1_1async__file__handle.html#a1b8753468fe5561b92da18d1cb4a6c68">async_file_handle</a> ret(std::move(v));</div>
-<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;    ret._service = &amp;<a class="code" href="classafio__v2__xxx_1_1file__handle.html#a672324d44ea84ccfb71594c1036628ac">service</a>;</div>
-<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;    <span class="keywordflow">return</span> std::move(ret);</div>
-<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;  }</div>
-<div class="ttc" id="classafio__v2__xxx_1_1file__handle_html_a2910fdfa511d1295e36e2eb015b989ac"><div class="ttname"><a href="classafio__v2__xxx_1_1file__handle.html#a2910fdfa511d1295e36e2eb015b989ac">afio_v2_xxx::file_handle::temp_inode</a></div><div class="ttdeci">static result&lt; file_handle &gt; temp_inode(path_view_type dirpath=temporary_files_directory(), mode _mode=mode::write, flag flags=flag::none) noexcept</div></div>
-<div class="ttc" id="classafio__v2__xxx_1_1handle_html_ab3d876f5996605158fd6a0582adadad6"><div class="ttname"><a href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">afio_v2_xxx::handle::flags</a></div><div class="ttdeci">flag flags() const noexcept</div><div class="ttdoc">The flags this handle was opened with. </div><div class="ttdef"><b>Definition:</b> handle.hpp:306</div></div>
-<div class="ttc" id="classafio__v2__xxx_1_1file__handle_html_a672324d44ea84ccfb71594c1036628ac"><div class="ttname"><a href="classafio__v2__xxx_1_1file__handle.html#a672324d44ea84ccfb71594c1036628ac">afio_v2_xxx::file_handle::service</a></div><div class="ttdeci">io_service * service() const noexcept</div><div class="ttdoc">The i/o service this handle is attached to, if any. </div><div class="ttdef"><b>Definition:</b> file_handle.hpp:217</div></div>
-<div class="ttc" id="classafio__v2__xxx_1_1async__file__handle_html_a1b8753468fe5561b92da18d1cb4a6c68"><div class="ttname"><a href="classafio__v2__xxx_1_1async__file__handle.html#a1b8753468fe5561b92da18d1cb4a6c68">afio_v2_xxx::async_file_handle::async_file_handle</a></div><div class="ttdeci">async_file_handle()=default</div><div class="ttdoc">Default constructor. </div></div>
-</div><!-- fragment -->
-</div>
-</div>
-<a class="anchor" id="ab493207a0372c9f4122bcbf39860a81e"></a>
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;class CompletionRoutine &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">result&lt;<a class="el" href="classafio__v2__xxx_1_1async__file__handle.html#a06eb57f7a0f9f0f975de47395808ee28">io_state_ptr</a>&lt;CompletionRoutine, const_buffers_type&gt; &gt; afio_v2_xxx::async_file_handle::async_write </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="structafio__v2__xxx_1_1io__handle_1_1io__request.html">io_request</a>&lt; const_buffers_type &gt;&#160;</td>
-          <td class="paramname"><em>reqs</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">CompletionRoutine &amp;&amp;&#160;</td>
-          <td class="paramname"><em>completion</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">noexcept</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Schedule a write to occur asynchronously. </p>
-<dl class="section return"><dt>Returns</dt><dd>Either an io_state_ptr to the i/o in progress, or an error code. </dd></dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">reqs</td><td>A scatter-gather and offset request. </td></tr>
-    <tr><td class="paramname">completion</td><td>A callable to call upon i/o completion. Spec is void(async_file_handle *, io_result&lt;const_buffers_type&gt; &amp;). Note that buffers returned may not be buffers input, see documentation for write(). </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section user"><dt>Errors returnable</dt><dd>As for write(), plus ENOMEM. </dd></dl>
-<dl class="section user"><dt>Memory Allocations</dt><dd>One calloc, one free. The allocation is unavoidable due to the need to store a type erased completion handler of unknown type. </dd></dl>
-
-</div>
-</div>
+<div class="textblock"><p>A memory mapped regular file or device. </p>
+<p>All the major OSs on all the major 64 bit CPU architectures now offer at least 127 Tb of address spaces to user mode processes. This makes feasible mapping multi-Tb files directly into memory, and thus avoiding the syscall overhead involved when reading and writing. This becames <b>especially</b> important with nextgen storage devices capable of Direct Access Storage (DAX) like Optane from 2018 onwards, performance via syscalls will always be but a fraction of speaking directly to the storage device via directly mapped memory.</p>
+<p>As an example of the gains, on Microsoft Windows to read or write 1Kb using the standard syscalls takes about fifteen times longer than the exact same i/o via mapped memory. On Linux, OS X or FreeBSD the gain is considerably lower, a 1Kb i/o might only be 50% slower via syscalls than memory maps. However for lots of say 64 byte i/o, the gain of memory maps over syscalls is unsurpassable.</p>
+<p>This class combines a <code>file_handle</code> with a <code>section_handle</code> and a <code>map_handle</code> to implement a fully memory mapped <code>file_handle</code>. The whole file is always mapped entirely into memory, including any appends to the file, and i/o is performed directly with the map. Reads always return the original mapped data, and do not fill any buffers passed in. For obvious reasons the utility of this class on 32-bit systems is limited, but can be useful when used with smaller files.</p>
+<p>Note that zero lengthed files cannot be memory mapped. On first write will the map be created, until then <code>address()</code> will return a null pointer. Similarly, calling <code>truncate(0)</code> will destroy the maps which can be useful to know as Microsoft Windows will not permit shrinking of a file with open maps in any process on it, thus every process must call <code>truncate(0)</code> and sink the error about the shrink failing until when the final process to attempt the truncation succeeds.</p>
+<p>For better performance when handling files which are growing, there is a concept of "address space reservation" via <code>reserve()</code> and <code>capacity()</code>. The implementation asks the kernel to set out a contiguous region of pages matching that reservation, and to map the file into the beginning of the reservation. The remainder of the pages are inaccessible and will generate a segfault.</p>
+<p><code>length()</code> reports the length of the mapped file, NOT the underlying file. For better performance, and to avoid kernel bugs, we do not automatically track the length of the underlying file, so reads and writes always terminate at the mapped file length and do not auto-extend the file. If you wish to extend the file, you must call <code>truncate(bytes)</code> which is of course racy with respect to other things extending the file. When you know that another process has extended the file and you wish to map the newly appended data, you can call <code>truncate()</code> with no parameters. This will read the current length of the underlying file, and map the new data into your process up until the reservation is full. It is then up to you to detect that the reservation has been exhausted, and to reserve a new reservation which will change the value returned by <code>address()</code>. This entirely manual system is a bit tedious and cumbersome to use, but as mapping files is an expensive operation given TLB shootdown, the only place where we change mappings silently is on the first write to an empty mapped file.</p>
+<dl class="section warning"><dt>Warning</dt><dd>You must be cautious when the file is being extended by third parties which are not using this <code>mapped_file_handle</code> to write the new data. With unified page cache kernels, mixing mapped and normal i/o is generally safe except at the end of a file where race conditions and outright kernel bugs tend to abound. To avoid these, <b>make sure you truncate to new length before appending data</b>, or else solely and exclusively use a dedicated handle configured to atomic append only to do the appends. </dd></dl>
+</div><h2 class="groupheader">Member Function Documentation</h2>
 <a class="anchor" id="a243156928e89b8988a1412f211b3b603"></a>
 <div class="memitem">
 <div class="memproto">
@@ -961,7 +555,7 @@ For portability, you can only assume that barriers write order for a single hand
 
 </div>
 </div>
-<a class="anchor" id="a5bf8b6c6bca19b98c999e9ba762e8ceb"></a>
+<a class="anchor" id="ab37c9af33f662fa5e4cbfc1dff155607"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -969,33 +563,7 @@ For portability, you can only assume that barriers write order for a single hand
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual result&lt;<a class="el" href="classafio__v2__xxx_1_1async__file__handle.html">async_file_handle</a>&gt; afio_v2_xxx::async_file_handle::clone </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classafio__v2__xxx_1_1io__service.html">io_service</a> &amp;&#160;</td>
-          <td class="paramname"><em>service</em></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span><span class="mlabel">noexcept</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Clone this handle to a different io_service (copy constructor is disabled to avoid accidental copying)</p>
-<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX dup() or DuplicateHandle() can return. </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="ac544e656873ccf3b6665064f46cfaf2b"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual result&lt;<a class="el" href="classafio__v2__xxx_1_1file__handle.html">file_handle</a>&gt; afio_v2_xxx::file_handle::clone </td>
+          <td class="memname">virtual result&lt;<a class="el" href="classafio__v2__xxx_1_1file__handle.html">file_handle</a>&gt; afio_v2_xxx::mapped_file_handle::clone </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -1003,14 +571,14 @@ For portability, you can only assume that barriers write order for a single hand
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span><span class="mlabel">noexcept</span><span class="mlabel">inherited</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">override</span><span class="mlabel">virtual</span><span class="mlabel">noexcept</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 <p>Clone this handle (copy constructor is disabled to avoid accidental copying)</p>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX dup() or DuplicateHandle() can return. </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classafio__v2__xxx_1_1mapped__file__handle.html#ab37c9af33f662fa5e4cbfc1dff155607">afio_v2_xxx::mapped_file_handle</a>.</p>
+<p>Reimplemented from <a class="el" href="classafio__v2__xxx_1_1file__handle.html#ac544e656873ccf3b6665064f46cfaf2b">afio_v2_xxx::file_handle</a>.</p>
 
 </div>
 </div>
@@ -1109,33 +677,6 @@ For portability, you can only assume that barriers write order for a single hand
   </dd>
 </dl>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX open() or CreateFile() can return. </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="a2083c37ffc746ec28f9e4d6b094d3ba5"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual result&lt;extent_type&gt; afio_v2_xxx::file_handle::length </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span><span class="mlabel">noexcept</span><span class="mlabel">inherited</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Return the current maximum permitted extent of the file.</p>
-<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX fstat() or GetFileInformationByHandleEx() can return. </dd></dl>
-
-<p>Reimplemented in <a class="el" href="classafio__v2__xxx_1_1mapped__file__handle.html#ad9f3e51710bff40a4237f08feb9c4a63">afio_v2_xxx::mapped_file_handle</a>.</p>
 
 </div>
 </div>
@@ -1294,6 +835,342 @@ For portability, you can only assume that barriers write order for a single hand
 <div class="line"><a name="l00428"></a><span class="lineno">  428</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classafio__v2__xxx_1_1io__handle.html#a88689b15e6e8b6ce1f945737dee4369e">lock</a>(reqs.offset, bytes, <span class="keyword">true</span>, std::move(d));</div>
 <div class="line"><a name="l00429"></a><span class="lineno">  429</span>&#160;  }</div>
 <div class="ttc" id="classafio__v2__xxx_1_1io__handle_html_a88689b15e6e8b6ce1f945737dee4369e"><div class="ttname"><a href="classafio__v2__xxx_1_1io__handle.html#a88689b15e6e8b6ce1f945737dee4369e">afio_v2_xxx::io_handle::lock</a></div><div class="ttdeci">virtual result&lt; extent_guard &gt; lock(extent_type offset, extent_type bytes, bool exclusive=true, deadline d=deadline()) noexcept</div><div class="ttdoc">Tries to lock the range of bytes specified for shared or exclusive access. Be aware this passes throu...</div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a class="anchor" id="aedf10997693cf088cf9d67720c4defe1"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static result&lt;<a class="el" href="classafio__v2__xxx_1_1mapped__file__handle.html">mapped_file_handle</a>&gt; afio_v2_xxx::mapped_file_handle::mapped_file </td>
+          <td>(</td>
+          <td class="paramtype">size_type&#160;</td>
+          <td class="paramname"><em>reservation</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classafio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;&#160;</td>
+          <td class="paramname"><em>base</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classafio__v2__xxx_1_1path__view.html">path_view_type</a>&#160;</td>
+          <td class="paramname"><em>_path</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18">mode</a>&#160;</td>
+          <td class="paramname"><em>_mode</em> = <code><a class="el" href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18aecae13117d6f0584c25a9da6c8f8415e">mode::read</a></code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classafio__v2__xxx_1_1handle.html#a45ff5c1c5662623d99156870dfeee0a7">creation</a>&#160;</td>
+          <td class="paramname"><em>_creation</em> = <code>creation::open_existing</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9e">caching</a>&#160;</td>
+          <td class="paramname"><em>_caching</em> = <code><a class="el" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9eaa181a603769c1f98ad927e7367c7aa51">caching::all</a></code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">flag&#160;</td>
+          <td class="paramname"><em>flags</em> = <code>flag::none</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Create a memory mapped file handle opening access to a file on path. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">reservation</td><td>The number of bytes to reserve for later expansion when mapping. Zero means reserve only the current file length. </td></tr>
+    <tr><td class="paramname">base</td><td>Handle to a base location on the filing system. Pass <code>{}</code> to indicate that path will be absolute. </td></tr>
+    <tr><td class="paramname">_path</td><td>The path relative to base to open. </td></tr>
+    <tr><td class="paramname">_mode</td><td>How to open the file. </td></tr>
+    <tr><td class="paramname">_creation</td><td>How to create the file. </td></tr>
+    <tr><td class="paramname">_caching</td><td>How to ask the kernel to cache the file. </td></tr>
+    <tr><td class="paramname">flags</td><td>Any additional custom behaviours.</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Note that if the file is currently zero sized, no mapping occurs now, but later when <code>truncate()</code> or <code>write()</code> is called.</p>
+<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values which the constructors for <code>file_handle</code>, <code>section_handle</code> and <code>map_handle</code> can return. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a1bb7ab6d64156732e0e6c26c47fbbf77"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static result&lt;<a class="el" href="classafio__v2__xxx_1_1mapped__file__handle.html">mapped_file_handle</a>&gt; afio_v2_xxx::mapped_file_handle::mapped_file </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classafio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;&#160;</td>
+          <td class="paramname"><em>base</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classafio__v2__xxx_1_1path__view.html">path_view_type</a>&#160;</td>
+          <td class="paramname"><em>_path</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18">mode</a>&#160;</td>
+          <td class="paramname"><em>_mode</em> = <code><a class="el" href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18aecae13117d6f0584c25a9da6c8f8415e">mode::read</a></code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classafio__v2__xxx_1_1handle.html#a45ff5c1c5662623d99156870dfeee0a7">creation</a>&#160;</td>
+          <td class="paramname"><em>_creation</em> = <code>creation::open_existing</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9e">caching</a>&#160;</td>
+          <td class="paramname"><em>_caching</em> = <code><a class="el" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9eaa181a603769c1f98ad927e7367c7aa51">caching::all</a></code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">flag&#160;</td>
+          <td class="paramname"><em>flags</em> = <code>flag::none</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
+<div class="fragment"><div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;{ <span class="keywordflow">return</span> <a class="code" href="classafio__v2__xxx_1_1mapped__file__handle.html#aedf10997693cf088cf9d67720c4defe1">mapped_file</a>(0, base, _path, _mode, _creation, _caching, <a class="code" href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">flags</a>); }</div>
+<div class="ttc" id="classafio__v2__xxx_1_1handle_html_ab3d876f5996605158fd6a0582adadad6"><div class="ttname"><a href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">afio_v2_xxx::handle::flags</a></div><div class="ttdeci">flag flags() const noexcept</div><div class="ttdoc">The flags this handle was opened with. </div><div class="ttdef"><b>Definition:</b> handle.hpp:306</div></div>
+<div class="ttc" id="classafio__v2__xxx_1_1mapped__file__handle_html_aedf10997693cf088cf9d67720c4defe1"><div class="ttname"><a href="classafio__v2__xxx_1_1mapped__file__handle.html#aedf10997693cf088cf9d67720c4defe1">afio_v2_xxx::mapped_file_handle::mapped_file</a></div><div class="ttdeci">static result&lt; mapped_file_handle &gt; mapped_file(size_type reservation, const path_handle &amp;base, path_view_type _path, mode _mode=mode::read, creation _creation=creation::open_existing, caching _caching=caching::all, flag flags=flag::none) noexcept</div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a class="anchor" id="a00875e717f4b2725bb58ecbb5310fc6f"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static result&lt;<a class="el" href="classafio__v2__xxx_1_1mapped__file__handle.html">mapped_file_handle</a>&gt; afio_v2_xxx::mapped_file_handle::mapped_random_file </td>
+          <td>(</td>
+          <td class="paramtype">size_type&#160;</td>
+          <td class="paramname"><em>reservation</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classafio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;&#160;</td>
+          <td class="paramname"><em>dirpath</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18">mode</a>&#160;</td>
+          <td class="paramname"><em>_mode</em> = <code><a class="el" href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18aefb2a684e4afb7d55e6147fbe5a332ee">mode::write</a></code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9e">caching</a>&#160;</td>
+          <td class="paramname"><em>_caching</em> = <code><a class="el" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9ead5197d93c063a2b1e22d1630a39b7aef">caching::temporary</a></code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">flag&#160;</td>
+          <td class="paramname"><em>flags</em> = <code>flag::none</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Create an mapped file handle creating a randomly named file on a path. The file is opened exclusively with <code>creation::only_if_not_exist</code> so it will never collide with nor overwrite any existing file. Note also that caching defaults to temporary which hints to the OS to only flush changes to physical storage as lately as possible.</p>
+<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX open() or CreateFile() can return. </dd></dl>
+<div class="fragment"><div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;  {</div>
+<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;    <span class="keywordflow">try</span></div>
+<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;    {</div>
+<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;      <span class="keywordflow">for</span>(;;)</div>
+<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;      {</div>
+<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;        <span class="keyword">auto</span> randomname = <a class="code" href="namespaceafio__v2__xxx_1_1utils.html#a767b8434456319066194534a4c4edbf5">utils::random_string</a>(32);</div>
+<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;        randomname.append(<span class="stringliteral">&quot;.random&quot;</span>);</div>
+<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;        result&lt;mapped_file_handle&gt; ret = <a class="code" href="classafio__v2__xxx_1_1mapped__file__handle.html#aedf10997693cf088cf9d67720c4defe1">mapped_file</a>(reservation, dirpath, randomname, _mode, creation::only_if_not_exist, _caching, <a class="code" href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">flags</a>);</div>
+<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;        <span class="keywordflow">if</span>(ret || (!ret &amp;&amp; ret.error() != std::errc::file_exists))</div>
+<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;          <span class="keywordflow">return</span> ret;</div>
+<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;      }</div>
+<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;    }</div>
+<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;    <span class="keywordflow">catch</span>(...)</div>
+<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;    {</div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;      <span class="keywordflow">return</span> error_from_exception();</div>
+<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;    }</div>
+<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;  }</div>
+<div class="ttc" id="namespaceafio__v2__xxx_1_1utils_html_a767b8434456319066194534a4c4edbf5"><div class="ttname"><a href="namespaceafio__v2__xxx_1_1utils.html#a767b8434456319066194534a4c4edbf5">afio_v2_xxx::utils::random_string</a></div><div class="ttdeci">std::string random_string(size_t randomlen)</div><div class="ttdoc">Returns a cryptographically random string capable of being used as a filename. Essentially random_fil...</div><div class="ttdef"><b>Definition:</b> utils.hpp:130</div></div>
+<div class="ttc" id="classafio__v2__xxx_1_1handle_html_ab3d876f5996605158fd6a0582adadad6"><div class="ttname"><a href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">afio_v2_xxx::handle::flags</a></div><div class="ttdeci">flag flags() const noexcept</div><div class="ttdoc">The flags this handle was opened with. </div><div class="ttdef"><b>Definition:</b> handle.hpp:306</div></div>
+<div class="ttc" id="classafio__v2__xxx_1_1mapped__file__handle_html_aedf10997693cf088cf9d67720c4defe1"><div class="ttname"><a href="classafio__v2__xxx_1_1mapped__file__handle.html#aedf10997693cf088cf9d67720c4defe1">afio_v2_xxx::mapped_file_handle::mapped_file</a></div><div class="ttdeci">static result&lt; mapped_file_handle &gt; mapped_file(size_type reservation, const path_handle &amp;base, path_view_type _path, mode _mode=mode::read, creation _creation=creation::open_existing, caching _caching=caching::all, flag flags=flag::none) noexcept</div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a class="anchor" id="ae19c88791bd2e0bca0d22ec576687a83"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static result&lt;<a class="el" href="classafio__v2__xxx_1_1mapped__file__handle.html">mapped_file_handle</a>&gt; afio_v2_xxx::mapped_file_handle::mapped_temp_file </td>
+          <td>(</td>
+          <td class="paramtype">size_type&#160;</td>
+          <td class="paramname"><em>reservation</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classafio__v2__xxx_1_1path__view.html">path_view_type</a>&#160;</td>
+          <td class="paramname"><em>name</em> = <code><a class="el" href="classafio__v2__xxx_1_1path__view.html">path_view_type</a>()</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18">mode</a>&#160;</td>
+          <td class="paramname"><em>_mode</em> = <code><a class="el" href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18aefb2a684e4afb7d55e6147fbe5a332ee">mode::write</a></code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classafio__v2__xxx_1_1handle.html#a45ff5c1c5662623d99156870dfeee0a7">creation</a>&#160;</td>
+          <td class="paramname"><em>_creation</em> = <code>creation::if_needed</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9e">caching</a>&#160;</td>
+          <td class="paramname"><em>_caching</em> = <code><a class="el" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9ead5197d93c063a2b1e22d1630a39b7aef">caching::temporary</a></code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">flag&#160;</td>
+          <td class="paramname"><em>flags</em> = <code>flag::unlink_on_close</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Create a mapped file handle creating the named file on some path which the OS declares to be suitable for temporary files. Most OSs are very lazy about flushing changes made to these temporary files. Note the default flags are to have the newly created file deleted on first handle close. Note also that an empty name is equivalent to calling <code>mapped_random_file(temporary_files_directory())</code> and the creation parameter is ignored.</p>
+<dl class="section note"><dt>Note</dt><dd>If the temporary file you are creating is not going to have its path sent to another process for usage, this is the WRONG function to use. Use <code>temp_inode()</code> instead, it is far more secure.</dd></dl>
+<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX open() or CreateFile() can return. </dd></dl>
+<div class="fragment"><div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;  {</div>
+<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;    OUTCOME_TRY(tempdirh, <a class="code" href="classafio__v2__xxx_1_1path__handle.html#a5cbd1d67ffe72d6cce0d093f861a4af7">path_handle::path</a>(<a class="code" href="namespaceafio__v2__xxx.html#a4968bb2d647535f4b91427c66ff8b9e4">temporary_files_directory</a>()));</div>
+<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;    <span class="keywordflow">return</span> name.empty() ? <a class="code" href="classafio__v2__xxx_1_1mapped__file__handle.html#a00875e717f4b2725bb58ecbb5310fc6f">mapped_random_file</a>(reservation, tempdirh, _mode, _caching, <a class="code" href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">flags</a>) : <a class="code" href="classafio__v2__xxx_1_1mapped__file__handle.html#aedf10997693cf088cf9d67720c4defe1">mapped_file</a>(reservation, tempdirh, name, _mode, _creation, _caching, <a class="code" href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">flags</a>);</div>
+<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;  }</div>
+<div class="ttc" id="namespaceafio__v2__xxx_html_a4968bb2d647535f4b91427c66ff8b9e4"><div class="ttname"><a href="namespaceafio__v2__xxx.html#a4968bb2d647535f4b91427c66ff8b9e4">afio_v2_xxx::temporary_files_directory</a></div><div class="ttdeci">path_view temporary_files_directory() noexcept</div><div class="ttdoc">Returns a path to a directory reported by the operating system to be suitable for storing temporary f...</div></div>
+<div class="ttc" id="classafio__v2__xxx_1_1mapped__file__handle_html_a00875e717f4b2725bb58ecbb5310fc6f"><div class="ttname"><a href="classafio__v2__xxx_1_1mapped__file__handle.html#a00875e717f4b2725bb58ecbb5310fc6f">afio_v2_xxx::mapped_file_handle::mapped_random_file</a></div><div class="ttdeci">static result&lt; mapped_file_handle &gt; mapped_random_file(size_type reservation, const path_handle &amp;dirpath, mode _mode=mode::write, caching _caching=caching::temporary, flag flags=flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> mapped_file_handle.hpp:175</div></div>
+<div class="ttc" id="classafio__v2__xxx_1_1path__handle_html_a5cbd1d67ffe72d6cce0d093f861a4af7"><div class="ttname"><a href="classafio__v2__xxx_1_1path__handle.html#a5cbd1d67ffe72d6cce0d093f861a4af7">afio_v2_xxx::path_handle::path</a></div><div class="ttdeci">static result&lt; path_handle &gt; path(const path_handle &amp;base, path_view_type _path) noexcept</div></div>
+<div class="ttc" id="classafio__v2__xxx_1_1handle_html_ab3d876f5996605158fd6a0582adadad6"><div class="ttname"><a href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">afio_v2_xxx::handle::flags</a></div><div class="ttdeci">flag flags() const noexcept</div><div class="ttdoc">The flags this handle was opened with. </div><div class="ttdef"><b>Definition:</b> handle.hpp:306</div></div>
+<div class="ttc" id="classafio__v2__xxx_1_1mapped__file__handle_html_aedf10997693cf088cf9d67720c4defe1"><div class="ttname"><a href="classafio__v2__xxx_1_1mapped__file__handle.html#aedf10997693cf088cf9d67720c4defe1">afio_v2_xxx::mapped_file_handle::mapped_file</a></div><div class="ttdeci">static result&lt; mapped_file_handle &gt; mapped_file(size_type reservation, const path_handle &amp;base, path_view_type _path, mode _mode=mode::read, creation _creation=creation::open_existing, caching _caching=caching::all, flag flags=flag::none) noexcept</div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a class="anchor" id="a35439e5c32b702717402b9035dd25199"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static result&lt;<a class="el" href="classafio__v2__xxx_1_1mapped__file__handle.html">mapped_file_handle</a>&gt; afio_v2_xxx::mapped_file_handle::mapped_temp_inode </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classafio__v2__xxx_1_1path__view.html">path_view_type</a>&#160;</td>
+          <td class="paramname"><em>dirpath</em> = <code><a class="el" href="namespaceafio__v2__xxx.html#a4968bb2d647535f4b91427c66ff8b9e4">temporary_files_directory</a>()</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18">mode</a>&#160;</td>
+          <td class="paramname"><em>_mode</em> = <code><a class="el" href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18aefb2a684e4afb7d55e6147fbe5a332ee">mode::write</a></code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">flag&#160;</td>
+          <td class="paramname"><em>flags</em> = <code>flag::none</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p><em>Securely</em> create a mapped file handle creating a temporary anonymous inode in the filesystem referred to by <em>dirpath</em>. The inode created has no name nor accessible path on the filing system and ceases to exist as soon as the last handle is closed, making it ideal for use as a temporary file where other processes do not need to have access to its contents via some path on the filing system (a classic use case is for backing shared memory maps).</p>
+<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX open() or CreateFile() can return. </dd></dl>
+<div class="fragment"><div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;  {</div>
+<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;    <span class="comment">// Open it overlapped, otherwise no difference.</span></div>
+<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;    OUTCOME_TRY(v, <a class="code" href="classafio__v2__xxx_1_1file__handle.html#a2910fdfa511d1295e36e2eb015b989ac">file_handle::temp_inode</a>(std::move(dirpath), std::move(_mode), <a class="code" href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">flags</a>));</div>
+<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;    <a class="code" href="classafio__v2__xxx_1_1mapped__file__handle.html#a5f3f5dd54b5c2cc9810621c05a6171f6">mapped_file_handle</a> ret(std::move(v));</div>
+<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;    <span class="keywordflow">return</span> std::move(ret);</div>
+<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;  }</div>
+<div class="ttc" id="classafio__v2__xxx_1_1mapped__file__handle_html_a5f3f5dd54b5c2cc9810621c05a6171f6"><div class="ttname"><a href="classafio__v2__xxx_1_1mapped__file__handle.html#a5f3f5dd54b5c2cc9810621c05a6171f6">afio_v2_xxx::mapped_file_handle::mapped_file_handle</a></div><div class="ttdeci">mapped_file_handle()=default</div><div class="ttdoc">Default constructor. </div></div>
+<div class="ttc" id="classafio__v2__xxx_1_1file__handle_html_a2910fdfa511d1295e36e2eb015b989ac"><div class="ttname"><a href="classafio__v2__xxx_1_1file__handle.html#a2910fdfa511d1295e36e2eb015b989ac">afio_v2_xxx::file_handle::temp_inode</a></div><div class="ttdeci">static result&lt; file_handle &gt; temp_inode(path_view_type dirpath=temporary_files_directory(), mode _mode=mode::write, flag flags=flag::none) noexcept</div></div>
+<div class="ttc" id="classafio__v2__xxx_1_1handle_html_ab3d876f5996605158fd6a0582adadad6"><div class="ttname"><a href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">afio_v2_xxx::handle::flags</a></div><div class="ttdeci">flag flags() const noexcept</div><div class="ttdoc">The flags this handle was opened with. </div><div class="ttdef"><b>Definition:</b> handle.hpp:306</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1522,6 +1399,55 @@ For portability, you can only assume that barriers write order for a single hand
 </div><!-- fragment -->
 </div>
 </div>
+<a class="anchor" id="a9700eb2bd35b78fcd8131a07090690dc"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual <a class="el" href="structafio__v2__xxx_1_1io__handle_1_1io__result.html">io_result</a>&lt;buffers_type&gt; afio_v2_xxx::mapped_file_handle::read </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structafio__v2__xxx_1_1io__handle_1_1io__request.html">io_request</a>&lt; buffers_type &gt;&#160;</td>
+          <td class="paramname"><em>reqs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a>&#160;</td>
+          <td class="paramname"><em>d</em> = <code><a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a>()</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">override</span><span class="mlabel">virtual</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Read data from the mapped file. </p>
+<dl class="section note"><dt>Note</dt><dd>Because this implementation never copies memory, you can pass in buffers with a null address.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The buffers read, which will never be the buffers input because they will point into the mapped view. The size of each scatter-gather buffer is updated with the number of bytes of that buffer transferred. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">reqs</td><td>A scatter-gather and offset request. </td></tr>
+    <tr><td class="paramname">d</td><td>Ignored. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section user"><dt>Errors returnable</dt><dd>None, though the various signals and structured exception throws common to using memory maps may occur. </dd></dl>
+<dl class="section user"><dt>Memory Allocations</dt><dd>None. </dd></dl>
+<div class="fragment"><div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;{ <span class="keywordflow">return</span> _mh.<a class="code" href="classafio__v2__xxx_1_1map__handle.html#ad50026d4eca2ddd77b5f9877666857b8">read</a>(std::move(reqs), std::move(d)); }</div>
+<div class="ttc" id="classafio__v2__xxx_1_1map__handle_html_ad50026d4eca2ddd77b5f9877666857b8"><div class="ttname"><a href="classafio__v2__xxx_1_1map__handle.html#ad50026d4eca2ddd77b5f9877666857b8">afio_v2_xxx::map_handle::read</a></div><div class="ttdeci">virtual io_result&lt; buffers_type &gt; read(io_request&lt; buffers_type &gt; reqs, deadline d=deadline()) noexceptoverride</div><div class="ttdoc">Read data from the mapped view. </div></div>
+</div><!-- fragment -->
+</div>
+</div>
 <a class="anchor" id="a06da220c6d1cf3ee4c981ae15012560e"></a>
 <div class="memitem">
 <div class="memproto">
@@ -1742,7 +1668,7 @@ For portability, you can only assume that barriers write order for a single hand
 
 </div>
 </div>
-<a class="anchor" id="a45873fd0b1ab27f936f046ed14124afd"></a>
+<a class="anchor" id="a47cd01f73559631556a0fd8817f01d48"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -1750,7 +1676,7 @@ For portability, you can only assume that barriers write order for a single hand
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual result&lt;extent_type&gt; afio_v2_xxx::file_handle::truncate </td>
+          <td class="memname">virtual result&lt;extent_type&gt; afio_v2_xxx::mapped_file_handle::truncate </td>
           <td>(</td>
           <td class="paramtype">extent_type&#160;</td>
           <td class="paramname"><em>newsize</em></td><td>)</td>
@@ -1759,21 +1685,49 @@ For portability, you can only assume that barriers write order for a single hand
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span><span class="mlabel">noexcept</span><span class="mlabel">inherited</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">override</span><span class="mlabel">virtual</span><span class="mlabel">noexcept</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Resize the current maximum permitted extent of the file to the given extent, avoiding any new allocation of physical storage where supported. Note that on extents based filing systems this will succeed even if there is insufficient free space on the storage medium.</p>
+
+<p>Resize the current maximum permitted extent of the mapped file to the given extent, avoiding any new allocation of physical storage where supported. </p>
+<p>Note that on extents based filing systems this will succeed even if there is insufficient free space on the storage medium. Only when pages are written to will the lack of sufficient free space be realised, resulting in an operating system specific exception.</p>
+<dl class="section note"><dt>Note</dt><dd>On Microsoft Windows you cannot shrink a file below any section handle's extent in any process in the system. We do, of course, shrink the internally held section handle correctly before truncating the underlying file. However you will need to coordinate with any other processes to shrink their section handles first. This is partly why <code>section()</code> is exposed.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>The bytes actually truncated to. </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">newsize</td><td>The bytes to truncate the file to. </td></tr>
+    <tr><td class="paramname">newsize</td><td>The bytes to truncate the file to. Zero causes the maps to be closed before truncation. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX ftruncate() or SetFileInformationByHandle() can return. </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classafio__v2__xxx_1_1mapped__file__handle.html#a47cd01f73559631556a0fd8817f01d48">afio_v2_xxx::mapped_file_handle</a>.</p>
+<p>Reimplemented from <a class="el" href="classafio__v2__xxx_1_1file__handle.html#a45873fd0b1ab27f936f046ed14124afd">afio_v2_xxx::file_handle</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="aea61aa0d30653b72a8e877e3b507552a"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">result&lt;extent_type&gt; afio_v2_xxx::mapped_file_handle::truncate </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Resize the mapping to match that of the underlying file, returning the size of the underlying file. </p>
+<p>If the internal section and map handle are invalid, they are restored unless the underlying file is zero length. </p>
 
 </div>
 </div>
@@ -2000,7 +1954,7 @@ For portability, you can only assume that barriers write order for a single hand
 </div><!-- fragment -->
 </div>
 </div>
-<a class="anchor" id="a649aa39b0d4b60a05d4aab4be569dcb6"></a>
+<a class="anchor" id="ab5445524727b27b8df50347320bc8d6e"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -2008,7 +1962,55 @@ For portability, you can only assume that barriers write order for a single hand
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual result&lt;extent_type&gt; afio_v2_xxx::file_handle::zero </td>
+          <td class="memname">virtual <a class="el" href="structafio__v2__xxx_1_1io__handle_1_1io__result.html">io_result</a>&lt;const_buffers_type&gt; afio_v2_xxx::mapped_file_handle::write </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structafio__v2__xxx_1_1io__handle_1_1io__request.html">io_request</a>&lt; const_buffers_type &gt;&#160;</td>
+          <td class="paramname"><em>reqs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a>&#160;</td>
+          <td class="paramname"><em>d</em> = <code><a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a>()</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">override</span><span class="mlabel">virtual</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Write data to the mapped file. Note this will never extend past the current length of the mapped file. </p>
+<dl class="section return"><dt>Returns</dt><dd>The buffers written, which will never be the buffers input because they will point at where the data was copied into the mapped view. The size of each scatter-gather buffer is updated with the number of bytes of that buffer transferred. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">reqs</td><td>A scatter-gather and offset request. </td></tr>
+    <tr><td class="paramname">d</td><td>Ignored. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section user"><dt>Errors returnable</dt><dd>None, though the various signals and structured exception throws common to using memory maps may occur. </dd></dl>
+<dl class="section user"><dt>Memory Allocations</dt><dd>None. </dd></dl>
+<div class="fragment"><div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;{ <span class="keywordflow">return</span> _mh.<a class="code" href="classafio__v2__xxx_1_1map__handle.html#a162d844e3dfcfcfad698a404bd55ef04">write</a>(std::move(reqs), std::move(d)); }</div>
+<div class="ttc" id="classafio__v2__xxx_1_1map__handle_html_a162d844e3dfcfcfad698a404bd55ef04"><div class="ttname"><a href="classafio__v2__xxx_1_1map__handle.html#a162d844e3dfcfcfad698a404bd55ef04">afio_v2_xxx::map_handle::write</a></div><div class="ttdeci">virtual io_result&lt; const_buffers_type &gt; write(io_request&lt; const_buffers_type &gt; reqs, deadline d=deadline()) noexceptoverride</div><div class="ttdoc">Write data to the mapped view. </div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a class="anchor" id="a58a53c65313fcf097bb57cd077adc17d"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual result&lt;extent_type&gt; afio_v2_xxx::mapped_file_handle::zero </td>
           <td>(</td>
           <td class="paramtype">extent_type&#160;</td>
           <td class="paramname"><em>offset</em>, </td>
@@ -2033,7 +2035,7 @@ For portability, you can only assume that barriers write order for a single hand
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span><span class="mlabel">noexcept</span><span class="mlabel">inherited</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">override</span><span class="mlabel">virtual</span><span class="mlabel">noexcept</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -2052,19 +2054,25 @@ For portability, you can only assume that barriers write order for a single hand
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX write() can return, <code>errc::timed_out</code>, <code>errc::operation_canceled</code>. <code>errc::not_supported</code> may be returned if deadline i/o is not possible with this particular handle configuration (e.g. writing to regular files on POSIX or writing to a non-overlapped HANDLE on Windows). </dd></dl>
 <dl class="section user"><dt>Memory Allocations</dt><dd>The default synchronous implementation in file_handle performs no memory allocation. The asynchronous implementation in async_file_handle may perform one calloc and one free. </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classafio__v2__xxx_1_1mapped__file__handle.html#a58a53c65313fcf097bb57cd077adc17d">afio_v2_xxx::mapped_file_handle</a>.</p>
-
+<p>Reimplemented from <a class="el" href="classafio__v2__xxx_1_1file__handle.html#a649aa39b0d4b60a05d4aab4be569dcb6">afio_v2_xxx::file_handle</a>.</p>
+<div class="fragment"><div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;  {</div>
+<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;    OUTCOME_TRYV(_mh.<a class="code" href="classafio__v2__xxx_1_1map__handle.html#ac35a85e8a6cca721640ddc6b5008e145">zero_memory</a>({_mh.<a class="code" href="classafio__v2__xxx_1_1map__handle.html#a1e9273d0c6aca7da6480437f6cf6638a">address</a>() + offset, bytes}));</div>
+<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;    <span class="keywordflow">return</span> bytes;</div>
+<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;  }</div>
+<div class="ttc" id="classafio__v2__xxx_1_1map__handle_html_ac35a85e8a6cca721640ddc6b5008e145"><div class="ttname"><a href="classafio__v2__xxx_1_1map__handle.html#ac35a85e8a6cca721640ddc6b5008e145">afio_v2_xxx::map_handle::zero_memory</a></div><div class="ttdeci">result&lt; void &gt; zero_memory(buffer_type region) noexcept</div></div>
+<div class="ttc" id="classafio__v2__xxx_1_1map__handle_html_a1e9273d0c6aca7da6480437f6cf6638a"><div class="ttname"><a href="classafio__v2__xxx_1_1map__handle.html#a1e9273d0c6aca7da6480437f6cf6638a">afio_v2_xxx::map_handle::address</a></div><div class="ttdeci">char * address() const noexcept</div><div class="ttdoc">The address in memory where this mapped view resides. </div><div class="ttdef"><b>Definition:</b> map_handle.hpp:299</div></div>
+</div><!-- fragment -->
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>include/afio/v2.0/<a class="el" href="async__file__handle_8hpp.html">async_file_handle.hpp</a></li>
+<li>include/afio/v2.0/<a class="el" href="mapped__file__handle_8hpp.html">mapped_file_handle.hpp</a></li>
 </ul>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="namespaceafio__v2__xxx.html">afio_v2_xxx</a></li><li class="navelem"><a class="el" href="classafio__v2__xxx_1_1async__file__handle.html">async_file_handle</a></li>
+    <li class="navelem"><a class="el" href="namespaceafio__v2__xxx.html">afio_v2_xxx</a></li><li class="navelem"><a class="el" href="classafio__v2__xxx_1_1mapped__file__handle.html">mapped_file_handle</a></li>
     <li class="footer">Generated by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>

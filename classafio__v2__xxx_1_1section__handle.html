@@ -194,10 +194,10 @@ Public Member Functions</h2></td></tr>
 constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1section__handle.html#a2824f51d5726bb8015d89ac1ea7abe5f">section_handle</a> ()</td></tr>
 <tr class="memdesc:a2824f51d5726bb8015d89ac1ea7abe5f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor. <br/></td></tr>
 <tr class="separator:a2824f51d5726bb8015d89ac1ea7abe5f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a793a3bf4c4d10c03c6a31e490bd586a0"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a793a3bf4c4d10c03c6a31e490bd586a0"></a>
-constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1section__handle.html#a793a3bf4c4d10c03c6a31e490bd586a0">section_handle</a> (<a class="el" href="structafio__v2__xxx_1_1native__handle__type.html">native_handle_type</a> sectionh, <a class="el" href="classafio__v2__xxx_1_1io__handle.html">io_handle</a> *<a class="el" href="classafio__v2__xxx_1_1section__handle.html#aa4a1627091cc26b3fe0029c03b12b431">backing</a>, <a class="el" href="classafio__v2__xxx_1_1handle.html#a818fff07c92eaab72532092d1c2a14f9">extent_type</a> maximum_size, flag __flag)</td></tr>
-<tr class="memdesc:a793a3bf4c4d10c03c6a31e490bd586a0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a section handle using the given native handle type for the section and the given i/o handle for the backing storage. <br/></td></tr>
-<tr class="separator:a793a3bf4c4d10c03c6a31e490bd586a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a01f8bba023c65d628e001bb1a02e580c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a01f8bba023c65d628e001bb1a02e580c"></a>
+constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1section__handle.html#a01f8bba023c65d628e001bb1a02e580c">section_handle</a> (<a class="el" href="structafio__v2__xxx_1_1native__handle__type.html">native_handle_type</a> sectionh, <a class="el" href="classafio__v2__xxx_1_1file__handle.html">file_handle</a> *<a class="el" href="classafio__v2__xxx_1_1section__handle.html#aa4a1627091cc26b3fe0029c03b12b431">backing</a>, <a class="el" href="classafio__v2__xxx_1_1handle.html#a818fff07c92eaab72532092d1c2a14f9">extent_type</a> maximum_size, flag __flag)</td></tr>
+<tr class="memdesc:a01f8bba023c65d628e001bb1a02e580c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a section handle using the given native handle type for the section and the given i/o handle for the backing storage. <br/></td></tr>
+<tr class="separator:a01f8bba023c65d628e001bb1a02e580c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a84ec7259dfb8bab518d3def875bdc6f2"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a84ec7259dfb8bab518d3def875bdc6f2"></a>
 constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1section__handle.html#a84ec7259dfb8bab518d3def875bdc6f2">section_handle</a> (<a class="el" href="classafio__v2__xxx_1_1section__handle.html">section_handle</a> &amp;&amp;o) noexcept</td></tr>
 <tr class="memdesc:a84ec7259dfb8bab518d3def875bdc6f2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Implicit move construction of section_handle permitted. <br/></td></tr>
@@ -226,8 +226,8 @@ flag&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <a class="el" href="classafio__v2__xxx_1_1handle.html#a818fff07c92eaab72532092d1c2a14f9">extent_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1section__handle.html#a7f36765bf63bbd31caf4e23cec6aa600">length</a> () const noexcept</td></tr>
 <tr class="memdesc:a7f36765bf63bbd31caf4e23cec6aa600"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the current maximum permitted extent of the memory section. <br/></td></tr>
 <tr class="separator:a7f36765bf63bbd31caf4e23cec6aa600"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac855a808ee7367d35f2616aed62e9ed8"><td class="memItemLeft" align="right" valign="top">result&lt; <a class="el" href="classafio__v2__xxx_1_1handle.html#a818fff07c92eaab72532092d1c2a14f9">extent_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1section__handle.html#ac855a808ee7367d35f2616aed62e9ed8">truncate</a> (<a class="el" href="classafio__v2__xxx_1_1handle.html#a818fff07c92eaab72532092d1c2a14f9">extent_type</a> newsize) noexcept</td></tr>
-<tr class="separator:ac855a808ee7367d35f2616aed62e9ed8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a229f515ed3251071d374476204e23e30"><td class="memItemLeft" align="right" valign="top">result&lt; <a class="el" href="classafio__v2__xxx_1_1handle.html#a818fff07c92eaab72532092d1c2a14f9">extent_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1section__handle.html#a229f515ed3251071d374476204e23e30">truncate</a> (<a class="el" href="classafio__v2__xxx_1_1handle.html#a818fff07c92eaab72532092d1c2a14f9">extent_type</a> newsize=0) noexcept</td></tr>
+<tr class="separator:a229f515ed3251071d374476204e23e30"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a657c12a309cf02bf2351bfcc7f41463b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a657c12a309cf02bf2351bfcc7f41463b"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1handle.html#a657c12a309cf02bf2351bfcc7f41463b">swap</a> (<a class="el" href="classafio__v2__xxx_1_1handle.html">handle</a> &amp;o) noexcept</td></tr>
 <tr class="memdesc:a657c12a309cf02bf2351bfcc7f41463b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Swap with another instance. <br/></td></tr>
@@ -337,9 +337,9 @@ Static Public Member Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
-<tr class="memitem:afafd65b2a47414273650e5f2e4c48006"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afafd65b2a47414273650e5f2e4c48006"></a>
-<a class="el" href="classafio__v2__xxx_1_1io__handle.html">io_handle</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>_backing</b></td></tr>
-<tr class="separator:afafd65b2a47414273650e5f2e4c48006"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3c26e221ec4de3bc485989ff104261d1"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3c26e221ec4de3bc485989ff104261d1"></a>
+<a class="el" href="classafio__v2__xxx_1_1file__handle.html">file_handle</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>_backing</b></td></tr>
+<tr class="separator:a3c26e221ec4de3bc485989ff104261d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aafde2623c9a54e14792eee729321f5a3"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aafde2623c9a54e14792eee729321f5a3"></a>
 <a class="el" href="classafio__v2__xxx_1_1handle.html#a818fff07c92eaab72532092d1c2a14f9">extent_type</a>&#160;</td><td class="memItemRight" valign="bottom"><b>_length</b></td></tr>
 <tr class="separator:aafde2623c9a54e14792eee729321f5a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -449,7 +449,7 @@ flag&#160;</td><td class="memItemRight" valign="bottom"><b>_flags</b></td></tr>
 <div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    <a class="code" href="namespaceafio__v2__xxx.html#a84d22c966fcabe50de30ad8cf26c7241">truncate</a>  <span class="comment">//!&lt; Atomically truncate on open, leaving creation date unmodified.</span></div>
 <div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;<span class="comment"></span>              <span class="comment">// NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!</span></div>
 <div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;  };</div>
-<div class="ttc" id="namespaceafio__v2__xxx_html_a84d22c966fcabe50de30ad8cf26c7241"><div class="ttname"><a href="namespaceafio__v2__xxx.html#a84d22c966fcabe50de30ad8cf26c7241">afio_v2_xxx::truncate</a></div><div class="ttdeci">result&lt; file_handle::extent_type &gt; truncate(file_handle &amp;self, file_handle::extent_type newsize) noexcept</div><div class="ttdef"><b>Definition:</b> file_handle.hpp:335</div></div>
+<div class="ttc" id="namespaceafio__v2__xxx_html_a84d22c966fcabe50de30ad8cf26c7241"><div class="ttname"><a href="namespaceafio__v2__xxx.html#a84d22c966fcabe50de30ad8cf26c7241">afio_v2_xxx::truncate</a></div><div class="ttdeci">result&lt; file_handle::extent_type &gt; truncate(file_handle &amp;self, file_handle::extent_type newsize) noexcept</div><div class="ttdef"><b>Definition:</b> file_handle.hpp:343</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -603,7 +603,7 @@ flag&#160;</td><td class="memItemRight" valign="bottom"><b>_flags</b></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">backing</td><td>The handle to use as backing storage. An invalid handle means to use the system page file as the backing storage. </td></tr>
-    <tr><td class="paramname">maximum_size</td><td>The maximum size this section can ever be. Zero means to use backing.length(). </td></tr>
+    <tr><td class="paramname">maximum_size</td><td>The maximum size this section can ever be. Zero means to use <code>backing.length()</code>. This cannot exceed the size of any backing file used. </td></tr>
     <tr><td class="paramname">_flag</td><td>How to create the section.</td></tr>
   </table>
   </dd>
@@ -650,8 +650,8 @@ flag&#160;</td><td class="memItemRight" valign="bottom"><b>_flags</b></td></tr>
 </table>
 </div><div class="memdoc">
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;{ <span class="keywordflow">return</span> <a class="code" href="classafio__v2__xxx_1_1section__handle.html#a34cf4f9a6ec20c2a456d6b6313f0e595">section</a>(<a class="code" href="classafio__v2__xxx_1_1section__handle.html#aa4a1627091cc26b3fe0029c03b12b431">backing</a>, maximum_size, _flag); }</div>
-<div class="ttc" id="classafio__v2__xxx_1_1section__handle_html_aa4a1627091cc26b3fe0029c03b12b431"><div class="ttname"><a href="classafio__v2__xxx_1_1section__handle.html#aa4a1627091cc26b3fe0029c03b12b431">afio_v2_xxx::section_handle::backing</a></div><div class="ttdeci">io_handle * backing() const noexcept</div><div class="ttdoc">Returns the borrowed handle backing this section, if any. </div><div class="ttdef"><b>Definition:</b> map_handle.hpp:136</div></div>
+<div class="fragment"><div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;{ <span class="keywordflow">return</span> <a class="code" href="classafio__v2__xxx_1_1section__handle.html#a34cf4f9a6ec20c2a456d6b6313f0e595">section</a>(<a class="code" href="classafio__v2__xxx_1_1section__handle.html#aa4a1627091cc26b3fe0029c03b12b431">backing</a>, maximum_size, _flag); }</div>
+<div class="ttc" id="classafio__v2__xxx_1_1section__handle_html_aa4a1627091cc26b3fe0029c03b12b431"><div class="ttname"><a href="classafio__v2__xxx_1_1section__handle.html#aa4a1627091cc26b3fe0029c03b12b431">afio_v2_xxx::section_handle::backing</a></div><div class="ttdeci">io_handle * backing() const noexcept</div><div class="ttdoc">Returns the borrowed handle backing this section, if any. </div><div class="ttdef"><b>Definition:</b> map_handle.hpp:137</div></div>
 <div class="ttc" id="classafio__v2__xxx_1_1section__handle_html_a34cf4f9a6ec20c2a456d6b6313f0e595"><div class="ttname"><a href="classafio__v2__xxx_1_1section__handle.html#a34cf4f9a6ec20c2a456d6b6313f0e595">afio_v2_xxx::section_handle::section</a></div><div class="ttdeci">static result&lt; section_handle &gt; section(file_handle &amp;backing, extent_type maximum_size=0, flag _flag=flag::read|flag::write) noexcept</div><div class="ttdoc">Create a memory section. </div></div>
 </div><!-- fragment -->
 </div>
@@ -678,13 +678,13 @@ flag&#160;</td><td class="memItemRight" valign="bottom"><b>_flags</b></td></tr>
 </table>
 </div><div class="memdoc">
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;  {</div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;    file_handle <a class="code" href="classafio__v2__xxx_1_1section__handle.html#aa4a1627091cc26b3fe0029c03b12b431">backing</a>;</div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classafio__v2__xxx_1_1section__handle.html#a34cf4f9a6ec20c2a456d6b6313f0e595">section</a>(backing, maximum_size, <a class="code" href="namespaceafio__v2__xxx.html#ac89289d85eff137c40d3d0084c410656">flag::read</a> | <a class="code" href="namespaceafio__v2__xxx.html#a5bfae365a1845c1bde4739de38c3653f">flag::write</a>);</div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;  }</div>
-<div class="ttc" id="namespaceafio__v2__xxx_html_a5bfae365a1845c1bde4739de38c3653f"><div class="ttname"><a href="namespaceafio__v2__xxx.html#a5bfae365a1845c1bde4739de38c3653f">afio_v2_xxx::write</a></div><div class="ttdeci">map_handle::io_result&lt; map_handle::const_buffers_type &gt; write(map_handle &amp;self, map_handle::io_request&lt; map_handle::const_buffers_type &gt; reqs, deadline d=deadline()) noexcept</div><div class="ttdoc">Write data to the mapped view. </div><div class="ttdef"><b>Definition:</b> map_handle.hpp:479</div></div>
-<div class="ttc" id="classafio__v2__xxx_1_1section__handle_html_aa4a1627091cc26b3fe0029c03b12b431"><div class="ttname"><a href="classafio__v2__xxx_1_1section__handle.html#aa4a1627091cc26b3fe0029c03b12b431">afio_v2_xxx::section_handle::backing</a></div><div class="ttdeci">io_handle * backing() const noexcept</div><div class="ttdoc">Returns the borrowed handle backing this section, if any. </div><div class="ttdef"><b>Definition:</b> map_handle.hpp:136</div></div>
-<div class="ttc" id="namespaceafio__v2__xxx_html_ac89289d85eff137c40d3d0084c410656"><div class="ttname"><a href="namespaceafio__v2__xxx.html#ac89289d85eff137c40d3d0084c410656">afio_v2_xxx::read</a></div><div class="ttdeci">map_handle::io_result&lt; map_handle::buffers_type &gt; read(map_handle &amp;self, map_handle::io_request&lt; map_handle::buffers_type &gt; reqs, deadline d=deadline()) noexcept</div><div class="ttdoc">Read data from the mapped view. </div><div class="ttdef"><b>Definition:</b> map_handle.hpp:465</div></div>
+<div class="fragment"><div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;  {</div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;    file_handle <a class="code" href="classafio__v2__xxx_1_1section__handle.html#aa4a1627091cc26b3fe0029c03b12b431">backing</a>;</div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classafio__v2__xxx_1_1section__handle.html#a34cf4f9a6ec20c2a456d6b6313f0e595">section</a>(backing, maximum_size, <a class="code" href="namespaceafio__v2__xxx.html#ac89289d85eff137c40d3d0084c410656">flag::read</a> | <a class="code" href="namespaceafio__v2__xxx.html#a5bfae365a1845c1bde4739de38c3653f">flag::write</a>);</div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;  }</div>
+<div class="ttc" id="namespaceafio__v2__xxx_html_a5bfae365a1845c1bde4739de38c3653f"><div class="ttname"><a href="namespaceafio__v2__xxx.html#a5bfae365a1845c1bde4739de38c3653f">afio_v2_xxx::write</a></div><div class="ttdeci">map_handle::io_result&lt; map_handle::const_buffers_type &gt; write(map_handle &amp;self, map_handle::io_request&lt; map_handle::const_buffers_type &gt; reqs, deadline d=deadline()) noexcept</div><div class="ttdoc">Write data to the mapped view. Note this will never extend past the current length of the mapped file...</div><div class="ttdef"><b>Definition:</b> map_handle.hpp:484</div></div>
+<div class="ttc" id="classafio__v2__xxx_1_1section__handle_html_aa4a1627091cc26b3fe0029c03b12b431"><div class="ttname"><a href="classafio__v2__xxx_1_1section__handle.html#aa4a1627091cc26b3fe0029c03b12b431">afio_v2_xxx::section_handle::backing</a></div><div class="ttdeci">io_handle * backing() const noexcept</div><div class="ttdoc">Returns the borrowed handle backing this section, if any. </div><div class="ttdef"><b>Definition:</b> map_handle.hpp:137</div></div>
+<div class="ttc" id="namespaceafio__v2__xxx_html_ac89289d85eff137c40d3d0084c410656"><div class="ttname"><a href="namespaceafio__v2__xxx.html#ac89289d85eff137c40d3d0084c410656">afio_v2_xxx::read</a></div><div class="ttdeci">map_handle::io_result&lt; map_handle::buffers_type &gt; read(map_handle &amp;self, map_handle::io_request&lt; map_handle::buffers_type &gt; reqs, deadline d=deadline()) noexcept</div><div class="ttdoc">Read data from the mapped view. </div><div class="ttdef"><b>Definition:</b> map_handle.hpp:470</div></div>
 <div class="ttc" id="classafio__v2__xxx_1_1section__handle_html_a34cf4f9a6ec20c2a456d6b6313f0e595"><div class="ttname"><a href="classafio__v2__xxx_1_1section__handle.html#a34cf4f9a6ec20c2a456d6b6313f0e595">afio_v2_xxx::section_handle::section</a></div><div class="ttdeci">static result&lt; section_handle &gt; section(file_handle &amp;backing, extent_type maximum_size=0, flag _flag=flag::read|flag::write) noexcept</div><div class="ttdoc">Create a memory section. </div></div>
 </div><!-- fragment -->
 </div>
@@ -745,7 +745,7 @@ flag&#160;</td><td class="memItemRight" valign="bottom"><b>_flags</b></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="ac855a808ee7367d35f2616aed62e9ed8"></a>
+<a class="anchor" id="a229f515ed3251071d374476204e23e30"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -756,7 +756,7 @@ flag&#160;</td><td class="memItemRight" valign="bottom"><b>_flags</b></td></tr>
           <td class="memname">result&lt;<a class="el" href="classafio__v2__xxx_1_1handle.html#a818fff07c92eaab72532092d1c2a14f9">extent_type</a>&gt; afio_v2_xxx::section_handle::truncate </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="classafio__v2__xxx_1_1handle.html#a818fff07c92eaab72532092d1c2a14f9">extent_type</a>&#160;</td>
-          <td class="paramname"><em>newsize</em></td><td>)</td>
+          <td class="paramname"><em>newsize</em> = <code>0</code></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -766,7 +766,13 @@ flag&#160;</td><td class="memItemRight" valign="bottom"><b>_flags</b></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Resize the current maximum permitted extent of the memory section to the given extent.</p>
+<p>Resize the current maximum permitted extent of the memory section to the given extent. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">newsize</td><td>The new size of the memory section. Specify zero to use <code>backing.length()</code>. This cannot exceed the size of any backing file used.</td></tr>
+  </table>
+  </dd>
+</dl>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values NtExtendSection() can return. On POSIX this is a no op. </dd></dl>
 
 </div>

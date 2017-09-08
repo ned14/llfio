@@ -20,7 +20,8 @@ var hierarchy =
     [ "afio_v2_xxx::fs_handle", "classafio__v2__xxx_1_1fs__handle.html", [
       [ "afio_v2_xxx::directory_handle", "classafio__v2__xxx_1_1directory__handle.html", null ],
       [ "afio_v2_xxx::file_handle", "classafio__v2__xxx_1_1file__handle.html", [
-        [ "afio_v2_xxx::async_file_handle", "classafio__v2__xxx_1_1async__file__handle.html", null ]
+        [ "afio_v2_xxx::async_file_handle", "classafio__v2__xxx_1_1async__file__handle.html", null ],
+        [ "afio_v2_xxx::mapped_file_handle", "classafio__v2__xxx_1_1mapped__file__handle.html", null ]
       ] ]
     ] ],
     [ "afio_v2_xxx::handle", "classafio__v2__xxx_1_1handle.html", [
@@ -69,6 +70,6 @@ var hierarchy =
     [ "afio_v2_xxx::stat_t", "structafio__v2__xxx_1_1stat__t.html", null ],
     [ "afio_v2_xxx::statfs_t", "structafio__v2__xxx_1_1statfs__t.html", null ],
     [ "afio_v2_xxx::storage_profile::storage_profile", "structafio__v2__xxx_1_1storage__profile_1_1storage__profile.html", null ],
-    [ "afio_v2_xxx::stat_t::want_base", "structafio__v2__xxx_1_1stat__t_1_1want__base.html", null ],
-    [ "afio_v2_xxx::statfs_t::want_base", "structafio__v2__xxx_1_1statfs__t_1_1want__base.html", null ]
+    [ "afio_v2_xxx::statfs_t::want_base", "structafio__v2__xxx_1_1statfs__t_1_1want__base.html", null ],
+    [ "afio_v2_xxx::stat_t::want_base", "structafio__v2__xxx_1_1stat__t_1_1want__base.html", null ]
 ];

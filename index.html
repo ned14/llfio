@@ -114,7 +114,7 @@ $(document).ready(function(){initNavTree('index.html','');});
 </div>
    </td></tr>
 </table>
-</center><p>Herein lies my proposed zero whole machine memory copy async file i/o and filesystem library for Boost and the C++ standard, intended for storage devices with ~1 microsecond 4Kb transfer latencies.</p>
+</center><p>Herein lies my proposed zero whole machine memory copy async file i/o and filesystem library for Boost and the C++ standard, intended for storage devices with ~1 microsecond 4Kb transfer latencies and those supporting Storage Class Memory (SCM)/Direct Access Storage (DAX). Its i/o overhead, including syscall overhead, has been benchmarked to 100 nanoseconds on Linux which corresponds to a theoretical maximum of 10M IOPS @ QD1, approx 40Gb/sec per thread. It has particularly strong support for writing portable filesystem algorithms which work well with directly mapped non-volatile storage such as Intel Optane.</p>
 <p>It is a complete rewrite after a Boost peer review in August 2015. Its github source code repository lives at <a href="https://github.com/ned14/boost.afio">https://github.com/ned14/boost.afio</a>.</p>
 <table  width="100%" border="0" cellpadding="4">
 <tr>
@@ -130,24 +130,32 @@ $(document).ready(function(){initNavTree('index.html','');});
 <li><code>memcpy(4Kb)</code> latency: <b>5us</b> (main memory) to <b>1.3us</b> (L3 cache)</li>
 <li>RTT PCIe latency: <b>0.5us</b>  </li>
 </ul>
-</td><td valign="top" width="33%"><p class="starttd">100% read QD1 4Kb direct transfer latencies for the software with AFIO:</p>
-<ul>
+</td><td valign="top" width="33%">100% read QD1 4Kb direct transfer latencies for the software with AFIO:<ul>
 <li>&lt; 99% spinning rust hard drive latency: Windows <b>187,231us</b> FreeBSD <b>9,836us</b> Linux <b>26,468us</b></li>
 <li>&lt; 99% SATA flash drive latency: Windows <b>290us</b> Linux <b>158us</b></li>
-<li>&lt; 99% NVMe drive latency: Windows <b>37us</b> FreeBSD <b>70us</b> Linux <b>30us</b></li>
+<li>&lt; 99% NVMe drive latency: Windows <b>37us</b> FreeBSD <b>70us</b> Linux <b>30us</b>  </li>
 </ul>
-<p class="endtd">Worst case AFIO read overhead benchmarked by author: <b>0.19us</b> (5.3M IOPS @ QD1, approx 20Gb/sec)  </p>
-</td><td valign="top" width="33%"><p class="starttd">75% read 25% write QD4 4Kb direct transfer latencies for the software with AFIO:</p>
-<ul>
+</td><td valign="top" width="33%">75% read 25% write QD4 4Kb direct transfer latencies for the software with AFIO:<ul>
 <li>&lt; 99% spinning rust hard drive latency: Windows <b>48,185us</b> FreeBSD <b>61,834us</b> Linux <b>104,507us</b></li>
 <li>&lt; 99% SATA flash drive latency: Windows <b>1,812us</b> Linux <b>1,416us</b></li>
-<li>&lt; 99% NVMe drive latency: Windows <b>50us</b> FreeBSD <b>143us</b> Linux <b>40us</b></li>
+<li>&lt; 99% NVMe drive latency: Windows <b>50us</b> FreeBSD <b>143us</b> Linux <b>40us</b>   </li>
 </ul>
-<p class="endtd">Worst case AFIO write overhead benchmarked by author: <b>0.18us</b> (5.6M IOPS @ QD1, approx 21Gb/sec)   </p>
 </td></tr>
 </table>
 <dl class="section note"><dt>Note</dt><dd>Note that this code is of late alpha quality. It's quite reliable on Windows and Linux, but be careful when using it!</dd></dl>
-<p>These compilers and OS are regularly tested:</p>
+<p>Example of use: </p>
+<div class="fragment"><div class="line"><span class="keyword">namespace </span>afio = <a class="code" href="group__config.html#gaa3ed9f085329a0b81feeac3397a83740">AFIO_V2_NAMESPACE</a>;</div>
+<div class="line"><span class="comment">// Make me a 1 trillion element sparsely allocated integer array!</span></div>
+<div class="line">afio::mapped_file_handle mfh = afio::mapped_temp_inode().value();</div>
+<div class="line"><span class="comment">// On an extents based filing system, doesn&#39;t actually allocate any physical storage</span></div>
+<div class="line"><span class="comment">// but does map approximately 4Tb of all bits zero data into memory</span></div>
+<div class="line">mfh.truncate(1000000000000ULL*<span class="keyword">sizeof</span>(<span class="keywordtype">int</span>));</div>
+<div class="line"><span class="comment">// Create a typed view of the one trillion integers</span></div>
+<div class="line">afio::algorithm::mapped_view&lt;int&gt; one_trillion_int_array(mfh);</div>
+<div class="line"><span class="comment">// Write and read as you see fit, if you exceed physical RAM it&#39;ll be paged to disk</span></div>
+<div class="line">one_trillion_int_array[0] = 5;</div>
+<div class="line">one_trillion_int_array[999999999999ULL] = 6;</div>
+</div><!-- fragment --><p>These compilers and OS are regularly tested:</p>
 <ul>
 <li>GCC 7.0 (Linux 4,x x64)</li>
 <li>clang 4.0 (Linux 4.x x64)</li>
@@ -182,13 +190,19 @@ $(document).ready(function(){initNavTree('index.html','');});
 <li>
 handle - provides open, close, get path, clone, set/unset append only, change caching, characteristics</li>
 <li>
+fs_handle - handles with an inode number</li>
+<li>
 path_handle - a race free anchor to a subset of the filesystem</li>
+<li>
+directory_handle - enumerates the filesystem</li>
 <li>
 io_handle - adds synchronous scatter-gather i/o, byte range locking</li>
 <li>
 file_handle - adds open/create file, get and set maximum extent</li>
 <li>
 async_file_handle - adds asynchronous scatter-gather i/o</li>
+<li>
+mapped_file_handle - adds low latency memory mapped scatter-gather i/o</li>
 </ol>
 </td></tr>
 <tr>
@@ -274,7 +288,7 @@ async_file_handle - adds asynchronous scatter-gather i/o</li>
 <tr>
 <td>✔ </td><td>✔ </td><td>✔ </td><td><code>shared_fs_mutex</code> shared/exclusive entities locking based on atomic append </td></tr>
 <tr>
-<td></td><td>✔ </td><td>✔ </td><td>Memory mapped files and virtual memory management (<code>section_handle</code> and <code>map_handle</code>) </td></tr>
+<td></td><td>✔ </td><td>✔ </td><td>Memory mapped files and virtual memory management (<code>section_handle</code>, <code>map_handle</code> and <code>mapped_file_handle</code>) </td></tr>
 <tr>
 <td>✔ </td><td>✔ </td><td>✔ </td><td><code>shared_fs_mutex</code> shared/exclusive entities locking based on memory maps </td></tr>
 <tr>
@@ -285,6 +299,8 @@ async_file_handle - adds asynchronous scatter-gather i/o</li>
 <td></td><td>✔ </td><td>✔ </td><td>Directory handles and very fast directory enumeration ported over from AFIO v1. </td></tr>
 <tr>
 <td>✔ </td><td>✔ </td><td>✔ </td><td><code>shared_fs_mutex</code> shared/exclusive entities locking based on safe byte ranges </td></tr>
+<tr>
+<td></td><td>✔ </td><td>✔ </td><td>Set random or sequential i/o (prefetch). </td></tr>
 </table>
 <p>Todo to reach feature parity with AFIO v1:</p>
 <table class="doxtable">
@@ -292,8 +308,6 @@ async_file_handle - adds asynchronous scatter-gather i/o</li>
 <th>NEW in v2 </th><th>Windows </th><th>POSIX </th><th></th></tr>
 <tr>
 <td></td><td></td><td></td><td>Hard links and symlinks. </td></tr>
-<tr>
-<td></td><td></td><td></td><td>Set random or sequential i/o (prefetch). </td></tr>
 <tr>
 <td></td><td></td><td></td><td>BSD and OS X kqueues optimised <code>io_service</code> </td></tr>
 </table>
@@ -306,7 +320,7 @@ async_file_handle - adds asynchronous scatter-gather i/o</li>
 <tr>
 <td>✔ </td><td></td><td></td><td>Coroutines TS integration for <code>async_file_handle</code>. Use example: <a href="https://gist.github.com/anonymous/a67ba4695c223a905ff108ed8b9a342f">https://gist.github.com/anonymous/a67ba4695c223a905ff108ed8b9a342f</a> </td></tr>
 <tr>
-<td>✔ </td><td></td><td></td><td>Linux KAIO support for native async <code>O_DIRECT</code> i/o </td></tr>
+<td>✔ </td><td></td><td></td><td>Linux KAIO support for native non-blocking <code>O_DIRECT</code> i/o </td></tr>
 <tr>
 <td>✔ </td><td></td><td></td><td>Reliable directory hierarchy deletion algorithm. </td></tr>
 <tr>

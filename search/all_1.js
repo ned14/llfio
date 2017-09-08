@@ -1,7 +1,7 @@
 var searchData=
 [
   ['acls',['acls',['../structafio__v2__xxx_1_1statfs__t_1_1f__flags__t.html#ad90201c2e2a8446c45feb244a9927778',1,'afio_v2_xxx::statfs_t::f_flags_t']]],
-  ['address',['address',['../classafio__v2__xxx_1_1map__handle.html#a1e9273d0c6aca7da6480437f6cf6638a',1,'afio_v2_xxx::map_handle']]],
+  ['address',['address',['../classafio__v2__xxx_1_1map__handle.html#a1e9273d0c6aca7da6480437f6cf6638a',1,'afio_v2_xxx::map_handle::address()'],['../classafio__v2__xxx_1_1mapped__file__handle.html#adca505e51ea006ffa59e3673ea0a9853',1,'afio_v2_xxx::mapped_file_handle::address()']]],
   ['afio_2ehpp',['afio.hpp',['../v2_80_2afio_8hpp.html',1,'']]],
   ['afio_2ehpp',['afio.hpp',['../afio_8hpp.html',1,'']]],
   ['afio_5fcompile_5fkqueues',['AFIO_COMPILE_KQUEUES',['../io__service_8hpp.html#ac31c5a745782f65978dc61e09f105040',1,'io_service.hpp']]],

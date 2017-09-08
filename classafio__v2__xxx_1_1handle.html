@@ -128,13 +128,14 @@ Inheritance diagram for afio_v2_xxx::handle:</div>
  <div class="center">
   <img src="classafio__v2__xxx_1_1handle.png" usemap="#afio_v2_xxx::handle_map" alt=""/>
   <map id="afio_v2_xxx::handle_map" name="afio_v2_xxx::handle_map">
-<area href="classafio__v2__xxx_1_1io__handle.html" title="A handle to something capable of scatter-gather i/o. " alt="afio_v2_xxx::io_handle" shape="rect" coords="99,56,287,80"/>
-<area href="classafio__v2__xxx_1_1path__handle.html" title="A handle to somewhere originally identified by a path on the filing system. Typically used as the lig..." alt="afio_v2_xxx::path_handle" shape="rect" coords="396,56,584,80"/>
-<area href="classafio__v2__xxx_1_1section__handle.html" title="A handle to a source of mapped memory. " alt="afio_v2_xxx::section_handle" shape="rect" coords="594,56,782,80"/>
-<area href="classafio__v2__xxx_1_1file__handle.html" title="A handle to a regular file or device, kept data layout compatible with async_file_handle. " alt="afio_v2_xxx::file_handle" shape="rect" coords="0,112,188,136"/>
-<area href="classafio__v2__xxx_1_1map__handle.html" title="A handle to a memory mapped region of memory. " alt="afio_v2_xxx::map_handle" shape="rect" coords="198,112,386,136"/>
-<area href="classafio__v2__xxx_1_1directory__handle.html" title="A handle to a directory which can be enumerated. " alt="afio_v2_xxx::directory_handle" shape="rect" coords="396,112,584,136"/>
-<area href="classafio__v2__xxx_1_1async__file__handle.html" title="An asynchronous handle to an open something. " alt="afio_v2_xxx::async_file_handle" shape="rect" coords="0,168,188,192"/>
+<area href="classafio__v2__xxx_1_1io__handle.html" title="A handle to something capable of scatter-gather i/o. " alt="afio_v2_xxx::io_handle" shape="rect" coords="208,56,406,80"/>
+<area href="classafio__v2__xxx_1_1path__handle.html" title="A handle to somewhere originally identified by a path on the filing system. Typically used as the lig..." alt="afio_v2_xxx::path_handle" shape="rect" coords="520,56,718,80"/>
+<area href="classafio__v2__xxx_1_1section__handle.html" title="A handle to a source of mapped memory. " alt="afio_v2_xxx::section_handle" shape="rect" coords="728,56,926,80"/>
+<area href="classafio__v2__xxx_1_1file__handle.html" title="A handle to a regular file or device, kept data layout compatible with async_file_handle. " alt="afio_v2_xxx::file_handle" shape="rect" coords="104,112,302,136"/>
+<area href="classafio__v2__xxx_1_1map__handle.html" title="A handle to a memory mapped region of memory. " alt="afio_v2_xxx::map_handle" shape="rect" coords="312,112,510,136"/>
+<area href="classafio__v2__xxx_1_1directory__handle.html" title="A handle to a directory which can be enumerated. " alt="afio_v2_xxx::directory_handle" shape="rect" coords="520,112,718,136"/>
+<area href="classafio__v2__xxx_1_1async__file__handle.html" title="An asynchronous handle to an open something. " alt="afio_v2_xxx::async_file_handle" shape="rect" coords="0,168,198,192"/>
+<area href="classafio__v2__xxx_1_1mapped__file__handle.html" title="A memory mapped regular file or device. " alt="afio_v2_xxx::mapped_file_handle" shape="rect" coords="208,168,406,192"/>
 </map>
  </div></div>
 <table class="memberdecls">
@@ -432,7 +433,7 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operato
 <div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    <a class="code" href="namespaceafio__v2__xxx.html#a84d22c966fcabe50de30ad8cf26c7241">truncate</a>  <span class="comment">//!&lt; Atomically truncate on open, leaving creation date unmodified.</span></div>
 <div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;<span class="comment"></span>              <span class="comment">// NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!</span></div>
 <div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;  };</div>
-<div class="ttc" id="namespaceafio__v2__xxx_html_a84d22c966fcabe50de30ad8cf26c7241"><div class="ttname"><a href="namespaceafio__v2__xxx.html#a84d22c966fcabe50de30ad8cf26c7241">afio_v2_xxx::truncate</a></div><div class="ttdeci">result&lt; file_handle::extent_type &gt; truncate(file_handle &amp;self, file_handle::extent_type newsize) noexcept</div><div class="ttdef"><b>Definition:</b> file_handle.hpp:335</div></div>
+<div class="ttc" id="namespaceafio__v2__xxx_html_a84d22c966fcabe50de30ad8cf26c7241"><div class="ttname"><a href="namespaceafio__v2__xxx.html#a84d22c966fcabe50de30ad8cf26c7241">afio_v2_xxx::truncate</a></div><div class="ttdeci">result&lt; file_handle::extent_type &gt; truncate(file_handle &amp;self, file_handle::extent_type newsize) noexcept</div><div class="ttdef"><b>Definition:</b> file_handle.hpp:343</div></div>
 </div><!-- fragment -->
 </div>
 </div>
