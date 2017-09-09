@@ -135,7 +135,9 @@ public:
   //! Returns the memory section's flags
   flag section_flags() const noexcept { return _flag; }
   //! Returns the borrowed handle backing this section, if any
-  io_handle *backing() const noexcept { return _backing; }
+  file_handle *backing() const noexcept { return _backing; }
+  //! Sets the borrowed handle backing this section, if any
+  void set_backing(file_handle *fh) noexcept { _backing = fh; }
   //! Returns the borrowed native handle backing this section
   native_handle_type backing_native_handle() const noexcept { return _backing ? _backing->native_handle() : native_handle_type(); }
   //! Return the current maximum permitted extent of the memory section.
@@ -297,6 +299,8 @@ public:
 
   //! The memory section this handle is using
   section_handle *section() const noexcept { return _section; }
+  //! Sets the memory section this handle is using
+  void set_section(section_handle *s) noexcept { _section = s; }
 
   //! The address in memory where this mapped view resides
   char *address() const noexcept { return _addr; }

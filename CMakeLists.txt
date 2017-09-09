@@ -36,6 +36,32 @@ include(QuickCppLibMakeHeaderOnlyLibrary)
 include(QuickCppLibMakeDoxygen)
 # Set the standard definitions for these libraries and bring in the all_* helper functions
 include(QuickCppLibApplyDefaultDefinitions)
+# Do we have the Coroutines TS?
+function(CheckCXXHasCoroutines iter flags)
+  set(CMAKE_REQUIRED_FLAGS "${flags}")
+  check_cxx_source_compiles("
+#include <future>
+std::future<int> g() { co_return 0; }
+int main() { return g().get(); }
+" CXX_HAS_COROUTINES${iter})
+  set(CXX_HAS_COROUTINES${iter} ${CXX_HAS_COROUTINES${iter}} PARENT_SCOPE)
+endfunction()
+include(CheckCXXSourceCompiles)
+if(MSVC)
+  CheckCXXHasCoroutines(_MSVC "/await")
+  if(CXX_HAS_COROUTINES_MSVC)
+    all_compile_options(PUBLIC "/await")
+    all_compile_definitions(PUBLIC "__cpp_coroutines")
+  endif()
+endif()
+if(CLANG OR GCC)
+  CheckCXXHasCoroutines(_CLANG_GCC "-std=c++14 -fcoroutines-ts")
+  if(CXX_HAS_COROUTINES_CLANG_GCC)
+    all_compile_options(PUBLIC "-fcoroutines-ts")
+    all_compile_definitions(PUBLIC "__cpp_coroutines")
+  endif()
+endif()
+
 # Set the C++ features this library requires
 all_compile_features(PUBLIC
   # cxx_exceptions                        ## Annoyingly not supported by cmake 3.6

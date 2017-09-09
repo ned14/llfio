@@ -27,30 +27,122 @@ Distributed under the Boost Software License, Version 1.0.
 
 AFIO_V2_NAMESPACE_BEGIN
 
-mapped_file_handle::~mapped_file_handle()
-{
-}
-
 result<mapped_file_handle::size_type> mapped_file_handle::reserve(size_type reservation) noexcept
 {
+  AFIO_LOG_FUNCTION_CALL(this);
+  if(reservation == 0)
+  {
+    OUTCOME_TRY(length, underlying_file_length());
+    reservation = length;
+  }
+  reservation = utils::round_up_to_page_size(reservation);
+  if(!_sh.is_valid())
+  {
+    section_handle::flag sectionflags = section_handle::flag::readwrite;
+    OUTCOME_TRY(sh, section_handle::section(*this, 0, sectionflags));
+    _sh = std::move(sh);
+  }
+  if(_mh.is_valid() && reservation == _mh.length())
+  {
+    return reservation;
+  }
+  // Reserve the full reservation in address space
+  section_handle::flag mapflags = section_handle::flag::nocommit | section_handle::flag::read;
+  if(this->is_writable())
+  {
+    mapflags |= section_handle::flag::write;
+  }
+  OUTCOME_TRYV(_mh.close());
+  OUTCOME_TRY(mh, map_handle::map(_sh, reservation, 0, mapflags));
+  _mh = std::move(mh);
+  _reservation = reservation;
+  return reservation;
 }
 
-result<void> mapped_file_handle::close() noexcept override
+result<void> mapped_file_handle::close() noexcept
 {
+  AFIO_LOG_FUNCTION_CALL(this);
+  if(_mh.is_valid())
+  {
+    OUTCOME_TRYV(_mh.close());
+  }
+  if(_sh.is_valid())
+  {
+    OUTCOME_TRYV(_sh.close());
+  }
+  return file_handle::close();
 }
-native_handle_type mapped_file_handle::release() noexcept override
+native_handle_type mapped_file_handle::release() noexcept
 {
-}
-result<file_handle> mapped_file_handle::clone() const noexcept override
-{
+  AFIO_LOG_FUNCTION_CALL(this);
+  if(_mh.is_valid())
+  {
+    (void) _mh.close();
+  }
+  if(_sh.is_valid())
+  {
+    (void) _sh.close();
+  }
+  return file_handle::release();
 }
 
-result<mapped_file_handle::extent_type> mapped_file_handle::truncate(extent_type newsize) noexcept override
+result<mapped_file_handle::extent_type> mapped_file_handle::truncate(extent_type newsize) noexcept
 {
+  AFIO_LOG_FUNCTION_CALL(this);
+  if(newsize == 0)
+  {
+    OUTCOME_TRYV(_mh.close());
+    OUTCOME_TRYV(_sh.close());
+    return file_handle::truncate(newsize);
+  }
+  if(!_sh.is_valid())
+  {
+    OUTCOME_TRY(ret, file_handle::truncate(newsize));
+    // Reserve now we have resized, it'll create a new section for the new size
+    OUTCOME_TRYV(reserve(_reservation));
+    return ret;
+  }
+  OUTCOME_TRY(size, _sh.length());
+  if(size == newsize)
+  {
+    return newsize;
+  }
+  // If we are making this smaller, we must discard the pages about to get truncated
+  // otherwise some kernels keep them around until last fd close, effectively leaking them
+  if(newsize < size)
+  {
+    char *start = utils::round_up_to_page_size(_mh.address() + newsize);
+    char *end = utils::round_up_to_page_size(_mh.address() + size);
+    (void) _mh.do_not_store({start, (size_t)(end - start)});
+  }
+  // Resize the file, then the section.
+  OUTCOME_TRY(ret, file_handle::truncate(newsize));
+  OUTCOME_TRYV(_sh.truncate(newsize));
+  return ret;
 }
 
-result<mapped_file_handle::extent_type> mapped_file_handle::truncate() noexcept
+result<mapped_file_handle::extent_type> mapped_file_handle::update_map() noexcept
 {
+  OUTCOME_TRY(length, underlying_file_length());
+  if(length == 0)
+  {
+    OUTCOME_TRYV(_mh.close());
+    OUTCOME_TRYV(_sh.close());
+    return length;
+  }
+  if(!_sh.is_valid())
+  {
+    OUTCOME_TRYV(reserve(_reservation));
+    return length;
+  }
+  OUTCOME_TRY(size, _sh.length());
+  if(size == length)
+  {
+    // Section is already the same size as the file
+    return length;
+  }
+  OUTCOME_TRYV(_sh.truncate(length));
+  return length;
 }
 
 AFIO_V2_NAMESPACE_END

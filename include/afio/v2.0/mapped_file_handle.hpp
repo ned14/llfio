@@ -152,7 +152,11 @@ public:
   mapped_file_handle() = default;
 
   //! Implicit move construction of mapped_file_handle permitted
-  mapped_file_handle(mapped_file_handle &&o) noexcept = default;
+  mapped_file_handle(mapped_file_handle &&o) noexcept : file_handle(std::move(o)), _sh(std::move(o._sh)), _mh(std::move(o._mh))
+  {
+    _sh.set_backing(this);
+    _mh.set_section(&_sh);
+  }
   //! Explicit conversion from file_handle permitted
   explicit constexpr mapped_file_handle(file_handle &&o) noexcept : file_handle(std::move(o)) {}
   //! Explicit conversion from file_handle permitted, this overload also attempts to map the file
@@ -205,12 +209,11 @@ public:
     OUTCOME_TRY(fh, file_handle::file(base, _path, _mode, _creation, _caching, flags));
     switch(_creation)
     {
-    case creation::open_existing:
-    case creation::if_needed:
+    default:
     {
       // Attempt mapping now
       mapped_file_handle mfh(std::move(fh), reservation);
-      return mfh;
+      return {std::move(mfh)};
     }
     case creation::only_if_not_exist:
     case creation::truncate:
@@ -218,7 +221,7 @@ public:
       // Don't attempt mapping now
       mapped_file_handle mfh(std::move(fh));
       mfh._reservation = reservation;
-      return mfh;
+      return {std::move(mfh)};
     }
     }
   }

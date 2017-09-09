@@ -36,7 +36,12 @@ result<section_handle> section_handle::section(file_handle &backing, extent_type
   {
     OUTCOME_TRY(_length, backing.length());
     length = _length;
-    if(maximum_size > length)
+    if(length == 0)
+    {
+      // Some systems allow zero sized maps, POSIX bans it
+      return std::errc::invalid_argument;
+    }
+    if(maximum_size > 0 && maximum_size > length)
     {
       // For compatibility with Windows, disallow sections larger than the file
       return std::errc::value_too_large;
@@ -75,7 +80,12 @@ result<section_handle::extent_type> section_handle::truncate(extent_type newsize
   {
     OUTCOME_TRY(_length, _backing->length());
     length = _length;
-    if(newsize > length)
+    if(length == 0)
+    {
+      // Some systems allow zero sized maps, POSIX bans it
+      return std::errc::invalid_argument;
+    }
+    if(newsize > 0 && newsize > length)
     {
       // For compatibility with Windows, disallow sections larger than the file
       return std::errc::value_too_large;
@@ -242,7 +252,7 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
   {
     if(!section.backing())
       return std::errc::argument_out_of_domain;
-    bytes = section.length();
+    bytes = section.length().value();
   }
   size_type _bytes = utils::round_up_to_page_size(bytes);
   if(!section.backing())
@@ -332,10 +342,14 @@ result<map_handle::buffer_type> map_handle::do_not_store(buffer_type region) noe
   if(!region.data)
     return std::errc::invalid_argument;
 #ifdef MADV_FREE
-  // Tell the kernel to throw away the contents of these pages
-  if(-1 == ::madvise(region.data, region.len, MADV_FREE))
-    return {errno, std::system_category()};
-  else
+  // Lightweight unset of dirty bit for these pages. Needs FreeBSD or very recent Linux.
+  if(-1 != ::madvise(region.data, region.len, MADV_FREE))
+    return region;
+#endif
+#ifdef MADV_REMOVE
+  // This is rather heavy weight in that it also punches a hole in any backing storage
+  // but it works on Linux for donkey's years
+  if(-1 != ::madvise(region.data, region.len, MADV_REMOVE))
     return region;
 #endif
   // No support on this platform

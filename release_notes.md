@@ -19,52 +19,60 @@ as Intel Optane.
 It is a complete rewrite after a Boost peer review in August 2015. Its github
 source code repository lives at https://github.com/ned14/boost.afio.
 
-<table width="100%" border="0" cellpadding="4">
-<tr>
-<th colspan="3">Why you might need AFIO<hr></th>
-</tr>
-<tr>
-<td valign="top" width="33%">
-Manufacturer claimed 4Kb transfer latencies for the physical hardware:
-- Spinning rust hard drive latency @ QD1: **9000us**
-- SATA flash drive latency @ QD1: **800us**
-- NVMe flash drive latency @ QD1: **300us**
-- RTT UDP packet latency over a LAN: **60us**
-- NVMe Optane drive latency @ QD1: **60us**
-- `memcpy(4Kb)` latency: **5us** (main memory) to **1.3us** (L3 cache)
-- RTT PCIe latency: **0.5us**
-</td>
-<td valign="top" width="33%">
-100% read QD1 4Kb direct transfer latencies for the software with AFIO:
-- &lt; 99% spinning rust hard drive latency: Windows **187,231us** FreeBSD **9,836us** Linux **26,468us**
-- &lt; 99% SATA flash drive latency: Windows **290us** Linux **158us**
-- &lt; 99% NVMe drive latency: Windows **37us** FreeBSD **70us** Linux **30us**
-</td>
-<td valign="top" width="33%">
-75% read 25% write QD4 4Kb direct transfer latencies for the software with AFIO:
-- &lt; 99% spinning rust hard drive latency: Windows **48,185us** FreeBSD **61,834us** Linux **104,507us**
-- &lt; 99% SATA flash drive latency: Windows **1,812us** Linux **1,416us**
-- &lt; 99% NVMe drive latency: Windows **50us** FreeBSD **143us** Linux **40us**
-</td>
-</tr>
-</table>
+- Portable to any conforming C++ 14 compiler with a working Filesystem TS in its STL.
+- Will make use of any Concepts TS if you have them.
+  - (Coroutines TS support is in the works)
+- Provides view adapters into the Ranges TS, so ready for STL2.
+- Original error code is always preserved, even down to the original NT kernel error code if a NT kernel API was used.
+- Race free filesystem design used throughout (i.e. no TOCTOU).
+- Zero malloc, zero exception throw and zero whole system memory copy design used throughout, even down to paths (which can hit 64Kb!).
+- Works very well with the C++ standard library, and is intended to be proposed for standardisation into C++ in 2020 or thereabouts.
 
 \note Note that this code is of late alpha quality. It's quite reliable on Windows and Linux, but be careful when using it!
 
-Example of use:
+Examples of use:
+<table width="100%" border="0" cellpadding="4">
+<tr>
+<td>
 \code
 namespace afio = AFIO_V2_NAMESPACE;
+
 // Make me a 1 trillion element sparsely allocated integer array!
 afio::mapped_file_handle mfh = afio::mapped_temp_inode().value();
+
 // On an extents based filing system, doesn't actually allocate any physical storage
 // but does map approximately 4Tb of all bits zero data into memory
 mfh.truncate(1000000000000ULL*sizeof(int));
+
 // Create a typed view of the one trillion integers
 afio::algorithm::mapped_view<int> one_trillion_int_array(mfh);
+
 // Write and read as you see fit, if you exceed physical RAM it'll be paged to disk
 one_trillion_int_array[0] = 5;
 one_trillion_int_array[999999999999ULL] = 6;
 \endcode
+</td>
+<td>
+\code
+namespace afio = AFIO_V2_NAMESPACE;
+
+// Create an asynchronous file handle
+afio::io_service service;
+afio::async_file_handle fh = afio::async_file(service, {}, "testfile.txt",
+                                              afio::async_file_handle::mode::write,
+                                              afio::async_file_handle::creation::if_needed).value();
+
+// Resize it to 1024 bytes
+truncate(fh, 1024).value();
+
+// Begin to asynchronously write "hello world" into the file at offset 0,
+// suspending execution of this coroutine until completion and then resuming
+// execution. Requires the Coroutines TS.
+co_await async_write(fh, 0, "hello world", 11).value();
+\endcode
+</td>
+</tr>
+</table>
 
 These compilers and OS are regularly tested:
 - GCC 7.0 (Linux 4,x x64)
@@ -181,6 +189,36 @@ Todo thereafter:
 | ✔ |   |   | Algorithm to replace all duplicate content with hard links.
 | ✔ |   |   | Algorithm to figure out all paths for a hard linked inode.
 
+
+<table width="100%" border="0" cellpadding="4">
+<tr>
+<th colspan="3">Why you might need AFIO<hr></th>
+</tr>
+<tr>
+<td valign="top" width="33%">
+Manufacturer claimed 4Kb transfer latencies for the physical hardware:
+- Spinning rust hard drive latency @ QD1: **9000us**
+- SATA flash drive latency @ QD1: **800us**
+- NVMe flash drive latency @ QD1: **300us**
+- RTT UDP packet latency over a LAN: **60us**
+- NVMe Optane drive latency @ QD1: **60us**
+- `memcpy(4Kb)` latency: **5us** (main memory) to **1.3us** (L3 cache)
+- RTT PCIe latency: **0.5us**
+</td>
+<td valign="top" width="33%">
+100% read QD1 4Kb direct transfer latencies for the software with AFIO:
+- &lt; 99% spinning rust hard drive latency: Windows **187,231us** FreeBSD **9,836us** Linux **26,468us**
+- &lt; 99% SATA flash drive latency: Windows **290us** Linux **158us**
+- &lt; 99% NVMe drive latency: Windows **37us** FreeBSD **70us** Linux **30us**
+</td>
+<td valign="top" width="33%">
+75% read 25% write QD4 4Kb direct transfer latencies for the software with AFIO:
+- &lt; 99% spinning rust hard drive latency: Windows **48,185us** FreeBSD **61,834us** Linux **104,507us**
+- &lt; 99% SATA flash drive latency: Windows **1,812us** Linux **1,416us**
+- &lt; 99% NVMe drive latency: Windows **50us** FreeBSD **143us** Linux **40us**
+</td>
+</tr>
+</table>
 
 Max bandwidth for the physical hardware:
 - DDR4 2133: **30Gb/sec** (main memory)

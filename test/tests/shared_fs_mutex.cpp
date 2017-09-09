@@ -331,7 +331,7 @@ static inline void check_child_worker(const KERNELTEST_V1_NAMESPACE::child_worke
   }
 }
 
-static std::string _TestSharedFSMutexCorrectnessChildWorker(KERNELTEST_V1_NAMESPACE::waitable_done &waitable, size_t childidx, shared_memory *shmem)
+static std::string _TestSharedFSMutexCorrectnessChildWorker(KERNELTEST_V1_NAMESPACE::waitable_done &waitable, size_t childidx, shared_memory *shmem)  // NOLINT
 {
   namespace afio = AFIO_V2_NAMESPACE;
   ++shmem->current_exclusive;
@@ -439,7 +439,8 @@ void TestSharedFSMutexCorrectness(shared_memory::mutex_kind_type mutex_kind, sha
     for(size_t n = 0; n < std::thread::hardware_concurrency(); n++)
     {
       std::packaged_task<std::string(KERNELTEST_V1_NAMESPACE::waitable_done &, size_t, shared_memory *)> task(_TestSharedFSMutexCorrectnessChildWorker);
-      thread_workers.push_back({task.get_future(), std::thread(std::move(task), std::ref(waitable), n, shmem)});
+      auto f = task.get_future();
+      thread_workers.push_back({std::move(f), std::thread(std::move(task), std::ref(waitable), n, shmem)});
     }
     std::this_thread::sleep_for(std::chrono::seconds(5));
     waitable.set_done(1);

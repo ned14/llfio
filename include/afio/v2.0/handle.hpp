@@ -29,6 +29,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include "native_handle_type.hpp"
 
 #include <algorithm>  // for std::count
+#include <cassert>
 
 //! \file handle.hpp Provides handle
 

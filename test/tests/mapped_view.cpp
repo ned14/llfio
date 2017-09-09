@@ -64,6 +64,7 @@ static inline void TestMappedView1()
 static inline void TestMappedView2()
 {
   using namespace AFIO_V2_NAMESPACE;
+  using AFIO_V2_NAMESPACE::file_handle;
   mapped_file_handle mfh = mapped_file_handle::mapped_file(1024 * 1024, {}, "testfile", file_handle::mode::write, file_handle::creation::if_needed, file_handle::caching::all, file_handle::flag::unlink_on_close).value();
   BOOST_CHECK(mfh.address() == nullptr);
   mfh.truncate(10000 * sizeof(int)).value();
