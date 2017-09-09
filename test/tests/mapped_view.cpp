@@ -25,7 +25,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../../include/afio/afio.hpp"
 #include "kerneltest/include/kerneltest.hpp"
 
-static inline void TestMappedView()
+static inline void TestMappedView1()
 {
   using namespace AFIO_V2_NAMESPACE;
   using AFIO_V2_NAMESPACE::file_handle;
@@ -52,9 +52,81 @@ static inline void TestMappedView()
   }
   catch(...)
   {
+#ifdef _WIN32
     // Unlike POSIX, Windows refuses to map a view exceeding the length of the file
     BOOST_CHECK(true);
+#else
+    BOOST_CHECK(false);
+#endif
   }
 }
 
-KERNELTEST_TEST_KERNEL(integration, afio, algorithm, mapped_view, "Tests that afio::algorithm::mapped_view works as expected", TestMappedView())
+static inline void TestMappedView2()
+{
+  using namespace AFIO_V2_NAMESPACE;
+  mapped_file_handle mfh = mapped_file_handle::mapped_file(1024 * 1024, {}, "testfile", file_handle::mode::write, file_handle::creation::if_needed, file_handle::caching::all, file_handle::flag::unlink_on_close).value();
+  BOOST_CHECK(mfh.address() == nullptr);
+  mfh.truncate(10000 * sizeof(int)).value();
+  char *addr = mfh.address();
+  BOOST_CHECK(addr != nullptr);
+
+  algorithm::mapped_view<int> v1(mfh);
+  BOOST_CHECK(v1.size() == 10000);
+  v1[0] = 78;
+  v1[9999] = 79;
+  mfh.truncate(20000 * sizeof(int)).value();
+  BOOST_CHECK(addr == mfh.address());
+  v1 = mfh;
+  BOOST_CHECK(v1.size() == 20000);
+  BOOST_CHECK(v1[0] == 78);
+  BOOST_CHECK(v1[9999] == 79);
+  mfh.truncate(2 * 1024 * 1024).value();
+  BOOST_CHECK(addr == mfh.address());
+  v1 = mfh;
+  BOOST_CHECK(v1.size() == 1024 * 1024 / sizeof(int));
+  BOOST_CHECK(v1[0] == 78);
+  BOOST_CHECK(v1[9999] == 79);
+  mfh.reserve(2 * 1024 * 1024).value();
+  BOOST_CHECK(mfh.address() != nullptr);
+  v1 = mfh;
+  BOOST_CHECK(v1.size() == 2 * 1024 * 1024 / sizeof(int));
+  BOOST_CHECK(v1[0] == 78);
+  BOOST_CHECK(v1[9999] == 79);
+  mfh.truncate(1 * sizeof(int)).value();
+  BOOST_CHECK(mfh.address() != nullptr);
+  v1 = mfh;
+  BOOST_CHECK(v1.size() == 1);
+  BOOST_CHECK(v1[0] == 78);
+
+  // Use a different handle to extend the file
+  mapped_file_handle mfh2 = mapped_file_handle::mapped_file(1024 * 1024, {}, "testfile", file_handle::mode::write, file_handle::creation::open_existing, file_handle::caching::all, file_handle::flag::unlink_on_close).value();
+  mfh2.truncate(10000 * sizeof(int)).value();
+  v1 = mfh2;
+  BOOST_CHECK(v1.size() == 10000);
+  v1[0] = 78;
+  v1[9999] = 79;
+  // Should have auto informed mfh of the change and remapped it for us
+  v1 = mfh;
+  BOOST_CHECK(v1.size() == 10000);
+  BOOST_CHECK(v1[0] == 78);
+  BOOST_CHECK(v1[9999] == 79);
+  mfh2.map().close().value();
+  mfh2.section().close().value();
+  mfh.truncate(1 * sizeof(int)).value();
+
+  // Use a normal file handle to extend the file
+  file_handle fh = file_handle::file({}, "testfile", file_handle::mode::write, file_handle::creation::open_existing, file_handle::caching::all, file_handle::flag::unlink_on_close).value();
+  fh.truncate(10000 * sizeof(int)).value();
+  // On POSIX this will have updated the mapping, on Windows it will not, so prod Windows
+  mfh.update_map().value();
+  v1 = mfh;
+  BOOST_REQUIRE(v1.size() == 10000);
+  BOOST_CHECK(v1[0] == 78);
+  BOOST_CHECK(v1[9999] == 0);
+
+  mfh.truncate(0).value();
+  BOOST_CHECK(mfh.address() == nullptr);
+}
+
+KERNELTEST_TEST_KERNEL(integration, afio, algorithm, mapped_view1, "Tests that afio::algorithm::mapped_view works as expected", TestMappedView1())
+KERNELTEST_TEST_KERNEL(integration, afio, algorithm, mapped_view2, "Tests that afio::algorithm::mapped_view works as expected", TestMappedView2())

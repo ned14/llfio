@@ -26,4 +26,31 @@ Distributed under the Boost Software License, Version 1.0.
 #include "import.hpp"
 
 AFIO_V2_NAMESPACE_BEGIN
+
+mapped_file_handle::~mapped_file_handle()
+{
+}
+
+result<mapped_file_handle::size_type> mapped_file_handle::reserve(size_type reservation) noexcept
+{
+}
+
+result<void> mapped_file_handle::close() noexcept override
+{
+}
+native_handle_type mapped_file_handle::release() noexcept override
+{
+}
+result<file_handle> mapped_file_handle::clone() const noexcept override
+{
+}
+
+result<mapped_file_handle::extent_type> mapped_file_handle::truncate(extent_type newsize) noexcept override
+{
+}
+
+result<mapped_file_handle::extent_type> mapped_file_handle::truncate() noexcept
+{
+}
+
 AFIO_V2_NAMESPACE_END

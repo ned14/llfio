@@ -61,8 +61,15 @@ result<section_handle> section_handle::section(file_handle &backing, extent_type
   return ret;
 }
 
+result<section_handle::extent_type> section_handle::length() const noexcept
+{
+  AFIO_LOG_FUNCTION_CALL(this);
+  return _length;
+}
+
 result<section_handle::extent_type> section_handle::truncate(extent_type newsize) noexcept
 {
+  AFIO_LOG_FUNCTION_CALL(this);
   extent_type length = 0;
   if(_backing)
   {

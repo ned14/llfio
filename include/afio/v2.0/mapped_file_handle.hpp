@@ -37,7 +37,7 @@ AFIO_V2_NAMESPACE_EXPORT_BEGIN
 All the major OSs on all the major 64 bit CPU architectures now offer at least 127 Tb of address
 spaces to user mode processes. This makes feasible mapping multi-Tb files directly into
 memory, and thus avoiding the syscall overhead involved when reading and writing. This
-becames **especially** important with nextgen storage devices capable of Direct Access
+becames **especially** important with next-gen storage devices capable of Direct Access
 Storage (DAX) like Optane from 2018 onwards, performance via syscalls will always be
 but a fraction of speaking directly to the storage device via directly mapped memory.
 
@@ -49,48 +49,81 @@ syscalls is unsurpassable.
 
 This class combines a `file_handle` with a `section_handle` and a `map_handle` to
 implement a fully memory mapped `file_handle`. The whole file is always mapped entirely
-into memory, including any appends to the file, and i/o is performed directly with the map.
+into memory, and `read()` and `write()` i/o is performed directly with the map.
 Reads always return the original mapped data, and do not fill any buffers passed in.
 For obvious reasons the utility of this class on 32-bit systems is limited,
 but can be useful when used with smaller files.
 
-Note that zero lengthed files cannot be memory mapped. On first write will the map be
-created, until then `address()` will return a null pointer. Similarly, calling `truncate(0)`
-will destroy the maps which can be useful to know as Microsoft Windows will not permit
-shrinking of a file with open maps in any process on it, thus every process must call
-`truncate(0)` and sink the error about the shrink failing until when the final process to
-attempt the truncation succeeds.
+Note that zero length files cannot be memory mapped, and writes past the maximum
+extent do NOT auto-extend the size of the file, rather the data written beyond the maximum valid
+extent has undefined kernel-specific behaviour, which includes segfaulting. You must therefore always
+`truncate(newsize)` to resize the file and its maps before you can read or write to it,
+and be VERY careful to not read or write beyond the maximum extent of the file.
+
+Therefore, when a file is created or is otherwise of zero length, `address()` will return
+a null pointer. Similarly, calling `truncate(0)` will close the map and section handles,
+they will be recreated on next truncation to a non-zero size.
 
 For better performance when handling files which are growing, there is a concept of
-"address space reservation" via `reserve()` and `capacity()`. The implementation asks the
+"address space reservation" via `reserve()` and `capacity()`, which on some kernels
+is automatically and efficiently expanded into when the underlying file grows.
+The implementation asks the
 kernel to set out a contiguous region of pages matching that reservation, and to map the
-file into the beginning of the reservation. The remainder of the pages are inaccessible
-and will generate a segfault.
+file into the beginning of the reservation. The remainder of the pages may be inaccessible
+and may generate a segfault, or they may automatically reflect any growth in the underlying
+file. This is why `read()` and `write()` only know about the reservation size, and will read
+and write memory up to that reservation size, without checking if the memory involved exists
+or not yet. You are guaranteed that `address()` will not return a new
+value unless you truncate from a bigger length to a smaller length, or you call `reserve()`
+with a new reservation.
 
-`length()` reports the length of the mapped file, NOT the underlying file. For better
-performance, and to avoid kernel bugs, we do not automatically track the length of the
-underlying file, so reads and writes always terminate at the mapped file length and do
-not auto-extend the file. If you wish to extend the file, you must call `truncate(bytes)`
-which is of course racy with respect to other things extending the file. When you
-know that another process has extended the file and you wish to map the newly appended
-data, you can call `truncate()` with no parameters. This will read the current length
-of the underlying file, and map the new data into your process up until the reservation
-is full. It is then up to you to detect that the reservation has been exhausted, and to
+`length()` reports the last truncated length of the mapped file (possibly by any process in
+the system) up to the reservation limit, NOT the length of the underlying file.
+When you know that another process has extended the file and you wish to map the newly appended
+data, you can call `update_map()` which guarantees that the mapping your
+process sees is up to date, rather than relying on any kernel-specific automatic mapping.
+Whether automatic or enforced by `update_map()`, the reservation limit will not be exceeded
+nor will `address()` suddenly return something different.
+It is thus up to you to detect that the reservation has been exhausted, and to
 reserve a new reservation which will change the value returned by `address()`. This
 entirely manual system is a bit tedious and cumbersome to use, but as mapping files
-is an expensive operation given TLB shootdown, the only place where we change mappings
-silently is on the first write to an empty mapped file.
+is an expensive operation given TLB shootdown, we leave it up to the end user to decide
+when to expend the cost of mapping.
 
 \warning You must be cautious when the file is being extended by third parties which are
 not using this `mapped_file_handle` to write the new data. With unified page cache kernels,
 mixing mapped and normal i/o is generally safe except at the end of a file where race
-conditions and outright kernel bugs tend to abound. To avoid these, **make sure you truncate to new
-length before appending data**, or else solely and exclusively use a dedicated handle
-configured to atomic append only to do the appends.
+conditions and outright kernel bugs tend to abound. To avoid these, solely and exclusively
+use a dedicated handle configured to atomic append only to do the appends.
+
+Automatic mapping of growing files on various kernels:
+<dl>
+<dt>Microsoft Windows</dt>
+<dd>For the current Terminal Services Session, the first `mapped_file_handle::truncate()` or
+`mapped_file_handle::update_map()` by any process update maps in all processes simultaneously.</dd>
+<dt>Linux</dt>
+<dd>?</dd>
+<dt>FreeBSD</dt>
+<dd>?</dd>
+<dt>Apple MacOS</dt>
+<dd>?</dd>
+</dl>
+
+Automatic mapping of shrinking files on various kernels:
+<dl>
+<dt>Microsoft Windows</dt>
+<dd>All maps and open section handles on the file anywhere in the system must be removed before
+any shrinkage of a file is permitted.</dd>
+<dt>Linux</dt>
+<dd>?</dd>
+<dt>FreeBSD</dt>
+<dd>?</dd>
+<dt>Apple MacOS</dt>
+<dd>?</dd>
+</dl>
 */
 class AFIO_DECL mapped_file_handle : public file_handle
 {
-
 public:
   using dev_t = file_handle::dev_t;
   using ino_t = file_handle::ino_t;
@@ -110,23 +143,28 @@ public:
   template <class T> using io_result = io_handle::io_result<T>;
 
 protected:
+  size_type _reservation{0};
   section_handle _sh;
   map_handle _mh;
 
 public:
   //! Default constructor
   mapped_file_handle() = default;
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC ~mapped_file_handle();
 
-  //! Construct a handle from a supplied native handle
-  constexpr mapped_file_handle(native_handle_type h, dev_t devid, ino_t inode, caching caching = caching::none, flag flags = flag::none)
-      : file_handle(std::move(h), devid, inode, std::move(caching), std::move(flags))
-  {
-  }
   //! Implicit move construction of mapped_file_handle permitted
   mapped_file_handle(mapped_file_handle &&o) noexcept = default;
   //! Explicit conversion from file_handle permitted
   explicit constexpr mapped_file_handle(file_handle &&o) noexcept : file_handle(std::move(o)) {}
+  //! Explicit conversion from file_handle permitted, this overload also attempts to map the file
+  explicit mapped_file_handle(file_handle &&o, size_type reservation) noexcept : file_handle(std::move(o))
+  {
+    auto out = reserve(reservation);
+    if(!out)
+    {
+      _reservation = utils::round_up_to_page_size(reservation);
+      // sink the error
+    }
+  }
   //! Move assignment of mapped_file_handle permitted
   mapped_file_handle &operator=(mapped_file_handle &&o) noexcept
   {
@@ -153,12 +191,37 @@ public:
   \param flags Any additional custom behaviours.
 
   Note that if the file is currently zero sized, no mapping occurs now, but
-  later when `truncate()` or `write()` is called.
+  later when `truncate()` or `update_map()` is called.
 
   \errors Any of the values which the constructors for `file_handle`, `section_handle` and `map_handle` can return.
   */
   AFIO_MAKE_FREE_FUNCTION
-  static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<mapped_file_handle> mapped_file(size_type reservation, const path_handle &base, path_view_type _path, mode _mode = mode::read, creation _creation = creation::open_existing, caching _caching = caching::all, flag flags = flag::none) noexcept;
+  static inline result<mapped_file_handle> mapped_file(size_type reservation, const path_handle &base, path_view_type _path, mode _mode = mode::read, creation _creation = creation::open_existing, caching _caching = caching::all, flag flags = flag::none) noexcept
+  {
+    if(_mode == mode::append)
+    {
+      return std::errc::invalid_argument;
+    }
+    OUTCOME_TRY(fh, file_handle::file(base, _path, _mode, _creation, _caching, flags));
+    switch(_creation)
+    {
+    case creation::open_existing:
+    case creation::if_needed:
+    {
+      // Attempt mapping now
+      mapped_file_handle mfh(std::move(fh), reservation);
+      return mfh;
+    }
+    case creation::only_if_not_exist:
+    case creation::truncate:
+    {
+      // Don't attempt mapping now
+      mapped_file_handle mfh(std::move(fh));
+      mfh._reservation = reservation;
+      return mfh;
+    }
+    }
+  }
   //! \overload
   AFIO_MAKE_FREE_FUNCTION
   static inline result<mapped_file_handle> mapped_file(const path_handle &base, path_view_type _path, mode _mode = mode::read, creation _creation = creation::open_existing, caching _caching = caching::all, flag flags = flag::none) noexcept { return mapped_file(0, base, _path, _mode, _creation, _caching, flags); }
@@ -224,7 +287,6 @@ public:
   AFIO_MAKE_FREE_FUNCTION
   static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<mapped_file_handle> mapped_temp_inode(path_view_type dirpath = temporary_files_directory(), mode _mode = mode::write, flag flags = flag::none) noexcept
   {
-    // Open it overlapped, otherwise no difference.
     OUTCOME_TRY(v, file_handle::temp_inode(std::move(dirpath), std::move(_mode), flags));
     mapped_file_handle ret(std::move(v));
     return std::move(ret);
@@ -246,39 +308,68 @@ public:
   //! The length of the underlying file
   result<extent_type> underlying_file_length() const noexcept { return file_handle::length(); }
 
+  //! The address space (to be) reserved for future expansion of this file.
+  size_type capacity() const noexcept { return _mh.is_valid() ? _mh.length() : _reservation; }
+
+  /*! \brief Reserve a new amount of address space for mapping future expansion of this file.
+  \param reservation The number of bytes of virtual address space to reserve. Zero means reserve
+  the current length of the underlying file.
+
+  Note that this is an expensive call, and `address()` may return a different value afterwards.
+  This call will fail if the underlying file has zero length.
+  */
+  AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_type> reserve(size_type reservation = 0) noexcept;
+
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> close() noexcept override;
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC native_handle_type release() noexcept override;
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> barrier(io_request<const_buffers_type> reqs = io_request<const_buffers_type>(), bool wait_for_device = false, bool and_metadata = false, deadline d = deadline()) noexcept override
   {
     return _mh.barrier(std::move(reqs), wait_for_device, and_metadata, std::move(d));
   }
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<file_handle> clone() const noexcept override;
-  //! Return the current maximum permitted extent of the file.
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_type> length() const noexcept override { return _mh.length(); }
+  using file_handle::clone;
+  inline result<mapped_file_handle> clone(size_type reservation) const noexcept
+  {
+    OUTCOME_TRY(fh, clone());
+    return mapped_file_handle(std::move(fh), reservation);
+  }
+  //! Return the current maximum permitted extent of the file which is the lesser of the section's length, or the reservation.
+  AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_type> length() const noexcept override
+  {
+    // The lesser of the section length or the mapping length
+    OUTCOME_TRY(sectionlen, _sh.length());
+    return _mh.length() < sectionlen ? _mh.length() : sectionlen;
+  }
 
   /*! \brief Resize the current maximum permitted extent of the mapped file to the given extent, avoiding any
-  new allocation of physical storage where supported.
+  new allocation of physical storage where supported, and mapping or unmapping any new pages
+  up to the reservation to reflect the new maximum extent.
 
   Note that on extents based filing systems
   this will succeed even if there is insufficient free space on the storage medium. Only when
   pages are written to will the lack of sufficient free space be realised, resulting in an
   operating system specific exception.
 
-  \note On Microsoft Windows you cannot shrink a file below any section handle's extent in any
-  process in the system. We do, of course, shrink the internally held section handle correctly
-  before truncating the underlying file. However you will need to coordinate with any other
-  processes to shrink their section handles first. This is partly why `section()` is exposed.
+  \note On Microsoft Windows you cannot shrink a file with a section handle open on it in any
+  process in the system. We therefore *always* destroy the internal map and section before
+  truncating, and then recreate the map and section afterwards if the new size is not zero.
+  `address()` therefore may change.
+  You will need to ensure all other users of the same file close their section and
+  map handles before any process can shrink the underlying file.
 
   \return The bytes actually truncated to.
   \param newsize The bytes to truncate the file to. Zero causes the maps to be closed before
   truncation.
   */
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_type> truncate(extent_type newsize) noexcept override;
-  /*! \brief Resize the mapping to match that of the underlying file, returning the size of the underlying file.
+
+  /*! \brief Efficiently update the mapping to match that of the underlying file,
+  returning the size of the underlying file.
+
+  This call is often considerably less heavyweight than `truncate(newsize)`, and should be used where possible.
 
   If the internal section and map handle are invalid, they are restored unless the underlying file is zero length.
   */
-  AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<extent_type> truncate() noexcept;
+  AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<extent_type> update_map() noexcept;
 
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_type> zero(extent_type offset, extent_type bytes, deadline /*unused*/ = deadline()) noexcept override
   {
@@ -286,7 +377,8 @@ public:
     return bytes;
   }
 
-  /*! \brief Read data from the mapped file.
+  /*! \brief Read data from the mapped file. Note that this works with the reservation size, not the valid length,
+  and thus reading past `length()` is undefined behaviour.
 
   \note Because this implementation never copies memory, you can pass in buffers with a null address.
 
@@ -298,7 +390,8 @@ public:
   \mallocs None.
   */
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<buffers_type> read(io_request<buffers_type> reqs, deadline d = deadline()) noexcept override { return _mh.read(std::move(reqs), std::move(d)); }
-  /*! \brief Write data to the mapped file. Note this will never extend past the current length of the mapped file.
+  /*! \brief Write data to the mapped file. Note that this works with the reservation size, not the valid length,
+  and thus writing past `length()` is undefined behaviour.
 
   \return The buffers written, which will never be the buffers input because they will point at where the data was copied into the mapped view.
   The size of each scatter-gather buffer is updated with the number of bytes of that buffer transferred.

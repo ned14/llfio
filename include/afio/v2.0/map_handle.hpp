@@ -58,6 +58,7 @@ public:
                                    nocommit = 1 << 8,     //!< Don't allocate space for this memory in the system immediately
                                    prefault = 1 << 9,     //!< Prefault, as if by reading every page, any views of memory upon creation.
                                    executable = 1 << 10,  //!< The backing storage is in fact an executable program binary.
+                                   singleton = 1 << 11,   //!< A single instance of this section is to be shared by all processes using the same backing file.
 
                                    barrier_on_close = 1 << 16,  //!< Maps of this section, if writable, issue a `barrier()` when destructed blocking until data (not metadata) reaches physical storage.
 
@@ -68,7 +69,7 @@ public:
 
 protected:
   file_handle *_backing;
-  extent_type _length;
+  extent_type _length;  // only used on POSIX
   flag _flag;
 
 public:
@@ -139,7 +140,7 @@ public:
   native_handle_type backing_native_handle() const noexcept { return _backing ? _backing->native_handle() : native_handle_type(); }
   //! Return the current maximum permitted extent of the memory section.
   AFIO_MAKE_FREE_FUNCTION
-  extent_type length() const noexcept { return _length; }
+  AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<extent_type> length() const noexcept;
 
   /*! Resize the current maximum permitted extent of the memory section to the given extent.
   \param newsize The new size of the memory section. Specify zero to use `backing.length()`.
@@ -167,6 +168,8 @@ inline std::ostream &operator<<(std::ostream &s, const section_handle::flag &v)
     temp.append("prefault|");
   if(!!(v & section_handle::flag::executable))
     temp.append("executable|");
+  if(!!(v & section_handle::flag::singleton))
+    temp.append("singleton|");
   if(!!(v & section_handle::flag::barrier_on_close))
     temp.append("barrier_on_close|");
   if(!temp.empty())
@@ -395,11 +398,6 @@ inline result<section_handle> section(section_handle::extent_type maximum_size, 
 inline result<section_handle> section(section_handle::extent_type maximum_size) noexcept
 {
   return section_handle::section(std::forward<decltype(maximum_size)>(maximum_size));
-}
-//! Return the current maximum permitted extent of the memory section.
-inline section_handle::extent_type length(const section_handle &self) noexcept
-{
-  return self.length();
 }
 /*! Resize the current maximum permitted extent of the memory section to the given extent.
 

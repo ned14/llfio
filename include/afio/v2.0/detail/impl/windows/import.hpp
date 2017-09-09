@@ -213,6 +213,15 @@ namespace windows_nt_kernel
     SIZE_T NumberOfBytes;
   } WIN32_MEMORY_RANGE_ENTRY, *PWIN32_MEMORY_RANGE_ENTRY;
 
+  typedef enum _SECTION_INFORMATION_CLASS { SectionBasicInformation, SectionImageInformation } SECTION_INFORMATION_CLASS, *PSECTION_INFORMATION_CLASS;
+
+  typedef struct _SECTION_BASIC_INFORMATION
+  {
+    PVOID BaseAddress;
+    ULONG AllocationAttributes;
+    LARGE_INTEGER MaximumSize;
+  } SECTION_BASIC_INFORMATION, *PSECTION_BASIC_INFORMATION;
+
   // From https://msdn.microsoft.com/en-us/library/bb432383%28v=vs.85%29.aspx
   typedef NTSTATUS(NTAPI *NtQueryObject_t)(_In_opt_ HANDLE Handle, _In_ OBJECT_INFORMATION_CLASS ObjectInformationClass, _Out_opt_ PVOID ObjectInformation, _In_ ULONG ObjectInformationLength, _Out_opt_ PULONG ReturnLength);
 
@@ -264,6 +273,8 @@ namespace windows_nt_kernel
   typedef NTSTATUS(NTAPI *NtUnlockFile_t)(_In_ HANDLE FileHandle, _Out_ PIO_STATUS_BLOCK IoStatusBlock, _In_ PLARGE_INTEGER ByteOffset, _In_ PLARGE_INTEGER Length, _In_ ULONG Key);
 
   typedef NTSTATUS(NTAPI *NtCreateSection_t)(_Out_ PHANDLE SectionHandle, _In_ ACCESS_MASK DesiredAccess, _In_opt_ POBJECT_ATTRIBUTES ObjectAttributes, _In_opt_ PLARGE_INTEGER MaximumSize, _In_ ULONG SectionPageProtection, _In_ ULONG AllocationAttributes, _In_opt_ HANDLE FileHandle);
+
+  typedef NTSTATUS(NTAPI *NtQuerySection_t)(_In_ HANDLE SectionHandle, _In_ SECTION_INFORMATION_CLASS InformationClass, _Out_ PVOID InformationBuffer, _In_ ULONG InformationBufferSize, _Out_opt_ PULONG ResultLength);
 
   typedef NTSTATUS(NTAPI *NtExtendSection_t)(_In_ HANDLE SectionHandle, _In_opt_ PLARGE_INTEGER MaximumSize);
 
@@ -498,6 +509,7 @@ namespace windows_nt_kernel
   static NtLockFile_t NtLockFile;
   static NtUnlockFile_t NtUnlockFile;
   static NtCreateSection_t NtCreateSection;
+  static NtQuerySection_t NtQuerySection;
   static NtExtendSection_t NtExtendSection;
   static NtMapViewOfSection_t NtMapViewOfSection;
   static NtUnmapViewOfSection_t NtUnmapViewOfSection;
@@ -575,6 +587,9 @@ namespace windows_nt_kernel
         abort();
     if(!NtCreateSection)
       if(!(NtCreateSection = (NtCreateSection_t) GetProcAddress(ntdllh, "NtCreateSection")))
+        abort();
+    if(!NtQuerySection)
+      if(!(NtQuerySection = (NtQuerySection_t) GetProcAddress(ntdllh, "NtQuerySection")))
         abort();
     if(!NtExtendSection)
       if(!(NtExtendSection = (NtExtendSection_t) GetProcAddress(ntdllh, "NtExtendSection")))

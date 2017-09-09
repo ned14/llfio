@@ -56,7 +56,7 @@ namespace algorithm
     {
       offset -= page_offset;
       char *addr = _mapping.address() + offset;
-      size_t len = sh.length() - offset;  // use section length, not mapped length as mapped length is rounded up to page size
+      size_t len = sh.length().value() - offset;  // use section length, not mapped length as mapped length is rounded up to page size
       if(bytes != 0 && bytes < len)
       {
         len = bytes;
@@ -102,7 +102,7 @@ namespace algorithm
     \param byteoffset The byte offset into the mapped file handle, this does not need to be a multiple of the page size.
     */
     mapped_view(mapped_file_handle &sh, size_type length = (size_type) -1, extent_type byteoffset = 0)
-        : span<T>(sh.address() + byteoffset, (length == (size_type) -1) ? (sh.length().value() / sizeof(T)) : length)
+        : span<T>(reinterpret_cast<T *>(sh.address() + byteoffset), (length == (size_type) -1) ? (sh.length().value() / sizeof(T)) : length)
     {
     }
   };

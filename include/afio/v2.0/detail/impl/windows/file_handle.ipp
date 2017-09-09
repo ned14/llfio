@@ -350,17 +350,20 @@ file_handle::io_result<file_handle::const_buffers_type> file_handle::barrier(fil
     flags |= 2 /*FLUSH_FLAGS_NO_SYNC*/;
   if(!and_metadata)
     flags |= 1 /*FLUSH_FLAGS_FILE_DATA_ONLY*/;
-  NtFlushBuffersFileEx(_v.h, flags, isb);
-  if(_v.is_overlapped())
+  NTSTATUS ntstat = NtFlushBuffersFileEx(_v.h, flags, isb);
+  if(STATUS_PENDING == ntstat)
   {
-    if(STATUS_TIMEOUT == ntwait(_v.h, ol, d))
+    ntstat = ntwait(_v.h, ol, d);
+    if(STATUS_TIMEOUT == ntstat)
     {
       CancelIoEx(_v.h, &ol);
       AFIO_WIN_DEADLINE_TO_TIMEOUT(d);
     }
   }
-  if(STATUS_SUCCESS != isb->Status)
-    return {(int) isb->Status, ntkernel_category()};
+  if(ntstat < 0)
+  {
+    return {(int) ntstat, ntkernel_category()};
+  }
   return io_handle::io_result<const_buffers_type>(std::move(reqs.buffers));
 }
 
@@ -379,6 +382,14 @@ result<file_handle> file_handle::clone() const noexcept
 result<file_handle::extent_type> file_handle::length() const noexcept
 {
   AFIO_LOG_FUNCTION_CALL(this);
+#if 0
+  char buffer[1];
+  DWORD read = 0;
+  OVERLAPPED ol;
+  memset(&ol, 0, sizeof(ol));
+  ol.OffsetHigh = ol.Offset = 0xffffffff;
+  WriteFile(_v.h, buffer, 0, &read, &ol);
+#endif
   FILE_STANDARD_INFO fsi;
   if(!GetFileInformationByHandleEx(_v.h, FileStandardInfo, &fsi, sizeof(fsi)))
     return {GetLastError(), std::system_category()};

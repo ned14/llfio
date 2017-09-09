@@ -231,7 +231,9 @@ public:
   the some buffers at the end of the returned buffers may return with zero bytes written.
   For example, with a zeroed deadline, some backends may only consume as many buffers as the system has available write slots
   for, thus for those backends this call is "non-blocking" in the sense that it will return immediately even if it
-  could not schedule a single buffer write.
+  could not schedule a single buffer write. Another example is that some implementations will not
+  auto-extend the length of a file when a write exceeds the maximum extent, you will need to issue
+  a `truncate(newsize)` first.
 
   \return The buffers written, which may not be the buffers input. The size of each scatter-gather
   buffer is updated with the number of bytes of that buffer transferred.

@@ -26,25 +26,24 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../../../utils.hpp"
 #include "import.hpp"
 
+#include "../../../quickcpplib/include/algorithm/hash.hpp"
+
+
 AFIO_V2_NAMESPACE_BEGIN
 
 result<section_handle> section_handle::section(file_handle &backing, extent_type maximum_size, flag _flag) noexcept
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
-  if(!maximum_size)
-  {
-    if(backing.is_valid())
-    {
-      OUTCOME_TRY(length, backing.length());
-      maximum_size = length;
-    }
-    else
-      return std::errc::invalid_argument;
-  }
   // Do NOT round up to page size here if backed by a file, it causes STATUS_SECTION_TOO_BIG
   if(!backing.is_valid())
+  {
+    if(!maximum_size)
+    {
+      return std::errc::invalid_argument;
+    }
     maximum_size = utils::round_up_to_page_size(maximum_size);
+  }
   result<section_handle> ret(section_handle(native_handle_type(), backing.is_valid() ? &backing : nullptr, maximum_size, _flag));
   native_handle_type &nativeh = ret.value()._v;
   ULONG prot = 0, attribs = 0;
@@ -77,11 +76,6 @@ result<section_handle> section_handle::section(file_handle &backing, extent_type
       prot = PAGE_READWRITE;
     }
   }
-  else if(PAGE_READONLY == prot)
-  {
-    // In the case where there is a backing file, asking for read perms or no perms
-    // means "don't auto-expand the file to the nearest 4Kb multiple"
-  }
   if(_flag & flag::executable)
     attribs = SEC_IMAGE;
   if(_flag & flag::prefault)
@@ -89,14 +83,50 @@ result<section_handle> section_handle::section(file_handle &backing, extent_type
     // Handled during view mapping below
   }
   nativeh.behaviour |= native_handle_type::disposition::section;
-  // OBJECT_ATTRIBUTES ObjectAttributes;
-  // InitializeObjectAttributes(&ObjectAttributes, &NULL, 0, NULL, NULL);
-  LARGE_INTEGER _maximum_size;
-  _maximum_size.QuadPart = maximum_size;
+  OBJECT_ATTRIBUTES oa, *poa = nullptr;
+  UNICODE_STRING _path;
+  static wchar_t *buffer = []() -> wchar_t * {
+    static wchar_t buffer[96] = L"\\Sessions\\0\\BaseNamedObjects\\";
+    DWORD sessionid = 0;
+    if(ProcessIdToSessionId(GetCurrentProcessId(), &sessionid))
+    {
+      wsprintf(buffer, L"\\Sessions\\%u\\BaseNamedObjects\\", sessionid);
+    }
+    return buffer;
+  }();
+  static wchar_t *bufferid = wcschr(buffer, 0);
+  if(_flag & flag::singleton)
+  {
+    OUTCOME_TRY(currentpath, backing.current_path());
+    auto hash = QUICKCPPLIB_NAMESPACE::algorithm::hash::fast_hash::hash((const char *) currentpath.native().data(), currentpath.native().size() * sizeof(wchar_t));
+    char *_buffer = (char *) (bufferid);
+    QUICKCPPLIB_NAMESPACE::algorithm::string::to_hex_string(_buffer, 96 * sizeof(wchar_t), (const char *) hash.as_bytes, sizeof(hash.as_bytes));
+    for(size_t n = 31; n <= 31; n--)
+    {
+      bufferid[n] = _buffer[n];
+    }
+    bufferid[32] = 0;
+    _path.Buffer = buffer;
+    _path.MaximumLength = (_path.Length = (USHORT)((32 + bufferid - buffer) * sizeof(wchar_t))) + sizeof(wchar_t);
+    memset(&oa, 0, sizeof(oa));
+    oa.Length = sizeof(OBJECT_ATTRIBUTES);
+    oa.ObjectName = &_path;
+    oa.Attributes = 0x80 /*OBJ_OPENIF*/;
+    poa = &oa;
+  }
+  LARGE_INTEGER _maximum_size, *pmaximum_size = &_maximum_size;
+  if(maximum_size > 0)
+  {
+    _maximum_size.QuadPart = maximum_size;
+  }
+  else
+  {
+    pmaximum_size = nullptr;
+  }
   AFIO_LOG_FUNCTION_CALL(&ret);
   HANDLE h;
-  NTSTATUS ntstat = NtCreateSection(&h, SECTION_ALL_ACCESS, NULL, &_maximum_size, prot, attribs, backing.is_valid() ? backing.native_handle().h : NULL);
-  if(STATUS_SUCCESS != ntstat)
+  NTSTATUS ntstat = NtCreateSection(&h, SECTION_ALL_ACCESS, poa, pmaximum_size, prot, attribs, backing.is_valid() ? backing.native_handle().h : NULL);
+  if(ntstat < 0)
   {
     return {(int) ntstat, ntkernel_category()};
   }
@@ -104,10 +134,29 @@ result<section_handle> section_handle::section(file_handle &backing, extent_type
   return ret;
 }
 
+result<section_handle::extent_type> section_handle::length() const noexcept
+{
+  windows_nt_kernel::init();
+  using namespace windows_nt_kernel;
+  AFIO_LOG_FUNCTION_CALL(this);
+  if(_backing == nullptr)
+  {
+    return _length;
+  }
+  SECTION_BASIC_INFORMATION sbi;
+  NTSTATUS ntstat = NtQuerySection(_v.h, SectionBasicInformation, &sbi, sizeof(sbi), NULL);
+  if(STATUS_SUCCESS != ntstat)
+  {
+    return {(int) ntstat, ntkernel_category()};
+  }
+  return sbi.MaximumSize.QuadPart;
+}
+
 result<section_handle::extent_type> section_handle::truncate(extent_type newsize) noexcept
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
+  AFIO_LOG_FUNCTION_CALL(this);
   if(!newsize)
   {
     if(_backing)
