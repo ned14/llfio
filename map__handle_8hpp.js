@@ -5,7 +5,6 @@ var map__handle_8hpp =
     [ "map_handle", "classafio__v2__xxx_1_1map__handle.html", "classafio__v2__xxx_1_1map__handle" ],
     [ "barrier", "map__handle_8hpp.html#a04980337d833bcc33cae657d6654f6a0", null ],
     [ "close", "map__handle_8hpp.html#aa7f2ca17db2468dbd5407e2f35870077", null ],
-    [ "length", "map__handle_8hpp.html#a9bf31de4c528f33e91c5c3d1877bddf3", null ],
     [ "length", "map__handle_8hpp.html#abb42093725f3206e37e53ec44c39ad68", null ],
     [ "map", "map__handle_8hpp.html#a819f25432ad3c4ec19d065a9c0ea6159", null ],
     [ "map", "map__handle_8hpp.html#ac0c1354bd001aa35aadb77f9c774a14d", null ],

@@ -116,46 +116,55 @@ $(document).ready(function(){initNavTree('index.html','');});
 </table>
 </center><p>Herein lies my proposed zero whole machine memory copy async file i/o and filesystem library for Boost and the C++ standard, intended for storage devices with ~1 microsecond 4Kb transfer latencies and those supporting Storage Class Memory (SCM)/Direct Access Storage (DAX). Its i/o overhead, including syscall overhead, has been benchmarked to 100 nanoseconds on Linux which corresponds to a theoretical maximum of 10M IOPS @ QD1, approx 40Gb/sec per thread. It has particularly strong support for writing portable filesystem algorithms which work well with directly mapped non-volatile storage such as Intel Optane.</p>
 <p>It is a complete rewrite after a Boost peer review in August 2015. Its github source code repository lives at <a href="https://github.com/ned14/boost.afio">https://github.com/ned14/boost.afio</a>.</p>
+<ul>
+<li>Portable to any conforming C++ 14 compiler with a working Filesystem TS in its STL.</li>
+<li>Will make use of any Concepts TS if you have them.<ul>
+<li>(Coroutines TS support is in the works)</li>
+</ul>
+</li>
+<li>Provides view adapters into the Ranges TS, so ready for STL2.</li>
+<li>Original error code is always preserved, even down to the original NT kernel error code if a NT kernel API was used.</li>
+<li>Race free filesystem design used throughout (i.e. no TOCTOU).</li>
+<li>Zero malloc, zero exception throw and zero whole system memory copy design used throughout, even down to paths (which can hit 64Kb!).</li>
+<li>Works very well with the C++ standard library, and is intended to be proposed for standardisation into C++ in 2020 or thereabouts.</li>
+</ul>
+<dl class="section note"><dt>Note</dt><dd>Note that this code is of late alpha quality. It's quite reliable on Windows and Linux, but be careful when using it!</dd></dl>
+<p>Examples of use: </p>
 <table  width="100%" border="0" cellpadding="4">
 <tr>
-<th colspan="3">Why you might need AFIO<hr/>
-  </th></tr>
-<tr>
-<td valign="top" width="33%">Manufacturer claimed 4Kb transfer latencies for the physical hardware:<ul>
-<li>Spinning rust hard drive latency @ QD1: <b>9000us</b></li>
-<li>SATA flash drive latency @ QD1: <b>800us</b></li>
-<li>NVMe flash drive latency @ QD1: <b>300us</b></li>
-<li>RTT UDP packet latency over a LAN: <b>60us</b></li>
-<li>NVMe Optane drive latency @ QD1: <b>60us</b></li>
-<li><code>memcpy(4Kb)</code> latency: <b>5us</b> (main memory) to <b>1.3us</b> (L3 cache)</li>
-<li>RTT PCIe latency: <b>0.5us</b>  </li>
-</ul>
-</td><td valign="top" width="33%">100% read QD1 4Kb direct transfer latencies for the software with AFIO:<ul>
-<li>&lt; 99% spinning rust hard drive latency: Windows <b>187,231us</b> FreeBSD <b>9,836us</b> Linux <b>26,468us</b></li>
-<li>&lt; 99% SATA flash drive latency: Windows <b>290us</b> Linux <b>158us</b></li>
-<li>&lt; 99% NVMe drive latency: Windows <b>37us</b> FreeBSD <b>70us</b> Linux <b>30us</b>  </li>
-</ul>
-</td><td valign="top" width="33%">75% read 25% write QD4 4Kb direct transfer latencies for the software with AFIO:<ul>
-<li>&lt; 99% spinning rust hard drive latency: Windows <b>48,185us</b> FreeBSD <b>61,834us</b> Linux <b>104,507us</b></li>
-<li>&lt; 99% SATA flash drive latency: Windows <b>1,812us</b> Linux <b>1,416us</b></li>
-<li>&lt; 99% NVMe drive latency: Windows <b>50us</b> FreeBSD <b>143us</b> Linux <b>40us</b>   </li>
-</ul>
-</td></tr>
-</table>
-<dl class="section note"><dt>Note</dt><dd>Note that this code is of late alpha quality. It's quite reliable on Windows and Linux, but be careful when using it!</dd></dl>
-<p>Example of use: </p>
-<div class="fragment"><div class="line"><span class="keyword">namespace </span>afio = <a class="code" href="group__config.html#gaa3ed9f085329a0b81feeac3397a83740">AFIO_V2_NAMESPACE</a>;</div>
+<td><div class="fragment"><div class="line"><span class="keyword">namespace </span>afio = <a class="code" href="group__config.html#gaa3ed9f085329a0b81feeac3397a83740">AFIO_V2_NAMESPACE</a>;</div>
+<div class="line"></div>
 <div class="line"><span class="comment">// Make me a 1 trillion element sparsely allocated integer array!</span></div>
 <div class="line">afio::mapped_file_handle mfh = afio::mapped_temp_inode().value();</div>
+<div class="line"></div>
 <div class="line"><span class="comment">// On an extents based filing system, doesn&#39;t actually allocate any physical storage</span></div>
 <div class="line"><span class="comment">// but does map approximately 4Tb of all bits zero data into memory</span></div>
 <div class="line">mfh.truncate(1000000000000ULL*<span class="keyword">sizeof</span>(<span class="keywordtype">int</span>));</div>
+<div class="line"></div>
 <div class="line"><span class="comment">// Create a typed view of the one trillion integers</span></div>
 <div class="line">afio::algorithm::mapped_view&lt;int&gt; one_trillion_int_array(mfh);</div>
+<div class="line"></div>
 <div class="line"><span class="comment">// Write and read as you see fit, if you exceed physical RAM it&#39;ll be paged to disk</span></div>
 <div class="line">one_trillion_int_array[0] = 5;</div>
 <div class="line">one_trillion_int_array[999999999999ULL] = 6;</div>
-</div><!-- fragment --><p>These compilers and OS are regularly tested:</p>
+</div><!-- fragment -->  </td><td><div class="fragment"><div class="line"><span class="keyword">namespace </span>afio = <a class="code" href="group__config.html#gaa3ed9f085329a0b81feeac3397a83740">AFIO_V2_NAMESPACE</a>;</div>
+<div class="line"></div>
+<div class="line"><span class="comment">// Create an asynchronous file handle</span></div>
+<div class="line">afio::io_service service;</div>
+<div class="line">afio::async_file_handle fh = <a class="code" href="namespaceafio__v2__xxx.html#aaca67159c4f0fc906967b9fb7912116b">afio::async_file</a>(service, {}, <span class="stringliteral">&quot;testfile.txt&quot;</span>,</div>
+<div class="line">                                              <a class="code" href="namespaceafio__v2__xxx.html#a2d15768d28ea660ebe44901508ed3372">afio::async_file_handle::mode::write</a>,</div>
+<div class="line">                                              afio::async_file_handle::creation::if_needed).value();</div>
+<div class="line"></div>
+<div class="line"><span class="comment">// Resize it to 1024 bytes</span></div>
+<div class="line"><a class="code" href="namespaceafio__v2__xxx.html#a84d22c966fcabe50de30ad8cf26c7241">truncate</a>(fh, 1024).value();</div>
+<div class="line"></div>
+<div class="line"><span class="comment">// Begin to asynchronously write &quot;hello world&quot; into the file at offset 0,</span></div>
+<div class="line"><span class="comment">// suspending execution of this coroutine until completion and then resuming</span></div>
+<div class="line"><span class="comment">// execution. Requires the Coroutines TS.</span></div>
+<div class="line">co_await <a class="code" href="namespaceafio__v2__xxx.html#ae02e72d068c5dfd1c686a32e614ea6f8">async_write</a>(fh, 0, <span class="stringliteral">&quot;hello world&quot;</span>, 11).value();</div>
+</div><!-- fragment -->   </td></tr>
+</table>
+<p>These compilers and OS are regularly tested:</p>
 <ul>
 <li>GCC 7.0 (Linux 4,x x64)</li>
 <li>clang 4.0 (Linux 4.x x64)</li>
@@ -331,6 +340,32 @@ mapped_file_handle - adds low latency memory mapped scatter-gather i/o</li>
 <td>✔ </td><td></td><td></td><td>Algorithm to replace all duplicate content with hard links. </td></tr>
 <tr>
 <td>✔ </td><td></td><td></td><td>Algorithm to figure out all paths for a hard linked inode. </td></tr>
+</table>
+<table  width="100%" border="0" cellpadding="4">
+<tr>
+<th colspan="3">Why you might need AFIO<hr/>
+  </th></tr>
+<tr>
+<td valign="top" width="33%">Manufacturer claimed 4Kb transfer latencies for the physical hardware:<ul>
+<li>Spinning rust hard drive latency @ QD1: <b>9000us</b></li>
+<li>SATA flash drive latency @ QD1: <b>800us</b></li>
+<li>NVMe flash drive latency @ QD1: <b>300us</b></li>
+<li>RTT UDP packet latency over a LAN: <b>60us</b></li>
+<li>NVMe Optane drive latency @ QD1: <b>60us</b></li>
+<li><code>memcpy(4Kb)</code> latency: <b>5us</b> (main memory) to <b>1.3us</b> (L3 cache)</li>
+<li>RTT PCIe latency: <b>0.5us</b>  </li>
+</ul>
+</td><td valign="top" width="33%">100% read QD1 4Kb direct transfer latencies for the software with AFIO:<ul>
+<li>&lt; 99% spinning rust hard drive latency: Windows <b>187,231us</b> FreeBSD <b>9,836us</b> Linux <b>26,468us</b></li>
+<li>&lt; 99% SATA flash drive latency: Windows <b>290us</b> Linux <b>158us</b></li>
+<li>&lt; 99% NVMe drive latency: Windows <b>37us</b> FreeBSD <b>70us</b> Linux <b>30us</b>  </li>
+</ul>
+</td><td valign="top" width="33%">75% read 25% write QD4 4Kb direct transfer latencies for the software with AFIO:<ul>
+<li>&lt; 99% spinning rust hard drive latency: Windows <b>48,185us</b> FreeBSD <b>61,834us</b> Linux <b>104,507us</b></li>
+<li>&lt; 99% SATA flash drive latency: Windows <b>1,812us</b> Linux <b>1,416us</b></li>
+<li>&lt; 99% NVMe drive latency: Windows <b>50us</b> FreeBSD <b>143us</b> Linux <b>40us</b>   </li>
+</ul>
+</td></tr>
 </table>
 <p>Max bandwidth for the physical hardware:</p>
 <ul>

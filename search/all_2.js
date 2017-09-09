@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['backing',['backing',['../classafio__v2__xxx_1_1section__handle.html#aa4a1627091cc26b3fe0029c03b12b431',1,'afio_v2_xxx::section_handle']]],
+  ['backing',['backing',['../classafio__v2__xxx_1_1section__handle.html#acdebf8de23e97950968d3fba84141366',1,'afio_v2_xxx::section_handle']]],
   ['backing_5fnative_5fhandle',['backing_native_handle',['../classafio__v2__xxx_1_1section__handle.html#a5464eac84bedf1ce13318451b3a95e93',1,'afio_v2_xxx::section_handle']]],
   ['barrier',['barrier',['../classafio__v2__xxx_1_1io__handle.html#a243156928e89b8988a1412f211b3b603',1,'afio_v2_xxx::io_handle::barrier()'],['../namespaceafio__v2__xxx.html#abb60a5dc89b41b1db101dbed12cb065d',1,'afio_v2_xxx::barrier()']]],
   ['barrier_5fon_5fclose',['barrier_on_close',['../structafio__v2__xxx_1_1section__handle_1_1flag__base.html#a5b790e66402ef3a07ce9464f3e1dc9d8a13b22e159d85ac0067a3aac0f7255acd',1,'afio_v2_xxx::section_handle::flag_base']]],

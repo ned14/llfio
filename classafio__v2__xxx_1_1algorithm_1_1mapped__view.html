@@ -149,8 +149,8 @@ constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href=
 <tr class="separator:af8a986d93d5967962763900af3f99824"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9b4829efc1c9b87957203e8313172064"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1algorithm_1_1mapped__view.html#a9b4829efc1c9b87957203e8313172064">mapped_view</a> (<a class="el" href="classafio__v2__xxx_1_1section__handle.html">section_handle</a> &amp;sh, <a class="el" href="classafio__v2__xxx_1_1algorithm_1_1mapped__view.html#a7812759f458831ea053fed38ec46dc30">size_type</a> <a class="el" href="namespaceafio__v2__xxx.html#afe66c5875c48c8bd172901a1159ccbdc">length</a>=(<a class="el" href="classafio__v2__xxx_1_1algorithm_1_1mapped__view.html#a7812759f458831ea053fed38ec46dc30">size_type</a>)-1, <a class="el" href="classafio__v2__xxx_1_1algorithm_1_1mapped__view.html#a0e413ca44e22e974598aa700f8fda08a">extent_type</a> byteoffset=0, section_handle::flag _flag=section_handle::flag::readwrite)</td></tr>
 <tr class="separator:a9b4829efc1c9b87957203e8313172064"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a99c21a04a2de47a6c7c24ac7da5ab89b"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1algorithm_1_1mapped__view.html#a99c21a04a2de47a6c7c24ac7da5ab89b">mapped_view</a> (<a class="el" href="classafio__v2__xxx_1_1mapped__file__handle.html">mapped_file_handle</a> &amp;sh, <a class="el" href="classafio__v2__xxx_1_1algorithm_1_1mapped__view.html#a7812759f458831ea053fed38ec46dc30">size_type</a> <a class="el" href="namespaceafio__v2__xxx.html#afe66c5875c48c8bd172901a1159ccbdc">length</a>=(<a class="el" href="classafio__v2__xxx_1_1algorithm_1_1mapped__view.html#a7812759f458831ea053fed38ec46dc30">size_type</a>)-1, <a class="el" href="classafio__v2__xxx_1_1algorithm_1_1mapped__view.html#a0e413ca44e22e974598aa700f8fda08a">extent_type</a> byteoffset=0)</td></tr>
-<tr class="separator:a99c21a04a2de47a6c7c24ac7da5ab89b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2365c26071823a4b01045a88474b918f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1algorithm_1_1mapped__view.html#a2365c26071823a4b01045a88474b918f">mapped_view</a> (<a class="el" href="classafio__v2__xxx_1_1mapped__file__handle.html">mapped_file_handle</a> &amp;mfh, <a class="el" href="classafio__v2__xxx_1_1algorithm_1_1mapped__view.html#a7812759f458831ea053fed38ec46dc30">size_type</a> <a class="el" href="namespaceafio__v2__xxx.html#afe66c5875c48c8bd172901a1159ccbdc">length</a>=(<a class="el" href="classafio__v2__xxx_1_1algorithm_1_1mapped__view.html#a7812759f458831ea053fed38ec46dc30">size_type</a>)-1, <a class="el" href="classafio__v2__xxx_1_1algorithm_1_1mapped__view.html#a0e413ca44e22e974598aa700f8fda08a">extent_type</a> byteoffset=0)</td></tr>
+<tr class="separator:a2365c26071823a4b01045a88474b918f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;class T&gt;<br/>
@@ -205,7 +205,7 @@ template&lt;class T &gt; </div>
 <div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;      <span class="keywordtype">char</span> *addr = _mapping.<a class="code" href="classafio__v2__xxx_1_1map__handle.html#a1e9273d0c6aca7da6480437f6cf6638a">address</a>();</div>
 <div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;      <span class="keyword">static_cast&lt;</span>span&lt;T&gt; &amp;<span class="keyword">&gt;</span>(*this) = span&lt;T&gt;(<span class="keyword">reinterpret_cast&lt;</span>T *<span class="keyword">&gt;</span>(addr), <a class="code" href="namespaceafio__v2__xxx.html#afe66c5875c48c8bd172901a1159ccbdc">length</a>);</div>
 <div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    }</div>
-<div class="ttc" id="classafio__v2__xxx_1_1map__handle_html_a1e9273d0c6aca7da6480437f6cf6638a"><div class="ttname"><a href="classafio__v2__xxx_1_1map__handle.html#a1e9273d0c6aca7da6480437f6cf6638a">afio_v2_xxx::map_handle::address</a></div><div class="ttdeci">char * address() const noexcept</div><div class="ttdoc">The address in memory where this mapped view resides. </div><div class="ttdef"><b>Definition:</b> map_handle.hpp:299</div></div>
+<div class="ttc" id="classafio__v2__xxx_1_1map__handle_html_a1e9273d0c6aca7da6480437f6cf6638a"><div class="ttname"><a href="classafio__v2__xxx_1_1map__handle.html#a1e9273d0c6aca7da6480437f6cf6638a">afio_v2_xxx::map_handle::address</a></div><div class="ttdeci">char * address() const noexcept</div><div class="ttdoc">The address in memory where this mapped view resides. </div><div class="ttdef"><b>Definition:</b> map_handle.hpp:306</div></div>
 <div class="ttc" id="namespaceafio__v2__xxx_html_afe66c5875c48c8bd172901a1159ccbdc"><div class="ttname"><a href="namespaceafio__v2__xxx.html#afe66c5875c48c8bd172901a1159ccbdc">afio_v2_xxx::length</a></div><div class="ttdeci">result&lt; file_handle::extent_type &gt; length(const file_handle &amp;self) noexcept</div><div class="ttdef"><b>Definition:</b> file_handle.hpp:330</div></div>
 <div class="ttc" id="classafio__v2__xxx_1_1map__handle_html_a9c43d182b257682d320f12f6e6be30b3"><div class="ttname"><a href="classafio__v2__xxx_1_1map__handle.html#a9c43d182b257682d320f12f6e6be30b3">afio_v2_xxx::map_handle::map</a></div><div class="ttdeci">static result&lt; map_handle &gt; map(size_type bytes, section_handle::flag _flag=section_handle::flag::readwrite) noexcept</div></div>
 </div><!-- fragment -->
@@ -282,7 +282,7 @@ template&lt;class T &gt; </div>
 </div><!-- fragment -->
 </div>
 </div>
-<a class="anchor" id="a99c21a04a2de47a6c7c24ac7da5ab89b"></a>
+<a class="anchor" id="a2365c26071823a4b01045a88474b918f"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
@@ -295,7 +295,7 @@ template&lt;class T &gt; </div>
           <td class="memname"><a class="el" href="classafio__v2__xxx_1_1algorithm_1_1mapped__view.html">afio_v2_xxx::algorithm::mapped_view</a>&lt; T &gt;::<a class="el" href="classafio__v2__xxx_1_1algorithm_1_1mapped__view.html">mapped_view</a> </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="classafio__v2__xxx_1_1mapped__file__handle.html">mapped_file_handle</a> &amp;&#160;</td>
-          <td class="paramname"><em>sh</em>, </td>
+          <td class="paramname"><em>mfh</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -330,7 +330,7 @@ template&lt;class T &gt; </div>
   </table>
   </dd>
 </dl>
-<div class="fragment"><div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;        : span&lt;T&gt;(sh.address() + byteoffset, (<a class="code" href="namespaceafio__v2__xxx.html#afe66c5875c48c8bd172901a1159ccbdc">length</a> == (<a class="code" href="classafio__v2__xxx_1_1algorithm_1_1mapped__view.html#a7812759f458831ea053fed38ec46dc30">size_type</a>) -1) ? (sh.length().value() / <span class="keyword">sizeof</span>(T)) : <a class="code" href="namespaceafio__v2__xxx.html#afe66c5875c48c8bd172901a1159ccbdc">length</a>)</div>
+<div class="fragment"><div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;        : span&lt;T&gt;(<span class="keyword">reinterpret_cast&lt;</span>T *<span class="keyword">&gt;</span>(mfh.address() + byteoffset), (<a class="code" href="namespaceafio__v2__xxx.html#afe66c5875c48c8bd172901a1159ccbdc">length</a> == (<a class="code" href="classafio__v2__xxx_1_1algorithm_1_1mapped__view.html#a7812759f458831ea053fed38ec46dc30">size_type</a>) -1) ? (mfh.length().value() / <span class="keyword">sizeof</span>(T)) : <a class="code" href="namespaceafio__v2__xxx.html#afe66c5875c48c8bd172901a1159ccbdc">length</a>)</div>
 <div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;    {</div>
 <div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;    }</div>
 <div class="ttc" id="namespaceafio__v2__xxx_html_afe66c5875c48c8bd172901a1159ccbdc"><div class="ttname"><a href="namespaceafio__v2__xxx.html#afe66c5875c48c8bd172901a1159ccbdc">afio_v2_xxx::length</a></div><div class="ttdeci">result&lt; file_handle::extent_type &gt; length(const file_handle &amp;self) noexcept</div><div class="ttdef"><b>Definition:</b> file_handle.hpp:330</div></div>
