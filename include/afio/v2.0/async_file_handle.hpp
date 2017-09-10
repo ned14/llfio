@@ -312,7 +312,32 @@ public:
 
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<buffers_type> read(io_request<buffers_type> reqs, deadline d = deadline()) noexcept override;
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> write(io_request<const_buffers_type> reqs, deadline d = deadline()) noexcept override;
+
+#if 0//def __cpp_coroutines
+  //! An   
+  template<class BuffersType> struct awaitable
+  {
+    using CompletionRoutine = detail::function_ptr<void(async_file_handle *, io_result<BuffersType> &)>;
+    io_state_ptr<CompletionRoutine, BuffersType> state;
+  };
+#endif
 };
+
+#if 0//def __cpp_coroutines
+auto operator co_await(async_file_handle::awaitable &&a)
+{
+  struct Awaiter { 
+    async_file_handle::awaitable &&a;
+    
+    bool await_ready() { return false; } 
+    auto await_resume() { return output.get(); } 
+    void await_suspend(std::experimental::coroutine_handle<> coro) { 
+      }); 
+    } 
+  }; 
+  return Awaiter{std::move(a)};   
+}
+#endif
 
 // BEGIN make_free_functions.py
 //! Swap with another instance
