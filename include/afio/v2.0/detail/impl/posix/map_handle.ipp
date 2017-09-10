@@ -29,39 +29,60 @@ Distributed under the Boost Software License, Version 1.0.
 
 AFIO_V2_NAMESPACE_BEGIN
 
+section_handle::~section_handle()
+{
+  if(_v)
+  {
+    (void) section_handle::close();
+  }
+}
+result<void> section_handle::close() noexcept
+{
+  AFIO_LOG_FUNCTION_CALL(this);
+  // We don't want ~handle() to close our fake handle
+  _v = native_handle_type();
+  return success();
+}
+
 result<section_handle> section_handle::section(file_handle &backing, extent_type maximum_size, flag _flag) noexcept
 {
-  extent_type length = 0;
-  if(backing.is_valid())
+  if(!(_flag & flag::posix_skip_length_checks))
   {
-    OUTCOME_TRY(_length, backing.length());
-    length = _length;
-    if(length == 0)
-    {
-      // Some systems allow zero sized maps, POSIX bans it
-      return std::errc::invalid_argument;
-    }
-    if(maximum_size > 0 && maximum_size > length)
-    {
-      // For compatibility with Windows, disallow sections larger than the file
-      return std::errc::value_too_large;
-    }
-  }
-  if(!maximum_size)
-  {
+    extent_type length = 0;
     if(backing.is_valid())
     {
-      maximum_size = length;
+      OUTCOME_TRY(_length, backing.length());
+      length = _length;
+      if(length == 0)
+      {
+        // Some systems allow zero sized maps, POSIX bans it
+        return std::errc::invalid_argument;
+      }
+      if(maximum_size > 0 && maximum_size > length)
+      {
+        // For compatibility with Windows, disallow sections larger than the file
+        return std::errc::value_too_large;
+      }
     }
-    else
+    if(!maximum_size)
     {
-      return std::errc::invalid_argument;
+      if(backing.is_valid())
+      {
+        maximum_size = length;
+      }
+      else
+      {
+        return std::errc::invalid_argument;
+      }
     }
   }
   if(!backing.is_valid())
     maximum_size = utils::round_up_to_page_size(maximum_size);
   result<section_handle> ret(section_handle(native_handle_type(), backing.is_valid() ? &backing : nullptr, maximum_size, _flag));
   // There are no section handles on POSIX, so do nothing
+  native_handle_type &nativeh = ret.value()._v;
+  nativeh.fd = INT_MAX;
+  nativeh.behaviour |= native_handle_type::disposition::section;
   AFIO_LOG_FUNCTION_CALL(&ret);
   return ret;
 }
@@ -75,20 +96,23 @@ result<section_handle::extent_type> section_handle::length() const noexcept
 result<section_handle::extent_type> section_handle::truncate(extent_type newsize) noexcept
 {
   AFIO_LOG_FUNCTION_CALL(this);
-  extent_type length = 0;
   if(_backing)
   {
-    OUTCOME_TRY(_length, _backing->length());
-    length = _length;
-    if(length == 0)
+    extent_type length = 0;
+    if(!(_flag & flag::posix_skip_length_checks))
     {
-      // Some systems allow zero sized maps, POSIX bans it
-      return std::errc::invalid_argument;
-    }
-    if(newsize > 0 && newsize > length)
-    {
-      // For compatibility with Windows, disallow sections larger than the file
-      return std::errc::value_too_large;
+      OUTCOME_TRY(_length, _backing->length());
+      length = _length;
+      if(length == 0)
+      {
+        // Some systems allow zero sized maps, POSIX bans it
+        return std::errc::invalid_argument;
+      }
+      if(newsize > 0 && newsize > length)
+      {
+        // For compatibility with Windows, disallow sections larger than the file
+        return std::errc::value_too_large;
+      }
     }
   }
   else

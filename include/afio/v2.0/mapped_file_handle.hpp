@@ -84,6 +84,7 @@ data, you can call `update_map()` which guarantees that the mapping your
 process sees is up to date, rather than relying on any kernel-specific automatic mapping.
 Whether automatic or enforced by `update_map()`, the reservation limit will not be exceeded
 nor will `address()` suddenly return something different.
+
 It is thus up to you to detect that the reservation has been exhausted, and to
 reserve a new reservation which will change the value returned by `address()`. This
 entirely manual system is a bit tedious and cumbersome to use, but as mapping files
@@ -100,9 +101,15 @@ Automatic mapping of growing files on various kernels:
 <dl>
 <dt>Microsoft Windows</dt>
 <dd>For the current Terminal Services Session, the first `mapped_file_handle::truncate()` or
-`mapped_file_handle::update_map()` by any process update maps in all processes simultaneously.</dd>
+`mapped_file_handle::update_map()` by any process update maps in all processes simultaneously.
+Other methods for extending the file will require a `mapped_file_handle::update_map()`
+by any process per Terminal Services Session to synchronise.
+</dd>
 <dt>Linux</dt>
-<dd>?</dd>
+<dd>The Linux kernel automatically maps newly appended data to a file into all over extended
+maps of that file. `mapped_file_handle::length()` will continue to return the old value until
+`mapped_file_handle::update_map()` is called to refresh it.
+</dd>
 <dt>FreeBSD</dt>
 <dd>?</dd>
 <dt>Apple MacOS</dt>
@@ -115,7 +122,13 @@ Automatic mapping of shrinking files on various kernels:
 <dd>All maps and open section handles on the file anywhere in the system must be removed before
 any shrinkage of a file is permitted.</dd>
 <dt>Linux</dt>
-<dd>?</dd>
+<dd>Data written after the maximum extent up to the page boundary appears to be zeroed on flush
+and any pages thereafter appear to be unmapped. Just to be safe, on all POSIX platforms
+`mapped_file_handle::truncate()` specifically
+undirties any pages about to be freed on newer kernels, or specifically deallocates them from
+memory and physical storage on older kernels before doing the file shrink. This ensures
+truncated pages don't get zombified.
+</dd>
 <dt>FreeBSD</dt>
 <dd>?</dd>
 <dt>Apple MacOS</dt>
@@ -152,7 +165,7 @@ public:
   mapped_file_handle() = default;
 
   //! Implicit move construction of mapped_file_handle permitted
-  mapped_file_handle(mapped_file_handle &&o) noexcept : file_handle(std::move(o)), _sh(std::move(o._sh)), _mh(std::move(o._mh))
+  mapped_file_handle(mapped_file_handle &&o) noexcept : file_handle(std::move(o)), _reservation(std::move(o._reservation)), _sh(std::move(o._sh)), _mh(std::move(o._mh))
   {
     _sh.set_backing(this);
     _mh.set_section(&_sh);

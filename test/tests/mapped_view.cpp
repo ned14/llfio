@@ -65,6 +65,10 @@ static inline void TestMappedView2()
 {
   using namespace AFIO_V2_NAMESPACE;
   using AFIO_V2_NAMESPACE::file_handle;
+  {
+    std::error_code ec;
+    filesystem::remove("testfile", ec);
+  }
   mapped_file_handle mfh = mapped_file_handle::mapped_file(1024 * 1024, {}, "testfile", file_handle::mode::write, file_handle::creation::if_needed, file_handle::caching::all, file_handle::flag::unlink_on_close).value();
   BOOST_CHECK(mfh.address() == nullptr);
   mfh.truncate(10000 * sizeof(int)).value();
@@ -106,7 +110,8 @@ static inline void TestMappedView2()
   BOOST_CHECK(v1.size() == 10000);
   v1[0] = 78;
   v1[9999] = 79;
-  // Should have auto informed mfh of the change and remapped it for us
+  // On Windows this will have updated the mapping, on POSIX it will not, so prod POSIX
+  mfh.update_map().value();
   v1 = mfh;
   BOOST_CHECK(v1.size() == 10000);
   BOOST_CHECK(v1[0] == 78);

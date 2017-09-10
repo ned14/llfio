@@ -63,6 +63,8 @@ public:
                                    barrier_on_close = 1 << 16,  //!< Maps of this section, if writable, issue a `barrier()` when destructed blocking until data (not metadata) reaches physical storage.
 
                                    // NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!
+                                   
+                                   posix_skip_length_checks = 1 << 28,
 
                                    readwrite = (read | write)};
   QUICKCPPLIB_BITFIELD_END(flag);
@@ -73,6 +75,10 @@ protected:
   flag _flag;
 
 public:
+#ifndef _WIN32
+  AFIO_HEADERS_ONLY_VIRTUAL_SPEC ~section_handle();
+  AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> close() noexcept override;
+#endif
   //! Default constructor
   constexpr section_handle()
       : _backing(nullptr)

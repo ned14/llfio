@@ -30,16 +30,20 @@ AFIO_V2_NAMESPACE_BEGIN
 result<mapped_file_handle::size_type> mapped_file_handle::reserve(size_type reservation) noexcept
 {
   AFIO_LOG_FUNCTION_CALL(this);
+  OUTCOME_TRY(length, underlying_file_length());
+  if(length == 0)
+  {
+    return std::errc::invalid_argument;
+  }
   if(reservation == 0)
   {
-    OUTCOME_TRY(length, underlying_file_length());
     reservation = length;
   }
   reservation = utils::round_up_to_page_size(reservation);
   if(!_sh.is_valid())
   {
-    section_handle::flag sectionflags = section_handle::flag::readwrite;
-    OUTCOME_TRY(sh, section_handle::section(*this, 0, sectionflags));
+    section_handle::flag sectionflags = section_handle::flag::readwrite | section_handle::flag::posix_skip_length_checks;
+    OUTCOME_TRY(sh, section_handle::section(*this, length, sectionflags));
     _sh = std::move(sh);
   }
   if(_mh.is_valid() && reservation == _mh.length())
