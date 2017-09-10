@@ -501,14 +501,15 @@ ino_t&#160;</td><td class="memItemRight" valign="bottom"><b>_inode</b></td></tr>
 <p>Note that zero length files cannot be memory mapped, and writes past the maximum extent do NOT auto-extend the size of the file, rather the data written beyond the maximum valid extent has undefined kernel-specific behaviour, which includes segfaulting. You must therefore always <code>truncate(newsize)</code> to resize the file and its maps before you can read or write to it, and be VERY careful to not read or write beyond the maximum extent of the file.</p>
 <p>Therefore, when a file is created or is otherwise of zero length, <code>address()</code> will return a null pointer. Similarly, calling <code>truncate(0)</code> will close the map and section handles, they will be recreated on next truncation to a non-zero size.</p>
 <p>For better performance when handling files which are growing, there is a concept of "address space reservation" via <code>reserve()</code> and <code>capacity()</code>, which on some kernels is automatically and efficiently expanded into when the underlying file grows. The implementation asks the kernel to set out a contiguous region of pages matching that reservation, and to map the file into the beginning of the reservation. The remainder of the pages may be inaccessible and may generate a segfault, or they may automatically reflect any growth in the underlying file. This is why <code>read()</code> and <code>write()</code> only know about the reservation size, and will read and write memory up to that reservation size, without checking if the memory involved exists or not yet. You are guaranteed that <code>address()</code> will not return a new value unless you truncate from a bigger length to a smaller length, or you call <code>reserve()</code> with a new reservation.</p>
-<p><code>length()</code> reports the last truncated length of the mapped file (possibly by any process in the system) up to the reservation limit, NOT the length of the underlying file. When you know that another process has extended the file and you wish to map the newly appended data, you can call <code>update_map()</code> which guarantees that the mapping your process sees is up to date, rather than relying on any kernel-specific automatic mapping. Whether automatic or enforced by <code>update_map()</code>, the reservation limit will not be exceeded nor will <code>address()</code> suddenly return something different. It is thus up to you to detect that the reservation has been exhausted, and to reserve a new reservation which will change the value returned by <code>address()</code>. This entirely manual system is a bit tedious and cumbersome to use, but as mapping files is an expensive operation given TLB shootdown, we leave it up to the end user to decide when to expend the cost of mapping.</p>
+<p><code>length()</code> reports the last truncated length of the mapped file (possibly by any process in the system) up to the reservation limit, NOT the length of the underlying file. When you know that another process has extended the file and you wish to map the newly appended data, you can call <code>update_map()</code> which guarantees that the mapping your process sees is up to date, rather than relying on any kernel-specific automatic mapping. Whether automatic or enforced by <code>update_map()</code>, the reservation limit will not be exceeded nor will <code>address()</code> suddenly return something different.</p>
+<p>It is thus up to you to detect that the reservation has been exhausted, and to reserve a new reservation which will change the value returned by <code>address()</code>. This entirely manual system is a bit tedious and cumbersome to use, but as mapping files is an expensive operation given TLB shootdown, we leave it up to the end user to decide when to expend the cost of mapping.</p>
 <dl class="section warning"><dt>Warning</dt><dd>You must be cautious when the file is being extended by third parties which are not using this <code>mapped_file_handle</code> to write the new data. With unified page cache kernels, mixing mapped and normal i/o is generally safe except at the end of a file where race conditions and outright kernel bugs tend to abound. To avoid these, solely and exclusively use a dedicated handle configured to atomic append only to do the appends.</dd></dl>
 <p>Automatic mapping of growing files on various kernels: </p>
 <dl>
 <dt>Microsoft Windows </dt>
-<dd>For the current Terminal Services Session, the first <code>mapped_file_handle::truncate()</code> or <code>mapped_file_handle::update_map()</code> by any process update maps in all processes simultaneously. </dd>
+<dd>For the current Terminal Services Session, the first <code>mapped_file_handle::truncate()</code> or <code>mapped_file_handle::update_map()</code> by any process update maps in all processes simultaneously. Other methods for extending the file will require a <code>mapped_file_handle::update_map()</code> by any process per Terminal Services Session to synchronise.  </dd>
 <dt>Linux </dt>
-<dd>? </dd>
+<dd>The Linux kernel automatically maps newly appended data to a file into all over extended maps of that file. <code>mapped_file_handle::length()</code> will continue to return the old value until <code>mapped_file_handle::update_map()</code> is called to refresh it.  </dd>
 <dt>FreeBSD </dt>
 <dd>? </dd>
 <dt>Apple MacOS </dt>
@@ -519,7 +520,7 @@ ino_t&#160;</td><td class="memItemRight" valign="bottom"><b>_inode</b></td></tr>
 <dt>Microsoft Windows </dt>
 <dd>All maps and open section handles on the file anywhere in the system must be removed before any shrinkage of a file is permitted. </dd>
 <dt>Linux </dt>
-<dd>? </dd>
+<dd>Data written after the maximum extent up to the page boundary appears to be zeroed on flush and any pages thereafter appear to be unmapped. Just to be safe, on all POSIX platforms <code>mapped_file_handle::truncate()</code> specifically undirties any pages about to be freed on newer kernels, or specifically deallocates them from memory and physical storage on older kernels before doing the file shrink. This ensures truncated pages don't get zombified.  </dd>
 <dt>FreeBSD </dt>
 <dd>? </dd>
 <dt>Apple MacOS </dt>
@@ -948,30 +949,30 @@ For portability, you can only assume that barriers write order for a single hand
 </dl>
 <p>Note that if the file is currently zero sized, no mapping occurs now, but later when <code>truncate()</code> or <code>update_map()</code> is called.</p>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values which the constructors for <code>file_handle</code>, <code>section_handle</code> and <code>map_handle</code> can return. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;  {</div>
-<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;    <span class="keywordflow">if</span>(_mode == <a class="code" href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18a9516dfb15f51c7ee19a4d46b8c0dbe1d">mode::append</a>)</div>
-<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;    {</div>
-<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;      <span class="keywordflow">return</span> std::errc::invalid_argument;</div>
-<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;    }</div>
-<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;    OUTCOME_TRY(fh, <a class="code" href="classafio__v2__xxx_1_1file__handle.html#a6f4e7c6e9768c0e853105b1d63bd9dfb">file_handle::file</a>(base, _path, _mode, _creation, _caching, <a class="code" href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">flags</a>));</div>
-<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;    <span class="keywordflow">switch</span>(_creation)</div>
-<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;    {</div>
-<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;    <span class="keywordflow">default</span>:</div>
-<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;    {</div>
-<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;      <span class="comment">// Attempt mapping now</span></div>
-<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;      <a class="code" href="classafio__v2__xxx_1_1mapped__file__handle.html#a5f3f5dd54b5c2cc9810621c05a6171f6">mapped_file_handle</a> mfh(std::move(fh), reservation);</div>
-<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;      <span class="keywordflow">return</span> {std::move(mfh)};</div>
-<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;    }</div>
-<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;    <span class="keywordflow">case</span> creation::only_if_not_exist:</div>
-<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;    <span class="keywordflow">case</span> <a class="code" href="classafio__v2__xxx_1_1handle.html#a45ff5c1c5662623d99156870dfeee0a7a244f58cf07c35fd48d7524b289551e5c">creation::truncate</a>:</div>
-<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;    {</div>
-<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;      <span class="comment">// Don&#39;t attempt mapping now</span></div>
-<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;      <a class="code" href="classafio__v2__xxx_1_1mapped__file__handle.html#a5f3f5dd54b5c2cc9810621c05a6171f6">mapped_file_handle</a> mfh(std::move(fh));</div>
-<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;      mfh._reservation = reservation;</div>
-<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;      <span class="keywordflow">return</span> {std::move(mfh)};</div>
-<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;    }</div>
-<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;    }</div>
-<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;  }</div>
+<div class="fragment"><div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;  {</div>
+<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;    <span class="keywordflow">if</span>(_mode == <a class="code" href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18a9516dfb15f51c7ee19a4d46b8c0dbe1d">mode::append</a>)</div>
+<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;    {</div>
+<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;      <span class="keywordflow">return</span> std::errc::invalid_argument;</div>
+<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;    }</div>
+<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;    OUTCOME_TRY(fh, <a class="code" href="classafio__v2__xxx_1_1file__handle.html#a6f4e7c6e9768c0e853105b1d63bd9dfb">file_handle::file</a>(base, _path, _mode, _creation, _caching, <a class="code" href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">flags</a>));</div>
+<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;    <span class="keywordflow">switch</span>(_creation)</div>
+<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;    {</div>
+<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;    <span class="keywordflow">default</span>:</div>
+<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;    {</div>
+<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;      <span class="comment">// Attempt mapping now</span></div>
+<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;      <a class="code" href="classafio__v2__xxx_1_1mapped__file__handle.html#a5f3f5dd54b5c2cc9810621c05a6171f6">mapped_file_handle</a> mfh(std::move(fh), reservation);</div>
+<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;      <span class="keywordflow">return</span> {std::move(mfh)};</div>
+<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;    }</div>
+<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;    <span class="keywordflow">case</span> creation::only_if_not_exist:</div>
+<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;    <span class="keywordflow">case</span> <a class="code" href="classafio__v2__xxx_1_1handle.html#a45ff5c1c5662623d99156870dfeee0a7a244f58cf07c35fd48d7524b289551e5c">creation::truncate</a>:</div>
+<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;    {</div>
+<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;      <span class="comment">// Don&#39;t attempt mapping now</span></div>
+<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;      <a class="code" href="classafio__v2__xxx_1_1mapped__file__handle.html#a5f3f5dd54b5c2cc9810621c05a6171f6">mapped_file_handle</a> mfh(std::move(fh));</div>
+<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;      mfh._reservation = reservation;</div>
+<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;      <span class="keywordflow">return</span> {std::move(mfh)};</div>
+<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;    }</div>
+<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;    }</div>
+<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;  }</div>
 <div class="ttc" id="classafio__v2__xxx_1_1mapped__file__handle_html_a5f3f5dd54b5c2cc9810621c05a6171f6"><div class="ttname"><a href="classafio__v2__xxx_1_1mapped__file__handle.html#a5f3f5dd54b5c2cc9810621c05a6171f6">afio_v2_xxx::mapped_file_handle::mapped_file_handle</a></div><div class="ttdeci">mapped_file_handle()=default</div><div class="ttdoc">Default constructor. </div></div>
 <div class="ttc" id="classafio__v2__xxx_1_1handle_html_a45ff5c1c5662623d99156870dfeee0a7a244f58cf07c35fd48d7524b289551e5c"><div class="ttname"><a href="classafio__v2__xxx_1_1handle.html#a45ff5c1c5662623d99156870dfeee0a7a244f58cf07c35fd48d7524b289551e5c">afio_v2_xxx::handle::creation::truncate</a></div><div class="ttdoc">Atomically truncate on open, leaving creation date unmodified. </div></div>
 <div class="ttc" id="classafio__v2__xxx_1_1handle_html_ab3d876f5996605158fd6a0582adadad6"><div class="ttname"><a href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">afio_v2_xxx::handle::flags</a></div><div class="ttdeci">flag flags() const noexcept</div><div class="ttdoc">The flags this handle was opened with. </div><div class="ttdef"><b>Definition:</b> handle.hpp:307</div></div>
@@ -1036,9 +1037,9 @@ For portability, you can only assume that barriers write order for a single hand
 </table>
 </div><div class="memdoc">
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;{ <span class="keywordflow">return</span> <a class="code" href="classafio__v2__xxx_1_1mapped__file__handle.html#aedf10997693cf088cf9d67720c4defe1">mapped_file</a>(0, base, _path, _mode, _creation, _caching, <a class="code" href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">flags</a>); }</div>
+<div class="fragment"><div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;{ <span class="keywordflow">return</span> <a class="code" href="classafio__v2__xxx_1_1mapped__file__handle.html#aedf10997693cf088cf9d67720c4defe1">mapped_file</a>(0, base, _path, _mode, _creation, _caching, <a class="code" href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">flags</a>); }</div>
 <div class="ttc" id="classafio__v2__xxx_1_1handle_html_ab3d876f5996605158fd6a0582adadad6"><div class="ttname"><a href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">afio_v2_xxx::handle::flags</a></div><div class="ttdeci">flag flags() const noexcept</div><div class="ttdoc">The flags this handle was opened with. </div><div class="ttdef"><b>Definition:</b> handle.hpp:307</div></div>
-<div class="ttc" id="classafio__v2__xxx_1_1mapped__file__handle_html_aedf10997693cf088cf9d67720c4defe1"><div class="ttname"><a href="classafio__v2__xxx_1_1mapped__file__handle.html#aedf10997693cf088cf9d67720c4defe1">afio_v2_xxx::mapped_file_handle::mapped_file</a></div><div class="ttdeci">static result&lt; mapped_file_handle &gt; mapped_file(size_type reservation, const path_handle &amp;base, path_view_type _path, mode _mode=mode::read, creation _creation=creation::open_existing, caching _caching=caching::all, flag flags=flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> mapped_file_handle.hpp:203</div></div>
+<div class="ttc" id="classafio__v2__xxx_1_1mapped__file__handle_html_aedf10997693cf088cf9d67720c4defe1"><div class="ttname"><a href="classafio__v2__xxx_1_1mapped__file__handle.html#aedf10997693cf088cf9d67720c4defe1">afio_v2_xxx::mapped_file_handle::mapped_file</a></div><div class="ttdeci">static result&lt; mapped_file_handle &gt; mapped_file(size_type reservation, const path_handle &amp;base, path_view_type _path, mode _mode=mode::read, creation _creation=creation::open_existing, caching _caching=caching::all, flag flags=flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> mapped_file_handle.hpp:216</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1093,26 +1094,26 @@ For portability, you can only assume that barriers write order for a single hand
 </div><div class="memdoc">
 <p>Create an mapped file handle creating a randomly named file on a path. The file is opened exclusively with <code>creation::only_if_not_exist</code> so it will never collide with nor overwrite any existing file. Note also that caching defaults to temporary which hints to the OS to only flush changes to physical storage as lately as possible.</p>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX open() or CreateFile() can return. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;  {</div>
-<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;    <span class="keywordflow">try</span></div>
-<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;    {</div>
-<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;      <span class="keywordflow">for</span>(;;)</div>
-<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;      {</div>
-<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;        <span class="keyword">auto</span> randomname = <a class="code" href="namespaceafio__v2__xxx_1_1utils.html#a767b8434456319066194534a4c4edbf5">utils::random_string</a>(32);</div>
-<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;        randomname.append(<span class="stringliteral">&quot;.random&quot;</span>);</div>
-<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;        result&lt;mapped_file_handle&gt; ret = <a class="code" href="classafio__v2__xxx_1_1mapped__file__handle.html#aedf10997693cf088cf9d67720c4defe1">mapped_file</a>(reservation, dirpath, randomname, _mode, creation::only_if_not_exist, _caching, <a class="code" href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">flags</a>);</div>
-<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;        <span class="keywordflow">if</span>(ret || (!ret &amp;&amp; ret.error() != std::errc::file_exists))</div>
-<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;          <span class="keywordflow">return</span> ret;</div>
-<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;      }</div>
-<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;    }</div>
-<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;    <span class="keywordflow">catch</span>(...)</div>
-<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;    {</div>
-<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;      <span class="keywordflow">return</span> error_from_exception();</div>
-<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;    }</div>
-<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;  }</div>
+<div class="fragment"><div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;  {</div>
+<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;    <span class="keywordflow">try</span></div>
+<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;    {</div>
+<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;      <span class="keywordflow">for</span>(;;)</div>
+<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;      {</div>
+<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;        <span class="keyword">auto</span> randomname = <a class="code" href="namespaceafio__v2__xxx_1_1utils.html#a767b8434456319066194534a4c4edbf5">utils::random_string</a>(32);</div>
+<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;        randomname.append(<span class="stringliteral">&quot;.random&quot;</span>);</div>
+<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;        result&lt;mapped_file_handle&gt; ret = <a class="code" href="classafio__v2__xxx_1_1mapped__file__handle.html#aedf10997693cf088cf9d67720c4defe1">mapped_file</a>(reservation, dirpath, randomname, _mode, creation::only_if_not_exist, _caching, <a class="code" href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">flags</a>);</div>
+<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;        <span class="keywordflow">if</span>(ret || (!ret &amp;&amp; ret.error() != std::errc::file_exists))</div>
+<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;          <span class="keywordflow">return</span> ret;</div>
+<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;      }</div>
+<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;    }</div>
+<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;    <span class="keywordflow">catch</span>(...)</div>
+<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;    {</div>
+<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;      <span class="keywordflow">return</span> error_from_exception();</div>
+<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;    }</div>
+<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;  }</div>
 <div class="ttc" id="namespaceafio__v2__xxx_1_1utils_html_a767b8434456319066194534a4c4edbf5"><div class="ttname"><a href="namespaceafio__v2__xxx_1_1utils.html#a767b8434456319066194534a4c4edbf5">afio_v2_xxx::utils::random_string</a></div><div class="ttdeci">std::string random_string(size_t randomlen)</div><div class="ttdoc">Returns a cryptographically random string capable of being used as a filename. Essentially random_fil...</div><div class="ttdef"><b>Definition:</b> utils.hpp:130</div></div>
 <div class="ttc" id="classafio__v2__xxx_1_1handle_html_ab3d876f5996605158fd6a0582adadad6"><div class="ttname"><a href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">afio_v2_xxx::handle::flags</a></div><div class="ttdeci">flag flags() const noexcept</div><div class="ttdoc">The flags this handle was opened with. </div><div class="ttdef"><b>Definition:</b> handle.hpp:307</div></div>
-<div class="ttc" id="classafio__v2__xxx_1_1mapped__file__handle_html_aedf10997693cf088cf9d67720c4defe1"><div class="ttname"><a href="classafio__v2__xxx_1_1mapped__file__handle.html#aedf10997693cf088cf9d67720c4defe1">afio_v2_xxx::mapped_file_handle::mapped_file</a></div><div class="ttdeci">static result&lt; mapped_file_handle &gt; mapped_file(size_type reservation, const path_handle &amp;base, path_view_type _path, mode _mode=mode::read, creation _creation=creation::open_existing, caching _caching=caching::all, flag flags=flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> mapped_file_handle.hpp:203</div></div>
+<div class="ttc" id="classafio__v2__xxx_1_1mapped__file__handle_html_aedf10997693cf088cf9d67720c4defe1"><div class="ttname"><a href="classafio__v2__xxx_1_1mapped__file__handle.html#aedf10997693cf088cf9d67720c4defe1">afio_v2_xxx::mapped_file_handle::mapped_file</a></div><div class="ttdeci">static result&lt; mapped_file_handle &gt; mapped_file(size_type reservation, const path_handle &amp;base, path_view_type _path, mode _mode=mode::read, creation _creation=creation::open_existing, caching _caching=caching::all, flag flags=flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> mapped_file_handle.hpp:216</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1174,15 +1175,15 @@ For portability, you can only assume that barriers write order for a single hand
 <p>Create a mapped file handle creating the named file on some path which the OS declares to be suitable for temporary files. Most OSs are very lazy about flushing changes made to these temporary files. Note the default flags are to have the newly created file deleted on first handle close. Note also that an empty name is equivalent to calling <code>mapped_random_file(temporary_files_directory())</code> and the creation parameter is ignored.</p>
 <dl class="section note"><dt>Note</dt><dd>If the temporary file you are creating is not going to have its path sent to another process for usage, this is the WRONG function to use. Use <code>temp_inode()</code> instead, it is far more secure.</dd></dl>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX open() or CreateFile() can return. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;  {</div>
-<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;    OUTCOME_TRY(tempdirh, <a class="code" href="classafio__v2__xxx_1_1path__handle.html#a5cbd1d67ffe72d6cce0d093f861a4af7">path_handle::path</a>(<a class="code" href="namespaceafio__v2__xxx.html#a4968bb2d647535f4b91427c66ff8b9e4">temporary_files_directory</a>()));</div>
-<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;    <span class="keywordflow">return</span> name.empty() ? <a class="code" href="classafio__v2__xxx_1_1mapped__file__handle.html#a00875e717f4b2725bb58ecbb5310fc6f">mapped_random_file</a>(reservation, tempdirh, _mode, _caching, <a class="code" href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">flags</a>) : <a class="code" href="classafio__v2__xxx_1_1mapped__file__handle.html#aedf10997693cf088cf9d67720c4defe1">mapped_file</a>(reservation, tempdirh, name, _mode, _creation, _caching, <a class="code" href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">flags</a>);</div>
-<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;  }</div>
+<div class="fragment"><div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;  {</div>
+<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;    OUTCOME_TRY(tempdirh, <a class="code" href="classafio__v2__xxx_1_1path__handle.html#a5cbd1d67ffe72d6cce0d093f861a4af7">path_handle::path</a>(<a class="code" href="namespaceafio__v2__xxx.html#a4968bb2d647535f4b91427c66ff8b9e4">temporary_files_directory</a>()));</div>
+<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;    <span class="keywordflow">return</span> name.empty() ? <a class="code" href="classafio__v2__xxx_1_1mapped__file__handle.html#a00875e717f4b2725bb58ecbb5310fc6f">mapped_random_file</a>(reservation, tempdirh, _mode, _caching, <a class="code" href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">flags</a>) : <a class="code" href="classafio__v2__xxx_1_1mapped__file__handle.html#aedf10997693cf088cf9d67720c4defe1">mapped_file</a>(reservation, tempdirh, name, _mode, _creation, _caching, <a class="code" href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">flags</a>);</div>
+<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;  }</div>
 <div class="ttc" id="namespaceafio__v2__xxx_html_a4968bb2d647535f4b91427c66ff8b9e4"><div class="ttname"><a href="namespaceafio__v2__xxx.html#a4968bb2d647535f4b91427c66ff8b9e4">afio_v2_xxx::temporary_files_directory</a></div><div class="ttdeci">path_view temporary_files_directory() noexcept</div><div class="ttdoc">Returns a path to a directory reported by the operating system to be suitable for storing temporary f...</div></div>
-<div class="ttc" id="classafio__v2__xxx_1_1mapped__file__handle_html_a00875e717f4b2725bb58ecbb5310fc6f"><div class="ttname"><a href="classafio__v2__xxx_1_1mapped__file__handle.html#a00875e717f4b2725bb58ecbb5310fc6f">afio_v2_xxx::mapped_file_handle::mapped_random_file</a></div><div class="ttdeci">static result&lt; mapped_file_handle &gt; mapped_random_file(size_type reservation, const path_handle &amp;dirpath, mode _mode=mode::write, caching _caching=caching::temporary, flag flags=flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> mapped_file_handle.hpp:241</div></div>
+<div class="ttc" id="classafio__v2__xxx_1_1mapped__file__handle_html_a00875e717f4b2725bb58ecbb5310fc6f"><div class="ttname"><a href="classafio__v2__xxx_1_1mapped__file__handle.html#a00875e717f4b2725bb58ecbb5310fc6f">afio_v2_xxx::mapped_file_handle::mapped_random_file</a></div><div class="ttdeci">static result&lt; mapped_file_handle &gt; mapped_random_file(size_type reservation, const path_handle &amp;dirpath, mode _mode=mode::write, caching _caching=caching::temporary, flag flags=flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> mapped_file_handle.hpp:254</div></div>
 <div class="ttc" id="classafio__v2__xxx_1_1path__handle_html_a5cbd1d67ffe72d6cce0d093f861a4af7"><div class="ttname"><a href="classafio__v2__xxx_1_1path__handle.html#a5cbd1d67ffe72d6cce0d093f861a4af7">afio_v2_xxx::path_handle::path</a></div><div class="ttdeci">static result&lt; path_handle &gt; path(const path_handle &amp;base, path_view_type _path) noexcept</div></div>
 <div class="ttc" id="classafio__v2__xxx_1_1handle_html_ab3d876f5996605158fd6a0582adadad6"><div class="ttname"><a href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">afio_v2_xxx::handle::flags</a></div><div class="ttdeci">flag flags() const noexcept</div><div class="ttdoc">The flags this handle was opened with. </div><div class="ttdef"><b>Definition:</b> handle.hpp:307</div></div>
-<div class="ttc" id="classafio__v2__xxx_1_1mapped__file__handle_html_aedf10997693cf088cf9d67720c4defe1"><div class="ttname"><a href="classafio__v2__xxx_1_1mapped__file__handle.html#aedf10997693cf088cf9d67720c4defe1">afio_v2_xxx::mapped_file_handle::mapped_file</a></div><div class="ttdeci">static result&lt; mapped_file_handle &gt; mapped_file(size_type reservation, const path_handle &amp;base, path_view_type _path, mode _mode=mode::read, creation _creation=creation::open_existing, caching _caching=caching::all, flag flags=flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> mapped_file_handle.hpp:203</div></div>
+<div class="ttc" id="classafio__v2__xxx_1_1mapped__file__handle_html_aedf10997693cf088cf9d67720c4defe1"><div class="ttname"><a href="classafio__v2__xxx_1_1mapped__file__handle.html#aedf10997693cf088cf9d67720c4defe1">afio_v2_xxx::mapped_file_handle::mapped_file</a></div><div class="ttdeci">static result&lt; mapped_file_handle &gt; mapped_file(size_type reservation, const path_handle &amp;base, path_view_type _path, mode _mode=mode::read, creation _creation=creation::open_existing, caching _caching=caching::all, flag flags=flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> mapped_file_handle.hpp:216</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1225,11 +1226,11 @@ For portability, you can only assume that barriers write order for a single hand
 </div><div class="memdoc">
 <p><em>Securely</em> create a mapped file handle creating a temporary anonymous inode in the filesystem referred to by <em>dirpath</em>. The inode created has no name nor accessible path on the filing system and ceases to exist as soon as the last handle is closed, making it ideal for use as a temporary file where other processes do not need to have access to its contents via some path on the filing system (a classic use case is for backing shared memory maps).</p>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX open() or CreateFile() can return. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;  {</div>
-<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;    OUTCOME_TRY(v, <a class="code" href="classafio__v2__xxx_1_1file__handle.html#a2910fdfa511d1295e36e2eb015b989ac">file_handle::temp_inode</a>(std::move(dirpath), std::move(_mode), <a class="code" href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">flags</a>));</div>
-<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;    <a class="code" href="classafio__v2__xxx_1_1mapped__file__handle.html#a5f3f5dd54b5c2cc9810621c05a6171f6">mapped_file_handle</a> ret(std::move(v));</div>
-<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;    <span class="keywordflow">return</span> std::move(ret);</div>
-<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;  }</div>
+<div class="fragment"><div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;  {</div>
+<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;    OUTCOME_TRY(v, <a class="code" href="classafio__v2__xxx_1_1file__handle.html#a2910fdfa511d1295e36e2eb015b989ac">file_handle::temp_inode</a>(std::move(dirpath), std::move(_mode), <a class="code" href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">flags</a>));</div>
+<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;    <a class="code" href="classafio__v2__xxx_1_1mapped__file__handle.html#a5f3f5dd54b5c2cc9810621c05a6171f6">mapped_file_handle</a> ret(std::move(v));</div>
+<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;    <span class="keywordflow">return</span> std::move(ret);</div>
+<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;  }</div>
 <div class="ttc" id="classafio__v2__xxx_1_1mapped__file__handle_html_a5f3f5dd54b5c2cc9810621c05a6171f6"><div class="ttname"><a href="classafio__v2__xxx_1_1mapped__file__handle.html#a5f3f5dd54b5c2cc9810621c05a6171f6">afio_v2_xxx::mapped_file_handle::mapped_file_handle</a></div><div class="ttdeci">mapped_file_handle()=default</div><div class="ttdoc">Default constructor. </div></div>
 <div class="ttc" id="classafio__v2__xxx_1_1file__handle_html_a2910fdfa511d1295e36e2eb015b989ac"><div class="ttname"><a href="classafio__v2__xxx_1_1file__handle.html#a2910fdfa511d1295e36e2eb015b989ac">afio_v2_xxx::file_handle::temp_inode</a></div><div class="ttdeci">static result&lt; file_handle &gt; temp_inode(path_view_type dirpath=temporary_files_directory(), mode _mode=mode::write, flag flags=flag::none) noexcept</div></div>
 <div class="ttc" id="classafio__v2__xxx_1_1handle_html_ab3d876f5996605158fd6a0582adadad6"><div class="ttname"><a href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">afio_v2_xxx::handle::flags</a></div><div class="ttdeci">flag flags() const noexcept</div><div class="ttdoc">The flags this handle was opened with. </div><div class="ttdef"><b>Definition:</b> handle.hpp:307</div></div>
@@ -1505,7 +1506,7 @@ For portability, you can only assume that barriers write order for a single hand
 </dl>
 <dl class="section user"><dt>Errors returnable</dt><dd>None, though the various signals and structured exception throws common to using memory maps may occur. </dd></dl>
 <dl class="section user"><dt>Memory Allocations</dt><dd>None. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;{ <span class="keywordflow">return</span> _mh.<a class="code" href="classafio__v2__xxx_1_1map__handle.html#ad50026d4eca2ddd77b5f9877666857b8">read</a>(std::move(reqs), std::move(d)); }</div>
+<div class="fragment"><div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;{ <span class="keywordflow">return</span> _mh.<a class="code" href="classafio__v2__xxx_1_1map__handle.html#ad50026d4eca2ddd77b5f9877666857b8">read</a>(std::move(reqs), std::move(d)); }</div>
 <div class="ttc" id="classafio__v2__xxx_1_1map__handle_html_ad50026d4eca2ddd77b5f9877666857b8"><div class="ttname"><a href="classafio__v2__xxx_1_1map__handle.html#ad50026d4eca2ddd77b5f9877666857b8">afio_v2_xxx::map_handle::read</a></div><div class="ttdeci">virtual io_result&lt; buffers_type &gt; read(io_request&lt; buffers_type &gt; reqs, deadline d=deadline()) noexceptoverride</div><div class="ttdoc">Read data from the mapped view. </div></div>
 </div><!-- fragment -->
 </div>
@@ -2093,7 +2094,7 @@ For portability, you can only assume that barriers write order for a single hand
 </dl>
 <dl class="section user"><dt>Errors returnable</dt><dd>None, though the various signals and structured exception throws common to using memory maps may occur. </dd></dl>
 <dl class="section user"><dt>Memory Allocations</dt><dd>None. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;{ <span class="keywordflow">return</span> _mh.<a class="code" href="classafio__v2__xxx_1_1map__handle.html#a162d844e3dfcfcfad698a404bd55ef04">write</a>(std::move(reqs), std::move(d)); }</div>
+<div class="fragment"><div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;{ <span class="keywordflow">return</span> _mh.<a class="code" href="classafio__v2__xxx_1_1map__handle.html#a162d844e3dfcfcfad698a404bd55ef04">write</a>(std::move(reqs), std::move(d)); }</div>
 <div class="ttc" id="classafio__v2__xxx_1_1map__handle_html_a162d844e3dfcfcfad698a404bd55ef04"><div class="ttname"><a href="classafio__v2__xxx_1_1map__handle.html#a162d844e3dfcfcfad698a404bd55ef04">afio_v2_xxx::map_handle::write</a></div><div class="ttdeci">virtual io_result&lt; const_buffers_type &gt; write(io_request&lt; const_buffers_type &gt; reqs, deadline d=deadline()) noexceptoverride</div><div class="ttdoc">Write data to the mapped view. </div></div>
 </div><!-- fragment -->
 </div>
@@ -2151,12 +2152,12 @@ For portability, you can only assume that barriers write order for a single hand
 <dl class="section user"><dt>Memory Allocations</dt><dd>The default synchronous implementation in file_handle performs no memory allocation. The asynchronous implementation in async_file_handle may perform one calloc and one free. </dd></dl>
 
 <p>Reimplemented from <a class="el" href="classafio__v2__xxx_1_1file__handle.html#a649aa39b0d4b60a05d4aab4be569dcb6">afio_v2_xxx::file_handle</a>.</p>
-<div class="fragment"><div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;  {</div>
-<div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;    OUTCOME_TRYV(_mh.<a class="code" href="classafio__v2__xxx_1_1map__handle.html#ac35a85e8a6cca721640ddc6b5008e145">zero_memory</a>({_mh.<a class="code" href="classafio__v2__xxx_1_1map__handle.html#a1e9273d0c6aca7da6480437f6cf6638a">address</a>() + offset, bytes}));</div>
-<div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;    <span class="keywordflow">return</span> bytes;</div>
-<div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;  }</div>
+<div class="fragment"><div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;  {</div>
+<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;    OUTCOME_TRYV(_mh.<a class="code" href="classafio__v2__xxx_1_1map__handle.html#ac35a85e8a6cca721640ddc6b5008e145">zero_memory</a>({_mh.<a class="code" href="classafio__v2__xxx_1_1map__handle.html#a1e9273d0c6aca7da6480437f6cf6638a">address</a>() + offset, bytes}));</div>
+<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;    <span class="keywordflow">return</span> bytes;</div>
+<div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;  }</div>
 <div class="ttc" id="classafio__v2__xxx_1_1map__handle_html_ac35a85e8a6cca721640ddc6b5008e145"><div class="ttname"><a href="classafio__v2__xxx_1_1map__handle.html#ac35a85e8a6cca721640ddc6b5008e145">afio_v2_xxx::map_handle::zero_memory</a></div><div class="ttdeci">result&lt; void &gt; zero_memory(buffer_type region) noexcept</div></div>
-<div class="ttc" id="classafio__v2__xxx_1_1map__handle_html_a1e9273d0c6aca7da6480437f6cf6638a"><div class="ttname"><a href="classafio__v2__xxx_1_1map__handle.html#a1e9273d0c6aca7da6480437f6cf6638a">afio_v2_xxx::map_handle::address</a></div><div class="ttdeci">char * address() const noexcept</div><div class="ttdoc">The address in memory where this mapped view resides. </div><div class="ttdef"><b>Definition:</b> map_handle.hpp:306</div></div>
+<div class="ttc" id="classafio__v2__xxx_1_1map__handle_html_a1e9273d0c6aca7da6480437f6cf6638a"><div class="ttname"><a href="classafio__v2__xxx_1_1map__handle.html#a1e9273d0c6aca7da6480437f6cf6638a">afio_v2_xxx::map_handle::address</a></div><div class="ttdeci">char * address() const noexcept</div><div class="ttdoc">The address in memory where this mapped view resides. </div><div class="ttdef"><b>Definition:</b> map_handle.hpp:312</div></div>
 </div><!-- fragment -->
 </div>
 </div>

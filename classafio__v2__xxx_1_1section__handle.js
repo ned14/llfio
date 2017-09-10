@@ -30,6 +30,7 @@ var classafio__v2__xxx_1_1section__handle =
       [ "write", "classafio__v2__xxx_1_1section__handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18aefb2a684e4afb7d55e6147fbe5a332ee", null ],
       [ "append", "classafio__v2__xxx_1_1section__handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18a9516dfb15f51c7ee19a4d46b8c0dbe1d", null ]
     ] ],
+    [ "~section_handle", "classafio__v2__xxx_1_1section__handle.html#af13f55fc422de3020a975da19feef09f", null ],
     [ "section_handle", "classafio__v2__xxx_1_1section__handle.html#a2824f51d5726bb8015d89ac1ea7abe5f", null ],
     [ "section_handle", "classafio__v2__xxx_1_1section__handle.html#a01f8bba023c65d628e001bb1a02e580c", null ],
     [ "section_handle", "classafio__v2__xxx_1_1section__handle.html#a84ec7259dfb8bab518d3def875bdc6f2", null ],
@@ -39,7 +40,7 @@ var classafio__v2__xxx_1_1section__handle =
     [ "backing", "classafio__v2__xxx_1_1section__handle.html#acdebf8de23e97950968d3fba84141366", null ],
     [ "backing_native_handle", "classafio__v2__xxx_1_1section__handle.html#a5464eac84bedf1ce13318451b3a95e93", null ],
     [ "clone", "classafio__v2__xxx_1_1section__handle.html#a54790e954f57372b87b095451cc79c38", null ],
-    [ "close", "classafio__v2__xxx_1_1section__handle.html#af4c39abeaa83d990e3bd48fff7b94fb9", null ],
+    [ "close", "classafio__v2__xxx_1_1section__handle.html#a48064b15b2bd83b97eaf35688d13b3ad", null ],
     [ "current_path", "classafio__v2__xxx_1_1section__handle.html#a616a67222676af5ec5b3aa94d7c02428", null ],
     [ "flags", "classafio__v2__xxx_1_1section__handle.html#ab3d876f5996605158fd6a0582adadad6", null ],
     [ "is_append_only", "classafio__v2__xxx_1_1section__handle.html#ae33d4d0faa1377cd371bd6a0ae0769ae", null ],
