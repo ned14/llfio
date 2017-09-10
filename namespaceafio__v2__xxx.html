@@ -469,11 +469,11 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operato
 </div><div class="memdoc">
 <p>Create an async file handle opening access to a file on path using the given io_service.</p>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX open() or CreateFile() can return. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;{</div>
-<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespaceafio__v2__xxx.html#aaca67159c4f0fc906967b9fb7912116b">async_file_handle::async_file</a>(std::forward&lt;decltype(service)&gt;(service), std::forward&lt;decltype(base)&gt;(base), std::forward&lt;decltype(_path)&gt;(_path), std::forward&lt;decltype(_mode)&gt;(_mode), std::forward&lt;decltype(_creation)&gt;(_creation), std::forward&lt;decltype(_caching)&gt;(_caching),</div>
-<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;                                       std::forward&lt;decltype(flags)&gt;(flags));</div>
-<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;}</div>
-<div class="ttc" id="namespaceafio__v2__xxx_html_aaca67159c4f0fc906967b9fb7912116b"><div class="ttname"><a href="namespaceafio__v2__xxx.html#aaca67159c4f0fc906967b9fb7912116b">afio_v2_xxx::async_file</a></div><div class="ttdeci">result&lt; async_file_handle &gt; async_file(io_service &amp;service, const path_handle &amp;base, async_file_handle::path_view_type _path, async_file_handle::mode _mode=async_file_handle::mode::read, async_file_handle::creation _creation=async_file_handle::creation::open_existing, async_file_handle::caching _caching=async_file_handle::caching::all, async_file_handle::flag flags=async_file_handle::flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> async_file_handle.hpp:328</div></div>
+<div class="fragment"><div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160;{</div>
+<div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespaceafio__v2__xxx.html#aaca67159c4f0fc906967b9fb7912116b">async_file_handle::async_file</a>(std::forward&lt;decltype(service)&gt;(service), std::forward&lt;decltype(base)&gt;(base), std::forward&lt;decltype(_path)&gt;(_path), std::forward&lt;decltype(_mode)&gt;(_mode), std::forward&lt;decltype(_creation)&gt;(_creation), std::forward&lt;decltype(_caching)&gt;(_caching),</div>
+<div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;                                       std::forward&lt;decltype(flags)&gt;(flags));</div>
+<div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;}</div>
+<div class="ttc" id="namespaceafio__v2__xxx_html_aaca67159c4f0fc906967b9fb7912116b"><div class="ttname"><a href="namespaceafio__v2__xxx.html#aaca67159c4f0fc906967b9fb7912116b">afio_v2_xxx::async_file</a></div><div class="ttdeci">result&lt; async_file_handle &gt; async_file(io_service &amp;service, const path_handle &amp;base, async_file_handle::path_view_type _path, async_file_handle::mode _mode=async_file_handle::mode::read, async_file_handle::creation _creation=async_file_handle::creation::open_existing, async_file_handle::caching _caching=async_file_handle::caching::all, async_file_handle::flag flags=async_file_handle::flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> async_file_handle.hpp:353</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -528,10 +528,10 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operato
 </div><div class="memdoc">
 <p>Create an async file handle creating a randomly named file on a path. The file is opened exclusively with <code>creation::only_if_not_exist</code> so it will never collide with nor overwrite any existing file. Note also that caching defaults to temporary which hints to the OS to only flush changes to physical storage as lately as possible.</p>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX open() or CreateFile() can return. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;{</div>
-<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespaceafio__v2__xxx.html#a7f695bc414e2abe02eeaf17b0070bf74">async_file_handle::async_random_file</a>(std::forward&lt;decltype(service)&gt;(service), std::forward&lt;decltype(dirpath)&gt;(dirpath), std::forward&lt;decltype(_mode)&gt;(_mode), std::forward&lt;decltype(_caching)&gt;(_caching), std::forward&lt;decltype(flags)&gt;(flags));</div>
-<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;}</div>
-<div class="ttc" id="namespaceafio__v2__xxx_html_a7f695bc414e2abe02eeaf17b0070bf74"><div class="ttname"><a href="namespaceafio__v2__xxx.html#a7f695bc414e2abe02eeaf17b0070bf74">afio_v2_xxx::async_random_file</a></div><div class="ttdeci">result&lt; async_file_handle &gt; async_random_file(io_service &amp;service, const path_handle &amp;dirpath, async_file_handle::mode _mode=async_file_handle::mode::write, async_file_handle::caching _caching=async_file_handle::caching::temporary, async_file_handle::flag flags=async_file_handle::flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> async_file_handle.hpp:342</div></div>
+<div class="fragment"><div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;{</div>
+<div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespaceafio__v2__xxx.html#a7f695bc414e2abe02eeaf17b0070bf74">async_file_handle::async_random_file</a>(std::forward&lt;decltype(service)&gt;(service), std::forward&lt;decltype(dirpath)&gt;(dirpath), std::forward&lt;decltype(_mode)&gt;(_mode), std::forward&lt;decltype(_caching)&gt;(_caching), std::forward&lt;decltype(flags)&gt;(flags));</div>
+<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;}</div>
+<div class="ttc" id="namespaceafio__v2__xxx_html_a7f695bc414e2abe02eeaf17b0070bf74"><div class="ttname"><a href="namespaceafio__v2__xxx.html#a7f695bc414e2abe02eeaf17b0070bf74">afio_v2_xxx::async_random_file</a></div><div class="ttdeci">result&lt; async_file_handle &gt; async_random_file(io_service &amp;service, const path_handle &amp;dirpath, async_file_handle::mode _mode=async_file_handle::mode::write, async_file_handle::caching _caching=async_file_handle::caching::temporary, async_file_handle::flag flags=async_file_handle::flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> async_file_handle.hpp:367</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -587,9 +587,9 @@ template&lt;class CompletionRoutine &gt; </div>
 </dl>
 <dl class="section user"><dt>Errors returnable</dt><dd>As for read(), plus ENOMEM. </dd></dl>
 <dl class="section user"><dt>Memory Allocations</dt><dd>One calloc, one free. The allocation is unavoidable due to the need to store a type erased completion handler of unknown type. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;{</div>
-<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.async_read(std::forward&lt;decltype(reqs)&gt;(reqs), std::forward&lt;decltype(completion)&gt;(completion));</div>
-<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;}</div>
+<div class="fragment"><div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;{</div>
+<div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.async_read(std::forward&lt;decltype(reqs)&gt;(reqs), std::forward&lt;decltype(completion)&gt;(completion));</div>
+<div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -651,10 +651,10 @@ template&lt;class CompletionRoutine &gt; </div>
 <p>Create an async file handle creating the named file on some path which the OS declares to be suitable for temporary files. Most OSs are very lazy about flushing changes made to these temporary files. Note the default flags are to have the newly created file deleted on first handle close. Note also that an empty name is equivalent to calling <code>async_random_file(temporary_files_directory())</code> and the creation parameter is ignored.</p>
 <dl class="section note"><dt>Note</dt><dd>If the temporary file you are creating is not going to have its path sent to another process for usage, this is the WRONG function to use. Use <code>temp_inode()</code> instead, it is far more secure.</dd></dl>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX open() or CreateFile() can return. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;{</div>
-<div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespaceafio__v2__xxx.html#aa3cdce920646dc31d5f8d36ae0fafc2b">async_file_handle::async_temp_file</a>(std::forward&lt;decltype(service)&gt;(service), std::forward&lt;decltype(name)&gt;(name), std::forward&lt;decltype(_mode)&gt;(_mode), std::forward&lt;decltype(_creation)&gt;(_creation), std::forward&lt;decltype(_caching)&gt;(_caching), std::forward&lt;decltype(flags)&gt;(flags));</div>
-<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;}</div>
-<div class="ttc" id="namespaceafio__v2__xxx_html_aa3cdce920646dc31d5f8d36ae0fafc2b"><div class="ttname"><a href="namespaceafio__v2__xxx.html#aa3cdce920646dc31d5f8d36ae0fafc2b">afio_v2_xxx::async_temp_file</a></div><div class="ttdeci">result&lt; async_file_handle &gt; async_temp_file(io_service &amp;service, async_file_handle::path_view_type name=async_file_handle::path_view_type(), async_file_handle::mode _mode=async_file_handle::mode::write, async_file_handle::creation _creation=async_file_handle::creation::if_needed, async_file_handle::caching _caching=async_file_handle::caching::temporary, async_file_handle::flag flags=async_file_handle::flag::unlink_on_close) noexcept</div><div class="ttdef"><b>Definition:</b> async_file_handle.hpp:361</div></div>
+<div class="fragment"><div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;{</div>
+<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespaceafio__v2__xxx.html#aa3cdce920646dc31d5f8d36ae0fafc2b">async_file_handle::async_temp_file</a>(std::forward&lt;decltype(service)&gt;(service), std::forward&lt;decltype(name)&gt;(name), std::forward&lt;decltype(_mode)&gt;(_mode), std::forward&lt;decltype(_creation)&gt;(_creation), std::forward&lt;decltype(_caching)&gt;(_caching), std::forward&lt;decltype(flags)&gt;(flags));</div>
+<div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;}</div>
+<div class="ttc" id="namespaceafio__v2__xxx_html_aa3cdce920646dc31d5f8d36ae0fafc2b"><div class="ttname"><a href="namespaceafio__v2__xxx.html#aa3cdce920646dc31d5f8d36ae0fafc2b">afio_v2_xxx::async_temp_file</a></div><div class="ttdeci">result&lt; async_file_handle &gt; async_temp_file(io_service &amp;service, async_file_handle::path_view_type name=async_file_handle::path_view_type(), async_file_handle::mode _mode=async_file_handle::mode::write, async_file_handle::creation _creation=async_file_handle::creation::if_needed, async_file_handle::caching _caching=async_file_handle::caching::temporary, async_file_handle::flag flags=async_file_handle::flag::unlink_on_close) noexcept</div><div class="ttdef"><b>Definition:</b> async_file_handle.hpp:386</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -703,10 +703,10 @@ template&lt;class CompletionRoutine &gt; </div>
 </div><div class="memdoc">
 <p><em>Securely</em> create an async file handle creating a temporary anonymous inode in the filesystem referred to by <em>dirpath</em>. The inode created has no name nor accessible path on the filing system and ceases to exist as soon as the last handle is closed, making it ideal for use as a temporary file where other processes do not need to have access to its contents via some path on the filing system (a classic use case is for backing shared memory maps).</p>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX open() or CreateFile() can return. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;{</div>
-<div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespaceafio__v2__xxx.html#a7e32a73d5c84a0b5aefcefe9fb2f5297">async_file_handle::async_temp_inode</a>(std::forward&lt;decltype(service)&gt;(service), std::forward&lt;decltype(dirpath)&gt;(dirpath), std::forward&lt;decltype(_mode)&gt;(_mode), std::forward&lt;decltype(flags)&gt;(flags));</div>
-<div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;}</div>
-<div class="ttc" id="namespaceafio__v2__xxx_html_a7e32a73d5c84a0b5aefcefe9fb2f5297"><div class="ttname"><a href="namespaceafio__v2__xxx.html#a7e32a73d5c84a0b5aefcefe9fb2f5297">afio_v2_xxx::async_temp_inode</a></div><div class="ttdeci">result&lt; async_file_handle &gt; async_temp_inode(io_service &amp;service, async_file_handle::path_view_type dirpath=temporary_files_directory(), async_file_handle::mode _mode=async_file_handle::mode::write, async_file_handle::flag flags=async_file_handle::flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> async_file_handle.hpp:376</div></div>
+<div class="fragment"><div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;{</div>
+<div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespaceafio__v2__xxx.html#a7e32a73d5c84a0b5aefcefe9fb2f5297">async_file_handle::async_temp_inode</a>(std::forward&lt;decltype(service)&gt;(service), std::forward&lt;decltype(dirpath)&gt;(dirpath), std::forward&lt;decltype(_mode)&gt;(_mode), std::forward&lt;decltype(flags)&gt;(flags));</div>
+<div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;}</div>
+<div class="ttc" id="namespaceafio__v2__xxx_html_a7e32a73d5c84a0b5aefcefe9fb2f5297"><div class="ttname"><a href="namespaceafio__v2__xxx.html#a7e32a73d5c84a0b5aefcefe9fb2f5297">afio_v2_xxx::async_temp_inode</a></div><div class="ttdeci">result&lt; async_file_handle &gt; async_temp_inode(io_service &amp;service, async_file_handle::path_view_type dirpath=temporary_files_directory(), async_file_handle::mode _mode=async_file_handle::mode::write, async_file_handle::flag flags=async_file_handle::flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> async_file_handle.hpp:401</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -762,9 +762,9 @@ template&lt;class CompletionRoutine &gt; </div>
 </dl>
 <dl class="section user"><dt>Errors returnable</dt><dd>As for write(), plus ENOMEM. </dd></dl>
 <dl class="section user"><dt>Memory Allocations</dt><dd>One calloc, one free. The allocation is unavoidable due to the need to store a type erased completion handler of unknown type. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;{</div>
-<div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.async_write(std::forward&lt;decltype(reqs)&gt;(reqs), std::forward&lt;decltype(completion)&gt;(completion));</div>
-<div class="line"><a name="l00414"></a><span class="lineno">  414</span>&#160;}</div>
+<div class="fragment"><div class="line"><a name="l00437"></a><span class="lineno">  437</span>&#160;{</div>
+<div class="line"><a name="l00438"></a><span class="lineno">  438</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.async_write(std::forward&lt;decltype(reqs)&gt;(reqs), std::forward&lt;decltype(completion)&gt;(completion));</div>
+<div class="line"><a name="l00439"></a><span class="lineno">  439</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
