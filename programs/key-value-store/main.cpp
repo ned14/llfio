@@ -96,7 +96,7 @@ void benchmark(key_value_store::basic_key_value_store &store, const char *desc)
     std::cout << "  Generating 1M key-value pairs ..." << std::endl;
     for(size_t n = 0; n < 1000000; n++)
     {
-      std::string randomvalue = AFIO_V2_NAMESPACE::utils::random_string(1024 / 2);
+      std::string randomvalue = AFIO_V2_NAMESPACE::utils::random_string(64 / 2);
       values.push_back({100 + n, randomvalue});
     }
   }
@@ -227,7 +227,7 @@ int main()
     }
     {
       key_value_store::basic_key_value_store store("teststore", 2000000);
-      benchmark(store, "no integrity, no durability, commit appends");
+      benchmark(store, "no integrity, no durability, read + append");
     }
     {
       std::error_code ec;
@@ -235,7 +235,7 @@ int main()
     }
     {
       key_value_store::basic_key_value_store store("teststore", 2000000, true);
-      benchmark(store, "integrity, no durability, commit appends");
+      benchmark(store, "integrity, no durability, read + append");
     }
     {
       std::error_code ec;
@@ -243,8 +243,8 @@ int main()
     }
     {
       key_value_store::basic_key_value_store store("teststore", 2000000);
-      store.use_mmaps_for_commit(true);
-      benchmark(store, "no integrity, no durability, commit mmaps");
+      store.use_mmaps();
+      benchmark(store, "no integrity, no durability, mmaps");
     }
     {
       std::error_code ec;
@@ -252,26 +252,8 @@ int main()
     }
     {
       key_value_store::basic_key_value_store store("teststore", 2000000, true);
-      store.use_mmaps_for_commit(true);
-      benchmark(store, "integrity, no durability, commit mmaps");
-    }
-    {
-      std::error_code ec;
-      AFIO_V2_NAMESPACE::filesystem::remove_all("teststore", ec);
-    }
-    {
-      key_value_store::basic_key_value_store store("teststore", 2000000);
-      store.use_mmaps_for_fetch();
-      benchmark(store, "no integrity, no durability, commit appends, fetch mmaps");
-    }
-    {
-      std::error_code ec;
-      AFIO_V2_NAMESPACE::filesystem::remove_all("teststore", ec);
-    }
-    {
-      key_value_store::basic_key_value_store store("teststore", 2000000, true);
-      store.use_mmaps_for_fetch();
-      benchmark(store, "integrity, no durability, commit appends, fetch mmaps");
+      store.use_mmaps();
+      benchmark(store, "integrity, no durability, mmaps");
     }
     {
       std::error_code ec;
@@ -279,8 +261,8 @@ int main()
     }
     {
       key_value_store::basic_key_value_store store("teststore", 2000000, true, AFIO_V2_NAMESPACE::file_handle::mode::write, AFIO_V2_NAMESPACE::file_handle::caching::reads);
-      store.use_mmaps_for_commit(true);
-      benchmark(store, "integrity, durability, commit mmaps");
+      store.use_mmaps();
+      benchmark(store, "integrity, durability, mmaps");
     }
   }
   catch(const std::exception &e)

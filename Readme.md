@@ -6,13 +6,9 @@ Tarballs of source and prebuilt binaries for Linux x64 and Windows x64: http://m
 
 
 ### Immediate todos in order of priority:
+- [ ] Coroutines TS support for `async_file_handle` as soon as MSVC can compile AFIO again.
 - [ ] `atomic_append` isn't actually being tested in shared_fs_mutex
-- [ ] Implement the long planned ACID key-value BLOB store
-with a very simple engine based on atomic renames and send it to Boost for peer review.
-  - You may need compression, https://github.com/johnezang/pithy looks easily convertible
-into header-only C++ and has a snappy-like performance to compression ratio. Make sure
-you merge the bug fixes from the forks first.
-
+- [ ] Implement a non-toy ACID key-value BLOB store and send it to Boost for peer review.
 - [ ] All time based kernel tests need to use soak test based API and auto adjust to
 valgrind.
 - [ ] In DEBUG builds, have io_handle always not fill buffers passed to remind
@@ -181,6 +177,9 @@ into a single file, then update the map in a single shot, then hole punch all th
 other small files.
 - Live resizing the open hash map I think is impossible however unless we use that
 atomic swapping design.
+- You may need compression, https://github.com/johnezang/pithy looks easily convertible
+into header-only C++ and has a snappy-like performance to compression ratio. Make sure
+you merge the bug fixes from the forks first.
 
 ## Commits and tags in this git repository can be verified using:
 <pre>

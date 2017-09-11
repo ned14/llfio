@@ -188,6 +188,10 @@ Todo thereafter:
 | ✔ |   |   | Reliable directory hierarchy update (two and three way) algorithm.
 | ✔ |   |   | Algorithm to replace all duplicate content with hard links.
 | ✔ |   |   | Algorithm to figure out all paths for a hard linked inode.
+| ✔ |   |   | Algorithm to compare two or three directory enumerations and give differences. Probably blocked on the Ranges TS.
+
+Features possibly to be added after a Boost peer review:
+- Directory change monitoring.
 
 
 <table width="100%" border="0" cellpadding="4">
