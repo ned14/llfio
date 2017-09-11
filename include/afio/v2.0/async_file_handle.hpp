@@ -35,6 +35,16 @@ AFIO_V2_NAMESPACE_EXPORT_BEGIN
 /*! \class async_file_handle
 \brief An asynchronous handle to an open something
 
+\note Unlike the others, `async_file_handle` defaults to `only_metadata` caching as that is the
+only use case where using async i/o makes sense given the other options below.
+
+<table>
+<tr><th></th><th>Cost of opening</th><th>Cost of i/o</th><th>Concurrency and Atomicity</th><th>Other remarks</th></tr>
+<tr><td>`file_handle`</td><td>Least</td><td>Syscall</td><td>POSIX guarantees (usually)</td><td>Least gotcha</td></tr>
+<tr><td>`async_file_handle`</td><td>More</td><td>Most (syscall + malloc/free + reactor)</td><td>POSIX guarantees (usually)</td><td>Makes no sense to use with cached i/o as it's a very expensive way to call `memcpy()`</td></tr>
+<tr><td>`mapped_file_handle`</td><td>Most</td><td>Least</td><td>None</td><td>Cannot be used with uncached i/o</td></tr>
+</table>
+
 \todo Direct use of `calloc()` ought to be replaced with a user supplied STL allocator instance.
 */
 class AFIO_DECL async_file_handle : public file_handle
@@ -107,7 +117,7 @@ public:
   \errors Any of the values POSIX open() or CreateFile() can return.
   */
   AFIO_MAKE_FREE_FUNCTION
-  static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<async_file_handle> async_file(io_service &service, const path_handle &base, path_view_type _path, mode _mode = mode::read, creation _creation = creation::open_existing, caching _caching = caching::all, flag flags = flag::none) noexcept
+  static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<async_file_handle> async_file(io_service &service, const path_handle &base, path_view_type _path, mode _mode = mode::read, creation _creation = creation::open_existing, caching _caching = caching::only_metadata, flag flags = flag::none) noexcept
   {
     // Open it overlapped, otherwise no difference.
     OUTCOME_TRY(v, file_handle::file(std::move(base), std::move(_path), std::move(_mode), std::move(_creation), std::move(_caching), flags | flag::overlapped));
@@ -118,14 +128,12 @@ public:
 
   /*! Create an async file handle creating a randomly named file on a path.
   The file is opened exclusively with `creation::only_if_not_exist` so it
-  will never collide with nor overwrite any existing file. Note also
-  that caching defaults to temporary which hints to the OS to only
-  flush changes to physical storage as lately as possible.
+  will never collide with nor overwrite any existing file.
 
   \errors Any of the values POSIX open() or CreateFile() can return.
   */
   AFIO_MAKE_FREE_FUNCTION
-  static inline result<async_file_handle> async_random_file(io_service &service, const path_handle &dirpath, mode _mode = mode::write, caching _caching = caching::temporary, flag flags = flag::none) noexcept
+  static inline result<async_file_handle> async_random_file(io_service &service, const path_handle &dirpath, mode _mode = mode::write, caching _caching = caching::only_metadata, flag flags = flag::none) noexcept
   {
     try
     {
@@ -159,7 +167,7 @@ public:
   \errors Any of the values POSIX open() or CreateFile() can return.
   */
   AFIO_MAKE_FREE_FUNCTION
-  static inline result<async_file_handle> async_temp_file(io_service &service, path_view_type name = path_view_type(), mode _mode = mode::write, creation _creation = creation::if_needed, caching _caching = caching::temporary, flag flags = flag::unlink_on_close) noexcept
+  static inline result<async_file_handle> async_temp_file(io_service &service, path_view_type name = path_view_type(), mode _mode = mode::write, creation _creation = creation::if_needed, caching _caching = caching::only_metadata, flag flags = flag::unlink_on_close) noexcept
   {
     OUTCOME_TRY(tempdirh, path_handle::path(temporary_files_directory()));
     return name.empty() ? async_random_file(service, tempdirh, _mode, _caching, flags) : async_file(service, tempdirh, name, _mode, _creation, _caching, flags);
@@ -313,7 +321,7 @@ public:
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<buffers_type> read(io_request<buffers_type> reqs, deadline d = deadline()) noexcept override;
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> write(io_request<const_buffers_type> reqs, deadline d = deadline()) noexcept override;
 
-#if 0//def __cpp_coroutines
+#if 0  // def __cpp_coroutines
   //! An   
   template<class BuffersType> struct awaitable
   {
@@ -323,7 +331,7 @@ public:
 #endif
 };
 
-#if 0//def __cpp_coroutines
+#if 0  // def __cpp_coroutines
 auto operator co_await(async_file_handle::awaitable &&a)
 {
   struct Awaiter { 

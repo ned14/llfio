@@ -161,14 +161,12 @@ namespace key_value_store
     friend class transaction;
     afio::file_handle _indexfile;
     afio::file_handle _mysmallfile;  // append only
-    afio::map_handle _mysmallfilemapped;
     afio::file_handle::extent_guard _indexfileguard, _smallfileguard;
     size_t _mysmallfileidx{(size_t) -1};
     struct
     {
-      std::vector<afio::file_handle> read;
-      std::vector<afio::section_handle> section;
-      std::vector<afio::map_handle> map;
+      std::vector<afio::file_handle> blocking;
+      std::vector<afio::mapped_file_handle> mapped;
     } _smallfiles;
     optional<index::open_hash_index> _index;
     index::index *_indexheader{nullptr};
@@ -195,11 +193,11 @@ namespace key_value_store
       mode
 #endif
       ;
-      if(_smallfiles.read.empty())
+      if(_smallfiles.blocking.empty())
       {
         // Open the small files, choosing the first unclaimed small file as "mine"
         std::string name;
-        _smallfiles.read.reserve(48);
+        _smallfiles.blocking.reserve(48);
         for(size_t n = 0; n < 48; n++)
         {
           name = std::to_string(n);
@@ -218,8 +216,8 @@ namespace key_value_store
                 _mysmallfile.set_append_only(true).value();
                 _smallfileguard = std::move(smallfileclaimed).value();
                 _mysmallfileidx = n;
-                _smallfiles.read.push_back(std::move(fh).value());
-                _smallfileguard.set_handle(&_smallfiles.read.back());
+                _smallfiles.blocking.push_back(std::move(fh).value());
+                _smallfileguard.set_handle(&_smallfiles.blocking.back());
                 claimed = true;
               }
             }
@@ -229,7 +227,7 @@ namespace key_value_store
               // We really need this to only have read only perms, otherwise any mmaps will extend the file ludicrously
               fh = afio::file_handle::file(dir, name, afio::file_handle::mode::read, afio::file_handle::creation::open_existing, afio::file_handle::caching::all, afio::file_handle::flag::disable_prefetching);
 #endif
-              _smallfiles.read.push_back(std::move(fh).value());
+              _smallfiles.blocking.push_back(std::move(fh).value());
             }
             continue;
           }
@@ -253,7 +251,7 @@ namespace key_value_store
         // Set up the index, either r/w or read only with copy on write
         afio::section_handle::flag mapflags = (mode == afio::file_handle::mode::write) ? afio::section_handle::flag::readwrite : (afio::section_handle::flag::read | afio::section_handle::flag::cow);
         afio::section_handle sh = afio::section_handle::section(_indexfile, 0, mapflags).value();
-        afio::file_handle::extent_type len = sh.length();
+        afio::file_handle::extent_type len = sh.length().value();
         len -= sizeof(index::index);
         len /= sizeof(index::open_hash_index::value_type);
         size_t offset = sizeof(index::index);
@@ -375,11 +373,6 @@ namespace key_value_store
     these circumstances, one can instead use a memory map of the end of the smallfile to append
     the small objects. This can cause the kernel to not flush the map to storage until the map is
     destroyed, but it also avoids the read-modify-write cycle with synchronous i/o.
-
-    Be aware that memory mapping off the end of a file being modified has historically been
-    full of quirks, race conditions and bugs in major OS kernels. Everything from data loss,
-    data corruption, denial of service and root privilege exploits have been found from the
-    unexpected interactions between memory maps and a moving end of file.
     */
     void use_mmaps_for_commit(bool v)
     {
@@ -408,24 +401,14 @@ namespace key_value_store
     {
       if(_mmap_over_extension != 0)
         return;
-      _smallfiles.section.reserve(_smallfiles.read.size());
-      _smallfiles.map.reserve(_smallfiles.read.size());
-      for(size_t n = 0; n < _smallfiles.read.size(); n++)
+      _smallfiles.mapped.reserve(_smallfiles.blocking.size());
+      for(size_t n = 0; n < _smallfiles.blocking.size(); n++)
       {
-        auto currentlength = _smallfiles.read[n].length().value();
-        _smallfiles.section.push_back(afio::section_handle::section(_smallfiles.read[n], currentlength,
-#ifdef _WIN32
-                                                                    // Yes this is confusing. But for some reason, Windows won't permit overextended views on read only sections.
-                                                                    // And somehow or other, Windows permits read/write sections on read only files. Which makes zero sense.
-                                                                    afio::section_handle::flag::readwrite
-#else
-                                                                    afio::section_handle::flag::read
-#endif
-                                                                    )
-                                      .value());
-        // The nocommit allows us to reserve all the address space now, and to fill in mapped data later as the file extends
-        _smallfiles.map.push_back(afio::map_handle::map(_smallfiles.section.back(), currentlength + overextension, 0, afio::section_handle::flag::nocommit | afio::section_handle::flag::read).value());
+        auto currentlength = _smallfiles.blocking[n].length().value();
+        _smallfiles.mapped.push_back(afio::mapped_file_handle(std::move(_smallfiles.blocking[n]), currentlength + overextension));
       }
+      _smallfileguard.set_handle(&_smallfiles.mapped[_mysmallfileidx]);
+      _smallfiles.blocking.clear();
       _mmap_over_extension = overextension;
     }
 
@@ -519,27 +502,27 @@ namespace key_value_store
           return keyvalue_info(key);
         }
         size_t length = item.length, smallfilelength = _pad_length(length);
-        if(item.value_identifier >= _smallfiles.read.size())
+        if(item.value_identifier >= _smallfiles.blocking.size() && item.value_identifier >= _smallfiles.mapped.size())
         {
           // TODO: Open newly created smallfiles
           abort();
         }
         char *buffer;
-        bool free_on_destruct = _smallfiles.map.empty() || !_smallfiles.map[item.value_identifier].is_valid();
+        bool free_on_destruct = _smallfiles.mapped.empty();
         if(!free_on_destruct)
         {
-          if(item.value_offset * 64 > _smallfiles.section[item.value_identifier].length())
+          auto mappedlength = _smallfiles.mapped[item.value_identifier].length().value();
+          if(item.value_offset * 64 > mappedlength)
           {
-            auto oldsize = _smallfiles.section[item.value_identifier].length();
-            auto newsize = _smallfiles.read[item.value_identifier].length().value();
-            // Resize the memory section to the current size of the file
-            _smallfiles.section[item.value_identifier].truncate(newsize).value();
-            // Commit the newly mapped pages
-            afio::map_handle::buffer_type bt{_smallfiles.map[item.value_identifier].address() + oldsize, newsize - oldsize};
-            bt.data = afio::utils::round_up_to_page_size(bt.data);
-            _smallfiles.map[item.value_identifier].commit(bt, afio::section_handle::flag::read).value();
+            // Update mapping to match the underlying file
+            mappedlength = _smallfiles.mapped[item.value_identifier].update_map().value();
+            if(mappedlength > _smallfiles.mapped[item.value_identifier].capacity())
+            {
+              // Need to remap into a new space
+              mappedlength = _smallfiles.mapped[item.value_identifier].reserve(mappedlength + _mmap_over_extension).value();
+            }
           }
-          buffer = _smallfiles.map[item.value_identifier].address() + item.value_offset * 64 - smallfilelength;
+          buffer = _smallfiles.mapped[item.value_identifier].address() + item.value_offset * 64 - smallfilelength;
         }
         else
         {
@@ -548,7 +531,7 @@ namespace key_value_store
           {
             throw std::bad_alloc();
           }
-          _smallfiles.read[item.value_identifier].read(item.value_offset * 64 - smallfilelength, buffer, smallfilelength).value();
+          _smallfiles.blocking[item.value_identifier].read(item.value_offset * 64 - smallfilelength, buffer, smallfilelength).value();
         }
         index::value_tail *vt = reinterpret_cast<index::value_tail *>(buffer + smallfilelength - sizeof(index::value_tail));
         if(_indexheader->contents_hashed || _indexheader->key_is_hash_of_value)

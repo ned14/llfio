@@ -13,7 +13,7 @@ benchmarks fare.
 - [x] Atomic append should issue gather buffers of `IOV_MAX`
 - [x] Optionally use mmaps to extend smallfile instead of atomic appends.
 Likely highly racy on Linux due to kernel bugs :)
-- [ ] Use mmaps for all smallfiles
+- [x] Use mmaps for all smallfiles
   - Windows x64 provides 128Tb of address space
   - Linux x64 provides 128Tb of address space
   - On adoption of smallfile, would need to parse backwards from end to
@@ -25,24 +25,45 @@ into new small file, update index to use new small file)
 index update.
 
 ## Benchmarks:
-- 1Kb values Windows with NTFS, no integrity, no durability:
+- 1Kb values Windows with NTFS, no integrity, no durability, commit appends, fetch read:
   ```
   Inserting 1M key-value pairs ...
-  Inserted at 157183 items per sec
+  Inserted at 195312 items per sec
   Retrieving 1M key-value pairs ...
   Fetched at 612745 items per sec
   ```
-- 1Kb values Windows with NTFS, integrity, no durability:
+- 1Kb values Windows with NTFS, integrity, no durability, commit appends, fetch read:
   ```
   Inserting 1M key-value pairs ...
-  Inserted at 145053 items per sec
+  Inserted at 188572 items per sec
   Retrieving 1M key-value pairs ...
   Fetched at 542005 items per sec
   ```
-- 1Kb values Windows with NTFS, integrity, durability:
+- 1Kb values Windows with NTFS, no integrity, no durability, commit appends, fetch mmaps:
+  ```
+  Inserting 1M key-value pairs ...
+  Inserted at 193012 items per sec
+  Retrieving 1M key-value pairs ...
+  Fetched at 2207505 items per sec
+  ```
+- 1Kb values Windows with NTFS, integrity, no durability, commit appends, fetch mmaps:
+  ```
+  Inserting 1M key-value pairs ...
+  Inserted at 185666 items per sec
+  Retrieving 1M key-value pairs ...
+  Fetched at 1438848 items per sec
+  ```
+- 1Kb values Windows with NTFS, integrity, durability, commit appends, fetch read:
   ```
   Inserting 1M key-value pairs ...
   Inserted at 32379 items per sec
+  Retrieving 1M key-value pairs ...
+  Fetched at 549752 items per sec
+  ```
+- 1Kb values Windows with NTFS, integrity, durability, commit mmaps, fetch read:
+  ```
+  Inserting 1M key-value pairs ...
+  Inserted at 87282 items per sec
   Retrieving 1M key-value pairs ...
   Fetched at 549752 items per sec
   ```

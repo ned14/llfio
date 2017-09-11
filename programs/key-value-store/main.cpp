@@ -227,7 +227,6 @@ int main()
     }
     {
       key_value_store::basic_key_value_store store("teststore", 2000000);
-      store.use_mmaps_for_fetch();
       benchmark(store, "no integrity, no durability, commit appends");
     }
     {
@@ -262,9 +261,8 @@ int main()
     }
     {
       key_value_store::basic_key_value_store store("teststore", 2000000);
-      store.use_mmaps_for_commit(true);
       store.use_mmaps_for_fetch();
-      benchmark(store, "no integrity, no durability, commit mmaps, fetch mmaps");
+      benchmark(store, "no integrity, no durability, commit appends, fetch mmaps");
     }
     {
       std::error_code ec;
@@ -272,9 +270,8 @@ int main()
     }
     {
       key_value_store::basic_key_value_store store("teststore", 2000000, true);
-      store.use_mmaps_for_commit(true);
       store.use_mmaps_for_fetch();
-      benchmark(store, "integrity, no durability, commit mmaps, fetch mmaps");
+      benchmark(store, "integrity, no durability, commit appends, fetch mmaps");
     }
     {
       std::error_code ec;
