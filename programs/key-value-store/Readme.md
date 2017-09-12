@@ -51,21 +51,50 @@ index update.
   Fetched at 1144164 items per sec
   ```
 
-- 1Kb values Linux with ext4, no integrity, no durability:
+- 1Kb values Linux with ext4, no integrity, no durability, read + append:
   ```
   Inserting 1M key-value pairs ...
-  Inserted at 656598 items per sec
+  Inserted at 698324 items per sec
   Retrieving 1M key-value pairs ...
-  Fetched at 1945525 items per sec
+  Fetched at 2544529 items per sec
   ```
-- 1Kb values Linux with ext4, integrity, no durability:
+- 1Kb values Linux with ext4, integrity, no durability, read + append:
   ```
   Inserting 1M key-value pairs ...
-  Inserted at 581057 items per sec
+  Inserted at 660501 items per sec
   Retrieving 1M key-value pairs ...
-  Fetched at 1519756 items per sec
+  Fetched at 1934235 items per sec
+  ```
+- 1Kb values Linux with ext4, no integrity, no durability, mmaps:
+  ```
+  Inserting 1M key-value pairs ...
+  Inserted at 695894 items per sec
+  Retrieving 1M key-value pairs ...
+  Fetched at 5988023 items per sec
+  ```
+- 1Kb values Linux with ext4, integrity, no durability, mmaps:
+  ```
+  Inserting 1M key-value pairs ...
+  Inserted at 639795 items per sec
+  Retrieving 1M key-value pairs ...
+  Fetched at 458715 items per sec
   ```
   
+- 1Kb values Windows with NTFS, integrity, durability, mmaps:
+  ```
+  Inserting 1M key-value pairs ...
+  Inserted at 33387 items per sec
+  Retrieving 1M key-value pairs ...
+  Fetched at 1360544 items per sec
+  ```
+- 1Kb values Linux with ext4, integrity, durability, mmaps:
+  ```
+  Inserting 1M key-value pairs ...
+  Inserted at 85397 items per sec
+  Retrieving 1M key-value pairs ...
+  Fetched at 781250 items per sec
+  ```
+
 - 16 byte values Windows with NTFS, no integrity, no durability, read + append:
   ```
   Inserting 1M key-value pairs ...
@@ -83,7 +112,14 @@ index update.
 - 16 byte values Linux with ext4, no integrity, no durability, read + append:
   ```
   Inserting 1M key-value pairs ...
-  Inserted at 1118568 items per sec
+  Inserted at 1400560 items per sec
   Retrieving 1M key-value pairs ...
-  Fetched at 2898550 items per sec
+  Fetched at 3816793 items per sec
+  ```
+- 16 byte values Linux with ext4, no integrity, no durability, mmaps:
+  ```
+  Inserting 1M key-value pairs ...
+  Inserted at 1663893 items per sec
+  Retrieving 1M key-value pairs ...
+  Fetched at 26315789 items per sec
   ```
