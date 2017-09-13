@@ -69,8 +69,8 @@ truncate(fh, 1024).value();
 // Begin to asynchronously write "hello world" into the file at offset 0,
 // suspending execution of this coroutine until completion and then resuming
 // execution. Requires the Coroutines TS.
-char buffer[] = "hello world";
-co_await co_write(fh, {{buffer, sizeof(buffer)}, 0}).value();
+alignas(4096) char buffer[] = "hello world";
+co_await co_write(fh, {{{buffer, sizeof(buffer)}}, 0}).value();
 \endcode
 </td>
 </tr>
