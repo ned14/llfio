@@ -349,49 +349,50 @@ public:
 
 #if defined(__cpp_coroutines) || defined(DOXYGEN_IS_IN_THE_HOUSE)
 private:
-  template <class CompletionRoutine> result<io_state_ptr<CompletionRoutine, const_buffers_type>> _call_read_write(io_request<const_buffers_type> reqs, CompletionRoutine &&completion) noexcept { return async_write(reqs, std::forward<CompletionRoutine>(completion)); }
-  template <class CompletionRoutine> result<io_state_ptr<CompletionRoutine, buffers_type>> _call_read_write(io_request<buffers_type> reqs, CompletionRoutine &&completion) noexcept { return async_read(reqs, std::forward<CompletionRoutine>(completion)); }
+  template <class BuffersType> class awaitable_state
+  {
+    friend class async_file_handle;
+    optional<coroutine_handle<>> _suspended;
+    optional<io_result<BuffersType>> _result;
+
+    // Called on completion of the i/o
+    void operator()(async_file_handle * /*unused*/, io_result<BuffersType> &result)
+    {
+      // store the result and resume the coroutine
+      _result = std::move(result);
+      if(_suspended)
+      {
+        _suspended->resume();
+      }
+    }
+  };
+
+public:
   //! Type sugar to tell `co_await` what to do
   template <class BuffersType> class awaitable
   {
     friend class async_file_handle;
-    async_file_handle *_parent;
-    io_request<BuffersType> _reqs;
-    erased_io_state_ptr _state;
-    optional<io_result<BuffersType>> _result;
+    io_state_ptr<awaitable_state<BuffersType>, BuffersType> _state;
 
-    constexpr awaitable(async_file_handle *parent, io_request<BuffersType> reqs)
-        : _parent(parent)
-        , _reqs(reqs)
+    awaitable(io_state_ptr<awaitable_state<BuffersType>, BuffersType> state)
+        : _state(std::move(state))
     {
     }
 
   public:
-    bool await_ready() { return false; }
-    void await_suspend(coroutine_handle<> co)
-    {
-      auto r = _parent->_call_read_write(_reqs, [this, co](async_file_handle * /*unused*/, io_result<BuffersType> &result) {
-        // store the result and resume the coroutine
-        _result = std::move(result);
-        co.resume();
-      });
-      if(r)
-      {
-        _state = erase(std::move(r).value());
-      }
-      else
-      {
-        _result = {r.error()};
-        co.resume();
-      }
-    }
-    io_result<BuffersType> await_resume() { return std::move(*_result); }
+    //! Called by `co_await` to determine whether to suspend the coroutine.
+    bool await_ready() { return _state->completion._result.has_value(); }
+    //! Called by `co_await` to suspend the coroutine.
+    void await_suspend(coroutine_handle<> co) { _state->completion._suspended = co; }
+    //! Called by `co_await` after resuming the coroutine to return a value.
+    io_result<BuffersType> await_resume() { return std::move(*_state->completion._result); }
   };
 
 public:
-  /*! \brief Suspend this coroutine to perform a read, resuming on completion.
+  /*! \brief Schedule a read to occur asynchronously.
 
-  \return An awaitable, which when `co_await`ed upon, returns the buffers read, which may
+  \return An awaitable, which when `co_await`ed upon, suspends execution of the coroutine
+  until the operation has completed, resuming with the buffers read, which may
   not be the buffers input. The size of each scatter-gather buffer is updated with the number
   of bytes of that buffer transferred, and the pointer to the data may be \em completely
   different to what was submitted (e.g. it may point into a memory map).
@@ -400,11 +401,16 @@ public:
   \mallocs One calloc, one free.
   */
   AFIO_MAKE_FREE_FUNCTION
-  awaitable<buffers_type> co_read(io_request<buffers_type> reqs) noexcept { return {this, reqs}; }
+  result<awaitable<buffers_type>> co_read(io_request<buffers_type> reqs) noexcept
+  {
+    OUTCOME_TRY(r, async_read(reqs, awaitable_state<buffers_type>()));
+    return awaitable<buffers_type>(std::move(r));
+  }
 
-  /*! \brief Suspend this coroutine to perform a write, resuming on completion.
+  /*! \brief Schedule a write to occur asynchronously
 
-  \return An awaitable, which when `co_await`ed upon, returns the buffers written, which
+  \return An awaitable, which when `co_await`ed upon, suspends execution of the coroutine
+  until the operation has completed, resuming with the buffers written, which
   may not be the buffers input. The size of each scatter-gather buffer is updated with
   the number of bytes of that buffer transferred.
   \param reqs A scatter-gather and offset request.
@@ -412,7 +418,11 @@ public:
   \mallocs One calloc, one free.
   */
   AFIO_MAKE_FREE_FUNCTION
-  awaitable<const_buffers_type> co_write(io_request<const_buffers_type> reqs) noexcept { return {this, reqs}; }
+  result<awaitable<const_buffers_type>> co_write(io_request<const_buffers_type> reqs) noexcept
+  {
+    OUTCOME_TRY(r, async_write(reqs, awaitable_state<const_buffers_type>()));
+    return awaitable<const_buffers_type>(std::move(r));
+  }
 #endif
 };
 
@@ -424,24 +434,29 @@ inline void swap(async_file_handle &self, async_file_handle &o) noexcept
 }
 /*! Create an async file handle opening access to a file on path
 using the given io_service.
+\param service The `io_service` to use.
+\param base Handle to a base location on the filing system. Pass `{}` to indicate that path will be absolute.
+\param _path The path relative to base to open.
+\param _mode How to open the file.
+\param _creation How to create the file.
+\param _caching How to ask the kernel to cache the file.
+\param flags Any additional custom behaviours.
 
 \errors Any of the values POSIX open() or CreateFile() can return.
 */
 inline result<async_file_handle> async_file(io_service &service, const path_handle &base, async_file_handle::path_view_type _path, async_file_handle::mode _mode = async_file_handle::mode::read, async_file_handle::creation _creation = async_file_handle::creation::open_existing,
-                                            async_file_handle::caching _caching = async_file_handle::caching::all, async_file_handle::flag flags = async_file_handle::flag::none) noexcept
+                                            async_file_handle::caching _caching = async_file_handle::caching::only_metadata, async_file_handle::flag flags = async_file_handle::flag::none) noexcept
 {
   return async_file_handle::async_file(std::forward<decltype(service)>(service), std::forward<decltype(base)>(base), std::forward<decltype(_path)>(_path), std::forward<decltype(_mode)>(_mode), std::forward<decltype(_creation)>(_creation), std::forward<decltype(_caching)>(_caching),
                                        std::forward<decltype(flags)>(flags));
 }
 /*! Create an async file handle creating a randomly named file on a path.
 The file is opened exclusively with `creation::only_if_not_exist` so it
-will never collide with nor overwrite any existing file. Note also
-that caching defaults to temporary which hints to the OS to only
-flush changes to physical storage as lately as possible.
+will never collide with nor overwrite any existing file.
 
 \errors Any of the values POSIX open() or CreateFile() can return.
 */
-inline result<async_file_handle> async_random_file(io_service &service, const path_handle &dirpath, async_file_handle::mode _mode = async_file_handle::mode::write, async_file_handle::caching _caching = async_file_handle::caching::temporary, async_file_handle::flag flags = async_file_handle::flag::none) noexcept
+inline result<async_file_handle> async_random_file(io_service &service, const path_handle &dirpath, async_file_handle::mode _mode = async_file_handle::mode::write, async_file_handle::caching _caching = async_file_handle::caching::only_metadata, async_file_handle::flag flags = async_file_handle::flag::none) noexcept
 {
   return async_file_handle::async_random_file(std::forward<decltype(service)>(service), std::forward<decltype(dirpath)>(dirpath), std::forward<decltype(_mode)>(_mode), std::forward<decltype(_caching)>(_caching), std::forward<decltype(flags)>(flags));
 }
@@ -461,7 +476,7 @@ to use. Use `temp_inode()` instead, it is far more secure.
 \errors Any of the values POSIX open() or CreateFile() can return.
 */
 inline result<async_file_handle> async_temp_file(io_service &service, async_file_handle::path_view_type name = async_file_handle::path_view_type(), async_file_handle::mode _mode = async_file_handle::mode::write, async_file_handle::creation _creation = async_file_handle::creation::if_needed,
-                                                 async_file_handle::caching _caching = async_file_handle::caching::temporary, async_file_handle::flag flags = async_file_handle::flag::unlink_on_close) noexcept
+                                                 async_file_handle::caching _caching = async_file_handle::caching::only_metadata, async_file_handle::flag flags = async_file_handle::flag::unlink_on_close) noexcept
 {
   return async_file_handle::async_temp_file(std::forward<decltype(service)>(service), std::forward<decltype(name)>(name), std::forward<decltype(_mode)>(_mode), std::forward<decltype(_creation)>(_creation), std::forward<decltype(_caching)>(_caching), std::forward<decltype(flags)>(flags));
 }
@@ -514,6 +529,39 @@ template <class CompletionRoutine> inline result<async_file_handle::io_state_ptr
 {
   return self.async_write(std::forward<decltype(reqs)>(reqs), std::forward<decltype(completion)>(completion));
 }
+#if defined(__cpp_coroutines) || defined(DOXYGEN_IS_IN_THE_HOUSE)
+/*! \brief Schedule a read to occur asynchronously.
+
+\return An awaitable, which when `co_await`ed upon, suspends execution of the coroutine
+until the operation has completed, resuming with the buffers read, which may
+not be the buffers input. The size of each scatter-gather buffer is updated with the number
+of bytes of that buffer transferred, and the pointer to the data may be \em completely
+different to what was submitted (e.g. it may point into a memory map).
+\param self The object whose member function to call.
+\param reqs A scatter-gather and offset request.
+\errors As for read(), plus ENOMEM.
+\mallocs One calloc, one free.
+*/
+inline result<async_file_handle::awaitable<async_file_handle::buffers_type>> co_read(async_file_handle &self, async_file_handle::io_request<async_file_handle::buffers_type> reqs) noexcept
+{
+  return self.co_read(std::forward<decltype(reqs)>(reqs));
+}
+/*! \brief Schedule a write to occur asynchronously
+
+\return An awaitable, which when `co_await`ed upon, suspends execution of the coroutine
+until the operation has completed, resuming with the buffers written, which
+may not be the buffers input. The size of each scatter-gather buffer is updated with
+the number of bytes of that buffer transferred.
+\param self The object whose member function to call.
+\param reqs A scatter-gather and offset request.
+\errors As for write(), plus ENOMEM.
+\mallocs One calloc, one free.
+*/
+inline result<async_file_handle::awaitable<async_file_handle::const_buffers_type>> co_write(async_file_handle &self, async_file_handle::io_request<async_file_handle::const_buffers_type> reqs) noexcept
+{
+  return self.co_write(std::forward<decltype(reqs)>(reqs));
+}
+#endif
 // END make_free_functions.py
 
 AFIO_V2_NAMESPACE_END

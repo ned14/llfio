@@ -277,11 +277,16 @@ inline void swap(file_handle &self, file_handle &o) noexcept
   return self.swap(std::forward<decltype(o)>(o));
 }
 /*! Create a file handle opening access to a file on path
+\param base Handle to a base location on the filing system. Pass `{}` to indicate that path will be absolute.
+\param _path The path relative to base to open.
+\param _mode How to open the file.
+\param _creation How to create the file.
+\param _caching How to ask the kernel to cache the file.
+\param flags Any additional custom behaviours.
 
 \errors Any of the values POSIX open() or CreateFile() can return.
 */
-inline result<file_handle> file(const path_handle &base, file_handle::path_view_type _path, file_handle::mode _mode = file_handle::mode::read, file_handle::creation _creation = file_handle::creation::open_existing, file_handle::caching _caching = file_handle::caching::all,
-                                file_handle::flag flags = file_handle::flag::none) noexcept
+inline result<file_handle> file(const path_handle &base, file_handle::path_view_type _path, file_handle::mode _mode = file_handle::mode::read, file_handle::creation _creation = file_handle::creation::open_existing, file_handle::caching _caching = file_handle::caching::all, file_handle::flag flags = file_handle::flag::none) noexcept
 {
   return file_handle::file(std::forward<decltype(base)>(base), std::forward<decltype(_path)>(_path), std::forward<decltype(_mode)>(_mode), std::forward<decltype(_creation)>(_creation), std::forward<decltype(_caching)>(_caching), std::forward<decltype(flags)>(flags));
 }
@@ -312,8 +317,7 @@ to use. Use `temp_inode()` instead, it is far more secure.
 
 \errors Any of the values POSIX open() or CreateFile() can return.
 */
-inline result<file_handle> temp_file(file_handle::path_view_type name = file_handle::path_view_type(), file_handle::mode _mode = file_handle::mode::write, file_handle::creation _creation = file_handle::creation::if_needed, file_handle::caching _caching = file_handle::caching::temporary,
-                                     file_handle::flag flags = file_handle::flag::unlink_on_close) noexcept
+inline result<file_handle> temp_file(file_handle::path_view_type name = file_handle::path_view_type(), file_handle::mode _mode = file_handle::mode::write, file_handle::creation _creation = file_handle::creation::if_needed, file_handle::caching _caching = file_handle::caching::temporary, file_handle::flag flags = file_handle::flag::unlink_on_close) noexcept
 {
   return file_handle::temp_file(std::forward<decltype(name)>(name), std::forward<decltype(_mode)>(_mode), std::forward<decltype(_creation)>(_creation), std::forward<decltype(_caching)>(_caching), std::forward<decltype(flags)>(flags));
 }

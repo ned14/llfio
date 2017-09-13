@@ -29,8 +29,8 @@ Distributed under the Boost Software License, Version 1.0.
 
 static inline void TestAsyncFileHandleCoroutines()
 {
-  namespace afio = AFIO_V2_NAMESPACE;
 #ifdef __cpp_coroutines
+  namespace afio = AFIO_V2_NAMESPACE;
   afio::io_service service;
   afio::async_file_handle h = afio::async_file_handle::async_file(service, {}, "temp", afio::file_handle::mode::write, afio::file_handle::creation::if_needed, afio::file_handle::caching::only_metadata, afio::file_handle::flag::unlink_on_close).value();
   h.truncate(1024 * 4096);
@@ -41,7 +41,7 @@ static inline void TestAsyncFileHandleCoroutines()
     afio::async_file_handle::const_buffer_type bt{buffer};
     for(size_t n = 0; n < 128; n++)
     {
-      auto written = co_await h.co_write({bt, n * 32768 + no * 4096});
+      auto written = co_await h.co_write({bt, n * 32768 + no * 4096}).value();
       written.value();
     }
   };

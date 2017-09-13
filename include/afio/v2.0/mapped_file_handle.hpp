@@ -426,6 +426,82 @@ public:
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> write(io_request<const_buffers_type> reqs, deadline d = deadline()) noexcept override { return _mh.write(std::move(reqs), std::move(d)); }
 };
 
+// BEGIN make_free_functions.py
+//! Swap with another instance
+inline void swap(mapped_file_handle &self, mapped_file_handle &o) noexcept
+{
+  return self.swap(std::forward<decltype(o)>(o));
+}
+/*! Create a memory mapped file handle opening access to a file on path.
+\param reservation The number of bytes to reserve for later expansion when mapping. Zero means reserve only the current file length.
+\param base Handle to a base location on the filing system. Pass `{}` to indicate that path will be absolute.
+\param _path The path relative to base to open.
+\param _mode How to open the file.
+\param _creation How to create the file.
+\param _caching How to ask the kernel to cache the file.
+\param flags Any additional custom behaviours.
+
+Note that if the file is currently zero sized, no mapping occurs now, but
+later when `truncate()` or `update_map()` is called.
+
+\errors Any of the values which the constructors for `file_handle`, `section_handle` and `map_handle` can return.
+*/
+inline result<mapped_file_handle> mapped_file(mapped_file_handle::size_type reservation, const path_handle &base, mapped_file_handle::path_view_type _path, mapped_file_handle::mode _mode = mapped_file_handle::mode::read, mapped_file_handle::creation _creation = mapped_file_handle::creation::open_existing, mapped_file_handle::caching _caching = mapped_file_handle::caching::all, mapped_file_handle::flag flags = mapped_file_handle::flag::none) noexcept
+{
+  return mapped_file_handle::mapped_file(std::forward<decltype(reservation)>(reservation), std::forward<decltype(base)>(base), std::forward<decltype(_path)>(_path), std::forward<decltype(_mode)>(_mode), std::forward<decltype(_creation)>(_creation), std::forward<decltype(_caching)>(_caching), std::forward<decltype(flags)>(flags));
+}
+//! \overload
+inline result<mapped_file_handle> mapped_file(const path_handle &base, mapped_file_handle::path_view_type _path, mapped_file_handle::mode _mode = mapped_file_handle::mode::read, mapped_file_handle::creation _creation = mapped_file_handle::creation::open_existing, mapped_file_handle::caching _caching = mapped_file_handle::caching::all, mapped_file_handle::flag flags = mapped_file_handle::flag::none) noexcept
+{
+  return mapped_file_handle::mapped_file(std::forward<decltype(base)>(base), std::forward<decltype(_path)>(_path), std::forward<decltype(_mode)>(_mode), std::forward<decltype(_creation)>(_creation), std::forward<decltype(_caching)>(_caching), std::forward<decltype(flags)>(flags));
+}
+/*! Create an mapped file handle creating a randomly named file on a path.
+The file is opened exclusively with `creation::only_if_not_exist` so it
+will never collide with nor overwrite any existing file. Note also
+that caching defaults to temporary which hints to the OS to only
+flush changes to physical storage as lately as possible.
+
+\errors Any of the values POSIX open() or CreateFile() can return.
+*/
+inline result<mapped_file_handle> mapped_random_file(mapped_file_handle::size_type reservation, const path_handle &dirpath, mapped_file_handle::mode _mode = mapped_file_handle::mode::write, mapped_file_handle::caching _caching = mapped_file_handle::caching::temporary, mapped_file_handle::flag flags = mapped_file_handle::flag::none) noexcept
+{
+  return mapped_file_handle::mapped_random_file(std::forward<decltype(reservation)>(reservation), std::forward<decltype(dirpath)>(dirpath), std::forward<decltype(_mode)>(_mode), std::forward<decltype(_caching)>(_caching), std::forward<decltype(flags)>(flags));
+}
+/*! Create a mapped file handle creating the named file on some path which
+the OS declares to be suitable for temporary files. Most OSs are
+very lazy about flushing changes made to these temporary files.
+Note the default flags are to have the newly created file deleted
+on first handle close.
+Note also that an empty name is equivalent to calling
+`mapped_random_file(temporary_files_directory())` and the creation
+parameter is ignored.
+
+\note If the temporary file you are creating is not going to have its
+path sent to another process for usage, this is the WRONG function
+to use. Use `temp_inode()` instead, it is far more secure.
+
+\errors Any of the values POSIX open() or CreateFile() can return.
+*/
+inline result<mapped_file_handle> mapped_temp_file(mapped_file_handle::size_type reservation, mapped_file_handle::path_view_type name = mapped_file_handle::path_view_type(), mapped_file_handle::mode _mode = mapped_file_handle::mode::write, mapped_file_handle::creation _creation = mapped_file_handle::creation::if_needed, mapped_file_handle::caching _caching = mapped_file_handle::caching::temporary, mapped_file_handle::flag flags = mapped_file_handle::flag::unlink_on_close) noexcept
+{
+  return mapped_file_handle::mapped_temp_file(std::forward<decltype(reservation)>(reservation), std::forward<decltype(name)>(name), std::forward<decltype(_mode)>(_mode), std::forward<decltype(_creation)>(_creation), std::forward<decltype(_caching)>(_caching), std::forward<decltype(flags)>(flags));
+}
+/*! \em Securely create a mapped file handle creating a temporary anonymous inode in
+the filesystem referred to by \em dirpath. The inode created has
+no name nor accessible path on the filing system and ceases to
+exist as soon as the last handle is closed, making it ideal for use as
+a temporary file where other processes do not need to have access
+to its contents via some path on the filing system (a classic use case
+is for backing shared memory maps).
+
+\errors Any of the values POSIX open() or CreateFile() can return.
+*/
+inline result<mapped_file_handle> mapped_temp_inode(mapped_file_handle::path_view_type dirpath = temporary_files_directory(), mapped_file_handle::mode _mode = mapped_file_handle::mode::write, mapped_file_handle::flag flags = mapped_file_handle::flag::none) noexcept
+{
+  return mapped_file_handle::mapped_temp_inode(std::forward<decltype(dirpath)>(dirpath), std::forward<decltype(_mode)>(_mode), std::forward<decltype(flags)>(flags));
+}
+// END make_free_functions.py
+
 AFIO_V2_NAMESPACE_END
 
 #if AFIO_HEADERS_ONLY == 1 && !defined(DOXYGEN_SHOULD_SKIP_THIS)

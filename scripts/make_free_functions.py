@@ -76,11 +76,13 @@ for header in glob.glob("../include/afio/*/*.hpp"):
             function = replace(function, 'size_type')
             function = replace(function, 'buffers_type')
             function = replace(function, 'const_buffers_type')
+            function = replace(function, 'enumerate_info')
             function = function.replace('path_view_type()', classname+'::path_view_type()')
             function = function.replace(' io_result<', ' '+classname+'::io_result<')
             function = function.replace(' io_request<', ' '+classname+'::io_request<')
             function = function.replace('(io_request<', '('+classname+'::io_request<')
             function = function.replace('<io_state_ptr<', '<'+classname+'::io_state_ptr<')
+            function = function.replace('<awaitable<', '<'+classname+'::awaitable<')
             function = function.replace(' mode ', ' '+classname+'::mode ')
             function = function.replace(' mode::', ' '+classname+'::mode::')
             function = function.replace(' creation ', ' '+classname+'::creation ')
@@ -89,6 +91,8 @@ for header in glob.glob("../include/afio/*/*.hpp"):
             function = function.replace(' caching::', ' '+classname+'::caching::')
             function = function.replace(' flag ', ' '+classname+'::flag ')
             function = function.replace(' flag::', ' '+classname+'::flag::')
+            function = function.replace(' filter ', ' '+classname+'::filter ')
+            function = function.replace(' filter::', ' '+classname+'::filter::')
             if function[-2] == ';':
                 function=function[:-2]
             elif '}' in function:

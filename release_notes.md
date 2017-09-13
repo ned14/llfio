@@ -194,6 +194,7 @@ Todo thereafter:
 
 Features possibly to be added after a Boost peer review:
 - Directory change monitoring.
+- Permissions support (ACLs).
 
 
 <table width="100%" border="0" cellpadding="4">

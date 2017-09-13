@@ -390,7 +390,8 @@ inline void swap(section_handle &self, section_handle &o) noexcept
 }
 /*! \brief Create a memory section.
 \param backing The handle to use as backing storage. An invalid handle means to use the system page file as the backing storage.
-\param maximum_size The maximum size this section can ever be. Zero means to use backing.length().
+\param maximum_size The maximum size this section can ever be. Zero means to use `backing.length()`. This cannot exceed the size
+of any backing file used.
 \param _flag How to create the section.
 
 \errors Any of the values POSIX dup() or NtCreateSection() can return.
@@ -409,11 +410,19 @@ inline result<section_handle> section(section_handle::extent_type maximum_size) 
 {
   return section_handle::section(std::forward<decltype(maximum_size)>(maximum_size));
 }
+//! Return the current maximum permitted extent of the memory section.
+inline result<section_handle::extent_type> length(const section_handle &self) noexcept
+{
+  return self.length();
+}
 /*! Resize the current maximum permitted extent of the memory section to the given extent.
+\param self The object whose member function to call.
+\param newsize The new size of the memory section. Specify zero to use `backing.length()`.
+This cannot exceed the size of any backing file used.
 
 \errors Any of the values NtExtendSection() can return. On POSIX this is a no op.
 */
-inline result<section_handle::extent_type> truncate(section_handle &self, section_handle::extent_type newsize) noexcept
+inline result<section_handle::extent_type> truncate(section_handle &self, section_handle::extent_type newsize = 0) noexcept
 {
   return self.truncate(std::forward<decltype(newsize)>(newsize));
 }
@@ -440,9 +449,9 @@ allocated from a paging file backed section instead, create a page file backed s
 the other constructor. This makes available all those very useful VM tricks Windows can do with section mapped memory which
 VirtualAlloc() memory cannot do.
 
-\errors Any of the values POSIX mmap() or NtMapViewOfSection() can return.
+\errors Any of the values POSIX mmap() or VirtualAlloc() can return.
 */
-inline result<map_handle> map(map_handle::size_type bytes, section_handle::flag _flag = section_handle::flag::read | section_handle::flag::write) noexcept
+inline result<map_handle> map(map_handle::size_type bytes, section_handle::flag _flag = section_handle::flag::readwrite) noexcept
 {
   return map_handle::map(std::forward<decltype(bytes)>(bytes), std::forward<decltype(_flag)>(_flag));
 }
@@ -454,7 +463,7 @@ inline result<map_handle> map(map_handle::size_type bytes, section_handle::flag 
 
 \errors Any of the values POSIX mmap() or NtMapViewOfSection() can return.
 */
-inline result<map_handle> map(section_handle &section, map_handle::size_type bytes = 0, map_handle::extent_type offset = 0, section_handle::flag _flag = section_handle::flag::read | section_handle::flag::write) noexcept
+inline result<map_handle> map(section_handle &section, map_handle::size_type bytes = 0, map_handle::extent_type offset = 0, section_handle::flag _flag = section_handle::flag::readwrite) noexcept
 {
   return map_handle::map(std::forward<decltype(section)>(section), std::forward<decltype(bytes)>(bytes), std::forward<decltype(offset)>(offset), std::forward<decltype(_flag)>(_flag));
 }
@@ -479,7 +488,7 @@ inline map_handle::io_result<map_handle::buffers_type> read(map_handle &self, ma
 {
   return self.read(std::forward<decltype(reqs)>(reqs), std::forward<decltype(d)>(d));
 }
-/*! \brief Write data to the mapped view. Note this will never extend past the current length of the mapped file.
+/*! \brief Write data to the mapped view.
 
 \return The buffers written, which will never be the buffers input because they will point at where the data was copied into the mapped view.
 The size of each scatter-gather buffer is updated with the number of bytes of that buffer transferred.

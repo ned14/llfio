@@ -472,7 +472,9 @@ inline io_handle::io_result<io_handle::buffers_type> read(io_handle &self, io_ha
 the some buffers at the end of the returned buffers may return with zero bytes written.
 For example, with a zeroed deadline, some backends may only consume as many buffers as the system has available write slots
 for, thus for those backends this call is "non-blocking" in the sense that it will return immediately even if it
-could not schedule a single buffer write.
+could not schedule a single buffer write. Another example is that some implementations will not
+auto-extend the length of a file when a write exceeds the maximum extent, you will need to issue
+a `truncate(newsize)` first.
 
 \return The buffers written, which may not be the buffers input. The size of each scatter-gather
 buffer is updated with the number of bytes of that buffer transferred.
@@ -501,7 +503,7 @@ Filing system can and do use different algorithms to give much better performanc
 some (e.g. ZFS) spectacularly better.
 
 \warning Let me repeat again: consider this call to be a **hint** to poke the kernel with a stick to
-go start to do some work sooner rather than later. It may be ignored entirely.
+go start to do some work sooner rather than later. **It may be ignored entirely**.
 
 \warning For portability, you can only assume that barriers write order for a single handle
 instance. You cannot assume that barriers write order across multiple handles to the same inode, or
