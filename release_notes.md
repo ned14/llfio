@@ -21,7 +21,7 @@ source code repository lives at https://github.com/ned14/boost.afio.
 
 - Portable to any conforming C++ 14 compiler with a working Filesystem TS in its STL.
 - Will make use of any Concepts TS if you have them.
-  - (Coroutines TS support is in the works)
+- `async_file_handle` supports `co_await` (Coroutines TS).
 - Provides view adapters into the Ranges TS, so ready for STL2.
 - Original error code is always preserved, even down to the original NT kernel error code if a NT kernel API was used.
 - Race free filesystem design used throughout (i.e. no TOCTOU).
@@ -33,34 +33,35 @@ source code repository lives at https://github.com/ned14/boost.afio.
 Examples of use:
 <table width="100%" border="0" cellpadding="4">
 <tr>
-<td>
+<td width="50%" valign="top">
 \code
 namespace afio = AFIO_V2_NAMESPACE;
 
 // Make me a 1 trillion element sparsely allocated integer array!
 afio::mapped_file_handle mfh = afio::mapped_temp_inode().value();
 
-// On an extents based filing system, doesn't actually allocate any physical storage
-// but does map approximately 4Tb of all bits zero data into memory
+// On an extents based filing system, doesn't actually allocate any physical
+// storage but does map approximately 4Tb of all bits zero data into memory
 mfh.truncate(1000000000000ULL*sizeof(int));
 
 // Create a typed view of the one trillion integers
 afio::algorithm::mapped_view<int> one_trillion_int_array(mfh);
 
-// Write and read as you see fit, if you exceed physical RAM it'll be paged to disk
+// Write and read as you see fit, if you exceed physical RAM it'll be paged out
 one_trillion_int_array[0] = 5;
 one_trillion_int_array[999999999999ULL] = 6;
 \endcode
 </td>
-<td>
+<td width="50%" valign="top">
 \code
 namespace afio = AFIO_V2_NAMESPACE;
 
 // Create an asynchronous file handle
 afio::io_service service;
-afio::async_file_handle fh = afio::async_file(service, {}, "testfile.txt",
-                                              afio::async_file_handle::mode::write,
-                                              afio::async_file_handle::creation::if_needed).value();
+afio::async_file_handle fh =
+  afio::async_file(service, {}, "testfile.txt",
+                   afio::async_file_handle::mode::write,
+                   afio::async_file_handle::creation::if_needed).value();
 
 // Resize it to 1024 bytes
 truncate(fh, 1024).value();
@@ -68,7 +69,8 @@ truncate(fh, 1024).value();
 // Begin to asynchronously write "hello world" into the file at offset 0,
 // suspending execution of this coroutine until completion and then resuming
 // execution. Requires the Coroutines TS.
-co_await async_write(fh, 0, "hello world", 11).value();
+char buffer[] = "hello world";
+co_await co_write(fh, {{buffer, sizeof(buffer)}, 0}).value();
 \endcode
 </td>
 </tr>
@@ -168,12 +170,13 @@ Todo:
 |   | ✔ | ✔ | Directory handles and very fast directory enumeration ported over from AFIO v1.
 | ✔ | ✔ | ✔ | `shared_fs_mutex` shared/exclusive entities locking based on safe byte ranges
 |   | ✔ | ✔ | Set random or sequential i/o (prefetch).
+| ✔ | ✔ | ✔ | i/o on `async_file_handle` is coroutines awaitable.
 
 Todo to reach feature parity with AFIO v1:
 
 | NEW in v2 | Windows | POSIX |     |
 | --------- | --------| ----- | --- |
-|   |   |   | Hard links and symlinks.
+|   |   |   | `symlink_handle`.
 |   |   |   | BSD and OS X kqueues optimised `io_service`
 
 Todo thereafter:
@@ -181,7 +184,6 @@ Todo thereafter:
 | NEW in v2 | Windows | POSIX |     |
 | --------- | --------| ----- | --- |
 | ✔ |   |   | Extended attributes support.
-| ✔ |   |   | Coroutines TS integration for `async_file_handle`. Use example: https://gist.github.com/anonymous/a67ba4695c223a905ff108ed8b9a342f
 | ✔ |   |   | Linux KAIO support for native non-blocking `O_DIRECT` i/o
 | ✔ |   |   | Reliable directory hierarchy deletion algorithm.
 | ✔ |   |   | Reliable directory hierarchy copy algorithm.

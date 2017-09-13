@@ -7,6 +7,7 @@ set(afio_TESTS
   "test/tests/file_handle_create_close/kernel_file_handle.cpp.hpp"
   "test/tests/map_handle_create_close/kernel_map_handle.cpp.hpp"
   "test/tests/section_handle_create_close/kernel_section_handle.cpp.hpp"
+  "test/tests/coroutines.cpp"
   "test/tests/current_path.cpp"
   "test/tests/directory_handle_create_close/runner.cpp"
   "test/tests/directory_handle_enumerate/runner.cpp"

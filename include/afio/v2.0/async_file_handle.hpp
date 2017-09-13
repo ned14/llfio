@@ -25,6 +25,24 @@ Distributed under the Boost Software License, Version 1.0.
 #include "file_handle.hpp"
 #include "io_service.hpp"
 
+#ifdef __cpp_coroutines
+// clang-format off
+#if __has_include(<coroutine>)
+#include <coroutine>
+AFIO_V2_NAMESPACE_EXPORT_BEGIN
+template<class T=void> using coroutine_handle = std::coroutine_handle<T>;
+AFIO_V2_NAMESPACE_END
+#elif __has_include(<experimental/coroutine>)
+#include <experimental/coroutine>
+AFIO_V2_NAMESPACE_EXPORT_BEGIN
+template<class T=void> using coroutine_handle = std::experimental::coroutine_handle<T>;
+AFIO_V2_NAMESPACE_END
+#else
+#error Cannot use C++ Coroutines without the <coroutine> header!
+#endif
+// clang-format on
+#endif
+
 //! \file async_file_handle.hpp Provides async_file_handle
 
 #ifndef AFIO_ASYNC_FILE_HANDLE_H
@@ -283,6 +301,12 @@ public:
   is <b>blocking</b> because the i/o must be cancelled before the destructor can safely exit.
   */
   template <class CompletionRoutine, class BuffersType> using io_state_ptr = std::unique_ptr<_io_state_type<CompletionRoutine, BuffersType>, _io_state_deleter>;
+  //! Erases the type of an io_state_ptr so it can be stored non-templated.
+  template <class CompletionRoutine, class BuffersType> static erased_io_state_ptr erase(io_state_ptr<CompletionRoutine, BuffersType> &&p) noexcept
+  {
+    _erased_io_state_type *_p = p.release();
+    return erased_io_state_ptr(_p);
+  }
 
 #if DOXYGEN_SHOULD_SKIP_THIS
 private:
@@ -318,34 +342,79 @@ public:
   AFIO_MAKE_FREE_FUNCTION
   template <class CompletionRoutine> result<io_state_ptr<CompletionRoutine, const_buffers_type>> async_write(io_request<const_buffers_type> reqs, CompletionRoutine &&completion) noexcept;
 
+  using file_handle::read;
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<buffers_type> read(io_request<buffers_type> reqs, deadline d = deadline()) noexcept override;
+  using file_handle::write;
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> write(io_request<const_buffers_type> reqs, deadline d = deadline()) noexcept override;
 
-#if 0  // def __cpp_coroutines
-  //! An   
-  template<class BuffersType> struct awaitable
+#if defined(__cpp_coroutines) || defined(DOXYGEN_IS_IN_THE_HOUSE)
+private:
+  template <class CompletionRoutine> result<io_state_ptr<CompletionRoutine, const_buffers_type>> _call_read_write(io_request<const_buffers_type> reqs, CompletionRoutine &&completion) noexcept { return async_write(reqs, std::forward<CompletionRoutine>(completion)); }
+  template <class CompletionRoutine> result<io_state_ptr<CompletionRoutine, buffers_type>> _call_read_write(io_request<buffers_type> reqs, CompletionRoutine &&completion) noexcept { return async_read(reqs, std::forward<CompletionRoutine>(completion)); }
+  //! Type sugar to tell `co_await` what to do
+  template <class BuffersType> class awaitable
   {
-    using CompletionRoutine = detail::function_ptr<void(async_file_handle *, io_result<BuffersType> &)>;
-    io_state_ptr<CompletionRoutine, BuffersType> state;
+    friend class async_file_handle;
+    async_file_handle *_parent;
+    io_request<BuffersType> _reqs;
+    erased_io_state_ptr _state;
+    optional<io_result<BuffersType>> _result;
+
+    constexpr awaitable(async_file_handle *parent, io_request<BuffersType> reqs)
+        : _parent(parent)
+        , _reqs(reqs)
+    {
+    }
+
+  public:
+    bool await_ready() { return false; }
+    void await_suspend(coroutine_handle<> co)
+    {
+      auto r = _parent->_call_read_write(_reqs, [this, co](async_file_handle * /*unused*/, io_result<BuffersType> &result) {
+        // store the result and resume the coroutine
+        _result = std::move(result);
+        co.resume();
+      });
+      if(r)
+      {
+        _state = erase(std::move(r).value());
+      }
+      else
+      {
+        _result = {r.error()};
+        co.resume();
+      }
+    }
+    io_result<BuffersType> await_resume() { return std::move(*_result); }
   };
+
+public:
+  /*! \brief Suspend this coroutine to perform a read, resuming on completion.
+
+  \return An awaitable, which when `co_await`ed upon, returns the buffers read, which may
+  not be the buffers input. The size of each scatter-gather buffer is updated with the number
+  of bytes of that buffer transferred, and the pointer to the data may be \em completely
+  different to what was submitted (e.g. it may point into a memory map).
+  \param reqs A scatter-gather and offset request.
+  \errors As for read(), plus ENOMEM.
+  \mallocs One calloc, one free.
+  */
+  AFIO_MAKE_FREE_FUNCTION
+  awaitable<buffers_type> co_read(io_request<buffers_type> reqs) noexcept { return {this, reqs}; }
+
+  /*! \brief Suspend this coroutine to perform a write, resuming on completion.
+
+  \return An awaitable, which when `co_await`ed upon, returns the buffers written, which
+  may not be the buffers input. The size of each scatter-gather buffer is updated with
+  the number of bytes of that buffer transferred.
+  \param reqs A scatter-gather and offset request.
+  \errors As for write(), plus ENOMEM.
+  \mallocs One calloc, one free.
+  */
+  AFIO_MAKE_FREE_FUNCTION
+  awaitable<const_buffers_type> co_write(io_request<const_buffers_type> reqs) noexcept { return {this, reqs}; }
 #endif
 };
-
-#if 0  // def __cpp_coroutines
-auto operator co_await(async_file_handle::awaitable &&a)
-{
-  struct Awaiter { 
-    async_file_handle::awaitable &&a;
-    
-    bool await_ready() { return false; } 
-    auto await_resume() { return output.get(); } 
-    void await_suspend(std::experimental::coroutine_handle<> coro) { 
-      }); 
-    } 
-  }; 
-  return Awaiter{std::move(a)};   
-}
-#endif
 
 // BEGIN make_free_functions.py
 //! Swap with another instance

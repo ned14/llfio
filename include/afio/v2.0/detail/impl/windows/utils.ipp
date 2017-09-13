@@ -188,7 +188,7 @@ namespace utils
     // Flush modified data so dropping the cache drops everything
     OUTCOME_TRYV(flush_modified_data());
     // Drop filesystem cache
-    if(!SetSystemFileCacheSize(-1, -1, 0))
+    if(!SetSystemFileCacheSize((SIZE_T) -1, (SIZE_T) -1, 0))
     {
       return {GetLastError(), std::system_category()};
     }

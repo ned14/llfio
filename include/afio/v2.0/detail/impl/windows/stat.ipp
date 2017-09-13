@@ -99,15 +99,15 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> stat_t::fill(const handle &h, stat
   if(wanted & want::dev)
   {
     // This is a bit hacky, but we just need a unique device number
-    alignas(8) wchar_t buffer[32769];
-    DWORD len = GetFinalPathNameByHandle(h.native_handle().h, buffer, sizeof(buffer) / sizeof(*buffer), VOLUME_NAME_NT);
-    if(!len || len >= sizeof(buffer) / sizeof(*buffer))
+    alignas(8) wchar_t buffer_[32769];
+    DWORD len = GetFinalPathNameByHandle(h.native_handle().h, buffer_, sizeof(buffer_) / sizeof(*buffer_), VOLUME_NAME_NT);
+    if(!len || len >= sizeof(buffer_) / sizeof(*buffer_))
       return {GetLastError(), std::system_category()};
-    buffer[len] = 0;
-    if(memcmp(buffer, L"\\Device\\HarddiskVolume", 44))
+    buffer_[len] = 0;
+    if(memcmp(buffer_, L"\\Device\\HarddiskVolume", 44))
       return std::errc::illegal_byte_sequence;
-    // buffer should look like \Device\HarddiskVolumeX, so our number is from +22 onwards
-    st_dev = _wtoi(buffer + 22);
+    // buffer_ should look like \Device\HarddiskVolumeX, so our number is from +22 onwards
+    st_dev = _wtoi(buffer_ + 22);
     ++ret;
   }
   if(wanted & want::ino)

@@ -86,13 +86,13 @@ result<section_handle> section_handle::section(file_handle &backing, extent_type
   OBJECT_ATTRIBUTES oa, *poa = nullptr;
   UNICODE_STRING _path;
   static wchar_t *buffer = []() -> wchar_t * {
-    static wchar_t buffer[96] = L"\\Sessions\\0\\BaseNamedObjects\\";
+    static wchar_t buffer_[96] = L"\\Sessions\\0\\BaseNamedObjects\\";
     DWORD sessionid = 0;
     if(ProcessIdToSessionId(GetCurrentProcessId(), &sessionid))
     {
-      wsprintf(buffer, L"\\Sessions\\%u\\BaseNamedObjects\\", sessionid);
+      wsprintf(buffer_, L"\\Sessions\\%u\\BaseNamedObjects\\", sessionid);
     }
-    return buffer;
+    return buffer_;
   }();
   static wchar_t *bufferid = wcschr(buffer, 0);
   if(_flag & flag::singleton)
@@ -384,35 +384,35 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
   return ret;
 }
 
-result<map_handle::buffer_type> map_handle::commit(buffer_type region, section_handle::flag _flag) noexcept
+result<map_handle::buffer_type> map_handle::commit(buffer_type region, section_handle::flag flag) noexcept
 {
   AFIO_LOG_FUNCTION_CALL(this);
   if(!region.data)
     return std::errc::invalid_argument;
   DWORD prot = 0;
-  if(_flag == section_handle::flag::none)
+  if(flag == section_handle::flag::none)
   {
     DWORD _ = 0;
     if(!VirtualProtect(region.data, region.len, PAGE_NOACCESS, &_))
       return {GetLastError(), std::system_category()};
     return region;
   }
-  if(_flag & section_handle::flag::cow)
+  if(flag & section_handle::flag::cow)
   {
     prot = PAGE_WRITECOPY;
     _v.behaviour |= native_handle_type::disposition::seekable | native_handle_type::disposition::readable | native_handle_type::disposition::writable;
   }
-  else if(_flag & section_handle::flag::write)
+  else if(flag & section_handle::flag::write)
   {
     prot = PAGE_READWRITE;
     _v.behaviour |= native_handle_type::disposition::seekable | native_handle_type::disposition::readable | native_handle_type::disposition::writable;
   }
-  else if(_flag & section_handle::flag::read)
+  else if(flag & section_handle::flag::read)
   {
     prot = PAGE_READONLY;
     _v.behaviour |= native_handle_type::disposition::seekable | native_handle_type::disposition::readable;
   }
-  if(_flag & section_handle::flag::execute)
+  if(flag & section_handle::flag::execute)
     prot = PAGE_EXECUTE;
   region = utils::round_to_page_size(region);
   if(!VirtualAlloc(region.data, region.len, MEM_COMMIT, prot))
