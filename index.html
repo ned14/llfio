@@ -160,8 +160,8 @@ $(document).ready(function(){initNavTree('index.html','');});
 <div class="line"><span class="comment">// Begin to asynchronously write &quot;hello world&quot; into the file at offset 0,</span></div>
 <div class="line"><span class="comment">// suspending execution of this coroutine until completion and then resuming</span></div>
 <div class="line"><span class="comment">// execution. Requires the Coroutines TS.</span></div>
-<div class="line"><span class="keywordtype">char</span> buffer[] = <span class="stringliteral">&quot;hello world&quot;</span>;</div>
-<div class="line">co_await co_write(fh, {{buffer, <span class="keyword">sizeof</span>(buffer)}, 0}).value();</div>
+<div class="line"><span class="keyword">alignas</span>(4096) <span class="keywordtype">char</span> buffer[] = <span class="stringliteral">&quot;hello world&quot;</span>;</div>
+<div class="line">co_await co_write(fh, {{{buffer, <span class="keyword">sizeof</span>(buffer)}}, 0}).value();</div>
 </div><!-- fragment -->   </td></tr>
 </table>
 <p>These compilers and OS are regularly tested:</p>
