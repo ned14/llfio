@@ -137,6 +137,12 @@ Inheritance diagram for afio_v2_xxx::async_file_handle:</div>
 </map>
  </div></div>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
+Classes</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1async__file__handle_1_1awaitable.html">awaitable</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Type sugar to tell <code>co_await</code> what to do.  <a href="classafio__v2__xxx_1_1async__file__handle_1_1awaitable.html#details">More...</a><br/></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
 Public Types</h2></td></tr>
 <tr class="memitem:ae881dbcdc2b71009f2a61895a0a45a3e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae881dbcdc2b71009f2a61895a0a45a3e"></a>
@@ -254,12 +260,13 @@ virtual <a class="el" href="structafio__v2__xxx_1_1io__handle_1_1io__result.html
 virtual <a class="el" href="structafio__v2__xxx_1_1io__handle_1_1io__result.html">io_result</a><br class="typebreak"/>
 &lt; const_buffers_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>write</b> (<a class="el" href="structafio__v2__xxx_1_1io__handle_1_1io__request.html">io_request</a>&lt; const_buffers_type &gt; reqs, <a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a>()) noexceptoverride</td></tr>
 <tr class="separator:a4489767a88acf8cdb963ecfaf4751268"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a74af8c30462b66794345f7ab7aef9870"><td class="memItemLeft" align="right" valign="top">awaitable&lt; buffers_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1async__file__handle.html#a74af8c30462b66794345f7ab7aef9870">co_read</a> (<a class="el" href="structafio__v2__xxx_1_1io__handle_1_1io__request.html">io_request</a>&lt; buffers_type &gt; reqs) noexcept</td></tr>
-<tr class="memdesc:a74af8c30462b66794345f7ab7aef9870"><td class="mdescLeft">&#160;</td><td class="mdescRight">Suspend this coroutine to perform a read, resuming on completion.  <a href="#a74af8c30462b66794345f7ab7aef9870">More...</a><br/></td></tr>
-<tr class="separator:a74af8c30462b66794345f7ab7aef9870"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a219b259e85abe4052550b009ab8a543e"><td class="memItemLeft" align="right" valign="top">awaitable&lt; const_buffers_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1async__file__handle.html#a219b259e85abe4052550b009ab8a543e">co_write</a> (<a class="el" href="structafio__v2__xxx_1_1io__handle_1_1io__request.html">io_request</a>&lt; const_buffers_type &gt; reqs) noexcept</td></tr>
-<tr class="memdesc:a219b259e85abe4052550b009ab8a543e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Suspend this coroutine to perform a write, resuming on completion.  <a href="#a219b259e85abe4052550b009ab8a543e">More...</a><br/></td></tr>
-<tr class="separator:a219b259e85abe4052550b009ab8a543e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abca08e496e10ac6ae890793888a5e3fe"><td class="memItemLeft" align="right" valign="top">result&lt; <a class="el" href="classafio__v2__xxx_1_1async__file__handle_1_1awaitable.html">awaitable</a>&lt; buffers_type &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1async__file__handle.html#abca08e496e10ac6ae890793888a5e3fe">co_read</a> (<a class="el" href="structafio__v2__xxx_1_1io__handle_1_1io__request.html">io_request</a>&lt; buffers_type &gt; reqs) noexcept</td></tr>
+<tr class="memdesc:abca08e496e10ac6ae890793888a5e3fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Schedule a read to occur asynchronously.  <a href="#abca08e496e10ac6ae890793888a5e3fe">More...</a><br/></td></tr>
+<tr class="separator:abca08e496e10ac6ae890793888a5e3fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0cd3e4803cfe986815ed8c27a70db777"><td class="memItemLeft" align="right" valign="top">result&lt; <a class="el" href="classafio__v2__xxx_1_1async__file__handle_1_1awaitable.html">awaitable</a><br class="typebreak"/>
+&lt; const_buffers_type &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1async__file__handle.html#a0cd3e4803cfe986815ed8c27a70db777">co_write</a> (<a class="el" href="structafio__v2__xxx_1_1io__handle_1_1io__request.html">io_request</a>&lt; const_buffers_type &gt; reqs) noexcept</td></tr>
+<tr class="memdesc:a0cd3e4803cfe986815ed8c27a70db777"><td class="mdescLeft">&#160;</td><td class="mdescRight">Schedule a write to occur asynchronously.  <a href="#a0cd3e4803cfe986815ed8c27a70db777">More...</a><br/></td></tr>
+<tr class="separator:a0cd3e4803cfe986815ed8c27a70db777"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae56f6754d6ad0a037ebb134d83f45dfc"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae56f6754d6ad0a037ebb134d83f45dfc"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1file__handle.html#ae56f6754d6ad0a037ebb134d83f45dfc">swap</a> (<a class="el" href="classafio__v2__xxx_1_1file__handle.html">file_handle</a> &amp;o) noexcept</td></tr>
 <tr class="memdesc:ae56f6754d6ad0a037ebb134d83f45dfc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Swap with another instance. <br/></td></tr>
@@ -1034,7 +1041,7 @@ For portability, you can only assume that barriers write order for a single hand
 
 </div>
 </div>
-<a class="anchor" id="a74af8c30462b66794345f7ab7aef9870"></a>
+<a class="anchor" id="abca08e496e10ac6ae890793888a5e3fe"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -1042,7 +1049,7 @@ For portability, you can only assume that barriers write order for a single hand
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">awaitable&lt;buffers_type&gt; afio_v2_xxx::async_file_handle::co_read </td>
+          <td class="memname">result&lt;<a class="el" href="classafio__v2__xxx_1_1async__file__handle_1_1awaitable.html">awaitable</a>&lt;buffers_type&gt; &gt; afio_v2_xxx::async_file_handle::co_read </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="structafio__v2__xxx_1_1io__handle_1_1io__request.html">io_request</a>&lt; buffers_type &gt;&#160;</td>
           <td class="paramname"><em>reqs</em></td><td>)</td>
@@ -1056,8 +1063,8 @@ For portability, you can only assume that barriers write order for a single hand
 </table>
 </div><div class="memdoc">
 
-<p>Suspend this coroutine to perform a read, resuming on completion. </p>
-<dl class="section return"><dt>Returns</dt><dd>An awaitable, which when <code>co_await</code>ed upon, returns the buffers read, which may not be the buffers input. The size of each scatter-gather buffer is updated with the number of bytes of that buffer transferred, and the pointer to the data may be <em>completely</em> different to what was submitted (e.g. it may point into a memory map). </dd></dl>
+<p>Schedule a read to occur asynchronously. </p>
+<dl class="section return"><dt>Returns</dt><dd>An awaitable, which when <code>co_await</code>ed upon, suspends execution of the coroutine until the operation has completed, resuming with the buffers read, which may not be the buffers input. The size of each scatter-gather buffer is updated with the number of bytes of that buffer transferred, and the pointer to the data may be <em>completely</em> different to what was submitted (e.g. it may point into a memory map). </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">reqs</td><td>A scatter-gather and offset request. </td></tr>
@@ -1066,11 +1073,15 @@ For portability, you can only assume that barriers write order for a single hand
 </dl>
 <dl class="section user"><dt>Errors returnable</dt><dd>As for read(), plus ENOMEM. </dd></dl>
 <dl class="section user"><dt>Memory Allocations</dt><dd>One calloc, one free. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;{ <span class="keywordflow">return</span> {<span class="keyword">this</span>, reqs}; }</div>
+<div class="fragment"><div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;  {</div>
+<div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;    OUTCOME_TRY(r, <a class="code" href="classafio__v2__xxx_1_1async__file__handle.html#a763966d2304e8eead72dcfd2bc775f35">async_read</a>(reqs, awaitable_state&lt;buffers_type&gt;()));</div>
+<div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;    <span class="keywordflow">return</span> awaitable&lt;buffers_type&gt;(std::move(r));</div>
+<div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;  }</div>
+<div class="ttc" id="classafio__v2__xxx_1_1async__file__handle_html_a763966d2304e8eead72dcfd2bc775f35"><div class="ttname"><a href="classafio__v2__xxx_1_1async__file__handle.html#a763966d2304e8eead72dcfd2bc775f35">afio_v2_xxx::async_file_handle::async_read</a></div><div class="ttdeci">result&lt; io_state_ptr&lt; CompletionRoutine, buffers_type &gt; &gt; async_read(io_request&lt; buffers_type &gt; reqs, CompletionRoutine &amp;&amp;completion) noexcept</div><div class="ttdoc">Schedule a read to occur asynchronously. </div></div>
 </div><!-- fragment -->
 </div>
 </div>
-<a class="anchor" id="a219b259e85abe4052550b009ab8a543e"></a>
+<a class="anchor" id="a0cd3e4803cfe986815ed8c27a70db777"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -1078,7 +1089,7 @@ For portability, you can only assume that barriers write order for a single hand
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">awaitable&lt;const_buffers_type&gt; afio_v2_xxx::async_file_handle::co_write </td>
+          <td class="memname">result&lt;<a class="el" href="classafio__v2__xxx_1_1async__file__handle_1_1awaitable.html">awaitable</a>&lt;const_buffers_type&gt; &gt; afio_v2_xxx::async_file_handle::co_write </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="structafio__v2__xxx_1_1io__handle_1_1io__request.html">io_request</a>&lt; const_buffers_type &gt;&#160;</td>
           <td class="paramname"><em>reqs</em></td><td>)</td>
@@ -1092,8 +1103,8 @@ For portability, you can only assume that barriers write order for a single hand
 </table>
 </div><div class="memdoc">
 
-<p>Suspend this coroutine to perform a write, resuming on completion. </p>
-<dl class="section return"><dt>Returns</dt><dd>An awaitable, which when <code>co_await</code>ed upon, returns the buffers written, which may not be the buffers input. The size of each scatter-gather buffer is updated with the number of bytes of that buffer transferred. </dd></dl>
+<p>Schedule a write to occur asynchronously. </p>
+<dl class="section return"><dt>Returns</dt><dd>An awaitable, which when <code>co_await</code>ed upon, suspends execution of the coroutine until the operation has completed, resuming with the buffers written, which may not be the buffers input. The size of each scatter-gather buffer is updated with the number of bytes of that buffer transferred. </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">reqs</td><td>A scatter-gather and offset request. </td></tr>
@@ -1102,7 +1113,11 @@ For portability, you can only assume that barriers write order for a single hand
 </dl>
 <dl class="section user"><dt>Errors returnable</dt><dd>As for write(), plus ENOMEM. </dd></dl>
 <dl class="section user"><dt>Memory Allocations</dt><dd>One calloc, one free. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00415"></a><span class="lineno">  415</span>&#160;{ <span class="keywordflow">return</span> {<span class="keyword">this</span>, reqs}; }</div>
+<div class="fragment"><div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;  {</div>
+<div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;    OUTCOME_TRY(r, <a class="code" href="classafio__v2__xxx_1_1async__file__handle.html#ab493207a0372c9f4122bcbf39860a81e">async_write</a>(reqs, awaitable_state&lt;const_buffers_type&gt;()));</div>
+<div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160;    <span class="keywordflow">return</span> awaitable&lt;const_buffers_type&gt;(std::move(r));</div>
+<div class="line"><a name="l00425"></a><span class="lineno">  425</span>&#160;  }</div>
+<div class="ttc" id="classafio__v2__xxx_1_1async__file__handle_html_ab493207a0372c9f4122bcbf39860a81e"><div class="ttname"><a href="classafio__v2__xxx_1_1async__file__handle.html#ab493207a0372c9f4122bcbf39860a81e">afio_v2_xxx::async_file_handle::async_write</a></div><div class="ttdeci">result&lt; io_state_ptr&lt; CompletionRoutine, const_buffers_type &gt; &gt; async_write(io_request&lt; const_buffers_type &gt; reqs, CompletionRoutine &amp;&amp;completion) noexcept</div><div class="ttdoc">Schedule a write to occur asynchronously. </div></div>
 </div><!-- fragment -->
 </div>
 </div>

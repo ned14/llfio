@@ -133,7 +133,7 @@ $(document).ready(function(){initNavTree('index.html','');});
 <td width="50%" valign="top"><div class="fragment"><div class="line"><span class="keyword">namespace </span>afio = <a class="code" href="group__config.html#gaa3ed9f085329a0b81feeac3397a83740">AFIO_V2_NAMESPACE</a>;</div>
 <div class="line"></div>
 <div class="line"><span class="comment">// Make me a 1 trillion element sparsely allocated integer array!</span></div>
-<div class="line">afio::mapped_file_handle mfh = afio::mapped_temp_inode().value();</div>
+<div class="line">afio::mapped_file_handle mfh = <a class="code" href="namespaceafio__v2__xxx.html#a3e529b57123f65a416935448c5e53957">afio::mapped_temp_inode</a>().value();</div>
 <div class="line"></div>
 <div class="line"><span class="comment">// On an extents based filing system, doesn&#39;t actually allocate any physical</span></div>
 <div class="line"><span class="comment">// storage but does map approximately 4Tb of all bits zero data into memory</span></div>
@@ -150,7 +150,7 @@ $(document).ready(function(){initNavTree('index.html','');});
 <div class="line"><span class="comment">// Create an asynchronous file handle</span></div>
 <div class="line">afio::io_service service;</div>
 <div class="line">afio::async_file_handle fh =</div>
-<div class="line">  <a class="code" href="namespaceafio__v2__xxx.html#aaca67159c4f0fc906967b9fb7912116b">afio::async_file</a>(service, {}, <span class="stringliteral">&quot;testfile.txt&quot;</span>,</div>
+<div class="line">  <a class="code" href="namespaceafio__v2__xxx.html#a5b0168993998aafc342233aa782040a6">afio::async_file</a>(service, {}, <span class="stringliteral">&quot;testfile.txt&quot;</span>,</div>
 <div class="line">                   <a class="code" href="namespaceafio__v2__xxx.html#a2d15768d28ea660ebe44901508ed3372">afio::async_file_handle::mode::write</a>,</div>
 <div class="line">                   afio::async_file_handle::creation::if_needed).value();</div>
 <div class="line"></div>
@@ -161,7 +161,7 @@ $(document).ready(function(){initNavTree('index.html','');});
 <div class="line"><span class="comment">// suspending execution of this coroutine until completion and then resuming</span></div>
 <div class="line"><span class="comment">// execution. Requires the Coroutines TS.</span></div>
 <div class="line"><span class="keyword">alignas</span>(4096) <span class="keywordtype">char</span> buffer[] = <span class="stringliteral">&quot;hello world&quot;</span>;</div>
-<div class="line">co_await co_write(fh, {{{buffer, <span class="keyword">sizeof</span>(buffer)}}, 0}).value();</div>
+<div class="line">co_await <a class="code" href="namespaceafio__v2__xxx.html#acd740f5aef6ca339575e7497fa873d06">co_write</a>(fh, {{{buffer, <span class="keyword">sizeof</span>(buffer)}}, 0}).value();</div>
 </div><!-- fragment -->   </td></tr>
 </table>
 <p>These compilers and OS are regularly tested:</p>
@@ -346,6 +346,7 @@ mapped_file_handle - adds low latency memory mapped scatter-gather i/o</li>
 <p>Features possibly to be added after a Boost peer review:</p>
 <ul>
 <li>Directory change monitoring.</li>
+<li>Permissions support (ACLs).</li>
 </ul>
 <table  width="100%" border="0" cellpadding="4">
 <tr>

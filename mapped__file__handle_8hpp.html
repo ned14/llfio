@@ -106,7 +106,8 @@ $(document).ready(function(){initNavTree('mapped__file__handle_8hpp.html','');})
 <div class="header">
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
-<a href="#namespaces">Namespaces</a>  </div>
+<a href="#namespaces">Namespaces</a> &#124;
+<a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">mapped_file_handle.hpp File Reference</div>  </div>
 </div><!--header-->
@@ -127,6 +128,23 @@ Namespaces</h2></td></tr>
 <tr class="memitem:namespaceafio__v2__xxx"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx.html">afio_v2_xxx</a></td></tr>
 <tr class="memdesc:namespaceafio__v2__xxx"><td class="mdescLeft">&#160;</td><td class="mdescRight">The AFIO namespace. <br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:aab2c5252a292132ac51a092ab6560b39"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aab2c5252a292132ac51a092ab6560b39"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx.html#aab2c5252a292132ac51a092ab6560b39">afio_v2_xxx::swap</a> (mapped_file_handle &amp;self, mapped_file_handle &amp;o) noexcept</td></tr>
+<tr class="memdesc:aab2c5252a292132ac51a092ab6560b39"><td class="mdescLeft">&#160;</td><td class="mdescRight">Swap with another instance. <br/></td></tr>
+<tr class="separator:aab2c5252a292132ac51a092ab6560b39"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abe51642ffc028c8f8b030944263b4a85"><td class="memItemLeft" align="right" valign="top">result&lt; mapped_file_handle &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx.html#abe51642ffc028c8f8b030944263b4a85">afio_v2_xxx::mapped_file</a> (mapped_file_handle::size_type reservation, const path_handle &amp;base, mapped_file_handle::path_view_type _path, mapped_file_handle::mode _mode=mapped_file_handle::mode::read, mapped_file_handle::creation _creation=mapped_file_handle::creation::open_existing, mapped_file_handle::caching _caching=mapped_file_handle::caching::all, mapped_file_handle::flag flags=mapped_file_handle::flag::none) noexcept</td></tr>
+<tr class="separator:abe51642ffc028c8f8b030944263b4a85"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2c44844c18f66950187cb57292d7a676"><td class="memItemLeft" align="right" valign="top">result&lt; mapped_file_handle &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx.html#a2c44844c18f66950187cb57292d7a676">afio_v2_xxx::mapped_file</a> (const path_handle &amp;base, mapped_file_handle::path_view_type _path, mapped_file_handle::mode _mode=mapped_file_handle::mode::read, mapped_file_handle::creation _creation=mapped_file_handle::creation::open_existing, mapped_file_handle::caching _caching=mapped_file_handle::caching::all, mapped_file_handle::flag flags=mapped_file_handle::flag::none) noexcept</td></tr>
+<tr class="separator:a2c44844c18f66950187cb57292d7a676"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac9be648f691d72c9cac6295ea7b3f9c8"><td class="memItemLeft" align="right" valign="top">result&lt; mapped_file_handle &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx.html#ac9be648f691d72c9cac6295ea7b3f9c8">afio_v2_xxx::mapped_random_file</a> (mapped_file_handle::size_type reservation, const path_handle &amp;dirpath, mapped_file_handle::mode _mode=mapped_file_handle::mode::write, mapped_file_handle::caching _caching=mapped_file_handle::caching::temporary, mapped_file_handle::flag flags=mapped_file_handle::flag::none) noexcept</td></tr>
+<tr class="separator:ac9be648f691d72c9cac6295ea7b3f9c8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab175b3720445c24cd43e3b7d88c6bbc9"><td class="memItemLeft" align="right" valign="top">result&lt; mapped_file_handle &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx.html#ab175b3720445c24cd43e3b7d88c6bbc9">afio_v2_xxx::mapped_temp_file</a> (mapped_file_handle::size_type reservation, mapped_file_handle::path_view_type name=mapped_file_handle::path_view_type(), mapped_file_handle::mode _mode=mapped_file_handle::mode::write, mapped_file_handle::creation _creation=mapped_file_handle::creation::if_needed, mapped_file_handle::caching _caching=mapped_file_handle::caching::temporary, mapped_file_handle::flag flags=mapped_file_handle::flag::unlink_on_close) noexcept</td></tr>
+<tr class="separator:ab175b3720445c24cd43e3b7d88c6bbc9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3e529b57123f65a416935448c5e53957"><td class="memItemLeft" align="right" valign="top">result&lt; mapped_file_handle &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx.html#a3e529b57123f65a416935448c5e53957">afio_v2_xxx::mapped_temp_inode</a> (mapped_file_handle::path_view_type dirpath=temporary_files_directory(), mapped_file_handle::mode _mode=mapped_file_handle::mode::write, mapped_file_handle::flag flags=mapped_file_handle::flag::none) noexcept</td></tr>
+<tr class="separator:a3e529b57123f65a416935448c5e53957"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Provides mapped_file_handle. </p>

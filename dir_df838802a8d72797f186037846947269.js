@@ -12,9 +12,7 @@ var dir_df838802a8d72797f186037846947269 =
     [ "io_handle.hpp", "io__handle_8hpp.html", "io__handle_8hpp" ],
     [ "io_service.hpp", "io__service_8hpp.html", "io__service_8hpp" ],
     [ "map_handle.hpp", "map__handle_8hpp.html", "map__handle_8hpp" ],
-    [ "mapped_file_handle.hpp", "mapped__file__handle_8hpp.html", [
-      [ "mapped_file_handle", "classafio__v2__xxx_1_1mapped__file__handle.html", "classafio__v2__xxx_1_1mapped__file__handle" ]
-    ] ],
+    [ "mapped_file_handle.hpp", "mapped__file__handle_8hpp.html", "mapped__file__handle_8hpp" ],
     [ "native_handle_type.hpp", "native__handle__type_8hpp.html", [
       [ "native_handle_type", "structafio__v2__xxx_1_1native__handle__type.html", "structafio__v2__xxx_1_1native__handle__type" ],
       [ "disposition_base", "structafio__v2__xxx_1_1native__handle__type_1_1disposition__base.html", "structafio__v2__xxx_1_1native__handle__type_1_1disposition__base" ]

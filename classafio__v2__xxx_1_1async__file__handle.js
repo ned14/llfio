@@ -1,5 +1,6 @@
 var classafio__v2__xxx_1_1async__file__handle =
 [
+    [ "awaitable", "classafio__v2__xxx_1_1async__file__handle_1_1awaitable.html", "classafio__v2__xxx_1_1async__file__handle_1_1awaitable" ],
     [ "buffer_type", "classafio__v2__xxx_1_1async__file__handle.html#abcdd973d43bca7a80b75603c97b8a03a", null ],
     [ "buffers_type", "classafio__v2__xxx_1_1async__file__handle.html#a0ce3592c95434ac52711e86e9a22ed6d", null ],
     [ "caching", "classafio__v2__xxx_1_1async__file__handle.html#ab48a3007097cfa403e68101954ddd477", null ],
@@ -35,8 +36,8 @@ var classafio__v2__xxx_1_1async__file__handle =
     [ "clone", "classafio__v2__xxx_1_1async__file__handle.html#a5bf8b6c6bca19b98c999e9ba762e8ceb", null ],
     [ "clone", "classafio__v2__xxx_1_1async__file__handle.html#ac544e656873ccf3b6665064f46cfaf2b", null ],
     [ "close", "classafio__v2__xxx_1_1async__file__handle.html#a08ec5c13136c04ae424833173734abdb", null ],
-    [ "co_read", "classafio__v2__xxx_1_1async__file__handle.html#a74af8c30462b66794345f7ab7aef9870", null ],
-    [ "co_write", "classafio__v2__xxx_1_1async__file__handle.html#a219b259e85abe4052550b009ab8a543e", null ],
+    [ "co_read", "classafio__v2__xxx_1_1async__file__handle.html#abca08e496e10ac6ae890793888a5e3fe", null ],
+    [ "co_write", "classafio__v2__xxx_1_1async__file__handle.html#a0cd3e4803cfe986815ed8c27a70db777", null ],
     [ "current_path", "classafio__v2__xxx_1_1async__file__handle.html#a616a67222676af5ec5b3aa94d7c02428", null ],
     [ "extents", "classafio__v2__xxx_1_1async__file__handle.html#a03d1774e3ad8678fb4aac4ced57beeef", null ],
     [ "flags", "classafio__v2__xxx_1_1async__file__handle.html#ab3d876f5996605158fd6a0582adadad6", null ],

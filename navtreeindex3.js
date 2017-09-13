@@ -1,5 +1,12 @@
 var NAVTREEINDEX3 =
 {
+"classafio__v2__xxx_1_1path__handle.html#a78abc121a0d23142d173cd623895a9af":[3,0,0,18,3],
+"classafio__v2__xxx_1_1path__handle.html#a8373f12c4835eecf6a3dce32eb16cc9e":[3,0,0,18,7],
+"classafio__v2__xxx_1_1path__handle.html#a875440f1b368472f1840c70c266f3a48":[3,0,0,18,32],
+"classafio__v2__xxx_1_1path__handle.html#a88881e89f538f09c1eaf9447a8182eea":[3,0,0,18,11],
+"classafio__v2__xxx_1_1path__handle.html#a8d816c9d7991a84bb85ee225f49ed51a":[3,0,0,18,2],
+"classafio__v2__xxx_1_1path__handle.html#a97ffbbf53f51549549efef0b49e125dc":[3,0,0,18,14],
+"classafio__v2__xxx_1_1path__handle.html#a99b23d7a01380400ee1f69cc840684c1":[3,0,0,18,10],
 "classafio__v2__xxx_1_1path__handle.html#aa53d88105df8c6be01be649829a65b14":[3,0,0,18,20],
 "classafio__v2__xxx_1_1path__handle.html#aac44deded3ae9cce27e21eed406e0c43":[3,0,0,18,1],
 "classafio__v2__xxx_1_1path__handle.html#aac62f621c42be6eeb8d9a5700da367f9":[3,0,0,18,27],
@@ -237,17 +244,10 @@ var NAVTREEINDEX3 =
 "fs__handle_8hpp.html":[4,0,0,0,0,7],
 "fs__handle_8hpp.html#a8d7c50561e9103968467c928f2e38f16":[4,0,0,0,0,7,1],
 "fs__handle_8hpp.html#abefe1503efb01ea89200b829bcd87713":[4,0,0,0,0,7,2],
-"functions.html":[3,3,0],
 "functions.html":[3,3,0,0],
+"functions.html":[3,3,0],
 "functions_a.html":[3,3,0,1],
 "functions_b.html":[3,3,0,2],
 "functions_c.html":[3,3,0,3],
-"functions_d.html":[3,3,0,4],
-"functions_e.html":[3,3,0,5],
-"functions_enum.html":[3,3,4],
-"functions_eval.html":[3,3,5],
-"functions_f.html":[3,3,0,6],
-"functions_func.html":[3,3,1],
-"functions_func.html":[3,3,1,0],
-"functions_func_a.html":[3,3,1,1]
+"functions_d.html":[3,3,0,4]
 };

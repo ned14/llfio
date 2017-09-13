@@ -1,5 +1,12 @@
 var NAVTREEINDEX1 =
 {
+"classafio__v2__xxx_1_1directory__handle.html#a3620b3c68611c77dd3cd98d77c073bd2":[3,0,0,8,58],
+"classafio__v2__xxx_1_1directory__handle.html#a39396b406595a84aa9888bb2051f317f":[3,0,0,8,6],
+"classafio__v2__xxx_1_1directory__handle.html#a3c777f045dc2b0248b891d6e7811d152":[3,0,0,8,37],
+"classafio__v2__xxx_1_1directory__handle.html#a3d62af738e156e9356d0e7c1bfa20642":[3,0,0,8,42],
+"classafio__v2__xxx_1_1directory__handle.html#a3fc7db93fac699f5ecad453642ed314e":[3,0,0,8,21],
+"classafio__v2__xxx_1_1directory__handle.html#a4194a05dd9694d2c47d5a45f925db1d7":[3,0,0,8,38],
+"classafio__v2__xxx_1_1directory__handle.html#a4200fba7657990da88c342fa1a82155e":[3,0,0,8,3],
 "classafio__v2__xxx_1_1directory__handle.html#a47ed88b4de271daa08862b273c2f609e":[3,0,0,8,14],
 "classafio__v2__xxx_1_1directory__handle.html#a47ed88b4de271daa08862b273c2f609ea14847befc159c1492671b53718fc46f8":[3,0,0,8,14,1],
 "classafio__v2__xxx_1_1directory__handle.html#a47ed88b4de271daa08862b273c2f609ea334c4a4c42fdb79d7ebc3e73b517e6f8":[3,0,0,8,14,0],
@@ -242,12 +249,5 @@ var NAVTREEINDEX1 =
 "classafio__v2__xxx_1_1io__handle.html#a888b9331492828bb282ea5849f2a4146":[3,0,0,12,8],
 "classafio__v2__xxx_1_1io__handle.html#a8af6c6dc1502d40f6aaccc83e49d5342":[3,0,0,12,46],
 "classafio__v2__xxx_1_1io__handle.html#a96b9da71ee7791fbaaa2470c936ec763":[3,0,0,12,53],
-"classafio__v2__xxx_1_1io__handle.html#a97ffbbf53f51549549efef0b49e125dc":[3,0,0,12,20],
-"classafio__v2__xxx_1_1io__handle.html#aa53d88105df8c6be01be649829a65b14":[3,0,0,12,27],
-"classafio__v2__xxx_1_1io__handle.html#aac62f621c42be6eeb8d9a5700da367f9":[3,0,0,12,34],
-"classafio__v2__xxx_1_1io__handle.html#aacabd3633b7c08a422c3e912f6319959":[3,0,0,12,12],
-"classafio__v2__xxx_1_1io__handle.html#ab26a3c5a18cdcc67a506533dbe55e2b3":[3,0,0,12,55],
-"classafio__v2__xxx_1_1io__handle.html#ab3d876f5996605158fd6a0582adadad6":[3,0,0,12,25],
-"classafio__v2__xxx_1_1io__handle.html#ab790af4654f5455d8c5e1f1d397543ca":[3,0,0,12,28],
-"classafio__v2__xxx_1_1io__handle.html#ac46e0a296c31fcd0a996a79d78647fb6":[3,0,0,12,57]
+"classafio__v2__xxx_1_1io__handle.html#a97ffbbf53f51549549efef0b49e125dc":[3,0,0,12,20]
 };
