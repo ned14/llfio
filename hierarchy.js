@@ -35,6 +35,7 @@ var hierarchy =
       [ "afio_v2_xxx::section_handle", "classafio__v2__xxx_1_1section__handle.html", null ]
     ] ],
     [ "afio_v2_xxx::io_handle::io_request< T >", "structafio__v2__xxx_1_1io__handle_1_1io__request.html", null ],
+    [ "afio_v2_xxx::io_handle::io_request< BuffersType >", "structafio__v2__xxx_1_1io__handle_1_1io__request.html", null ],
     [ "afio_v2_xxx::io_service", "classafio__v2__xxx_1_1io__service.html", null ],
     [ "afio_v2_xxx::storage_profile::item_base", "structafio__v2__xxx_1_1storage__profile_1_1item__base.html", [
       [ "afio_v2_xxx::storage_profile::item< T >", "structafio__v2__xxx_1_1storage__profile_1_1item.html", null ],

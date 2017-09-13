@@ -1,5 +1,8 @@
 var NAVTREEINDEX4 =
 {
+"functions_func_b.html":[3,3,1,2],
+"functions_func_c.html":[3,3,1,3],
+"functions_func_d.html":[3,3,1,4],
 "functions_func_e.html":[3,3,1,5],
 "functions_func_f.html":[3,3,1,6],
 "functions_func_h.html":[3,3,1,7],
@@ -100,8 +103,8 @@ var NAVTREEINDEX4 =
 "namespaceafio__v2__xxx.html":[2,0,0],
 "namespaceafio__v2__xxx_1_1algorithm.html":[3,0,0,0],
 "namespaceafio__v2__xxx_1_1algorithm.html":[2,0,0,0],
-"namespaceafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex.html":[2,0,0,0,0],
 "namespaceafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex.html":[3,0,0,0,0],
+"namespaceafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex.html":[2,0,0,0,0],
 "namespaceafio__v2__xxx_1_1storage__profile.html":[2,0,0,1],
 "namespaceafio__v2__xxx_1_1storage__profile.html":[3,0,0,1],
 "namespaceafio__v2__xxx_1_1utils.html":[2,0,0,2],
@@ -246,8 +249,5 @@ var NAVTREEINDEX4 =
 "structafio__v2__xxx_1_1native__handle__type.html#a0aa00d6598a6f23989961957907d2e38":[3,0,0,17,23],
 "structafio__v2__xxx_1_1native__handle__type.html#a1c0dbb20854cc9ff3566c5ed11090a98":[3,0,0,17,14],
 "structafio__v2__xxx_1_1native__handle__type.html#a3aab386f73623173d5275c1ce0c01877":[3,0,0,17,1],
-"structafio__v2__xxx_1_1native__handle__type.html#a3b64af4b45ca02bec2779e94baa779b4":[3,0,0,17,6],
-"structafio__v2__xxx_1_1native__handle__type.html#a3ccc940c54df8f66f2af83d622a679ba":[3,0,0,17,5],
-"structafio__v2__xxx_1_1native__handle__type.html#a3f16b5e811a973c7c65d16a159721530":[3,0,0,17,28],
-"structafio__v2__xxx_1_1native__handle__type.html#a49757bc9e154c27d50f5ff003b30ccca":[3,0,0,17,22]
+"structafio__v2__xxx_1_1native__handle__type.html#a3b64af4b45ca02bec2779e94baa779b4":[3,0,0,17,6]
 };
