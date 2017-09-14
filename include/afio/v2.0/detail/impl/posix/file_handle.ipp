@@ -137,7 +137,7 @@ result<file_handle> file_handle::file(const path_handle &base, file_handle::path
   return ret;
 }
 
-result<file_handle> file_handle::temp_inode(path_view_type dirpath, mode _mode, flag flags) noexcept
+result<file_handle> file_handle::temp_inode(const path_handle &dirh, mode _mode, flag flags) noexcept
 {
   caching _caching = caching::temporary;
   // No need to rename to random on unlink or check inode before unlink
@@ -148,12 +148,11 @@ result<file_handle> file_handle::temp_inode(path_view_type dirpath, mode _mode, 
   nativeh.behaviour |= native_handle_type::disposition::file;
   // Open file exclusively to prevent collision
   OUTCOME_TRY(attribs, attribs_from_handle_mode_caching_and_flags(nativeh, _mode, creation::only_if_not_exist, _caching, flags));
-  path_view::c_str zpath(dirpath);
 #ifdef O_TMPFILE
   // Linux has a special flag just for this use case
   attribs |= O_TMPFILE;
   attribs &= ~O_EXCL;  // allow relinking later
-  nativeh.fd = ::open(zpath.buffer, attribs, 0600);
+  nativeh.fd = ::openat(dirh.native_handle().fd, "", attribs, 0600);
   if(-1 != nativeh.fd)
   {
     ret.value()._flags |= flag::anonymous_inode;
@@ -167,7 +166,6 @@ result<file_handle> file_handle::temp_inode(path_view_type dirpath, mode _mode, 
 #ifdef AFIO_DISABLE_RACE_FREE_PATH_FUNCTIONS
   return std::errc::function_not_supported;
 #endif
-  OUTCOME_TRY(dirh, path_handle::path(dirpath));
   std::string random;
   for(;;)
   {

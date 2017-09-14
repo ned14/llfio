@@ -25,10 +25,10 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef AFIO_DIRECTORY_HANDLE_H
 #define AFIO_DIRECTORY_HANDLE_H
 
-#include "fs_handle.hpp"
+#include "path_discovery.hpp"
 #include "stat.hpp"
 
-#include <memory>  // for shared_ptr
+#include <memory>  // for unique_ptr
 
 //! \file directory_handle.hpp Provides a handle to a directory.
 
@@ -38,8 +38,6 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 
 AFIO_V2_NAMESPACE_EXPORT_BEGIN
-
-AFIO_HEADERS_ONLY_FUNC_SPEC path_view temporary_files_directory() noexcept;
 
 struct directory_entry
 {
@@ -89,8 +87,12 @@ public:
   struct buffers_type : public span<buffer_type>
   {
     using span<buffer_type>::span;
-    buffers_type(span<buffer_type> v) : span<buffer_type>(std::move(v)) {}
-    buffers_type(buffers_type &&o) noexcept : span<buffer_type>(std::move(o)), _kernel_buffer(std::move(o._kernel_buffer)), _kernel_buffer_size(o._kernel_buffer_size) {
+    buffers_type(span<buffer_type> v)
+        : span<buffer_type>(std::move(v))
+    {
+    }
+    buffers_type(buffers_type &&o) noexcept : span<buffer_type>(std::move(o)), _kernel_buffer(std::move(o._kernel_buffer)), _kernel_buffer_size(o._kernel_buffer_size)
+    {
       static_cast<span<buffer_type> &>(o) = {};
       o._kernel_buffer_size = 0;
     }
@@ -100,6 +102,7 @@ public:
       new(this) buffers_type(std::move(o));
       return *this;
     }
+
   private:
     friend class directory_handle;
     std::unique_ptr<char[]> _kernel_buffer;
@@ -180,7 +183,7 @@ public:
   /*! Create a directory handle creating the named directory on some path which
   the OS declares to be suitable for temporary files.
   Note also that an empty name is equivalent to calling
-  `random_file(temporary_files_directory())` and the creation
+  `random_file(path_discovery::storage_backed_temporary_files_directory())` and the creation
   parameter is ignored.
 
   \errors Any of the values POSIX open() or CreateFile() can return.
@@ -188,7 +191,7 @@ public:
   AFIO_MAKE_FREE_FUNCTION
   static inline result<directory_handle> temp_directory(path_view_type name = path_view_type(), mode _mode = mode::write, creation _creation = creation::if_needed, caching _caching = caching::all, flag flags = flag::none) noexcept
   {
-    OUTCOME_TRY(tempdirh, path_handle::path(temporary_files_directory()));
+    auto &tempdirh = path_discovery::storage_backed_temporary_files_directory();
     return name.empty() ? random_directory(tempdirh, _mode, _caching, flags) : directory(tempdirh, name, _mode, _creation, _caching, flags);
   }
 
@@ -243,14 +246,14 @@ public:
 };
 inline std::ostream &operator<<(std::ostream &s, const directory_handle::filter &v)
 {
-  static constexpr const char *values[] = { "none", "fastdeleted" };
-  if (static_cast<size_t>(v) >= sizeof(values) / sizeof(values[0]) || !values[static_cast<size_t>(v)])
+  static constexpr const char *values[] = {"none", "fastdeleted"};
+  if(static_cast<size_t>(v) >= sizeof(values) / sizeof(values[0]) || !values[static_cast<size_t>(v)])
     return s << "afio::directory_handle::filter::<unknown>";
   return s << "afio::directory_handle::filter::" << values[static_cast<size_t>(v)];
 }
 inline std::ostream &operator<<(std::ostream &s, const directory_handle::enumerate_info &)
 {
-  return s <<  "afio::directory_handle::enumerate_info";
+  return s << "afio::directory_handle::enumerate_info";
 }
 
 // BEGIN make_free_functions.py
@@ -280,7 +283,7 @@ inline result<directory_handle> random_directory(const path_handle &dirpath, dir
 /*! Create a directory handle creating the named directory on some path which
 the OS declares to be suitable for temporary files.
 Note also that an empty name is equivalent to calling
-`random_file(temporary_files_directory())` and the creation
+`random_file(path_discovery::storage_backed_temporary_files_directory())` and the creation
 parameter is ignored.
 
 \errors Any of the values POSIX open() or CreateFile() can return.

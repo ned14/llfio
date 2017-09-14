@@ -282,7 +282,7 @@ public:
   Note the default flags are to have the newly created file deleted
   on first handle close.
   Note also that an empty name is equivalent to calling
-  `mapped_random_file(temporary_files_directory())` and the creation
+  `mapped_random_file(path_discovery::storage_backed_temporary_files_directory())` and the creation
   parameter is ignored.
 
   \note If the temporary file you are creating is not going to have its
@@ -294,7 +294,7 @@ public:
   AFIO_MAKE_FREE_FUNCTION
   static inline result<mapped_file_handle> mapped_temp_file(size_type reservation, path_view_type name = path_view_type(), mode _mode = mode::write, creation _creation = creation::if_needed, caching _caching = caching::temporary, flag flags = flag::unlink_on_close) noexcept
   {
-    OUTCOME_TRY(tempdirh, path_handle::path(temporary_files_directory()));
+    auto &tempdirh = path_discovery::storage_backed_temporary_files_directory();
     return name.empty() ? mapped_random_file(reservation, tempdirh, _mode, _caching, flags) : mapped_file(reservation, tempdirh, name, _mode, _creation, _caching, flags);
   }
   /*! \em Securely create a mapped file handle creating a temporary anonymous inode in
@@ -308,9 +308,9 @@ public:
   \errors Any of the values POSIX open() or CreateFile() can return.
   */
   AFIO_MAKE_FREE_FUNCTION
-  static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<mapped_file_handle> mapped_temp_inode(path_view_type dirpath = temporary_files_directory(), mode _mode = mode::write, flag flags = flag::none) noexcept
+  static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<mapped_file_handle> mapped_temp_inode(const path_handle &dir = path_discovery::storage_backed_temporary_files_directory(), mode _mode = mode::write, flag flags = flag::none) noexcept
   {
-    OUTCOME_TRY(v, file_handle::temp_inode(std::move(dirpath), std::move(_mode), flags));
+    OUTCOME_TRY(v, file_handle::temp_inode(dir, std::move(_mode), flags));
     mapped_file_handle ret(std::move(v));
     return std::move(ret);
   }
@@ -473,7 +473,7 @@ very lazy about flushing changes made to these temporary files.
 Note the default flags are to have the newly created file deleted
 on first handle close.
 Note also that an empty name is equivalent to calling
-`mapped_random_file(temporary_files_directory())` and the creation
+`mapped_random_file(path_discovery::storage_backed_temporary_files_directory())` and the creation
 parameter is ignored.
 
 \note If the temporary file you are creating is not going to have its
@@ -496,9 +496,9 @@ is for backing shared memory maps).
 
 \errors Any of the values POSIX open() or CreateFile() can return.
 */
-inline result<mapped_file_handle> mapped_temp_inode(mapped_file_handle::path_view_type dirpath = temporary_files_directory(), mapped_file_handle::mode _mode = mapped_file_handle::mode::write, mapped_file_handle::flag flags = mapped_file_handle::flag::none) noexcept
+inline result<mapped_file_handle> mapped_temp_inode(const path_handle &dir = path_discovery::storage_backed_temporary_files_directory(), mapped_file_handle::mode _mode = mapped_file_handle::mode::write, mapped_file_handle::flag flags = mapped_file_handle::flag::none) noexcept
 {
-  return mapped_file_handle::mapped_temp_inode(std::forward<decltype(dirpath)>(dirpath), std::forward<decltype(_mode)>(_mode), std::forward<decltype(flags)>(flags));
+  return mapped_file_handle::mapped_temp_inode(std::forward<decltype(dir)>(dir), std::forward<decltype(_mode)>(_mode), std::forward<decltype(flags)>(flags));
 }
 // END make_free_functions.py
 

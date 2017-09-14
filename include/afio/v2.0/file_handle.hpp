@@ -25,8 +25,8 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef AFIO_FILE_HANDLE_H
 #define AFIO_FILE_HANDLE_H
 
-#include "fs_handle.hpp"
 #include "io_handle.hpp"
+#include "path_discovery.hpp"
 #include "utils.hpp"
 
 //! \file file_handle.hpp Provides file_handle
@@ -37,19 +37,6 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 
 AFIO_V2_NAMESPACE_EXPORT_BEGIN
-
-/*! \brief Returns a path to a directory reported by the operating system to be
-suitable for storing temporary files. As operating systems are known to sometimes
-lie about the validity of this path, each of the available temporary file path
-options reported by the OS are probed by trying to create a file in each until
-success is found. If none of the available options are writable, some valid path
-containing the string "no_temporary_directories_accessible" will be returned
-which should cause all operations using that path to fail with a usefully user
-visible error message.
-
-\mallocs Allocates storage for each path probed.
-*/
-AFIO_HEADERS_ONLY_FUNC_SPEC path_view temporary_files_directory() noexcept;
 
 class io_service;
 
@@ -169,7 +156,7 @@ public:
   Note the default flags are to have the newly created file deleted
   on first handle close.
   Note also that an empty name is equivalent to calling
-  `random_file(temporary_files_directory())` and the creation
+  `random_file(path_discovery::storage_backed_temporary_files_directory())` and the creation
   parameter is ignored.
 
   \note If the temporary file you are creating is not going to have its
@@ -181,7 +168,7 @@ public:
   AFIO_MAKE_FREE_FUNCTION
   static inline result<file_handle> temp_file(path_view_type name = path_view_type(), mode _mode = mode::write, creation _creation = creation::if_needed, caching _caching = caching::temporary, flag flags = flag::unlink_on_close) noexcept
   {
-    OUTCOME_TRY(tempdirh, path_handle::path(temporary_files_directory()));
+    auto &tempdirh = path_discovery::storage_backed_temporary_files_directory();
     return name.empty() ? random_file(tempdirh, _mode, _caching, flags) : file(tempdirh, name, _mode, _creation, _caching, flags);
   }
   /*! \em Securely create a file handle creating a temporary anonymous inode in
@@ -195,7 +182,7 @@ public:
   \errors Any of the values POSIX open() or CreateFile() can return.
   */
   AFIO_MAKE_FREE_FUNCTION
-  static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<file_handle> temp_inode(path_view_type dirpath = temporary_files_directory(), mode _mode = mode::write, flag flags = flag::none) noexcept;
+  static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<file_handle> temp_inode(const path_handle &dir = path_discovery::storage_backed_temporary_files_directory(), mode _mode = mode::write, flag flags = flag::none) noexcept;
 
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> close() noexcept override
   {
@@ -308,7 +295,7 @@ very lazy about flushing changes made to these temporary files.
 Note the default flags are to have the newly created file deleted
 on first handle close.
 Note also that an empty name is equivalent to calling
-`random_file(temporary_files_directory())` and the creation
+`random_file(path_discovery::storage_backed_temporary_files_directory())` and the creation
 parameter is ignored.
 
 \note If the temporary file you are creating is not going to have its
@@ -331,9 +318,9 @@ is for backing shared memory maps).
 
 \errors Any of the values POSIX open() or CreateFile() can return.
 */
-inline result<file_handle> temp_inode(file_handle::path_view_type dirpath = temporary_files_directory(), file_handle::mode _mode = file_handle::mode::write, file_handle::flag flags = file_handle::flag::none) noexcept
+inline result<file_handle> temp_inode(const path_handle &dir = path_discovery::storage_backed_temporary_files_directory(), file_handle::mode _mode = file_handle::mode::write, file_handle::flag flags = file_handle::flag::none) noexcept
 {
-  return file_handle::temp_inode(std::forward<decltype(dirpath)>(dirpath), std::forward<decltype(_mode)>(_mode), std::forward<decltype(flags)>(flags));
+  return file_handle::temp_inode(std::forward<decltype(dir)>(dir), std::forward<decltype(_mode)>(_mode), std::forward<decltype(flags)>(flags));
 }
 /*! Return the current maximum permitted extent of the file.
 

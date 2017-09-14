@@ -532,7 +532,7 @@ namespace windows_nt_kernel
 #pragma warning(disable : 4706)  // assignment within conditional
 #pragma warning(disable : 6387)  // MSVC sanitiser warns that GetModuleHandleA() might fail (hah!)
 #endif
-  static inline void doinit()
+  inline void doinit()
   {
     if(RtlUTF8ToUnicodeN)
       return;
@@ -652,7 +652,7 @@ namespace windows_nt_kernel
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
-  static inline void init()
+  inline void init()
   {
     static bool initialised = false;
     if(!initialised)
@@ -662,7 +662,7 @@ namespace windows_nt_kernel
     }
   }
 
-  static inline filesystem::file_type to_st_type(ULONG FileAttributes, ULONG ReparsePointTag)
+  inline filesystem::file_type to_st_type(ULONG FileAttributes, ULONG ReparsePointTag)
   {
 #ifdef AFIO_USE_LEGACY_FILESYSTEM_SEMANTICS
     if(FileAttributes & FILE_ATTRIBUTE_REPARSE_POINT && (ReparsePointTag == IO_REPARSE_TAG_MOUNT_POINT || ReparsePointTag == IO_REPARSE_TAG_SYMLINK))
@@ -687,7 +687,7 @@ namespace windows_nt_kernel
 #pragma warning(push)
 #pragma warning(disable : 6326)  // comparison of constants
 #endif
-  static inline std::chrono::system_clock::time_point to_timepoint(LARGE_INTEGER time)
+  inline std::chrono::system_clock::time_point to_timepoint(LARGE_INTEGER time)
   {
     // For speed we make the big assumption that the STL's system_clock is based on the time_t epoch 1st Jan 1970.
     static constexpr unsigned long long FILETIME_OFFSET_TO_1970 = ((27111902ULL << 32U) + 3577643008ULL);
@@ -700,7 +700,7 @@ namespace windows_nt_kernel
     std::chrono::system_clock::duration duration(ticks_since_1970 * multiplier / divider);
     return std::chrono::system_clock::time_point(duration);
   }
-  static inline LARGE_INTEGER from_timepoint(std::chrono::system_clock::time_point time)
+  inline LARGE_INTEGER from_timepoint(std::chrono::system_clock::time_point time)
   {
     // For speed we make the big assumption that the STL's system_clock is based on the time_t epoch 1st Jan 1970.
     static constexpr unsigned long long FILETIME_OFFSET_TO_1970 = ((27111902ULL << 32U) + 3577643008ULL);
@@ -720,7 +720,7 @@ namespace windows_nt_kernel
 #pragma warning(push)
 #pragma warning(disable : 6387)  // MSVC sanitiser warns on misuse of GetOverlappedResult
 #endif
-  static inline DWORD win32_error_from_nt_status(NTSTATUS ntstatus)
+  inline DWORD win32_error_from_nt_status(NTSTATUS ntstatus)
   {
     DWORD br;
     OVERLAPPED o;
@@ -740,7 +740,7 @@ namespace windows_nt_kernel
 }  // namespace
 
 #if 0
-static inline void fill_stat_t(stat_t &stat, AFIO_POSIX_STAT_STRUCT s, metadata_flags wanted)
+inline void fill_stat_t(stat_t &stat, AFIO_POSIX_STAT_STRUCT s, metadata_flags wanted)
 {
 #ifndef _WIN32
   if (!!(wanted&metadata_flags::dev)) { stat.st_dev = s.st_dev; }
@@ -769,14 +769,14 @@ struct win_handle_deleter
 {
   void operator()(HANDLE h) { CloseHandle(h); }
 };
-static inline std::unique_ptr<void, win_handle_deleter> create_waitable_timer()
+inline std::unique_ptr<void, win_handle_deleter> create_waitable_timer()
 {
   HANDLE ret = CreateWaitableTimer(nullptr, true, nullptr);
   if(INVALID_HANDLE_VALUE == ret)
     throw std::system_error(GetLastError(), std::system_category());
   return std::unique_ptr<void, win_handle_deleter>(ret);
 }
-static inline HANDLE get_thread_local_waitable_timer()
+inline HANDLE get_thread_local_waitable_timer()
 {
   static thread_local auto self = create_waitable_timer();
   return self.get();
@@ -926,7 +926,7 @@ if(d)                                                                           
 #endif
 
 // Initialise an IO_STATUS_BLOCK for later wait operations
-static inline windows_nt_kernel::IO_STATUS_BLOCK make_iostatus() noexcept
+inline windows_nt_kernel::IO_STATUS_BLOCK make_iostatus() noexcept
 {
   windows_nt_kernel::IO_STATUS_BLOCK isb;
   memset(&isb, 0, sizeof(isb));
@@ -935,7 +935,7 @@ static inline windows_nt_kernel::IO_STATUS_BLOCK make_iostatus() noexcept
 }
 
 // Wait for an overlapped handle to complete a specific operation
-static inline NTSTATUS ntwait(HANDLE h, windows_nt_kernel::IO_STATUS_BLOCK &isb, const deadline &d) noexcept
+inline NTSTATUS ntwait(HANDLE h, windows_nt_kernel::IO_STATUS_BLOCK &isb, const deadline &d) noexcept
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
@@ -956,13 +956,13 @@ static inline NTSTATUS ntwait(HANDLE h, windows_nt_kernel::IO_STATUS_BLOCK &isb,
   } while(isb.Status == -1);
   return isb.Status;
 }
-static inline NTSTATUS ntwait(HANDLE h, OVERLAPPED &ol, const deadline &d) noexcept
+inline NTSTATUS ntwait(HANDLE h, OVERLAPPED &ol, const deadline &d) noexcept
 {
   return ntwait(h, reinterpret_cast<windows_nt_kernel::IO_STATUS_BLOCK &>(ol), d);
 }
 
 // Sleep the thread until some deadline
-static inline bool ntsleep(const deadline &d, bool return_on_alert = false) noexcept
+inline bool ntsleep(const deadline &d, bool return_on_alert = false) noexcept
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
@@ -990,7 +990,7 @@ static inline bool ntsleep(const deadline &d, bool return_on_alert = false) noex
 
 
 // Utility routine for building an ACCESS_MASK from a handle::mode
-static inline result<ACCESS_MASK> access_mask_from_handle_mode(native_handle_type &nativeh, handle::mode _mode, handle::flag flags)
+inline result<ACCESS_MASK> access_mask_from_handle_mode(native_handle_type &nativeh, handle::mode _mode, handle::flag flags)
 {
   ACCESS_MASK access = SYNCHRONIZE;  // appears that this is the bare minimum for the call to succeed
   switch(_mode)
@@ -1023,7 +1023,7 @@ static inline result<ACCESS_MASK> access_mask_from_handle_mode(native_handle_typ
     access |= DELETE;
   return access;
 }
-static inline result<DWORD> attributes_from_handle_caching_and_flags(native_handle_type &nativeh, handle::caching _caching, handle::flag flags)
+inline result<DWORD> attributes_from_handle_caching_and_flags(native_handle_type &nativeh, handle::caching _caching, handle::flag flags)
 {
   DWORD attribs = 0;
   if(flags & handle::flag::overlapped)
@@ -1062,7 +1062,7 @@ static inline result<DWORD> attributes_from_handle_caching_and_flags(native_hand
     attribs |= FILE_FLAG_SEQUENTIAL_SCAN;
   return attribs;
 }
-static inline result<DWORD> ntflags_from_handle_caching_and_flags(native_handle_type &nativeh, handle::caching _caching, handle::flag flags)
+inline result<DWORD> ntflags_from_handle_caching_and_flags(native_handle_type &nativeh, handle::caching _caching, handle::flag flags)
 {
   DWORD ntflags = 0;
   if(flags & handle::flag::overlapped)
@@ -1116,7 +1116,7 @@ with a non-broken version.
 This edition does pretty much the same as the Win32 edition, minus support for file
 templates and lpFileName being anything but a file path.
 */
-static inline HANDLE CreateFileW_(_In_ LPCTSTR lpFileName, _In_ DWORD dwDesiredAccess, _In_ DWORD dwShareMode, _In_opt_ LPSECURITY_ATTRIBUTES lpSecurityAttributes, _In_ DWORD dwCreationDisposition, _In_ DWORD dwFlagsAndAttributes, _In_opt_ HANDLE hTemplateFile, bool forcedir = false)
+inline HANDLE CreateFileW_(_In_ LPCTSTR lpFileName, _In_ DWORD dwDesiredAccess, _In_ DWORD dwShareMode, _In_opt_ LPSECURITY_ATTRIBUTES lpSecurityAttributes, _In_ DWORD dwCreationDisposition, _In_ DWORD dwFlagsAndAttributes, _In_opt_ HANDLE hTemplateFile, bool forcedir = false)
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
@@ -1223,6 +1223,24 @@ static inline HANDLE CreateFileW_(_In_ LPCTSTR lpFileName, _In_ DWORD dwDesiredA
     SetLastError(ERROR_DELETE_PENDING);
   }
   return INVALID_HANDLE_VALUE;
+}
+
+// Detect if we are running under SUID or SGID
+inline bool running_under_suid_gid()
+{
+  HANDLE processtoken;
+  if(!OpenProcessToken(GetCurrentProcess(), TOKEN_ALL_ACCESS, &processtoken))
+    abort();
+  auto unprocesstoken = undoer([&processtoken] { CloseHandle(processtoken); });
+  (void) unprocesstoken;
+  DWORD written;
+  TOKEN_USER tu;
+  TOKEN_OWNER to;
+  if(!GetTokenInformation(processtoken, TokenUser, &tu, sizeof(tu), &written))
+    abort();
+  if(!GetTokenInformation(processtoken, TokenOwner, &to, sizeof(to), &written))
+    abort();
+  return !EqualSid(tu.User.Sid, to.Owner);
 }
 
 AFIO_V2_NAMESPACE_END

@@ -263,7 +263,7 @@ result<file_handle> file_handle::file(const path_handle &base, file_handle::path
   return ret;
 }
 
-result<file_handle> file_handle::temp_inode(file_handle::path_view_type dirpath, mode _mode, flag flags) noexcept
+result<file_handle> file_handle::temp_inode(const path_handle &dirh, mode _mode, flag flags) noexcept
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
@@ -277,7 +277,6 @@ result<file_handle> file_handle::temp_inode(file_handle::path_view_type dirpath,
   DWORD fileshare = /* no read nor write access for others */ FILE_SHARE_DELETE;
   OUTCOME_TRY(access, access_mask_from_handle_mode(nativeh, _mode, flags));
   OUTCOME_TRY(attribs, attributes_from_handle_caching_and_flags(nativeh, _caching, flags));
-  OUTCOME_TRY(dirh, path_handle::path(dirpath));
   DWORD creatdisp = 0x00000002 /*FILE_CREATE*/;
 
   attribs &= 0x00ffffff;  // the real attributes only, not the win32 flags
