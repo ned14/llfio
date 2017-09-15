@@ -17,6 +17,7 @@ var dir_df838802a8d72797f186037846947269 =
       [ "native_handle_type", "structafio__v2__xxx_1_1native__handle__type.html", "structafio__v2__xxx_1_1native__handle__type" ],
       [ "disposition_base", "structafio__v2__xxx_1_1native__handle__type_1_1disposition__base.html", "structafio__v2__xxx_1_1native__handle__type_1_1disposition__base" ]
     ] ],
+    [ "path_discovery.hpp", "path__discovery_8hpp.html", "path__discovery_8hpp" ],
     [ "path_handle.hpp", "path__handle_8hpp.html", "path__handle_8hpp" ],
     [ "path_view.hpp", "path__view_8hpp.html", "path__view_8hpp" ],
     [ "stat.hpp", "stat_8hpp.html", [

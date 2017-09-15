@@ -10,6 +10,5 @@ var directory__handle_8hpp =
     [ "operator<<", "directory__handle_8hpp.html#adc0cc191e052bf33253287e0d1baeb4c", null ],
     [ "random_directory", "directory__handle_8hpp.html#a26a149bed05acb7e27596e84f16cd0bd", null ],
     [ "swap", "directory__handle_8hpp.html#a3ece430e8478fc6909cd7ec2fc0082b3", null ],
-    [ "temp_directory", "directory__handle_8hpp.html#ac095df054e29fb086f9e7b96274c3c67", null ],
-    [ "temporary_files_directory", "directory__handle_8hpp.html#a4968bb2d647535f4b91427c66ff8b9e4", null ]
+    [ "temp_directory", "directory__handle_8hpp.html#ac095df054e29fb086f9e7b96274c3c67", null ]
 ];

@@ -7,8 +7,7 @@ var file__handle_8hpp =
     [ "random_file", "file__handle_8hpp.html#aac0b7d76c4298e86cef49c832c93edec", null ],
     [ "swap", "file__handle_8hpp.html#a579d619e4d73e584fdd41e34761afa67", null ],
     [ "temp_file", "file__handle_8hpp.html#aa14b24c8bc330dd8e472f42676ba03d6", null ],
-    [ "temp_inode", "file__handle_8hpp.html#a25e7624225f9b77179792bd16ce169a0", null ],
-    [ "temporary_files_directory", "file__handle_8hpp.html#a4968bb2d647535f4b91427c66ff8b9e4", null ],
+    [ "temp_inode", "file__handle_8hpp.html#a2a2248a6545d55ee8f46628c8afb7946", null ],
     [ "truncate", "file__handle_8hpp.html#a84d22c966fcabe50de30ad8cf26c7241", null ],
     [ "zero", "file__handle_8hpp.html#ae412aa7c9e37601d1814e75d09795185", null ]
 ];

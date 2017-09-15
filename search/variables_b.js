@@ -21,6 +21,6 @@ var searchData=
   ['st_5fsparse',['st_sparse',['../structafio__v2__xxx_1_1stat__t.html#a6461e6278085dea3b33b865867746f6d',1,'afio_v2_xxx::stat_t']]],
   ['st_5ftype',['st_type',['../structafio__v2__xxx_1_1stat__t.html#aa36e06b416a94dd67d3a112e2da0a3b7',1,'afio_v2_xxx::stat_t']]],
   ['st_5fuid',['st_uid',['../structafio__v2__xxx_1_1stat__t.html#a76b46ca289cd0bb1ed94c5eb8273e52d',1,'afio_v2_xxx::stat_t']]],
-  ['stat',['stat',['../structafio__v2__xxx_1_1directory__entry.html#abb735d664f64ed69a62fef4f62237a29',1,'afio_v2_xxx::directory_entry']]],
+  ['stat',['stat',['../structafio__v2__xxx_1_1directory__entry.html#abb735d664f64ed69a62fef4f62237a29',1,'afio_v2_xxx::directory_entry::stat()'],['../structafio__v2__xxx_1_1path__discovery_1_1discovered__path.html#a4096c25137f7ac4bd58284ab7a82bd00',1,'afio_v2_xxx::path_discovery::discovered_path::stat()']]],
   ['steady',['steady',['../structafio__v2__xxx_1_1deadline.html#a37956f66fc9e6d091fb1f34c4ba90236',1,'afio_v2_xxx::deadline']]]
 ];

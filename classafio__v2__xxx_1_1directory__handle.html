@@ -400,10 +400,10 @@ ino_t&#160;</td><td class="memItemRight" valign="bottom"><b>_inode</b></td></tr>
 <p>Filter out AFIO deleted files based on their filename (fast and fairly reliable) </p>
 </td></tr>
 </table>
-<div class="fragment"><div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;  {</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;    none,        <span class="comment">//!&lt; Do no filtering at all</span></div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;<span class="comment"></span>    fastdeleted  <span class="comment">//!&lt; Filter out AFIO deleted files based on their filename (fast and fairly reliable)</span></div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;<span class="comment"></span>  };</div>
+<div class="fragment"><div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;  {</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;    none,        <span class="comment">//!&lt; Do no filtering at all</span></div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;<span class="comment"></span>    fastdeleted  <span class="comment">//!&lt; Filter out AFIO deleted files based on their filename (fast and fairly reliable)</span></div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;<span class="comment"></span>  };</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -715,22 +715,22 @@ ino_t&#160;</td><td class="memItemRight" valign="bottom"><b>_inode</b></td></tr>
 </div><div class="memdoc">
 <p>Create a directory handle creating a randomly named file on a path. The file is opened exclusively with <code>creation::only_if_not_exist</code> so it will never collide with nor overwrite any existing entry.</p>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX open() or CreateFile() can return. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;  {</div>
-<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;    <span class="keywordflow">try</span></div>
-<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;    {</div>
-<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;      <span class="keywordflow">for</span>(;;)</div>
-<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;      {</div>
-<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;        <span class="keyword">auto</span> randomname = <a class="code" href="namespaceafio__v2__xxx_1_1utils.html#a767b8434456319066194534a4c4edbf5">utils::random_string</a>(32);</div>
-<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;        result&lt;directory_handle&gt; ret = <a class="code" href="classafio__v2__xxx_1_1directory__handle.html#ade355bac3d2aafd1ead15d090f85c057">directory</a>(dirpath, randomname, _mode, creation::only_if_not_exist, _caching, <a class="code" href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">flags</a>);</div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;        <span class="keywordflow">if</span>(ret || (!ret &amp;&amp; ret.error() != std::errc::file_exists))</div>
-<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;          <span class="keywordflow">return</span> ret;</div>
-<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;      }</div>
-<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;    }</div>
-<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;    <span class="keywordflow">catch</span>(...)</div>
-<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;    {</div>
-<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;      <span class="keywordflow">return</span> error_from_exception();</div>
-<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;    }</div>
-<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;  }</div>
+<div class="fragment"><div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;  {</div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;    <span class="keywordflow">try</span></div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;    {</div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;      <span class="keywordflow">for</span>(;;)</div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;      {</div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;        <span class="keyword">auto</span> randomname = <a class="code" href="namespaceafio__v2__xxx_1_1utils.html#a767b8434456319066194534a4c4edbf5">utils::random_string</a>(32);</div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;        result&lt;directory_handle&gt; ret = <a class="code" href="classafio__v2__xxx_1_1directory__handle.html#ade355bac3d2aafd1ead15d090f85c057">directory</a>(dirpath, randomname, _mode, creation::only_if_not_exist, _caching, <a class="code" href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">flags</a>);</div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;        <span class="keywordflow">if</span>(ret || (!ret &amp;&amp; ret.error() != std::errc::file_exists))</div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;          <span class="keywordflow">return</span> ret;</div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;      }</div>
+<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;    }</div>
+<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;    <span class="keywordflow">catch</span>(...)</div>
+<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;    {</div>
+<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;      <span class="keywordflow">return</span> error_from_exception();</div>
+<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;    }</div>
+<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;  }</div>
 <div class="ttc" id="classafio__v2__xxx_1_1directory__handle_html_ade355bac3d2aafd1ead15d090f85c057"><div class="ttname"><a href="classafio__v2__xxx_1_1directory__handle.html#ade355bac3d2aafd1ead15d090f85c057">afio_v2_xxx::directory_handle::directory</a></div><div class="ttdeci">static result&lt; directory_handle &gt; directory(const path_handle &amp;base, path_view_type _path, mode _mode=mode::read, creation _creation=creation::open_existing, caching _caching=caching::all, flag flags=flag::none) noexcept</div></div>
 <div class="ttc" id="namespaceafio__v2__xxx_1_1utils_html_a767b8434456319066194534a4c4edbf5"><div class="ttname"><a href="namespaceafio__v2__xxx_1_1utils.html#a767b8434456319066194534a4c4edbf5">afio_v2_xxx::utils::random_string</a></div><div class="ttdeci">std::string random_string(size_t randomlen)</div><div class="ttdoc">Returns a cryptographically random string capable of being used as a filename. Essentially random_fil...</div><div class="ttdef"><b>Definition:</b> utils.hpp:130</div></div>
 <div class="ttc" id="classafio__v2__xxx_1_1handle_html_ab3d876f5996605158fd6a0582adadad6"><div class="ttname"><a href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">afio_v2_xxx::handle::flags</a></div><div class="ttdeci">flag flags() const noexcept</div><div class="ttdoc">The flags this handle was opened with. </div><div class="ttdef"><b>Definition:</b> handle.hpp:307</div></div>
@@ -900,17 +900,16 @@ ino_t&#160;</td><td class="memItemRight" valign="bottom"><b>_inode</b></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Create a directory handle creating the named directory on some path which the OS declares to be suitable for temporary files. Note also that an empty name is equivalent to calling <code>random_file(temporary_files_directory())</code> and the creation parameter is ignored.</p>
+<p>Create a directory handle creating the named directory on some path which the OS declares to be suitable for temporary files. Note also that an empty name is equivalent to calling <code>random_file(path_discovery::storage_backed_temporary_files_directory())</code> and the creation parameter is ignored.</p>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX open() or CreateFile() can return. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;  {</div>
-<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;    OUTCOME_TRY(tempdirh, <a class="code" href="classafio__v2__xxx_1_1path__handle.html#a5cbd1d67ffe72d6cce0d093f861a4af7">path_handle::path</a>(<a class="code" href="namespaceafio__v2__xxx.html#a4968bb2d647535f4b91427c66ff8b9e4">temporary_files_directory</a>()));</div>
-<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;    <span class="keywordflow">return</span> name.empty() ? <a class="code" href="classafio__v2__xxx_1_1directory__handle.html#a28fdac2d7adadbdddd036efd802ad726">random_directory</a>(tempdirh, _mode, _caching, <a class="code" href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">flags</a>) : <a class="code" href="classafio__v2__xxx_1_1directory__handle.html#ade355bac3d2aafd1ead15d090f85c057">directory</a>(tempdirh, name, _mode, _creation, _caching, <a class="code" href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">flags</a>);</div>
-<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;  }</div>
+<div class="fragment"><div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;  {</div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;    <span class="keyword">auto</span> &amp;tempdirh = <a class="code" href="namespaceafio__v2__xxx_1_1path__discovery.html#af398b6c3762f60aa96cebd270879093e">path_discovery::storage_backed_temporary_files_directory</a>();</div>
+<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;    <span class="keywordflow">return</span> name.empty() ? <a class="code" href="classafio__v2__xxx_1_1directory__handle.html#a28fdac2d7adadbdddd036efd802ad726">random_directory</a>(tempdirh, _mode, _caching, <a class="code" href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">flags</a>) : <a class="code" href="classafio__v2__xxx_1_1directory__handle.html#ade355bac3d2aafd1ead15d090f85c057">directory</a>(tempdirh, name, _mode, _creation, _caching, <a class="code" href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">flags</a>);</div>
+<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;  }</div>
+<div class="ttc" id="namespaceafio__v2__xxx_1_1path__discovery_html_af398b6c3762f60aa96cebd270879093e"><div class="ttname"><a href="namespaceafio__v2__xxx_1_1path__discovery.html#af398b6c3762f60aa96cebd270879093e">afio_v2_xxx::path_discovery::storage_backed_temporary_files_directory</a></div><div class="ttdeci">const path_handle &amp; storage_backed_temporary_files_directory() noexcept</div><div class="ttdoc">Returns a reference to an open handle to a verified temporary directory where files created are store...</div></div>
 <div class="ttc" id="classafio__v2__xxx_1_1directory__handle_html_ade355bac3d2aafd1ead15d090f85c057"><div class="ttname"><a href="classafio__v2__xxx_1_1directory__handle.html#ade355bac3d2aafd1ead15d090f85c057">afio_v2_xxx::directory_handle::directory</a></div><div class="ttdeci">static result&lt; directory_handle &gt; directory(const path_handle &amp;base, path_view_type _path, mode _mode=mode::read, creation _creation=creation::open_existing, caching _caching=caching::all, flag flags=flag::none) noexcept</div></div>
-<div class="ttc" id="namespaceafio__v2__xxx_html_a4968bb2d647535f4b91427c66ff8b9e4"><div class="ttname"><a href="namespaceafio__v2__xxx.html#a4968bb2d647535f4b91427c66ff8b9e4">afio_v2_xxx::temporary_files_directory</a></div><div class="ttdeci">path_view temporary_files_directory() noexcept</div><div class="ttdoc">Returns a path to a directory reported by the operating system to be suitable for storing temporary f...</div></div>
-<div class="ttc" id="classafio__v2__xxx_1_1path__handle_html_a5cbd1d67ffe72d6cce0d093f861a4af7"><div class="ttname"><a href="classafio__v2__xxx_1_1path__handle.html#a5cbd1d67ffe72d6cce0d093f861a4af7">afio_v2_xxx::path_handle::path</a></div><div class="ttdeci">static result&lt; path_handle &gt; path(const path_handle &amp;base, path_view_type _path) noexcept</div></div>
 <div class="ttc" id="classafio__v2__xxx_1_1handle_html_ab3d876f5996605158fd6a0582adadad6"><div class="ttname"><a href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">afio_v2_xxx::handle::flags</a></div><div class="ttdeci">flag flags() const noexcept</div><div class="ttdoc">The flags this handle was opened with. </div><div class="ttdef"><b>Definition:</b> handle.hpp:307</div></div>
-<div class="ttc" id="classafio__v2__xxx_1_1directory__handle_html_a28fdac2d7adadbdddd036efd802ad726"><div class="ttname"><a href="classafio__v2__xxx_1_1directory__handle.html#a28fdac2d7adadbdddd036efd802ad726">afio_v2_xxx::directory_handle::random_directory</a></div><div class="ttdeci">static result&lt; directory_handle &gt; random_directory(const path_handle &amp;dirpath, mode _mode=mode::write, caching _caching=caching::temporary, flag flags=flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> directory_handle.hpp:163</div></div>
+<div class="ttc" id="classafio__v2__xxx_1_1directory__handle_html_a28fdac2d7adadbdddd036efd802ad726"><div class="ttname"><a href="classafio__v2__xxx_1_1directory__handle.html#a28fdac2d7adadbdddd036efd802ad726">afio_v2_xxx::directory_handle::random_directory</a></div><div class="ttdeci">static result&lt; directory_handle &gt; random_directory(const path_handle &amp;dirpath, mode _mode=mode::write, caching _caching=caching::temporary, flag flags=flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> directory_handle.hpp:166</div></div>
 </div><!-- fragment -->
 </div>
 </div>

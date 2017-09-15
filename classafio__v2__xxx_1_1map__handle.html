@@ -870,10 +870,10 @@ For portability, you can only assume that barriers write order for a single hand
 </table>
 </div><div class="memdoc">
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;  {</div>
-<div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;    OUTCOME_TRY(ret, <a class="code" href="classafio__v2__xxx_1_1map__handle.html#ae16cb0af9b96f90f87f42318f7d35e65">prefetch</a>(span&lt;buffer_type&gt;(&amp;region, 1)));</div>
-<div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160;    <span class="keywordflow">return</span> *ret.data();</div>
-<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;  }</div>
+<div class="fragment"><div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160;  {</div>
+<div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;    OUTCOME_TRY(ret, <a class="code" href="classafio__v2__xxx_1_1map__handle.html#ae16cb0af9b96f90f87f42318f7d35e65">prefetch</a>(span&lt;buffer_type&gt;(&amp;region, 1)));</div>
+<div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;    <span class="keywordflow">return</span> *ret.data();</div>
+<div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;  }</div>
 <div class="ttc" id="classafio__v2__xxx_1_1map__handle_html_ae16cb0af9b96f90f87f42318f7d35e65"><div class="ttname"><a href="classafio__v2__xxx_1_1map__handle.html#ae16cb0af9b96f90f87f42318f7d35e65">afio_v2_xxx::map_handle::prefetch</a></div><div class="ttdeci">static result&lt; span&lt; buffer_type &gt; &gt; prefetch(span&lt; buffer_type &gt; regions) noexcept</div><div class="ttdoc">Ask the system to begin to asynchronously prefetch the span of memory regions given, returning the regions actually prefetched. Note that on Windows 7 or earlier the system call to implement this was not available, and so you will see an empty span returned. </div></div>
 </div><!-- fragment -->
 </div>

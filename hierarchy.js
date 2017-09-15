@@ -7,6 +7,7 @@ var hierarchy =
     [ "afio_v2_xxx::io_handle::const_buffer_type", "structafio__v2__xxx_1_1io__handle_1_1const__buffer__type.html", null ],
     [ "afio_v2_xxx::deadline", "structafio__v2__xxx_1_1deadline.html", null ],
     [ "afio_v2_xxx::directory_entry", "structafio__v2__xxx_1_1directory__entry.html", null ],
+    [ "afio_v2_xxx::path_discovery::discovered_path", "structafio__v2__xxx_1_1path__discovery_1_1discovered__path.html", null ],
     [ "afio_v2_xxx::native_handle_type::disposition_base", "structafio__v2__xxx_1_1native__handle__type_1_1disposition__base.html", null ],
     [ "afio_v2_xxx::algorithm::shared_fs_mutex::shared_fs_mutex::entities_guard", "classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex_1_1entities__guard.html", null ],
     [ "afio_v2_xxx::algorithm::shared_fs_mutex::shared_fs_mutex::entity_type", "structafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex_1_1entity__type.html", null ],

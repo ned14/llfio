@@ -115,7 +115,7 @@ $(document).ready(function(){initNavTree('directory__handle_8hpp.html','');});
 
 <p>Provides a handle to a directory.  
 <a href="#details">More...</a></p>
-<div class="textblock"><code>#include &quot;<a class="el" href="fs__handle_8hpp.html">fs_handle.hpp</a>&quot;</code><br/>
+<div class="textblock"><code>#include &quot;<a class="el" href="path__discovery_8hpp.html">path_discovery.hpp</a>&quot;</code><br/>
 <code>#include &quot;<a class="el" href="stat_8hpp.html">stat.hpp</a>&quot;</code><br/>
 <code>#include &lt;memory&gt;</code><br/>
 </div><table class="memberdecls">
@@ -140,9 +140,6 @@ Namespaces</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a4968bb2d647535f4b91427c66ff8b9e4"><td class="memItemLeft" align="right" valign="top">path_view&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx.html#a4968bb2d647535f4b91427c66ff8b9e4">afio_v2_xxx::temporary_files_directory</a> () noexcept</td></tr>
-<tr class="memdesc:a4968bb2d647535f4b91427c66ff8b9e4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a path to a directory reported by the operating system to be suitable for storing temporary files. As operating systems are known to sometimes lie about the validity of this path, each of the available temporary file path options reported by the OS are probed by trying to create a file in each until success is found. If none of the available options are writable, some valid path containing the string "no_temporary_directories_accessible" will be returned which should cause all operations using that path to fail with a usefully user visible error message.  <a href="#a4968bb2d647535f4b91427c66ff8b9e4">More...</a><br/></td></tr>
-<tr class="separator:a4968bb2d647535f4b91427c66ff8b9e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2cbad389de45a9893ef02eeec86dcd21"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2cbad389de45a9893ef02eeec86dcd21"></a>
 std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>afio_v2_xxx::operator&lt;&lt;</b> (std::ostream &amp;s, const directory_handle::filter &amp;v)</td></tr>
 <tr class="separator:a2cbad389de45a9893ef02eeec86dcd21"><td class="memSeparator" colspan="2">&#160;</td></tr>
