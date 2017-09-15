@@ -39,8 +39,11 @@ section_handle::~section_handle()
 result<void> section_handle::close() noexcept
 {
   AFIO_LOG_FUNCTION_CALL(this);
-  // We don't want ~handle() to close our fake handle
-  _v = native_handle_type();
+  if(!(_flags & flag::posix_anonymous_inode))
+  {
+    // We don't want ~handle() to close our handle borrowed from the backing file
+    _v = native_handle_type();
+  }
   return success();
 }
 
@@ -77,11 +80,23 @@ result<section_handle> section_handle::section(file_handle &backing, extent_type
     }
   }
   if(!backing.is_valid())
+  {
     maximum_size = utils::round_up_to_page_size(maximum_size);
+  }
   result<section_handle> ret(section_handle(native_handle_type(), backing.is_valid() ? &backing : nullptr, maximum_size, _flag));
   // There are no section handles on POSIX, so do nothing
   native_handle_type &nativeh = ret.value()._v;
-  nativeh.fd = INT_MAX;
+  if(backing.is_valid())
+  {
+    nativeh.fd = backing.native_handle().fd;
+  }
+  else
+  {
+    // Create a temporary anonymous inode in a tmpfs
+    OUTCOME_TRY(tmpfsfile, file_handle::temp_inode(path_discovery::memory_backed_temporary_files_directory()));
+    nativeh.fd = tmpfsfile.release().fd;
+    ret.value()._flag |= flag::posix_anonymous_inode;
+  }
   nativeh.behaviour |= native_handle_type::disposition::section;
   AFIO_LOG_FUNCTION_CALL(&ret);
   return ret;
@@ -119,7 +134,11 @@ result<section_handle::extent_type> section_handle::truncate(extent_type newsize
   {
     newsize = utils::round_up_to_page_size(newsize);
   }
-  // There are no section handles on POSIX, so do nothing
+  if(_flag & flag::posix_anonymous_inode)
+  {
+    if(-1 == ::ftruncate(_v.fd, newsize))
+      return {errno, std::system_category()};
+  }
   _length = newsize;
   return newsize;
 }
@@ -240,8 +259,8 @@ static inline result<void *> do_mmap(native_handle_type &nativeh, void *ataddr, 
   if(have_backing && (section->backing()->kernel_caching() == handle::caching::temporary))
     flags |= MAP_NOSYNC;
 #endif
-  // printf("mmap(%p, %u, %d, %d, %d, %u)\n", ataddr, (unsigned) bytes, prot, flags, have_backing ? section->backing_native_handle().fd : -1, (unsigned) offset);
-  addr = ::mmap(ataddr, bytes, prot, flags, have_backing ? section->backing_native_handle().fd : -1, offset);
+  // printf("mmap(%p, %u, %d, %d, %d, %u)\n", ataddr, (unsigned) bytes, prot, flags, have_backing ? section->native_handle().fd : -1, (unsigned) offset);
+  addr = ::mmap(ataddr, bytes, prot, flags, have_backing ? section->native_handle().fd : -1, offset);
   // printf("%d mmap %p-%p\n", getpid(), addr, (char *) addr+bytes);
   if(MAP_FAILED == addr)
     return {errno, std::system_category()};
@@ -291,7 +310,7 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
   ret.value()._offset = offset;
   ret.value()._length = _bytes;
   // Make my handle borrow the native handle of my backing storage
-  ret.value()._v.fd = section.backing_native_handle().fd;
+  ret.value()._v.fd = section.native_handle().fd;
   AFIO_LOG_FUNCTION_CALL(&ret);
   return ret;
 }

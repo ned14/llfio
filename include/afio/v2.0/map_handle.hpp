@@ -40,7 +40,8 @@ AFIO_V2_NAMESPACE_EXPORT_BEGIN
 \brief A handle to a source of mapped memory.
 
 \note On Windows the native handle of this handle is that of the NT kernel section object. On POSIX it is
-a cloned file descriptor of the backing storage.
+a cloned file descriptor of the backing storage if there is backing storage, else it will be a file
+descriptor to an unnamed inode in a tmpfs or ramfs based temporary directory.
 */
 class AFIO_DECL section_handle : public handle
 {
@@ -63,8 +64,8 @@ public:
                                    barrier_on_close = 1 << 16,  //!< Maps of this section, if writable, issue a `barrier()` when destructed blocking until data (not metadata) reaches physical storage.
 
                                    // NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!
-                                   
-                                   posix_skip_length_checks = 1 << 28,
+
+                                   posix_skip_length_checks = 1 << 28, posix_anonymous_inode = 1 << 29,
 
                                    readwrite = (read | write)};
   QUICKCPPLIB_BITFIELD_END(flag);
@@ -123,7 +124,11 @@ public:
   of any backing file used.
   \param _flag How to create the section.
 
-  \errors Any of the values POSIX dup() or NtCreateSection() can return.
+  \note On POSIX, non-file backed sections are implemented by creating an unnamed inode in a tmpfs implemented temporary directory
+  as returned by `path_discovery::memory_backed_temporary_files_directory()`. If no tmpfs temporary directories are available,
+  non-file back sections will fail to construct.
+
+  \errors Any of the values POSIX dup(), open() or NtCreateSection() can return.
   */
   AFIO_MAKE_FREE_FUNCTION
   static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<section_handle> section(file_handle &backing, extent_type maximum_size = 0, flag _flag = flag::read | flag::write) noexcept;

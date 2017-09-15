@@ -1234,13 +1234,14 @@ inline bool running_under_suid_gid()
   auto unprocesstoken = undoer([&processtoken] { CloseHandle(processtoken); });
   (void) unprocesstoken;
   DWORD written;
-  TOKEN_USER tu;
-  TOKEN_OWNER to;
-  if(!GetTokenInformation(processtoken, TokenUser, &tu, sizeof(tu), &written))
+  char buffer1[1024], buffer2[1024];
+  if(!GetTokenInformation(processtoken, TokenUser, buffer1, sizeof(buffer1), &written))
     abort();
-  if(!GetTokenInformation(processtoken, TokenOwner, &to, sizeof(to), &written))
+  if(!GetTokenInformation(processtoken, TokenOwner, buffer2, sizeof(buffer2), &written))
     abort();
-  return !EqualSid(tu.User.Sid, to.Owner);
+  TOKEN_USER *tu = (TOKEN_USER *) buffer1;
+  TOKEN_OWNER *to = (TOKEN_OWNER *) buffer2;
+  return !EqualSid(tu->User.Sid, to->Owner);
 }
 
 AFIO_V2_NAMESPACE_END

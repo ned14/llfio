@@ -273,7 +273,8 @@ inline void swap(file_handle &self, file_handle &o) noexcept
 
 \errors Any of the values POSIX open() or CreateFile() can return.
 */
-inline result<file_handle> file(const path_handle &base, file_handle::path_view_type _path, file_handle::mode _mode = file_handle::mode::read, file_handle::creation _creation = file_handle::creation::open_existing, file_handle::caching _caching = file_handle::caching::all, file_handle::flag flags = file_handle::flag::none) noexcept
+inline result<file_handle> file(const path_handle &base, file_handle::path_view_type _path, file_handle::mode _mode = file_handle::mode::read, file_handle::creation _creation = file_handle::creation::open_existing, file_handle::caching _caching = file_handle::caching::all,
+                                file_handle::flag flags = file_handle::flag::none) noexcept
 {
   return file_handle::file(std::forward<decltype(base)>(base), std::forward<decltype(_path)>(_path), std::forward<decltype(_mode)>(_mode), std::forward<decltype(_creation)>(_creation), std::forward<decltype(_caching)>(_caching), std::forward<decltype(flags)>(flags));
 }
@@ -304,7 +305,8 @@ to use. Use `temp_inode()` instead, it is far more secure.
 
 \errors Any of the values POSIX open() or CreateFile() can return.
 */
-inline result<file_handle> temp_file(file_handle::path_view_type name = file_handle::path_view_type(), file_handle::mode _mode = file_handle::mode::write, file_handle::creation _creation = file_handle::creation::if_needed, file_handle::caching _caching = file_handle::caching::temporary, file_handle::flag flags = file_handle::flag::unlink_on_close) noexcept
+inline result<file_handle> temp_file(file_handle::path_view_type name = file_handle::path_view_type(), file_handle::mode _mode = file_handle::mode::write, file_handle::creation _creation = file_handle::creation::if_needed, file_handle::caching _caching = file_handle::caching::temporary,
+                                     file_handle::flag flags = file_handle::flag::unlink_on_close) noexcept
 {
   return file_handle::temp_file(std::forward<decltype(name)>(name), std::forward<decltype(_mode)>(_mode), std::forward<decltype(_creation)>(_creation), std::forward<decltype(_caching)>(_caching), std::forward<decltype(flags)>(flags));
 }
@@ -384,6 +386,13 @@ AFIO_V2_NAMESPACE_END
 #else
 #include "detail/impl/posix/file_handle.ipp"
 #endif
+#undef AFIO_INCLUDED_BY_HEADER
+#endif
+
+// Needs to be here as path discovery uses file_handle
+#if AFIO_HEADERS_ONLY == 1 && !defined(DOXYGEN_SHOULD_SKIP_THIS)
+#define AFIO_INCLUDED_BY_HEADER 1
+#include "detail/impl/path_discovery.ipp"
 #undef AFIO_INCLUDED_BY_HEADER
 #endif
 
