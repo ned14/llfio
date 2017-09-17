@@ -43,6 +43,7 @@ namespace path_discovery
     struct _discovered_path
     {
       filesystem::path path;
+      size_t priority{0};
       std::string fstypename;
       path_handle h;  // not retained after verification
       _discovered_path(filesystem::path _path)
@@ -84,10 +85,16 @@ namespace path_discovery
     try
     {
       std::vector<std::pair<discovered_path::source_type, _store::_discovered_path>> raw = _all_temporary_directories();
+      for(size_t n = 0; n < raw.size(); n++)
+      {
+        raw[n].second.priority = n;
+      }
       // Firstly sort by source and path so duplicates are side by side
       std::sort(raw.begin(), raw.end(), [](const auto &a, const auto &b) { return (a.first < b.first) || (a.first == b.first && a.second.path < b.second.path); });
       // Remove duplicates
       raw.erase(std::unique(raw.begin(), raw.end(), [](const auto &a, const auto &b) { return a.first == b.first && a.second.path == b.second.path; }), raw.end());
+      // Put them back into the order in which they were returned
+      std::sort(raw.begin(), raw.end(), [](const auto &a, const auto &b) { return a.second.priority < b.second.priority; });
       ps.all.reserve(raw.size());
       ps._all.reserve(raw.size());
       for(auto &i : raw)
@@ -136,26 +143,8 @@ namespace path_discovery
           continue;
         }
         ps._all[n].h = std::move(_h).value();
-        statfs_t statfs;
-        auto statfsres = statfs.fill(ps._all[n].h, statfs_t::want::fstypename);
-        if(statfsres)
-        {
-          ps._all[n].fstypename = std::move(statfs.f_fstypename);
-        }
-        else
-        {
-#if AFIO_LOGGING_LEVEL >= 3
-          std::string msg("path_discovery::verified_temporary_directories() failed to statfs the temp direct ");
-          msg.append(ps._all[n].path.u8string());
-          msg.append(" due to ");
-          msg.append(statfsres.error().message());
-          AFIO_LOG_WARN(nullptr, msg.c_str());
-#endif
-          ps._all[n].h = {};
-          continue;
-        }
         // Try to create a small file in that directory
-        auto _fh = file_handle::random_file(ps._all[n].h);
+        auto _fh = file_handle::random_file(ps._all[n].h, file_handle::mode::write, file_handle::caching::temporary, file_handle::flag::unlink_on_close);
         if(!_fh)
         {
 #if AFIO_LOGGING_LEVEL >= 3
@@ -174,6 +163,26 @@ namespace path_discovery
           AFIO_LOG_WARN(nullptr, "path_discovery::verified_temporary_directories() failed to stat an open handle to a temp directory");
           ps.all[n].stat = {};
           ps._all[n].h = {};
+          continue;
+        }
+        statfs_t statfs;
+        auto statfsres = statfs.fill(_fh.value(), statfs_t::want::fstypename);
+        if(statfsres)
+        {
+          ps._all[n].fstypename = std::move(statfs.f_fstypename);
+        }
+        else
+        {
+#if AFIO_LOGGING_LEVEL >= 3
+          std::string msg("path_discovery::verified_temporary_directories() failed to statfs the temp directory ");
+          msg.append(ps._all[n].path.u8string());
+          msg.append(" due to ");
+          msg.append(statfsres.error().message());
+          AFIO_LOG_WARN(nullptr, msg.c_str());
+#endif
+          ps.all[n].stat = {};
+          ps._all[n].h = {};
+          continue;
         }
       }
       // Now partition into those with valid stat directories and those without
@@ -183,10 +192,11 @@ namespace path_discovery
       if(ps.verified.empty())
       {
         AFIO_LOG_FATAL(nullptr, "path_discovery::verified_temporary_directories() could not find at least one writable temporary directory");
+        abort();
       }
 
       // Finally, need to choose storage and memory backed directories
-      std::regex storage_backed_regex("btrfs|cifs|exfat|ext?|f2fs|hfs|jfs|nfs|nilf2|ufs|vfat|xfs|zfs|msdosfs|newnfs|ntfs|smbfs|unionfs|fat|fat32", std::regex::icase);
+      std::regex storage_backed_regex("btrfs|cifs|exfat|ext?|f2fs|hfs|jfs|lxfs|nfs|nilf2|ufs|vfat|xfs|zfs|msdosfs|newnfs|ntfs|smbfs|unionfs|fat|fat32", std::regex::icase);
       std::regex memory_backed_regex("tmpfs|ramfs", std::regex::icase);
       for(size_t n = 0; n < ps.verified.size(); n++)
       {
@@ -207,10 +217,12 @@ namespace path_discovery
       std::string msg("path_discovery::verified_temporary_directories() saw exception thrown: ");
       msg.append(e.what());
       AFIO_LOG_FATAL(nullptr, msg.c_str());
+      abort();
     }
     catch(...)
     {
       AFIO_LOG_FATAL(nullptr, "path_discovery::verified_temporary_directories() saw unknown exception throw");
+      abort();
     }
     return ps.verified;
   }

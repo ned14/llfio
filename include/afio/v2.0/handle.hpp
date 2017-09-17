@@ -209,16 +209,28 @@ public:
 
   /*! Returns the current path of the open handle as said by the operating system. Note
   that you are NOT guaranteed that any path refreshed bears any resemblance to the original,
-  many operating systems will return some different path which still reaches the same inode
-  via some other route e.g. hardlinks, dereferenced symbolic links, etc.
+  some operating systems will return some different path which still reaches the same inode
+  via some other route e.g. hardlinks, dereferenced symbolic links, etc. Windows and
+  Linux correctly track changes to the specific path the handle was opened with,
+  not getting confused by other hard links. MacOS nearly gets it right, but under some
+  circumstances e.g. renaming may switch to a different hard link's path which is almost
+  certainly a bug.
 
   If AFIO was not able to determine the current path for this open handle e.g. the inode
-  has been unlinked, it returns an empty path. Some operating systems e.g. FreeBSD also
-  only can fetch the current path for directory inodes, not file inodes.
+  has been unlinked, it returns an empty path. Be aware that FreeBSD can return an empty
+  (deleted) path for file inodes no longer cached by the kernel path cache, AFIO cannot
+  detect the difference. FreeBSD will also return any path leading to the inode if it is
+  hard linked. FreeBSD does implement path retrieval for directory inodes
+  correctly however, and see `algorithm::stablized_path<T>` for a handle adapter which
+  makes use of that.
 
-  \warning This call is expensive, it always asks the kernel for the current path, and if
-  `disable_safety_unlinks` is off (the default) it checks the path returned to ensure it does
-  actually point at the correct inode.
+  On Linux if `/proc` is not mounted, this call fails with an error. All APIs in AFIO
+  which require the use of `current_path()` can be told to not use it e.g. `flag::disable_safety_unlinks`.
+  It is up to you to detect if `current_path()` is not working, and to change how you
+  call AFIO appropriately.
+
+  \warning This call is expensive, it always asks the kernel for the current path, and no
+  checking is done to ensure what the kernel returns is accurate or even sensible.
   Be aware that despite these precautions, paths are unstable and **can change randomly at
   any moment**. Most code written to use absolute file systems paths is **racy**, so don't
   do it, use `path_handle` to fix a base location on the file system and work from that anchor

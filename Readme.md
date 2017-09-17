@@ -9,14 +9,9 @@ Tarballs of source and prebuilt binaries for Linux x64 and Windows x64: http://m
 - [ ] Make some system for registering static constructors
   - Then make the random_X and temp_X implementations common
   - Then add a sibling_X()
-- [ ] Temp directory needs to go into path_discovery namespace and people can retrieve different
-types of temp directory with different properties.
-  - Options: runtime verified, overridden by environment vars, return inode+dev
-  - Criteria: where the logged user, where the current user, where I can write 10Gb,
-  where some user X
-  - Mine https://doc.qt.io/qt-5.6/qstandardpaths.html#StandardLocation-enum
-  - Do we also need executable search paths?
-- [ ] Coroutines TS support for `async_file_handle` as soon as MSVC can compile AFIO again.
+- [ ] Make a templated file handle adapter which keeps a `shared_ptr<directory_handle>`
+for the parent of the inode, thus making race free operations much quicker and
+reliable but at the cost of construction time.
 - [ ] `atomic_append` isn't actually being tested in shared_fs_mutex
 - [ ] Implement a non-toy ACID key-value BLOB store and send it to Boost for peer review.
 - [ ] All time based kernel tests need to use soak test based API and auto adjust to

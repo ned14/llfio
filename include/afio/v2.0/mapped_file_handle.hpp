@@ -343,6 +343,13 @@ public:
   */
   AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_type> reserve(size_type reservation = 0) noexcept;
 
+  AFIO_HEADERS_ONLY_VIRTUAL_SPEC ~mapped_file_handle()
+  {
+    if(_v)
+    {
+      (void) mapped_file_handle::close();
+    }
+  }
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> close() noexcept override;
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC native_handle_type release() noexcept override;
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> barrier(io_request<const_buffers_type> reqs = io_request<const_buffers_type>(), bool wait_for_device = false, bool and_metadata = false, deadline d = deadline()) noexcept override
@@ -446,12 +453,15 @@ later when `truncate()` or `update_map()` is called.
 
 \errors Any of the values which the constructors for `file_handle`, `section_handle` and `map_handle` can return.
 */
-inline result<mapped_file_handle> mapped_file(mapped_file_handle::size_type reservation, const path_handle &base, mapped_file_handle::path_view_type _path, mapped_file_handle::mode _mode = mapped_file_handle::mode::read, mapped_file_handle::creation _creation = mapped_file_handle::creation::open_existing, mapped_file_handle::caching _caching = mapped_file_handle::caching::all, mapped_file_handle::flag flags = mapped_file_handle::flag::none) noexcept
+inline result<mapped_file_handle> mapped_file(mapped_file_handle::size_type reservation, const path_handle &base, mapped_file_handle::path_view_type _path, mapped_file_handle::mode _mode = mapped_file_handle::mode::read, mapped_file_handle::creation _creation = mapped_file_handle::creation::open_existing,
+                                              mapped_file_handle::caching _caching = mapped_file_handle::caching::all, mapped_file_handle::flag flags = mapped_file_handle::flag::none) noexcept
 {
-  return mapped_file_handle::mapped_file(std::forward<decltype(reservation)>(reservation), std::forward<decltype(base)>(base), std::forward<decltype(_path)>(_path), std::forward<decltype(_mode)>(_mode), std::forward<decltype(_creation)>(_creation), std::forward<decltype(_caching)>(_caching), std::forward<decltype(flags)>(flags));
+  return mapped_file_handle::mapped_file(std::forward<decltype(reservation)>(reservation), std::forward<decltype(base)>(base), std::forward<decltype(_path)>(_path), std::forward<decltype(_mode)>(_mode), std::forward<decltype(_creation)>(_creation), std::forward<decltype(_caching)>(_caching),
+                                         std::forward<decltype(flags)>(flags));
 }
 //! \overload
-inline result<mapped_file_handle> mapped_file(const path_handle &base, mapped_file_handle::path_view_type _path, mapped_file_handle::mode _mode = mapped_file_handle::mode::read, mapped_file_handle::creation _creation = mapped_file_handle::creation::open_existing, mapped_file_handle::caching _caching = mapped_file_handle::caching::all, mapped_file_handle::flag flags = mapped_file_handle::flag::none) noexcept
+inline result<mapped_file_handle> mapped_file(const path_handle &base, mapped_file_handle::path_view_type _path, mapped_file_handle::mode _mode = mapped_file_handle::mode::read, mapped_file_handle::creation _creation = mapped_file_handle::creation::open_existing,
+                                              mapped_file_handle::caching _caching = mapped_file_handle::caching::all, mapped_file_handle::flag flags = mapped_file_handle::flag::none) noexcept
 {
   return mapped_file_handle::mapped_file(std::forward<decltype(base)>(base), std::forward<decltype(_path)>(_path), std::forward<decltype(_mode)>(_mode), std::forward<decltype(_creation)>(_creation), std::forward<decltype(_caching)>(_caching), std::forward<decltype(flags)>(flags));
 }
@@ -463,7 +473,8 @@ flush changes to physical storage as lately as possible.
 
 \errors Any of the values POSIX open() or CreateFile() can return.
 */
-inline result<mapped_file_handle> mapped_random_file(mapped_file_handle::size_type reservation, const path_handle &dirpath, mapped_file_handle::mode _mode = mapped_file_handle::mode::write, mapped_file_handle::caching _caching = mapped_file_handle::caching::temporary, mapped_file_handle::flag flags = mapped_file_handle::flag::none) noexcept
+inline result<mapped_file_handle> mapped_random_file(mapped_file_handle::size_type reservation, const path_handle &dirpath, mapped_file_handle::mode _mode = mapped_file_handle::mode::write, mapped_file_handle::caching _caching = mapped_file_handle::caching::temporary,
+                                                     mapped_file_handle::flag flags = mapped_file_handle::flag::none) noexcept
 {
   return mapped_file_handle::mapped_random_file(std::forward<decltype(reservation)>(reservation), std::forward<decltype(dirpath)>(dirpath), std::forward<decltype(_mode)>(_mode), std::forward<decltype(_caching)>(_caching), std::forward<decltype(flags)>(flags));
 }
@@ -482,7 +493,8 @@ to use. Use `temp_inode()` instead, it is far more secure.
 
 \errors Any of the values POSIX open() or CreateFile() can return.
 */
-inline result<mapped_file_handle> mapped_temp_file(mapped_file_handle::size_type reservation, mapped_file_handle::path_view_type name = mapped_file_handle::path_view_type(), mapped_file_handle::mode _mode = mapped_file_handle::mode::write, mapped_file_handle::creation _creation = mapped_file_handle::creation::if_needed, mapped_file_handle::caching _caching = mapped_file_handle::caching::temporary, mapped_file_handle::flag flags = mapped_file_handle::flag::unlink_on_close) noexcept
+inline result<mapped_file_handle> mapped_temp_file(mapped_file_handle::size_type reservation, mapped_file_handle::path_view_type name = mapped_file_handle::path_view_type(), mapped_file_handle::mode _mode = mapped_file_handle::mode::write,
+                                                   mapped_file_handle::creation _creation = mapped_file_handle::creation::if_needed, mapped_file_handle::caching _caching = mapped_file_handle::caching::temporary, mapped_file_handle::flag flags = mapped_file_handle::flag::unlink_on_close) noexcept
 {
   return mapped_file_handle::mapped_temp_file(std::forward<decltype(reservation)>(reservation), std::forward<decltype(name)>(name), std::forward<decltype(_mode)>(_mode), std::forward<decltype(_creation)>(_creation), std::forward<decltype(_caching)>(_caching), std::forward<decltype(flags)>(flags));
 }

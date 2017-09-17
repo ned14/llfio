@@ -82,6 +82,7 @@ namespace algorithm
     there have been editions of the Linux kernel and the OS X kernel which did this.
     - If your OS doesn't have sane byte range locks (OS X, BSD, older Linuxes) and multiple
     objects in your process use the same lock file, misoperation will occur.
+    - Requires `handle::current_path()` to be working.
 
     \todo memory_map::_hash_entities needs to hash x16, x8 and x4 at a time to encourage auto vectorisation
     */

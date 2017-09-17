@@ -184,6 +184,13 @@ public:
   AFIO_MAKE_FREE_FUNCTION
   static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<file_handle> temp_inode(const path_handle &dir = path_discovery::storage_backed_temporary_files_directory(), mode _mode = mode::write, flag flags = flag::none) noexcept;
 
+  AFIO_HEADERS_ONLY_VIRTUAL_SPEC ~file_handle()
+  {
+    if(_v)
+    {
+      (void) file_handle::close();
+    }
+  }
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> close() noexcept override
   {
     AFIO_LOG_FUNCTION_CALL(this);

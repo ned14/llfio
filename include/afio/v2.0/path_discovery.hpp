@@ -96,7 +96,7 @@ namespace path_discovery
   This is implemented by iterating all of the paths returned by `verified_temporary_directories()`
   and checking what file system is in use. The following regex is used:
 
-  `btrfs|cifs|exfat|ext?|f2fs|hfs|jfs|nfs|nilf2|ufs|vfat|xfs|zfs|msdosfs|newnfs|ntfs|smbfs|unionfs|fat|fat32`
+  `btrfs|cifs|exfat|ext?|f2fs|hfs|jfs|lxfs|nfs|nilf2|ufs|vfat|xfs|zfs|msdosfs|newnfs|ntfs|smbfs|unionfs|fat|fat32`
 
   The handle is created during `verified_temporary_directories()` and is statically cached thereafter.
   */
