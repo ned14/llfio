@@ -237,6 +237,12 @@ public:
   instead!
 
   \mallocs At least one malloc for the `path_type`, likely several more.
+  \sa `algorithm::cached_parent_handle_adapter<T>` which overrides this with an
+  implementation based on retrieving the current path of a cached handle to the parent
+  directory. On platforms with instability or failure to retrieve the correct current path
+  for regular files, the cached parent handle adapter works around the problem by
+  taking advantage of directory inodes not having the same instability problems on any
+  platform.
   */
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<path_type> current_path() const noexcept;
   //! Immediately close the native handle type managed by this handle
@@ -378,6 +384,21 @@ inline std::ostream &operator<<(std::ostream &s, const handle::flag &v)
     temp = "none";
   return s << "afio::handle::flag::" << temp;
 }
+
+/*! \brief Metaprogramming shim for constructing any `handle` subclass.
+
+Each `handle` implementation provides one or more static member functions used to construct it.
+Each of these has a descriptive, unique name so it can be used as a free function which is
+convenient and intuitive for human programmers.
+
+This design pattern is however inconvenient for generic code which needs a single way
+of constructing some arbitrary unknown `handle` implementation. This shim function
+provides that.
+*/
+template <class T> struct construct
+{
+  result<T> operator()() const noexcept { static_assert(!std::is_same<T, T>::value, "construct<T>() was not specialised for the type T supplied"); }
+};
 
 // Intercept when Outcome creates an errored result and log it to our log
 template <class T, class R> inline void hook_result_construction(OUTCOME_V2_NAMESPACE::in_place_type_t<T>, result<R> *res) noexcept

@@ -86,6 +86,14 @@ public:
   static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<path_handle> path(path_view_type _path) noexcept { return path(path_handle(), _path); }
 };
 
+//! \brief Constructor for `path_handle`
+template <> struct construct<path_handle>
+{
+  const path_handle &base;
+  path_handle::path_view_type _path;
+  result<path_handle> operator()() const noexcept { return path_handle::path(base, _path); }
+};
+
 // BEGIN make_free_functions.py
 /*! Create a path handle opening access to some location on the filing system.
 Some operating systems provide a particularly lightweight method of doing this

@@ -264,6 +264,18 @@ public:
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_type> zero(extent_type offset, extent_type bytes, deadline d = deadline()) noexcept;
 };
 
+//! \brief Constructor for `file_handle`
+template <> struct construct<file_handle>
+{
+  const path_handle &base;
+  file_handle::path_view_type _path;
+  file_handle::mode _mode = file_handle::mode::read;
+  file_handle::creation _creation = file_handle::creation::open_existing;
+  file_handle::caching _caching = file_handle::caching::all;
+  file_handle::flag flags = file_handle::flag::none;
+  result<file_handle> operator()() const noexcept { return file_handle::file(base, _path, _mode, _creation, _caching, flags); }
+};
+
 // BEGIN make_free_functions.py
 //! Swap with another instance
 inline void swap(file_handle &self, file_handle &o) noexcept

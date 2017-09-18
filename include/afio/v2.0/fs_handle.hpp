@@ -41,6 +41,8 @@ AFIO_V2_NAMESPACE_EXPORT_BEGIN
 
 /*! \class fs_handle
 \brief A handle to something with a device and inode number.
+
+\sa `algorithm::cached_parent_handle_adapter<T>`
 */
 class AFIO_DECL fs_handle
 {
@@ -117,8 +119,11 @@ public:
   success until the deadline given.
 
   \mallocs Calls `current_path()` and thus is both expensive and calls malloc many times.
+
+  \sa `algorithm::cached_parent_handle_adapter<T>` which overrides this with a zero cost
+  implementation, thus making unlinking and relinking very considerably quicker.
   */
-  result<path_handle> parent_path_handle(deadline d = std::chrono::seconds(30)) const noexcept;
+  AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<path_handle> parent_path_handle(deadline d = std::chrono::seconds(30)) const noexcept;
 
   /*! Relinks the current path of this open handle to the new path specified. If `atomic_replace` is
   true, the relink \b atomically and silently replaces any item at the new path specified. This operation
@@ -141,9 +146,10 @@ public:
   \param d The deadline by which the matching of the containing directory to the open handle's inode
   must succeed, else `std::errc::timed_out` will be returned.
   \mallocs Except on platforms with race free syscalls for renaming open handles (Windows), calls
-  `current_path()` and thus is both expensive and calls malloc many times.
+  `current_path()` via `parent_path_handle()` and thus is both expensive and calls malloc many times.
   */
   AFIO_MAKE_FREE_FUNCTION
+  AFIO_HEADERS_ONLY_VIRTUAL_SPEC
   result<void> relink(const path_handle &base, path_view_type newpath, bool atomic_replace = true, deadline d = std::chrono::seconds(30)) noexcept;
 
   /*! Unlinks the current path of this open handle, causing its entry to immediately disappear from the filing system.
@@ -169,6 +175,7 @@ public:
   `current_path()` if `flag::disable_safety_unlinks` is not set.
   */
   AFIO_MAKE_FREE_FUNCTION
+  AFIO_HEADERS_ONLY_VIRTUAL_SPEC
   result<void> unlink(deadline d = std::chrono::seconds(30)) noexcept;
 };
 

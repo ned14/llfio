@@ -196,6 +196,16 @@ inline std::ostream &operator<<(std::ostream &s, const section_handle::flag &v)
   return s << "afio::section_handle::flag::" << temp;
 }
 
+//! \brief Constructor for `section_handle`
+template <> struct construct<section_handle>
+{
+  file_handle &backing;
+  section_handle::extent_type maximum_size = 0;
+  section_handle::flag _flag = section_handle::flag::read | section_handle::flag::write;
+  result<section_handle> operator()() const noexcept { return section_handle::section(backing, maximum_size, _flag); }
+};
+
+
 /*! \class map_handle
 \brief A handle to a memory mapped region of memory.
 
@@ -386,6 +396,15 @@ public:
   using io_handle::write;
 };
 
+//! \brief Constructor for `map_handle`
+template <> struct construct<map_handle>
+{
+  section_handle &section;
+  map_handle::size_type bytes = 0;
+  map_handle::extent_type offset = 0;
+  section_handle::flag _flag = section_handle::flag::readwrite;
+  result<map_handle> operator()() const noexcept { return map_handle::map(section, bytes, offset, _flag); }
+};
 
 // BEGIN make_free_functions.py
 //! Swap with another instance

@@ -263,6 +263,18 @@ inline std::ostream &operator<<(std::ostream &s, const directory_handle::enumera
   return s << "afio::directory_handle::enumerate_info";
 }
 
+//! \brief Constructor for `directory_handle`
+template <> struct construct<directory_handle>
+{
+  const path_handle &base;
+  directory_handle::path_view_type _path;
+  directory_handle::mode _mode = directory_handle::mode::read;
+  directory_handle::creation _creation = directory_handle::creation::open_existing;
+  directory_handle::caching _caching = directory_handle::caching::all;
+  directory_handle::flag flags = directory_handle::flag::none;
+  result<directory_handle> operator()() const noexcept { return directory_handle::directory(base, _path, _mode, _creation, _caching, flags); }
+};
+
 // BEGIN make_free_functions.py
 //! Swap with another instance
 inline void swap(directory_handle &self, directory_handle &o) noexcept

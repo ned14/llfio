@@ -217,6 +217,12 @@ AFIO_V2_NAMESPACE_END
 #else
 #error No <filesystem> implementation found
 #endif
+AFIO_V2_NAMESPACE_BEGIN
+struct path_hasher
+{
+  size_t operator()(const filesystem::path &p) const { return std::hash<filesystem::path::string_type>()(p.native()); }
+};
+AFIO_V2_NAMESPACE_END
 
 
 // Configure AFIO_DECL

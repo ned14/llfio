@@ -6,12 +6,6 @@ Tarballs of source and prebuilt binaries for Linux x64 and Windows x64: http://m
 
 
 ### Immediate todos in order of priority:
-- [ ] Make some system for registering static constructors
-  - Then make the random_X and temp_X implementations common
-  - Then add a sibling_X()
-- [ ] Make a templated file handle adapter which keeps a `shared_ptr<directory_handle>`
-for the parent of the inode, thus making race free operations much quicker and
-reliable but at the cost of construction time.
 - [ ] `atomic_append` isn't actually being tested in shared_fs_mutex
 - [ ] Implement a non-toy ACID key-value BLOB store and send it to Boost for peer review.
 - [ ] All time based kernel tests need to use soak test based API and auto adjust to
