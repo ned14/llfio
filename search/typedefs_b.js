@@ -1,4 +1,6 @@
 var searchData=
 [
-  ['value_5ftype',['value_type',['../classafio__v2__xxx_1_1path__view.html#adb138ab8ec53fff761a5c0a8ea55ba3b',1,'afio_v2_xxx::path_view::value_type()'],['../structafio__v2__xxx_1_1storage__profile_1_1storage__profile.html#a6a57c86ccdb40add3f4d4b461bcca445',1,'afio_v2_xxx::storage_profile::storage_profile::value_type()'],['../structafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex_1_1entity__type.html#a51e399ed65877f238f840fb90b8a3e20',1,'afio_v2_xxx::algorithm::shared_fs_mutex::shared_fs_mutex::entity_type::value_type()']]]
+  ['uint128',['uint128',['../namespaceafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex.html#a48547949428f2da935a05cad87f2a7ff',1,'afio_v2_xxx::algorithm::shared_fs_mutex']]],
+  ['uint64',['uint64',['../namespaceafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex.html#af6e3781d4c08b2d3f74b32255f49479f',1,'afio_v2_xxx::algorithm::shared_fs_mutex']]],
+  ['unique_5fid_5ftype',['unique_id_type',['../classafio__v2__xxx_1_1fs__handle.html#a0344f48ef10fa2b94199d5566aedd879',1,'afio_v2_xxx::fs_handle']]]
 ];

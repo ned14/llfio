@@ -5,6 +5,15 @@ var hierarchy =
     [ "afio_v2_xxx::io_handle::buffer_type", "structafio__v2__xxx_1_1io__handle_1_1buffer__type.html", null ],
     [ "afio_v2_xxx::path_view::c_str", "structafio__v2__xxx_1_1path__view_1_1c__str.html", null ],
     [ "afio_v2_xxx::io_handle::const_buffer_type", "structafio__v2__xxx_1_1io__handle_1_1const__buffer__type.html", null ],
+    [ "afio_v2_xxx::construct< T >", "structafio__v2__xxx_1_1construct.html", null ],
+    [ "afio_v2_xxx::construct< algorithm::cached_parent_handle_adapter< T > >", "structafio__v2__xxx_1_1construct_3_01algorithm_1_1cached__parent__handle__adapter_3_01_t_01_4_01_4.html", null ],
+    [ "afio_v2_xxx::construct< async_file_handle >", "structafio__v2__xxx_1_1construct_3_01async__file__handle_01_4.html", null ],
+    [ "afio_v2_xxx::construct< directory_handle >", "structafio__v2__xxx_1_1construct_3_01directory__handle_01_4.html", null ],
+    [ "afio_v2_xxx::construct< file_handle >", "structafio__v2__xxx_1_1construct_3_01file__handle_01_4.html", null ],
+    [ "afio_v2_xxx::construct< map_handle >", "structafio__v2__xxx_1_1construct_3_01map__handle_01_4.html", null ],
+    [ "afio_v2_xxx::construct< mapped_file_handle >", "structafio__v2__xxx_1_1construct_3_01mapped__file__handle_01_4.html", null ],
+    [ "afio_v2_xxx::construct< path_handle >", "structafio__v2__xxx_1_1construct_3_01path__handle_01_4.html", null ],
+    [ "afio_v2_xxx::construct< section_handle >", "structafio__v2__xxx_1_1construct_3_01section__handle_01_4.html", null ],
     [ "afio_v2_xxx::deadline", "structafio__v2__xxx_1_1deadline.html", null ],
     [ "afio_v2_xxx::directory_entry", "structafio__v2__xxx_1_1directory__entry.html", null ],
     [ "afio_v2_xxx::path_discovery::discovered_path", "structafio__v2__xxx_1_1path__discovery_1_1discovered__path.html", null ],
@@ -51,6 +60,7 @@ var hierarchy =
     [ "afio_v2_xxx::native_handle_type", "structafio__v2__xxx_1_1native__handle__type.html", null ],
     [ "afio_v2_xxx::utils::page_allocator< T >", "classafio__v2__xxx_1_1utils_1_1page__allocator.html", null ],
     [ "afio_v2_xxx::utils::page_allocator< void >", "classafio__v2__xxx_1_1utils_1_1page__allocator_3_01void_01_4.html", null ],
+    [ "afio_v2_xxx::path_hasher", "structafio__v2__xxx_1_1path__hasher.html", null ],
     [ "afio_v2_xxx::path_view", "classafio__v2__xxx_1_1path__view.html", null ],
     [ "afio_v2_xxx::utils::page_allocator< T >::rebind< U >", "structafio__v2__xxx_1_1utils_1_1page__allocator_1_1rebind.html", null ],
     [ "afio_v2_xxx::utils::page_allocator< void >::rebind< U >", "structafio__v2__xxx_1_1utils_1_1page__allocator_3_01void_01_4_1_1rebind.html", null ],
@@ -72,6 +82,6 @@ var hierarchy =
     [ "afio_v2_xxx::stat_t", "structafio__v2__xxx_1_1stat__t.html", null ],
     [ "afio_v2_xxx::statfs_t", "structafio__v2__xxx_1_1statfs__t.html", null ],
     [ "afio_v2_xxx::storage_profile::storage_profile", "structafio__v2__xxx_1_1storage__profile_1_1storage__profile.html", null ],
-    [ "afio_v2_xxx::stat_t::want_base", "structafio__v2__xxx_1_1stat__t_1_1want__base.html", null ],
-    [ "afio_v2_xxx::statfs_t::want_base", "structafio__v2__xxx_1_1statfs__t_1_1want__base.html", null ]
+    [ "afio_v2_xxx::statfs_t::want_base", "structafio__v2__xxx_1_1statfs__t_1_1want__base.html", null ],
+    [ "afio_v2_xxx::stat_t::want_base", "structafio__v2__xxx_1_1stat__t_1_1want__base.html", null ]
 ];

@@ -1,5 +1,6 @@
 var config_8hpp =
 [
+    [ "path_hasher", "structafio__v2__xxx_1_1path__hasher.html", "structafio__v2__xxx_1_1path__hasher" ],
     [ "error_code", "structafio__v2__xxx_1_1error__code.html", "structafio__v2__xxx_1_1error__code" ],
     [ "log_level_guard", "classafio__v2__xxx_1_1log__level__guard.html", "classafio__v2__xxx_1_1log__level__guard" ],
     [ "AFIO_DECL", "config_8hpp.html#a10535ba14c672e51779ac3d70b2e09d8", null ],

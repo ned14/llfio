@@ -2,7 +2,9 @@ var map__handle_8hpp =
 [
     [ "section_handle", "classafio__v2__xxx_1_1section__handle.html", "classafio__v2__xxx_1_1section__handle" ],
     [ "flag_base", "structafio__v2__xxx_1_1section__handle_1_1flag__base.html", "structafio__v2__xxx_1_1section__handle_1_1flag__base" ],
+    [ "construct< section_handle >", "structafio__v2__xxx_1_1construct_3_01section__handle_01_4.html", "structafio__v2__xxx_1_1construct_3_01section__handle_01_4" ],
     [ "map_handle", "classafio__v2__xxx_1_1map__handle.html", "classafio__v2__xxx_1_1map__handle" ],
+    [ "construct< map_handle >", "structafio__v2__xxx_1_1construct_3_01map__handle_01_4.html", "structafio__v2__xxx_1_1construct_3_01map__handle_01_4" ],
     [ "barrier", "map__handle_8hpp.html#a04980337d833bcc33cae657d6654f6a0", null ],
     [ "close", "map__handle_8hpp.html#aa7f2ca17db2468dbd5407e2f35870077", null ],
     [ "length", "map__handle_8hpp.html#afc6d4594196e16ac67b25d91e48d09ee", null ],

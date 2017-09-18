@@ -106,7 +106,10 @@ $(document).ready(function(){initNavTree('namespaceafio__v2__xxx_1_1algorithm.ht
 <div class="header">
   <div class="summary">
 <a href="#namespaces">Namespaces</a> &#124;
-<a href="#nested-classes">Classes</a>  </div>
+<a href="#nested-classes">Classes</a> &#124;
+<a href="#typedef-members">Typedefs</a> &#124;
+<a href="#func-members">Functions</a> &#124;
+<a href="#var-members">Variables</a>  </div>
   <div class="headertitle">
 <div class="title">afio_v2_xxx::algorithm Namespace Reference</div>  </div>
 </div><!--header-->
@@ -126,10 +129,130 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1algorithm_1_1mapped__view.html">mapped_view</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Provides a typed mapped view of a <code>section_handle</code> suitable for feeding to STL algorithms or the Ranges TS by wrapping a <code>map_handle</code> into a <code>span&lt;T&gt;</code>.  <a href="classafio__v2__xxx_1_1algorithm_1_1mapped__view.html#details">More...</a><br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
+Typedefs</h2></td></tr>
+<tr class="memitem:a06693c2d73fcb52b2cf97f3671b98976"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
+<tr class="memitem:a06693c2d73fcb52b2cf97f3671b98976"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx_1_1algorithm.html#a06693c2d73fcb52b2cf97f3671b98976">adapted_handle_type</a> = T</td></tr>
+<tr class="memdesc:a06693c2d73fcb52b2cf97f3671b98976"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adapts any <code>construct()</code>-able implementation to cache its parent directory handle in a process wide cache.  <a href="#a06693c2d73fcb52b2cf97f3671b98976">More...</a><br/></td></tr>
+<tr class="separator:a06693c2d73fcb52b2cf97f3671b98976"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1f3c0891c6a42988d3eec7bbeecdd919"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1f3c0891c6a42988d3eec7bbeecdd919"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>path_type</b> = typename T::path_type</td></tr>
+<tr class="separator:a1f3c0891c6a42988d3eec7bbeecdd919"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:a4bfe9b9f4a511d11804b347eeeec26ea"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4bfe9b9f4a511d11804b347eeeec26ea"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>cached_parent_handle_adapter</b> ()=default</td></tr>
+<tr class="separator:a4bfe9b9f4a511d11804b347eeeec26ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1d2c1f4980e4c596c30f193d4f06f4fe"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1d2c1f4980e4c596c30f193d4f06f4fe"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>cached_parent_handle_adapter</b> (const cached_parent_handle_adapter &amp;)=default</td></tr>
+<tr class="separator:a1d2c1f4980e4c596c30f193d4f06f4fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a837f2adf6ba082799dc0abc9ae061f0c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a837f2adf6ba082799dc0abc9ae061f0c"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>cached_parent_handle_adapter</b> (cached_parent_handle_adapter &amp;&amp;)=default</td></tr>
+<tr class="separator:a837f2adf6ba082799dc0abc9ae061f0c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8811a5c223d66124f71ab63e13e79599"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8811a5c223d66124f71ab63e13e79599"></a>
+cached_parent_handle_adapter &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator=</b> (const cached_parent_handle_adapter &amp;)=default</td></tr>
+<tr class="separator:a8811a5c223d66124f71ab63e13e79599"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad1328db32a1bd95225c70e5476dcf49f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad1328db32a1bd95225c70e5476dcf49f"></a>
+cached_parent_handle_adapter &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator=</b> (cached_parent_handle_adapter &amp;&amp;)=default</td></tr>
+<tr class="separator:ad1328db32a1bd95225c70e5476dcf49f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8cc4c280ed496b2557d32139d1bfff6b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8cc4c280ed496b2557d32139d1bfff6b"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>cached_parent_handle_adapter</b> (<a class="el" href="namespaceafio__v2__xxx_1_1algorithm.html#a06693c2d73fcb52b2cf97f3671b98976">adapted_handle_type</a> &amp;&amp;o, const <a class="el" href="classafio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;base, <a class="el" href="classafio__v2__xxx_1_1path__view.html">path_view</a> <a class="el" href="namespaceafio__v2__xxx.html#a7432c582b3af692a1f94be33aa73a00e">path</a>)</td></tr>
+<tr class="separator:a8cc4c280ed496b2557d32139d1bfff6b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7caabf09d835d034d073248110569111"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7caabf09d835d034d073248110569111"></a>
+virtual result&lt; path_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>current_path</b> () const noexceptoverride</td></tr>
+<tr class="separator:a7caabf09d835d034d073248110569111"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a54eeba582daaf4455706f51718cbc7bf"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a54eeba582daaf4455706f51718cbc7bf"></a>
+virtual result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>close</b> () noexceptoverride</td></tr>
+<tr class="separator:a54eeba582daaf4455706f51718cbc7bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a65e71dd37114edda4e9b0f071af6b38d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a65e71dd37114edda4e9b0f071af6b38d"></a>
+virtual <a class="el" href="structafio__v2__xxx_1_1native__handle__type.html">native_handle_type</a>&#160;</td><td class="memItemRight" valign="bottom"><b>release</b> () noexceptoverride</td></tr>
+<tr class="separator:a65e71dd37114edda4e9b0f071af6b38d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1648673ad205320af95997269dfddcfa"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1648673ad205320af95997269dfddcfa"></a>
+virtual result&lt; <a class="el" href="classafio__v2__xxx_1_1path__handle.html">path_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>parent_path_handle</b> (<a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a>=std::chrono::seconds(30)) const noexceptoverride</td></tr>
+<tr class="separator:a1648673ad205320af95997269dfddcfa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad379921e24d7867b79d1f6443d39a4e3"><td class="memTemplParams" colspan="2">template&lt;class T , class... Args&gt; </td></tr>
+<tr class="memitem:ad379921e24d7867b79d1f6443d39a4e3"><td class="memTemplItemLeft" align="right" valign="top">result<br class="typebreak"/>
+&lt; cached_parent_handle_adapter<br class="typebreak"/>
+&lt; T &gt; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx_1_1algorithm.html#ad379921e24d7867b79d1f6443d39a4e3">cache_parent</a> (Args &amp;&amp;...args) noexcept</td></tr>
+<tr class="memdesc:ad379921e24d7867b79d1f6443d39a4e3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs a <code>T</code> adapted into a parent handle caching implementation.  <a href="#ad379921e24d7867b79d1f6443d39a4e3">More...</a><br/></td></tr>
+<tr class="separator:ad379921e24d7867b79d1f6443d39a4e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:a3f01ce072280725171dce2ea105c94a3"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3f01ce072280725171dce2ea105c94a3"></a>
+detail::cached_path_handle_ptr&#160;</td><td class="memItemRight" valign="bottom"><b>_sph</b></td></tr>
+<tr class="separator:a3f01ce072280725171dce2ea105c94a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac1a17dca81259389095c95496bc98fd3"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac1a17dca81259389095c95496bc98fd3"></a>
+filesystem::path&#160;</td><td class="memItemRight" valign="bottom"><b>_leafname</b></td></tr>
+<tr class="separator:ac1a17dca81259389095c95496bc98fd3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Collection of file system based algorithms. </p>
-</div></div><!-- contents -->
+</div><h2 class="groupheader">Typedef Documentation</h2>
+<a class="anchor" id="a06693c2d73fcb52b2cf97f3671b98976"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="namespaceafio__v2__xxx_1_1algorithm.html#a06693c2d73fcb52b2cf97f3671b98976">afio_v2_xxx::algorithm::adapted_handle_type</a> = typedef T</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Adapts any <code>construct()</code>-able implementation to cache its parent directory handle in a process wide cache. </p>
+<p>For some use cases where one is calling <code>parent_path_handle()</code> or code which calls that function very frequently e.g. calling <code>relink()</code> or <code>unlink()</code> a lot on many files with the same parent directory, having to constantly fetch the current path, open the parent directory and verify inodes becomes unhelpfully inefficient. This adapter keeps a process-wide hash table of directory handles shared between all instances of this adapter, thus making calling <code>parent_path_handle()</code> almost zero cost.</p>
+<p>This adapter is of especial use on platforms which do not reliably implement per-fd path tracking for regular files (Apple MacOS, FreeBSD) as <code>current_path()</code> is reimplemented to use the current path of the shared parent directory instead. One loses race freedom within the contained directory, but that is the case on POSIX anyway.</p>
+<p>This adapter is also of use on platforms which do not implement path tracking for open handles at all (e.g. Linux without <code>/proc</code> mounted) as the process-wide cache of directory handles retains the path of the directory handle at the time of creation. Third party changes to the part of the filesystem you are working upon will result in the inability to do race free unlinking etc, but if no third party changes are encountered it ought to work well.The handle type being adapted </p>
+
+</div>
+</div>
+<h2 class="groupheader">Function Documentation</h2>
+<a class="anchor" id="ad379921e24d7867b79d1f6443d39a4e3"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T , class... Args&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">result&lt;cached_parent_handle_adapter&lt;T&gt; &gt; afio_v2_xxx::algorithm::cache_parent </td>
+          <td>(</td>
+          <td class="paramtype">Args &amp;&amp;...&#160;</td>
+          <td class="paramname"><em>args</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Constructs a <code>T</code> adapted into a parent handle caching implementation. </p>
+<p>This function works via the <code>construct&lt;T&gt;()</code> free function framework for which your <code>handle</code> implementation must have registered its construction details. </p>
+<div class="fragment"><div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;  {</div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;    construct&lt;T&gt; constructor{std::forward&lt;Args&gt;(args)...};</div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;    OUTCOME_TRY(h, constructor());</div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;    <span class="keywordflow">try</span></div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;    {</div>
+<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;      <span class="keywordflow">return</span> cached_parent_handle_adapter&lt;T&gt;(std::move(h), constructor.base, constructor._path);</div>
+<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;    }</div>
+<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;    <span class="keywordflow">catch</span>(...)</div>
+<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;    {</div>
+<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;      <span class="keywordflow">return</span> error_from_exception();</div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;    }</div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;  }</div>
+</div><!-- fragment -->
+</div>
+</div>
+</div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->

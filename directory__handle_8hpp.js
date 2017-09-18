@@ -4,6 +4,7 @@ var directory__handle_8hpp =
     [ "directory_handle", "classafio__v2__xxx_1_1directory__handle.html", "classafio__v2__xxx_1_1directory__handle" ],
     [ "buffers_type", "structafio__v2__xxx_1_1directory__handle_1_1buffers__type.html", "structafio__v2__xxx_1_1directory__handle_1_1buffers__type" ],
     [ "enumerate_info", "structafio__v2__xxx_1_1directory__handle_1_1enumerate__info.html", "structafio__v2__xxx_1_1directory__handle_1_1enumerate__info" ],
+    [ "construct< directory_handle >", "structafio__v2__xxx_1_1construct_3_01directory__handle_01_4.html", "structafio__v2__xxx_1_1construct_3_01directory__handle_01_4" ],
     [ "directory", "directory__handle_8hpp.html#affce2389376e27ffa0565890034d209f", null ],
     [ "enumerate", "directory__handle_8hpp.html#a275b97722fe32f3946d8b23206ffb8da", null ],
     [ "operator<<", "directory__handle_8hpp.html#a2cbad389de45a9893ef02eeec86dcd21", null ],

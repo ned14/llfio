@@ -223,7 +223,7 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operato
 
 <p>Returns a reference to an open handle to a verified temporary directory where files created are stored in a filesystem directory, usually under the current user's quota. </p>
 <p>This is implemented by iterating all of the paths returned by <code>verified_temporary_directories()</code> and checking what file system is in use. The following regex is used:</p>
-<p><code>btrfs|cifs|exfat|ext?|f2fs|hfs|jfs|nfs|nilf2|ufs|vfat|xfs|zfs|msdosfs|newnfs|ntfs|smbfs|unionfs|fat|fat32</code></p>
+<p><code>btrfs|cifs|exfat|ext?|f2fs|hfs|jfs|lxfs|nfs|nilf2|ufs|vfat|xfs|zfs|msdosfs|newnfs|ntfs|smbfs|unionfs|fat|fat32</code></p>
 <p>The handle is created during <code>verified_temporary_directories()</code> and is statically cached thereafter. </p>
 
 </div>

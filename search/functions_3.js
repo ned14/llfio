@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['cache_5fparent',['cache_parent',['../namespaceafio__v2__xxx_1_1algorithm.html#ad379921e24d7867b79d1f6443d39a4e3',1,'afio_v2_xxx::algorithm']]],
   ['capacity',['capacity',['../classafio__v2__xxx_1_1mapped__file__handle.html#ae8e389b2dbdff1b1f155ea351f5ba9c5',1,'afio_v2_xxx::mapped_file_handle']]],
   ['clear',['clear',['../structafio__v2__xxx_1_1storage__profile_1_1item.html#a5f7494ef59c8a25210953863888da1ec',1,'afio_v2_xxx::storage_profile::item']]],
   ['clone',['clone',['../classafio__v2__xxx_1_1async__file__handle.html#a5bf8b6c6bca19b98c999e9ba762e8ceb',1,'afio_v2_xxx::async_file_handle::clone()'],['../classafio__v2__xxx_1_1directory__handle.html#a52e014939626d1afcb0c8756732e1817',1,'afio_v2_xxx::directory_handle::clone()'],['../classafio__v2__xxx_1_1file__handle.html#ac544e656873ccf3b6665064f46cfaf2b',1,'afio_v2_xxx::file_handle::clone()'],['../classafio__v2__xxx_1_1handle.html#a54790e954f57372b87b095451cc79c38',1,'afio_v2_xxx::handle::clone()']]],
