@@ -132,6 +132,7 @@ ctest -C Release -R afio_sl
 | ✔ |   | Path views used throughout, thus avoiding string copying and allocation in `std::filesystem::path`.
 | ✔ |   | Paths are equally interpreted as UTF-8 on all platforms.
 | ✔ |   | We never store nor retain a path, as they are inherently racy and are best avoided.
+| ✔ | ✔ | Parent handle caching is hard coded in, it is now an optional user applied templated adapter class.
 
 Todo:
 

@@ -45,14 +45,14 @@ namespace path_discovery
       filesystem::path path;
       size_t priority{0};
       std::string fstypename;
-      path_handle h;  // not retained after verification
+      directory_handle h;  // not retained after verification
       _discovered_path(filesystem::path _path)
           : path(std::move(_path))
       {
       }
     };
     std::vector<_discovered_path> _all;
-    path_handle storage_backed, memory_backed;
+    directory_handle storage_backed, memory_backed;
   };
   inline _store &path_store()
   {
