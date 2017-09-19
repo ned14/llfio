@@ -186,6 +186,8 @@ mapped_file_handle - adds low latency memory mapped scatter-gather i/o</li>
 <td>✔ </td><td></td><td>Paths are equally interpreted as UTF-8 on all platforms. </td></tr>
 <tr>
 <td>✔ </td><td></td><td>We never store nor retain a path, as they are inherently racy and are best avoided. </td></tr>
+<tr>
+<td>✔ </td><td>✔ </td><td>Parent handle caching is hard coded in, it is now an optional user applied templated adapter class. </td></tr>
 </table>
 <p>Todo:</p>
 <table class="doxtable">
