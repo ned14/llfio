@@ -84,7 +84,7 @@ script:
      cd doc/html;
      git checkout gh-pages;
      cd ../..;
-     CXX=clang++-4.0 ctest -S .docs.cmake -V;
+     CXX=g++-7 ctest -S .docs.cmake -VV;
      cd doc/html;
      git add . || true;
      git commit -a -m "Travis CI updates documentation" || true;

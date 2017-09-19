@@ -330,7 +330,7 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
   LARGE_INTEGER _offset;
   _offset.QuadPart = offset;
   SIZE_T _bytes = bytes;
-  if((_flag & section_handle::flag::nocommit) || (_flag == section_handle::flag::none))
+  if(section.backing() && ((_flag & section_handle::flag::nocommit) || (_flag == section_handle::flag::none)))
   {
     allocation = MEM_RESERVE;
     commitsize = 0;
