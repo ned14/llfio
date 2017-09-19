@@ -37,7 +37,7 @@ var classafio__v2__xxx_1_1path__view =
     [ "operator=", "classafio__v2__xxx_1_1path__view.html#a420097f3696f6fbb7e34c1e0eafd9699", null ],
     [ "operator=", "classafio__v2__xxx_1_1path__view.html#aecf9862c68d120d214672e9e64e584f8", null ],
     [ "parent_path", "classafio__v2__xxx_1_1path__view.html#a62ca88909cee314619f4ef969ccd25f9", null ],
-    [ "path", "classafio__v2__xxx_1_1path__view.html#af12921c31bf6f0a5934c175cdbde3289", null ],
+    [ "path", "classafio__v2__xxx_1_1path__view.html#a9ffd7729fb1a57f42deab7375c4fa45f", null ],
     [ "relative_path", "classafio__v2__xxx_1_1path__view.html#a7ba53d6c7b36556bde79d69aa3215d5f", null ],
     [ "remove_filename", "classafio__v2__xxx_1_1path__view.html#a628788bf5c788d109b28aa7afdc46a8f", null ],
     [ "root_directory", "classafio__v2__xxx_1_1path__view.html#a69eaf579e09f3c357dcb860749d5d0ba", null ],

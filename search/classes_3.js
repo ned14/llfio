@@ -1,6 +1,7 @@
 var searchData=
 [
   ['c_5fstr',['c_str',['../structafio__v2__xxx_1_1path__view_1_1c__str.html',1,'afio_v2_xxx::path_view']]],
+  ['cached_5fparent_5fhandle_5fadapter',['cached_parent_handle_adapter',['../classafio__v2__xxx_1_1algorithm_1_1cached__parent__handle__adapter.html',1,'afio_v2_xxx::algorithm']]],
   ['const_5fbuffer_5ftype',['const_buffer_type',['../structafio__v2__xxx_1_1io__handle_1_1const__buffer__type.html',1,'afio_v2_xxx::io_handle']]],
   ['construct',['construct',['../structafio__v2__xxx_1_1construct.html',1,'afio_v2_xxx']]],
   ['construct_3c_20algorithm_3a_3acached_5fparent_5fhandle_5fadapter_3c_20t_20_3e_20_3e',['construct&lt; algorithm::cached_parent_handle_adapter&lt; T &gt; &gt;',['../structafio__v2__xxx_1_1construct_3_01algorithm_1_1cached__parent__handle__adapter_3_01_t_01_4_01_4.html',1,'afio_v2_xxx']]],

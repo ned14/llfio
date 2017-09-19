@@ -50,8 +50,8 @@ var hierarchy =
     [ "afio_v2_xxx::storage_profile::item_base", "structafio__v2__xxx_1_1storage__profile_1_1item__base.html", [
       [ "afio_v2_xxx::storage_profile::item< T >", "structafio__v2__xxx_1_1storage__profile_1_1item.html", null ],
       [ "afio_v2_xxx::storage_profile::item_erased", "structafio__v2__xxx_1_1storage__profile_1_1item__erased.html", null ],
-      [ "afio_v2_xxx::storage_profile::item< afio_v2_xxx::io_service::extent_type >", "structafio__v2__xxx_1_1storage__profile_1_1item.html", null ],
       [ "afio_v2_xxx::storage_profile::item< float >", "structafio__v2__xxx_1_1storage__profile_1_1item.html", null ],
+      [ "afio_v2_xxx::storage_profile::item< io_service::extent_type >", "structafio__v2__xxx_1_1storage__profile_1_1item.html", null ],
       [ "afio_v2_xxx::storage_profile::item< std::string >", "structafio__v2__xxx_1_1storage__profile_1_1item.html", null ],
       [ "afio_v2_xxx::storage_profile::item< unsigned >", "structafio__v2__xxx_1_1storage__profile_1_1item.html", null ],
       [ "afio_v2_xxx::storage_profile::item< unsigned long long >", "structafio__v2__xxx_1_1storage__profile_1_1item.html", null ]
@@ -62,8 +62,8 @@ var hierarchy =
     [ "afio_v2_xxx::utils::page_allocator< void >", "classafio__v2__xxx_1_1utils_1_1page__allocator_3_01void_01_4.html", null ],
     [ "afio_v2_xxx::path_hasher", "structafio__v2__xxx_1_1path__hasher.html", null ],
     [ "afio_v2_xxx::path_view", "classafio__v2__xxx_1_1path__view.html", null ],
-    [ "afio_v2_xxx::utils::page_allocator< T >::rebind< U >", "structafio__v2__xxx_1_1utils_1_1page__allocator_1_1rebind.html", null ],
     [ "afio_v2_xxx::utils::page_allocator< void >::rebind< U >", "structafio__v2__xxx_1_1utils_1_1page__allocator_3_01void_01_4_1_1rebind.html", null ],
+    [ "afio_v2_xxx::utils::page_allocator< T >::rebind< U >", "structafio__v2__xxx_1_1utils_1_1page__allocator_1_1rebind.html", null ],
     [ "result", null, [
       [ "afio_v2_xxx::io_handle::io_result< T >", "structafio__v2__xxx_1_1io__handle_1_1io__result.html", null ],
       [ "afio_v2_xxx::io_handle::io_result< BuffersType >", "structafio__v2__xxx_1_1io__handle_1_1io__result.html", null ]
@@ -82,6 +82,9 @@ var hierarchy =
     [ "afio_v2_xxx::stat_t", "structafio__v2__xxx_1_1stat__t.html", null ],
     [ "afio_v2_xxx::statfs_t", "structafio__v2__xxx_1_1statfs__t.html", null ],
     [ "afio_v2_xxx::storage_profile::storage_profile", "structafio__v2__xxx_1_1storage__profile_1_1storage__profile.html", null ],
+    [ "T", null, [
+      [ "afio_v2_xxx::algorithm::cached_parent_handle_adapter< T >", "classafio__v2__xxx_1_1algorithm_1_1cached__parent__handle__adapter.html", null ]
+    ] ],
     [ "afio_v2_xxx::statfs_t::want_base", "structafio__v2__xxx_1_1statfs__t_1_1want__base.html", null ],
     [ "afio_v2_xxx::stat_t::want_base", "structafio__v2__xxx_1_1stat__t_1_1want__base.html", null ]
 ];

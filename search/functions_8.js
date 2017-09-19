@@ -1,7 +1,7 @@
 var searchData=
 [
   ['interruption_5fsignal',['interruption_signal',['../classafio__v2__xxx_1_1io__service.html#ae97a626545f0eac83e7d26394cbc0c7f',1,'afio_v2_xxx::io_service']]],
-  ['invoke',['invoke',['../structafio__v2__xxx_1_1storage__profile_1_1item__erased.html#a19b8d4eeaebe25918aec254e1964a8e5',1,'afio_v2_xxx::storage_profile::item_erased']]],
+  ['invoke',['invoke',['../structafio__v2__xxx_1_1storage__profile_1_1item__erased.html#a0bb3a7e5bcefe690782c4dd90fd9a513',1,'afio_v2_xxx::storage_profile::item_erased']]],
   ['io_5fhandle',['io_handle',['../classafio__v2__xxx_1_1io__handle.html#a2da2f177b841701a840a8191a79dd1d4',1,'afio_v2_xxx::io_handle::io_handle()=default'],['../classafio__v2__xxx_1_1io__handle.html#a5e4f43f6ce4820bc483404c02fa52c5a',1,'afio_v2_xxx::io_handle::io_handle(native_handle_type h, caching caching=caching::none, flag flags=flag::none)'],['../classafio__v2__xxx_1_1io__handle.html#a1e64e30fe37476a7ac55ae73ee743b7e',1,'afio_v2_xxx::io_handle::io_handle(handle &amp;&amp;o) noexcept'],['../classafio__v2__xxx_1_1io__handle.html#a0cb380330b99ebe79ebceaa04f476d2e',1,'afio_v2_xxx::io_handle::io_handle(io_handle &amp;&amp;)=default']]],
   ['io_5fservice',['io_service',['../classafio__v2__xxx_1_1io__service.html#a444d27f19c042b91f1751621135f65e9',1,'afio_v2_xxx::io_service']]],
   ['is_5fappend_5fonly',['is_append_only',['../classafio__v2__xxx_1_1handle.html#ae33d4d0faa1377cd371bd6a0ae0769ae',1,'afio_v2_xxx::handle::is_append_only()'],['../structafio__v2__xxx_1_1native__handle__type.html#aaf2cb07f0c13dcdfe89bf652bd5cac15',1,'afio_v2_xxx::native_handle_type::is_append_only()']]],

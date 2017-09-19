@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['adapted_5fhandle_5ftype',['adapted_handle_type',['../namespaceafio__v2__xxx_1_1algorithm.html#a06693c2d73fcb52b2cf97f3671b98976',1,'afio_v2_xxx::algorithm']]]
+  ['adapted_5fhandle_5ftype',['adapted_handle_type',['../classafio__v2__xxx_1_1algorithm_1_1cached__parent__handle__adapter.html#a8650bcb7fef2623698debe2d49629d36',1,'afio_v2_xxx::algorithm::cached_parent_handle_adapter']]]
 ];

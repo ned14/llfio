@@ -3,7 +3,7 @@ var classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1atomic__append =
     [ "entities_type", "classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1atomic__append.html#a8122298dacfb0e372d9a7e2ce0f6d463", null ],
     [ "entity_type", "classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1atomic__append.html#a0b8ee014f4d70b6e972eef6eed3a9cc5", null ],
     [ "atomic_append", "classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1atomic__append.html#a8f5b9600df711a61c49d50988b83ea51", null ],
-    [ "_lock", "classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1atomic__append.html#a314b006449b2516b1dbe3c4ac07067dc", null ],
+    [ "_lock", "classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1atomic__append.html#ae0fc38b714e656d3a4a0b54149d7ed72", null ],
     [ "entity_from_buffer", "classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1atomic__append.html#a96b28acf46a3d4ebe93b6031d90f79ac", null ],
     [ "entity_from_string", "classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1atomic__append.html#a3cd51b21b55c1ed21fcea0edaefdae85", null ],
     [ "fill_random_entities", "classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1atomic__append.html#a1d2d3fb211c48b0322333c55e1d019a5", null ],
@@ -14,5 +14,5 @@ var classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1atomic__append =
     [ "random_entity", "classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1atomic__append.html#a17f374fc7863784f478498eac95dcc70", null ],
     [ "try_lock", "classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1atomic__append.html#a0987b9c6c93a65acb2715e589d45c273", null ],
     [ "try_lock", "classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1atomic__append.html#aebdc3d01ccb30b297950130c7ebac57b", null ],
-    [ "unlock", "classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1atomic__append.html#ad66b0f2de1fc1853c9b2f9893145bf41", null ]
+    [ "unlock", "classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1atomic__append.html#a0b8cb5f949038789514a1f52ff4ef3c0", null ]
 ];
