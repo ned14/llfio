@@ -42,9 +42,6 @@ result<void> fs_handle::_fetch_inode() noexcept
 
 inline result<path_handle> containing_directory(optional<std::reference_wrapper<filesystem::path>> out_filename, const handle &h, const fs_handle &fsh, deadline d) noexcept
 {
-#ifdef AFIO_DISABLE_RACE_FREE_PATH_FUNCTIONS
-  return std::errc::function_not_supported;
-#endif
   std::chrono::steady_clock::time_point began_steady;
   std::chrono::system_clock::time_point end_utc;
   if(d)

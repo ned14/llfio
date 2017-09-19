@@ -80,14 +80,39 @@ namespace algorithm
       else
       {
         dirpath = path.path();
-        if(dirpath.empty())
+        if(path.empty())
         {
           dirpath = filesystem::current_path();
+        }
+#ifdef _WIN32
+        // On Windows, only use the kernel path form
+        dirpath = path_handle::path(dirpath).value().current_path().value();
+#endif
+        if(path.empty())
+        {
           path = dirpath;
         }
       }
       auto &map = cached_path_handle_map();
       std::lock_guard<std::mutex> g(map.lock);
+      auto rungc = undoer([&map] {
+        if(map.gc_count++ >= 1024)
+        {
+          for(auto it = map.by_path.begin(); it != map.by_path.end();)
+          {
+            if(it->second.expired())
+            {
+              it = map.by_path.erase(it);
+            }
+            else
+            {
+              ++it;
+            }
+          }
+          map.gc_count = 0;
+        }
+      });
+      (void) rungc;
       auto it = map.by_path.find(dirpath);
       if(it != map.by_path.end())
       {
@@ -96,7 +121,16 @@ namespace algorithm
           return {ret, leaf.path()};
       }
       cached_path_handle_ptr ret = std::make_shared<cached_path_handle>(directory_handle::directory(base, path).value());
-      ret->_lastpath = ret->h.current_path().value();
+      auto _currentpath = ret->h.current_path();
+      if(_currentpath)
+      {
+        ret->_lastpath = std::move(_currentpath).value();
+      }
+      else
+      {
+        ret->_lastpath = std::move(dirpath);
+      }
+      it = map.by_path.find(ret->_lastpath);
       if(it != map.by_path.end())
       {
         it->second = ret;
@@ -104,21 +138,6 @@ namespace algorithm
       else
       {
         map.by_path.emplace(ret->_lastpath, ret);
-      }
-      if(map.gc_count++ >= 1024)
-      {
-        for(auto it = map.by_path.begin(); it != map.by_path.end();)
-        {
-          if(it->second.expired())
-          {
-            it = map.by_path.erase(it);
-          }
-          else
-          {
-            ++it;
-          }
-        }
-        map.gc_count = 0;
       }
       return {ret, leaf.path()};
     }

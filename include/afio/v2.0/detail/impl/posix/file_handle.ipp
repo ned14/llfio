@@ -38,11 +38,7 @@ result<file_handle> file_handle::file(const path_handle &base, file_handle::path
   path_view::c_str zpath(path);
   if(base.is_valid())
   {
-#ifdef AFIO_DISABLE_RACE_FREE_PATH_FUNCTIONS
-    return std::errc::function_not_supported;
-#else
     nativeh.fd = ::openat(base.native_handle().fd, zpath.buffer, attribs, 0x1b0 /*660*/);
-#endif
   }
   else
   {
@@ -94,9 +90,6 @@ result<file_handle> file_handle::temp_inode(const path_handle &dirh, mode _mode,
   // If it failed, assume this kernel or FS doesn't support O_TMPFILE
   attribs &= ~O_TMPFILE;
   attribs |= O_EXCL;
-#endif
-#ifdef AFIO_DISABLE_RACE_FREE_PATH_FUNCTIONS
-  return std::errc::function_not_supported;
 #endif
   std::string random;
   for(;;)

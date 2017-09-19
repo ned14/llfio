@@ -43,6 +43,10 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
     return std::errc::is_a_directory;
   OUTCOME_TRY(access, access_mask_from_handle_mode(nativeh, _mode, flags));
   OUTCOME_TRY(attribs, attributes_from_handle_caching_and_flags(nativeh, _caching, flags));
+  /* It is super important that we remove the DELETE permission for directories as otherwise relative renames
+  will always fail due to an unfortunate design choice by Microsoft.
+  */
+  access &= ~DELETE;
   if(base.is_valid() || path.is_ntpath())
   {
     DWORD creatdisp = 0x00000001 /*FILE_OPEN*/;
@@ -82,7 +86,7 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
     oa.Length = sizeof(OBJECT_ATTRIBUTES);
     oa.ObjectName = &_path;
     oa.RootDirectory = base.is_valid() ? base.native_handle().h : nullptr;
-    // oa.Attributes = 0x40 /*OBJ_CASE_INSENSITIVE*/;
+    oa.Attributes = 0x40 /*OBJ_CASE_INSENSITIVE*/;
     // if(!!(flags & file_flags::int_opening_link))
     //  oa.Attributes|=0x100/*OBJ_OPENLINK*/;
 
@@ -152,6 +156,57 @@ result<directory_handle> directory_handle::clone() const noexcept
   if(!DuplicateHandle(GetCurrentProcess(), _v.h, GetCurrentProcess(), &ret.value()._v.h, 0, false, DUPLICATE_SAME_ACCESS))
     return {GetLastError(), std::system_category()};
   return ret;
+}
+
+namespace detail
+{
+  inline result<file_handle> duplicate_handle_with_delete_privs(directory_handle *o) noexcept
+  {
+    windows_nt_kernel::init();
+    using namespace windows_nt_kernel;
+    native_handle_type nativeh = o->native_handle();
+    DWORD fileshare = FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE;
+    OBJECT_ATTRIBUTES oa;
+    memset(&oa, 0, sizeof(oa));
+    oa.Length = sizeof(OBJECT_ATTRIBUTES);
+    // It is entirely undocumented that this is how you clone a file handle with new privs
+    UNICODE_STRING _path;
+    memset(&_path, 0, sizeof(_path));
+    oa.ObjectName = &_path;
+    oa.RootDirectory = o->native_handle().h;
+    IO_STATUS_BLOCK isb = make_iostatus();
+    NTSTATUS ntstat = NtOpenFile(&nativeh.h, GENERIC_READ | SYNCHRONIZE | DELETE, &oa, &isb, fileshare, 0x01 /*FILE_DIRECTORY_FILE*/ | 0x20 /*FILE_SYNCHRONOUS_IO_NONALERT*/);
+    if(STATUS_PENDING == ntstat)
+      ntstat = ntwait(nativeh.h, isb, deadline());
+    if(ntstat < 0)
+    {
+      return {(int) ntstat, ntkernel_category()};
+    }
+    // Return as a file handle so the direct relink and unlink are used
+    return file_handle(nativeh, 0, 0, file_handle::caching::all);
+  }
+}
+
+result<void> directory_handle::relink(const path_handle &base, directory_handle::path_view_type newpath, bool atomic_replace, deadline d) noexcept
+{
+  AFIO_LOG_FUNCTION_CALL(this);
+  /* We can never hold DELETE permission on an open handle to a directory as otherwise
+  race free renames into that directory will fail, so we are forced to duplicate the
+  handle with DELETE privs temporarily in order to issue the rename
+  */
+  OUTCOME_TRY(h, detail::duplicate_handle_with_delete_privs(this));
+  return h.relink(base, newpath, atomic_replace, d);
+}
+
+result<void> directory_handle::unlink(deadline d) noexcept
+{
+  AFIO_LOG_FUNCTION_CALL(this);
+  /* We can never hold DELETE permission on an open handle to a directory as otherwise
+  race free renames into that directory will fail, so we are forced to duplicate the
+  handle with DELETE privs temporarily in order to issue the unlink
+  */
+  OUTCOME_TRY(h, detail::duplicate_handle_with_delete_privs(this));
+  return h.unlink(d);
 }
 
 result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_type &&tofill, path_view_type glob, filter filtering, span<char> kernelbuffer) const noexcept

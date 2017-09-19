@@ -75,6 +75,7 @@ namespace algorithm
     //! The handle type being adapted
     using adapted_handle_type = T;
     using path_type = typename T::path_type;
+    using path_view_type = typename T::path_view_type;
 
   protected:
     detail::cached_path_handle_ptr _sph;
@@ -103,7 +104,7 @@ namespace algorithm
     AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<path_type> current_path() const noexcept override
     {
       AFIO_LOG_FUNCTION_CALL(this);
-      return _sph->current_path(_leafname);
+      return (_sph != nullptr) ? _sph->current_path(_leafname) : path_type();
     }
     AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> close() noexcept override
     {
@@ -125,6 +126,34 @@ namespace algorithm
       AFIO_LOG_FUNCTION_CALL(this);
       OUTCOME_TRY(ret, _sph->h.clone());
       return path_handle(std::move(ret));
+    }
+    AFIO_HEADERS_ONLY_VIRTUAL_SPEC
+    result<void> relink(const path_handle &base, path_view_type newpath, bool atomic_replace = true, deadline d = std::chrono::seconds(30)) noexcept override
+    {
+      AFIO_LOG_FUNCTION_CALL(this);
+      OUTCOME_TRYV(adapted_handle_type::relink(base, newpath, atomic_replace, d));
+      _sph.reset();
+      _leafname.clear();
+      try
+      {
+        auto r = detail::get_cached_path_handle(base, newpath);
+        _sph = std::move(r.first);
+        _leafname = std::move(r.second);
+        return success();
+      }
+      catch(...)
+      {
+        return error_from_exception();
+      }
+    }
+    AFIO_HEADERS_ONLY_VIRTUAL_SPEC
+    result<void> unlink(deadline d = std::chrono::seconds(30)) noexcept override
+    {
+      AFIO_LOG_FUNCTION_CALL(this);
+      OUTCOME_TRYV(adapted_handle_type::unlink(d));
+      _sph.reset();
+      _leafname.clear();
+      return success();
     }
   };
   /*! \brief Constructs a `T` adapted into a parent handle caching implementation.

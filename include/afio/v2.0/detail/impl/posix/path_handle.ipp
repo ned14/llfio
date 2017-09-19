@@ -45,11 +45,7 @@ result<path_handle> path_handle::path(const path_handle &base, path_handle::path
   path_view::c_str zpath(_path);
   if(base.is_valid())
   {
-#ifdef AFIO_DISABLE_RACE_FREE_PATH_FUNCTIONS
-    return std::errc::function_not_supported;
-#else
     nativeh.fd = ::openat(base.native_handle().fd, zpath.buffer, attribs);
-#endif
   }
   else
   {

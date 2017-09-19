@@ -62,12 +62,15 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
 #ifdef O_SEARCH
   attribs |= O_SEARCH;
 #endif
+  if(base.is_valid() && path.empty())
+  {
+    // It can happen that we are passed a base fd and no leafname, in which case he
+    // really ought to be cloning the handle. But let's humour him.
+    path = ".";
+  }
   path_view::c_str zpath(path);
   if(base.is_valid())
   {
-#ifdef AFIO_DISABLE_RACE_FREE_PATH_FUNCTIONS
-    return std::errc::function_not_supported;
-#else
     if(_creation == creation::if_needed || _creation == creation::only_if_not_exist)
     {
       if(-1 == ::mkdirat(base.native_handle().fd, zpath.buffer, 0x1f8 /*770*/))
@@ -80,7 +83,6 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
       attribs &= ~(O_CREAT | O_EXCL);
     }
     nativeh.fd = ::openat(base.native_handle().fd, zpath.buffer, attribs);
-#endif
   }
   else
   {
@@ -266,17 +268,17 @@ result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_typ
   size_t n = 0;
   for(dirent *dent = buffer;; dent = (dirent *) ((uintptr_t) dent + dent->d_reclen))
   {
-    if (dent->d_ino)
+    if(dent->d_ino)
     {
       size_t length = strchr(dent->d_name, 0) - dent->d_name;
-      if (length <= 2 && '.' == dent->d_name[0])
+      if(length <= 2 && '.' == dent->d_name[0])
       {
-        if (1 == length || '.' == dent->d_name[1])
+        if(1 == length || '.' == dent->d_name[1])
         {
           goto cont;
         }
       }
-      if (!glob.empty() && fnmatch(zglob.buffer, dent->d_name, 0)!=0)
+      if(!glob.empty() && fnmatch(zglob.buffer, dent->d_name, 0) != 0)
       {
         goto cont;
       }
@@ -285,7 +287,7 @@ result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_typ
       item.stat = stat_t(nullptr);
       item.stat.st_ino = dent->d_ino;
       char d_type = dent->d_type;
-      switch (d_type)
+      switch(d_type)
       {
       case DT_BLK:
         item.stat.st_type = filesystem::file_type::block;
@@ -315,12 +317,12 @@ result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_typ
       }
       n++;
     }
-    cont:
-    if ((bytes -= dent->d_reclen) <= 0)
+  cont:
+    if((bytes -= dent->d_reclen) <= 0)
     {
       // Fill is complete
       tofill._resize(n);
-      return enumerate_info{ std::move(tofill), default_stat_contents, true };
+      return enumerate_info{std::move(tofill), default_stat_contents, true};
     }
     if(n >= tofill.size())
     {

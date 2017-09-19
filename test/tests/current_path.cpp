@@ -39,8 +39,8 @@ template <class FileHandleType, class DirectoryHandleType> static inline void Te
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmissing-braces"
 #endif
-  FileHandleType h1 = afio::construct<FileHandleType>{afio::path_handle(), "tempfile", afio::file_handle::mode::write, afio::file_handle::creation::if_needed, afio::file_handle::caching::temporary, afio::file_handle::flag::unlink_on_close}().value();     // NOLINT
-  DirectoryHandleType h2 = afio::construct<DirectoryHandleType>{afio::path_handle(), "tempdir", afio::file_handle::mode::write, afio::file_handle::creation::if_needed, afio::file_handle::caching::all, afio::file_handle::flag::unlink_on_close}().value();  // NOLINT
+  FileHandleType h1 = afio::construct<FileHandleType>{afio::path_handle(), "tempfile", afio::file_handle::mode::write, afio::file_handle::creation::if_needed, afio::file_handle::caching::temporary, afio::file_handle::flag::none}().value();     // NOLINT
+  DirectoryHandleType h2 = afio::construct<DirectoryHandleType>{afio::path_handle(), "tempdir", afio::file_handle::mode::write, afio::file_handle::creation::if_needed, afio::file_handle::caching::all, afio::file_handle::flag::none}().value();  // NOLINT
 #ifdef __clang__
 #pragma clang diagnostic pop
 #endif
@@ -94,6 +94,11 @@ template <class FileHandleType, class DirectoryHandleType> static inline void Te
       BOOST_CHECK(!h1path.value().empty());
       std::cerr << "Getting the current path of a file FAILED due to the returned path being empty" << std::endl;
     }
+    else if(h1path.value().filename() != "tempfile2")
+    {
+      BOOST_CHECK(h1path.value().filename() == "tempfile2");
+      std::cerr << "Getting the current path of a file FAILED due to the wrong path being returned: " << h1path.value() << std::endl;
+    }
     else
     {
       std::cout << "The path of the file is " << h1path.value() << std::endl;
@@ -110,11 +115,45 @@ template <class FileHandleType, class DirectoryHandleType> static inline void Te
       BOOST_CHECK(!h2path.value().empty());
       std::cerr << "Getting the current path of a directory FAILED due to the returned path being empty" << std::endl;
     }
+    else if(h2path.value().filename() != "tempdir2")
+    {
+      BOOST_CHECK(h2path.value().filename() == "tempdir2");
+      std::cerr << "Getting the current path of a directory FAILED due to the wrong path being returned: " << h2path.value() << std::endl;
+    }
     else
     {
       std::cout << "The path of the directory is " << h2path.value() << std::endl;
     }
   }
+
+  h1.relink(h2, "tempfile3").value();
+
+  {
+    auto h1path = h1.current_path();
+    BOOST_CHECK(h1path);
+    if(!h1path)
+    {
+      std::cerr << "Getting the current path of a file FAILED due to " << h1path.error().message() << std::endl;
+    }
+    else if(h1path.value().empty())
+    {
+      BOOST_CHECK(!h1path.value().empty());
+      std::cerr << "Getting the current path of a file FAILED due to the returned path being empty" << std::endl;
+    }
+    else if(h1path.value().filename() != "tempfile3")
+    {
+      BOOST_CHECK(h1path.value().filename() == "tempfile3");
+      std::cerr << "Getting the current path of a file FAILED due to the wrong path being returned: " << h1path.value() << std::endl;
+    }
+    else
+    {
+      std::cout << "The path of the file is " << h1path.value() << std::endl;
+    }
+  }
+
+  h1.unlink().value();
+  h1.close().value();
+  h2.unlink().value();
 }
 
 KERNELTEST_TEST_KERNEL(integration, afio, current_path, handle, "Tests that afio::handle::current_path() works as expected", TestHandleCurrentPath<AFIO_V2_NAMESPACE::file_handle, AFIO_V2_NAMESPACE::directory_handle>())

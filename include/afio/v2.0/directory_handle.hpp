@@ -224,6 +224,13 @@ public:
   */
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<directory_handle> clone() const noexcept;
 
+#ifdef _WIN32
+  AFIO_HEADERS_ONLY_VIRTUAL_SPEC
+  result<void> relink(const path_handle &base, path_view_type newpath, bool atomic_replace = true, deadline d = std::chrono::seconds(30)) noexcept override;
+  AFIO_HEADERS_ONLY_VIRTUAL_SPEC
+  result<void> unlink(deadline d = std::chrono::seconds(30)) noexcept override;
+#endif
+
   //! Completion information for `enumerate()`
   struct enumerate_info
   {

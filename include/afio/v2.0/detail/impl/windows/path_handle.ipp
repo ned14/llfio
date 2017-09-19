@@ -39,6 +39,10 @@ result<path_handle> path_handle::path(const path_handle &base, path_handle::path
   // Open directory with no access requested, this is much faster than asking for access
   OUTCOME_TRY(access, access_mask_from_handle_mode(nativeh, mode::none, flag::none));
   OUTCOME_TRY(attribs, attributes_from_handle_caching_and_flags(nativeh, caching::all, flag::none));
+  /* It is super important that we remove the DELETE permission for directories as otherwise relative renames
+  will always fail due to an unfortunate design choice by Microsoft.
+  */
+  access &= ~DELETE;
   if(base.is_valid() || path.is_ntpath())
   {
     DWORD creatdisp = 0x00000001 /*FILE_OPEN*/;
@@ -63,7 +67,7 @@ result<path_handle> path_handle::path(const path_handle &base, path_handle::path
     oa.Length = sizeof(OBJECT_ATTRIBUTES);
     oa.ObjectName = &_path;
     oa.RootDirectory = base.is_valid() ? base.native_handle().h : nullptr;
-    // oa.Attributes = 0x40 /*OBJ_CASE_INSENSITIVE*/;
+    oa.Attributes = 0x40 /*OBJ_CASE_INSENSITIVE*/;
     // if(!!(flags & file_flags::int_opening_link))
     //  oa.Attributes|=0x100/*OBJ_OPENLINK*/;
 
