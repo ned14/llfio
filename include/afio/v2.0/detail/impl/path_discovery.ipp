@@ -85,6 +85,11 @@ namespace path_discovery
     try
     {
       std::vector<std::pair<discovered_path::source_type, _store::_discovered_path>> raw = _all_temporary_directories();
+      if(raw.empty())
+      {
+        AFIO_LOG_FATAL(nullptr, "path_discovery::all_temporary_directories() sees no possible temporary directories, something has gone very wrong");
+        abort();
+      }
       for(size_t n = 0; n < raw.size(); n++)
       {
         raw[n].second.priority = n;
@@ -126,6 +131,7 @@ namespace path_discovery
     {
       return ps.verified;
     }
+    (void) all_temporary_directories();
     std::lock_guard<std::mutex> g(ps.lock);
     if(!ps.verified.empty())
     {

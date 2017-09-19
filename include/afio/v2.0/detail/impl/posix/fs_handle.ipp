@@ -56,10 +56,7 @@ inline result<path_handle> containing_directory(optional<std::reference_wrapper<
     for(;;)
     {
       // Get current path for handle and open its containing dir
-      auto currentpath_ = h.current_path();
-      if(!currentpath_)
-        continue;
-      filesystem::path _currentpath = std::move(currentpath_.value());
+      OUTCOME_TRY(_currentpath, h.current_path());
       // If current path is empty, it's been deleted
       if(_currentpath.empty())
         return std::errc::no_such_file_or_directory;
@@ -83,7 +80,13 @@ inline result<path_handle> containing_directory(optional<std::reference_wrapper<
       path_view::c_str zpath(filename);
       int fd = ::openat(currentdirh.native_handle().fd, zpath.buffer, O_CLOEXEC);
       if(fd == -1)
-        continue;
+      {
+        if(ENOENT == errno)
+        {
+          continue;
+        }
+        return {errno, std::system_category()};
+      }
       auto unfd = undoer([fd] { ::close(fd); });
       (void) unfd;
       struct stat s;

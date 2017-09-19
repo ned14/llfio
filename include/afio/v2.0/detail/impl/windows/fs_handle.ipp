@@ -50,10 +50,7 @@ result<path_handle> fs_handle::parent_path_handle(deadline d) const noexcept
     for(;;)
     {
       // Get current path for handle and open its containing dir
-      auto currentpath_ = h.current_path();
-      if(!currentpath_)
-        continue;
-      filesystem::path currentpath = std::move(currentpath_.value());
+      OUTCOME_TRY(currentpath, h.current_path());
       // If current path is empty, it's been deleted
       if(currentpath.empty())
         return std::errc::no_such_file_or_directory;
@@ -87,7 +84,13 @@ result<path_handle> fs_handle::parent_path_handle(deadline d) const noexcept
       HANDLE nh = nullptr;
       NTSTATUS ntstat = NtCreateFile(&nh, SYNCHRONIZE, &oa, &isb, &AllocationSize, 0, fileshare, 0x00000001 /*FILE_OPEN*/, 0x20 /*FILE_SYNCHRONOUS_IO_NONALERT*/, NULL, 0);
       if(STATUS_SUCCESS != ntstat)
-        continue;
+      {
+        if((NTSTATUS) 0xC000000F /*STATUS_NO_SUCH_FILE*/ == ntstat || (NTSTATUS) 0xC0000034 /*STATUS_OBJECT_NAME_NOT_FOUND*/ == ntstat)
+        {
+          continue;
+        }
+        return {(int) ntstat, ntkernel_category()};
+      }
       auto unnh = undoer([nh] { CloseHandle(nh); });
       (void) unnh;
       isb.Status = -1;

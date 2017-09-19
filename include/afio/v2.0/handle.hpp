@@ -328,9 +328,13 @@ public:
 };
 inline std::ostream &operator<<(std::ostream &s, const handle &v)
 {
-  auto _currentpath = v.current_path();
-  std::string currentpath = !_currentpath ? std::string(_currentpath.error().message()) : _currentpath.value().u8string();
-  return s << "afio::handle(" << v._v._init << ", " << currentpath << ")";
+  if(v.is_valid())
+  {
+    auto _currentpath = v.current_path();
+    std::string currentpath = !_currentpath ? std::string(_currentpath.error().message()) : _currentpath.value().u8string();
+    return s << "afio::handle(" << v._v._init << ", " << currentpath << ")";
+  }
+  return s << "afio::handle(closed)";
 }
 inline std::ostream &operator<<(std::ostream &s, const handle::mode &v)
 {
