@@ -23,6 +23,7 @@ Distributed under the Boost Software License, Version 1.0.
 */
 
 #include "../../test_kernel_decl.hpp"
+#include "kerneltest/include/kerneltest.hpp"
 
 namespace directory_handle_create_close
 {
