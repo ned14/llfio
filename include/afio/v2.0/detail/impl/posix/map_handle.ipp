@@ -84,7 +84,6 @@ result<section_handle> section_handle::section(file_handle &backing, extent_type
     maximum_size = utils::round_up_to_page_size(maximum_size);
   }
   result<section_handle> ret(section_handle(native_handle_type(), backing.is_valid() ? &backing : nullptr, maximum_size, _flag));
-  // There are no section handles on POSIX, so do nothing
   native_handle_type &nativeh = ret.value()._v;
   if(backing.is_valid())
   {
@@ -93,7 +92,12 @@ result<section_handle> section_handle::section(file_handle &backing, extent_type
   else
   {
     // Create a temporary anonymous inode in a tmpfs
-    OUTCOME_TRY(tmpfsfile, file_handle::temp_inode(path_discovery::memory_backed_temporary_files_directory()));
+    const path_handle &tempdirh = path_discovery::memory_backed_temporary_files_directory();
+    if(!tempdirh.is_valid())
+    {
+      AFIO_LOG_WARN(nullptr, "A suitable memory backed temporary files directory was not found on this system, so attempting to create memory-backed section_handle's will always fail");
+    }
+    OUTCOME_TRY(tmpfsfile, file_handle::temp_inode(tempdirh));
     nativeh.fd = tmpfsfile.release().fd;
     ret.value()._flag |= flag::posix_anonymous_inode;
   }
