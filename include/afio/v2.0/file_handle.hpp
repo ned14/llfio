@@ -209,11 +209,19 @@ public:
 
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> barrier(io_request<const_buffers_type> reqs = io_request<const_buffers_type>(), bool wait_for_device = false, bool and_metadata = false, deadline d = deadline()) noexcept override;
 
-  /*! Clone this handle (copy constructor is disabled to avoid accidental copying)
+  /*! Clone this handle (copy constructor is disabled to avoid accidental copying),
+  optionally race free reopening the handle with different access or caching.
+
+  Microsoft Windows provides a syscall for cloning an existing handle but with new
+  access. On POSIX, if not changing the mode, we change caching via `fcntl()`, if
+  changing the mode we must loop calling `current_path()`,
+  trying to open the path returned and making sure it is the same inode.
 
   \errors Any of the values POSIX dup() or DuplicateHandle() can return.
+  \mallocs On POSIX if changing the mode, we must loop calling `current_path()` and
+  trying to open the path returned. Thus many allocations may occur.
   */
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<file_handle> clone() const noexcept;
+  AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<file_handle> clone(mode _mode = mode::unchanged, caching _caching = caching::unchanged, deadline d = std::chrono::seconds(30)) const noexcept;
 
   //! The i/o service this handle is attached to, if any
   io_service *service() const noexcept { return _service; }

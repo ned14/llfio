@@ -41,8 +41,10 @@ AFIO_V2_NAMESPACE_BEGIN
 
 result<directory_handle> directory_handle::directory(const path_handle &base, path_view_type path, mode _mode, creation _creation, caching _caching, flag flags) noexcept
 {
-  // We don't implement unlink on close
-  flags &= ~flag::unlink_on_close;
+  if(flags & flag::unlink_on_close)
+  {
+    return std::errc::invalid_argument;
+  }
   result<directory_handle> ret(directory_handle(native_handle_type(), 0, 0, _caching, flags));
   native_handle_type &nativeh = ret.value()._v;
   AFIO_LOG_FUNCTION_CALL(&ret);
@@ -116,15 +118,60 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
   return ret;
 }
 
-result<directory_handle> directory_handle::clone() const noexcept
+result<directory_handle> directory_handle::clone(mode mode_, caching caching_, deadline d) const noexcept
 {
   AFIO_LOG_FUNCTION_CALL(this);
-  result<directory_handle> ret(directory_handle(native_handle_type(), _devid, _inode, _caching, _flags));
-  ret.value()._v.behaviour = _v.behaviour;
-  ret.value()._v.fd = ::dup(_v.fd);
-  if(-1 == ret.value()._v.fd)
-    return {errno, std::system_category()};
-  return ret;
+  // Fast path
+  if(mode_ == mode::unchanged && caching_ == caching::unchanged)
+  {
+    result<directory_handle> ret(directory_handle(native_handle_type(), _devid, _inode, _caching, _flags));
+    ret.value()._v.behaviour = _v.behaviour;
+    ret.value()._v.fd = ::dup(_v.fd);
+    if(-1 == ret.value()._v.fd)
+      return {errno, std::system_category()};
+    return ret;
+  }
+  // Slow path
+  std::chrono::steady_clock::time_point began_steady;
+  std::chrono::system_clock::time_point end_utc;
+  if(d)
+  {
+    if(d.steady)
+      began_steady = std::chrono::steady_clock::now();
+    else
+      end_utc = d.to_time_point();
+  }
+  for(;;)
+  {
+    // Get the current path of myself
+    OUTCOME_TRY(currentpath, current_path());
+    // Open myself
+    auto fh = directory({}, currentpath, mode_, creation::open_existing, caching_, _flags);
+    if(fh)
+    {
+      if(fh.value().unique_id() == unique_id())
+        return fh;
+    }
+    else
+    {
+      if(fh.error() != std::errc::no_such_file_or_directory)
+        return fh.error();
+    }
+    // Check timeout
+    if(d)
+    {
+      if(d.steady)
+      {
+        if(std::chrono::steady_clock::now() >= (began_steady + std::chrono::nanoseconds(d.nsecs)))
+          return std::errc::timed_out;
+      }
+      else
+      {
+        if(std::chrono::system_clock::now() >= end_utc)
+          return std::errc::timed_out;
+      }
+    }
+  }
 }
 
 result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_type &&tofill, path_view_type glob, filter /*unused*/, span<char> kernelbuffer) const noexcept

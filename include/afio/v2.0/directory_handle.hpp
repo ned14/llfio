@@ -218,11 +218,18 @@ public:
     return path_handle::close();
   }
 
-  /*! Clone this handle (copy constructor is disabled to avoid accidental copying)
+  /*! Clone this handle (copy constructor is disabled to avoid accidental copying),
+  optionally race free reopening the handle with different access or caching.
+
+  Microsoft Windows provides a syscall for cloning an existing handle but with new
+  access. On POSIX, we must loop calling `current_path()`,
+  trying to open the path returned and making sure it is the same inode.
 
   \errors Any of the values POSIX dup() or DuplicateHandle() can return.
+  \mallocs On POSIX if changing the mode, we must loop calling `current_path()` and
+  trying to open the path returned. Thus many allocations may occur.
   */
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<directory_handle> clone() const noexcept;
+  AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<directory_handle> clone(mode _mode = mode::unchanged, caching _caching = caching::unchanged, deadline d = std::chrono::seconds(30)) const noexcept;
 
 #ifdef _WIN32
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC

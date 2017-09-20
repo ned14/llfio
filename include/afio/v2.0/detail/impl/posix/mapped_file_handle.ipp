@@ -33,7 +33,7 @@ result<mapped_file_handle::size_type> mapped_file_handle::reserve(size_type rese
   OUTCOME_TRY(length, underlying_file_length());
   if(length == 0)
   {
-    return std::errc::invalid_argument;
+    return std::errc::invalid_seek;
   }
   if(reservation == 0)
   {

@@ -33,14 +33,6 @@ async_file_handle::io_result<async_file_handle::const_buffers_type> async_file_h
   return file_handle::barrier(std::move(reqs), wait_for_device, and_metadata, std::move(d));
 }
 
-result<async_file_handle> async_file_handle::clone(io_service &service) const noexcept
-{
-  OUTCOME_TRY(v, clone());
-  async_file_handle ret(std::move(v));
-  ret._service = &service;
-  return std::move(ret);
-}
-
 template <class CompletionRoutine, class BuffersType, class IORoutine>
 result<async_file_handle::io_state_ptr<CompletionRoutine, BuffersType>> async_file_handle::_begin_io(async_file_handle::operation_t operation, async_file_handle::io_request<BuffersType> reqs, CompletionRoutine &&completion, IORoutine &&ioroutine) noexcept
 {

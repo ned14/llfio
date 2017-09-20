@@ -22,8 +22,8 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#include "kerneltest/include/kerneltest.hpp"
 #include "kernel_directory_handle.cpp.hpp"
+#include "kerneltest/include/kerneltest.hpp"
 
 template <class U> inline void directory_handle_create_close_creation(U &&f)
 {
@@ -76,9 +76,6 @@ template <class U> inline void directory_handle_create_close_creation(U &&f)
       {            is_a_directory, { directory_handle::mode::write, directory_handle::creation::truncate         , directory_handle::flag::none, &entries, &info }, { "non-existing" }, { "non-existing" },{ success() } },
       {            is_a_directory, { directory_handle::mode::write, directory_handle::creation::truncate         , directory_handle::flag::none, &entries, &info }, { "existing0"    }, { "existing0"    },{ success() } },
       {            is_a_directory, { directory_handle::mode::write, directory_handle::creation::truncate         , directory_handle::flag::none, &entries, &info }, { "existing1"    }, { "existing1"    },{ success() } },
-
-      // Does the flag parameter have the expected side effects?
-      {                 success(), { directory_handle::mode::write, directory_handle::creation::open_existing, directory_handle::flag::unlink_on_close, &entries, &info }, { "existing1" }, { "existing1" },{ success() } }
     },
     precondition::filesystem_setup(),                
     postcondition::filesystem_comparison_structure(),

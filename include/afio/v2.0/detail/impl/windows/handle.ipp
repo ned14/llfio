@@ -109,26 +109,4 @@ result<void> handle::set_append_only(bool enable) noexcept
   return success();
 }
 
-result<void> handle::set_kernel_caching(caching caching) noexcept
-{
-  AFIO_LOG_FUNCTION_CALL(this);
-  native_handle_type nativeh;
-  handle::mode _mode = mode::none;
-  if(is_append_only())
-    _mode = mode::append;
-  else if(is_writable())
-    _mode = mode::write;
-  else if(is_readable())
-    _mode = mode::read;
-  OUTCOME_TRY(access, access_mask_from_handle_mode(nativeh, _mode, _flags));
-  OUTCOME_TRY(attribs, attributes_from_handle_caching_and_flags(nativeh, caching, _flags));
-  nativeh.behaviour |= native_handle_type::disposition::file;
-  if(INVALID_HANDLE_VALUE == (nativeh.h = ReOpenFile(_v.h, access, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, attribs)))
-    return {GetLastError(), std::system_category()};
-  _v.swap(nativeh);
-  if(!CloseHandle(nativeh.h))
-    return {GetLastError(), std::system_category()};
-  return success();
-}
-
 AFIO_V2_NAMESPACE_END

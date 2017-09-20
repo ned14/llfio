@@ -309,17 +309,6 @@ public:
   bool are_writes_durable() const noexcept { return _caching == caching::none || _caching == caching::reads || _caching == caching::reads_and_metadata; }
   //! True if issuing safety fsyncs is on
   bool are_safety_fsyncs_issued() const noexcept { return !(_flags & flag::disable_safety_fsyncs) && !!(static_cast<int>(_caching) & 1); }
-  /*! Changes the kernel cache strategy used by this handle.
-  Note most OSs impose severe restrictions on what can be changed and will error out,
-  it may be easier to simply create a new handle.
-
-  \warning On Windows this reopens the file, it is no slower than
-  opening the file fresh but equally it is vastly slower than on POSIX.
-
-  \errors Whatever POSIX fcntl() or ReOpenFile() returns.
-  \mallocs No memory allocation.
-  */
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> set_kernel_caching(caching caching) noexcept;
 
   //! The flags this handle was opened with
   flag flags() const noexcept { return _flags; }

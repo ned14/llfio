@@ -216,8 +216,20 @@ public:
 
   \errors Any of the values POSIX dup() or DuplicateHandle() can return.
   */
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<async_file_handle> clone(io_service &service) const noexcept;
-  using file_handle::clone;
+  result<async_file_handle> clone(io_service &service, mode _mode = mode::unchanged, caching _caching = caching::unchanged, deadline d = std::chrono::seconds(30)) const noexcept
+  {
+    OUTCOME_TRY(v, file_handle::clone(_mode, _caching, d));
+    async_file_handle ret(std::move(v));
+    ret._service = &service;
+    return std::move(ret);
+  }
+  AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<file_handle> clone(mode _mode = mode::unchanged, caching _caching = caching::unchanged, deadline d = std::chrono::seconds(30)) const noexcept override
+  {
+    OUTCOME_TRY(v, file_handle::clone(_mode, _caching, d));
+    async_file_handle ret(std::move(v));
+    ret._service = _service;
+    return static_cast<file_handle &&>(ret);
+  }
 
 #if DOXYGEN_SHOULD_SKIP_THIS
 private:

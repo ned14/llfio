@@ -31,8 +31,10 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
-  // We don't implement unlink on close
-  flags &= ~flag::unlink_on_close;
+  if(flags & flag::unlink_on_close)
+  {
+    return std::errc::invalid_argument;
+  }
   result<directory_handle> ret(directory_handle(native_handle_type(), 0, 0, _caching, flags));
   native_handle_type &nativeh = ret.value()._v;
   AFIO_LOG_FUNCTION_CALL(&ret);
@@ -134,27 +136,52 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
       ret.value()._flags &= ~flag::disable_safety_unlinks;
     }
   }
-  if(flags & flag::unlink_on_close)
-  {
-    // Hide this item
-    IO_STATUS_BLOCK isb = make_iostatus();
-    FILE_BASIC_INFORMATION fbi;
-    memset(&fbi, 0, sizeof(fbi));
-    fbi.FileAttributes = FILE_ATTRIBUTE_HIDDEN;
-    NtSetInformationFile(nativeh.h, &isb, &fbi, sizeof(fbi), FileBasicInformation);
-    if(flags & flag::overlapped)
-      ntwait(nativeh.h, isb, deadline());
-  }
   return ret;
 }
 
-result<directory_handle> directory_handle::clone() const noexcept
+result<directory_handle> directory_handle::clone(mode mode_, caching caching_, deadline /* unused */) const noexcept
 {
   AFIO_LOG_FUNCTION_CALL(this);
-  result<directory_handle> ret(directory_handle(native_handle_type(), _devid, _inode, _caching, _flags));
-  ret.value()._v.behaviour = _v.behaviour;
-  if(!DuplicateHandle(GetCurrentProcess(), _v.h, GetCurrentProcess(), &ret.value()._v.h, 0, false, DUPLICATE_SAME_ACCESS))
-    return {GetLastError(), std::system_category()};
+  // Fast path
+  if(mode_ == mode::unchanged && caching_ == caching::unchanged)
+  {
+    result<directory_handle> ret(directory_handle(native_handle_type(), _devid, _inode, _caching, _flags));
+    ret.value()._v.behaviour = _v.behaviour;
+    if(!DuplicateHandle(GetCurrentProcess(), _v.h, GetCurrentProcess(), &ret.value()._v.h, 0, false, DUPLICATE_SAME_ACCESS))
+      return {GetLastError(), std::system_category()};
+    return ret;
+  }
+  // Slow path
+  windows_nt_kernel::init();
+  using namespace windows_nt_kernel;
+  result<directory_handle> ret(directory_handle(native_handle_type(), _devid, _inode, caching_, _flags));
+  native_handle_type &nativeh = ret.value()._v;
+  nativeh.behaviour |= native_handle_type::disposition::directory;
+  DWORD fileshare = FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE;
+  OUTCOME_TRY(access, access_mask_from_handle_mode(nativeh, mode_, _flags));
+  OUTCOME_TRYV(attributes_from_handle_caching_and_flags(nativeh, caching_, _flags));
+  /* It is super important that we remove the DELETE permission for directories as otherwise relative renames
+  will always fail due to an unfortunate design choice by Microsoft.
+  */
+  access &= ~DELETE;
+  OUTCOME_TRY(ntflags, ntflags_from_handle_caching_and_flags(nativeh, caching_, _flags));
+  ntflags |= 0x01 /*FILE_DIRECTORY_FILE*/;  // required to open a directory
+  OBJECT_ATTRIBUTES oa;
+  memset(&oa, 0, sizeof(oa));
+  oa.Length = sizeof(OBJECT_ATTRIBUTES);
+  // It is entirely undocumented that this is how you clone a file handle with new privs
+  UNICODE_STRING _path;
+  memset(&_path, 0, sizeof(_path));
+  oa.ObjectName = &_path;
+  oa.RootDirectory = _v.h;
+  IO_STATUS_BLOCK isb = make_iostatus();
+  NTSTATUS ntstat = NtOpenFile(&nativeh.h, access, &oa, &isb, fileshare, ntflags);
+  if(STATUS_PENDING == ntstat)
+    ntstat = ntwait(nativeh.h, isb, deadline());
+  if(ntstat < 0)
+  {
+    return {(int) ntstat, ntkernel_category()};
+  }
   return ret;
 }
 

@@ -163,16 +163,113 @@ file_handle::io_result<file_handle::const_buffers_type> file_handle::barrier(fil
   return io_handle::io_result<const_buffers_type>(std::move(reqs.buffers));
 }
 
-result<file_handle> file_handle::clone() const noexcept
+result<file_handle> file_handle::clone(mode mode_, caching caching_, deadline d) const noexcept
 {
   AFIO_LOG_FUNCTION_CALL(this);
-  result<file_handle> ret(file_handle(native_handle_type(), _devid, _inode, _caching, _flags));
-  ret.value()._service = _service;
-  ret.value()._v.behaviour = _v.behaviour;
-  ret.value()._v.fd = ::dup(_v.fd);
-  if(-1 == ret.value()._v.fd)
-    return {errno, std::system_category()};
-  return ret;
+  // Fast path
+  if(mode_ == mode::unchanged)
+  {
+    result<file_handle> ret(file_handle(native_handle_type(), _devid, _inode, caching_, _flags));
+    ret.value()._service = _service;
+    ret.value()._v.behaviour = _v.behaviour;
+    ret.value()._v.fd = ::dup(_v.fd);
+    if(-1 == ret.value()._v.fd)
+      return {errno, std::system_category()};
+    if(caching_ == caching::unchanged)
+      return ret;
+
+    int attribs = fcntl(ret.value()._v.fd, F_GETFL);
+    if(-1 != attribs)
+    {
+      attribs &= ~(O_SYNC | O_DIRECT
+#ifdef O_DSYNC
+                   | O_DSYNC
+#endif
+                   );
+      switch(caching_)
+      {
+      case caching::unchanged:
+        break;
+      case caching::none:
+        attribs |= O_SYNC | O_DIRECT;
+        if(-1 == fcntl(ret.value()._v.fd, F_SETFL, attribs))
+          return {errno, std::system_category()};
+        ret.value()._v.behaviour |= native_handle_type::disposition::aligned_io;
+        break;
+      case caching::only_metadata:
+        attribs |= O_DIRECT;
+        if(-1 == fcntl(ret.value()._v.fd, F_SETFL, attribs))
+          return {errno, std::system_category()};
+        ret.value()._v.behaviour |= native_handle_type::disposition::aligned_io;
+        break;
+      case caching::reads:
+        attribs |= O_SYNC;
+        if(-1 == fcntl(ret.value()._v.fd, F_SETFL, attribs))
+          return {errno, std::system_category()};
+        ret.value()._v.behaviour &= ~native_handle_type::disposition::aligned_io;
+        break;
+      case caching::reads_and_metadata:
+#ifdef O_DSYNC
+        attribs |= O_DSYNC;
+#else
+        attribs |= O_SYNC;
+#endif
+        if(-1 == fcntl(ret.value()._v.fd, F_SETFL, attribs))
+          return {errno, std::system_category()};
+        ret.value()._v.behaviour &= ~native_handle_type::disposition::aligned_io;
+        break;
+      case caching::all:
+      case caching::safety_fsyncs:
+      case caching::temporary:
+        if(-1 == fcntl(ret.value()._v.fd, F_SETFL, attribs))
+          return {errno, std::system_category()};
+        ret.value()._v.behaviour &= ~native_handle_type::disposition::aligned_io;
+        break;
+      }
+      return ret;
+    }
+  }
+  // Slow path
+  std::chrono::steady_clock::time_point began_steady;
+  std::chrono::system_clock::time_point end_utc;
+  if(d)
+  {
+    if(d.steady)
+      began_steady = std::chrono::steady_clock::now();
+    else
+      end_utc = d.to_time_point();
+  }
+  for(;;)
+  {
+    // Get the current path of myself
+    OUTCOME_TRY(currentpath, current_path());
+    // Open myself
+    auto fh = file({}, currentpath, mode_, creation::open_existing, caching_, _flags);
+    if(fh)
+    {
+      if(fh.value().unique_id() == unique_id())
+        return fh;
+    }
+    else
+    {
+      if(fh.error() != std::errc::no_such_file_or_directory)
+        return fh.error();
+    }
+    // Check timeout
+    if(d)
+    {
+      if(d.steady)
+      {
+        if(std::chrono::steady_clock::now() >= (began_steady + std::chrono::nanoseconds(d.nsecs)))
+          return std::errc::timed_out;
+      }
+      else
+      {
+        if(std::chrono::system_clock::now() >= end_utc)
+          return std::errc::timed_out;
+      }
+    }
+  }
 }
 
 result<file_handle::extent_type> file_handle::length() const noexcept
