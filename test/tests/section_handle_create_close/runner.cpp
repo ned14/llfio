@@ -22,14 +22,15 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#include "kerneltest/include/kerneltest.hpp"
 #include "kernel_section_handle.cpp.hpp"
+#include "kerneltest/include/kerneltest.hpp"
 
 template <class U> inline void section_handle_create_close_(U &&f)
 {
   using namespace KERNELTEST_V1_NAMESPACE;
   using AFIO_V2_NAMESPACE::file_handle;
   using AFIO_V2_NAMESPACE::section_handle;
+  namespace path_discovery = AFIO_V2_NAMESPACE::path_discovery;
 
   // Create a temporary file and put some text into it
   file_handle temph;
@@ -75,6 +76,13 @@ template <class U> inline void section_handle_create_close_(U &&f)
         else
         {
           temph = file_handle();
+#ifndef _WIN32
+		  // On POSIX unbacksed sections will fail if no tmpfs temp directory is available
+		  if (!path_discovery::memory_backed_temporary_files_directory().is_valid())
+		  {
+			  temph = file_handle::temp_inode().value();
+		  }
+#endif
         }
         return &testreturn;
       },

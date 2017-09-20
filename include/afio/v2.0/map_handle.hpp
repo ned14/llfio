@@ -41,7 +41,11 @@ AFIO_V2_NAMESPACE_EXPORT_BEGIN
 
 \note On Windows the native handle of this handle is that of the NT kernel section object. On POSIX it is
 a cloned file descriptor of the backing storage if there is backing storage, else it will be a file
-descriptor to an unnamed inode in a tmpfs or ramfs based temporary directory.
+descriptor to an unnamed inode in a tmpfs or ramfs based temporary directory. Hence on POSIX, if
+`path_discovery::memory_backed_temporary_files_directory()` is returning an invalid fd because no memory
+backed temporary files directory could be found, sections without backing storage will fail to construct.
+Using `map_handle` without a section backing or using a temporary inode in
+`path_discovery::storage_backed_temporary_files_directory()` may be viable alternatives.
 */
 class AFIO_DECL section_handle : public handle
 {
