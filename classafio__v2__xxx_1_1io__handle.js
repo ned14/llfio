@@ -50,7 +50,6 @@ var classafio__v2__xxx_1_1io__handle =
     [ "release", "classafio__v2__xxx_1_1io__handle.html#a73d5f2070bce0c3d7fa536d3cbed7b52", null ],
     [ "requires_aligned_io", "classafio__v2__xxx_1_1io__handle.html#affb10caeeca67b804695b7378be29e23", null ],
     [ "set_append_only", "classafio__v2__xxx_1_1io__handle.html#af1610ec7fb0a41f039e3e17e0dc467ab", null ],
-    [ "set_kernel_caching", "classafio__v2__xxx_1_1io__handle.html#ad90f8264470763069256ae9eeda45e69", null ],
     [ "swap", "classafio__v2__xxx_1_1io__handle.html#a657c12a309cf02bf2351bfcc7f41463b", null ],
     [ "try_lock", "classafio__v2__xxx_1_1io__handle.html#a0a1c4773b9fa7bbd04fee0756075d319", null ],
     [ "unlock", "classafio__v2__xxx_1_1io__handle.html#a96b9da71ee7791fbaaa2470c936ec763", null ],

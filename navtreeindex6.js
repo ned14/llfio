@@ -1,10 +1,5 @@
 var NAVTREEINDEX6 =
 {
-"structafio__v2__xxx_1_1statfs__t_1_1f__flags__t.html#aa60cb5337a8754332284d5fa19a311d7":[3,0,0,32,0,6],
-"structafio__v2__xxx_1_1statfs__t_1_1f__flags__t.html#aad31bddf29d0736339709e78ca93062a":[3,0,0,32,0,2],
-"structafio__v2__xxx_1_1statfs__t_1_1f__flags__t.html#aca3e492928914b0fb46e98289f32d0cd":[3,0,0,32,0,7],
-"structafio__v2__xxx_1_1statfs__t_1_1f__flags__t.html#ad90201c2e2a8446c45feb244a9927778":[3,0,0,32,0,0],
-"structafio__v2__xxx_1_1statfs__t_1_1f__flags__t.html#ada0e4acd2108972f836b87781b3bf19a":[3,0,0,32,0,1],
 "structafio__v2__xxx_1_1statfs__t_1_1want__base.html":[3,0,0,32,1],
 "structafio__v2__xxx_1_1statfs__t_1_1want__base.html#a328ecf03e9e9d49f6a7e5ba513b4bced":[3,0,0,32,1,0],
 "structafio__v2__xxx_1_1statfs__t_1_1want__base.html#a328ecf03e9e9d49f6a7e5ba513b4bceda0ee581dff39660236e1a7988ff9be697":[3,0,0,32,1,0,2],

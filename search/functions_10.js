@@ -9,7 +9,6 @@ var searchData=
   ['set_5fbacking',['set_backing',['../classafio__v2__xxx_1_1section__handle.html#a1b77cff150e130669624b5046b35e01e',1,'afio_v2_xxx::section_handle']]],
   ['set_5fhandle',['set_handle',['../classafio__v2__xxx_1_1io__handle_1_1extent__guard.html#ab3186062f0496b7c65272c81bbab4e1c',1,'afio_v2_xxx::io_handle::extent_guard']]],
   ['set_5finterruption_5fsignal',['set_interruption_signal',['../classafio__v2__xxx_1_1io__service.html#af8fe115b95c19e19fc7e685db214441d',1,'afio_v2_xxx::io_service']]],
-  ['set_5fkernel_5fcaching',['set_kernel_caching',['../classafio__v2__xxx_1_1handle.html#ad90f8264470763069256ae9eeda45e69',1,'afio_v2_xxx::handle']]],
   ['set_5fsection',['set_section',['../classafio__v2__xxx_1_1map__handle.html#a127eef4449f6afcddbdb684030776868',1,'afio_v2_xxx::map_handle']]],
   ['size',['size',['../structafio__v2__xxx_1_1storage__profile_1_1storage__profile.html#a7b088508cc1b731b64b501a1f77a0108',1,'afio_v2_xxx::storage_profile::storage_profile']]],
   ['st_5fdev',['st_dev',['../classafio__v2__xxx_1_1fs__handle.html#abf1012040064a3d429adfae8e6f443f0',1,'afio_v2_xxx::fs_handle']]],

@@ -13,7 +13,6 @@ var searchData=
   ['set_5fbacking',['set_backing',['../classafio__v2__xxx_1_1section__handle.html#a1b77cff150e130669624b5046b35e01e',1,'afio_v2_xxx::section_handle']]],
   ['set_5fhandle',['set_handle',['../classafio__v2__xxx_1_1io__handle_1_1extent__guard.html#ab3186062f0496b7c65272c81bbab4e1c',1,'afio_v2_xxx::io_handle::extent_guard']]],
   ['set_5finterruption_5fsignal',['set_interruption_signal',['../classafio__v2__xxx_1_1io__service.html#af8fe115b95c19e19fc7e685db214441d',1,'afio_v2_xxx::io_service']]],
-  ['set_5fkernel_5fcaching',['set_kernel_caching',['../classafio__v2__xxx_1_1handle.html#ad90f8264470763069256ae9eeda45e69',1,'afio_v2_xxx::handle']]],
   ['set_5fsection',['set_section',['../classafio__v2__xxx_1_1map__handle.html#a127eef4449f6afcddbdb684030776868',1,'afio_v2_xxx::map_handle']]],
   ['shared_5ffs_5fmutex',['shared_fs_mutex',['../classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex.html',1,'afio_v2_xxx::algorithm::shared_fs_mutex']]],
   ['singleton',['singleton',['../structafio__v2__xxx_1_1section__handle_1_1flag__base.html#a5b790e66402ef3a07ce9464f3e1dc9d8a091dabebebe6745fe9c1ed2901c125f2',1,'afio_v2_xxx::section_handle::flag_base']]],

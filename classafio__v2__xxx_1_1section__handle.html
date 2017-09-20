@@ -292,8 +292,6 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1handle.html#a3fc7db93fac699f5ecad453642ed314e">are_safety_fsyncs_issued</a> () const noexcept</td></tr>
 <tr class="memdesc:a3fc7db93fac699f5ecad453642ed314e"><td class="mdescLeft">&#160;</td><td class="mdescRight">True if issuing safety fsyncs is on. <br /></td></tr>
 <tr class="separator:a3fc7db93fac699f5ecad453642ed314e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad90f8264470763069256ae9eeda45e69"><td class="memItemLeft" align="right" valign="top">virtual result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1handle.html#ad90f8264470763069256ae9eeda45e69">set_kernel_caching</a> (<a class="el" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9e">caching</a> <a class="el" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9e">caching</a>) noexcept</td></tr>
-<tr class="separator:ad90f8264470763069256ae9eeda45e69"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab3d876f5996605158fd6a0582adadad6"><td class="memItemLeft" align="right" valign="top"><a id="ab3d876f5996605158fd6a0582adadad6"></a>
 flag&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">flags</a> () const noexcept</td></tr>
 <tr class="memdesc:ab3d876f5996605158fd6a0582adadad6"><td class="mdescLeft">&#160;</td><td class="mdescRight">The flags this handle was opened with. <br /></td></tr>
@@ -403,7 +401,7 @@ flag&#160;</td><td class="memItemRight" valign="bottom"><b>_flags</b></td></tr>
 <tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a45ff5c1c5662623d99156870dfeee0a7a244f58cf07c35fd48d7524b289551e5c"></a>truncate&#160;</td><td class="fielddoc"><p>Atomically truncate on open, leaving creation date unmodified. </p>
 </td></tr>
 </table>
-<div class="fragment"><div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;                      : <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span></div><div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;  {</div><div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;    open_existing = 0,</div><div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;    only_if_not_exist,</div><div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    if_needed,</div><div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    <a class="code" href="namespaceafio__v2__xxx.html#a84d22c966fcabe50de30ad8cf26c7241">truncate</a>  <span class="comment">//!&lt; Atomically truncate on open, leaving creation date unmodified.</span></div><div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;<span class="comment"></span>              <span class="comment">// NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!</span></div><div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;  };</div><div class="ttc" id="namespaceafio__v2__xxx_html_a84d22c966fcabe50de30ad8cf26c7241"><div class="ttname"><a href="namespaceafio__v2__xxx.html#a84d22c966fcabe50de30ad8cf26c7241">afio_v2_xxx::truncate</a></div><div class="ttdeci">result&lt; file_handle::extent_type &gt; truncate(file_handle &amp;self, file_handle::extent_type newsize) noexcept</div><div class="ttdef"><b>Definition:</b> file_handle.hpp:363</div></div>
+<div class="fragment"><div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;                      : <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span></div><div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;  {</div><div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;    open_existing = 0,</div><div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;    only_if_not_exist,</div><div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    if_needed,</div><div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    <a class="code" href="namespaceafio__v2__xxx.html#a84d22c966fcabe50de30ad8cf26c7241">truncate</a>  <span class="comment">//!&lt; Atomically truncate on open, leaving creation date unmodified.</span></div><div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;<span class="comment"></span>              <span class="comment">// NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!</span></div><div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;  };</div><div class="ttc" id="namespaceafio__v2__xxx_html_a84d22c966fcabe50de30ad8cf26c7241"><div class="ttname"><a href="namespaceafio__v2__xxx.html#a84d22c966fcabe50de30ad8cf26c7241">afio_v2_xxx::truncate</a></div><div class="ttdeci">result&lt; file_handle::extent_type &gt; truncate(file_handle &amp;self, file_handle::extent_type newsize) noexcept</div><div class="ttdef"><b>Definition:</b> file_handle.hpp:371</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -662,36 +660,6 @@ flag&#160;</td><td class="memItemRight" valign="bottom"><b>_flags</b></td></tr>
 <p>Changes whether this handle is append only or not.</p>
 <dl class="section warning"><dt>Warning</dt><dd>On Windows this is implemented as a bit of a hack to make it fast like on POSIX, so make sure you open the handle for read/write originally. Note unlike on POSIX the append_only disposition will be the only one toggled, seekable and readable will remain turned on.</dd></dl>
 <dl class="section user"><dt>Errors returnable</dt><dd>Whatever POSIX fcntl() returns. On Windows nothing is changed on the handle. </dd></dl>
-<dl class="section user"><dt>Memory Allocations</dt><dd>No memory allocation. </dd></dl>
-
-</div>
-</div>
-<a id="ad90f8264470763069256ae9eeda45e69"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad90f8264470763069256ae9eeda45e69">&#9670;&nbsp;</a></span>set_kernel_caching()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual result&lt;void&gt; afio_v2_xxx::handle::set_kernel_caching </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9e">caching</a>&#160;</td>
-          <td class="paramname"><em>caching</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span><span class="mlabel">noexcept</span><span class="mlabel">inherited</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Changes the kernel cache strategy used by this handle. Note most OSs impose severe restrictions on what can be changed and will error out, it may be easier to simply create a new handle.</p>
-<dl class="section warning"><dt>Warning</dt><dd>On Windows this reopens the file, it is no slower than opening the file fresh but equally it is vastly slower than on POSIX.</dd></dl>
-<dl class="section user"><dt>Errors returnable</dt><dd>Whatever POSIX fcntl() or ReOpenFile() returns. </dd></dl>
 <dl class="section user"><dt>Memory Allocations</dt><dd>No memory allocation. </dd></dl>
 
 </div>

@@ -193,8 +193,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 virtual result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1directory__handle.html#a195e944c47ae9a10214b15030e241e51">close</a> () noexcept override</td></tr>
 <tr class="memdesc:a195e944c47ae9a10214b15030e241e51"><td class="mdescLeft">&#160;</td><td class="mdescRight">Immediately close the native handle type managed by this handle. <br /></td></tr>
 <tr class="separator:a195e944c47ae9a10214b15030e241e51"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a52e014939626d1afcb0c8756732e1817"><td class="memItemLeft" align="right" valign="top">virtual result&lt; <a class="el" href="classafio__v2__xxx_1_1directory__handle.html">directory_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1directory__handle.html#a52e014939626d1afcb0c8756732e1817">clone</a> () const noexcept</td></tr>
-<tr class="separator:a52e014939626d1afcb0c8756732e1817"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a044f58e72d70fe5b80b96a2a56e02743"><td class="memItemLeft" align="right" valign="top">virtual result&lt; <a class="el" href="classafio__v2__xxx_1_1directory__handle.html">directory_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1directory__handle.html#a044f58e72d70fe5b80b96a2a56e02743">clone</a> (<a class="el" href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18">mode</a> _mode=mode::unchanged, <a class="el" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9e">caching</a> _caching=caching::unchanged, <a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a> d=std::chrono::seconds(30)) const noexcept</td></tr>
+<tr class="separator:a044f58e72d70fe5b80b96a2a56e02743"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac4b90958be1b1b620a6768de52407935"><td class="memItemLeft" align="right" valign="top">virtual result&lt; <a class="el" href="structafio__v2__xxx_1_1directory__handle_1_1enumerate__info.html">enumerate_info</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1directory__handle.html#ac4b90958be1b1b620a6768de52407935">enumerate</a> (<a class="el" href="structafio__v2__xxx_1_1directory__handle_1_1buffers__type.html">buffers_type</a> &amp;&amp;tofill, <a class="el" href="classafio__v2__xxx_1_1path__view.html">path_view_type</a> glob=<a class="el" href="classafio__v2__xxx_1_1path__view.html">path_view_type</a>(), <a class="el" href="classafio__v2__xxx_1_1directory__handle.html#a47ed88b4de271daa08862b273c2f609e">filter</a> filtering=<a class="el" href="classafio__v2__xxx_1_1directory__handle.html#a47ed88b4de271daa08862b273c2f609ea14847befc159c1492671b53718fc46f8">filter::fastdeleted</a>, span&lt; char &gt; kernelbuffer=span&lt; char &gt;()) const noexcept</td></tr>
 <tr class="separator:ac4b90958be1b1b620a6768de52407935"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a657c12a309cf02bf2351bfcc7f41463b"><td class="memItemLeft" align="right" valign="top"><a id="a657c12a309cf02bf2351bfcc7f41463b"></a>
@@ -203,6 +203,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <tr class="separator:a657c12a309cf02bf2351bfcc7f41463b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a616a67222676af5ec5b3aa94d7c02428"><td class="memItemLeft" align="right" valign="top">virtual result&lt; path_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1handle.html#a616a67222676af5ec5b3aa94d7c02428">current_path</a> () const noexcept</td></tr>
 <tr class="separator:a616a67222676af5ec5b3aa94d7c02428"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a54790e954f57372b87b095451cc79c38"><td class="memItemLeft" align="right" valign="top">result&lt; <a class="el" href="classafio__v2__xxx_1_1handle.html">handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1handle.html#a54790e954f57372b87b095451cc79c38">clone</a> () const noexcept</td></tr>
+<tr class="separator:a54790e954f57372b87b095451cc79c38"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a73d5f2070bce0c3d7fa536d3cbed7b52"><td class="memItemLeft" align="right" valign="top"><a id="a73d5f2070bce0c3d7fa536d3cbed7b52"></a>
 virtual <a class="el" href="structafio__v2__xxx_1_1native__handle__type.html">native_handle_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1handle.html#a73d5f2070bce0c3d7fa536d3cbed7b52">release</a> () noexcept</td></tr>
 <tr class="memdesc:a73d5f2070bce0c3d7fa536d3cbed7b52"><td class="mdescLeft">&#160;</td><td class="mdescRight">Release the native handle type managed by this handle. <br /></td></tr>
@@ -277,8 +279,6 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1handle.html#a3fc7db93fac699f5ecad453642ed314e">are_safety_fsyncs_issued</a> () const noexcept</td></tr>
 <tr class="memdesc:a3fc7db93fac699f5ecad453642ed314e"><td class="mdescLeft">&#160;</td><td class="mdescRight">True if issuing safety fsyncs is on. <br /></td></tr>
 <tr class="separator:a3fc7db93fac699f5ecad453642ed314e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad90f8264470763069256ae9eeda45e69"><td class="memItemLeft" align="right" valign="top">virtual result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1handle.html#ad90f8264470763069256ae9eeda45e69">set_kernel_caching</a> (<a class="el" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9e">caching</a> <a class="el" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9e">caching</a>) noexcept</td></tr>
-<tr class="separator:ad90f8264470763069256ae9eeda45e69"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab3d876f5996605158fd6a0582adadad6"><td class="memItemLeft" align="right" valign="top"><a id="ab3d876f5996605158fd6a0582adadad6"></a>
 flag&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">flags</a> () const noexcept</td></tr>
 <tr class="memdesc:ab3d876f5996605158fd6a0582adadad6"><td class="mdescLeft">&#160;</td><td class="mdescRight">The flags this handle was opened with. <br /></td></tr>
@@ -378,8 +378,8 @@ ino_t&#160;</td><td class="memItemRight" valign="bottom"><b>_inode</b></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="a52e014939626d1afcb0c8756732e1817"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a52e014939626d1afcb0c8756732e1817">&#9670;&nbsp;</a></span>clone()</h2>
+<a id="a044f58e72d70fe5b80b96a2a56e02743"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a044f58e72d70fe5b80b96a2a56e02743">&#9670;&nbsp;</a></span>clone() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -390,13 +390,59 @@ ino_t&#160;</td><td class="memItemRight" valign="bottom"><b>_inode</b></td></tr>
         <tr>
           <td class="memname">virtual result&lt;<a class="el" href="classafio__v2__xxx_1_1directory__handle.html">directory_handle</a>&gt; afio_v2_xxx::directory_handle::clone </td>
           <td>(</td>
+          <td class="paramtype"><a class="el" href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18">mode</a>&#160;</td>
+          <td class="paramname"><em>_mode</em> = <code>mode::unchanged</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9e">caching</a>&#160;</td>
+          <td class="paramname"><em>_caching</em> = <code>caching::unchanged</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a>&#160;</td>
+          <td class="paramname"><em>d</em> = <code>std::chrono::seconds(30)</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Clone this handle (copy constructor is disabled to avoid accidental copying), optionally race free reopening the handle with different access or caching.</p>
+<p>Microsoft Windows provides a syscall for cloning an existing handle but with new access. On POSIX, we must loop calling <code>current_path()</code>, trying to open the path returned and making sure it is the same inode.</p>
+<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX dup() or DuplicateHandle() can return. </dd></dl>
+<dl class="section user"><dt>Memory Allocations</dt><dd>On POSIX if changing the mode, we must loop calling <code>current_path()</code> and trying to open the path returned. Thus many allocations may occur. </dd></dl>
+
+</div>
+</div>
+<a id="a54790e954f57372b87b095451cc79c38"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a54790e954f57372b87b095451cc79c38">&#9670;&nbsp;</a></span>clone() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">result&lt;<a class="el" href="classafio__v2__xxx_1_1handle.html">handle</a>&gt; afio_v2_xxx::handle::clone </td>
+          <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span><span class="mlabel">noexcept</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span><span class="mlabel">inherited</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -705,7 +751,7 @@ ino_t&#160;</td><td class="memItemRight" valign="bottom"><b>_inode</b></td></tr>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX open() or CreateFile() can return. </dd></dl>
 <div class="fragment"><div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;  {</div><div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;    <span class="keywordflow">try</span></div><div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;    {</div><div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;      <span class="keywordflow">for</span>(;;)</div><div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;      {</div><div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;        <span class="keyword">auto</span> randomname = <a class="code" href="namespaceafio__v2__xxx_1_1utils.html#a767b8434456319066194534a4c4edbf5">utils::random_string</a>(32);</div><div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;        result&lt;directory_handle&gt; ret = <a class="code" href="classafio__v2__xxx_1_1directory__handle.html#ade355bac3d2aafd1ead15d090f85c057">directory</a>(dirpath, randomname, _mode, creation::only_if_not_exist, _caching, <a class="code" href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">flags</a>);</div><div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;        <span class="keywordflow">if</span>(ret || (!ret &amp;&amp; ret.error() != std::errc::file_exists))</div><div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;          <span class="keywordflow">return</span> ret;</div><div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;      }</div><div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;    }</div><div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;    <span class="keywordflow">catch</span>(...)</div><div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;    {</div><div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;      <span class="keywordflow">return</span> error_from_exception();</div><div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;    }</div><div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;  }</div><div class="ttc" id="classafio__v2__xxx_1_1directory__handle_html_ade355bac3d2aafd1ead15d090f85c057"><div class="ttname"><a href="classafio__v2__xxx_1_1directory__handle.html#ade355bac3d2aafd1ead15d090f85c057">afio_v2_xxx::directory_handle::directory</a></div><div class="ttdeci">static result&lt; directory_handle &gt; directory(const path_handle &amp;base, path_view_type _path, mode _mode=mode::read, creation _creation=creation::open_existing, caching _caching=caching::all, flag flags=flag::none) noexcept</div></div>
 <div class="ttc" id="namespaceafio__v2__xxx_1_1utils_html_a767b8434456319066194534a4c4edbf5"><div class="ttname"><a href="namespaceafio__v2__xxx_1_1utils.html#a767b8434456319066194534a4c4edbf5">afio_v2_xxx::utils::random_string</a></div><div class="ttdeci">std::string random_string(size_t randomlen)</div><div class="ttdoc">Returns a cryptographically random string capable of being used as a filename. Essentially random_fil...</div><div class="ttdef"><b>Definition:</b> utils.hpp:130</div></div>
-<div class="ttc" id="classafio__v2__xxx_1_1handle_html_ab3d876f5996605158fd6a0582adadad6"><div class="ttname"><a href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">afio_v2_xxx::handle::flags</a></div><div class="ttdeci">flag flags() const noexcept</div><div class="ttdoc">The flags this handle was opened with. </div><div class="ttdef"><b>Definition:</b> handle.hpp:325</div></div>
+<div class="ttc" id="classafio__v2__xxx_1_1handle_html_ab3d876f5996605158fd6a0582adadad6"><div class="ttname"><a href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">afio_v2_xxx::handle::flags</a></div><div class="ttdeci">flag flags() const noexcept</div><div class="ttdoc">The flags this handle was opened with. </div><div class="ttdef"><b>Definition:</b> handle.hpp:314</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -799,36 +845,6 @@ ino_t&#160;</td><td class="memItemRight" valign="bottom"><b>_inode</b></td></tr>
 
 </div>
 </div>
-<a id="ad90f8264470763069256ae9eeda45e69"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad90f8264470763069256ae9eeda45e69">&#9670;&nbsp;</a></span>set_kernel_caching()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual result&lt;void&gt; afio_v2_xxx::handle::set_kernel_caching </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9e">caching</a>&#160;</td>
-          <td class="paramname"><em>caching</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span><span class="mlabel">noexcept</span><span class="mlabel">inherited</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Changes the kernel cache strategy used by this handle. Note most OSs impose severe restrictions on what can be changed and will error out, it may be easier to simply create a new handle.</p>
-<dl class="section warning"><dt>Warning</dt><dd>On Windows this reopens the file, it is no slower than opening the file fresh but equally it is vastly slower than on POSIX.</dd></dl>
-<dl class="section user"><dt>Errors returnable</dt><dd>Whatever POSIX fcntl() or ReOpenFile() returns. </dd></dl>
-<dl class="section user"><dt>Memory Allocations</dt><dd>No memory allocation. </dd></dl>
-
-</div>
-</div>
 <a id="a87b6b5fd0537c0915f2f9a669bccfcfb"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a87b6b5fd0537c0915f2f9a669bccfcfb">&#9670;&nbsp;</a></span>temp_directory()</h2>
 
@@ -884,7 +900,7 @@ ino_t&#160;</td><td class="memItemRight" valign="bottom"><b>_inode</b></td></tr>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX open() or CreateFile() can return. </dd></dl>
 <div class="fragment"><div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;  {</div><div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;    <span class="keyword">auto</span> &amp;tempdirh = <a class="code" href="namespaceafio__v2__xxx_1_1path__discovery.html#af398b6c3762f60aa96cebd270879093e">path_discovery::storage_backed_temporary_files_directory</a>();</div><div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;    <span class="keywordflow">return</span> name.empty() ? <a class="code" href="classafio__v2__xxx_1_1directory__handle.html#a28fdac2d7adadbdddd036efd802ad726">random_directory</a>(tempdirh, _mode, _caching, <a class="code" href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">flags</a>) : <a class="code" href="classafio__v2__xxx_1_1directory__handle.html#ade355bac3d2aafd1ead15d090f85c057">directory</a>(tempdirh, name, _mode, _creation, _caching, <a class="code" href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">flags</a>);</div><div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;  }</div><div class="ttc" id="namespaceafio__v2__xxx_1_1path__discovery_html_af398b6c3762f60aa96cebd270879093e"><div class="ttname"><a href="namespaceafio__v2__xxx_1_1path__discovery.html#af398b6c3762f60aa96cebd270879093e">afio_v2_xxx::path_discovery::storage_backed_temporary_files_directory</a></div><div class="ttdeci">const path_handle &amp; storage_backed_temporary_files_directory() noexcept</div><div class="ttdoc">Returns a reference to an open handle to a verified temporary directory where files created are store...</div></div>
 <div class="ttc" id="classafio__v2__xxx_1_1directory__handle_html_ade355bac3d2aafd1ead15d090f85c057"><div class="ttname"><a href="classafio__v2__xxx_1_1directory__handle.html#ade355bac3d2aafd1ead15d090f85c057">afio_v2_xxx::directory_handle::directory</a></div><div class="ttdeci">static result&lt; directory_handle &gt; directory(const path_handle &amp;base, path_view_type _path, mode _mode=mode::read, creation _creation=creation::open_existing, caching _caching=caching::all, flag flags=flag::none) noexcept</div></div>
-<div class="ttc" id="classafio__v2__xxx_1_1handle_html_ab3d876f5996605158fd6a0582adadad6"><div class="ttname"><a href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">afio_v2_xxx::handle::flags</a></div><div class="ttdeci">flag flags() const noexcept</div><div class="ttdoc">The flags this handle was opened with. </div><div class="ttdef"><b>Definition:</b> handle.hpp:325</div></div>
+<div class="ttc" id="classafio__v2__xxx_1_1handle_html_ab3d876f5996605158fd6a0582adadad6"><div class="ttname"><a href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">afio_v2_xxx::handle::flags</a></div><div class="ttdeci">flag flags() const noexcept</div><div class="ttdoc">The flags this handle was opened with. </div><div class="ttdef"><b>Definition:</b> handle.hpp:314</div></div>
 <div class="ttc" id="classafio__v2__xxx_1_1directory__handle_html_a28fdac2d7adadbdddd036efd802ad726"><div class="ttname"><a href="classafio__v2__xxx_1_1directory__handle.html#a28fdac2d7adadbdddd036efd802ad726">afio_v2_xxx::directory_handle::random_directory</a></div><div class="ttdeci">static result&lt; directory_handle &gt; random_directory(const path_handle &amp;dirpath, mode _mode=mode::write, caching _caching=caching::temporary, flag flags=flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> directory_handle.hpp:166</div></div>
 </div><!-- fragment -->
 </div>
