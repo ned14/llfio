@@ -75,7 +75,7 @@ template <class U> inline void directory_handle_create_close_creation(U &&f)
       {                 success(), { directory_handle::mode::write, directory_handle::creation::if_needed        , directory_handle::flag::none, &entries, &info }, { "existing1"    }, { "existing1"    },{ success() } },
       {            is_a_directory, { directory_handle::mode::write, directory_handle::creation::truncate         , directory_handle::flag::none, &entries, &info }, { "non-existing" }, { "non-existing" },{ success() } },
       {            is_a_directory, { directory_handle::mode::write, directory_handle::creation::truncate         , directory_handle::flag::none, &entries, &info }, { "existing0"    }, { "existing0"    },{ success() } },
-      {            is_a_directory, { directory_handle::mode::write, directory_handle::creation::truncate         , directory_handle::flag::none, &entries, &info }, { "existing1"    }, { "existing1"    },{ success() } },
+      {            is_a_directory, { directory_handle::mode::write, directory_handle::creation::truncate         , directory_handle::flag::none, &entries, &info }, { "existing1"    }, { "existing1"    },{ success() } }
     },
     precondition::filesystem_setup(),                
     postcondition::filesystem_comparison_structure(),
