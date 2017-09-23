@@ -171,6 +171,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <tr class="memitem:acaa55fe3a61484c646c479f256158c02"><td class="memTemplParams" colspan="2">template&lt;class U &gt; </td></tr>
 <tr class="memitem:acaa55fe3a61484c646c479f256158c02"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1io__service.html#acaa55fe3a61484c646c479f256158c02">post</a> (U &amp;&amp;f)</td></tr>
 <tr class="separator:acaa55fe3a61484c646c479f256158c02"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa1db648c3e2c4506fa73406f6ffd8528"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1io__service.html#aa1db648c3e2c4506fa73406f6ffd8528">co_post_self_to_run</a> ()</td></tr>
+<tr class="separator:aa1db648c3e2c4506fa73406f6ffd8528"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
@@ -218,6 +220,32 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>async_file_handle</b
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
+<a id="aa1db648c3e2c4506fa73406f6ffd8528"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa1db648c3e2c4506fa73406f6ffd8528">&#9670;&nbsp;</a></span>co_post_self_to_run()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void afio_v2_xxx::io_service::co_post_self_to_run </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Suspend execution of this coroutine on this kernel thread, and resume execution on the kernel thread running this i/o service. This is a convenience wrapper for <code>post()</code>. </p>
+<div class="fragment"><div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;  {</div><div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;    <span class="comment">// Suspend on this kernel thread, resume on run() thread</span></div><div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;    co_await _post_to_self_awaitable{<span class="keyword">this</span>};</div><div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;  }</div></div><!-- fragment -->
+</div>
+</div>
 <a id="ae97a626545f0eac83e7d26394cbc0c7f"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ae97a626545f0eac83e7d26394cbc0c7f">&#9670;&nbsp;</a></span>interruption_signal()</h2>
 
@@ -270,8 +298,8 @@ template&lt;class U &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Schedule the callable to be invoked by the thread owning this object at its next available opportunity. Unlike any other function in this API layer, this function is thread safe. </p>
-<div class="fragment"><div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;{ _post(detail::make_function_ptr&lt;<span class="keywordtype">void</span>(<a class="code" href="classafio__v2__xxx_1_1io__service.html#a444d27f19c042b91f1751621135f65e9">io_service</a> *)&gt;(std::forward&lt;U&gt;(f))); }</div><div class="ttc" id="classafio__v2__xxx_1_1io__service_html_a444d27f19c042b91f1751621135f65e9"><div class="ttname"><a href="classafio__v2__xxx_1_1io__service.html#a444d27f19c042b91f1751621135f65e9">afio_v2_xxx::io_service::io_service</a></div><div class="ttdeci">io_service()</div></div>
+<p>Schedule the callable to be invoked by the thread owning this object and executing <code>run()</code> at its next available opportunity. Unlike any other function in this API layer, this function is thread safe. </p>
+<div class="fragment"><div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;{ _post(detail::make_function_ptr&lt;<span class="keywordtype">void</span>(<a class="code" href="classafio__v2__xxx_1_1io__service.html#a444d27f19c042b91f1751621135f65e9">io_service</a> *)&gt;(std::forward&lt;U&gt;(f))); }</div><div class="ttc" id="classafio__v2__xxx_1_1io__service_html_a444d27f19c042b91f1751621135f65e9"><div class="ttname"><a href="classafio__v2__xxx_1_1io__service.html#a444d27f19c042b91f1751621135f65e9">afio_v2_xxx::io_service::io_service</a></div><div class="ttdeci">io_service()</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -298,7 +326,7 @@ template&lt;class U &gt; </div>
 </table>
 </div><div class="memdoc">
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;{ <span class="keywordflow">return</span> <a class="code" href="classafio__v2__xxx_1_1io__service.html#a72e68348a3f92ee2a91599960132f404">run_until</a>(deadline()); }</div><div class="ttc" id="classafio__v2__xxx_1_1io__service_html_a72e68348a3f92ee2a91599960132f404"><div class="ttname"><a href="classafio__v2__xxx_1_1io__service.html#a72e68348a3f92ee2a91599960132f404">afio_v2_xxx::io_service::run_until</a></div><div class="ttdeci">virtual result&lt; bool &gt; run_until(deadline d) noexcept</div></div>
+<div class="fragment"><div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;{ <span class="keywordflow">return</span> <a class="code" href="classafio__v2__xxx_1_1io__service.html#a72e68348a3f92ee2a91599960132f404">run_until</a>(deadline()); }</div><div class="ttc" id="classafio__v2__xxx_1_1io__service_html_a72e68348a3f92ee2a91599960132f404"><div class="ttname"><a href="classafio__v2__xxx_1_1io__service.html#a72e68348a3f92ee2a91599960132f404">afio_v2_xxx::io_service::run_until</a></div><div class="ttdeci">virtual result&lt; bool &gt; run_until(deadline d) noexcept</div></div>
 </div><!-- fragment -->
 </div>
 </div>

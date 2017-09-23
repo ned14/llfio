@@ -3,7 +3,6 @@ var async__file__handle_8hpp =
     [ "async_file_handle", "classafio__v2__xxx_1_1async__file__handle.html", "classafio__v2__xxx_1_1async__file__handle" ],
     [ "awaitable", "classafio__v2__xxx_1_1async__file__handle_1_1awaitable.html", "classafio__v2__xxx_1_1async__file__handle_1_1awaitable" ],
     [ "construct< async_file_handle >", "structafio__v2__xxx_1_1construct_3_01async__file__handle_01_4.html", "structafio__v2__xxx_1_1construct_3_01async__file__handle_01_4" ],
-    [ "AFIO_ASYNC_FILE_HANDLE_H", "async__file__handle_8hpp.html#a1dc6d0f4535e760af697884e2e809595", null ],
     [ "async_file", "async__file__handle_8hpp.html#a5b0168993998aafc342233aa782040a6", null ],
     [ "async_random_file", "async__file__handle_8hpp.html#a40cd3a25b8d4a293a8864fe6eb585034", null ],
     [ "async_read", "async__file__handle_8hpp.html#a9b76b093cea445bbf0215e59e0533c1a", null ],

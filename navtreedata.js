@@ -38,8 +38,8 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "afio_8hpp.html",
-"classafio__v2__xxx_1_1async__file__handle.html#af056e7f0890da5d370afc08d6e5a56c8",
-"classafio__v2__xxx_1_1io__handle.html#a3fc7db93fac699f5ecad453642ed314e",
+"classafio__v2__xxx_1_1async__file__handle.html#af1072d7353a063f62ca01648c86fc22e",
+"classafio__v2__xxx_1_1io__handle.html#a4194a05dd9694d2c47d5a45f925db1d7",
 "classafio__v2__xxx_1_1mapped__file__handle.html#af42904dd49b5517a303e7cb256eae939",
 "functions.html",
 "structafio__v2__xxx_1_1construct_3_01async__file__handle_01_4.html#ad4547b4d236cd079473f0a3d0e37e7f1",

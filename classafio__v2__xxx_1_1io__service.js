@@ -15,6 +15,7 @@ var classafio__v2__xxx_1_1io__service =
     [ "_post_done", "classafio__v2__xxx_1_1io__service.html#a2eed345de929f681d7a5380d8ad167bb", null ],
     [ "_work_done", "classafio__v2__xxx_1_1io__service.html#a444cb7d21db240378bdea7bcb41fb8da", null ],
     [ "_work_enqueued", "classafio__v2__xxx_1_1io__service.html#a465d36981cbc25ae2529478a922eb03a", null ],
+    [ "co_post_self_to_run", "classafio__v2__xxx_1_1io__service.html#aa1db648c3e2c4506fa73406f6ffd8528", null ],
     [ "disable_kqueues", "classafio__v2__xxx_1_1io__service.html#a83ed27472ae75a1a31d73b383aa78564", null ],
     [ "operator=", "classafio__v2__xxx_1_1io__service.html#a1761cc16a1cc9362d4200df37a978d93", null ],
     [ "post", "classafio__v2__xxx_1_1io__service.html#acaa55fe3a61484c646c479f256158c02", null ],
