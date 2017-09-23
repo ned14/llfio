@@ -25,24 +25,6 @@ Distributed under the Boost Software License, Version 1.0.
 #include "file_handle.hpp"
 #include "io_service.hpp"
 
-#ifdef __cpp_coroutines
-// clang-format off
-#if __has_include(<coroutine>)
-#include <coroutine>
-AFIO_V2_NAMESPACE_EXPORT_BEGIN
-template<class T=void> using coroutine_handle = std::coroutine_handle<T>;
-AFIO_V2_NAMESPACE_END
-#elif __has_include(<experimental/coroutine>)
-#include <experimental/coroutine>
-AFIO_V2_NAMESPACE_EXPORT_BEGIN
-template<class T=void> using coroutine_handle = std::experimental::coroutine_handle<T>;
-AFIO_V2_NAMESPACE_END
-#else
-#error Cannot use C++ Coroutines without the <coroutine> header!
-#endif
-// clang-format on
-#endif
-
 //! \file async_file_handle.hpp Provides async_file_handle
 
 #ifndef AFIO_ASYNC_FILE_HANDLE_H
@@ -222,16 +204,16 @@ public:
 
   \errors Any of the values POSIX dup() or DuplicateHandle() can return.
   */
-  result<async_file_handle> clone(io_service &service, mode _mode = mode::unchanged, caching _caching = caching::unchanged, deadline d = std::chrono::seconds(30)) const noexcept
+  result<async_file_handle> clone(io_service &service, mode mode_ = mode::unchanged, caching caching_ = caching::unchanged, deadline d = std::chrono::seconds(30)) const noexcept
   {
-    OUTCOME_TRY(v, file_handle::clone(_mode, _caching, d));
+    OUTCOME_TRY(v, file_handle::clone(mode_, caching_, d));
     async_file_handle ret(std::move(v));
     ret._service = &service;
     return std::move(ret);
   }
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<file_handle> clone(mode _mode = mode::unchanged, caching _caching = caching::unchanged, deadline d = std::chrono::seconds(30)) const noexcept override
+  AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<file_handle> clone(mode mode_ = mode::unchanged, caching caching_ = caching::unchanged, deadline d = std::chrono::seconds(30)) const noexcept override
   {
-    OUTCOME_TRY(v, file_handle::clone(_mode, _caching, d));
+    OUTCOME_TRY(v, file_handle::clone(mode_, caching_, d));
     async_file_handle ret(std::move(v));
     ret._service = _service;
     return static_cast<file_handle &&>(ret);

@@ -31,6 +31,24 @@ Distributed under the Boost Software License, Version 1.0.
 #include <deque>
 #include <mutex>
 
+#ifdef __cpp_coroutines
+// clang-format off
+#if __has_include(<coroutine>)
+#include <coroutine>
+AFIO_V2_NAMESPACE_EXPORT_BEGIN
+template<class T = void> using coroutine_handle = std::coroutine_handle<T>;
+AFIO_V2_NAMESPACE_END
+#elif __has_include(<experimental/coroutine>)
+#include <experimental/coroutine>
+AFIO_V2_NAMESPACE_EXPORT_BEGIN
+template<class T = void> using coroutine_handle = std::experimental::coroutine_handle<T>;
+AFIO_V2_NAMESPACE_END
+#else
+#error Cannot use C++ Coroutines without the <coroutine> header!
+#endif
+// clang-format on
+#endif
+
 #undef _threadid  // windows macro splosh sigh
 
 //! \file io_service.hpp Provides io_service.
@@ -253,13 +271,38 @@ public:
   result<bool> run() noexcept { return run_until(deadline()); }
 
 private:
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC void post(detail::function_ptr<void(io_service *)> &&f);
+  AFIO_HEADERS_ONLY_VIRTUAL_SPEC void _post(detail::function_ptr<void(io_service *)> &&f);
 
 public:
-  /*! Schedule the callable to be invoked by the thread owning this object at its next
+  /*! Schedule the callable to be invoked by the thread owning this object and executing `run()` at its next
   available opportunity. Unlike any other function in this API layer, this function is thread safe.
   */
   template <class U> void post(U &&f) { _post(detail::make_function_ptr<void(io_service *)>(std::forward<U>(f))); }
+
+#if defined(__cpp_coroutines) || defined(DOXYGEN_IS_IN_THE_HOUSE)
+private:
+  struct _post_to_self_awaitable
+  {
+    io_service *service;
+
+    bool await_ready() { return false; }
+    void await_suspend(coroutine_handle<> co)
+    {
+      service->post([co = std::move(co)](io_service * /*unused*/) { co.resume(); });
+    }
+    void await_resume() {}
+  };
+
+public:
+  /*! Suspend execution of this coroutine on this kernel thread, and resume execution on
+  the kernel thread running this i/o service. This is a convenience wrapper for `post()`.
+  */
+  void co_post_self_to_run()
+  {
+    // Suspend on this kernel thread, resume on run() thread
+    co_await _post_to_self_awaitable{this};
+  }
+#endif
 };
 
 AFIO_V2_NAMESPACE_END

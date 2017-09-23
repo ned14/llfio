@@ -27,6 +27,11 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include "../directory_handle.hpp"
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4251)  // dll interface
+#endif
+
 //! \file cached_parent_handle_adapter.hpp Adapts any `fs_handle` to cache its parent directory handle
 AFIO_V2_NAMESPACE_BEGIN
 
@@ -201,6 +206,10 @@ AFIO_V2_NAMESPACE_END
 #define AFIO_INCLUDED_BY_HEADER 1
 #include "../detail/impl/cached_parent_handle_adapter.ipp"
 #undef AFIO_INCLUDED_BY_HEADER
+#endif
+
+#ifdef _MSC_VER
+#pragma warning(pop)
 #endif
 
 #endif

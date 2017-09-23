@@ -311,7 +311,7 @@ result<bool> io_service::run_until(deadline d) noexcept
   return _work_queued != 0;
 }
 
-void io_service::post(detail::function_ptr<void(io_service *)> &&f)
+void io_service::_post(detail::function_ptr<void(io_service *)> &&f)
 {
   {
     post_info pi(this, std::move(f));
