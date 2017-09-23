@@ -33,7 +33,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #undef _threadid  // windows macro splosh sigh
 
-//! \file io_service.hpp Provides io_service
+//! \file io_service.hpp Provides io_service.
 
 // Need to decide which kind of POSIX AIO to use
 #ifndef _WIN32
@@ -96,6 +96,32 @@ class async_file_handle;
 
 /*! \class io_service
 \brief An asynchronous i/o multiplexer service.
+
+This service is used in conjunction with `async_file_handle` to multiplex
+initating i/o and completing it onto a single kernel thread.
+Unlike the `io_service` in ASIO or the Networking TS, this `io_service`
+is much simpler, in particular it is single threaded per instance only
+i.e. you must run a separate `io_service` instance one per kernel thread
+if you wish to run i/o processing across multiple threads. AFIO does not
+do this for you (and for good reason, unlike socket i/o, it is generally
+unwise to distribute file i/o across kernel threads due to the much
+more code executable between user space and physical storage i.e. keeping
+processing per CPU core hot in cache delivers outsize benefits compared
+to socket i/o).
+
+Furthermore, you cannot use this i/o service in any way from any
+thread other than where it was created. You cannot call its `run()`
+from any thread other than where it was created. And you cannot
+initiate i/o on an `async_file_handle` from any thread other than where
+its owning i/o service was created.
+
+In other words, keep your i/o service and all associated file handles
+on their owning thread. The sole function you can call from another
+thread is `post()` which lets you execute some callback in the `run()`
+of the owning thread. This lets you schedule i/o from other threads
+if you really must do that.
+
+\snippet coroutines.cpp coroutines_example
 */
 class AFIO_DECL io_service
 {

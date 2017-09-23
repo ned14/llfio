@@ -51,7 +51,7 @@ AFIO_V2_NAMESPACE_END
 AFIO_V2_NAMESPACE_EXPORT_BEGIN
 
 /*! \class async_file_handle
-\brief An asynchronous handle to an open something
+\brief An asynchronous handle to an open something.
 
 \note Unlike the others, `async_file_handle` defaults to `only_metadata` caching as that is the
 only use case where using async i/o makes sense given the other options below.
@@ -63,7 +63,13 @@ only use case where using async i/o makes sense given the other options below.
 <tr><td>`mapped_file_handle`</td><td>Most</td><td>Least</td><td>None</td><td>Cannot be used with uncached i/o</td></tr>
 </table>
 
+\warning i/o initiated by this class MUST be on the same kernel thread as which
+created the owning `io_service` which MUST also be the same kernel thread as which
+runs the i/o service's `run()` function.
+
 \todo Direct use of `calloc()` ought to be replaced with a user supplied STL allocator instance.
+
+\snippet coroutines.cpp coroutines_example
 */
 class AFIO_DECL async_file_handle : public file_handle
 {

@@ -30,10 +30,18 @@ Distributed under the Boost Software License, Version 1.0.
 static inline void TestAsyncFileHandleCoroutines()
 {
 #ifdef __cpp_coroutines
+  //! [coroutines_example]
   namespace afio = AFIO_V2_NAMESPACE;
+
+  // Create an i/o service for this thread  
   afio::io_service service;
+  
+  // Create an async file i/o handle attached to the i/o service for this thread
   afio::async_file_handle h = afio::async_file_handle::async_file(service, {}, "temp", afio::file_handle::mode::write, afio::file_handle::creation::if_needed, afio::file_handle::caching::only_metadata, afio::file_handle::flag::unlink_on_close).value();
+
+  // Truncate to 1Mb
   h.truncate(1024 * 4096);
+
   // Launch 8 coroutines, each writing 4Kb of chars 0-8 to every 32Kb block
   auto coroutine = [&h](size_t no) -> std::future<void> {
     alignas(4096) char buffer[4096];
@@ -41,6 +49,8 @@ static inline void TestAsyncFileHandleCoroutines()
     afio::async_file_handle::const_buffer_type bt{buffer};
     for(size_t n = 0; n < 128; n++)
     {
+      // This will initiate the i/o, and suspend the coroutine until completion.
+      // The caller will thus resume execution with a valid unsignaled future.
       auto written = co_await h.co_write({bt, n * 32768 + no * 4096}).value();
       written.value();
     }
@@ -48,16 +58,19 @@ static inline void TestAsyncFileHandleCoroutines()
   std::vector<std::future<void>> coroutines;
   for(size_t n = 0; n < 8; n++)
   {
+    // Construct each coroutine, initiating the i/o, then suspending.
     coroutines.push_back(coroutine(n));
   }
-  // Pump the i/o, multiplexing the coroutines, until no more work remains
+  // Pump the i/o, multiplexing the coroutines, until no more work remains.
   while(service.run().value())
     ;
-  // Make sure nothing went wrong
+  // Make sure nothing went wrong by fetching the futures.
   for(auto &i : coroutines)
   {
     i.get();
   }
+  //! [coroutines_example]
+
   // Check that the file has the right contents
   alignas(4096) char buffer1[4096], buffer2[4096];
   afio::async_file_handle::extent_type offset = 0;
