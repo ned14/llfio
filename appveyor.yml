@@ -8,8 +8,7 @@ branches:
     - gh-pages
 skip_tags: true
  
-# Operating system (build VM template)
-os: Visual Studio 2017 Preview
+image: Visual Studio 2017
 init:
   - git config --global core.longpaths true
 
@@ -24,7 +23,7 @@ before_build:
   - git checkout master
   - git submodule update --init --recursive
 build_script:
-  - ctest -S .ci.cmake -V --timeout 300 --build-generator-toolset LLVM-vs2014
+  - ctest -S .ci.cmake -V --timeout 300
 after_build:
 
 before_test:
