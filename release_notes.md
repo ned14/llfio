@@ -79,7 +79,7 @@ co_await co_write(fh, {{{buffer, sizeof(buffer)}}, 0}).value();
 These compilers and OS are regularly tested:
 - GCC 7.0 (Linux 4,x x64)
 - clang 4.0 (Linux 4.x x64)
-- clang 5.0 (Windows 10 x64)
+- Visual Studio 2017 (Windows 10 x64)
 
 Other compilers, architectures and OSs may work, but are not tested regularly. You will need a Filesystem TS
 implementation in your STL and C++ 14. See https://github.com/ned14/afio/blob/master/programs/fs-probe/fs_probe_results.yaml

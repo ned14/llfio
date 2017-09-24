@@ -90,8 +90,8 @@ template <class U> inline void directory_handle_create_close_creation(U &&f)
         info = std::error_code();
         return std::make_tuple(std::ref(permuter), std::ref(testreturn), idx, std::ref(enumeration_should_be));
       },
-      [&](auto tuplestate) {
-        return;
+      [&](auto /*tuplestate*/) {
+#if 0
         auto &permuter = std::get<0>(tuplestate);
         auto &testreturn = std::get<1>(tuplestate);
         size_t idx = std::get<2>(tuplestate);
@@ -144,6 +144,7 @@ template <class U> inline void directory_handle_create_close_creation(U &&f)
             }
           }
         }
+#endif
       },
     "check enumeration")
   ));

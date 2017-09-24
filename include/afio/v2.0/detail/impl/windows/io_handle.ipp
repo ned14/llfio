@@ -158,7 +158,7 @@ result<io_handle::extent_guard> io_handle::lock(io_handle::extent_type offset, i
     // It seems the NT kernel is guilty of casting bugs sometimes
     ol.Internal = ol.Internal & 0xffffffff;
     if(ol.Internal != 0)
-      return {ol.Internal, ntkernel_category()};
+      return {(int) ol.Internal, ntkernel_category()};
   }
   return extent_guard(this, offset, bytes, exclusive);
 }

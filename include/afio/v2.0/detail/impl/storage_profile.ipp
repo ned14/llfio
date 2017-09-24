@@ -504,7 +504,14 @@ namespace storage_profile
         // offsets not at the front of the file
         if(sp.max_aligned_atomic_rewrite.value > sp.atomic_rewrite_quantum.value)
         {
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4456)  // declaration hides previous local declaration
+#endif
           size_t size = (size_t) sp.max_aligned_atomic_rewrite.value;
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
           for(off_t offset = sp.max_aligned_atomic_rewrite.value; offset < sp.max_aligned_atomic_rewrite.value * 4; offset += sp.max_aligned_atomic_rewrite.value)
           {
             // Create two concurrent writer threads and as many reader threads as additional CPU cores

@@ -39,8 +39,9 @@ template <class FileHandleType, class DirectoryHandleType> static inline void Te
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmissing-braces"
 #endif
-  FileHandleType h1 = afio::construct<FileHandleType>{afio::path_handle(), "tempfile", afio::file_handle::mode::write, afio::file_handle::creation::if_needed, afio::file_handle::caching::temporary, afio::file_handle::flag::none}().value();     // NOLINT
-  DirectoryHandleType h2 = afio::construct<DirectoryHandleType>{afio::path_handle(), "tempdir", afio::file_handle::mode::write, afio::file_handle::creation::if_needed, afio::file_handle::caching::all, afio::file_handle::flag::none}().value();  // NOLINT
+  afio::path_handle null_path_handle;
+  FileHandleType h1 = afio::construct<FileHandleType>{null_path_handle, "tempfile", afio::file_handle::mode::write, afio::file_handle::creation::if_needed, afio::file_handle::caching::temporary, afio::file_handle::flag::none}().value();     // NOLINT
+  DirectoryHandleType h2 = afio::construct<DirectoryHandleType>{null_path_handle, "tempdir", afio::file_handle::mode::write, afio::file_handle::creation::if_needed, afio::file_handle::caching::all, afio::file_handle::flag::none}().value();  // NOLINT
 #ifdef __clang__
 #pragma clang diagnostic pop
 #endif

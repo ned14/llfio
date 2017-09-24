@@ -251,7 +251,7 @@ struct child_workers
 #else
       std::chrono::steady_clock::time_point deadline;
 #endif
-      int ret = child.wait_until(deadline).value();
+      intptr_t ret = child.wait_until(deadline).value();
       if(ret != 0)
       {
         results[n].retcode = ret;

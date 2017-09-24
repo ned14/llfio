@@ -417,12 +417,19 @@ template <class T, class R> inline void hook_result_construction(OUTCOME_V2_NAME
       {
         auto currentpath = currentpath_.value().u8string();
         uint16_t tlsidx = 0;
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4996)  // the function may be unsafe
+#endif
         strncpy(tls.next(tlsidx), QUICKCPPLIB_NAMESPACE::ringbuffer_log::last190(currentpath), 190);
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
         OUTCOME_V2_NAMESPACE::hooks::set_spare_storage(res, tlsidx);
       }
       tls.reentered = false;
     }
-    log().emplace_back(log_level::error, res->assume_error().message().c_str(), nativeh._init, QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id());
+    log().emplace_back(log_level::error, res->assume_error().message().c_str(), (uint32_t) nativeh._init, QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id());
   }
 }
 template <class T, class R> inline void hook_result_in_place_construction(OUTCOME_V2_NAMESPACE::in_place_type_t<T> _, result<R> *res) noexcept
