@@ -66,7 +66,9 @@ static inline void TestAsyncFileHandle()
   // Make sure nothing went wrong by fetching the futures.
   for(auto &i : futures)
   {
-    BOOST_CHECK(i.first.get().data()->len == 4096);
+    afio::async_file_handle::const_buffers_type out = i.first.get();
+    //std::cout << out.data()->len << std::endl;
+    BOOST_CHECK(out.data()->len == 4096);
   }
 }
 

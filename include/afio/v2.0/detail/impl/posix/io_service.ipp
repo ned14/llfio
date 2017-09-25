@@ -276,15 +276,31 @@ result<bool> io_service::run_until(deadline d) noexcept
       // Poll the outstanding aiocbs to see which are ready
       for(auto &aiocb : _aiocbsv)
       {
-        int ioret = aio_return(aiocb);
-        if(ioret >= 0 || errno != EINVAL)
+        int ioerr = aio_error(aiocb);
+        if(EINPROGRESS == ioerr)
         {
-          int errcode = ioret < 0 ? errno : 0;
-          //          std::cout << "aiocb " << aiocb << " sees return " << ioret << " errno " << errcode << std::endl;
+          continue;
+        }
+        if(0 == ioerr)
+        {
+          // Scavenge the aio
+          int ioret = aio_return(aiocb);
+          if(ioret < 0)
+            return {errno, std::system_category()};
+          // std::cout << "aiocb " << aiocb << " sees succesful return " << ioret << std::endl;
           // The aiocb aio_sigevent.sigev_value.sival_ptr field will point to a file_handle::_io_state_type
           auto io_state = (async_file_handle::_erased_io_state_type *) aiocb->aio_sigevent.sigev_value.sival_ptr;
           assert(io_state);
-          io_state->_system_io_completion(errcode, ioret, &aiocb);
+          io_state->_system_io_completion(0, ioret, &aiocb);
+        }
+        else
+        {
+          // Either cancelled or errored out
+          // std::cout << "aiocb " << aiocb << " sees failed return " << ioerr << std::endl;
+          // The aiocb aio_sigevent.sigev_value.sival_ptr field will point to a file_handle::_io_state_type
+          auto io_state = (async_file_handle::_erased_io_state_type *) aiocb->aio_sigevent.sigev_value.sival_ptr;
+          assert(io_state);
+          io_state->_system_io_completion(ioerr, 0, &aiocb);
         }
       }
       // Eliminate any empty holes in the quick aiocbs vector
