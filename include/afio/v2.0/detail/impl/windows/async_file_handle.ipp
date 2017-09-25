@@ -33,25 +33,27 @@ async_file_handle::io_result<async_file_handle::const_buffers_type> async_file_h
   return file_handle::barrier(std::move(reqs), wait_for_device, and_metadata, std::move(d));
 }
 
-template <class CompletionRoutine, class BuffersType, class IORoutine>
-result<async_file_handle::io_state_ptr<CompletionRoutine, BuffersType>> async_file_handle::_begin_io(async_file_handle::operation_t operation, async_file_handle::io_request<BuffersType> reqs, CompletionRoutine &&completion, IORoutine &&ioroutine) noexcept
+template <class BuffersType, class IORoutine> result<async_file_handle::io_state_ptr> async_file_handle::_begin_io(span<char> mem, async_file_handle::operation_t operation, async_file_handle::io_request<BuffersType> reqs, async_file_handle::_erased_completion_handler &&completion, IORoutine &&ioroutine) noexcept
 {
   // Need to keep a set of OVERLAPPED matching the scatter-gather buffers
-  struct state_type : public _io_state_type<CompletionRoutine, BuffersType>
+  struct state_type : public _erased_io_state_type
   {
     OVERLAPPED ols[1];
-    state_type(async_file_handle *_parent, operation_t _operation, CompletionRoutine &&f, size_t _items)
-        : _io_state_type<CompletionRoutine, BuffersType>(_parent, _operation, std::forward<CompletionRoutine>(f), _items)
+    _erased_completion_handler *completion;
+    state_type(async_file_handle *_parent, operation_t _operation, bool must_deallocate_self, size_t _items)
+        : _erased_io_state_type(_parent, _operation, must_deallocate_self, _items)
+        , completion(nullptr)
     {
     }
-    AFIO_HEADERS_ONLY_VIRTUAL_SPEC void operator()(long errcode, long bytes_transferred, void *internal_state) noexcept override final
+    AFIO_HEADERS_ONLY_VIRTUAL_SPEC void _system_io_completion(long errcode, long bytes_transferred, void *internal_state) noexcept override final
     {
       LPOVERLAPPED ol = (LPOVERLAPPED) internal_state;
       ol->hEvent = nullptr;
-      if(this->result)
+      auto &result = this->result.write;
+      if(result)
       {
         if(errcode)
-          this->result = error_code{errcode, std::system_category()};
+          result = error_code{errcode, std::system_category()};
         else
         {
           // Figure out which i/o I am and update the buffer in question
@@ -61,13 +63,13 @@ result<async_file_handle::io_state_ptr<CompletionRoutine, BuffersType>> async_fi
             AFIO_LOG_FATAL(0, "async_file_handle::io_state::operator() called with invalid index");
             std::terminate();
           }
-          this->result.value()[idx].len = bytes_transferred;
+          result.value()[idx].len = bytes_transferred;
         }
       }
       this->parent->service()->_work_done();
       // Are we done?
       if(!--this->items_to_go)
-        this->completion(this);
+        (*completion)(this);
     }
     AFIO_HEADERS_ONLY_VIRTUAL_SPEC ~state_type() override final
     {
@@ -99,20 +101,33 @@ result<async_file_handle::io_state_ptr<CompletionRoutine, BuffersType>> async_fi
 #endif
         }
       }
+      completion->~_erased_completion_handler();
     }
   } * state;
   extent_type offset = reqs.offset;
-  size_t statelen = sizeof(state_type) + (reqs.buffers.size() - 1) * sizeof(OVERLAPPED), items(reqs.buffers.size());
-  using return_type = io_state_ptr<CompletionRoutine, BuffersType>;
+  size_t statelen = sizeof(state_type) + (reqs.buffers.size() - 1) * sizeof(OVERLAPPED) + completion.bytes();
+  if(!mem.empty() && statelen > mem.size())
+  {
+    return std::errc::not_enough_memory;
+  }
+  size_t items(reqs.buffers.size());
   // On Windows i/o must be scheduled on the same thread pumping completion
   if(GetCurrentThreadId() != service()->_threadid)
     return std::errc::operation_not_supported;
 
-  void *mem = ::calloc(1, statelen);
-  if(!mem)
-    return std::errc::not_enough_memory;
-  return_type _state((_io_state_type<CompletionRoutine, BuffersType> *) mem);
-  new((state = (state_type *) mem)) state_type(this, operation, std::forward<CompletionRoutine>(completion), items);
+  bool must_deallocate_self = false;
+  if(mem.empty())
+  {
+    void *_mem = ::calloc(1, statelen);
+    if(!_mem)
+      return std::errc::not_enough_memory;
+    mem = {(char *) _mem, statelen};
+    must_deallocate_self = true;
+  }
+  io_state_ptr _state((state_type *) mem.data());
+  new((state = (state_type *) mem.data())) state_type(this, operation, must_deallocate_self, items);
+  state->completion = (_erased_completion_handler *) ((uintptr_t) state + sizeof(state_type) + (reqs.buffers.size() - 1) * sizeof(OVERLAPPED));
+  completion.move(state->completion);
 
   // To be called once each buffer is read
   struct handle_completion
@@ -120,11 +135,11 @@ result<async_file_handle::io_state_ptr<CompletionRoutine, BuffersType>> async_fi
     static VOID CALLBACK Do(DWORD errcode, DWORD bytes_transferred, LPOVERLAPPED ol)
     {
       state_type *state = (state_type *) ol->hEvent;
-      (*state)(errcode, bytes_transferred, ol);
+      state->_system_io_completion(errcode, bytes_transferred, ol);
     }
   };
   // Noexcept move the buffers from req into result
-  BuffersType &out = state->result.value();
+  auto &out = state->result.write.value();
   out = std::move(reqs.buffers);
   for(size_t n = 0; n < items; n++)
   {
@@ -154,13 +169,13 @@ result<async_file_handle::io_state_ptr<CompletionRoutine, BuffersType>> async_fi
       assert((out[n].len & 511) == 0);
     }
 #endif
-    if(!ioroutine(_v.h, out[n].data, (DWORD) out[n].len, ol, handle_completion::Do))
+    if(!ioroutine(_v.h, (char *) out[n].data, (DWORD) out[n].len, ol, handle_completion::Do))
     {
       --state->items_to_go;
-      state->result = {GetLastError(), std::system_category()};
+      state->result.write = {GetLastError(), std::system_category()};
       // Fire completion now if we didn't schedule anything
       if(!n)
-        state->completion(state);
+        (*state->completion)(state);
       return _state;
     }
     service()->_work_enqueued();
@@ -168,24 +183,27 @@ result<async_file_handle::io_state_ptr<CompletionRoutine, BuffersType>> async_fi
   return _state;
 }
 
-template <class CompletionRoutine> result<async_file_handle::io_state_ptr<CompletionRoutine, async_file_handle::buffers_type>> async_file_handle::async_read(async_file_handle::io_request<async_file_handle::buffers_type> reqs, CompletionRoutine &&completion) noexcept
+result<async_file_handle::io_state_ptr> async_file_handle::_begin_io(span<char> mem, async_file_handle::operation_t operation, io_request<const_buffers_type> reqs, async_file_handle::_erased_completion_handler &&completion) noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(this);
-  return _begin_io(operation_t::read, std::move(reqs), [completion = std::forward<CompletionRoutine>(completion)](auto *state) { completion(state->parent, state->result); }, ReadFileEx);
-}
-
-template <class CompletionRoutine> result<async_file_handle::io_state_ptr<CompletionRoutine, async_file_handle::const_buffers_type>> async_file_handle::async_write(async_file_handle::io_request<async_file_handle::const_buffers_type> reqs, CompletionRoutine &&completion) noexcept
-{
-  AFIO_LOG_FUNCTION_CALL(this);
-  return _begin_io(operation_t::write, std::move(reqs), [completion = std::forward<CompletionRoutine>(completion)](auto *state) { completion(state->parent, state->result); }, WriteFileEx);
+  switch(operation)
+  {
+  case operation_t::read:
+    return _begin_io(mem, operation, reqs, std::move(completion), ReadFileEx);
+  case operation_t::write:
+    return _begin_io(mem, operation, reqs, std::move(completion), WriteFileEx);
+  case operation_t::fsync:
+  case operation_t::dsync:
+    // TODO FIXME Implement these for Windows
+    return std::errc::operation_not_supported;
+  }
+  return std::errc::operation_not_supported;
 }
 
 async_file_handle::io_result<async_file_handle::buffers_type> async_file_handle::read(async_file_handle::io_request<async_file_handle::buffers_type> reqs, deadline d) noexcept
 {
   AFIO_LOG_FUNCTION_CALL(this);
   optional<io_result<buffers_type>> ret;
-  auto _io_state(_begin_io(operation_t::read, std::move(reqs), [&ret](auto *state) { ret = std::move(state->result); }, ReadFileEx));
-  OUTCOME_TRY(io_state, _io_state);
+  OUTCOME_TRY(io_state, async_read(reqs, [&ret](async_file_handle *, io_result<buffers_type> &result) { ret = std::move(result); }));
   (void) io_state;  // holds i/o open until it completes
 
   // While i/o is not done pump i/o completion
@@ -210,8 +228,7 @@ async_file_handle::io_result<async_file_handle::const_buffers_type> async_file_h
 {
   AFIO_LOG_FUNCTION_CALL(this);
   optional<io_result<const_buffers_type>> ret;
-  auto _io_state(_begin_io(operation_t::write, std::move(reqs), [&ret](auto *state) { ret = std::move(state->result); }, WriteFileEx));
-  OUTCOME_TRY(io_state, _io_state);
+  OUTCOME_TRY(io_state, async_write(reqs, [&ret](async_file_handle *, io_result<const_buffers_type> &result) { ret = std::move(result); }));
   (void) io_state;  // holds i/o open until it completes
 
   // While i/o is not done pump i/o completion

@@ -49,8 +49,6 @@ only use case where using async i/o makes sense given the other options below.
 created the owning `io_service` which MUST also be the same kernel thread as which
 runs the i/o service's `run()` function.
 
-\todo Direct use of `calloc()` ought to be replaced with a user supplied STL allocator instance.
-
 \snippet coroutines.cpp coroutines_example
 */
 class AFIO_DECL async_file_handle : public file_handle
@@ -233,32 +231,31 @@ protected:
     dsync
   };
   // Holds state for an i/o in progress. Will be subclassed with platform specific state and how to implement completion.
-  // Note this is allocated using malloc not new to avoid memory zeroing, and therefore it has a custom deleter.
   struct _erased_io_state_type
   {
+    friend class io_service;
     async_file_handle *parent;
     operation_t operation;
+    bool must_deallocate_self;
     size_t items;
     shared_size_type items_to_go;
-    constexpr _erased_io_state_type(async_file_handle *_parent, operation_t _operation, size_t _items)
+    union result_storage {
+      io_result<buffers_type> read;
+      io_result<const_buffers_type> write;
+      constexpr result_storage()
+          : read(buffers_type())
+      {
+      }
+    } result;
+    constexpr _erased_io_state_type(async_file_handle *_parent, operation_t _operation, bool _must_deallocate_self, size_t _items)
         : parent(_parent)
         , operation(_operation)
+        , must_deallocate_self(_must_deallocate_self)
         , items(_items)
         , items_to_go(0)
+        , result()
     {
     }
-    /*
-    For Windows:
-      - errcode: GetLastError() code
-      - bytes_transferred: obvious
-      - internal_state: LPOVERLAPPED for this op
-
-    For POSIX AIO:
-      - errcode: errno code
-      - bytes_transferred: return from aio_return(), usually bytes transferred
-      - internal_state: address of pointer to struct aiocb in io_service's _aiocbsv
-    */
-    virtual void operator()(long errcode, long bytes_transferred, void *internal_state) noexcept = 0;
     AFIO_HEADERS_ONLY_VIRTUAL_SPEC ~_erased_io_state_type()
     {
       // i/o still pending is very bad, this should never happen
@@ -269,26 +266,32 @@ protected:
         abort();
       }
     }
-  };
-  // State for an i/o in progress, but with the per operation typing
-  template <class CompletionRoutine, class BuffersType> struct _io_state_type : public _erased_io_state_type
-  {
-    io_result<BuffersType> result;
-    CompletionRoutine completion;
-    constexpr _io_state_type(async_file_handle *_parent, operation_t _operation, CompletionRoutine &&f, size_t _items)
-        : _erased_io_state_type(_parent, _operation, _items)
-        , result(BuffersType())
-        , completion(std::forward<CompletionRoutine>(f))
-    {
-    }
+
+    /* Called when an i/o is completed by the system, figures out whether to call invoke_completion.
+
+    For Windows:
+      - errcode: GetLastError() code
+      - bytes_transferred: obvious
+      - internal_state: LPOVERLAPPED for this op
+
+    For POSIX AIO:
+      - errcode: errno code
+      - bytes_transferred: return from aio_return(), usually bytes transferred
+      - internal_state: address of pointer to struct aiocb in io_service's _aiocbsv
+    */
+    virtual void _system_io_completion(long errcode, long bytes_transferred, void *internal_state) noexcept = 0;
   };
   struct _io_state_deleter
   {
     template <class U> void operator()(U *_ptr) const
     {
+      bool must_deallocate_self = _ptr->must_deallocate_self;
       _ptr->~U();
-      char *ptr = (char *) _ptr;
-      ::free(ptr);
+      if(must_deallocate_self)
+      {
+        char *ptr = (char *) _ptr;
+        ::free(ptr);
+      }
     }
   };
 
@@ -296,51 +299,97 @@ public:
   /*! Smart pointer to state of an i/o in progress. Destroying this before an i/o has completed
   is <b>blocking</b> because the i/o must be cancelled before the destructor can safely exit.
   */
-  using erased_io_state_ptr = std::unique_ptr<_erased_io_state_type, _io_state_deleter>;
-  /*! Smart pointer to state of an i/o in progress. Destroying this before an i/o has completed
-  is <b>blocking</b> because the i/o must be cancelled before the destructor can safely exit.
-  */
-  template <class CompletionRoutine, class BuffersType> using io_state_ptr = std::unique_ptr<_io_state_type<CompletionRoutine, BuffersType>, _io_state_deleter>;
-  //! Erases the type of an io_state_ptr so it can be stored non-templated.
-  template <class CompletionRoutine, class BuffersType> static erased_io_state_ptr erase(io_state_ptr<CompletionRoutine, BuffersType> &&p) noexcept
-  {
-    _erased_io_state_type *_p = p.release();
-    return erased_io_state_ptr(_p);
-  }
+  using io_state_ptr = std::unique_ptr<_erased_io_state_type, _io_state_deleter>;
 
 #if DOXYGEN_SHOULD_SKIP_THIS
 private:
 #else
 protected:
 #endif
-  template <class CompletionRoutine, class BuffersType, class IORoutine> result<io_state_ptr<CompletionRoutine, BuffersType>> _begin_io(operation_t operation, io_request<BuffersType> reqs, CompletionRoutine &&completion, IORoutine &&ioroutine) noexcept;
+  // Used to indirect copy and call of unknown completion handler
+  struct _erased_completion_handler
+  {
+    virtual ~_erased_completion_handler() {}
+    // Returns my size including completion handler
+    virtual size_t bytes() const noexcept = 0;
+    // Moves me and handler to some new location
+    virtual void move(_erased_completion_handler *dest) = 0;
+    // Invokes my completion handler
+    virtual void operator()(_erased_io_state_type *state) = 0;
+  };
+  template <class BuffersType, class IORoutine> result<io_state_ptr> AFIO_HEADERS_ONLY_MEMFUNC_SPEC _begin_io(span<char> mem, operation_t operation, io_request<BuffersType> reqs, _erased_completion_handler &&completion, IORoutine &&ioroutine) noexcept;
+  AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<io_state_ptr> _begin_io(span<char> mem, operation_t operation, io_request<const_buffers_type> reqs, _erased_completion_handler &&completion) noexcept;
 
 public:
   /*! \brief Schedule a read to occur asynchronously.
 
   \return Either an io_state_ptr to the i/o in progress, or an error code.
   \param reqs A scatter-gather and offset request.
-  \param completion A callable to call upon i/o completion. Spec is void(async_file_handle *, io_result<buffers_type> &).
-  Note that buffers returned may not be buffers input, see documentation for read().
-  \errors As for read(), plus ENOMEM.
-  \mallocs One calloc, one free. The allocation is unavoidable due to the need to store a type
-  erased completion handler of unknown type.
+  \param completion A callable to call upon i/o completion. Spec is `void(async_file_handle *, io_result<buffers_type> &)`.
+  Note that buffers returned may not be buffers input, see documentation for `read()`.
+  \param mem Optional span of memory to use to avoid using `calloc()`. Note span MUST be all bits zero on entry.
+  \errors As for `read()`, plus `ENOMEM`.
+  \mallocs If mem is not set, one calloc, one free. The allocation is unavoidable due to the need to store a type
+  erased completion handler of unknown type and state per buffers input.
   */
   AFIO_MAKE_FREE_FUNCTION
-  template <class CompletionRoutine> result<io_state_ptr<CompletionRoutine, buffers_type>> async_read(io_request<buffers_type> reqs, CompletionRoutine &&completion) noexcept;
+  template <class CompletionRoutine>                                                                                                  //
+  AFIO_REQUIRES({ std::declval<CompletionRoutine>()(&std::declval<async_file_handle>(), std::declval<io_result<buffers_type>>()); })  //
+  result<io_state_ptr> async_read(io_request<buffers_type> reqs, CompletionRoutine &&completion, span<char> mem = {}) noexcept
+  {
+    AFIO_LOG_FUNCTION_CALL(this);
+    struct completion_handler : _erased_completion_handler
+    {
+      CompletionRoutine completion;
+      completion_handler(CompletionRoutine c)
+          : completion(std::move(c))
+      {
+      }
+      virtual size_t bytes() const noexcept override final { return sizeof(*this); }
+      virtual void move(_erased_completion_handler *_dest) override final
+      {
+        completion_handler *dest = (completion_handler *) _dest;
+        new(dest) completion_handler(std::move(*this));
+      }
+      virtual void operator()(_erased_io_state_type *state) override final { completion(state->parent, state->result.read); }
+    } ch{std::forward<CompletionRoutine>(completion)};
+    return _begin_io(mem, operation_t::read, reinterpret_cast<io_request<const_buffers_type> &>(reqs), std::move(ch));
+  }
 
   /*! \brief Schedule a write to occur asynchronously.
 
   \return Either an io_state_ptr to the i/o in progress, or an error code.
   \param reqs A scatter-gather and offset request.
-  \param completion A callable to call upon i/o completion. Spec is void(async_file_handle *, io_result<const_buffers_type> &).
-  Note that buffers returned may not be buffers input, see documentation for write().
-  \errors As for write(), plus ENOMEM.
-  \mallocs One calloc, one free. The allocation is unavoidable due to the need to store a type
-  erased completion handler of unknown type.
+  \param completion A callable to call upon i/o completion. Spec is `void(async_file_handle *, io_result<const_buffers_type> &)`.
+  Note that buffers returned may not be buffers input, see documentation for `write()`.
+  \param mem Optional span of memory to use to avoid using `calloc()`. Note span MUST be all bits zero on entry.
+  \errors As for `write()`, plus `ENOMEM`.
+  \mallocs If mem in not set, one calloc, one free. The allocation is unavoidable due to the need to store a type
+  erased completion handler of unknown type and state per buffers input.
   */
   AFIO_MAKE_FREE_FUNCTION
-  template <class CompletionRoutine> result<io_state_ptr<CompletionRoutine, const_buffers_type>> async_write(io_request<const_buffers_type> reqs, CompletionRoutine &&completion) noexcept;
+  template <class CompletionRoutine>                                                                                                        //
+  AFIO_REQUIRES({ std::declval<CompletionRoutine>()(&std::declval<async_file_handle>(), std::declval<io_result<const_buffers_type>>()); })  //
+  result<io_state_ptr> async_write(io_request<const_buffers_type> reqs, CompletionRoutine &&completion, span<char> mem = {}) noexcept
+  {
+    AFIO_LOG_FUNCTION_CALL(this);
+    struct completion_handler : _erased_completion_handler
+    {
+      CompletionRoutine completion;
+      completion_handler(CompletionRoutine c)
+          : completion(std::move(c))
+      {
+      }
+      virtual size_t bytes() const noexcept override final { return sizeof(*this); }
+      virtual void move(_erased_completion_handler *_dest) override final
+      {
+        completion_handler *dest = (completion_handler *) _dest;
+        new(dest) completion_handler(std::move(*this));
+      }
+      virtual void operator()(_erased_io_state_type *state) override final { completion(state->parent, state->result.write); }
+    } ch{std::forward<CompletionRoutine>(completion)};
+    return _begin_io(mem, operation_t::write, reqs, std::move(ch));
+  }
 
   using file_handle::read;
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<buffers_type> read(io_request<buffers_type> reqs, deadline d = deadline()) noexcept override;
@@ -512,36 +561,6 @@ inline async_file_handle::io_result<async_file_handle::const_buffers_type> barri
                                                                                    deadline d = deadline()) noexcept
 {
   return self.barrier(std::forward<decltype(reqs)>(reqs), std::forward<decltype(wait_for_device)>(wait_for_device), std::forward<decltype(and_metadata)>(and_metadata), std::forward<decltype(d)>(d));
-}
-/*! \brief Schedule a read to occur asynchronously.
-
-\return Either an io_state_ptr to the i/o in progress, or an error code.
-\param self The object whose member function to call.
-\param reqs A scatter-gather and offset request.
-\param completion A callable to call upon i/o completion. Spec is void(async_file_handle *, io_result<buffers_type> &).
-Note that buffers returned may not be buffers input, see documentation for read().
-\errors As for read(), plus ENOMEM.
-\mallocs One calloc, one free. The allocation is unavoidable due to the need to store a type
-erased completion handler of unknown type.
-*/
-template <class CompletionRoutine> inline result<async_file_handle::io_state_ptr<CompletionRoutine, async_file_handle::buffers_type>> async_read(async_file_handle &self, async_file_handle::io_request<async_file_handle::buffers_type> reqs, CompletionRoutine &&completion) noexcept
-{
-  return self.async_read(std::forward<decltype(reqs)>(reqs), std::forward<decltype(completion)>(completion));
-}
-/*! \brief Schedule a write to occur asynchronously.
-
-\return Either an io_state_ptr to the i/o in progress, or an error code.
-\param self The object whose member function to call.
-\param reqs A scatter-gather and offset request.
-\param completion A callable to call upon i/o completion. Spec is void(async_file_handle *, io_result<const_buffers_type> &).
-Note that buffers returned may not be buffers input, see documentation for write().
-\errors As for write(), plus ENOMEM.
-\mallocs One calloc, one free. The allocation is unavoidable due to the need to store a type
-erased completion handler of unknown type.
-*/
-template <class CompletionRoutine> inline result<async_file_handle::io_state_ptr<CompletionRoutine, async_file_handle::const_buffers_type>> async_write(async_file_handle &self, async_file_handle::io_request<async_file_handle::const_buffers_type> reqs, CompletionRoutine &&completion) noexcept
-{
-  return self.async_write(std::forward<decltype(reqs)>(reqs), std::forward<decltype(completion)>(completion));
 }
 #if defined(__cpp_coroutines) || defined(DOXYGEN_IS_IN_THE_HOUSE)
 /*! \brief Schedule a read to occur asynchronously.

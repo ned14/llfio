@@ -33,9 +33,9 @@ static inline void TestAsyncFileHandleCoroutines()
   //! [coroutines_example]
   namespace afio = AFIO_V2_NAMESPACE;
 
-  // Create an i/o service for this thread  
+  // Create an i/o service for this thread
   afio::io_service service;
-  
+
   // Create an async file i/o handle attached to the i/o service for this thread
   afio::async_file_handle h = afio::async_file_handle::async_file(service, {}, "temp", afio::file_handle::mode::write, afio::file_handle::creation::if_needed, afio::file_handle::caching::only_metadata, afio::file_handle::flag::unlink_on_close).value();
 
@@ -87,4 +87,25 @@ static inline void TestAsyncFileHandleCoroutines()
 #endif
 }
 
+static inline void TestPostSelfToRunCoroutines()
+{
+#ifdef __cpp_coroutines
+  namespace afio = AFIO_V2_NAMESPACE;
+  afio::io_service service;
+  auto runthreadid = QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id();
+  auto coroutine = [&]() -> std::future<void> {
+    auto thisthreadid = QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id();
+    BOOST_CHECK(thisthreadid != runthreadid);
+    co_await afio::io_service::awaitable_post_to_self(service);
+    thisthreadid = QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id();
+    BOOST_CHECK(thisthreadid == runthreadid);
+  };
+  auto asynch = std::async(std::launch::async, coroutine);
+  while(!service.run())
+    ;
+  asynch.get().get();
+#endif
+}
+
 KERNELTEST_TEST_KERNEL(integration, afio, coroutines, async_file_handle, "Tests that afio::async_file_handle works as expected with Coroutines", TestAsyncFileHandleCoroutines())
+KERNELTEST_TEST_KERNEL(integration, afio, coroutines, co_post_self_to_run, "Tests that afio::io_service::co_post_self_to_run() works as expected with Coroutines", TestPostSelfToRunCoroutines())

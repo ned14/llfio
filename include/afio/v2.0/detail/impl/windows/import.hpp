@@ -967,11 +967,13 @@ inline bool ntsleep(const deadline &d, bool return_on_alert = false) noexcept
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
   AFIO_WIN_DEADLINE_TO_SLEEP_INIT(d);
+  alignas(8) LARGE_INTEGER infinity;
+  infinity.QuadPart = INT64_MIN;
   for(;;)
   {
     AFIO_WIN_DEADLINE_TO_SLEEP_LOOP(d);
     // Pump alerts and APCs
-    NTSTATUS ntstat = NtDelayExecution(true, timeout);
+    NTSTATUS ntstat = NtDelayExecution(true, timeout ? timeout : &infinity);
     (void) ntstat;
     if((d).steady)
     {

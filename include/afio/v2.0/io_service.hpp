@@ -280,10 +280,19 @@ public:
   template <class U> void post(U &&f) { _post(detail::make_function_ptr<void(io_service *)>(std::forward<U>(f))); }
 
 #if defined(__cpp_coroutines) || defined(DOXYGEN_IS_IN_THE_HOUSE)
-private:
-  struct _post_to_self_awaitable
+  /*! An awaitable suspending execution of this coroutine on the current kernel thread,
+  and resuming execution on the kernel thread running this i/o service. This is a
+  convenience wrapper for `post()`.
+  */
+  struct awaitable_post_to_self
   {
     io_service *service;
+
+    //! Constructor, takes the i/o service whose kernel thread we are to reschedule onto
+    awaitable_post_to_self(io_service &_service)
+        : service(&_service)
+    {
+    }
 
     bool await_ready() { return false; }
     void await_suspend(coroutine_handle<> co)
@@ -292,16 +301,6 @@ private:
     }
     void await_resume() {}
   };
-
-public:
-  /*! Suspend execution of this coroutine on this kernel thread, and resume execution on
-  the kernel thread running this i/o service. This is a convenience wrapper for `post()`.
-  */
-  void co_post_self_to_run()
-  {
-    // Suspend on this kernel thread, resume on run() thread
-    co_await _post_to_self_awaitable{this};
-  }
 #endif
 };
 
