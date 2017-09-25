@@ -371,7 +371,7 @@ public:
       virtual size_t bytes() const noexcept override final { return sizeof(*this); }
       virtual void move(_erased_completion_handler *_dest) override final
       {
-        completion_handler *dest = (completion_handler *) _dest;
+        void *dest = (void *) _dest;
         new(dest) completion_handler(std::move(*this));
       }
       virtual void operator()(_erased_io_state_type *state) override final { completion(state->parent, state->result.write); }
@@ -414,7 +414,7 @@ public:
       virtual size_t bytes() const noexcept override final { return sizeof(*this); }
       virtual void move(_erased_completion_handler *_dest) override final
       {
-        completion_handler *dest = (completion_handler *) _dest;
+        void *dest = (void *) _dest;
         new(dest) completion_handler(std::move(*this));
       }
       virtual void operator()(_erased_io_state_type *state) override final { completion(state->parent, state->result.read); }
@@ -450,7 +450,7 @@ public:
       virtual size_t bytes() const noexcept override final { return sizeof(*this); }
       virtual void move(_erased_completion_handler *_dest) override final
       {
-        completion_handler *dest = (completion_handler *) _dest;
+        void *dest = (void *) _dest;
         new(dest) completion_handler(std::move(*this));
       }
       virtual void operator()(_erased_io_state_type *state) override final { completion(state->parent, state->result.write); }
