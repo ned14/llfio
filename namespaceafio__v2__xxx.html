@@ -119,6 +119,9 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structafio__v2__xxx_1_1construct_3_01algorithm_1_1cached__parent__handle__adapter_3_01_t_01_4_01_4.html">construct&lt; algorithm::cached_parent_handle_adapter&lt; T &gt; &gt;</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor for <code>algorithm::cached_parent_handle_adapter&lt;T&gt;</code>  <a href="structafio__v2__xxx_1_1construct_3_01algorithm_1_1cached__parent__handle__adapter_3_01_t_01_4_01_4.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structafio__v2__xxx_1_1construct_3_01async__file__handle_01_4.html">construct&lt; async_file_handle &gt;</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor for <code>async_file_handle</code>  <a href="structafio__v2__xxx_1_1construct_3_01async__file__handle_01_4.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structafio__v2__xxx_1_1construct_3_01directory__handle_01_4.html">construct&lt; directory_handle &gt;</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor for <code>directory_handle</code>  <a href="structafio__v2__xxx_1_1construct_3_01directory__handle_01_4.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -210,9 +213,27 @@ using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="nam
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a62fa06e66453eea2b5cfc8044083bb60"><td class="memItemLeft" align="right" valign="top"><a id="a62fa06e66453eea2b5cfc8044083bb60"></a>
-<a class="el" href="classafio__v2__xxx_1_1async__file__handle.html">afio_v2_xxx::async_file_handle</a> <a class="el" href="classafio__v2__xxx_1_1file__handle.html">file_handle</a>&#160;</td><td class="memItemRight" valign="bottom"><b>async_read</b> (io_request&lt; buffers_type &gt; reqs, CompletionRoutine &amp;&amp;completion, span&lt; char &gt; mem={}) noexcept</td></tr>
-<tr class="separator:a62fa06e66453eea2b5cfc8044083bb60"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae927cd0656591e7763a96703da0ebebb"><td class="memItemLeft" align="right" valign="top"><a id="ae927cd0656591e7763a96703da0ebebb"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx.html#ae927cd0656591e7763a96703da0ebebb">swap</a> (<a class="el" href="classafio__v2__xxx_1_1async__file__handle.html">async_file_handle</a> &amp;self, <a class="el" href="classafio__v2__xxx_1_1async__file__handle.html">async_file_handle</a> &amp;o) noexcept</td></tr>
+<tr class="memdesc:ae927cd0656591e7763a96703da0ebebb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Swap with another instance. <br /></td></tr>
+<tr class="separator:ae927cd0656591e7763a96703da0ebebb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5b0168993998aafc342233aa782040a6"><td class="memItemLeft" align="right" valign="top">result&lt; <a class="el" href="classafio__v2__xxx_1_1async__file__handle.html">async_file_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx.html#a5b0168993998aafc342233aa782040a6">async_file</a> (<a class="el" href="classafio__v2__xxx_1_1io__service.html">io_service</a> &amp;service, const <a class="el" href="classafio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;base, <a class="el" href="classafio__v2__xxx_1_1path__view.html">async_file_handle::path_view_type</a> _path, <a class="el" href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18">async_file_handle::mode</a> _mode=<a class="el" href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18aecae13117d6f0584c25a9da6c8f8415e">async_file_handle::mode::read</a>, <a class="el" href="classafio__v2__xxx_1_1handle.html#a45ff5c1c5662623d99156870dfeee0a7">async_file_handle::creation</a> _creation=async_file_handle::creation::open_existing, <a class="el" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9e">async_file_handle::caching</a> _caching=<a class="el" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9eab8a61dd00ce6fc5888706bda8fab2e98">async_file_handle::caching::only_metadata</a>, async_file_handle::flag flags=async_file_handle::flag::none) noexcept</td></tr>
+<tr class="separator:a5b0168993998aafc342233aa782040a6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a40cd3a25b8d4a293a8864fe6eb585034"><td class="memItemLeft" align="right" valign="top">result&lt; <a class="el" href="classafio__v2__xxx_1_1async__file__handle.html">async_file_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx.html#a40cd3a25b8d4a293a8864fe6eb585034">async_random_file</a> (<a class="el" href="classafio__v2__xxx_1_1io__service.html">io_service</a> &amp;service, const <a class="el" href="classafio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;dirpath, <a class="el" href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18">async_file_handle::mode</a> _mode=<a class="el" href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18aefb2a684e4afb7d55e6147fbe5a332ee">async_file_handle::mode::write</a>, <a class="el" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9e">async_file_handle::caching</a> _caching=<a class="el" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9eab8a61dd00ce6fc5888706bda8fab2e98">async_file_handle::caching::only_metadata</a>, async_file_handle::flag flags=async_file_handle::flag::none) noexcept</td></tr>
+<tr class="separator:a40cd3a25b8d4a293a8864fe6eb585034"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0b751376f48a4fd14cb90cce03b2b491"><td class="memItemLeft" align="right" valign="top">result&lt; <a class="el" href="classafio__v2__xxx_1_1async__file__handle.html">async_file_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx.html#a0b751376f48a4fd14cb90cce03b2b491">async_temp_file</a> (<a class="el" href="classafio__v2__xxx_1_1io__service.html">io_service</a> &amp;service, <a class="el" href="classafio__v2__xxx_1_1path__view.html">async_file_handle::path_view_type</a> name=<a class="el" href="classafio__v2__xxx_1_1path__view.html">async_file_handle::path_view_type</a>(), <a class="el" href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18">async_file_handle::mode</a> _mode=<a class="el" href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18aefb2a684e4afb7d55e6147fbe5a332ee">async_file_handle::mode::write</a>, <a class="el" href="classafio__v2__xxx_1_1handle.html#a45ff5c1c5662623d99156870dfeee0a7">async_file_handle::creation</a> _creation=async_file_handle::creation::if_needed, <a class="el" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9e">async_file_handle::caching</a> _caching=<a class="el" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9eab8a61dd00ce6fc5888706bda8fab2e98">async_file_handle::caching::only_metadata</a>, async_file_handle::flag flags=async_file_handle::flag::unlink_on_close) noexcept</td></tr>
+<tr class="separator:a0b751376f48a4fd14cb90cce03b2b491"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5eb846433fec3c9c80336ff686c2527e"><td class="memItemLeft" align="right" valign="top">result&lt; <a class="el" href="classafio__v2__xxx_1_1async__file__handle.html">async_file_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx.html#a5eb846433fec3c9c80336ff686c2527e">async_temp_inode</a> (<a class="el" href="classafio__v2__xxx_1_1io__service.html">io_service</a> &amp;service, const <a class="el" href="classafio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;dir=<a class="el" href="namespaceafio__v2__xxx_1_1path__discovery.html#af398b6c3762f60aa96cebd270879093e">path_discovery::storage_backed_temporary_files_directory</a>(), <a class="el" href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18">async_file_handle::mode</a> _mode=<a class="el" href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18aefb2a684e4afb7d55e6147fbe5a332ee">async_file_handle::mode::write</a>, async_file_handle::flag flags=async_file_handle::flag::none) noexcept</td></tr>
+<tr class="separator:a5eb846433fec3c9c80336ff686c2527e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0ff925d5c5434bcec35b2167d87d5c55"><td class="memItemLeft" align="right" valign="top"><a id="a0ff925d5c5434bcec35b2167d87d5c55"></a>
+<a class="el" href="structafio__v2__xxx_1_1io__handle_1_1io__result.html">async_file_handle::io_result</a>&lt; async_file_handle::const_buffers_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>barrier</b> (<a class="el" href="classafio__v2__xxx_1_1async__file__handle.html">async_file_handle</a> &amp;self, <a class="el" href="structafio__v2__xxx_1_1io__handle_1_1io__request.html">async_file_handle::io_request</a>&lt; async_file_handle::const_buffers_type &gt; reqs=<a class="el" href="structafio__v2__xxx_1_1io__handle_1_1io__request.html">async_file_handle::io_request</a>&lt; async_file_handle::const_buffers_type &gt;(), bool wait_for_device=false, bool and_metadata=false, <a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
+<tr class="separator:a0ff925d5c5434bcec35b2167d87d5c55"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a37590ba383783ccfca30404318eb1114"><td class="memItemLeft" align="right" valign="top">result&lt; <a class="el" href="classafio__v2__xxx_1_1async__file__handle_1_1awaitable.html">async_file_handle::awaitable</a>&lt; async_file_handle::buffers_type &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx.html#a37590ba383783ccfca30404318eb1114">co_read</a> (<a class="el" href="classafio__v2__xxx_1_1async__file__handle.html">async_file_handle</a> &amp;self, <a class="el" href="structafio__v2__xxx_1_1io__handle_1_1io__request.html">async_file_handle::io_request</a>&lt; async_file_handle::buffers_type &gt; reqs) noexcept</td></tr>
+<tr class="memdesc:a37590ba383783ccfca30404318eb1114"><td class="mdescLeft">&#160;</td><td class="mdescRight">Schedule a read to occur asynchronously.  <a href="#a37590ba383783ccfca30404318eb1114">More...</a><br /></td></tr>
+<tr class="separator:a37590ba383783ccfca30404318eb1114"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acd740f5aef6ca339575e7497fa873d06"><td class="memItemLeft" align="right" valign="top">result&lt; <a class="el" href="classafio__v2__xxx_1_1async__file__handle_1_1awaitable.html">async_file_handle::awaitable</a>&lt; async_file_handle::const_buffers_type &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx.html#acd740f5aef6ca339575e7497fa873d06">co_write</a> (<a class="el" href="classafio__v2__xxx_1_1async__file__handle.html">async_file_handle</a> &amp;self, <a class="el" href="structafio__v2__xxx_1_1io__handle_1_1io__request.html">async_file_handle::io_request</a>&lt; async_file_handle::const_buffers_type &gt; reqs) noexcept</td></tr>
+<tr class="memdesc:acd740f5aef6ca339575e7497fa873d06"><td class="mdescLeft">&#160;</td><td class="mdescRight">Schedule a write to occur asynchronously.  <a href="#acd740f5aef6ca339575e7497fa873d06">More...</a><br /></td></tr>
+<tr class="separator:acd740f5aef6ca339575e7497fa873d06"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a08363b8572e6a8971a6d236d54fb8287"><td class="memItemLeft" align="right" valign="top"><a id="a08363b8572e6a8971a6d236d54fb8287"></a>
 QUICKCPPLIB_NAMESPACE::ringbuffer_log::simple_ringbuffer_log&lt; <a class="el" href="group__config.html#ga7c2409ed4b38a384c422012a43423a16">AFIO_LOGGING_MEMORY</a> &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx.html#a08363b8572e6a8971a6d236d54fb8287">log</a> () noexcept</td></tr>
 <tr class="memdesc:a08363b8572e6a8971a6d236d54fb8287"><td class="mdescLeft">&#160;</td><td class="mdescRight">The log used by AFIO. <br /></td></tr>
@@ -388,6 +409,258 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operato
 <div class="textblock"><p>The AFIO namespace. </p>
 <dl class="todo"><dt><b><a class="el" href="todo.html#_todo000001">Todo:</a></b></dt><dd>TODO FIXME Replace in-memory log with memory map file backed log. </dd></dl>
 </div><h2 class="groupheader">Function Documentation</h2>
+<a id="a5b0168993998aafc342233aa782040a6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5b0168993998aafc342233aa782040a6">&#9670;&nbsp;</a></span>async_file()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">result&lt;<a class="el" href="classafio__v2__xxx_1_1async__file__handle.html">async_file_handle</a>&gt; afio_v2_xxx::async_file </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classafio__v2__xxx_1_1io__service.html">io_service</a> &amp;&#160;</td>
+          <td class="paramname"><em>service</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classafio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;&#160;</td>
+          <td class="paramname"><em>base</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classafio__v2__xxx_1_1path__view.html">async_file_handle::path_view_type</a>&#160;</td>
+          <td class="paramname"><em>_path</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18">async_file_handle::mode</a>&#160;</td>
+          <td class="paramname"><em>_mode</em> = <code><a class="el" href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18aecae13117d6f0584c25a9da6c8f8415e">async_file_handle::mode::read</a></code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classafio__v2__xxx_1_1handle.html#a45ff5c1c5662623d99156870dfeee0a7">async_file_handle::creation</a>&#160;</td>
+          <td class="paramname"><em>_creation</em> = <code>async_file_handle::creation::open_existing</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9e">async_file_handle::caching</a>&#160;</td>
+          <td class="paramname"><em>_caching</em> = <code><a class="el" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9eab8a61dd00ce6fc5888706bda8fab2e98">async_file_handle::caching::only_metadata</a></code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">async_file_handle::flag&#160;</td>
+          <td class="paramname"><em>flags</em> = <code>async_file_handle::flag::none</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Create an async file handle opening access to a file on path using the given io_service. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">service</td><td>The <code>io_service</code> to use. </td></tr>
+    <tr><td class="paramname">base</td><td>Handle to a base location on the filing system. Pass <code>{}</code> to indicate that path will be absolute. </td></tr>
+    <tr><td class="paramname">_path</td><td>The path relative to base to open. </td></tr>
+    <tr><td class="paramname">_mode</td><td>How to open the file. </td></tr>
+    <tr><td class="paramname">_creation</td><td>How to create the file. </td></tr>
+    <tr><td class="paramname">_caching</td><td>How to ask the kernel to cache the file. </td></tr>
+    <tr><td class="paramname">flags</td><td>Any additional custom behaviours.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX open() or CreateFile() can return. </dd></dl>
+<div class="fragment"><div class="line"><a name="l00584"></a><span class="lineno">  584</span>&#160;{</div><div class="line"><a name="l00585"></a><span class="lineno">  585</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespaceafio__v2__xxx.html#a5b0168993998aafc342233aa782040a6">async_file_handle::async_file</a>(std::forward&lt;decltype(service)&gt;(service), std::forward&lt;decltype(base)&gt;(base), std::forward&lt;decltype(_path)&gt;(_path), std::forward&lt;decltype(_mode)&gt;(_mode), std::forward&lt;decltype(_creation)&gt;(_creation), std::forward&lt;decltype(_caching)&gt;(_caching),</div><div class="line"><a name="l00586"></a><span class="lineno">  586</span>&#160;                                       std::forward&lt;decltype(flags)&gt;(flags));</div><div class="line"><a name="l00587"></a><span class="lineno">  587</span>&#160;}</div><div class="ttc" id="namespaceafio__v2__xxx_html_a5b0168993998aafc342233aa782040a6"><div class="ttname"><a href="namespaceafio__v2__xxx.html#a5b0168993998aafc342233aa782040a6">afio_v2_xxx::async_file</a></div><div class="ttdeci">result&lt; async_file_handle &gt; async_file(io_service &amp;service, const path_handle &amp;base, async_file_handle::path_view_type _path, async_file_handle::mode _mode=async_file_handle::mode::read, async_file_handle::creation _creation=async_file_handle::creation::open_existing, async_file_handle::caching _caching=async_file_handle::caching::only_metadata, async_file_handle::flag flags=async_file_handle::flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> async_file_handle.hpp:582</div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a40cd3a25b8d4a293a8864fe6eb585034"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a40cd3a25b8d4a293a8864fe6eb585034">&#9670;&nbsp;</a></span>async_random_file()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">result&lt;<a class="el" href="classafio__v2__xxx_1_1async__file__handle.html">async_file_handle</a>&gt; afio_v2_xxx::async_random_file </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classafio__v2__xxx_1_1io__service.html">io_service</a> &amp;&#160;</td>
+          <td class="paramname"><em>service</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classafio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;&#160;</td>
+          <td class="paramname"><em>dirpath</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18">async_file_handle::mode</a>&#160;</td>
+          <td class="paramname"><em>_mode</em> = <code><a class="el" href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18aefb2a684e4afb7d55e6147fbe5a332ee">async_file_handle::mode::write</a></code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9e">async_file_handle::caching</a>&#160;</td>
+          <td class="paramname"><em>_caching</em> = <code><a class="el" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9eab8a61dd00ce6fc5888706bda8fab2e98">async_file_handle::caching::only_metadata</a></code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">async_file_handle::flag&#160;</td>
+          <td class="paramname"><em>flags</em> = <code>async_file_handle::flag::none</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Create an async file handle creating a randomly named file on a path. The file is opened exclusively with <code>creation::only_if_not_exist</code> so it will never collide with nor overwrite any existing file.</p>
+<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX open() or CreateFile() can return. </dd></dl>
+<div class="fragment"><div class="line"><a name="l00595"></a><span class="lineno">  595</span>&#160;{</div><div class="line"><a name="l00596"></a><span class="lineno">  596</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespaceafio__v2__xxx.html#a40cd3a25b8d4a293a8864fe6eb585034">async_file_handle::async_random_file</a>(std::forward&lt;decltype(service)&gt;(service), std::forward&lt;decltype(dirpath)&gt;(dirpath), std::forward&lt;decltype(_mode)&gt;(_mode), std::forward&lt;decltype(_caching)&gt;(_caching), std::forward&lt;decltype(flags)&gt;(flags));</div><div class="line"><a name="l00597"></a><span class="lineno">  597</span>&#160;}</div><div class="ttc" id="namespaceafio__v2__xxx_html_a40cd3a25b8d4a293a8864fe6eb585034"><div class="ttname"><a href="namespaceafio__v2__xxx.html#a40cd3a25b8d4a293a8864fe6eb585034">afio_v2_xxx::async_random_file</a></div><div class="ttdeci">result&lt; async_file_handle &gt; async_random_file(io_service &amp;service, const path_handle &amp;dirpath, async_file_handle::mode _mode=async_file_handle::mode::write, async_file_handle::caching _caching=async_file_handle::caching::only_metadata, async_file_handle::flag flags=async_file_handle::flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> async_file_handle.hpp:594</div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a0b751376f48a4fd14cb90cce03b2b491"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0b751376f48a4fd14cb90cce03b2b491">&#9670;&nbsp;</a></span>async_temp_file()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">result&lt;<a class="el" href="classafio__v2__xxx_1_1async__file__handle.html">async_file_handle</a>&gt; afio_v2_xxx::async_temp_file </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classafio__v2__xxx_1_1io__service.html">io_service</a> &amp;&#160;</td>
+          <td class="paramname"><em>service</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classafio__v2__xxx_1_1path__view.html">async_file_handle::path_view_type</a>&#160;</td>
+          <td class="paramname"><em>name</em> = <code><a class="el" href="classafio__v2__xxx_1_1path__view.html">async_file_handle::path_view_type</a>()</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18">async_file_handle::mode</a>&#160;</td>
+          <td class="paramname"><em>_mode</em> = <code><a class="el" href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18aefb2a684e4afb7d55e6147fbe5a332ee">async_file_handle::mode::write</a></code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classafio__v2__xxx_1_1handle.html#a45ff5c1c5662623d99156870dfeee0a7">async_file_handle::creation</a>&#160;</td>
+          <td class="paramname"><em>_creation</em> = <code>async_file_handle::creation::if_needed</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9e">async_file_handle::caching</a>&#160;</td>
+          <td class="paramname"><em>_caching</em> = <code><a class="el" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9eab8a61dd00ce6fc5888706bda8fab2e98">async_file_handle::caching::only_metadata</a></code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">async_file_handle::flag&#160;</td>
+          <td class="paramname"><em>flags</em> = <code>async_file_handle::flag::unlink_on_close</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Create an async file handle creating the named file on some path which the OS declares to be suitable for temporary files. Most OSs are very lazy about flushing changes made to these temporary files. Note the default flags are to have the newly created file deleted on first handle close. Note also that an empty name is equivalent to calling <code>async_random_file(path_discovery::storage_backed_temporary_files_directory())</code> and the creation parameter is ignored.</p>
+<dl class="section note"><dt>Note</dt><dd>If the temporary file you are creating is not going to have its path sent to another process for usage, this is the WRONG function to use. Use <code>temp_inode()</code> instead, it is far more secure.</dd></dl>
+<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX open() or CreateFile() can return. </dd></dl>
+<div class="fragment"><div class="line"><a name="l00615"></a><span class="lineno">  615</span>&#160;{</div><div class="line"><a name="l00616"></a><span class="lineno">  616</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespaceafio__v2__xxx.html#a0b751376f48a4fd14cb90cce03b2b491">async_file_handle::async_temp_file</a>(std::forward&lt;decltype(service)&gt;(service), std::forward&lt;decltype(name)&gt;(name), std::forward&lt;decltype(_mode)&gt;(_mode), std::forward&lt;decltype(_creation)&gt;(_creation), std::forward&lt;decltype(_caching)&gt;(_caching), std::forward&lt;decltype(flags)&gt;(flags));</div><div class="line"><a name="l00617"></a><span class="lineno">  617</span>&#160;}</div><div class="ttc" id="namespaceafio__v2__xxx_html_a0b751376f48a4fd14cb90cce03b2b491"><div class="ttname"><a href="namespaceafio__v2__xxx.html#a0b751376f48a4fd14cb90cce03b2b491">afio_v2_xxx::async_temp_file</a></div><div class="ttdeci">result&lt; async_file_handle &gt; async_temp_file(io_service &amp;service, async_file_handle::path_view_type name=async_file_handle::path_view_type(), async_file_handle::mode _mode=async_file_handle::mode::write, async_file_handle::creation _creation=async_file_handle::creation::if_needed, async_file_handle::caching _caching=async_file_handle::caching::only_metadata, async_file_handle::flag flags=async_file_handle::flag::unlink_on_close) noexcept</div><div class="ttdef"><b>Definition:</b> async_file_handle.hpp:613</div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a5eb846433fec3c9c80336ff686c2527e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5eb846433fec3c9c80336ff686c2527e">&#9670;&nbsp;</a></span>async_temp_inode()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">result&lt;<a class="el" href="classafio__v2__xxx_1_1async__file__handle.html">async_file_handle</a>&gt; afio_v2_xxx::async_temp_inode </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classafio__v2__xxx_1_1io__service.html">io_service</a> &amp;&#160;</td>
+          <td class="paramname"><em>service</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classafio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;&#160;</td>
+          <td class="paramname"><em>dir</em> = <code><a class="el" href="namespaceafio__v2__xxx_1_1path__discovery.html#af398b6c3762f60aa96cebd270879093e">path_discovery::storage_backed_temporary_files_directory</a>()</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18">async_file_handle::mode</a>&#160;</td>
+          <td class="paramname"><em>_mode</em> = <code><a class="el" href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18aefb2a684e4afb7d55e6147fbe5a332ee">async_file_handle::mode::write</a></code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">async_file_handle::flag&#160;</td>
+          <td class="paramname"><em>flags</em> = <code>async_file_handle::flag::none</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p><em>Securely</em> create an async file handle creating a temporary anonymous inode in the filesystem referred to by <em>dirpath</em>. The inode created has no name nor accessible path on the filing system and ceases to exist as soon as the last handle is closed, making it ideal for use as a temporary file where other processes do not need to have access to its contents via some path on the filing system (a classic use case is for backing shared memory maps).</p>
+<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX open() or CreateFile() can return. </dd></dl>
+<div class="fragment"><div class="line"><a name="l00629"></a><span class="lineno">  629</span>&#160;{</div><div class="line"><a name="l00630"></a><span class="lineno">  630</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespaceafio__v2__xxx.html#a5eb846433fec3c9c80336ff686c2527e">async_file_handle::async_temp_inode</a>(std::forward&lt;decltype(service)&gt;(service), std::forward&lt;decltype(dir)&gt;(dir), std::forward&lt;decltype(_mode)&gt;(_mode), std::forward&lt;decltype(flags)&gt;(flags));</div><div class="line"><a name="l00631"></a><span class="lineno">  631</span>&#160;}</div><div class="ttc" id="namespaceafio__v2__xxx_html_a5eb846433fec3c9c80336ff686c2527e"><div class="ttname"><a href="namespaceafio__v2__xxx.html#a5eb846433fec3c9c80336ff686c2527e">afio_v2_xxx::async_temp_inode</a></div><div class="ttdeci">result&lt; async_file_handle &gt; async_temp_inode(io_service &amp;service, const path_handle &amp;dir=path_discovery::storage_backed_temporary_files_directory(), async_file_handle::mode _mode=async_file_handle::mode::write, async_file_handle::flag flags=async_file_handle::flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> async_file_handle.hpp:628</div></div>
+</div><!-- fragment -->
+</div>
+</div>
 <a id="abb60a5dc89b41b1db101dbed12cb065d"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#abb60a5dc89b41b1db101dbed12cb065d">&#9670;&nbsp;</a></span>barrier()</h2>
 
@@ -460,6 +733,102 @@ For portability, you can only assume that barriers write order for a single hand
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX fdatasync() or Windows NtFlushBuffersFileEx() can return. </dd></dl>
 <dl class="section user"><dt>Memory Allocations</dt><dd>None. </dd></dl>
 <div class="fragment"><div class="line"><a name="l00527"></a><span class="lineno">  527</span>&#160;{</div><div class="line"><a name="l00528"></a><span class="lineno">  528</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.barrier(std::forward&lt;decltype(reqs)&gt;(reqs), std::forward&lt;decltype(wait_for_device)&gt;(wait_for_device), std::forward&lt;decltype(and_metadata)&gt;(and_metadata), std::forward&lt;decltype(d)&gt;(d));</div><div class="line"><a name="l00529"></a><span class="lineno">  529</span>&#160;}</div></div><!-- fragment -->
+</div>
+</div>
+<a id="a37590ba383783ccfca30404318eb1114"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a37590ba383783ccfca30404318eb1114">&#9670;&nbsp;</a></span>co_read()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">result&lt;<a class="el" href="classafio__v2__xxx_1_1async__file__handle_1_1awaitable.html">async_file_handle::awaitable</a>&lt;async_file_handle::buffers_type&gt; &gt; afio_v2_xxx::co_read </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classafio__v2__xxx_1_1async__file__handle.html">async_file_handle</a> &amp;&#160;</td>
+          <td class="paramname"><em>self</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structafio__v2__xxx_1_1io__handle_1_1io__request.html">async_file_handle::io_request</a>&lt; async_file_handle::buffers_type &gt;&#160;</td>
+          <td class="paramname"><em>reqs</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Schedule a read to occur asynchronously. </p>
+<dl class="section return"><dt>Returns</dt><dd>An awaitable, which when <code>co_await</code>ed upon, suspends execution of the coroutine until the operation has completed, resuming with the buffers read, which may not be the buffers input. The size of each scatter-gather buffer is updated with the number of bytes of that buffer transferred, and the pointer to the data may be <em>completely</em> different to what was submitted (e.g. it may point into a memory map). </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">self</td><td>The object whose member function to call. </td></tr>
+    <tr><td class="paramname">reqs</td><td>A scatter-gather and offset request. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section user"><dt>Errors returnable</dt><dd>As for read(), plus ENOMEM. </dd></dl>
+<dl class="section user"><dt>Memory Allocations</dt><dd>One calloc, one free. </dd></dl>
+<div class="fragment"><div class="line"><a name="l00651"></a><span class="lineno">  651</span>&#160;{</div><div class="line"><a name="l00652"></a><span class="lineno">  652</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.co_read(std::forward&lt;decltype(reqs)&gt;(reqs));</div><div class="line"><a name="l00653"></a><span class="lineno">  653</span>&#160;}</div></div><!-- fragment -->
+</div>
+</div>
+<a id="acd740f5aef6ca339575e7497fa873d06"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acd740f5aef6ca339575e7497fa873d06">&#9670;&nbsp;</a></span>co_write()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">result&lt;<a class="el" href="classafio__v2__xxx_1_1async__file__handle_1_1awaitable.html">async_file_handle::awaitable</a>&lt;async_file_handle::const_buffers_type&gt; &gt; afio_v2_xxx::co_write </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classafio__v2__xxx_1_1async__file__handle.html">async_file_handle</a> &amp;&#160;</td>
+          <td class="paramname"><em>self</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structafio__v2__xxx_1_1io__handle_1_1io__request.html">async_file_handle::io_request</a>&lt; async_file_handle::const_buffers_type &gt;&#160;</td>
+          <td class="paramname"><em>reqs</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Schedule a write to occur asynchronously. </p>
+<dl class="section return"><dt>Returns</dt><dd>An awaitable, which when <code>co_await</code>ed upon, suspends execution of the coroutine until the operation has completed, resuming with the buffers written, which may not be the buffers input. The size of each scatter-gather buffer is updated with the number of bytes of that buffer transferred. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">self</td><td>The object whose member function to call. </td></tr>
+    <tr><td class="paramname">reqs</td><td>A scatter-gather and offset request. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section user"><dt>Errors returnable</dt><dd>As for write(), plus ENOMEM. </dd></dl>
+<dl class="section user"><dt>Memory Allocations</dt><dd>One calloc, one free. </dd></dl>
+<div class="fragment"><div class="line"><a name="l00666"></a><span class="lineno">  666</span>&#160;{</div><div class="line"><a name="l00667"></a><span class="lineno">  667</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.co_write(std::forward&lt;decltype(reqs)&gt;(reqs));</div><div class="line"><a name="l00668"></a><span class="lineno">  668</span>&#160;}</div></div><!-- fragment -->
 </div>
 </div>
 <a id="affce2389376e27ffa0565890034d209f"></a>

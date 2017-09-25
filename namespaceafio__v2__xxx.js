@@ -7,6 +7,7 @@ var namespaceafio__v2__xxx =
     [ "async_file_handle", "classafio__v2__xxx_1_1async__file__handle.html", "classafio__v2__xxx_1_1async__file__handle" ],
     [ "construct", "structafio__v2__xxx_1_1construct.html", "structafio__v2__xxx_1_1construct" ],
     [ "construct< algorithm::cached_parent_handle_adapter< T > >", "structafio__v2__xxx_1_1construct_3_01algorithm_1_1cached__parent__handle__adapter_3_01_t_01_4_01_4.html", "structafio__v2__xxx_1_1construct_3_01algorithm_1_1cached__parent__handle__adapter_3_01_t_01_4_01_4" ],
+    [ "construct< async_file_handle >", "structafio__v2__xxx_1_1construct_3_01async__file__handle_01_4.html", "structafio__v2__xxx_1_1construct_3_01async__file__handle_01_4" ],
     [ "construct< directory_handle >", "structafio__v2__xxx_1_1construct_3_01directory__handle_01_4.html", "structafio__v2__xxx_1_1construct_3_01directory__handle_01_4" ],
     [ "construct< file_handle >", "structafio__v2__xxx_1_1construct_3_01file__handle_01_4.html", "structafio__v2__xxx_1_1construct_3_01file__handle_01_4" ],
     [ "construct< map_handle >", "structafio__v2__xxx_1_1construct_3_01map__handle_01_4.html", "structafio__v2__xxx_1_1construct_3_01map__handle_01_4" ],

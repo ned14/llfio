@@ -1,14 +1,14 @@
 var hierarchy =
 [
     [ "afio_v2_xxx::algorithm::shared_fs_mutex::memory_map< Hasher, HashIndexSize, SpinlockType >::_entity_idx", "structafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map_1_1__entity__idx.html", null ],
-    [ "awaitable< BuffersType >", "classawaitable.html", null ],
+    [ "afio_v2_xxx::async_file_handle::awaitable< BuffersType >", "classafio__v2__xxx_1_1async__file__handle_1_1awaitable.html", null ],
     [ "afio_v2_xxx::io_service::awaitable_post_to_self", "structafio__v2__xxx_1_1io__service_1_1awaitable__post__to__self.html", null ],
     [ "afio_v2_xxx::io_handle::buffer_type", "structafio__v2__xxx_1_1io__handle_1_1buffer__type.html", null ],
     [ "afio_v2_xxx::path_view::c_str", "structafio__v2__xxx_1_1path__view_1_1c__str.html", null ],
     [ "afio_v2_xxx::io_handle::const_buffer_type", "structafio__v2__xxx_1_1io__handle_1_1const__buffer__type.html", null ],
     [ "afio_v2_xxx::construct< T >", "structafio__v2__xxx_1_1construct.html", null ],
     [ "afio_v2_xxx::construct< algorithm::cached_parent_handle_adapter< T > >", "structafio__v2__xxx_1_1construct_3_01algorithm_1_1cached__parent__handle__adapter_3_01_t_01_4_01_4.html", null ],
-    [ "construct< async_file_handle >", "structconstruct_3_01async__file__handle_01_4.html", null ],
+    [ "afio_v2_xxx::construct< async_file_handle >", "structafio__v2__xxx_1_1construct_3_01async__file__handle_01_4.html", null ],
     [ "afio_v2_xxx::construct< directory_handle >", "structafio__v2__xxx_1_1construct_3_01directory__handle_01_4.html", null ],
     [ "afio_v2_xxx::construct< file_handle >", "structafio__v2__xxx_1_1construct_3_01file__handle_01_4.html", null ],
     [ "afio_v2_xxx::construct< map_handle >", "structafio__v2__xxx_1_1construct_3_01map__handle_01_4.html", null ],
@@ -63,14 +63,13 @@ var hierarchy =
     [ "afio_v2_xxx::utils::page_allocator< void >", "classafio__v2__xxx_1_1utils_1_1page__allocator_3_01void_01_4.html", null ],
     [ "afio_v2_xxx::path_hasher", "structafio__v2__xxx_1_1path__hasher.html", null ],
     [ "afio_v2_xxx::path_view", "classafio__v2__xxx_1_1path__view.html", null ],
-    [ "afio_v2_xxx::utils::page_allocator< T >::rebind< U >", "structafio__v2__xxx_1_1utils_1_1page__allocator_1_1rebind.html", null ],
     [ "afio_v2_xxx::utils::page_allocator< void >::rebind< U >", "structafio__v2__xxx_1_1utils_1_1page__allocator_3_01void_01_4_1_1rebind.html", null ],
+    [ "afio_v2_xxx::utils::page_allocator< T >::rebind< U >", "structafio__v2__xxx_1_1utils_1_1page__allocator_1_1rebind.html", null ],
     [ "result", null, [
       [ "afio_v2_xxx::io_handle::io_result< T >", "structafio__v2__xxx_1_1io__handle_1_1io__result.html", null ],
       [ "afio_v2_xxx::io_handle::io_result< buffers_type >", "structafio__v2__xxx_1_1io__handle_1_1io__result.html", null ],
       [ "afio_v2_xxx::io_handle::io_result< const_buffers_type >", "structafio__v2__xxx_1_1io__handle_1_1io__result.html", null ]
     ] ],
-    [ "_erased_io_state_type::result_storage", "union__erased__io__state__type_1_1result__storage.html", null ],
     [ "afio_v2_xxx::async_file_handle::_erased_io_state_type::result_storage", "unionafio__v2__xxx_1_1async__file__handle_1_1__erased__io__state__type_1_1result__storage.html", null ],
     [ "afio_v2_xxx::algorithm::shared_fs_mutex::shared_fs_mutex", "classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex.html", [
       [ "afio_v2_xxx::algorithm::shared_fs_mutex::atomic_append", "classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1atomic__append.html", null ],
