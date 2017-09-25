@@ -44,9 +44,9 @@ static inline void TestAsyncFileHandleCoroutines()
 
   // Launch 8 coroutines, each writing 4Kb of chars 0-8 to every 32Kb block
   auto coroutine = [&h](size_t no) -> std::future<void> {
-    alignas(4096) char buffer[4096];
-    memset(buffer, (int) ('0' + no), 4096);
-    afio::async_file_handle::const_buffer_type bt{buffer};
+    std::vector<char, afio::utils::page_allocator<char>> buffer(4096);
+    memset(buffer.data(), (int) ('0' + no), 4096);
+    afio::async_file_handle::const_buffer_type bt{buffer.data(), buffer.size()};
     for(size_t n = 0; n < 128; n++)
     {
       // This will initiate the i/o, and suspend the coroutine until completion.
@@ -92,18 +92,25 @@ static inline void TestPostSelfToRunCoroutines()
 #ifdef __cpp_coroutines
   namespace afio = AFIO_V2_NAMESPACE;
   afio::io_service service;
+  std::atomic<bool> ready(false);
   auto runthreadid = QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id();
   auto coroutine = [&]() -> std::future<void> {
     auto thisthreadid = QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id();
     BOOST_CHECK(thisthreadid != runthreadid);
+    ready = true;
     co_await afio::io_service::awaitable_post_to_self(service);
     thisthreadid = QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id();
     BOOST_CHECK(thisthreadid == runthreadid);
   };
   auto asynch = std::async(std::launch::async, coroutine);
+  while(!ready)
+  {
+    std::this_thread::yield();
+  }
   while(!service.run())
     ;
-  asynch.get().get();
+  auto r = asynch.get();
+  r.get();
 #endif
 }
 

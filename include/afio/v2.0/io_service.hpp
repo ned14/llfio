@@ -210,7 +210,7 @@ public:
     if(pi)
       abort();
     _work_done();
-    while(!_posts.front().service)
+    while(!_posts.empty() && !_posts.front().service)
       _posts.pop_front();
   }
   void _post_done(post_info *pi)

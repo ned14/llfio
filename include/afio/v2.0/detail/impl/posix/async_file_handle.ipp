@@ -32,12 +32,11 @@ Distributed under the Boost Software License, Version 1.0.
 
 AFIO_V2_NAMESPACE_BEGIN
 
-async_file_handle::io_result<async_file_handle::const_buffers_type> async_file_handle::barrier(async_file_handle::io_request<async_file_handle::const_buffers_type> reqs, bool /*wait_for_device*/, bool and_metadata, deadline d) noexcept
+async_file_handle::io_result<async_file_handle::const_buffers_type> async_file_handle::barrier(async_file_handle::io_request<async_file_handle::const_buffers_type> reqs, bool wait_for_device, bool and_metadata, deadline d) noexcept
 {
   AFIO_LOG_FUNCTION_CALL(this);
   optional<io_result<const_buffers_type>> ret;
-  auto _io_state(_begin_io(and_metadata ? operation_t::fsync : operation_t::dsync, std::move(reqs), [&ret](auto *state) { ret = std::move(state->result); }, nullptr));
-  OUTCOME_TRY(io_state, _io_state);
+  OUTCOME_TRY(io_state, async_barrier(reqs, [&ret](async_file_handle *, io_result<const_buffers_type> &result) { ret = std::move(result); }, wait_for_device, and_metadata));
   (void) io_state;
 
   // While i/o is not done pump i/o completion
@@ -58,22 +57,24 @@ async_file_handle::io_result<async_file_handle::const_buffers_type> async_file_h
   return *ret;
 }
 
-template <class CompletionRoutine, class BuffersType, class IORoutine>
-result<async_file_handle::io_state_ptr<CompletionRoutine, BuffersType>> async_file_handle::_begin_io(async_file_handle::operation_t operation, async_file_handle::io_request<BuffersType> reqs, CompletionRoutine &&completion, IORoutine && /*ioroutine*/) noexcept
+template <class BuffersType, class IORoutine> result<async_file_handle::io_state_ptr> async_file_handle::_begin_io(span<char> mem, async_file_handle::operation_t operation, async_file_handle::io_request<BuffersType> reqs, async_file_handle::_erased_completion_handler &&completion, IORoutine && /*unused*/) noexcept
 {
   // Need to keep a set of aiocbs matching the scatter-gather buffers
-  struct state_type : public _io_state_type<CompletionRoutine, BuffersType>
+  struct state_type : public _erased_io_state_type
   {
 #if AFIO_USE_POSIX_AIO
     struct aiocb aiocbs[1];
 #else
 #error todo
 #endif
-    state_type(async_file_handle *_parent, operation_t _operation, CompletionRoutine &&f, size_t _items)
-        : _io_state_type<CompletionRoutine, BuffersType>(_parent, _operation, std::forward<CompletionRoutine>(f), _items)
+    _erased_completion_handler *completion;
+    state_type(async_file_handle *_parent, operation_t _operation, bool must_deallocate_self, size_t _items)
+        : _erased_io_state_type(_parent, _operation, must_deallocate_self, _items)
+        , completion(nullptr)
     {
     }
-    AFIO_HEADERS_ONLY_VIRTUAL_SPEC void operator()(long errcode, long bytes_transferred, void *internal_state) noexcept override final
+    AFIO_HEADERS_ONLY_VIRTUAL_SPEC _erased_completion_handler *erased_completion_handler() noexcept override final { return completion; }
+    AFIO_HEADERS_ONLY_VIRTUAL_SPEC void _system_io_completion(long errcode, long bytes_transferred, void *internal_state) noexcept override final
     {
 #if AFIO_USE_POSIX_AIO
       struct aiocb **_paiocb = (struct aiocb **) internal_state;
@@ -83,10 +84,11 @@ result<async_file_handle::io_state_ptr<CompletionRoutine, BuffersType>> async_fi
 #else
 #error todo
 #endif
-      if(this->result)
+      auto &result = this->result.write;
+      if(result)
       {
         if(errcode)
-          this->result = error_code((int) errcode, std::system_category());
+          result = error_code((int) errcode, std::system_category());
         else
         {
 // Figure out which i/o I am and update the buffer in question
@@ -100,13 +102,13 @@ result<async_file_handle::io_state_ptr<CompletionRoutine, BuffersType>> async_fi
             AFIO_LOG_FATAL(0, "file_handle::io_state::operator() called with invalid index");
             std::terminate();
           }
-          this->result.value()[idx].len = bytes_transferred;
+          result.value()[idx].len = bytes_transferred;
         }
       }
       this->parent->service()->_work_done();
       // Are we done?
       if(!--this->items_to_go)
-        this->completion(this);
+        (*completion)(this);
     }
     AFIO_HEADERS_ONLY_VIRTUAL_SPEC ~state_type() override final
     {
@@ -155,22 +157,36 @@ result<async_file_handle::io_state_ptr<CompletionRoutine, BuffersType>> async_fi
 #endif
         }
       }
+      completion->~_erased_completion_handler();
     }
   } * state;
   extent_type offset = reqs.offset;
-  size_t statelen = sizeof(state_type) + (reqs.buffers.size() - 1) * sizeof(struct aiocb), items(reqs.buffers.size());
-  using return_type = io_state_ptr<CompletionRoutine, BuffersType>;
+  size_t statelen = sizeof(state_type) + (reqs.buffers.size() - 1) * sizeof(struct aiocb) + completion.bytes();
+  if(!mem.empty() && statelen > mem.size())
+  {
+    return std::errc::not_enough_memory;
+  }
+  size_t items(reqs.buffers.size());
 #if AFIO_USE_POSIX_AIO && defined(AIO_LISTIO_MAX)
   if(items > AIO_LISTIO_MAX)
     return std::errc::invalid_argument;
 #endif
-  void *mem = ::calloc(1, statelen);
-  if(!mem)
-    return std::errc::not_enough_memory;
-  return_type _state((_io_state_type<CompletionRoutine, BuffersType> *) mem);
-  new((state = (state_type *) mem)) state_type(this, operation, std::forward<CompletionRoutine>(completion), items);
+  bool must_deallocate_self = false;
+  if(mem.empty())
+  {
+    void *_mem = ::calloc(1, statelen);
+    if(!_mem)
+      return std::errc::not_enough_memory;
+    mem = {(char *) _mem, statelen};
+    must_deallocate_self = true;
+  }
+  io_state_ptr _state((state_type *) mem.data());
+  new((state = (state_type *) mem.data())) state_type(this, operation, must_deallocate_self, items);
+  state->completion = (_erased_completion_handler *) ((uintptr_t) state + sizeof(state_type) + (reqs.buffers.size() - 1) * sizeof(struct aiocb));
+  completion.move(state->completion);
+
   // Noexcept move the buffers from req into result
-  BuffersType &out = state->result.value();
+  BuffersType &out = state->result.write.value();
   out = std::move(reqs.buffers);
   for(size_t n = 0; n < items; n++)
   {
@@ -198,10 +214,12 @@ result<async_file_handle::io_state_ptr<CompletionRoutine, BuffersType>> async_fi
     case operation_t::write:
       aiocb->aio_lio_opcode = LIO_WRITE;
       break;
-    case operation_t::fsync:
+    case operation_t::fsync_async:
+    case operation_t::fsync_sync:
       aiocb->aio_lio_opcode = LIO_NOP;
       break;
-    case operation_t::dsync:
+    case operation_t::dsync_async:
+    case operation_t::dsync_sync:
       aiocb->aio_lio_opcode = LIO_NOP;
       break;
     }
@@ -237,15 +255,17 @@ result<async_file_handle::io_state_ptr<CompletionRoutine, BuffersType>> async_fi
     case operation_t::write:
       ret = lio_listio(LIO_NOWAIT, thislist, items, nullptr);
       break;
-    case operation_t::fsync:
-    case operation_t::dsync:
+    case operation_t::fsync_async:
+    case operation_t::fsync_sync:
+    case operation_t::dsync_async:
+    case operation_t::dsync_sync:
       for(size_t n = 0; n < items; n++)
       {
         struct aiocb *aiocb = state->aiocbs + n;
 #if defined(__FreeBSD__) || defined(__APPLE__)  // neither of these have fdatasync()
         ret = aio_fsync(O_SYNC, aiocb);
 #else
-        ret = aio_fsync(operation == operation_t::dsync ? O_DSYNC : O_SYNC, aiocb);
+        ret = aio_fsync((operation == operation_t::dsync_async || operation == operation_t::dsync_sync) ? O_DSYNC : O_SYNC, aiocb);
 #endif
       }
       break;
@@ -258,29 +278,24 @@ result<async_file_handle::io_state_ptr<CompletionRoutine, BuffersType>> async_fi
   {
     service()->_aiocbsv.resize(service()->_aiocbsv.size() - items);
     state->items_to_go = 0;
-    state->result = {errno, std::system_category()};
-    state->completion(state);
+    state->result.write = {errno, std::system_category()};
+    (*state->completion)(state);
     return success(std::move(_state));
   }
   service()->_work_enqueued(items);
   return success(std::move(_state));
 }
 
-template <class CompletionRoutine> result<async_file_handle::io_state_ptr<CompletionRoutine, async_file_handle::buffers_type>> async_file_handle::async_read(async_file_handle::io_request<async_file_handle::buffers_type> reqs, CompletionRoutine &&completion) noexcept
+result<async_file_handle::io_state_ptr> async_file_handle::_begin_io(span<char> mem, async_file_handle::operation_t operation, io_request<const_buffers_type> reqs, async_file_handle::_erased_completion_handler &&completion) noexcept
 {
-  return _begin_io(operation_t::read, std::move(reqs), [completion = std::forward<CompletionRoutine>(completion)](auto *state) { completion(state->parent, state->result); }, nullptr);
-}
-
-template <class CompletionRoutine> result<async_file_handle::io_state_ptr<CompletionRoutine, async_file_handle::const_buffers_type>> async_file_handle::async_write(async_file_handle::io_request<async_file_handle::const_buffers_type> reqs, CompletionRoutine &&completion) noexcept
-{
-  return _begin_io(operation_t::write, std::move(reqs), [completion = std::forward<CompletionRoutine>(completion)](auto *state) { completion(state->parent, state->result); }, nullptr);
+  return _begin_io(mem, operation, reqs, std::move(completion), nullptr);
 }
 
 async_file_handle::io_result<async_file_handle::buffers_type> async_file_handle::read(async_file_handle::io_request<async_file_handle::buffers_type> reqs, deadline d) noexcept
 {
+  AFIO_LOG_FUNCTION_CALL(this);
   optional<io_result<buffers_type>> ret;
-  auto _io_state(_begin_io(operation_t::read, std::move(reqs), [&ret](auto *state) { ret = std::move(state->result); }, nullptr));
-  OUTCOME_TRY(io_state, _io_state);
+  OUTCOME_TRY(io_state, async_read(reqs, [&ret](async_file_handle *, io_result<buffers_type> &result) { ret = std::move(result); }));
   (void) io_state;
 
   // While i/o is not done pump i/o completion
@@ -303,9 +318,9 @@ async_file_handle::io_result<async_file_handle::buffers_type> async_file_handle:
 
 async_file_handle::io_result<async_file_handle::const_buffers_type> async_file_handle::write(async_file_handle::io_request<async_file_handle::const_buffers_type> reqs, deadline d) noexcept
 {
+  AFIO_LOG_FUNCTION_CALL(this);
   optional<io_result<const_buffers_type>> ret;
-  auto _io_state(_begin_io(operation_t::write, std::move(reqs), [&ret](auto *state) { ret = std::move(state->result); }, nullptr));
-  OUTCOME_TRY(io_state, _io_state);
+  OUTCOME_TRY(io_state, async_write(reqs, [&ret](async_file_handle *, io_result<const_buffers_type> &result) { ret = std::move(result); }));
   (void) io_state;
 
   // While i/o is not done pump i/o completion

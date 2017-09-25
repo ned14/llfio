@@ -284,7 +284,7 @@ result<bool> io_service::run_until(deadline d) noexcept
           // The aiocb aio_sigevent.sigev_value.sival_ptr field will point to a file_handle::_io_state_type
           auto io_state = (async_file_handle::_erased_io_state_type *) aiocb->aio_sigevent.sigev_value.sival_ptr;
           assert(io_state);
-          (*io_state)(errcode, ioret, &aiocb);
+          io_state->_system_io_completion(errcode, ioret, &aiocb);
         }
       }
       // Eliminate any empty holes in the quick aiocbs vector

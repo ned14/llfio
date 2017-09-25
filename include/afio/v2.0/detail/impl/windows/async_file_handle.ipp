@@ -45,6 +45,7 @@ template <class BuffersType, class IORoutine> result<async_file_handle::io_state
         , completion(nullptr)
     {
     }
+    AFIO_HEADERS_ONLY_VIRTUAL_SPEC _erased_completion_handler *erased_completion_handler() noexcept override final { return completion; }
     AFIO_HEADERS_ONLY_VIRTUAL_SPEC void _system_io_completion(long errcode, long bytes_transferred, void *internal_state) noexcept override final
     {
       LPOVERLAPPED ol = (LPOVERLAPPED) internal_state;
@@ -191,10 +192,11 @@ result<async_file_handle::io_state_ptr> async_file_handle::_begin_io(span<char> 
     return _begin_io(mem, operation, reqs, std::move(completion), ReadFileEx);
   case operation_t::write:
     return _begin_io(mem, operation, reqs, std::move(completion), WriteFileEx);
-  case operation_t::fsync:
-  case operation_t::dsync:
-    // TODO FIXME Implement these for Windows
-    return std::errc::operation_not_supported;
+  case operation_t::fsync_async:
+  case operation_t::dsync_async:
+  case operation_t::fsync_sync:
+  case operation_t::dsync_sync:
+    break;
   }
   return std::errc::operation_not_supported;
 }

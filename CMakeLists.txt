@@ -47,7 +47,7 @@ int main() { return g().get(); }
   set(CXX_HAS_COROUTINES${iter} ${CXX_HAS_COROUTINES${iter}} PARENT_SCOPE)
 endfunction()
 include(CheckCXXSourceCompiles)
-if(0 AND MSVC)
+if(MSVC)
   CheckCXXHasCoroutines(_MSVC "/await")
   if(CXX_HAS_COROUTINES_MSVC)
     all_compile_options(PUBLIC "/await")

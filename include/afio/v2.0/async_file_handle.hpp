@@ -32,6 +32,15 @@ Distributed under the Boost Software License, Version 1.0.
 
 AFIO_V2_NAMESPACE_EXPORT_BEGIN
 
+namespace detail
+{
+#if __cplusplus > 201700
+  template <class R, class Fn, class... Args> using is_invocable_r = std::is_invocable_r<R, Fn, Args...>;
+#else
+  template <class R, class Fn, class... Args> using is_invocable_r = std::true_type;
+#endif
+}
+
 /*! \class async_file_handle
 \brief An asynchronous handle to an open something.
 
@@ -227,9 +236,12 @@ protected:
   {
     read,
     write,
-    fsync,
-    dsync
+    fsync_sync,
+    dsync_sync,
+    fsync_async,
+    dsync_async
   };
+  struct _erased_completion_handler;
   // Holds state for an i/o in progress. Will be subclassed with platform specific state and how to implement completion.
   struct _erased_io_state_type
   {
@@ -267,6 +279,8 @@ protected:
       }
     }
 
+    //! Retrieves a pointer to the copy of the completion handler held inside the i/o state.
+    virtual _erased_completion_handler *erased_completion_handler() noexcept = 0;
     /* Called when an i/o is completed by the system, figures out whether to call invoke_completion.
 
     For Windows:
@@ -316,11 +330,65 @@ protected:
     virtual void move(_erased_completion_handler *dest) = 0;
     // Invokes my completion handler
     virtual void operator()(_erased_io_state_type *state) = 0;
+    // Returns a pointer to the completion handler
+    virtual void *address() noexcept = 0;
   };
   template <class BuffersType, class IORoutine> result<io_state_ptr> AFIO_HEADERS_ONLY_MEMFUNC_SPEC _begin_io(span<char> mem, operation_t operation, io_request<BuffersType> reqs, _erased_completion_handler &&completion, IORoutine &&ioroutine) noexcept;
   AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<io_state_ptr> _begin_io(span<char> mem, operation_t operation, io_request<const_buffers_type> reqs, _erased_completion_handler &&completion) noexcept;
 
 public:
+  /*! \brief Schedule a barrier to occur asynchronously.
+
+  \note All the caveats and exclusions which apply to `barrier()` also apply here. Note that Microsoft Windows
+  does not support asynchronously executed barriers, and this call will fail on that operating system.
+
+  \return Either an io_state_ptr to the i/o in progress, or an error code.
+  \param reqs A scatter-gather and offset request for what range to barrier. May be ignored on some platforms
+  which always write barrier the entire file. Supplying a default initialised reqs write barriers the entire file.
+  \param completion A callable to call upon i/o completion. Spec is `void(async_file_handle *, io_result<const_buffers_type> &)`.
+  Note that buffers returned may not be buffers input, see documentation for `barrier()`.
+  \param wait_for_device True if you want the call to wait until data reaches storage and that storage
+  has acknowledged the data is physically written. Slow.
+  \param and_metadata True if you want the call to sync the metadata for retrieving the writes before the
+  barrier after a sudden power loss event. Slow.
+  \errors As for `barrier()`, plus `ENOMEM`.
+  \mallocs If mem is not set, one calloc, one free. The allocation is unavoidable due to the need to store a type
+  erased completion handler of unknown type and state per buffers input.
+  */
+  AFIO_MAKE_FREE_FUNCTION
+  template <class CompletionRoutine>                                                                                           //
+  AFIO_REQUIRES(detail::is_invocable_r<void, CompletionRoutine, async_file_handle *, io_result<const_buffers_type> &>::value)  //
+  result<io_state_ptr> async_barrier(io_request<const_buffers_type> reqs, CompletionRoutine &&completion, bool wait_for_device = false, bool and_metadata = false, span<char> mem = {}) noexcept
+  {
+    AFIO_LOG_FUNCTION_CALL(this);
+    struct completion_handler : _erased_completion_handler
+    {
+      CompletionRoutine completion;
+      completion_handler(CompletionRoutine c)
+          : completion(std::move(c))
+      {
+      }
+      virtual size_t bytes() const noexcept override final { return sizeof(*this); }
+      virtual void move(_erased_completion_handler *_dest) override final
+      {
+        completion_handler *dest = (completion_handler *) _dest;
+        new(dest) completion_handler(std::move(*this));
+      }
+      virtual void operator()(_erased_io_state_type *state) override final { completion(state->parent, state->result.write); }
+      virtual void *address() noexcept override final { return &completion; }
+    } ch{std::forward<CompletionRoutine>(completion)};
+    operation_t operation;
+    if(wait_for_device && and_metadata)
+      operation = operation_t::fsync_sync;
+    else if(!wait_for_device && and_metadata)
+      operation = operation_t::fsync_async;
+    else if(wait_for_device && !and_metadata)
+      operation = operation_t::dsync_sync;
+    else if(!wait_for_device && !and_metadata)
+      operation = operation_t::dsync_async;
+    return _begin_io(mem, operation, reinterpret_cast<io_request<const_buffers_type> &>(reqs), std::move(ch));
+  }
+
   /*! \brief Schedule a read to occur asynchronously.
 
   \return Either an io_state_ptr to the i/o in progress, or an error code.
@@ -333,8 +401,8 @@ public:
   erased completion handler of unknown type and state per buffers input.
   */
   AFIO_MAKE_FREE_FUNCTION
-  template <class CompletionRoutine>                                                                                                  //
-  AFIO_REQUIRES({ std::declval<CompletionRoutine>()(&std::declval<async_file_handle>(), std::declval<io_result<buffers_type>>()); })  //
+  template <class CompletionRoutine>                                                                                     //
+  AFIO_REQUIRES(detail::is_invocable_r<void, CompletionRoutine, async_file_handle *, io_result<buffers_type> &>::value)  //
   result<io_state_ptr> async_read(io_request<buffers_type> reqs, CompletionRoutine &&completion, span<char> mem = {}) noexcept
   {
     AFIO_LOG_FUNCTION_CALL(this);
@@ -352,6 +420,7 @@ public:
         new(dest) completion_handler(std::move(*this));
       }
       virtual void operator()(_erased_io_state_type *state) override final { completion(state->parent, state->result.read); }
+      virtual void *address() noexcept override final { return &completion; }
     } ch{std::forward<CompletionRoutine>(completion)};
     return _begin_io(mem, operation_t::read, reinterpret_cast<io_request<const_buffers_type> &>(reqs), std::move(ch));
   }
@@ -368,8 +437,8 @@ public:
   erased completion handler of unknown type and state per buffers input.
   */
   AFIO_MAKE_FREE_FUNCTION
-  template <class CompletionRoutine>                                                                                                        //
-  AFIO_REQUIRES({ std::declval<CompletionRoutine>()(&std::declval<async_file_handle>(), std::declval<io_result<const_buffers_type>>()); })  //
+  template <class CompletionRoutine>                                                                                           //
+  AFIO_REQUIRES(detail::is_invocable_r<void, CompletionRoutine, async_file_handle *, io_result<const_buffers_type> &>::value)  //
   result<io_state_ptr> async_write(io_request<const_buffers_type> reqs, CompletionRoutine &&completion, span<char> mem = {}) noexcept
   {
     AFIO_LOG_FUNCTION_CALL(this);
@@ -387,6 +456,7 @@ public:
         new(dest) completion_handler(std::move(*this));
       }
       virtual void operator()(_erased_io_state_type *state) override final { completion(state->parent, state->result.write); }
+      virtual void *address() noexcept override final { return &completion; }
     } ch{std::forward<CompletionRoutine>(completion)};
     return _begin_io(mem, operation_t::write, reqs, std::move(ch));
   }
@@ -421,20 +491,22 @@ public:
   template <class BuffersType> class awaitable
   {
     friend class async_file_handle;
-    io_state_ptr<awaitable_state<BuffersType>, BuffersType> _state;
+    io_state_ptr _state;
+    awaitable_state<BuffersType> *_astate;
 
-    awaitable(io_state_ptr<awaitable_state<BuffersType>, BuffersType> state)
+    awaitable(io_state_ptr state)
         : _state(std::move(state))
+        , _astate((awaitable_state<BuffersType> *) _state->erased_completion_handler()->address())
     {
     }
 
   public:
     //! Called by `co_await` to determine whether to suspend the coroutine.
-    bool await_ready() { return _state->completion._result.has_value(); }
+    bool await_ready() { return _astate->_result.has_value(); }
     //! Called by `co_await` to suspend the coroutine.
-    void await_suspend(coroutine_handle<> co) { _state->completion._suspended = co; }
+    void await_suspend(coroutine_handle<> co) { _astate->_suspended = co; }
     //! Called by `co_await` after resuming the coroutine to return a value.
-    io_result<BuffersType> await_resume() { return std::move(*_state->completion._result); }
+    io_result<BuffersType> await_resume() { return std::move(*_astate->_result); }
   };
 
 public:
