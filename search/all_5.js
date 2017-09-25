@@ -11,8 +11,6 @@ var searchData=
   ['enumerate',['enumerate',['../classafio__v2__xxx_1_1directory__handle.html#ac4b90958be1b1b620a6768de52407935',1,'afio_v2_xxx::directory_handle::enumerate()'],['../namespaceafio__v2__xxx.html#a275b97722fe32f3946d8b23206ffb8da',1,'afio_v2_xxx::enumerate()']]],
   ['enumerate_5finfo',['enumerate_info',['../structafio__v2__xxx_1_1directory__handle_1_1enumerate__info.html',1,'afio_v2_xxx::directory_handle']]],
   ['environment',['environment',['../structafio__v2__xxx_1_1path__discovery_1_1discovered__path.html#a1deccea0a3ad1c3a5a2688a1a3cc118cae900e40bc91d3f9f7f0a99fed68a2e96',1,'afio_v2_xxx::path_discovery::discovered_path']]],
-  ['erase',['erase',['../classafio__v2__xxx_1_1async__file__handle.html#a1428856327cac59c1797ebef7f898cd0',1,'afio_v2_xxx::async_file_handle']]],
-  ['erased_5fio_5fstate_5fptr',['erased_io_state_ptr',['../classafio__v2__xxx_1_1async__file__handle.html#a78ad3cca36cdd444a459b5f63d413c19',1,'afio_v2_xxx::async_file_handle']]],
   ['error_5fcode',['error_code',['../structafio__v2__xxx_1_1error__code.html',1,'afio_v2_xxx']]],
   ['exclusive',['exclusive',['../structafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex_1_1entity__type.html#aebf91f90fd55b749c3739978dd3ae20c',1,'afio_v2_xxx::algorithm::shared_fs_mutex::shared_fs_mutex::entity_type']]],
   ['executable',['executable',['../structafio__v2__xxx_1_1section__handle_1_1flag__base.html#a5b790e66402ef3a07ce9464f3e1dc9d8ac4d63015efddf12ccdb30242e135f35c',1,'afio_v2_xxx::section_handle::flag_base']]],
