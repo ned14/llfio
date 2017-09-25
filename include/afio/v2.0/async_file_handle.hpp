@@ -377,10 +377,8 @@ public:
       virtual void operator()(_erased_io_state_type *state) override final { completion(state->parent, state->result.write); }
       virtual void *address() noexcept override final { return &completion; }
     } ch{std::forward<CompletionRoutine>(completion)};
-    operation_t operation;
-    if(wait_for_device && and_metadata)
-      operation = operation_t::fsync_sync;
-    else if(!wait_for_device && and_metadata)
+    operation_t operation = operation_t::fsync_sync;
+    if(!wait_for_device && and_metadata)
       operation = operation_t::fsync_async;
     else if(wait_for_device && !and_metadata)
       operation = operation_t::dsync_sync;
@@ -422,7 +420,7 @@ public:
       virtual void operator()(_erased_io_state_type *state) override final { completion(state->parent, state->result.read); }
       virtual void *address() noexcept override final { return &completion; }
     } ch{std::forward<CompletionRoutine>(completion)};
-    return _begin_io(mem, operation_t::read, reinterpret_cast<io_request<const_buffers_type> &>(reqs), std::move(ch));
+    return _begin_io(mem, operation_t::read, io_request<const_buffers_type>({(const_buffer_type *) reqs.buffers.data(), reqs.buffers.size()}, reqs.offset), std::move(ch));
   }
 
   /*! \brief Schedule a write to occur asynchronously.

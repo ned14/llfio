@@ -36,7 +36,7 @@ static inline void TestAsyncFileHandle()
   futures.reserve(1024);
   h.truncate(1024 * 4096).value();
   alignas(4096) char buffer[4096];
-  memset(buffer, (int) ('0'), 4096);
+  memset(buffer, 78, 4096);
   afio::async_file_handle::const_buffer_type bt{buffer, sizeof(buffer)};
   for(size_t n = 0; n < 1024; n++)
   {
@@ -44,9 +44,10 @@ static inline void TestAsyncFileHandle()
     auto f(p.get_future());
     auto g(h
            .async_write({bt, n * 4096}, [ p = std::move(p), n ](afio::async_file_handle *, afio::async_file_handle::io_result<afio::async_file_handle::const_buffers_type> & result) mutable {
+             (void) n;
              try
              {
-               p.set_value(std::move(result).value());
+               p.set_value(result.value());
                // std::cout << "Written block " << n << " successfully" << std::endl;
              }
              catch(...)
@@ -60,7 +61,8 @@ static inline void TestAsyncFileHandle()
   }
   // Pump the i/o until no more work remains.
   while(service.run().value())
-    ;
+  {
+  }
   // Make sure nothing went wrong by fetching the futures.
   for(auto &i : futures)
   {

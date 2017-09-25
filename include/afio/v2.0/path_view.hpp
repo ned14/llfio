@@ -38,7 +38,7 @@ AFIO_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace detail
 {
-#if !_HAS_CXX17 && __cplusplus < 201700
+#if(!_HAS_CXX17 && __cplusplus < 201700) || (defined(__GLIBCXX__) && __GLIBCXX__ <= 20170818)  // libstdc++'s char_traits is missing constexpr
   template <class T> constexpr size_t constexpr_strlen(const T *s) noexcept
   {
     const T *e = s;
@@ -193,7 +193,7 @@ public:
   path_view(const std::string &v) noexcept : _state(v) {}
   //! Implicitly constructs a UTF-8 path view from a zero terminated `const char *`. The input string MUST continue to exist for this view to be valid.
   constexpr path_view(const char *v) noexcept :
-#if !_HAS_CXX17 && __cplusplus < 201700
+#if(!_HAS_CXX17 && __cplusplus < 201700) || (defined(__GLIBCXX__) && __GLIBCXX__ <= 20170818)  // libstdc++'s char_traits is missing constexpr
   _state(string_view(v, detail::constexpr_strlen(v)))
 #else
   _state(string_view(v))
