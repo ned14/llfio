@@ -94,23 +94,31 @@ static inline void TestPostSelfToRunCoroutines()
   afio::io_service service;
   std::atomic<bool> ready(false);
   auto runthreadid = QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id();
-  auto coroutine = [&]() -> std::future<void> {
-    auto thisthreadid = QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id();
-    BOOST_CHECK(thisthreadid != runthreadid);
-    ready = true;
-    co_await afio::io_service::awaitable_post_to_self(service);
-    thisthreadid = QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id();
-    BOOST_CHECK(thisthreadid == runthreadid);
+  auto coroutinethread = [&]() -> void {
+    auto coroutine = [&]() -> std::future<void> {
+      auto thisthreadid = QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id();
+      BOOST_CHECK(thisthreadid != runthreadid);
+      ready = true;
+      co_await afio::io_service::awaitable_post_to_self(service);
+      thisthreadid = QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id();
+      BOOST_CHECK(thisthreadid == runthreadid);
+      // std::cout << "Coroutine exiting" << std::endl;
+      ready = false;
+    };
+    // std::cout << "Thread waiting on coroutine" << std::endl;
+    coroutine().get();
+    // std::cout << "Thread exiting" << std::endl;
   };
-  auto asynch = std::async(std::launch::async, coroutine);
+  auto asynch = std::async(std::launch::async, coroutinethread);
   while(!ready)
   {
     std::this_thread::yield();
   }
-  while(!service.run())
-    ;
-  auto r = asynch.get();
-  r.get();
+  while(ready)
+  {
+    service.run().value();
+  }
+  asynch.get();
 #endif
 }
 
