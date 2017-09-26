@@ -17,7 +17,7 @@ ctest_build(TARGET _dl)
 ctest_build(TARGET _sl)
 ctest_test(RETURN_VALUE retval EXCLUDE "afio_hl|shared_fs_mutex")
 if(WIN32)
-  if(EXISTS prebuilt/bin/Release/afio_dl-2.0-Windows-x64-Release.dll)
+  if(EXISTS "prebuilt/bin/Release/afio_dl-2.0-Windows-x64-Release.dll")
     checked_execute_process("Tarring up binaries"
       COMMAND "${CMAKE_COMMAND}" -E make_directory afio/prebuilt/bin/Release
       COMMAND "${CMAKE_COMMAND}" -E make_directory afio/prebuilt/lib/Release
@@ -33,7 +33,7 @@ if(WIN32)
     get_filename_component(toupload afio_v2_binaries_win64.tar.gz ABSOLUTE)
   endif()
 else()
-  if(EXISTS prebuilt/lib/libafio_dl-2.0-Linux-x86_64-Release.so)
+  if(EXISTS "prebuilt/lib/libafio_dl-2.0-Linux-x86_64-Release.so")
     checked_execute_process("Tarring up binaries"
       COMMAND mkdir afio
       COMMAND cp -a doc afio/
@@ -47,8 +47,8 @@ else()
     get_filename_component(toupload afio_v2_binaries_linux64.tgz ABSOLUTE)
   endif()
 endif()
-if($ENV{CXX} MATCHES "clang" OR $ENV{CXX} MATCHES "g++")
-  if($ENV{CXX} MATCHES "clang")
+if("$ENV{CXX}" MATCHES "clang" OR "$ENV{CXX}" MATCHES "g++")
+  if("$ENV{CXX}" MATCHES "clang")
     ctest_build(TARGET _sl-asan)
     set(CTEST_CONFIGURATION_TYPE "asan")
     ctest_test(RETURN_VALUE retval2 INCLUDE "afio_sl" EXCLUDE "shared_fs_mutex")
