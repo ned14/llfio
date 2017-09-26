@@ -23,14 +23,14 @@ if(WIN32)
       COMMAND "${CMAKE_COMMAND}" -E make_directory afio/prebuilt/lib/Release
       COMMAND xcopy doc afio\\doc\\ /s
       COMMAND xcopy include afio\\include\\ /s
-      COMMAND "${CMAKE_COMMAND}" -E copy Readme.md afio/
-      COMMAND "${CMAKE_COMMAND}" -E copy release_notes.md afio/
-      COMMAND "${CMAKE_COMMAND}" -E copy prebuilt/lib/Release/afio_sl-2.0-Windows-x64-Release.lib afio/prebuilt/lib/Release/
-      COMMAND "${CMAKE_COMMAND}" -E copy prebuilt/lib/Release/ntkernel-error-category_sl.lib afio/prebuilt/lib/Release/
-      COMMAND "${CMAKE_COMMAND}" -E copy prebuilt/lib/Release/afio_dl-2.0-Windows-x64-Release.lib afio/prebuilt/lib/Release/
-      COMMAND "${CMAKE_COMMAND}" -E copy prebuilt/lib/Release/ntkernel-error-category_dl.lib afio/prebuilt/lib/Release/
-      COMMAND "${CMAKE_COMMAND}" -E copy prebuilt/bin/Release/afio_dl-2.0-Windows-x64-Release.dll afio/prebuilt/bin/Release/
-      COMMAND "${CMAKE_COMMAND}" -E copy prebuilt/bin/Release/ntkernel-error-category_dl.dll afio/prebuilt/bin/Release/
+      COMMAND xcopy Readme.md afio\\
+      COMMAND xcopy release_notes.md afio\\
+      COMMAND xcopy prebuilt\\lib\\Release\\afio_sl-2.0-Windows-x64-Release.lib afio\\prebuilt\\lib\\Release\\
+      COMMAND xcopy prebuilt\\lib\\Release\\ntkernel-error-category_sl.lib afio\\prebuilt\\lib\\Release\\
+      COMMAND xcopy prebuilt\\lib\\Release\\afio_dl-2.0-Windows-x64-Release.lib afio\\prebuilt\\lib\\Release\\
+      COMMAND xcopy prebuilt\\lib\\Release\\ntkernel-error-category_dl.lib afio\\prebuilt\\lib\\Release\\
+      COMMAND xcopy prebuilt\\bin\\Release\\afio_dl-2.0-Windows-x64-Release.dll afio\\prebuilt\\bin\\Release\\
+      COMMAND xcopy prebuilt\\bin\\Release\\ntkernel-error-category_dl.dll afio\\prebuilt\\bin\\Release\\
       COMMAND "${CMAKE_COMMAND}" -E tar cfz afio-v2.0-binaries-win64.tar.gz afio
     )
     get_filename_component(toupload afio-v2.0-binaries-win64.tar.gz ABSOLUTE)
