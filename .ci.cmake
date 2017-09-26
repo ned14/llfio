@@ -26,11 +26,14 @@ if(WIN32)
       COMMAND "${CMAKE_COMMAND}" -E copy Readme.md afio/
       COMMAND "${CMAKE_COMMAND}" -E copy release_notes.md afio/
       COMMAND "${CMAKE_COMMAND}" -E copy prebuilt/lib/Release/afio_sl-2.0-Windows-x64-Release.lib afio/prebuilt/lib/Release/
+      COMMAND "${CMAKE_COMMAND}" -E copy prebuilt/lib/Release/ntkernel-error-category_sl.lib afio/prebuilt/lib/Release/
       COMMAND "${CMAKE_COMMAND}" -E copy prebuilt/lib/Release/afio_dl-2.0-Windows-x64-Release.lib afio/prebuilt/lib/Release/
+      COMMAND "${CMAKE_COMMAND}" -E copy prebuilt/lib/Release/ntkernel-error-category_dl.lib afio/prebuilt/lib/Release/
       COMMAND "${CMAKE_COMMAND}" -E copy prebuilt/bin/Release/afio_dl-2.0-Windows-x64-Release.dll afio/prebuilt/bin/Release/
-      COMMAND "${CMAKE_COMMAND}" -E tar cfz afio_v2_binaries_win64.tar.gz afio
+      COMMAND "${CMAKE_COMMAND}" -E copy prebuilt/bin/Release/ntkernel-error-category_dl.dll afio/prebuilt/bin/Release/
+      COMMAND "${CMAKE_COMMAND}" -E tar cfz afio-v2.0-binaries-win64.tar.gz afio
     )
-    get_filename_component(toupload afio_v2_binaries_win64.tar.gz ABSOLUTE)
+    get_filename_component(toupload afio-v2.0-binaries-win64.tar.gz ABSOLUTE)
   endif()
 else()
   if(EXISTS "prebuilt/lib/libafio_dl-2.0-Linux-x86_64-Release.so")
@@ -42,9 +45,9 @@ else()
       COMMAND cp -a release_notes.md afio/
       COMMAND cp -a --parents prebuilt/lib/libafio_sl-2.0-Linux-x86_64-Release.a afio/
       COMMAND cp -a --parents prebuilt/lib/libafio_dl-2.0-Linux-x86_64-Release.so afio/
-      COMMAND "${CMAKE_COMMAND}" -E tar cfz afio_v2_binaries_linux64.tgz afio
+      COMMAND "${CMAKE_COMMAND}" -E tar cfz afio-v2.0-binaries-linux64.tgz afio
     )
-    get_filename_component(toupload afio_v2_binaries_linux64.tgz ABSOLUTE)
+    get_filename_component(toupload afio-v2.0-binaries-linux64.tgz ABSOLUTE)
   endif()
 endif()
 if(("$ENV{CXX}" MATCHES "clang") OR ("$ENV{CXX}" MATCHES "g\\+\\+"))
