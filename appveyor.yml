@@ -33,9 +33,7 @@ after_test:
 on_success:
 on_failure:
 on_finish:
-  - dir prebuilt\bin\Release
-  - dir prebuilt\lib\Release
-  - echo %date%
+  - dir afio
   - set "NEWNAME=afio-v2.0-binaries-win64-%date:~10,4%%date:~4,2%%date:~7,2%%time:~0,2%%time:~3,2%.zip"
   - echo %NEWNAME%
   - rename afio-v2.0-binaries-win64.zip "%NEWNAME"

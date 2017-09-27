@@ -21,8 +21,8 @@ if(WIN32)
     checked_execute_process("Tarring up binaries 1"
       COMMAND "${CMAKE_COMMAND}" -E make_directory afio/prebuilt/bin/Release
       COMMAND "${CMAKE_COMMAND}" -E make_directory afio/prebuilt/lib/Release
-      COMMAND xcopy "doc" "afio\\doc\\" /s
-      COMMAND xcopy "include" "afio\\include\\" /s
+      COMMAND xcopy "doc" "afio\\doc\\" /s /q
+      COMMAND xcopy "include" "afio\\include\\" /s /q
     )
     checked_execute_process("Tarring up binaries 2"
       COMMAND copy "Readme.md" "afio\\"
