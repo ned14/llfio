@@ -24,8 +24,10 @@ if(WIN32)
       COMMAND xcopy doc afio\\doc\\ /s /q
       COMMAND xcopy include afio\\include\\ /s /q
     )
-    checked_execute_process("Tarring up binaries 2"
+    checked_execute_process("Tarring up binaries 2a"
       COMMAND copy Readme.md afio\\
+    )
+    checked_execute_process("Tarring up binaries 2b"
       COMMAND copy release_notes.md afio\\
     )
     checked_execute_process("Tarring up binaries 3"
