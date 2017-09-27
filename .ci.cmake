@@ -21,8 +21,8 @@ if(WIN32)
     checked_execute_process("Tarring up binaries 1"
       COMMAND "${CMAKE_COMMAND}" -E make_directory afio/prebuilt/bin/Release
       COMMAND "${CMAKE_COMMAND}" -E make_directory afio/prebuilt/lib/Release
-      COMMAND xcopy doc afio\\doc\\ /s
-      COMMAND xcopy include afio\\include\\ /s
+      COMMAND xcopy doc afio\\doc\\ /s /q
+      COMMAND xcopy include afio\\include\\ /s /q
     )
     checked_execute_process("Tarring up binaries 2"
       COMMAND "${CMAKE_COMMAND}" -E copy Readme.md afio/
@@ -41,7 +41,7 @@ if(WIN32)
       COMMAND "${CMAKE_COMMAND}" -E copy prebuilt/bin/Release/ntkernel-error-category_dl.dll afio/prebuilt/bin/Release/
     )
     checked_execute_process("Tarring up binaries final"
-      COMMAND 7za a -tzip afio-v2.0-binaries-win64.zip afio\\
+      COMMAND 7z a -tzip afio-v2.0-binaries-win64.zip afio\\
     )
     get_filename_component(toupload afio-v2.0-binaries-win64.zip ABSOLUTE)
   endif()
