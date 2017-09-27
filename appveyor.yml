@@ -36,8 +36,8 @@ on_finish:
   - dir prebuilt\bin\Release
   - dir prebuilt\lib\Release
   - echo %date%
-  - set "NEWNAME=afio-v2.0-binaries-win64-%date:~10,4%%date:~4,2%%date:~7,2%%time:~0,2%%time:~3,2%.tar.gz"
+  - set "NEWNAME=afio-v2.0-binaries-win64-%date:~10,4%%date:~4,2%%date:~7,2%%time:~0,2%%time:~3,2%.zip"
   - echo %NEWNAME%
-  - rename afio-v2.0-binaries-win64.tar.gz "%NEWNAME"
+  - rename afio-v2.0-binaries-win64.zip "%NEWNAME"
   - curl -T "%NEWNAME%" -u jenkins-nedprod:%JENKINS_NEDPROD_PASSWORD% https://dedi4.nedprod.com/static/files/upload/
   - ps: (new-object net.webclient).UploadFile("https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path prebuilt\merged_junit_results.xml))

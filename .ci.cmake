@@ -18,22 +18,26 @@ ctest_build(TARGET _sl)
 ctest_test(RETURN_VALUE retval EXCLUDE "afio_hl|shared_fs_mutex")
 if(WIN32)
   if(EXISTS "prebuilt/bin/Release/afio_dl-2.0-Windows-x64-Release.dll")
-    checked_execute_process("Tarring up binaries"
+    checked_execute_process("Tarring up binaries 1"
       COMMAND "${CMAKE_COMMAND}" -E make_directory afio/prebuilt/bin/Release
       COMMAND "${CMAKE_COMMAND}" -E make_directory afio/prebuilt/lib/Release
       COMMAND xcopy "doc" "afio\\doc\\" /s
       COMMAND xcopy "include" "afio\\include\\" /s
       COMMAND xcopy "Readme.md" "afio\\"
       COMMAND xcopy "release_notes.md" "afio\\"
+    )
+    checked_execute_process("Tarring up binaries 2"
       COMMAND xcopy "prebuilt\\lib\\Release\\afio_sl-2.0-Windows-x64-Release.lib" "afio\\prebuilt\\lib\\Release\\"
       COMMAND xcopy "prebuilt\\lib\\Release\\ntkernel-error-category_sl.lib" "afio\\prebuilt\\lib\\Release\\"
       COMMAND xcopy "prebuilt\\lib\\Release\\afio_dl-2.0-Windows-x64-Release.lib" "afio\\prebuilt\\lib\\Release\\"
       COMMAND xcopy "prebuilt\\lib\\Release\\ntkernel-error-category_dl.lib" "afio\\prebuilt\\lib\\Release\\"
       COMMAND xcopy "prebuilt\\bin\\Release\\afio_dl-2.0-Windows-x64-Release.dll" "afio\\prebuilt\\bin\\Release\\"
       COMMAND xcopy "prebuilt\\bin\\Release\\ntkernel-error-category_dl.dll" "afio\\prebuilt\\bin\\Release\\"
-      COMMAND "${CMAKE_COMMAND}" -E tar cfz afio-v2.0-binaries-win64.tar.gz afio
     )
-    get_filename_component(toupload afio-v2.0-binaries-win64.tar.gz ABSOLUTE)
+    checked_execute_process("Tarring up binaries 3"
+      COMMAND 7za a -tzip afio-v2.0-binaries-win64.zip afio\
+    )
+    get_filename_component(toupload afio-v2.0-binaries-win64.zip ABSOLUTE)
   endif()
 else()
   if(EXISTS "prebuilt/lib/libafio_dl-2.0-Linux-x86_64-Release.so")
