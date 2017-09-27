@@ -8,7 +8,7 @@ os:
  - linux
 branches:
   only:
-    - master
+    - develop
 notifications:
   email:
     recipients:
@@ -64,7 +64,7 @@ before_install:
       fi;
       export PATH="$PWD/doxygen-$DOXYGEN_VERSION/bin:$PATH";
     fi
- - git checkout master
+ - git checkout develop
  - git submodule update --init --recursive
  - mount
 

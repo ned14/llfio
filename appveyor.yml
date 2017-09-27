@@ -5,6 +5,7 @@ version: 2.00.{build}-{branch}
 branches:
   # blacklist
   except:
+    - master
     - gh-pages
 skip_tags: true
  
@@ -20,7 +21,7 @@ environment:
     secure: 9Bx/dfr0ne9DTgnezRILRuOrPOZ71pVuzWBAscR9vTG9n42gIvNhYVCaCnr6FMa/
 
 before_build:
-  - git checkout master
+  - git checkout develop
   - git submodule update --init --recursive
 build_script:
   - ctest -S .ci.cmake -V --timeout 300
@@ -31,10 +32,10 @@ test_script:
 after_test:
 
 on_success:
-on_failure:
-on_finish:
 #  - set "NEWNAME=afio-v2.0-binaries-win64-%date:~10,4%%date:~4,2%%date:~7,2%%time:~0,2%%time:~3,2%.zip"
   - set "NEWNAME=afio-v2.0-binaries-win64-%APPVEYOR_REPO_COMMIT%.zip"
   - rename afio-v2.0-binaries-win64.zip %NEWNAME%
   - curl -T %NEWNAME% -u jenkins-nedprod:%JENKINS_NEDPROD_PASSWORD% https://dedi4.nedprod.com/static/files/upload/
+on_failure:
+on_finish:
   - ps: (new-object net.webclient).UploadFile("https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path prebuilt\merged_junit_results.xml))
