@@ -35,7 +35,7 @@ if(WIN32)
       COMMAND xcopy "prebuilt\\bin\\Release\\ntkernel-error-category_dl.dll" "afio\\prebuilt\\bin\\Release\\"
     )
     checked_execute_process("Tarring up binaries 3"
-      COMMAND 7za a -tzip afio-v2.0-binaries-win64.zip afio\
+      COMMAND 7za a -tzip afio-v2.0-binaries-win64.zip afio\\
     )
     get_filename_component(toupload afio-v2.0-binaries-win64.zip ABSOLUTE)
   endif()
