@@ -34,11 +34,13 @@ if(WIN32)
       COMMAND xcopy prebuilt\\lib\\Release\\afio_sl-2.0-Windows-x64-Release.lib afio\\prebuilt\\lib\\Release\\
       COMMAND xcopy prebuilt\\lib\\Release\\ntkernel-error-category_sl.lib afio\\prebuilt\\lib\\Release\\
       COMMAND xcopy prebuilt\\lib\\Release\\afio_dl-2.0-Windows-x64-Release.lib afio\\prebuilt\\lib\\Release\\
+    )
+    checked_execute_process("Tarring up binaries 4"
       COMMAND xcopy prebuilt\\lib\\Release\\ntkernel-error-category_dl.lib afio\\prebuilt\\lib\\Release\\
       COMMAND xcopy prebuilt\\bin\\Release\\afio_dl-2.0-Windows-x64-Release.dll afio\\prebuilt\\bin\\Release\\
       COMMAND xcopy prebuilt\\bin\\Release\\ntkernel-error-category_dl.dll afio\\prebuilt\\bin\\Release\\
     )
-    checked_execute_process("Tarring up binaries 4"
+    checked_execute_process("Tarring up binaries final"
       COMMAND 7za a -tzip afio-v2.0-binaries-win64.zip afio\\
     )
     get_filename_component(toupload afio-v2.0-binaries-win64.zip ABSOLUTE)
