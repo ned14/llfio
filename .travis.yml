@@ -27,12 +27,14 @@ addons:
     - cmake
     - cmake-data
 
-secure: "A3TeWTlJdjUaQ31NF60kMOik8mzaJkdKA55jZXjN83BJ2ZjMDmWfq1XmZ7iDIxmn7HC2BVpjhdkj9jpRtPztb08L5VSlJIiVbXlBWNwgzmYANujpR9rA+bhZJwlKDaYQHUZUd4+iGHCHb0dLt2HG0eHF5azaifd0YqCfz5GcWl8="
 
 env:
- - __="cmake tests" NAME=TravisLinuxWorker
- - __="Documentation" NAME=TravisDocumentation
- - __="Programs"
+  global:
+    - secure: "A3TeWTlJdjUaQ31NF60kMOik8mzaJkdKA55jZXjN83BJ2ZjMDmWfq1XmZ7iDIxmn7HC2BVpjhdkj9jpRtPztb08L5VSlJIiVbXlBWNwgzmYANujpR9rA+bhZJwlKDaYQHUZUd4+iGHCHb0dLt2HG0eHF5azaifd0YqCfz5GcWl8="
+  matrix:
+    - __="cmake tests" NAME=TravisLinuxWorker
+    - __="Documentation" NAME=TravisDocumentation
+    - __="Programs"
  
 matrix:
   exclude:
