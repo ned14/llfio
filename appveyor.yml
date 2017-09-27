@@ -21,7 +21,7 @@ environment:
     secure: 9Bx/dfr0ne9DTgnezRILRuOrPOZ71pVuzWBAscR9vTG9n42gIvNhYVCaCnr6FMa/
 
 before_build:
-  - git checkout master
+  - git checkout develop
   - git submodule update --init --recursive
 build_script:
   - ctest -S .ci.cmake -V --timeout 300
