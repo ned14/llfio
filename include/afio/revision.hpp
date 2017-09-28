@@ -1,4 +1,4 @@
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define AFIO_PREVIOUS_COMMIT_REF    1779774d41e668be7c3dd9ee0d1a24fc3e1e9bdf
-#define AFIO_PREVIOUS_COMMIT_DATE   "2017-09-27 00:36:27 +00:00"
-#define AFIO_PREVIOUS_COMMIT_UNIQUE 1779774d
+#define AFIO_PREVIOUS_COMMIT_REF    a47da2269dd1efb8b6e301ae3a808df7bb5c0e34
+#define AFIO_PREVIOUS_COMMIT_DATE   "2017-09-27 17:44:26 +00:00"
+#define AFIO_PREVIOUS_COMMIT_UNIQUE a47da226
