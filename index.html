@@ -265,12 +265,16 @@ mapped_file_handle - adds low latency memory mapped scatter-gather i/o</li>
 <tr>
 <td></td><td></td><td></td><td>BSD and OS X kqueues optimised <code>io_service</code> </td></tr>
 </table>
-<p>Todo thereafter:</p>
+<p>Todo thereafter in order of priority:</p>
 <table class="doxtable">
 <tr>
 <th>NEW in v2 </th><th>Windows </th><th>POSIX </th><th></th></tr>
 <tr>
-<td>✔ </td><td></td><td></td><td>Extended attributes support. </td></tr>
+<td>✔ </td><td></td><td></td><td><code>std::pmr::memory_resource</code> adapting a file backing. </td></tr>
+<tr>
+<td>✔ </td><td></td><td></td><td><code>afio::algorithm::vector&lt;T&gt;</code> with constant time reallocation if <code>T</code> is trivially copyable. </td></tr>
+<tr>
+<td>✔ </td><td></td><td></td><td>Some algorithm primitive for intelligently resizing a typed view or vector. </td></tr>
 <tr>
 <td>✔ </td><td></td><td></td><td>Linux KAIO support for native non-blocking <code>O_DIRECT</code> i/o </td></tr>
 <tr>
@@ -279,6 +283,8 @@ mapped_file_handle - adds low latency memory mapped scatter-gather i/o</li>
 <td>✔ </td><td></td><td></td><td>Reliable directory hierarchy copy algorithm. </td></tr>
 <tr>
 <td>✔ </td><td></td><td></td><td>Reliable directory hierarchy update (two and three way) algorithm. </td></tr>
+<tr>
+<td>✔ </td><td></td><td></td><td>Extended attributes support. </td></tr>
 <tr>
 <td>✔ </td><td></td><td></td><td>Algorithm to replace all duplicate content with hard links. </td></tr>
 <tr>
