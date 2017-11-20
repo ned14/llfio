@@ -183,15 +183,18 @@ Todo to reach feature parity with AFIO v1:
 |   |   |   | `symlink_handle`.
 |   |   |   | BSD and OS X kqueues optimised `io_service`
 
-Todo thereafter:
+Todo thereafter in order of priority:
 
 | NEW in v2 | Windows | POSIX |     |
 | --------- | --------| ----- | --- |
-| ✔ |   |   | Extended attributes support.
+| ✔ |   |   | `std::pmr::memory_resource` adapting a file backing.
+| ✔ |   |   | `afio::algorithm::vector<T>` with constant time reallocation if `T` is trivially copyable.
+| ✔ |   |   | Some algorithm primitive for intelligently resizing a typed view or vector.
 | ✔ |   |   | Linux KAIO support for native non-blocking `O_DIRECT` i/o
 | ✔ |   |   | Reliable directory hierarchy deletion algorithm.
 | ✔ |   |   | Reliable directory hierarchy copy algorithm.
 | ✔ |   |   | Reliable directory hierarchy update (two and three way) algorithm.
+| ✔ |   |   | Extended attributes support.
 | ✔ |   |   | Algorithm to replace all duplicate content with hard links.
 | ✔ |   |   | Algorithm to figure out all paths for a hard linked inode.
 | ✔ |   |   | Algorithm to compare two or three directory enumerations and give differences. Probably blocked on the Ranges TS.

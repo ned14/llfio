@@ -1,7 +1,7 @@
 ---
 Checks:          '*,-llvm-header-guard,-google-build-using-namespace,-clang-analyzer-alpha.clone.CloneChecker,-google-runtime-int,-cppcoreguidelines-pro-bounds-array-to-pointer-decay,-clang-analyzer-alpha.deadcode.UnreachableCode,-misc-use-after-move,-cppcoreguidelines-pro-type-vararg,-modernize-use-emplace,-cert-err60-cpp,-cppcoreguidelines-pro-type-union-access'
 WarningsAsErrors: ''
-HeaderFilterRegex: ''
+HeaderFilterRegex: '.*'
 AnalyzeTemporaryDtors: true
 CheckOptions:    
   - key:             cert-oop11-cpp.UseCERTSemantics
