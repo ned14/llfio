@@ -88,6 +88,10 @@ is named FS + device e.g.
 
 
 ### Algorithms library `AFIO_V2_NAMESPACE::algorithm` todo:
+- [ ] Add `vector<T>` which adapts a `mapped_view<T>`.
+- [ ] Add some primitive which intelligently copies/moves between views and vectors.
+Specifically, if resizing, if type is trivially copyable, skip memory copying during
+resize via remapping.
 - [ ] Add an intelligent on demand memory mapper:
   - Use one-two-three level page system, so 4Kb/2Mb/1Gb. Files under 2Mb need just
 one indirection.
