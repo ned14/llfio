@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['want_5fbase',['want_base',['../structafio__v2__xxx_1_1stat__t_1_1want__base.html',1,'afio_v2_xxx::stat_t::want_base'],['../structafio__v2__xxx_1_1statfs__t_1_1want__base.html',1,'afio_v2_xxx::statfs_t::want_base']]],
+  ['want_5fbase',['want_base',['../structafio__v2__xxx_1_1statfs__t_1_1want__base.html',1,'afio_v2_xxx::statfs_t::want_base'],['../structafio__v2__xxx_1_1stat__t_1_1want__base.html',1,'afio_v2_xxx::stat_t::want_base']]],
   ['win_5fdisable_5fsparse_5ffile_5fcreation',['win_disable_sparse_file_creation',['../structafio__v2__xxx_1_1handle_1_1flag__base.html#a51aaa32c78950cedbc1b7a61e1738d3eae448a705e5dc826a89900353c2601db4',1,'afio_v2_xxx::handle::flag_base']]],
   ['win_5fdisable_5funlink_5femulation',['win_disable_unlink_emulation',['../structafio__v2__xxx_1_1handle_1_1flag__base.html#a51aaa32c78950cedbc1b7a61e1738d3ea476a57854e60d134c425521a18099df1',1,'afio_v2_xxx::handle::flag_base']]],
   ['writable',['writable',['../structafio__v2__xxx_1_1native__handle__type_1_1disposition__base.html#a89e0e728fc7a7e4a008e57d572702de6acd0caaeed87841654e1b02e779ec248f',1,'afio_v2_xxx::native_handle_type::disposition_base']]],

@@ -1,5 +1,6 @@
 var NAVTREEINDEX2 =
 {
+"classafio__v2__xxx_1_1io__handle.html#a4194a05dd9694d2c47d5a45f925db1d7":[3,0,0,21,36],
 "classafio__v2__xxx_1_1io__handle.html#a4caf41149703af7e0029242ece843a49":[3,0,0,21,13],
 "classafio__v2__xxx_1_1io__handle.html#a4d9cbbb7aae98704c6ad97de080c4210":[3,0,0,21,42],
 "classafio__v2__xxx_1_1io__handle.html#a526c300d421155ccc071b04db4bca65d":[3,0,0,21,32],
@@ -248,6 +249,5 @@ var NAVTREEINDEX2 =
 "classafio__v2__xxx_1_1mapped__file__handle.html#af024e3d92d9a01ac367734e9cdc517fb":[3,0,0,25,87],
 "classafio__v2__xxx_1_1mapped__file__handle.html#af1610ec7fb0a41f039e3e17e0dc467ab":[3,0,0,25,70],
 "classafio__v2__xxx_1_1mapped__file__handle.html#af33b97dcd0a501da97baa39f44e418da":[3,0,0,25,67],
-"classafio__v2__xxx_1_1mapped__file__handle.html#af42904dd49b5517a303e7cb256eae939":[3,0,0,25,40],
-"classafio__v2__xxx_1_1mapped__file__handle.html#af645b1c8daf7b1ce9bf5ed50d1ee83a1":[3,0,0,25,62]
+"classafio__v2__xxx_1_1mapped__file__handle.html#af42904dd49b5517a303e7cb256eae939":[3,0,0,25,40]
 };

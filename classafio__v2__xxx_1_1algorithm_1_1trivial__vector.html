@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.13"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>AFIO: include/afio/v2.0/algorithm/section_allocator.hpp File Reference</title>
+<title>AFIO: afio_v2_xxx::algorithm::trivial_vector&lt; T &gt; Class Template Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -62,7 +62,7 @@ $(function() {
   </div>
 </div>
 <script type="text/javascript">
-$(document).ready(function(){initNavTree('section__allocator_8hpp.html','');});
+$(document).ready(function(){initNavTree('classafio__v2__xxx_1_1algorithm_1_1trivial__vector.html','');});
 </script>
 <div id="doc-content">
 <!-- window showing the filter options -->
@@ -80,37 +80,40 @@ $(document).ready(function(){initNavTree('section__allocator_8hpp.html','');});
 </div>
 
 <div class="header">
-  <div class="summary">
-<a href="#namespaces">Namespaces</a>  </div>
   <div class="headertitle">
-<div class="title">section_allocator.hpp File Reference</div>  </div>
+<div class="title">afio_v2_xxx::algorithm::trivial_vector&lt; T &gt; Class Template Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 
-<p>Provides section based STL allocators.  
-<a href="#details">More...</a></p>
-<div class="textblock"><code>#include &quot;<a class="el" href="map__handle_8hpp.html">../map_handle.hpp</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="utils_8hpp.html">../utils.hpp</a>&quot;</code><br />
-<code>#include &lt;memory&gt;</code><br />
-<code>#include &lt;type_traits&gt;</code><br />
-</div><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="namespaces"></a>
-Namespaces</h2></td></tr>
-<tr class="memitem:namespaceafio__v2__xxx"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx.html">afio_v2_xxx</a></td></tr>
-<tr class="memdesc:namespaceafio__v2__xxx"><td class="mdescLeft">&#160;</td><td class="mdescRight">The AFIO namespace. <br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:namespaceafio__v2__xxx_1_1algorithm"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx_1_1algorithm.html">afio_v2_xxx::algorithm</a></td></tr>
-<tr class="memdesc:namespaceafio__v2__xxx_1_1algorithm"><td class="mdescLeft">&#160;</td><td class="mdescRight">Collection of file system based algorithms. <br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table>
+<p>Provides a constant time capacity expanding move-only STL vector. Requires <code>T</code> to be trivially copyable.  
+ <a href="classafio__v2__xxx_1_1algorithm_1_1trivial__vector.html#details">More...</a></p>
+
+<p><code>#include &quot;trivial_vector.hpp&quot;</code></p>
+<div class="dynheader">
+Inheritance diagram for afio_v2_xxx::algorithm::trivial_vector&lt; T &gt;:</div>
+<div class="dyncontent">
+ <div class="center">
+  <img src="classafio__v2__xxx_1_1algorithm_1_1trivial__vector.png" usemap="#afio_5Fv2_5Fxxx::algorithm::trivial_5Fvector_3C_20T_20_3E_map" alt=""/>
+  <map id="afio_5Fv2_5Fxxx::algorithm::trivial_5Fvector_3C_20T_20_3E_map" name="afio_5Fv2_5Fxxx::algorithm::trivial_5Fvector_3C_20T_20_3E_map">
+</map>
+ </div></div>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Provides section based STL allocators. </p>
-</div></div><!-- contents -->
+<div class="textblock"><h3>template&lt;class T&gt;<br />
+class afio_v2_xxx::algorithm::trivial_vector&lt; T &gt;</h3>
+
+<p>Provides a constant time capacity expanding move-only STL vector. Requires <code>T</code> to be trivially copyable. </p>
+<p>Note that no STL allocator support is provided as <code>T</code> must be trivially copyable (for which most STL's simply use <code>memcpy()</code> anyway instead of the allocator's <code>construct</code>), and an internal <code>section_handle</code> is used for the storage in order to implement the constant time capacity resizing.</p>
+<p>We also disable the copy constructor, as copying an entire backing file is expensive. Use the iterator based copy constructor if you really want to copy one of these.</p>
+<p>The very first item stored reserves a capacity of <code>utils::page_size()/sizeof(T)</code>. Capacity is doubled in byte terms thereafter (i.e. 8Kb, 16Kb and so on). Also be aware that the capacity of the vector needs to become reasonably large before going to the kernel to resize the <code>section_handle</code> and remapping memory becomes faster than <code>memcpy</code>. For these reasons, this vector implementation is best suited to arrays of unknown in advance, but likely large, sizes. </p>
+</div><hr/>The documentation for this class was generated from the following file:<ul>
+<li>include/afio/v2.0/algorithm/trivial_vector.hpp</li>
+</ul>
+</div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="dir_d44c64559bbebec7f509842c48db8b23.html">include</a></li><li class="navelem"><a class="el" href="dir_4443eecac141a9c11b93921c40e6e530.html">afio</a></li><li class="navelem"><a class="el" href="dir_df838802a8d72797f186037846947269.html">v2.0</a></li><li class="navelem"><a class="el" href="dir_c7b3dfb2539fcbb9cef19e5f81ceb887.html">algorithm</a></li><li class="navelem"><a class="el" href="section__allocator_8hpp.html">section_allocator.hpp</a></li>
+    <li class="navelem"><a class="el" href="namespaceafio__v2__xxx.html">afio_v2_xxx</a></li><li class="navelem"><a class="el" href="namespaceafio__v2__xxx_1_1algorithm.html">algorithm</a></li><li class="navelem"><a class="el" href="classafio__v2__xxx_1_1algorithm_1_1trivial__vector.html">trivial_vector</a></li>
     <li class="footer">Generated by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.13 </li>

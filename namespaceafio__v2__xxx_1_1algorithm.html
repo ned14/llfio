@@ -106,6 +106,9 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1algorithm_1_1mapped__view.html">mapped_view</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Provides a typed mapped view of a <code>section_handle</code> suitable for feeding to STL algorithms or the Ranges TS by wrapping a <code>map_handle</code> into a <code>span&lt;T&gt;</code>.  <a href="classafio__v2__xxx_1_1algorithm_1_1mapped__view.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1algorithm_1_1trivial__vector.html">trivial_vector</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Provides a constant time capacity expanding move-only STL vector. Requires <code>T</code> to be trivially copyable.  <a href="classafio__v2__xxx_1_1algorithm_1_1trivial__vector.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
@@ -113,6 +116,41 @@ Functions</h2></td></tr>
 <tr class="memitem:a537a827c92150d83c1f392c7e8dd7a99"><td class="memTemplItemLeft" align="right" valign="top">result&lt; <a class="el" href="classafio__v2__xxx_1_1algorithm_1_1cached__parent__handle__adapter.html">cached_parent_handle_adapter</a>&lt; T &gt; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx_1_1algorithm.html#a537a827c92150d83c1f392c7e8dd7a99">cache_parent</a> (Args &amp;&amp;... args) noexcept</td></tr>
 <tr class="memdesc:a537a827c92150d83c1f392c7e8dd7a99"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs a <code>T</code> adapted into a parent handle caching implementation.  <a href="#a537a827c92150d83c1f392c7e8dd7a99">More...</a><br /></td></tr>
 <tr class="separator:a537a827c92150d83c1f392c7e8dd7a99"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6e88d5387907ae2419405d07e75a8711"><td class="memTemplParams" colspan="2"><a id="a6e88d5387907ae2419405d07e75a8711"></a>
+template&lt;class T &gt; </td></tr>
+<tr class="memitem:a6e88d5387907ae2419405d07e75a8711"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx_1_1algorithm.html#a6e88d5387907ae2419405d07e75a8711">operator==</a> (const <a class="el" href="classafio__v2__xxx_1_1algorithm_1_1trivial__vector.html">trivial_vector</a>&lt; T &gt; &amp;a, const <a class="el" href="classafio__v2__xxx_1_1algorithm_1_1trivial__vector.html">trivial_vector</a>&lt; T &gt; &amp;b)</td></tr>
+<tr class="memdesc:a6e88d5387907ae2419405d07e75a8711"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compare. <br /></td></tr>
+<tr class="separator:a6e88d5387907ae2419405d07e75a8711"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2fc33609da4eefad93bd5f488e347cf0"><td class="memTemplParams" colspan="2"><a id="a2fc33609da4eefad93bd5f488e347cf0"></a>
+template&lt;class T &gt; </td></tr>
+<tr class="memitem:a2fc33609da4eefad93bd5f488e347cf0"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx_1_1algorithm.html#a2fc33609da4eefad93bd5f488e347cf0">operator!=</a> (const <a class="el" href="classafio__v2__xxx_1_1algorithm_1_1trivial__vector.html">trivial_vector</a>&lt; T &gt; &amp;a, const <a class="el" href="classafio__v2__xxx_1_1algorithm_1_1trivial__vector.html">trivial_vector</a>&lt; T &gt; &amp;b)</td></tr>
+<tr class="memdesc:a2fc33609da4eefad93bd5f488e347cf0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compare. <br /></td></tr>
+<tr class="separator:a2fc33609da4eefad93bd5f488e347cf0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2aaefda2f3a9dd9753b82cc14959dd4b"><td class="memTemplParams" colspan="2"><a id="a2aaefda2f3a9dd9753b82cc14959dd4b"></a>
+template&lt;class T &gt; </td></tr>
+<tr class="memitem:a2aaefda2f3a9dd9753b82cc14959dd4b"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx_1_1algorithm.html#a2aaefda2f3a9dd9753b82cc14959dd4b">operator&lt;</a> (const <a class="el" href="classafio__v2__xxx_1_1algorithm_1_1trivial__vector.html">trivial_vector</a>&lt; T &gt; &amp;a, const <a class="el" href="classafio__v2__xxx_1_1algorithm_1_1trivial__vector.html">trivial_vector</a>&lt; T &gt; &amp;b)</td></tr>
+<tr class="memdesc:a2aaefda2f3a9dd9753b82cc14959dd4b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compare. <br /></td></tr>
+<tr class="separator:a2aaefda2f3a9dd9753b82cc14959dd4b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a47097f309c42e17b1f5e8bee62564821"><td class="memTemplParams" colspan="2"><a id="a47097f309c42e17b1f5e8bee62564821"></a>
+template&lt;class T &gt; </td></tr>
+<tr class="memitem:a47097f309c42e17b1f5e8bee62564821"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx_1_1algorithm.html#a47097f309c42e17b1f5e8bee62564821">operator&lt;=</a> (const <a class="el" href="classafio__v2__xxx_1_1algorithm_1_1trivial__vector.html">trivial_vector</a>&lt; T &gt; &amp;a, const <a class="el" href="classafio__v2__xxx_1_1algorithm_1_1trivial__vector.html">trivial_vector</a>&lt; T &gt; &amp;b)</td></tr>
+<tr class="memdesc:a47097f309c42e17b1f5e8bee62564821"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compare. <br /></td></tr>
+<tr class="separator:a47097f309c42e17b1f5e8bee62564821"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a08758484aa80b2d4ed6b22b38027ec11"><td class="memTemplParams" colspan="2"><a id="a08758484aa80b2d4ed6b22b38027ec11"></a>
+template&lt;class T &gt; </td></tr>
+<tr class="memitem:a08758484aa80b2d4ed6b22b38027ec11"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx_1_1algorithm.html#a08758484aa80b2d4ed6b22b38027ec11">operator&gt;</a> (const <a class="el" href="classafio__v2__xxx_1_1algorithm_1_1trivial__vector.html">trivial_vector</a>&lt; T &gt; &amp;a, const <a class="el" href="classafio__v2__xxx_1_1algorithm_1_1trivial__vector.html">trivial_vector</a>&lt; T &gt; &amp;b)</td></tr>
+<tr class="memdesc:a08758484aa80b2d4ed6b22b38027ec11"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compare. <br /></td></tr>
+<tr class="separator:a08758484aa80b2d4ed6b22b38027ec11"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a58672bf75e59c2a4e0f0e101007b9cfa"><td class="memTemplParams" colspan="2"><a id="a58672bf75e59c2a4e0f0e101007b9cfa"></a>
+template&lt;class T &gt; </td></tr>
+<tr class="memitem:a58672bf75e59c2a4e0f0e101007b9cfa"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx_1_1algorithm.html#a58672bf75e59c2a4e0f0e101007b9cfa">operator&gt;=</a> (const <a class="el" href="classafio__v2__xxx_1_1algorithm_1_1trivial__vector.html">trivial_vector</a>&lt; T &gt; &amp;a, const <a class="el" href="classafio__v2__xxx_1_1algorithm_1_1trivial__vector.html">trivial_vector</a>&lt; T &gt; &amp;b)</td></tr>
+<tr class="memdesc:a58672bf75e59c2a4e0f0e101007b9cfa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compare. <br /></td></tr>
+<tr class="separator:a58672bf75e59c2a4e0f0e101007b9cfa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac14fcd6542bf058d4c69fd2b4bf07a41"><td class="memTemplParams" colspan="2"><a id="ac14fcd6542bf058d4c69fd2b4bf07a41"></a>
+template&lt;class T &gt; </td></tr>
+<tr class="memitem:ac14fcd6542bf058d4c69fd2b4bf07a41"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx_1_1algorithm.html#ac14fcd6542bf058d4c69fd2b4bf07a41">swap</a> (<a class="el" href="classafio__v2__xxx_1_1algorithm_1_1trivial__vector.html">trivial_vector</a>&lt; T &gt; &amp;a, <a class="el" href="classafio__v2__xxx_1_1algorithm_1_1trivial__vector.html">trivial_vector</a>&lt; T &gt; &amp;b) noexcept</td></tr>
+<tr class="memdesc:ac14fcd6542bf058d4c69fd2b4bf07a41"><td class="mdescLeft">&#160;</td><td class="mdescRight">Swap. <br /></td></tr>
+<tr class="separator:ac14fcd6542bf058d4c69fd2b4bf07a41"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Collection of file system based algorithms. </p>
