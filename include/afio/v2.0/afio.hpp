@@ -65,11 +65,11 @@ import AFIO_MODULE_NAME;
 
 #include "algorithm/cached_parent_handle_adapter.hpp"
 #include "algorithm/mapped_view.hpp"
-#include "algorithm/section_allocator.hpp"
 #include "algorithm/shared_fs_mutex/atomic_append.hpp"
 #include "algorithm/shared_fs_mutex/byte_ranges.hpp"
 #include "algorithm/shared_fs_mutex/lock_files.hpp"
 #include "algorithm/shared_fs_mutex/memory_map.hpp"
 #include "algorithm/shared_fs_mutex/safe_byte_ranges.hpp"
+#include "algorithm/trivial_vector.hpp"
 
 #endif
