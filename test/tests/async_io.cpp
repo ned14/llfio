@@ -22,8 +22,7 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#include "../../include/afio/afio.hpp"
-#include "kerneltest/include/kerneltest.hpp"
+#include "../test_kernel_decl.hpp"
 
 #include <future>
 
@@ -67,7 +66,7 @@ static inline void TestAsyncFileHandle()
   for(auto &i : futures)
   {
     afio::async_file_handle::const_buffers_type out = i.first.get();
-    //std::cout << out.data()->len << std::endl;
+    // std::cout << out.data()->len << std::endl;
     BOOST_CHECK(out.data()->len == 4096);
   }
 }

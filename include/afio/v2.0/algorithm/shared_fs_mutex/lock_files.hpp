@@ -154,7 +154,7 @@ namespace algorithm
               if(ret.has_error())
               {
                 const auto &ec = ret.error();
-                if(ec.category() != std::generic_category() || (ec.value() != EAGAIN && ec.value() != EEXIST))
+                if(ec != std::errc::resource_unavailable_try_again && ec != std::errc::file_exists)
                   return ret.error();
                 // Collided with another locker
                 was_contended = n;

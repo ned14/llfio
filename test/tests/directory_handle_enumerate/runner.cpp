@@ -23,11 +23,11 @@ Distributed under the Boost Software License, Version 1.0.
 */
 
 #include "kernel_directory_handle_enumerate.cpp.hpp"
-#include "kerneltest/include/kerneltest.hpp"
 
 template <class U> inline void directory_handle_enumerate_(U &&f)
 {
   using namespace KERNELTEST_V1_NAMESPACE;
+  using AFIO_V2_NAMESPACE::result;
   using AFIO_V2_NAMESPACE::path_view;
   using AFIO_V2_NAMESPACE::directory_entry;
   using AFIO_V2_NAMESPACE::directory_handle;

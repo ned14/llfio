@@ -22,13 +22,13 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#include "kerneltest/include/kerneltest.hpp"
 #include "kernel_async_file_handle.cpp.hpp"
 #include "kernel_file_handle.cpp.hpp"
 
 template <class U> inline void file_handle_create_close_creation(U &&f)
 {
   using namespace KERNELTEST_V1_NAMESPACE;
+  using AFIO_V2_NAMESPACE::result;
   using file_handle = AFIO_V2_NAMESPACE::file_handle;
   static const result<void> no_such_file_or_directory = std::errc::no_such_file_or_directory;
   static const result<void> file_exists = std::errc::file_exists;

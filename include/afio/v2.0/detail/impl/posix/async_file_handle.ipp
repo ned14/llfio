@@ -88,7 +88,7 @@ template <class BuffersType, class IORoutine> result<async_file_handle::io_state
       if(result)
       {
         if(errcode)
-          result = error_code((int) errcode, std::system_category());
+          result = error_info((int) errcode, std::system_category());
         else
         {
 // Figure out which i/o I am and update the buffer in question

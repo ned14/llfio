@@ -9,7 +9,7 @@ Tarballs of source and prebuilt binaries for Linux x64 and Windows x64:
 
 
 ### Immediate todos in order of priority:
-- [ ] Implement new custom C++ exception synthesis support from Outcome.
+- [x] Implement new custom C++ exception synthesis support from Outcome.
 - [ ] Run clang-tidy fix pass, it's got a bit untidy recently.
 - [ ] `atomic_append` isn't actually being tested in shared_fs_mutex
 - [ ] Implement a non-toy ACID key-value BLOB store and send it to Boost for peer review.

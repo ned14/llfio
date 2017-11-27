@@ -23,11 +23,11 @@ Distributed under the Boost Software License, Version 1.0.
 */
 
 #include "kernel_directory_handle.cpp.hpp"
-#include "kerneltest/include/kerneltest.hpp"
 
 template <class U> inline void directory_handle_create_close_creation(U &&f)
 {
   using namespace KERNELTEST_V1_NAMESPACE;
+  using AFIO_V2_NAMESPACE::result;
   using directory_handle = AFIO_V2_NAMESPACE::directory_handle;
   static const result<void> no_such_file_or_directory = std::errc::no_such_file_or_directory;
   static const result<void> file_exists = std::errc::file_exists;

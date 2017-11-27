@@ -23,11 +23,11 @@ Distributed under the Boost Software License, Version 1.0.
 */
 
 #include "kernel_map_handle.cpp.hpp"
-#include "kerneltest/include/kerneltest.hpp"
 
 template <class U> inline void map_handle_create_close_(U &&f)
 {
   using namespace KERNELTEST_V1_NAMESPACE;
+  using AFIO_V2_NAMESPACE::result;
   using AFIO_V2_NAMESPACE::file_handle;
   using AFIO_V2_NAMESPACE::section_handle;
   using AFIO_V2_NAMESPACE::map_handle;

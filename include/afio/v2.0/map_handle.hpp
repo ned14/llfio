@@ -236,17 +236,14 @@ public:
   template <class T> using io_result = io_handle::io_result<T>;
 
 protected:
-  section_handle *_section;
-  char *_addr;
-  extent_type _offset;
-  size_type _length;
-  section_handle::flag _flag;
+  section_handle *_section{nullptr};
+  char *_addr{nullptr};
+  extent_type _offset{0};
+  size_type _length{0};
+  section_handle::flag _flag{section_handle::flag::none};
 
   explicit map_handle(section_handle *section)
       : _section(section)
-      , _addr(nullptr)
-      , _offset(0)
-      , _length(0)
       , _flag(section ? section->section_flags() : section_handle::flag::none)
   {
   }
@@ -255,11 +252,6 @@ public:
   //! Default constructor
   constexpr map_handle()
       : io_handle()
-      , _section(nullptr)
-      , _addr(nullptr)
-      , _offset(0)
-      , _length(0)
-      , _flag(section_handle::flag::none)
   {
   }
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC ~map_handle();
