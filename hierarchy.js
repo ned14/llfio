@@ -22,11 +22,12 @@ var hierarchy =
     [ "afio_v2_xxx::algorithm::shared_fs_mutex::shared_fs_mutex::entities_guard", "classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex_1_1entities__guard.html", null ],
     [ "afio_v2_xxx::algorithm::shared_fs_mutex::shared_fs_mutex::entity_type", "structafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex_1_1entity__type.html", null ],
     [ "afio_v2_xxx::directory_handle::enumerate_info", "structafio__v2__xxx_1_1directory__handle_1_1enumerate__info.html", null ],
-    [ "std::error_code", null, [
-      [ "afio_v2_xxx::error_code", "structafio__v2__xxx_1_1error__code.html", null ]
-    ] ],
+    [ "afio_v2_xxx::error_info", "structafio__v2__xxx_1_1error__info.html", null ],
     [ "afio_v2_xxx::io_handle::extent_guard", "classafio__v2__xxx_1_1io__handle_1_1extent__guard.html", null ],
     [ "afio_v2_xxx::statfs_t::f_flags_t", "structafio__v2__xxx_1_1statfs__t_1_1f__flags__t.html", null ],
+    [ "filesystem_error", null, [
+      [ "afio_v2_xxx::error", "classafio__v2__xxx_1_1error.html", null ]
+    ] ],
     [ "afio_v2_xxx::handle::flag_base", "structafio__v2__xxx_1_1handle_1_1flag__base.html", null ],
     [ "afio_v2_xxx::section_handle::flag_base", "structafio__v2__xxx_1_1section__handle_1_1flag__base.html", null ],
     [ "afio_v2_xxx::fs_handle", "classafio__v2__xxx_1_1fs__handle.html", [
@@ -63,8 +64,8 @@ var hierarchy =
     [ "afio_v2_xxx::utils::page_allocator< void >", "classafio__v2__xxx_1_1utils_1_1page__allocator_3_01void_01_4.html", null ],
     [ "afio_v2_xxx::path_hasher", "structafio__v2__xxx_1_1path__hasher.html", null ],
     [ "afio_v2_xxx::path_view", "classafio__v2__xxx_1_1path__view.html", null ],
-    [ "afio_v2_xxx::utils::page_allocator< void >::rebind< U >", "structafio__v2__xxx_1_1utils_1_1page__allocator_3_01void_01_4_1_1rebind.html", null ],
     [ "afio_v2_xxx::utils::page_allocator< T >::rebind< U >", "structafio__v2__xxx_1_1utils_1_1page__allocator_1_1rebind.html", null ],
+    [ "afio_v2_xxx::utils::page_allocator< void >::rebind< U >", "structafio__v2__xxx_1_1utils_1_1page__allocator_3_01void_01_4_1_1rebind.html", null ],
     [ "result", null, [
       [ "afio_v2_xxx::io_handle::io_result< T >", "structafio__v2__xxx_1_1io__handle_1_1io__result.html", null ],
       [ "afio_v2_xxx::io_handle::io_result< buffers_type >", "structafio__v2__xxx_1_1io__handle_1_1io__result.html", null ],

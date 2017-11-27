@@ -1,7 +1,8 @@
 var config_8hpp =
 [
     [ "path_hasher", "structafio__v2__xxx_1_1path__hasher.html", "structafio__v2__xxx_1_1path__hasher" ],
-    [ "error_code", "structafio__v2__xxx_1_1error__code.html", "structafio__v2__xxx_1_1error__code" ],
+    [ "error_info", "structafio__v2__xxx_1_1error__info.html", "structafio__v2__xxx_1_1error__info" ],
+    [ "error", "classafio__v2__xxx_1_1error.html", "classafio__v2__xxx_1_1error" ],
     [ "log_level_guard", "classafio__v2__xxx_1_1log__level__guard.html", "classafio__v2__xxx_1_1log__level__guard" ],
     [ "AFIO_DECL", "config_8hpp.html#a10535ba14c672e51779ac3d70b2e09d8", null ],
     [ "AFIO_GLUE", "config_8hpp.html#a84d91a729e5c9f99860fe8548bfbbb08", null ],
@@ -39,10 +40,15 @@ var config_8hpp =
     [ "dword", "config_8hpp.html#af7f8a19da7028ffc370391b79513b58d", null ],
     [ "handle", "config_8hpp.html#a55941737a7ecd8f04f0bebeaa4ea5f03", null ],
     [ "log_level", "config_8hpp.html#aed225790bbca36d005efff21edbee937", null ],
-    [ "outcome", "config_8hpp.html#a4f43f6b79b0f01b0f5a4b5b7873b24b8", null ],
-    [ "result", "config_8hpp.html#a536f4a9f568b26dc2586c34d3f5ccc9c", null ],
+    [ "outcome", "config_8hpp.html#abacadff1ffbf16bfba8ef9a3d6fb20d8", null ],
+    [ "result", "config_8hpp.html#a7ca979e5ecde58384b6a964b8db006cc", null ],
     [ "emplace_function_ptr", "config_8hpp.html#a0223ac96deaa57f1c6124e8ea00f987e", null ],
     [ "log", "config_8hpp.html#a08363b8572e6a8971a6d236d54fb8287", null ],
+    [ "make_error_code", "config_8hpp.html#aa5f11cc32803b0966fe64dfdc325a18b", null ],
     [ "make_function_ptr", "config_8hpp.html#ae11f63b07f766758e45df316122b3598", null ],
+    [ "operator!=", "config_8hpp.html#a32361fd287b7160ae34aada17191e41e", null ],
+    [ "operator<<", "config_8hpp.html#ac0d5364044c4627667e827f5aaaa183f", null ],
+    [ "operator==", "config_8hpp.html#a14e8f43a04092eb024ced8b5909cfd88", null ],
+    [ "throw_as_system_error_with_payload", "config_8hpp.html#ae44838fe79524e9d9eb432eb072395cb", null ],
     [ "tls_errored_results", "config_8hpp.html#ae2ddff37f35bbb27dbde71beff2e6f6d", null ]
 ];

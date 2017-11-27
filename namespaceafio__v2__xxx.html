@@ -148,8 +148,11 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1directory__handle.html">directory_handle</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A handle to a directory which can be enumerated.  <a href="classafio__v2__xxx_1_1directory__handle.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structafio__v2__xxx_1_1error__code.html">error_code</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Trampoline to <code>std::error_code</code>, used to ADL hook <code>result&lt;T, E&gt;</code> creation in Outcome.  <a href="structafio__v2__xxx_1_1error__code.html#details">More...</a><br /></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1error.html">error</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">The exception type synthesised and thrown when an <code>afio::result</code> or <code>afio::outcome</code> is no-value observed.  <a href="classafio__v2__xxx_1_1error.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structafio__v2__xxx_1_1error__info.html">error_info</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">The cause of the failure of an operation in AFIO.  <a href="structafio__v2__xxx_1_1error__info.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1file__handle.html">file_handle</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A handle to a regular file or device, kept data layout compatible with async_file_handle.  <a href="classafio__v2__xxx_1_1file__handle.html#details">More...</a><br /></td></tr>
@@ -198,14 +201,14 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
-<tr class="memitem:a536f4a9f568b26dc2586c34d3f5ccc9c"><td class="memTemplParams" colspan="2"><a id="a536f4a9f568b26dc2586c34d3f5ccc9c"></a>
+<tr class="memitem:a7ca979e5ecde58384b6a964b8db006cc"><td class="memTemplParams" colspan="2"><a id="a7ca979e5ecde58384b6a964b8db006cc"></a>
 template&lt;class T &gt; </td></tr>
-<tr class="memitem:a536f4a9f568b26dc2586c34d3f5ccc9c"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><b>result</b> = OUTCOME_V2_NAMESPACE::result&lt; T, <a class="el" href="structafio__v2__xxx_1_1error__code.html">error_code</a> &gt;</td></tr>
-<tr class="separator:a536f4a9f568b26dc2586c34d3f5ccc9c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4f43f6b79b0f01b0f5a4b5b7873b24b8"><td class="memTemplParams" colspan="2"><a id="a4f43f6b79b0f01b0f5a4b5b7873b24b8"></a>
+<tr class="memitem:a7ca979e5ecde58384b6a964b8db006cc"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><b>result</b> = OUTCOME_V2_NAMESPACE::result&lt; T, <a class="el" href="structafio__v2__xxx_1_1error__info.html">error_info</a> &gt;</td></tr>
+<tr class="separator:a7ca979e5ecde58384b6a964b8db006cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abacadff1ffbf16bfba8ef9a3d6fb20d8"><td class="memTemplParams" colspan="2"><a id="abacadff1ffbf16bfba8ef9a3d6fb20d8"></a>
 template&lt;class T &gt; </td></tr>
-<tr class="memitem:a4f43f6b79b0f01b0f5a4b5b7873b24b8"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><b>outcome</b> = OUTCOME_V2_NAMESPACE::outcome&lt; T, <a class="el" href="structafio__v2__xxx_1_1error__code.html">error_code</a> &gt;</td></tr>
-<tr class="separator:a4f43f6b79b0f01b0f5a4b5b7873b24b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abacadff1ffbf16bfba8ef9a3d6fb20d8"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><b>outcome</b> = OUTCOME_V2_NAMESPACE::outcome&lt; T, <a class="el" href="structafio__v2__xxx_1_1error__info.html">error_info</a> &gt;</td></tr>
+<tr class="separator:abacadff1ffbf16bfba8ef9a3d6fb20d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aed225790bbca36d005efff21edbee937"><td class="memItemLeft" align="right" valign="top"><a id="aed225790bbca36d005efff21edbee937"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx.html#aed225790bbca36d005efff21edbee937">log_level</a> = QUICKCPPLIB_NAMESPACE::ringbuffer_log::level</td></tr>
 <tr class="memdesc:aed225790bbca36d005efff21edbee937"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enum for the log level. <br /></td></tr>
@@ -234,6 +237,21 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="name
 <tr class="memitem:acd740f5aef6ca339575e7497fa873d06"><td class="memItemLeft" align="right" valign="top">result&lt; <a class="el" href="classafio__v2__xxx_1_1async__file__handle_1_1awaitable.html">async_file_handle::awaitable</a>&lt; async_file_handle::const_buffers_type &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx.html#acd740f5aef6ca339575e7497fa873d06">co_write</a> (<a class="el" href="classafio__v2__xxx_1_1async__file__handle.html">async_file_handle</a> &amp;self, <a class="el" href="structafio__v2__xxx_1_1io__handle_1_1io__request.html">async_file_handle::io_request</a>&lt; async_file_handle::const_buffers_type &gt; reqs) noexcept</td></tr>
 <tr class="memdesc:acd740f5aef6ca339575e7497fa873d06"><td class="mdescLeft">&#160;</td><td class="mdescRight">Schedule a write to occur asynchronously.  <a href="#acd740f5aef6ca339575e7497fa873d06">More...</a><br /></td></tr>
 <tr class="separator:acd740f5aef6ca339575e7497fa873d06"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a14e8f43a04092eb024ced8b5909cfd88"><td class="memItemLeft" align="right" valign="top"><a id="a14e8f43a04092eb024ced8b5909cfd88"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>operator==</b> (const <a class="el" href="structafio__v2__xxx_1_1error__info.html">error_info</a> &amp;a, const <a class="el" href="structafio__v2__xxx_1_1error__info.html">error_info</a> &amp;b)</td></tr>
+<tr class="separator:a14e8f43a04092eb024ced8b5909cfd88"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a32361fd287b7160ae34aada17191e41e"><td class="memItemLeft" align="right" valign="top"><a id="a32361fd287b7160ae34aada17191e41e"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>operator!=</b> (const <a class="el" href="structafio__v2__xxx_1_1error__info.html">error_info</a> &amp;a, const <a class="el" href="structafio__v2__xxx_1_1error__info.html">error_info</a> &amp;b)</td></tr>
+<tr class="separator:a32361fd287b7160ae34aada17191e41e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac0d5364044c4627667e827f5aaaa183f"><td class="memItemLeft" align="right" valign="top"><a id="ac0d5364044c4627667e827f5aaaa183f"></a>
+std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator&lt;&lt;</b> (std::ostream &amp;s, const <a class="el" href="structafio__v2__xxx_1_1error__info.html">error_info</a> &amp;v)</td></tr>
+<tr class="separator:ac0d5364044c4627667e827f5aaaa183f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa5f11cc32803b0966fe64dfdc325a18b"><td class="memItemLeft" align="right" valign="top"><a id="aa5f11cc32803b0966fe64dfdc325a18b"></a>
+std::error_code&#160;</td><td class="memItemRight" valign="bottom"><b>make_error_code</b> (<a class="el" href="structafio__v2__xxx_1_1error__info.html">error_info</a> ei)</td></tr>
+<tr class="separator:aa5f11cc32803b0966fe64dfdc325a18b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae44838fe79524e9d9eb432eb072395cb"><td class="memItemLeft" align="right" valign="top"><a id="ae44838fe79524e9d9eb432eb072395cb"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>throw_as_system_error_with_payload</b> (const <a class="el" href="structafio__v2__xxx_1_1error__info.html">error_info</a> &amp;ei)</td></tr>
+<tr class="separator:ae44838fe79524e9d9eb432eb072395cb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a08363b8572e6a8971a6d236d54fb8287"><td class="memItemLeft" align="right" valign="top"><a id="a08363b8572e6a8971a6d236d54fb8287"></a>
 QUICKCPPLIB_NAMESPACE::ringbuffer_log::simple_ringbuffer_log&lt; <a class="el" href="group__config.html#ga7c2409ed4b38a384c422012a43423a16">AFIO_LOGGING_MEMORY</a> &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx.html#a08363b8572e6a8971a6d236d54fb8287">log</a> () noexcept</td></tr>
 <tr class="memdesc:a08363b8572e6a8971a6d236d54fb8287"><td class="mdescLeft">&#160;</td><td class="mdescRight">The log used by AFIO. <br /></td></tr>
@@ -298,14 +316,6 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operato
 <tr class="memitem:a2e9ad4a02efc6016631baecfbc1d1d4d"><td class="memItemLeft" align="right" valign="top"><a id="a2e9ad4a02efc6016631baecfbc1d1d4d"></a>
 std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator&lt;&lt;</b> (std::ostream &amp;s, const handle::flag &amp;v)</td></tr>
 <tr class="separator:a2e9ad4a02efc6016631baecfbc1d1d4d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6e724f1ed8bc70cb89ea1ef13176a4aa"><td class="memTemplParams" colspan="2"><a id="a6e724f1ed8bc70cb89ea1ef13176a4aa"></a>
-template&lt;class T , class R &gt; </td></tr>
-<tr class="memitem:a6e724f1ed8bc70cb89ea1ef13176a4aa"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>hook_result_construction</b> (OUTCOME_V2_NAMESPACE::in_place_type_t&lt; T &gt;, result&lt; R &gt; *res) noexcept</td></tr>
-<tr class="separator:a6e724f1ed8bc70cb89ea1ef13176a4aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6346bec3589df60770ce11fbb0bb04b6"><td class="memTemplParams" colspan="2"><a id="a6346bec3589df60770ce11fbb0bb04b6"></a>
-template&lt;class T , class R &gt; </td></tr>
-<tr class="memitem:a6346bec3589df60770ce11fbb0bb04b6"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>hook_result_in_place_construction</b> (OUTCOME_V2_NAMESPACE::in_place_type_t&lt; T &gt; _, result&lt; R &gt; *res) noexcept</td></tr>
-<tr class="separator:a6346bec3589df60770ce11fbb0bb04b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9400ec51b93324c384c3fa062038ff60"><td class="memItemLeft" align="right" valign="top"><a id="a9400ec51b93324c384c3fa062038ff60"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx.html#a9400ec51b93324c384c3fa062038ff60">swap</a> (<a class="el" href="classafio__v2__xxx_1_1handle.html">handle</a> &amp;self, <a class="el" href="classafio__v2__xxx_1_1handle.html">handle</a> &amp;o) noexcept</td></tr>
 <tr class="memdesc:a9400ec51b93324c384c3fa062038ff60"><td class="mdescLeft">&#160;</td><td class="mdescRight">Swap with another instance. <br /></td></tr>
@@ -1105,7 +1115,7 @@ For portability, you can only assume that barriers write order for a single hand
 </dl>
 <dl class="section note"><dt>Note</dt><dd>On Microsoft Windows this constructor uses the faster VirtualAlloc() which creates less versatile page backed memory. If you want anonymous memory allocated from a paging file backed section instead, create a page file backed section and then a mapped view from that using the other constructor. This makes available all those very useful VM tricks Windows can do with section mapped memory which VirtualAlloc() memory cannot do.</dd></dl>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX mmap() or VirtualAlloc() can return. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00483"></a><span class="lineno">  483</span>&#160;{</div><div class="line"><a name="l00484"></a><span class="lineno">  484</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespaceafio__v2__xxx.html#accb0ec68871a9c3e3e7aeadc0f31e009">map_handle::map</a>(std::forward&lt;decltype(bytes)&gt;(bytes), std::forward&lt;decltype(_flag)&gt;(_flag));</div><div class="line"><a name="l00485"></a><span class="lineno">  485</span>&#160;}</div><div class="ttc" id="namespaceafio__v2__xxx_html_accb0ec68871a9c3e3e7aeadc0f31e009"><div class="ttname"><a href="namespaceafio__v2__xxx.html#accb0ec68871a9c3e3e7aeadc0f31e009">afio_v2_xxx::map</a></div><div class="ttdeci">result&lt; map_handle &gt; map(section_handle &amp;section, map_handle::size_type bytes=0, map_handle::extent_type offset=0, section_handle::flag _flag=section_handle::flag::readwrite) noexcept</div><div class="ttdef"><b>Definition:</b> map_handle.hpp:494</div></div>
+<div class="fragment"><div class="line"><a name="l00475"></a><span class="lineno">  475</span>&#160;{</div><div class="line"><a name="l00476"></a><span class="lineno">  476</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespaceafio__v2__xxx.html#accb0ec68871a9c3e3e7aeadc0f31e009">map_handle::map</a>(std::forward&lt;decltype(bytes)&gt;(bytes), std::forward&lt;decltype(_flag)&gt;(_flag));</div><div class="line"><a name="l00477"></a><span class="lineno">  477</span>&#160;}</div><div class="ttc" id="namespaceafio__v2__xxx_html_accb0ec68871a9c3e3e7aeadc0f31e009"><div class="ttname"><a href="namespaceafio__v2__xxx.html#accb0ec68871a9c3e3e7aeadc0f31e009">afio_v2_xxx::map</a></div><div class="ttdeci">result&lt; map_handle &gt; map(section_handle &amp;section, map_handle::size_type bytes=0, map_handle::extent_type offset=0, section_handle::flag _flag=section_handle::flag::readwrite) noexcept</div><div class="ttdef"><b>Definition:</b> map_handle.hpp:486</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1164,8 +1174,8 @@ For portability, you can only assume that barriers write order for a single hand
   </dd>
 </dl>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX mmap() or NtMapViewOfSection() can return. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00495"></a><span class="lineno">  495</span>&#160;{</div><div class="line"><a name="l00496"></a><span class="lineno">  496</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespaceafio__v2__xxx.html#accb0ec68871a9c3e3e7aeadc0f31e009">map_handle::map</a>(std::forward&lt;decltype(<a class="code" href="namespaceafio__v2__xxx.html#ac66cb0c9b287056b325469cc52e93f97">section</a>)&gt;(<a class="code" href="namespaceafio__v2__xxx.html#ac66cb0c9b287056b325469cc52e93f97">section</a>), std::forward&lt;decltype(bytes)&gt;(bytes), std::forward&lt;decltype(offset)&gt;(offset), std::forward&lt;decltype(_flag)&gt;(_flag));</div><div class="line"><a name="l00497"></a><span class="lineno">  497</span>&#160;}</div><div class="ttc" id="namespaceafio__v2__xxx_html_ac66cb0c9b287056b325469cc52e93f97"><div class="ttname"><a href="namespaceafio__v2__xxx.html#ac66cb0c9b287056b325469cc52e93f97">afio_v2_xxx::section</a></div><div class="ttdeci">result&lt; section_handle &gt; section(section_handle::extent_type maximum_size) noexcept</div><div class="ttdef"><b>Definition:</b> map_handle.hpp:437</div></div>
-<div class="ttc" id="namespaceafio__v2__xxx_html_accb0ec68871a9c3e3e7aeadc0f31e009"><div class="ttname"><a href="namespaceafio__v2__xxx.html#accb0ec68871a9c3e3e7aeadc0f31e009">afio_v2_xxx::map</a></div><div class="ttdeci">result&lt; map_handle &gt; map(section_handle &amp;section, map_handle::size_type bytes=0, map_handle::extent_type offset=0, section_handle::flag _flag=section_handle::flag::readwrite) noexcept</div><div class="ttdef"><b>Definition:</b> map_handle.hpp:494</div></div>
+<div class="fragment"><div class="line"><a name="l00487"></a><span class="lineno">  487</span>&#160;{</div><div class="line"><a name="l00488"></a><span class="lineno">  488</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespaceafio__v2__xxx.html#accb0ec68871a9c3e3e7aeadc0f31e009">map_handle::map</a>(std::forward&lt;decltype(<a class="code" href="namespaceafio__v2__xxx.html#ac66cb0c9b287056b325469cc52e93f97">section</a>)&gt;(<a class="code" href="namespaceafio__v2__xxx.html#ac66cb0c9b287056b325469cc52e93f97">section</a>), std::forward&lt;decltype(bytes)&gt;(bytes), std::forward&lt;decltype(offset)&gt;(offset), std::forward&lt;decltype(_flag)&gt;(_flag));</div><div class="line"><a name="l00489"></a><span class="lineno">  489</span>&#160;}</div><div class="ttc" id="namespaceafio__v2__xxx_html_ac66cb0c9b287056b325469cc52e93f97"><div class="ttname"><a href="namespaceafio__v2__xxx.html#ac66cb0c9b287056b325469cc52e93f97">afio_v2_xxx::section</a></div><div class="ttdeci">result&lt; section_handle &gt; section(section_handle::extent_type maximum_size) noexcept</div><div class="ttdef"><b>Definition:</b> map_handle.hpp:429</div></div>
+<div class="ttc" id="namespaceafio__v2__xxx_html_accb0ec68871a9c3e3e7aeadc0f31e009"><div class="ttname"><a href="namespaceafio__v2__xxx.html#accb0ec68871a9c3e3e7aeadc0f31e009">afio_v2_xxx::map</a></div><div class="ttdeci">result&lt; map_handle &gt; map(section_handle &amp;section, map_handle::size_type bytes=0, map_handle::extent_type offset=0, section_handle::flag _flag=section_handle::flag::readwrite) noexcept</div><div class="ttdef"><b>Definition:</b> map_handle.hpp:486</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1756,7 +1766,7 @@ For portability, you can only assume that barriers write order for a single hand
 </dl>
 <dl class="section user"><dt>Errors returnable</dt><dd>None, though the various signals and structured exception throws common to using memory maps may occur. </dd></dl>
 <dl class="section user"><dt>Memory Allocations</dt><dd>None. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00516"></a><span class="lineno">  516</span>&#160;{</div><div class="line"><a name="l00517"></a><span class="lineno">  517</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.read(std::forward&lt;decltype(reqs)&gt;(reqs), std::forward&lt;decltype(d)&gt;(d));</div><div class="line"><a name="l00518"></a><span class="lineno">  518</span>&#160;}</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l00508"></a><span class="lineno">  508</span>&#160;{</div><div class="line"><a name="l00509"></a><span class="lineno">  509</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.read(std::forward&lt;decltype(reqs)&gt;(reqs), std::forward&lt;decltype(d)&gt;(d));</div><div class="line"><a name="l00510"></a><span class="lineno">  510</span>&#160;}</div></div><!-- fragment -->
 </div>
 </div>
 <a id="a8d7c50561e9103968467c928f2e38f16"></a>
@@ -1876,7 +1886,7 @@ For portability, you can only assume that barriers write order for a single hand
   </dd>
 </dl>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX dup() or NtCreateSection() can return. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00428"></a><span class="lineno">  428</span>&#160;{</div><div class="line"><a name="l00429"></a><span class="lineno">  429</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespaceafio__v2__xxx.html#ac66cb0c9b287056b325469cc52e93f97">section_handle::section</a>(std::forward&lt;decltype(backing)&gt;(backing), std::forward&lt;decltype(maximum_size)&gt;(maximum_size), std::forward&lt;decltype(_flag)&gt;(_flag));</div><div class="line"><a name="l00430"></a><span class="lineno">  430</span>&#160;}</div><div class="ttc" id="namespaceafio__v2__xxx_html_ac66cb0c9b287056b325469cc52e93f97"><div class="ttname"><a href="namespaceafio__v2__xxx.html#ac66cb0c9b287056b325469cc52e93f97">afio_v2_xxx::section</a></div><div class="ttdeci">result&lt; section_handle &gt; section(section_handle::extent_type maximum_size) noexcept</div><div class="ttdef"><b>Definition:</b> map_handle.hpp:437</div></div>
+<div class="fragment"><div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;{</div><div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespaceafio__v2__xxx.html#ac66cb0c9b287056b325469cc52e93f97">section_handle::section</a>(std::forward&lt;decltype(backing)&gt;(backing), std::forward&lt;decltype(maximum_size)&gt;(maximum_size), std::forward&lt;decltype(_flag)&gt;(_flag));</div><div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;}</div><div class="ttc" id="namespaceafio__v2__xxx_html_ac66cb0c9b287056b325469cc52e93f97"><div class="ttname"><a href="namespaceafio__v2__xxx.html#ac66cb0c9b287056b325469cc52e93f97">afio_v2_xxx::section</a></div><div class="ttdeci">result&lt; section_handle &gt; section(section_handle::extent_type maximum_size) noexcept</div><div class="ttdef"><b>Definition:</b> map_handle.hpp:429</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1920,7 +1930,7 @@ For portability, you can only assume that barriers write order for a single hand
 </table>
 </div><div class="memdoc">
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><a name="l00433"></a><span class="lineno">  433</span>&#160;{</div><div class="line"><a name="l00434"></a><span class="lineno">  434</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespaceafio__v2__xxx.html#ac66cb0c9b287056b325469cc52e93f97">section_handle::section</a>(std::forward&lt;decltype(maximum_size)&gt;(maximum_size), std::forward&lt;decltype(backing)&gt;(backing), std::forward&lt;decltype(_flag)&gt;(_flag));</div><div class="line"><a name="l00435"></a><span class="lineno">  435</span>&#160;}</div><div class="ttc" id="namespaceafio__v2__xxx_html_ac66cb0c9b287056b325469cc52e93f97"><div class="ttname"><a href="namespaceafio__v2__xxx.html#ac66cb0c9b287056b325469cc52e93f97">afio_v2_xxx::section</a></div><div class="ttdeci">result&lt; section_handle &gt; section(section_handle::extent_type maximum_size) noexcept</div><div class="ttdef"><b>Definition:</b> map_handle.hpp:437</div></div>
+<div class="fragment"><div class="line"><a name="l00425"></a><span class="lineno">  425</span>&#160;{</div><div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespaceafio__v2__xxx.html#ac66cb0c9b287056b325469cc52e93f97">section_handle::section</a>(std::forward&lt;decltype(maximum_size)&gt;(maximum_size), std::forward&lt;decltype(backing)&gt;(backing), std::forward&lt;decltype(_flag)&gt;(_flag));</div><div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160;}</div><div class="ttc" id="namespaceafio__v2__xxx_html_ac66cb0c9b287056b325469cc52e93f97"><div class="ttname"><a href="namespaceafio__v2__xxx.html#ac66cb0c9b287056b325469cc52e93f97">afio_v2_xxx::section</a></div><div class="ttdeci">result&lt; section_handle &gt; section(section_handle::extent_type maximum_size) noexcept</div><div class="ttdef"><b>Definition:</b> map_handle.hpp:429</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1948,7 +1958,7 @@ For portability, you can only assume that barriers write order for a single hand
 </table>
 </div><div class="memdoc">
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><a name="l00438"></a><span class="lineno">  438</span>&#160;{</div><div class="line"><a name="l00439"></a><span class="lineno">  439</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespaceafio__v2__xxx.html#ac66cb0c9b287056b325469cc52e93f97">section_handle::section</a>(std::forward&lt;decltype(maximum_size)&gt;(maximum_size));</div><div class="line"><a name="l00440"></a><span class="lineno">  440</span>&#160;}</div><div class="ttc" id="namespaceafio__v2__xxx_html_ac66cb0c9b287056b325469cc52e93f97"><div class="ttname"><a href="namespaceafio__v2__xxx.html#ac66cb0c9b287056b325469cc52e93f97">afio_v2_xxx::section</a></div><div class="ttdeci">result&lt; section_handle &gt; section(section_handle::extent_type maximum_size) noexcept</div><div class="ttdef"><b>Definition:</b> map_handle.hpp:437</div></div>
+<div class="fragment"><div class="line"><a name="l00430"></a><span class="lineno">  430</span>&#160;{</div><div class="line"><a name="l00431"></a><span class="lineno">  431</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespaceafio__v2__xxx.html#ac66cb0c9b287056b325469cc52e93f97">section_handle::section</a>(std::forward&lt;decltype(maximum_size)&gt;(maximum_size));</div><div class="line"><a name="l00432"></a><span class="lineno">  432</span>&#160;}</div><div class="ttc" id="namespaceafio__v2__xxx_html_ac66cb0c9b287056b325469cc52e93f97"><div class="ttname"><a href="namespaceafio__v2__xxx.html#ac66cb0c9b287056b325469cc52e93f97">afio_v2_xxx::section</a></div><div class="ttdeci">result&lt; section_handle &gt; section(section_handle::extent_type maximum_size) noexcept</div><div class="ttdef"><b>Definition:</b> map_handle.hpp:429</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2199,7 +2209,7 @@ For portability, you can only assume that barriers write order for a single hand
   </dd>
 </dl>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values NtExtendSection() can return. On POSIX this is a no op. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00454"></a><span class="lineno">  454</span>&#160;{</div><div class="line"><a name="l00455"></a><span class="lineno">  455</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.truncate(std::forward&lt;decltype(newsize)&gt;(newsize));</div><div class="line"><a name="l00456"></a><span class="lineno">  456</span>&#160;}</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l00446"></a><span class="lineno">  446</span>&#160;{</div><div class="line"><a name="l00447"></a><span class="lineno">  447</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.truncate(std::forward&lt;decltype(newsize)&gt;(newsize));</div><div class="line"><a name="l00448"></a><span class="lineno">  448</span>&#160;}</div></div><!-- fragment -->
 </div>
 </div>
 <a id="abefe1503efb01ea89200b829bcd87713"></a>
@@ -2356,7 +2366,7 @@ For portability, you can only assume that barriers write order for a single hand
 </dl>
 <dl class="section user"><dt>Errors returnable</dt><dd>None, though the various signals and structured exception throws common to using memory maps may occur. </dd></dl>
 <dl class="section user"><dt>Memory Allocations</dt><dd>None. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00530"></a><span class="lineno">  530</span>&#160;{</div><div class="line"><a name="l00531"></a><span class="lineno">  531</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.write(std::forward&lt;decltype(reqs)&gt;(reqs), std::forward&lt;decltype(d)&gt;(d));</div><div class="line"><a name="l00532"></a><span class="lineno">  532</span>&#160;}</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l00522"></a><span class="lineno">  522</span>&#160;{</div><div class="line"><a name="l00523"></a><span class="lineno">  523</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.write(std::forward&lt;decltype(reqs)&gt;(reqs), std::forward&lt;decltype(d)&gt;(d));</div><div class="line"><a name="l00524"></a><span class="lineno">  524</span>&#160;}</div></div><!-- fragment -->
 </div>
 </div>
 <a id="ae412aa7c9e37601d1814e75d09795185"></a>

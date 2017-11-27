@@ -12,5 +12,6 @@ var searchData=
   ['operator_3d_3d',['operator==',['../namespaceafio__v2__xxx_1_1algorithm.html#a6e88d5387907ae2419405d07e75a8711',1,'afio_v2_xxx::algorithm']]],
   ['operator_3e',['operator&gt;',['../namespaceafio__v2__xxx_1_1algorithm.html#a08758484aa80b2d4ed6b22b38027ec11',1,'afio_v2_xxx::algorithm']]],
   ['operator_3e_3d',['operator&gt;=',['../namespaceafio__v2__xxx_1_1algorithm.html#a58672bf75e59c2a4e0f0e101007b9cfa',1,'afio_v2_xxx::algorithm']]],
+  ['outcome_5ftemplate',['OUTCOME_TEMPLATE',['../structafio__v2__xxx_1_1error__info.html#a891cf9546a70373c8415de2e3b2355cd',1,'afio_v2_xxx::error_info']]],
   ['overlapped',['overlapped',['../structafio__v2__xxx_1_1handle_1_1flag__base.html#a51aaa32c78950cedbc1b7a61e1738d3ea99093d0cc4dd36e5f36f336b33a826ab',1,'afio_v2_xxx::handle::flag_base::overlapped()'],['../structafio__v2__xxx_1_1native__handle__type_1_1disposition__base.html#a89e0e728fc7a7e4a008e57d572702de6af3e91c8d3d0603717a82e3a720da5c43',1,'afio_v2_xxx::native_handle_type::disposition_base::overlapped()']]]
 ];
