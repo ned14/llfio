@@ -393,49 +393,54 @@ template <class T> struct construct
   result<T> operator()() const noexcept { static_assert(!std::is_same<T, T>::value, "construct<T>() was not specialised for the type T supplied"); }
 };
 
-// Intercept when Outcome creates an errored result and log it to our log
-template <class T, class R> inline void hook_result_construction(OUTCOME_V2_NAMESPACE::in_place_type_t<T>, result<R> *res) noexcept
+// failure_info is defined in config.hpp, this is its constructor which needs
+// to be defined here so that we have handle's definition available
+inline error_info::error_info(std::error_code _ec)
+    : ec(_ec)
 {
-  // Sanity check that we never construct a null error code
-  assert(!res->has_error() || res->error().value() != 0);
-  if(res->has_error() && log().log_level() >= log_level::error)
+  // Here is a VERY useful place to breakpoint!
+  if(ec)
   {
-    // Here is a VERY useful place to breakpoint!
+#ifndef AFIO_DISABLE_PATHS_IN_FAILURE_INFO
     auto &tls = detail::tls_errored_results();
-    handle *currenth = tls.current_handle;
-    native_handle_type nativeh;
-    if(currenth != nullptr)
+    if(!tls.reentering_self)
     {
-      if(tls.reentered)
+      handle *currenth = tls.current_handle;
+      native_handle_type nativeh;
+      if(currenth != nullptr)
       {
-        return;
-      }
-      tls.reentered = true;
-      nativeh = currenth->native_handle();
-      auto currentpath_ = currenth->current_path();
-      if(currentpath_)
-      {
-        auto currentpath = currentpath_.value().u8string();
-        uint16_t tlsidx = 0;
+        nativeh = currenth->native_handle();
+        // This may fail, if it does it will construct an error_info thus reentering ourselves. Prevent that.
+        tls.reentering_self = true;
+        auto currentpath_ = currenth->current_path();
+        tls.reentering_self = false;
+        if(currentpath_)
+        {
+          auto currentpath = currentpath_.value().u8string();
+          _thread_id = tls.this_thread_id;
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4996)  // the function may be unsafe
 #endif
-        strncpy(tls.next(tlsidx), QUICKCPPLIB_NAMESPACE::ringbuffer_log::last190(currentpath), 190);
+          strncpy(tls.next(_tls_path_id1), QUICKCPPLIB_NAMESPACE::ringbuffer_log::last190(currentpath), 190);
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
-        OUTCOME_V2_NAMESPACE::hooks::set_spare_storage(res, tlsidx);
+          _tls_path_id2 = _tls_path_id1 - 17;  // guaranteed invalid
+        }
       }
-      tls.reentered = false;
+#endif
+#if AFIO_LOGGING_LEVEL >= 2
+      if(log().log_level() >= log_level::error)
+      {
+        _log_id = log().emplace_back(log_level::error, ec.message().c_str(), (uint32_t) nativeh._init, tls.this_thread_id);
+      }
+#endif
     }
-    log().emplace_back(log_level::error, res->assume_error().message().c_str(), (uint32_t) nativeh._init, QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id());
   }
 }
-template <class T, class R> inline void hook_result_in_place_construction(OUTCOME_V2_NAMESPACE::in_place_type_t<T> _, result<R> *res) noexcept
-{
-  hook_result_construction(_, res);
-}
+
+// Define how we log handles and subclasses thereof
 namespace detail
 {
   template <class T> void log_inst_to_info(const handle *inst, const char *buffer)

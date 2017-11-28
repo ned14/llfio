@@ -34,4 +34,55 @@ Distributed under the Boost Software License, Version 1.0.
 #define AFIO_TEST_KERNEL_DECL extern QUICKCPPLIB_SYMBOL_EXPORT
 #endif
 
+#include "kerneltest/include/kerneltest.hpp"
+
+#if 0
+// Tell KernelTest's outcome how to grok AFIO's result
+OUTCOME_V2_NAMESPACE_BEGIN
+namespace convert
+{
+  // Provide custom ValueOrError conversion from afio::result<U> into kerneltest::result<T>
+  template <class T, class U> struct value_or_error<KERNELTEST_V1_NAMESPACE::result<T>, AFIO_V2_NAMESPACE::result<U>>
+  {
+    static constexpr bool enable_result_inputs = true;
+    static constexpr bool enable_outcome_inputs = true;
+
+    template <class X,                                                                                        //
+              typename = std::enable_if_t<std::is_same<AFIO_V2_NAMESPACE::result<U>, std::decay_t<X>>::value  //
+                                          && std::is_constructible<T, U>::value>>                             //
+    constexpr KERNELTEST_V1_NAMESPACE::result<T>
+    operator()(X &&src)
+    {
+      // Forward exactly
+      return src.has_value() ?                                                 //
+             KERNELTEST_V1_NAMESPACE::result<T>{std::forward<X>(src).value()}  //
+             :
+             KERNELTEST_V1_NAMESPACE::result<T>{make_error_code(std::forward<X>(src).error())};
+    }
+  };
+  // Provide custom ValueOrError conversion from afio::result<U> into kerneltest::outcome<T>
+  template <class T, class U> struct value_or_error<KERNELTEST_V1_NAMESPACE::outcome<T>, AFIO_V2_NAMESPACE::result<U>>
+  {
+    static constexpr bool enable_result_inputs = true;
+    static constexpr bool enable_outcome_inputs = true;
+
+    template <class X,                                                                                        //
+              typename = std::enable_if_t<std::is_same<AFIO_V2_NAMESPACE::result<U>, std::decay_t<X>>::value  //
+                                          && std::is_constructible<T, U>::value>>                             //
+    constexpr KERNELTEST_V1_NAMESPACE::outcome<T>
+    operator()(X &&src)
+    {
+      // Forward exactly
+      return src.has_value() ?                                                  //
+             KERNELTEST_V1_NAMESPACE::outcome<T>{std::forward<X>(src).value()}  //
+             :
+             KERNELTEST_V1_NAMESPACE::outcome<T>{make_error_code(std::forward<X>(src).error())};
+    }
+  };
+}
+OUTCOME_V2_NAMESPACE_END
+static_assert(std::is_constructible<KERNELTEST_V1_NAMESPACE::result<int>, AFIO_V2_NAMESPACE::result<int>>::value, "kerneltest::result<int> is not constructible from afio::result<int>!");
+static_assert(std::is_constructible<KERNELTEST_V1_NAMESPACE::outcome<int>, AFIO_V2_NAMESPACE::result<int>>::value, "kerneltest::outcome<int> is not constructible from afio::result<int>!");
+#endif
+
 #endif  // namespace

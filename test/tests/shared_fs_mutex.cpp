@@ -24,8 +24,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #define QUICKCPPLIB_BOOST_UNIT_TEST_CUSTOM_MAIN_DEFINED
 
-#include "../../include/afio/afio.hpp"
-#include "kerneltest/include/kerneltest.hpp"
+#include "../test_kernel_decl.hpp"
 
 KERNELTEST_TEST_KERNEL(unit, afio, shared_fs_mutex, entity_endian, "Tests that afio::algorithm::shared_fs_mutex::entity_type has the right endian", [] {
   AFIO_V2_NAMESPACE::algorithm::shared_fs_mutex::shared_fs_mutex::entity_type v(0, true);

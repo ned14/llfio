@@ -38,10 +38,17 @@ Distributed under the Boost Software License, Version 1.0.
 #define AFIO_HEADERS_ONLY 1
 #endif
 
+//! \def AFIO_DISABLE_PATHS_IN_FAILURE_INFO
+//! \brief Define to not record the current handle's path in any failure info.
+
 #if !defined(AFIO_LOGGING_LEVEL)
 //! \brief How much detail to log. 0=disabled, 1=fatal, 2=error, 3=warn, 4=info, 5=debug, 6=all.
 //! Defaults to error level. \ingroup config
+#ifdef NDEBUG
+#define AFIO_LOGGING_LEVEL 1  // fatal
+#else
 #define AFIO_LOGGING_LEVEL 3  // warn
+#endif
 #endif
 
 #ifndef AFIO_LOG_TO_OSTREAM
@@ -300,26 +307,128 @@ AFIO_V2_NAMESPACE_END
 // Bring in a result implementation
 #include "outcome/include/outcome.hpp"
 AFIO_V2_NAMESPACE_BEGIN
-// Specialise error_code into this namespace so we can hook result creation via ADL
-/*! \struct error_code
-\brief Trampoline to `std::error_code`, used to ADL hook `result<T, E>` creation in Outcome.
+/*! \struct error_info
+\brief The cause of the failure of an operation in AFIO.
 */
-struct error_code : public std::error_code
+struct error_info
 {
-  // literally passthrough
-  using std::error_code::error_code;
-  error_code() = default;
-  error_code(std::error_code ec)  // NOLINT
-  : std::error_code(ec)
+  //! The error code for the failure
+  std::error_code ec;
+
+#ifndef AFIO_DISABLE_PATHS_IN_FAILURE_INFO
+private:
+  // The id of the thread where this failure occurred
+  uint32_t _thread_id{0};
+  // The TLS path store entry
+  uint16_t _tls_path_id1{(uint16_t) -1}, _tls_path_id2{(uint16_t) -1};
+  // The id of the relevant log entry in the AFIO log (if logging enabled)
+  size_t _log_id{(size_t) -1};
+
+public:
+#endif
+
+  //! Default constructor
+  error_info() = default;
+  //! Construct from a code and error category
+  error_info(int code, const std::error_category &cat)
+      : error_info(std::error_code(code, cat))
+  {
+  }
+  // Construct from an error code
+  inline error_info(std::error_code ec);
+  /* NOTE TO SELF: The error_info constructor implementation is in handle.hpp as we need that
+  defined before we can do useful logging.
+  */
+  //! Construct from an error condition enum
+  OUTCOME_TEMPLATE(class ErrorCondEnum)
+  OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_error_condition_enum<ErrorCondEnum>::value))
+  error_info(ErrorCondEnum &&v)
+      : error_info(make_error_code(std::forward<ErrorCondEnum>(v)))
+  {
+  }
+
+  //! Retrieve any first path associated with this failure. Note this only works if called from the same thread as where the failure occurred.
+  inline filesystem::path path1() const;
+  //! Retrieve any second path associated with this failure. Note this only works if called from the same thread as where the failure occurred.
+  inline filesystem::path path2() const;
+  //! Retrieve a descriptive message for this failure, possibly with paths and stack backtraces. Extra detail only appears if called from the same thread as where the failure occurred.
+  inline std::string message() const;
+  /*! Throw this failure as a C++ exception. Firstly if the error code matches any of the standard
+  C++ exception types e.g. `bad_alloc`, we throw those types using the string from `message()`
+  where possible. We then will throw an `error` exception type.
+  */
+  inline void throw_as_exception() const;
+};
+inline bool operator==(const error_info &a, const error_info &b)
+{
+  return a.ec == b.ec;
+}
+inline bool operator!=(const error_info &a, const error_info &b)
+{
+  return a.ec != b.ec;
+}
+#ifndef NDEBUG
+// Is trivial in all ways, except default constructibility
+static_assert(std::is_trivially_copyable<error_info>::value, "error_info is not a trivially copyable!");
+#endif
+inline std::ostream &operator<<(std::ostream &s, const error_info &v)
+{
+  if(v.ec)
+  {
+    return s << "afio::error_info(" << v.message() << ")";
+  }
+  return s << "afio::error_info(null)";
+}
+// Tell Outcome that error_info is to be treated as an error_code
+inline std::error_code make_error_code(error_info ei)
+{
+  return ei.ec;
+}
+// Tell Outcome to call error_info::throw_as_exception() on no-value observation
+inline void throw_as_system_error_with_payload(const error_info &ei)
+{
+  ei.throw_as_exception();
+}
+
+/*! \class error
+\brief The exception type synthesised and thrown when an `afio::result` or `afio::outcome` is no-value observed.
+*/
+class error : public filesystem::filesystem_error
+{
+public:
+  error_info ei;
+
+  //! Constructs from an error_info
+  explicit error(error_info _ei)
+      : filesystem::filesystem_error(_ei.message(), _ei.path1(), _ei.path2(), _ei.ec)
+      , ei(_ei)
   {
   }
 };
-template <class T> using result = OUTCOME_V2_NAMESPACE::result<T, error_code>;
-template <class T> using outcome = OUTCOME_V2_NAMESPACE::outcome<T, error_code>;
+
+inline void error_info::throw_as_exception() const
+{
+  std::string msg;
+  try
+  {
+    msg = message();
+  }
+  catch(...)
+  {
+  }
+  OUTCOME_V2_NAMESPACE::try_throw_std_exception_from_error(ec, msg);
+  throw error(*this);
+}
+
+template <class T> using result = OUTCOME_V2_NAMESPACE::result<T, error_info>;
+template <class T> using outcome = OUTCOME_V2_NAMESPACE::outcome<T, error_info>;
 using OUTCOME_V2_NAMESPACE::success;
 using OUTCOME_V2_NAMESPACE::failure;
 using OUTCOME_V2_NAMESPACE::error_from_exception;
 using OUTCOME_V2_NAMESPACE::in_place_type;
+
+static_assert(OUTCOME_V2_NAMESPACE::trait::has_error_code_v<error_info>, "error_info is not detected to be an error code");
+
 AFIO_V2_NAMESPACE_END
 
 
@@ -356,30 +465,18 @@ public:
   ~log_level_guard() { log().log_level(_v); }
 };
 
-/* Some notes on how error logging works:
-
-Throughout AFIO in almost all of its functions, we call `AFIO_LOG_FUNCTION_CALL(inst)` where `inst` is
-usually `this`. We test if inst points to a `handle`, and if so we replace the "current handle" in
-TLS storage with the new one, restoring it on stack unwind.
-
-When an errored result is created, Outcome provides ADL based hooks which let us intercept an errored
-result creation. We look up TLS storage for the current handle, and if one is set then we fetch its
-current path and store it into a round robin store in TLS, storing the index into the result. Later
-on, when we are reporting or otherwise dealing with the error, the path the error refers to can be
-printed.
-
-All this gets compiled out if AFIO_LOGGING_LEVEL < 2 (error) and is skipped if log().log_level() < 2 (error).
-In this situation, no paths are captured on error.
-*/
-#if AFIO_LOGGING_LEVEL >= 2
+// Infrastructure for recording the current path for when failure occurs
+#ifndef AFIO_DISABLE_PATHS_IN_FAILURE_INFO
 namespace detail
 {
   // Our thread local store
   struct tls_errored_results_t
   {
-    handle *current_handle{nullptr};  // The current handle for this thread
-    bool reentered{false};            // Whether hook_result_construction is reentering itself
-    char paths[190][16];              // The log can only store 190 chars of message anyway
+    uint32_t this_thread_id{QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id()};
+    handle *current_handle{nullptr};  // The current handle for this thread. Changed via RAII via AFIO_LOG_FUNCTION_CALL, see below.
+    bool reentering_self{false};      // Prevents any failed call to current_path() by us reentering ourselves
+
+    char paths[190][16];  // Last 190 chars of path
     uint16_t pathidx{0};
     char *next(uint16_t &idx)
     {
@@ -442,6 +539,66 @@ namespace detail
 #else
 #define AFIO_LOG_INST_TO_TLS(inst)
 #endif
+
+inline filesystem::path error_info::path1() const
+{
+  if(QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id() == _thread_id)
+  {
+    auto &tls = detail::tls_errored_results();
+    const char *path1 = tls.get(_tls_path_id1);
+    if(path1 != nullptr)
+    {
+      return filesystem::path(path1);
+    }
+  }
+  return {};
+}
+inline filesystem::path error_info::path2() const
+{
+  if(QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id() == _thread_id)
+  {
+    auto &tls = detail::tls_errored_results();
+    const char *path2 = tls.get(_tls_path_id2);
+    if(path2 != nullptr)
+    {
+      return filesystem::path(path2);
+    }
+  }
+  return {};
+}
+inline std::string error_info::message() const
+{
+  std::string ret(ec.message());
+  if(QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id() == _thread_id)
+  {
+    auto &tls = detail::tls_errored_results();
+    const char *path1 = tls.get(_tls_path_id1), *path2 = tls.get(_tls_path_id2);
+    if(path1 != nullptr)
+    {
+      ret.append(" [path1 = ");
+      ret.append(path1);
+      if(path2 != nullptr)
+      {
+        ret.append(", path2 = ");
+        ret.append(path2);
+      }
+      ret.append("]");
+    }
+  }
+#if AFIO_LOGGING_LEVEL >= 2
+  if(_log_id != (uint32_t) -1)
+  {
+    if(log().valid(_log_id))
+    {
+      ret.append(" [location = ");
+      ret.append(location(log()[_log_id]));
+      ret.append("]");
+    }
+  }
+#endif
+  return ret;
+}
+
 AFIO_V2_NAMESPACE_END
 
 #ifndef AFIO_LOG_FATAL_TO_CERR

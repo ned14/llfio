@@ -23,25 +23,24 @@ Distributed under the Boost Software License, Version 1.0.
 */
 
 #include "../../test_kernel_decl.hpp"
-#include "kerneltest/include/kerneltest.hpp"
 
 namespace directory_handle_create_close
 {
   AFIO_TEST_KERNEL_DECL AFIO_V2_NAMESPACE::result<AFIO_V2_NAMESPACE::directory_handle> test_kernel_directory_handle_absolute(AFIO_V2_NAMESPACE::directory_handle::mode m, AFIO_V2_NAMESPACE::directory_handle::creation c, AFIO_V2_NAMESPACE::directory_handle::flag f,
-                                                                                                                             AFIO_V2_NAMESPACE::directory_handle::buffers_type *entries, KERNELTEST_V1_NAMESPACE::result<AFIO_V2_NAMESPACE::directory_handle::enumerate_info> *info)
+                                                                                                                             AFIO_V2_NAMESPACE::directory_handle::buffers_type *entries, AFIO_V2_NAMESPACE::result<AFIO_V2_NAMESPACE::directory_handle::enumerate_info> *info)
   {
     auto h = AFIO_V2_NAMESPACE::directory_handle::directory({}, "testdir", m, c, AFIO_V2_NAMESPACE::directory_handle::caching::all, f);
     if(h)
     {
       // git needs a file in a directory to create it, so any directory created needs an empty file called pin.txt
       (void) AFIO_V2_NAMESPACE::file_handle::file(h.value(), "pin.txt", AFIO_V2_NAMESPACE::file_handle::mode::write, AFIO_V2_NAMESPACE::file_handle::creation::if_needed);
-      *info = KERNELTEST_V1_NAMESPACE::result<AFIO_V2_NAMESPACE::directory_handle::enumerate_info>(h.value().enumerate(std::move(*entries)));
+      *info = AFIO_V2_NAMESPACE::result<AFIO_V2_NAMESPACE::directory_handle::enumerate_info>(h.value().enumerate(std::move(*entries)));
       h.value().close().value();
     }
     return h;
   }
   AFIO_TEST_KERNEL_DECL AFIO_V2_NAMESPACE::result<AFIO_V2_NAMESPACE::directory_handle> test_kernel_directory_handle_relative(AFIO_V2_NAMESPACE::directory_handle::mode m, AFIO_V2_NAMESPACE::directory_handle::creation c, AFIO_V2_NAMESPACE::directory_handle::flag f,
-                                                                                                                             AFIO_V2_NAMESPACE::directory_handle::buffers_type *entries, KERNELTEST_V1_NAMESPACE::result<AFIO_V2_NAMESPACE::directory_handle::enumerate_info> *info)
+                                                                                                                             AFIO_V2_NAMESPACE::directory_handle::buffers_type *entries, AFIO_V2_NAMESPACE::result<AFIO_V2_NAMESPACE::directory_handle::enumerate_info> *info)
   {
     OUTCOME_TRY(b, AFIO_V2_NAMESPACE::path_handle::path("."));
     auto h = AFIO_V2_NAMESPACE::directory_handle::directory(b, "testdir", m, c, AFIO_V2_NAMESPACE::directory_handle::caching::all, f);
@@ -49,7 +48,7 @@ namespace directory_handle_create_close
     {
       // git needs a file in a directory to create it, so any directory created needs an empty file called pin.txt
       (void) AFIO_V2_NAMESPACE::file_handle::file(h.value(), "pin.txt", AFIO_V2_NAMESPACE::file_handle::mode::write, AFIO_V2_NAMESPACE::file_handle::creation::if_needed);
-      *info = KERNELTEST_V1_NAMESPACE::result<AFIO_V2_NAMESPACE::directory_handle::enumerate_info>(h.value().enumerate(std::move(*entries)));
+      *info = AFIO_V2_NAMESPACE::result<AFIO_V2_NAMESPACE::directory_handle::enumerate_info>(h.value().enumerate(std::move(*entries)));
       h.value().close().value();
     }
     b.close().value();

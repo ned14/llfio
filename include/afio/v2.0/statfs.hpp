@@ -90,7 +90,7 @@ struct AFIO_DECL statfs_t
   {
     auto v(fill(h, wanted));
     if(v.has_error())
-      throw std::system_error(v.error());
+      v.error().throw_as_exception();
   }
 #endif
   //! Fills in the structure with metadata, returning number of items filled in
