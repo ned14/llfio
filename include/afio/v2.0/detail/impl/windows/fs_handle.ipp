@@ -174,8 +174,16 @@ result<void> fs_handle::unlink(deadline d) noexcept
   if((h.is_regular() || h.is_symlink()) && !(h.flags() & flag::win_disable_unlink_emulation))
   {
     // Rename it to something random to emulate immediate unlinking
-    auto randomname = utils::random_string(32);
-    randomname.append(".deleted");
+    std::string randomname;
+    try
+    {
+      randomname = utils::random_string(32);
+      randomname.append(".deleted");
+    }
+    catch(...)
+    {
+      return error_from_exception();
+    }
     OUTCOME_TRY(dirh, parent_path_handle(d));
     result<void> out = relink(dirh, randomname);
     if(!out)

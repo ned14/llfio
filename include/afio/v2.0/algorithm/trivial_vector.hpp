@@ -35,7 +35,12 @@ AFIO_V2_NAMESPACE_BEGIN
 
 namespace algorithm
 {
+#ifndef DOXYGEN_IS_IN_THE_HOUSE
   namespace detail
+#else
+  //! Does not exist in the actual source code, purely here to workaround doxygen limitations
+  namespace impl
+#endif
   {
     template <bool has_default_construction, class T> struct trivial_vector_impl;
     template <class T> class trivial_vector_iterator
@@ -524,6 +529,7 @@ namespace algorithm
       using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
     public:
+      constexpr trivial_vector_impl() = default;
       using trivial_vector_impl<false, T>::trivial_vector_impl;
       //! Filling constructor of default constructed `value_type`
       explicit trivial_vector_impl(size_type count)
@@ -536,30 +542,40 @@ namespace algorithm
     };
   }  // namespace detail
 
-  /*! \class trivial_vector
-  \brief Provides a constant time capacity expanding move-only STL vector. Requires `T` to be
-  trivially copyable.
+/*! \class trivial_vector
+\brief Provides a constant time capacity expanding move-only STL vector. Requires `T` to be
+trivially copyable.
 
-  Note that no STL allocator support is provided as `T` must be trivially copyable
-  (for which most STL's simply use `memcpy()` anyway instead of the allocator's
-  `construct`), and an internal `section_handle` is used for the storage in order
-  to implement the constant time capacity resizing.
+As a hand waving estimate for whether this vector implementation may be useful to you,
+it roughly breaks even with `std::vector` on recent Intel CPUs at around the L2 cache
+level. So if your vector fits into the L2 cache, this implementation will be no
+better, and likely slower.
 
-  We also disable the copy constructor, as copying an entire backing file is expensive.
-  Use the iterator based copy constructor if you really want to copy one of these.
+Note that no STL allocator support is provided as `T` must be trivially copyable
+(for which most STL's simply use `memcpy()` anyway instead of the allocator's
+`construct`), and an internal `section_handle` is used for the storage in order
+to implement the constant time capacity resizing.
 
-  The very first item stored reserves a capacity of `utils::page_size()/sizeof(T)`.
-  Capacity is doubled in byte terms thereafter (i.e. 8Kb, 16Kb and so on).
-  Also be aware that the capacity of the vector needs to become reasonably large
-  before going to the kernel to resize the `section_handle` and remapping memory
-  becomes faster than `memcpy`. For these reasons, this vector implementation is
-  best suited to arrays of unknown in advance, but likely large, sizes.
-  */
+We also disable the copy constructor, as copying an entire backing file is expensive.
+Use the iterator based copy constructor if you really want to copy one of these.
+
+The very first item stored reserves a capacity of `utils::page_size()/sizeof(T)`.
+Capacity is doubled in byte terms thereafter (i.e. 8Kb, 16Kb and so on).
+Also be aware that the capacity of the vector needs to become reasonably large
+before going to the kernel to resize the `section_handle` and remapping memory
+becomes faster than `memcpy`. For these reasons, this vector implementation is
+best suited to arrays of unknown in advance, but likely large, sizes.
+*/
+#ifndef DOXYGEN_IS_IN_THE_HOUSE
   template <class T> AFIO_REQUIRES(std::is_trivially_copyable<T>::value) class trivial_vector : public detail::trivial_vector_impl<std::is_default_constructible<T>::value, T>
+#else
+  template <class T> class trivial_vector : public impl::trivial_vector_impl<true, T>
+#endif
   {
     static_assert(std::is_trivially_copyable<T>::value, "trivial_vector: Type T is not trivially copyable!");
 
   public:
+    constexpr trivial_vector() = default;
     using detail::trivial_vector_impl<std::is_default_constructible<T>::value, T>::trivial_vector_impl;
   };
 

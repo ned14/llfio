@@ -205,7 +205,7 @@ result<file_handle> file_handle::temp_inode(const path_handle &dirh, mode _mode,
   OUTCOME_TRY(ntflags, ntflags_from_handle_caching_and_flags(nativeh, _caching, flags));
   ntflags |= 0x040 /*FILE_NON_DIRECTORY_FILE*/;  // do not open a directory
   UNICODE_STRING _path;
-  _path.MaximumLength = (_path.Length = (USHORT)(32 * sizeof(wchar_t))) + sizeof(wchar_t);
+  _path.MaximumLength = (_path.Length = (USHORT)(68 * sizeof(wchar_t))) + sizeof(wchar_t);
 
   OBJECT_ATTRIBUTES oa;
   memset(&oa, 0, sizeof(oa));
@@ -216,7 +216,7 @@ result<file_handle> file_handle::temp_inode(const path_handle &dirh, mode _mode,
   LARGE_INTEGER AllocationSize;
   memset(&AllocationSize, 0, sizeof(AllocationSize));
   std::string _random;
-  std::wstring random(32, 0);
+  std::wstring random(68, 0);
   for(;;)
   {
     try
@@ -240,6 +240,7 @@ result<file_handle> file_handle::temp_inode(const path_handle &dirh, mode _mode,
         return {(int) ntstat, ntkernel_category()};
       }
     }
+    // std::cerr << random << std::endl;
     OUTCOME_TRYV(ret.value()._fetch_inode());  // It can be useful to know the inode of temporary inodes
     if(nativeh.h)
     {

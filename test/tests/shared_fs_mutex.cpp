@@ -405,7 +405,7 @@ static std::string _TestSharedFSMutexCorrectnessChildWorker(KERNELTEST_V1_NAMESP
 static auto TestSharedFSMutexCorrectnessChildWorker = KERNELTEST_V1_NAMESPACE::register_child_worker("TestSharedFSMutexCorrectness", [](KERNELTEST_V1_NAMESPACE::waitable_done &waitable, size_t childidx, const char * /*unused*/) -> std::string {  // NOLINT
   namespace afio = AFIO_V2_NAMESPACE;
   auto shared_mem_file = afio::file_handle::file({}, "shared_memory", afio::file_handle::mode::write, afio::file_handle::creation::open_existing, afio::file_handle::caching::temporary).value();
-  auto shared_mem_file_section = afio::section_handle::section(sizeof(shared_memory), shared_mem_file, afio::section_handle::flag::readwrite).value();
+  auto shared_mem_file_section = afio::section_handle::section(shared_mem_file, sizeof(shared_memory), afio::section_handle::flag::readwrite).value();
   auto shared_mem_file_map = afio::map_handle::map(shared_mem_file_section).value();
   auto *shmem = reinterpret_cast<shared_memory *>(shared_mem_file_map.address());  // NOLINT
   return _TestSharedFSMutexCorrectnessChildWorker(waitable, childidx, shmem);
@@ -422,7 +422,7 @@ void TestSharedFSMutexCorrectness(shared_memory::mutex_kind_type mutex_kind, sha
   namespace afio = AFIO_V2_NAMESPACE;
   auto shared_mem_file = afio::file_handle::file({}, "shared_memory", afio::file_handle::mode::write, afio::file_handle::creation::if_needed, afio::file_handle::caching::temporary, afio::file_handle::flag::unlink_on_close).value();
   shared_mem_file.truncate(sizeof(shared_memory)).value();
-  auto shared_mem_file_section = afio::section_handle::section(sizeof(shared_memory), shared_mem_file, afio::section_handle::flag::readwrite).value();
+  auto shared_mem_file_section = afio::section_handle::section(shared_mem_file, sizeof(shared_memory), afio::section_handle::flag::readwrite).value();
   auto shared_mem_file_map = afio::map_handle::map(shared_mem_file_section).value();
   auto *shmem = reinterpret_cast<shared_memory *>(shared_mem_file_map.address());  // NOLINT
   shmem->current_shared = -static_cast<long>(std::thread::hardware_concurrency());
@@ -512,7 +512,7 @@ static void TestSharedFSMutexConstructDestruct(shared_memory::mutex_kind_type mu
   namespace afio = AFIO_V2_NAMESPACE;
   auto shared_mem_file = afio::file_handle::file({}, "shared_memory", afio::file_handle::mode::write, afio::file_handle::creation::if_needed, afio::file_handle::caching::temporary, afio::file_handle::flag::unlink_on_close).value();
   shared_mem_file.truncate(sizeof(shared_memory)).value();
-  auto shared_mem_file_section = afio::section_handle::section(sizeof(shared_memory), shared_mem_file, afio::section_handle::flag::readwrite).value();
+  auto shared_mem_file_section = afio::section_handle::section(shared_mem_file, sizeof(shared_memory), afio::section_handle::flag::readwrite).value();
   auto shared_mem_file_map = afio::map_handle::map(shared_mem_file_section).value();
   auto *shmem = reinterpret_cast<shared_memory *>(shared_mem_file_map.address());  // NOLINT
   shmem->current_shared = -2;

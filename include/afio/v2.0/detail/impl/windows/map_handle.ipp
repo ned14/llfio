@@ -31,20 +31,35 @@ Distributed under the Boost Software License, Version 1.0.
 
 AFIO_V2_NAMESPACE_BEGIN
 
+section_handle::~section_handle()
+{
+  if(_v)
+  {
+    auto ret = section_handle::close();
+    if(ret.has_error())
+    {
+      AFIO_LOG_FATAL(_v.h, "section_handle::~section_handle() close failed");
+      abort();
+    }
+  }
+}
+result<void> section_handle::close() noexcept
+{
+  AFIO_LOG_FUNCTION_CALL(this);
+  if(_v)
+  {
+    OUTCOME_TRYV(handle::close());
+    OUTCOME_TRYV(_anonymous.close());
+    _flag = flag::none;
+  }
+  return success();
+}
+
 result<section_handle> section_handle::section(file_handle &backing, extent_type maximum_size, flag _flag) noexcept
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
-  // Do NOT round up to page size here if backed by a file, it causes STATUS_SECTION_TOO_BIG
-  if(!backing.is_valid())
-  {
-    if(!maximum_size)
-    {
-      return std::errc::invalid_argument;
-    }
-    maximum_size = utils::round_up_to_page_size(maximum_size);
-  }
-  result<section_handle> ret(section_handle(native_handle_type(), backing.is_valid() ? &backing : nullptr, maximum_size, _flag));
+  result<section_handle> ret(section_handle(native_handle_type(), &backing, file_handle(), _flag));
   native_handle_type &nativeh = ret.value()._v;
   ULONG prot = 0, attribs = 0;
   if(_flag & flag::read)
@@ -65,17 +80,6 @@ result<section_handle> section_handle::section(file_handle &backing, extent_type
   else
     prot = PAGE_READONLY;  // PAGE_NOACCESS is refused, so this is the next best
   attribs = SEC_COMMIT;
-  if(!backing.is_valid())
-  {
-    // On Windows, asking for inaccessible memory from the swap file almost certainly
-    // means the user is intending to change permissions later, so reserve read/write
-    // memory of the size requested
-    if(!_flag)
-    {
-      attribs = SEC_RESERVE;
-      prot = PAGE_READWRITE;
-    }
-  }
   if(_flag & flag::executable)
     attribs = SEC_IMAGE;
   if(_flag & flag::prefault)
@@ -125,7 +129,63 @@ result<section_handle> section_handle::section(file_handle &backing, extent_type
   }
   AFIO_LOG_FUNCTION_CALL(&ret);
   HANDLE h;
-  NTSTATUS ntstat = NtCreateSection(&h, SECTION_ALL_ACCESS, poa, pmaximum_size, prot, attribs, backing.is_valid() ? backing.native_handle().h : NULL);
+  NTSTATUS ntstat = NtCreateSection(&h, SECTION_ALL_ACCESS, poa, pmaximum_size, prot, attribs, backing.native_handle().h);
+  if(ntstat < 0)
+  {
+    return {(int) ntstat, ntkernel_category()};
+  }
+  nativeh.h = h;
+  return ret;
+}
+
+result<section_handle> section_handle::section(extent_type bytes, const path_handle &dirh, flag _flag) noexcept
+{
+  windows_nt_kernel::init();
+  using namespace windows_nt_kernel;
+  OUTCOME_TRY(_anonh, file_handle::temp_inode(dirh));
+  OUTCOME_TRYV(_anonh.truncate(bytes));
+  result<section_handle> ret(section_handle(native_handle_type(), nullptr, std::move(_anonh), _flag));
+  native_handle_type &nativeh = ret.value()._v;
+  file_handle &anonh = ret.value()._anonymous;
+  ULONG prot = 0, attribs = 0;
+  if(_flag & flag::read)
+    nativeh.behaviour |= native_handle_type::disposition::readable;
+  if(_flag & flag::write)
+    nativeh.behaviour |= native_handle_type::disposition::writable;
+  if(_flag & flag::execute)
+  {
+  }
+  if(!!(_flag & flag::cow) && !!(_flag & flag::execute))
+    prot = PAGE_EXECUTE_WRITECOPY;
+  else if(_flag & flag::execute)
+    prot = PAGE_EXECUTE;
+  else if(_flag & flag::cow)
+    prot = PAGE_WRITECOPY;
+  else if(_flag & flag::write)
+    prot = PAGE_READWRITE;
+  else
+    prot = PAGE_READONLY;  // PAGE_NOACCESS is refused, so this is the next best
+  attribs = SEC_COMMIT;
+  // On Windows, asking for inaccessible memory from the swap file almost certainly
+  // means the user is intending to change permissions later, so reserve read/write
+  // memory of the size requested
+  if(!_flag)
+  {
+    attribs = SEC_RESERVE;
+    prot = PAGE_READWRITE;
+  }
+  if(_flag & flag::executable)
+    attribs = SEC_IMAGE;
+  if(_flag & flag::prefault)
+  {
+    // Handled during view mapping below
+  }
+  nativeh.behaviour |= native_handle_type::disposition::section;
+  LARGE_INTEGER _maximum_size, *pmaximum_size = &_maximum_size;
+  _maximum_size.QuadPart = bytes;
+  AFIO_LOG_FUNCTION_CALL(&ret);
+  HANDLE h;
+  NTSTATUS ntstat = NtCreateSection(&h, SECTION_ALL_ACCESS, nullptr, pmaximum_size, prot, attribs, anonh.native_handle().h);
   if(ntstat < 0)
   {
     return {(int) ntstat, ntkernel_category()};
@@ -139,10 +199,6 @@ result<section_handle::extent_type> section_handle::length() const noexcept
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
   AFIO_LOG_FUNCTION_CALL(this);
-  if(_backing == nullptr)
-  {
-    return _length;
-  }
   SECTION_BASIC_INFORMATION sbi;
   NTSTATUS ntstat = NtQuerySection(_v.h, SectionBasicInformation, &sbi, sizeof(sbi), NULL);
   if(STATUS_SUCCESS != ntstat)
@@ -167,16 +223,16 @@ result<section_handle::extent_type> section_handle::truncate(extent_type newsize
     else
       return std::errc::invalid_argument;
   }
-  if(!_backing)
-    newsize = utils::round_up_to_page_size(newsize);
   LARGE_INTEGER _maximum_size;
   _maximum_size.QuadPart = newsize;
   NTSTATUS ntstat = NtExtendSection(_v.h, &_maximum_size);
   if(STATUS_SUCCESS != ntstat)
     return {(int) ntstat, ntkernel_category()};
-  _length = newsize;
   return newsize;
 }
+
+
+/******************************************* map_handle *********************************************/
 
 
 map_handle::~map_handle()
