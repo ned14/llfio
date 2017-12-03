@@ -33,74 +33,64 @@ section_handle::~section_handle()
 {
   if(_v)
   {
-    (void) section_handle::close();
+    auto ret = section_handle::close();
+    if(ret.has_error())
+    {
+      AFIO_LOG_FATAL(_v.h, "section_handle::~section_handle() close failed");
+      abort();
+    }
   }
 }
 result<void> section_handle::close() noexcept
 {
   AFIO_LOG_FUNCTION_CALL(this);
-  if(!(_flags & flag::posix_anonymous_inode))
+  if(_v)
   {
-    // We don't want ~handle() to close our handle borrowed from the backing file
+    // We don't want ~handle() to close our handle borrowed from the backing file or _anonymous
     _v = native_handle_type();
+    OUTCOME_TRYV(handle::close());
+    OUTCOME_TRYV(_anonymous.close());
+    _flag = flag::none;
   }
   return success();
 }
 
 result<section_handle> section_handle::section(file_handle &backing, extent_type maximum_size, flag _flag) noexcept
 {
-  if(!(_flag & flag::posix_skip_length_checks))
+  OUTCOME_TRY(length, backing.length());
+  if(maximum_size == 0)
   {
-    extent_type length = 0;
-    if(backing.is_valid())
-    {
-      OUTCOME_TRY(_length, backing.length());
-      length = _length;
-      if(length == 0)
-      {
-        // Some systems allow zero sized maps, POSIX bans it
-        return std::errc::invalid_argument;
-      }
-      if(maximum_size > 0 && maximum_size > length)
-      {
-        // For compatibility with Windows, disallow sections larger than the file
-        return std::errc::value_too_large;
-      }
-    }
-    if(!maximum_size)
-    {
-      if(backing.is_valid())
-      {
-        maximum_size = length;
-      }
-      else
-      {
-        return std::errc::invalid_argument;
-      }
-    }
+    maximum_size = length;
   }
-  if(!backing.is_valid())
+  else if(maximum_size > length)
   {
-    maximum_size = utils::round_up_to_page_size(maximum_size);
+    // For compatibility with Windows, disallow sections larger than the file
+    return std::errc::value_too_large;
   }
-  result<section_handle> ret(section_handle(native_handle_type(), backing.is_valid() ? &backing : nullptr, maximum_size, _flag));
+  result<section_handle> ret(section_handle(native_handle_type(), &backing, file_handle(), _flag));
   native_handle_type &nativeh = ret.value()._v;
-  if(backing.is_valid())
-  {
-    nativeh.fd = backing.native_handle().fd;
-  }
-  else
-  {
-    // Create a temporary anonymous inode in a tmpfs
-    const path_handle &tempdirh = path_discovery::memory_backed_temporary_files_directory();
-    if(!tempdirh.is_valid())
-    {
-      AFIO_LOG_WARN(nullptr, "A suitable memory backed temporary files directory was not found on this system, so attempting to create memory-backed section_handle's will always fail");
-    }
-    OUTCOME_TRY(tmpfsfile, file_handle::temp_inode(tempdirh));
-    nativeh.fd = tmpfsfile.release().fd;
-    ret.value()._flag |= flag::posix_anonymous_inode;
-  }
+  nativeh.fd = backing.native_handle().fd;
+  if(_flag & flag::read)
+    nativeh.behaviour |= native_handle_type::disposition::readable;
+  if(_flag & flag::write)
+    nativeh.behaviour |= native_handle_type::disposition::writable;
+  nativeh.behaviour |= native_handle_type::disposition::section;
+  AFIO_LOG_FUNCTION_CALL(&ret);
+  return ret;
+}
+
+result<section_handle> section_handle::section(extent_type bytes, const path_handle &dirh, flag _flag) noexcept
+{
+  OUTCOME_TRY(_anonh, file_handle::temp_inode(dirh));
+  OUTCOME_TRYV(_anonh.truncate(bytes));
+  result<section_handle> ret(section_handle(native_handle_type(), nullptr, std::move(_anonh), _flag));
+  native_handle_type &nativeh = ret.value()._v;
+  file_handle &anonh = ret.value()._anonymous;
+  nativeh.fd = anonh.native_handle().fd;
+  if(_flag & flag::read)
+    nativeh.behaviour |= native_handle_type::disposition::readable;
+  if(_flag & flag::write)
+    nativeh.behaviour |= native_handle_type::disposition::writable;
   nativeh.behaviour |= native_handle_type::disposition::section;
   AFIO_LOG_FUNCTION_CALL(&ret);
   return ret;
@@ -109,43 +99,26 @@ result<section_handle> section_handle::section(file_handle &backing, extent_type
 result<section_handle::extent_type> section_handle::length() const noexcept
 {
   AFIO_LOG_FUNCTION_CALL(this);
-  return _length;
+  struct stat s;
+  memset(&s, 0, sizeof(s));
+  if(-1 == ::fstat(_v.fd, &s))
+    return {errno, std::system_category()};
+  return s.st_size;
 }
 
 result<section_handle::extent_type> section_handle::truncate(extent_type newsize) noexcept
 {
   AFIO_LOG_FUNCTION_CALL(this);
-  if(_backing)
+  if(!_backing)
   {
-    extent_type length = 0;
-    if(!(_flag & flag::posix_skip_length_checks))
-    {
-      OUTCOME_TRY(_length, _backing->length());
-      length = _length;
-      if(length == 0)
-      {
-        // Some systems allow zero sized maps, POSIX bans it
-        return std::errc::invalid_argument;
-      }
-      if(newsize > 0 && newsize > length)
-      {
-        // For compatibility with Windows, disallow sections larger than the file
-        return std::errc::value_too_large;
-      }
-    }
-  }
-  else
-  {
-    newsize = utils::round_up_to_page_size(newsize);
-  }
-  if(_flag & flag::posix_anonymous_inode)
-  {
-    if(-1 == ::ftruncate(_v.fd, newsize))
+    if(-1 == ::ftruncate(_anonymous.native_handle().fd, newsize))
       return {errno, std::system_category()};
   }
-  _length = newsize;
   return newsize;
 }
+
+
+/******************************************* map_handle *********************************************/
 
 
 map_handle::~map_handle()
@@ -300,12 +273,6 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
     if(!section.backing())
       return std::errc::argument_out_of_domain;
     bytes = section.length().value();
-  }
-  size_type _bytes = utils::round_up_to_page_size(bytes);
-  if(!section.backing())
-  {
-    // Do NOT round up bytes to the nearest page size for backed maps, it causes an attempt to extend the file
-    bytes = _bytes;
   }
   result<map_handle> ret{map_handle(&section)};
   native_handle_type &nativeh = ret.value()._v;

@@ -51,7 +51,7 @@ template <class U> inline void section_handle_create_close_(U &&f)
       { success(),{ 1, section_handle::flag::read },{ "_" },{ false } },
       { success(),{ 1, section_handle::flag::write },{ "_" },{ false } },
       { success(),{ 1, section_handle::flag::cow },{ "_" },{ false } },
-      { success(),{ 1, section_handle::flag::execute },{ "_" },{ false } },
+      //{ success(),{ 1, section_handle::flag::execute },{ "_" },{ false } },
       { success(),{ 1, section_handle::flag::write|section_handle::flag::nocommit },{ "_" },{ false } },
       { success(),{ 1, section_handle::flag::write|section_handle::flag::prefault },{ "_" },{ false } },
       //{ success(),{ 1, section_handle::flag::write|section_handle::flag::executable },{ "_" },{ false } },
@@ -76,14 +76,6 @@ template <class U> inline void section_handle_create_close_(U &&f)
         else
         {
           temph = file_handle();
-#ifndef _WIN32
-		  // On POSIX unbacked sections will fail if no tmpfs temp directory is available
-		  if (!path_discovery::memory_backed_temporary_files_directory().is_valid())
-		  {
-			  temph = file_handle::temp_inode().value();
-			  temph.truncate(1).value();
-		  }
-#endif
         }
         return &testreturn;
       },

@@ -121,7 +121,17 @@ public:
   \errors Any of the values POSIX dup(), open() or NtCreateSection() can return.
   */
   AFIO_MAKE_FREE_FUNCTION
-  static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<section_handle> section(file_handle &backing, extent_type bytes = 0, flag _flag = flag::read) noexcept;
+  static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<section_handle> section(file_handle &backing, extent_type bytes, flag _flag) noexcept;
+  /*! \brief Create a memory section backed by a file.
+  \param backing The handle to use as backing storage.
+  \param bytes The initial size of this section, which cannot be larger than any backing file. Zero means to use `backing.length()`.
+
+  This convenience overload create a writable section if the backing file is writable, otherwise a read-only section.
+
+  \errors Any of the values POSIX dup(), open() or NtCreateSection() can return.
+  */
+  AFIO_MAKE_FREE_FUNCTION
+  static result<section_handle> section(file_handle &backing, extent_type bytes = 0) noexcept { return section(backing, bytes, backing.is_writable() ? (flag::readwrite) : (flag::read)); }
   /*! \brief Create a memory section backed by an anonymous, managed file.
   \param bytes The initial size of this section. Cannot be zero.
   \param dirh Where to create the anonymous, managed file.

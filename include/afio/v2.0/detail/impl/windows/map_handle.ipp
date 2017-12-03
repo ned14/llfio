@@ -373,11 +373,6 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
-  if(!section.backing())
-  {
-    // Do NOT round up bytes to the nearest page size for backed maps, it causes an attempt to extend the file
-    bytes = utils::round_up_to_page_size(bytes);
-  }
   result<map_handle> ret{map_handle(&section)};
   native_handle_type &nativeh = ret.value()._v;
   ULONG allocation = 0, prot = PAGE_NOACCESS;
