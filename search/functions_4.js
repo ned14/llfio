@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['data',['data',['../structafio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl.html#ab887c4445a8d0a42bdf493e28556aee4',1,'afio_v2_xxx::algorithm::impl::trivial_vector_impl::data() noexcept'],['../structafio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl.html#ace4d6145031f0cbe70ef34ecc5a9ba92',1,'afio_v2_xxx::algorithm::impl::trivial_vector_impl::data() const noexcept']]],
   ['decommit',['decommit',['../classafio__v2__xxx_1_1map__handle.html#a5b69e8faa8a9e47dec1b1a123c722a3e',1,'afio_v2_xxx::map_handle']]],
   ['default_5fvalue',['default_value',['../namespaceafio__v2__xxx_1_1storage__profile.html#a2ad39b78e400cf1ab64579129522d4ac',1,'afio_v2_xxx::storage_profile']]],
   ['directory',['directory',['../classafio__v2__xxx_1_1directory__handle.html#ade355bac3d2aafd1ead15d090f85c057',1,'afio_v2_xxx::directory_handle::directory()'],['../namespaceafio__v2__xxx.html#affce2389376e27ffa0565890034d209f',1,'afio_v2_xxx::directory()']]],

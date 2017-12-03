@@ -89,9 +89,13 @@ var hierarchy =
     [ "T", null, [
       [ "afio_v2_xxx::algorithm::cached_parent_handle_adapter< T >", "classafio__v2__xxx_1_1algorithm_1_1cached__parent__handle__adapter.html", null ]
     ] ],
-    [ "afio_v2_xxx::algorithm::detail::trivial_vector_impl< std::is_default_constructible< T >::value, T >", null, [
-      [ "afio_v2_xxx::algorithm::trivial_vector< T >", "classafio__v2__xxx_1_1algorithm_1_1trivial__vector.html", null ]
+    [ "afio_v2_xxx::algorithm::impl::trivial_vector_impl< has_default_construction, T >", "structafio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl.html", null ],
+    [ "afio_v2_xxx::algorithm::impl::trivial_vector_impl< false, T >", "structafio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl.html", [
+      [ "afio_v2_xxx::algorithm::impl::trivial_vector_impl< true, T >", "structafio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl_3_01true_00_01_t_01_4.html", [
+        [ "afio_v2_xxx::algorithm::trivial_vector< T >", "classafio__v2__xxx_1_1algorithm_1_1trivial__vector.html", null ]
+      ] ]
     ] ],
+    [ "afio_v2_xxx::algorithm::impl::trivial_vector_iterator< T >", "classafio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__iterator.html", null ],
     [ "afio_v2_xxx::statfs_t::want_base", "structafio__v2__xxx_1_1statfs__t_1_1want__base.html", null ],
     [ "afio_v2_xxx::stat_t::want_base", "structafio__v2__xxx_1_1stat__t_1_1want__base.html", null ]
 ];

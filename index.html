@@ -255,6 +255,8 @@ mapped_file_handle - adds low latency memory mapped scatter-gather i/o</li>
 <td></td><td>✔ </td><td>✔ </td><td>Set random or sequential i/o (prefetch). </td></tr>
 <tr>
 <td>✔ </td><td>✔ </td><td>✔ </td><td>i/o on <code>async_file_handle</code> is coroutines awaitable. </td></tr>
+<tr>
+<td>✔ </td><td>✔ </td><td></td><td><code>afio::algorithm::trivial_vector&lt;T&gt;</code> with constant time reallocation if <code>T</code> is trivially copyable. </td></tr>
 </table>
 <p>Todo to reach feature parity with AFIO v1:</p>
 <table class="doxtable">
@@ -269,10 +271,6 @@ mapped_file_handle - adds low latency memory mapped scatter-gather i/o</li>
 <table class="doxtable">
 <tr>
 <th>NEW in v2 </th><th>Windows </th><th>POSIX </th><th></th></tr>
-<tr>
-<td>✔ </td><td></td><td></td><td><code>afio::algorithm::vector&lt;T&gt;</code> with constant time reallocation if <code>T</code> is trivially copyable. </td></tr>
-<tr>
-<td>✔ </td><td></td><td></td><td>Some algorithm primitive for intelligently resizing a typed view or vector. </td></tr>
 <tr>
 <td>✔ </td><td></td><td></td><td>Linux KAIO support for native non-blocking <code>O_DIRECT</code> i/o </td></tr>
 <tr>

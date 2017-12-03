@@ -32,7 +32,7 @@ var classafio__v2__xxx_1_1section__handle =
     ] ],
     [ "~section_handle", "classafio__v2__xxx_1_1section__handle.html#af13f55fc422de3020a975da19feef09f", null ],
     [ "section_handle", "classafio__v2__xxx_1_1section__handle.html#a2824f51d5726bb8015d89ac1ea7abe5f", null ],
-    [ "section_handle", "classafio__v2__xxx_1_1section__handle.html#a01f8bba023c65d628e001bb1a02e580c", null ],
+    [ "section_handle", "classafio__v2__xxx_1_1section__handle.html#a74e73651ebfc233e31fff3d39b3a8e1a", null ],
     [ "section_handle", "classafio__v2__xxx_1_1section__handle.html#a84ec7259dfb8bab518d3def875bdc6f2", null ],
     [ "are_reads_from_cache", "classafio__v2__xxx_1_1section__handle.html#a71137cb82edd9a1bcb24f64886b5826d", null ],
     [ "are_safety_fsyncs_issued", "classafio__v2__xxx_1_1section__handle.html#a3fc7db93fac699f5ecad453642ed314e", null ],
@@ -67,10 +67,10 @@ var classafio__v2__xxx_1_1section__handle =
     [ "swap", "classafio__v2__xxx_1_1section__handle.html#a852a6b382a9e69f568977b2cd53e0496", null ],
     [ "swap", "classafio__v2__xxx_1_1section__handle.html#a657c12a309cf02bf2351bfcc7f41463b", null ],
     [ "truncate", "classafio__v2__xxx_1_1section__handle.html#a229f515ed3251071d374476204e23e30", null ],
+    [ "_anonymous", "classafio__v2__xxx_1_1section__handle.html#a428fdb11c830ba8ad191590a0fb48535", null ],
     [ "_backing", "classafio__v2__xxx_1_1section__handle.html#a3c26e221ec4de3bc485989ff104261d1", null ],
     [ "_caching", "classafio__v2__xxx_1_1section__handle.html#af024e3d92d9a01ac367734e9cdc517fb", null ],
     [ "_flag", "classafio__v2__xxx_1_1section__handle.html#afa234bf3475037d668f5f0a9e55ad036", null ],
     [ "_flags", "classafio__v2__xxx_1_1section__handle.html#ac46e0a296c31fcd0a996a79d78647fb6", null ],
-    [ "_length", "classafio__v2__xxx_1_1section__handle.html#aafde2623c9a54e14792eee729321f5a3", null ],
     [ "_v", "classafio__v2__xxx_1_1section__handle.html#a771ef2bf39ad784eb6265dde077792ad", null ]
 ];
