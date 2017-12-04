@@ -28,7 +28,7 @@ namespace section_handle_create_close
 {
   AFIO_TEST_KERNEL_DECL AFIO_V2_NAMESPACE::result<AFIO_V2_NAMESPACE::section_handle> test_kernel_section_handle(AFIO_V2_NAMESPACE::file_handle &backing, AFIO_V2_NAMESPACE::section_handle::extent_type maximum_size, AFIO_V2_NAMESPACE::section_handle::flag m)
   {
-    auto h = AFIO_V2_NAMESPACE::section_handle::section(backing, maximum_size, m);
+    auto h = backing.is_valid() ? AFIO_V2_NAMESPACE::section_handle::section(backing, maximum_size, m) : AFIO_V2_NAMESPACE::section_handle::section(maximum_size, AFIO_V2_NAMESPACE::path_discovery::storage_backed_temporary_files_directory(), m);
     return h;
   }
 }

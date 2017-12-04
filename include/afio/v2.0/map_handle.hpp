@@ -39,13 +39,14 @@ AFIO_V2_NAMESPACE_EXPORT_BEGIN
 /*! \class section_handle
 \brief A handle to a source of mapped memory.
 
-\note On Windows the native handle of this handle is that of the NT kernel section object. On POSIX it is
-a cloned file descriptor of the backing storage if there is backing storage, else it will be a file
-descriptor to an unnamed inode in a tmpfs or ramfs based temporary directory. Hence on POSIX, if
-`path_discovery::memory_backed_temporary_files_directory()` is returning an invalid fd because no memory
-backed temporary files directory could be found, sections without backing storage will fail to construct.
-Using `map_handle` without a section backing or using a temporary inode in
-`path_discovery::storage_backed_temporary_files_directory()` may be viable alternatives.
+There are two configurations of section handle, one where the user supplies the file backing for the
+section and the other where an internal file descriptor to an unnamed inode in a tmpfs or ramfs based
+temporary directory is kept and managed. The latter is merely a convenience for creating an anonymous
+source of memory which can be resized whilst preserving contents: see `algorithm::trivial_vector<T>`.
+
+On Windows the native handle of this handle is that of the NT kernel section object. On POSIX it is
+a cloned file descriptor of the backing storage if there is backing storage, else it will be the
+aforementioned file descriptor to an unnamed inode.
 */
 class AFIO_DECL section_handle : public handle
 {
@@ -69,41 +70,31 @@ public:
 
                                    // NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!
 
-                                   posix_skip_length_checks = 1 << 28, posix_anonymous_inode = 1 << 29,
-
                                    readwrite = (read | write)};
   QUICKCPPLIB_BITFIELD_END(flag);
 
 protected:
-  file_handle *_backing;
-  extent_type _length;  // only used on POSIX
-  flag _flag;
+  file_handle *_backing{nullptr};
+  file_handle _anonymous;
+  flag _flag{flag::none};
 
 public:
-#ifndef _WIN32
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC ~section_handle();
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> close() noexcept override;
-#endif
   //! Default constructor
-  constexpr section_handle()
-      : _backing(nullptr)
-      , _length(0)
-      , _flag(flag::none)
-  {
-  }
+  constexpr section_handle() {}
   //! Construct a section handle using the given native handle type for the section and the given i/o handle for the backing storage
-  explicit constexpr section_handle(native_handle_type sectionh, file_handle *backing, extent_type maximum_size, flag __flag)
+  explicit section_handle(native_handle_type sectionh, file_handle *backing, file_handle anonymous, flag __flag)
       : handle(sectionh, handle::caching::all)
       , _backing(backing)
-      , _length(maximum_size)
+      , _anonymous(std::move(anonymous))
       , _flag(__flag)
   {
   }
   //! Implicit move construction of section_handle permitted
-  constexpr section_handle(section_handle &&o) noexcept : handle(std::move(o)), _backing(o._backing), _length(o._length), _flag(o._flag)
+  constexpr section_handle(section_handle &&o) noexcept : handle(std::move(o)), _backing(o._backing), _anonymous(std::move(o._anonymous)), _flag(o._flag)
   {
     o._backing = nullptr;
-    o._length = 0;
     o._flag = flag::none;
   }
   //! Move assignment of section_handle permitted
@@ -122,30 +113,34 @@ public:
     o = std::move(temp);
   }
 
-  /*! \brief Create a memory section.
-  \param backing The handle to use as backing storage. An invalid handle means to use the system page file as the backing storage.
-  \param maximum_size The maximum size this section can ever be. Zero means to use `backing.length()`. This cannot exceed the size
-  of any backing file used.
+  /*! \brief Create a memory section backed by a file.
+  \param backing The handle to use as backing storage.
+  \param bytes The initial size of this section, which cannot be larger than any backing file. Zero means to use `backing.length()`.
   \param _flag How to create the section.
-
-  \note On POSIX, non-file backed sections are implemented by creating an unnamed inode in a tmpfs implemented temporary directory
-  as returned by `path_discovery::memory_backed_temporary_files_directory()`. If no tmpfs temporary directories are available,
-  non-file back sections will fail to construct.
 
   \errors Any of the values POSIX dup(), open() or NtCreateSection() can return.
   */
   AFIO_MAKE_FREE_FUNCTION
-  static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<section_handle> section(file_handle &backing, extent_type maximum_size = 0, flag _flag = flag::read | flag::write) noexcept;
-  //! \overload
+  static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<section_handle> section(file_handle &backing, extent_type bytes, flag _flag) noexcept;
+  /*! \brief Create a memory section backed by a file.
+  \param backing The handle to use as backing storage.
+  \param bytes The initial size of this section, which cannot be larger than any backing file. Zero means to use `backing.length()`.
+
+  This convenience overload create a writable section if the backing file is writable, otherwise a read-only section.
+
+  \errors Any of the values POSIX dup(), open() or NtCreateSection() can return.
+  */
   AFIO_MAKE_FREE_FUNCTION
-  static inline result<section_handle> section(extent_type maximum_size, file_handle &backing, flag _flag = flag::read | flag::write) noexcept { return section(backing, maximum_size, _flag); }
-  //! \overload
+  static result<section_handle> section(file_handle &backing, extent_type bytes = 0) noexcept { return section(backing, bytes, backing.is_writable() ? (flag::readwrite) : (flag::read)); }
+  /*! \brief Create a memory section backed by an anonymous, managed file.
+  \param bytes The initial size of this section. Cannot be zero.
+  \param dirh Where to create the anonymous, managed file.
+  \param _flag How to create the section.
+
+  \errors Any of the values POSIX dup(), open() or NtCreateSection() can return.
+  */
   AFIO_MAKE_FREE_FUNCTION
-  static inline result<section_handle> section(extent_type maximum_size) noexcept
-  {
-    file_handle backing;
-    return section(backing, maximum_size, flag::read | flag::write);
-  }
+  static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<section_handle> section(extent_type bytes, const path_handle &dirh = path_discovery::storage_backed_temporary_files_directory(), flag _flag = flag::read | flag::write) noexcept;
 
   //! Returns the memory section's flags
   flag section_flags() const noexcept { return _flag; }
@@ -161,9 +156,9 @@ public:
 
   /*! Resize the current maximum permitted extent of the memory section to the given extent.
   \param newsize The new size of the memory section. Specify zero to use `backing.length()`.
-  This cannot exceed the size of any backing file used.
+  This cannot exceed the size of any backing file used if that file is not writable.
 
-  \errors Any of the values NtExtendSection() can return. On POSIX this is a no op.
+  \errors Any of the values `NtExtendSection()` or `ftruncate()` can return.
   */
   AFIO_MAKE_FREE_FUNCTION
   AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<extent_type> truncate(extent_type newsize = 0) noexcept;
@@ -408,28 +403,7 @@ inline void swap(section_handle &self, section_handle &o) noexcept
 {
   return self.swap(std::forward<decltype(o)>(o));
 }
-/*! \brief Create a memory section.
-\param backing The handle to use as backing storage. An invalid handle means to use the system page file as the backing storage.
-\param maximum_size The maximum size this section can ever be. Zero means to use `backing.length()`. This cannot exceed the size
-of any backing file used.
-\param _flag How to create the section.
 
-\errors Any of the values POSIX dup() or NtCreateSection() can return.
-*/
-inline result<section_handle> section(file_handle &backing, section_handle::extent_type maximum_size = 0, section_handle::flag _flag = section_handle::flag::read | section_handle::flag::write) noexcept
-{
-  return section_handle::section(std::forward<decltype(backing)>(backing), std::forward<decltype(maximum_size)>(maximum_size), std::forward<decltype(_flag)>(_flag));
-}
-//! \overload
-inline result<section_handle> section(section_handle::extent_type maximum_size, file_handle &backing, section_handle::flag _flag = section_handle::flag::read | section_handle::flag::write) noexcept
-{
-  return section_handle::section(std::forward<decltype(maximum_size)>(maximum_size), std::forward<decltype(backing)>(backing), std::forward<decltype(_flag)>(_flag));
-}
-//! \overload
-inline result<section_handle> section(section_handle::extent_type maximum_size) noexcept
-{
-  return section_handle::section(std::forward<decltype(maximum_size)>(maximum_size));
-}
 //! Return the current maximum permitted extent of the memory section.
 inline result<section_handle::extent_type> length(const section_handle &self) noexcept
 {

@@ -175,6 +175,7 @@ Todo:
 | ✔ | ✔ | ✔ | `shared_fs_mutex` shared/exclusive entities locking based on safe byte ranges
 |   | ✔ | ✔ | Set random or sequential i/o (prefetch).
 | ✔ | ✔ | ✔ | i/o on `async_file_handle` is coroutines awaitable.
+| ✔ | ✔ |   | `afio::algorithm::trivial_vector<T>` with constant time reallocation if `T` is trivially copyable.
 
 Todo to reach feature parity with AFIO v1:
 
@@ -187,8 +188,6 @@ Todo thereafter in order of priority:
 
 | NEW in v2 | Windows | POSIX |     |
 | --------- | --------| ----- | --- |
-| ✔ |   |   | `afio::algorithm::vector<T>` with constant time reallocation if `T` is trivially copyable.
-| ✔ |   |   | Some algorithm primitive for intelligently resizing a typed view or vector.
 | ✔ |   |   | Linux KAIO support for native non-blocking `O_DIRECT` i/o
 | ✔ |   |   | Reliable directory hierarchy deletion algorithm.
 | ✔ |   |   | Reliable directory hierarchy copy algorithm.

@@ -27,7 +27,7 @@ Distributed under the Boost Software License, Version 1.0.
 static size_t trivial_vector_udts_constructed;
 static inline void TestTrivialVector()
 {
-  // Test udt without default constructor, but complex destructor and constructor
+  // Test udt without default constructor, complex constructor and trivial everything else
   struct udt
   {
     size_t v;
@@ -42,6 +42,116 @@ static inline void TestTrivialVector()
   v.push_back(udt(5));
   BOOST_CHECK(v.size() == 1);
   BOOST_CHECK(v.capacity() == AFIO_V2_NAMESPACE::utils::page_size() / sizeof(udt));
+  v.resize(512, udt(6));
+  BOOST_CHECK(v.size() == 512);
+  BOOST_CHECK(v.capacity() == AFIO_V2_NAMESPACE::utils::round_up_to_page_size(512 * sizeof(udt)) / sizeof(udt));
+  v.resize(2048, udt(7));
+  BOOST_CHECK(v.size() == 2048);
+  BOOST_CHECK(v.capacity() == AFIO_V2_NAMESPACE::utils::round_up_to_page_size(2048 * sizeof(udt)) / sizeof(udt));
+  v.resize(8192, udt(8));
+  BOOST_CHECK(v.size() == 8192);
+  BOOST_CHECK(v.capacity() == AFIO_V2_NAMESPACE::utils::round_up_to_page_size(8192 * sizeof(udt)) / sizeof(udt));
+  for(size_t n = 0; n < 8192; n++)
+  {
+    if(!n)
+    {
+      BOOST_CHECK(v[n].v == 0);
+    }
+    else if(n < 512)
+    {
+      BOOST_CHECK(v[n].v == 1);
+    }
+    else if(n < 2048)
+    {
+      BOOST_CHECK(v[n].v == 2);
+    }
+    else if(n < 8192)
+    {
+      BOOST_CHECK(v[n].v == 3);
+    }
+  }
+  auto it = v.begin();
+  for(size_t n = 0; n < 8192; n++, ++it)
+  {
+    if(!n)
+    {
+      BOOST_CHECK(it->v == 0);
+    }
+    else if(n < 512)
+    {
+      BOOST_CHECK(it->v == 1);
+    }
+    else if(n < 2048)
+    {
+      BOOST_CHECK(it->v == 2);
+    }
+    else if(n < 8192)
+    {
+      BOOST_CHECK(it->v == 3);
+    }
+  }
+  BOOST_CHECK(it == v.end());
+}
+
+template <class T> unsigned long long BenchmarkVector(T &v, size_t no)
+{
+  auto begin = std::chrono::high_resolution_clock::now();
+  for(size_t n = 0; n < no; n++)
+  {
+    v.push_back(5);
+  }
+  auto end = std::chrono::high_resolution_clock::now();
+  return std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
+}
+
+static inline void BenchmarkTrivialVector1()
+{
+  for(size_t items = 512; items < 16 * 1024 * 1024; items *= 2)
+  {
+    auto begin = std::chrono::high_resolution_clock::now();
+    while(std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock::now() - begin).count() < 1)
+      ;
+    std::vector<int> v1;
+    v1.reserve(1);
+    auto std_time = BenchmarkVector(v1, items);
+    AFIO_V2_NAMESPACE::algorithm::trivial_vector<int> v2;
+    v2.reserve(2);
+    auto afio_time = BenchmarkVector(v2, items);
+    std::cout << "                    std::vector<int> inserts " << items << " items in " << std_time << " microseconds" << std::endl;
+    std::cout << "afio::algorithm::trivial_vector<int> inserts " << items << " items in " << afio_time << " microseconds" << std::endl;
+  }
+}
+
+static inline void BenchmarkTrivialVector2()
+{
+  for(size_t items = 1024; items < 16 * 1024 * 1024; items *= 2)
+  {
+    std::chrono::high_resolution_clock::time_point begin = std::chrono::high_resolution_clock::now(), end;
+    {
+      std::vector<int> v1;
+      v1.resize(items, 5);
+      while(std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock::now() - begin).count() < 1)
+        ;
+      begin = std::chrono::high_resolution_clock::now();
+      v1.resize(items * 2, 6);
+      end = std::chrono::high_resolution_clock::now();
+    }
+    auto std_time = std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
+    {
+      AFIO_V2_NAMESPACE::algorithm::trivial_vector<int> v1;
+      v1.resize(items, 5);
+      while(std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock::now() - begin).count() < 1)
+        ;
+      begin = std::chrono::high_resolution_clock::now();
+      v1.resize(items * 2, 6);
+      end = std::chrono::high_resolution_clock::now();
+    }
+    auto afio_time = std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
+    std::cout << "                    std::vector<int> resizes " << items << " items to " << (items * 2) << " items in " << std_time << " microseconds" << std::endl;
+    std::cout << "afio::algorithm::trivial_vector<int> resizes " << items << " items to " << (items * 2) << " items in " << afio_time << " microseconds" << std::endl;
+  }
 }
 
 KERNELTEST_TEST_KERNEL(integration, afio, algorithm, trivial_vector, "Tests that afio::algorithm::trivial_vector works as expected", TestTrivialVector())
+KERNELTEST_TEST_KERNEL(integration, afio, algorithm, trivial_vector2, "Benchmarks afio::algorithm::trivial_vector against std::vector 1", BenchmarkTrivialVector1())
+KERNELTEST_TEST_KERNEL(integration, afio, algorithm, trivial_vector3, "Benchmarks afio::algorithm::trivial_vector against std::vector 2", BenchmarkTrivialVector2())
