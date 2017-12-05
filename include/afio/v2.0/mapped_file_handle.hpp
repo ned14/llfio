@@ -82,7 +82,7 @@ file. This is why `read()` and `write()` only know about the reservation size, a
 and write memory up to that reservation size, without checking if the memory involved exists
 or not yet. You are guaranteed that `address()` will not return a new
 value unless you truncate from a bigger length to a smaller length, or you call `reserve()`
-with a new reservation.
+with a new reservation or `truncate()` with a value bigger than the reservation.
 
 `length()` reports the last truncated length of the mapped file (possibly by any process in
 the system) up to the reservation limit, NOT the length of the underlying file.
@@ -103,44 +103,6 @@ not using this `mapped_file_handle` to write the new data. With unified page cac
 mixing mapped and normal i/o is generally safe except at the end of a file where race
 conditions and outright kernel bugs tend to abound. To avoid these, solely and exclusively
 use a dedicated handle configured to atomic append only to do the appends.
-
-Automatic mapping of growing files on various kernels:
-<dl>
-<dt>Microsoft Windows</dt>
-<dd>For the current Terminal Services Session, the first `mapped_file_handle::truncate()` or
-`mapped_file_handle::update_map()` by any process update maps in all processes simultaneously.
-Other methods for extending the file will require a `mapped_file_handle::update_map()`
-by any process per Terminal Services Session to synchronise.
-</dd>
-<dt>Linux</dt>
-<dd>The Linux kernel automatically maps newly appended data to a file into all over extended
-maps of that file. `mapped_file_handle::length()` will continue to return the old value until
-`mapped_file_handle::update_map()` is called to refresh it.
-</dd>
-<dt>FreeBSD</dt>
-<dd>?</dd>
-<dt>Apple MacOS</dt>
-<dd>?</dd>
-</dl>
-
-Automatic mapping of shrinking files on various kernels:
-<dl>
-<dt>Microsoft Windows</dt>
-<dd>All maps and open section handles on the file anywhere in the system must be removed before
-any shrinkage of a file is permitted.</dd>
-<dt>Linux</dt>
-<dd>Data written after the maximum extent up to the page boundary appears to be zeroed on flush
-and any pages thereafter appear to be unmapped. Just to be safe, on all POSIX platforms
-`mapped_file_handle::truncate()` specifically
-undirties any pages about to be freed on newer kernels, or specifically deallocates them from
-memory and physical storage on older kernels before doing the file shrink. This ensures
-truncated pages don't get zombified.
-</dd>
-<dt>FreeBSD</dt>
-<dd>?</dd>
-<dt>Apple MacOS</dt>
-<dd>?</dd>
-</dl>
 */
 class AFIO_DECL mapped_file_handle : public file_handle
 {
@@ -164,8 +126,8 @@ public:
 
 protected:
   size_type _reservation{0};
-  section_handle _sh;
-  map_handle _mh;
+  section_handle _sh;  // Tracks the file (i.e. *this) somewhat lazily
+  map_handle _mh;      // The current map with valid extent
 
 public:
   //! Default constructor
@@ -332,7 +294,7 @@ public:
   result<extent_type> underlying_file_length() const noexcept { return file_handle::length(); }
 
   //! The address space (to be) reserved for future expansion of this file.
-  size_type capacity() const noexcept { return _mh.is_valid() ? _mh.length() : _reservation; }
+  size_type capacity() const noexcept { return _reservation; }
 
   /*! \brief Reserve a new amount of address space for mapping future expansion of this file.
   \param reservation The number of bytes of virtual address space to reserve. Zero means reserve
@@ -367,17 +329,13 @@ public:
     OUTCOME_TRY(fh, file_handle::clone(mode_, caching_, d));
     return mapped_file_handle(std::move(fh), reservation);
   }
-  //! Return the current maximum permitted extent of the file which is the lesser of the section's length, or the reservation.
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_type> length() const noexcept override
-  {
-    // The lesser of the section length or the mapping length
-    OUTCOME_TRY(sectionlen, _sh.length());
-    return _mh.length() < sectionlen ? _mh.length() : sectionlen;
-  }
+  //! Return the current maximum permitted extent of the file.
+  AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_type> length() const noexcept override { return _mh.length(); }
 
   /*! \brief Resize the current maximum permitted extent of the mapped file to the given extent, avoiding any
   new allocation of physical storage where supported, and mapping or unmapping any new pages
-  up to the reservation to reflect the new maximum extent.
+  up to the reservation to reflect the new maximum extent. If the new size exceeds the reservation,
+  `reserve()` will be called to increase the reservation.
 
   Note that on extents based filing systems
   this will succeed even if there is insufficient free space on the storage medium. Only when
@@ -412,8 +370,7 @@ public:
     return bytes;
   }
 
-  /*! \brief Read data from the mapped file. Note that this works with the reservation size, not the valid length,
-  and thus reading past `length()` is undefined behaviour.
+  /*! \brief Read data from the mapped file.
 
   \note Because this implementation never copies memory, you can pass in buffers with a null address.
 
@@ -425,8 +382,7 @@ public:
   \mallocs None.
   */
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<buffers_type> read(io_request<buffers_type> reqs, deadline d = deadline()) noexcept override { return _mh.read(std::move(reqs), std::move(d)); }
-  /*! \brief Write data to the mapped file. Note that this works with the reservation size, not the valid length,
-  and thus writing past `length()` is undefined behaviour.
+  /*! \brief Write data to the mapped file.
 
   \return The buffers written, which will never be the buffers input because they will point at where the data was copied into the mapped view.
   The size of each scatter-gather buffer is updated with the number of bytes of that buffer transferred.

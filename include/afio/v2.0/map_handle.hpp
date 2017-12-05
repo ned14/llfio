@@ -204,6 +204,7 @@ template <> struct construct<section_handle>
   result<section_handle> operator()() const noexcept { return section_handle::section(backing, maximum_size, _flag); }
 };
 
+class mapped_file_handle;
 
 /*! \class map_handle
 \brief A handle to a memory mapped region of memory.
@@ -216,6 +217,8 @@ Locking byte ranges of this handle is therefore equal to locking byte ranges in 
 */
 class AFIO_DECL map_handle : public io_handle
 {
+  friend class mapped_file_handle;
+
 public:
   using extent_type = io_handle::extent_type;
   using size_type = io_handle::size_type;
