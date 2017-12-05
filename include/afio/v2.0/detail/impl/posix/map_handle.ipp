@@ -55,18 +55,8 @@ result<void> section_handle::close() noexcept
   return success();
 }
 
-result<section_handle> section_handle::section(file_handle &backing, extent_type maximum_size, flag _flag) noexcept
+result<section_handle> section_handle::section(file_handle &backing, extent_type /* unused */, flag _flag) noexcept
 {
-  OUTCOME_TRY(length, backing.length());
-  if(maximum_size == 0)
-  {
-    maximum_size = length;
-  }
-  else if(maximum_size > length)
-  {
-    // For compatibility with Windows, disallow sections larger than the file
-    return std::errc::value_too_large;
-  }
   result<section_handle> ret(section_handle(native_handle_type(), &backing, file_handle(), _flag));
   native_handle_type &nativeh = ret.value()._v;
   nativeh.fd = backing.native_handle().fd;
@@ -279,7 +269,7 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
   OUTCOME_TRY(addr, do_mmap(nativeh, nullptr, &section, bytes, offset, _flag));
   ret.value()._addr = (char *) addr;
   ret.value()._offset = offset;
-  ret.value()._length = _bytes;
+  ret.value()._length = bytes;
   // Make my handle borrow the native handle of my backing storage
   ret.value()._v.fd = section.native_handle().fd;
   AFIO_LOG_FUNCTION_CALL(&ret);
