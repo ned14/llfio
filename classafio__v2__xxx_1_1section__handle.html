@@ -719,7 +719,7 @@ flag&#160;</td><td class="memItemRight" valign="bottom"><b>_flags</b></td></tr>
 </div><div class="memdoc">
 <p>Resize the current maximum permitted extent of the memory section to the given extent. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">newsize</td><td>The new size of the memory section. Specify zero to use <code>backing.length()</code>. This cannot exceed the size of any backing file used if that file is not writable.</td></tr>
+    <tr><td class="paramname">newsize</td><td>The new size of the memory section, which cannot be zero. Specify zero to use <code>backing.length()</code>. This cannot exceed the size of any backing file used if that file is not writable.</td></tr>
   </table>
   </dd>
 </dl>

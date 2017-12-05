@@ -775,7 +775,7 @@ For portability, you can only assume that barriers write order for a single hand
 <p>Create a memory mapped view of a backing storage. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">section</td><td>A memory section handle specifying the backing storage to use. </td></tr>
-    <tr><td class="paramname">bytes</td><td>How many bytes to map (0 = the size of the memory section). Typically will be rounded to a multiple of the page size (see utils::page_sizes()). </td></tr>
+    <tr><td class="paramname">bytes</td><td>How many bytes to map (0 = the size of the memory section). </td></tr>
     <tr><td class="paramname">offset</td><td>The offset into the backing storage to map from. Typically needs to be at least a multiple of the page size (see utils::page_sizes()), on Windows it needs to be a multiple of the kernel memory allocation granularity (typically 64Kb). </td></tr>
     <tr><td class="paramname">_flag</td><td>The permissions with which to map the view which are constrained by the permissions of the memory section. <code>flag::none</code> can be useful for reserving virtual address space without committing system resources, use commit() to later change availability of memory.</td></tr>
   </table>
