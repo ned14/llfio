@@ -155,7 +155,7 @@ public:
   AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<extent_type> length() const noexcept;
 
   /*! Resize the current maximum permitted extent of the memory section to the given extent.
-  \param newsize The new size of the memory section. Specify zero to use `backing.length()`.
+  \param newsize The new size of the memory section, which cannot be zero. Specify zero to use `backing.length()`.
   This cannot exceed the size of any backing file used if that file is not writable.
 
   \errors Any of the values `NtExtendSection()` or `ftruncate()` can return.
@@ -300,7 +300,7 @@ public:
 
   /*! Create a memory mapped view of a backing storage.
   \param section A memory section handle specifying the backing storage to use.
-  \param bytes How many bytes to map (0 = the size of the memory section). Typically will be rounded to a multiple of the page size (see utils::page_sizes()).
+  \param bytes How many bytes to map (0 = the size of the memory section).
   \param offset The offset into the backing storage to map from. Typically needs to be at least a multiple of the page size (see utils::page_sizes()), on Windows it needs to be a multiple of the kernel memory allocation granularity (typically 64Kb).
   \param _flag The permissions with which to map the view which are constrained by the permissions of the memory section. `flag::none` can be useful for reserving virtual address space without committing system resources, use commit() to later change availability of memory.
 

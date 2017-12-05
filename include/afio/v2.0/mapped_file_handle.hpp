@@ -231,14 +231,14 @@ public:
     {
     default:
     {
-      // Attempt mapping now
+      // Attempt mapping now (may silently fail if file is empty)
       mapped_file_handle mfh(std::move(fh), reservation);
       return {std::move(mfh)};
     }
     case creation::only_if_not_exist:
     case creation::truncate:
     {
-      // Don't attempt mapping now
+      // Don't attempt mapping now as file will be empty
       mapped_file_handle mfh(std::move(fh));
       mfh._reservation = reservation;
       return {std::move(mfh)};

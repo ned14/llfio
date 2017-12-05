@@ -99,7 +99,7 @@ result<section_handle::extent_type> section_handle::length() const noexcept
 result<section_handle::extent_type> section_handle::truncate(extent_type newsize) noexcept
 {
   AFIO_LOG_FUNCTION_CALL(this);
-  if(!_backing)
+  if(!_backing && newsize > 0)
   {
     if(-1 == ::ftruncate(_anonymous.native_handle().fd, newsize))
       return {errno, std::system_category()};
@@ -262,7 +262,7 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
   {
     if(!section.backing())
       return std::errc::argument_out_of_domain;
-    bytes = section.length().value();
+    bytes = section.length().value() - offset;
   }
   result<map_handle> ret{map_handle(&section)};
   native_handle_type &nativeh = ret.value()._v;

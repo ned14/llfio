@@ -48,23 +48,23 @@ template <class U> inline void map_handle_create_close_(U &&f)
     postcondition::custom_parameters<bool>
   >(
     {
-      { success(),{ 1, section_handle::flag::none },{ "_" },{ false } },
-      { success(),{ 1, section_handle::flag::read },{ "_" },{ false } },
-      { success(),{ 1, section_handle::flag::write },{ "_" },{ false } },
-      { success(),{ 1, section_handle::flag::cow },{ "_" },{ false } },
-      //{ success(),{ 1, section_handle::flag::execute },{ "_" },{ false } },
-      { success(),{ 1, section_handle::flag::write|section_handle::flag::nocommit },{ "_" },{ false } },
-      { success(),{ 1, section_handle::flag::write|section_handle::flag::prefault },{ "_" },{ false } },
-      //{ success(),{ 1, section_handle::flag::write|section_handle::flag::executable },{ "_" },{ false } },
+      { success(),{ 4096, section_handle::flag::none },{ "_" },{ false } },
+      { success(),{ 4096, section_handle::flag::read },{ "_" },{ false } },
+      { success(),{ 4096, section_handle::flag::write },{ "_" },{ false } },
+      { success(),{ 4096, section_handle::flag::cow },{ "_" },{ false } },
+      //{ success(),{ 4096, section_handle::flag::execute },{ "_" },{ false } },
+      { success(),{ 4096, section_handle::flag::write|section_handle::flag::nocommit },{ "_" },{ false } },
+      { success(),{ 4096, section_handle::flag::write|section_handle::flag::prefault },{ "_" },{ false } },
+      //{ success(),{ 4096, section_handle::flag::write|section_handle::flag::executable },{ "_" },{ false } },
 
-      { success(),{ 1, section_handle::flag::none },{ "_" },{ true } },
-      { success(),{ 1, section_handle::flag::read },{ "_" },{ true } },
-      { success(),{ 1, section_handle::flag::write },{ "_" },{ true } },
-      { success(),{ 1, section_handle::flag::cow },{ "_" },{ true } },
-      //{ success(),{ 1, section_handle::flag::execute },{ "_" },{ true } },
-      { success(),{ 1, section_handle::flag::write | section_handle::flag::nocommit },{ "_" },{ true } },
-      { success(),{ 1, section_handle::flag::write | section_handle::flag::prefault },{ "_" },{ true } },
-      //{ success(),{ 1, section_handle::flag::write|section_handle::flag::executable },{ "_" },{ true } },
+      { success(),{ 0, section_handle::flag::none },{ "_" },{ true } },
+      { success(),{ 0, section_handle::flag::read },{ "_" },{ true } },
+      { success(),{ 0, section_handle::flag::write },{ "_" },{ true } },
+      { success(),{ 0, section_handle::flag::cow },{ "_" },{ true } },
+      //{ success(),{ 0, section_handle::flag::execute },{ "_" },{ true } },
+      { success(),{ 0, section_handle::flag::write | section_handle::flag::nocommit },{ "_" },{ true } },
+      { success(),{ 0, section_handle::flag::write | section_handle::flag::prefault },{ "_" },{ true } },
+      //{ success(),{ 0, section_handle::flag::write|section_handle::flag::executable },{ "_" },{ true } },
   },
     precondition::filesystem_setup(),
     postcondition::custom(
@@ -97,6 +97,8 @@ template <class U> inline void map_handle_create_close_(U &&f)
           (void) maph.close();
           (void) temph.close();
         });
+//#undef KERNELTEST_CHECK
+//#define KERNELTEST_CHECK(a, ...) BOOST_CHECK(__VA_ARGS__)
         if (testreturn)
         {
           char *addr = maph.address();
@@ -112,11 +114,13 @@ template <class U> inline void map_handle_create_close_(U &&f)
               KERNELTEST_CHECK(testreturn, !memcmp(addr, "I am some file data", 19));
             }
             // Make sure maph's read() does what it is supposed to
+            if (use_file_backing)
             {
               auto b = maph.read(0, nullptr, 20).value();
               KERNELTEST_CHECK(testreturn, b.data == addr);
-              KERNELTEST_CHECK(testreturn, b.len == 20);
+              KERNELTEST_CHECK(testreturn, b.len == 19);  // reads do not read more than the backing length
             }
+            else
             {
               auto b = maph.read(5, nullptr, 5000).value();
               KERNELTEST_CHECK(testreturn, b.data == addr+5); // NOLINT

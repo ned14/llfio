@@ -413,7 +413,12 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
   }
   ret.value()._addr = (char *) addr;
   ret.value()._offset = offset;
+#if 0
   ret.value()._length = _bytes;
+#else
+  // Need exact size here, not rounded up value
+  ret.value()._length = section.length().value();
+#endif
   // Make my handle borrow the native handle of my backing storage
   ret.value()._v.h = section.backing_native_handle().h;
 

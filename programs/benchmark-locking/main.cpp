@@ -70,9 +70,9 @@ static volatile size_t *shared_memory;
 static void initialise_shared_memory()
 {
   auto fh = afio::file_handle::file({}, "shared_memory", afio::file_handle::mode::write, afio::file_handle::creation::if_needed, afio::file_handle::caching::temporary).value();
-  auto sh = afio::section_handle::section(8, fh, afio::section_handle::flag::write).value();
+  auto sh = afio::section_handle::section(fh, 8, afio::section_handle::flag::write).value();
   auto mp = afio::map_handle::map(sh).value();
-  shared_memory = (size_t *)mp.address();
+  shared_memory = (size_t *) mp.address();
   if(!shared_memory)
     abort();
   *shared_memory = (size_t) -1;
