@@ -100,10 +100,6 @@ result<mapped_file_handle::extent_type> mapped_file_handle::truncate(extent_type
   if(!_sh.is_valid())
   {
     OUTCOME_TRY(ret, file_handle::truncate(newsize));
-    if(newsize > _reservation)
-    {
-      _reservation = newsize;
-    }
     // Reserve now we have resized, it'll create a new section for the new size
     OUTCOME_TRYV(reserve(_reservation));
     return ret;
@@ -134,7 +130,8 @@ result<mapped_file_handle::extent_type> mapped_file_handle::truncate(extent_type
     // Have we exceeded the reservation? If so, reserve a new reservation which will recreate the map.
     if(newsize > _reservation)
     {
-      return reserve(newsize);
+      OUTCOME_TRY(ret, reserve(newsize));
+      return ret;
     }
     size = newsize;
   }
