@@ -5,6 +5,7 @@ var config_8hpp =
     [ "error", "classafio__v2__xxx_1_1error.html", "classafio__v2__xxx_1_1error" ],
     [ "log_level_guard", "classafio__v2__xxx_1_1log__level__guard.html", "classafio__v2__xxx_1_1log__level__guard" ],
     [ "AFIO_DECL", "config_8hpp.html#a10535ba14c672e51779ac3d70b2e09d8", null ],
+    [ "AFIO_DISABLE_PATHS_IN_FAILURE_INFO", "config_8hpp.html#a233035c2698f3cbf5910c8ecf5193135", null ],
     [ "AFIO_GLUE", "config_8hpp.html#a84d91a729e5c9f99860fe8548bfbbb08", null ],
     [ "AFIO_GLUE2", "config_8hpp.html#ae49d7cc75eaf5579526f169b04d66023", null ],
     [ "AFIO_HEADERS_ONLY", "group__config.html#gafa3b0c57823d6f9736497df6a1571a95", null ],
@@ -49,6 +50,5 @@ var config_8hpp =
     [ "operator!=", "config_8hpp.html#a32361fd287b7160ae34aada17191e41e", null ],
     [ "operator<<", "config_8hpp.html#ac0d5364044c4627667e827f5aaaa183f", null ],
     [ "operator==", "config_8hpp.html#a14e8f43a04092eb024ced8b5909cfd88", null ],
-    [ "throw_as_system_error_with_payload", "config_8hpp.html#ae44838fe79524e9d9eb432eb072395cb", null ],
-    [ "tls_errored_results", "config_8hpp.html#ae2ddff37f35bbb27dbde71beff2e6f6d", null ]
+    [ "throw_as_system_error_with_payload", "config_8hpp.html#ae44838fe79524e9d9eb432eb072395cb", null ]
 ];

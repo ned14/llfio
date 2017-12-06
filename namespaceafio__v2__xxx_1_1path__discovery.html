@@ -234,7 +234,8 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operato
 </div><div class="memdoc">
 
 <p>Returns a subset of <code>all_temporary_directories()</code> each of which has been tested to be writable by the current process. No testing is done of available writable space. </p>
-<p>After this call returns, the successfully probed entries returned by <code>all_temporary_directories()</code> will have their stat structure set. As the probing involves creating a non-zero sized file in each possible temporary directory to verify its validity, this is not a fast call. It is however cached statically, so the cost occurs exactly once per process, unless someone calls <code>all_temporary_directories(true)</code> to wipe and refresh the master list. An internal mutex is held for the duration of this call. </p><dl class="section user"><dt>Memory Allocations</dt><dd>None.  This call never fails, though if it fails to find any writable temporary directory, it will terminate the process. </dd></dl>
+<p>After this call returns, the successfully probed entries returned by <code>all_temporary_directories()</code> will have their stat structure set. As the probing involves creating a non-zero sized file in each possible temporary directory to verify its validity, this is not a fast call. It is however cached statically, so the cost occurs exactly once per process, unless someone calls <code>all_temporary_directories(true)</code> to wipe and refresh the master list. An internal mutex is held for the duration of this call. </p><dl class="section user"><dt>Memory Allocations</dt><dd>None. </dd></dl>
+<dl class="section user"><dt>Errors returnable</dt><dd>This call never fails, though if it fails to find any writable temporary directory, it will terminate the process. </dd></dl>
 
 </div>
 </div>

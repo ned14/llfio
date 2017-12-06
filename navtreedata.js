@@ -29,6 +29,7 @@ var NAVTREE =
       [ "File List", "files.html", "files" ],
       [ "File Members", "globals.html", [
         [ "All", "globals.html", null ],
+        [ "Functions", "globals_func.html", null ],
         [ "Macros", "globals_defs.html", null ]
       ] ]
     ] ]
@@ -42,9 +43,9 @@ var NAVTREEINDEX =
 "classafio__v2__xxx_1_1fs__handle.html#a334ed7c11091e8f3f83686b8aeaa1c5b",
 "classafio__v2__xxx_1_1mapped__file__handle.html#a00f42a44de714feb3ed86dd0a175e69c",
 "classafio__v2__xxx_1_1section__handle.html#af1610ec7fb0a41f039e3e17e0dc467ab",
-"path__discovery_8hpp.html#ac6173c177876fe011aa4e9574ee736f6",
-"structafio__v2__xxx_1_1construct_3_01mapped__file__handle_01_4.html#aec02b80a89b23de312e0f6a3b0a47f0d",
-"structafio__v2__xxx_1_1storage__profile_1_1item.html#a3914ff417e4a91fd0cc1da8ccb3e81d0"
+"path__discovery_8hpp.html#a87e2960b95e0ba2e3169cc31abc6cd03",
+"structafio__v2__xxx_1_1construct_3_01mapped__file__handle_01_4.html#aeb1703dfe797a5a0c2dd3dff66a40ba3",
+"structafio__v2__xxx_1_1storage__profile_1_1item.html#a1c59e24cdf6e608b87539c5639a8ded6"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

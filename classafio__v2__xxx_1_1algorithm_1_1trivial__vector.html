@@ -352,7 +352,7 @@ class afio_v2_xxx::algorithm::trivial_vector&lt; T &gt;</h3>
 <p>We also disable the copy constructor, as copying an entire backing file is expensive. Use the iterator based copy constructor if you really want to copy one of these.</p>
 <p>The very first item stored reserves a capacity of <code>utils::page_size()/sizeof(T)</code>. Capacity is doubled in byte terms thereafter (i.e. 8Kb, 16Kb and so on). Also be aware that the capacity of the vector needs to become reasonably large before going to the kernel to resize the <code>section_handle</code> and remapping memory becomes faster than <code>memcpy</code>. For these reasons, this vector implementation is best suited to arrays of unknown in advance, but likely large, sizes. </p>
 </div><hr/>The documentation for this class was generated from the following file:<ul>
-<li>include/afio/v2.0/algorithm/trivial_vector.hpp</li>
+<li>include/afio/v2.0/algorithm/<a class="el" href="trivial__vector_8hpp.html">trivial_vector.hpp</a></li>
 </ul>
 </div><!-- contents -->
 </div><!-- doc-content -->
