@@ -29,7 +29,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../utils.hpp"
 
 
-//! \file vector.hpp Provides constant time reallocating STL vector.
+//! \file trivial_vector.hpp Provides constant time reallocating STL vector.
 
 AFIO_V2_NAMESPACE_BEGIN
 
