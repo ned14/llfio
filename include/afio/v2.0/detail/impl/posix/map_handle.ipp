@@ -258,18 +258,17 @@ result<map_handle> map_handle::map(size_type bytes, section_handle::flag _flag) 
 
 result<map_handle> map_handle::map(section_handle &section, size_type bytes, extent_type offset, section_handle::flag _flag) noexcept
 {
+  OUTCOME_TRY(length, section.length());  // length of the backing file
   if(!bytes)
   {
-    if(!section.backing())
-      return std::errc::argument_out_of_domain;
-    bytes = section.length().value() - offset;
+    bytes = length - offset;
   }
   result<map_handle> ret{map_handle(&section)};
   native_handle_type &nativeh = ret.value()._v;
   OUTCOME_TRY(addr, do_mmap(nativeh, nullptr, &section, bytes, offset, _flag));
   ret.value()._addr = (char *) addr;
   ret.value()._offset = offset;
-  ret.value()._length = bytes;
+  ret.value()._length = length - offset;  // length of backing, not reservation
   // Make my handle borrow the native handle of my backing storage
   ret.value()._v.fd = section.native_handle().fd;
   AFIO_LOG_FUNCTION_CALL(&ret);
