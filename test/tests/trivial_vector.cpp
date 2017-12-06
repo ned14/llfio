@@ -32,13 +32,13 @@ static inline void TestTrivialVector()
   {
     size_t v;
     udt() = delete;
-    explicit udt(int) { v = trivial_vector_udts_constructed++; };
+    explicit udt(int /*unused*/) { v = trivial_vector_udts_constructed++; };
   };
   using udt_vector = AFIO_V2_NAMESPACE::algorithm::trivial_vector<udt>;
 
   udt_vector v;
   BOOST_CHECK(v.empty());
-  BOOST_CHECK(v.size() == 0);
+  BOOST_CHECK(v.size() == 0);  // NOLINT
   v.push_back(udt(5));
   BOOST_CHECK(v.size() == 1);
   BOOST_CHECK(v.capacity() == AFIO_V2_NAMESPACE::utils::page_size() / sizeof(udt));
@@ -53,7 +53,7 @@ static inline void TestTrivialVector()
   BOOST_CHECK(v.capacity() == AFIO_V2_NAMESPACE::utils::round_up_to_page_size(8192 * sizeof(udt)) / sizeof(udt));
   for(size_t n = 0; n < 8192; n++)
   {
-    if(!n)
+    if(0 == n)
     {
       BOOST_CHECK(v[n].v == 0);
     }
@@ -73,7 +73,7 @@ static inline void TestTrivialVector()
   auto it = v.begin();
   for(size_t n = 0; n < 8192; n++, ++it)
   {
-    if(!n)
+    if(0 == n)
     {
       BOOST_CHECK(it->v == 0);
     }
@@ -110,7 +110,8 @@ static inline void BenchmarkTrivialVector1()
   {
     auto begin = std::chrono::high_resolution_clock::now();
     while(std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock::now() - begin).count() < 1)
-      ;
+    {
+    }
     std::vector<int> v1;
     v1.reserve(1);
     auto std_time = BenchmarkVector(v1, items);
@@ -131,7 +132,8 @@ static inline void BenchmarkTrivialVector2()
       std::vector<int> v1;
       v1.resize(items, 5);
       while(std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock::now() - begin).count() < 1)
-        ;
+      {
+      }
       begin = std::chrono::high_resolution_clock::now();
       v1.resize(items * 2, 6);
       end = std::chrono::high_resolution_clock::now();
@@ -141,7 +143,8 @@ static inline void BenchmarkTrivialVector2()
       AFIO_V2_NAMESPACE::algorithm::trivial_vector<int> v1;
       v1.resize(items, 5);
       while(std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock::now() - begin).count() < 1)
-        ;
+      {
+      }
       begin = std::chrono::high_resolution_clock::now();
       v1.resize(items * 2, 6);
       end = std::chrono::high_resolution_clock::now();

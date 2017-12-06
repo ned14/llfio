@@ -31,7 +31,6 @@ template <class U> inline void map_handle_create_close_(U &&f)
   using AFIO_V2_NAMESPACE::file_handle;
   using AFIO_V2_NAMESPACE::section_handle;
   using AFIO_V2_NAMESPACE::map_handle;
-  namespace path_discovery = AFIO_V2_NAMESPACE::path_discovery;
 
   // Create a temporary file and put some text into it
   file_handle temph;
@@ -135,14 +134,14 @@ template <class U> inline void map_handle_create_close_(U &&f)
               // Make sure data written to the map turns up in the file
               if (use_file_backing)
               {
-                temph.read(0, buffer, 64);
+                temph.read(0, buffer, 64);  // NOLINT
                 if (flags & section_handle::flag::cow)
                 {
-                  KERNELTEST_CHECK(testreturn, !memcmp(buffer, "I am some file data", 19));
+                  KERNELTEST_CHECK(testreturn, !memcmp(buffer, "I am some file data", 19));  // NOLINT
                 }
                 else
                 {
-                  KERNELTEST_CHECK(testreturn, !memcmp(buffer, "Niall was here data", 19));
+                  KERNELTEST_CHECK(testreturn, !memcmp(buffer, "Niall was here data", 19));  // NOLINT
                 }
               }
             }

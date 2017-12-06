@@ -35,8 +35,8 @@ static inline void TestAsyncFileHandle()
   futures.reserve(1024);
   h.truncate(1024 * 4096).value();
   alignas(4096) char buffer[4096];
-  memset(buffer, 78, 4096);
-  afio::async_file_handle::const_buffer_type bt{buffer, sizeof(buffer)};
+  memset(buffer, 78, 4096);                                               // NOLINT
+  afio::async_file_handle::const_buffer_type bt{buffer, sizeof(buffer)};  // NOLINT
   for(size_t n = 0; n < 1024; n++)
   {
     std::promise<afio::async_file_handle::const_buffers_type> p;
@@ -56,7 +56,7 @@ static inline void TestAsyncFileHandle()
              }
            })
            .value());
-    futures.push_back({std::move(f), std::move(g)});
+    futures.emplace_back(std::move(f), std::move(g));
   }
   // Pump the i/o until no more work remains.
   while(service.run().value())
