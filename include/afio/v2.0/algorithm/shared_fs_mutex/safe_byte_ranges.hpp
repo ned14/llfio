@@ -49,8 +49,8 @@ namespace algorithm
         return safe_byte_ranges(std::move(v));
       }
     };
-  }  // namespace
-}  // namespace
+  }  // namespace shared_fs_mutex
+}  // namespace algorithm
 
 AFIO_V2_NAMESPACE_END
 
@@ -160,8 +160,8 @@ namespace algorithm
       AFIO_HEADERS_ONLY_VIRTUAL_SPEC void unlock(entities_type entities, unsigned long long hint) noexcept override final { return _p->unlock(entities, hint); }
     };
 
-  }  // namespace
-}  // namespace
+  }  // namespace shared_fs_mutex
+}  // namespace algorithm
 
 AFIO_V2_NAMESPACE_END
 

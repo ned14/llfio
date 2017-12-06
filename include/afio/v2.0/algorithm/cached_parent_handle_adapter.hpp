@@ -52,7 +52,7 @@ namespace algorithm
     using cached_path_handle_ptr = std::shared_ptr<cached_path_handle>;
     // Passed the base and path of the adapted handle being created, returns a handle to the containing directory and the leafname
     AFIO_HEADERS_ONLY_FUNC_SPEC std::pair<cached_path_handle_ptr, filesystem::path> get_cached_path_handle(const path_handle &base, path_view path);
-  }
+  }  // namespace detail
 
   /*! \brief Adapts any `construct()`-able implementation to cache its parent directory handle in a process wide cache.
 
@@ -180,7 +180,7 @@ namespace algorithm
     }
   }
 
-}  // namespace
+}  // namespace algorithm
 
 //! \brief Constructor for `algorithm::::cached_parent_handle_adapter<T>`
 template <class T> struct construct<algorithm::cached_parent_handle_adapter<T>>

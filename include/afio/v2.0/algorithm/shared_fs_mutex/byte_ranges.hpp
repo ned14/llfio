@@ -211,8 +211,8 @@ namespace algorithm
       }
     };
 
-  }  // namespace
-}  // namespace
+  }  // namespace shared_fs_mutex
+}  // namespace algorithm
 
 AFIO_V2_NAMESPACE_END
 

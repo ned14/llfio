@@ -67,7 +67,7 @@ namespace algorithm
       };
       static_assert(sizeof(lock_request) == 128, "lock_request structure is not 128 bytes long!");
 #pragma pack(pop)
-    }  // namespace
+    }  // namespace atomic_append_detail
 #endif
     /*! \class atomic_append
     \brief Scalable many entity shared/exclusive file system based lock
@@ -479,8 +479,8 @@ namespace algorithm
       }
     };
 
-  }  // namespace
-}  // namespace
+  }  // namespace shared_fs_mutex
+}  // namespace algorithm
 
 AFIO_V2_NAMESPACE_END
 
