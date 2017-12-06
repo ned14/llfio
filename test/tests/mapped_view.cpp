@@ -80,14 +80,16 @@ static inline void TestMappedView2()
   v1[9999] = 79;
   mfh.truncate(20000 * sizeof(int)).value();
   BOOST_CHECK(addr == mfh.address());
+  BOOST_CHECK(mfh.length().value() == 20000 * sizeof(int));
+  BOOST_CHECK(mfh.underlying_file_length().value() == 20000 * sizeof(int));
   v1 = mfh;
   BOOST_CHECK(v1.size() == 20000);
   BOOST_CHECK(v1[0] == 78);
   BOOST_CHECK(v1[9999] == 79);
-  mfh.truncate(2 * 1024 * 1024).value();
-  BOOST_CHECK(addr == mfh.address());
+  mfh.truncate(2 * 1024 * 1024).value();  // exceed reservation, cause hidden reserve
+  BOOST_CHECK(addr != nullptr);
   v1 = mfh;
-  BOOST_CHECK(v1.size() == 1024 * 1024 / sizeof(int));
+  BOOST_CHECK(v1.size() == 2 * 1024 * 1024 / sizeof(int));
   BOOST_CHECK(v1[0] == 78);
   BOOST_CHECK(v1[9999] == 79);
   mfh.reserve(2 * 1024 * 1024).value();

@@ -90,6 +90,7 @@ native_handle_type mapped_file_handle::release() noexcept
 result<mapped_file_handle::extent_type> mapped_file_handle::truncate(extent_type newsize) noexcept
 {
   AFIO_LOG_FUNCTION_CALL(this);
+  // Release all maps and sections and truncate the backing file to zero
   if(newsize == 0)
   {
     OUTCOME_TRYV(_mh.close());
@@ -108,32 +109,45 @@ result<mapped_file_handle::extent_type> mapped_file_handle::truncate(extent_type
   // AFIO in another process may have already resized the section for us in which case
   // we can skip doing work now.
   OUTCOME_TRY(size, _sh.length());
-  if(size == newsize)
+  if(size != newsize)
   {
-    return newsize;
+    // If we are making this smaller, we must destroy the map and section first
+    if(newsize < size)
+    {
+      OUTCOME_TRYV(_mh.close());
+      OUTCOME_TRYV(_sh.close());
+      // This will fail on Windows if any other processes are holding a section on this file
+      OUTCOME_TRY(ret, file_handle::truncate(newsize));
+      // Put the reservation and map back
+      OUTCOME_TRYV(reserve(_reservation));
+      return ret;
+    }
+    // Otherwise resize the file upwards, then the section.
+    OUTCOME_TRYV(file_handle::truncate(newsize));
+    // On Windows, resizing the section upwards maps the added extents into memory in all
+    // processes using this singleton section
+    OUTCOME_TRYV(_sh.truncate(newsize));
+    // Have we exceeded the reservation? If so, reserve a new reservation which will recreate the map.
+    if(newsize > _reservation)
+    {
+      OUTCOME_TRY(ret, reserve(newsize));
+      return ret;
+    }
+    size = newsize;
   }
-  // If we are making this smaller, we must destroy the map and section first
-  if(newsize < size)
-  {
-    OUTCOME_TRYV(_mh.close());
-    OUTCOME_TRYV(_sh.close());
-    // This will fail on Windows if any other processes are holding a section on this file
-    OUTCOME_TRY(ret, file_handle::truncate(newsize));
-    // Put the reservation and map back
-    OUTCOME_TRYV(reserve(_reservation));
-    return ret;
-  }
-  // Otherwise resize the file upwards, then the section.
-  OUTCOME_TRY(ret, file_handle::truncate(newsize));
-  // On Windows, resizing the section upwards maps the added extents into memory in all
-  // processes using this singleton section
-  OUTCOME_TRYV(_sh.truncate(newsize));
-  return ret;
+  // Adjust the map to reflect the new size of the section
+  _mh._length = size;
+  return newsize;
 }
 
 result<mapped_file_handle::extent_type> mapped_file_handle::update_map() noexcept
 {
   OUTCOME_TRY(length, underlying_file_length());
+  if(length > _reservation)
+  {
+    // This API never exceeds the reservation
+    length = _reservation;
+  }
   if(length == 0)
   {
     OUTCOME_TRYV(_mh.close());
@@ -146,12 +160,17 @@ result<mapped_file_handle::extent_type> mapped_file_handle::update_map() noexcep
     return length;
   }
   OUTCOME_TRY(size, _sh.length());
-  if(size == length)
+  // Section may have become bigger than our reservation ...
+  if(size >= length)
   {
-    // Section is already the same size as the file
+    // Section is already the same size as the file, or is as big as it can go
+    _mh._length = length;
     return length;
   }
+  // Nobody appears to have extended the section to match the file yet
   OUTCOME_TRYV(_sh.truncate(length));
+  // Adjust the map to reflect the new size of the section
+  _mh._length = length;
   return length;
 }
 

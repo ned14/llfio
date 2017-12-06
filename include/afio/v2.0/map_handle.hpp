@@ -155,7 +155,7 @@ public:
   AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<extent_type> length() const noexcept;
 
   /*! Resize the current maximum permitted extent of the memory section to the given extent.
-  \param newsize The new size of the memory section. Specify zero to use `backing.length()`.
+  \param newsize The new size of the memory section, which cannot be zero. Specify zero to use `backing.length()`.
   This cannot exceed the size of any backing file used if that file is not writable.
 
   \errors Any of the values `NtExtendSection()` or `ftruncate()` can return.
@@ -204,6 +204,7 @@ template <> struct construct<section_handle>
   result<section_handle> operator()() const noexcept { return section_handle::section(backing, maximum_size, _flag); }
 };
 
+class mapped_file_handle;
 
 /*! \class map_handle
 \brief A handle to a memory mapped region of memory.
@@ -216,6 +217,8 @@ Locking byte ranges of this handle is therefore equal to locking byte ranges in 
 */
 class AFIO_DECL map_handle : public io_handle
 {
+  friend class mapped_file_handle;
+
 public:
   using extent_type = io_handle::extent_type;
   using size_type = io_handle::size_type;
@@ -300,7 +303,7 @@ public:
 
   /*! Create a memory mapped view of a backing storage.
   \param section A memory section handle specifying the backing storage to use.
-  \param bytes How many bytes to map (0 = the size of the memory section). Typically will be rounded to a multiple of the page size (see utils::page_sizes()).
+  \param bytes How many bytes to map (0 = the size of the memory section).
   \param offset The offset into the backing storage to map from. Typically needs to be at least a multiple of the page size (see utils::page_sizes()), on Windows it needs to be a multiple of the kernel memory allocation granularity (typically 64Kb).
   \param _flag The permissions with which to map the view which are constrained by the permissions of the memory section. `flag::none` can be useful for reserving virtual address space without committing system resources, use commit() to later change availability of memory.
 
