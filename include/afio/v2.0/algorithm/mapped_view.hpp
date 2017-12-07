@@ -51,8 +51,8 @@ namespace algorithm
 
   private:
     map_handle _mapping;
-    mapped_view(extent_type page_offset, extent_type offset, section_handle &sh, size_type bytes, section_handle::flag _flag)
-        : _mapping(map_handle::map(sh, (bytes == 0) ? 0 : bytes + (offset - page_offset), page_offset, _flag).value())
+    mapped_view(extent_type page_offset, extent_type offset, section_handle &sh, size_type bytes, section_handle::flag _flag)  // NOLINT
+    : _mapping(map_handle::map(sh, (bytes == 0) ? 0 : bytes + (offset - page_offset), page_offset, _flag).value())
     {
       offset -= page_offset;
       char *addr = _mapping.address() + offset;
@@ -61,7 +61,7 @@ namespace algorithm
       {
         len = bytes;
       }
-      static_cast<span<T> &>(*this) = span<T>(reinterpret_cast<T *>(addr), len / sizeof(T));
+      static_cast<span<T> &>(*this) = span<T>(reinterpret_cast<T *>(addr), len / sizeof(T));  // NOLINT
     }
 
   public:
@@ -72,7 +72,7 @@ namespace algorithm
     \param length The number of items to map.
     \param _flag The flags to pass to `map_handle::map()`.
     */
-    mapped_view(size_type length, section_handle::flag _flag = section_handle::flag::readwrite)
+    explicit mapped_view(size_type length, section_handle::flag _flag = section_handle::flag::readwrite)
         : _mapping(map_handle::map(length * sizeof(T), _flag).value())
     {
       char *addr = _mapping.address();
@@ -85,14 +85,14 @@ namespace algorithm
     \param byteoffset The byte offset into the section handle, this does not need to be a multiple of the page size.
     \param _flag The flags to pass to `map_handle::map()`.
     */
-    mapped_view(section_handle &sh, size_type length = (size_type) -1, extent_type byteoffset = 0, section_handle::flag _flag = section_handle::flag::readwrite)
-        : mapped_view((length == 0) ? mapped_view() : mapped_view(
+    explicit mapped_view(section_handle &sh, size_type length = (size_type) -1, extent_type byteoffset = 0, section_handle::flag _flag = section_handle::flag::readwrite)  // NOLINT
+    : mapped_view((length == 0) ? mapped_view() : mapped_view(
 #ifdef _WIN32
-                                                      byteoffset & ~65535,
+                                                  byteoffset & ~65535,
 #else
-                                                      utils::round_down_to_page_size(byteoffset),
+                                                  utils::round_down_to_page_size(byteoffset),
 #endif
-                                                      byteoffset, sh, (length == (size_type) -1) ? 0 : length * sizeof(T), _flag))
+                                                  byteoffset, sh, (length == (size_type) -1) ? 0 : length * sizeof(T), _flag))  // NOLINT
     {
     }
     /*! Construct a mapped view of the given mapped file handle.
@@ -101,12 +101,12 @@ namespace algorithm
     \param length The number of items to map, use -1 to mean the length of the section handle divided by `sizeof(T)`.
     \param byteoffset The byte offset into the mapped file handle, this does not need to be a multiple of the page size.
     */
-    mapped_view(mapped_file_handle &mfh, size_type length = (size_type) -1, extent_type byteoffset = 0)
-        : span<T>(reinterpret_cast<T *>(mfh.address() + byteoffset), (length == (size_type) -1) ? (mfh.length().value() / sizeof(T)) : length)
+    explicit mapped_view(mapped_file_handle &mfh, size_type length = (size_type) -1, extent_type byteoffset = 0)                            // NOLINT
+    : span<T>(reinterpret_cast<T *>(mfh.address() + byteoffset), (length == (size_type) -1) ? (mfh.length().value() / sizeof(T)) : length)  // NOLINT
     {
     }
   };
-}  // namespace
+}  // namespace algorithm
 
 AFIO_V2_NAMESPACE_END
 

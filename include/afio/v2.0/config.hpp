@@ -40,6 +40,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 //! \def AFIO_DISABLE_PATHS_IN_FAILURE_INFO
 //! \brief Define to not record the current handle's path in any failure info.
+#if DOXYGEN_IS_IN_THE_HOUSE
+#define AFIO_DISABLE_PATHS_IN_FAILURE_INFO not defined
+#endif
 
 #if !defined(AFIO_LOGGING_LEVEL)
 //! \brief How much detail to log. 0=disabled, 1=fatal, 2=error, 3=warn, 4=info, 5=debug, 6=all.

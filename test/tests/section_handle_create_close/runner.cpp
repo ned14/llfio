@@ -30,7 +30,6 @@ template <class U> inline void section_handle_create_close_(U &&f)
   using AFIO_V2_NAMESPACE::result;
   using AFIO_V2_NAMESPACE::file_handle;
   using AFIO_V2_NAMESPACE::section_handle;
-  namespace path_discovery = AFIO_V2_NAMESPACE::path_discovery;
 
   // Create a temporary file and put some text into it
   file_handle temph;

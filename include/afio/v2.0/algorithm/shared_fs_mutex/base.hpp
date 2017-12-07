@@ -214,8 +214,8 @@ namespace algorithm
       virtual void unlock(entities_type entities, unsigned long long hint = 0) noexcept = 0;
     };
 
-  }  // namespace
-}  // namespace
+  }  // namespace shared_fs_mutex
+}  // namespace algorithm
 
 AFIO_V2_NAMESPACE_END
 

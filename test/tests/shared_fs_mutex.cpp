@@ -184,15 +184,15 @@ struct child_workers
     for(size_t n = 0; n < workers.size(); n++)
     {
       auto &i = workers[n].cout();
-      if(!i.getline(buffer, sizeof(buffer)))
+      if(!i.getline(buffer, sizeof(buffer)))  // NOLINT
       {
         results[n].cerr = "ERROR: Child seems to have vanished! (wait_until_ready)";
         results[n].retcode = 99;
         continue;
       }
-      if(0 != strncmp(buffer, "READY", 5))
+      if(0 != strncmp(buffer, "READY", 5))  // NOLINT
       {
-        results[n].cerr = "ERROR: Child wrote unexpected output '" + std::string(buffer) + "' (wait_until_ready)";
+        results[n].cerr = "ERROR: Child wrote unexpected output '" + std::string(buffer) + "' (wait_until_ready)";  // NOLINT
         results[n].retcode = 98;
         continue;
       }
@@ -226,14 +226,14 @@ struct child_workers
       auto &child = workers[n];
       if(0 == results[n].retcode)
       {
-        if(!child.cout().getline(buffer, sizeof(buffer)))
+        if(!child.cout().getline(buffer, sizeof(buffer)))  // NOLINT
         {
           results[n].cerr = child.is_running() ? "ERROR: Child pipe is unreadable! (join)" : "ERROR: Child seems to have vanished! (join)";
           results[n].retcode = 99;
         }
-        else if(0 != strncmp(buffer, "RESULTS ", 8))
+        else if(0 != strncmp(buffer, "RESULTS ", 8))  // NOLINT
         {
-          results[n].cerr = "ERROR: Child wrote unexpected output '" + std::string(buffer) + "' (join)";
+          results[n].cerr = "ERROR: Child wrote unexpected output '" + std::string(buffer) + "' (join)";  // NOLINT
           results[n].retcode = 98;
         }
         else
@@ -439,7 +439,7 @@ void TestSharedFSMutexCorrectness(shared_memory::mutex_kind_type mutex_kind, sha
     {
       std::packaged_task<std::string(KERNELTEST_V1_NAMESPACE::waitable_done &, size_t, shared_memory *)> task(_TestSharedFSMutexCorrectnessChildWorker);
       auto f = task.get_future();
-      thread_workers.push_back({std::move(f), std::thread(std::move(task), std::ref(waitable), n, shmem)});
+      thread_workers.emplace_back(std::move(f), std::thread(std::move(task), std::ref(waitable), n, shmem));
     }
     std::this_thread::sleep_for(std::chrono::seconds(5));
     waitable.set_done(1);
@@ -637,18 +637,18 @@ int main(int argc, char *argv[])
         {
           char buffer[1024];
           // This blocks
-          if(!std::cin.getline(buffer, sizeof(buffer)))
+          if(!std::cin.getline(buffer, sizeof(buffer)))  // NOLINT
           {
             waitable.set_done(1);
             worker.join();
             return 1;
           }
-          if(0 == strcmp(buffer, "GO"))
+          if(0 == strcmp(buffer, "GO"))  // NOLINT
           {
             // Launch worker thread
             waitable.set_done(0);
           }
-          else if(0 == strcmp(buffer, "STOP"))
+          else if(0 == strcmp(buffer, "STOP"))  // NOLINT
           {
             waitable.set_done(1);
             worker.join();

@@ -205,19 +205,19 @@ namespace utils
   template <typename T> class page_allocator
   {
   public:
-    typedef T value_type;
-    typedef T *pointer;
-    typedef const T *const_pointer;
-    typedef T &reference;
-    typedef const T &const_reference;
-    typedef size_t size_type;
-    typedef ptrdiff_t difference_type;
-    typedef std::true_type propagate_on_container_move_assignment;
-    typedef std::true_type is_always_equal;
+    using value_type = T;
+    using pointer = T *;
+    using const_pointer = const T *;
+    using reference = T &;
+    using const_reference = const T &;
+    using size_type = size_t;
+    using difference_type = ptrdiff_t;
+    using propagate_on_container_move_assignment = std::true_type;
+    using is_always_equal = std::true_type;
 
     template <class U> struct rebind
     {
-      typedef page_allocator<U> other;
+      using other = page_allocator<U>;
     };
 
     page_allocator() noexcept {}

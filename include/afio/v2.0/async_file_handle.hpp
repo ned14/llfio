@@ -351,6 +351,7 @@ public:
   has acknowledged the data is physically written. Slow.
   \param and_metadata True if you want the call to sync the metadata for retrieving the writes before the
   barrier after a sudden power loss event. Slow.
+  \param mem Optional span of memory to use to avoid using `calloc()`. Note span MUST be all bits zero on entry.
   \errors As for `barrier()`, plus `ENOMEM`.
   \mallocs If mem is not set, one calloc, one free. The allocation is unavoidable due to the need to store a type
   erased completion handler of unknown type and state per buffers input.

@@ -417,7 +417,7 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
   ret.value()._length = _bytes;
 #else
   // Need exact size here, not rounded up value
-  ret.value()._length = section.length().value();
+  ret.value()._length = section.length().value() - offset;
 #endif
   // Make my handle borrow the native handle of my backing storage
   ret.value()._v.h = section.backing_native_handle().h;

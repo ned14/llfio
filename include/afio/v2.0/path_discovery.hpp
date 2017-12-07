@@ -85,7 +85,7 @@ namespace path_discovery
   cost occurs exactly once per process, unless someone calls `all_temporary_directories(true)` to wipe and refresh
   the master list. An internal mutex is held for the duration of this call.
   \mallocs None.
-  \error This call never fails, though if it fails to find any writable temporary directory, it will
+  \errors This call never fails, though if it fails to find any writable temporary directory, it will
   terminate the process.
   */
   AFIO_HEADERS_ONLY_FUNC_SPEC span<discovered_path> verified_temporary_directories() noexcept;

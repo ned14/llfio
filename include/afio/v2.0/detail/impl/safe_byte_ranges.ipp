@@ -46,6 +46,7 @@ namespace algorithm
   {
     namespace detail
     {
+#if 0
       struct _byte_ranges : public byte_ranges
       {
         using byte_ranges::byte_ranges;
@@ -55,6 +56,7 @@ namespace algorithm
         {
         }
       };
+#endif
       class threaded_byte_ranges : public shared_fs_mutex
       {
       public:

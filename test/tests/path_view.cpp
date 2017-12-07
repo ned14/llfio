@@ -36,7 +36,7 @@ static inline void TestPathView()
   BOOST_CHECK(afio::path_view("niall*").contains_glob());
   // Splitting
   constexpr const char p[] = "/mnt/c/Users/ned/Documents/boostish/afio/programs/build_posix/testdir/0";
-  afio::path_view e(p);
+  afio::path_view e(p);  // NOLINT
   afio::path_view f(e.filename());
   e.remove_filename();
   BOOST_CHECK(e == "/mnt/c/Users/ned/Documents/boostish/afio/programs/build_posix/testdir");
@@ -44,7 +44,7 @@ static inline void TestPathView()
 #ifndef _WIN32
   // cstr
   afio::path_view::c_str g(e);
-  BOOST_CHECK(g.buffer != p);
+  BOOST_CHECK(g.buffer != p);  // NOLINT
   afio::path_view::c_str h(f);
   BOOST_CHECK(h.buffer == p + 70);  // NOLINT
 #endif
