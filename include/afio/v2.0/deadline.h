@@ -25,8 +25,8 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef AFIO_DEADLINE_H
 #define AFIO_DEADLINE_H
 
-#include <stdbool.h>
-#include <time.h>
+#include <stdbool.h>  // NOLINT
+#include <time.h>     // NOLINT
 
 //! \file deadline.h Provides struct deadline
 
@@ -47,41 +47,50 @@ AFIO_V2_NAMESPACE_EXPORT_BEGIN
 */
 struct AFIO_DEADLINE_NAME
 {
-  bool steady;  //!< True if deadline does not change with system clock changes
+  //! True if deadline does not change with system clock changes
+  bool steady;  // NOLINT
   union {
-    struct timespec utc;       //!< System time from timespec_get(&ts, TIME_UTC)
-    unsigned long long nsecs;  //!< Nanosecond ticks from start of operation
+    //! System time from timespec_get(&ts, TIME_UTC)
+    struct timespec utc;  // NOLINT
+    //! Nanosecond ticks from start of operation
+    unsigned long long nsecs;  // NOLINT
   };
 #ifdef __cplusplus
   deadline() noexcept { memset(this, 0, sizeof(*this)); }
   //! True if deadline is valid
   explicit operator bool() const noexcept { return steady || utc.tv_sec != 0; }
   //! Construct a deadline from a system clock time point
-  deadline(std::chrono::system_clock::time_point tp)
+  explicit deadline(std::chrono::system_clock::time_point tp)
       : steady(false)
   {
     std::chrono::seconds secs(std::chrono::system_clock::to_time_t(tp));
     utc.tv_sec = secs.count();
     std::chrono::system_clock::time_point _tp(std::chrono::system_clock::from_time_t(utc.tv_sec));
-    utc.tv_nsec = (long) std::chrono::duration_cast<std::chrono::nanoseconds>(tp - _tp).count();
+    utc.tv_nsec = static_cast<long>(std::chrono::duration_cast<std::chrono::nanoseconds>(tp - _tp).count());
   }
   //! Construct a deadline from a duration from now
   template <class Rep, class Period>
-  deadline(std::chrono::duration<Rep, Period> d)
+  explicit deadline(std::chrono::duration<Rep, Period> d)
       : steady(true)
   {
     std::chrono::nanoseconds _nsecs = std::chrono::duration_cast<std::chrono::nanoseconds>(d);
     // Negative durations are zero duration
     if(_nsecs.count() > 0)
+    {
       nsecs = _nsecs.count();
+    }
     else
+    {
       nsecs = 0;
+    }
   }
   //! Returns a system_clock::time_point for this deadline
   std::chrono::system_clock::time_point to_time_point() const
   {
     if(steady)
+    {
       throw std::invalid_argument("Not a UTC deadline!");
+    }
     std::chrono::system_clock::time_point tp(std::chrono::system_clock::from_time_t(utc.tv_sec));
     tp += std::chrono::duration_cast<std::chrono::system_clock::duration>(std::chrono::nanoseconds(utc.tv_nsec));
     return tp;
