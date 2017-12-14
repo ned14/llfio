@@ -7,7 +7,7 @@ var classafio__v2__xxx_1_1algorithm_1_1cached__parent__handle__adapter =
     [ "cached_parent_handle_adapter", "classafio__v2__xxx_1_1algorithm_1_1cached__parent__handle__adapter.html#a8279d67e48d81cac8d03c6391f6f14a3", null ],
     [ "cached_parent_handle_adapter", "classafio__v2__xxx_1_1algorithm_1_1cached__parent__handle__adapter.html#a4af377c75cb4226be81d09f515ae0646", null ],
     [ "cached_parent_handle_adapter", "classafio__v2__xxx_1_1algorithm_1_1cached__parent__handle__adapter.html#aae24d7b58ece72009e5abde3ff2cda98", null ],
-    [ "~cached_parent_handle_adapter", "classafio__v2__xxx_1_1algorithm_1_1cached__parent__handle__adapter.html#a2500c8295d9316cc3a8a6e0e16069fb1", null ],
+    [ "~cached_parent_handle_adapter", "classafio__v2__xxx_1_1algorithm_1_1cached__parent__handle__adapter.html#acdae379243839da1c13509b02f771350", null ],
     [ "close", "classafio__v2__xxx_1_1algorithm_1_1cached__parent__handle__adapter.html#afdccb18366c07c8c23d3e73c54ed4693", null ],
     [ "current_path", "classafio__v2__xxx_1_1algorithm_1_1cached__parent__handle__adapter.html#a3feee05d182ad0001862c303a0e3210d", null ],
     [ "operator=", "classafio__v2__xxx_1_1algorithm_1_1cached__parent__handle__adapter.html#afa41fbbb63660c52f30effc17b856d5e", null ],

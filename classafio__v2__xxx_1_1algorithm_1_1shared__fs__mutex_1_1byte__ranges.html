@@ -130,10 +130,10 @@ Public Member Functions</h2></td></tr>
 const <a class="el" href="classafio__v2__xxx_1_1file__handle.html">file_handle</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1byte__ranges.html#ae0c765a4db09854a28d7be414cb3d018">handle</a> () const noexcept</td></tr>
 <tr class="memdesc:ae0c765a4db09854a28d7be414cb3d018"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the handle to file being used for this lock. <br /></td></tr>
 <tr class="separator:ae0c765a4db09854a28d7be414cb3d018"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa7350fcc7ab858ff23f52c2bbb978944"><td class="memItemLeft" align="right" valign="top"><a id="aa7350fcc7ab858ff23f52c2bbb978944"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1byte__ranges.html#aa7350fcc7ab858ff23f52c2bbb978944">unlock</a> (<a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex.html#ab9b3f3598d373786919eafc643d78633">entities_type</a> entities, unsigned long long) noexcept override final</td></tr>
-<tr class="memdesc:aa7350fcc7ab858ff23f52c2bbb978944"><td class="mdescLeft">&#160;</td><td class="mdescRight">Unlock a previously locked sequence of entities. <br /></td></tr>
-<tr class="separator:aa7350fcc7ab858ff23f52c2bbb978944"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ade7f672a228670cb193cf05e96368ff4"><td class="memItemLeft" align="right" valign="top"><a id="ade7f672a228670cb193cf05e96368ff4"></a>
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1byte__ranges.html#ade7f672a228670cb193cf05e96368ff4">unlock</a> (<a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex.html#ab9b3f3598d373786919eafc643d78633">entities_type</a> entities, unsigned long long) noexcept final</td></tr>
+<tr class="memdesc:ade7f672a228670cb193cf05e96368ff4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Unlock a previously locked sequence of entities. <br /></td></tr>
+<tr class="separator:ade7f672a228670cb193cf05e96368ff4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a96b28acf46a3d4ebe93b6031d90f79ac"><td class="memItemLeft" align="right" valign="top"><a id="a96b28acf46a3d4ebe93b6031d90f79ac"></a>
 <a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1byte__ranges.html#a29c486c2b6b93b7bebf2c34211fa284e">entity_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex.html#a96b28acf46a3d4ebe93b6031d90f79ac">entity_from_buffer</a> (const char *buffer, size_t bytes, bool exclusive=true) noexcept</td></tr>
 <tr class="memdesc:a96b28acf46a3d4ebe93b6031d90f79ac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generates an entity id from a sequence of bytes. <br /></td></tr>
@@ -177,9 +177,9 @@ static result&lt; <a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared_
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
-<tr class="memitem:a3dce92c978ab82511436f5e4a77745e2"><td class="memItemLeft" align="right" valign="top"><a id="a3dce92c978ab82511436f5e4a77745e2"></a>
-virtual result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>_lock</b> (<a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex_1_1entities__guard.html">entities_guard</a> &amp;out, <a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a> d, bool spin_not_sleep) noexcept override final</td></tr>
-<tr class="separator:a3dce92c978ab82511436f5e4a77745e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae49ef7ab79656de643283f29f1249190"><td class="memItemLeft" align="right" valign="top"><a id="ae49ef7ab79656de643283f29f1249190"></a>
+virtual result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>_lock</b> (<a class="el" href="classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex_1_1entities__guard.html">entities_guard</a> &amp;out, <a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a> d, bool spin_not_sleep) noexcept final</td></tr>
+<tr class="separator:ae49ef7ab79656de643283f29f1249190"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Many entity shared/exclusive file system based lock. </p>
