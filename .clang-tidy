@@ -1,5 +1,5 @@
 ---
-Checks:          '*,-llvm-header-guard,-google-build-using-namespace,-clang-analyzer-alpha.clone.CloneChecker,-google-runtime-int,-cppcoreguidelines-pro-bounds-array-to-pointer-decay,-clang-analyzer-alpha.deadcode.UnreachableCode,-misc-use-after-move,-cppcoreguidelines-pro-type-vararg,-modernize-use-emplace,-cert-err60-cpp,-cppcoreguidelines-pro-type-union-access,-fuchsia-*'
+Checks:          '*,-llvm-header-guard,-google-build-using-namespace,-google-runtime-int,-cppcoreguidelines-pro-bounds-array-to-pointer-decay,-modernize-unary-static-assert,-fuchsia-*,-llvm-namespace-comment'
 WarningsAsErrors: ''
 HeaderFilterRegex: '.*'
 AnalyzeTemporaryDtors: true

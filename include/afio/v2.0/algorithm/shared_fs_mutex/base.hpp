@@ -86,7 +86,7 @@ namespace algorithm
         entity_type(value_type _value, bool _exclusive) noexcept : _init(0)
         {
           value = _value;
-          exclusive = _exclusive;
+          exclusive = _exclusive;  // NOLINT
         }
       };
       static_assert(std::is_literal_type<entity_type>::value, "entity_type is not a literal type");
@@ -95,36 +95,38 @@ namespace algorithm
       using entities_type = span<entity_type>;
 
     protected:
-      constexpr shared_fs_mutex() {}
+      constexpr shared_fs_mutex() = default;
 
     public:
-      AFIO_HEADERS_ONLY_VIRTUAL_SPEC ~shared_fs_mutex() {}
+      AFIO_HEADERS_ONLY_VIRTUAL_SPEC ~shared_fs_mutex() = default;
 
       //! Generates an entity id from a sequence of bytes
       entity_type entity_from_buffer(const char *buffer, size_t bytes, bool exclusive = true) noexcept
       {
         uint128 hash = QUICKCPPLIB_NAMESPACE::algorithm::hash::fast_hash::hash(buffer, bytes);
-        return entity_type(hash.as_longlongs[0] ^ hash.as_longlongs[1], exclusive);
+        return {hash.as_longlongs[0] ^ hash.as_longlongs[1], exclusive};
       }
       //! Generates an entity id from a string
       template <typename T> entity_type entity_from_string(const std::basic_string<T> &str, bool exclusive = true) noexcept
       {
         uint128 hash = QUICKCPPLIB_NAMESPACE::algorithm::hash::fast_hash::hash(str);
-        return entity_type(hash.as_longlongs[0] ^ hash.as_longlongs[1], exclusive);
+        return {hash.as_longlongs[0] ^ hash.as_longlongs[1], exclusive};
       }
       //! Generates a cryptographically random entity id.
       entity_type random_entity(bool exclusive = true) noexcept
       {
         entity_type::value_type v;
-        utils::random_fill((char *) &v, sizeof(v));
-        return entity_type(v, exclusive);
+        utils::random_fill(reinterpret_cast<char *>(&v), sizeof(v));
+        return {v, exclusive};
       }
       //! Fills a sequence of entity ids with cryptographic randomness. Much faster than calling random_entity() individually.
       void fill_random_entities(span<entity_type> seq, bool exclusive = true) noexcept
       {
-        utils::random_fill((char *) seq.data(), seq.size() * sizeof(entity_type));
+        utils::random_fill(reinterpret_cast<char *>(seq.data()), seq.size() * sizeof(entity_type));
         for(auto &i : seq)
-          i.exclusive = exclusive;
+        {
+          i.exclusive = exclusive;  // NOLINT
+        }
       }
 
       //! RAII holder for a lock on a sequence of entities
@@ -133,9 +135,9 @@ namespace algorithm
         entity_type _entity;
 
       public:
-        shared_fs_mutex *parent;
+        shared_fs_mutex *parent{nullptr};
         entities_type entities;
-        unsigned long long hint;
+        unsigned long long hint{0};
         entities_guard() = default;
         entities_guard(shared_fs_mutex *_parent, entities_type _entities)
             : parent(_parent)
@@ -152,10 +154,12 @@ namespace algorithm
         }
         entities_guard(const entities_guard &) = delete;
         entities_guard &operator=(const entities_guard &) = delete;
-        entities_guard(entities_guard &&o) noexcept : _entity(std::move(o._entity)), parent(o.parent), entities(std::move(o.entities)), hint(o.hint)
+        entities_guard(entities_guard &&o) noexcept : _entity(o._entity), parent(o.parent), entities(o.entities), hint(o.hint)
         {
           if(entities.data() == &o._entity)
+          {
             entities = entities_type(&_entity, 1);
+          }
           o.release();
         }
         entities_guard &operator=(entities_guard &&o) noexcept
@@ -166,8 +170,10 @@ namespace algorithm
         }
         ~entities_guard()
         {
-          if(parent)
+          if(parent != nullptr)
+          {
             unlock();
+          }
         }
         //! True if extent guard is valid
         explicit operator bool() const noexcept { return parent != nullptr; }
@@ -176,7 +182,7 @@ namespace algorithm
         //! Unlocks the locked entities immediately
         void unlock() noexcept
         {
-          if(parent)
+          if(parent != nullptr)
           {
             parent->unlock(entities, hint);
             release();
@@ -195,21 +201,21 @@ namespace algorithm
       //! Lock all of a sequence of entities for exclusive or shared access
       result<entities_guard> lock(entities_type entities, deadline d = deadline(), bool spin_not_sleep = false) noexcept
       {
-        entities_guard ret(this, std::move(entities));
-        OUTCOME_TRYV(_lock(ret, std::move(d), spin_not_sleep));
+        entities_guard ret(this, entities);
+        OUTCOME_TRYV(_lock(ret, d, spin_not_sleep));
         return std::move(ret);
       }
       //! Lock a single entity for exclusive or shared access
       result<entities_guard> lock(entity_type entity, deadline d = deadline(), bool spin_not_sleep = false) noexcept
       {
         entities_guard ret(this, entity);
-        OUTCOME_TRYV(_lock(ret, std::move(d), spin_not_sleep));
+        OUTCOME_TRYV(_lock(ret, d, spin_not_sleep));
         return std::move(ret);
       }
       //! Try to lock all of a sequence of entities for exclusive or shared access
-      result<entities_guard> try_lock(entities_type entities) noexcept { return lock(std::move(entities), deadline(std::chrono::seconds(0))); }
+      result<entities_guard> try_lock(entities_type entities) noexcept { return lock(entities, deadline(std::chrono::seconds(0))); }
       //! Try to lock a single entity for exclusive or shared access
-      result<entities_guard> try_lock(entity_type entity) noexcept { return lock(std::move(entity), deadline(std::chrono::seconds(0))); }
+      result<entities_guard> try_lock(entity_type entity) noexcept { return lock(entity, deadline(std::chrono::seconds(0))); }
       //! Unlock a previously locked sequence of entities
       virtual void unlock(entities_type entities, unsigned long long hint = 0) noexcept = 0;
     };

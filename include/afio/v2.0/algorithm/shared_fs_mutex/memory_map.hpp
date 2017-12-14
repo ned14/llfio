@@ -101,8 +101,8 @@ namespace algorithm
     private:
       static constexpr size_t _container_entries = HashIndexSize / sizeof(spinlock_type);
       using _hash_index_type = std::array<spinlock_type, _container_entries>;
-      static constexpr file_handle::extent_type _initialisingoffset = (file_handle::extent_type) 1024 * 1024;
-      static constexpr file_handle::extent_type _lockinuseoffset = (file_handle::extent_type) 1024 * 1024 + 1;
+      static constexpr file_handle::extent_type _initialisingoffset = static_cast<file_handle::extent_type>(1024) * 1024;
+      static constexpr file_handle::extent_type _lockinuseoffset = static_cast<file_handle::extent_type>(1024) * 1024 + 1;
 
       file_handle _h, _temph;
       file_handle::extent_guard _hlockinuse;  // shared lock of last byte of _h marking if lock is in use
@@ -110,7 +110,7 @@ namespace algorithm
 
       _hash_index_type &_index() const
       {
-        _hash_index_type *ret = (_hash_index_type *) _temphmap.address();
+        auto *ret = (_hash_index_type *) _temphmap.address();
         return *ret;
       }
 
@@ -136,7 +136,7 @@ namespace algorithm
         new(this) memory_map(std::move(o));
         return *this;
       }
-      ~memory_map()
+      ~memory_map() override
       {
         if(_h.is_valid())
         {
@@ -197,11 +197,15 @@ namespace algorithm
           if(lockinuse.has_error())
           {
             if(lockinuse.error() != std::errc::timed_out)
+            {
               return lockinuse.error();
+            }
             // Somebody else is also using this file, so try to read the hash index file I ought to use
             lockinuse = ret.lock(_lockinuseoffset, 1, false);  // inuse shared access, blocking
             if(!lockinuse)
+            {
               return lockinuse.error();
+            }
             char buffer[65536];
             memset(buffer, 0, sizeof(buffer));
             OUTCOME_TRYV(ret.read(0, buffer, 65535));
@@ -223,36 +227,34 @@ namespace algorithm
             OUTCOME_TRY(hmap, map_handle::map(hsection, 0, 0, section_handle::flag::read));
             return memory_map(std::move(ret), std::move(temph), std::move(lockinuse.value()), std::move(hmap), std::move(temphmap));
           }
-          else
-          {
-            // I am the first person to be using this (stale?) file, so create a new hash index file in /tmp
-            auto &tempdirh = path_discovery::memory_backed_temporary_files_directory().is_valid() ? path_discovery::memory_backed_temporary_files_directory() : path_discovery::storage_backed_temporary_files_directory();
-            OUTCOME_TRY(_temph, file_handle::random_file(tempdirh));
-            temph = std::move(_temph);
-            // Truncate it out to the hash index size, and map it into memory for read/write access
-            OUTCOME_TRYV(temph.truncate(HashIndexSize));
-            OUTCOME_TRY(temphsection, section_handle::section(temph, HashIndexSize));
-            OUTCOME_TRY(temphmap, map_handle::map(temphsection, HashIndexSize));
-            // Write the path of my new hash index file, padding zeros to the nearest page size
-            // multiple to work around a race condition in the Linux kernel
-            OUTCOME_TRY(temppath, temph.current_path());
-            char buffer[4096];
-            memset(buffer, 0, sizeof(buffer));
-            size_t bytes = temppath.native().size() * sizeof(*temppath.c_str());
-            file_handle::const_buffer_type buffers[] = {{(const char *) temppath.c_str(), bytes}, {(const char *) buffer, 4096 - (bytes % 4096)}};
-            OUTCOME_TRYV(ret.truncate(65536));
-            OUTCOME_TRYV(ret.write({buffers, 0}));
-            // Map for read the maximum possible path file size, again to avoid race problems
-            OUTCOME_TRY(hsection, section_handle::section(ret, 65536, section_handle::flag::read));
-            OUTCOME_TRY(hmap, map_handle::map(hsection, 0, 0, section_handle::flag::read));
-            /* Take shared locks on inuse. Even if this implementation doesn't implement
-            atomic downgrade of exclusive range to shared range, we're fully prepared for other users
-            now. The _initialisingoffset remains exclusive to prevent double entry into this init routine.
-            */
-            OUTCOME_TRY(lockinuse2, ret.lock(_lockinuseoffset, 1, false));
-            lockinuse = std::move(lockinuse2);  // releases exclusive lock on all three offsets
-            return memory_map(std::move(ret), std::move(temph), std::move(lockinuse.value()), std::move(hmap), std::move(temphmap));
-          }
+
+          // I am the first person to be using this (stale?) file, so create a new hash index file in /tmp
+          auto &tempdirh = path_discovery::memory_backed_temporary_files_directory().is_valid() ? path_discovery::memory_backed_temporary_files_directory() : path_discovery::storage_backed_temporary_files_directory();
+          OUTCOME_TRY(_temph, file_handle::random_file(tempdirh));
+          temph = std::move(_temph);
+          // Truncate it out to the hash index size, and map it into memory for read/write access
+          OUTCOME_TRYV(temph.truncate(HashIndexSize));
+          OUTCOME_TRY(temphsection, section_handle::section(temph, HashIndexSize));
+          OUTCOME_TRY(temphmap, map_handle::map(temphsection, HashIndexSize));
+          // Write the path of my new hash index file, padding zeros to the nearest page size
+          // multiple to work around a race condition in the Linux kernel
+          OUTCOME_TRY(temppath, temph.current_path());
+          char buffer[4096];
+          memset(buffer, 0, sizeof(buffer));
+          size_t bytes = temppath.native().size() * sizeof(*temppath.c_str());
+          file_handle::const_buffer_type buffers[] = {{static_cast<const char *>(temppath.c_str()), bytes}, {(const char *) buffer, 4096 - (bytes % 4096)}};
+          OUTCOME_TRYV(ret.truncate(65536));
+          OUTCOME_TRYV(ret.write({buffers, 0}));
+          // Map for read the maximum possible path file size, again to avoid race problems
+          OUTCOME_TRY(hsection, section_handle::section(ret, 65536, section_handle::flag::read));
+          OUTCOME_TRY(hmap, map_handle::map(hsection, 0, 0, section_handle::flag::read));
+          /* Take shared locks on inuse. Even if this implementation doesn't implement
+          atomic downgrade of exclusive range to shared range, we're fully prepared for other users
+          now. The _initialisingoffset remains exclusive to prevent double entry into this init routine.
+          */
+          OUTCOME_TRY(lockinuse2, ret.lock(_lockinuseoffset, 1, false));
+          lockinuse = std::move(lockinuse2);  // releases exclusive lock on all three offsets
+          return memory_map(std::move(ret), std::move(temph), std::move(lockinuse.value()), std::move(hmap), std::move(temphmap));
         }
         catch(...)
         {
@@ -283,16 +285,20 @@ namespace algorithm
             if(entity_to_idx[m].value == ep->value)
             {
               if(ep->exclusive && !entity_to_idx[m].exclusive)
+              {
                 entity_to_idx[m].exclusive = true;
+              }
               skip = true;
             }
           }
           if(!skip)
+          {
             ++ep;
+          }
         }
         return span<_entity_idx>(entity_to_idx, ep - entity_to_idx);
       }
-      AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> _lock(entities_guard &out, deadline d, bool spin_not_sleep) noexcept override final
+      AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> _lock(entities_guard &out, deadline d, bool spin_not_sleep) noexcept final
       {
         AFIO_LOG_FUNCTION_CALL(this);
         std::chrono::steady_clock::time_point began_steady;
@@ -300,9 +306,13 @@ namespace algorithm
         if(d)
         {
           if((d).steady)
+          {
             began_steady = std::chrono::steady_clock::now();
+          }
           else
+          {
             end_utc = (d).to_time_point();
+          }
         }
         // alloca() always returns 16 byte aligned addresses
         span<_entity_idx> entity_to_idx(_hash_entities((_entity_idx *) alloca(sizeof(_entity_idx) * out.entities.size()), out.entities));
@@ -312,7 +322,7 @@ namespace algorithm
         size_t n;
         for(;;)
         {
-          size_t was_contended = (size_t) -1;
+          auto was_contended = static_cast<size_t>(-1);
           {
             auto undo = undoer([&] {
               // 0 to (n-1) need to be closed
@@ -321,7 +331,9 @@ namespace algorithm
                 --n;
                 // Now 0 to n needs to be closed
                 for(; n > 0; n--)
+                {
                   entity_to_idx[n].exclusive ? index[entity_to_idx[n].value].unlock() : index[entity_to_idx[n].value].unlock_shared();
+                }
                 entity_to_idx[0].exclusive ? index[entity_to_idx[0].value].unlock() : index[entity_to_idx[0].value].unlock_shared();
               }
             });
@@ -344,12 +356,16 @@ namespace algorithm
             if((d).steady)
             {
               if(std::chrono::steady_clock::now() >= (began_steady + std::chrono::nanoseconds((d).nsecs)))
+              {
                 return std::errc::timed_out;
+              }
             }
             else
             {
               if(std::chrono::system_clock::now() >= end_utc)
+              {
                 return std::errc::timed_out;
+              }
             }
           }
           // Move was_contended to front and randomise rest of out.entities
@@ -358,13 +374,15 @@ namespace algorithm
           ++front;
           QUICKCPPLIB_NAMESPACE::algorithm::small_prng::random_shuffle(front, entity_to_idx.end());
           if(!spin_not_sleep)
+          {
             std::this_thread::yield();
+          }
         }
         // return success();
       }
 
     public:
-      AFIO_HEADERS_ONLY_VIRTUAL_SPEC void unlock(entities_type entities, unsigned long long /*unused*/) noexcept override final
+      AFIO_HEADERS_ONLY_VIRTUAL_SPEC void unlock(entities_type entities, unsigned long long /*unused*/) noexcept final
       {
         AFIO_LOG_FUNCTION_CALL(this);
         span<_entity_idx> entity_to_idx(_hash_entities((_entity_idx *) alloca(sizeof(_entity_idx) * entities.size()), entities));

@@ -123,7 +123,7 @@ namespace algorithm
     {
       std::shared_ptr<shared_fs_mutex> _p;
 
-      safe_byte_ranges(std::shared_ptr<shared_fs_mutex> p)
+      explicit safe_byte_ranges(std::shared_ptr<shared_fs_mutex> p)
           : _p(std::move(p))
       {
       }
@@ -154,10 +154,10 @@ namespace algorithm
       }
 
     protected:
-      AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> _lock(entities_guard &out, deadline d, bool spin_not_sleep) noexcept override final { return _p->_lock(out, d, spin_not_sleep); }
+      AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> _lock(entities_guard &out, deadline d, bool spin_not_sleep) noexcept final { return _p->_lock(out, d, spin_not_sleep); }
 
     public:
-      AFIO_HEADERS_ONLY_VIRTUAL_SPEC void unlock(entities_type entities, unsigned long long hint) noexcept override final { return _p->unlock(entities, hint); }
+      AFIO_HEADERS_ONLY_VIRTUAL_SPEC void unlock(entities_type entities, unsigned long long hint) noexcept final { return _p->unlock(entities, hint); }
     };
 
   }  // namespace shared_fs_mutex

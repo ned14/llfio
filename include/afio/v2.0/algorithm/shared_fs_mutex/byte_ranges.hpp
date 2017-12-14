@@ -74,7 +74,7 @@ namespace algorithm
     {
       file_handle _h;
 
-      byte_ranges(file_handle &&h)
+      explicit byte_ranges(file_handle &&h)
           : _h(std::move(h))
       {
       }
@@ -109,7 +109,7 @@ namespace algorithm
       const file_handle &handle() const noexcept { return _h; }
 
     protected:
-      AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> _lock(entities_guard &out, deadline d, bool spin_not_sleep) noexcept override final
+      AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> _lock(entities_guard &out, deadline d, bool spin_not_sleep) noexcept final
       {
         AFIO_LOG_FUNCTION_CALL(this);
         std::chrono::steady_clock::time_point began_steady;
@@ -117,16 +117,20 @@ namespace algorithm
         if(d)
         {
           if((d).steady)
+          {
             began_steady = std::chrono::steady_clock::now();
+          }
           else
+          {
             end_utc = (d).to_time_point();
+          }
         }
         // Fire this if an error occurs
         auto disableunlock = undoer([&] { out.release(); });
         size_t n;
         for(;;)
         {
-          size_t was_contended = (size_t) -1;
+          auto was_contended = static_cast<size_t>(-1);
           {
             auto undo = undoer([&] {
               // 0 to (n-1) need to be closed
@@ -135,7 +139,9 @@ namespace algorithm
                 --n;
                 // Now 0 to n needs to be closed
                 for(; n > 0; n--)
+                {
                   _h.unlock(out.entities[n].value, 1);
+                }
                 _h.unlock(out.entities[0].value, 1);
               }
             });
@@ -143,8 +149,10 @@ namespace algorithm
             {
               deadline nd;
               // Only for very first entity will we sleep until its lock becomes available
-              if(n)
+              if(n != 0u)
+              {
                 nd = deadline(std::chrono::seconds(0));
+              }
               else
               {
                 nd = deadline();
@@ -154,15 +162,21 @@ namespace algorithm
                   {
                     std::chrono::nanoseconds ns = std::chrono::duration_cast<std::chrono::nanoseconds>((began_steady + std::chrono::nanoseconds((d).nsecs)) - std::chrono::steady_clock::now());
                     if(ns.count() < 0)
+                    {
                       (nd).nsecs = 0;
+                    }
                     else
+                    {
                       (nd).nsecs = ns.count();
+                    }
                   }
                   else
+                  {
                     (nd) = (d);
+                  }
                 }
               }
-              auto outcome = _h.lock(out.entities[n].value, 1, out.entities[n].exclusive, nd);
+              auto outcome = _h.lock(out.entities[n].value, 1, out.entities[n].exclusive != 0u, nd);
               if(!outcome)
               {
                 was_contended = n;
@@ -181,12 +195,16 @@ namespace algorithm
             if((d).steady)
             {
               if(std::chrono::steady_clock::now() >= (began_steady + std::chrono::nanoseconds((d).nsecs)))
+              {
                 return std::errc::timed_out;
+              }
             }
             else
             {
               if(std::chrono::system_clock::now() >= end_utc)
+              {
                 return std::errc::timed_out;
+              }
             }
           }
           // Move was_contended to front and randomise rest of out.entities
@@ -195,13 +213,15 @@ namespace algorithm
           ++front;
           QUICKCPPLIB_NAMESPACE::algorithm::small_prng::random_shuffle(front, out.entities.end());
           if(!spin_not_sleep)
+          {
             std::this_thread::yield();
+          }
         }
         // return success();
       }
 
     public:
-      AFIO_HEADERS_ONLY_VIRTUAL_SPEC void unlock(entities_type entities, unsigned long long) noexcept override final
+      AFIO_HEADERS_ONLY_VIRTUAL_SPEC void unlock(entities_type entities, unsigned long long /*hint*/) noexcept final
       {
         AFIO_LOG_FUNCTION_CALL(this);
         for(const auto &i : entities)

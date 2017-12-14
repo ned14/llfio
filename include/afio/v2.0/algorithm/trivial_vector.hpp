@@ -102,7 +102,7 @@ namespace algorithm
         return *this;
       }
       //! Decrement
-      trivial_vector_iterator operator--(int /*unused*/)
+      const trivial_vector_iterator operator--(int /*unused*/)
       {
         trivial_vector_iterator ret(*this);
         _v--;
@@ -116,7 +116,7 @@ namespace algorithm
         return *this;
       }
       //! Increment
-      trivial_vector_iterator operator++(int /*unused*/)
+      const trivial_vector_iterator operator++(int /*unused*/)
       {
         trivial_vector_iterator ret(*this);
         _v++;
@@ -243,14 +243,18 @@ namespace algorithm
       reference at(size_type i)
       {
         if(i >= size())
+        {
           throw std::out_of_range("bounds exceeded");
+        }
         return _begin[i];
       }
       //! Item index, bounds checked
       const_reference at(size_type i) const
       {
         if(i >= size())
+        {
           throw std::out_of_range("bounds exceeded");
+        }
         return _begin[i];
       }
       //! Item index, unchecked
@@ -300,12 +304,14 @@ namespace algorithm
       //! Items in container
       size_type size() const noexcept { return _end - _begin; }
       //! Maximum items in container
-      size_type max_size() const noexcept { return (map_handle::size_type) -1 / sizeof(T); }
+      size_type max_size() const noexcept { return static_cast<map_handle::size_type>(-1) / sizeof(T); }
       //! Increase capacity
       void reserve(size_type n)
       {
         if(n > max_size())
+        {
           throw std::length_error("Max size exceeded");
+        }
         size_type current_size = size();
         size_type bytes = n * sizeof(value_type);
         bytes = utils::round_up_to_page_size(bytes);
@@ -485,7 +491,7 @@ namespace algorithm
         {
           reserve(count);
         }
-        // TODO: Kinda assuming the compiler will do the right thing below, should really check that
+        // TODO(ned): Kinda assuming the compiler will do the right thing below, should really check that
         while(count > size())
         {
           emplace_back(v);
