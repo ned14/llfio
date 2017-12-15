@@ -141,8 +141,8 @@ ino_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cla
 <tr class="separator:a5a5244ab1a15053aefe93f2c253db5b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaacc27a62ce0859506d7443f0d0e7adf"><td class="memItemLeft" align="right" valign="top">virtual result&lt; <a class="el" href="classafio__v2__xxx_1_1path__handle.html">path_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1fs__handle.html#aaacc27a62ce0859506d7443f0d0e7adf">parent_path_handle</a> (<a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a> d=std::chrono::seconds(30)) const noexcept</td></tr>
 <tr class="separator:aaacc27a62ce0859506d7443f0d0e7adf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7ba740f03628f3151cdc1debf208b315"><td class="memItemLeft" align="right" valign="top">virtual result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1fs__handle.html#a7ba740f03628f3151cdc1debf208b315">relink</a> (const <a class="el" href="classafio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;base, <a class="el" href="classafio__v2__xxx_1_1fs__handle.html#ac25247b15af82faf1db557b3e45e13d7">path_view_type</a> newpath, bool atomic_replace=true, <a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a> d=std::chrono::seconds(30)) noexcept</td></tr>
-<tr class="separator:a7ba740f03628f3151cdc1debf208b315"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a747962d0776c0fa9e79c9aa9b86da1c0"><td class="memItemLeft" align="right" valign="top">virtual result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1fs__handle.html#a747962d0776c0fa9e79c9aa9b86da1c0">relink</a> (const <a class="el" href="classafio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;base, <a class="el" href="classafio__v2__xxx_1_1fs__handle.html#ac25247b15af82faf1db557b3e45e13d7">path_view_type</a> <a class="el" href="namespaceafio__v2__xxx.html#a7432c582b3af692a1f94be33aa73a00e">path</a>, bool atomic_replace=true, <a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a> d=std::chrono::seconds(30)) noexcept</td></tr>
+<tr class="separator:a747962d0776c0fa9e79c9aa9b86da1c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6860b9626adc4d8e6db3ebb92974c054"><td class="memItemLeft" align="right" valign="top">virtual result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1fs__handle.html#a6860b9626adc4d8e6db3ebb92974c054">unlink</a> (<a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a> d=std::chrono::seconds(30)) noexcept</td></tr>
 <tr class="separator:a6860b9626adc4d8e6db3ebb92974c054"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -183,10 +183,10 @@ constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href=
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
 <tr class="memitem:a03d2084c14493ccb95b19503df109bba"><td class="memItemLeft" align="right" valign="top"><a id="a03d2084c14493ccb95b19503df109bba"></a>
-dev_t&#160;</td><td class="memItemRight" valign="bottom"><b>_devid</b></td></tr>
+dev_t&#160;</td><td class="memItemRight" valign="bottom"><b>_devid</b> {0}</td></tr>
 <tr class="separator:a03d2084c14493ccb95b19503df109bba"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3620b3c68611c77dd3cd98d77c073bd2"><td class="memItemLeft" align="right" valign="top"><a id="a3620b3c68611c77dd3cd98d77c073bd2"></a>
-ino_t&#160;</td><td class="memItemRight" valign="bottom"><b>_inode</b></td></tr>
+ino_t&#160;</td><td class="memItemRight" valign="bottom"><b>_inode</b> {0}</td></tr>
 <tr class="separator:a3620b3c68611c77dd3cd98d77c073bd2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -223,8 +223,8 @@ ino_t&#160;</td><td class="memItemRight" valign="bottom"><b>_inode</b></td></tr>
 
 </div>
 </div>
-<a id="a7ba740f03628f3151cdc1debf208b315"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7ba740f03628f3151cdc1debf208b315">&#9670;&nbsp;</a></span>relink()</h2>
+<a id="a747962d0776c0fa9e79c9aa9b86da1c0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a747962d0776c0fa9e79c9aa9b86da1c0">&#9670;&nbsp;</a></span>relink()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -242,7 +242,7 @@ ino_t&#160;</td><td class="memItemRight" valign="bottom"><b>_inode</b></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype"><a class="el" href="classafio__v2__xxx_1_1fs__handle.html#ac25247b15af82faf1db557b3e45e13d7">path_view_type</a>&#160;</td>
-          <td class="paramname"><em>newpath</em>, </td>
+          <td class="paramname"><em>path</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -273,7 +273,7 @@ ino_t&#160;</td><td class="memItemRight" valign="bottom"><b>_inode</b></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">base</td><td>Base for any relative path. </td></tr>
-    <tr><td class="paramname">newpath</td><td>The relative or absolute new path to relink to. </td></tr>
+    <tr><td class="paramname">path</td><td>The relative or absolute new path to relink to. </td></tr>
     <tr><td class="paramname">atomic_replace</td><td>Atomically replace the destination if a file entry already is present there. Choosing false for this will fail if a file entry is already present at the destination, and may not be an atomic operation on some platforms (i.e. both the old and new names may be linked to the same inode for a very short period of time). Windows and recent Linuxes are always atomic. </td></tr>
     <tr><td class="paramname">d</td><td>The deadline by which the matching of the containing directory to the open handle's inode must succeed, else <code>std::errc::timed_out</code> will be returned. </td></tr>
   </table>

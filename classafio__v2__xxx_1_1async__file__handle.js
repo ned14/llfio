@@ -67,7 +67,7 @@ var classafio__v2__xxx_1_1async__file__handle =
     [ "read", "classafio__v2__xxx_1_1async__file__handle.html#a8af6c6dc1502d40f6aaccc83e49d5342", null ],
     [ "read", "classafio__v2__xxx_1_1async__file__handle.html#a77ee5c917cfbe448e8fae35989995dea", null ],
     [ "release", "classafio__v2__xxx_1_1async__file__handle.html#a73d5f2070bce0c3d7fa536d3cbed7b52", null ],
-    [ "relink", "classafio__v2__xxx_1_1async__file__handle.html#a7ba740f03628f3151cdc1debf208b315", null ],
+    [ "relink", "classafio__v2__xxx_1_1async__file__handle.html#a747962d0776c0fa9e79c9aa9b86da1c0", null ],
     [ "requires_aligned_io", "classafio__v2__xxx_1_1async__file__handle.html#affb10caeeca67b804695b7378be29e23", null ],
     [ "service", "classafio__v2__xxx_1_1async__file__handle.html#a672324d44ea84ccfb71594c1036628ac", null ],
     [ "set_append_only", "classafio__v2__xxx_1_1async__file__handle.html#af1610ec7fb0a41f039e3e17e0dc467ab", null ],

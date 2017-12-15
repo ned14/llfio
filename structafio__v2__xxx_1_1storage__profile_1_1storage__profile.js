@@ -16,7 +16,7 @@ var structafio__v2__xxx_1_1storage__profile_1_1storage__profile =
     [ "max_size", "structafio__v2__xxx_1_1storage__profile_1_1storage__profile.html#ab6b3c4513e47e2905c8e6fe1c831d742", null ],
     [ "read", "structafio__v2__xxx_1_1storage__profile_1_1storage__profile.html#aa3040d68a929247da822c74600fb977d", null ],
     [ "size", "structafio__v2__xxx_1_1storage__profile_1_1storage__profile.html#a7b088508cc1b731b64b501a1f77a0108", null ],
-    [ "write", "structafio__v2__xxx_1_1storage__profile_1_1storage__profile.html#a1d8630d67e46bf8fdf8f1980bde95843", null ],
+    [ "write", "structafio__v2__xxx_1_1storage__profile_1_1storage__profile.html#a9811705f9110d7dae69e621a67a39ec8", null ],
     [ "atomic_rewrite_offset_boundary", "structafio__v2__xxx_1_1storage__profile_1_1storage__profile.html#ae4084914a74c2cd9185ba41be05c3d8b", null ],
     [ "atomic_rewrite_quantum", "structafio__v2__xxx_1_1storage__profile_1_1storage__profile.html#ae5dedb255932673f9d735eaaca375a81", null ],
     [ "clock_granularity", "structafio__v2__xxx_1_1storage__profile_1_1storage__profile.html#a516721918d79d9ab56cb813cf07d5aa7", null ],

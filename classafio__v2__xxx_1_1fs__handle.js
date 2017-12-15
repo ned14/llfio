@@ -13,7 +13,7 @@ var classafio__v2__xxx_1_1fs__handle =
     [ "operator=", "classafio__v2__xxx_1_1fs__handle.html#a334ed7c11091e8f3f83686b8aeaa1c5b", null ],
     [ "operator=", "classafio__v2__xxx_1_1fs__handle.html#a57612714e944a93f6e26ec66b91ffd6e", null ],
     [ "parent_path_handle", "classafio__v2__xxx_1_1fs__handle.html#aaacc27a62ce0859506d7443f0d0e7adf", null ],
-    [ "relink", "classafio__v2__xxx_1_1fs__handle.html#a7ba740f03628f3151cdc1debf208b315", null ],
+    [ "relink", "classafio__v2__xxx_1_1fs__handle.html#a747962d0776c0fa9e79c9aa9b86da1c0", null ],
     [ "st_dev", "classafio__v2__xxx_1_1fs__handle.html#abf1012040064a3d429adfae8e6f443f0", null ],
     [ "st_ino", "classafio__v2__xxx_1_1fs__handle.html#a1f7779618e9b0e27bd1619025dcbb617", null ],
     [ "unique_id", "classafio__v2__xxx_1_1fs__handle.html#a5a5244ab1a15053aefe93f2c253db5b3", null ],

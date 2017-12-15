@@ -2,7 +2,7 @@ var structafio__v2__xxx_1_1stat__t =
 [
     [ "want_base", "structafio__v2__xxx_1_1stat__t_1_1want__base.html", "structafio__v2__xxx_1_1stat__t_1_1want__base" ],
     [ "want", "structafio__v2__xxx_1_1stat__t.html#ab281797a371fd64de0d5350fb6ebba98", null ],
-    [ "stat_t", "structafio__v2__xxx_1_1stat__t.html#a1612293fb6cfe7ea9d3aac852a6e0628", null ],
+    [ "stat_t", "structafio__v2__xxx_1_1stat__t.html#a43962c6fd805a803986ded6c91b01cbc", null ],
     [ "stat_t", "structafio__v2__xxx_1_1stat__t.html#a0a07fcfc00ab2593a47400549eba8509", null ],
     [ "fill", "structafio__v2__xxx_1_1stat__t.html#a594e03167fe2b5315ef61edc532ab840", null ],
     [ "st_allocated", "structafio__v2__xxx_1_1stat__t.html#adc79f76a01eab3ca4704731e4d14e72e", null ],

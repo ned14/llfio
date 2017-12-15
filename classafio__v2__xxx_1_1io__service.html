@@ -181,8 +181,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 Static Public Member Functions</h2></td></tr>
 <tr class="memitem:ae97a626545f0eac83e7d26394cbc0c7f"><td class="memItemLeft" align="right" valign="top">static int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1io__service.html#ae97a626545f0eac83e7d26394cbc0c7f">interruption_signal</a> () noexcept</td></tr>
 <tr class="separator:ae97a626545f0eac83e7d26394cbc0c7f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af8fe115b95c19e19fc7e685db214441d"><td class="memItemLeft" align="right" valign="top">static int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1io__service.html#af8fe115b95c19e19fc7e685db214441d">set_interruption_signal</a> (int sig=<a class="el" href="io__service_8hpp.html#ad825811f728a93d01908dd72e484f7ad">AFIO_IO_POST_SIGNAL</a>)</td></tr>
-<tr class="separator:af8fe115b95c19e19fc7e685db214441d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0e2bf03bff44981446846a273b95d5e0"><td class="memItemLeft" align="right" valign="top">static int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1io__service.html#a0e2bf03bff44981446846a273b95d5e0">set_interruption_signal</a> (int signo=<a class="el" href="io__service_8hpp.html#ad825811f728a93d01908dd72e484f7ad">AFIO_IO_POST_SIGNAL</a>)</td></tr>
+<tr class="separator:a0e2bf03bff44981446846a273b95d5e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
 Friends</h2></td></tr>
@@ -276,7 +276,7 @@ template&lt;class U &gt; </div>
 </table>
 </div><div class="memdoc">
 <p>Schedule the callable to be invoked by the thread owning this object and executing <code>run()</code> at its next available opportunity. Unlike any other function in this API layer, this function is thread safe. </p>
-<div class="fragment"><div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;{ _post(detail::make_function_ptr&lt;<span class="keywordtype">void</span>(<a class="code" href="classafio__v2__xxx_1_1io__service.html#a444d27f19c042b91f1751621135f65e9">io_service</a> *)&gt;(std::forward&lt;U&gt;(f))); }</div><div class="ttc" id="classafio__v2__xxx_1_1io__service_html_a444d27f19c042b91f1751621135f65e9"><div class="ttname"><a href="classafio__v2__xxx_1_1io__service.html#a444d27f19c042b91f1751621135f65e9">afio_v2_xxx::io_service::io_service</a></div><div class="ttdeci">io_service()</div></div>
+<div class="fragment"><div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;{ _post(detail::make_function_ptr&lt;<span class="keywordtype">void</span>(<a class="code" href="classafio__v2__xxx_1_1io__service.html#a444d27f19c042b91f1751621135f65e9">io_service</a> *)&gt;(std::forward&lt;U&gt;(f))); }</div><div class="ttc" id="classafio__v2__xxx_1_1io__service_html_a444d27f19c042b91f1751621135f65e9"><div class="ttname"><a href="classafio__v2__xxx_1_1io__service.html#a444d27f19c042b91f1751621135f65e9">afio_v2_xxx::io_service::io_service</a></div><div class="ttdeci">io_service()</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -303,7 +303,7 @@ template&lt;class U &gt; </div>
 </table>
 </div><div class="memdoc">
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;{ <span class="keywordflow">return</span> <a class="code" href="classafio__v2__xxx_1_1io__service.html#a72e68348a3f92ee2a91599960132f404">run_until</a>(deadline()); }</div><div class="ttc" id="classafio__v2__xxx_1_1io__service_html_a72e68348a3f92ee2a91599960132f404"><div class="ttname"><a href="classafio__v2__xxx_1_1io__service.html#a72e68348a3f92ee2a91599960132f404">afio_v2_xxx::io_service::run_until</a></div><div class="ttdeci">virtual result&lt; bool &gt; run_until(deadline d) noexcept</div></div>
+<div class="fragment"><div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;{ <span class="keywordflow">return</span> <a class="code" href="classafio__v2__xxx_1_1io__service.html#a72e68348a3f92ee2a91599960132f404">run_until</a>(deadline()); }</div><div class="ttc" id="classafio__v2__xxx_1_1io__service_html_a72e68348a3f92ee2a91599960132f404"><div class="ttname"><a href="classafio__v2__xxx_1_1io__service.html#a72e68348a3f92ee2a91599960132f404">afio_v2_xxx::io_service::run_until</a></div><div class="ttdeci">virtual result&lt; bool &gt; run_until(deadline d) noexcept</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -334,8 +334,8 @@ template&lt;class U &gt; </div>
 
 </div>
 </div>
-<a id="af8fe115b95c19e19fc7e685db214441d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af8fe115b95c19e19fc7e685db214441d">&#9670;&nbsp;</a></span>set_interruption_signal()</h2>
+<a id="a0e2bf03bff44981446846a273b95d5e0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0e2bf03bff44981446846a273b95d5e0">&#9670;&nbsp;</a></span>set_interruption_signal()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -347,7 +347,7 @@ template&lt;class U &gt; </div>
           <td class="memname">static int afio_v2_xxx::io_service::set_interruption_signal </td>
           <td>(</td>
           <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>sig</em> = <code><a class="el" href="io__service_8hpp.html#ad825811f728a93d01908dd72e484f7ad">AFIO_IO_POST_SIGNAL</a></code></td><td>)</td>
+          <td class="paramname"><em>signo</em> = <code><a class="el" href="io__service_8hpp.html#ad825811f728a93d01908dd72e484f7ad">AFIO_IO_POST_SIGNAL</a></code></td><td>)</td>
           <td></td>
         </tr>
       </table>
