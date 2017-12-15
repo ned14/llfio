@@ -75,7 +75,7 @@ namespace algorithm
       const path_handle &_path;
       std::vector<file_handle> _hs;
 
-      lock_files(const path_handle &o)
+      explicit lock_files(const path_handle &o)
           : _path(o)
       {
       }
@@ -110,7 +110,7 @@ namespace algorithm
       const path_handle &path() const noexcept { return _path; }
 
     protected:
-      AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> _lock(entities_guard &out, deadline d, bool spin_not_sleep) noexcept override final
+      AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> _lock(entities_guard &out, deadline d, bool spin_not_sleep) noexcept final
       {
         AFIO_LOG_FUNCTION_CALL(this);
         std::chrono::steady_clock::time_point began_steady;
@@ -118,9 +118,13 @@ namespace algorithm
         if(d)
         {
           if((d).steady)
+          {
             began_steady = std::chrono::steady_clock::now();
+          }
           else
+          {
             end_utc = (d).to_time_point();
+          }
         }
         size_t n;
         // Create a set of paths to files to exclusively create
@@ -128,12 +132,12 @@ namespace algorithm
         for(n = 0; n < out.entities.size(); n++)
         {
           auto v = out.entities[n].value;
-          entity_paths[n] = QUICKCPPLIB_NAMESPACE::algorithm::string::to_hex_string(span<char>((char *) &v, 8));
+          entity_paths[n] = QUICKCPPLIB_NAMESPACE::algorithm::string::to_hex_string(span<char>(reinterpret_cast<char *>(&v), 8));
         }
         _hs.resize(out.entities.size());
         do
         {
-          size_t was_contended = (size_t) -1;
+          auto was_contended = static_cast<size_t>(-1);
           {
             auto undo = undoer([&] {
               // 0 to (n-1) need to be closed
@@ -155,7 +159,9 @@ namespace algorithm
               {
                 const auto &ec = ret.error();
                 if(ec != std::errc::resource_unavailable_try_again && ec != std::errc::file_exists)
+                {
                   return ret.error();
+                }
                 // Collided with another locker
                 was_contended = n;
                 break;
@@ -163,7 +169,9 @@ namespace algorithm
               _hs[n] = std::move(ret.value());
             }
             if(n == out.entities.size())
+            {
               undo.dismiss();
+            }
           }
           if(n != out.entities.size())
           {
@@ -172,12 +180,16 @@ namespace algorithm
               if((d).steady)
               {
                 if(std::chrono::steady_clock::now() >= (began_steady + std::chrono::nanoseconds((d).nsecs)))
+                {
                   return std::errc::timed_out;
+                }
               }
               else
               {
                 if(std::chrono::system_clock::now() >= end_utc)
+                {
                   return std::errc::timed_out;
+                }
               }
             }
             // Move was_contended to front and randomise rest of out.entities
@@ -187,14 +199,16 @@ namespace algorithm
             QUICKCPPLIB_NAMESPACE::algorithm::small_prng::random_shuffle(front, out.entities.end());
             // Sleep for a very short time
             if(!spin_not_sleep)
+            {
               std::this_thread::yield();
+            }
           }
         } while(n < out.entities.size());
         return success();
       }
 
     public:
-      AFIO_HEADERS_ONLY_VIRTUAL_SPEC void unlock(entities_type, unsigned long long) noexcept override final
+      AFIO_HEADERS_ONLY_VIRTUAL_SPEC void unlock(entities_type /*entities*/, unsigned long long /*hint*/) noexcept final
       {
         AFIO_LOG_FUNCTION_CALL(this);
         for(auto &i : _hs)

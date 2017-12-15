@@ -43,7 +43,7 @@ namespace algorithm
     {
       directory_handle h;
       filesystem::path _lastpath;
-      cached_path_handle(directory_handle &&_h)
+      explicit cached_path_handle(directory_handle &&_h)
           : h(std::move(_h))
       {
       }
@@ -99,7 +99,7 @@ namespace algorithm
       _sph = std::move(r.first);
       _leafname = std::move(r.second);
     }
-    AFIO_HEADERS_ONLY_VIRTUAL_SPEC ~cached_parent_handle_adapter()
+    AFIO_HEADERS_ONLY_VIRTUAL_SPEC ~cached_parent_handle_adapter() override
     {
       if(this->_v)
       {

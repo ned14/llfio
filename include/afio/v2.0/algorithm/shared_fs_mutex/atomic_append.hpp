@@ -46,13 +46,16 @@ namespace algorithm
 #pragma pack(1)
       struct alignas(16) header
       {
-        uint128 hash;                   // Hash of remaining 112 bytes
-        uint64 generation;              // Iterated per write
-        uint64 time_offset;             // time_t in seconds at time of creation. Used to offset us_count below.
-        uint64 first_known_good;        // offset to first known good lock_request
-        uint64 first_after_hole_punch;  // offset to first byte after last hole punch
-        // First 48 bytes are the header, remainder is zeros for future expansion
-        uint64 _padding[10];
+        uint128 hash;                     // Hash of remaining 112 bytes
+        uint64 generation{};              // Iterated per write
+        uint64 time_offset{};             // time_t in seconds at time of creation. Used to
+                                          // offset us_count below.
+        uint64 first_known_good{};        // offset to first known good lock_request
+        uint64 first_after_hole_punch{};  // offset to first byte after last hole
+                                          // punch
+        // First 48 bytes are the header, remainder is zeros for future
+        // expansion
+        uint64 _padding[10]{};
         // Last byte is used to detect first user of the file
       };
       static_assert(sizeof(header) == 128, "header structure is not 128 bytes long!");
@@ -60,7 +63,7 @@ namespace algorithm
       struct alignas(16) lock_request
       {
         uint128 hash;                               // Hash of remaining 112 bytes
-        uint64 unique_id;                           // A unique id identifying this locking instance
+        uint64 unique_id{};                         // A unique id identifying this locking instance
         uint64 us_count : 56;                       // Microseconds since the lock file created
         uint64 items : 8;                           // The number of entities below which are valid
         shared_fs_mutex::entity_type entities[12];  // Entities to exclusive or share lock
@@ -120,7 +123,7 @@ namespace algorithm
       {
         // guard now points at a non-existing handle
         _guard.set_handle(&_h);
-        utils::random_fill((char *) &_unique_id, sizeof(_unique_id));  // crypto strong random
+        utils::random_fill(reinterpret_cast<char *>(&_unique_id), sizeof(_unique_id));  // crypto strong random
         memset(&_header, 0, sizeof(_header));
         (void) _read_header();
       }
@@ -133,16 +136,24 @@ namespace algorithm
         do
         {
           OUTCOME_TRY(_, _h.read(0, (char *) &_header, 48));
-          if(_.data != (char *) &_header)
+          if(_.data != reinterpret_cast<char *>(&_header))
+          {
             memcpy(&_header, _.data, _.len);
+          }
           if(_skip_hashing)
+          {
             return success();
+          }
           if(first)
+          {
             first = false;
+          }
           else
+          {
             std::this_thread::yield();
+          }
           // No timeout as this should very rarely block for any significant length of time
-        } while(_header.hash != QUICKCPPLIB_NAMESPACE::algorithm::hash::fast_hash::hash(((char *) &_header) + 16, sizeof(_header) - 16));
+        } while(_header.hash != QUICKCPPLIB_NAMESPACE::algorithm::hash::fast_hash::hash((reinterpret_cast<char *>(&_header)) + 16, sizeof(_header) - 16));
         return success();
       }
 
@@ -184,7 +195,9 @@ namespace algorithm
         if(lockresult.has_error())
         {
           if(lockresult.error() != std::errc::timed_out)
+          {
             return lockresult.error();
+          }
           // Somebody else is also using this file
         }
         else
@@ -196,14 +209,18 @@ namespace algorithm
           header.first_known_good = sizeof(header);
           header.first_after_hole_punch = sizeof(header);
           if(!skip_hashing)
-            header.hash = QUICKCPPLIB_NAMESPACE::algorithm::hash::fast_hash::hash(((char *) &header) + 16, sizeof(header) - 16);
+          {
+            header.hash = QUICKCPPLIB_NAMESPACE::algorithm::hash::fast_hash::hash((reinterpret_cast<char *>(&header)) + 16, sizeof(header) - 16);
+          }
           OUTCOME_TRYV(ret.write(0, (char *) &header, sizeof(header)));
         }
         // Open a shared lock on last byte in header to prevent other users zomping the file
         OUTCOME_TRY(guard, ret.lock(sizeof(header) - 1, 1, false));
         // Unlock any exclusive lock I gained earlier now
         if(lockresult)
+        {
           lockresult.value().unlock();
+        }
         // The constructor will read and cache the header
         return atomic_append(std::move(ret), std::move(guard), nfs_compatibility, skip_hashing);
       }
@@ -212,21 +229,27 @@ namespace algorithm
       const file_handle &handle() const noexcept { return _h; }
 
     protected:
-      AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> _lock(entities_guard &out, deadline d, bool spin_not_sleep) noexcept override final
+      AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> _lock(entities_guard &out, deadline d, bool spin_not_sleep) noexcept final
       {
         AFIO_LOG_FUNCTION_CALL(this);
         atomic_append_detail::lock_request lock_request;
         if(out.entities.size() > sizeof(lock_request.entities) / sizeof(lock_request.entities[0]))
+        {
           return std::errc::argument_list_too_long;
+        }
 
         std::chrono::steady_clock::time_point began_steady;
         std::chrono::system_clock::time_point end_utc;
         if(d)
         {
           if((d).steady)
+          {
             began_steady = std::chrono::steady_clock::now();
+          }
           else
+          {
             end_utc = (d).to_time_point();
+          }
         }
         // Fire this if an error occurs
         auto disableunlock = undoer([&] { out.release(); });
@@ -239,7 +262,9 @@ namespace algorithm
         lock_request.items = out.entities.size();
         memcpy(lock_request.entities, out.entities.data(), sizeof(lock_request.entities[0]) * out.entities.size());
         if(!_skip_hashing)
-          lock_request.hash = QUICKCPPLIB_NAMESPACE::algorithm::hash::fast_hash::hash(((char *) &lock_request) + 16, sizeof(lock_request) - 16);
+        {
+          lock_request.hash = QUICKCPPLIB_NAMESPACE::algorithm::hash::fast_hash::hash((reinterpret_cast<char *>(&lock_request)) + 16, sizeof(lock_request) - 16);
+        }
         // My lock request will be the file's current length or higher
         OUTCOME_TRY(my_lock_request_offset, _h.length());
         {
@@ -248,7 +273,7 @@ namespace algorithm
           file_handle::extent_guard append_guard;
           if(_nfs_compatibility)
           {
-            file_handle::extent_type lastbyte = (file_handle::extent_type) -1;
+            auto lastbyte = static_cast<file_handle::extent_type>(-1);
             // Lock up to the beginning of the shadow lock space
             lastbyte &= ~(1ULL << 63);
             OUTCOME_TRY(append_guard_, _h.lock(my_lock_request_offset, lastbyte, true));
@@ -274,10 +299,14 @@ namespace algorithm
             std::terminate();
           }
           const atomic_append_detail::lock_request *record, *lastrecord;
-          for(record = (const atomic_append_detail::lock_request *) readoutcome.value().data, lastrecord = (const atomic_append_detail::lock_request *) (readoutcome.value().data + readoutcome.value().len); record < lastrecord && record->hash != lock_request.hash; ++record)
+          for(record = reinterpret_cast<const atomic_append_detail::lock_request *>(readoutcome.value().data), lastrecord = reinterpret_cast<const atomic_append_detail::lock_request *>(readoutcome.value().data + readoutcome.value().len); record < lastrecord && record->hash != lock_request.hash; ++record)
+          {
             my_lock_request_offset += sizeof(atomic_append_detail::lock_request);
+          }
           if(record->hash == lock_request.hash)
+          {
             break;
+          }
         }
 
         // extent_guard is now valid and will be unlocked on error
@@ -305,32 +334,44 @@ namespace algorithm
           OUTCOME_TRYV(_read_header());
           // If there are no preceding records, we're done
           if(record_offset < _header.first_known_good)
+          {
             break;
+          }
           auto start_offset = record_offset;
           if(start_offset > sizeof(_buffer) - sizeof(atomic_append_detail::lock_request))
+          {
             start_offset -= sizeof(_buffer) - sizeof(atomic_append_detail::lock_request);
+          }
           else
+          {
             start_offset = sizeof(atomic_append_detail::lock_request);
+          }
           if(start_offset < _header.first_known_good)
+          {
             start_offset = _header.first_known_good;
+          }
           assert(record_offset >= start_offset);
           assert(record_offset - start_offset <= sizeof(_buffer));
           OUTCOME_TRY(batchread, _h.read(start_offset, _buffer, (size_t)(record_offset - start_offset) + sizeof(atomic_append_detail::lock_request)));
           assert(batchread.len == record_offset - start_offset + sizeof(atomic_append_detail::lock_request));
-          const atomic_append_detail::lock_request *record = (atomic_append_detail::lock_request *) (batchread.data + batchread.len - sizeof(atomic_append_detail::lock_request));
-          const atomic_append_detail::lock_request *firstrecord = (atomic_append_detail::lock_request *) batchread.data;
+          const atomic_append_detail::lock_request *record = reinterpret_cast<atomic_append_detail::lock_request *>(batchread.data + batchread.len - sizeof(atomic_append_detail::lock_request));
+          const atomic_append_detail::lock_request *firstrecord = reinterpret_cast<atomic_append_detail::lock_request *>(batchread.data);
 
           // Skip all completed lock requests or not mentioning any of my entities
           for(; record >= firstrecord; record_offset -= sizeof(atomic_append_detail::lock_request), --record)
           {
             // If a completed lock request, skip
-            if(!record->hash && !record->unique_id)
+            if(!record->hash && (record->unique_id == 0u))
+            {
               continue;
+            }
             // If record hash doesn't match contents it's a torn read, reload
             if(!_skip_hashing)
             {
               if(record->hash != QUICKCPPLIB_NAMESPACE::algorithm::hash::fast_hash::hash(((char *) record) + 16, sizeof(atomic_append_detail::lock_request) - 16))
+              {
                 goto reload;
+              }
             }
 
             // Does this record lock anything I am locking?
@@ -342,8 +383,10 @@ namespace algorithm
                 {
                   // Is the lock I want exclusive or the lock he wants exclusive?
                   // If so, need to block
-                  if(record->entities[n].exclusive || entity.exclusive)
+                  if((record->entities[n].exclusive != 0u) || (entity.exclusive != 0u))
+                  {
                     goto beginwait;
+                  }
                 }
               }
             }
@@ -368,12 +411,18 @@ namespace algorithm
               {
                 std::chrono::nanoseconds ns = std::chrono::duration_cast<std::chrono::nanoseconds>((began_steady + std::chrono::nanoseconds((d).nsecs)) - std::chrono::steady_clock::now());
                 if(ns.count() < 0)
+                {
                   (nd).nsecs = 0;
+                }
                 else
+                {
                   (nd).nsecs = ns.count();
+                }
               }
               else
+              {
                 (nd) = (d);
+              }
             }
             auto lock_offset = record_offset;
             // Set the top bit to use the shadow lock space on Windows
@@ -386,12 +435,16 @@ namespace algorithm
             if((d).steady)
             {
               if(std::chrono::steady_clock::now() >= (began_steady + std::chrono::nanoseconds((d).nsecs)))
+              {
                 return std::errc::timed_out;
+              }
             }
             else
             {
               if(std::chrono::system_clock::now() >= end_utc)
+              {
                 return std::errc::timed_out;
+              }
             }
           }
         } while(record_offset >= _header.first_known_good);
@@ -399,16 +452,16 @@ namespace algorithm
       }
 
     public:
-      AFIO_HEADERS_ONLY_VIRTUAL_SPEC void unlock(entities_type entities, unsigned long long hint) noexcept override final
+      AFIO_HEADERS_ONLY_VIRTUAL_SPEC void unlock(entities_type entities, unsigned long long hint) noexcept final
       {
         (void) entities;
         AFIO_LOG_FUNCTION_CALL(this);
-        if(!hint)
+        if(hint == 0u)
         {
           AFIO_LOG_WARN(this, "atomic_append::unlock() currently requires a hint to work, assuming this is a failed lock.");
           return;
         }
-        file_handle::extent_type my_lock_request_offset = (file_handle::extent_type) hint;
+        auto my_lock_request_offset = static_cast<file_handle::extent_type>(hint);
         {
           atomic_append_detail::lock_request record;
 #ifdef _DEBUG
@@ -426,11 +479,11 @@ namespace algorithm
           }
 #endif
           memset(&record, 0, sizeof(record));
-          (void) _h.write(my_lock_request_offset, (char *) &record, sizeof(record));
+          (void) _h.write(my_lock_request_offset, reinterpret_cast<char *>(&record), sizeof(record));
         }
 
         // Every 32 records or so, bump _header.first_known_good
-        if(!(my_lock_request_offset & 4095))
+        if((my_lock_request_offset & 4095) == 0u)
         {
           //_read_header();
 
@@ -450,15 +503,21 @@ namespace algorithm
             const auto &bytesread = bytesread_.value();
             // If read was partial, we are done after this round
             if(bytesread.len < sizeof(_buffer))
+            {
               done = true;
-            const atomic_append_detail::lock_request *record = (const atomic_append_detail::lock_request *) bytesread.data;
-            const atomic_append_detail::lock_request *lastrecord = (const atomic_append_detail::lock_request *) (bytesread.data + bytesread.len);
+            }
+            const auto *record = reinterpret_cast<const atomic_append_detail::lock_request *>(bytesread.data);
+            const auto *lastrecord = reinterpret_cast<const atomic_append_detail::lock_request *>(bytesread.data + bytesread.len);
             for(; record < lastrecord; ++record)
             {
-              if(!record->hash && !record->unique_id)
+              if(!record->hash && (record->unique_id == 0u))
+              {
                 _header.first_known_good += sizeof(atomic_append_detail::lock_request);
+              }
               else
+              {
                 break;
+              }
             }
           }
           // Hole punch if >= 1Mb of zeros exists
@@ -472,9 +531,11 @@ namespace algorithm
           }
           ++_header.generation;
           if(!_skip_hashing)
-            _header.hash = QUICKCPPLIB_NAMESPACE::algorithm::hash::fast_hash::hash(((char *) &_header) + 16, sizeof(_header) - 16);
+          {
+            _header.hash = QUICKCPPLIB_NAMESPACE::algorithm::hash::fast_hash::hash((reinterpret_cast<char *>(&_header)) + 16, sizeof(_header) - 16);
+          }
           // Rewrite the first part of the header only
-          (void) _h.write(0, (char *) &_header, 48);
+          (void) _h.write(0, reinterpret_cast<char *>(&_header), 48);
         }
       }
     };

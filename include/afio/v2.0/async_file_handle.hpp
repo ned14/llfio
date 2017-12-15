@@ -91,7 +91,7 @@ public:
 
   //! Construct a handle from a supplied native handle
   constexpr async_file_handle(io_service *service, native_handle_type h, dev_t devid, ino_t inode, caching caching = caching::none, flag flags = flag::none)
-      : file_handle(std::move(h), devid, inode, std::move(caching), std::move(flags))
+      : file_handle(std::move(h), devid, inode, caching, flags)
   {
     this->_service = service;
   }
@@ -133,7 +133,7 @@ public:
   static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<async_file_handle> async_file(io_service &service, const path_handle &base, path_view_type _path, mode _mode = mode::read, creation _creation = creation::open_existing, caching _caching = caching::only_metadata, flag flags = flag::none) noexcept
   {
     // Open it overlapped, otherwise no difference.
-    OUTCOME_TRY(v, file_handle::file(std::move(base), std::move(_path), std::move(_mode), std::move(_creation), std::move(_caching), flags | flag::overlapped));
+    OUTCOME_TRY(v, file_handle::file(std::move(base), _path, _mode, _creation, _caching, flags | flag::overlapped));
     async_file_handle ret(std::move(v));
     ret._service = &service;
     return std::move(ret);
@@ -156,7 +156,9 @@ public:
         randomname.append(".random");
         result<async_file_handle> ret = async_file(service, dirpath, randomname, _mode, creation::only_if_not_exist, _caching, flags);
         if(ret || (!ret && ret.error() != std::errc::file_exists))
+        {
           return ret;
+        }
       }
     }
     catch(...)
@@ -199,7 +201,7 @@ public:
   static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<async_file_handle> async_temp_inode(io_service &service, const path_handle &dir = path_discovery::storage_backed_temporary_files_directory(), mode _mode = mode::write, flag flags = flag::none) noexcept
   {
     // Open it overlapped, otherwise no difference.
-    OUTCOME_TRY(v, file_handle::temp_inode(dir, std::move(_mode), flags | flag::overlapped));
+    OUTCOME_TRY(v, file_handle::temp_inode(dir, _mode, flags | flag::overlapped));
     async_file_handle ret(std::move(v));
     ret._service = &service;
     return std::move(ret);
@@ -265,14 +267,13 @@ protected:
         , must_deallocate_self(_must_deallocate_self)
         , items(_items)
         , items_to_go(0)
-        , result()
     {
     }
     AFIO_HEADERS_ONLY_VIRTUAL_SPEC ~_erased_io_state_type()
     {
       // i/o still pending is very bad, this should never happen
       assert(!items_to_go);
-      if(items_to_go)
+      if(items_to_go != 0u)
       {
         AFIO_LOG_FATAL(parent->native_handle().h, "FATAL: io_state destructed while i/o still in flight, the derived class should never allow this.");
         abort();
@@ -303,7 +304,7 @@ protected:
       _ptr->~U();
       if(must_deallocate_self)
       {
-        char *ptr = (char *) _ptr;
+        auto *ptr = (char *) _ptr;
         ::free(ptr);
       }
     }
@@ -323,7 +324,7 @@ protected:
   // Used to indirect copy and call of unknown completion handler
   struct _erased_completion_handler
   {
-    virtual ~_erased_completion_handler() {}
+    virtual ~_erased_completion_handler() = default;
     // Returns my size including completion handler
     virtual size_t bytes() const noexcept = 0;
     // Moves me and handler to some new location
@@ -365,26 +366,32 @@ public:
     struct completion_handler : _erased_completion_handler
     {
       CompletionRoutine completion;
-      completion_handler(CompletionRoutine c)
+      explicit completion_handler(CompletionRoutine c)
           : completion(std::move(c))
       {
       }
-      virtual size_t bytes() const noexcept override final { return sizeof(*this); }
-      virtual void move(_erased_completion_handler *_dest) override final
+      size_t bytes() const noexcept final { return sizeof(*this); }
+      void move(_erased_completion_handler *_dest) final
       {
-        void *dest = (void *) _dest;
+        auto *dest = (void *) _dest;
         new(dest) completion_handler(std::move(*this));
       }
-      virtual void operator()(_erased_io_state_type *state) override final { completion(state->parent, state->result.write); }
-      virtual void *address() noexcept override final { return &completion; }
+      void operator()(_erased_io_state_type *state) final { completion(state->parent, state->result.write); }
+      void *address() noexcept final { return &completion; }
     } ch{std::forward<CompletionRoutine>(completion)};
     operation_t operation = operation_t::fsync_sync;
     if(!wait_for_device && and_metadata)
+    {
       operation = operation_t::fsync_async;
+    }
     else if(wait_for_device && !and_metadata)
+    {
       operation = operation_t::dsync_sync;
+    }
     else if(!wait_for_device && !and_metadata)
+    {
       operation = operation_t::dsync_async;
+    }
     return _begin_io(mem, operation, reinterpret_cast<io_request<const_buffers_type> &>(reqs), std::move(ch));
   }
 
@@ -408,20 +415,20 @@ public:
     struct completion_handler : _erased_completion_handler
     {
       CompletionRoutine completion;
-      completion_handler(CompletionRoutine c)
+      explicit completion_handler(CompletionRoutine c)
           : completion(std::move(c))
       {
       }
-      virtual size_t bytes() const noexcept override final { return sizeof(*this); }
-      virtual void move(_erased_completion_handler *_dest) override final
+      size_t bytes() const noexcept final { return sizeof(*this); }
+      void move(_erased_completion_handler *_dest) final
       {
-        void *dest = (void *) _dest;
+        auto *dest = (void *) _dest;
         new(dest) completion_handler(std::move(*this));
       }
-      virtual void operator()(_erased_io_state_type *state) override final { completion(state->parent, state->result.read); }
-      virtual void *address() noexcept override final { return &completion; }
+      void operator()(_erased_io_state_type *state) final { completion(state->parent, state->result.read); }
+      void *address() noexcept final { return &completion; }
     } ch{std::forward<CompletionRoutine>(completion)};
-    return _begin_io(mem, operation_t::read, io_request<const_buffers_type>({(const_buffer_type *) reqs.buffers.data(), reqs.buffers.size()}, reqs.offset), std::move(ch));
+    return _begin_io(mem, operation_t::read, io_request<const_buffers_type>({reinterpret_cast<const_buffer_type *>(reqs.buffers.data()), reqs.buffers.size()}, reqs.offset), std::move(ch));
   }
 
   /*! \brief Schedule a write to occur asynchronously.
@@ -444,18 +451,18 @@ public:
     struct completion_handler : _erased_completion_handler
     {
       CompletionRoutine completion;
-      completion_handler(CompletionRoutine c)
+      explicit completion_handler(CompletionRoutine c)
           : completion(std::move(c))
       {
       }
-      virtual size_t bytes() const noexcept override final { return sizeof(*this); }
-      virtual void move(_erased_completion_handler *_dest) override final
+      size_t bytes() const noexcept final { return sizeof(*this); }
+      void move(_erased_completion_handler *_dest) final
       {
-        void *dest = (void *) _dest;
+        auto *dest = (void *) _dest;
         new(dest) completion_handler(std::move(*this));
       }
-      virtual void operator()(_erased_io_state_type *state) override final { completion(state->parent, state->result.write); }
-      virtual void *address() noexcept override final { return &completion; }
+      void operator()(_erased_io_state_type *state) final { completion(state->parent, state->result.write); }
+      void *address() noexcept final { return &completion; }
     } ch{std::forward<CompletionRoutine>(completion)};
     return _begin_io(mem, operation_t::write, reqs, std::move(ch));
   }

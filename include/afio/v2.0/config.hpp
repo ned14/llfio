@@ -323,9 +323,9 @@ private:
   // The id of the thread where this failure occurred
   uint32_t _thread_id{0};
   // The TLS path store entry
-  uint16_t _tls_path_id1{(uint16_t) -1}, _tls_path_id2{(uint16_t) -1};
+  uint16_t _tls_path_id1{static_cast<uint16_t>(-1)}, _tls_path_id2{static_cast<uint16_t>(-1)};
   // The id of the relevant log entry in the AFIO log (if logging enabled)
-  size_t _log_id{(size_t) -1};
+  size_t _log_id{static_cast<size_t>(-1)};
 
 public:
 #endif
@@ -338,14 +338,14 @@ public:
   {
   }
   // Construct from an error code
-  inline error_info(std::error_code ec);
+  inline explicit error_info(std::error_code _ec);
   /* NOTE TO SELF: The error_info constructor implementation is in handle.hpp as we need that
   defined before we can do useful logging.
   */
   //! Construct from an error condition enum
   OUTCOME_TEMPLATE(class ErrorCondEnum)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_error_condition_enum<ErrorCondEnum>::value))
-  error_info(ErrorCondEnum &&v)
+  error_info(ErrorCondEnum &&v)  // NOLINT
       : error_info(make_error_code(std::forward<ErrorCondEnum>(v)))
   {
   }
@@ -460,7 +460,7 @@ class log_level_guard
   log_level _v;
 
 public:
-  log_level_guard(log_level n)
+  explicit log_level_guard(log_level n)
       : _v(log().log_level())
   {
     log().log_level(n);
@@ -479,7 +479,7 @@ namespace detail
     handle *current_handle{nullptr};  // The current handle for this thread. Changed via RAII via AFIO_LOG_FUNCTION_CALL, see below.
     bool reentering_self{false};      // Prevents any failed call to current_path() by us reentering ourselves
 
-    char paths[190][16];  // Last 190 chars of path
+    char paths[190][16]{};  // Last 190 chars of path
     uint16_t pathidx{0};
     char *next(uint16_t &idx)
     {
@@ -514,7 +514,7 @@ namespace detail
   {
     handle *old{nullptr};
     bool enabled{false};
-    tls_current_handle_holder(const handle *h)
+    explicit tls_current_handle_holder(const handle *h)
     {
       if(h != nullptr && log().log_level() >= log_level::error)
       {
@@ -535,10 +535,10 @@ namespace detail
   };
   template <> struct tls_current_handle_holder<false>
   {
-    template <class T> tls_current_handle_holder(T &&) {}
+    template <class T> explicit tls_current_handle_holder(T && /*unused*/) {}
   };
 #define AFIO_LOG_INST_TO_TLS(inst) AFIO_V2_NAMESPACE::detail::tls_current_handle_holder<std::is_base_of<AFIO_V2_NAMESPACE::handle, std::decay_t<std::remove_pointer_t<decltype(inst)>>>::value> AFIO_UNIQUE_NAME(inst)
-}
+}  // namespace detail
 #else
 #define AFIO_LOG_INST_TO_TLS(inst)
 #endif
@@ -589,7 +589,7 @@ inline std::string error_info::message() const
     }
   }
 #if AFIO_LOGGING_LEVEL >= 2
-  if(_log_id != (uint32_t) -1)
+  if(_log_id != static_cast<uint32_t>(-1))
   {
     if(log().valid(_log_id))
     {
@@ -605,7 +605,7 @@ inline std::string error_info::message() const
 AFIO_V2_NAMESPACE_END
 
 #ifndef AFIO_LOG_FATAL_TO_CERR
-#include <stdio.h>
+#include <cstdio>
 #define AFIO_LOG_FATAL_TO_CERR(expr)                                                                                                                                                                                                                                                                                           \
   fprintf(stderr, "%s\n", (expr));                                                                                                                                                                                                                                                                                             \
   fflush(stderr)
@@ -735,7 +735,7 @@ AFIO_V2_NAMESPACE_END
 #define AFIO_LOG_ALL(inst, message)
 #endif
 
-#include <time.h>  // for struct timespec
+#include <ctime>  // for struct timespec
 
 AFIO_V2_NAMESPACE_BEGIN
 
@@ -747,18 +747,18 @@ namespace detail
   {
     struct function_ptr_storage
     {
-      virtual ~function_ptr_storage() {}
+      virtual ~function_ptr_storage() = default;
       virtual R operator()(Args &&... args) = 0;
     };
     template <class U> struct function_ptr_storage_impl : public function_ptr_storage
     {
       U c;
       template <class... Args2>
-      constexpr function_ptr_storage_impl(Args2 &&... args)
+      constexpr explicit function_ptr_storage_impl(Args2 &&... args)
           : c(std::forward<Args2>(args)...)
       {
       }
-      virtual R operator()(Args &&... args) override final { return c(std::move(args)...); }
+      R operator()(Args &&... args) final { return c(std::move(args)...); }
     };
     function_ptr_storage *ptr;
     template <class U> struct emplace_t
@@ -772,14 +772,14 @@ namespace detail
     }
     template <class R_, class U, class... Args2> friend inline function_ptr<R_> emplace_function_ptr(Args2 &&... args);
     template <class U, class... Args2>
-    explicit function_ptr(emplace_t<U>, Args2 &&... args)
+    explicit function_ptr(emplace_t<U> /*unused*/, Args2 &&... args)
         : ptr(new function_ptr_storage_impl<U>(std::forward<Args2>(args)...))
     {
     }
 
   public:
     constexpr function_ptr() noexcept : ptr(nullptr) {}
-    constexpr function_ptr(function_ptr_storage *p) noexcept : ptr(p) {}
+    constexpr explicit function_ptr(function_ptr_storage *p) noexcept : ptr(p) {}
     constexpr function_ptr(function_ptr &&o) noexcept : ptr(o.ptr) { o.ptr = nullptr; }
     function_ptr &operator=(function_ptr &&o)
     {
@@ -808,7 +808,7 @@ namespace detail
   };
   template <class R, class U> inline function_ptr<R> make_function_ptr(U &&f) { return function_ptr<R>(nullptr, std::forward<U>(f)); }
   template <class R, class U, class... Args> inline function_ptr<R> emplace_function_ptr(Args &&... args) { return function_ptr<R>(typename function_ptr<R>::template emplace_t<U>(), std::forward<Args>(args)...); }
-}
+}  // namespace detail
 
 // Native handle support
 namespace win
