@@ -37,10 +37,14 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, st
 {
   size_t ret = 0;
 #ifdef __linux__
-  struct statfs64 s;
+  struct statfs64 s
+  {
+  };
   memset(&s, 0, sizeof(s));
   if(-1 == fstatfs64(h.native_handle().fd, &s))
-    return {errno, std::system_category()};
+  {
+    return { errno, std::system_category() };
+  }
   if(!!(wanted & want::bsize))
   {
     f_bsize = s.f_bsize;
@@ -84,8 +88,8 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, st
   //            if(!!(wanted&&want::owner))       { f_owner      =s.f_owner;  ++ret; }
   if(!!(wanted & want::fsid))
   {
-    f_fsid[0] = (unsigned) s.f_fsid.__val[0];
-    f_fsid[1] = (unsigned) s.f_fsid.__val[1];
+    f_fsid[0] = static_cast<unsigned>(s.f_fsid.__val[0]);
+    f_fsid[1] = static_cast<unsigned>(s.f_fsid.__val[1]);
     ++ret;
   }
   if(!!(wanted & want::flags) || !!(wanted & want::fstypename) || !!(wanted & want::mntfromname) || !!(wanted & want::mntonname))
@@ -107,29 +111,41 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, st
       {
         // Need to parse mount options on Linux
         FILE *mtab = setmntent("/etc/mtab", "r");
-        if(!mtab)
-          mtab = setmntent("/proc/mounts", "r");
-        if(!mtab)
-          return {errno, std::system_category()};
-        auto unmtab = undoer([mtab] { endmntent(mtab); });
-        struct mntent m;
-        char buffer[32768];
-        while(getmntent_r(mtab, &m, buffer, sizeof(buffer)))
+        if(mtab == nullptr)
         {
-          struct statfs64 temp;
+          mtab = setmntent("/proc/mounts", "r");
+        }
+        if(mtab == nullptr)
+        {
+          return { errno, std::system_category() };
+        }
+        auto unmtab = undoer([mtab] { endmntent(mtab); });
+        struct mntent m
+        {
+        };
+        char buffer[32768];
+        while(getmntent_r(mtab, &m, buffer, sizeof(buffer)) != nullptr)
+        {
+          struct statfs64 temp
+          {
+          };
           memset(&temp, 0, sizeof(temp));
           // std::cout << m.mnt_fsname << "," << m.mnt_dir << "," << m.mnt_type << "," << m.mnt_opts << std::endl;
           if(0 == statfs64(m.mnt_dir, &temp))
           {
             // std::cout << "   " << temp.f_fsid.__val[0] << temp.f_fsid.__val[1] << " =? " << s.f_fsid.__val[0] << s.f_fsid.__val[1] << std::endl;
-            if(temp.f_type == s.f_type && !memcmp(&temp.f_fsid, &s.f_fsid, sizeof(s.f_fsid)))
-              mountentries.push_back(std::make_pair(mountentry(m.mnt_fsname, m.mnt_dir, m.mnt_type, m.mnt_opts), temp));
+            if(temp.f_type == s.f_type && (memcmp(&temp.f_fsid, &s.f_fsid, sizeof(s.f_fsid)) == 0))
+            {
+              mountentries.emplace_back(mountentry(m.mnt_fsname, m.mnt_dir, m.mnt_type, m.mnt_opts), temp);
+            }
           }
         }
       }
 #ifndef AFIO_COMPILING_FOR_GCOV
       if(mountentries.empty())
+      {
         return std::errc::no_such_file_or_directory;
+      }
       // Choose the mount entry with the most closely matching statfs. You can't choose
       // exclusively based on mount point because of bind mounts
       if(mountentries.size() > 1)
@@ -137,11 +153,13 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, st
         std::vector<std::pair<size_t, size_t>> scores(mountentries.size());
         for(size_t n = 0; n < mountentries.size(); n++)
         {
-          const char *a = (const char *) &mountentries[n].second;
-          const char *b = (const char *) &s;
+          const auto *a = reinterpret_cast<const char *>(&mountentries[n].second);
+          const auto *b = reinterpret_cast<const char *>(&s);
           scores[n].first = 0;
           for(size_t x = 0; x < sizeof(struct statfs64); x++)
+          {
             scores[n].first += abs(a[x] - b[x]);
+          }
           scores[n].second = n;
         }
         std::sort(scores.begin(), scores.end());
@@ -152,14 +170,14 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, st
 #endif
       if(!!(wanted & want::flags))
       {
-        f_flags.rdonly = !!(s.f_flags & MS_RDONLY);
-        f_flags.noexec = !!(s.f_flags & MS_NOEXEC);
-        f_flags.nosuid = !!(s.f_flags & MS_NOSUID);
-        f_flags.acls = (std::string::npos != mountentries.front().first.mnt_opts.find("acl") && std::string::npos == mountentries.front().first.mnt_opts.find("noacl"));
-        f_flags.xattr = (std::string::npos != mountentries.front().first.mnt_opts.find("xattr") && std::string::npos == mountentries.front().first.mnt_opts.find("nouser_xattr"));
+        f_flags.rdonly = static_cast<uint32_t>(!((s.f_flags & MS_RDONLY)) == 0);
+        f_flags.noexec = static_cast<uint32_t>(!((s.f_flags & MS_NOEXEC)) == 0);
+        f_flags.nosuid = static_cast<uint32_t>(!((s.f_flags & MS_NOSUID)) == 0);
+        f_flags.acls = static_cast<uint32_t>(std::string::npos != mountentries.front().first.mnt_opts.find("acl") && std::string::npos == mountentries.front().first.mnt_opts.find("noacl"));
+        f_flags.xattr = static_cast<uint32_t>(std::string::npos != mountentries.front().first.mnt_opts.find("xattr") && std::string::npos == mountentries.front().first.mnt_opts.find("nouser_xattr"));
         //                out.f_flags.compression=0;
         // Those filing systems supporting FALLOC_FL_PUNCH_HOLE
-        f_flags.extents = (mountentries.front().first.mnt_type == "btrfs" || mountentries.front().first.mnt_type == "ext4" || mountentries.front().first.mnt_type == "xfs" || mountentries.front().first.mnt_type == "tmpfs");
+        f_flags.extents = static_cast<uint32_t>(mountentries.front().first.mnt_type == "btrfs" || mountentries.front().first.mnt_type == "ext4" || mountentries.front().first.mnt_type == "xfs" || mountentries.front().first.mnt_type == "tmpfs");
         ++ret;
       }
       if(!!(wanted & want::fstypename))

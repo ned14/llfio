@@ -55,7 +55,7 @@ static inline filesystem::file_type to_st_type(uint16_t mode)
 static inline std::chrono::system_clock::time_point to_timepoint(struct timespec ts)
 {
   // Need to have this self-adapt to the STL being used
-  static constexpr unsigned long long STL_TICKS_PER_SEC = (unsigned long long) std::chrono::system_clock::period::den / std::chrono::system_clock::period::num;
+  static constexpr unsigned long long STL_TICKS_PER_SEC = static_cast<unsigned long long>(std::chrono::system_clock::period::den) / std::chrono::system_clock::period::num;
   static constexpr unsigned long long multiplier = STL_TICKS_PER_SEC >= 1000000000ULL ? STL_TICKS_PER_SEC / 1000000000ULL : 1;
   static constexpr unsigned long long divider = STL_TICKS_PER_SEC >= 1000000000ULL ? 1 : 1000000000ULL / STL_TICKS_PER_SEC;
   // For speed we make the big assumption that the STL's system_clock is based on the time_t epoch 1st Jan 1970.
@@ -66,12 +66,16 @@ static inline std::chrono::system_clock::time_point to_timepoint(struct timespec
 AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> stat_t::fill(const handle &h, stat_t::want wanted) noexcept
 {
   AFIO_LOG_FUNCTION_CALL(&h);
-  struct stat s;
+  struct stat s
+  {
+  };
   memset(&s, 0, sizeof(s));
   size_t ret = 0;
 
   if(-1 == ::fstat(h.native_handle().fd, &s))
-    return {errno, std::system_category()};
+  {
+    return { errno, std::system_category() };
+  }
   if(wanted & want::dev)
   {
     st_dev = s.st_dev;
@@ -168,7 +172,7 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> stat_t::fill(const handle &h, stat
   }
   if(wanted & want::allocated)
   {
-    st_allocated = (handle::extent_type) s.st_blocks * 512;
+    st_allocated = static_cast<handle::extent_type>(s.st_blocks) * 512;
     ++ret;
   }
   if(wanted & want::blocks)
@@ -212,7 +216,7 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> stat_t::fill(const handle &h, stat
 #endif
   if(wanted & want::sparse)
   {
-    st_sparse = ((handle::extent_type) s.st_blocks * 512) < (handle::extent_type) s.st_size;
+    st_sparse = static_cast<unsigned int>((static_cast<handle::extent_type>(s.st_blocks) * 512) < static_cast<handle::extent_type>(s.st_size);
     ++ret;
   }
   return ret;

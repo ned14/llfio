@@ -42,7 +42,7 @@ namespace storage_profile
   namespace system
   {
     // OS name, version
-    outcome<void> os(storage_profile &sp, file_handle &) noexcept
+    outcome<void> os(storage_profile &sp, file_handle & /*unused*/) noexcept
     {
       static std::string os_name, os_ver;
       if(!os_name.empty())
@@ -54,10 +54,14 @@ namespace storage_profile
       {
         try
         {
-          struct utsname name;
+          struct utsname name
+          {
+          };
           memset(&name, 0, sizeof(name));
           if(uname(&name) < 0)
+          {
             return {errno, std::system_category()};
+          }
           sp.os_name.value = os_name = name.sysname;
           sp.os_ver.value = os_ver = name.release;
         }
@@ -70,7 +74,7 @@ namespace storage_profile
     }
 
     // CPU name, architecture, physical cores
-    outcome<void> cpu(storage_profile &sp, file_handle &) noexcept
+    outcome<void> cpu(storage_profile &sp, file_handle & /*unused*/) noexcept
     {
       static std::string cpu_name, cpu_architecture;
       static unsigned cpu_physical_cores;
@@ -84,15 +88,19 @@ namespace storage_profile
       {
         try
         {
-          struct utsname name;
+          struct utsname name
+          {
+          };
           memset(&name, 0, sizeof(name));
           if(uname(&name) < 0)
+          {
             return {errno, std::system_category()};
+          }
           sp.cpu_name.value = sp.cpu_architecture.value = name.machine;
           sp.cpu_physical_cores.value = 0;
 #if defined(__linux__)
           {
-            int ih = ::open("/proc/cpuinfo", O_RDONLY);
+            int ih = ::open("/proc/cpuinfo", O_RDONLY | O_CLOEXEC);
             if(ih >= 0)
             {
               char cpuinfo[8192];
@@ -104,15 +112,21 @@ namespace storage_profile
               */
               const char *siblings = strstr(cpuinfo, "siblings");
               const char *cpucores = strstr(cpuinfo, "cpu cores");
-              if(siblings && cpucores)
+              if((siblings != nullptr) && (cpucores != nullptr))
               {
                 for(siblings = strchr(siblings, ':'); ' ' == *siblings; siblings++)
+                {
                   ;
+                }
                 for(cpucores = strchr(cpucores, ':'); ' ' == *cpucores; cpucores++)
+                {
                   ;
+                }
                 int s = atoi(siblings), c = atoi(cpucores);
-                if(s && c)
+                if((s != 0) && (c != 0))
+                {
                   sp.cpu_physical_cores.value = sysconf(_SC_NPROCESSORS_ONLN) * c / s;
+                }
               }
             }
           }
@@ -138,38 +152,46 @@ namespace storage_profile
           }
 #endif
           // Doesn't account for any hyperthreading
-          if(!sp.cpu_physical_cores.value)
+          if(sp.cpu_physical_cores.value == 0u)
+          {
             sp.cpu_physical_cores.value = sysconf(_SC_NPROCESSORS_ONLN);
+          }
 #if defined(__i386__) || defined(_M_IX86) || defined(__x86_64__) || defined(_M_X64)
           // We can do a much better CPU name on x86/x64
           sp.cpu_name.value.clear();
-          auto __cpuid = [](int *cpuInfo, int func) { __asm__ __volatile__("cpuid\n\t" : "=a"(cpuInfo[0]), "=b"(cpuInfo[1]), "=c"(cpuInfo[2]), "=d"(cpuInfo[3]) : "0"(func)); };
+          auto __cpuid = [](int *cpuInfo, int func) { __asm__ __volatile__("cpuid\n\t" : "=a"(cpuInfo[0]), "=b"(cpuInfo[1]), "=c"(cpuInfo[2]), "=d"(cpuInfo[3]) : "0"(func)); };  // NOLINT
           {
             char buffer[62];
             memset(buffer, 32, 62);
             int nBuff[4];
             __cpuid(nBuff, 0);
             memcpy(buffer + 0, nBuff + 1, 4);
-            *(int *) (buffer + 4) = nBuff[3];
-            *(int *) (buffer + 8) = nBuff[2];
+            *reinterpret_cast<int *>(buffer + 4) = nBuff[3];
+            *reinterpret_cast<int *>(buffer + 8) = nBuff[2];
 
             // Do we have a brand string?
             __cpuid(nBuff, 0x80000000);
-            if((unsigned) nBuff[0] >= 0x80000004)
+            if(static_cast<unsigned>(nBuff[0]) >= 0x80000004)
             {
-              __cpuid((int *) &buffer[14], 0x80000002);
-              __cpuid((int *) &buffer[30], 0x80000003);
-              __cpuid((int *) &buffer[46], 0x80000004);
+              __cpuid(reinterpret_cast<int *>(&buffer[14]), 0x80000002);
+              __cpuid(reinterpret_cast<int *>(&buffer[30]), 0x80000003);
+              __cpuid(reinterpret_cast<int *>(&buffer[46]), 0x80000004);
             }
             else
+            {
               strcpy(&buffer[14], "unbranded");
+            }
 
             // Trim string
             for(size_t n = 0; n < 62; n++)
             {
-              if(!n || buffer[n] != 32 || buffer[n - 1] != 32)
-                if(buffer[n])
+              if((n == 0u) || buffer[n] != 32 || buffer[n - 1] != 32)
+              {
+                if(buffer[n] != 0)
+                {
                   sp.cpu_name.value.push_back(buffer[n]);
+                }
+              }
             }
           }
 #endif
@@ -186,14 +208,14 @@ namespace storage_profile
     }
     namespace posix
     {
-      outcome<void> _mem(storage_profile &sp, file_handle &) noexcept
+      outcome<void> _mem(storage_profile &sp, file_handle & /*unused*/) noexcept
       {
 #if defined(_SC_PHYS_PAGES)
         size_t physpages = sysconf(_SC_PHYS_PAGES), pagesize = sysconf(_SC_PAGESIZE);
-        sp.mem_quantity.value = (unsigned long long) physpages * pagesize;
+        sp.mem_quantity.value = static_cast<unsigned long long>(physpages) * pagesize;
 #if defined(_SC_AVPHYS_PAGES)
         size_t freepages = sysconf(_SC_AVPHYS_PAGES);
-        sp.mem_in_use.value = (float) (physpages - freepages) / physpages;
+        sp.mem_in_use.value = static_cast<float>(physpages - freepages) / physpages;
 #elif defined(HW_USERMEM)
         unsigned long long freemem = 0;
         size_t len = sizeof(freemem);
@@ -209,23 +231,25 @@ namespace storage_profile
 #endif
         return success();
       }
-    }
-  }
+    }  // namespace posix
+  }    // namespace system
   namespace storage
   {
     namespace posix
     {
       // Controller type, max transfer, max buffers. Device name, size
-      outcome<void> _device(storage_profile &sp, file_handle &, std::string mntfromname, std::string fstypename) noexcept
+      outcome<void> _device(storage_profile &sp, file_handle & /*unused*/, std::string mntfromname, std::string fstypename) noexcept
       {
-	(void) fstypename;
+        (void) fstypename;
         try
         {
           // Firstly open a handle to the device
-          if(!strncmp(mntfromname.data(), "/dev", 4))
+          if(strncmp(mntfromname.data(), "/dev", 4) == 0)
           {
-            if(std::isdigit(mntfromname.back()))
+            if(std::isdigit(mntfromname.back()) != 0)
+            {
               mntfromname.resize(mntfromname.size() - 1);
+            }
           }
           else
           {
@@ -268,7 +292,7 @@ namespace storage_profile
           }
           OUTCOME_TRY(deviceh, file_handle::file({}, mntfromname, handle::mode::none, handle::creation::open_existing, handle::caching::only_metadata));
 
-// TODO See https://github.com/baruch/diskscan/blob/master/arch/arch-linux.c
+// TODO(ned): See https://github.com/baruch/diskscan/blob/master/arch/arch-linux.c
 //          sp.controller_type.value = "SCSI";
 //          sp.controller_max_transfer.value = sad->MaximumTransferLength;
 //          sp.controller_max_buffers.value = sad->MaximumPhysicalPages;
@@ -293,8 +317,8 @@ namespace storage_profile
         }
         return success();
       }
-    }
-  }
-}
+    }  // namespace posix
+  }    // namespace storage
+}  // namespace system
 
 AFIO_V2_NAMESPACE_END

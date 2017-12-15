@@ -52,7 +52,9 @@ result<path_handle> path_handle::path(const path_handle &base, path_handle::path
     nativeh.fd = ::open(zpath.buffer, attribs);
   }
   if(-1 == nativeh.fd)
-    return {errno, std::system_category()};
+  {
+    return { errno, std::system_category() };
+  }
   return ret;
 }
 

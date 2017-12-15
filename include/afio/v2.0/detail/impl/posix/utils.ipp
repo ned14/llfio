@@ -37,8 +37,10 @@ namespace utils
   size_t page_size() noexcept
   {
     static size_t ret;
-    if(!ret)
+    if(ret == 0u)
+    {
       ret = getpagesize();
+    }
     return ret;
   }
   std::vector<size_t> page_sizes(bool only_actually_available)
@@ -73,7 +75,7 @@ namespace utils
 #elif defined(__linux__)
       pagesizes.push_back(getpagesize());
       pagesizes_available.push_back(getpagesize());
-      int ih = ::open("/proc/meminfo", O_RDONLY);
+      int ih = ::open("/proc/meminfo", O_RDONLY | O_CLOEXEC);
       if(-1 != ih)
       {
         char buffer[4096], *hugepagesize, *hugepages;
@@ -81,24 +83,34 @@ namespace utils
         ::close(ih);
         hugepagesize = strstr(buffer, "Hugepagesize:");
         hugepages = strstr(buffer, "HugePages_Total:");
-        if(hugepagesize && hugepages)
+        if((hugepagesize != nullptr) && (hugepages != nullptr))
         {
           unsigned _hugepages = 0, _hugepagesize = 0;
           while(*++hugepagesize != ' ')
+          {
             ;
+          }
           while(*++hugepages != ' ')
+          {
             ;
+          }
           while(*++hugepagesize == ' ')
+          {
             ;
+          }
           while(*++hugepages == ' ')
+          {
             ;
+          }
           sscanf(hugepagesize, "%u", &_hugepagesize);
           sscanf(hugepages, "%u", &_hugepages);
-          if(_hugepagesize)
+          if(_hugepagesize != 0u)
           {
-            pagesizes.push_back(((size_t) _hugepagesize) * 1024);
-            if(_hugepages)
-              pagesizes_available.push_back(((size_t) _hugepagesize) * 1024);
+            pagesizes.push_back((static_cast<size_t>(_hugepagesize)) * 1024);
+            if(_hugepages != 0u)
+            {
+              pagesizes_available.push_back((static_cast<size_t>(_hugepagesize)) * 1024);
+            }
           }
         }
       }
@@ -122,9 +134,9 @@ namespace utils
     if(-1 == fd)
     {
       std::lock_guard<decltype(lock)> g(lock);
-      randomfd = fd = ::open("/dev/urandom", O_RDONLY);
+      randomfd = fd = ::open("/dev/urandom", O_RDONLY | O_CLOEXEC);
     }
-    if(-1 == fd || ::read(fd, buffer, bytes) < (ssize_t) bytes)
+    if(-1 == fd || ::read(fd, buffer, bytes) < static_cast<ssize_t>(bytes))
     {
       AFIO_LOG_FATAL(0, "afio: Kernel crypto function failed");
       std::terminate();
@@ -141,7 +153,7 @@ namespace utils
   {
     (void) flush_modified_data();
 #ifdef __linux__
-    int h = ::open("/proc/sys/vm/drop_caches", O_WRONLY);
+    int h = ::open("/proc/sys/vm/drop_caches", O_WRONLY | O_CLOEXEC);
     if(h == -1)
     {
       return {errno, std::system_category()};
@@ -175,15 +187,21 @@ namespace utils
         flags |= VM_FLAGS_SUPERPAGE_SIZE_ANY;
 #endif
       }
-      if(!(ret.p = mmap(nullptr, ret.actual_size, PROT_WRITE, flags, -1, 0)))
+      if((ret.p = mmap(nullptr, ret.actual_size, PROT_WRITE, flags, -1, 0)) == nullptr)
       {
         if(ENOMEM == errno)
-          if((ret.p = mmap(nullptr, ret.actual_size, PROT_WRITE, MAP_SHARED | MAP_ANON, -1, 0)))
+        {
+          if((ret.p = mmap(nullptr, ret.actual_size, PROT_WRITE, MAP_SHARED | MAP_ANON, -1, 0)) != nullptr)
+          {
             return ret;
+          }
+        }
       }
 #ifndef NDEBUG
       else if(ret.page_size_used > 65536)
+      {
         printf("afio: Large page allocation successful\n");
+      }
 #endif
       return ret;
     }
@@ -195,7 +213,7 @@ namespace utils
         std::terminate();
       }
     }
-  }
-}
+  }  // namespace detail
+}  // namespace detail
 
 AFIO_V2_NAMESPACE_END
