@@ -28,7 +28,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include "io_service.hpp"
 
 #include <regex>
-
+#include <utility>
 //! \file storage_profile.hpp Provides storage_profile
 
 #ifdef _MSC_VER
@@ -62,9 +62,9 @@ namespace storage_profile
   template <class T> constexpr T default_value() { return T{}; }
 
   template <> constexpr storage_types map_to_storage_type<io_service::extent_type>() { return storage_types::extent_type; }
-  template <> constexpr io_service::extent_type default_value<io_service::extent_type>() { return (io_service::extent_type) -1; }
+  template <> constexpr io_service::extent_type default_value<io_service::extent_type>() { return static_cast<io_service::extent_type>(-1); }
   template <> constexpr storage_types map_to_storage_type<unsigned int>() { return storage_types::unsigned_int; }
-  template <> constexpr unsigned int default_value<unsigned int>() { return (unsigned int) -1; }
+  template <> constexpr unsigned int default_value<unsigned int>() { return static_cast<unsigned int>(-1); }
   //  template<> constexpr storage_types map_to_storage_type<unsigned long long>() { return storage_types::unsigned_long_long; }
   template <> constexpr storage_types map_to_storage_type<float>() { return storage_types::float_; }
   template <> constexpr storage_types map_to_storage_type<std::string>() { return storage_types::string; }
@@ -100,7 +100,7 @@ namespace storage_profile
     constexpr item(const char *_name, callable c, const char *_desc = nullptr, T _value = default_value<T>())
         : item_base(_name, _desc, map_to_storage_type<T>())
         , impl(c)
-        , value(_value)
+        , value(std::move(_value))
         , _padding{0}
     {
       static_assert(sizeof(*this) == item_size, "");
@@ -111,7 +111,9 @@ namespace storage_profile
     outcome<void> operator()(storage_profile &sp, handle_type &h) const
     {
       if(value != default_value<T>())
+      {
         return success();
+      }
       return impl(sp, h);
     }
   };
@@ -177,7 +179,7 @@ namespace storage_profile
     AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> yield_overhead(storage_profile &sp, file_handle &h) noexcept;
     AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> sleep_wake_overhead(storage_profile &sp, file_handle &h) noexcept;
     AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> drop_filesystem_cache_support(storage_profile &sp, file_handle & /*unused*/) noexcept;
-  }
+  }  // namespace system
   namespace storage
   {
     // Device name, size, min i/o size
@@ -193,38 +195,38 @@ namespace storage_profile
 #endif
       AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> _device(storage_profile &sp, file_handle &h, std::string mntfromname, std::string fstypename) noexcept;
     }
-  }
+  }  // namespace storage
   namespace concurrency
   {
-    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> atomic_rewrite_quantum(storage_profile &sp, file_handle &h) noexcept;
-    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> atomic_rewrite_offset_boundary(storage_profile &sp, file_handle &h) noexcept;
+    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> atomic_rewrite_quantum(storage_profile &sp, file_handle &srch) noexcept;
+    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> atomic_rewrite_offset_boundary(storage_profile &sp, file_handle &srch) noexcept;
   }
   namespace latency
   {
-    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> read_nothing(storage_profile &sp, file_handle &h) noexcept;
-    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> write_nothing(storage_profile &sp, file_handle &h) noexcept;
-    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> read_qd1(storage_profile &sp, file_handle &h) noexcept;
-    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> write_qd1(storage_profile &sp, file_handle &h) noexcept;
-    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> read_qd16(storage_profile &sp, file_handle &h) noexcept;
-    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> write_qd16(storage_profile &sp, file_handle &h) noexcept;
-    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> readwrite_qd4(storage_profile &sp, file_handle &h) noexcept;
+    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> read_nothing(storage_profile &sp, file_handle &srch) noexcept;
+    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> write_nothing(storage_profile &sp, file_handle &srch) noexcept;
+    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> read_qd1(storage_profile &sp, file_handle &srch) noexcept;
+    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> write_qd1(storage_profile &sp, file_handle &srch) noexcept;
+    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> read_qd16(storage_profile &sp, file_handle &srch) noexcept;
+    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> write_qd16(storage_profile &sp, file_handle &srch) noexcept;
+    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> readwrite_qd4(storage_profile &sp, file_handle &srch) noexcept;
   }
   namespace response_time
   {
-    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> traversal_warm_racefree_0b(storage_profile &sp, file_handle &h) noexcept;
+    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> traversal_warm_racefree_0b(storage_profile &sp, file_handle &srch) noexcept;
     AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> traversal_warm_racefree_1b(storage_profile &sp, file_handle &h) noexcept;
     AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> traversal_warm_racefree_4k(storage_profile &sp, file_handle &h) noexcept;
-    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> traversal_warm_nonracefree_0b(storage_profile &sp, file_handle &h) noexcept;
+    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> traversal_warm_nonracefree_0b(storage_profile &sp, file_handle &srch) noexcept;
     AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> traversal_warm_nonracefree_1b(storage_profile &sp, file_handle &h) noexcept;
     AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> traversal_warm_nonracefree_4k(storage_profile &sp, file_handle &h) noexcept;
     AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> traversal_warm_nonracefree_1M(storage_profile &sp, file_handle &h) noexcept;
-    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> traversal_cold_racefree_0b(storage_profile &sp, file_handle &h) noexcept;
+    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> traversal_cold_racefree_0b(storage_profile &sp, file_handle &srch) noexcept;
     AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> traversal_cold_racefree_1b(storage_profile &sp, file_handle &h) noexcept;
     AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> traversal_cold_racefree_4k(storage_profile &sp, file_handle &h) noexcept;
     AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> traversal_cold_nonracefree_0b(storage_profile &sp, file_handle &h) noexcept;
     AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> traversal_cold_nonracefree_1b(storage_profile &sp, file_handle &h) noexcept;
     AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> traversal_cold_nonracefree_4k(storage_profile &sp, file_handle &h) noexcept;
-  }
+  }  // namespace response_time
 
   //! A (possibly incomplet) profile of storage
   struct AFIO_DECL storage_profile
@@ -233,11 +235,10 @@ namespace storage_profile
     using size_type = size_t;
 
   private:
-    size_type _size;
+    size_type _size{0};
 
   public:
     storage_profile()
-        : _size(0)
     {
     }
 
@@ -272,7 +273,7 @@ namespace storage_profile
     //! Read the matching items in the storage profile from in as YAML
     AFIO_HEADERS_ONLY_MEMFUNC_SPEC void read(std::istream &in, std::regex which = std::regex(".*"));
     //! Write the matching items from storage profile as YAML to out with the given indentation
-    AFIO_HEADERS_ONLY_MEMFUNC_SPEC void write(std::ostream &out, std::regex which = std::regex(".*"), size_t _indent = 0, bool invert_which = false) const;
+    AFIO_HEADERS_ONLY_MEMFUNC_SPEC void write(std::ostream &out, const std::regex &which = std::regex(".*"), size_t _indent = 0, bool invert_match = false) const;
 
     // System characteristics
     item<std::string> os_name = {"system:os:name", &system::os};                     // e.g. Microsoft Windows NT
@@ -387,7 +388,7 @@ namespace storage_profile
     item<unsigned> delete_1M_files = {"response_time:delete_1M_files_single_dir", response_time::traversal_warm_nonracefree_1M, "The milliseconds to delete 1M files in a single directory"};
     */
   };
-}
+}  // namespace storage_profile
 
 AFIO_V2_NAMESPACE_END
 

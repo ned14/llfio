@@ -57,8 +57,10 @@ namespace path_discovery
   inline std::ostream &operator<<(std::ostream &s, const discovered_path::source_type &v)
   {
     static constexpr const char *values[] = {"local", "environment", "system", "hardcoded"};
-    if(static_cast<size_t>(v) >= sizeof(values) / sizeof(values[0]) || !values[static_cast<size_t>(v)])
+    if(static_cast<size_t>(v) >= sizeof(values) / sizeof(values[0]) || (values[static_cast<size_t>(v)] == nullptr))
+    {
       return s << "afio::path_discovery::discovered_path::source_type::<unknown>";
+    }
     return s << "afio::path_discovery::discovered_path::source_type::" << values[static_cast<size_t>(v)];
   }
 
@@ -118,7 +120,7 @@ namespace path_discovery
   strongly consider using a non-file-backed `section_handle` as this is more portable.
   */
   AFIO_HEADERS_ONLY_FUNC_SPEC const path_handle &memory_backed_temporary_files_directory() noexcept;
-}
+}  // namespace path_discovery
 
 AFIO_V2_NAMESPACE_END
 

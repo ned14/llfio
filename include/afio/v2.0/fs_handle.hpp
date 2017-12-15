@@ -55,8 +55,8 @@ public:
   using unique_id_type = QUICKCPPLIB_NAMESPACE::integers128::uint128;
 
 protected:
-  dev_t _devid;
-  ino_t _inode;
+  dev_t _devid{0};
+  ino_t _inode{0};
 
   //! Fill in _devid and _inode from the handle via fstat()
   AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> _fetch_inode() noexcept;
@@ -66,8 +66,6 @@ protected:
 protected:
   //! Default constructor
   constexpr fs_handle()
-      : _devid(0)
-      , _inode(0)
   {
   }
   //! Construct a handle
@@ -138,7 +136,7 @@ public:
   success until the deadline given. This should prevent most unmalicious accidental loss of data.
 
   \param base Base for any relative path.
-  \param newpath The relative or absolute new path to relink to.
+  \param path The relative or absolute new path to relink to.
   \param atomic_replace Atomically replace the destination if a file entry already is present there.
   Choosing false for this will fail if a file entry is already present at the destination, and may
   not be an atomic operation on some platforms (i.e. both the old and new names may be linked to the
@@ -150,7 +148,7 @@ public:
   */
   AFIO_MAKE_FREE_FUNCTION
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC
-  result<void> relink(const path_handle &base, path_view_type newpath, bool atomic_replace = true, deadline d = std::chrono::seconds(30)) noexcept;
+  result<void> relink(const path_handle &base, path_view_type path, bool atomic_replace = true, deadline d = std::chrono::seconds(30)) noexcept;
 
   /*! Unlinks the current path of this open handle, causing its entry to immediately disappear from the filing system.
   On Windows unless `flag::win_disable_unlink_emulation` is set, this behaviour is

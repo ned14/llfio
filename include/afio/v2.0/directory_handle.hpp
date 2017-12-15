@@ -63,7 +63,8 @@ static_assert(std::is_standard_layout<directory_entry>::value, "directory_entry 
 */
 class AFIO_DECL directory_handle : public path_handle, public fs_handle
 {
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC const handle &_get_handle() const noexcept override final { return *this; }
+  AFIO_HEADERS_ONLY_VIRTUAL_SPEC const handle &_get_handle() const noexcept final { return *this; }
+
 public:
   using path_type = path_handle::path_type;
   using extent_type = path_handle::extent_type;
@@ -87,8 +88,8 @@ public:
   struct buffers_type : public span<buffer_type>
   {
     using span<buffer_type>::span;
-    buffers_type(span<buffer_type> v)
-        : span<buffer_type>(std::move(v))
+    explicit buffers_type(span<buffer_type> v)
+        : span<buffer_type>(v)
     {
     }
     buffers_type(buffers_type &&o) noexcept : span<buffer_type>(std::move(o)), _kernel_buffer(std::move(o._kernel_buffer)), _kernel_buffer_size(o._kernel_buffer_size)
@@ -120,13 +121,12 @@ public:
 public:
   //! Default constructor
   constexpr directory_handle()
-      : path_handle()
-      , fs_handle()
+      :,
   {
   }
   //! Construct a directory_handle from a supplied native path_handle
   explicit constexpr directory_handle(native_handle_type h, dev_t devid, ino_t inode, caching caching = caching::all, flag flags = flag::none)
-      : path_handle(std::move(h), std::move(caching), std::move(flags))
+      : path_handle(std::move(h), caching, flags)
       , fs_handle(devid, inode)
   {
   }
@@ -155,7 +155,7 @@ public:
   \errors Any of the values POSIX open() or CreateFile() can return.
   */
   AFIO_MAKE_FREE_FUNCTION
-  static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<directory_handle> directory(const path_handle &base, path_view_type _path, mode _mode = mode::read, creation _creation = creation::open_existing, caching _caching = caching::all, flag flags = flag::none) noexcept;
+  static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<directory_handle> directory(const path_handle &base, path_view_type path, mode _mode = mode::read, creation _creation = creation::open_existing, caching _caching = caching::all, flag flags = flag::none) noexcept;
   /*! Create a directory handle creating a randomly named file on a path.
   The file is opened exclusively with `creation::only_if_not_exist` so it
   will never collide with nor overwrite any existing entry.
@@ -172,7 +172,9 @@ public:
         auto randomname = utils::random_string(32);
         result<directory_handle> ret = directory(dirpath, randomname, _mode, creation::only_if_not_exist, _caching, flags);
         if(ret || (!ret && ret.error() != std::errc::file_exists))
+        {
           return ret;
+        }
       }
     }
     catch(...)
@@ -195,7 +197,7 @@ public:
     return name.empty() ? random_directory(tempdirh, _mode, _caching, flags) : directory(tempdirh, name, _mode, _creation, _caching, flags);
   }
 
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC ~directory_handle()
+  AFIO_HEADERS_ONLY_VIRTUAL_SPEC ~directory_handle() override
   {
     if(_v)
     {
@@ -212,7 +214,9 @@ public:
       {
         // File may have already been deleted, if so ignore
         if(ret.error() != std::errc::no_such_file_or_directory)
+        {
           return ret.error();
+        }
       }
     }
     return path_handle::close();
@@ -229,7 +233,7 @@ public:
   \mallocs On POSIX if changing the mode, we must loop calling `current_path()` and
   trying to open the path returned. Thus many allocations may occur.
   */
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<directory_handle> clone(mode _mode = mode::unchanged, caching _caching = caching::unchanged, deadline d = std::chrono::seconds(30)) const noexcept;
+  AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<directory_handle> clone(mode mode_ = mode::unchanged, caching caching_ = caching::unchanged, deadline d = std::chrono::seconds(30)) const noexcept;
 
 #ifdef _WIN32
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC
@@ -268,11 +272,13 @@ public:
 inline std::ostream &operator<<(std::ostream &s, const directory_handle::filter &v)
 {
   static constexpr const char *values[] = {"none", "fastdeleted"};
-  if(static_cast<size_t>(v) >= sizeof(values) / sizeof(values[0]) || !values[static_cast<size_t>(v)])
+  if(static_cast<size_t>(v) >= sizeof(values) / sizeof(values[0]) || (values[static_cast<size_t>(v)] == nullptr))
+  {
     return s << "afio::directory_handle::filter::<unknown>";
+  }
   return s << "afio::directory_handle::filter::" << values[static_cast<size_t>(v)];
 }
-inline std::ostream &operator<<(std::ostream &s, const directory_handle::enumerate_info &)
+inline std::ostream &operator<<(std::ostream &s, const directory_handle::enumerate_info & /*unused*/)
 {
   return s << "afio::directory_handle::enumerate_info";
 }

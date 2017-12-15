@@ -79,10 +79,10 @@ protected:
   flag _flag{flag::none};
 
 public:
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC ~section_handle();
+  AFIO_HEADERS_ONLY_VIRTUAL_SPEC ~section_handle() override;
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> close() noexcept override;
   //! Default constructor
-  constexpr section_handle() {}
+  constexpr section_handle() = default;
   //! Construct a section handle using the given native handle type for the section and the given i/o handle for the backing storage
   explicit section_handle(native_handle_type sectionh, file_handle *backing, file_handle anonymous, flag __flag)
       : handle(sectionh, handle::caching::all)
@@ -149,7 +149,7 @@ public:
   //! Sets the borrowed handle backing this section, if any
   void set_backing(file_handle *fh) noexcept { _backing = fh; }
   //! Returns the borrowed native handle backing this section
-  native_handle_type backing_native_handle() const noexcept { return _backing ? _backing->native_handle() : native_handle_type(); }
+  native_handle_type backing_native_handle() const noexcept { return _backing != nullptr ? _backing->native_handle() : native_handle_type(); }
   //! Return the current maximum permitted extent of the memory section.
   AFIO_MAKE_FREE_FUNCTION
   AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<extent_type> length() const noexcept;
@@ -167,31 +167,53 @@ inline std::ostream &operator<<(std::ostream &s, const section_handle::flag &v)
 {
   std::string temp;
   if(!!(v & section_handle::flag::read))
+  {
     temp.append("read|");
+  }
   if(!!(v & section_handle::flag::write))
+  {
     temp.append("write|");
+  }
   if(!!(v & section_handle::flag::cow))
+  {
     temp.append("cow|");
+  }
   if(!!(v & section_handle::flag::execute))
+  {
     temp.append("execute|");
+  }
   if(!!(v & section_handle::flag::nocommit))
+  {
     temp.append("nocommit|");
+  }
   if(!!(v & section_handle::flag::prefault))
+  {
     temp.append("prefault|");
+  }
   if(!!(v & section_handle::flag::executable))
+  {
     temp.append("executable|");
+  }
   if(!!(v & section_handle::flag::singleton))
+  {
     temp.append("singleton|");
+  }
   if(!!(v & section_handle::flag::barrier_on_close))
+  {
     temp.append("barrier_on_close|");
+  }
   if(!temp.empty())
   {
     temp.resize(temp.size() - 1);
     if(std::count(temp.cbegin(), temp.cend(), '|') > 0)
+    {
       temp = "(" + temp + ")";
+    }
   }
   else
+  {
     temp = "none";
+  }
   return s << "afio::section_handle::flag::" << temp;
 }
 
@@ -242,17 +264,16 @@ protected:
 
   explicit map_handle(section_handle *section)
       : _section(section)
-      , _flag(section ? section->section_flags() : section_handle::flag::none)
+      , _flag(section != nullptr ? section->section_flags() : section_handle::flag::none)
   {
   }
 
 public:
   //! Default constructor
   constexpr map_handle()
-      : io_handle()
   {
   }
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC ~map_handle();
+  AFIO_HEADERS_ONLY_VIRTUAL_SPEC ~map_handle() override;
   //! Implicit move construction of map_handle permitted
   constexpr map_handle(map_handle &&o) noexcept : io_handle(std::move(o)), _section(o._section), _addr(o._addr), _offset(o._offset), _length(o._length), _flag(o._flag)
   {

@@ -54,7 +54,8 @@ async_file_handle.
 */
 class AFIO_DECL file_handle : public io_handle, public fs_handle
 {
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC const handle &_get_handle() const noexcept override final { return *this; }
+  AFIO_HEADERS_ONLY_VIRTUAL_SPEC const handle &_get_handle() const noexcept final { return *this; }
+
 public:
   using path_type = io_handle::path_type;
   using extent_type = io_handle::extent_type;
@@ -74,19 +75,16 @@ public:
   using path_view_type = fs_handle::path_view_type;
 
 protected:
-  io_service *_service;
+  io_service *_service{nullptr};
 
 public:
   //! Default constructor
   constexpr file_handle()
-      : io_handle()
-      , fs_handle()
-      , _service(nullptr)
   {
   }
   //! Construct a handle from a supplied native handle
   constexpr file_handle(native_handle_type h, dev_t devid, ino_t inode, caching caching = caching::none, flag flags = flag::none)
-      : io_handle(std::move(h), std::move(caching), std::move(flags))
+      : io_handle(std::move(h), caching, flags)
       , fs_handle(devid, inode)
       , _service(nullptr)
   {
@@ -122,7 +120,7 @@ public:
   \errors Any of the values POSIX open() or CreateFile() can return.
   */
   AFIO_MAKE_FREE_FUNCTION
-  static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<file_handle> file(const path_handle &base, path_view_type _path, mode _mode = mode::read, creation _creation = creation::open_existing, caching _caching = caching::all, flag flags = flag::none) noexcept;
+  static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<file_handle> file(const path_handle &base, path_view_type path, mode _mode = mode::read, creation _creation = creation::open_existing, caching _caching = caching::all, flag flags = flag::none) noexcept;
   /*! Create a file handle creating a randomly named file on a path.
   The file is opened exclusively with `creation::only_if_not_exist` so it
   will never collide with nor overwrite any existing file. Note also
@@ -142,7 +140,9 @@ public:
         randomname.append(".random");
         result<file_handle> ret = file(dirpath, randomname, _mode, creation::only_if_not_exist, _caching, flags);
         if(ret || (!ret && ret.error() != std::errc::file_exists))
+        {
           return ret;
+        }
       }
     }
     catch(...)
@@ -182,9 +182,9 @@ public:
   \errors Any of the values POSIX open() or CreateFile() can return.
   */
   AFIO_MAKE_FREE_FUNCTION
-  static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<file_handle> temp_inode(const path_handle &dir = path_discovery::storage_backed_temporary_files_directory(), mode _mode = mode::write, flag flags = flag::none) noexcept;
+  static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<file_handle> temp_inode(const path_handle &dirh = path_discovery::storage_backed_temporary_files_directory(), mode _mode = mode::write, flag flags = flag::none) noexcept;
 
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC ~file_handle()
+  AFIO_HEADERS_ONLY_VIRTUAL_SPEC ~file_handle() override
   {
     if(_v)
     {
@@ -201,7 +201,9 @@ public:
       {
         // File may have already been deleted, if so ignore
         if(ret.error() != std::errc::no_such_file_or_directory)
+        {
           return ret.error();
+        }
       }
     }
     return io_handle::close();
@@ -221,7 +223,7 @@ public:
   \mallocs On POSIX if changing the mode, we must loop calling `current_path()` and
   trying to open the path returned. Thus many allocations may occur.
   */
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<file_handle> clone(mode _mode = mode::unchanged, caching _caching = caching::unchanged, deadline d = std::chrono::seconds(30)) const noexcept;
+  AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<file_handle> clone(mode mode_ = mode::unchanged, caching caching_ = caching::unchanged, deadline d = std::chrono::seconds(30)) const noexcept;
 
   //! The i/o service this handle is attached to, if any
   io_service *service() const noexcept { return _service; }
