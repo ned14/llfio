@@ -36,7 +36,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 AFIO_V2_NAMESPACE_BEGIN
 
-inline result<int> attribs_from_handle_mode_caching_and_flags(native_handle_type &nativeh, handle::mode _mode, handle::creation _creation, handle::caching _caching, handle::flag) noexcept
+inline result<int> attribs_from_handle_mode_caching_and_flags(native_handle_type &nativeh, handle::mode _mode, handle::creation _creation, handle::caching _caching, handle::flag /*unused*/) noexcept
 {
   int attribs = O_CLOEXEC;
   switch(_mode)

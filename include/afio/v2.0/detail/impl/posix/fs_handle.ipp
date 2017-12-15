@@ -27,7 +27,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../../../utils.hpp"
 #include "import.hpp"
 
-#include <limits.h>  // for PATH_MAX
+#include <climits>  // for PATH_MAX
 
 AFIO_V2_NAMESPACE_BEGIN
 
@@ -47,9 +47,13 @@ inline result<path_handle> containing_directory(optional<std::reference_wrapper<
   if(d)
   {
     if(d.steady)
+    {
       began_steady = std::chrono::steady_clock::now();
+    }
     else
+    {
       end_utc = d.to_time_point();
+    }
   }
   try
   {
@@ -59,7 +63,9 @@ inline result<path_handle> containing_directory(optional<std::reference_wrapper<
       OUTCOME_TRY(_currentpath, h.current_path());
       // If current path is empty, it's been deleted
       if(_currentpath.empty())
+      {
         return std::errc::no_such_file_or_directory;
+      }
       // Split the path into root and leafname
       path_view currentpath(_currentpath);
       path_view filename = currentpath.filename();
@@ -68,12 +74,16 @@ inline result<path_handle> containing_directory(optional<std::reference_wrapper<
       const_cast<filesystem::path::string_type &>(_currentpath.native())[currentpath.native_size()] = 0;
       auto currentdirh_ = path_handle::path(currentpath);
       if(!currentdirh_)
+      {
         continue;
+      }
       path_handle currentdirh = std::move(currentdirh_.value());
       if(h.flags() & handle::flag::disable_safety_unlinks)
       {
         if(out_filename)
+        {
           out_filename->get() = filename.path();
+        }
         return success(std::move(currentdirh));
       }
       // Open the same file name, and compare dev and inode
@@ -89,14 +99,20 @@ inline result<path_handle> containing_directory(optional<std::reference_wrapper<
       }
       auto unfd = undoer([fd] { ::close(fd); });
       (void) unfd;
-      struct stat s;
+      struct stat s
+      {
+      };
       if(-1 == ::fstat(fd, &s))
+      {
         continue;
+      }
       // If the same, we know for a fact that this is the correct containing dir for now at least
       if(s.st_dev == fsh.st_dev() && s.st_ino == fsh.st_ino())
       {
         if(out_filename)
+        {
           out_filename->get() = filename.path();
+        }
         return success(std::move(currentdirh));
       }
       // Check timeout
@@ -105,12 +121,16 @@ inline result<path_handle> containing_directory(optional<std::reference_wrapper<
         if(d.steady)
         {
           if(std::chrono::steady_clock::now() >= (began_steady + std::chrono::nanoseconds(d.nsecs)))
+          {
             return std::errc::timed_out;
+          }
         }
         else
         {
           if(std::chrono::system_clock::now() >= end_utc)
+          {
             return std::errc::timed_out;
+          }
         }
       }
     }
@@ -138,11 +158,15 @@ result<void> fs_handle::relink(const path_handle &base, path_view_type path, boo
   if(h.flags() & handle::flag::anonymous_inode)
   {
     if(atomic_replace)
+    {
       return std::errc::function_not_supported;
+    }
     char _path[PATH_MAX];
     snprintf(_path, PATH_MAX, "/proc/self/fd/%d", h.native_handle().fd);
     if(-1 == ::linkat(AT_FDCWD, _path, base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.buffer, AT_SYMLINK_FOLLOW))
-      return {errno, std::system_category()};
+    {
+      return { errno, std::system_category() };
+    }
     h._flags &= ~handle::flag::anonymous_inode;
     return success();
   }
@@ -161,10 +185,14 @@ result<void> fs_handle::relink(const path_handle &base, path_view_type path, boo
 #endif
     // Otherwise we need to use linkat followed by renameat (non-atomic)
     if(-1 == ::linkat(dirh.native_handle().fd, filename.c_str(), base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.buffer, 0))
-      return {errno, std::system_category()};
+    {
+      return { errno, std::system_category() };
+    }
   }
   if(-1 == ::renameat(dirh.native_handle().fd, filename.c_str(), base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.buffer))
-    return {errno, std::system_category()};
+  {
+    return { errno, std::system_category() };
+  }
   return success();
 }
 

@@ -46,7 +46,7 @@ namespace path_discovery
       size_t priority{0};
       std::string fstypename;
       directory_handle h;  // not retained after verification
-      _discovered_path(filesystem::path _path)
+      explicit _discovered_path(filesystem::path _path)
           : path(std::move(_path))
       {
       }
@@ -245,7 +245,7 @@ namespace path_discovery
     auto &ps = path_store();
     return ps.memory_backed;
   }
-}
+}  // namespace path_discovery
 
 AFIO_V2_NAMESPACE_END
 

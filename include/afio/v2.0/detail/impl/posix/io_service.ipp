@@ -40,7 +40,7 @@ AFIO_V2_NAMESPACE_BEGIN
 static int interrupt_signal;
 static struct sigaction interrupt_signal_handler_old_action;
 struct ucontext;
-static inline void interrupt_signal_handler(int, siginfo_t *, void *)
+static inline void interrupt_signal_handler(int /*unused*/, siginfo_t * /*unused*/, void * /*unused*/)
 {
   // We do nothing, and aio_suspend should exit with EINTR
 }
@@ -53,37 +53,47 @@ int io_service::interruption_signal() noexcept
 int io_service::set_interruption_signal(int signo)
 {
   int ret = interrupt_signal;
-  if(interrupt_signal)
+  if(interrupt_signal != 0)
   {
     if(sigaction(interrupt_signal, &interrupt_signal_handler_old_action, nullptr) < 0)
+    {
       throw std::system_error(errno, std::system_category());
+    }
     interrupt_signal = 0;
   }
-  if(signo)
+  if(signo != 0)
   {
 #if AFIO_HAVE_REALTIME_SIGNALS
     if(-1 == signo)
     {
       for(signo = SIGRTMIN; signo < SIGRTMAX; signo++)
       {
-        struct sigaction sigact;
+        struct sigaction sigact
+        {
+        };
         memset(&sigact, 0, sizeof(sigact));
         if(sigaction(signo, nullptr, &sigact) >= 0)
         {
           if(sigact.sa_handler == SIG_DFL)
+          {
             break;
+          }
         }
       }
     }
 #endif
     // Install process wide signal handler for signal
-    struct sigaction sigact;
+    struct sigaction sigact
+    {
+    };
     memset(&sigact, 0, sizeof(sigact));
     sigact.sa_sigaction = &interrupt_signal_handler;
     sigact.sa_flags = SA_SIGINFO;
     sigemptyset(&sigact.sa_mask);
     if(sigaction(signo, &sigact, &interrupt_signal_handler_old_action) < 0)
+    {
       throw std::system_error(errno, std::system_category());
+    }
     interrupt_signal = signo;
   }
   return ret;
@@ -92,7 +102,9 @@ int io_service::set_interruption_signal(int signo)
 void io_service::_block_interruption() noexcept
 {
   if(_use_kqueues)
+  {
     return;
+  }
   assert(!_blocked_interrupt_signal);
   sigset_t set;
   sigemptyset(&set);
@@ -105,9 +117,11 @@ void io_service::_block_interruption() noexcept
 void io_service::_unblock_interruption() noexcept
 {
   if(_use_kqueues)
+  {
     return;
+  }
   assert(_blocked_interrupt_signal);
-  if(_blocked_interrupt_signal)
+  if(_blocked_interrupt_signal != 0)
   {
     sigset_t set;
     sigemptyset(&set);
@@ -138,13 +152,15 @@ io_service::io_service()
 
 io_service::~io_service()
 {
-  if(_work_queued)
+  if(_work_queued != 0u)
   {
 #ifndef NDEBUG
     fprintf(stderr, "WARNING: ~io_service() sees work still queued, blocking until no work queued\n");
 #endif
-    while(_work_queued)
+    while(_work_queued != 0u)
+    {
       std::this_thread::yield();
+    }
   }
 #if AFIO_USE_POSIX_AIO
 #if AFIO_COMPILE_KQUEUES
@@ -153,7 +169,9 @@ io_service::~io_service()
 #endif
   _aiocbsv.clear();
   if(pthread_self() == _threadh)
+  {
     _unblock_interruption();
+  }
 #else
 #error todo
 #endif
@@ -164,13 +182,19 @@ void io_service::disable_kqueues()
 {
   if(_use_kqueues)
   {
-    if(_work_queued)
+    if(_work_queued != 0u)
+    {
       throw std::runtime_error("Cannot disable kqueues if work is pending");
+    }
     if(pthread_self() != _threadh)
+    {
       throw std::runtime_error("Cannot disable kqueues except from owning thread");
+    }
     // Is the global signal handler set yet?
-    if(!interrupt_signal)
+    if(interrupt_signal == 0)
+    {
       set_interruption_signal();
+    }
     _use_kqueues = false;
     // Block interruption on this thread
     _block_interruption();
@@ -186,20 +210,28 @@ void io_service::disable_kqueues()
 
 result<bool> io_service::run_until(deadline d) noexcept
 {
-  if(!_work_queued)
+  if(_work_queued == 0u)
+  {
     return false;
+  }
   if(pthread_self() != _threadh)
+  {
     return std::errc::operation_not_supported;
+  }
   std::chrono::steady_clock::time_point began_steady;
   std::chrono::system_clock::time_point end_utc;
   if(d)
   {
     if(d.steady)
+    {
       began_steady = std::chrono::steady_clock::now();
+    }
     else
+    {
       end_utc = d.to_time_point();
+    }
   }
-  struct timespec *ts = nullptr, _ts;
+  struct timespec *ts = nullptr, _ts{};
   memset(&_ts, 0, sizeof(_ts));
   bool done = false;
   do
@@ -208,9 +240,13 @@ result<bool> io_service::run_until(deadline d) noexcept
     {
       std::chrono::nanoseconds ns;
       if(d.steady)
+      {
         ns = std::chrono::duration_cast<std::chrono::nanoseconds>((began_steady + std::chrono::nanoseconds(d.nsecs)) - std::chrono::steady_clock::now());
+      }
       else
+      {
         ns = std::chrono::duration_cast<std::chrono::nanoseconds>(end_utc - std::chrono::system_clock::now());
+      }
       ts = &_ts;
       if(ns.count() <= 0)
       {
@@ -252,17 +288,21 @@ result<bool> io_service::run_until(deadline d) noexcept
     else
     {
       if(aio_suspend(_aiocbsv.data(), _aiocbsv.size(), ts) < 0)
+      {
         errcode = errno;
+      }
     }
     // Block the interruption signal
     _block_interruption();
-    if(errcode)
+    if(errcode != 0)
     {
       switch(errcode)
       {
       case EAGAIN:
         if(d)
+        {
           timedout = true;
+        }
         break;
       case EINTR:
         // Let him loop, recalculate any timeout and check for posts to be executed
@@ -286,10 +326,12 @@ result<bool> io_service::run_until(deadline d) noexcept
           // Scavenge the aio
           int ioret = aio_return(aiocb);
           if(ioret < 0)
-            return {errno, std::system_category()};
+          {
+            return { errno, std::system_category() };
+          }
           // std::cout << "aiocb " << aiocb << " sees succesful return " << ioret << std::endl;
           // The aiocb aio_sigevent.sigev_value.sival_ptr field will point to a file_handle::_io_state_type
-          auto io_state = (async_file_handle::_erased_io_state_type *) aiocb->aio_sigevent.sigev_value.sival_ptr;
+          auto io_state = static_cast<async_file_handle::_erased_io_state_type *>(aiocb->aio_sigevent.sigev_value.sival_ptr);
           assert(io_state);
           io_state->_system_io_completion(0, ioret, &aiocb);
         }
@@ -298,7 +340,7 @@ result<bool> io_service::run_until(deadline d) noexcept
           // Either cancelled or errored out
           // std::cout << "aiocb " << aiocb << " sees failed return " << ioerr << std::endl;
           // The aiocb aio_sigevent.sigev_value.sival_ptr field will point to a file_handle::_io_state_type
-          auto io_state = (async_file_handle::_erased_io_state_type *) aiocb->aio_sigevent.sigev_value.sival_ptr;
+          auto io_state = static_cast<async_file_handle::_erased_io_state_type *>(aiocb->aio_sigevent.sigev_value.sival_ptr);
           assert(io_state);
           io_state->_system_io_completion(ioerr, 0, &aiocb);
         }
@@ -315,12 +357,16 @@ result<bool> io_service::run_until(deadline d) noexcept
       if(d.steady)
       {
         if(std::chrono::steady_clock::now() >= (began_steady + std::chrono::nanoseconds(d.nsecs)))
+        {
           return std::errc::timed_out;
+        }
       }
       else
       {
         if(std::chrono::system_clock::now() >= end_utc)
+        {
           return std::errc::timed_out;
+        }
       }
     }
   } while(!done);

@@ -51,12 +51,18 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
   nativeh.behaviour |= native_handle_type::disposition::directory;
   // POSIX does not permit directory opens with O_RDWR like Windows, so silently convert to read
   if(_mode == mode::attr_write)
+  {
     _mode = mode::attr_read;
+  }
   else if(_mode == mode::write || _mode == mode::append)
+  {
     _mode = mode::read;
+  }
   // Also trying to truncate a directory returns EISDIR
   if(_creation == creation::truncate)
+  {
     return std::errc::is_a_directory;
+  }
   OUTCOME_TRY(attribs, attribs_from_handle_mode_caching_and_flags(nativeh, _mode, _creation, _caching, flags));
 #ifdef O_DIRECTORY
   attribs |= O_DIRECTORY;
@@ -114,7 +120,9 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
     }
   }
   if(ret.value().are_safety_fsyncs_issued())
+  {
     fsync(nativeh.fd);
+  }
   return ret;
 }
 
@@ -126,9 +134,11 @@ result<directory_handle> directory_handle::clone(mode mode_, caching caching_, d
   {
     result<directory_handle> ret(directory_handle(native_handle_type(), _devid, _inode, _caching, _flags));
     ret.value()._v.behaviour = _v.behaviour;
-    ret.value()._v.fd = ::dup(_v.fd);
+    ret.value()._v.fd = ::fcntl(_v.fd, F_DUPFD_CLOEXEC);
     if(-1 == ret.value()._v.fd)
-      return {errno, std::system_category()};
+    {
+      return { errno, std::system_category() };
+    }
     return ret;
   }
   // Slow path
@@ -137,9 +147,13 @@ result<directory_handle> directory_handle::clone(mode mode_, caching caching_, d
   if(d)
   {
     if(d.steady)
+    {
       began_steady = std::chrono::steady_clock::now();
+    }
     else
+    {
       end_utc = d.to_time_point();
+    }
   }
   for(;;)
   {
@@ -150,12 +164,16 @@ result<directory_handle> directory_handle::clone(mode mode_, caching caching_, d
     if(fh)
     {
       if(fh.value().unique_id() == unique_id())
+      {
         return fh;
+      }
     }
     else
     {
       if(fh.error() != std::errc::no_such_file_or_directory)
+      {
         return fh.error();
+      }
     }
     // Check timeout
     if(d)
@@ -163,12 +181,16 @@ result<directory_handle> directory_handle::clone(mode mode_, caching caching_, d
       if(d.steady)
       {
         if(std::chrono::steady_clock::now() >= (began_steady + std::chrono::nanoseconds(d.nsecs)))
+        {
           return std::errc::timed_out;
+        }
       }
       else
       {
         if(std::chrono::system_clock::now() >= end_utc)
+        {
           return std::errc::timed_out;
+        }
       }
     }
   }
@@ -178,14 +200,20 @@ result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_typ
 {
   AFIO_LOG_FUNCTION_CALL(this);
   if(tofill.empty())
-    return enumerate_info{std::move(tofill), stat_t::want::none, false};
+  {
+    return enumerate_info { std::move(tofill), stat_t::want::none, false };
+  }
   // Is glob a single entry match? If so, this is really a stat call
   path_view_type::c_str zglob(glob);
   if(!glob.empty() && !glob.contains_glob())
   {
-    struct stat s;
+    struct stat s
+    {
+    };
     if(-1 == ::fstatat(_v.fd, zglob.buffer, &s, AT_SYMLINK_NOFOLLOW))
-      return {errno, std::system_category()};
+    {
+      return { errno, std::system_category() };
+    }
     tofill[0].stat.st_dev = s.st_dev;
     tofill[0].stat.st_ino = s.st_ino;
     tofill[0].stat.st_type = to_st_type(s.st_mode);
@@ -208,7 +236,7 @@ result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_typ
     tofill[0].stat.st_ctim = to_timepoint(s.st_ctim);
 #endif
     tofill[0].stat.st_size = s.st_size;
-    tofill[0].stat.st_allocated = (handle::extent_type) s.st_blocks * 512;
+    tofill[0].stat.st_allocated = static_cast<handle::extent_type>(s.st_blocks) * 512;
     tofill[0].stat.st_blocks = s.st_blocks;
     tofill[0].stat.st_blksize = s.st_blksize;
 #ifdef HAVE_STAT_FLAGS
@@ -224,7 +252,7 @@ result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_typ
     tofill[0].stat.st_birthtim = to_timepoint(s.st_birthtim);
 #endif
 #endif
-    tofill[0].stat.st_sparse = ((handle::extent_type) s.st_blocks * 512) < (handle::extent_type) s.st_size;
+    tofill[0].stat.st_sparse = static_cast<unsigned int>((static_cast<handle::extent_type>(s.st_blocks) * 512) < static_cast<handle::extent_type>(s.st_size);
     tofill._resize(1);
     static constexpr stat_t::want default_stat_contents = stat_t::want::dev | stat_t::want::ino | stat_t::want::type | stat_t::want::perms | stat_t::want::nlink | stat_t::want::uid | stat_t::want::gid | stat_t::want::rdev | stat_t::want::atim | stat_t::want::mtim | stat_t::want::ctim | stat_t::want::size |
                                                           stat_t::want::allocated | stat_t::want::blocks | stat_t::want::blksize
@@ -242,9 +270,9 @@ result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_typ
   }
 #ifdef __linux__
   // Unlike FreeBSD, Linux doesn't define a getdents() function, so we'll do that here.
-  typedef int (*getdents64_t)(int, char *, unsigned);
-  static getdents64_t getdents = (getdents64_t)[](int fd, char *buf, unsigned count)->int { return syscall(SYS_getdents64, fd, buf, count); };
-  typedef dirent64 dirent;
+  using getdents64_t = int (*)(int, char *, unsigned int);
+  static auto getdents = (getdents64_t)[](int fd, char *buf, unsigned count)->int { return syscall(SYS_getdents64, fd, buf, count); };
+  using dirent = dirent64;
 #endif
 #ifdef __APPLE__
   // OS X defines a getdirentries64() kernel syscall which can emulate getdents
@@ -259,8 +287,8 @@ result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_typ
   {
     // Let's assume the average leafname will be 64 characters long.
     size_t toallocate = (sizeof(dirent) + 64) * tofill.size();
-    char *mem = new(std::nothrow) char[toallocate];
-    if(!mem)
+    auto *mem = new(std::nothrow) char[toallocate];
+    if(mem == nullptr)
     {
       return std::errc::not_enough_memory;
     }
@@ -274,23 +302,25 @@ result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_typ
   bool done = false;
   do
   {
-    buffer = kernelbuffer.empty() ? (dirent *) tofill._kernel_buffer.get() : (dirent *) kernelbuffer.data();
+    buffer = kernelbuffer.empty() ? reinterpret_cast<dirent *>(tofill._kernel_buffer.get()) : reinterpret_cast<dirent *>(kernelbuffer.data());
     bytesavailable = kernelbuffer.empty() ? tofill._kernel_buffer_size : kernelbuffer.size();
 // Seek to start
 #ifdef __linux__
     if(-1 == ::lseek64(_v.fd, 0, SEEK_SET))
-      return {errno, std::system_category()};
+    {
+      return { errno, std::system_category() };
+    }
 #else
     if(-1 == ::lseek(_v.fd, 0, SEEK_SET))
       return {errno, std::system_category()};
 #endif
-    bytes = getdents(_v.fd, (char *) buffer, bytesavailable);
+    bytes = getdents(_v.fd, reinterpret_cast<char *>(buffer), bytesavailable);
     if(kernelbuffer.empty() && bytes == -1 && EINVAL == errno)
     {
       tofill._kernel_buffer.reset();
       size_t toallocate = tofill._kernel_buffer_size * 2;
-      char *mem = new(std::nothrow) char[toallocate];
-      if(!mem)
+      auto *mem = new(std::nothrow) char[toallocate];
+      if(mem == nullptr)
       {
         return std::errc::not_enough_memory;
       }
@@ -315,7 +345,7 @@ result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_typ
   size_t n = 0;
   for(dirent *dent = buffer;; dent = (dirent *) ((uintptr_t) dent + dent->d_reclen))
   {
-    if(dent->d_ino)
+    if(dent->d_ino != 0u)
     {
       size_t length = strchr(dent->d_name, 0) - dent->d_name;
       if(length <= 2 && '.' == dent->d_name[0])

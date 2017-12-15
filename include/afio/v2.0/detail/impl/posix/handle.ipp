@@ -57,18 +57,22 @@ result<handle::path_type> handle::current_path() const noexcept
     filesystem::path::string_type ret;
 #if defined(__linux__)
     ret.resize(32769);
-    char *out = const_cast<char *>(ret.data());
+    auto *out = const_cast<char *>(ret.data());
     // Linux keeps a symlink at /proc/self/fd/n
     char in[64];
     snprintf(in, sizeof(in), "/proc/self/fd/%d", _v.fd);
     ssize_t len;
     if((len = readlink(in, out, 32768)) == -1)
-      return {errno, std::system_category()};
+    {
+      return { errno, std::system_category() };
+    }
     ret.resize(len);
     // Linux prepends or appends a " (deleted)" when a fd is nameless
-    // TODO: Should I stat the target to be really sure?
-    if(ret.size() >= 10 && (!ret.compare(0, 10, " (deleted)") || !ret.compare(ret.size() - 10, 10, " (deleted)")))
+    // TODO(ned): Should I stat the target to be really sure?
+    if(ret.size() >= 10 && ((ret.compare(0, 10, " (deleted)") == 0) || (ret.compare(ret.size() - 10, 10, " (deleted)") == 0)))
+    {
       ret.clear();
+    }
 #elif defined(__APPLE__)
     ret.resize(32769);
     char *out = const_cast<char *>(ret.data());
@@ -129,10 +133,14 @@ result<void> handle::close() noexcept
     if(are_safety_fsyncs_issued() && is_writable())
     {
       if(-1 == fsync(_v.fd))
-        return {errno, std::system_category()};
+      {
+        return { errno, std::system_category() };
+      }
     }
     if(-1 == ::close(_v.fd))
-      return {errno, std::system_category()};
+    {
+      return { errno, std::system_category() };
+    }
     _v = native_handle_type();
   }
   return success();
@@ -143,32 +151,40 @@ result<handle> handle::clone() const noexcept
   AFIO_LOG_FUNCTION_CALL(this);
   result<handle> ret(handle(native_handle_type(), _caching, _flags));
   ret.value()._v.behaviour = _v.behaviour;
-  ret.value()._v.fd = ::dup(_v.fd);
+  ret.value()._v.fd = ::fcntl(_v.fd, F_DUPFD_CLOEXEC);
   if(-1 == ret.value()._v.fd)
-    return {errno, std::system_category()};
+  {
+    return { errno, std::system_category() };
+  }
   return ret;
 }
 
 result<void> handle::set_append_only(bool enable) noexcept
 {
   AFIO_LOG_FUNCTION_CALL(this);
-  int attribs = fcntl(_v.fd, F_GETFL);
+  int attribs = ::fcntl(_v.fd, F_GETFL);
   if(-1 == attribs)
-    return {errno, std::system_category()};
+  {
+    return { errno, std::system_category() };
+  }
   if(enable)
   {
     // Set append_only
     attribs |= O_APPEND;
-    if(-1 == fcntl(_v.fd, F_SETFL, attribs))
-      return {errno, std::system_category()};
+    if(-1 == ::fcntl(_v.fd, F_SETFL, attribs))
+    {
+      return { errno, std::system_category() };
+    }
     _v.behaviour |= native_handle_type::disposition::append_only;
   }
   else
   {
     // Remove append_only
     attribs &= ~O_APPEND;
-    if(-1 == fcntl(_v.fd, F_SETFL, attribs))
-      return {errno, std::system_category()};
+    if(-1 == ::fcntl(_v.fd, F_SETFL, attribs))
+    {
+      return { errno, std::system_category() };
+    }
     _v.behaviour &= ~native_handle_type::disposition::append_only;
   }
   return success();
