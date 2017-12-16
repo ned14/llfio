@@ -61,9 +61,13 @@ result<section_handle> section_handle::section(file_handle &backing, extent_type
   native_handle_type &nativeh = ret.value()._v;
   nativeh.fd = backing.native_handle().fd;
   if(_flag & flag::read)
+  {
     nativeh.behaviour |= native_handle_type::disposition::readable;
+  }
   if(_flag & flag::write)
+  {
     nativeh.behaviour |= native_handle_type::disposition::writable;
+  }
   nativeh.behaviour |= native_handle_type::disposition::section;
   AFIO_LOG_FUNCTION_CALL(&ret);
   return ret;
@@ -78,9 +82,13 @@ result<section_handle> section_handle::section(extent_type bytes, const path_han
   file_handle &anonh = ret.value()._anonymous;
   nativeh.fd = anonh.native_handle().fd;
   if(_flag & flag::read)
+  {
     nativeh.behaviour |= native_handle_type::disposition::readable;
+  }
   if(_flag & flag::write)
+  {
     nativeh.behaviour |= native_handle_type::disposition::writable;
+  }
   nativeh.behaviour |= native_handle_type::disposition::section;
   AFIO_LOG_FUNCTION_CALL(&ret);
   return ret;
@@ -89,20 +97,26 @@ result<section_handle> section_handle::section(extent_type bytes, const path_han
 result<section_handle::extent_type> section_handle::length() const noexcept
 {
   AFIO_LOG_FUNCTION_CALL(this);
-  struct stat s;
+  struct stat s
+  {
+  };
   memset(&s, 0, sizeof(s));
   if(-1 == ::fstat(_v.fd, &s))
-    return {errno, std::system_category()};
+  {
+    return { errno, std::system_category() }
+  };
   return s.st_size;
 }
 
 result<section_handle::extent_type> section_handle::truncate(extent_type newsize) noexcept
 {
   AFIO_LOG_FUNCTION_CALL(this);
-  if(!_backing && newsize > 0)
+  if((_backing == nullptr) && newsize > 0)
   {
     if(-1 == ::ftruncate(_anonymous.native_handle().fd, newsize))
-      return {errno, std::system_category()};
+    {
+      return { errno, std::system_category() }
+    };
   }
   return newsize;
 }
@@ -128,7 +142,7 @@ map_handle::~map_handle()
 result<void> map_handle::close() noexcept
 {
   AFIO_LOG_FUNCTION_CALL(this);
-  if(_addr)
+  if(_addr != nullptr)
   {
     if(is_writable() && (_flag & section_handle::flag::barrier_on_close))
     {
@@ -136,7 +150,9 @@ result<void> map_handle::close() noexcept
     }
     // printf("%d munmap %p-%p\n", getpid(), _addr, _addr+_length);
     if(-1 == ::munmap(_addr, _length))
-      return {errno, std::system_category()};
+    {
+      return { errno, std::system_category() };
+    }
   }
   // We don't want ~handle() to close our borrowed handle
   _v = native_handle_type();
@@ -152,7 +168,7 @@ native_handle_type map_handle::release() noexcept
   _v = native_handle_type();
   _addr = nullptr;
   _length = 0;
-  return native_handle_type();
+  return {};
 }
 
 map_handle::io_result<map_handle::const_buffers_type> map_handle::barrier(map_handle::io_request<map_handle::const_buffers_type> reqs, bool wait_for_device, bool and_metadata, deadline d) noexcept
@@ -163,7 +179,9 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::barrier(map_ha
   for(const auto &req : reqs.buffers)
   {
     if(bytes + req.len < bytes)
+    {
       return std::errc::value_too_large;
+    }
     bytes += req.len;
   }
   if(reqs.buffers.empty())
@@ -172,19 +190,21 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::barrier(map_ha
   }
   int flags = (wait_for_device || and_metadata) ? MS_SYNC : MS_ASYNC;
   if(-1 == ::msync(addr, bytes, flags))
-    return {errno, std::system_category()};
-  if(_section->backing() && (wait_for_device || and_metadata))
+  {
+    return { errno, std::system_category() };
+  }
+  if((_section->backing() != nullptr) && (wait_for_device || and_metadata))
   {
     reqs.offset += _offset;
-    return _section->backing()->barrier(std::move(reqs), wait_for_device, and_metadata, d);
+    return _section->backing()->barrier(reqs, wait_for_device, and_metadata, d);
   }
-  return io_handle::io_result<const_buffers_type>(std::move(reqs.buffers));
+  return io_handle::io_result<const_buffers_type>(reqs.buffers);
 }
 
 
 static inline result<void *> do_mmap(native_handle_type &nativeh, void *ataddr, section_handle *section, map_handle::size_type &bytes, map_handle::extent_type offset, section_handle::flag _flag) noexcept
 {
-  bool have_backing = section ? (section->backing() != nullptr) : false;
+  bool have_backing = section != nullptr ? (section->backing() != nullptr) : false;
   int prot = 0, flags = have_backing ? MAP_SHARED : (MAP_PRIVATE | MAP_ANONYMOUS);
   void *addr = nullptr;
   if(_flag == section_handle::flag::none)
@@ -209,14 +229,20 @@ static inline result<void *> do_mmap(native_handle_type &nativeh, void *ataddr, 
     nativeh.behaviour |= native_handle_type::disposition::seekable | native_handle_type::disposition::readable;
   }
   if(_flag & section_handle::flag::execute)
+  {
     prot |= PROT_EXEC;
+  }
 #ifdef MAP_NORESERVE
   if(_flag & section_handle::flag::nocommit)
+  {
     flags |= MAP_NORESERVE;
+  }
 #endif
 #ifdef MAP_POPULATE
   if(_flag & section_handle::flag::prefault)
+  {
     flags |= MAP_POPULATE;
+  }
 #endif
 #ifdef MAP_PREFAULT_READ
   if(_flag & section_handle::flag::prefault)
@@ -230,7 +256,9 @@ static inline result<void *> do_mmap(native_handle_type &nativeh, void *ataddr, 
   addr = ::mmap(ataddr, bytes, prot, flags, have_backing ? section->native_handle().fd : -1, offset);
   // printf("%d mmap %p-%p\n", getpid(), addr, (char *) addr+bytes);
   if(MAP_FAILED == addr)
-    return {errno, std::system_category()};
+  {
+    return { errno, std::system_category() };
+  }
 #if 0  // not implemented yet, not seen any benefit over setting this at the fd level
   if(have_backing && ((flags & map_handle::flag::disable_prefetching) || (flags & map_handle::flag::maximum_prefetching)))
   {
@@ -244,13 +272,15 @@ static inline result<void *> do_mmap(native_handle_type &nativeh, void *ataddr, 
 
 result<map_handle> map_handle::map(size_type bytes, section_handle::flag _flag) noexcept
 {
-  if(!bytes)
+  if(bytes == 0u)
+  {
     return std::errc::argument_out_of_domain;
+  }
   bytes = utils::round_up_to_page_size(bytes);
   result<map_handle> ret(map_handle(nullptr));
   native_handle_type &nativeh = ret.value()._v;
   OUTCOME_TRY(addr, do_mmap(nativeh, nullptr, nullptr, bytes, 0, _flag));
-  ret.value()._addr = (char *) addr;
+  ret.value()._addr = static_cast<char *>(addr);
   ret.value()._length = bytes;
   AFIO_LOG_FUNCTION_CALL(&ret);
   return ret;
@@ -259,14 +289,14 @@ result<map_handle> map_handle::map(size_type bytes, section_handle::flag _flag) 
 result<map_handle> map_handle::map(section_handle &section, size_type bytes, extent_type offset, section_handle::flag _flag) noexcept
 {
   OUTCOME_TRY(length, section.length());  // length of the backing file
-  if(!bytes)
+  if(bytes == 0u)
   {
     bytes = length - offset;
   }
   result<map_handle> ret{map_handle(&section)};
   native_handle_type &nativeh = ret.value()._v;
   OUTCOME_TRY(addr, do_mmap(nativeh, nullptr, &section, bytes, offset, _flag));
-  ret.value()._addr = (char *) addr;
+  ret.value()._addr = static_cast<char *>(addr);
   ret.value()._offset = offset;
   ret.value()._length = length - offset;  // length of backing, not reservation
   // Make my handle borrow the native handle of my backing storage
@@ -278,8 +308,10 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
 result<map_handle::buffer_type> map_handle::commit(buffer_type region, section_handle::flag _flag) noexcept
 {
   AFIO_LOG_FUNCTION_CALL(this);
-  if(!region.data)
+  if(region.data == nullptr)
+  {
     return std::errc::invalid_argument;
+  }
   // Set permissions on the pages
   region = utils::round_to_page_size(region);
   extent_type offset = _offset + (region.data - _addr);
@@ -287,19 +319,25 @@ result<map_handle::buffer_type> map_handle::commit(buffer_type region, section_h
   OUTCOME_TRYV(do_mmap(_v, region.data, _section, bytes, offset, _flag));
   // Tell the kernel we will be using these pages soon
   if(-1 == ::madvise(region.data, region.len, MADV_WILLNEED))
-    return {errno, std::system_category()};
+  {
+    return { errno, std::system_category() };
+  }
   return region;
 }
 
 result<map_handle::buffer_type> map_handle::decommit(buffer_type region) noexcept
 {
   AFIO_LOG_FUNCTION_CALL(this);
-  if(!region.data)
+  if(region.data == nullptr)
+  {
     return std::errc::invalid_argument;
+  }
   region = utils::round_to_page_size(region);
   // Tell the kernel to kick these pages into storage
   if(-1 == ::madvise(region.data, region.len, MADV_DONTNEED))
-    return {errno, std::system_category()};
+  {
+    return { errno, std::system_category() };
+  }
   // Set permissions on the pages to no access
   extent_type offset = _offset + (region.data - _addr);
   size_type bytes = region.len;
@@ -310,12 +348,14 @@ result<map_handle::buffer_type> map_handle::decommit(buffer_type region) noexcep
 result<void> map_handle::zero_memory(buffer_type region) noexcept
 {
   AFIO_LOG_FUNCTION_CALL(this);
-  if(!region.data)
+  if(region.data == nullptr)
+  {
     return std::errc::invalid_argument;
+  }
 #ifdef MADV_REMOVE
   buffer_type page_region{(char *) utils::round_up_to_page_size((uintptr_t) region.data), utils::round_down_to_page_size(region.len)};
   // Zero contents and punch a hole in any backing storage
-  if(page_region.len && -1 != ::madvise(page_region.data, page_region.len, MADV_REMOVE))
+  if((page_region.len != 0u) && -1 != ::madvise(page_region.data, page_region.len, MADV_REMOVE))
   {
     memset(region.data, 0, page_region.data - region.data);
     memset(page_region.data + page_region.len, 0, (region.data + region.len) - (page_region.data + page_region.len));
@@ -333,7 +373,9 @@ result<span<map_handle::buffer_type>> map_handle::prefetch(span<buffer_type> reg
   for(const auto &region : regions)
   {
     if(-1 == ::madvise(region.data, region.len, MADV_WILLNEED))
-      return {errno, std::system_category()};
+    {
+      return { errno, std::system_category() };
+    }
   }
   return regions;
 }
@@ -342,8 +384,10 @@ result<map_handle::buffer_type> map_handle::do_not_store(buffer_type region) noe
 {
   AFIO_LOG_FUNCTION_CALL(0);
   region = utils::round_to_page_size(region);
-  if(!region.data)
+  if(region.data == nullptr)
+  {
     return std::errc::invalid_argument;
+  }
 #ifdef MADV_FREE
   // Lightweight unset of dirty bit for these pages. Needs FreeBSD or very recent Linux.
   if(-1 != ::madvise(region.data, region.len, MADV_FREE))
@@ -353,52 +397,62 @@ result<map_handle::buffer_type> map_handle::do_not_store(buffer_type region) noe
   // This is rather heavy weight in that it also punches a hole in any backing storage
   // but it works on Linux for donkey's years
   if(-1 != ::madvise(region.data, region.len, MADV_REMOVE))
+  {
     return region;
+  }
 #endif
   // No support on this platform
   region.len = 0;
   return region;
 }
 
-map_handle::io_result<map_handle::buffers_type> map_handle::read(io_request<buffers_type> reqs, deadline) noexcept
+map_handle::io_result<map_handle::buffers_type> map_handle::read(io_request<buffers_type> reqs, deadline /*d*/) noexcept
 {
   AFIO_LOG_FUNCTION_CALL(this);
   char *addr = _addr + reqs.offset;
-  size_type togo = reqs.offset < _length ? (size_type)(_length - reqs.offset) : 0;
+  size_type togo = reqs.offset < _length ? static_cast<size_type>(_length - reqs.offset) : 0;
   for(buffer_type &req : reqs.buffers)
   {
-    if(togo)
+    if(togo != 0u)
     {
       req.data = addr;
       if(req.len > togo)
+      {
         req.len = togo;
+      }
       addr += req.len;
       togo -= req.len;
     }
     else
+    {
       req.len = 0;
+    }
   }
   return reqs.buffers;
 }
 
-map_handle::io_result<map_handle::const_buffers_type> map_handle::write(io_request<const_buffers_type> reqs, deadline) noexcept
+map_handle::io_result<map_handle::const_buffers_type> map_handle::write(io_request<const_buffers_type> reqs, deadline /*d*/) noexcept
 {
   AFIO_LOG_FUNCTION_CALL(this);
   char *addr = _addr + reqs.offset;
-  size_type togo = reqs.offset < _length ? (size_type)(_length - reqs.offset) : 0;
+  size_type togo = reqs.offset < _length ? static_cast<size_type>(_length - reqs.offset) : 0;
   for(const_buffer_type &req : reqs.buffers)
   {
-    if(togo)
+    if(togo != 0u)
     {
       if(req.len > togo)
+      {
         req.len = togo;
+      }
       memcpy(addr, req.data, req.len);
       req.data = addr;
       addr += req.len;
       togo -= req.len;
     }
     else
+    {
       req.len = 0;
+    }
   }
   return reqs.buffers;
 }

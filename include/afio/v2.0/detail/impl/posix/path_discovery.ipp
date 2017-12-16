@@ -47,17 +47,17 @@ namespace path_discovery
       // Note that XDG_RUNTIME_DIR is the systemd runtime directory for the current user, usually mounted with tmpfs
       // XDG_CACHE_HOME  is the systemd cache directory for the current user, usually at $HOME/.cache
       static const char *variables[] = {"TMPDIR", "TMP", "TEMP", "TEMPDIR", "XDG_RUNTIME_DIR", "XDG_CACHE_HOME"};
-      for(size_t n = 0; n < sizeof(variables) / sizeof(variables[0]); n++)
+      for(auto &variable : variables)
       {
-        const char *env = getenv(variables[n]);
-        if(env)
+        const char *env = getenv(variable);
+        if(env != nullptr)
         {
           ret.emplace_back(discovered_path::source_type::environment, env);
         }
       }
       // Also try $HOME/.cache
       const char *env = getenv("HOME");
-      if(env)
+      if(env != nullptr)
       {
         buffer = env;
         buffer.append("/.cache");
@@ -88,26 +88,26 @@ namespace path_discovery
         const char *linestart = passwd.data(), *lineend, *end = passwd.data() + passwd.size();
         do
         {
-          lineend = (const char *) memchr(linestart, 10, end - linestart);
+          lineend = static_cast<const char *>(memchr(linestart, 10, end - linestart));
           if(lineend == nullptr)
           {
             lineend = end;
           }
           // uid is two colons in
-          const char *colon = (const char *) memchr(linestart, ':', lineend - linestart);
+          const auto *colon = static_cast<const char *>(memchr(linestart, ':', lineend - linestart));
           if(colon != nullptr)
           {
-            colon = (const char *) memchr(colon + 1, ':', lineend - colon - 1);
+            colon = static_cast<const char *>(memchr(colon + 1, ':', lineend - colon - 1));
             if(colon != nullptr)
             {
               long uid = strtol(colon + 1, nullptr, 10);
               if(uid == geteuid())
               {
                 // home directory is two colons from end
-                const char *homeend = (const char *) memrchr(colon + 1, ':', lineend - colon - 1);
+                const auto *homeend = static_cast<const char *>(memrchr(colon + 1, ':', lineend - colon - 1));
                 if(homeend != nullptr)
                 {
-                  colon = (const char *) memrchr(colon + 1, ':', homeend - colon - 1);
+                  colon = static_cast<const char *>(memrchr(colon + 1, ':', homeend - colon - 1));
                   if(colon != nullptr)
                   {
                     buffer.assign(colon + 1, homeend - colon - 1);
@@ -137,6 +137,6 @@ namespace path_discovery
     ret.emplace_back(discovered_path::source_type::hardcoded, "/run/shm");
     return ret;
   }
-}
+}  // namespace path_discovery
 
 AFIO_V2_NAMESPACE_END

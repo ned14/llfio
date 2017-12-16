@@ -90,11 +90,9 @@ public:
   //! The i/o request type used by this handle. Guaranteed to be `TrivialType` apart from construction, and `StandardLayoutType`.
   template <class T> struct io_request
   {
-    T buffers;
-    extent_type offset;
+    T buffers{};
+    extent_type offset{0};
     constexpr io_request()
-        : buffers()
-        , offset(0)
     {
     }
     constexpr io_request(T _buffers, extent_type _offset)
@@ -141,11 +139,13 @@ public:
     //! Returns bytes transferred
     size_type bytes_transferred() noexcept
     {
-      if(_bytes_transferred == (size_type) -1)
+      if(_bytes_transferred == static_cast<size_type>(-1))
       {
         _bytes_transferred = 0;
         for(auto &i : this->value())
+        {
           _bytes_transferred += i.second;
+        }
       }
       return _bytes_transferred;
     }
@@ -168,7 +168,7 @@ public:
   //! Default constructor
   constexpr io_handle() = default;
   //! Construct a handle from a supplied native handle
-  constexpr io_handle(native_handle_type h, caching caching = caching::none, flag flags = flag::none)
+  constexpr explicit io_handle(native_handle_type h, caching caching = caching::none, flag flags = flag::none)
       : handle(h, caching, flags)
   {
   }
@@ -296,9 +296,9 @@ public:
   class extent_guard
   {
     friend class io_handle;
-    io_handle *_h;
-    extent_type _offset, _length;
-    bool _exclusive;
+    io_handle *_h{nullptr};
+    extent_type _offset{0}, _length{0};
+    bool _exclusive{false};
     constexpr extent_guard(io_handle *h, extent_type offset, extent_type length, bool exclusive)
         : _h(h)
         , _offset(offset)
@@ -312,10 +312,6 @@ public:
   public:
     //! Default constructor
     constexpr extent_guard()
-        : _h(nullptr)
-        , _offset(0)
-        , _length(0)
-        , _exclusive(false)
     {
     }
     //! Move constructor
@@ -333,8 +329,10 @@ public:
     }
     ~extent_guard()
     {
-      if(_h)
+      if(_h != nullptr)
+      {
         unlock();
+      }
     }
     //! True if extent guard is valid
     explicit operator bool() const noexcept { return _h != nullptr; }
@@ -351,7 +349,7 @@ public:
     //! Unlocks the locked extent immediately
     void unlock() noexcept
     {
-      if(_h)
+      if(_h != nullptr)
       {
         _h->unlock(_offset, _length);
         release();
@@ -412,10 +410,12 @@ public:
     for(auto &i : reqs.buffers)
     {
       if(bytes + i.len < bytes)
+      {
         return std::errc::value_too_large;
+      }
       bytes += i.len;
     }
-    return lock(reqs.offset, bytes, false, std::move(d));
+    return lock(reqs.offset, bytes, false, d);
   }
   //! \overload Locks for exclusive access
   result<extent_guard> lock(io_request<const_buffers_type> reqs, deadline d = deadline()) noexcept
@@ -424,10 +424,12 @@ public:
     for(auto &i : reqs.buffers)
     {
       if(bytes + i.len < bytes)
+      {
         return std::errc::value_too_large;
+      }
       bytes += i.len;
     }
-    return lock(reqs.offset, bytes, true, std::move(d));
+    return lock(reqs.offset, bytes, true, d);
   }
 
   /*! \brief Unlocks a byte range previously locked.

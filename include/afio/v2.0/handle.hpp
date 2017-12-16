@@ -170,13 +170,13 @@ public:
   QUICKCPPLIB_BITFIELD_END(flag);
 
 protected:
-  caching _caching;
-  flag _flags;
+  caching _caching{caching::none};
+  flag _flags{flag::none};
   native_handle_type _v;
 
 public:
   //! Default constructor
-  constexpr handle() noexcept : _caching(caching::none), _flags(flag::none) {}
+  constexpr handle() {}
   //! Construct a handle from a supplied native handle
   explicit constexpr handle(native_handle_type h, caching caching = caching::none, flag flags = flag::none) noexcept : _caching(caching), _flags(flags), _v(std::move(h)) {}
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC ~handle();
@@ -308,7 +308,7 @@ public:
   //! True if writes are safely on storage on completion
   bool are_writes_durable() const noexcept { return _caching == caching::none || _caching == caching::reads || _caching == caching::reads_and_metadata; }
   //! True if issuing safety fsyncs is on
-  bool are_safety_fsyncs_issued() const noexcept { return !(_flags & flag::disable_safety_fsyncs) && !!(static_cast<int>(_caching) & 1); }
+  bool are_safety_fsyncs_issued() const noexcept { return !(_flags & flag::disable_safety_fsyncs) && !((static_cast<int>(_caching) & 1) == 0); }
 
   //! The flags this handle was opened with
   flag flags() const noexcept { return _flags; }
@@ -328,53 +328,81 @@ inline std::ostream &operator<<(std::ostream &s, const handle &v)
 inline std::ostream &operator<<(std::ostream &s, const handle::mode &v)
 {
   static constexpr const char *values[] = {"unchanged", nullptr, "none", nullptr, "attr_read", "attr_write", "read", "write", nullptr, "append"};
-  if(static_cast<size_t>(v) >= sizeof(values) / sizeof(values[0]) || !values[static_cast<size_t>(v)])
+  if(static_cast<size_t>(v) >= sizeof(values) / sizeof(values[0]) || (values[static_cast<size_t>(v)] == nullptr))
+  {
     return s << "afio::handle::mode::<unknown>";
+  }
   return s << "afio::handle::mode::" << values[static_cast<size_t>(v)];
 }
 inline std::ostream &operator<<(std::ostream &s, const handle::creation &v)
 {
   static constexpr const char *values[] = {"open_existing", "only_if_not_exist", "if_needed", "truncate"};
-  if(static_cast<size_t>(v) >= sizeof(values) / sizeof(values[0]) || !values[static_cast<size_t>(v)])
+  if(static_cast<size_t>(v) >= sizeof(values) / sizeof(values[0]) || (values[static_cast<size_t>(v)] == nullptr))
+  {
     return s << "afio::handle::creation::<unknown>";
+  }
   return s << "afio::handle::creation::" << values[static_cast<size_t>(v)];
 }
 inline std::ostream &operator<<(std::ostream &s, const handle::caching &v)
 {
   static constexpr const char *values[] = {"unchanged", "none", "only_metadata", "reads", "all", "reads_and_metadata", "temporary", "safety_fsyncs"};
-  if(static_cast<size_t>(v) >= sizeof(values) / sizeof(values[0]) || !values[static_cast<size_t>(v)])
+  if(static_cast<size_t>(v) >= sizeof(values) / sizeof(values[0]) || (values[static_cast<size_t>(v)] == nullptr))
+  {
     return s << "afio::handle::caching::<unknown>";
+  }
   return s << "afio::handle::caching::" << values[static_cast<size_t>(v)];
 }
 inline std::ostream &operator<<(std::ostream &s, const handle::flag &v)
 {
   std::string temp;
   if(!!(v & handle::flag::unlink_on_close))
+  {
     temp.append("unlink_on_close|");
+  }
   if(!!(v & handle::flag::disable_safety_fsyncs))
+  {
     temp.append("disable_safety_fsyncs|");
+  }
   if(!!(v & handle::flag::disable_prefetching))
+  {
     temp.append("disable_prefetching|");
+  }
   if(!!(v & handle::flag::maximum_prefetching))
+  {
     temp.append("maximum_prefetching|");
+  }
   if(!!(v & handle::flag::win_disable_unlink_emulation))
+  {
     temp.append("win_disable_unlink_emulation|");
+  }
   if(!!(v & handle::flag::win_disable_sparse_file_creation))
+  {
     temp.append("win_disable_sparse_file_creation|");
+  }
   if(!!(v & handle::flag::overlapped))
+  {
     temp.append("overlapped|");
+  }
   if(!!(v & handle::flag::byte_lock_insanity))
+  {
     temp.append("byte_lock_insanity|");
+  }
   if(!!(v & handle::flag::anonymous_inode))
+  {
     temp.append("anonymous_inode|");
+  }
   if(!temp.empty())
   {
     temp.resize(temp.size() - 1);
     if(std::count(temp.cbegin(), temp.cend(), '|') > 0)
+    {
       temp = "(" + temp + ")";
+    }
   }
   else
+  {
     temp = "none";
+  }
   return s << "afio::handle::flag::" << temp;
 }
 
@@ -433,7 +461,7 @@ inline error_info::error_info(std::error_code _ec)
 #if AFIO_LOGGING_LEVEL >= 2
       if(log().log_level() >= log_level::error)
       {
-        _log_id = log().emplace_back(log_level::error, ec.message().c_str(), (uint32_t) nativeh._init, tls.this_thread_id);
+        _log_id = log().emplace_back(log_level::error, ec.message().c_str(), static_cast<uint32_t>(nativeh._init), tls.this_thread_id);
       }
 #endif
     }

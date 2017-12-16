@@ -43,66 +43,81 @@ namespace detail
   {
     const T *e = s;
     for(; *e; e++)
+    {
       ;
+    }
     return e - s;
   }
 #endif
-}
+}  // namespace detail
 
 /*! \class path_view
-\brief A borrowed view of a path. A lightweight trivial-type alternative to `std::filesystem::path`.
+\brief A borrowed view of a path. A lightweight trivial-type alternative to
+`std::filesystem::path`.
 
-AFIO is sufficiently fast that `std::filesystem::path` as a wrapper of an underlying `std::basic_string<>`
-can be problematically expensive for some filing system operations due to the potential memory allocation.
-AFIO therefore works exclusively with borrowed views of other path storage.
+AFIO is sufficiently fast that `std::filesystem::path` as a wrapper of an
+underlying `std::basic_string<>` can be problematically expensive for some
+filing system operations due to the potential memory allocation. AFIO
+therefore works exclusively with borrowed views of other path storage.
 
-Some of the API for `std::filesystem::path` is replicated here, however any APIs which modify the path other
-than taking subsets are obviously not possible with borrowed views.
+Some of the API for `std::filesystem::path` is replicated here, however any
+APIs which modify the path other than taking subsets are obviously not
+possible with borrowed views.
 
 \todo Lots of member functions remain to be implemented.
 
 # Windows specific notes:
 
-Be aware that on Microsoft Windows, the native path storage `std::filesystem::path::value_type` is a `wchar_t`
-referring to UTF-16. However much of AFIO path usage is a `path_handle` to somewhere on the filing system
-plus a relative `const char *` UTF-8 path fragment as the use of absolute paths is discouraged. Rather than
-complicate the ABI to handle templated path character types, on Microsoft Windows only we do the following:
+Be aware that on Microsoft Windows, the native path storage
+`std::filesystem::path::value_type` is a `wchar_t` referring to UTF-16.
+However much of AFIO path usage is a `path_handle` to somewhere on the filing
+system plus a relative `const char *` UTF-8 path fragment as the use of
+absolute paths is discouraged. Rather than complicate the ABI to handle
+templated path character types, on Microsoft Windows only we do the following:
 
-- If view input is `wchar_t`, the original source is passed through unmodified to the syscall without any
-memory allocation, copying nor slash conversion.
+- If view input is `wchar_t`, the original source is passed through unmodified
+to the syscall without any memory allocation, copying nor slash conversion.
 - If view input is `char`:
-  1. The original source **is assumed to be in UTF-8**, not ASCII like most `char` paths on Microsoft Windows.
-  2. Use with any kernel function converts to a temporary UTF-16 internal buffer. We use the fast NT kernel
-UTF8 to UTF16 routine, not the slow Win32 routine.
+  1. The original source **is assumed to be in UTF-8**, not ASCII like most
+`char` paths on Microsoft Windows.
+  2. Use with any kernel function converts to a temporary UTF-16 internal
+buffer. We use the fast NT kernel UTF8 to UTF16 routine, not the slow Win32
+routine.
   3. Any forward slashes are converted to backwards slashes.
 
 AFIO calls the NT kernel API directly rather than the Win32 API for:
 
-- For any paths relative to a `path_handle` (the Win32 API does not provide a race free file system API).
-- For any paths beginning with `\!!\`, we pass the path + 3 characters directly through. This prefix
-is a pure AFIO extension, and will not be recognised by other code.
-- For any paths beginning with `\??\`, we pass the path + 0 characters directly through. Note the NT kernel
-keeps a symlink at `\??\` which refers to the DosDevices namespace for the current login, so as an
-incorrect relation which you should **not** rely on, the Win32 path `C:\foo` probably will appear
+- For any paths relative to a `path_handle` (the Win32 API does not provide a
+race free file system API).
+- For any paths beginning with `\!!\`, we pass the path + 3 characters
+directly through. This prefix is a pure AFIO extension, and will not be
+recognised by other code.
+- For any paths beginning with `\??\`, we pass the path + 0 characters
+directly through. Note the NT kernel keeps a symlink at `\??\` which refers to
+the DosDevices namespace for the current login, so as an incorrect relation
+which you should **not** rely on, the Win32 path `C:\foo` probably will appear
 at `\??\C:\foo`.
 
 These prefixes are still passed to the Win32 API:
 
-- `\\?\` which is used to tell a Win32 API that the remaining path is longer than a DOS path.
+- `\\?\` which is used to tell a Win32 API that the remaining path is longer
+than a DOS path.
 - `\\.\` which since Windows 7 is treated exactly like `\\?\`.
 
 If the NT kernel API is used directly then:
 
-- Paths are matched case sensitively as raw bytes via `memcmp()`, not case insensitively (requires slow
-locale conversion).
+- Paths are matched case sensitively as raw bytes via `memcmp()`, not case
+insensitively (requires slow locale conversion).
 - The path limit is 32,767 characters.
 
-If you really care about performance, you are very strongly recommended to use the NT kernel API wherever possible. Where paths
-are involved, it is often three to five times faster due to the multiple memory allocations and string
-translations that the Win32 functions perform before calling the NT kernel routine.
+If you really care about performance, you are very strongly recommended to use
+the NT kernel API wherever possible. Where paths are involved, it is often
+three to five times faster due to the multiple memory allocations and string
+translations that the Win32 functions perform before calling the NT kernel
+routine.
 
-If however you are taking input from some external piece of code, then for maximum compatibility you
-should still use the Win32 API.
+If however you are taking input from some external piece of code, then for
+maximum compatibility you should still use the Win32 API.
 */
 class AFIO_DECL path_view
 {
@@ -170,11 +185,8 @@ private:
   {
     string_view _utf8;
 
-    constexpr state()
-        : _utf8()
-    {
-    }
-    constexpr state(string_view v)
+    constexpr state() {}
+    constexpr explicit state(string_view v)
         : _utf8(v)
     {
     }
@@ -186,17 +198,17 @@ private:
 #endif
 public:
   //! Constructs an empty path view
-  constexpr path_view() noexcept : _state{} {}
+  constexpr path_view() noexcept: {}
   //! Implicitly constructs a path view from a path. The input path MUST continue to exist for this view to be valid.
-  path_view(const filesystem::path &v) noexcept : _state(v.native()) {}
+  path_view(const filesystem::path &v) noexcept : _state(v.native()) {}  // NOLINT
   //! Implicitly constructs a UTF-8 path view from a string. The input string MUST continue to exist for this view to be valid.
-  path_view(const std::string &v) noexcept : _state(v) {}
+  path_view(const std::string &v) noexcept : _state(v) {}  // NOLINT
   //! Implicitly constructs a UTF-8 path view from a zero terminated `const char *`. The input string MUST continue to exist for this view to be valid.
-  constexpr path_view(const char *v) noexcept :
+  constexpr path_view(const char *v) noexcept :                                                // NOLINT
 #if(!_HAS_CXX17 && __cplusplus < 201700) || (defined(__GLIBCXX__) && __GLIBCXX__ <= 20170818)  // libstdc++'s char_traits is missing constexpr
-  _state(string_view(v, detail::constexpr_strlen(v)))
+                                                 _state(string_view(v, detail::constexpr_strlen(v)))
 #else
-  _state(string_view(v))
+                                                 _state(string_view(v))
 #endif
   {
   }
@@ -205,7 +217,7 @@ public:
   /*! Implicitly constructs a UTF-8 path view from a string view.
   \warning The byte after the end of the view must be legal to read.
   */
-  constexpr path_view(string_view v) noexcept : _state(v) {}
+  constexpr path_view(string_view v) noexcept : _state(v) {}  // NOLINT
 #ifdef _WIN32
   //! Implicitly constructs a UTF-16 path view from a string. The input string MUST continue to exist for this view to be valid.
   path_view(const std::wstring &v) noexcept : _state(v) {}
@@ -306,9 +318,13 @@ public:
     auto sep_idx = _find_last_sep();
     _invoke([sep_idx](auto &v) {
       if(_npos == sep_idx)
+      {
         v = {};
+      }
       else
+      {
         v.remove_suffix(v.size() - sep_idx);
+      }
     });
   }
   //! Returns the size of the view in characters.
@@ -326,7 +342,9 @@ public:
   {
     auto sep_idx = _find_last_sep();
     if(_npos == sep_idx)
+    {
       return *this;
+    }
     return _invoke([sep_idx](const auto &v) { return path_view(v.data() + sep_idx + 1, v.size() - sep_idx - 1); });
   }
   constexpr path_view stem() const noexcept;
@@ -340,7 +358,9 @@ public:
       return filesystem::path(std::wstring(_state._utf16.data(), _state._utf16.size()));
 #endif
     if(!_state._utf8.empty())
+    {
       return filesystem::path(std::string(_state._utf8.data(), _state._utf8.size()));
+    }
     return {};
   }
 
@@ -437,7 +457,7 @@ public:
         return;
       }
 #else
-    c_str(const path_view &view) noexcept
+    c_str(const path_view &view) noexcept  // NOLINT
     {
       if(!view._state._utf8.empty())
       {
@@ -475,7 +495,7 @@ public:
     c_str &operator=(c_str &&) = delete;
 
   private:
-    filesystem::path::value_type _buffer[32768];
+    filesystem::path::value_type _buffer[32768]{};
 #ifdef _WIN32
     AFIO_HEADERS_ONLY_MEMFUNC_SPEC void _from_utf8(const path_view &view) noexcept;
 #endif
@@ -485,13 +505,17 @@ public:
 inline constexpr bool operator==(path_view x, path_view y) noexcept
 {
   if(x.native_size() != y.native_size())
+  {
     return false;
+  }
   return x.compare(y) == 0;
 }
 inline constexpr bool operator!=(path_view x, path_view y) noexcept
 {
   if(x.native_size() != y.native_size())
+  {
     return true;
+  }
   return x.compare(y) != 0;
 }
 inline constexpr bool operator<(path_view x, path_view y) noexcept

@@ -36,7 +36,7 @@ async_file_handle::io_result<async_file_handle::const_buffers_type> async_file_h
 {
   AFIO_LOG_FUNCTION_CALL(this);
   optional<io_result<const_buffers_type>> ret;
-  OUTCOME_TRY(io_state, async_barrier(reqs, [&ret](async_file_handle *, io_result<const_buffers_type> &result) { ret = std::move(result); }, wait_for_device, and_metadata));
+  OUTCOME_TRY(io_state, async_barrier(reqs, [&ret](async_file_handle *, io_result<const_buffers_type> &result) { ret = result; }, wait_for_device, and_metadata));
   (void) io_state;
 
   // While i/o is not done pump i/o completion
@@ -45,7 +45,9 @@ async_file_handle::io_result<async_file_handle::const_buffers_type> async_file_h
     auto t(_service->run_until(d));
     // If i/o service pump failed or timed out, cancel outstanding i/o and return
     if(!t)
+    {
       return t.error();
+    }
 #ifndef NDEBUG
     if(!ret && t && !t.value())
     {
@@ -63,7 +65,7 @@ template <class BuffersType, class IORoutine> result<async_file_handle::io_state
   struct state_type : public _erased_io_state_type
   {
 #if AFIO_USE_POSIX_AIO
-    struct aiocb aiocbs[1];
+    struct aiocb aiocbs[1]{};
 #else
 #error todo
 #endif
@@ -73,11 +75,11 @@ template <class BuffersType, class IORoutine> result<async_file_handle::io_state
         , completion(nullptr)
     {
     }
-    AFIO_HEADERS_ONLY_VIRTUAL_SPEC _erased_completion_handler *erased_completion_handler() noexcept override final { return completion; }
-    AFIO_HEADERS_ONLY_VIRTUAL_SPEC void _system_io_completion(long errcode, long bytes_transferred, void *internal_state) noexcept override final
+    AFIO_HEADERS_ONLY_VIRTUAL_SPEC _erased_completion_handler *erased_completion_handler() noexcept final { return completion; }
+    AFIO_HEADERS_ONLY_VIRTUAL_SPEC void _system_io_completion(long errcode, long bytes_transferred, void *internal_state) noexcept final
     {
 #if AFIO_USE_POSIX_AIO
-      struct aiocb **_paiocb = (struct aiocb **) internal_state;
+      auto **_paiocb = static_cast<struct aiocb **>(internal_state);
       struct aiocb *aiocb = *_paiocb;
       assert(aiocb >= aiocbs && aiocb < aiocbs + this->items);
       *_paiocb = nullptr;
@@ -88,7 +90,9 @@ template <class BuffersType, class IORoutine> result<async_file_handle::io_state
       if(result)
       {
         if(errcode)
-          result = error_info((int) errcode, std::system_category());
+        {
+          result = error_info(static_cast<int>(errcode), std::system_category());
+        }
         else
         {
 // Figure out which i/o I am and update the buffer in question
@@ -108,9 +112,11 @@ template <class BuffersType, class IORoutine> result<async_file_handle::io_state
       this->parent->service()->_work_done();
       // Are we done?
       if(!--this->items_to_go)
+      {
         (*completion)(this);
+      }
     }
-    AFIO_HEADERS_ONLY_VIRTUAL_SPEC ~state_type() override final
+    AFIO_HEADERS_ONLY_VIRTUAL_SPEC ~state_type() final
     {
       // Do we need to cancel pending i/o?
       if(this->items_to_go)
@@ -176,8 +182,10 @@ template <class BuffersType, class IORoutine> result<async_file_handle::io_state
   {
     void *_mem = ::calloc(1, statelen);
     if(!_mem)
+    {
       return std::errc::not_enough_memory;
-    mem = {(char *) _mem, statelen};
+    }
+    mem = {static_cast<char *>(_mem), statelen};
     must_deallocate_self = true;
   }
   io_state_ptr _state((state_type *) mem.data());
@@ -295,7 +303,7 @@ async_file_handle::io_result<async_file_handle::buffers_type> async_file_handle:
 {
   AFIO_LOG_FUNCTION_CALL(this);
   optional<io_result<buffers_type>> ret;
-  OUTCOME_TRY(io_state, async_read(reqs, [&ret](async_file_handle *, io_result<buffers_type> &result) { ret = std::move(result); }));
+  OUTCOME_TRY(io_state, async_read(reqs, [&ret](async_file_handle *, io_result<buffers_type> &result) { ret = result; }));
   (void) io_state;
 
   // While i/o is not done pump i/o completion
@@ -304,7 +312,9 @@ async_file_handle::io_result<async_file_handle::buffers_type> async_file_handle:
     auto t(_service->run_until(d));
     // If i/o service pump failed or timed out, cancel outstanding i/o and return
     if(!t)
+    {
       return t.error();
+    }
 #ifndef NDEBUG
     if(!ret && t && !t.value())
     {
@@ -320,7 +330,7 @@ async_file_handle::io_result<async_file_handle::const_buffers_type> async_file_h
 {
   AFIO_LOG_FUNCTION_CALL(this);
   optional<io_result<const_buffers_type>> ret;
-  OUTCOME_TRY(io_state, async_write(reqs, [&ret](async_file_handle *, io_result<const_buffers_type> &result) { ret = std::move(result); }));
+  OUTCOME_TRY(io_state, async_write(reqs, [&ret](async_file_handle *, io_result<const_buffers_type> &result) { ret = result; }));
   (void) io_state;
 
   // While i/o is not done pump i/o completion
@@ -329,7 +339,9 @@ async_file_handle::io_result<async_file_handle::const_buffers_type> async_file_h
     auto t(_service->run_until(d));
     // If i/o service pump failed or timed out, cancel outstanding i/o and return
     if(!t)
+    {
       return t.error();
+    }
 #ifndef NDEBUG
     if(!ret && t && !t.value())
     {

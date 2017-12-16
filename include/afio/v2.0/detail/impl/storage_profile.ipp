@@ -76,7 +76,7 @@ namespace storage_profile
   min_atomic_write: 1
   max_atomic_write: 1
   */
-  void storage_profile::write(std::ostream &out, std::regex which, size_t _indent, bool invert_match) const
+  void storage_profile::write(std::ostream &out, const std::regex &which, size_t _indent, bool invert_match) const
   {
     AFIO_LOG_FUNCTION_CALL(this);
     std::vector<std::string> lastsection;
@@ -86,11 +86,11 @@ namespace storage_profile
       {
         std::vector<std::string> thissection;
         const char *s, *e;
-        for(s = i.name, e = i.name; *e; e++)
+        for(s = i.name, e = i.name; *e != 0; e++)
         {
           if(*e == ':')
           {
-            thissection.push_back(std::string(s, e - s));
+            thissection.emplace_back(s, e - s);
             s = e + 1;
           }
         }
@@ -113,22 +113,34 @@ namespace storage_profile
             if(idx < text.size())
             {
               while(text[idx] != ' ')
+              {
                 --idx;
+              }
             }
             else
+            {
               idx = text.size();
+            }
             lines.push_back(text.substr(0, idx));
             if(idx < text.size())
+            {
               text = text.substr(idx + 1);
+            }
             else
+            {
               break;
+            }
           }
           for(auto &line : lines)
+          {
             out << std::string(indent, ' ') << "# " << line << "\n";
+          }
         }
         out << std::string(indent, ' ') << name << ": " << i.value << "\n";
         if(i.description && strlen(i.description) > 78)
+        {
           out << "\n";
+        }
         lastsection = std::move(thissection);
       }
     };
@@ -136,7 +148,9 @@ namespace storage_profile
     {
       bool matches = std::regex_match(i.name, which);
       if((matches && !invert_match) || (!matches && invert_match))
+      {
         i.invoke(print);
+      }
     }
   }
 
@@ -147,7 +161,7 @@ namespace storage_profile
     {
       static unsigned long long mem_quantity, mem_max_bandwidth, mem_min_bandwidth;
       static float mem_in_use;
-      if(mem_quantity)
+      if(mem_quantity != 0u)
       {
         sp.mem_quantity.value = mem_quantity;
         sp.mem_in_use.value = mem_in_use;
@@ -166,7 +180,9 @@ namespace storage_profile
 #endif
 
           if(sp.mem_quantity.value / 4 < chunksize)
-            chunksize = (size_t)(sp.mem_quantity.value / 4);
+          {
+            chunksize = static_cast<size_t>(sp.mem_quantity.value / 4);
+          }
           char *buffer = utils::page_allocator<char>().allocate(chunksize);
           auto unbuffer = AFIO_V2_NAMESPACE::undoer([buffer, chunksize] { utils::page_allocator<char>().deallocate(buffer, chunksize); });
           // Make sure all memory is really allocated first
@@ -179,7 +195,7 @@ namespace storage_profile
           {
             memset(buffer, count & 0xff, chunksize);
           }
-          sp.mem_max_bandwidth.value = (unsigned long long) ((double) count * chunksize / 10);
+          sp.mem_max_bandwidth.value = static_cast<unsigned long long>(static_cast<double>(count) * chunksize / 10);
 
           // Min bandwidth is randomised 4Kb copies of the same
           QUICKCPPLIB_NAMESPACE::algorithm::small_prng::small_prng ctx(78);
@@ -193,7 +209,7 @@ namespace storage_profile
               memset(buffer + offset, count & 0xff, 4096);
             }
           }
-          sp.mem_min_bandwidth.value = (unsigned long long) ((double) count * chunksize / 10);
+          sp.mem_min_bandwidth.value = static_cast<unsigned long long>(static_cast<double>(count) * chunksize / 10);
         }
         catch(...)
         {
@@ -216,9 +232,9 @@ namespace storage_profile
     inline clock_info_t _clock_granularity_and_overhead()
     {
       static clock_info_t info;
-      if(!info.granularity)
+      if(info.granularity == 0u)
       {
-        unsigned count = (unsigned) -1;
+        auto count = static_cast<unsigned>(-1);
         for(size_t n = 0; n < 20; n++)
         {
           std::chrono::high_resolution_clock::time_point begin = std::chrono::high_resolution_clock::now(), end;
@@ -228,7 +244,9 @@ namespace storage_profile
           } while(begin == end);
           auto diff = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count();
           if(diff < count)
-            count = (unsigned) diff;
+          {
+            count = static_cast<unsigned>(diff);
+          }
         }
         info.granularity = count;
         std::chrono::high_resolution_clock::time_point begin = std::chrono::high_resolution_clock::now();
@@ -237,7 +255,7 @@ namespace storage_profile
           (void) std::chrono::high_resolution_clock::now();
         }
         std::chrono::high_resolution_clock::time_point end = std::chrono::high_resolution_clock::now();
-        info.overhead = (unsigned) ((double) std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count() / 1000000);
+        info.overhead = static_cast<unsigned>(static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count()) / 1000000);
       }
       return info;
     }
@@ -251,9 +269,9 @@ namespace storage_profile
     inline unsigned _sleep_wake_overhead()
     {
       static unsigned v;
-      if(!v)
+      if(v == 0u)
       {
-        unsigned count = (unsigned) -1, period = 1000;  // 1us
+        unsigned count = static_cast<unsigned>(-1), period = 1000;  // 1us
         for(size_t n = 0; n < 20; n++)
         {
           std::chrono::high_resolution_clock::time_point begin, end;
@@ -264,11 +282,11 @@ namespace storage_profile
             std::this_thread::sleep_for(std::chrono::nanoseconds(period));
             end = std::chrono::high_resolution_clock::now();
             period *= 2;  // 2^20 = ~1ms
-            diff = (unsigned) std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count();
+            diff = static_cast<unsigned>(std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count());
           } while(diff == 0);
           if(diff < count)
           {
-            count = (unsigned) diff;
+            count = diff;
           }
         }
         v = count;
@@ -283,9 +301,9 @@ namespace storage_profile
     inline unsigned _yield_overhead()
     {
       static unsigned v;
-      if(!v)
+      if(v == 0u)
       {
-        unsigned count = (unsigned) -1;
+        auto count = static_cast<unsigned>(-1);
         for(size_t n = 0; n < 20; n++)
         {
           std::chrono::high_resolution_clock::time_point begin, end;
@@ -301,10 +319,10 @@ namespace storage_profile
           std::this_thread::yield();
           std::this_thread::yield();
           end = std::chrono::high_resolution_clock::now();
-          unsigned diff = (unsigned) std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count();
+          unsigned diff = static_cast<unsigned>(std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count());
           if(diff < count)
           {
-            count = (unsigned) diff / 10;
+            count = diff / 10;
           }
         }
         v = count;
@@ -319,10 +337,10 @@ namespace storage_profile
     outcome<void> drop_filesystem_cache_support(storage_profile &sp, file_handle & /*unused*/) noexcept
     {
       static bool v = !!utils::drop_filesystem_cache();
-      sp.drop_filesystem_cache_support.value = v;
+      sp.drop_filesystem_cache_support.value = static_cast<unsigned int>(v);
       return success();
     }
-  }
+  }  // namespace system
   namespace storage
   {
     // Device name, size, min i/o size
@@ -332,7 +350,7 @@ namespace storage_profile
       {
         statfs_t fsinfo;
         OUTCOME_TRYV(fsinfo.fill(h, statfs_t::want::iosize | statfs_t::want::mntfromname | statfs_t::want::fstypename));
-        sp.device_min_io_size.value = (unsigned) fsinfo.f_iosize;
+        sp.device_min_io_size.value = static_cast<unsigned>(fsinfo.f_iosize);
 #ifdef WIN32
         OUTCOME_TRYV(windows::_device(sp, h, fsinfo.f_mntfromname, fsinfo.f_fstypename));
 #else
@@ -355,7 +373,7 @@ namespace storage_profile
         sp.fs_name.value = fsinfo.f_fstypename;
         sp.fs_config.value = "todo";
         sp.fs_size.value = fsinfo.f_blocks * fsinfo.f_bsize;
-        sp.fs_in_use.value = (float) (fsinfo.f_blocks - fsinfo.f_bfree) / fsinfo.f_blocks;
+        sp.fs_in_use.value = static_cast<float>(fsinfo.f_blocks - fsinfo.f_bfree) / fsinfo.f_blocks;
       }
       catch(...)
       {
@@ -363,7 +381,7 @@ namespace storage_profile
       }
       return success();
     }
-  }
+  }  // namespace storage
 
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -373,13 +391,15 @@ namespace storage_profile
   {
     outcome<void> atomic_rewrite_quantum(storage_profile &sp, file_handle &srch) noexcept
     {
-      if(sp.atomic_rewrite_quantum.value != (io_service::extent_type) -1)
+      if(sp.atomic_rewrite_quantum.value != static_cast<io_service::extent_type>(-1))
+      {
         return success();
+      }
       try
       {
         using off_t = io_service::extent_type;
         sp.max_aligned_atomic_rewrite.value = 1;
-        sp.atomic_rewrite_quantum.value = (off_t) -1;
+        sp.atomic_rewrite_quantum.value = static_cast<off_t>(-1);
         size_t size = srch.requires_aligned_io() ?
 #ifdef _WIN32
                       4096
@@ -399,15 +419,21 @@ namespace storage_profile
             std::packaged_task<void()> task([size, &srch, no, &done] {
               auto _h(srch.clone());
               if(!_h)
-                throw std::runtime_error("concurrency::atomic_rewrite_quantum: Could not open work file due to " + _h.error().message());
+              {
+                throw std::runtime_error("concurrency::atomic_rewrite_quantum: "
+                                         "Could not open work file due to " +
+                                         _h.error().message());
+              }
               file_handle h(std::move(_h.value()));
               std::vector<char, utils::page_allocator<char>> buffer(size, no);
               file_handle::const_buffer_type _reqs[1] = {{buffer.data(), size}};
               file_handle::io_request<file_handle::const_buffers_type> reqs(_reqs, 0);
               --done;
-              while(done)
+              while(done != 0u)
+              {
                 std::this_thread::yield();
-              while(!done)
+              }
+              while(done == 0u)
               {
                 h.write(reqs).value();
               }
@@ -416,11 +442,15 @@ namespace storage_profile
             writers.emplace_back(std::make_unique<std::thread>(std::move(task)), std::move(f));
           }
           // Wait till the writers launch
-          while(done)
+          while(done != 0u)
+          {
             std::this_thread::yield();
+          }
           unsigned concurrency = std::thread::hardware_concurrency() - 2;
           if(concurrency < 4)
+          {
             concurrency = 4;
+          }
           std::atomic<io_service::extent_type> atomic_rewrite_quantum(sp.atomic_rewrite_quantum.value);
           std::atomic<bool> failed(false);
           for(unsigned no = 0; no < concurrency; no++)
@@ -428,18 +458,22 @@ namespace storage_profile
             std::packaged_task<void()> task([size, &srch, &done, &atomic_rewrite_quantum, &failed] {
               auto _h(srch.clone());
               if(!_h)
-                throw std::runtime_error("concurrency::atomic_rewrite_quantum: Could not open work file due to " + _h.error().message());
+              {
+                throw std::runtime_error("concurrency::atomic_rewrite_quantum: "
+                                         "Could not open work file due to " +
+                                         _h.error().message());
+              }
               file_handle h(std::move(_h.value()));
               std::vector<char, utils::page_allocator<char>> buffer(size, 0), tocmp(size, 0);
               file_handle::buffer_type _reqs[1] = {{buffer.data(), size}};
               file_handle::io_request<file_handle::buffers_type> reqs(_reqs, 0);
-              while(!done)
+              while(done == 0u)
               {
                 h.read(reqs).value();
                 // memset(tocmp.data(), buffer.front(), size);
                 // if (memcmp(buffer.data(), tocmp.data(), size))
                 {
-                  const size_t *data = (size_t *) buffer.data(), *end = (size_t *) (buffer.data() + size);
+                  const size_t *data = reinterpret_cast<size_t *>(buffer.data()), *end = reinterpret_cast<size_t *>(buffer.data() + size);
                   for(const size_t *d = data; d < end; d++)
                   {
                     if(*d != *data)
@@ -492,13 +526,19 @@ namespace storage_profile
           if(!failed)
           {
             if(size > sp.max_aligned_atomic_rewrite.value)
+            {
               sp.max_aligned_atomic_rewrite.value = size;
+            }
           }
           else
+          {
             break;
+          }
         }
         if(sp.atomic_rewrite_quantum.value > sp.max_aligned_atomic_rewrite.value)
+        {
           sp.atomic_rewrite_quantum.value = sp.max_aligned_atomic_rewrite.value;
+        }
 
         // If burst quantum exceeds rewrite quantum, make sure it does so at
         // offsets not at the front of the file
@@ -508,7 +548,7 @@ namespace storage_profile
 #pragma warning(push)
 #pragma warning(disable : 4456)  // declaration hides previous local declaration
 #endif
-          size_t size = (size_t) sp.max_aligned_atomic_rewrite.value;
+          auto size = static_cast<size_t>(sp.max_aligned_atomic_rewrite.value);
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
@@ -523,15 +563,22 @@ namespace storage_profile
               std::packaged_task<void()> task([size, offset, &srch, no, &done] {
                 auto _h(srch.clone());
                 if(!_h)
-                  throw std::runtime_error("concurrency::atomic_rewrite_quantum: Could not open work file due to " + _h.error().message());
+                {
+                  throw std::runtime_error("concurrency::atomic_rewrite_"
+                                           "quantum: Could not open work file "
+                                           "due to " +
+                                           _h.error().message());
+                }
                 file_handle h(std::move(_h.value()));
                 std::vector<char, utils::page_allocator<char>> buffer(size, no);
                 file_handle::const_buffer_type _reqs[1] = {{buffer.data(), size}};
                 file_handle::io_request<file_handle::const_buffers_type> reqs(_reqs, offset);
                 --done;
-                while(done)
+                while(done != 0u)
+                {
                   std::this_thread::yield();
-                while(!done)
+                }
+                while(done == 0u)
                 {
                   h.write(reqs).value();
                 }
@@ -540,11 +587,15 @@ namespace storage_profile
               writers.emplace_back(std::make_unique<std::thread>(std::move(task)), std::move(f));
             }
             // Wait till the writers launch
-            while(done)
+            while(done != 0u)
+            {
               std::this_thread::yield();
+            }
             unsigned concurrency = std::thread::hardware_concurrency() - 2;
             if(concurrency < 4)
+            {
               concurrency = 4;
+            }
             std::atomic<io_service::extent_type> max_aligned_atomic_rewrite(sp.max_aligned_atomic_rewrite.value);
             std::atomic<bool> failed(false);
             for(unsigned no = 0; no < concurrency; no++)
@@ -552,18 +603,23 @@ namespace storage_profile
               std::packaged_task<void()> task([size, offset, &srch, &done, &max_aligned_atomic_rewrite, &failed] {
                 auto _h(srch.clone());
                 if(!_h)
-                  throw std::runtime_error("concurrency::atomic_rewrite_quantum: Could not open work file due to " + _h.error().message());
+                {
+                  throw std::runtime_error("concurrency::atomic_rewrite_"
+                                           "quantum: Could not open work file "
+                                           "due to " +
+                                           _h.error().message());
+                }
                 file_handle h(std::move(_h.value()));
                 std::vector<char, utils::page_allocator<char>> buffer(size, 0), tocmp(size, 0);
                 file_handle::buffer_type _reqs[1] = {{buffer.data(), size}};
                 file_handle::io_request<file_handle::buffers_type> reqs(_reqs, offset);
-                while(!done)
+                while(done == 0u)
                 {
                   h.read(reqs).value();
                   // memset(tocmp.data(), buffer.front(), size);
                   // if (memcmp(buffer.data(), tocmp.data(), size))
                   {
-                    const size_t *data = (size_t *) buffer.data(), *end = (size_t *) (buffer.data() + size);
+                    const size_t *data = reinterpret_cast<size_t *>(buffer.data()), *end = reinterpret_cast<size_t *>(buffer.data() + size);
                     for(const size_t *d = data; d < end; d++)
                     {
                       if(*d != *data)
@@ -614,7 +670,9 @@ namespace storage_profile
             }
             sp.max_aligned_atomic_rewrite.value = max_aligned_atomic_rewrite;
             if(failed)
+            {
               return success();
+            }
           }
         }
       }
@@ -627,8 +685,10 @@ namespace storage_profile
 
     outcome<void> atomic_rewrite_offset_boundary(storage_profile &sp, file_handle &srch) noexcept
     {
-      if(sp.atomic_rewrite_offset_boundary.value != (io_service::extent_type) -1)
+      if(sp.atomic_rewrite_offset_boundary.value != static_cast<io_service::extent_type>(-1))
+      {
         return success();
+      }
 #ifdef _WIN32  // The 4Kb min i/o makes this test take too long
       if(srch.requires_aligned_io())
         return success();
@@ -636,13 +696,17 @@ namespace storage_profile
       try
       {
         using off_t = io_service::extent_type;
-        size_t size = (size_t) sp.max_aligned_atomic_rewrite.value;
-        size_t maxsize = (size_t) sp.max_aligned_atomic_rewrite.value;
+        auto size = static_cast<size_t>(sp.max_aligned_atomic_rewrite.value);
+        auto maxsize = static_cast<size_t>(sp.max_aligned_atomic_rewrite.value);
         if(size > 1024)
+        {
           size = 1024;
+        }
         if(maxsize > 8192)
+        {
           maxsize = 8192;
-        sp.atomic_rewrite_offset_boundary.value = (off_t) -1;
+        }
+        sp.atomic_rewrite_offset_boundary.value = static_cast<off_t>(-1);
         if(size > 1)
         {
           for(; size <= maxsize; size = size * 2)
@@ -658,15 +722,22 @@ namespace storage_profile
                 std::packaged_task<void()> task([size, offset, &srch, no, &done] {
                   auto _h(srch.clone());
                   if(!_h)
-                    throw std::runtime_error("concurrency::atomic_rewrite_offset_boundary: Could not open work file due to " + _h.error().message());
+                  {
+                    throw std::runtime_error("concurrency::atomic_rewrite_"
+                                             "offset_boundary: Could not open "
+                                             "work file due to " +
+                                             _h.error().message());
+                  }
                   file_handle h(std::move(_h.value()));
                   std::vector<char, utils::page_allocator<char>> buffer(size, no);
                   file_handle::const_buffer_type _reqs[1] = {{buffer.data(), size}};
                   file_handle::io_request<file_handle::const_buffers_type> reqs(_reqs, offset);
                   --done;
-                  while(done)
+                  while(done != 0u)
+                  {
                     std::this_thread::yield();
-                  while(!done)
+                  }
+                  while(done == 0u)
                   {
                     h.write(reqs).value();
                   }
@@ -675,11 +746,15 @@ namespace storage_profile
                 writers.emplace_back(std::make_unique<std::thread>(std::move(task)), std::move(f));
               }
               // Wait till the writers launch
-              while(done)
+              while(done != 0u)
+              {
                 std::this_thread::yield();
+              }
               unsigned concurrency = std::thread::hardware_concurrency() - 2;
               if(concurrency < 4)
+              {
                 concurrency = 4;
+              }
               std::atomic<io_service::extent_type> atomic_rewrite_offset_boundary(sp.atomic_rewrite_offset_boundary.value);
               std::atomic<bool> failed(false);
               for(unsigned no = 0; no < concurrency; no++)
@@ -687,18 +762,23 @@ namespace storage_profile
                 std::packaged_task<void()> task([size, offset, &srch, &done, &atomic_rewrite_offset_boundary, &failed] {
                   auto _h(srch.clone());
                   if(!_h)
-                    throw std::runtime_error("concurrency::atomic_rewrite_offset_boundary: Could not open work file due to " + _h.error().message());
+                  {
+                    throw std::runtime_error("concurrency::atomic_rewrite_"
+                                             "offset_boundary: Could not open "
+                                             "work file due to " +
+                                             _h.error().message());
+                  }
                   file_handle h(std::move(_h.value()));
                   std::vector<char, utils::page_allocator<char>> buffer(size, 0), tocmp(size, 0);
                   file_handle::buffer_type _reqs[1] = {{buffer.data(), size}};
                   file_handle::io_request<file_handle::buffers_type> reqs(_reqs, offset);
-                  while(!done)
+                  while(done == 0u)
                   {
                     h.read(reqs).value();
                     // memset(tocmp.data(), buffer.front(), size);
                     // if (memcmp(buffer.data(), tocmp.data(), size))
                     {
-                      const size_t *data = (size_t *) buffer.data(), *end = (size_t *) (buffer.data() + size);
+                      const size_t *data = reinterpret_cast<size_t *>(buffer.data()), *end = reinterpret_cast<size_t *>(buffer.data() + size);
                       for(const size_t *d = data; d < end; d++)
                       {
                         if(*d != *data)
@@ -749,7 +829,9 @@ namespace storage_profile
               }
               sp.atomic_rewrite_offset_boundary.value = atomic_rewrite_offset_boundary;
               if(failed)
+              {
                 return success();
+              }
             }
           }
         }
@@ -760,7 +842,7 @@ namespace storage_profile
       }
       return success();
     }
-  }
+  }  // namespace concurrency
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
@@ -816,15 +898,17 @@ namespace storage_profile
 #endif
             file_handle &h = *workfiles[no];
             alignas(4096) char buffer[4096];
-            memset(buffer, (int) no, 4096);
+            memset(buffer, static_cast<int>(no), 4096);
             file_handle::const_buffer_type _reqs[1] = {{buffer, 4096}};
             file_handle::io_request<file_handle::const_buffers_type> reqs(_reqs, 0);
-            QUICKCPPLIB_NAMESPACE::algorithm::small_prng::small_prng rand((uint32_t) no);
+            QUICKCPPLIB_NAMESPACE::algorithm::small_prng::small_prng rand(static_cast<uint32_t>(no));
             auto maxsize = h.length().value();
             --done;
-            while(done)
+            while(done != 0u)
+            {
               std::this_thread::yield();
-            while(!done)
+            }
+            while(done == 0u)
             {
               reqs.offset = (rand() % maxsize) & ~4095ULL;
               auto begin = std::chrono::high_resolution_clock::now();
@@ -832,10 +916,14 @@ namespace storage_profile
               auto end = std::chrono::high_resolution_clock::now();
               auto ns = (std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count());
               if(ns == 0)
+              {
                 ns = clock_granularity / 2;
+              }
               results[no].push_back(ns);
               if(results[no].size() == results[no].capacity())
+              {
                 return;
+              }
             }
           });
           auto f(task.get_future());
@@ -849,15 +937,17 @@ namespace storage_profile
 #endif
             file_handle &h = *workfiles[no];
             alignas(4096) char buffer[4096];
-            memset(buffer, (int) no, 4096);
+            memset(buffer, static_cast<int>(no), 4096);
             file_handle::buffer_type _reqs[1] = {{buffer, 4096}};
             file_handle::io_request<file_handle::buffers_type> reqs(_reqs, 0);
-            QUICKCPPLIB_NAMESPACE::algorithm::small_prng::small_prng rand((uint32_t) no);
+            QUICKCPPLIB_NAMESPACE::algorithm::small_prng::small_prng rand(static_cast<uint32_t>(no));
             auto maxsize = h.length().value();
             --done;
-            while(done)
+            while(done != 0u)
+            {
               std::this_thread::yield();
-            while(!done)
+            }
+            while(done == 0u)
             {
               reqs.offset = (rand() % maxsize) & ~4095ULL;
               auto begin = std::chrono::high_resolution_clock::now();
@@ -865,18 +955,24 @@ namespace storage_profile
               auto end = std::chrono::high_resolution_clock::now();
               auto ns = (std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count());  // / 16;
               if(ns == 0)
+              {
                 ns = clock_granularity / 2;
+              }
               results[no].push_back(ns);
               if(results[no].size() == results[no].capacity())
+              {
                 return;
+              }
             }
           });
           auto f(task.get_future());
           readers.emplace_back(std::make_unique<std::thread>(std::move(task)), std::move(f));
         }
         // Wait till the readers and writers launch
-        while(done)
+        while(done != 0u)
+        {
           std::this_thread::yield();
+        }
         auto begin = std::chrono::high_resolution_clock::now();
         while(std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock::now() - begin).count() < (10))
         {
@@ -915,31 +1011,35 @@ namespace storage_profile
         std::vector<unsigned long long> totalresults;
         unsigned long long sum = 0;
         stats s;
-        s.min = (unsigned long long) -1;
-        for(size_t n = 0; n < results.size(); n++)
+        s.min = static_cast<unsigned long long>(-1);
+        for(auto &result : results)
         {
-          for(const auto &i : results[n])
+          for(const auto &i : result)
           {
             if(i < s.min)
+            {
               s.min = i;
+            }
             if(i > s.max)
+            {
               s.max = i;
+            }
             sum += i;
             totalresults.push_back(i);
           }
-          results[n].clear();
-          results[n].shrink_to_fit();
+          result.clear();
+          result.shrink_to_fit();
         }
         std::cout << "Total results = " << totalresults.size() << std::endl;
-        s.mean = (unsigned long long) ((double) sum / totalresults.size());
+        s.mean = static_cast<unsigned long long>(static_cast<double>(sum) / totalresults.size());
         // Latency distributions are definitely not normally distributed, but here we have the
         // advantage of tons of sample points. So simply sort into order, and pluck out the values
         // at 99.999%, 99% and 95%. It'll be accurate enough.
         std::sort(totalresults.begin(), totalresults.end());
-        s._50 = totalresults[(size_t)(0.5 * totalresults.size())];
-        s._95 = totalresults[(size_t)(0.95 * totalresults.size())];
-        s._99 = totalresults[(size_t)(0.99 * totalresults.size())];
-        s._99999 = totalresults[(size_t)(0.99999 * totalresults.size())];
+        s._50 = totalresults[static_cast<size_t>(0.5 * totalresults.size())];
+        s._95 = totalresults[static_cast<size_t>(0.95 * totalresults.size())];
+        s._99 = totalresults[static_cast<size_t>(0.99 * totalresults.size())];
+        s._99999 = totalresults[static_cast<size_t>(0.99999 * totalresults.size())];
         return s;
       }
       catch(...)
@@ -949,8 +1049,10 @@ namespace storage_profile
     }
     outcome<void> read_qd1(storage_profile &sp, file_handle &srch) noexcept
     {
-      if(sp.read_qd1_mean.value != (unsigned long long) -1)
+      if(sp.read_qd1_mean.value != static_cast<unsigned long long>(-1))
+      {
         return success();
+      }
       OUTCOME_TRY(s, _latency_test(srch, 1, 0, false));
       sp.read_qd1_min.value = s.min;
       sp.read_qd1_mean.value = s.mean;
@@ -963,8 +1065,10 @@ namespace storage_profile
     }
     outcome<void> write_qd1(storage_profile &sp, file_handle &srch) noexcept
     {
-      if(sp.write_qd1_mean.value != (unsigned long long) -1)
+      if(sp.write_qd1_mean.value != static_cast<unsigned long long>(-1))
+      {
         return success();
+      }
       OUTCOME_TRY(s, _latency_test(srch, 0, 1, false));
       sp.write_qd1_min.value = s.min;
       sp.write_qd1_mean.value = s.mean;
@@ -977,8 +1081,10 @@ namespace storage_profile
     }
     outcome<void> read_qd16(storage_profile &sp, file_handle &srch) noexcept
     {
-      if(sp.read_qd16_mean.value != (unsigned long long) -1)
+      if(sp.read_qd16_mean.value != static_cast<unsigned long long>(-1))
+      {
         return success();
+      }
       OUTCOME_TRY(s, _latency_test(srch, 16, 0, true));
       sp.read_qd16_min.value = s.min;
       sp.read_qd16_mean.value = s.mean;
@@ -991,8 +1097,10 @@ namespace storage_profile
     }
     outcome<void> write_qd16(storage_profile &sp, file_handle &srch) noexcept
     {
-      if(sp.write_qd16_mean.value != (unsigned long long) -1)
+      if(sp.write_qd16_mean.value != static_cast<unsigned long long>(-1))
+      {
         return success();
+      }
       OUTCOME_TRY(s, _latency_test(srch, 0, 16, true));
       sp.write_qd16_min.value = s.min;
       sp.write_qd16_mean.value = s.mean;
@@ -1005,8 +1113,10 @@ namespace storage_profile
     }
     outcome<void> readwrite_qd4(storage_profile &sp, file_handle &srch) noexcept
     {
-      if(sp.readwrite_qd4_mean.value != (unsigned long long) -1)
+      if(sp.readwrite_qd4_mean.value != static_cast<unsigned long long>(-1))
+      {
         return success();
+      }
       OUTCOME_TRY(s, _latency_test(srch, 3, 1, true));
       sp.readwrite_qd4_min.value = s.min;
       sp.readwrite_qd4_mean.value = s.mean;
@@ -1019,8 +1129,10 @@ namespace storage_profile
     }
     outcome<void> read_nothing(storage_profile &sp, file_handle &srch) noexcept
     {
-      if(sp.read_nothing.value != (unsigned) -1)
+      if(sp.read_nothing.value != static_cast<unsigned>(-1))
+      {
         return success();
+      }
       volatile size_t errors = 0;
       auto begin = std::chrono::high_resolution_clock::now();
       for(size_t n = 0; n < 1000000; n++)
@@ -1032,13 +1144,15 @@ namespace storage_profile
       }
       auto end = std::chrono::high_resolution_clock::now();
       auto diff = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count();
-      sp.read_nothing.value = (unsigned) (diff / 1000000);
+      sp.read_nothing.value = static_cast<unsigned>(diff / 1000000);
       return success();
     }
     outcome<void> write_nothing(storage_profile &sp, file_handle &srch) noexcept
     {
-      if(sp.write_nothing.value != (unsigned) -1)
+      if(sp.write_nothing.value != static_cast<unsigned>(-1))
+      {
         return success();
+      }
       volatile size_t errors = 0;
       auto begin = std::chrono::high_resolution_clock::now();
       for(size_t n = 0; n < 1000000; n++)
@@ -1050,10 +1164,10 @@ namespace storage_profile
       }
       auto end = std::chrono::high_resolution_clock::now();
       auto diff = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count();
-      sp.write_nothing.value = (unsigned) (diff / 1000000);
+      sp.write_nothing.value = static_cast<unsigned>(diff / 1000000);
       return success();
     }
-  }
+  }  // namespace latency
   namespace response_time
   {
     struct stats
@@ -1103,7 +1217,7 @@ namespace storage_profile
           (void) utils::flush_modified_data();
         }
         end = std::chrono::high_resolution_clock::now();
-        s.create = (unsigned long long) ((double) std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count() / no);
+        s.create = static_cast<unsigned long long>(static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count()) / no);
         if(cold_cache)
         {
           (void) utils::drop_filesystem_cache();
@@ -1115,7 +1229,7 @@ namespace storage_profile
         assert(ei.done == true);
         assert(ei.filled.size() == no);
         end = std::chrono::high_resolution_clock::now();
-        s.enumerate = (unsigned long long) ((double) std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count() / no);
+        s.enumerate = static_cast<unsigned long long>(static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count()) / no);
         if(cold_cache)
         {
           (void) utils::drop_filesystem_cache();
@@ -1135,7 +1249,7 @@ namespace storage_profile
             (void) utils::flush_modified_data();
           }
           end = std::chrono::high_resolution_clock::now();
-          s.open_read = (unsigned long long) ((double) std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count() / no);
+          s.open_read = static_cast<unsigned long long>(static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count()) / no);
           if(cold_cache)
           {
             (void) utils::drop_filesystem_cache();
@@ -1153,7 +1267,7 @@ namespace storage_profile
             (void) utils::flush_modified_data();
           }
           end = std::chrono::high_resolution_clock::now();
-          s.open_write = (unsigned long long) ((double) std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count() / no);
+          s.open_write = static_cast<unsigned long long>(static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count()) / no);
           if(cold_cache)
           {
             (void) utils::drop_filesystem_cache();
@@ -1172,7 +1286,7 @@ namespace storage_profile
           (void) utils::flush_modified_data();
         }
         end = std::chrono::high_resolution_clock::now();
-        s.destroy = (unsigned long long) ((double) std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count() / no);
+        s.destroy = static_cast<unsigned long long>(static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count()) / no);
 
         dirh.unlink().value();
         return s;
@@ -1184,8 +1298,10 @@ namespace storage_profile
     }
     outcome<void> traversal_warm_racefree_0b(storage_profile &sp, file_handle &srch) noexcept
     {
-      if(sp.create_file_warm_racefree_0b.value != (unsigned long long) -1)
+      if(sp.create_file_warm_racefree_0b.value != static_cast<unsigned long long>(-1))
+      {
         return success();
+      }
       size_t items = srch.are_writes_durable() ? 256 : 16384;
       OUTCOME_TRY(s, _traversal_N(srch, items, 0, false, true, false));
       sp.create_file_warm_racefree_0b.value = s.create;
@@ -1197,8 +1313,10 @@ namespace storage_profile
     }
     outcome<void> traversal_warm_nonracefree_0b(storage_profile &sp, file_handle &srch) noexcept
     {
-      if(sp.create_file_warm_nonracefree_0b.value != (unsigned long long) -1)
+      if(sp.create_file_warm_nonracefree_0b.value != static_cast<unsigned long long>(-1))
+      {
         return success();
+      }
       size_t items = srch.are_writes_durable() ? 256 : 16384;
       OUTCOME_TRY(s, _traversal_N(srch, items, 0, false, false, false));
       sp.create_file_warm_nonracefree_0b.value = s.create;
@@ -1210,8 +1328,10 @@ namespace storage_profile
     }
     outcome<void> traversal_cold_racefree_0b(storage_profile &sp, file_handle &srch) noexcept
     {
-      if(sp.create_file_cold_racefree_0b.value != (unsigned long long) -1)
+      if(sp.create_file_cold_racefree_0b.value != static_cast<unsigned long long>(-1))
+      {
         return success();
+      }
       size_t items = srch.are_writes_durable() ? 256 : 16384;
       OUTCOME_TRY(s, _traversal_N(srch, items, 0, true, true, false));
       sp.create_file_cold_racefree_0b.value = s.create;
@@ -1237,8 +1357,8 @@ namespace storage_profile
       return success();
     }
     */
-  }
-}
+  }  // namespace response_time
+}  // namespace storage_profile
 AFIO_V2_NAMESPACE_END
 
 #ifdef WIN32

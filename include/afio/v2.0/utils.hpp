@@ -94,17 +94,21 @@ namespace utils
   inline size_t file_buffer_default_size()
   {
     static size_t size;
-    if(!size)
+    if(size == 0u)
     {
       std::vector<size_t> sizes(page_sizes(true));
       for(auto &i : sizes)
+      {
         if(i >= 1024 * 1024)
         {
           size = i;
           break;
         }
-      if(!size)
+      }
+      if(size == 0u)
+      {
         size = 1024 * 1024;
+      }
     }
     return size;
   }
@@ -153,13 +157,10 @@ namespace utils
   {
     struct large_page_allocation
     {
-      void *p;
-      size_t page_size_used;
-      size_t actual_size;
+      void *p{nullptr};
+      size_t page_size_used{0};
+      size_t actual_size{0};
       large_page_allocation()
-          : p(nullptr)
-          , page_size_used(0)
-          , actual_size(0)
       {
       }
       large_page_allocation(void *_p, size_t pagesize, size_t actual)
@@ -177,30 +178,35 @@ namespace utils
       {
         ret.page_size_used = pagesizes.back();
         pagesizes.pop_back();
-      } while(!pagesizes.empty() && !(bytes / ret.page_size_used));
+      } while(!pagesizes.empty() && ((bytes / ret.page_size_used) == 0u));
       ret.actual_size = (bytes + ret.page_size_used - 1) & ~(ret.page_size_used - 1);
       return ret;
     }
     AFIO_HEADERS_ONLY_FUNC_SPEC large_page_allocation allocate_large_pages(size_t bytes);
     AFIO_HEADERS_ONLY_FUNC_SPEC void deallocate_large_pages(void *p, size_t bytes);
-  }
+  }  // namespace detail
   /*! \class page_allocator
   \brief An STL allocator which allocates large TLB page memory.
   \ingroup utils
 
-  If the operating system is configured to allow it, this type of memory is particularly efficient for doing
-  large scale file i/o. This is because the kernel must normally convert the scatter gather buffers you pass
-  into extended scatter gather buffers as the memory you see as contiguous may not, and probably isn't, actually be
-  contiguous in physical memory. Regions returned by this allocator \em may be allocated contiguously in physical
-  memory and therefore the kernel can pass through your scatter gather buffers unmodified.
+  If the operating system is configured to allow it, this type of memory is
+  particularly efficient for doing large scale file i/o. This is because the
+  kernel must normally convert the scatter gather buffers you pass into
+  extended scatter gather buffers as the memory you see as contiguous may not,
+  and probably isn't, actually be contiguous in physical memory. Regions
+  returned by this allocator \em may be allocated contiguously in physical
+  memory and therefore the kernel can pass through your scatter gather buffers
+  unmodified.
 
-  A particularly useful combination with this allocator is with the page_sizes() member function of __afio_dispatcher__.
-  This will return which pages sizes are possible, and which page sizes are enabled for this user. If writing a
-  file copy routine for example, using this allocator with the largest page size as the copy chunk makes a great
-  deal of sense.
+  A particularly useful combination with this allocator is with the
+  page_sizes() member function of __afio_dispatcher__. This will return which
+  pages sizes are possible, and which page sizes are enabled for this user. If
+  writing a file copy routine for example, using this allocator with the
+  largest page size as the copy chunk makes a great deal of sense.
 
-  Be aware that as soon as the allocation exceeds a large page size, most systems allocate in multiples of the large
-  page size, so if the large page size were 2Mb and you allocate 2Mb + 1 byte, 4Mb is actually consumed.
+  Be aware that as soon as the allocation exceeds a large page size, most
+  systems allocate in multiples of the large page size, so if the large page
+  size were 2Mb and you allocate 2Mb + 1 byte, 4Mb is actually consumed.
   */
   template <typename T> class page_allocator
   {
@@ -220,9 +226,9 @@ namespace utils
       using other = page_allocator<U>;
     };
 
-    page_allocator() noexcept {}
+    page_allocator() noexcept = default;
 
-    template <class U> page_allocator(const page_allocator<U> &) noexcept {}
+    template <class U> explicit page_allocator(const page_allocator<U> & /*unused*/) noexcept {}
 
     size_type max_size() const noexcept { return size_type(~0) / sizeof(T); }
 
@@ -230,20 +236,26 @@ namespace utils
 
     const_pointer address(const_reference x) const noexcept { return std::addressof(x); }
 
-    pointer allocate(size_type n, const void * = 0)
+    pointer allocate(size_type n, const void * /*unused*/ = nullptr)
     {
       if(n > max_size())
+      {
         throw std::bad_alloc();
+      }
       auto mem(detail::allocate_large_pages(n * sizeof(T)));
       if(mem.p == nullptr)
+      {
         throw std::bad_alloc();
+      }
       return reinterpret_cast<pointer>(mem.p);
     }
 
     void deallocate(pointer p, size_type n)
     {
       if(n > max_size())
+      {
         throw std::bad_alloc();
+      }
       detail::deallocate_large_pages(p, n * sizeof(T));
     }
 
@@ -254,19 +266,19 @@ namespace utils
   template <> class page_allocator<void>
   {
   public:
-    typedef void value_type;
-    typedef void *pointer;
-    typedef const void *const_pointer;
-    typedef std::true_type propagate_on_container_move_assignment;
-    typedef std::true_type is_always_equal;
+    using value_type = void;
+    using pointer = void *;
+    using const_pointer = const void *;
+    using propagate_on_container_move_assignment = std::true_type;
+    using is_always_equal = std::true_type;
 
     template <class U> struct rebind
     {
-      typedef page_allocator<U> other;
+      using other = page_allocator<U>;
     };
   };
-  template <class T, class U> inline bool operator==(const page_allocator<T> &, const page_allocator<U> &) noexcept { return true; }
-}
+  template <class T, class U> inline bool operator==(const page_allocator<T> & /*unused*/, const page_allocator<U> & /*unused*/) noexcept { return true; }
+}  // namespace utils
 
 AFIO_V2_NAMESPACE_END
 

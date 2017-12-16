@@ -83,11 +83,11 @@ Run as root 'kldload aio' or add 'aio_load=YES' in loader.conf.
 
 #if AFIO_USE_POSIX_AIO
 // We'll be using POSIX AIO and signal based interruption for post()
-#include <signal.h>
+#include <csignal>
 // Do we have realtime signals?
 #if !defined(AFIO_HAVE_REALTIME_SIGNALS) && defined(_POSIX_RTSIG_MAX) && defined(SIGRTMIN)
 #ifndef AFIO_IO_POST_SIGNAL
-#define AFIO_IO_POST_SIGNAL -1
+#define AFIO_IO_POST_SIGNAL (-1)
 #endif
 #define AFIO_HAVE_REALTIME_SIGNALS 1
 #else
@@ -207,11 +207,15 @@ public:
       }
     }
     assert(!pi);
-    if(pi)
+    if(pi != nullptr)
+    {
       abort();
+    }
     _work_done();
-    while(!_posts.empty() && !_posts.front().service)
+    while(!_posts.empty() && (_posts.front().service == nullptr))
+    {
       _posts.pop_front();
+    }
   }
   void _post_done(post_info *pi)
   {
@@ -231,8 +235,8 @@ public:
 
 #ifdef AFIO_IO_POST_SIGNAL
 private:
-  int _blocked_interrupt_signal;
-  std::atomic<bool> _need_signal;  // false = signal not needed, true = signal needed
+  int _blocked_interrupt_signal{0};
+  std::atomic<bool> _need_signal{false};  // false = signal not needed, true = signal needed
   AFIO_HEADERS_ONLY_MEMFUNC_SPEC void _block_interruption() noexcept;
   AFIO_HEADERS_ONLY_MEMFUNC_SPEC void _unblock_interruption() noexcept;
 
@@ -251,7 +255,7 @@ public:
 
   \note Only present if AFIO_IO_POST_SIGNAL is defined.
   */
-  static AFIO_HEADERS_ONLY_MEMFUNC_SPEC int set_interruption_signal(int sig = AFIO_IO_POST_SIGNAL);
+  static AFIO_HEADERS_ONLY_MEMFUNC_SPEC int set_interruption_signal(int signo = AFIO_IO_POST_SIGNAL);
 #endif
 
 #if AFIO_USE_POSIX_AIO

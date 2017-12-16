@@ -131,7 +131,7 @@ namespace algorithm
           AFIO_LOG_FUNCTION_CALL(0);
           _h = file_handle::file(base, lockfile, file_handle::mode::write, file_handle::creation::if_needed, file_handle::caching::temporary).value();
         }
-        AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> _lock(entities_guard &out, deadline d, bool spin_not_sleep) noexcept override final
+        AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> _lock(entities_guard &out, deadline d, bool spin_not_sleep) noexcept final
         {
           AFIO_LOG_FUNCTION_CALL(this);
           unsigned mythreadid = QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id();
@@ -140,16 +140,20 @@ namespace algorithm
           if(d)
           {
             if((d).steady)
+            {
               began_steady = std::chrono::steady_clock::now();
+            }
             else
+            {
               end_utc = (d).to_time_point();
+            }
           }
           // Fire this if an error occurs
           auto disableunlock = undoer([&] { out.release(); });
           size_t n;
           for(;;)
           {
-            size_t was_contended = (size_t) -1;
+            auto was_contended = static_cast<size_t>(-1);
             bool pls_sleep = true;
             std::unique_lock<decltype(_m)> guard(_m);
             {
@@ -174,8 +178,10 @@ namespace algorithm
                   // This entity has not been locked before
                   deadline nd;
                   // Only for very first entity will we sleep until its lock becomes available
-                  if(n)
+                  if(n != 0u)
+                  {
                     nd = deadline(std::chrono::seconds(0));
+                  }
                   else
                   {
                     nd = deadline();
@@ -185,17 +191,23 @@ namespace algorithm
                       {
                         std::chrono::nanoseconds ns = std::chrono::duration_cast<std::chrono::nanoseconds>((began_steady + std::chrono::nanoseconds((d).nsecs)) - std::chrono::steady_clock::now());
                         if(ns.count() < 0)
+                        {
                           (nd).nsecs = 0;
+                        }
                         else
+                        {
                           (nd).nsecs = ns.count();
+                        }
                       }
                       else
+                      {
                         (nd) = (d);
+                      }
                     }
                   }
                   // Allow other threads to use this threaded_byte_ranges
                   guard.unlock();
-                  auto outcome = _h.lock(out.entities[n].value, 1, out.entities[n].exclusive, nd);
+                  auto outcome = _h.lock(out.entities[n].value, 1, out.entities[n].exclusive != 0u, nd);
                   guard.lock();
                   if(!outcome)
                   {
@@ -207,14 +219,11 @@ namespace algorithm
                   it = _thread_locks.find(out.entities[n].value);
                   if(it == _thread_locks.end())
                   {
-                    it = _thread_locks.insert(std::make_pair((entity_type::value_type) out.entities[n].value, _entity_info(out.entities[n].exclusive, mythreadid, std::move(outcome).value()))).first;
+                    it = _thread_locks.insert(std::make_pair(static_cast<entity_type::value_type>(out.entities[n].value), _entity_info(out.entities[n].exclusive != 0u, mythreadid, std::move(outcome).value()))).first;
                     continue;
                   }
-                  else
-                  {
-                    // Otherwise throw away the presumably shared superfluous byte range lock
-                    assert(!out.entities[n].exclusive);
-                  }
+                  // Otherwise throw away the presumably shared superfluous byte range lock
+                  assert(!out.entities[n].exclusive);
                 }
 
                 // If we are here, then this entity has been locked by someone before
@@ -226,7 +235,7 @@ namespace algorithm
                   if(it->second.writer_tid == mythreadid)
                   {
                     // If I am relocking myself, return deadlock
-                    if(out.entities[n].exclusive || already_have_shared_lock)
+                    if((out.entities[n].exclusive != 0u) || already_have_shared_lock)
                     {
                       return std::errc::resource_deadlock_would_occur;
                     }
@@ -234,17 +243,14 @@ namespace algorithm
                     it->second.reader_tids.push_back(mythreadid);
                     continue;
                   }
-                  else
-                  {
-                    // Some other thread holds the exclusive lock, so we cannot take it
-                    was_contended = n;
-                    pls_sleep = true;
-                    goto failed;
-                  }
+                  // Some other thread holds the exclusive lock, so we cannot take it
+                  was_contended = n;
+                  pls_sleep = true;
+                  goto failed;
                 }
                 // If reached here, nobody is holding the exclusive lock
                 assert(it->second.writer_tid == 0);
-                if(!out.entities[n].exclusive)
+                if(out.entities[n].exclusive == 0u)
                 {
                   // If I am relocking myself, return deadlock
                   if(already_have_shared_lock)
@@ -259,8 +265,10 @@ namespace algorithm
                 assert(out.entities[n].exclusive);
                 deadline nd;
                 // Only for very first entity will we sleep until its lock becomes available
-                if(n)
+                if(n != 0u)
+                {
                   nd = deadline(std::chrono::seconds(0));
+                }
                 else
                 {
                   nd = deadline();
@@ -270,12 +278,18 @@ namespace algorithm
                     {
                       std::chrono::nanoseconds ns = std::chrono::duration_cast<std::chrono::nanoseconds>((began_steady + std::chrono::nanoseconds((d).nsecs)) - std::chrono::steady_clock::now());
                       if(ns.count() < 0)
+                      {
                         (nd).nsecs = 0;
+                      }
                       else
+                      {
                         (nd).nsecs = ns.count();
+                      }
                     }
                     else
+                    {
                       (nd) = (d);
+                    }
                   }
                 }
                 // Allow other threads to use this threaded_byte_ranges
@@ -306,12 +320,16 @@ namespace algorithm
               if((d).steady)
               {
                 if(std::chrono::steady_clock::now() >= (began_steady + std::chrono::nanoseconds((d).nsecs)))
+                {
                   return std::errc::timed_out;
+                }
               }
               else
               {
                 if(std::chrono::system_clock::now() >= end_utc)
+                {
                   return std::errc::timed_out;
+                }
               }
             }
             // Move was_contended to front and randomise rest of out.entities
@@ -335,7 +353,7 @@ namespace algorithm
           }
           // return success();
         }
-        AFIO_HEADERS_ONLY_VIRTUAL_SPEC void unlock(entities_type entities, unsigned long long /*unused*/) noexcept override final
+        AFIO_HEADERS_ONLY_VIRTUAL_SPEC void unlock(entities_type entities, unsigned long long /*unused*/) noexcept final
         {
           AFIO_LOG_FUNCTION_CALL(this);
           unsigned mythreadid = QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id();
@@ -362,9 +380,13 @@ namespace algorithm
         try
         {
           path_view::c_str zpath(lockfile);
-          struct stat s;
+          struct stat s
+          {
+          };
           if(-1 == ::fstatat(base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.buffer, &s, AT_SYMLINK_NOFOLLOW))
-            return {errno, std::system_category()};
+          {
+            return { errno, std::system_category() };
+          }
           threaded_byte_ranges_list::key_type key;
           key.as_longlongs[0] = s.st_ino;
           key.as_longlongs[1] = s.st_dev;
@@ -396,8 +418,8 @@ namespace algorithm
           return error_from_exception();
         }
       }
-    }
-  }  // namespace
-}  // namespace
+    }  // namespace detail
+  }    // namespace shared_fs_mutex
+}  // namespace algorithm
 
 AFIO_V2_NAMESPACE_END

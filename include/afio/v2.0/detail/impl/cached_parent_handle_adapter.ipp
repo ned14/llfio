@@ -76,7 +76,9 @@ namespace algorithm
       path.remove_filename();
       filesystem::path dirpath;
       if(base.is_valid())
+      {
         dirpath = base.current_path().value() / path.path();
+      }
       else
       {
         dirpath = path.path();
@@ -118,7 +120,9 @@ namespace algorithm
       {
         cached_path_handle_ptr ret = it->second.lock();
         if(ret)
-          return {ret, leaf.path()};
+        {
+          return { ret, leaf.path() }
+        };
       }
       cached_path_handle_ptr ret = std::make_shared<cached_path_handle>(directory_handle::directory(base, path).value());
       auto _currentpath = ret->h.current_path();
@@ -141,7 +145,7 @@ namespace algorithm
       }
       return {ret, leaf.path()};
     }
-  }
-}
+  }  // namespace detail
+}  // namespace algorithm
 
 AFIO_V2_NAMESPACE_END

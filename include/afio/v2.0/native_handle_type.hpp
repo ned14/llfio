@@ -63,13 +63,13 @@ struct native_handle_type
   QUICKCPPLIB_BITFIELD_END(disposition)
   disposition behaviour;  //! The behaviour of the handle
   union {
-    intptr_t _init;
-    int fd;         //!< A POSIX file descriptor
+    intptr_t _init{-1};
+    int fd;       //!< A POSIX file descriptor
     int pid;        //!< A POSIX process identifier
     win::handle h;  //!< A Windows HANDLE
   };
   //! Constructs a default instance
-  constexpr native_handle_type() noexcept : behaviour(), _init(-1) {}
+  constexpr native_handle_type() noexcept {}
   //! Construct from a POSIX file descriptor
   constexpr native_handle_type(disposition _behaviour, int _fd) noexcept : behaviour(_behaviour), fd(_fd) {}
   //! Construct from a Windows HANDLE
@@ -78,7 +78,7 @@ struct native_handle_type
   //! Copy construct
   constexpr native_handle_type(const native_handle_type &) = default;
   //! Move construct
-  constexpr native_handle_type(native_handle_type &&o) noexcept : behaviour(std::move(o.behaviour)), _init(std::move(o._init))
+  constexpr native_handle_type(native_handle_type &&o) noexcept : behaviour(o.behaviour), _init(o._init)
   {
     o.behaviour = disposition();
     o._init = -1;
@@ -88,8 +88,8 @@ struct native_handle_type
   //! Move assign
   constexpr native_handle_type &operator=(native_handle_type &&o) noexcept
   {
-    behaviour = std::move(o.behaviour);
-    _init = std::move(o._init);
+    behaviour = o.behaviour;
+    _init = o._init;
     o.behaviour = disposition();
     o._init = -1;
     return *this;

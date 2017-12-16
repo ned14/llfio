@@ -134,7 +134,7 @@ public:
   mapped_file_handle() = default;
 
   //! Implicit move construction of mapped_file_handle permitted
-  mapped_file_handle(mapped_file_handle &&o) noexcept : file_handle(std::move(o)), _reservation(std::move(o._reservation)), _sh(std::move(o._sh)), _mh(std::move(o._mh))
+  mapped_file_handle(mapped_file_handle &&o) noexcept : file_handle(std::move(o)), _reservation(o._reservation), _sh(std::move(o._sh)), _mh(std::move(o._mh))
   {
     _sh.set_backing(this);
     _mh.set_section(&_sh);
@@ -230,7 +230,9 @@ public:
         randomname.append(".random");
         result<mapped_file_handle> ret = mapped_file(reservation, dirpath, randomname, _mode, creation::only_if_not_exist, _caching, flags);
         if(ret || (!ret && ret.error() != std::errc::file_exists))
+        {
           return ret;
+        }
       }
     }
     catch(...)
@@ -272,7 +274,7 @@ public:
   AFIO_MAKE_FREE_FUNCTION
   static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<mapped_file_handle> mapped_temp_inode(const path_handle &dir = path_discovery::storage_backed_temporary_files_directory(), mode _mode = mode::write, flag flags = flag::none) noexcept
   {
-    OUTCOME_TRY(v, file_handle::temp_inode(dir, std::move(_mode), flags));
+    OUTCOME_TRY(v, file_handle::temp_inode(dir, _mode, flags));
     mapped_file_handle ret(std::move(v));
     return std::move(ret);
   }
@@ -305,7 +307,7 @@ public:
   */
   AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_type> reserve(size_type reservation = 0) noexcept;
 
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC ~mapped_file_handle()
+  AFIO_HEADERS_ONLY_VIRTUAL_SPEC ~mapped_file_handle() override
   {
     if(_v)
     {
@@ -314,10 +316,7 @@ public:
   }
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> close() noexcept override;
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC native_handle_type release() noexcept override;
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> barrier(io_request<const_buffers_type> reqs = io_request<const_buffers_type>(), bool wait_for_device = false, bool and_metadata = false, deadline d = deadline()) noexcept override
-  {
-    return _mh.barrier(std::move(reqs), wait_for_device, and_metadata, std::move(d));
-  }
+  AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> barrier(io_request<const_buffers_type> reqs = io_request<const_buffers_type>(), bool wait_for_device = false, bool and_metadata = false, deadline d = deadline()) noexcept override { return _mh.barrier(reqs, wait_for_device, and_metadata, d); }
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<file_handle> clone(mode mode_ = mode::unchanged, caching caching_ = caching::unchanged, deadline d = std::chrono::seconds(30)) const noexcept override
   {
     OUTCOME_TRY(fh, file_handle::clone(mode_, caching_, d));
@@ -381,7 +380,7 @@ public:
   \errors None, though the various signals and structured exception throws common to using memory maps may occur.
   \mallocs None.
   */
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<buffers_type> read(io_request<buffers_type> reqs, deadline d = deadline()) noexcept override { return _mh.read(std::move(reqs), std::move(d)); }
+  AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<buffers_type> read(io_request<buffers_type> reqs, deadline d = deadline()) noexcept override { return _mh.read(reqs, d); }
   /*! \brief Write data to the mapped file.
 
   \return The buffers written, which will never be the buffers input because they will point at where the data was copied into the mapped view.
@@ -391,7 +390,7 @@ public:
   \errors None, though the various signals and structured exception throws common to using memory maps may occur.
   \mallocs None.
   */
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> write(io_request<const_buffers_type> reqs, deadline d = deadline()) noexcept override { return _mh.write(std::move(reqs), std::move(d)); }
+  AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> write(io_request<const_buffers_type> reqs, deadline d = deadline()) noexcept override { return _mh.write(reqs, d); }
 };
 
 //! \brief Constructor for `mapped_file_handle`

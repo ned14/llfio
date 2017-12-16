@@ -56,41 +56,43 @@ struct AFIO_DECL statfs_t
     uint32_t compression : 1;      //!< Filing system provides whole volume compression                 (Windows, POSIX)
     uint32_t extents : 1;          //!< Filing system provides extent based file storage (sparse files) (Windows, POSIX)
     uint32_t filecompression : 1;  //!< Filing system provides per-file selectable compression          (Windows)
-  } f_flags;                       /*!< copy of mount exported flags       (Windows, POSIX) */
-  uint64_t f_bsize;                /*!< fundamental filesystem block size  (Windows, POSIX) */
-  uint64_t f_iosize;               /*!< optimal transfer block size        (Windows, POSIX) */
-  uint64_t f_blocks;               /*!< total data blocks in filesystem    (Windows, POSIX) */
-  uint64_t f_bfree;                /*!< free blocks in filesystem          (Windows, POSIX) */
-  uint64_t f_bavail;               /*!< free blocks avail to non-superuser (Windows, POSIX) */
-  uint64_t f_files;                /*!< total file nodes in filesystem     (POSIX) */
-  uint64_t f_ffree;                /*!< free nodes avail to non-superuser  (POSIX) */
-  uint32_t f_namemax;              /*!< maximum filename length            (Windows, POSIX) */
+  } f_flags{};                     /*!< copy of mount exported flags       (Windows, POSIX) */
+  uint64_t f_bsize{};              /*!< fundamental filesystem block size  (Windows, POSIX) */
+  uint64_t f_iosize{};             /*!< optimal transfer block size        (Windows, POSIX) */
+  uint64_t f_blocks{};             /*!< total data blocks in filesystem    (Windows, POSIX) */
+  uint64_t f_bfree{};              /*!< free blocks in filesystem          (Windows, POSIX) */
+  uint64_t f_bavail{};             /*!< free blocks avail to non-superuser (Windows, POSIX) */
+  uint64_t f_files{};              /*!< total file nodes in filesystem     (POSIX) */
+  uint64_t f_ffree{};              /*!< free nodes avail to non-superuser  (POSIX) */
+  uint32_t f_namemax{};            /*!< maximum filename length            (Windows, POSIX) */
 #ifndef _WIN32
-  int16_t f_owner; /*!< user that mounted the filesystem   (BSD, OS X) */
+  int16_t f_owner{}; /*!< user that mounted the filesystem   (BSD, OS X) */
 #endif
-  uint64_t f_fsid[2];           /*!< filesystem id                      (Windows, POSIX) */
+  uint64_t f_fsid[2]{};         /*!< filesystem id                      (Windows, POSIX) */
   std::string f_fstypename;     /*!< filesystem type name               (Windows, POSIX) */
   std::string f_mntfromname;    /*!< mounted filesystem                 (Windows, POSIX) */
   filesystem::path f_mntonname; /*!< directory on which mounted         (Windows, POSIX) */
 
   //! Used to indicate what metadata should be filled in
-  QUICKCPPLIB_BITFIELD_BEGIN(want) { flags = 1 << 0, bsize = 1 << 1, iosize = 1 << 2, blocks = 1 << 3, bfree = 1 << 4, bavail = 1 << 5, files = 1 << 6, ffree = 1 << 7, namemax = 1 << 8, owner = 1 << 9, fsid = 1 << 10, fstypename = 1 << 11, mntfromname = 1 << 12, mntonname = 1 << 13, all = (unsigned) -1 }
+  QUICKCPPLIB_BITFIELD_BEGIN(want) { flags = 1 << 0, bsize = 1 << 1, iosize = 1 << 2, blocks = 1 << 3, bfree = 1 << 4, bavail = 1 << 5, files = 1 << 6, ffree = 1 << 7, namemax = 1 << 8, owner = 1 << 9, fsid = 1 << 10, fstypename = 1 << 11, mntfromname = 1 << 12, mntonname = 1 << 13, all = static_cast<unsigned>(-1) }
   QUICKCPPLIB_BITFIELD_END(want)
   //! Constructs a default initialised instance (all bits set)
   statfs_t()
   {
-    size_t frontbytes = ((char *) &f_fstypename) - ((char *) this);
+    size_t frontbytes = (reinterpret_cast<char *>(&f_fstypename)) - (reinterpret_cast<char *>(this));
     memset(this, 0xff, frontbytes);
     memset(this, 0, sizeof(f_flags));
   }
 #ifdef __cpp_exceptions
   //! Constructs a filled instance, throwing as an exception any error which might occur
-  statfs_t(const handle &h, want wanted = want::all)
+  explicit statfs_t(const handle &h, want wanted = want::all)
       : statfs_t()
   {
     auto v(fill(h, wanted));
     if(v.has_error())
+    {
       v.error().throw_as_exception();
+    }
   }
 #endif
   //! Fills in the structure with metadata, returning number of items filled in
