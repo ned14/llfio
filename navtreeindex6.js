@@ -1,5 +1,7 @@
 var NAVTREEINDEX6 =
 {
+"structafio__v2__xxx_1_1construct_3_01mapped__file__handle_01_4.html#ac804d51eacb3217f415e63f870f993c1":[3,0,0,11,7],
+"structafio__v2__xxx_1_1construct_3_01mapped__file__handle_01_4.html#ad69599525e5d835b5b73f87f62497c6a":[3,0,0,11,5],
 "structafio__v2__xxx_1_1construct_3_01mapped__file__handle_01_4.html#aeb1703dfe797a5a0c2dd3dff66a40ba3":[3,0,0,11,0],
 "structafio__v2__xxx_1_1construct_3_01mapped__file__handle_01_4.html#aec02b80a89b23de312e0f6a3b0a47f0d":[3,0,0,11,6],
 "structafio__v2__xxx_1_1construct_3_01path__handle_01_4.html":[3,0,0,12],
@@ -158,13 +160,13 @@ var NAVTREEINDEX6 =
 "structafio__v2__xxx_1_1stat__t.html#a0ffd227226a02f4507fd69039e3b7aed":[3,0,0,32,7],
 "structafio__v2__xxx_1_1stat__t.html#a28c1c62cef680fcd70df29508d6587af":[3,0,0,32,16],
 "structafio__v2__xxx_1_1stat__t.html#a3095960c9c7bf14371869b6278ab3d8a":[3,0,0,32,19],
-"structafio__v2__xxx_1_1stat__t.html#a43962c6fd805a803986ded6c91b01cbc":[3,0,0,32,2],
 "structafio__v2__xxx_1_1stat__t.html#a594e03167fe2b5315ef61edc532ab840":[3,0,0,32,4],
 "structafio__v2__xxx_1_1stat__t.html#a6461e6278085dea3b33b865867746f6d":[3,0,0,32,23],
 "structafio__v2__xxx_1_1stat__t.html#a76b46ca289cd0bb1ed94c5eb8273e52d":[3,0,0,32,25],
 "structafio__v2__xxx_1_1stat__t.html#a7870b1954f030a7af49ab8b98ca4c71f":[3,0,0,32,15],
 "structafio__v2__xxx_1_1stat__t.html#a78b6297a93774d5d2c1499cad3de366d":[3,0,0,32,21],
 "structafio__v2__xxx_1_1stat__t.html#a8057fa7dddeb8373f762b4d1a7f31747":[3,0,0,32,17],
+"structafio__v2__xxx_1_1stat__t.html#a84bd9a56f4639702d233b2b8bb258beb":[3,0,0,32,2],
 "structafio__v2__xxx_1_1stat__t.html#a869c50d26a4ecceaca4bd36edc8781c0":[3,0,0,32,8],
 "structafio__v2__xxx_1_1stat__t.html#a998eb1b348255bdcfa25e2f99064e5e5":[3,0,0,32,18],
 "structafio__v2__xxx_1_1stat__t.html#a9b925315d4e65458bd5382efc343dec5":[3,0,0,32,10],
@@ -247,7 +249,5 @@ var NAVTREEINDEX6 =
 "structafio__v2__xxx_1_1statfs__t_1_1want__base.html#a328ecf03e9e9d49f6a7e5ba513b4bcedacfbeed8e100ea7e7b2e6ee5c18047a3a":[3,0,0,33,1,0,12],
 "structafio__v2__xxx_1_1statfs__t_1_1want__base.html#a328ecf03e9e9d49f6a7e5ba513b4bcedaee8b566b96ead2727d5790db395cf818":[3,0,0,33,1,0,6],
 "structafio__v2__xxx_1_1statfs__t_1_1want__base.html#a328ecf03e9e9d49f6a7e5ba513b4bcedaf376e6b0d61316509a37ec70b66ff060":[3,0,0,33,1,0,14],
-"structafio__v2__xxx_1_1statfs__t_1_1want__base.html#a328ecf03e9e9d49f6a7e5ba513b4bcedafecd7ffad2bb412c9794142dff71b4f7":[3,0,0,33,1,0,3],
-"structafio__v2__xxx_1_1storage__profile_1_1item.html":[3,0,0,2,0],
-"structafio__v2__xxx_1_1storage__profile_1_1item.html#a14bac4885038259853d4b82eab6d9c67":[3,0,0,2,0,5]
+"structafio__v2__xxx_1_1statfs__t_1_1want__base.html#a328ecf03e9e9d49f6a7e5ba513b4bcedafecd7ffad2bb412c9794142dff71b4f7":[3,0,0,33,1,0,3]
 };
