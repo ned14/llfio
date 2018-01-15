@@ -105,7 +105,7 @@ struct stat_t
   }
   QUICKCPPLIB_BITFIELD_END(want)
   //! Constructs a UNINITIALIZED instance i.e. full of random garbage
-  stat_t() noexcept = default;
+  stat_t() = default;
   //! Constructs a zeroed instance
   constexpr explicit stat_t(std::nullptr_t) noexcept : st_dev(0),
                                                        st_ino(0),
@@ -133,7 +133,6 @@ struct stat_t
 #ifdef __cpp_exceptions
   //! Constructs a filled instance, throwing as an exception any error which might occur
   explicit stat_t(const handle &h, want wanted = want::all)
-      : stat_t()
   {
     auto v(fill(h, wanted));
     if(v.has_error())

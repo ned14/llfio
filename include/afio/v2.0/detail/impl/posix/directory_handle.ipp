@@ -137,7 +137,7 @@ result<directory_handle> directory_handle::clone(mode mode_, caching caching_, d
     ret.value()._v.fd = ::fcntl(_v.fd, F_DUPFD_CLOEXEC);
     if(-1 == ret.value()._v.fd)
     {
-      return { errno, std::system_category() };
+      return {errno, std::system_category()};
     }
     return ret;
   }
@@ -201,7 +201,7 @@ result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_typ
   AFIO_LOG_FUNCTION_CALL(this);
   if(tofill.empty())
   {
-    return enumerate_info { std::move(tofill), stat_t::want::none, false };
+    return enumerate_info{std::move(tofill), stat_t::want::none, false};
   }
   // Is glob a single entry match? If so, this is really a stat call
   path_view_type::c_str zglob(glob);
@@ -212,7 +212,7 @@ result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_typ
     };
     if(-1 == ::fstatat(_v.fd, zglob.buffer, &s, AT_SYMLINK_NOFOLLOW))
     {
-      return { errno, std::system_category() };
+      return {errno, std::system_category()};
     }
     tofill[0].stat.st_dev = s.st_dev;
     tofill[0].stat.st_ino = s.st_ino;
@@ -252,7 +252,7 @@ result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_typ
     tofill[0].stat.st_birthtim = to_timepoint(s.st_birthtim);
 #endif
 #endif
-    tofill[0].stat.st_sparse = static_cast<unsigned int>((static_cast<handle::extent_type>(s.st_blocks) * 512) < static_cast<handle::extent_type>(s.st_size);
+    tofill[0].stat.st_sparse = static_cast<unsigned int>((static_cast<handle::extent_type>(s.st_blocks) * 512) < static_cast<handle::extent_type>(s.st_size));
     tofill._resize(1);
     static constexpr stat_t::want default_stat_contents = stat_t::want::dev | stat_t::want::ino | stat_t::want::type | stat_t::want::perms | stat_t::want::nlink | stat_t::want::uid | stat_t::want::gid | stat_t::want::rdev | stat_t::want::atim | stat_t::want::mtim | stat_t::want::ctim | stat_t::want::size |
                                                           stat_t::want::allocated | stat_t::want::blocks | stat_t::want::blksize
@@ -308,7 +308,7 @@ result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_typ
 #ifdef __linux__
     if(-1 == ::lseek64(_v.fd, 0, SEEK_SET))
     {
-      return { errno, std::system_category() };
+      return {errno, std::system_category()};
     }
 #else
     if(-1 == ::lseek(_v.fd, 0, SEEK_SET))

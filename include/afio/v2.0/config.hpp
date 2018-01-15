@@ -337,8 +337,8 @@ public:
       : error_info(std::error_code(code, cat))
   {
   }
-  // Construct from an error code
-  inline explicit error_info(std::error_code _ec);
+  // Implicit construction from an error code
+  inline error_info(std::error_code _ec);  // NOLINT
   /* NOTE TO SELF: The error_info constructor implementation is in handle.hpp as we need that
   defined before we can do useful logging.
   */
@@ -346,7 +346,7 @@ public:
   OUTCOME_TEMPLATE(class ErrorCondEnum)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_error_condition_enum<ErrorCondEnum>::value))
   error_info(ErrorCondEnum &&v)  // NOLINT
-      : error_info(make_error_code(std::forward<ErrorCondEnum>(v)))
+  : error_info(make_error_code(std::forward<ErrorCondEnum>(v)))
   {
   }
 

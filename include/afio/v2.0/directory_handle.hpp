@@ -88,8 +88,8 @@ public:
   struct buffers_type : public span<buffer_type>
   {
     using span<buffer_type>::span;
-    explicit buffers_type(span<buffer_type> v)
-        : span<buffer_type>(v)
+    buffers_type(span<buffer_type> v)  // NOLINT
+    : span<buffer_type>(v)
     {
     }
     buffers_type(buffers_type &&o) noexcept : span<buffer_type>(std::move(o)), _kernel_buffer(std::move(o._kernel_buffer)), _kernel_buffer_size(o._kernel_buffer_size)
@@ -120,10 +120,7 @@ public:
 
 public:
   //! Default constructor
-  constexpr directory_handle()
-      :,
-  {
-  }
+  constexpr directory_handle() = default;
   //! Construct a directory_handle from a supplied native path_handle
   explicit constexpr directory_handle(native_handle_type h, dev_t devid, ino_t inode, caching caching = caching::all, flag flags = flag::none)
       : path_handle(std::move(h), caching, flags)

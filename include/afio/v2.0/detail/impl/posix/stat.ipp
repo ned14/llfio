@@ -74,7 +74,7 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> stat_t::fill(const handle &h, stat
 
   if(-1 == ::fstat(h.native_handle().fd, &s))
   {
-    return { errno, std::system_category() };
+    return {errno, std::system_category()};
   }
   if(wanted & want::dev)
   {
@@ -216,7 +216,7 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> stat_t::fill(const handle &h, stat
 #endif
   if(wanted & want::sparse)
   {
-    st_sparse = static_cast<unsigned int>((static_cast<handle::extent_type>(s.st_blocks) * 512) < static_cast<handle::extent_type>(s.st_size);
+    st_sparse = static_cast<unsigned int>((static_cast<handle::extent_type>(s.st_blocks) * 512) < static_cast<handle::extent_type>(s.st_size));
     ++ret;
   }
   return ret;

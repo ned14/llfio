@@ -198,7 +198,7 @@ private:
 #endif
 public:
   //! Constructs an empty path view
-  constexpr path_view() noexcept: {}
+  constexpr path_view() noexcept {}
   //! Implicitly constructs a path view from a path. The input path MUST continue to exist for this view to be valid.
   path_view(const filesystem::path &v) noexcept : _state(v.native()) {}  // NOLINT
   //! Implicitly constructs a UTF-8 path view from a string. The input string MUST continue to exist for this view to be valid.
